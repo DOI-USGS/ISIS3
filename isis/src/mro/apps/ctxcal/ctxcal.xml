@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="ctxcal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Radiometrically calibrates a CTX image
+  </brief>
+
+  <description>
+    <p>
+    ctxcal performs radiometric corrections to images acquired by the Context
+    Imager aboard the Mars Reconnaissance Orbiter spacecraft.  The CTX camera
+    will make observations simulteously with the HiRise camera.
+    </p>
+
+    <p>
+    The MRO CTX detector has a total of 5000 pixels, divided among an A
+    channel and a B channel.  The pixels alternate between the two channels:
+    ABABABAB, etc.  Images from CTX may or may not include all pixels in the
+    acquired image.  There are special summing modes that are utilized
+    on-board the spacecraft to average detector pixels to combine them into a
+    single output pixel value.  The value of the ISIS label keyord,
+    SpatialSumming, indicates the number of samples that were summed and
+    averaged to result in the pixel values stored in the file.  Note that this
+    will reduce the number of samples in the output image by a factor of at
+    most the SpatialSumming mode value.
+    </p>
+    <p>
+    The CTX camera has the ability to acquire images of differing sizes in
+    both line and sample.  The starting hardware detector pixel for the
+    acquired image is specified by the ISIS label keyword, SampleFirstPixel.
+    The first pixel in the detector is indicated by a value of 0.
+    </p>
+
+    <p>
+    Dark current pixels are taken for each line and are stored in the Isis
+    cube as a table, named "Ctx Prefix Dark Pixels".  The number of dark
+    current pixels in this table is dependent on the SpatialSumming and the
+    SampleFirstPixel keywords from the labels.  The following table shows the
+    association between these keywords and dark current pixels.
+    </p>
+
+    <table class="tableFormattedInformation">
+      <caption>
+        Association between keywords the number of dark current pixels
+      </caption>
+      <col class="number"/>
+      <col class="number"/>
+      <col class="number"/>
+      <col class="text"/>
+      <tr>
+        <th>SpatialSumming</th>
+        <th>SampleFirstPixel</th>
+        <th colspan="2">Number of Dark current pixels in the table</th>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td>0</td>
+          <td>24 </td>
+          <td>(12 for each channel, stored as ABABABABABABABABABABABAB)</td>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td>&gt;0</td>
+          <td>16 </td>
+          <td>(8 for each channel, stored  as ABABABABABABABAB)</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>0</td>
+          <td>12 </td>
+          <td>(The dc pixels for the A and B channel have been summed together)</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>&gt;0</td>
+          <td>8 </td>
+          <td>(The dc pixels for the A and B channel have been summed together)</td>
+      </tr>
+    </table>
+
+    <p>
+    If SpatialSumming is 1 the dark current pixels are averaged together then
+    this average is subtracted from all image pixels.  If SpatialSumming is 2,
+    the dark current pixels for the A and B channel are averaged separately,
+    then the A channel dark average is subtracted from the A channel image
+    pixels and the B channel dark average is subtracted from the B channel
+    image pixels.
+    </p>
+
+    <p>
+    The equation ctxcal implements is as follows:
+
+    <pre>
+    r = ( dn - dc / (gain(i,j) * exp)
+    </pre>
+
+    where r is the average signal being generated at the focal plane (in
+    DN/msec), dc is the dark current term (in DN/msec), gain(i,j) is the pixel
+    dependent gain, and ex is the exposure time in milliseconds.
+    </p>
+
+    <p>
+    If the IOF parameter is chosen, the output pixels are converted to
+    relative reflectance (I/F) using the solar radiance, with an albedo 1
+    target at normal incidence at Mars perihelion distance (2.07e+08 km) and
+    a CTX response of 3660.5 DN/msec.
+    </p>
+
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="2006-11-02">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2007-01-19">
+        Moved the flat file into the mro calibration data area and changed the code to point to that area.
+    </change>
+    <change name="Tracie Sucharski" date="2007-03-16">
+        Make sure input cube is a ctx image.
+    </change>
+    <change name="Deborah Lee Soltesz" date="2007-03-16" hidden="true">
+        Reformatted table in documentation, converting illegal characters to HTML character entities.
+    </change>
+    <change name="Steven Lambright" date="2007-08-15">
+        Added an application test
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Koechle" date="2008-12-04">
+      Removed hard coded flatfile, now searchs for highest version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>ctxevenodd</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Level 0 CTX image
+        </brief>
+        <description>
+          An uncalibrated CTX image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Level 1 CTX image
+        </brief>
+        <description>
+          The resultant radiometrically calibrated cube
+        </description>
+      </parameter>
+
+      <parameter name="FLATFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Flat Field file (pixel dependent gain)
+        </brief>
+        <internalDefault>Internal Default</internalDefault>
+        <description>
+          Flat Field file (pixel dependent gain).  If no file is entered, the
+          default will be used.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Calibration Parameters">
+      <parameter name="IOF">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Convert to I/F
+        </brief>
+        <description>
+           The user has the option to request the output of ctxcal to be in
+           either units of percent reflectance (IOF="YES") or in average signal
+           level at the focal plane (IOF="NO") in DN/msec.  Ctxcal has a
+           default I/F (percent reflectance) factor of 3660.5 DN/msecond response
+           with an albedo 1 target a normal incidence at Mars perihelion distance
+           (2.07 e+08).  Conversion to I/F takes place after calibration and
+           pixel-to-pixel variation corrections.
+        </description>
+      </parameter>
+
+    </group>
+  </groups>
+</application>

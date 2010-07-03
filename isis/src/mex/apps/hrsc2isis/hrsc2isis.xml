@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hrsc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import HRSC image</brief>
+
+  <description> 
+    This program imports Mars Express HRSC files. This works by first
+    determining whether or not the input file has prefix data. If there is
+    prefix data, the prefix data is collected and used to look for "gaps" - HRSC
+    files can give us a time and exposure duration  for each line, we look for 
+    where the time + exposure duration =/= next line's time.   We populate a 
+    table (LineScanTimes) with the prefix data and lineInFile with whether or 
+    not a gap should be inserted. For all files, we now process the  data and if 
+    there were gaps, they will be put in their proper places. This is a two-pass
+    system for files with prefix data, one-pass for files without.  The Isis2
+    equivalent to this program is mex2isis.pl. It is worth noting that
+    regardless of the  input file's byte order, the prefix data byte order is 
+    always LSB.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2008-01-16">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-03-18">
+      Checks if input file is rdr based on whether or not the input file has 
+      prefix data.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-07-28">
+      Updated to support the HRSC camera model. The Kernels group now has the IK code
+        properly added, the summing keyword is propagated, the times table is now compressed
+        into only having entries on time changes, and the times no longer have a 'Z' at the end
+        of them once imported.
+    </change>
+  </history>
+
+  <oldName>
+    <item>mex2isis.pl</item>
+    <item>readpfx</item>
+  </oldName>
+
+  <category>
+    <missionItem>Mars Express</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input HRSC Image
+        </brief>
+        <description>
+          Use this parameter to select the PDS filename.  This file
+          must contain the PDS labels, however the image data can
+          be detached and will be automatically obtained from the
+          PDS image pointer keyword.  If the pointer is incorrect then
+          use the IMAGE parameter to specify the file containing the
+          binary image data.
+        </description>
+        <filter>
+          *.lbl *.img
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Import an HRSC image with gaps</brief>
+      <description>
+        This example covers importing an HRSC image and shows what happens when 
+        gaps are found.
+      </description>
+      <terminalInterface>
+        <commandLine> from=h0279_0000_re2.img to=h0279_0000_re2.cub</commandLine>
+        <description>Run this program on "h0279_0000_re2.img"</description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/images/h0279_0000_re2.jpg" width="89" height="550">
+          <brief>This is the raw input image, not imported with this program</brief>
+          <description>
+            This image was imported with pds2isis and then exported with isis2std, in order to get a 
+            good idea of what the raw input image looks like.
+          </description>
+          <thumbnail caption=" Input HRSC Image " src="assets/thumbs/h0279_0000_re2.jpg" width="32" height="200" />
+        </image>
+
+        <image src="assets/images/h0279_0000_re2.in_zoomed.jpg" width="550" height="550">
+          <brief> Input discontinuity from this example </brief>
+          <description>
+            This is a zoomed in region of what will become a gap from this example. Notice the 
+            features aren't aligned in the middle of the image, as if there are missing lines.
+          </description>
+          <thumbnail caption=" Output HRSC Gap " src="assets/thumbs/h0279_0000_re2.in_zoomed.jpg" width="200" height="200" />
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/h0279_0000_re2.out.jpg" width="76" height="550">
+          <brief> Output image from this example </brief>
+          <description>
+            This is the output from this example. The large "black" areas are NULL lines where data 
+            was missing, according to the prefix data on the raw input image.
+          </description>
+          <thumbnail caption=" Output HRSC Image " src="assets/thumbs/h0279_0000_re2.out.jpg" width="28" height="200" />
+        </image>
+
+        <image src="assets/images/h0279_0000_re2.out_zoomed.jpg" width="550" height="550">
+          <brief> A gap from this example </brief>
+          <description>
+            This is a zoomed in region of a gap from this example. Notice the features on the top 
+            and bottom would not normally line up  if the gap did not exist.
+          </description>
+          <thumbnail caption=" Output HRSC Gap " src="assets/thumbs/h0279_0000_re2.out_zoomed.jpg" width="200" height="200" />
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

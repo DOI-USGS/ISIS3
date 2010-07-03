@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="clemnirclean" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Clean-up of Clementine NIR Images
+  </brief>
+
+  <description>
+    This program will take a Clementime calibrated cube and clean up null pixels and noise.
+  </description>
+
+  <category>
+    <missionItem>Clementine</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>noisefilter</item>
+      <item>lowpass</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Ella Mae Lee" date="2001-05-18">
+      Original version Isis2: perl script nir2db.pl
+    </change>
+    <change name="Steven Koechle" date="2007-06-08">
+      Converted to Isis3 from Isis2
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be cleaned
+        </brief>
+        <description>
+          The cube to be cleaned.  The cube will be ran through a series of filters to
+          remove noise.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the cleaned data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Options">
+      <parameter name="REMOVE">
+        <type>boolean</type>
+        <brief>
+                  Remove intermediate files
+        </brief>
+        <description>
+                Option to remove or leave intermediate cube files made by the application
+        </description>
+        <default>
+          <item>TRUE</item>
+        </default>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief>
+      Using clemnirclean
+      </brief>
+      <description>
+        The use of clemnircal creates a clean NIR image.  It creates 4 images in intermediate steps.
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= lne4885r.cub
+	  to=lne4885r.cal.cub
+	  remove=no
+        </commandLine>
+        <description>
+	This example shows the use of clemnircal to clean up NIR images
+        </description>
+      </terminalInterface>
+   
+
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="448" height="550" src="assets/images/clemnircleanGUI.jpg">
+            <brief>
+	    Example GUI
+            </brief>
+            <description>
+	      Screenshot of the GUI with parameters set to leave temporary images
+            </description>
+            <thumbnail width="163" height="200" caption="clemnirclean gui"
+             src="assets/thumbs/clemnircleanGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+ 
+
+
+      <inputImages>
+        <image width="492" height="492" src="assets/images/lne4885r.jpg">
+          <brief>
+	    Input image before the filter.
+          </brief>
+          <description>
+	    This is the image after it was run through clemnircal.
+          </description>
+          <thumbnail caption= "lne4885r.cub before the filter"
+           src="assets/thumbs/lne4885r.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      
+
+
+      <outputImages>
+        <image width="494" height="492" src="assets/images/lne4885r.box1.jpg">
+          <brief>
+	  Output image after the first boxcar filter was applied
+          </brief>
+          <description>
+	    Does a 3x3 noisefilter with null replace.
+          </description>
+          <thumbnail caption= "The image after the first filter"
+          src="assets/thumbs/lne4885r.cal.jpg" width="199" height="200"/>
+        </image>
+
+        <image width="492" height="493" src="assets/images/lne4885r.box2.jpg">
+          <brief>
+	  Output image after the second boxcar filter was applied
+          </brief>
+          <description>
+	    Does a 3x3 lowpass with outside filter.
+          </description>
+          <thumbnail caption= "The image after the second filter"
+          src="assets/thumbs/lne4885r.box2.jpg" width="200" height="200"/>
+        </image>
+
+        <image width="492" height="491" src="assets/images/lne4885r.box3.jpg">
+          <brief>
+	  Output image after the third boxcar filter was applied
+          </brief>
+          <description>
+	    Does a 3x3 lowpass with outside filter.
+          </description>
+          <thumbnail caption= "The image after the third filter"
+          src="assets/thumbs/lne4885r.box3.jpg" width="200" height="200"/>
+        </image>
+
+        <image width="491" height="493" src="assets/images/lne4885r.box4.jpg">
+          <brief>
+	  Output image after the fourth boxcar filter was applied
+          </brief>
+          <description>
+	    Does a 3x3 noisefilter with average replace.
+          </description>
+          <thumbnail caption= "The image after the fourth filter"
+          src="assets/thumbs/lne4885r.box4.jpg" width="199" height="200"/>
+        </image>
+
+        <image width="490" height="492" src="assets/images/lne4885r.cal.jpg">
+          <brief>
+	  Final output image after the all boxcar filters were applied
+          </brief>
+          <description>
+	    Does a 5x5 lowpass with outside filter.
+          </description>
+          <thumbnail caption= "The image after the final filter"
+          src="assets/thumbs/lne4885r.cal.jpg" width="199" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>
+

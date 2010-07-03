@@ -1,0 +1,81 @@
+UNIT TEST FOR ObliqueCylindrical
+
+Test missing pole rotation keyword ...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [PoleRotation] does not exist in [Group = Mapping]
+
+Testing operator == ...
+(p1==p2) = True
+
+Test X,Y,Z Axis Vector Calculations ... 
+Map Group Data (X[0]):      -0.514035
+Map Group Data (X[1]):      0.568173
+Map Group Data (X[2]):      -0.64261
+Map Group Data (Y[0]):      -0.747567
+Map Group Data (Y[1]):      0.0706105
+Map Group Data (Y[2]):      0.660423
+Map Group Data (Z[0]):      0.420609
+Map Group Data (Z[1]):      0.819874
+Map Group Data (Z[2]):      0.388451
+
+Test SetCoordinate method ... 
+Setting coordinate to (-2646.237039,-537.814519)
+Latitude:               -40.04353207704
+Longitude:              227.8893979987
+XCoord:                 -2646.237039
+YCoord:                 -537.814519
+
+Test SetGround method ... 
+Setting ground to (-40.04353208,227.889398)
+Latitude:               -40.04353208
+Longitude:              227.889398
+XCoord:                 -2646.237039
+YCoord:                 -537.814519
+
+Test XYRange method ... 
+
+
+Minimum X:  -8089601.1
+Maximum X:  8089601.1
+Minimum Y:  -3113684.4
+Maximum Y:  1169055.3
+
+Test Name and comparision method ... 
+Name:       ObliqueCylindrical
+operator==  1
+
+Test Name and comparision method with differing data... 
+Name:       ObliqueCylindrical
+operator==  0
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = ObliqueCylindrical
+  EquatorialRadius   = 2575000.0
+  PolarRadius        = 2575000.0
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveWest
+  LongitudeDomain    = 360
+  MinimumLatitude    = -90
+  MaximumLatitude    = 0.92523
+  MinimumLongitude   = -0.8235
+  MaximumLongitude   = 180.5
+  PoleLatitude       = 22.858149
+  PoleLongitude      = 297.158602
+  PoleRotation       = 45.7832
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -90
+  MaximumLatitude = 0.92523
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -0.8235
+  MaximumLongitude = 180.5
+End_Group
+End
+

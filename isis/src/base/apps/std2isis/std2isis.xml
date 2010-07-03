@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="std2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Imports a cube from PNG, JPEG, JP2, BMP or TIFF format
+  </brief>
+
+  <description>
+    This program will import several standard image formats to an Isis cube.
+    The input image formats may include PNG, JPEG, JP2, TIFF, BMP, and GIF.  Not all
+    formats are available as the program implementation depends on the Qt 
+    library by TrollTech.  This is not true of JPEG2000 files (JP2). It has
+    support in the ISIS3 library. By default, the number of bands in the output cube 
+    will be one, three, and four when the input image is all gray, RGB, 
+    and RGB with an alpha channel, respectively.  The user can, however, specify 
+    the color mode manually. The JP2 file can have any number of bands up to 
+    16384. The output from a JP2 file will be a multi-spectral ISIS3 image file.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2007-07-18">
+      Original version
+    </change>
+    <change name="Steven Koechle" date="2007-08-29">
+      Added special pixel ranges and updated example images
+    </change>
+    <change name="Travis Addair" date="2009-12-01">
+      Added support for RGB and ARGB imports.
+    </change>
+    <change name="Travis Addair" date="2009-12-03">
+      Added AUTO option for automatically determining MODE.
+    </change>
+    <change name="Travis Addair" date="2009-12-04">
+      Changed example and added two new examples.
+    </change>
+    <change name="Janet Barrett" date="2010-01-24">
+      Added support for JPEG2000 files.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>isis2std</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input image file to import
+        </brief>
+        <description>
+          Use this parameter to select the filename to import.
+        </description>
+        <filter>
+          *.PNG *.JPG* .JPEG *.BMP *.TIF *.TIFF *.GIF *.JP2
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output image 
+        </brief>
+        <description>
+          Use this parameter to specify the name of the output cube.
+        </description>
+        <pixelType>real</pixelType>
+      </parameter>
+    </group>
+
+    <group name="Color  Model Options">
+      <parameter name="MODE">
+            <type>string</type>
+            <default><item>AUTO</item></default>
+            <brief>Mode for determining color model</brief>
+            <description>
+                This parameter specifies the image mode for the output cube. If 
+                GRAYSCALE, a single one-band cube will be created. If RGB, a
+                three-band cube is created.  Finally, if ARGB is selected, then 
+                a four-band cube will be created where the four bands correspond 
+                to first Red, second Green, third Blue, and last Alpha. 
+            </description>
+            <list>
+                <option value="AUTO">
+                  <brief>Automatically determine output mode</brief>
+                  <description>
+                      Checks to see if the image is a grayscale image, and if not, 
+                      if it has an alpha channel, and sets the output mode 
+                      accordingly.
+                  </description>
+                </option>
+                <option value="GRAYSCALE">
+                    <brief>Grayscale mode</brief>
+                    <description>
+                        A single-channel image.
+                    </description>
+                </option>
+                <option value="RGB">
+                    <brief>RGB mode</brief>
+                    <description>
+                        A three-channel image (red, green, and blue).
+                    </description>
+                </option>
+                <option value="ARGB">
+                    <brief>ARGB mode</brief>
+                    <description>
+                        A four-channel image (red, green, blue, and alpha).
+                    </description>
+                </option>
+            </list>
+        </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="SETNULLRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>NULLMIN</item>
+          <item>NULLMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="NULLMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>HRSMIN</item>
+          <item>HRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>LRSMIN</item>
+          <item>LRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Converting an image to an Isis Cube in Automatic mode
+      </brief>
+      <description>
+        This example will show the conversion from a color PNG image to a cube, 
+        automatically determining the color mode.  Here, the output image will 
+        be a four-band ARGB cube, because the input image is both in color, and 
+        has an alpha channel.
+      </description>
+      <terminalInterface>
+        <commandLine>from=input.png to=argb.cub</commandLine>
+        <description>
+          Convert the PNG to an Isis Cube, with the default option of
+          automatically determining the color mode
+          </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/autoGui.jpg" width="614" height="750">
+            <brief>
+              Example GUI
+              </brief>
+            <description>
+              Screenshot of the GUI for std2isis, ready to convert the image 
+              input.png to the Isis Cube argb.cub, with mode left at its default
+              of AUTOMATIC.
+            </description>
+            <thumbnail caption="Convert the image input.png to the Isis Cube argb.cub" src="assets/thumbs/autoGui.jpg" width="164" height="200" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image height="492" width="492" src="assets/images/input.png">
+          <brief>Input Image</brief>
+          <description>
+            The input image, a color PNG in this example.
+          </description>
+          <thumbnail src="assets/thumbs/input.png" width="200" height="200" caption="Input Image" />
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="492" height="492" src="assets/images/gray_argb.png">
+          <brief>Output Isis Cube with Grayscale</brief>
+          <description>
+            The four-band ARGB output image viewed in black-and-white with a 
+            grayscale.
+          </description>
+          <thumbnail src="assets/thumbs/gray_argb.png" width="200" height="200" caption="Output Image in Black-and-White" />
+        </image>
+        <image width="492" height="492" src="assets/images/rgb.png">
+          <brief>Output Isis Cube with RGB</brief>
+          <description>
+            The same four-band ARGB output image viewed in color with RGB 
+            filtering (Band 1 = Red, Band 2 = Green, Band 3 = Blue).  Note that 
+            the image here appears brighter than the original, because qview has 
+            auto-stretched the DN values, and can be adjusted back with qview's 
+            "stretch" tool.  The actual data, however, has not been changed.
+          </description>
+          <thumbnail src="assets/thumbs/rgb.png" width="200" height="200" caption="Output Image in Color" />
+        </image>
+        <image width="492" height="492" src="assets/images/argb.png">
+          <brief>Output Isis Cube with RGA</brief>
+          <description>
+            The same four-band ARGB output image viewed in color with RGB
+            filtering as in the previous image, but here Band 4 (the alpha 
+            channel) is viewed through the Blue filter.
+          </description>
+          <thumbnail src="assets/thumbs/argb.png" width="200" height="200" caption="Output Image in Color with Band 4 in Blue" />
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>
+        Converting an image to an Isis Cube in Grayscale mode
+      </brief>
+      <description>
+        This example will show the conversion from a color PNG image to a cube, 
+        with the color mode set to GRAYSCALE, meaning that the output image will
+        be a single-band black-and-white cube.
+      </description>
+      <terminalInterface>
+        <commandLine>from=input.png to=gray.cub mode=grayscale</commandLine>
+        <description>
+          Convert the image input.png to the Isis Cube gray.cub.  In order to
+          get a single-band black-and-white image, we set the mode equal to
+          GRAYSCALE.
+          </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/grayGui.jpg" width="614" height="750">
+            <brief>
+              Example GUI
+              </brief>
+            <description>
+              Screenshot of the GUI for std2isis, ready to convert the image
+              input.png to the Isis Cube gray.cub with mode set to GRAYSCALE.
+            </description>
+            <thumbnail caption="Convert the image input.png to the Isis Cube gray.cub" src="assets/thumbs/grayGui.jpg" width="164" height="200" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image height="492" width="492" src="assets/images/input.png">
+          <brief>Input Image</brief>
+          <description>
+            The input image, in this example, the same color PNG from the 
+            previous example.
+          </description>
+          <thumbnail src="assets/thumbs/input.png" width="200" height="200" caption="Input Image" />
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="492" height="492" src="assets/images/gray.png">
+          <brief>Output Isis Cube</brief>
+          <description>
+            The is the output Isis Cube peaks.cub generated from this example.
+          </description>
+          <thumbnail src="assets/thumbs/gray.png" width="200" height="200" caption="Output Image" />
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>
+        Converting an image to an Isis Cube in RGB mode
+      </brief>
+      <description>
+        This example will show the conversion from a color PNG image to a cube, 
+        with the color mode set to RGB, meaning that the output image will
+        be a three-band color cube.
+      </description>
+      <terminalInterface>
+        <commandLine>from=input.png to=rgb.cub mode=rgb</commandLine>
+        <description>
+          Convert the image input.png to the Isis Cube rgb.cub.  In order to
+          get a three-band color image, we set the mode equal to
+          RGB.
+          </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/colorGui.jpg" width="614" height="750">
+            <brief>
+              Example GUI
+              </brief>
+            <description>
+              Screenshot of the GUI for std2isis, ready to convert the image
+              input.png to the Isis Cube rgb.cub with mode set to RGB.
+            </description>
+            <thumbnail caption="Convert the image input.png to the Isis Cube rgb.cub" src="assets/thumbs/colorGui.jpg" width="164" height="200" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image height="492" width="492" src="assets/images/input.png">
+          <brief>Input Image</brief>
+          <description>
+            The input image, in this example, the same color PNG from the 
+            first example.
+          </description>
+          <thumbnail src="assets/thumbs/input.png" width="200" height="200" caption="Input Image" />
+        </image>
+      </inputImages>
+
+      <outputImages>
+       <image width="492" height="492" src="assets/images/gray_argb.png">
+          <brief>Output Isis Cube with Grayscale</brief>
+          <description>
+            The three-band RGB output image viewed in black-and-white with a 
+            grayscale.
+          </description>
+          <thumbnail src="assets/thumbs/gray_argb.png" width="200" height="200" caption="Output Image in Black-and-White" />
+        </image>
+        <image width="492" height="492" src="assets/images/rgb.png">
+          <brief>Output Isis Cube with RGB</brief>
+          <description>
+            The same three-band RGB output image viewed in color with RGB 
+            filtering (Band 1 = Red, Band 2 = Green, Band 3 = Blue).  Once 
+            again, the output image appears to be brighter than the original due 
+            to qview's auto-stretching, but can be adjusted in qview with the 
+            "stretch" tool. 
+          </description>
+          <thumbnail src="assets/thumbs/rgb.png" width="200" height="200" caption="Output Image in Color" />
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

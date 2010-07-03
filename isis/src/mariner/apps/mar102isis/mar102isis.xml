@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mar102isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Convert Mariner10 images to Isis cubes.
+  </brief>
+
+  <description>
+    Converts raw mariner10 images to Isis cubes. This includes converting labels 
+    and adding the group reseaus, and which encounter the image is specific to.
+  </description>
+
+  <category>
+    <missionItem>Mariner</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>raw2isis</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="2009-06-01">
+      Original version
+    </change>
+    <change name="Mackenzie Boyd" date="2009-08-03">
+      Made several additions to labels including reseaus, and NaifFrameCode, 
+      added to repository.
+    </change>
+    <change name="Travis Addair" date="2009-12-22">
+      Added compatibility for importing Isis 2 cubes.
+    </change>
+    <change name="Travis Addair" date="2009-12-23">
+      Fixed consistency errors between RAW and Isis2 imports.
+    </change>
+    <change name="Tracie Sucharski" date="2010-02-03">
+      Changed SpacecraftName from Mariner10 to Mariner_10.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be converted to an Isis cube
+        </brief>
+        <description>
+          The raw Mariner10 image to be converted to an Isis cube with complete 
+          labels.
+        </description>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the Mariner10 image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> 
+        Mariner10 image imported 
+      </brief>
+      <description>
+        This example shows the simple process of importing a Mariner10 image.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          from=MVE_002.117 to=imported.cub
+        </commandLine>
+        <description>
+          The command line argument needed to execut an import of a Mariner10 
+          image.
+        </description>
+      </terminalInterface>
+
+     <dataFiles>
+        <dataFile path="assets/MVE_002.117">
+          <brief>
+            A raw Mariner10 image
+          </brief>
+          <description>
+            This is a raw Mariner10 image to be imported.
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+     </dataFiles>
+
+      <outputImages>
+        <image src="assets/images/imported.jpg" width="654" height="550">
+          <brief> 
+            The imported ouput
+          </brief>
+          <description> 
+             This is the Mariner10 image, now imported and in cube format.
+          </description>
+          <thumbnail caption="Output image showing results of import program." src="assets/thumbs/imported.jpg" width="200" height="168"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="455" height="337" src="assets/images/gui.jpg">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to with a mariner10 raw image as input and a cube as output.
+            </description>
+            <thumbnail width="200" height="148" caption="mar102isis Gui" src="assets/thumbs/gui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

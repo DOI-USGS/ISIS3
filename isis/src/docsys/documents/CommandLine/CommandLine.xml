@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+        <h2>Introduction</h2>
+        <p>
+        This section describes how to run Isis programs on the command line, instead of the GUI.  This is particularly useful if 1) you desire to setup shell scripts or other batch job mechanisms to run a sequence of programs on cubes or 2) you are a power user who prefers keyboarding over mousing.
+        </p>
+
+        <h2>Invoking a Program</h2>
+        <p>
+          To start an ISIS program, simply type it’s name, for example, "ratio".  This starts the program under the GUI, however, if you provide anything after the program name it will be assumed the program is running under the command line.  For example,
+        </p>
+
+
+<pre style="padding-left:4em;">
+lowpass from=moon.cub to=moon.lpf.cub lines=5 samples=5 minimum=1
+stats from=moon.lpf.cub
+</pre>
+
+        <p>
+          The programs will immediately attempt to run and if parameters are missing or wrong, an error will be output.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass from=moon.cub lines=4 samples=5 minimum=1
+**USER ERROR** Parameter [TO] must be entered.
+
+lowpass from=moon.cub to=moon.lpf.cub lines=4 samples=5 minimum=1
+**USER ERROR** Value for [LINES] must be odd.
+</pre>
+
+        <h2>Parameter-Value Pairs</h2>
+        <p>
+          For consistency, all Isis command lines take the form of:
+        </p>
+
+<pre style="padding-left:4em;">
+program parameter1=value parameter2=value …parameterN=value
+</pre>
+
+        <p>
+          The parameters can occur in any order, can be abbreviated so long as they are unique, are case insensitive, and can be omitted if they have a default value.  The values can be integers, doubles, strings, or booleans  <em><span style="color:red;">[Future Option]</span> The values can also be homogenous arrays of these types.</em>  Using the GUI for lowpass in the below figure as a guide, we can present several examples:
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass f=moon.cub t=moon.lpf.cub s=5 l=5 minimum=1
+lowpass f=moon.cub t=moon.lpf.cub s=5 li=5
+lowpass f=moon.cub t=moon.lpf.cub s=5 lin=5
+</pre>
+
+
+<table class="imageTable" align="center" style="width:240px;">
+  <tr>
+    <td>
+      <a href="assets/image001.png">
+      <img src="assets/thumbs/image001.png" width="220" height="300" alt="[lowpass GUI Screenshot]"/></a>
+      <p>
+        Parameter-Value Pairs Example
+      </p>
+      <p class="caption">
+        420x627, 22KB
+      </p>
+    </td>
+  </tr>
+</table>
+
+
+        <p>
+          The first example would fail with a uniqueness error as "l" could mean parameter line, lis, lrs, or low.
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass f=moon.cub t=moon.lpf.cub s=5 l=5 minimum=1
+**USER ERROR** Invalid command line
+**USER ERROR** Parameter [l] is not unique.
+</pre>
+        <p>
+          The second example would fail with a uniqueness error as "li" could mean parameter lines or lis.
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass f=moon.cub t=moon.lpf.cub s=5 li=5 minimum=1
+**USER ERROR** Invalid command line
+**USER ERROR** Parameter [li] is not unique.
+</pre>
+
+        <p>
+          The third example would succeed; note the minimum parameter is not required as it has a default of one, the parameters are case insensitive, and their order has changed.
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass S=5 LIN=5 F=moon.cub T=moon.lpf.cub
+Working
+100% Processed
+</pre>
+        <h2>Integer and Double Parameters</h2>
+        <p>
+          The application documentation indicates the type of each parameter.  Integer and Double parameters are trivial taking the form of:
+        </p>
+
+<pre style="padding-left:4em;">
+samples=5
+minimum=0.679
+</pre>
+
+        <p>
+          Often there will be error check conditions performed by the application to ensure they have a valid range.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass f=moon.cub t=moon.lpf.cub s=0 lin=5
+**USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1]
+</pre>
+
+        <p>
+          Similarly, two parameters may be required to be ordered
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass f=moon.cub t=moon.lpf.cub s=5 lin=5 low=5 hi=3
+ **USER ERROR** Parameter [LOW] must be less than parameter [HIGH]
+</pre>
+
+        <h2>String Parameters</h2>
+        <p>
+          String parameters can be slightly more complicated because of operating system intricacies.  The difference is in one word strings versus multiple word strings.  The following example would cause problems:
+        </p>
+
+<pre style="padding-left:4em;">
+foobar comment=Hello world
+**USER ERROR** Invalid command line
+**USER ERROR** Unknown parameter [world].
+</pre>
+        <p>
+          Therefore multiple word strings must be quoted.  We would expect the following to work, but receive the same error:
+        </p>
+
+<pre style="padding-left:4em;">
+foobar comment="Hello World"
+**USER ERROR** Invalid command line
+**USER ERROR** Unknown parameter [world].
+</pre>
+        <p>
+          Unfortunately, the Unix shell pre-parses command lines and removes the quotes.  To alleviate this problem use the following:
+        </p>
+
+<pre style="padding-left:4em;">
+Foobar comment=\"Hello World\"
+</pre>
+        <h2>Lists of String Parameters</h2>
+        <p>
+          Some applications will restrict the values of string parameters to a pre-defined list.  We will use the below "raw2isis" GUI as an example.  In this particular case, both BITTYPE and BYTEORDER are strings restricted to certain values.  Those values are given in parenthesis to the right of the radio buttons.  Two examples of valid command lines are:
+        </p>
+
+<pre style="padding-left:4em;">
+raw2isis byteorder=lsb bittype=real from=file.raw to=file.cub nl=500 ns=500
+raw2isis byteorder=lsb bittype=R from=file.raw to=file.cub nl=500 ns=500
+</pre>
+        <p>
+          When radio buttons appear the GUI, the value can be abbreviated to uniqueness and is case insensitive as well.  The second example, bittype=R implies bittype=real.  The following example would fail because of uniqueness issues matching both UnsignedByte and UnsignedWord:
+        </p>
+
+<pre style="padding-left:4em;">
+raw2isis bittype=unsigned from=file.raw to=file.cub nl=500 ns=500
+**PROGRAMMER ERROR** Value of [BITTYPE] does not match a list option uniquely
+</pre>
+
+
+<table class="imageTable" align="center" style="width:260px;">
+  <tr>
+    <td>
+      <a href="assets/image003.png">
+      <img src="assets/thumbs/image003.png" width="241" height="300" alt="[raw2isis GUI Screenshot]"/></a>
+      <p>
+        Lists of String Parameters Example
+      </p>
+      <p class="caption">
+        503x627, 24KB
+      </p>
+    </td>
+  </tr>
+</table>
+
+        <h2>Boolean Parameters</h2>
+        <p>
+          These parameters are represented by check boxes in the GUI.  Command line examples of the use of a boolean parameter are:
+        </p>
+
+<pre style="padding-left:4em;">
+foobar option=yes
+foobar option=no
+foobar option=true
+foobar option=false
+foobar option=t
+foobar option=f
+</pre>
+
+        <p>
+          The values are case insensitive.  That is, Yes, YES, True, T, etc work as well.
+        </p>
+
+        <h2>Inclusive and Exclusive Parameters</h2>
+        <p>
+          The GUI has the ability to include or exclude parameters via stipling (graying out parameters).  The application programs will complain if you get it wrong in command line mode.  Using our "raw2isis" example,
+        </p>
+
+<pre style="padding-left:4em;">
+raw2isis fr=my.raw to=my.cub li=500 sa=500 min=0 max=255
+**USER ERROR** Parameter [CREATESPECIAL] must be used
+  if parameter [MINIMUM] is used.
+
+raw2isis fr=my.raw to=my.cub li=500 sa=500 createspecial=yes
+**USER ERROR** Parameter [MINIMUM] must be used
+  if parameter [CREATESPECIAL] equates to true.
+</pre>
+
+        <h2>Cube Attributes</h2>
+        <p>
+          When a parameter is an input or output cube the GUI presents two extra buttons […] and [att].  The […] button which gives a file selection dialog is not implemented on the command line.  However, the [att] button is fully implemented in order to select the attributes for the input and output cube.
+        </p>
+
+        <h3>Output Cube Attributes</h3>
+        <p>
+          The user can specify properties of the output cube.  They include:
+        </p>
+
+        <ul>
+          <li>Pixel Type</li>
+          <li>Output Pixel Range</li>
+          <li>Label Format</li>
+          <li>Pixel Storage Order</li>
+          <li>Storage Format</li>
+        </ul>
+
+        <p>
+          On the command line, the user supplements the output parameter with the attributes.  Some examples are:
+        </p>
+
+<pre style="padding-left:4em;">
+highpass to=temp.hpf.cub+detached+bsq
+highpass to=temp.hpf.cub+16bit
+highpass to=temp.hpf.cub+8bit+-5.0:5.0
+</pre>
+
+        <h4>Pixel Type</h4>
+        <p>
+          This defines the output pixel type.  There are three types of output pixels:  UnsignedByte, SignedWord, and Real.  Valid values and synonyms are given below:
+        </p>
+
+        <ul>
+          <li>+UnsignedByte</li>
+          <li>+8bit</li>
+          <li>+8-bit</li>
+        </ul>
+
+        <ul>
+          <li>+SignedWord</li>
+          <li>+16bit</li>
+          <li>+16-bit</li>
+        </ul>
+
+        <ul>
+          <li>+Real</li>
+          <li>+32-bit</li>
+        </ul>
+
+        <p>
+          The default value depends upon the type of program.  Most geometry-like programs such as crop, rotate, cam2map, pad, etc will simply propagate the input pixel type.  Programs which fiddle with the pixel values such as derive, highpass, grad, etc will generally output real pixels.
+        </p>
+
+        <h4>Output Pixel Range</h4>
+        <p>
+          When choosing an output pixel type other than Real/32-bit the user must define the expected range of output pixels.  The form is +minimum:maximum.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+moccal to=cal.cub+0.0:0.3
+</pre>
+
+        <p>
+          It is important to select a good minimum and maximum.  If the window is too tight, pixels in the output file will be saturated (many LRS or HRS special pixels).  If the window is wide then quantization can occur.  That is, all the pixels are mapped to one value in the output cube.  It can be a difficult problem that can be alleviated by outputting real images, understanding that the sacrifice is utilizing more disk space.
+        </p>
+
+        <h4>Label Format</h4>
+        <p>
+          The option exists to create attached or detached labels.  This is facilitated through:
+        </p>
+
+<pre style="padding-left:4em;">
+crop from=input.cub to=output.cub+detached
+crop from=input.cub to=output.cub+attached
+</pre>
+
+        <p>
+          Detached labels will be put in a separate file with an .lbl extension.  The default option is read from the system-wide/user IsisPreference file.
+        </p>
+
+        <h4>Pixel Storage Order</h4>
+        <p>
+          The output order of 16-bit and 32-bit pixels can be selected in the following manner:
+        </p>
+
+<pre style="padding-left:4em;">
+crop from=input.cub to=output.cub+lsb
+crop from=input.cub to=output.cub+msb
+</pre>
+
+        <p>
+          The two formats, lsb and msb are for least and most significant byte orders respectively.  The default is to use the format native to the machines architecture.
+        </p>
+
+        <h4>Storage Format Format</h4>
+        <p>
+          The storage format of the file can be tiled or band sequential.  The default format is tiled which is preferable for most geometric processing programs.  To select the format use:
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass from=input.cub to=output.cub+tiled
+lowpass from=input.cub to=output.cub+bsq
+lowpass from=input.cub to=output.cub+bandSequential
+</pre>
+        <p>
+          Combining
+        </p>
+
+<pre style="padding-left:4em;">
+lowpass from=input.cub to=output.cub+bandSequential+detached
+</pre>
+
+        <p>
+          gives a raw file that can be easily imported into other image processing packages.
+        </p>
+
+        <h3>Input Cube Attributes</h3>
+        <p>
+          Input cube attributes are significantly less complicated than those of output.  They allow the user to select the bands on which to operate.  The below example divides all bands by band 5:
+        </p>
+
+<pre style="padding-left:4em;">
+ratio num=input.cub den=input.cub+5 to=dividebyband5.cub
+</pre>
+
+        <p>
+          There are several forms of band selection:
+        </p>
+
+        <ul>
+            <li>+singleBand</li>
+            <li>+startBand-endBand</li>
+            <li><em><span style="color:red;">[Future Option]</span> +filtername</em></li>
+        </ul>
+
+        <p>
+          The selections can be combined by comma separation.  Below are several examples,
+        </p>
+
+<pre style="padding-left:4em;">
++9
++3-5
++3,8,10-12
++3-1
++8,4,2
+</pre>
+
+        <h2>Reserved Parameters</h2>
+        <p>
+          All Isis applications have a suite of reserved parameters.  These parameters are
+        </p>
+
+        <ul>
+          <li>-webhelp, -help or -help=parameterName</li>
+          <li>-last</li>
+          <li>-restore=file</li>
+          <li>-gui</li>
+          <li>-nogui</li>
+          <li>-batchlist=file</li>
+          <li>-errlist=file</li>
+          <li>-onerror=abort | continue</li>
+          <li>-preference=file</li>
+          <li>-log or -log=file</li>
+          <li>-info or -info=file</li>
+          <li>-save or -save=file</li>
+          <li>-verbose</li>
+        </ul>
+
+        <p>
+           These parameters may be typed out in full or until the command is distinct.  For instance:
+
+<pre style="padding-left:4em;">
+equalizer -pref=myPreferences -s=ttt –g
+equalizer -l
+</pre>
+          The first command line is acceptable because each parameter is distinct.  However, the second command
+          line would cause an error.  The -l could have been intended to be the -last or -log parameter.  In this case, the 
+          -l must be extended to -lo for log or -la for last.  If you choose to use the shortened version of the parameters, 
+          be sure to watch for conflicts of this sort.
+        </p>
+
+        <h3>-webhelp and -help  Parameters</h3>
+        <p>
+          This parameter is used to obtain help on the program.  Typing the <b>-webhelp</b> parameter will launch a
+          browser containing the documentation for the application.  Typing the <b>-help</b> parameter will give a list of the
+          programs parameters with their default value.  For list parameters, all the possible options will be output, and there
+          will be a * denoting the default option.  Typing <b>-help=<i>parameterName</i></b> will give a brief description of
+          the parameter, its default value, inclusion/exclusion information, and any other information given in the xml.  The
+          three possible options and the resulting output are seen below:
+        </p>
+
+<pre style="padding-left:4em;">
+equalizer –webhelp
+</pre>
+        <p>
+           This command will cause a web browser to be launched with the documentation for the "equalizer" program.
+        </p>
+<pre style="padding-left:4em;">
+equalizer -help
+</pre>
+        <p>
+           The above command will cause the following terminal output to appear on the screen.
+        </p>
+<pre style="padding-left:4em;">
+FROMLIST = Null
+TO       = Null
+HOLDLIST = Null
+APPLY    = TRUE
+ADJUST   = (*BOTH, CONTRAST, BRIGHTNESS)
+CMODE    = (*PCA, SD)
+MINCOUNT = 1000
+WEIGHT   = FALSE
+</pre>
+         <p>
+           To gain more information on the CMODE parameter, the following command can be used.
+         </p>
+<pre style="padding-left:4em;">
+equalizer -help=cmode
+</pre>
+          <p>
+             This command will cause the following terminal output to appear on the screen.
+          </p>
+<pre style="padding-left:4em;">
+ParameterName = CMODE
+Brief         = "The constrast mode to use for the equalization"
+Type          = string
+Default       = PCA
+
+Group = PCA
+  Brief = "Principal Component Analysis Fit Mode"
+End_Group
+
+Group = SD
+  Brief = "Standard Deviation Fit Mode"
+End_Group
+</pre>
+
+        <h3>-last Parameter</h3>
+        <p>
+          This parameter will run the program using the parameters from the last time a program was run in the GUI.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+highpass –last
+</pre>
+
+        <p>
+          Additionally, parameters can be modified in the following manner:
+        </p>
+
+<pre style="padding-left:4em;">
+highpass –last from=next.cub to=next.hpf.cub
+</pre>
+
+        <h3>-restore Parameter</h3>
+        <p>
+          This parameter allows the user to run the programs with the parameters from a file.  In particular, a file saved using the GUI save mode or a session log.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+highpass –restore=guiSave.par
+highpass –restore=print.prt
+</pre>
+
+        <p>
+          Either will look for the last occurrence of Group=UserParameters in Object=highpass in the specified file.  Parameters will be loaded from that group.
+        </p>
+
+        <h3>-gui Parameter</h3>
+
+        <p>
+          This parameter forces the GUI to run.  It can be used in combination with parameters and reserved parameters.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+highpass from=input.cub to=output.cub lines=5 –gui
+highpass –last –gui
+highpass –restore=print.prt –gui
+</pre>
+
+
+        <p>
+          All examples cause the GUI to be shown with the values filled into the appropriate fields.
+        </p>
+
+        <h3>-nogui Parameter</h3>
+
+        <p>
+          This parameter forces the GUI not to run.  Its main intention is to be used on a program with no parameters  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+csspck2spk –nogui
+</pre>
+        <p>
+          All examples cause the GUI to be shown with the values filled into the appropriate fields.
+        </p>
+
+        <h3>-batchlist Parameter</h3>
+
+        <p>
+          This parameter allows the user to run a program multiple times on a list of input parameters.  It can be used in
+          combination with all parameters.  It cannot be used with the -last, -restore, or -gui reserved parameters.  The
+          batchlist file must be a text file containing one or more columns of data.  The columns can be used in the other
+          parameters by using a '\$' followed by the column number. An example of what the batchList.txt file might look like
+          can be seen below.
+        </p>
+<pre style="padding-left:4em;">
+/work2/eribelin/viking/   f387a06.cub
+/work2/eribelin/viking/   f348b26.cub
+/work2/eribelin/viking/   f319b19.cub
+</pre>
+        <p>
+           An example commandline would look similar to the following:
+        </p>
+
+<pre style="padding-left:4em;">
+highpass -batchlist=batchList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5
+</pre>
+
+        <p>
+          The commandlines that would be run from the above command would be:
+        </p>
+
+<pre style="padding-left:4em;">
+highpass from=/work2/eribelin/viking/f387a06.cub to=/work2/eribelin/viking/hpf/f387a06.cub  lines=5 samples=5
+highpass from=/work2/eribelin/viking/f348b26.cub to=/work2/eribelin/viking/hpf/f348b26.cub  lines=5 samples=5
+highpass from=/work2/eribelin/viking/f319b19.cub to=/work2/eribelin/viking/hpf/f319b19.cub  lines=5 samples=5
+</pre>
+
+        <h3>-errlist Parameter</h3>
+
+        <p>
+          This parameter will save the lines from the batchlist that an error occurs on in an error file in addition to writing
+          the errors out to the screen.  It can be used in combination with all parameters and the -batchlist and -onerror
+          reserved parameters.  All lines that were not run successfully will be propagated to the errorfile.
+        </p>
+
+<pre style="padding-left:4em;">
+highpass -batchlist=batchList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5 -errlist=errList.txt
+</pre>
+        <p>
+          This errorlist can be read back in as the batchlist once the errors are corrected.
+        </p>
+
+        <h3>-onerror Parameter</h3>
+
+        <p>
+          This parameter can be used with all parameters, and the -batchlist and -errlist reserved parameters.  If the 
+          <b>continue</b> option is selected, it allows the user to run the program on several different files, without stopping
+          if an error occurs on one of the commandlines.  If the <b>abort</b> option is selected or it is ran without being set 
+          (the default is <b>abort</b>), the program will halt when the first error occurs.
+        </p>
+
+<pre style="padding-left:4em;">
+highpass -batchlist=batchList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5 -onerror=continue
+</pre>
+        <p>
+          In this example, any errors that occur will be printed out to the screen and the program will continue to the next
+          command.  
+        </p>
+
+        <h3>-preference Parameter</h3>
+
+        <p>
+          This parameter can be used with all parameters, and reserved parameters.  It overrides the current preference file
+          with the file input by the user.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+highpass from=input.cub to=output.cub lines=5 samples=5 -preference=myHighpassPrefs
+</pre>
+        <p>
+          In this example, anything currently in the preference file will be overridden with the preferences in the file
+          <b>myHighpassPrefs</b>.
+        </p>
+
+        <h3>-log Parameter</h3>
+
+        <p>
+          This parameter can be used with all parameters, and reserved parameters.  It overrides the current log file
+          in the preferences with the file input by the user.  If the -preference option is also used, the log file entered
+          will override the session log loaded in the preference file.  When -log is used without specifying a filename, 
+          the session log will be save to the print.prt file.  If the session log output is turned off in the preferences, using
+          the -log option will override it for the command line being run.  Examples of each use follow.
+        </p>
+
+<pre style="padding-left:4em;">
+highpass from=input.cub to=output.cub lines=5 samples=5 -log
+highpass from=input.cub to=output.cub lines=5 samples=5 -log=temp.prt
+</pre>
+        <p>
+          In the first example, the session log will be saved in the <b>print.prt</b> file in the current directory (even if the 
+          session log output is turned off in the preferences). In the second example, the current session log file in the
+          preference file will be overridden with <b>temp.prt</b>, and the session log information will be saved there.
+        </p>
+
+        <h3>-info Parameter</h3>
+
+        <p>
+          This parameter can be used with all parameters, and reserved parameters.  It gathers debugging information necessary
+          to help the Isis developers understand user problems. When -info is used without specifying a filename, 
+          the debugging information will be displayed to the console through standard output.  <span class="warning">PLEASE NOTE: The
+          user should remove any data from this file that they consider to be personal and do not want publicly available before posting 
+          the file on the Isis Support Forums</span>  Examples of each use follow.
+        </p>
+
+<pre style="padding-left:4em;">
+highpass from=input.cub to=output.cub lines=5 samples=5 -info
+highpass from=input.cub to=output.cub lines=5 samples=5 -info=debug.log
+</pre>
+        <p>
+          In the first example, the debugging information will be output to standard out. In the second example, the debugging information
+          will be written to <b>debug.log</b>.
+        </p>
+
+        <h3>-save Parameter</h3>
+
+        <p>
+          This parameter can be used with all parameters, and reserved parameters except the -batchlist and -errlist
+          options.  It saves the command line parameters to a file in Pvl format.  The output file can be read back in to the
+          program using the -restore option.  The default save file name is <b><i>programName</i>.par</b>.  If the -save
+          option is not used, the history file will be saved by default in the location specified in the preference file under
+          HistoryPath.  If only -save is used, the file will be saved in the current directory, and if the -save option is used 
+          with a specific filename, it will be saved in that location.
+        </p>
+
+<pre style="padding-left:4em;">
+highpass from=input.cub to=output.cub lines=5 samples=5 -save=hpf/saveFile.par
+highpass from=input.cub to=output.cub lines=5 samples=5 -save
+</pre>
+        <p>
+          In the first example, the program will save the parameters information in the saveFile.par file in the hpf directory.
+          The second example would save the same parameters in the highpass.par file in the current directory.
+        </p>
+
+        <h3>-verbose Parameter</h3>
+
+        <p>
+          This parameter can be used with all parameters, and reserved parameters.  If the terminal output preference is
+          turned off in the preferences, the -verbose option will override it, and print the terminal output to the screen for the
+          current command only.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+highpass from=input.cub to=output.cub lines=5 samples=5 -verbose
+</pre>
+        <p>
+          The terminal output would be written out to the screen as the program was executed.
+        </p>
+
+        <h2>Error Status</h2>
+
+        <p>
+          Command lines programs exit with a status indicating success or failure.
+          Further information regarding the status can be found in the
+          <a href="../ErrorHandlingFacility/ErrorHandlingFacility.html">Isis Error Handling Facility</a>.
+        </p>
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>CommandLine.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>guide</categoryItem>
+  </category>
+
+  <audience>
+    <target>intermediate</target>
+  </audience>
+
+  <bibliography>
+    <title>Command Line Usage</title>
+
+    <brief>
+    Invoking Isis programs from the Unix command line
+    </brief>
+    <description>
+      How to run Isis on the Unix Command Line.
+      Required reading before using the software in any scripting language
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2004-02-27</date>
+  </bibliography>
+</documentation>
+

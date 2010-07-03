@@ -1,0 +1,372 @@
+Testing Isis::ProcessMapMosaic Class ... 
+Testing Mosaic 1
+unittest: Initializing mosaic
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Mosaicking unitTest1.cub
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+./unitTest1.cub is inside the mosaic
+unittest: Mosaicking unitTest2.cub
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+./unitTest2.cub is inside the mosaic
+Mosaic label: 
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 124
+      Lines   = 125
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 30.5
+    TargetName         = MOON
+    EquatorialRadius   = 1737400.0 <meters>
+    PolarRadius        = 1737400.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    MinimumLatitude    = -5.5
+    MaximumLatitude    = -4.0
+    MinimumLongitude   = 29.5
+    MaximumLongitude   = 31.0
+    UpperLeftCornerX   = -15195.585618718
+    UpperLeftCornerY   = -121074.5047685
+    PixelResolution    = 245.09009062449 <meters/pixel>
+    Scale              = 123.72328210776 <pixels/degree>
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 81921
+  Bytes     = 3026
+End_Object
+End
+Testing Mosaic 2
+unittest: Initializing mosaic
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Mosaicking unitTest1.cub
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+./unitTest1.cub is inside the mosaic
+unittest: Mosaicking unitTest2.cub
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+./unitTest2.cub is inside the mosaic
+Mosaic label: 
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 248
+      Lines   = 249
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 30.5
+    TargetName         = MOON
+    EquatorialRadius   = 1737400.0 <meters>
+    PolarRadius        = 1737400.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    MinimumLatitude    = -6.0
+    MaximumLatitude    = -4.0
+    MinimumLongitude   = 29.0
+    MaximumLongitude   = 31.0
+    UpperLeftCornerX   = -45586.756856155
+    UpperLeftCornerY   = -121074.5047685
+    PixelResolution    = 245.09009062449 <meters/pixel>
+    Scale              = 123.72328210776 <pixels/degree>
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 131073
+  Bytes     = 3026
+End_Object
+End
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	10
+Mosaic Data: -1.79769e+308	-1.79769e+308	10
+Mosaic Data: -1.79769e+308	-1.79769e+308	10
+Mosaic Data: -1.79769e+308	-1.79769e+308	13
+Mosaic Data: -1.79769e+308	-1.79769e+308	16
+Mosaic Data: -1.79769e+308	-1.79769e+308	15
+Mosaic Data: -1.79769e+308	-1.79769e+308	14
+Mosaic Data: -1.79769e+308	-1.79769e+308	17
+Mosaic Data: -1.79769e+308	-1.79769e+308	21
+Mosaic Data: -1.79769e+308	-1.79769e+308	20
+Mosaic Data: -1.79769e+308	-1.79769e+308	19
+Mosaic Data: -1.79769e+308	-1.79769e+308	22
+Mosaic Data: -1.79769e+308	31	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	31	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	24
+Mosaic Data: -1.79769e+308	-1.79769e+308	26
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	31	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	39	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	30
+Mosaic Data: -1.79769e+308	-1.79769e+308	31
+Mosaic Data: -1.79769e+308	-1.79769e+308	29
+Mosaic Data: -1.79769e+308	-1.79769e+308	26
+Mosaic Data: -1.79769e+308	-1.79769e+308	24
+Mosaic Data: -1.79769e+308	31	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	31	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	25
+Mosaic Data: -1.79769e+308	-1.79769e+308	26
+Mosaic Data: -1.79769e+308	31	23
+Mosaic Data: -1.79769e+308	-1.79769e+308	19
+Mosaic Data: -1.79769e+308	-1.79769e+308	20
+Mosaic Data: -1.79769e+308	-1.79769e+308	21
+Mosaic Data: -1.79769e+308	-1.79769e+308	19
+Mosaic Data: -1.79769e+308	-1.79769e+308	15
+Mosaic Data: -1.79769e+308	-1.79769e+308	15
+Mosaic Data: -1.79769e+308	-1.79769e+308	15
+Mosaic Data: -1.79769e+308	-1.79769e+308	15
+Mosaic Data: -1.79769e+308	-1.79769e+308	11
+Mosaic Data: -1.79769e+308	-1.79769e+308	9
+Mosaic Data: -1.79769e+308	-1.79769e+308	10
+Mosaic Data: -1.79769e+308	-1.79769e+308	10
+Mosaic Data: -1.79769e+308	-1.79769e+308	33
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308

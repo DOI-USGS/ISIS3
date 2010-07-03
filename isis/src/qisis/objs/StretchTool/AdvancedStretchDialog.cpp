@@ -1,0 +1,278 @@
+#include "AdvancedStretchDialog.h"
+
+#include <QHBoxLayout>
+
+#include "CubeViewport.h"
+#include "Stretch.h"
+#include "AdvancedStretch.h"
+
+using namespace Isis;
+
+namespace Qisis {
+  /**
+   * This constructs an advanced stretch.
+   *
+   * @param parent the parent widget
+   */
+  AdvancedStretchDialog::AdvancedStretchDialog(QWidget *parent) :
+    QDialog(parent) {
+    p_grayStretch = NULL;
+    p_redStretch = NULL;
+    p_grnStretch = NULL;
+    p_bluStretch = NULL;
+    p_enabled = false;
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    setLayout(layout);
+  }
+
+
+  /**
+   * This destroys the advanced stretch dialog
+   */
+  AdvancedStretchDialog::~AdvancedStretchDialog() {
+    destroyCurrentStretches();
+  }
+
+
+  /**
+   * This displays RGB advanced stretches.
+   *
+   * @param redStretch
+   * @param redHist
+   * @param grnStretch
+   * @param grnHist
+   * @param bluStretch
+   * @param bluHist
+   */
+  void AdvancedStretchDialog::enableRgbMode(Isis::Stretch &redStretch,
+      Isis::Histogram &redHist,
+      Isis::Stretch &grnStretch, Isis::Histogram &grnHist,
+      Isis::Stretch &bluStretch, Isis::Histogram &bluHist) {
+    destroyCurrentStretches();
+
+    p_redStretch = new AdvancedStretch(redHist, redStretch,
+                                       "Red", QColor(Qt::red));
+    layout()->addWidget(p_redStretch);
+
+    p_grnStretch = new AdvancedStretch(grnHist, grnStretch,
+                                       "Green", QColor(Qt::green));
+    layout()->addWidget(p_grnStretch);
+
+    p_bluStretch = new AdvancedStretch(bluHist, bluStretch,
+                                       "Blue", QColor(Qt::blue));
+    layout()->addWidget(p_bluStretch);
+
+    connect(p_redStretch, SIGNAL(stretchChanged()),
+            this, SIGNAL(stretchChanged()));
+    connect(p_grnStretch, SIGNAL(stretchChanged()),
+            this, SIGNAL(stretchChanged()));
+    connect(p_bluStretch, SIGNAL(stretchChanged()),
+            this, SIGNAL(stretchChanged()));
+  }
+
+
+  /**
+   * This displays a gray advanced stretch.
+   *
+   * @param grayStretch
+   * @param grayHist
+   */
+  void AdvancedStretchDialog::enableGrayMode(Isis::Stretch &grayStretch,
+      Isis::Histogram &grayHist) {
+    destroyCurrentStretches();
+
+    p_grayStretch = new AdvancedStretch(grayHist, grayStretch,
+                                        "Gray", QColor(Qt::gray));
+    layout()->addWidget(p_grayStretch);
+
+    connect(p_grayStretch, SIGNAL(stretchChanged()),
+            this, SIGNAL(stretchChanged()));
+  }
+
+
+  /**
+   * This cleans up memory from currently displayed advanced
+   * stretches. No stretches are visible after this is called.
+   */
+  void AdvancedStretchDialog::destroyCurrentStretches() {
+    if(p_redStretch) {
+      layout()->removeWidget(p_redStretch);
+      disconnect(p_redStretch, SIGNAL(stretchChanged()),
+                 this, SIGNAL(stretchChanged()));
+      delete p_redStretch;
+      p_redStretch = NULL;
+    }
+
+    if(p_grnStretch) {
+      layout()->removeWidget(p_grnStretch);
+      disconnect(p_grnStretch, SIGNAL(stretchChanged()),
+                 this, SIGNAL(stretchChanged()));
+      delete p_grnStretch;
+      p_grnStretch = NULL;
+    }
+
+    if(p_bluStretch) {
+      layout()->removeWidget(p_bluStretch);
+      disconnect(p_bluStretch, SIGNAL(stretchChanged()),
+                 this, SIGNAL(stretchChanged()));
+      delete p_bluStretch;
+      p_bluStretch = NULL;
+    }
+
+    if(p_grayStretch) {
+      layout()->removeWidget(p_grayStretch);
+      disconnect(p_grayStretch, SIGNAL(stretchChanged()),
+                 this, SIGNAL(stretchChanged()));
+      delete p_grayStretch;
+      p_grayStretch = NULL;
+    }
+  }
+
+
+  /**
+   * This calls setStretch on all applicable advanced stretches.
+   * This should be called any time the cube viewport changes.
+   *
+   * @param cvp
+   */
+  void AdvancedStretchDialog::updateStretch(CubeViewport *cvp) {
+    if(p_grayStretch)
+      p_grayStretch->setStretch(cvp->grayStretch());
+    if(p_redStretch)
+      p_redStretch->setStretch(cvp->redStretch());
+    if(p_grnStretch)
+      p_grnStretch->setStretch(cvp->greenStretch());
+    if(p_bluStretch)
+      p_bluStretch->setStretch(cvp->blueStretch());
+  }
+
+
+  /**
+   * This calls setHistogram on all of the advanced stretches.
+   * This should be called every time the visible area changes.
+   *
+   * @param redHist Histogram of visible area on red band
+   * @param grnHist Histogram of visible area on green band
+   * @param bluHist Histogram of visible area on blue band
+   */
+  void AdvancedStretchDialog::updateHistograms(const Isis::Histogram &redHist,
+      const Isis::Histogram &grnHist,
+      const Isis::Histogram &bluHist) {
+    if(p_redStretch)
+      p_redStretch->setHistogram(redHist);
+    if(p_grnStretch)
+      p_grnStretch->setHistogram(grnHist);
+    if(p_bluStretch)
+      p_bluStretch->setHistogram(bluHist);
+  }
+
+
+  /**
+   * This calls setHistogram on the gray advanced stretche. This
+   * should be called every time the visible area changes.
+   *
+   * @param grayHist Histogram of visible area on gray band
+   */
+  void AdvancedStretchDialog::updateHistogram(const Isis::Histogram &grayHist) {
+    if(p_grayStretch)
+      p_grayStretch->setHistogram(grayHist);
+  }
+
+
+  /**
+   * This is implemented to send a signal when visibility changes
+   *
+   * @param event
+   */
+  void AdvancedStretchDialog::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    emit visibilityChanged();
+  }
+
+
+  /**
+   * This is implemented to send a signal when visibility changes
+   *
+   * @param event
+   */
+  void AdvancedStretchDialog::hideEvent(QHideEvent *event) {
+    QDialog::hideEvent(event);
+    emit visibilityChanged();
+  }
+
+
+  /**
+   * Returns true if the dialog is displaying the RGB advanced
+   * stretches.
+   *
+   * @return bool
+   */
+  bool AdvancedStretchDialog::isRgbMode() const {
+    return (p_redStretch && p_grnStretch && p_bluStretch);
+  }
+
+
+  /**
+   * This returns the advanced stretch's stretch for gray.
+   *
+   * @return Isis::Stretch
+   */
+  Isis::Stretch AdvancedStretchDialog::getGrayStretch() {
+    if(p_grayStretch) {
+      return p_grayStretch->getStretch();
+    }
+    else {
+      iString msg = "Gray mode not enabled, cannot get gray stretch";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * This returns the advanced stretch's stretch for red.
+   *
+   * @return Isis::Stretch
+   */
+  Isis::Stretch AdvancedStretchDialog::getRedStretch() {
+    if(p_redStretch) {
+      return p_redStretch->getStretch();
+    }
+    else {
+      iString msg = "RGB mode not enabled, cannot get red stretch";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * This returns the advanced stretch's stretch for green.
+   *
+   * @return Isis::Stretch
+   */
+  Isis::Stretch AdvancedStretchDialog::getGrnStretch() {
+    if(p_grnStretch) {
+      return p_grnStretch->getStretch();
+    }
+    else {
+      iString msg = "RGB mode not enabled, cannot get green stretch";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * This returns the advanced stretch's stretch for blue.
+   *
+   * @return Isis::Stretch
+   */
+  Isis::Stretch AdvancedStretchDialog::getBluStretch() {
+    if(p_redStretch) {
+      return p_bluStretch->getStretch();
+    }
+    else {
+      iString msg = "RGB mode not enabled, cannot get blue stretch";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+};

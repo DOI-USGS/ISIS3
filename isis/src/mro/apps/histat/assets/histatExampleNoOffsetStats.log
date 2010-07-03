@@ -1,0 +1,150 @@
+Group = IMAGE_POSTRAMP
+  Average           = 3370.1694010417
+  StandardDeviation = 133.48696067032
+  Variance          = 17818.768668999
+  Minimum           = 2901.0
+  Maximum           = 4147.0
+  TotalPixels       = 7680
+  ValidPixels       = 7680
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = IMAGE
+  Average           = 3334.2398034794
+  StandardDeviation = 146.94654623209
+  Variance          = 21593.287449541
+  Minimum           = 2530.0
+  Maximum           = 4430.0
+  TotalPixels       = 248320
+  ValidPixels       = 248320
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = IMAGE_DARK
+  Average           = 1270.5005969981
+  StandardDeviation = 70.658578091737
+  Variance          = 4992.6346579461
+  Minimum           = 1215.0
+  Maximum           = 1700.0
+  TotalPixels       = 159968
+  ValidPixels       = 159967
+  NullPixels        = 0
+  LisPixels         = 1
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = IMAGE_BUFFER
+  Average           = 1211.7019737281
+  StandardDeviation = 18.413955445191
+  Variance          = 339.0737551375
+  Minimum           = 1179.0
+  Maximum           = 1286.0
+  TotalPixels       = 119976
+  ValidPixels       = 119976
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = CAL_REVERSE
+  Average           = 1199.3069053708
+  StandardDeviation = 18.180739136806
+  Variance          = 330.53927556058
+  Minimum           = 1143.0
+  Maximum           = 1268.0
+  TotalPixels       = 4301
+  ValidPixels       = 4301
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = CAL_MASK
+  Average           = 1252.871541502
+  StandardDeviation = 47.386522088447
+  Variance          = 2245.4824756389
+  Minimum           = 1179.0
+  Maximum           = 1429.0
+  TotalPixels       = 506
+  ValidPixels       = 506
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = CAL_RAMP
+  Average           = 3786.06796875
+  StandardDeviation = 795.72403145508
+  Variance          = 633176.73423512
+  Minimum           = 2415.0
+  Maximum           = 5617.0
+  TotalPixels       = 1280
+  ValidPixels       = 1280
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = CAL_DARK
+  Average           = 1245.2973484848
+  StandardDeviation = 52.463745795903
+  Variance          = 2752.4446229372
+  Minimum           = 1215.0
+  Maximum           = 1901.0
+  TotalPixels       = 528
+  ValidPixels       = 528
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = CAL_DARK_RAMP
+  Average           = 1297.9375
+  StandardDeviation = 89.282561517573
+  Variance          = 7971.3757911392
+  Minimum           = 1250.0
+  Maximum           = 1815.0
+  TotalPixels       = 80
+  ValidPixels       = 80
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+
+Group = CAL_BUFFER
+  Average           = 1230.4116161616
+  StandardDeviation = 18.608144845648
+  Variance          = 346.2630545966
+  Minimum           = 1197.0
+  Maximum           = 1286.0
+  TotalPixels       = 396
+  ValidPixels       = 396
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 0
+End_Group
+End

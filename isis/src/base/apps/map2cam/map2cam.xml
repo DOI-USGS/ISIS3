@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<application name="map2cam" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+  <brief>
+    Convert map projected image to a raw camera image
+  </brief>
+  
+  <description>
+    This program will take as input an image in a map project and 
+    geometrically transform it into a raw instrument image.  This allows
+    for example a Viking base map to be converted to a MOC raw geometry
+    image.
+  </description>
+  
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+  </category>
+
+  <history>
+    <change name="Kay Edwards" date="1987-09-02">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-06-06">
+      Converted to Isis 3.0 
+    </change>
+    <change name="Jacob Danton" date="2005-12-05">
+      Fixed a bug in BandChange, added appTest 
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-23">
+      Fixed appTest to reflect changes made to all camera models
+    </change>
+    <change name="Steven Lambright" date="2006-06-22">
+      Fixed typo in user documentation
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <oldName>
+    <item>lev2tolev1</item>
+    <item>base2l1</item>
+    <item>base</item>
+  </oldName>
+  
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input map projected cube to geometrically transform
+        </brief>
+        <description>
+          The specification of the input cube to be projected.  The cube must
+          contain a valid Mapping group in the labels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Raw instrument cube to match
+        </brief>
+        <description>
+          This cube defines the raw instrument geometry to be matched.  The
+          output file will have the same labels (Kernel and Instrument
+          group).  Note the Band group will represent data from the
+          raw camera and the content of the cube may not match.  For example,
+          using the MOLA base as the FROM file and a MOC Wide Angle Red cube
+          as the match, will have labels which indicate geometry for the MOC
+          WA red camera but the pixels will contain MOLA elevations.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output raw instrument cube
+        </brief>
+        <description>
+          This cube will contain data whose geometric properties are identical
+          to those of the MATCH cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description> 
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description> 
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description> 
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>  
+</application> 

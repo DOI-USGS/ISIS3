@@ -1,0 +1,4 @@
+Group = AlbedoAtm
+  Library = AlbedoAtm
+  Routine = AlbedoAtmPlugin
+End_Group

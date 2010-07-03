@@ -1,0 +1,112 @@
+Test 1
+Group = ControlMeasure
+  SerialNumber = Null
+  MeasureType  = Unmeasured
+  Sample       = Null
+  Line         = Null
+  Reference    = False
+End_Group
+End
+Test 2
+Group = ControlMeasure
+  SerialNumber   = Test
+  MeasureType    = Manual
+  Sample         = 1.0
+  Line           = 2.0
+  ErrorLine      = 4.0
+  ErrorSample    = -3.0
+  ErrorMagnitude = 5.0
+  Diameter       = 15.0
+  DateTime       = 2005-05-03T00:00:00
+  ChooserName    = Bob
+  Ignore         = True
+  GoodnessOfFit  = 0.5
+  Reference      = True
+End_Group
+End
+Test 3
+Group = ControlMeasure
+  SerialNumber   = Test
+  MeasureType    = Estimated
+  Sample         = 1.0
+  Line           = 2.0
+  ErrorLine      = 4.0
+  ErrorSample    = -3.0
+  ErrorMagnitude = 5.0
+  Diameter       = 15.0
+  DateTime       = 2005-05-03T00:00:00
+  ChooserName    = Bob
+  Ignore         = True
+  GoodnessOfFit  = 0.5
+  Reference      = False
+End_Group
+End
+Test 4
+Group = ControlMeasure
+  SerialNumber   = Test
+  MeasureType    = Automatic
+  Sample         = 1.0
+  Line           = 2.0
+  ErrorLine      = 4.0
+  ErrorSample    = -3.0
+  ErrorMagnitude = 5.0
+  Diameter       = 15.0
+  DateTime       = 2005-05-03T00:00:00
+  ChooserName    = Bob
+  Ignore         = True
+  GoodnessOfFit  = 0.5
+  Reference      = False
+End_Group
+End
+Test 5
+Group = ControlMeasure
+  SerialNumber   = Test
+  MeasureType    = ValidatedManual
+  Sample         = 1.0
+  Line           = 2.0
+  ErrorLine      = 4.0
+  ErrorSample    = -3.0
+  ErrorMagnitude = 5.0
+  Diameter       = 15.0
+  DateTime       = 2005-05-03T00:00:00
+  ChooserName    = Bob
+  Ignore         = True
+  GoodnessOfFit  = 0.5
+  Reference      = False
+End_Group
+End
+Test 6
+Group = ControlMeasure
+  SerialNumber   = Test
+  MeasureType    = ValidatedAutomatic
+  Sample         = 1.0
+  Line           = 2.0
+  ErrorLine      = 4.0
+  ErrorSample    = -3.0
+  ErrorMagnitude = 5.0
+  Diameter       = 15.0
+  DateTime       = 2005-05-03T00:00:00
+  ChooserName    = Bob
+  Ignore         = True
+  GoodnessOfFit  = 0.5
+  Reference      = False
+End_Group
+End
+Test 7
+Group = ControlMeasure
+  SerialNumber   = Test
+  MeasureType    = ValidatedAutomatic
+  Sample         = 1.0
+  Line           = 2.0
+  ErrorLine      = 4.0
+  ErrorSample    = -3.0
+  ErrorMagnitude = 5.0
+  ZScore         = (-1.1, 1.0)
+  Diameter       = 15.0
+  DateTime       = 2005-05-03T00:00:00
+  ChooserName    = Bob
+  Ignore         = True
+  GoodnessOfFit  = 0.5
+  Reference      = False
+End_Group
+End

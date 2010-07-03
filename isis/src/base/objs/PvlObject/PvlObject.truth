@@ -1,0 +1,192 @@
+Object = Beasts
+  CAT = Meow
+End_Object
+
+Object = Beasts
+  CAT = Meow
+
+  Group = Fish
+    Trout = Brown
+    Bass  = "Large mouth"
+  End_Group
+End_Object
+
+Object = Beasts
+  CAT = Meow
+
+  Group = Fish
+    Trout = Brown
+    Bass  = "Large mouth"
+  End_Group
+
+  Group = Birds
+    Sparrow = House
+    Crow    = Null
+  End_Group
+End_Object
+
+Object = Beasts
+  CAT = Meow
+
+  # Are slimey
+  Object = Snake
+    Rattler = DiamondBack
+  End_Object
+
+  Group = Fish
+    Trout = Brown
+    Bass  = "Large mouth"
+  End_Group
+
+  Group = Birds
+    Sparrow = House
+    Crow    = Null
+  End_Group
+End_Object
+
+Object = Beasts
+  CAT = Meow
+
+  # Are slimey
+  Object = Snake
+    Rattler = DiamondBack
+
+    Group = Fish
+      Trout = Brown
+      Bass  = "Large mouth"
+    End_Group
+  End_Object
+
+  Group = Fish
+    Trout = Brown
+    Bass  = "Large mouth"
+  End_Group
+
+  Group = Birds
+    Sparrow = House
+    Crow    = Null
+  End_Group
+End_Object
+
+Object = Beasts
+  CAT = Meow
+
+  # Are slimey
+  Object = Snake
+    Rattler = DiamondBack
+
+    # Are slimey
+    Object = Snake
+      Rattler = DiamondBack
+    End_Object
+
+    Group = Fish
+      Trout = Brown
+      Bass  = "Large mouth"
+    End_Group
+  End_Object
+
+  Group = Fish
+    Trout = Brown
+    Bass  = "Large mouth"
+  End_Group
+
+  Group = Birds
+    Sparrow = House
+    Crow    = Null
+  End_Group
+End_Object
+
+New for PvlObjectFindKeyword
+1
+Trout = Brown
+1
+Crow = Null
+1
+Rattler = DiamondBack
+1
+CAT = Meow
+**PVL ERROR** Keyword [Trout] does not exist in [Object = Beasts]
+**PVL ERROR** Unable to find keyword [Bus]
+Keyword Trout should not exist at top level 0
+Keyword Bus should dnot exit at top level 0
+End new for PvlObjectFindKeyword
+------------
+Object = Beasts
+  CAT = Meow
+
+  # Are slimey
+  Object = Snake
+    Rattler = DiamondBack
+
+    # Are slimey
+    Object = Snake
+      Rattler = DiamondBack
+      Gopher  = Constrictor
+    End_Object
+
+    # Are slimey
+    Object = Snake
+      Rattler = DiamondBack
+    End_Object
+
+    Group = Fish
+      Trout = Brown
+      Bass  = "Large mouth"
+    End_Group
+  End_Object
+
+  Group = Fish
+    Trout = Brown
+    Bass  = "Large mouth"
+  End_Group
+
+  Group = Birds
+    Sparrow = House
+    Crow    = Null
+  End_Group
+End_Object
+
+------------
+Object = Beasts
+  CAT = Meow
+
+  # Are slimey
+  Object = Snake
+    Rattler = DiamondBack
+
+    # Are slimey
+    Object = Snake
+      Rattler = DiamondBack
+      Gopher  = Constrictor
+    End_Object
+
+    # Are slimey
+    Object = Snake
+      Rattler = DiamondBack
+    End_Object
+
+    Group = Fish
+      Trout = Brown
+      Bass  = "Large mouth"
+    End_Group
+  End_Object
+
+  Group = Fish
+    Trout = Brown
+    Bass  = "Large mouth"
+  End_Group
+
+  Group = Birds
+    Sparrow = House
+    Crow    = Null
+  End_Group
+End_Object
+Object = Hello
+  Key = Value
+End_Object
+
+Testing Object with no end tag
+**PVL ERROR** Object [Hello] EndObject not found before end of file
+Testing Object with wrong end tag
+**PVL ERROR** Unexpected [EndGroup] in Object [Hello]

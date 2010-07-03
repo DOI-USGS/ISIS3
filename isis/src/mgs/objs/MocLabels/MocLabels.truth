@@ -1,0 +1,41 @@
+Unit test for MocLabels
+MocWideAngleCamera cub test...
+NarrowAngle?  0
+WideAngle?  1
+WideAngleRed?  1
+WideAngleBlue?  0
+Crosstrack Summing = 4
+Downtrack Summing = 4
+First Line Sample = 673
+Focal Plane Temperature = 213.1
+Line Rate = 0.4
+Exposure Duration = 100
+Start Time = 1997-10-20T10:58:37.46
+Detectors = 3456
+StartDetector(1) = 672
+EndDetector(1) = 675
+Sample = 0.625
+EphemerisTime = -6.93828e+07
+Gain = 16.03
+Offset = 25
+
+MocNarrowAngleCamera cub test...
+NarrowAngle?  1
+WideAngle?  0
+WideAngleRed?  0
+WideAngleBlue?  0
+Crosstrack Summing = 1
+Downtrack Summing = 1
+First Line Sample = 1025
+Focal Plane Temperature = 251
+Line Rate = 0.0004821
+Exposure Duration = 0.4821
+Start Time = 1999-03-09T16:51:43.25
+Detectors = 2048
+StartDetector(1) = 1024
+EndDetector(1) = 1024
+Sample = 1
+EphemerisTime = -2.57296e+07
+Gain = 93.465
+Offset = 230
+

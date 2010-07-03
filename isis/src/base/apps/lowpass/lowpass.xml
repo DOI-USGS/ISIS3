@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lowpass" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply lowpass or blurring filter to a cube
+  </brief>
+
+  <description>
+    This program applies a lowpass or blurring filter to a cube. An NxM boxcar is
+    moved through the cube and average of the boxcar at each position is computed.
+    This average, which effectively blurs the data, is written to the
+    output cube.  The user has the ability to choose which input pixels are filtered
+    including 1) all pixels, 2) pixels within a user specified range, 3) pixels
+    outside a user specified range, and 4) special pixels.  In general, the larger
+    the boxcar the more the output cube is blurred. For example, a 101x101 boxcar
+    will cause more blurring than a 3x3 boxcar.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>highpass</item>
+      <item>trimfilter</item>
+      <item>sdfilter</item>
+      <item>varfilter</item>
+    </applications>
+  </seeAlso>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <history>
+    <change name="Eric Eliason" date="1988-05-20">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2002-07-10">
+      Ported to Isis 3.0
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Drew Davidson" date="2005-08-17">
+      Added examples
+    </change>
+    <change name="Brendan George" date="2005-11-21">
+      Modified user interface
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-22">
+      Fixed appTest parameters and documentation
+    </change>
+    <change name="Brendan George" date="2006-05-31">
+      Added Minopt parameter, modified user interface
+    </change>
+    <change name="Brendan George" date="2006-06-19">
+       Reorganized user interface
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+	        Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output lowpass cube
+        </brief>
+        <description>
+	        The resultant filtered cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of samples in the boxcar.  It must be odd and
+          can not exceed twice the number of samples in the cube.  In general, the
+          size of the boxcar does not cause the program to operate significantly
+          slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of lines in the boxcar.  It must be odd and
+          can not exceed twice the number of lines in the cube.  In general, the
+          size of the boxcar does not cause the program to operate significantly
+          slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Settings">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Minimum valid DN
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when computing
+          the average.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Maximum valid DN
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing the average.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>    
+
+      <parameter name="MINOPT">
+          <type>string</type>
+          <default>
+              <item>COUNT</item>
+          </default>
+          <brief>
+             Sets minimum to be either a count or a percentage
+          </brief>
+          <description>
+              This parameter determines whether the minimum
+              parameter is to be interpreted as a count of pixels, or a
+              percentage of all pixels in the boxcar.
+          </description>
+
+          <list>
+              <option value="COUNT">
+                  <brief>
+                      Minimum valid pixel count
+                  </brief>
+                  <description>
+                      This option indicates that the minimum is a minimum
+                      count of pixels required for filtering.
+                  </description>
+              </option>
+              <option value="PERCENTAGE">
+                <brief>
+                    Minimum valid pixel percentage
+                </brief>
+                <description>
+                    This option indicates the the minimum parameter is to be
+                    interpreted as a percentage of the total pixels in the
+                    boxcar.
+                </description>
+              </option>
+          </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <default><item>1</item></default>
+        <brief>
+          Minimum boxcar pixels required for filter
+        </brief>
+        <description>
+          This option is the minimum number of valid pixels
+          required in a boxcar for filtering to begin.
+        </description>
+      </parameter>
+
+      <parameter name="REPLACEMENT">
+        <type>string</type>
+        <default>
+          <item>CENTER</item>
+        </default>
+        <brief>
+          Replacement if minimum not met
+        </brief>
+        <description>
+          This determines what to put in the center pixel,
+          in the event that there aren't enough valid,  non-special
+          pixels in the boxcar to meet the minimum. The
+          default is to replace it with the current value,
+          and the other option is to replace it with NULL.
+        </description>
+
+        <list>
+          <option value="CENTER">
+            <brief>
+              Center pixel value
+            </brief>
+            <description>
+              This sets the center pixel of the boxcar
+              to whatever was already there, in the event
+              that there are not enough valid, non-Special pixels
+              to meet minimum requirements.
+            </description>
+          </option>
+
+          <option value="NULL">
+            <brief>
+              Pixel value Null
+            </brief>
+            <description>
+              This sets the center pixel of the boxcar
+              to the special pixel value fo "Null", if
+              there are not enough valid, non-Special pixels
+              to meet minimum requirements.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Non-Special Pixel Filtering">
+      <parameter name="FILTER">
+        <type>string</type>
+        <default><item>ALL</item></default>
+        <brief>
+          Which pixels to filter
+        </brief>
+        <description>
+          These options choose which pixels to filter. The options are ALL, 
+          VALID and INVALID. If the first is chosen, the filter will be run on
+          all pixels inside the LOW-HIGH range, and all Specials declared valid.
+          If the second option is chosen, the filter is only run when the center
+          pixel is valid, and the third option only runs the filter when the
+          center is invalid. Regardless of which option is chosen, the average is only 
+          calculated from values between LOW and HIGH.
+        </description>
+        <list>
+          <option value="ALL">
+            <brief>
+              Filter All Pixels
+            </brief>
+            <description>
+              This is the option if you wish to filter all pixels, regardless
+              of validitity. It will only filter those Special Pixels indicated
+              by the user to be filtered. Also, the average will only be
+              calculated from the pixels with values between LOW
+              and HIGH.
+            </description>
+          </option>
+
+          <option value="INSIDE">
+            <brief>
+              Filter Pixels Between Low and High
+            </brief>
+            <description>
+              This is the option if you only wish to run the filter when the
+              center pixel is valid. The filter will only run if there are
+              enough valid pixels to meet the requirements set by LOW, HIGH,
+              and MINIMUM
+            </description>
+          </option>
+
+          <option value="OUTSIDE">
+            <brief>
+              Filter Pixels Outside Low and High
+            </brief>
+            <description>
+              This is the option if you only wish to run the filter when the
+              center pixel is invalid. The filter will only run if there are
+              enough valid pixels to meet the requirements set by LOW, HIGH,
+              and MINIMUM
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+
+    </group>
+
+    <group name="Special Pixel Filtering">
+
+      <parameter name="NULL">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter NULL Pixels
+        </brief>
+        <description>
+          If the center pixel of a boxcar is NULL, and this box is checked, 
+          the pixel will be overwritten with the average value of the boxcar 
+          as a whole. If this box is not checked, the pixel will be left alone.
+        </description>
+      </parameter>
+
+      <parameter name="HRS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter HRS Pixels
+        </brief>
+        <description>
+          If the center pixel of a boxcar is HRS, and this box is checked, 
+          the pixel will be overwritten with the average value of the boxcar 
+          as a whole. If this box is not checked, the pixel will be treated according
+          to the REPLACEMENT parameter.
+        </description>
+      </parameter>
+
+      <parameter name="HIS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter HIS Pixels
+        </brief>
+        <description>
+          If the center pixel of a boxcar is HIS, and this box is checked, 
+          the pixel will be overwritten with the average value of the boxcar 
+          as a whole. If this box is not checked, the pixel will be treated according
+          to the REPLACEMENT parameter.
+        </description>
+      </parameter>
+
+      <parameter name="LRS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter LRS Pixels
+        </brief>
+        <description>
+           If the center pixel of a boxcar is LRS, and this box is checked, 
+          the pixel will be overwritten with the average value of the boxcar 
+          as a whole. If this box is not checked, the pixel will be treated according
+          to the REPLACEMENT parameter.
+        </description>
+      </parameter>
+
+      <parameter name="LIS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter LIS Pixels
+        </brief>
+        <description>
+          If the center pixel of a boxcar is LIS, and this box is checked, 
+          the pixel will be overwritten with the average value of the boxcar 
+          as a whole. If this box is not checked, the pixel will treated according
+          to the REPLACEMENT parameter.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+  
+  <examples>
+    <example>
+      <brief>
+         Running a 3x3 boxcar on all pixels
+      </brief>
+      <description>
+	 The lowpass filter 
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= peaks.cub
+	  to=3x3lowpass.cub
+	  samples=3
+	  lines=3
+	</commandLine>
+	<description>
+	  This configuration creates a relatively small filter, resulting in a
+	  slight amount of blurring. 
+	</description>
+      </terminalInterface>
+      
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="456" height="629" 
+	    src="assets/images/3x3gui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI set to filter all pixels for the image using
+	      a three by three boxcar. Note that as many of the default 
+	      parameters as are allowed are being used.
+	    </description>
+	    <thumbnail width="145" height="200" caption="lowpass gui" 
+	     src="assets/thumbs/3x3gui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before the lowpass filter.
+	  </brief>
+	  <description>
+ 	    Here we see the original cube. The areas of greatest interest are 
+	    those with a great deal of contrast such as edges.
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/3x3lowpass.jpg">
+	  <brief>
+	  Output image after lowpass
+	  </brief>
+	  <description>
+            After the filter, the entire image is somewhat softer. The difference
+	    may be hard to detect on uniform areas, but the sections of the 
+	    image that previously were sharply contrasted are now blurred. As
+	    this particular configuration has been set for a small filter, the
+	    results are obtained quickly and are more subtle than a large filter.
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/3x3lowpass.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+    
+    <example>
+      <brief>
+         Running a 21x21 boxcar on all pixels
+      </brief>
+      <description>
+	 The lowpass filter is used again here, but at a much more intense level 
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= peaks.cub
+	  to=bigLowpass.cub
+	  samples=21
+	  lines=21
+	</commandLine>
+	<description>
+	  This configuration creates a relatively large filter, resulting in a
+	  great amount of blurring.
+	</description>
+      </terminalInterface>
+      
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="456" height="629" 
+	    src="assets/images/bigLowpassGui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI set to filter all pixels for the image using
+	      a 21 by 21 boxcar. This configuration will be slightly slower than
+	      in the previous example, due to the increased boxcar size.
+	    </description>
+	    <thumbnail width="145" height="200" caption="lowpass gui" 
+	     src="assets/thumbs/bigLowpassGui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before the lowpass filter.
+	  </brief>
+	  <description>
+ 	    Here we see the original cube. The areas of greatest interest are 
+	    those with a great deal of contrast such as edges.
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/bigLowpass.jpg">
+	  <brief>
+	  Output image after lowpass
+	  </brief>
+	  <description>
+            As seen here, the 21 by 21 boxcar blurs the image to a great extent.
+	    In fact, there seems to be little purpose for ever using a square
+	    boxcar this large, except for the purpose of illustrating the effect
+	    of the lowpass.
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/bigLowpass.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

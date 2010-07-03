@@ -1,0 +1,77 @@
+#!/usr/bin/perl -wi.bak
+($progname) = ($0 =~ m#([^/]+)$#);  # get the name of this program
+
+$usage = "Usage:  $progname [-i] [-r] [-e] [-v] oldname newname filedesc
+where
+   -i causes case to be ignored.
+   -r allows Perl regular expressions to be used within the pattern.
+      (Default is that no characters have special meaning.
+      Be sure to use single quotes to protect characters from
+      the shell.)
+   -e Allows newname to be an expression. This automatically turns
+      on -r.
+   -v specifies verbose mode
+";
+
+die "$usage\n" if @ARGV == 0;
+$opt = '';
+$regexp = $verbose = 0;
+while ($ARGV[0] =~ /^-([a-z]$)/) {
+  $switch = $1;
+  shift;
+  if ($switch eq 'i') {
+    $opt .= 'i';
+  } elsif ($switch eq 'r') {
+    $regexp = 1;
+  } elsif ($switch eq 'e') {
+    $opt .= 'e';
+    $regexp = 1;
+  } elsif ($switch eq 'v') {
+    $verbose = 1;
+  } else {
+    die "$usage\n";
+  }
+}
+die "$usage\n" if @ARGV < 3;
+
+$opt .= 'g';
+$old = shift;
+$new = shift;
+
+if ($verbose) {
+  print STDERR "Replacing $old with $new\n";
+  $mode1 = $regexp ? 'Regular Expression' : 'Literal';
+  $mode2 = ($opt =~ /i/) ? 'in' : '';
+  print STDERR "Operating in $mode1 mode, case ${mode2}sensitive\n";
+}
+
+#warn "Before:  old = $old\t\tnew = $new\n";
+$old = quotemeta $old unless $regexp;
+$new = quotemeta $new unless $regexp;
+#warn "After:   old = $old\t\tnew = $new\n";
+
+$command = "s#$old#$new#$opt";
+#warn "\$command = $command\n";
+
+$linec = $n = 0;
+$oldname = '';
+while (<>) {
+  if ($verbose) {
+    if ($ARGV ne $oldname) { # on new file
+      if ($oldname ne '') {
+        print STDERR "$oldname ($linec line(s)):  Replaced $n occurrence(s)\n";
+      }
+      $linec = 0;
+      $n = 0;
+      $oldname = $ARGV;
+    }
+    ++$linec;
+  }
+  $n += eval "$command";
+  print;
+}
+
+if ($verbose) {
+  print STDERR "$oldname ($linec line(s)):  Replaced $n occurrence(s)\n";
+  print STDERR "Done\n";
+}

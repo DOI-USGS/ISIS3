@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="divfilter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a spatial high pass filter to a cube (divide)
+  </brief>
+
+  <description>
+    <p>
+      This program divides the pixel being processed by a low pass filter.
+      This has the general effect of highlighting the edges of grouped
+      contrasted DN values in the image, and therefore, feature changes will be
+      emphasized.  Predominant changes will be emphasized with larger boxcars,
+      and smaller changes can be searched for using smaller boxcars.
+    </p>
+    <p>
+      This is done by convolving an NxM boxcar through the data, where
+      N and M are odd integers.  In other words, the average DN value of the
+      boxcar is divided into its middle pixel DN value.  Please refer to the
+      following diagram:
+    </p>
+      <image src="assets/image/divfilterExample.jpg" width="200" height="200">
+      </image>
+    <p>
+      Thus, P(output) = P(input) / lowPassFilter, or P(s,l) = P(s,l) / 
+      average(s,l,N,M) where P is the target pixel, s and l are the sample and
+      line position in the boxcar, N and M are the size of the boxcar (in this
+      case 3x3) and average(s,l,N,M) is the average of the NxM centered box.
+    </p>
+    <p>
+      For details on the box filtering see the following references:
+    <pre>
+      M. J. McDonnell, Box-Filtering Techniques, Computer Graphics
+      and Image Processing, Vol. 17, 1981, pages 65-70
+
+      E. M. Eliason and L. A. Soderblom, An Array Processing System
+      for Lunar Geochemical and Geophysical Data,
+      Porc. Lunar Sci. Conf. (8th) , 1977, pages 1163-1170.
+    </pre>
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>highpass</item>
+      <item>lowpass</item>
+      <item>trimfilter</item>
+      <item>svfilter</item>
+      <item>noisfilter</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Eric Eliason" date="1988-05-20">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2002-08-12">
+      Ported to Isis 3.0
+    </change>
+    <change name="K Teal Thompson" date="2003-04-10">
+      Add example.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Jeff Anderson" date="2003-06-03">
+      Updated application test to fix errors
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Brendan George" date="2006-03-20">
+      Added Minopt parameter
+    </change>
+    <change name="Jac Shinaman" date="2007-02-22">
+      Updated xml documentation with examples and new GUI configuration
+    </change>
+  </history>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+	        Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+	  The resultant filtered cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	  This is the total number of samples in the boxcar.
+      It must be odd and can not exceed twice the number of samples
+      in the cube.  In general, due to the computational algorithm,
+	  the size of the boxcar does not cause the program to operate
+	  significantly slower. (See Eliason/Soderblom document)
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+        <description>
+	  This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, due to the computational algorithm,
+          the size of the boxcar does not cause the program to operate
+          significantly slower. (See Eliason/Soderblom document)
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Restrictions">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Valid minimum pixel
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Valid maximum pixel
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="MINOPT">
+          <type>string</type>
+          <default>
+              <item>COUNT</item>
+          </default>
+          <brief>
+             Sets minimum to be either a count or a percentage
+          </brief>
+          <description>
+              This parameter determines whether the minimum
+              parameter is to be interpreted as a count of pixels, or a
+              percentage of all pixels in the boxcar.
+          </description>
+
+          <list>
+              <option value="COUNT">
+                  <brief>
+                      Minimum valid pixel count
+                  </brief>
+                  <description>
+                      This option indicates that the minimum is a minimum
+                      count of pixels required for filtering.
+                  </description>
+              </option>
+              <option value="PERCENTAGE">
+                <brief>
+                    Minimum valid pixel percentage
+                </brief>
+                <description>
+                    This option indicates the the minimum parameter is to be
+                    interpreted as a percentage of the total pixels in the
+                    boxcar.
+                </description>
+              </option>
+          </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>integer</type>
+        <brief>
+          Minimum boxcar pixel count
+        </brief>
+        <description>
+          This is the minimum number of valid pixels which must occur inside the
+          NxM boxcar for filtering to occur. For example, 3x5 boxcar has 15 pixels
+          inside.  If MINIMUM=10 then the filter will occur if there are 10 or
+          greater valid pixels.  A valid pixel is one that is not special (NULL, LIS,
+          etc) and is in the range defined by LOW to HIGH.
+        </description>
+        <default>
+          <item>1</item>
+        </default>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="PROPAGATE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Propagate special pixels</brief>
+        <description>
+          This option is used to define how special pixels are handled.  If the
+          center pixel of the boxcar(input) is a special pixel, the output pixel
+	  will contain the same special pixel, or set to NULL depending on the
+	  value of this parameter.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief> 101x101</brief>
+      <description>
+        Use a 101x101 boxcar
+      </description>
+      <terminalInterface>
+        <commandLine> f=peaks.cub:4 t=divfilter s=101 li=101
+        </commandLine>
+        <description>
+        In this example the boxcar size is 101 by 101.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.4.jpg" width="500" height="500">
+          <brief> Input image for divfilter</brief>
+          <description>This is the input image for the divfilter example.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.4.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/divfilter.jpg" width="500" height="500">
+          <brief> Output image for divfilter</brief>
+          <description> This is the output image for this example of divfilter.  It is the same as running lowpass and dividing the input image by the lowpass output using the ratio application.
+          </description>
+          <thumbnail caption="Output image showing results of the divfilter application." src="assets/thumb/divfilter.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="470" height="597" src="assets/image/divfilterGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a divide filter of the input image with a boxcar of 101x101. </description>
+            <thumbnail width="200" height="200" caption="Divfilter Gui" src="assets/thumb/divfilterGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

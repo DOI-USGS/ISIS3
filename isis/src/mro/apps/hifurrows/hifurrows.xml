@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hifurrows" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Null furrowed pixels 
+  </brief>
+
+  <description>
+    This program works by finding the correlation between the columns
+    in an input image.  With a Channel 0 image, the first five columns
+    are examined; in a Channel 1 image, the last five columns are 
+    examined (Channel 2 images are not supported).  If the statistical 
+    results suggest a furrow is detected (i.e. the correlation between 
+    two columns is below a certain threshold), then the affected column is 
+    replaced with Null pixels.<br></br><br></br>
+    If a an input image does not have a furrow, none of its pixels will be
+    altered.  The label of all output files will include a new group called
+    "Correlations."  This group lists the correlations between the relevant
+    columns.  For example, "Column3to2  0.987..." means there is a strong 
+    positive correlation between columns 2 and 3 (and very unlikely to have
+    a furrow in the area).  
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>hiclean</item> 
+      <item>hifringe</item> 
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name = "Sean Crosby" date = "2007-04-03">
+      Original version 
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+          Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name = "Files">
+      <parameter name = "FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file 
+        </brief>
+        <description>
+          The cube to be corrected 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name = "TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the modified data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Furrow parameters">
+      <parameter name = "CORRELATION">
+        <type>double</type>
+        <default><item>0.75</item></default>
+        <brief>Correlation threshold</brief>
+        <description>
+          The maximum correlation from pixel to pixel.  If the correlation
+          between two pixels suddenly drops below this value, then a furrow
+          has been detected.
+        </description>  
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>  
+    </group>  
+  </groups>
+
+</application>

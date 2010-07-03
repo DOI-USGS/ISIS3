@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="raw2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import raw cube into Isis format
+  </brief>
+
+  <description>
+    This program will import a raw image into an Isis cube.  Bytes will be swapped if
+    necessary and there is an option to create special pixels.
+  </description>
+
+  <history>
+    <change name="Tracie L Sucharski" date="1994-07-21">
+      Original version
+    </change>
+
+    <change name="Tracie L Sucharski" date="2002-07-25">
+      Ported to Isis 3.0
+    </change>
+    <change name="Tracie L Sucharski" date="2003-01-28">
+      Move from Utility to Import/Export category.
+    </change>
+    <change name="Jeff Anderson" date="2003-02-03">
+      Move from Import/Export to Import and Export category.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Tracie Sucharski" date="2003-08-22">
+      Modified to use the new IsisImport object, which simplified the code.
+    </change>
+    <change name="Stuart Sides" date="2003-10-10">
+      Modified call to StartProcess to match new IsisImport class.
+    </change>
+    <change name="Jeff Anderson" date="2004-02-06">
+      Modified due to refactor of IsisImport class
+    </change>
+    <change name="Jeff Anderson" date="2004-05-18">
+      Updated documentation
+    </change>
+    <change name="Drew Davidson" date="2005-06-27">
+      Updated application test
+    </change>
+    <change name="Steven Koechle" date="2007-08-29">
+      Added ability to change special pixel ranges. Added example.
+    </change>
+    <change name="Christopher Austin" date="2008-08-28">
+      Added the UNSIGNEDWORD option for param BITTYPE.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input raw file
+        </brief>
+        <description>
+          Use this parameter to select the raw filename. If multi-band, it
+          is assumed to be in band sequential order.
+        </description>
+        <filter>
+          *.raw
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+
+    <group name="Raw file dimensions">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>Number of samples in raw image</brief>
+        <description>
+          This defines the number of samples in the raw image.
+        </description>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>Number of lines in raw image</brief>
+        <description>
+          This defines the number of lines in the raw image.
+        </description>
+      </parameter>
+
+      <parameter name="BANDS">
+        <type>integer</type>
+        <default>
+          <item>1</item>
+        </default>
+        <brief>Number of bands in raw image</brief>
+        <description>
+          This defines the number of bands in the raw image.  If
+          greater than 1, the image is assumed to be in band sequential
+          order.
+        </description>
+      </parameter>
+
+      <parameter name="SKIP">
+        <type>integer</type>
+        <default>
+          <item>0</item>
+        </default>
+        <brief>Number of bytes to skip before reading data</brief>
+        <description>
+          This defines the number of bytes to skip before the actual image
+          data is read.  This would be for raw images with header data.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Data specifications">
+      <parameter name="BITTYPE">
+        <type>string</type>
+        <default>
+          <item>UNSIGNEDBYTE</item>
+        </default>
+        <brief>Bit type of input data</brief>
+        <description>
+          Bit type of data:
+            8 bit, 
+            16 bit signed, or
+            32 bit
+        </description>
+        <list>
+          <option value="UNSIGNEDBYTE">
+            <brief>8 bit data</brief>
+            <description>
+              Pixels are in 8-bit data range (0 to 255).
+            </description>
+          </option>
+          <option value="UNSIGNEDWORD">
+            <brief> 16 bit unsigned data </brief>
+            <description>
+              Pixels are in 16 bit unsigned data range (0 to 65535)
+            </description>
+          </option>
+          <option value="SIGNEDWORD">
+            <brief> 16 bit signed data </brief>
+            <description>
+              Pixels are in 16 bit signed data range (-32767 to 32767)
+            </description>
+          </option>
+          <option value="REAL">
+            <brief> 32 bit data </brief>
+            <description>
+              Pixels are in the 32 bit floating point data range
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="BYTEORDER">
+        <type>string</type>
+        <default>
+          <item>LSB</item>
+        </default>
+        <brief> Byte order of data </brief>
+        <description>
+          Indicates the byte order of the data.  Options are LSB (Least
+          Significant Byte firs) or MSB (Most Significant Byte first).
+        </description>
+        <list>
+          <option value="LSB">
+            <brief> Least Significant Byte </brief>
+            <description>
+              Least Significant Byte first.  Possible architectures include:
+              Intel and Amd.
+          </description>
+          </option>
+          <option value="MSB">
+            <brief> Most Significant Byte </brief>
+            <description>
+              Most Significant Byte first.  Possible architectures include:
+              Sun and Mac.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="SETNULLRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>NULLMIN</item>
+          <item>NULLMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="NULLMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>HRSMIN</item>
+          <item>HRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>LRSMIN</item>
+          <item>LRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+      Using raw2isis with default parameters
+      </brief>
+      <description>
+        The use of raw2isis to ingest raw data and output Isis3 cubes. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= input.raw
+	  to= out.cub
+      samples=126
+      lines=126
+      bands=2
+      bittype=real
+        </commandLine>
+        <description>
+	This example shows the use of raw2isis create an Isis3 cube. 
+        </description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/raw2isisGUI.jpg">
+            <brief>
+	    Example GUI
+            </brief>
+            <description>
+	      Screenshot of the GUI with parameters
+            </description>
+            <thumbnail width="164" height="200" caption="raw2isis gui"
+             src="assets/thumbs/raw2isisGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/input.raw">
+          <brief>
+	    Raw input file.
+          </brief>
+          <description>
+	    This is the raw data
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+      </dataFiles>
+  
+      <outputImages>
+        <image width="550" height="550" src="assets/images/out.jpg">
+          <brief>
+	  Final output image after the conversion
+          </brief>
+          <description>
+	    Converts from PDS format to a Isis3 cube.
+          </description>
+          <thumbnail caption= "The cube image after conversion"
+          src="assets/thumbs/out.jpg" width="126" height="126"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

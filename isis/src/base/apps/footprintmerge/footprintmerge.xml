@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="footprintmerge" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Find footprint islands, given a list of cubes
+  </brief>
+
+  <description>
+    This program will take a list of cubes, merge the cube footprints and find 
+    those cubes that are islands.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Tracie Sucharski" date="2007-09-19"> Original version</change>
+    <change name="Tracie Sucharski" date="2007-11-13">
+        Added handling of cubes crossing 0/360 boundary
+    </change>
+    <change name="Tracie Sucharski" date="2008-04-17">
+        Fixed progress printing.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of Input cubes
+        </brief>
+        <description>
+          The list of  cubes used to find footprint islands.
+        </description>
+        <filter>
+          *.lis *.lst *.txt
+        </filter>
+      </parameter>
+      <parameter name="TO">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>Text file output</brief>
+          <description>
+              Text file used if MODE=Full.  The filenames are listed for each footprint island.
+          </description>
+      </parameter>
+
+        <parameter name="MODE">
+            <type>string</type>
+            <default>
+                <item>BRIEF</item>
+            </default>
+            <brief>
+               Amount of information written out about each footprint island.
+            </brief>
+            <description>
+                Indicates whether detailed information about which images are contained in each footprint
+                island are printed or simply how many footprint islands there are.
+            </description>
+            <list>
+                <option value="BRIEF">
+                    <brief>Simply print how many footprint islands there are to the screen and log file</brief>
+                    <description>
+                        The number of footprint islands will be printed to the screen and log file.
+                    </description>
+                    <exclusions><item>TO</item></exclusions>
+                </option>
+                <option value="FULL">
+                    <brief>Print the number of cubes contained in each footprint island along with the filenames.</brief>
+                    <description>
+                        Print the number of cubes in each footprint island and the filesnames in each island to the 
+                        screen and log file.
+                    </description>
+                    <inclusions><item>TO</item></inclusions>
+                </option>
+            </list>
+        </parameter>
+    </group>
+  </groups>
+</application>

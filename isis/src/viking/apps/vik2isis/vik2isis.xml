@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="vik2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import PDS formatted Viking EDR into Isis format cube
+  </brief>
+
+  <description>
+    This program will import a PDS formatted Viking EDR into an Isis cube. 
+    The input file can be in compressed or decompressed form.
+  </description>
+
+  <history>
+    <change name="Jeff Anderson" date="2004-06-09">
+      Original version
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-04-29">
+        Added nominal reseau values to the label.
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-07-11">
+        Altered application to accept compressed or uncompressed files.
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-15">
+      Fixed problems caused by split of viking data area
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Koechle" date="2009-01-21">
+      Changed to use the Isis::Filename class and use the temporary preferences
+    </change>
+    <change name="Eric Hyer" date="2009-06-23">
+      Replaced file extention checking with file data checking for determining
+      whether the file is decompressed already or not.  Also added ability to
+      handle vdcomp error codes and throw meaningful iExceptions.
+    </change>
+    <change name="Steven Lambright" date="2010-06-29">
+      Updated check for PVL labels to reflect changes in PvlKeyword 
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted Viking Orbiter EDR image file
+        </brief>
+        <description>
+          Use this parameter to select the Viking PDS EDR filename. 
+        </description>
+        <filter>
+          *.imq  *.img
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>

@@ -1,0 +1,31 @@
+include $(ISISROOT)/make/isismake.macros
+
+DIRONLY = $(subst /,,$(shell ls -d */))
+CVS := CVS
+
+APPLICATIONS = $(filter-out $(CVS), $(DIRONLY)) 
+
+applications:
+	for i in $(APPLICATIONS); do \
+          echo "    Building and installing [$$i] ("`date +%T`")"; \
+	  cd $$i; $(MAKE) install; cd ..; \
+	done
+
+documentation:
+	for i in $(APPLICATIONS); do \
+          echo "    Installing application documentation [$$i]"; \
+	  cd $$i; $(MAKE) docs; cd ..; \
+	done
+
+
+clean:
+	for i in $(APPLICATIONS); do \
+	  echo "    Cleaning [$$i]"; \
+	  cd $$i; $(MAKE) clean; cd ..; \
+	done
+
+test:
+	for i in $(APPLICATIONS); do \
+          printf %-46s "    Testing [$$i]"; \
+	  cd $$i; $(MAKE) test; cd ..; \
+	done

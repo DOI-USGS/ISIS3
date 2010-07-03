@@ -1,0 +1,6 @@
+Group = Cassini-Huygens/ISSWA
+  Version = 1
+  Library = IssWACamera
+  Routine = IssWACameraPlugin
+EndGroup
+ 

@@ -1,0 +1,6 @@
+peaks.cub 	out1.txt
+peaks.cub, out2.txt
+peaks.cub 	out3.txt
+peaks.cub, 	 out4.txt
+ peaks.cub	 ,	" out 5.txt"
+peaks.cub , 	 ' out 6.txt'

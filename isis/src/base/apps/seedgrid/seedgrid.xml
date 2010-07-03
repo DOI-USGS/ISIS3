@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="seedgrid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Creates a control network for a Lat/Lon range
+  </brief>
+
+  <description>
+    <p>
+      This program creates a control network for a latitude/longitude range on a
+      specified target planet using a specified projection type to do the 
+      seeding.  The control network generated will have no control measures, but 
+      will instead have a known latitude and longitude for each control point.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stacy Alley" date="2009-07-27">
+      Original version
+    </change>
+    <change name="Travis Addair" date="2009-08-27">
+      Fixed error when calculating X/Y range and added application test.
+    </change>
+    <change name="Travis Addair" date="2009-09-11">
+      Added parameter allowing user to enter in projection type to use in seeding process.
+    </change>
+    <change name="Travis Addair" date="2009-09-14">
+      Changed means of entering projection type to be a map file so as to allow 
+      for more customization and accepted projection types.
+    </change>
+    <change name="Travis Addair" date="2009-09-24">
+      Added option to use lat/lon spacing when seeding points; fixed bug causing 
+      points to be seeded outside the lat/lon range; added a default projection 
+      type and reinstated the TARGET parameter so the user does not need to edit 
+      a projection file in order to run the program.
+    </change>
+    <change name="Travis Addair" date="2010-06-07">
+      Added progress bar.
+    </change>
+  </history>
+
+  <groups>
+
+    <group name="Target/Range"> 
+
+      <parameter name="TARGET">
+        <type>string</type>
+        <brief>
+          Target planet for the Lat/Lon range
+        </brief>
+        <description>
+          This is the planet on which the Lat/Lon range resides.  The target 
+          can be specified in one of two ways: by typing the name of a planet
+          for this parameter, or by including a value for the keyword TargetName
+          in the PROJECTION file, which will set the value of this parameter at 
+          runtime, and show up in the print file.  If the user specifies both,
+          then the value for the TARGET parameter will be used.  If neither is
+          specified, the program will throw an error.
+        </description>
+        <internalDefault>From PROJECTION file</internalDefault>
+      </parameter>                                                   
+
+      <parameter name="PROJECTION">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing mapping parameters
+        </brief>
+        <defaultPath>$base/templates/maps</defaultPath>
+        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <description>
+          A file containing the mapping parameters in PVL form.  This
+          file can be a hand produced label file.  It can also be an existing cube label
+          which contains a Mapping group.  By default, the program will use a 
+          standard map template for a Sinusoidal projection.  If the keyword 
+          TargetName is not in this projection file, then the user must specify 
+          a value for the TARGET parameter.  If the TargetName keyword is used,
+          then the program will set the value of the TARGET parameter to the
+          value of the keyword.  You can produce map files using the 
+          "maptemplate" program.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>PrintMap</function>
+            <brief>View MapFile</brief>
+            <description>
+              This helper button will cat out the mapping group of the given mapfile to the session log
+               of the application
+             </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
+        <filter>
+          *.map *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MINLAT">
+        <type>double</type>
+        <brief>
+          Minimum Latitude
+        </brief>
+        <description>
+          This is the minimum latitude for the Lat/Lon range.
+        </description>
+      </parameter>
+
+      <parameter name="MAXLAT">
+        <type>double</type>
+        <brief>
+          Maximum Latitude
+        </brief>
+        <description>
+          This is the maximum latitude for the Lat/Lon range.
+        </description>
+      </parameter>
+
+      <parameter name="MINLON">
+        <type>double</type>
+        <brief>
+          Minimum Longitude
+        </brief>
+        <description>
+          This is the minimum longitude for the Lat/Lon range.
+        </description>
+      </parameter>
+
+      <parameter name="MAXLON">
+        <type>double</type>
+        <brief>
+          Maximum Longitude
+        </brief>
+        <description>
+          This is the maximum longitude for the Lat/Lon range.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Step Size">
+      <parameter name="SPACING">
+        <type>string</type>
+        <brief>
+          Whether the generated control points should be spaced by a meter 
+          increment, or by a latitude/longitude increment.
+        </brief>
+        <description>
+            This option allows the user to specify the type of spacing the 
+            program will use when generating the control points.  Selecting 
+            METER spacing will use a projection to attempt to place control 
+            points every XSTEP meters within the longitude range, and every 
+            YSTEP meters within the latitude range.  Conversely, LATLON spacing
+            will simply place control points every LATSTEP and LONSTEP within
+            the range.
+        </description>
+        <default><item>METER</item></default>
+        <list>
+            <option value="METER">
+                <brief>
+                   Space control points in the range by meter increments.
+                </brief>
+                <description>
+                    This option will space control points in the range by a 
+                    specified XSTEP and YSTEP given in meters on the planet's 
+                    surface.  If this option is selected, the user must also 
+                    specify a PROJECTION file, but not necessarily a value for 
+                    TARGET if the projection contains the TargetName keyword.
+                </description>
+                <inclusions>
+                    <item>PROJECTION</item>
+                    <item>XSTEP</item>
+                    <item>YSTEP</item>
+                </inclusions>
+                <exclusions>
+                    <item>LATSTEP</item>
+                    <item>LONSTEP</item>
+                </exclusions>
+            </option>
+            <option value="LATLON">
+                <brief>
+                    Space control points in the range by latitude and longitude 
+                    increments.
+                </brief>
+                <description>
+                    This option will space control points in the range by a 
+                    specified LATSTEP and LONSTEP, given in terms of the 
+                    planet's degrees latitude and longitude, respectively.  If 
+                    this option is selected, the user must specify a TARGET 
+                    name, but not a PROJECTION file.
+                </description>
+                <inclusions>
+                    <item>TARGET</item>
+                    <item>LATSTEP</item>
+                    <item>LONSTEP</item>
+                </inclusions>
+                <exclusions>
+                    <item>PROJECTION</item>
+                    <item>XSTEP</item>
+                    <item>YSTEP</item>
+                </exclusions>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name="XSTEP">
+        <type>double</type>
+        <brief>
+            Step Size in the x direction in meters.
+        </brief>
+        <description>
+            Points will be placed on the grid in the longitude range in the
+            step descriped here in meters.
+        </description>
+      </parameter>
+
+      <parameter name="YSTEP">
+        <type>double</type>
+        <brief>
+            Step Size in the y direction in meters.
+        </brief>
+        <description>
+            Points will be placed on the grid in the latitude range in the step
+            descriped here in meters.
+        </description>
+      </parameter>
+
+      <parameter name="LATSTEP">
+        <type>double</type>
+        <brief>
+            Step Size in the north/south direction.
+        </brief>
+        <description>
+            Points will be placed on the grid in the latitude range in the
+            step descriped here in degrees latitude.
+        </description>
+      </parameter>
+
+      <parameter name="LONSTEP">
+        <type>double</type>
+        <brief>
+            Step Size in the east/west direction.
+        </brief>
+        <description>
+            Points will be placed on the grid in the longitude range in the
+            step descriped here in degrees longitude.
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Control">
+
+      <parameter name="NETWORKID">
+        <type>string</type>
+        <brief>
+            Name of this control network
+        </brief>
+        <description>
+            The ID or name of this particular control network. This string
+            should be unique.
+        </description>
+      </parameter>
+
+      <parameter name="POINTID">
+        <type>string</type>
+        <brief>
+            The pattern to be used to create point ids.
+        </brief>
+        <description>
+            A string with one and only one set of question marks ("?").
+            This string will be used to create unique IDs for each control
+            point created by this program. The question marks will be replaced
+            with a number beginning with zero. For example the pattern
+            "User????" would create point IDs "User0001" through
+            "User9999". Note: Make sure there are enough "?"s for all the control
+            points that may be created during this run. If all question marks are
+            exausted the program will throw an error.
+        </description>
+      </parameter>
+
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <brief>
+            The description of the network.
+        </brief>
+        <description>
+            A string describing purpose of this control network.
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Files">
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output control network
+        </brief>
+        <description>
+          This file will contain the control network
+        </description>
+      </parameter>
+    </group>
+
+  </groups>
+
+</application>

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="isis2fits" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  
+  <brief>
+    Exports a cube to fits format
+  </brief>
+
+  <description>
+    This program will export an Isis cube to fits format. It is recommended
+    that the image be output in 32-bit per pixel format. The user may also
+    choose to output into an 8-bit, 16-bit unsigned, or 16-bit signed image but
+    in order to ensure that the range of pixels is not truncated when going to
+    a less precise format, it is recommended that the output file be stretched
+    using a linear stretch. Special pixels are mapped in the following manner;
+    Low Saturation values and Null are made black and High Saturation values
+    are made white.
+  </description>
+
+  <history>
+    <change name="Drew Davidson" date="2005-06-01">
+      Original version
+    </change>
+    <change name="Drew Davidson" date="2005-06-15">
+      Added code to export multiple bands
+    </change>
+    <change name="Jeff Anderson" date="2006-05-15">
+      Added minpercent and maxpercent options
+    </change>
+    <change name="Steven Lambright" date="2007-06-15">
+      Updated documentation to follow current standards
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Mackenzie Boyd" date="2009-10-29">
+      Made SkyMap and All options work, added more keywords to ALL option, 
+      removed unsigned 16 bit option, made file total come out to a sum evenly 
+      divisible by 2880 as specified in the standard.
+          
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>isis2jpg</item>
+      <item>isis2tiff</item>
+      <item>isis2raw</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to export
+        </brief>
+        <description>
+          Use this parameter to select the filename and band to export. For
+          example, file.cub+5 will select band 5
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output fits file
+        </brief>
+        <description> 
+          Use this parameter to specify the name of the output fits file. If you
+          do not include an extension of ".fits" it will be added automatically.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Output Data Type">
+      <parameter name="BITTYPE">
+        <type>string</type>
+        <default>
+          <item>32BIT</item>
+        </default>
+        <brief>Bit type of output file</brief>
+        <description>
+          Bit type of output:
+            8 bit (0=black, 255=white)
+            16 bit unsigned (0=black, 65535=white)
+            16 bit signed (-32767=black, 32768=white)
+            32 bit (1.17549435e-38=black, 3.40282347e+38=white)
+        </description>
+        <list>
+          <option value="8BIT">
+            <brief>8 bit data</brief>
+            <description>
+              Pixels are in 8-bit data range (0 to 255).
+            </description>
+          </option>
+          <option value="16BIT">
+            <brief> 16 bit data </brief>
+            <description>
+              Pixels are in 16 bit signed data range (-32768 to 32767)
+            </description>
+          </option>
+          <option value="32BIT">
+            <brief> 32 bit data </brief>
+            <description>
+              Pixels are in the 32 bit floating point data range
+              (-3.40282347e+38 to 3.40282347e+38)
+            </description>
+            <exclusions>
+              <item>STRETCH</item>
+              <item>MINPERCENT</item>
+              <item>MAXPERCENT</item>
+            </exclusions>
+
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Stretch Options">
+      <parameter name="STRETCH">
+        <type>string</type>
+        <default>
+          <item>LINEAR</item>
+        </default>
+        <brief>Type of stretch</brief>
+        <description>
+          This parameter is used to select one of four ways to stretch
+          (or map) output pixels.  They are NONE, LINEAR, or MANUAL. It is
+          recommended that output data that is less precise than the input data
+          from whence it came (i.e. 32-bit data being output as 8-bit data) be 
+          stretched.
+        </description>
+
+        <list>
+          <option value="NONE">
+            <brief> No stretch </brief>
+            <description>
+              No stretch is performed.
+            </description>
+            <exclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+              <item>MINPERCENT</item>
+              <item>MAXPERCENT</item>
+            </exclusions>
+          </option>
+          <option value="LINEAR">
+            <brief> Linear stretch </brief>
+            <description>
+              A minimum and maximum are automatically computed based on
+              the statistics of the selected band.  A histogram of the band
+              is used to pick the minimum at 0.5% of the data and the maximum
+              at 99.5% of the data.  Input pixels less than or equal to the
+              minimum are stretched to black while pixels greater than the or
+              equal to the maximum are stretched to white.  A linear mapping
+              occurs between the minimum and maximum.
+            </description>
+            <exclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+            </exclusions>
+            <inclusions>
+              <item>MINPERCENT</item>
+              <item>MAXPERCENT</item>
+           </inclusions>
+          </option>
+          <option value="MANUAL">
+            <brief> Manual stretch </brief>
+            <description>
+              This option allows you to pick your own stretch.  You must
+              enter a value for MINIMUM and MAXIMUM;
+            </description>
+            <inclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+            </inclusions>
+            <exclusions>
+              <item>MINPERCENT</item>
+              <item>MAXPERCENT</item>
+           </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <brief>Minimum pixel value</brief>
+        <description>
+          The minimum input pixel value which will be mapped to black.
+        </description>
+        <lessThan>
+          <item>MAXIMUM</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MAXIMUM">
+        <type>double</type>
+        <brief>Maximum pixel value</brief>
+        <description>
+          The maximum input pixel value which will be mapped to white.
+        </description>
+        <greaterThan>
+          <item>MINIMUM</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="MINPERCENT">
+        <type>double</type>
+        <brief>Minimum Percent</brief>
+        <description>
+          The percentage of data in the histogram used to compute the minimum pixel value in the stretch.
+        </description>
+        <default><item>0.5</item></default>
+        <lessThan>
+          <item>MAXPERCENT</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MAXPERCENT">
+        <type>double</type>
+        <brief>Maximum Percent</brief>
+        <description>
+          The percentage of data in the histogram used to compute the maximum pixel value in the stretch.
+        </description>
+        <default><item>99.5</item></default>
+        <greaterThan>
+          <item>MINPERCENT</item>
+        </greaterThan>
+      </parameter>
+    </group>
+
+    <group name="Header Information">
+      <parameter name="INFO">
+        <type>string</type>
+        <default><item>NOMINAL</item></default>
+        <brief>Level of information in the header (nominal, projection)</brief>
+        <description>
+          This parameter is used to determine how much information will appear 
+          in the FITS header. Minimally, the header will include the information
+          necessary to conform to the FITS header, which conveniently also 
+          allows it to be read by a FITS file reader. This is automatically read
+          from the cube label.
+        </description>
+        <list>
+          <option value="NOMINAL">
+            <brief>Nominal Fits header</brief>
+            <description>
+              This option will include only minimal information in the fits 
+              header. This includes the bits per pixel, the number of samples in
+              the cube, the number of lines in the cube, and the core base and 
+              multiplier for DN values. Though this will transfer information to 
+              the fits standard quickly, it will essentially strip the cube of 
+              all information other than raw pixel values.
+            </description>
+          </option>
+          <option value="SKY">
+            <brief>Include information from a Skymap in the fits header</brief>
+            <description>
+              This option will include, in addition to everything in the nominal
+              option, the OBJCTRA and OBJCTDEC fits keywords, which signify the
+              right ascension and the declination, respectively.
+            </description>
+          </option>
+          <option value="ALL">
+            <brief>Include as much of the cube label as possible</brief>
+            <description>
+              This option will include as many keywords from the label as are 
+              supported by the fits standard, including the information from the 
+              skymap.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+  </groups>
+</application>

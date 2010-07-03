@@ -1,0 +1,287 @@
+Testing Isis::ProcessByBoxcar Class ... 
+unittest: Working
+0% Processed
+Testing one input and output cube ... 
+Boxcar Samples:  3
+Boxcar Lines:    3
+Boxcar Bands:    1
+
+Top Left Sample:  0, Top Left Line:  0, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  1, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  2, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  3, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  4, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  5, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  6, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  7, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  8, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  9, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  10, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  11, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  12, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  13, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  14, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  15, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  16, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  17, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  18, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  19, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  20, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  21, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  22, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  23, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  24, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  25, Top Left Band:  1
+10% ProcessedTop Left Sample:  0, Top Left Line:  26, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  27, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  28, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  29, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  30, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  31, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  32, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  33, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  34, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  35, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  36, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  37, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  38, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  39, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  40, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  41, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  42, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  43, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  44, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  45, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  46, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  47, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  48, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  49, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  50, Top Left Band:  1
+20% ProcessedTop Left Sample:  0, Top Left Line:  51, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  52, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  53, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  54, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  55, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  56, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  57, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  58, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  59, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  60, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  61, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  62, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  63, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  64, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  65, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  66, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  67, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  68, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  69, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  70, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  71, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  72, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  73, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  74, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  75, Top Left Band:  1
+30% ProcessedTop Left Sample:  0, Top Left Line:  76, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  77, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  78, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  79, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  80, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  81, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  82, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  83, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  84, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  85, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  86, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  87, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  88, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  89, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  90, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  91, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  92, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  93, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  94, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  95, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  96, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  97, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  98, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  99, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  100, Top Left Band:  1
+40% ProcessedTop Left Sample:  0, Top Left Line:  101, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  102, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  103, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  104, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  105, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  106, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  107, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  108, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  109, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  110, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  111, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  112, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  113, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  114, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  115, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  116, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  117, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  118, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  119, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  120, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  121, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  122, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  123, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  124, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  125, Top Left Band:  1
+50% ProcessedTop Left Sample:  0, Top Left Line:  0, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  1, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  2, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  3, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  4, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  5, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  6, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  7, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  8, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  9, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  10, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  11, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  12, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  13, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  14, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  15, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  16, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  17, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  18, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  19, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  20, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  21, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  22, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  23, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  24, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  25, Top Left Band:  2
+60% ProcessedTop Left Sample:  0, Top Left Line:  26, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  27, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  28, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  29, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  30, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  31, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  32, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  33, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  34, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  35, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  36, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  37, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  38, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  39, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  40, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  41, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  42, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  43, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  44, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  45, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  46, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  47, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  48, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  49, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  50, Top Left Band:  2
+70% ProcessedTop Left Sample:  0, Top Left Line:  51, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  52, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  53, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  54, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  55, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  56, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  57, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  58, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  59, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  60, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  61, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  62, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  63, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  64, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  65, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  66, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  67, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  68, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  69, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  70, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  71, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  72, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  73, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  74, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  75, Top Left Band:  2
+80% ProcessedTop Left Sample:  0, Top Left Line:  76, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  77, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  78, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  79, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  80, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  81, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  82, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  83, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  84, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  85, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  86, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  87, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  88, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  89, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  90, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  91, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  92, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  93, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  94, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  95, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  96, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  97, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  98, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  99, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  100, Top Left Band:  2
+90% ProcessedTop Left Sample:  0, Top Left Line:  101, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  102, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  103, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  104, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  105, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  106, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  107, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  108, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  109, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  110, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  111, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  112, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  113, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  114, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  115, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  116, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  117, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  118, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  119, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  120, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  121, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  122, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  123, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  124, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  125, Top Left Band:  2
+100% Processed
+Testing for no inputs/outputs ...
+**PROGRAMMER ERROR** You must specify exactly one input cube
+
+Testing for exactly one input ...
+**PROGRAMMER ERROR** You must specify exactly one output cube
+
+**PROGRAMMER ERROR** No input images have been selected ... thereforethe output image size can not be determined
+
+Testing for too many input cubes ...
+**PROGRAMMER ERROR** You must specify exactly one input cube
+
+Testing for too many output cubes ...
+**PROGRAMMER ERROR** You must specify exactly one output cube
+
+Testing for lines mismatch ...
+**PROGRAMMER ERROR** The number of lines in the input and output cubes must match
+
+Testing for samples mismatch ...
+**PROGRAMMER ERROR** The number of samples in the input and output cubes must match
+
+Testing for bands mismatch ...
+**PROGRAMMER ERROR** The number of bands in the input and output cubes must match
+
+Testing for boxcar size not set ...
+**PROGRAMMER ERROR** Use the SetBoxcarSize method to set the boxcar size
+

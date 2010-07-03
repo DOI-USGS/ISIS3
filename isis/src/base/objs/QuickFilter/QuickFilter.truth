@@ -1,0 +1,79 @@
+Unit Test for QuickFilter Object
+--------------------------------
+Constructing f
+Adding Line 1
+Adding Line 2
+Adding Line 3
+Adding Line 4
+Adding Line 5
+
+Boxcar Width:           3
+Boxcar Height:          5
+Half Boxcar Width:      1
+Half Boxcar Height:     2
+Samples in Line:        4
+
+Average[0]:             1.66667
+Average[1]:             2
+Average[2]:             2.5
+Average[3]:             3
+Variance[0]:            0.238095
+Variance[1]:            0.714286
+Variance[2]:            0.277778
+Variance[3]:            0
+Count[0]:               15
+Count[1]:               15
+Count[2]:               10
+Count[3]:               10
+
+Changing Valid Count
+Average[0]:             1.66667
+Average[1]:             2
+Average[2]:             -1.79769e+308
+Average[3]:             -1.79769e+308
+Variance[0]:            0.238095
+Variance[1]:            0.714286
+Variance[2]:            -1.79769e+308
+Variance[3]:            -1.79769e+308
+Count[0]:               15
+Count[1]:               15
+Count[2]:               10
+Count[3]:               10
+
+Unloading data
+Average[0]:             -1.79769e+308
+Average[1]:             -1.79769e+308
+Average[2]:             -1.79769e+308
+Average[3]:             -1.79769e+308
+Variance[0]:            -1.79769e+308
+Variance[1]:            -1.79769e+308
+Variance[2]:            -1.79769e+308
+Variance[3]:            -1.79769e+308
+Count[0]:               0
+Count[1]:               0
+Count[2]:               0
+Count[3]:               0
+
+Changing Valid Range
+Average[0]:             1.66667
+Average[1]:             1.5
+Average[2]:             2
+Average[3]:             -1.79769e+308
+Variance[0]:            0.238095
+Variance[1]:            0.277778
+Variance[2]:            0
+Variance[3]:            -1.79769e+308
+Count[0]:               15
+Count[1]:               10
+Count[2]:               5
+Count[3]:               0
+
+Testing errors
+**PROGRAMMER ERROR** Invalid value for [ns] in QuickFilter constructor
+**PROGRAMMER ERROR** [Width] must be must be greater than or equal to one in QuickFilter constructor
+**PROGRAMMER ERROR** [Height] must be must be greater than or equal to one in QuickFilter constructor
+**PROGRAMMER ERROR** [Width] must be must be odd in QuickFilter constructor
+**PROGRAMMER ERROR** [Height] must be must be odd in QuickFilter constructor
+**PROGRAMMER ERROR** Minimum must be less than maximum in [QuickFilter::SetMinMax]
+**PROGRAMMER ERROR** Minimum must be less than maximum in [QuickFilter::SetMinMax]
+**PROGRAMMER ERROR** Number of lines added exceeds boxcar height ... use RemoveLine before AddLine

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+<h2><a name="Introduction">Introduction</a></h2>
+<p>
+This reference document describes the elements of the Isis User Preference file.  See Environment and Preference Setup for detailed information.
+</p>
+
+<h2><a name="UserInterface">User Interface</a></h2>
+<p>
+The user interface group in the preference file allows you to customize the way your applications run, and how they look
+in graphical form.  The user interface in either graphical or command line mode supplies a progress indicator to the user. 
+The increment of the progress bar can be customized to increase the bar by 10%, 5%, 2%, or 1%.   Additionally, in the
+command line mode, the user can turn off the progress bar if desired.  The GUI will always update the progress bar.  The
+style of the GUI can be customized to have a windows, cde, kde, etc. look to it.  The browser fired up from the GUI can
+also be specified, along with the size of the GUI, and its font type and size.  By default, all history files are stored in the
+users home directory under .Isis/history.  This can be customized to save the history files in the users current directory 
+(using '.') or any other directory.  The history recording can also be turned off if the user does not wish to record any
+history on the programs being run.
+
+<pre style="padding-left:4em;">
+Group=UserInterface
+  ProgressBarPercent = 10 | 5 | 2 | 1
+  ProgressBar        = On | Off
+  GuiStyle           = windows | motif | cde | motifplus | platinum | sgi | kde | aqua
+  GuiHelpBrowser     = firefox { your preferred browser, may need path }
+  GuiFontName        = helvitica | times | charter | any legal font
+  GuiFontSize        = 10 | 12 | 14 | any font point size
+  GuiWidth           = 460 { your preferred gui width }
+  GuiHeight          = 600 { your preferred gui height }
+  HistoryPath        = $HOME/.Isis/history { your preferred location for the application .par files }
+  HistoryRecording   = On | Off
+  HistoryLength      = your preferred count of history entries to remember
+EndGroup
+</pre>
+</p>
+
+<h2><a name="">Error Facility</a></h2>
+<p>
+Errors can be written in either standard (single line) or PVL format.  
+Additionally, the source file and line number identifying where the error 
+occurred can be suppressed. Stack traces can also be displayed when running Isis 
+in debug mode.
+
+<pre style="padding-left:4em;">
+Group = ErrorFacility
+  Format   = Standard | Pvl
+  FileLine = On | Off
+  StackTrace = On | Off
+EndGroup
+</pre>
+</p>
+
+<h2><a name="SessionLog">Session Log</a></h2>
+<p>
+These parameters control the session log.  Logging can be completely turned off, directed to a terminal, to a file, or both.  The name of the log file is customizable and content can be either overwritten or appended.
+
+<pre style="padding-left:4em;">
+Group = SessionLog
+  TerminalOutput = On | Off
+  FileOutput     = On | Off
+  FileName       = print.prt
+  FileAccess     = Append | Overwrite
+EndGroup
+</pre>
+</p>
+
+<h2><a name="CubeCustomization">Cube Customization</a></h2>
+<p>
+The user can control how specific attributes of cube I/O are performed.  In particular, they can specify whether programs will 1) automatically overwrite an existing cube or issue and error message, 2) generate a single attached file containing labels, history, and cube data or detached cube with three files (label, history, data), 3) automatically gather statistics as the data is written to disk and record the computations in the labels, and 4) record a history entry of the program in the cube file.
+
+<pre style="padding-left:4em;">
+Group = CubeCustomization
+  Overwrite  = Allow | Error
+  Format     = Attached | Detached
+  Statistics = On | Off
+  History    = On | Off
+EndGroup
+</pre>
+</p>
+
+<h2><a name="">Data Directories</a></h2>
+<p>
+Isis supports many missions that require various data such as SPICE kernels or calibration files.  Because these files can be quite large it may be required to move the data into a different directories from the normal distribution.  This customization supports that requirement.  The Isis system manager would generally modify this group in the system-wide preference file.
+
+<pre style="padding-left:4em;">
+Group = DataDirectory
+  Base      = $ISIS3DATA/base
+  Viking1   = $ISIS3DATA/viking1
+  Viking2   = $ISIS3DATA/viking2
+  Voyager   = $ISIS3DATA/voyager
+  Mgs       = $ISIS3DATA/mgs
+  Galileo   = $ISIS3DATA/galileo
+  Cassini   = $ISIS3DATA/cassini
+  Odyssey   = $ISIS3DATA/odyssey
+  Mro       = $ISIS3DATA/mro
+  Messenger = $ISIS3DATA/messenger
+  Temporary = .
+EndGroup
+</pre>
+</p>
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>PreferenceDictionary.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>reference</categoryItem>
+  </category>
+
+  <audience>
+    <target>intermediate</target>
+  </audience>
+
+  <bibliography>
+    <title>Preference Dictionary</title>
+    <brief>
+    Complete reference to all user preference settings
+    </brief>
+    <description>
+      Complete reference to all user preference settings
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2003-03-27</date>
+  </bibliography>
+</documentation>

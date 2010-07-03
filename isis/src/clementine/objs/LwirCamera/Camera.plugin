@@ -1,0 +1,6 @@
+Group = Clementine_1/Lwir
+  Version = 1
+  Library = LwirCamera
+  Routine = LwirCameraPlugin
+EndGroup
+ 

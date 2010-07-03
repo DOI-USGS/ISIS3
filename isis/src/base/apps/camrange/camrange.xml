@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="camrange" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Compute the lat/lon range of a camera image
+  </brief>
+
+  <description>
+    This program computes and outputs the latitude/longitude range of
+    an image in camera space, as well as the pixel resolution.  An
+    example of the output generated is:
+<pre>
+      Object = Results
+        From = moc.cub
+
+        Group = Target
+          TargetName = Mars
+          RadiusA    = 3396190.0 &lt;meters&gt;
+          RadiusB    = 3396190.0 &lt;meters&gt;
+          RadiusC    = 3376200.0 &lt;meters&gt;
+        EndGroup
+
+        Group = PixelResolution
+          Lowest  = 1.3890716392389 &lt;meters&gt;
+          Highest = 1.3890519075556 &lt;meters&gt;
+        EndGroup
+
+        Group = UniversalGroundRange
+          LatitudeType       = Planetocentric
+          LongitudeDirection = PositiveEast
+          LongitudeDomain    = 360
+          MinimumLatitude    = -79.61917144991
+          MaximumLatitude    = -79.553447654676
+          MinimumLongitude   = 123.79357963013
+          MaximumLongitude   = 124.14022828935
+        EndGroup
+
+        Group = LatitudeRange
+          LatitudeType    = Planetographic
+          MinimumLatitude = -79.73841136553
+          MaximumLatitude = -79.673409432806
+        EndGroup
+
+        Group = LongitudeRange1
+          LongitudeDirection = PositiveWest
+          LongitudeDomain    = 360
+          MinimumLongitude   = 235.85977171065
+          MaximumLongitude   = 236.20642036987
+        EndGroup
+
+        Group = LongitudeRange2
+          LongitudeDirection = PositiveEast
+          LongitudeDomain    = 180
+          MinimumLongitude   = 123.79357963013
+          MaximumLongitude   = 124.14022828935
+        EndGroup
+
+        Group = LongitudeRange3
+          LongitudeDirection = PositiveWest
+          LongitudeDomain    = 180
+          MinimumLongitude   = -124.14022828935
+          MaximumLongitude   = -123.79357963013
+        EndGroup
+      EndObject
+</pre>
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-04-29">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Jeff Anderson" date="2003-06-04">
+      Added edge option and modified to handle multi-band cubes.
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2003-08-27">
+      Changed default extension handling mechanism
+    </change>
+    <change name="Jeff Anderson" date="2003-11-12">
+      Modified to output various flavors of ground range (e.g. Planetocentric,
+      Planetographic, positive east, positive west, etc).
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-15">
+      Modified appTest input image (image testData area was moved)
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-22">
+      Modified appTest truth files, ranges changed in linescan cameras due to 
+      a bug fix
+    </change>
+    <change name="Jacob Danton" date="2005-12-05">
+        Updated appTest
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-23">
+        Updated appTest truth files (change due to modifications to all camera models)
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+          Removed references to CubeInfo 
+    </change>
+</history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to compute range
+        </brief>
+        <description>
+          Use this parameter to select the filename of a cube with
+          camera labels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <default><item>None</item></default>
+        <brief>
+          Output label
+        </brief>
+        <description>
+          This file will contain the ground range of the cube
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

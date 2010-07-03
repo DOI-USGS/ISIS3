@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="skypt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Converts between sample/line and ra/ dec positions
+  </brief>
+
+  <description>
+    This program requires the user supply a "level 1" cube.  That is, a
+    cube in raw camera geometry. 
+    The user must also enter one of the following coordinates:
+    <pre>
+     sample/line
+      ra/dec
+    </pre>
+    The program will then compute the other coordinates and the ephemeris
+    time and pixel dn value.
+
+   <p>
+    Hint:  If you would like to use this program for multiple points, look into the 
+    -batchlist option.
+   </p>
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Elizabeth Miller" date="2006-03-21">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-31">
+      Modified to output pvl and flat format files and added append option
+    </change>
+    <change name="Elizabeth Miller" date="2006-04-14">
+      Added check for valid samp/line  and ra/dec positions
+    </change>
+    <change name="Tracie Sucharski" date="2006-04-21">
+        Do not check error on SetImage, because there might not be an intersection
+        on the planet when dealing with sky images.
+    </change>
+    <change name="Sean Crosby" date="2007-04-12">
+      Changed flatfile output so it duplicates PVL data.  User now
+      required to enter a flatfile name.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+          <type>cube</type>
+          <fileMode>input</fileMode>
+          <brief>
+            Filename of a cube
+          </brief>
+          <description>
+            Input cube with appropriate camera labels 
+            (Instrument and kernel groups)
+          </description>
+          <filter>
+              *.cub
+          </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output List
+        </brief>
+        <description>
+          The output list will be a text file and will contain the  filename,  
+         sample, line, ra, dec, et, and dn values.  The values will be written out 
+          in pvl or flat format, depending on what the user selects for the FORMAT
+          parameter.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="FORMAT">
+        <type>string</type>
+        <brief>
+          Output Format
+        </brief>
+        <description>
+          Format type for output file.  Pvl format is default.
+        </description>  
+        <default><item>PVL</item></default>
+        <list>
+          <option value="PVL">
+            <brief>
+              Pvl Format
+            </brief>
+            <description>
+              Output file will be in pvl format.
+            </description>
+          </option>
+          <option value="FLAT">
+            <brief>
+              FlatFile Format
+            </brief>
+            <description>
+              Output file will be a comma deliminated flatfile.  This file format can easily be 
+              imported into excel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <brief>
+          Append Output to File
+        </brief>
+        <description>
+          If this option is selected, the output from the application will be appended to the file. 
+          If it is not selected, any information in the TO file will be overwritten.  This option is 
+         selected by default.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+    </group>
+
+    <group name="Position">
+      <parameter name="TYPE">
+        <type>string</type>
+        <brief>Coordinate selection</brief>
+        <default><item>IMAGE</item></default>
+        <list>
+          <option value="IMAGE">
+            <brief>Interprets the coordinate as sample/line</brief>
+            <description>
+              This option interprets the coordinate as sample/line and will
+              compute teh right ascension/declination
+            </description>
+            <exclusions>
+              <item>RA</item>
+              <item>DEC</item>
+            </exclusions>
+            <inclusions>
+              <item>SAMPLE</item>
+              <item>LINE</item>
+            </inclusions>
+          </option>
+          <option value="SKY">
+            <brief>Interprets the coordinates as ra/dec</brief>
+            <description>
+              This option interprets the coordinate as right ascension/declination and will
+              compute sample/line
+            </description>
+            <exclusions>
+              <item>SAMPLE</item>
+              <item>LINE</item>
+            </exclusions>
+            <inclusions>
+              <item>RA</item>
+              <item>DEC</item>
+            </inclusions>
+          </option>
+        </list>
+        <description>
+          This parameter is used to select the type of coordinate which will be used to
+          compute the other two remaining coordinates.
+        </description>
+      </parameter>
+
+      <parameter name="SAMPLE">
+        <type>double</type>
+        <brief>
+          Sample position to report
+        </brief>
+        <description>
+            This is the sample position used to compute information about the camera state at the pixel.
+        </description>
+      </parameter>
+
+      <parameter name="LINE">
+        <type>double</type>
+        <brief>
+          Line position to report
+        </brief>
+        <description>
+            This is the line position used to compute information about the camera state at the pixel.
+        </description>
+      </parameter>
+
+      <parameter name="RA">
+        <type>double</type>
+        <brief>
+          Right Ascension
+        </brief>
+        <description>
+            This is the right ascension value used to compute information about the camera state at the pixel.
+        </description>
+      </parameter>
+
+      <parameter name="DEC">
+        <type>double</type>
+        <brief>
+          Declination
+        </brief>
+        <description>
+            This is the declination value used to compute information about the camera state at the pixel.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+</application>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="vikclean" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Clean-up of Viking Orbiter Level 1 images
+  </brief>
+
+  <description>
+    This program will perform the  level 1 processing sequence on a Viking 
+    Orbiter PDS image, including the cleanup of salt and pepper noise, the removal of 
+    reseaus and tracks, and the removal of butterflies from the image.
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>vikfixtrx</item>
+      <item>findrx</item>
+      <item>remrx</item>
+      <item>viknosalt</item>
+      <item>viknopepper</item>
+      <item>viknobutter</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Miller" date="2005-12-06">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-16">
+      Added example
+    </change>
+    <change name="Travis Addair" date="2009-06-10">
+      Refactored application to use Pipelines
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be cleaned
+        </brief>
+        <description>
+          The cube to be cleaned.  The cube will be run through a series of 
+          filters to remove salt and pepper noise, tracks, and reseaus.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the clean data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Options">
+        <parameter name="REMOVE">
+            <type>boolean</type>
+            <brief>
+                  Remove intermediate files
+            </brief>
+            <description>
+                Option to remove or leave intermediate cube files made by the application
+            </description>
+            <default><item>TRUE</item></default>
+        </parameter>
+        <parameter name="LDIM">
+          <type>integer</type>
+          <brief>
+               Number of Lines to Remove around each Reseau
+          </brief>
+          <description>
+            This number will be used in the remrx step of the clean up.  It is the number of 
+            lines to remove around each reseau.
+          </description>
+          <default><item>9</item></default>
+        </parameter>
+        <parameter name="SDIM">
+          <type>integer</type>
+          <brief>
+               Number of Samples to Remove around each Reseau
+          </brief>
+          <description>
+            This number will be used in the remrx step of the clean up.  It is the number of 
+            samples to remove around each reseau.
+          </description>
+          <default><item>9</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Input Viking Image to be cleaned </brief>
+      <description>
+        This example shows the vikclean application in action.  It removes all salt and pepper noise, along with reseaus,
+        tracks, and butterfiles.
+      </description>
+      <terminalInterface>
+        <commandLine> from=../IN/temp.cub to=OUT/out.cub
+        </commandLine>
+        <description>
+          Input a viking image to clean and give it an output file name.
+        </description>
+      </terminalInterface>
+  
+      <inputImages>
+        <image src="assets/image/inputImage.jpg" width="584" height="512">
+          <brief> Viking Image to Clean</brief>
+          <description>
+              This is the input viking image prior to cleaning.
+          </description>
+          <thumbnail caption=" Input Viking Image" src="assets/thumb/inputImage.jpg" width="200" height="175"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+  
+      <outputImages>
+        <image src="assets/image/outputImage.jpg" width="584" height="512">
+          <brief> Cleaned Viking Image</brief>
+          <description> 
+              This is the viking image after the cleaning sequence has taken place.
+          </description>
+          <thumbnail caption="Output Viking Image after the cleaning process application." src="assets/thumb/outputImage.jpg" width="200" height="175"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+  
+    </example>
+  </examples>
+
+ </application>
+

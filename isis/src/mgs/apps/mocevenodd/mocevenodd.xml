@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mocevenodd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Remove even/odd detector striping
+  </brief>
+
+  <description>
+    This program will remove even/odd detector striping from a MOC narrow
+    angle image.  It will check to ensure the crosstrack summing mode for
+    the image is 1, otherwise the destriping is unnecessary. The algorithm
+    gather the average of the even columns as well as the odd columns.  The
+    difference between the averages is split (divided by two) to create
+    offsets for both columns which are then applied.  
+  </description>
+
+  <seeAlso>
+    <applications>
+      <item>mocnoise50</item>
+      <item>moccal</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <missionItem>Mars Global Surveyor</missionItem>
+  </category>
+
+  <history>
+    <change name="Tracie Sucharski" date="1999-02-23">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-06-11">
+      Converted to Isis 3.0
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input MOC narrow angle image
+        </brief>
+        <description>
+          The input image must be a MOC narrow angle cube with
+          crosstrack summing of 1.
+         </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Destriped MOC cube
+        </brief>
+        <description>
+          The resultant destriped moc image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

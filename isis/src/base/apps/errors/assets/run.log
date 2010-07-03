@@ -1,0 +1,81 @@
+Object = stats
+  IsisVersion       = "3.1.14beta | 2007-08-23"
+  ProgramVersion    = 2006-01-23
+  ProgramPath       = /usgs/pkgs/isis3nightly/isis/bin
+  ExecutionDateTime = 2007-11-05T11:38:41
+  HostName          = blackflag
+  UserName          = smkoechle
+  Description       = "Generates statistics about a cube"
+
+  Group = UserParameters
+    FROM = /usgs/cpkgs/isis3/data/mro/testData/ctx_pmoi_i_00003.bottom.cub
+  End_Group
+
+  Group = Results
+    From              = /usgs/cpkgs/isis3/data/mro/testData/ctx_pmoi_i_00003.bottom.cub
+    Average           = 831.548116
+    StandardDeviation = 135.62724726194
+    Variance          = 18394.750199851
+    Median            = 861.0
+    Mode              = 978.0
+    Skew              = -0.65145945069103
+    Minimum           = 426.0
+    Maximum           = 1103.0
+    Sum               = 207887029.0
+    TotalPixels       = 250000
+    ValidPixels       = 250000
+    NullPixels        = 0
+    LisPixels         = 0
+    LrsPixels         = 0
+    HisPixels         = 0
+    HrsPixels         = 0
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:00.0
+    CpuTime     = 00:00:00.1
+  End_Group
+End_Object
+
+
+Object = phocube
+  IsisVersion       = "3.1.14beta | 2007-08-23"
+  ProgramVersion    = 2006-09-21
+  ProgramPath       = /usgs/pkgs/isis3nightly/isis/bin
+  ExecutionDateTime = 2007-11-05T11:51:17
+  HostName          = blackflag
+  UserName          = smkoechle
+  Description       = "Creates phase, incidence, and/or emmision angle bands 
+                      for a cube"
+
+  Group = UserParameters
+    FROM      = /usgs/cpkgs/isis3/testData/isis/src/cassini/apps/ciss2isis/tsts/narrowAngle/truth/N1472853667_1.truth.cub
+    TO        = out.cub
+    PHASE     = TRUE
+    EMISSION  = TRUE
+    INCIDENCE = TRUE
+    LATITUDE  = TRUE
+    LONGITUDE = TRUE
+  End_Group
+
+  Group = Error
+    Program = phocube
+    Class   = "CAMERA ERROR"
+    Code    = 6
+    Message = "Unable to initialize camera model from group [Instrument]"
+    File    = CameraFactory.cpp
+    Line    = 82
+  End_Group
+
+  Group = Error
+    Program = phocube
+    Class   = "PVL ERROR"
+    Code    = 3
+    Message = "Keyword [InstrumentPosition] does not exist in [Group = 
+              Kernels]"
+    File    = PvlContainer.cpp
+    Line    = 75
+  End_Group
+End_Object
+
+

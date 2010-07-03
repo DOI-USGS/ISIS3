@@ -1,0 +1,225 @@
+
+Unit test for NumericalApproximation
+Using the function f(x) = x^3 + x^2 + x
+
+1) Creating objects, accessing properties
+Valid interpolation types include: 
+type 	 name 		   minpoints
+0	linear			2
+1	polynomial		3
+2	polynomial-Neville's	3
+3	cspline-natural		3
+4	cspline-clamped		3
+5	cspline-periodic	2
+6	cspline-neighborhood	4
+7	cspline-Hermite		2
+8	akima			5
+9	akima-periodic		5
+EXCEPTIONS:
+**PROGRAMMER ERROR** SetInterpType() - Invalid argument. Unknown interpolation type: 11
+	************************************************
+
+Test constructors: 
+object 	 type 	 name
+interp1  3 	 cspline-natural
+interp2  3 	 cspline-natural
+interp3  3 	 cspline-natural
+interp4  4 	 cspline-clamped
+interp5  2 	 polynomial-Neville's
+interp6  7 	 cspline-Hermite
+
+EXCEPTIONS:
+**PROGRAMMER ERROR** NumericalApproximation() - Unable to construct an object using the given vectors and interpolation type
+**PROGRAMMER ERROR** AddData() - Invalid arguments. The sizes of the input vectors do not match
+	************************************************
+
+Add data, set properties:  
+d = 0 is an x element of dataset? 1
+d = 0.01 is an x element of dataset? 0
+d = 0.02 is an x element of dataset? 0
+d = 0.03 is an x element of dataset? 0
+d = 0.04 is an x element of dataset? 1
+
+description 					 size 	 domain
+cspline-natural, regularly spaced		 21 	[0, 0.8]
+cspline-natural, irregularly spaced		 21 	[0, 0.8]
+cspline-neighborhood, irregularly spaced	 21 	[0, 0.8]
+cspline-clamped, irregularly spaced		 21 	[0, 0.8]
+polynomial-Neville's, irregularly spaced	 21 	[0, 0.8]
+
+EXCEPTIONS:
+**PROGRAMMER ERROR** DomainMinimum() - Unable to calculate the domain minimum for the data set
+**PROGRAMMER ERROR** ComputeGsl() - Unable to compute GSL interpolation
+**PROGRAMMER ERROR** ValidateDataSet() - Invalid data set, x-values must be in ascending order for cspline-natural interpolation: 
+		x[20] = 0.8 > x[21] = 0.0
+**PROGRAMMER ERROR** DomainMaximum() - Unable to calculate the domain maximum for the data set
+**PROGRAMMER ERROR** ComputeGsl() - Unable to compute GSL interpolation
+**PROGRAMMER ERROR** ValidateDataSet() - cspline-natural interpolation requires a minimum of 3 data points - currently have 0
+**PROGRAMMER ERROR** Evaluate() - Unable to evaluate the function at the point a = 0.5
+**PROGRAMMER ERROR** ComputeCubicClamped() - Must set endpoint derivative values after adding data in order to compute cubic spline with clamped boundary conditions
+**PROGRAMMER ERROR** Evaluate() - Unable to evaluate the function at the point a = 0.5
+**PROGRAMMER ERROR** ComputeCubicClamped() - Must set endpoint derivative values after adding data in order to compute cubic spline with clamped boundary conditions
+**PROGRAMMER ERROR** DomainMinimum() - Unable to calculate the domain minimum for the data set
+**PROGRAMMER ERROR** ValidateDataSet() - Invalid data set, x-values must be in ascending order for cspline-clamped interpolation: 
+		x[21] = 0.9 > x[22] = 0.5
+**PROGRAMMER ERROR** DomainMinimum() - Unable to calculate the domain minimum for the data set
+**PROGRAMMER ERROR** ComputeGsl() - Unable to compute GSL interpolation
+**PROGRAMMER ERROR** ValidateDataSet() - First and last points of the data set must have the same y-value for cspline-periodicinterpolation to prevent discontinuity at the boundary
+	************************************************
+
+
+2) Dataset Interpolation:  
+Evaluated points:
+x 	 y 		 c-nat-regular 	 c-nat-irreg 	 c-neigh 	 c-clamped 	 p-neville 	 c-hermite
+0.05 	0.052625 	 0.0525871 	 0.0528784 	 0.0529363 	 0.052625 	 0.052625 	 0.052625
+0.15 	0.175875 	 0.175873 	 0.175905 	 0.175647 	 0.175875 	 0.175875 	 0.175875
+0.25 	0.328125 	 0.328125 	 0.328125 	 0.32802 	 0.328125 	 0.328125 	 0.328125
+0.35 	0.515375 	 0.515375 	 0.515375 	 0.515329 	 0.515375 	 0.515375 	 0.515375
+0.45 	0.743625 	 0.743625 	 0.743625 	 0.743474 	 0.743625 	 0.743625 	 0.743625
+0.55 	1.01887 	 1.01888 	 1.01887 	 1.01867 	 1.01887 	 1.01887 	 1.01887
+0.65 	1.34712 	 1.34712 	 1.34712 	 1.34697 	 1.34712 	 1.34712 	 1.34712
+0.75 	1.73437 	 1.73425 	 1.73424 	 1.73407 	 1.73437 	 1.73437 	 1.73437
+Errors: (difference from y-value)
+x 	c-nat-regular	c-nat-irreg	c-neigh		c-clamped	p-neville-trueErr	p-neville-estimErr	c-herm
+0.05	-3.79165e-05	0.000253378	0.00031133	-4.90601e-18	2.68408e-10		1.24404e-10		-4.90601e-18
+0.15	-1.50265e-06	2.9835e-05	-0.00022794	9.48677e-19	1.72651e-12		6.57385e-13		9.48677e-19
+0.25	5.23612e-08	-3.65474e-07	-0.000105006	0		-1.67089e-14		-4.50315e-15		0
+0.35	1.82955e-09	-2.65526e-09	-4.63289e-05	-3.75676e-17	-1.4859e-16		-8.44769e-18		-3.75676e-17
+0.45	6.98432e-09	-5.86827e-09	-0.000151105	-1.91904e-17	-9.07369e-16		1.0563e-16		-1.91904e-17
+0.55	1.78058e-07	-9.69423e-08	-0.0002096	-4.66207e-17	-1.24811e-14		7.20647e-15		-4.66207e-17
+0.65	-5.10901e-06	-1.30783e-06	-0.00015885	6.50521e-19	-1.05693e-13		1.77221e-13		6.50521e-19
+0.75	-0.000128916	-0.000133122	-0.000302098	2.08167e-17	-4.22318e-11		2.96468e-10		2.08167e-17
+
+3) Dataset Extrapolation: 
+   Notice: Clamped cubic spline accurate if extrapolating cubic function.
+type			a	Domain	{ymin,ymax}	NearestEndpoint		Extrapolate	y(a)
+cspline-clamped		-1.5	[0,0.8]	{0,1.952}		0		-2.625		-2.625
+cspline-clamped		-1.3	[0,0.8]	{0,1.952}		0		-1.807		-1.807
+cspline-clamped		-1.1	[0,0.8]	{0,1.952}		0		-1.221		-1.221
+cspline-clamped		-0.9	[0,0.8]	{0,1.952}		0		-0.819		-0.819
+cspline-clamped		-0.7	[0,0.8]	{0,1.952}		0		-0.553		-0.553
+cspline-clamped		-0.5	[0,0.8]	{0,1.952}		0		-0.375		-0.375
+cspline-clamped		-0.3	[0,0.8]	{0,1.952}		0		-0.237		-0.237
+cspline-clamped		-0.1	[0,0.8]	{0,1.952}		0		-0.091		-0.091
+polynomial-Neville's	0.801	[0,0.8]	{0,1.952}		1.952		1.95652		1.95652
+polynomial-Neville's	0.901	[0,0.8]	{0,1.952}		1.952		2.44423		2.44423
+polynomial-Neville's	1.001	[0,0.8]	{0,1.952}		1.952		3.00584		3.006
+polynomial-Neville's	1.101	[0,0.8]	{0,1.952}		1.952		3.641		3.64783
+polynomial-Neville's	1.201	[0,0.8]	{0,1.952}		1.952		4.22704		4.37572
+polynomial-Neville's	1.301	[0,0.8]	{0,1.952}		1.952		3.15934		5.19567
+polynomial-Neville's	1.401	[0,0.8]	{0,1.952}		1.952		-14.0584		6.11369
+   Notice: In general, accuracy declines farther from domain endpoints.
+	************************************************
+EXCEPTIONS:
+**PROGRAMMER ERROR** Evaluate() - Unable to evaluate the function at the point a = 0.9
+**PROGRAMMER ERROR** Evaluate() - Invalid argument. Value entered, a = 0.9, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** Evaluate() - Unable to evaluate the function at the point a = 0.9
+**PROGRAMMER ERROR** Evaluate() - Invalid argument. Cannot extrapolate for type cspline-natural, must choose to throw error or return nearest neighbor
+**PROGRAMMER ERROR** Evaluate() - Unable to evaluate the function at the point a = 0.9
+**PROGRAMMER ERROR** Evaluate() - Invalid argument. Cannot extrapolate for type cspline-neighborhood, must choose to throw error or return nearest neighbor
+**PROGRAMMER ERROR** PolynomialNevilleErrorEstimate() - This method is only valid for polynomial-Neville's, may not be used for cspline-natural interpolation
+**PROGRAMMER ERROR** PolynomialNevilleErrorEstimate() - Error not calculated. This method only valid after Evaluate() has been called
+	************************************************
+
+4) Differentiation Approximation:  
+GSL First derivative method errors:  
+a 	y'(a)	Err:natural-reg		Err:natural-irreg
+0.05 	1.1075 	-0.0016784		-0.0138232
+0.35 	2.0675 	-2.11708e-07		1.40745e-07
+0.65 	3.5675 	-0.000547938		-0.000136049
+First difference method errors:  
+a 	y'(a)	2ptBack-Neigh	3ptBack-Neigh	2ptFor-Clamp	3ptFor-Clamp	3ptCtr-Neville	5ptCtr-Neville
+0.15 	1.3675 	-0.0180999	-0.00196076	0.0146		-0.0002		9.99999e-05		-7.33331e-11
+0.45 	2.5075 	-0.0385105	-0.0271011	0.0236		-0.0002		1e-04		-1.02141e-13
+0.75 	4.1875 	-0.0309367	0.00292015	0.0326		-0.0002		9.99984e-05		-1.74694e-09
+
+	--------------------------
+GSL Second derivative method errors:  
+a 	y''(a)	Err:natural-reg		Err:natural-irreg
+0.15 	2.9 	0.00188678		-0.0590771
+0.45 	4.7 	-8.16229e-06		-1.0402e-05
+0.75 	6.5 	1.24449		0.155058
+Second difference method errors:  
+a 	y'(a)	3ptBack-Neigh	3ptFor-Clamp	3ptCtr-Neville	5ptCtr-Neville
+0.15 	2.9 	0.327829	0.06		-1.21057e-09	-8.53521e-10
+0.45 	4.7 	-2.41811	0.06		-2.94875e-13	-2.94875e-13
+0.75 	6.5 	0.271365	0.06		3.93413e-10	-7.98118e-09
+CubicClampedSecondDerivatives(): 
+xi 	 actual2ndDeriv 	 calculated2ndDeriv
+0 	 2 			 2
+0.07 	 2.42 			 2.42
+0.12 	 2.72 			 2.72
+0.19 	 3.14 			 3.14
+0.22 	 3.32 			 3.32
+0.23 	 3.38 			 3.38
+0.32 	 3.92 			 3.92
+0.34 	 4.04 			 4.04
+0.36 	 4.16 			 4.16
+0.39 	 4.34 			 4.34
+0.4 	 4.4 			 4.4
+0.41 	 4.46 			 4.46
+0.44 	 4.64 			 4.64
+0.49 	 4.94 			 4.94
+0.54 	 5.24 			 5.24
+0.59 	 5.54 			 5.54
+0.64 	 5.84 			 5.84
+0.68 	 6.08 			 6.08
+0.7 	 6.2 			 6.2
+0.79 	 6.74 			 6.74
+0.8 	 6.8 			 6.8
+
+EXCEPTIONS:
+**PROGRAMMER ERROR** GslFirstDerivative() - Invalid argument. Value entered, a = 1.0, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** GslFirstDerivative() - Unable to compute the first derivative at a = 0.2 using the GSL interpolation
+**PROGRAMMER ERROR** GslComputed() - Method only valid for GSL interpolation types, may not be used for cspline-neighborhood interpolation
+**PROGRAMMER ERROR** BackwardFirstDifference() - Invalid argument. Value entered, a = -1.0, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** BackwardFirstDifference() - Formula steps outside of domain. For 2-point backward difference, a-(n-1)h = -0.09 is smaller than domain min = 0.0.  Try forward difference or use smaller value for h or n
+**PROGRAMMER ERROR** BackwardFirstDifference() - Invalid argument. There is no 4-point backward difference formula in use
+**PROGRAMMER ERROR** ForwardFirstDifference() - Invalid argument. Value entered, a = -0.01, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** ForwardFirstDifference() - Formula steps outside of domain. For 3-point forward difference, a+(n-1)h = 0.95 is greater than domain max = 0.8.  Try backward difference or use smaller value for h or n
+**PROGRAMMER ERROR** ForwardFirstDifference() - Invalid argument. There is no 4-point forward difference formula in use
+**PROGRAMMER ERROR** CenterFirstDifference() - Invalid argument. Value entered, a = 0.81, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** CenterFirstDifference() - Formula steps outside of domain. For 5-point center difference, a-(n-1)h = -0.39 or a+(n-1)h = 0.41 is out of domain = [0.0, 0.8].  Use smaller value for h or n
+**PROGRAMMER ERROR** CenterFirstDifference() - Invalid argument. There is no 4-point center difference formula in use
+**PROGRAMMER ERROR** GslSecondDerivative() - Invalid argument. Value entered, a = 1.0, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** GslSecondDerivative() - Unable to compute the second derivative at a = 0.8 using the GSL interpolation
+**PROGRAMMER ERROR** GslComputed() - Method only valid for GSL interpolation types, may not be used for cspline-neighborhood interpolation
+**PROGRAMMER ERROR** BackwardSecondDifference() - Invalid argument. Value entered, a = -1.0, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** BackwardSecondDifference() - Formula steps outside of domain. For 3-point backward difference, a-(n-1)h = -0.19 is smaller than domain min = 0.0.  Try forward difference or use smaller value for h or n
+**PROGRAMMER ERROR** BackwardSecondDifference() - Invalid argument. There is no 2-point backward second difference formula in use
+**PROGRAMMER ERROR** ForwardSecondDifference() - Invalid argument. Value entered, a = -0.01, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** ForwardSecondDifference() - Formula steps outside of domain. For 3-point forward difference, a+(n-1)h = 0.95 is greater than domain max = 0.8.  Try backward difference or use smaller value for h or n
+**PROGRAMMER ERROR** ForwardSecondDifference() - Invalid argument. There is no 2-point forward second difference formula in use
+**PROGRAMMER ERROR** CenterSecondDifference() - Invalid argument. Value entered, a = 0.81, is outside of domain = [0.0, 0.8]
+**PROGRAMMER ERROR** CenterSecondDifference() - Formula steps outside of domain. For 5-point center difference, a-(n-1)h = -0.39 or a+(n-1)h = 0.41 is out of domain = [0.0, 0.8].  Use smaller value for h or n
+**PROGRAMMER ERROR** CenterSecondDifference() - Invalid argument. There is no 4-point center second difference formula in use
+	************************************************
+
+5) Integration Approximation:  
+GSL Integral method errors:  
+(a,b)		Y(b)-Y(a)	Err:c-nat-reg		Err:c-nat-irreg
+(0,0.8)		0.593067 	1.35485e-05		1.14534e-05
+(0,0.5)		0.182292 	3.07896e-06		1.86016e-05
+(0,0.2)		0.0230667 	3.08345e-06		1.86464e-05
+(0.3,0.8)	0.537042 	1.04692e-05		-7.14968e-06
+(0.3,0.5)	0.126267 	-3.07786e-10		-1.40653e-09
+(0.6,0.8)	0.308667 	1.04837e-05		-7.1442e-06
+Quadrature method errors:  
+(a,b)		Y(b)-Y(a)	Trap-Neigh	Simp3pt-Neigh	Simp4pt-Clamp	Boole-Clamp	ExtTrap-Nev	Romberg-Nev
+(0,0.8)		0.593067 	0.000400496	-6.1384e-05	1.11022e-16	0		-0.296534	1.6196e-11
+(0,0.5)		0.182292 	6.36444e-05	-2.47352e-05	0		2.77556e-17	-0.091146	4.58905e-11
+(0,0.2)		0.0230667 	9.49862e-06	5.4552e-06	3.46945e-18	-3.46945e-18	-0.0115333	5.5672e-11
+(0.3,0.8)	0.537042 	6.04423e-05	-8.09038e-05	0		-1.11022e-16	-0.268521	-3.09897e-12
+(0.3,0.5)	0.126267 	-7.1205e-06	-1.45287e-05	0		0		-0.0631333	-2.77556e-17
+(0.6,0.8)	0.308667 	-2.36812e-05	-3.50883e-05	5.55112e-17	5.55112e-17	-0.154333	-2.41507e-12
+
+EXCEPTIONS:
+**PROGRAMMER ERROR** GslIntegral() - Invalid interval entered: [a,b] = [1.1, 1.0]
+**PROGRAMMER ERROR** GslIntegral() - Invalid arguments. Interval entered [1.0, 1.1] is not contained within domain [0.0, 0.8]
+**PROGRAMMER ERROR** GslIntegral() - Unable to compute the integral on the interval (a,b) = (0.0, 0.8) using the GSL interpolation
+**PROGRAMMER ERROR** GslComputed() - Method only valid for GSL interpolation types, may not be used for cspline-neighborhood interpolation
+**PROGRAMMER ERROR** TrapezoidalRule() - Unable to calculate the integral on the interval (a,b) = (0.81, 0.7) using the trapeziodal rule
+**PROGRAMMER ERROR** EvaluatedForIntegration() - Invalid interval entered: [a,b] = [0.81, 0.7]
+**PROGRAMMER ERROR** TrapezoidalRule() - Unable to calculate the integral on the interval (a,b) = (-0.1, 0.7) using the trapeziodal rule
+**PROGRAMMER ERROR** EvaluateForIntegration() - Invalid arguments. Interval entered [-0.1, 0.7] is not contained within domain [0.0, 0.8]
+	************************************************

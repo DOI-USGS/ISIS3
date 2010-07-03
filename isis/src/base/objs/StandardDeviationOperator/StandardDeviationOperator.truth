@@ -1,0 +1,16 @@
+Object = InterestOperator
+  Group = Operator
+    Name            = StandardDeviation
+    DeltaLine       = 100
+    DeltaSamp       = 100
+    Samples         = 15
+    Lines           = 15
+    MinimumDN       = 0.0
+    MaximumDN       = 1.0
+    MinimumInterest = 0.01
+  End_Group
+End_Object
+End
+Sample: 90
+Line : 379
+Interest: 0.0166121

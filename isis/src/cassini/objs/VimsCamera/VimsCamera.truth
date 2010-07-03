@@ -1,0 +1,106 @@
+Unit Test for VimsCamera...
+Testing image $cassini/testData/CM_1515951157_1.ir.cub ...
+For upper left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For upper right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+Testing image $cassini/testData/CM_1514390782_1.ir.cub ...
+For upper left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For upper right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+Testing image $cassini/testData/CM_1514390782_1.vis.cub ...
+For upper left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For upper right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+Testing image $cassini/testData/CM_1515945709_1.ir.cub ...
+For upper left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For upper right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+Testing image $cassini/testData/CM_1515945709_1.vis.cub ...
+For upper left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For upper right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+

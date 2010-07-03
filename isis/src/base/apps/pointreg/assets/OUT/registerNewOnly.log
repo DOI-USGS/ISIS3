@@ -1,0 +1,45 @@
+pointreg: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% ProcessedGroup = Points
+  Ignored = 1
+End_Group
+
+Group = Measures
+  Validated    = 0
+  Registered   = 4
+  Unregistered = 5
+  Unmeasured   = 0
+End_Group
+
+Group = AutoRegStatistics
+  Total      = 9
+  Successful = 4
+  Failure    = 5
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 1
+  PatternZScoreNotMet       = 2
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 2
+  SurfaceModelDistanceInvalid         = 0
+End_Group
+
+Group = AutoRegistration
+  Algorithm      = MaximumCorrelation
+  Tolerance      = 0.9
+  PatternSamples = 15
+  PatternLines   = 15
+  MinimumZScore  = 1.5
+  ValidPercent   = 80
+  SearchSamples  = 25
+  SearchLines    = 25
+End_Group

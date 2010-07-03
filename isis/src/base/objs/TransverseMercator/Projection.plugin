@@ -1,0 +1,8 @@
+Group = TransverseMercator
+  Library = TransverseMercator
+  Routine = TransverseMercatorPlugin
+  Keyword = CenterLongitude
+  Keyword = CenterLatitude
+  Keyword = ScaleFactor
+EndGroup
+

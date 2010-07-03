@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hi2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import HiRISE EDR images into Isis cube format
+  </brief>
+
+  <description>
+    <p>
+      Converts a single channel HiRISE EDR into an Isis Cube file.
+      The observation image data from the EDR is transfered into the Isis Cube data.
+      The observation line prefix and suffix data will be combined into a single Isis table
+      named "HiRISE Ancillary". The calibration image data will be placed into an Isis
+      table named "HiRISE Calibration Image", and the calibration line prefix and suffix
+      data will be combined into a single Isis table named "HiRISE Calibration Ancillary".
+    </p>
+    <p>
+      8 bit EDR pixels are checked for invalid values in the following order: 
+      gaps (255 = 0xFF), high instrument saturation (254 = 0xFE), and low
+      instrument saturation (0 = 0x00). See the following table for what these 
+      values are converted to. Once the special pixels have been delt with the 
+      8 bit data is processed in one of two ways depending on the UNLUT 
+      parameter. If UNLUT is false then the 8 bit values are simply moved into 
+      a signed 16 bit integer without modifying their magnitude. If UNLUT is
+      true, the 8 bit values are converted to their 14 bit value by applying 
+      the lookup table and stored in a signed 16 bit integer. The lookup table
+      from the EDR labels contaings 256 pairs of 14 bit values. The first pair
+      is the range of 14 bit pixels that were compressed to 8 bit pixel value 
+      zero (0). The second pair is the range compressed to pixel value one (1),
+      and so on. 8 bit pixels are mapped to the corresponding average of the 
+      14 bit lookup table range.
+    </p>
+    <table class="tableFormattedInformation">
+      <caption>8 bit EDR pixel mapping and stats</caption>
+      <tr>
+        <th>Input DN</th>
+        <th>Output DN</th>
+        <th>Counter</th>
+        <th>Explanation</th>
+      </tr>
+      <tr>
+        <td>255 (0xFF)</td>
+        <td>NULL</td>
+        <td>Gap</td>
+        <td>Downlink data gaps are filled with 255s</td>
+      </tr>
+      <tr>
+        <td>254 (0xFE)</td>
+        <td>HIS</td>
+        <td>HIS</td>
+        <td>Sensor saturated on the high end</td>
+      </tr>
+      <tr>
+        <td>0 (0x00)</td>
+        <td>LIS</td>
+        <td>LIS</td>
+        <td>Sensor saturated on the low end</td>
+      </tr>
+    </table>
+
+    <p>
+      16 bit EDR pixels are checked for invalid values in the following order: 
+      gaps (-1 = 0xFFFF), low order byte appears to be the beginning of a gap
+      (0x??FF), outside of unsigned 14 bit range (0 to 16383), high instrument saturation
+      (16383 = 0x3FFF), and low instrument saturation (0 = 0x0000).
+      Since the byte order of all HiRISE
+      EDR products is most significant byte first all integer values within the EDR
+      will be converted to the native byte order of the machine running "hi2isis"
+      unless the cube attribute specifies otherwise.
+    </p>
+    <table class="tableFormattedInformation">
+      <caption>16 bit EDR pixel mapping and stats</caption>
+      <tr>
+        <th>Input DN</th>
+        <th>Output DN</th>
+        <th>Counter</th>
+        <th>Explanation</th>
+      </tr>
+      <tr>
+        <td>-1 (65535) (0xFFFF)</td>
+        <td>NULL</td>
+        <td>Gap</td>
+        <td>Downlink data gaps are filled with 255s (0xFF)</td>
+      </tr>
+      <tr>
+        <td>(0x??FF) followed by (0xFFFF)</td>
+        <td>NULL (possibly)</td>
+        <td>Suspected</td>
+        <td>Beginning of a gap (see LSBGAP parameter)</td>
+      </tr>
+      <tr>
+        <td>0 &lt; pixel &gt; 16383</td>
+        <td>NULL</td>
+        <td>Invalid</td>
+        <td>The pixel is not in the unsigned 14 bit legal range</td>
+      </tr>
+      <tr>
+        <td>16383 (0x3FFF)</td>
+        <td>HIS</td>
+        <td>HIS</td>
+        <td>Sensor saturated on the high end</td>
+      </tr>
+      <tr>
+        <td>0 (0x00)</td>
+        <td>LIS</td>
+        <td>LIS</td>
+        <td>Sensor saturated on the low end</td>
+      </tr>
+    </table>
+
+    <p>
+      The line prefix and suffix data for the calibration and observation image are converted
+      and stored into their respective tables in the same manner as the image pixels.
+      The Isis tables which hold 
+      prefix and suffix data have four, four byte integer fields. These are "Gap Flag", 
+      "LineNumber", "BufferPixels", and "DarkPixels". The BufferPixel field contains twelve
+      integers and the DarkPixel field contains sixteen integers. Other information from the
+      EDR prefix tables such as the synchronization pattern are not transfered to the Isis file.
+    </p>
+    <p>
+      The "GapFlag" is taken directly from byte zero of the EDR line prefix data and is stored
+      in the least significant byte of the four byte field integer. The upper three bytes are set to all
+      zeros. The byte from the EDR has two possible values, all zeros and all ones. This means
+      the Isis GapFlag value as an integer has two possible values, 255 and zero (0).
+    </p>
+      The "LineNumber" is taken from bytes three, four and five of the EDR line prefix data and
+      is stored into a single four byte integer with the most significant byte set to zero.
+    <p>
+    </p>
+      The twelve values for "BufferPixels" are taken from the EDR line prefix buffer pixels.
+      8-bit buffer pixels are converted to 16 bit values in exactly the same way as image pixels.
+      All buffer pixels are stored in the 
+      corresponding Isis "BufferPixels" array. All pixel values will be
+      stored in the low order two bytes and will be swapped if the native byte order is least 
+      significant byte first.
+    <p>
+      The sixteen values for "DarkPixels" are taken from the EDR line suffix dark pixels, and are
+      handled in the same manner as the buffer pixels.
+    </p>
+    <img src='assets/hi2isis_diagram.png' alt='Diagram of output Isis cube' width='499' height='520' />
+
+  </description>
+
+  <history>
+    <change name="Stuart Sides" date="2004-04-26">
+        Original version
+    </change>
+    <change name="Stuart Sides" date="2004-06-15">
+        Updated according to new SIS. Added Calibration, Ancillary calibration
+        and Ancillary Image BLOBs.
+    </change>
+    <change name="Stuart Sides" date="2004-10-18">
+        Added documentation specific to the Isis tables that are created.
+    </change>
+    <change name="Stuart Sides" date="2004-10-22">
+      Fixed a bug with the allocation of the TableField "image". It now works for 
+      HiRISE EDRs that have a binning mode other than one (1).
+    </change>
+    <change name="Stuart Sides" date="2005-02-28">
+      Added gap and lookup table handling. Both 8 and 16 bit inputs are now
+      converted to 16 bit output. The lookup table for 8 bit is applied. The output
+      DN for an 8 bit input is the average of the lookup table range values. Added
+      new option (LSBGAP) to handle 16 bit pixels with a low order byte of 0xff immediately
+      before a gap. By default, this new option will convert these pixels to a gap. With
+      the option turned off, these pixels will be left unaltered.
+    </change>
+    <change name="Stuart Sides" date="2005-06-27">
+      Added the parameter UNLUT to give the ability to apply the 8 to 14 bit
+      look up table or not. Also fixed problem with gaps, LIS and HIS being reported
+      correctly but not converted correctly to double precision values before 
+      being inserted into the BUFFER.
+    </change>
+    <change name="Stuart Sides" date="2005-07-21">
+      Added new keywords to the results group. For each of the six sections, the
+      program now outputs the number gaps, LIS, HIS, PossibleGaps, and Invalid
+      pixels.
+    </change>
+    <change name="Stuart Sides" date="2006-04-07">
+      Fixed a bug with signedword data where gaps were being reported as LIS
+      instead of gap. Added more progress information.
+    </change>
+    <change name="Brendan George" date="2006-06-14">
+        Removed call to OriginalLabel, ProcessImportPds now handles this
+    </change>
+    <change name="Brendan George" date="2006-09-26">
+        Documentation fixes
+    </change>
+    <change name="Brendan George" date="2007-01-17">
+        Added blob testing to default appTest
+    </change>
+    <change name="Christopher Austin" date="2008-03-18">
+      Checks if input file is rdr.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted HiRISE EDR image file.
+        </brief>
+        <description>
+          Use this parameter to select the HiRISE EDR image filename. This must
+          be a single channel original HiRISE EDR file.
+        </description>
+        <filter>
+          *.img *.IMG
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename. The output file will
+           contain the observation, buffer, and dark pixels from both the main
+           image and the calibration areas.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="LSBGAP">
+        <type>boolean</type>
+        <default>
+          <item>true</item>
+        </default>
+        <brief>
+           Ignore least significant byte of 0xFF before a gap.
+        </brief>
+        <description>
+          Ignore legal 16 bit pixels with a low order byte of 0xff immediately
+          preceding a gap. Pixels like this are normally treated as a gap
+          and converted to NULL.
+          Set this parameter to FALSE if you want these pixels treated as
+          if they were valid data. Set this parameter to TRUE if you want
+          these pixels treated as if they were gaps.
+        </description>
+      </parameter>
+
+      <parameter name="UNLUT">
+        <type>boolean</type>
+        <default>
+          <item>true</item>
+        </default>
+        <brief>
+          Convert 8-bit values back to 14-bit values
+        </brief>
+        <description>
+          <p>
+            If the input data is stored in 8-bit values, and this parameters is
+            set to true then the lookup table will be used to convert all valid
+            image, buffer and dark pixels back to 14-bit values. This includes
+            both the main image and calibration areas. If this parameter is false
+            then the valid pixels will be left at their 8 bit lutted values.
+          </p>
+          <p>
+            The label keyword "Unlutted" in the "Instrument" object is used to
+            indicate if the valid pixels are in their 8 bit lutted (Unlutted = FALSE),
+            or their 14 bit unlutted (Unlutted = TRUE) representation. Note: Invalid
+            pixels (i.e., Gaps, NULL, HRS, HIS, LRS, and LIS) are always represented
+            as 16 bit special pixel values.
+          </p>
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

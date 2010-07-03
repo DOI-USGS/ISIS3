@@ -1,0 +1,23 @@
+size   = 3
+hasXYZ = 0
+/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub = MGS/561812335:32/MOC-WA/RED
+/usgs/cpkgs/isis3/data/mgs/testData/m0402852.cub = MGS/619971158:28/MOC-NA/BROAD_BAND
+/usgs/cpkgs/isis3/data/lo/testData/3133_h1.cub = LO3/HRC/3133/1
+
+SN->File: /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub
+File->SN:MGS/561812335:32/MOC-WA/RED
+MGS/561812335:32/MOC-WA/RED = 0
+MGS/619971158:28/MOC-NA/BROAD_BAND = 1
+LO3/HRC/3133/1 = 2
+
+SN->File (0): /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub
+
+SN->File (1): /usgs/cpkgs/isis3/data/mgs/testData/m0402852.cub
+
+SN->File (2): /usgs/cpkgs/isis3/data/mgs/testData/m0402852.cub
+
+Index->observationNumber (2):  LO3/HRC/3133
+
+
+**USER ERROR** File [/usgs/cpkgs/isis3/data/base/testData/blobTruth.cub] can not be added to serial number list
+**USER ERROR** Target name of [SKY] from file [$base/testData/blobTruth.cub] does not match [MARS]

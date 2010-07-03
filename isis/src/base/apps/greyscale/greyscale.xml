@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<application name="greyscale" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>Generate a grey scale cube</brief>
+
+  <description>
+    This program can be used to generate an output cube of user specified
+    dimensions.  The pixel values of each line or sample evenly increment or 
+    decrement from value1 input  to value2 input.                                    
+    <strong> Note: </strong> Vertical scaling can take twice as long to process, 
+    however this is insignificant for output images less than 10,000 
+    lines/samples. 
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeannie Walldren" date="2010-05-13">
+      Original version with examples.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>Output cube</brief>
+        <description>
+	      The file name of the output cube to be created.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+    <group name="Pixel Specifications">
+      <parameter name="DIRECTION">
+        <type>string</type>
+        <brief>
+          Direction of the grey scaling of given DN values.
+        </brief>
+        <description>
+          The direction options allow the user to choose whether to scale the 
+          pixel values horizontally or vertically.
+        </description>
+        <default>
+          <item> HORIZONTAL </item> 
+        </default>
+        <list>
+          <option value="HORIZONTAL">
+            <brief>
+              Scale DN values horizontally over each line.
+            </brief>
+            <description>
+              This option will scale the DN values from left to right across 
+              each line.  The value given for BEGINDN will be the pixel value of the 
+              first sample of each line and ENDDN  will be the pixel value of the 
+              last sample of each line.
+            </description>
+          </option>
+          <option value="VERTICAL">
+            <brief>
+              Scale DN values vertically over each sample.
+            </brief>
+            <description>
+              This option will scale the DN values from top to bottom.  The 
+              value given for BEGINDN will be the pixle value of the first line and 
+              ENDDN will be the pixel value of the last line.
+            </description>
+          </option>
+          </list>
+      </parameter>
+      <parameter name="BEGINDN">
+        <type>double</type>
+        <default>
+          <item>0.0</item>
+        </default>
+        <brief>DN Value of each beginning pixel</brief>
+        <description>
+          This is the user specified DN value to output to the first pixel of 
+          each line (or row) if scaling horizontally or the first pixel of each 
+          sample (or column) if scaling vertically.
+        </description>
+      </parameter>
+      <parameter name="ENDDN">
+        <type>double</type>
+        <default>
+          <item>0.0</item>
+        </default>
+        <brief>DN Value of each end pixel</brief>
+        <description>
+          This is the user specified DN value to output to the last pixel of 
+          each line (or row) if scaling horizontally or the last pixel of each 
+          sample (or column) if scaling vertically.
+        </description>
+      </parameter>
+    </group>
+    <group name="Cube size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <default>
+          <item>1</item>
+        </default>
+        <brief>Number of samples in the cube </brief>
+        <description>
+          The number of samples to be allocated in the output cube.  This 
+          integer value must be at least 1.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+      <parameter name="LINES">
+        <type>integer</type>
+        <default>
+          <item>1</item>
+        </default>
+        <brief>Number of line in the cube </brief>
+        <description>
+          The number of lines to be allocated in the ouput cube.  This integer 
+          value must be at least 1.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Create horizontally grey scaled cube.</brief>
+      <description>
+        This example demonstrates how to use <strong>greyscale</strong> to 
+        create a cube with pixel values from BEGINDN to ENDDN horizontally.
+      </description> 
+      <terminalInterface>
+        <commandLine>
+          to=../OUT/output.cub direction=horizontal begindn=1 enddn=25 samples=49 
+          lines=20
+        </commandLine>
+        <description>
+          Run <strong>greyscale</strong> to create a cube with the given 
+          parameters.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="589" height="533" src="assets/images/greyscaleGuiEx1.jpg">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform 
+              <strong>greyscale</strong> application.  DIRECTION 
+              parameter HORIZONTAL is chosen as default.
+            </description>
+            <thumbnail width="200" height="181" caption="" src="assets/thumbs/greyscaleGuiEx1Thumb.jpg"/> 
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <outputImages>
+        <image width="550" height="550" src="assets/images/greyscaleOutputEx1.jpg">
+          <brief>Output cube</brief>
+          <description>
+            This is an example of the the output image with the given 
+            parameters.  It is a 20 line by 49 sample cube with the first 
+            samples of each line equal to 1.  Subsequent samples increment by 
+            0.5 until the last sample, which is equal to 25.
+          </description>
+          <thumbnail width="200" height="200" caption="" src="assets/thumbs/greyscaleOutputEx1Thumb.jpg"/> 
+          <parameterName>
+            TO
+          </parameterName>
+        </image> 
+      </outputImages>
+    </example>
+    <example>
+      <brief>Create vertically grey scaled cube.</brief>
+      <description>
+        This example demonstrates how to use <strong>greyscale</strong> to 
+        create a cube with pixel values from BEGINDN to ENDDN vertically.
+      </description> 
+      <terminalInterface>
+        <commandLine>
+          to=../OUT/output.cub direction=vertical begindn=50 enddn=25 samples=20 
+          lines=49
+        </commandLine>
+        <description>
+          Run <strong>greyscale</strong> to create a cube with the given 
+          parameters.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="589" height="533" src="assets/images/greyscaleGuiEx2.jpg">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform 
+              <strong>greyscale</strong> application.  
+            </description>
+            <thumbnail width="200" height="181" caption="" src="assets/thumbs/greyscaleGuiEx2Thumb.jpg"/> 
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <outputImages>
+        <image width="550" height="550" src="assets/images/greyscaleOutputEx2.jpg">
+          <brief>Output cube</brief>
+          <description>
+            This is an example of the the output image with the given 
+            parameters.  It is a 49 line by 20 sample cube with the a DN of 50 
+            for the pixels in the first line.  Subsequent lines decrement by a 
+            pixel value 0.5208 until the last line, which has a DN of 25. 
+          </description>
+          <thumbnail width="200" height="200" caption="" src="assets/thumbs/greyscaleOutputEx2Thumb.jpg"/> 
+          <parameterName>
+            TO
+          </parameterName>
+        </image> 
+      </outputImages>
+    </example>  
+  </examples>
+
+</application>

@@ -1,0 +1,122 @@
+UNIT TEST FOR LunarAzimuthalEqualArea
+
+
+******* Test SetGround and SetCoordinate methods ********
+
+for all lat and lon in [-90..90] step 45
+  first call SetGround
+  then call SetCoordinate
+  trigger fail if SetCoordinate doesn't
+  return the original coordinate
+  note that at the poles the lon is not relevant!
+
+ original Lat:  -90   original Lon:  -90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -90   original Lon:  -45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -90   original Lon:    0
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -90   original Lon:   45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -90   original Lon:   90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -45   original Lon:  -90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -45   original Lon:  -45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -45   original Lon:    0
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -45   original Lon:   45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:  -45   original Lon:   90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:    0   original Lon:  -90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:    0   original Lon:  -45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:    0   original Lon:    0
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:    0   original Lon:   45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:    0   original Lon:   90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   45   original Lon:  -90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   45   original Lon:  -45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   45   original Lon:    0
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   45   original Lon:   45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   45   original Lon:   90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   90   original Lon:  -90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   90   original Lon:  -45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   90   original Lon:    0
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   90   original Lon:   45
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+ original Lat:   90   original Lon:   90
+testing SetCoordinate and SetGround ......................... [   OK   ]
+
+
+Testing for SetGround and SetCoordiante done!
+Now test the Name method, the == operator and finally
+print the output of the XYRange and Mapping methods...
+
+
+Name method returns "LunarAzimuthalEqualArea"................ [   OK   ]
+
+Isis::Projection * s = &p; // p is this projection
+(*s == p) returns true! ..................................... [   OK   ]
+created a second Projection reference p2
+using the same pvl as p except for that PolarRadius = 42
+Pvl for p2...
+Group = Mapping
+  ProjectionName     = LunarAzimuthalEqualArea
+  EquatorialRadius   = 6378206.4
+  PolarRadius        = 42
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -30.0
+  MaximumLatitude    = -15.0
+  MinimumLongitude   = -30.0
+  MaximumLongitude   = -15.0
+  MaximumLibration   = 1
+End_Group
+End
+s = &p2
+(*s == p) returns false! .................................... [   OK   ]
+
+XYRange...
+  Minimum X:  -3050406.2705
+  Maximum X:  -1415698.4769
+  Minimum Y:  -3160283.3444
+  Maximum Y:  -1633473.9958

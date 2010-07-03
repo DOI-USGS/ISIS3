@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="defaulttemplate" xmlns:xsi=
+    "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=
+    "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    A template gui of all types of defaults
+  </brief>
+  <description>
+    The gui has an input area for each kind of input type with different types 
+    of defaults.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Elizabeth Miller" date="2005-11-03">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Standard Types">
+      
+      <parameter name="INTEGER">
+        <type>integer</type>
+        <brief>
+          Input integer value
+        </brief>
+        <description>
+          Input integer value for the application
+        </description>
+        <default>
+          <item>5</item>
+        </default>
+      </parameter>
+
+      <parameter name="DOUBLE">
+        <type>double</type>
+        <brief>
+          Input double value
+        </brief>
+        <description>
+          Input double value for the application
+        </description>
+        <internalDefault>Computed</internalDefault>
+      </parameter>
+          
+      <parameter name="STRING">
+        <type>string</type>
+        <brief>
+          Input string parameter
+        </brief>
+        <description>
+          Input string parameter for the application
+        </description>
+        <default>
+          <item>String</item>
+        </default>
+      </parameter>
+          
+      <parameter name="BOOLEAN">
+        <type>boolean</type>
+        <brief>
+          Boolean Option
+        </brief>
+        <description>
+          Boolean input option
+        </description>
+        <default>
+          <item>TRUE</item>
+        </default>
+      </parameter>
+    </group>
+
+    <group name="File Types">
+
+      <parameter name="FILE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Filename
+        </brief>
+        <description>
+          Input filename for the application
+        </description>
+        <default>
+          <item>tempList.txt</item>
+        </default>
+      </parameter>
+
+      <parameter name="INPUTCUBE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <defaultPath>$base/testData/</defaultPath>
+        <brief>
+          Input Cube
+        </brief>
+        <description>
+          Input cube parameter for the application
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <pixelType>real</pixelType>
+      </parameter>
+
+      <parameter name="OUTPUTCUBE">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output Cube
+        </brief>
+        <description>
+          Output cube parameter for the application
+        </description>
+        <filter>
+          *.cub *.lbl
+        </filter>
+        <internalDefault>None</internalDefault>
+      </parameter>
+    </group>
+  </groups>
+</application>

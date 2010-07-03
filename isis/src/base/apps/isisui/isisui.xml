@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="isisui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs the command line of any ISIS application
+  </brief>
+
+  <description>
+    <p>
+      This program allows its user to output a validated command line for any
+      ISIS application. The parameters will be validated using the application's
+      xml file. Command line arguments will be used to initialize the
+      application's parameters.
+    </p>
+    <p>
+      If the GUI flag is not present on the command line, the
+      parameters will be validated and the command line will be output if no
+      errors were detected.
+    </p>
+    <p>
+      If the GUI flag is present on the command line, the GUI parameters fields
+      will be initilized using the command line arguments. The user will then
+      be able to change parameter values and supply values for ones not on the
+      command line. When the GUI is told to process the parameters, a validation
+      check is done. If there were errors, a message will be displayed and the
+      user will be allowed to correct the problem. If the validation succeeds
+      the command line will be output, and the GUI will be taken down.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2003-03-13">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Added modifications to apptest by Kim
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Kris Becker" date="2009-11-27">
+        Changed the call to Application to provide compatability withg Qt 
+        startup requirements.
+    </change>
+
+  </history>
+
+  <groups>
+    <group name="Command Line">
+      <parameter name="arg1">
+        <type>string</type>
+        <brief>
+          An ISIS application
+        </brief>
+        <description>
+          The ISIS application you need the command line for.
+          Note: This must be the first command line option!
+        </description>
+      </parameter>
+
+      <parameter name="arg2">
+        <type>boolean</type>
+        <brief>
+          Flag for starting the Isis GUI
+        </brief>
+        <description>
+          If this flag is present anywhere on the command line, the Isis GUI
+          will be started. All application parameters from the other arguments
+          will be inserted into the correct fields.
+        </description>
+      </parameter>
+
+      <parameter name="arg3-n">
+        <type>string</type>
+        <brief>
+          Arguments to the application named in arg1
+        </brief>
+        <description>
+          These arguments are specific to the application named in arg1. Their
+          formats and values are dependant on the application.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Display GUI for the program crop.
+      </brief>
+      <description>
+        Display the GUI for the application "crop". Since there are no
+        parameter arguments for crop the fields will be initially empty.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          crop GUI
+        </commandLine>
+        <description>
+          This example deminstrates how to get the GUI for the ISIS application
+          "crop" to be displayed. The parameters for crop will initially be
+          empty.
+        </description>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>
+        Display GUI for program ratio.
+      </brief>
+      <description>
+        Display the GUI for the application "ratio". The arguments "num",
+        "den" and "to" will be used to fill in the corresponding parameter
+        values when the GUI is displayed.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          ratio GUI num=$WORK/numerator.cub:3
+            den=denominated.cub:1 to=result.cub
+        </commandLine>
+        <description>
+          This example deminstrates how to get the GUI for the ISIS application
+          "ratio" to be displayed. The parameters for ratio will initially be
+          set to the values from the command line.
+        </description>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>
+        Check the command line argument to ratio for validity without the GUI.
+      </brief>
+      <description>
+        The argument "num" will be filled in when the GUI is displayed.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          ratio num=$WORK/numerator.cub:3
+        </commandLine>
+        <description>
+          This example deminstrates how to validate the parameters given on
+          the command line. No GUI will be displayed. This example will fail
+          with an error message since values were not specified for all the
+          required parameters. It will also set the exicution status to a non
+          zero (failes) value.
+        </description>
+      </terminalInterface>
+    </example>
+  </examples>
+</application>
+

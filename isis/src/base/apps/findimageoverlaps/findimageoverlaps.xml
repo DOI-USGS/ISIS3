@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="findimageoverlaps" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Writes the image overlaps in a control net to a file
+  </brief>
+
+  <description>
+    This program writes the image overlaps, in a given control net, to a file for use
+    by other control net programs. By using this program, the image overlaps in a control
+    net could be calculated once (this is a slow process) for many program runs, 
+    speeding up the process.
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <history>
+    <change name="Steven Lambright" date="2008-11-03">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-11-24">
+      Added the "DETAILED" and "ERRORS" parameters.
+    </change>
+    <change name="Steven Lambright" date="2009-01-07">
+      Added the number of errors to the results output
+    </change>
+    <change name="Steven Lambright" date="2009-05-27">
+      Uses different method call to ImageOverlapSet for optimization
+    </change>
+    <change name="Steven Lambright" date="2009-05-28">
+      The input list will be internally sorted by serial number so that
+      one list of input images will always produce the same results regardless 
+      of the sort order.
+    </change>
+    <change name="Christopher Austin" date="2010-03-26">
+      Added an error when no new overlaps are calculated. (i.e. All overlaps
+      contain only a single Serial Number)
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of Input cubes in the control network
+        </brief>
+        <description>
+          Use this parameter to specify the cube filenames which are associated with
+          the control network.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output overlap list
+        </brief>
+        <description>
+          This file will contain image overlap polygons for the control network
+        </description>
+      </parameter>
+
+      <parameter name="ERRORS">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>No Error Output</internalDefault>
+        <brief>
+          Errors generated when making the overlap list
+        </brief>
+        <description>
+          This file will contain the errors that occurred while calculating the image overlaps.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Settings">
+      <parameter name="DETAILED">
+        <type>boolean</type>
+        <brief>
+          Output detailed error information
+        </brief>
+        <description>
+          This will cause the error file to contain more detailed information about the errors. If this
+          is true, only filenames will be reported in the errors file.
+        </description>
+        <default><item>false</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

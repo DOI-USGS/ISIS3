@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="butterworth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>Apply Butterworth filter for cube in fft frequency domain</brief>
+  <description>
+      Applies a Butterworth filter to a cube. This filter is used
+      on images in the frequency domain. Use the fft app to transform an 
+      image from a spacial to frequency domain and use the ifft app to transform from frequency to spacial.
+  </description>
+  <category>
+    <categoryItem>Fourier Domain</categoryItem>
+  </category>
+  <history>
+    <change name="Jacob Danton" date="2005-11-28" >
+        Original version
+    </change>
+    <change name="Brendan George" date="2006-09-21">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+        Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-10-17">
+        Removed outdated examples from the documentation.
+    </change>
+  </history> 
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <brief>Input file</brief>
+        <description> Cube to filter  </description>
+        <fileMode>input</fileMode>
+        <filter>*.cub</filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <brief>Output cube</brief>
+        <description> The resultant cube </description>
+	    <fileMode>output</fileMode>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+    
+    <group name="Parameter Info">  
+      <parameter name="CUTOFF">
+        <type>double</type>
+        <brief> Cutoff frequency </brief>
+        <description> The specified cutoff frequency. </description>
+	    <default><item>0.0</item></default>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+
+      <parameter name="ORDER">
+        <type>integer</type>
+        <brief> Order </brief>
+        <description> The order of the Butterworth filter. </description>
+	    <default><item>1</item></default>
+        <minimum inclusive="yes">0</minimum>
+      </parameter>
+
+      <parameter name="BANDWIDTH">
+        <type>double</type>
+        <brief> The width of the cutoff band.</brief>
+        <description> This parameter is used when the type specified is "bandpass" or "bandstop".</description>
+	    <default><item>1.0</item></default>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+    </group>
+
+    <group name="Filter Type">
+      <parameter name="TYPE">
+        <type>string</type>
+        <default>
+          <item>LOWPASS</item>
+        </default>
+        <brief>Type of filter</brief>
+        <description>
+          This is the type of filter to be performed on the input.
+        </description>
+        <list>
+          <option value="LOWPASS">
+            <brief>Lowpass filter</brief>
+            <description>
+                Applies a lowpass filter to an image in the frequency domain.
+            </description>
+          </option>
+          <option value="HIGHPASS">
+            <brief>Highpass filter</brief>
+            <description>
+                Applies a highpass filter to an image in the frequency domain.
+            </description>
+          </option>
+          <option value="BANDPASS">
+            <brief>Bandpass filter</brief>
+            <description>
+                Applies a bandpass filter to an image in the frequency domain.
+            </description>
+          </option>
+          <option value="BANDSTOP">
+            <brief>Bandstop filter</brief>
+            <description>
+              Applies a bandstop filter to an image in the frequency domain.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

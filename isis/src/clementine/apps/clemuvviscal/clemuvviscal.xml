@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="clemuvviscal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Radiometric correction of Clementine UV/VIS camera images
+  </brief>
+
+  <description>
+This program performs radiometric corrections to images acquired by the
+Clementine spacecraft UVVIS camera. It performs dark subtraction,
+readout correction, non-linearity and flat field corrections and
+gives the user the option of writing the output image values as radiance
+values or as reflectance(I/F) values.
+    <br />
+
+    <p>PLEASE NOTE: In the ISIS2 Fortran code the method FIXTEMP uses a REAL*4 (6 digits of accuracy) to
+ store the RIMGID (8 digits) which results in the last digits being lost. In the table that references RIMGID
+  the value is a  REAL*4 again resulting in the same loss of precision; this makes the lookup table for temperature corrections inaccurate.</p>
+    <br />
+    <br />
+
+ALGORITHM
+    <br />
+    <br />
+    <br />
+
+
+General algorithm applied to data for radiometric correction is
+described below:
+    <br />
+    <br />
+
+
+Step 1. Global Offset Correction
+    <br />
+    <br />
+
+     Step1_DN = raw_DN - C4*OffsetModeID - C5
+    <br />
+       C4 = -8.177
+    <br />
+       C5 = 15.56
+    <br />
+    <br />
+
+Step 2. Divide by gain
+    <br />
+    <br />
+
+     Step2_DN = Step1_DN / g(GainModeID)
+    <br />
+         g(GainModeID)
+    <br />
+              g(1) = 1.0
+    <br />
+              g(2) = 2.907
+    <br />
+              g(4) = 6.906
+    <br />
+    <br />
+
+Step 3. Dark current correction
+    <br />
+    <br />
+
+     Step3_DN = Step2_DN - (DC + C3)
+    <br />
+       C3 = 7.13
+    <br />
+    <br />
+
+  Non-linearity correction
+    <br />
+    <br />
+
+   XMUL = ACO + BCO*Step3_DN + CCO*(Step3_DN**2) + DCO*(Step3_DN**3)
+    <br />
+
+     CorrectedStep3_DN = Step3_DN * XMUL
+    <br />
+
+       ACO = 1.062
+    <br />
+       BCO = -.1153E-02
+    <br />
+       CCO = .6245E-05
+    <br />
+       DCO = -.1216E-07
+    <br />
+    <br />
+
+Step 4.  Temperature-Dependent Offset Correction
+    <br />
+    <br />
+
+     Step4_DN = CorrectedStep3_DN - C2 * u
+    <br />
+       C2 = .003737 * exp(.0908*(T-273.15))
+    <br />
+       T = Corrected FocalPlaneTemperature (The value in the labels is
+           not correct.  The value used is taken from an interpolated
+           set of values from ACT)
+    <br />
+       u = t + readout time
+    <br />
+       t = ExposureDuration + .0494
+    <br />
+       readout time = 60.05 + .05*(line # - 1)
+    <br />
+    <br />
+
+Step 5.  Frame Transfer Correction
+    <br />
+    <br />
+
+     Step5_DN = Step4_DN - ro
+    <br />
+     ro = column_sum*dt/(t+288*dt)
+    <br />
+     column_sum = sum of all 288 Step4_DN values
+    <br />
+     dt = frame transfer time per row = .00068
+    <br />
+     t = ExposureDuration + .0494
+    <br />
+    <br />
+
+Step 6.  Flat-Field and Exposure Time Normalization
+    <br />
+    <br />
+
+     Step6_DN = Step5_DN / (FF*t)
+    <br />
+       FF = Filter-dependent flat-field
+    <br />
+       t = ExposureDuration + .0494
+    <br />
+    <br />
+
+ The units of Step6_DN are now in counts/ms.
+    <br />
+    <br />
+
+Step 7.  Normalize to Sun-Moon distance of 1 AU
+    <br />
+    <br />
+
+     Step7_DN = Step6_DN * (SolarDistance in AU)**2
+    <br />
+    <br />
+
+Step 8a.  Conversion to 1 AU Relative Radiance
+    <br />
+    <br />
+
+     L = Step7_DN / C1 ( L = Radiance in mW/sr-cm**2 )
+    <br />
+    <br />
+
+   CenterFilterWavelength   C1
+    <br />
+            415 nm           1.39
+    <br />
+            750 nm           2.57
+    <br />
+            900 nm           4.35
+    <br />
+            950 nm           4.76
+    <br />
+            1000 nm          2.77
+    <br />
+    <br />
+
+Step 8b. Conversion to Reflectance
+    <br />
+    <br />
+
+     R = Step7_DN * CR
+    <br />
+    <br />
+
+ The following CR values were derived by Eric Eliason on 6/20/96.  These
+ are slight improvements over Carle Pieter's values because Eric used
+ the most current flat files and Alfred McEwen's non-linearity
+ correction.  For more information, see Eric's memo from 6/20/96.
+    <br />
+    <br />
+
+
+   CenterFilterWavelength   CR
+    <br />
+            415 nm          .021406
+    <br />
+            750 nm          .012266
+    <br />
+            900 nm          .010674
+    <br />
+            950 nm          .010831
+    <br />
+            1000 nm         .024271
+    <br />
+    <br />
+      Note: if the cub has a compression ratio of 1.0 (the cube is uncompressed) 
+      it will use difference flat field file.
+  </description>
+
+  <category>
+    <missionItem>Clementine</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>clemnircal</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Tracie Sucharski" date="1994-11-18">
+      Original Version (uvviscal.F)
+    </change>
+    <change name="Steven Lambright &amp; Steven Koechle" date="2007-05-16">
+      Converted to Isis 3.0
+    </change>
+    <change name="Steven Lambright &amp; Steven Koechle" date="2007-06-07">
+      Beautified and forcing output pixel type to real.
+    </change>
+    <change name="Steven Lambright" date="2007-06-14">
+      Cleaned up XML, added an example and added Radiometry group to labels of output cube.
+    </change>
+    <change name="Steven Lambright &amp; Steven Koechle" date="2007-06-18">
+      Fixed problem with solar distance calculation
+    </change>
+    <change name="Steven Lambright" date="2008-02-08">
+      Changed TCOR paramter's default to TRUE
+    </change>
+    <change name="Christopher Austin" date="2008-02-20">
+      Altered the output cube's BandBin group, changing the Keyword "Name" back
+      to "FilterName".
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Christopher Austin" date="2009-06-11">
+      Fixed a segmentation fault.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file name
+        </brief>
+        <description>
+          Specify the input file to be corrected.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file name
+        </brief>
+        <description>
+	  Specify the output file. The result will be the
+ 	  radiometrically corrected image. The output values can
+	  either be output as absolute radiance or converted to
+	  reflectance (I/F) values.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <pixelType>real</pixelType>
+      </parameter>
+    </group>
+
+    <group name="Settings">
+      <parameter name="CONV">
+        <type>boolean</type>
+        <brief>
+          Convert to I/F reflectance
+        </brief>
+        <description>
+	  This option allows the output values to be written as
+	  absolute radiance or converted to reflectance values (I/F).
+        </description>
+        <default>
+          <item>true</item>
+        </default>
+      </parameter>
+
+      <parameter name="TCOR">
+        <type>boolean</type>
+        <brief>
+          Use temperature correction
+        </brief>
+        <description>
+          This option defines whether or not to use temperature correction.
+          If disabled, the focal plane temperature read from the labels is used (if it is not equal to zero, otherwise temperature correction is used anyways).
+          When TCOR is enabled, the temperature read from the labels is disregarded and a table is searched based on the orbit number and mission phasederived from
+          the ProductID stored in the labels.
+        </description>
+        <default>
+          <item>true</item>
+        </default>
+      </parameter>
+
+      <parameter name="DARKCURRENT">
+        <type>string</type>
+        <brief>Dark current data source</brief>
+        <description>
+          This option allows the user to input a constant value for the dark current, or alternatively a cube file with dark current values (default).
+        </description>
+        <default><item>DCFILE</item></default>
+        <list>
+          <option value="DCFILE">
+            <brief>Uses a dark current cube</brief>
+            <description>
+              The dark current values used in the equations will be taken from a cube.
+            </description>
+            <exclusions><item>DCCONST</item></exclusions>
+          </option>
+          <option value="DCCONST">
+            <brief>Uses a dark current constant</brief>
+            <description>
+              The dark current values used in the equations will be a constant number.
+            </description>
+            <inclusions><item>DCCONST</item></inclusions>
+            <exclusions><item>DCFILE</item></exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="DCCONST">
+        <type>double</type>
+        <brief>
+          Dark current constant
+        </brief>
+        <description>
+    	  This constant will replace the array of dark current
+    	  coefficients in the derived dark current file.  In most
+    	  cases, the default should be used for this parameter to
+    	  indicate the derived dark current file is to be used.
+        </description>
+      </parameter>
+
+      <parameter name="DCFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>Dark current file</brief>
+        <description>
+	  This parameter allows the user to use an alternate dark
+	  current file. In most cases, the default should be used for
+	  this parameter to indicate the derived dark current file is
+	  to be used.  The name of the derived dark current file is
+	  $ISIS3DATA/clementine1/calibration/uvvis/dark_5_15_96.cub.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+
+      <parameter name="FFFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+	  Array of flat-field coefficients
+        </brief>
+        <description>
+	  This parameter allows the user to use an alternate
+	  flat-field file.  In most cases, the default should be used
+	  for this parameter to indicate the derived flat-field file
+	  is to be used.  There is a different version of the flat
+	  file for compressed and uncompressed images. The name of the
+	  derived flat-field file is
+	     $ISIS3DATA/clementine1/calibration/uvvis/lu[filter]_[un]comp_flat_long.cub.
+	  An example for a compressed B filter image is
+	     $ISIS3DATA/clementine1/calibration/uvvis/lub_comp_flat_long.cub.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Calibrating a cube to I/F values using temperature correction
+      </brief>
+      <description>
+        Calibrating a cube to I/F values using temperature correction
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          clemuvviscal FROM=lua1841h.cub TO=lua1841h.cal.cub TCOR=TRUE
+        </commandLine>
+        <description>
+          In this example clemuvviscal will calibrate lua1841h.cub using temperature correction.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="448" height="550" src="assets/images/TempCorrection.jpg">
+            <brief>Calibrate lua1841h.cub using temperature correction</brief>
+            <description>In this example clemuvviscal will calibrate lua1841h.cub using temperature correction.</description>
+            <thumbnail width="163" height="200" src="assets/thumbs/TempCorrection.jpg" caption="Calibrate lua1841h.cub using temperature correction"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image width="384" height="288" src="assets/images/before.jpg">
+          <brief>Image before correction</brief>
+          <description>This is the input image lua1841h.cub before being corrected with clemuvviscal.</description>
+          <thumbnail caption="lua1841h.cub before being corrected" width="200" height="150" src="assets/thumbs/before.jpg"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="384" height="288" src="assets/images/after.jpg">
+          <brief>Image after correction</brief>
+          <description>This is the input image lua1841h.cub after being corrected with clemuvviscal. The values in this cube are all I/F because CONV was set to true by default.</description>
+          <thumbnail caption="lua1841h.cub after being corrected" width="200" height="150" src="assets/thumbs/after.jpg"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

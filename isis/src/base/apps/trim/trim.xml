@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="trim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Trim edges of input cube
+  </brief>
+
+  <description>
+    This program will trim (set to NULL) edge pixels of the input cube defined
+    by the parameters TOP, BOTTOM, LEFT and RIGHT, which indicate the
+    number of pixels to trim from edges of the cube.  Note that this program
+    does not change the dimensions of the cube.  The program "crop" allows
+    a section of a cube to be output.
+  </description>
+
+  <history>
+    <change name="Jim Mathews" date="1994-02-14">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2002-07-01">
+      Ported to Isis 3.0
+    </change>
+    <change name="K Teal Thompson" date="2002-12-02">
+      Add example.
+    </change>
+    <change name="K Teal Thompson" date="2003-03-28">
+      Make images smaller
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>crop</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to trim
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be trimmed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the trimmed cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Trim size">
+      <parameter name="TOP">
+        <type>integer</type>
+        <default>
+          <item>0</item>
+        </default>
+        <brief>Number of lines to trim at top of cube</brief>
+        <description>
+          This defines the number of lines that will be set to NULL
+          at the top of the cube.
+        </description>
+        <minimum inclusive="yes">
+            0
+        </minimum>
+      </parameter>
+
+      <parameter name="BOTTOM">
+        <type>integer</type>
+        <default>
+          <item>0</item>
+        </default>
+        <brief>Number of lines to trim at bottom of cube</brief>
+        <description>
+          This defines the number of lines that will be set to NULL
+          at the bottom of the cube.
+        </description>
+        <minimum inclusive="yes">
+            0
+        </minimum>
+      </parameter>
+
+      <parameter name="LEFT">
+        <type>integer</type>
+        <default>
+          <item>0</item>
+        </default>
+        <brief>Number of samples to trim at left side of cube</brief>
+        <description>
+          This defines the number of samples that will be set to NULL
+          at the left side of the cube.
+        </description>
+        <minimum inclusive="yes">
+            0
+        </minimum>
+      </parameter>
+
+      <parameter name="RIGHT">
+        <type>integer</type>
+        <default>
+          <item>0</item>
+        </default>
+        <brief>Number of samples to trim at right side of cube</brief>
+        <description>
+          This defines the number of samples that will be set to NULL
+          at the right side of the cube.
+        </description>
+        <minimum inclusive="yes">
+            0
+        </minimum>
+      </parameter>
+
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> trim Lunar Orbiter </brief>
+      <description>
+        This example shows a trim operation.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/lo.crp.cub to=OUT/lo.trm top=240 l=53 r=48
+        </commandLine>
+        <description>
+        trim 3 sides of a Lunar Orbiter image.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/lo.crp.jpg" width="485" height="400">
+          <brief> Input image for trim</brief>
+          <description>This is the input image for the trim example
+.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/lo.crp.jpg" width="200" height="165"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/lo.trm.jpg" width="485" height="400">
+          <brief> Output image for trim</brief>
+          <description> This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the trim application." src="assets/thumb/lo.trm.jpg" width="200" height="165"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="457" height="317" src="assets/image/trimGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a trim operation on the input image. </description>
+            <thumbnail width="200" height="138" caption="trim Gui" src="assets/thumb/trimGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

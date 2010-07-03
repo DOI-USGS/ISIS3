@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mrf2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+    <brief> Export a Mini-RF isis cube to a pds image</brief>
+
+    <description> 
+        This program takes an isis cube of the  Mini-RF of levels 2 and 3 and
+        produces a pds image. Level 2: Caliberated projected  Mini-RF  isis cube
+        Level 3: Mosaic isis cube containing 1 or more Level 2  Mini-RF isis 
+        cubes
+    </description>
+
+    <history>
+        <change name="Sharmila Prasad" date="2009-10-27">Original Version</change>
+        <change name="Sharmila Prasad" date="2010-02-09">Added Level3 conversion capability</change>
+        <change name="Sharmila Prasad" date="2010-03-09">Use class 
+             ProcessExportMiniRFLroPds instead of ProcessExportLroPds with 
+             class name change</change>
+   </history>
+
+    <category>
+      <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+    </category>
+
+    <groups>
+        <group name="Files">
+            <parameter name="FROM">
+                <type>cube</type>
+                <fileMode>input</fileMode>
+                <brief>Input file</brief>
+                <description>The Mini-RF isis cube to be converted to PDS format</description>
+                <filter> *.cub</filter>
+            </parameter>
+            <parameter name="TO">
+                <type>filename</type>
+                <fileMode>output</fileMode>
+                <brief>Output cube </brief>
+                <description>Output Mini-RF pds image</description>
+                <filter> *.lbl</filter>
+            </parameter>
+        </group>
+
+        <group name="Options">
+            <parameter name="USERLBL">
+                <type>filename</type>
+                <fileMode>input</fileMode>
+                <default><item>Default</item></default>
+                 <brief>Specify the values for user defined keywords in pvl format</brief>
+                 <description>Specify the values for user defined keywords in  pvl format 
+                     <html>
+                         <head></head>
+                         <body><font size="2" face="Verdana">
+                             <p><table><tr><td valign="top"><table>
+                                        <tr><th colspan="2"><u>Format for Level2 User defined Keywords</u></th></tr>
+                                        <tr><td colspan="2">LABEL_REVISION_NOTE=</td></tr>
+                                         <tr><td colspan="2">DATA_SET_NAME= </td></tr> 
+                                         <tr><td colspan="2">PRODUCER_ID= </td></tr>
+                                         <tr><td colspan="2">PRODUCER_FULL_NAME= </td></tr>
+                                         <tr><td colspan="2">PRODUCER_INSTITUTION_NAME= </td></tr>
+                                         <tr><td colspan="2">MISSION_NAME= </td></tr>
+                                         <tr><td colspan="2"> PRODUCT_ID= </td></tr>
+                                         <tr><td colspan="2">PRODUCT_VERSION_ID= </td></tr>
+                                         <tr><td colspan="2">RELEASE_ID=</td></tr> 
+                                         <tr><td colspan="2">START_TIME= </td></tr>
+                                         <tr><td colspan="2">STOP_TIME= </td></tr>
+                                         <tr><td colspan="2">SPACECRAFT_CLOCK_START_COUNT=</td></tr>
+                                         <tr><td colspan="2">SPACECRAFT_CLOCK_STOP_COUNT= </td></tr>
+                                         <tr><td colspan="2">DESCRIPTION= </td></tr>
+                                         <tr><td colspan="2">OBJECT=IMAGE</td></tr>
+                                         <tr><td width="25"> </td> <td>DESCRIPTION=</td></tr>
+                                        <tr><td colspan="2">END_OBJECT </td></tr>
+                                     </table>
+                                    </td><td width="75"></td>
+                                     <td><table>
+                                         <tr><th colspan="2"><u>Format for Level3 User defined Keywords </u></th></tr>
+                                         <tr><td colspan="2">LABEL_REVISION_NOTE=</td></tr> 
+                                         <tr><td colspan="2">DATA_SET_ID= </td></tr>
+                                         <tr><td colspan="2">DATA_SET_NAME= </td></tr> 
+                                         <tr><td colspan="2">PRODUCER_ID= </td></tr>
+                                         <tr><td colspan="2">PRODUCER_FULL_NAME= </td></tr>
+                                         <tr><td colspan="2">PRODUCER_INSTITUTION_NAME= </td></tr>
+                                         <tr><td colspan="2">MISSION_NAME= </td></tr>
+                                         <tr><td colspan="2"> PRODUCT_ID= </td></tr>
+                                         <tr><td colspan="2">PRODUCT_VERSION_ID= </td></tr>
+                                         <tr><td colspan="2">RELEASE_ID=</td></tr> 
+                                         <tr><td colspan="2">START_TIME= </td></tr>
+                                         <tr><td colspan="2">STOP_TIME= </td></tr>
+                                         <tr><td colspan="2">SPACECRAFT_CLOCK_START_COUNT=</td></tr>
+                                         <tr><td colspan="2">SPACECRAFT_CLOCK_STOP_COUNT= </td></tr>
+                                         <tr><td colspan="2">DESCRIPTION= </td></tr>
+                                         <tr><td colspan="2">OBJECT=IMAGE</td></tr>
+                                         <tr><td width="25"> </td><td>NAME=</td></tr>
+                                         <tr><td width="25"> </td> <td>DESCRIPTION=</td></tr>
+                                         <tr><td colspan="2">END_OBJECT </td></tr>
+                                         <tr><td colspan="2">OBJECT=IMAGE_MAP_PROJECTION</td></tr>
+                                         <tr><td width="25"> </td> <td>COORDINATE_SYSTEM_TYPE =</td></tr>
+                                         <tr><td colspan="2">END_OBJECT </td></tr>
+                                     </table></td></tr></table>
+                             </p>
+                         </font></body>
+                     </html>
+                     </description>
+                 <filter>*.pvl</filter> 
+                </parameter>
+        </group>
+        <group name="Source Product">
+                <parameter name="TYPE">
+                    <type>string</type>
+                    <default>
+                        <item>ID</item>
+                    </default>
+                    <brief>File with source product Ids or Filenames</brief>
+                    <description>
+                        This parameter is used to select whether the source file 
+                        has Id's or Filenames
+                    </description>
+                    <list>
+                        <option value="ID"> 
+                        <brief>Id</brief>
+                        <description>The file contains source product Ids</description> 
+                        </option> 
+                        <option value="LIST"> 
+                        <brief>Filename</brief>
+                        <description>The file contains source product filenames 
+                            from which the id's are generated</description>
+                         </option> 
+                    </list>
+                </parameter>
+                    <parameter name="SRC">
+                    <type>filename</type>
+                    <fileMode>input</fileMode>
+                    <default><item>None</item></default>
+                     <brief>File with all the Source Product ID or Filenames </brief>
+                     <description>File with all the Source Product IDs or Filenames</description>
+                     <filter>*.lis</filter> 
+                    </parameter>
+        </group> 
+        </groups>
+</application>
+

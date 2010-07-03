@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+
+  <!-- ********************************************
+        CATEGORY
+        ******************************************** -->
+  <category>
+    <categoryItem>hidden</categoryItem>
+    <categoryItem>technicaldoc</categoryItem>
+    <categoryItem>isis2</categoryItem>
+  </category>
+
+  <!-- ********************************************
+        AUDIENCE
+        ******************************************** -->
+  <audience>
+    <target>developer</target>
+  </audience>
+
+  <!-- ********************************************
+        BIBLIOGRAPHY
+        ******************************************** -->
+  <bibliography>
+    <title>Isis 2 Technical Documentation</title>
+    <brief>Links to Isis 2 Technical Documents</brief>
+    <description>List of links to Isis 2 documents covering technical topics, such as administration, release notes, and installation.</description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2003-04-03</date>
+  </bibliography>
+
+  <!-- ********************************************
+        FILES
+        ******************************************** -->
+  <files>
+    <file>
+      <type>HTML</type>
+
+      <source>
+        <filename>index.html</filename>
+      </source>
+
+      <body>
+
+        <ul>
+          <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/release.cgi">Release Notes</A></LI>
+          <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/programmer_doc.cgi">Programmer Documentation</A></LI>
+          <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/operating_guide.cgi">Operating Environment Guide</A></LI>
+          <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">Installation Guide</A></LI>
+        </ul>
+
+
+      </body>
+    </file>
+  </files>
+
+  <history>
+    <change name="Deborah Lee Soltesz" date="2003-04-03">Created</change>
+  </history>
+
+</documentation>

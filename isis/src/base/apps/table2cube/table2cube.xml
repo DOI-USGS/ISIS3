@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="table2cube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Converts a table to a cube
+  </brief>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <description>
+     This program converts a single field of a table into a cube. 
+     The table records will become lines in the output cube, and the table field data will become samples. 
+     So, a field with an array of size three and twenty records will produce a 3 sample by 20 line cube. 
+  </description>
+
+<history>
+    <change name="Steve Koechle and Steven Lambright" date="2007-06-15">
+      Original Version
+    </change>
+ </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file name
+        </brief>
+        <description>
+          Specify the input file containing table data.
+        </description>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file name
+        </brief>
+        <description>
+	      Specify the output file, which will be a cube populated with the data from the table.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <pixelType>real</pixelType>
+      </parameter>
+    </group>
+
+    <group name="Settings">
+      <parameter name="TABLENAME">
+        <type>string</type>
+        <brief>
+          Table Name
+        </brief>
+        <description>
+          Specify the table name inside of the table input file (FROM).
+        </description>
+      </parameter>
+
+      <parameter name="FIELD">
+        <type>string</type>
+        <brief>
+          Field Name
+        </brief>
+        <description>
+          Specify the field name inside of the cube to gather the data from. The size of the array inside of 
+          this field will be the same as the number of samples in the output cube (unless otherwise specified).
+        </description>
+      </parameter>
+
+      <parameter name="STARTREC">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>
+          Starting Record
+        </brief>
+        <description>
+          Specify the starting record inside of the table. Use this if you want to skip initial data. One Based.
+        </description>
+      </parameter>
+
+      <parameter name="NUMREC">
+        <type>integer</type>
+        <internalDefault>All</internalDefault>
+        <brief>
+          Number of records
+        </brief>
+        <description>
+          Specify the number of records to convert, this starts with the first record specified by STARTREC. One Based.
+        </description>
+      </parameter>
+
+      <parameter name="STARTELEM">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>
+          Starting element in field
+        </brief>
+        <description>
+          Specify the starting element in the field. For example, if you have an array of size three but only 
+          want the last element this should be set to three. One Based.
+        </description>
+      </parameter>
+
+      <parameter name="NUMELEM">
+        <type>integer</type>
+        <internalDefault>All</internalDefault>
+        <brief>
+          Number of elements in field
+        </brief>
+        <description>
+          Specify the number of elements in the field to convert into the output cube, this starts with the first 
+          record specified by STARTELEM. One Based.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+    <brief>
+        Converting a table to a cube using table2cube
+      </brief>
+      <description>
+        Converting a table to a cube using table2cube.
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+       from=out.tbl to=out.cub tablename=Example field=Data
+        </commandLine>
+        <description>
+          In this example table2cube will convert the table "Example," field "Data" from out.tbl to out.cub
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="448" height="550" src="assets/images/table2cubeGUI.jpg">
+            <brief>Convert table to cube</brief>
+            <description>
+                In this example table2cube will convert the table "Example," field "Data" from out.tbl to out.cub
+            .</description>
+            <thumbnail width="163" height="200" src="assets/thumbs/table2cubeGUI.jpg" caption="table2cube GUI with defaults"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <outputImages>
+        <image width="500" height="500" src="assets/images/out.jpg">
+          <brief>Image after conversion</brief>
+          <description>
+            This is the table from out.tbl after being converted to an Isis cube. The file "out.tbl" was constructed by making a
+            500 by 500 table of the mathematical equation: element mod row (effectively x % y).
+          </description>
+          <thumbnail caption="Table after being converted" width="200" height="200" src="assets/thumbs/out.jpg"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

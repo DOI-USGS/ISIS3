@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="thmvistrim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Trims data from framelets on Themis Vis images
+  </brief>
+
+  <description>
+    This program nulls out data on a per-framelet basis. By default, only the 
+    bottom is trimmed and just enough so that data won't be repeated in 
+    projected space. This program removes the data from the bottom of the 
+    framelets because the themis camera produces the worst data at that point.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2008-03-20">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Odyssey</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+         </brief>
+         <description>
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+
+    <group name="Settings">
+     <parameter name="TOPTRIM">
+        <type>integer</type>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <minimum inclusive="yes">0</minimum>
+       <default><item>0</item></default>
+      </parameter>
+     <parameter name="BOTTOMTRIM">
+        <type>integer</type>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <minimum inclusive="yes">0</minimum>
+       <internalDefault>Automatically Determine</internalDefault>
+      </parameter>
+     <parameter name="LEFTTRIM">
+        <type>integer</type>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <minimum inclusive="yes">0</minimum>
+        <default><item>0</item></default>
+      </parameter>
+     <parameter name="RIGHTTRIM">
+        <type>integer</type>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <minimum inclusive="yes">0</minimum>
+       <default><item>0</item></default>
+      </parameter>
+    </group>
+   </groups>
+</application>

@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="warp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+      Warp an image to another using control points
+  </brief>
+
+  <description>
+      This program warps images using a control net.
+  </description>
+
+  <history>
+    <change name="Kay Edwards" date="1987-06-08">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2004-06-18">
+      Converted to Isis 3.0
+    </change>
+    <change name="Elizabeth Miller" date="2005-10-11">
+        Finished  documentation and code
+    </change>
+    <change name="Elizabeth Miler" date="2005-11-03">
+        Added appTest
+    </change>
+    <change name="Jacob Danton" date="2006-04-05">
+        Added error checking for control networks
+    </change>
+    <change name="Steven Lambright" date="2007-06-22">
+        Fixed typo in user documentation
+    </change>
+    <change name="Steven Lambright" date="2008-05-13"> 
+      Removed references to CubeInfo
+    </change>
+     <change name="Stacy Alley" date="2008-12-19"> 
+      Updating documentation and adding examples
+    </change>
+  </history>
+
+  <oldName>
+      <item>random</item>
+      <item>warp2</item>
+  </oldName>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to warp
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be warped unless a specific band is specified.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the warping.
+        </description>
+      </parameter>
+
+      <parameter name="CONTROL">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Control Net file
+        </brief>
+        <description>
+          This file will contain the control net used to find the translation.
+        </description>
+        <filter>
+          *.net
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Warp parameters">
+      <parameter name="DEGREE">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Order of polynomial</brief>
+        <description>
+            The order of the polynomial to be used in the linear regression fit.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="WEIGHTED">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>Weight the control points using distance</brief>
+        <description>
+            The control points will be weighted based on distance if this option is selected.
+            If it is not selected, all control points will have a weight of 1, reguardless of distance.
+        </description>
+      </parameter>
+
+      <parameter name="OSIZE">
+        <type>string</type>
+        <brief>Output cube size</brief>
+        <default><item>MATCH</item></default>
+        <description>
+          This option determines how the size of the output cube is found.  The  choices are MATCH, 
+          COMPUTE, and USER.  The MATCH option matches the output cube size to the size of the
+          cube entered in the CUBE parameter.  The COMPUTE option calculates the output cube 
+          size from the control net file.  The USER parameter allows the user to set the output cube
+          size by entering the sample and line values in the ONS and ONL parameters.  The MATCH 
+          option is the default.
+        </description>
+        <list>
+          <option value="MATCH">
+            <brief>Match size of cube</brief>
+            <description>
+                This option will match the output cube to the size of the cube entered in the CUBE box.
+            </description>
+            <exclusions>
+                <item>ONL</item>
+                <item>ONS</item>
+            </exclusions>
+          </option>
+          <option value="COMPUTE">
+            <brief>Compute size using control points</brief>
+            <description>
+                Computes the size of the output file using the control net file.
+            </description>
+            <exclusions>
+                <item>ONL</item>
+                <item>ONS</item>
+                <item>CUBE</item>
+            </exclusions>
+          </option>
+          <option value="USER">
+            <brief>User specific output cube size</brief>
+            <description>
+                The output cube will be the size that the user enters for the ONS and ONL parameters.
+            </description>
+            <inclusions>
+                <item>ONL</item>
+                <item>ONS</item>
+            </inclusions>
+            <exclusions>
+                <item>CUBE</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="CUBE">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+        <brief>Match Output cube to this Cube's Size</brief>
+        <description>
+            The output cube will have the same dimensions as the cube entered here.
+        </description>
+        <filter>
+            *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="ONL">
+       <type>integer</type>
+       <brief>Output Lines</brief>
+       <description>
+           The number of lines in the output cube.
+       </description>
+       <minimum inclusive="yes">1</minimum>
+     </parameter>
+    
+     <parameter name="ONS">
+       <type>integer</type>
+       <brief>Output Samples</brief>
+       <description>
+           The number of samples in the output cube.
+       </description>
+       <minimum inclusive="yes">1</minimum>
+     </parameter>
+    </group>
+
+    <group name="Interpolation">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+
+   <examples>
+    <example>
+      <brief> Warp Example 1</brief>
+      <description>
+       Warp Example 1
+      </description>
+      <terminalInterface>
+        <commandLine> warp from=warp_from.cub to=warp_example1.cub control=warp_example1.net osize=user onl=1000 ons=1000
+        </commandLine>
+        <description>
+         This warp command will warp the from cube (warp_from.cub) which is a 
+         100Sx1000L image, to a 1000Sx1000L image and match the points from the 
+         control points in warp_example1.net. 
+         See the control net input file for more details.
+        </description>
+      </terminalInterface>
+        <inputImages>
+        <image src="assets/image/warp_from.jpg" width="55" height="550">
+          <brief> Input image for warp</brief>
+          <description>This is the input image for the warp examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/warp_from.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/warp_example1.jpg" width="550" height="550">
+          <brief> Output image for warp</brief>
+          <description> This is the output image for this example of warp.  
+           The control net file link below contains the points required to 
+           create this kind of a warp output.
+          </description>
+          <thumbnail caption="Output image showing results of the warp application." src="assets/thumb/warp_example1.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <dataFiles>
+        <dataFile path="assets/warp_example1.net">
+          <brief>
+            Control net input file.
+          </brief>
+          <description>
+            This is the require input for the CONTROL parameter.  User can edit 
+            this file to fit individual needs.  In each control point there are 
+            two measures.  Measure 1 is the point on the from file you would 
+            like to map to measure 2.
+          </description>
+          <parameterName></parameterName>
+        </dataFile>
+      </dataFiles>
+
+    </example>
+
+      <example>
+      <brief> Warp Example 2</brief>
+      <description>
+       Warp Example 2
+      </description>
+      <terminalInterface>
+        <commandLine> warp from=warp_from.cub to=warp_example2.cub 
+          control=warp_example2.net osize=user onl=1000 ons=1000
+        </commandLine>
+        <description>
+         This warp command will warp the from cube (warp_from.cub) which is a 
+         100Sx1000L image, to a 1000Sx1000L image and match the points from the 
+         control points in warp_example1.net. 
+         See the control net input file for more details.
+        </description>
+      </terminalInterface>
+        <inputImages>
+        <image src="assets/image/warp_from.jpg" width="55" height="550">
+          <brief> Input image for warp</brief>
+          <description>This is the input image for the warp examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/warp_from.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/warp_example2.jpg" width="550" height="550">
+          <brief> Output image for warp</brief>
+          <description> This is the output image for this example of warp.  
+           The control net file link below contains the points required to 
+           create this kind of a warp output.
+          </description>
+          <thumbnail caption="Output image showing results of the warp application." src="assets/thumb/warp_example1.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <dataFiles>
+        <dataFile path="assets/warp_example2.net">
+          <brief>
+            Control net input file.
+          </brief>
+          <description>
+            This is the require input for the CONTROL parameter.  User can edit 
+            this file to fit individual needs.  In each control point there are 
+            two measures.  Measure 1 is the point on the from file you would 
+            like to map to measure 2.
+          </description>
+          <parameterName></parameterName>
+        </dataFile>
+      </dataFiles>
+
+    </example>
+
+   </examples>
+
+</application>
+

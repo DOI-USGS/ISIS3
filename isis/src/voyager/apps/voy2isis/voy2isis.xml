@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="voy2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import PDS formatted Voyager EDR into Isis format cube
+  </brief>
+
+  <description>
+    This program will take in raw image files from the Voyager spacecraft
+    mission and import them into Isis formatted cubes.  The input files are
+    compressed Planetary Data System (PDS) formatted Voyager Experiment 
+    Data Record (EDR) files.  The output cube will contain tranlated labels in 
+    pvl format with instrument, archive, bandbin, kernel, and nominal reseau 
+    information.
+  </description>
+
+  <history>
+    <change name="Jeannie Walldren" date="2009-03-11">
+      Original version
+    </change>
+    <change name="Jeannie Walldren" date="2009-03-23">
+      Modified the Makefile in the app test to ignore particular lines when
+      comparing labels.  Removed the orginal extension from the name of the 
+      temporary decompressed file output by a call to vdcomp.  Modified error 
+      message for accuracy.
+    </change>
+    <change name="Mackenzie Boyd" date="2010-04-30">
+      Modified StartTime in labels to remove Z from end. Modified naif frame
+      code for all cameras to be -100 (-32001 -> -32101) from what they were 
+      previously to match updated ck and fk kernels. Added significant changes
+      which affect the start time and image number for improved accuracy. 
+    </change>  
+    <change name="Steven Lambright" date="2010-06-17">
+      Updated to make input IMQ's PVL labels parsable by our PVL classes
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Voyager</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>
+        pds2isis
+      </item>
+    </applications>
+    <documents>
+      <document>
+        <title>
+            Voyager ISS Main Page
+        </title>
+        <source>
+          <filename></filename>
+          <path>http://pds-rings.seti.org/voyager/iss/</path>
+        </source>
+        <publisher>Planetary Data System Rings Node</publisher>
+      </document>
+      <document>
+        <title>
+            Voyager ISS Raw Images
+        </title>
+        <source>
+          <filename></filename>
+          <path>http://pds-rings.seti.org/voyager/iss/raw_images.html/</path>
+        </source>
+        <publisher>Planetary Data System Rings Node</publisher>
+      </document>
+    </documents>
+  </seeAlso>
+
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Voyager EDR image file
+        </brief>
+        <description>
+          Use this parameter to select the Voyager PDS EDR file to be imported.  
+          These files are in compressed format and have the form cnnnnnnn.imq 
+          where "nnnnnnn" is the FDS count.
+        </description>
+        <filter>
+          *.imq
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename for the imported 
+           image.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief>Using voy2isis</brief>
+      <description>
+        This example shows the use of voy2isis to ingest Voyager EDRs and output
+        Isis3 cubes.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=input/voyagerEdr.imq to=isisImage.cub
+        </commandLine>
+        <description>
+          This example shows how to import with voy2isis.  Both parameters must 
+          be used.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="655" height="550" src="assets/images/voy2isisGUI.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI 
+            </description>
+            <thumbnail width="200" height="168" src="assets/thumbs/voy2isisGUI.jpg" caption="voy2isis gui"/>
+          </image>
+        </guiInterface>
+        </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/output.pvl">
+            <brief> Output cube label </brief>
+            <description>
+              This is the label from the output cube showing the Instrument,
+              BandBin, Kernels and Reseaus groups imported.
+            </description>
+            <parameterName>TO</parameterName>
+          </dataFile>
+      </dataFiles>
+      <outputImages>
+        <image width="579" height="550" src="assets/images/output.jpg">
+          <brief>
+            Output after ingestion
+          </brief>
+          <description>
+            Screenshot of the image in the Isis qview application after it has
+            been ingested.
+          </description>
+          <thumbnail width="200" height="190" src="assets/thumbs/output.jpg" caption="Output cube in qview"/>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

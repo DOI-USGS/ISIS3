@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="catoriglab" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs the original labels of a cube
+  </brief>
+
+  <description>
+    This program will output the full labels from the original source.
+  </description>
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+     <applications>
+      <item>cathist</item>
+      <item>catlab</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Robert Wallace and Brian Lipkowitz" date="2006-02-03">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-26">
+        Documentation fixes
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file from which to extract the labels 
+        </brief>
+        <description>
+          The cube file from which to extract the original labels. 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Full printout of the original labels in a cub </brief>
+      <description>
+        This example shows how the catoriglab application works. 
+        There are no defaults.                  
+        <pre> 
+PDS_VERSION_ID                = PDS3
+
+/* FILE DATA ELEMENTS */
+RECORD_TYPE                   = FIXED_LENGTH
+RECORD_BYTES                  = 2048
+FILE_RECORDS                  = 1042
+LABEL_RECORDS                 = 11
+
+/* POINTERS TO DATA OBJECTS */
+^IMAGE_HEADER                 = 12
+^IMAGE                        = 19
+
+/* IDENTIFICATION DATA ELEMENTS */
+DATA_SET_ID                   = MER1-M-MI-2-EDR-OPS-V1.0
+DATA_SET_NAME                 = "MER 1 MARS MICROSCOPIC IMAGER 
+                                 CAMERA ED OPS VERSION 1.0"
+       .
+       .
+       .
+         </pre>
+      </description>
+      <terminalInterface>
+        <commandLine> from=temp.cub 
+        </commandLine>
+        <description>
+            Run the catoriglab application on a .cub file.
+        </description>
+      </terminalInterface>
+    </example>
+  </examples>
+
+</application>

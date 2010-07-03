@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="bandnorm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Normalize bands in a cube
+  </brief>
+
+  <description>
+    <p/>
+    The program accomplishes the fairly straightforward task of taking an input
+    cube and outputting normalized values. 
+    <p/>
+    Normalization may be done with respect to each band or the entire cube.
+    If the user were to normalize by band, the program would take a pass through
+    the data in order to determine the average of each band. Bandnorm will then
+    pass through each band again and normalize each one based on the average
+    of the given band.  If normalizing by the entire cube, the first pass would compute
+    the average of the cube, and the second pass would normalize each band using
+    this average.  Bandnorm can use a text file as the input for the average 
+    value of each band. 
+    <p/>
+  </description>
+
+  <history>
+    <change name="Elizabeth Miller" date="2006-07-18">
+      Original version
+    </change>
+    <change name="Chris Austin" date="2007-12-27">
+      Added Spectral Pencil option.
+    </change>
+    <change name="Chris Austin" date="2008-01-23">
+      Modified Spectral Pencil option to be more flexible with the structure of 
+      its Spectral files, namely, allowing for more than one column, and 
+      specifying which column to use durring normilization.
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+          Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>divfilter</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          This file will be the input cube that gets normalized.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+         Output file that will be created using average values from 
+         the input cube to normalize.
+        </description>
+      </parameter>
+   </group>
+
+    <group name="Normalization option">
+      <parameter name="AVERAGE">
+         <type>string</type>
+         <default><item>BAND</item></default>
+         <brief>Direction in which statistics and operations operate</brief>
+         <description>
+        	This is the the average to be used during normalization. If the user chooses
+        	to use band averages, they intend to take in an entire band of data 
+            and normalize based on the average of that band for each pixel in
+            that band. If they choose to use the average from the entire cube, 
+        	they intend to take in an entire cube of data and normalize each 
+            pixel in each band based on the average of the entire cube.  If they 
+            choose pencil, they intend to use a file containing the averages of 
+            each band to normalize each pixel in correlating band.  This file is 
+            best obtained using Qview's plot tool.
+         </description>
+         <list>
+           <option value="BAND">
+            <brief>Divide by Band Average </brief>
+            <description>
+              Get the average of each band separately to use in the normalization
+            </description>
+             <exclusions>
+               <item>SPECTRUM</item>
+               <item>METHOD</item>
+               <item>NUMBER</item>
+               <item>NAME</item>
+            </exclusions>
+            </option>
+           <option value="CUBE">
+            <brief>Divide by Cube Average</brief>
+            <description>
+	           Get the average of the entire cube to use in the normailization
+            </description>
+             <exclusions>
+               <item>SPECTRUM</item>
+               <item>METHOD</item>
+               <item>NUMBER</item>
+               <item>NAME</item>
+            </exclusions>
+            </option>
+            <option value="PENCIL">
+            <brief>Divide by Spectral Pencil</brief>
+            <description>
+              Use the given file as the source of the values used to normalize 
+              each band separately.
+            </description> 
+            <inclusions>
+              <item>SPECTRUM</item>
+              <item>METHOD</item>
+              <item>NUMBER</item>
+              <item>NAME</item>
+            </inclusions>
+            </option>
+         </list>
+      </parameter>
+      <parameter name="SPECTRUM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>Spectral Pencil</brief>
+        <description>
+          The file with the spectrum data for each band to be normalized with.  
+          It assumes this file was aquired using Qview's plot tool. The first 
+          line of the spectrum file MUST be composed of titles, and the
+          following lines MUST be the data desired (in most cases the average) 
+          of each band in sequential order, starting with the first band. Extra 
+          lines are ignored.
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+      </parameter>
+      <parameter name="METHOD">
+        <type>string</type>
+        <default><item>BYNAME</item></default>
+        <brief>The mothod used to determine desired column</brief>
+        <description>
+          The method used to determine the correct data column of the spectrum
+          file wished to be used in creating the normalized cube.
+        </description>
+        <list>
+          <option value="BYNUMBER">
+            <brief>Specify the column of the spectrum file to be used by 
+              column number</brief>
+            <description>
+              Allows one to specify by column number within the given 
+              spectrum file, the column data to be used to create the normalized 
+              cube.
+            </description>
+            <inclusions>
+              <item>NUMBER</item>
+            </inclusions>
+            <exclusions>
+              <item>NAME</item>
+            </exclusions>
+          </option>
+          <option value="BYNAME">
+            <brief>Specify the column of the spectrum file to be used by 
+              column name</brief>
+            <description>
+              The name of the column within the specified spectrum file, used to 
+              create the normalized cube.
+            </description>
+            <inclusions>
+              <item>NAME</item>
+            </inclusions>
+            <exclusions>
+              <item>NUMBER</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="NUMBER">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Specifies column used by number</brief>
+         <description>
+          Allows one to specify by column number within the given 
+          spectrum file, the column data to be used to create the normalized 
+          cube.
+        </description>
+      </parameter>
+      <parameter name="NAME">
+        <type>string</type>
+        <default><item>Average</item></default>
+        <brief>Specifies column used by name</brief>
+         <description>
+          Allows one to specify by column name within the given 
+          spectrum file, the column data to be used to create the normalized 
+          cube.
+        </description>
+      </parameter>
+    </group>
+
+  </groups>
+
+</application>

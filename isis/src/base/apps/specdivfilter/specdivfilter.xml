@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="specdivfilter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a spectral division filter
+  </brief>
+
+  <description>
+    This program applies a spectral division filter to a cube. A spectral filter 
+    works between bands as opposed to a spacial operation on a single band. As a 
+    division filter, it divides the original pixel by the average.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>speclowpass</item>
+      <item>spechighpass</item>
+      
+    </applications>
+  </seeAlso>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <history>
+    <change name="Stacy Alley" date="2008-09-02">
+      Original version
+    </change>
+    <change name="Mackenzie Boyd" date="2009-06-05">
+      Modified documentation, added error checking for the number of bands, and 
+      added examples
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+          Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Filtered output cube
+        </brief>
+        <description>
+          The resultant filtered cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="BANDS">
+        <type>integer</type>
+        <brief>
+          Number of bands in boxcar
+        </brief>
+
+        <description>
+          This is the total number of bands in the boxcar.  It must be odd and
+          can not exceed twice the number of bands in the cube.  In general, the 
+          size of the boxcar does not cause the program to operate significantly
+          slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Settings">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Minimum valid DN
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when computing
+          the average.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Maximum valid DN
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing the average.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>    
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Example of usage of the spectral division filter.
+      </brief>
+      <description>
+        This example shows a spectral division filter being applied to the image 
+        with a 15 depth boxcar. This cube has 256 bands so 15 is relatively 
+        small. No averaging is done between bands, the divisoin filter more 
+        increases differences between bands. Here is an image which highlights 
+        which pixels a single pass would influence. The image shows a 9x9 dot 
+        instead of a single pixel highlighted to make it more visible. In this 
+        picture the boxcar would be seven or more bands, with the output pixel 
+        being one of the visible pixels. Depending on how large the boxcar was 
+        many of the values taken in could not be original, at a minimum, one 
+        value will be mirrored since there are only six available bands.
+        <pre>
+          <image width="350" height="350" src="assets/images/cubeform.jpg"/>    
+        </pre>
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=/work1/mboyd/CM_1514302573_1.cub to=/work1/mboyd/postlow.cub 
+          bands=15
+        </commandLine>
+        <description>
+          This example will filter the image using 15 bands and no limits on 
+          high or low. 
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="553" height="471" src="assets/images/div15gui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to perform the 
+              specdivision filter with a 15 band boxcar on the image 
+              CM_1514302573_1.ir.cub.
+            </description>
+            <thumbnail width="200" height="170" caption="This program's GUI"
+            src="assets/thumbs/div15gui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="750" height="298" src="assets/images/prediv.jpg">
+          <brief>
+            Input image spectral graph before specdivfilter
+          </brief>
+          <description>
+            This is the spectral plot of the center point of the image, (32, 
+            32), and shows all bands, 1- 256. No filter has been applied, and 
+            the graph clearly shows how the value of line 32 sample 32 differs 
+            from band to band.
+          </description>
+          <thumbnail caption= "The image graph before the filter" 
+            src="assets/thumbs/prediv.jpg" width="200" height="80"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="750" height="298" src="assets/images/postdiv.jpg">
+          <brief>
+            Output image spectral graph after being filtered
+          </brief>
+          <description>
+            This is the image after the filter. First note the change in scale, 
+            everything has been amplified. Even in the apparent flat area small 
+            differences have been amplified.
+          </description>
+          <thumbnail caption= "The image graph after the filter" 
+            src="assets/thumbs/postdiv.jpg" width="200" height="80"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>
+        Example of usage of the spectral division filter.
+      </brief>
+      <description>
+        This example shows a spectral division filter being applied to the image 
+        with a 61 depth boxcar. This cube has 256 bands so 61 takes in over a 
+        fifth. In this case an image begins to show through, however, this is 
+        not because of average but because of amplificatino of differences from 
+        the original.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=/work1/mboyd/CM_1514302573_1.cub to=/work1/mboyd/postlow.cub 
+          bands=61
+        </commandLine>
+        <description>
+          This example will filter the image using 61 bands and no limits on 
+          high or low. 
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="553" height="471" src="assets/images/div61gui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to perform the 
+              spechighpass filter with a 61 band boxcar on the image 
+              CM_1514302573_1.ir.cub.
+            </description>
+            <thumbnail width="200" height="170" caption="This program's GUI"
+            src="assets/thumbs/div61gui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="750" height="298" src="assets/images/predivjpg">
+          <brief>
+            Input image spectral graph before spectral division filter
+          </brief>
+          <description>
+            This is the spectral plot of the center point of the image, (32, 
+            32), and shows all bands, 1- 256. No averaging or amplification has 
+            been applied.
+          </description>
+          <thumbnail caption= "The image graph before the filter" 
+            src="assets/thumbs/prediv.jpg" width="200" height="80"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="750" height="298" src="assets/images/postdiv61.jpg">
+          <brief>
+            Output image spectral graph after being filtered
+          </brief>
+          <description>
+            This is the image after the filter. The amplification is clear 
+            immediately from the change in scale necessary to show the new 
+            values. All differences have been amplified, but smaller differences 
+            have increased more significantly than large differences.
+          </description>
+          <thumbnail caption= "The image graph after the filter" 
+            src="assets/thumbs/postdiv61.jpg" width="200" height="80"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

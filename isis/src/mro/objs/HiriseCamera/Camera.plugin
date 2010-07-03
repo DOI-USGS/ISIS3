@@ -1,0 +1,6 @@
+Group = MarsReconnaissanceOrbiter/HiRISE
+  Version = 1
+  Library = HiriseCamera
+  Routine = HiriseCameraPlugin
+EndGroup
+ 

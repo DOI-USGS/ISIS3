@@ -1,0 +1,33 @@
+Median:              2
+Mode:                2
+Skew:                0
+Percent(0.5):        1
+Percent(99.5):       3
+Bins:                21
+BinSize:             1
+BinMiddle:           -10
+BinRange(0,low):     -10.5
+BinRange(0,high):    -9.5
+BinCount(0):         0
+BinRange(20,low):  9.5
+BinRange(20,high): 10.5
+BinCount(20):      0
+
+Average:             4
+Median:              5
+Mode:                5
+Skew:                -1.73205
+Percent(0.5):        2
+Percent(99.5):       5
+BinCount(0):         0
+BinCount(20):      0
+
+**PROGRAMMER ERROR** Invalid Range: Minimum [1.0] must be less than the Maximum [0.0]
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
+**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
+**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
+**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds

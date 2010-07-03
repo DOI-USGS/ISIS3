@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mrf2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import PDS formatted MiniRF level 1 or level 2 image cube into Isis format cube</brief>
+
+  <description>
+    This program will import a PDS formatted Chandrayaan-1 Mini-RF Forerunner level 1 or 
+    level 2 image into an Isis cube. It will also import a PDS formatted Lunar Reconnaissance
+    Orbiter Mini-RF LRO level 1 or level 2 image into an Isis cube.
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2007-10-22">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Janet Barrett" date="2009-07-08">
+      Added a check to make sure the ScaledPixelHeight and
+      ScaledPixelWidth are equal; hard code the frequency
+      value in the labels based on the instrument mode id -
+      this is done because the PDS labels are lacking in
+      this information; add Kernels group to the labels
+    </change>
+    <change name="Janet Barrett" date="2009-08-26">
+      Added a check to see if the Frequency keyword exists
+      in the labels. If it doesn't exist, then mrf2isis
+      will put a Frequency keyword in the labels.
+    </change>
+    <change name="Janet Barrett" date="2010-04-09">
+      Made changes so that program would run on files that
+      were created by the mrf2pds program.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted MiniRF level 1 or level 2 file
+        </brief>
+        <description>
+          Use this parameter to select the MiniRF (Chandrayaan-1
+	  or LRO) level 1 or level 2 filename. This file must
+          contain the PDS labels.
+        </description>
+        <filter>
+          *.lbl *.LBL
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+  </groups>
+</application>

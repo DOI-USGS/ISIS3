@@ -1,0 +1,204 @@
+#ifndef InterestOperator_h
+#define InterestOperator_h
+/**
+ * @file
+ * $Revision: 1.20 $
+ * $Date: 2010/07/02 23:38:14 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+
+#include <string>
+#include <vector>
+#include "PvlGroup.h"
+#include "Camera.h"
+#include "UniversalGroundMap.h"
+#include "CnetValidMeasure.h"
+#include "ImageOverlapSet.h"
+
+#include "geos/geom/Point.h"
+#include "geos/geom/Coordinate.h"
+#include "geos/geom/MultiPolygon.h"
+#include "geos/util/GEOSException.h"
+
+namespace Isis {
+  class Chip;
+  class Pvl;
+  class Cube;
+  class PvlObject;
+  class ControlNet;
+  class ControlPoint;
+  class ControlMeasure;
+
+  typedef struct {
+    std::string msSerialNum; 	//!< Serial Number of the Measure
+    double mdInterest; 		//!< Resulting interest amt from InterestOperator
+    double mdBestSample;		//!< Most interesting sample
+    double mdBestLine; 		//!< Most interesting line
+    double mdOrigSample; 	//!< Control Measure's original sample
+    double mdOrigLine; 		//!< Control Measure's original line
+    double mdEmission; 		//!< Emission angle at most interesting sample,line
+    double mdIncidence; 		//!< Incidence angle at most interesting sample,line
+    double mdDn; 		//!< Cube DN value at most interesting sample,line
+    double mdResolution; 	//!< Camera resolution at most interesting sample,line
+    bool mbValid; 		//!< Value of the interest operator result (success)
+    int  miDeltaSample;          //!< The number of Samples the point has been moved
+    int  miDeltaLine;            //!< The number of Lines the point has been moved
+  } InterestResults;
+
+  /**
+   * @brief Interest Operator class
+   *
+   * Create InterestOperator object.  Because this is a pure virtual class you
+   * can not create an InterestOperator class directly.  Instead, see the
+   * InterestOperatorFactory class.
+   *
+   * @see StandardDeviationOperator GradientOperator
+   *
+   * @internal
+   *   @history 2006-02-11 Jacob Danton - Original Version
+   *   @history 2007-08-02 Steven Koechle - Added better
+   *            documentation to CompareInterests().
+   *   @history 2007-08-02 Steven Koechle - Fixed looping error
+   *            that caused subchip to go outside the chip to the
+   *            left and top, and not check the bottom and right.
+   *   @history 2007-08-14 Steven Koechle - Added virtual method
+   *            Padding() which default returns 0.
+   *   @history 2007-08-16 Steven Koechle - Fixed Looping error
+   *            in Operate. Made the loops <= instead of just <.
+   *            Changed from accepting one delta to accepting a
+   *            deltaSamp and a deltaLine.
+   *   @history 2008-06-18 Stuart Sides - Fixed doc error
+   *   @history 2008-08-19 Steven Koechle - Updated to work with
+   *            Geos3.0.0
+   *   @history 2009-08-11 Travis Addair - Added functionality allowing it and all its
+   *                     subclasses to return the pvl group that they were initialized from
+   *   @history 2010-04-09 Sharmila Prasad - API's to check valid DN and Emission Angle.
+   *  			Also changed functionality of Operate and made it overloaded.
+   *   @history 2010-04-30 Sharmila Prasad - Added class members mdBestEmissionAngle, mdBestDnValue
+   *   and their access functions.Also added member mUnusedParamGrp to check for the default
+   *   values used for the operator.
+   *   @history 2010-04-30 Sharmila Prasad - 1. Interest Operator a child of CnetValidMeasure which validates
+   *                      all the standard control network options. Changed functionality to accomadate CnetValidMeasure
+   *                      2. Removed class members  mdBestEmissionAngle, mdBestDnValue..., instead stored in
+   *                      structure InterestResults structure
+   *                      3. Move processing ImageOverlaps from app to here
+   *                      4. Added API's to compute Interest by point and by measure
+   *   @history 2010-06-18 Sharmila Prasad - 1. Fixed Bug to ignore Points with no good interest
+   *                                         2. Do not process previously Ignored points in the Original Control Net
+   *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
+   *                                         use CubeManager instead
+   *   @history 2010-06-23 Sharmila Prasad - Use CnetValidMeasure's Validate Standard Options &
+   *                                         Std Options Pixels/Meters from Edge
+   */
+  class InterestOperator : public CnetValidMeasure {
+    public:
+      InterestOperator(Pvl &pPvl);
+      virtual ~InterestOperator();
+
+      void SetPatternValidPercent(const double percent);
+      void SetPatternSampling(const double percent);
+      void SetSearchSampling(const double percent);
+      void SetTolerance(double tolerance);
+      void SetPatternReduction(std::vector<int> samples, std::vector<int> lines);
+
+      //!< Return name of the matching operator
+      inline std::string operatorName() const {
+        return mOperatorGrp["Name"];
+      };
+
+      //!< Operate used by the app interestcube- to calculate interest by sample,line
+      bool Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap, int piSample, int piLine);
+
+      //!< Operate - to calculate interest for entire control net to get better reference
+      void Operate(const ControlNet &pOrigNet, ControlNet &pNewNet, std::string psSerialNumFile, std::string psOverlapListFile = "");
+
+      //!< Return the goodness of fit of the match operator
+      inline double InterestAmount() const {
+        return p_interestAmount;
+      };
+
+      inline double WorstInterest() const {
+        return p_worstInterest;
+      }
+
+      //!< Return the search chip cube sample that best matched
+      inline double CubeSample() const {
+        return p_cubeSample;
+      };
+
+      //!< Return the search chip cube line that best matched
+      inline double CubeLine() const {
+        return p_cubeLine;
+      };
+
+      //!< Compare for int1 greater than / equal to int2
+      virtual bool CompareInterests(double int1, double int2);
+      void AddGroup(Isis::PvlObject &obj); //???? check if used
+
+      //!< Set the Clip Polygon for points to be contained in the overlaps
+      void SetClipPolygon(const geos::geom::MultiPolygon &clipPolygon);
+
+      //!< Return the Operator name
+      Isis::PvlGroup Operator();
+
+    protected:
+      //!< Parse the Interest specific keywords
+      void Parse(Pvl &pPvl);
+
+      //!< Calculate the interest
+      virtual double Interest(Chip &subCube) = 0;
+
+      //!< Find if a point is in the overlap
+      const geos::geom::MultiPolygon *FindOverlap(Isis::ControlPoint &pCnetPoint);
+      
+      //<! Find imageoverlaps by finding the intersection of image footprints
+      const geos::geom::MultiPolygon *FindOverlapByImageFootPrint(Isis::ControlPoint &pCnetPoint);
+
+      //!< Find best ref for an entire control net by calculating the interest and
+      //!< moving point to a better interest area.
+      void FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet);
+
+      //!< Calculate interest for a Control Point
+      int InterestByPoint(ControlPoint &pCnetPoint);
+
+      //!< Calculate interest for a measure by index
+      bool InterestByMeasure(int piMeasure, Isis::ControlMeasure &pCnetMeasure, Isis::Cube &pCube);
+
+      //!< Init Interest Results structure
+      void InitInterestResults(int piIndex);
+
+      virtual int Padding();
+
+      double p_worstInterest, p_interestAmount;
+
+      geos::geom::MultiPolygon *p_clipPolygon; //!< clipping polygon set by SetClipPolygon (line,samp)
+
+      Isis::PvlGroup mOperatorGrp;             //!< Operator group that created this projection
+
+    private:
+      double p_cubeSample, p_cubeLine;  //!< Exact point in a cube from a chip perspective
+      double p_minimumInterest;         //!< Specified in the Pvl Operator group
+      int p_deltaSamp, p_deltaLine, p_lines, p_samples; //!< Specified in the Pvl Operator group
+      Isis::ImageOverlapSet mOverlaps;  //!< Holds the overlaps, after reading an Overlaplist
+      bool mbOverlaps;                  //!< If Overlaplist exists
+      InterestResults *mtInterestResults;//!< Holds the results of an interest computation
+  };
+};
+
+#endif

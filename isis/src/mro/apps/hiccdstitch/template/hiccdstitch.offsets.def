@@ -1,0 +1,131 @@
+# This file describes the line and sample offsets for each HiRISE
+# CCD in the focal plane.  Negative values shift CCDs left and up.
+# Positive values shift CCD right and down.
+Object = Hiccdstitch
+  Group = RED0
+    FocalPlaneSample = -8000
+    FocalPlaneLine   = -1219
+    ImageSample      = 1
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED1
+    FocalPlaneSample = -6000
+    FocalPlaneLine   = -1793
+    ImageSample      = 2001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED2
+    FocalPlaneSample = -4004
+    FocalPlaneLine   = -1171
+    ImageSample      = 3997
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED3
+    FocalPlaneSample = -2003
+    FocalPlaneLine   = -1791
+    ImageSample      = 5998
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED4
+    FocalPlaneSample = 0
+    FocalPlaneLine   = -1205
+    ImageSample      = 8001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED5
+    FocalPlaneSample = 2000
+    FocalPlaneLine   = -1789
+    ImageSample      = 10001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED6
+    FocalPlaneSample = 4000
+    FocalPlaneLine   = -1189
+    ImageSample      = 12001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED7
+    FocalPlaneSample = 6000
+    FocalPlaneLine   = -1786
+    ImageSample      = 14001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED8
+    FocalPlaneSample = 8000
+    FocalPlaneLine   = -1210
+    ImageSample      = 16001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = RED9
+    FocalPlaneSample = 10000
+    FocalPlaneLine   = -1817
+    ImageSample      = 18001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = IR10
+    FocalPlaneSample = 0
+    FocalPlaneLine   = 0
+    ImageSample      = 8001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = IR11
+    FocalPlaneSample = 2000
+    FocalPlaneLine   = -606
+    ImageSample      = 10001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = BG12
+    FocalPlaneSample = 0
+    FocalPlaneLine   = -2396
+    ImageSample      = 8001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+
+  Group = BG13
+    FocalPlaneSample = 2000
+    FocalPlaneLine   = -3002
+    ImageSample      = 10001
+    ImageLine        = 1
+    SampleOffset     = 0
+    LineOffset       = 0
+  End_Group
+End_Object
+End

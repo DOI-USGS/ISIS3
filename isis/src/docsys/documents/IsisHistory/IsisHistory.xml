@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <h2><a name="Introduction">Introduction</a></h2>
+
+        <p>
+        The cartographic and scientific processing of planetary image
+        data has a long history within the USGS Astrogeology Program.
+        The software used has evolved numerous times to keep up with
+        the steady advances made in computing technology.  The
+        following outlines the progression of the software over
+        nearly thirty years:
+        </p>
+
+        <table class="tableFormattedInformation" align="center">
+          <tr>
+            <th>Dates</th>
+            <th>Computer</th>
+            <th>Cartographic Software</th>
+          </tr>
+          <tr>
+            <td>1971-1980</td>
+            <td>PDP-11/DOS-BATCH</td>
+            <td>Unnamed</td>
+          </tr>
+          <tr>
+            <td>1978-1987</td>
+            <td>PDP-11/RSX-11M</td>
+            <td>Flagstaff Image Processing System (FIPS)</td>
+          </tr>
+          <tr>
+            <td>1985-1994</td>
+            <td>VAX/VMS</td>
+            <td>Planetary Image Cartography System (PICS)</td>
+          </tr>
+          <tr>
+            <td>1992-Present</td>
+            <td>UNIX</td>
+            <td>Integrated Software for Imagers and Spectrometers</td>
+          </tr>
+        </table>
+
+        <br/>
+
+        <h2><a name="TheEarlyYears">The Early Years</a></h2>
+
+        <table class="imageTable" align="left" style="width:130px;">
+          <tr>
+            <td>
+              <a href="images/computer_room.jpg">
+              <img src="images/thumbs/computer_room.jpg" width="100" height="62" alt="[Computer Room]"/></a>
+              <p>
+                Computer Room
+              </p>
+              <p class="caption">
+                600x370, 135KB
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="images/ella.jpg">
+              <img src="images/thumbs/ella.jpg" width="91" height="100" alt="[Ella]"/></a>
+              <p>
+                Ella Lee using a DeAnza system to display her work
+              </p>
+              <p class="caption">
+                456x500, 115KB
+              </p>
+            </td>
+          </tr>
+        </table>
+
+
+        <p>
+        In 1971, when the Astrogeology's involvement in the Apollo program ended,
+        many computer personnel transferred to Eros Data Center, transferred to
+        other federal agencies, or took jobs in the private sector.
+        Jim Crawforth and Alex Acosta remained and established a computer group to
+        serve the Flagstaff Field Center.  Development began of the unnamed image
+        processing package on a Digital Equipment Corporation (DEC) PDP-11/20
+        with 8K bytes of memory, two 2.5
+        megabyte removable disks, an 800BPI tape drive, a card reader, and a
+        teletype terminal.  It ran the DOS/Batch, a single user operating
+        system, and image display was handled on a $80,000 filmwriter from
+        Optronics International Inc.
+        </p>
+
+        <p>
+        During the following years, the software migrated to a DEC PDP-11/45
+        with 256KB of memory and larger 40MB disks the size of washing machines.
+        The operating system of choice was RSX-11M, a multi-user system
+        accessed through VT52 black and white video terminals.  Programmers
+        were restricted to developing applications which utilized a maximum
+        of 32KB of memory.  Image display was upgraded from film to a DeAnza
+        512x512 Frame Buffer.  This configuration became known as the Flagstaff
+        Image Processing System (FIPS)
+        </p>
+        <br clear="all"/>
+
+
+        <h2><a name="ThePlanetaryImageCartographySystem">The Planetary Image Cartography System</a></h2>
+
+        <p>
+        In the early 1980's, DEC announced their new VAX/VMS computers which
+        allowed for virtual addressing.  Developers no longer had restrictions
+        on the size of their programs.  With this major change in computing
+        environment, the Astrogeology Team selected Eric Eliason to lead
+        the conversion of FIPS to the Planetary Image Cartography System
+        (PICS).  The Transportable Application Executive (TAE) was chosen
+        as the user interface and programs were gradually migrated to VAX/VMS.
+        PICS was a popular tool in the planetary community with its ability
+        to process Viking, Voyager, Magellan, Landsat and various other
+        spacecraft imagery.
+        </p>
+
+        <table class="imageTable" align="center" style="width:400px;">
+          <tr>
+            <td>
+              <a href="images/grinnell_station.jpg">
+              <img src="images/thumbs/grinnell_station.jpg" width="123" height="100" alt="[Grinnell Workstation]"/></a>
+              <p>
+                Grinnell Workstation
+              </p>
+              <p class="caption">
+                615x500, 190KB
+              </p>
+            </td>
+            <td>
+              <a href="images/grinnell.jpg">
+              <img src="images/thumbs/grinnell.jpg" width="65" height="100" alt="[Grinnell System]"/></a>
+              <p>
+                Grinnell System
+              </p>
+              <p class="caption">
+                333x500, 95KB
+              </p>
+            </td>
+            <td>
+              <a href="images/vax4000.jpg">
+              <img src="images/thumbs/vax4000.jpg" width="67" height="100" alt="[VAX 4000]"/></a>
+              <p>
+                VAX 4000
+              </p>
+              <p class="caption">
+                325x500, 95KB
+              </p>
+            </td>
+          </tr>
+        </table>
+
+        <br clear="all"/>
+
+        <h2><a name="AStarIsBorn">A Star is Born</a></h2>
+        <p>
+        In the late 1980's, several major events occurred which significantly
+        changed the future of Astrogeology imaging processing software.  The
+        first was our involvement in the Galileo NIMS mission.  PICS could
+        handle multi-spectral instruments with two to seven bands, but the
+        burden was on the user to manage each band as a separate file.  The
+        hyper-spectral NIMS instrument would have 200-300 bands making
+        management under PICS an impossibility.  At this
+        time, a completely new software system was invented.  The
+        Integrated System for Imaging Spectrometers (ISIS) came into
+        existence under the guidance of designer Jim Torson and developer
+        Kris Becker. The prototype software was released as Isis 2.0.
+        </p>
+
+        <table class="imageTable" align="left" style="width:130px;">
+          <tr>
+            <td>
+              <a href="images/tae.jpg">
+              <img src="images/thumbs/tae.jpg" width="125" height="100" alt="[Janet using TAE]"/></a>
+              <p>
+                Janet Richie uses TAE for her processing work
+              </p>
+              <p class="caption">
+                500x401, 150KB
+              </p>
+            </td>
+          </tr>
+        </table>
+
+        <p>
+        A second major event occurred in the early 1990's, the Clementine
+        mission. Literally hundreds of thousands of images would be
+        collected.  Unfortunately, PICS operated on VAX/VMS, an aging
+        and expensive computer system.  The planetary community often
+        lamented over the $50,000 for a single machine including a
+        display device.  At this time, Unix began to make a push
+        into the computing world.  Astrogeology made the decision to
+        merge the VAX/VMS versions ISIS and PICS under Unix.  The integration
+        of PICS into ISIS was lead by Kay Edwards.  The primary Unix platforms
+        supported were SunOS and DEC OSF1. This version is referred to as Isis 2.1.
+        </p>
+
+        <p>
+        During the late 1990's, ISIS continued to grow in
+        both number of applications
+        and the supported operating systems.  Software to process data from
+        Galileo SSI, Mars Pathfinder, Mars Global Surveyor MOC, Mars Odyssey
+        Themis, and other instruments was added.  The software was ported
+        to the
+        Linux operating system as the demand for cheaper computers with
+        "Open Software" increased.  TAE was still the user interface but
+        display software ran under X-windows making visual image analysis
+        available directly on the user's desktop.  ISIS made huge gains in
+        usage by non-USGS customers, especially with increased focus on
+        cartographic processing.  So much so that the Astrogeolgy Team
+        changed the meaning of the acronym to Integrated System for Imagers
+        and Spectrometers. 
+        </p>
+
+        <h2><a name="CurrentEvents">Current Events</a></h2>
+
+
+        <p>
+        In 2001, Astrogeology recognized the software was approaching an
+        end-of-life cycle.  Users constantly asked for TAE to be replaced
+        by a standard Graphical User Interface (GUI).  The ISIS development staff
+        were unable to use many powerful debugging tools because they
+        did not function at all on Fortran and had other issues with combined
+        Fortran/C programs.  Many of the Open Source APIs were only available
+        in C++ or Java and thus not available for usage. Aging cube file
+        formats would not efficiently support missions with line scan cameras.
+        These and many other reasons led to the decision to modernize ISIS.
+        Led by Jeff Anderson, work began in December 2001 on the conversion
+        of Isis to C++.  
+        </p>
+
+        <table class="imageTable" align="center" style="width:600px;">
+          <caption><strong>Screenshots of Isis Application GUIs</strong>:
+          In addition to GUIs replacing the outdated TAE interface to Isis, programs
+          will have more meaningful names and there will be more task-specific programs
+          to make using Isis easier and faster</caption>
+          <tr>
+            <td>
+              <a href="images/screenshot_crop.jpg">
+              <img src="images/thumbs/screenshot_crop.jpg" width="110" height="100" alt="[Crop screenshot]"/></a>
+              <p style="font-weight:bold;">
+              Crop
+              </p>
+              <p>
+              All programs will have dialog boxes for selecting files to process, as shown in this screenshot.
+              <tt>Crop</tt> was called <tt>dsk2dsk</tt> in earlier versions of Isis, one of many programs that have been given
+              more meaningful names in Isis 3.0.
+              </p>
+              <p class="caption">
+                549x500, 65KB
+              </p>
+            </td>
+            <td>
+              <a href="images/screenshot_lowpass.jpg">
+              <img src="images/thumbs/screenshot_lowpass.jpg" width="89" height="100" alt="[Low Pass screenshot]"/></a>
+              <p style="font-weight:bold;">
+              Lowpass
+              </p>
+              <p>
+              <tt>Lowpass</tt> is one of several task-specific programs that were once the <tt>boxfilter</tt> program.
+              </p>
+              <p class="caption">
+                463x522, 75KB
+              </p>
+            </td>
+            <td>
+              <a href="images/screenshot_sharpen.jpg">
+              <img src="images/thumbs/screenshot_sharpen.jpg" width="112" height="100" alt="[Sharpen screenshot]"/></a>
+              <p style="font-weight:bold;">
+              Sharpen
+              </p>
+              <p>
+              <tt>Sharpen</tt> is another processing task that was once acheived through the <tt>boxfilter</tt> program.
+              With large programs like filter broken into several smaller programs, there are few parameters to provide, and
+              the names are more meaningful, making Isis easier to learn and use.
+              </p>
+              <p class="caption">
+                480x430, 65KB
+              </p>
+            </td>
+          </tr>
+        </table>
+
+        <br clear="all"/>
+
+        <h2><a name="IsisPedigree">Isis Pedigree</a></h2>
+        <table class="tableFormattedInformation" align="center" style="width:600px;">
+          <caption><strong>Summary of Major Versions of Isis</strong></caption>
+          <tr>
+            <th>
+              Version
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              1.0
+            </td>
+            <td>
+              Prototype software
+            </td>
+          </tr>
+          <tr>
+            <td>
+              2.0
+            </td>
+            <td>
+              First official release on VAX/VMS
+            </td>
+          </tr>
+          <tr>
+            <td>
+              2.1
+            </td>
+            <td>
+              Ported to Unix
+            </td>
+          </tr>
+          <tr>
+            <td>
+              3.0
+            </td>
+            <td>
+              Rewritten in the C++ programming language for Linux
+            </td>
+          </tr>
+        </table>
+
+
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>IsisHistory.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>about</categoryItem>
+  </category>
+
+  <audience>
+    <target>all</target>
+  </audience>
+
+  <bibliography>
+    <title>History</title>
+    <brief>A 30 year history of USGS Astrogeology image processing software</brief>
+    <description>
+      This is a history of the evolution of image procesisng software
+      within the Astrogeology Team over a 30+ year period from 1971 to 2003.
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2003-03-25</date>
+  </bibliography>
+
+  <history>
+    <change date="2003-03-25" name="Jeff Anderson">Original document</change>
+    <change date="2003-04-02" name="Kimberly Sides">Photographs of computer systems, scans of historical photographs</change>
+    <change date="2003-04-07" name="Deborah Lee Soltesz">Dressed up formatting, embedded images</change>
+  </history>
+</documentation>

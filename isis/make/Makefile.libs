@@ -1,0 +1,15 @@
+
+HOST_TYPE   := $(shell uname -s)
+
+#  Get archive to convert to shared 
+SRCS = $(wildcard *.a)
+
+ifeq ($(HOST_TYPE),Darwin)
+  SHARED = $(SRCS:%.a=%.dylib)
+else
+  SHARED = $(SRCS:%.a=%.so)
+endif
+
+shared: $(SHARED)
+
+include $(ISISROOT)/make/isismake.objs

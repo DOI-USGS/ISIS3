@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="map2map" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Change a cube's map projection
+  </brief>
+
+  <description>
+    This program will alter the projection of a cube which is already in a map
+    projection.  Pixels are physically moved using either a nearest neighbor,
+    bilinear, or cubic convolution interpolator.  Usage examples of this
+    program include:
+    <pre>
+      1.  Converting from Sinusodial to Mercator or any other
+          supported projection
+      2.  No projection change but altering projection parameters
+          such as center longitude or standard parallels
+      3.  No projection change but altering pixel resolution
+      4.  No projection change but altering latitude/longitude window
+      5.  No projection change but altering latitude types, longitude
+          domains, or longitude direction
+    </pre>
+
+  </description>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+  </category>
+
+  <history>
+    <change name="Kay Edwards" date="1986-09-27">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-01-15">
+      Converted to Isis 3.0
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology...
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Fixed compiler error with uninitialized variable after adding -O1 flag
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jacob Danton" date="2005-12-05">
+      Added appTest
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-18">
+      Depricated CubeProjection and ProjectionManager to ProjectionFactory
+    </change>
+    <change name="Steven Lambright" date="2007-06-22">
+      Fixed typo in user documentation
+    </change>
+    <change name="Steven Lambright" date="2007-06-27">
+      Expanded options, fixed conversions when switching measurement systems (such as from planetographic to planetocentric)
+    </change>
+    <change name="Steven Lambright" date="2007-07-31">
+      Fixed bug with changing resolutions
+    </change>
+    <change name="Steven Lambright" date="2007-08-09">
+      Rewrote resolution handling code to be simpler and fix yet another bug.
+    </change>
+    <change name="Steven Lambright" date="2007-08-14">
+      Fixed method of getting cube specific projection group parameters, such as the scale and resolution.
+    </change>
+    <change name="Jeff Anderson" date="2007-11-08">
+      Fixed bug trimming longitudes
+    </change>
+    <change name="Stuart Sides" date="2007-11-16">
+        Fixed bug when TRIM option was used and most if not all data was being 
+        NULLed.
+    </change>
+    <change name="Steven Lambright" date="2007-12-05">
+        Fixed bug where user-entered resolutions could be ignored
+    </change>
+    <change name="Christopher Austin" date="2008-04-18">
+      Added the MATCHMAP option.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-06-13">
+      The rotation keyword will no longer automatically propagate
+    </change>
+    <change name="Steven Lambright" date="2008-06-23">
+      Added helper button and improved error message
+    </change>
+    <change name="Steven Lambright" date="2008-08-04">
+      Changed MATCHMAP to default off and added exclusions. If MATCHMAP is true,
+      the ground range and pixel resolution can not be set because they are to be
+      taken from the map file.
+    </change>
+    <change name="Steven Lambright" date="2008-11-12">
+      Moved the MATCHMAP parameter to the "FILES" parameter group. Fixed a problem with this
+      program that caused null output images when the input longitude domain was inconsistent
+      with the input longitude range in equatorial cylindrical projections.
+    </change>
+    <change name="Christopher Austin" date="2008-12-11">
+      Changed the parameters SLAT, ELAT, SLON, ELON to MINLAT, MAXLAT, MINLON,
+      MAXLON in correlation with autimos.
+    </change>
+    <change name="Christopher Austin" date="2008-03-12">
+      Added a default path as well as a helper function for the MAP parameter.
+    </change>
+  </history>
+
+  <oldName>
+    <item>nuproj</item>
+    <item>newmap</item>
+    <item>lev2tolev2</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to remap
+        </brief>
+        <description>
+          The specification of the input cube to be remapped.  The cube must
+          contain a valid Mapping group in the labels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MAP">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing mapping parameters
+        </brief>
+        <defaultPath>$base/templates/maps</defaultPath>
+        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <description>
+          A file containing the desired output mapping parameters.  This
+          file can be a simple label file, hand produced or created via
+          the "maptemplate" program.  It can also be an existing cube label
+          which contains a Mapping group.  In the later case the input cube
+          will be transformed into the same map projection, resolution, etc.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>PrintMap</function>
+            <brief>View MapFile</brief>
+            <description>
+              This helper button will cat out the mapping group of the given mapfile to the session log
+               of the application
+             </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
+        <filter>
+          *.map *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Newly mapped cube
+        </brief>
+        <description>
+          This file will contain the results of the remapping.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="MATCHMAP">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Match number of Lines and Samples</brief>
+        <description>
+          This makes the number of lines, number of samples, resolution 
+          and ground range of the output cube match the MAP file.
+        </description>
+        <exclusions>
+          <item>PIXRES</item>
+          <item>RESOLUTION</item>
+          <item>DEFAULTRANGE</item>
+          <item>MINLAT</item>
+          <item>MAXLAT</item>
+          <item>MINLON</item>
+          <item>MAXLON</item>
+        </exclusions>
+      </parameter>
+    </group>
+
+    <group name="Output Cube Resolution">
+      <parameter name="PIXRES">
+        <type>string</type>
+        <brief>Defines how the pixel resolution in the output map file is obtained</brief>
+        <default><item>FROM</item></default>
+        <description>
+          This parameter is used to specify how the pixel resolution is obtained for the output map
+          projected cube.
+        </description>
+        <list>
+          <option value="FROM">
+             <brief>Read resolution from input cube</brief>
+             <description>
+               This option will automatically determine the resolution from the input cube.
+             </description>
+             <exclusions>
+               <item>RESOLUTION</item>
+             </exclusions>
+           </option>
+           <option value="MAP">
+              <brief>Read resolution from input map file</brief>
+              <description>
+                This option will use either the PixelResolution (meters/pixel) or Scale (pixels/degree) in the map file.
+              </description>
+              <exclusions>
+                <item>RESOLUTION</item>
+              </exclusions>
+            </option>
+
+           <option value="MPP">
+              <brief> Get resolution from user in meters per pixel</brief>
+              <description>
+                This option allows the user to specify the resolution in meters per pixel using the RESOLUTION parameter
+              </description>
+              <inclusions>
+                <item>RESOLUTION</item>
+              </inclusions>
+            </option>
+
+           <option value="PPD">
+              <brief> Get resolution from user in pixels per degree</brief>
+              <description>
+                This option allows the user to specify the resolution in pixels per degree using the RESOLUTION parameter
+              </description>
+              <inclusions>
+                <item>RESOLUTION</item>
+              </inclusions>
+            </option>
+        </list>
+      </parameter>
+      <parameter name="RESOLUTION">
+        <type>double</type>
+        <brief>Pixel resolution</brief>
+        <description>
+          Specifies the resolution in either meters per pixel or pixels per degree
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+    </group>
+
+   <group name="Output Map Ground Range">
+      <parameter name="DEFAULTRANGE">
+        <type>string</type>
+        <brief>Defines how the default ground range is determined</brief>
+        <default><item>FROM</item></default>
+        <description>
+          This parameter is used to specify how the default latitude/longitude ground range for the output map projected image
+          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can overide the default using the MINLAT, MAXLAT, MINLON, MAXLON parameters.
+          The purpose of the ground range is to define the coverage of the map projected image.  Essentially, the ground range and
+          pixel resolution are used to compute the size (samples and line) of the output image.
+        </description>
+        <list>
+          <option value="FROM">
+            <brief>Read default range from input cube</brief>
+            <description>
+              This option will automatically determine the mininum/maximum latitude/longitude from the input cube specified
+              using the FROM parameter.
+            </description>
+          </option>
+          <option value="MAP">
+            <brief> Read default range from map file</brief>
+            <description>
+              This option will read the mininum/maximum latitude/longitude from the input map file.
+            </description>
+          </option>
+        </list>
+        <helpers>
+          <helper name="H1">
+            <function>LoadMapRange</function>
+            <brief>Calculate Latitude/Longitude Ranges</brief>
+            <description>
+              This helper button will calculate and convert the latitudes and 
+              longitudes it finds in the input file if DEFAULTRANGE=FROM. If the 
+              default range is MAP, this will copy the latitudes/longitudes from 
+              the map files and calculate the unfound ones from the input cube.
+             </description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+        </helpers>
+      </parameter>
+
+      <parameter name="MINLAT">
+        <type>double</type>
+        <brief>Minimum Latitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The minimum latitude of the ground range.   If this is entered by the user it will override the default input cube or map value.
+        </description>
+
+        <minimum inclusive="yes">-90.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+      </parameter>
+
+      <parameter name="MAXLAT">
+        <type>double</type>
+        <brief>Maximum Latitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The maximum latitude of the ground range.   If this is entered by the user it will override the default input cube or map value.
+        </description>
+        <minimum inclusive="yes">-90.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <greaterThan><item>MINLAT</item></greaterThan>
+      </parameter>
+
+      <parameter name="MINLON">
+        <type>double</type>
+        <brief>Minimum Longitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The minimum longitude of the ground range.   If this is entered by the user it will override the default input cube or map value.
+        </description>
+      </parameter>
+
+      <parameter name="MAXLON">
+        <type>double</type>
+        <brief>Maximum Longitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The maximum longitude of the ground range.   If this is entered by the user it will override the default input cube or map value.
+        </description>
+        <greaterThan><item>MINLON</item></greaterThan>
+      </parameter>
+
+      <parameter name="TRIM">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Trim pixels outside ground range
+        </brief>
+        <description>
+          If this option is selected, pixels outside the latitude/longtiude
+          range will be trimmed or set to null.
+          This is useful for certain projections whose lines of latitude and
+          longitude are not parallel to image lines and sample columns.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Interpolation">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

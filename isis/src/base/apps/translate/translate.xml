@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="translate" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Translate an image by given sample and line translation values
+  </brief>
+
+  <description>
+    This program will translate an image any amount in both the sample and line
+    directions.
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="2002-12-30">
+      Original version
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Fixed compiler error with uninitialized variable after adding -O1 flag
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Steven Lambright" date="2007-06-22">
+      Fixed typo in user documentation
+    </change>
+    <change name="Steven Lambright" date="2008-05-13"> 
+      Removed references to CubeInfo
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to translate
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be translated unless a specific band is specified.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the translation.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Translation">
+      <parameter name="STRANS">
+        <type>double</type>
+        <brief>Sample translation value</brief>
+        <description>
+          This determines translation in the sample direction.
+        </description>
+      </parameter>
+
+      <parameter name="LTRANS">
+        <type>double</type>
+        <brief>Line translation value</brief>
+        <description>
+          This determines translation in the line direction.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Interpolation">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+
+</application>
+

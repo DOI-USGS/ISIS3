@@ -1,0 +1,261 @@
+  /*  ISIS OBJECT PROGRAMMING DOC STYLE SHEET
+   *  FILENAME: IsisObjectAPIDocStyle.css
+   *
+   *  Purpose: formatting style sheet for Isis Object
+   *           API documentation presentation
+   *
+   *  Author:   Deborah Lee Soltesz, USGS, 03/15/2002
+   *  Modified: Deborah Lee Soltesz, USGS, 12/02/2004
+   *            for use with new doxygen generated documentation
+   */
+
+
+    /* ----------------------------------------------------------------
+     * HEADINGS */
+
+     H1       {
+               color:           #663333 ;
+              }
+
+     H2       {
+               background-color: #CCAA99 ;
+              }
+
+     H3       {
+               color: #663333 ;
+              }
+
+
+     HR       {
+               color: #990000 ;
+              }
+
+
+     body     {
+                background-repeat: repeat ;
+                background-attachment: fixed ;
+                background-image: URL('../../../assets/banners/isis_bg.jpg');
+              }
+
+     small    {
+                font-size: 60%;
+              }
+
+
+    /* -----------------------------------------------------
+     * DOXYGEN FORMATTING: styles taken from doxygen      */
+
+DIV.qindex {
+        width: 100%;
+        background-color: #775544;
+        color: #AA9988 ;
+        border: 1px solid #664433 ;
+        text-align: center;
+        margin: 2px;
+        padding: 4px;
+        line-height: 120%;
+}
+
+A.qindexHL, A.qindex {color: #FFFFEE;}
+A.qindexHL:visited, A.qindex:visited {color: #FFFFEE ;}
+A.qindexHL:hover, A.qindexHL:active, A.qindex:hover, A.qindex:active {color: gold ;}
+
+.el {
+      font-family: Arial, Helvetica, SANS-SERIF ;
+      font-variant: normal ;
+    }
+
+A.el {}
+A.elRef {}
+A.code {}
+A.codeRef {}
+A:hover {}
+
+DL.el { margin-left: -1cm }
+PRE.fragment {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        margin-left: 2px;
+        margin-right: 8px;
+        padding-left: 6px;
+        padding-right: 6px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+}
+DIV.fragment {
+        border: 1px solid #DDCCBB;
+        background-color: #fff9f3;
+        padding: 6px;
+        margin-bottom: 12px ;
+}
+
+DIV.ah {
+  background-color: black;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 3px;
+  margin-top: 3px
+}
+
+TD.md {
+  background-color: #FFEEDD;
+  font-weight: bold;
+}
+TD.mdname1 {
+  background-color: #FFEEDD;
+  font-weight: bold;
+  color: #602020;
+}
+TD.mdname {
+  background-color: #FFEEDD;
+  font-weight: bold;
+  color: #602020;
+  width: 600px;
+}
+
+DIV.groupHeader {
+       margin-left: 16px;
+       margin-top: 12px;
+       margin-bottom: 6px;
+       font-weight: bold;
+       font-family: Geneva, Arial, Helvetica, sans-serif;
+}
+
+DIV.groupText { margin-left: 16px; font-style: italic; font-size: 14px }
+BODY {
+        color: black;
+        margin-right: 20px;
+        margin-left: 20px;
+}
+TD.indexkey {
+        background-color: #EEDDCC;
+        font-weight: bold;
+        padding-right  : 10px;
+        padding-top    : 2px;
+        padding-left   : 10px;
+        padding-bottom : 2px;
+        margin-left    : 0px;
+        margin-right   : 0px;
+        margin-top     : 2px;
+        margin-bottom  : 2px;
+        border: 1px solid #DDCCCC;
+}
+TD.indexvalue {
+        background-color: #FFEEDD;
+        font-style: italic;
+        padding-right  : 10px;
+        padding-top    : 2px;
+        padding-left   : 10px;
+        padding-bottom : 2px;
+        margin-left    : 0px;
+        margin-right   : 0px;
+        margin-top     : 2px;
+        margin-bottom  : 2px;
+        border: 1px solid #DDCCCC;
+}
+TR.memlist {
+   background-color: #f6f3f0;
+}
+P.formulaDsp { text-align: center; }
+IMG.formulaDsp { }
+IMG.formulaInl { vertical-align: middle; }
+
+img {
+  background-color: white ;
+  border: 2px solid black ;
+  padding: 5px;
+  margin: 5px;
+}
+img.noborder {
+  background-color: transparent ;
+  border: 0px none transparent ;
+  padding: 0px;
+}
+
+SPAN.keyword       { color: #008000 }
+SPAN.keywordtype   { color: #604020 }
+SPAN.keywordflow   { color: #c06000 }
+SPAN.comment       { color: #800000 }
+SPAN.preprocessor  { color: #806020 }
+SPAN.stringliteral { color: #002080 }
+SPAN.charliteral   { color: #008080 }
+.mdTable {
+        border: 1px solid #887766;
+        background-color: #FFEEDD;
+}
+.mdRow {
+        padding: 8px 10px;
+}
+.mdescLeft {
+       padding: 0px 8px 4px 8px;
+        font-size: 14px;
+        font-style: italic;
+        background-color: #FFFFF0;
+        border-top: 1px none #E3E1E0;
+        border-right: 1px none #E3E1E0;
+        border-bottom: 1px none #E3E1E0;
+        border-left: 1px none #E3E1E0;
+        margin: 0px;
+}
+.mdescRight {
+       padding: 0px 8px 4px 8px;
+        font-size: 14px;
+        font-style: italic;
+        background-color: #FFFFF0;
+        border-top: 1px none #E3E1E0;
+        border-right: 1px none #E3E1E0;
+        border-bottom: 1px none #E3E1E0;
+        border-left: 1px none #E3E1E0;
+        margin: 0px;
+}
+.memItemLeft {
+        padding: 1px 0px 0px 8px;
+        margin: 4px;
+        border-top-width: 1px;
+        border-right-width: 1px;
+        border-bottom-width: 1px;
+        border-left-width: 1px;
+        border-top-style: solid;
+        border-top-color: #E3E1E0;
+        border-right-color: #E3E1E0;
+        border-bottom-color: #E3E1E0;
+        border-left-color: #E3E1E0;
+        border-right-style: none;
+        border-bottom-style: none;
+        border-left-style: none;
+        background-color: #FFFFF0;
+        font-family: Geneva, Arial, Helvetica, sans-serif;
+        font-size: 12px;
+}
+.memItemRight {
+        padding: 1px 8px 0px 8px;
+        margin: 4px;
+        border-top-width: 1px;
+        border-right-width: 1px;
+        border-bottom-width: 1px;
+        border-left-width: 1px;
+        border-top-style: solid;
+        border-top-color: #E3E1E0;
+        border-right-color: #E3E1E0;
+        border-bottom-color: #E3E1E0;
+        border-left-color: #E3E1E0;
+        border-right-style: none;
+        border-bottom-style: none;
+        border-left-style: none;
+        background-color: #FFFFF0;
+        font-family: Geneva, Arial, Helvetica, sans-serif;
+        font-size: 13px;
+}
+.search     { color: #003399;
+              font-weight: bold;
+}
+FORM.search {
+              margin-bottom: 0px;
+              margin-top: 0px;
+}
+INPUT.search { font-size: 75%;
+               color: #000080;
+               font-weight: normal;
+               background-color: #ffeeee;
+}
+TD.tiny      { font-size: 75%;}

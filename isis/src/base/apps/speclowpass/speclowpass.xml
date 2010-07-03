@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="speclowpass" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply spectral low pass filter to a cube
+  </brief>
+
+  <description>
+    This program applies a spectral low pass filter to a cube. A spectral filter 
+    works between bands as opposed to a spacial operation on a single band. 
+    Lowpass filter means it will be subtracting the average from the original 
+    pixel.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>spechighpass</item>
+      <item>specdivfilter</item>
+    </applications>
+  </seeAlso>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <history>
+    <change name="Stacy Alley" date="2008-09-02">
+      Original version
+    </change>
+    <change name="Mackenzie Boyd" date="2009-06-09">
+      Modified documentation, added exception handling for too many bands, modified 
+      examples
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+          Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Filtered output cube
+        </brief>
+        <description>
+          The resultant filtered cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="BANDS">
+        <type>integer</type>
+        <brief>
+          Number of bands in boxcar
+        </brief>
+        <description>
+          This is the total number of bands in the boxcar.  It must be odd and
+          can not exceed twice the number of bands in the cube.  In general, the 
+          size of the boxcar does not cause the program to operate significantly
+          slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Settings">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Minimum valid DN
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when computing
+          the average.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Maximum valid DN
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing the average.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>    
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Example of usage of the spectral lowpass filter.
+      </brief>
+      <description>
+        This example shows a spectral lowpass filter being applied to the image 
+        with a 5 depth boxcar. This cube has 256 bands so 5 is relatively small.
+        Although no averaging is done within a single band, the averaging of the
+        pixels of many bands will cause some averaging and smoothing of the
+        image if there is much difference between bands. Here is an image which
+        highlights which pixels a single pass would average. The image shows a
+        9x9 dot instead of a single pixel highlighted to make it more visible.
+        In this picture the boxcar would be seven or more bands, with the output
+        pixel being one of the visible pixels. Depending on how large the boxcar
+        was many of the values taken in could not be original, at a minimum, one
+        value will be mirrored since there are only six available bands.
+        <pre>
+          <image width="350" height="350" src="assets/images/cubeform.jpg"/>    
+        </pre>
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=/work1/mboyd/CM_1514302573_1.cub to=/work1/mboyd/postlow.cub 
+          bands=5
+        </commandLine>
+        <description>
+          This example will filter the image using 5 bands and no limits on high
+          or low. 
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="533" height="477" src="assets/images/slowpassgui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI wit
+h parameters set to perform the 
+              spechighpass filter with a 5 band boxcar on the image 
+              CM_1514302573_1.ir.cub.
+            </description>
+            <thumbnail width="200" height="178" caption="This program's GUI"
+            src="assets/thumbs/slowpassgui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="750" height="298" src="assets/images/prelow.jpg">
+          <brief>
+            Input image spectral graph before speclowpass filter
+          </brief>
+          <description>
+            This is the spectral plot of the center point of the image, (32, 
+            32), and shows all bands, 1- 256. No averaging has been applied, 
+            this is clear partialy because of th extreme peaks visible in the 
+            first half. The peaks are related to values which differ 
+            significantly from the bands around them.
+          </description>
+          <thumbnail caption= "The image graph before the filter" 
+            src="assets/thumbs/prelow.jpg" width="200" height="80"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="750" height="298" src="assets/images/postlow.jpg">
+          <brief>
+            Output image spectral graph after being filtered
+          </brief>
+          <description>
+            This is the image after the filter. Although there are still peaks, 
+            everything has been smoothed. In the before image the peaks were
+            sharp where as now they are more curved. Differences have been
+            leveled out to some extent.
+          </description>
+          <thumbnail caption= "The image graph after the filter" 
+            src="assets/thumbs/postlow.jpg" width="200" height="80"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>
+        Example of usage of the spectral lowpass filter.
+      </brief>
+      <description>
+        This example shows a spectral lowpass filter being applied to the image 
+        with a 61 depth boxcar. This cube has 256 bands so 61 takes in over a
+        fifth. Although no averaging is done within a single band, the averaging 
+        of the pixels of many bands will cause some averaging and smoothing of 
+        the image if there is much difference between bands. In this case a 
+        blurry image begins to show through. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=/work1/mboyd/CM_1514302573_1.cub to=/work1/mboyd/postlow.cub 
+          bands=61
+        </commandLine>
+        <description>
+          This example will filter the image using 61 bands and no limits on 
+          high or low. 
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="533" height="477" src="assets/images/gui2.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to perform the 
+              spechighpass filter with a 61 band boxcar on the image 
+              CM_1514302573_1.ir.cub.
+            </description>
+            <thumbnail width="200" height="170" caption="This program's GUI"
+            src="assets/thumbs/gui2.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="750" height="298" src="assets/images/prelow.jpg">
+          <brief>
+            Input image spectral graph before speclowpass filter
+          </brief>
+          <description>
+            This is the spectral plot of the center point of the image, (32, 
+            32), and shows all bands, 1- 256. No averaging has been applied, 
+            this is clear partialy because of th extreme peaks visible in the 
+            first half. The peaks are related to values which differ 
+            significantly from the bands around them.
+          </description>
+          <thumbnail caption= "The image graph before the filter" 
+            src="assets/thumbs/prelow.jpg" width="200" height="80"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="750" height="298" src="assets/images/post61.jpg">
+          <brief>
+            Output image spectral graph after being filtered
+          </brief>
+          <description>
+            This is the image after the filter. As is very clear, the averaging 
+            has turned sharp peaks into a smooth slope and small bumps into 
+            nothing. All bands in the image are now muchmore similar to each 
+            ohter than they were before. Also note that the scale has changed 
+            significantly.
+          </description>
+          <thumbnail caption= "The image graph after the filter" 
+            src="assets/thumbs/post61.jpg" width="200" height="80"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

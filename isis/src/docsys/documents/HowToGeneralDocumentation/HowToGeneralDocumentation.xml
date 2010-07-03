@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+
+  <!-- ********************************************
+        CATEGORY
+        ******************************************** -->
+  <category>
+    <categoryItem>xml</categoryItem>
+    <categoryItem>technicaldoc</categoryItem>
+    <categoryItem>guide</categoryItem>
+  </category>
+
+  <!-- ********************************************
+        AUDIENCE
+        ******************************************** -->
+  <audience>
+    <target>developer</target>
+  </audience>
+
+  <!-- ********************************************
+        BIBLIOGRAPHY
+        ******************************************** -->
+  <bibliography>
+    <title>Isis Documents How-to</title>
+    <brief>Guide to writing documents using Isis Documentation XML</brief>
+    <description>Guide to adding documents to the Isis documentation tree. All documents added to the official Isis
+                        documentation will be automatically linked on the Isis web pages and distributed with Isis. This guide
+                        describes the formats documents may be in, what types of documents may be added, and how to
+                        write the Isis Documentation XML metadata file that is used automatically add a document to the Isis
+                        system.</description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2003-01-29</date>
+  </bibliography>
+
+  <!-- ********************************************
+        FILES
+        ******************************************** -->
+  <files>
+    <file>
+      <type>HTML</type>
+
+      <source>
+        <filename>index.html</filename>
+      </source>
+
+      <body>
+        <!-- OVERVIEW -->
+        <h2>Overview</h2>
+        <p>
+           Isis has three kinds of documentation: Application, Object, and General Documents. Application and Object documentation
+           are part of the programming and development structure and are discussed in those portions of the Isis documentation.
+           General Documents are not associated directly with Applications or Objects. Such documents include user guides,
+           procedural instructions, administration references, and this very document you are reading now. This guide describes
+           the formats Documents may be in, what types of Documents may be added, and how to write the Isis Documentation XML
+           metadata file that is used to automatically add a Document to the Isis system.
+        </p>
+        <p>
+          Isis documentation is part of the source code distribution, resides in an organized structure, and in part is automatically
+          generated from text files written in the Isis XML languages. When Isis is installed on a system, a complete copy of the
+          documentation is installed with the software. Additionally, a copy of the documentation is published to the Isis web site, therefore
+          the Isis web site and the Isis documentation are identical. In this document, the term "web site" will refer to the complete Isis
+          documentation.
+        </p>
+
+        <!-- QUESTIONS AND ANSWERS -->
+        <h2>Questions &amp; Answers</h2>
+        <h3>What do I need to know?</h3>
+        <p>
+            You should have a general understanding of what XML is - this document explains how to write an XML file for
+            adding a Document to Isis. If you plan to add a web page to Isis, you should be able to write basic HTML. It also helps if
+            you are familiar with the Isis web site and how it is organized from a visitor's standpoint. There are many good tutorials on the web
+            for learning XML and HTML, such as <a href="http://www.w3schools.com/default.asp" target="_blank">W3Schools.com</a>.
+        </p>
+
+        <h3>What is a Document?</h3>
+        <p>
+            A Document is a file, or a set of files, that supply information related to Isis. Documents that are most common are guides and
+            reference manuals. Documents are automatically linked into the upper levels of the Isis website based on the <i>audience</i> and
+            <i>category</i> supplied in the metadata file. Documents may be written by the Isis team members and housed in the documentation
+            or may be external resources on other web sites.
+        </p>
+
+        <h3>What is the Document metadata file?</h3>
+        <p>
+            The Document metadata file is an XML file that describes a Document, and may even contain the HTML formatted content of the Document itself.
+            In the latter case, the Document metadata will be automatically transformed to an HTML file during the building of the Isis documentation.
+            The metadata file also contains bibliographic information, history tracking, file information, and the target audience and category the
+            Document will be linked under on the Isis web site.
+        </p>
+
+        <h3>Where do I find the Document XML specification?</h3>
+        <p>
+            A
+            <a href="../../Schemas/Documentation/documentation/index.html">
+            handy reference to the Document XML language</a> is available as part of the Isis documentation.
+        </p>
+
+        <h3>What does "mandatory by policy" mean?</h3>
+        <p>
+            An element that is "mandatory by policy" means it must be used in certain situations according to the policies
+            of the Isis Programming Team, USGS, DOI, Section 508, or common sense. For instance, specifying file size
+            for non-text files is a USGS policy and is standard practice in web development - when a link to a non-text file
+            is created on the Isis website, the link will include the file size information so visitors will know how big the file
+            they're getting ready to download is. Not only does the USGS say we have to give this information, but it's also a
+            very polite practice, and visitors love polite web developers.
+        </p>
+
+        <h3>Where do Documents go in the Isis structure?</h3>
+        <p>
+            Documents live in $ISISROOT/src/docsys/documents/. Each Document (its metadata and files) should be in its
+            own directory, and subcomponents should reside in a directory named <tt>assets</tt>. The XML metadata file should
+            be named the same as the directory with a .xml extension. For example, this Document:
+        </p>
+
+        <ul>
+          <li>resides in $ISISROOT/src/docsys/documents/HowToGeneralDocumentation/</li>
+          <li>its metadata file is HowToGeneralDocumentation.xml</li>
+          <li>all the images on this page are in the $ISISROOT/src/docsys/documents/HowToGeneralDocumentation/assets/ directory</li>
+        </ul>
+
+        <!-- WRITING A DOCUMENT XML METATDATA FILE -->
+        <h2>Writing the Document XML metadata file</h2>
+
+        <!-- Anatomy -->
+        <h3>Anatomy</h3>
+        <p>
+              Each document must start with the XML document prolog:
+              <pre><code>  &lt;?xml version="1.0" encoding="UTF-8"?&gt;</code></pre>
+
+              followed by the start root element:
+              <pre><code>  &lt;documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd"&gt;</code></pre>
+
+              The rest of the document is made up of the metadata content, and ended with the closing tag of the root element:
+              <pre><code>  &lt;/documentation&gt;</code></pre>
+        </p>
+
+        <p>
+              The following chart illustrates the layout of the Document XML language used to write the metadata file.
+              Click the image to view the full sized chart (opens in a new window).
+        </p>
+
+        <div style="text-align:center;">
+        <a href="assets/diagram.png" target="_blank">
+        <img class="blackBorderedImage" src="assets/diagram_small.png" width="600" height="655" alt="[Document XML Diagram]"/></a>
+        </div>
+
+        <p>
+          The language and its usage will be described in the sections that follow, in order of increasing complexity.
+        </p>
+
+        <!-- History -->
+        <hr/>
+        <h3>History</h3>
+
+        <div style="text-align:center;">
+        <img class="blackBorderedImage"  src="assets/history.png" width="289" height="63" alt="[History Element - Document XML Diagram]"/>
+        </div>
+
+        <p>
+              The purpose of the <tt>history</tt> element is to record changes to a Document. This element is not mandatory because
+              a Document may be a resource on another website and not maintained by the Isis team. However, if you are creating a new
+              Document or editing an existing Document, this element is mandatory by policy!
+        </p>
+
+        <p>
+              The <tt>history</tt> element contains one or more <tt>change</tt> elements. The <tt>change</tt> element has
+              two attributes, <tt>name</tt> and <tt>date</tt> and should contain a free text comment describing the change to
+              the document.
+        </p>
+
+        <h4>Example</h4>
+        <pre><code>  &lt;change name="Deborah Lee Soltesz" date="2003-01-29"&gt;Created&lt;/change&gt;</code></pre>
+
+        <ul>
+          <li><b>name:</b> your name</li>
+          <li><b>date:</b> the date of the change in <tt>YYYY-MM-DD</tt> format. If the month or year is less than 10, pad the number with a 0 (see example above)</li>
+        </ul>
+
+        <!-- Bibliography -->
+        <hr/>
+        <h3>Bibliography</h3>
+
+        <div style="text-align:center;">
+        <img class="blackBorderedImage"  src="assets/bibliography.png" width="306" height="320" alt="[Bibliography Element - Document XML Diagram]"/>
+        </div>
+
+        <p>
+              The purpose of the <tt>bibliography</tt> element is to document bibliographic information about the document: author, publisher, etc.
+              The <tt>bibliography</tt> element contains the following elements:
+        </p>
+
+        <ul>
+          <li><b>title:</b> The title of the Document</li>
+          <li><b>brief:</b> A short (one sentence) description</li>
+          <li><b>description:</b> A long (paragraph) description</li>
+          <li><b>author:</b> The name(s) of the author(s)</li>
+          <li><b>publisher:</b> The publisher information - name, address, etc.</li>
+          <li><b>date:</b> the publication date in <tt>YYYY-MM-DD</tt> format</li>
+        </ul>
+
+        <p>
+              All elements are mandatory except for publisher (which should be used when the publisher is not the Astrogeology Research Program).
+              All elements may contain free text except the <tt>date</tt> and may appear in any order. The bibliography information is used to
+              create links in the Isis web pages and generate title and header information if the Document metadata is to be transformed to an HTML file.
+        </p>
+
+        <h4>Example</h4>
+        <pre><code>  &lt;bibliography&gt;
+    &lt;title&gt;Isis Documents How-to&lt;/title&gt;
+    &lt;brief&gt;Guide to writing documents using Isis Documentation XML&lt;/brief&gt;
+    &lt;description&gt;Guide to adding documents to the Isis
+    documentation tree. All documents added to the official Isis
+    documentation will be automatically linked on the Isis web
+    pages and distributed with Isis. This guide describes the formats
+    documents may be in, what types of documents may be added, and
+    how to write the Isis Documentation XML metadata file that is
+    used automatically add a document to the Isis system.&lt;/description&gt;
+    &lt;author&gt;Deborah Lee Soltesz&lt;/author&gt;
+    &lt;date&gt;2003-01-29&lt;/date&gt;
+  &lt;/bibliography&gt;</code></pre>
+
+        <!-- Category -->
+        <hr/>
+        <h3>Category</h3>
+
+        <div style="text-align:center;">
+        <img class="blackBorderedImage"  src="assets/category.png" width="319" height="77" alt="[Category Element - Document XML Diagram]"/>
+        </div>
+
+        <p>
+              The purpose of the <tt>category</tt> element is to specify how the Document will be categorized on the web site.
+              The <tt>category</tt> element contains one or more <tt>categoryItem</tt> elements. The <tt>categoryItem</tt> element
+              can be one of several preset categories:
+        </p>
+
+        <ul>
+          <li><b>hidden:</b> A special category that will prevent this document from being linked on the Isis website</li>
+          <li><b>about:</b> The document falls under the <b>About Isis</b> section of the site. E.g. <i>The History of the Isis Software Package</i></li>
+          <li><b>guide:</b> The document serves as a guide to some element of using, developing, or administrating Isis. E.g. this document</li>
+          <li><b>tutorial:</b> The document serves as a step-by-step tutorial or lesson. E.g. Destriping Noisy Data</li>
+          <li><b>installation:</b> The document is related to installing Isis</li>
+          <li><b>administration:</b> The document is related to maintaining the installation of Isis</li>
+          <li><b>technicaldoc:</b> This is a technical document about developing, programming, or the adminstration of Isis. This document falls under the Technical Documents section of the site.</li>
+          <li><b>support:</b> The document is related to Isis technical support</li>
+          <li><b>information:</b> General information about Isis</li>
+          <li><b>reference:</b> This document is a reference (such as a listing of commands without the detailed examples and explanations a guide might include)</li>
+          <li><b>policy:</b> This document outlines a policy. E.g. <i>Privacy Policy</i> and <i>Disclaimers</i></li>
+          <li><b>xml:</b> This document is about one of the XML languages. E.g. this document </li>
+        </ul>
+
+        <p>
+          <a href="../../Schemas/Documentation/documentation/index.html">
+              Refer to the Documentation XML specification</a> for an up-to-date list of categories.
+        </p>
+
+        <h4>Example</h4>
+        <pre><code>  &lt;category&gt;
+    &lt;categoryItem&gt;xml&lt;/categoryItem&gt;
+    &lt;categoryItem&gt;technicalinfo&lt;/categoryItem&gt;
+    &lt;categoryItem&gt;guide&lt;/categoryItem&gt;
+  &lt;/category&gt;</code></pre>
+
+        <!-- Audience -->
+        <hr/>
+        <h3>Audience</h3>
+
+        <div style="text-align:center;">
+        <img class="blackBorderedImage"  src="assets/audience.png" width="315" height="97" alt="[Audience Element - Document XML Diagram]"/>
+        </div>
+
+        <p>
+              The purpose of the <tt>audience</tt> element is to specify (in combination with <tt>category</tt>) how the Document will be categorized on the web site.
+              The <tt>audience</tt> element contains one or more <tt>target</tt> elements. The <tt>target</tt> element
+              can be one of several preset audiences:
+        </p>
+
+        <ul>
+          <li><b>user:</b> A person who is new to Isis, or uses Isis and has basic skill at using the software</li>
+          <li><b>intermediate:</b> An intermediate user. A person who has mastered basic skills and is performing intermediate level functions</li>
+          <li><b>advanced:</b> An advanced user. A person who has advanced skills or is performing advanced functions</li>
+          <li><b>administrator:</b> A person who maintains the software on the computer, usually a systems administrator</li>
+          <li><b>developer:</b> A person who uses the Isis API to develop applications. This group may include image processors and scientists</li>
+          <li><b>programmer:</b> A person who writes Isis base software libraries. This is generally a member of the Astrogeology Programming Team</li>
+          <li><b>all:</b> Everybody</li>
+        </ul>
+
+        <p>
+          <a href="../../Schemas/Documentation/documentation/index.html">
+              Refer to the Documentation XML specification</a> for an up-to-date list of audiences.
+        </p>
+
+        <h4>Example</h4>
+        <pre><code>  &lt;audience&gt;
+    &lt;target&gt;developer&lt;/target&gt;
+  &lt;/audience&gt;</code></pre>
+
+        <!-- Files -->
+        <hr/>
+        <h3>Files</h3>
+
+        <div style="text-align:center;">
+        <img class="blackBorderedImage"  src="assets/files.png" width="600" height="385" alt="[History Element - Document XML Diagram]"/>
+        </div>
+
+        <p>
+              The purpose of the <tt>files</tt> element is to specify the information about the file or files in this Document.
+              This information is used to create links in the Isis web pages and even transform the metadata file into new HTML documents.
+        </p>
+        <p>
+              The <tt>files</tt> element contains one or more <tt>file</tt> elements. There is one <tt>file</tt> element for each
+              file in the Document. Another application of this is that you want to present one document in multiple file formats
+              (e.g. PDF, Excel, and Access) - each format would be documented in its own <tt>file</tt> element.
+              The <tt>file</tt> element has the following attributes:
+        </p>
+
+        <ul>
+          <li><b>hidden</b> true or false. Hides this file in the Document so it is not linked. If you want to hide the entire Document,
+                                   use the <tt>hidden</tt> attribute in <tt>category/categoryItem</tt>. Use is optional and defaults to <tt>false</tt>.</li>
+          <li><b>primary</b> true or false. Sets this file as the top page of a multipage Document. Use is optional and defaults to <tt>false</tt>.</li>
+        </ul>
+
+        <p>
+              The  <tt>file</tt> element contains the following elements:
+        </p>
+
+        <ul>
+          <li><b>type:</b> A mandatory, free text description of the file type - shorter is better! E.g. <i>PDF, HTML, JPEG, Quicktime</i></li>
+          <li><b>size:</b> The file size in bytes. This is not mandatory except by policy: use <tt>size</tt> for non-text (text, HTML, XML)
+                                        content such as PDF files, images, movies, etc. E.g. <i>1.3 MB, 225 KB</i></li>
+          <li><b>subtitle:</b> Specify the subtitle of this page in the document. This is not mandatory, but is useful for multipage Documents and will be used in creating the text for links to the pages.</li>
+          <li><b>source:</b> Contains the filename or URL (web, ftp, or other electronic address) of the file. This element is mandatory and may contain <b>one</b>
+                                           of the following elements:</li>
+                                           <ol>
+                                             <li><b>URL:</b> web, ftp, or other electronic address e.g. http://astrogeology.usgs.gov</li>
+                                             <li><b>source:</b> file name of a Document that resides in $ISISROOT/src/docsys/documents/. If this Document is a web page
+                                                                           that will be generated from the metadata file, this is the target file name for the web page.</li>
+                                           </ol>
+
+          <li><b>body:</b> If your Document is an autogenerated web page, this is where the content of your webpage goes. <i>All</i> web page Documents
+                                         should be created this way, not as a separate HTML file. When Isis is built, the web page will be generated with consistent formatting
+                                         and layout, summary information (ie. HTML <tt>title</tt> and <tt>meta</tt> tags), and page headers and footers. The <tt>body</tt>
+                                         element contains <b>one</b> of the following:</li>
+
+                                        <ol>
+                                          <li><b><i>HTML</i>:</b> inline (i.e. in the metadata file), XML-compliant, HTML formatted content (see
+                                                                          <a href="http://www.w3.org/TR/xhtml1/#diffs" taget="_blank">W3C XHTML: Differences with HTML 4</a>
+                                                                          for tips on writing XML compliant HTML)</li>
+                                          <li><b>src:</b> filename for an external XML file containing the content of the web page. The external file must have a root element of
+                                                                  <tt>body</tt> and contain XML compliant, body-level HTML</li>
+                                        </ol>
+
+        </ul>
+
+        <h4>Examples</h4>
+        <p>
+             The following examples are Document XML metadata files.
+        </p>
+
+        <ul>
+          <li><a href="assets/examples/example4/example4.xml">External Document</a>:
+                   this example shows a metadata file for an external, non-HTML document,
+                   <a href="assets/examples/example4/diagram.png">diagram.png</a> (35 KB)</li>
+          <li><a href="assets/examples/example3/example3.xml">Simple Web Page, Inline Content</a>:
+                  an example of a metadata file that contains the HTML formatted content in the
+                  body element. This example would generate a single web page.</li>
+          <li><a href="assets/examples/example2/example2.xml">Single Web Page, External Content</a>:
+                   an example of a metadata file that contains a <tt>src</tt> reference in the <tt>file</tt> to an external
+                   file (<a href="assets/examples/example2/example2_body.xml">example2_body.xml</a>)
+                   containing the HTML formatted content. This example would generate a single web page.</li>
+          <li><a href="assets/examples/example1/example1.xml">Multiple Pages, Inline Content</a>:
+                   a example of a metadata file that contains the HTML formatted content in <tt>body</tt> elements of
+                   several <tt>file</tt> elements. This example would generate several web pages, one for each file element.</li>
+        </ul>
+
+        <h4>Coming Soon</h4>
+        <ul>
+          <li>Templates you can use to get started on a document</li>
+          <li>Tools to build a preview of your document</li>
+        </ul>
+
+      </body>
+    </file>
+  </files>
+
+  <history>
+    <change name="Deborah Lee Soltesz" date="2003-01-29">Created</change>
+    <change name="Deborah Lee Soltesz" date="2003-03-04">Revisions based on review by Stuart Sides</change>
+    <change name="Deborah Lee Soltesz" date="2003-04-01">Added explanations for new items category:tutorial and audience:intermediate</change>
+  </history>
+
+</documentation>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="camstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Outputs camera statistics for a  cube in raw camera geometry
+  </brief>
+
+  <description>
+    This program will generate camera statistics from a user supplied "level 1" cube.  The output of camstats can be directed 
+    to a PVL file or flat text file.  For each output group, the program will calculate the minimum, maximum, average, and standard 
+    deviation.  The output groups are:
+    <pre>
+      Latitude
+      Longitude
+      Sample Resolution
+      Line Resolution
+      Resolution
+      Aspect Ratio
+      Phase Angle
+      Emission Angle
+      Incidence Angle
+      Local Solar Time
+      North Azimuth
+    </pre>
+    The output values are calculated using the full image area.  However, the number of data collection
+     points  for the statistics can be controlled by using the line increment (linc) and  sample increment (sinc)
+     parameters.  If the default linc and sinc of one are used then every line and sample of the image is 
+     used in the calculation of the output values.  If the user enters a linc or sinc, then the number of data 
+     collection points will be reduced.  However, the edges of the image area always used  even if they an 
+     incrament does not fall on the edge.
+
+  </description>
+
+  <history>
+    <change name="Robert Sucharski" date="2007-01-22">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2007-08-14">
+      Added an application test
+    </change>
+    <change name="Kris Becker" date="2008-02-27"> 
+        Check for special pixel values and write them as NULL values in keywords 
+        and the flat text file.
+    </change>
+     <change name="Steven Lambright" date="2008-05-12">
+          Removed references to CubeInfo 
+     </change>
+     <change name="Christopher Austin" date="2008-06-11">
+       Added the ATTACH option
+     </change>
+    <change name="Steven Koechle" date="2008-11-12">
+       Camstats now outputs history to the cube when it finishes execution
+     </change>
+  </history>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input  file
+        </brief>
+        <description>
+          Input cube with appropriate camera labels (instrument and kernel groups)
+        </description>
+        <filter>
+          *.cub *.CUB
+        </filter>
+      </parameter>
+      <parameter name="ATTACH">
+        <type>boolean</type>
+        <brief>
+          Attach result to the cube in the Table "CameraStatistics"
+        </brief>
+        <description>
+          If this option is selected, the output camera statistics will be
+          attached as the Table "CameraStatistics" in the FROM cube's labels.
+          Note: This does alter the input cube.
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Text file output
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          A text file in label format which will contain the results of this program.  this file can be used
+          in conjunction with the "getkey" program in order to pass the results to another program 
+          when developing scripts.  The output can also be a flat text file, see the "FORMAT" parameter.
+        </description>
+        <filter>
+          *.txt *.TXT
+        </filter>
+      </parameter>
+
+      <parameter name="FORMAT">
+        <type>string</type>
+        <brief>
+          Output Format
+        </brief>
+        <description>
+          Format type for output file.  PVL format is the default.
+        </description>
+        <default><item>PVL</item></default>
+        <list>
+          <option value="PVL">
+            <brief>
+              PVL Format
+            </brief>
+            <description>
+              Output file will be in PVL format
+            </description>
+          </option>
+          <option value="FLAT">
+            <brief>
+              FlatFile Format
+            </brief>
+          <description>
+            Output file will be a comma deliminated flatfile.  This form can easily be imported into spreadsheet applications.
+          </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <brief>
+          Append Output to File
+        </brief>
+        <description>
+          If this option is selected, the output from the application will be appended to the "TO" file.  if it is not 
+          selected, and information in the "TO" file will be overwritten.
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+    </group>
+
+
+    <group name="Option">
+      <parameter name="LINC">
+        <type>integer</type>
+        <brief>
+          Line increment
+        </brief>
+        <description>
+          Will contol the number of lines where statistical data is collected.  if a LINC of 10 is entered, every tenth line
+          will be used in the data collection.
+        </description>
+        <default><item>1</item></default>
+      </parameter>
+
+     <parameter name="SINC">
+        <type>integer</type>
+        <brief>
+          Sample increment
+        </brief>
+        <description>
+          Will contol the number of samples where statistical data is collected.  if a SINC of 10 is entered, every tenth sample
+          will be used in the data collection.
+        </description>
+        <default><item>1</item></default>
+      </parameter>
+    </group>
+   </groups>
+</application>
+

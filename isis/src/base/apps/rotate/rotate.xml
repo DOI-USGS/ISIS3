@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="rotate" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Rotates a cube any number of degrees
+  </brief>
+
+  <description>
+    This program will rotate a cube any number of degrees. The rotation will
+    not clip any pixels from the input (i.e., the output cube will be made
+    large enough to contain all of the input cube). Pixels outside of the input
+    cube will be set to NULL.
+  </description>
+
+  <history>
+    <change name="Stuart Sides" date="2002-10-28">
+      Original version
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Fixed compiler error with uninitialized variable after adding -O1 flag
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Steven Lambright" date="2007-06-22">
+      Fixed typo in user documentation
+    </change>    
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to rotate
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be rotated unless a specific band is specified.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the rotation.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Rotation">
+      <parameter name="DEGREES">
+        <type>double</type>
+        <brief>Number of degrees of rotation</brief>
+        <description>
+          This defines the number of degrees the cube will be rotated.
+          The angle is measured positive clockwize.
+        </description>
+        <minimum inclusive="no">-360.0</minimum>
+        <maximum inclusive="no">360.0</maximum>
+      </parameter>
+
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+
+</application>
+

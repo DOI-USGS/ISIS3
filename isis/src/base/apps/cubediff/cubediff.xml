@@ -1,0 +1,265 @@
+<?xml version="1.0"?>
+<application name="cubediff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Compare two cubes for differences
+  </brief>
+
+  <description>
+    This program compares two cube files pixel by pixel,  with results written
+    to the log and/or user specified output file.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <history>
+    <change name="Tracie Sucharski" date="2002-10-10">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2002-11-12">
+      Add user parameter, IGNORESPECIAL, which indicates whether special
+      pixel values in either file are ignored in the comparison.
+    </change>
+    <change name="K Teal Thompson" date="2002-11-25">
+      Add example.
+    </change>
+    <change name="K Teal Thompson" date="2003-04-11">
+      Make images smaller
+    </change>
+    <change name="Stuart Sides" date="2003-04-29">
+      Added the band number to the logged information
+    </change>
+    <change name="Stuart Sides" date="2003-05-01">
+      Fixed multipal run bug where once the inputs were reported as different
+      any files entered after that would aldo be reported as different.
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology...
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2003-08-26">
+      Changed default extension handling mechanism
+    </change>
+    <change name="Stuart Sides" date="2003-11-07">
+      Modified results pvl to not include the results group
+    </change>
+    <change name="Jacob Danton" date="2006-04-07">
+      Changed the IGNORESPECIAL from a string to a bool.
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-19">
+      Modified to output statistical data about the differences
+    </change>
+    <change name="Elizabeth Miller" date="2006-06-15">
+      Added ValidPixelDifferences to output
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Tracie Sucharski" date="2007-02-26">
+        Documentation correction-Description said program
+        exited at first difference.  This is no longer the case,
+        all pixels are compared and statistics are collected.
+    </change>
+    <change name="Brendan George" date="2007-04-25">
+        Added tabular output option. Option allows the program to
+        collect and print out a table of the differences found
+    </change>
+    <change name="Brendan George" date="2007-04-26">
+        Changed name from compare to cubediff
+    </change>
+    <change name="Steven Lambright" date="2007-06-08">
+        Fixed problems with the special pixel comparisons:
+          changed IGNORESPECIAL to only ignore the case where one pixel has a DN value and the other pixel is special, 
+          fixed a problem where the special pixel difference would never be the first difference,
+          fixed a comparison of DN value differences before checking if the pixel is special.
+          Added significant figure reports for testing purposes.
+    </change>
+    <change name="Steven Lambright" date="2007-06-11">
+        Removed IGNORESPECIAL
+    </change>
+    <change name="Steven Lambright" date="2007-06-12">
+        Updated example images
+    </change>
+    <change name="Steven Lambright" date="2007-06-18">
+        Fixed bug where sig. fig. accuracy would report "1" when it should report "0"
+    </change>
+    <change name="Brendan George" date="2007-08-09">
+        Integrated WriteTabular and Column (tabular output objects) as
+        application-specific classes
+    </change> 
+    <change name="Steven Koechle" date="2009-05-14">
+        Changed output, if no valid pixel differences, output zero instead of 
+        NULL8
+    </change> 
+      <change name="Sharmila Prasad" date="2010-02-26">
+        Incuded keywords MaxDifference Line, Sample and Band in the output to 
+        indicate the line, sample, band where the max cube difference occured
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          First cube for comparison
+        </brief>
+        <description>
+  	  The file specification for the first input cube. This cube will
+          be compared to the cube given in "FROM2".
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="FROM2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Second cube for comparison
+        </brief>
+        <description>
+  	  The file specification for the second input cube. This cube will
+          be compared to the cube given in "FROM".
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>Text file</brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          A text file in label format which will contain the results of
+          this compare.  This file can be used in conjunction with the
+          "getkey" program to pass the results to another program.
+          </description>
+        </parameter>
+      </group>
+
+    <group name="Options">
+      <parameter name="TOLERANCE">
+        <type>double</type>
+        <brief>Tolerance value</brief>
+        <internalDefault>
+          DBL_EPSILON
+        </internalDefault>
+        <description>
+           This parameter allows a tolerance when comparing values.  If the
+           difference between pixel values is less than or equal to
+           TOLERANCE,the values are considered to be equal.  The default
+           value, DBL_EPSILON, is machine specific, but a possible value
+           is 2.2204460492503131e-16.  It is defined in float.h.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Table Parameters">
+        <parameter name = "OUTPUTDIFFS">
+            <type>boolean</type>
+            <brief>Output table of differences</brief>
+            <description>This determines if the differences will be output to a
+            table. If it is checked, the options below will be opened up and
+            used to determine the specifics of the table to which the data will
+            be written. The differences are written out as a table, where the
+            columns represent the sample number, once for each image, and the
+            rows represent the line number, with the data being the DN at that 
+            point.
+            </description>
+            <default><item>false</item></default>
+            <inclusions>
+                <item>PRECISION</item>
+                <item>COUNT</item>
+            </inclusions>
+        </parameter>
+        <parameter name="PRECISION">
+            <type>integer</type>
+            <brief>The decimal precision of the output values</brief>
+            <description>
+                This number determines how many digits past the decimal point
+                will be displayed for the compared values in the output table.
+            </description>
+            <default><item>3</item></default>
+            <inclusions>
+                <item>OUTPUTDIFFS</item>
+            </inclusions>
+        </parameter>
+        <parameter name="COUNT">
+            <type>integer</type>
+            <brief>Number of differences to be displayed</brief>
+            <description>
+                This indicates the number of differences to be displayed. The
+                count is made from left to right, top to bottom. Differences on
+                the top row are considered first, then the second row, and so
+                on.
+            </description>
+            <default><item>100</item></default>
+            <inclusions>
+                <item>OUTPUTDIFFS</item>
+            </inclusions>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+
+    <example>
+      <brief>Different</brief>
+      <description>
+        Compare isisTruth.cub band one against band two
+      </description>
+      <terminalInterface>
+        <commandLine>cubediff from=isisTruth.cub+1 from2=isisTruth.cub+2 </commandLine>
+        <description>
+          Compare isisTruth.cub band one against band two
+        </description>
+      </terminalInterface>
+      <inputImages>
+
+        <image src="assets/images/isistruth1.jpg" width="126" height="126">
+          <brief> First input image for compare</brief>
+          <description>This is the first input image for the compare example.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumbs/isistruth1.jpg" width="126" height="126"/>
+          <parameterName>FROM</parameterName>
+        </image>
+
+        <image src="assets/images/isistruth2.jpg" width="126" height="126">
+          <brief> Second input image for compare</brief>
+          <description>This is the second input image for the compare example.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumbs/isistruth2.jpg" width="126" height="126"/>
+          <parameterName>FROM2</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/compareLog.jpg" width="448" height="550">
+          <brief>The output log</brief>
+          <description> This is the default output compare log.  Use the TO parameter for a text file output.
+          </description>
+          <thumbnail caption="Display of Output compare log showing results of the compare application." src="assets/thumbs/compareLog.jpg" width="200" height="170"/>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="448" height="550" src="assets/images/compareGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform the compare operation</description>
+            <thumbnail width="170" height="200" caption="compare GUI" src="assets/thumbs/compareGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+  </examples>
+
+</application>

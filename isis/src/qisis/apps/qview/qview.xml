@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="qview" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Display and analyze cubes
+  </brief>
+
+  <description>
+    This program will display cubes and allow for interactive analysis.
+  </description>
+
+  <category>
+    <categoryItem>Display</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2004-12-01">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2006-01-06">
+      Port to Qt4 and add blink tool 
+    </change>
+    <change name="Elizabeth Miller" date="2006-07-26">
+      Fixed bug with filename expansion and added the MeasureTool
+    </change>
+    <change name="Brendan George" date="2006-09-19">
+      Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2007-09-11">
+      Added new rubber band functionality
+    </change>
+    <change name="Sharmila Prasad" date="2009-10-19">
+      Added Mosaic Tracking info like image index, serial number and file name 
+      in the Advanced Tracking window to have the ability to track mosaic 
+      origin.
+    </change>
+    <change name="Jeannie Walldren" date="2010-03-08">
+      Modified FindTool.  If a user enters a line/sample in the Image tab, then 
+      the corresponding lat/lon is displayed in the Ground tab.  Added Record 
+      button to FindTool to record clicked or typed point in the 
+      AdvancedTrackTool window.
+    </change>
+    <change name="Sharmila Prasad" date="2010-03-19">
+      "qview" now has the ability to handle exceptions. The status bar now 
+      displays a default NoWarning icon with "Ready" message. If an 
+      exception is caught, the icon changes to Warning and displays the error 
+      message. Clicking on the Warning icon will display a dialog window with 
+      the details of the most recent error occured. Closing the dialog or any 
+      other mouse activity will reset the Warning status.
+    </change>
+    <change name="Eric Hyer" date="2010-03-22">
+      Discontinued forcing of gui style to windows
+    </change>
+    <change name="Sharmila Prasad" date="2010-03-24">
+      Enable FindTool for images without camera and/or projection
+    </change>
+  </history>
+</application>

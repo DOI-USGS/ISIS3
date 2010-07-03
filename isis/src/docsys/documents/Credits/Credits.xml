@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <h2>Recent Astrogeology Contributors</h2>
+        <p>
+        As indicated in the
+        <a href="../IsisHistory/IsisHistory.html">history</a>,
+        Isis has been in existence in one form or another for over 30 years and
+        any aged software package will have had many contributors.  Dozens of
+        people within the USGS and other institutions have been involved in
+        the Isis design and development at some point in its evolution.
+        These include scientists, programmers, users, and students.  Here is
+        a current list of Astrogeology Team members involved in the
+        development of Isis:
+        </p>
+        
+        <table class="tableGeneralInformation" align="center" width="90%">
+          <tr>
+            <td>Travis Addair</td>
+            <td>Jeff Anderson</td>
+            <td>Brent Archinal</td>
+            <td>Christopher Austin</td>
+          </tr>
+          <tr>
+            <td>Jeannie Waldren Backer</td>
+            <td>Janet Barrett</td>
+            <td>Kris Becker</td>
+            <td>Tammy Becker</td>
+          </tr>
+          <tr>
+            <td>MacKenzie Boyd</td>
+            <td>Debbie Cook</td>
+            <td>Kenneth Edmundson</td>
+            <td>Lisa Gaddis</td>
+          </tr>
+          <tr>
+            <td>Trent Hare</td>
+            <td>Ken Herkenhoff</td>
+            <td>Annie Howington-Kraus</td>
+            <td>Eric Hyer</td>
+            </tr>
+          <tr>
+            <td>Chris Isbell</td>
+            <td>Jeff Johnson</td>
+            <td>Randy Kirk</td>
+            <td>Steven Lambright</td>
+          </tr>
+          <tr>
+            <td>Ella Lee</td>
+            <td>Sharmila Prasad</td>
+            <td>Jac Shinaman</td>
+            <td>Stuart Sides</td>
+            </tr>
+          <tr>
+            <td>Larry Soderblom</td>
+            <td>Tracie Sucharski</td> 
+          </tr>
+        </table>
+        <br />
+
+        <h2>Past USGS Contributors</h2>
+        <p>
+        Additionally, there are many past Astrogeology or USGS employees
+        who have contributed to the image processing software. They include:
+        </p>
+
+        <table class="tableGeneralInformation" align="center" width="90%">
+          <tr>
+             <td>Alex Acosta</td>
+             <td>Stacey Alley</td>
+             <td>James Anderson</td>
+             <td>Joni Bauers</td>
+          </tr>
+          <tr>
+             <td>Glenn Bennett</td>
+             <td>Pat Chavez</td>
+             <td>Way Christensen</td>
+             <td>Jim Crawforth</td>
+            </tr>
+          <tr>
+             <td>Norm Cushing</td>
+             <td>Jacob Danton</td>
+             <td>Phil Davis</td>
+             <td>Kay Edwards</td>
+          </tr>
+          <tr>
+             <td>Eric Eliason</td>
+             <td>Patrica Eliason</td>
+             <td>Brendon George</td>
+             <td>Verna Gregg</td> 
+          </tr>
+          <tr>
+             <td>Rae Harvey</td>
+             <td>Noah Hilt</td>
+             <td>Tom Kelleher</td>
+             <td>Hugh Kieffer</td> 
+           </tr>
+          <tr>
+             <td>Steven Koechle</td>
+             <td>Jim Mathews</td>
+             <td>Jason Mawhinney</td>
+             <td>Alfred McEwen</td>
+             </tr>
+          <tr>
+             <td>Dennis McMacken</td>
+             <td>Elizabeth Miller</td>
+             <td>Wendy Parker</td>
+             <td>Mark Robinson</td>
+          </tr>
+          <tr>
+            <td>Bill Scott</td>
+            <td>Deborah Lee Soltesz</td>
+            <td>Jim Stapleton</td>
+            <td>Teal Thompson</td>
+          </tr>
+          <tr>
+            <td>Jim Torson</td>
+            <td>Aaron Young</td>
+          </tr>
+        </table>
+        <br />
+
+        <h2>Outside Contributors</h2>
+        <p>
+        Finally, contributions have been made to Isis by many people outside
+        of the USGS.  Their involvement came at various times during the
+        evolution of Isis and is sincerely appreciated:
+        </p>
+
+        <table class="tableGeneralInformation" align="center" width="90%">
+          <tr>
+            <td>Don Anderson, ASU</td>
+            <td>Bob Dean, JPL</td>
+          </tr>
+          <tr>
+            <td>Roger Clark, USGS</td>
+            <td>Pierre Drossary, Observatoire de Paris</td>
+          </tr>
+          <tr>
+            <td>Paul Jensen, University of Colorado</td>
+            <td>Mike Jones, University of Colorado</td>
+          </tr>
+          <tr>
+            <td>Lucas Kamp, Oxford University</td>
+            <td>John Lindelow, University of Hawaii</td>
+          </tr>
+          <tr>
+            <td>Ralph Lewis, University of Hawaii</td>
+            <td>Julianna Lo, University of Hawaii</td>
+          </tr>
+          <tr>
+            <td>Bob Mehlman, UCLA</td>
+            <td>Bill Smythe, JPL</td>
+          </tr>
+        </table>
+        <br />
+
+        <h2>Don't Be Forgotten</h2>
+        <p>
+        There are undoubtedly individuals that were overlooked in their
+        contributions to this image processing system.  Their exclusion is
+        not intentional or deliberate.  Our apologies for any oversight and
+        please feel free to send us an email to be included in the credits.
+        </p>
+
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>Credits.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>about</categoryItem>
+  </category>
+
+  <audience>
+    <target>all</target>
+  </audience>
+
+  <bibliography>
+    <title>Credits</title>
+    <brief>Contributors to the Isis software package</brief>
+    <description>
+      A summary of USGS and non-USGS contributors to the Isis
+      software package
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2003-03-25</date>
+  </bibliography>
+</documentation>

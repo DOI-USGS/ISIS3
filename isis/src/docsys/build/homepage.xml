@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<homePage>
+  <div class="isisNavigationBar">
+  <table>
+    <tr>
+      <td><img src="assets/banners/banner.jpg" width="600" height="106" alt="[USGS Banner]" border="0" usemap="#bannermap"/>
+        <map name="bannermap" id="bannermap">
+          <area shape="rect" target="_top" alt="Visit the USGS Home Page"                          coords="2,1,186,73"   href="http://www.usgs.gov" title="Visit the USGS Home Page"/>
+          <area shape="rect" target="_top" alt="Go to the Astrogeology Research Program Home Page" coords="2,75,249,102" href="/"                   title="Go to the Astrogeology Research Program Home Page"/>
+          <area shape="default" alt="USGS" nohref="nohref"/>
+        </map>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <script type="text/javascript">
+          writeNavigationBar();
+        </script>
+      </td>
+    </tr>
+  </table>
+  </div>
+
+
+  <h1>Isis</h1>
+  <h1 class="subtitle">Integrated Software for Imagers and Spectrometers</h1>
+  <hr/>
+  <table>
+    <tr>
+      <td valign="top">
+        <h2>Welcome</h2>
+        <p>
+        This is the home page for Isis, an image processing software package. The focus
+        of the software is to manipulate imagery collected by current and past NASA
+        planetary missions sent to Mars, Jupiter, Saturn, and other solar system bodies.
+        </p>
+        <h2>Announcements</h2>
+        <div style="text-align:center;">
+          <div style="padding:10px; text-align: left;">
+            <script type="text/javascript">
+              writeAnnouncements () ;
+            </script>
+          </div>
+        </div>
+        <h2>Popular Destinations</h2>
+        <ul>
+          <li>
+            <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/isis.cgi">Isis 2.1
+            Home Page</a>
+          </li>
+          <li>
+            <a href="Application">Isis 3.0 Application Table of Contents</a>
+          </li>
+        </ul>
+
+<script language="JavaScript" src="http://isis.astrogeology.usgs.gov/assets/scripts/feed2js/feed2js.php?src=http%3A%2F%2Fisis.astrogeology.usgs.gov%2FIsisSupport%2Findex.php%3Ftype%3Drss%3Baction%3D.xml&amp;chan=y&amp;num=10" type="text/javascript"></script>
+
+<noscript>
+<a href="http://isis.astrogeology.usgs.gov/assets/scripts/feed2js/feed2js.php?src=http%3A%2F%2Fisis.astrogeology.usgs.gov%2FIsisSupport%2Findex.php%3Ftype%3Drss%3Baction%3D.xml&amp;chan=y&amp;num=10&amp;html=y">View RSS feed</a>
+</noscript>
+
+        <script language="JavaScript" type="text/javascript">
+          writeWhatsUpAtTheSupportCenter() ;
+        </script>
+      </td>
+    </tr>
+  </table>
+
+  <script type="text/javascript" src="assets/scripts/footer.js">
+          //<![CDATA[<!--
+          //-->]]>
+  </script>
+</homePage>

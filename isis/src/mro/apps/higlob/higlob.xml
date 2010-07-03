@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="higlob" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Combines HiRISE image data with all pixel data in the blobs
+  </brief>
+
+  <description>
+    <p>
+      This program will create a new image with the calibration pixel data
+      at the top, followed by the main image data. Both the calibration and main image
+      will have the buffer pixels added to the left side and the dark pixels to the right
+      side.
+      </p>
+    <img src='assets/higlob_diagram.png' alt='Diagram of output pixel groups' width='444' height='520' />
+    <p>
+       The pixel values are retrieved from either the Isis tables or the main image.
+       The calibration buffer and dark pixels are pulled from the "HiRISE Ancillary" table. The main 
+       calibration image pixels come from the "HiRISE Calibration Image" table. The image buffer
+       and dark pixels come from the "HiRISE Ancillary" table. The observation pixels come from
+       the main Isis cube.
+     </p>
+     <p>
+       The calibration image and observation image pixels of a HiRISE image can be flipped from left to right
+       using the "FLIP" parameter. See the "FLIP" parameter description for details.
+     </p>
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2004-10-06">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2005-06-07">
+      Fixed problem with special pixels in image ancillary, calibration and calibration ancillary
+      areas. They are now converted to double precision special pixels before being inserted
+      into the Buffer.
+    </change>
+    <change name="Stuart Sides" date="2005-07-21">
+      Fixed another problem with special pixels in the image ancillary table. The
+      16 bit integer special pixel values in table were not being converted to double
+      special pixels when being dumped into the output buffer.
+    </change>
+    <change name="Kris Becker" date="2005-09-23">
+        During our first observation in cruise, it was determined that channel 1 required
+        flippping rather than channel 0.  This confusion due to assumptions of which channel,
+        0 or 1, was on the left or right side of the CCD.  Channel 1 is on the left, channel 0 on the
+        right.    Also changed the FLIP parameter to an integer to allow the user to choose
+        either channel to flip (so we don't have to do this again!)
+    </change>
+    <change name="Stuart Sides" date="2006-09-19">
+      Fixed a memory leak caused by not deleting a global pointer.
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input HiRISE cube
+        </brief>
+        <description>
+  	      The HiRISE cube containing the image and tables from the EDR product. This must 
+          be an Isis cube (i.e., "hi2isis" must be run before "higlob").
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Combined output cube
+        </brief>
+        <description>
+          The output cube containing the main image data, calibration data, buffer pixels
+          and dark pixels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="FLIP">
+        <type>string</type>
+        <brief>Specify HiRISE channel (0 or 1) image &amp; calibration image to flip</brief>
+        <default><item>1</item></default>
+        <description>
+          <p>
+               This is typically  channel 1 (discovered after launch!) rather than 0, but this
+               option allows you to choose the channel you want to flip.  The default (1) is
+               the one designated as the channel to flip to best assist in calibration analysis.
+          </p>
+          <p>
+              If FLIP matches the value of the ChannelNumber keyword in the Instrument
+              group, then both the observation and calibration image data will be filpped left to
+              right. This does not modify the byte order of the individual pixels, and does not
+              flip any of the buffer or dark pixels.
+          </p>
+          <p>
+              To ensure that you flip no channel, set FLIP to "None".
+          </p>
+        </description>
+        <list>
+           <option value="0">
+                <brief>Channel 0</brief>
+                <description>Flips HiRISE channel 0 images</description>
+            </option>
+            <option value="1">
+                <brief>Channel 1</brief>
+                <description>Flips HiRISE channel 1 images</description>
+            </option>
+           <option value="None">
+                <brief>None</brief>
+                <description>Do not flip any data in image</description>
+            </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

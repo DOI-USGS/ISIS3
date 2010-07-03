@@ -1,0 +1,99 @@
+Testing Isis::Application Class ... 
+
+Group = Accounting
+  ConnectTime = 00:00:01.0
+  CpuTime     = 00:00:00.0
+End_Group
+
+Object = unittest
+  IsisVersion       = "3.0.16 beta | 2006-03-22"
+  ProgramVersion    = 2006-03-30
+  ExecutionDateTime = 2006-03-30T10:53:42
+  HostName          = orkin
+  UserName          = janderso
+  Description       = "Unit test for Application class"
+
+  Group = UserParameters
+    FROM = unitTest.cub
+    TO   = /tmp/isisprocess_01.cub
+    TO2  = /tmp/isisprocess_02.cub
+    TO3  = /tmp/isisprocess_03.cub
+    TO4  = /tmp/isisprocess_04.cub
+  End_Group
+End_Object
+
+Can't test Gui methods
+  GuiLog(Pvl &results)
+  GuiLog(PvlGroup &results)
+  GuiLog(std::string &results)
+  GuiReportErrorLog(iException &e)
+
+GuiHelpers ok
+
+In myFunct
+
+**PROGRAMMER ERROR** testing an error
+
+Object = unittest
+  IsisVersion       = "3.0.16 beta | 2006-03-22"
+  ProgramVersion    = 2006-03-30
+  ExecutionDateTime = 2006-03-30T10:53:42
+  HostName          = orkin
+  UserName          = janderso
+  Description       = "Unit test for Application class"
+
+  Group = UserParameters
+    FROM = unitTest.cub
+    TO   = /tmp/isisprocess_01.cub
+    TO2  = /tmp/isisprocess_02.cub
+    TO3  = /tmp/isisprocess_03.cub
+    TO4  = /tmp/isisprocess_04.cub
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:01.0
+    CpuTime     = 00:00:00.0
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:01.0
+    CpuTime     = 00:00:00.1
+  End_Group
+End_Object
+
+Object = unittest
+  IsisVersion       = "3.0.16 beta | 2006-03-22"
+  ProgramVersion    = 2006-03-30
+  ExecutionDateTime = 2006-03-30T10:53:42
+  HostName          = orkin
+  UserName          = janderso
+  Description       = "Unit test for Application class"
+
+  Group = UserParameters
+    FROM = unitTest.cub
+    TO   = /tmp/isisprocess_01.cub
+    TO2  = /tmp/isisprocess_02.cub
+    TO3  = /tmp/isisprocess_03.cub
+    TO4  = /tmp/isisprocess_04.cub
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:01.0
+    CpuTime     = 00:00:00.0
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:01.0
+    CpuTime     = 00:00:00.1
+  End_Group
+
+  Group = Error
+    Program = unitTest
+    Class   = "PROGRAMMER ERROR"
+    Code    = 2
+    Message = "testing an error"
+    File    = unitTest.cpp
+    Line    = 16
+  End_Group
+End_Object
+End

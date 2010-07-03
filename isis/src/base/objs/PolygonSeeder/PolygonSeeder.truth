@@ -1,0 +1,22 @@
+Object = AutoSeed
+  Group = PolygonSeederAlgorithm
+    Name             = Grid
+    MinimumThickness = 0.5
+    MinimumArea      = 10
+    XSpacing         = 11
+    YSpacing         = 11
+  End_Group
+End_Object
+End
+
+Test invalidInput() ...
+Object = AutoSeed
+  Group = PolygonSeederAlgorithm
+  End_Group
+End_Object
+End
+
+Test to make sure Parse did it's job
+MinimumThickness = 0.5
+MinimumArea = 10
+No reason to test GridPolygonSeeder, so we're done

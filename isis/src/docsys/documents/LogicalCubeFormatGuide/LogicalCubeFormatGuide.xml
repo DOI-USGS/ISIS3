@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+        <h2><a name="Introduction">Introduction</a></h2>
+
+        <p>
+          This basic guide focuses on core Isis labels and a conceptual file structure for a cube.  The intent is not to describe the complex nature of the physical file format or the meaning of every element of an Isis label.  There are other programmer-related documents that delve into this detailed information.  They include, Isis Physical Cube Format Guide and Isis Label Reference.   While this document is basic in nature, it is not intended to be an introduction to image processing.  We assume the reader has a general understanding of common terminology such as pixels, lines, samples, bit-type, etc.
+        </p>
+        <p>
+          From our past experiences we know that a digital image is a two-dimensional array of pixels.  The Isis cube format expands an image into the third dimension.
+        </p>
+
+        <div align="center">
+          <div  style="width:360px;">
+              <img src="assets/cubediagram.png" width="353" height="131" alt="[Line Diagram of the Isis Cube image format]"/><br/>
+            <p class="caption">
+            This diagram illustrates that the Isis Cube image format can be visualized as a rectangular prism,
+            with the origin in the closest upper left corner , the lines running in the height direction, the
+            samples running in the width direction, and the bands running in the depth direction.
+            </p>
+          </div>
+        </div>
+
+
+      <p>
+          The word "cube" may be somewhat misleading as it implies equal length along each dimension.  The volume of course is a rectangular prism
+          but for convenience sake we will continue to use cube.  The origin of the cube is referred as coordinate (1,1,1) in order of
+          (sample,line,band).  Samples increase from left-to-right, lines from top-to-bottom, and bands from front-to-back.  We refer to the sample-line axes as spatial planes.
+          The sample-band and line-band axes are denoted as spectral planes.
+      </p>
+
+      <h2><a name="PixelsAndSpecialPixels">Pixels and Special Pixels</a></h2>
+
+      <p>
+          As usual, each individual pixel contains a number representing some physical property (e.g., radiance, reflectance, elevation).  As a user, these numbers should always be thought of as a floating-point number.  That is, 15.397 or –1E15.  The conversion from 8-bit or 16-bit pixels is handled behind the scene, thus presenting users (and application programmers) with real world values.
+      </p>
+      <p>
+          Isis has the ability to deal with unique conditions within a cube.  That is, there are reserved values that have special meaning and hence the name "special pixels".
+          The following is a table of pixel value you may encounter when running programs or visually examining cubes:
+      </p>
+
+        <table class="tableFormattedInformation" align="center">
+          <tr>
+            <th>
+              Null
+            </th>
+            <td>
+              A null pixel indicates no data was collected at the particular location
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+              Lis
+            </th>
+            <td>
+              A low instrument saturation pixel occurred meaning the instrument readout was at its lowest possible value
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+              His
+            </th>
+            <td>
+              A high instrument saturation pixel occurred meaning the instrument readout was at its highest possible value
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+              Lrs
+            </th>
+            <td>
+              A low representation saturation pixel occurred meaning a program computed a new pixel value at this
+              location that was lower than native bit-type for the file (e.g., less than zero for an 8-bit file).
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+              Hrs
+            </th>
+            <td>
+              A high representation saturation pixel occurred meaning a program computed a new pixel value at this
+              location that was greater than native bit-type for the file (e.g., greater than 255 for an 8-bit file).
+            </td>
+          </tr>
+        </table>
+
+        <h2><a name="FileSpecifications">File Specifications</a></h2>
+
+        <p>
+          An Isis cube consists of two parts, the labels and the pixel data.  These can be stored together in one file (attached) or
+          in two separate files (detached).  As Isis programs automatically enforce an extension of .cub on the output file you can expect
+          to find the pixels in a file with an extension of .cub; if you decide detach your labels you will also have a file with an extension of .lbl.
+          The following is an example of the minimum labels for a cube:
+
+          <pre style="padding-left:4em;">
+  Object = IsisCube
+    Object = Core
+      StartByte   = 65537
+      Format      = Tile
+      TileSamples = 128
+      TileLines   = 128
+
+      Group = Dimensions
+        Samples = 2468
+        Lines   = 11499
+        Bands   = 1
+      EndGroup
+
+      Group = Pixels
+        Type       = Real
+        ByteOrder  = Lsb
+        Base       = 0.0
+        Multiplier = 1.0
+      EndGroup
+    EndObject
+  EndObject
+End
+
+          </pre>
+        </p>
+
+          <h2><a name="OtherGroups">Other Groups</a></h2>
+
+          <p>
+          There are many other groups that you will find in the labels of a cube.  For example,
+          <tt>Instrument</tt>, <tt>Kernels</tt>, <tt>Archive</tt>, and <tt>Mapping</tt>, to name a few.
+          Definitions of these groups and their keywords, as well as the IsisCube object presented above, can be found in the
+          <a href="../LabelDictionary/LabelDictionary.html">Isis Label Dictionary</a>.
+          </p>
+
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>LogicalCubeFormatGuide.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>guide</categoryItem>
+  </category>
+
+  <audience>
+    <target>intermediate</target>
+  </audience>
+
+  <bibliography>
+    <title>Logical Cube Format Guide</title>
+    <brief>Guide to core Isis labels and a conceptual file structure for a cube</brief>
+    <description>
+    This basic guide focuses on core Isis labels and a conceptual file structure for a cube
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2003-03-26</date>
+  </bibliography>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-03-25">Original</change>
+    <change name="Deborah Lee Soltesz" date="2003-06-11">Converted Jeff Anderson's documentation to HTML and added to this file</change>
+  </history>
+</documentation>

@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<application name="percent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Obtains the DN value at a percent in a histogram
+  </brief>
+
+  <description>
+    This program will output the DN value at a cumulative
+    percentage in a histogram.  For example, requesting
+    the 50% DN will output the median.  Values such as
+    the 0.5% and 99.5% are good for selecting minimums and
+    maximums which do not include outliers.  The histogram
+    will be obtained from a single band in the input cube and
+    is identified using the band specifier (e.g., file.cub:5).
+    In general, this program is used
+    within batch jobs, perl programs, or other scripting
+    languages.  The value(s) will be written to the output
+    text file specified by the parameter TO and it can
+    be extracted using the "getkey" program.  If multiple
+    percents were requested, the values are printed to the
+    text file in the same order as the requested percents 
+    and are comma delimited.
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>getkey</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="2002-10-25">
+      Original version
+    </change>
+    <change name="K Teal Thompson" date="2002-11-25">
+      Add example
+    </change>
+    <change name="K Teal Thompson" date="2003-03-28">
+      Make images smaller.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Jeff Anderson" date="2003-06-03">
+      Updated application test due to compiler optimizations
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2003-08-27">
+      Change default extension handling mechanism
+    </change>
+    <change name="Stuart Sides" date="2003-11-07">
+      Modified results pvl to not include the results group
+    </change>
+    <change name="Jacob Danton" date="2006-01-23">
+        Fixed appTest to comply to changes in String
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Filename of a cube
+        </brief>
+        <description>
+          Compute the histogram using this cube file. The program
+          operates on only one band and therefore a band specifier
+          is required (e.g., file.cub:3)
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>Text file</brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          A text file in label format which will contain
+          the results of this program.  This file can
+          be used inconjunction with the "getkey" program
+          in order to pass the results to another program.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Selection">
+      <parameter name="PERCENTAGE">
+        <type>string</type>
+        <brief>
+          Histogram percentage to return
+        </brief>
+        <description>
+          This parameter indicates the cumulative percentage
+          to examine in the histogram.  The DN value at that
+          percentage will be output by this program.  For example,
+          PERCENTAGE=50 will return the median of the image.
+          When entering multiple percentages, be sure they are
+          comma delimited.
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+        <maximum inclusive="no">100.0</maximum>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> percent.txt </brief>
+      <description> Use text file output
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/f332s28.cub t=OUT/percent.txt p=50 </commandLine>
+        <description> Set TO parameter to percent.txt
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/f332s28.jpg" width="500" height="439">
+          <brief> Input image for percent</brief>
+          <description>This is the input image f332s28.cub
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/f332s28.jpg" width="200" height="175"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/percentTxt.jpg" width="410" height="200">
+          <brief> Output text file </brief>
+          <description> Output text file shown in editor giving results of
+ the percent application.
+          </description>
+          <thumbnail caption="This is the text file percent.txt." src="assets/thumb/percentTxt.jpg" width="200" height="98"/>
+          <parameterName>TO</parameterName>
+        </image>
+        <image src="assets/image/mPercentTxt.JPG" width="610" height="300">
+          <brief> </brief>
+          <description>Results of the percent application when multiple percentages are requested.
+          </description>
+          <thumbnail caption="This is the text file multiple-percents.txt." src="assets/thumb/mPercentTxt.JPG" width="200" height="98"/>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="487" height="251" src="assets/image/percentGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform the percent operation</description>
+            <thumbnail width="200" height="103" caption="percent GUI" src="assets/thumb/percentGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>
+

@@ -1,0 +1,217 @@
+Unit test for Isis::CubeAttribute and its subclasses
+
+Test of invalid attribute "sometext"
+
+
+
+Test of attribute "+sometext"
++sometext
++sometext
+Group = Attributes
+  Format = +sometext
+End_Group
+End
+
+
+
+Test of system default output cube attributes
++Tile+Lsb+Attached
+Group = OutputCubeAttributes
+  Format    = Tile
+  Minimum   = 0.0
+  Maximum   = 0.0
+  ByteOrder = Lsb
+  LabelType = Attached
+End_Group
+End
+
+Propagate Pixel Type = 1
+**PROGRAMMER ERROR** Request for CubeAttributeOutput::PixelType failed. PixelType has not been set. Use PropagatePixelType or UserPixelType to determine how to set PixelType.
+Propagate Min/Max    = 1
+Minimum              = 0
+Maximum              = 0
+FileFormatStr        = Tile
+FileFormat enum      = Tile
+ByteOrder            = ok
+Label attachment     = Attached
+
+
+
+
+Test of output attribute "+8bit+Tile+0.0:100.1+MSB"
++UnsignedByte+0.0:100.1+Tile+Msb+Attached
+Group = OutputCubeAttributes
+  Type      = UnsignedByte
+  Format    = Tile
+  Minimum   = 0.0
+  Maximum   = 100.1
+  ByteOrder = Msb
+  LabelType = Attached
+End_Group
+End
+
+Propagate Pixel Type = 0
+PixelType            = UnsignedByte
+Propagate Min/Max    = 0
+Minimum              = 0
+Maximum              = 100.1
+FileFormatStr        = Tile
+FileFormat enum      = Tile
+ByteOrder            = ok
+Label attachment     = Attached
+
+
+
+
+Test of output attribute "+16bit+Bsq+-10000.0:-100.1+lsb"
++SignedWord+-100000.0:-100.1+BandSequential+Lsb+Attached
+Group = OutputCubeAttributes
+  Type      = SignedWord
+  Format    = BandSequential
+  Minimum   = -100000.0
+  Maximum   = -100.1
+  ByteOrder = Lsb
+  LabelType = Attached
+End_Group
+End
+
+Propagate Pixel Type = 0
+PixelType            = SignedWord
+Propagate Min/Max    = 0
+Minimum              = -100000
+Maximum              = -100.1
+FileFormatStr        = BandSequential
+FileFormat enum      = BandSequential
+ByteOrder            = ok
+Label attachment     = Attached
+
+
+
+
+Test of output attribute "+32bit"
++Real+Tile+Lsb+Attached
+Group = OutputCubeAttributes
+  Type      = Real
+  Format    = Tile
+  ByteOrder = Lsb
+  LabelType = Attached
+End_Group
+End
+
+Propagate Pixel Type = 0
+PixelType            = Real
+Propagate Min/Max    = 0
+Minimum              = 999
+Maximum              = 9999
+FileFormatStr        = Tile
+FileFormat enum      = Tile
+ByteOrder            = ok
+Label attachment     = Attached
+
+
+
+
+Test of output attribute "+0.0:100.1+detached"
++Tile+Lsb+Detached
+Group = OutputCubeAttributes
+  Format    = Tile
+  Minimum   = 0.0
+  Maximum   = 100.1
+  ByteOrder = Lsb
+  LabelType = Detached
+End_Group
+End
+
+Propagate Pixel Type = 1
+**PROGRAMMER ERROR** Request for CubeAttributeOutput::PixelType failed. PixelType has not been set. Use PropagatePixelType or UserPixelType to determine how to set PixelType.
+Propagate Min/Max    = 0
+Minimum              = 0
+Maximum              = 100.1
+FileFormatStr        = Tile
+FileFormat enum      = Tile
+ByteOrder            = ok
+Label attachment     = Detached
+
+
+
+
+Test of output attribute "+8bit+Tile"
++UnsignedByte+0.0:0.0+Tile+Lsb+Attached
+Group = OutputCubeAttributes
+  Type      = UnsignedByte
+  Format    = Tile
+  Minimum   = 0.0
+  Maximum   = 0.0
+  ByteOrder = Lsb
+  LabelType = Attached
+End_Group
+End
+
+Propagate Pixel Type = 0
+PixelType            = UnsignedByte
+Propagate Min/Max    = 1
+Minimum              = 0
+Maximum              = 0
+FileFormatStr        = Tile
+FileFormat enum      = Tile
+ByteOrder            = ok
+Label attachment     = Attached
+
+
+
+
+Test of output attribute "Defaults" with Set
++UnsignedByte+0.0:0.0+Tile+Lsb+Detached
+Group = OutputCubeAttributes
+  Type      = UnsignedByte
+  Format    = Tile
+  Minimum   = 0.0
+  Maximum   = 0.0
+  ByteOrder = Lsb
+  LabelType = Detached
+End_Group
+End
+
+Propagate Pixel Type = 0
+PixelType            = UnsignedByte
+Propagate Min/Max    = 1
+Minimum              = 0
+Maximum              = 0
+FileFormatStr        = Tile
+FileFormat enum      = Tile
+ByteOrder            = ok
+Label attachment     = Detached
+
+
+
+
+Test of input attribute "+3"
++3
++3
+Group = InputAttributes
+  Bands = 3
+End_Group
+End
+
+
+Test of input attribute "+3,5-9,99"
++3,5,6,7,8,9,99
++3,5,6,7,8,9,99
+Group = InputAttributes
+  Bands = (3, 5, 6, 7, 8, 9, 99)
+End_Group
+End
+
+
+Test of input attribute "+7-10"
++7,8,9,10
++7,8,9,10
+Group = InputAttributes
+  Bands = (7, 8, 9, 10)
+End_Group
+End
+
+
+Testing put members (strings)
++Tile+Lsb+Attached
+

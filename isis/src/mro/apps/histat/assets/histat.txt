@@ -1,0 +1,90 @@
+Group = Image
+  Average           = 3647.6194437663
+  StandardDeviation = 4959.1813476707
+  Variance          = 24593479.639085
+  Minimum           = 626.0
+  Maximum           = 14296.0
+  TotalPixels       = 491520.0
+  ValidPixels       = 491520.0
+  NullPixels        = 0.0
+  LisPixels         = 0.0
+  LrsPixels         = 0.0
+  HisPixels         = 0.0
+  HrsPixels         = 0.0
+EndGroup
+
+Group = ImageDarkReference
+  Average           = 3758.5634114583
+  StandardDeviation = 5295.5828428429
+  Variance          = 28043197.645412
+  Minimum           = 680.0
+  Maximum           = 14294.0
+  TotalPixels       = 7680.0
+  ValidPixels       = 7680.0
+  NullPixels        = 0.0
+  LisPixels         = 0.0
+  LrsPixels         = 0.0
+  HisPixels         = 0.0
+  HrsPixels         = 0.0
+EndGroup
+
+Group = ImageBuffer
+  Average           = 692.12378472222
+  StandardDeviation = 44.264879248685
+  Variance          = 1959.3795349007
+  Minimum           = 546.0
+  Maximum           = 771.0
+  TotalPixels       = 5760.0
+  ValidPixels       = 5760.0
+  NullPixels        = 0.0
+  LisPixels         = 0.0
+  LrsPixels         = 0.0
+  HisPixels         = 0.0
+  HrsPixels         = 0.0
+EndGroup
+
+Group = CalibrationImage
+  Average           = 12972.213427734
+  StandardDeviation = 3042.8299293759
+  Variance          = 9258813.9791058
+  Minimum           = 1.0
+  Maximum           = 65280.0
+  TotalPixels       = 20480.0
+  ValidPixels       = 20480.0
+  NullPixels        = 0.0
+  LisPixels         = 0.0
+  LrsPixels         = 0.0
+  HisPixels         = 0.0
+  HrsPixels         = 0.0
+EndGroup
+
+Group = CalibrationImageDarkReference
+  Average           = 13543.959375
+  StandardDeviation = 764.18916906662
+  Variance          = 583985.08611873
+  Minimum           = 9236.0
+  Maximum           = 14528.0
+  TotalPixels       = 320.0
+  ValidPixels       = 320.0
+  NullPixels        = 0.0
+  LisPixels         = 0.0
+  LrsPixels         = 0.0
+  HisPixels         = 0.0
+  HrsPixels         = 0.0
+EndGroup
+
+Group = CalibrationImageBuffer
+  Average           = 12263.816666667
+  StandardDeviation = 3943.5486036918
+  Variance          = 15551575.589679
+  Minimum           = 0.0
+  Maximum           = 14524.0
+  TotalPixels       = 240.0
+  ValidPixels       = 240.0
+  NullPixels        = 0.0
+  LisPixels         = 0.0
+  LrsPixels         = 0.0
+  HisPixels         = 0.0
+  HrsPixels         = 0.0
+EndGroup
+End

@@ -1,0 +1,80 @@
+ControlPoint unitTest
+test PointTypeToString(): Ground
+Object = ControlPoint
+  PointType = Ground
+  PointId   = C151
+  Latitude  = 10.0
+  Longitude = 15.0
+  Radius    = 20.0
+  Held      = True
+  Ignore    = True
+
+  Group = ControlMeasure
+    SerialNumber = Test1
+    MeasureType  = Unmeasured
+    Sample       = Null
+    Line         = Null
+    Diameter     = 15.0
+    Reference    = False
+  End_Group
+End_Object
+End
+Object = ControlPoint
+  PointType = Ground
+  PointId   = C151
+  Latitude  = 10.0
+  Longitude = 15.0
+  Radius    = 20.0
+  Held      = True
+  Ignore    = True
+
+  Group = ControlMeasure
+    SerialNumber = Test1
+    MeasureType  = Unmeasured
+    Sample       = Null
+    Line         = Null
+    Diameter     = 15.0
+    Reference    = False
+  End_Group
+
+  Group = ControlMeasure
+    SerialNumber   = Test2
+    MeasureType    = Manual
+    Sample         = 100.0
+    Line           = 200.0
+    ErrorLine      = 2.0
+    ErrorSample    = -2.0
+    ErrorMagnitude = 2.8284271247462
+    Diameter       = 15.0
+    Reference      = True
+  End_Group
+End_Object
+End
+ReferenceIndex = 1
+Object = ControlPoint
+  PointType = Ground
+  PointId   = C151
+  Latitude  = 10.0
+  Longitude = 15.0
+  Radius    = 20.0
+  Held      = True
+  Ignore    = True
+
+  Group = ControlMeasure
+    SerialNumber   = Test2
+    MeasureType    = Manual
+    Sample         = 100.0
+    Line           = 200.0
+    ErrorLine      = 2.0
+    ErrorSample    = -2.0
+    ErrorMagnitude = 2.8284271247462
+    Diameter       = 15.0
+    Reference      = True
+  End_Group
+End_Object
+End
+ReferenceIndex = 0
+
+Test adding control measures with identical serial numbers ...
+**PROGRAMMER ERROR** The SerialNumber is not unique. A measure with serial number [Test2] already exists for ControlPoint [C151].
+

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="fits2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  
+  <brief>
+    Import fits files into Isis format
+  </brief>
+  <description>
+    This program will import fits (Flexible Image Transport System) files into 
+    Isis format. Only simple fits files are accepted. Extensions are not 
+    support and files with no initial data, NAXIS = 0 , implying extensions with 
+    data, are not supported either. Some common header data is transfered to 
+    Isis labels. Primary image data is transfered completely and reliably.
+  </description>
+  
+  <history>
+    <change name="Mackenzie Boyd" date="2009-10-27">
+      Original version
+    </change> 
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>isis2fits</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A fits file to be converted to an isis cube
+        </brief>
+        <description>
+          Use this parameter to select the filename of a fits file to be 
+          converted to a cube. Currently extensions and files with no initial
+          data, NAXIS = 0, are not supported.
+        </description>
+        <filter>
+          *.fits
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file converted to cube format
+        </brief>
+        <description>
+          The cube output file, containing image data and applicable headers.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Usage of this import application
+      </brief>
+      <description>
+        This example shows how to import a fits file to the isis cube format.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=fitsFile.fits to=imported.cub
+        </commandLine>
+        <description>
+          The command line arguments to import a file to cube format.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="506" height="343" src="assets/images/gui.jpg">
+            <brief>
+              The application's gui  
+            </brief>
+            <description>
+              The gui for the application, with parameters set to import a fits 
+              file to a cube.
+            </description>
+            <thumbnail width="200" height="136" caption="" src="assets/thumbs/gui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

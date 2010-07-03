@@ -1,0 +1,4 @@
+Group = LommelSeeliger
+  Library = LommelSeeliger
+  Routine = LommelSeeligerPlugin
+End_Group

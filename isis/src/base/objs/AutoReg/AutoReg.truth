@@ -1,0 +1,330 @@
+Unit test for Isis::AutoReg ...
+
+---------------------------------
+Test for missing Algorithm Group
+---------------------------------
+**PVL ERROR** Unable to find group [Algorithm]
+
+------------------------------
+Test for missing Name Keyword
+------------------------------
+**PVL ERROR** Keyword [Name] does not exist in []
+
+------------------------------
+Test for invalid Name Keyword
+------------------------------
+**PVL ERROR** Unable to find group [MaxCor] in file []
+
+-----------------------------------
+Test for missing Tolerance Keyword
+-----------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**PVL ERROR** Keyword [Tolerance] does not exist in []
+
+-----------------------------------
+Test for missing PatternChip Group
+-----------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**PVL ERROR** Unable to find group [PatternChip]
+
+-----------------------------------
+Test for wrong ChipInterpolator Keyword value
+-----------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**USER ERROR** Invalid Interpolator type.  Cannot use [None] to load chip
+
+-------------------------------
+Test for missing Lines Keyword
+-------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**PVL ERROR** Keyword [Lines] does not exist in []
+
+---------------------------------
+Test for missing Samples Keyword
+---------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**PVL ERROR** Keyword [Samples] does not exist in []
+
+---------------------------------
+Test for invalid Lines Keyword
+---------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**USER ERROR** Unable to set chip size to [90, -90].  Samples and lines must be greater than zero.
+
+---------------------------------
+Test for invalid Samples Keyword
+---------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**USER ERROR** Unable to set chip size to [-90, 90].  Samples and lines must be greater than zero.
+
+----------------------------------
+Test for missing SearchChip group
+----------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**PVL ERROR** Unable to find group [SearchChip]
+
+-------------------------------
+Test for missing Lines Keyword
+-------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**PVL ERROR** Keyword [Lines] does not exist in []
+
+---------------------------------
+Test for missing Samples Keyword
+---------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**PVL ERROR** Keyword [Samples] does not exist in []
+
+
+-------------------------------------------
+Testing Error = PatternNotEnoughValidData
+-------------------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 1
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+------------------------------------
+Testing Error = PatternZScoreNotMet
+------------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 1
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+------------------------------
+Testing Error = FitChipNoData
+------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 1
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+----------------------------------------
+Testing Error = FitChipToleranceNotMet
+----------------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 1
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+-----------------------------------------------
+Testing Error = SurfaceModelNotEnoughValidData
+-----------------------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 1
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+----------------------------------------------------
+Testing Error = SurfaceModelEccentricityRatioNotMet
+----------------------------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 1
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+----------------------------------------------------
+Testing Error = SurfaceModelResidualToleranceNotMet
+----------------------------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 1
+End_Group
+End
+
+---------------------------------------------
+Testing Error = SurfaceModelDistanceInvalid
+---------------------------------------------
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 0
+  Failure    = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 1
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+----------------
+Testing Success
+----------------
+Position = 71.0284 51.0874
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 1
+  Failure    = 0
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End

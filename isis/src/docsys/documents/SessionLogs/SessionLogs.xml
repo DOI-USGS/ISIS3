@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+
+<h2><a name="Introduction">Introduction</a></h2>
+<p>
+Session logs are a mechanism for users to keep track of work they have done.  It is a record of the execution of an Isis program or sequence of Isis programs.  Information written to the log includes:
+</p>
+
+  <ul>
+	<li>Isis version number</li>
+	<li>Program version date</li>
+	<li>Date and time the program was run</li>
+	<li>Computer name on which the program was run</li>
+	<li>User who ran the program</li>
+	<li>Brief description of the program</li>
+	<li>Input parameters</li>
+	<li>Program results</li>
+	<li>Error messages</li>
+	<li>Accounting information</li>
+  </ul>
+
+<p>
+Control of session logs can be handled via user preferences.  For specific information on these preferences see the 
+<a href="../PreferenceDictionary/PreferenceDictionary.html">Isis Preference Dictionary</a>.
+
+<pre style="padding-left:4em;">Group = SessionLog
+  TerminalOutput = On | Off
+  FileOutput = On | Off
+  FileName = print.prt
+  FileAccess = Append | Overwrite
+EndGroup
+</pre>
+</p>
+
+<h2><a name="Format">Format</a></h2>
+<p>
+The output format for session logs is the Parameter Value Language.  An example log file for a program would be as follows:
+
+<pre style="padding-left:4em;">
+Object = Highpass
+  IsisVersion        = 3.0
+  ProgramVersionDate = 2003-05-16
+  ExecutionDateTime  = 2003-06-25T12:18:45
+  ComputerName       = char
+  UserName           = janderso
+  ProgramDescription = "Apply a high pass filter to a cube"
+
+  Group = UserParameters
+    From      = input.cub
+    To        = output.cub
+    Samples   = 5
+    Lines     = 5
+    Low       = "Use all pixels" 
+    High      = "Use all pixels"
+    Minimum   = 0
+    Propagate = True
+  EndGroup
+
+  Group = Results
+    PixelsChanged  = 1024000
+    PercentChanged = 100.0
+  EndGroup
+
+  Group = Accounting
+    ConnectTime  = 0:00:05.2
+    CpuTime      = 0:00:04.1
+    DirectIO     = 0
+    PageFaults   = 2673
+    ProcessSwaps = 0
+  EndGroup
+EndObject
+</pre>
+</p>
+
+<p>
+If an error occurred during the processing the file may look like,
+
+<pre style="padding-left:4em;">
+Object = Highpass
+  IsisVersion        = 3.0
+  ProgramVersionDate = 2003-05-16
+  ExecutionDateTime  = 2003-06-25T12:18:45
+  ComputerName       = char
+  UserName           = janderso
+  ProgramDescription = "Apply a high pass filter to a cube"
+
+  Group = UserParameters
+    From      = moon.cub
+    To        = output.cub
+    Samples   = 5
+    Lines     = 5
+    Low       = "Use all pixels" 
+    High      = "Use all pixels"
+    Minimum   = 0
+    Propagate = True
+  EndGroup
+
+  Group = Error
+    Program = Highpass
+    Class   = "I/O ERROR"
+    Code    = -3
+    Message = "Unable to open cube [moon.cub]"
+    Source  = IsisCube.cpp
+    Line    = 203
+  EndGroup
+EndObject
+</pre>
+</p>
+
+<h2><a name="ControllingTerminalOutput">Controlling Terminal Output</a></h2>
+<p>
+One method of session logging is writing the information to STDOUT , that is, the terminal.  This can be turned on or off with user preferences:
+
+<pre style="padding-left:4em;">
+Group = SessionLog
+  TerminalOutput = On | Off
+EndGroup
+</pre>
+</p>
+
+<p>
+The user can utilize standard Unix constructs to redirect the output if desired. For example,
+
+<pre style="padding-left:4em;">
+stats from=moon.cub &gt; stats.log
+</pre>
+
+</p>
+
+
+<h2><a name="ControllingFileOutput">Controlling File Output</a></h2>
+<p>
+Another method of session logging is writing information to a file.  Again control of this mechanism is through the user preferences:
+
+<pre style="padding-left:4em;">
+Group = SessionLog
+  FileOutput = On | Off
+  FileName = print.prt
+  FileAccess = Append | Overwrite
+EndGroup
+</pre>
+</p>
+
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>SessionLogs.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>guide</categoryItem>
+  </category>
+  <audience>
+    <target>intermediate</target>
+  </audience>
+  <bibliography>
+    <title>Session Logs</title>
+    <brief>Guide to understanding, controlling, and reading Session Logs</brief>
+    <description>Guide to understanding, controlling, and reading Session Logs, a mechanism for users to keep track of work that they have done</description>
+    <author>Jeff Anderson</author>
+    <date>2003-06-25</date>
+  </bibliography>
+</documentation>

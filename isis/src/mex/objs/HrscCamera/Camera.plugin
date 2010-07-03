@@ -1,0 +1,6 @@
+Group = MarsExpress/HRSC
+  Version = 1
+  Library = HrscCamera
+  Routine = HrscCameraPlugin
+EndGroup
+ 

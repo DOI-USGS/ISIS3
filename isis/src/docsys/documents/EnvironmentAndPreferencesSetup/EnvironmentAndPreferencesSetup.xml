@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+
+        <h2><a name="Introduction">Introduction</a></h2>
+        <p>
+        This document describes how to setup your Unix environment in order to run Isis.
+        It also discusses the Isis Preference files, which gives the user the ability to
+        customize the operation of Isis.
+        </p>
+
+        <h2><a name="UnixSetup">Unix Setup</a></h2>
+
+        <p>
+          Assuming Isis 3 has been successful installed on your computer (see
+          <a href="../InstallGuide/index.html">Isis Download and Installation Guide</a>),
+          you will need to add a few commands to your startup file.  For the
+          C-shell, add the following commands to the $HOME/.login file or the equivalent system-wide
+          startup file:
+
+        <pre style="padding-left:4em;">
+setenv ISISROOT directory
+setenv PATH ${PATH}:${ISISROOT}/bin
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${ISISROOT}/lib
+        </pre>
+
+          where directory is the location of the Isis tree.
+        </p>
+
+        <p>
+          If you are using the Bourne shell or a derivative (e.g., bash), add the following commands
+          to your .profile file or the equivalent system-wide startup file:
+
+          <pre style="padding-left:4em;">
+set ISISROOT directory
+PATH=${PATH}:${ISISROOT}/bin
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ISISROOT}/lib
+          </pre>
+        </p>
+
+        <p>
+          Before you add these commands to your startup script you may want to check with your local system
+          administrator to see if they have already done this step.  You can use the following command to see
+          if Isis is already setup:
+
+        <pre style="padding-left:4em;">
+echo $ISISROOT
+        </pre>
+        </p>
+
+        <p>
+          It will output either the directory of the Isis system or
+          <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">
+          "ISISROOT: Undefined variable"</code>, which implies the Isis is not setup and/or not installed.
+        </p>
+
+
+        <h2><a name="SystemPreferenceFile">System Preference File</a></h2>
+        <p>
+        Your local Isis administrator manages a system-wide preference file.  The file $ISISROOT/IsisPreferences,
+        is in Parameter Value Language (PVL) format, and contains specifications for how Isis should operate.
+        For example,
+        </p>
+
+        <pre style="padding-left:4em;">
+Group = UserInterface
+  ProgressBarPercent = 10
+EndGroup
+        </pre>
+
+        <p>
+        Implies the application progress bar (GUI thermometer) for all users will change by
+        10% for every Isis user by default.  To find out specifics about various user preferences
+        see the <a href="../PreferenceDictionary/PreferenceDictionary.html">Isis Preference Dictionary</a>.
+        </p>
+
+        <h2><a name="UserPreferenceFile">User Preference File</a></h2>
+
+        <p>
+          The user can override elements of the system wide preference file by creating a personal preference
+          file.  The file must reside in the hidden directory $HOME/.Isis and must be named IsisPreferences.
+        </p>
+
+        <p>
+          An example usage is,
+        </p>
+
+        <pre style="padding-left:4em;">
+Group = UserInterface
+  ProgressBarPercent = 1
+EndGroup
+        </pre>
+
+
+        <h2><a name="ProjectPreferenceFile">Project Preference File</a></h2>
+
+        <i>
+        <p>
+          <font color="RED">[Future Option]</font>  Finally the highest priority preference file is a project file.  It is specified on the command line when
+          executing Isis applications.  For example,
+        </p>
+
+<pre style="padding-left:4em;">
+highpass -pref=/bigProject/Preferences
+</pre>
+
+        <p>
+          This allows for large batch/scripted projects to ensure all users involved in the project
+          have the same preferences.
+        </p>
+        </i>
+
+        <div class="highlightSection">
+        <h2><a name="TipsForProgrammers">Tips For Programmers</a></h2>
+        <p>
+          Every Isis application program should instantiate an IsisProcess object or one of its
+          derivatives; if you don’t your doing a lot of unnecessary work!  The instantiation allows
+          for access, in the rare case that an application needs it, to a user preference.  For example,
+
+
+<pre style="padding-left:4em;">
+IsisProcessByLine p;
+
+IsisPreference *pref = p.GetPreferences();
+pref->UseGroup(“DataAreas”);
+string directory = pref->GetString("Voyager");
+</pre>
+        </p>
+
+        <p>
+          See the <a href="../../Object/index.html">Isis Developers Reference</a>.
+        </p>
+        </div>
+
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>EnvironmentAndPreferencesSetup.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>administration</categoryItem>
+    <categoryItem>guide</categoryItem>
+  </category>
+  <audience>
+    <target>intermediate</target>
+    <target>administrator</target>
+  </audience>
+  <bibliography>
+    <title>Environment &amp; Preference Setup</title>
+    <brief>Setting up the Unix environment and customizing Isis preferences</brief>
+    <description>Setting up the Unix environment to run Isis and customizing the operation of Isis</description>
+    <author>Jeff Anderson</author>
+    <date>2003-06-25</date>
+  </bibliography>
+</documentation>

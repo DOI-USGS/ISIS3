@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="moc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import PDS formatted MOC image cube into Isis format cube
+  </brief>
+
+  <description>
+    This program will import a PDS formatted MOC image into an Isis cube. The input file can be
+    in MOC compressed format (extension = ".imq" normally) or uncompressed (extension = "img").
+    The program does not use the extension to determine if the file is compressed or not. It uses
+    the label keyword "ENCODING_TYPE".
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="1997-05-01">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-05-15">
+      Wrote for Isis 3.
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astrogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-06-04">
+      Fixed Makefile
+    </change>
+    <change name="Stuart Sides" date="2003-10-10">
+      Converted to use new IsisImport instead of IsisPdsImport
+    </change>
+    <change name="Stuart Sides" date="2003-10-16">
+      Modified pds2isis to become moc2isis
+    </change>
+    <change name="Stuart Sides" date="2003-10-28">
+      Changed OriginalSpacecraftClockCount to SpacecraftClockCount
+      Translated MARS_GLOBAL_SURVEYOR to "MARS GLOBAL SURVEYOR"
+    </change>
+    <change name="Stuart Sides" date="2003-12-09">
+      Fixed label band_bin group for the broad band.
+    </change>
+    <change name="Stuart Sides" date="2004-01-14">
+      Modified to have the "kernels" group added to the labels. The
+      only keyword (for now) is "NaifFrameCode".
+    </change>
+    <change name="Stuart Sides" date="2004-02-17">
+        Updated to use the new IsisImportPds class instead of the 
+        IsisImport class.
+    </change>
+    <change name="Stuart Sides" date="2004-02-17">
+        Added new "Alpha" keywords to the instrument group.
+    </change>
+    <change name="Jeff Anderson" date="2004-04-21">
+       Will attempt decompression using the ENCODING_TYPE keyword
+       instead of the DATA_SET_ID 
+    </change>
+    <change name="Jeff Anderson" date="2004-06-02">
+       Fixed bug due to PVL refactor 
+    </change>
+    <change name="Brendan George" date="2006-11-14">
+        Modified to comply with changes to PvlTranslationManager and 
+        PvlTranslationTable
+    </change>
+    <change name="Kris Becker" date="2007-09-25">
+        Changed the way the temporary filename is created when
+        the file needs to be uncompressed.  It now uses the input
+        base filename as the root of the file path.
+    </change>
+    <change name="Kris Becker" date="2007-10-10">
+        Ensure the label of the uncompressed image is used in the
+        translation of PDS keywords, not the compressed image.
+    </change>
+    <change name="Christopher Austin" date="2008-03-18">
+      Checks if input file is rdr.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Global Surveyor</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted MOC EDR image file
+        </brief>
+        <description>
+          Use this parameter to select the MOC image filename. The file can be
+          in either MOC compressed format or uncompressed format. The extension
+          is not used to determine the compression status.
+        </description>
+        <filter>
+          *.imq *.img
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>

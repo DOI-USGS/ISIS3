@@ -1,0 +1,67 @@
+Unit test for Pixel
+Testing 0.0 ... 
+IsSpecial:     0
+IsValid:  1
+IsNull:   0
+IsLow:    0
+IsHigh:   0
+IsHrs:    0
+IsHis:    0
+IsLrs:    0
+IsLis:    0
+
+Testing Isis::Null ... 
+IsSpecial:     1
+IsValid:  0
+IsNull:   1
+IsLow:    0
+IsHigh:   0
+IsHrs:    0
+IsHis:    0
+IsLrs:    0
+IsLis:    0
+
+Testing Isis::Lis ... 
+IsSpecial:     1
+IsValid:  0
+IsNull:   0
+IsLow:    1
+IsHigh:   0
+IsHrs:    0
+IsHis:    0
+IsLrs:    0
+IsLis:    1
+
+Testing Isis::Lrs ... 
+IsSpecial:     1
+IsValid:  0
+IsNull:   0
+IsLow:    1
+IsHigh:   0
+IsHrs:    0
+IsHis:    0
+IsLrs:    1
+IsLis:    0
+
+Testing Isis::His ... 
+IsSpecial:     1
+IsValid:  0
+IsNull:   0
+IsLow:    0
+IsHigh:   1
+IsHrs:    0
+IsHis:    1
+IsLrs:    0
+IsLis:    0
+
+Testing Hrs ... 
+IsSpecial:     1
+IsValid:  0
+IsNull:   0
+IsLow:    0
+IsHigh:   1
+IsHrs:    1
+IsHis:    0
+IsLrs:    0
+IsLis:    0
+

@@ -1,0 +1,18 @@
+Object = Root
+  Object = hist
+    IsisVersion       = "3.0.16 beta | 2006-03-22"
+    ProgramVersion    = 2005-03-28
+    ExecutionDateTime = 2006-03-29T14:39:39
+    HostName          = orkin
+    UserName          = janderso
+    Description       = "Unit test for History class"
+
+    Group = UserParameters
+      FROM = unitTest.cub
+      TO   = /tmp/isisprocess_01.cub
+      TO2  = /tmp/isisprocess_02.cub
+      TO3  = /tmp/isisprocess_03.cub
+      TO4  = /tmp/isisprocess_04.cub
+    End_Group
+  End_Object
+End_Object

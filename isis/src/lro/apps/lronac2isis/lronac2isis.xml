@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lronac2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+    <brief>
+      Import an LROC NAC image as an Isis cube
+    </brief>
+
+    <description>
+        This program takes an image from the Lunar Reconnaissance Orbiter Narrow Angle Camera
+        and produces an Isis cube containing the image data.
+    </description>
+
+    <history>
+        <change name="Jacob Danton" date="2008-12-15">
+            Original Version
+        </change>
+    </history>
+
+    <category>
+      <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+    </category>
+
+    <groups>
+        <group name="Files">
+            <parameter name="FROM">
+                <type>filename</type>
+                <fileMode>input</fileMode>
+                <brief>
+                    Input file
+                </brief>
+                <description>
+                    The image to be processed
+                </description>
+                <filter>
+                    *.img
+                </filter>
+            </parameter>
+
+            <parameter name="TO">
+                <type>cube</type>
+                <fileMode>output</fileMode>
+                <brief>
+                    Output cube
+                </brief>
+                <description>
+                    This is the resultant cube, containing the image and label data.
+                </description>
+                <filter>
+                    *.cub
+                </filter>
+            </parameter>
+        </group>
+    </groups>
+</application>

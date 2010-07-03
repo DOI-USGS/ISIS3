@@ -1,0 +1,4 @@
+Group = Lambert
+  Library = Lambert
+  Routine = LambertPlugin
+End_Group

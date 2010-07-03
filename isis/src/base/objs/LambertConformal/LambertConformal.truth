@@ -1,0 +1,112 @@
+UNIT TEST FOR LambertConformal
+
+Test missing center longitude keyword ...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+
+Test missing center latitude keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+
+Test missing first standard parallel keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [FirstStandardParallel] does not exist in [Group = Mapping]
+
+Test missing second standard parallel keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [SecondStandardParallel] does not exist in [Group = Mapping]
+
+Test SetGround method ... 
+Setting ground to (35,-75)
+Latitude:               35
+Longitude:              -75
+XCoord:                 0.29667846
+YCoord:                 0.246211229
+
+Test SetCoordinate method ... 
+Setting coordinate to (0.29667846, 0.246211229)
+Latitude:               35
+Longitude:              -75
+XCoord:                 0.29667846
+YCoord:                 0.246211229
+
+Test XYRange method ... 
+Minimum X:  -1.24648325
+Maximum X:  1.56158542
+Minimum Y:  -0.0544425349
+Maximum Y:  3.06020748
+
+Test Name and comparision method ... 
+Name:       LambertConformal
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius       = 1.0
+  PolarRadius            = 1.0
+  LatitudeType           = Planetographic
+  LongitudeDirection     = PositiveEast
+  LongitudeDomain        = 180
+  MinimumLatitude        = 20.0
+  MaximumLatitude        = 80.0
+  MinimumLongitude       = -180.0
+  MaximumLongitude       = 180.0
+  ProjectionName         = LambertConformal
+  FirstStandardParallel  = 33
+  SecondStandardParallel = 45
+  CenterLongitude        = 0.0
+  CenterLatitude         = 50.0
+End_Group
+End
+
+Test TrueScaleLatitude method... 
+TrueScaleLatitude = 33
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName         = LambertConformal
+  EquatorialRadius       = 1.0
+  PolarRadius            = 1.0
+  LatitudeType           = Planetographic
+  LongitudeDirection     = PositiveEast
+  LongitudeDomain        = 180
+  MinimumLatitude        = 20.0
+  MaximumLatitude        = 80.0
+  MinimumLongitude       = -180.0
+  MaximumLongitude       = 180.0
+  CenterLatitude         = 23.0
+  CenterLongitude        = -96.0
+  FirstStandardParallel  = 33
+  SecondStandardParallel = 45
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude        = 20.0
+  MaximumLatitude        = 80.0
+  CenterLatitude         = 23.0
+  FirstStandardParallel  = 33
+  SecondStandardParallel = 45
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = -96.0
+End_Group
+End
+
+Test invalid combinations of mapping parameters ...
+**I/O ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** Center Latitude [-90.0] is not valid, it projects to infinity for standard parallels [33.0,45.0]
+
+**I/O ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** Center Latitude [90.0] is not valid, it projects to infinity for standard parallels [45.0,-60.0]
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 295-297

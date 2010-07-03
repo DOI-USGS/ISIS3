@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="bandtrim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Propagates a NULL in any band to all other bands
+  </brief>
+
+  <description>
+    This program searches for NULL pixels in all bands of a cube. 
+    When a NULL pixel is found the corresponding pixel is set to NULL in all
+    other bands.
+  </description>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>trim</item>
+      <item>mask</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="2007-05-23">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2007-05-23">
+      Finished the program
+    </change>
+    <change name="Steven Lambright" date="2007-08-07">
+      Fixed documentation and added test
+    </change>
+     <change name="Steven Lambright" date="2008-05-12">
+          Removed references to CubeInfo 
+     </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be trimmed
+        </brief>
+        <description>
+          The cube containing the input data to be trimmed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the trimmed data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+</application>

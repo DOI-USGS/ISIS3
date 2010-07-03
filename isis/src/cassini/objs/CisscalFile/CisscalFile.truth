@@ -1,0 +1,10 @@
+
+Unit test for CisscalFile
+--------------------------------------------
+1) Read valid data from /tmp/CisscalFile.tmp
+data line 1
+data line 2
+data line 3: last line of data, next line (last in file) is empty
+
+--------------------------------------------
+2) Remove temp file -> /tmp/CisscalFile.tmp <-

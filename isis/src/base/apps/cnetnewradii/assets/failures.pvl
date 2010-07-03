@@ -1,0 +1,10 @@
+Group = Summary
+  Successes = 7
+  Failures  = 3
+End_Group
+
+# A point fails if we are unable to set universal ground or if the radius calculated is a special pixel value.
+Group = Failures
+  PointIDs = "LOLA_FEB3, LOLA_FEB4, LOLA_FEB8"
+End_Group
+End

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <type>PNG</type>
+      <source>
+        <filename>diagram.png</filename>
+      </source>
+      <size>30 KB</size>
+    </file>
+  </files>
+  <category>
+    <categoryItem>guide</categoryItem>
+  </category>
+  <audience>
+    <target>programmer</target>
+    <target>developer</target>
+  </audience>
+  <bibliography>
+    <title>Example of an external Document</title>
+    <brief>Example of a Document that is a stand-alone external file</brief>
+    <description>Example of a Document that is a stand-alone external file. In this case, the file is an image
+                        (actually, the Isis Documentation XML Language Diagram),
+                        but could be a PDF file, a spreadsheet, or just about anything.
+    </description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2003-01-30</date>
+  </bibliography>
+</documentation>

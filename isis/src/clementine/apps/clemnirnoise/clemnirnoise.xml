@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="clemnirnoise" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    identifiy and remove NIR noise pattern
+  </brief>
+ 
+
+
+  <description>
+   <div style="background: gold; border: 2px solid red ; padding: 10px ;">
+      <p>
+      <strong style="color: #f00 ;">
+        WARNING 
+      </strong> 
+      </p>
+      <p>
+                For the clementine mosaic in Isis2, this program was run before calibration.  There is concern this 
+                application's systematic noise removal eliminates a substantial amount of valid data.
+   </p>
+   </div>
+    <p>
+    The program removes a bothersome noise pattern periodically
+    found in Clementine NIR camera imaging. The noise pattern
+    is found in samples 2,6,10,14,18.... found on some or all lines
+    in a NIR image. The program will recognize that the
+    noise pattern exists and then will simply set these sample
+    positions to "null" if the pattern is found.
+    </p>
+  </description>
+  
+
+
+  <category>
+    <missionItem>Clementine</missionItem>
+  </category>
+
+  <history>
+    <change name="Eric Eliason" date="1999-06-15">
+      Original Version: clemnirns.F
+    </change>
+    <change name="Steven Koechle" date="2007-06-07">
+      Converted to Isis 3
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+  
+
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Input cube file name
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          Output cube file name
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief>
+      Using clemnirnoise
+      </brief>
+      <description>
+        The use of clemnirnoise detects certain patterns of noise and replaces the noise with nulls.
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= lne4885r.cub
+	  to=lne4885r.noise.cub
+        </commandLine>
+        <description>
+	This example shows the use of clemnirnoise to detect and remove systematic noise.
+        </description>
+      </terminalInterface>
+   
+
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="448" height="550" src="assets/images/clemnirnoiseGUI.jpg">
+            <brief>
+	    Example GUI
+            </brief>
+            <description>
+	      Screenshot of the GUI with parameters set to leave temporary images
+            </description>
+            <thumbnail width="163" height="200" caption="clemnirnoise gui"
+             src="assets/thumbs/clemnirnoiseGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+ 
+
+
+      <inputImages>
+        <image width="494" height="493" src="assets/images/lne4885r.jpg">
+          <brief>
+	    Input image before the filter.
+          </brief>
+          <description>
+	    This is the image after ingestion from clem2isis
+          </description>
+          <thumbnail caption= "lne4885r.cub before run through clemnirclean"
+           src="assets/thumbs/lne4885r.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      
+
+
+      <outputImages>
+        <image width="494" height="490" src="assets/images/lne4885r.noise.jpg">
+          <brief>
+	  Final output image after the all boxcar filters were applied
+          </brief>
+          <description>
+	    Looks for noise in specific patterns on lines and removes it if detected.
+          </description>
+          <thumbnail caption= "The image after the systematic noise removal"
+          src="assets/thumbs/lne4885r.noise.jpg" width="200" height="198"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

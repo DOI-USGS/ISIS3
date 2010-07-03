@@ -1,0 +1,292 @@
+Object = ControlNetwork
+  NetworkId    = TestNetwork1
+  NetworkType  = ImageToGround
+  TargetName   = MOON
+  UserName     = jwalldren
+  Created      = 2010-05-27T08:56:47
+  LastModified = 2010-05-27T08:56:47
+  Description  = AS15_Rev4_AutoSeed
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = AS15R4_0003
+    Latitude  = -26.725494037818
+    Longitude = 178.2671495273
+    Radius    = 1734723.8455167
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType    = Estimated
+      Sample         = 16641.066683342
+      Line           = 18441.299208028
+      ErrorLine      = 31.371961396097
+      ErrorSample    = -16.188068399169
+      ErrorMagnitude = 35.302316076065
+      DateTime       = 2010-03-26T10:22:13
+      ChooserName    = tbecker
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:41.097
+      MeasureType    = Automatic
+      Sample         = 21165.339298552
+      Line           = 18388.043343993
+      ErrorLine      = -31.468088376383
+      ErrorSample    = 16.087134599038
+      ErrorMagnitude = 35.341710282206
+      ZScore         = (-1.8265233914471, 1.7170948216629)
+      DateTime       = 2010-03-26T11:41:48
+      ChooserName    = tbecker
+      GoodnessOfFit  = 0.95831193693118
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = AS15R4_0005
+    Latitude  = -25.016910097201
+    Longitude = 178.21447560641
+    Radius    = 1734024.7049447
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType    = Estimated
+      Sample         = 15537.131784551
+      Line           = 11119.450685981
+      ErrorLine      = 23.000341737652
+      ErrorSample    = -18.957401500413
+      ErrorMagnitude = 29.806019386973
+      DateTime       = 2010-03-26T11:42:21
+      ChooserName    = tbecker
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:41.097
+      MeasureType    = Estimated
+      Sample         = 20081.654717586
+      Line           = 11092.839678099
+      ErrorLine      = -22.947521239779
+      ErrorSample    = 18.63295081292
+      ErrorMagnitude = 29.559695313836
+      ZScore         = (-3.8453926445342, 2.9646044014384)
+      DateTime       = 2010-03-26T11:42:33
+      ChooserName    = tbecker
+      GoodnessOfFit  = 0.46819498859581
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB1
+    Latitude  = -22.405161656842
+    Longitude = 175.13615189262
+    Radius    = 1735886.5
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType    = Estimated
+      Sample         = 1748.4133699751
+      Line           = 1275.0785012628
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:22:20
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB2
+    Latitude  = -26.739277441672
+    Longitude = 175.25974417689
+    Radius    = 1733416.0
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType    = Estimated
+      Sample         = 4866.542991192
+      Line           = 19934.177686413
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:24:19
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB3
+    Latitude  = -26.71892681544
+    Longitude = 178.70609470425
+    Radius    = 1734120.0
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType    = Estimated
+      Sample         = 18375.381858411
+      Line           = 18227.026515154
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:26:34
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB4
+    Latitude  = -25.24563284454
+    Longitude = 178.6731813868
+    Radius    = 1735973.0
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType    = Estimated
+      Sample         = 17618.053743943
+      Line           = 11634.768048021
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:27:57
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB5
+    Latitude  = -22.517216023506
+    Longitude = 167.84166695506
+    Radius    = 1736570.0
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:20:44.876
+      MeasureType    = Estimated
+      Sample         = 18350.011205256
+      Line           = 6574.6967095522
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:11:32
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB6
+    Latitude  = -24.371395530564
+    Longitude = 164.89045242137
+    Radius    = 1737721.5
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:20:44.876
+      MeasureType    = Estimated
+      Sample         = 7538.376041843
+      Line           = 17849.107247623
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:12:37
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB7
+    Latitude  = -22.141261108836
+    Longitude = 164.86824950122
+    Radius    = 1737969.0
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:20:44.876
+      MeasureType    = Estimated
+      Sample         = 5246.5491442556
+      Line           = 7445.4873882713
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:13:59
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB8
+    Latitude  = -15.815860550749
+    Longitude = 143.85339030177
+    Radius    = 1742237.0
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:27:53.464
+      MeasureType    = Estimated
+      Sample         = 9677.951478109
+      Line           = 3420.4384955915
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:41:43
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB9
+    Latitude  = -18.656246410701
+    Longitude = 142.57663890403
+    Radius    = 1742204.0
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:27:53.464
+      MeasureType    = Estimated
+      Sample         = 8663.5116124686
+      Line           = 21584.797333383
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:43:28
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = LOLA_FEB10
+    Latitude  = -18.518634429218
+    Longitude = 144.51633135074
+    Radius    = 1742642.5
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:27:53.464
+      MeasureType    = Estimated
+      Sample         = 18870.679628564
+      Line           = 17207.772627622
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-04-01T16:44:31
+      ChooserName    = tbecker
+      Reference      = False
+    End_Group
+  End_Object
+End_Object
+End

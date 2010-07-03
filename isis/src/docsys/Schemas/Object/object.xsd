@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by Stuart C Sides (USGS) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:annotation>
+    <xs:documentation>ISIS Object Schema</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>XML Schema for ISIS object documentation</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>Designed by Stuart Sides, ssides@usgs.gov, and Deborah Lee Soltesz, dsoltesz@usgs.gov, 3/14/2002, USGS Astrogeology Research Program, Flagstaff, AZ</xs:documentation>
+  </xs:annotation>
+  <xs:element name="class">
+    <xs:annotation>
+      <xs:documentation>root element for XML describing an ISIS object</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="brief" minOccurs="0"/>
+        <xs:element ref="description"/>
+        <xs:element ref="history"/>
+        <xs:element ref="category"/>
+        <xs:element ref="audience" minOccurs="0"/>
+        <xs:element ref="seeAlso" minOccurs="0"/>
+        <xs:element ref="inherits" minOccurs="0"/>
+        <xs:element ref="includes" minOccurs="0"/>
+        <xs:element ref="liens" minOccurs="0"/>
+        <xs:element ref="private" minOccurs="0"/>
+        <xs:element ref="protected" minOccurs="0"/>
+        <xs:element ref="public"/>
+        <xs:element ref="global" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="brief">
+    <xs:annotation>
+      <xs:documentation>short description</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="description">
+    <xs:annotation>
+      <xs:documentation>multiparagraph description</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:any namespace="##any" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="includes">
+    <xs:annotation>
+      <xs:documentation>list of files to include to use this object. Each 'item' contains a single included filename.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element ref="item"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="inherits">
+    <xs:annotation>
+      <xs:documentation>list of parent classes this object inherits from</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="internalClass"/>
+        <xs:element ref="externalClass"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="history">
+    <xs:annotation>
+      <xs:documentation>programming history beginning with creation</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="change" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>A single 'change' in the history of this class. Attribute 'name' is the author's full name; attribute 'date' is the change date in YYYY-MM-DD format. The element contains a free text dexcription of the changes made.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType mixed="true">
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="date" type="xs:date" use="required"/>
+            <xs:attribute name="hidden" use="optional" default="false">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="yes"/>
+                  <xs:enumeration value="no"/>
+                  <xs:enumeration value="true"/>
+                  <xs:enumeration value="false"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="liens">
+    <xs:annotation>
+      <xs:documentation>things-to-do list. Each 'item' contains a single lien in the list.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="item" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="seeAlso">
+    <xs:annotation>
+      <xs:documentation>list of related objects and documents</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="documents" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>A list of related documents. Each item should contain the directory nane for a particular document stored in the 'documents' directory.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="document" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>container describing a document</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element ref="title"/>
+                    <xs:element ref="source" minOccurs="0"/>
+                    <xs:element name="author" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>author (or authors) of this document</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="publisher" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>publisher information (name, city, etc.)</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pages" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>pages in document refered to by this reference</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="date" type="xs:date" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>publication date</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="classes" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>A list of related classes. Each item should contain the proper Isis class name.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="item" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="private" type="memberAccessType">
+    <xs:annotation>
+      <xs:documentation>container for private member variables and functions</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="protected" type="memberAccessType">
+    <xs:annotation>
+      <xs:documentation>container for protected member variables and functions</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="public" type="memberAccessType">
+    <xs:annotation>
+      <xs:documentation>container for public member variables and functions</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="type">
+    <xs:annotation>
+      <xs:documentation>class or native type of a parameter, variable, return value, etc.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="item">
+    <xs:annotation>
+      <xs:documentation>list item</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="memberAccessType">
+    <xs:annotation>
+      <xs:documentation>type defining everything that belongs in the private, protected, and public sections of a class</xs:documentation>
+    </xs:annotation>
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="data" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>a container describing a member variable of a class</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="valueDescriptionType">
+              <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="function" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>a container for describing a member fucntion of a class. The attribute 'name' is the function name; the attribute 'type' is an enumeration for the basic function type (method, constructor, etc.)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:all>
+            <xs:element ref="description"/>
+            <xs:element ref="brief" minOccurs="0"/>
+            <xs:element name="returns" type="valueDescriptionType" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>a container for describing what is returned by the function. If not present, either the function is a constructor or destructor, or is assumed to return void</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="argumentList" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>The list of arguments to the function. Arguments should be listed in the order they are taken by the function.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="argument" maxOccurs="unbounded">
+                    <xs:annotation>
+                      <xs:documentation>A container for describing a single argument.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                      <xs:complexContent>
+                        <xs:extension base="valueDescriptionType">
+                          <xs:attribute name="name" type="xs:string" use="required"/>
+                        </xs:extension>
+                      </xs:complexContent>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="throws" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>container for information about what exceptions the function throws</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="reason" maxOccurs="unbounded">
+                    <xs:annotation>
+                      <xs:documentation>the reason (free text) an exception is thrown, with attribute 'type' for what the exception type is </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType mixed="true">
+                      <xs:attribute name="type" type="xs:string" use="required"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="prefix" type="xs:string" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>information that is appended to the beginning of a function prototype; e.g. virtual</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="suffix" type="xs:string" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>information that is appended to the end of a function prototype; e.g. const, = 0, or static</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element ref="example" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="type" type="functionType" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="userDefinedTypes" minOccurs="0">
+        <xs:complexType>
+          <xs:choice maxOccurs="unbounded">
+            <xs:element name="enumeration">
+              <xs:annotation>
+                <xs:documentation>description of a defined enumerated type</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:all>
+                  <xs:element ref="brief" minOccurs="0"/>
+                  <xs:element ref="description"/>
+                  <xs:element name="definition">
+                    <xs:annotation>
+                      <xs:documentation>list of name/values that define this type</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="expression" maxOccurs="unbounded">
+                          <xs:annotation>
+                            <xs:documentation>a name/value pair in an enumerated type</xs:documentation>
+                          </xs:annotation>
+                          <xs:complexType>
+                            <xs:all>
+                              <xs:element ref="brief" minOccurs="0"/>
+                            </xs:all>
+                            <xs:attribute name="name" type="xs:string" use="required"/>
+                            <xs:attribute name="value" type="xs:int" use="optional"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:all>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="struct">
+              <xs:annotation>
+                <xs:documentation>description of a defined struct</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:all>
+                  <xs:element ref="brief" minOccurs="0"/>
+                  <xs:element ref="description"/>
+                  <xs:element name="variables">
+                    <xs:annotation>
+                      <xs:documentation>list of variables in the struct</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                      <xs:all>
+                        <xs:element name="variable">
+                          <xs:annotation>
+                            <xs:documentation>a variable in the struct</xs:documentation>
+                          </xs:annotation>
+                          <xs:complexType>
+                            <xs:all>
+                              <xs:element ref="brief" minOccurs="0"/>
+                            </xs:all>
+                            <xs:attribute name="type" type="xs:string" use="required"/>
+                            <xs:attribute name="name" type="xs:string" use="required"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:all>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:all>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="typedef">
+              <xs:annotation>
+                <xs:documentation>description of a defined typdef</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:all>
+                  <xs:element ref="brief" minOccurs="0"/>
+                  <xs:element ref="description"/>
+                  <xs:element name="oldName" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>the name of the type being redefined</xs:documentation>
+                    </xs:annotation>
+                  </xs:element>
+                </xs:all>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="valueDescriptionType">
+    <xs:annotation>
+      <xs:documentation>type defining a container which describes a value, such as an argument, parameter, or variable</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element ref="type"/>
+      <xs:element ref="description" minOccurs="0"/>
+      <xs:element name="default" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>the default value of a member variable, argument, or funtion return.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:simpleType name="functionType" final="restriction">
+    <xs:annotation>
+      <xs:documentation>enumerated function type (constructor | destructor | method)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="constructor"/>
+      <xs:enumeration value="destructor"/>
+      <xs:enumeration value="method"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="example">
+    <xs:annotation>
+      <xs:documentation>text example that may include source code</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="text"/>
+        <xs:element ref="code"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="code">
+    <xs:annotation>
+      <xs:documentation>source code</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="text">
+    <xs:annotation>
+      <xs:documentation>free text</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="category">
+    <xs:annotation>
+      <xs:documentation>A list of categories this object falls under.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="categoryItem" type="categoryItem_type">
+          <xs:annotation>
+            <xs:documentation>Enumerated type describing a single basic category this object falls in</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="missionItem" type="missionItem_type">
+          <xs:annotation>
+            <xs:documentation>Enumerated type describing a single mission specific category this object falls in</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title">
+    <xs:annotation>
+      <xs:documentation>title of an application, document, or resource</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="source">
+    <xs:annotation>
+      <xs:documentation>for an electronic document, full path or URL to a resource including the filename</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="filename"/>
+        <xs:element ref="path" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="path">
+    <xs:annotation>
+      <xs:documentation>Relative path or URL path to a file without a filename specified. If this element is not specified, stylesheets may assume a default location other than the current working director.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="filename">
+    <xs:annotation>
+      <xs:documentation>Filename of a resource with no path specified</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="internalClass">
+    <xs:annotation>
+      <xs:documentation>name of the class in this project</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="externalClass">
+    <xs:annotation>
+      <xs:documentation>name and description of the third party class</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:simpleType name="audienceType" final="restriction">
+    <xs:annotation>
+      <xs:documentation>enumeration for target audience types</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="developer"/>
+      <xs:enumeration value="programmer"/>
+      <xs:enumeration value="all"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="categoryItem_type" final="restriction">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Footprint"/>
+      <xs:enumeration value="Geometry"/>
+      <xs:enumeration value="High Level Cube I/O"/>
+      <xs:enumeration value="Low Level Cube I/O"/>
+      <xs:enumeration value="Map Projection"/>
+      <xs:enumeration value="Mosaicking"/>
+      <xs:enumeration value="Parsing"/>
+      <xs:enumeration value="Spice, Instruments, and Cameras"/>
+      <xs:enumeration value="Statistics"/>
+      <xs:enumeration value="User Interface"/>
+      <xs:enumeration value="Utility"/>
+      <xs:enumeration value="Math"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="missionItem_type" final="restriction">
+    <xs:annotation>
+      <xs:documentation>enumeration for mission specific Application categorizations</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Apollo"/>
+      <xs:enumeration value="Cassini"/>
+      <xs:enumeration value="Chandrayaan"/>
+      <xs:enumeration value="Clementine"/>
+      <xs:enumeration value="Dawn"/>
+      <xs:enumeration value="Mariner"/>
+      <xs:enumeration value="Galileo"/>
+      <xs:enumeration value="Lunar Orbiter"/>
+      <xs:enumeration value="Lunar Reconnaissance Orbiter"/>
+      <xs:enumeration value="Mars Express"/>
+      <xs:enumeration value="Mars Reconnaissance Orbiter"/>
+      <xs:enumeration value="Mars Global Surveyor"/>
+      <xs:enumeration value="Mars Odyssey"/>
+      <xs:enumeration value="Mars Exploration Rover"/>
+      <xs:enumeration value="Messenger"/>
+      <xs:enumeration value="Robotic Lunar Observatory"/>
+      <xs:enumeration value="Small Missions for Advanced Research and Technology 1"/>
+      <xs:enumeration value="Voyager"/>
+      <xs:enumeration value="Viking"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="target" type="audienceType">
+    <xs:annotation>
+      <xs:documentation>a single target audience type who is expected to use this object</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="audience">
+    <xs:annotation>
+      <xs:documentation>list of target audience types</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="target" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="global" type="memberAccessType"/>
+</xs:schema>

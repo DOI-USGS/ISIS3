@@ -1,0 +1,4 @@
+Group = Gradient
+  Library = GradientOperator
+  Routine = GradientOperatorPlugin
+End_Group

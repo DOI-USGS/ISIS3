@@ -1,0 +1,6 @@
+Group = Clementine_1/Hires
+  Version = 1
+  Library = HiresCamera
+  Routine = HiresCameraPlugin
+EndGroup
+ 

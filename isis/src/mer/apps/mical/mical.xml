@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mical" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+     Radiometrically calibrates a Mars Exploration Rover (MER) 
+     Microscopic Imager(MI) image
+  </brief>
+
+  <description>
+  <p>
+    mical performs radiometric corrections to images acquired by the MER
+    MI camera.  MI images taken during science operations have 1024 samples
+    and 1024 lines and are single bands.  The pre calibration images are signed 
+    word or 16 bit images.  Subareas can be aquired but this was rarely done during 
+    the mission.<br/>
+
+    mical has a number of parameters required to process MER MI image
+    data.  Most of these parameters are read from an ISIS parameter defaults
+    file located in the mer directory specified in the IsisPreference file.  
+    This file has the form:
+     <pre>    
+      $mer/calibration/mical.ker.xxx
+    
+      where "xxx" is a positive number.
+     </pre>  
+    mical will search for the parameter file with the highest number and
+    load all its defaults needed to process MI images.  Note that the
+    caller may explicity provide an alternative ISIS parameter defaults
+    file name in the "CALKERNEL" input parameter if they have their own
+    set of defaults that applies to MI data.  See an existing calibration
+    file for details on how to configure this file.
+  </p>  
+<p>
+    The level of calibration output can be selected.  by choosing one of the
+    output options, the user can choose to dark current correct, dark current and 
+    flat field, or dark current, flat field and output in I/F values.
+  </p>
+
+  <p>
+    The dark current correction equation mical implements is as follows:
+    <pre>
+      r = dn - (rpi + rpv) + (zei * zev) + (aai * aav)
+    </pre>
+
+    Where: 
+            r is the aver signal being generated at the focal plane
+            dn is the input pixel value
+            rpi is the referance pixel dn 
+            rpv is the referance pixel correction value
+            zei is the zero exposure pixel dn
+            zev is the zero exposure correction value
+            aai is the active area pixel dn
+            aav is the active area correction value
+
+     The user can choose to not correct for the reference pixel, zero exposure
+     or active area  by selecting or deselecting the RPCORRECTION, ZECORECTION,
+     or AACORRECTION checkbox.  The program will also determain if these 
+     corrections should be applied.  If the ShutteEffectCorrectionFlag is set to "TRUE"
+     in the image labels, the reference pixel, and zero exposure will not be applied.<br/>
+
+     If a flat fielded output is chosen:
+     <pre>
+       r = dn / f
+     </pre>
+
+       where:
+       r is the corrected output value
+       dn is the input pixel that has been dark current corrected
+       f is a flat field pixel<br/>
+
+       if the "ShutteEffectCorrectionFlag is false and the exposure duration is greater
+       them zero and less them 1000 and the image is mot equal to 1024 samples, a 
+       image smear correction is applied.
+</p>
+
+
+
+
+  </description>
+
+  <history>
+    <change name="Robert Sucharski" date="2007-02-16">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Exploration Rover</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>mer2isis</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Level 0 MER MI image
+        </brief>
+        <description>
+          An uncalibrated MER MI image.
+        </description>
+        <filter>
+          *.cub *.CUB
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Level 1 MER MI image
+        </brief>
+        <description>
+          The resultant radiometrically calibrated cube
+        </description>
+        <filter>
+          *.cub *.CUB
+        </filter>
+      </parameter>
+
+      <parameter name="CALKERNEL">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          PVL kernel containing calibration prameters
+        </brief>
+        <internalDefault>Internal Default </internalDefault>
+        <description>
+          If you do not enter a file, mical will search for a file with the form:
+          <pre>
+            $mer/calibration/mical.kernel.xxx
+
+            where "xxx" is a positive number.
+          </pre>
+          the kernel with the highest version (xxx) will be used.
+          See an existing calibration 
+          file for details on how to configure this file.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonLogCalKernel</function>
+            <brief>View Calibration Kernel in the log area</brief>
+            <description>
+              This button will display the callibration kernel in the log area.
+              If no file is entered in the CALKERNEL parameter then the system
+              file will be displayed.
+            </description>
+            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+          </helper>
+        </helpers>
+     </parameter>
+
+     <parameter name="REFPIXIMAGE">
+       <type>cube</type>
+       <fileMode>input</fileMode>
+       <brief>
+         Referance Pixel image (ERP)
+       </brief>
+       <description>
+         At times, a referance pixel image was aquired when image data was 
+         taken.  If a referance pixel image was acquired, it can be used in the 
+         calibration.  A referance pixel image uses the designation "ERP" rather 
+         then "EFF" in the file name.
+       </description>
+       <filter>
+         *.cub *.CUB
+       </filter>
+       <internalDefault>Use Model Value</internalDefault>
+     </parameter> 
+      <parameter name="FLATFIELD">
+         <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The flat field image used in correction
+        </brief>
+        <description>
+          User can enter a flat field image that will be used in the correction.  
+          If no value is entered, then the file listed in the calibration kernel 
+          will be used.
+        </description>
+        <filter>
+          *.cub *.CUB
+        </filter>
+        <internalDefault> Use value in kernel </internalDefault>
+      </parameter>
+    </group>
+    <group name="Output Options">
+      <parameter name="CALSTAGE">
+        <type>string</type>
+        <brief>
+          The calibration stage to process
+        </brief>
+        <description>
+          This parameter allows the user to control what calibration step will 
+          be applied to the input image.  if "DARK" is selected, then only a 
+          dark current correction is preformed.  If "FLAT" is selected, the 
+          image is corrected for dark current and a flat field correction is 
+          applied.  if "IOF" is chosen then the final outut will in refiectance 
+          values.
+        </description>
+        <default>
+          <item>IOF</item>
+        </default>
+        <list>
+          <option value="DARK">
+            <brief>
+              Dark Current correction
+            </brief>
+            <description>
+              The output file will be a dark current corrected file.
+            </description>
+          </option>
+          <option value="FLAT">
+            <brief>
+              Dark Current and Flat Field correction
+            </brief>
+            <description>
+              The output will be a dark current corrected and flat field 
+              corrected.  This is the "CFD" image in the PDS archive.
+            </description>
+          </option>
+          <option value="IOF">
+            <brief>
+              Convert Dark current and Flat Field  corrected image to I/F values
+            </brief>
+            <description>
+              The output file will be a flat field corrected image that has been 
+              converted to refiectance.  This is the "IFF" file in the PDS 
+              archive.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Entry Option">
+      <parameter name="CCDtemp">
+        <type>double</type>
+        <brief>
+          CCD temperature
+        </brief>
+        <description>
+          A user defined CCD temperature that will be used in calculations that use
+          the CCD temperature.  If entered, this value will be used rather then the 
+          temperature in the image labels.
+        </description>
+        <internalDefault>Temperature from Labels</internalDefault>
+      </parameter>
+
+     <parameter name="PCBtemp">
+        <type>double</type>
+        <brief>
+          PCB temperature
+        </brief>
+        <description>
+          A user defined PCB temperature that will be used in calculations that use
+          the PCB temperature.  If entered, this value will be used rather then the 
+          temperature in the image labels.          
+        </description>
+        <internalDefault>Temperature from labels</internalDefault>
+      </parameter>
+
+      <parameter name="RPCORRECTION">
+        <type>boolean</type>
+        <brief>
+          Correct for Referance Pixel
+        </brief>
+        <description>
+          If this option is selected, the reference pixel correction will be applied.  
+          if the ShutteEffectCorrectionFlag is set to TRUE then the reference pixel
+          correction is not applied, even if this parameter is set to true.  The 
+          default is true which will apply the correction.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+
+      <parameter name="ZECORRECTION">
+        <type>boolean</type>
+        <brief>
+          Correct for Zero Exposure
+        </brief>
+        <description>
+          If this option is selected, the zero exposure correction will be applied.  
+          if the ShutteEffectCorrectionFlag is set to TRUE then the zero exposure
+          correction is not applied, even if this parameter is set to true.  The 
+          default is true which will apply the correction.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+
+      <parameter name="AACORRECTION">
+        <type>boolean</type>
+        <brief>
+          Correct for Active Area
+        </brief>
+        <description>
+          If this option is selected, the active area. correction will be applied.  
+          The default is true which will apply the correction.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+      </group>
+   </groups>
+</application>
+

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="autoseed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Creates a control network for a list of images
+  </brief>
+
+  <description>
+    <p>
+      This program creates a first guess control network with tie points between
+      overlapping images. The control network is based on the available pointing information
+      for each image (most likely SPICE).
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2005-08-20">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2007-07-27">
+      Changed category from Geometry to Control Networks
+    </change>
+    <change name="Stuart Sides" date="2008-11-11">
+      Removed terminal output code
+    </change>
+    <change name="Steven Lambright" date="2008-11-24">
+      Added the "OVERLAPLIST" parameter.
+    </change>
+    <change name="Christopher Austin" date="2008-12-18">
+      Added the optional CNET parameter and fixed memory leaks.
+    </change>
+    <change name="Christopher Austin" date="2008-12-22">
+      Removed beta status, fixed a bug, and added test.
+    </change>
+    <change name="Christopher Austin" date="2009-01-26">
+      Replaced the cerr output with the ERRORS option.
+    </change>
+    <change name="Christopher Austin" date="2009-02-09">
+      Added the seed definition parameters to the results group of the
+      print.prt file
+    </change>
+    <change name="Christopher Austin" date="2009-03-16">
+      Fixed the progress objects.
+    </change>
+    <change name="Travis Addair" date="2009-08-05">
+      Moved seed definition parameters to unique group, and encapsulated the 
+      group creation within the seeding objects.
+    </change>
+    <change name="Travis Addair" date="2009-08-11">
+      Added .def filter to the SEEDDEF parameter.
+    </change>
+    <change name="Christopher Austin" date="2009-10-23">
+      Added keywords to the SEEDDEF file which tell autoseed which Control
+      Measures to mark as ignored under the keyword's conditions. These new
+      keywords include "PixelsFromEdge", "MinEmission", "MaxEmission",
+      "MinIncidence", "MaxIncidence", "MinResolution", and "MaxResolution".
+      Any Control Point with less than 2 valid measures as a result of these
+      keywords will be marked as ignored.
+    </change>
+    <change name="Christopher Austin" date="2009-11-25">
+      Added the keywords "MinDN" and "MaxDN" to the SEEDDEF possibilities.
+      Using these keywords will increase runtime. 
+    </change>
+    <change name="Eric Hyer" date="2010-01-29">
+      Added Results group to print.prt
+    </change>
+    <change name="Christopher Austin" date="2010-03-26">
+      Now throws an error if the output Control Net is empty.
+    </change>
+    <change name="Eric Hyer" date="2010-04-16">
+      Added optional parameters to results group.  Also now report invalid
+      or unrecognized keywords found in the def file to the user.
+    </change>
+    <change name="Sharmila Prasad" date="2010-04-28">
+      Fixed error while checking for max and min dn values restriction for a 
+      valid control point. Ignore control points with special pixel dn values.
+    </change>
+    <change name="Christopher Austin" date="2010-05-05">
+      Adapted to handle seeding in both XY and SampleLine units using the
+      optional Seeddef keywork SeedDomain.
+    </change>
+    <change name="Christopher Austin" date="2010-06-09">
+      Added the ControlPointsIgnored and ControlMeasuresIgnored keywords to the
+      results group.
+    </change>
+    <change name="Sharmila Prasad" date="2010-06-30">
+      Throw exception, when SetUniversalGround Fails
+    </change>
+  </history>
+
+  <groups>
+
+    <group name="Files">
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of Input cubes to create a control network for
+        </brief>
+        <description>
+          Use this parameter to select the filename which contains a list of
+          cube filename to be used to create the control network.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="SEEDDEF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          PVL file containing the description of the autoseed plugin
+        </brief>
+        <description>
+          Use this parameter to select the filename which contains the
+          definition of the type of autoseeding to be preformed. This file
+          must contain a valid Autoseed plugin definition in PVL format.
+        </description>
+        <filter>
+          *.api *.def
+        </filter>
+      </parameter>
+
+      <parameter name="OVERLAPLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube overlap list
+        </brief>
+        <description>
+          This file should contain overlaps of cubes in the control network. This file can be
+          generated by running "findimageoverlaps."
+        </description>
+      </parameter>
+
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>No previous control network</internalDefault>
+        <brief>Control Network which already seeds some of the overlap</brief>
+        <description>
+          Use this parameter to provide a Control Network that already seeds a
+          portion of the provided overlap. The Control Points it contains will
+          prevent re-seeding during execution, resulting in a new Control
+          Network that only seeds overlaps that do not contain any Control
+          Points. You may then use cnetmerge to combine this Control Network
+          (CNET) with the resultant Control Network (TO) to create a single
+          Control Network for the entire overlap.
+        </description>
+        <filter> *.net </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output control network
+        </brief>
+        <description>
+          This file will contain the autoseeded control network
+        </description>
+      </parameter>
+
+      <parameter name="ERRORS">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>No Error Output</internalDefault>
+        <brief>
+          Errors generated while seeding the overlaps
+        </brief>
+        <description>
+          This file will contain the errors that occurred while seeding the overlaps.
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Control">
+
+      <parameter name="NETWORKID">
+        <type>string</type>
+        <brief>
+            Name of this control network
+        </brief>
+        <description>
+            The ID or name of this particular control network. This string
+            should be unique.
+        </description>
+      </parameter>
+
+      <parameter name="POINTID">
+        <type>string</type>
+        <brief>
+            The pattern to be used to create point ids.
+        </brief>
+        <description>
+            A string with one and only one set of question marks ("?").
+            This string will be used to create unique IDs for each control
+            point created by this program. The question marks will be replaced
+            with a number beginning with zero. For example the pattern
+            "User????" would create point IDs "User0001" through 
+            "User9999". Note: Make sure there are enough "?"s for all the control
+            points that may be created during this run. If all question marks are
+            exausted the program will throw an error.
+        </description>
+      </parameter>
+
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <brief>
+            The description of the network.
+        </brief>
+        <description>
+            A string describing purpose of this control network.
+        </description>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+</application>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cathist" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs the history of a cube
+  </brief>
+
+  <description>
+    This program will output the full or brief history of a .cub file.  The brief mode
+     is especially useful for creating a script for a batch job, because the output is in the
+     command line format.
+  </description>
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>catlab</item>
+    </applications>
+  </seeAlso>
+
+  <oldName>
+      <item>labels</item>
+  </oldName>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-01-10">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-25">
+        Documentation fixes
+    </change>
+    <change name="Elizabeth Miller" date="2007-02-26">
+      Modified to output results in gui log if the gui is open
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file the history is needed from 
+        </brief>
+        <description>
+          The cube file the history is to be extracted from. 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Output Options">
+        <parameter name="MODE">
+           <type>string</type>
+           <brief>Mode types</brief>
+           <description>
+               Different modes that cathist can run in.
+           </description>
+           <default><item>FULL</item></default>
+            <list>  
+               <option value="FULL">
+                    <brief>Full history listing</brief>
+                    <description>
+                        Lists the full history of the file in the PVL format.
+                    </description>
+               </option>
+                <option value="BRIEF">
+                    <brief>Brief history listing</brief>
+                    <description>
+                        Lists a brief history of the file in a command line format.
+                    </description>
+               </option>
+            </list>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Full printout of a .cub history </brief>
+      <description>
+        This example shows the cathist application in the full mode.
+        This is the default mode.                  
+        <pre> 
+Object = mirror
+  IsisVersion       = "3.0.2 beta | 2004-11-17"
+  ProgramVersion    = 2003-07-29
+  ExecutionDateTime = 2005-01-10T13:33:12
+  HostName          = orkin
+  UserName          = eribelin
+  Description       = "Flip a cube from left-to-right"
+
+  Group = UserParameters
+    FROM = peaks.cub
+    TO   = temp.cub
+  End_Group
+End_Object
+
+Object = circle
+  IsisVersion       = "3.0.2 beta | 2004-11-17"
+  ProgramVersion    = 2003-07-29
+  ExecutionDateTime = 2005-01-10T13:50:46
+  HostName          = orkin
+  UserName          = eribelin
+  Description       = "Trims data outside of a circle"
+
+  Group = UserParameters
+    FROM = temp.cub
+    TO   = temp2.cub
+  End_Group
+End_Object
+End
+         </pre>
+      </description>
+      <terminalInterface>
+        <commandLine> from=temp2.cub 
+        </commandLine>
+        <description>
+            Run the cathist application on a .cub file.
+        </description>
+      </terminalInterface>
+    </example>
+    <example>
+        <brief>Brief printout of a .cub history</brief>
+        <description>
+            This example shows the cathist application in the brief mode.
+            <pre>
+mirror from=peaks.cub to=temp.cub
+circle from=temp.cub to=temp2.cub
+            </pre>
+        </description>
+        <terminalInterface>
+            <commandLine> from=temp2.cub mode=brief
+            </commandLine>
+            <description>
+                Run the cahist application on a .cub file in brief mode.
+            </description>
+        </terminalInterface>
+      </example>
+  </examples>
+
+</application>

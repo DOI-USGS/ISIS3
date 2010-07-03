@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="marcical" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    This program calibrates MARCI images
+  </brief>
+
+  <description>
+    This program applies a flat-field correction for each framelet based on the 
+    band's filter number. In order to output in I/F units, the cube must have spice
+    data. This calibration problem follows the algorithms described the document titled:<br/><br/>
+
+Mars Reconnaissance Orbiter Mars Color Imager (MARCI): <br/>
+Instrument Description, Calibration, and Performance<br/><br/>
+
+J.F. Bell III, M.J. Wolff, M.C. Malin, W.M. Calvin, B.A. Cantor, 
+M.A. Caplinger, R.T. Clancy, K.S. Edgett3, L.J. Edwards5, J. Fahle, 
+F. Ghaemi, R.M. Haberle, A. Hale, P.B. James, S.W. Lee, 
+T. McConnochie, E. Noe Dobrea1, M.A. Ravine, D. Schaeffer, 
+K.D. Supulver, and P.C. Thomas
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Steven Lambright" date="2009-01-21">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2009-03-03">
+      Added lookup table
+    </change>
+    <change name="Steven Lambright" date="2009-04-09">
+      Fixed a problem where segmentation faults would occur if run 
+      with the option "IOF=false"
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input MARCI Image
+        </brief>
+        <description>
+          This is the non-flat-field corrected, unprojected MARCI cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <pixelType>real</pixelType>
+         <brief>
+           Output MARCI Image
+         </brief>
+         <description>
+           This is the flat-field corrected MARCI cube
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="IOF">
+         <type>boolean</type>
+         <brief>
+           Make the output MARCI image in units of I/F
+         </brief>
+         <description>
+           This makes the output MARCI image in I/F units instead of radiance
+         </description>
+         <filter>
+           *.cub
+         </filter>
+         <default><item>true</item></default>
+       </parameter>
+     </group>
+   </groups>
+</application>

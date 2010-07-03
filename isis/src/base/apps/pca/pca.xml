@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="pca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Apply Principal Component Analysis on a cube
+  </brief>
+
+  <description>
+      This programs converts a cube into principal component space or
+        converts a cube back from principal component space.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>decorstretch</item>
+      <item>fft</item>
+      <item>ifft</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2006-05-05">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to transform
+        </brief>
+        <description>
+            The input cube which will be transformed into principal component space.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the image in principal component space.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+
+    <group name="Transform Options">
+      <parameter name="MODE">
+        <type>string</type>
+        <default>
+          <item>TRANSFORM</item>
+        </default>
+        <brief>Transform mode</brief>
+        <description>
+          This option is used to specify a forward or inverse transform.
+        </description>
+        <list>
+          <option value="TRANSFORM">
+            <brief>Transform to PC space</brief>
+            <description>
+                This option is used to transform a cube into principal component space.
+            </description>
+          </option>
+          <option value="INVERSE">
+            <brief>Transform from PC space</brief>
+            <description>
+                This option is used to transform a cube back from principal component space.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

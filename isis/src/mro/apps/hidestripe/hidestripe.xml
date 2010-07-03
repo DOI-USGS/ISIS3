@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<application name="hidestripe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Corrects a known striping pattern in HiRISE images.
+  </brief>
+
+  <description>
+    <p>
+    In mixed mode HiRISE images, there is a tendency for every other line in the 
+	 ccd with the lower binning mode to be significantly darker or lighter than 
+	 normal image data would suggest. This program attempts to correct that 
+	 problem. 2 passes through a cube are necessary to perform the correction. The 
+	 first pass gathers information on each line of the cube to determine if the 
+	 striping phenomenon occurs in odd numbered lines or in even numbered lines, and
+	 also gathers information to perform the actual correction.
+	 </p>
+	 The second pass through the data performs the actual correction, of which there
+	 are two different types. The default, an additive correction, is of the following
+	 form for each pixel
+	 
+	 <pre>
+    					     
+                                         ((Line[i-1]) + Line[i+1])
+                Pixel[i,j] - Line[i] +   --------------------------
+                                                      2
+    </pre>
+	 
+	 The other correction, a multiplicative correction of a similar style, is of
+	 the form
+	 
+    <pre>
+                Pixel        ((Line[i-1]) + Line[i+1])
+               -------   *  ---------------------------
+               Line[i]                    2
+    </pre>
+	 <p>
+	 It should finally be noted that the striping pattern has been observed to
+	 be most prevalent in a certain quardrant of the image, though that phase
+	 is not the same for all images. In order to address this irregularitiy, the 
+	 line averages shown above are not for the entire line, but only for the 
+	 quarter of the line in which sample i exists. 
+	 </p>
+	 <p>
+	 Caution should be taken when running hidestripe: it should only be run on
+	 images where different CCDs are run at different binning modes. Of those,
+	 only channels that are not used in the highest binning mode of the image
+	 should be corrected. For example, if an image has binning modes 1, 2, and 4
+	 the CCDs with modes 1 and 2 may be hidestripe'd, but in an image that is 
+	 only binned in modes 1 and 2, the bin 1 CCDs are the only ones that need 
+	 the hidestripe correction.
+	 </p>
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Drew Davidson" date="2006-05-30">
+      Original version
+    </change>
+	 <change name="Drew Davidson" date="2006-07-29">
+      Changed to calculate phase limits differently for Channel 1
+    </change>
+	 <change name="Drew Davidson" date="2006-08-17">
+      Added capability to process bin 2 data
+    </change>
+    <change name="Drew Davidson" date="2007-01-05">
+	   Allowed users to specify odd or even correction
+	 </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Single hirise channel in cub form
+        </brief>
+        <description>
+		    input channel file. The file must have a number of samples divisible
+			 by four so that it may be equally divided into phases. Also, the
+			 image should exibit the horizontal striping problem addressed above.
+			 Otherwise, this program will do an unwanted normalization.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube to contain cub with correction.
+        </brief>
+        <description>
+		    This image will have the hidestripe correction applied to it. 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+	 
+	 <group name="Correction Type">
+	   <parameter name="CORRECTION"> 
+		  <type>string</type>
+		  <brief>Type of correction to apply</brief>
+		  <description>
+          A correction that is either multiplicative or additive in nature.
+			 For more specific information on the nature of the correction, see
+			 the general program description
+		  </description> 
+		  <default><item>ADD</item></default>
+		  <list>
+		    <option value="ADD">
+			   <brief>Additive correction</brief>
+				<description>
+				  Correct by subtracting the average of the line needing correction
+				  from every pixel on that line and then adding the average of the 
+				  line above and below that line.
+				</description>
+			  </option>
+			  <option value="MULTIPLY">
+			    <brief>Multiplicative correction</brief>
+				 <description>
+				  Correct by dividing the average of the line needing correction
+				  from every pixel on that line and then multiplying the average
+				  of the line above and below that line.
+				 </description>
+			  </option>
+		  </list>
+		</parameter>
+     </group>
+	  
+ <group name="Correction Start">
+      <parameter name="PARITY">
+        <type>string</type>
+        <brief>Specify line stripes as an even or odd pattern</brief>
+        <default>
+          <item>AUTO</item>
+        </default>
+        <description>
+        </description>
+        <list>
+          <option value="AUTO">
+            <brief>Automatically determine what parity to correct</brief>
+            <description>
+				
+            </description>
+          </option>
+          <option value="EVEN">
+            <brief>Apply correction to even lines (2,4,6 ...)</brief>
+            <description>
+            </description>
+          </option>
+          <option value="ODD">
+            <brief>Apply correct to odd lines (1,3,5 ...)</brief>
+            <description>
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+  
+  <examples>
+    <example>
+      <brief> Additive correction </brief>
+      <description>
+        This example shows the default additive correction applied to a binned
+		  1 image in an image that is mixed and includes binning modes 1 and 4
+      </description>
+      <terminalInterface>
+        <commandLine> 
+		    from=HiRISE/cubs/RED5_bin1.cub to=HIRISE/cubs/RED5_bin1_corrected.cub
+        </commandLine>
+        <description>
+		    Note that the defaults are not changed, and thus the additive 
+			 correction is applied.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/in1.jpg" width="500" height="500">
+          <brief> Input image before hidestripe</brief>
+          <description>
+			   The image before the correction is applied. Note the horizontal 
+				stripes.
+          </description>
+          <thumbnail caption="Before correction" src="assets/thumb/in1.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/out1.jpg" width="500" height="500">
+          <brief> Output image after hidestripe</brief>
+          <description>
+			   The same image has now been smoothed such that the horizontal
+				stripes are removed.
+          </description>
+          <thumbnail caption="After correction" src="assets/thumb/out1.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="221" src="assets/image/gui1.jpg">
+            <brief>Example Gui</brief>
+            <description>
+				  Parameters set to perform additive correction. No options have
+				  been changed from their defaults (though required TO/FROM have).
+            </description>
+            <thumbnail width="200" height="100" caption="Default Gui" src="assets/thumb/gui1.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

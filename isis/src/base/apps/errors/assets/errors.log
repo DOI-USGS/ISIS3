@@ -1,0 +1,40 @@
+Object = phocube
+  IsisVersion       = "3.1.14beta | 2007-08-23"
+  ProgramVersion    = 2006-09-21
+  ProgramPath       = /usgs/pkgs/isis3nightly/isis/bin
+  ExecutionDateTime = 2007-11-05T11:51:17
+  HostName          = blackflag
+  UserName          = smkoechle
+  Description       = "Creates phase, incidence, and/or emmision angle bands 
+                      for a cube"
+
+  Group = UserParameters
+    FROM      = /usgs/cpkgs/isis3/testData/isis/src/cassini/apps/ciss2isis/tsts/narrowAngle/truth/N1472853667_1.truth.cub
+    TO        = out.cub
+    PHASE     = TRUE
+    EMISSION  = TRUE
+    INCIDENCE = TRUE
+    LATITUDE  = TRUE
+    LONGITUDE = TRUE
+  End_Group
+
+  Group = Error
+    Program = phocube
+    Class   = "CAMERA ERROR"
+    Code    = 6
+    Message = "Unable to initialize camera model from group [Instrument]"
+    File    = CameraFactory.cpp
+    Line    = 82
+  End_Group
+
+  Group = Error
+    Program = phocube
+    Class   = "PVL ERROR"
+    Code    = 3
+    Message = "Keyword [InstrumentPosition] does not exist in [Group = 
+              Kernels]"
+    File    = PvlContainer.cpp
+    Line    = 75
+  End_Group
+End_Object
+End

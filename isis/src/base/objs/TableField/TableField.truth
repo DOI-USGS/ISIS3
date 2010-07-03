@@ -1,0 +1,139 @@
+Testing integer singleton
+Name      = Test
+IsInteger = 1
+IsDouble  = 0
+IsText    = 0
+IsReal    = 0
+Size      = 1
+Bytes     = 4
+Value     = 15
+Group = Field
+  Name = Test
+  Type = Integer
+  Size = 1
+End_Group
+----------------------------------------
+Testing double singleton
+Name      = Test
+IsInteger = 0
+IsDouble  = 1
+IsText    = 0
+IsReal    = 0
+Size      = 1
+Bytes     = 8
+Value     = -3.14
+Group = Field
+  Name = Test
+  Type = Double
+  Size = 1
+End_Group
+----------------------------------------
+Testing text singleton
+Name      = Test
+IsInteger = 0
+IsDouble  = 0
+IsText    = 1
+IsReal    = 0
+Size      = 20
+Bytes     = 20
+Value     = Bah humbug
+Group = Field
+  Name = Test
+  Type = Text
+  Size = 20
+End_Group
+----------------------------------------
+Testing real singleton
+Name      = Test
+IsInteger = 0
+IsDouble  = 0
+IsText    = 0
+IsReal    = 1
+Size      = 1
+Bytes     = 4
+Value     = 15.542
+Group = Field
+  Name = Test
+  Type = Real
+  Size = 1
+End_Group
+----------------------------------------
+Testing integer array
+Name      = Test
+IsInteger = 1
+IsDouble  = 0
+IsText    = 0
+IsReal    = 0
+Size      = 3
+Bytes     = 12
+Value     = 3 2 1
+Group = Field
+  Name = Test
+  Type = Integer
+  Size = 3
+End_Group
+----------------------------------------
+Testing double array
+Name      = Test
+IsInteger = 0
+IsDouble  = 1
+IsText    = 0
+IsReal    = 0
+Size      = 3
+Bytes     = 24
+Value     = 1.3 2.4 -9.2
+Group = Field
+  Name = Test
+  Type = Double
+  Size = 3
+End_Group
+----------------------------------------
+Testing real array
+Name      = Test
+IsInteger = 0
+IsDouble  = 0
+IsText    = 0
+IsReal    = 1
+Size      = 3
+Bytes     = 12
+Value     = 1.3 2.4 -9.2
+Group = Field
+  Name = Test
+  Type = Real
+  Size = 3
+End_Group
+----------------------------------------
+Testing integer constructor
+Group = Field
+  Name = Test
+  Type = Integer
+  Size = 20
+End_Group
+----------------------------------------
+Testing double constructor
+Group = Field
+  Name = Test
+  Type = Double
+  Size = 20
+End_Group
+----------------------------------------
+Testing text constructor
+Group = Field
+  Name = Test
+  Type = Text
+  Size = 20
+End_Group
+----------------------------------------
+Testing real constructor
+Group = Field
+  Name = Test
+  Type = Real
+  Size = 20
+End_Group
+----------------------------------------
+Testing erroneous type constructor
+**PROGRAMMER ERROR** Field [Test] has invalid type
+----------------------------------------
+Testing erroneous size constructor
+**PARSE ERROR** Cannot convert (-7.3) to an integer
+----------------------------------------

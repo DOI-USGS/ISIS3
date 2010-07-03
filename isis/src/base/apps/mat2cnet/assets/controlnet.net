@@ -1,0 +1,249 @@
+Object = ControlNetwork
+  NetworkId    = TestNet01
+  NetworkType  = ImageToGround
+  TargetName   = Titan
+  UserName     = jwalldren
+  Created      = 2009-11-05T11:28:47
+  LastModified = 2009-11-05T11:28:47
+  Description  = "Default Test Network"
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1001
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467436709.122
+      MeasureType    = ValidatedManual
+      Sample         = 893.0
+      Line           = 616.0
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467443189.122
+      MeasureType    = ValidatedManual
+      Sample         = 799.25
+      Line           = 701.21
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = ValidatedManual
+      Sample         = 569.01
+      Line           = 807.23
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1002
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467436709.122
+      MeasureType    = ValidatedManual
+      Sample         = 963.5
+      Line           = 216.5
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467443189.122
+      MeasureType    = ValidatedManual
+      Sample         = 836.48
+      Line           = 284.28
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = ValidatedManual
+      Sample         = 548.19
+      Line           = 400.6
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1003
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467436709.122
+      MeasureType    = ValidatedManual
+      Sample         = 348.5
+      Line           = 583.5
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467443189.122
+      MeasureType    = ValidatedManual
+      Sample         = 235.74
+      Line           = 692.39
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1004
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467436709.122
+      MeasureType    = ValidatedManual
+      Sample         = 781.0
+      Line           = 466.0
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467443189.122
+      MeasureType    = ValidatedManual
+      Sample         = 663.99
+      Line           = 552.76
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = ValidatedManual
+      Sample         = 408.5
+      Line           = 672.5
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1005
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467453442.125
+      MeasureType    = ValidatedManual
+      Sample         = 82.25
+      Line           = 202.48
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = ValidatedManual
+      Sample         = 1007.5
+      Line           = 210.5
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1006
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467453442.125
+      MeasureType    = ValidatedManual
+      Sample         = 63.51
+      Line           = 405.49
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = ValidatedManual
+      Sample         = 989.0
+      Line           = 412.0
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1007
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467453442.125
+      MeasureType    = ValidatedManual
+      Sample         = 21.86
+      Line           = 557.84
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = ValidatedManual
+      Sample         = 950.0
+      Line           = 563.0
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = True
+    End_Group
+  End_Object
+End_Object
+End

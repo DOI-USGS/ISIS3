@@ -1,0 +1,105 @@
+Testing Isis::Process Class ... 
+Testing GetUserInterface ... 
+unitTest.cub
+
+Testing SetOutputCube without an input cube ...
+**PROGRAMMER ERROR** No input images have been selected ... thereforethe output image size can not be determined
+
+Testing SetOutputCube with bogus samples ...
+**PROGRAMMER ERROR** Invalid cube size specifications [ns=0,nl=1,nb=1]
+
+Testing SetOutputCube with bogus lines ...
+**PROGRAMMER ERROR** Invalid cube size specifications [ns=1,nl=0,nb=1]
+
+Testing SetOutputCube with bogus bands ...
+**PROGRAMMER ERROR** Invalid cube size specifications [ns=1,nl=1,nb=0]
+
+Testing SetInputCube/SetInputWorkCube ... 
+Samples:  126
+Lines:  126
+Bands:  2
+
+Testing SetInputWorkCube OneBand Error ...
+An exception was thrown!
+
+Testing SetInputWorkCube SizeMatch error for bands ...
+**USER ERROR** The number of bands in the input cubes must match
+
+Testing SetInputWorkCube SizeMatch error for lines ...
+**USER ERROR** The number of lines in the input cubes must match
+
+Testing SetInputWorkCube SizeMatch error for samples ...
+**USER ERROR** The number of samples in the input cubes must match
+
+Testing SetInputWorkCube SpatialMatch error for lines ...
+**USER ERROR** The number of lines in the input cubes must match
+
+Testing SetInputWorkCube SpatialMatch error for samples ...
+**USER ERROR** The number of samples in the input cubes must match
+
+Testing SetInputWorkCube BandMatchOrOne error ...
+**USER ERROR** The number of bands in the secondary input cubes must match the primary input cube or be exactly one
+
+Testing SetInputWorkCube AllMatchOrOne error ...
+**USER ERROR** The number of bands in the secondary input cubes must match the primary input cube or be exactly one
+
+Testing Logging ...
+Group = Results
+  Test = Me
+  No   = Way
+End_Group
+
+Testing label propagation (on) ...
+Keyword = "This is a test"
+
+Testing label propagation (off) ...
+Group Test does not exist
+
+Testing OriginalLabel propagation (on) ...
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+End
+
+Testing OriginalLabel propagation (off) ...
+Group OriginalLabel does not exist
+
+Testing Table propagation (on) ...
+Number of record = 2
+Record Size = 8
+
+Testing Table propagation (off) ...
+Group Table does not exist
+
+Testing Polygon propagation (on) ...
+Image Polygon does exist
+Size: 60
+Testing Polygon propagation (off) ...
+Image Polygon does not exist
+

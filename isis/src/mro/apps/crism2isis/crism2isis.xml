@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="crism2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import MRO CRISM PDS image cube into Isis format cube</brief>
+
+  <description>
+    This program will import an MRO CRISM PDS image into an Isis cube. The 
+    following CRISM formats are supported:
+    <ul>
+      <li>
+        DDR
+      </li>
+      <li>
+        TRDR
+      </li>
+      <li>
+        MRDR
+      </li>
+    </ul>
+  </description>
+
+  <history>
+    <change name="Noah Hilt" date="2008-08-08">
+      Original version
+    </change>
+    <change name="Jeannie Walldren" date="2009-06-02">
+      Moved from base directory to mro directory.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input MRO CRISM PDS file
+        </brief>
+        <description>
+          Use this parameter to select the PDS filename.  This file
+          must contain the PDS labels, however the image data can
+          be detached and will be automatically obtained from the
+          PDS image pointer keyword.  If the pointer is incorrect then
+          use the IMAGE parameter to specify the file containing the
+          binary image data.
+        </description>
+        <filter>
+          *.lbl
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>

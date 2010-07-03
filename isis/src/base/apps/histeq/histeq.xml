@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="histeq" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+  Apply histogram equalization to a cube.
+  </brief>
+
+  <description>
+    This program equalizes the histogram of an input cube (defined by FROM), and outputs the results to a file (defined by TO).<br></br><br></br> 
+    By equalizing the input file's histogram, the resulting cumulative distribution  becomes linear instead of curved.  The following
+    is an illustration of what happens to an input file.  The blue line represents the histogram and the red line is the cumulative
+    distribution. On the left is the histogram and cumulative distribution of an unmodified image, while the figure on the right shows
+    how the both the histogram and distribution are altered.
+    <br></br>
+        <img src="assets/image/exampleBefore.jpg"
+         alt="Before equalization"></img>
+        <img src="assets/image/exampleAfter.jpg"
+         alt="After equalization"></img> <br></br>
+    The blue line represents the input file's histogram and the red line represents its cumulative distribution function.      
+ 
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>histmatch</item>
+      <item>stretch</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Sean Crosby" date="2006-12-15">
+      Original version 
+    </change>
+    <change name="Steven Lambright" date="2008-05-06">
+      Histogram object no longer has SetRange, updated to use SetValidRange
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be equalized 
+        </brief>
+        <description>
+          This file will have its cumulative distribution reshaped to be more linear. 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing a linearized image
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Histogram Options">
+      <parameter name = "MINPER">
+        <type>double</type>
+        <default><item>0.5</item></default>
+        <brief>Minimum percentage</brief>
+        <description>
+          Minimum DN cut-off value at the cumulative percent of the histogram
+        </description>
+
+        <minimum inclusive="yes">0.0</minimum>
+        <lessThan>
+          <item>MAXPER</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "MAXPER">
+        <type>double</type>
+        <default><item>99.5</item></default>
+        <brief>Maximum percentage</brief>
+        <description>
+          Maximum DN cut-off value at the cumulative percent of the histogram
+        </description>
+
+        <maximum inclusive="yes">100.0</maximum>
+      </parameter>
+
+      <parameter name = "INCREMENT">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Percentage increment</brief>
+        <description>
+          Percentage increment for the histogram
+        </description>
+
+        <minimum inclusive="yes">1</minimum>
+        <lessThan>
+          <item>MAXPER</item>
+        </lessThan>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Histogram equalization</brief>
+      <description>
+        This example shows the results of histogram equalization on a single band of an image. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=../peaks.cub+6 to=../result.cub 
+        </commandLine>
+        <description>
+        Use histogram equalization to the make the input cube's sixth band distribution function linear.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/FROMparameter.jpg" width="500" height="500">
+          <brief> Input image for histeq</brief>
+          <description>This is band 6 of the input image for this example.
+          </description>
+          <thumbnail caption="Input Peaks (band 6) Image" src="assets/thumb/FROMparameter.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+
+        <image src="assets/image/band6plot.jpg" width="500" height="500">
+          <brief> Band 6 histogram</brief>
+          <description>This is the input image's cumulative distribution for band 6.
+          </description>
+          <thumbnail caption="Input Peaks (band 6) Image" src="assets/thumb/band6plot.jpg" width="200" height="200" />
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/TOparameter.jpg" width="500" height="500">
+          <brief>Output image for histogram equalization</brief>
+          <description> This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing the result of the histogram equalization." src="assets/thumb/TOparameter.jpg" width="200" height="200"  />
+          <parameterName>TO</parameterName>
+        </image>
+
+        <image src="assets/image/toplot.jpg" width="500" height="500">
+          <brief>Resulting cumulative distribution</brief>
+          <description>This is the output image's cumulative distribution.
+          </description>
+          <thumbnail caption="Output image" src="assets/thumb/toplot.jpg" width="200" height="200"  />
+        </image>
+
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/image/histeqgui.jpg" width="500" height="500">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+                         a histogram equalization operation with the input image. </description>
+            <thumbnail caption="Histeq Gui" src="assets/thumb/histeqgui.jpg" width="200" height="200"  />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

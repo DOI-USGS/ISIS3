@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="shade" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Create shaded-relief cube from topographic cube
+  </brief>
+
+  <description>
+    This program will create a shaded-relief cube from a topographic cube. It uses the sun angle (azimuth)
+    as well as the solar elevation (zenith) to compute the correct shading on the output cube.
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="2003-01-09">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2003-01-28">
+      Changed category from filter to photometry.
+    </change>
+    <change name="Tracie Sucharski" date="2003-02-07">
+      Changed user parameter names and now read pixel resolution
+      from labels.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Brian Peck" date="2006-12-25">
+      Algorithm change and input parameter change.
+    </change>
+    <change name="Mackenzie Boyd" date="2010-01-06">
+      Reversed slopes to be correct. Changed azimuth to be 0 degrees is 12 
+      o'clock rotating clockwise. Updated documentation to match.
+    </change>
+  </history>
+
+  <liens>
+    <item>
+      2007-05-31 Deborah Lee Soltesz: find out why IsisGUIBuilder doesn't
+      read this file and display it correctly.
+    </item>
+  </liens>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the input filename. All bands within the file
+          will have the shade applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the shaded output image.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Sun Parameters">
+      <parameter name="AZIMUTH">
+        <type>double</type>
+        <brief>Sun azimuth</brief>
+        <default>
+          <item>90.0</item>
+        </default>
+        <minimum inclusive="yes">0</minimum>
+        <maximum inclusive="no">360</maximum>
+        <description>
+          The direction of sun with 0 degrees at the 12:00, north position, 
+          rotating clockwise. Ranging from 0 to 359.9.
+        </description>
+      </parameter>
+      <parameter name="ZENITH">
+        <type>double</type>
+        <brief>Sun angle</brief>
+        <default>
+          <item>45.0</item>
+        </default>
+        <minimum inclusive="yes">0</minimum>
+        <maximum inclusive="yes">90</maximum>
+        <description>
+          The Sun Angle is the elevation at which the sun is relative to the 
+          planet horizon. 90 degrees is at the horizon, 0 is directly overhead.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="SCALE PARAMETERS">
+      <parameter name="PIXELRESOL">
+        <type>double</type>
+        <internalDefault>Automatic</internalDefault>
+        <brief>Pixel resolution</brief>
+        <description>
+          The pixel resolution of the image. This parameter will default to
+          the value from the labels or may be used to increase or decrease the
+          apparent steepness. If no mapping group exists, the user must enter a
+          pixel resolution. Greater than the image's pixel resolution will level 
+          and smooth, and less than will make steep and sharpen.
+        </description>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Shading Vallis Marinaris</brief>
+      <description>
+        Creating a shaded relief of Vallis Marinaris with a 22 degree azimuth 
+        and a 45 degree zenith
+      </description>
+      <terminalInterface>
+        <commandLine> from=vallis_marinaris.cub to=22.cub azimuth=22
+        </commandLine>
+        <description>
+          In this example shade will create a shaded relief of Vallis Marinaris 
+          with a 22 solar azimuth and a 45 degree zenith
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/Vallis_Marinaris.jpg" width="645" height="667">
+          <brief> Input image for shade</brief>
+          <description>
+            This is the input image used in the creation of our shaded relief.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/Vallis_Marinaris.thumb.jpg" width="193" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/292.jpg" width="645" height="666">
+          <brief> Output image for shade</brief>
+          <description>This is the output image that resulted.
+          </description>
+          <thumbnail caption="Output image showing results of the shade application." src="assets/thumb/292.thumb.jpg" width="194" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="501" height="412" src="assets/image/GUI.jpg">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of the GUI with parameters filled in to perform a 22
+              azimuth shade on our input image.
+            </description>
+            <thumbnail width="200" height="164" caption="shade Gui" src="assets/thumb/GUI.thumb.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>
+

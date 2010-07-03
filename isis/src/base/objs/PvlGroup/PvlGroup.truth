@@ -1,0 +1,36 @@
+/* Pets are cool
+Group = Animals
+  DOG    = 5.2 <meters>
+
+  # Cats shed
+  CATTLE = Meow
+End_Group
+5.2
+
+/* Pets are cool
+Group = Animals
+  # Cats shed
+  CATTLE = Meow
+End_Group
+
+/* Pets are cool
+Group = Animals
+End_Group
+
+# Testing
+/* 123 */
+Group = POODLE
+  CAT     = TABBY
+  BIRD    = PARROT
+  REPTILE = (SNAKE, LIZARD)
+  -VEGGIE = Null
+  BOVINE  = (COW, CAMEL)
+  TREE    = (MAPLE, ELM, PINE)
+
+  # This is a comment
+  FLOWER  = "DAISY & TULIP "
+
+  /* This is another comment */
+  BIG     = ("  NOT  ", "REALLY LARGE")
+End_Group
+**PVL ERROR** Group [POODLE] EndGroup not found before end of file

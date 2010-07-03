@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="enlarge" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Enlarge the pixel dimensions of an image
+  </brief>
+
+  <description>
+    This program will enlarge a cube by a given scalar of the original or to 
+    specific dimensions.  The user can specify to perform the enlargement by
+    cubic convolution, nearest neighbor, or bi-linear interpolation. 
+  </description>
+
+  <history>
+    <change name="Stuart Sides" date="2002-12-13">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-01-28">
+      Fixed documentation error. The application name was rotate
+      instead of enlarge.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Fixed compiler error with uninitialized variable after adding -O1 flag
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Drew Davidson" date="2005-08-17">
+      Added example
+    </change>
+    <change name="Brendan George" date="2005-10-31">
+      Fixed application test
+    </change>
+    <change name="Sean Crosby" date="2007-02-28">
+      Program now updates output file's mapping keywords
+    </change>
+    <change name="Steven Lambright" date="2007-06-22">
+      Fixed typo in the user documentation
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change> 
+    <change name="Steven Koechle" date="2008-05-28">
+        Fixed problems with the way the Alpha Cube was handled
+    </change>
+    <change name="Christopher Austin" date="2008-12-11">
+      Changed the parameter names smag/lmag to sscale/lscale for consistancy
+      with reduce.
+    </change>
+    <change name="Steven Lambright" date="2008-12-22"> 
+      The "Scale" keyword in the Projection group in the labels is now being 
+      updated if this program is run on a projected cube. 
+    </change>
+    <change name="Janet Barrett" date="2009-10-22"> 
+      Now uses the SubArea class to produce output cube labels
+      with corrected Mapping, Instrument, and AlphaCube groups.
+    </change>
+    <change name="Travis Addair" date="2009-12-10">
+      Added functionality for enlarging to a total number of pixels.
+    </change>
+    <change name="Travis Addair" date="2009-12-11">
+      Updated example.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to enlarge
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be enlarged unless a specific band is specified.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <fileMode>output</fileMode>
+        <type>cube</type>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the enlargement.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Scaling Parameters">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MODE">
+        <type>string</type>
+        <brief>
+          Scale up the image or enlarge to specific dimensions
+        </brief>
+        <default><item>SCALE</item></default>
+        <description>
+          Select between enlarging the image to a multiple of the original (by a 
+          scaling factor) or to specific dimensions (in terms of total 
+          number of pixels).
+        </description>
+        <list>
+          <option value="SCALE">
+            <brief>
+              Enlarge by a scaling factor 
+            </brief>
+            <description>
+              Enlarges the input image by a scaling factor.  The scaling factor
+              along the sample range and line range must then be 
+              specified in the SSCALE and LSCALE parameters, respectively.
+            </description>
+            <exclusions>
+              <item>ONS</item>
+              <item>ONL</item>
+            </exclusions>
+            <inclusions>
+              <item>SSCALE</item>
+              <item>LSCALE</item>
+            </inclusions>
+          </option>
+          <option value="TOTAL">
+            <brief>
+              Enlarge to a total number of pixels
+            </brief>
+            <description>
+              Enlarges the input image to a total number of pixels.  The number 
+              of pixels in the output image along the sample range and line 
+              range must then be specified in the ONS and ONL parameters, 
+              respectively.
+            </description>
+            <inclusions>
+              <item>ONS</item>
+              <item>ONL</item>
+            </inclusions>
+            <exclusions>
+              <item>SSCALE</item>
+              <item>LSCALE</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="SSCALE">
+        <type>double</type>
+        <brief>Sample magnification factor</brief>
+        <description>
+          This determines new size of the cube in the sample direction only.
+          The number of samples will be multiplied by this number.
+        </description>
+        <minimum inclusive="yes">1.0</minimum>
+        <default><item>1.0</item></default>
+      </parameter>
+
+      <parameter name="LSCALE">
+        <type>double</type>
+        <brief>Line magnification factor</brief>
+        <description>
+          This determines new size of the cube in the line direction only.
+          The number of linees will be multiplied by this number.
+        </description>
+        <minimum inclusive="yes">1.0</minimum>
+        <default><item>1.0</item></default>
+      </parameter>
+
+      <parameter name="ONS">
+        <type>integer</type>
+        <minimum inclusive="yes">1</minimum>
+        <brief>Number of samples in output</brief>
+        <description>
+          The number of samples desired in the output cube.  This value
+          must be greater than or equal to the number of samples in the input
+          image.
+        </description>
+      </parameter>
+
+      <parameter name="ONL">
+        <type>integer</type>
+        <minimum inclusive="yes">1</minimum>
+        <brief>Number of lines in output</brief>
+        <description>
+          The number of lines desired in the output cube.  This value
+          must be greater than or equal to the number of lines in the input
+          image.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Enlarge the number of samples by a scaling factor of 2, while leaving 
+        the number of lines the same.
+      </brief>
+      <description>
+        Here, the 1024 x 1024 image "peaks.cub" has had the application "reduce" 
+        applied to it in order to produce a 512 x 1024 image called 
+        "reducedPeaks.cub".  In this example, the reduced image, 
+        reducedPeaks.cub, will be enlarged by a factor of 2 along the sample 
+        dimension in an attempt to restore it back to its original form.
+      </description>
+      <terminalInterface>
+        <commandLine>
+      	  from=reducedPeaks.cub
+      	  to=restoredPeaks.cub
+      	  sscale=2.0
+      	</commandLine>
+      	<description>
+      	  In order to double the number of sample pixels, the sample scale is 
+      	  set to 2.0, and the line scale remains at its default of 1.0.  Since 
+      	  no mode or interpolation has been specified, the application will 
+          default to scale and cube convolution interpolation, respectively.
+      	</description>
+      </terminalInterface>
+      
+      <guiInterfaces>
+        <guiInterface>
+      	  <image width="614" height="750" src="assets/images/scaleGui.jpg">
+      	    <brief>
+              Example GUI
+      	    </brief>
+      	    <description>
+      	      Screenshot of the GUI with parameters set to perform an enlargement
+      	      of the samples by scaling.
+      	    </description>
+      	    <thumbnail width="164" height="200" caption="enlarge gui" src="assets/thumbs/scaleGui.jpg" />
+      	  </image>
+      	</guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+      	  <brief>
+      	    Input image for reduce
+      	  </brief>
+      	  <description>
+            This is the original image, before being reduced, that the enlarge 
+            application will attempt to replicate.   It is important to realize 
+            that this image has been scaled down to fit in a web browser. At 
+            full size, the image would be 1024 x 1024 pixels.
+      	  </description>
+      	  <thumbnail caption= "peaks.cub" src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+      	</image>
+        <image width="500" height="500" src="assets/images/reducedPeaks.jpg">
+      	  <brief>
+      	    Input image for enlarge, output from reduce
+      	  </brief>
+      	  <description>
+      	    This is the reduced image, containing half its original number of 
+            samples, that enlarge will attempt to restore.  Though it 
+            has also been scaled down to fit in a web browser, at full size it 
+            would be 512 x 1024 pixels. For more information, see the 
+            documentation for the "reduce" application.
+      	  </description>
+      	  <thumbnail caption= "reducedPeaks.cub" src="assets/thumbs/reducedPeaks.jpg" width="200" height="200"/>
+      	  <parameterName>FROM</parameterName>
+      	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/restoredPeaks.jpg">
+      	  <brief>
+            Output image from enlarge
+      	  </brief>
+      	  <description>
+      	    The enlarged image.  Despite the fact that half the samples were 
+      	    lost as a result of the reduction, the two images (peaks.cub and 
+            restoredPeaks.cub) look nearly identical due to the cubic 
+            convolution interpolation that was applied.  Again scaled down for 
+            web browsers, at full size, the image would be 1024 x 1024 pixels.
+      	  </description>
+      	  <thumbnail caption= "restoredPeaks.cub" src="assets/thumbs/restoredPeaks.jpg" width="200" height="200"/>
+      	  <parameterName>TO</parameterName>
+      	</image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>
+        Enlarge the number of samples to 768, and keep the number of lines at 
+        1024
+      </brief>
+      <description>
+        Here the mode has been set to enlarge to a total number of pixels along 
+        the sample and line dimensions, with all other parameters kept at their 
+        default settings.
+      </description>
+      <terminalInterface>
+        <commandLine>
+      	  from=reducedPeaks.cub 
+          to=enlargeTotalPeaks.cub 
+          mode=total 
+          ons=768 
+          onl=1024
+      	</commandLine>
+      	<description>
+          In order to enlarge to specific dimensions, the mode is set here to
+          "total".  Also, because total lines and samples do not have default 
+          values, the output number of lines must still be specified, even 
+          though they will be unchanged.
+      	</description>
+      </terminalInterface>
+      
+      <guiInterfaces>
+        <guiInterface>
+      	  <image width="614" height="750" src="assets/images/totalGui.jpg">
+      	    <brief>
+              Example GUI
+      	    </brief>
+      	    <description>
+      	      Screenshot of the GUI with parameters set to perform a sample  
+              enlargement to a total number of pixels.
+      	    </description>
+      	    <thumbnail width="164" height="200" caption="enlarge gui" src="assets/thumbs/totalGui.jpg" />
+      	  </image>
+      	</guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/reducedPeaks.jpg">
+      	  <brief>
+      	    Input image for enlarge
+      	  </brief>
+      	  <description>
+      	    This is the same input image, reducedPeaks.cub, that was enlarged in 
+            the last example.
+      	  </description>
+      	  <thumbnail caption= "reducedPeaks.cub" src="assets/thumbs/reducedPeaks.jpg" width="200" height="200"/>
+      	  <parameterName>FROM</parameterName>
+      	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/enlargeTotalPeaks.jpg">
+      	  <brief>
+            Output image from enlarge
+      	  </brief>
+      	  <description>
+      	    The enlarged image. Though it has been scaled down so that it can
+      	    be viewed in a web browser, the essential change can still be 
+      	    observed. The horizontal enlargement is noticable, and the output 
+            cube has 3/2 the number of samples as the input cube.
+      	  </description>
+      	  <thumbnail caption= "enlargeTotalPeaks.cub" src="assets/thumbs/enlargeTotalPeaks.jpg" width="200" height="200"/>
+      	  <parameterName>TO</parameterName>
+      	</image>
+      </outputImages>
+    </example>
+  </examples>
+</application>
+

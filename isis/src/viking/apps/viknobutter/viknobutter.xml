@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="viknobutter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Final step of Viking Orbiter Level 1 image clean-up
+  </brief>
+
+  <description>
+    This program will perform the  final level 1 clean up processing sequence 
+    on a Viking Orbiter PDS image to remove butterflies from the image.
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>vikfixtrx</item>
+      <item>findrx</item>
+      <item>remrx</item>
+      <item>vikclean</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Miller" date="2005-12-28">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-16">
+      Added Examples
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be cleaned
+        </brief>
+        <description>
+          The cube to be cleaned.  The cube will be ran through a series of filters to
+          remove butterflies from the image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the cleaned data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Options">
+        <parameter name="REMOVE">
+            <type>boolean</type>
+            <brief>
+                  Remove intermediate files
+            </brief>
+            <description>
+                Option to remove or leave intermediate cube files made by the application
+            </description>
+            <default><item>TRUE</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+     <example>
+      <brief> Input Viking Image to have butterflies removed </brief>
+      <description>
+        This example shows the viknobutter application in action.  It removes all butterflies from the image.
+      </description>
+      <terminalInterface>
+        <commandLine> from=../IN/temp.cub to=OUT/out.cub
+        </commandLine>
+        <description>
+          Input a viking image to remove butterflies from and give it an output file name.
+        </description>
+      </terminalInterface>
+      
+      <inputImages>
+        <image src="assets/image/inputImage.jpg" width="584" height="512">
+          <brief> Viking Image to Remove Butterflies from</brief>
+          <description>
+              This is the input viking image prior to the removal of butterflies.
+          </description>
+          <thumbnail caption=" Input Viking Image" src="assets/thumb/inputImage.jpg" width="200" height="175"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      
+      <outputImages>
+        <image src="assets/image/outputImage.jpg" width="584" height="512">
+          <brief> Output Image</brief>
+          <description> 
+              This is the viking image after the viknobutter application has been run.
+          </description>
+          <thumbnail caption="Output Viking Image after running the viknobutter application." src="assets/thumb/outputImage.jpg" width="200" height="175"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+   
+     </example>
+   </examples>
+ </application>
+

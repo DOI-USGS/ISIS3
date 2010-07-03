@@ -1,0 +1,16 @@
+UNIT TEST for LunarLambertMcEwen photometric function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name = LunarLambertMcEwen
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.903853
+Test phase=60.0, incidence=45.0, emission=30.0 ...
+Albedo = 1.14863
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+

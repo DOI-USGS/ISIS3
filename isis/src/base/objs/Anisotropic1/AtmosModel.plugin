@@ -1,0 +1,4 @@
+Group = Anisotropic1
+  Library = Anisotropic1
+  Routine = Anisotropic1Plugin
+End_Group

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="vicar2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import Vicar image file into Isis format
+  </brief>
+
+  <description>
+    This program will import a Vicar image file into an Isis cube.  No
+    translation of Vicar labels are done.
+  </description>
+
+  <history>
+    <change name="Tracie L Sucharski" date="2003-09-10">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2004-02-06">
+      Modified due to IsisImport refactor
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-15">
+      Added appTest
+    </change>
+    <change name="Steven Koechle" date="2007-08-29">
+      Added special pixel ranges and example
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Vicar file
+        </brief>
+        <description>
+          Use this parameter to select the Vicar filename. If multi-band, it
+          is assumed to be in band sequential order.
+        </description>
+        <filter>
+          *.img *.IMG *.vic
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+
+     <group name="Special Pixels">
+      <parameter name="SETNULLRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>NULLMIN</item>
+          <item>NULLMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="NULLMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>HRSMIN</item>
+          <item>HRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>LRSMIN</item>
+          <item>LRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Converting an vicar file to an Isis Cube
+      </brief>
+      <description>
+        This example will show the conversion from a vicar file to a cube.
+      </description>
+      <terminalInterface>
+        <commandLine>FROM=input.img TO=out.cub</commandLine>
+        <description>Convert the image input.img to the Isis Cube out.cub</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/vicar2isisGUI.jpg" width="450" height="550">
+            <brief>Convert the image input.img to the Isis Cube out.cub</brief>
+            <description>
+              The is the GUI for vicar2isis when converting the ascii file input.txt to the Isis Cube out.cub
+            </description>
+            <thumbnail caption="Convert input.img to the Isis Cube out.cub" src="assets/thumbs/vicar2isisGUI.jpg" width="164" height="200" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/input.img">
+          <brief>
+	    Vicar input file.
+          </brief>
+          <description>
+	    This is the vicar data
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image width="550" height="550" src="assets/images/out.jpg">
+          <brief>Output Isis Cube</brief>
+          <description>
+            The is the output Isis Cube peaks.cub generated from this example.
+          </description>
+          <thumbnail src="assets/thumbs/out.jpg" width="200" height="200" caption="Output Image" />
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

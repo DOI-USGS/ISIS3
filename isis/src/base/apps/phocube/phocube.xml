@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="phocube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Creates phase, incidence, and/or emmision angle bands for a cube
+  </brief>
+
+  <description>
+    This program creates a cube where the bands represent the photometry phase,
+    emission and/or incidence angles. Only the desired bands will be created.
+  </description>
+
+  <oldName>
+    <item>lev1geoplane</item>
+    <item>levgeoplane</item>
+    <item>geoback</item>
+  </oldName>
+
+  <liens>
+    <item>Add resolution to possible outputs</item>
+    <item>Convert to a IsisProcessBySpectra when it gets written</item>
+  </liens>
+
+  <history>
+    <change name="Unknown" date="1999-02-11">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-06-04">
+      Converted to Isis 3.0, and made it create a cube rather than adding
+      backplanes.
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Stuart Sides" date="2005-09-09">
+      Fixed problem where the program through an error when it tried to propagate 
+      the pixel type from the input file.
+    </change>
+    <change name="Stuart Sides" date="2005-09-09">
+      Added the bandbin group to the cube labels.
+    </change>
+    <change name="Jeff Anderson" date="2005-09-20">
+      Fixed a bug with switched samples and lines
+    </change>
+    <change name="Elizabeth Miller" date="2005-10-05">
+        Moved into Photometry and Radiometry category
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-23">
+      Modified to use ProcessByBrick instead of ProcessByLine to make faster
+    </change>
+    <change name="Brendan George" date="2006-09-21">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Koechle" date="2008-08-19">
+      Added new parameters: PIXELRESOLUTION, LINERESOLUTION,
+      SAMPLERESOLUTION, DETECTORRESOLUTION, NORTHAZIMUTH, 
+      SUNAZIMUTH, SPACECRAFTAZIMUTH, OFFNADIRANGLE
+    </change>
+    <change name="Steven Lambright" date="2009-03-06">
+      Fixed a bug that occurred when processing band-dependant cubes
+    </change>
+   <change name="Kris Becker" date="2009-05-29">
+      Added the propagation of the input cube labels, objects, blobs, etc..., so 
+      the pedigree of the input source is retained.
+    </change>
+    <change name="Sharmila Prasad" date="2009-07-17">
+      Set the defaults for PIXELRESOLUTION, LINERESOLUTION,
+      SAMPLERESOLUTION, DETECTORRESOLUTION, NORTHAZIMUTH, 
+      SUNAZIMUTH, SPACECRAFTAZIMUTH, OFFNADIRANGLE to FALSE
+    </change>
+</history>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the input filename.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the phase and/or emission and/or incidence
+          angles.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Photometry">
+      <parameter name="PHASE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Create a phase angle band.</brief>
+        <description>
+          If this parameter is true then a phase angle band will be created
+        </description>
+      </parameter>
+      <parameter name="EMISSION">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Create an emission angle band.</brief>
+        <description>
+          If this parameter is true then an emission angle band will be created
+        </description>
+      </parameter>
+      <parameter name="INCIDENCE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Create an incidience angle band.</brief>
+        <description>
+          If this parameter is true then an incidence angle band will be created
+        </description>
+      </parameter>
+      <parameter name="LATITUDE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Create a latitude band.</brief>
+        <description>
+          If this parameter is true then a latitude band will be created
+        </description>
+      </parameter>
+      <parameter name="LONGITUDE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Create a longitude band.</brief>
+        <description>
+          If this parameter is true then a longitude band will be created
+        </description>
+      </parameter>
+      <parameter name="PIXELRESOLUTION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a pixel resolution band.</brief>
+        <description>
+          If this parameter is true then a pixel resolution band will be created
+        </description>
+      </parameter>
+      <parameter name="LINERESOLUTION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a line resolution band.</brief>
+        <description>
+          If this parameter is true then a line resolution band will be created
+        </description>
+      </parameter>
+      <parameter name="SAMPLERESOLUTION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a sample resolution band.</brief>
+        <description>
+          If this parameter is true then a sample resolution band will be 
+          created
+        </description>
+      </parameter>
+      <parameter name="DETECTORRESOLUTION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a detector resolution band.</brief>
+        <description>
+          If this parameter is true then a detector resolution band will be 
+          created
+        </description>
+      </parameter>
+      <parameter name="NORTHAZIMUTH">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a north azimuth band.</brief>
+        <description>
+          If this parameter is true then a north azimuth band will be created
+        </description>
+      </parameter>
+      <parameter name="SUNAZIMUTH">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a sun azimuth band.</brief>
+        <description>
+          If this parameter is true then a sun azimuth band will be 
+          created
+        </description>
+      </parameter>
+      <parameter name="SPACECRAFTAZIMUTH">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a spacecraft azimuth band.</brief>
+        <description>
+          If this parameter is true then a spacecraft azimuth band will be 
+          created
+        </description>
+      </parameter>
+      <parameter name="OFFNADIRANGLE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a offNadir angle band.</brief>
+        <description>
+          If this parameter is true then a offNadir angle band will be created
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

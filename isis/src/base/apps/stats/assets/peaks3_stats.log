@@ -1,0 +1,20 @@
+Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Gathering histogram
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Average:        48.6321
+Std Deviation:  14.9684
+Variance:       224.053
+Median:         47.0317
+Mode:           38.9517
+Skew:           0.320739
+Minimum:        15
+Maximum:        212
+ 
+Total Pixels:    1.04858e+06
+Valid Pixels:    1.04858e+06
+Null Pixels:     0
+Lis Pixels:      0
+Lrs Pixels:      0
+His Pixels:      0
+Hrs Pixels:      0

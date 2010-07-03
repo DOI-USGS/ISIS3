@@ -1,0 +1,14 @@
+Object = InterestOperator
+  Group = Operator
+    Name            = Gradient
+    DeltaLine       = 100
+    DeltaSamp       = 100
+    Samples         = 15
+    Lines           = 15
+    MinimumInterest = 1
+  End_Group
+End_Object
+End
+Sample: 91
+Line : 371
+Interest: 2.99249

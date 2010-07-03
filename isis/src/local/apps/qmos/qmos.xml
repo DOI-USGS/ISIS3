@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="qmos" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Display and analyze cube footprints
+  </brief>
+
+  <description>
+    This program will display cube footprints and allow for interactive 
+    analysis. It is a prototype version and is still in progress.  More 
+    documentation will be forthcoming.
+  </description>
+
+  <category>
+    <categoryItem>Display</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stacy Alley" date="2009-05-20">
+      Original version
+    </change>
+    <change name="Eric Hyer" date="2010-03-22">
+      Discontinued forcing of gui style to windows
+    </change>
+  </history>
+</application>

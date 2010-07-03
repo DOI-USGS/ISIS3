@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="overlapstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Calculates the statistics of overlapping cube regions</brief>
+
+  <description>
+    <p>
+    Taking a list of cubes and an image overlap list file from 
+    "findimageoverlaps", this application determines the statistics on all 
+    overlapping polygons of those provided images, and displays those values 
+    in the print.prt file.  Note that the units of Area is square meters, and
+    Image is images per polygon.
+    </p>
+    <p>
+    In addition, if there are any cubes within the list that do not overlap with
+    any other cube in the list, those cube's filenames and Serial Numbers will
+    included at the end if the output given to the print.prt file.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+   <history>
+    <change name="Christopher Austin" date="2008-09-30">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-10-28">
+      Fixed the formatting for a  tab tabletype, improved documentation, and
+      added an example.
+    </change>
+    <change name="Christopher Austin" date="2008-11-10">
+      The output file TO must now be specified.
+    </change>
+    <change name="Steven Lambright" date="2008-11-17">
+      Added support for image overlap files, which is what "OVERLAPLIST" needs to
+      be. This is a required parameter obtained from running "findimageoverlaps."
+    </change>
+    <change name="Christopher Austin" date="2008-10-28">
+      Added error throwing when there are no overlaps among the cubes provided
+      and other small bug fixes.
+    </change>
+    <change name="Christopher Austin" date="2009-01-26">
+      Added the ERRORS flat file.
+    </change>
+    <change name="Christopher Austin" date="2009-02-17">
+      Added the DETAILS FULL output option. BRIEF is now what the application
+      use to result in.
+    </change>
+    <change name="Christopher Austin" date="2009-03-05">
+      Altered the DETAILS FULL and BRIEF options based off of user input. Now,
+      the statistical data will always be placed in the print.prt file, and the
+      TO file will only be used for the detailed output of the overlaps.
+    </change>
+    <change name="Christopher Austin" date="2009-06-05">
+      Added the SINGLELINE parameter and changed the keywords SerialNumber* to
+      ImageStack*
+    </change>
+    <change name="Christopher Austin" date="2009-06-08">
+      Removed the *Sum keywords from the BRIEF output, and added PolygonCount.
+    </change>
+  </history>
+
+  <groups>
+
+    <group name="Input Files">
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of Input cubes
+        </brief>
+        <description>
+          The filename which contains a list of input cubes.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="OVERLAPLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          This is the list of image overlaps corresponding to this control net
+        </brief>
+        <description>
+          Use this parameter to select the filename which contains the
+          overlap list. You can obtain this file by running "findimageoverlaps."
+        </description>
+        <filter>
+          *
+        </filter>
+      </parameter>
+
+    </group>
+
+    <group name="Output">
+
+      <parameter name="DETAIL">
+        <type>string</type>
+        <default>
+          <item>BRIEF</item>
+        </default>
+        <brief>Output data content</brief>
+        <description>
+          Determines how much detail is given.
+        </description>
+        <list>
+          <option value="BRIEF">
+            <brief>Brief Table</brief>
+            <description>
+              The ouput will be displayed and placed in the print.prt file, 
+              containing a table of statistics as described in the application
+              Description, including Area and Thickness statistics. If there
+              are any cubes in the FROMLIST which do not overlap any other
+              cubes in the FROMLIST, they will be listed at the bottom of the
+              PVL Group.
+            </description>
+            <exclusions>
+              <item>TO</item>
+              <item>TABLETYPE</item>
+              <item>SINGLELINE</item>
+            </exclusions>
+          </option>
+          <option value="FULL">
+            <brief>Full Data</brief>
+            <description>
+              This option includes the same output as the BRIEF option. In
+              addition, it places in the TO file a listing of all overlaps with
+              each overlap's Area, Thickness, and all cubes that make up that
+              overlap.
+            </description>
+            <inclusions>
+              <item>TO</item>
+              <item>TABLETYPE</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output stats file
+        </brief>
+        <description>
+          The table file of the detailed stats of each overlap.
+        </description>
+      </parameter>
+
+      <parameter name="TABLETYPE">
+        <type>string</type>
+        <default>
+          <item>CSV</item>
+        </default>
+        <brief>Output data format</brief>
+        <description>
+          The resultant statistics of the overlaps will be formatted
+          in accordance to the following option.
+        </description>
+        <list>
+          <option value="TAB">
+            <brief> Tab Table </brief>
+            <description>
+              Places the resulting statistics into an easy to read table,
+              which displays values seperates by tabs.
+            </description>
+            <exclusions>
+              <item>SINGLELINE</item>
+            </exclusions>
+          </option>
+          <option value="CSV">
+            <brief>CSV</brief>
+            <description>
+              Output the resulting statistics into Comma Seperated Value (CSV)
+              format.
+            </description>
+            <inclusions>
+              <item>SINGLELINE</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="SINGLELINE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Place all Serial Numbers on the same CVS line
+        </brief>
+        <description>
+          When True, places all Serial Numbers and Filenames on the same line
+          in the output CVS file. When False, Serial Numbers and Filenames
+          are placed in columns for readability.
+        </description>
+      </parameter>
+
+      <parameter name="ERRORS">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>No Error Output</internalDefault>
+        <brief>
+          Errors generated when calculating the overlap stats
+        </brief>
+        <description>
+          This file will contain the errors that occurred while calculating the overlap stats.
+        </description>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+  <examples>
+
+    <example>
+      <brief>Overlapping Statistics</brief>
+      <description>
+        Get the overlapping statistics of the following cubes.
+      </description>
+      <terminalInterface>
+        <commandLine>  from=cubes.lis overlpalist=overlaps.dat</commandLine>
+        <description>
+        In this example overlapstats will calculate the statistics of the thickness,
+        area, and serial number count of the overlapping polygons that the cubes
+        provided in cubes.lis create, and output those results into the
+        print.prt file.
+        </description>
+      </terminalInterface>
+
+      <dataFiles>
+        <dataFile path="assets/cubes.lis">
+          <brief>The list of cubes to use</brief>
+          <description>
+            This is the input list of cubes to use to create the overlap which
+            the statistics will be ran on.
+          </description>
+          <parameterName>FROMLIST</parameterName>
+        </dataFile>
+        <dataFile path="assets/print.prt">
+          <brief>The resultant stats</brief>
+          <description>
+            The stats of overlapstats will be displayed and sent to print.prt.
+          </description>
+        </dataFile>
+      </dataFiles>
+
+      <inputImages>
+        <image src="assets/image/cube.1.jpg" width="494" height="494">
+          <brief>First image</brief>
+          <description>This is the first input image for the overlapstats to use
+          </description>
+          <thumbnail caption="cube.1.cube" src="assets/thumb/thumb.1.jpg" width="198" height="198"/>
+        </image>
+        <image src="assets/image/cube.2.jpg" width="493" height="493">
+          <brief>Second image</brief>
+          <description>This is the second input image
+          </description>
+          <thumbnail caption="cube.2.cub" src="assets/thumb/thumb.2.jpg" width="198" height="198"/>
+        </image>
+        <image src="assets/image/cube.3.jpg" width="481" height="476">
+          <brief>Third image</brief>
+          <description>This is the third input image
+          </description>
+          <thumbnail caption=" cube.3.cub" src="assets/thumb/thumb.3.jpg" width="198" height="197"/>
+        </image>
+      </inputImages>
+
+    </example>
+
+  </examples>
+
+</application>

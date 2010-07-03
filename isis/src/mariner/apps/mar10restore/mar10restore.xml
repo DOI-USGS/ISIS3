@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mar10restore" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+   Restoration of Mariner10 compress images
+  </brief>
+
+  <description>
+    This application makes full images out of previously compressed images. The 
+    compressed images don't appear compressed when imported, they appear dark 
+    because there are 3/4 nulls. By removing noise and then averaging these 
+    cubes a decent image can be produced.
+  </description>
+
+  <category>
+    <missionItem>Mariner</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>noisefilter</item>
+      <item>lowpass</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Travis Addair" date="2009-06-10">
+      Original version
+    </change>
+    <change name="Mackneize Boyd" date="2009-08-12">
+       Added trim to pipeline, updated documentation, added example, added test
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be restored
+        </brief>
+        <description>
+          An input file which needs reconstruction.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          Reconstructed cube without null data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    
+    <group name="Options">
+      <parameter name="REMOVE">
+        <type>boolean</type>
+        <brief>
+          Remove intermediate files
+        </brief>
+        <description>
+          Option to remove or leave intermediate cube files made by the 
+          application
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Input Mariner10 image to be restored 
+      </brief>
+      <description>
+        This image was originally transmitted compressed and now needs to be 
+        restored. Restoration is imperfect as only a quarter of the original 
+        data is present.
+      </description>
+      <terminalInterface>
+        <commandLine> from=MVE_010.102.cub to=restored.cub
+        </commandLine>
+        <description>
+          Arguments to input a Mariner10 image needing restoration
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="475" height="398" src="assets/images/restoreGUI.jpg">
+            <brief> 
+              Example Gui
+            </brief>
+            <description>
+              Screenshot of GUI with parameters filled in to with a Mariner10 
+              cube needing restoration.
+            </description>
+            <thumbnail width="200" height="168" caption="mar10restore Gui" src="assets/thumbs/restoreGUI.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image src="assets/images/preRestore.jpg" width="750" height="631">
+          <brief>
+            Mariner10 image to be restored
+          </brief>
+          <description>
+            This image will have noise removed and will have the significant 
+            amount of null data filled in from the original data.
+          </description>
+          <thumbnail caption=" Input Mariner10 image" src="assets/thumbs/preRestore.jpg" width="200" height="168"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+  
+      <outputImages>
+        <image src="assets/images/postRestore.jpg" width="750" height="631">
+          <brief>
+            Restored Mariner10 image
+          </brief>
+          <description>
+            A restored image after noise removal and averaging to fill in null
+            data.
+          </description>
+          <thumbnail caption="Output restored image" src="assets/thumbs/postRestore.jpg" width="200" height="168"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+  
+    </example>
+  </examples>
+
+</application>
+

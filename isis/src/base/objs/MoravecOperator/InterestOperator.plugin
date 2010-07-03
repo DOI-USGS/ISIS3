@@ -1,0 +1,4 @@
+Group = Moravec
+  Library = MoravecOperator
+  Routine = MoravecOperatorPlugin
+End_Group

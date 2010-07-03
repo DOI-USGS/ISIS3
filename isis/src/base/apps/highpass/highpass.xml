@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="highpass" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a spatial high pass filter to a cube
+  </brief>
+
+  <description>
+    This program applies a high pass filter to a cube.  That is, it filters
+    the cube data by suppressing low frequency data (e.g., albedo) and allows
+    high frequency data (e.g., structure) to pass through.
+    This is done by convolving an NxM boxcar through the data, where N and M
+    are odd integers.  The average of the boxcar is subtracted from the
+    middle pixel.  The result of the subtraction is the high frequency
+    information.  Thus, output(i,j) = input(i,j) - average(i,j,N,M) where
+    i and j are the sample and line position in the cube, N and M are the
+    size of the boxcar, and average(i,j,N,M) is the average of the NxM centered
+    at i,j.  A small boxcar (e.g, 3x3) will allow fine
+    details to pass thru and will significantly suppress the albedo.  A large
+    boxcar (e.g, 101x101) will enhance larger features and allow more albedo
+    information to pass through.  In general, features which are half the size
+    of the boxcar will pass through the filter.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>sharpen</item>
+      <item>lowpass</item>
+      <item>trimfilter</item>
+      <item>svfilter</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Eric Eliason" date="1988-05-20">
+      Original version
+    </change>
+
+    <change name="Jeff Anderson" date="2002-07-30">
+      Ported to Isis 3.0
+    </change>
+
+    <change name="K Teal Thompson" date="2002-11-19">
+      Add examples.
+    </change>
+
+    <change name="K Teal Thompson" date="2002-12-09">
+      Make images smaller
+    </change>
+
+    <change name="K Teal Thompson" date="2003-03-19">
+      Add move images to /image and /thumb directory.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Stuart Sides" date="2004-02-17">
+      Added addback parameter 
+    </change>
+  </history>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+	        Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output highpass cube
+        </brief>
+        <description>
+	        The resultant filtered cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Settings">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of samples in the boxcar.
+          It must be odd and can not exceed twice the number of samples
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly
+          slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>   
+
+      <parameter name="MINOPT">
+          <type>string</type>
+          <default>
+              <item>COUNT</item>
+          </default>
+          <brief>
+             Sets minimum to be either a count or a percentage
+          </brief>
+          <description>
+              This parameter determines whether the minimum
+              parameter is to be interpreted as a count of pixels, or a
+              percentage of all pixels in the boxcar.
+          </description>
+
+          <list>
+              <option value="COUNT">
+                  <brief>
+                      Minimum valid pixel count
+                  </brief>
+                  <description>
+                      This option indicates that the minimum is a minimum
+                      count of pixels required for filtering.
+                  </description>
+              </option>
+              <option value="PERCENTAGE">
+                <brief>
+                    Minimum valid pixel percentage
+                </brief>
+                <description>
+                    This option indicates the the minimum parameter is to be
+                    interpreted as a percentage of the total pixels in the
+                    boxcar.
+                </description>
+              </option>
+          </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <brief>
+          Minimum boxcar pixel count
+        </brief>
+
+        <description>
+          This is the minimum number of valid pixels which must occur inside the
+          NxM boxcar for filtering to occur. For example, 3x5 boxcar has 15
+          pixels inside.  If MINIMUM=10 then the filter will occur if there are
+          10 or greater valid pixels.  A valid pixel is one that is not special
+          (NULL, LIS, etc) and is in the range defined by LOW to HIGH.
+        </description>
+
+        <default>
+          <item>1</item>
+        </default>
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Valid minimum pixel
+        </brief>
+
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar statistics.
+        </description>
+
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Valid maximum pixel
+        </brief>
+
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing boxcar statistics.
+        </description>
+
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="PROPAGATE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Propagate special pixels</brief>
+
+        <description>
+          This option is used to define how special pixels are handled.  If the
+          center pixel of the boxcar is a special pixel it will be propagated
+          or set to NULL depending on the value of this parameter.
+        </description>
+      </parameter>
+
+      <parameter name="ADDBACK">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Percentage of input pixel to add back to the filter</brief>
+        <description>
+          This option is used to specify how much of the input pixel is
+          added to the filter result.  A value of 100 implies the entire input
+          pixel will be added back to the filter which is equivalent to the
+          sharpen program.  Recall that highpass filters
+          suppress albedo and therefore you are essentially selecting 
+          a percentage of albedo to addback.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">100.0</maximum>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+
+    <example>
+      <brief> 7 by 7 </brief>
+      <description> Use a 7 by 7 pixel filter and use all pixels.
+      </description>
+      <terminalInterface>
+        <commandLine> from=2400r to=2400r.hpf7x7all samp=7 line=7 </commandLine>
+        <description> The highpass box filter is selected 7 pixels wide by 7 pixels long and parameters 'low' and 'high' default to 'use all pixels'.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/2400r.jpg" width="500" height="500">
+          <brief> Input image for highpass</brief>
+          <description>This is the input image for the 7x7 example of highpass.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/2400r.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/2400r.hpf7x7all.jpg" width="500" height="500">
+          <brief> Output image 7x7 example of highpass </brief>
+          <description> This is the output image for highpass. Notice the smoothing of abedo typical of high pass filtering, which leaves terrain more visible.  This smaller filter leaves smaller features visible.
+          </description>
+          <thumbnail caption="Output image showing results of the highpass application with 7 by 7 pixel filter." src="assets/thumb/2400r.hpf7x7all.jpg" width=" 200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="480" height="415" src="assets/image/highpass7x7allGui.jpg">
+            <brief>Example GUI</brief>
+            <description> Screenshot of GUI with parameters filled in to perform the 7x7 filter - with low, high, min default - highpass operation </description>
+            <thumbnail width="200" height="172" caption="highpass GUI" src="assets/thumb/highpass7x7allGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+
+    <example>
+      <brief> 21 by 21 </brief>
+      <description> Use a 21 by 21 pixel filter and use all pixels.
+      </description>
+      <terminalInterface>
+        <commandLine> from=2400r to=2400r.hpf21x21all samp=21 line=21 </commandLine>
+        <description> The boxcar filter is selected 21 pixels wide by 21 pixels long and parameters 'low' and 'high' default to 'use all pixels'.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/2400r.jpg" width="500" height="500">
+          <brief> Input image for highpass</brief>
+          <description>This is the input image for the 21x21 example of highpass.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/2400r.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/2400r.hpf21x21all.jpg" width="500" height="500">
+          <brief> Output image 21x21 example of highpass </brief>
+          <description> This is the output image for highpass. This larger filter leaves larger features visible.
+          </description>
+          <thumbnail caption="Output image showing results of the highpass applica tion with 21 by 21 pixel filter." src="assets/thumb/2400r.hpf21x21all.jpg" width=" 200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="480" height="415" src="assets/image/highpass21x21allGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform the 21x21 filter - with low, high, min default - highpass operation</description>
+            <thumbnail width="200" height="172" caption="highpass GUI" src="assets/thumb/highpass21x21allGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+
+  </examples>
+</application>

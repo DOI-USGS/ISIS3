@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="grid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Add a grid to the input image.     
+  </brief>
+
+  <description>
+    Superimpose a grid on an input image using input from the user.  The grid can
+    defined in terms of latitude and longitude, or simply lines and samples.  For 
+    example, if you wanted to draw a grid that has an intersection at line 23, 
+    sample 17, with vertical lines every 30 pixels and horizontal lines every
+    40 pixels, your parameters would be: BASELINE = 23, BASESAMPLE = 17, 
+    SINC = 30, and LINC = 40. <br></br><br></br>
+    If you wanted to draw a grid on a map projection that was based on latitude 
+    and longitude, GROUND would be selected instead.  And suppose you wanted the 
+    grid to have an intersection at LAT 50, LON 60, with lines drawn every two
+    and a half degrees latitude and every three degrees longitude.  Your parameters 
+    would be: BASELAT = 50, BASELON = 60, LATINC = 2.5, and LONINC = 3. 
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+    <categoryItem>Map Projection</categoryItem>
+  </category>
+
+  <history>
+    <change name="Sean Crosby" date="2007-03-16">
+      Original version 
+    </change>
+    <change name="Steven Lambright" date="2007-07-27">
+      Added category: Map Projection
+    </change>
+    <change name="Steven Lambright" date="2008-04-22">
+      Fixed problems with mapping outside of the projection space and with 0lat/0lon boundaries.
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-06-12">
+      Added outline option
+    </change>
+    <change name="Steven Lambright" date="2009-01-06">
+      Changed how mode=ground works
+    </change>
+    <change name="Steven Lambright" date="2010-05-06">
+      Added TICKS options
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube 
+        </brief>
+        <description>
+          Use this parameter to select the input file.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the grid. 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Grid type">
+      <parameter name = "MODE">
+        <type>string</type>
+        <default><item>IMAGE</item></default> 
+        <brief>Grid options</brief>
+        <description>
+          This allows the user to decide which grid option to use.
+        </description>
+        <list>
+          <option value = "IMAGE">
+            <brief>Add a grid in terms of lines and samples</brief>
+            <description>
+              A grid will be inserted into the image with spacing and position
+              defined in terms of lines and samples.
+            </description>
+            <exclusions>
+              <item>BASELAT</item>
+              <item>BASELON</item>
+              <item>LATINC</item>
+              <item>LONINC</item>
+            </exclusions>  
+          </option>
+
+          <option value = "GROUND">
+            <brief>Add a grid in terms of lat/lon coordinates</brief>
+            <description>
+              A grid will be inserted into the image with spacing and position
+              defined in terms of latitude and longitude.
+            </description>
+            <exclusions>
+              <item>LINC</item>
+              <item>SINC</item>
+              <item>BASELINE</item>
+              <item>BASESAMPLE</item>
+            </exclusions>  
+          </option>
+        </list>
+      </parameter>
+
+       <parameter name="TICKS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Draw ticks instead of lines</brief>
+        <description>
+          Draw ticks at lat, lon line intersections instead of lines
+        </description>
+        <inclusions>
+          <item>DIAGONALTICKS</item>
+          <item>TICKSIZE</item>
+        </inclusions>
+      </parameter>
+
+       <parameter name="OUTLINE">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Outline the image</brief>
+        <description>
+          This will draw grid lines at the very edges of the image
+        </description>
+      </parameter>
+    </group>  
+
+    <group name="Image Grid Parameters">
+      <parameter name="BASELINE">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Starting line</brief>
+        <description>
+          Starting line of grid.  This, along with BASESAMPLE will give the 
+          program a starting point to draw the grid with.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="BASESAMPLE">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Starting sample</brief>
+        <description>
+          Starting sample of grid.  This, along with BASELINE will give the 
+          program a starting point to draw the grid with.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINC">
+        <type>integer</type>
+        <default><item>100</item></default>
+        <brief>Line increment</brief>
+        <description>
+          This defines the number of lines between gridlines 
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+      
+      <parameter name="SINC">
+        <type>integer</type>
+        <default><item>100</item></default>
+        <brief>Sample increment</brief>
+        <description>
+          This defines the number of samples between gridlines 
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+    
+    <group name="Ground Grid Parameters">
+      <parameter name="BASELAT">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Starting latitude</brief>
+        <description>
+          This is a latitude line the grid will lie on. If it is not in the image, 
+          then it is a latitude line the grid would lie on if the image were larger.
+          This is not a minimum latitude for the grid.
+        </description>
+        <minimum inclusive="yes">-90.0</minimum>
+      </parameter>
+
+      <parameter name="BASELON">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Starting longitude</brief>
+        <description>
+          This is a longitude line the grid will lie on. If it is not in the image, 
+          then it is a longitude line the grid would lie on if the image were larger.
+          This is not a minimum longitude for the grid.
+        </description>
+        <minimum inclusive="yes">-360.0</minimum>
+      </parameter>
+
+      <parameter name="LATINC">
+        <type>double</type>
+        <default><item>1.0</item></default>
+        <brief>Latitude increment</brief>
+        <description>
+          This defines the latitudinal spacing between gridlines 
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+      
+      <parameter name="LONINC">
+        <type>double</type>
+        <default><item>1.0</item></default>
+        <brief>Longitude increment</brief>
+        <description>
+          This defines the longitudinal spacing between gridlines 
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+    </group>
+    
+    <group name="Tick Parameters">
+      <parameter name="DIAGONALTICKS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Draw tick marks diagonally</brief>
+        <description>
+          Instead of drawing the tick marks vertically and horizonally, creating a '+', 
+          draw the tick marks diagonally creating an 'x'
+        </description>
+      </parameter>
+
+      <parameter name="TICKSIZE">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>Size of tickmarks</brief>
+        <description>
+          This defines the width and height (which are always equal) of the tick marks in pixels.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+        <odd />
+      </parameter>
+    </group>
+
+  </groups>
+</application>

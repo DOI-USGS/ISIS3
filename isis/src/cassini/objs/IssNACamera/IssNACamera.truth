@@ -1,0 +1,28 @@
+Unit Test for IssNACamera...
+Filename: N1525100863_2.cub
+CK Frame: 14082360
+
+For upper left corner ...
+Line, Sample: 0.5000, 0.5000
+Lat, Long:    8.2462, 323.2153
+WestLon:      36.7847
+
+For upper right corner ...
+Line, Sample: 0.5000, 1024.5000
+Lat, Long:    23.3914, 331.5063
+WestLon:      28.4937
+
+For lower left corner ...
+Line, Sample: 1024.5000, 0.5000
+Lat, Long:    -0.6730, 339.0561
+WestLon:      20.9439
+
+For lower right corner ...
+Line, Sample: 1024.5000, 1024.5000
+Lat, Long:    13.9600, 347.9185
+WestLon:      12.0815
+
+For center pixel position ...
+Line, Sample: 512.5000, 512.5000
+Lat, Long:    11.0856, 335.8600
+WestLon:      24.1400

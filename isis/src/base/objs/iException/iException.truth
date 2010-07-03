@@ -1,0 +1,15 @@
+TEST CASES FOR ERROR OBJECTS
+----------------------------
+**MATH ERROR** Testing math errors
+**SYSTEM ERROR** Testing system errors
+**SPICE ERROR** Testing spice errors
+**PARSE ERROR** Testing parse errors
+**PROJECTION ERROR** Testing projection errors
+**CAMERA ERROR** Testing camera errors
+**I/O ERROR** Testing I/O errors
+**PVL ERROR** Testing PVL errors
+**PROGRAMMER ERROR** Testing programmer errors
+**USER ERROR** Testing user errors
+**UNKNOWN ERROR** Testing unknown (none) errors
+Testing cancel option ...
+**CANCEL** 

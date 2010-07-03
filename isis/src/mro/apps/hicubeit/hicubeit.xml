@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hicubeit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Stack slithered HiRISE red, bg, and ir cubes
+  </brief>
+
+  <description>
+    This program will stack HiRISE color images.  The images must have been run through the "slither" procedure so that the pixels are spectrally aligned.    The output cube will contain three bands in
+    blue-green, red, and infrared order.    The Mosaic group will be written to the labels of the output cube which defines information about the three stacked bands.  This information is used in the
+    program "hirdrgen".  Using the program "cubeit" will not create this group and therefore "cubeit" products can not be written in RDR format.
+    Note that only CCDs
+    RED4, IR10, and BG12 or RED5, IR11, and BG13 can be stacked.  The program will report an error if invalid CCD combinations are given.
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson and Bob Sucharski" date="2006-10-19">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2007-02-20">
+        Changed OriginalLabel name to IsisCube
+    </change>
+    <change name="Robert Sucharski" date="2007-04-18">
+      Added keyword SpecialProcessingFlag to the mosaic group in output labels
+    </change>
+    <change name="Jeff Anderson" date="2007-06-19">
+      Reordered from BGR to RGB format
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="RED">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input red HiRISE cube
+        </brief>
+        <description>
+          The red HiRISE cube, either RED4 or RED5
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="IR">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input infrared HiRISE cube
+        </brief>
+        <description>
+          The infrared HiRISE cube, either IR10 or IR11
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="BG">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input blue-green HiRISE cube
+        </brief>
+        <description>
+          The blue-green HiRISE cube, either BG12 or BG13
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Combined output cube
+        </brief>
+        <description>
+          This will contain a three band output cube stacked in the order of BG, RED, and IR.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

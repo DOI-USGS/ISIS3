@@ -1,0 +1,21 @@
+Group = VIKING_ORBITER_1/VISUAL_IMAGING_SUBSYSTEM_CAMERA_A 
+  Version = 1
+  Library = VikingCamera
+  Routine = VikingCameraPlugin
+EndGroup
+Group = VIKING_ORBITER_1/VISUAL_IMAGING_SUBSYSTEM_CAMERA_B 
+  Version = 1
+  Library = VikingCamera
+  Routine = VikingCameraPlugin
+EndGroup
+Group = VIKING_ORBITER_2/VISUAL_IMAGING_SUBSYSTEM_CAMERA_A 
+  Version = 1
+  Library = VikingCamera
+  Routine = VikingCameraPlugin
+EndGroup
+Group = VIKING_ORBITER_2/VISUAL_IMAGING_SUBSYSTEM_CAMERA_B 
+  Version = 1
+  Library = VikingCamera
+  Routine = VikingCameraPlugin
+EndGroup
+

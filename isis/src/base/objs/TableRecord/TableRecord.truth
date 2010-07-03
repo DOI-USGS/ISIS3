@@ -1,0 +1,41 @@
+Testing Isis::TableRecord
+Fields      = 4
+Record size = 66
+-----
+testing pack
+Packing...
+Unpacking...
+Group = Field
+  Name = One
+  Type = Integer
+  Size = 1
+End_Group
+Group = Field
+  Name = Two
+  Type = Double
+  Size = 1
+End_Group
+Group = Field
+  Name = Three
+  Type = Text
+  Size = 50
+End_Group
+Group = Field
+  Name = Four
+  Type = Real
+  Size = 1
+End_Group
+-----
+Group = Field
+  Name = Three
+  Type = Text
+  Size = 50
+End_Group
+-----
+Group = Field
+  Name = Two
+  Type = Double
+  Size = 1
+End_Group
+-----
+**PROGRAMMER ERROR** Field [Five] does not exist in record

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tabledump" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+      Program to output a selected table to a file
+  </brief>
+
+  <description>
+      <p>
+          This program takes a cube with one or more table blobs in it, and, through
+          input provided by the user, outputs a selected table to an ASCII file,
+          with formatting determined by user input.
+      </p>
+
+      <p>
+          Helper button has been provided in the GUI mode for the NAME 
+          parameter.  The helper button will sequentially fill in the name of 
+          each table when pressed, clear the field to blank after the last table
+          has been reached, and then wrap back to the beginning.
+      </p>
+  </description>
+
+  <category>
+      <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <history>
+      <change name="Brendan George" date="2006-10-26">
+          Original version
+      </change>
+      <change name="Brendan George" date="2006-12-18">
+          Fixed helper button
+      </change>
+      <change name="Steven Lambright" date="2007-07-27">
+          Changed category from Utility to Import and Export 
+      </change>
+      <change name="Steven Koechle" date="2008-05-20">
+          Changed TO parameter to function like other applications in ISIS.
+          It now defaults to console output when no TO file is enterd.
+      </change>
+      <change name="Christopher Austin" date="2008-06-19">
+          Fixed string representation and display.
+      </change>
+      <change name="Travis Addair" date="2009-03-03">
+          Changed helper button to only place one table name into the 
+          NAME parameter each time it is pressed
+      </change>
+  </history>
+
+  <groups>
+      <group name="Files">
+          <parameter name="FROM">
+              <type>cube</type>
+              <fileMode>input</fileMode>
+              <brief>
+                  Input Cube
+              </brief>
+              <description>
+                  This is the cube containing the table to be output.
+              </description>
+              <filter>*.cub</filter>
+          </parameter>
+
+          <parameter name="TO">
+              <type>filename</type>
+              <fileMode>output</fileMode>
+              <brief>
+                  Output file
+              </brief>
+              <description>
+                  This is the output file where the table will be written.
+              </description>
+              <internalDefault>
+                No Output file will be created
+              </internalDefault>
+              <filter>*.txt</filter>
+          </parameter>
+      </group>
+
+      <group name="Specifications">
+          <parameter name="NAME">
+              <type>string</type>
+              <brief>
+                  The name of the table
+              </brief>
+              <description>
+                  This is the name of the table to be output. The name is found
+                  in the labels, in the relevant object, as the value of the
+                  Keyword "Name." This value is set by the program creating
+                  the table, and is standardized to certain conventions.
+              </description>
+              <helpers>
+                <helper name="H1">
+                  <function>helperButtonGetTableList</function>
+                  <brief>Retrieve Table names</brief>
+                  <description>
+                     This button will, each time it is pressed, generate the 
+                     name of a table in the input cube and put it in the 
+                     appropriate field in the GUI, clearing the field to blank 
+                     and wrapping back to the top after the last table is hit.  
+                  </description>
+                  <icon>$ISIS3DATA/base/icons/exec.png</icon>
+               </helper>
+            </helpers>
+          </parameter>
+
+          <parameter name="DELIMIT">
+              <type>string</type>
+              <brief>
+                  The character to be inserted between table entries
+              </brief>
+              <description>
+                  This option will determine which character will be used to
+                  separate table entries, with the default option as a comma.
+                  The other options are space, to separate with a single
+                  space, or "OTHER," which allows the user to input whatever
+                  they wish as the delimiter character.
+              </description>
+              <default><item>COMMA</item></default>
+              <list>
+                  <option value="COMMA">
+                      <brief>Separate with commas</brief>
+                      <description>
+                          This option will cause the table entries to be
+                          separated by commas.
+                      </description>
+                      <exclusions>
+                          <item>CUSTOM</item>
+                      </exclusions>
+                  </option>
+                  <option value="SPACE">
+                      <brief>Separate with spaces</brief>
+                      <description>
+                          This option will cause the table entries to be
+                          separated by single space when output.
+                      </description>
+                      <exclusions>
+                          <item>CUSTOM</item>
+                      </exclusions>
+                  </option>
+                  <option value="OTHER">
+                      <brief>Separate with user-defined characters</brief>
+                      <description>
+                          This option allows the user to determine what
+                          character is used to separate entries. When this
+                          option is selected, the CUSTOM parameter is used
+                          to determine what will be used. Whatever string the
+                          user enters will be used in between the entries.
+                      </description>
+                      <inclusions>
+                          <item>CUSTOM</item>
+                      </inclusions>
+                  </option>
+              </list>
+          </parameter>
+          <parameter name="CUSTOM">
+              <type>string</type>
+              <brief>User-defined delimiter</brief>
+              <description>
+                  This parameter is only used if the user has selected "OTHER"
+                  as a delimiter. The user then enters something into this
+                  parameter to use as a delimiter.
+              </description>
+          </parameter>
+      </group>
+  </groups>
+</application>

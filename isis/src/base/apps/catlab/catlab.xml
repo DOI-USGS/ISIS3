@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="catlab" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs the label from a cube
+  </brief>
+
+  <description>
+    This program will output the labels from an Isis cube or its detached label 
+    file.  If it is run in gui mode, the label will be written to the gui log 
+    screen. Otherwise, it will be written to the terminal window.  
+    <strong> Note:</strong> This program is designed to output Isis cube 
+    labels.  However, it will work on many files with pds like labels.  
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>cathist</item>
+      <item>editlab</item>
+    </applications>
+  </seeAlso>
+
+  <oldName>
+    <item>labels</item>
+  </oldName>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-01-10">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-01">
+      Modified to output label to gui if it is in interactive mode
+    </change>
+    <change name="Brendan George" date="2006-09-26">
+      Documentation fixes
+    </change>
+    <change name="Steven Koechle" date="2008-05-20"> 
+      Added TO parameter
+    </change>
+    <change name="Jeannie Walldren" date="2010-06-24"> 
+      Added more filters for FROM and TO.  Updated documentation.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          This is the input cube file from which the labels will be extracted. 
+        </description>
+        <filter>
+          *.cub *.lbl
+        </filter>
+      </parameter>
+        <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Optional output file.
+        </brief>
+        <internalDefault>
+          No Output file will be created
+        </internalDefault>
+        <description>
+          The text file to which the result Pvl will be written. 
+        </description>
+        <filter>
+          *.txt *.prt *.pvl 
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Default example </brief>
+      <description>
+        This is an example of catlab with no output file.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=peaks.cub
+        </commandLine>
+        <description>
+          In this example, catlab will extract the labels from the input 
+          cube and output them to the terminal window:
+                  <pre>
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Bogus
+    Key = Wow
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name = IsisCube 
+  StartByte = 29425665 
+  Bytes = 1048 
+End_Object
+End
+        </pre>
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="566" height="550" src="assets/images/catlabGUI1.jpg">
+            <brief>
+              Example using GUI
+            </brief>
+            <description>
+              In this example, catlab will extract the labels from the input 
+              cube and output them to the GUI log screeen.
+            </description>
+            <thumbnail width="200" height="194" caption="" src="assets/thumbs/catlabGUI1thumb.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+    <example>
+      <brief> Example with output file created </brief>
+      <description>
+        This is an example of catlab with an output file.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=peaks.cub to=peaks.pvl
+        </commandLine>
+        <description>
+          In this example, catlab will extract the labels from the input 
+          cube and output them to a pvl file.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="566" height="550" src="assets/images/catlabGUI2.jpg">
+            <brief>
+              Example using GUI
+            </brief>
+            <description>
+              In this example, catlab will extract the labels from the input 
+              cube and output them to a pvl file.  They will not print in the 
+              GUI log screeen.
+            </description>
+            <thumbnail width="200" height="194" caption="" src="assets/thumbs/catlabGUI2thumb.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/peaks.pvl">
+          <brief>
+            Output pvl created by catlab.
+          </brief>
+          <description>
+            In this example, the label is printed in a pvl file.  This pvl is 
+            identical to the terminal interface or GUI log screen 
+            outputs in Example 1.  
+          </description>
+          <parameterName>
+            TO
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+     </example>
+  </examples>
+
+</application>

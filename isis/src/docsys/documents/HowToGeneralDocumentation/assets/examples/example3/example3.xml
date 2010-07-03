@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <p>This is the content of this example document. This will become the content of the HTML page generated during the Isis build.</p>
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>example3.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>administration</categoryItem>
+    <categoryItem>guide</categoryItem>
+  </category>
+  <audience>
+    <target>administrator</target>
+  </audience>
+  <bibliography>
+    <title>Example of an Inline Content Single Page Document</title>
+    <brief>Example of a Document metadata file that generates a single web page</brief>
+    <description>Example of a Document metadata file that will generate a single page document from HTML formatted content included in the file</description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2002-12-09</date>
+  </bibliography>
+</documentation>

@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lopdsgen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Convert from Isis 3 Lunar Orbiter cubes to the PDS format
+  </brief>
+
+  <description>
+   Program to convert Isis 3 cubes for Lunar Orbiter strips and level 1 products 
+   to PDS image files.
+  </description>
+
+  <category>
+    <missionItem>Lunar Orbiter</missionItem>
+  </category>
+
+
+  <history>
+    <change name="Travis Addair" date="2009-12-16">
+      Original version
+    </change>
+    <change name="Travis Addair" date="2009-12-18">
+      Updated test and example for changes to PVL.
+    </change>
+    <change name="Travis Addair" date="2010-02-16">
+      Added support for reexporting the cubes generated from PDS files produced 
+      by this application.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be converted
+        </brief>
+        <description>
+          The LO strip or level 1 Isis 3 cube to be converted to PDS format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output PDS image
+        </brief>
+        <description>
+          The resulting PDS file.
+        </description>
+        <filter>
+          *.img
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Output Settings">
+     <parameter name="BITTYPE">
+        <type>string</type>
+        <default>
+          <item>32BIT</item>
+        </default>
+        <brief>Bit type of output file</brief>
+        <description>
+          Bit type of output:
+            8 bit (0=black, 255=white)
+            16 bit unsigned (0=black, 65535=white)
+            16 bit signed (-32767=black, 32768=white)
+            32 bit (1.17549435e-38=black, 3.40282347e+38=white)
+        </description>
+        <list>
+          <option value="8BIT">
+            <brief>8-bit data</brief>
+            <description>
+              Pixels are in 8-bit data range (0 to 255).
+            </description>
+            <exclusions>
+              <item>ENDIAN</item>
+            </exclusions>
+          </option>
+          <option value="U16BIT">
+            <brief> 16-bit unsigned data </brief>
+            <description>
+              Pixels are in the 16-bit data range (0 to 65535)
+            </description>
+          </option>
+          <option value="S16BIT">
+            <brief> 16-bit signed data </brief>
+            <description>
+              Pixels are in 16-bit signed data range (-32768 to 32767)
+            </description>
+          </option>
+          <option value="32BIT">
+            <brief> 32-bit data </brief>
+            <description>
+              Pixels are in the 32-bit floating point data range
+              (-3.40282347e+38 to 3.40282347e+38)
+            </description>
+            <exclusions>
+              <item>STRETCH</item>
+              <item>MINPERCENT</item>
+              <item>MAXPERCENT</item>
+              <item>NULL</item>
+              <item>LRS</item>
+              <item>LIS</item>
+              <item>HIS</item>
+              <item>HRS</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="NULL">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>Dedicates the minimum DN value for null pixels.</brief>
+        <description>
+          If set to true, the minimum value of the raw output data will be 
+          reserved for null pixels.  The actual value used for null pixels will
+          be denoted in the print.prt file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="LRS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for LRS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the LRS input pixels.
+          The actual DN value used for LRS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="LIS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for LIS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the LIS input pixels.
+          The actual DN value used for LIS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="HIS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for HIS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the HIS input pixels.
+          The actual DN value used for HIS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="HRS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for HRS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the HRS input pixels.
+          The actual DN value used for HRS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Stretch Options">
+      <parameter name="STRETCH">
+        <type>string</type>
+        <default>
+          <item>NONE</item>
+        </default>
+        <brief>Type of stretch</brief>
+        <description>
+          This parameter is used to select one of three ways to stretch
+          (or map) the input pixels.  They are NONE, LINEAR, or MANUAL.
+        </description>
+
+        <list>
+          <option value="NONE">
+            <brief> No stretch </brief>
+            <description>
+              No stretch is performed.
+            </description>
+            <exclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+              <item>MINPERCENT</item>
+              <item>MAXPERCENT</item>
+            </exclusions>
+          </option>
+          <option value="LINEAR">
+            <brief> Linear stretch </brief>
+            <description>
+              A minimum and maximum are automatically computed based on
+              the statistics of the selected input band.  A histogram of the band
+              is used to pick the minimum at 0.5% of the data and the maximum
+              at 99.5% of the data.  Input pixels less than or equal to the
+              minimum are stretched to black while pixels greater than the or
+              equal to the maximum are stretched to white.  A linear mapping
+              occurs between the minimum and maximum.
+            </description>
+            <exclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+            </exclusions>
+          </option>
+          <option value="MANUAL">
+            <brief> Manual stretch </brief>
+            <description>
+              This option allows you to pick your own stretch.  You must
+              enter a value for MINIMUM and MAXIMUM input pixel.
+            </description>
+            <inclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+            </inclusions>
+            <exclusions>
+              <item>MINPERCENT</item>
+              <item>MAXPERCENT</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <brief>Minimum pixel value</brief>
+        <description>
+          The minimum input pixel value which will be mapped to black.
+        </description>
+        <lessThan>
+          <item>MAXIMUM</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MAXIMUM">
+        <type>double</type>
+        <brief>Maximum pixel value</brief>
+        <description>
+          The maximum input pixel value which will be mapped to white.
+        </description>
+        <greaterThan>
+          <item>MINIMUM</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="MINPERCENT">
+        <type>double</type>
+        <brief>Minimum Percent</brief>
+        <description>
+          The percentage of data in the histogram used to compute the minimum
+          pixel value in the stretch.
+        </description>
+        <default><item>0.5</item></default>
+        <lessThan>
+          <item>MAXPERCENT</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MAXPERCENT">
+        <type>double</type>
+        <brief>Maximum Percent</brief>
+        <description>
+          The percentage of data in the histogram used to compute the maximum
+          pixel value in the stretch.
+        </description>
+        <default><item>99.5</item></default>
+        <greaterThan>
+          <item>MINPERCENT</item>
+        </greaterThan>
+      </parameter>
+    </group>
+
+    <group name="Output Data Storage Order">
+      <parameter name="ENDIAN">
+        <type>string</type>
+        <default>
+          <item>LSB</item>
+        </default>
+        <brief>Endianness of the output bytes</brief>
+        <description>
+          This parameter is used to select one whether the output will be
+	      streamed starting with the most significant byte (MSB) or starting
+	      with the least significant bytes (LSB). The choice should be made by
+	      the user depending upon the format read by the system architecture
+	      from which they plan to read the raw data.
+        </description>
+        <list>
+          <option value="LSB">
+            <brief>Least significant byte</brief>
+            <description>
+            The least significant byte will be the first byte output.
+            </description>
+          </option>
+          <option value="MSB">
+            <brief>Most significant byte</brief>
+            <description>
+            The most significant byte will be the first byte output.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  
+    <group name="Special Keyword">
+      <parameter name="NOTE">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Value for the output PDS keyword NOTE
+        </brief>
+        <description>
+          This parameter allows the user to specify the value of the standard 
+          PDS keyword NOTE within the output PDS label. This keyword
+          will be located in the Root of the PDS PVL label.
+        </description>
+      </parameter>
+    </group>
+  </groups> 
+
+  <examples>
+    <example>
+      <brief>
+          Export Level 1 cube to 32-bit PDS
+      </brief>
+      <description>
+          This example shows a typical conversion of an Isis 3 Lunar 
+          Orbiter cube to a PDS format image.  The default settings 
+          produce 32-bit data with least significant byte first order.
+      </description>
+      <terminalInterface>
+          <commandLine>
+              from=lev1.cub to=lev1.pds.img
+          </commandLine>
+          <description>
+              In this example, lopdsgen will convert a cube to a pds 
+              format image with all settings left at their defaults.
+          </description>
+      </terminalInterface>
+  
+      <guiInterfaces>
+        <guiInterface>
+            <image width="614" height="750" src="assets/images/baseGui.jpg">
+                <brief>
+                  Example GUI
+                </brief>
+                <description>
+                  Screenshot of GUI with parameters set to export a level1 LO 
+                  cube to a PDS image.
+                </description>
+                <thumbnail width="164" height="200" caption="lopdsgen gui" src="assets/thumbs/baseGui.jpg" />
+            </image>
+        </guiInterface>
+      </guiInterfaces>
+  
+      <inputImages>
+          <image src="assets/images/input_level1.jpg" width="500" height="500">
+            <brief>
+              Input cube for lopdsgen
+            </brief>
+            <description>
+              This is an Isis 3 cube, specifically a level 1 LO product, that 
+              will be exported to a standard PDS format image.
+            </description>
+            <thumbnail caption="lev1.cub" src="assets/thumbs/input_level1.jpg" width="200" height="200" />
+            <parameterName>FROM</parameterName>
+          </image>
+      </inputImages>
+
+      <dataFiles>
+          <dataFile path="assets/input_labels.pvl">
+              <brief>Click here for the labels of the input image</brief>
+              <description>
+                This PVL contains the labels of the Isis 3, level 1 LO input 
+                image that will be exported to a PDS. 
+              </description>
+          </dataFile>
+          <dataFile path="assets/output_labels.pvl">
+              <brief>Click here for the labels of the output image</brief>
+              <description>
+                This PVL contains the labels of the PDS format image that has 
+                been generated from an Isis 3, level 1 LO cube. 
+              </description>
+          </dataFile>
+      </dataFiles>  
+
+      <outputImages>
+        <image src="assets/images/output_level1.jpg" width="500" height="500">
+          <brief>
+            Output pds image from lopdsgen
+          </brief>
+          <description>
+            This is a PDS format image that has been produced by exporting the 
+            input Isis 3, level 1 LO cube with default settings.
+          </description>
+          <thumbnail caption="lev1.pds.img" src="assets/thumbs/output_level1.jpg" width="200" height="200" />
+          <parameterName>TO</parameterName>
+        </image> 
+      </outputImages>
+    </example>
+  </examples>
+</application>

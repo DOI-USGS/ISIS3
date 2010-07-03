@@ -1,0 +1,15 @@
+Group = Apollo15/Metric
+  Library = ApolloMetricCamera
+  Routine = ApolloMetricCameraPlugin
+  Version = 1
+EndGroup
+Group = Apollo16/Metric
+  Library = ApolloMetricCamera
+  Routine = ApolloMetricCameraPlugin
+  Version = 1
+EndGroup
+Group = Apollo17/Metric
+  Library = ApolloMetricCamera
+  Routine = ApolloMetricCameraPlugin
+  Version = 1
+EndGroup

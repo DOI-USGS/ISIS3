@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="makeflat" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Create a flat-field image for line-scan instruments
+  </brief>
+
+  <description>
+    <p>
+      This program creates flat-field images for line scan, push frame, and framing instruments. 
+      All input cubes should have the same number of samples; any images in the list that do not
+      have the same number of samples as the first image will not be used.  The names of the cube 
+      files used to create the flat-field image must be entered using an ASCII file (FROMLIST) with 
+      one filename per line (any line beginning with a '#' or '//' is treated as a comment).  The 
+      specific equation for each camera type is below.
+    </p>
+    <ul>
+      <li>Line Scan</li>
+        <p>
+          A frame is a NUMLINES line section of data. The equation for the final single line, single
+          band, flat field file is:
+             <br />
+         Sum( Sum(FrameColumn) / Average(Frame) * ValidPixels(FrameColumn) ) / 
+         TotalColumnValidPixels<br />
+        </p>
+          
+      <li>Push Frame</li>
+        <p>
+          The equation for the final single framelet, single band flat field file is:<br /> Average(
+          PixelInFramelet1, PixelInFramelet2, PixelInFramelet3, ... )
+        </p>
+      <li>Framing</li>
+        <p>
+          The equation for the final single framelet, single band flat field file is:<br /> Average(
+          PixelInCube1, PixelInCube2, PixelInCube3, ... )
+        </p>
+    </ul>
+    <p>
+      <b>Warning: This program creates potentially large temporary files</b>
+    </p>
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="2007-06-20">
+      Original version, Adapted from Isis2 version of makeflat.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo .
+    </change>
+    <change name="Steven Lambright" date="2008-06-11">
+      Changed algorithm and added support for framing and push frame cameras.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of input cubes
+        </brief>
+        <description>
+          Use this parameter to select the file which contains a list of
+          cube filenames to be used to create the flat file.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+     </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output flat field cube
+        </brief>
+        <description>
+         Output flat field cube
+        </description>
+      </parameter>
+
+      <parameter name="EXCLUDE">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output PVL-formatted file of all excluded files and sections of data
+        </brief>
+        <description>
+         Output PVL-formatted file of all excluded files and sections of data.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Statistical Options">
+        <parameter name="STDEVTOL">
+            <type>double</type>
+            <brief>
+              This is the maximum standard deviation
+              </brief>
+            <description>
+              For a framing camera, this is the maximum standard deviation of each image. For a push
+              frame camera, this is the maximum standard deviation of each framelet. For a line scan
+              camera, this is the maximum standard deviation of NUMLINES lines. Data that exceeds
+              this standard deviation will be ignored.
+            </description>
+        </parameter>
+    </group>
+
+    <group name="Image Options">
+      <parameter name="IMAGETYPE">
+        <type>string</type>
+        <default><item>LINESCAN</item></default>
+        <brief>
+          This is the type of camera which took the image.
+        </brief>
+        <description>
+          Line scan cameras collect a cube a single line of data at a time. Push frame cameras collect
+          multiple lines of cube data at once.  Framing cameras collect an entire cube of data at 
+          once.
+        </description>
+        <list>
+          <option value="LINESCAN">
+            <brief>Line scan camera</brief>
+            <description>
+              Line scan cameras collect a cube a single line of data at a time. This option makes 
+              the flat field a single line of data.
+            </description>
+            <inclusions>
+              <item>NUMLINES</item>
+            </inclusions>
+            <exclusions>
+              <item>FRAMELETHEIGHT</item>
+            </exclusions>
+          </option> 
+          <option value="PUSHFRAME">
+            <brief>Push frame camera</brief>
+            <description>
+              Push frame cameras take multiple lines of cube data at once. This option makes the 
+              flat field a single framelet of data.
+            </description>
+            <inclusions>
+              <item>FRAMELETHEIGHT</item>
+            </inclusions>
+            <exclusions>
+              <item>NUMLINES</item>
+            </exclusions>
+          </option>
+          <option value="FRAMING">
+            <brief>Framing camera</brief>
+            <description>
+              Framing cameras collect an entire cube of data at once. This option makes the 
+              flat field the size of one of the input images.
+            </description>
+            <exclusions>
+              <item>NUMLINES</item>
+              <item>FRAMELETHEIGHT</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+  <group name="LINESCAN">
+      <parameter name="NUMLINES">
+        <type>integer</type>
+        <brief>
+          This is the the number of lines to consider when doing statistics
+        </brief>
+        <description>
+          A single line often does not have enough data in it to perform good tolerance 
+          calculations. The tolerance calculations will be performed on this many lines as
+          a time, and if found to be invalid, this many lines will be excluded from the output
+          flat file calculations at a time.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="PUSHFRAME">
+      <parameter name="FRAMELETHEIGHT">
+        <type>integer</type>
+        <brief>
+          This is the height of each framelet in the image.
+        </brief>
+        <description>
+          Push frame images consist of framelets. The framelet size needs to be
+          known in order to make a flat field file for a push frame camera.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Line Scan Cubes</brief>
+      <description>
+        This program was run on 65 hirise images to produce a flat file, and one of the images was
+        calibrated with the flat file.
+      </description>
+      <terminalInterface>
+        <commandLine>fromlist=files.lis to=flat.linescan.cub exclude=exclude.txt stdevtol=30  
+          numlines=100  
+         </commandLine>
+         <description>
+          This is a typical run for makeflat. files.lis is a list file generated by a "ls *.cub > 
+          files.lis" command. The files inside of files.lis are between 20,000 lines and 200,000 
+          lines of data (variable length). The file flat.linescan.cub is the flat-field output given 
+          these cubes and the file exclude.txt is a detailed output of what was excluded.
+        </description> 
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/linescan_gui.jpg">
+            <brief>
+              This is a typical run for the linescan mode
+            </brief>
+            <description>
+              This is a typical run for makeflat. files.lis is a list file generated by a "ls *.cub > 
+              files.lis" command. The files inside of files.lis are between 20,000 lines and 200,000 
+              lines of data (variable length). The file flat.linescan.cub is the flat-field output given 
+              these cubes and the file exclude.txt is a detailed output of what was excluded.
+            </description>
+            <thumbnail width="164" height="200" caption="Line-Scan Run" src="assets/thumbs/linescan_gui_thumb.jpg" />
+            <parameterName>IMAGETYPE</parameterName>
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image width="550" height="550" src="assets/images/PSP_004398_1610_RED5_0.raw.crop.jpg">
+            <brief>
+              This is a section of one of the inputs listed in files.lis
+            </brief>
+            <description>
+              This is the input to makeflat. Notice the vertical lines persistent throughout the 
+              image and the dark area on the right-hand side. 
+            </description>
+            <thumbnail width="164" height="200" caption="Line-Scan Input Image" src="assets/thumbs/PSP_004398_1610_RED5_0.raw.crop.thumb.jpg" />
+            <parameterName>FROMLIST</parameterName>
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image width="550" height="550" src="assets/images/PSP_004398_1610_RED5_0.corr.crop.jpg">
+            <brief>
+              This is input that has been calibrated
+            </brief>
+            <description>
+              This is the same section of image data as before, except calibrated with the 
+              flat-field file that was generated by dividing by the flat field file. The vertical
+              lines and darkness have completely gone away. 
+            </description>
+            <thumbnail width="164" height="200" caption="Line-Scan Calibrated Image" src="assets/thumbs/PSP_004398_1610_RED5_0.corr.crop.thumb.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

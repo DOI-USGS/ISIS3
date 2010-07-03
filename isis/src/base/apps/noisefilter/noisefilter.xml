@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="noisefilter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a noise removal filter to a cube
+  </brief>
+
+  <description>
+     This program applies a noise filter to a cube.  Pixel values that
+     are considered to be noise will be replaced with either the average
+     of the boxcar or the Isis NULL value.  The criteria for determining
+     whether a pixel is noise or not is given by the TOLMIN and TOLMAX
+     parameters.  If the difference between the input pixel and the average
+     of the boxcar is greater than the tolerance given, the pixel is
+     considered to be noise and is replaced.  If the STDDEV option is
+     chosen, then TOLMIN and TOLMAX indicate the tolerance in number of
+     standard deviations between the input pixel and the boxcar average
+     that determines whether the pixel is noise.   The number of pixels
+     replaced and the corresponding percentage is output.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>lowpass</item>
+      <item>highpass</item>
+      <item>trimfilter</item>
+      <item>divfilter</item>
+      <item>svfilter</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Eric Eliason" date="1988-05-20">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2002-08-15">
+      Ported to Isis 3.0
+    </change>
+    <change name="K Teal Thompson" date="2003-04-10">
+      Add example.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Fixed compiler error with uninitialized variable after adding -O1 flag
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2003-08-25">
+      Separated standard deviation and average noise filter options into two routines.  Fixed problem
+      filtering special pixels.  Modified explanations for TOLMIN and TOLMAX.
+    </change>
+    <change name="Stuart Sides" date="2003-11-07">
+      Modified results pvl to not include the results group
+    </change>
+    <change name="Elizabeth Miller" date="2005-12-15">
+      Added a flattol parameter - it replaces the tolmin parameter in isis2 boxfilter
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+	        Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output noisefilter cube
+        </brief>
+        <description>
+	        The resultant filtered cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Noise Parameters">
+      <parameter name="TOLDEF">
+        <type>string</type>
+        <default><item>DN</item></default>
+        <brief>
+          Defines the meaning of TOLMIN and TOLMAX
+        </brief>
+        <description>
+          If DN is chosen TOLMIN and TOLMAX are in dn units.  If STDDEV is
+          chosen, TOLMIN and TOLMAX are number of standard deviations.
+        </description>
+        <list>
+          <option value="DN">
+            <brief>
+              TOLMIN and TOLMAX are in units of DN.
+            </brief>
+            <description>
+             If the difference between the input pixel and the boxcar average
+             is greater then the tolerances given in TOLMIN or TOLMAX (values
+             of DN), the pixel is considered to be noise and will be replaced.
+             See TOLMIN and TOLMAX for more details.
+            </description>
+            <exclusions><item>FLATTOL</item></exclusions>
+          </option>
+          <option value="STDDEV">
+            <brief>
+              TOLMIN and TOLMAX are in units of standard deviation.
+            </brief>
+            <description>
+            If the difference between the input pixel and the boxcar average is
+            greater than the number of standard deviations indicated in TOLMIN
+            or TOLMAX, the pixel is considered to be noise and will be replaced.
+            See TOLMIN and TOLMAX for more details.
+            </description>
+            <inclusions><item>FLATTOL</item></inclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="FLATTOL">
+        <type>double</type>
+        <brief>
+           Scaled tolerance value
+        </brief>
+        <description>
+          Minimum tolerance value used in the STDDEV filter.  If the difference 
+          between the original pixel, and the average value of the noise filter is 
+          less than the FLATTOL then the output pixel will remain unchanged 
+          from the input pixel.  Without this safeguard, very uniform inage areas 
+          (low standard deviation) will be excessively smoothed, creating areas
+          of constant DN.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <default><item>0.0</item></default>
+      </parameter>
+
+      <parameter name="TOLMIN">
+        <type>double</type>
+        <brief>
+          Dark noise tolerance
+        </brief>
+        <description>
+          If you are attempting to remove black speckle or other dark noise then you should be modifying this
+          parameter.   When a pixel is being checked for noise, a difference between the pixel and boxcar
+          average is computed.  If this difference is negative then TOLMIN will be used to determine if we
+          have noise, hence dark noise will be removed by modifying TOLMIN.
+
+          For the DN option, if the absolute value of the difference (pixel - average) is less than TOLMIN, then
+          the input pixel is preserved.  Otherwise it is considered noisy and will be replaced.
+          For the STDDEV option, if the absolute value of the difference is less than TOLMIN * standard deviation
+          of the boxcar then the input pixel is preserved. Otherwise it is considered noisy and will be replaced.
+
+          In general, a high tolerance means fewer pixels will be replaced and lower tolerance will cause more
+          pixels to be replaced.  Too small of a tolerance can actually replace real/good data.  For the STDDEV option,
+          you might try TOLMIN=3 as a starting point.   For the DN option, try TOLMIN=2.
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+        <default><item>20</item></default>
+      </parameter>
+      <parameter name="TOLMAX">
+        <type>double</type>
+        <brief>
+          Bright noise tolerance
+        </brief>
+        <description>
+          If you are attempting to remove white speckle or other bright noise then you should be modifying this
+          parameter.   When a pixel is being checked for noise, a difference between the pixel and boxcar
+          average is computed.  If this difference is positive then TOLMAX will be used to determine if we
+          have noise, hence white noise will be removed by modifying TOLMAX.
+
+          For the DN option, if the difference (pixel - average) is less than TOLMAX, then the input pixel is
+          preserved.  Otherwise it is considered noisy and will be replaced.
+          For the STDDEV option, if the difference is less than TOLMAX * standard deviation of the boxcar then the
+          input pixel
+          is preserved. Otherwise it is considered noisy and will be replaced.
+
+          In general, a high tolerance means fewer pixels will be replaced and lower tolerance will cause more
+          pixels to be replaced.  Too small of a tolerance can actually replace real/good data.  For the STDDEV option,
+          you might try TOLMAX=3 as a starting point.   For the DN option, try TOLMAX=2.
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+        <default><item>20</item></default>
+      </parameter>
+
+      <parameter name="REPLACE">
+        <type>string</type>
+        <default>
+          <item>AVERAGE</item>
+        </default>
+        <brief>
+          Value to replace noise
+        </brief>
+        <description>
+          This is the value that is used to replace pixels which are
+          considered to be noise.
+        </description>
+        <list>
+          <option value="AVERAGE">
+            <brief>  Replace noise with boxcar average </brief>
+            <description>
+              If the input pixel is considered as noise, it is replaced
+              with the average value of the boxcar.
+            </description>
+          </option>
+          <option value="NULL">
+            <brief> Replace noise with Isis Null value </brief>
+            <description>
+              If the input pixel is considered noise, it is replaced with
+              the Isis Null value.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of samples in the boxcar.
+          It must be odd and can not exceed twice the number of samples
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly slower.
+
+            The shape of the filter can be used to control types of noise to remove.  For example, a 3x3 or 5x5 boxcar
+            can be used to remove speckle or salt and pepper noise.   A 1 sample x 5 line boxcar with REPLACE=NULL
+            could be used to remove dropped or noisy lines of data.  Then use the lowpass program with a 3x3 boxcar
+            to fill in the NULLed data.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly
+          slower.
+
+            The shape of the filter can be used to control types of noise to remove.  For example, a 3x3 or 5x5 boxcar
+            can be used to remove speckle or salt and pepper noise.   A 1 sample x 5 line boxcar with REPLACE=NULL
+            could be used to remove dropped or noisy lines of data.  Then use the lowpass program with a 3x3 boxcar
+            to fill in the NULLed data.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Restrictions">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Valid minimum pixel
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Valid maximum pixel
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>integer</type>
+        <brief>
+          Minimum boxcar pixel count
+        </brief>
+        <description>
+          This is the minimum number of valid pixels which must occur inside the
+          NxM boxcar for filtering to occur. For example, 3x5 boxcar has 15 pixels
+          inside.  If MINIMUM=10 then the filter will occur if there are 10 or
+          greater valid pixels.  A valid pixel is one that is not special (NULL, LIS,
+          etc) and is in the range defined by LOW to HIGH.
+        </description>
+        <default>
+          <item>1</item>
+        </default>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="NULLISNOISE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Null is noise</brief>
+        <description>
+          This option is used to define how NULL pixels are handled.  If this
+          parameter is set to TRUE, then NULL pixels will be considered to be
+          noise and will be replaced.  If FALSE, the NULL will be propagated
+          to the output.
+        </description>
+      </parameter>
+      <parameter name="HISISNOISE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>HIS is noise</brief>
+        <description>
+          This option is used to define how HIS (High Instrument Saturation)
+          pixels are handled.  If this parameter is set to TRUE, then HIS
+          pixels will be considered to be noise and will be replaced.  If
+          FALSE, the HIS will be propagated to the output.
+        </description>
+      </parameter>
+      <parameter name="HRSISNOISE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>HRS is noise</brief>
+        <description>
+          This option is used to define how HRS (High Representation Saturation)
+          pixels are handled.  If this parameter is set to TRUE, then HRS
+          pixels will be considered to be noise and will be replaced.  If
+          FALSE, the HRS will be propagated to the output.
+        </description>
+      </parameter>
+      <parameter name="LISISNOISE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>HIS is noise</brief>
+        <description>
+          This option is used to define how LIS (Low Instrument Saturation)
+          pixels are handled.  If this parameter is set to TRUE, then LIS
+          pixels will be considered to be noise and will be replaced.  If
+          FALSE, the LIS will be propagated to the output.
+        </description>
+      </parameter>
+      <parameter name="LRSISNOISE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>HRS is noise</brief>
+        <description>
+          This option is used to define how LRS (Low Representation Saturation)
+          pixels are handled.  If this parameter is set to TRUE, then LRS
+          pixels will be considered to be noise and will be replaced.  If
+          FALSE, the LRS will be propagated to the output.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief> Header default </brief>
+      <description> Demonstrate the noisefilter application with header
+      </description>
+      <terminalInterface>
+        <commandLine> f=f332s28.cub t=nzfltr tolmin=5 tolmax=50 samples=11 lines=11 </commandLine>
+        <description> Run a noise filter on a Viking image.  (Let toldef default to DN.)
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/f332s28.jpg" width="500" height="439">
+          <brief> Input image for noisefilter</brief>
+          <description>This is the input image f332s28.cub.  It has noise in the form of small black rectangles.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/f332s28.jpg" width="200" height="176"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/nzfltr.jpg" width="500" height="439">
+          <brief> Output image for the noisefilter example </brief>
+          <description> This is the output image for the noisefilter application.  The black rectangles are gone.
+          </description>
+          <thumbnail caption="Output image showing results of a noise filter." src="assets/image/nzfltr.jpg" width=" 200" height="176"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="512" height="468" src="assets/image/nzfltrGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+the noisefilter application</description>
+            <thumbnail width="200" height="183" caption="noisefilter GUI" src="assets/thumb/nzfltrGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

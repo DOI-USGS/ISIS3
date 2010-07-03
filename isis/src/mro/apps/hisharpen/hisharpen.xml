@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hisharpen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+    <brief>
+HiSharpen uses a linear frequency domain filter to remove the minor
+blur caused by the optical system of the HiRISE camera.
+    </brief>
+
+    <description>
+HiSharpen uses a linear frequency domain filter to remove the minor
+blur caused by the optical system of the HiRISE camera. This blur is
+estimated from prelaunch measurements of the camera's point spread
+function (PSF) supplied by Alan Delamere of Ball Aerospace. The
+program accepts as input a HiRISE subimage of dimensions 2**n square.
+The program determines which filter  (Red, BG, IR) was used for
+acquiring the HiRISE image and then selects the corresponding PSF and
+scales it to match the dimensions of the input image. First, the
+Fourier transforms of both the image and the PSF are calculated using
+the Fast Fourier Transform (FFT) algorithm. Next, the transform of the
+image is divided by the transform of the PSF (the Modulation Transfer
+Function, or MTF). The quotient is then transformed back to the
+spatial domain by an inverse FFT.
+
+Note that no pre-whitening or other noise suppression is done by
+HiSharpen. Random noise and pixel-to-pixel variations will be
+accentuated by HiSharpen unless steps have been taken to reduce the
+noise in the input image prior to sharpening.
+
+Note also that the FFT algorithm assumes that the input image is
+periodic, i.e. the left side of the image is repeated when the right
+edge of the image is reached. HiSharpen may therefore produce severe
+ringing in input images with low spatial frequency variations. 
+    </description>
+
+    <history>
+      <change name="Paul Geisser" date="2008-10-07">
+        Original Version
+      </change>
+      <change name="Steven Lambright" date="2008-10-07">
+        Converted to Isis 3
+      </change>
+    </history>
+
+    <category>
+      <missionItem>Mars Reconnaissance Orbiter</missionItem>
+    </category>
+
+    <groups>
+      <group name="Files">
+        <parameter name="FROM">
+          <type>cube</type>
+          <fileMode>input</fileMode>
+          <brief>
+            Input file
+          </brief>
+          <description>
+          </description>
+        </parameter>
+
+        <parameter name="PSF">
+          <type>cube</type>
+          <fileMode>input</fileMode>
+          <brief>
+            Input file
+          </brief>
+          <description>
+          </description>
+          <internalDefault>
+            Automatic
+          </internalDefault> 
+        </parameter>
+
+        <parameter name="TO">
+          <type>cube</type>
+          <pixelType>real</pixelType>
+          <fileMode>output</fileMode>
+          <brief>
+          </brief>
+          <description>
+          </description>
+          <filter>
+            *.cub
+          </filter>
+        </parameter>
+
+        <parameter name="CLEANUP">
+          <type>boolean</type>
+          <default><item>true</item></default>
+          <brief>
+          </brief>
+          <description>
+          </description>
+          <filter>
+            *.cub
+          </filter>
+        </parameter>
+      </group>
+    </groups>
+
+  <examples>
+    <example>
+      <brief>Typical Run (256x256 input)</brief>
+      <description>
+        This is hisharpen being run on a cropped version of a hirise cube,
+        the cropped area has dimensions of 256 by 256.
+      </description>
+      <terminalInterface>
+        <commandLine>from=PSP_008530_1560_IR10_0.cub to=PSP_008530_1560_IR10_0.sharp.cub
+        </commandLine>
+        <description>
+          FROM and TO are the only required parameters
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/images/input.jpg" width="256" height="256">
+          <brief>Input image for this program</brief>
+          <description>This is the input image to be sharpened
+          </description>
+          <thumbnail caption="Input image" src="assets/thumbs/input.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/output.jpg" width="256" height="256">
+          <brief>Output image for this program</brief>
+          <description>This is the sharpened output image.
+          </description>
+          <thumbnail caption="Output image showing results of this program" src="assets/thumbs/output.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="700" height="343" src="assets/images/gui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI for this run of the program</description>
+            <thumbnail width="200" height="98" caption="Graphical Interface" src="assets/thumbs/gui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

@@ -1,0 +1,21 @@
+Testing Isis::ProcessImport Class ... 
+unittest: Importing
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+0
+3.69653e+38
+
+
+**USER ERROR** The LRS range [35.0,55.0] overlaps the NULL range [0.0,45.0]
+
+
+**USER ERROR** The HRS range [-10.0,5.0] overlaps the NULL range [0.0,45.0]
+
+**USER ERROR** The Null range [35.0,55.0] overlaps the LRS range [10.0,145.0]
+
+**USER ERROR** The LIS range [0.0,15.0] overlaps the NULL range [0.0,45.0]
+
+**USER ERROR** The HIS range [-10.0,155.0] overlaps the LRS range [10.0,145.0]
+
+

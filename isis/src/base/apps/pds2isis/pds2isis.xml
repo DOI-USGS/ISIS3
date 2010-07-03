@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="pds2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import PDS image cube into Isis format cube</brief>
+
+  <description>
+    <p>This program will import a PDS image into an Isis cube.</p>
+    <p>
+      The special pixel ranges that may be entered, can align back-to-back.
+      i.e. Null Range = ( 0.0 3.0 ) and LIS Range = ( 3.0, 5.0 )
+      When this is done, certain special pixels take precedence over others in
+      the following order:
+      Null
+      HRS
+      LRS
+      HIS
+      LIS
+      Therefore, in the above example, the actual raw value of 3.0 would be
+      translated into a Null pixel, since Null is listed before LIS in the
+      priority list.
+    </p>
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="1997-05-01">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-05-15">
+      Wrote for Isis 3.
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astrogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-06-04">
+      Fixed Makefile
+    </change>
+    <change name="Stuart Sides" date="2003-10-10">
+      Converted to use new IsisImport instead of IsisPdsImport
+    </change>
+    <change name="Stuart Sides" date="2004-02-20">
+      Converted to use the new IsisImportPds class and added
+      import labels to the output cube.
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Stuart Sides" date="2007-01-25">
+        Added ability to transfers Isis2 instrument and bandbin
+        information.
+    </change>
+   <change name="Tracie Sucharski" date="2007-04-10">
+       Added LatitudeType2 group to translation table to handle CTX cubes.
+       Additonal changes to projection translation tables for other possible 
+       values for Longitude direction, latitude type.  If the min or max 
+       longitude values are greater than 180, change longitude domain to 360.
+       Only call TranslateIsis2Labels if pds file is an Isis2 cube.
+   </change>
+   <change name="Steven Lambright" date="2007-08-07">
+       Added support for copying some PDS labels, if they exist, into the output.
+   </change>
+   <change name="Steven Koechle" date="2007-08-29">
+       Added special pixel ranges. Added examples.
+   </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Christopher Austin" date="2008-09-15">
+      Fixed problem with special pixel range functionality and documentation.
+      Added HIS and LIS range options.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS file
+        </brief>
+        <description>
+          Use this parameter to select the PDS filename.  This file
+          must contain the PDS labels, however the image data can
+          be detached and will be automatically obtained from the
+          PDS image pointer keyword.  If the pointer is incorrect then
+          use the IMAGE parameter to specify the file containing the
+          binary image data.
+        </description>
+        <filter>
+          *.lbl *.img
+        </filter>
+      </parameter>
+
+      <parameter name="IMAGE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Detached data file 
+        </brief>
+        <description>
+          Use this parameter if the pointer to the image data in the
+          detached label (FROM) is incorrrect.
+        </description>
+        <internalDefault>
+          Cube data embedded with label or file pointer in label file.
+        </internalDefault>
+        <filter>
+          *.img
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+
+    <group name="Special Pixels">
+
+      <parameter name="SETNULLRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Pixel values in the given range are converted to Null</brief>
+        <description>
+	      If this option is used, the input raw pixels inside and including the
+        NULLMIN and NULLMAX will be converted to Null pixels.  Otherwise pixels
+        in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit
+        real will cause 0 and 255 to be actual values.  If left as 8-bit then 0
+        will be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>NULLMIN</item>
+          <item>NULLMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMIN">
+        <type>double</type>
+        <brief> Minimum Null value </brief>
+        <description>
+          Minimum Null value.  Anything from this value to NULLMAX will be
+          converted to Null.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMAX">
+        <type>double</type>
+        <brief> Maximum Null value </brief>
+        <description>
+          Maximum Null value.  Anything from this value to NULLMIN will be
+          converted to Null.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Pixel values in the given range are converted to HRS</brief>
+        <description>
+	      If this option is used, the input raw pixels inside and including the
+        HRSMIN and HRSMAX will be converted to HRS pixels.  Otherwise pixels
+        in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit
+        real will cause 0 and 255 to be actual values.  If left as 8-bit then 0
+        will be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>HRSMIN</item>
+          <item>HRSMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMIN">
+        <type>double</type>
+        <brief> Minimum HRS value </brief>
+        <description>
+          Minimum HRS value.  Anything from this value to HRSMAX will be
+          converted to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMAX">
+        <type>double</type>
+        <brief> Maximum HRS value </brief>
+        <description>
+          Maximum HRS value.  Anything from this value to HRSMIN will be
+          converted to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHISRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Pixel values in the given range are converted to HIS</brief>
+        <description>
+	      If this option is used, the input raw pixels inside and including the
+        HISMIN and HISMAX will be converted to HIS pixels.  Otherwise pixels
+        in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit
+        real will cause 0 and 255 to be actual values.  If left as 8-bit then 0
+        will be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>HISMIN</item>
+          <item>HISMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HISMIN">
+        <type>double</type>
+        <brief> Minimum HIS value </brief>
+        <description>
+          Minimum HIS value.  Anything from this value to HISMAX will be
+          converted to HIS.
+        </description>
+        <inclusions>
+          <item>SETHISRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HISMAX">
+        <type>double</type>
+        <brief> Maximum HIS value </brief>
+        <description>
+          Maximum HIS value.  Anything from this value to HISMIN will be
+          converted to HIS.
+        </description>
+        <inclusions>
+          <item>SETHISRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Pixel values in the given range are converted to LRS</brief>
+        <description>
+	      If this option is used, the input raw pixels inside and including the
+        LRSMIN and LRSMAX will be converted to LRS pixels.  Otherwise pixels
+        in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit
+        real will cause 0 and 255 to be actual values.  If left as 8-bit then 0
+        will be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>LRSMIN</item>
+          <item>LRSMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMIN">
+        <type>double</type>
+        <brief> Minimum LRS value </brief>
+        <description>
+          Minimum LRS value.  Anything from this value to LRSMAX will be
+          converted to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMAX">
+        <type>double</type>
+        <brief> Maximum LRS value </brief>
+        <description>
+          Maximum LRS value.  Anything from this value to LRSMIN will be
+          converted to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLISRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Pixel values in the given range are converted to LIS</brief>
+        <description>
+	      If this option is used, the input raw pixels inside and including the
+        LISMIN and LISMAX will be converted to LIS pixels.  Otherwise pixels
+        in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit
+        real will cause 0 and 255 to be actual values.  If left as 8-bit then 0
+        will be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>LISMIN</item>
+          <item>LISMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LISMIN">
+        <type>double</type>
+        <brief> Minimum LIS value </brief>
+        <description>
+          Minimum LIS value.  Anything from this value to LISMAX will be
+          converted to LIS.
+        </description>
+        <inclusions>
+          <item>SETLISRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LISMAX">
+        <type>double</type>
+        <brief> Maximum LIS value </brief>
+        <description>
+          Maximum LIS value.  Anything from this value to LISMIN will be
+          converted to LIS.
+        </description>
+        <inclusions>
+          <item>SETLISRANGE</item>
+        </inclusions>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+      Using pds2isis with default parameters
+      </brief>
+      <description>
+        The use of pds2isis to ingest PDS data and output Isis3 cubes. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+	         from= input.img
+	         to= out.cub
+        </commandLine>
+        <description>
+	        This example shows the use of pds2isis create an Isis3 cube. 
+        </description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/pds2isisGUI.jpg">
+            <brief>
+	            Example GUI
+            </brief>
+            <description>
+	            Screenshot of the GUI with parameters
+            </description>
+            <thumbnail width="164" height="200" caption="pds2isis gui"
+             src="assets/thumbs/pds2isisGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/input.img">
+          <brief>
+	          PDS format input file.
+          </brief>
+          <description>
+	          This is the PDS labels and data
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+      </dataFiles>
+  
+      <outputImages>
+        <image width="458" height="550" src="assets/images/out.jpg">
+          <brief>
+	          Final output image after the conversion
+          </brief>
+          <description>
+	          Converts from PDS format to a Isis3 cube.
+          </description>
+          <thumbnail caption= "The cube image after conversion"
+          src="assets/thumbs/out.jpg" width="167" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

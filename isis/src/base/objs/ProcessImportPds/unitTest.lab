@@ -1,0 +1,64 @@
+PDS_VERSION_ID                    = PDS3
+
+/* FILE DATA ELEMENTS */
+
+RECORD_TYPE                       = FIXED_LENGTH
+RECORD_BYTES                      = 128
+FILE_RECORDS                      = 330
+LABEL_RECORDS                     = 170
+
+/* POINTERS TO DATA OBJECTS */
+
+^QUBE = ("unitTest.img", 267)
+
+/* IDENTIFICATION DATA ELEMENTS */
+
+ DATA_SET_ID                      = "MER2-M-MI-2-EDR-V1.0"
+ DATA_SET_NAME                    = "MARS EXPLORATION ROVER 2 MICROSCOPIC 
+                                     IMAGER CAMERA V1.0"
+ COMMAND_SEQUENCE_NUMBER          = 1
+ FRAME_ID                         = MONO
+ FRAME_TYPE                       = MONO
+ GEOMETRY_PROJECTION_TYPE         = RAW
+ IMAGE_ID                         = 229420001
+ IMAGE_TYPE                       = THUMBNAIL
+ INSTRUMENT_HOST_ID               = MER2
+ INSTRUMENT_HOST_NAME             = "MARS EXPLORATION ROVER 2"
+ INSTRUMENT_ID                    = MI
+ INSTRUMENT_NAME                  = "MICROSCOPIC IMAGER"
+ INSTRUMENT_SERIAL_NUMBER         = 105
+ INSTRUMENT_TYPE                  = "IMAGING CAMERA"
+ INSTRUMENT_VERSION_ID            = FM
+ LOCAL_TRUE_SOLAR_TIME            = 11:08:59
+ MAGNET_ID                        = "NULL"
+ MISSION_NAME                     = "MARS EXPLORATION ROVER"
+ MISSION_PHASE_NAME               = "PRIMARY MISSION"
+ OBSERVATION_ID                   = 301989888
+ PLANET_DAY_NUMBER                = 35
+ PRODUCER_INSTITUTION_NAME        = "MULTIMISSION IMAGE PROCESSING SUBSYSTEM
+                                     , JET PROPULSION LAB"
+ PRODUCT_CREATION_TIME            = "2004-02-08T03:13:17.000Z"
+ PRODUCT_ID                       = 2M129469022ETH0327P2942M1M1
+ PRODUCT_VERSION_ID               = "V3.0 D-22846"
+ RELEASE_ID                       = 0001
+ ROVER_MOTION_COUNTER             = (3,27,149,1886,1347)
+ ROVER_MOTION_COUNTER_NAME        = (SITE,DRIVE,IDD,PMA,HGA)
+ SEQUENCE_ID                      = p2942
+ SEQUENCE_VERSION_ID              = 1
+ SOLAR_LONGITUDE                  = -13.6249
+ SPACECRAFT_CLOCK_CNT_PARTITION   = 1
+ SPACECRAFT_CLOCK_START_COUNT     = 129469022.371
+ SPACECRAFT_CLOCK_STOP_COUNT      = 129469022.601
+ START_TIME                       = "2004-02-07T23:35:51.722Z"
+ STOP_TIME                        = "2004-02-07T23:35:51.953Z"
+ TARGET_NAME                      = MARS
+ TARGET_TYPE                      = PLANET
+
+OBJECT                            = QUBE
+  AXES                            = 3
+  AXIS_NAME                       = (SAMPLE, LINE, BAND)
+  CORE_ITEMS                      = (64, 64, 1)
+  CORE_ITEM_TYPE                  = MSB_INTEGER
+  CORE_ITEM_BYTES                 = 2
+END_OBJECT                        = QUBE
+END

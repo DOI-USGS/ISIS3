@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="findgaps" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+   <brief>
+    Finds the gaps in a given Cube.
+  </brief>
+
+  <description>
+        This program will find any gaps in a Cube and display their beggining and final lines as well as their band.
+        These values will be placed into the file defined by the TO parameter.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Christopher Austin" date="2007-11-26">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube file.
+        </brief>
+        <description>
+          Input cube file to be checked for line gaps.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The text to append Gap info
+        </brief>
+        <description>
+          The text file in which all of the information about the gaps found in 
+          the input cube is written.
+        </description>
+        <filter>
+          *.txt *.prt *.pvl
+        </filter>
+      </parameter>
+    </group>
+
+     <group name="Correlation Coefficient Tolerance" >
+      <parameter name="CORTOL">
+          <type>double</type>
+	  <default><item>0.7</item></default>
+	  <brief>Correlation Tolerance</brief>
+	  <description>
+	      This parameter specifies the tolerance of the correlation coefficient 
+          when running FindGaps.  Default = 0.7
+	  </description>
+      </parameter>
+    </group>
+  </groups>
+
+    <examples>
+        <example>
+            <brief>Finds Image Gaps</brief>
+            <description>
+                This example shows how findgaps works on the cube 
+                I11971007RDR_lev1.cub.
+            </description>
+            
+            <terminalInterface>
+                <commandLine>FROM=I11971007RDR_lev1.cub 
+                  TO=results.txt</commandLine>
+                <description>
+                    Searches I11971007RDR_lev1.cub for gaps based on the default 
+                    Correlation Tolerance of CORTOL=0.7
+                </description>
+            </terminalInterface> 
+            
+            <inputImages>
+                <image src="assets/images/I11971007RDR_lev1.jpg" width="320" height="750">
+                    <brief>The image</brief>
+                    <description> 
+                        This is the image I11971007RDR_lev1.cub within which 
+                        line gaps are being found.
+                    </description>
+                    <thumbnail caption="I11971007RDR_lev1.cub" src="assets/images/I11971007RDR_lev1.jpg" width="86" height="200"/>
+                    <parameterName>FROM</parameterName>
+                </image>
+            </inputImages> 
+
+            <dataFiles>
+                <dataFile path="assets/results.txt">
+                    <brief>results.txt</brief>
+                    <description>
+                        <p> In the case of no gaps, the TO output file 
+                          parameter will be empty. </p>
+                        <p>  When there are gaps in the cube image, then there 
+                        is a pvl display in the TO file. In this example, 
+                        that file is results.txt as shown here. This group
+                        displays the band these gaps were found in, the starting 
+                        line for the particular gap, the correlation coefficient 
+                        that initiated the finding of that gap, as well as the 
+                        last line of the given gap. 
+                        </p>
+                    </description>
+                </dataFile>
+            </dataFiles>
+
+      </example>
+    </examples>
+
+</application>

@@ -1,0 +1,4 @@
+Group = MaximumCorrelation
+  Library = MaximumCorrelation
+  Routine = MaximumCorrelationPlugin
+End_Group

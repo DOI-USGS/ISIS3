@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<homePage>
+  <a name="top" accesskey="T"/><a href="http://www.usgs.gov"><img src="../assets/icons/littleVIS.gif" width="80" height="22" border="0" alt="USGS"/></a>
+
+
+  <h1>Isis Advanced Search</h1>
+  <hr/>
+  <div align="right">
+    <a href="http://search.usgs.gov/help/?la=en">Help</a> |
+    <a href="main.html">Home</a>
+  </div>
+
+  <!-- search -->
+  <form name="seek1" method="get" accept-charset="iso-8859-1" action="http://search.usgs.gov/query.html">
+    <table class="tableTOC" style="width:80%;" cellspacing="0" cellpadding="6" align="center">
+        <tr valign="top">
+          <td width="80%">
+            <div>
+              <table cellspacing="0" cellpadding="6" width="100%">
+                <tr>
+                  <td>
+                  <strong>Search</strong>
+                    <input type="hidden" name="col" value="usgs"/>
+                    <table>
+                      <tr>
+                        <td nowrap="nowrap">
+                          <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov" checked="checked"/>
+                          Entire site</td>
+                        <td nowrap="nowrap">
+                          <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/documents"/>
+                          Isis 3.0: Guides &amp; References</td>
+                      </tr>
+                      <tr>
+                        <td nowrap="nowrap">
+                          <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Application/presentation/Tabbed"/>
+                          Isis 3.0: Software Manual</td>
+                        <td nowrap="nowrap">
+                          <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Object/presentation/APITabbed"/>
+                          Isis 3.0: Developers Reference</td>
+                      </tr>
+                      <tr>
+                        <td nowrap="nowrap">
+                          <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Object/presentation/ProgTabbed"/>
+                          Isis 3.0: Programmers Reference</td>
+                        <td nowrap="nowrap">
+                          <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Isis2"/>
+                          Isis 2.1: All Documentation</td>
+                      </tr>
+                    </table>
+
+
+                    <br/><strong>for documents that</strong>
+                    <br/>
+                    <select name="op0" id="constraints0">
+                      <option value=""/>should contain
+                      <option value="+" selected="selected"/>must contain
+                    </select>
+                    <select name="fl0" id="constraints0">
+                      <option value="" selected="selected"/>in the body
+                      <option value="title:"/>in the title
+                      <option value="url:"/>in the URL
+                      <option value="site:"/>in the site name
+                      <option value="link:"/>in a link
+                      <option value="imagelink:"/>in an image link
+                      <option value="alt:"/>in image alt text
+                      <option value="description:"/>in the description
+                      <option value="keywords:"/>in the keywords
+                      <option value="anchor:"/>in remote anchor text
+                    </select>
+                    <select name="ty0" id="constraints0">
+                      <option value="w" selected="selected"/>the words
+                      <option value="p"/>the phrase
+                      <option value="n"/>the name
+                    </select>
+                    <br/>
+                    <input type="text" name="tx0" id="constraints0" size="50" value=" " maxlength="512"/>
+                    <br/>
+                    <br/><strong>and</strong>
+                    <br/>
+                    <select name="op1" id="constraints1">
+                      <option value=""/>should contain
+                      <option value="+"/>must contain
+                      <option value="-" selected="selected"/>must not contain
+                    </select>
+                    <select name="fl1" id="constraints1">
+                      <option value="" selected="selected"/>in the body
+                      <option value="title:"/>in the title
+                      <option value="url:"/>in the URL
+                      <option value="site:"/>in the site name
+                      <option value="link:"/>in a link
+                      <option value="imagelink:"/>in an image link
+                      <option value="alt:"/>in image alt text
+                      <option value="description:"/>in the description
+                      <option value="keywords:"/>in the keywords
+                      <option value="anchor:"/>in remote anchor text
+                    </select>
+                    <select name="ty1" id="constraints1">
+                      <option value="w" selected="selected"/>the words
+                      <option value="p"/>the phrase
+                      <option value="n"/>the name
+                    </select>
+                    <br/>
+                    <input type="text" name="tx1" id="constraints1" size="50" value=" " maxlength="512"/>
+                    <br/>
+
+                    <br/><strong>dated</strong>
+
+                    <table cellspacing="0" cellpadding="1">
+                      <tr>
+                        <td>
+                          <input type="radio" name="dt" id="date" value="an" checked="checked"/>
+                        </td>
+                        <td>Anytime</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <input type="radio" id="date" name="dt" value="in"/>
+                        </td>
+                        <td colspan="2">
+                          <select name="inthe" id="date" onchange="document.seek1.dt[1].checked=true">
+                            <option value="604800" selected="selected"/>in the last week
+                            <option value="1209600"/>in the last 2 weeks
+                            <option value="2592000"/>in the last 30 days
+                            <option value="5184000"/>in the last 60 days
+                            <option value="7776000"/>in the last 90 days
+                            <option value="15552000"/>in the last 180 days
+                            <option value="31536000"/>in the last year
+                            <option value="63072000"/>in the last 2 years
+                          </select>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <input type="radio" name="dt" id="date" value="ba"/>
+                        </td>
+                        <td align="right">
+                          on or after
+                        </td>
+                        <td>
+
+                          <input name="ady" id="after" size="2" maxlength="2" value="14" onchange="document.seek1.dt[2].checked=true"/>
+                          <select name="amo" id="after" onchange="document.seek1.dt[2].checked=true">
+                            <option value="1" selected="selected"/>January
+                            <option value="2"/>February
+                            <option value="3"/>March
+                            <option value="4"/>April
+                            <option value="5"/>May
+                            <option value="6"/>June
+                            <option value="7"/>July
+                            <option value="8"/>August
+                            <option value="9"/>September
+                            <option value="10"/>October
+                            <option value="11"/>November
+                            <option value="12"/>December
+                          </select>
+                          <input name="ayr" id="after" size="4" maxlength="4" value="2003" onchange="document.seek1.dt[2].checked=true"/>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td align="right">
+                          and before
+                        </td>
+                        <td>
+
+                          <input name="bdy" id="before" size="2" maxlength="2" value="21" onchange="document.seek1.dt[2].checked=true"/>
+                          <select name="bmo" id="before" onchange="document.seek1.dt[2].checked=true">
+                            <option value="1" selected="selected"/>January
+                            <option value="2"/>February
+                            <option value="3"/>March
+                            <option value="4"/>April
+                            <option value="5"/>May
+                            <option value="6"/>June
+                            <option value="7"/>July
+                            <option value="8"/>August
+                            <option value="9"/>September
+                            <option value="10"/>October
+                            <option value="11"/>November
+                            <option value="12"/>December
+                          </select>
+                          <input name="byr" id="before" size="4" maxlength="4" value="2003" onchange="document.seek1.dt[2].checked=true"/>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <br/><strong>and show</strong>
+                    <br/>
+                    <select name="nh" id="show">
+                      <option value="10" selected="selected"/>10 results
+                      <option value="25"/>25 results
+                      <option value="100"/>100 results
+                      <option value="500"/>500 results
+                    </select>
+                    <select name="rf" id="show">
+                      <option value="0" selected="selected"/>sorted by relevance
+                      <option value="1"/>scored using date, sorted by relevance
+                      <option value="3"/>sorted by title
+                    </select>
+                    <select name="lk" id="show">
+                      <option value="1" selected="selected"/>with summaries
+                      <option value="2"/>without summaries
+                    </select>
+                    <br/><br/>
+
+                    <input type="hidden" name="charset" value="iso-8859-1"/>
+                    <input type="hidden" name="ht" value="0"/>
+                    <input type="hidden" name="qp" value=""/>
+                    <input type="hidden" name="qt" value=""/>
+                    <input type="hidden" name="qs" value=""/>
+                    <input type="hidden" name="qc" value=""/>
+                    <input type="hidden" name="pw" value="100%"/>
+                    <input type="hidden" name="la" value="en"/>
+                    <input type="hidden" name="qm" value="1"/>
+                    <input type="hidden" name="st" value="1"/>
+                    <input type="hidden" name="rq" value="1"/>
+                    <input type="hidden" name="ql" value="a"/>
+                    <input type="hidden" name="fs" value=""/>
+                    <input type="hidden" name="si" value="0"/>
+                    <input type="submit" value=" Go "/>
+                    </td>
+                </tr>
+              </table>
+            </div> <!-- class=query -->
+          </td>
+        </tr>
+      </table>
+    </form>
+
+
+    <script type="text/javascript" language="JavaScript" src="assets/scripts/footer.js">
+<![CDATA[
+]]>
+    </script>
+
+</homePage>

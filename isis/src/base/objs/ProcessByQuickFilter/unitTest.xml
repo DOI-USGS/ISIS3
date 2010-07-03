@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Unit test for IsisFilterProcess class
+  </brief>
+
+  <description>
+    Just a test only a test
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-03-31">
+      Original Version
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema from astrogeology... isis.astrogeology...
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>$base/testData/isisTruth.cub</item></default>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/isisfilterprocess_02.cub</item></default>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of samples in the boxcar.
+          It must be odd and can not exceed twice the number of samples
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <default><item>7</item></default>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly
+          slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Restrictions">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Valid minimum pixel
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+        <default><item>0.0</item></default>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Valid maximum pixel
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+        <default><item>300.0</item></default>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>integer</type>
+        <brief>
+          Minimum boxcar pixel count
+        </brief>
+        <description>
+          This is the minimum number of valid pixels which must occur inside the
+          NxM boxcar for filtering to occur. For example, 3x5 boxcar has 15 pixels
+          inside.  If MINIMUM=10 then the filter will occur if there are 10 or
+          greater valid pixels.  A valid pixel is one that is not special (NULL, LIS,
+          etc) and is in the range defined by LOW to HIGH.
+        </description>
+        <default><item>3</item></default>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+  </groups>
+</application>

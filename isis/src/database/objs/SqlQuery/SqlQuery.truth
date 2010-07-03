@@ -1,0 +1,16 @@
+Is throwing: 1
+Executing CREATE TABLE command: 1
+Query: CREATE TABLE testTable ( v1 TEXT, v2 INTEGER, v3 REAL );
+Executing INSERT command: 1
+Query: INSERT INTO testTable (v1, v2, v3)  VALUES ('test txt', 7, 123.4);
+Executing SELECT command: 1
+Query: SELECT * FROM testTable;
+The mac systems report the double fields as string fields. Until the problematic 3rd party software is fixed, the mac systems will need OS truth data.
+0) Name: v1, Type: string
+1) Name: v2, Type: int
+2) Name: v3, Type: string
+Field index (v2): 1
+nFields: 3
+nRows: -1
+Field name[0]: v1
+SqlRecord size: 3

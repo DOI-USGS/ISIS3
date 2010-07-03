@@ -1,0 +1,29 @@
+ Object = AutoRegistration
+   Group = Algorithm
+     Name              = AdaptiveGruen
+     Tolerance         = 0.1
+     MaximumIterations = 30
+     AffineTolerance   = 5.0
+     AffineTranslationTolerance = 0.2
+     AffineScaleTolerance = 0.7
+
+#    AffineShearTolerance = 0.7
+#    SpiceTolerance    = 7.0
+#    RadioShiftTolerance = 256
+#    RadioGainMinTolerance = -0.75
+#    RadioGainMaxTolerance = 3.0
+#    FitChipScale = 0.1
+#    DefaultRadioShift = 0.0
+#    DefaultRadioGain = 0.0
+   EndGroup
+ 
+   Group = PatternChip
+     Samples = 15 
+     Lines   = 15
+   EndGroup
+ 
+   Group = SearchChip
+     Samples = 30 
+     Lines   = 30 
+   EndGroup
+ EndObject

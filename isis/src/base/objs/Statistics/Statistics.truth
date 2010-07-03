@@ -1,0 +1,74 @@
+Average:        5
+Average:        2
+Variance:       1
+Std Deviation:  1
+Minimum:        1
+Maximum:        3
+ChebyShev Min:  -12.1421
+ChebyShev Max:  16.1421
+Best Minimum:   1
+Best Maximum:   3
+Total Pixels:   8
+Valid Pixels:   3
+Null Pixels:    1
+Lis Pixels:     1
+Lrs Pixels:     1
+His Pixels:     1
+Hrs Pixels:     1
+Sum:            6
+SumSquare:      14
+
+Average:        3.5
+Variance:       3.5
+Std Deviation:  1.87083
+Minimum:        1
+Maximum:        6
+ChebyShev Min:  -22.9575
+ChebyShev Max:  29.9575
+Best Minimum:   1
+Best Maximum:   6
+Total Pixels:   12
+Valid Pixels:   6
+Null Pixels:    2
+Lis Pixels:     1
+Lrs Pixels:     1
+His Pixels:     1
+Hrs Pixels:     1
+Sum:            21
+SumSquare:      91
+
+Average:        5
+Variance:       1
+Std Deviation:  1
+ChebyShev Min:  -9.14214
+ChebyShev Max:  19.1421
+Total Pixels:   9
+Valid Pixels:   3
+Null Pixels:    2
+Lis Pixels:     1
+Lrs Pixels:     1
+His Pixels:     1
+Hrs Pixels:     1
+Sum:            15
+SumSquare:      77
+
+Average:        -1.79769e+308
+Variance:       -1.79769e+308
+Std Deviation:  -1.79769e+308
+ChebyShev Min:  -1.79769e+308
+ChebyShev Max:  -1.79769e+308
+Total Pixels:   0
+Valid Pixels:   0
+Null Pixels:    0
+Lis Pixels:     0
+Lrs Pixels:     0
+His Pixels:     0
+Hrs Pixels:     0
+Sum:            0
+SumSquare:      0
+
+**PROGRAMMER ERROR** You are removing non-existant data in [Statistics::RemoveData]
+**PROGRAMMER ERROR** Minimum is invalid since you removed data
+**PROGRAMMER ERROR** Maximum is invalid since you removed data
+**PROGRAMMER ERROR** Invalid value for percent
+**PROGRAMMER ERROR** Invalid value for percent

@@ -1,0 +1,6 @@
+Group = CASSINI-HUYGENS/VIMS
+  Version = 1
+  Library = VimsCamera
+  Routine = VimsCameraPlugin
+EndGroup
+ 

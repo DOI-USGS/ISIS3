@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="ratio" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Divide two cubes
+  </brief>
+
+  <description>
+    This program divides two cubes.  It operates in one of two manners: 1) the
+    denominator cube must have the same number of bands as the numerator cube
+    or 2) the denominator cube must have exactly one band.  In the former case,
+    corresponding bands are divided, for example, band one is divided by
+    band one, band two by band two, and so on.  In the later case, all bands
+    in the numerator cube are divided by the single band in the denominator
+    cube.
+    Special pixels values are handled identically in both cases.  Whenever a
+    special pixel occurs, in either the numerator or denominator, the output
+    pixel is set to NULL.  Likewise, if the denominator is zero, the output
+    is set to NULL.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <history>
+    <change name="Eric Eliason" date="1990-09-01">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2002-06-17">
+      Converted to Isis 3.0
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-22">
+      Changed NUM, DEN and To from type filename to type cube
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+
+  </history>
+
+  <oldName>
+    <item>ratio</item>
+    <item>cosi</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="NUMERATOR">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Numerator cube
+        </brief>
+        <description>
+  	      The numerator cube.  All pixels in this cube will be divided by
+          corresponding pixels in the denominator cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="DENOMINATOR">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Denominator cube
+        </brief>
+        <description>
+          The denominator cube.  The number of bands in this cube must
+          match the numerator cube or be exactly one.  In the former case,
+          a band-by-band division occurs.  In the later, each numerator
+          band is divided by the single denominator band.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>Real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The output cube containing the results of the ratio.  A NULL
+          pixel will be output when either of the numerator or denominator
+          pixels is special.  Similarly, a NULL will be output if the
+          denominator pixel is zero.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Dividing one band by one band</brief>
+      <description>
+        This example presents dividing one band in a cube by a single band.
+        In this case, we divide band 5 by band 4 in peaks.cub and
+        generate a single band
+        output cube.  Note that the file (peaks.cub) does not have to be
+        the same name for NUMERATOR and DENOMINATOR so long as the
+        spatial size (samples and lines) match between the given files.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          numerator=peaks.cub:5 denominator=peaks.cub:4 to=ratio.cub
+        </commandLine>
+        <description></description>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>Dividing multiple bands by one band</brief>
+      <description>
+        This example presents dividing all bands in a cube by an individual
+        band.  In this case, the seven bands in peaks.cub are divided
+        by band 4 and the results output to ratio.cub.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          numerator=peaks.cub denominator=peaks.cub:4 to=ratio.cub
+        </commandLine>
+        <description>
+        </description>
+      </terminalInterface>
+    </example>
+  </examples>
+
+</application>

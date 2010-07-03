@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hsv2rgb" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+   Convert HSV to RGB 
+  </brief>
+
+  <description>
+    This program takes in three input images, representing Hue, Saturation, and Value, then outputs Red, 
+    Green, and Blue files respectively.  It works by creating an HSV pixel from pixels in the Hue, Saturation, 
+    and Value files, converting it to RGB format, then writing the data to the Red, Green, and Blue files. <br /><br />
+
+     HSV Stores colors in terms of hue, saturation, and value. The hue determines the color,
+     which is an angle around the color wheel. The basic colors are: 0 degrees = RED, 
+     60 degrees = YELLOW, 120 degrees = GREEN, 180 degrees = CYAN, 240 degrees = BLUE and 
+     300 degrees = PURPLE. 
+     The saturation is how much grey is in the color (intensity of the color). A saturation value of zero means it's perfect, 
+     while a saturation value of 1 would cause any color to become pure grey. As an example, the color RGB(255,0,0)
+     is pure so the saturation would be zero. The value is how bright the color is. A value of 0 is always black,
+     and 100 is the color (if not saturated).<br />
+     In brief,<br />
+     HUE = COLOR (degrees around the color wheel)<br />
+     SATURATION = INTENSITY (0-1, 0 being no color/grey)<br />
+     VALUE = BRIGHTNESS (0 being black)<br /><br />
+     
+     For more information, see<br />
+     http://en.wikipedia.org/wiki/Color_spaces
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>rgb2hsv</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Sean Crosby" date="2006-01-05">
+      Original version   
+    </change>
+    <change name="Steven Lambright" date="2007-06-20">
+      Added comment explaining what HSV is and what the code is doing. Also, added code for boundary cases.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Input Files">
+      <parameter name="HUE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be converted 
+        </brief>
+        <description>
+          This file will be converted from Hue to Red 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="SATURATION">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be converted
+        </brief>
+        <description>
+          This file will be converted from Saturation to Green
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="VALUE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be converted
+        </brief>
+        <description>
+          This file will be converted from Value to Blue
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    
+    <group name="Output Files">
+      <parameter name="RED">
+        <type>cube</type>
+				<pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant Hue cube 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="GREEN">
+        <type>cube</type>
+				<pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant Saturation cube 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="BLUE">
+        <type>cube</type>
+				<pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant Value cube 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+		<group name = "Multiplier">
+			<parameter name = "SCALAR">
+				<type>double</type>
+				<default><item>1.0</item></default>
+				<brief>VALUE DN multiplier</brief>
+				<description>
+					This value can be used to alter the DNs of the VALUE image
+				</description>
+				<minimum inclusive="yes">0.0</minimum>
+			</parameter>
+		</group>	
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Convert RGB image to HSV </brief>
+      <description>
+        This example shows the results of converting RGB images to HSV format.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          red=../peaks.cub+5 green=../peaks.cub+4 blue=../peaks.cub+3 hue=../hue.cub saturation=../sat.cub value=../val.cub 
+        </commandLine>
+        <description>
+        Convert Hue, Saturation, and Value into their respective Red, Green, and Blue images. 
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/hue.jpg" width="500" height="500">
+          <brief> Input image for hsv2rgb</brief>
+          <description>This is the input image for the hsv2rgb example. 
+          </description>
+          <thumbnail caption="Hue image" src="assets/thumb/hue.jpg" width="200" height="200" />
+          <parameterName>HUE</parameterName>
+        </image>
+        <image src="assets/image/sat.jpg" width="500" height="500">
+          <brief> Input image for hsv2rgb</brief>
+          <description>This is the input image for the hsv2rgb example. 
+          </description>
+          <thumbnail caption="Saturation image" src="assets/thumb/sat.jpg" width="200" height="200" />
+          <parameterName>SATURATION</parameterName>
+        </image>
+        <image src="assets/image/val.jpg" width="500" height="500">
+          <brief> Input image for hsv2rgb</brief>
+          <description>This is the input image for the hsv2rgb example. 
+          </description>
+          <thumbnail caption="Value image" src="assets/thumb/val.jpg" width="200" height="200" />
+          <parameterName>VALUE</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/red.jpg" width="500" height="500">
+          <brief>Output image </brief>
+          <description> This is the output image that results from converting Hue to Red.
+          </description>
+          <thumbnail caption="Output image showing results of hsv2rgb." src="assets/thumb/red.jpg" width="200" height="200"  />
+          <parameterName>RED</parameterName>
+        </image>
+
+        <image src="assets/image/green.jpg" width="500" height="500">
+          <brief>Output image </brief>
+          <description> This is the output image that results from converting Saturation to Green.
+          </description>
+          <thumbnail caption="Output image showing results of hsv2rgb." src="assets/thumb/green.jpg" width="200" height="200"  />
+          <parameterName>GREEN</parameterName>
+        </image>
+
+        <image src="assets/image/blue.jpg" width="500" height="500">
+          <brief>Output image </brief>
+          <description> This is the output image that results from converting Value to Blue.
+          </description>
+          <thumbnail caption="Output image showing results of hsv2rgb." src="assets/thumb/blue.jpg" width="200" height="200"  />
+          <parameterName>BLUE</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/image/hsv2rgbgui.jpg" width="500" height="500">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+                         a conversion from HSV to RGB.</description>
+            <thumbnail caption="HSV2RGB Gui" src="assets/thumb/hsv2rgbgui.jpg" width="200" height="240"  />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+  </examples>
+
+</application>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="demwrap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    This program pads DEMs with a specified number of pixels. It is not valid to run this program on anything but a DEM.
+  </brief>
+
+  <description>
+    This program pads DEMs with a specified number of pixels. It is not valid to run this program on anything but a DEM.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2008-09-15">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-10-03">
+      Added additional checks for valid projections and fixed the implementation of the north and south poles.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input DEM cube
+        </brief>
+        <description>
+  	      The DEM cube which will be padded
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output padded DEM cube
+        </brief>
+        <description>
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Settings">
+      <parameter name="LEFT">
+        <type>integer</type>
+        <brief>Number of pixels to pad on the left side</brief>
+        <minimum inclusive="yes">0</minimum>
+        <default><item>0</item></default>
+        <description>
+          This is the number of pixels to pad on the left side of the cube
+        </description>
+      </parameter>
+
+      <parameter name="RIGHT">
+        <type>integer</type>
+        <brief>Number of pixels to pad on the right side</brief>
+        <minimum inclusive="yes">0</minimum>
+        <default><item>0</item></default>
+        <description>
+          This is the number of pixels to pad on the right side of the cube
+        </description>
+      </parameter>
+
+      <parameter name="TOP">
+        <type>integer</type>
+        <brief>Number of pixels to pad on the top edge</brief>
+        <minimum inclusive="yes">0</minimum>
+        <default><item>0</item></default>
+        <description>
+          This is the number of pixels to pad on the top edge of the cube
+        </description>
+      </parameter>
+
+      <parameter name="BOTTOM">
+        <type>integer</type>
+        <brief>Number of pixels to pad on the bottom edge</brief>
+        <minimum inclusive="yes">0</minimum>
+        <default><item>0</item></default>
+        <description>
+          This is the number of pixels to pad on the bottom edge of the cube
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

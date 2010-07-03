@@ -1,0 +1,32 @@
+UNIT TEST for ShadeAtm normalization function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name = Lambert
+  End_Group
+End_Object
+
+Object = AtmosphericModel
+  Group = Algorithm
+    Name = Anisotropic1
+    Bha  = 0.85
+  End_Group
+End_Object
+
+Object = NormalizationModel
+  Group = Algorithm
+    Name   = ShadeAtm
+    Albedo = 0.0690507
+  End_Group
+End_Object
+End
+
+Test phase=86.7226722, incidence=51.7002388, emission=38.9414439, dn=.0800618902 ...
+Normalization value = 0.131329
+
+Test phase=86.7207248, incidence=51.7031305, emission=38.9372914, dn=.0797334611 ...
+Normalization value = 0.131322
+
+Test phase=86.7187773, incidence=51.7060221, emission=38.9331391, dn=.0794225037 ...
+Normalization value = 0.131316
+

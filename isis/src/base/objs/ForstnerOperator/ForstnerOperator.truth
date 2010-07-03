@@ -1,0 +1,14 @@
+Object = InterestOperator
+  Group = Operator
+    Name            = Forstner
+    DeltaLine       = 100
+    DeltaSamp       = 100
+    Samples         = 15
+    Lines           = 15
+    MinimumInterest = 0.0
+  End_Group
+End_Object
+End
+Sample: 87
+Line : 380
+Interest: 4.75802e-92

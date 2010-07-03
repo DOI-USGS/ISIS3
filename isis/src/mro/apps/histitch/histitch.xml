@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="histitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Merge a HiRISE channel pair to make a single image
+  </brief>
+
+  <description>
+      <p>
+    The program allows the user to combine two HiRISE channels to form a 
+    single CCD image. Histitch will typically be run after radiometric
+    correction and prior to geometric processing. The two input files 
+    must be the individual channel files (channels 0 and 1) of the 
+    same CCD observation.   The program will test to make sure the 
+    Observation IDs and CCD IDs of the input cubes match, and that one
+    cube is channel 0  and the other is channel 1. The program is clever enough 
+     to figure out the channels associated with each input file and correctly
+    order them in the output file.  Any ancillary data "blobs" 
+    will not be propagated to the output file.  The channel number on 
+    the output cube is set to 2 to signify that it is the combination of channels 
+    0 and 1.
+      </p>
+      <p>
+     histitch can create a CCD image if when only one channel is provided.
+     The proper placement, left half of CCD for channel 1 images, right half for
+     channel 0, is determined from the input file and the remainder of the CCD
+     is filled with Nulls.
+      </p>
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Eric Eliason" date="2004-07-31">
+      Original version
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-02-22">
+      Added obsevation id, ccd id, and channel number tests
+    </change>
+    <change name="Kris Becker" date="2006-02-22">
+      Made FROM2 optional and allow creation of full CCD with just one
+      channel file.
+    </change> 
+    <change name="Brendan George" date="2006-08-24">
+      Added StitchedChannels keyword to Instrument Group, to identify
+      which channels were used.
+    </change>
+    <change name="Brendan George" date="2006-09-01">
+      Added StitchedProductIds keyword to Instrument group, to identify
+      which images were used.
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Stacy Alley" date="2007-08-16">
+        Added the balance option.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Kris Becker" date="2008-10-02">
+      Added new EQUALIZE balance option that has utilizes new options WIDTH, 
+      FILL, CHANNEL and OPERATOR parameters.  This new option applies a 
+      line-by-line equalization of the CCD channels using and addative or 
+      multiplicative option.
+    </change> 
+    <change name="Jeannie Walldren" date="2008-11-05"> 
+      Replaced references to DataInterp class with NumericalApproximation.
+    </change>
+    <change name="Kris Becker" date="2008-12-08">
+      Set  channel 1 (left) as the default to hold instead of channel 0.   
+      Added reporting of results to label in the Histitch group.  Also added 
+      creation of a Table of data when the EQUALIZE BALANCE option is 
+      selected.
+    </change> 
+    <change name="Kris Becker" date="2008-12-23">
+      The BALANCE=TRUE option now honors the CHANNEL parameter and applies the 
+      coefficient/ratio to the other channel.
+    </change> 
+    <change name="Steven Lambright &amp; Stacy Alley" date="2009-06-09">
+      Added error checking to SKIP and SEAMSIZE parameters. Fixed problem
+      with accessing out of array bounds.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM1">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          First HiRISE Channel file.
+        </brief>
+        <description>
+          This is the first of a pair of input HiRISE channel
+          image files. This file can be either the channel 0
+          or 1 file. The pair of input files must correspond
+          to the the same observation of a HiRISE CCD.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="FROM2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Second HiRISE Channel file.
+        </brief>
+        <description>
+            <p>
+          This is the second of a pair of input HiRISE channel
+          image files. This file can be either the channel 0
+          or 1 file. The pair of input files must correspond
+          to the the same observation of a HiRISE CCD.
+            </p>
+            <p>
+              If the user does not provide a file for the second file, histitch
+              will create a full CCD and map the FROM1 file into the proper
+              location in the CCD.  This allows creation of the full CCD without
+              both channels being required.
+            </p>
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output HiRISE CCD image.
+        </brief>
+        <description>
+          The output cube is a HiRISE CCD image with the two channel
+          files combined. The channel number for this cube is set  to 2.
+         </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Balance Channels">
+      <parameter name="BALANCE">
+        <type>string</type>
+        <default><item>FALSE</item></default>
+        <brief>Option to balance channel 0 and channel 1</brief>
+        <description>
+            A feature which calculates the average on each channel and multiplies one side with
+            the ratio of the averages
+        </description>
+       <list>
+          <option value="TRUE">
+            <brief>Balance On</brief>
+            <description>
+                Enables balance feature.
+            </description>
+            <exclusions>
+             <item>WIDTH</item>
+             <item>FILL</item>
+             <item>OPERATOR</item>
+            </exclusions>
+          </option>
+          <option value="FALSE">
+            <brief>Balance Off</brief>
+            <description>
+               Disables balance feature.
+            </description>
+            <exclusions>
+              <item>SEAMSIZE</item>
+              <item>SKIP</item>
+             <item>WIDTH</item>
+             <item>FILL</item>
+             <item>CHANNEL</item>
+             <item>OPERATOR</item>
+            </exclusions>
+          </option>
+          <option value="EQUALIZE">
+            <brief>Line-by-line equalization</brief>
+            <description>
+                <p>
+                    Enables line-by-line equalization feature.  This feature uses 
+                    the SEAMSIZE and SKIP parameters to generate an average of each 
+                    line for both channels.  These averages can be filtered (using 
+                    an LPF) and missing data filled (using spline interpolation).  
+                    The results can be subtracted or multiplied to correct for 
+                    downtrack differences in the channels.
+                </p>
+                <p>
+                    When this option is selected, an ISIS Table is created 
+                    called HistitchStats.  This table contains four fields: 
+                    Channel1Original, Channel0Original, Channe1Correction, and 
+                    Channel0Correction.  If the MULTIPLY OPERATOR is selected, 
+                    then one channel corrected column will be all 1.0.  For the 
+                    ADD OPERATOR one column will contain all 0.0.  
+                </p>
+                <p>
+                    The two original columns will contain the results of 
+                    averaging the specified window with the values of SEAMSIZE 
+                    and SKIP parameters.  The correction columns will contain 
+                    the ratio (MULTIPLY) or additive (ADD) component of the 
+                    correction that was appled to channel 0 or 1, whichever one
+                    is not designated the hold channel  in the CHANNEL 
+                    parameter.
+                </p>
+                <p>
+                    The ISIS program <b>tabledump</b> can be used to extract the 
+                    contents of this table to an ASCII file.
+                </p>
+            </description>
+           <inclusions>
+              <item>SEAMSIZE</item>
+              <item>SKIP</item>
+             <item>WIDTH</item>
+             <item>FILL</item>
+             <item>CHANNEL</item>
+             <item>OPERATOR</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="SKIP">
+        <type>integer</type>
+        <default>
+          <item> 7 </item>
+        </default>
+        <minimum inclusive="true">0</minimum>
+        <brief> Number of Pixels to skip on the edges of the image. </brief>
+        <description>
+          Number of pixels to skip on each side of the seam before the program 
+          starts to accumulate pixel DN's to calculate the seam average value.  
+        </description>
+      </parameter>
+    <parameter name="SEAMSIZE">
+        <type>integer</type>
+        <default>
+          <item> 11 </item>
+        </default>
+        <minimum inclusive="true">1</minimum>
+        <brief> Number of Pixels on the seam </brief>
+        <description>
+          Number of pixels (after skipping 'SKIP' number of pixels) used to 
+          compute the averages on each side of the seam.
+        </description>
+      </parameter> 
+      <parameter name="WIDTH">
+        <type>integer</type>
+        <brief>Width of filter to apply to line averages</brief>
+        <default><item>0</item></default>
+
+        <description>
+          Specify the width of the filter to apply to both channel line 
+          averages.  This is turned off with a value of 0.
+        </description>
+      </parameter>
+      <parameter name="FILL">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>
+          Apply spline interpolation to channel line averages
+        </brief>
+        <description>
+          Apply a spline interpolation to each line average to fill any gaps 
+          that may exist
+        </description>
+      </parameter>
+      <parameter name="CHANNEL">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Specify channel to normalize to (hold as truth)</brief>
+        <minimum inclusive="yes">0</minimum>
+        <maximum inclusive="yes">1</maximum>
+        <description>
+          Typically, channel 1, the left channel, is held and channel 0, the 
+          right channel, is corrected.  This option allows the user to select 
+          which channel to hold.
+        </description>
+      </parameter>   
+      <parameter name="OPERATOR">
+        <type>string</type>
+        <default><item>MULTIPLY</item></default>
+        <brief>Option to balance channel 0 and channel 1</brief>
+        <description>
+            A feature which calculates the average on each channel and multiplies one side with
+            the ratio of the averages
+        </description>
+       <list>
+          <option value="MULTIPLY">
+            <brief>Multiply channel line average corrections</brief>
+            <description>
+                Line average ratio is multiplied to the specified channel to 
+                equalize the combined CCD channels.
+            </description>
+          </option>
+          <option value="ADD">
+            <brief>Add channel line average corrections</brief>
+            <description>
+               Line average ratio is added to the specified channel to 
+                equalize the combined CCD channels.
+            </description>
+          </option>
+       </list>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief> HiRISE image </brief>
+      <description>
+        This example shows the hiStitch application.
+      </description>
+      <terminalInterface>
+        <commandLine> from1=IN/Channel0.cub from2=IN/Channel1.cub to=OUT/output.cub balance=true skip=7 seamsize=11
+        </commandLine>
+        <description>
+         hiStitch gui example
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/oldStitch.JPG" width="500" height="500">
+          <brief> Input images for hiStitch</brief>
+          <description>These are input images stitched together without the balance option on.
+          </description>
+          <thumbnail caption=" Input HiRISE images" src="assets/thumb/oldStitch.JPG" width="200" height="200"/>
+          <parameterName>FROM1,FROM2</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/newStitch.JPG" width="500" height="500">
+          <brief> Output image for hiStitch</brief>
+          <description> This is the output image with the balance option TRUE.
+          </description>
+          <thumbnail caption="Output image showing results of the hiStitch application." src="assets/thumb/newStitch.JPG" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="741" height="841" src="assets/image/hiStitchGUI.JPG">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a hiStitch operation on the input images. </description>
+            <thumbnail width="200" height="300" caption="hiStitch Gui" src="assets/thumb/hiStitchGUI.JPG" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

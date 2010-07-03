@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="skymap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Convert camera image to a skymap projection
+  </brief>
+
+  <description>
+    This program converts a cube in camera coordinates to a map projection.  It differs from the application "cam2map" in that it maps camera
+    ra/dec (right acsension/declination) to map projection longitude/latitude.  The program is useful for inflight geometric and optical distortion
+    calibration of a camera when star images are collected.  The input cube labels must have an Instrument Group and
+    Kernels Group.  That is, the program "spiceinit" should be run on the input cube prior to "skymap".  
+
+    <p>
+    This program will pick appropriate defaults for most parameters.   In particular for the MAP parameter, it will generate the following:
+    </p>
+    <pre>
+  Group = Mapping
+    TargetName             = "Sky"
+    EquatorialRadius       = 1.0
+    PolarRadius            = 1.0
+
+    LatitudeType           = Planetocentric
+    LongitudeDirection     = PositiveEast
+    LongitudeDomain        = 360
+
+    MinimumLatitude        = Computed from the input camera cube or map file
+    MaximumLatitude        = Computed from the input camera cube or map file
+    MinimumLongitude       = Computed from the input camera cube or map file
+    MaximumLongitude       = Computed from the input camera cube or map file
+
+    ProjectionName         = Projection name in the map file
+    Scale                 = Computed from the input camera cube or map file
+  EndGroup
+    </pre>
+
+    Note that although the map projection group reflects latitude/longitude, those values are synomous with declination/right ascension.
+
+  <p>
+  Note that an important concept here is a Mapping group can come from any PVL file.   You can use an existing map projected cube
+  as input for the MAP user parameter.  Because the cube has PVL labels and contains the Mapping group, you will essentially force
+  the input camera cube to have the same mapping parameters or match the existing cube.  Information about map projections and
+  the Mapping group can be found in the Isis user documentation.
+  </p>
+
+  <p>
+    Finally, the user has the option to override the pixel resolution and the ground range (latitude/longitude).  These changes can be
+    facilitied through the parameters SCALE, SRA, ERA, SDEC, and EDEC.
+  </p>
+  </description>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2004-12-14">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2005-09-21">
+      Fixed bug with program not using all keywords in
+      the user MAP file
+    </change>
+    <change name="Jeff Anderson" date="2005-10-13">
+      Fixed bug with garbage pixels being produced
+      at extremities of the projected image edges.
+    </change>
+    <change name="Jeff Anderson" date="2005-10-17">
+      Fixed bug, full mapping group was not written to
+      cube labels.  Also, updated documentation to correctly
+      state that the RESOLUTION parameter is the IFOV of
+      the camera .
+    </change>
+    <change name="Brendan George" date="2005-11-08">
+      Added application test
+    </change>
+      <change name="Tracie Sucharski" date="2006-04-11">
+        Check to see if center of input image projects, if it does, force the  tile containing center
+        to be processed in ProcessRubberSheet.
+     </change>
+      <change name="Elizabeth Miller" date="2006-05-03">
+        Redid UI to match cam2map 
+      </change>
+      <change name="Elizabeth Miller" date="2006-05-18">
+        Depricated CubeProjection and ProjectionManager to ProjectionFactory
+      </change>
+      <change name="Elizabeth Miller" date="2006-05-30">
+        Moved helper buttons and refined helper error checking 
+      </change>
+      <change name="Steven Lambright" date="2007-06-22">
+        Fixed typo in user documentation
+      </change>    
+      <change name="Steven Lambright" date="2008-05-13">
+        Removed references to CubeInfo 
+      </change>
+      <change name="Travis Addair" date="2009-08-10">
+        Mapping group parameters are now placed into the print file.
+      </change>
+ </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to project
+        </brief>
+        <description>
+          The specification of the input cube to be projected.  The cube must
+          contain a valid Instrument and Kernel group in the labels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MAP">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing mapping parameters
+        </brief>
+        <defaultPath>$base/templates/maps</defaultPath>
+        <default><item>$base/templates/maps/simplecylindrical.map</item></default>
+        <description>
+          A file containing the desired output mapping parameters in PVL form.  This
+          file can be a simple hand produced label file.  It can also be an existing cube label
+          which contains a Mapping group.
+        </description>
+        <filter>
+          *.map *.cub
+        </filter>
+        <helpers>
+          <helper name="H1">
+            <function>PrintMap</function>
+            <brief>View MapFile</brief>
+            <description>
+              This helper button will cat out the mapping group of the given mapfile to the session log
+               of the application 
+             </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Newly mapped cube
+        </brief>
+        <description>
+          This file will contain the sky as a map projected image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Output Map Scale">
+      <parameter name="DEFAULTSCALE">
+        <type>string</type>
+        <brief>Defines how the scale in the output map file is obtained</brief>
+        <default><item>CAMERA</item></default>
+        <description>
+          This parameter is used to specify how the scale is obtained for the output map
+          projected cube. 
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>LoadCameraRes</function>
+            <brief>Load Camera Scale </brief>
+            <description>This helper button will load the default scale from the camera</description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+          <helper name="H2">
+            <function>LoadMapRes</function>
+            <brief>Load Map File Scale </brief>
+            <description>This helper button will load the default scale from the map file</description>
+          </helper>
+        </helpers>
+        <list>
+           <option value="CAMERA">
+              <brief>Compute resolution from input cube</brief>
+              <description>
+                This option will automatically determine the scale from the input  cube specified using the FROM parameter.
+              </description>
+              <exclusions>
+                <item>SCALE</item>
+              </exclusions>
+            </option>
+
+           <option value="MAP">
+              <brief>Read scale from input map file</brief>
+              <description>
+                This option will use the Scale (pixels/degree) in the map file.
+              </description>
+              <exclusions>
+                <item>SCALE</item>
+              </exclusions>
+            </option>
+
+           <option value="USER">
+              <brief> Get scale from user</brief>
+              <description>
+                This option allows the user to specify the resolution using the SCALE parameter.  The scale
+                should be entered in pixels/degree.
+              </description>
+              <inclusions>
+                <item>SCALE</item>
+              </inclusions>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name="SCALE">
+        <type>double</type>
+        <brief>Scale in pixels per degree</brief>
+        <description>
+            The number of pixels per degrees (RA/DEC).  By default, 
+            the program attempts to compute this value as 1 / IFOV of the camera. 
+            Note you will typically need to convert
+            IFOV in milli-or-micro radians to degrees.
+            Alternatively, you can entered the scale in the MAP file in
+            pixels per degrees (1 / IFOV).  That is,
+            <pre>
+              Group = Mapping
+                ...
+                Scale = 17000.0
+              End_Group
+              End_Group
+            </pre>
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+    </group>
+
+    <group name="Output Map Sky Range">
+      <parameter name="DEFAULTRANGE">
+        <type>string</type>
+        <brief>Defines how the default sky range is determined</brief>
+        <default><item>CAMERA</item></default>
+        <description>
+          This parameter is used to specify how the default ra/dec ground range for the output map projected image
+          is obtained.  Note the user can overide the default using the SRA, ERA, SDEC, EDEC parameters.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>LoadCameraRange</function>
+            <brief>Load Camera Sky Range </brief>
+            <description>This helper button will load the default sky range from the camera</description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+          <helper name="H2">
+            <function>LoadMapRange</function>
+            <brief>Load Map File Sky Range </brief>
+            <description>This helper button will load the default sky range from the map file</description>
+          </helper>
+        </helpers>
+        <list>
+           <option value="CAMERA">
+              <brief> Compute default range from input cube</brief>
+              <description>
+                This option will automatically determine the mininum/maximum ra/dec from the input camera model cube specified
+                using the FROM parameter.
+              </description>
+            </option>
+
+           <option value="MAP">
+              <brief> Read default range from map file</brief>
+              <description>
+                This option will read the mininum/maximum ra/dec from the input map file.  All four values are expected to be defined.
+              </description>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name="SRA">
+        <type>double</type>
+        <brief>Starting right ascension</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The starting right ascension of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.   
+        </description>          
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">360.0</maximum>
+      </parameter>
+
+      <parameter name="ERA">
+        <type>double</type>
+        <brief>Ending right ascension</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The ending right ascension of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.   
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">360.0</maximum>
+        <greaterThan><item>SRA</item></greaterThan>
+      </parameter>
+
+      <parameter name="SDEC">
+        <type>double</type>
+        <brief>Starting declination</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The starting declination of the sky map.  If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.    
+        </description>
+        <minimum inclusive="yes">-90.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+      </parameter>
+
+      <parameter name="EDEC">
+        <type>double</type>
+        <brief>Ending declination</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The ending declination of the sky map.   If not entered it will be read computed from the CAMERA or read from the MAP file, depending 
+          on the option chosen for DEFAULTRANGE.  If this value is entered, it will override the default value.    
+        </description>
+        <minimum inclusive="yes">-90.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <greaterThan><item>SDEC</item></greaterThan>
+      </parameter>
+
+      <parameter name="TRIM">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Trim pixels outside sky range
+        </brief>
+        <description>
+          If this option is selected, pixels outside the ra/dec
+          range be trimmed or set to null.
+          This is useful for certain projections whose lines of latitude and
+          longitude are not parallel to image lines and sample columns.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

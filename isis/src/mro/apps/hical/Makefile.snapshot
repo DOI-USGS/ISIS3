@@ -1,0 +1,51 @@
+include $(ISISROOT)/make/isismake.macros
+
+RM = rm -rf
+
+STAGE := hical_stage
+CVS3 :=  cvs -d :ext:$(USER)@blackflag:/usgs/cpkgs/isis3/cvs
+REPLACE := $(PWD)/tools/replacetxt
+TARGETS := $(shell find . -name '*.h' -exec fgrep -l  hicalbeta {} \;) \
+	   $(shell find . -name '*.cpp' -exec fgrep -l  -i hicalbeta {} \;) \
+	   $(shell find . -name Makefile -exec fgrep -l -i hicalbeta {} \;) \
+	   $(shell find . -name '*.conf' -exec fgrep -l -i hicalbeta {} \;) \
+	   $(shell find . -name '*.xml' -exec fgrep -l -i hicalbeta {} \;) 
+BETAS := $(filter %.xml %.conf, $(TARGETS))
+
+.SUFFIXES:
+.PHONY:
+.PHONY: snapshot clone targets $(TARGETS) betas $(BETAS) rename clean
+
+snapshot: export clone rename
+
+export:
+	@echo "Exporting hicalbeta to $(STAGE)..."
+	$(RM)  $(STAGE)
+	$(CVS3) export -D now -d $(STAGE) isis/src/mro/apps/hicalbeta
+	$(RSYNC) -av  $(STAGE)/ .
+	$(RM)  $(STAGE)
+
+
+clone:
+	@echo "Cloning designated targets AND betas..."
+	$(MAKE) -f Makefile.snapshot targets betas
+
+rename: hicalbeta.cpp hicalbeta.xml
+	$(MV) hicalbeta.cpp hical.cpp
+	$(MV) hicalbeta.xml hical.xml
+	$(MV) assets/hicalbeta.XXXX.conf assets/hical.XXXX.conf
+
+targets: $(TARGETS)
+
+betas: $(BETAS)
+
+$(TARGETS)::
+	@echo "Converting hicalbeta to hical in $@..."
+	$(REPLACE) hicalbeta  hical $@
+
+$(BETAS)::
+	@echo "Converting /beta/ to / in $@..."
+	$(REPLACE) '/beta/' '/' $@
+
+clean:
+	$(RM)  $(STAGE) $(shell find . -name '*.bak')

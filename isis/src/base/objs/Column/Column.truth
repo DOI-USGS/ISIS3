@@ -1,0 +1,13 @@
+
+Unit Test for Column!!!
+
+Name() returns: test column
+
+Width() returns: 15
+
+DataType() returns: 1
+
+Alignment() returns: 1
+
+Precision() returns: 4
+

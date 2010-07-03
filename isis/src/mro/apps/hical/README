@@ -1,0 +1,63 @@
+                            HiRISE hical Appication
+			      September 15, 2009
+                              $Revision: 1.2 $
+
+
+Calibrating HiRISE image data is still currently undergoing active development 
+due to the complex nature of the instrument and its operating conditions.  As 
+such, the ISIS HiRISE calibration program, hicalbeta, is also evolving.  In 
+order to continue improvements to HiRISE calibration whilst providing a stable, 
+best order calibration program, the hical program will be a snapshot of the 
+hicalbeta application.  hicalbeta is also distributed with each ISIS release so 
+both are simultaneously available. 
+
+The hical program that existed prior to this event has completely removed and 
+will no longer be available.  These periodic snapshots of hicalbeta will 
+replace existing versions of hical from henceforth and until further notice.
+
+We will continue to actively develop hicalbeta and periodically, when deemed 
+appropriate by the HiRISE team and ISIS Development team, generate a hicalbeta 
+snapshot creating a new version of hical.  The file, HISTORY, will contain a 
+log of these events and list files that are affected.
+
+This action has been taken in order to minimize confusion and provide a stable 
+HiRISE calibration resource (program).  Other applications that are affected 
+by this action are:
+
+hiclean
+hiclean2
+hipical
+
+The three above applications have been completely removed from the ISIS system 
+as of release 3.1.21.  They will no longer be maintained or distributed from 
+this time forward.  All HiRISE users should use hical.  hicalbeta should be 
+used ONLY at your own risk!
+
+The steps to make a hicalbeta clone are:
+
+1)  Check out the hical application from the CVS repository
+2)  Execute the make file to create the snapshot as such:
+          make -f Makefile.snapshot snapshot clean
+3)  Run a check against what has changed to see if anything new needs to be
+    added.  This is done using the cvs command:
+          cvs3 -nq update
+    Anything with a ? in front of the name needs to be determined if it should 
+    be added to the hical respository.  If so add it with 'cvs3 add <file>'.
+4)  Commit all changes to CVS with:
+          cvs3 commit -m "New hical snapshot"
+
+5)  Now as isis3mgr, you must update/copy assets/hical.XXXX.conf to 
+    $ISIS3DATA/mro/calibration ensuring the 'XXXX' is exactly what the last 
+    'XXXX' in hicalbeta.XXXX.conf is.  This makes it consistant with hicalbeta.
+6)  Then inspect $ISIS3DATA/mro/calibration/matrices/beta for new files or 
+    files with higher version numbers and copy them to
+    $ISIS3DATA/mro/calibration/matrices.  Ensure that any of files that have
+    'hicalbeta' in the name are converted to 'hical' as this is what the
+    snapshot process will rename.
+
+7)  Now rerun the app tests and update accordingly.  This will almost always 
+    require updates to the truth files.  They should be consistant with any 
+    hicalbeta updates.
+8)  Update the HISTORY file with changes.
+
+At this point hical and hicalbeta should produce consistant results.

@@ -1,0 +1,12 @@
+Object = InterestOperator
+  Group = Operator
+    Name = StandardDeviation
+    DeltaSamp = 0
+    DeltaLine = 0
+    Samples = 3
+    Lines = 3
+    MinimumDN = 0.0
+    MaximumDN = 1.0
+    MinimumInterest = 0.0
+  End_Group
+End_Object

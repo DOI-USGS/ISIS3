@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="slpmap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Creates cubes that have slope data or aspect data
+  </brief>
+
+  <description>
+    This program takes a cube in which the DN values represent elevations. This program
+    will calculate either the slope at every point, or the direction of the slope at
+    every point in radians or degrees. These directions are relative to the image (not
+    relative to north), which can be different in various projections and cameras.
+  </description>
+
+  <history>
+    <change name="Brian Peck" date="2006-12-25">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-10-06">
+      Changed slope and aspect algorithms
+    </change>
+  </history>
+
+  <category>
+   <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select input cube. All bands of the cube within the file
+          will have the shade applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          Output cube for your process.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="OUTPUT">
+        <type>string</type>
+        <brief>Type of output requested</brief>
+        <default><item>SLOPE</item></default>
+        <description>
+          This determines the type of output that will be created.
+        </description>
+      	<list>
+      	  <option value="SLOPE">
+      	    <brief>Create Slope Cube</brief>
+      	    <description>
+      	      This creates a slope cube. In other words, every DN value will
+              be set to its slope. The algorithm is explained 
+              <a href="http://webhelp.esri.com/arcgisdesktop/9.3/index.cfm?TopicName=How%20Slope%20(3D%20Analyst)%20works">here</a>.
+               
+      	    </description>
+      	  </option>
+      	  <option value="ASPECT">
+      	    <brief>Create Aspect Cube</brief>
+      	    <description>
+      	      This creates an aspect cube. In other words, every DN value will
+              be set to the direction of the slope. The algorithm is explained 
+              <a href="http://webhelp.esri.com/arcgisdesktop/9.3/index.cfm?TopicName=How%20Aspect%20(3D%20Analyst)%20works">here</a>.
+      	    </description>
+      	  </option>
+      	</list>
+      </parameter>
+
+      <parameter name="DEGREES">
+        <type>boolean</type>
+        <brief>Output in degrees</brief>
+        <default><item>false</item></default>
+        <description>
+          When set to true, the output image will be in degrees. If this is false,
+          the output image will be in radians.
+        </description>
+      </parameter>
+
+      <parameter name="CONVERSION">
+        <type>double</type>
+        <brief>Conversion factor (resolution to meters)</brief>
+        <default><item>1.0</item></default>
+        <description>
+          Since the slope algorithm depends on cancelling out the units, the
+          conversion factor from the input unit to meters should be set. For
+          example, if the input image DN values mean kilometers, then this
+          value should be 1000 because there are 1000m in one kilometer.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+
+  <examples>
+    <example>
+      <brief>Creating an aspect cube</brief>
+      <description>
+        This example creates an aspect (shows the direction of the slope) cube of Vallis Marinaris 
+      </description>
+      <terminalInterface>
+        <commandLine>from=vallis_marinaris.cub to=aspect.cub output=aspect</commandLine>
+        <description>
+          In this examples we will create an aspect cube.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/vallis_marinaris.jpg" width="692" height="641">
+          <brief>Image of Vallis Marinaris</brief>
+          <description>
+            This is our input image of Vallis Marinaris. The DN values are the angle, in radians, the slope is facing relative to the image.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/vallis_marinaris_thumb.jpg" width="346" height="321"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/angle.jpg" width="691" height="639">
+          <brief>The cube holding angle data</brief>
+          <description>
+            This is the cube that holds the angle data.
+          </description>
+          <thumbnail caption="Output image showing angle cube." src="assets/thumb/angle_thumb.jpg" width="346" height="320"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="728" height="416" src="assets/image/angleGUI.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of the GUI with parameters filled in to create a steepest slope cube.
+            </description>
+            <thumbnail width="364" height="208" caption="Angle Gui" src="assets/thumb/angleGUI_thumb.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>
+

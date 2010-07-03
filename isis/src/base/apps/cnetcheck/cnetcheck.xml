@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnetcheck" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Checks for validity of a Control Net file.
+  </brief>
+
+  <description>
+    Checks for the validity of a Control Net file given a cube list.  Its primary
+    function is to check and find islands of the Control Net.  These islands
+    are then written to seperate files, which lists the cubes and their
+    corresponding serial number.  If a serial number's cube is not listed in
+    the input list, than that cube will NOT be listed within the appropriate
+    island file.  If an island file is missing altogether, it is due to the fact
+    that all of that islands cubes were not listed in the input list.
+
+    cnetcheck should be ran from the directory you wish for the output files to 
+    be written to.
+  </description>
+
+  <history>
+    <change name="Christopher Austin" date="2008-07-09">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-07-10">
+      Fixed output files to only show filenames and usage of c_str.
+    </change>
+    <change name="Christopher Austin" date="2008-07-28">
+      Fixed NoLatLon option.
+    </change>
+    <change name="Christopher Austin" date="2008-08-01">
+      Added Control Point IDs to the NoLatLon flat file.
+    </change>
+    <change name="Christopher Austin" date="2008-10-28">
+      Greatly optimized the NoLatLon option.
+    </change>
+    <change name="Steven Lambright" date="2008-11-24">
+      Renamed parameters: "LIST" is now "FROMLIST" and "CONTROL" is now "NETWORK"
+    </change>
+    <change name="Christopher Austin" date="2009-04-07">
+      Added the IGNORE option, which ignores ignored Control Points.
+    </change>
+    <change name="Christopher Austin" date="2009-04-23">
+      Added a results group that correlates parameter names to keywords,  fixed
+      the newline character outputs, and changed NOMATCH to NOCONTROL.
+    </change>
+    <change name="Christopher Austin" date="2009-05-15">
+      Fixed the island detecting to disregard ignored control points and other
+      bug fixes.
+    </change>
+    <change name="Christopher Austin" date="2009-06-03">
+      Fixed a bug with ignored Control Measures, changed NETWORK to CNET,
+      changed the output formats to be more useful and consistant.
+    </change>
+    <change name="Christopher Austin" date="2009-08-21">
+      Cleaned up syntax and improved readability.
+    </change>
+    <change name="Christopher Austin" date="2009-09-18">
+      Added the SINGLECUBE parameter, renaming SINGLE to SINGLEMEASURE as a consequence.
+    </change>
+    <change name="Mackenzie Boyd" date="2010-05-28">
+      Modified functionality of NOLATLON option to check all measures, not just 
+      each cube.
+    </change>
+    <change name="Christopher Austin" date="2009-06-08">
+      Added the DELIMIT parameter
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+  
+  <groups>
+    <group name="Input Files">
+      <parameter name="FROMLIST">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+            List of ISIS3 input cubes in the Control Network
+          </brief>
+          <description>
+          A text file containing one column of ISIS3 cube file names. Every file
+          used in the match point file should be represented in this list.
+          </description>
+          <filter>
+            *.txt *.lis *.list
+          </filter>
+        </parameter>
+
+        <parameter name="CNET">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+             Isis3 input Control Network file
+          </brief>
+          <description>
+            Use this parameter to specify the control network file containing
+            the information to be validated
+            </description>
+          <filter>
+            *.net
+          </filter>
+        </parameter>
+
+    </group>
+
+    <group name="Output Options">
+
+      <parameter name="DELIMIT">
+          <type>string</type>
+          <brief>
+              The character to be inserted between file entries
+          </brief>
+          <description>
+              This option will determine which character will be used to
+              separate file entries, with the default option as a tab.
+              The other options are comma, to separate with a single
+              space, or "OTHER," which allows the user to input whatever
+              they wish as the delimiter character.
+          </description>
+          <default><item>TAB</item></default>
+          <list>
+            <option value="TAB">
+                <brief>Separate with tabs</brief>
+                <description>
+                    This option will cause the file entries to be
+                    separated by tabs.
+                </description>
+                <exclusions>
+                    <item>CUSTOM</item>
+                </exclusions>
+            </option>
+              <option value="COMMA">
+                  <brief>Separate with commas</brief>
+                  <description>
+                      This option will cause the file entries to be
+                      separated by commas.
+                  </description>
+                  <exclusions>
+                      <item>CUSTOM</item>
+                  </exclusions>
+              </option>
+              <option value="SPACE">
+                  <brief>Separate with spaces</brief>
+                  <description>
+                      This option will cause the file entries to be
+                      separated by single space when output.
+                  </description>
+                  <exclusions>
+                      <item>CUSTOM</item>
+                  </exclusions>
+              </option>
+              <option value="OTHER">
+                  <brief>Separate with user-defined characters</brief>
+                  <description>
+                      This option allows the user to determine what
+                      character is used to separate entries. When this
+                      option is selected, the CUSTOM parameter is used
+                      to determine what will be used. Whatever string the
+                      user enters will be used in between the entries.
+                  </description>
+                  <inclusions>
+                      <item>CUSTOM</item>
+                  </inclusions>
+              </option>
+          </list>
+      </parameter>
+      <parameter name="CUSTOM">
+          <type>string</type>
+          <brief>User-defined delimiter</brief>
+          <description>
+              This parameter is only used if the user has selected "OTHER"
+              as a delimiter. The user then enters something into this
+              parameter to use as a delimiter.
+          </description>
+      </parameter>
+
+      <parameter name="PREFIX">
+        <type>string</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Outputs results
+        </brief>
+        <description>
+	        The result of the validity check is placed in output files with the 
+          given prefix.
+        </description>
+      </parameter>
+
+      <parameter name="IGNORE">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Ignores ignored Control Points when checking the Control Net.
+        </brief>
+        <description>
+  	       When true, all ignored Control Points and all ignored Control
+           Measures provided by the Control Net will be discarded during
+           calculations.
+        </description>
+      </parameter>
+
+      <parameter name="NOCONTROL">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Check for Cubes in the FROMLIST which are not in the Control Net.
+        </brief>
+        <description>
+  	       When true, a file named [PREFIX]NoMatch.txt will be created, which 
+           will list all of the cubes, and their corresponding Serial Number 
+           which do not exist within the provided Control Net.  If there are no 
+           such cubes, then no file is created.
+        </description>
+      </parameter>
+
+      <parameter name="NOCUBE">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Checks for cubes in the Control Net that are not listed in the FROMLIST.
+        </brief>
+        <description>
+            When true, a file named [PREFIX]NoCube.txt will be created, which 
+            will list all of the Serial Numbers in the given Control Net which 
+            do not have a corresponding Cube in the proveded List.  If there are 
+            no such Serial Numbers, then no file is created.
+        </description>
+      </parameter>
+
+      <parameter name="SINGLEMEASURE">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Check for Control Points which contain a single Control Measure.
+        </brief>
+        <description>
+          When true, a file named [PREFIX]SinglePointCubes.txt will be created, 
+          which will list all of the Cubes which exist as a single Control 
+          Measure in any Control Point within the provided Control Net.  If there 
+          are no such single Control Measures, then no file is created.
+        </description>
+      </parameter>
+
+      <parameter name="DUPLICATE">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Check for Control Points which contain the same cube in more than one Control Measure.
+        </brief>
+        <description>
+          When true, a file named [PREFIX]DuplicateMeasures.txt will be created, 
+          which will list all of the cubes which exist in more than one Control 
+          Measure in a single Control Point within the provided Control Net.  If 
+          there are no such duplicate Control Measures, then no file is created.
+        </description>
+      </parameter>
+
+      <parameter name="SINGLECUBE">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Check for Cubes which have only a single Control Measure.
+        </brief>
+        <description>
+          When true, a file named [PREFIX]SingleCubes.txt will be created, 
+          which will list all of the Cubes which exist in only a single Control 
+          Measure within the entire Control Net.  If there 
+          are no such single Cubes, then no file is created.
+        </description>
+      </parameter>
+
+      <parameter name="NOLATLON">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Check for measures for which latitudes and longitudes cannot be 
+          computed for. 
+        </brief>
+        <description>
+          When true, a file named [PREFIX]NoLatLon.txt will be created, which
+          will list all of the serial numbers which are within the given Control
+          Net and listed in the input list which cannot compute a latitude and
+          longitude.  These serial numbers will be followed by the Control Point
+          IDs in which they could not compute their latitudes and longitudes.
+          If there are no such serial numbers, then no file is created.
+
+          Only cubes in both the FROMLIST and CNET are checked.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

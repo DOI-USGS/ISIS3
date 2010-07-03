@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mat2cnet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Converts an Isis2 match point file to an Isis3 control network file.
+  </brief>
+
+  <description>
+    <p>
+      This program converts an Isis2 match point file to an Isis3 control
+      network file.  It requires a list file of Isis 2 cubes and corresponding 
+      list file of Isis 3 cubes.  There should be the same number of cubes in 
+      each list and they should be listed in corresponding order.  This 
+      application also requires a match point file, an output Control Network 
+      pvl name, a network ID, a target and a description.  The user may also 
+      choose whether to input a RAND PPP file containing latitude, longitude 
+      and radius for each corresponding point ID and to create an output RAND 
+      PPP log.  This program converst the radius values in these files from km
+      to meters before adding them to the output control network.  If a RAND 
+      PPP file is not entered, all the points in the MATCH file will be set to 
+      type TIE.  If a RAND PPP is input, then any points not found in this file 
+      will still be set to TIE and the user may choose whether to set points 
+      found in both the RAND and MATCH files to GROUND or TIE.  Any points 
+      found in the RAND file without measurements in the MATCH file will not be 
+      included in the output control net.  The corresponding lines from the 
+      RAND PPP file for these points will be copied to the RAND PPP log.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <history>
+    <change name="Brendan George" date="2007-08-10">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2007-12-14">
+      Now IMAGE_NUMBER will be used before IMAGE_ID for matching files
+    </change>
+    <change name="Stuart Sides" date="2008-04-15"> 
+      Fixed bug where serial numbers were not correct.
+    </change>
+    <change name="Steven Lambright" date="2008-05-19"> 
+      Error message added for missing FSC's
+    </change>
+    <change name="Christopher Austin" date="2008-07-01">
+      Added exception message when the given MATCH file's "Matchpoint total"
+      keyword is less than the number of actual Match Points in the file.
+    </change>
+    <change name="Jeannie Walldren" date="2009-11-06">
+      Added RAND input parameter and updated documentation.  Added exception 
+      messages for invalid match point file headers and values. Added 1%
+      Progress updates to show potentially slower steps. Added appTests for
+      RAND parameter and to catch errors.  Added examples to xml file.
+    </change>
+    <change name="Jeannie Walldren" date="2009-12-17">
+      Modify code to allow use of particular types of edited RAND files. 
+      Updated description of RAND parameter to reflect this change.  
+    </change>
+    <change name="Jeannie Walldren" date="2010-03-21">
+      Convert RAND radius values from kilometers to meters.  Added option to 
+    </change>
+    <change name="Jeannie Walldren" date="2010-04-15">
+      Added option to create RAND only points (no measures in the matchpoint 
+      file) as GROUND points.
+    </change>
+    <change name="Jeannie Walldren" date="2010-04-19">
+      Modified error messages to output filename typed in by user rather than 
+      entire path.
+    </change>
+    <change name="Jeannie Walldren" date="2010-06-30">
+      Changed CONTROL parameter name to CNET for consistency with other ISIS3 
+      programs.  Added INPUTPPP parameter. Changed parameter name from RAND to 
+      PPP for more precise description and modified POINTTYPE parameter usage.  
+      Added results to GUI log and added output PPPLOG parameter.  
+    </change>
+  </history>
+
+  <groups>
+
+    <group name="Isis 2 Files">
+
+      <parameter name="LIST2">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of Isis2 input cubes in the match point file.
+        </brief>
+        <description>
+          A text file containing one column of Isis 2 cube file names. Every 
+          file used in the match point file should be represented in this list. 
+          The cubes must be available for the program to open and must be in the 
+          same order as the Isis 3 cubes in LIST3.  An error will be thrown if 
+          the number of files in this list does not match the number of files in 
+          LIST2, or if the IMAGE_ID and IMAGE_NUMBER keywords are not found in 
+          any Isis 2 cube.
+        </description>
+        <filter>
+          *.lis *.txt *.lst
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+            Isis2 match point file
+        </brief>
+        <description>
+          Use this parameter to specify the Isis2 match point file to be
+          converted to an Isis3 control network file.  This file must contain a 
+          two line header.  The first line of the header must have the 
+          "Matchpoint Total" keyword and a value for the number of measures in 
+          the match point file.  The second line of the header should be text 
+          labels for each column.  The match point file has 7 columns: PointID, 
+          FSC, LINE, SAMP, CLASS, DIAMETER, and Comments.  The Point ID is 
+          made up of alphanumeric characters,  FSC is an integer, LINE and SAMP 
+          must be doubles.  CLASS is used to determine the measure type.  Valid 
+          values include T (set to reference measure, validated manual), M 
+          (validated manual), S (validated automatic), or U (if line/samp=0/0, 
+          set unmeasured, otherwise set estimated).   The DIAMETER column is 
+          used in the case of a crater.  Comments are not read in to this 
+          application. A match point file may only have one line for a 
+          particular PointID/FSC combination, otherwise an error will be thrown 
+          since there is no way to determine which line contains correct values.
+        </description>
+        <filter>
+          *.mat *.dat *.txt *.tbl
+        </filter>
+      </parameter>
+
+      <parameter name="INPUTPPP">
+        <type>boolean</type>
+        <brief>Input a RAND PPP file</brief>
+        <description>
+          This parameter indicates whether a RAND PPP (Pole, Point, Picture) 
+          file will be input.  Valid RAND PPP files for mat2cnet are detailed
+          in the PPP parameter description.
+        </description>
+        <default><item>FALSE</item></default>
+        <inclusions>
+          <item>PPP</item>
+          <item>POINTTYPE</item>
+          <item>PPPLOG</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="PPP">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+            RAND PPP file containing latitude, longitude, and radius values for 
+            given Point IDs.
+        </brief>
+        <description>
+          Use this parameter to specify the RAND PPP file to assign lat/lon/rad
+          values associated with corresponding point IDs from the MATCH file.  
+          These files do not contain headers and have 4 unlabeled columns: 
+          LATITUDE, LONGITUDE, RADIUS, and PointID.  The lines of original RAND
+          PPP files have exactly 79 characters, and columns are right justified 
+          with specific lengths, namely, 24, 24, 24, and 7.  The only edited 
+          RAND PPP files that are valid for this program are those that have a 
+          single space added between the RADIUS and the PointID. LATITUDE, 
+          LONGITUDE, and RADIUS values must be doubles and PointID is 
+          alphanumeric.  If this file contains a Point ID that does not exist 
+          in the match point file, it will not be added to the ControlNet 
+          output and the corresponding lines from the RAND PPP file will be 
+          copied to the PPPLOG output file.
+        </description>
+        <filter>
+          *.ppp *.dat
+        </filter>
+        <inclusions>
+          <item>INPUTPPP</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="POINTTYPE">
+        <type>string</type>
+        <default><item>GROUND</item></default>
+        <brief>
+          ControlPoint type for points found in RAND PPP and MATCH files.
+        </brief>
+        <description>
+          This parameter determines the ControlPoint type to which points will 
+          be set if they are found in the RAND PPP file and have corresponding 
+          measurements in the MATCH file.  This parameter defaults to GROUND.  
+          <strong>Note: </strong> All points from the MATCH file not found in 
+          the RAND PPP file will be set to TIE and all points from the RAND PPP
+          file not found in the MATCH file will be omitted from the output 
+          Control Network.
+        </description>
+        <list>
+
+          <option value = "GROUND">
+            <brief> 
+              Points in RAND PPP with measurements in MATCH set to ground type
+            </brief>
+            <description>
+              Set Control Point Type to Ground in output control net for points 
+              in RAND PPP file.
+            </description>
+          </option>
+
+          <option value = "TIE">
+            <brief> 
+              Points in RAND PPP with measurements in MATCH set to tie type
+            </brief>
+            <description>
+              Set Control Point Type to Tie in output control net for points in 
+              RAND PPP file.
+            </description>
+          </option>
+
+        </list>
+        <inclusions>
+          <item>INPUTPPP</item>
+        </inclusions>
+      </parameter>
+
+    </group>
+    <group name="Isis 3 Files">
+
+      <parameter name="LIST3">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of Isis3 input cubes in the match point file.
+        </brief>
+        <description>
+          A text file containing one column of Isis 3 cube file names. Every 
+          file used in the match point file should be represented in this list. 
+          The cubes must be available for the program to open and must be in the 
+          same order as the Isis 2 cubes in LIST2.  An error will be thrown if 
+          the number of files in this list does not match the number of files in 
+          LIST2.
+        </description>
+        <filter>
+          *.lis *.txt *.lst
+        </filter>
+      </parameter>
+
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Isis3 output control network file
+        </brief>
+        <description>
+          Use this parameter to specify the file name of the output Isis3
+          control network.
+          </description>
+        <filter>
+          *.net *.pvl *.ctl *.cnet
+        </filter>
+      </parameter>
+
+    </group>
+    <group name="Control Network">
+
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <brief>
+          The description of this output control network.
+        </brief>
+        <description>
+          A string describing this control network.
+        </description>
+      </parameter>
+
+      <parameter name="NETWORKID">
+        <type>string</type>
+        <brief>
+          Name of the output control network
+        </brief>
+        <description>
+          The ID or name of this particular control network. This string
+          should be unique.
+        </description>
+      </parameter>
+
+      <parameter name="TARGET">
+        <type>string</type>
+        <brief>
+          The target body of the control network.
+        </brief>
+        <description>
+          The targeted planet or body for the control points and measures in 
+          this control network.
+        </description>
+      </parameter>
+
+    </group>
+    <group name="Log">
+
+      <parameter name="PPPLOG">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>No Log Output</internalDefault>
+        <brief>
+          Optional RAND PPP log file.
+        </brief>
+        <description>
+          This file will contain the Point IDs of all control points that were 
+          found in the RAND PPP file but had no measurements in the MATCH file.
+        </description>
+        <filter>
+          *.log *.txt 
+        </filter>
+        <inclusions>
+          <item>INPUTPPP</item>
+        </inclusions>
+      </parameter>
+
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Create control net from match point file</brief>
+      <description>
+        This example demonstrates how to use the  <strong>mat2cnet </strong> 
+        application to create a control network from a match point file.  In 
+        this case, no RAND PPP file is used.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          list2=../IN/isis2cubes.lis match=../IN/matchpointfile.mat 
+          list3=../IN/isis3cubes.lis control=../OUT/controlnet.net 
+          description="Default Test Network" networkid= TestNet01 target=Titan
+        </commandLine>
+        <description> 
+          Run the <strong>mat2cnet</strong> application to create a ControlNet 
+          file from a match point file with corresponding Isis2 cubelist and 
+          Isis3 cubelist
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="750" height="539" src="assets/images/mat2cnetGuiEx1.jpg">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform the 
+              <strong>mat2cnet</strong> application.  The RAND PPP parameter is left
+              as the default of "None".
+            </description>
+            <thumbnail width="200" height="144" caption="Mat2cnet Gui using match point file" src="assets/thumbs/mat2cnetGuiThumbEx1.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/match.mat">
+          <brief>Example of match point file.</brief>
+          <description>
+            This text file is an example of a valid match point file with proper
+            header and columns.
+          </description>
+          <parameterName>
+            MATCH
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/controlnet.net">
+          <brief>Example of control net file.</brief>
+          <description>
+            This pvl file is an example of the output control network created
+            from the given match point file.  Notice the NetworkId, TargetName,
+            and Description are assigned the values from the command line.
+          </description>
+          <parameterName>
+            CONTROL
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+    <example>
+      <brief>Create control net from match point file and RAND PPP file</brief>
+      <description>
+        This example demonstrates how to use the  <strong>mat2cnet </strong> 
+        application to create a control network from a match point file and 
+        corresponding RAND PPP file.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          list2=../IN/isis2cubes.lis match=../IN/matchpt.mat inputppp=true
+          ppp=../IN/rand.ppp list3=../IN/isis3cubes.lis 
+          control=../OUT/control.net description="RAND PPP Test Network" 
+          networkid= TestNet02 target=Titan
+        </commandLine>
+        <description> 
+          Run the <strong>mat2cnet</strong> application to create a ControlNet 
+          file from a match point file with corresponding Isis2 cubelist, Isis3
+          cubelist, RAND PPP file with a default point type of ground.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="750" height="539" src="assets/images/mat2cnetGuiEx2.jpg">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform the 
+              <strong>mat2cnet</strong> application with a RAND PPP file.  
+            </description>
+            <thumbnail width="200" height="144" caption="Mat2cnet Gui using intensity" src="assets/thumbs/mat2cnetGuiThumbEx2.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/match.mat">
+          <brief>Example of match point file.</brief>
+          <description>
+            This text file is an example of a valid match point file with proper
+            header and columns.
+          </description>
+          <parameterName>
+            MATCH
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/rand.ppp">
+          <brief>Example of RAND PPP file.</brief>
+          <description>
+            This text file is an example of a valid RAND PPP file.
+            Notice that there are 2 points in this file to add.
+          </description>
+          <parameterName>
+            PPP
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/controlnet_rand.net">
+          <brief>Example of control net file.</brief>
+          <description>
+            This pvl file is an example of the output control network created
+            from the given match point file and RAND PPP file.  Notice the 
+            following: the first point in the RAND PPP file has 3 measures in 
+            the MATCH file and is written to the control network as type GROUND
+            and the second point in the RAND PPP file is not contained in the 
+            Control Network since there are no measures with this ID in the 
+            MATCH file.
+          </description>
+          <parameterName>
+            CONTROL
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/randlog.txt">
+          <brief>Example of RAND PPP output log file.</brief>
+          <description>
+            This text file is an example of the output RAND PPP log created when
+            there are points in the RAND PPP file that do not have measures in 
+            the MATCH file.
+          </description>
+          <parameterName>
+            CONTROL
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
+  </examples>
+</application>

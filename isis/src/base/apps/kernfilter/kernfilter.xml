@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="kernfilter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Filter a cube through a kernel
+  </brief>
+
+  <description>
+    This program uses a kernel gathered from an input file to filter a cube. 
+    The intent of the program is to allow a flexible, user-defined kernel to
+    be applied to an image. This program is not recommended for cubes with 
+    significant numbers of special pixels as it will create more special pixels. 
+    A group of pre-made kernels has been provided, but the procedure to 
+    create a custom kernel is outlined below. 
+      <p/> A kernel follows
+    the rules and regulations of the Isis PVL (parameter value language). This
+    means that several keywords must be inserted into the text document which
+    will become the custom kernel. Any text editor should allow you to create a
+    kernel, though the program will only read files with the .txt extension. In
+    addition, there are some specifications that must be met. <p/> A sample
+    kernel file will appear in the form
+    <pre> 
+    Group=Kernel 
+      Samples=2 
+      Lines=1 
+      Weight=1 
+      Data= (1, -1)
+    EndGroup
+    </pre> 
+    The "group" keyword should equal Kernel (Group=Kernel). This lets the 
+    program know that it is the users intent that the text file is used as a 
+    kernel.
+    <p/>
+    The "lines" and "samples" keywords should match the amount of data that
+    is supplied in the data keyword. In this example, there are 2 samples 
+    worth of data and 1 line worth. The keywords above thus reflect these 
+    values.
+    <p/>
+    The "weight" is applied to all of the values in the kernel. It is 
+    often set to a fraction that allows for averaging, but it is a value
+    that is used differently by each type of filter simulated by the 
+    kernel. Since the above filter uses no averaging, the weight is simply 1.
+    <p/>
+    The "data" defines a set of multiplicative constants. These multiplicative
+    constants are the weights that the kernfilter will use on the input image.
+    In our example, assume that the DNs being examined are 10 and 20. The 
+    first DN (10) would be multiplied by the first weight (1). The second DN 
+    (20) would be multiplied by the second weight (-1). The two products (10 
+    and -20) would then be added together and the resultant sum (-10) would 
+    be output.  The set of data should be enclosed in parentheses. For 
+    organizational purposes, one may insert as much or as little white space
+    as they desire but they must separate each constant with a comma.
+    <p/>
+    Finally, the document should be finished with the keyword "EndGroup" to
+    signify that no more information is provided.
+  </description>
+
+  <history>
+    <change name="Drew Davidson" date="2004-07-26">
+      Original version
+    </change>
+    <change name="Drew Davidson" date="2004-07-27">
+      Added application test
+    </change>
+    <change name="Drew Davidson" date="2004-08-16">
+      Added examples
+    </change>
+    <change name="Elizabeth Miller" date="2006-07-24">
+      Moved kernel files to the $base/templates/kernels folder
+    </change>
+    <change name="Mackenzie Boyd" date="2009-07-27"> 
+      Added error checking for kernel input, modified special pixel handling to
+      null resultant pixel, added example, added application test, changed
+      pixel type to real.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be filtered
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be filtered.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the filter
+        </description>
+        <filter>
+          *.cub 
+        </filter>
+      </parameter>
+
+      <parameter name="KERNEL">
+         <type>filename</type>
+         <fileMode>input</fileMode>
+         <defaultPath>$base/templates/kernels/</defaultPath>
+         <brief>
+           The kernel that describes the filter to be applied
+         </brief>
+         <description>
+           Use this parameter to select the file to be used as the kernel.    
+           The input kernel is by default found in the "kernels" directory and
+           includes several examples that can be used to filter images.
+         </description>
+         <filter>
+           *.txt
+         </filter>
+       </parameter>
+
+    </group>
+  </groups>
+  
+  <examples>
+    <example>
+      <brief>
+       Using the highpassCircle5x5.txt kernel
+      </brief>
+      <description>
+        This example assumes that a kernel named "highpassCircle5x5.txt" (which         
+        is provided with the program) exists in the "kernels" file that is 
+        created by default. The program does not actually run a highpass 
+        algorithm on the cube. Instead, it weighs the pixels with a common 
+        algorithm that adds all of the weighted pixel values together and 
+        outputs that sum as the center pixel of the boxcar. The weights, which 
+        are provided by the user-specified parameter "kernel" define the 
+        characteristics of that final sum. In this example, the kernel 
+        "highpassCircle5x5.txt" (which is provided with the program) is 
+        selected. The kernel weights are as follows:
+        <pre>
+        0  -1  -1  -1   0
+       -1  -1  -1  -1  -1
+       -1  -1  24  -1  -1     x .04
+       -1  -1  -1  -1  -1
+        0  -1  -1  -1   0 
+      </pre> 
+       Thus, the highpass filter is simulated. The center pixel will be
+       multiplied by 24. Then this value will be added to the values of its 
+       surrounding pixels (all of these values will either have a sign change
+       since they were multiplied by -1 in this filter or they will be 0, since
+       0 and -1 are the only weight values that the filter holds, except for the
+       center pixel). Finally, after all of the addition has been done, the final
+       sum of all of the weights that were multiplied by either 24, or -1, or 0, 
+       will be multiplied by .04, which equals 1/25. The reason all of the pixels
+        are multiplied by 1/25 is that there are 25 spots in the 5 by 5 kernel, 
+        and thus the image will be normalized.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          from= peaks.cub to=highpass.cub kernel=highpassCircle5x5.txt     
+        </commandLine>
+        <description> 
+          The kernfilter program has been loaded with a kernel that will 
+          simulate a circular highpass filter with a 5 x 5 boxcar.
+        </description>
+      </terminalInterface>
+      
+      <guiInterfaces>
+        <guiInterface>   
+          <image width="440" height="625" 
+            src="assets/images/kernHighpassGui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to simulate the highpass
+              filter with a 5 x 5 circular boxcar.
+            </description>
+            <thumbnail width="220" height="312" caption="kernfilter gui" 
+            src="assets/thumbs/kernHighpassGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+          <brief>
+            Input image before kernfilter.
+          </brief>
+          <description>
+            This is the unfiltered image. Note the low frequency data (albedo) 
+            in the image. The highpass filter that this kernel mimics is 
+            intended to filter this type of data out. 
+          </description>
+          <thumbnail caption= "The image before the filter" 
+            src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/kernHighpass.jpg">
+          <brief>
+            Output image after kernfilter
+          </brief>
+          <description>
+            The filtered image. Just as an actual 5 x 5 circular highpass
+            filter would do, this kernel has removed albedo, allowing the user
+            to see more terrain. Since a 5x5 filter is considered relatively small,
+            features which are considered relatively small will still be visible.
+          </description>
+          <thumbnail caption= "The image after the filter" 
+            src="assets/thumbs/kernHighpass.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    
+    <example>
+      <brief>
+        Using the smoothPyramid5x5.txt kernel 
+      </brief>
+      <description>
+        This example assumes that a kernel named "smoothPyramid5x5.txt" (which
+          is provided with the program) exists in the "kernels" file that is created
+          by default. The program simulates a smoothing algorithm that takes an
+          average of the DNs in the boxcar. The kernel weights pixels that are
+          nearest to the center higher than those at the edges of the boxcar.
+          The kernel weights are as follows
+        <pre> 
+          1  2  3  2 1 
+          2  4  6  4  2
+            3  6  9  6  3      x  1/81 
+          2  4  6  4  2 
+          1  2  3  2  1
+        </pre> 
+        The pixels in the boxcar are assigned weights that inversely reflect     
+        their distance from the center of the boxcar. The pixel at the very 
+        center will be multiplied by 9 and then added to all of the values that 
+        were multiplied by the other weights in the boxcar. Note that all of the 
+        weights add up to 81. This is why the final output is divided by 81; it 
+        allows the center pixel to be an average of the weights. Thus, the blur 
+        appears as though a smoothing algorithm applying weight in a pyramidal 
+        fashion had been applied.    
+      </description>
+      <terminalInterface>
+        <commandLine>         
+            from= peaks.cub to=smooth.cub 
+            kernel=smoothPyramid5x5.txt
+        </commandLine>
+        <description>       
+          This example has loaded the smoothPyramid5x5.txt kernel, which will
+          smooth the input image using weights that are dispersed in a pyramidal 
+          fashion. The boxcar is 5 x 5.
+        </description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+          <image width="440" height="625" src="assets/images/kernSmoothGui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>           
+              Screenshot of the GUI with parameters set to perform the smoothing       
+              filter with a 5 x 5 boxcar.
+            </description>
+            <thumbnail width="220" height="312" caption="kernfilter gui" 
+              src="assets/thumbs/kernSmoothGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+          <brief>
+            Input image before kernfilter.
+          </brief>
+          <description>
+            This is the image as it was taken originally with no smoothing. 
+          </description>
+          <thumbnail caption= "The image before the filter" 
+            src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/kernSmooth.jpg">
+          <brief>
+            Output image after kernfilter
+          </brief>
+          <description>
+            The image after the filter. Although possibly hard to detect, everything 
+            about the pictures is a little blurred, and smoother, than in the 
+            original. A larger filter size would further increase this effect.
+          </description>
+          <thumbnail caption= "The image after the filter" 
+            src="assets/thumbs/kernSmooth.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>
+        Using the derivativeNWtoSE2x2.txt kernel
+      </brief>
+      <description>
+        This example assumes that a kernel named "derivativeNWtoSE2x2.txt" 
+        (which is provided with the program) exists in the "kernels" file that 
+        is created by default. This program serves the purpose of bringing out 
+        areas of high contrast. It does so by finding the difference of 2 pixels
+        on a diagonal from each other. The weights are as follows
+        <pre> 
+          1   0 
+          0  -1  x 1.0
+        </pre> 
+        The top left pixel receives the value of itself minus the pixel down
+        right of itself. The other two pixesl do not matter. Anywhere where is
+        significant change from the top left to the bottom right then shows it
+        with brighter or darker pixels than the surrounding gray where there was
+        little difference and the DNs are at or close to zero.
+      </description>
+      <terminalInterface>
+        <commandLine>
+            from=peaks.cub to=derivative.cub kernel=derivativeNWtoSE2x2.txt
+          </commandLine>
+          <description>
+            The kernfilter program has been loaded with a kernel that will find 
+          the difference between 2 diagonal pixels.
+          </description>
+      </terminalInterface>
+      <guiInterfaces> 
+        <guiInterface>
+          <image width="723" height="353" src="assets/images/kernDerivativeGui.jpg">
+            <brief>
+                Example GUI
+            </brief>
+            <description>          
+              Screenshot of the GUI with parameters set to perform the
+              derivative from NW to SE with a 2x2 boxcar.
+            </description>
+            <thumbnail width="362" height="178" caption="kernfilter gui" 
+              src="assets/thumbs/kernDerivativeGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+          <brief>
+              Input image before kernfilter.
+            </brief>
+            <description>
+              This is the image as it was taken originally. 
+            </description>
+            <thumbnail caption= "The image before the filter" 
+            src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+            <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/kernDerivative.jpg">
+          <brief>
+              Output image after kernfilter
+          </brief>
+          <description>
+            The processed image now appears to have a light source in the 
+            northwest and shadows and bright spots in areas of significant 
+            contrast in the original. 
+          </description>
+          <thumbnail caption="The image after the filter" 
+              src="assets/thumbs/kernDerivative.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example> 
+  </examples>
+</application>

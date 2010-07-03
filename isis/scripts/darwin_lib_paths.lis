@@ -1,0 +1,8 @@
+# $Id: darwin_lib_paths.lis,v 1.1 2010/04/09 23:19:58 slambright Exp $
+# Default 3rdParty locations for Max OS X libraries.  The first column servers
+# as a pattern to search all cooked library paths and replace with second
+# column.  Order is crtical as more complete paths must come before 
+# directories higher in the hierarchy.
+/usgs/pkgs/local(.*?)lib       @loader_path
+/opt/local/libexec/qt4-mac/lib @loader_path
+/opt/local/lib                 @loader_path

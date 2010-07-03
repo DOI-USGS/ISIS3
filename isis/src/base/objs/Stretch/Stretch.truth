@@ -1,0 +1,64 @@
+Pairs as Text: 0.0:1.0 0.25:50.0 1.0:100.0
+Number of Pairs = 3
+First Input Value = 0
+First Output Value = 1
+
+Stretch(0.0):    1
+Stretch(0.125):  25.5
+Stretch(0.25):   50
+Stretch(0.625):  75
+Stretch(1.0):    100
+
+Stretch(-0.1):   -1.79769e+308
+Stretch(1.1):    -1.79769e+308
+
+Stretch(Null):   1
+Stretch(Lis):    2
+Stretch(Lrs):    3
+Stretch(His):    4
+Stretch(Hrs):    5
+
+Stretch(-0.1):   3
+Stretch(1.1):    5
+
+Stretch(-0.1):   6
+Stretch(1.1):    7
+
+Test ClearPairs method
+ClearPairs()
+Pairs = 0
+
+
+Testing Parse
+127.5
+
+**USER ERROR** Invalid stretch pairs [0:0 50:0 49:255 255:255]
+**PROGRAMMER ERROR** Input pairs must be in ascending order
+**USER ERROR** Invalid stretch pairs [-5xyzzy:0 50:0 100:255 255:255]
+**PARSE ERROR** Cannot convert [-5xyzzy] to a double
+
+Testing new Parse that takes %'s for input side of pairs
+75
+
+**USER ERROR** Invalid stretch pairs [0:0 50:0 49:255 100:255]
+**PROGRAMMER ERROR** Input pairs must be in ascending order
+**USER ERROR** Invalid stretch pairs [-5:10]
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
+**USER ERROR** Invalid stretch pairs [121:215]
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
+**USER ERROR** Invalid stretch pairs [-5xyzzy:0 50:0 100:255]
+**PARSE ERROR** Cannot convert [-5xyzzy] to a double
+0, 255
+100, 100
+255, 0
+testing save
+0, 255
+100, 100
+255, 0
+testing copy pairs
+original stretch pairs
+0, 0
+255, 255
+copy stretch pairs
+0, 0
+255, 255

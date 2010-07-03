@@ -1,0 +1,13 @@
+<META xmlns="http://www.w3.org/2002/01/P3Pv1">
+	<POLICY-REFERENCES>
+	<POLICY-REF about="http://astrogeology.usgs.gov/w3c/policy.xml#generalPolicyForum">
+		<INCLUDE>/IsisSupport</INCLUDE>
+                <COOKIE-INCLUDE name="*" value="*" domain="*" path="*"/>
+	</POLICY-REF>
+        <POLICY-REF about="http://astrogeology.usgs.gov/w3c/policy.xml#generalPolicy">
+                <INCLUDE>/*</INCLUDE>
+                <EXCLUDE>/IsisSupport</EXCLUDE>
+        </POLICY-REF>
+	</POLICY-REFERENCES>
+</META>
+

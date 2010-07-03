@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<application name="deltack" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Update camera pointing for a single image
+  </brief>
+
+  <description>
+    <p>
+    This program can be used to update camera pointing (SPICE) for a single cube.  The user must supply a latitude/longitude for a single sample/line coordinate in the image.  The right ascension
+    and declination of the camera will be adjusted to match this request.   In order for this program to work properly, the cube must have been initialized with the "spiceinit" program using
+    ATTACH="YES".  Additionally, a second latitude/longitude and sample/line can be given to adjust for camera twist.
+    </p>
+
+    <p>
+      The camera pointing is updated using an iterative least-squares bundle adjustment.  The number of iterations and tolerance for convergence are input parameters to this program.  Solving for the
+      right ascension and declination only is similar to a translation of the image.  Solving for the twist includes both translation and rotation.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>jigsaw</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="2006-09-06">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2007-05-02">
+        Added inclusion of TWIST to SAMP2,LINE2,LAT2,LON2,RAD2.  
+        Without this inclusion, the AML was requiring these parameters
+        even if TWIST was false.
+    </change>
+    <change name="Debbie A. Cook" date="2007-07-12">
+        Added pvl status report for a successful update.
+    </change>
+    <change name="Steven Koechle" date="2007-10-05">
+      Added check to see if cube has existing polygon, if so delete it.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input camera cube
+        </brief>
+        <description>
+  	      The file specification for the input cube.   The cube will have
+          camera pointing updated.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Bundle Adjustment Options">
+        <parameter name="MAXITS">
+            <brief>Number of iterations</brief>
+            <description>Maximum number of iterations to try for convergence to tolerance before stopping</description>
+            <type>integer</type>
+            <default><item>5</item></default>
+        </parameter>
+
+        <parameter name="TOL">
+            <brief>Tolerance</brief>
+            <description>
+              Tolerance in pixels.  When the bundle adjustment error drops below this value the solution has converged and
+              the camera pointing will be updated.  If the solution does not converge in MAXITS then the camera pointing will
+              not be updated.
+            </description>
+             <type>double</type>
+            <default><item>0.5</item></default>
+        </parameter>
+
+        <parameter name="TWIST">
+          <type>boolean</type>
+          <brief>Solve for camera twist</brief>
+          <default><item>False</item></default>
+          <description>
+            In addition to right ascension and declination, If this parameter is set, the program will solve for the camera twist.  This requires input of a second ground coordinate (SAMP2,LINE2) and
+            (LAT2,LON2)
+          </description>
+          <inclusions>
+            <item>LINE2</item>
+            <item>SAMP2</item>
+            <item>LAT2</item>
+            <item>LON2</item>
+            <item>RAD2</item>
+          </inclusions>
+        </parameter>
+   </group>
+
+   <group name="Ground Points">
+     <parameter name="SAMP1">
+       <type>double</type>
+       <brief>Sample coordinate</brief>
+       <description>The sample coordinate for ground point #1 (LAT1,LON1)</description>
+     </parameter>
+
+     <parameter name="LINE1">
+       <type>double</type>
+       <brief>Line coordinate</brief>
+       <description>The line coordinate for ground point #1 (LAT1,LON1)</description>
+     </parameter>
+
+     <parameter name="LAT1">
+       <type>double</type>
+       <brief>Latitude</brief>
+       <description>Planetocentric latitude at the image coordinate (SAMP1,LINE1)</description>
+       <minimum inclusive="yes">-90.0</minimum>
+       <maximum inclusive="yes">90.0</maximum>
+     </parameter>
+
+     <parameter name="LON1">
+       <type>double</type>
+       <brief>Longitude</brief>
+       <description>Planetocentric longitude at the image coordinate (SAMP1,LINE1)</description>
+       <minimum inclusive="yes">0.0</minimum>
+       <maximum inclusive="yes">360.0</maximum>
+     </parameter>
+
+     <parameter name="RAD1">
+       <type>double</type>
+       <brief>Radius</brief>
+       <internalDefault>Computed</internalDefault>
+       <description>
+         Radius in meters at the image coordinate (SAMP1,LINE1).  It will be automatically computed using the shape model that
+         was initialized during the "spiceinit" program, either an ellipsoid or a DEM.
+       </description>
+       <minimum inclusive="no">0.0</minimum>
+     </parameter>
+
+     <parameter name="SAMP2">
+       <type>double</type>
+       <brief>Sample coordinate</brief>
+       <description>The sample coordinate for ground point #2 (LAT2,LON2)</description>
+       <inclusions>
+           <item>TWIST</item>
+       </inclusions>
+     </parameter>
+
+     <parameter name="LINE2">
+       <type>double</type>
+       <brief>Line coordinate</brief>
+       <description>The line coordinate for ground point #2 (LAT2,LON2)</description>
+       <inclusions>
+           <item>TWIST</item>
+       </inclusions>
+     </parameter>
+
+     <parameter name="LAT2">
+       <type>double</type>
+       <brief>Latitude</brief>
+       <description>Planetocentric latitude at the image coordinate (SAMP2,LINE2)</description>
+       <minimum inclusive="yes">-90.0</minimum>
+       <maximum inclusive="yes">90.0</maximum>
+       <inclusions>
+           <item>TWIST</item>
+       </inclusions>
+     </parameter>
+
+     <parameter name="LON2">
+       <type>double</type>
+       <brief>Longitude</brief>
+       <description>Planetocentric longitude at the image coordinate (SAMP2,LINE2)</description>
+       <minimum inclusive="yes">0.0</minimum>
+       <maximum inclusive="yes">360.0</maximum>
+       <inclusions>
+           <item>TWIST</item>
+       </inclusions>
+     </parameter>
+
+     <parameter name="RAD2">
+       <type>double</type>
+       <brief>Radius</brief>
+       <internalDefault>Computed</internalDefault>
+       <description>
+         Radius in meters at the image coordinate (SAMP2,LINE2).  It will be automatically computed using the shape model that
+         was initialized during the "spiceinit" program, either an ellipsoid or a DEM.
+       </description>
+       <minimum inclusive="no">0.0</minimum>
+       <inclusions>
+           <item>TWIST</item>
+       </inclusions>
+     </parameter>
+   </group>
+  </groups>
+
+</application>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="gaussstretch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Apply a Gaussian Stretch to a cube.
+  </brief>
+
+  <description>
+      This programs applies a gaussian stretch to a cube.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>stretch</item>
+      <item>decorstretch</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2006-05-26">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2006-10-28">
+      Fixed memory leakage
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to stretch
+        </brief>
+        <description>
+            The input cube which will have the gaussian stretch applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the image after being stretched.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+      <parameter name="GSIGMA">
+        <type>double</type>
+        <brief>
+          gsigma
+        </brief>
+        <description>
+            The nonuniformity of the output image's histogram.
+            For values less than 1.0, the distribution will be closer to uniform.
+        </description>
+        <default><item>3.0</item></default>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+    </group>
+  </groups>
+</application>

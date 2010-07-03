@@ -1,0 +1,23 @@
+Object = NormalizationModel 
+  Group = Algorithm 
+    Name = Mixed 
+#    PhotoModel = HapkeHen 
+    Incmat=87.0
+    Albedo=0.05
+    Incref=0.0
+#    Emaref=0.0
+#    Pharef=0.0
+    Thresh=10E30
+  EndGroup 
+EndObject 
+Object = PhotometricModel 
+  Group = Algorithm 
+    Name = HapkeHen 
+    Wh=0.278906221
+    Hh=0.0438
+    B0=1.0
+    Theta=10.0
+    HG1=-0.229315607
+    HG2=0.0
+  EndGroup 
+EndObject 

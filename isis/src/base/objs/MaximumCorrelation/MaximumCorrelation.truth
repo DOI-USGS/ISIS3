@@ -1,0 +1,22 @@
+Object = AutoRegistration
+  Group = Algorithm
+    Name             = MaximumCorrelation
+    Tolerance        = 0.1
+    SubpixelAccuracy = True
+  End_Group
+
+  Group = PatternChip
+    Samples      = 15
+    Lines        = 15
+    Sampling     = 50
+    ValidPercent = 10
+  End_Group
+
+  Group = SearchChip
+    Samples = 35
+    Lines   = 35
+  End_Group
+End_Object
+End
+Register = 0
+Position = 120 45

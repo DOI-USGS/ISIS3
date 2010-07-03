@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Brief description
+  </brief>
+
+  <description>
+    This program tests the IsisAml class and its supporting classes.
+  </description>
+
+  <history>
+    <change name="Stuart Sides" date="2002-06-13">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2002-06-26">
+      Added more parameters for a more complete test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema from astrogeology... isis.astrogeology...
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <groups>
+    <group name="GROUP 0">
+      <parameter name="G0p0">
+        <type>filename</type>
+        <filemode>input</filemode>
+        <brief>
+          G0P0 Filename
+        </brief>
+        <description>
+	        Description for G0P0
+          <p>
+            Paragraph 2 of description for G0P0
+          </p>
+          End of description for G0P0
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="G0P1">
+        <type>filename</type>
+        <filemode>output</filemode>
+        <brief>
+          G0P1 Filename
+        </brief>
+        <description>
+          Description for G0P0,
+          line 2 of the description,
+          line 3 of the description
+        </description>
+        <default>
+          <item>/my/dir/file.cub</item>
+        </default>
+      </parameter>
+    </group>
+
+    <group name="Group 1, string list test">
+      <parameter name="G1P0">
+        <type>string</type>
+        <brief>Brief for parameter G1P0</brief>
+        <description>
+          Description for G1P0.
+        </description>
+
+        <default>
+          <item>G1P0L0</item>
+        </default>
+
+        <list>
+          <option value="G1P0L0">
+            <brief>Brief for list item G1P0L0</brief>
+            <description>
+              Description for list item G1P0L0
+            </description>
+            <exclusions>
+              <item>G1P1</item>
+              <item>G1P2</item>
+              <item>G2P0</item>
+            </exclusions>
+          </option>
+          <option value="G1P0L1">
+            <brief>Brief for list item G1P0L1</brief>
+            <description>
+              Description for list item G1P0L1
+            </description>
+            <exclusions>
+              <item>G2P1</item>
+              <item>G2P2</item>
+              <item>G3P0</item>
+            </exclusions>
+          </option>
+          <option value="G1P0L1X">
+            <brief>Brief for list item G1P0L2</brief>
+            <description>
+              Description for list item G1P0L2
+            </description>
+            <inclusions>
+              <item>G1P1</item>
+              <item>G1P3</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="G1P1">
+        <type>integer</type>
+        <brief>Brief for G1P1</brief>
+        <description>
+          Description for G1P1
+        </description>
+        <helpers>
+          <helper button="H1">
+            <brief>Helper 1</brief>
+            <description>
+              This helper button does.....
+            </description>
+            <function>myHelper</function>
+          </helper>
+          <helper button="H2">
+            <brief>Helper 2</brief>
+            <description>
+              This helper buttion will...
+            </description>
+            <function>myHelper2</function>
+            <icon>$ISIS3DATA/base/icons/back.png</icon>
+          </helper>
+        </helpers>
+        <default>
+          <item>0</item>
+        </default>
+        <lessThan>
+          <item>G1P2</item>
+          <item>G1P3</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="G1P2">
+        <type>double</type>
+        <brief>Brief for G1P2</brief>
+        <description>
+          Description for G1P2
+        </description>
+        <default>
+          <item>10.5</item>
+        </default>
+        <greaterThan>
+          <item>G1P1</item>
+        </greaterThan>
+        <lessThan>
+          <item>G1P2</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="G1P3">
+        <type>double</type>
+        <brief>Brief for G1P3</brief>
+        <description>
+          Description for G1P3
+        </description>
+        <greaterThan>
+          <item>G1P1</item>
+          <item>G1P2</item>
+        </greaterThan>
+      </parameter>
+    </group>
+
+    <group name="Group 2, integer tests">
+      <parameter name="G2P0">
+        <type>integer</type>
+        <brief>Brief for parameter G2P0</brief>
+        <description>
+          Description for G2P0.
+        </description>
+
+        <internalDefault>
+          Calculated inside program
+        </internalDefault>
+
+        <minimum inclusive="false">0</minimum>
+        <maximum inclusive="yes">999</maximum>
+        <odd/>
+
+        <lessThan>
+          <item>G2P1</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="G2P1">
+        <type>integer</type>
+        <brief>Brief for parameter G2P1</brief>
+        <description>
+          Description for G2P1.
+        </description>
+        <greaterThan>
+          <item>G2P0</item>
+        </greaterThan>
+        <lessThanOrEqual>
+          <item>G2P2</item>
+        </lessThanOrEqual>
+      </parameter>
+
+      <parameter name="G2P2">
+        <type>integer</type>
+        <brief>Brief for parameter G2P2</brief>
+        <description>
+          Description for G2P2.
+        </description>
+        <greaterThanOrEqual>
+          <item>G2P1</item>
+        </greaterThanOrEqual>
+      </parameter>
+
+      <parameter name="G2P3">
+        <type>integer</type>
+        <brief>Brief for parameter G2P3</brief>
+        <description>
+          Description for G2P3.
+        </description>
+        <notEqual>
+          <item>g2p4</item>
+        </notEqual>
+      </parameter>
+
+      <parameter name="g2P4">
+        <type>integer</type>
+        <brief>Brief for parameter G2P4</brief>
+        <description>
+          Description for G2P4.
+        </description>
+        <notEqual>
+          <item>G2P3</item>
+        </notEqual>
+      </parameter>
+    </group>
+
+    <group name="Group 3, double tests">
+      <parameter name="G3P0">
+        <type>double</type>
+        <brief>Brief for parameter G3P0</brief>
+        <description>
+          Description for G3P0.
+        </description>
+        <internalDefault>
+          Calculated inside program
+        </internalDefault>
+        <minimum inclusive="false">-0.5</minimum>
+        <maximum inclusive="yes">999.5</maximum>
+        <lessThan>
+          <item>G3P1</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="G3P1">
+        <type>double</type>
+        <brief>Brief for parameter G3P1</brief>
+        <description>
+          Description for G3P1.
+        </description>
+        <helpers>
+          <helper button="H3">
+            <brief>Helper 3</brief>
+            <description>
+              Long Description for Helper 3
+            </description>
+            <function>myHelper3</function>
+            <icon>$ISIS3DATA/base/icons/up.png</icon>
+          </helper>
+        </helpers>
+        <greaterThan>
+          <item>G3P0</item>
+        </greaterThan>
+        <lessThanOrEqual>
+          <item>G3P2</item>
+        </lessThanOrEqual>
+      </parameter>
+
+      <parameter name="G3P2">
+        <type>double</type>
+        <brief>Brief for parameter G3P2</brief>
+        <description>
+          Description for G3P2.
+        </description>
+        <greaterThanOrEqual>
+          <item>G3P1</item>
+        </greaterThanOrEqual>
+      </parameter>
+
+      <parameter name="G3P3">
+        <type>double</type>
+        <brief>Brief for parameter G3P3</brief>
+        <description>
+          Description for G3P3.
+        </description>
+        <notEqual>
+          <item>G3P4</item>
+        </notEqual>
+      </parameter>
+
+      <parameter name="G3P4">
+        <type>double</type>
+        <brief>Brief for parameter G3P4</brief>
+        <description>
+          Description for G3P4.
+        </description>
+
+        <notEqual>
+          <item>G3P3</item>
+        </notEqual>
+      </parameter>
+    </group>
+
+    <group name="Group 4, double -vs- integer tests">
+      <parameter name="G4P0">
+        <type>double</type>
+        <brief>Brief for parameter G4P0</brief>
+        <description>
+          Description for G4P0.
+        </description>
+        <lessThanOrEqual>
+          <item>G4P1</item>
+        </lessThanOrEqual>
+      </parameter>
+
+      <parameter name="G4P1">
+        <type>integer</type>
+        <brief>Brief for parameter G4P1</brief>
+        <description>
+          Description for G4P1.
+        </description>
+        <lessThanOrEqual>
+          <item>G4P2</item>
+        </lessThanOrEqual>
+        <greaterThanOrEqual>
+          <item>G4P0</item>
+        </greaterThanOrEqual>
+      </parameter>
+
+      <parameter name="G4P2">
+        <type>double</type>
+        <brief>Brief for parameter G4P2</brief>
+        <description>
+          Description for G4P2.
+        </description>
+        <lessThan>
+          <item>G4P3</item>
+        </lessThan>
+        <greaterThanOrEqual>
+          <item>G4P1</item>
+        </greaterThanOrEqual>
+      </parameter>
+
+      <parameter name="G4P3">
+        <type>integer</type>
+        <brief>Brief for parameter G4P3</brief>
+        <description>
+          Description for G4P3.
+        </description>
+        <lessThan>
+          <item>G4P4</item>
+        </lessThan>
+        <greaterThan>
+          <item>G4P2</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="G4P4">
+        <type>double</type>
+        <brief>Brief for parameter G4P4</brief>
+        <description>
+          Description for G4P4.
+        </description>
+        <greaterThan>
+          <item>G4P3</item>
+        </greaterThan>
+        <notEqual>
+          <item>G4P5</item>
+        </notEqual>
+      </parameter>
+
+      <parameter name="G4P5">
+        <type>integer</type>
+        <brief>Brief for parameter G4P5</brief>
+        <description>
+          Description for G4P5.
+        </description>
+        <notEqual>
+          <item>G4P4</item>
+        </notEqual>
+      </parameter>
+    </group>
+
+    <group name="Group 5, in/exclusive tests">
+      <parameter name="G5P0">
+        <type>integer</type>
+        <brief>Brief for parameter G5P0</brief>
+        <description>
+          Description for G5P0.
+        </description>
+        <inclusions>
+          <item>G5P1</item>
+          <item>G5P2</item>
+        </inclusions>
+        <exclusions>
+          <item>G5P3</item>
+        </exclusions>
+      </parameter>
+
+      <parameter name="G5P1">
+        <type>integer</type>
+        <brief>Brief for parameter G5P1</brief>
+        <description>
+          Description for G5P1.
+        </description>
+        <inclusions>
+          <item>G5P0</item>
+          <item>G5P2</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="G5P2">
+        <type>integer</type>
+        <brief>Brief for parameter G5P2</brief>
+        <description>
+          Description for G5P2.
+        </description>
+        <inclusions>
+          <item>G5P0</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="G5P3">
+        <type>integer</type>
+        <brief>Brief for parameter G5P3</brief>
+        <description>
+          Description for G5P3.
+        </description>
+        <exclusions>
+          <item>G5P0</item>
+          <item>G5P1</item>
+          <item>G5P2</item>
+        </exclusions>
+      </parameter>
+    </group>
+
+    <group name="Group 6, boolean tests">
+      <parameter name="G6P0">
+        <type>boolean</type>
+        <brief>Brief for parameter G6P0</brief>
+        <description>
+          Description for G6P0.
+        </description>
+        <helpers>
+          <helper button="H4">
+            <brief>Helper 4</brief>
+            <description>
+              Long Description for Helper 4...
+            </description>
+            <function>myHelper4</function>
+          </helper>
+        </helpers>
+        <inclusions>
+          <item>G6P1</item>
+        </inclusions>
+        <exclusions>
+          <item>G6P2</item>
+        </exclusions>
+      </parameter>
+
+      <parameter name="G6P1">
+        <type>integer</type>
+        <brief>Brief for parameter G6P1</brief>
+        <description>
+          Description for G6P1.
+        </description>
+      </parameter>
+
+      <parameter name="G6P2">
+        <type>integer</type>
+        <brief>Brief for parameter G6P2</brief>
+        <description>
+          Description for G6P2.
+        </description>
+        <default>
+          <item>100</item>
+        </default>
+      </parameter>
+      <parameter name="G6P3">
+        <type>string</type>
+        <brief>Brief for parameter G6P3</brief>
+        <description>
+          Description for G6P3.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Group 7, name search test">
+      <parameter name="FROM">
+        <type>string</type>
+        <brief>Brief for parameter FROM</brief>
+        <description>
+          Description for FROM.
+        </description>
+        <default>
+          <item>FROM</item>
+        </default>
+      </parameter>
+
+      <parameter name="FROM1">
+        <type>string</type>
+        <brief>Brief for parameter FROM1</brief>
+        <description>
+          Description for FROM1.
+        </description>
+        <helpers>
+          <helper button="H5">
+            <brief>Helper 5</brief>
+            <description>
+              Long Description for Helper 5...
+            </description>
+            <function>myHelper5</function>
+            <icon>$ISIS3DATA/base/icons/link.png</icon>
+          </helper>
+        </helpers>
+        <default>
+          <item>FROM1</item>
+        </default>
+      </parameter>
+
+      <parameter name="FR">
+        <type>string</type>
+        <brief>Brief for parameter FR</brief>
+        <description>
+          Description for FR.
+        </description>
+        <default>
+          <item>FR</item>
+        </default>
+      </parameter>
+    </group>
+
+    <group name="Group 8, Cube test">
+      <parameter name="CUBE1">
+        <type>cube</type>
+        <filemode>input</filemode>
+        <brief>Brief for parameter CUBE1</brief>
+        <description>
+          Description for CUBE1.
+        </description>
+        <helpers>
+          <helper button="H6">
+            <brief>Helper 6</brief>
+            <description>
+              Long Description for Helper 6...
+            </description>
+            <function>myHelper6</function>
+          </helper>
+        </helpers>
+      </parameter>
+
+      <parameter name="CUBE2">
+        <type>cube</type>
+        <filemode>output</filemode>
+        <brief>Brief for parameter CUBE2</brief>
+        <description>
+          Description for CUBE2.
+        </description>
+      </parameter>
+
+    </group>
+  </groups>
+
+</application>

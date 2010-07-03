@@ -1,0 +1,322 @@
+<?xml version="1.0"?>
+<application name="fillgap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Compute interpolations to replace special pixels.
+  </brief>
+
+  <description>
+      This program will fill in the gaps of a cube (i.e. replace special pixels 
+      with DN values) by using an interpolation scheme and a direction specified 
+      by the user.
+
+    <p><strong> Note: </strong>  This application will not extrapolate DN 
+       values beyond the endpoints of a data set.  For example, if you choose to 
+       fill gaps that run across lines, then any special pixel values in the 
+       first or last vertical column of the image will not be filled.  If any of
+       these are not in a corner, you can run fillgap again using the output of
+       the first run as input and SAMPLE as the DIRECTION parameter. Corner 
+       pixels can be filled by using the
+      <strong>specpix</strong> application or the 
+      <strong>lowpass</strong> filter application.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <history>
+    <change name = "Stacy Alley" date="2007-08-08">
+        based off slither - first version of fillgap
+    </change>
+    <change name="Christopher Austin" date="2008-01-30">
+      Changed INTERP option CUBIC's name to CUBICCONVOLUTION to correlate with 
+      other apps using the INTERP param.
+    </change>
+    <change name="Jeannie Walldren" date="2008-11-05">
+      Removed references to DataInterp class and replaced them  with 
+      NumericalApproximation class.
+    </change>
+    <change name="Jeannie Walldren" date="2009-04-21">
+      Added an exception catch so the application may continue if the  
+      interpolation fails for some pixel.  Added a message to the log to inform 
+      users how many pixels were not filled.  Updated user documentation to 
+      explain what they may do if this occurs.  Changed the INTERP parameter
+      CUBICCONVOLUTION back to CUBIC since this application uses a cubic spline, 
+      not cubic convolution.  Added test cases and documentation examples.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file.
+        </brief>
+        <description>                                   
+            Input file to be filled.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file.
+        </brief>
+        <description>
+          Output cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Interpolation Scheme">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default><item>CUBIC</item></default>
+        <brief>Interpolation type to be used on the line and sample transform</brief>
+        <description>
+            fillgap provides 3 different interpolation options.  The   
+            interpolation option chosen is used to compute a continuous (or 
+            piecewise continous) interpolation so that each line and sample
+            has a transform location that maps the output line and sample
+            to a shifted input line and sample.  These interpolations provide
+            this mapping.  This is done by collecting the known DN values for   
+            each line or sample column and using the chosen interpolation scheme   
+            to approximate the missing DN values (special pixels). 
+        </description>
+       <list>
+          <option value="LINEAR">
+            <brief>Linear Interpolation of lines and samples</brief>
+            <description>
+                This interpolation type is used to determine intermediate line 
+                and sample shifts for each line.  Linear interpolation is 
+                piecewise discontinuous.  This interpolation option requires a 
+                minimum 2 points.
+            </description>
+          </option>
+          <option value="CUBIC">
+            <brief>Natural Cubic Spline interpolation of each line or 
+              sample column</brief>
+            <description>
+                This interpolation uses a cubic spline with natural 
+                boundary conditions for interpolation of each line and sample 
+                shift.  The resulting curve is piecewise cubic on each interval 
+                with matching first and second derivatives at the supplied data 
+                points. The second derivative is chosen to be zero at the first 
+                point and last point.  This interpolation option requires a 
+                minimum of 3 points.
+            </description>
+          </option>
+          <option value="AKIMA">
+            <brief>Akima Spline interpolation of each line and sample</brief>
+            <description>
+                This interpolation uses a non-rounded Akima spline with natural 
+                boundary conditions for interpolation of each line and sample 
+                shift.  This spline uses the non-rounded corner algorithm of 
+                Wodicka.  It requires a minimum of 5 points.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Direction">
+      <parameter name="DIRECTION">
+        <type>string</type>
+        <default>
+          <item>SAMPLE</item>
+        </default>
+        <brief>Direction of bad pixels </brief>
+        <description>
+          This is the direction of the special pixels across the image.  If the special pixels run through the bands of the image data,
+          try both directions to see which works best.
+        </description>
+        <list>
+          <option value="Sample">
+            <brief>Across samples</brief>
+            <description>
+              The special pixels run horizontally across the image samples.
+            </description>
+          </option>
+          <option value="Line">
+            <brief>Across lines</brief>
+            <description>
+              The special pixels run vertically across the image lines.
+            </description>
+          </option>
+          <option value="Band">
+            <brief>Across Bands</brief>
+            <description>
+              The special pixels run 3-D through the image bands.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief> Fill horizontal gaps of peaks image</brief>
+      <description>
+        This example shows the fillgap application using the default parameters 
+        SAMPLE and CUBIC. This will fill horizontal gaps in data using a
+        cubic spline on the DN values of each vertical column of samples.
+      </description>
+      <terminalInterface>
+        <commandLine> from=../IN/peaks-h-null.cub to=OUT/output.cub interp=cubic direction=sample
+        </commandLine>
+        <description>
+         fillgap gui example
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="741" height="841" src="assets/image/fillgapGui.JPG">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+              a fillgap operation on the input image.
+            </description>
+            <thumbnail width="200" height="300" caption="Fillgap Gui" src="assets/thumb/fillgapGui.JPG" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/image/peaks-horizline.JPG" width="500" height="500">
+          <brief> Input image for fillgap</brief>
+          <description>This is the input image for the fillgap example with null horizontal line.
+          </description>
+          <thumbnail caption=" Input Peaks image" src="assets/thumb/peaks-horizline.JPG" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/peaks-fixed.JPG" width="500" height="500">
+          <brief> Output image for fillgap</brief>
+          <description> This is the output image that results after a cubic interpolation to fill the null data gaps.
+          </description>
+          <thumbnail caption="Output image showing results of the fillgap application." src="assets/thumb/peaks-fixed.JPG" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief> Fill gaps of Cassini ISS image</brief>
+      <description>
+        This example shows the fillgap application using the LINE and CUBIC 
+        parameters. This will fill vertical gaps in data using a cubic spline 
+        on the DN values of each horizontal line.
+      </description>
+      <terminalInterface>
+        <commandLine> from=../IN/N1506393614_2.sp.cub 
+          to=OUT/N1506393614_2.sp.line.cub interp=cubic direction=line
+        </commandLine>
+        <description>
+         fillgap gui example
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="513" height="550" src="assets/image/N1506393614_2.sp.line.gui.jpeg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+              a fillgap operation on the input image.
+            </description>
+            <thumbnail width="187" height="200" caption="Fillgap Gui" src="assets/thumb/N1506393614_2.sp.line.gui.thumb.jpeg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/image/N1506393614_2.sp.jpeg" width="552" height="550">
+          <brief> Input image for fillgap</brief>
+          <description>
+            This is a Cassini ISS image that has been altered to include each 
+            type of special pixels on an edge of the image.
+          </description>
+          <thumbnail caption=" Input Cassini ISS image" src="assets/thumb/N1506393614_2.sp.thumb.jpeg" width="200" height="199"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/N1506393614_2.sp.line.jpeg" width="548" height="550">
+          <brief> Output image for fillgap</brief>
+          <description>
+            This is the output image that results after a cubic interpolation to 
+            fill the special pixel data gaps.  Notice the special pixels that 
+            move across samples and touch edges are not filled.  This 
+            includes the block of null pixels at the top left corner of the 
+            image.  This happens because the valid data only does not exist on 
+            both sides of these gaps and extrapolation is not permited. However, 
+            the special pixels that touch the upper and lower edges are filled 
+            since these gaps move across lines.  
+          </description>
+          <thumbnail caption="Output image showing results of the fillgap application." src="assets/thumb/N1506393614_2.sp.line.thumb.jpeg" width="199" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief> Fill gaps of Cassini ISS image</brief>
+      <description>
+        This example shows the fillgap application on the output of Example 2.  
+        Here we use the SAMPLE parameter to fill the remaining horizontal gaps in 
+        data using the DN values of each vertical column of samples.
+      </description>
+      <terminalInterface>
+        <commandLine> from=../IN/N1506393614_2.sp.line.cub 
+          to=OUT/N1506393614_2.sp.linesamp.cub interp=cubic direction=sample
+        </commandLine>
+        <description>
+         fillgap gui example
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="513" height="550" src="assets/image/N1506393614_2.sp.linesamp.gui.jpeg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+              a fillgap operation on the input image.
+            </description>
+            <thumbnail width="187" height="200" caption="Fillgap Gui" src="assets/thumb/N1506393614_2.sp.linesamp.gui.thumb.jpeg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/image/N1506393614_2.sp.line.jpeg" width="548" height="550">
+          <brief> Input image for fillgap</brief>
+          <description>
+            This is a Cassini ISS image that has been altered to include each 
+            type of special pixels on an edge of the image.  Some of these 
+            pixels have already been filled by a previous run of fill gap (see 
+            Example 2).
+          </description>
+          <thumbnail caption=" Input Cassini ISS image" src="assets/thumb/N1506393614_2.sp.line.thumb.jpeg" width="199" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/N1506393614_2.sp.linesamp.jpeg" width="551" height="550">
+          <brief> Output image for fillgap</brief>
+          <description>
+            This is the output image that results after a cubic interpolation to 
+            fill the special pixel data gaps.  Notice all special pixels have
+            been filled except the top left corner of the image. Special pixels 
+            in the corners of an image can not be filled by the fillgap 
+            application since they are beyond the endpoints of any known data 
+            values (i.e. DNs values of samples and lines).
+          </description>
+          <thumbnail caption="Output image showing results of the fillgap application." src="assets/thumb/N1506393614_2.sp.linesamp.thumb.jpeg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>
+

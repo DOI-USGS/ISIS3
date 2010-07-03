@@ -1,0 +1,946 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>
+            USGS: ISIS deriv Application Documentation
+        </title>
+<link rel="stylesheet" href="../styles/IsisApplicationDocStyle.css">
+<meta name="keywords" content="Isis, image processing, deriv">
+<meta name="author" content="Tracie Sucharski">
+<meta name="description" content="Apply horizontal or vertical derivative">
+<meta name="publisher" content="USGS - GD - Astrogeology Research Program">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="country" content="USA">
+<meta name="state" content="AZ">
+<meta name="county" content="Coconino">
+<meta name="city" content="Flagstaff">
+<meta name="zip" content="86001">
+<script language="javascript" type="text/javascript">
+<!--
+  // SCRIPT:   Utility Functions
+  // Filename: utility.js
+  // Purpose:  miscellaneous little handy JavaScript fuctions
+  //
+  // Author:   Deborah Lee Soltesz, USGS, 11/2001
+
+  // History:  added popUpNewWindow - dls 2/5/2003
+
+
+  // browser checks
+  ns4    = (document.layers) ? true:false ;
+  ns6    = (document.getElementById) ? true:false ;
+  isNav  = (navigator.appName.indexOf("Netscape")  != -1)
+  isMSIE = (navigator.appName.indexOf("Microsoft") != -1)
+
+
+  // *****************************************************************
+  // POP UP WINDOW
+  // Open an image (or other file) in new window sized to width-height.
+  // If window exists, close and open with new size attributes.
+  // NO decor (toolbars, menus, scrollbars, etc.) and NOT resizable.
+
+  function popUpWindow (url, width, height) {
+    if (window["POP"] && window["POP"].closed == false) {
+      POP = window["POP"] ;
+      if (ns4) {
+        POP.close() ;
+      }
+      else {
+        POP.resizeTo (width + 30, height + 50) ;
+      }
+    }
+    POP = open(url,"POP","toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=1,width=" + (width + 20) + ",height=" + (height + 20));
+    POP.focus() ;
+  }
+
+  function popUpWindowScrolling (url, width, height) {
+    if (window["POPs"] && window["POPs"].closed == false) {
+      POPs = window["POPs"] ;
+      if (ns4) {
+        POP.close() ;
+      }
+      else {
+        POPs.resizeTo (width + 30, height + 50) ;
+      }
+    }
+    POPs = open(url,"POPs","toolbar=0,location=0,status=0,menubar=0,scrollbars=1,resizable=1,width=" + (width + 20) + ",height=" + (height + 20));
+    POPs.focus() ;
+  }
+
+  function popUpNewWindow (url, width, height) {
+    //create random window name
+    now = new Date() ;
+    winname = "POP" + now.getHours() + now.getMinutes() + now.getSeconds() + (String)(Math.round(Math.random() * 1000)) ;
+    open(url,winname,"toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=1,width=" + (width + 20) + ",height=" + (height + 20));
+  }
+
+  // CLEAN UP POP UP WINDOW
+  function cleanUpPopUpWindow () {
+    if (window["POP"] && window["POP"].closed == false) {
+      POP = window["POP"] ;
+      POP.close() ;
+    }
+  }
+          --></script>
+<style type="text/css">
+
+  /*  ISIS APPLICATION DOC STYLE SHEET
+   *  FILENAME: IsisApplicationDocStyle.css
+   *
+   *  Purpose: formatting style sheet for Isis Application
+   *           documentation presentation
+   *
+   *  Author:  Deborah Lee Soltesz, USGS, 04/03/2002
+   */
+
+
+    /* ----------------------------------------------------------------
+     * HEADINGS */
+
+     H1       {
+               font-family:     Arial Black, Arial, Geneva, sans-serif ;
+               font-size:       150% ;
+               font-weight:     bold ;
+               text-decoration: none ;
+               margin-top:      2px;
+               margin-bottom:   3px;
+               color:           #336699 ;
+              }
+
+     H2       {
+               font-family: Arial, Helvetica, Geneva, sans-serif ;
+               font-size: 110% ;
+               font-weight: bold ;
+               font-variant: small-caps ;
+               text-decoration: none ;
+               margin-top:2px;
+               margin-bottom:3px;
+               background-color: #88AACC ;
+               padding: 3px ;
+              }
+
+     H3       {
+               font-family: serif ;
+               font-size: 110% ;
+               font-weight: bold ;
+               text-decoration: none ;
+               margin-top:10px;
+               margin-bottom:5px;
+               color: #336699 ;
+              }
+
+
+     H4       {
+               font-family: Arial, Helvetica, Geneva, sans-serif ;
+               font-size: 110% ;
+               font-weight: bold ;
+               text-decoration: underline ;
+               margin-top:10px;
+               margin-bottom:5px;
+
+              }
+
+     H5       {
+               font-family: serif ;
+               font-size: 90% ;
+               font-weight: bold ;
+               text-decoration: underline ;
+               margin-top:10px;
+               margin-bottom:5px;
+              }
+
+     H6       {
+               font-family: Arial, Helvetica, Geneva, sans-serif ;
+               font-size: 80% ;
+               font-weight: bold ;
+               font-variant: small-caps ;
+               text-decoration: underline ;
+               margin-top:10px;
+               margin-bottom:5px;
+              }
+
+     HR       {
+               color: #000099 ;
+               height: 1px ;
+              }
+
+     body     {
+               background-color: #FFFFFF;
+              }
+
+
+    /* ----------------------------------------------------------------
+     * TABLE CELL FORMATTING: table styles for figures; use with CAPTIONS     */
+
+
+     /* History table */
+
+
+    .tableCellHistory_date
+              {
+                font-style:   italic ;
+              }
+
+    .tableCellHistory_name
+              {
+                font-weight:  bold ;
+              }
+
+    .tableCellHistory_description
+              {
+              }
+
+
+
+     /* LEVEL 1: outside level of table cells*/
+
+    .tableCellLevel1
+              {
+                border:       1px ;
+                border-color: #88AACC ;
+                border-style: solid ;
+              }
+
+    .tableCellLevel1_th
+              {
+                border:           3px ;
+                border-color:     #88AACC ;
+                border-style:     solid ;
+                background-color: #BBDDEE ;
+              }
+
+
+    .tableCellLevel1_type
+              {
+                border:       1px ;
+                border-color: #88AACC ;
+                border-style: solid ;
+                font-style:   italic ;
+              }
+
+    .tableCellLevel1_name
+              {
+                border:       1px ;
+                border-color: #88AACC ;
+                border-style: solid ;
+                font-weight:  bold ;
+              }
+
+    .tableCellLevel1_description
+              {
+                border:       1px ;
+                border-color: #88AACC ;
+                border-style: solid ;
+              }
+
+
+     /* LEVEL 2: level of table cells nested inside an outer table */
+
+    .tableCellLevel2
+              {
+                border:       1px ;
+                border-color: #CCCCCC ;
+                border-style: solid ;
+                font-size:    80%
+                font-family: Arial, Helvetica, Geneva, sans-serif ;
+              }
+
+    .tableCellLevel2_type
+              {
+                border:       1px ;
+                border-color: #CCCCCC ;
+                border-style: solid ;
+                font-style:   italic ;
+                font-size:    80%
+                font-family: Arial, Helvetica, Geneva, sans-serif ;
+              }
+
+    .tableCellLevel2_name
+              {
+                border:       1px ;
+                border-color: #CCCCCC ;
+                border-style: solid ;
+                font-weight:  bold ;
+                font-size:    80%
+                font-family: Arial, Helvetica, Geneva, sans-serif ;
+              }
+
+    .tableCellLevel2_description
+              {
+                border:       1px ;
+                border-color: #CCCCCC ;
+                border-style: solid ;
+                font-size:    80%
+                font-family: Arial, Helvetica, Geneva, sans-serif ;
+              }
+
+
+
+
+    /* ----------------------------------------------------------------
+     * TABS: tab styles */
+
+    .tabOn
+              {
+                border:              1px ;
+                border-bottom:       0px ;
+                border-color:        #333399 ;
+                border-style:        solid ;
+                background-color:    #6666AA;
+                font-family: Arial,  Helvetica, Geneva, sans-serif ;
+                font-weight:         bold ;
+                padding:             5px ;
+                color:               #FFFFFF ;
+                margin:              0px;
+              }
+
+    .tabOff
+              {
+                border:              1px ;
+                border-bottom:       0px ;
+                border-color:        #6666AA;
+                border-style:        solid ;
+                background-color:    #DDCCCC ;
+                font-family: Arial,  Helvetica, Geneva, sans-serif ;
+                font-weight:         normal ;
+                font-style:          italic ;
+                padding:             5px ;
+                color:               #666666 ;
+                margin:              0px;
+              }
+
+    .tabHighlight
+              {
+                border:              1px ;
+                border-bottom:       0px ;
+                border-color:        #6666AA;
+                border-style:        solid ;
+                background-color:    #DDDDEE ;
+                font-family: Arial,  Helvetica, Geneva, sans-serif ;
+                font-style:          italic ;
+                padding:             5px ;
+                color:               #666666 ;
+                margin:              0px;
+                cursor:              hand ;
+              }
+
+
+
+    /* ----------------------------------------------------------------
+     * PAGE VIEW: page view styles */
+
+     .pageView {
+                 border:      3px;
+                 border-style:solid;
+                 border-color:#6666AA;
+               }
+
+     .functionView {
+                      background-color: #DDDDEE;
+                      border-top:       3px;
+                      border-left:      3px;
+                      border-right:     10px;
+                      border-bottom:    10px;
+                      border-style:     solid;
+                      border-color:     #666666;
+
+                      position:         absolute;
+                      padding:          10px;
+                      top:              10px;
+                      left:             20px;
+
+                      visibility:       hidden;
+                   }
+
+
+
+
+    /* ----------------------------------------------------------------
+     * CAPTION: caption text styles */
+
+    .caption /* defines style for a text caption using page's default color */
+              {
+               font-family: Arial, Helvetica, Geneva, sans-serif ;
+               font-size: 80% ;
+              }
+
+    .captionBold /* defines style for a text caption using page's default color */
+              {
+               font-family: Arial, Helvetica, Geneva, sans-serif ;
+               font-size: 80% ;
+               font-weight:bold;
+              }
+
+
+    /* ----------------------------------------------------------------
+     * TABLE OF CONTENTS: table of contents text styles */
+    .TOCanchors /* defines style for top-of-page table-of-contents anchor links */
+              {
+               font-family: Arial, Helvetica, Geneva, sans-serif ;
+               font-size: 80% ;
+               margin-bottom:5px ;
+               margin-top:5px ;
+              }
+
+    .TOCtoplink /* defines style for link to top of page */
+              {
+               font-family: Arial, Helvetica, Geneva, sans-serif ;
+               font-size: 70% ;
+               font-variant: small-caps ;
+               font-weight: bold ;
+               margin-bottom:10px ;
+               margin-top:10px ;
+              }
+
+
+    /* ----------------------------------------------------------------
+     * IMAGE FORMATTING: special formatting for linked images */
+
+    .blackBorderedImage /*  */
+              {
+               border-color: #000000 ;
+              }
+
+        </style>
+</head>
+<body>
+<a href="http://www.usgs.gov">
+        USGS</a>
+<br>
+<p style="margin-top:10px; margin-bottom:0px;">
+        Isis 3 Application Documentation</p>
+<hr>
+<h1>deriv</h1>
+<p style="margin-top:0px; font-style:italic;">
+    Apply horizontal or vertical derivative
+  </p>
+<p class="TOCanchors">
+<a href="#Description">
+            Description</a>
+<br>
+<a href="#Categories">
+              Categories</a>
+<br>
+<a href="#Groups">
+              Groups</a>
+<br>
+<a href="#Examples">
+              Examples</a>
+<br>
+<a href="#History">
+              History</a>
+<br>
+</p>
+<a name="Description"></a>
+<hr>
+<h2>
+          Description
+        </h2>
+<div>
+    <p>
+      This program will apply a horizontal or vertical derivative to a cube.
+      This will highlight edges in the image created by groups of contrasting
+      DN values.  The horizontal derivative utilizes a two sample by one line
+      boxcar convolution for its solution, and will highlight horizontal linear
+      changes.  The vertical derivative utilizes a one sample by two line boxcar
+      convolution for the output, and will highlight vertical linear changes.
+      Please refer to the following 2 by 2 pixel example image:
+    </p>
+      <image src="assets/image/derivExample.jpg" width="100" height="100">
+      </image>
+    <p>
+      In this image, the horizontal derivative for A would be:
+    </p>
+    <pre>
+        A_NewDN = A - B
+    </pre>
+    <p>
+      The vertical derivative for A would be:
+    </p>
+    <pre>
+        A_NewDN = A - C
+    </pre>
+    <p>
+      NOTE: If this program needs to do calculations where special pixels
+      are involved, it will simply output NULL. If this causes undesireable
+      results, you should run the image through the stretch program to change
+      all special pixels to valid data. For example, if you have a number of
+      HRS pixels, you might want to stretch those to 255 prior to running the
+      deriv filter.
+    </p>
+  </div>
+<a name="Categories"></a>
+<hr>
+<h2>
+          Categories
+        </h2>
+<ul>
+<li>Filters</li>
+</ul>
+<a name="Groups"></a>
+<hr>
+<h2>
+                Parameter Groups
+            </h2>
+<h3>Files</h3>
+<table>
+<tr>
+<th class="tableCellLevel1_th">
+                    Name
+                    </th><th class="tableCellLevel1_th">
+                    Description
+                    </th>
+</tr>
+<tr>
+<td class="tableCellLevel1_name"><a href="#FilesFROM">FROM</a></td><td class="tableCellLevel1">
+          Input cube
+        </td>
+</tr>
+<tr>
+<td class="tableCellLevel1_name"><a href="#FilesTO">TO</a></td><td class="tableCellLevel1">
+          Output cube
+        </td>
+</tr>
+</table>
+<h3>Derivative Direction</h3>
+<table>
+<tr>
+<th class="tableCellLevel1_th">
+                    Name
+                    </th><th class="tableCellLevel1_th">
+                    Description
+                    </th>
+</tr>
+<tr>
+<td class="tableCellLevel1_name"><a href="#Derivative DirectionDIRECTION">DIRECTION</a></td><td class="tableCellLevel1">Direction of derivative</td>
+</tr>
+</table>
+<a name="FilesFROM"></a>
+<hr>
+<h3>
+<span style="font-style:italic; text-decoration:underline;">Files</span>:
+                        FROM</h3>
+<div style="margin-left:20px;">
+<table>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                             Type
+                           </th><td class="tableCellLevel1_description">cube</td>
+</tr>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                               File Mode
+                             </th><td class="tableCellLevel1_description">input</td>
+</tr>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                               Filter
+                             </th><td class="tableCellLevel1_description">
+          *.cub
+        </td>
+</tr>
+</table>
+<h4>
+                         Description
+                       </h4>
+          Use this parameter to select the filename. All bands within the file
+          will have the derivative applied.
+        </div>
+<a name="FilesTO"></a>
+<hr>
+<h3>
+<span style="font-style:italic; text-decoration:underline;">Files</span>:
+                        TO</h3>
+<div style="margin-left:20px;">
+<table>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                             Type
+                           </th><td class="tableCellLevel1_description">cube</td>
+</tr>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                               File Mode
+                             </th><td class="tableCellLevel1_description">output</td>
+</tr>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                               Pixel Type
+                             </th><td class="tableCellLevel1_description">real</td>
+</tr>
+</table>
+<h4>
+                         Description
+                       </h4>
+          This is the output file.
+        </div>
+<a name="Derivative DirectionDIRECTION"></a>
+<hr>
+<h3>
+<span style="font-style:italic; text-decoration:underline;">Derivative Direction</span>:
+                        DIRECTION</h3>
+<div style="margin-left:20px;">
+<table>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                             Type
+                           </th><td class="tableCellLevel1_description">string</td>
+</tr>
+<tr>
+<th class="tableCellLevel1_th">
+                               Default
+                             </th><td class="tableCellLevel1_description">HORZ</td>
+</tr>
+<tr>
+<th class="tableCellLevel1_th" align="right">
+                               Option List:
+                             </th><td class="tableCellLevel1_description">
+<table>
+<tr>
+<th class="tableCellLevel2">
+                                   Option</th><th class="tableCellLevel2">
+                                   Brief</th><th class="tableCellLevel2">
+                                   Description</th><th class="tableCellLevel2">
+                                   Exclusions</th><th class="tableCellLevel2">
+                                   Inclusions</th>
+</tr>
+<tr>
+<td class="tableCellLevel2_name">HORZ</td><td class="tableCellLevel2_type">Horizontal derivative (2x1)</td><td class="tableCellLevel2_description">
+	      The horizontal derivative uses a 2x1 kernel.
+	    </td><td class="tableCellLevel2_description"></td><td class="tableCellLevel2_description"></td>
+</tr>
+<tr>
+<td class="tableCellLevel2_name">VERT</td><td class="tableCellLevel2_type">Vertical derivative (1x2)</td><td class="tableCellLevel2_description">
+	      The vertical derivative uses a 1 x 2 kernel.
+	    </td><td class="tableCellLevel2_description"></td><td class="tableCellLevel2_description"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<h4>
+                         Description
+                       </h4>
+          This chooses the derivative direction.  The possibilities
+          are: HORZ which uses a 2x1 kernel and VERT which uses a 1x2
+	  kernel.
+        </div>
+<a name="Examples"></a>
+<hr>
+<h2>
+            Examples
+          </h2>
+<hr>
+<h3>
+                Example 1</h3>
+<p style="margin-top:0px;"> Horizontal</p>
+<h4>
+                Description
+                </h4>
+<div style="margin-left:20px;">
+        Use horizontal derivative option.
+      </div>
+<h4>
+                  Command Line
+                  </h4>
+<div style="margin-left:20px;">
+<tt style="font-weight:bold;">deriv  f=peaks.cub t=deriv.horz d=h
+        </tt>
+<br>
+<div style="font-style:italic; font-size:X-SMALL;margin-left:20px; width:400px;">
+        In this example the derivative direction is horizontal.
+        </div>
+</div>
+<h4>
+                  GUI Screenshot
+                  </h4>
+<div style="margin-left:20px;">
+<table cellpadding="5" width="600">
+<tr valign="top">
+<td class="tableCellLevel1_th" width="200" align="center"><script type="text/javascript">
+<!--
+        
+        //<!- -
+document.write("<a title='Click to view larger image' href='javascript:popUpNewWindow (\"assets/image/derivHorzGui.jpg\","  + 
+500+ ", " + 600+ ")'>") ;
+
+document.write("<img src=\"assets/thumb/derivHorzGui.jpg\""
++ " width=" + 200
++ " height=" + 252
++ " alt=\"Derivative Gui\" class='blackBorderedImage'><" + "/a><br>") ;
+        //- ->
+        
+    --></script>
+<noscript>
+<a title="Click to view larger image" href="assets/image/derivHorzGui.jpg" target="_new"><img src="assets/thumb/derivHorzGui.jpg" width="200" height="252" alt="Derivative Gui" class="blackBorderedImage"></a>
+<br>
+</noscript>
+<div class="caption">Derivative Gui</div>
+</td><td class="tableCellLevel1">
+<p style="font-weight:bold;">Example Gui</p>
+<div>Screenshot of GUI with parameters filled in to perform a horizontal derivative of the input image. </div>
+</td>
+</tr>
+</table>
+</div>
+<h4>
+                                 Input Image
+                               </h4>
+<div style="margin-left:20px;">
+<table cellpadding="5" width="600">
+<tr valign="top">
+<td class="tableCellLevel1_th" width="200" align="center"><script type="text/javascript">
+<!--
+        
+        //<!- -
+document.write("<a title='Click to view larger image' href='javascript:popUpNewWindow (\"assets/image/peaks.4.jpg\","  + 
+500+ ", " + 500+ ")'>") ;
+
+document.write("<img src=\"assets/thumb/peaks.4.jpg\""
++ " width=" + 200
++ " height=" + 200
++ " alt=\"Input image\" class='blackBorderedImage'><" + "/a><br>") ;
+        //- ->
+        
+    --></script>
+<noscript>
+<a title="Click to view larger image" href="assets/image/peaks.4.jpg" target="_new"><img src="assets/thumb/peaks.4.jpg" width="200" height="200" alt="Input image" class="blackBorderedImage"></a>
+<br>
+</noscript>
+<div class="caption"> Input image</div>
+</td><td class="tableCellLevel1">
+<p style="font-weight:bold;"> Input image for deriv</p>
+<p>
+<span style="font-weight:bold;">
+                                Parameter Name:
+                                </span>FROM<br>
+</p>
+<div>This is the input image for the horizontal direction option of deriv.
+          </div>
+</td>
+</tr>
+</table>
+</div>
+<h4>
+                                 Output Image
+                               </h4>
+<div style="margin-left:20px;">
+<table cellpadding="5" width="600">
+<tr valign="top">
+<td class="tableCellLevel1_th" width="200" align="center"><script type="text/javascript">
+<!--
+        
+        //<!- -
+document.write("<a title='Click to view larger image' href='javascript:popUpNewWindow (\"assets/image/deriv.horz.jpg\","  + 
+500+ ", " + 500+ ")'>") ;
+
+document.write("<img src=\"assets/thumb/deriv.horz.jpg\""
++ " width=" + 200
++ " height=" + 200
++ " alt=\"Output image showing results of the deriv application with direction: horizontal.\" class='blackBorderedImage'><" + "/a><br>") ;
+        //- ->
+        
+    --></script>
+<noscript>
+<a title="Click to view larger image" href="assets/image/deriv.horz.jpg" target="_new"><img src="assets/thumb/deriv.horz.jpg" width="200" height="200" alt="Output image showing results of the deriv application with direction: horizontal." class="blackBorderedImage"></a>
+<br>
+</noscript>
+<div class="caption">Output image showing results of the deriv application with direction: horizontal.</div>
+</td><td class="tableCellLevel1">
+<p style="font-weight:bold;"> Output image for deriv</p>
+<p>
+<span style="font-weight:bold;">
+                                Parameter Name:
+                                </span>TO<br>
+</p>
+<div> This is the output image for the horizontal example of deriv.  The horizontal features fade and vertical features are enhanced.
+          </div>
+</td>
+</tr>
+</table>
+</div>
+<hr>
+<h3>
+                Example 2</h3>
+<p style="margin-top:0px;"> Vertical</p>
+<h4>
+                Description
+                </h4>
+<div style="margin-left:20px;">
+        Use vertical derivative option.
+      </div>
+<h4>
+                  Command Line
+                  </h4>
+<div style="margin-left:20px;">
+<tt style="font-weight:bold;">deriv  f=peaks.cub t=deriv.vert d=v
+        </tt>
+<br>
+<div style="font-style:italic; font-size:X-SMALL;margin-left:20px; width:400px;">
+        In this example the derivative direction is vertical.
+        </div>
+</div>
+<h4>
+                  GUI Screenshot
+                  </h4>
+<div style="margin-left:20px;">
+<table cellpadding="5" width="600">
+<tr valign="top">
+<td class="tableCellLevel1_th" width="200" align="center"><script type="text/javascript">
+<!--
+        
+        //<!- -
+document.write("<a title='Click to view larger image' href='javascript:popUpNewWindow (\"assets/image/derivVertGui.jpg\","  + 
+500+ ", " + 600+ ")'>") ;
+
+document.write("<img src=\"assets/thumb/derivVertGui.jpg\""
++ " width=" + 200
++ " height=" + 252
++ " alt=\"Derivative Gui\" class='blackBorderedImage'><" + "/a><br>") ;
+        //- ->
+        
+    --></script>
+<noscript>
+<a title="Click to view larger image" href="assets/image/derivVertGui.jpg" target="_new"><img src="assets/thumb/derivVertGui.jpg" width="200" height="252" alt="Derivative Gui" class="blackBorderedImage"></a>
+<br>
+</noscript>
+<div class="caption">Derivative Gui</div>
+</td><td class="tableCellLevel1">
+<p style="font-weight:bold;">Example Gui</p>
+<div>Screenshot of GUI with parameters filled in to perform a vertical derivative of the input image. </div>
+</td>
+</tr>
+</table>
+</div>
+<h4>
+                                 Input Image
+                               </h4>
+<div style="margin-left:20px;">
+<table cellpadding="5" width="600">
+<tr valign="top">
+<td class="tableCellLevel1_th" width="200" align="center"><script type="text/javascript">
+<!--
+        
+        //<!- -
+document.write("<a title='Click to view larger image' href='javascript:popUpNewWindow (\"assets/image/peaks.4.jpg\","  + 
+500+ ", " + 500+ ")'>") ;
+
+document.write("<img src=\"assets/thumb/peaks.4.jpg\""
++ " width=" + 200
++ " height=" + 200
++ " alt=\"Input image\" class='blackBorderedImage'><" + "/a><br>") ;
+        //- ->
+        
+    --></script>
+<noscript>
+<a title="Click to view larger image" href="assets/image/peaks.4.jpg" target="_new"><img src="assets/thumb/peaks.4.jpg" width="200" height="200" alt="Input image" class="blackBorderedImage"></a>
+<br>
+</noscript>
+<div class="caption"> Input image</div>
+</td><td class="tableCellLevel1">
+<p style="font-weight:bold;"> Input image for deriv</p>
+<p>
+<span style="font-weight:bold;">
+                                Parameter Name:
+                                </span>FROM<br>
+</p>
+<div>This is the input image for the vertical direction option of deriv.
+          </div>
+</td>
+</tr>
+</table>
+</div>
+<h4>
+                                 Output Image
+                               </h4>
+<div style="margin-left:20px;">
+<table cellpadding="5" width="600">
+<tr valign="top">
+<td class="tableCellLevel1_th" width="200" align="center"><script type="text/javascript">
+<!--
+        
+        //<!- -
+document.write("<a title='Click to view larger image' href='javascript:popUpNewWindow (\"assets/image/deriv.vert.jpg\","  + 
+500+ ", " + 500+ ")'>") ;
+
+document.write("<img src=\"assets/thumb/deriv.vert.jpg\""
++ " width=" + 200
++ " height=" + 200
++ " alt=\"Output image showing results of the deriv application with direction: vertical.\" class='blackBorderedImage'><" + "/a><br>") ;
+        //- ->
+        
+    --></script>
+<noscript>
+<a title="Click to view larger image" href="assets/image/deriv.vert.jpg" target="_new"><img src="assets/thumb/deriv.vert.jpg" width="200" height="200" alt="Output image showing results of the deriv application with direction: vertical." class="blackBorderedImage"></a>
+<br>
+</noscript>
+<div class="caption">Output image showing results of the deriv application with direction: vertical.</div>
+</td><td class="tableCellLevel1">
+<p style="font-weight:bold;"> Output image for deriv</p>
+<p>
+<span style="font-weight:bold;">
+                                Parameter Name:
+                                </span>TO<br>
+</p>
+<div> This is the output image for the vertical example of deriv.  The vertical features fade and horizontal features are enhanced.
+          </div>
+</td>
+</tr>
+</table>
+</div>
+<a name="History"></a>
+<hr>
+<h2>
+              History
+          </h2>
+<p>
+<em>All history entries are shown, including those marked hidden</em>
+</p>
+<table>
+<tr>
+<td class="tableCellHistory_name" nowrap>Tracie Sucharski</td><td class="tableCellHistory_date" nowrap>2002-12-24</td><td class="tableCellHistory_description">
+      Original version
+    </td>
+</tr>
+<tr>
+<td class="tableCellHistory_name" nowrap>Tracie Sucharski</td><td class="tableCellHistory_date" nowrap>2003-01-28</td><td class="tableCellHistory_description">
+      Fixed application name in xml file, misnamed as gradient.
+    </td>
+</tr>
+<tr>
+<td class="tableCellHistory_name" nowrap>K Teal Thompson</td><td class="tableCellHistory_date" nowrap>2003-04-10</td><td class="tableCellHistory_description">
+      Added examples.
+    </td>
+</tr>
+<tr>
+<td class="tableCellHistory_name" nowrap>Kim Sides</td><td class="tableCellHistory_date" nowrap>2003-05-13</td><td class="tableCellHistory_description">
+      Added application test
+    </td>
+</tr>
+<tr>
+<td class="tableCellHistory_name" nowrap>Stuart Sides</td><td class="tableCellHistory_date" nowrap>2003-05-16</td><td class="tableCellHistory_description">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </td>
+</tr>
+<tr>
+<td class="tableCellHistory_name" nowrap>Stuart Sides</td><td class="tableCellHistory_date" nowrap>2003-07-29</td><td class="tableCellHistory_description">
+      Modified filename parameters to be cube parameters where necessary
+    </td>
+</tr>
+<tr>
+<td class="tableCellHistory_name" nowrap>Brendan George</td><td class="tableCellHistory_date" nowrap>2005-11-07</td><td class="tableCellHistory_description">
+      Modified to handle special pixels
+    </td>
+</tr>
+<tr>
+<td class="tableCellHistory_name" nowrap>Jac Shinaman</td><td class="tableCellHistory_date" nowrap>2007-02-08</td><td class="tableCellHistory_description">
+      Updated xml documentation with examples
+    </td>
+</tr>
+</table>
+<hr>
+          footer will appear here
+
+      </body>
+</html>

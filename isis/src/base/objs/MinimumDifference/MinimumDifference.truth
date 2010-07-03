@@ -1,0 +1,23 @@
+Object = AutoRegistration
+  Group = Algorithm
+    Name             = MinimumDifference
+    Tolerance        = 5.0
+    SubpixelAccuracy = True
+  End_Group
+
+  Group = PatternChip
+    Samples      = 15
+    Lines        = 15
+    Sampling     = 25
+    ValidPercent = 10
+  End_Group
+
+  Group = SearchChip
+    Samples  = 35
+    Lines    = 35
+    Sampling = 50
+  End_Group
+End_Object
+End
+Register = 0
+Position = 120 45

@@ -1,0 +1,121 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 959
+      Lines   = 1404
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = "MARS GLOBAL SURVEYOR"
+    InstrumentId          = MOC-WA
+    TargetName            = Mars
+    StartTime             = 1997-10-20T10:58:37.46
+    StopTime              = 1997-10-20T11:03:44.66
+    CrosstrackSumming     = 4
+    DowntrackSumming      = 4
+    FocalPlaneTemperature = 213.1
+    GainModeId            = 1A
+    LineExposureDuration  = 100.000000 <milliseconds>
+    MissionPhaseName      = AB-1
+    OffsetModeId          = 5
+    SpacecraftClockCount  = 561812335:32
+    RationaleDesc         = "OLYMPUS MONS SPECIAL RED WIDE ANGLE"
+    FirstLineSample       = 673
+  End_Group
+
+  Group = Archive
+    DataSetId           = MGS-M-MOC-NA/WA-2-DSDP-L0-V1.0
+    ProductId           = AB-1-024/01
+    ProducerId          = MGS_MOC_TEAM
+    ProductCreationTime = 1999-01-15T20:40:59
+    SoftwareName        = "makepds 1.3"
+    UploadId            = moc_p024_v1.sasf
+    ImageNumber         = 7293-024/01
+    ImageKeyId          = 56181-024/01
+  End_Group
+
+  Group = BandBin
+    FilterName   = RED
+    OriginalBand = 1
+    Center       = 0.6134 <micrometers>
+    Width        = 5.0e-02 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode       = -94032
+    LeapSecond          = $base/kernels/lsk/naif0008.tls
+    TargetAttitudeShape = $base/kernels/pck/pck00008.tpc
+    TargetPosition      = Table
+    Instrument          = $mgs/kernels/ik/moc20.ti
+    SpacecraftClock     = $mgs/kernels/sclk/MGS_SCLKSCET.00060.tsc
+    Frame               = Null
+    InstrumentAddendum  = $mgs/kernels/iak/mocAddendum002.ti
+    InstrumentPointing  = Table
+    InstrumentPosition  = Table
+    ShapeModel          = Null
+  End_Group
+
+  Group = Radiometry
+    CalibrationKernel = /usgs/cpkgs/isis3/data/mgs/calibration/moccal.ker.001
+    CoefficientFile   = $MGS/calibration/mocRedWA.coef
+
+    /* Radiometric equation in moccal
+    /* r = (pixel - z + off) / a - g / ex - dc
+    a                 = 16.03
+    off               = 25.0
+    ex                = 100.0
+    z                 = 27.67658
+    dc                = 1.33691e-03
+    g                 = 0.123262
+
+    /* Reflectance = r * iof, where iof = (s * s) / w0
+    w0                = 3.991
+    s                 = 1.4234269469347
+    iof               = 0.50767834459028
+  End_Group
+
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 227.95679821639
+    TargetName         = Mars
+    EquatorialRadius   = 3396190.0 <meters>
+    PolarRadius        = 3376200.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    MinimumLatitude    = 10.76690271209
+    MaximumLatitude    = 34.444196777763
+    MinimumLongitude   = 219.72404560653
+    MaximumLongitude   = 236.18955082624
+    UpperLeftCornerX   = -11051573.293228 <meters>
+    UpperLeftCornerY   = 363329.51075901 <meters>
+    PixelResolution    = 1000.0 <meters/pixel>
+    Scale              = 59.274697523306 <pixels/degree>
+    TrueScaleLatitude  = 0.0
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 640
+    AlphaLines          = 768
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 640.5
+    AlphaEndingLine     = 768.5
+    BetaSamples         = 640
+    BetaLines           = 768
+  End_Group
+End_Object

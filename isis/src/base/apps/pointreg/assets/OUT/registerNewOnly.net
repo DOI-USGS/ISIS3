@@ -1,0 +1,488 @@
+Object = ControlNetwork
+  NetworkId    = "Default cnetadd test"
+  NetworkType  = ImageToImage
+  TargetName   = Mercury
+  UserName     = jwalldren
+  Created      = 2010-03-18T15:58:19
+  LastModified = 2010-03-18T15:58:20
+  Description  = Test
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000001
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 651.97003024903
+      Line           = 12.216544898526
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 985.83359606539
+      Line           = 301.85268062912
+      ErrorLine      = -0.84256775766687
+      ErrorSample    = -2.335783753835
+      ErrorMagnitude = 2.483104140172
+      ZScore         = (-2.0034478613635, 2.2620851616904)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.98643155177487
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Estimated
+      Sample         = 537.37603601737
+      Line           = 666.87097797601
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      ZScore         = (-2.1757062330938, 1.7198892329013)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      Ignore         = True
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000002
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 599.11852932624
+      Line           = 6.3895258304361
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 937.52281672183
+      Line           = 296.9651781907
+      ErrorLine      = -0.42552192462102
+      ErrorSample    = -2.3056060471066
+      ErrorMagnitude = 2.3445443379872
+      ZScore         = (-1.6694637829536, 3.0018517053317)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.98816135664775
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Estimated
+      Sample         = 492.84553389656
+      Line           = 663.65648508611
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      ZScore         = (-0.93673609107144, 2.9187213029442)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      Ignore         = True
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000003
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 651.39051715658
+      Line           = 39.015402638171
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 984.42099675797
+      Line           = 327.59962581525
+      ErrorLine      = -0.7178460434136
+      ErrorSample    = -2.3307959319554
+      ErrorMagnitude = 2.4388342744976
+      ZScore         = (-1.9655398870161, 2.7089591848142)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.98144883722171
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Estimated
+      Sample         = 535.51105609178
+      Line           = 691.89621568813
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      ZScore         = (-2.0624640853015, 1.9044963162636)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      Ignore         = True
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000004
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 598.69665165384
+      Line           = 33.295458756966
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 936.11490929155
+      Line           = 323.01474763996
+      ErrorLine      = -0.50219682629228
+      ErrorSample    = -2.1643728084314
+      ErrorMagnitude = 2.2218711272743
+      ZScore         = (-1.9377958814932, 3.281699600531)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.98392430568853
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Automatic
+      Sample         = 492.93959134525
+      Line           = 686.7247079002
+      ErrorLine      = 2.0414203313002
+      ErrorSample    = -1.829355241993
+      ErrorMagnitude = 2.7411562469974
+      ZScore         = (-1.8053573913747, 3.6941447265008)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.95933356739263
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000005
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 545.76896108632
+      Line           = 27.450073761743
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 887.64556536396
+      Line           = 318.02175246376
+      ErrorLine      = 0.013100271611108
+      ErrorSample    = -2.1122133561236
+      ErrorMagnitude = 2.1122539806811
+      ZScore         = (-1.7826764336141, 2.9099620790137)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.98660994076081
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Automatic
+      Sample         = 448.07813884887
+      Line           = 683.39088270037
+      ErrorLine      = 2.1446434488973
+      ErrorSample    = -1.5799659512102
+      ErrorMagnitude = 2.6637920207632
+      ZScore         = (-1.9003143809838, 2.6847840031923)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.97332111563125
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000006
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 492.61600601607
+      Line           = 21.479938293483
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 839.10242479023
+      Line           = 313.1427280157
+      ErrorLine      = 0.30296399328051
+      ErrorSample    = -2.2420871737804
+      ErrorMagnitude = 2.2624637181743
+      ZScore         = (-2.0434711253274, 4.4599620077926)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.97672753158462
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Automatic
+      Sample         = 403.61219141834
+      Line           = 680.04523729693
+      ErrorLine      = 2.1594946885375
+      ErrorSample    = -1.9298903090695
+      ErrorMagnitude = 2.896186098106
+      ZScore         = (-2.5359408722569, 1.9921906863269)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.9758029563125
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000007
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 439.2467442986
+      Line           = 15.387890985786
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 790.45059234978
+      Line           = 308.07642445756
+      ErrorLine      = 0.66575537569639
+      ErrorSample    = -2.5018478613854
+      ErrorMagnitude = 2.5889134674197
+      ZScore         = (-2.3118534152149, 2.0955505085493)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.98273189889574
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Estimated
+      Sample         = 356.67030041236
+      Line           = 678.7760540263
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      ZScore         = (-1.4622831906697, 2.2612666599493)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      Ignore         = True
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000008
+    Ignore    = True
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 385.67168330894
+      Line           = 9.1791310309534
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Estimated
+      Sample         = 738.81177770483
+      Line           = 303.92161240047
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      ZScore         = (-1.7560215125654, 2.3684067593322)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      Ignore         = True
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Estimated
+      Sample         = 311.47106411062
+      Line           = 675.25393216829
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-03-18T09:00:05
+      ChooserName    = "Application cnetadd"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000009
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 331.90409027176
+      Line           = 2.8614265038939
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 692.07507992819
+      Line           = 297.58156056399
+      ErrorLine      = 1.3999920671355
+      ErrorSample    = -2.6159945594508
+      ErrorMagnitude = 2.9670533064167
+      ZScore         = (-1.70394396103, 1.9289612953385)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.98429149084156
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Estimated
+      Sample         = 266.09571933301
+      Line           = 671.6450764237
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      Ignore         = True
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 0000010
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771118:976000
+      MeasureType    = Estimated
+      Sample         = 649.96902270705
+      Line           = 65.402139906388
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-12-24T10:59:15
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771213:976000
+      MeasureType    = Automatic
+      Sample         = 982.02028107944
+      Line           = 353.13967032571
+      ErrorLine      = -0.76529600043153
+      ErrorSample    = -2.1189906515796
+      ErrorMagnitude = 2.2529534726128
+      ZScore         = (-2.1045268293299, 3.2193995278892)
+      DateTime       = 2010-03-18T08:58:13
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.97632158687133
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MeSSEnGeR/MDIS-NAC/1/0131771303:976000
+      MeasureType    = Automatic
+      Sample         = 534.8287486994
+      Line           = 714.44103329103
+      ErrorLine      = 2.168935353985
+      ErrorSample    = -1.9120506845132
+      ErrorMagnitude = 2.8914042245791
+      ZScore         = (-2.0452953253288, 2.0756816017994)
+      DateTime       = 2010-03-18T15:58:20
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.96041684223308
+      Reference      = False
+    End_Group
+  End_Object
+End_Object
+End

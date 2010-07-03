@@ -1,0 +1,2838 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+
+  <category>
+    <categoryItem>api</categoryItem>
+    <categoryItem>guide</categoryItem>
+    <categoryItem>technicaldoc</categoryItem>
+  </category>
+
+  <audience>
+    <target>programmer</target>
+  </audience>
+
+  <bibliography>
+    <title>Style Guide</title>
+    <brief>
+      Object source code styles and conventions
+    </brief>
+    <description>
+      This document describes Object naming conventions,
+      documenting source code for automatic documentation generation,
+      and formatting documentation.
+    </description>
+    <author>Deborah Lee Soltesz and Leah Dahmer</author>
+    <date>2005-02-17</date>
+  </bibliography>
+
+  <history>
+    <change date="2005-10-31" name="Deborah Lee Soltesz">
+     Fixed format instructions for @history (date and author were inverted)
+    </change>
+    <change date="2006-06-05" name="Deborah Lee Soltesz">
+     Updated @image use instructions and conventions
+    </change>
+    <change date="2006-07-29" name="Deborah Lee Soltesz">
+     Update CVS tags described in the guide so that CVS 
+     wouldn't automatically replace the tag with actual 
+     information when this document is checked in. (Replaced
+     $ signs with ISO8859-1 entity, treating the $s as special
+     characters). 
+    </change>
+  </history>
+
+  <files>
+    <file primary="true">
+      <body>
+
+<h2>
+<a name="intro"></a>
+Introduction: Conventions and Definitions of this Guide
+</h2>
+
+
+<table class="pageMenu">
+  <tr>
+    <td>
+        <p>
+          <a href="#intro">Introduction</a>
+        </p>
+
+        <p>
+          <a href="#audience">Understanding Our Audience</a>
+        </p>
+
+        <p>
+          <a href="#NamingConventions">Naming Conventions</a>
+        </p>
+
+        <p>
+          <a href="#Basics">Basics</a>
+        </p>
+          <ul>
+            <li>
+              <a href="#structuredCodeDoc">Structure</a>
+            </li>
+            <li>
+              <a href="#dateFormat">Date Format</a>
+            </li>
+            <li>
+              <a href="#usingHTML">Using HTML</a>
+            </li>
+            <li>
+              <a href="#autolinking">Autolinking</a>
+            </li>
+          </ul>
+
+    </td>
+  </tr>
+</table>
+
+
+
+<h3>Purpose</h3>
+<p>
+This guide has been generated for Isis programming team as a style reference for
+writing in-code documentation to meet team requirements for consistency,
+content, and information dissemination. Serving as a reference for proper
+documentation structure for automatic generation of documentation in various formats,
+primarily HTML, is the primary focus of this guide. Isis Applications have their own
+code and documentation style. Information for the documentation system maintainers
+will be provided in a separate document covering system level tags (such as
+@mainpage and @defgroup), directory structure, naming conventions, etc.
+</p>
+
+<h3>Conventions</h3>
+<p>
+In the tag lists (later in this guide), arguments will be surrounded with either
+<b>&lt; &gt;</b>s, <b>[ ]</b>s, <b>( )</b>s, or <b>{ }</b>s. These brackets should <em>not</em> be included in
+the tags when used--they are only used as a visual reference in this document.
+</p>
+<ul>
+  <li>Parentheses () will be used to mark titles and independent names for items,</li>
+  <li>square brackets [] will be used to mark optional one word arguments,</li>
+  <li>angle brackets &lt;&gt; will be used to mark keywords used by doxygen to identify members, and</li>
+  <li>curly braces {} will be used to denote multi-worded descriptions.</li>
+</ul>
+
+
+<h3>Definitions</h3>
+<p>
+<em><strong>Mandatory</strong></em> is a pretty strong word... we will define here to mean
+<em>use it if it applies</em>. Many documentation components will always be included,
+such as CVS revision for files and category for classes. Other tags
+may not always be applicable, such as documenting return value and parameters for functions.
+Use your discretion, and have your documentation reviewed by a peer.
+</p>
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- Audience -->
+
+<hr/>
+<h2><a name="audience"></a>
+Understanding Our Audience: API verses Programmer Reference</h2>
+
+<p>
+There are two major audiences for our source code documenation.
+Two sets of documentation are maintained, one for each audience.
+</p>
+
+<ul>
+  <li>
+    <b>Application Developers</b>:
+    These folks only want to know how to use Isis objects. They use
+    the <b>API</b>, which gives information about public and protected
+    entities, new features, and descriptions and examples of usage.
+    This audience will be encouraged to use the web pages for reading
+    the API.
+  </li>
+  <li>
+    <b>Object Programmers</b>:
+    These folks are mainly the ones who maintain and develop Isis.
+    This audience needs to know details about the inner workings of
+    the code in order to maintain it. They use the <b>Programmers' Reference</b>,
+    which provides all the verbose nitty gritty information, such as documentation
+    for private entities, history, things to do, and other internal documentation.
+    While this group will have verbose web-based documentation, they often read the
+    documentation in the source code instead of going to the website.
+  </li>
+</ul>
+
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- Audience -->
+
+<hr/>
+<h2><a name="NamingConventions">Naming Conventions</a></h2>
+
+<h3>File Extensions:</h3>
+<ul>
+  <li>Header files have a .h extension.</li>
+  <li>Implementation files have a .cpp extension.</li>
+  <li>Plugin files have a .plugin extension.</li>
+  <li>Truth files have a .truth extension.</li>
+  <li>Primary make files are named Makefile. Secondary make files
+      (called from the primary) should begin with the string Makefile.</li>
+</ul>
+
+<h3>Files and Directories</h3>
+<p>
+We will be using a UpperCamelCase syntax, where every new word begins with
+a capital letter, for all file names and most directory names.
+</p>
+
+<p>
+<b>Object Directories</b>: All of an Object's files go into a directory named identically
+to the Object. In the case where the Object has several classes, one primary
+class (the parent, base, API) should be identified and used for naming the directory.
+</p>
+
+<p>
+<b>Subdirectories</b> are not allowed for Object source code.
+</p>
+
+<p>
+<b>Files</b>: Header and Implementation files are to name identically to the class they define.
+In the case where the file contains several classes, one primary
+class (the parent, base, API) should be identified and used for naming the file.
+</p>
+
+<h3>Naming user defined types and method names:</h3>
+
+<p>
+We will be using a UpperCamelCase syntax, where every new word begins with
+a capital letter, for all user defined types (classes, structs, typedefs, etc.),
+and method names, such as: <b>ProcessByLine</b> (class) and
+<b>ProcessByLine()</b> (constructor).
+</p>
+
+<h3>Naming variables:</h3>
+
+<p>
+All variables will use lowerCamelCase syntax, where the first letter
+is lower case and the beginning of other words are capitalized,
+such as: <b>allRequirements</b>.
+</p>
+
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- Audience -->
+
+<hr/>
+<h2><a name="Basics"></a>
+Documentation Basics</h2>
+
+<h3>
+<a name="structuredCodeDoc"></a>
+Source Code Documentation Structure
+</h3>
+
+<p>
+Currently, the Isis programming team is using the
+<a href="http://www.doxygen.org ">Doxygen</a>
+documentation extraction software. Doxygen has extended the tag set of the
+<a href="http://java.sun.com/j2se/javadoc">javadoc documentation style</a>,
+a systematic in-code documentation style that allows pertinent documentation
+to be extracted easily. Doxygen is just one of many software packages that
+are able to extract and use javadoc documentation for a variety of purposes,
+allowing us to take advantage of a wealth of documentation extractors, IDEs,
+and other tools on the market that make our lives simpler and more productive.
+</p>
+
+<p>
+In order to be able to generate automatic documentation correctly and follow a
+systematic and consistent approach , each programmer must:
+</p>
+
+<ul>
+  <li>
+    Write documentation for each entity (class, method, struct, variable, etc.)
+    in the source code <em>where the primary or most commonly used definition
+    of that entity resides</em>. Generally, this means the following files contain
+    documentation for the listed entities:
+    <ul>
+      <li>
+        <b>Header (.h)</b>: classes, inline functions, enums, typedefs, unions, structs, and variables declared in the header file
+      </li>
+      <li>
+        <b>Implementation (.cpp)</b>: member function implementations and any entities declared or defined in the implementation file
+      </li>
+    </ul>
+
+  </li>
+
+  <li>
+    Use specialized commenting styles before or after each entity, called <em>documentation lines</em>
+    or <em>documentation blocks</em>, for example:
+  <ul>
+    <li>
+      <b>Single line of documentation (<em>documentation line</em>)</b>
+      <ul>
+        <li>start documentation with string <b>//!</b> before or <b>//!&lt;</b> after the code</li>
+
+        <li>Before the entity
+          <div class="code">
+            //! my integer<br/>
+            int myInteger ;
+          </div>
+        </li>
+
+        <li>After the entity
+          <div class="code">
+            int myInteger ; //!&lt; my integer<br/>
+          </div>
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <b>Multi-lined documentation (<em>documentation block</em>)</b>
+      <ul>
+        <li>wrap documentation with <b>/** */</b> before or <b>/**&lt; */</b> after the code</li>
+
+        <li>Before the entity
+          <div class="code">
+            <pre>
+/**
+ * my method
+ */
+int myMethod () {
+  return myInteger ;
+}
+            </pre>
+          </div>
+        </li>
+
+        <li>After the entity
+          <div class="code">
+            <pre>
+int myMethod () {
+  return myInteger ;
+}
+/**&lt;
+ * my method
+ */
+            </pre>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  </li>
+</ul>
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<h3>
+<a name="dateFormat"></a>
+Date Format
+</h3>
+
+<p>
+Dates should always follow the
+<a href="http://www.iso.org/iso/en/prods-services/popstds/datesandtime.html">
+ISO date format standard</a>. Generally, you'll want to note the current date - use
+<b>YYYY-MM-DD</b>. See the
+<a href="http://lists.ebxml.org/archives/ebxml-core/200104/pdf00005.pdf"
+   onclick="window.open('http://lists.ebxml.org/archives/ebxml-core/200104/pdf00005.pdf')"
+   onkeypress="window.open('http://lists.ebxml.org/archives/ebxml-core/200104/pdf00005.pdf')">
+complete ISO 8601 standard [190KB PDF]</a> for the complete information.
+Use of this standard allows us to avoid internationalization issues and have dates
+that can be easily extracted by computer software.
+</p>
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<h3>
+<a name="usingHTML"></a>
+Using HTML
+</h3>
+
+<p>
+HTML can be used anywhere in your documentation.
+Keep it simple. Doxygen will "interpret" your HTML, so you may not get the
+desired effect. Best advice, avoid attempting special effects by just using the basic HTML
+formatting tags - bold, underline, pre, code, table (caption, tr, td, th), etc. and only
+when really necessary. Better yet, consider using the formatting tags in the Other Useful
+Tags section instead of HTML. Your plain old text will be pretty nicely rendered into paragraphs
+with automatically linked items and other bells and whistles. Keep your source readable:
+minimize formatting.
+</p>
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+
+
+<h3>
+<a name="autolinking"></a>
+Autolinking
+</h3>
+
+<p>
+Class, method, variable, and other entity names will be automatically linked
+in the documentation. To prevent this for a specific occurence of a name,
+use a percent sign (%) in front of the name. For example, if you have a
+class name "Histogram" and you want to prevent the linking of the word
+"Histogram" in your description because it is not referring to the class but
+to an actual histogram, use "%Histogram" to prevent the word from being linked.
+</p>
+
+<p>
+E-mail addresses and web addresses are also automatically linked. If a web
+address is particularly long, put it on its own line.
+</p>
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<div style="height:600px;"></div>
+      </body>
+
+      <type>HTML</type>
+
+      <subtitle>Introduction</subtitle>
+      <source>
+        <filename>intro.html</filename>
+      </source>
+    </file>
+
+    <file>
+      <body>
+
+
+<table class="pageMenu">
+  <tr>
+    <td>
+        <p>
+          <a href="#MandatoryDoxyCmd">Mandatory Documentation</a>
+        </p>
+
+          <ul>
+            <li>
+              <a href="#MandForFiles">Files</a>
+              <ul>
+                <li>
+                  <a href="#file">file</a>
+                </li>
+                <li>
+                  <a href="#disclaimer">Disclaimer</a>
+                </li>
+                <li>
+                  <a href="#date">&#036;Date&#036;</a>
+                </li>
+                <li>
+                  <a href="#version">&#036;Revision&#036;</a>
+                </li>
+                <li>
+                  <a href="#fileRecommendations">Recommendations</a>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="#MandForClasses">Classes</a>
+              <ul>
+                <li>
+                  <a href="#classes_example">Inline Examples</a>
+                </li>
+                <li>
+                  <a href="#classes_isisexample">Isis Examples</a>
+                </li>
+                <li>
+                  <a href="#classes_author">author</a>
+                </li>
+                <li>
+                  <a href="#classes_bug">bug</a>
+                </li>
+                <li>
+                  <a href="#classes_deprecated">deprecated</a>
+                </li>
+                <li>
+                  <a href="#classes_ingroup">ingroup</a>
+                </li>
+                <li>
+                  <a href="#classes_whatsnew">whatsnew</a>
+                </li>
+                <li>
+                  <a href="#classes_internal">internal</a>
+                </li>
+                <li>
+                  <a href="#classes_history">history</a>
+                </li>
+                <li>
+                  <a href="#classes_todo">todo</a>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="#MandForMethods">Methods</a>
+              <ul>
+                <li>
+                  <a href="#methods_param">param</a>
+                </li>
+                <li>
+                  <a href="#methods_relates">relates</a>
+                </li>
+                <li>
+                  <a href="#methods_return">return</a>
+                </li>
+                <li>
+                  <a href="#methods_see">see</a>
+                </li>
+                <li>
+                  <a href="#methods_throws">throws</a>
+                </li>
+                <li>
+                  <a href="#methods_author">author</a>
+                </li>
+                <li>
+                  <a href="#methods_bug">bug</a>
+                </li>
+                <li>
+                  <a href="#methods_deprecated">deprecated</a>
+                </li>
+                <li>
+                  <a href="#methods_internal">internal</a>
+                </li>
+                <li>
+                  <a href="#methods_todo">todo</a>
+                </li>
+                <li>
+                  <a href="#methods_history">history</a>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="#MandForVariables">Variables</a>
+            </li>
+            <li>
+              <a href="#MandForUDTs">Other User Defined Types</a>
+              <ul>
+                <li>
+                  <a href="#enum">enum</a>
+                </li>
+                <li>
+                  <a href="#struct">struct</a>
+                </li>
+                <li>
+                  <a href="#typedef">typedef</a>
+                </li>
+              </ul>
+            </li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<p>
+<em><strong>Mandatory</strong></em> is a strong word we will define here to mean
+<em>use it if it applies</em>. Many tags will always be used,
+such as &#036;Revision&#036; for files and @ingroup for classes. Other tags
+may not always be applicable, such as @return and @param for functions.
+</p>
+
+<p>
+<b>Descriptions</b> do not require a special tag. Simply write text and make
+sure for blocks there's a blank line before and after the description:
+</p>
+
+  <div class="code" style="margin-right:250px;">
+    <pre>
+/**
+ * @brief Get my integer
+ *
+ * myMethod is a simple function for returning
+ * my integer stored in this data structure.
+ *
+ * @return (int) The current value of my integer.
+ */
+int myMethod () {
+  return myInteger ;
+}</pre>
+  </div>
+
+
+
+<p>
+<b>Syntax notes:</b> Within the list of the following commands, arguments will be outlined in <b>&lt;
+&gt;</b>s, <b>[]</b>s, <b>{}</b>s, and <b>()</b>s. Below is a list of their
+meanings:
+</p>
+
+<ul>
+  <li>
+    <b>&lt;argument&gt;</b>: Signifies a one-worded argument. Any comments after the
+    initial word will be either ignored or used as comments, depending on the
+    command.
+  </li>
+  <li>
+    <b>[argument]</b>: Indicates an optional one-worded argument.
+  </li>
+  <li>
+    <b>(argument)</b>: Indicates a multi-worded argument that is not a description
+    or comment block
+  </li>
+  <li>
+    <b>{argument}</b>: Indicates a description or comment stream.
+  </li>
+</ul>
+
+<p>
+<b>Do not use any of these indicators within your doxygen comment blocks.</b>
+They are merely for organization of this document only.
+</p>
+
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- FILES -->
+
+<hr/>
+<h3><a name="MandForFiles">Files:</a></h3>
+
+<p>
+<a name="file"></a>
+<b>@file</b>: Required to start a file documentation block.
+</p>
+
+
+<p>
+<a name="disclaimer"></a>
+<b>Disclaimer</b>: Use the following disclaimer in the @file block of every file:
+</p>
+<blockquote>
+  <p>
+    Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
+    individual third-party library and package descriptions for intellectual property information,
+    user agreements, and related information.
+  </p>
+
+  <p>
+    Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
+    USGS as to the accuracy and functioning of such software and related material nor shall the
+    fact of distribution constitute any such warranty, and no responsibility is assumed by the
+    USGS in connection therewith.
+  </p>
+
+  <p>
+    For additional information, launch $ISISROOT/doc/documents/Disclaimers/Disclaimers.html
+    in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+    http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+    http://www.usgs.gov/privacy.html.
+  </p>
+</blockquote>
+
+<p>
+<a name="version"></a>
+<b>&#036;Revision&#036;</b>: Enters the CVS version of this file into the documentation. CVS will replace this string with the full version string when the file is checked in. For example, the CVS version of this document is <em>$Revision: 1.1.1.1 $</em>.
+</p>
+
+<p>
+<a name="date"></a>
+<b>&#036;Date&#036;</b>: Enters the CVS last modification date of this file into the
+documentation. CVS will replace this string with the full last modification date when the file is checked in. For example, the CVS last modification date of this document is <em>$Date: 2006/10/31 23:18:12 $</em>. 
+</p>
+
+<h4><a name="fileRecommendations"></a>
+Notes</h4>
+
+<p>
+<b>Additional documentation</b>: A brief and/or long description, history, or
+other information is left to the discretion of the programmer.
+</p>
+
+<p>
+<b>Other CVS tags</b>: &#036;Id&#036; and other CVS tags may be used at the taste
+and discretion of the programmer.
+</p>
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+
+<!-- CLASSES -->
+
+<hr/>
+<h3><a name="MandForClasses">Classes:</a></h3>
+
+<p>
+Give an overall description of the class. Does it
+represent a particular data structure (e.g. binary tree)
+or emulate the behavior and attributes of a real world
+object (e.g. camera) or concept (e.g. vector)?
+</p>
+
+<p>
+<a name="classes_example"></a>
+<b>Writing Inline Examples with @code and @endcode</b>:
+
+Examples should <em>always</em> be provided to illustrate the setup and intended use
+of a class. Include one or more brief examples in your documentation, using
+the @code to start the example and @endcode to end the example. Do <em>not</em>
+escape special characters like &lt;, &gt;, and &amp; inside a @code/@endcoe block -
+your code snippet will be parsed and special characters properly rendered for you.
+</p>
+
+<p>
+<a name="classes_isisexample"></a>
+<b>Linking to Examples in Other Isis Objects or Applications:</b>
+
+Whenever possible, point out working Isis sourcecode where your object is in heavy and thorough use, such
+as a class or application containing your object or a a class inheriting your object.
+In the web page output, names of files and classes in your descriptions are automatically linked
+to the appropriate documentation. Simply write a sentence that contains the class or file names
+you wish to link to with a bit of explanation, such as in the following snippet from the
+Statistics class documentation:
+</p>
+
+<pre class="code">
+* For an example of how the Statistics object is used in %Isis, see the
+* Histogram object (inherits from Statistics) and the stats application,
+* stats.cpp (uses the Statistics child class Histogram).
+</pre>
+
+<p>
+In the resulting web page output, Statistics, Histogram, and stats.cpp will all be linked
+to pages about those classes and file. The percent sign (%) in '%Isis' prevents the word Isis from being
+linked to the Isis namespace documentation.
+</p>
+
+<p>
+<a name="classes_author"></a>
+<b>@author { Author }</b>: Always use original author(s), with modifiers noted in
+<a href="#classes_history"><b>@history</b></a>.
+</p>
+
+<p>
+<a name="classes_bug"></a>
+<b>@bug { bug description }</b>: Use for noting bugs. Remove the
+bug documentation when the bug is fixed, and make a note in a
+<a href="#classes_history"><b>@history</b></a> entry.
+</p>
+
+<p>
+<a name="classes_deprecated"></a>
+<b>@deprecated</b>: Indicates a deprecated entity in a documentation block.
+</p>
+
+<p>
+<a name="classes_ingroup"></a>
+<b>@ingroup(&lt;groupname&gt;[&lt;groupname&gt; &lt;groupname&gt;])</b>:
+Categorize this class as belonging to a particular group of Objects.
+The class documentation will be linked in the group's page (identified by &lt;groupname&gt;).
+Groups are listed in the Modules section of the Isis documentation, and defined by the
+<a href="assets/isisDoxyDefs.doxydef">isisDoxyDefs.doxydef</a>
+file.
+</p>
+
+<p>
+<a name="classes_whatsnew"></a>
+<b>@whatsnew { date } { paragraph describing new features }</b>:
+Description of a new feature of this class that users of your object will
+find interesting. Keep it exciting, simple, and brief.
+</p>
+
+
+<h4>Internal Class Documentation</h4>
+
+<p>
+<a name="classes_internal"></a>
+<b>@internal</b>: to start a section of internal documentation
+put @internal on its own line in your documentation block.
+Everything between the @internal tag and the end of the block
+will be marked as "not for public consumption." Internal
+documentation will not appear in the API, only in the Programmers'
+Reference.
+</p>
+
+<p>
+@todo and @history should <b>always</b> be placed in the internal
+section of the documentation.
+</p>
+
+<p>
+<a name="classes_todo"></a>
+<b>@todo { paragraph describing what is to be done }</b>:
+Notes a lien, or item needing to be done. When it's done, the
+entry should be removed and a @history entry should be added.
+</p>
+
+<p>
+<a name="classes_history"></a>
+<b>@history YYYY-MM-DD &lt;author&gt; { description of change } </b>:
+Make a note of the who, when, and what of a modification to the class.
+</p>
+
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- METHODS -->
+
+<hr/>
+<h3><a name="MandForMethods"></a>
+For Methods:</h3>
+
+<p>
+Methods are documented where they are <em>implemented</em>. Inline
+methods will be documented in the header, others in the
+implementation file.
+</p>
+
+<p>
+Write a wonderful description explaining the use of the method.
+Information describing its implementation, such as algorithms,
+design decisions, etc. can be placed in an @internal section
+at the end of the documentation block. Parameters, return value,
+and exceptions thrown are documented in their own section in
+the method's documentation block.
+</p>
+
+<p>
+Use the following tags as needed to complete your desription.
+</p>
+
+
+<p>
+<a name="methods_author"></a>
+<b>@author { Author }</b>: This is only needed if the method author is not the author of
+ the method's scope (e.g. Bob added a member function to Ted's class).
+ Always use original author(s), with modifiers noted in
+<a href="#methods_history"><b>@history</b></a>.
+</p>
+
+<p>
+<a name="methods_bug"></a>
+<b>@bug { bug description }</b>: Use for noting bugs. Remove the
+bug documentation when the bug is fixed, and make a note in a
+<a href="#methods_history"><b>@history</b></a> entry.
+</p>
+
+<p>
+<a name="methods_deprecated"></a>
+<b>@deprecated</b>: Indicate a deprecated function.
+</p>
+
+<p>
+<a name="methods_param"></a>
+<b>@param&lt;[in|out|in,out]&gt; &lt;parameter-name&gt; {(type) parameter description}</b>:
+Describe a parameter for the function with name &lt;parameter-name&gt;,
+followed by the parameter type, then a description. The <a href="#methods_param"><b>@param</b></a> command
+also has a <strong>mandatory</strong> attribute specifying direction of the attribute, [in] or [out], or [in,out] for both.
+</p>
+
+<p>
+<a name="methods_return"></a>
+<b>@return (type) {description}</b>: Describe the return value of a method.
+</p>
+
+<p>
+<a name="methods_throws"></a>
+<b>@throws &lt;exception-object&gt; { description }</b>: Desribe the exception
+of type exception-object thrown by this method.
+</p>
+
+<p>
+<a name="methods_relates"></a>
+<b>@relates &lt;name&gt;</b>:
+Indicate this function is related to the entity indicated by <em>name</em>.
+Useful for documenting non-friend functions that are
+nevertheless strongly coupled to a certain class. This tag will cause this
+method's documentation to be included in the documentation indicated by
+<em>name</em>.
+</p>
+
+<p>
+<b>Example:</b>
+</p>
+  <pre class="code">
+/*!
+* A String class.
+*/
+class String {
+  friend int strcmp(const String &amp;,const String &amp;);
+};
+
+/*!
+* Compares two strings.
+*/
+int strcmp(const String &amp;s1,const String &amp;s2) {...}
+
+/*! <b>@relates String</b>
+* A string debug function.
+*/
+void stringDebug() {...}
+  </pre>
+
+
+<p>
+<a name="methods_see"></a>
+<b>@see { references }</b>: List cross-references to
+classes, functions, methods, variable, files, or URL may be specified. Two
+names joined by either :: or # are understood as referring to a class and one of
+its members. One of several overloaded methods or constructors may be selected
+by including a parenthesized list of argument types after the method name.
+</p>
+
+
+
+
+<h4><a name="methods_internalDocs"></a>
+Internal Documentation</h4>
+
+<p>
+<a name="methods_internal"></a>
+<b>@internal</b>: Start a section of internal documentation
+by putting @internal on its own line in your documentation block.
+Everything between the @internal tag and the end of the block
+will be marked as "not for public consumption." Internal
+documentation will not appear in the API, only in the Programmers'
+Reference.
+</p>
+
+<p>
+@todo and @history should <b>always</b> be placed in the internal
+section of the documentation.
+</p>
+
+<p>
+<a name="methods_todo"></a>
+<b>@todo { paragraph describing what is to be done }</b>:
+Note any liens, or items needing to be done. When it's done, the
+entry should be removed and a @history entry should be added.
+</p>
+
+<p>
+<a name="methods_history"></a>
+<b>@history YYYY-MM-DD &lt;author&gt; { description of change } </b>:
+Make a note of the who, when, and what of a modification to the class.
+</p>
+
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- VARIABLES -->
+
+<hr/>
+<h3><a name="MandForVariables"></a>
+Variables:</h3>
+<p>
+For most variables, a short one-lined description will suffice. For longer
+descriptions, use a description block (described in the <a href="intro.html#Basics">Basics</a>
+section of this document). Variable declarations are often one of the places where programmers prefer to
+place their documentation on the same line after the declaration. In the following example, note the
+use of the left angle bracket to start documentation that
+follows the value, and this notation can be used for both single and
+block documentation.
+</p>
+
+<div class="code">
+  <pre>
+int    counter ;   //!&lt;  An iterator that tracks how often this instance has been touched
+float  value   ;   //!&lt;  The value stored by this data structure
+String title   ;   /**!&lt; The title, or name, of the value.
+                    *    The title follows the standards outlined
+                    *    in the design document available on the
+                    *    mission website.
+                    */
+  </pre>
+</div>
+
+<p>
+Use @internal, @history, @whatsnew, @author, @todo, and other tags if needed.
+</p>
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+
+<!-- USER DEFINED TYPES -->
+
+<hr/>
+<h3><a name="MandForUDTs"></a>
+For Other User Defined Types:</h3>
+<p>
+Aside from classes, most user defined type declarations need only a short one-lined description
+For longer descriptions, use a description block (described in the <a href="intro.html#Basics">Basics</a>
+section of this document).
+</p>
+
+<p>
+In all cases, use @internal, @history, @whatsnew, @author, @todo, @deprecated, and other tags if needed.
+</p>
+
+<p>
+<a name="enum"></a>
+<b>Enumerations</b>:
+A general description is required for all enum declarations, and enumeration value
+descriptions should be used as necessary. In the following example,
+note the use of the left angle bracket to start documentation that
+follows the value, and this notation can be used for both single and
+block documentation.
+</p>
+
+<div class="code">
+  <pre>
+/**
+ * This enum is a set of red, blue, and green values of a specified pixel.
+ */
+enum Colors {
+    Red,    //!&lt;  The "red" value of the pixel.
+    Blue,   //!&lt;  The "blue" value of the pixel.
+    Green   /**!&lt; The "green" value of the pixel.
+             *    Green is a very special portion of
+             *    the visible EM spectrum, so more
+             *    documentation is being provided.
+             */
+};
+  </pre>
+</div>
+
+<p>
+<a name="struct"></a>
+<b>Structures</b>:
+A general description is required for all stuct declarations and the
+variables they contain. In the following example,
+note the use of the left angle bracket to start documentation that
+follows the value, and this notation can be used for both single and
+block documentation.
+</p>
+
+
+<div class="code">
+  <pre>
+/**
+ * This structure holds a name-value pair
+ */
+struct NamedFloat {
+  float  value   ;   //!&lt;  The value stored by this data structure
+  String name    ;   /**!&lt; The of the value.
+                      *    The name follows the standards outlined
+                      *    in the design document available on the
+                      *    mission's website.
+                      */
+};
+  </pre>
+</div>
+
+
+
+
+<p>
+<a name="typedef"></a>
+<b>Type Definitions</b>:
+A general description is required for all type definition declarations. Note in the
+example below the use of the @internal tag to add a little extra information for other
+programmer's to understand why the types were defined (i.e. explains the design decision).
+</p>
+
+<div class="code">
+  <pre>
+/**
+ * A set of data types to represent various monetary units.
+ *
+ * @internal This typedef was created for the purpose of increasing code readability.
+ */
+ typedef int Pounds, Shillings, Pennies, Dollars, Cents;
+  </pre>
+</div>
+
+<p>
+<a name="internal"></a>
+<b>@internal</b>: Use this in any documenation block where you wish to add internal documentation,
+such as comments regarding design, @history, @todo, and so forth.
+All documentation after the @internal tag and before the end of the documenation block will appear
+in a section of the Programmer's Documentation titled "For internal use only."
+</p>
+<div style="height:600px;"></div>
+      </body>
+
+      <type>HTML</type>
+
+      <subtitle>Mandatory Commands</subtitle>
+
+      <source>
+        <filename>mandatoryCommands.html</filename>
+      </source>
+    </file>
+
+    <file>
+      <body>
+<table class="pageMenu">
+  <tr>
+    <td>
+              <p>
+                <a href="#Formatting">Formatting</a>
+              </p>
+                <ul>
+                  <li>
+                    <a href="#a">a</a>
+                  </li>
+                  <li>
+                    <a href="#b">b</a>
+                  </li>
+                  <li>
+                    <a href="#c">c</a>
+                  </li>
+                  <li>
+                    <a href="#code">code</a>
+                  </li>
+                  <li>
+                    <a href="#e">e</a>
+                  </li>
+                  <li>
+                    <a href="#fDollar">f$, including instructions for in-text formulas.</a>
+                  </li>
+                  <li>
+                    <a href="#fStart">f[</a>
+                  </li>
+                  <li>
+                    <a href="#fEnd">f]</a>
+                  </li>
+                  <li>
+                    <a href="#n">n</a>
+                  </li>
+                  <li>
+                    <a href="#commands">Special Characters</a>
+                  </li>
+                </ul>
+              <p>
+                <a href="#Messages">Messages</a>
+              </p>
+                <ul>
+                  <li>
+                    <a href="#attention">attention</a>
+                  </li>
+                  <li>
+                    <a href="#note">note</a>
+                  </li>
+                  <li>
+                    <a href="#par">par</a>
+                  </li>
+                  <li>
+                    <a href="#remarks">remarks</a>
+                  </li>
+                  <li>
+                    <a href="#warning">warning</a>
+                  </li>
+                </ul>
+
+              <p>
+                <a href="#CodeDocumentation">Code Documentation</a>
+              </p>
+                <ul>
+                  <li>
+                    <a href="#brief">brief</a>
+                  </li>
+                  <li>
+                    <a href="#date">date</a>
+                  </li>
+                  <li>
+                    <a href="#dir">dir</a>
+                  </li>
+                  <li>
+                    <a href="#hideinitializer">hideinitializer</a>
+                  </li>
+                  <li>
+                    <a href="#name">name</a>
+                  </li>
+                  <li>
+                    <a href="#nosubgrouping">nosubgrouping</a>
+                  </li>
+                  <li>
+                    <a href="#overload">overload</a>
+                  </li>
+                  <li>
+                    <a href="#post">post</a>
+                  </li>
+                  <li>
+                    <a href="#pre">pre</a>
+                  </li>
+                  <li>
+                    <a href="#showinitializer">showinitializer</a>
+                  </li>
+                  <li>
+                    <a href="#since">since</a>
+                  </li>
+                  <li>
+                    <a href="#test">test</a>
+                  </li>
+                </ul>
+
+              <p>
+                <a href="#IncludingFiles">Including &amp; Linking Files</a>
+              </p>
+                  <ul>
+                    <li>
+                      <a href="#link">link</a>
+                    </li>
+                    <li>
+                      <a href="#endlink">endlink</a>
+                    </li>
+                    <li>
+                      <a href="#file">file</a>
+                    </li>
+                    <li>
+                      <a href="#image">image</a>
+                    </li>
+                    <li>
+                      <a href="#include">include &amp; includelineno</a>
+                    </li>
+                    <li>
+                      <a href="#dontinclude">dontinclude</a>
+                    </li>
+                    <li>
+                      <a href="#skip">skip</a>
+                    </li>
+                    <li>
+                      <a href="#line">line</a>
+                    </li>
+                    <li>
+                      <a href="#skipline">skipline</a>
+                    </li>
+                    <li>
+                      <a href="#if">if</a>
+                    </li>
+                    <li>
+                      <a href="#elseif">elseif</a>
+                    </li>
+                    <li>
+                      <a href="#else">else</a>
+                    </li>
+                    <li>
+                      <a href="#endif">endif</a>
+                    </li>
+                    <li>
+                      <a href="#ifnot">ifnot</a>
+                    </li>
+                    <li>
+                      <a href="#until">until</a>
+                    </li>
+                  </ul>
+    </td>
+  </tr>
+</table>
+
+<p>
+The following list are additional tags that may be useful in
+documenting your code. Tags not appearing in this list or the
+list of mandatory tags are generally forbidden either because of
+the documentation rules (such as documentation must appear directly
+before or after the entity being documented) or because the usage
+is restricted to the documentation system managers (such as creating
+new categorization groups). Forbidden tags include: mainpage, defgroup,
+class, fn, enum, struct, and other tags that are unecessary if documentation
+is positioned next to the entity it documents.
+</p>
+
+<hr/>
+<h3><a name="Formatting"></a>
+Formatting:</h3>
+
+<p>
+<a name="a"></a>
+<b>@a &lt;argument&gt;</b>: Format argument in a special font.
+</p>
+
+
+<p>
+<a name="b"></a>
+<b>@b &lt;word&gt;</b>: Display the argument word in bold.
+Equivilant to HTML &lt;b&gt;word&lt;/b&gt;
+</p>
+
+<p>
+<a name="c"></a>
+<b>@c &lt;word&gt;</b>: Display the argument word in typewriter font.
+&lt;tt&gt;word&lt;/tt&gt;
+</p>
+
+<p>
+<a name="code"></a>
+<b>@code</b>: Start a block of code. A code block is treated differently
+than regular text. It is interpreted as C/C++ code. The names of classes and
+members are hyperlinked to their documentation.
+</p>
+
+<p>
+<a name="endcode"></a>
+<b>@endcode</b>: End a code block after starting it with the <a href="#code">
+<b>@code</b></a> command.
+</p>
+
+<p>
+<a name="e"></a>
+<b>@e &lt;word&gt;</b>: Display "word" in italics.
+&lt;em&gt;word&lt;/em&gt; or &lt;i&gt;word&lt;/i&gt;
+</p>
+
+<p>
+<a name="fDollar"></a>
+<b>@f$</b>: Mark the beginning or end of an in-text formula. All formulas
+should be in between @f$ commands. For example:
+</p>
+
+    <div class="code" style="margin-right: 220px; ">
+      The distance between @f$(x_1,y_1)@f$ and
+      @f$(x_2,y_2)@f$ is @f$ @sqrt{(x_2-x_1)^2+(y_2-y_1)^2}@f$
+    </div>
+
+<p>
+    This example results in the display of the distance equation.
+</p>
+
+  <p>
+  <a name="fStart"></a>
+  <b>@f[</b>: Mark the start of a long formula that is displayed centered on
+  a separate line.
+  </p>
+
+  <p>
+  <a name="fEnd"></a>
+  <b>@f]</b>: Mark the end of a long formula that is displayed on a separate
+  line.
+  </p>
+
+  <p>
+  <a name="n"></a>
+  <b>@n</b>: Force a new line.
+  </p>
+
+  <p>
+  <a name="commands"></a>
+  <b>\$</b>, <b>\@</b>, <b>\\</b>, <b>\&amp;</b>, <b>\&lt;</b>, <b>\&gt;</b>, <b>\#</b>,
+  <b>\&#37;</b>:  These commands write the character after the first '\' symbol
+  to the output. These characters need to be escaped because they have special
+  meanings in HTML, XML, and/or Doxygen.
+  </p>
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- Messages -->
+
+<hr/>
+  <h3>
+  <a name="Messages"></a>
+  Messages:</h3>
+
+  <p>
+  <a name="attention"></a>
+  <b>@attention { attention text }</b>: Start a paragraph where a message
+  that needs attention may be entered. Ends when a blank line is encountered or
+  some other sectioning device.
+  </p>
+
+  <p>
+  <a name="note"></a>
+  <b>@note { text }</b>: Start a paragraph where a note can be entered. The
+  paragraph will be indented.
+  </p>
+
+  <p>
+  <a name="par"></a>
+  <b>@par [( paragraph title )] { paragraph }</b>: Start a paragraph with a
+  user defined heading. The heading extends until the end of a line. The paragraph
+  following the command will be indented.
+  </p>
+
+  <p>
+  <a name="remarks"></a>
+  <b>@remarks { remarks text }</b>>: Start a paragraph where one or more
+  remarks may be entered.
+  </p>
+
+  <p>
+  <a name="warning"></a>
+  <b>@warning { warning message }</b>: Start a paragraph where one or more
+  warnings may be entered.
+  </p>
+
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- Code Documentation -->
+
+<hr/>
+  <h3>
+  <a name="CodeDocumentation"></a>
+  Code Documentation:</h3>
+
+  <p>
+  <a name="brief"></a>
+  <b>@brief { description }</b>: Start a paragraph where a brief description
+  may be entered. NOTE: If you do not use the <b>@brief</b> command, your
+  first sentence (ending with a .) will be used as the brief description. When
+  appearing in output documentation with your long description, the brief description
+  (marked by @brief or the first line of your long description) will appear on its
+  own line above the long description and will not be repeated.
+  </p>
+
+  <p>
+  <a name="date"></a>
+  <b>@date &lt;&#036;Date&#036; | YYYY-MM-DD&gt; { Optional comment }</b>: Start a paragraph where one or
+  more dates may be entered. You may use the CVS date command to insert the last file modification
+  date from CVS or enter your own date using the
+  <a href="http://www.iso.org/iso/en/prods-services/popstds/datesandtime.html">ISO 8601 date format</a>.
+  </p>
+
+  <p>
+  <a name="dir"></a>
+  <b>@dir [&lt;path fragment&gt;]</b>: Directory documentation. The "path fragment"
+  argument should the directory name and enough of the path to be unique with respect to
+  the other directories in the project.
+  </p>
+
+  <p>
+  <a name="hideinitializer"></a>
+  <b>@hideinitializer</b>: By default, the value of a define and the
+  initializer of a variable are displayed unless they are longer than 30 lines. By
+  putting this command in a comment block of a define or variable, the initializer
+  is always hidden.
+  </p>
+
+  <p>
+  <a name="name"></a>
+  <b>@name ( header )</b>: This command turns a document block into a header
+  definition of a member group. The comment block should be followed by a //@{...//@}
+  block containing the members of the group.
+  </p>
+
+  <p>
+If a compound (e.g. a class or file) has many members, it is often desired to group them together. Doxygen
+already automatically groups things together on type and protection level, but maybe you feel that this is
+not enough or that that default grouping is wrong. For instance, because you feel that members of different
+(syntactic) types belong to the same (semantic) group.
+A member group is defined by a
+</p>
+
+  <pre>
+  //@{
+  ...
+  //@}
+  </pre>
+
+<p>
+  block or a
+</p>
+
+  <pre>
+  /*@{*/
+  ...
+  /*@}*/
+  </pre>
+
+  <p>
+  block if you prefer C style comments. Note that the members of the group should be physcially inside the
+  member group's body.
+  </p>
+
+  <p>
+  Before the opening marker of a block a separate documentation block may be placed. This block should contain
+  the @name command and is used to specify the title of the group. Optionally, the documentation
+  block may also contain more detailed information about the group.
+  </p>
+
+  <p>
+  Nesting of member groups is not allowed.
+  </p>
+
+  <p>
+  If all members of a member group inside a class have the same type and protection level (for instance all
+  are static public members), then the whole member group is displayed as a subgroup of the type/protection
+  level group (the group is displayed as a subsection of the "Static Public Members" section for instance).
+  If two or more members have different types, then the group is put at the same level as the automatically
+  generated groups. If you want to force all member-groups of a class to be at the top level, you should put a
+  @nosubgrouping command inside the documentation of the class.
+  </p>
+
+
+  <p>
+  <a name="nosubgrouping"></a>
+  <b>@nosubgrouping</b>: This command can be put in the documentation of a
+  class. It can be used in combination with member grouping to avoid that doxygen
+  put a member group as a subgroup of a Public/Protected/Private... section.
+  </p>
+
+  <p>
+  <a name="overload"></a>
+  <b>@overload [( function declaration )]</b>: This command can be used to
+  generate the following standard text for an overloaded member function: 'This is
+  an overloaded member function, provided for convenience. It differs from the
+  above function only in what argument(s) it accepts.' The overload command does
+  not work inside a one-line comment.
+  </p>
+
+  <p>
+  <a name="post"></a>
+  <b>@post { description of the post-condition }</b>: Starts a paragraph where
+  the post-condition of an entity can be described. The paragraph will be indented.
+  </p>
+
+  <p>
+  <a name="pre"></a>
+  <b>@pre { description of the pre-condition }</b>: Starts a paragraph where
+  the pre-condition of an entity can be described. The paragraph will be indented.
+  </p>
+
+  <p>
+  <a name="showinitializer"></a>
+  <b>@showinitializer</b>: By default, the value of a define and the
+  initializer of a variable are only displayed if they are less than 30 lines long.
+  By putting this command in a comment block of a define or variable, the
+  initializer is shown unconditionally.
+  </p>
+
+  <p>
+  <a name="since"></a>
+  <b>@since YYYY.MM.DD</b>: This tag can be used to specify since when an
+  entity has been avaliable.
+  </p>
+
+  <p>
+  <a name="test"></a>
+  <b>@test { paragraph describing a test case }</b>: Starts a paragraph where
+  a test can be described. The description will also add the test case to a
+  separate test list. The two instances of the description will be cross-referenced.
+  </p>
+
+
+
+
+<p class="TOCtoplink">
+<a href="#top">
+Top</a>
+</p>
+
+<!-- Including and Linking Files -->
+
+<hr/>
+  <h3>
+  <a name="IncludingFiles"></a>
+  Including &amp; Linking Files:</h3>
+
+  <p>
+  <a name="file"></a>
+  <b>@file &lt;file-name&gt;</b>: Indicates that a comment block contains
+  documentation for a source or header file with name &lt;name&gt;.The
+  documentation of global functions, variables, typedefs, and enums will only be
+  included in the output if the file they are in is documented as well.
+  </p>
+
+  <p>
+  <a name="htmlinclude"></a>
+  <b>@htmlinclude &lt;file-name&gt;</b>: This command includes the file as is
+  in the HTML documentation.
+  </p>
+
+  <p>
+  <a name="image"></a>
+  <b>@image &lt;format&gt; &lt;file&gt; ["Caption"][&lt;size-indication&gt;=&lt;size&gt;]</b>
+  </p>
+
+  <p>
+    <b>Syntax</b>
+    <ul>
+      <li><b>format</b>: html</li>
+      <li><b>file</b>: image filename, no path</li>
+      <li><b>caption</b>: brief description of the image, <em>required</em>, quoted</li>
+      <li><b>size indication</b>: width | height</li>
+      <li><b>size</b>: integer number of pixels</li>
+      <li><b>size indication</b>: width | height</li>
+    </ul>
+  </p>
+
+  <p>
+    <b>Conventions</b>
+    <ul>
+      <li><b>image file names</b>: Object name + _ + filename (e.g., Statistics_graph.png)</li>
+      <li><b>image file locations</b>: <em>assets</em> directory beneath the Object source code directory (e.g., $ISISROOT/src/base/obj/Statistics/assets/)</li>
+    </ul>
+  </p>
+
+  <p>
+  Inserts an image into the documentation. Image files must be in the <b>assets</b> directory beneath
+  the Isis Object source code($ISISROOT/src/*/obj/*). If the image is found, it will be copied
+  to the correct output directory.
+  </p>
+
+  <p>
+  This command is output format-specific,
+  so if you want to insert an image into generated documentation for more than one format, you'll have to
+  enter the command for each format. The format values supported are <b>html</b> and
+  <b>latex</b>, however Isis documentation is <em>not</em> generated in latex format,
+  so html should be the only format specified.
+  You can also use a URL to specify image
+  location, but doxygen will not check for existance or copy it into a directory
+  for you. The last argument is used to specify width and height of the image. The
+  image format for HTML is limited to what your browser supports. Doxygen does not
+  check if the image is in the correct format.
+  </p>
+
+  <p>
+  <a name="include"></a>
+  <b>@include &lt;file-name&gt;</b> and <b>@includelineno &lt;file-name&gt;</b>:
+  This command can be used to include a source file as a block of code. The
+  command takes the name of the include file or the line number as an argument.
+  Source files or directories can be specified by using the EXAMPLE_PATH tag in
+  the doxygen configuration file.
+  </p>
+
+  <p>
+  <a name="dontinclude"></a>
+  <b>@dontinclude &lt;file-name&gt;</b>: This command can be used to parse a
+  source file without actually verbatim including it (as <b>@include</b> does).
+  This is useful if you want to divide the source file into smaller pieces and add
+  documentation between the pieces.
+  </p>
+
+  <p>
+  <a name="link"></a>
+  <b>@link &lt;link-object&gt;</b>: The links that are automatically generated
+  in doxygen always have the name of the object they point to as link-text. The
+  link command can be used to create a link to an object with a user-specified
+  link-text. This command has a matching <b>@endlink</b> command.
+  </p>
+
+  <p>
+  <a name="endlink"></a>
+  <b>@endlink</b>: Ends a link that was started with the <b>@link</b> command.
+  </p>
+
+  <p>
+  <a name="skip"></a>
+  <b>@skip ( pattern )</b>: This command searches line-by-line through the
+  example that was last included using <b>@include</b> or <b>@dontinclude</b>
+  until it finds a line that contains the specified pattern.
+  </p>
+
+  <p>
+  <a name="line"></a>
+  <b>@line ( pattern )</b>: This command searches line by line through the
+  example that was last included using <b>@include</b> and <b>@dontinclude</b>
+  until it finds a non-blank line. If that line contains the specified pattern, it
+  is written to the output.
+  </p>
+
+  <p>
+  <a name="skipline"></a>
+  <b>@skipline ( pattern )</b>: This command searches line-by-line through the
+  example that was last included using <b>@include</b> or <b>@dontinclude</b>
+  until it finds a line that contains the specified pattern. It then writes the
+  line to the output. The <b>@skipline</b> command is equivalent to <b>@skip</b>
+  followed by a <b>@line</b>.
+  </p>
+
+  <p>
+  <a name="if"></a>
+  <b>@if &lt;section-label&gt;</b>: Starts a conditional documentation section.
+  This section ends with a matching <a href="#endif"><b>@endif</b></a> command.
+  Conditional documentation is disabled by default. To enable it, you must put the
+  section label after the ENABLED_SECTIONS tag in the doxygen configuration file.
+  </p>
+
+  <p>
+  <a name="elseif"></a>
+  <b>@elseif</b>: Starts a conditional documentation section if the previous
+  section was not enabled. A conditional section is disabled by default. To enable
+  it, you must put the section-label after the ENABLED_SECTIONS tag in the
+  configuration file. Conditional blocks can be nested with proper ending commands.
+  (<b>@endif</b>, <b>@ifnot</b>, <b>@else</b>, <b>@elseif</b>).
+  </p>
+
+  <p>
+  <a name="else"></a>
+  <b>@else</b>: Starts a conditional section if the previous section was not
+  enabled. The previous should have started with an <b>@if</b>, <b>@ifnot</b>, or <b>@elseif</b>
+  command.
+  </p>
+
+  <p>
+  <a name="endif"></a>
+  <b>@endif</b>: Ends a conditional documentation statement after beginning it
+  with the <b>@if</b> or <b>@elseif</b> commands.
+  </p>
+
+  <p>
+  <a name="ifnot"></a>
+  <b>@ifnot &lt;section-label&gt;</b>: Starts a conditional documentation
+  section. This section ends with a matching <a href="#endif"><b>@endif</b></a>
+  command. This conditional statement is enabled by default. To disable it, you
+  must put the section label after the ENABLED_SECTIONS tag in the doxygen
+  configuration file.
+  </p>
+
+  <p>
+  <a name="until"></a>
+  <b>@until ( pattern )</b>: This command writes all lines of the example that
+  was last included using <b>@include</b> or <b>@dontinclude</b> to the output,
+  until it finds a line containing the specified pattern. The line containing the
+  pattern will be written as well.
+  </p>
+
+
+<div style="height:600px;"></div>
+      </body>
+
+      <type>HTML</type>
+
+      <subtitle>Useful Commands</subtitle>
+
+      <source>
+        <filename>usefulCommands.html</filename>
+      </source>
+    </file>
+
+    <file>
+      <body>
+
+
+
+
+
+<!--
+start example header file
+put on its own page
+-->
+
+<p>
+Below is an example of a well documented header file, using our standard
+commenting style. Note that in a collection of multiple tags, an
+empty line must exist between different commands. Also notice the position of
+documentation for the class and its members as the placement of these document blocks is
+important. Remember, member functions are documented where they're implemented.
+</p>
+
+<div class="code">
+  <pre>
+#ifndef Statistics_h
+#define Statistics_h
+/**
+ * @file
+ * &#036;Date&#036;
+ * &#036;Revision&#036;
+ *
+ *  Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
+ *  individual third-party library and package descriptions for intellectual property information,
+ *  user agreements, and related information.
+ *
+ *  Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
+ *  USGS as to the accuracy and functioning of such software and related material nor shall the
+ *  fact of distribution constitute any such warranty, and no responsibility is assumed by the
+ *  USGS in connection therewith.
+ *
+ *  For additional information, launch $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *  in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *  http://www.usgs.gov/privacy.html.
+ */
+
+
+#include "SpecialPixel.h"
+
+namespace Isis {
+    /**
+    * @brief This class is used to accumulate statistics on double arrays.
+    *
+    * This class is used to accumulate statistics on double arrays. In
+    * particular, it is highly useful for obtaining statistics on cube data.
+    * Parameters which can be computed are 1) @b average, 2) @b standard
+    * @b deviation, 3) @b variance, 4) @b minimum, 5) @b maximum and 6)
+    * @b various @b counts of valid and/or special pixels.
+    *
+    * The following example shows a simple set up and usage of the Statistics
+    * class to calculate the average of a set of values:
+    *
+    * @code
+    *   Statistics myStats ;
+    *   double myData [] = { 1.0, 3.0, 2.4, 7.5 } ;
+    *
+    *   myStats.AddData (myData, 4) ;
+    *   double myAverage = myStats.Average () ;
+    *   cout &lt;&lt; "The average of the data is " &lt;&lt; myAverage &lt;&lt; endl ;
+    * @endcode
+    *
+    * For an example of how the Statistics object is used in %Isis, see the
+    * Histogram object (inherits from Statistics) and the stats application,
+    * stats.cpp (uses the Statistics child class Histogram).
+    *
+    * @ingroup Statistics
+    *
+    * @author Jeff Anderson - 2002-05-06
+    *
+    * @whatsnew 2002-05-06 The current sum and squared sum of the data can be retrieved
+    *                      with the Sum and SumSquare methods.
+    *
+    * @internal
+    * @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best
+    *                                     minimum/maximum methods.
+    * @history 2004-05-11 Jeff Anderson - Moved Reset, AddData and
+    *                                     RemoveData methods into
+    *                                     public space.
+    * @history 2004-06-28 Jeff Anderson - Added Sum and SumSquare
+    *                                     methods.
+    *
+    * @todo 2005-02-07 Deborah Lee Soltesz - add example using cube
+    *                                        data to the class documentation
+    *
+    */
+  class Statistics {
+    private:
+      double p_sum;           //!&lt; Sum accumulator.
+      double p_sumsum;        //!&lt; Sum-squared accumulator.
+      double p_minimum;       //!&lt; Minimum double value encountered.
+      double p_maximum;       //!&lt; Maximum double value encountered.
+      double p_totalPixels;   //!&lt; Count of total pixels processed.
+      double p_validPixels;   //!&lt; Count of valid pixels (non-special) processed.
+      double p_nullPixels;    //!&lt; Count of null pixels processed.
+      double p_lrsPixels;     //!&lt; Count of low instrument saturation pixels processed.
+      double p_lisPixels;     //!&lt; Count of low representation saturation pixels processed.
+      double p_hrsPixels;     //!&lt; Count of high instrument saturation pixels processed.
+      double p_hisPixels;     //!&lt; Count of high instrument representation pixels processed.
+      bool   p_removedData;   /**&lt; Indicates the RemoveData method was called which implies
+                                   p_minimum and p_maximum are invalid. */
+
+    public:
+      Statistics ();
+      ~Statistics ();
+
+      void Reset ();
+      void AddData (const double *data, const unsigned int count);
+      void RemoveData (const double *data, const unsigned int count);
+
+      double Average () const;
+      double StandardDeviation () const;
+      double Variance () const;
+
+      double Minimum () const;
+      double Maximum () const;
+      double ChebyshevMinimum (const double percent=99.5) const;
+      double ChebyshevMaximum (const double percent=99.5) const;
+      double BestMinimum (const double percent=99.5) const;
+      double BestMaximum (const double percent=99.5) const;
+
+      double TotalPixels () const;
+      double ValidPixels () const;
+      double NullPixels () const;
+      double LisPixels () const;
+      double LrsPixels () const;
+      double HisPixels () const;
+      double HrsPixels () const;
+
+
+      /**
+       * Returns the sum of all the data
+       *
+       * @return (double) Sum of the data
+       */
+      double Sum() const { return p_sum; };
+
+      /**
+       * Returns the sum of all the squared data
+       *
+       * @return (double) Sum of the squared data
+       */
+      double SumSquare () const { return p_sumsum; };
+  };
+} // end namespace isis
+  </pre>
+</div>
+
+<p>
+<a href="assets/Statistics.h">Download the Statistics header code example</a>
+</p>
+
+<p>
+<a href="../../Object/Developer/class_isis_1_1_statistics.html">
+  View the corresponding HTML documentation that is generated by doxygen</a>
+</p>
+<!-- end example -->
+
+<div style="height:600px;"></div>
+      </body>
+
+      <type>HTML</type>
+
+      <subtitle>Example Header</subtitle>
+
+      <source>
+        <filename>exampleHeader.html</filename>
+      </source>
+    </file>
+
+    <file>
+      <body>
+
+
+<!--
+start example implementation file
+put on its own page
+-->
+
+<p>
+Below is an example of a perfectly commented implementation file, using our standard
+documentation style. Note that in a collection of multiple tags, an
+empty line must exist between different commands. Also notice the position of
+documentation for each method as the placement of these document blocks is
+important.
+</p>
+
+<div class="code">
+  <pre>
+/**
+ * @file
+ * &#036;Date&#036;
+ * &#036;Revision&#036;
+ *
+ *  Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
+ *  individual third-party library and package descriptions for intellectual property information,
+ *  user agreements, and related information.
+ *
+ *  Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
+ *  USGS as to the accuracy and functioning of such software and related material nor shall the
+ *  fact of distribution constitute any such warranty, and no responsibility is assumed by the
+ *  USGS in connection therewith.
+ *
+ *  For additional information, launch $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *  in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *  http://www.usgs.gov/privacy.html.
+ */
+
+#include &lt;float.h&gt;
+#include &lt;string&gt;
+#include "Statistics.h"
+#include "iException.h"
+
+using namespace std;
+namespace Isis {
+  //! Constructs an IsisStats object with accumulators and counters set to zero.
+  Statistics::Statistics () {
+    Reset ();
+  }
+
+  //! Reset all accumulators and counters to zero.
+  void Statistics::Reset() {
+    p_sum = 0.0;
+    p_sumsum = 0.0;
+    p_minimum = DBL_MAX;
+    p_maximum = -DBL_MAX;
+    p_totalPixels = 0.0;
+    p_validPixels = 0.0;
+    p_nullPixels = 0.0;
+    p_lisPixels = 0.0;
+    p_lrsPixels = 0.0;
+    p_hrsPixels = 0.0;
+    p_hisPixels = 0.0;
+    p_removedData = false;
+}
+
+  //! Destroys the IsisStats object.
+  Statistics::~Statistics () {};
+
+  /**
+   * Add an array of doubles to the accumulators and counters.
+   * This method can be invoked multiple times (for example: once
+   * for each line in a cube) before obtaining statistics.
+   *
+   * @param[in] data  (const double*)      data to be added to the data
+   *                                       set used for statistical calculations
+   *
+   * @param[in] count (const unsigned int) number of elements in the incoming
+   *                                       data to be added
+   */
+  void Statistics::AddData (const double *data, const unsigned int count) {
+    for (unsigned int i=0; i&lt;count; i++) {
+      p_totalPixels++;
+
+      if (Isis::IsValidPixel(data[i])) {
+        p_sum += data[i];
+        p_sumsum += data[i] * data[i];
+        if (data[i] &lt; p_minimum) p_minimum = data[i];
+        if (data[i] &gt; p_maximum) p_maximum = data[i];
+        p_validPixels++;
+      } else if (Isis::IsNullPixel(data[i])) {
+        p_nullPixels++;
+      } else if (Isis::IsHisPixel(data[i])) {
+        p_hisPixels++;
+      } else if (Isis::IsHrsPixel(data[i])) {
+        p_hrsPixels++;
+      } else if (Isis::IsLisPixel(data[i])) {
+        p_lisPixels++;
+      } else {
+        p_lrsPixels++;
+      }
+    }
+  }
+
+  /**
+   * Remove an array of doubles from the accumulators and counters.
+   * Note that is invalidates the absolute minimum and maximum. They
+   * will no longer be usable.
+   *
+   * @param[in]  data  (const double*)      data to be removed from data
+   *                                       set used for statistical calculations
+   *
+   * @param[in]  count (const unsigned int) number of elements in the data to be removed
+   *
+   * @throws Isis::iException::Message
+   */
+  void Statistics::RemoveData (const double *data, const unsigned int count) {
+    p_removedData = true;
+
+    for (unsigned int i=0; i&lt;count; i++) {
+      p_totalPixels--;
+
+      if (Isis::IsValidPixel(data[i])) {
+        p_sum -= data[i];
+        p_sumsum -= data[i] * data[i];
+        p_validPixels--;
+      } else if (Isis::IsNullPixel(data[i])) {
+        p_nullPixels--;
+      } else if (Isis::IsHisPixel(data[i])) {
+        p_hisPixels--;
+      } else if (Isis::IsHrsPixel(data[i])) {
+        p_hrsPixels--;
+      } else if (Isis::IsLisPixel(data[i])) {
+        p_lisPixels--;
+      } else {
+        p_lrsPixels--;
+      }
+    }
+
+    if (p_totalPixels &lt; 0) {
+      string m="You are removing non-existant data in [Statistics::RemoveData]";
+      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    }
+  }
+
+  /**
+   * Computes and returns the average.
+   * If there are no valid pixels, then NULL8 is returned.
+   *
+   * @return (double) average
+   */
+  double Statistics::Average () const {
+    if (p_validPixels &lt; 1.0) return Isis::NULL8;
+    return p_sum / p_validPixels;
+  }
+
+  /**
+   * Computes and returns the standard deviation.
+   * If there are no valid pixels, then NULL8 is returned.
+   *
+   * @return (double) standard deviation
+   */
+  double Statistics::StandardDeviation () const {
+    if (p_validPixels &lt;= 1.0) return Isis::NULL8;
+    return sqrt(Variance());
+  }
+
+  /**
+   * Computes and returns the variance.
+   * If there are no valid pixels, then NULL8 is returned.
+   *
+   * @return (double) variance
+   *
+   * @internal
+   * @history 2003-08-27 Jeff Anderson - Modified Variance method to compute
+   *                                     using n*(n-1) instead of n*n.
+   */
+  double Statistics::Variance () const {
+    if (p_validPixels &lt;= 1.0) return Isis::NULL8;
+    double temp = p_validPixels * p_sumsum - p_sum * p_sum;
+    if (temp &lt; 0.0) temp = 0.0; // This should happen unless roundoff occurs
+    return temp / ((p_validPixels - 1.0) * p_validPixels);
+  }
+
+  /**
+   * Returns the absolute minimum double found in all data passed through the
+   * AddData method. If there are no valid pixels, then NULL8 is returned.
+   *
+   * @return (double) current minimum value in data set
+   *
+   * @throws Isis::iException::Message
+   */
+  double Statistics::Minimum () const {
+    if (p_removedData) {
+      string m = "Minimum is invalid since you removed data";
+      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    }
+
+    if (p_validPixels &lt; 1.0) return Isis::NULL8;
+    return p_minimum;
+  }
+
+  /**
+   * Returns the absolute maximum double found in all
+   * data passed through the AddData method. If there
+   * are no valid pixels, then NULL8 is returned.
+   *
+   * @return (double) current maximum value in data set
+   *
+   * @throws Isis::iException::Message
+   */
+  double Statistics::Maximum () const {
+    if (p_removedData) {
+      string m = "Maximum is invalid since you removed data";
+      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    }
+
+    if (p_validPixels &lt; 1.0) return Isis::NULL8;
+    return p_maximum;
+  }
+
+  /**
+   * Returns the total number of pixels processed
+   * (valid and invalid).
+   *
+   * @return (double) number of pixels (data) processed
+   */
+  double Statistics::TotalPixels () const {
+    return p_totalPixels;
+  }
+
+  /**
+   * Returns the total number of valid pixels processed.
+   * Only valid pixels are utilized when computing the
+   * average, standard deviation, variance, minimum and
+   * maximum.
+   *
+   * @return (double) number of valid pixels (data) processed
+   */
+  double Statistics::ValidPixels () const {
+    return p_validPixels;
+  }
+
+  /**
+   * Returns the total number of NULL pixels encountered.
+   *
+   * @return (double) number of NULL pixels (data) processed
+   */
+  double Statistics::NullPixels () const {
+    return p_nullPixels;
+  }
+
+  /**
+   * Returns the total number of low instrument
+   * saturation (LIS) pixels encountered.
+   *
+   * @return (double) number of LIS pixels (data) processed
+   */
+  double Statistics::LisPixels () const {
+    return p_lisPixels;
+  }
+
+  /**
+   * Returns the total number of low representation
+   * saturation (LRS) pixels encountered.
+   *
+   * @return (double) number of LRS pixels (data) processed
+   */
+  double Statistics::LrsPixels () const {
+    return p_lrsPixels;
+  }
+
+  /**
+   * Returns the total number of high instrument
+   * saturation (HIS) pixels encountered.
+   *
+   * @return (double) number of HIS pixels (data) processed
+   */
+  double Statistics::HisPixels () const {
+    return p_hisPixels;
+  }
+
+  /**
+   * Returns the total number of high representation
+   * saturation (HRS) pixels encountered.
+   *
+   * @return (double) number of HRS pixels (data) processed
+   */
+  double Statistics::HrsPixels () const {
+    return p_hrsPixels;
+  }
+
+  /**
+   * This method returns a minimum such that X percent
+   * of the data will fall with K standard deviations
+   * of the average (Chebyshev's Theorem). It can be
+   * used to obtain a minimum that does not include
+   * statistical outliers.
+   *
+   * @param[in]  percent (double) The probability that the minimum
+   *                is within K standard deviations of the mean.
+   *                Default value = 99.5.
+   *
+   * @return minimum value excluding statistical outliers
+   *
+   * @throws Isis::iException::Message
+   */
+  double Statistics::ChebyshevMinimum (const double percent) const {
+    if ((percent &lt;= 0.0) || (percent &gt;= 100.0)) {
+      string m = "Invalid value for percent";
+      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    }
+
+    if (p_validPixels &lt; 1.0) return Isis::NULL8;
+    double k = sqrt (1.0 / (1.0 - percent / 100.0));
+    return Average() - k * StandardDeviation();
+  }
+
+  /**
+   * This method returns a maximum such that
+   * X percent of the data will fall with K
+   * standard deviations of the average (Chebyshev's
+   * Theorem). It can be used to obtain a minimum that
+   * does not include statistical outliers.
+   *
+   * @param[in]  percent (double) The probability that the maximum
+   *                is within K standard deviations of the mean.
+   *                Default value = 99.5.
+   *
+   * @return maximum value excluding statistical outliers
+   *
+   * @throws Isis::iException::Message
+   */
+  double Statistics::ChebyshevMaximum (const double percent) const {
+    if ((percent &lt;= 0.0) || (percent &gt;= 100.0)) {
+      string m = "Invalid value for percent";
+      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    }
+
+    if (p_validPixels &lt; 1.0) return Isis::NULL8;
+    double k = sqrt (1.0 / (1.0 - percent / 100.0));
+    return Average() + k * StandardDeviation();
+  }
+
+  /**
+   * This method returns the better of the absolute
+   * minimum or the Chebyshev minimum. The better
+   * value is considered the value closest to the mean.
+   *
+   * @param[in]  percent (double) The probability that the minimum is within K
+   *                standard deviations of the mean (Used to compute
+   *                the Chebyshev minimum). Default value = 99.5.
+   *
+   * @return (double) Best of absolute and Chebyshev minimums
+   *
+   * @see Statistics::Minimum
+   *      Statistics::ChebyshevMinimum
+   */
+  double Statistics::BestMinimum (const double percent) const {
+    if (p_validPixels &lt; 1.0) return Isis::NULL8;
+    double min = ChebyshevMinimum (percent);
+    if (Minimum() &gt; min) min = Minimum();
+    return min;
+  }
+
+  /**
+   *
+   * This method returns the better of the absolute
+   * maximum or the Chebyshev maximum. The better value
+   * is considered the value closest to the mean.
+   *
+   * @param[in]  percent (double) The probability that the maximum is within K
+   *                standard deviations of the mean (Used to compute
+   *                the Chebyshev maximum). Default value = 99.5.
+   *
+   * @return (double) Best of absolute and Chebyshev maximums
+   *
+   * @see Statistics::Maximum
+   *      Statistics::ChebyshevMaximum
+   */
+  double Statistics::BestMaximum (const double percent) const {
+    if (p_validPixels &lt; 1.0) return Isis::NULL8;
+    double max = ChebyshevMaximum (percent);
+    if (Maximum() &lt; max) max = Maximum();
+    return max;
+  }
+
+} // end namespace isis
+  </pre>
+</div>
+
+<p>
+<a href="assets/Statistics.cpp">Download the Statistics implementation code example</a>
+</p>
+
+<p>
+<a href="../../Object/Developer/class_isis_1_1_statistics.html">
+  View the corresponding HTML documentation that is generated by doxygen</a>
+</p>
+<!-- end example -->
+
+<div style="height:600px;"></div>
+      </body>
+
+      <type>HTML</type>
+
+      <subtitle>Example Implementation</subtitle>
+
+      <source>
+        <filename>exampleImplementation.html</filename>
+      </source>
+    </file>
+
+    <file>
+      <body>
+        <h2>Rules of Thumb</h2>
+
+        <ul>
+          <li>All tags must have an ending tag, even if it is not normally required.
+              Eg. Text in a bullet, <tt style="font-weight:bold;">&lt;li&gt;</tt>,
+              must end with an ending bullet tag, <tt style="font-weight:bold;">&lt;/li&gt;</tt>
+          </li>
+          <li>Empty tags (meaning tags that do  not contain text and normally do not
+              have an ending tag) such as <tt style="font-weight:bold;">img</tt>
+              must have a slash before the ending angle bracket of the tag. Eg.
+              <tt style="font-weight:bold;">&lt;img src="bob.gif" width="150" height="75" alt="Bob"/&gt;</tt>
+          </li>
+          <li>Attribute (name-value pairs inside an HTML tag) values must be quoted. Eg.
+              <tt style="font-weight:bold;">&lt;table width="600"&gt;</tt>
+          </li>
+          <li>Only use <tt style="font-weight:bold;">body</tt> level tags (tags allowed
+              in the body of an HTML document).
+          </li>
+          <li>Do not use document structure elements, such as headings
+              (<tt style="font-weight:bold;">h1</tt>, <tt style="font-weight:bold;">h2</tt>, etc.)
+              and <tt style="font-weight:bold;">hr</tt>. Such elements are intended to structure the
+              document, not serve as pretty formatting. Your documentation is transformed into HTML
+              which already contains document structure elements.
+          </li>
+          <li>Use lower case for tag tag and attribute names.
+            <tt style="font-weight:bold;background-color: #FFC;">&lt;img src="bob.gif" width="150" height="75" alt="Bob"/&gt;</tt>
+            not
+            <tt style="font-weight:bold;">&lt;IMG SRC="bob.gif" WIDTH="150" HEIGHT="75" ALT="Bob"/&gt;</tt>
+          </li>
+          <li>Avoid elements deprecated in HTML 4.01 and higher. Favorites include
+              <tt style="font-weight:bold;">U</tt>, <tt style="font-weight:bold;">CENTER</tt>,
+              and <tt style="font-weight:bold;">FONT</tt>.
+          </li>
+        </ul>
+
+        <p>
+        These rules are not a matter of taste, style, or preference... they're a matter of
+        conformance to standards.
+        </p>
+
+
+        <h2>Reference</h2>
+
+        <h3>HTML Tags</h3>
+        <div style="text-align: center;">
+        <table class="cheatSheet">
+          <tr>
+            <th>
+            b
+            </th>
+
+            <td>
+            Bold.
+            Renders current font as boldface.
+            </td>
+
+            <td>
+            &lt;b&gt;This is bolded&lt;/b&gt; appears as
+            <b>This is bolded</b>
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            i
+            </th>
+
+            <td>
+            Italic. Renders current font in italics.
+            </td>
+
+            <td>
+            &lt;i&gt;This is italicized&lt;/i&gt; appears as
+            <i>This is italicized</i>
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            em
+            </th>
+
+            <td>
+            Phrase element meaning "emphasis". Generally rendered by browsers in italics.
+            </td>
+
+            <td>
+            &lt;em&gt;This is emphasized&lt;/em&gt; appears as
+            <em>This is emphasized</em>
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            strong
+            </th>
+
+            <td>
+            Phrase element meaning "strong emphasis". Generally rendered by browsers in boldface.
+            </td>
+
+            <td>
+            &lt;strong&gt;This is strongly emphasized&lt;/strong&gt; appears as
+            <strong>This is strongly emphasized</strong>
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            sup
+            </th>
+
+            <td>
+            Superscript
+            </td>
+
+            <td>
+            Bob&lt;sup&gt;1&lt;/sup&gt; appears as
+            Bob<sup>1</sup>
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            sub
+            </th>
+
+            <td>
+            Subscript
+            </td>
+
+            <td>
+            Bob&lt;sub&gt;1&lt;/sub&gt; appears as
+            Bob<sub>1</sub>
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            tt
+            </th>
+
+            <td>
+            Teletype font.
+            Rendered in browser's default fixed-width font.
+            </td>
+
+            <td>
+            &lt;tt&gt;This is teletype&lt;/tt&gt; appears as
+            <tt>This is teletype</tt>
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            pre
+            </th>
+
+            <td>
+            Preformatted text.
+            Generally rendered in browser's default fixed-width font, with whitespace intact, and automatic word wrap disabled.
+            Generally browsers render all whitespace within this tag, and add padding before and after the tagged text.
+            This is not a quick and dirty alternative to tables! Use if for code snippets, data file snippets, etc.
+            </td>
+
+            <td>
+            <pre>
+            &lt;pre&gt;
+              This is preformatted text.
+              53.6    82.1    536.3
+               8.53  137.6     66.3
+            &lt;/pre&gt;
+            </pre>
+
+            appears as
+
+            <pre>
+              This is preformatted text.
+              53.6    82.1    536.3
+               8.53  137.6     66.3
+            </pre>
+
+            <p>
+            Whereas without the PRE tag, you'd get this:
+            </p>
+
+            <p>
+              This is preformatted text.
+              53.6    82.1    536.3
+               8.53  137.6     66.3
+            </p>
+            </td>
+          </tr>
+
+
+          <tr>
+            <th>
+            table
+            </th>
+
+            <td>
+            Table start/end
+            </td>
+
+            <td>
+
+            <p>
+            Contains "tr" and "caption" tags. See more table tags below.
+            Eg.
+            </p>
+
+            <pre>
+            &lt;table&gt;
+              &lt;caption&gt;My table caption&lt;/caption&gt;
+              &lt;tr&gt;
+                &lt;th&gt;
+                Row 1, Column 1 Header
+                &lt;/th&gt;
+                &lt;th&gt;
+                Row 1, Column 2 Header
+                &lt;/th&gt;
+                &lt;th&gt;
+                Row 1, Column 3 Header
+                &lt;/th&gt;
+              &lt;/tr&gt;
+
+              &lt;tr&gt;
+                &lt;td&gt;
+                Row 2, Column 1
+                &lt;/td&gt;
+                &lt;td&gt;
+                Row 2, Column 2
+                &lt;/td&gt;
+                &lt;td&gt;
+                Row 2, Column 3
+                &lt;/td&gt;
+              &lt;/tr&gt;
+
+              &lt;tr&gt;
+                &lt;td&gt;
+                Row 3, Column 1
+                &lt;/td&gt;
+                &lt;td&gt;
+                Row 3, Column 2
+                &lt;/td&gt;
+                &lt;td&gt;
+                Row 4, Column 3
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+            </pre>
+
+            <p>
+            Looks like:
+            </p>
+
+            <table>
+              <caption>My table caption</caption>
+              <tr>
+                <th>
+                Row 1, Column 1 Header
+                </th>
+                <th>
+                Row 1, Column 2 Header
+                </th>
+                <th>
+                Row 1, Column 3 Header
+                </th>
+              </tr>
+
+              <tr>
+                <td>
+                Row 2, Column 1
+                </td>
+                <td>
+                Row 2, Column 2
+                </td>
+                <td>
+                Row 2, Column 3
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                Row 3, Column 1
+                </td>
+                <td>
+                Row 3, Column 2
+                </td>
+                <td>
+                Row 4, Column 3
+                </td>
+              </tr>
+            </table>
+
+
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            caption
+            </th>
+
+            <td>
+            Adds a caption to this table
+            </td>
+
+            <td>
+
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            tr
+            </th>
+
+            <td>
+            Table row start/end
+            </td>
+
+            <td>
+            Contains TH and TD tags
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            th
+            </th>
+
+            <td>
+            Table row or column header cell
+            </td>
+
+            <td>
+            Usually rendered with highlighting, bolding, or other special formatting to make the cell stand out.
+            Some accessibility readers will audibly repeat the contents of the TH before each cell in the column/row.
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            td
+            </th>
+
+            <td>
+            Table cell
+            </td>
+
+            <td>
+            Stardard table cell in a row
+            </td>
+          </tr>
+        </table>
+        </div>
+
+        <h3>Special Characters</h3>
+
+        <p>
+        Some keyboard characters are reserved for special use.
+        Some characters you may wish to use are not accessible from
+        the keyboard. Use the special character sequences below.
+        </p>
+
+        <div style="text-align:center;">
+        <table class="cheatSheet">
+          <tr>
+            <th>
+            &amp;
+            </th>
+
+            <td>
+            &amp;amp;
+            </td>
+
+            <td>
+            Ampersand
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &lt;
+            </th>
+
+            <td>
+            &amp;lt;
+            </td>
+
+            <td>
+            Less than
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &#8804;
+            </th>
+
+            <td>
+            &amp;le;
+            </td>
+
+            <td>
+            Less than or equal
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &gt;
+            </th>
+
+            <td>
+            &amp;gt;
+            </td>
+
+            <td>
+            Greater than
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &#8805;
+            </th>
+
+            <td>
+            &amp;ge;
+            </td>
+
+            <td>
+            Greater than or equal
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &#176;
+            </th>
+
+            <td>
+            &amp;deg;
+            </td>
+
+            <td>
+            Degree
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &#177;
+            </th>
+
+            <td>
+            &amp;plusmn;
+            </td>
+
+            <td>
+            Plus or minus
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &#247;
+            </th>
+
+            <td>
+            &amp;divide;
+            </td>
+
+            <td>
+            Division symbol
+            </td>
+          </tr>
+
+          <tr>
+            <th>
+            &#215;
+            </th>
+
+            <td>
+            &amp;times;
+            </td>
+
+            <td>
+            Multiplication symbol
+            </td>
+          </tr>
+        </table>
+        </div>
+<div style="height:600px;"></div>
+      </body>
+
+      <type>HTML</type>
+
+      <subtitle>HTML Quick Reference</subtitle>
+      <source>
+        <filename>HTMLQuickRef.html</filename>
+      </source>
+    </file>
+
+  </files>
+
+</documentation>
+

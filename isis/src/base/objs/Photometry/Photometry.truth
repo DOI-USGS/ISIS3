@@ -1,0 +1,13 @@
+UNIT TEST for Isis::Photometry
+
+Testing creation of photometry object ...
+Testing photometry method without dem ...
+Photometric brightness value = 0.111872
+
+Photometric brightness value = 0.11142
+
+Testing photometry method with dem ...
+Photometric brightness value = 0.0531455
+
+Photometric brightness value = 0.0524591
+

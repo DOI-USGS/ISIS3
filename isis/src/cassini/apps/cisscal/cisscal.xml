@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cisscal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Radiometric correction of  Cassini ISS camera images. 
+  </brief>
+
+  <description>
+    <p>
+      This program performs radiometric corrections on images acquired by the 
+      Cassisi Imaging Science Subsystem (ISS) camera.  It performs bitweight 
+      correction, bias subtraction, dark subtraction, non-linearity correction, 
+      flat field correction, DN to flux conversion, and correction factor 
+      division.  The user may choose between intensity units and I/F for the DN 
+      to flux conversion.  This application is derived from the IDL CISSCAL 
+      application developed by the Cassini Imaging Central Laboratory for 
+      Operations (CICLPOS) using the following set of steps:
+    </p>
+    <p>
+      <strong>
+        Step 1: Correct Bitweight
+      </strong>
+       This step is performed on images that do not have a data  conversion 
+       type  of "Table" or compression type of "Lossy" due to loss of  
+       information in  these processses.  This step is also skipped if the image
+       has a zero gain state due to the lack of data for this case.  Bitweight 
+       correction requires no user defined parameters.  It uses a bitweight file 
+       found in the Cassini calibration bitweight directory.
+    </p>
+    <p>
+      <strong>
+        Step 2: Subtract Bias 
+      </strong> 
+      This step defaults to a method that uses a line dependent bias. That 
+      method derives the bias by performing a linear fit to an array of
+      overclocked pixels taken out of the binary prefix data and saved off by 
+      the <strong>ciss2isis</strong> application. This method cannot be 
+      performed if the image has a compression type of "Lossy".  In that case, 
+      the BiasStripMean value found in the Instrument Group of the cube's labels 
+      is subtracted from every pixel. This alternative method cannot be 
+      implemented if the instrument used was CAS-ISS3  or earlier since, 
+      according to the SIS, the BiasStripMean keyword contains invalid data for 
+      these images.  Bias subtraction requires no user defined parameters.
+    </p>
+    <p>
+      <strong>
+        Step 3: Subtract Dark
+      </strong> 
+      This step uses a spline interpolation to construct a  dark image by
+      calculating, for each pixel, a duration to be used with the coefficients
+      found in the dark parmeter file.  Dark current removal requires no user
+      defined parameters and should be performed on all images. It uses a dark
+      parameter file and if a narrow angle camera was used, a bias distortion
+      table. These are found in the Cassini calibration darkcurrent directory.
+    </p>
+    <p>
+      <strong>
+        Step 4: Linearize
+      </strong> 
+      This step corrects for non-linearity.  It requires no user defined
+      parameters and should be performed on all images.   It uses a linearity
+      correction table found in the Cassini calibration linearize directory.
+    </p>
+    <p>
+      <strong>
+        Step 5: Correct Flat field 
+      </strong> 
+      This step consists of two parts: dust ring removal  and division by flat
+      field.  <strong>Dust ring removal</strong>  only applies to images from
+      narrow angle cameras.  This process masks a dust ring found on images and,
+      if the image has SummingMode equal to 1 (i.e. it is a full, 1024x1024
+      image) and is recent (after 286th day of 2003), divides out a mottle map.
+      <strong> Flat field correction </strong> is applied to all images. During
+      this process, each pixel is divided by the average of the center of the 
+      image.  For SummingMode 2 or 4, the results from this method diverge from 
+      the IDL results due to differences in the bilinear method used to expand 
+      the flat file image.  Flat field correction requires no user defined 
+      parameters. If narrow angle, it uses a dust ring file found in the Cassini 
+      calibration dustring directory.  If narrow and full, it also uses a mottle 
+      file and an effective wavelength file found in dustring and efficiency 
+      directories. And, for any image a slope database and a flat file are used, 
+      found in slope and slope/slope2flat directories.  
+    </p>
+    <p>
+      <strong>
+        Step 6: Convert DN to Flux
+      </strong> 
+      This step consists of 4 processes and the user must enter a value of 
+      "intensity" or "I/F" for the parameter "fluxunits".  In the first process, 
+      DNs are <strong>converted to electrons</strong> by multiplying by the true
+      gain.  Second, the image is <strong>divided by the exposure time</strong>, 
+      correcting for shutter offset effect. Third, the image is                                                          
+      <strong>divided by the optics area</strong> and, if intensity units are 
+      chosen, <strong>divided by the solid angle</strong>.  In the last process,           
+      each pixel is <strong>divided by an efficiency factor</strong>. This value 
+      is dependent on the flux units chosen by the user: intensity units 
+      (photons/cm<sup>2</sup>/s/nm/ster) or I/F (irradiance over solar flux).  
+      If "I/F" is chosen, the input cube must have been run through the Isis3 
+      application <strong>spiceinit</strong> to be able to calculate Solar 
+      Distance.  The results from this method diverge from the IDL results due 
+      to differences in the way they calculate solar distance. However, the DN 
+      results are still within 0.2% after we divide by the efficiency factor. DN 
+      to Flux conversion should be performed on all images. Converting DN to 
+      flux units requires a shutter offset file, a spectral file (if I/F is 
+      chosen), a transmission file, and a quantum efficiency correction file 
+      found in the Cassini calibration offset, efficiency, efficiency/systrans 
+      and correction directories.
+    </p>
+    <p>
+      <strong>
+        Step 7: Divide by Correction Factor
+      </strong> 
+      This step is implemented in order to force theory and observation to match.
+      It consists of 2 processes.  First, if polarized, (i.e. a filter value of 
+      IRP0, IRP90, P0, P60, or P120) the image is divided by a polarization
+      factor.  Next, the image is divided by its correction factor.  This step 
+      requires no user defined parameters. It uses a polarization factor file 
+      and a correction factor file found in the Cassini calibration correction 
+      directory.
+    </p> 
+    <p>
+    <strong>
+      Omitted IDL Steps: 
+    </strong> 
+      In the original IDL program, there were 2 steps that were omitted in this 
+      application since they act as noise removal that can be filtered using
+      other applications after calibration is complete. 
+      
+      The first omitted step is <strong>2-Hz noise removal</strong>.  This is meant to
+      remove horizontal banding patterns introduced during image readout of
+      Cassini ISS images and has two peaks in the power spectrum near 2Hz. There
+      are two methods to this correction. The first method invovles the
+      smoothing and filtering of the overclocked pixel array, thus removing high
+      frequency random noise, slow-varying, and DC-offset components. The second
+      method requires large regions of dark sky pixels present for all lines and
+      uses an image mean to construct a 2-Hz signal.
+      
+      The second omited step is <strong>A-B pixel pairs correction</strong> 
+      (also referred to as anti-blooming correction or bright/dark pixel pair 
+      removal). In the IDL program, this correction is only performed if the 
+      labels of the image indicate that the AntiBloomingStateFlag is "On" and 
+      the InstrumentModeId is "Full" (i.e., SummingMode is 1). In this 
+      correction, bright/dark pixel pairs are identified and replaced with a 
+      boxcar average of their horizontal neighbors. 
+    </p>
+
+  </description>
+
+  <history>
+    <change name="Jeannie Walldren" date="2008-11-05">
+      Original version
+    </change>
+    <change name="Jeannie Walldren" date="2008-11-12">
+      Fixed documentation.
+    </change>
+    <change name="Jeannie Walldren" date="2008-12-22">
+      Fixed bug in bitweight correction.  Updated documentation.
+    </change>
+    <change name="Jeannie Walldren" date="2009-01-09">
+      Updated user documentation "Related Objects and Documents" section 
+      document web links.
+    </change>
+    <change name="Jeannie Walldren" date="2009-01-12">
+      Fixed documentation.
+    </change>
+    <change name="Jeannie Walldren" date="2009-01-26">
+      Fixed bug that caused errors on other compilers.
+    </change>
+    <change name="Jeannie Walldren" date="2009-02-12">
+      Modified the "I/F" option to make 2 attempts to locate the the target 
+      before throwing an exception.  First, the Isis::Camera class is used to 
+      look for the target at the center point of the cube.  If this fails, the 
+      subspacecraft point is used to find the target.  Only if both fail will 
+      the application throw an error.
+    </change>
+    <change name="Jeannie Walldren" date="2009-05-27">
+      Modified cisscal and its DarkCurrent class to reflect updates to the new 
+      idl cisscal program version, 3.6.  Updated documentation and app test to 
+      reflect these changes.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Cassini</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>
+        ciss2isis
+      </item>
+      <item>
+        spiceinit
+      </item>
+    </applications>
+    <documents>
+      <document>
+        <title>
+            Cassini ISS Software Interface Specification (SIS)
+        </title>
+        <source>
+          <filename>edrsis.pdf</filename>
+          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/</path>
+        </source>
+        <author>Charles Avis and Carolyn Porco</author>
+        <publisher>Cassini Electronic Library</publisher>
+      </document>
+      <document>
+        <title>
+            CISSCAL User Guide
+        </title>
+        <source>
+          <filename>cisscal_manual.pdf</filename>
+          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/</path>
+        </source>
+        <publisher>Planetary Data System Rings Node</publisher>
+      </document>
+      <document>
+        <title>
+            Cassini ISS Image Calibration: Theoretical Basis
+        </title>
+        <source>
+          <filename>theoretical_basis.pdf</filename>
+          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/</path>
+        </source>
+        <author>R. West</author>
+        <publisher>Planetary Data System Rings Node</publisher>
+      </document>
+      <document>
+        <title>
+            Cassini ISS Calibration Report
+        </title>
+        <source>
+          <filename></filename>
+          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/report/</path>
+        </source>
+        <author>Cassini ISS Development Team</author>
+        <publisher>Planetary Data System Rings Node</publisher>
+      </document>
+      <document>
+        <title>
+          Cassini ISS Calibration Report: 7.0 Radiometric Calibration Steps 
+        </title>
+        <source>
+          <filename> </filename>
+          <path>http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v2/document/report/iss/7.0/7.0.html</path>
+        </source>
+        <author>Alfred McEwen and James Winburn</author>
+        <publisher>Planetary Data System Rings Node</publisher>
+      </document>
+    </documents>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Isis cube
+        </brief>
+        <description>
+          Use this parameter to choose an Isis cube to be calibrated.  To ensure 
+          that it contains all needed keywords in its label, input cube should 
+          have been imported using <strong>ciss2isis</strong> and, if "I/F" is chosen, input cube 
+          must have been run through <strong>spiceinit</strong> application.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+           Output Isis cube
+        </brief>
+        <description>
+           Use this parameter to select the output filename of the calibrated 
+           Isis cube.
+        </description>
+        <filter>
+           *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name = "Input Values">
+      <parameter name = "FLUXUNITS">
+        <type>string</type>
+        <brief>Options for converted flux units</brief>
+        <description>
+          A list of the types of units to which user may choose to convert from
+          DNs. 
+        </description>
+        <default><item>INTENSITY</item></default>
+        <list>
+          <option value="INTENSITY">
+            <brief>Intensity units </brief>
+            <description> 
+              This option indicates that the user prefers to convert DNs to 
+              standard intensity units (photons/cm^2/s/nm/ster).
+            </description>
+          </option>
+          <option value="I/F">
+            <brief>Irradiance/SolarFlux </brief>
+            <description> 
+              This option indicates that the user prefers to normalize intensity
+              in terms of solar flux (I/F).  Input cube must have been run 
+              through <strong>spiceinit</strong> application.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief>Cube calibrated using intensity units.</brief>
+      <description>
+        This example shows how to calibrate a Cassini ISS cube, converting to 
+        intensity units.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          from=../IN/inputCube.cub to=../OUT/outputCube.cub 
+        </commandLine>
+        <description> 
+          Run the <strong>cisscal</strong> application to calibrate the cube.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="496" height="550" src="assets/images/cisscalGuiEx1.jpg">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform the <strong>cisscal</strong>
+              application.  Input and output cubes are always required. The
+              radio button INTENSITY is chosen as default.
+            </description>
+            <thumbnail width="180" height="200" caption="Cisscal Gui using intensity" src="assets/thumbs/cisscalGuiThumbEx1.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/dataFiles/cisscalStatsEx1.pvl">
+          <brief>
+            Stats on output cube
+          </brief>
+          <description>
+            This pvl file contains the results of the <strong> stats</strong> application run on 
+            the example 1 output cube.  This may be compared with the pvl file 
+            of the same application run on the example 2 output cube.
+          </description>
+          <parameterName>
+            FLUXUNITS
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image width="479" height="550" src="assets/images/cisscalInput.jpg">
+          <brief>
+            Input image
+          </brief>
+          <description>
+            This is a Titan narrow-angle image that was imported into Isis cube 
+            format using <strong>ciss2isis</strong>.
+          </description>
+          <thumbnail width="174" height="200" src="assets/thumbs/cisscalInputThumb.jpg" caption="Input cube"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image width="479" height="550" src="assets/images/cisscalOutputEx1.jpg">
+          <brief>
+            Output image
+        </brief>
+        <description>
+          This is the Titan narrow-angle image calibrated and converted to 
+          intensity units.
+        </description>
+        <thumbnail width="174" height="200" src="assets/thumbs/cisscalOutputThumbEx1.jpg" caption="Output cube calibrated with intensity units"/>
+        <parameterName>
+          TO
+        </parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Cube calibrated using I/F.</brief>
+      <description>
+        This example shows how to calibrate a Cassini ISS cube, converting to 
+        I/F.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          from=../IN/inputCube.cub to=../OUT/outputCube.cub fluxunits="I/F"
+        </commandLine>
+        <description> 
+          Run the <strong>cisscal</strong> application to calibrate the cube.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="496" height="550" src="assets/images/cisscalGuiEx2.jpg">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform the <strong>cisscal</strong>
+              application.  Input and output cubes are always required. The
+              radio button I/F is chosen.
+            </description>
+            <thumbnail width="180" height="200" caption="Cisscal Gui using I/F" src="assets/thumbs/cisscalGuiThumbEx2.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/dataFiles/cisscalStatsEx2.pvl">
+          <brief>
+            Stats on output cube
+          </brief>
+          <description>
+            This pvl file contains the results of the <strong> stats</strong> application run on 
+            the example 2 output cube.  This may be compared with the pvl file 
+            of the same application run on the example 1 output cube.
+          </description>
+          <parameterName>
+            FLUXUNITS
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image width="479" height="550" src="assets/images/cisscalInput.jpg">
+          <brief>
+            Input image
+          </brief>
+          <description>
+            This is a Titan narrow-angle image that was imported into Isis cube 
+            format using <strong>ciss2isis</strong> and run through <strong>spiceinit</strong>.
+          </description>
+          <thumbnail width="174" height="200" src="assets/thumbs/cisscalInputThumb.jpg" caption="Input cube"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image width="479" height="550" src="assets/images/cisscalOutputEx2.jpg">
+          <brief>
+            Output image
+          </brief>
+          <description>
+            This is the Titan narrow-angle image calibrated and converted to 
+            I/F.
+          </description>
+          <thumbnail width="174" height="200" src="assets/thumbs/cisscalOutputThumbEx2.jpg" caption="Output cube calibrated with I/F"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

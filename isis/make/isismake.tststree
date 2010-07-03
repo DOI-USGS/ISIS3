@@ -1,0 +1,89 @@
+include $(ISISROOT)/make/isismake.macros
+
+DIRONLY = $(subst /,,$(shell ls -d */))
+CVS := CVS
+TESTS = $(filter-out $(CVS), $(DIRONLY))
+
+#----------------------------------------------------------------------------
+# Target = help
+# Dependencies = 
+#
+# Displays a list of targets and their descriptions.
+#----------------------------------------------------------------------------
+help:
+	echo "Isis Make Tests Commands"
+	echo "------------------------ "
+	echo "make test                   : Runs and displays results for all of the tests"
+	echo "make newtest TEST=testname  : Creates a new test named testname"
+
+#----------------------------------------------------------------------------
+# Target = tests
+# Dependencies = 
+#
+# Iteretates over all of the tests and runs them.  If the test
+# has no makefile or there is no tests a message is
+# printed saying so.
+#----------------------------------------------------------------------------
+test: force
+	if [ "$(TESTS)" != "" ]; \
+	then \
+	  echo ""; \
+	  for i in $(TESTS); do \
+	    cd $$i; \
+	    if [ -f "Makefile" ]; \
+	    then \
+	      $(MAKE) test CASE=$$i BLANKS=$(BLANKS); \
+	    else \
+	      printf $(BLANKS) ""; \
+	      echo "no makefile"; \
+	    fi ; \
+	    cd ..; \
+	  done \
+	else \
+	  echo ""; \
+	  printf $(BLANKS) ""; \
+	  echo "no tests"; \
+	fi
+force: ;
+
+#----------------------------------------------------------------------------
+# Target = newtest
+# Dependencies = variable TEST 
+#
+# Creates a new test in the current directory.  Relies on 
+# the TEST variable to create a new folder that will contain 
+# the new test.  If the folder does not already exist then it is
+# created and the right Makefile is copied into that directory
+# and the test is told to create what it needs. 
+#----------------------------------------------------------------------------
+newtest:
+	if [ "$(TEST)" = "" ]; \
+	then \
+	  echo "TEST needs to be set to create a new test"; \
+	elif [ -d "$(TEST)" ]; \
+	then \
+	    echo "The test already exists"; \
+	else \
+	  $(MKDIR) $(TEST); \
+	  cd $(TEST); \
+	  $(CP) $(ISISROOT)/make/Makefile.tsts Makefile; \
+	  $(MAKE) dirs; \
+	fi
+
+#----------------------------------------------------------------------------
+# Target = clean
+#
+# Removes the output from any previous tests
+#----------------------------------------------------------------------------
+clean:
+	if [ "$(TESTS)" != "" ]; \
+	then \
+	  for i in $(TESTS); do \
+	    cd $$i; \
+	    if [ -f "Makefile" ]; \
+	    then \
+	      $(MAKE) clean; \
+	    fi ; \
+	    cd ..; \
+	  done \
+	fi

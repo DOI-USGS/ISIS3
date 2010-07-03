@@ -1,0 +1,6 @@
+Group = MARS_RECONNAISSANCE_ORBITER/CTX
+  Version = 1
+  Library = CTXCamera
+  Routine = CTXCameraPlugin
+EndGroup
+ 

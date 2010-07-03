@@ -1,0 +1,10 @@
+Group = DAWN/FC1
+  Version = 1
+  Library = DawnFcCamera
+  Routine = DawnFcCameraPlugin
+EndGroup
+Group = DAWN/FC2
+  Version = 1
+  Library = DawnFcCamera
+  Routine = DawnFcCameraPlugin
+EndGroup

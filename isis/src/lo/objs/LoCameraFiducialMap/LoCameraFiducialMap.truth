@@ -1,0 +1,12 @@
+Unit Test for LoCameraFiducialMap...
+Testing medium fiducial fit on a 100 x 100 cropped frame
+Upper left corner OK
+Upper right corner OK
+Lower left corner OK
+Lower right corner OK
+Testing high fiducial fit on a full 34530 x 8750 frame
+Upper left corner OK
+Upper right corner OK
+Lower left corner OK
+Lower right corner OK
+Center corner OK

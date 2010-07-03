@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    UnitTest
+  </brief>
+
+  <description>
+    UnitTest for IsisExport object
+  </description>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-04-03">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema from astrogeology... isis.astrogeology...
+    </change>
+    <change name="Chris Austin" date="2007-12-17">
+      Added processes for BIL and BIP, leaving BSQ as the default, as well as 
+      fixed rounding accuracy.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>UnitTest</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <default><item>$base/testData/isisTruth.cub+1</item></default>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to export
+        </brief>
+        <description>
+          stuff
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="FROMBAD">
+        <type>cube</type>
+        <default><item>$base/testData/isisTruth.cub</item></default>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to export
+        </brief>
+        <description>
+          stuff
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Stretch Options">
+      <parameter name="STRETCH">
+        <type>string</type>
+        <default>
+          <item>LINEAR</item>
+        </default>
+        <brief>Type of stretch</brief>
+        <description>
+          This parameter is used to select one of three ways to stretch
+          (or map) output pixels.  They are LINEAR, PIECEWISE, or MANUAL.
+        </description>
+
+        <list>
+          <option value="LINEAR">
+            <brief> Linear stretch </brief>
+            <description>
+              A minimum and maximum are automatically computed based on
+              the statistics of the selected band.  A histogram of the band
+              is used to pick the minimum at 0.5% of the data and the maximum
+              at 99.5% of the data.  Input pixels less than or equal to the
+              minimum are stretched to black while pixels greater than the or
+              equal to the maximum are stretched to white.  A linear mapping
+              occurs between the minimum and maximum.
+            </description>
+            <exclusions>
+              <item>MINIMUM</item>
+              <item>MIDDLE</item>
+              <item>MAXIMUM</item>
+            </exclusions>
+          </option>
+          <option value="PIECEWISE">
+            <brief> Piecewise-linear stretch </brief>
+            <description>
+              This option is similar to the LINEAR option.  A minimum and
+              maximum are automatically computed.  Additionally, the median
+              is computed and it is mapped to the middle gray value (halfway
+              between white and black). Therefore, it is a piecewise-linear
+              stretch with input pixels mapped linearly between either 1) the
+              minimum/median or 2) the median/maximum.  This option is useful
+              for contrast stretching cubes with skewed histograms to ensure
+              a balanced contrast.
+            </description>
+            <exclusions>
+              <item>MINIMUM</item>
+              <item>MIDDLE</item>
+              <item>MAXIMUM</item>
+            </exclusions>
+          </option>
+          <option value="MANUAL">
+            <brief> Manual stretch </brief>
+            <description>
+              This option allows you to pick your own stretch.  You must
+              enter a value for MINIMUM and MAXIMUM; however, MIDDLE is
+              optional.  If you only enter a MINIMUM and MAXIMUM values are
+              stretched similarly to the LINEAR option.  If you set
+              MIDDLE then the stretch is similar to the PIECEWISE option.
+            </description>
+            <inclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <brief>Minimum pixel value</brief>
+        <description>
+          The minimum input pixel value which will be mapped to black.
+        </description>
+        <lessThan>
+          <item>MIDDLE</item>
+          <item>MAXIMUM</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MIDDLE">
+        <type>double</type>
+        <brief>Middle pixel value</brief>
+        <description>
+          The middle pixel value which will be mapped to middle gray or
+          halfway between black and white.
+        </description>
+        <greaterThan>
+          <item>MINIMUM</item>
+        </greaterThan>
+        <lessThan>
+          <item>MAXIMUM</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MAXIMUM">
+        <type>double</type>
+        <brief>Maximum pixel value</brief>
+        <description>
+          The maximum input pixel value which will be mapped to white.
+        </description>
+        <greaterThan>
+          <item>MINIMUM</item>
+          <item>MIDDLE</item>
+        </greaterThan>
+      </parameter>
+    </group>
+  </groups>
+</application>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="uncrop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Puts a sub-cube back into its parent cube
+  </brief>
+
+  <description>
+    This program reverses the effect of crop. That is, it puts a cropped cube back
+    into a parent cube. The sub or child cube must have an AlphaCube label.
+    Note: The filename and size of the parent cube is not checked for correctness.
+  </description>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2003-04-19">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-05-01">
+      Changed category from Utility to Trim and Mask
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2004-02-16">
+      Replaced extraction group with AlphaCube group 
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+  </history>
+
+  <oldName>
+    <item>mosaic</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Child cube
+        </brief>
+        <description>
+  	      The sub-cube, possibly created by crop. This cube must contain a valid
+          AlphaCube label.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="PARENT">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Parent output cube
+        </brief>
+        <description>
+          The output cube. Normally, this would be the cube where the sub-cube
+          came from, although this is not necessary.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Combine options">
+      <parameter name="COMBINE">
+        <type>string</type>
+        <default>
+          <item>CROP</item>
+        </default>
+        <brief>How to combine the crop and parent pixels</brief>
+        <description>
+          This parameter is used to select one of two ways to combine the
+          crop and parent pixels in areas of overlap.
+        </description>
+
+        <list>
+          <option value="CROP">
+            <brief> Input cube takes priority </brief>
+            <description>
+              When the input pixel is not NULL, the input
+              pixel value will be written to the output cube. Otherwise the
+              output is unchanged.
+            </description>
+          </option>
+          <option value="PARENT">
+            <brief> Parent cube takes priority </brief>
+            <description>
+              When the parent pixel is not NULL, the parent
+              pixel value will be left unchanged. If the parent pixel is NULL
+              the cropped pixel will be written to the output cube.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

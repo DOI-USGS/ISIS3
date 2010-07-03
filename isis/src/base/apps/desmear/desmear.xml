@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="desmear" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Remove frame transfer smear
+  </brief>
+
+  <description>
+    This program removes the frame transfer smear from a CCD
+    camera.  Transfer smear is the build up of residual enegy as the data is read 
+    from the detector, line by line.  The current algorithm is written to remove smear for a
+    CCD that reads data at the top of the detector.  No visual examples have
+    been included because, the difference between the input and output is only a
+    few DN values.
+  </description>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+    <missionItem>Mars Exploration Rover</missionItem>
+  </category>
+
+  <history>
+    <change name="Tracie Sucharski" date="2003-06-16">
+      Original version,  algorithm from Andrew E. Johnson
+      (aej@robotics.jpl.nasa.gov).
+    </change>
+    <change name="Bob Sucharski" date="2005-11-04">
+      Converted to Isis 3.0
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>    
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be corrected
+        </brief>
+        <description>
+          The input cube that will be corrected for CCD smear.
+        </description>
+        <filter>
+          *.cub *.lbl
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The smear corrected output cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  
+    <group name="Correction Values">
+      <parameter name="DURATION">
+        <type>double</type>
+        <internalDefault>
+          From labels
+        </internalDefault>
+        <brief>Exposure duration of input file.</brief>
+        <description>
+                  The exposure duration value to be used in the smear calculation.
+                  Exposure duration is the value of time between the opening and closing
+                  of a instrument aperture.<br></br>
+                  If <b>NO</b> value is entered by the user, the value will be filled
+                  with the exposure duration keyword from the Instrument group<br></br>
+                  The exposure duration value must be in the same units as the transfer time.
+        </description>
+      </parameter>
+
+      <parameter name="TRANSFER">
+        <type>double</type>
+        <internalDefault>
+          From labels
+        </internalDefault>
+        <brief>Frame transfer time</brief>
+        <description>
+                  Time required to transfer data from from active imaging area.<br></br>
+                  If <b>NO</b> value is entered by the user, the value will be filled 
+                  with the transfer time keyword from the Instrument group.<br></br>
+                  The transfer time value must be in the same units as the exposure duration
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

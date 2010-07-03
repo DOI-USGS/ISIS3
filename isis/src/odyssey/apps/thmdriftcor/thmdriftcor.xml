@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="thmdriftcor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply thermal drift correction to THEMIS images
+  </brief>
+
+  <description>
+    This program applies a thermal drift correction to calibrated THEMIS RDR cubes.  It requires as input the atmospheric band (band 10) and Band 9 which will be corrected for thermal drift.
+  </description>
+
+  <history>
+    <change name="Jeff Anderson" date="2007-05-30">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-05-02">
+      Fixed a bug which occured when there were Null lines in the input cube.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Odyssey</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input THEMIS cube
+        </brief>
+        <description>
+          This is the input THEMIS cube to be corrected.  Note only band 9
+          can be corrected for atmospheric drift.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="ATM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input THEMIS cube atmospheric band
+        </brief>
+        <description>
+          This is the input THEMIS cube with the atmospheric band (10) which
+          will be used to correct band 9 for thermal drift.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           A THEMIS image that has been corrected for thermal drift
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+
+   </groups>
+</application>

@@ -1,0 +1,27 @@
+CubeManager Unit Test
+Verify proper cubes have been read
+Cube Filenames: 
+  1 : isisTruth
+  2 : isisTruth
+  3 : blobTruth
+  4 : blobTruth
+  5 : isisTruth
+  6 : isisTruth
+
+Verify We Don't Have Duplicates...
+  Cube # | Equals 1 | Equals 2 | Equals 3 | Equals 4 | Equals 5 | Equals 6
+  Cube 1 |        1 |        1 |        0 |        0 |        0 |        0
+  Cube 2 |        1 |        1 |        0 |        0 |        0 |        0
+  Cube 3 |        0 |        0 |        1 |        1 |        0 |        0
+  Cube 4 |        0 |        0 |        1 |        1 |        0 |        0
+  Cube 5 |        0 |        0 |        0 |        0 |        1 |        1
+  Cube 6 |        0 |        0 |        0 |        0 |        1 |        1
+
+Verify cube attributes have been taken into account
+  Cube # | # of Bands
+  Cube 1 | 2
+  Cube 2 | 2
+  Cube 3 | 1
+  Cube 4 | 1
+  Cube 5 | 1
+  Cube 6 | 1

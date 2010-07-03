@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="vdcomp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Uncompresses Voyager and Viking PDS files
+  </brief>
+
+  <description>
+    This program will decompress Voyager and Viking EDR imq files in PDS
+    format.  It is not a standard Isis program but is used internally within
+    "vik2isis" and "voy2isis" when decompression of the EDR is necessary.
+  </description>
+
+  <history>
+    <change name="Mike Martin" date="1989-12-01">
+      Original Version 
+    </change>
+    <change name="Jeff Anderson" date="2004-06-08">
+      Removed compilation warnings under Linux
+    </change>
+    <change name="Jeff Anderson" date="2004-06-09">
+      Removed extraneous output to terminal
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-14">
+      Added appTest
+    </change>
+    <change name="Jeff Anderson" date="2005-05-19">
+        64-bit Solaris port required replacing long with int and adding malloc.h
+    </change>
+    <change name="Jeannie Walldren" date="2009-03-23">
+      Modified code to allow string length of 1024 characters for input and 
+      output filenames.
+    </change>
+    <change name="Eric Hyer" date="2009-06-23">
+      Increased buffer sizes for ibuf and obuf.  Also added some error checking.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Viking</missionItem>
+    <missionItem>Voyager</missionItem>
+  </category>
+</application>

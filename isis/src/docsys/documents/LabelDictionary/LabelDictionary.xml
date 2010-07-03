@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+        <h2>Introduction</h2>
+
+        <p>
+        This document is a reference to the various objects and groups, which can be found in Isis labels.
+        The definition of each object/group, the parameter meanings, and an example will be given.
+        </p>
+
+        <h2>
+        IsisCube Object
+        </h2>
+
+        <p>
+        The IsisCube Object is simply a container.  It is used to house the various elements (groups and objects) that make up an Isis cube.  The IsisCube object is comprised of the Core object, which defines the cube size and pixel attributes and many optional groups that are described elsewhere in this document including Archive, BandBin, Instrument, Kernels, and Mapping Groups.  While we present a whole IsisCube object we will save of the individual elements in their own sections.
+        </p>
+
+<pre style="padding-left:4em;">
+Object = IsisCube
+  Object = Core
+    ^Core       = filename.dat
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 320
+      Lines   = 5392
+      Bands   = 1
+    EndGroup
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    EndGroup
+  EndObject
+
+  Group = BandBin
+    OriginalBand = 10
+    Center       = 14.88 &lt;microns&gt;
+    Width        = 0.87 &lt;microns&gt;
+    FilterNumber = 10
+  EndGroup
+EndObject
+</pre>
+
+
+
+        <h3>Core Object</h3>
+        <p>
+        The core object is used to house the groups (Dimensions and Pixels) that describe the size and pixel attributes of the cube, as well as the storage type of the data.
+        </p>
+
+<pre style="padding-left:4em;">
+Object = Core
+  ^Core       = filename.dat
+  StartByte   = 65537
+  Format      = Tile
+  TileSamples = 128
+  TileLines   = 128
+
+  Group = Dimensions
+    Samples = 320
+    Lines   = 5392
+    Bands   = 1
+  EndGroup
+
+  Group = Pixels
+    Type       = Real
+    ByteOrder  = Lsb
+    Base       = 0.0
+    Multiplier = 1.0
+  EndGroup
+EndObject
+</pre>
+
+        <table class="tableFormattedInformation" align="center">
+          <tr><th>Keyword</th>
+              <th>Type</th>
+              <th>Description</th>
+          </tr>
+          <tr><td>^Core</td>
+              <td>String</td>
+              <td>This optional keyword is used to point to an extra binary file containing the cube data.  The cube is designated detached (labels and cube data in separate files) if this keyword exists.  If the keyword does not exist it indicates the labels and cube data are attached (in the same file).</td>
+          </tr>
+          <tr><td>StartByte</td>
+              <td>Integer</td>
+              <td>This keyword points to the starting byte (one-based) of the cube data.  For detached cubes this value is often equal to one.  For attached cubes it often 65537 as there is typically 64k bytes reserved for label space.  On occasions it may be larger if the labels have grown beyond this boundary.</td>
+          </tr>
+          <tr><td>Format</td>
+              <td>String (Tile or BandSequential)</td>
+              <td>This keyword indicates how the cube data is arranged.  BandSequential indicates the pixels are stored first by sample, then by line, and finally by band.  Tile indicates the pixels are stored in tiles which is the preferred storage mechanism in Isis 3 as it facilities the fastest “universal access”. The tiles are stored in row major format.  That is, all the tiles for band 1 ordered from left-to-right, then top-to-bottom, followed by all the tiles for band 2, etc.</td>
+          </tr>
+          <tr><td>TileSamples, TileLines</td>
+              <td>Integer</td>
+              <td>Optional keywords which must exist when Format=Tile in a cube. These define the size of the tiles in the cube and do not have to be the same.  They are typically 128 x 128 in size.</td>
+          </tr>
+        </table>
+
+        <h3>Dimensions Group</h3>
+        <p>
+        This group contains keywords which define the physical dimensions of the cube.  The group is always found inside the Core object.
+        </p>
+
+<pre style="padding-left:4em;">
+Group = Dimensions
+  Samples = 320
+  Lines   = 5392
+  Bands   = 1
+EndGroup
+</pre>
+
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  <tr><td>Samples, Lines, Bands</td>
+      <td>Integer</td>
+      <td>These three keywords are in the Dimensions group and define the size of the cube.</td>
+  </tr>
+</table>
+        <h3>Pixel Group</h3>
+        <p>
+        This group describes information about the pixels in a cube.  The group is always found inside the Core object.
+        </p>
+
+<pre style="padding-left:4em;">
+Group = Pixels
+  Type       = Real
+  ByteOrder  = Lsb
+  Base       = 0.0
+  Multiplier = 1.0
+EndGroup
+</pre>
+
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  <tr><td>Type</td>
+      <td>String (UnsignedByte, SignedWord, Real)</td>
+      <td>Currently there are three type of pixels in Isis which represent unsigned 8-bit vaues (0 to 255), signed 16-bit values (-32768 to 32767) and 32-bit IEEE floating point pixel values.  [Future option] Support alternative pixel types.</td>
+  </tr>
+  <tr><td>ByteOrder</td>
+      <td>String (Lsb, Msb)</td>
+      <td>This defines the byte order or endianess of the pixels.  The order must either be least significant byte (Lsb) or most significant byte (Msb).</td>
+  </tr>
+  <tr><td>Base, Multiplier</td>
+      <td>Double</td>
+      <td>These values are used to scale UnsignedByte and SignedWord pixels so they appear to be Real (32-bit floating) pixels.  That is, realDn = diskDN * Multiplier + Base.  These values are always 0.0 and 1.0 when Type=Real.</td>
+  </tr>
+</table>
+
+        <h2>AlphaCube Group</h2>
+        <p>
+        This group is used to map pixel locations in a child cube (beta) back to its parent cube (alpha).  It is necessary in order to determine which detector a pixel represents in Isis camera models.  The group is created by Isis ingestion programs (e.g., thm2isis, moc2isis, ciss2isis, etc) and automatically updated by programs such as crop, pad, reduce, or enlarge.  The keywords found in this group can occur in one of two places.  Either inside of the AlphaCube group or inside of the Instrument group and therefore they can occur twice.  Once if a crop occurred in Instrument (level 1) space and again if a crop occurred in Mapping (level 2) space.
+        </p>
+
+<pre style="padding-left:4em;">
+Group = AlphaCube
+    AlphaSamples          = 320
+    AlphaLines            = 5392
+    AlphaStartingSample   = 0.5
+    AlphaStartingLine     = 0.5
+    AlphaEndingSample     = 320.5
+    AlphaEndingLine       = 5392.5
+    BetaSamples           = 320
+    BetaLines             = 5392
+EndGroup
+</pre>
+
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  <tr><td>  AlphaSamples, AlphaLines</td>
+      <td>  Integer</td>
+      <td>  The number of lines and samples in the original parent/alpha cube.</td>
+  </tr>
+  <tr><td>  AlphaStartingSample, AlphaStartingLine</td>
+      <td>  Double</td>
+      <td>  The starting sample and line in the alpha cube which maps to (0.5,0.5) in the beta cube.</td>
+  </tr>
+  <tr><td>  AlphaEndingSample, AlphaEndingLine</td>
+      <td>  Double</td>
+      <td>  The ending sample and line in the alpha cube which maps to (BetaSamples+0.5,BetaLines+0.5) in the beta cube.</td>
+  </tr>
+</table>
+        <h2>Archive Group</h2>
+        <p>
+        This group is used to store keywords that identify archival information.  That is, information which uniquely identifies the data.  There is not a “required” set of keywords for this group.  Generally, the keywords found in this group represent PDS specific information as indicated in the example given below.
+        </p>
+
+<pre style="padding-left:4em;">
+Group = Archive
+  ImageNumber         = "7102002401"
+  ProductId           = “AB-1-024/01”
+  DataSetId           = "MGS-M-MOC-NA/WA-2-DSDP-L0-V1.0"
+  ProducerId          = "MGS_MOC_TEAM"
+  ProductCreationTime = "1999-01-15T20:40:59.000Z"
+  UploadId            = "moc_p024_v1.sasf"
+  ImageKeyId          = "5618102401"
+  RationalDescription = “OLYMPUS MONS SPECIAL RED WA"
+EndGroup
+</pre>
+
+        <h2>BandBin Group</h2>
+        <p>
+        This group is used to stored information regarding each band in the cube.  This implies that every keyword in the group be an array with a dimension equal to the number of bands in the cube.  This group is not required nor if it exists are any particular keywords required.  That is, the names of keywords are irrelevant although some instrument- specific programs may expect certain keywords to be available (e.g., OriginalBand).  The keywords in this group will be automatically pruned if any program uses the input cube attribute option (e.g., from=input.cub+1,3-4).
+        </p>
+
+<pre style="padding-left:4em;">
+Group = BandBin
+  OriginalBand = (1, 2, 3, 4, 5)
+  Center       = (6.78, 6.78, 7.93, 8.56, 9.35) &lt;microns&gt;
+  Width        = (1.01, 1.01, 1.09, 1.16, 1.20) &lt;microns&gt;
+  FilterNumber = (1, 2, 3, 4, 5)
+EndGroup
+</pre>
+
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  <tr><td>  OriginalBand</td>
+      <td>  Integer</td>
+      <td>  This keyword indicates the original band number at the current band location.  Hence, extracting bands 2 and 5 from a cube via the input cube attribute option would yield OriginalBand = (2,5)</td>
+  </tr>
+  <tr><td>  Center, Width</td>
+      <td>  Double</td>
+      <td>  Often these keywords are used to describe the center wavelength and width of each band.</td>
+  </tr>
+</table>
+
+        <h2>ImportLabel Object</h2>
+        This object contains the original labels that were read during the import process, if possible.  For example, vicar2isis and pds2isis often have many more labels than are required by Isis programs.  However, there may be information in those labels that the user would like to examine or preserve.  Note that Isis program should never use any keywords values in these labels.
+
+<pre style="padding-left:4em;">
+Object = ImportLabel
+  Lblsize  = 536
+  Format   = HALF
+  Type     = IMAGE
+  Bufsiz   = 24576
+  Dim      = 3
+  Eol      = 1
+  Recsize  = 536
+  Org      = BSQ
+  Nl       = 256
+  Ns       = 256
+  Nb       = 1
+  N1       = 256
+  N2       = 256
+  N3       = 1
+  N4       = 0
+  Nbb      = 24
+  Nlb      = 1
+  Host     = SUN-SOLR
+  Intfmt   = HIGH
+EndObject
+</pre>
+
+        <h2>Instrument Group</h2>
+        <p>
+        This group stores specific information regarding the mission and instrument.  This information is typically used to perform radiometric calibration as well as in camera models in order to accurately compute ground positions in a raw camera cube.  Obviously, the keywords in the group will vary from instrument to instrument.  However, there are three required keywords (Name, SpaceCraft, and Target).  Definitions for Instrument specific keywords can be found in the appropriate documentation for that instrument.
+        </p>
+
+<pre style="padding-left:4em;">
+Group = Instrument
+  SpacecraftName  = "Galileo Orbiter"
+  InstrumentId    = "Solid State Imaging System"
+  TargetName      = Io
+  StartTime       = "1996-06-25T17:36:56.858"
+  FrameModeId     = Full
+EndGroup
+</pre>
+
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  <tr><td>  SpacecraftName</td>
+      <td>  String</td>
+      <td>  Name of the mission/spacecraft</td>
+  </tr>
+  <tr><td>  InstrumentId</td>
+      <td>  String</td>
+      <td>  The name of the instrument</td>
+  </tr>
+  <tr><td>  TargetName</td>
+      <td>  String</td>
+      <td>  The name of target/body which the instrument is viewing</td>
+  </tr>
+</table>
+
+        <h2>Kernels Group</h2>
+        <p>
+        The Kernels group is created when the program “spiceinit” is run on a raw camera cube (e.g., Moc or Themis raw geometry).  The program determines which NAIF SPICE kernels are needed for proper operation of the camera model.  These kernels are written to this group.
+        </p>
+
+<pre style="padding-left:4em;">
+Group = Kernels
+  LeapSecond          = mk98264a.tls
+  SpaceCraftClock     = mk00062b.tsc
+  TargetPosition      = s980326b.bsp
+  TargetAttitudeShape = pck00005.tpc
+  Instrument          = ""
+  InstrumentAddendum  = ssiAddendum.ti
+  SpaceCraftPosition  = s980326b.bsp
+  SpaceCraftPointing  = galssi_io_010806.baa.bck
+  Frame               = ""
+  ElevationModel      = iodem.cub
+EndGroup
+</pre>
+
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  <tr><td>    LeapSecond</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF leapsecond kernel.  See NAIF required reading document time.req for more information.</td>
+  </tr>
+  <tr><td>  SpaceCraftClock</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF spacecraft clock kernel.  See NAIF required reading document sclk.req for more information.</td>
+  </tr>
+  <tr><td>  TargetPosition</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF planetary ephemeris kernel.  Note that this may be the same as the spacecraft position kernel.  See NAIF required reading document spk.req for more information.</td>
+  </tr>
+  <tr><td>  TargetAttitudeShape</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF planetary constants kernel.  It contains the target radii and definitions for prime merdian and the pole. See NAIF required reading document pck.req for more information.</td>
+  </tr>
+  <tr><td>  Instrument</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF instrument kernel for the particular mission/instrument.  It contains specifics regarding the instruement (e.g., focal length, boresight, etc).</td>
+  </tr>
+  <tr><td>  InstrumentAddendum</td>
+      <td>    Filename</td>
+      <td>  The name of the Isis addendum to the instrument kernel for the particular mission/instrument.  This often contains information that is lacking from the NAIF instrument kernel in order to have a properly functioning sensor model.</td>
+  </tr>
+  <tr><td>  SpacecraftPosition</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF spacecraft ephemeris (position) kernel.  Note that this may be the same as the target position kernel.  See NAIF required reading document spk.req for more information.</td>
+  </tr>
+  <tr><td>  SpacecraftPointing</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF spacecraft pointing (c-matrix) kernel. See NAIF required reading document ck.req for more information.</td>
+  </tr>
+  <tr><td>  Frame</td>
+      <td>    Filename</td>
+      <td>  The name of the NAIF frame kernel.  See NAIF required reading document frames.req for more information.</td>
+  </tr>
+  <tr><td>  ElevationModel</td>
+      <td>    Filename</td>
+      <td>  The name of an Isis cube containing the local (or global) radii covering the cube’s latitude/longitude ground range.  The elevation model will utilized by the camera model to remove topographic effects.  If one is not available the local radii is computed from the ellipsoid defined in the TargetAttitudeShape kernel.</td>
+  </tr>
+</table>
+
+        <h2>Mapping Group</h2>
+        <p>
+        The Mapping Group is used to define map projections.  Recommending reading includes the Isis Map Projection Guide and Map Projections – A Working Manual, Snyder, J.P., U.S. Geological Survey, Bulletin 1532.
+        </p>
+
+<pre style="padding-left:4em;">
+Group = Mapping
+  ProjectionName         = Sinusoidal
+  TargetName             = MARS
+  EquatorialRadius       = 3396190.0 &lt;meters&gt;
+  PolarRadius            = 3376200.0 &lt;meters&gt;
+  LatitudeType           = Planetocentric
+  LongitudeDirection     = PositiveEast
+  LongitudeDomain        = 360
+  MinimumLatitude        = -5.5707102
+  MaximumLatitude        = 13.8285999
+  MinimumLongitude       = 351.4547729
+  MaximumLongitude       = 355.6184082
+  PixelResolution        = 100.0 &lt;meters/pixel&gt;
+  Scale                  = 592.74697523306 &lt;pixels/degree&gt;
+  TrueScaleLatitude      = 0.0
+  CenterLongitude        = 354.0
+  LineProjectionOffset   = -8196.5
+  SampleProjectionOffset = -1508.5
+  UpperLeftCornerX       = -150900.0 &lt;meters&gt;
+  UpperLeftCornerY       = 819700.0 &lt;meters&gt;
+EndGroup
+</pre>
+
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  <tr><td>  ProjectionName</td>
+      <td>    String</td>
+      <td>  This indicates the name of the map projection (Sinusoidal, SimpleCylindrical, PolarStereographic, etc)</td>
+  </tr>
+  <tr><td>  EquatorialRadius, PolarRadius</td>
+      <td>    Double</td>
+      <td>  The distance in meters from the center of the body to any point on the equator or to either pole, respectively.</td>
+  </tr>
+  <tr><td>  LongitudeDirection</td>
+      <td>    String</td>
+      <td>  The direction of positive longitude, PositiveEast or PostiveWest.  The term PositiveEast implies that longitudes increase to the right on a map.</td>
+  </tr>
+  <tr><td>  LatitudeType</td>
+      <td>    String</td>
+      <td>  Indicates the coordinate type for the latitude values, Planetocentric or Planetographic</td>
+  </tr>
+  <tr><td>  LongitudeDomain</td>
+      <td>    String</td>
+      <td>  Indicates the preferred representation, 180 or 360 domain, of longitudes when reporting values or constructing new map. The value 360 implies 0 to 360 while 180 implies -180 to 180.</td>
+  </tr>
+  <tr><td>  MinimumLatitude, MaximumLatitude, MinimumLongitude, MaximumLongitude</td>
+      <td>    Double</td>
+      <td>  The values indicate the ground range of the projection (in coordinates of LatitudeType and LongitudeDirection).  Because cubes/images are discrete by nature (integral number of pixels), the latitude and longitude boundaries will rarely if every match perfectly.  Therefore these values are used only when a map-projected cube is constructed and should only be used as reference from that point forward.  For example, do not use these values to import data into another image processing package; instead use UpperLeftCornerX and UpperLeftCornerY.</td>
+  </tr>
+  <tr><td>  PixelResolution</td>
+      <td>    Double</td>
+      <td>  This indicates size of each pixel in meters relative to the map projection.  Beware that this does not imply each pixel has true scale.  That is completely dependent upon the type of map projection utilized (Sinusoidal, Mercator, etc).   The resolution often only holds at the latitude of true scale.</td>
+  </tr>
+  <tr><td>  Scale</td>
+      <td>    Double</td>
+      <td>  This indicates the number of pixels per degree relative to the map projection.  Beware that this does not imply each pixel has true scale.  That is completely dependent upon the type of map projection utilized (Sinusoidal, Mercator, etc).   The scale often only holds at the latitude of true scale.</td>
+  </tr>
+  <tr><td>  TrueScaleLatitude</td>
+      <td>  Double</td>
+      <td>  This indicates the latitude at which the Scale or PixelResolution holds true.</td>
+  </tr>
+  <tr><td>  UpperLeftCornerX, UpperLeftCornerY</td>
+      <td>    Double</td>
+      <td>  These values indicate the projection X/Y in meters at sample 0.5, line 0.5.  This base X/Y along with the PixelResolution can be used to compute the projection X/Y at any pixel location in the cube.  For example, X = (Sample – 0.5) * PixelResolution + UpperLeftCornerX and Y = UpperLeftCornerY – (Line – 0.5) * PixelResolution.   With the proper equations for the projection the computed X/Y could be converted to a latitude/longitude.</td>
+  </tr>
+  <tr><td>  LineProjectionOffset,SampleProjectionOffset</td>
+      <td>    Double</td>
+      <td>  These values are listed solely for compatibility with PDS labels and are equivalent to the UpperLeftCorner values in pixel units.</td>
+  </tr>
+</table>
+
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>LabelDictionary.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>reference</categoryItem>
+  </category>
+
+  <audience>
+    <target>intermediate</target>
+  </audience>
+
+  <bibliography>
+    <title>Label Dictionary</title>
+    <brief>Reference to the objects and groups in Isis cube labels</brief>
+    <description>
+        This document is a reference to the various objects and groups, which can be found in Isis labels.
+        The definition of each object/group, the parameter meanings, and an example will be given.
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2003-06-11</date>
+  </bibliography>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-06-11">Original</change>
+    <change name="Deborah Lee Soltesz" date="2003-06-11">Converted Jeff Anderson's documentation to HTML and added to this file</change>
+    <change name="Jeff Anderson" date="2004-03-08">Total rewrite</change>
+  </history>
+</documentation>

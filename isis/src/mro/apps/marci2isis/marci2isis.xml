@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="marci2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+    <brief>
+      Import an MRO MARCI image to an Isis cube
+    </brief>
+
+    <description>
+        This program takes an image from the Mars Reconnaissance Orbiter Color Imager
+        and produces an Isis cube containing the image data.
+    </description>
+
+    <history>
+      <change name="Steven Lambright " date="2007-10-02">
+        Original Version
+      </change>
+      <change name="Christopher Austin" date="2008-03-18">
+        Checks if input file is rdr.
+      </change>
+      <change name="Steven Lambright " date="2008-11-19">
+        The COLOROFFSET keyword in the output instrument group labels
+        is now properly set when no color offset is used.
+      </change>
+    </history>
+
+    <category>
+      <missionItem>Mars Reconnaissance Orbiter</missionItem>
+    </category>
+
+    <groups>
+      <group name="Files">
+        <parameter name="FROM">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+            Input file
+          </brief>
+          <description>
+            The EDR to be processed
+          </description>
+          <filter>
+            *.img
+          </filter>
+        </parameter>
+
+        <parameter name="TO">
+          <type>cube</type>
+          <pixelType>real</pixelType>
+          <fileMode>output</fileMode>
+          <brief>
+            Even bands of the output cube
+          </brief>
+          <description>
+            This should be the base filename of resultant cube. The output will actually be two cubes,
+            with "even" and "odd" added to the filename.
+          </description>
+          <filter>
+            *.cub
+          </filter>
+        </parameter>
+      </group>
+
+      <group name="Settings">
+        <parameter name="COLOROFFSET">
+          <type>boolean</type>
+          <brief>Add padding to align bands</brief>
+          <description>
+            The result of how MARCI takes pictures leaves a filter height offset in adjacent filters. This will correct that offset
+            by adding padding to the top of the image file, aligning color images correctly.
+          </description>
+          <default><item>true</item></default>
+          <inclusions><item>COLOROFFSET_SIZE</item></inclusions>
+        </parameter>
+           
+        <parameter name="COLOROFFSET_SIZE">
+          <type>integer</type>
+          <brief>Amount of filter heights to pad with for COLOROFFSET</brief>
+          <description>
+            The filters are offset by a certain number of filters, which is a multiple of their height. It appears
+            the filters are all offset by twice their height, or two filter heights. One filter height can be explained by
+            the method of taking pictures: the first filter on the first framelet is one higher than the second filter on
+            the first framelet.  
+          </description>
+          <default><item>2</item></default>
+          <minimum inclusive="false">0</minimum>
+        </parameter>
+           
+        <parameter name="FLIP">
+          <type>string</type>
+          <brief>Flip the framelets for pictures taken on ascending orbits</brief>
+          <description>This corrects pictures taken on an ascending orbit</description>
+          <default><item>AUTO</item></default>
+          <list>
+            <option value="AUTO">
+            <brief>Auto-detect whether or not this correction is needed</brief>
+              <description>
+              This option will look at the correlation between the first framelet's data and the second framelet's data. 
+              If there is a better correlation between the end of the first framelet and the end of the second
+              framelet compared to the beginning of the second framelet, the framelets will be flipped. This only
+              correlates the first filter's data.
+              </description>
+            </option> 
+            <option value="YES">
+              <brief>Flip the framelets</brief>
+              <description>
+                On ascending orbits, the framelets are aligned incorrectly. This option will mirror the framelets to correct this problem.
+              </description>
+            </option>
+               
+            <option value="NO">
+              <brief>Don't modify original data</brief>
+              <description>
+                This will prevent any modification of the original data and should be used on descending orbits.
+              </description>
+            </option>
+          </list>
+        </parameter>
+      </group>
+    </groups>
+    
+    <examples>
+      <example>
+        <brief>
+          Importing a MARCI EDR
+        </brief>
+        <description>
+          This example covers importing a typical MARCI EDR using the various FLIP options.
+        </description>
+        <terminalInterface>
+          <commandLine>
+            FROM=T02_001000_1199_MC_00N230W.IMG TO=T02_001000_1199_MC_00N230W.cub FLIP=AUTO|YES|NO  
+          </commandLine>
+          <description>
+            This is the command line for running this program with a typical EDR. FLIP should be AUTO, YES, or NO.
+          </description>
+        </terminalInterface>
+        <guiInterfaces>
+          <guiInterface>
+            <image width="719" height="550" src="assets/images/gui.jpg">
+              <brief>Running with default options</brief>
+              <description>
+                This is what the interface should look like when running this example with FLIP set to AUTO.
+              </description>
+              <thumbnail width="200" height="153" src="assets/thumbs/gui.jpg" caption="Running this program" />
+            </image>
+          </guiInterface>
+        </guiInterfaces>
+        <outputImages>
+          <image src="assets/images/T02_001000_1199_MC_00N230W.auto.jpg" width="282" height="550">
+            <brief>The output images (combined), using AUTO flip, cropped and colorized for this example</brief>
+            <description>
+              Since this particular input image had a RED, GREEN, and ORANGE filter, it was possible to display the image
+              in color. To give a better picture of the outputs, because MARCI takes long strips of data, this image was
+              cropped at line 2800 to a height of 1000 pixels. This image was created with FLIP set to AUTO, which decided to
+              flip the data.
+            </description>
+            <thumbnail src="assets/thumbs/T02_001000_1199_MC_00N230W.auto.jpg" caption="Output Image" width="103" height="200" />
+          </image>
+          <image src="assets/images/T02_001000_1199_MC_00N230W.noflip.jpg" width="282" height="550">
+            <brief>The output images (combined), using NO flip, cropped and colorized for this example</brief>
+            <description>
+              Since this particular input image had a RED, GREEN, and ORANGE filter, it was possible to display the image
+              in color. To give a better picture of the outputs, because MARCI takes long strips of data, this image was
+              cropped. In order to show the same feature as the flipped image, the crop was at line 5800 to a height of 1000 pixels. 
+              This image was created with FLIP set to NO, because AUTO flipped the data. When you look closely, especially compared
+              to the flipped data, the features in this data are distorted.
+            </description>
+            <thumbnail src="assets/thumbs/T02_001000_1199_MC_00N230W.noflip.jpg" caption="Output Image Without FLIP" width="103" height="200" />
+          </image>
+        </outputImages>
+      </example>
+    </examples>
+</application>

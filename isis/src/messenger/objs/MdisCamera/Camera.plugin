@@ -1,0 +1,11 @@
+Group = Messenger/MDIS-WAC
+  Version = 1
+  Library = MdisCamera
+  Routine = MdisCameraPlugin
+EndGroup
+Group = Messenger/MDIS-NAC
+  Version = 1
+  Library = MdisCamera
+  Routine = MdisCameraPlugin
+EndGroup
+ 

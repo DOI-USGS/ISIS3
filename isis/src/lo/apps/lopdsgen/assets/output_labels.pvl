@@ -1,0 +1,87 @@
+PDS_VERSION_ID             = PDS3
+
+/*          FILE FORMAT AND LENGTH */
+RECORD_TYPE                = FIXED_LENGTH
+RECORD_BYTES               = 33052
+FILE_RECORDS               = 7841
+LABEL_RECORDS              = 1
+INTERCHANGE_FORMAT         = BINARY
+
+/*          POINTERS TO START RECORDS OF OBJECTS IN FILE */
+^IMAGE                     = 2
+
+/*          IMAGE DESCRIPTION */
+DATA_SET_ID                = LO-L-LO1/2/3-4-CDR-V1.0
+PRODUCT_ID                 = level1
+ORIGINAL_PRODUCT_ID        = 3200H
+PRODUCT_TYPE               = CDR
+MISSION_NAME               = "LUNAR ORBITER"
+SPACECRAFT_NAME            = LUNAR_ORBITER_3
+INSTRUMENT_NAME            = 24_INCH_FOCAL_LENGTH_CAMERA
+INSTRUMENT_ID              = 24INCH_FLC
+TARGET_NAME                = MOON
+START_TIME                 = 1967-02-22T05:24:28.800
+IMAGE_NUMBER               = (320010780, 320010790, 320010800, 320010810,
+                              320010820, 320010830, 320010850, 320010860,
+                              320010870, 320010880, 320010890, 320010900,
+                              320010910, 320010920, 320010940, 320010950,
+                              320010960, 320010970, 320010980, 320010990,
+                              320011000, 320011010, 320011020, 320011040,
+                              320011050, 320011060, 320011070, 320011080,
+                              320011090)
+FRAME_NUMBER               = 3200
+SCAN_CREATION_DATE         = 2003-06-18T10:11:57
+SCAN_PARAMETER             = (25, 50um, 0.5, 3.0)
+SCAN_PARAMETER_DESCRIPTION = (SCAN_RESOLUTION, OUTPUT_MICRON,
+                              SCAN_DENSITY_RANGE1, SCAN_DENSITY_RANGE2)
+FIDUCIAL_ID                = (1a, 2a, 46b, 93b, 94b, 26b, 70b, 27b, 47b, 69b,
+                              98b, 145b, 146b, 189b, 190b, 120b, 166b, 123b,
+                              165b, 99b, 192b, 193b, 245b, 246b, 285b, 286b,
+                              220b, 264b, 269b, 219b)
+FIDUCIAL_SAMPLES           = (32093.000, 32096.000, 27242.000, 21970.000,
+                              21976.000, 29433.000, 24604.000, 29209.000,
+                              27018.000, 24604.000, 21537.000, 16271.000,
+                              16276.000, 11451.000, 11451.000, 19122.000,
+                              14082.000, 18681.000, 14078.000, 21312.000,
+                              11230.000, 11015.000, 5313.000, 5309.000,
+                              929.000, 927.000, 8160.000, 3338.000, 2679.000,
+                              8163.000) <pixels>
+FIDUCIAL_LINES             = (8497.000, 579.000, 571.000, 8481.000, 565.000,
+                              579.000, 571.000, 8488.000, 8487.000, 8486.000,
+                              565.000, 8476.000, 560.000, 8475.000, 555.000,
+                              566.000, 558.000, 8476.000, 8476.000, 8482.000,
+                              557.000, 8474.000, 8471.000, 564.000, 8476.000,
+                              561.000, 557.000, 560.000, 8472.000,
+                              8474.000) <pixels>
+FIDUCIAL_COORD_MICRON      = 50 <um>
+FIDUCIAL_X_COORDINATES     = (-108.396, -108.339, -74.548, -38.026, -37.964,
+                              -89.786, -56.272, -88.373, -73.101, -56.319,
+                              -34.929, 1.610, 1.642, 35.174, 35.198, -18.178,
+                              16.913, -15.149, 16.863, -33.441, 36.710, 38.211,
+                              77.875, 77.889, 108.365, 108.352, 58.079, 91.579,
+                              96.167, 58.045) <mm>
+FIDUCIAL_Y_COORDINATES     = (27.470, -27.488, -27.493, 27.496, -27.490,
+                              -27.490, -27.489, 27.488, 27.498, 27.493,
+                              -27.490, 27.500, -27.492, 27.492, -27.486,
+                              -27.499, -27.483, 27.490, 27.499, 27.499,
+                              -27.493, 27.488, 27.484, -27.490, 27.480,
+                              -27.481, -27.487, -27.490, 27.480, 27.492) <mm>
+PRODUCER_INSTITUTION_NAME  = "U.S. GEOLOGICAL SURVEY"
+PRODUCT_CREATION_TIME      = 2009-12-18T17:44:45
+
+/*          DESCRIPTION OF OBJECTS CONTAINED IN FILE */
+Object = IMAGE
+  LINES                      = 7840
+  LINE_SAMPLES               = 8263
+  SAMPLE_TYPE                = PC_REAL
+  SAMPLE_BITS                = 32
+  SAMPLE_BIT_MASK            = 2#11111111111111111111111111111111#
+  MINIMUM                    = 1.0
+  MAXIMUM                    = 248.0
+  CORE_NULL                  = 16#FF7FFFFB#
+  CORE_LOW_REPR_SATURATION   = 16#FF7FFFFC#
+  CORE_LOW_INSTR_SATURATION  = 16#FF7FFFFD#
+  CORE_HIGH_REPR_SATURATION  = 16#FF7FFFFF#
+  CORE_HIGH_INSTR_SATURATION = 16#FF7FFFFE#
+End_Object
+End

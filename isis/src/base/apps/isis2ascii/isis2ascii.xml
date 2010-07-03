@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<application name="isis2ascii" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief> Export cube to an ascii file</brief>
+
+  <description>
+    This program will print the cube data to an ascii file.  Special pixels will be represented
+    as NULL, LIS, LRS, HIS and HRS.  If you do not want special pixels in your ascii output,
+    run the program "stretch" to replace their value.  If there are multiple bands in the cube,
+    they will be output in band sequential format.  Beware:  The output file will be roughly
+    3 times as big as the input.
+  </description>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <oldName>
+    <item>list</item>
+    <item>cube2ascii</item>
+  </oldName>
+
+  <history>
+    <change name="Tracie L Sucharski" date="2002-06-28">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2002-10-25">
+      Fixed bug-was writing LRS for LIS values.
+    </change>
+    <change name="K Teal Thompson" date="2002-11-25">
+      Add example
+    </change>
+    <change name="Tracie Sucharski" date="2003-01-28">
+      Remove from Utility category.
+    </change>
+    <change name="K Teal Thompson" date="2003-02-03">
+      Make images smaller.
+    </change>
+    <change name="K Teal Thompson" date="2003-03-19">
+      Add /image and /thumb directory.
+    </change>
+    <change name="Tracie Sucharski" date="2003-04-03">
+      Added-lien:Use IsisString class when outputing pixel values.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2003-08-27">
+      Changed default extension handling mechanism
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Input cube</brief>
+        <description>
+	      The file name of the input cube to be listed.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>Output ascii file</brief>
+        <description>
+	      The file name of the ascii output file.
+        </description>
+        <filter>*.txt</filter>
+      </parameter>
+    </group>
+    <group name="Options">
+      <parameter name="HEADER">
+        <type>boolean</type>
+        <brief>Print header</brief>
+        <description>
+          If set to yes, a brief header will be printed to
+          the ascii file which will include the cube name
+          and dimensions.
+        </description>
+        <default>
+          <item>YES</item>
+        </default>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <liens>
+    <item>Use IsisString class when outputing pixel values.</item>
+  </liens>
+
+  <examples>
+
+    <example>
+      <brief> Header default </brief>
+      <description> Demonstrate the isis2ascii application with header
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/f332s28.cub t=OUT/isis2ascii.txt </commandLine>
+        <description> Convert Viking ISIS image to ascii file.  Let header default to yes.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/f332s28.jpg" width="500" height="439">
+          <brief> Input image for isis2ascii</brief>
+          <description>This is the input image f332s28.cub to be converted to ascii.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/f332s28.jpg" width="200" height="175"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/isis2asciiTxt.jpg" width="500" height="523">
+          <brief> Example output ascii text from isis2ascii run</brief>
+          <description> This is the output ascii text file isis2ascii.txt with the header.
+          </description>
+          <thumbnail caption="Output image showing results of the isis2ascii application." src="assets/thumb/isis2asciiTxt.jpg" width="200" height="209"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="455" height="247" src="assets/image/isis2asciiGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+the isis2ascii application</description>
+            <thumbnail width="200" height="109" caption="isis2ascii GUI" src="assets/thumb/isis2asciiGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+  </examples>
+
+
+
+</application>

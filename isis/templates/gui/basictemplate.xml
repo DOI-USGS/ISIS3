@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="basicTemplate" xmlns:xsi=
+    "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=
+    "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    A template xml file for basic tags
+  </brief>
+  <description>
+    This is a template for the basic layout of the xml file.  It contains no 
+    parameters, only the necessary tags prior to the parameters.
+  </description>
+
+  <category>
+    <categoryItem>CategoryName</categoryItem>
+    <missionItem>MissionName</missionItem>
+  </category>
+
+  <oldName>
+    <item>name in isis2</item>
+  </oldName>
+
+  <seeAlso>
+    <applications>
+      <item>related application name</item>
+      <item>typetemplate</item>
+      <item>listtemplate</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Miller" date="2005-11-03">
+      Original Version
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-04">
+      Description of change made
+    </change>
+  </history>
+</application>
+

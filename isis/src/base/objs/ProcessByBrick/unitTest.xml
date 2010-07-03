@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    ProcessByBrick unitTest.
+  </brief>
+
+  <description>
+      This is a unit test for ProcessByBrick.
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jacob Danton" date="2005-11-18">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>$base/testData/isisTruth.cub</item></default>
+      </parameter>
+      <parameter name="FROM2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>$base/testData/isisTruth.cub+2-1</item></default>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/isisProcessByBrick_01.cub</item></default>
+      </parameter>
+      <parameter name="TO2">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/isisProcessByBrick_02.cub</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

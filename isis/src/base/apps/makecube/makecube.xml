@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<application name="makecube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>Generate a cube with a constant value</brief>
+
+  <description>
+    This program can be used to generate an output cube of user specified
+    dimensions with a constant value for each of the pixels.  In general,
+    it is more useful as a development tool than as a standard image
+    processing tool.  For example, a person developing software to compute
+    statistics on a cube can used this program to create the degenerate
+    case.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <oldName>
+    <item>zero</item>
+  </oldName>
+
+  <history>
+    <change name="Kris Becker" date="1993-05-19">
+      Original version
+    </change>
+
+    <change name="Jeff Anderson" date="2002-05-21">
+      Ported to Isis 3.0
+    </change>
+
+    <change name="K Teal Thompson" date="2002-11-21">
+      Add example
+    </change>
+
+    <change name="K Teal Thompson" date="2003-03-28">
+      Make images smaller.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+
+    <change name="Jeff Anderson" date="2004-03-31">
+      Modified XML file to default output pixel type to real
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>Output cube</brief>
+        <description>
+	      The file name of the output cube to be created.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+
+    <group name="Pixel Specifications">
+      <parameter name="PIXELS">
+        <type>string</type>
+        <default>
+          <item>VALUE</item>
+        </default>
+        <brief>Type of value to output</brief>
+        <description>
+          This is the value to output in all pixels in the output image.  The
+          value can be one of the standard Isis special pixel values (NULL, LIS,
+          LRS, HIS, HRS) or a user specified constant.
+        </description>
+        <list>
+          <option value="NULL">
+            <brief> Null value </brief>
+            <description>
+              Each pixel will be set to the Null value
+            </description>
+            <exclusions>
+              <item>VALUE</item>
+            </exclusions>
+          </option>
+          <option value="LIS">
+            <brief> Low instrument saturation </brief>
+            <description>
+              Each pixel will be set to Low Instrument Saturation value
+            </description>
+            <exclusions>
+              <item>VALUE</item>
+            </exclusions>
+          </option>
+          <option value="HIS">
+            <brief> High instrument saturation </brief>
+            <description>
+              Each pixel will be set to High Instrument Saturation value
+            </description>
+            <exclusions>
+              <item>VALUE</item>
+            </exclusions>
+          </option>
+          <option value="LRS">
+            <brief> Low representation saturation </brief>
+            <description>
+              Each pixel will be set to Low Representation Saturation value
+            </description>
+            <exclusions>
+              <item>VALUE</item>
+            </exclusions>
+          </option>
+          <option value="HRS">
+            <brief> High representation saturation </brief>
+            <description>
+              Each pixel will be set to High Representation Saturation value
+            </description>
+            <exclusions>
+              <item>VALUE</item>
+            </exclusions>
+          </option>
+          <option value="VALUE">
+            <brief> User specified value </brief>
+            <description>
+              Each pixel will be set the user specified value
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="VALUE">
+        <type>double</type>
+        <default>
+          <item>0.0</item>
+        </default>
+        <brief>Value to output for all pixels</brief>
+        <description>
+          This is the user specified value to output in all pixels in the output cube.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Cube size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>Number of samples in the cube </brief>
+        <description>
+          The number of samples to be allocated in the output cube
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>Number of line in the cube </brief>
+        <description>
+          The number of lines to be allocated in the ouput cube
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="BANDS">
+        <type>integer</type>
+        <brief>Number of bands in the cube </brief>
+        <description>
+          The number of bands to be allocated in the output cube
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> default value </brief>
+      <description> let parameter PIXELS default to value.
+      </description>
+      <terminalInterface>
+        <commandLine> t=makecube.cub v=100. s=800 l=800 b=1 </commandLine>
+        <description> Run makecube letting parameter PIXELS default to value and setting parameter VALUE to 100.
+        </description>
+      </terminalInterface>
+
+
+      <outputImages>
+        <image src="assets/image/makecube.jpg" width="500" height="500">
+          <brief> Output image Io example of makecube </brief>
+          <description> This is the output image makecube.cub.
+          </description>
+          <thumbnail caption="Output image showing results of the makecube application." src="assets/thumb/makecube.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="463" height="430" src="assets/image/makecubeGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform the makecube operation</description>
+            <thumbnail width="200" height="186" caption="makecube GUI" src="assets/thumb/makecubeGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="getsn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>Prints Image Serial Number</brief>
+
+  <description>
+    This program will print the serial number for an image.
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2006-06-01">
+      Original version
+    </change>
+    <change name="Elizabeth Miler" date="2006-12-13">
+      Fixed up, finished documentation and checked in
+    </change>
+    <change name="Steven Lambright" date="2007-07-27">
+      Changed category from Utility to Control Networks
+    </change>
+    <change name="Steven Lambright" date="2007-08-07">
+      Added application test: default
+    </change>
+    <change name="Christopher Austin" date="2008-01-08">
+      Augmented observation number and added TO file with APPEND option
+    </change>
+    <change name="Steven Koechle" date="2008-04-04"> 
+      Added booleans for which keywords to get. If TO parameter is not entered 
+      output will go to console. Added results group to SessionLog and GuiLog 
+      (if applicable)
+    </change>
+    <change name="Steven Lambright" date="2008-10-31">
+      The print.prt file will now properly contain the results when getsn is run from
+      the command line; before the results group was always empty. The "TerminalOutput" user
+      preference no longer affects the output of this program. The default values of "FILE" and
+      "OBSERVATION" have been changed to FALSE.
+    </change>
+  </history>
+
+  <groups>
+
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Cube file to get  the serial number for
+        </brief>
+        <description>
+          The cube file containing the label the serial number is to be created for.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+       <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The text to append result Pvl
+        </brief>
+        <internalDefault>
+            No Output file will be created
+        </internalDefault>
+        <description>
+          The text file in which the Result Pvl created is either appended or 
+          written to.
+        </description>
+        <filter>
+          *.txt *.prt *.pvl
+        </filter>
+      </parameter>
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Appends results on output file</brief>
+        <description>
+          Appends the created Results Pvl to the TO parameter output file.  If 
+          this is set to false, then it write the results to the output file 
+          instead.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Display File Name">
+      <parameter name="DEFAULT">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Allows serial number to default to the file name</brief>
+        <description>
+          Within the Result Pvl, if the serial number is not know, then Unknown 
+          is displayed in the keyword SerialNumber.  If this parameter is set to 
+          TRUE, then is displays the input cube's filename is displayed in the 
+          keyword SerialNumber instead.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Options">
+        <parameter name="FILE">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Get the Filename
+        </brief>
+        <description>
+            If this boolean is not checked then the filename will not be part of 
+            the output.
+        </description>
+      </parameter>
+        <parameter name="SN">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Get the Serial Number
+        </brief>
+        <description>
+            If this boolean is not checked then the Serial Number will not be 
+            part of the output.
+        </description>
+      </parameter>
+        <parameter name="OBSERVATION">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Get the Observation Number
+        </brief>
+        <description>
+            If this boolean is not checked then the Observation Number will not 
+            be part of the output.
+        </description>
+      </parameter>
+    </group>
+    
+  </groups>
+
+</application>

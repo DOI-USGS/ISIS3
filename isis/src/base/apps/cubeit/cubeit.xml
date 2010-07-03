@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cubeit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Stacks cubes in individual files into one cube
+  </brief>
+
+  <description>
+    This program will stack a series of cubes into a single cube.  It
+    requires a file containing a list of cubes to stack and the order
+    of the file is used to generate the stacking order.  Each cube
+    must have the same spatial dimensions (e.g., samples and lines).
+    The BandBin group will be constructed.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>explode</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-09-04">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-14">
+        Changed List parameter to have filename type, and added support
+        for Attributes on tthe cubes in the file list.
+    </change>
+    <change name="Elizabeth Miller" date="2006-10-11">
+      Modified to allow the user to pick which cube labels are propagated (using the
+      PROPLAB keyword), rather than just using the first input cube (this is still
+      the default).  And added a helper button
+    </change>
+    <change name="Jeff Anderson" date="2007-05-16">
+      Modified so that the cube list does not need to contain the full directory path for PROPLAB option
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="LIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A text file containing a list of cubes
+        </brief>
+        <description>
+          Each file in this list, one per line, will be added to
+          the output cube in the order they appear.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonLog</function>
+            <brief>View file in log area</brief>
+            <description>This helper button will display the input file in the log area</description>
+            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+          </helper>
+        </helpers>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube name
+        </brief>
+        <description>
+          The name of cube containing the stacked data.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Label Propagation Options">
+      <parameter name="PROPLAB">
+        <type>cube</type>
+        <brief>
+          Input cube to propagate labels from
+        </brief>
+        <description>
+          The input cube to propagate the labels from.  By default, it will propagate the labels
+          from the first input cube in the list.
+        </description>
+        <internalDefault>First Cube in List</internalDefault>
+      </parameter>
+    </group>
+  </groups>
+</application>

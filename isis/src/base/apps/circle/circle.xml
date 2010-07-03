@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="circle" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Trims data outside of a circle
+  </brief>
+
+  <description>
+    This program will trim (set to NULL) all pixels in an input cube
+    which fall outside of a user defined circle.  That is, given a
+    sample/line coordinate and a radius, all pixels whose distance away
+    from the input sample/line is further than the radius will be set to NULL.
+    This program is useful for trimming global cubes collected by framing
+    cameras.  A global cube is one in which the limb of the planet/target body
+    is visible and therefore the camera has taken a picture of space as well as
+    the planet.  Using this program you can ensure the space pixels are NULL.
+    This can be done by determining the sub-spacecraft point in sample/line
+    coordinates and the radius of the body.  Note that the sample/line position
+    does not have to be within the image in question.
+  </description>
+
+  <history>
+    <change name="Kay Edwards" date="1986-02-03">
+      Original version
+    </change>
+
+    <change name="Jeff Anderson" date="2002-06-19">
+      Ported to Isis 3.0
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+</history>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to trim
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be trimmed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the circle trim.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Circle Definition">
+      <parameter name="SAMPLE">
+        <type>double</type>
+        <internalDefault>
+          Middle sample
+        </internalDefault>
+        <brief>Sample coordinate of circle</brief>
+        <description>
+          This defines the sample coordinate at the center of the circle.
+          It can be negative or greater than the number of samples in the
+          cube.
+        </description>
+      </parameter>
+
+      <parameter name="LINE">
+        <type>double</type>
+        <internalDefault>
+          Middle line
+        </internalDefault>
+        <brief>Line coordinate of circle</brief>
+        <description>
+          This defines the line coordinate at the center of the circle.
+          It can be negative or greater than the number of lines in the
+          cube.
+        </description>
+      </parameter>
+
+      <parameter name="RADIUS">
+        <type>double</type>
+        <internalDefault>
+          Half the image size
+        </internalDefault>
+        <brief>Radius of the circle</brief>
+        <description>
+          This defines the radius of the circle.  Pixels outside the radius
+          of the circle centered at (SAMPLE,LINE) will be trimmed.  The default
+          value is the lesser of half the samples or half the lines.
+        </description>
+        <minimum inclusive="yes">1.0</minimum>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Taking all defaults </brief>
+      <description>
+        This example shows the result of taking all the default
+        parameters on the application circle.
+        line and samp defaulted to the center of the image, and
+        radius defaulted to the minimum of nl/2.0 and ns/2.0
+      </description>
+      <terminalInterface>
+        <commandLine>from=circle_in to=circle1_out </commandLine>
+        <description>line and sample default to the center of the image, radius defaults to the lesser one half of the number of lines or the number of samples  </description>
+      </terminalInterface>
+      <inputImages>
+        <image width="500" height="500" src="assets/circle_in.jpg">
+          <brief>Input image for circle</brief>
+          <description>This is the input image for the default example of circle.   </description>
+          <thumbnail caption="Input image" height="200" src="assets/circle_in_s.jpg" width="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image height="500" src="assets/circle1_out.jpg" width="500">
+          <brief>
+        Output image for circle
+      </brief>
+          <description>This is the output image for circle. Notice the NULL values in the corners  of this image.
+      </description>
+          <thumbnail caption="Output image showing results of the circle application defaults" src="assets/circle1_out_s.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="328" height="249" src="assets/screen1.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform the default circle operation</description>
+            <thumbnail width="200" height="152" caption="Circle GUI" src="assets/screen1_s.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+    <example>
+      <brief>Small centered circle</brief>
+      <description>This example shows the result of setting a smaller radius than the minimum of ns/2.0 and nl/2.0. The center of the circle defaults to the center of the image</description>
+      <terminalInterface>
+        <commandLine>from=circle_in to=circle_out rad=150</commandLine>
+        <description>line and sample default to the center of the input image, with a radius of 150 pixels</description>
+      </terminalInterface>
+      <inputImages>
+        <image width="500" height="500" src="assets/circle_in.jpg">
+          <brief>Input image for circle</brief>
+          <description>Input image</description>
+          <thumbnail width="200" height="200" caption="Input Image" src="assets/circle_in_s.jpg"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image width="500" height="500" src="assets/circle_out.jpg">
+          <brief>Circle radius smaller than image</brief>
+          <description>Output image for circle radius = 150 on a 500 by 500 image</description>
+          <thumbnail width="200" height="200" caption="Output image showing results of the circle application with a user defined radius" src="assets/circle_out_s.jpg"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="328" height="249" src="assets/screen2.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a circle operation with a radius of 150</description>
+            <thumbnail width="200" height="152" caption="Circle GUI" src="assets/screen2_s.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+    <example>
+      <brief>Off centered    </brief>
+      <description>
+      This example shows the result of circle when the radius center is placed
+      at the center of the upper right quadrant of the image. The radius is large
+      enough to include data not in the immage.
+    </description>
+      <terminalInterface>
+        <commandLine>from=circle_in to=circle2_out line=125 samp=375 rad=200          </commandLine>
+        <description>the center of the circle is line 125 and sample 375, with a radius of 200
+          </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/circle_in.jpg" width="500" height="500">
+          <brief> Input image for circle</brief>
+          <description>This is the input image for the default example of circle.
+        </description>
+          <thumbnail caption=" Input image" src="assets/circle_in_s.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/circle2_out.jpg" width="500" height="500">
+          <brief>
+        Output image off centered example of circle
+      </brief>
+          <description>
+        This is the output image for circle. Notice the NULL values of this image.
+      </description>
+          <thumbnail caption="Output image showing results of the circle application with all parameters defined" src="assets/circle2_out_s.jpg        " width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="328" height="249" src="assets/screen3.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a circle operation with a radius of 200 and centered on line/sample 125/375</description>
+            <thumbnail width="200" height="152" caption="Circle GUI" src="assets/screen3_s.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

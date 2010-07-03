@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<application name="getkey" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs the value of a requested keyword
+  </brief>
+
+  <description>
+    This program will output the value of a requested keyword.
+    Its general use is
+    within batch jobs, perl programs, or other scripting languages.  It allows
+    the script writer to easily obtain values from cube labels or other
+    label-like files such as those output by programs like stats, percent, etc.
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2002-10-25">
+      Original version
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Jeff Anderson" date="2004-03-29">
+      Change parameter from GROUP to GRPNAME because of conflicts in the
+      print and history files (keyword named GROUP in a GROUP).  Added 
+      OBJNAME and UPPER parameters.
+    </change>
+    <change name="Brendan George" date="2005-11-03">
+      Fixed application test
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-09">
+      Added KEYINDEX param and fixed bug with list keywords.  Also modified
+      to output to the UI session log rather than the terminal window if the UI is
+      open.
+    </change>
+    <change name = "Elizabeth Miller" date="2006-06-14">
+      Fixed bug that did not allow you to get a keyword that was not in a group
+      or object and reworked code to avoid the repetition of code
+    </change>
+    <change name="Elizabeth Miller" date="2006-07-24">
+      Added helper button to the FROM parameter to output the file.
+    </change>
+    <change name="Steven Koechle" date="2007-08-14">
+      Added recursive search option
+    </change>
+    <change name="Steven Koechle" date="2008-03-05">
+        Changed preferences to not output to terminal, and added  results 
+        group to session log.
+    </change>
+    <change name="Christopher Austin" date="2010-03-03">
+      Made UPPER equal to FALSE by default
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Filename of a label file
+        </brief>
+        <description>
+  	      The file specification containing the input label.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonLog</function>
+            <brief>View file in log area</brief>
+            <description>This helper button will display the input file in the log area</description>
+            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+          </helper>
+        </helpers>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Selection">
+      <parameter name="OBJNAME">
+        <type>string</type>
+        <brief>
+          Object name containing the group or keyword
+        </brief>
+        <internalDefault>Root</internalDefault>
+        <description>
+  	  Enter the name of the Object which contains the group or keyword.  
+          If the keyword is not in an Object then ignore this parameter.  
+          The name is case insensitive.
+        </description>
+      </parameter>
+
+      <parameter name="GRPNAME">
+        <type>string</type>
+        <brief>
+          Group name containing the keyword
+        </brief>
+        <internalDefault>Root</internalDefault>
+        <description>
+  	  Enter the name of the Group which contains the keyword.  
+        </description>
+      </parameter>
+
+      <parameter name="KEYWORD">
+        <type>string</type>
+        <brief>
+          Keyword name
+        </brief>
+        <description>
+  	  Enter the name of the keyword.  
+        </description>
+      </parameter>
+
+      <parameter name="KEYINDEX">
+        <type>integer</type>
+        <brief>
+          Index in keyword to return
+        </brief>
+        <description>
+          If the keyword is a list, you may enter an integer value for the index of the keyword 
+          value you would like to retrieve.  The default is 'All' and will return the entire list of 
+          keyword values.
+        </description>
+        <internalDefault>All</internalDefault>
+        <minimum inclusive="true">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="UPPER">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Convert results to uppercase
+        </brief>
+        <description>
+  	  If set this parameter causes all character output to be
+          in uppercase.
+        </description>
+      </parameter>
+      <parameter name="RECURSIVE">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Recursively searches for keyword
+        </brief>
+        <description>
+            If set it will search recursively, however if an object name is specified it will recursively
+            search for that object and then recursively search inside only that object.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

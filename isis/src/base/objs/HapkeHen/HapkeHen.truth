@@ -1,0 +1,24 @@
+UNIT TEST for HapkeHen photometric function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name  = HapkeHen
+    Wh    = 0.52
+    B0    = 0.0
+    Hh    = 0.0
+    Theta = 30.0
+    Hg1   = 0.213
+    Hg2   = 1.0
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.158749
+
+Test phase=60.0, incidence=45.0, emission=30.0 ...
+Albedo = 0.0911799
+
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+

@@ -1,0 +1,95 @@
+Unit Test For PolarStereographic
+
+Test missing center longitude keyword ...
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+
+Test missing center latitude keyword ...
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+
+Test invalid center latitude keyword ...
+**PROJECTION ERROR** Invalid label group [Mapping]
+**USER ERROR** Invalid value for keyword [CenterLatitude] in map file.  CenterLatitude cannot equal 0.0
+
+Test SetGround method ... 
+Setting ground to (-75,150)
+Latitude:               -75
+Longitude:              150
+XCoord:                 -1540033.6209707
+YCoord:                 -560526.39780253
+
+Test SetCoordinate method ... 
+Setting coordinate to (-1540033.620970689,-560526.3978025292)
+Latitude:               -75
+Longitude:              150
+XCoord:                 -1540033.6209707
+YCoord:                 -560526.39780253
+
+Test XYRange method ... 
+Minimum X:  -12367708.016158
+Maximum X:  12367708.016158
+Minimum Y:  -12367708.016158
+Maximum Y:  12367708.016158
+
+Test TrueScaleLatitude method... 
+TrueScaleLatitude = -71
+
+Test Name and comparision method ... 
+Name:       PolarStereographic
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius   = 6378388.0
+  PolarRadius        = 6356911.9
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 0.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  ProjectionName     = PolarStereographic
+  CenterLongitude    = 0.0
+  CenterLatitude     = -90.0
+End_Group
+End
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = PolarStereographic
+  EquatorialRadius   = 6378388.0
+  PolarRadius        = 6356911.9
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 0.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  CenterLatitude     = -71.0
+  CenterLongitude    = -100.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -90.0
+  MaximumLatitude = 0.0
+  CenterLatitude  = -71.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = -100.0
+End_Group
+End
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 315-319

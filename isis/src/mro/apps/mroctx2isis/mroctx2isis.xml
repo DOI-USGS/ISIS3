@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mroctx2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+    <brief>
+      Import an MRO CTX image as an Isis cube
+    </brief>
+
+    <description>
+        This program takes an image from the Mars Reconnaissance Orbiter Context Imager
+        and produces an Isis cube containing the image data.
+    </description>
+
+    <history>
+        <change name="Brendan George " date="2006-06-15">
+            Original Version
+        </change>
+        <change name="Elizabeth Miller" date="2006-09-21">
+          Added NaifFrameCode keyword to the Kernels group
+        </change>
+        <change name="Brendan George" date="2006-09-28">
+            Documentation fixes
+        </change>
+        <change name="Elizabeth Miller" date="2006-09-28">
+          Modified to convert from 8 to 12 bit data and pulled prefix and suffix data out of cube
+        </change>
+        <change name="Elizabeth Miller" date="2006-11-06">
+          Put dark prefix data in a table blob
+        </change>
+        <change name="Elizabeth Miller" date="2006-11-15">
+          Modified keywords to handle keywords that were modified in new data files.  Modified
+          the PREFIX and SUFFIX parameters to automatically compute, and added documentation.
+        </change>
+        <change name="Steven Lambright" date="2007-08-15">
+          Added an application test
+        </change>
+        <change name="Steven Lambright" date="2008-02-14">
+          Added a fillgap option
+        </change>
+        <change name="Christopher Austin" date="2008-03-18">
+          Checks if input file is rdr.
+        </change>
+        <change name="Steven Lambright" date="2008-05-13">
+          Removed references to CubeInfo 
+        </change>
+        <change name="Steven Lambright" date="2008-09-02">
+          Fixed bug where dark current data could be corrupted if FILLGAP was true
+        </change>
+    </history>
+
+    <category>
+      <missionItem>Mars Reconnaissance Orbiter</missionItem>
+    </category>
+
+    <groups>
+        <group name="Files">
+            <parameter name="FROM">
+                <type>filename</type>
+                <fileMode>input</fileMode>
+                <brief>
+                    Input file
+                </brief>
+                <description>
+                    The image to be processed
+                </description>
+                <filter>
+                    *.img
+                </filter>
+            </parameter>
+
+            <parameter name="TO">
+                <type>cube</type>
+                <fileMode>output</fileMode>
+                <brief>
+                    Output cube
+                </brief>
+                <description>
+                    This is the resultant cube, containing the image and label data.
+                </description>
+                <filter>
+                    *.cub
+                </filter>
+            </parameter>
+        </group>
+
+        <group name="Options">
+          <parameter name="PREFIX">
+            <type>integer</type>
+            <brief>Prefix Pixels</brief>
+            <description>
+                Prefix dark pixels to strip off and put in a BLOB table. The default value is computed.  This will compute
+                what is believed to be the number of suffix pixels based on data in the labels.  If you find that suffix pixels are 
+                being left on the edge of the image, adjust this parameter accordingly.
+            </description>
+            <minimum inclusive="yes">0</minimum>
+            <internalDefault>Computed</internalDefault>
+          </parameter>
+          <parameter name="SUFFIX">
+            <type>integer</type>
+            <brief>Suffix Pixels</brief>
+            <description>
+                Suffix dark pixels to strip off and put in a BLOB table.  The default value is computed.  This will compute
+                what is believed to be the number of suffix pixels based on data in the labels.  If you find that suffix pixels are 
+                being left on the edge of the image, adjust this parameter accordingly.
+            </description>
+            <minimum inclusive="yes">0</minimum>
+            <internalDefault>Computed</internalDefault>
+          </parameter>
+          <parameter name="FILLGAP">
+            <type>boolean</type>
+            <brief> Set zeros to null</brief>
+            <description>
+              The CTX table for the SQROOT SAMPLE_BIT_MODE_ID correlates the DN value 
+              zero to one. Errorenous data is also set to a DN value of zero. When enabled, this
+              option assumes the DN values of zero are errenous data and thus zeros are set to NULL. 
+              When disabled, this data is preserved.
+            </description>
+            <default><item>true</item></default>
+          </parameter>
+        </group>
+    </groups>
+</application>

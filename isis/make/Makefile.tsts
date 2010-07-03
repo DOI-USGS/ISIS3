@@ -1,0 +1,6 @@
+APPNAME =
+
+include $(ISISROOT)/make/isismake.tsts
+
+commands:
+	> /dev/null;

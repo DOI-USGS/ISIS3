@@ -1,0 +1,91 @@
+UNIT TEST FOR Mercator
+
+Test missing center longitude keyword ...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+
+Test missing center latitude keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+
+Test SetGround method ... 
+Setting ground to (35,-75)
+Latitude:               35
+Longitude:              -75
+XCoord:                 11688673.7
+YCoord:                 4139145.66
+
+Test SetCoordinate method ... 
+Setting coordinate to (11688673.7,4139145.66)
+Latitude:               35
+Longitude:              -75.0000001
+XCoord:                 11688673.7
+YCoord:                 4139145.66
+
+Test XYRange method ... 
+Minimum X:  0
+Maximum X:  40075452.7
+Minimum Y:  -11028186.7
+Maximum Y:  11028186.7
+
+Test Name and comparision method ... 
+Name:       Mercator
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius   = 6378206.4
+  PolarRadius        = 6356583.8
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -70.0
+  MaximumLatitude    = 70.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  ProjectionName     = Mercator
+  CenterLongitude    = 0.0
+  CenterLatitude     = 0.0
+End_Group
+End
+
+Test TrueScaleLatitude method... 
+TrueScaleLatitude = 0
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = Mercator
+  EquatorialRadius   = 6378206.4
+  PolarRadius        = 6356583.8
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -70.0
+  MaximumLatitude    = 70.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  CenterLatitude     = 0.0
+  CenterLongitude    = -180.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -70.0
+  MaximumLatitude = 70.0
+  CenterLatitude  = 0.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = -180.0
+End_Group
+End
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 267-268

@@ -1,0 +1,31 @@
+pointreg: Working
+0% Processed10% ProcessedGroup = Points
+  Ignored = 0
+End_Group
+
+Group = Measures
+  Validated    = 0
+  Registered   = 1
+  Unregistered = 0
+  Unmeasured   = 2
+End_Group
+
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 1
+  Failure    = 0
+End_Group
+
+Group = PatternChip1
+  PatternNotEnoughData   = 0
+  PatternZScoreNotMet    = 0
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModel
+  SurfaceModelNotEnoughData   = 0
+  SurfaceModelSolutionInvalid = 0
+  SurfaceModelToleranceNotMet = 0
+  SurfaceModelDistanceInvalid = 0
+End_Group

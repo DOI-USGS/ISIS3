@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cubefunc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    This program will apply a chosen function to the input cube
+  </brief>
+
+  <description>
+    This program will apply the chosen function to the input cube.
+    The following functions with their corresponding restrictions are available:
+     NOTE:  Trig functions requiring angles as the input must be in radians.
+<pre>
+    	FUNCTION       RESTRICTIONS
+	cos (x)
+	sin (x)
+	tan (x)        x cannot equal: 90, 270, -90, -270,
+                                       pi/2, 3pi/2, -pi/2, -3pi/2
+	arccos(x)      -1.0 &lt; x &lt; 1.0
+	arcsin(x)      -1.0 &lt; x &lt; 1.0
+	arctan(x)
+	1.0 / x        x cannot equal 0.
+	sqrt (x)       x must be greater than or equal to 0.
+	10 ^ x
+	e ^ x
+	x ^ y          x is the input cube, y is an input constant
+	log (x)        x &gt; 0
+	ln (x)         x &gt; 0
+	abs(x)
+</pre>
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="2002-10-18">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2002-10-29">
+      If input pixel is a special pixel, output the input value instead
+      of the NULL value.
+    </change>
+    <change name="K Teal Thompson" date="2002-11-22">
+      Add example.
+    </change>
+    <change name="Tracie Sucharski" date="2003-01-28">
+      Removed from Utility category.
+    </change>
+    <change name="K Teal Thompson" date="2003-02-03">
+      Make images smaller.  Move "constants" group below "functions" group.
+    </change>
+    <change name="Tracie Sucharski" date="2003-04-03">
+      Added to liens:
+        1.  Add degree and radian radio buttons.
+        2.  Move constants group below functions goup.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Tracie Sucharski" date="2004-07-16">
+        Add error checking for cos/sin function.  Print number invalid input pixels.
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Brendan George" date="2007-01-09">
+        Fixed appTest
+    </change>
+    <change name="Steven Lambright" date="2007-08-21">
+        Fixed output to contain valid pvl
+    </change>
+  </history>
+
+  <liens>
+    <item>Add degree and radian radio buttons.</item>
+    <item>Move constants group below functions goup.</item>
+  </liens>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>algebra</item>
+      <item>poly</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file (X value)
+        </brief>
+        <description>
+          Cube that is used as input to chosen function (x value).
+          NOTE:  For trig functions requiring angles, input must be in radians.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file
+        </brief>
+        <description>
+          Cube containing the result of the function.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Functions">
+      <parameter name="FUNCTION">
+        <type>string</type>
+        <brief> Function to apply to input cube </brief>
+        <default><item>COS</item></default>
+        <description>
+          This indicates the function to apply to the input cube.
+        </description>
+        <list>
+          <option value="COS">
+            <brief>cosine</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Apply the cosine function to the input pixel (x).
+              X must be in radians.
+            </description>
+          </option>
+          <option value="SIN">
+            <brief>sine</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Apply the sine function to the input pixel (x).
+              x must be in radians.
+            </description>
+          </option>
+          <option value="TAN">
+            <brief>tangent</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Apply the tangent function to the input pixel (x).
+              x cannot equal:  pi/2, 3pi/2, -pi/2, -3p/2, and must be
+              in radians.
+            </description>
+          </option>
+          <option value="ACOS">
+            <brief>arc cosine</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Apply the arc cosine function to the input pixel (x).
+              x must be in radians and between -1.0 and 1.0.
+            </description>
+          </option>
+          <option value="ASIN">
+            <brief>arc sine</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Apply the arc sine function to the input pixel (x).
+              x must be in radians and between -1.0 and 1.0.
+            </description>
+          </option>
+          <option value="ATAN">
+            <brief>arc tan</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Apply the arc tangent function to the input pixel.
+            </description>
+          </option>
+          <option value="INV">
+            <brief>inverse</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Apply the inverse function, 1/x, to the input cube.
+              (x > 0.)
+            </description>
+          </option>
+          <option value="SQRT">
+            <brief>square root</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Take the square root of the input pixel (x).
+              (x > 0.)
+            </description>
+          </option>
+          <option value="POW10">
+            <brief>Power of 10</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Take 10 to the power of x (x=input pixel)
+            </description>
+          </option>
+          <option value="EXP">
+            <brief>exponent</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Take e to the x (x=input pixel)
+	       e = 2.7182818284590452353602874713526
+            </description>
+          </option>
+          <option value="XTOY">
+            <brief>x ^ y</brief>
+            <inclusions><item>Y</item></inclusions>
+            <description>
+              Calculate x (FROM) to the power of y.
+            </description>
+          </option>
+          <option value="LOG10">
+            <brief>Log base 10(x)</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Calculate the log 10 of the input pixel (x).
+              (x > 0.)
+            </description>
+	  </option>
+          <option value="LN">
+            <brief>Natural log(x)</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Calculate the natural log of the input pixel (x).
+              (x > 0.)
+            </description>
+          </option>
+          <option value="ABS">
+            <brief>Absolute value(x)</brief>
+	    <exclusions><item>Y</item></exclusions>
+            <description>
+              Calculate the absolute value of the input pixel (x).
+            </description>
+          </option>
+
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Constants">
+      <parameter name="Y">
+	<type>double</type>
+	<brief>y value for XTOY function</brief>
+	<description>
+	  y value which is only used when FUNCTION=XTOY.
+	</description>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief> X to Y </brief>
+      <description>
+        This example shows the use of the "x to y" function.
+      </description>
+      <terminalInterface>
+        <commandLine> fr=../IN/9700r.cub t=OUT/cubefunc fu=xtoy y=3
+        </commandLine>
+        <description>
+        You have to use "fr" for the FROM parameter because the parameter FUNCTION starts with an "f", also.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/9700r.jpg" width="500" height="500">
+          <brief> Input image for cubefunc</brief>
+          <description>This is the input image for the cubefunc example.
+          </description>
+          <thumbnail caption=" Input Io image" src="assets/thumb/9700r.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/IoCubefunc.jpg" width="500" height="500">
+          <brief> Output image for cubefunc</brief>
+          <description> This is the "X to Y" output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of cubefunc using the X to Y function." src="assets/thumb/IoCubefunc.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="471" height="546" src="assets/image/IoCubefuncGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+a cubefunc operation on the input image. </description>
+            <thumbnail width="200" height="232" caption="Cubefunc Gui" src="assets/thumb/IoCubefuncGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

@@ -1,0 +1,7 @@
+Group = Orthographic
+  Library = Orthographic
+  Routine = OrthographicPlugin
+  Keyword = CenterLongitude
+  Keyword = CenterLatitude
+EndGroup
+

@@ -1,0 +1,96 @@
+
+Unit test for CissLabels
+
+
+ISSWA,NotCompressed,12Bit,CAS-ISS,WacOnly,Full test...
+IsNarrowAngle?                 0
+Bias Strip Mean              = 69.72
+Compression Ratio            = NotCompressed
+Compression Type             = NotCompressed
+Data Conversion Type         = 12Bit
+Delayed Readout Flag         = No
+Exposure Duration            = 120
+Filter 1 Name                = IR4
+Filter 2 Name                = CL2
+Filter 1 Index               = 10
+Filter 2 Index               = 18
+Flight Software Version(FSW) = Unknown
+Front Optics Temp            = 8.48
+Gain Mode ID                 = 29
+Gain State                   = 2
+Image Number                 = 1.29456e+09
+Instrument Data Rate         = 365.6
+Instrument ID                = ISSWA
+Readout Cycle Index          = 0
+Shutter Mode ID              = WacOnly
+Summing Mode                 = 1
+
+ISSNA,Lossy,Table,CAS-ISS2,NacOnly,Sum2 test...
+IsNarrowAngle?                 1
+Bias Strip Mean              = 120.75
+Compression Ratio            = 18.437473
+Compression Type             = Lossy
+Data Conversion Type         = Table
+Delayed Readout Flag         = No
+Exposure Duration            = 2000
+Filter 1 Name                = IRP0
+Filter 2 Name                = MT3
+Filter 1 Index               = 20
+Filter 2 Index               = 16
+Flight Software Version(FSW) = 1.2
+Front Optics Temp            = 0.71269
+Gain Mode ID                 = 12
+Gain State                   = 3
+Image Number                 = 1.35554e+09
+Instrument Data Rate         = 182.784
+Instrument ID                = ISSNA
+Readout Cycle Index          = 15
+Shutter Mode ID              = NacOnly
+Summing Mode                 = 2
+
+ISSNA,Lossless,Table,CAS-ISS4,BothSim,Sum4 test...
+IsNarrowAngle?                 1
+Bias Strip Mean              = 30
+Compression Ratio            = 3.721945
+Compression Type             = Lossless
+Data Conversion Type         = Table
+Delayed Readout Flag         = No
+Exposure Duration            = 18000
+Filter 1 Name                = CL1
+Filter 2 Name                = CB3
+Filter 1 Index               = 17
+Filter 2 Index               = 13
+Flight Software Version(FSW) = 1.4
+Front Optics Temp            = 0.712693
+Gain Mode ID                 = 95
+Gain State                   = 1
+Image Number                 = 1.53636e+09
+Instrument Data Rate         = 182.784
+Instrument ID                = ISSNA
+Readout Cycle Index          = 15
+Shutter Mode ID              = BothSim
+Summing Mode                 = 4
+
+ISSNA,Lossless,8LSB,CAS-ISS,NacOnly,Full test...
+IsNarrowAngle?                 1
+Bias Strip Mean              = 49.75
+Compression Ratio            = 3.976
+Compression Type             = Lossless
+Data Conversion Type         = 8LSB
+Delayed Readout Flag         = No
+Exposure Duration            = 10
+Filter 1 Name                = CL1
+Filter 2 Name                = CL2
+Filter 1 Index               = 17
+Filter 2 Index               = 18
+Flight Software Version(FSW) = Unknown
+Front Optics Temp            = 6.43
+Gain Mode ID                 = 12
+Gain State                   = 3
+Image Number                 = 1.31363e+09
+Instrument Data Rate         = 182.8
+Instrument ID                = ISSNA
+Readout Cycle Index          = 15
+Shutter Mode ID              = NacOnly
+Summing Mode                 = 1
+

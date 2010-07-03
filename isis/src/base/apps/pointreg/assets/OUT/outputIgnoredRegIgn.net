@@ -1,0 +1,296 @@
+Object = ControlNetwork
+  NetworkId    = NiliFossae
+  NetworkType  = ImageToGround
+  TargetName   = Mars
+  UserName     = jwalldren
+  Created      = 2008-11-17T13:52:56
+  LastModified = Null
+  Description  = "NiliFossae Jitter - use spicefit"
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600001
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2042.3350730536
+      Line           = 71.29440261681
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Automatic
+      Sample         = 40.982541075274
+      Line           = 73.347661016967
+      ErrorLine      = -2.3650125369658
+      ErrorSample    = 1.142211418757
+      ErrorMagnitude = 2.626391293228
+      ZScore         = (-1.8126794102863, 1.9209675846147)
+      DateTime       = 2008-11-17T13:52:58
+      ChooserName    = "Application pointreg"
+      GoodnessOfFit  = 0.95303076679148
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600002
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2002.639916173
+      Line           = 66.57377716384
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600003
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2029.6922678382
+      Line           = 169.76283611677
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Estimated
+      Sample         = 29.492607315035
+      Line           = 169.44015966286
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600004
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2017.0482456316
+      Line           = 268.23033341812
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Estimated
+      Sample         = 16.85914095714
+      Line           = 267.8967346471
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600005
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2044.1054109109
+      Line           = 371.41814410624
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Estimated
+      Sample         = 43.914972221782
+      Line           = 371.0923469903
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600006
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2004.403169377
+      Line           = 366.69783071947
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Estimated
+      Sample         = 4.2245219795274
+      Line           = 366.35299756514
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600007
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2031.4609997924
+      Line           = 469.88532934139
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600008
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2018.8154240193
+      Line           = 568.35251457654
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Estimated
+      Sample         = 18.646136218309
+      Line           = 568.00487282638
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600009
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2045.8782485386
+      Line           = 671.53938906605
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Estimated
+      Sample         = 45.707486236206
+      Line           = 671.19986103717
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600010
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2006.1688073063
+      Line           = 666.81907567928
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType    = Estimated
+      Sample         = 6.0099094607153
+      Line           = 666.46051161202
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+End_Object
+End

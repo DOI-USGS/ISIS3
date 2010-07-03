@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="flip" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Flip a cube from top-to-bottom
+  </brief>
+
+  <description>
+    This program will flip a cube from top-to-bottom.  By flipping the cube
+    the geometric integrity of the cube is destroyed.  Therefore, any
+    geometric, mapping, or instrument related labels will be marked as
+    invalid.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>rotate</item>
+      <item>mirror</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2006-04-03">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2006-06-14">
+      Added example
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be flipped
+        </brief>
+        <description>
+          The cube to be flipped.  All bands will be flipped from
+          top-to-bottom.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the flipped data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Io flipped </brief>
+      <description>
+        This example shows the simple but indispensable flip application.  There are no defaults.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/peaks.cub t=OUT/peaksFlip.cub
+        </commandLine>
+        <description>
+        Just flip an image.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for flip</brief>
+          <description>This is the 800 by 800 input image for the flip example.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/peaksFlip.jpg" width="500" height="500">
+          <brief> Output image for flip</brief>
+          <description> This is the 800 by 800 output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the flip application." src="assets/thumb/peaksFlip.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+    </example>
+  </examples>
+
+</application>

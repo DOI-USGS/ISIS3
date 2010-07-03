@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="rgb2hsv" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+   Convert RGB to HSV 
+  </brief>
+
+  <description>
+    This program takes in three input images, representing Red, Green, and Blue, then outputs Hue, Saturation, 
+    and Value files respectively.  It works by creating an RGB pixel from pixels in the Red, Green, and Blue  
+    files, converting it to HSV format, then writing the data to the Hue, Saturation, and Value files.<br /><br />
+
+    <b>NOTE:</b> The original input file dn range is compressed down to a value between 0.0 and 1.0 When it comes back out
+     through hsv2rgb, it remains in the range of 0.0 to 1.0  We currently do not have the capability to return the dn values
+     to their original value.<br /><br />
+
+      HSV Stores colors in terms of hue, saturation, and value. The hue determines the color,
+     which is an angle around the color wheel. The basic colors are: 0 degrees = RED, 
+     60 degrees = YELLOW, 120 degrees = GREEN, 180 degrees = CYAN, 240 degrees = BLUE and 
+     300 degrees = PURPLE. <br />
+     The saturation is how much grey is in the color (intensity of the color). A saturation value of zero means it's a perfect color, 
+     while a saturation value of 1 would cause any color to become pure grey. As an example, the color RGB(255,0,0)
+     is pure so the saturation would be zero. The value is how bright the color is. A value of 0 is always black,
+     and 100 is the color (if not saturated).<br /><br />
+     In brief,<br />
+     HUE = COLOR (degrees around the color wheel)<br />
+     SATURATION = INTENSITY (0-1, 0 being no color/grey)<br />
+     VALUE = BRIGHTNESS (0 being black)<br /><br />
+
+     For more information, see<br />
+     http://en.wikipedia.org/wiki/Color_spaces
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>hsv2rgb</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Sean Crosby" date="2006-12-22">
+      Original version   
+    </change>
+    <change name="Steven Lambright" date="2007-06-20">
+      Added comment explaining what HSV is and what the code is doing
+    </change>
+    <change name="Steven Koechle" date="2007-08-22">
+      Added documentation explaining why running images through rgb2hsv and 
+      then running it back through hsv2rgb gives a different result that the original.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Input Files">
+      <parameter name="RED">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be converted 
+        </brief>
+        <description>
+          This file will be converted from Red to Hue 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="GREEN">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be converted
+        </brief>
+        <description>
+          This file will be converted from Green to Saturation
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="BLUE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be converted
+        </brief>
+        <description>
+          This file will be converted from Blue to Value
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    
+    <group name="Output Files">
+      <parameter name="HUE">
+        <type>cube</type>
+		<pixelType>real</pixelType> 
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant Hue cube 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="SATURATION">
+        <type>cube</type>
+		<pixelType>real</pixelType> 
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant Saturation cube 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="VALUE">
+        <type>cube</type>
+		<pixelType>real</pixelType> 
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant Value cube 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Stretch">
+      <parameter name = "MODE">
+        <type>string</type>
+        <default><item>Automatic</item></default>
+        <brief>Histogram parameters</brief>
+        <description>
+          This determines which values will be used for minimum and maximum cut-off limits 
+        </description>
+        <list>
+          <option value = "Automatic">
+            <brief>Use default percentages</brief>
+            <description>Use minimum and maximum percentages of 0.5 and 99.5 for each input files' histogram cut-off values.
+            </description>
+            <exclusions>
+              <item>RMIN</item>
+              <item>RMAX</item>
+              <item>GMIN</item>
+              <item>GMAX</item>
+              <item>BMIN</item>
+              <item>BMAX</item>
+            </exclusions>
+          </option>
+
+          <option value = "Manual">
+            <brief>Use manually defined percentages</brief>
+            <description>The user defines minimum and maximum pixel values 
+            </description>
+            <exclusions>
+              <item>RMINPER</item>
+              <item>RMAXPER</item>
+              <item>GMINPER</item>
+              <item>GMAXPER</item>
+              <item>BMINPER</item>
+              <item>BMAXPER</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name = "Auto settings">
+      <parameter name = "RMINPER">
+        <type>double</type>
+        <default><item>0.5</item></default>
+        <brief>Minumim percentage</brief>
+        <description>
+          Minimum cut-off value for the histogram
+        </description>
+        <minimum inclusive = "yes">0.0</minimum>
+        <lessThan>
+          <item>RMAXPER</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "RMAXPER">
+        <type>double</type>
+        <default><item>99.5</item></default>
+        <brief>Maximum percentage</brief>
+        <description>
+          Maximum cut-off value for the histogram
+        </description>
+        <maximum inclusive="yes">100.0</maximum>
+      </parameter>
+
+      <parameter name = "GMINPER">
+        <type>double</type>
+        <default><item>0.5</item></default>
+        <brief>Minumim percentage</brief>
+        <description>
+          Minimum cut-off value for the histogram
+        </description>
+        <minimum inclusive = "yes">0.0</minimum>
+        <lessThan>
+          <item>GMAXPER</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "GMAXPER">
+        <type>double</type>
+        <default><item>99.5</item></default>
+        <brief>Maximum percentage</brief>
+        <description>
+          Maximum cut-off value for the histogram
+        </description>
+        <maximum inclusive="yes">100.0</maximum>
+      </parameter>
+
+      <parameter name = "BMINPER">
+        <type>double</type>
+        <default><item>0.5</item></default>
+        <brief>Minumim percentage</brief>
+        <description>
+          Minimum cut-off value for the histogram
+        </description>
+        <minimum inclusive = "yes">0.0</minimum>
+        <lessThan>
+          <item>BMAXPER</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "BMAXPER">
+        <type>double</type>
+        <default><item>99.5</item></default>
+        <brief>Maximum percentage</brief>
+        <description>
+          Maximum cut-off value for the histogram
+        </description>
+        <maximum inclusive="yes">100.0</maximum>
+      </parameter>
+    </group> 
+
+    <group name = "Manual settings">
+      <parameter name = "RMIN">
+        <type>double</type>
+        <brief>Minumim pixel value</brief>
+        <description>
+          Minimum cut-off pixel value 
+        </description>
+        <minimum inclusive = "yes">0.0</minimum>
+        <lessThan>
+          <item>RMAX</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "RMAX">
+        <type>double</type>
+        <brief>Maximum pixel value</brief>
+        <description>
+          Maximum cut-off pixel value 
+        </description>
+        <maximum inclusive="yes">255.0</maximum>
+      </parameter>
+
+      <parameter name = "GMIN">
+        <type>double</type>
+        <brief>Minumim pixel value</brief>
+        <description>
+          Minimum cut-off pixel value
+        </description>
+        <minimum inclusive = "yes">0.0</minimum>
+        <lessThan>
+          <item>GMAX</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "GMAX">
+        <type>double</type>
+        <brief>Maximum pixel value</brief>
+        <description>
+          Maximum cut-off pixel value
+        </description>
+        <maximum inclusive="yes">255.0</maximum>
+      </parameter>
+
+      <parameter name = "BMIN">
+        <type>double</type>
+        <brief>Minumim pixel value</brief>
+        <description>
+          Minimum cut-off pixel value
+        </description>
+        <minimum inclusive = "yes">0.0</minimum>
+        <lessThan>
+          <item>RMAX</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "BMAX">
+        <type>double</type>
+        <brief>Maximum pixel value</brief>
+        <description>
+          Maximum cut-off pixel value
+        </description>
+        <maximum inclusive="yes">255.0</maximum>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Convert RGB image to HSV </brief>
+      <description>
+        This example shows the results of converting RGB images to HSV format.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          red=../peaks.cub+5 green=../peaks.cub+4 blue=../peaks.cub+3 hue=../hue.cub saturation=../sat.cub value=../val.cub mode=automatic 
+        </commandLine>
+        <description>
+        Convert Red, Green, and Blue images into their respective Hue, Saturation, and Value images. 
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/rgb.jpg" width="500" height="500">
+          <brief> Input image for rgb2hsv</brief>
+          <description>This is the color input image for the rgb2hsv example. 
+          </description>
+          <thumbnail caption="Input Peaks (Bands 3, 4, and 5) image" src="assets/thumb/rgb.jpg" width="200" height="200" />
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/hue.jpg" width="500" height="500">
+          <brief>Output image </brief>
+          <description> This is the output image that results from converting Red to Hue.
+          </description>
+          <thumbnail caption="Output image showing results of rgb2hsv." src="assets/thumb/hue.jpg" width="200" height="200"  />
+          <parameterName>HUE</parameterName>
+        </image>
+
+        <image src="assets/image/sat.jpg" width="500" height="500">
+          <brief>Output image </brief>
+          <description> This is the output image that results from converting Green to Saturation.
+          </description>
+          <thumbnail caption="Output image showing results of rgb2hsv." src="assets/thumb/sat.jpg" width="200" height="200"  />
+          <parameterName>SATURATION</parameterName>
+        </image>
+
+        <image src="assets/image/val.jpg" width="500" height="500">
+          <brief>Output image </brief>
+          <description> This is the output image that results from converting Blue to Value.
+          </description>
+          <thumbnail caption="Output image showing results of rgb2hsv." src="assets/thumb/val.jpg" width="200" height="200"  />
+          <parameterName>VALUE</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/image/rgb2hsvgui.jpg" width="500" height="500">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+                         a conversion from RGB to HSV using the different bands of peaks.cub.</description>
+            <thumbnail caption="RGB2HSV Gui" src="assets/thumb/rgb2hsvgui.jpg" width="200" height="240"  />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

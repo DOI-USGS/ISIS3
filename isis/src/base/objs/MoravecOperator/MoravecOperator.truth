@@ -1,0 +1,16 @@
+Object = InterestOperator
+  Group = Operator
+    Name            = Moravec
+    DeltaSamp       = 100
+    DeltaLine       = 100
+    Samples         = 15
+    Lines           = 15
+    MinimumDN       = 0.0
+    MaximumDN       = 1.0
+    MinimumInterest = 0.0
+  End_Group
+End_Object
+End
+Sample: 87
+Line : 379
+Interest: 0.0112082

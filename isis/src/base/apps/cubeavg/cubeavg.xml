@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cubeavg"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Averages all bands from the input cube</brief>
+
+  <description>
+    Averages every pixel with it's corresponding pixels throughout each given
+    band, resulting in a spectral average cube.  Cube attributes must be used to 
+    specify specific bands from the original cube.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <history>
+    <change name="Christopher Austin" date="2008-01-03">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-01-14">
+      Fix output cube to only having one band.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Cube
+        </brief>
+        <description>
+  	      The input cube.  All pixels in this cube will be averaged by
+          corresponding pixels in the output cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The output spectral average cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="BandBin">
+      <parameter name="BANDBIN">
+        <type>string</type>
+        <default><item>DELETE</item></default>
+        <brief>How to handle the BandBin Group in the ouput cube</brief>
+        <description>
+          When creating a single band spectral average cube from a multiband 
+          cube, the BandBin Group must be altered in some manner to represent 
+          the new single band cube.  The keywords which are always removed from 
+          the output cube include "OriginalBand" and "Name".
+        </description>
+        <list>
+          <option value="DELETE">
+            <brief>Delete BandBin </brief>
+            <description>
+              Simply deletes the BandBin group if it exists.
+            </description>
+            <exclusions>
+              <item>CENTER</item>
+              <item>WIDTH</item>
+            </exclusions>
+          </option>
+          <option value="COMPUTE">
+            <brief>Computes the new BandBin </brief>
+            <description>
+              Automatically computes the new BandBin Center and Width values 
+              using the input cube.  If there is not a BandBin group within the
+              original cube, or there is not a Center keyword within the 
+              origianl cube's BandBin group, an error with be thrown.  If there 
+              is not a Width keyword within the original's BandBin group, then 
+              Width will be calculated using the Center keyword's values.
+            </description>
+            <exclusions>
+              <item>CENTER</item>
+              <item>WIDTH</item>
+            </exclusions>
+          </option>
+          <option value="USER">
+            <brief>User declaired BandBin values</brief>
+            <description>
+              Allows the user to specify the desired Center and Width values of 
+              the output spectral average cube.
+            </description>
+            <inclusions>
+              <item>CENTER</item>
+              <item>WIDTH</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="CENTER">
+        <type>double</type>
+        <brief>The new Center value of the output cube's BandBin</brief>
+        <description>
+          Sets the output cube's BandBin Center to the specified value.
+        </description>
+      </parameter>
+      <parameter name="WIDTH">
+        <type>double</type>
+        <brief>The new Width value of the output cube's BandBin</brief>
+        <description>
+          Sets the output cube's BandBin Width to the specified value.
+        </description>
+      </parameter>
+    </group>
+
+  </groups>
+
+
+</application>

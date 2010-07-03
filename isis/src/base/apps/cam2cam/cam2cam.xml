@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cam2cam" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert camera image to a different camera image
+  </brief>
+
+  <description>
+      This program will convert a input camera cube to a different camera geometry.  For example, given overlapping MGS MOC and Odyssey Themis cubes, 
+      this program can convert the MOC image to have the same geometric camera characteristics as the Themis cube (or vice versa).  Another use is to align
+      bands in a camera cube which has independent bands.  For example, a raw Themis cube (after thm2isis) will not have aligned pixels.  This program can
+      be used to align the pixels without going to a map projection.  To prevent pixels from falling off the edge of the cube you can run pad on the cube prior to
+      this program.
+    </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2000-05-10">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2004-01-19">
+      Converted to Isis 3.0
+    </change>
+    <change name="Jacob Danton" date="2005-12-05">
+      Added an appTest.
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-23">
+      Fixed appTest to reflect changes in all camera models
+    </change>
+    <change name="Debbie A. Cook" date="2007-06-21">
+       Corrected setting of output file labels so that the Spice comes from the match cube and not the input cube
+     </change>
+    <change name="Steven Lambright" date="2007-06-22">
+       Fixed typo in documentation
+     </change>
+    <change name="Steven Lambright" date="2008-01-23">
+       Fixed an access on an invalid pointer that caused segmentation faults on 
+       cubes in which the camera is band-dependant.
+     </change>
+    <change name="Jeff Anderson" date="2008-02-12">
+       Fixed problems with reference bands on band-dependent instruments
+     </change>
+    <change name="Steven Lambright" date="2008-05-12">
+          Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <oldName>
+    <item>lev1tolev1</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input camera cube
+        </brief>
+        <description>
+            The camera cube which will be modified
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Instrument cube to match
+        </brief>
+        <description>
+            This is the camera cube which will be matched.  It must be only one band so use the input attributes to select the band to match.  For example,
+            themis.cub+5.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube which will have the same camera geometry and image size as the match cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="REFBAND">
+        <type>integer</type>
+        <internalDefault>middle</internalDefault>
+        <brief>Reference Band</brief>
+        <description>
+            This is the reference band to be used in the MATCH cube.  
+            That is, all bands in the FROM cube will be matched to 
+            this band.  The default is to use the middle band; however,
+            the user can enter any band number which is valid for the
+            instrument, regardless of whether the band is in the cube
+            or not.  
+            This only applies to band dependent camera models such as 
+            Themis.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

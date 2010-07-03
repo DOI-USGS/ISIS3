@@ -1,0 +1,4 @@
+Group = HapkeAtm1
+  Library = HapkeAtm1
+  Routine = HapkeAtm1Plugin
+End_Group

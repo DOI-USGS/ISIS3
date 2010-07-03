@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="moccal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Radiometrically calibrates a MOC image
+  </brief>
+
+  <description>
+    <p>
+    moccal performs radiometric corrections to images acquired by the Mars
+    Global Surveyor (MGS) MOC camera.  MOC has one Narrow Angle (NA)
+    detector and 2 Wide Angle (WA) detectors.  It also has two camera
+    systems, A and B.  The B camera system is a backup and currently has
+    very little or no radiometric calibration information.  It is supported
+    to a very limited extent but is not in use at this time.
+    </p>
+    
+    <p>
+    The MGS MOC NA detector has a total of 2048 pixels.  The WA Red and WA
+    Blue detectors have a total of 3456 pixels.  Images from MOC may or may
+    not include all pixels in the acquired image.  There are special summing
+    modes that are utilized on-board the spacecraft to average detector
+    pixels to combine them into a single output pixel value.  Both NA and WA
+    detectors can utilize crosstrack (sample) and downtrack (line) summing
+    modes.  The value of these modes indicate the number of samples and
+    lines, respectively, that were summed and averaged to result in the
+    pixel values stored in the input file to moccal specified in the FROM
+    parameter.  These values are stored in the ISIS labels as
+    CROSSTRACK_SUMMING and DOWNTRACK_SUMMING, respectively.  Note that this
+    will reduce the number of samples in the output image by a factor of at
+    most the crosstrack summing mode value.  The NA is restricted to modes
+    of 1 through 8 for both crosstrack and downtrack summing.  Furthermore,
+    the crosstrack and downtrack modes must be the same.  For both WA
+    detectors, crosstrack and downtrack modes range from 1 to 127.  Unlike
+    NA, WA crosstrack and downtrack summing modes can differ.  There are two
+    additional special WA crosstrack summing modes.  These modes are
+    indicated by crosstrack summing mode values of 13 and 27.  Both of these
+    modes use specially configured tables to indicate the relative detector
+    hardware pixels involved in computing the output pixel value.  These
+    modes are intended to maintain approximately equal spatial resolution
+    from nadir to limb.  Crosstrack summing mode 13 has a resolution of
+    7.5 km/pixel and maximum number of output pixels of 768; mode 27 has
+    a resolution of 3.75 km/pixel with the maximum number of output pixels
+    of 384.  moccal recognizes both these modes and applies appropriate
+    measures to radiometrically correct them.
+    </p>
+    <p>
+    The MOC camera has the ability to acquire images of differing sizes in
+    both line and sample.  The starting hardware detector pixel for the
+    acquired image is specified by the ISIS label keyword,
+    FIRST_LINE_SAMPLE.  The first pixel in the detector is indicated by a
+    value of 1.  (Note that in the original PDS image products this is the
+    EDIT_MODE_ID keyword and is 0-based.  In ISIS, FIRST_LINE_SAMPLE is a
+    PDS standard and is 1 plus this value, a 1-based numbering scheme.)
+    Note that all corrections are applied relative to the actual hardware
+    pixel.
+    </p>
+    
+    moccal has a number of parameters required to process MGS MOC image
+    data.  Most of these parameters are read from an ISIS parameter defaults
+    file located in the the mgs directory specified in the IsisPreference file.  
+    This file has the form:
+     <pre>    
+      $mgs/calibration/moccal.kernel.xxx
+    
+      where "xxx" is a positive number.
+     </pre>  
+    moccal will search for the parameter file with the highest number and
+    load all its defaults needed to process MOC images.  Note that the
+    caller may explicity provide an alternative ISIS parameter defaults
+    file name in the "CALKERNEL" input parameter if they have their own
+    set of defaults that applies to MOC data.  See an existing calibration
+    file for details on how to configure this file.
+    
+    <p>
+    The MOC response equation (without pixel-to-pixel variation terms) is as
+    follows:
+    </p>
+    
+    <pre>
+           dn = a * (r * ex + dc * ex + g) + (z - off)
+    
+      where r is the average signal being generated at the focal
+      plane (in DN/msec at minimum gain), z is the fixed zero
+      offset, off is the commanded variable offset, dc is the dark
+      current term (in DN/msec at minimum gain), g is the gain-
+      dependent offset (in DN at minimum gain), a is the commanded
+      system gain (where minimum gain is 1 and all other gains
+      are &gt;1) and ex is the exposure time in milliseconds.
+    </pre>
+    
+    moccal computes "r" from "dn" at every pixel in the input MOC image.
+    Hence, the actual equation moccal implements is as follows:
+    
+    <pre>
+           r = ((dn - z + off) / a - g) / ex - dc
+    </pre>
+    
+   <p>
+    Additional pixel-to-pixel variations are corrected by a detector
+    coefficient file also specified in the parameter defaults file.  This
+    file has been provided after analysis of the calibration data taken
+    prior to and after the launch of MGS.  Certain detectors may not have
+    these coefficients derived and thus will not have this correction
+    applied.  If these files do exist, they are typically taken from the
+    mgs directory specified in the IsisPreference file.  The coefficent file is expected to contain any number of
+    comments indicated by a '#' as the first character in a line.  The
+    first non-blank or uncommented line must contain the number of values
+    (i.e., one per line) of pixel coefficients for this detector.  This
+    must be the exact number of pixels in the given detector, 2048 for the
+    MOC NA detector and 3456 for the MOC WA Red and Blue detectors.  All
+    non-blank, uncommented lines after the detector count expects two values
+    per line.  The first is a multiplicative value followed by an additive
+    value.  These values are applied to the value "r" computed in the above
+    equation to correct for individual pixel variation.  Note that some
+    detectors, namely WA Blue, may not have a pixel variation correction
+    derived.  For these cases, moccal will apply the
+    calibration equation without pixel-to-pixel variation applied. 
+   </p>
+    
+    <p>  
+    Prior to MGS MOC mapping phases, MOC NA downtrack summing modes
+    greater than 1 was implemented differently in onboard camera software.
+    A software patch was made at some point prior to normal mission
+    mapping phase that would be used throughout the mapping and extended
+    phases for the rest of the mission.  moccal applies the following
+    algorithm for all MOC NA images:  *ALL* NA images have the exposure
+    times multiplied by the downtrack summing mode.  All NA images prior
+    to mapping phases has the recoreded GAIN mode value divided by the
+    downtrack summing mode and a new GAIN value is looked up in the table
+    that is closest to this value.  It is substituted in the calibration
+    equation for the commanded gain value (a).  The critical piece of
+    information needed for this algorithm is the time (spacecraft clock
+    count or SCLK) when this patch was uploaded to the spacecraft.  This
+    time has been determined to be just prior to the first image acquired
+    in the normal mapping phase.  This is image m0000001.imq and its SCLK
+    is 607568463:128 which corresponds to April 3, 1999, 01:00:40.4405 UTC.
+    None of the MOC WA images are affected by this algorithm.
+   </p>
+
+    <pre>
+    References:
+    
+    "MOC2 Calibration Report, October 1997 [SCCS 10/17/97 version 1.3]"
+    
+    "Software Interface Specification, Narrow Angle and Wide Angle
+       Standard Data Products (September 1999 (revised for MGS)
+       (formatted April 7, 2000))"
+    </pre>
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="1998-04-06">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-12-18">
+      Converted to Isis 3.0
+    </change>
+    <change name="Jeff Anderson" date="2003-12-18">
+      Fixed buffer overflow
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Jeannie Walldren" date="2008-11-05">
+      Changed MocLabels references from IsNarrowAngle(), IsWideAngleBlue(), 
+      IsWideAngleRed() to NarrowAngle(), WideAngleBlue(), WideAngleRed(), 
+      respectively.
+    </change>
+    <change name="Steven Koechle" date="2009-05-14">
+      Fixed calls to AddComment.  Removed "/*" that should not have been there.
+    </change>
+
+  </history>
+
+  <category>
+    <missionItem>Mars Global Surveyor</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>mocevenodd</item>
+      <item>mocnoise50</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Level 0 MOC image
+        </brief>
+        <description>
+          A uncalibrated MOC image.  If the image is from the narrow angle camera, it should be run through mocevenodd
+          and mocnoise50 prior to moccal.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Level 1 MOC image
+        </brief>
+        <description>
+          The resultant radiometrically calibrated cube
+        </description>
+      </parameter>
+
+      <parameter name="CALKERNEL">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          PVL kernel containing calibration parameters
+        </brief>
+        <internalDefault>Internal Default</internalDefault>
+        <description>
+          If you do not enter a file, mocal will search for a file with the form:
+         <pre>    
+          $mgs/calibration/moccal.kernel.xxx
+        
+          where "xxx" is a positive number.
+         </pre>  
+          The kernel with the highest version (xxx) will be used.
+          See an existing calibration
+          file for details on how to configure this file.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Calibration Parameters">
+      <parameter name="IOF">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Convert to I/F
+        </brief>
+        <description>
+           The user has the option to request the output of moccal to be in
+           either units of percent reflectance (IOF="YES") or in average signal
+           level at the focal plane (IOF="NO") in DN/msec.  moccal has a set of
+           default I/F (percent reflectance) factors for each detector, NA and both
+           WA.  Should they not have this value, a W0 of 0.0 will be detected and
+           I/F cannot be generated.  moccal will detect occurances of W0=0.0 and
+           report this to the user whilst functioning as if IOF="NO" irregardless
+           of what may have been provided by the user for IOF.  Conversion to I/F 
+           takes place after calibration and pixel-to-pixel variation correction.
+        </description>
+      </parameter>
+
+      <parameter name="NULLWAGO">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Null lines near WA gain/offset changes
+        </brief>
+        <description>
+          <p>
+           The MOC WA camera has an additional capability to change the commanded
+           gain state (a) and offset (off) at any time during image acquistion.
+           The approximate time these changes are made is provided in a file called
+           "wago.tab".  This file can be found on all MOC CDROM products under the
+           "index" directory.  This table, called a "WAGO" (Wide Angle Gain Offset)
+           table, contains one entry per line of four fields.  All fields are
+           double quoted.  The first field is the WA detector for which the gain
+           and offset change occurs, the second is the SCLK time of the change, the
+           third is the hexidecimal code of the new gain mode identifier and the
+           fourth is the offset mode identifier.  The WA detector will be either
+           "RED" or "BLUE".  The SCLK is the spacecraft clock count of the time at
+           which the command to change gain and offset was initiated.  The gain
+           mode identifier indicates a gain value that is stored in a table of
+           gain values.  The offset mode identifier is actually specified in
+           factors of 5 DN.  Hence, if the commanded offset mode is "5", then "off"
+           in the above calibration equation is set to 25 (5 * 5 = 25).  Any number
+           of these WAGO changes can occur during WA image acquisition.  WAGO
+           changes are apparent as an abrupt change in brightness at a particular
+           line.  Beware, not all changes are WAGOs as this is also a
+           characteristic of dropped data.
+          </p>
+
+          <p>
+           As the timing knowledge of the gain-offset changes is only accurate to
+           1/8 of a second, and the WA line rate is somewhat faster than this and
+           not an even multiple of 1/8 second, the line on which the brightness
+           discontinuity occurs may not match precisely the line computed from the
+           image start time, line rate, and known time of state change.  In
+           addition, changes in highly-summed images (such as global map swaths)
+           may result in summed output lines having been created in the instrument
+           from unsummed input lines taken in different states.  moccal attempts to
+           detect lines that exhibit this signature and corrects them using a
+           brightness matching algorithm.  With the WA line rate at 75ms, for a
+           downtrack summing mode of 1, the change should occur no more than two
+           lines before or after the computed line of the change.  moccal looks in
+           this window of transition lines and applies an averaging techinque to
+           correct them if NULLWAGO="NO".  If NULLWAGO="YES", then these lines are
+           assigned the ISIS NULL value and can be handled later using alternative
+           processing techniques.
+          </p>
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

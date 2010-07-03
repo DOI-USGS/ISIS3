@@ -1,0 +1,16 @@
+Object = InterestOperator
+  Group = Operator
+    Name            = No
+    DeltaLine       = 100
+    DeltaSamp       = 100
+    Samples         = 15
+    Lines           = 15
+    MinimumDN       = 0.0
+    MaximumDN       = 1.0
+    MinimumInterest = 0.01
+  End_Group
+End_Object
+End
+Sample: 92
+Line : 450
+Interest: 8.53973

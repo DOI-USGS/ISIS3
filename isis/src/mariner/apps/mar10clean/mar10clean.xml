@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mar10clean" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Clean-up of Mariner10 images 
+  </brief>
+
+  <description>
+    This program performs the clean up of Mariner10 images. This includes salt 
+    and pepper noise, removing reseaus, and trimming edges of invalid data.
+  </description>
+
+  <category>
+    <missionItem>Mariner</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>findrx</item>
+      <item>remrx</item>
+      <item>trim</item>
+      <item>mar10nonoise</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Travis Addair" date="2009-08-03">
+      Original version
+    </change>
+    <change name="Mackenzie Boyd" date="2009-08-05">
+      Added example, test
+    </change>
+    <change name="Mackenzie Boyd" date="2009-08-12">
+      Modified order of runs to remove noise before finding and removing 
+      reseaus.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be cleaned
+        </brief>
+        <description>
+          The cube to be cleaned.  The cube will be run through a series of 
+          filters to remove salt and pepper noise and reseaus.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the clean data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="REMOVE">
+        <type>boolean</type>
+          <brief>
+            Remove intermediate files
+          </brief>
+        <description>
+          Option to remove or leave intermediate cube files made by the 
+          application.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+
+      <parameter name="SDIM">
+        <type>integer</type>
+        <brief>
+          Number of Samples to Remove around each Reseau
+        </brief>
+        <description>
+          This number will be used in the remrx step of the clean up.  It is 
+           the number of samples to remove around each reseau.
+        </description>
+        <default><item>9</item></default>
+      </parameter>
+
+      <parameter name="LDIM">
+        <type>integer</type>
+        <brief>
+          Number of Lines to Remove around each Reseau
+        </brief>
+        <description>
+          This number will be used in the remrx step of the clean up.  It is 
+           the number of lines to remove around each reseau.
+        </description>
+        <default><item>9</item></default>
+      </parameter> 
+
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> 
+        Input Mariner10 Image to be cleaned 
+      </brief>
+      <description>
+        This example shows the application in action.  It removes all salt and
+        pepper noise as well as reseaus.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          from=MVE_030.227.cub to=clean.cub
+        </commandLine>
+        <description>
+          Input a Mariner10 unclead image to from and output a cleaned image to 
+          to.
+        </description>
+      </terminalInterface>
+  
+      <inputImages>
+        <image src="assets/images/input.jpg" width="750" height="631">
+          <brief> 
+            Mariner10 Image to Clean
+          </brief>
+          <description>
+              This is the input Mariner10 image prior to cleaning.
+          </description>
+          <thumbnail caption=" Input Mariner10 Image" src="assets/thumbs/input.jpg" width="200" height="168"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+  
+      <outputImages>
+        <image src="assets/images/clean.jpg" width="750" height="631">
+          <brief> 
+            Cleaned Mariner10 Image
+          </brief>                   
+          <description> 
+            This is the Mariner10 image after the cleaning sequence has taken 
+            place.
+          </description>
+          <thumbnail caption="Cleaned Mariner10 image" src="assets/thumbs/clean.jpg" width="200" height="168"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      
+      <guiInterfaces>
+        <guiInterface>
+          <image width="490" height="442" src="assets/images/cleanGUI.jpg">
+            <brief>
+              Example Gui
+            </brief>
+            <description>
+              Screenshot of GUI with parameters filled in to with a Mariner10 
+              uncleaned cube as input and a clean cube as output.
+            </description>
+            <thumbnail width="200" height="180" caption="mar10clean Gui" src="assets/thumbs/cleanGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+    </example>
+  </examples>
+
+</application>
+

@@ -1,0 +1,400 @@
+Testing Isis::ProcessBySpectra Class ... 
+unittest: Working
+0% ProcessedTesting one input cube ... 
+Buffer Samples:  252
+Buffer Lines:    126
+Buffer Bands:    2
+
+Sample:  1  Line:  1  Band:  1
+Sample:  2  Line:  1  Band:  1
+Sample:  3  Line:  1  Band:  1
+Sample:  4  Line:  1  Band:  1
+Sample:  5  Line:  1  Band:  1
+Sample:  6  Line:  1  Band:  1
+Sample:  7  Line:  1  Band:  1
+Sample:  8  Line:  1  Band:  1
+Sample:  9  Line:  1  Band:  1
+Sample:  10  Line:  1  Band:  1
+Sample:  11  Line:  1  Band:  1
+Sample:  12  Line:  1  Band:  1
+Sample:  13  Line:  1  Band:  1
+10% ProcessedSample:  14  Line:  1  Band:  1
+Sample:  15  Line:  1  Band:  1
+Sample:  16  Line:  1  Band:  1
+Sample:  17  Line:  1  Band:  1
+Sample:  18  Line:  1  Band:  1
+Sample:  19  Line:  1  Band:  1
+Sample:  20  Line:  1  Band:  1
+Sample:  21  Line:  1  Band:  1
+Sample:  22  Line:  1  Band:  1
+Sample:  23  Line:  1  Band:  1
+Sample:  24  Line:  1  Band:  1
+Sample:  25  Line:  1  Band:  1
+Sample:  26  Line:  1  Band:  1
+20% ProcessedSample:  27  Line:  1  Band:  1
+Sample:  28  Line:  1  Band:  1
+Sample:  29  Line:  1  Band:  1
+Sample:  30  Line:  1  Band:  1
+Sample:  31  Line:  1  Band:  1
+Sample:  32  Line:  1  Band:  1
+Sample:  33  Line:  1  Band:  1
+Sample:  34  Line:  1  Band:  1
+Sample:  35  Line:  1  Band:  1
+Sample:  36  Line:  1  Band:  1
+Sample:  37  Line:  1  Band:  1
+Sample:  38  Line:  1  Band:  1
+30% ProcessedSample:  39  Line:  1  Band:  1
+Sample:  40  Line:  1  Band:  1
+Sample:  41  Line:  1  Band:  1
+Sample:  42  Line:  1  Band:  1
+Sample:  43  Line:  1  Band:  1
+Sample:  44  Line:  1  Band:  1
+Sample:  45  Line:  1  Band:  1
+Sample:  46  Line:  1  Band:  1
+Sample:  47  Line:  1  Band:  1
+Sample:  48  Line:  1  Band:  1
+Sample:  49  Line:  1  Band:  1
+Sample:  50  Line:  1  Band:  1
+Sample:  51  Line:  1  Band:  1
+40% ProcessedSample:  52  Line:  1  Band:  1
+Sample:  53  Line:  1  Band:  1
+Sample:  54  Line:  1  Band:  1
+Sample:  55  Line:  1  Band:  1
+Sample:  56  Line:  1  Band:  1
+Sample:  57  Line:  1  Band:  1
+Sample:  58  Line:  1  Band:  1
+Sample:  59  Line:  1  Band:  1
+Sample:  60  Line:  1  Band:  1
+Sample:  61  Line:  1  Band:  1
+Sample:  62  Line:  1  Band:  1
+Sample:  63  Line:  1  Band:  1
+50% ProcessedSample:  64  Line:  1  Band:  1
+Sample:  65  Line:  1  Band:  1
+Sample:  66  Line:  1  Band:  1
+Sample:  67  Line:  1  Band:  1
+Sample:  68  Line:  1  Band:  1
+Sample:  69  Line:  1  Band:  1
+Sample:  70  Line:  1  Band:  1
+Sample:  71  Line:  1  Band:  1
+Sample:  72  Line:  1  Band:  1
+Sample:  73  Line:  1  Band:  1
+Sample:  74  Line:  1  Band:  1
+Sample:  75  Line:  1  Band:  1
+Sample:  76  Line:  1  Band:  1
+60% ProcessedSample:  77  Line:  1  Band:  1
+Sample:  78  Line:  1  Band:  1
+Sample:  79  Line:  1  Band:  1
+Sample:  80  Line:  1  Band:  1
+Sample:  81  Line:  1  Band:  1
+Sample:  82  Line:  1  Band:  1
+Sample:  83  Line:  1  Band:  1
+Sample:  84  Line:  1  Band:  1
+Sample:  85  Line:  1  Band:  1
+Sample:  86  Line:  1  Band:  1
+Sample:  87  Line:  1  Band:  1
+Sample:  88  Line:  1  Band:  1
+Sample:  89  Line:  1  Band:  1
+70% ProcessedSample:  90  Line:  1  Band:  1
+Sample:  91  Line:  1  Band:  1
+Sample:  92  Line:  1  Band:  1
+Sample:  93  Line:  1  Band:  1
+Sample:  94  Line:  1  Band:  1
+Sample:  95  Line:  1  Band:  1
+Sample:  96  Line:  1  Band:  1
+Sample:  97  Line:  1  Band:  1
+Sample:  98  Line:  1  Band:  1
+Sample:  99  Line:  1  Band:  1
+Sample:  100  Line:  1  Band:  1
+Sample:  101  Line:  1  Band:  1
+80% ProcessedSample:  102  Line:  1  Band:  1
+Sample:  103  Line:  1  Band:  1
+Sample:  104  Line:  1  Band:  1
+Sample:  105  Line:  1  Band:  1
+Sample:  106  Line:  1  Band:  1
+Sample:  107  Line:  1  Band:  1
+Sample:  108  Line:  1  Band:  1
+Sample:  109  Line:  1  Band:  1
+Sample:  110  Line:  1  Band:  1
+Sample:  111  Line:  1  Band:  1
+Sample:  112  Line:  1  Band:  1
+Sample:  113  Line:  1  Band:  1
+Sample:  114  Line:  1  Band:  1
+90% ProcessedSample:  115  Line:  1  Band:  1
+Sample:  116  Line:  1  Band:  1
+Sample:  117  Line:  1  Band:  1
+Sample:  118  Line:  1  Band:  1
+Sample:  119  Line:  1  Band:  1
+Sample:  120  Line:  1  Band:  1
+Sample:  121  Line:  1  Band:  1
+Sample:  122  Line:  1  Band:  1
+Sample:  123  Line:  1  Band:  1
+Sample:  124  Line:  1  Band:  1
+Sample:  125  Line:  1  Band:  1
+Sample:  126  Line:  1  Band:  1
+100% Processed
+unittest: Working
+0% Processed
+Testing one input and output cube ... 
+Buffer Samples:  252
+Buffer Lines:    126
+Buffer Bands:    2
+
+Sample:  1  Line:  1  Band:  1
+Sample:  2  Line:  1  Band:  1
+Sample:  3  Line:  1  Band:  1
+Sample:  4  Line:  1  Band:  1
+Sample:  5  Line:  1  Band:  1
+Sample:  6  Line:  1  Band:  1
+Sample:  7  Line:  1  Band:  1
+Sample:  8  Line:  1  Band:  1
+Sample:  9  Line:  1  Band:  1
+Sample:  10  Line:  1  Band:  1
+Sample:  11  Line:  1  Band:  1
+Sample:  12  Line:  1  Band:  1
+Sample:  13  Line:  1  Band:  1
+10% ProcessedSample:  14  Line:  1  Band:  1
+Sample:  15  Line:  1  Band:  1
+Sample:  16  Line:  1  Band:  1
+Sample:  17  Line:  1  Band:  1
+Sample:  18  Line:  1  Band:  1
+Sample:  19  Line:  1  Band:  1
+Sample:  20  Line:  1  Band:  1
+Sample:  21  Line:  1  Band:  1
+Sample:  22  Line:  1  Band:  1
+Sample:  23  Line:  1  Band:  1
+Sample:  24  Line:  1  Band:  1
+Sample:  25  Line:  1  Band:  1
+Sample:  26  Line:  1  Band:  1
+20% ProcessedSample:  27  Line:  1  Band:  1
+Sample:  28  Line:  1  Band:  1
+Sample:  29  Line:  1  Band:  1
+Sample:  30  Line:  1  Band:  1
+Sample:  31  Line:  1  Band:  1
+Sample:  32  Line:  1  Band:  1
+Sample:  33  Line:  1  Band:  1
+Sample:  34  Line:  1  Band:  1
+Sample:  35  Line:  1  Band:  1
+Sample:  36  Line:  1  Band:  1
+Sample:  37  Line:  1  Band:  1
+Sample:  38  Line:  1  Band:  1
+30% ProcessedSample:  39  Line:  1  Band:  1
+Sample:  40  Line:  1  Band:  1
+Sample:  41  Line:  1  Band:  1
+Sample:  42  Line:  1  Band:  1
+Sample:  43  Line:  1  Band:  1
+Sample:  44  Line:  1  Band:  1
+Sample:  45  Line:  1  Band:  1
+Sample:  46  Line:  1  Band:  1
+Sample:  47  Line:  1  Band:  1
+Sample:  48  Line:  1  Band:  1
+Sample:  49  Line:  1  Band:  1
+Sample:  50  Line:  1  Band:  1
+Sample:  51  Line:  1  Band:  1
+40% ProcessedSample:  52  Line:  1  Band:  1
+Sample:  53  Line:  1  Band:  1
+Sample:  54  Line:  1  Band:  1
+Sample:  55  Line:  1  Band:  1
+Sample:  56  Line:  1  Band:  1
+Sample:  57  Line:  1  Band:  1
+Sample:  58  Line:  1  Band:  1
+Sample:  59  Line:  1  Band:  1
+Sample:  60  Line:  1  Band:  1
+Sample:  61  Line:  1  Band:  1
+Sample:  62  Line:  1  Band:  1
+Sample:  63  Line:  1  Band:  1
+50% ProcessedSample:  64  Line:  1  Band:  1
+Sample:  65  Line:  1  Band:  1
+Sample:  66  Line:  1  Band:  1
+Sample:  67  Line:  1  Band:  1
+Sample:  68  Line:  1  Band:  1
+Sample:  69  Line:  1  Band:  1
+Sample:  70  Line:  1  Band:  1
+Sample:  71  Line:  1  Band:  1
+Sample:  72  Line:  1  Band:  1
+Sample:  73  Line:  1  Band:  1
+Sample:  74  Line:  1  Band:  1
+Sample:  75  Line:  1  Band:  1
+Sample:  76  Line:  1  Band:  1
+60% ProcessedSample:  77  Line:  1  Band:  1
+Sample:  78  Line:  1  Band:  1
+Sample:  79  Line:  1  Band:  1
+Sample:  80  Line:  1  Band:  1
+Sample:  81  Line:  1  Band:  1
+Sample:  82  Line:  1  Band:  1
+Sample:  83  Line:  1  Band:  1
+Sample:  84  Line:  1  Band:  1
+Sample:  85  Line:  1  Band:  1
+Sample:  86  Line:  1  Band:  1
+Sample:  87  Line:  1  Band:  1
+Sample:  88  Line:  1  Band:  1
+Sample:  89  Line:  1  Band:  1
+70% ProcessedSample:  90  Line:  1  Band:  1
+Sample:  91  Line:  1  Band:  1
+Sample:  92  Line:  1  Band:  1
+Sample:  93  Line:  1  Band:  1
+Sample:  94  Line:  1  Band:  1
+Sample:  95  Line:  1  Band:  1
+Sample:  96  Line:  1  Band:  1
+Sample:  97  Line:  1  Band:  1
+Sample:  98  Line:  1  Band:  1
+Sample:  99  Line:  1  Band:  1
+Sample:  100  Line:  1  Band:  1
+Sample:  101  Line:  1  Band:  1
+80% ProcessedSample:  102  Line:  1  Band:  1
+Sample:  103  Line:  1  Band:  1
+Sample:  104  Line:  1  Band:  1
+Sample:  105  Line:  1  Band:  1
+Sample:  106  Line:  1  Band:  1
+Sample:  107  Line:  1  Band:  1
+Sample:  108  Line:  1  Band:  1
+Sample:  109  Line:  1  Band:  1
+Sample:  110  Line:  1  Band:  1
+Sample:  111  Line:  1  Band:  1
+Sample:  112  Line:  1  Band:  1
+Sample:  113  Line:  1  Band:  1
+Sample:  114  Line:  1  Band:  1
+90% ProcessedSample:  115  Line:  1  Band:  1
+Sample:  116  Line:  1  Band:  1
+Sample:  117  Line:  1  Band:  1
+Sample:  118  Line:  1  Band:  1
+Sample:  119  Line:  1  Band:  1
+Sample:  120  Line:  1  Band:  1
+Sample:  121  Line:  1  Band:  1
+Sample:  122  Line:  1  Band:  1
+Sample:  123  Line:  1  Band:  1
+Sample:  124  Line:  1  Band:  1
+Sample:  125  Line:  1  Band:  1
+Sample:  126  Line:  1  Band:  1
+100% Processed
+unittest: Working
+0% ProcessedTesting two input and output cubes ... 
+Number of input cubes:   2
+Number of output cubes:  2
+
+Sample:  1:1  Line:  1:1  Band:  1:1
+Sample:  2:2  Line:  1:1  Band:  1:1
+Sample:  3:3  Line:  1:1  Band:  1:1
+Sample:  4:4  Line:  1:1  Band:  1:1
+Sample:  5:5  Line:  1:1  Band:  1:1
+Sample:  6:6  Line:  1:1  Band:  1:1
+Sample:  7:7  Line:  1:1  Band:  1:1
+Sample:  8:8  Line:  1:1  Band:  1:1
+Sample:  9:9  Line:  1:1  Band:  1:1
+Sample:  10:10  Line:  1:1  Band:  1:1
+Sample:  11:11  Line:  1:1  Band:  1:1
+Sample:  12:12  Line:  1:1  Band:  1:1
+Sample:  13:13  Line:  1:1  Band:  1:1
+10% ProcessedSample:  14:14  Line:  1:1  Band:  1:1
+Sample:  15:15  Line:  1:1  Band:  1:1
+Sample:  16:16  Line:  1:1  Band:  1:1
+Sample:  17:17  Line:  1:1  Band:  1:1
+Sample:  18:18  Line:  1:1  Band:  1:1
+Sample:  19:19  Line:  1:1  Band:  1:1
+Sample:  20:20  Line:  1:1  Band:  1:1
+Sample:  21:21  Line:  1:1  Band:  1:1
+Sample:  22:22  Line:  1:1  Band:  1:1
+Sample:  23:23  Line:  1:1  Band:  1:1
+Sample:  24:24  Line:  1:1  Band:  1:1
+Sample:  25:25  Line:  1:1  Band:  1:1
+Sample:  26:26  Line:  1:1  Band:  1:1
+20% ProcessedSample:  27:27  Line:  1:1  Band:  1:1
+Sample:  28:28  Line:  1:1  Band:  1:1
+Sample:  29:29  Line:  1:1  Band:  1:1
+Sample:  30:30  Line:  1:1  Band:  1:1
+Sample:  31:31  Line:  1:1  Band:  1:1
+Sample:  32:32  Line:  1:1  Band:  1:1
+Sample:  33:33  Line:  1:1  Band:  1:1
+Sample:  34:34  Line:  1:1  Band:  1:1
+Sample:  35:35  Line:  1:1  Band:  1:1
+Sample:  36:36  Line:  1:1  Band:  1:1
+Sample:  37:37  Line:  1:1  Band:  1:1
+Sample:  38:38  Line:  1:1  Band:  1:1
+30% ProcessedSample:  39:39  Line:  1:1  Band:  1:1
+Sample:  40:40  Line:  1:1  Band:  1:1
+Sample:  41:41  Line:  1:1  Band:  1:1
+Sample:  42:42  Line:  1:1  Band:  1:1
+Sample:  43:43  Line:  1:1  Band:  1:1
+Sample:  44:44  Line:  1:1  Band:  1:1
+Sample:  45:45  Line:  1:1  Band:  1:1
+Sample:  46:46  Line:  1:1  Band:  1:1
+Sample:  47:47  Line:  1:1  Band:  1:1
+Sample:  48:48  Line:  1:1  Band:  1:1
+Sample:  49:49  Line:  1:1  Band:  1:1
+Sample:  50:50  Line:  1:1  Band:  1:1
+Sample:  51:51  Line:  1:1  Band:  1:1
+40% ProcessedSample:  52:52  Line:  1:1  Band:  1:1
+Sample:  53:53  Line:  1:1  Band:  1:1
+Sample:  54:54  Line:  1:1  Band:  1:1
+Sample:  55:55  Line:  1:1  Band:  1:1
+Sample:  56:56  Line:  1:1  Band:  1:1
+Sample:  57:57  Line:  1:1  Band:  1:1
+Sample:  58:58  Line:  1:1  Band:  1:1
+Sample:  59:59  Line:  1:1  Band:  1:1
+Sample:  60:60  Line:  1:1  Band:  1:1
+Sample:  61:61  Line:  1:1  Band:  1:1
+Sample:  62:62  Line:  1:1  Band:  1:1
+Sample:  63:63  Line:  1:1  Band:  1:1
+50% ProcessedSample:  64:64  Line:  1:1  Band:  1:1
+Sample:  65:65  Line:  1:1  Band:  1:1
+Sample:  66:66  Line:  1:1  Band:  1:1
+Sample:  67:67  Line:  1:1  Band:  1:1
+Sample:  68:68  Line:  1:1  Band:  1:1
+Sample:  69:69  Line:  1:1  Band:  1:1
+Sample:  70:70  Line:  1:1  Band:  1:1
+Sample:  71:71  Line:  1:1  Band:  1:1
+Sample:  72:72  Line:  1:1  Band:  1:1
+Sample:  73:73  Line:  1:1  Band:  1:1
+Sample:  74:74  Line:  1:1  Band:  1:1
+Sample:  75:75  Line:  1:1  Band:  1:1
+Sample:  76:76  Line:  1:1  Band:  1:1
+60% ProcessedSample:  77:77  Line:  1:1  Band:  1:1
+Sample:  78:78  Line:  1:1  Band:  1:1
+Sample:  79:79  Line:  1:1  Band:  1:1
+Sample:  80:80  Line:  1:1  Band:  1:1
+Sample:  81:81  Line:  1:1  Band:  1:1
+Sample:  82:82  Line:  1:1  Band:  1:1
+Sample:  83:83  Line:  1:1  Band:  1:1
+Sample:  84:84  Line:  1:1  Band:  1:1
+Sample:  85:85  Line:  1:1  Band:  1:1
+Sample:  86:86  Line:  1:1  Band:  1:1
+Sample:  87:87  Line:  1:1  Band:  1:1
+Sample:  88:88  Line:  1:1  Band:  1:1
+Sample:  89:89  Line:  1:1  Band:  1:1
+70% ProcessedSample:  90:90  Line:  1:1  Band:  1:1
+Sample:  91:91  Line:  1:1  Band:  1:1
+Sample:  92:92  Line:  1:1  Band:  1:1
+Sample:  93:93  Line:  1:1  Band:  1:1
+Sample:  94:94  Line:  1:1  Band:  1:1
+Sample:  95:95  Line:  1:1  Band:  1:1
+Sample:  96:96  Line:  1:1  Band:  1:1
+Sample:  97:97  Line:  1:1  Band:  1:1
+Sample:  98:98  Line:  1:1  Band:  1:1
+Sample:  99:99  Line:  1:1  Band:  1:1
+Sample:  100:100  Line:  1:1  Band:  1:1
+Sample:  101:101  Line:  1:1  Band:  1:1
+80% ProcessedSample:  102:102  Line:  1:1  Band:  1:1
+Sample:  103:103  Line:  1:1  Band:  1:1
+Sample:  104:104  Line:  1:1  Band:  1:1
+Sample:  105:105  Line:  1:1  Band:  1:1
+Sample:  106:106  Line:  1:1  Band:  1:1
+Sample:  107:107  Line:  1:1  Band:  1:1
+Sample:  108:108  Line:  1:1  Band:  1:1
+Sample:  109:109  Line:  1:1  Band:  1:1
+Sample:  110:110  Line:  1:1  Band:  1:1
+Sample:  111:111  Line:  1:1  Band:  1:1
+Sample:  112:112  Line:  1:1  Band:  1:1
+Sample:  113:113  Line:  1:1  Band:  1:1
+Sample:  114:114  Line:  1:1  Band:  1:1
+90% ProcessedSample:  115:115  Line:  1:1  Band:  1:1
+Sample:  116:116  Line:  1:1  Band:  1:1
+Sample:  117:117  Line:  1:1  Band:  1:1
+Sample:  118:118  Line:  1:1  Band:  1:1
+Sample:  119:119  Line:  1:1  Band:  1:1
+Sample:  120:120  Line:  1:1  Band:  1:1
+Sample:  121:121  Line:  1:1  Band:  1:1
+Sample:  122:122  Line:  1:1  Band:  1:1
+Sample:  123:123  Line:  1:1  Band:  1:1
+Sample:  124:124  Line:  1:1  Band:  1:1
+Sample:  125:125  Line:  1:1  Band:  1:1
+Sample:  126:126  Line:  1:1  Band:  1:1
+100% Processed

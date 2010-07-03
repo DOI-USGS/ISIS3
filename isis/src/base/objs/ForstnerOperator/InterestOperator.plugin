@@ -1,0 +1,4 @@
+Group = Forstner
+  Library = ForstnerOperator
+  Routine = ForstnerOperatorPlugin
+End_Group

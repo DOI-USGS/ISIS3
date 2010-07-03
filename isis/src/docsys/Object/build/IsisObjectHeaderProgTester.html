@@ -1,0 +1,285 @@
+<!-- HEADER FILE for Isis API/Object documentation (used by doxygen)  -->
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>USGS Astrogeology Isis API</title>
+<link rel="stylesheet" href="http://isis.astrogeology.usgs.gov/assets/styles/IsisStyleCommon.css">
+<link rel="stylesheet" href="http://isis.astrogeology.usgs.gov/assets/styles/IsisObjectAPIDocStyle.css">
+<link rel="stylesheet" href="doxygen.css">
+<link rel="stylesheet" href="tabs.css">
+
+<meta name="keywords" content="Isis, image processing, API, object, class documentation">
+<meta name="author" content="USGS Astrogeology Research Program">
+<meta name="description" content="Documentation for Isis Objects, the Isis API">
+<meta name="publisher" content="USGS - GD - Astrogeology Research Program">
+<meta name="country" content="USA">
+<meta name="state" content="AZ">
+<meta name="county" content="Coconino">
+<meta name="city" content="Flagstaff">
+<meta name="zip" content="86001">
+<style type="text/css">
+
+
+    /* ----------------------------------------------------------------
+     * isis settings */
+
+     H1       {
+               color:           #663333 ;
+              }
+
+     H2       {
+               background-color: #CCAA99 ;
+              }
+
+     H3       {
+               color: #663333 ;
+              }
+
+
+     HR       {
+               color: #990000 ;
+              }
+
+
+     small    {
+                font-size: 60%;
+              }
+
+     body     {
+                background-repeat: repeat ;
+                background-attachment: fixed ;
+                background-image: URL('http://isis.astrogeology.usgs.gov/assets/banners/isis_bg.jpg');
+              }
+
+
+    /* -----------------------------------------------------
+     * DOXYGEN FORMATTING: styles taken from doxygen      */
+
+    DIV.qindex {
+            width: 100%;
+            background-color: #775544;
+            color: #AA9988 ;
+            border: 1px solid #664433 ;
+            text-align: center;
+            margin: 2px;
+            padding: 4px;
+            line-height: 120%;
+    }
+
+    A.qindexHL, A.qindex {color: #FFEEDD;}
+    A.qindexHL:visited, A.qindex:visited {color: #FFEEDD ;}
+    A.qindexHL:hover, A.qindexHL:active, A.qindex:hover, A.qindex:active {color: gold ;}
+    A.el {}
+    A.elRef {}
+    A.code {}
+    A.codeRef {}
+    A:hover {}
+
+    DL.el { margin-left: -1cm }
+    PRE.fragment {
+            border: 1px solid #DDCCBB;
+            background-color: #fff9f3;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            margin-left: 2px;
+            margin-right: 8px;
+            padding-left: 6px;
+            padding-right: 6px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+    }
+    DIV.fragment {
+            border: 1px solid #DDCCBB;
+            background-color: #fff9f3;
+            padding: 6px;
+    }
+
+    DIV.ah {
+      background-color: black;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 3px;
+      margin-top: 3px
+    }
+
+    TD.md {
+      background-color: #FFEEDD;
+      font-weight: bold;
+    }
+    TD.mdname1 {
+      background-color: #FFEEDD;
+      font-weight: bold;
+      color: #602020;
+    }
+    TD.mdname {
+      background-color: #FFEEDD;
+      font-weight: bold;
+      color: #602020;
+      width: 600px;
+    }
+
+    DIV.groupHeader {
+           margin-left: 16px;
+           margin-top: 12px;
+           margin-bottom: 6px;
+           font-weight: bold;
+           font-family: Geneva, Arial, Helvetica, sans-serif;
+    }
+
+    DIV.groupText { margin-left: 16px; font-style: italic; font-size: 14px }
+    BODY {
+            color: black;
+            margin-right: 20px;
+            margin-left: 20px;
+    }
+    TD.indexkey {
+            background-color: #EEDDCC;
+            font-weight: bold;
+            padding-right  : 10px;
+            padding-top    : 2px;
+            padding-left   : 10px;
+            padding-bottom : 2px;
+            margin-left    : 0px;
+            margin-right   : 0px;
+            margin-top     : 2px;
+            margin-bottom  : 2px;
+            border: 1px solid #DDCCCC;
+    }
+    TD.indexvalue {
+            background-color: #FFEEDD;
+            font-style: italic;
+            padding-right  : 10px;
+            padding-top    : 2px;
+            padding-left   : 10px;
+            padding-bottom : 2px;
+            margin-left    : 0px;
+            margin-right   : 0px;
+            margin-top     : 2px;
+            margin-bottom  : 2px;
+            border: 1px solid #DDCCCC;
+    }
+    TR.memlist {
+       background-color: #f6f3f0;
+    }
+    P.formulaDsp { text-align: center; }
+    IMG.formulaDsp { }
+    IMG.formulaInl { vertical-align: middle; }
+
+    img {
+      background-color: white ;
+      border: 2px solid black ;
+      padding: 5px;
+    }
+    img.noborder {
+      background-color: transparent ;
+      border: 0px none transparent ;
+      padding: 0px;
+    }
+
+    SPAN.keyword       { color: #008000 }
+    SPAN.keywordtype   { color: #604020 }
+    SPAN.keywordflow   { color: #c06000 }
+    SPAN.comment       { color: #800000 }
+    SPAN.preprocessor  { color: #806020 }
+    SPAN.stringliteral { color: #002080 }
+    SPAN.charliteral   { color: #008080 }
+    .mdTable {
+            border: 1px solid #887766;
+            background-color: #FFEEDD;
+    }
+    .mdRow {
+            padding: 8px 10px;
+    }
+    .mdescLeft {
+           padding: 0px 8px 4px 8px;
+            font-size: 14px;
+            font-style: italic;
+            background-color: #FFFCF0;
+            border-top: 1px none #E3E1E0;
+            border-right: 1px none #E3E1E0;
+            border-bottom: 1px none #E3E1E0;
+            border-left: 1px none #E3E1E0;
+            margin: 0px;
+    }
+    .mdescRight {
+           padding: 0px 8px 4px 8px;
+            font-size: 14px;
+            font-style: italic;
+            background-color: #FFFCF0;
+            border-top: 1px none #E3E1E0;
+            border-right: 1px none #E3E1E0;
+            border-bottom: 1px none #E3E1E0;
+            border-left: 1px none #E3E1E0;
+            margin: 0px;
+    }
+    .memItemLeft {
+            padding: 1px 0px 0px 8px;
+            margin: 4px;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-style: solid;
+            border-top-color: #E3E1E0;
+            border-right-color: #E3E1E0;
+            border-bottom-color: #E3E1E0;
+            border-left-color: #E3E1E0;
+            border-right-style: none;
+            border-bottom-style: none;
+            border-left-style: none;
+            background-color: #FFFCF0;
+            font-family: Geneva, Arial, Helvetica, sans-serif;
+            font-size: 12px;
+    }
+    .memItemRight {
+            padding: 1px 8px 0px 8px;
+            margin: 4px;
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-style: solid;
+            border-top-color: #E3E1E0;
+            border-right-color: #E3E1E0;
+            border-bottom-color: #E3E1E0;
+            border-left-color: #E3E1E0;
+            border-right-style: none;
+            border-bottom-style: none;
+            border-left-style: none;
+            background-color: #FFFCF0;
+            font-family: Geneva, Arial, Helvetica, sans-serif;
+            font-size: 13px;
+    }
+    .search     { color: #003399;
+                  font-weight: bold;
+    }
+    FORM.search {
+                  margin-bottom: 0px;
+                  margin-top: 0px;
+    }
+    INPUT.search { font-size: 75%;
+                   color: #000080;
+                   font-weight: normal;
+                   background-color: #ffeeee;
+    }
+    TD.tiny      { font-size: 75%;}
+
+
+</style>
+</head>
+<body>
+<a href="http://www.usgs.gov">[USGS]</a>
+<br>
+
+<table width="100%" cellpadding="0" border="0" cellspacing="0">
+<tr valign="top">
+  <td align="left">
+<p style="margin-top:10px; margin-bottom:0px;">
+Isis 3.0 Programmers Test Documentation</p>
+  </td>
+  <td align="right" class="caption"><a href="http://isis.astrogeology.usgs.gov" target="_top">Home</a></td>
+</tr>
+</table>
+
+<hr>
+

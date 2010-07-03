@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="mdisproc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Runs a raw Messenger cube through ingestion and calibration
+  </brief>
+
+  <description>
+      Runs a raw Messenger cube through ingestion and/or calibration.
+     With the optional CDR on, the final output will be a re-exported cdr img.
+  </description>
+
+  <history>
+    <change name="Christopher Austin" date="2008-08-12">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-08-21">
+      Fixed the trim option and added a test for it.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Messenger</missionItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Messenger img
+        </brief>
+        <description>
+          Input filename to be ingested, calebrated, and possibly re-exported into a cdr.
+        </description>
+        <filter>
+          *.QUB *.imq *.ima *.img *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Final output filename.
+        </brief>
+        <description>
+          Output filename from the last enabled processing sequence. By
+          default the filename will be generated from the input filename with an
+          .cdr.IMG extension.
+        </description>
+      </parameter>
+
+      <parameter name="BANDS">
+        <type>string</type>
+        <internalDefault>All</internalDefault>
+        <brief>
+          Process a subset of bands
+        </brief>
+        <description>
+          This parameter allows the user to specify a sub-set of
+          bands to process.  Enter bands separated by commas (no spaces
+          allowed).  For example, 1,3,8 or 1-3,9 or 5
+        </description>
+      </parameter>
+
+      <parameter name="REMOVE">
+        <type>boolean</type>
+        <brief>Remove Intermediate Files</brief>
+        <description>
+            This option allows the user to decide whether the intermediate files 
+            created in the thmproc application are to be deleted.  The default value
+            is TRUE.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+
+    </group>
+
+    <group name="Level Processing">
+
+      <parameter name="INGESTION">
+        <type>boolean</type>
+        <default>
+          <item>YES</item>
+        </default>
+        <brief>
+          Import and initialize a Messenger RDR file.
+        </brief>
+        <description>
+          Process the input file through all level0 steps. This includes mdis2isis.
+        </description>
+      </parameter>
+
+      <parameter name="CALIBRATION">
+        <type>boolean</type>
+        <default><item>YES</item></default>
+        <brief>
+          Process the input file through the calibration phase.
+        </brief>
+        <description>
+          Process the input file through level1. This includes mdiscal.
+        </description>
+        <inclusions>
+          <item>TRIM</item>
+          <item>DARKCURRENT</item>
+          <item>IOF</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="TRIM">
+        <type>integer</type>
+        <brief>Trim off poor left pixles</brief>
+        <description>
+          Removes the first few pixels of each line of the final cdr prouct.
+        </description>
+        <default><item>3</item></default>
+      </parameter>
+
+      <parameter name="CDR">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Export the calibrated image to cdr</brief>
+        <description>
+          <p>Exports the calibrated cube back into cdr format.</p>
+          <p>If only this step needs to be ran, use mdis2pds instead.</p>
+        </description>
+        <inclusions>
+          <item>BITS</item>
+        </inclusions>
+      </parameter>
+
+    </group>
+
+    <group name="Calibration">
+      <parameter name="DARKCURRENT">
+        <type>string</type>
+        <brief>Dark current calibration method</brief>
+        <description></description>
+        <default><item>MODEL</item></default>
+        <list>
+          <option value="NONE">
+            <brief>No correction</brief>
+            <description>
+                No dark current correction will be applied
+              </description>
+          </option>
+          <option value="STANDARD">
+            <brief>Do a median dark current correction</brief>
+              <description>
+                  This will use the median of the three leftmost pixels to as 
+                  the dark current, on a line by line basis. 
+              </description>
+          </option>
+          <option value="LINEAR">
+            <brief>Use a linear fit</brief>
+            <description>
+              This will fit a line to the leftmost pixel values, which should be 
+              dark current data, through the lines. The equation derived from 
+              these pixels will be used to calculate the dark current 
+              correction, on a line by line basis.
+            </description>
+          </option>
+          <option value="MODEL">
+            <brief>Use pre-developed model</brief>
+             <description>
+               Messenger has independent dark models, developed on-ground. 
+               This will use the most recent of these models to correct the dark
+               current.
+              </description>
+          </option>
+        </list>
+      </parameter>
+     <parameter name="IOF">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Convert to I/F units
+        </brief>
+        <description>
+            <p>
+            This option when set wil convert the output to I/F from radiance values.  
+            To convert from radiance to I/F (also known as radiance factor, the ratio 
+            of measured radiance to that which would be measured from a white 
+            perfectly Lambertian surface), the following expression should is applied: 
+            <PRE>
+I_over_F(f) = L(f) * PI * (SOLAR_DISTANCE/149597870.691)**2 / F(f)                
+            </PRE> 
+            where L(f) is calibrated radiance calculated for some filter f,
+            SOLAR_DISTANCE is that value for distance of the target object from
+            the center of the sun in kilometers (as indicated by the keyword
+            SOLAR_DISTANCE), 149597870.691 is the number of kilometers in 1 AU
+            and F(f) is effective average solar irradiance sampled under the
+            filter bandpass.
+            </p>
+            <p>
+                If the observed target is not of a valid body as recognized by 
+                NAIF, the output is left in radiance.
+            </p>
+        </description>
+      </parameter>
+    </group>
+
+    <group name="CDR">
+      <parameter name="BITS">
+          <type>integer</type>
+          <default><item>32</item></default>
+          <brief>
+            Number of bits for the output DN
+          </brief>
+          <description>
+            The number of bits to compress the input data to. The valid data as
+            well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
+            compressed into this number of bits. The output data type will be
+            automaticity choosen using this value. A value of 8 will create 
+            unsigned byte output files. Values from 9 to 16 will create unsigned
+            word output files. Unused bits in the unsigned word output file will be
+            set to zero.
+          </description>
+          <minimum inclusive="yes">8</minimum>
+          <maximum inclusive="yes">32</maximum>
+        </parameter>
+    </group>
+
+  </groups>
+
+</application>

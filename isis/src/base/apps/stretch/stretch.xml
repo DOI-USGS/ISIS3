@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="stretch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Remaps pixel values in a cube
+  </brief>
+
+  <description>
+    This program stretchs or remaps pixels values in a cube.  Note that the same
+    stretch is applied to all bands within the cube.  The underlying method for
+    remapping pixels is defined by a set of stretch pairs and is best described
+    using an example:
+    <pre>
+      0:0
+      255:1
+    </pre>
+    A stretch pair is two numbers separated by a colon.  In this case, 0:0 and
+    255:1 comprise two stretch pairs.  A pair is used to identify the mapping
+    of input pixels to output pixels where the colon is a delimiter
+    (i.e., input:output).  Our first pair indicates input pixel values
+    of 0 will be mapped to an output 0, while the second pair indicates input
+    pixel values of 255 will be mapped to 1.  All inputs between 0 and 255 will
+    be mapped linearly (e.g., 127.5 will be mapped to 0.5). Therefore,
+    the output cube
+    will only have pixel values between 0 and 1.  Those input pixels below
+    0 will be mapped to LRS and above 255 to HRS.  This mapping to special pixels
+    can be overridden.  Because multiple pairs are allowed,
+    many different types of remappings can be accomplished.  For example:
+    <pre>
+      Inverse Stretch
+      0:255
+      255:0
+
+      Piece-wise Linear Stretch
+      20:0.0
+      50:0.5
+      125:1.0
+
+      Saw-tooth Stretch
+      0:0.0
+      50:1.0
+      100:0.0
+      200:1.0
+
+      Binary stretch
+      0:0.0
+      49.9999:0.0
+      50:1.0.0
+      79.9999:1.0
+      80:0.0
+      255:0.0
+    </pre>
+    If you are having difficulty visualizing these stretches simply plot the
+    input:output pairs on graph paper and connect the dots or see some
+    of the examples.  Note that the
+    input value of each pair is in ascending order. As a reminder,
+    all input pixel values less
+    than the input value for the first pair are mapped to LRS.  Likewise,
+    all pixel values greater than the input value for the last pair are mapped
+    to HRS.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>specpix</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jim Torson" date="1990-11-17">
+      Original version
+    </change>
+
+    <change name="Jeff Anderson" date="2002-09-17">
+      Ported to Isis 3.0
+    </change>
+
+    <change name="K Teal Thompson" date="2002-12-03">
+      Add examples
+    </change>
+
+    <change name="K Teal Thompson" date="2003-04-04">
+      Make images smaller.  Adjust binary stretch example.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Made changes to application test truth files to reflect -O1 optimization
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Brendan George" date="2006-06-30">
+        Fixed application test
+    </change>
+    <change name="Jeannie Walldren" date="2008-01-09"> 
+      Modified stretch parameters (except PAIRS) to accept string instead of 
+      double so that special pixels may be set to other special pixel values. 
+    </change>
+    <change name="Eric Hyer" date="2009-04-30">
+      Users can pass a file containing stretch pairs as well as inputing them
+      manually as before.  Also, the input side of stretch pairs can optionally
+      be percentages instead of dn values.
+    </change>
+    <change name="Eric Hyer" date="2010-04-23">
+      Added support for stretch files not ending in a newline.  Also did some
+      code refactoring to eliminate duplicate code.
+    </change>
+    </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Input cube to stretch
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output stretched cube
+        </brief>
+        <description>
+          The resultant stretched cube
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Stretch Parameters">
+      <parameter name="USEPERCENTAGES">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Percentage mode for pairs</brief>
+        <description>
+          If true the input side of the pairs are interpreted as percentages.
+          The dn value which is used is the dn value at the specified percentage
+          of the input cube's histogram
+        </description>
+      </parameter>
+      
+      <parameter name="READFILE">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Input pairs from file</brief>
+        <description>
+          Selects the method of pair data input.  If true then read pairs from a
+          file.  Otherwise read the stretch pairs from the "PAIRS" parameter
+        </description>
+        <inclusions>
+          <item>INPUTFILE</item>
+        </inclusions>
+        <exclusions>
+          <item>PAIRS</item>
+        </exclusions>
+      </parameter>
+      
+      <parameter name="PAIRS">
+        <type>string</type>
+        <brief>Stretch pairs manual input</brief>
+        <description>
+          A string must be entered in the form of
+          <!--pre>
+            input1:output1 input2:output2 ... inputN:outputN
+          </pre-->
+          Where the input values are in ascending order (increasing). There is
+          no limit to the number of pairs although each pair must be separated
+          by a space.  The stretch that is entered will be applied to all bands
+          in the cube.  By default "No Stretch" is applied which allows users
+          to remap only special pixels if desired.
+        </description>
+        <internalDefault>
+          No Stretch
+        </internalDefault>
+      </parameter>
+      
+      <parameter name="INPUTFILE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>The file name where pairs are stored</brief>
+        <description>
+          Read pairs from this file instead of entering them manually.  Commented
+          lines are ignored and defined as beginning with a '#'.  Pairs must be
+          separated by white space which may be new lines.
+          <pre>
+            # example 1 of a file containing stretch pairs
+            0:0 1:10 15:255
+          </pre>
+          <pre>
+            # example 2 of a file containing stretch pairs
+            0:0
+            1:10
+            # this is a comment inside a file containing stretch pairs
+            15:255
+          </pre>
+        </description>
+      </parameter>
+
+      <parameter name="NULL">
+        <type>string</type>
+        <brief>
+          Replace NULL pixels with another special pixel value or a double value
+        </brief>
+        <description>
+          Double or alternate special pixel value used to replace all NULL 
+          special pixels.  For example all NULL pixels can be replaced with 
+          -100.0.  By default, the NULL special pixels will be left unchanged.
+        </description>
+        <internalDefault>
+          NULL
+        </internalDefault>
+      </parameter>
+
+      <parameter name="LIS">
+        <type>string</type>
+        <brief>
+          Replace LIS pixels with another special pixel value or a double value
+        </brief>
+        <description>
+          Double or alternate special pixel value used to replace all LIS special pixels.  For example
+          all LIS pixels can be replaced with 0.0.  By default, the LIS
+          special pixels will be left unchanged.
+        </description>
+
+        <internalDefault>
+          LIS
+        </internalDefault>
+      </parameter>
+
+      <parameter name="LRS">
+        <type>string</type>
+        <brief>
+          Replace LRS pixels with another special pixel value or a double value
+        </brief>
+        <description>
+          Double or alternate special pixel value used to replace all LRS special pixels.  For example
+          all LRS pixels can be replaced with 0.0.  By default, the LRS
+          special pixels will be left unchanged.
+        </description>
+        <internalDefault>
+          LRS
+        </internalDefault>
+      </parameter>
+
+      <parameter name="HIS">
+        <type>string</type>
+        <brief>
+          Replace HIS pixels with another special pixel value or a double value
+        </brief>
+        <description>
+          Double or alternate special pixel value used to replace all HIS special pixels.  For example
+          all HIS pixels can be replaced with 500.0.  By default, the HIS
+          special pixels will be left unchanged.
+        </description>
+
+        <internalDefault>
+          HIS
+        </internalDefault>
+      </parameter>
+
+      <parameter name="HRS">
+        <type>string</type>
+        <brief>
+          Replace HRS pixels with another special pixel value or a double value
+        </brief>
+        <description>
+          Double or alternate special pixel value used to replace all HRS special pixels.  For example
+          all HRS pixels can be replaced with 500.0.  By default, the HRS
+          special pixels will be left unchanged.
+        </description>
+        <internalDefault>
+          HRS
+        </internalDefault>
+      </parameter>
+    </group>
+    
+  </groups>
+
+  <examples>
+    <example>
+      <brief> run stretch </brief>
+      <description>
+        This example shows a stretch operation using a binary type of stretch.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/peaks.cub:4 t=OUT/stretchBin p=\"0.:0 101.9:0 102.:255 200.:255 200.1:0. 255.:0.\"
+        </commandLine>
+        <description>
+        stretch a Terra image.  Use binary type of stretch.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for stretch</brief>
+          <description>This is the input image for the stretch examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+        <image src="assets/image/binaryStretchChart.jpg" width="388" height="223">
+          <brief> Explanation image for stretch</brief>
+          <description>This is a graph demonstrating the binary stretch.
+          </description>
+          <thumbnail caption=" graph demonstration" src="assets/thumb/binaryStretchChart.jpg" width="200" height="115"/>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/stretchBin.jpg" width="500" height="500">
+          <brief> Output image for stretch</brief>
+          <description> This is the output image that results from a binary type of stretch
+          </description>
+          <thumbnail caption="Output image showing results of the stretch application." src="assets/thumb/stretchBin.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="374" src="assets/image/binStrGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a stretch operation on the input image. </description>
+            <thumbnail width="200" height="170" caption="stretch Gui" src="assets/thumb/binStrGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief> run stretch </brief>
+      <description>
+        This example shows the result of stretching dark data.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/peaks.cub:4 t=OUT/stretchDark p=\"0.:0 50.:255 255.:255.\"
+        </commandLine>
+        <description>
+        stretch the dark data in a Terra image.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for stretch</brief>
+          <description>This is the input image for the stretch examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+        <image src="assets/image/darkStretchChart.jpg" width="348" height="208">
+          <brief> Explanation image for stretch</brief>
+          <description>This is a graph demonstrating dark data enhancement.
+          </description>
+          <thumbnail caption=" graph demonstration" src="assets/thumb/darkStretchChart.jpg" width="200" height="119"/>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/stretchDark.jpg" width="500" height="500">
+          <brief> Output image for stretch</brief>
+          <description> This is the output image that results from a dark data enhancement
+          </description>
+          <thumbnail caption="Output image showing results of the stretch application." src="assets/thumb/stretchDark.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="361" src="assets/image/darkStrGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a stretch operation on the input image. </description>
+            <thumbnail width="200" height="164" caption="stretch Gui" src="assets/thumb/darkStrGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief> run stretch </brief>
+      <description>
+        This example shows the result of stretching light data.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/peaks.cub:4 t=OUT/stretchLight p=\"0.:0 84.:0 255.:255.\"
+        </commandLine>
+        <description>
+        stretch the light data in a Terra image.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for stretch</brief>
+          <description>This is the input image for the stretch examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+        <image src="assets/image/lightStretchChart.jpg" width="331" height="214">
+          <brief> Explanation image for stretch</brief>
+          <description>This is a graph demonstrating light data enhancement.
+          </description>
+          <thumbnail caption=" graph demonstration" src="assets/thumb/lightStretchChart.jpg" width="200" height="129"/>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/stretchLight.jpg" width="500" height="500">
+          <brief> Output image for stretch</brief>
+          <description> This is the output image that results from a light data enhancement
+          </description>
+          <thumbnail caption="Output image showing results of the stretch application." src="assets/thumb/stretchLight.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="361" src="assets/image/lightStrGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a stretch operation on the input image. </description>
+            <thumbnail width="200" height="164" caption="stretch Gui" src="assets/thumb/lightStrGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief> run stretch </brief>
+      <description>
+        This example shows a stretch operation using a inverse type of stretch.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/peaks.cub:4 t=OUT/stretchInv p=\"0.:255  255.:0.\"
+        </commandLine>
+        <description>
+        stretch a Terra image.  Use inverse type of stretch.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for stretch</brief>
+          <description>This is the input image for the stretch examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+        <image src="assets/image/inverseStretchChart.jpg" width="304" height="190">
+          <brief> Explanation image for stretch</brief>
+          <description>This is a graph demonstrating the inverse stretch.
+          </description>
+          <thumbnail caption=" graph demonstration" src="assets/thumb/inverseStretchChart.jpg" width="200" height="124"/>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/stretchInv.jpg" width="500" height="500">
+          <brief> Output image for stretch</brief>
+          <description> This is the output image that results from an inverse type of stretch
+          </description>
+          <thumbnail caption="Output image showing results of the stretch application." src="assets/thumb/stretchInv.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="361" src="assets/image/invStrGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform an inverse stretch operation on the input image. </description>
+            <thumbnail width="200" height="164" caption="stretch Gui" src="assets/thumb/invStrGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+    
+    <example>
+      <brief> run stretch </brief>
+      <description>
+        This example shows how to input non-double parameters for the special 
+        pixel values.
+      </description>
+      <terminalInterface>
+        <commandLine> f=peaks.cub:4 t=stretch NULL=lis Lis=LR Lr=hi his=Hr 
+          Hr=n
+        </commandLine>
+        <description>
+        stretch a Terra image.  Input non-double parameters.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for stretch</brief>
+          <description>This is the input image for the stretch examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+        </inputImages>
+
+      <outputImages>
+        <image src="assets/image/stretchSpecPix.jpg" width="500" height="500">
+          <brief> Output image for stretch</brief>
+          <description> This is the output image that results from swapping 
+            special pixel values.  Notice that there is no visible change since 
+            all special pixel values have the same value.
+          </description>
+          <thumbnail caption="Output image showing results of the stretch application." src="assets/thumb/stretchSpecPix.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="386" height="473" src="assets/image/specPixStrGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with non-double values filled in to 
+              the special pixel parameters.
+            </description>
+            <thumbnail width="163" height="200" caption="stretch Gui" src="assets/thumb/specPixStrThumb.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

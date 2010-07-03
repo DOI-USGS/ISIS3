@@ -1,0 +1,20 @@
+Group = Results
+  ThicknessMinimum              = 0.05948606716346617
+  ThicknessMaximum              = 0.06408276921322625
+  ThicknessAverage              = 0.06178441818834621
+  ThicknessStandardDeviation    = 0.003250359190479414
+  ThicknessVariance             = 1.056483486713399e-05
+  ThicknessSum                  = 0.1235688363766924
+  AreaMinimum                   = 46045158354.94140
+  AreaMaximum                   = 49893721108.36636
+  AreaAverage                   = 47969439731.65388
+  AreaStandardDeviation         = 2721344820.768736
+  AreaVariance                  = 7.405717633524826e+18
+  AreaSum                       = 95938879463.30775
+  SerialNumberMinimum           = 2.0
+  SerialNumberMaximum           = 2.0
+  SerialNumberAverage           = 2.0
+  SerialNumberStandardDeviation = 0.0
+  SerialNumberVariance          = 0.0
+  SerialNumberSum               = 4.0
+End_Group

@@ -1,0 +1,6 @@
+Unit test for Isis::WorldMapper
+WorldX to ProjectionX:  50
+ProjectionX to WorldX:  100
+WorldY to ProjectionY:  30
+ProjectionY to WorldY:  90
+Resolution:             1

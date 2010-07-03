@@ -1,0 +1,29 @@
+UNIT TEST for Isis::PhotoModel
+
+Testing missing PhotometricModel object ...
+**PVL ERROR** Unable to find object [PhotometricModel]
+
+Testing missing Algorithm group ...
+**PVL ERROR** Unable to find group [Algorithm]
+
+Testing missing Name keyword ...
+**PVL ERROR** Keyword [Name] does not exist in [Group = Algorithm]
+
+Testing supported photometric model ...
+
+Testing photometric model PhtTopder method ...
+Results from PhtTopder = 1e-15
+
+Results from PhtTopder = 0.013697
+
+Test PhtAcos ...
+Results from PhtAcos = 0
+        Actual value = 0
+
+Results from PhtAcos = 0.000349285
+        Actual value = 0.000349285
+
+Results from PhtAcos = 2.6088
+        Actual value = 2.6088
+
+

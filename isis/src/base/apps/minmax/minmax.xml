@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="minmax" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a minimum or maximum filter to a cube
+  </brief>
+
+  <description>
+    This program will apply a minimum or maximum filter to a cube.
+    Using the "max" option, the pixel with the highest DN in the NxM size boxcar will be 
+    output. Using the "min" option, the pixel with the lowest DN in the NxM boxcar
+    will be output. With either option, more extreme DNs will be more 
+    noticeable in the output image.
+    <p/>
+    The boxcar will be N samples long by M lines high. Assuming a 3 x 3 boxcar
+    <pre>
+    		V1  V2  V3
+		V4  V5  V6
+		V7  V8  V9
+    </pre>  
+    the program will first substitute an extremely high or low internal value for ISIS. 
+    This essentially zeroes out the process in such a way that one of the values in the
+    current boxcar will be supplied as the output pixel, instead of an output pixel from
+    a previous boxcar. Assume that the MAX option is being used on the model boxcar shown
+    above.This value is then compared to the first pixel in the boxcar. This would be 
+    the value substituted for "V1". If V1 is greater than the internal value (this will
+    be the case unless V1 is a special pixel) then the new output pixel will tenatively 
+    be set to V1. V1 is then compared to V2, and the greater pixel is again set to the 
+    temporary maximum. This process continues until the temporary maximum is compared to 
+    all of the values in the boxcar, at which point it is set as the output value. 
+  </description>
+
+  <history>
+    <change name="Drew Davidson" date="2004-07-23">
+      Original version
+    </change>
+    
+    <change name="Drew Davidson" date="2004-07-26">
+      Added application test
+    </change>
+    
+    <change name="Drew Davidson" date="2004-08-16">
+     Added examples
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will have the filter applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        
+	<fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+	<brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the filtered output.
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Boxcar Size">  
+      <parameter name="LINES">
+        <type>integer</type>
+	<default><item>3</item></default>
+        <brief>
+          Boxcar Lines
+        </brief>
+        <description>
+          Use this parameter to select the number of lines in the boxcar.
+	  Higher values take longer, and intensify the results in the vertical
+	  direction. The default value is three.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    
+      <parameter name="SAMPLES">
+        <type>integer</type>
+	<default><item>3</item></default>
+        <brief>
+          Boxcar Samples
+        </brief>
+        <description>
+          Use this parameter to select the number of samples in the boxcar. 
+	  Higher values take longer, and intensify the results in the horizontal
+	  direction. The default value is three.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+	
+    <group name="Filter Type">
+      <parameter name="FILTER">
+        <type>string</type>
+	<default><item>MIN</item></default>
+        <brief>Type of filter (minimum, maximum)</brief>
+        <description>
+          Use this parameter to choose the filter type.  The possibilities
+          include min, which finds the lowest DN in the boxcar and max, 
+	  which finds the highest DN in the boxcar. 
+        </description>
+        <list>
+          <option value="MIN">
+            <brief>Minimum filter</brief>
+            <description>
+            The minimum filter uses a variable kernel to find the pixel with the 
+	    lowest DN in the boxcar.
+            </description>
+          </option>
+          <option value="MAX">
+            <brief>Maximum filter</brief>
+            <description>
+            The maximum filter uses a variable kernel to find the pixel with the 
+	    greatest DN in the boxcar              
+            </description>
+	  </option>
+        </list>
+      </parameter>
+    </group>
+
+  </groups>
+  
+  <examples>
+    <example>
+      <brief>
+      Minimum 3x3 
+      </brief>
+      <description>
+      Use the minimum option to enlarge dark areas (low DN pixels) and shrink
+      light areas (high DN pixels).
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= peaks.cub
+	  to=darkcube.cub
+	  lines=3
+	  samples=3
+	  filter=min
+	</commandLine>
+	<description>
+	In this example the "lines" and "samples" are both 3, making a 3 x 3
+	 boxcar. The minimum filter is selected, so as to essentially darken the
+	 output.	
+	</description>
+      </terminalInterface>
+      
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="440" height="625" src="assets/images/min3x3gui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI with parameters set to perform the minimum
+	      filter with a 3 x 3 boxcar.
+	    </description>
+	    <thumbnail width="220" height="312" caption="minmax gui" 
+	     src="assets/thumbs/min3x3gui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before minmax.
+	  </brief>
+	  <description>
+	    This is the image as it was taken originally. Take note of the size 
+	    of areas with high DNs, such as on top of mountains and in the lower
+	    right corner of the image. 
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/min3x3.jpg">
+	  <brief>
+	  Output image after minmax
+	  </brief>
+	  <description>
+	    The filtered image. A side-effect of the program is a slight blur to
+	     the image, but notice the change in the details described above. 
+	     the mountain tops have lost some area, while the dark region at the
+	     base has expanded. Also note the reduced intensity of the brightness
+	     in the lower right corner.
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/min3x3.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+    
+    <example>
+      <brief>
+      Maximum 2x2 
+      </brief>
+      <description>
+      Use the maximum option to enlarge bright areas (pixels with high DNs) and
+      shrink dark areas (pixels with low DNs).
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= peaks.cub
+	  to=lightcube.cub
+	  lines=2
+	  samples=2
+	  filter=max
+	</commandLine>
+	<description>
+	In this example both the "lines" and "samples" options are set to 2. This
+	will make the program run faster than the 3 x 3 boxcar featured in 
+	example 1. The effect of the filter will also be somewhat less dramatic 
+	than with a 3 x 3 boxcar.	
+	</description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="440" height="625" src="assets/images/max2x2gui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI with parameters set to perform the maximum
+	      filter with a 2 x 2 boxcar.
+	    </description>
+	    <thumbnail width="220" height="312" caption="minmax gui" 
+	     src="assets/thumbs/max2x2gui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before minmax.
+	  </brief>
+	  <description>
+	    This is the image as it was taken originally. Take note of the size 
+	     of areas with high DNs. In particular, notice the man-made lights
+	     in the lower right corner of the image and the bright spots on top
+	     of the mountain.  
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/max2x2.jpg">
+	  <brief>
+	  Output image after minmax
+	  </brief>
+	  <description>
+	    The filtered image. Just as in example 1, the image is blurred 
+	    slightly. Unlike the first example, bright areas are now enlarged and
+	     the brightness that would have been shrunk using the minimum filter 
+	    is now expanded. Again, note the peaks of the mountains and the 
+	    man-made lights in the lower right corner.
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/max2x2.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+    
+  </examples>
+
+</application>

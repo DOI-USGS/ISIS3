@@ -1,0 +1,7 @@
+Unit test for LineEquation
+Testing first constructor...
+     Slope = 2.5
+     Intercept = -1.5
+Testing second constructor...
+     Slope = -0.5
+     Intercept = 0.5

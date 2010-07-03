@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mappt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs latitude/longitude at line/sample or reverse
+  </brief>
+
+  <description>
+    This program requires the user supply a cube in a map projection.
+    The user must also enter one of the following coordinates:
+    <pre>
+      line/sample
+      latitude/longitude
+      x/y
+    </pre>
+    The program will then compute the other two coordinates.  For example,
+    entering a line/sample will cause the program to compute a latitude/longitude
+    and x/y.  The output can be sent to a text file using the TO parameter and can
+    be read in a script via the "getkey" program.
+
+    Example output:
+    <pre>
+      Group = Results
+        Filename                 = /home/mboyd/mapped.cub
+        Sample                   = 400.0
+        Line                     = 400.0
+        PixelValue               = Null
+        X                        = 36094.582198722
+        Y                        = -2602604.7032335
+
+        # Input map coordinate system
+        PlanetocentricLatitude   = -85.828401770565
+        PositiveEast180Longitude = 26.807891885122
+
+        # Location in other coordinate systems
+        PlanetographicLatitude   = -85.828401770565
+        PositiveEast360Longitude = 26.807891885122
+        PositiveWest360Longitude = 333.19210811488
+        PositiveWest180Longitude = -26.807891885122
+      End_Group
+    </pre>
+  </description>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-02-05">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2003-11-07">
+      Modified results pvl to not include the results group
+    </change>
+    <change name="Brendan George" date="2005-11-21">
+      Added application test
+    </change>
+    <change name="Elizabeth Miller" date="2006-06-29">
+      Changed name to mappt and made ui look like skypt and campt
+    </change>
+    <change name="Sean Crosby" date="2007-04-12">
+      Changed flatfile output so it duplicates PVL data.  User now
+      required to entered a flatfile name.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Koechle" date="2008-08-14">
+      Added pixel value to the output group
+    </change>
+    <change name="Mackenzie Boyd" date="2010-01-12">
+      Modified output to include all coordinate systems for latitude and 
+      longitude and clearly declare the input files coordinate system. Improved 
+      documentation.
+    </change>
+    <change name="Mackenzie Boyd" date="2010-02-16">
+      Added many parameters accesible when inputing a lat lon, all under 
+      coordinate system. These parameters are to select the input coordinate 
+      system being used. Updated documentation to match.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Filename of a cube
+        </brief>
+        <description>
+          Input cube which must have a Mapping group in the labels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>Text file</brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          A text file which will contain the results of this program.  This file can
+          be used in conjunction with the "getkey" program in order to pass 
+          the results to another program when developing scripts if the PVL 
+          format is selected.
+        </description>
+      </parameter>
+      <parameter name="FORMAT">
+        <type>string</type>
+        <brief>
+          Output Format
+        </brief>
+        <description>
+          Format type for output file.  Pvl format is default.
+        </description>  
+        <default><item>PVL</item></default>
+        <list>
+          <option value="PVL">
+            <brief>
+              Pvl Format
+            </brief>
+            <description>
+              Output file will be in pvl format
+            </description>
+          </option>
+          <option value="FLAT">
+            <brief>
+              FlatFile Format
+            </brief>
+            <description>
+              Output file will be a comma deliminated flatfile.  This file format can easily be 
+              imported into excel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <brief>
+          Append Output to File
+        </brief>
+        <description>
+          If this option is selected, the output from the application will be appended to the file. 
+          If it is not selected, any information in the TO file will be overwritten.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+    </group>
+
+    <group name="Position">
+      <parameter name="TYPE">
+        <type>string</type>
+        <brief>Coordinate selection</brief>
+        <default><item>IMAGE</item></default>
+        <list>
+          <option value="IMAGE">
+            <brief>Interprets the coordinate as sample/line</brief>
+            <description>
+              This option interprets the coordinate as sample/line and will
+              compute latitude/longitude and x/y
+            </description>
+            <inclusions>
+              <item>SAMPLE</item>
+              <item>LINE</item>
+            </inclusions>
+            <exclusions>
+              <item>LATITUDE</item>
+              <item>LONGITUDE</item>
+              <item>X</item>
+              <item>Y</item>
+              <item>COORDSYS</item>
+              <item>LATTYPE</item>
+              <item>LONDIR</item>
+              <item>LONDOM</item>
+              <item>MAP</item>
+            </exclusions>
+          </option>
+          <option value="GROUND">
+            <brief>Interprets the coordinates as latitude/longitude</brief>
+            <description>
+              This option interprets the coordinate as latitude/longitude and will
+              compute sample/line and x/y
+            </description>
+            <inclusions>
+              <item>LATITUDE</item>
+              <item>LONGITUDE</item>
+              <item>COORDSYS</item>
+            </inclusions>
+            <exclusions>
+              <item>SAMPLE</item>
+              <item>LINE</item>
+              <item>X</item>
+              <item>Y</item>
+            </exclusions>
+          </option>
+          <option value="PROJECTION">
+            <brief>Interprets the coordinate as x/y</brief>
+            <description>
+              This option interprets the coordinate as x/y and will
+              compute sample/line and latitude/longitude
+            </description>
+            <inclusions>
+              <item>X</item>
+              <item>Y</item>
+            </inclusions>
+            <exclusions>
+              <item>SAMPLE</item>
+              <item>LINE</item>
+              <item>LATITUDE</item>
+              <item>LONGITUDE</item>
+              <item>LATTYPE</item>
+              <item>LONDIR</item>
+              <item>LONDOM</item>
+              <item>MAP</item>
+              <item>COORDSYS</item>
+            </exclusions>
+          </option>
+        </list>
+        <description>
+          This parameter is used to select the type of coordinate which will be used to
+          compute the other two remaining coordinates.
+        </description>
+      </parameter>
+
+      <parameter name="SAMPLE">
+        <type>double</type>
+        <brief>
+          Sample Position
+        </brief>
+        <description>
+            This is the sample position used to compute information about the camera state at the pixel.
+        </description>
+      </parameter>
+
+      <parameter name="LINE">
+        <type>double</type>
+        <brief>
+          Line Position
+        </brief>
+        <description>
+            This is the line position used to compute information about the camera state at the pixel.
+        </description>
+      </parameter>
+
+      <parameter name="LATITUDE">
+        <type>double</type>
+        <brief>
+          Latitude Value
+        </brief>
+        <description>
+          This is the latitude value used to compute the other coordinate values. The latitude
+          will be interpreted as either Planetographic or Planetocentric 
+          latitude depending on the option selected under coordinate system. 
+        </description>
+      </parameter>
+
+      <parameter name="LONGITUDE">
+        <type>double</type>
+        <brief>
+          Longitude value
+        </brief>
+        <description>
+          This is the longitude value used to compute the other coordinate values.  The longitude
+          will be interpreted as either PositiveEast or PositiveWest longitude 
+          and -180 to 180 or 0 to 360 domain depending on the option selected 
+          under coordinate system.
+        </description>
+      </parameter>
+
+      <parameter name="X">
+        <type>double</type>
+        <brief>
+          X coordinate
+        </brief>
+        <description>
+          This is the x coordinate value used to compute the other coordinate values. It
+          will be a projection X value in meters.
+        </description>
+      </parameter>
+
+      <parameter name="Y">
+        <type>double</type>
+        <brief>
+          Y coordinate
+        </brief>
+        <description>
+          This is the y coordinate value used to compute the other coordinate values.  It
+           will be a projection Y value in meters.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Coordinate System">
+      <parameter name="COORDSYS">
+        <type>string</type>
+        <brief> 
+          The coordinate system of the input latitude and longitude.
+        </brief>
+        <default><item>INPUTFILESYS</item></default>
+        <description>
+          This is the coordinate system the input latitude and longitude will be 
+          interpreted in. There are eight possible options with the variation of 
+          planetocentric or planetographic, positive east or west, 180 to -180 
+          range or 0 to 360.
+        </description>
+        <list>
+          <option value="INPUTFILESYS">
+            <brief>
+              Use coordinate system of input file
+            </brief>  
+            <description>
+              This option uses the coordinate system of the input cube, this 
+              could be any of eight possibilities. This is the default behavior.
+            </description>
+            <exclusions>
+              <item>LATTYPE</item>
+              <item>LONDIR</item>
+              <item>LONDOM</item>
+              <item>MAP</item>
+            </exclusions>
+          </option>
+
+          <option value="UNIVERSAL">
+            <brief>
+              Isis default
+            </brief>
+            <description>
+              The Isis default coordinate system of planetocentric, positive 
+              east, domain 0 to 360. 
+            </description>
+            <exclusions>
+              <item>LATTYPE</item>
+              <item>LONDIR</item>
+              <item>LONDOM</item>
+              <item>MAP</item>
+            </exclusions> 
+          </option>
+          
+          <option value="USERDEFINED">
+            <brief>
+              User defined coordinate system  
+            </brief>  
+            <description>
+              Accepts latitude and longitude in a user defined coordinate 
+              system, any of eight possible combinations.
+            </description>
+            <inclusions>
+              <item>LATTYPE</item>
+              <item>LONDIR</item>
+              <item>LONDOM</item>
+            </inclusions>
+            <exclusions>
+              <item>MAP</item>
+            </exclusions>
+          </option>
+          
+          <option value="MAP">
+            <brief>
+              Use mapping group from other file
+            </brief>  
+            <description>
+              The mapping group of the given file is read in to convert from its
+              system to universal to be set in the input cube's projection.
+            </description>
+            <inclusions>
+              <item>MAP</item>
+            </inclusions>
+            <exclusions>
+              <item>LATTYPE</item>
+              <item>LONDIR</item>
+              <item>LONDOM</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MAP">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing mapping parameters
+        </brief>
+        <description>
+          This file can be a cube or a simple hand produced map file. This file 
+          must contain a maping group and is how the coordinate system will be 
+          determined if selected.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>PrintMap</function>
+            <brief>View MapFile</brief>
+            <description>
+              This helper button will cat out the mapping group of the given mapfile to the session log
+               of the application
+             </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
+        <filter>
+          *.map *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="LATTYPE">
+        <type>string</type>
+        <brief>
+          Latitude type
+        </brief>
+        <description>
+          The latitude type for the projection.  It can either be Planetocentric or Planetographic.
+           PLANETOCENTRIC is the default.
+        </description>
+        <default>
+          <item>PLANETOCENTRIC</item>
+        </default>
+        <list>
+          <option value="PLANETOCENTRIC">
+            <brief>
+              Planetocentric
+            </brief>
+            <description>
+              Sets the latitude type of the input to be interpreted as
+              Planetocentric.
+            </description>
+          </option>
+          <option value="PLANETOGRAPHIC">
+            <brief>
+              Planetographic
+            </brief>
+            <description>
+              Sets the latitude type of the input to be interpreted as 
+              Planetographic.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="LONDIR">
+        <type>string</type>
+        <brief>
+          Longitude Direction
+        </brief>
+        <description>
+          The longitude direction for the projection.  It can have a direction of Positive East 
+          or Positive West.  POSITIVEEAST is the default.
+        </description>
+        <default>
+          <item>POSITIVEEAST</item>
+        </default>
+        <list>
+          <option value="POSITIVEEAST">
+            <brief>
+              PositiveEast Longitude Direction
+            </brief>
+            <description>
+              Sets the longitude direction of the input  to be interpreted as 
+              PositiveEast.
+            </description>
+          </option>
+          <option value="POSITIVEWEST">
+            <brief>
+              PositiveWest Longitude Direction
+            </brief>
+            <description>
+              Sets the longitude direction of the input to be interpreted as 
+              PositiveWest.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="LONDOM">
+        <type>string</type>
+        <brief>
+          Longitude Domain
+        </brief>
+        <description>
+          The longitude domain for the projection. It can either have a domain
+          of 180 or 360. 360 is the default.
+        </description>
+        <default>
+          <item>360</item>
+        </default>
+        <list>
+          <option value="360">
+            <brief>
+              0 to 360 Degree Longitude Domain
+            </brief>
+            <description>
+              Sets the longitude domain of the input to be intrepreted as 0 to 
+              360 degrees.
+            </description>
+          </option>
+          <option value="180">
+            <brief>
+              -180 to 180 Degree Longitude Domain
+            </brief>
+            <description>
+              Sets the longitude domain of the input to be interpreted as 0 to 
+              180 degrees.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

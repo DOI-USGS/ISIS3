@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <h2>
+          <a name="DrivingForceOfTheConversion">Driving Force of the Conversion</a>
+        </h2>
+        <p>
+          The major reason for embarking on the conversion of Isis was to modernize a nearly 15-year old software package.
+          Isis was prototyped in the mid-to-late 1980's.   Mainstream use began when it was ported to Unix around 1990.
+          At that time, the technologies used in the development included TAE (a text-based user interface) and Fortran and C.
+          Later IDL and X-Windows were used to add display functionality to the system.  In the mid-1990's, the Perl scripting
+          language was used to replace TAE PDF procedures.  A modernization needed to be undertaken, one that would benefit users,
+          software developers, and Isis system management.
+        </p>
+
+        <h2>
+          <a name="UserDesignConsiderations">User Design Considerations</a>
+        </h2>
+
+        <p>
+          Two major elements were considered, the first was replacing the TAE text-based user interface and the second was
+          easing the users learning curve.  Currently, Isis employs a graphic user interface derived from the Qt API.
+          A significant reason the Qt API was selected is it is available on Unix, Windows, and Macintosh platforms.
+        </p>
+
+        <table class="imageTable" align="center" style="width:210px;">
+          <tr>
+            <td>
+              <a href="assets/lowpass.jpg">
+              <img src="assets/thumbs/lowpass.jpg" width="200" height="230" alt="[lowpass GUI Screenshot]"/></a>
+              <p>
+                Example of the GUI
+              </p>
+              <p class="caption">
+                500x666, 64KB
+              </p>
+            </td>
+          </tr>
+        </table>
+
+
+        <p>
+          In addition to replacing the user interface, several other problem areas were identified and addressed in order
+          to make learning and using Isis easier.  They include
+        </p>
+
+        <ul>
+          <li>Overly feature rich programs such that only the programmer or designer can fully utilize the application</li>
+          <li>Programs names with unclear meanings</li>
+          <li>Two or more programs with the same functionality</li>
+          <li>Function of the program is unclear</li>
+        </ul>
+
+        <br clear="all"/>
+
+        <p>
+          Some examples and solutions of each if these problems are:
+        </p>
+
+
+        <table class="tableFormattedInformation" align="center">
+          <tr>
+            <th>
+              Problem
+            </th>
+            <th>
+              Solution
+            </th>
+          </tr>
+
+          <tr>
+            <td>
+              Overly Feature Rich
+              <ul>
+                <li>boxfilter</li>
+                <li>photomet</li>
+                <li>mosaic</li>
+              </ul>
+            </td>
+
+            <td>
+              Multiple Programs
+              <ul>
+                <li>highpass, lowpass, etc</li>
+                <li>hapke, minneart, etc</li>
+                <li>handmos, mapmos, pad</li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Unclear Names
+              <ul>
+                <li>dsk2dsk</li>
+                <li>random</li>
+              </ul>
+            </td>
+            <td>
+              Standard Meanings
+              <ul>
+                <li>crop</li>
+                <li>rotate</li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Multiple Programs
+              <ul>
+                <li>plansinu</li>
+                <li>planorth</li>
+                <li>lev1tolev2</li>
+              </ul>
+            </td>
+            <td>
+              Single Programs
+              <ul>
+                <li>cam2map</li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Unclear Program Function
+              <ul>
+                <li>Documentation restricted to text-only</li>
+              </ul>
+            </td>
+            <td>
+              Clearer Program Function
+              <ul>
+                <li>Documentation with text</li>
+                <li>Documentation with visual examples</li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+
+        <table class="imageTable" align="center" style="width:210px;">
+          <tr>
+            <td>
+              <a href="assets/docshot.jpg">
+              <img src="assets/thumbs/docshot.jpg" width="200" height="207" alt="[Documentation screenshot]"/></a>
+              <p>
+                Example of the Documentation
+              </p>
+              <p class="caption">
+                579x600, 114KB
+              </p>
+            </td>
+          </tr>
+        </table>
+
+
+        <h2>
+          <a name="ProgrammerDesignConsiderations">Programmer Design Considerations</a>
+        </h2>
+
+        <p>
+There were many major design considerations relating to software development.  They included:
+        </p>
+
+        <ul>
+          <li>Increase code reuse</li>
+          <li>Increase programmer productivity</li>
+          <li>Utilize more third party APIs</li>
+          <li>Utilize more developer tools</li>
+        </ul>
+
+        <h3>Increase code reuse</h3>
+        <p>
+          The Isis API consisted of many hundreds of C and Fortran subroutines.  The documentation for the routines
+          was located in the source code, forcing application programmers to manually find and locate the desired
+          function.  Coupled with fact there was no table of contents or other front-end navigation ability meant
+          developers often relied on word-of-mouth to determine existing capabilities.  In the worst case, capabilities
+          were sometimes re-coded because of lack of information.
+        </p>
+        <p>
+          The conversion process allowed for more planning in regards to the Isis Application Programmer API.  The API
+          reference presents a full developer documentation set in a consistent, web-based interface.  The following is
+          an example of the documentation for a C++ class,
+        </p>
+
+
+        <h3>Increase programmer productivity</h3>
+        <p>
+          Another aspect of the design was to increase programmer productivity.  In particular, the goal was to have
+          the developer redirect focus from error checking, user input, and cube I/O to the algorithm.  The following
+          example of the “mirror” program clarifies the position:
+        </p>
+
+        <table class="tableFormattedInformation" align="center">
+          <tr>
+            <th>
+              Isis 2.1
+            </th>
+            <th>
+              Isis 3.0
+            </th>
+          </tr>
+          <tr>
+            <td>
+              <ul>
+                <li>Total 261 lines</li>
+                <li>Documentation – 97 lines</li>
+                <li>Algorithm – 3 lines</li>
+                <li>User interface – 8 lines</li>
+                <li>Error checking – 48 lines</li>
+                <li>I/O handling – 65 lines</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li>Total 29 lines</li>
+                <li>Documentation – 10 lines</li>
+                <li>Algorithm – 3 lines</li>
+                <li>User interface – 2 lines</li>
+                <li>Error checking – 0 lines</li>
+                <li>I/O handling – 0 lines</li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+
+        <p>
+          The redirection of focus can be attributed to the C++ expansion of the “DOIO” concept.  This concept
+          developed in the late 1970's, significantly reduced the amount of programming overhead (errors, I/O,
+          user interface).
+        </p>
+
+        <h3>Utilize more third party APIs</h3>
+        <p>
+          To further increase code reuse there was a desire to utilize third party APIs.  Many of the newer APIs
+          are restricted to C++ or Java and not available in Fortran or C.   Currently the Isis system utilizes
+          the following APIs:
+        </p>
+
+        <ul>
+          <li>Imagemagick  (image file format library)</li>
+          <li>Qt  (multi-platform window system)</li>
+          <li>Xerces (Xml parsing)</li>
+          <li>TNT/JAMA (matrix and linear algebra)</li>
+          <li>NAIF/SPICE Toolkit</li>
+        </ul>
+
+        <h3>Utilize more developer tools</h3>
+        <p>
+          Many of the current development tools are geared toward object-oriented languages or other new
+          technologies (e.g., Xml, MySql, etc).  Developers can use various language sensitive editors, debuggers,
+           code profilers, code analyzers, and other tools not readily available or fine-tuned for Fortran/C.
+        </p>
+
+        <h2>
+          <a name="IsisSystemManagementDesignConsiderations">Isis System Management Design Considerations</a>
+        </h2>
+        <p>
+          The administration of Isis is especially critical as it is being used more and more by the external USGS
+          planetary community.  In particular the following areas were addressed:
+        </p>
+
+        <ul>
+          <li>Source maintenance</li>
+          <li>Software verification</li>
+          <li>Distribution</li>
+          <li>User Support</li>
+        </ul>
+
+        <h3>Source Maintenance</h3>
+        <p>
+          Isis source code maintenance is now handled through Concurrent Versions System.  CVS allows for programmers
+          to check out, modify, and commit changes to the Isis source repository.  It monitors conflicts between
+          simultaneous access to the source code by developers, as well as providing methods for retrieving all
+          previous versions of the source.
+        </p>
+
+        <h3>Software Verification</h3>
+        <p>
+          A major need for system management was the ability to verify Isis functions properly when porting to
+          a new operating system, upgrading operating systems, changing compilers, or modifying compiler switches.
+          Isis now relies on a suite of “unit tests” to verify the entire API is functioning properly.  In addition,
+          a suite of “application tests” is used to verify individual programs are operating the same.
+        </p>
+
+        <h3>Distribution</h3>
+        <p>
+          The distribution of Isis on CD/DVDs to external customers became problematic due to the growing size of
+          support files (SPICE and calibration) for current missions.  To facilitate timely distribution and quick
+          installation, a self-syncing system was constructed.  The system utilizes the “rsync” software package
+          to distribute Isis over the Internet in time period of 2 to 10 hours.
+        </p>
+
+        <h3>User Support</h3>
+        <p> Previously, Isis user support was handled through an email-based mechanism.  It was not centralized
+        and therefore questions could fall through the cracks.  Additionally, no uniform methods existed for
+        collecting user information (e.g., platform, O/S level, Isis version, etc).  Currently, we utilize a
+        web-based ticket tracking system.  It can be found at http://isis-support.wr.usgs.gov/
+        </p>
+
+        <h2>
+          <a name="OtherSignificantDesignChanges">Other Significant Design Changes</a>
+        </h2>
+        <p>
+          Obviously there have been significant changes already discussed including the GUI, programming,
+          and system management.  There are other changes or additions made, some subtle, worth minor discussion
+          and some major.  The following sections discuss other these changes.
+        </p>
+
+        <h3>User Preferences</h3>
+        <p>
+          In the past, user preferences were handled via system environment variables.  For example, “setenv
+          ISIS_SESSION_LOG myprint.prt” was the c-shell command for changing user preferences for error logging.
+          Currently, all user preferences will be specified in a system-wide, personal-user, and/or project-specific
+          preference file.  The preference file is in Parameter Value Language (PVL) format.
+        </p>
+
+        <h3>Session Log File</h3>
+        <p>
+          In the previous version of Isis, the session log files were partially PVL and then free-format as the
+          programmer output results of the program.  The current version requires all output to the session log
+          be in PVL format.  Results of the program will be stored in a RESULTS group.  Additional information
+          needed to be free-format can be written to a user specified output file.  For example, the histogram
+          program now writes either a postscript histogram or a classic histogram to a file.  It is no longer
+          output in the session log.   Additionally, the programmer has some control over free-format in the
+          session log by utilizing the PVL comment construct.
+        </p>
+
+        <h3>Cube Format and Compatibility</h3>
+        <p>
+          The cube format for Isis has been upgraded.  In particular, Isis outputs a new tiled format discussed
+          at a later point in this document.  The tiled format is better suited for large spatial products and
+          still allows for rapid access in the hyper-spectral modes.  However, all programs in Isis 3 will
+          continue to read the band sequential format produced in Isis 2 for backward compatibility. Support
+          is also continued for 8-bit unsigned, 16-bit signed, and 32-bit real pixel types, along with the
+          various special pixel values.  Finally, the Isis software will be endian-neutral.  That is, programs
+          will automatically handle LSB or MSB pixel storage order, regardless of machine architecture.
+        </p>
+
+        <h3>Suffix Data</h3>
+        <i>
+        <p>
+          <font color="RED">[Future Option]</font> Much effort went into the design and development of suffix data such as backplanes,
+          sideplanes, and bottomplanes.  Conceptually, the idea of suffix data was appealing in the original Isis design.   Realistically, most
+          of the Isis 2 application programs never dealt with them because of the complexity.   In Isis 3 we plan to continue with the ability to
+          support suffix data, albeit in a different form and name.  Suffix data will be handled through BLOBs (Binary Large OBjects).  The
+          advantage is the BLOB is a contingous
+          chunk of data unlike suffixes which were intermixed amongst the pixel data.  A BLOB will be able to represent a sideplane, bottomplane,
+          or any other non-image data (e.g., vectors defining regions of interest, lookup tables).
+        </p>
+        </i>
+
+        <h3>SFROM, ORANGE and OTYPE Parameters</h3>
+        <p>
+          In Isis 2.1, the SFROM, ORANGE, and OTYPE parameters were essentially qualifiers for input and output
+          cubes, respectively.  The functionality of these three parameters still exists; however, it is handled
+          via attributes to cube files as opposed to sets of parameters. For example, TO2, ORANGE2, OTYPE2 or
+          FROM2, SFROM2 are replaced by a file specification with attributes TO=output.cub+16bit
+        </p>
+
+        <h3>Display Software</h3>
+        <p>
+          Image display was handled via “qview” for cartographic (large spatial) and “cv” for hyper-spectral cubes.
+          They were coded using X-Windows and IDL, respectively.    Display capabilities for Isis 3 are coded in
+          the Qt API.  The design for these capabilities will follow the PICS TVDO concept.  That is, an image
+          display base class is provided.  This class allows for standard display functions such as zoom, roam,
+          stretch, blink, cursor interrogation, and measurement tools.  Individual display programs that perform
+          specialized functions will be derived off the base class.  Such programs include control point selection,
+          limb-fitting, and editing.
+        </p>
+
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>Conversion.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>reference</categoryItem>
+  </category>
+  <audience>
+    <target>intermediate</target>
+  </audience>
+  <bibliography>
+    <title>Conversion from Isis 2 to Isis 3</title>
+    <brief>The reasons, considerations, and major design changes related to the upgrade from Isis 2 to Isis 3</brief>
+    <description>The reasons, considerations, and major design changes related to the upgrade from Isis 2 to Isis 3</description>
+    <author>Jeff Anderson</author>
+    <date>2003-06-30</date>
+    <history>
+      <change date="2006-04-10" name="Deborah Lee Soltesz" hidden="true">Added brief and description</change>
+    </history>
+  </bibliography>
+</documentation>

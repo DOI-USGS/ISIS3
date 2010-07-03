@@ -1,0 +1,24 @@
+UNIT TEST for Albedo normalization function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name = Lambert
+  End_Group
+End_Object
+
+Object = NormalizationModel
+  Group = Algorithm
+    Name = Albedo
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0, dn=.0800618902 ...
+Normalization value = 0.0800619
+
+Test phase=86.7207248, incidence=51.7031305, emission=38.9372914, dn=.0797334611 ...
+Normalization value = 0.128657
+
+Test phase=180, incidence=90, emission=90, dn=.0794225037 ...
+Normalization value = -1.79769e+308
+

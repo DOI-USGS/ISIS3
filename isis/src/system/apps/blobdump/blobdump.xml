@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="blobdump" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+      Program to output a selected blob out to a file
+  </brief>
+
+  <description>
+      <p>
+          This program takes a cube with a blob in it, and strings to identify which 
+          blob, and reads that blob out to a file specified by the user.
+      </p>
+
+       <p>
+          Helper button has been provided in the GUI mode for the NAME and TYPE 
+          parameters.  The helper button will sequentially fill in the name and
+          type of each blob when pressed, clear the field to blank after the 
+          last blob has been reached, and then wrap back to the 
+          beginning.
+      </p>
+  </description>
+
+  <category>
+      <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <history>
+      <change name="Brendan George" date="2006-06-23">
+          Original version
+      </change>
+
+      <change name="Steven Lambright" date="2007-07-27">
+          Changed category from Utility to Import and Export
+      </change>
+      
+      <change name="Travis Addair" date="2009-03-03">
+          Added helper button to sequentially place one blob into the NAME and 
+          TYPE parameters each time it is pressed
+      </change>
+  </history>
+
+  <groups>
+      <group name="Files">
+          <parameter name="FROM">
+              <type>cube</type>
+              <fileMode>input</fileMode>
+              <brief>
+                  Input Cube
+              </brief>
+              <description>
+                  This is the cube containing the blob to be output.
+              </description>
+              <filter>*.cub</filter>
+          </parameter>
+
+          <parameter name="TO">
+              <type>filename</type>
+              <fileMode>output</fileMode>
+              <brief>
+                  Output file
+              </brief>
+              <description>
+                  This is the output file the blob will be written as
+              </description>
+          </parameter>
+      </group>
+
+      <group name="Blob Specifications">
+          <parameter name="NAME">
+              <type>string</type>
+              <brief>
+                  The name of the blob
+              </brief>
+              <description>
+                  This is the name of the blob to be output. It is generally mission-specific, and 
+                  does not refer to which subclass of blob created it. In the cube's labels, this
+                  will be the information to the right of the equals sign after the keyword "Name"
+              </description>
+              <helpers>
+                <helper name="H1">
+                  <function>helperButtonGetBlobList</function>
+                  <brief>Retrieve Blob names</brief>
+                  <description>
+                     This button will, each time it is pressed, generate the 
+                     name and type of a blob in the input cube and put it in 
+                     the appropriate field in the GUI, clear to blank after the
+                     last blob is hit, and then wrap back to the beginning.  
+                  </description>
+                  <icon>$ISIS3DATA/base/icons/exec.png</icon>
+               </helper>
+            </helpers>
+          </parameter>
+
+          <parameter name="TYPE">
+              <type>string</type>
+              <brief>
+                  The type of blob to be grabbed
+              </brief>
+              <description>
+                  This is the blob type, and generally refers to the subclass of Blob that created the
+                  blob, for example, "OriginalLabel", "Polygon", "Table", or "History". This appears in
+                  the cube label as the information to the right of the "Object" entry.
+              </description>
+          </parameter>
+      </group>
+  </groups>
+</application>

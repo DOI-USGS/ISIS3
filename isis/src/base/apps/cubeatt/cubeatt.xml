@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cubeatt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+      Cube attribute editor
+  </brief>
+
+  <description>
+      Copies the input cube to the output cube using the specified attributes.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jacob Danton" date="2005-11-16">
+      Original version
+    </change>
+    <change name="Jacob Danton" date="2006-02-06">
+      Added examples
+    </change>
+    <change name="Jeff Anderson" date="2007-06-25">
+      Added ability to optionally not propagate tables
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+            The input cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube with attribute modifications.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="PROPTABLES">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>
+          Propagate tables
+        </brief>
+        <description>
+            This option allows the user to select if tables will be propagated to the output cube
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> cubeatt example </brief>
+      <description>
+          Example of the cubeatt program.
+      </description>
+      <terminalInterface>
+        <commandLine> from=peaks.cub+1 to=peaks_band1.cub </commandLine>
+        <description>
+            Copy the first band of peaks.cub into peaks_band1.cub.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="512" height="512">
+          <brief> Input image</brief>
+          <description>This is the input image, peaks.cub.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="256" height="256"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/peaks.jpg" width="512" height="512">
+          <brief> Example output</brief>
+          <description>
+              This is the output image which consists of just the first band of peaks.
+              Notice, it is impossible to tell them apart.
+          </description>
+          <thumbnail caption="Output image" src="assets/thumb/peaks.jpg" width="256" height="256"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="329" src="assets/image/cubeattGui1.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform this example</description>
+            <thumbnail width="221" height="165" caption="cubeatt GUI" src="assets/thumb/cubeattGui1.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief> cubeatt example </brief>
+      <description>
+          Example of the cubeatt program.
+      </description>
+      <terminalInterface>
+        <commandLine> from=peaks.cub to=peaks_8bit.cub+8bit+0.0:255.0 </commandLine>
+        <description>
+            Copy an 8bit version of peaks.cub into peaks_8bit.cub.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="512" height="512">
+          <brief> Input image</brief>
+          <description>This is the input image, peaks.cub.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="256" height="256"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/peaks.jpg" width="512" height="512">
+          <brief> Example output</brief>
+          <description>
+              This is the output image which is an 8-bit version of the original which is 32-bits.
+              Again, it is impossible to tell them apart.
+          </description>
+          <thumbnail caption="Output image" src="assets/thumb/peaks.jpg" width="256" height="256"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="329" src="assets/image/cubeattGui2.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform this example</description>
+            <thumbnail width="221" height="165" caption="cubeatt GUI" src="assets/thumb/cubeattGui2.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+      <example>
+      <brief> cubeatt example </brief>
+      <description>
+          Example of the cubeatt program.
+      </description>
+      <terminalInterface>
+        <commandLine> from=peaks.cub+1 to=peaks_8bit.cub+8bit+75.0:125.0 </commandLine>
+        <description>
+            Copy an 8bit version of the first band in peaks.cub into peaks_cropped.cub that has a output range from 75 to 125.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="512" height="512">
+          <brief> Input image</brief>
+          <description>This is the input image, peaks.cub.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="256" height="256"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/peaks_scaled.jpg" width="512" height="512">
+          <brief> Example output</brief>
+          <description>
+              This is the output image which is an 8-bit version of the first band of the original which is 32-bits.
+              The range of the output image has been limited to values between 75 and 125.
+          </description>
+          <thumbnail caption="Output image" src="assets/thumb/peaks_scaled.jpg" width="256" height="256"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="329" src="assets/image/cubeattGui3.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform this example</description>
+            <thumbnail width="221" height="165" caption="cubeatt GUI" src="assets/thumb/cubeattGui3.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

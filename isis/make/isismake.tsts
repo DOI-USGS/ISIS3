@@ -1,0 +1,757 @@
+#----------------------------------------------------------------------------
+# Makefile for running and maintaining tests
+#----------------------------------------------------------------------------
+
+include $(ISISROOT)/make/isismake.macros
+
+# File extensions that valid file types to compare
+BINFILES =  jpg tif bin fits raw bmp png bc img imq
+PVLFILES =  pvl
+
+# Determine isis path from the current directory and use that path to set the TESTDATA_PATH variable
+DIR := `pwd`
+STR :=$(AWK) -v str=$(DIR) 'BEGIN { pos=index( str, \"/isis/\" ); print substr( str, pos, length( str ) - pos + 1 ) }'
+ISIS_PATH := $(shell $(AWK) -v str=$(DIR) 'BEGIN { pos=index( str, "/isis/" ); print substr( str, pos, length( str ) - pos + 1 ) }' )
+TESTDATA_PATH := $(ISIS3TESTDATA)$(ISIS_PATH)
+
+ifneq ("$(shell echo $(ISIS_PATH) | cut -d '/' -f2,3,5,7)", "isis/src/apps/tsts")
+  ifneq ("$(shell echo $(ISIS_PATH) | cut -d '/' -f2,3,5)", "isis/src/tsts")
+    $(error Your directory structure is not a legal isis structure!)
+  endif
+endif
+
+# define local test folders
+LOCAL_INPUT := input
+LOCAL_TRUTH := truth
+
+ifeq ($(HOST_OS),"")
+  LOCAL_OSTRUTH := $(LOCAL_TRUTH).$(HOST_ARCH).$(HOST_PROC)
+else
+  LOCAL_OSTRUTH := $(LOCAL_TRUTH).$(HOST_ARCH).$(HOST_PROC).$(HOST_OS)
+endif
+
+# Sets the TRUTH variable to point to the truth directory to use
+# This works by seeing if a local truth dir exists, and if it does
+# then it will check for a local OS specific truth dir. However,
+# if a local truth dir does not exist it will check the testdata
+# area for the truth directory. If it finds one there, it will use it
+# and check for OS specific. If neither are found, TRUTH should equal the
+# local truth folder for a good error message.
+TRUTH := $(LOCAL_TRUTH)
+
+# Local truth directory found, check for OS Specific
+ifeq "$(shell test -d $(LOCAL_TRUTH) && echo YES)" "YES"
+# TRUTH := $(LOCAL_TRUTH) not necessary - initialized to this already
+
+  ifeq "$(shell test -d $(LOCAL_OSTRUTH) && echo YES)" "YES"
+    TRUTH := $(LOCAL_OSTRUTH)
+  endif
+# Local truth directory not found, check for testdata
+else
+  ifeq "$(shell test -d $(TESTDATA_PATH)/$(LOCAL_TRUTH) && echo YES)" "YES"
+    TRUTH := $(TESTDATA_PATH)/$(LOCAL_TRUTH)
+
+    ifeq "$(shell test -d $(TESTDATA_PATH)/$(LOCAL_OSTRUTH) && echo YES)" "YES"
+      TRUTH := $(TESTDATA_PATH)/$(LOCAL_OSTRUTH)
+    endif
+  endif
+endif
+
+# Set input variable to be the input directory
+INPUT := $(LOCAL_INPUT)
+
+# Test to see if the input directory exists in the current directory
+# If not then set it to the testdata directory. The INPUT does not have
+# to exist, so if the testdata doesn't exist it is okay and will be handled
+# properly.
+ifeq "$(shell test -d $(INPUT) && echo YES)" "YES"
+  INPUT := $(LOCAL_INPUT)
+else
+  INPUT := $(TESTDATA_PATH)/$(LOCAL_INPUT)
+endif
+
+# Test to see if the executable exists above the test
+# if it exists then set APPNAME to reflect that, if not then leave APPNAME alone
+ifeq "$(shell test -f  ../../$(APPNAME) && echo YES)" "YES"
+   APPNAME := ../../$(APPNAME)
+else
+  APPNAME := $(APPNAME)
+endif
+
+# set the output variable to the output directory
+OUTPUT = output
+
+# Key word to signal that the test should not be cleaned
+TESTNOCLEAN := NOCLEAN
+
+# Defined text statements
+TESTPASSED =$(PRINTF) $(BLANKS) \"\"; echo -n "OK ... Case [$(CASE)] "
+TESTFAILED =$(PRINTF) $(BLANKS) \"\"; echo -n "Failed ... Case [$(CASE)] "
+TESTFILEFAILED =echo Failed ... File [$@]
+FILENOTFOUND =echo Failed ... File does not exist [$@]
+UNKNOWNFILE =echo Failed ... Unknown file type [$@]
+NOTRUTH =echo Failed ... No truth folder or files
+NOTRUTHFILE =echo Failed ... No files in truth directory
+NOOUTPUT =$(PRINTF) $(BLANKS) ""; echo "Error ... Output folder does not exist"
+
+DIRPATTERN=2774
+FILEPATTERN=2664
+DIRLISTPATTERN="drwxrwsr--"
+
+#----------------------------------------------------------------------------
+# Target = help
+# Dependencies = 
+#
+# Displays a list of targets and their descriptions.
+#----------------------------------------------------------------------------
+help:
+	echo "Isis Make Test Commands"
+	echo "------------------------ "
+	echo "make test               : Run test and print result, remove output"
+	echo "make test MODE=NOCLEAN  : Run test and print result, leave output"
+	echo "make output             : Runs commands"
+	echo "make checkin            : Copy input and truth files to testdata area"
+	echo "make checkout           : Copy input and truth files to test"
+	echo "make compare            : Compare truth against output files"
+	echo "make truthdata          : Copy files from the output to the truth directory"
+	echo "make ostruthdata        : Copy files from the output to os truth directory"
+	echo "make release            : Remove input truth and output directories"
+
+#----------------------------------------------------------------------------
+# Target = test
+# Dependencies = clean output compare
+#
+# Clean is to make sure that there is nothing in the 
+# output directory other than what is generated in the test.
+# Output then generates the file from the test.  Finally 
+# comparefiles shows the result of the test.  If the truth
+# directory doesn't exist that a message is printed stating so.
+#----------------------------------------------------------------------------
+test: clean; \
+	TIME1=`date +"%s"`; \
+	if [ -d "$(TRUTH)" ]; \
+	then \
+	  truthdir=`$(LS) $(TRUTH)`; \
+	  if [ "$$truthdir" == "" ]; \
+	  then \
+	    msg='$(NOTRUTHFILE)'; \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	    $$msg >> casefailed.txt; \
+	  else \
+	    $(MAKE) output; \
+	    $(MAKE) comparefiles; \
+	    if [  "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ]; \
+	    then \
+	      $(MAKE) clean; \
+	    fi; \
+	  fi; \
+	else \
+	  msg='$(NOTRUTH)'; \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	  $$msg >> casefailed.txt; \
+	fi; \
+	if [ $$TIME1 = %s ]; \
+	then \
+	  if [ -f casefailed.txt ]; \
+	  then \
+	    eval $(TESTFAILED); \
+	    echo; \
+	    $(CAT) casefailed.txt; \
+	    $(RM) casefailed.txt; \
+	  else \
+	    eval $(TESTPASSED); \
+	    echo; \
+	  fi; \
+	else \
+	  TIME2=`date +"%s"`; \
+	  TIMEDIFF=`expr $$TIME2 - $$TIME1`; \
+	  SEC60=`expr $$TIMEDIFF % 60`; \
+	  MIN=`expr $$TIMEDIFF / 60`; \
+	  MIN60=`expr $$MIN % 60`; \
+	  HOUR=`expr $$MIN / 60`; \
+	  HOUR60=`expr $$HOUR % 60`; \
+	  if [ -f casefailed.txt ]; \
+	  then \
+	    eval $(TESTFAILED); \
+	    $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60; \
+	    $(CAT) casefailed.txt; \
+	    $(RM) casefailed.txt; \
+	  else \
+	    eval $(TESTPASSED); \
+	    $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60; \
+	  fi; \
+	fi;
+
+#----------------------------------------------------------------------------
+# Target = compare
+# Dependencies = All files in the truth directory
+#
+# Iterates over the list of files in the truth directory and 
+# compares the files against the files in the output
+# directory.  If there are any files that are not recognized
+# then an unknown file message is printed.
+#----------------------------------------------------------------------------
+compare:
+	if [ -d "output" ]; \
+	then \
+	  if [ -d "$(TRUTH)" ]; \
+	  then \
+	    truthdir=`$(LS) $(TRUTH)`; \
+	    if [ "$$truthdir" == "" ]; \
+	    then \
+	      msg='$(NOTRUTHFILE)'; \
+	      $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	      $$msg >> casefailed.txt; \
+	    else \
+	      $(MAKE) comparefiles; \
+	    fi; \
+	  else \
+	    msg='$(NOTRUTH)'; \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	    $$msg >> casefailed.txt; \
+	  fi; \
+	  if [ -f casefailed.txt ]; \
+	  then \
+	    eval $(TESTFAILED); \
+	    echo; \
+	    $(CAT) casefailed.txt; \
+	    $(RM) casefailed.txt; \
+	  else \
+	    eval $(TESTPASSED); \
+	    echo; \
+	  fi; \
+	else \
+	  command='$(NOOUTPUT)'; \
+	  eval $$command; \
+	fi;
+
+#----------------------------------------------------------------------------
+# Target = truthdata
+# Dependencies = 
+#
+# Copies the contents of the output directory to the truth
+# directory.  If the truth directory doesn't exist it is created.
+# $(RSYNC) -ru --delete $(TESTDATA_PATH)/input/ input; \
+#----------------------------------------------------------------------------
+truthdata:
+	$(MKDIR) truth;
+	$(RSYNC) -rt --delete output/ truth;
+
+#----------------------------------------------------------------------------
+# Target = ostruthdata
+# Dependencies = 
+#
+# Copies the contents of the output directory to the truth
+# directory.  If the truth directory corresponding to the 
+# OS the test is being run on doesn't exist it is created.
+#----------------------------------------------------------------------------
+ostruthdata:
+	osdir="$(TRUTH)"; \
+	if [ "$(TRUTH)" = "truth" ]; then \
+	  if [ "$(HOST_OS)" = "" ]; then \
+	    osdir="$(TRUTH).$(HOST_ARCH).$(HOST_PROC)"; \
+	  else \
+	    osdir="$(TRUTH).$(HOST_ARCH).$(HOST_PROC).$(HOST_OS)"; \
+	  fi; \
+	fi; \
+	$(MKDIR) $$osdir; \
+	$(RSYNC) -rt --delete $(OUTPUT)/ $$osdir;
+
+#----------------------------------------------------------------------------
+# Target = output
+# Dependencies = temp commands modifyFiles
+#
+# Masks target command with a better name to just run the 
+# commands.  If the output directory doesn't exist it is 
+# created.  The temp target is needed because the directory
+# output causes make to check the directory output if there
+# is no dependency.  Runs the commands and then
+# modifies the output files based on the variables set 
+# in the test.
+#----------------------------------------------------------------------------
+output: temp
+	$(MKDIR) $(OUTPUT);
+	$(MAKE) commands;
+	$(MAKE) modifyFiles;
+
+# needed to make the output target work
+temp:
+	temp="";
+
+#----------------------------------------------------------------------------
+# Target = clean
+# Dependencies = 
+#
+# Deletes the output directory.
+#----------------------------------------------------------------------------
+clean:
+	$(RM) -r $(OUTPUT); \
+	$(RM) print.prt; \
+
+#----------------------------------------------------------------------------
+# Target = comparefiles
+# Dependencies = All files in the truth directory
+#
+# Iterates over the list of files in the truth directory and 
+# compares the files against the files in the output
+# directory.  If there are any files that are not recognized
+# then an unknown file message is printed.  
+#echo "t = $(notdir $(wildcard $(TRUTH)/*) )";
+#echo "b = $(BINFILES)";
+#----------------------------------------------------------------------------
+comparefiles:  $(notdir $(wildcard $(TRUTH)/*) )
+	temp="";
+	
+#----------------------------------------------------------------------------
+# Target = modifyFiles
+# Dependencies = modText modBin
+#
+# Performs the modifications to the files in the output 
+# directory.  Iterates over the output files and modifies 
+# the file based on variables such as .SKIPLINES
+# Utilizes the modText and modBin targets to carryout
+# the modifactions. 
+#----------------------------------------------------------------------------
+modifyFiles:
+	files="$(notdir $(wildcard $(OUTPUT)/*.txt) )"; \
+	for i in $$files; do \
+	    $(MAKE) modText FILE=$$i; \
+	done;
+	files="$(notdir $(wildcard $(foreach j, $(BINFILES), $(addprefix $(OUTPUT)/*., $j))  ) )"; \
+	for i in $$files; do \
+	  $(MAKE) modBin FILE=$$i; \
+	done;
+	files="$(notdir $(wildcard $(foreach j, $(PVLFILES), $(addprefix $(OUTPUT)/*., $j))  ) )"; \
+	for i in $$files; do \
+	  $(MAKE) modText FILE=$$i; \
+	done;
+
+#----------------------------------------------------------------------------
+# Target = modText
+# Dependencies = 
+#
+# Handles the modifactions of text files in the output
+# directory.  Looks at variables .SKIPLINES and .IGNORELINES.
+# The variable FILE must be set to the name of the file in
+# the output directory to be modified.
+#----------------------------------------------------------------------------
+modText: 
+	if [ "$(FILE)" != "" ]; \
+	then \
+	  numLines="+0"; \
+	  if [ "$($(FILE).SKIPLINES)" != "" ]; \
+	  then \
+	    numLines="$($(FILE).SKIPLINES)"; \
+	    skipLines=`expr $($(FILE).SKIPLINES)  + 1`; \
+	    numLines="+$$skipLines"; \
+	  fi; \
+	  $(TAIL) -n $$numLines $(OUTPUT)/$(FILE) > $(OUTPUT)/$(FILE).tail; \
+	  if [ "$($(FILE).IGNORELINES)" = "" ]; \
+	  then \
+	    $(CP) $(OUTPUT)/$(FILE).tail $(OUTPUT)/$(FILE).tail2; \
+	  else \
+	    command="grep -vw $(word 1,  $($(FILE).IGNORELINES)) $(OUTPUT)/$(FILE).tail"; \
+	    if [ $(words $($(FILE).IGNORELINES)) != 1 ]; \
+	    then \
+	      command2="$(foreach i, $(wordlist 2, 10000, $($(FILE).IGNORELINES) ), | grep -vw $i)" ; \
+	    fi; \
+	    eval $$command$$command2 > $(OUTPUT)/$(FILE).tail2; \
+	  fi; \
+	  $(MV) $(OUTPUT)/$(FILE).tail2 $(OUTPUT)/$(FILE); \
+	  $(RM) $(OUTPUT)/$(FILE).tail; \
+	fi
+
+#----------------------------------------------------------------------------
+# Target = modBin
+# Dependencies = 
+#
+# Handles the modifactions of bin files in the output
+# directory.  Looks at variables .BINSKIP and .BINCOUNT.
+# The variable FILE must be set to the name of the file in
+# the output directory to be modified. 
+#----------------------------------------------------------------------------
+modBin:
+	if [ "$(FILE)" != "" ]; \
+	then \
+	  binskipstr="";  \
+	  bincountstr=""; \
+	  if [ "$($(FILE).BINSKIP)" != "" ]; \
+	  then \
+	    binskipstr="skip=$($(FILE).BINSKIP)"; \
+	  fi; \
+	  if [ "$($(FILE).BINCOUNT)" != "" ]; \
+	  then \
+	    bincountstr="count=$($(FILE).BINCOUNT)"; \
+	  fi; \
+	  $(DD) if=$(OUTPUT)/$(FILE) of=$(OUTPUT)/$(FILE).dd $$binskipstr $$bincountstr >& /dev/null; \
+	  $(MV) $(OUTPUT)/$(FILE).dd $(OUTPUT)/$(FILE); \
+	fi
+
+force: ;
+
+#----------------------------------------------------------------------------
+# Target = %.cub
+# Dependencies = 
+#
+# Compare two cub files.  This is a pattern rule used by the 
+# compare target to compare cubs in the truth directory 
+# against a similiarly named file in the output directory.
+#----------------------------------------------------------------------------
+%.cub: force
+	if [ ! -f $(OUTPUT)/$@ ]; \
+	then \
+	  msg='$(FILENOTFOUND)'; \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	  $$msg >> casefailed.txt; \
+	else \
+	  tolerancestr=""; \
+	  ignorestr="";\
+	  if [ "$($@.TOLERANCE)" != "" ]; \
+	  then \
+	    tolerancestr="tolerance=$($@.TOLERANCE)"; \
+	  fi; \
+	  if [ "$($@.IGNORESPECIAL)" != "" ]; \
+	  then \
+	    ignorestr="ignorespecial=$($@.IGNORESPECIAL)"; \
+	  fi; \
+	  $(ISISROOT)/bin/cubediff from=$(TRUTH)/$@ \
+	          from2=$(OUTPUT)/$@ \
+	          to=compare.txt \
+		  $$tolerancestr  \
+		  $$ignorestr > /dev/null; \
+	  compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results keyword=Compare`; \
+	  command="";\
+	  if [ "$$compResult" = "DIFFERENT" ]; \
+	  then \
+	    msg='$(TESTFILEFAILED)'; \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	    $$msg >> casefailed.txt; \
+	  fi ; \
+	  $(RM) compare.txt; \
+	fi;
+
+#----------------------------------------------------------------------------
+# Target = %.txt
+# Dependencies = 
+#
+# Compare two text files.  This is a pattern rule used by the 
+# compare target to compare text files in the truth directory 
+# against a similiarly named file in the output directory.
+#----------------------------------------------------------------------------
+%.txt: force
+	if [ ! -f "$(OUTPUT)/$@" ]; \
+	then \
+	  msg='$(FILENOTFOUND)'; \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	  $$msg >> casefailed.txt; \
+	else \
+	  command="";\
+	  $(DIFF) $(TRUTH)/$@ $(OUTPUT)/$@ > /dev/null; \
+	  if [ $$? -ne 0 ];  \
+	  then \
+	    msg='$(TESTFILEFAILED)'; \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	    $$msg >> casefailed.txt; \
+	  fi; \
+	fi
+
+#----------------------------------------------------------------------------
+# Target = %.pvl
+# Dependencies = 
+#
+# Compare two pvl files using pvldiff. The tolerances and ignore lines are
+#   specified in the file (if it exists) filename.DIFF.
+#----------------------------------------------------------------------------
+%.pvl: force
+	if [ ! -f $(OUTPUT)/$@ ]; then                                       \
+	  msg='$(FILENOTFOUND)';                                             \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                         \
+	  $$msg >> casefailed.txt;                                           \
+	else                                                                 \
+	  difffile="$(INPUT)/$@.DIFF";                                       \
+	  if [ ! -f $$difffile ];                                            \
+	  then                                                               \
+	    difffile='';                                                     \
+	  fi;                                                                \
+	                                                                     \
+	  $(ISISROOT)/bin/pvldiff from=$(TRUTH)/$@ from2=$(OUTPUT)/$@        \
+	      to=compare.txt diff=$$difffile >& /dev/null;                   \
+	                                                                     \
+	  compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results    \
+	      keyword=Compare | tr '[:upper:]' '[:lower:]'`;                 \
+	                                                                     \
+	  if [ "$$compResult" = "different" ]; then                          \
+	    msg='$(TESTFILEFAILED)';                                         \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                       \
+	    $$msg >> casefailed.txt;                                         \
+	  fi ;                                                               \
+	  $(RM) compare.txt;                                                 \
+	fi;
+
+%.DIFF: force
+	temp="";
+
+#----------------------------------------------------------------------------
+# Target = %.BIN
+# Dependencies = 
+#
+# Compare two bin files.  This is a pattern rule used by the 
+# compare target to compare bin files in the truth directory 
+# against a similiarly named file in the output directory.
+# This target covers any files with extension in the list in the
+# variable BINFILES.
+#----------------------------------------------------------------------------
+$(foreach i, $(BINFILES), $(addprefix %., $i)):
+	if [ ! -f "$(OUTPUT)/$@" ]; \
+	then \
+	  msg='$(FILENOTFOUND)'; \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	  $$msg >> casefailed.txt; \
+	else \
+	  command="";\
+	  $(DIFF) $(TRUTH)/$@ $(OUTPUT)/$@ > /dev/null; \
+	  if [ $$? -ne 0 ];  \
+	  then \
+	    msg='$(TESTFILEFAILED)'; \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	    $$msg >> casefailed.txt; \
+	  fi; \
+	fi
+
+#----------------------------------------------------------------------------
+# Target = %
+# Dependencies = 
+#
+# Handles any other files that may be in the truth directory.
+# Prints that the file is unknown.
+#----------------------------------------------------------------------------
+% :: 
+	msg='$(UNKNOWNFILE)'; \
+	$(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
+	$$msg >> casefailed.txt; \
+
+#----------------------------------------------------------------------------
+# Target = checkin
+# Dependencies = copyInTruth
+#
+# Copies data from the test into the test data area. 
+# ISIS3TESTDATA needs to be set to know where to copy
+# data for this test to.  Data in the input and all of the truth
+# directories are copied to the test data area.
+#
+# Modified by: Stuart Sides 2007-01-09
+# Modified so we can do "make checkin" for files/dirs we do not own in the
+# testdata area.
+# The reasons for the (RM):
+#   NOTE: chmod docs say you can not set permissioins unless you own the file
+#   NOTE: rsync can not set the times on directories you do not own
+# Thus the (RM) makes everything work
+# Modified by: Steven Lambright 2007-07-18
+# Modified to properly sync the input folder because it is not required
+#----------------------------------------------------------------------------
+checkin:
+	if [ "$(ISIS3TESTDATA)" != "" ]; \
+	then \
+	  if [ -d "$(TRUTH)" ]; \
+	  then \
+	    truthdir=`$(LS) $(TRUTH)`; \
+	    if [ "$$truthdir" != "" ]; \
+	    then \
+	      $(RM) -rf $(TESTDATA_PATH); \
+              $(MKDIR) -m775 $(TESTDATA_PATH); \
+	      if [ -d "$(LOCAL_INPUT)" ]; \
+	      then \
+	        $(MKDIR) -m775 $(TESTDATA_PATH)/input; \
+	        find $(TESTDATA_PATH)/../.. -type d -user `whoami` -exec chmod 2775 {} \; ; \
+	        inputdir=`$(LS) $(LOCAL_INPUT)`; \
+	        if [ "$$inputdir" != "" ]; \
+	        then \
+                  find $(LOCAL_INPUT) -type d -user `whoami` -exec chmod 2775 {} \; ; \
+	          find $(LOCAL_INPUT) -type f -user `whoami` -exec chmod 664 {} \; ; \
+	          $(RSYNC) -rt --delete $(LOCAL_INPUT)/ $(TESTDATA_PATH)/input; \
+	        fi; \
+	      elif [ -d "$(TESTDATA_PATH)/input" ]; \
+	      then \
+	        $(RM) -rf $(TESTDATA_PATH)/input; \
+	      fi; \
+              $(MAKE) copyInTruth DEST=$(TESTDATA_PATH)/; \
+	      find $(TESTDATA_PATH)/../.. -type d -user `whoami` -exec chmod 2775 {} \; ; \
+	      find $(TESTDATA_PATH)/../.. -type f -user `whoami` -exec chmod 664 {} \; ; \
+	    else \
+	      echo "Truth directory empty"; \
+	    fi; \
+	  else \
+	    echo "Truth directory not found"; \
+	  fi; \
+	else \
+	  echo "ISIS3TESTDATA not set"; \
+	fi
+
+#----------------------------------------------------------------------------
+# Target = copyInTruth
+# Dependencies = 
+#
+# Copies all of the truth directories to the value in the 
+# variable DEST.  Iterates over all of the directories in the
+# test that have truth in it.  Creates the directory in DEST
+# and then copies all of the files in the truth directory to 
+# directory in DEST.
+#----------------------------------------------------------------------------
+copyInTruth:
+	for i in $(wildcard truth*); do \
+	  $(MKDIR) -m2775 $(DEST)$$i; \
+	  files=`$(LS) $$i`; \
+	  if [ "$$files" != "" ]; \
+	  then \
+	    find $$i -type d -user `whoami` -exec chmod 2775 {} \; ; \
+	    find $$i -type f -user `whoami` -exec chmod 664 {} \; ; \
+	    $(RSYNC) -rt --delete $$i/ $(DEST)$$i; \
+	  fi; \
+	done;
+
+#----------------------------------------------------------------------------
+# Target = checkout
+# Dependencies = dirs copyOutTruth
+#
+# Copies data from the test data area into the test. 
+# ISIS3TESTDATA needs to be set to know where to get the
+# test data from.  Uses the TESTDATA_PATH to get the data
+# for this test.  Copies the files from the input directory in the 
+# TESTDATA_PATH to the input directory of the test.  Then 
+# copies all of the truth directories and their contents to the test.
+# If the input or truth directories exist in the local test a warning
+# is printed and no copying takes place.
+#----------------------------------------------------------------------------
+checkout:
+	if [ "$(ISIS3TESTDATA)" = "" ]; \
+	then \
+	  echo "ISIS3TESTDATA not set"; \
+	elif [  -d "$(LOCAL_INPUT)" ]; \
+	then \
+	  echo "Input directory already exists, nothing copied"; \
+	elif [  -d "$(LOCAL_TRUTH)" ]; \
+	then \
+	  echo "Truth directory already exists, nothing copied"; \
+	elif [  -d "$(LOCAL_OSTRUTH)" ]; \
+	then \
+	  echo "OStruth directory already exists, nothing copied"; \
+	else \
+	  if [  -d "$(TESTDATA_PATH)/input" ]; \
+	  then \
+	    inputdir=`$(LS) $(TESTDATA_PATH)/input`; \
+	    if [ "$$inputdir" != "" ]; \
+	    then \
+	      $(MAKE) dirs; \
+	      $(RSYNC) -rt --delete $(TESTDATA_PATH)/input/ input; \
+	    fi; \
+	  fi; \
+	  $(MAKE) copyOutTruth DEST=$(TESTDATA_PATH); \
+	fi
+
+#----------------------------------------------------------------------------
+# Target = copyOutTruth
+# Dependencies = 
+#
+# Copies all of the truth directories from the value in the 
+# variable DEST.  Iterates over all of the directories in 
+# DEST that have truth in it.  Creates the directory in test
+# and then copies all of the files from the DEST directory
+# to the one in the test.
+#----------------------------------------------------------------------------
+copyOutTruth:
+	for i in $(notdir $(wildcard $(DEST)/truth*) ); do \
+	  $(MKDIR) $$i; \
+	  files=`$(LS) $(DEST)/$$i`; \
+	  if [ "$$files" != "" ]; \
+	  then \
+	    $(RSYNC) -rt --delete $(DEST)/$$i/ $$i; \
+	  fi; \
+	done;
+
+
+#----------------------------------------------------------------------------#
+# Target = release                                                           #
+# Dependencies = clean                                                       #
+#                                                                            #
+# Deletes all extraneous files and folders inside the current directory.     #
+# If any of these files or folders do not exist or don't match the ones      #
+# in $ISIS3TESTDATA then the user is prompted before continuing.             #
+#----------------------------------------------------------------------------#
+release: clean
+	proceedWithRelease="true";                                           \
+	                                                                     \
+	for i in $(notdir $(filter-out CVS Makefile print.prt  $(OUTPUT),    \
+	    $(wildcard *))); do                                              \
+	                                                                     \
+	  $(DIFF) -r $$i $(TESTDATA_PATH)/$$i >& /dev/null;                  \
+	                                                                     \
+	  if [ "$$?" != "0" ]; then                                          \
+	    continueAnyway="invalidAnswer";                                  \
+	                                                                     \
+	    until [ "$$continueAnyway" = "y" -o                              \
+	            "$$continueAnyway" = "yes" -o                            \
+	            "$$continueAnyway" = "n" -o                              \
+	            "$$continueAnyway" = "no" ]; do                          \
+	                                                                     \
+	      $(PRINTF) %-6s                                                 \
+	          "$$i was not checked in!    Delete anyway? (y/n) ";        \
+	      read continueAnyway;                                           \
+	      continueAnyway=`echo $$continueAnyway | tr '[:upper:]'         \
+	                                                 '[:lower:]'`;       \
+	                                                                     \
+	    done;                                                            \
+	                                                                     \
+	    if [ "$$continueAnyway" = "n" -o                                 \
+	         "$$continueAnyway" = "no" ]; then                           \
+	      proceedWithRelease="false";                                    \
+	      break;                                                         \
+	    fi                                                               \
+	  fi                                                                 \
+	done;                                                                \
+	                                                                     \
+	if [ "$$proceedWithRelease" = "true" ]; then                         \
+	  for i in $(notdir $(filter-out CVS Makefile print.prt  $(OUTPUT),  \
+	      $(wildcard *))); do                                            \
+	    $(RM) -r $$i;                                                    \
+	  done;                                                              \
+	fi
+
+
+#----------------------------------------------------------------------------
+# Target = dirs
+# Dependencies =  
+#
+# Creates the necessary directories for the test.
+#----------------------------------------------------------------------------
+dirs:
+	$(MKDIR) input;
+
+#----------------------------------------------------------------------------
+# Target=changePerms
+# Dependencies =  
+#
+# Changes the directory permissions starting at DEST_PATH
+# and preceding up the directory path till a directory is found
+# that matches the DIRLISTPATTERN variable.  Both the 
+# LOOKUP and DEST_PATH variables need to be set in order
+# to work properly.  LOOKUP is the first directory to start checking 
+# folder permissions on, and DEST_PATH is the full directory 
+# path above the LOOKUP directory.
+#----------------------------------------------------------------------------
+changePerms:
+	lookup=$(LOOKUP); \
+	path=$(DEST_PATH); \
+	permsline=`$(LS) -l $$path | grep -w $$lookup`; \
+	perms=`perl -e 'print substr( @ARGV[0], 0, 10 )' $$permsline`; \
+	while [ "$$perms" != $(DIRLISTPATTERN) ]; \
+	do \
+	  t=`chmod $(DIRPATTERN) $$path/$$lookup`; \
+	  revpath=`perl -e 'print scalar reverse ( @ARGV[0] )' $$path`; \
+	  pos=`perl -e 'print index( @ARGV[0], "/" )' $$revpath`; \
+	  folderrev=`perl -e 'print substr( @ARGV[0], 0, @ARGV[1] )' $$revpath $$pos`; \
+	  lookup=`perl -e 'print scalar reverse ( @ARGV[0] )' $$folderrev`; \
+	  subpath=`perl -e 'print substr( @ARGV[0], @ARGV[1]+1, length( @ARGV[0] ) -@ARGV[1] +1)' $$revpath $$pos`; \
+	  path=`perl -e 'print scalar reverse( @ARGV[0] )' $$subpath`; \
+	  permsline=`$(LS) -l $$path | grep -w $$lookup`; \
+	  perms=`perl -e 'print substr( @ARGV[0], 0, 10 )' $$permsline`; \
+	done

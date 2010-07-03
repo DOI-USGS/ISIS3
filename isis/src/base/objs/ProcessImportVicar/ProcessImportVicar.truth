@@ -1,0 +1,94 @@
+hist: Importing
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+LBLSIZE                        = 4096
+FORMAT                         = REAL
+TYPE                           = IMAGE
+BUFSIZ                         = 24576
+DIM                            = 3
+EOL                            = 0
+RECSIZE                        = 4096
+ORG                            = BSQ
+NL                             = 1024
+NS                             = 1024
+NB                             = 1
+N1                             = 1024
+N2                             = 1024
+N3                             = 1
+N4                             = 0
+NBB                            = 0
+NLB                            = 0
+HOST                           = DECSTATN
+INTFMT                         = LOW
+REALFMT                        = RIEEE
+BHOST                          = DECSTATN
+BINTFMT                        = LOW
+BREALFMT                       = RIEEE
+BLTYPE                         = CAS-ISS2
+PROPERTY                       = COMPRESSION
+ANTIBLOOMING_STATE_FLAG        = ON
+CALIBRATION_LAMP_STATE_FLAG    = N/A
+DELAYED_READOUT_FLAG           = NO
+DETECTOR_TEMPERATURE           = -89.2435
+EXPOSURE_DURATION              = 820.0
+FILTER_NAME                    = (P0, UV3)
+FILTER_TEMPERATURE             = -0.468354
+FLIGHT_SOFTWARE_VERSION_ID     = 1.2
+GAIN_MODE_ID                   = "29 ELECTRONS PER DN"
+INSTRUMENT_DATA_RATE           = 182.784
+INSTRUMENT_MODE_ID             = FULL
+LIGHT_FLOOD_STATE_FLAG         = ON
+OPTICS_TEMPERATURE             = 0.712693
+PREPARE_CYCLE_INDEX            = 0
+READOUT_CYCLE_INDEX            = 11
+SENSOR_HEAD_ELEC_TEMPERATURE   = 1.63302
+SHUTTER_MODE_ID                = NACONLY
+SHUTTER_STATE_ID               = ENABLED
+BIAS_STRIP_MEAN                = 6.59002
+DARK_STRIP_MEAN                = 0.0
+DATA_CONVERSION_TYPE           = TABLE
+MISSING_LINES                  = 0
+CALIBRATION_LAMP_DURATION      = 0.0
+COMMAND_FILE_NAME              = ISS_C23EU_EUR1X1004_VIMS_B.icf
+COMMAND_SEQUENCE_NUMBER        = 625
+ELECTRONICS_BIAS               = 112
+PARALLEL_CLOCK_VOLTAGE_INDEX   = 9
+DATA_SET_ID                    = CO-J/JSA-ISS-2/3-EDR-V1.0
+IMAGE_NUMBER                   = 1356768698
+IMAGE_OBSERVATION_TYPE         = SCIENCE
+IMAGE_TIME                     = 2000-364T08:00:01.352Z
+INSTRUMENT_HOST_NAME           = "CASSINI ORBITER"
+INSTRUMENT_ID                  = ISSNA
+INSTRUMENT_NAME                = "IMAGING SCIENCE SUBSYSTEM NARROW ANGLE"
+MISSION_NAME                   = CASSINI
+MISSION_PHASE_NAME             = "EARTH-JUPITER CRUISE"
+NOTE                           = N/A
+OBSERVATION_ID                 = VIMS_C23EU_EUR1X1004_PRIME
+PRODUCT_CREATION_TIME          = 2001-002T10:58:08.000Z
+PRODUCT_ID                     = 1_N1356768698.123
+PRODUCT_VERSION_TYPE           = FINAL
+SEQUENCE_ID                    = C23
+SEQUENCE_TITLE                 = Europa_Lon
+SPACECRAFT_CLOCK_CNT_PARTITION = 1
+SPACECRAFT_CLOCK_START_COUNT   = 1356768697.168
+SPACECRAFT_CLOCK_STOP_COUNT    = 1356768698.123
+START_TIME                     = 2000-364T08:00:00.532Z
+STOP_TIME                      = 2000-364T08:00:01.352Z
+TARGET_NAME                    = EUROPA
+EARTH_RECEIVED_START_TIME      = 2000-365T04:28:13.001Z
+EARTH_RECEIVED_STOP_TIME       = 2000-365T04:28:32.159Z
+MISSING_PACKET_FLAG            = NO
+SOFTWARE_VERSION_ID            = "ISS V7.0 11-22-2000"
+INST_CMPRS_PARAM               = (N/A, N/A, N/A, N/A)
+INST_CMPRS_RATIO               = 5.32396
+INST_CMPRS_TYPE                = LOSSLESS
+TASK                           = CISSCAL
+USER                           = doug
+DAT_TIM                        = "Thu Jul 10 13:53:21 2003"
+CISSCAL_CORRECTION_FACTOR      = 1
+CISSCAL_CORRECTION_FACTOR_FILE = correctionfactors.1
+CISSCAL_WTIM                   = "Thu Jul 10 13:54:00 2003"
+End
+hist: Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+-0.00156779
+9.824e-05

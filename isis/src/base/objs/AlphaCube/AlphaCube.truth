@@ -1,0 +1,78 @@
+1st Test Alpha
+4
+8
+2
+3
+3
+5
+1.5
+2.5
+3.5
+5.5
+
+1st Test Beta
+2
+3
+0
+-1
+3
+6
+
+2nd Alpha Test
+2
+3
+1.75
+1.75
+2.25
+3.25
+1.5
+1.5
+2.5
+3.5
+
+2nd Beta Test
+2
+4
+-0.5
+-0.5
+1.5
+3.5
+
+3rd Test Alpha
+4
+8
+2.75
+3.75
+3.25
+5.25
+2.5
+3.5
+3.5
+5.5
+
+3rd Test Beta
+2
+4
+-2.5
+-4.5
+3.5
+9.5
+
+Object = IsisCube
+  Group = Dimensions
+    Samples = 4
+    Lines   = 8
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 4
+    AlphaLines          = 8
+    AlphaStartingSample = 2.5
+    AlphaStartingLine   = 3.5
+    AlphaEndingSample   = 3.5
+    AlphaEndingLine     = 5.5
+    BetaSamples         = 2
+    BetaLines           = 4
+  End_Group
+End_Object
+End

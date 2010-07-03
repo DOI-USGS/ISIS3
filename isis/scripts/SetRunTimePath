@@ -1,0 +1,618 @@
+#!/usr/bin/perl
+use Getopt::Long;
+use File::Temp;
+# use strict;
+
+my $SUCCESS      = 0;
+my $BAD_INPUT    = 1;
+
+my ($progname) = ($0 =~ m#([^/]+)$#);  # get the name of this program
+
+my $usage = "
+Usage:  $progname [-h] [-v] [--dryrun] {--bins | --libs | --bundles}
+                  [--oldpath=<path>] [--newpath=<path>] [--libmap=<file>] 
+                  [ --prepend | --append] [--liblog=<file>] [--update]
+                  [--install_root=<path>] [--relocdir=<dir:dir>]
+                  file [file ...]
+
+where
+   -h                    Help, prints this menu
+   -v                    Verbose output
+   --dryrun              Only show commands that will be executed.  Note
+                         this automatically turns on verbose.
+   --bins                Input file(s) are binary application. Either this
+                           option or the --libs or --bundles option is required.
+   --libs                Input file(s) are libraries.  Either this option or
+                           the --bins or --bundles option is required.
+   --bundles            [MACOSX] Specifies files are MacOSX bundles that must 
+                          be treated slightly different than a MacOSX library.
+   --oldpath=<path:path> Old path to replace in library paths (MacOSX)
+   --newpath=<path:path> New runtime path to set in binary
+   --libmap=<file>       As an alternative or an augmentation, you can provide
+                           a file containing a list of oldpaths and newpaths.
+                           Each line in the file contains a map of the oldpath
+                           as the first column.  The second column is the 
+                           newpath replacement for the old path. You can still
+                           provide oldpath and newpath parameters.  If provided,
+                           they will be appended by default to the list read
+                           from the file provided in libmap.  Use the --prepend
+                           and --append options to control this.  Note that all
+                           lines that begin with a # will be treated a comment
+                           and ignored.  This option is MacOSX specific/useful.
+   --prepend             Prepend any library maps as provided in the oldpath and
+                           newpath parameters to any read from the libmap
+                           parameter if provided.
+   --append              Append any library maps as provided in the oldpath and
+                           newpath parameters to any read from the libmap
+                           parameter if provided.  [This is the default
+                           behavior]
+   --liblog=<file>       Specify filename to write the names of all unique
+                           libraries that were found during processing.  This
+                           is MacOSX specific/useful.
+   --update              Used in conjuction with the \"liblog\" option.  Setting
+                           this parameter will cause the file provided in the
+                           liblog parameter to be read in an used to initialize
+                           the list.  Only new libraries that don't previously
+                           exist will be added.  As such, it is not an error for
+                           the liblog file to not exists. No error or warning
+                           will be issued if the liblog file does not exist.
+   --install_root=<path> This parameter only applies to Mac libraries (dylib) 
+                           files.  The value of this parameter replaces the
+                           root as defined in the --oldpath parameter or the
+                           first column of the libmap file.  If it not
+                           provided, the install name for the library will not
+                           be modified.
+   --relocdir=<dir:dir>  In conjunction with liblog, these directory prefixes
+                           will be used to replace the prefix found during
+                           processing to specify the actual deployment directory
+                           location.  The resulting list can be used to alter
+                           the install_names of those libraries using this
+                           same application for proper deployment.  This is
+                           MacOSX specific/useful. There is no default so if 
+                           no value is provided, it creates a list of absolute
+                           library locations.
+   --errlog=<file>       If specified, it will contain a list of input files
+                           that had errors during processing.  If no errors
+                           were encountered, the file is not modified.  If
+                           errors did occur, the files are appended to the
+                           file name specified.
+   file [file...]        Name of files to modify paths in
+
+$progname will modify runtime dynamic/shared library paths in binary
+executables and, in some OSes (e.g., MacOSX), library install names.
+This is necessary to eliminate the need for use of mostly problimatic
+LD_LIBRARY_PATH/DYLD_LIBRARY_PATH environment variables.  These have
+led to problems on deployed versions of ISIS.
+
+Note, I recommend that the proper time to modify the runtime path on
+executables is at install time.  There will be trouble if you attempt
+to make this modification at link time, since the runtime paths are
+typically relative to the directory of the executable binary.
+
+MacOSX is far more complicated to create environment variable free deployment
+of large software systems.  As such, MacOSX requires additional considerations
+(i.e., parameters) as there are runtime library path locations baked into the
+dynamic libraries and for each shared library.
+
+On the other hand, Linux only requires one runtime path update with multiple
+paths.  Hence, the newpath parameter is typically all that is needed in order
+to ensure deployment ready software systems.  Unfortunately, Linux does not
+readily provided a utility that modify rpaths after linking.  There are two
+third party applications that provided this capability.  One is chrpath which
+seems to be no longer maintained.  The other is patchELF.  This is the
+recommended utility at this time as it offers more flexibility, such as
+extending the size of the executables if needed in order to accomodate new
+rpath entry lengths.
+
+MacOSX will require each library path in the executable to be
+modified.  In addition, MacOSX libraries require modification of the
+install name of the library prior to deployment.  All this can be accomplished
+using the MacOSX install_name_tool utility.  Linux platforms make use
+of the chrpath or patchELF utility which are not available as a native
+application on most Linux distributions.
+
+In addition to shared libraries and binary executables, plugins may
+also require modification.
+";
+
+#####################################################################
+#  Author:  Kris Becker, USGS, Flagstaff Original Version
+#  Date:    2010-02-25
+#  Version: $Id: SetRunTimePath,v 1.1 2010/04/09 23:19:58 slambright Exp $
+#####################################################################
+my $help = '';          # Help option
+
+# Get options
+my $opterrs = GetOptions ( "h"              => \$help,
+                           "v"              => \$verbose,
+                           "dryrun"         => \$dryrun,
+                           "bins"           => \$bins,
+                           "libs"           => \$libs,
+                           "bundles"        => \$bundles,
+                           "oldpath=s"      => \$oldpath,
+                           "newpath=s"      => \$newpath,
+                           "libmap=s"       => \$libmap,
+                           "prepend"        => \$prepend,
+                           "append"         => \$append,
+                           "liblog=s"       => \$liblog,
+                           "errlog=s"       => \$errlog,
+                           "update"         => \$update,
+                           "relocdir=s"     => \$relocdir,
+                           "install_root=s" => \$install_root,
+                           "changer=s"      => \$myChanger,
+                           "changeopt=s"    => \$myChangerOpt,
+                           "changelist=s"   => \$myChangerList
+                           );
+
+#$dryrun = 1;  ###  Ensure test mode for now
+die "$usage\n" if (!$opterrs);
+die "$usage\n" if ($help);
+Usage("*** Program Documentation ***\n") if ($#ARGV < 0);
+#$verbose = 1 if ($dryrun);
+my $fopt = 0;
+$fopt += 1 if ($bins);
+$fopt += 1 if ($libs);
+$fopt += 1 if ($bundles);
+Usage("Must give one and only one of --libs, --bins or --bundles") if ($fopt != 1);
+
+#  Determine system architecture and initialize default changer
+my $sysArch = "$^O";
+my $ChangerFunc = sub { die "Changer function not found for system $sysArch!\n" };
+my $CheckLibs   = sub { die "Library checker function not available for $sysArch!\n" };
+
+#  Set up changer tool for the specific platform
+my $changer = "";
+my $changerOption = "";
+my $changerList = "";
+if ($sysArch eq "darwin") {
+   $ChangerFunc = \&DarwinLibs if ($libs);
+   $ChangerFunc = \&DarwinBins if ($bins);
+   $ChangerFunc = \&DarwinBundles if ($bundles);
+   $CheckLibs   = \&CheckDarwinLibs;
+   $changer = "/usr/bin/install_name_tool" if (!$changer);
+   $changerOption = "-change";
+}
+elsif ($sysArch eq "linux") {
+   $ChangerFunc = \&LinuxLibs if ($libs);
+   $ChangerFunc = \&LinuxBins if ($bins);
+   $CheckLibs   = \&CheckLinuxLibs;
+   if ($myChanger) {
+      $changer = $myChanger;
+      $changerOption = $myChangerOpt;
+      $changerList   = $myChangerList;
+   }
+   else {
+      $changer = qx(which patchelf 2> /dev/null);
+      chomp $changer;
+      if ($changer) { 
+         $changerOption = "--set-rpath"; 
+         $changerList   = "--print-rpath";
+      }
+      else { 
+         $changer = qx(which chrpath 2> /dev/null);
+         $changerOption = "-r";
+         $changerList = "-l";
+      }
+   }
+
+}
+else {
+   Usage("Unsupported system ($sysArch) - can do Linux and MacOSX");
+}
+
+#  Ensure we have an RPATH changer program
+if (!$changer || !(-e $changer)) {
+  print STDERR "
+*********** ERROR - No changer utility found for $sysArch platform ***********
+Darwin uses the install_name_tool utility.  Linux uses either patchelf or
+chrpath, both of which are third party utilities.  It may also be as simple
+as adding the proper directory where these programs reside into your PATH
+environment variable.
+";
+  exit (1);
+}
+
+#  Get the maps for each parameter
+my @oldlibs = ParsePaths($oldpath);
+my @newlibs = ParsePaths($newpath);
+$CheckLibs->(\@oldlibs, \@newlibs);
+
+# Parse the relocation directories
+my @libprefix = ParsePaths($relocdir);
+
+#  Read the library map if provided
+if ($libmap) {
+   open (LMAP, "<$libmap") or die "Could not open library map file ($libmap)\n";
+   my @lmaps = <LMAP>;
+   chomp @lmaps;
+   close (LMAP);
+   my @oldmap = ();
+   my @newmap = ();
+   my $lineno = 0;
+   map {
+      my $mline = Trim($_);
+      $lineno++;
+      #  Ignore if a # in column 1
+      if (! ($mline =~ m/^#/)) {
+         my @parts = split(/ +/, $mline);
+         my $pcount = scalar @parts;
+         die "Bad form at line $lineno - expected two columns (old new) libraries"
+            if ($pcount != 2);
+         push @oldmap, $parts[0];
+         push @newmap, $parts[1];
+      }
+   } @lmaps;
+
+
+   $CheckLibs->(\@oldmap, \@newmap);
+
+#  Add library maps to input list in order specified
+   if ($prepend) {
+      push @oldmap, @oldlibs;
+      push @newmap, @newlibs;
+      @oldlibs = @oldmap;
+      @newlibs = @newmap;
+   }
+   else {
+      push @oldlibs, @oldmap;
+      push @newlibs, @newmap;
+   }
+   $CheckLibs->(\@oldlibs, \@newlibs);
+}
+
+
+# Initialize empty library list to contain affected libraries list (MacOSX).
+my @libraries = ();
+if (($update) && (-e $liblog)) {
+   print "Opening/loading library log file $liblog\n" if ($verbose);
+   open (LIBLOG, "<$liblog") or die "Cannot open library log file $liblog\n";
+   @libraries = <LIBLOG>;
+   chomp @libraries;
+   close (LIBLOG);
+}
+
+#  Loop through all input files.  Initialize error list
+my @errfiles = ();
+foreach $file0 (@ARGV) {
+   print "\nProcessing file $file0...\n" if ($verbose);
+   $ChangerFunc->(\@oldlibs, \@newlibs, "$file0");
+}
+
+my $total = scalar @ARGV;
+my $logged = scalar @libraries;
+my $errors = scalar @errfiles;
+
+## Processing information
+print "Total Files: $total\n";
+print "Libraries:   $logged\n";
+map { print "$_\n" } @libraries if ($verbose);
+print "Errors:      $errors\n";
+map { print "$_\n" } @errfiles if ($verbose);
+
+# If specifed write out the unique libraries found.
+if ($liblog) {
+   open (LIBS, ">$liblog") or die "Could not create file list ($liblog)\n";
+   map { print LIBS "$_\n" } @libraries;
+   close (LIBS);
+}
+
+# If specifed write out the error log if any occured
+if ($errlog && ($errors > 0)) {
+   open (ERRS, ">>$errlog") or die "Could not open/create error file ($errlog)\n";
+   map { print ERRS "$_\n" } @errlog;
+   close (ERRS);
+}
+
+
+exit(0);
+
+#####################################################################
+#  Parse out the paths of the libraries separated by colons.
+#####################################################################
+sub Trim {
+   my ($str) = @_;
+   $str =~ s/^\s+//;
+   $str =~ s/\s+$//;
+   return ($str);
+}
+
+#####################################################################
+#  Parse out the paths of the libraries separated by colons.
+#####################################################################
+sub ParsePaths {
+   my ($paths) = @_;
+   my @parts = split(/:/, $paths);
+   my @lpaths = ();
+   map { push @lpaths, Trim("$_") } @parts;
+   return (@lpaths);
+}
+
+
+#####################################################################
+#  Check libraries for validity for Linux system processing
+#####################################################################
+sub CheckLinuxLibs {
+   my ($old, $new) = @_;
+   return;
+}
+
+#####################################################################
+#  Check libraries for validity for Darwin system processing
+#####################################################################
+sub CheckDarwinLibs {
+   my ($old, $new) = @_;
+   my @dold = @$old;
+   my @dnew = @$new;
+   my $dold_size = scalar @dold;
+   my $dnew_size = scalar @dnew;
+
+## Check sizes 
+   if (($dold_size != $dnew_size) && ($dnew_size != 1)) {
+      print STDERR "Number of old .vs. new not equal or new not one newpath\n";
+      map { print STDERR "Old: $_\n" } @dold;
+      print STDERR "\n";
+      map { print STDERR "New: $_\n" } @new;
+      exit (2);
+   }
+
+## Copy the last one of new to fill out the array to match the size
+## of old
+   while ($dnew_size != $dold_size) {
+      push @$new, @$new[$dnew_size-1];
+      $dnew_size++;
+   }
+
+## Now check to ensure that each library path in old is not a substring
+## of any other on as that is probably not what is intended and erroneous.
+   my $conflicts = 0;
+   for (my $i = 0 ; $i < $dold_size-1 ; $i++) {
+      my $first = @dold[$i];
+      for (my $j = $i+1 ; $j < $dold_size ; $j++) {
+         my $last =  @dold[$j];
+         if ($last =~ m!^$first!) {
+            print STDERR "$first ($i) is a substring of $last ($j) posing a conflict!\n";
+            $conflicts++;
+         }
+      }
+   }
+
+   if ($conflicts > 0) {
+      print STDERR "
+You must reorder the old path list as it will cause trouble.  Subsequent paths
+that contain a subpath of a previous entry will produce an incorrect path.
+This is almost certainly not what is intended.  Reorder and try again.
+";
+      exit (3);
+   }
+   return;
+}
+
+#####################################################################
+#  Update library log with input if not already in list
+#####################################################################
+sub AddLibrary {
+   my ($lib, $oldprefix) = @_;
+# Determine if a user passed a specific path location and replace
+# the existing prefix with it.
+   foreach $i (@libprefix) {
+      (my $reloclib = $lib) =~ s!$oldprefix!$i!;
+      if (-e $reloclib) {
+         $lib = $reloclib;
+         last;
+      }
+   }
+
+#  Determine if the library already exits in the list
+   map {
+      return if ("$_" eq "$lib");
+   } @libraries;
+
+# if it reaches here, add the new library
+   push @libraries, $lib;
+   return;
+}
+
+#####################################################################
+#  Change MacOSX binaries library runtime paths
+#####################################################################
+sub DarwinPaths {
+   my ($file0) = @_;
+   my $command = "otool -L $file0";
+   printCommand($command) if ($dryrun || $verbose);
+   my @paths = qx($command);
+   if ($? != 0) {
+      push @errfiles, $file0;
+      print STDERR "Cannot get library paths for file $file0\n" if ($verbose);
+      return (());
+   }
+   chomp @paths;
+   shift (@paths);  #  First line returns the file name, ignore it
+   my @darwinLibs = ();
+   map {
+     my @parts = split(/ /,$_);
+     my $lib = shift @parts;
+     $lib = Trim($lib);
+     push @darwinLibs, $lib;
+   } @paths;
+   return (@darwinLibs);
+}
+
+#####################################################################
+#  Change MacOSX binaries (executables or libraries) runtime paths
+#####################################################################
+sub ChangeDarwinLibPath {
+   my ($library, $oldpaths, $newpaths, $file0, $option) = @_;
+   my $old_size = scalar @$oldpaths;
+   my $new_size = scalar @$newpaths;
+   for (my $i = 0 ; $i < $old_size ; $i++) {
+     my $opath = @$oldpaths[$i];
+     if ($library =~ m!^$opath! ) {
+       AddLibrary("$library", "$opath");
+       my $npath = @$newpaths[$i];
+       $npath = $install_root if ($option eq "-id");
+       (my $newlib = $library) =~ s!$opath!$npath!;
+       print "\n\nChange $library to $newlib in $file0\n" if ($verbose);
+       my $target = $library if ($option eq "-change");
+       my $command = "$changer $option $target $newlib $file0";
+       if (execCommand($command) != 0) {
+         push @errfiles, $file0;
+         print STDERR "DarwinBins - Alteration of library path $library failed in file $file0\n" if ($verbose);
+         return (-1);
+       }
+       return (1);  ## indicate success 
+     }
+   }
+   return (0);
+}
+
+#####################################################################
+#  Change MacOSX library install names and any runtime libraries
+#  contained therein.
+#####################################################################
+sub DarwinLibs {
+   my ($oldpath, $newpath, $file0) = @_;
+   my @paths = DarwinPaths($file0);
+   my $libid = shift @paths;
+   ChangeDarwinLibPath($libid, \@$oldpath, \@$newpath, $file0, "-id") if ($install_root);
+   map {
+      ChangeDarwinLibPath($_, \@$oldpath, \@$newpath, $file0, $changerOption);
+   } @paths;
+   return;
+}
+
+#####################################################################
+#  Change MacOSX library install names and any runtime libraries
+#  contained therein.
+#####################################################################
+sub DarwinBundles {
+   my ($oldpath, $newpath, $file0) = @_;
+   my @paths = DarwinPaths($file0);
+   map {
+      ChangeDarwinLibPath($_, \@$oldpath, \@$newpath, $file0, $changerOption);
+   } @paths;
+   return;
+}
+
+#####################################################################
+#  Change MacOSX binaries library runtime paths. This should also
+#  be used for (Qt) plugins (bundles).
+#####################################################################
+sub DarwinBins {
+   my ($oldpath, $newpath, $file0) = @_;
+   my $old_size = scalar @$oldpath;
+   my $new_size = scalar @$newpath;
+   my @paths = DarwinPaths($file0);
+   map  {
+      ChangeDarwinLibPath($_, \@$oldpath, \@$newpath, $file0, $changerOption);
+   } @paths;
+
+   return;
+}
+
+#####################################################################
+#  Change MacOSX binaries (executables or libraries) runtime paths
+#####################################################################
+sub ChangeLinuxLibPath {
+   my ($library, $oldpaths, $newpaths, $file0, $option) = @_;
+   my $old_size = scalar @$oldpaths;
+   my $new_size = scalar @$newpaths;
+   for (my $i = 0 ; $i < $old_size ; $i++) {
+     my $opath = @$oldpaths[$i];
+     if ($library =~ m!^$opath! ) {
+## Got a pattern match on the existing rpath.  Construct new rpath.
+       map {
+         my $llib = $_;
+         my $quote = "\\" if ($llib =~ m!^\$!);
+         $rpath .= "${colon}${quote}${llib}";
+         $colon = ":";
+       } @$newpath;
+
+##  Modify the path
+       my $command = "$changer $option $rpath $file0 2>&1 > /dev/null";
+       if (execCommand($command) != 0) {
+         push @errfiles, $file0;
+         print "ChangeLinuxLibPath - Error changing RPATH in library $file0\n" if ($verbose);
+         return(-1);    ## failed
+       }
+       return (1);  ## indicate success 
+     }
+   }
+   return (0);
+}
+
+#####################################################################
+#  Change Linux library install names
+#####################################################################
+sub LinuxLibs {
+   my ($oldpath, $newpath, $file) = @_;
+
+## Check existing library paths
+   my $runpath = qx($changer $changerList $file 2>&1);
+   if ($? != 0) {
+      push @errfiles, $file0;
+      print "LinuxLibs - Error on RPATH test in file $file\n" if ($verbose);
+      return (-1);
+   }
+   chomp $runpath;
+   my $status =  ChangeLinuxLibPath($runpath, \@$oldpath, \@$newpath, 
+                                    $file, $changerOption);
+   return ($status);
+}
+
+#####################################################################
+#  Change Linux library install names
+#####################################################################
+sub LinuxBins {
+   my ($oldpath, $newpath, $file) = @_;
+   my $rpath = "";
+   my $colon = "";
+   map {
+      my $llib = $_;
+      my $quote = "\\" if ($llib =~ m!^\$!);
+      $rpath .= "${colon}${quote}${llib}";
+      $colon = ":";
+   } @$newpath;
+
+   ## Change the path
+   my $command = "$changer $changerOption $rpath $file 2>&1 > /dev/null";
+   my $status = execCommand($command);
+   if ($status != 0) {
+      push @errfiles, $file;
+      print "LinuxBins - Error changing RPATH test in binary $file\n" if ($verbose);
+      $status = -1;
+   }
+   return ($status);
+}
+
+
+#####################################################################
+#  printCommand - prints the command line to be executed
+#  Call:  printCommand($command);
+#####################################################################
+sub printCommand  {
+   my ($command) = @_;
+   print "$command\n";
+}
+
+#####################################################################
+#  printCommand - prints the command line to be executed
+#  Call:  printCommand($command);
+#####################################################################
+sub execCommand  {
+   my ($command) = @_;
+   printCommand($command) if ($verbose || $dryrun);
+   if ($dryrun) { return(0); }
+   else { return (system($command)); }
+}
+
+
+#####################################################################
+#  Prints usage
+#####################################################################
+sub Usage {
+  my ($message) = @_;
+  print STDERR "$message\n" if ($message);
+  print STDERR $usage;
+  exit ($BAD_INPUT);
+}
+

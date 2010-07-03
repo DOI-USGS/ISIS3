@@ -1,0 +1,15 @@
+Valid: 0
+Size: 0
+Name: test profile
+Adding a key...
+Valid: 1
+Size: 1
+Count: 1
+Exists: 0
+Exists: 1
+() operator: bar
+Value: bar
+Test getting non-existing key BadKey
+**PROGRAMMER ERROR** Error fetching value from key BadKey
+**PROGRAMMER ERROR** Requested value does not exist!
+BadKey =

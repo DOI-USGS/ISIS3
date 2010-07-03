@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- sample of examples section from crop.xml Isis Application XML file  -->
+
+  <examples>
+    <example>
+      <brief>200x300 sub-area</brief>
+      <description>
+        Extracting a 200x300 sub-area
+      </description>
+      <terminalInterface>
+        <commandLine> f=peaks.cub t=crop.cub samp=100 line=200 band=1 nsamp=200 nline=300 nbands=1
+        </commandLine>
+        <description>
+        In this example crop will extract a 200x300 sub-area that starts at sample 100 and line 200
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.1.jpg" width="500" height="500">
+          <brief> Input image for crop</brief>
+          <description>This is the input image for the 200x300 example of crop.  The area to be "cropped" is shown in red.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.1.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/peaks.crop.jpg" width="200" height="300">
+          <brief> Output image for crop</brief>
+          <description> This is the output image for the 200x300 example of crop
+          </description>
+          <thumbnail caption="Output image showing results of the crop application with 200 by 300 input." src="assets/thumb/peaks.crop.jpg" width="133" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="472" height="388" src="assets/image/cropgui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a 200 pixel by 300 pixel crop of the input image. </description>
+            <thumbnail width="200" height="165" caption="Crop Gui" src="assets/thumb/cropgui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+

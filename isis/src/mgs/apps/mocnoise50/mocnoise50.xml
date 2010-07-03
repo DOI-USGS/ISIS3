@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mocnoise50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Removes noise from MOC narrow angle images
+  </brief>
+
+  <description>
+    MOC narrow angle images with a crosstrack summing mode of 1 exhibit diagnol noise patterns.  This
+    program will statistically determine the pattern and remove it.
+  </description>
+
+  <category>
+    <missionItem>Mars Global Surveyor</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>mocevenodd</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Tracie Sucharski" date="1999-02-19">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-12-03">
+      Converted to Isis 3.0
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Jeannie Walldren" date="2008-11-05">
+      Replaced reference to MocLabels::IsWideAngle() with MocLabels::WideAngle()
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input MOC cube 
+        </brief>
+        <description>
+          The MOC narrow angle cube to have the noise removed.  It must have a crosstrack summing mode
+          of 1.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing cleaned-up data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+      <parameter name="WIDTH">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>
+          Width around noise pattern to use when computing noise removal coefficients
+        </brief>
+        <description>
+          After the noise pattern is detected, three correction coefficients are computed by examining
+          the average around the noise.  The width defines how many pixels around the noise that will 
+          be used for the average computation.  
+        </description>
+        <minimum inclusive="yes">5</minimum>
+      </parameter>
+    </group>
+
+  </groups>
+
+</application>

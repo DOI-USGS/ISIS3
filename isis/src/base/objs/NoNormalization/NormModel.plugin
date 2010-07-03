@@ -1,0 +1,4 @@
+Group = NoNormalization
+  Library = NoNormalization
+  Routine = NoNormalizationPlugin
+End_Group

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="campt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs latitude/longitude at line/sample or reverse
+  </brief>
+
+  <description>
+    This program requires the user supply a "level 1" cube.  That is, a
+    cube in raw camera geometry. 
+    The user must also enter one of the following coordinates:
+    <pre>
+      line/sample
+      latitude/longitude
+    </pre>
+    The program will then compute the other coordinates and various other
+    spacecraft and instrument related information including but not limited to
+    the north azimuth, solar azimuth,
+    spacecraft azimuth, incidence angle, phase angle, emission angle, and
+    resolution.  The following is an example of the output given when campt is ran:
+    <pre>
+Group = GroundPoint
+  Filename                   = /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub
+  Sample                     = 1.0
+  Line                       = 1.0
+  PixelValue                 = 0.0607816
+  RightAscension             = 65.749350916052
+  Declination                = -18.390093214966
+  PlanetocentricLatitude     = 34.444196777763
+  PlanetographicLatitude     = 34.760399604837
+  PositiveEastLongitude      = 223.84999971299
+  PositiveWestLongitude      = 136.15000028701
+  BodyFixedCoordinate        = (-2015.9595225544, -1936.6155808127, 1917.2574858384) &lt;km&gt;
+  LocalRadius                = 3389756.4767145 &lt;m&gt;
+  SampleResolution           = 536.05556350077 &lt;m&gt;
+  LineResolution             = 536.05556350077 &lt;m&gt;
+
+  # Spacecraft Information
+  SpacecraftPosition         = (-2025.6211429076, -2130.1417975758, 2009.318879871) &lt;km&gt;
+  SpacecraftAzimuth          = 0.006855593033889
+  SlantDistance              = 214.52515878961 &lt;km&gt;
+  TargetCenterDistance       = 3560.6189705415 &lt;km&gt;
+  SubSpacecraftLatitude      = 34.354896748841
+  SubSpacecraftLongitude     = 226.44072947174
+  SpacecraftAltitude         = 170.83335389965 &lt;km&gt;
+  OffNadirAngle              = 36.149255932304
+  SubSpacecraftGroundAzimuth = 91.64525294858
+
+  # Sun Information
+  SunPosition                = (-177337948.13839, 112957442.69098, -33704752.205292) &lt;km&gt;
+  SubSolarAzimuth            = 172.30460990873
+  SolarDistance              = 1.4234246174889 &lt;AU&gt;
+  SubSolarLatitude           = -9.1071705738361
+  SubSolarLongitude          = 147.50443340123
+  SubSolarGroundAzimuth      = 254.69139701227
+
+  # Illumination and Other
+  Phase                      = 120.59515694473
+  Incidence                  = 84.106289446623
+  Emission                   = 38.288719431206
+  NorthAzimuth               = 261.46910874636
+
+  # Time
+  EphemerisTime              = -69382819.160519 &lt;seconds&gt;
+  UTC                        = 1997-10-20T10:58:37.6570806
+  LocalSolarTime             = 17.089704420784 &lt;hour&gt;
+  SolarLongitude             = 201.83159041209
+End_Group
+    </pre>
+    <p>
+      In the output, all positions are in body fixed coordinates.  The  
+      <b>SubSpacecraftLatitude</b> and <b>SubSpacecraftLongitude</b> 
+      make up the subspacecraft point, which is the point on a body which 
+      lies directly beneath the spacecraft.  The <b>SubSolarLatitude</b> 
+      and <b>SubSolarLongitude</b> make up the subsolar point, which 
+      is the point on a body's refernce surface where a line from the body 
+      center to the sun center intersects that surface.   The 
+      <b>NorthAzimuth</b>, <b>SpacecraftAzimuth</b>, and 
+      <b>SubSolarAzimuth</b> are the values of the angle between a line 
+      from the image center to the relative point (North pole, SubSpacecraft 
+      Latitude/Longitude, SubSolar Latitude/Longitude respectively) and a 
+      reference line in the image plane.  The reference line is a horizontal 
+      line from the image center to the middle right edge of the image.  The 
+      angles increase in a clockwise direction.  The <b>LocalSolarTime</b>
+      is the time at the current longitude relative to the subsolar longitude,
+      which has a time of 12 o'clock.  The <b>SolarLongitude</b> 
+      is LSubS, or the seasonal angle. 
+      </p>
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2005-02-04">
+      Original version
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-06-20">
+        Fixed bug in Latitude range
+    </change>
+    <change name="Jacob Danton" date="2005-12-02">
+        Added appTest
+    </change>
+    <change name="Jacob Danton" date="2006-01-23">
+        Fixed appTest to comply to changes in String
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-23">
+        Fixed appTest files to comply with changes to all camera models
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-27">
+      Modified to output a flatfile as well as a pvl, make GUI consistent with skypt
+    </change>
+    <change name="Elizabeth Miller" date="2006-04-19">
+      Added additional output
+    </change>
+    <change name="Elizabeth Miller" date="2006-07-31">
+      Modified to use OffNadirAngle instead of SpacecraftRoll angle due to 
+      changes made to the camera class
+    </change>
+    <change name="Sean Crosby" date="2007-04-12">
+      Added RightAscension and Declination to PVL output.  Program now requires
+      user to specify a filename when using FLAT option.  Increased precision in 
+      flatfile output and updated appTest truthdata.
+    </change>
+    <change name="Steven Lambright" date="2008-04-21">
+      Added default values for the lines and samples
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Koechle" date="2008-08-19">
+      Removed unnecessary duplicate cube creation
+     </change>
+    <change name="Janet Barrett" date="2008-11-15">
+      Added SubSolarGroundAzimuth and SubSpacecraftGroundAzimuth
+      to PVL output. The SubSolarGroundAzimuth is the clockwise
+      angle on the ground between a line drawn from the ground 
+      point to the North pole of the body and a line drawn from 
+      the ground point to the subsolar point. The 
+      SubSpacecraftGroundAzimuth is defined similarly except it
+      uses the subspacecraft point.
+    </change>
+    <change name="Steven Lambright" date="2009-01-05">
+      Added the ALLOWOUTSIDE option
+    </change>
+    <change name="Mackenzie Boyd" date="2009-08-24">
+      Modified to use new class CameraPointInfo
+    </change>
+    <change name="Mackenzie Boyd" date="2009-09-14">
+      Added missed functionality for defaulting to center sample/line
+    </change>
+  </history>
+
+  <oldName>
+    <item>levpt</item>
+    <item>lev1pt</item>
+    <item>photostat</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Filename of a cube
+        </brief>
+        <description>
+          Input cube with appropriate camera labels 
+          (Instrument and kernel groups)
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>Text file</brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          A text file in label format which will contain
+          the results of this program.  This file can
+          be used in conjunction with the "getkey" program
+          in order to pass the results to another program
+          when developing scripts.
+        </description>
+      </parameter>
+
+      <parameter name="FORMAT">
+        <type>string</type>
+        <brief>
+          Output Format
+        </brief>
+        <description>
+          Format type for output file.  Pvl format is default.
+        </description>  
+        <default><item>PVL</item></default>
+        <list>
+          <option value="PVL">
+            <brief>
+              Pvl Format
+            </brief>
+            <description>
+              Output file will be in pvl format
+            </description>
+          </option>
+          <option value="FLAT">
+            <brief>
+              FlatFile Format
+            </brief>
+            <description>
+              Output file will be a comma deliminated flatfile.  This file format can easily be 
+              imported into excel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <brief>
+          Append Output to File
+        </brief>
+        <description>
+          If this option is selected, the output from the application will be appended to the file. 
+          If it is not selected, any information in the TO file will be overwritten.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+    </group>
+
+    <group name="Position">
+      <parameter name="TYPE">
+        <type>string</type>
+        <brief>Coordinate selection</brief>
+        <default><item>IMAGE</item></default>
+        <list>
+          <option value="IMAGE">
+            <brief>Interprets the coordinate as sample/line</brief>
+            <description>
+              This option interprets the coordinate as sample/line and will
+              compute latitude/longitude and x/y
+            </description>
+            <exclusions>
+              <item>LATITUDE</item>
+              <item>LONGITUDE</item>
+            </exclusions>
+          </option>
+          <option value="GROUND">
+            <brief>Interprets the coordinates as latitude/longitude</brief>
+            <description>
+              This option interprets the coordinate as latitude/longitude and will
+              compute sample/line and x/y
+            </description>
+            <exclusions>
+              <item>LINE</item>
+              <item>SAMPLE</item>
+            </exclusions>
+          </option>
+        </list>
+        <description>
+          This parameter is used to select the type of coordinate which will be used to
+          compute the other two remaining coordinates.
+        </description>
+      </parameter>
+
+      <parameter name="SAMPLE">
+        <type>double</type>
+        <brief>
+          Sample position to report
+        </brief>
+        <internalDefault>Center sample</internalDefault>
+        <description>
+            This is the sample position used to compute infomration about the camera state at the pixel.
+        </description>
+      </parameter>
+
+      <parameter name="LINE">
+        <type>double</type>
+        <brief>
+          Line position to report
+        </brief>
+       <internalDefault>Center line</internalDefault>
+        <description>
+            This is the line position used to compute infomration about the camera state at the pixel.
+        </description>
+      </parameter>
+
+      <parameter name="LATITUDE">
+        <type>double</type>
+        <brief>
+          Latitude position
+        </brief>
+        <description>
+            This is the planetocentric latitude to try to find in the camera image
+        </description>
+        <minimum inclusive="yes">-90.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+      </parameter>
+
+      <parameter name="LONGITUDE">
+        <type>double</type>
+        <brief>
+          Longitude position
+        </brief>
+        <description>
+            This is the positive east longitude to try to find in the camera image
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">360.0</maximum>
+      </parameter>
+
+      <parameter name="ALLOWOUTSIDE">
+        <type>boolean</type>
+        <brief>
+          Allow sample/line values outside the image
+        </brief>
+        <description>
+          When this is checked, sample/line values that are outside of the image (but close)
+          will be extrapolated. For example, a sample of -0.5 would be valid. If this is not
+          checked, a sample of -0.5 is not allowed.
+        </description>
+        <default><item>true</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

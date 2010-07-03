@@ -1,0 +1,18 @@
+SumX            = 35
+SumY            = 697
+SumXY           = 2554
+SumXX           = 133
+SumYY           = 50085
+
+Covariance      = 12.7222
+VarianceX       = 1.16667
+VarianceY       = 167.122
+Correlation     = 0.911113
+
+Valid Pixels    = 10
+Invalid Pixels  = 0
+Total Pixels    = 10
+
+Linear Regression Y = aX + b
+a = 31.5333
+b = 10.9048

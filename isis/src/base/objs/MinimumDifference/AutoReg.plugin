@@ -1,0 +1,4 @@
+Group = MinimumDifference
+  Library = MinimumDifference
+  Routine = MinimumDifferencePlugin
+End_Group

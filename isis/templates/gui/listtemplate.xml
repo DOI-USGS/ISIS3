@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="listtemplate" xmlns:xsi=
+    "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=
+    "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    A template gui for lists and inclusions/exclusions
+  </brief>
+  <description>
+    The template gui illustrates the functionality of lists and inclusions and
+    exclusions.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Elizabeth Miller" date="2005-11-03">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Options">
+
+      <parameter name="LIST">
+        <type>string</type>
+        <brief>
+          List of possible options
+        </brief>
+        <description>
+          List of possible options for the parameter
+        </description>
+        <list>
+          <option value="NONE">
+            <brief>
+              None Option
+            </brief>
+            <description>
+              The none option in the list includes none of the extra parameter.
+              It is the first parameter in the list, which is usually the 
+              default.
+            </description>
+            <exclusions>
+              <item>FIRST</item>
+              <item>SECOND</item>
+            </exclusions>
+          </option>
+          <option value="FIRST">
+            <brief>
+              1st Option
+            </brief>
+            <description>
+              Includes the 'first' parameter
+            </description>
+            <exclusions>
+              <item>SECOND</item>
+            </exclusions>
+          </option>
+          <option value="SECOND">
+            <brief>
+              2nd Option
+            </brief>
+            <description>
+              Includes the 'second' paramter
+            </description>
+            <exclusions>
+              <item>FIRST</item>
+            </exclusions>
+          </option>
+          <option value="BOTH">
+            <brief>
+              Both Option
+            </brief>
+            <description>
+              Includes both paramters
+            </description>
+          </option>
+          <default>
+            <item>NONE</item>
+          </default>
+        </list>
+      </parameter>
+
+      <parameter name="FIRST">
+        <type>string</type>
+        <brief>
+          Parameter needed for first option and both option
+        </brief>
+        <description>
+          This parameter is only used for the first option and the both option.
+        </description>
+      </parameter>
+
+      <parameter name="SECOND">
+        <type>double</type>
+        <brief>
+          Parameter needed for second and both options
+        </brief>
+        <description>
+          This parameter is used with the second and both options.
+        </description>
+      </parameter>
+
+    </group>
+  </groups>
+</application>

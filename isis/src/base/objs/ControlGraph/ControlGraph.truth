@@ -1,0 +1,43 @@
+
+Unit Test for ControlGraph!!!
+
+building the following ControlNet for testing...
+
+  ControlPoint  |  Images
+----------------|--------------------------
+	0	|	A	B
+	1	|	A	B	C
+	2	|	A	B	C
+	3	|	B	C
+	4	|	B	C
+	5	|	D	E
+
+ControlNet built!
+
+constructing a ControlGraph...
+ControlGraph constructed!
+
+IsConnected() returns: false
+
+GetIslandCount returns: 2
+
+GetCubesOnIsland(0) returns:  A  B  C
+
+GetCubesOnIsland(1) returns:  D  E
+
+GetCubesOnIsland(42) returns:**PROGRAMMER ERROR** 
+
+A list of cubes was requested from island 42
+but that island does not exist!!!
+
+There are 2 islands numbered from 0 to 1
+
+
+
+GetCubeList() returns:
+    D
+    E
+    A
+    B
+    C
+

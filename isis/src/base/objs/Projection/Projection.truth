@@ -1,0 +1,288 @@
+Unit test for Isis::Projection ...
+
+Test for missing Mapping Group
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PVL ERROR** Unable to find group [Mapping]
+
+Test for missing Equatorial Radius
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+
+Test for missing polar radius
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+
+Test for invalid Equatoral Radius
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** Invalid value for keyword [EquatorialRadius] it must be greater than zero
+
+Test for invalid polar radius
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** Invalid value for keyword [PolarRadius] it must be greater than zero
+
+Test for missing latitude type
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [LatitudeType] does not exist in [Group = Mapping]
+
+Test for invalid latitude type
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** Invalid value for keyword [LatitudeType] must be [Planetographic or Planetocentric]
+
+Test for missing longitude direction
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [LongitudeDirection] does not exist in [Group = Mapping]
+
+Test for invalid longitude direction
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** Invalid value for keyword [LongitudeDirection] must be [PositiveWest or PositiveEast]
+
+Test for missing longitude domain
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [LongitudeDomain] does not exist in [Group = Mapping]
+
+Test for invalid longitude domain
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** Invalid value for keyword [LongitudeDomain] must be [180 or 360]
+
+Projection Specifications
+Equatorial Radius:     1
+Polar Radius:          0.95
+Eccentricity:          0.3122498999199
+Is Planetographic:     1
+Is Planetocentric:     0
+Is PositiveEast:       1
+Is PositiveWest:       0
+Has 360 domain:        1
+Has 180 domain:        0
+Has ground range:      0
+Rotation:              0
+
+Testing conversion methods
+Bring -50  into 360 Domain:  310
+Bring  50  into 360 Domain:  50
+Bring   0  into 360 Domain:  0
+Bring 360  into 360 Domain:  360
+
+Bring 240  into 180 Domain:  -120
+Bring 140  into 180 Domain:  140
+Bring -180 into 180 Domain:  -180
+Bring 180  into 180 Domain:  180
+
+Change -90 to planetographic: -90
+Change -45 to planetographic: -47.93374799092
+Change   0 to planetographic: 0
+Change  45 to planetographic: 47.93374799092
+Change  90 to planetographic: 90
+Change -90 to planetocentric: -90
+Change -45 to planetocentric: -42.06625200908
+Change   0 to planetocentric: 0
+Change  45 to planetocentric: 42.06625200908
+Change  90 to planetocentric: 90
+
+ocentric to ographic to ocentric = 45
+ographic to ocentric to ographic = 45
+
+Testing unordered latitude range
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** [MinimumLatitude,MaximumLatitude] of [45.0,-80.0] are not properly ordered
+
+Testing invalid minimum latitude
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** [MinimumLatitude] of [-95.0] is outside the range of [-90:90]
+
+Testing invalid maximum latitude
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** [MaximumLatitude] of [95.0] is outside the range of [-90:90]
+
+Testing unordered longitude range
+**PROJECTION ERROR** Invalid label group [Mapping]
+**PROJECTION ERROR** [MinimumLongitude,MaximumLongitude] of [15.0,-190.0] are not properly ordered
+
+Has as longitude range:  1
+Minimum latitude:        45
+Maximum latitude:        80
+Minimum longitude:       15
+Maximum longitude:       190
+Minimum X:              150
+Maximum X:              1900
+Minimum Y:              135
+Maximum Y:              170
+
+Testing Ground coordinate routines
+Setting latitude to (-91,  0):  0
+Is Good:                        0
+Setting latitude to ( 91,  0):  0
+Is Good:                        0
+Setting position to (60,  -5):  1
+Is Good:                        1
+Latitude:                       60
+Longitude:                      -5
+XCoord:                         -50
+YCoord:                         150
+UniversalLatitude:              57.39200572938
+UniversalLongitude:             355
+
+Testing Universal Ground coordinate routines
+Setting position to (57.3920057293825,  355):  1
+Is Good:                                       1
+Latitude:                                      60
+Longitude:                                     355
+XCoord:                                        3550
+YCoord:                                        150
+UniversalLatitude:                             57.39200572938
+UniversalLongitude:                            355
+
+Testing projection coordinate routines
+Setting x/y position to (-2550,15):  1
+Is Good:                             1
+Latitude:                            -75
+Longitude:                           -225
+XCoord:                              -2250
+YCoord:                              15
+UniversalLatitude:                   -73.46402416274
+UniversalLongitude:                  135
+WorldX:                              -2250
+WorldY:                              15
+
+Testing world coordinate routines
+Setting world x/y position to (-4500,45):  1
+Is Good:                                   1
+Latitude:                                  -75
+Longitude:                                 -225
+XCoord:                                    -2250
+YCoord:                                    15
+UniversalLatitude:                         -73.46402416274
+UniversalLongitude:                        135
+WorldX:                                    -4500
+WorldY:                                    45
+ToProjectionX (-4500):                     -2250
+ToProjectionY (45):                        15
+ToWorldX:                                  -4500
+ToWorldY:                                  45
+Resolution:                                0.5
+Scale:                                     1.948077660234
+TrueScaleLatitude:                         45
+
+Testing IsSky method
+0
+1
+
+Testing string routines
+Planetographic
+PositiveEast
+360
+
+Testing Name and comparision routines
+Name:        None
+operator==:  0
+operator!=:  1
+
+Testing no projection
+Latitude:    47.93374799092
+Longitude:   90
+
+Testing radius methods 
+0.9714973035092
+1
+0.95
+0.95
+Testing compute methods 
+1
+0.4442906125131
+0
+1
+0.7249994335944
+1.050824192444
+1.570796326795
+-1.390161104192
+-1.552715454644
+-1.568988222422
+
+Testing static conversion methods 
+0 degrees in hours: 0
+0 degrees in HMS format: 00h 00m 00.0s
+0 degrees in DMS format: 0 00m 00.0s
+30.5 degrees in hours: 2.033333333333
+30.5 degrees in HMS format: 02h 02m 00.0s
+30.5 degrees in DMS format: 30 30m 00.0s
+40.3472 degrees in hours: 2.689813333333
+40.3472 degrees in HMS format: 02h 41m 23.328s
+40.3472 degrees in DMS format: 40 20m 49.920s
+45 degrees in Hours: 3
+45 degrees in HMS format: 03h 00m 00.0s
+45 degrees in DMS format: 45 00m 00.0s
+180 degrees in Hours: 12
+180 degrees in HMS format: 12h 00m 00.0s
+180 degrees in DMS format: 180 00m 00.0s
+360 degrees in Hours: 24
+360 degrees in HMS format: 24h 00m 00.0s
+360 degrees in DMS format: 360 00m 00.0s
+-390 To180Domain:          -30
+-390 To360Domain:          330
+50 to Planetocentric (sphere): 50
+50 to Planetographic (sphere): 50
+-30 ToPositiveEast (180 domain): 30
+30 ToPositiveWest (360 domain):  330
+
+
+Testing other static methods 
+Mars equatorial radius: EquatorialRadius = 3396190.0 <meters>
+Mars polar radius: PolarRadius = 3376200.0 <meters>
+Rotation Tests
+Rotation:     90
+Testing Ground coordinate routines
+Setting latitude to (-91,  0):  0
+Is Good:                        0
+Setting latitude to ( 91,  0):  0
+Is Good:                        0
+Setting position to (60,  -5):  1
+Is Good:                        1
+Latitude:                       60
+Longitude:                      -5
+XCoord:                         150
+YCoord:                         50
+UniversalLatitude:              57.39200572938
+UniversalLongitude:             355
+
+Testing projection coordinate routines
+Setting x/y position to (150,50):  1
+Is Good:                             1
+Latitude:                            60
+Longitude:                           -5
+XCoord:                              150
+YCoord:                              50
+UniversalLatitude:                   57.39200572938
+UniversalLongitude:                  355
+WorldX:                              150
+WorldY:                              50
+
+Testing Mapping() methods
+Mapping() = 
+Group = Mapping
+  TargetName         = SKY
+  ProjectionName     = MyProjection
+  EquatorialRadius   = 1.0
+  PolarRadius        = 0.95
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = 45.0 <units>
+  MaximumLatitude    = 80.0 <units>
+  MinimumLongitude   = 15.0
+  MaximumLongitude   = 190.0
+  Rotation           = 90.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = 45.0 <units>
+  MaximumLatitude = 80.0 <units>
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = 15.0
+  MaximumLongitude = 190.0
+End_Group
+End
+

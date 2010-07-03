@@ -1,0 +1,4 @@
+Group = Shade
+  Library = Shade
+  Routine = ShadePlugin
+End_Group

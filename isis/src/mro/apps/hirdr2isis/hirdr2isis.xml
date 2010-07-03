@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hirdr2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import PDS formatted HiRISE RDR image cube into Isis format cube</brief>
+
+  <description>
+      <p> 
+          This program will import a PDS formatted HiRISE RDR image into an Isis
+     cube.  The normal generic application is <b>pds2isis</b>, however HiRISE 
+     images require special consideration.  These considerations are based upon 
+     requirements placed on the process of converting original HiRISE ISIS 
+     products into PDS archive format and back again.  The HiRISE team requires 
+     a certain level of preservation so that science analysis on the PDS 
+     archived product, particularly in the ISIS system, is not compromised.
+      </p>
+      <p>
+          One consequence of the PDS storage requirements is the conversion of 
+          ISIS data to unsigned 16-bit integers.  This data storage type is not 
+          support inherently in the ISIS system, but this application converts 
+          it to the best data representation possible - 32-bit floating point 
+          values.  Comparisons of the conversion process falls within acceptable 
+          precision loss (approximately 1.0E-6).
+      </p>
+      <p>
+          Much of what this program does is ensure labels are properly copied 
+          and translated from PDS archival form that is consistant and highly 
+          comparable to the original ISIS product.  The strictest requirement is
+          label integrity which applies mainly to geometric datum contained in 
+          the ISIS labels.  The goal is to ensure geometric behavior is within 
+          acceptable limits of the original product.
+      </p>
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2007-08-17">
+      Original version
+    </change>
+      <change name="Kris Becker" date="2007-12-05">
+          The following modifications where made to more closely adhere to the
+          orginal ISIS himos source:  map the PDS Archive group back to the
+          ISIS Mosaic group; PDS NULL values of -9998 are mapped back to
+          ISIS Null; order of the groups are written in the same order as the 
+          ISIS input file;  Target radius values are updated for the 
+          Equirectangular projection only such that the existing 
+          (EquatorialRadius) radius value is copied to the CenterLatitudeRadius 
+          keyword and the actual NAIF radii replace EquatorialRadius and 
+          PolarRadius values if it is a valid NAIF target; the order of the 
+          values in keywords cpmmTdiFlag, cpmmSummingFlag and 
+          SpecialProcessingFlag are reordered according to CPMM order as it is 
+          in the original source; and added a bit more documentation.
+      </change>
+      <change name="Steven Lambright" date="2008-05-13">
+        Removed references to CubeInfo 
+      </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted HiRISE RDR file
+        </brief>
+        <description>
+          Use this parameter to select the HiRISE RDR filename. This 
+          file must contain the PDS labels.  This file must have been generated 
+          by the ISIS <b>hirdrgen</b> application.  These files are assumed to 
+          be projected products.
+        </description>
+        <filter>
+          *.img *.IMG
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the ISIS output filename.  This file 
+           will compare very closely with the original input file to the ISIS 
+           <b>hirdrgen</b> application.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>

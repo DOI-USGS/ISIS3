@@ -1,0 +1,20 @@
+Unit Test for VikingCamera...
+For upper left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For upper right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower left corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For lower right corner ...
+DeltaSample = 0
+DeltaLine = 0
+
+For center pixel position ...
+Latitude OK
+Longitude OK

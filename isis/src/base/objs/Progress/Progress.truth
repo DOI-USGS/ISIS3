@@ -1,0 +1,9 @@
+Working
+0% Processed5% Processed10% Processed15% Processed20% Processed25% Processed30% Processed35% Processed40% Processed45% Processed50% Processed55% Processed60% Processed65% Processed70% Processed75% Processed80% Processed85% Processed90% Processed95% Processed100% Processed
+
+Drinking Coffee
+0% Processed5% Processed10% Processed15% Processed20% Processed25% Processed30% Processed35% Processed40% Processed45% Processed50% Processed55% Processed60% Processed65% Processed70% Processed75% Processed80% Processed85% Processed90% Processed95% Processed100% Processed
+
+**PROGRAMMER ERROR** Step exceeds maximumSteps in [Progress::CheckStatus]
+**PROGRAMMER ERROR** Value for [steps] must be greater than zero in [Progress::SetMaximumSteps]
+**USER ERROR** Invalid preference for [ProgressBarPercent] in group [UserInterface] must be 1, 2, 5, or 10

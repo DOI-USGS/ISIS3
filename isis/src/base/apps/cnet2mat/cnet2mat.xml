@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnet2mat" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Converts an Isis3 control network file to an ISIS2 match point file.
+  </brief>
+
+  <description>
+    <p>
+      This program converts an Isis3 control network file to an ISIS2 match 
+      point file.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <history>
+    <change name="Brendan George" date="2007-08-10">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2008-03-12"> 
+        Added ability to use ISIS2 keyword IMAGE_NUMBER. Fixed bug where the 
+        diameter was being written as an Isis::Null when it had not been set.
+    </change>
+    <change name="Christopher Austin" date="2009-09-29">
+      Changed the default point class of 'U' to 'M' to prevent qmatch issues.
+    </change>
+    <change name="Christopher Austin" date="2009-10-07">
+      All Ignored Control Measures as well as all Control Measures inside
+      ignored Control Points will now have the Type Unmeasured.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Isis 3 Files">
+        <parameter name="LIST3">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+            List of ISIS3 input cubes in the match point file.
+          </brief>
+          <description>
+          A text file containing one column of ISIS3 cube file names. Every file
+          used in the match point file should be represented in this list. The
+          cubes must be available for the program to open and must be in the 
+          same order as the Isis2 cubes in LIST2
+          </description>
+          <filter>
+            *.lis
+          </filter>
+        </parameter>
+
+        <parameter name="CONTROL">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+              Isis3 output control network file
+          </brief>
+          <description>
+            Use this parameter to specify the control network file containing
+            the information to be translated into ISIS2 format
+            </description>
+          <filter>
+            *.ctl
+          </filter>
+        </parameter>
+    </group>
+
+    <group name="ISIS 2 Files">
+      <parameter name="LIST2">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of ISIS2 input cubes in the match point file.
+        </brief>
+        <description>
+          A text file containing one column of ISIS2 cube file names. Every file
+          used in the match point file should be represented in this list. The
+          cubes must be available for the program to open and must be in the 
+          same order as the Isis3 cubes in LIST3
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+            ISIS2 match point file
+        </brief>
+        <description>
+          Use this parameter to specify the target location of the output
+          control network file
+        </description>
+        <filter>
+          *.mat
+        </filter>
+      </parameter>
+    </group>
+ </groups>
+</application>

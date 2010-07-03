@@ -1,0 +1,25 @@
+<body>
+
+      <p>
+        This file is the external source of content for a Document that will be converted to an HTML file.
+      </p>
+
+
+      <h2>What's the deal?</h2>
+
+
+      <h3>The Document XML Metadata File</h3>
+      <p>
+        The metadata file example2.xml contains all the bibliographic, history, and basic file information for the Document.
+        The metadata file specifies that the Document content is HTML that is to be created from the contents of the metadata file.
+        The files/file/body/src element references this file as its source of content.
+      </p>
+
+      <h3>What will happen to this file?</h3>
+      <p>
+        When Isis is built, the metadata file will be converted into a web page. The bibliographic information will be output as summary
+        information in the HTML file, preset page headers and footers will be used, with the title (and subtitle) from the metadata used in the
+        page header. The file specified by files/file/body/src will be inserted into the body of the HTML file between the page header and footer.
+      </p>
+
+</body>

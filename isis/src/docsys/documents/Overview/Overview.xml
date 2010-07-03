@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        
+        <h2><a name="WhatIsIsis">What is Isis</a></h2>
+        <p>
+          The Integrated System for Imagers and Spectrometers (Isis) is
+          a specialized image processing package. It has many standard
+          image processing operations such as contrast stretch, image
+          algebra, filters, and statistical analysis. Isis operates on both
+          classical two-dimensional images as well as three-dimensional
+          cubes collected from imaging spectrometers.  The real power of 
+          Isis, however, is its unique 
+          capabilities for processing data from NASA spacecraft missions
+          such as Voyager, Viking, Galileo, Mars Global Surveyor,
+          and Mars Odyssey.
+        </p>
+
+        <h2><a name="MissionSpecificCapabilities">Mission Specific Capabilities</a></h2>
+        <p>
+          There are three major functions which must exist in order to
+          process EDR images (Experimental Data Records) for a particular
+          mission. The first is the ability to ingest or convert the EDR
+          into an Isis image.  The second is to calibrate
+          the raw DNs (e.g. number from 0 to 255) by converting them to
+          radiance or some other planetophysical property.  Finally,
+          a camera/sensor model must be developed in order to convert
+          the images in raw camera geometry to a usable map projection.
+        </p>
+
+        <h2><a name="CartographicCapabilities">Cartographic Capabilities</a></h2>
+        <p>
+          Once the software for ingestion, calibration, and camera models
+          are in place, a large suite of cartography programs can be
+          utilized.  These programs allow for digital mosaicking of
+          adjacent EDRs, photometric modeling and normalization,
+          removal of systematic noise patterns, overlaying graticules,
+          and numerous other cartographic and scientific analysis functions.
+        </p>
+
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>Overview.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>about</categoryItem>
+  </category>
+
+  <audience>
+    <target>all</target>
+  </audience>
+
+  <bibliography>
+    <title>Overview</title>
+    <brief>A quick summary of Isis</brief>
+    <description>
+      This document summarizes the purpose, functions, and supported
+      missions in the Isis software package.
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2003-06-25</date>
+  </bibliography>
+</documentation>

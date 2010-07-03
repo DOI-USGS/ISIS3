@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <src>example2_body.xml</src>
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>example2.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>about</categoryItem>
+  </category>
+  <audience>
+    <target>all</target>
+  </audience>
+  <bibliography>
+    <title>HTML with External Content Document Example</title>
+    <brief>Example of a Document with an external source of body content</brief>
+    <description>Example of a Document XML metadata file with the body stored in an external file that will be converted to an HTML file</description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2002-12-05</date>
+  </bibliography>
+</documentation>

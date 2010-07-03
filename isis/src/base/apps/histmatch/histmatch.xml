@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="histmatch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Match histograms of 2 cubes
+  </brief>
+
+  <description>
+    This program takes in two input images, FROM and MATCH, and uses their histograms to compute stretch pairs.  The data 
+    in the stretch depends on which matching algorithm is chosen.  If Culmulative Distribution Function (CDF) is chosen,
+    the histogram data will be stored into stretch pairs at regular intervals, the default being every one percent between
+    0.5 and 99.5 percent.  If MODE is chosen, only the histogram data at the endpoints and mode are stored.  The
+    pixels from the input image are remapped based on the data in the stretch pairs and the results are written to
+    a new cube file.  This is useful for tone matching two images.  The following figures 
+    illustrate what is happening.  Band 1 is FROM, Band 6 is MATCH, and CDF and Mode are two different output cubes.  The 
+    blue line is the histogram and the red line is the cumulative distribution.
+    <br></br>
+    <img src="assets/image/exampleBand1.jpg"
+     alt="Band 1 image"></img>
+    <img src="assets/image/exampleCDF.jpg"
+     alt="Output of CDF algorithm"></img>
+    <br></br>    
+    <img src="assets/image/exampleBand6.jpg"
+     alt="Band 6 image"></img>
+    <img src="assets/image/exampleMode.jpg"
+     alt="Output of Mode algorithm"></img>
+    <br></br>
+    Notice how the endpoints, mode, and overall shape of Band 1's histogram is now roughly equivalent to Band 6.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>equalizer</item>
+      <item>tonematch</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Sean Crosby" date="2006-12-04">
+     Original version 
+    </change>
+    <change name="Sean Crosby" date="2007-03-12">
+      Included ability to histmatch input cubes of different sizes 
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be altered 
+        </brief>
+        <description>
+          This file will have its histogram reshaped to resemble MATCH's histogram
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be matched
+        </brief>
+        <description>
+          This file's histogram will be matched by FROM
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the altered input file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Algorithm">
+      <parameter name = "STRETCH">
+        <type>string</type>
+        <default><item>CDF</item></default>
+        <brief>Stretch mode</brief>
+        <description>
+          This parameter specifies how the histogram will be stretched.  The options are to stretch by
+          by percentage (CDF), or by mode (Mode).
+        </description>
+        <list>
+          <option value = "CDF">
+            <brief>Match Cumulative Distribution Function</brief>
+            <description>
+              Remap image using stretch pairs taken at regular percentage intervals
+            </description>
+          </option>
+       
+          <option value = "MODE">
+            <brief>Match modes</brief>
+            <description>
+              Remap image using stretch pairs based on endpoints and mode
+            </description>
+            <exclusions>
+              <item>INCREMENT</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>  
+    </group>
+
+    <group name = "Histogram Options">
+      <parameter name = "MINPER">
+        <type>double</type>
+        <default><item>0.5</item></default>
+        <brief>Minimum percentage</brief>
+        <description>
+          Minimum cut-off value for the histogram
+        </description>
+       
+        <minimum inclusive="yes">0.0</minimum>
+        <lessThan>
+          <item>MAXPER</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name = "MAXPER">
+        <type>double</type>
+        <default><item>99.5</item></default>
+        <brief>Maximum percentage</brief>
+        <description>
+          Maximum cut-off value for the histogram
+        </description>
+
+        <maximum inclusive="yes">100.0</maximum>
+      </parameter>
+
+      <parameter name = "INCREMENT">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Percentage increment</brief>
+        <description>
+          Percentage increment for the histogram
+        </description>
+    
+        <minimum inclusive="yes">1</minimum>
+        <lessThan>
+          <item>MAXPER</item>
+        </lessThan>
+      </parameter>
+
+    </group>
+    
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Peaks histogram matching with CDF</brief>
+      <description>
+        This example shows the results of histogram matching using the cumulative distribution function. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=../peaks.cub+1 match=../peaks.cub+6 stretch=cdf to=../result.cub 
+        </commandLine>
+        <description>
+        Use CDF matching to adjust Band 1's histogram to resemble Band 6's histogram
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/FROMparameter.jpg" width="500" height="500">
+          <brief> Input image for histmatch</brief>
+          <description>This is the input image for the histmatch example.
+          </description>
+          <thumbnail caption="Input Peaks (Band 1) image" src="assets/thumb/FROMparameter.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+
+        <image src="assets/image/band1plot.jpg" width="500" height="500">
+          <brief> Band 1 histogram</brief>
+          <description>This is the input image's histogram.
+          </description>
+          <thumbnail caption="Input Peaks (Band 1) image" src="assets/thumb/band1plot.jpg" width="200" height="200" />
+        </image>
+
+        <image src="assets/image/MATCHparameter.jpg" width="500" height="500">
+          <brief> Match image for histmatch</brief>
+          <description>This is the match image for the histmatch example (i.e. the other input's histogram will be matched to this image's histogram).
+          </description>
+          <thumbnail caption="Input Peaks (Band 6) image" src="assets/thumb/MATCHparameter.jpg" width="200" height="200"  />
+          <parameterName>MATCH</parameterName>
+        </image>
+
+        <image src="assets/image/band6plot.jpg" width="500" height="500">
+          <brief> Band 6 histogram</brief>
+          <description>This is the input image's histogram.
+          </description>
+          <thumbnail caption="Input Peaks (Band 6) image" src="assets/thumb/band6plot.jpg" width="200" height="200"  />
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/CDFTOparameter.jpg" width="500" height="500">
+          <brief>Output image for CDF matching</brief>
+          <description> This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the CDF histogram matching." src="assets/thumb/CDFTOparameter.jpg" width="200" height="200"  />
+          <parameterName>TO</parameterName>
+        </image>
+
+        <image src="assets/image/cdfplot.jpg" width="500" height="500">
+          <brief>CDF histogram</brief>
+          <description>This is the output image's histogram.
+          </description>
+          <thumbnail caption="Output image" src="assets/thumb/cdfplot.jpg" width="200" height="200"  />
+        </image>
+
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/image/histmatchgui.jpg" width="500" height="500">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+a histogram matching operation with the input images. </description>
+            <thumbnail caption="Histmatch Gui" src="assets/thumb/histmatchgui.jpg" width="200" height="200"  />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief> Peaks histogram matching with mode</brief>
+      <description>
+        This example shows the results of histogram matching using the match mode function. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=../peaks.cub+1 match=../peaks.cub+6 stretch=mode to=../result.cub 
+        </commandLine>
+        <description>
+        Use mode matching to adjust Band 1's histogram to resemble Band 6's histogram
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/FROMparameter.jpg" width="500" height="500">
+          <brief> Input image for histmatch</brief>
+          <description>This is the input image for the histmatch example.
+          </description>
+          <thumbnail caption="Input Peaks (Band 1) image" src="assets/thumb/FROMparameter.jpg" width="200" height="200"  />
+          <parameterName>FROM</parameterName>
+        </image>
+
+        <image src="assets/image/band1plot.jpg" width="500" height="500">
+          <brief> Band 1 histogram</brief>
+          <description>This is the input image's histogram.
+          </description>
+          <thumbnail caption="Input Peaks (Band 1) image" src="assets/thumb/band1plot.jpg" width="200" height="200"  />
+        </image>
+
+        <image src="assets/image/MATCHparameter.jpg" width="500" height="500">
+          <brief> Match image for histmatch</brief>
+          <description>This is the match image for the histmatch example (i.e. the other input's histogram will be matched to this image's histogram).
+          </description>
+          <thumbnail caption="Input Peaks (Band 6) image" src="assets/thumb/MATCHparameter.jpg" width="200" height="200"  />
+          <parameterName>MATCH</parameterName>
+        </image>
+
+        <image src="assets/image/band6plot.jpg" width="500" height="500">
+          <brief> Band 6 histogram</brief>
+          <description>This is the input image's histogram.
+          </description>
+          <thumbnail caption="Input Peaks (Band 6) image" src="assets/thumb/band6plot.jpg" width="200" height="200"  />
+        </image>
+
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/MODETOparameter.jpg"  width="500" height="500">
+          <brief>Output image for mode matching</brief>
+          <description> This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the modal histogram matching." src="assets/thumb/MODETOparameter.jpg" width="200" height="200" />
+          <parameterName>TO</parameterName>
+        </image>
+
+        <image src="assets/image/modeplot.jpg" width="500" height="500">
+          <brief> Mode histogram</brief>
+          <description>This is the output image's histogram.
+          </description>
+          <thumbnail caption="Output image" src="assets/thumb/modeplot.jpg" width="200" height="200"  />
+        </image>
+
+      </outputImages>
+    </example>
+
+  </examples>
+
+</application>

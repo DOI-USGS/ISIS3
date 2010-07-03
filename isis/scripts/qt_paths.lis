@@ -1,0 +1,9 @@
+# $Id: qt_paths.lis,v 1.1 2010/04/09 23:19:58 slambright Exp $
+#  Qt Frameworks need relative path loading of all libraries they  reference.
+#  They all will exist in $ISISROOT/3rdpaty/lib.  The @loader_path is where
+#  the current library exists in the framework which is assumed to be
+#  $ISISROOT/3rdparty/lib/qt*.framework/Versions/4/.  The path to all libraries
+#  are therefore fixed and the same path for all.
+/usgs/pkgs/local(.*?)lib       @loader_path/../../..
+/opt/local/libexec/qt4-mac/lib @loader_path/../../..
+/opt/local/lib                 @loader_path/../../..

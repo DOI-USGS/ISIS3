@@ -1,0 +1,11 @@
+Coordinates and value of upper left pixel in several portals:
+  Corner of portal 1 is: (1, 1, 1) = 0
+  Corner of portal 2 is: (1, 1, 2) = 0
+  Corner of portal 3 is: (10, 10, 1) = 177
+  Corner of portal 4 is: (126, 126, 2) = -1.79769e+308
+  Corner of portal 5 is: (100, 101, 1) = -1.79769e+308
+  Corner of portal 6 is: (126, 1, 1) = 0
+  Corner of portal 7 is: (1, 126, 1) = -1.79769e+308
+  Corner of portal 8 is: (1, 1, 1) = 0
+  Corner of portal 9 is: (126, 126, 2) = -1.79769e+308
+  Corner of portal 10 is: (113, 102, 2) = -1.79769e+308

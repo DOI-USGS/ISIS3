@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnetmerge" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Merges 2 ControlNets into one.
+  </brief>
+
+  <description>
+    <p>
+    Merges 2 Control Nets into a single Control Net.  Each Control Net must
+    share the same  target, and be of the same type (i .e. Singleton,
+    ImageToImage, ImageToGround ).
+    </p>
+  </description>
+
+  <history>
+    <change name="Christpher Austin" date="2008-04-04">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-06-24">
+      Clarified error messages and added documentation.  (Removed netmerge from
+      the system, because it did the same thing, just not quite as clean)
+    </change>
+    <change name="Christopher Austin" date="2008-08-05">
+      Fix xml app name error
+    </change>
+    <change name="Christopher Austin" date="2008-11-13">
+      Rebuilt for more Control Point Id control, including a REPLACE option.
+      Only FORCE prefixes the original Control Network Id to the new Control
+      Point Ids, then logs the number of duplicate Control Points.  NORMAL and
+      REPLACE leave the Control Point Ids alone.
+    </change>
+    <change name="Christopher Austin" date="2009-01-09">
+      Added the FROMLIST input option.
+    </change>
+    <change name="Christopher Austin" date="2009-01-13">
+      Changed MERGETYPE param name and options to be more clear. Changed MODE
+      to INPUTTYPE. Added the REPORT param which reveals any Control Points
+      that have been renamed or replaced durring the merge.
+    </change>
+    <change name="Christopher Austin" date="2009-01-15">
+      Added Filename expansion to the listed nets and a few other minor
+      readability changes.
+    </change>
+    <change name="Christopher Austin" date="2009-11-19">
+      Multiple changes based on user request, including removal of RENAME,
+      replacing REPLACE with MERGE while merging at the Control Measure level.
+    </change>
+    <change name="Christopher Austin" date="2010-03-15">
+      Changed an outdated error message.
+    </change>
+  </history> 
+  
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <groups>
+    
+    <group name="Input">
+
+      <parameter name = "INPUTTYPE">
+        <type>string</type>
+        <default><item>LIST</item></default>
+        <brief>File I/O options</brief>
+        <description>
+          There is a choice to simply specify input cubes directly, use a list of input cubes in a text file, or to create output data only.
+        </description>
+        <list>
+          <option value = "LIST">
+            <brief>Select input Control Net list</brief>
+            <description>
+              Select a list of Control Nets, all to be merged.
+            </description>
+            <exclusions>
+              <item>FROM1</item>
+              <item>FROM2</item>
+            </exclusions>
+          </option>
+          <option value = "CNETS">
+            <brief>Select input Control Nets directly</brief>
+            <description>
+              Select the 2 Control Nets to be merged directly.
+            </description>
+            <exclusions>
+              <item>FROMLIST</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name = "FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input list file 
+        </brief>
+        <description>
+          This file contains a list of all the Control Nets to be merged
+        </description>
+        <filter>
+          *.txt *.lis *.list *.lst
+        </filter>
+      </parameter>
+      
+      <parameter name="FROM1">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input ControlNet
+        </brief>
+        <description>
+          The first ControlNet to be merged.
+        </description>
+        <filter>
+          *.ctl *.pvl *.net
+        </filter>
+      </parameter>
+
+      <parameter name="FROM2">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input ControlNet
+        </brief>
+        <description>
+          The second ControlNet to be merged.
+        </description>
+        <filter>
+          *.ctl *.pvl *.net
+        </filter>
+      </parameter>
+
+    </group>
+
+    <group name="Output">
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Merged ControlNet
+        </brief>
+        <description>
+          The output ControlNet, which is the merged result of the two input 
+          ControlNets.
+        </description>
+        <filter>
+          *.ctl *.pvl *.net
+        </filter>
+      </parameter>
+
+      <parameter name="REPORT">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>No Report Output</internalDefault>
+        <brief>
+          Reports Control Points that were renamed or replaced
+        </brief>
+        <description>
+          This file will contain a report that reveals all Control Points that
+          were renamed or replaced. If no Control Points were renamed or
+          replaced, than this file will be empty.
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Output Control">
+
+      <parameter name="ID">
+        <type>string</type>
+        <brief>The NetworkId for the merged ControlNet</brief>
+        <description>
+          The NetworkId keyword for the new merged ControlNet will be set to the 
+          given value.
+        </description>
+      </parameter>
+
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <brief>The Description for the merged ControlNet</brief>
+        <description>
+          The Descrition keyword for the new merged ControlNet will be set to the 
+          given value.
+        </description>
+      </parameter>
+
+      <parameter name="DUPLICATEPOINTS">
+        <type>string</type>
+        <brief>Defines how duplicate Control Points are handled</brief>
+        <default><item>ERROR</item></default>
+        <description>
+          This parameter is used to specify how duplicate Control Points of the
+          given Control Networks are handled when merging.
+        </description>
+        <list>
+           <option value="ERROR">
+              <brief>Does not merge duplicate Control Points</brief>
+              <description>
+                This option will check for duplicate Control Points in the
+                Control Nets and throw an error when a duplication occurs.
+                If no duplication occurs, all Control Points will be transfered
+                to the new Control Net as is.
+              </description>
+              <exclusions>
+                <item>REPORT</item>
+              </exclusions>
+            </option>
+            <option value="MERGE">
+              <brief>Merges duplicate Control Points</brief>
+              <description>
+                This option will merge all duplicate Control Points in the
+                following Control Net over the first Control Net.  When
+                INPUTTYPE=CNETS, the FROM2 Control Net will override the
+                duplicate Control Points in FROM1. When INPUTTYPE=LIST, a
+                listed Control Net will override any and all duplicate Control
+                Points from any and all previously listed Control Nets.
+              </description>
+            </option>
+        </list>
+      </parameter>
+      
+      <parameter name="OVERWRITEPOINTS">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Merge conficting Control Points</brief>
+        <description>
+          Whenever a latitude or a longitude value has been changed on a held
+          or ground Control Point, then the changed values will be merged when
+          this parameter is TRUE. If this parameter is FALSE and a change is
+          found, the change will be noted in the REPORT file, but will not be
+          merged in the final output.
+        </description>
+      </parameter>
+
+      <parameter name="OVERWRITEMEASURES">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Merge conficting Control Measures</brief>
+        <description>
+          Whenever a the reference measure has been changed in a held or
+          ground Control Measure, then the change will be merged when this
+          parameter is TRUE. If this parameter is FALSE and a reference measure
+          change is found, the change will be noted in the REPORT file, but
+          will not be merged in the final output.
+        </description>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+</application>

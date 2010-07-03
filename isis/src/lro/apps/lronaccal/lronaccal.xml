@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lronaccal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Radiometrically calibrates a LROC NAC image
+  </brief>
+
+  <description>
+    <p>
+    lronaccal performs radiometric corrections to images acquired by the Narrow Angle
+    Camera aboard the Lunar Reconnaissance Orbiter spacecraft.  The LROC NAC camera
+    will make observations simulteously with the HiRise camera.
+    </p>
+
+    <p>
+    The LRO NAC detector has a total of 5064 pixels, divided among an A
+    channel and a B channel.  The pixels alternate between the two channels:
+    ABABABAB, etc.  Images from LROC NAC may or may not include all pixels in the
+    acquired image.  There are special summing modes that are utilized
+    on-board the spacecraft to average detector pixels to combine them into a
+    single output pixel value.  The value of the ISIS label keyord,
+    SpatialSumming, indicates the number of samples that were summed and
+    averaged to result in the pixel values stored in the file.  Note that this
+    will reduce the number of samples in the output image by a factor of at
+    most the SpatialSumming mode value.
+    </p>
+    <p>
+    The LROC NAC camera has the ability to acquire images of differing sizes in
+    both line and sample.  The starting hardware detector pixel for the
+    acquired image is specified by the ISIS label keyword, SampleFirstPixel.
+    The first pixel in the detector is indicated by a value of 0.
+    </p>
+
+    <p>
+    Dark current pixels are taken for each line from the masked pixels
+    that lie along each edge of the image.
+    </p>
+    
+    <p>
+    If SpatialSumming is 1 the dark current pixels are averaged together then
+    this average is subtracted from all image pixels.  If SpatialSumming is 2,
+    the dark current pixels for the A and B channel are averaged separately,
+    then the A channel dark average is subtracted from the A channel image
+    pixels and the B channel dark average is subtracted from the B channel
+    image pixels.
+    </p>
+
+  </description>
+
+  <history>
+    <change name="Jacob Danton" date="2008-11-02">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>lronac2isis</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Level 0 LROC NAC image
+        </brief>
+        <description>
+          An uncalibrated LROC NAC image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Level 1 LROC NAC image
+        </brief>
+        <description>
+          The resultant radiometrically calibrated cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Masked Pixels Options">
+      <parameter name="Masked">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+        Calibrate using the masked pixels.
+        </brief>
+        <description>
+        </description>
+        <inclusions><item>MaskedFile</item></inclusions>
+      </parameter>
+      <parameter name="MaskedFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+        </brief>
+        <description>
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Dark Options">
+      <parameter name="Dark">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+        Calibrate using the average dark pixels.
+        </brief>
+        <description>
+        </description>
+        <inclusions><item>DarkFile</item></inclusions>
+      </parameter>
+      
+      <parameter name="DarkFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+        Calibrate using the average dark pixels.
+        </brief>
+        <description>
+        </description>
+      </parameter>
+    </group>
+      
+    <group name="Nonlinearity Options">
+      <parameter name="Nonlinearity">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+        Calibrate using nonlinearity.
+        </brief>
+        <description>
+        </description>
+        <inclusions><item>OffsetFile</item></inclusions>
+        <inclusions><item>NonlinearityFile</item></inclusions>
+      </parameter>
+      
+      <parameter name="OffsetFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+        The Nonlinearity offset values.
+        </brief>
+        <description>
+        </description>
+      </parameter>
+      
+      <parameter name="NonlinearityFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+        Calibrate using the average dark pixels.
+        </brief>
+        <description>
+        </description>
+      </parameter>
+    </group>
+      
+    <group name="Flatfield Options">
+      <parameter name="Flatfield">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+        Calibrate using the flatfield.
+        </brief>
+        <description>
+        </description>
+        <inclusions><item>FlatfieldFile</item></inclusions>
+      </parameter>
+      
+      <parameter name="FlatfieldFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+        Calibrate using the average dark pixels.
+        </brief>
+        <description>
+        </description>
+      </parameter>
+    </group>
+      
+    <group name="Radiometric Options">
+      <parameter name="Radiometric">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+        Calibrate using radiometric calibration.
+        </brief>
+        <description>
+        </description>
+        <inclusions><item>RadiometricType</item></inclusions>
+        <inclusions><item>RadiometricFile</item></inclusions>
+      </parameter>
+      
+      <parameter name="RadiometricType">
+        <type>string</type>
+        <brief>
+        Which radiance correction?
+        </brief>
+        <description>
+        </description>
+        <default><item>IOF</item></default>
+        <list>
+          <option value="IOF">
+            <brief>I/F</brief>
+            <description>
+            </description>
+          </option>
+          <option value="RADIANCE">
+            <brief>Radiance</brief>
+            <description>
+            </description>
+          </option>
+        </list>
+      </parameter>
+      
+      <parameter name="RadiometricFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+        </brief>
+        <description>
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

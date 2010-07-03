@@ -1,0 +1,4 @@
+Group = LunarAzimuthalEqualArea
+  Library = LunarAzimuthalEqualArea
+  Routine = LunarAzimuthalEqualAreaPlugin
+EndGroup

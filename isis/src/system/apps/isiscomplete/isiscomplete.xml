@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="isiscomplete" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Outputs the completion command for any Isis application
+  </brief>
+
+  <description>
+    <p>
+      This program is used to load tcsh tab-completion settings for all Isis applications. This 
+      program will NOT run in GUI mode! Call this program like this: 
+      eval `isiscomplete isisapp [isisapp2 isisapp3 ...]`
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Steven Lambright" date="2008-04-07">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-05-06">
+      isiscomplete now does not complete itself and does not complete when isis is in debug mode
+    </change>
+    <change name="Steven Lambright" date="2008-06-17">
+      This program now handles qview properly
+    </change>
+    <change name="Steven Lambright" date="2008-09-12">
+      This program now handles isisui properly
+    </change>
+    <change name="Kris Becker" date="2009-11-27">
+        Changed the call to Application to provide compatability withg Qt 
+        startup requirements.
+    </change>
+  </history>
+</application>
+

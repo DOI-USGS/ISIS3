@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <h2>Trademarks and Tradenames</h2>
+        <p>
+        Any use of trade, product, or firm names in Isis web pages,
+        documents, or publications is for descriptive purposes only and
+        does not imply endorsement by the U.S. Government.
+        </p>
+
+        <h2>Warranty</h2>
+        <p>
+        Although Isis has been used by the USGS, no warranty, expressed
+        or implied, is made by the USGS as to the accuracy and functioning
+        of such software and related material nor shall the fact of
+        distribution constitute any such warranty, and no responsibility
+        is assumed by the USGS in connection therewith.
+        </p>
+
+        <h2>Preliminary Content</h2>
+        <p>
+        Please note that some information
+        accessed through these pages may be preliminary in nature. This
+        information is provided with the understanding that it is not
+        guaranteed to be complete, and conclusions drawn from such
+        information are the responsibility of the user.
+        </p>
+
+        <h2>Privacy Notice</h2>
+        <h3>Isis Web Site</h3>
+        <p>
+        Visits to this site are logged by domain - personal
+        identifying information, such as e-mail addresses, are
+        not logged. Information, web traffic logs, e-mails,
+        and other correspondence related to this web server and
+        its content are archived. This information is used only by
+        the USGS Astrogeology Web team members and others in the
+        USGS hierarchy, and will not be released to any other
+        program, organization, business, or individual.
+        </p>
+
+        <h3>Isis Support Center</h3>
+        <p>
+            In addition to the general privacy policy for the Isis Web Site, mentioned above,
+            the
+            <a href="http://isis.astrogeology.usgs.gov/IsisSupport/">Isis Support Center</a>
+            does collect information that has the potential to identify a particular user.
+            Some of the information users put in their profiles can be accessed by other users of this
+            system, such as IM user names, location, website, occupation, and interests.
+        </p>
+
+        <p>
+            <strong>Required Information:</strong>
+            The only obligatory information required to use the Isis Support Center are Username, E-mail Address, and Password.
+            E-mail address <em><strong>must</strong></em> be a valid e-mail address. Users concerned about privacy
+            should use a username and e-mail account that does not identify them personally and should turn off the
+            "Always show my e-mail address" in their profiles (this option is turned off by default).
+        </p>
+
+        <p>
+          <strong>E-mail Communcations Between Users:</strong>
+            A user cannot e-mail a second user unless the second users has chosen "Always show my e-mail address" in his profile.
+            If he chooses to turn this option on, users will be able to send mail to him through the Support Center,
+            but they will not be able to see his e-mail address on the Support Center web pages. However, when a
+            user e-mails another user through the Center, the e-mail address of the sender will be revealed to the recipient
+            in the e-mail. If the sender requests a copy, the recipient's address will not be revealed in the copy. Site
+            administrators do have access to user e-mail addresses.
+        </p>
+
+        <p>
+          <strong>Visibility of Topics, Instant Messages, and Other Communications</strong>
+            Messages posted to the forum are publicly viewable. Other forms of correspondence (private messages, e-mail, postings
+            to the old Isis Support Center/Support Wizard) may be published on the forum, but all identifying information will be
+            removed or permission will be requested from the user to include the message on the board.
+        </p>
+
+        <p>
+          <strong>Cookies</strong>
+          The Isis Support Center uses temporary cookies to store your session ID and a small amount of user data needed to
+          determine your log-in status as you move around the web site. These temporary cookies are automatically deleted
+          when you close your browser. Persistent cookies are used to automatically log
+          you onto the site when you come back later <em>if</em> you choose this option when you log-in, and will remain
+          available to your browser between visits to our site. To disable automatic log-in, log out of the Isis Support
+          Center, and make sure to the "Log me in automatically" box is not checked the next time you log in. Cookies are
+          only used to keep you logged in to the Isis Support Center, and <em>never</em> used to track the frequency of
+          visits, pages you visit, or any other purpose.
+        </p>
+
+        <p>
+          If you have questions or concerns, or need assistance protecting your privacy while using the Isis Support Center,
+          please e-mail the <a href="mailto: webteam@astrogeology.usgs.gov">Isis Support Center Administration</a>.
+        </p>
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>Disclaimers.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>about</categoryItem>
+  </category>
+
+  <audience>
+    <target>all</target>
+  </audience>
+
+  <bibliography>
+    <title>Disclaimers</title>
+    <brief>Standard legalese regarding usage, trademarks, and privacy</brief>
+    <description>
+      This section contain standard USGS comments regarding software
+      accuracy, use of trademarks and tradenames and other general
+      disclaimers.
+    </description>
+    <author>Jeff Anderson</author>
+    <date>2003-03-25</date>
+  </bibliography>
+</documentation>

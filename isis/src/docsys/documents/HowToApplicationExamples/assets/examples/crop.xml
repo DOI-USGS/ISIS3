@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="crop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Crops a cube
+  </brief>
+
+  <description>
+    This program can be used to crop or select a sub-area from a cube.  The user
+    can select to crop in any or all dimensions:  sample, line, and band.  The
+    crop parameter selection requires that the area of interest be contiguous.
+    That is, the program will not allow non-continuous cropping such as lines
+    1-5, 10-30, and 80-100.
+  </description>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jim Mathews" date="1994-04-20">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2002-08-05">
+      Converted to Isis 3.0
+    </change>
+    <change name="K Teal Thompson" date="2002-11-18">
+      Added examples
+    </change>
+    <change name="Jeff Anderson" date="2003-01-28">
+      Removed crop from the Utility category
+    </change>
+    <change name="K Teal Thompson" date="2003-02-03">
+      Make images smaller
+    </change>
+    <change name="K Teal Thompson" date="2003-02-04">
+      Added red rectangle to input image of example to illustrate crop area.
+    </change>
+    <change name="K Teal Thompson" date="2003-03-19">
+       Moved images to /assets/image directory and thumbnails to /assets/thumb directory.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+
+  </history>
+
+  <oldName>
+    <item>dsk2dsk</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <filemode>input</filemode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+  	      The cube which will be cropped.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <filemode>output</filemode>
+        <brief>
+          Output cropped cube
+        </brief>
+        <description>
+          The smaller output cube containing the results of the crop.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Starting Coordinate">
+      <parameter name="SAMPLE">
+        <type>integer</type>
+        <brief>Starting Sample</brief>
+
+        <description>
+          The starting sample to extract.  It must be inside
+          the cube.
+        </description>
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINE">
+        <type>integer</type>
+        <brief>Starting Line</brief>
+
+        <description>
+          The starting line to extract.  It must be inside
+          the cube.
+        </description>
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="BAND">
+        <type>integer</type>
+        <brief>Starting Band</brief>
+
+        <description>
+          The starting band to extract.  It must be inside
+          the cube.
+        </description>
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+    </group>
+
+    <group name="Output Dimensions">
+      <parameter name="NSAMPLES">
+        <type>integer</type>
+        <brief>Number of Samples</brief>
+
+        <description>
+          The number of samples to extract.  It must stay
+          inside the input cube.
+        </description>
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="NLINES">
+        <type>integer</type>
+        <brief>Number of Lines</brief>
+
+        <description>
+          The number of lines to extract.  It must stay
+          inside the input cube.
+        </description>
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="NBANDS">
+        <type>integer</type>
+        <brief>Number of Bands</brief>
+
+        <description>
+          The number of bands to extract.  It must stay
+          inside the input cube.
+        </description>
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>200x300 sub-area</brief>
+      <description>
+        Extracting a 200x300 sub-area
+      </description>
+      <terminalInterface>
+        <commandLine> f=peaks.cub t=crop.cub samp=100 line=200 band=1 nsamp=200 nline=300 nbands=1
+        </commandLine>
+        <description>
+        In this example crop will extract a 200x300 sub-area that starts at sample 100 and line 200
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.1.jpg" width="500" height="500">
+          <brief> Input image for crop</brief>
+          <description>This is the input image for the 200x300 example of crop.  The area to be "cropped" is shown in red.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.1.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/peaks.crop.jpg" width="200" height="300">
+          <brief> Output image for crop</brief>
+          <description> This is the output image for the 200x300 example of crop
+          </description>
+          <thumbnail caption="Output image showing results of the crop application with 200 by 300 input." src="assets/thumb/peaks.crop.jpg" width="133" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="472" height="388" src="assets/image/cropgui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a 200 pixel by 300 pixel crop of the input image. </description>
+            <thumbnail width="200" height="165" caption="Crop Gui" src="assets/thumb/cropgui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

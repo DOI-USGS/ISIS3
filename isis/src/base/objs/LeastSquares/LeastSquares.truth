@@ -1,0 +1,31 @@
+Unit Test for LeastSquares:
+
+*** TEST 1:  3 POINTS, NO WEIGHTS ***************************
+Number of Knowns = 3
+        SVD	residual	QRD	residual
+  one = 3.08	0.08		3.08	0.08
+  two = 0.94	-0.06		0.94	-0.06
+  tre = 1.9	-0.1		1.9	-0.1
+---
+Test from Linear Algebra with Applications, 2nd Edition
+Steven J. Leon, page 191, 83/50=1.66 71/50=1.42
+1.66
+1.42
+---
+*** TEST 2:  SAME 3 POINTS, MIDDLE POINT HAS WEIGHT 5 *******
+Number of Knowns = 3
+        SVD		QRD
+  one = 3.09346		3.09346
+  two = 0.985981	0.985981
+  tre = 1.88318		1.88318
+  x =   1.65888		1.65888
+  y =   1.43458		1.43458
+---
+*** TEST 3:  SAME 3 POINTS, MIDDLE POINT REPEATED 5 TIMES ***
+Number of Knowns = 7
+        SVD		QRD
+  one = 3.09346		3.09346
+  two = 0.985981	0.985981
+  tre = 1.88318		1.88318
+  x =   1.65888		1.65888
+  y =   1.43458		1.43458

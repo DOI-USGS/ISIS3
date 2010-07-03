@@ -1,0 +1,12 @@
+v1: test text
+v2: 7
+v3: 123.4
+Is null (v1): 0
+Is null (blank): 1
+Size: 3
+Has field(v2): 1
+Field index(v3): 2
+The mac systems report the double fields as string fields. Until the problematic 3rd party software is fixed, the mac systems will need OS truth data.
+Col 0) Name: v1, Type: string
+Col 1) Name: v2, Type: int
+Col 2) Name: v3, Type: string

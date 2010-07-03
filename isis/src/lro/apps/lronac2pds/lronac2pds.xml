@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lronac2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert from cube to pds format
+  </brief>
+
+  <description>
+   Program to convert cubes to pds image files.
+  </description>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+
+  <history>
+    <change name="Jacob Danton" date="2010-01-10">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be converted
+        </brief>
+        <description>
+          The cube to be converted to pds format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output pds image
+        </brief>
+        <description>
+          The resulting pds file.
+        </description>
+        <filter>
+          *.img
+        </filter>
+      </parameter>
+    </group>
+    
+    <group name="Options">
+        <parameter name="VERSIONIDSTRING">
+          <type>string</type>
+          <brief>Group to modify</brief>
+          <description>
+            The user input ID string
+          </description>
+          <default><item>"N/A"</item></default>
+        </parameter>
+      </group>
+    
+  </groups>
+</application>

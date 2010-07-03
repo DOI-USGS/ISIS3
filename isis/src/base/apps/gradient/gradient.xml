@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="gradient" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply Sobel or Roberts gradient to a cube
+  </brief>
+
+  <description>
+    This program will apply a Sobel or Roberts gradient filter to a cube.
+    These gradient filters will highlight edges of the image.  The output
+    contains the estimated, absolute magnitude of the spatial gradient of the
+    input cube.
+    NOTE: Any time a calculation must be done where one or more values are
+    special pixels, the output will simply be NULL. If this causes unexpected
+    results, you may need to run stretch to change input special pixels to 
+    something that is appropriate for calculation. For example, if the image
+    contains a number of HIS values, you may want to stretch these to 255
+    prior to running the gradient filter.
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="2002-12-18">
+       Original version
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+  Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Drew Davidson" date="2005-08-16">
+      Added examples
+    </change>
+    <change name="Brendan George" date="2005-11-07">
+      Modified to handle Special Pixels
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will have the gradient applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the estimated absolute magnitude of the
+	  gradient.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Gradient Type">
+      <parameter name="GRADTYPE">
+        <type>string</type>
+        <brief>Type of gradient (Sobel, Roberts)</brief>
+        <default>
+          <item>SOBEL</item>
+        </default>
+        <description>
+          This chooses the gradient type.  The possibilities
+          are: Sobel which uses a 3 x 3 kernal or Roberts which uses a
+	  2 x 2 kernel.
+        </description>
+        <list>
+          <option value="SOBEL">
+            <brief>Sobel gradient (3x3)</brief>
+            <description>
+              <!--pre>
+            The Sobel gradient uses a 3 x 3 kernel which makes it slower,
+            but less susceptible to noise, and it will also create higher
+            output for edges than the Roberts gradient.
+
+            Equation for Sobel gradient based on these input pixels:
+                                                IP1 IP2 IP3
+                   Input (3x3 boxcar):  IP4 IP5 IP6
+                                                IP7 IP8 IP9
+
+              out = |(IP1 + (2*IP2) + IP3) - (IP7 + (2*IP8) + IP9)|
+                          + |(IP3 + (2*IP6) + IP9) - (IP1 + (2*IP4) + IP7)|
+
+              Uses the following 3x3 kernels to calculate the gradient.
+
+                      -1  0  1             1  2  1
+                Gx =  -2  0  2       Gy =  0  0  0
+                          -1  0  1            -1 -2 -1
+              </pre-->
+            </description>
+          </option>
+          <option value="ROBERTS">
+            <brief>Roberts gradient (2x2)</brief>
+            <description>
+              <!--pre>
+            The Roberts gradient uses a 2 x 2 kernel which makes it fast,
+            but sensitive to noise.  It also works best on sharp, obvious
+            edges.
+
+                    Equation for Roberts gradient based on these input pixels:
+                                                IP1 IP2
+                   Input (3x3 boxcar):  IP3 IP4
+
+                      out = |IP1 - IP4| + |IP2 - IP3|
+
+                Uses the following 2x2 kernels to calculate the gradient.
+
+                    Gx =  1  0         Gy =  0  1
+                                  0 -1              -1  0
+                  </pre-->
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+  </groups>
+  <examples>
+    <example>
+      <brief>
+      Applying a sobel filter
+      </brief>
+      <description>
+        The use of the Sobel gradient here creates an output image which helps 
+	to highlight the edges.   
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= peaks.cub 
+	  to=sobelPeaks.cub
+	  gradtype=sobel
+	</commandLine>
+	<description>
+	This example shows the use of the sobel filter in order to highlight 
+	edges
+	</description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="440" height="625" src="assets/images/sobelGui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI with parameters set to filter using a sobel
+	      configuration
+	    </description>
+	    <thumbnail width="220" height="312" caption="gradient gui" 
+	     src="assets/thumbs/sobelGui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image width="505" height="505" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before the filter.
+	  </brief>
+	  <description>
+	    This is the image as it was taken originally. 
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/sobel.jpg">
+	  <brief>
+	  Output image after the gradient was applied
+	  </brief>
+	  <description>
+	    As you can see, sharp edges on the image have been emphasized, while
+	    areas of more constant DNs have been de-emphasized. 
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/sobel.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>
+      Applying a roberts filter
+      </brief>
+      <description>
+        
+      </description>
+      <terminalInterface>
+        <commandLine>
+	  from= peaks.cub 
+	  to=robertsPeaks.cub
+	  gradtype=roberts
+	</commandLine>
+	<description>
+	This example shows the use of the roberts filter in order to highlight 
+	edges
+	</description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="440" height="625" src="assets/images/robertsGui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI with parameters set to filter using a roberts
+	      gradient
+	    </description>
+	    <thumbnail width="148" height="200" caption="gradient gui" 
+	     src="assets/thumbs/robertsGui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image width="505" height="505" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before the filter.
+	  </brief>
+	  <description>
+	    This is the image as it was taken originally. 
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/roberts.jpg">
+	  <brief>
+	  Output image after the roberts gradient
+	  </brief>
+	  <description>
+	  The use of the Roberts gradient here creates an output image which 
+	  helps to highlight the edges. Since the Roberts filter uses a smaller
+	  boxcar, less of the image is taken into consideration at each processing
+	  step and thus the image can be created faster. The tradeoff is that images
+	  that have had the Roberts gradient applied tend be effected more by noise
+	  in the image.
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/roberts.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

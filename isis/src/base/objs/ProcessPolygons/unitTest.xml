@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Unit test for Isis::ProcessPolygons class
+  </brief>
+  <description>
+    Just a test only a test
+  </description>
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+  <history>
+    <change name="Stacy Alley" date="2007-12-13">
+      Original Version
+    </change>
+  </history>
+</application>

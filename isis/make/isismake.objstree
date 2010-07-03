@@ -1,0 +1,51 @@
+include $(ISISROOT)/make/isismake.macros
+
+DIRONLY = $(subst /,,$(shell ls -d */))
+CVS := CVS
+
+OBJECTS = $(filter-out $(CVS), $(DIRONLY))
+
+api:
+	if [ "$(OBJECTS)" != "" ]; \
+	then \
+	for i in $(OBJECTS); do \
+	  echo "    Adding API object [$$i]"; \
+	  cd $$i; $(MAKE) install; cd ..; \
+	done \
+	fi
+
+objects:
+	if [ "$(OBJECTS)" != "" ]; \
+	then \
+	for i in $(OBJECTS); do \
+	  echo "    Building object [$$i] ("`date +%T`")"; \
+	  cd $$i; $(MAKE) object; cd ..; \
+	done \
+	fi
+
+includes:
+	if [ "$(OBJECTS)" != "" ]; \
+	then \
+	for i in $(OBJECTS); do \
+	  echo "    Installing includes [$$i]"; \
+	  cd $$i; $(MAKE) incs; cd ..; \
+	done \
+	fi
+
+clean:
+	if [ "$(OBJECTS)" != "" ]; \
+	then \
+	for i in $(OBJECTS); do \
+	  echo "    Cleaning [$$i]"; \
+	  cd $$i; $(MAKE) clean; cd ..; \
+	done \
+	fi
+
+test: 
+	if [ "$(OBJECTS)" != "" ]; \
+	then \
+	for i in $(OBJECTS); do \
+	  printf %-60s "    Testing [$$i] ("`date +%T`")"; \
+	  cd $$i; $(MAKE) test; cd ..; \
+	done \
+	fi

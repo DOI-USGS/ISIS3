@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+  </brief>
+
+  <description>
+  
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2008-08-04">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Themis PDS RDR or an ISIS Themis level 1 cube 
+        </brief>
+        <description>
+          Input filename. This file can be in one of two stages.  A raw PDS Themis RDR or
+          an ISIS Level 0/1 cube.  The level 0/1 cube is assumed to have been run
+          through thm2isis and spiceinit.
+        </description>
+        <filter>
+          *.QUB *.imq *.img *.cub
+        </filter>
+        <default><item>fromValue</item></default>
+      </parameter>
+
+      <parameter name="FROM2">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Themis PDS RDR or an ISIS Themis level 1 cube 
+        </brief>
+        <description>
+          Input filename. This file can be in one of two stages.  A raw PDS Themis RDR or
+          an ISIS Level 0/1 cube.  The level 0/1 cube is assumed to have been run
+          through thm2isis and spiceinit.
+        </description>
+        <filter>
+          *.QUB *.imq *.img *.cub
+        </filter>
+        <default><item>fromValue2</item></default>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Final output filename.
+        </brief>
+        <description>
+          Output filename from the last enabled processing sequence. By
+          default the filename will be generated from the input filename with
+           ".lev#" appended to the name, where "#" is the last level of
+           processing (i.e., INGESTION = "lev1" or MAPPING = "lev2").
+           For ThemisVIS images, if processing is stopped at the ingestion
+           phase, there will be an output cube for each frame in the image,
+           with a ".frame#" appended to the end of the filename.
+        </description>
+      </parameter>
+
+      <parameter name="BANDS">
+        <type>string</type>
+        <internalDefault>All</internalDefault>
+        <brief>
+          Process a subset of bands
+        </brief>
+        <description>
+          This parameter allows the user to specify a sub-set of
+          bands to process.  Enter bands separated by commas (no spaces
+          allowed).  For example, 1,3,8 or 1-3,9 or 5
+        </description>
+      </parameter>
+
+      <parameter name="REMOVE">
+        <type>boolean</type>
+        <brief>Remove Intermediate Files</brief>
+        <description>
+            This option allows the user to decide whether the intermediate files 
+            created in the thmproc application are to be deleted.  The default value
+            is TRUE.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+    </group>
+
+    <group name="Level Processing">
+      <parameter name="Ingestion">
+        <type>boolean</type>
+        <default>
+          <item>YES</item>
+        </default>
+        <brief>
+          Import and initialize a Themis RDR file.
+        </brief>
+        <description>
+          Process the input file through all level0 steps. This includes "thm2isis" and "
+          spiceinit".
+        </description>
+        <inclusions>
+          <item>PCK</item>
+          <item>CK</item>
+          <item>SPK</item>
+          <item>SHAPE</item>
+          <item>CKNADIR</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="Mapping">
+        <type>boolean</type>
+        <default>
+          <item>YES</item>
+        </default>
+        <brief>
+          Process the input file through the map projection phase.
+        </brief>
+        <description>
+          Process the input file through level2. This includes cam2map.
+        </description>
+        <inclusions>
+          <item>MAP</item>
+          <item>PIXRES</item>
+        </inclusions>
+      </parameter>
+    </group>
+
+      <group name="Ingestion Parameters">
+        <parameter name="PCK">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+          <brief>
+            User defined target attitude and shape kernel file.
+          </brief>
+          <description>
+            Naif kernel file to be used for the target attitude and shape.
+          </description>
+          <defaultPath>
+            $BASE/kernels/pck/
+          </defaultPath>
+          <inclusions>
+              <item>INGESTION</item>
+          </inclusions>
+        </parameter>
+
+        <parameter name="CK">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+          <brief>
+            User defined spacecraft pointing kernel file.
+          </brief>
+          <description>
+            Naif kernel file to be used for the spacecraft pointing.
+          </description>
+          <defaultPath>
+            $odyssey/kernels/ck/
+          </defaultPath>
+          <inclusions>
+              <item>INGESTION</item>
+          </inclusions>
+        </parameter>
+
+        <parameter name="SPK">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+
+          <brief>
+            User defined spacecraaft position kernel file.
+          </brief>
+          <description>
+            Naif kernel file to be used for the spacecraft position.
+          </description>
+          <defaultPath>
+            $odyessy/kernels/spk/
+          </defaultPath>
+          <inclusions>
+              <item>INGESTION</item>
+          </inclusions>
+        </parameter>
+
+        <parameter name="CKNADIR">
+          <type>boolean</type>
+          <default><item>false</item></default>
+          <brief>
+            Compute nadir pointing if no other kernels exist
+          </brief>
+          <description>
+            Compute nadir pointing if no other kernels exist
+          </description>
+        </parameter>
+
+        <parameter name="SHAPE">
+          <type>string</type>
+          <default><item>SYSTEM</item></default>
+          <inclusions>
+              <item>INGESTION</item>
+          </inclusions>
+          <brief>
+          Select the definition of the shape model
+          </brief>
+          <description>
+           ISIS camera models can use a shape model (a  projected ISIS cube that defines the radii for a global or regional area).  You can choose
+           to select a shape model or to use the definition of the ellipsoid found in the planetary constants (PCK) file.
+          </description>
+          <list>
+            <option value="ELLIPSOID">
+              <brief>Use triiaxial ellipsoid from PCK</brief>
+              <description>
+                The camera will use the radii defined in the planetary constants file (PCK) when 
+                determining intersections of the body surface
+                </description>
+              <exclusions>
+                <item>MODEL</item>
+              </exclusions>
+            </option>
+            <option value="SYSTEM">
+              <brief>Search system for a default shape model</brief>
+              <description>
+                This option will search the default system data area ($ISIS3DATA/base/dems) for a shape model that 
+                matches the target of the input cube.  If none are found then no shape model will be used and the default 
+                ellipsoid parameters found in the planetary constants (PCK) file define the shape.
+              </description>
+              <exclusions>
+                <item>MODEL</item>
+              </exclusions>
+            </option>
+            <option value="USER">
+              <brief>User specified shape model file</brief>
+              <description>
+                The camera will use shape model defined by the parameter MODEL
+                </description>
+            </option>
+          </list>
+        </parameter>
+
+        <parameter name="MODEL">
+          <type>cube</type>
+          <fileMode>input</fileMode>
+          <brief>
+            User defined ISIS cube shape model.
+          </brief>
+          <description>
+            A map projected ISIS cube which contains the radii of the target.  The file can 
+            cover more than the input cube (FROM) but must minimally cover the data in the input cube.
+          </description>
+          <defaultPath>$base//dems/</defaultPath>
+          <filter>*.cub</filter>
+        </parameter>
+      </group>
+
+      <group name="Mapping parameters">
+        <parameter name="MAP">
+          <type>filename</type>
+          <internalDefault>Sinusoidal</internalDefault>
+          <brief>
+            File containing mapping parameters
+          </brief>
+          <description>
+            A file containing the desired output mapping parameters in PVL form.  This
+            file can be a simple hand produced label file.  It can also be an existing cube
+            label which contains a Mapping group.
+          </description>
+          <filter>*.map</filter>
+          <inclusions>
+              <item>MAPPING</item>
+          </inclusions>
+        </parameter>
+
+        <parameter name="PIXRES">
+          <type>double</type>
+          <brief>Pixel resolution in meters</brief>
+          <internalDefault>Automatic</internalDefault>
+          <description>
+            Specifies the resolution in meters per pixel.  
+            If not in the MAP file the resolution will be computed from
+            the themis level 1 cube.
+          </description>
+          <minimum inclusive="no">0.0</minimum>
+          <inclusions>
+              <item>MAPPING</item>
+          </inclusions>
+        </parameter>
+      </group>
+
+      <group name="Themis VIS Parameters">  
+        <parameter name="VISCLEANUP">
+          <type>boolean</type>
+          <brief>Run thmvistrim and thmvisflat</brief>
+          <description>
+            thmvistrim removes the overlap between framelets, which often contains both valid and
+            invalid data. Set this to false to preserve this data. thmvisflat applies a flat-field 
+            correction to the data.
+          </description>
+          <default><item>true</item></default>
+        </parameter>
+      </group>
+    </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Running this program on a Themis VIS EDR
+      </brief>
+      <description>
+        This program will process this themis edr from ingestion to mapping. 
+        Since the file is a VIS file, the intermediate processes will split the 
+        image into even and odd framelets which are recombined once mapped. 
+        Since this file is an EDR, thmvistrim and thmvisflat will be run by 
+        default to clean up the image. 
+      </description>
+      <terminalInterface>
+        <commandLine>from=V20018003EDR.QUB</commandLine>
+        <description>
+          This runs this program with the defaults; the output is automatically 
+          determined.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="403" height="550" src="assets/images/gui.jpg">
+            <brief>
+              This is the default GUI
+            </brief>
+            <description>
+              This is what the GUI looks like when running this program with 
+              default parameters
+            </description>
+            <thumbnail width="147" height="200" caption="The GUI" src="assets/thumbs/gui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image width="154" height="550" src="assets/images/raw.jpg">
+          <brief>
+            Raw Input Data
+          </brief>
+          <description>
+            This is the raw input data
+          </description>
+          <thumbnail caption="Raw Data" src="assets/thumbs/raw.jpg" width="56" height="200" />
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/out.jpg" width="283" height="550">
+          <brief>
+            The projected image (final output)
+          </brief>
+          <description>
+            This is the output from this program. It was cleaned up and 
+            projected.
+          </description>
+          <thumbnail src="assets/thumbs/out.jpg" width="103" height="200" caption="Final Output" />
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

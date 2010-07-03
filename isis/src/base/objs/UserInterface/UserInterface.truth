@@ -1,0 +1,99 @@
+Unit test for Isis::UserInterface ...
+Basic FROM/TO Test
+FROM:    input.cub
+TO:      output.cub
+GUI:     0
+
+Testing param= value Format
+FROM:    dog
+TO:      biscuit
+GUI:     0
+
+Testing No Arguments (Defaults)
+FROM:    /ISISROOT/testData/base/isisTruth.cub
+TO:      /tmp/junk.dat
+GUI:     0
+
+Testing Basic Array Argument
+FROM:    dog
+TO:      biscuit,bread
+GUI:     0
+
+Testing Complicated Array Argument
+FROM:    dog
+TO:      
+ >> biscuit,
+ >> bread,
+ >> ,b,\,iscuit2,,
+ >> 
+
+GUI:     0
+
+Testing param = value Format
+FROM:    dog
+TO:      bread
+GUI:     0
+
+Testing Space in Argument Value
+FROM:    input file.cub
+TO:      output.cub
+GUI:     0
+
+Testing unitTest v. ./unitTest for GUI
+GUI:     0
+
+GUI:     0
+
+Starting Batchlist Test
+unitTest from=peaks.cub to=out1.txt 
+FROM:    peaks.cub
+TO:      out1.txt
+GUI:     0
+
+unitTest from=peaks.cub to=out2.txt 
+FROM:    peaks.cub
+TO:      out2.txt
+GUI:     0
+
+unitTest from=peaks.cub to=out3.txt 
+FROM:    peaks.cub
+TO:      out3.txt
+GUI:     0
+
+unitTest from=peaks.cub to=out4.txt 
+FROM:    peaks.cub
+TO:      out4.txt
+GUI:     0
+
+unitTest from=peaks.cub to= out 5.txt 
+FROM:    peaks.cub
+TO:       out 5.txt
+GUI:     0
+
+unitTest from=peaks.cub to= out 6.txt 
+FROM:    peaks.cub
+TO:       out 6.txt
+GUI:     0
+
+Finished Batchlist Test
+
+Testing =value
+**USER ERROR** Unknown parameter [=input.cub]
+
+Testing param =value
+**USER ERROR** Unknown parameter [=bread]
+
+Testing unterminated array-value quote
+**USER ERROR** Invalid array format [("hello)]
+
+Testing array-value ending in backslash
+**USER ERROR** Invalid array format [(hello)\]
+
+FROM:    It
+TO:      Worked
+GUI:     0
+
+**USER ERROR** Invalid command line
+**USER ERROR** Unknown parameter [bogus].
+
+**USER ERROR** Parameter history file [junk.par] does not exist

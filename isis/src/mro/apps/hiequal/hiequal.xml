@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hiequal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+      Tonematches a set of HiRISE cubes prior to mosaicking
+  </brief>
+
+  <description>
+      <p>
+        This program can be used to tonematch or equalize the brightness and 
+        contrast of the input HiRISE cubes prior to mosaicking. The set of N
+        cubes inputed must be all Red, all Blue-Green, or all Infared, where N 
+        is an integer 2-10 for RED sets and exactly 2 both for IR and BG sets. 
+        The order the cube names are provided in does not matter, but the cubes 
+        must all follow a linear sequence without skipping cubes all the same 
+        (i.e., the user cannot run this application on cubes RED1-RED3 and RED5 
+        without also providing the program RED4).  Statistics are gathered by 
+        line, taking into account the bin number of the cube (automatically 
+        derived from the number of samples in the line).  The statistics are 
+        used in an IntersectionStatistics object's least squares solution to 
+        determine multiplicative and additive corrections to each image.  The 
+        user has the option to stop the processing after the statistics and 
+        corrective factors have been computed for examination. Alternatively, 
+        the processing can continue and the corrective factors will be applied 
+        to each image (by making sure the APPLY checkbox is ticked).  The actual
+        equation to be used for each cube is:
+        <pre>
+            newdn(s,l)   =   (olddn(s,l) - avg()) * MULT() + avg() + BASE()
+        </pre> where
+        <pre>
+            s = sample index
+            l = line index 
+          </pre>
+      </p>
+
+      <p>
+          The BASE and MULT values are computed independently for each image, therefore we have two
+          least squares computations with M unknowns, where M is the number of 
+          cubes to be equalized. The intersections, O, between all the cubes are 
+          computed and O &lt; M should hold in all cases.  In order for the
+          least squares equation to be solved, there must be at least as many
+          knowns as unknowns.  Therefore, you must hold one or more cubes to 
+          alleviate this problem.  Holding a cube forces MULT and BASE to 1.0 
+          and 0.0 respectively.
+      </p>
+
+      <p>
+         If the APPLY option is selected, the equalized cubes will be named the same as the input cubes
+         with the addition of a '.equ' prior to the '.cub' extension.
+      </p>
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+<seeAlso>
+    <applications>
+      <item>equalizer</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Travis Addair" date="2009-05-07">
+      Original version
+    </change>
+    <change name="Travis Addair" date="2009-06-08">
+      Fixed test data for compatibility across all systems and improved 
+      documentation for clarity 
+    </change>
+    <change name="Travis Addair" date="2009-08-06">
+      Changed parameter TO to OUTSTATS and added parameter TOLIST allowing the 
+      user to specify the location of output files.  Output files are now placed 
+      into the directory of the input cube when TOLIST is on the default 
+      setting.  Statistic gathering results are now placed in the print file.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+        <parameter name="FROMLIST">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+              List of cubes to equalize
+          </brief>
+          <description>
+              A list of HiRISE cubes to equalize.  The types (i.e., RED, BG, IR) 
+              must match in order to do the equalization. 
+          </description>
+
+        </parameter>
+        <parameter name="HOLDLIST">
+            <type>filename</type>
+            <fileMode>input</fileMode>
+            <brief>
+                List of filenames to hold 
+            </brief>
+            <description>
+                List of cubes that are to be held in the equalization.  
+                An additive and a multiplicative factor of 0 and 1 will be applied 
+                to all cubes that were held.  All cubes listed in this file must 
+                also be contained in FROMLIST.
+            </description>
+            <internalDefault>None</internalDefault>
+            <filter>
+              *.txt *.lis *.lst
+            </filter>
+        </parameter>  
+
+        <parameter name="TOLIST">
+            <type>filename</type>
+            <fileMode>input</fileMode>
+            <brief>
+                The list of the equalized cubes to be created
+            </brief>
+            <description>
+                This list of output files should contain a file to correspond to each 
+                input file.  The output files will be written to the exact location 
+                with the exact name specified unless it happens to be identical to 
+                that of its corresponding input file, in which case an error will be 
+                thrown.  If this file is not specified, but the APPLY option is 
+                still selected, the output cubes will be placed in the directory of
+                its input file, and named the same with the exception of ".equ" 
+                extension (e.g. "foobar.cub" becomes foobar.equ.cub").
+            </description>
+            <internalDefault>Automatic</internalDefault>
+            <filter>
+              *.txt *.lis *.lst
+            </filter>
+        </parameter>  
+
+        <parameter name="OUTSTATS">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+               Text file containing thorough equalization related statistics
+          </brief>
+          <description>
+               This file will contain the statistics of all of the intersecting 
+               areas along with the computed equalizing factors 
+               (BASE and MULT).  Specifying this output file is optional.  
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+            *.txt *.pvl *.lis *.lst
+          </filter>
+        </parameter>
+
+        <parameter name="APPLY">
+            <type>boolean</type>
+            <brief>
+                Apply correction to the cubes
+            </brief>
+            <description>
+                This option allows the user to decide whether they want to do the 
+                equalization calculations only, or do the calculations and apply the 
+                correction to the images.  If the APPLY option is not selected, you must
+                specify a TO file.  If it is selected you can still optionally specify a TO file and
+                the MULT/BASE values will be applied to each input cube.  The output cubes
+                will be named the same with the exception of ".equ" extension (e.g. "foobar.cub"
+                becomes "foobar.equ.cub").
+            </description>
+              <inclusions>
+                <item>TOLIST</item>
+              </inclusions>
+             <default><item>TRUE</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+    <examples>
+    <example>
+      <brief> RED Images Equalized </brief>
+      <description>
+        This example shows the use of the hiequal application with default 
+        settings (i.e., no TO file with APPLY set true).  For demonstrative 
+        purposes, the first image (RED0) has had its pixel values multiplied by 
+        .8 with the "fx" application, and the two images have been mosaicked 
+        together with "hiccdstitch".
+      </description>
+      <terminalInterface>
+        <commandLine> fromlist= ../RedList.lst holdlist= ../RedHoldList.lst
+        </commandLine>
+        <description>
+          Specify a list of 2 adjacent RED images to equalize along with a 
+          holding list of one of the images (RED1) that enables the necessary 
+          calculations to be performed.  All other options are at default 
+          values.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/images/before.jpg" width="512" height="512">
+          <brief> Mosaic of the input images for hiequal</brief>
+          <description>
+              This is a small section of the two input images for this example 
+              mosaicked together, showing part of the intersection line prior to 
+              tonematching.
+          </description>
+          <thumbnail caption=" Mosaic of unequalized adjacent images." src="assets/thumbs/before.jpg" width="200" height="200"/>
+          <parameterName>FROMLIST</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/after.jpg" width="512" height="512">
+          <brief> Mosaic of the output images for hiequal</brief>
+          <description> 
+              The same section of the equalized output images mosaicked 
+              together after the tonematching has been applied.
+          </description>
+          <thumbnail caption="Output image of mosaic showing results of the hiequal application." src="assets/thumbs/after.jpg" width="200" height="200"/>
+        </image>
+      </outputImages>
+
+    </example>
+  </examples>
+</application>

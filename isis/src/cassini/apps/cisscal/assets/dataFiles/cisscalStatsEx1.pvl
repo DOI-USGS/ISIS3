@@ -1,0 +1,22 @@
+Group = Results
+  From                    = ../OUT/outputCube.cub
+  Average                 = 282831015573.66
+  StandardDeviation       = 58186356748.861
+  Variance                = 3.38565211170568e+21
+  Median                  = 291049818955.29
+  Mode                    = 327543612837.65
+  Skew                    = -0.42374899413832
+  Minimum                 = -70238740480.0
+  Maximum                 = 860353003520.0
+  Sum                     = 2.96476763582042e+17
+  TotalPixels             = 1048576
+  ValidPixels             = 1048247
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 0
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 329
+End_Group
+End

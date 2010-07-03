@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="algebra" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Performs algebra on either one or two cubes
+  </brief>
+
+  <description>
+    This program will perform simple algebra on either one or two cubes.
+    The two cubes may be added, subtracted, multiplied or divided.  The 
+    following equations are used:
+
+    <pre>
+    UNARY:      out = (A * from1) + C
+    ADD:        out = ((from1 - D) * A) + ((from2 - E) * B) + C
+    SUBTRACT:   out = ((from1 - D) * A) - ((from2 - E) * B) + C
+    MULTIPLY:   out = ((from1 - D) * A) * ((from2 - E) * B) + C
+    DIVIDE:     out = ((from1 - D) * A) / ((from2 - E) * B) + C
+    </pre>
+
+    The FROM2 cube must have either one band or the same number of bands as the
+    FROM1 cube.  If the FROM2 cube has one band, then the algebraic formula will
+    be applied to all bands in FROM1 using that single band in FROM2.  If FROM2
+    is a multi-band cube, the algebra will be performed between corresponding
+    bands from FROM1 and FROM2.
+  </description>
+
+  <history>
+    <change name="Jim Mathews" date="1994-02-09">
+      Original version
+    </change>
+
+    <change name="Tracie Sucharski" date="2002-08-20">
+      Ported to Isis 3.0, combining add,mad,b16mad and mult.
+    </change>
+    <change name="Tracie Sucharski" date="2002-10-29">
+      Was not handling special pixel values correctly.  If only one input
+      file, output the input special pixel value.  If two input files and
+      one of the input values is a special pixel value, output a NULL.
+    </change>
+    <change name="Tracie Sucharski" date="2002-11-12">
+      Changed parameters MULT1,MULT2 and ADD to A,B and C respectively.
+    </change>
+    <change name="Tracie Sucharski" date="2003-01-28">
+      Removed from Utility category.
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Stuart Sides" date="2003-10-23">
+      Fixed typo in algebra.xml which caused IsisGui to display names
+      and input fields incorrectly.
+    </change>
+    <change name="Jeff Anderson" date="2004-02-17">
+      Fixed division by zero problem with DIV operator and bug with
+      single files by adding UNARY operator.
+    </change>
+    <change name="Jeff Anderson" date="2004-02-17">
+      Fixed division by zero problem with DIV operator and bug with
+      single files by adding UNARY operator.
+    </change>
+    <change name="Drew Davidson" date="2005-07-27">
+      Added the D and E coefficients
+    </change>
+    <change name="Kris Becker" date="2006-12-14">
+       Modifed how special pixels are propagated to the output file.
+       Originally, all special pixel values and operations resulted in
+       Null being set to the output pixel.  Now if the FROM1 pixel
+       is a special pixel, it is always propagated to the output file
+       unchanged without regard of the FROM2 pixel.  If FROM1 is
+       not a special pixel and FROM2 is, the output pixel is set to
+       Null.
+    </change>
+    <change name="Stacy Alley" date="2007-08-20">
+        Fixed segmenation fault error. If the user did not enter a FROM2 value then tried to perform a non-unary operation
+        the program would crash. FIX:The program will inform the user of the error without crashing so they can make the 
+        proper correction.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>ratio</item>
+      <item>poly</item>
+    </applications>
+  </seeAlso>
+
+  <oldName>
+    <item>add</item>
+    <item>mad</item>
+    <item>b16mad</item>
+    <item>mult</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM1">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          First Input cube
+        </brief>
+        <description>
+          Use this parameter to select the cube which is the first term in
+          the equation.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="FROM2">
+         <type>cube</type>
+         <fileMode>input</fileMode>
+         <brief>
+           Second Input Cube
+         </brief>
+         <description>
+           This image will be used as the second term in the equation. This
+           cube must have either one band or the same number of bands as the
+           cube in FROM1.  If this cube has one band, then the single band will
+           be applied to each band in FROM1 using the equation.  If this cube
+           has multi-bands then each corresponding band in FROM2 is applied to
+           FROM1 using the equation.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the algebraically manipulated
+          cubes.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Operators and Coefficients">
+      <parameter name="OPERATOR">
+        <type>string</type>
+        <default><item>SUBTRACT</item></default>
+        <brief>
+          Operation performed on cubes
+        </brief>
+        <description>
+          Mathematical operation performed on the two input cubes
+        </description>
+        <list>
+          <option value="UNARY">
+            <brief>Operate on first input cube</brief>
+            <description>
+              Apply the following equation:
+                out = A * from1 + C
+            </description>
+            <exclusions>
+              <item>FROM2</item>
+              <item>B</item>
+	      <item>D</item>
+	      <item>E</item>
+            </exclusions>
+          </option>
+          <option value="ADD">
+            <brief>Add images</brief>
+            <description>
+              Add images together using following equation:
+		out = ((from1 - D) * A) + ((from2 - E) * B) + C
+            </description>
+             <inclusions>
+                <item>FROM2</item>
+            </inclusions>
+          </option>
+          <option value="SUBTRACT">
+            <brief>Subtract images</brief>
+            <description>
+              Subtract FROM2 from FROM1 using the following equation:
+                out = ((from1 - D) * A) - ((from2 - E) * B) + C
+            </description>
+            <inclusions>
+                <item>FROM2</item>
+            </inclusions>
+          </option>
+          <option value="MULTIPLY">
+            <brief>Multiply images</brief>
+            <description>
+              Multiply images together using the following equation:
+                out = ((from1 - D) * A) * ((from2 - E) * B) + C
+            </description>
+            <inclusions>
+                <item>FROM2</item>
+            </inclusions>
+          </option>
+          <option value="DIVIDE">
+            <brief>Divide images</brief>
+            <description>
+              Divide FROM1 by FROM2 using the following equation:
+                out = ((from1 - D) * A) + ((from2 - E) * B) + C
+            </description>
+            <inclusions>
+                <item>FROM2</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="A">
+        <type>double</type>
+        <default>
+          <item> 1.0 </item>
+        </default>
+        <brief> Multiplicative constant for first input cube </brief>
+        <description>
+          This defines the multiplicative constant for the first input
+          cube.
+        </description>
+      </parameter>
+
+      <parameter name="B">
+        <type>double</type>
+        <default>
+          <item> 1.0 </item>
+        </default>
+        <brief> Multiplicative constant for second input cube </brief>
+        <description>
+          This defines the multiplicative constant for the second input
+          cube.
+        </description>
+      </parameter>
+
+      <parameter name="C">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Additive constant</brief>
+        <description>
+          This defines the additive constant for entire equation.
+        </description>
+      </parameter>
+	
+      <parameter name="D">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Additive constant</brief>
+        <description>
+          This defines the additive constant for the first input cube.
+        </description>
+       </parameter>
+	
+      <parameter name="E">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Additive constant</brief>
+        <description>
+          This defines the additive constant for second input cube.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

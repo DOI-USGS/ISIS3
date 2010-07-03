@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="edrget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Download network file using FTP or HTTP protocol.
+  </brief>
+
+  <description>
+    When the Uniform Resouce Locator (URL) of a desired file is entered, edrget will use
+     the FTP or HTTP protocol to download the requested file.  The URL must contain the scheme, 
+     domain, path, and filename.<br></br>
+         <b>URL Example:</b><br></br>
+                   ftp://host.gov/directory/sub_directory/image_name.QUB<br></br>
+         or<br></br>
+                   http://host.gov/directory/sub_directory/image_name.QUB
+  </description>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+  
+  <history>
+    <change name="Robert Sucharski" date="2005-07-12">
+      Original version
+    </change>
+    <change name="Brendan George" date="2007-02-14">
+        Added TOPATH parameter
+    </change>
+    <change name="Brendan George" date="2007-02-15">
+        Changed output to default  to current working directory
+    </change>
+    <change name="Steven Lambright" date="2007-08-14">
+        Added an application test
+    </change>
+  </history>
+
+
+  <groups>
+    <group name="Files">
+      <parameter name="URL">
+        <type>string</type>
+        <brief>Uniform Resouce Locator (URL) of the desired file. </brief>
+        <description>
+          <p>
+          This is the Uniform Resource Locator (URL) for the network file to downloaded.  The URL 
+          must contain the scheme, domain name, path, and file name.<br></br>
+          <b>URL Example:</b><br></br>
+                   ftp://host.gov/directory/sub_directory/image_name.QUB<br></br>
+         or<br></br>
+                   http://host.gov/directory/sub_directory/image_name.QUB
+          </p>
+        </description>
+      </parameter>
+
+      <parameter name="TOPATH">
+        <type>string</type>
+        <brief>The path to the output file </brief>
+        <description>
+            This path describes where the output file is to be located. The
+            output filename will be derived from the URL.
+        </description>
+        <internalDefault>
+            Current Working Directory
+        </internalDefault>
+      </parameter>
+
+    </group>
+  </groups>
+
+</application>

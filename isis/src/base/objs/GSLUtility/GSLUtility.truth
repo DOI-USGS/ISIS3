@@ -1,0 +1,13 @@
+
+*** Test GSLUtility Functionality ***
+Tests use GSL Cholesky and Eigen Value Solutions
+Data provided by a Gruen Test case
+Expected result for Fit = 0.02782
+
+Solve using GSL Cholesky
+Solve Affine translation
+Affine parameters = 2 3
+-0.02394 -0.04493 -0.01943 
+-0.01661 -0.02399 0.4105 
+Eigen Vectors: 0.02499 0.01224
+Fit:  0.02782

@@ -1,0 +1,1547 @@
+Create the aml object
+--------- Tests for private data ----------
+  App name = unittest
+  App brief = Brief description
+  App description = This program tests the IsisAml class and its supporting classes.
+  group 0 name = GROUP 0
+    parameter 0, name = G0p0
+      type = filename
+      brief = G0P0 Filename
+      description = 	        Description for G0P0<p>Paragraph 2 of description for G0P0</p>End of description for G0P0
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = *.cub
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 1, name = G0P1
+      type = filename
+      brief = G0P1 Filename
+      description = Description for G0P0,
+          line 2 of the description,
+          line 3 of the description
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = /my/dir/file.cub
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+  group 1 name = Group 1, string list test
+    parameter 0, name = G1P0
+      type = string
+      brief = Brief for parameter G1P0
+      description = Description for G1P0.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = G1P0L0
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+        value [0] = G1P0L0
+        brief [0] = Brief for list item G1P0L0
+        description [0] = Description for list item G1P0L0
+          exclude = G1P1
+          exclude = G1P2
+          exclude = G2P0
+        value [1] = G1P0L1
+        brief [1] = Brief for list item G1P0L1
+        description [1] = Description for list item G1P0L1
+          exclude = G2P1
+          exclude = G2P2
+          exclude = G3P0
+        value [2] = G1P0L1X
+        brief [2] = Brief for list item G1P0L2
+        description [2] = Description for list item G1P0L2
+    parameter 1, name = G1P1
+      type = integer
+      brief = Brief for G1P1
+      description = Description for G1P1
+      internal def = 
+      helpers = 2
+        name = H1
+        brief = Helper 1
+        description = This helper button does.....
+        function = myHelper
+        icon = 
+        name = H2
+        brief = Helper 2
+        description = This helper buttion will...
+        function = myHelper2
+        icon = $ISIS3DATA/base/icons/back.png
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = 0
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+        [0] = G1P2
+        [1] = G1P3
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 2, name = G1P2
+      type = double
+      brief = Brief for G1P2
+      description = Description for G1P2
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = 10.5
+      Greater Than:
+        [0] = G1P1
+      Greater or Equal Than:
+      Less Than:
+        [0] = G1P2
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 3, name = G1P3
+      type = double
+      brief = Brief for G1P3
+      description = Description for G1P3
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+        [0] = G1P1
+        [1] = G1P2
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+  group 2 name = Group 2, integer tests
+    parameter 0, name = G2P0
+      type = integer
+      brief = Brief for parameter G2P0
+      description = Description for G2P0.
+      internal def = Calculated inside program
+      helpers = 0
+      count = 
+      minimum = 0
+      minimum inclusive = false
+      maximum = 999
+      maximum inclusive = yes
+      filter = 
+      file mode = 
+      odd = TRUE
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+        [0] = G2P1
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 1, name = G2P1
+      type = integer
+      brief = Brief for parameter G2P1
+      description = Description for G2P1.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+        [0] = G2P0
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+        [0] = G2P2
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 2, name = G2P2
+      type = integer
+      brief = Brief for parameter G2P2
+      description = Description for G2P2.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+        [0] = G2P1
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 3, name = G2P3
+      type = integer
+      brief = Brief for parameter G2P3
+      description = Description for G2P3.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+        [0] = g2p4
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 4, name = g2P4
+      type = integer
+      brief = Brief for parameter G2P4
+      description = Description for G2P4.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+        [0] = G2P3
+      Include parameters:
+      Exclude parameters:
+      List data:
+  group 3 name = Group 3, double tests
+    parameter 0, name = G3P0
+      type = double
+      brief = Brief for parameter G3P0
+      description = Description for G3P0.
+      internal def = Calculated inside program
+      helpers = 0
+      count = 
+      minimum = -0.5
+      minimum inclusive = false
+      maximum = 999.5
+      maximum inclusive = yes
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+        [0] = G3P1
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 1, name = G3P1
+      type = double
+      brief = Brief for parameter G3P1
+      description = Description for G3P1.
+      internal def = 
+      helpers = 1
+        name = H3
+        brief = Helper 3
+        description = Long Description for Helper 3
+        function = myHelper3
+        icon = $ISIS3DATA/base/icons/up.png
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+        [0] = G3P0
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+        [0] = G3P2
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 2, name = G3P2
+      type = double
+      brief = Brief for parameter G3P2
+      description = Description for G3P2.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+        [0] = G3P1
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 3, name = G3P3
+      type = double
+      brief = Brief for parameter G3P3
+      description = Description for G3P3.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+        [0] = G3P4
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 4, name = G3P4
+      type = double
+      brief = Brief for parameter G3P4
+      description = Description for G3P4.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+        [0] = G3P3
+      Include parameters:
+      Exclude parameters:
+      List data:
+  group 4 name = Group 4, double -vs- integer tests
+    parameter 0, name = G4P0
+      type = double
+      brief = Brief for parameter G4P0
+      description = Description for G4P0.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+        [0] = G4P1
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 1, name = G4P1
+      type = integer
+      brief = Brief for parameter G4P1
+      description = Description for G4P1.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+        [0] = G4P0
+      Less Than:
+      Less Than or Equal:
+        [0] = G4P2
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 2, name = G4P2
+      type = double
+      brief = Brief for parameter G4P2
+      description = Description for G4P2.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+        [0] = G4P1
+      Less Than:
+        [0] = G4P3
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 3, name = G4P3
+      type = integer
+      brief = Brief for parameter G4P3
+      description = Description for G4P3.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+        [0] = G4P2
+      Greater or Equal Than:
+      Less Than:
+        [0] = G4P4
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 4, name = G4P4
+      type = double
+      brief = Brief for parameter G4P4
+      description = Description for G4P4.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+        [0] = G4P3
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+        [0] = G4P5
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 5, name = G4P5
+      type = integer
+      brief = Brief for parameter G4P5
+      description = Description for G4P5.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+        [0] = G4P4
+      Include parameters:
+      Exclude parameters:
+      List data:
+  group 5 name = Group 5, in/exclusive tests
+    parameter 0, name = G5P0
+      type = integer
+      brief = Brief for parameter G5P0
+      description = Description for G5P0.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+        [0] = G5P1
+        [1] = G5P2
+      Exclude parameters:
+        [0] = G5P3
+      List data:
+    parameter 1, name = G5P1
+      type = integer
+      brief = Brief for parameter G5P1
+      description = Description for G5P1.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+        [0] = G5P0
+        [1] = G5P2
+      Exclude parameters:
+      List data:
+    parameter 2, name = G5P2
+      type = integer
+      brief = Brief for parameter G5P2
+      description = Description for G5P2.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+        [0] = G5P0
+      Exclude parameters:
+      List data:
+    parameter 3, name = G5P3
+      type = integer
+      brief = Brief for parameter G5P3
+      description = Description for G5P3.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+        [0] = G5P0
+        [1] = G5P1
+        [2] = G5P2
+      List data:
+  group 6 name = Group 6, boolean tests
+    parameter 0, name = G6P0
+      type = boolean
+      brief = Brief for parameter G6P0
+      description = Description for G6P0.
+      internal def = 
+      helpers = 1
+        name = H4
+        brief = Helper 4
+        description = Long Description for Helper 4...
+        function = myHelper4
+        icon = 
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+        [0] = G6P1
+      Exclude parameters:
+        [0] = G6P2
+      List data:
+    parameter 1, name = G6P1
+      type = integer
+      brief = Brief for parameter G6P1
+      description = Description for G6P1.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 2, name = G6P2
+      type = integer
+      brief = Brief for parameter G6P2
+      description = Description for G6P2.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = 100
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 3, name = G6P3
+      type = string
+      brief = Brief for parameter G6P3
+      description = Description for G6P3.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+  group 7 name = Group 7, name search test
+    parameter 0, name = FROM
+      type = string
+      brief = Brief for parameter FROM
+      description = Description for FROM.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = FROM
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 1, name = FROM1
+      type = string
+      brief = Brief for parameter FROM1
+      description = Description for FROM1.
+      internal def = 
+      helpers = 1
+        name = H5
+        brief = Helper 5
+        description = Long Description for Helper 5...
+        function = myHelper5
+        icon = $ISIS3DATA/base/icons/link.png
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = FROM1
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 2, name = FR
+      type = string
+      brief = Brief for parameter FR
+      description = Description for FR.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+        [0] = FR
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+  group 8 name = Group 8, Cube test
+    parameter 0, name = CUBE1
+      type = cube
+      brief = Brief for parameter CUBE1
+      description = Description for CUBE1.
+      internal def = 
+      helpers = 1
+        name = H6
+        brief = Helper 6
+        description = Long Description for Helper 6...
+        function = myHelper6
+        icon = 
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+    parameter 1, name = CUBE2
+      type = cube
+      brief = Brief for parameter CUBE2
+      description = Description for CUBE2.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+Application information
+Program name : unittest
+Brief description: Brief description
+Full description: This program tests the IsisAml class and its supporting classes.
+Version date: 2003-05-16
+
+Number of parameter groups : 9
+
+Parameter information:
+  Group number: 0
+  Group name : GROUP 0
+    Parameter number: 0
+      Name: G0p0
+      Type: filename
+      Brief: G0P0 Filename
+      Default: 
+      Internal default: 
+      Filter: *.cub
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 1
+      Name: G0P1
+      Type: filename
+      Brief: G0P1 Filename
+      Default: /my/dir/file.cub
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 1
+  Group name : Group 1, string list test
+    Parameter number: 0
+      Name: G1P0
+      Type: string
+      Brief: Brief for parameter G1P0
+      Default: G1P0L0
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+        Value: G1P0L0
+        Brief: Brief for list item G1P0L0
+        Description: Description for list item G1P0L0
+        List exclusions: 
+          Exclude parameter: G1P1
+          Exclude parameter: G1P2
+          Exclude parameter: G2P0
+        List inclusions: 
+        Value: G1P0L1
+        Brief: Brief for list item G1P0L1
+        Description: Description for list item G1P0L1
+        List exclusions: 
+          Exclude parameter: G2P1
+          Exclude parameter: G2P2
+          Exclude parameter: G3P0
+        List inclusions: 
+        Value: G1P0L1X
+        Brief: Brief for list item G1P0L2
+        Description: Description for list item G1P0L2
+        List exclusions: 
+        List inclusions: 
+          Include parameter: G1P1
+          Include parameter: G1P3
+    Parameter number: 1
+      Name: G1P1
+      Type: integer
+      Brief: Brief for G1P1
+      Default: 0
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+        Name: H1
+        Brief: Helper 1
+        Description: This helper button does.....
+        Function: myHelper
+        Icon: 
+        Name: H2
+        Brief: Helper 2
+        Description: This helper buttion will...
+        Function: myHelper2
+        Icon: $ISIS3DATA/base/icons/back.png
+      List Information:
+    Parameter number: 2
+      Name: G1P2
+      Type: double
+      Brief: Brief for G1P2
+      Default: 10.5
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 3
+      Name: G1P3
+      Type: double
+      Brief: Brief for G1P3
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 2
+  Group name : Group 2, integer tests
+    Parameter number: 0
+      Name: G2P0
+      Type: integer
+      Brief: Brief for parameter G2P0
+      Default: 
+      Internal default: Calculated inside program
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 1
+      Name: G2P1
+      Type: integer
+      Brief: Brief for parameter G2P1
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 2
+      Name: G2P2
+      Type: integer
+      Brief: Brief for parameter G2P2
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 3
+      Name: G2P3
+      Type: integer
+      Brief: Brief for parameter G2P3
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 4
+      Name: g2P4
+      Type: integer
+      Brief: Brief for parameter G2P4
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 3
+  Group name : Group 3, double tests
+    Parameter number: 0
+      Name: G3P0
+      Type: double
+      Brief: Brief for parameter G3P0
+      Default: 
+      Internal default: Calculated inside program
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 1
+      Name: G3P1
+      Type: double
+      Brief: Brief for parameter G3P1
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+        Name: H3
+        Brief: Helper 3
+        Description: Long Description for Helper 3
+        Function: myHelper3
+        Icon: $ISIS3DATA/base/icons/up.png
+      List Information:
+    Parameter number: 2
+      Name: G3P2
+      Type: double
+      Brief: Brief for parameter G3P2
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 3
+      Name: G3P3
+      Type: double
+      Brief: Brief for parameter G3P3
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 4
+      Name: G3P4
+      Type: double
+      Brief: Brief for parameter G3P4
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 4
+  Group name : Group 4, double -vs- integer tests
+    Parameter number: 0
+      Name: G4P0
+      Type: double
+      Brief: Brief for parameter G4P0
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 1
+      Name: G4P1
+      Type: integer
+      Brief: Brief for parameter G4P1
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 2
+      Name: G4P2
+      Type: double
+      Brief: Brief for parameter G4P2
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 3
+      Name: G4P3
+      Type: integer
+      Brief: Brief for parameter G4P3
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 4
+      Name: G4P4
+      Type: double
+      Brief: Brief for parameter G4P4
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 5
+      Name: G4P5
+      Type: integer
+      Brief: Brief for parameter G4P5
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 5
+  Group name : Group 5, in/exclusive tests
+    Parameter number: 0
+      Name: G5P0
+      Type: integer
+      Brief: Brief for parameter G5P0
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 1
+      Name: G5P1
+      Type: integer
+      Brief: Brief for parameter G5P1
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 2
+      Name: G5P2
+      Type: integer
+      Brief: Brief for parameter G5P2
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 3
+      Name: G5P3
+      Type: integer
+      Brief: Brief for parameter G5P3
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 6
+  Group name : Group 6, boolean tests
+    Parameter number: 0
+      Name: G6P0
+      Type: boolean
+      Brief: Brief for parameter G6P0
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+        Name: H4
+        Brief: Helper 4
+        Description: Long Description for Helper 4...
+        Function: myHelper4
+        Icon: 
+      List Information:
+    Parameter number: 1
+      Name: G6P1
+      Type: integer
+      Brief: Brief for parameter G6P1
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 2
+      Name: G6P2
+      Type: integer
+      Brief: Brief for parameter G6P2
+      Default: 100
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 3
+      Name: G6P3
+      Type: string
+      Brief: Brief for parameter G6P3
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 7
+  Group name : Group 7, name search test
+    Parameter number: 0
+      Name: FROM
+      Type: string
+      Brief: Brief for parameter FROM
+      Default: FROM
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+    Parameter number: 1
+      Name: FROM1
+      Type: string
+      Brief: Brief for parameter FROM1
+      Default: FROM1
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+        Name: H5
+        Brief: Helper 5
+        Description: Long Description for Helper 5...
+        Function: myHelper5
+        Icon: $ISIS3DATA/base/icons/link.png
+      List Information:
+    Parameter number: 2
+      Name: FR
+      Type: string
+      Brief: Brief for parameter FR
+      Default: FR
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+  Group number: 8
+  Group name : Group 8, Cube test
+    Parameter number: 0
+      Name: CUBE1
+      Type: cube
+      Brief: Brief for parameter CUBE1
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+        Name: H6
+        Brief: Helper 6
+        Description: Long Description for Helper 6...
+        Function: myHelper6
+        Icon: 
+      List Information:
+    Parameter number: 1
+      Name: CUBE2
+      Type: cube
+      Brief: Brief for parameter CUBE2
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+Get/Put/Clear/WasEntered tests
+Default value of G0P1 is /my/dir/file.cub
+G0P1 WasEntered value 0
+G0P1 WasEntered value 1
+The value of G0P1 is /home/user/file1.cub
+Default value of G0P1 is /my/dir/file.cub
+The value of G0P1 is /home/user/file2.dat
+
+The value of G0P1 is /home/user/file2.dat.txt
+
+Default value of G1P1 is 0
+The value of G1P1 is 33
+
+Default value of G1P2 is 10.5
+The value of G1P2 is 1e-09
+
+Default value of G1P0 is G1P0L0
+The value of G1P0 is G1P0L1
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+The value of G6P0 is 1
+
+The value of G6P0 is 0
+
+Exact and partial name match tests:
+  FROM's value = FROM
+  FROM1's value = FROM1
+  FR's value = FR
+
+
+---------- Test error throwing ----------  PutAsString:
+**USER ERROR** A value for this parameter [G1P0] has already been entered.
+
+  PutString:
+**PROGRAMMER ERROR** A value for this parameter [G1P0] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
+
+**PROGRAMMER ERROR** Parameter [G2P4] is not a string.
+
+  PutFilename:
+**PROGRAMMER ERROR** A value for this parameter [G0P0] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
+
+**PROGRAMMER ERROR** Parameter [G2P4] is not a filename.
+
+  Cube tests:
+**PROGRAMMER ERROR** Parameter [CUBE1] does not contain an [input] file
+**PROGRAMMER ERROR** Parameter [CUBE2] does not contain an [output] file
+
+  PutInteger:
+**PROGRAMMER ERROR** A value for this parameter [G6P2] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
+
+**PROGRAMMER ERROR** Parameter [G6P0] is not an integer.
+
+  PutDouble:
+**PROGRAMMER ERROR** A value for this parameter [G1P2] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
+
+**PROGRAMMER ERROR** Parameter [G0P0] is not a double.
+
+  PutBoolean:
+**PROGRAMMER ERROR** A value for this parameter [G6P0] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
+
+**PROGRAMMER ERROR** Parameter [G0P0] is not a boolean.
+
+  GetAsString:
+**PROGRAMMER ERROR** Parameter [G2P0] has no value.
+
+  GetFilename:
+**USER ERROR** Parameter [G0P0] has no value.
+
+**PROGRAMMER ERROR** Parameter [G2P4] is not a filename.
+
+  GetString:
+**USER ERROR** Parameter [G6P3] has no value.
+
+**PROGRAMMER ERROR** Parameter [G2P4] is not a string.
+
+  GetInteger:
+**USER ERROR** Parameter [G2P0] has no value.
+
+**PROGRAMMER ERROR** Parameter [G0P0] is not an integer.
+
+  GetDouble:
+**USER ERROR** Parameter [G1P3] has no value.
+
+**PROGRAMMER ERROR** Parameter [G0P1] is not a double.
+
+  GetBoolean:
+**USER ERROR** Parameter [G6P0] has no value.
+**PROGRAMMER ERROR** Invalid boolean value [CCCC].
+
+**PROGRAMMER ERROR** Parameter [G1P1] is not a boolean.
+**USER ERROR** Parameter [F] is not unique.
+
+---------- Validate a correctly loaded set of parameters ----------
+
+The current command line:
+Group = UserParameters
+  G0p0  = FILE1
+  G0P1  = FILE2
+  G1P0  = G1P0L0
+  G1P3  = 1.1
+  G2P1  = 1
+  G2P2  = 3
+  G2P3  = 4
+  g2P4  = 5
+  G3P1  = 1.2
+  G3P2  = 1.3
+  G3P3  = 1.4
+  G3P4  = 1.5
+  G4P0  = 1.6
+  G4P1  = 6
+  G4P2  = 6.7
+  G4P3  = 7
+  G4P4  = 7.8
+  G4P5  = 8
+  G5P0  = 9
+  G5P1  = 10
+  G5P2  = 11
+  G6P0  = yes
+  G6P1  = 13
+  G6P2  = 100
+  G6P3  = STRING2
+  FROM  = STRING3
+  FROM1 = STRING4
+  FR    = STRING4
+  CUBE1 = CUBE.DAT
+  CUBE2 = CUBE2.DAT
+End_Group
+End
+
+
+--- Check for NO value in an option/list/included parameter ---
+**USER ERROR** Parameter [G1P3] must be entered if parameter [G1P0] is equal to [G1P0L1X]
+
+----- Check for value in an option/list/excluded parameter -----
+**USER ERROR** Parameter [G2P0] can not be entered if parameter [G1P0] is equal to [G1P0L0]
+
+---------- Check error for unknow parameter ----------
+**USER ERROR** Unknown parameter [xyz].

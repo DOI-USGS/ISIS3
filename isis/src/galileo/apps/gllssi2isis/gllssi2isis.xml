@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="gllssi2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import a Galileo solid state imager (SSI) image EDR into Isis cube format
+  </brief>
+
+  <description>
+    Converts a PDS formatted Galileo solid state imager (SSI) image EDR
+    into an Isis Cube.  The required instrument labels will be propagated 
+    into the instrument group.  The user must choose an input image label, 
+    output cube name, and frame mode, or summing mode.  Galileo SSI images have 
+    a summing mode of FULL (800 x 800 pixels) or SUMMED (400 x 400 pixels).  
+    <p>
+      <strong> Note: </strong> For the I24 encounter (found in volume go_0022), 
+      many Galileo SSI images of Io were originally  "garbled".  These images 
+      were reconstructed and released with the filename ####s where ####r is the 
+      name of the original garbled file and #### is the last four digits of the 
+      SPACECRAFT_CLOCK_START_COUNT.  These images will have Most of the original 
+      images were 400 x 400 (i.e. SUMMED). However, the reconstructed files are 
+      800 x 800 and must be imported as FULL to get the entire image.  If the 
+      user imports a reconstructed image with FRAMEMODE = AUTO, it will be 
+      treated as a FULL image, even if the original was SUMMED.
+    </p>
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2002-02-25">
+      Original version
+    </change>
+    <change name="Robert Sucharski" date="2005-12-30">
+      Converted to Isis 3.0
+    </change>
+    <change name="Steven Koechle" date="2007-10-30">
+      Added Summing Keyword. Moved most hardcoded translations into a 
+      translation table.  Modified tests to check the lables. Removed ImageID 
+      keyword.
+    </change>
+    <change name="Steven Lambright" date="2007-12-31">
+      Removed the hard coded Instrument Mode ID keyword translation.
+    </change>
+    <change name="Steven Lambright" date="2007-01-08">
+      Added summing options. Output summed images will now only be a quarter of 
+      the size for calibration (the upper-left data in the input is preserved).
+    </change>
+    <change name="Christopher Austin" date="2008-03-18">
+      Checks if input file is rdr.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo.
+    </change>
+    <change name="Jeannie Walldren" date="2009-06-08">
+       Added valid DATA_SET_ID value for reconstructed images (i.e. value
+       contains "SSI-4-REDR-V1.0").  Modified code to set as FULL summing 
+       mode if FRAMEMODE=AUTO and the image is reconstructed.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Galileo</missionItem>
+  </category>
+
+  <seeAlso>
+    <documents>
+      <document>
+        <title>
+          Planetary Science Data Dictionary Document
+        </title>
+        <source>
+          <filename>
+            PSDDmain_1r71.pdf
+          </filename>
+          <path>
+            http://pds.jpl.nasa.gov/documents/psdd/
+          </path>
+        </source>
+        <author>
+          Jet Propulsion Laboratory
+        </author>
+        <publisher>
+          California Institute of Technology
+        </publisher>
+      </document>
+    </documents>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS Galileo SSI file
+        </brief>
+        <description>
+          Use this parameter to select the PDS filename.  This file must
+          contain the PDS labels, however the image data can be detached
+          and will be automatically obtained from the PDS image pointer keyword.
+        </description>
+        <filter>
+          *.lbl *.LBL
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+
+    <group name="SETTINGS">
+      <parameter name="FRAMEMODE">
+        <type>string</type>
+        <brief>Summing mode of the input image</brief>
+        <description>Summing mode of the input image.  The user 
+          may specify the summing mode or choose to allow the program to
+          determine this.
+        </description>
+        <default><item>AUTO</item></default>
+        <list>
+          <option value="AUTO">
+            <brief>Automatically Detect</brief>
+            <description>
+              This will attempt to automatically detect the summing mode of the 
+              input image based on the DATA_SET_ID and/or FRAME_DURATION keyword 
+              values from the input image labels.
+            </description>
+          </option>
+          <option value="SUMMED">
+            <brief>The image is summed</brief>
+            <description>
+              This will treat the input image as if it has a summing mode of 2 
+              in both the sample and line direction.
+            </description>
+          </option>
+          <option value="FULL">
+            <brief>The image is not summed</brief>
+            <description>
+              This will treat the input image as if it has no summing.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+   </groups>
+
+  <examples>
+    <example>
+      <brief>Cube imported with defaults</brief>
+      <description>
+        This example shows how to import Galileo SSI image to ISIS 3.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=../IN/input.lbl to=../OUT/output.cub
+        </commandLine>
+        <description>
+          Run the gllssi2isis application with defaults
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="623" height="550" src="assets/images/gllssi2isisGuiAuto.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform the 
+              gllssi2isis application.  Input label and output cubes are always 
+              required.  The FRAMEMODE radio button AUTO is chosen as default.
+            </description>
+            <thumbnail width="200" height="177" caption="Gllssi2isis GUI using defaults." src="assets/thumbs/gllssi2isisGuiAutoThumb.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/inputLabelEx1.txt">
+          <brief>
+            Input label
+          </brief>
+          <description>
+            Copy of the labels of the input image
+          </description>
+          <parameterName>
+            FROM
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+      <outputImages>
+        <image width="513" height="550" src="assets/images/gllssi2isisOutputAuto.jpg">
+          <brief>
+            Output image
+          </brief>
+          <description>
+            Output image after gllssi2isis has imported it to ISIS3.
+          </description>
+          <thumbnail width="187" height="200" caption="Output cube imported with defaults" src="assets/thumbs/gllssi2isisOutputAutoThumb.jpg" />
+          <parameterName>
+            TO
+          </parameterName> 
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

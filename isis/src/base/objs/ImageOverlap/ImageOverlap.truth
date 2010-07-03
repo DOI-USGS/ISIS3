@@ -1,0 +1,55 @@
+One ----------------------------------------------
+Original coordinates:
+(0 0, 0 10, 5 15, 8 -5, 0 0)
+Well Known Text version of the multi polygon
+MULTIPOLYGON (((0.0000000000000000 0.0000000000000000, 0.0000000000000000 10.0000000000000000, 5.0000000000000000 15.0000000000000000, 8.0000000000000000 -5.0000000000000000, 0.0000000000000000 0.0000000000000000)))
+
+Area of the polygon 97.5
+Number of serial numbers: 1
+Serial numbers: 
+  idOne
+
+Two ----------------------------------------------
+Well Known Text version of the multi polygon
+MULTIPOLYGON (((0.0000000000000000 0.0000000000000000, 0.0000000000000000 10.0000000000000000, 5.0000000000000000 15.0000000000000000, 8.0000000000000000 -5.0000000000000000, 0.0000000000000000 0.0000000000000000)))
+
+Area of the polygon 97.5
+Number of serial numbers: 4
+Serial numbers: 
+  idOne
+  sn2
+  sn3
+  sn4
+
+Three --------------------------------------------
+Well Known Text version of the multi polygon
+MULTIPOLYGON (((0.1234567890000000 0.1234567890000000, 0.1234567890000000 10.1234567890000005, 5.1234567889999996 15.1234567890000005, 8.1234567890000005 -5.1234567889999996, 0.1234567890000000 0.1234567890000000)))
+
+Area of the polygon 98.1173
+Number of serial numbers: 4
+Serial numbers: 
+  idOne
+  sn2
+  sn3
+  sn4
+
+Well Known Text version of the multi polygon
+MULTIPOLYGON (((10.1234567890000005 10.1234567890000005, 10.1234567890000005 110.1234567890000022, 15.1234567890000005 115.1234567890000022, 18.1234567889999987 -15.1234567890000005, 10.1234567890000005 10.1234567890000005)))
+
+Area of the polygon 733.117
+Number of serial numbers: 4
+Serial numbers: 
+  idOne
+  sn2
+  sn3
+  sn4
+
+Four ---------------------------------------------
+Well Known Text version of the multi polygon
+MULTIPOLYGON (((0.1234567890000000 0.1234567890000000, 0.1234567890000000 10.1234567890000005, 5.1234567889999996 15.1234567890000005, 8.1234567890000005 -5.1234567889999996, 0.1234567890000000 0.1234567890000000)))
+
+Area of the polygon 98.1173
+Number of serial numbers: 1
+Serial numbers: 
+  idFour
+

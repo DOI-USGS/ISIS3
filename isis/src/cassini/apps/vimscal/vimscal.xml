@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="vimscal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Radiometric correction of Cassini VIMS camera images. 
+  </brief>
+
+  <description>
+    This program applies a dark current and a flat field correction to images, then converts the output units
+    to either specific energy or I/F.
+
+    <br/><br/>
+    <b>Dark Current:</b><br/>
+    The dark current correction for VIS consists of reading a binary ".tab" file from $cassini/calibration/vims and subtracting
+    derived values from this file.<br/>
+
+    The dark current correction for IR consists of reading the sideplane data (stored in a SideplaneIr table in the cube) and
+    subtracting this from the input cube. If "CompressorId" is available then the sideplane data was already subtracted from
+    the file, but the linear fit capabilities are still available to re-do the dark current with a linear fit instead of the
+    default subtraction. If spectral summing is on then no dark current can be applied. If spectral editing is on then the linear
+    fit on the dark current can not be applied. Sideplane keywords for IR are as follows:
+    <ul>
+      <li>None = No dark current subtraction (applied by the instrument)</li>
+      <li>Sideplane = Sideplane was subtracted only without fitting a line</li>
+      <li>Fit Delta = Sideplane was previously subtracted so the difference between the
+    sideplane and linear fit function subtracted</li>
+      <li>Fit = A linear fit was applied to the dark current values and the result was subtracted</li>
+    </ul>
+    <br/><br/>
+
+    <b>Flat Field:</b><br/>
+    For both VIS and IR this determines the correct file from $cassini/calibration/vims/flatfield and divides the input data by the
+    flat field data.<br /><br />
+
+    <b>Subareas</b><br/>
+    The offset and swath keywords will be respected by running "crop" on the calibration files appropriately and using the cropped 
+    calibration files.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2009-06-24">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2009-08-03">
+      The solar distance calculation is now much more likely to succeed
+    </change>
+    <change name="Steven Lambright" date="2009-12-16">
+      Better error handling - fewer temporary files left around
+    </change>
+    <change name="Steven Lambright" date="2009-12-17">
+      Sped up program by not searching a pvl much more than necessary,
+      improved error messages
+    </change>
+    <change name="Steven Lambright" date="2010-02-19">
+      Now closing calibration files when done with them
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Cassini</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Isis cube
+        </brief>
+        <description>
+          Use this parameter to choose an Isis cube to be calibrated.  To ensure 
+          that it contains all needed keywords in its label, input cube should 
+          have been imported using <strong>vims2isis</strong> and, if "I/F" is chosen, input cube 
+          must have been run through <strong>spiceinit</strong> application.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+           Output Isis cube
+        </brief>
+        <description>
+           Use this parameter to select the output filename of the calibrated 
+           Isis cube.
+        </description>
+        <filter>
+           *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Options">
+      <parameter name = "UNITS">
+        <type>string</type>
+        <brief>Output units</brief>
+        <description>
+        </description>
+        <default><item>IOF</item></default>
+        <list>
+          <option value="SPECENERGY">
+            <brief>Specific Energy</brief>
+            <description>
+              This option indicates that the output is in terms of specific energy (ergs/sec/spectel). 
+            </description>
+          </option>
+          <option value="IOF">
+            <brief>I/F</brief>
+            <description>
+              This option indicates that the output is in terms of solar flux (I/F). 
+              Input cube must have been run through the <strong>spiceinit</strong> application.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="IRORIGDARK">
+        <type>boolean</type>
+        <brief>Do not perform IR Dark Current Corrections</brief>
+        <description>
+          By default Isis will fit a line to the dark current values, on each band, across the lines since
+          there is one dark value per line. The linear fit value will be applied correctly even if a dark
+          current was applied to this cube beforehand. This disables the line fitting for the dark current.
+          This parameter has no effect for VIS cubes.
+        </description>
+        <default><item>false</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

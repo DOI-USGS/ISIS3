@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="svfilter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a variance or standard deviation filter to a cube
+  </brief>
+
+  <description>
+    This program applies either a variance or standard deviation filter to a
+    cube.  The standard deviation filter is simply the square root of the
+    variance and is selected by setting the FILTER parameter to STDDEV.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>lowpass</item>
+      <item>highpass</item>
+      <item>trimfilter</item>
+      <item>divfilter</item>
+      <item>noisfilter</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Eric Eliason" date="1988-05-20">
+      Original version
+    </change>
+
+    <change name="Tracie Sucharski" date="2002-08-13">
+      Ported to Isis 3.0
+    </change>
+
+    <change name="Jeff Anderson" date="2002-11-26">
+      Fixed bug which disallowed the standard deviation filter
+    </change>
+
+    <change name="K Teal Thompson" date="2002-12-03">
+      Add examples.
+    </change>
+
+    <change name="K Teal Thompson" date="2003-03-28">
+      Make images smaller.
+    </change>
+
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+
+  </history>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+	        Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output svfilter cube
+        </brief>
+        <description>
+	        The resultant filtered cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Filter Type">
+      <parameter name="FILTER">
+        <type>string</type>
+        <default><item>VARIANCE</item></default>
+        <brief>
+          Filter type
+        </brief>
+        <description>
+          The output of the filter operation is either the variance value or
+          the standard deviation value.
+        </description>
+        <list>
+          <option value="VARIANCE">
+            <brief>
+              Perform variance filter
+            </brief>
+            <description>
+              This will output the variance at the center of the boxcar.
+            </description>
+          </option>
+          <option value="STDDEV">
+            <brief>
+              Perform standard deviation filter
+            </brief>
+            <description>
+              This will output the standard deviation at the center of the
+              boxcar.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of samples in the boxcar.
+          It must be odd and can not exceed twice the number of samples
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly
+          slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Restrictions">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Valid minimum pixel
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Valid maximum pixel
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>integer</type>
+        <brief>
+          Minimum boxcar pixel count
+        </brief>
+        <description>
+          This is the minimum number of valid pixels which must occur inside the
+          NxM boxcar for filtering to occur. For example, 3x5 boxcar has 15 pixels
+          inside.  If MINIMUM=10 then the filter will occur if there are 10 or
+          greater valid pixels.  A valid pixel is one that is not special (NULL, LIS,
+          etc) and is in the range defined by LOW to HIGH.
+        </description>
+        <default>
+          <item>1</item>
+        </default>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="PROPAGATE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Propagate special pixels</brief>
+        <description>
+          This option is used to define how special pixels are handled.  If the
+          center pixel of the boxcar is a special pixel it will be propagated
+          or set to NULL depending on the value of this parameter.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> run svfilter </brief>
+      <description>
+        This example shows an svfilter operation using standard deviation.
+      </description>
+      <terminalInterface>
+        <commandLine> fr=../IN/peaks.cub:4 t=OUT/svfilter.sd fi=s s=5 li=5
+        </commandLine>
+        <description>
+        svfilter a Terra image.  Use STDDEV filter (fi=s)
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for svfilter</brief>
+          <description>This is the input image for the svfilter examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/svfilter.sd.jpg" width="500" height="500">
+          <brief> Output image for svfilter</brief>
+          <description> This is the output image that results from STDDEV filter.
+          </description>
+          <thumbnail caption="Output image showing results of the svfilter application." src="assets/thumb/svfilter.sd.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="480" height="480" src="assets/image/svfilterSdGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+an svfilter operation on the input image. </description>
+            <thumbnail width="200" height="200" caption="svfilter Gui" src="assets/thumb/svfilterSdGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+
+    <example>
+      <brief> run svfilter </brief>
+      <description>
+        This example shows an svfilter operation using variance.
+      </description>
+      <terminalInterface>
+        <commandLine> fr=../IN/peaks.cub:4 t=OUT/svfilter.var fi=v s=5 li=5
+        </commandLine>
+        <description>
+        svfilter a Terra image.  Use VARIANCE filter. (fi=v)
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief> Input image for svfilter</brief>
+          <description>This is the input image for the svfilter examples.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/svfilter.var.jpg" width="500" height="500">
+          <brief> Output image for svfilter</brief>
+          <description> This is the output image that results from VARIANCE filter.
+          </description>
+          <thumbnail caption="Output image showing results of the svfilter application." src="assets/thumb/svfilter.var.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="480" height="480" src="assets/image/svfilterVarGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+an svfilter operation on the input image. </description>
+            <thumbnail width="200" height="200" caption="svfilter Gui" src="assets/thumb/svfilterVarGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

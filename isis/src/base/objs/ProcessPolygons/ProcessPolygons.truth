@@ -1,0 +1,23 @@
+Testing Isis::ProcessPolygons Class ... 
+Filename: processPolygonsTest.cub
+unittest: Working
+0% ProcessedBand: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 
+10% ProcessedBand: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 
+20% ProcessedBand: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 
+30% ProcessedBand: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 4 
+40% Processed50% ProcessedBand: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 
+60% ProcessedBand: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 
+70% ProcessedBand: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 
+80% ProcessedBand: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 
+90% Processed100% Processed
+Filename: processPolygonsTest_count.cub
+unittest: Working
+0% ProcessedBand: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 
+10% ProcessedBand: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 
+20% ProcessedBand: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 
+30% ProcessedBand: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 Band: 1 DN: 16 
+40% Processed50% ProcessedBand: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 
+60% ProcessedBand: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 
+70% ProcessedBand: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 
+80% ProcessedBand: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 Band: 2 DN: 16 
+90% Processed100% Processed

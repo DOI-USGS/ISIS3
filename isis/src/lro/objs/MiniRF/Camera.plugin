@@ -1,0 +1,10 @@
+Group = CHANDRAYAAN1_ORBITER/MRFFR
+  Version = 1
+  Library = MiniRF
+  Routine = MiniRFPlugin
+EndGroup
+Group = LUNARRECONNAISSANCEORBITER/MRFLRO
+  Version = 1
+  Library = MiniRF
+  Routine = MiniRFPlugin
+EndGroup

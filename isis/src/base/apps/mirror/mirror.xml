@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mirror" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Flip a cube from left-to-right
+  </brief>
+
+  <description>
+    This program will flip a cube from left-to-right.  By flipping the cube
+    the geometric integrity of the cube is destroyed.  Therefore, any
+    geometric, mapping, or instrument related labels will be marked as
+    invalid.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>rotate</item>
+      <item>flip</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="1998-01-12">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2002-06-17">
+      Converted to Isis 3.0
+    </change>
+    <change name="K Teal Thompson" date="2002-11-22">
+      Add example
+    </change>
+    <change name="Jeff Anderson" date="2003-01-28">
+      Removed mirror from the Utility category and
+      added "rotate" under See Also.
+    </change>
+    <change name="K Teal Thompson" date="2003-03-28">
+      Make images smaller.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be flipped
+        </brief>
+        <description>
+          The cube to be flipped.  All bands will be flipped from
+          left-to-right.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the flipped data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Io mirrored </brief>
+      <description>
+        This example shows the simple but indispensable mirror application.  There are no defaults.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/9700r.cub t=OUT/mirror.cub
+        </commandLine>
+        <description>
+        Just mirror an Io image.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/9700r.jpg" width="500" height="500">
+          <brief> Input image for mirror</brief>
+          <description>This is the 800 by 800 input image for the mirror example.
+          </description>
+          <thumbnail caption=" Input Io image" src="assets/thumb/9700r.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/IoMirror.jpg" width="500" height="500">
+          <brief> Output image for mirror</brief>
+          <description> This is the 800 by 800 output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the mirror application." src="assets/thumb/IoMirror.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="221" src="assets/image/IoMirrorGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+a mirror operation on the input image. </description>
+            <thumbnail width="200" height="100" caption="Mirror Gui" src="assets/thumb/IoMirrorGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

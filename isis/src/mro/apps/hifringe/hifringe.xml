@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<application name="hifringe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Gathers statistics on the first and last several samples of a channel
+  </brief>
+
+  <description>
+    Gathers several statistics on the "fringe" of a channel file. These 
+  statistics are then output to a pvl file that can be viewed to see if several
+  channel files, based upon those statistics, are suitable for stitching 
+  together. The number of lines that are gathered is a function of the binning 
+  mode of the channel file being input as follows:
+  <pre>
+  binning mode 1          48 rightmost and 48 leftmost samples gathered
+  binning mode 2          24 rightmost and 24 leftmost samples gathered
+  binning mode 3          16 rightmost and 16 leftmost samples gathered
+  binning mode 4          12 rightmost and 12 leftmost samples gathered
+  binning mode 8           6 rightmost and  6 leftmost samples gathered
+  </pre>
+  
+  The following statistics are gathered:
+  <pre>
+  Valid Pixels
+  Standard Deviation
+  Average
+  Minimum
+  Maximum
+  </pre>
+  </description>
+
+  <category>
+		 <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+
+  <history>
+    <change name="Drew Davidson" date="2006-05-15">
+      Original version
+    </change>
+    <change name="Drew Davidson" date="2006-05-26">
+      Added the ability to sample multiple sections
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <seeAlso>
+      <applications>
+         <item>stats</item>
+      </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Single hirise channel in cub form
+        </brief>
+        <description>
+		    input channel file. Although this program is meant to be used solely
+			 for stitching channel files together, it could be used on any hirise
+			 image at all.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file to contain statistics
+        </brief>
+        <description>
+          This pvl file will contain two groups. The first group will be 
+			 statistics for the leftmost samples, and the second group will be 
+			 statistics for the rightmost samples.
+        </description>
+        <filter>
+          *.pvl
+        </filter>
+      </parameter>
+    </group>
+	 
+	 <group name="sections">
+	   <parameter name="SECTIONS"> 
+		  <type>integer</type>
+		  <brief>Number of sections</brief>
+                  <default><item>5</item></default>
+		  <description>
+		    This is the number of sub-areas that are extracted from each side of
+			 the cube. They will be spaced in such a way that there will be a 
+			 section starting at the <pre>l/n</pre>th line where <pre>l</pre> is 
+			 the total number of lines in the cube and <pre>n</pre> is the number
+			 of sections specified.
+		  </description> 
+		</parameter>
+		
+		<parameter name="LINESIZE">
+		  <type>integer</type>
+		  <brief>Number of lines in each section</brief>
+                  <internalDefault>complete coverage</internalDefault>
+		  <description>
+		    This is the number of lines in each section. If the user
+		    does not enter anything, or specifies an invalid number
+		    of lines (i.e. more lines than exist in the cube), the
+		    sections will be stretched to cover as many lines of the
+		    cube as possible
+		  </description>
+		</parameter>
+     </group>
+	  
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Calculating statistics for a band in a cube</brief>
+      <description>
+        This example shows the statistics gathered from a single band of
+        a cube.
+      </description>
+      <terminalInterface>
+        <commandLine>
+		      from= ATL_MarsCube_RED5_0.cub to= red5.pvl
+        </commandLine>
+        <description>
+          Running hifringe on a channel file.
+        </description>
+      </terminalInterface>
+      <dataFiles>
+        <dataFile path="assets/red5.pvl">
+          <brief>
+            Output from stats
+          </brief>
+          <description>
+            This is the output captured in "red5.pvl".
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
+  </examples>
+</application>

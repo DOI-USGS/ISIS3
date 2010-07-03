@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="viknopepper" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Pepper noise Clean-up of Viking Orbiter Level 1 images
+  </brief>
+
+  <description>
+    This program will perform the middle portion of the level 1 processing sequence on a Viking 
+    Orbiter PDS image, the cleanup of pepper noise in the image.
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>vikfixtrx</item>
+      <item>viknosalt</item>
+      <item>viknobutter</item>
+      <item>remrx</item>
+      <item>findrx</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2006-05-03">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-16">
+      Added examples
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be cleaned
+        </brief>
+        <description>
+          The cube to be cleaned.  The cube will be ran through a series of filters to
+          remove pepper noise.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the cleaned data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Option">
+        <parameter name="REMOVE">
+            <type>boolean</type>
+            <brief>
+                  Remove intermediate files
+            </brief>
+            <description>
+                Option to remove or leave intermediate cube files made by the application
+            </description>
+            <default><item>TRUE</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Input Viking Image to have pepper noise removed </brief>
+      <description>
+        This example shows the viknopepper application in action.  It removes all pepper noise.
+      </description>
+      <terminalInterface>
+        <commandLine> from=../IN/temp.cub to=OUT/out.cub
+        </commandLine>
+        <description>
+          Input a viking image to remove the pepper noise from and give it an output file name.
+        </description>
+      </terminalInterface>
+  
+      <inputImages>
+        <image src="assets/image/inputImage.jpg" width="584" height="512">
+          <brief> Viking Image to Remove Pepper Noise from</brief>
+          <description>
+              This is the input viking image prior to the removal of black noise.
+          </description>
+          <thumbnail caption=" Input Viking Image" src="assets/thumb/inputImage.jpg" width="200" height="175"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+  
+      <outputImages>
+        <image src="assets/image/outputImage.jpg" width="584" height="512">
+          <brief> Output Image</brief>
+          <description> 
+              This is the viking image after the viknopepper application has been run.
+          </description>
+          <thumbnail caption="Output Viking Image after running the viknopepper application." src="assets/thumb/outputImage.jpg" width="200" height="175"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+  
+    </example>
+  </examples>
+
+ </application>
+

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="sharpen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Sharpen the features in a cube
+  </brief>
+
+  <description>
+    This program sharpens the edges in the image.  The method for sharpening
+    is done by applying a high pass filter to a cube and adding the filter
+    results back to the original image.  In general, you will sharpen small
+    features with smaller boxcars and larger features with larger boxcars.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>highpass</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Eric Eliason" date="1988-05-20">
+      Original version
+    </change>
+
+    <change name="Jeff Anderson" date="2002-09-25">
+      Ported to Isis 3.0
+    </change>
+
+    <change name="K Teal Thompson" date="2003-04-10">
+      Add example.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2004-02-17">
+      Removed addback option and put it in the highpass program
+    </change>
+  </history>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+	        Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output highpass cube
+        </brief>
+        <description>
+	        The resultant filtered cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <default><item>3</item></default>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of samples in the boxcar.
+          It must be odd and can not exceed twice the number of samples
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <default><item>3</item></default>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly
+          slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Restrictions">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Valid minimum pixel
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Valid maximum pixel
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing boxcar statistics.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>integer</type>
+        <brief>
+          Minimum boxcar pixel count
+        </brief>
+        <description>
+          This is the minimum number of valid pixels which must occur inside the
+          NxM boxcar for filtering to occur. For example, 3x5 boxcar has 15 pixels
+          inside.  If MINIMUM=10 then the filter will occur if there are 10 or
+          greater valid pixels.  A valid pixel is one that is not special (NULL, LIS,
+          etc) and is in the range defined by LOW to HIGH.
+        </description>
+        <default>
+          <item>1</item>
+        </default>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Other">
+      <parameter name="PROPAGATE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Propagate special pixels</brief>
+        <description>
+          This option is used to define how special pixels are handled.  If the
+          center pixel of the boxcar is a special pixel it will be propagated
+          or set to NULL depending on the value of this parameter.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief> 3x3</brief>
+      <description>
+        Use a 3x3 boxcar
+      </description>
+      <terminalInterface>
+        <commandLine> f=peaks.cub:4 t=sharpen
+        </commandLine>
+        <description>
+        In this example the boxcar size is the default 3 by 3.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.4.jpg" width="500" height="500">
+          <brief> Input image for sharpen</brief>
+          <description>This is the input image for the sharpen example.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.4.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/sharpen.jpg" width="500" height="500">
+          <brief> Output image for sharpen</brief>
+          <description> This is the output image for this example of sharpen.  Notice the edges of features are sharper.  It is the same as running highpass and adding the highpass output back to the input image.
+          </description>
+          <thumbnail caption="Output image showing results of the sharpen application." src="assets/thumb/sharpen.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="480" height="450" src="assets/image/sharpenGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a "sharpen"ing of the input image with the default boxcar of 3x3. </description>
+            <thumbnail width="200" height="188" caption="Sharpen Gui" src="assets/thumb/sharpenGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

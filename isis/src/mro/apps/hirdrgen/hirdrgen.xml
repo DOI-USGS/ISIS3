@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hirdrgen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+      Converts HiRISE RDR cubes into PDS standard format
+  </brief>
+
+  <description>
+      <p>
+        Takes an input Isis cube with HiRISE RDR specific labels, and outputs a PDS compatible file.
+        The DN values are NOT assumed to be between 0.0 and 1.0.
+        All DN values between MINPER and MAXPER will be stretched to an unsigned integer with
+        a size equal to the number of bits specified by BITS, excluding the special pixels. 
+      <p>
+          NOTE: This program does not generate the final PDS HiRISE product. The output
+          from this program is converted to a JPEG 2000 in the HiRISE pipeline processing.
+      </p>
+      </p>
+      <p>
+          For NBITS=8, two values are reserved for special pixels.
+          For NBITS=9 through 16, five values are reserved for special pixels.
+
+          <table class="tableFormattedInformation">
+            <caption>RDR special pixel mapping</caption>
+            <tr>
+              <th>Special Pixel</th> <th>8 Bit Output Value</th> <th>9-16 Bit Output Value</th>
+            </tr>
+            <tr>
+                <td>NULL</td> <td>0</td> <td>0</td>
+            </tr>
+            <tr>
+                <td>LRS</td> <td>0</td> <td>1</td>
+            </tr>
+            <tr>
+                <td>LIS</td> <td>0</td> <td>2</td>
+            </tr>
+            <tr>
+                <td>HIS</td> <td>255</td> <td>(2**BITS)-2</td>
+            </tr>
+            <tr>
+                <td>HRS</td> <td>255</td> <td>(2**BITS)-1</td>
+            </tr>
+          </table>
+      </p>
+  </description>
+
+  <category>
+      <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+      <change name="Stuart Sides" date="2006-09-11">
+          Original Version
+      </change>
+      <change name="Stuart Sides" date="2006-12-14">
+          Modified labels to meet PDS standards and add new keywords.
+      </change>
+      <change name="Stuart Sides" date="2007-01-10">
+          Modified to output 8-bit products.
+      </change>
+      <change name="Stuart Sides" date="2007-02-21">
+          Modified with new keywords (NBITS, MINPER, MAXPER). Remove the OUTTYPE keyword.
+          It is now infered by NBITS.
+      </change>
+      <change name="Kris Becker" date="2007-07-24">
+          Modified to convert FILTER_NAME from BLUEGREEN to BLUE-GREEN and
+          NEARINFRARED to NEAR-INFRARED to comply with PDS.
+      </change>
+      <change name="Steven Koechle" date="2007-12-07"> Added parameters to allow 
+          for a user specified manual stretch.
+      </change>
+      <change name="Steven Lambright" date="2008-05-13">
+        Removed references to CubeInfo 
+      </change>
+      <change name="Stuart Sides" date="2008-06-06"> 
+          Changed output keyword PRODUCT_VERSION_ID from an automatic 
+          translation to a user input parameter 
+      </change>
+      <change name="Steven Lambright" date="2008-07-10"> 
+          Added Rationale Description option
+      </change>
+      <change name="Janet Barrett" date="2010-02-17"> 
+          Added ability to write output file in JPEG2000 format.
+      </change>
+      <change name="Christopher Austin" date="2010-03-01"> 
+          Fixed an error which misplaced the proper SCALING_FACTOR and OFFSET
+          keyword values.
+      </change>
+ </history>
+
+  <groups>
+      <group name="Files">
+          <parameter name="FROM">
+              <type>cube</type>
+              <fileMode>input</fileMode>
+              <brief>
+                  The input cube
+              </brief>
+              <description>
+                  This is the Isis cube to be exported to PDS format. All bands of the cube will be exported to the PDS file.
+              </description>
+              <filter>*.cub</filter> 
+          </parameter>
+
+          <parameter name="TO">
+              <type>filename</type>
+              <fileMode>output</fileMode>
+              <brief>
+                  The ouput file
+              </brief>
+              <description>
+                  This is the destination file, where the input cube data will 
+                  be written in PDS format. This file will have unsigned 16 bit DN values in the
+                  PDS IMAGE object no matter what type the input file is. All valid data from the input
+                  cube will be converted to unsigned, 16 bit, most significant byte first (Big Endian).
+              </description>
+          </parameter>
+      </group>
+
+      <group name="Stretch">
+          <parameter name="TYPE">
+        <type>string</type>
+        <default><item>AUTOMATIC</item></default>
+        <brief>
+          Select the type of stretch
+        </brief>
+        <description>
+          This parameter is used to select one of two ways to stretch output
+          pixels.  The are AUTOMATIC or MANUAL.
+        </description>
+        <list>
+          <option value="AUTOMATIC">
+            <brief>Automatically calculate stretch</brief>
+            <description>Automatically calculate stretch</description>
+            <exclusions>
+              <item>MIN</item> 
+              <item>MAX</item>
+            </exclusions>
+          </option>
+          <option value="MANUAL">
+            <brief>User defined stretch</brief>
+            <description>User defined stretch</description>
+              <exclusions>
+              <item>MINPER</item> 
+              <item>MAXPER</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+          <parameter name="MIN">
+              <type>double</type>
+              <brief>
+                  Lower bound of the stretch
+              </brief>
+              <description>
+                  Lower bound for the manually specified stretch.
+              </description>
+          </parameter>
+          <parameter name="MAX">
+              <type>double</type>
+              <brief>
+                  Upper bound of the stretch
+              </brief>
+              <description>
+                  Upper bound for the manually specified stretch.
+              </description>
+          </parameter>
+          <parameter name="MINPER">
+          <type>double</type>
+          <default>
+            <item>0.0</item>
+          </default>
+          <brief>
+            Minimum DN valid percentage
+          </brief>
+          <description>
+            The cumulative percentage value to be mapped to the minimum 
+            valid pixel for the specified number of bits. For example: With BITS=10
+            and MINPER=1.0, the DN which corresponds to the cummulative
+            percent of 1.0 will be mapped to 3, where 0 represents NULL, 1
+            represents LRS and 2 represents LIS.
+          </description>
+          <minimum inclusive="yes">0.0</minimum>
+          <maximum inclusive="yes">100.0</maximum>
+          <lessThanOrEqual>
+              <item>
+                  MAXPER
+                </item>
+          </lessThanOrEqual>
+        </parameter>
+
+        <parameter name="MAXPER">
+          <type>double</type>
+          <default>
+            <item>100.0</item>
+          </default>
+          <brief>
+            Mazimum DN valid percentage
+          </brief>
+          <description>
+            The cumulative percentage value to be mapped to the maximum 
+            valid pixel for the specified number of bits. For example: With BITS=10
+            and MINPER=99.0, the DN which corresponds to the cummulative
+            percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2. 
+            Where 1023 represents HIS and 1022 represents HRS.
+          </description>
+          <minimum inclusive="yes">0.0</minimum>
+          <maximum inclusive="yes">100.0</maximum>
+          <greaterThanOrEqual>
+              <item>
+                MINPER
+              </item>
+          </greaterThanOrEqual>
+        </parameter>
+      </group>
+
+      <group name="Output Controls">
+        <parameter name="BITS">
+          <type>integer</type>
+          <default>
+            <item>10</item>
+          </default>
+          <brief>
+            Number of bits for the output DN
+          </brief>
+          <description>
+            The number of bits to compress the input data to. The valid data as
+            well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
+            compressed into this number of bits. The output data type will be
+            automaticity choosen using this value. A value of 8 will create 
+            unsigned byte output files. Values from 9 to 16 will create unsigned
+            word output files. Unused bits in the unsigned word output file will be
+            set to zero.
+          </description>
+          <minimum inclusive="yes">8</minimum>
+          <maximum inclusive="yes">16</maximum>
+        </parameter> 
+        <parameter name="ENCODING_TYPE">
+          <type>string</type>
+          <default><item>NONE</item></default>
+          <brief>
+            Determine if data is to be encoded as JPEG2000
+          </brief>
+          <description>
+            This parameter is used to determine if the output data will
+            encoded using JPEG2000. The options are NONE or JP2.
+          </description>
+          <list>
+            <option value="NONE">
+              <brief>No encoding is performed</brief>
+              <description>No encoding is performed</description>
+            </option>
+            <option value="JP2">
+              <brief>Encode as JPEG2000</brief>
+              <description>The data is encoded as JPEG2000</description>
+            </option>
+          </list>
+        </parameter> 
+      </group>
+
+      <group name="Special Keyword">
+        <parameter name="VERSION">
+          <type>string</type>
+          <default>
+            <item>1.0</item>
+          </default>
+          <brief>
+            Value for the output PDS keyword PRODUCT_VERSION_ID
+          </brief>
+          <description>
+            This parameter allows the user to specify the value of the standard 
+            PDS keyword  PRODUCT_VERSION_ID within the output PDS label. This 
+            keyword will be located in the Root of the PDS PVL label.
+          </description>
+        </parameter>
+        <parameter name="RATIONALE_DESC">
+          <type>string</type>
+          <internalDefault>Preserve Original Rationale Description</internalDefault>
+          <brief>
+            Value for the output PDS keyword RATIONALE_DESC
+          </brief>
+          <description>
+            This parameter allows the user to specify the value of the standard 
+            PDS keyword RATIONALE_DESC within the output PDS label. This keyword
+            will be located in the Root of the PDS PVL label.
+          </description>
+        </parameter>
+      </group>
+
+  </groups>
+</application>

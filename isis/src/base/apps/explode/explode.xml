@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="explode" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Extracts each band of a cube into a separate one band file
+  </brief>
+
+  <description>
+    This program extracts each band of the input cube into a separate one band file.  Given the output base name of
+    "base", each output cube will be named base.band#.cub.  The appropiate
+    BandBin group will be created.
+  </description>
+
+  <seeAlso>
+    <applications>
+      <item>cubeit</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2003-09-02">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2004-02-24">
+      Fixed percent processed message and added leading zeros to
+      output cubes
+    </change>
+    <change name="Brendan George" date="2006-09-26">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be exploded
+        </brief>
+        <description>
+          Each band in this cube will be written as a separate cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output base cube name
+        </brief>
+        <description>
+          The base name of the output cubes.  For example, if TO=base, then each output cube will be
+          base.band#.cub
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

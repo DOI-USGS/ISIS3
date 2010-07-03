@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="fx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Generalized arithmetic operations using multiple cube files
+  </brief>
+
+  <description>
+    FX allows general arithmetic operations to be performed on an arbitrary 
+    number of input cubes.  It works by loading whatever input files are 
+    specified, if any, then applying a user defined equation to those files 
+    and then writing the results to an output cube.  For instance, if the user
+    wanted to isolate all pixels in a cube that had a DN greater than 100, 
+    then an equation like "f1 * (f1 > 100)" could be applied to the cube.
+
+    <p>
+    The equation parser is case insensitive and all braces get converted to 
+    parenthesis.  Whitespace is ignored.  Currently, you must explicitly 
+    state all multiplication operations (e.g. 5x will not work, but 5*x will).  
+    The modulus (%), AND and OR operators are not implemented yet. 
+    </p>
+
+    <p>
+    The following table shows all currently supported scalars/special tokens.
+    </p>
+    
+    <table border = "1">
+      <tr>
+        <td colspan="3" align="center" valign="middle"><b>SCALARS</b></td>
+      </tr>
+      <tr>
+        <th>Scalar</th>
+        <th>Description</th>
+        <th>Example</th>
+      </tr>
+      <tr>
+        <td>F<i>#</i></td>
+        <td>File operator</td>
+        <td>f3 denotes third file</td>
+      </tr>
+      <tr>
+        <td><i>#</i> or <i>#.#</i> or <i>.#</i></td>
+        <td>Any integer or double.</td>
+        <td>12, 3.14, .007 are all valid.</td>
+      </tr>
+      <tr>
+        <td>band</td>
+        <td>Current band number</td>
+        <td>f1 * band</td>
+      </tr>
+      <tr>
+        <td>line</td>
+        <td>Current line number</td>
+        <td>line + f1</td>
+      </tr>
+      <tr>
+        <td>sample</td>
+        <td>Current sample number</td>
+        <td>sample / line + f1</td>
+      </tr>
+      <tr>
+        <td>pi</td>
+        <td>Pi (3.14159...)</td>
+        <td>f1 > (e^pi)</td>
+      </tr>
+      <tr>
+        <td>e</td>
+        <td>Euler's number (2.71828...)</td>
+        <td>f1 == ln(e)</td>
+      </tr>
+    </table>
+
+    <p>
+      The following table shows all currently supported operators sorted 
+      by precedence (0 = highest precedence).  All examples are valid 
+      equations that assume one or two files (F1, F2) are loaded. All angles
+      are in radians, not degrees.
+    </p>  
+    
+    <table border = "1">
+      <tr>
+        <td colspan="4" align="center" valign="middle"><b>OPERATORS</b></td>
+      </tr>
+      <tr>
+        <th>Precedence</th>
+        <th>Operator</th>
+        <th>Description</th>
+        <th>Example</th>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>{ [ ( ) ] }</td>
+        <td>Parenthesis, brackets, or braces</td>
+        <td>f2*(f1+[30-{line/pi}])</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>--</td>
+        <td>Negative sign</td>
+        <td>--f1 + f2</td>
+      </tr>   
+      <tr>
+        <td>2</td>
+        <td>></td>
+        <td>Greater than</td>
+        <td>f1 > f2</td>
+      </tr>   
+      <tr>
+        <td>3</td>
+        <td>&lt;</td>
+        <td>Less than</td>
+        <td>(f1 &lt; f2) / f2</td>
+      </tr>   
+      <tr>
+        <td>4</td>
+        <td>&lt;=</td>
+        <td>Less than or equal</td>
+        <td>.505 &lt;= f1</td>
+      </tr>   
+      <tr>
+        <td>5</td>
+        <td>>=</td>
+        <td>Greater than or equal</td>
+        <td>f1 * (f1 >= 101)</td>
+      </tr>   
+      <tr>
+        <td>6</td>
+        <td>==</td>
+        <td>Equal to</td>
+        <td>f1 == (f2/2)</td>
+      </tr>   
+      <tr>
+        <td>7</td>
+        <td>!=</td>
+        <td>Not equal to</td>
+        <td>f1 != f2</td>
+      </tr>   
+      <tr>
+        <td>8</td>
+        <td>abs</td>
+        <td>Absolute value</td>
+        <td>abs(f2 - f1)</td>
+      </tr>   
+      <tr>
+        <td>9</td>
+        <td>min</td>
+        <td>Minimum of Two DNs</td>
+        <td>f1 + min(5, f2) + min(f2, f3)</td>
+      </tr>   
+      <tr>
+        <td>10</td>
+        <td>linemin</td>
+        <td>Minimum of DNs on the current line</td>
+        <td>f1 + linemin(f2)</td>
+      </tr>   
+      <tr>
+        <td>11</td>
+        <td>cubemin</td>
+        <td>Minimum of a Cube</td>
+        <td>f1 + mincube(f2)</td>
+      </tr>   
+      <tr>
+        <td>12</td>
+        <td>max</td>
+        <td>Maximum</td>
+        <td>20 * max(f1)</td>
+      </tr>   
+      <tr>
+        <td>13</td>
+        <td>linemmax</td>
+        <td>Minimum of DNs on the current line</td>
+        <td>f1 + linemax(f2)</td>
+      </tr>   
+      <tr>
+        <td>14</td>
+        <td>cubemax</td>
+        <td>Minimum of a Cube</td>
+        <td>f1 + maxcube(f2)</td>
+      </tr>   
+      <tr>
+        <td>15</td>
+        <td>sin</td>
+        <td>Sine</td>
+        <td>f1 * sin(123/321)</td>
+      </tr>   
+      <tr>
+        <td>16</td>
+        <td>cos</td>
+        <td>Cosine</td>
+        <td>cos(.02*50)</td>
+      </tr>   
+      <tr>
+        <td>17</td>
+        <td>tan</td>
+        <td>Tangent</td>
+        <td>tan(f1/f2)</td>
+      </tr>   
+      <tr>
+        <td>18</td>
+        <td>csc</td>
+        <td>Cosecant</td>
+        <td>12.3 + csc(f1)</td>
+      </tr>   
+      <tr>
+        <td>19</td>
+        <td>sec</td>
+        <td>Secant</td>
+        <td>sin(pi/60) + (sec(f2))^2</td>
+      </tr>   
+      <tr>
+        <td>20</td>
+        <td>cot</td>
+        <td>Cotangent</td>
+        <td>line + cot(f1) - 42</td>
+      </tr>   
+      <tr>
+        <td>21</td>
+        <td>asin</td>
+        <td>Arcsine</td>
+        <td>0.006 ^ asin(f1*5)</td>
+      </tr>   
+      <tr>
+        <td>22</td>
+        <td>acos</td>
+        <td>Arccosine</td>
+        <td>acos(1/[2*pi])</td>
+      </tr>   
+      <tr>
+        <td>23</td>
+        <td>atan</td>
+        <td>Arctangent</td>
+        <td>atan(f1/e)</td>
+      </tr>   
+      <tr>
+        <td>24</td>
+        <td>atan2</td>
+        <td>Arctangent2</td>
+        <td>atan2(--10  5.5)</td>
+      </tr>   
+      <tr>
+        <td>25</td>
+        <td>sinh</td>
+        <td>Hyperbolic sine</td>
+        <td>55 + sinh(f2)</td>
+      </tr>   
+      <tr>
+        <td>26</td>
+        <td>cosh</td>
+        <td>Hyperbolic cosine</td>
+        <td>cosh(sample^pi)</td>
+      </tr>   
+      <tr>
+        <td>27</td>
+        <td>tanh</td>
+        <td>Hyperbolic tangent</td>
+        <td>tanh(f1)</td>
+      </tr>   
+      <tr>
+        <td>28</td>
+        <td>log or ln</td>
+        <td>Natural log</td>
+        <td>ln(abs(1/[f2-f1]))</td>
+      </tr>   
+      <tr>
+        <td>29</td>
+        <td>log10</td>
+        <td>Log base 10</td>
+        <td>99 + log10(f1-160)</td>
+      </tr>   
+      <tr>
+        <td>30</td>
+        <td>sqrt</td>
+        <td>Square root</td>
+        <td>sqrt(abs[1000 - f2])</td>
+      </tr>   
+      <tr>
+        <td>31</td>
+        <td>&lt;&lt;</td>
+        <td>Left shift.  <i>Note:</i> pixel shift, not bitwise</td>
+        <td>f1 &lt;&lt; 250</td>
+      </tr>   
+      <tr>
+        <td>32</td>
+        <td>>></td>
+        <td>Right shift.  <i>Note:</i> pixel shift, not bitwise</td>
+        <td>f2 + (f1 >> 500)</td>
+      </tr>   
+      <tr>
+        <td>33</td>
+        <td>^</td>
+        <td>Exponent</td>
+        <td>f1 ^ 3</td>
+      </tr>   
+      <tr>
+        <td>34</td>
+        <td>*</td>
+        <td>Multiplication</td>
+        <td>10 * f1</td>
+      </tr>   
+      <tr>
+        <td>35</td>
+        <td>/</td>
+        <td>Division</td>
+        <td>f2 / f1</td>
+      </tr>   
+      <tr>
+        <td>36</td>
+        <td>+</td>
+        <td>Addition</td>
+        <td>123 + 0.004 + f1</td>
+      </tr>   
+      <tr>
+        <td>37</td>
+        <td>-</td>
+        <td>Subtraction</td>
+        <td>10 - (--f1)</td>
+      </tr>   
+    </table>  
+    
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>algebra</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Kris Becker" date="1997-04-24">
+      Original version
+    </change>
+    <change name="Sean Crosby" date="2007-02-14">
+      Converted to Isis 3
+    </change>
+    <change name="Steven Lambright" date="2007-06-18">
+      Added single line and sample functionality
+    </change>
+    <change name="Steven Lambright" date="2008-04-16">
+      Upgraded to work with new Calculator classes
+    </change>
+    <change name="Steven Lambright" date="2008-12-17">
+      Renamed parameter FILELIST to FROMLIST
+    </change>
+    <change name="Steven Lambright" date="2009-04-17">
+      Updated documentation to reflect the units of the trig functions.
+    </change>
+    <change name="Steven Lambright" date="2010-04-08">
+      Min, max capabilities have been expanded to include line and cube
+        min/max.
+    </change>
+  </history>
+
+  <groups>     
+    <group name = "Input cube files">
+      <parameter name = "F1">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Input file</brief>
+        <description>
+          Input cube file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name = "F2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>Input file</brief>
+        <description>
+          Input cube file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name = "F3">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>Input file</brief>
+        <description>
+          Input cube file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name = "F4">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>Input file</brief>
+        <description>
+          Input cube file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name = "F5">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>Input file</brief>
+        <description>
+          Input cube file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Output file and Equation">
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the data after it has processed by the equation.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    
+      <parameter name = "EQUATION">
+        <type>string</type>
+        <brief>Image processing equation</brief>
+        <description>
+          This equation will be parsed and used to perform the specified calculations.
+        </description>
+      </parameter>
+    </group>
+
+    <group name = "File I/O Mode">
+      <parameter name = "MODE">
+        <type>string</type>
+        <default><item>CUBES</item></default>
+        <brief>File I/O options</brief>
+        <description>
+          There is a choice to simply specify input cubes directly, use a list of input cubes in a text file, or to create output data only.
+        </description>
+        <list>
+          <option value = "CUBES">
+            <brief>Select input cubes directly</brief>
+            <description>
+              Select up to five input cubes manually.
+            </description>
+            <exclusions>
+              <item>FROMLIST</item>
+              <item>LINES</item>
+              <item>SAMPLES</item>
+              <item>BANDS</item>
+            </exclusions>
+          </option>
+          
+          <option value = "LIST">
+            <brief>Specify a list of input files</brief>
+            <description>
+              This file contains a list of all the cube files to be processed
+            </description>
+            <exclusions>
+              <item>F1</item>
+              <item>F2</item>
+              <item>F3</item>
+              <item>F4</item>
+              <item>F5</item>
+              <item>LINES</item>
+              <item>SAMPLES</item>
+              <item>BANDS</item>
+            </exclusions>
+          </option>
+        
+          <option value = "OUTPUTONLY">
+            <brief>Write output only</brief>
+            <description>
+              Do not use any input cubes and generate output from an equation 
+            </description>
+            <exclusions>
+              <item>F1</item>
+              <item>F2</item>
+              <item>F3</item>
+              <item>F4</item>
+              <item>F5</item>
+              <item>FROMLIST</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name = "File list">
+      <parameter name = "FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input list file 
+        </brief>
+        <description>
+          This file contains a list of all the cube files to be processed
+        </description>
+        <filter>
+          *.txt
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Output only">
+      <parameter name = "LINES">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Number of lines</brief>
+        <description>
+          This is the number of the lines the output cube will have
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+      </parameter>
+
+      <parameter name = "SAMPLES">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Number of samples</brief>
+        <description>
+          This is the number of the samples the output cube will have
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+      </parameter>
+
+      <parameter name = "BANDS">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Number of bands</brief>
+        <description>
+          This is the number of the bands the output cube will have
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+      </parameter>
+    </group>
+
+    
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Add two images</brief>
+      <description>
+        In this example, two images will be added to each other
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          f1=../isisTruth.cub+1 f2=../isisTruth.cub+2 to=../result.cub equation=f1+f2
+        </commandLine>
+        <description>
+          Add Band 1 and Band 2 using default settings
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/band1.jpg" width="500" height="500">
+          <brief>Band 1</brief>
+          <description>This is an input image for the FX example.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/band1.jpg" width="200" height="200"/>
+          <parameterName>F1</parameterName>
+        </image>
+        
+        <image src="assets/image/band2.jpg" width="500" height="500">
+          <brief>Band 2</brief>
+          <description>This is an input image for the FX example.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/band2.jpg" width="200" height="200"/>
+          <parameterName>F2</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/sum.jpg" width="500" height="500">
+          <brief> Output image</brief>
+          <description> This is the 500 by 500 output image of the results.
+          </description>
+          <thumbnail caption="Output image showing results of the FX application." src="assets/thumb/sum.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="500" height="500" src="assets/image/fxgui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a calculation on the input image. </description>
+            <thumbnail width="200" height="240" caption="FX Gui" src="assets/thumb/fxgui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<application name="hist" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Unit test for History class
+  </brief>
+
+  <description>
+    Just a test only a test
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2005-03-28">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>unitTest.cub</item></default>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/isisprocess_01.cub</item></default>
+      </parameter>
+      <parameter name="TO2">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/isisprocess_02.cub</item></default>
+      </parameter>
+      <parameter name="TO3">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/isisprocess_03.cub</item></default>
+      </parameter>
+      <parameter name="TO4">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/isisprocess_04.cub</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

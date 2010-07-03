@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="editlab" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>Modifies cube labels</brief>
+
+  <description>
+    This program will allow the user to modify cube file labels.  Modifications include adding, deleting or modifying
+    keywords in a group, adding and deleting entire groups, and adding template files.  Adding a
+    group will add a new, empty group to the label, and you will have to rerun the program to add any keywords
+    you want in the group individually.  A way around this is creating a template file of groups and keywords you
+    would like to add and then adding the template file to the label.  When a group is deleted, all the keywords
+    inside the group are deleted also.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>catlab</item>
+    </applications>
+  </seeAlso>
+
+  <oldName>
+      <item>labels</item>
+  </oldName>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-01-13">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2005-10-27">
+        Fixed appTest
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-08">
+      Fixed xml issues
+    </change>
+    <change name="Brendan George" date="2006-09-26">
+        Documentation fixes
+    </change>
+    <change name="Christopher Austin" date="2008-04-18">
+       Added Comment allocation and fixed documentation.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Cube file containing the label to be modified
+        </brief>
+        <description>
+          The cube file containing the label to be modified.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Modification Options">
+        <parameter name="OPTIONS">
+           <type>string</type>
+           <brief>Options for modifying label</brief>
+           <description>
+               A list of the different types of modifications allowed on the label.
+           </description>
+           <default><item>ADDKEY</item></default>
+            <list>
+               <option value="DELG">
+                    <brief>Delete Group</brief>
+                    <description>
+                        Deletes specified group from the file label.
+                    </description>
+                    <inclusions>
+                      <item>GRPNAME</item>
+                    </inclusions>
+                    <exclusions>
+                        <item>KEYWORD</item>
+                        <item>VALUE</item>
+                        <item>UNITS</item>
+                        <item>TEMPFILE</item>
+                        <item>COMMENT</item>
+                    </exclusions>
+               </option>
+               <option value="ADDG">
+                   <brief>Add Group</brief>
+                   <description>
+                       Adds a group to the file label.
+                   </description>
+                   <inclusions>
+                     <item>GRPNAME</item>
+                   </inclusions>
+                   <exclusions>
+                       <item>KEYWORD</item>
+                       <item>VALUE</item>
+                       <item>UNITS</item>
+                       <item>TEMPFILE</item>
+                   </exclusions>
+               </option>
+               <option value="DELKEY">
+                    <brief>Delete Keyword</brief>
+                    <description>
+                        Deletes specified keyword from the specified group on the file label.
+                    </description>
+                    <inclusions>
+                      <item>GRPNAME</item>
+                      <item>KEYWORD</item>
+                    </inclusions>
+                    <exclusions>
+                        <item>VALUE</item>
+                        <item>UNITS</item>
+                        <item>TEMPFILE</item>
+                        <item>COMMENT</item>
+                    </exclusions>
+               </option>
+               <option value="MODKEY">
+                   <brief>Modify Keyword</brief>
+                   <description>
+                       Modifies existing keyword in specified group on the file label.
+                   </description>
+                   <inclusions>
+                     <item>GRPNAME</item>
+                     <item>KEYWORD</item>
+                     <item>VALUE</item>
+                   </inclusions>
+                   <exclusions>
+                       <item>TEMPFILE</item>
+                   </exclusions>
+               </option>
+                <option value="ADDKEY">
+                    <brief>Add Keyword</brief>
+                    <description>
+                        Adds a keyword to the specified group in the file label.
+                    </description>
+                    <inclusions>
+                      <item>GRPNAME</item>
+                      <item>KEYWORD</item>
+                      <item>VALUE</item>
+                    </inclusions>
+                <exclusions>
+                    <item>TEMPFILE</item>
+                </exclusions>
+                </option>
+                <option value="ADDTEMP">
+                    <brief>Add Template File</brief>
+                    <description>
+                        Adds a template file to the file label.
+                    </description>
+                    <inclusions>
+                      <item>TEMPFILE</item>
+                    </inclusions>
+                    <exclusions>
+                        <item>GRPNAME</item>
+                        <item>KEYWORD</item>
+                        <item>VALUE</item>
+                        <item>UNITS</item>
+                        <item>COMMENT</item>
+                    </exclusions>
+                </option>
+            </list>
+        </parameter>
+    </group>
+    <group name="Input Values">
+        <parameter name="GRPNAME">
+            <type>string</type>
+            <brief>Group to modify</brief>
+            <description>
+                Group that is being added, deleted, or modified.
+            </description>
+        </parameter>
+        <parameter name="KEYWORD">
+            <type>string</type>
+            <brief>Keyword to modify</brief>
+            <description>
+                Keyword that is being added, deleted, or modified.
+            </description>
+        </parameter>
+        <parameter name="VALUE">
+            <type>string</type>
+            <brief>Value of Keyword being modified</brief>
+            <description>
+                The value of the Keyword being added or modified.
+            </description>
+        </parameter>
+        <parameter name="UNITS">
+            <type>string</type>
+            <internalDefault>none</internalDefault>
+            <brief>Units of Keyword being modified</brief>
+            <description>
+                The units associated with the Keyword being added or modified.
+            </description>
+        </parameter>
+        <parameter name="TEMPFILE">
+            <type>filename</type>
+            <fileMode>input</fileMode>
+            <brief>Template file being added to label</brief>
+            <description>
+                Adds the PvlGroups defined within the template file to the 
+                cube's labels.
+            </description>
+        </parameter>
+        <parameter name="COMMENT">
+            <type>string</type>
+            <internalDefault>none</internalDefault>
+            <brief>Comment to be added to the change</brief>
+            <description>
+              When adding or modifying a PvlGroup or PvlKeyword, then this comment 
+              is added to that altered PvlGroup or PvlKeyword.
+            </description>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Adding a group </brief>
+      <description>
+        This example uses the editlab application to add a new group to a previously blank label.  The new
+        group created will be empty.
+        </description>
+        <terminalInterface>
+            <commandLine> from=new.cub option=addg grpname=NewGroup
+            </commandLine>
+            <description>
+                Run the editlab application to add a group to a label
+            </description>
+        </terminalInterface>
+          <dataFiles>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+                        <pre></pre>
+        <u>Starting Label</u>
+        <pre>
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+End_Object
+End
+        </pre>
+                </description>
+            </dataFile>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+        <u>Label after the command line is ran</u>
+        <pre>
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = NewGroup
+  End_Group
+End_Object
+End
+      </pre>
+               </description>
+            </dataFile>
+        </dataFiles>
+    </example>
+    <example>
+        <brief>Adding a keyword</brief>
+        <description>
+            This example uses the editlab application to add a keyword to the empty group created in the last example.
+        </description>
+        <terminalInterface>
+            <commandLine> from=new.cub option=addkey grpname=NewGroup keyword=Keyword value=new
+            </commandLine>
+            <description>
+                Run the editlab application to add a keyword to an existing group
+            </description>
+        </terminalInterface>
+        <dataFiles>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+        <pre>
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = NewGroup
+    Keyword = new
+  End_Group
+End_Object
+End
+        </pre>
+                </description>
+            </dataFile>
+        </dataFiles>
+    </example>
+    <example>
+        <brief>Modifying a keyword</brief>
+        <description>
+            This example uses the editlab application to modify the keyword created in the previous example to change its value.
+        </description>
+        <terminalInterface>
+            <commandLine> from=new.cub option=modkey grpname=NewGroup keyword=Keyword value=old
+            </commandLine>
+            <description>
+                Run the editlab application to modify a preexisting keyword
+            </description>
+        </terminalInterface>
+        <dataFiles>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+        <pre>
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = NewGroup
+    Keyword = old
+  End_Group
+End_Object
+End
+        </pre>
+                </description>
+            </dataFile>
+        </dataFiles>
+    </example>
+    <example>
+        <brief>Adding a template file</brief>
+        <description>
+            This example uses the editlab application to add more than one group (containing keywords) at a time
+            by using a template file containing only groups and keywords to the label.
+        </description>
+        <terminalInterface>
+            <commandLine> from=new.cub option=addtemp tempfile=template1.txt
+            </commandLine>
+            <description>
+                Run the editlab application to add a template file to the label
+            </description>
+        </terminalInterface>
+        <dataFiles>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+        <pre>
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = NewGroup
+    Keyword = old
+  End_Group
+
+  Group = test
+    Key = insertme
+  End_Group
+
+  Group = TwoKeys
+    Key1 = (1, 2, 3)
+    Key2 = "a b c"
+  End_Group
+End_Object
+End
+        </pre>
+                </description>
+            </dataFile>
+        </dataFiles>
+    </example>
+    <example>
+        <brief>Deleting a keyword</brief>
+        <description>
+            This example uses the editlab application to erase a keyword added by the template file in example 4.
+        </description>
+        <terminalInterface>
+            <commandLine> from=new.cub option=delkey grpname=TwoKeys keyword=Key1
+            </commandLine>
+            <description>
+                Run the editlab application to delete a keyword
+          </description>
+        </terminalInterface>
+        <dataFiles>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+        <pre>
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = NewGroup
+    Keyword = old
+  End_Group
+
+  Group = test
+    Key = insertme
+  End_Group
+
+  Group = TwoKeys
+    Key2 = "a b c"
+  End_Group
+End_Object
+End
+        </pre>
+                </description>
+            </dataFile>
+        </dataFiles>
+    </example>
+    <example>
+        <brief>Deleting a group</brief>
+        <description>
+            This example uses the editlab application to delete a group from a label.  Deleting a group will also
+            delete any keywords inside of the group.
+        </description>
+        <terminalInterface>
+            <commandLine> from=new.cub option=delg grpname=TwoKeys
+            </commandLine>
+            <description>
+                Run the editlab application to delete a group
+            </description>
+        </terminalInterface>
+        <dataFiles>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+                    <u>template1.txt</u>
+        <pre>
+Group = test
+  Key = insertme
+End_Group
+
+Group = TwoKeys
+  Key1 = ( 1, 2, 3)
+  Key2 = "a b c"
+End_Group
+        </pre>
+                </description>
+            </dataFile>
+            <dataFile path="">
+                <brief></brief>
+                <description>
+            <u>Label</u>
+        <pre>
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = IsisCube
+  Object = Core
+    /* Location of the core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 7
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = LSB
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = NewGroup
+    Keyword = old
+  End_Group
+
+  Group = test
+    Key = insertme
+  End_Group
+End_Object
+End
+        </pre>
+                </description>
+            </dataFile>
+        </dataFiles>
+    </example>
+  </examples>
+
+</application>

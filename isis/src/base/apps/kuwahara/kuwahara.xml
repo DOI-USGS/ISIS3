@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="kuwahara" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+  <brief>
+    Filter a cube, smoothing but preserving edges
+  </brief>
+  <description> 
+    Kuwahara is a edge preserving smoothing filter. This is accomplished through 
+    examining the four quadrants surrounding a pixel, selecting the one with the 
+    smallest variance, and using its average as the resultant pixel value. In 
+    the case where two or more variances are equivalent, the average from the 
+    first quadrant encountered with an equivalent variance will be used.
+  </description>
+  <history>
+    <change name="Mackenzie Boyd" date="2009-05-19">
+      Original version 
+    </change>
+    <change name="Mackenzie Boyd" date="2009-05-20">
+      Added examples, test
+    </change>
+    <change name="Mackenzie Boyd" date="2009-06-04">
+      Fixed images in documentation
+    </change>
+    <change name="Mackenzie Boyd" date="2009-06-09">
+      Made ostruthdata for samson only to handle problem with rounding errors
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be smoothed
+        </brief>
+        <description>
+          Use this parameter to select the input cube. All bands within the file
+          will be filtered.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the filter.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Boxcar size">
+      <parameter name="SAMPLES">
+        <type>integer</type>    
+        <default><item>5</item></default>
+        <brief>
+          The number of samples, width, of the boxcar    
+        </brief>  
+        <description>
+          This parameter sets the width, or number of samples, to have the 
+          filter process. This must be an odd number. The larger this is the 
+          larger the details that will be smoothed. A wide and short filter will 
+          do mostly horizantal smoothing, a tall and narrow filter mostly 
+          vertical.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+      
+      <parameter name="LINES">
+        <type>integer</type>    
+        <default><item>5</item></default>
+        <brief>
+          The size of the filter boxcar    
+        </brief>  
+        <description>
+          This parameter sets the number of lines to be processed by the filter. 
+          This must be an odd number. Larger sizes will smooth larger features. 
+          A wide and short filter will do mostly horizantal smoothing, a tall
+          and narrow filter mostly vertical.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>   
+    </group>
+  </groups>
+  
+  <examples>
+    <example>
+      <brief>
+        Example of usage of the kuwahara filter to smooth and perserve edges.
+      </brief>
+      <description>
+        Kuwahara filter is put to use here, smoothing while preserving edges. Here 
+        is a image which shows the exact quadrants used in a 5x5.  Each quadrant is 
+        then a 3x3 with some overlap on the next.
+        <pre>
+          <image width="320" height="232" src="assets/images/kuwaharaDiagram.gif"/>
+        </pre>
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=peaks.cub to=smooth.cub samples=5 lines=5
+        </commandLine>
+        <description>
+          This example will filter the image using a 5x5 boxcar with subunit 
+          size of 3x3. The size in this case is unnecessray since 5 is default, 
+          but for other sizes a different, odd numbed, could be placed there.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="319" height="409" src="assets/images/kuwaGUI.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to perform the kuwahara
+              filter with a 5x5 boxcar on the image peaks.cub.
+            </description>
+            <thumbnail width="156" height="200" caption="kuwahara gui" 
+            src="assets/thumbs/kuwaGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+          <brief>
+            Input image before kuwahara filter
+          </brief>
+          <description>
+            This is the image as it was taken originally. 
+          </description>
+          <thumbnail caption= "The image before the filter" 
+            src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="500" height="500" src="assets/images/kuwa.jpg">
+          <brief>
+            Output image after being smoother by kuwahara filter.
+          </brief>
+          <description>
+            As you can observe, the image has been smoothed, but still retains
+            the edges present in the original image.
+          </description>
+          <thumbnail caption= "The image after the filter" 
+            src="assets/thumbs/kuwa.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+    </example>
+  </examples>
+</application>

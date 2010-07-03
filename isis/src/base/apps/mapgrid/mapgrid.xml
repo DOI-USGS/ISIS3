@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mapgrid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Draws a grid of Latitude/Longitude lines for a projection
+  </brief>
+
+  <description>
+    This program will draw a grid of latitude and longitude lines for a 
+    projected mapping.   The mapfile should contain all necessary 
+    keywords and values to create the specific projection.  If you are unsure
+    of what keywords are necessary, a template file can be created
+    for the projection using the maptemplate application.  The output
+    is a GML file that can be plotted using qgis.
+  </description>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+  </category>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-09-06">
+      Original version
+    </change>
+    <change name="Brendan George" date="2005-11-01">
+      Fixed application test for all systems
+    </change>
+    <change name="Elizabeth Miler" date="2005-11-03">
+      Fixed bug in xml and made appTest test larger lat/lon increments and spacings to reduce the size of truth files
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-29">
+      Modified mapgrid so the boundary lat lines will always be drawn
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-18">
+      Depricated CubeProjection and ProjectionManager to ProjectionFactory
+    </change>
+    <change name="Steven Lambright" date="2007-06-21">
+      Changed output to be in GML format, fixed bug with bounded option
+    </change>  
+    <change name="Steven Lambright" date="2007-07-17">
+      Fixed bug with include files.
+    </change>
+    <change name="Travis Addair" date="2009-08-10">
+      Mapping group parameters are now placed into the print file.
+    </change>
+   </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="MAPFILE">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+              Map File
+          </brief>
+          <description>
+              This file contains the mapping projection information necessary to 
+              make the grid. This can be a text file or a cube.
+          </description>
+          <filter>
+              *.txt *.cub
+          </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Grid Output
+        </brief>
+        <description>
+          The resultant grid.  The output is a GML file that can be plotted using qgis.
+        </description>
+        <filter>
+          *.gml
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+        <parameter name="STARTLAT">
+            <type>double</type>
+            <brief>
+                Starting Latitude
+            </brief>
+            <description>
+                This is the starting value for the latitude lines in the grid.
+            </description>
+        </parameter>
+
+        <parameter name="STARTLON">
+            <type>double</type>
+            <brief>
+                Starting Longitude
+            </brief>
+            <description>
+                This is the starting value for the longitude lines in the grid.
+            </description>
+        </parameter>
+
+        <parameter name="ENDLAT">
+            <type>double</type>
+            <brief>
+                Ending Latitude
+            </brief>
+            <description>
+                This is the ending value for the latitude lines in the grid.
+            </description>
+        </parameter>
+
+        <parameter name="ENDLON">
+            <type>double</type>
+            <brief>
+                Ending Longitude
+            </brief>
+            <description>
+                This is the ending value for the longitude lines in the grid.
+            </description>
+        </parameter>
+
+        <parameter name="LATSPACING">
+            <type>double</type>
+            <brief>
+                Value for Spacing the Latitude Lines
+            </brief>
+            <description>
+                This value will determine how far apart the latitude
+                lines are spaced.
+            </description>
+            <default><item>10.0</item></default>
+        </parameter>
+
+        <parameter name="LONSPACING">
+            <type>double</type>
+            <brief>
+                Value for Spacing the Longitude Lines
+            </brief>
+            <description>
+                This value will determine how far apart the longitude
+                lines are spaced.
+            </description>
+            <default><item>10.0</item></default>
+        </parameter>
+
+        <parameter name="LATINCREMENT">
+            <type>double</type>
+            <brief>
+                Incrementing value for the Latitude Lines
+            </brief>
+            <description>
+                This value will determine how smooth the latitude lines are drawn.
+                A large value here will create a more rough, jagged line, while a very
+                small value will create a more smooth, curved line.
+            </description>
+            <default><item>0.01</item></default>
+        </parameter>
+
+        <parameter name="LONINCREMENT">
+            <type>double</type>
+            <brief>
+                Incrementing value for the Longitude lines
+            </brief>
+            <description>
+                This value will determine how smooth the longitude lines are drawn.
+                 A large value here will create a more rough, jagged line, while a very 
+                 small value will create a more smooth, curved line.
+            </description>
+            <default><item>0.01</item></default>
+        </parameter>
+
+        <parameter name="BOUNDED">
+            <type>boolean</type>
+            <brief>
+               Draw Boundary Lines on Grid
+            </brief>
+            <description>
+                If this option is selected, boundry lines will be drawn
+                around the projection grid.  If the option is not selected, 
+                no boundry lines will be drawn.
+            </description>
+            <default><item>TRUE</item></default>
+        </parameter>
+
+    </group>
+  </groups>
+
+    <examples>
+    <example>
+      <brief> Sinusoidal Map Grid </brief>
+      <description>
+        This example shows the qgis display of a sinusoidal projection created by this application.  
+        The following mapfile was used in the mapgrid application to create the grid.
+        <pre>
+Group = Mapping
+  ProjectionName     = Sinusoidal
+  TargetName         = MARS
+  EquatorialRadius   = 3396190.0 &lt;meters&gt;
+  PolarRadius        = 3376200.0 &lt;meters&gt;
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 360
+  CenterLongitude    = 180.0
+End_Group
+End
+         </pre>
+      </description>
+      <terminalInterface>
+        <commandLine> mapfile=mapFile1.txt startlat=-90 endlat=90 startlon=0 endlon=360 to=sinuGrid.txt
+        </commandLine>
+        <description>
+        Create a sinusoidal projection map grid.
+        </description>
+      </terminalInterface>
+
+      <outputImages>
+        <image src="assets/image/sinusoidalGrid.JPG" width="800" height="600">
+          <brief> Output image as it appears in qgis for mapgrid</brief>
+          <description> 
+              This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing the results of the mapgrid application." src="assets/thumb/sinusoidalGrid.JPG" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief> Lambert Confromal Map Grid </brief>
+      <description>
+        This example shows the qgis display of a lambert conformal projection created by this application.  
+        The following mapfile was used in the this application to create the grid.
+        <pre>
+Group = Mapping
+  ProjectionName         = LambertConformal
+  TargetName             = MARS
+  EquatorialRadius       = 3396190.0 &lt;meters&gt;
+  PolarRadius            = 3376200.0 &lt;meters&gt;
+  LatitudeType           = Planetocentric
+  LongitudeDirection     = PositiveEast
+  LongitudeDomain        = 360
+  CenterLongitude        = 20.0
+  CenterLatitude         = 40.0
+  FirstStandardParallel  = 32.0
+  SecondStandardParallel = 43.0
+End_Group
+End
+         </pre>
+      </description>
+      <terminalInterface>
+        <commandLine> mapfile=mapFile2.txt startlat=20 endlat=60 startlon=0 endlon=40 to=lambGrid.txt
+        </commandLine>
+        <description>
+        Create a lambert conformal projection map grid.
+        </description>
+      </terminalInterface>
+
+      <outputImages>
+        <image src="assets/image/lambertGrid.JPG" width="700" height="700">
+          <brief>Output image as it appears in qgis</brief>
+          <description> 
+              This is the output image that results
+          </description>
+          <thumbnail caption="Output image showing the results of the mapgrid application." src="assets/thumb/lambertGrid.JPG" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

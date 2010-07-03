@@ -1,0 +1,169 @@
+CCSD3ZF0000100000001NJPL3IF0PDS200000001 = SFDU_LABEL                         
+                                                                              
+/* File Format and Length */                                                  
+RECORD_TYPE = FIXED_LENGTH                                                    
+RECORD_BYTES = 1000                                                           
+FILE_RECORDS = 813                                                            
+                                                                              
+/* Pointers to Data Objects */                                                
+^IMAGE_HEADER = ("0826R.IMG",1)                                               
+^TELEMETRY_TABLE = ("0826R.IMG",3)                                            
+^BAD_DATA_VALUES_HEADER = ("0826R.IMG",5)                                     
+^IMAGE = ("0826R.IMG",14)                                                     
+^LINE_PREFIX_TABLE = ("0826R.IMG",14)                                         
+                                                                              
+/* Description/Catalog Keywords */                                            
+DATA_SET_ID = "GO-J/JSA-SSI-2-REDR-V1.0"                                      
+SPACECRAFT_NAME = "GALILEO ORBITER"                                           
+INSTRUMENT_NAME = "SOLID STATE IMAGING SYSTEM"                                
+                                                                              
+/* Time tags and observation descriptors */                                   
+SPACECRAFT_CLOCK_CNT_PARTITION = 1                                            
+SPACECRAFT_CLOCK_START_COUNT = "03836008.26"                                  
+IMAGE_TIME = 1997-02-19T21:07:27.314Z                                         
+IMAGE_ID = E6I0032                                                            
+ORBIT_NUMBER = 6                                                              
+OBSERVATION_ID = "E6ISSRFMON01"                                               
+TARGET_NAME = "IO"                                                            
+NTV_TIME_FROM_CLOSEST_APPROACH = "-000T23:47:33Z"                             
+NTV_SAT_TIME_FROM_CLOSEST_APRH = "-000T14:56:32Z"                             
+NOTE = "NOT APPLICABLE"                                                       
+                                                                              
+/* Camera and spacecraft state parameters */                                  
+FILTER_NAME = "VIOLET"                                                        
+FILTER_NUMBER = 3                                                             
+EXPOSURE_DURATION =   195.83                                                  
+GAIN_MODE_ID = "100K"                                                         
+FRAME_DURATION =    8.667                                                     
+LIGHT_FLOOD_STATE_FLAG = "ON"                                                 
+EXPOSURE_TYPE = "NORMAL"                                                      
+BLEMISH_PROTECTION_FLAG = "OFF"                                               
+INVERTED_CLOCK_STATE_FLAG = "NOT INVERTED"                                    
+ON_CHIP_MOSAIC_FLAG = "Y"                                                     
+COMPRESSION_TYPE = "INTEGER COSINE TRANSFORM"                                 
+ENTROPY =    2.879                                                            
+TELEMETRY_FORMAT_ID = "IM8"                                                   
+OBSTRUCTION_ID = "NOT POSSIBLE"                                               
+INSTRUMENT_MODE_ID = "N/A"                                                    
+                                                                              
+/* Viewing Geometry */                                                        
+/* Note: These viewing geometry parameters are best estimates */              
+/* at the time this picture label was generated. */                           
+POSITIVE_LONGITUDE_DIRECTION = WEST                                           
+                                                                              
+/* Spacecraft Geometry */                                                     
+TARGET_CENTER_DISTANCE = 1.073668e+06                                         
+CENTRAL_BODY_DISTANCE = 1.181189e+06                                          
+SUB_SPACECRAFT_LATITUDE =   -0.352                                            
+SUB_SPACECRAFT_LONGITUDE =   94.985                                           
+SUB_SPACECRAFT_LINE =  208.036                                                
+SUB_SPACECRAFT_LINE_SAMPLE =  618.951                                         
+SUB_SPACECRAFT_AZIMUTH =  138.758                                             
+                                                                              
+/* Camera and Lighting Geometry                        */                     
+/* Resolution of HORIZONTAL_PIXEL_SCALE,               */                     
+/* VERTICAL_PIXEL_SCALE, and SLANT_DISTANCE            */                     
+/* is calculated from the light source values in       */                     
+/* INTERCEPT_POINT_LATITUDE, INTERCEPT_POINT_LONGITUDE,*/                     
+/* INTERCEPT_POINT_LINE and INTERCEPT_POINT_LINE_SAMPLE keywords  */          
+/* If the target is a Ring keyword RING_RADIUS         */                     
+/* is substituted for INTERCEPT_POINT_LATITUDE         */                     
+/* If the TARGET_NAME = J RINGS, viewing geometry was */                      
+/* calculated using Jupiter as the target. */                                 
+TWIST_ANGLE =   91.629                                                        
+CONE_ANGLE =  143.115                                                         
+RIGHT_ASCENSION =  271.728                                                    
+DECLINATION =  -25.015                                                        
+NORTH_AZIMUTH =   89.938                                                      
+SMEAR_AZIMUTH = "UNK"                                                         
+SMEAR_MAGNITUDE = "UNK"                                                       
+HORIZONTAL_PIXEL_SCALE = 1.088200e+04                                         
+VERTICAL_PIXEL_SCALE = 1.088240e+04                                           
+SLANT_DISTANCE = 1.071840e+06                                                 
+SOLAR_DISTANCE = 7.660860e+08                                                 
+SUB_SOLAR_LATITUDE =   -0.830                                                 
+SUB_SOLAR_LONGITUDE =   64.399                                                
+SUB_SOLAR_AZIMUTH =  180.964                                                  
+INCIDENCE_ANGLE =   30.588                                                    
+EMISSION_ANGLE =    0.006                                                     
+PHASE_ANGLE =   30.588                                                        
+LOCAL_HOUR_ANGLE =  149.414                                                   
+INTERCEPT_POINT_LATITUDE =   -0.352                                           
+INTERCEPT_POINT_LONGITUDE =   94.985                                          
+INTERCEPT_POINT_LINE = 208.0                                                  
+INTERCEPT_POINT_LINE_SAMPLE = 619.0                                           
+                                                                              
+/* Target radii */                                                            
+A_AXIS_RADIUS = 1.830000e+03                                                  
+B_AXIS_RADIUS = 1.818700e+03                                                  
+C_AXIS_RADIUS = 1.815300e+03                                                  
+                                                                              
+/* Processing parameters */                                                   
+MEAN_RADIANCE = "N/A"                                                         
+MEAN_REFLECTANCE = "N/A"                                                      
+REFLECTANCE_SCALING_FACTOR = "N/A"                                            
+RADIANCE_SCALING_FACTOR = "N/A"                                               
+UNEVEN_BIT_WEIGHT_CORR_FLAG = "N/A"                                           
+DARK_CURRENT_FILE_NAME = "N/A"                                                
+SLOPE_FILE_NAME = "N/A"                                                       
+BLEMISH_FILE_NAME = "N/A"                                                     
+SHUTTER_OFFSET_FILE_NAME = "N/A"                                              
+DATA_TYPE = LSB_UNSIGNED_INTEGER                                              
+SOURCE_PRODUCT_ID = {"S980127A.BSP","S980127A.BSP","N/A","CKE06APE.PLT","NULL"
+}                                                                             
+PROCESSING_HISTORY_TEXT = "VICAR programs run: SSIMERGE,UNMOSAIC,CATLABEL,BADL
+ABELS."                                                                       
+PRODUCT_TYPE = "REDR"                                                         
+                                                                              
+                                                                              
+/* ICT or Lossless compression */                                             
+ENCODING_COMPRESSION_RATIO =    8.870                                         
+ENCODING_MIN_COMPRESSION_RATIO =    5.748                                     
+ENCODING_MAX_COMPRESSION_RATIO =   72.831                                     
+HUFFMAN_TABLE_TYPE = "SKEWED"                                                 
+ICT_DESPIKE_THRESHOLD = 30                                                    
+CUT_OUT_WINDOW = {1,389,400,410}                                              
+TRUTH_WINDOW = {801,801,96,96}                                                
+PRODUCT_VERSION_ID = 0                                                        
+ICT_QUANTIZATION_STEP_SIZE = 5                                                
+ICT_ZIGZAG_PATTERN = "ZIGZAG"                                                 
+CMPRS_QUANTZ_TBL_ID = "UNIFORM"                                               
+                                                                              
+/* VICAR IMAGE HEADER Object */                                               
+OBJECT = IMAGE_HEADER                                                         
+INTERCHANGE_FORMAT = BINARY                                                   
+HEADER_TYPE = VICAR2                                                          
+BYTES = 2000                                                                  
+RECORDS = 2                                                                   
+^DESCRIPTION = "VICAR2.TXT"                                                   
+END_OBJECT                                                                    
+                                                                              
+/* Table Object (for telemetry table) */                                      
+OBJECT = TELEMETRY_TABLE                                                      
+INTERCHANGE_FORMAT = BINARY                                                   
+ROWS = 1                                                                      
+COLUMNS = 86                                                                  
+ROW_BYTES = 1800                                                              
+^STRUCTURE = "RTLMTAB.FMT"                                                    
+END_OBJECT                                                                    
+                                                                              
+/* Bad Data Value Header Object */                                            
+OBJECT = BAD_DATA_VALUES_HEADER                                               
+HEADER_TYPE = BDV                                                             
+INTERCHANGE_FORMAT = BINARY                                                   
+BYTES = 9000                                                                  
+RECORDS = 9                                                                   
+^DESCRIPTION = "BADDATA.TXT"                                                  
+END_OBJECT                                                                    
+                                                                              
+/* Image Object */                                                            
+OBJECT = IMAGE                                                                
+LINES = 800                                                                   
+LINE_SAMPLES = 800                                                            
+SAMPLE_BITS = 8                                                               
+SAMPLE_TYPE = UNSIGNED_INTEGER                                                
+INVALID_CONSTANT = "N/A"                                                      
+LINE_PREFIX_BYTES = 200                                                       
+^LINE_PREFIX_STRUCTURE = "RLINEPRX.FMT"                                       
+END_OBJECT                                                                    
+END                                                                           

@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="mocproc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Processes a MOC image through Levels 0, 1, and/or 2
+  </brief>
+
+  <description>
+    <p>
+    Runs Mars Global Surveyer, Mars Obital Camera (MGS/MOC) images through the
+    applications necessary to create a map projected product. There are three
+    stages of processing, ingestion, calibration, and mapping. Each stage can
+    be disabled and runs all the programs necessary to complete that stage if
+    not disabled.
+    </p>
+    <p>
+    All intermediate files will be generated in the users Isis temporary
+    directory and deleted after they are no longer needed. In case of a catastrophic
+    failure the intermediate files should be deleted.
+    </p>
+  </description>
+
+  <history>
+    <change name="Eric Eliason" date="2001-01-01">
+      Original version
+    </change>
+    <change name="Stuart Sides" date="2004-01-16">
+      Converted from Perl to C++ for conversion to Isis 3.0
+    </change>
+    <change name="Jeff Anderson" date="2004-02-27">
+      Added extra error messages
+    </change>
+    <change name="Jeff Anderson" date="2004-03-01">
+      Made use of the IsisProcessExecutable class
+    </change>
+    <change name="Jacob Danton" date="2006-02-08">
+      Fixed a filename bug that occured with the no mapping option and crosstrackSumming not equal to 1.
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-18">
+      Fixed UI and parameters to be consistent with changes made to spiceinit
+    </change>
+    <change name="Elizabeth Miller" date="2006-07-25">
+      Removed the AUTOLON parameter (no longer an option in cam2map)
+    </change>
+    <change name="Brendan George" date="2006-09-26">
+        Documentation fixes
+    </change>
+    <change name="Elizabeth Miller" date="2006-09-28">
+      Fixed PIXRES handling issue caused by changes in cam2map
+    </change>
+    <change name="Steven Lambright" date="2006-11-06">
+      Added CKNADIR functionality
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-10-27">
+      This program now uses the Pipeline class to accomplish its processing.
+      The 'Map' parameter now actually accepts projected cubes, as the documentation
+      specifies. In the past, an error would be thrown if a cube was specified. The 'Map'
+      parameter is also now set to be an input, as it is not being modified. This program also
+      ran "cam2map" with "DEFAULTRANGE=CAMERA," but is now using the default (MINIMIZE).
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Global Surveyor</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input MOC EDR, Level0, or Level1 image file
+        </brief>
+        <description>
+          Input filename. This file can be in one of four stages. A compressed
+          PDS formatted MOC EDR, an uncompressed PDS formatted MOC EDR,
+          a Level0 Isis cube with a complete kernels group in its label, or a
+          Level1 radiometriclly calibrated Isis cube.
+        </description>
+        <filter>
+          *.imq *.img
+        </filter>
+      </parameter>
+
+        <parameter name="TO">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <internalDefault>Automatic</internalDefault>
+          <brief>
+            Final output filename.
+          </brief>
+          <description>
+            Output filename from the last enabled processing sequence. By
+            default the filename will be generated from the input filename with
+             ".lev#" appended to the name, where "#" is the last level of
+             processing (i.e., INGESTION = "lev0", CALIBRATION = "lev1",
+             or MAPPING = "lev2").
+          </description>
+        </parameter>
+    </group>
+
+    <group name="Level Processing">
+      <parameter name="Ingestion">
+        <type>boolean</type>
+        <default>
+          <item>YES</item>
+        </default>
+        <brief>
+          Import and initialize a moc EDR or RDR file.
+        </brief>
+        <description>
+          Process the input file through all level0 steps. This includes "moc2isis" and "
+          spiceinit".
+          "moc2isis" will uncompress a compressed EDR automatically.
+        </description>
+        <inclusions>
+          <item>PCK</item>
+          <item>CK</item>
+          <item>SPK</item>
+          <item>SHAPE</item>
+          <item>CKNADIR</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="Calibration">
+        <type>boolean</type>
+        <default>
+          <item>YES</item>
+        </default>
+        <brief>
+          Process the input file through the calibration phase.
+        </brief>
+        <description>
+          Process the input file through level1. This includes moccal,
+          mocnoise50, and mocevenodd,
+        </description>
+      </parameter>
+
+      <parameter name="Mapping">
+        <type>boolean</type>
+        <default>
+          <item>YES</item>
+        </default>
+        <brief>
+          Process the input file through the map phase.
+        </brief>
+        <description>
+          Process the input file through level2. This include cam2map.
+        </description>
+        <inclusions>
+          <item>MAP</item>
+          <item>PIXRES</item>
+        </inclusions>
+      </parameter>
+    </group>
+
+    <group name="Ingestion Parameters">
+      <parameter name="PCK">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          User defined target attitude and shape kernel file.
+        </brief>
+        <description>
+          Naif kernel file to be used for the target attitude and shape.
+        </description>
+        <defaultPath>
+          $BASE/kernels/pck/
+        </defaultPath>
+        <inclusions>
+          <item>Ingestion</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="CK">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          User defined spacecraft pointing kernel file.
+        </brief>
+        <description>
+          Naif kernel file to be used for the spacecraft pointing.
+        </description>
+        <defaultPath>
+          $MGS/kernels/ck/
+        </defaultPath>
+        <inclusions>
+          <item>Ingestion</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SPK">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          User defined spacecraaft position kernel file.
+        </brief>
+        <description>
+          Naif kernel file to be used for the spacecraft position.
+        </description>
+        <inclusions>
+          <item>Ingestion</item>
+        </inclusions>
+        <defaultPath>
+          $MGS/kernels/spk/
+        </defaultPath>
+      </parameter>
+
+      <parameter name="CKNADIR">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>
+          Compute nadir pointing if no other kernels exist
+        </brief>
+        <description>
+          Compute nadir pointing if no other kernels exist
+        </description>
+      </parameter>
+
+
+      <parameter name="SHAPE">
+        <type>string</type>
+        <default><item>SYSTEM</item></default>
+        <inclusions>
+          <item>Ingestion</item>
+        </inclusions>
+        <brief>
+          Select the definition of the shape model for spiceinit
+        </brief>
+        <description>
+          ISIS camera models can use a shape model (a  projected ISIS cube that defines the radii for a global or regional area).  You can choose
+          to select a shape model or to use the definition of the ellipsoid found in the planetary constants (PCK) file.
+        </description>
+        <list>
+          <option value="ELLIPSOID">
+            <brief>Use triiaxial ellipsoid from PCK</brief>
+            <description>The camera will use the radii defined in the planetary constants file (PCK) when determining intersections of the body surface</description>
+            <exclusions>
+              <item>MODEL</item>
+            </exclusions>
+          </option>
+          <option value="SYSTEM">
+            <brief>Search system for a default shape model</brief>
+            <description>
+              This option will search the default system data area ($ISIS3DATA/base/dems) for a shape model that matches the target of the input cube.  If none are
+              found then no shape model will be used and the default ellipsoid parameters found in the planetary constants (PCK) file define the shape.
+            </description>
+            <exclusions>
+              <item>MODEL</item>
+            </exclusions>
+          </option>
+          <option value="USER">
+            <brief>User specified shape model file</brief>
+            <description>The camera will use shape model defined by the parameter MODEL</description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MODEL">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          User defined ISIS cube shape model.
+        </brief>
+        <description>
+          A map projected ISIS cube which contains the radii of the target.  The file can cover more than the input cube
+           (FROM) but must minimally cover the data in the input cube.
+        </description>
+        <defaultPath>$base/dems/</defaultPath>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+
+    <group name="Mapping parameters">
+
+      <parameter name="MAP">
+        <type>filename</type>
+        <internalDefault>Sinusoidal</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing mapping parameters
+        </brief>
+        <description>
+          A file containing the desired output mapping parameters in PVL form.  This
+          file can be a simple hand produced label file.  It can also be an existing cube
+          label which contains a Mapping group.
+        </description>
+        <filter>*.map</filter>
+        <inclusions>
+          <item>Mapping</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="PIXRES">
+        <type>double</type>
+        <brief>Pixel resolution in meters</brief>
+        <internalDefault>Automatic</internalDefault>
+        <description>
+          Specifies the resolution in meters per pixel. If not
+          entered the resolution will 
+          be obtained from the MAP file.
+          If not in the MAP file the resolution will be computed from
+          the input camera cube.
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+        <inclusions>
+          <item>Mapping</item>
+        </inclusions>
+      </parameter>
+    </group>
+  </groups>
+</application>

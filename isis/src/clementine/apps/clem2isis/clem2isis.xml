@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="clem2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert Clementine data to Isis cube
+  </brief>
+
+  <description>
+    This program takes a Clementine image and formats it into an Isis cube. The
+    images are decompressed from Clementine 8-bit into a pixel type selected by
+    the user.
+  </description>
+  
+  <category>
+    <missionItem>Clementine</missionItem>
+  </category>
+
+  <history>
+    <change name="Brendan George" date="2006-02-03">
+      Converted to Isis 3
+    </change>
+    <change name="Brendan George" date="2006-07-28">
+        Fixed compiletime warnings
+    </change>
+    <change name="Kris Becker" date="2006-12-11">
+        Made changes to make code more standard (replaced malloc.h with
+        stdlib.h).  Also fixed bug in format for internal read of long formatted
+        for an int,  which differs in size.
+    </change>
+    <change name="Jeff Anderson" date="2007-01-08">
+     Fixed bug with non-permanent char* pointer
+    </change>
+    <change name="Steven Koechle" date="2007-05-22">
+       Removed "Z" from end of value for StartTime label.
+       Propagated Original Labels
+       Added PvlKeywords:
+            FocalPlaneTemperature
+            ExposureDuration
+            EncodingCompressionRatio
+            OffsetModeID
+            GainModeID
+            ProductID
+            MissionPhase.
+       Changed output cube from real to unsignedByte.
+       Added handeling for LIS and HIS values.
+    </change>
+    <change name="Steven Koechle" date="2007-06-06">
+       Added PvlKeywords and Added NIR Test Data
+    </change>
+    <change name="Steven Koechle" date="2007-06-12">
+       Added Example
+    </change>
+      <change name="Steven Koechle" date="2007-06-12">
+       Changed to translate labels through translation table.
+       Fixed Name keyword in BandBin group
+    </change>
+    <change name="Christopher Austin" date="2008-02-20">
+      Altered the output cube's BandBin group, changing the Keyword "Name" back
+      to "FilterName".
+    </change>
+    <change name="Christopher Austin" date="2008-03-18">
+      Checks if input file is rdr.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Tracie Sucharski" date="2009-02-17">
+      Added BandBin keywords Center and Width to clementine.trn and
+      alter the output values only if the filter is not the F filter.
+    </change>
+    <change name="Mackenzie Boyd" date="2009-05-26">
+      Modified label transfer to include MCP_Gain_Mode_ID when images is from 
+      HIRES camera.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+          This file is the input Clementine image to be processed into an Isis
+          cube.
+        </description>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This is the cube which will be output after the processing is
+          finished.
+        </description>
+        <filter>*.cub</filter>
+        <pixelType>unsignedByte</pixelType>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+      <brief>
+      Using clem2isis
+      </brief>
+      <description>
+        The use of clem2isis to ingest PDS images and output Isis3 cubes
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from= lne4885r.300
+          to=lne4885r.cub
+        </commandLine>
+        <description>
+          This example shows the use of clem2isis create an Isis3 cube from a PDS 
+          image.
+        </description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+          <image width="448" height="550" src="assets/images/clem2isisGUI.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters
+            </description>
+            <thumbnail width="163" height="200" caption="clem2isis gui"
+             src="assets/thumbs/clem2isisGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/lne4885r.300">
+          <brief>
+            Input PDS image.
+          </brief>
+          <description>
+            This is the image from PDS
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+      </dataFiles>
+      
+      <outputImages>
+        <image width="491" height="492" src="assets/images/lne4885r.jpg">
+          <brief>
+            Final output image after the conversion
+          </brief>
+          <description>
+            Converts from PDS format to a Isis3 cube.
+          </description>
+          <thumbnail caption= "The cube image after conversion"
+          src="assets/thumbs/lne4885r.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

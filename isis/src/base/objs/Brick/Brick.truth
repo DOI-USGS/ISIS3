@@ -1,0 +1,20 @@
+Isis::Brick Unit Test
+
+SampleDimension:  4
+LineDimension:    3
+BandDimension:    2
+Size:             24
+
+SampleDimension:  9
+LineDimension:    8
+BandDimension:    7
+Size:             504
+
+Sample():         3
+Line():           2
+Band():           1
+
+Sample():         5
+Line():           6
+Band():           7
+

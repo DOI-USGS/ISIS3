@@ -1,0 +1,11 @@
+Group = LUNAR_RECONNAISSANCE_ORBITER/WAC-VIS
+  Library = LroWideAngleCamera
+  Routine = LroWideAngleCameraPlugin
+  Version = 1
+EndGroup
+
+Group = LUNAR_RECONNAISSANCE_ORBITER/WAC-UV
+  Library = LroWideAngleCamera
+  Routine = LroWideAngleCameraPlugin
+  Version = 1
+EndGroup

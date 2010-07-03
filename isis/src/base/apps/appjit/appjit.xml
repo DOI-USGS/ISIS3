@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<application name="appjit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Apply sample/line jitter offsets to the camera pointing of an observation
+    set
+  </brief>
+
+  <description>
+    This program requires an observation set of cubes to be initialized with 
+    "spiceinit".  It will then apply the offsets in the input jitter table, 
+    after high pass filtering them, to the low pass filtered rotations in the 
+    InstrumentPointing table of the cubes.  The low pass filter is achieved by 
+    using a least square solution to compute a polynomial fit of the right 
+    ascension, declination, and twist angles of the rotation. This should reduce 
+    "noisy" pointing data.  To restore the original pointing just rerun 
+    "spiceinit".
+
+    <p>
+     Note that this program should be used on line scan cameras.  It will not work
+     on framing cameras.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Debbie Cook" date="2008-08-08">
+      Original version
+    </change>
+    <change name="Debbie Cook" date="2009-01-10">
+      Corrected error handling for master file
+    </change>
+    <change name="Debbie Cook" date="2009-08-03">
+      Added new argument to LineScanCameraRotation 
+    </change>
+    <change name="Debbie Cook" date="2009-08-05">
+      Added alternate tolerance calculation
+    </change>
+   </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Cubes to update
+        </brief>
+        <description>
+  	     The file specifications for the input cubes all from the same 
+         observation. The pointing for these cubes will be updated to correct 
+         for jitter and smoothed to remove noise.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+      <parameter name="MASTER">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Cubes used to initialize pointint fit
+        </brief>
+        <description>
+          The file specification of the cube used to set the apriori pointing 
+          fit for all the cubes in the observation FROMLIST.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="JITTERFILE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Ascii table of pixel jitter offsets for selected times
+        </brief>
+        <description>
+          The file specification of the Ascii table of pixel offsets formatted 
+          so that each line lists
+          sampleOffset       lineOffset     ephemerisTimeSeconds
+        </description>
+        <filter>
+          *.txt
+        </filter>
+      </parameter>
+    </group>
+    <group name="Parameters">
+      <parameter name="DEGREE">
+        <brief>
+          Degree of fit
+        </brief>
+        <description>
+          Enter the degree of the polynomial to fit to the data
+        </description>
+        <type>integer</type>
+        <default>
+          <item> 2</item> 
+          </default>
+        </parameter>
+      <parameter name="PITCHRATE">
+        <brief>
+          Optional replacement pitch rate
+        </brief>
+        <internalDefault>No change</internalDefault>
+        <description>
+          This value can be used to center the adjacent ccd line errors around 
+          zero
+        </description>
+        <type>double</type>
+      </parameter>
+      <parameter name="YAW">
+        <brief>
+          Optional replacement yaw
+        </brief>
+        <internalDefault>No change</internalDefault>
+        <description>
+          This value can be used to center the adjacent ccd sample errors around 
+          zero
+        </description>
+        <type>double</type>
+      </parameter>
+      </group>
+  </groups>
+</application>

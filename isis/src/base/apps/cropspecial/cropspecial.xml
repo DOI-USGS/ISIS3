@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cropspecial" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Crops specified special pixels from a cube
+  </brief>
+
+  <description>
+    This program automatically crops as many of the special pixels in a cube as
+    possible, without removing any valid data.  The user can specify which of
+    the five special pixel types the program should attempt to crop  and which
+    should be retained in the output cube.  Labels are duplicated from the input
+    to the output cube.  
+    </description>
+  
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>crop</item>
+      <item>trim</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Travis Addair" date="2009-02-24">
+      Original version
+    </change>
+    <change name="Janet Barrett" date="2009-10-22">
+      Now uses the SubArea class to produce output cube labels
+      with corrected Mapping, Instrument, and AlphaCube groups.
+    </change>
+    <change name="Travis Addair" date="2010-01-06">
+      Changed Progress to tell the user when the program is finding the 
+      perimeter and when it is removing special pixels from the image.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Input cube to be cropped.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cropped cube
+        </brief>
+        <description>
+          The resultant cropped cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Crop Pixels">
+       <parameter name="NULL">
+        <type>boolean</type>
+        <brief>
+          Crop NULL pixels
+        </brief>
+        <description>
+          This option will cause the program to consider NULL pixels when 
+          cropping pixels for the output cube.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+
+      <parameter name="HRS">
+        <type>boolean</type>
+        <brief>
+          Crop high representation saturation (HRS) pixels
+        </brief>
+        <description>
+          This option will cause the program to consider high representation 
+          saturation (HRS) pixels when cropping pixels for the output cube.
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="LRS">
+        <type>boolean</type>
+        <brief>
+          Crop low representation saturation (LRS) pixels
+        </brief>
+        <description>
+          This option will cause the program to consider low representation 
+          saturation (LRS) pixels when cropping pixels for the output cube.
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="HIS">
+        <type>boolean</type>
+        <brief>
+          Crop high instrument saturation (HIS) pixels
+        </brief>
+        <description>
+          This option will cause the program to consider high instrument 
+          saturation (HIS) pixels when cropping pixels for the output cube.
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="LIS">
+        <type>boolean</type>
+        <brief>
+          Crop low instrument saturation (LIS) pixels
+        </brief>
+        <description>
+          This option will cause the program to consider low instrument 
+          saturation (LIS) pixels when cropping pixels for the output cube.
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Crop NULL pixels </brief>
+      <description>
+        Cropping the cube with default settings selected.
+      </description>
+      <terminalInterface>
+        <commandLine> from=allspecial.cub+1 to=nonulls.cub
+        </commandLine>
+        <description>
+        In this example, cropspecial will extract a sub-area from a cube
+        surrounded in special pixels with only the NULL pixel type selected.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/images/allspecial.jpg" width="500" height="500">
+          <brief> Input image for cropspecial</brief>
+          <description>The original, 82x361 image.  NULL, HRS, LRS, HIS, and 
+            LIS pixels are shown in blue, light green, yellow, pink, and 
+            light blue, respectively.  NULL SPACE is shown here in black.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumbs/allspecial.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/nonulls.jpg" width="500" height="500">
+          <brief> Output image for cropspecial</brief>
+          <description> This is the 82x315 output image that results.  The NULL 
+            pixels at the bottom have been removed, but the NULL pixels 
+            surrounded by saturation pixels have not been removed as doing 
+            so would result in the loss of pixels not selected for cropping.
+          </description>
+          <thumbnail caption="Output image showing results on the default settings" src="assets/thumbs/nonulls.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/defaultgui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with the default parameter settings, 
+ready to perform a crop on the NULL pixels contained within the first band of 
+the input cube. 
+</description>
+            <thumbnail width="164" height="200" caption="cropspecial gui" src="assets/thumbs/defaultgui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>    
+
+    <example>
+      <brief> Crop all special pixels </brief>
+      <description>
+        Cropping the cube with all special pixels selected.
+      </description>
+      <terminalInterface>
+        <commandLine> from=allspecial.cub+1 to=nospecial.cub hrs=yes lrs=yes 
+          his=yes lis=yes
+        </commandLine>
+        <description>
+        In this example, cropspecial will extract a sub-area from a cube
+        surrounded in special pixels with all pixel types selected.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/images/allspecial.jpg" width="500" height="500">
+          <brief> Input image for cropspecial</brief>
+          <description>The original, 82x361 image.  NULL, HRS, LRS, HIS, and 
+            LIS pixels are shown in blue, light green, yellow, pink, and 
+            light blue, respectively.  NULL SPACE is shown here in black.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumbs/allspecial.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/nospecial.jpg" width="500" height="500">
+          <brief> Output image for cropspecial</brief>
+          <description> This is the 22x173 output image that results.  Some HRS, 
+             HIS, and NULL pixels are still present due to the rectangular 
+             dimensions of the cube, but their occurence has been minimized.
+          </description>
+          <thumbnail caption="Output image showing results of the cropspecial application" src="assets/thumbs/nospecial.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/cropallgui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+a crop on all special pixels contained within the first band of the input cube. 
+</description>
+            <thumbnail width="164" height="200" caption="cropspecial gui" src="assets/thumbs/cropallgui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

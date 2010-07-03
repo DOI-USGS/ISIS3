@@ -1,0 +1,7 @@
+# $Id: isis_bins_paths.lis,v 1.1 2010/04/09 23:19:58 slambright Exp $
+#  ISIS application library path modifications are set to lookup relative
+#  to the rpath directories as specified at build/link time in the main apps.
+/usgs/pkgs/local(.*?)lib       @rpath/3rdParty/lib
+/(.+)/isis/lib                 @rpath/lib
+/opt/local/libexec/qt4-mac/lib @rpath/3rdParty/lib
+/opt/local/lib                 @rpath/3rdParty/lib

@@ -1,0 +1,1294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="photemplate" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief> 
+    Create a PVL template with photometric algorithms and parameters to be used 
+    for photometric correction
+  </brief>
+
+  <description>
+    <pre>
+     This program creates a PVL template to be used in photomet for photometric 
+     correction. There are three types of correction that can be applied in
+     photomet:
+  
+      1) Photometric
+      2) Atmospheric
+      3) Normalization
+      
+     Photometric correction applies to the surface of an image. Atmospheric 
+     correction applies to the atmosphere through which an image was acquired. 
+     Normalization is the method in which the photometric and atmospheric 
+     corrections are applied. 
+      
+     The photomet program requires at least that the user specify a photometric 
+     option and a normalization option. The atmospheric correction is only valid 
+     if one of the following normalization models is being used: AlbedoAtm,
+     ShadeAtm, TopoAtm. 
+
+     Example output files: 
+      Example 1:
+
+      Object = PhotometricModel 
+       Group = Algorithm
+          Name = Lambert
+        EndGroup
+      EndObject
+      Object = NormalizationModel
+        Group = Algorithm
+          Name = NoNormalization
+        EndGroup
+      EndObject
+      
+      Example 2:
+      
+      Object = PhotometricModel
+        Group = Algorithm
+          Name = Minnaert
+          K = .5
+        EndGroup
+      EndObject
+      Object = NormalizationModel
+        Group = Algorithm
+          Name = Albedo
+          Incref = 0.0
+          Incmat = 0.0
+          Albedo = 1.0
+          Thresh = 30.0
+        EndGroup
+      EndObject
+      
+      Example 3:
+      
+      Object = PhotometricModel
+        Group  = Algorithm
+          Name = Moonpr
+        EndGroup
+      EndObject
+      Object = NormalizationModel
+        Group = Algorithm
+          Name = MoonAlbedo
+          D = 0.0
+          E = -0.222
+          F = 0.5
+          G2 = 0.39
+          H = 0.062
+          Bsh1 = 2.31
+        EndGroup
+      EndObject
+      
+      Example 4:
+      
+      Object = PhotometricModel
+        Group  = Algorithm
+          Name = HapkeHen
+          Wh = 0.52
+          Hh = 0.0
+          B0 = 0.0
+          Theta = 30.0
+          Hg1 = .213
+          Hg2 = 1.0
+        EndGroup
+      EndObject
+      Object = AtmosphericModel
+        Group = Algorithm
+          Name = HapkeAtm2
+          Hnorm = .003
+          Tau = 0.28
+          Tauref = 0.0
+          Wha = .95
+          Hga = 0.68
+        EndGroup
+      EndObject
+      Object = NormalizationModel
+        Group = Algorithm
+          Name = AlbedoAtm
+          Incref = 0.0
+        EndGroup
+      EndObject
+
+    </pre>
+  </description>
+
+  <history>
+    <change name="Noah Hilt" date="2008-11-18">
+      Original version
+    </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>photomet</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="PVL">
+         <type>filename</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output PVL containing the photometric algorithms to use
+         </brief>
+         <description>
+           Use this parameter to select the output filename. If the file already
+           exists it will be overwritten. The '.pvl' extension will 
+           automatically be appended to the entered filename if you do not type  
+           in an extension.
+         </description>
+         <filter>
+           *.pvl
+         </filter>
+       </parameter>
+    </group>
+    
+    <group name="Photometric Model">
+      <parameter name="PHOTOMETRIC">
+        <type>string</type>
+        <brief>
+          Photometric model to be used
+        </brief>
+        <description>
+          This is the name of the surface photometric function model
+        </description>
+        <default>
+          <item>LAMBERT</item>
+        </default>
+        <list>
+          <option value="LAMBERT">
+            <brief>
+              Lambert Photometric Model
+            </brief>
+            <description>
+              Simple photometric model which predicts that light 
+              incident on a surface is scattered uniformly in all directions;
+		          the total amount of reflected light depends on the incidence angle
+		          of the illumination. This function does not depend upon the
+		          outgoing light direction.
+            </description>
+            <exclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>HH</item>
+              <item>B0</item>
+              <item>L</item>
+              <item>K</item>
+            </exclusions>
+          </option>
+          <option value="HAPKEHEN">
+            <brief>
+              Hapke-Henyey-Greenstein Photometric Model
+            </brief>
+            <description>
+              Hapke-Henyey-Greenstein photometric model. Derive model albedo
+              using complete Hapke model with Henyey-Greenstein single-particle
+		          phase function whose coefficients are Hg1 and Hg2, plus single
+		          scattering albedo Wh, opposition surge parameters Hh and B0, and
+		          macroscopic roughness Theta.
+            </description>
+            <inclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>HH</item>
+              <item>B0</item>
+            </inclusions>
+            <exclusions>
+              <item>L</item>
+              <item>K</item>
+            </exclusions>
+          </option>
+          <option value="LOMMELSEELIGER">
+            <brief>
+              Lommel-Seeliger Photometric Model
+            </brief>
+            <description>
+              This model takes into account the radiance that results from
+              single scattering (scattering of collimated incident light) and
+		          does not take into account the radiance that results from multiple
+		          scattering (scattering of diffuse light which has made its way
+		          indirectly to the same position by being scattered one or more
+		          times). This model depends on the incidence and emission angles.
+            </description>
+            <exclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>HH</item>
+              <item>B0</item>
+              <item>L</item>
+              <item>K</item>
+            </exclusions>
+          </option>
+          <option value="LUNARLAMBERT">
+            <brief>
+              Lunar Lambert Photometric Model
+            </brief>
+            <description>
+              This model combines a weighted sum of the LommelSeeliger and
+              Lambert models. Given a suitable value for the LunarLambert
+		          function weight, L, this model fits the true reflectance behavior
+		          of many planetary surfaces equally well as the Hapke model. This
+		          model also depends on the incidence and emission angles.
+            </description>
+            <inclusions>
+              <item>L</item>
+            </inclusions>
+            <exclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>HH</item>
+              <item>B0</item>
+              <item>K</item>
+            </exclusions>
+          </option>
+          <option value="MINNAERT">
+            <brief>
+              Minnaert Photometric Model
+            </brief>
+            <description>
+              This model combines a weighted sum of the LommelSeeliger and
+              Lambert models. Given a suitable value for the LunarLambert
+		          function weight, L, this model fits the true reflectance behavior
+		          of many planetary surfaces equally well as the Hapke model. This
+		          model also depends on the incidence and emission angles.
+            </description>
+            <inclusions>
+              <item>K</item>
+            </inclusions>
+            <exclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>HH</item>
+              <item>B0</item>
+              <item>L</item>
+            </exclusions>
+          </option>
+          <option value="LUNARLAMBERTMCEWEN">
+            <brief>
+              Lunar Lambert-McEwen Photometric Model
+            </brief>
+            <description>
+              This model was developed specifically for use with the Moon. This
+              model was designed to be used in conjunction with the MoonAlbedo
+		          normalization model.
+            </description>
+            <exclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>HH</item>
+              <item>B0</item>
+              <item>L</item>
+              <item>K</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Photometric Parameters">
+      <parameter name="THETA">
+        <type>double</type>
+        <brief>
+          Macroscopic Roughness Angle
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          The Hapke macroscopic roughness component.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+      </parameter>
+
+      <parameter name="WH">
+        <type>double</type>
+        <brief>
+          Single Scattering Albedo
+        </brief>
+        <default>
+          <item>0.5</item>
+        </default>
+        <description>
+          The Hapke single scattering albedo component.
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+        <maximum inclusive="yes">1.0</maximum>
+      </parameter>
+
+      <parameter name="HG1">
+        <type>double</type>
+        <brief>
+          Hapke Henyey Greenstein Coefficient
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          The Hapke Henyey Greenstein coefficient for single particle phase 
+          function.
+        </description>
+        <minimum inclusive="no">-1.0</minimum>
+        <maximum inclusive="no">1.0</maximum>
+      </parameter>
+
+      <parameter name="HG2">
+        <type>double</type>
+        <brief>
+          Hapke Henyey Greenstein Coefficient
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          The Hapke Henyey Greenstein coefficient for single particle phase 
+          function.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">1.0</maximum>
+      </parameter>
+
+      <parameter name="HH">
+        <type>double</type>
+        <brief>
+          Hapke Opposition Surge 
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          The Hapke opposition surge component.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+
+      <parameter name="B0">
+        <type>double</type>
+        <brief>
+          Hapke Opposition Surge
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          The Hapke opposition surge component.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+
+      <parameter name="L">
+        <type>double</type>
+        <brief>
+          Lunar-Lambert Function Weight
+        </brief>
+        <default>
+          <item>1.0</item>
+        </default>
+        <description>
+          The Lunar-Lambert function weight.
+        </description>
+      </parameter>
+
+      <parameter name="K">
+        <type>double</type>
+        <brief>
+          Minnaert Function Exponent
+        </brief>
+        <default>
+          <item>1.0</item>
+        </default>
+        <description>
+          The Minnaert function exponent.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+    </group>
+
+    <group name="Normalization Model">
+      <parameter name="NORMALIZATION">
+        <type>string</type>
+        <brief>
+          Normalization model to be used
+        </brief>
+        <description>
+          This is the name of the normalization model to be performed
+        </description>
+        <default>
+          <item>NONORMALIZATION</item>
+        </default>
+        <list>
+          <option value="ALBEDO">
+            <brief>
+              Albedo Normalization Model
+            </brief>
+            <description>
+              Normalization without atmosphere. Each pixel is divided by the
+              model photometric function evaluated at the geometry of that
+              pixel, then multiplied by the function at reference geometry with
+		          incidence and phase angles equal to Incref and emission angle 0.
+		          This has the effect of removing brightness variations due to
+		          incidence angle and showing relative albedo variations with the
+		          same contrast everywhere. If topographic shading is present, it
+		          will be amplified more in regions of low incidence angle and will
+		          not appear uniform.
+            </description>
+            <inclusions>
+              <item>INCREF</item>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>ATMOSPHERIC</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+              <item>TAUREF</item>
+              <item>WHAREF</item>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="MIXED">
+            <brief>
+              Mixed Normalization Model
+            </brief>
+            <description>
+              Normalization without atmosphere. Used to do albedo normalization
+              over most of the planet, but near the terminator it will normalize
+              topographic contrast to avoid the seams that can occur with the
+		          usual albedo normalization. The two effects will be joined
+		          seamlessly at incidence angle Incmat. Incmat must be adjusted to
+		          give the best equalization of contrast at all incidence angles.
+		          The Albedo parameter must also be adjusted so the topographically
+		          normalized regions at high incidence angle are set to an albedo
+		          compatible with the albedo-normalized data at lower incidence.
+            </description>
+            <inclusions>
+              <item>INCREF</item>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>ATMOSPHERIC</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+              <item>TAUREF</item>
+              <item>WHAREF</item>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="MOONALBEDO">
+            <brief>
+              Moon Albedo Normalization Model
+            </brief>
+            <description>
+              Normalization without atmosphere. This model was designed
+              specifically for use on Lunar data. It will compute normalized
+              albedo for the Moon, normalized to 0 degrees emission angle and 30 
+              degrees illumination and phase angles. The Moonpr photometric 
+              function was designed to be used with this normalization model.
+            </description>
+            <inclusions>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+            </inclusions>
+            <exclusions>
+              <item>ATMOSPHERIC</item>
+              <item>INCREF</item>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>ALBEDO</item>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+              <item>TAUREF</item>
+              <item>WHAREF</item>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="NONORMALIZATION">
+            <brief>
+              No Normalization Model
+            </brief>
+            <description>
+              This will perform no normalization
+            </description>
+            <exclusions>
+              <item>ATMOSPHERIC</item>
+              <item>INCREF</item>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>ALBEDO</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+              <item>TAUREF</item>
+              <item>WHAREF</item>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="SHADE">
+            <brief>
+                Shade Normalization Model
+            </brief>
+            <description>
+              Normalization without atmosphere. The surface photometric function
+              is evaluated at the geometry of the image in order to calculate a
+              shaded relief image of the ellipsoid (and  in the future the DEM). 
+              The radiance of the model surface is set to Albedo at incidence 
+              angle Incref and zero phase. The image data is not used.
+            </description>
+            <inclusions>
+              <item>INCREF</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>ATMOSPHERIC</item>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+              <item>TAUREF</item>
+              <item>WHAREF</item>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="TOPO">
+            <brief>
+              Topographic Normalization Model
+            </brief>
+            <description>
+              Normalization without atmosphere. Used to normalize topographic
+              shading to uniform contrast regardless of incidence angle. Such a
+              normalization would exagerate albedo variations at large incidence 
+              angles, so this model is used as part of a three step process in 
+              which (1) the image is temporarily normalized for albedo; (2) a 
+              highpass divide filter is used to remove regional albedo 
+              variations; and (3) the image is renormalized with the Topo mode 
+              to undo the first normalization and equalize topographic shading. 
+              The reference state in the first step MUST have Incref=0 because 
+              this is waht is undone in the final step. If there are no 
+              significant albedo variations, step (2) can be skipped but step 
+              (1) must not be.
+            </description>
+            <inclusions>
+              <item>INCREF</item>
+              <item>THRESH</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>ATMOSPHERIC</item>
+              <item>INCMAT</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+              <item>TAUREF</item>
+              <item>WHAREF</item>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="ATMALBEDO">
+            <brief>
+              Albedo Normalization Model With Atmosphere
+            </brief>
+            <description>
+              Normalization with atmosphere. For each pixel, a model of 
+              atmospheric scattering is subtracted and a surface model is
+              divided out, both evaluated at the actual geometry of the pixel. 
+              Then the resulting value is multiplied by the surface function at 
+              reference conditions is added. In normal usage, the reference 
+              condition has normal incidence (Incref=0) and no atmosphere 
+              (Tauref=0) but in some cases it may be desirable to normalize 
+              images to a different incidence angle or a finite optical depth to 
+              obtain a more uniform appearance. As with the Albedo model, if 
+              topographic shading is present, it will be amplified more at high 
+              incidence angles and will not appear uniform.
+            </description>
+            <inclusions>
+              <item>ATMOSPHERIC</item>
+              <item>INCREF</item>
+            </inclusions>
+            <exclusions>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>ALBEDO</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+            </exclusions>
+          </option>
+          <option value="ATMSHADE">
+            <brief>
+              Shade Normalization Model With Atmosphere
+            </brief>
+            <description>
+              Normalization with atmosphere. The surface photometric function is
+              used to simulate an image by relief shading, just like the Shade
+              model, but the effects of atmospheric scattering are also included
+              in the calculation.
+            </description>
+            <inclusions>
+              <item>ATMOSPHERIC</item>
+              <item>INCREF</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+            </exclusions>
+          </option>
+          <option value="ATMTOPO">
+            <brief>
+              Topographic Normalization Model With Atmosphere
+            </brief>
+            <description>
+              Normalization with atmosphere. As with the Topo model, this option
+              is used in the final step of a three step  process: (1) normalize 
+              with the AlbedoAtm model, Incref=0, and Tauref=0 to temporarily 
+              remove atmosphere and normalize albedo variations; (2) use 
+              highpass divide filter to remove albedo variations; and (3) 
+              normalize with the TopoAtm model to undo the temporary 
+              normalization and equalize topographic shading.
+            </description>
+            <inclusions>
+              <item>ATMOSPHERIC</item>
+              <item>INCREF</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Normalization Parameters">
+      <parameter name="INCREF">
+        <type>double</type>
+        <brief>
+          Reference Incidence Angle
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          The reference incidence angle to which the image will be normalized.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="no">90.0</maximum>
+      </parameter>
+
+      <parameter name="INCMAT">
+        <type>double</type>
+        <brief>
+          Incidence Angle
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          This specifies the incidence angle where albedo normalization 
+          transition to incidence normalization.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="no">90.0</maximum>
+      </parameter>
+
+      <parameter name="THRESH">
+        <type>double</type>
+        <brief>
+          Amplification Threshold
+        </brief>
+        <default>
+          <item>30.0</item>
+        </default>
+        <description>
+          This sets upper limit on amount of amplification in regions of small 
+          incidence angle.
+        </description>
+      </parameter>
+
+      <parameter name="ALBEDO">
+        <type>double</type>
+        <brief>
+          Albedo
+        </brief>
+        <default>
+          <item>1.0</item>
+        </default>
+        <description>
+          The albedo to which the image will be normalized.
+        </description>
+      </parameter>
+
+      <parameter name="D">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>0.14</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter> 
+
+      <parameter name="E">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>-0.4179</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter>
+
+      <parameter name="F">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>0.55</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter>
+
+      <parameter name="G2">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>0.02</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter>
+
+      <parameter name="H">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>0.048</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter>
+
+      <parameter name="XMUL">
+        <type>double</type>
+        <brief>
+          Radiance to Reflectance/Calibration Factor
+        </brief>
+        <default>
+          <item>1.0</item>
+        </default>
+        <description>
+          This is used to convert radiance to reflectance or apply a calibration
+          factor.
+        </description>
+      </parameter>
+
+      <parameter name="WL">
+        <type>double</type>
+        <brief>
+          Wavelength
+        </brief>
+        <default>
+          <item>1.0</item>
+        </default>
+        <description>
+          The wavelength in micrometers of the image being normalized.
+        </description>
+      </parameter>
+
+      <parameter name="BSH1">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>0.08</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter>
+
+      <parameter name="XB1">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>-0.0817</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter>
+
+      <parameter name="XB2">
+        <type>double</type>
+        <brief>
+          Albedo Normalization Parameter
+        </brief>
+        <default>
+          <item>0.0081</item>
+        </default>
+        <description>
+          The albedo dependent phase function normalization parameter.
+        </description>
+      </parameter>
+      </group>
+
+    <group name="Atmospheric Model">
+      <parameter name="ATMOSPHERIC">
+        <type>string</type>
+        <brief>
+          Atmospheric model to be used
+        </brief>
+        <description>
+          This is the name of the atmospheric photometric function model. This 
+          can only be used with the three atmospheric normalization models: 
+          AlbedoAtm, ShadeAtm, and TopoAtm.
+        </description>
+        <default>
+          <item>ANISOTROPIC1</item>
+        </default>
+        <list>
+          <option value="ANISOTROPIC1">
+            <brief>
+              Anisotropic 1 Atmospheric Model
+            </brief>
+            <description>
+              Uses Chandrasekhar's solution for anisotropic scattering described
+              by a one term Legendre polynomial. This model uses first order
+              scattering approximation.
+            </description>
+            <inclusions>
+              <item>HNORM</item>
+              <item>BHA</item>
+              <item>TAU</item>
+              <item>TAUREF</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+            </inclusions>
+            <exclusions>
+              <item>HGA</item>
+              <item>HGAREF</item>
+            </exclusions>
+          </option>
+          <option value="ANISOTROPIC2">
+            <brief>
+              Anisotropic 2 Atmospheric Model
+            </brief>
+            <description>
+              Uses Chandrasekhar's solution for anisotropic scattering described
+              by a one term Legendre polynomial. This model uses second order 
+              scattering approximation. It is slower but more accurate than 
+              Anisotropic1.
+            </description>
+            <inclusions>
+              <item>HNORM</item>
+              <item>BHA</item>
+              <item>TAU</item>
+              <item>TAUREF</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+            </inclusions>
+            <exclusions>
+              <item>HGA</item>
+              <item>HGAREF</item>
+            </exclusions>
+          </option>
+          <option value="HAPKEATM1">
+            <brief>
+              Hapke 1 Atmospheric Model
+            </brief>
+            <description>
+              Provides an approximation for strongly anisotropic scattering that
+              is similar to Hapke's model for a planetary surface. The 
+              Chandrasekhar solution for isotropic scattering is used for the 
+              multiple scattering terms, and a correction is made to the singly 
+              scattered light for anisotropic particle phase function. A one 
+              term Henyey Greenstein function is used. This model uses a first 
+              order scattering approximation.
+            </description>
+            <inclusions>
+              <item>HNORM</item>
+              <item>HGA</item>
+              <item>TAU</item>
+              <item>TAUREF</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+            </inclusions>
+            <exclusions>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="HAPKEATM2">
+            <brief>
+              Hapke 2 Atmospheric Model
+            </brief>
+            <description>
+              Provides an approximation for strongly anisotropic scattering that
+              is similar to Hapke's model for a planetary surface. The 
+              Chandrasekhar solution for isotropic scattering is used for the 
+              multiple scattering terms, and a correction is made to the singly 
+              scattered light for anisotropic particle phase function. A one 
+              term Henyey Greenstein function is used. This model uses a second 
+              order scattering approximation. It is slower but more accurate 
+              than HapkeAtm1.
+            </description>
+            <inclusions>
+              <item>HNORM</item>
+              <item>HGA</item>
+              <item>TAU</item>
+              <item>TAUREF</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+            </inclusions>
+            <exclusions>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="ISOTROPIC1">
+            <brief>
+              Isotropic 1 Atmospheric Model
+            </brief>
+            <description>
+              Uses Chandrasekhar's solution for isotropic scattering. This model
+              uses first order scattering approximation.
+            </description>
+            <inclusions>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>TAUREF</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+            </inclusions>
+            <exclusions>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+          <option value="ISOTROPIC2">
+            <brief>
+              Isotropic 2 Atmospheric Model
+            </brief>
+            <description>
+              Uses Chandrasekhar's solution for isotropic scattering. This model
+              uses second order scattering approximation. It is slower but more 
+              accurate than Isotropic1.
+            </description>
+            <inclusions>
+              <item>HNORM</item>
+              <item>TAU</item>
+              <item>TAUREF</item>
+              <item>WHA</item>
+              <item>NULNEG</item>
+            </inclusions>
+            <exclusions>
+              <item>HGA</item>
+              <item>HGAREF</item>
+              <item>BHA</item>
+              <item>BHAREF</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Atmospheric Parameters">
+      <parameter name="NULNEG">
+        <type>boolean</type>
+        <brief>
+          Set negative values to NULL
+        </brief>
+        <default>
+          <item>FALSE</item>
+        </default>
+        <description>
+          This determines if negative values after removal of atmospheric 
+          effects will be set to NULL.
+        </description>
+      </parameter>
+
+      <parameter name="TAU">
+        <type>double</type>
+        <brief>
+          Optical Depth of Atmosphere
+        </brief>
+        <default>
+          <item>0.28</item>
+        </default>
+        <description>
+          The normal optical depth of the atmosphere.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+
+      <parameter name="TAUREF">
+        <type>double</type>
+        <brief>
+          Reference Value of Tau
+        </brief>
+        <default>
+          <item>0.0</item>
+        </default>
+        <description>
+          The reference value of Tau to which the image will be normalized.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+
+      <parameter name="HGA">
+        <type>double</type>
+        <brief>
+          Henyey Greenstein Coefficient
+        </brief>
+        <default>
+          <item>0.68</item>
+        </default>
+        <description>
+          The coefficient of single particle Henyey Greenstein phase 
+          function.
+        </description>
+        <minimum inclusive="no">-1.0</minimum>
+        <maximum inclusive="no">1.0</maximum>
+      </parameter>
+
+      <parameter name="HGAREF">
+        <type>double</type>
+        <brief>
+          Reference Value of Hga
+        </brief>
+        <internalDefault>HGA</internalDefault>
+        <description>
+          The reference value to Hga to which the image will be 
+          normalized.
+        </description>
+        <minimum inclusive="no">-1.0</minimum>
+        <maximum inclusive="no">1.0</maximum>
+      </parameter>
+
+      <parameter name="WHA">
+        <type>double</type>
+        <brief>
+          Single Scattering Albedo
+        </brief>
+        <default>
+          <item>0.95</item>
+        </default>
+        <description>
+          The single scattering albedo of atmospheric particles.
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+        <maximum inclusive="yes">1.0</maximum>
+      </parameter>
+
+      <parameter name="WHAREF">
+        <type>double</type>
+        <brief>
+          Reference Value of Wha
+        </brief>
+        <internalDefault>WHA</internalDefault>
+        <description>
+          The reference value to Wha to which the image will be normalized.
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+        <maximum inclusive="yes">1.0</maximum>
+      </parameter>
+
+      <parameter name="BHA">
+        <type>double</type>
+        <brief>
+          Legendre Coefficient
+        </brief>
+        <default>
+          <item>0.85</item>
+        </default>
+        <description>
+          The coefficient of the single particle Legendre phase function.
+        </description>
+        <minimum inclusive="yes">-1.0</minimum>
+        <maximum inclusive="yes">1.0</maximum>
+      </parameter>
+
+      <parameter name="BHAREF">
+        <type>double</type>
+        <brief>
+          Reference Value of Bha
+        </brief>
+        <internalDefault>BHA</internalDefault>
+        <description>
+          The reference value to Bha to which the image will be 
+          normalized.
+        </description>
+        <minimum inclusive="yes">-1.0</minimum>
+        <maximum inclusive="yes">1.0</maximum>
+      </parameter>
+
+      <parameter name="HNORM">
+        <type>double</type>
+        <brief>
+          Atmospheric Shell Thickness
+        </brief>
+        <default>
+          <item>0.003</item>
+        </default>
+        <description>
+          The atmospheric shell thickness normalized to the planet 
+          radius.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+    </group>
+  </groups>
+</application>

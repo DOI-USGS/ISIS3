@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="camtest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>Perform basic camera accuracy tests</brief>
+
+  <description>This program will do basic tests for new camera models</description>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <history>
+    <change name="Steven Lambright" date="2009-02-06">
+      Original Version
+    </change>
+    <change name="Steven Lambright" date="2009-06-11">
+      Now tests the center of each pixel instead
+        of edges - this upset pushframe tests a lot and
+        produced inaccurate results.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+  	      The cube which needs to be tested
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="FORMAT">
+        <type>string</type>
+        <brief>Units of the output cube</brief>
+        <description>
+        </description>
+        <default>
+          <item>ERR</item>
+        </default>
+        <list>
+          <option value="LAT">
+            <brief>Output latitudes</brief>
+            <description>Output is latitudes; NULL if SetImage(samp,line) failed</description>
+          </option>
+          <option value="LON">
+            <brief>Output universal longitudes</brief>
+            <description>Output is universal longitudes; NULL if SetImage(samp,line) failed</description>
+          </option>
+          <option value="ERR">
+            <brief>Output sample/line errors</brief>
+            <description>
+              SetImage(s,l) will return a (lat,lon). This (lat,lon) will be passed into SetUniversalGround(lat,lon).
+              The output is the distance from the input (sample,line) and the resulting (sample,line) after the
+              SetUniversalGround(lat,lon) call. This tests how accurate the camera model converts l,s->lat,lon->l,s
+            </description>
+          </option>
+          <option value="SAMP">
+            <brief>Output sample</brief>
+            <description>
+              SetImage(s,l) will return a (lat,lon). This (lat,lon) will be passed into SetUniversalGround(lat,lon).
+              The output is the resulting sample after the
+              SetUniversalGround(lat,lon) call.
+            </description>
+          </option>
+          <option value="LINE">
+            <brief>Output sample</brief>
+            <description>
+              SetImage(s,l) will return a (lat,lon). This (lat,lon) will be passed into SetUniversalGround(lat,lon).
+              The output is the resulting line after the
+              SetUniversalGround(lat,lon) call.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

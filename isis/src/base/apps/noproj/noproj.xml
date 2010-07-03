@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="noproj" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Removes camera distortions in a raw level 1 cube creating an ideal version of the cube.
+  </brief>
+
+  <description>
+    This program will modify the cube labels for the Ideal camera.
+    The original Instrument group is renamed OriginalInstrument and a new
+    instrument group is created for the Ideal Camera.  The cube data
+    is modified when this program runs cam2cam, creating the noproj'd
+    output cube with camera distortions removed.
+  </description>
+
+  <history>
+    <change name="Debbie A. Cook" date="2006-11-14">
+      Original version
+    </change>
+    <change name="Debbie A. Cook" date="2007-02-13">
+       Corrected for case where original instrument has negative affine coefficients
+     </change>
+     <change name="Debbie A. Cook" date="2007-04-24">
+         Added INTERP option, fixed SPECS parameter to allow user to override the default and enter a file, and updated the documentation
+     </change>
+     <change name="Debbie A. Cook" date="2007-05-21">
+         Changed category to Cameras
+     </change>
+     <change name="Debbie A. Cook" date="2007-06-12">
+         Corrected order of SetInputCube calls to set the MATCH cube first if is entered so that the labels on the cube to match are propagated from it and not the from cube
+     </change>
+        <change name="Debbie A. Cook" date="2007-08-31">
+         Turned off propagation of the polygon blobs because the file name contains "/" from
+         the serial number and unix does not allow "/".  Also added a remove of the match file
+         OriginalInstrument group written by cam2cam before writing the input OriginalInstrument.
+         hijitreg reads the input CcdId from this group.
+        </change>
+        <change name="Steven Lambright" date="2008-05-13"> 
+            Removed references to CubeInfo
+        </change>
+        <change name="Debbie A. Cook" date="2009-01-26">
+         Completed applying summing mode to ideal camera by applying it to the sample/line translations.
+        </change>
+        <change name="Debbie A. Cook" date="2009-03-25">
+          Fixed setting of et to correspond to first line of parent (Alpha cube)
+        </change>
+  </history>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>cam2cam</item>
+    </applications>
+  </seeAlso>
+
+  <oldName>
+    <item>noproj</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          This cube will have the camera distortions removed based on the correction for the MATCH file and output to the TO file.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+         <type>cube</type>
+         <fileMode>input</fileMode>
+         <internalDefault>
+             Match cube
+         </internalDefault>
+         <brief>
+           Instrument cube to match
+         </brief>
+         <description>
+           This is the level 1 cube whose labels will be converted to the Ideal instrument and used as the cube to match.  It must have only one band so use the input attributes to select the band to match.  For example,
+           themis.cub+5
+         </description>
+         <filter>
+           *.cub
+         </filter>
+      </parameter>
+
+      <parameter name="SPECS">
+         <type>filename</type>
+         <fileMode>input</fileMode>
+         <brief>
+           Ideal camera specifications file
+         </brief>
+         <internalDefault>
+             SystemDefault
+         </internalDefault>
+          <description>
+           This file contains the specifications for the "ideal" camera based on the original instrument.   If no value is entered, the default
+           specs file will be read from "$base/applications/noprojInstruments???.pvl", where ??? indicates the highest version of the file.
+         </description>
+         <filter>
+           *.pvl
+         </filter>
+         <defaultPath>
+             $base/applications/
+         </defaultPath>
+       </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will be a copy of the input cube with the labels modified for the Ideal Camera
+          cubes.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Output Summing Mode">
+        <parameter name="SOURCE">
+            <type>string</type>
+            <brief>Defines how the summing mode in the output noproj'd file is obtained </brief>
+            <default><item>FROMMATCH</item></default>
+            <description>
+                This parameter is used to specify how the summing mode is obtained for the output
+                noproj'd cube.  The pixel pitch of the output file will be set to the summing mode times the pixel
+                pitch of the input file.  The output pixel pitch is written to the labels of the noproj'd cube.
+                Note::  The user can override the default using the USER parameter.
+            </description>
+            <helpers>
+                <helper name="H1">
+                    <function>LoadMatchSummingMode</function>
+                    <brief>Load Output Summing Mode from Match file</brief>
+                    <description>This helper button will load the default summing mode from the match camera </description>
+                    <icon>$ISIS3DATA/base/icons/exec.png</icon>
+                </helper>
+                <helper name="H2">
+                    <function>LoadInputSummingMode</function>
+                    <brief>Load Output Summing Mode From Input file</brief>
+                    <description>This helper button will load the output summing mode  from the input (FROM) camera </description> 
+                </helper>
+            </helpers>
+            <list>
+                <option value="FROMMATCH">
+                    <brief>Get from input MATCH cube</brief>
+                    <description>
+                        This option will automatically determine the output summing mode from the cube to match specified using
+                        the MATCH parameter
+                    </description>
+                    <exclusions>
+                         <item>SUMMINGMODE</item>
+                     </exclusions>
+                </option>
+
+                <option value="FROMINPUT">
+                    <brief>Get from input FROM cube </brief>
+                    <description>
+                        This option will automatically determine the output summing mode from the cube to match specified using
+                        the FROM parameter
+                    </description>
+                    <exclusions>
+                        <item>SUMMINGMODE</item>
+                    </exclusions>
+                </option>
+
+                <option value="FROMUSER">
+                    <brief> Get summing mode from user  </brief>
+                    <description>
+                        This option allows the user to specify the summing mode to be applied to the input file pixel pitch (mm/pix)
+                        to determine the output pixel pitch.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+        <parameter name="SUMMINGMODE">
+            <type>double</type>
+            <brief>Summing Mode</brief>
+            <description>
+                Specifies the summing mode to multiply times  the input file (FROM) camera pixel pitch (mm/pix) to determine the
+                output noproj'd file pixel pitch (pixel size in mm).  This value is written to the output file labels
+            </description>
+            <minimum inclusive="yes">1.0</minimum>
+        </parameter>
+    </group>
+
+    <group name="Options">
+        <parameter name="INTERP">
+            <type>string</type>
+            <default>
+                <item>CUBICCONVOLUTION</item>
+            </default>
+            <brief>Type of interpolation</brief>
+            <description>
+                This is the type of interpolation to be performed on the input in cam2cam.
+            </description>
+            <list>
+                <option value="NEARESTNEIGHBOR">
+                    <brief>Nearest Neighbor</brief>
+                    <description>
+                        Each output pixel will be set to the pixel nearest the calculated input pixel.
+                    </description>
+                </option>
+                <option value="BILINEAR">
+                    <brief>Bi-Linear interpolation</brief>
+                    <description>
+                        Each output pixel will be set to the value calculated by a bi-linear interpolation of the calculated input pixel.
+                    </description>
+                </option>
+                <option value="CUBICCONVOLUTION">
+                    <brief>Cubic Convolution interpolation</brief>
+                    <description>
+                        Each output pixel will be set to the value calculated by a cubic convolution interpolation of the calculated input pixel.
+                    </description>
+                </option>
+             </list>
+        </parameter>
+       <parameter name="SAMPEXP">
+           <type>double</type>
+           <default>
+               <item> 0.0 </item>
+           </default>
+           <brief> Sample expansion percentage </brief>
+           <description>
+               This parameter expands the size of the output file in samples beyond the default size to prevent cropping of the 
+               undistorted image.  The undistorted image may be larger than the raw distorted image.
+           </description>
+       </parameter>
+
+       <parameter name="LINEEXP">
+            <type>double</type>
+            <default>
+                <item> 0.0 </item>
+            </default>
+            <brief> Line expansion percentage </brief>
+            <description>
+                This parameter expands the size of the output file in lines beyond the default size to prevent cropping of the 
+                undistorted image.  The undistorted image may be larger than the raw distorted image.
+            </description>
+        </parameter>
+    </group>
+
+  </groups>
+</application>

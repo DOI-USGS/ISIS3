@@ -1,0 +1,56 @@
+Object = ratio
+  IsisVersion       = "3.1.13 | 2007-07-13"
+  ProgramVersion    = 2003-07-29
+  ExecutionDateTime = 2007-08-01T11:42:35
+  HostName          = blackflag
+  UserName          = slambright
+  Description       = "Divide two cubes"
+
+  Group = UserParameters
+    NUMERATOR   = a
+    DENOMINATOR = b
+    TO          = bogus
+  End_Group
+
+  // This is an example of the results group
+  Group = Results
+    // Average size of a rock
+    Average = 13.5 <Meters>
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:00.0
+    CpuTime     = 00:00:00.0
+  End_Group
+End_Object
+End
+Object = ratio
+  IsisVersion       = "3.1.13 | 2007-07-13"
+  ProgramVersion    = 2003-07-29
+  ExecutionDateTime = 2007-08-01T11:42:35
+  HostName          = blackflag
+  UserName          = slambright
+  Description       = "Divide two cubes"
+
+  Group = UserParameters
+    NUMERATOR   = a
+    DENOMINATOR = b
+    TO          = bogus
+  End_Group
+
+  // This is an example of the results group
+  Group = Results
+    // Average size of a rock
+    Average = 13.5 <Meters>
+  End_Group
+
+  Group = Error
+    Program = ratio
+    Class   = "I/O ERROR"
+    Status  = -1
+    Message = "Unable to open file"
+    File    = unitTest.cpp
+    Line    = 501
+  End_Group
+End_Object
+End

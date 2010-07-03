@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="clemhirescal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+      Calibrate Clementine Hires images
+  </brief>
+  <description>
+      This program serves to calibrate most images from the Clementine Hires
+      camera. It does so through the use of some constants based on offset and
+      flat images based on filter type. There are six possible offsets, with the
+      resultant change being anywhere between eight and fifty to the DN. There
+      are four flat images, one for each of the four possible filters. 
+      Information for this program came from JGR Vol 108, A radiometric 
+      calibration for the Clementine Hires camera: Robinson, Malaret, White.
+  </description>
+  <history>
+    <change name="Mackenzie Boyd" date="2009-08-03">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Clementine</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be calibrated
+        </brief>
+        <description>
+          Use this parameter to select the filename
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output of calibrated cube
+        </brief>
+        <description>
+          This file will contain the results of the calibration
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="K value">
+      <parameter name="KFROM">
+        <type>string</type>
+        <brief>
+          K value selection
+        </brief>
+        <default>
+          <item>COMPUTED</item>
+        </default>
+        <list>
+          <option value="COMPUTED">
+            <brief>
+              Compute a K value from MCP gain mode
+            </brief>
+            <description>
+              This option has the program use a known K value depending on the
+              MCP gain and filter type, very few MCP gain mode IDs are
+              supported. The K value is the absolute coefficient per wavelength
+              and MCP gain state.
+            </description>
+            <exclusions>
+              <item>KVALUE</item>
+            </exclusions>
+          </option>
+          <option value="USER">
+            <brief>
+              User input K value
+            </brief>
+            <description>
+              User chooses a K value and enters it into the system. This is more
+              likely as very few MCP gain modes are supported.
+            </description>
+            <inclusions>
+              <item>KVALUE</item>
+            </inclusions>
+          </option>
+        </list>
+        <description>
+          This parameter is used to choose either a user entered K value or a
+          previously set, calculated K value.
+        </description>
+      </parameter>
+
+      <parameter name="KVALUE">
+        <type>double</type>
+        <default>
+          <item>0.00125</item>
+        </default>
+        <minimum inclusive="no">0.0</minimum>
+        <maximum inclusive="no">0.05</maximum>
+        <brief>
+          An averaged K value
+        </brief>
+        <description>
+            The K value is the absolute coefficient per wavelength and MCP gain
+            state. This is an average of several possible K values, the default 
+            should not be used when possible as it is an average.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Usage of the Clementine Hires calibration
+      </brief>
+      <description>
+        This shows the usage of the clementine high resolution image calibration
+        program. In this case a K value can be computed for the image.
+      </description>
+      <terminalInterface>
+        <commandLine>
+            from= clem2.cub to=clem2CAL.cub
+        </commandLine>
+        <description>
+          This shows the terminal interface for using clemhirescal from the command
+          line.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="584" height="435" src="assets/images/clemGUI.jpg">
+            <brief>
+             Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to calibrate a hires
+              image using a perviously set K value.
+            </description>
+            <thumbnail width="200" height="152" caption="clemhirescal gui"
+              src="assets/thumbs/clemGUI.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image width="384" height="288" src="assets/images/clem2.jpg">
+          <brief>
+           Input image before calibration
+          </brief>
+          <description>
+           This is the image as it was taken originally, complete with hotspot
+            and chickenwire pattern.
+          </description>
+          <thumbnail caption= "The image before the calibration"
+           src="assets/thumbs/clem2.jpg" width="192" height="144"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="384" height="288" src="assets/images/clem2CAL.jpg">
+          <brief>
+           Output image after calibration
+          </brief>
+          <description>
+           The image should now appear more even, without hotspot or
+            chickenwire pattern, and radiometrically calibrated.
+          </description>
+          <thumbnail caption= "The image after the calibration"
+            src="assets/thumbs/clem2CAL.jpg" width="192" height="144"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <dataFiles>
+        <dataFile path="assets/data/lhd_flat.jpg">
+          <brief>
+            Flat file denominator
+          </brief>
+          <description>
+            This is one of the four avaliable flat files. It is the one used on
+            the image you see, it is specifically for the D filter type.
+          </description>
+          <parameterName>
+            Flat file for D filter
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
+  </examples>
+
+</application>

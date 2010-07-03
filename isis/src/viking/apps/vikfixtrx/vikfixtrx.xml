@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="vikfixtrx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Fix null tracks in a Viking image plane
+  </brief>                                                                                      
+  <description>
+    This program checks for NULL tracks in the seven tracks of
+     a Viking image cube. If the percentage of pixels in a
+     line of a track meets or exceeds the THRESHLD value, then that
+     track is considered bad and the program will replace all
+     NULL values in that track.  It does this replacement by using
+     valid pixels from each side of the track to perform an interpolation
+     to calculate the new pixel value.
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>vikclean</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-04-21">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-15">
+      Made changes to appTest.xml (viking data area split into viking1 and viking2)
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-03">
+      Modified documentation to be more accurate
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file null tracks will be removed from
+        </brief>
+        <description>
+          The cube to be filtered.  All null tracks in each line of the cube will be 
+          filled in using a 5x5 low pass filter.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the filtered data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Values">
+        <parameter name="THRESHLD">
+            <type>double</type>
+            <brief>
+                Threshhold Percentage
+            </brief>
+            <description>
+                The threshhold percentage value for determining a bad track.
+                If the percentage of pixels in a line of a track meets or exceeds 
+                the THRESHLD value, then that track is considered bad.   Defaults to 90.0.  
+            </description>
+            <default><item>90.0</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Viking image filtered </brief>
+      <description>
+        This example shows the vikfixtrx application.  The threshhold percentage value is defaulted to 90.0.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../f387a06.cub t=vikfixtrx-out.cub
+        </commandLine>
+        <description>
+        Just filter a Viking image.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/f387a06.jpg" width="500" height="500">
+          <brief> Input image for mirror</brief>
+          <description>This is the input image for the vikfixtrx example.
+          </description>
+          <thumbnail caption=" Input Viking image" src="assets/thumb/f387a06.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/vikfixtrx-out.jpg" width="500" height="500">
+          <brief> Output image for mirror</brief>
+          <description> This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the vikfixtrx application." src="assets/thumb/vikfixtrx-out.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="441" height="221" src="assets/image/VikfixtrxGui.JPG">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+                    a vikfixtrx operation on the input image. 
+            </description>
+            <thumbnail width="200" height="100" caption="Vikfixtrx Gui" src="assets/thumb/VikfixtrxGui.JPG" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

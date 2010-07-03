@@ -1,0 +1,6 @@
+Group = GalileoOrbiter/SolidStateImagingSystem
+  Version = 1
+  Library = SsiCamera
+  Routine = SsiCameraPlugin
+EndGroup
+ 

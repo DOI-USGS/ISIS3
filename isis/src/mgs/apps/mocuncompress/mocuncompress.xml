@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mocuncompress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Uncompresses moc EDR data files
+  </brief>
+
+  <description>
+    This program will uncompress MOC EDR data.  It is not a standard Isis
+    program but is used internally within "moc2isis" when decompression
+    of the EDR is necessary.
+  </description>
+
+  <history>
+    <change name="Malin Space Science Systems" date="2000-04-10">
+      Ported to LINUX under the Isis 3.0 conversion
+    </change>
+    <change name="Stuart Sides" date="2003-12-09">
+      Ported to LINUX under the Isis 3.0 conversion
+    </change>
+    <change name="Jeff Anderson" date="2004-03-26">
+      Fixed problems with Sun OS Port
+    </change>
+    <change name="Jeff Anderson" date="2004-03-29">
+      Added Janet Barrets fix to readBlock.c for discrete cosine
+      transform imqs.
+    </change>
+    <change name="Kris Becker" date="2007-10-10">
+        Fixed problem on MacOSX that caused bus errors.
+    </change>
+    <change name="Chris Austin" date="2007-12-19">
+      Changed "static char label[256]" to "static char label[1024]", which keeps 
+      this program working on more systems.
+    </change>
+    <change name="Steven Lambright" date="2009-02-23">
+      Removed some unnecessary code that caused problems on some 64bit systems.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Global Surveyor</missionItem>
+  </category>
+</application>

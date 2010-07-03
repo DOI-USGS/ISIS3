@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cosi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply simple photometric model
+  </brief>
+
+  <description>
+    This program applies a basic photometric normalization to an image by dividing each pixel by the cosine of the incidence angle.  It uses the camera
+    model to compute the incidence angle at each pixel in the cube.   The corresponding input pixel value is then divided by the cosine of the incidence angle.  If the
+    absolute value of the incidence angle is 90 or greater then a Null pixel will be output.
+  </description>
+
+  <history>
+    <change name="Jim Torson" date="1997-05-20">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2007-05-30">
+      Converted to ISIS3
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input camera cube
+        </brief>
+        <description>
+          An Isis cube with a supported camera model and initialized with SPICE.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           The name of the output Isis cube.  This cube will contain the input cube  divided by the cosine of the
+           incidence angle.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="MAXINC">
+        <type>double</type>
+        <default><item>90.0</item></default>
+        <brief>
+          Maximum incidence angle
+        </brief>
+        <description>
+          Pixels which have an absolute value of indicence angle at or above this value will be set to NULL in the output cube
+        </description>
+        <maximum inclusive="yes">90.0</maximum>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+    </group>
+   </groups>
+
+</application>

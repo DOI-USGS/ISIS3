@@ -1,0 +1,381 @@
+<?xml version="1.0"?>
+<application name="jigsaw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Improves camera pointing
+  </brief>
+
+  <description>
+    This program takes as input a control network and list of level 1 cubes.  It uses the control network to solve for new
+    camera pointing for each of the cubes.  This helps eliminate mismatches in mosaics of multiple images.
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>deltack</item>
+      <item>qnet</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="2007-04-27">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2007-07-23">
+       Changed category to Control Networks and corrected XML bugs
+    </change>
+    <change name="Debbie A. Cook" date="2007-10-05">
+        Revised iteration report to list the errors and sigmas from the same iteration.  Previous version reported errors from previous iteration and sigmas from current iteration.
+    </change>
+    <change name="Christopher Austin" date="2008-07-03">
+      Cleaned the Bundle Adjust memory leak and fixed the app tests.
+    </change>
+    <change name="Tracie Sucharski" date="2009-04-08">
+      Added date to the Jigged comment in the spice tables.
+    </change> 
+    <change name="Tracie Sucharski" date="2009-04-22">
+      If updating pointing, delete the CameraStatistics table from labels.
+    </change>
+    <change name="Mackenzie Boyd" date="2009-07-23">
+      Modified program to write history to input cubes.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Cube list
+        </brief>
+        <description>
+          This file contains a list of all cubes in the network
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="HELDLIST">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Held list
+        </brief>
+        <description>
+          This file contains a list of all cubes whose pointing angles will be held in the adjustment.
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input control network
+        </brief>
+        <description>
+          This file is a control network generated from programs such as autoseed or qnet
+        </description>
+        <filter>
+          *.net
+        </filter>
+      </parameter>
+
+      <parameter name="ONET">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output control network
+        </brief>
+        <description>
+          This file will contain the update control network with residuals for each measurement.
+        </description>
+        <filter>
+          *.net
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Solve Options">
+      <parameter name="OBSERVATIONS">
+        <brief> Keep instances of the same observation in different cube files dependent</brief>
+        <description>
+            This option will solve for spice on all cubes with a matching observation number as though they were a single image.
+            For most missions the default observation number is the serial number of the cube file so that a single cube is an observation.
+            However all Lunar Orbiter missions have defined observation numbers that are different from their serial numbers, so that the 3
+            subframes of a Lunar Orbiter High Resolution frame will be treated as a single observation if this option is on.  Otherwise each
+            subframe will be adjusted independently.
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>No</item>
+        </default>
+      </parameter>
+
+      <parameter name="RADIUS">
+        <brief> Solve for local radii of points</brief>
+        <description>
+            Select this option to solve for the local radius of each control
+            point.  If this button is not turned on, the radii of the points
+            will not change from the cube's shape model.
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>No</item>
+        </default>
+      </parameter>
+
+      <parameter name="UPDATE">
+        <brief> Update cube label</brief>
+        <description>
+            This option will write the results of the solution to each cube in the FROMLIST.  The pointing is written in the form of a SPICE
+            blob which is attached to the cube.  This only occurs if the solution converged to the requested tolerance within the
+            the requested number of iterations.  If this option is turned off, then only the output control network with the latitude/longitude/radius
+            for each point in  the solution and and the point residuals is created.
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>Yes</item>
+        </default>
+      </parameter>
+
+      <parameter name="METHOD">
+        <type>string</type>
+        <brief> Matrix solution method to use</brief>
+        <default>
+          <item>QRD</item>
+        </default>
+        <description>
+          <p>
+            Enter the desired method to use to solve the matrix.  Methods will
+            vary in speed and accuracy.   The default, QRD,  is the preferred
+            method, unless the matrix is close to singular or the system being
+            solved has more than 2000 unknowns.  A matrix might be close to 
+            singular if some of the points are very close to each other, or if 
+            some of the images have camera angles that are nearly identical.  In 
+            the case of a nearly singular matrix, the SVD method wil work the 
+            best.  For larger bundle adjustments involving more than 2000 
+            unknowns, the SPARSE option will work the best.  To determine the 
+            number of unknowns use the following formula:
+          </p>
+          <p>
+              Total # Unknowns = observCount * (camUnknowns + spUnknowns) + controlPt*ptUnknowns,
+          </p>
+          <pre>
+            where, observCount = the number of images or observations
+
+                   camUnknowns = 2, if CAMSOLVE=ANGLES and TWIST is not checked
+                               = 3, if CAMSOLVE=ANGLES and TWIST is checked
+                               = 4, if CAMSOLVE=VELOCITIES and TWIST is not checked                                     
+                               = 5, if CAMSOLVE=VELOCITIES and TWIST is checked
+                               = 6, if CAMSOLVE=ACCELERATIONS and TWIST is not checked
+                               = 7, if CAMSOLVE=ACCELERATIONS and TWIST is checked
+                               = SOLVEDEGREE * 2 if TWIST is not checked
+                               = SOLVEDEGREE * 3 if TWIST is checked
+
+                    spUnknowns = 0, if SPSOLVE=NONE
+                               = 3, if SPSOLVE=POSITION
+                               = 6, if SPSOLVE=VELOCITIES
+                               = 9, if SPSOLVE=ACCELERATIONS
+
+                     controlPt = The number of control points in the network
+
+                    ptUnknowns = 2, if RADIUS is not checked in the Solve Options box
+                               = 3, if RADIUS is checked in the Solve Options box
+        </pre>
+        </description>
+        <list>
+          <option value="SVD">
+            <brief> Single Value Decomposition</brief>
+            <description>
+                      Solve the matrix using the method of single value
+                      decomposition.  This method is very accurate, but slow.
+            </description>
+          </option>
+          <option value="QRD">
+            <brief> QR Decomposition</brief>
+            <description>
+                      Solve the matrix using the method of QR
+                      decomposition, where Q is an orthogonal matrix such that Q
+                      transpose * Q =I, and R is an upper triangular matrix. 
+            </description>
+          </option>
+          <option value="SPARSE">
+            <brief> Sparse matrix solver</brief>
+            <description> 
+              Solve the matrix using a sparse matrix solver.
+                Note:  Sparse solver will not work on Sun/Solaris, QRD will be 
+                          used.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Iteration Options">
+      <parameter name="MAXITS">
+        <brief> iterations
+        </brief>
+        <description> Number of iterations</description>
+        <type>integer</type>
+        <default>
+          <item>5</item>
+        </default>
+      </parameter>
+
+      <parameter name="TOL">
+        <brief> tolerance</brief>
+        <description> Tolerance in pixels</description>
+        <type>double</type>
+        <default>
+          <item>0.5</item>
+        </default>
+      </parameter>
+    </group>
+
+    <group name="Camera Pointing Options">
+      <parameter name="CKDEGREE">
+        <type>integer</type>
+        <default>
+          <item>2</item>
+        </default>
+        <brief>
+          Degree of polynomial fit to original camera angles
+        </brief>
+        <description>
+                The degree of the polynomial fit to the original camera angles 
+                and used to generate apriori camera angles for the first 
+                iteration.
+        </description>
+      </parameter>
+      <parameter name="SOLVEDEGREE">
+        <type>integer</type>
+        <default>
+          <item>2</item>
+        </default>
+        <brief>
+          The degree of the polynomial being fit to in the bundle adjustment
+        </brief>
+        <description>
+                The degree of the polynomial being fit to in the bundle adjust 
+                solution.  This polynomial can be different from the one used to 
+                generate the apriori camera angles used in the first iteration.  
+                In the case of an instrument with a jitter problem, a higher 
+                degree polynomial fit to each of the camera angles might provide 
+                a better solution (smaller errors).
+        </description>
+      </parameter>
+      <parameter name="CAMSOLVE">
+        <type>string</type>
+        <brief> Sets which, if any,  camera pointing factors to include in the bundle adjustment"</brief>
+        <default>
+          <item>ANGLES</item>
+        </default>
+        <description>
+                This parameter is used to specify which camera pointing factors to fit in the adjustment.  At least one item must be selected in this group or the spacecraft group, or the application will have nothing to adjust.
+        </description>
+        <list>
+          <option value="NONE">
+            <brief> Don't solve for any camera pointing factors</brief>
+            <description>
+                         If this option is selected, no camera pointing factors will be adjusted.
+            </description>
+          </option>
+
+          <option value="ANGLES">
+            <brief>Solve for camera angles:   right ascension, declination, and optionally twist</brief>
+            <description>
+                        If this option is selected the camera angles in each cube will be adjusted in the solution, but not the angular velocity or angular acceleration.  The adjustments will not be applied unless UPDATE is selected.
+            </description>
+          </option>
+
+          <option value="VELOCITIES">
+            <brief>Solve for camera angles AND their angular velocities</brief>
+            <description>
+                        If this option is selected, camera angles (right ascension, declination, and optionally twist) and their angular velocites will be adjusted in the solution.
+            </description>
+          </option>
+
+          <option value="ACCELERATIONS">
+            <brief>Solve for camera angles, their angular velocities, and their angular accelerations</brief>
+            <description>
+                        If this option is selected, camera angles (right ascension, declination, and optionall twist), their angular velocities, and their angular accelerations will be adjusted in the solution.
+            </description>
+          </option>
+
+          <option value="ALL">
+            <brief>Solve for all coefficients in the polynomials fit to the camera angles.</brief>
+            <description>
+                  If this option is selected, all coefficients of the
+                        solve equation will be fit in the solution
+                        (SOLVEDEGREE+1 coefficients)
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="TWIST">
+        <brief> Solve for twist?</brief>
+        <description>
+                If this option is on, the twist angle will be adjusted in the bundle adjustment solution.
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>Yes</item>
+        </default>
+      </parameter>
+    </group>
+
+    <group name="Spacecraft Options">
+      <parameter name="SPSOLVE">
+        <type>string</type>
+        <brief> Sets which, if any, spacecraft position factors to include in the adjustment</brief>
+        <default>
+          <item>NONE</item>
+        </default>
+        <description>
+              This parameter is used to specify which spacecraft position factors to fit in the adjustment.
+        </description>
+        <list>
+          <option value="NONE">
+            <brief>Don't solve for any spacecraft position factors</brief>
+            <description>
+                         If this option is selected, no spacecraft position factors will be adjusted.  A camera angle factor must be included in the adjustment in order for the application to run.
+            </description>
+          </option>
+
+          <option value="POSITION">
+            <brief>Solve for the spacecraft positions</brief>
+            <description>
+                         If this option is selected, the spacecraft positions will be adjusted in the solution, but not the velocity or the acceleration.
+            </description>
+          </option>
+
+          <option value="VELOCITIES">
+            <brief>Solve for the spacecraft positions and velocites</brief>
+            <description>
+                         If this option is selected, the spacecraft positions will be adjusted in the solution, as well as the velocities of the spacecraft at each instance.
+            </description>
+          </option>
+
+          <option value="ACCELERATIONS">
+            <brief>Solve for the spacecraft positions, velocities, and accelerations</brief>
+            <description>
+                         If this option is selected, the spacecraft positions will be adjusted in the solution, as well as the velocities and accelerations of the spacecraft at each instance.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+    </group>
+  </groups>
+</application>

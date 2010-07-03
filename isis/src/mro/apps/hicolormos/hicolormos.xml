@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hicolormos" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Create a color mosaic of a HiRISE cubes from an observation and update labels required by hirdrgen.
+  </brief>
+
+  <description>
+    <p>
+  ** The output from this program is required by hirdrgen ** <br/>
+  If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.  
+  This program produces a mosaic and adds keywords to the label group "Mosaic" that are required 
+  by hirdrgen. <br/>
+
+  The  input cubes  to this program must be from the same observation,  stacked by hicubeit, and 
+  map projected.<br/>
+
+  the CCDs of the HiRISE instrument are arranged in a way that color products can only be produced in two 
+  positions of the CCD array.  The CCDs that overlap for a color product are RED4, IR10, and
+  BG12 or RED5, IR11, and BG13.  The program hicubeit is used to stack the individual CCDs into 
+  a multi band cube.  The output from hicubeit is the required input for hicolormos.  The from1 and 
+  from2 parameters allow these two CCD stacks to be input.  The program hicolormos can also be run 
+  with only the from1 parameter.<br/>  
+
+   A new label group, that is required by hirdrgen, called "Mosaic"  is added to the image labels of 
+   the output cube.  The original label blob is also propagated from the from1 input file.
+   </p>
+
+<p>
+  <b> processing sequence for color products that will become RDRs </b><br/>
+         <b>Slither</b> -  match the blue-green and/or the infer-red to the red CCD.<br/>
+         <b>hicubeit</b> - stack the matching CCDs to make a three band cube.<br/>
+         <b>cam2map</b> - project the cube.  hicolormos requiers a map projected cube.<br/>
+         <b>hicolormos</b> - mosaic files and add keywords to the mosaic group.<br/>
+         <b>hirdrgen</b> - produce a RDR product.<br/>
+</p>
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Robert Sucharski" date="2006-07-19">
+      Original version,
+    </change>
+    <change name="Elizabeth Miller" date="2007-02-20">
+      Changed OriginalLabel name to IsisCube
+    </change>
+    <change name="Robert Sucharski" date="2007-04-12">
+      Added keywords SubSolarAzimuth, NorthAzimuth, and SpecialProcessingFlag to mosaic group in output labels.
+    </change>
+    <change name="Robert Sucharski" date="2007-06-26">
+      Fixed a bug, needed to add traverse when looking for PVL group archive.
+    </change>
+    <change name="Rovert Sucharski" date="2007-10-18">
+      Added code to get the avg line and sample for gathering camera infomation if using the avg latitude and longitude fails.
+      We contine to use the latitude and logitude so that we are backwards compatible.  We added this new code because 
+      the camera could not find an itersect for some images (polar) if we used projection latitude and longitude to "setGround".
+     </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM1">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          First input file
+        </brief>
+        <description>
+          The first file that will be added to a color mosaic.  This file is also used to propagate
+          the Original label blob.     This file must be the output file from hicubeit and map projected.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="FROM2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Second input file. this file is not required.
+        </brief>
+        <description>
+          This is the second cube that will be added to a color masaic.  This file should be the output
+          from hicubeit and map projected.  This input file is not required.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The name of the output cube
+        </brief>
+        <description>
+          This is the name that will be given to the output cube.  this cube is a mosaic of the two
+           from files and has the new group "mosaic' added.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="PRIORITY">
+        <type>string</type>
+        <default>
+          <item>ONTOP</item>
+        </default>
+        <brief>The priority of pixel placement</brief>
+        <description>
+          This parameter is used to select one of two ways to masaic the
+          pixels in areas of overlap.
+        </description>
+
+        <list>
+          <option value="ONTOP">
+            <brief>Input cube will be placed on top of the mosaic </brief>
+            <description>
+              When the input pixel is not Null, the input pixel
+              value will be written to the output cube.
+            </description>
+          </option>
+          <option value="BENEATH">
+            <brief>Input cube will be placed beneath the mosaic</brief>
+            <description>
+              When the mosaic pixel is not Null it will be left unchanged.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

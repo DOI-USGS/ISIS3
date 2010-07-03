@@ -1,0 +1,14 @@
+Size of Double:  8   Double 0x12345678 to HOST:  3.0542e+08
+Size of Float:  4   Float 0x1234 to HOST:  4660
+Size of Short Int:  2   Short Int 0x1234 to HOST:  4660
+Size of Unsigned Short Int:  2   Unsigned Short Int 0x1234 to HOST:  4660
+Size of Double:  8   Double 0x12345678 to HOST:  2.55354e-312
+Size of Float:  4   Float 0x1234 to HOST:  1.47458e-38
+Size of Short Int:  2   Short Int 0x1234 to HOST:  13330
+Size of Unsigned Short Int:  2   Unsigned Short Int 0x1234 to HOST:  13330
+Size of Int:  4   Int 0x12345678 to HOST:  2018915346
+Size of Long Long Int:  8   Long Long Int 0x0000000012345600 to HOST:  24264099911172096
+Testing nan:  
+PreSwap:  -1 -87 15 61 
+PostSwap: 61 15 -87 -1 
+**PROGRAMMER ERROR** Invalid parameter-InputEndian must be LSB or MSB

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="thm2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import a Themis IR/VIS RDR or EDR
+  </brief>
+
+  <description>
+    Converts a Themis VIS or IR PDS spectral cube into an Isis Cube.  Themis IR
+    cube will automatically be converted to 32-bit floating point unless the
+    user specifies differently.  This is done to accommodate different 
+    core/base multiplier values for each band.  Themis VIS cubes will automatically
+    create framelet files. These framelet files will have the name of the TO parameter with
+    a ".frame" followed by the frame number inserted prior to the ".cub" extension.  For example,
+    if the TO parameter was <i>out.cub</i>, the first frame of the output would be named 
+    <i>out.frame1.cub</i>.  If you do not want framelet files, run the cube through pds2isis instead.
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2002-02-25">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2004-01-30">
+      Converted to Isis 3.0
+    </change>
+    <change name="Jeff Anderson" date="2004-02-16">
+      Added AlphaCube keywords
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-06-28">
+        Added visual image processing and framelet extraction option
+    </change>
+    <change name="Elizabeth Miller" date="2006-01-04">
+      Added Frames keyword to framelet labels for the ThemisVis Camera model
+    </change>
+    <change name="Elizabeth Miller" date="2006-01-09">
+      Modified AppTest to remove framelet files
+    </change>
+    <change name="Elizabeth Miller" date="2006-04-14">
+      Removed Framelets option, it always creates them now
+    </change>
+    <change name="Stuart Sides" date="2006-06-09">
+      Removed the ReleaseId keyword from the archive group
+    </change>
+    <change name="Elizabeth Miller" date="2006-08-08">
+      Modified VIS processing portion to no longer call crop and editlab, but 
+      to split the frames apart in the application itself.  This helps increase the
+      speed of the application
+    </change>
+    <change name="Elizabeth Miller" date="2006-09-15">
+      Fixed bugs with pathname and extensions of filenames in the VIS processing
+    </change>
+    <change name="Elizabeth Miller" date="2007-02-20">
+      Changed OriginalLabel name to IsisCube
+    </change>
+    <change name="Jeff Anderson" date="2007-07-13">
+      Transfered SpatialSumming parameter for IR camera
+    </change>
+    <change name="Christopher Austin" date="2008-03-18">
+      Checks if input file is rdr.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-09-18">
+      The original labels are now being preserved in the Isis 3 cube
+    </change>
+  </history>
+
+<!--
+<liens>
+    Convert hard coded translation of QUB labels to use a translation table
+</liens>
+    !-->
+  <category>
+    <missionItem>Mars Odyssey</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS Themis EDR/RDR file
+        </brief>
+        <description>
+          Must contain a valid Themis EDR or a Themis RDR which has only been through radiometric calibration.
+        </description>
+        <filter>
+          *.imq *.img *.QUB
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           The name of the output Isis cube. If the input cube is a VIS image, the output file will have a 
+          ".frame" and frame number inserted in the output name prior to the ".cub" extension.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+
+    <group name="Options">
+      <parameter name="TIMEOFFSET">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>
+          Time offset to the spacecraft clock count
+        </brief>
+        <description>
+The software assumes that the SCLK (spacecraft clock) recorded for an IR image is the time at which the first detector frame readout occurs. Apparently, the actual first readout can be delayed from this by the following amounts: 
+<pre>
+8 microseconds - PACI write 
+0 to 1/30 sec - delay of the image acquisition after receipt of the command 
+0 to 0.1 sec - delay for the command sending by the HPP code so that it is aligned on a 0.1 second boundary 
+</pre>
+Currently, the software ignores these three because the 8 microseconds is a negligible fraction of the 1/30 second line rate and the other two are (apparently) variable and unknowable. However, this can result in an incorrect absolute position of as much as four pixels. 
+
+Similar timing uncertainties probably are applicable to the VIS images. 
+
+The effect of these timing uncertainties is primarily to potentially introduce errors in absolute coordinates in the along-track direction. This in turn can result in misalignment when mosaicking multiple observations together. 
+
+The TIMEOFFSET parameter on "thm2isis" allows the user to apply a correction for this time delay, which can thus improve absolute coordinate accuracy and improve mosaic alignments.  This offset is stored in the Instrument group of the output Isis cube as SpacecraftClockOffset.
+        </description>
+      </parameter>
+    </group>
+   </groups>
+
+  <examples>
+    <example>
+      <brief>Importing a Themis Vis EDR</brief>
+      <description>
+        This program imports both Themis VIS and Themis IR images. Themis VIS images are split into 
+        even and odd files.
+      </description>
+      <terminalInterface>
+        <commandLine>from=V04860003EDR.QUB to=V04860003EDR</commandLine>
+        <description>This is how to run thm2isis on any themis EDR/RDR</description>
+      </terminalInterface>
+        <guiInterfaces>
+          <guiInterface>
+            <image width="728" height="473" src="assets/images/gui.jpg">
+              <brief>The GUI when running this program</brief>
+              <description>
+                This is what the interface looks like when you run this program.
+              </description>
+              <thumbnail width="200" height="130" src="assets/thumbs/gui.jpg" caption="Running thm2isis" />
+            </image>
+          </guiInterface>
+        </guiInterfaces>
+      <inputImages>
+          <image width="154" height="550" src="assets/images/input.jpg">
+            <brief>The input EDR V04860003EDR</brief>
+            <description>
+              This is the input raw data
+            </description>
+            <thumbnail width="56" height="200" src="assets/thumbs/input.jpg" caption="Raw EDR" />
+          </image>
+      </inputImages>
+      <outputImages>
+          <image width="154" height="550" src="assets/images/output1.jpg">
+            <brief>The output odd themis vis cube</brief>
+            <description>
+              This is the outputted cube "V04860003EDR.odd.cub"
+            </description>
+            <thumbnail width="56" height="200" src="assets/thumbs/output1.jpg" caption="Output Isis Cube (odd)" />
+          </image>
+          <image width="154" height="550" src="assets/images/output2.jpg">
+            <brief>The output even themis vis cube</brief>
+            <description>
+              This is the outputted cube "V04860003EDR.even.cub"
+            </description>
+            <thumbnail width="56" height="200" src="assets/thumbs/output2.jpg" caption="Output Isis Cube (even)" />
+          </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

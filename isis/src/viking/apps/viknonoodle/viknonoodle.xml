@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="viknonoodle" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Remove periodic noise from a Viking image
+  </brief>
+
+  <description>
+      VIKNONOODLE removes periodic noise, in the sample direction, from VIKING
+       images.  The images should be run through LEVEL1 before VIKNONOODLE is
+       run on the images. This program is to be run before any cropping. For
+       best results, use trim to remove unwanted data from the sides first. No data
+       that lies between the two noise locations will be affected.
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>fft</item>
+      <item>ifft</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2006-05-22">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2006-07-24">
+      Moved from base to viking area
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2007-12-14">
+        Fixed boundary condition where vectors went out of bounds
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to apply VIKNONOODLE to.
+        </brief>
+        <description>
+            The input cube with periodic noise in the sample direction.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube with the noise removed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+      <parameter name="TOLERANCE">
+        <type>double</type>
+        <brief>
+          Frequency magnitude tolerance level.
+        </brief>
+        <description>
+          The tolerance parameter is used to specify how strong the frequency
+          must be to count as noise. The higher the tolerance level, the less likely
+          the frequency will be cleaned. However, if the tolerance is too low, it may
+          wipe out good data and some banding may occur around the noise location.
+          (Note: most noise frequencies have a magnitude greater than 1.0).
+        </description>
+        <default><item>0.5</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+        <h2>
+          <a name="Introduction">Introduction</a>
+        </h2>
+        <p>
+          This dictionary contains information regarding the various classes of errors that can occur in Isis programs.  Below is a table of the classes of errors with accompanying error codes. The code is sent to the operating system when a program exits due to an error.
+        </p>
+
+        <table class="tableFormattedInformation" align="center" style="width:300px;">
+          <tr>
+            <th>
+              Class
+            </th>
+            <th>
+              Code
+            </th>
+          </tr>
+          <tr>
+            <td>
+              User Error
+            </td>
+            <td>
+              1
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Programmer Error
+            </td>
+            <td>
+              2
+            </td>
+          </tr>
+          <tr>
+            <td>
+              PVL Error
+            </td>
+            <td>
+              3
+            </td>
+          </tr>
+          <tr>
+            <td>
+              I/O Error
+            </td>
+            <td>
+              5
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Camera Error
+            </td>
+            <td>
+              6
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Projection Error
+            </td>
+            <td>
+              7
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Parse Error
+            </td>
+            <td>
+              8
+            </td>
+          </tr>
+          <tr>
+            <td>
+              System Error
+            </td>
+            <td>
+              255
+            </td>
+          </tr>
+        </table>
+
+
+        <h2>
+          <a name="UserError">User Error</a>
+        </h2>
+        <p>
+          This error occurs when the user chooses values for input parameters that are invalid.
+          Examples include entering 1) a negative integer when the parameter only allows positive integers,
+          2) parameters that do not exist in a program (usually a typo), and 3) entering a value not in a required
+          list (8bit, 16bit, 32bit).  The error is almost always related to the user input provided in either the
+          Isis GUI or on the command line.
+        </p>
+
+        <h2>
+          <a name="ProgrammerError">Programmer Error</a>
+        </h2>
+        <p>
+          This should be a rare error.  It occurs when the programmer supplied invalid information to a C++
+          class and/or method.  Generally, these errors are caught by the programmer during the development
+          stage of the software.  They can occur under unusual circumstances such as array out-of-bounds or
+          memory leaks.  Users should report these errors to the
+          <a href="http://isisdist.wr.usgs.gov" target="_blank">Isis Support Site</a>.
+        </p>
+
+        <h2>
+          <a name="PVLError">PVL Error</a>
+        </h2>
+        <p>
+          Isis makes heavy use of Parameter Value Language (PVL).  The most common error that can occur with
+          PVL is requesting parameter-values (Objects, Groups, or Keywords) that do not exist.  Generally, the
+          PVL error message is the most specific information in a stack of error messages.  For example,
+        </p>
+
+          <pre style="padding-left:4em;">
+** PVL ERROR** Could not find requested keyword [SpacecraftName]
+** LABEL ERROR** Error in label file [moon.cub]
+** CAMERA ERROR ** Unable to initialize camera model
+          </pre>
+
+        <h2>
+          <a name="IoError">I/O Error</a>
+        </h2>
+        <p> Errors of this nature are directly related to file I/O.  This includes opening, closing, reading, or
+            writing files.  These errors could include 1) non-existent file on open/allocate, generally caused by a
+            misspelling or wrong directory paths, 2) read and/or write permission violations based on user or group
+            ownership, and 3) insufficient disk space for allocation of an output file.
+        </p>
+
+        <h2>
+          <a name="CameraError">Camera Error</a>
+        </h2>
+        <p> Generally, a handful of conditions can cause a camera error.  One of the most common is the cube does
+            not have Instrument and Kernels group and therefore is not a raw camera cube.  Programs such as cam2map,
+            camtrim, or others beginning with “cam” require such groups in the cube labels.   If the cube has an Instrument
+            group but not a Kernel group you should run the “caminit” program on your cube. Other sources of problems may
+            include missing keywords in the Instrument group, invalid pointers to SPICE files in the kernel group, or
+            unsupported instruments.
+        </p>
+
+        <h2>
+          <a name="ProjectionError">Projection Error</a>
+        </h2>
+        <p> Projection errors occur when reading labels of a cube or a map file.  In most cases, a require keyword
+            is missing or there may be some type of syntax error with the map projection group.  Another possibility
+            is that the map projection is not supported by the Isis system.
+        </p>
+
+        <h2>
+          <a name="ParseError">Parse Error</a>
+        </h2>
+        <p> This error occurs when parsing command lines or PVL files.  Generally, the syntax of a file or command
+            line is not correct and can include problems such as missing quotes, parenthesis, equal signs, etc.
+        </p>
+
+        <h2>
+          <a name="SystemError">System Error</a>
+        </h2>
+        <p> This error relates to operating system or instruction set errors.  Example may include insufficient
+            dynamic memory, out of bounds array errors, or division by zero.  Often these errors are due to insufficient
+            checks made by the programmer.  Such error should be submitted to the Isis support web site.
+        </p>
+
+
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>ErrorDictionary.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>reference</categoryItem>
+  </category>
+  <audience>
+    <target>intermediate</target>
+  </audience>
+  <bibliography>
+    <title>Error Dictionary</title>
+    <brief>Reference of error messages, their meanings, and resolving errors</brief>
+    <description>Reference of error messages, their meanings, and resolving errors</description>
+    <author>Jeff Anderson</author>
+    <date>2003-06-30</date>
+    <history>
+      <change date="2006-04-10" name="Deborah Lee Soltesz" hidden="true">Added brief and description; changed category to 'reference'</change>
+    </history>
+  </bibliography>
+</documentation>

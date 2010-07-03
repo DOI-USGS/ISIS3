@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="photomet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Perform photometric corrections on a cube
+  </brief>
+
+  <description>
+    This program performs photometric corrections on a cube. It can be used
+    to normalize an image for mosaicking. The user must input the cube with a
+    pvl containing the corresponding photometric parameters.  Examples of sample
+    pvl files are shown below. There are three aspects of photometric correction 
+    that need to be considered when running the photomet program:
+  
+    <pre>
+    1) Surface photometric function model type
+    2) Atmospheric photometric function model type
+    3) Type of normalization to be performed
+    </pre>
+  
+    The types of surface photometric function model types currently available
+    in photomet are:
+    <pre>
+    HapkeHen        : Hapke-Henyey-Greenstein photometric model. Derive model 
+                      albedo using complete Hapke model with Henyey-Greenstein 
+		      single-particle phase function whose coefficients are 
+		      Hg1 and Hg2, plus single scattering albedo Wh, opposition
+		      surge parameters Hh and B0, and macroscopic roughness
+		      Theta.
+    Lambert         : Simple photometric model which predicts that light
+                      incident on a surface is scattered uniformly in all
+		      directions; the total amount of reflected light depends
+		      on the incidence angle of the illumination. This function
+		      does not depend upon the outgoing light direction.
+    LommelSeeliger  : This model takes into account the radiance that results
+                      from single scattering (scattering of collimated
+		      incident light) and does not take into account the
+		      radiance that results from multiple scattering (scattering
+		      of diffuse light which has made its way indirectly to
+		      the same position by being scattered one or more times).
+		      This model depends on the incidence and emission angles.
+    LunarLambert    : This model combines a weighted sum of the LommelSeeliger
+                      and Lambert models. Given a suitable value for the
+		      LunarLambert function weight, L, this model fits the true
+		      reflectance behavior of many planetary surfaces equally
+		      well as the Hapke model. This model also depends on the
+		      incidence and emission angles.
+    Minnaert        : This model expands upon the Lambert function by introducing
+                      constant, K, that is used to describe the roughness of a
+		      surface. When the K constant is set to 1.0, then the 
+		      Minnaert model is equivalent to the Lambert model.
+    LunarLambertMcEwen : This model was developed specifically for use with the
+                      Moon. This model was designed to be used in conjunction
+		      with the MoonAlbedo normalization model.
+    </pre>
+  
+    The types of atmospheric photometric function model types currently
+    available in photomet are:
+  
+    <pre>
+    Anisotropic1    : Uses Chandrasekhar's solution for anisotropic scattering
+                      described by a one term Legendre polynomial. This model
+		      uses first order scattering approximation.
+    Anisotropic2    : Uses Chandrasekhar's solution for anisotropic scattering
+                      described by a one term Legendre polynomial. This model
+		      uses second order scattering approximation. It is slower
+		      but more accurate than Anisotropic1.
+    HapkeAtm1       : Provides an approximation for strongly anisotropic
+                      scattering that is similar to Hapke's model for a planetary
+		      surface. The Chandrasekhar solution for isotropic
+		      scattering is used for the multiple scattering terms, and
+		      a correction is made to the singly scattered light for
+		      anisotropic particle phase function. A one term Henyey
+		      Greenstein function is used. This model uses a first
+		      order scattering approximation.
+    HapkeAtm2       : Provides an approximation for strongly anisotropic
+                      scattering that is similar to Hapke's model for a planetary
+		      surface. The Chandrasekhar solution for isotropic
+		      scattering is used for the multiple scattering terms, and
+		      a correction is made to the singly scattered light for
+		      anisotropic particle phase function. A one term Henyey
+		      Greenstein function is used. This model uses a second
+		      order scattering approximation. It is slower but more
+		      accurate than HapkeAtm1.
+    Isotropic1      : Uses Chandrasekhar's solution for isotropic scattering.
+                      This model uses first order scattering approximation.
+    Isotropic2      : Uses Chandrasekhar's solution for isotropic scattering.
+                      This model uses second order scattering approximation.
+		      It is slower but more accurate than Isotropic1.
+    </pre>
+  
+    The types of normalization models currently available in photomet are:
+  
+    <pre>
+    Albedo          : Normalization without atmosphere. Each pixel is divided by 
+                      the model photometric function evaluated at the geometry
+                      of that pixel, then multiplied by the function at reference
+		      geometry with incidence and phase angles equal to Incref
+		      and emission angle 0. This has the effect of removing
+		      brightness variations due to incidence angle and showing
+		      relative albedo variations with the same contrast
+		      everywhere. If topographic shading is present, it will be
+		      amplified more in regions of low incidence angle and will
+		      not appear uniform.
+    AlbedoAtm       : Normalization with atmosphere. For each pixel, a model of 
+                      atmospheric scattering is subtracted and a surface model
+                      is divided out, both evaluated at the actual geometry of
+		      the pixel. Then the resulting value is multiplied by the 
+		      surface function at reference conditions is added. In 
+		      normal usage, the reference condition has normal incidence
+		      (Incref=0) and no atmosphere (Tauref=0) but in some cases
+		      it may be desirable to normalize images to a different
+		      incidence angle or a finite optical depth to obtain a more
+		      uniform appearance. As with the Albedo model, if 
+		      topographic shading is present, it will be amplified more at
+		      high incidence angles and will not appear uniform.
+    Mixed           : Normalization without atmosphere. Used to do albedo 
+                      normalization over most of the planet, but near the 
+                      terminator it will normalize topographic contrast to avoid
+		      the seams that can occur with the usual albedo normalization.
+		      The two effects will be joined seamlessly at incidence 
+		      angle Incmat. Incmat must be adjusted to give the best
+		      equalization of contrast at all incidence angles. The
+		      Albedo parameter must also be adjusted so the topographically
+		      normalized regions at high incidence angle are set to an
+		      albedo compatible with the albedo-normalized data at lower
+		      incidence.
+    MoonAlbedo      : Normalization without atmosphere. This model was designed
+                      specifically for use on Lunar data. It will compute 
+                      normalized albedo for the Moon, normalized to 0 degrees
+		      emission angle and 30 degrees illumination and phase angles.
+		      The LunarLambertMcEwen photometric function was designed to 
+                      be used with this normalization model.
+    NoNormalization : Normalization without atmosphere. No normalization is 
+                      performed. Only photometric correction is performed.
+    Shade           : Normalization without atmosphere. The surface photometric 
+                      function is evaluated at the geometry of the image in order
+                      to calculate a shaded relief image of the ellipsoid (and
+		      in the future the DEM). The radiance of the model surface
+		      is set to Albedo at incidence angle Incref and zero phase.
+		      The image data is not used.
+    ShadeAtm        : Normalization with atmosphere. The surface photometric 
+                      function is used to simulate an image by relief shading,
+                      just like the Shade model, but the effects of atmospheric
+		      scattering are also included in the calculation.
+    Topo            : Normalization without atmosphere. Used to normalize 
+                      topographic shading to uniform contrast regardless of 
+                      incidence angle. Such a normalization would exagerate
+		      albedo variations at large incidence angles, so this model
+		      is used as part of a three step process in which (1) the
+		      image is temporarily normalized for albedo; (2) a highpass
+		      divide filter is used to remove regional albedo variations;
+		      and (3) the image is renormalized with the Topo mode to 
+		      undo the first normalization and equalize topographic 
+		      shading. The reference state in the first step MUST have
+		      Incref=0 because this is waht is undone in the final step.
+		      If there are no significant albedo variations, step (2)
+		      can be skipped but step (1) must not be.
+    TopoAtm         : Normalization with atmosphere. As with the Topo model, 
+                      this option is used in the final step of a three step
+		      process: (1) normalize with the AlbedoAtm model, Incref=0,
+		      and Tauref=0 to temporarily remove atmosphere and normalize
+		      albedo variations; (2) use highpass divide filter to remove
+		      albedo variations; and (3) normalize with the TopoAtm model
+		      to undo the temporary normalization and equalize topographic
+		      shading.
+    </pre>
+  
+    As you can see above, the only normalization models that make use of atmospheric
+    correction are: AlbedoAtm, ShadeAtm, and TopoAtm. Atmospheric correction is not
+    applied by any of the other normalization models. If you specify an atmospheric
+    model in a PVL along with a normalization model that does not do atmospheric
+    correction, then the atmospheric model will be ignored.
+  
+    Each of the above photometric, atmospheric, and normalization models has specific
+    parameters that apply to them. Here is a list of the models and their related
+    parameters (in parentheses):
+  
+    <pre>
+    HapkeHen (B0,Hg1,Hg2,Hh,Theta,Wh)
+    Lambert
+    LommelSeeliger
+    LunarLambert (L)
+    Minnaert (K)
+    LunarLambertMcEwen
+  
+    Anisotropic1 (Bha,Bharef,Hnorm,Nulneg,Tau,Tauref,Wha,Wharef)
+    Anisotropic2 (Bha,Bharef,Hnorm,Nulneg,Tau,Tauref,Wha,Wharef)
+    HapkeAtm1 (Hga,Hgaref,Hnorm,Nulneg,Tau,Tauref,Wha,Wharef)
+    HapkeAtm2 (Hga,Hgaref,Hnorm,Nulneg,Tau,Tauref,Wha,Wharef)
+    Isotropic1 (Hnorm,Nulneg,Tau,Tauref,Wha,Wharef)
+    Isotropic2 (Hnorm,Nulneg,Tau,Tauref,Wha,Wharef)
+  
+    Albedo (Albedo,Incmat,Incref,Thresh)
+    AlbedoAtm (Incref)
+    Mixed (Albedo,Incmat,Incref,Thresh)
+    MoonAlbedo (Bsh1,D,E,F,G2,H,Wl,Xb1,Xb2,Xmul)
+    NoNormalization
+    Shade (Albedo,Incref)
+    ShadeAtm (Albedo,Incref)
+    Topo (Albedo,Incref,Thresh)
+    TopoAtm (Albedo,Incref)
+    </pre>
+  
+    Here is a description of each parameter along with a valid range
+    of values and the default for that parameter:
+  
+    <pre>
+    Photometric parameters:
+    -----------------------
+    B0:     Hapke opposition surge component: 0 &lt;= value : default is 0.0
+    Bh:     Hapke Legendre coefficient for single particle phase function:
+            -1 &lt;= value &lt;= 1 : default is 0.0
+    Ch:     Hapke Legendre coefficient for single particle phase function:
+            -1 &lt;= value &lt;= 1 : default is 0.0
+    Hg1:    Hapke Henyey Greenstein coefficient for single particle phase
+            function: -1 &lt; value &lt; 1 : default is 0.0
+    Hg2:    Hapke Henyey Greenstein coefficient for single particle phase
+            function: 0 &lt;= value &lt;= 1 : default is 0.0
+    Hh:     Hapke opposition surge component: 0 &lt;= value : default is 0.0
+    K:      Minnaert function exponent: 0 &lt;= value : default is 1.0
+    L:      Lunar-Lambert function weight: no limit : default is 1.0
+    Theta:  Hapke macroscopic roughness component: 0 &lt;= value &lt;= 90 :
+            default is 0.0
+    Wh:     Hapke single scattering albedo component: 0 &lt; value &lt;= 1 : 
+            default is 0.5
+  
+    Atmospheric parameters:
+    -----------------------
+    Bha    : Coefficient of the single particle Legendre phase function:
+             -1 &lt;= value &lt;= 1 : default is 0.85
+    Bharef : Reference value of Bha to which the image will be
+             normalized: -1 &lt;= value &lt;= 1 : default is Bha
+    Hga    : Coefficient of single particle Henyey Greenstein phase
+             function: -1 &lt; value &lt; 1 : default is 0.68
+    Hgaref : Reference value of Hga to which the image will be
+             normalized: -1 &lt; value &lt; 1 : default is Hga
+    Hnorm  : Atmospheric shell thickness normalized to the planet radius:
+             0 &lt;= value : default is .003
+    Nulneg : Determines if negative values after removal of atmospheric
+             effects will be set to NULL: YES or NO : default is NO
+    Tau    : Normal optical depth of the atmosphere: 0 &lt;= value : default 
+             is 0.28
+    Tauref : Reference value of Tau to which the image will be
+             normalized: 0 &lt;= value : default is 0.0
+    Wha    : Single scattering albedo of atmospheric particles: 
+             0 &lt; value &lt;= 1 : default is 0.95
+    Wharef : Reference value of Wha to which the image will be
+             normalized: 0 &lt; value &lt;= 1 : default is Wha
+  
+    Normalization parameters:
+    -------------------------
+    Albedo : Albedo to which the image will be normalized: no limit : 
+             default is 1.0
+    Bsh1   : Albedo dependent phase function normalization parameter: 
+             0 &lt;= value : default is 0.08
+    D      : Albedo dependent phase function normalization parameter: no 
+             limit : default is 0.14
+    E      : Albedo dependent phase function normalization parameter: no 
+             limit : default is -0.4179
+    F      : Albedo dependent phase function normalization parameter: no 
+             limit : default is 0.55
+    G2     : Albedo dependent phase function normalization parameter: no 
+             limit : default is 0.02
+    H      : Albedo dependent phase function normalization parameter: no 
+             limit : default is 0.048
+    Incmat : Specifies incidence angle where albedo normalization transitions 
+             to incidence normalization: 0 &lt;= value &lt; 90 : default is 0.0
+    Incref : Reference incidence angle to which the image will be normalized:
+             0 &lt;= value &lt; 90 : default is 0.0
+    Thresh : Sets upper limit on amount of amplification in regions of small
+             incidence angle: no limit : default is 30.0
+    Wl     : Wavelength in micrometers of the image being normalized: no 
+             limit : default is 1.0
+    Xb1    : Albedo dependent phase function normalization parameter: no 
+             limit : default is -0.0817
+    Xb2    : Albedo dependent phase function normalization parameter: no 
+             limit : default is 0.0081
+    Xmul   : Used to convert radiance to reflectance or apply a calibration 
+             fudge factor: no limit : default is 1.0
+    </pre>
+  
+    Here are some example PVL files:
+    <pre>
+    Example 1:
+  
+    Object = PhotometricModel
+      Group = Algorithm
+        Name = Lambert
+      EndGroup
+    EndObject
+    Object = NormalizationModel
+      Group = Algorithm
+        Name = NoNormalization
+      EndGroup
+    EndObject
+  
+    --------------------------------
+    Example 2:
+  
+    Object = PhotometricModel
+      Group = Algorithm
+        Name = Minnaert
+	K = .5
+      EndGroup
+    EndObject
+    Object = NormalizationModel
+      Group = Algorithm
+        Name = Albedo
+	Incref = 0.0
+	Incmat = 0.0
+	Albedo = 1.0
+	Thresh = 30.0
+      EndGroup
+    EndObject
+  
+    --------------------------------
+    Example 3:
+  
+    Object = PhotometricModel
+      Group  = Algorithm
+        Name = HapkeHen
+	Wh = 0.52
+	Hh = 0.0
+	B0 = 0.0
+	Theta = 30.0
+	Hg1 = .213
+	Hg2 = 1.0
+      EndGroup
+    EndObject
+    Object = AtmosphericModel
+      Group = Algorithm
+        Name = HapkeAtm2
+	Hnorm = .003
+	Tau = 0.28
+	Tauref = 0.0
+	Wha = .95
+	Hga = 0.68
+      EndGroup
+    EndObject
+    Object = NormalizationModel
+      Group = Algorithm
+        Name = AlbedoAtm
+	Incref = 0.0
+      EndGroup
+    EndObject
+
+    --------------------------------
+    Example 4 (Used to process Clementine UVVIS filter "a" data):
+  
+    Object = PhotometricModel
+      Group  = Algorithm
+        Name = LunarLambertMcEwen
+      EndGroup
+    EndObject
+    Object = NormalizationModel
+      Group = Algorithm
+        Name = MoonAlbedo
+	D = 0.0
+	E = -0.222
+	F = 0.5
+	G2 = 0.39
+	H = 0.062
+	Bsh1 = 2.31
+      EndGroup
+    EndObject
+  
+    --------------------------------
+    Example 5 (Used to process Clementine UVVIS filter "b" data):
+  
+    Object = PhotometricModel
+      Group  = Algorithm
+        Name = LunarLambertMcEwen
+      EndGroup
+    EndObject
+    Object = NormalizationModel
+      Group = Algorithm
+        Name = MoonAlbedo
+	D = 0.0
+	E = -0.218
+	F = 0.5
+	G2 = 0.4
+	H = 0.054
+	Bsh1 = 1.6
+      EndGroup
+    EndObject
+  
+    --------------------------------
+    Example 6 (Used to process Clementine UVVIS filter "cde" data):
+  
+    Object = PhotometricModel
+      Group  = Algorithm
+        Name = LunarLambertMcEwen
+      EndGroup
+    EndObject
+    Object = NormalizationModel
+      Group = Algorithm
+        Name = MoonAlbedo
+	D = 0.0
+	E = -0.226
+	F = 0.5
+	G2 = 0.36
+	H = 0.052
+	Bsh1 = 1.35
+      EndGroup
+    EndObject
+  
+  </pre>
+
+  </description>
+
+  <oldName>
+    <item>photomet</item>
+  </oldName>
+
+  <history>
+    <change name="Tammy Becker" date="1989-02-15">
+      Original version - based on Tammy Becker's
+      photom/photompr programs which were later 
+      converted to Randy Kirk's photomet
+    </change>
+    <change name="Janet Barrett" date="2008-03-07">
+      Added code to acquire the BandBin Center keyword from the
+      input image. This value is needed in case the user chooses
+      the MoonAlbedo normalization method.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Jeannie Walldren" date="2009-01-08">
+      Added MAXEMISSION and MAXINCIDENCE parameters.  Modified code to set 
+      off-target pixels to NULL.  Added appTests for new parameters.  Added user
+      documentation examples. 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the input filename.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the of the photometric 
+          correction.
+        </description>
+      </parameter>
+      <parameter name="PHOPAR">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Pvl file
+        </brief>
+        <description>
+          This file will contain the photometric parameters to use
+          when doing the photometric correction.
+        </description>
+	      <filter>
+	        *.pvl
+        </filter>
+      </parameter>
+    </group>
+    <group name="TrimParameters">
+      <parameter name="MAXEMISSION">
+        <type>double</type>
+        <brief>Maximum emisson angle</brief>
+        <description>
+          The maximum number of degrees allowed for the emission angle.  This 
+          number must be between 0.0 and 90.0.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <default><item> 90.0</item></default>
+      </parameter>
+      <parameter name="MAXINCIDENCE">
+        <type>double</type>
+        <brief>Maximum incidence angle</brief>
+        <description>
+          The maximum number of degrees allowed for the incidence angle.  This 
+          number must be between 0.0 and 90.0.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <default><item> 90.0</item></default>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Photometric corrections with any valid angles</brief>
+      <description>
+        This example shows the photometric correction of a cube by using 
+        photomet application with the default parameter values kept for the 
+        maximum emission and incidence angles. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          photomet from=input.cub phopar=input.pvl to=output.cub
+        </commandLine>
+        <description>Run photomet with default maximum angles</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/gui1.jpg" width="510" height="550">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI version of the application.  Notice the default
+              values of 90.0 are left alone for the MAXEMISSION and
+              MAXINCIDENCE parameters.
+            </description>
+            <thumbnail src="assets/thumbs/gui1thumb.jpg" caption="photomet GUI using defaults" width="185" height="200"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/input.pvl">
+          <brief>Example input PVL</brief>
+          <description>
+            Pvl file including the input photometric parameters for the input 
+            cube.
+          </description>
+          <parameterName>
+            PHOPAR
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/images/input.jpg" width="547" height="550">
+          <brief>Example input cube </brief>
+          <description>
+            Screenshot of the input image before photometric correction has been 
+            performed. 
+          </description>
+          <thumbnail src="assets/thumbs/inputthumb.jpg" caption="Input image" width="199" height="200"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/output1.jpg" width="547" height="550">
+          <brief>Example output cube </brief>
+          <description> 
+            Screenshot of the output image after photometric correction.  Notice 
+            many features on the surface are easier to view due to the 
+            normalization of the pixels.
+          </description>
+          <thumbnail src="assets/thumbs/output1thumb.jpg" caption="Output image" width="199" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Photometric corrections using maximum emission angle parameter</brief>
+      <description>
+        This example shows the photometric correction of a cube by using 
+        photomet application with the maximum emission angle set to 75.0 and the
+        default parameter value kept for the maximum incidence angle. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          photomet from=input.cub phopar=input.pvl to=output.cub maxemission=75.0
+        </commandLine>
+        <description>
+          Run photomet with maximum emission angle less than the default value 
+          of 90 degrees.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/gui2.jpg" width="510" height="550">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI version of the application.  Notice the 
+              MAXEMISSION parameter is changed from the default value of 90.0.
+            </description>
+            <thumbnail src="assets/thumbs/gui2thumb.jpg" caption="photomet GUI with MAXEMISSION changed" width="185" height="200"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/input.pvl">
+          <brief>Example input PVL</brief>
+          <description>
+            Pvl file including the input photometric parameters for the input 
+            cube.
+          </description>
+          <parameterName>
+            PHOPAR
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/images/input.jpg" width="547" height="550">
+          <brief>Example input cube </brief>
+          <description>
+            Screenshot of the input image before photometric correction has been 
+            performed. 
+          </description>
+          <thumbnail src="assets/thumbs/inputthumb.jpg" caption="Input image" width="199" height="200"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/output2.jpg" width="547" height="550">
+          <brief>Example output cube </brief>
+          <description> 
+            Screenshot of the output image after photometric correction.  Notice 
+            there are more blackened areas than in the Example 1 output image.  
+            This happens since the pixel values have been set to null where the 
+            emission angles are greater than 75.
+          </description>
+          <thumbnail src="assets/thumbs/output2thumb.jpg" caption="Output image" width="199" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Photometric corrections using maximum incidence angle parameter</brief>
+      <description>
+        This example shows the photometric correction of a cube by using 
+        photomet application with the maximum incidence angle set to 85.0 and the
+        default parameter value kept for the maximum emission angle. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          photomet from=input.cub phopar=input.pvl to=output.cub maxincidence=85.0
+        </commandLine>
+        <description>
+          Run photomet with maximum incidence angle less than the default value 
+          of 90 degrees.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/gui3.jpg" width="510" height="550">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI version of the application.  Notice the 
+              MAXINCIDENCE parameter is changed from the default value of 90.0.
+            </description>
+            <thumbnail src="assets/thumbs/gui3thumb.jpg" caption="photomet GUI with MAXINCIDENCE changed" width="185" height="200"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/input.pvl">
+          <brief>Example input PVL</brief>
+          <description>
+            Pvl file including the input photometric parameters for the input 
+            cube.
+          </description>
+          <parameterName>
+            PHOPAR
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/images/input.jpg" width="547" height="550">
+          <brief>Example input cube </brief>
+          <description>
+            Screenshot of the input image before photometric correction has been 
+            performed. 
+          </description>
+          <thumbnail src="assets/thumbs/inputthumb.jpg" caption="Input image" width="199" height="200"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/output3.jpg" width="547" height="550">
+          <brief>Example output cube </brief>
+          <description> 
+            Screenshot of the output image after photometric correction.  Notice 
+            there are different areas of valid pixels from Examples 1 and 2 
+            output images. This happens since the pixel values have been set to 
+            null where the incidence angles are greater than 85, but the 
+            emission angle parameter is kept at default.
+          </description>
+          <thumbnail src="assets/thumbs/output3thumb.jpg" caption="Output image" width="199" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Photometric corrections using maximum emission and incidence angle parameters</brief>
+      <description>
+        This example shows the photometric correction of a cube by using 
+        photomet application with the maximum emission angle set to 75.0 and the 
+        maximum incidence angle set to 85.0. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          photomet from=input.cub phopar=input.pvl to=output.cub maxemission=75.0 maxincidence=85.0
+        </commandLine>
+        <description>
+          Run photomet with maximum emission and incidence angles less than the 
+          default values of 90 degrees.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/gui4.jpg" width="510" height="550">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI version of the application.  Notice the 
+              MAXEMISSION and MAXINCIDENCE parameters are changed from the 
+              default values of 90.0.
+            </description>
+            <thumbnail src="assets/thumbs/gui4thumb.jpg" caption="photomet GUI with MAXEMISSION and MAXINCIDENCE changed" width="185" height="200"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/input.pvl">
+          <brief>Example input PVL</brief>
+          <description>
+            Pvl file including the input photometric parameters for the input 
+            cube.
+          </description>
+          <parameterName>
+            PHOPAR
+          </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/images/input.jpg" width="547" height="550">
+          <brief>Example input cube </brief>
+          <description>
+            Screenshot of the input image before photometric correction has been 
+            performed. 
+          </description>
+          <thumbnail src="assets/thumbs/inputthumb.jpg" caption="Input image" width="199" height="200"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/output4.jpg" width="547" height="550">
+          <brief>Example output cube </brief>
+          <description> 
+            Screenshot of the output image after photometric correction.  Notice 
+            this output image contains the overlapping valid pixels from 
+            Examples 2 and 3.
+          </description>
+          <thumbnail src="assets/thumbs/output4thumb.jpg" caption="Output image" width="199" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

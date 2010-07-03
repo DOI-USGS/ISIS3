@@ -1,0 +1,211 @@
+			caminfo Modifications
+			  September 18, 2008
+
+
+The caminfo application used by the UPC has had some extensive changes made to 
+support cubes where the bands have dependent geometry.  This means each band in 
+the cube has a different geometric footprint.  THEMIS IR and VIS are but one 
+example where bands have different geometric characteristics.
+
+caminfo is perhaps the most critical application in the processing of UPC data.  
+It computes and/or stores of all data that eventually is populated in the UPC 
+database.  This document describes the changes and alludes to the impact it may 
+have on others who have come to rely on caminfo for their processing needs.
+
+Structural Changes
+The change with the most impact is a restructuring of the PVL Object and Group 
+structure of the resulting PVL output file.  No longer is each band's 
+individual geometry included in the PVL.  The "BandSet" object has been removed 
+from the PVL.  All "Band" groups that report individual geometry 
+characteristics have been removed.  In general, All Groups have been replaced 
+with objects that are named the same as the parameters in the user interface.
+
+The top level object was renamed from "Parameters" to "Caminfo", the name of 
+the application.  The "Common" object has been renamed to "Parameters" and only 
+IsisId, From, Lines, Samples and Bands are contained therein.  This is a big 
+change from the old structure as the top level Object was named "Parameters" 
+and the "Common" Object contained all other Pvl structures.  This essentially 
+eliminates an entire level of object nesting.
+
+The "CubeCamStats" Group has been renamed to the "Camstats" Object and is 
+contained in the "Caminfo" top level object.
+
+The statistics keywords in each old "Band" Group have been consolidated into 
+the "Statistics" Object.  This object is new and now includes all data in all 
+bands of the input cube.  This differs from the old version in that it only was 
+generated for each band an no data was available for the whole file.  One 
+casualty occured in that the "MedianValue" keyword is no longer calculated.  
+This required two passes and was not the true median of the cube when they are 
+in floating point format.  Note that in order to get the true median of a 
+dataset, the entire dataset must stored and sorted in order and the exact 
+middle value will be the median.  This is impractical for large files.
+
+The Group "Band" in the "BandSet" Object has been replaced with the "Geometry" 
+Object in the "Caminfo" top level object.  The "BandSet" Object has been 
+removed entirely.  Note that a "Band" Group was generated for each band in a 
+mult-band cube.  Bands are no longer being treated this way.  They are 
+consolidated as	a union of all band dependent bands. This is discussed in 
+detail below.
+
+The geometry characteristics contained in each "Band" Group are now 
+consolidated for all bands and contained in the "Geometry" Object.  The 
+Geometry Object is contained in the "Caminfo" top level object.  This new 
+object is a union of the geometric characteristics for all band dependent data 
+or simply the first band for data that is band independent.  
+
+Some additional keywords have been added to the new "Geometry" Object.  Many
+of the keywords that were in the "Band" Group are retained, however, they
+should be deemed representative of the complete image cube geometry and not 
+just one band. They are:
+
+BandsUsed         - reports the number of bands used to generate the data
+ReferenceBand     - This reports the logical band used to describe the geometry 
+                    excluding the corners latitude/longitude keywords.  This 
+                    reference band is selected as the band whose center 
+                    latitude is closest to the Centroid latitude/longitude of 
+                    the combined polygon of all bands.
+OriginalBand      - The physical band of ReferenceBand.  Many times they will 
+                    be one in the same.
+Target            - Name of the target observed.  This may be necessary if no
+                    label output option is selected.
+CenterRadius      - The "local" radius at the CenterLatitude/CenterLongitude 
+                    coordinate.  This may be the radius of the spheroid or the 
+		    DEM if one is available.
+CentroidLatitude  - Latitude coordinate of the centroid of the polygon.  This 
+                    is computed using the union polygon of all bands.
+CentroidLongitude - Longitude coordinate of the centroid of the polygon.  This 
+                    is computed using the union polygon of all bands.
+CentroidLine      - Reports the line coordinate in the image where the polygon 
+                    centroid point is located.
+CentroidSample    - Reports the sample coordinate in the image where the 
+                    polygon centroid point is located.
+CentroidRadius    - "Local" radius at the polygon centroid.  This may differ 
+                    from the CenterRadius.
+MeanGroundResolution - Average of the lowest and highest occuring image 
+                       resolution.
+
+
+Band-by-Band Processing
+The biggest change in caminfo is perhaps how each band is considered in the 
+gathering of cube and geometry statistics and the characterization of the cube 
+geometry and polygon footprint for the product.  Note that as far as I am 
+concerned, a UPC product or database entry refers uniquely to a single file.  
+It is with this in mind	that motivated the choices made in implementing the 
+current version of caminfo.
+
+For band independant image cubes, only the first band is used to generate the 
+"Geometry" object.  For band dependent data, the following processes are 
+employed:
+
+1)  Polygons for all data are generated regardless as to if the user requested 
+polygon information.  Polygons are used to assist in the full Geometry 
+characterization.
+
+2)  The polygons for each band are unioned into one final multipolygon that 
+characterizes the full geometric footprint for all bands in the cube.
+
+3)  The centroid latitude and longitude point is calculated for each band
+polygon.  This point is converted to line and sample and the local radius at 
+that position is recorded.
+
+4)  The centroid point for the combined union polygon of all bands is computed.
+
+5)  The union centroid point is used to determine the four corner 
+latitude/longitude points in the following fashion:
+	a) Each bands geometry is saved storing information that is reported
+	   in the Geometry object.
+	b) At each corner the distance from the polygon centroid point to the 
+           corner latitude/longitude point is computed.
+	c) The point that is furthest from the centroid point is saved as the
+	   corner point.
+	d) All four corners are computed this way.
+
+The "Polygon" Object contains the GisFootprint along wth some new information.  
+In additon to the Well Known Text (WKT) format of the GIS footprint, the 
+centroid latitude/longitude point of the union polygon is recorded.  
+
+Also reported is the Radius computed according to the following procedure:
+	a)  The average radius of the image center and polygon center are 
+            computed independantly.
+        b)  If the polygon radius is valid, it is the reported Radius.
+	c)  Otherwise the center image point radius is returned if it is valid.
+	d)  And finally, if neither of the above two radii are valid, the
+	    radius from the average of the three radii reported in the SPICE 
+            kernels is reported.
+
+New to the "Polygon" Object is the surface area of the full polygon in units of 
+square kilometers.  The surface area of the polygon is computed by projecting 
+the full footprint polygon into a sinusoidal projection in global map X/Y 
+coordinates.  These coordinates are in meters.  Then I use the GEOS getArea()
+function of the polygon to compute the area of the polygon.
+
+Once this is computed, the global surface area in square kilometers is computed 
+as: 
+	4.0 * PI * radius^2 / (1000.0*1000.0)
+
+Then the ratio of polygon area to global area is calculated and converted to a 
+percentage of global coverage.  This may be very helpful in the query process 
+to eliminate wide angle images or select a range of images within a certain 
+area resolution.
+
+Note that it is simple to compute individual band Geometry to emulate much of 
+how the old version computed band dependent geometry individually.  Simply use 
+the band selection command line option to select the desired band to compute.  
+In my opinion, this approach is easier to manage as the PVL format remains 
+identical and is easier to manipulate with other tools outside the ISIS 
+programming environment (such as getkey, etc...).
+
+Here is a small diagram comparing the structural differences of the old version 
+and new version of the PVL output file format:
+
+----  OLD FORMAT ----                 ----  NEW FORMAT ----              
+Object = Parameters                   Object = Caminfo                   
+  Object = Common                       Object = Parameters              
+    Group = CubeCamStats                EndObject                        
+    EndGroup                            Object = Camstats                
+  EndObject                             EndObject                        
+  Object = IsisLabel                    Object = IsisLabel               
+  EndObject                             EndObject                        
+  Object = OriginalLabel                Object = OriginalLabel           
+  EndObject                             EndObject                        
+  Object = BandSet                      Object = Statistics              
+    Group = Band                        EndObject                        
+      Band =1                           Object = Geometry                
+    EndGroup                            EndObject                        
+    Group = Band                        Object = Polygon                 
+      Band = 2                          EndObject                        
+    EndGroup                          EndObject                          
+  EndObject                           End                                
+EndObject                             
+End
+
+
+Attached are some examples of old and new output.  If you would like to see the 
+images used to calculate these examples, please come see me.
+
+If you have strong objections to these modifications, you should bring them to 
+my attention ASAP as I need to commit these changes to CVS and use it to 
+restart pipeline processing.
+
+Thanks...
+				    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			      

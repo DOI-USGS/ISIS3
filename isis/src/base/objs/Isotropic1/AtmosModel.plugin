@@ -1,0 +1,4 @@
+Group = Isotropic1
+  Library = Isotropic1
+  Routine = Isotropic1Plugin
+End_Group

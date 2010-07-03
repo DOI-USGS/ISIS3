@@ -1,0 +1,86 @@
+$Id: IssWAAddendumXXX.ti,v 1.1 2009/01/22 22:14:49 kbecker Exp $
+
+Data was gathered from the Isis2 file: iss_parameters.def.1
+
+The Default focal length is not being used, but was left in
+from isis2.
+
+The boresight of the instrument has been updated to the center
+of the detector.  Previous values were used along with specific
+CK rotation angle frames that were propagated from ISIS2.  These
+values proved to be incorrect and have subsequently been corrected
+so as to use the frames kernel directly as provided by NAIF.  See
+below for additional details pertaining to the SPICE frames
+kernels as there is some special handling of this kernel.
+(KJB, 2009-01-22)
+
+\begindata
+INS-82361_BORESIGHT_LINE=512.5
+INS-82361_BORESIGHT_SAMPLE=512.5
+
+INS-82361_DEFAULT_FOCAL_LENGTH=200.77
+INS-82361_CB2_CL2_FOCAL_LENGTH=200.85
+INS-82361_CB2_IRP90_FOCAL_LENGTH=200.83
+INS-82361_CB2_IRP0_FOCAL_LENGTH=200.82
+INS-82361_CB3_CL2_FOCAL_LENGTH=201.22
+INS-82361_CB3_IRP90_FOCAL_LENGTH=201.12
+INS-82361_CB3_IRP0_FOCAL_LENGTH=201.11
+INS-82361_CL1_BL1_FOCAL_LENGTH=200.86
+INS-82361_CL1_CL2_FOCAL_LENGTH=200.77
+INS-82361_CL1_GRN_FOCAL_LENGTH=200.71
+INS-82361_CL1_HAL_FOCAL_LENGTH=200.74
+INS-82361_CL1_IR1_FOCAL_LENGTH=200.80
+INS-82361_CL1_RED_FOCAL_LENGTH=200.74
+INS-82361_CL1_VIO_FOCAL_LENGTH=201.09
+INS-82361_IR2_CL2_FOCAL_LENGTH=200.97
+INS-82361_IR2_IR_FOCAL_LENGTH=200.95
+INS-82361_IR2_IRP90_FOCAL_LENGTH=200.95
+INS-82361_IR3_CL2_FOCAL_LENGTH=201.04
+INS-82361_IR3_IRP90_FOCAL_LENGTH=201.03
+INS-82361_IR3_IRP0_FOCAL_LENGTH=201.04
+INS-82361_IR4_CL2_FOCAL_LENGTH=201.22
+INS-82361_IR4_IRP90_FOCAL_LENGTH=201.16
+INS-82361_IR4_IRP0_FOCAL_LENGTH=201.15
+INS-82361_MT2_CL2_FOCAL_LENGTH=200.82
+INS-82361_MT2_IRP0_FOCAL_LENGTH=200.81
+INS-82361_MT2_IRP90_FOCAL_LENGTH=200.82
+INS-82361_MT3_CL2_FOCAL_LENGTH=201.04
+INS-82361_MT3_IRP0_FOCAL_LENGTH=201.06
+INS-82361_MT3_IRP90_FOCAL_LENGTH=201.07
+
+INS-82361_PIXEL_PITCH=.012
+
+INS-82361_TRANSX=(0.0 0.012 0.0)
+INS-82361_TRANSY=(0.0 0.0 0.012)
+
+INS-82361_ITRANSS=(0.0 83.333333333333333 0.0)
+INS-82361_ITRANSL=(0.0 0.0 83.333333333333333)
+
+INS-82361_K1=.000062
+
+\begintext
+
+The Cassini ISS WAC frames kernel is missing one final rotation in its
+CK frames hierarchy.  A 180 degree rotation about the detector center
+(Z-axis) is required to map into the proper detector orientation.  This
+is not included in the NAIF SPICE frames kernel (cas_v??.tf).  The following
+frames definition applies the rotation into camera coordinates and must
+be the frame used in the ISIS camera model converting from the s/c frame to
+the instrument. (KJB, 2009-01-22)
+
+\begindata
+
+INS_-82361_FRAME_ID           = 14082361
+FRAME_CASSINI_ISS_WAC_USGS    = 14082361
+FRAME_14082361_NAME           = 'CASSINI_ISS_WAC_USGS'
+FRAME_14082361_CLASS          = 4
+FRAME_14082361_CLASS_ID       = 14082361
+FRAME_14082361_CENTER         = -82
+TKFRAME_14082361_SPEC         = 'ANGLES'
+TKFRAME_14082361_RELATIVE     = 'CASSINI_ISS_WAC'
+TKFRAME_14082361_ANGLES       = (0.0,       0.0,    180.0)
+TKFRAME_14082361_AXES         = (  1,         2,        3)
+TKFRAME_14082361_UNITS        = 'DEGREES' 
+
+\begintext
+

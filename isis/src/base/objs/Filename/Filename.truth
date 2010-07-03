@@ -1,0 +1,191 @@
+Testing Basics ...
+Original filename: /path/base.ext+attr
+Path:              /path
+Name:              base.ext
+Basename:          base
+Extension:         ext
+Filename:          /path/base.ext
+Original path      /path
+
+Testing Extension change ...
+Filename:      /path/base.tmp
+Filename:      /path/base.tmp.jpg
+
+Testing path with a dot and extension ...
+Original filename: /path1/.path2/base.ext+attr
+Path:              /path1/.path2
+Name:              base.ext
+Basename:          base
+Extension:         ext
+Filename:          /path1/.path2/base.ext
+Original path      /path1/.path2
+
+Testing path with dot and no extension ...
+Original filename: /path1/pat.h2/base+attr
+Path:              /path1/pat.h2
+Name:              base
+Basename:          base
+Extension:         
+Filename:          /path1/pat.h2/base
+Original path      /path1/pat.h2
+
+Testing path starting with a dot ...
+Original filename: /.path1/path2/base
+Path:              /.path1/path2
+Name:              base
+Basename:          base
+Extension:         
+Filename:          /.path1/path2/base
+Original path      /.path1/path2
+
+Testing file with a dot at the end ...
+Original filename: /.path1/path2/base.+attr
+Path:              /.path1/path2
+Name:              base.
+Basename:          base
+Extension:         
+Filename:          /.path1/path2/base.
+Original path      /.path1/path2
+
+Testing file name with multiple extensions...
+Original filename: /path/base.ex1.exten2.ext3
+Path:              /another/path
+Name:              base.ex1.exten2.ext3
+Basename:          base.ex1.exten2
+Extension:         ext3
+Filename:          /another/path/base.ex1.exten2.ext3
+Original path      /another/path
+
+Testing environment variable expansion
+Original filename: $base/testData/isisTruth.cub
+Filename was expanded correctly
+Name:              isisTruth.cub
+Basename:          isisTruth
+Extension:         cub
+Original path      $base/testData
+
+Testing bad environment variable expansion
+Original filename: $BADENV/base.ext+attr
+New filename:      /$BADENV/base.ext
+Path:              /$BADENV
+Name:              base.ext
+Basename:          base
+Extension:         ext
+Original path      /$BADENV
+
+Testing ISIS preference variable expansion
+Original filename: /$TEMPORARY/unitTest.cpp
+New filename:      /unitTest.cpp
+Name:              unitTest.cpp
+Basename:          unitTest
+Extension:         cpp
+Original path      /$TEMPORARY
+
+Testing file name without a path
+Original filename: unitTest.cpp
+Filename was expanded correctly
+Name:              unitTest.cpp
+Basename:          unitTest
+Extension:         cpp
+Original path      .
+
+Testing file name with . as the path
+Original filename: ./unitTest.cpp
+Filename was expanded correctly
+Name:              unitTest.cpp
+Basename:          unitTest
+Extension:         cpp
+Original path      .
+
+Testing file name with no path and no extension
+Original filename: Makefile
+Filename was expanded correctly
+Name:              Makefile
+Basename:          Makefile
+Extension:         
+Original path      .
+
+Testing file name with no path and only an extension
+Original filename: .cub
+Name:              .cub
+Basename:          
+Extension:         cub
+Original path      .
+
+Testing filename operator= with a c++ string
+Original filename: /home/me/new.extension+0:255
+New filename:      /home/me/new.extension
+Path:              /home/me
+Name:              new.extension
+Basename:          new
+Extension:         extension
+Original path      /home/me
+
+Testing filename operator= with a c string
+Original filename: /home/me/new.extension+0:255
+New filename:      /home/me/new.extension
+Path:              /home/me
+Name:              new.extension
+Basename:          new
+Extension:         extension
+Original path      /home/me
+
+Testing 1st temporary file name
+Name and extension : tttt, tmp
+Name:                tttt100000.tmp
+Basename:            tttt100000
+Extension:           tmp
+Original path        .
+
+Testing 2nd temporary file name
+Name and extension : tttt, tmp
+Name:                tttt100001.tmp
+Basename:            tttt100001
+Extension:           tmp
+Original path        .
+
+Testing HighestVersion for file tttt??????.tmp
+  tttt000008.tmp
+
+Testing HighestVersion for file tttt??????
+  tttt000001
+
+Testing HighestVersion for file ?tttt000008.tmp
+  2tttt000008.tmp
+
+Testing HighestVersion for file tttt
+No version string in tttt
+
+Testing HighestVersion for file ??tttt
+No version available for ??tttt
+
+Testing HighestVersion to expand 1 "?" into 2 digits
+junk09.tmp
+
+Testing NewVersion for file tttt??????.tmp
+  tttt000009.tmp
+
+Testing NewVersion for file tttt??????
+  tttt000002
+
+Testing NewVersion for file ?tttt000008.tmp
+ 3tttt000008.tmp
+
+Testing NewVersion for file tttt
+No version string in tttt
+
+Testing NewVersion for file ??tttt
+ 01tttt
+
+Testing Exists() for a file that should exist:
+  The test file for "Exists()" was located
+
+Testing Exists() for a file that does NOT exist:
+  The test file for "!Exists()" was not located (this is correct)
+
+Testing MakeDirctory for /tmp/IsisFilenameTest
+  The directory create succeed
+
+Testing MakeDirectory for /tmp/IsisFilenameTest
+**PROGRAMMER ERROR** Unable to create directory [/tmp/IsisFilenameTest]
+

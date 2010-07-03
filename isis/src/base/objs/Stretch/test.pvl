@@ -1,0 +1,4 @@
+Group = Pairs
+  Input = (0,100,255)
+  Output = (255,100,0)
+EndGroup

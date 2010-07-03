@@ -1,0 +1,124 @@
+UNIT TEST FOR TransverseMercator
+
+Part 1: Sphere...
+Test missing center longitude keyword ...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+
+Test missing center latitude keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+
+Test missing scale factor keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [ScaleFactor] does not exist in [Group = Mapping]
+
+Test SetGround method ... 
+Setting ground to (40.5,-73.5)
+Latitude:               40.5
+Longitude:              -73.5
+XCoord:                 0.0199077372
+YCoord:                 0.707027609
+
+Test SetCoordinate method ... 
+Setting coordinate to (0.0199077372, 0.707027609)
+Latitude:               40.5
+Longitude:              -73.5
+XCoord:                 0.0199077372
+YCoord:                 0.707027609
+
+Test XYRange method ... 
+Minimum X:  -0.264842248
+Maximum X:  0.264842248
+Minimum Y:  -1.23272509
+Maximum Y:  1.23272509
+
+Test Name and comparision method ... 
+Name:       TransverseMercator
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -70.0
+  MaximumLatitude    = 70.0
+  MinimumLongitude   = -90.0
+  MaximumLongitude   = -60.0
+  ProjectionName     = TransverseMercator
+  CenterLongitude    = -75.0
+  CenterLatitude     = 0.0
+  ScaleFactor        = 1.0
+End_Group
+End
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 268-269
+
+
+Part 2: Ellipsoid...
+
+Test SetGround method ... 
+Setting ground to (40.5,-73.5)
+Latitude:               40.5
+Longitude:              -73.5
+XCoord:                 127106.467
+YCoord:                 4484124.43
+
+Test SetCoordinate method ... 
+Setting coordinate to (127106.467, 4484124.43)
+Latitude:               40.5
+Longitude:              -73.5
+XCoord:                 127106.467
+YCoord:                 4484124.43
+
+Test XYRange method ... 
+Minimum X:  -1688672.35
+Maximum X:  1688672.35
+Minimum Y:  -7836006.29
+Maximum Y:  7836006.29
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = TransverseMercator
+  EquatorialRadius   = 6378206.4
+  PolarRadius        = 6356583.8
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -70.0
+  MaximumLatitude    = 70.0
+  MinimumLongitude   = -90.0
+  MaximumLongitude   = -60.0
+  CenterLatitude     = 0.0
+  CenterLongitude    = -75.0
+  ScaleFactor        = 0.9996
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -70.0
+  MaximumLatitude = 70.0
+  CenterLatitude  = 0.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -90.0
+  MaximumLongitude = -60.0
+  CenterLongitude  = -75.0
+End_Group
+End
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 269-270

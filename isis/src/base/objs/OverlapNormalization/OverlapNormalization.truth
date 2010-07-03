@@ -1,0 +1,21 @@
+UnitTest for Overlap Normalization
+Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+statsList size: 3
+oNorm creation == SUCCESS
+Gathering Overlap Statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Gathering Overlap Statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Gathering Overlap Statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+I00824006RDR.lev2.cub : Gathered Offset: -6.418653512314e-05
+I00824006RDR.lev2.cub : Gathered Gain: 0.8024773380228
+I01523019RDR.lev2.cub : Gathered Offset: 0
+I01523019RDR.lev2.cub : Gathered Gain: 1
+I02609002RDR.lev2.cub : Gathered Offset: 0.0001596195090359
+I02609002RDR.lev2.cub : Gathered Gain: 1.931615747861

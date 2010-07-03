@@ -1,0 +1,18 @@
+size   = 4
+hasXYZ = 0
+/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub = MGS/561812335:32/MOC-WA
+/usgs/cpkgs/isis3/data/mgs/testData/m0402852.cub = MGS/619971158:28/MOC-NA
+/usgs/cpkgs/isis3/data/lo/testData/3133_h1.cub = LO3/HRC/3133
+/usgs/cpkgs/isis3/data/odyssey/testData/I00824006RDR.lev2.cub = Odyssey/THEMIS_IR/698670100.051
+
+Possible filename for [LO3/HRC/3133]: /usgs/cpkgs/isis3/data/lo/testData/3133_h1.cub
+Possible serial number for [LO3/HRC/3133]: LO3/HRC/3133/1
+File->ON:MGS/561812335:32/MOC-WA
+
+SN->File (0): /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub
+SN->File (1): /usgs/cpkgs/isis3/data/mgs/testData/m0402852.cub
+SN->File (2): /usgs/cpkgs/isis3/data/lo/testData/3133_h1.cub
+
+[NotAnObservation] is not an existing ObservationNumber
+
+

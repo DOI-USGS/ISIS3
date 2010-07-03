@@ -1,0 +1,159 @@
+PDS_VERSION_ID       = PDS3 
+
+/*** FILE FORMAT ***/
+RECORD_TYPE          = FIXED_LENGTH 
+RECORD_BYTES         = 53 
+FILE_RECORDS         = 1 
+
+/*** GENERAL DATA DESCRIPTION PARAMETERS ***/
+MISSION_NAME         = "MESSENGER" 
+SPACECRAFT_NAME      = "MESSENGER" 
+INSTRUMENT_HOST_NAME = "MERCURY SURFACE, SPACE ENVIRONMENT,
+                        GEOCHEMISTRY AND RANGING" 
+DATA_SET_ID          = "MESS-E/V/H-MDIS-2-EDR-RAWDATA-V1.0" 
+PRODUCT_ID           = "MDISNAC_BINNED_RESP_3" 
+                        /*( MDIScam_bining_RESP_v                      )*/
+                        /*( cam = camera, NAC or WAC                   )*/
+                        /*( bining = binning, NOTBIN or BINNED         )*/
+                        /*( v = version number, 0-9,a-z                )*/
+PRODUCER_INSTITUTION_NAME = "APPLIED PHYSICS LABORATORY" 
+
+/*** TIME PARAMETERS ***/
+PRODUCT_CREATION_TIME = 2008-12-22T20:00:00 
+
+/***  INSTRUMENT ENGINEERING PARAMETERS ***/
+INSTRUMENT_NAME      = "MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA"
+INSTRUMENT_ID        = "MDIS-NAC"
+MESS:FPU_BIN         =  1
+MESS:COMP12_8        =  0
+
+
+OBJECT                         = FILE
+  ^TABLE                       = "MDISNAC_BINNED_RESP_3.TAB"
+  RECORD_TYPE                  = FIXED_LENGTH
+  FILE_RECORDS                 = 1
+  RECORD_BYTES                 = 53
+
+  OBJECT                       = TABLE
+    NAME                       = "MDIS NAC BINNED RESPONSIVITY MODEL,
+                                  VERSION 3"
+    INTERCHANGE_FORMAT         = "ASCII"
+    ROWS                       = 1
+    COLUMNS                    = 4
+    ROW_BYTES                  = 53
+    DESCRIPTION                = "This is the model of responsivity for 
+                                  the MDIS narrow-angle camera, with pixel 
+                                  binning turned on (MESS:FPU_BIN = 1). It
+                                  is used to correct raw DN to units of 
+                                  radiance, after correction for dark level, 
+                                  frame transfer smear, linearity, and flat 
+                                  field. The responsivity is in units of DN 
+                                  per unit time per unit radiance. It is 
+                                  dependent on CCD temperature T 
+                                  (MESS:CCD_TEMP), and binning state b
+                                  (MESS:FPU_BIN). 
+
+                                  Exposure time t is in raw units of ms 
+                                  (MESS:EXPOSURE or EXPOSURE_DURATION) and 
+                                  radiance in units of 
+                                  W / (m**2 microns**1 sr**1).
+
+                                  Responsivity is calculated 
+                                  using a second-order polynomial as
+                                  Resp(T,b) = R(t=-30.3C,b) * 
+                                  [correction_offset(b) + T(CCD) * 
+                                  correction_coef1(b) + T(CCD)^2 * 
+                                  correction_coef2(b)]
+
+                                  where 
+
+                                  Resp(T,b) is responsivity 
+                                  at CCD temperature T in binning state b, 
+
+                                  T(CCD) is raw CCD temperature in units 
+                                  of DNs, 
+
+                                  R(t=-30.3C,b) is responsivity in 
+                                  binning state b at CCD temperature 
+                                  of 1060 DN (-30.3C), 
+
+                                  correction_offset(b) is the camera- 
+                                  dependent temperature correction 
+                                  offset for binning state b, 
+
+                                  correction_coef1(b) is the camera- 
+                                  dependent temperature correction 
+                                  first-order coefficient for 
+                                  binning state b.
+
+                                  correction_coef2(b) is the camera- 
+                                  dependent temperature correction 
+                                  second-order coefficient for 
+                                  binning state b.
+
+                                  The temperature correction defaults to 
+                                  unity at CCD temperature of 1060 DN 
+                                  (-30.3C).
+
+                                  To apply responsivity to obtain radiance 
+                                  L, the expression is 
+                                  L = DN_dk_sm_lin_fl / (t * Resp(T,b))
+
+                                  where
+
+                                  DN_dk_sm_lin_fl is dark-, smear-, 
+                                  linearity-, and flat field-corrected DN,
+
+                                  t is the exposure time in milliseconds,
+
+                                  Resp(T,b) is the responsivity."
+
+    OBJECT                     = COLUMN
+      COLUMN_NUMBER            = 1
+      NAME                     = REFERENCE_RESPONSIVITY
+      DATA_TYPE                = ASCII_REAL
+      START_BYTE               = 1
+      BYTES                    = 11
+      DESCRIPTION              = "Responsivity at the reference 
+                                  temperature MESS:CCD_TEMP=1060 
+                                  (-30.3C)."
+    END_OBJECT                 = COLUMN
+
+    OBJECT                     = COLUMN
+      COLUMN_NUMBER            = 2
+      NAME                     = CORRECTION_OFFSET
+      DATA_TYPE                = ASCII_REAL
+      START_BYTE               = 13
+      BYTES                    = 12
+      DESCRIPTION              = "Offset term in the CCD temperature 
+                                  correction to responsivity."
+    END_OBJECT                 = COLUMN
+
+    OBJECT                     = COLUMN
+      COLUMN_NUMBER            = 3
+      NAME                     = CORRECTION_COEF1
+      DATA_TYPE                = ASCII_REAL
+      START_BYTE               = 26
+      BYTES                    = 12
+      DESCRIPTION              = "Coefficient to the first order term 
+                                  in the CCD temperature correction 
+                                  to responsivity."
+    END_OBJECT                 = COLUMN
+
+    OBJECT                     = COLUMN
+      COLUMN_NUMBER            = 3
+      NAME                     = CORRECTION_COEF2
+      DATA_TYPE                = ASCII_REAL
+      START_BYTE               = 39
+      BYTES                    = 15
+      DESCRIPTION              = "Coefficient to the second order term 
+                                  in the CCD temperature correction 
+                                  to responsivity."
+    END_OBJECT                 = COLUMN
+
+  END_OBJECT                   = TABLE
+
+END_OBJECT                     = FILE
+
+END
+

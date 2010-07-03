@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="dstripe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Remove horizontal or vertical stripes/noise from a cube
+  </brief>
+
+  <description>
+    This program uses a combination of lowpass and highpass filters to remove horizontal or vertical stripes in a cube.  The steps
+    behind the noise removal technique are:
+    <pre>
+       output = input - noise
+       where noise = highpass(lowpass(input))
+    </pre>
+    
+    <p>
+      Suppose an input image had vertical striping noise, 
+      like in the example below.  The noise can be removed or suppressed by
+      applying a sequence of lowpass and highpass filters.  The idea is to
+      create an image containing only the noise and subtract that noise image
+      from the original.
+    </p>
+
+    <p>
+      First, we apply a tall (1xNL) lowpass filter to the input image.  This
+      produces an image that is essentially a column average.  The high 
+      frequency information has been suppressed and the vertical noise is
+      left behind.  Note however, the average of the lowpass filter
+      matches the original input so we can not subtract the noise quite yet.
+    </p>
+
+    <p>
+      Second, we appy a (NSx1) highpass filter to the lowpass image.  This
+      effectively suppress the albedo information in the noise leaving only the
+      noise behind.  Note that the noise (third) histogram is centered
+      about zero.
+    </p>
+
+    <p>
+      Finally, the noise image is subtracted from the original input image
+      resulting in the desired noise-free image.  All the steps the program 
+      goes through (along with their respective histograms) are illustrated 
+      below:
+    </p>
+
+    <img src="assets/thumb/input.jpg" alt="Input image"> </img>
+    <img src="assets/thumb/low.jpg" alt="After lowpass"> </img>
+    <img src="assets/thumb/noise.jpg" alt="After highpass"> </img>
+    <img src="assets/thumb/output.jpg" alt="Output image"> </img> <br></br>
+    <a href="assets/image/inputHist.jpg"><img src="assets/thumb/inputHist.jpg" alt="Input histogram"></img></a>
+    <a href="assets/image/lowHist.jpg"><img src="assets/thumb/lowHist.jpg" alt="Lowpass histogram"></img></a>
+    <a href="assets/image/noiseHist.jpg"><img src="assets/thumb/noiseHist.jpg" alt="Highpass histogram"></img></a>
+    <a href="assets/image/outputHist.jpg"><img src="assets/thumb/outputHist.jpg" alt="Output histogram"></img></a> <br></br>
+    <font size="2">From left to right: Input, Lowpass, Highpass, Output</font>
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>highpass</item>
+      <item>lowpass</item>
+      <item>cubenorm</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Randy Kirk" date="1988-01-01">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-08-29">
+      Ported to Isis 3.0
+    </change>
+    <change name="Sean Crosby" date="2007-04-20">
+      Changed destriping algorithm
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file with striping
+        </brief>
+        <description>
+	        Name of the input cube which has horizontal or vertical striping
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output destriped cube
+        </brief>
+        <description>
+	        The resultant cube which will have suppressed or removed striping
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      
+    </group>
+
+    <group name = "Noise type">
+      <parameter name = "MODE">
+        <type>string</type>
+        <default><item>VERTICAL</item></default>
+        <brief>Type of noise</brief>
+        <description>
+          This allows the user to specify which kind of striping noise needs
+          to be removed.
+        </description>
+        <list>
+          <option value = "VERTICAL">
+            <brief>Vertical noise</brief>
+            <description>
+              Remove vertical striping from image
+            </description>
+            <exclusions>
+              <item>HLNL</item>
+              <item>HLNS</item>
+              <item>HHNL</item>
+              <item>HHNS</item>
+            </exclusions>
+          </option>  
+
+          <option value = "HORIZONTAL">
+            <brief>Horizontal noise</brief>
+            <description>
+              Remove horizontal striping from image
+            </description>
+            <exclusions>
+              <item>VLNL</item>
+              <item>VLNS</item>
+              <item>VHNL</item>
+              <item>VHNS</item>
+            </exclusions>
+          </option>  
+        </list>
+      </parameter>  
+    </group>  
+        
+    <group name = "Vertical noise">
+      <parameter name = "VLNL">
+        <type>integer</type>
+        <internalDefault>Number of lines</internalDefault>
+        <brief>Vertical Lowpass Number of Lines</brief>
+        <description>
+          This is the number of the lines to be used by lowpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+      
+      <parameter name = "VLNS">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Vertical Lowpass Number of Samples</brief>
+        <description>
+          This is the number of the samples to be used by lowpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+
+      <parameter name = "VHNL">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Vertical Highpass Number of Lines</brief>
+        <description>
+          This is the number of the lines to be used by highpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+      
+      <parameter name = "VHNS">
+        <type>integer</type>
+        <internalDefault>Number of samples</internalDefault>
+        <brief>Vertical Highpass Number of Samples</brief>
+        <description>
+          This is the number of the samples to be used by highpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+    </group>                                                                  
+
+    <group name = "Horizontal noise">
+      <parameter name = "HLNL">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Horizontal Lowpass Number of Lines</brief>
+        <description>
+          This is the number of the lines to be used by lowpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+      
+      <parameter name = "HLNS">
+        <type>integer</type>
+        <internalDefault>Number of samples</internalDefault>
+        <brief>Horizontal Lowpass Number of Samples</brief>
+        <description>
+          This is the number of the samples to be used by lowpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+      <parameter name = "HHNL">
+        <type>integer</type>
+        <internalDefault>Number of lines</internalDefault>
+        <brief>Horizontal Highpass Number of Lines</brief>
+        <description>
+          This is the number of the lines to be used by highpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+      
+      <parameter name = "HHNS">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Horizontal Highpass Number of Samples</brief>
+        <description>
+          This is the number of the samples to be used by highpass
+        </description>
+        <minimum inclusive = "yes">1</minimum>
+        <odd/>
+      </parameter>
+    </group>                                                                  
+
+    <group name = "Noise files">
+      <parameter name="DELETENOISE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Delete the noise file</brief>
+        <description>
+          This will delete the noise file after the image is processed.
+        </description>
+        <exclusions>
+              <item>LPFNOISE</item>
+              <item>NOISE</item>              
+            </exclusions>
+      </parameter>
+
+      <parameter name="LPFNOISE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <default><item>lowpass.noise.cub</item></default>
+        <brief>
+          Lowpass filter noise file 
+        </brief>
+        <description>
+	        The results of running lowpass(input) 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="NOISE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <default><item>dstripe.noise.cub</item></default>
+        <brief>
+          Temporary work file 
+        </brief>
+        <description>
+	        The results of running highpass(lowpass(input)) 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+    </group>
+  </groups> 
+
+  <examples>
+    <example>
+      <brief>Vertical stripe removal</brief>
+      <description>
+        This example shows the results of removing vertical striping noise from an image.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=../LO_4090_h1.cub to=../result.cub 
+        </commandLine>
+        <description>
+        Using default settings to remove striping noise from input file
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/input.jpg" width="500" height="500">
+          <brief>Input image for dstripe</brief>
+          <description>This is a Lunar Orbitor image with vertical striping.
+          </description>
+          <thumbnail caption="Input LO Image" src="assets/thumb/input.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+
+        <image src="assets/image/noise.jpg" width="500" height="500">
+          <brief>Noise image from dstripe</brief>
+          <description>This is a result of the low and highpass filters of the input image.
+          </description>
+          <thumbnail caption="Striping Noise Image" src="assets/thumb/noise.jpg" width="200" height="200"/>
+          <parameterName>NOISE</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/output.jpg" width="500" height="500">
+          <brief>Output image from destriping</brief>
+          <description> This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing the result of destriping." src="assets/thumb/output.jpg" width="200" height="200"  />
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/image/dstripegui.jpg" width="500" height="500">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+                         a destriping operation on the input image. </description>
+            <thumbnail caption="dstripe Gui" src="assets/thumb/dstripegui.jpg" width="200" height="200"  />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

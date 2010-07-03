@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="dawnfc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import PDS formatted DAWN FC EDR or RDR image cube into Isis format cube</brief>
+
+  <description>
+    This program will import a PDS formatted DAWN Framing Camera (FC) level 1 (EDR) or 
+    level 2 (RDR) image into an Isis cube. A DAWN RDR file contains a single image
+    object and will be written to the file specified by the TO parameter. The DAWN
+    EDR file can contain multiple image objects. Until we have further information
+    about the frame image objects in the EDR, this program is going to ignore them and
+    only process the main image object. The main EDR image object will be written to 
+    the file specified by the TO parameter.
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2010-03-10">
+      Original version
+    </change>
+    <change name="Janet Barrett" date="2010-04-15">
+      The program now automatically flips the image in the line direction.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted DAWN EDR or RDR file
+        </brief>
+        <description>
+          Use this parameter to select the DAWN EDR or RDR
+	  filename. This file must contain the PDS labels.
+        </description>
+        <filter>
+          *.img *.IMG
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+  </groups>
+</application>

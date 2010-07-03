@@ -1,0 +1,23 @@
+UNIT TEST for Isis::NormModel
+
+Testing missing NormalizationModel object ...
+**PVL ERROR** Unable to find object [NormalizationModel]
+
+**PVL ERROR** Unable to find object [NormalizationModel]
+
+Testing missing Algorithm group ...
+**PVL ERROR** Unable to find group [Algorithm]
+
+**PVL ERROR** Unable to find group [Algorithm]
+
+Testing missing Name keyword ...
+**PVL ERROR** Keyword [Name] does not exist in [Group = Algorithm]
+
+**PVL ERROR** Keyword [Name] does not exist in [Group = Algorithm]
+
+Testing supported normalization model ...
+
+
+Testing normalization model get methods ...
+AlgorithmName = Unknown
+

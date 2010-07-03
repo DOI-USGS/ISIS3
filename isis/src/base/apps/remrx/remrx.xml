@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="remrx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Removes Reseaus from an image
+  </brief>
+
+  <description>
+    This program will remove Reseaus from Viking, Voyager, and Mariner images.  
+    The Reseaus are removed using either bilinear interpolation of the 
+    surrounding pixels or by simply putting NULLs in the portion of the 
+    image around the Reseau location of the input image.  The ACTION 
+    parameter is used to tell the program which of these two actions to 
+    take.  The user should input the size of the box around the Reseau that 
+    will be modified.  SDIM and LDIM are the sample and line dimensions of 
+    the box around the reseau.  RESVALID is used to determine whether the
+    program will check the reseau valid flag for nominal reseaux before
+    removing the reseau.  If RESVALID is NO, the program will not check
+    the reseau valid flag for nominal reseaux and all the reseaux will be
+    removed except invalid nominal positions.  If RESVALID is YES, the 
+    program will check the reseau valid flag that is output from the 
+    findrx program.  If the flag is 0, the program will not remove that
+    reseau.  If the flag is 1, the reseau will be removed.  If the flag is
+    -1, indicating an invalid nominal position, the reseau will not be
+    removed in any case.   The output cube file can be written over the
+    input file or a new output cube can be created.  To overwrite the input
+    file, the TO parameter should be set to blank, " ".  The "findrx"
+    program, which writes the Reseau locations, Reseau type, and a valid
+    flag to the cube file label, must be run before "remrx".
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+    <missionItem>Voyager</missionItem>
+    <missionItem>Mariner</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>findrx</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-05-02">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2005-10-24">
+        Added truth file for gala
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-15">
+      Modified appTest input path (viking testData areas split)
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file reseaus will be removed from
+        </brief>
+        <description>
+          The cube the reseaus will be removed from.  All reseaus in the cube 
+          will be removed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the data with reseaus removed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Dimensions">
+        <parameter name="SDIM">
+            <type>integer</type>
+            <brief>
+                Samples to remove around each reseau
+            </brief>
+            <description>
+                The number of samples to remove around each reseau. Defaults to 9.0
+            </description>
+            <default><item>9</item></default>
+            <odd />
+        </parameter>
+
+        <parameter name="LDIM">
+            <type>integer</type>
+            <brief>
+                Lines to remove around each reseau
+            </brief>
+            <description>
+                The number of lines to remove around each reseau. Defaults to 9.0
+            </description>
+            <default><item>9</item></default>
+            <odd />
+        </parameter>
+    </group>
+
+    <group name="Options">
+        <parameter name="ACTION">
+            <type>string</type>
+            <brief>
+                The way the reseaus will be removed
+            </brief>
+            <description>
+                There are 2 options for removing the Reseaus.  The program 
+                can replace pixels inside the SDIM x LDIM box with Null or 
+                bilinear interpolation. Defaults to BILINEAR.
+            </description>
+            <default><item>BILINEAR</item></default>
+            <list>
+                <option value="BILINEAR">
+                    <brief>
+                       Replace values with bilinear interpolation
+                    </brief>
+                    <description>
+                        This option uses bilinear interpolation to create new DN
+                        values for the pixels inside the SDIM x LDIM box.
+                    </description>
+                </option>
+                <option value="NULL">
+                    <brief>
+                       Replace values with NULLs
+                    </brief>
+                    <description>
+                       This option will replace each value inside the SDIM x LDIM
+                       box with the Isis::NULL value.  This allows the user to run 
+                       another filter program to replace the NULL values.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+
+        <parameter name="RESVALID">
+            <type>boolean</type>
+            <brief>
+                Check Reseau Valid Flag?
+            </brief>
+            <description>
+                If this parameter is TRUE, the reseau valid flag will be
+                checked before the reseau is removed.  If the reseau 
+                valid flag is a 0 or -1, the reseau will not be removed.
+                If the reseau valid flag is a 1, the reseau will be
+                removed.  Reseaus with a valid flag=-1 are never removed.
+                This flag indicates an invalid nominal position.
+                If RESVALID is FALSE, the reseau valid flag will not be 
+                checked for nominals and all the reseaus will be removed,
+                except the invalid nominals. Defaults to FALSE.
+            </description>
+            <default><item>FALSE</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+      <example>
+        <brief> Reseaus replaced with Bilinear Interpolation </brief>
+        <description>
+          This example shows the remrx application with the BILINEAR action option.  The SDIM and LDIM default to 9, 
+          and RESVALID defaults to false.
+        </description>
+        <terminalInterface>
+          <commandLine> f=../inputRemrx.cub t=out-bilinear.cub
+          </commandLine>
+          <description>
+            Uses bilinear interpolation to fill in missing data around each reseau.
+          </description>
+        </terminalInterface>
+
+        <inputImages>
+          <image src="assets/image/inputRemrx.JPG" width="500" height="500">
+            <brief> Input image for mirror</brief>
+            <description>This is the 800 by 800 input image for the remrx examples.
+            </description>
+            <thumbnail caption=" Input Io image" src="assets/thumb/inputRemrx.JPG" width="200" height="200"/>
+            <parameterName>FROM</parameterName>
+          </image>
+        </inputImages>
+
+        <outputImages>
+          <image src="assets/image/IoRemrxBilinear.JPG" width="500" height="500">
+            <brief> Output image for bilinear interpolation remrx</brief>
+            <description> This is the 800 by 800 output image that results.
+            </description>
+            <thumbnail caption="Output image showing results of the remrx application with bilinear interpolation option." src="assets/thumb/IoRemrxBilinear.JPG" width="200" height="200"/>
+            <parameterName>TO</parameterName>
+          </image>
+        </outputImages>
+
+        <guiInterfaces>
+          <guiInterface>
+            <image width="441" height="221" src="assets/image/IoRemrxGui.JPG">
+              <brief>Example Gui</brief>
+              <description>
+                  Screenshot of GUI with parameters filled in to perform a bilinear interpolation remrx operation on the input image. 
+              </description>
+              <thumbnail width="200" height="100" caption="Remrx Gui" src="assets/thumb/IoRemrxGui.JPG" />
+            </image>
+          </guiInterface>
+        </guiInterfaces>
+      </example>
+
+      <example>
+        <brief> Reseaus replaced with Nulls </brief>
+        <description>
+          This example shows the remrx application with the NULL action option, using the same input image as the above
+          example.  The SDIM and LDIM default to 9, and RESVALID defaults to false.
+        </description>
+        <terminalInterface>
+            <commandLine> f=../inputRemrx.cub t=out-null.cub
+          </commandLine>
+          <description>
+            Nulls out 9x9 boxes around each reseau.
+          </description>
+        </terminalInterface>
+
+        <outputImages>
+          <image src="assets/image/IoRemrxNull.JPG" width="500" height="500">
+            <brief> Output image for null remrx</brief>
+            <description> This is the 800 by 800 output image that results.
+            </description>
+            <thumbnail caption="Output image showing results of the remrx application with null option." src="assets/thumb/IoRemrxNull.JPG" width="200" height="200"/>
+            <parameterName>TO</parameterName>
+          </image>
+        </outputImages>
+
+      </example>
+   </examples>
+</application>
+

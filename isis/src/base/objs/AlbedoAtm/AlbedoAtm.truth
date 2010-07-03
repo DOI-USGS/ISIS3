@@ -1,0 +1,38 @@
+UNIT TEST for AlbedoAtm normalization function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name = Lambert
+  End_Group
+End_Object
+
+Object = AtmosphericModel
+  Group = Algorithm
+    Name   = Anisotropic1
+    Bha    = 0.85
+    Tau    = 0.28
+    Wha    = 0.95
+    Hga    = 0.68
+    Tauref = 0.0
+    Hnorm  = 0.003
+  End_Group
+End_Object
+
+Object = NormalizationModel
+  Group = Algorithm
+    Name   = AlbedoAtm
+    Incref = 0.0
+    Thresh = 30.0
+  End_Group
+End_Object
+End
+
+Test phase=86.7207248, incidence=51.7031305, emission=38.9372914, dn=.0800618902 ...
+Normalization value = -0.0385293
+
+Test phase=86.7207248, incidence=51.7031305, emission=38.9372914, dn=.0797334611 ...
+Normalization value = -0.0392226
+
+Test phase=86.7187773, incidence=51.7060221, emission=38.9331391, dn=.0794225037 ...
+Normalization value = -0.0398726
+

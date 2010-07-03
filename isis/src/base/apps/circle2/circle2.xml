@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="circle2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Trims data outside of a circle
+  </brief>
+
+  <description>
+    This program will trim (set to NULL) all pixels in an input cube
+    which fall outside of a user defined circle.  This works differently
+    than the circle program.  It expects the user to supply three points
+    on the edge of the circle and will automatically computer the center
+    of the circle and the radius.
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="1996-02-23">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-04-30">
+      Ported to Isis 3.0
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Added modifications to apptest by Kim
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+</history>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <oldName>
+    <item>getcirc</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to trim
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be trimmed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the circle trim.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Circle Definition">
+      <parameter name="SAMP1">
+        <type>double</type>
+        <brief>First sample coordinate on the circle</brief>
+        <description>
+          This defines the sample coordinate of a point on the circle.
+        </description>
+      </parameter>
+
+      <parameter name="LINE1">
+        <type>double</type>
+        <brief>First line coordinate on the circle</brief>
+        <description>
+          This defines the line coordinate of a point on the circle.
+        </description>
+      </parameter>
+
+
+      <parameter name="SAMP2">
+        <type>double</type>
+        <brief>Second sample coordinate on the circle</brief>
+        <description>
+          This defines the sample coordinate of a point on the circle.
+        </description>
+      </parameter>
+
+      <parameter name="LINE2">
+        <type>double</type>
+        <brief>Second line coordinate on the circle</brief>
+        <description>
+          This defines the line coordinate of a point on the circle.
+        </description>
+      </parameter>
+
+      <parameter name="SAMP3">
+        <type>double</type>
+        <brief>Third sample coordinate on the circle</brief>
+        <description>
+          This defines the sample coordinate of a point on the circle.
+        </description>
+      </parameter>
+
+      <parameter name="LINE3">
+        <type>double</type>
+        <brief>Third line coordinate on the circle</brief>
+        <description>
+          This defines the line coordinate of a point on the circle.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

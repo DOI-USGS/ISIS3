@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="autoregtemplate" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+      Create autoregistration group template
+  </brief>
+
+  <description>
+    This program creates an autoregistration group template for autoregs.  Given
+    a specific algorithm name, it will create that specific algorithm group template.
+    If you are unsure of what algorithm name you want to use, running the application
+    with an 'unknown' algorithm name will give you an error box containing a list of the
+    possible algorithm names.  If a tolerance is specified, the application will automatically
+    insert the tolerance keyword and value into the autoreg template.  The user must enter 
+    values for the chip sizes of both the pattern and search chips.  The output templates 
+    can be used in applications that use autoregistrations, such as coreg, 
+    pointreg, findrx, etc.
+  </description>
+
+  <history>
+    <change name="Elizabeth Miller" date="2005-09-28">
+      Original Version
+    </change>
+    <change name="Jacob Danton" date="2006-01-05">
+      Added SubpixelAccuracy option.
+    </change>
+    <change name="Jacob Danton" date="2006-05-17">
+      Added MinimumPatternZScore option and updated appTest.
+    </change>
+    <change name="Brendan George" date="2006-07-19">
+        Moved MininmumPatternZScore keyword to PatternChip Group
+    </change>
+    <change name="Travis Addair" date="2010-04-15">
+        Updated to use the current version of keywords accepted by AutoReg, 
+        improved documentation on parameters, and improved error reports.
+    </change>
+    <change name="Travis Addair" date="2010-04-22">
+        Updated tests and examples.
+    </change>
+    <change name="Jeannie Walldren" date="2010-06-16">
+        Added CHIPINTERPOLATOR and INTERPOLATORTYPE parameters to Algorithm 
+        group.  Updated examples and added error unitTest.
+    </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+        <item>coreg</item>
+        <item>pointreg</item>
+        <item>findrx</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <categoryItem>Registration and Pattern Matching</categoryItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output text file containing autoreg template
+        </brief>
+        <description>
+          This file will contain the autoregistration group template.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Algorithm">
+
+      <parameter name="ALGORITHM">
+        <type>string</type>
+        <brief>
+          Name of Algorithm to create autoregistration group 
+        </brief>
+        <description>
+          This is the name of the algorithm for the autoregistration group being 
+          created.  If left as unknown, an error will be reported listing all possible
+          options for the algorithm name.
+        </description>
+        <default><item>Undefined</item></default>
+      </parameter>
+
+      <parameter name="TOLERANCE">
+        <type>double</type>
+        <brief>
+          Tolerance
+        </brief>
+        <description>
+          This is the value of the tolerance for the autoregistration, 
+          represented in the template as the Tolerance keyword. 
+        </description>
+      </parameter>
+        
+      <parameter name="REDUCTIONFACTOR">
+        <type>integer</type>
+        <brief>
+          Reduction Factor
+        </brief>
+        <description>
+          Reduction factor used to speed up the pattern matching algorithm.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="SUBPIXELACCURACY">
+        <type>boolean</type>
+        <brief>
+          Use sub-pixel accuracy
+        </brief>
+        <description>
+          This option allows the user to specify if sub-pixel accuracy will be used in
+          the registration.  Enables the SurfaceModel options, as those tests 
+          will only be performed when calculating to sub-pixel accuracy.  When 
+          this parameter is true, SurfaceModel parameters may be selected.
+        </description>
+        <inclusions>
+          <item>DISTANCETOLERANCE</item>
+          <item>WINDOWSIZE</item>
+          <item>ECCENTRICITYTESTING</item>
+          <item>ECCENTRICITYRATIO</item>
+          <item>RESIDUALTESTING</item>
+          <item>RESIDUALTOLERANCE</item>
+        </inclusions>
+        <default><item>TRUE</item></default>
+      </parameter>
+
+        <parameter name="CHIPINTERPOLATOR">
+          <type>boolean</type>
+          <brief>
+            Include ChipInterpolator keyword in template.
+          </brief>
+          <description>
+            Determines whether to include the ChipInterpolator keyword in the 
+            generated template.  When this parameter is true, INTERPOLATORTYPE 
+            may be selected.
+          </description>
+          <default>
+            <item>
+              false
+            </item>
+          </default>
+          <inclusions>
+            <item>
+              INTERPOLATORTYPE
+            </item>
+          </inclusions>
+        </parameter>
+      <parameter name="INTERPOLATORTYPE">
+        <type>string</type>
+        <brief>
+          Interpolator to be used to load chips.
+        </brief>
+        <description>
+          Type of interpolator to be used to read and load the pattern and 
+          search chips.
+        </description>
+        <default><item>CUBICCONVOLUTIONTYPE</item></default>
+        <list>
+          <option value="NEARESTNEIGHBORTYPE">
+            <brief>
+              NearestNeighborType 
+            </brief>
+            <description>
+              Indicates that a NearestNeighborType interpolator should be used 
+              to load chips.
+            </description>      
+          </option>
+          <option value="BILINEARTYPE">
+            <brief>
+              BiLinearType
+            </brief>
+            <description>
+              Indicates that a BiLinearType interpolator should be used 
+              to load chips.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTIONTYPE">
+            <brief>
+              CubicConvolutionType
+            </brief>
+            <description>
+              Indicates that a CubicConvolutionType interpolator should be used 
+              to load chips.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+    </group>
+
+    <group name="PatternChip">
+
+      <parameter name="PSAMP">
+        <type>integer</type>
+        <brief>
+          Pattern Chip Sample Size
+        </brief>
+        <description>
+          The sample size of the pattern chip for the autoregistration.
+          The Sample keyword in the PatternChip group will be set to
+          this value in the autoreg template.  
+        </description>
+      </parameter>
+
+      <parameter name="PLINE">
+        <type>integer</type>
+        <brief>
+          Pattern Chip Line Size
+        </brief>
+        <description>
+          The line size of the pattern chip for the autoregistration.
+          The Line keyword in the PatternChip group will be set to
+          this value in the autoreg template.  
+        </description>
+      </parameter>
+
+      <parameter name="PMIN">
+        <type>integer</type>
+        <brief>
+          Pattern Chip Valid Minimum Pixel Value
+        </brief>
+        <description> 
+          The minimum value a pixel must have in order to be considered valid and used
+          in the autoregistration.  This parameter is optional, and does 
+          not have to be set.  Within AutoReg, defaults to Isis' 
+          ValidMinimum if not provided.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="PMAX">
+        <type>integer</type>
+        <brief>
+          Pattern Chip Valid Maximum Pixel Value
+        </brief>
+        <description>
+          The maximum value a pixel must have in order to be considered valid and used
+          in the autoregistration.  This parameter is optional, and does 
+          not have to be set.  Within AutoReg, defaults to isis' 
+          ValidMaximum if not provided.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="MINIMUMZSCORE">
+        <type>double</type>
+        <brief>
+          Minimum Pattern Chip Z-Score Range (Default = 1.0)
+        </brief>
+        <description>
+          This option allows the user to specify the minimum z-score range for the minimum
+          and maximum values for the pattern chip that will be used in the 
+          registration.  Within AutoReg, will default to 1.0 if not 
+          provided.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+    </group>
+
+    <group name="SearchChip">
+
+      <parameter name="SSAMP">
+        <type>integer</type>
+        <brief>
+          Search Chip Sample Size
+        </brief>
+        <description>
+          The sample size of the search chip for the autoregistration.
+          The Sample keyword in the SearchChip group will be set to
+          this value in the autoreg template.  
+        </description>
+      </parameter>
+
+      <parameter name="SLINE">
+        <type>integer</type>
+        <brief>
+          Search Chip Line Size
+        </brief>
+        <description>
+          The line size of the search chip for the autoregistration.
+          The Line keyword in the SearchChip group will be set to
+          this value in the autoreg template.
+        </description>
+      </parameter>
+
+      <parameter name="SMIN">
+        <type>integer</type>
+        <brief>
+          Search Chip Minimum Valid Pixel Value
+        </brief>
+        <description>
+          The minimum value a pixel must have in order to be considered valid and used
+          in the autoregistration.  This parameter is optional, and does 
+          not have to be set.  Within AutoReg, defaults to Isis' 
+          ValidMinimum if not provided.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="SMAX">
+        <type>integer</type>
+        <brief>
+          Search Chip Maximum Valid Pixel Value
+        </brief>
+        <description>
+          The maximum value a pixel must have in order to be considered valid and used
+          in the autoregistration.  This parameter is optional, and does 
+          not have to be set.  Within AutoReg, defaults to isis' 
+          ValidMaximum if not provided.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="VALIDPERCENT">
+        <type>double</type>
+        <brief>
+          Search Chip Valid Pixel Percent Value (Default = 50.0)
+        </brief>
+        <description>
+          The minimum percent of pixels in the pattern chip that must be valid in order for 
+          the autoregistration of the chip to be used.  This parameter is optional, and does
+          not have to be set.  Within AutoReg, will default to 50.0 if not 
+          provided.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+    </group>
+
+    <group name="SurfaceModel">
+
+      <parameter name="DISTANCETOLERANCE">
+        <type>double</type>
+        <brief>
+          Distance Tolerance
+        </brief>
+        <description>
+          Set the distance the surface model is allowed to move away from 
+          the best whole pixel fit in the chip.
+        </description>
+        <default><item>1.5</item></default>
+      </parameter>
+
+      <parameter name="WINDOWSIZE">
+        <type>integer</type>
+        <brief>
+          Window Size
+        </brief>
+        <description>
+          Set the surface model window size in terms of the legnth of a 
+          square window.  The pixels in this window will be used to fit a 
+          surface model in order to compute to sub-pixel accuracy.  Must 
+          be odd and greater than or equal to three.
+        </description>
+        <default><item>5</item></default>
+      </parameter>
+
+      <parameter name="ECCENTRICITYTESTING">
+        <type>boolean</type>
+        <brief>
+          Eccentricity Testing
+        </brief>
+        <description>
+          Whether or not the eccentricity of the surface model should be 
+          considered when calculating to sub-pixel accuracy.  For the sake 
+          of the template, disabling this parameter will result in no 
+          EccentricityRatio keyword.  In AutoReg, eccentricity testing is 
+          disabled by not providing the EccentricityRatio keyword.
+        </description>
+        <inclusions>
+          <item>ECCENTRICITYRATIO</item>
+        </inclusions>      
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="ECCENTRICITYRATIO">
+        <type>double</type>
+        <brief>
+          Ratio of Surface Model Major Axis to Normalized Minor Axis  
+        </brief>
+        <description>
+          Use eccentricity to throw out points whose surface models are 
+          too elliptical.  Though eccentricity is a decimal value between 
+          0 and 1, it can also be thought of as the ratio of the major 
+          axis to the minor axis.  Normalazing the minor axis to 1.0, the 
+          anetecedent of that ratio becomes this value.  This parameter 
+          states "the major axis length can be no more than this many 
+          times larger than the minor axis."
+        </description>
+        <default><item>2.0</item></default>
+      </parameter>
+
+      <parameter name="RESIDUALTESTING">
+        <type>boolean</type>
+        <brief>
+          Residual Testing
+        </brief>
+        <description>
+          Whether or not the maximum average residual of the surface model 
+          should be considered when calculating to sub-pixel accuracy.  
+          For the sake of the template, disabling this parameter will 
+          result in no ResidualTolerance keyword.  In AutoReg, 
+          eccentricity testing is disabled by not providing the 
+          ResidualTolerance keyword. 
+        </description>
+        <inclusions>
+          <item>RESIDUALTOLERANCE</item>
+        </inclusions>
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="RESIDUALTOLERANCE">
+        <type>double</type>
+        <brief>
+          Maximum Average Residual Tolerance
+        </brief>
+        <description>
+          Set the maximum average residual allowed from the surface 
+          model. Changing this tolerance allows the user to throw out  
+          points whose surfaces cannot be modeled well. The average  
+          residual is derived from the least squares solution fitting a 
+          surface model to a set of known data points, and computed by 
+          summing the absolute values of all the residuals (computed z 
+          minus actual z) and dividing by the number of residuals. 
+        </description>
+        <default><item>0.1</item></default>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief> 
+        Create an Autoreg Template with all Defaults
+      </brief>
+      <description>
+        This example shows how the autoregtemplate application works, and how 
+        to create a simple AutoReg template.  Here, only the required parameters 
+        have been entered.  Because SubpixelAccuracy is "true" by default, there 
+        is a SurfaceModel group in the output PVL containing the default 
+        DistanceTolerance and WindowSize.
+        <pre>
+            Object = AutoRegistration
+              Group = Algorithm
+                Name             = MaximumCorrelation
+                Tolerance        = 0.7
+                SubpixelAccuracy = True
+              End_Group
+            
+              Group = PatternChip
+                Samples = 15
+                Lines   = 15
+              End_Group
+            
+              Group = SearchChip
+                Samples = 31
+                Lines   = 31
+              End_Group
+            
+              Group = SurfaceModel
+                DistanceTolerance = 1.5
+                WindowSize        = 5
+              End_Group
+            End_Object
+            End
+        </pre> 
+        The above output is the text file resulting when the following 
+        command line is run:  
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          algorithm=MaximumCorrelation tolerance=0.7  psamp=15 pline=15 
+          ssamp=31 sline=31 to=out.txt
+        </commandLine>
+        <description>
+          Run autoregtemplate with an algorithm name, tolerance, output file 
+          name, and search and pattern chip sizes.
+        </description>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief> 
+        Create an Autoreg Template without Subpixel Accuracy and with Chip 
+        Interpolator specified
+      </brief>
+      <description>
+        This example shows the process and results of creating an AutoReg 
+        template that disables calculating to subpixel accuracy.  All the 
+        parameter values from the previous example are left the same, except 
+        that the SUBPIXELACCURACY keyword is set to "false".  As a result, there 
+        is no SurfaceModel PVL group, and none of those keywords may be entered. 
+        Notice, the INTERPOLATORTYPE parameter is not specified in the 
+        commandline.  Thus, the default cubic convolution type of interpolator 
+        is used to load chips.  
+                <pre>
+            Object = AutoRegistration
+              Group = Algorithm
+                Name             = MaximumCorrelation 
+                Tolerance        = 0.7 
+                SubpixelAccuracy = False
+                ChipInterpolator = CubicConvolutionType
+              End_Group
+            
+              Group = PatternChip
+                Samples = 15 
+                Lines   = 15 
+              End_Group
+            
+              Group = SearchChip
+                Samples = 31 
+                Lines   = 31 
+              End_Group
+            End_Object 
+            End 
+        </pre> 
+        The above output is the text file resulting when the following 
+        command line is run:  
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          algorithm=MaximumCorrelation tolerance=0.7 subpixelaccuracy=false 
+          chipinterpolator=true psamp=15 pline=15 ssamp=31 sline=31 to=out.txt
+        </commandLine>
+        <description> 
+          Run autoregtemplate with an algorithm name, tolerance, output file 
+          name, search and pattern chip sizes, specified chip interpolator, but 
+          no subpixel accuracy computation. 
+        </description> 
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief> 
+        Create an AutoReg Template Specifying Every Parameter 
+      </brief>
+      <description>
+        This example shows the kinds of values one might potentially enter for 
+        every valid keyword in an AutoReg template.  Every parameter is 
+        specified in the template for this example.  The only parameter not 
+        specified in the command line is subpixel accuracy, which must remain at 
+        its default ("true") in order to have a SurfaceModel group in the output 
+        PVL.  ChipInterpolator is enabled in order to choose an interpolator 
+        type.  Also, EccentricityTesting and ResidualTesting must be 
+        enabled in order to enter values for their keywords, because unlike 
+        MinimumZScore and ValidPercent (keywords that have defaults inside 
+        AutoReg if not specified in the template), Eccentricity and Residual 
+        testing are disabled altogether if EccentricityRatio and 
+        ResidualTolerance are not specified in the AutoReg template. 
+        <pre> 
+            Object = AutoRegistration
+              Group = Algorithm
+                Name             = MinimumDifference
+                Tolerance        = 0.7
+                ReductionFactor  = 2
+                SubpixelAccuracy = True
+                ChipInterpolator = NearestNeighborType
+              End_Group
+            
+              Group = PatternChip
+                Samples       = 15
+                Lines         = 15
+                ValidMinimum  = 1200
+                ValidMaximum  = 2800
+                MinimumZScore = 0.5
+              End_Group
+            
+              Group = SearchChip
+                Samples      = 31
+                Lines        = 31
+                ValidMinimum = 1200
+                ValidMaximum = 2800
+                ValidPercent = 75.0
+              End_Group
+            
+              Group = SurfaceModel
+                DistanceTolerance = 2.5
+                WindowSize        = 11
+                EccentricityRatio = 5.0
+                ResidualTolerance = 0.001
+              End_Group
+            End_Object
+            End
+       </pre>
+        The above output is the text file resulting when the following command 
+        line is run:  
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          algorithm=MinimumDifference tolerance=0.7 
+          reductionfactor=2 chipinterpolator=true 
+          interpolatortype=nearestneighbor psamp=15 pline=15 pmin=1200 pmax=2800 
+          validpercent=75 ssamp=31 sline=31 smin=1200 smax=2800 minimumzscore = 
+          0.5 distancetolerance=2.5 windowsize=11 eccentricitytesting=true 
+          eccentricityratio=5.0 residualtesting=true residualtolerance=0.001 
+          to=out.txt
+        </commandLine>
+        <description>
+          Run autoregtemplate with all parameters specified by the user.
+        </description>
+      </terminalInterface>
+     </example>
+
+  </examples>
+
+</application>
+

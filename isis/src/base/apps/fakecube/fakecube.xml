@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="fakecube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Create geometric testing cubes
+  </brief>
+
+  <description>
+    This program will create a geometric testing cube by using line and sample numbers from the input cube.  The pixels in the
+    output cube will equal the sum of the line and sample numbers, the line number, the sample number, or will create
+    a checkerboard pattern (5x5 is the default) depending on what pixel option is chosen.  This is more of a tool for 
+    programmers developing camera models or other geometric software than the average user.
+  </description>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>makecube</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-01-26">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-21">
+        Documentation fixes
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          The input cube whose parameters will be used to create the output cube.  
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The output cube created with specified pixel values.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Pixel Value Options">
+        <parameter name="OPTION">
+            <type>string</type>
+            <brief>Options for output cube pixel values</brief>
+            <description>
+                A list of the possible options for pixel values in the output cube.
+            </description>
+            <default><item>GRADIENT</item></default>
+            <list>
+                <option value="GRADIENT">
+                    <brief>Sum of Line and Sample</brief>
+                    <description>
+                        Makes pixels in the output cube equal to the sum of the line number and sample number.
+                    </description>
+                    <exclusions>
+                        <item>SIZE</item>                      
+                    </exclusions>
+                </option>
+                <option value="LINEWEDGE">
+                    <brief>Line Number</brief>
+                    <description>
+                        Makes pixels in the output cube equal to the line number.
+                    </description>
+                    <exclusions>
+                        <item>SIZE</item>                     
+                    </exclusions>
+                </option>
+                <option value="SAMPLEWEDGE">
+                    <brief>Sample Number</brief>
+                    <description>
+                        Makes pixels in the output cube equal to the sample number.
+                    </description>
+                    <exclusions>
+                        <item>SIZE</item>                     
+                    </exclusions>
+                </option>
+                <option value="CHECKERBOARD">
+                    <brief>Checkerboard Pattern</brief>
+                    <description>
+                        Makes pixels turn on or off to create a checkerboard pattern in the output cube of size specified
+                        by the user.
+                    </description>               
+                </option>
+            </list>
+        </parameter>
+    </group>
+    <group name="Input Values">
+        <parameter name="SIZE">
+            <type>integer</type>
+            <fileMode>input</fileMode>
+            <brief>Size of Checkerboard Squares</brief>
+            <description>
+                The size, in pixels, of the Checkerboard tiles. Default value is 5x5.
+            </description>
+        </parameter>
+    </group>
+   </groups>
+
+</application>

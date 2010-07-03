@@ -1,0 +1,16 @@
+Group = "Left Side"
+  ValidPixels = 2604
+  Mean        = 7050.6720430108
+  Std         = 216.20715611304
+  Minimum     = 6483.0
+  Maximum     = 7286.0
+End_Group
+
+Group = "Right Side"
+  ValidPixels = 2604
+  Mean        = 6888.8667434716
+  Std         = 22.370305423197
+  Minimum     = 6818.0
+  Maximum     = 6961.0
+End_Group
+End

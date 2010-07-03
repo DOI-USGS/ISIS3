@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="thmvisflat" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    This program applies a flat field correction to Themis VIS Images
+  </brief>
+
+  <description>
+    This program applies a flat-field correction for each framelet based on the 
+    band's filter number 
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2008-06-13">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Odyssey</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Themis VIS image
+        </brief>
+        <description>
+          This is the non-flat-field corrected, unprojected themis cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <pixelType>real</pixelType>
+         <brief>
+           Output Themis VIS Imagw
+         </brief>
+         <description>
+           This is the flat-field corrected themis cube
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+   </groups>
+  
+  <examples>
+    <example>
+      <brief>
+        Running this program on a themis vis image
+      </brief>
+      <description>
+        This program applies a flat-field correction to the input Themis Vis 
+        image
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=V04860003EDR.even.cub to=V04860003EDR.even.flat.cub 
+        </commandLine>
+        <description>
+          This applies a flat-field correction to the V04860003EDR.even.cub 
+          themis vis cube
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image width="154" height="550" src="assets/images/raw.jpg">
+          <brief>
+            Input Cube Data
+          </brief>
+          <description>
+            This is the raw input data; notice the bottom of each framelet is 
+            darker than the rest (fades to black). This is a consistent problem 
+            with the camera.
+          </description>
+          <thumbnail caption="Raw Data" src="assets/thumbs/raw.jpg" width="56" height="200" />
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/out.jpg" width="154" height="550">
+          <brief>
+            The corrected image
+          </brief>
+          <description>
+            This is the output from this program; notice each framelet ends 
+            sharply now. Other minor corrections exist, but the most noticable 
+            correction is data from the darker area is brightened.
+          </description>
+          <thumbnail src="assets/thumbs/out.jpg" width="56" height="200" caption="Corrected Output" />
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

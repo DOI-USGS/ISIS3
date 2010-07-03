@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file primary="true">
+      <body>
+        <p>This is the content of the main page of the example multipage document</p>
+      </body>
+      <type>HTML</type>
+      <subtitle>Page 1</subtitle>
+      <source>
+        <filename>example1_page1.html</filename>
+      </source>
+    </file>
+    <file>
+      <body>
+        <p>This is the content of page 2 of the example multipage document</p>
+      </body>
+      <type>HTML</type>
+      <subtitle>Page 2</subtitle>
+      <source>
+        <filename>example1_page2.html</filename>
+      </source>
+    </file>
+    <file>
+      <body>
+        <p>This is the content of page 3 of the example multipage document</p>
+      </body>
+      <type>HTML</type>
+      <subtitle>Page 3</subtitle>
+      <source>
+        <filename>example1_page3.html</filename>
+      </source>
+    </file>
+    <file>
+      <body>
+        <p>This is the content of page 4 of the example multipage document</p>
+      </body>
+      <type>HTML</type>
+      <subtitle>Page 4</subtitle>
+      <source>
+        <filename>example1_page4.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>about</categoryItem>
+  </category>
+  <audience>
+    <target>all</target>
+  </audience>
+  <bibliography>
+    <title>Multipage Document Example</title>
+    <brief>An example of a multipage Document</brief>
+    <description>An example demonstrating how a multipage Document with inline content is created.
+                        The XML contains several file elements under the files element and during the Isis build
+                        will be converted into a set HTML formatted web pages.</description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2002-12-12</date>
+  </bibliography>
+</documentation>

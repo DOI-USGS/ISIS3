@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tonematch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Matches the tone of two images
+  </brief>
+
+  <description>
+    This application is very similar to the equalizer application, but is only used on two images.   
+    Tonematch collects statistics on each individual cube.  It then uses this data to find a linear
+    regression model between the input cube and the match cube.  The linear regression is 
+    applied to the input cube, creating the output cube (whose tone is equal to that of the match cube).
+  </description>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>equalizer</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jeff Anderson" date="1998-01-12">
+      Original version
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-08-29">
+        Documented and refactored
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-22">
+      Added appTest and poverlap option
+    </change>
+    <change name="Elizabeth Miller" date="2006-02-10">
+      Moved to Photometry and Radiometry group in documentation
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube 
+        </brief>
+        <description>
+          The pixels of the input cube will be altered using the base and multiplier found 
+           in the linear regression to make the tone of the output and match cubes equal.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Match Cube
+        </brief>
+        <description>
+          The match cube will be used to find the tone that the output cube should have.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the tonematched image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Option">
+      <parameter name="POVERLAP">
+        <type>boolean</type>
+        <brief>
+          Projection Overlap
+        </brief>
+        <description>
+          This parameter allows the user to match the tone of the entire images, or just match the overlapping
+          area of the cubes.  If this option is chosen, both cubes must have the same projection parameters and
+          must be overlapping.
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="mocgap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Fix data gap in MOC images
+  </brief>
+
+  <description>
+    Fixes data gaps in MOC images that occur around detector 371. The program 
+    calculates the average and standard deviation of the 5 pixels on a line 
+    centered at detector 371 and 
+  </description>
+
+  <category>
+    <missionItem>Mars Global Surveyor</missionItem>
+  </category>
+
+  <history>
+    <change name="Janet Barrett" date="2003-01-31">
+      Original version
+    </change>
+    <change name="Brendan George" date="2005-11-21">
+      Converted to Isis3
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          This is the input cube to be procesed and fixed around detector 371.
+          must be an Isis cube from the Mars Global Surveyor Orbital Camera,
+          and it needs to have already been processed to a level 1 cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This is the cube to which we will output our data
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Parameters">
+      <parameter name="MAXSD">
+        <type>double</type>
+        <brief>
+          Maximum allowable deviance
+        </brief>
+        <description>
+          This parameter describes how many standard deviations from the local
+          average are considered valid for the purpose of filling in the gap.
+        </description>
+        <default>
+          <item>1.0</item>
+        </default>
+      </parameter>
+    </group>
+  </groups>
+</application>

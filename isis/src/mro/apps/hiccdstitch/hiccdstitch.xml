@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hiccdstitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Stitch together multiple HiRISE CCD images
+  </brief>
+
+  <description>
+      <p>
+    This program combines images from multiple HiRISE CCDs into a single
+    output image file.  The output file can be considered to be a special
+    type of mosaic in which the different CCD images are placed next to
+    each other in positions that correspond to detector numbers.  The input
+    files must each contain both channels of a single detector, which are
+    the files produced by the "histitch" program.  CCD images with lower
+    CCD numbers are placed into the output file to the left of CCD images
+    with higher CCD numbers.  By default the CCD images are placed into the 
+    output file from left to right, i.e., in order of increasing CCD number.  This
+    order can be changed with the MosaicOrder keyword in the "shiftdef"
+    file.
+      </p>
+      <p>
+    Images are inserted at locations
+    corresponding to the relative offsets of the detectors.  In most cases,
+    pixel replication is used when processing an input image so that it
+    matches the scale of the image with the lowest summing mode.  However,
+    if any of the input images were observed with a summing mode of 3, then
+    pixel replication is used for all images to match the scale that would
+    have been obtained with a summing mode of 1.  No resampling of input
+    pixel values is done.
+      </p> 
+      <p>
+     In many cases, adjacent images do not line up vertically due to observing
+     conditions and other factors.  The SHIFTDEF parameter allows the user to
+     apply arbitrary offsets in lines to any or all the input images so they align
+     properly.
+      </p>
+      <p>
+     It has been determined that summing modes add an additional delay to
+     imaging due to pre-cycling of the detector electronics.  Typically, images
+     have an additional <b>180 * (summing mode  - 1)</b> lines delay
+     in the actual imaging
+     of the target.  These lines are unbinned, not subject to the summing mode
+     applied during imaging.  This is not an issue if all images being stitched by
+     this application are the same summing mode.  If images with different
+     summing modes are acquired in the same observation, then this offset
+     is automatically applied to the images with differing summing modes.  This
+     will result in adding
+     lines of offset to some images and increasing the number of lines in the
+     resulting output image.
+      </p>
+      <p>
+          The input files may contain multiple bands but all input files must contain
+          the same number of bands.   This is useful for creating color products
+          where the input files are compatable with the constraints of this application.
+      </p>
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Jim Torson" date="2005-06-24">
+       Original version 
+    </change>
+    <change name="Kris Becker" date="2006-03-02">
+        Eliminated the requirement that all CCDs be adjacent.  As a side
+        effect,  24 pixels on the left edge of the adjacent CCDs are no
+        longer clipped but are layed on top of the last 24 pixels on the
+        right side of preceding CCDs.
+    </change> 
+    <change name="Kris Becker" date="2006-03-31">
+        Added the SHIFTDEF parameter that allows for offsets to be provided
+        for any CCD.  Also added the PLACEMENT parameter that writes the
+        line and sample coordinate of each CCD in the output TO file.
+    </change>
+    <change name="Kris Becker" date="2006-09-27">
+        Added recently discovered time delay as a function of summing modes.
+        This adds lines of offset to images with higher summing modes.  These
+        lines are unbinned but are subject to the smallest occuring summing
+        mode in that the offsets are reduced by the number of offsets divided by
+        the minimum summing mode.
+     </change>  
+    <change name="Kris Becker" date="2006-11-27">
+        Modified to allow a single CCD image file as input to hiccdstitch.
+        Previously, two or more CCDs image files were required.  With this
+        change only one need be provided (to expedite pipeline processing).
+     </change>
+     <change name="Tracie Sucharski" date="2007-03-13">
+         Modified to allow user to determine the order the ccd's are laid down
+         through the use of the MosaicOrder keyword in the shiftdef file.
+         Also added option to replicate pixels by nearestNeighbor, Bilinear
+         or cubicConvolution.  Also deleted ChannelNumber and CpmmNumber
+         keywords so that output image cannot be projected.
+     </change>
+     <change name="Kris Becker" date="2007-07-31">
+         Modified to allow for stitching of multiband cubes.  This will allow
+         users to create color products as long all files have the same
+         number of bands. 
+      </change>
+      <change name="Steven Lambright" date="2008-05-13">
+        Removed references to CubeInfo 
+      </change>
+   </history>
+
+  <groups>
+    <group name="Input Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of cubes to stitch together
+        </brief>
+        <description>
+          The name of a file containing a list of HiRISE image files to be
+          stitched together.  Each file should be listed on a separate
+          line.
+        </description>
+        <filter>
+          *
+        </filter>
+      </parameter>
+
+      <parameter name="SHIFTDEF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonLog</function>
+            <brief>View file in log area</brief>
+            <description>This helper button will display the shiftdef file in the log area</description>
+            <icon>$ISIS3DATA/base/icons/view_text.png</icon>
+          </helper>
+        </helpers>
+        <filter>
+          *.def
+        </filter>
+        <defaultPath>$mro/calibration</defaultPath>
+        <default><item>$mro/calibration/HiccdstitchOffsets.def</item></default>
+        <brief>
+          Pvl file containing mosaic order for ccd's  and the absolute shifts for CCD
+          lines and samples.
+        </brief>
+        <description>
+            <p>
+                This file contains objects for each CCD and for each combo
+                of binning/tdi that requires a 
+                modification to its placement in the mapping of the HiRISE
+                focal plane.  The name of each object is the CCD name for
+                which the shift in line or sample is needed.  For example, the
+                leftmost CCD, CCD 0 is named "RED0", the next "RED1" and
+                so on.  The binning/tdi groups are named by combining the
+                binning and tdi mode.  For example, summing=1 and tdi=64 the
+                group would be "1/64".   Hiccdstitch searches for names of objects that match
+                the stitched input cube files ccd then for the proper combo of summing and tdi.
+                If the group for summing/tdi isn't found, values from the ccd object will be
+                used.   These offsets will be applied to the
+                default sample and line location of where the CCD is mapped to
+                in the focal plane.
+            </p>
+            <p>
+                Offsets for both line and sample can be supplied.  None, one or
+                both can be provided for any CCD.  Negative values shift the 
+                image left if a sample offset is given or up if a line offset is given.
+                Positive values in sample and line shift the image right and down,
+                respectively.
+            </p>
+            <p>
+                These shifts are absolute shifts and only apply to
+                the specified CCD and are not propagated to subsequent CCDs
+                left to right in the focal plane layout.  (HiRISE CCD arrangement
+                is always left to right as far as hiccdstitch is concerned, unless
+                overiridden by the MosaicOrder keyword.)  For
+                example, if stitching all 10 RED CCDs in an image you find that
+                RED5 must be shifted left 20 pixels but all other CCDs line up file
+                to the right, meaning RED6 through RED9, then you are required
+                to privide groups for RED6, RED7, RED8 and RED9 with the same
+                SampleOffset provided for RED5.  This is the only way proper
+                sample alignment is retained.
+            </p>
+            <p>
+                Below is an example of the format of the input file for the
+                SHIFTDEF file:
+            </p>
+            <pre>
+            Object = Hiccdstitch
+
+            # Defaults for Red0 images
+              Object = RED0
+                SampleOffset     = -10
+                LineOffset       = 5
+
+                # Summing=1, Tdi=64 values.  Any of the three keywords (MosaicOrder, SampleOffset, LineOffset) 
+                #  can exist in the summing/tdi groups that will override the defaults in the RED0 object.
+                Group = 1/64
+                  SampleOffset = 0
+                  LineOffset = 0
+                End_Group
+
+                # Summing=1, Tdi=128
+                Group = 1/128
+                  SampleOffset = 20
+                End_Group
+
+                # If a summing/tdi group does not exist, the ccd defaults are used
+              End_Object
+
+              Object = RED3
+                SampleOffset     = 13
+                LineOffset       = -5
+              End_Object
+
+              Object = RED5
+                LineOffset       = 22
+              End_Object
+
+              Object = RED9
+                # MosaicOrder of -1, indicates the ccd is placed in mosaic first.
+                 MosaicOrder = -1
+               End_Object
+
+               Object = IR11
+                SampleOffset     = -4
+                LineOffset       = 2
+              End_Object
+
+              Object = BG12
+                SampleOffset     = 12
+              End_Object
+            End_Object
+            End
+            </pre>
+            <p>
+                The only keywords that hiccdstitch reads from this file
+                are <b>SampleOffset</b> , <b>LineOffset</b> and 
+                <b>MosaicOrder</b>.  All other keywords are ignored.
+                All CCD objects must be contained within the
+                <b>Hiccdstitch</b> object.
+            </p>
+            <p>
+                Note that this file is an optional parameter.  If it is not
+                provided, then all CCD files provided are mapped to
+                focal plane positions as specified in the HiRISE
+                Instrument Operations Handbook.  Note that the size
+                of a HiRISE pixel is 0.012 millimeters and the measurements
+                in the handbook are also in millimeters.
+            </p>
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Output Files">
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output stitched cube
+        </brief>
+        <description>
+          The output cube into which the input cubes will be placed.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="PLACEMENT">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file providing the placement of CCDs in the TO cube
+        </brief>
+        <description>
+            If provided, the actual line and sample locations of each CCD as
+            they map to the TO cube are recorded here.  This format is the
+            the same as the format provided in the STITCHDEF file.
+        </description>
+        <filter>
+          *.def
+        </filter>
+      </parameter>
+    </group>
+    <group name="Interpolation">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>NEARESTNEIGHBOR</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input when 
+          ccds of different summing modes are combined.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolutioin interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>

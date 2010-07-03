@@ -1,0 +1,2068 @@
+/**
+ * @file
+ * $Date: 2010/06/30 03:38:12 $
+ * $Revision: 1.46 $
+ *
+ *  Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
+ *  individual third-party library and package descriptions for intellectual property information,
+ *  user agreements, and related information.
+ *
+ *  Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
+ *  USGS as to the accuracy and functioning of such software and related material nor shall the
+ *  fact of distribution constitute any such warranty, and no responsibility is assumed by the
+ *  USGS in connection therewith.
+ *
+ *  For additional information, launch $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *  in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *  http://www.usgs.gov/privacy.html.
+ */
+#include "IsisDebug.h"
+#include "CubeViewport.h"
+
+#include <iomanip>
+#include <iostream>
+#include <QApplication>
+#include <QCloseEvent>
+#include <QCursor>
+#include <QIcon>
+#include <QPen>
+#include <QPainter>
+#include <QFileInfo>
+#include <QMessageBox>
+#include <QMouseEvent>
+#include <QRgb>
+#include <QScrollBar>
+#include <QTimer>
+
+#include "Camera.h"
+#include "CubeDataThread.h"
+#include "iException.h"
+#include "Filename.h"
+#include "Histogram.h"
+#include "Stretch.h"
+#include "StretchTool.h"
+#include "Tool.h"
+#include "UniversalGroundMap.h"
+#include "ViewportBuffer.h"
+
+
+using namespace Isis;
+using namespace std;
+
+
+namespace Qisis {
+  /**
+   * Construct a cube viewport
+   *
+   *
+   * @param cube
+   * @param parent
+   */
+  CubeViewport::CubeViewport(Isis::Cube *cube, QWidget *parent) :
+    QAbstractScrollArea(parent) {
+    // Is the cube usable?
+    if (cube == NULL) {
+      throw iException::Message(iException::Programmer,
+                                "Can not view NULL cube pointer",
+                                _FILEINFO_);
+    }
+    else if (!cube->IsOpen()) {
+      throw iException::Message(iException::Programmer,
+                                "Can not view unopened cube",
+                                _FILEINFO_);
+    }
+
+    p_cube = cube;
+    p_cubeData = NULL;
+    p_cubeData = new CubeDataThread();
+    p_cubeId = p_cubeData->AddCube(p_cube);
+
+    connect(p_cubeData, SIGNAL(BrickChanged(int, const Isis::Brick *)),
+            this, SLOT(cubeDataChanged(int, const Isis::Brick *)));
+    connect(this, SIGNAL(doneWithData(int, const Isis::Brick *)),
+            p_cubeData, SLOT(DoneWithData(int, const Isis::Brick *)));
+
+    p_cubeData->AddChangeListener();
+
+    void doneWithData(int, const Isis::Brick *);
+
+    // Set up the scroll area
+    setAttribute(Qt::WA_DeleteOnClose);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    viewport()->setCursor(QCursor(Qt::CrossCursor));
+    viewport()->installEventFilter(this);
+    viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+
+//    viewport()->setAttribute(Qt::WA_NoSystemBackground);
+//    viewport()->setAttribute(Qt::WA_PaintOnScreen,false);
+
+    p_saveEnabled = false;
+    // Save off info about the cube
+    p_scale = -1.0;
+    p_color = false;
+
+
+    setCaption();
+
+    p_redBrick = new Brick(4, 1, 1, cube->PixelType());
+    p_grnBrick = new Brick(4, 1, 1, cube->PixelType());
+    p_bluBrick = new Brick(4, 1, 1, cube->PixelType());
+    p_gryBrick = new Brick(4, 1, 1, cube->PixelType());
+    p_pntBrick = new Brick(4, 1, 1, cube->PixelType());
+
+    p_paintPixmap = false;
+    p_image = NULL;
+    p_cubeShown = true;
+    p_updatingBuffers = false;
+
+    //updateScrollBars(1,1);
+
+    p_groundMap = NULL;
+    p_projection = NULL;
+    p_camera = NULL;
+
+    // Setup a universal ground map
+    try {
+      p_groundMap = new UniversalGroundMap(*p_cube);
+    }
+    catch (iException &e) {
+      e.Clear();
+    }
+
+    if (p_groundMap != NULL) {
+      // Setup the camera or the projection
+      if (p_groundMap->Camera() != NULL) {
+        p_camera = p_groundMap->Camera();
+        if (p_camera->HasProjection()) {
+          try {
+            p_projection = cube->Projection();
+          }
+          catch (iException &e) {
+            e.Clear();
+          }
+        }
+      }
+      else {
+        p_projection = p_groundMap->Projection();
+      }
+    }
+
+
+    // Setup context sensitive help
+    string cubeFileName = p_cube->Filename();
+    p_whatsThisText = QString("<b>Function: </b>Viewport to ") + cubeFileName.c_str();
+
+    p_cubeWhatsThisText =
+      "<p><b>Cube Dimensions:</b> \
+      <blockQuote>Samples = " +
+      QString::number(cube->Samples()) + "<br>" +
+      "Lines = " +
+      QString::number(cube->Lines()) + "<br>" +
+      "Bands = " +
+      QString::number(cube->Bands()) + "</blockquote></p>";
+
+    /*setting up the qlist of CubeBandsStretch objs.
+    for( int b = 0; b < p_cube->Bands(); b++) {
+      CubeBandsStretch *stretch = new CubeBandsStretch();
+      p_bandsStretchList.push_back(stretch);
+    }*/
+
+    p_grayBuffer = new ViewportBuffer(this, p_cubeData, p_cubeId);
+    p_grayBuffer->enable(false);
+    p_grayBuffer->setBand(1);
+
+    p_redBuffer = NULL;
+    p_greenBuffer = NULL;
+    p_blueBuffer = NULL;
+    p_pixmapPaintRects = NULL;
+
+    p_pixmapPaintRects = new QList<QRect *>();
+    p_progressTimer = new QTimer();
+    p_progressTimer->setInterval(250);
+
+    p_knownStretches = new QVector< Isis::Stretch * >();
+    p_globalStretches = new QVector< Isis::Stretch * >();
+
+    while (p_cube->Bands() > p_knownStretches->size()) {
+      p_knownStretches->push_back(NULL);
+      p_globalStretches->push_back(NULL);
+    }
+
+    connect(p_progressTimer, SIGNAL(timeout()), this, SLOT(onProgressTimer()));
+
+    p_bgColor = Qt::black;
+  }
+
+
+  /**
+   * This method is called to initially show the viewport. It will set the
+   * scale to show the entire cube and enable the gray buffer.
+   *
+   */
+  void CubeViewport::showEvent(QShowEvent *event) {
+    if (p_scale == -1) {
+      double sampScale = (double) sizeHint().width() / (double) cubeSamples();
+      double lineScale = (double) sizeHint().height() / (double) cubeLines();
+      double scale = sampScale < lineScale ? sampScale : lineScale;
+
+      setScale(scale, cubeSamples() / 2.0, cubeLines() / 2.0);
+    }
+
+    if (p_grayBuffer && !p_grayBuffer->enabled()) {
+      p_grayBuffer->enable(true);
+
+      // gives a proper initial stretch (entire cube)
+      p_grayBuffer->addStretchAction();
+    }
+
+    QAbstractScrollArea::show();
+
+    p_paintPixmap = true;
+
+    paintPixmap();
+  }
+
+
+  /**
+   * This updates the progress bar visually. Conceptually it emits
+   * the progressChanged signal with the current progress.
+   */
+  void CubeViewport::onProgressTimer() {
+    double progress = 0.0;
+    bool completed = false;
+
+    if (p_grayBuffer) {
+      progress += p_grayBuffer->currentProgress();
+      completed = !p_grayBuffer->working();
+    }
+
+    if (p_redBuffer) {
+      progress += p_redBuffer->currentProgress() / 3.0;
+      completed = !p_redBuffer->working();
+    }
+
+    if (p_greenBuffer) {
+      progress += p_greenBuffer->currentProgress() / 3.0;
+      completed = completed && !p_greenBuffer->working();
+    }
+
+    if (p_blueBuffer) {
+      progress += p_blueBuffer->currentProgress() / 3.0;
+      completed = completed && !p_blueBuffer->working();
+    }
+
+    int realProgress = (int)(progress * 100.0);
+
+    if (completed) {
+      realProgress = 100;
+      p_progressTimer->stop();
+      emit screenPixelsChanged();
+    }
+    else if (realProgress == 100) {
+      realProgress = 99;
+    }
+
+    emit progressChanged(realProgress);
+  }
+
+
+  /**
+   * Destructor
+   *
+   */
+  CubeViewport::~CubeViewport() {
+    if (p_redBrick) {
+      delete p_redBrick;
+      p_redBrick = NULL;
+    }
+
+    if (p_grnBrick) {
+      delete p_grnBrick;
+      p_grnBrick = NULL;
+    }
+
+    if (p_bluBrick) {
+      delete p_bluBrick;
+      p_bluBrick = NULL;
+    }
+
+    if (p_gryBrick) {
+      delete p_gryBrick;
+      p_gryBrick = NULL;
+    }
+
+    if (p_pntBrick) {
+      delete p_pntBrick;
+      p_pntBrick = NULL;
+    }
+
+    if (p_groundMap) {
+      delete p_groundMap;
+      p_groundMap = NULL;
+    }
+
+    if (p_grayBuffer) {
+      delete p_grayBuffer;
+      p_grayBuffer = NULL;
+    }
+
+    if (p_redBuffer) {
+      delete p_redBuffer;
+      p_redBuffer = NULL;
+    }
+
+    if (p_greenBuffer) {
+      delete p_greenBuffer;
+      p_greenBuffer = NULL;
+    }
+
+    if (p_blueBuffer) {
+      delete p_blueBuffer;
+      p_blueBuffer = NULL;
+    }
+
+    // p_cubeData MUST be deleted AFTER all viewport buffers!!!
+    if (p_cubeData) {
+      p_cubeData->RemoveChangeListener();
+      delete p_cubeData;
+      p_cubeData = NULL;
+    }
+
+    // p_cube MUST be deleted AFTER all viewport buffers!!!
+    if (p_cube) {
+      delete p_cube;
+      p_cube = NULL;
+    }
+
+    if (p_progressTimer) {
+      delete p_progressTimer;
+      p_progressTimer = NULL;
+    }
+
+    if (p_image) {
+      delete p_image;
+      p_image = NULL;
+    }
+
+    if (p_pixmapPaintRects) {
+      for (int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {
+        delete(*p_pixmapPaintRects)[rect];
+      }
+
+      delete p_pixmapPaintRects;
+      p_pixmapPaintRects = NULL;
+    }
+
+    if (p_knownStretches) {
+      for (int stretch = 0; stretch < p_knownStretches->size(); stretch ++) {
+        if ((*p_knownStretches)[stretch] != NULL) {
+          delete(*p_knownStretches)[stretch];
+          (*p_knownStretches)[stretch] = NULL;
+        }
+      }
+
+      p_knownStretches->clear();
+
+      delete p_knownStretches;
+      p_knownStretches = NULL;
+    }
+
+    if (p_globalStretches) {
+      for (int stretch = 0; stretch < p_globalStretches->size(); stretch ++) {
+        if ((*p_globalStretches)[stretch] != NULL) {
+          delete(*p_globalStretches)[stretch];
+          (*p_globalStretches)[stretch] = NULL;
+        }
+      }
+
+      p_globalStretches->clear();
+
+      delete p_globalStretches;
+      p_globalStretches = NULL;
+    }
+  }
+
+  /**
+   * This method sets the viewports cube.
+   *
+   * @param cube
+   */
+  void CubeViewport::setCube(Isis::Cube *cube) {
+    p_cube = cube;
+    setCaption();
+  }
+
+
+  //! Return the number of samples in the cube
+  int CubeViewport::cubeSamples() const {
+    return p_cube->Samples();
+  }
+
+
+  //! Return the number of lines in the cube
+  int CubeViewport::cubeLines() const {
+    return p_cube->Lines();
+  }
+
+
+  //! Return the number of bands in the cube
+  int CubeViewport::cubeBands() const {
+    return p_cube->Bands();
+  }
+
+
+  /**
+   * This method updates the internal viewport buffer based on
+   * changes in cube DN values.
+   *
+   * @param cubeId Cube that the changed brick belongs to
+   * @param data New data
+   */
+  void CubeViewport::cubeDataChanged(int cubeId, const Isis::Brick *data) {
+    if (cubeId == p_cubeId) {
+      double ss, sl, es, el;
+      ss = data->Sample();
+      sl = data->Line();
+      es = data->Sample() + data->SampleDimension();
+      el = data->Line() + data->LineDimension();
+      if (ss < 0.5)
+        ss = 0.5;
+      if (sl < 0.5)
+        sl = 0.5;
+      if (es > cube()->Samples() + 0.5)
+        es = cube()->Samples() + 0.5;
+      if (el > cube()->Lines() + 0.5)
+        el = cube()->Lines() + 0.5;
+
+      int sx, sy, ex, ey;
+
+      cubeToViewport(ss, sl, sx, sy);
+      cubeToViewport(es, el, ex, ey);
+      if (sx < 0)
+        sx = 0;
+      if (sy < 0)
+        sy = 0;
+      if (ex > viewport()->width())
+        ex = viewport()->width();
+      if (ey > viewport()->height())
+        ey = viewport()->height();
+      QRect vpRect(sx, sy, ex - sx + 1, ey - sy + 1);
+
+      p_updatingBuffers = true;
+      if (p_grayBuffer)
+        p_grayBuffer->fillBuffer(vpRect, data);
+      if (p_redBuffer)
+        p_redBuffer->fillBuffer(vpRect, data);
+      if (p_greenBuffer)
+        p_greenBuffer->fillBuffer(vpRect, data);
+      if (p_blueBuffer)
+        p_blueBuffer->fillBuffer(vpRect, data);
+      p_updatingBuffers = false;
+
+      paintPixmapRects();
+    }
+
+    emit doneWithData(cubeId, data);
+  }
+
+
+  /**
+   * This method is called when the viewport recieves a close
+   * event. If changes have been made to this viewport it opens an
+   * information dialog that asks the user if they want to save,
+   * discard changes, or cancel.
+   *
+   * @param event
+   */
+  void CubeViewport::closeEvent(QCloseEvent *event) {
+    if (p_saveEnabled) {
+      switch (QMessageBox::information(this, "Qview",
+                                       "The document contains unsaved changes\n"
+                                       "Do you want to save the changes before exiting?",
+                                       "&Save", "&Discard", "Cancel",
+                                       0,    // Enter == button 0
+                                       2))
+        // Escape == button 2
+      {
+          //Save changes and close viewport
+        case 0:
+          emit saveChanges();
+          event->accept();
+          break;
+          //Discard changes and close viewport
+        case 1:
+          emit discardChanges();
+          event->accept();
+          break;
+          //Cancel, don't close viewport
+        case 2:
+          event->ignore();
+          break;
+      }
+    }
+  }
+
+  /**
+   * This method is called when the cube has changed or changes
+   * have been finalized.
+   *
+   * @param changed
+   */
+  void CubeViewport::cubeChanged(bool changed) {
+    p_saveEnabled = changed;
+  }
+
+  /**
+   *  Make viewports show up as 512 by 512
+   *
+   *
+   * @return QSize
+   */
+  QSize CubeViewport::sizeHint() const {
+    QSize s(512, 512);
+    return s;
+  }
+
+
+  /**
+   *  Change the scale of the cube
+   *
+   * @param scale
+   */
+  void CubeViewport::setScale(double scale) {
+    // Sanitize the scale value
+    if (scale == p_scale)
+      return;
+    if (scale > 16.0)
+      scale = 16.0;
+    //if (scale < 1.0/16.0) scale = 1.0/16.0;
+
+    // Resize the scrollbars to reflect the new scale
+    double samp, line;
+    contentsToCube(horizontalScrollBar()->value(), verticalScrollBar()->value(),
+                   samp, line);
+    p_scale = scale;
+    updateScrollBars(1, 1); // Setting to 1,1 make sure we don't have bad values
+
+    // Now update the scroll bar value to the old line/sample
+    int x, y;
+    cubeToContents(samp, line, x, y);
+    updateScrollBars(x, y);
+
+    p_updatingBuffers = true;
+    if (p_grayBuffer)
+      p_grayBuffer->scaleChanged();
+    if (p_redBuffer)
+      p_redBuffer->scaleChanged();
+    if (p_greenBuffer)
+      p_greenBuffer->scaleChanged();
+    if (p_blueBuffer)
+      p_blueBuffer->scaleChanged();
+    p_updatingBuffers = false;
+
+    paintPixmapRects();
+
+    // Notify other tools about the scale change
+    emit scaleChanged();
+
+    // Update the display
+    setCaption();
+    paintPixmap(); // Will get rid of old data in the display
+
+    viewport()->repaint();
+    emit screenPixelsChanged();
+  }
+
+  /**
+   *  Change the scale of the cube after moving x,y to the center
+   *
+   *
+   * @param scale
+   * @param x
+   * @param y
+   */
+  void CubeViewport::setScale(double scale, int x, int y) {
+    double samp, line;
+    viewportToCube(x, y, samp, line);
+    setScale(scale, samp, line);
+  }
+
+
+  /**
+   * Change the scale of the cube after moving samp/line to the
+   * center
+   *
+   *
+   * @param scale
+   * @param sample
+   * @param line
+   */
+  void CubeViewport::setScale(double scale, double sample, double line) {
+    viewport()->setUpdatesEnabled(false);
+
+    bool wasEnabled = false;
+
+    if ((p_grayBuffer && p_grayBuffer->enabled()) ||
+        (p_redBuffer && p_redBuffer->enabled())) {
+      wasEnabled = true;
+    }
+
+    if (p_grayBuffer)
+      p_grayBuffer->enable(false);
+    if (p_redBuffer)
+      p_redBuffer->enable(false);
+    if (p_greenBuffer)
+      p_greenBuffer->enable(false);
+    if (p_blueBuffer)
+      p_blueBuffer->enable(false);
+
+    if (p_paintPixmap) {
+      p_paintPixmap = false;
+      setScale(scale);
+      p_paintPixmap = true;
+    }
+    else {
+      setScale(scale);
+    }
+
+    center(sample, line);
+
+    if (p_grayBuffer)
+      p_grayBuffer->enable(wasEnabled);
+    if (p_redBuffer)
+      p_redBuffer->enable(wasEnabled);
+    if (p_greenBuffer)
+      p_greenBuffer->enable(wasEnabled);
+    if (p_blueBuffer)
+      p_blueBuffer->enable(wasEnabled);
+
+    paintPixmap();
+    viewport()->setUpdatesEnabled(true);
+    viewport()->update();
+    emit screenPixelsChanged();
+  }
+
+
+  /**
+   *  Bring the cube pixel under viewport x/y to the center
+   *
+   *
+   * @param x
+   * @param y
+   */
+  void CubeViewport::center(int x, int y) {
+    double sample, line;
+    viewportToCube(x, y, sample, line);
+    center(sample, line);
+  }
+
+
+  /**
+   * Bring the cube sample/line the center
+   *
+   *
+   * @param sample
+   * @param line
+   */
+  void CubeViewport::center(double sample, double line) {
+    // TODO:  If the x/y is close to the scrollbar values then
+    // we should use the scrollBy routine to make the display faster
+    int x, y;
+    cubeToContents(sample, line, x, y);
+
+    int panX = horizontalScrollBar()->value() - x;
+    int panY = verticalScrollBar()->value() - y;
+
+    updateScrollBars(x, y);
+
+    p_updatingBuffers = true;
+    if (p_grayBuffer)
+      p_grayBuffer->pan(panX, panY);
+    if (p_redBuffer)
+      p_redBuffer->pan(panX, panY);
+    if (p_greenBuffer)
+      p_greenBuffer->pan(panX, panY);
+    if (p_blueBuffer)
+      p_blueBuffer->pan(panX, panY);
+    p_updatingBuffers = false;
+
+    paintPixmapRects();
+
+    shiftPixmap(panX, panY);
+
+    emit screenPixelsChanged();
+  }
+
+
+  /**
+   * Goes through the list of requested paints, from the viewport
+   * buffer, and paints them.
+   */
+  void CubeViewport::paintPixmapRects() {
+    for (int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {
+      paintPixmap(*(*p_pixmapPaintRects)[rect]);
+    }
+
+    p_pixmapPaintRects->clear();
+  }
+
+
+  /**
+   *  Convert a contents x/y to a cube sample/line (may be outside
+   *  the cube)
+   *
+   *
+   * @param x
+   * @param y
+   * @param sample
+   * @param line
+   */
+  void CubeViewport::contentsToCube(int x, int y,
+                                    double &sample, double &line) const {
+    sample = x / p_scale;
+    line = y / p_scale;
+  }
+
+
+  /**
+   * Convert a viewport x/y to a cube sample/line (may be outside
+   * the cube)
+   *
+   *
+   * @param x
+   * @param y
+   * @param sample
+   * @param line
+   */
+  void CubeViewport::viewportToCube(int x, int y,
+                                    double &sample, double &line) const {
+    x += horizontalScrollBar()->value();
+    x -= viewport()->width() / 2;
+    y += verticalScrollBar()->value();
+    y -= viewport()->height() / 2;
+    contentsToCube(x, y, sample, line);
+  }
+
+
+  /**
+   * Convert a cube sample/line to a contents x/y (should not be
+   * outside)
+   *
+   *
+   * @param sample
+   * @param line
+   * @param x
+   * @param y
+   */
+  void CubeViewport::cubeToContents(double sample, double line,
+                                    int &x, int &y) const {
+    x = (int)(sample * p_scale + 0.5);
+    y = (int)(line * p_scale + 0.5);
+  }
+
+
+  /**
+   * Convert a cube sample/line to a viewport x/y (may be outside
+   * the viewport)
+   *
+   *
+   * @param sample
+   * @param line
+   * @param x
+   * @param y
+   */
+  void CubeViewport::cubeToViewport(double sample, double line,
+                                    int &x, int &y) const {
+    cubeToContents(sample, line, x, y);
+    x -= horizontalScrollBar()->value();
+    x += viewport()->width() / 2;
+    y -= verticalScrollBar()->value();
+    y += viewport()->height() / 2;
+  }
+
+
+  /**
+   * Move the scrollbars by dx/dy screen pixels
+   *
+   *
+   * @param dx
+   * @param dy
+   */
+  void CubeViewport::scrollBy(int dx, int dy) {
+    // Make sure we don't generate bad values outside of the scroll range
+    int x = horizontalScrollBar()->value() + dx;
+    if (x <= 1) {
+      dx = 1 - horizontalScrollBar()->value();
+    }
+    else if (x >= horizontalScrollBar()->maximum()) {
+      dx = horizontalScrollBar()->maximum() - horizontalScrollBar()->value();
+    }
+
+    // Make sure we don't generate bad values outside of the scroll range
+    int y = verticalScrollBar()->value() + dy;
+    if (y <= 1) {
+      dy = 1 - verticalScrollBar()->value();
+    }
+    else if (y >= verticalScrollBar()->maximum()) {
+      dy = verticalScrollBar()->maximum() - verticalScrollBar()->value();
+    }
+
+    // Do we do anything?
+    if ((dx == 0) && (dy == 0))
+      return;
+
+    // We do so update the scroll bars
+    updateScrollBars(horizontalScrollBar()->value() + dx,
+                     verticalScrollBar()->value() + dy);
+
+    // Scroll the the pixmap
+    scrollContentsBy(-dx, -dy);
+  }
+
+
+  /**
+   * Scroll the viewport contents by dx/dy screen pixels
+   *
+   *
+   * @param dx
+   * @param dy
+   */
+  void CubeViewport::scrollContentsBy(int dx, int dy) {
+
+    // We shouldn't do anything if scrollbars are being updated
+    if (viewport()->signalsBlocked()) {
+      return;
+    }
+
+    // Tell the buffers to update appropriate for the pan and upon completion
+    //   they will call bufferUpdated. We don't want bufferUpdated to happen
+    //   until afterwards. If only shrinking and no new data then the viewport
+    //   buffers will complete immediately. When all buffers don't have their
+    //   appropriate actions queued bufferUpdated can't succeed.
+
+    // Also block paints because we'll repaint it all when we're done
+    //   telling each buffer about the pan.
+    bool panQueued = false;
+    QRect bufferXYRect;
+
+    p_updatingBuffers = true;
+
+    if (p_grayBuffer) {
+      p_grayBuffer->pan(dx, dy);
+      panQueued |= p_grayBuffer->working();
+      bufferXYRect = p_grayBuffer->bufferXYRect();
+    }
+
+    if (p_redBuffer) {
+      p_redBuffer->pan(dx, dy);
+      panQueued |= p_redBuffer->working();
+      bufferXYRect = p_redBuffer->bufferXYRect();
+    }
+
+    if (p_greenBuffer) {
+      p_greenBuffer->pan(dx, dy);
+      panQueued |= p_greenBuffer->working();
+    }
+
+    if (p_blueBuffer) {
+      p_blueBuffer->pan(dx, dy);
+      panQueued |= p_blueBuffer->working();
+    }
+
+    p_updatingBuffers = false;
+
+    // shift the pixmap by x,y if the viewport buffer didn't do it immediately
+    if (panQueued) {
+      shiftPixmap(dx, dy);
+    }
+    else {
+      // Need to do this to clear area outside of cube
+      p_pixmapPaintRects->clear();
+      paintPixmap();
+    }
+
+    viewport()->update();
+    emit screenPixelsChanged();
+  }
+
+
+  /**
+   * This restarts the progress bar. Does nothing if already
+   * loading.
+   */
+  void CubeViewport::enableProgress() {
+    if (!p_progressTimer->isActive()) {
+      p_progressTimer->start();
+
+      emit progressChanged(0);
+    }
+  }
+
+
+  /**
+   * Change the caption on the viewport title bar
+   *
+   */
+  void CubeViewport::setCaption() {
+    string cubeFilename = p_cube->Filename();
+    QString str = QFileInfo(cubeFilename.c_str()).fileName();
+    str += QString(" @ ");
+    str += QString::number(p_scale * 100.0);
+    str += QString("% ");
+
+    if (p_color) {
+      str += QString("(RGB = ");
+      str += QString::number(p_red.band);
+      str += QString(",");
+      str += QString::number(p_green.band);
+      str += QString(",");
+      str += QString::number(p_blue.band);
+      str += QString(")");
+    }
+    else {
+      str += QString("(Gray = ");
+      str += QString::number(p_gray.band);
+      str += QString(")");
+    }
+
+    //If changes have been made make sure to add '*' to the end
+    if (p_saveEnabled) {
+      str += "*";
+    }
+
+    parentWidget()->setWindowTitle(str);
+    emit windowTitleChanged();
+  }
+
+
+  /**
+   * The viewport is being resized
+   *
+   *
+   * @param e
+   */
+  void CubeViewport::resizeEvent(QResizeEvent *e) {
+    p_paintPixmap = false;
+
+    // Tell the buffers to update their coefficients to reinitialize
+    //   and have their immediate paint events happen afterwards. Should not
+    //   happen, but if buffers have actions complete immediately and call
+    //   bufferUpdated. We don't want to have bufferUpdated ever when all
+    //   buffers don't have their appropriate actions queued. It can't succeed.
+    p_updatingBuffers = true;
+    if (p_grayBuffer)
+      p_grayBuffer->resizedViewport();
+    if (p_redBuffer)
+      p_redBuffer->resizedViewport();
+    if (p_greenBuffer)
+      p_greenBuffer->resizedViewport();
+    if (p_blueBuffer)
+      p_blueBuffer->resizedViewport();
+    p_updatingBuffers = false;
+
+    paintPixmapRects();
+
+    // Change the size of the image and pixmap
+    if (p_image) {
+      delete p_image;
+      p_image = NULL;
+    }
+
+    p_image = new QImage(viewport()->size(), QImage::Format_RGB32);
+    p_pixmap = QPixmap(viewport()->size());
+
+    p_paintPixmap = true;
+
+    // Fixup the scroll bars
+    updateScrollBars(horizontalScrollBar()->value(),
+                     verticalScrollBar()->value());
+
+    p_viewportWhatsThisText =
+      "<p><b>Viewport Dimensions:</b> \
+      <blockQuote>Samples = " +
+      QString::number(viewport()->width()) + "<br>" +
+      "Lines = " +
+      QString::number(viewport()->height()) + "</blockquote></p>";
+
+    // Repaint the pixmap
+    paintPixmap();
+
+    // Repaint the internal viewport and scroll bars
+    viewport()->update();
+  }
+
+
+  /**
+   * Repaint the viewport
+   *
+   * @param e [in]  (QPaintEvent *)  event
+   *
+   * @internal
+   *
+   * @history  2007-04-30  Tracie Sucharski - Add the QPainter to the call to
+   *                           Tool::paintViewport.
+   */
+  void CubeViewport::paintEvent(QPaintEvent *e) {
+    if (!p_cubeShown || !viewport()->isVisible())
+      return;
+  }
+
+
+  /**
+   * This method is called by ViewportBuffer upon successful
+   * completion of all operations and gives the appropriate rect
+   * to be repainted. This is intended to update the screen once
+   * all data is done and ready to be displayed.
+   *
+   * @param rect Area to update screen
+   */
+  void CubeViewport::bufferUpdated(QRect rect) {
+    paintPixmap(rect);
+
+    // Don't repaint from buffer updates if any buffers are working...
+    // This set of statements fixes a flash of black when in RGB mode
+    //   and a pan (or other operation?) completes. What would happen is
+    //   the first would reset to black then other buffers still working so
+    //   not restored to DN values.
+    if (p_grayBuffer && p_grayBuffer->working())
+      return;
+    if (p_redBuffer && p_redBuffer->working())
+      return;
+    if (p_greenBuffer && p_greenBuffer->working())
+      return;
+    if (p_blueBuffer && p_blueBuffer->working())
+      return;
+
+    viewport()->repaint(rect);
+  }
+
+//! Paint the whole pixmap
+  void CubeViewport::paintPixmap() {
+    QRect rect(0, 0, p_image->width(), p_image->height());
+    paintPixmap(rect);
+  }
+
+
+  /**
+   * Paint a region of the pixmap
+   *
+   *
+   * @param rect
+   */
+  void CubeViewport::paintPixmap(QRect rect) {
+    if (!p_paintPixmap)
+      return;
+
+    if (p_updatingBuffers) {
+      p_pixmapPaintRects->push_back(new QRect(rect));
+      return;
+    }
+
+    if (p_pixmap.isNull())
+      return;
+
+    QPainter p(&p_pixmap);
+
+    p.fillRect(rect, QBrush(p_bgColor));
+
+    QRect dataArea;
+
+    if (p_grayBuffer && p_grayBuffer->enabled()) {
+      if (p_grayBuffer->working())
+        return;
+
+      dataArea = QRect(p_grayBuffer->bufferXYRect().intersected(rect));
+
+      for (int y = dataArea.top();
+           !dataArea.isNull() && y <= dataArea.bottom();
+           y++) {
+        const vector< double > & line =
+          p_grayBuffer->getLine(y - p_grayBuffer->bufferXYRect().top());
+
+        if (line.size() == 0)
+          break;
+
+        QRgb *rgb = (QRgb *) p_image->scanLine(y);
+
+        for (int x = dataArea.left(); x <= dataArea.right(); x++) {
+          int bufferLeft = p_grayBuffer->bufferXYRect().left();
+          int bufferX = x - bufferLeft;
+
+          if (bufferX >= (int)line.size())
+            break;
+
+          if (bufferX < 0) {
+            throw iException::Message(iException::Programmer, "bufferX < 0",
+                                      _FILEINFO_);
+          }
+
+          if (x >= p_image->width()) {
+            throw iException::Message(iException::Programmer, "bufferX too big",
+                                      _FILEINFO_);
+          }
+
+          double bufferVal = line.at(bufferX);
+
+          // This is still RGB; the pairs are identical but the boundary
+          //   conditions are different. Display saturations cause this.
+          int redPix = (int)(p_red.getStretch().Map(bufferVal) + 0.5);
+          int greenPix = (int)(p_green.getStretch().Map(bufferVal) + 0.5);
+          int bluePix = (int)(p_blue.getStretch().Map(bufferVal) + 0.5);
+          rgb[x] =  qRgb(redPix, greenPix, bluePix);
+        }
+      }
+    }
+    else {
+      if (p_redBuffer && p_redBuffer->enabled()) {
+        if (p_redBuffer->working() || p_greenBuffer->working() ||
+            p_blueBuffer->working()) {
+          return;
+        }
+
+
+        if ((p_greenBuffer->bufferXYRect().top() !=
+             p_redBuffer->bufferXYRect().top()) ||
+            (p_greenBuffer->bufferXYRect().top() !=
+             p_blueBuffer->bufferXYRect().top())) {
+          throw iException::Message(iException::Programmer,
+                                    "Buffer rects mismatched", _FILEINFO_);
+        }
+
+        if ((p_greenBuffer->bufferXYRect().left() !=
+             p_redBuffer->bufferXYRect().left()) ||
+            (p_greenBuffer->bufferXYRect().left() !=
+             p_blueBuffer->bufferXYRect().left())) {
+          throw iException::Message(iException::Programmer,
+                                    "Buffer rects mismatched", _FILEINFO_);
+        }
+
+        dataArea = QRect(p_redBuffer->bufferXYRect().intersected(rect));
+
+        for (int y = dataArea.top();
+             !dataArea.isNull() && y <= dataArea.bottom();
+             y++) {
+          int bufferLine = y - p_redBuffer->bufferXYRect().top();
+
+          const vector<double> &redLine   = p_redBuffer->getLine(bufferLine);
+          const vector<double> &greenLine = p_greenBuffer->getLine(bufferLine);
+          const vector<double> &blueLine  = p_blueBuffer->getLine(bufferLine);
+
+          if ((int)redLine.size() < dataArea.width() ||
+              (int)greenLine.size() < dataArea.width() ||
+              (int)blueLine.size() < dataArea.width()) {
+            throw iException::Message(iException::Programmer,
+                                      "Empty buffer line", _FILEINFO_);
+          }
+
+          QRgb *rgb = (QRgb *) p_image->scanLine(y);
+
+          for (int x = dataArea.left(); x <= dataArea.right(); x++) {
+            int redPix = (int)(p_red.getStretch().Map(redLine[ x - p_redBuffer->bufferXYRect().left()]) + 0.5);
+            int greenPix = (int)(p_green.getStretch().Map(greenLine[ x - p_greenBuffer->bufferXYRect().left()]) + 0.5);
+            int bluePix = (int)(p_blue.getStretch().Map(blueLine[ x - p_blueBuffer->bufferXYRect().left()]) + 0.5);
+
+            rgb[x] = qRgb(redPix, greenPix, bluePix);
+          }
+        }
+      }
+    }
+
+    if (!dataArea.isNull())
+      p.drawImage(dataArea.topLeft(), *p_image, dataArea);
+
+    // Change whats this info
+    updateWhatsThis();
+  }
+
+
+  /**
+   * Shifts the pixels on the pixmap without reading new data.
+   *
+   * @param dx
+   * @param dy
+   */
+  void CubeViewport::shiftPixmap(int dx, int dy) {
+    if (!p_paintPixmap || !p_pixmap)
+      return;
+
+    // Prep to scroll the pixmap
+    int drawStartX = dx;
+    int pixmapStartX = 0;
+    if (drawStartX < 0) {
+      drawStartX = 0;
+      pixmapStartX = -dx;
+    }
+
+    int drawStartY = dy;
+    int pixmapStartY = 0;
+    if (dy < 0) {
+      drawStartY = 0;
+      pixmapStartY = -dy;
+    }
+
+    // Ok we can shift the pixmap and filling
+    int pixmapDrawWidth  = p_pixmap.width()  - pixmapStartX + 1;
+    int pixmapDrawHeight = p_pixmap.height() - pixmapStartY + 1;
+    QRect rect(0, 0, p_pixmap.width(), p_pixmap.height());
+    QPixmap pixmapCopy   = p_pixmap.copy();
+
+    QPainter painter(&p_pixmap);
+    painter.fillRect(rect, QBrush(p_bgColor));
+    painter.drawPixmap(drawStartX, drawStartY,
+                       pixmapCopy,
+                       pixmapStartX, pixmapStartY,
+                       pixmapDrawWidth, pixmapDrawHeight);
+    painter.end();
+
+    // Now fill in the left or right side
+    QRect xFillRect;
+    QRect yFillRect;
+
+    if (dx > 0) {
+      xFillRect = QRect(QPoint(0, 0),
+                        QPoint(dx, p_pixmap.height()));
+    }
+    else {
+      if (dx < 0)
+        xFillRect = QRect(QPoint(p_pixmap.width() + dx, 0),
+                          QPoint(p_pixmap.width(), p_pixmap.height()));
+    }
+
+    // Fill in the top or bottom side
+    if (dy > 0) {
+      yFillRect = QRect(QPoint(0, 0),
+                        QPoint(p_pixmap.width(), dy));
+    }
+    else {
+      if (dy < 0)
+        yFillRect = QRect(QPoint(0, p_pixmap.height() + dy),
+                          QPoint(p_pixmap.width(), p_pixmap.height()));
+    }
+
+    if (dx != 0) {
+      paintPixmap(xFillRect);
+    }
+
+    if (dy != 0) {
+      paintPixmap(yFillRect);
+    }
+
+    viewport()->update();
+  }
+
+
+  /**
+   * Update the What's This text.
+   *
+   */
+  void CubeViewport::updateWhatsThis() {
+    double sl, ss;
+    viewportToCube(0, 0, ss, sl);
+    if (ss < 1.0)
+      ss = 1.0;
+    if (sl < 1.0)
+      sl = 1.0;
+
+    double el, es;
+    viewportToCube(viewport()->width() - 1, viewport()->height() - 1, es, el);
+    if (es > cubeSamples())
+      es = cubeSamples();
+    if (el > cubeLines())
+      el = cubeLines();
+
+    QString area =
+      "<p><b>Visible Cube Area:</b><blockQuote> \
+      Samples = " + QString::number(int(ss + 0.5)) + "-" +
+      QString::number(int(es + 0.5)) + "<br> \
+      Lines = " + QString::number(int(sl + 0.5)) + "-" +
+      QString::number(int(el + 0.5)) + "<br></blockQuote></p>";
+    viewport()->setWhatsThis(p_whatsThisText +
+                             area +
+                             p_cubeWhatsThisText +
+                             p_viewportWhatsThisText);
+  }
+
+  /**
+   * Return the red pixel value at a sample/line
+   *
+   *
+   * @param sample
+   * @param line
+   *
+   * @return double
+   */
+  double CubeViewport::redPixel(int sample, int line) {
+    p_pntBrick->SetBasePosition(sample, line, p_red.band);
+    p_cube->Read(*p_pntBrick);
+    return (*p_pntBrick)[0];
+  }
+
+
+  /**
+   * Return the green pixel value at a sample/line
+   *
+   *
+   * @param sample
+   * @param line
+   *
+   * @return double
+   */
+  double CubeViewport::greenPixel(int sample, int line) {
+    p_pntBrick->SetBasePosition(sample, line, p_green.band);
+    p_cube->Read(*p_pntBrick);
+    return (*p_pntBrick)[0];
+  }
+
+
+  /**
+   * Return the blue pixel value at a sample/line
+   *
+   *
+   * @param sample
+   * @param line
+   *
+   * @return double
+   */
+  double CubeViewport::bluePixel(int sample, int line) {
+    p_pntBrick->SetBasePosition(sample, line, p_blue.band);
+    p_cube->Read(*p_pntBrick);
+    return (*p_pntBrick)[0];
+  }
+
+
+  /**
+   * Return the gray pixel value at a sample/line
+   *
+   *
+   * @param sample
+   * @param line
+   *
+   * @return double
+   */
+  double CubeViewport::grayPixel(int sample, int line) {
+    p_pntBrick->SetBasePosition(sample, line, p_gray.band);
+    p_cube->Read(*p_pntBrick);
+    return (*p_pntBrick)[0];
+  }
+
+
+  //! Return the gray band stretch
+  Stretch CubeViewport::grayStretch() const {
+    return p_gray.getStretch();
+  }
+
+
+  //! Return the red band stretch
+  Isis::Stretch CubeViewport::redStretch() const {
+    return p_red.getStretch();
+  };
+
+
+  //! Return the green band stretch
+  Isis::Stretch CubeViewport::greenStretch() const {
+    return p_green.getStretch();
+  };
+
+
+  //! Return the blue band stretch
+  Isis::Stretch CubeViewport::blueStretch() const {
+    return p_blue.getStretch();
+  };
+
+
+  /**
+   * Event filter to watch for mouse events on viewport
+   *
+   *
+   * @param o
+   * @param e
+   *
+   * @return bool
+   */
+  bool CubeViewport::eventFilter(QObject *o, QEvent *e) {
+    // Handle standard mouse tracking on the viewport
+    if (o == viewport()) {
+      switch (e->type()) {
+        case QEvent::Enter: {
+            viewport()->setMouseTracking(true);
+            emit mouseEnter();
+            return true;
+          }
+
+        case QEvent::MouseMove: {
+            QMouseEvent *m = (QMouseEvent *) e;
+            emit mouseMove(m->pos());
+            return true;
+          }
+
+        case QEvent::Leave: {
+            viewport()->setMouseTracking(false);
+            emit mouseLeave();
+            return true;
+          }
+
+        case QEvent::MouseButtonPress: {
+            QMouseEvent *m = (QMouseEvent *) e;
+            emit mouseButtonPress(m->pos(),
+                                  (Qt::MouseButton)(m->button() + m->modifiers()));
+            return true;
+          }
+
+        case QEvent::MouseButtonRelease: {
+            QMouseEvent *m = (QMouseEvent *) e;
+            emit mouseButtonRelease(m->pos(),
+                                    (Qt::MouseButton)(m->button() + m->modifiers()));
+            return true;
+          }
+
+        case QEvent::MouseButtonDblClick: {
+            QMouseEvent *m = (QMouseEvent *) e;
+            emit mouseDoubleClick(m->pos());
+            return true;
+          }
+
+        default: {
+            return false;
+          }
+      }
+    }
+    else {
+      return QAbstractScrollArea::eventFilter(o, e);
+    }
+  }
+
+
+  /**
+   * Process arrow keystrokes on cube
+   *
+   *
+   * @param e
+   */
+  void CubeViewport::keyPressEvent(QKeyEvent *e) {
+    if (e->key() == Qt::Key_Plus) {
+      double scale = p_scale * 2.0;
+      setScale(scale);
+      e->accept();
+    }
+    else if (e->key() == Qt::Key_Minus) {
+      double scale = p_scale / 2.0;
+      setScale(scale);
+      e->accept();
+    }
+    else if (e->key() == Qt::Key_Up) {
+      moveCursor(0, -1);
+      e->accept();
+    }
+    else if (e->key() == Qt::Key_Down) {
+      moveCursor(0, 1);
+      e->accept();
+    }
+    else if (e->key() == Qt::Key_Left) {
+      moveCursor(-1, 0);
+      e->accept();
+    }
+    else if (e->key() == Qt::Key_Right) {
+      moveCursor(1, 0);
+      e->accept();
+    }
+    else {
+      QAbstractScrollArea::keyPressEvent(e);
+    }
+  }
+
+
+  /**
+   * Is cursor inside viewport
+   *
+   *
+   * @return bool
+   */
+  bool CubeViewport::cursorInside() const {
+    QPoint g = QCursor::pos();
+    QPoint v = viewport()->mapFromGlobal(g);
+    if (v.x() < 0)
+      return false;
+    if (v.y() < 0)
+      return false;
+    if (v.x() >= viewport()->width())
+      return false;
+    if (v.y() >= viewport()->height())
+      return false;
+    return true;
+  }
+
+
+  /**
+   * Return the cursor position in the viewport
+   *
+   *
+   * @return QPoint
+   */
+  QPoint CubeViewport::cursorPosition() const {
+    QPoint g = QCursor::pos();
+    return viewport()->mapFromGlobal(g);
+  }
+
+
+  /**
+   * Move the cursor by x,y if possible
+   *
+   *
+   * @param x
+   * @param y
+   */
+  void CubeViewport::moveCursor(int x, int y) {
+    QPoint g = QCursor::pos();
+    g += QPoint(x, y);
+    QPoint v = viewport()->mapFromGlobal(g);
+    if (v.x() < 0)
+      return;
+    if (v.y() < 0)
+      return;
+    if (v.x() >= viewport()->width())
+      return;
+    if (v.y() >= viewport()->height())
+      return;
+    QCursor::setPos(g);
+  }
+
+
+  /**
+   * Set the cursor position to x/y in the viewport
+   *
+   *
+   * @param x
+   * @param y
+   */
+  void CubeViewport::setCursorPosition(int x, int y) {
+    QPoint g(x, y);
+    QPoint v = viewport()->mapToGlobal(g);
+    QCursor::setPos(v);
+  }
+
+
+  /**
+   * Update the scroll bar
+   *
+   *
+   * @param x
+   * @param y
+   */
+  void CubeViewport::updateScrollBars(int x, int y) {
+    viewport()->blockSignals(true);
+
+    verticalScrollBar()->setValue(1);
+    verticalScrollBar()->setMinimum(1);
+    verticalScrollBar()->setMaximum((int)(ceil(cubeLines() * p_scale) + 0.5));
+    verticalScrollBar()->setPageStep(viewport()->height() / 2);
+
+    horizontalScrollBar()->setValue(1);
+    horizontalScrollBar()->setMinimum(1);
+    horizontalScrollBar()->setMaximum((int)(ceil(cubeSamples() * p_scale) + 0.5));
+    horizontalScrollBar()->setPageStep(viewport()->width() / 2);
+
+    if (horizontalScrollBar()->value() != x || verticalScrollBar()->value() != y) {
+      horizontalScrollBar()->setValue(x);
+      verticalScrollBar()->setValue(y);
+      emit scaleChanged();
+    }
+
+    QApplication::sendPostedEvents(viewport(), 0);
+    viewport()->blockSignals(false);
+  }
+
+
+  /**
+   * View cube as gray
+   *
+   *
+   * @param band
+   */
+  void CubeViewport::viewGray(int band) {
+    p_gray.band = band;
+    p_color = false;
+    setCaption();
+
+    if (!p_grayBuffer)
+      p_grayBuffer = new ViewportBuffer(this, p_cubeData,
+                                        p_cubeId);
+
+    if (p_redBuffer)
+      delete p_redBuffer;
+    p_redBuffer = NULL;
+
+    if (p_greenBuffer)
+      delete p_greenBuffer;
+    p_greenBuffer = NULL;
+
+    if (p_blueBuffer)
+      delete p_blueBuffer;
+    p_blueBuffer = NULL;
+
+    if (p_grayBuffer->getBand() != band) {
+      int oldBand = p_grayBuffer->getBand();
+
+      if (oldBand >= 0) {
+        if ((*p_knownStretches)[oldBand - 1]) {
+          delete(*p_knownStretches)[oldBand - 1];
+        }
+
+        (*p_knownStretches)[oldBand - 1] = new Stretch(p_gray.getStretch());
+      }
+
+      p_grayBuffer->setBand(band);
+      p_gray.band = band;
+
+      if ((*p_knownStretches)[band - 1]) {
+        stretchGray(*(*p_knownStretches)[band - 1]);
+      }
+      else {
+        p_grayBuffer->addStretchAction();
+      }
+    }
+
+
+    if (p_camera) {
+      p_camera->SetBand(band);
+    }
+
+    viewport()->repaint();
+  }
+
+  void CubeViewport::forgetStretches() {
+    for (int stretch = 0; stretch < p_knownStretches->size(); stretch++) {
+      if ((*p_knownStretches)[stretch]) {
+        delete(*p_knownStretches)[stretch];
+        (*p_knownStretches)[stretch] = NULL;
+      }
+    }
+  }
+
+
+  void CubeViewport::setAllBandStretches(Isis::Stretch stretch) {
+    for (int index = 0; index < p_knownStretches->size(); index ++) {
+      if ((*p_knownStretches)[index]) {
+        delete(*p_knownStretches)[index];
+      }
+
+      (*p_knownStretches)[index] = new Stretch(stretch);
+    }
+  }
+
+
+  /**
+   * View cube as color
+   *
+   *
+   * @param rband
+   * @param gband
+   * @param bband
+   */
+  void CubeViewport::viewRGB(int rband, int gband, int bband) {
+    p_red.band = rband;
+    p_green.band = gband;
+    p_blue.band = bband;
+    p_color = true;
+    setCaption();
+
+    if (!p_redBuffer) {
+      p_redBuffer = new ViewportBuffer(this, p_cubeData, p_cubeId);
+    }
+
+    if (!p_greenBuffer) {
+      p_greenBuffer = new ViewportBuffer(this, p_cubeData, p_cubeId);
+    }
+
+    if (!p_blueBuffer) {
+      p_blueBuffer = new ViewportBuffer(this, p_cubeData, p_cubeId);
+    }
+
+    if (p_redBuffer->getBand() != rband) {
+      int oldBand = p_redBuffer->getBand();
+
+      // Remember current stretch for future band changes
+      if (oldBand >= 0) {
+        if ((*p_knownStretches)[oldBand - 1]) {
+          delete(*p_knownStretches)[oldBand - 1];
+        }
+
+        (*p_knownStretches)[oldBand - 1] = new Stretch(p_red.getStretch());
+      }
+
+      p_redBuffer->setBand(rband);
+      p_red.band = rband;
+
+      if ((*p_knownStretches)[rband - 1]) {
+        p_red.setStretch(*(*p_knownStretches)[rband - 1]);
+      }
+      else {
+        p_redBuffer->addStretchAction();
+      }
+    }
+
+    if (p_greenBuffer->getBand() != gband) {
+      int oldBand = p_greenBuffer->getBand();
+
+      // Remember current stretch for future band changes
+      if (oldBand >= 0) {
+        if ((*p_knownStretches)[oldBand - 1]) {
+          delete(*p_knownStretches)[oldBand - 1];
+        }
+
+        (*p_knownStretches)[oldBand - 1] = new Stretch(p_green.getStretch());
+      }
+
+      p_greenBuffer->setBand(gband);
+      p_green.band = gband;
+
+      if ((*p_knownStretches)[gband - 1]) {
+        p_green.setStretch(*(*p_knownStretches)[gband - 1]);
+      }
+      else {
+        p_greenBuffer->addStretchAction();
+      }
+    }
+
+    if (p_blueBuffer->getBand() != bband) {
+      int oldBand = p_blueBuffer->getBand();
+
+      // Remember current stretch for future band changes
+      if (oldBand >= 0) {
+        if ((*p_knownStretches)[oldBand - 1]) {
+          delete(*p_knownStretches)[oldBand - 1];
+        }
+
+        (*p_knownStretches)[oldBand - 1] = new Stretch(p_blue.getStretch());
+      }
+
+      p_blueBuffer->setBand(bband);
+      p_blue.band = bband;
+
+      if ((*p_knownStretches)[bband - 1]) {
+        p_blue.setStretch(*(*p_knownStretches)[bband - 1]);
+      }
+      else {
+        p_blueBuffer->addStretchAction();
+      }
+    }
+
+    if (p_grayBuffer)
+      delete p_grayBuffer;
+    p_grayBuffer = NULL;
+
+    if (p_camera) {
+      p_camera->SetBand(rband);
+    }
+  }
+
+
+  /**
+   *  Apply stretch pairs to gray band
+   *
+   *
+   * @param string
+   */
+  void CubeViewport::stretchGray(const QString &string) {
+    Stretch stretch;
+    stretch.Parse(string.toStdString());
+    stretchGray(stretch);
+  }
+
+
+  /**
+   * Apply stretch pairs to red bands
+   *
+   * @param stretch
+   */
+  void CubeViewport::stretchRed(const QString &string) {
+    Stretch stretch;
+    stretch.Parse(string.toStdString());
+    stretchRed(stretch);
+  }
+
+
+  /**
+   * Apply stretch pairs to green bands
+   *
+   * @param stretch
+   */
+  void CubeViewport::stretchGreen(const QString &string) {
+    Stretch stretch;
+    stretch.Parse(string.toStdString());
+    stretchGreen(stretch);
+  }
+
+
+  /**
+   * Apply stretch pairs to blue bands
+   *
+   * @param stretch
+   */
+  void CubeViewport::stretchBlue(const QString &string) {
+    Stretch stretch;
+    stretch.Parse(string.toStdString());
+    stretchBlue(stretch);
+  }
+
+
+  /**List<Tool *> p
+   * This stretches to the global stretch
+   */
+  void CubeViewport::stretchKnownGlobal() {
+    if (!p_globalStretches)
+      return;
+
+    if (isGray()) {
+      if ((*p_globalStretches)[grayBand() - 1]) {
+        stretchGray(*(*p_globalStretches)[grayBand() - 1]);
+      }
+    }
+    else {
+      if ((*p_globalStretches)[redBand() - 1]) {
+        stretchRed(*(*p_globalStretches)[redBand() - 1]);
+      }
+
+      if ((*p_globalStretches)[greenBand() - 1]) {
+        stretchGreen(*(*p_globalStretches)[greenBand() - 1]);
+      }
+
+      if ((*p_globalStretches)[blueBand() - 1]) {
+        stretchBlue(*(*p_globalStretches)[blueBand() - 1]);
+      }
+    }
+  }
+
+
+  /**
+   * Sets the stretch for gray mode
+   *
+   * @param stretch
+   */
+  void CubeViewport::stretchGray(const Isis::Stretch &stretch) {
+    p_gray.setStretch(stretch);
+    p_red.setStretch(stretch);
+    p_green.setStretch(stretch);
+    p_blue.setStretch(stretch);
+
+    // Assume first stretch is always the global stretch (and it should be)
+    if ((*p_globalStretches)[grayBand() - 1] == NULL) {
+      (*p_globalStretches)[grayBand() - 1] = new Stretch(p_gray.getStretch());
+    }
+
+    paintPixmap();
+    viewport()->update();
+  }
+
+
+  /**
+   * Sets the stretch for red in rgb mode
+   *
+   * @param stretch
+   */
+  void CubeViewport::stretchRed(const Isis::Stretch &stretch) {
+    p_red.setStretch(stretch);
+
+    // Assume first stretch is always the global stretch (and it should be)
+    if ((*p_globalStretches)[redBand() - 1] == NULL) {
+      (*p_globalStretches)[redBand() - 1] = new Stretch(p_red.getStretch());
+    }
+
+    paintPixmap();
+    viewport()->update();
+  }
+
+
+  /**
+   * Sets the stretch for green in rgb mode
+   *
+   * @param stretch
+   */
+  void CubeViewport::stretchGreen(const Isis::Stretch &stretch) {
+    p_green.setStretch(stretch);
+
+    // Assume first stretch is always the global stretch (and it should be)
+    if ((*p_globalStretches)[greenBand() - 1] == NULL) {
+      (*p_globalStretches)[greenBand() - 1] = new Stretch(p_green.getStretch());
+    }
+
+    paintPixmap();
+    viewport()->update();
+  }
+
+
+  /**
+   * Sets the stretch for blue in rgb mode
+   *
+   * @param stretch
+   */
+  void CubeViewport::stretchBlue(const Isis::Stretch &stretch) {
+    p_blue.setStretch(stretch);
+
+    // Assume first stretch is always the global stretch (and it should be)
+    if ((*p_globalStretches)[blueBand() - 1] == NULL) {
+      (*p_globalStretches)[blueBand() - 1] = new Stretch(p_blue.getStretch());
+    }
+
+    paintPixmap();
+    viewport()->update();
+  }
+
+
+  /**
+   * Determine the scale that causes the full cube to fit in the viewport.
+   *
+   * @return The scale
+   *
+   * @internal
+   */
+  double CubeViewport::fitScale() const {
+    double sampScale = (double) viewport()->width() / (double) cubeSamples();
+    double lineScale = (double) viewport()->height() / (double) cubeLines();
+    double scale = sampScale < lineScale ? sampScale : lineScale;
+//    scale = floor(scale * 100.0) / 100.0;
+    return scale;
+  }
+
+
+  /**
+   * Determine the scale of cube in the width to fit in the viewport
+   *
+   * @return The scale for width
+   *
+   */
+  double CubeViewport::fitScaleWidth() const {
+    double scale = (double) viewport()->width() / (double) cubeSamples();
+
+//    scale = floor(scale * 100.0) / 100.0;
+    return scale;
+  }
+
+  /**
+   * Determine the scale of cube in heighth to fit in the viewport
+   *
+   * @return The scale for heighth
+   *
+   */
+  double CubeViewport::fitScaleHeight() const {
+    double scale = (double) viewport()->height() / (double) cubeLines();
+
+//    scale = floor(scale * 100.0) / 100.0;
+    return scale;
+  }
+
+  /**
+   *   Cube changed, repaint given area
+   *
+   * @param[in] cubeRect (QRect rect)  Rectange containing portion of cube
+   *                                  (sample/line) that changed.
+   *
+   */
+  void CubeViewport::cubeContentsChanged(QRect cubeRect) {
+    double ss, sl, es, el;
+    ss = (double)(cubeRect.left()) - 1.;
+    sl = (double)(cubeRect.top()) - 1.;
+    es = (double)(cubeRect.right()) + 1.;
+    el = (double)(cubeRect.bottom()) + 1.;
+    if (ss < 1)
+      ss = 0.5;
+    if (sl < 1)
+      sl = 0.5;
+    if (es > cube()->Samples())
+      es = cube()->Samples() + 0.5;
+    if (el > cube()->Lines())
+      el = cube()->Lines() + 0.5;
+
+    int sx, sy, ex, ey;
+
+    cubeToViewport(ss, sl, sx, sy);
+    cubeToViewport(es, el, ex, ey);
+    if (sx < 0)
+      sx = 0;
+    if (sy < 0)
+      sy = 0;
+    if (ex > viewport()->width())
+      ex = viewport()->width();
+    if (ey > viewport()->height())
+      ey = viewport()->height();
+    QRect vpRect(sx, sy, ex - sx + 1, ey - sy + 1);
+
+    p_updatingBuffers = true;
+    if (p_grayBuffer)
+      p_grayBuffer->fillBuffer(vpRect);
+    if (p_redBuffer)
+      p_redBuffer->fillBuffer(vpRect);
+    if (p_greenBuffer)
+      p_greenBuffer->fillBuffer(vpRect);
+    if (p_blueBuffer)
+      p_blueBuffer->fillBuffer(vpRect);
+    p_updatingBuffers = false;
+
+    paintPixmapRects();
+  }
+
+
+  /**
+   * Allows users to change the cursor type on the viewport.
+   *
+   *
+   * @param cursor
+   */
+  void CubeViewport::changeCursor(QCursor cursor) {
+    viewport()->setCursor(cursor);
+  }
+
+
+  CubeViewport::BandInfo::BandInfo() : band(1), stretch(NULL) {
+    stretch = new Stretch;
+    stretch->SetNull(0.0);
+    stretch->SetLis(0.0);
+    stretch->SetLrs(0.0);
+    stretch->SetHis(255.0);
+    stretch->SetHrs(255.0);
+    stretch->SetMinimum(0.0);
+    stretch->SetMaximum(255.0);
+  };
+
+
+  CubeViewport::BandInfo::BandInfo(const CubeViewport::BandInfo &other) :
+    band(other.band) {
+    stretch = NULL;
+    stretch = new Stretch(*other.stretch);
+  }
+
+
+  CubeViewport::BandInfo::~BandInfo() {
+    if (stretch) {
+      delete stretch;
+      stretch = NULL;
+    }
+  }
+
+
+  Stretch CubeViewport::BandInfo::getStretch() const {
+    ASSERT_PTR(stretch);
+
+    return *stretch;
+  }
+
+
+  void CubeViewport::BandInfo::setStretch(const Stretch &newStretch) {
+    *stretch = newStretch;
+  }
+
+
+  const CubeViewport::BandInfo &CubeViewport::BandInfo::operator=(
+    CubeViewport::BandInfo other) {
+    ASSERT_PTR(other.stretch);
+
+    stretch = NULL;
+    stretch = new Stretch;
+    *stretch = *other.stretch;
+    band = other.band;
+
+    return *this;
+  }
+
+}

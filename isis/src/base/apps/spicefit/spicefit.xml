@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<application name="spicefit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Fit a function to camera pointing
+  </brief>
+
+  <description>
+    This program requires a cube be initialized with "spiceinit".  It will
+    then look at the InstrumentPointing table for the cube and use a least
+    square solution to compute a fit of the right ascension, declination,
+    and twist to a parabola.  This should reduce "noisy"
+    pointing data.  To restore the original pointing just rerun "spiceinit".
+
+    <p>
+     Note that this program should be used on line scan cameras.  It will not work
+     on framing cameras.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2006-10-25">
+      Original version
+    </change>
+    <change name="Steven Koechle" date="2007-10-05">
+      Added check to see if cube has existing polygon, if so delete it.
+    </change>
+    <change name="Debbie A. Cook" date="2008-12-08">
+      Added code to write InstrumentPointing keyword value as table in kernels 
+      group in case the kernels are not already attached.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Cube to update
+        </brief>
+        <description>
+  	     The file specification for the input cube. The pointing
+          for this cube will be fit to a parabola.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

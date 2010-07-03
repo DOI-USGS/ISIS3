@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="ctxevenodd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Remove even/odd detector striping from MRO Ctx images
+  </brief>
+
+  <description>
+    This program will remove even/odd detector striping from a Mars
+    Reconnaissance Oribiter Context Imager cube.  The algorithm
+    gathers the average of the even columns as well as the odd columns.  The
+    difference between the averages is split (divided by two) to create
+    offsets for both columns which are then applied.  
+
+    Note:  Ctxcal should be run prior to this program.
+  </description>
+
+  <seeAlso>
+    <applications>
+      <item>ctxcal</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Tracie Sucharski" date="2006-12-20">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2007-03-16">
+        Make sure image is a CTX cube and the SpatialSumming 
+        is equal to 1.
+    </change>
+    <change name="Steven Lambright" date="2007-08-15">
+        Added an application test
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input CTX image
+        </brief>
+        <description>
+          The input image CTX image.
+         </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Destriped CTX cube
+        </brief>
+        <description>
+          The resultant destriped CTX image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

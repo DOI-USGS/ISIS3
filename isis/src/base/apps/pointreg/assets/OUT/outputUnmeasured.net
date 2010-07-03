@@ -1,0 +1,66 @@
+Object = ControlNetwork
+  NetworkId    = NiliFossae
+  NetworkType  = ImageToGround
+  TargetName   = Mars
+  UserName     = jwalldren
+  Created      = 2008-11-17T13:53:50
+  LastModified = Null
+  Description  = "NiliFossae Jitter - use spicefit"
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600002
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2002.639916173
+      Line           = 66.57377716384
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType  = Unmeasured
+      Sample       = Null
+      Line         = Null
+      DateTime     = 2008-06-19T15:31:04
+      ChooserName  = "Application autoseed"
+      Reference    = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = PSP755600007
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType    = Estimated
+      Sample         = 2031.4609997924
+      Line           = 469.88532934139
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-06-19T15:31:04
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType  = Unmeasured
+      Sample       = Null
+      Line         = Null
+      DateTime     = 2008-06-19T15:31:04
+      ChooserName  = "Application autoseed"
+      Reference    = False
+    End_Group
+  End_Object
+End_Object
+End

@@ -1,0 +1,85 @@
+Unit test for Isis::iTime
+  Test of date = 2003/01/02 12:15:01.1234
+   Year        = 2003
+   Year        = 2003
+   Month       = 1
+   Month       = 1
+   Day         = 2
+   Day         = 2
+   Hour        = 12
+   Hour        = 12
+   Minute      = 15
+   Minute      = 15
+   Second      = 1.1234
+   Second      = 1.1234
+   Day of Year = 2
+   Day of Year = 2
+   Et          = 94781765.307363
+   Et          = 94781765.3
+   UTC         = 2003-01-02T12:15:01.1234
+
+  Test of date = 2000-12-31T23:59:01.6789
+   Year        = 2000
+   Year        = 2000
+   Month       = 12
+   Month       = 12
+   Day         = 31
+   Day         = 31
+   Hour        = 23
+   Hour        = 23
+   Minute      = 59
+   Minute      = 59
+   Second      = 1.6789
+   Second      = 1.6789
+   Day of Year = 366
+   Day of Year = 366
+   Et          = 31579205.862834
+   Et          = 31579205.9
+   UTC         = 2000-12-31T23:59:01.6789
+
+  Test of date = 31579205.862834
+   Year        = 2000
+   Year        = 2000
+   Month       = 12
+   Month       = 12
+   Day         = 31
+   Day         = 31
+   Hour        = 23
+   Hour        = 23
+   Minute      = 59
+   Minute      = 59
+   Second      = 1.6789
+   Second      = 1.6789
+   Day of Year = 366
+   Day of Year = 366
+   Et          = 31579205.862834
+   Et          = 31579205.9
+   UTC         = 2000-12-31T23:59:01.6789
+
+  Test of Isis::iTime operator>= member
+    94781765.307363 >= 94781765.307363 = 1
+    94781765.307363 >= 94781765.307413 = 0
+    94781765.307363 >= 94781765.306963 = 1
+
+  Test of Isis::iTime operator<= member
+    94781765.307363 <= 94781765.307363 = 1
+    94781765.307363 <= 94781765.307413 = 1
+    94781765.307363 <= 94781765.306963 = 0
+
+  Test of Isis::iTime operator> member
+    94781765.307363 > 94781765.307363 = 0
+    94781765.307363 > 94781765.307413 = 0
+    94781765.307363 > 94781765.306963 = 1
+
+  Test of Isis::iTime operator< member
+    94781765.307363 < 94781765.307363 = 0
+    94781765.307363 < 94781765.307413 = 1
+    94781765.307363 < 94781765.306963 = 0
+
+  Test of Isis::iTime operator!= member
+    94781765.307363 != 94781765.307363 = 0
+    94781765.307363 != 94781765.307413 = 1
+
+  Test of Isis::iTime operator== member
+    94781765.307363 == 94781765.307363 = 1
+    94781765.307363 == 94781765.307413 = 0

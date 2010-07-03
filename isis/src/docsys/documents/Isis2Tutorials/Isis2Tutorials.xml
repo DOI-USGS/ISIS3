@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+
+  <!-- ********************************************
+        CATEGORY
+        ******************************************** -->
+  <category>
+    <categoryItem>hidden</categoryItem>
+    <categoryItem>technicaldoc</categoryItem>
+    <categoryItem>isis2</categoryItem>
+  </category>
+
+  <!-- ********************************************
+        AUDIENCE
+        ******************************************** -->
+  <audience>
+    <target>developer</target>
+  </audience>
+
+  <!-- ********************************************
+        BIBLIOGRAPHY
+        ******************************************** -->
+  <bibliography>
+    <title>Isis 2 Tutorials</title>
+    <brief>Links to Isis 2 tutorials, procedures, and how-to's</brief>
+    <description>List of links to Isis 2 tutorials, procedures, and how-to's.</description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2003-04-03</date>
+  </bibliography>
+
+  <!-- ********************************************
+        FILES
+        ******************************************** -->
+  <files>
+    <file>
+      <type>HTML</type>
+
+      <source>
+        <filename>index.html</filename>
+      </source>
+
+      <body>
+
+        <h2>General</h2>
+          <ul>
+            <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/idl_prog_notes.cgi">Accessing an ISIS Cube from an IDL Program</A></LI>
+            <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/exchange_data.cgi">Exchanging Data with Other Software Systems</A></LI>
+          </ul>
+
+
+        <h2>Digital Image Processing Procedures</h2>
+          <UL>
+            <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/intro_digi_mosaic.cgi">Production of Digital Image Models with ISIS</A></LI>
+            <LI style="font-weight:bold;">Mission-Specific Image Processing</LI>
+              <UL>
+                <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/clementine_mosaic.cgi">Clementine Image Processing with ISIS</A></LI>
+                <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/mgs_moc_processing.cgi">MGS Mars Orbiter Camera Image Processing with ISIS</A></LI>
+                <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/themis_processing.cgi">Mars Odyssey THEMIS Geometry Processing With ISIS</A></LI>
+                <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/tes_mosaic.cgi">TES Emissivity Data Processing with ISIS</A></LI>
+                <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/viking_mosaic.cgi">Viking Image Processing with Pre ISIS Level Software</A></LI>
+                <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/voyager_mosaic.cgi">Voyager and Galileo SSI Image Processing with ISIS</A></LI>
+              </UL>
+          <LI style="font-weight:bold;">Controlled Mosaicing Procedures (ISIS Geodesy Software)</LI>
+            <UL>
+              <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin//viking_geodesy.cgi">Making Controlled Mosaics of Viking Images</A></LI>
+              <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin//cassini_geodesy.cgi">Making Controlled Mosaics of Cassini Images</A></LI>
+            </UL>
+        </UL>
+
+      </body>
+    </file>
+  </files>
+
+  <history>
+    <change name="Deborah Lee Soltesz" date="2003-04-03">Created</change>
+  </history>
+
+</documentation>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: mdis2pds.xml,v 1.10 2009/05/11 18:39:42 slambright Exp $ -->
+
+<application name="mdis2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Exports a Messenger cube back into PDS format
+  </brief>
+
+  <description>
+    <b>mdis2pds</b> will process a Messenger  MDIS cube and export it to PDS/CDR
+    format.  The resulting file will have a PDS compliant label and data object 
+    according to the SIS document.    <b>mdis2pds</b> assumes the input file has 
+    at least been run through mdis2isis and mdiscal.  This will ensure that 
+    proper values of the  PRODUCT_ID and SOURCE_PRODUCT_ID are included in the 
+    output CDR label.  
+  </description>
+
+  <history>
+    <change name="Christopher Austin" date="2008-08-12">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-08-14">
+      Shortened and optimized the code handling the histograms. Removed the
+      32 bit strech.
+    </change>
+    <change name="Christopher Austin" date="2008-08-22">
+      Fixed for correct source.  Previously was using incorrect comparison data.
+    </change>
+    <change name="Kris Becker" date="2008-09-03">
+      Modified sources of some of the keywords for the translation.  Honors 
+      existing software name and versions if they exist;  only include the High 
+      Instrument Saturation count in the SATURATED_PIXEL_COUNT label keyword 
+      where before it included all special pixels.
+    </change>
+    <change name="Kris Becker" date="2008-09-08">
+      Corrected the determination of minimum/maximum data ranges when using the 
+      histogram.  The issue involves specifying MAXPER=100.0 and it not 
+      producing the entire valid range of data.  This may result in HRS pixels.  
+      It has been changed to use the full valid data range in as computed from 
+      the Histogram.
+    </change>
+    <change name="Kris Becker" date="2008-09-19">
+        Fixed N/A quoting, misplaced units and data values that exceeded 20 
+        characters.  Also quoted the SOFTWARE_VERSION_ID and FILTER_NUMBER 
+        keyword values.  Added units to RETICLE_POINT_* keywords where missing.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Messenger</missionItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief> Input Messenger cube </brief>
+        <description>
+          Input filename of a messenger cube file to be exported into a cdr image.
+        </description>
+        <filter> *.cub </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Final output filename.
+        </brief>
+        <description>
+          Output filename, by  default the filename will be generated from the
+          input filename.
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Stretch">
+
+      <parameter name="TYPE">
+        <type>string</type>
+        <default><item>AUTOMATIC</item></default>
+        <brief>
+          Select the type of stretch
+        </brief>
+        <description>
+          This parameter is used to select one of two ways to stretch output
+          pixels.  The are AUTOMATIC or MANUAL.
+        </description>
+        <list>
+          <option value="AUTOMATIC">
+            <brief>Automatically calculate stretch</brief>
+            <description>
+              Automatically calculate stretch from the input cube. No strecth
+              will be used if BITS equals 32, MINPER equals 0.0, and MAXPER
+              equals 100.0.
+            </description>
+            <exclusions>
+              <item>MIN</item> 
+              <item>MAX</item>
+            </exclusions>
+          </option>
+          <option value="MANUAL">
+            <brief>User defined stretch</brief>
+            <description>
+              Enables the user defined stretch for the output IMG.
+            </description>
+            <exclusions>
+              <item>MINPER</item> 
+              <item>MAXPER</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MIN">
+          <type>double</type>
+          <brief>
+              Lower bound of the stretch
+          </brief>
+          <description>
+             Lower bound for the manually specified stretch.
+          </description>
+      </parameter>
+      <parameter name="MAX">
+          <type>double</type>
+          <brief>
+              Upper bound of the stretch
+          </brief>
+          <description>
+              Upper bound for the manually specified stretch.
+          </description>
+      </parameter>
+
+      <parameter name="MINPER">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>
+          Minimum DN valid percentage
+        </brief>
+        <description>
+          The cumulative percentage value to be mapped to the minimum 
+          valid pixel for the specified number of bits. For example: With BITS=10
+          and MINPER=1.0, the DN which corresponds to the cummulative
+          percent of 1.0 will be mapped to 3, where 0 represents NULL, 1
+          represents LRS and 2 represents LIS.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">100.0</maximum>
+        <lessThanOrEqual>
+          <item>
+              MAXPER
+          </item>
+        </lessThanOrEqual>
+      </parameter>
+      <parameter name="MAXPER">
+        <type>double</type>
+        <default><item>100.0</item></default>
+        <brief>
+          Mazimum DN valid percentage
+        </brief>
+        <description>
+          The cumulative percentage value to be mapped to the maximum 
+          valid pixel for the specified number of bits. For example: With BITS=10
+          and MINPER=99.0, the DN which corresponds to the cummulative
+          percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2. 
+          Where 1023 represents HIS and 1022 represents HRS.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">100.0</maximum>
+        <greaterThanOrEqual>
+          <item>
+            MINPER
+          </item>
+        </greaterThanOrEqual>
+      </parameter>
+
+    </group>
+
+    <group name="Output Controls">
+
+        <parameter name="BITS">
+          <type>integer</type>
+          <default><item>32</item></default>
+          <brief>
+            Number of bits for the output DN
+          </brief>
+          <description>
+            The number of bits to compress the input data to. The valid data as
+            well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
+            compressed into this number of bits. The output data type will be
+            automaticity choosen using this value. A value of 8 will create 
+            unsigned byte output files. Values from 9 to 16 will create unsigned
+            word output files. Unused bits in the unsigned word output file will be
+            set to zero.
+          </description>
+          <minimum inclusive="yes">8</minimum>
+          <maximum inclusive="yes">32</maximum>
+        </parameter>
+
+      </group>
+
+  </groups>
+
+</application>

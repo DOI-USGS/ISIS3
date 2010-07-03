@@ -1,0 +1,20 @@
+Profile count: 0
+Adding a profile...
+Profile exist: 1
+Profile count: 1
+Default profile name: 
+Duplicate profile name: test profile
+DbProfile valid: 0
+Size: 0
+Setting name: new name
+Adding a key test_key...
+Exists (before): 0
+Exists (after): 1
+Size: 1
+Count: 1
+Key: test_key
+Value: test value
+() operator: test value
+**PROGRAMMER ERROR** Requested index (99) out of range
+
+**I/O ERROR** Unable to open [/tmp/not_a_file]

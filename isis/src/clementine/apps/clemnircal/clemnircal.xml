@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="clemnircal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Performs radiometric corrections on Clementine NIR images
+  </brief>
+
+  <description>
+INTRODUCTION
+    <br />
+    <br />
+
+
+This program performs radiometric corrections to images acquired by the
+Clementine spacecraft Near Infrared camera and writes the
+output image values in units of radiance.
+    <br />
+    <br />
+
+
+EQUATIONS
+    <br />
+    <br />
+
+Term1 = ( DR(x,y) - digital_offset ) / Gfact(gm)
+    <br />
+
+Term2 = Term1 - bias_global - BIAS(x,y) - (om * V)
+    <br />
+
+Term3 = Term2 / t
+    <br />
+
+Term4 = Term3 - DC(x,y) - 0.730
+    <br />
+
+Term5 = Term4 - therm - thermShape
+    <br />
+
+Term6 = Term5 / FF(x,y)
+    <br />
+
+Term7 = Term6 / OF(x,y)
+    <br />
+
+Term8 = Term7 - AF(x,y)
+    <br />
+
+R(x,y) = Term8 *  abscoef
+    <br />
+    <br />
+
+General equations applied to data for radiometric correction are
+indicated below:
+    <br />
+    <br />
+
+Let: x,y     = line and sample position of pixel in an image
+    <br />
+     R(x,y)  = Result of correction in absolute radiance.
+    <br />
+     DO(x,y) = Result of correction.  The output can either
+               be absolute radiance values or they can be converted to
+               reflectance(I/F values
+    <br />
+     DR(x,y) = Raw input density number
+    <br />
+     FF(x,y) = Flat-field as a function of filter and line, sample
+    <br />
+               position. This will be read from an ISIS cube file.
+    <br />
+     OF(x,y) = Orbit dependent flat file correction.
+    <br />
+     DC(x,y) = Dark current as a function of compression type,
+    <br />
+               line, sample position.
+     AF(x,y) = Empirical additive flat-field coefficients at line, sample position.
+    <br />
+     BIAS(x,y) = Bias correction as a function of compression type,
+                 line, sample position.
+    <br />
+     digital_offset = 9.0
+    <br />
+     bias_global    = 2.0
+    <br />
+     V              = -.91
+    <br />
+     abscoef        = 1.0
+    <br />
+    g(GainModeID) = Gain factor as a function of insturment GainModeID
+    <br />
+    g(0)  = 2.0235
+    <br />
+    g(1)  = 8.2755
+    <br />
+    g(2)  = 4.9144
+    <br />
+    g(5)  = 0.9443
+    <br />
+    g(8)  = 4.1835
+    <br />
+    g(9)  = 1.3530
+    <br />
+    g(11)  = 15.9844
+    <br />
+    g(13)  = 7.77177
+    <br />
+    g(16)  = 28.1618
+    <br />
+    g(17)  = 24.8658
+    <br />
+    g(18)  = 21.9100
+    <br />
+    g(19)  = 18.6140
+    <br />
+    g(22)  = 6.83130
+    <br />
+    g(23)  = 3.48425
+    <br />
+    g(24)  = 20.3218
+    <br />
+    g(25)  = 17.9433
+    <br />
+    g(26)  = 15.8104
+    <br />
+    g(27)  = 13.4320
+    <br />
+    g(28)  = 9.32361
+    <br />
+    g(29)  = 6.95951
+    <br />
+    g(30)  = 4.75472
+    <br />
+    g(31)  = 2.43896
+    <br />
+    g(33)  = 13.9238
+    <br />
+    g(34)  = 12.2687
+    <br />
+    g(36)  = 7.23501
+    <br />
+    g(41)  = 7.04438
+    <br />
+    g(42)  = 6.16495
+    <br />
+    g(44)  = 3.57405
+    <br />
+    g(45)  = 2.73995
+    <br />
+    g(46)  = 1.88595
+    <br />
+    g(48)  = 11.9078
+    <br />
+    g(50)  = 9.26433
+    <br />
+    g(52)  = 5.39513
+    <br />
+    g(53)  = 4.08125
+    <br />
+    g(61)  = 1.40899
+    <br />
+    g(62)  = 0.964975
+    <br />
+
+     gm      = Gain_mode of instrument(gm = 1,2,4)
+    <br />
+     om      = Offset_mode of instrument(om = 1,2,3,4,...,31)
+    <br />
+     t       = Optimal integration duration of observation in seconds
+               (function of ExposureDuration on labels in
+                milliseconds.)
+    <br />
+     therm = Thermal background correction value
+    <br />
+     thermShape = Thermal shape correction value (always 0.0)
+  </description>
+
+  <category>
+    <missionItem>Clementine</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>clemnirnoise</item>
+      <item>clemnirclean</item>
+      <item>clemuvviscal</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Tracie Sucharski" date="1994-11-28">
+      Original Version (nircal.F)
+    </change>
+    <change name="Steven Lambright &amp; Steven Koechle" date="2007-05-16">
+      Converted to Isis 3.0
+    </change>
+    <change name="Steven Koechle" date="2007-06-11">
+      Removed unused Thermal Shape Correction Parameter.
+      Fixed table lookup problem, and Radiometry group
+    </change>
+    <change name="Steven Lambright" date="2007-06-14">
+      Fixed bugs in XML file, added an example, added more data to Radiometry group.
+    </change>
+    <change name="Christopher Austin" date="2007-02-20"> Altered the output 
+      cube's BandBin group, changing the Keyword "Name" back to "FilterName".
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file name
+        </brief>
+        <description>
+          Specify the input file to be corrected.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Output file name
+        </brief>
+        <description>
+	      Specify the output file. The result will be the
+          radiometrically corrected image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="FFFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Array of flat-field coefficients
+        </brief>
+        <description>
+          This parameter allows the user to use an alternate
+          flat-field file.  In most cases, the default should be used
+          for this parameter to indicate the derived flat-field file
+          is to be used.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="OFFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Array of orbit dependent flat-field coefficients
+        </brief>
+        <description>
+          The parameter allows the user to use an alternate orbit
+          dependent flat-field file. In most cases, the default should
+          be used for this paramter.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="AFFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Array of empirical additive flat-field coefficients
+        </brief>
+        <description>
+          The parameter allows the user to use an alternate emperical
+          additive flat-field file. In most cases, the default
+          should be used for this parameter.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="DCFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Dark current file
+        </brief>
+        <description>
+          This parameter allows the user to use an alternate
+          dark current file.  In most cases, the default should be
+          used for this parameter to indicate the derived dark file
+          is to be used.  The name of the derived dark current file
+          is "$ISIS3DATA/clementine1/calibration/nir/dark_nir.cub"
+          When InstrumentCompressionType = "CLEM-JPEG-0" the name
+          of the derived dark current file is
+          "$ISIS3DATA/clementine1/calibration/nir/dark_nir_cmp0.cub"
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="BIASFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Bias correction file
+        </brief>
+        <description>
+          This parameter allows the user to use an alternate
+          bias file.  In most cases, the default should be
+          used for this parameter to indicate the derived bias file
+          is to be used.  The name of the derived bias file
+          is "$ISIS3DATA/clementine1/calibration/nir/bias_nir.cub"
+          When InstrumentCompressionType = "CLEM-JPEG-0" the name
+          of the derived bias file is
+          "$ISIS3DATA/clementine1/calibration/nir/bias_nir_cmp0.cub"
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="BPFILE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
+        <brief>
+          Bad pixel file
+        </brief>
+        <description>
+          This parameter allows the user to use an alternate
+          bad pixel file.  In most cases, the default should be
+          used for this parameter to indicate the derived
+          bad pixel file is to be used.  The name of the derived
+          bad pixel file is "$ISIS3DATA/clementine1/calibration/nir/badpix_nir.v3.cub"
+          When InstrumentCompressionType = "CLEM-JPEG-0" the name
+          of the derived bad pixel file is
+          "$ISIS3DATA/clementine1/calibration/nir/badpix_nir_cmp0.v3.cub"
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Settings">
+      <parameter name="BPFLAG">
+        <type>boolean</type>
+        <default>
+          <item>true</item>
+        </default>
+        <brief>
+          Convert bad pixels to null
+        </brief>
+        <description>
+          This option allows the user to decide whether to keep or remove known bad pixels. 
+          When enabled, DN values of 0.0 in the bad pixel cube are known bad pixels that will be set to NULL in the output.
+        </description>
+      </parameter>
+
+      <parameter name="THCOR">
+        <type>boolean</type>
+        <default>
+          <item>true</item>
+        </default>
+        <brief>
+          Apply thermal background correction
+        </brief>
+        <description>
+          Apply thermal background correction
+        </description>
+      </parameter>
+
+      <parameter name="ABSCOEF">
+        <type>double</type>
+        <default>
+          <item>1.0</item>
+        </default>
+        <brief>
+          Absolute coefficient
+        </brief>
+        <description>
+          Absolute coefficient
+        </description>
+      </parameter>
+
+      <parameter name="HISAT">
+        <type>double</type>
+        <default>
+          <item>240.0</item>
+        </default>
+        <brief>
+          High saturation value
+        </brief>
+        <description>
+          DN values greater than this value in the input cube will be set to HRS.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Calibrating a cube to radiance values using nircal
+      </brief>
+      <description>
+        Calibrating a cube to radiance values using nircal
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          nircal FROM=lna3056k.cub TO=lna3056k.cal.cub
+        </commandLine>
+        <description>
+          In this example nircal will calibrate lna3056k.cub.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="448" height="550" src="assets/images/clemnircal.jpg">
+            <brief>Calibrate lna3056k.cub</brief>
+            <description>In this example clemnircal will calibrate lna3056k.cub using the defaults.</description>
+            <thumbnail width="163" height="200" src="assets/thumbs/clemnircal.jpg" caption="Calibrate clemnircal.cub"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image width="384" height="288" src="assets/images/before.jpg">
+          <brief>Image before correction</brief>
+          <description>This is the input image lna3056k.cub before being corrected with clemnircal.</description>
+          <thumbnail caption="lna3056k.cub before being corrected" width="200" height="200" src="assets/thumbs/before.jpg"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="256" height="256" src="assets/images/after.jpg">
+          <brief>Image after correction</brief>
+          <description>This is the input image lna3056k.cub after being corrected with clemnircal. There are scattered NULL pixels because BPFLAG was true, so all known bad pixels were automatically set to NULL.</description>
+          <thumbnail caption="lna3056k.cub after being corrected" width="200" height="200" src="assets/thumbs/after.jpg"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+</application>

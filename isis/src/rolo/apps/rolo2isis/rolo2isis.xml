@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="rolo2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import isis2 rolo image into isis3 </brief>
+
+  <description>
+    This program will import an isis2 rolo image into an isis3 cube.
+  </description>
+
+  <history>
+    <change name="Eric Hyer" date="2009-08-19">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input rolo isis2 file
+        </brief>
+        <description>
+          Use this parameter to select the isis2 filename.
+        </description>
+        <filter>
+          *.alx *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+
+  </groups>
+
+  <examples>
+    
+    <example>
+      <brief>
+      Using rolo2isis
+      </brief>
+      <description>
+        The use of rolo2isis to ingest rolo isis2 data and output isis3 cubes
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=mm185801.alx
+          to=mm185801.cub
+        </commandLine>
+        <description>
+          This example shows the use of rolo2isis to create an Isis3 cube
+        </description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+          <image width="720" height="886" src="assets/images/roloExampleGUI.png">
+            <brief>
+	      Example GUI
+            </brief>
+            <description>
+	      Screenshot of the GUI with parameters
+            </description>
+            <thumbnail width="164" height="200" caption="pds2isis gui" src="assets/thumbs/roloExampleThumbGUI.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  
+  </examples>
+
+</application>

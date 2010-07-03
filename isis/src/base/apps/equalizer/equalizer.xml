@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="equalizer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+      Tone matches map projected cubes
+  </brief>
+
+  <description>
+      <p>
+        This program can be used to tonematch or equalize the brightness and/or 
+        contrast of a list of input cubes prior to mosaicking.  All the input 
+        cubes, which can include mosaics, must be in a common map projection as 
+        this program will use the mapping information to gather statistics in 
+        overlapping areas. This statistic gathering is done on a band-by-band 
+        basis.  The statistics are used in a least squares solution to 
+        determine multiplicative (GAIN or MULT) and additive (OFFSET or BASE) 
+        corrections for each image. In addition to simply calculating corrective 
+        factors and applying said factors to each image in one run of the 
+        program, the user has the option to stop the processing and examine the 
+        gathered statistics in a text file. The program can then be run again, 
+        using the file containing those statistics as an input, to apply 
+        correction to any or all of the images without the need to recalculate 
+        corrective factors. The actual equation to be used for equalization on 
+        each band in each cube is:
+        <pre>
+            newdn(s,l,b)   =   (olddn(s,l,b) - avg(b)) * GAIN(b) + avg(b) + OFFSET(b)
+        </pre>
+        where
+        <pre>
+            s = sample index
+            l = line index
+            b = band index
+        </pre>
+      </p>
+
+      <p>
+        Prior to equalizing, the user can choose whether to adjust the brightness and/or contrast of the cubes. 
+        The default is to adjust both, however, if the brightness (average) of all the cubes is the same,
+        then simply adjusting the contrast may suffice.   Likewise, if the standard deviation of all the 
+        cubes is similar, then a contrast adjustment is not necessary.  Adjusting for contrast only implies
+        the OFFSET values will be held to zero.  Similarly, adjusting for 
+        brightness implies the GAIN values will be held to one.
+      </p>
+
+      <p>
+          The OFFSET and GAIN values are computed independently for each image, therefore we have two
+          least squares computations with N unknowns, where N is the number of cubes to be equalized.
+          The overlaps, M, between all the cubes are computed, and in some cases 
+          M &lt; N.  This implies an underdetermined system, and the program 
+          will report an error if this occurs.  You can hold one or more images 
+          to alleviate this problem.  Holding an image forces GAIN and OFFSET to 
+          1.0 and 0.0 for that image, respectively. 
+      </p>
+
+      <p>
+         If the the user chooses to apply correction to the images, then a list
+         of output file names can be specified with the TOLIST parameter.  If no
+         TOLIST is specified, the equalized cubes will be named the same as the 
+         input cubes with the addition of a '.equ' prior to the '.cub' 
+         extension, and placed in the same directories as their input files.
+      </p>
+
+      <p>
+          For the sake of efficiency, the user may choose to set the "sampling 
+          percent" to be less than its default value of 100.0.  By doing so, the
+          program will likely perform its statistic gathering noticeably faster,
+          but at the risk of losing accuracy in the results.  It should 
+          be noted that the user also runs the risk of encountering an error if
+          decreasing the sampling percent results in the amount of valid data in
+          the calculated overlaps being less than the minimum set by the
+          MINCOUNT parameter (default value of 1000).  Sampling percent must be 
+          a decimal value between 0.0 (exclusive) and 100.0 (inclusive).
+      </p>
+  </description>
+
+  <category>
+    <categoryItem>Mosaicking</categoryItem>
+  </category>
+
+<oldName>
+    <item>b4equal</item>
+    <item>equalizer</item>
+</oldName>
+
+  <history>
+    <change name="Kay Edwards" date="1994-05-24">
+      Original version
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-06-25">
+      Ported to Isis 3.0
+    </change>
+    <change name="Elizabeth Ribelin" date="2005-10-04">
+        Changed categoryItem to Photometry and Radiometry 
+    </change>
+    <change name="Brendan George" date="2005-11-07">
+        Added application test
+    </change>
+    <change name="Elizabeth Miller" date="2006-01-12">
+      Made SD default contrast mode (PCA may have errors)
+    </change>
+    <change name="Jeff Anderson" date="2007-07-16">
+      Fixed memory leak
+    </change>
+    <change name="Jeff Anderson" date="2008-04-09">
+      Modified to solve system using QRD which is faster the SVD
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Tracie Sucharski" date="2008-06-12">
+      Modified call LeastSquares Solve due to change to LeastSquares
+      Solve method.
+    </change>
+    <change name="Travis Addair" date="2009-03-12">
+      Added user feedback during statistic gathering, modified existing progress
+      information, and moved error checking on number of bands and projection 
+      parameters to be done prior to statistic gathering    
+    </change>
+    <change name="Travis Addair" date="2009-06-24">
+      Refactored for use with the new OverlapNormalization class, thus removing
+      the option to use the broken PCA contrast mode; the PVL output has been
+      modified to print all normalization information for a cube in one group
+      with OverlapStatistics information coming last in the file; added an
+      option to decrease the percentage of lines sampled in statistic gathering
+    </change>
+    <change name="Travis Addair" date="2009-07-17">
+      Added a TOLIST parameter, allowing the user to specify a unique output 
+      file name and location for each input file.  The default is now to 
+      place each output file in the same directory as its input file, not in 
+      the current working directory.
+    </change> 
+     <change name="Travis Addair" date="2009-07-30">
+      Added functionality allowing the user to run the program applying 
+      corrections based off of previously gathered statistics obtained from 
+      the program's output PVL file.  The output PVL has also been changed 
+      from "PVL" to "OUTSTATS".  Results will now be placed into the print 
+      file.
+     </change>
+     <change name="Travis Addair" date="2009-11-19">
+      Updated documentation and examples to reflect the most recent changes to 
+      using the program.
+     </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+        <parameter name="FROMLIST">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+              List of cubes to equalize
+          </brief>
+          <description>
+              A list of map projected cubes to equalize.  The Mapping groups 
+              must match in order to do the equalization. 
+          </description>
+        </parameter>
+
+        <parameter name="HOLDLIST">
+            <type>filename</type>
+            <fileMode>input</fileMode>
+            <brief>
+                List of filenames to hold 
+            </brief>
+            <description>
+                List of cubes that are to be held in the equalization.  
+                An additive and a multiplicative factor of 0 and 1 will be applied 
+                to all cubes that were held.  All cubes listed in this file must 
+                also be contained in FROMLIST.
+            </description>
+            <internalDefault>None</internalDefault>
+            <filter>
+              *.txt *.lis *.lst
+            </filter>
+        </parameter>  
+
+        <parameter name="TOLIST">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+            List of the equalized cubes to be created
+          </brief>
+          <description>
+            This list of output files must contain a file name to correspond to 
+            each input file in the FROMLIST.  Input files will be associated 
+            with output files by index, so that the equalized product of the 
+            first file in the FROMLIST will be written to the name and location 
+            of the first file in the TOLIST, and so on.  Each output file will 
+            be written to the exact location with the exact name specified, 
+            unless the location and name happen to be identical to those of its 
+            corresponding input file, in which case an error will be thrown.  If 
+            this list is not specified, but the APPLY option is still selected, 
+            the output files will be placed in the directories of their input 
+            files, and named the same with the exception of an added ".equ" 
+            extension (e.g. "foobar.cub" becomes "foobar.equ.cub").
+          </description>
+          <internalDefault>Automatic</internalDefault>
+        </parameter>
+
+        <parameter name="OUTSTATS">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+               Output text file containing thorough equalization-related 
+               statistics
+          </brief>
+          <description>
+               This file will contain the statistics of all of the overlapping areas 
+               in every band along with the computed equalizing factors 
+               (OFFSET and GAIN).  Specifying this output file is optional.  
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+            *.txt *.pvl *.lis *.lst
+          </filter>
+        </parameter>
+
+        <parameter name="INSTATS">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>
+               Input text file containing thorough equalization-related 
+               statistics, used for applying correction
+          </brief>
+          <description>
+               This file must contain the statistics of all of the overlapping 
+               areas in every band along with the computed equalizing factors 
+               (OFFSET and GAIN) for every image in the FROMLIST.  
+          </description>
+          <filter>
+            *.txt *.pvl *.lis *.lst
+          </filter>
+        </parameter>
+    </group>
+
+    <group name="ProcessingOptions">                           
+        <parameter name="PROCESS">
+            <type>string</type>
+            <brief>
+               Calculate statistics, apply correction, or do both 
+            </brief>
+            <description>
+                This option allows the user to decide whether they want to do the 
+                equalization calculations and then go on to apply correction 
+                afterwards, apply correction to the images off of previously 
+                gathered statistics, or do the calculations but not apply 
+                correction.  If the APPLY option is not selected, you must 
+                specify an OUTSTATS file.  If it is selected you can still 
+                optionally specify an OUTSTATS file and the GAIN/OFFSET values 
+                will be applied to each input cube.  The names and locations of 
+                the output cubes are specified by the TOLIST file.  
+            </description>
+            <default><item>BOTH</item></default>
+            <list>
+                <option value="BOTH">
+                    <brief>
+                       Calculate statistics and apply correction 
+                    </brief>
+                    <description>
+                        This option will calculate statistics on the images, 
+                        then apply correction off of those results. 
+                    </description>
+                    <exclusions>
+                        <item>INSTATS</item>
+                    </exclusions>
+                </option>
+                <option value="CALCULATE">
+                    <brief>
+                        Calculate statistics only
+                    </brief>
+                    <description>
+                        This option will calculate statistics on the images and 
+                        print them to an output PVL file, but not correct them.
+                    </description>
+                    <inclusions>
+                        <item>OUTSTATS</item>
+                    </inclusions>
+                    <exclusions>
+                        <item>TOLIST</item>
+                        <item>INSTATS</item>
+                    </exclusions>
+                </option>
+                <option value="APPLY">
+                    <brief>
+                        Apply correction only
+                    </brief>
+                    <description>
+                        This option will use previously generated statistics to 
+                        apply correction to the images.
+                    </description>
+                    <inclusions>
+                        <item>INSTATS</item>
+                    </inclusions>
+                    <exclusions>
+                        <item>HOLDLIST</item>
+                        <item>OUTSTATS</item>
+                        <item>ADJUST</item>
+                        <item>MINCOUNT</item>
+                        <item>WEIGHT</item>
+                        <item>PERCENT</item>
+                    </exclusions>
+                </option>
+                               
+            </list>
+        </parameter>
+    </group>
+
+    <group name="CalculationOptions">                           
+        <parameter name="ADJUST">
+            <type>string</type>
+            <brief>
+                Algorithm type used to adjust the pixel values.
+            </brief>
+            <description>
+                Choose the fit option to select the algorithm to use to
+                adjust the pixel values.  The BRIGHTNESS mode will equalize 
+                using only an offset (the gain will be set to 1.0), and the 
+                CONTRAST mode will equalize using only a gain (the offset will
+                be set to 0.0).  The BOTH option will equalize using both an 
+                offset and a gain.  In most cases this option will give 
+                you the best results.
+            </description>
+            <default><item>BOTH</item></default>
+            <list>
+                <option value="BOTH">
+                    <brief>
+                        Adjust the Brightness and Contrast of the images.
+                    </brief>
+                    <description>
+                        This option will use an algorithm that equalizes
+                        both the brightness and contrast of the images.
+                    </description>
+                </option>
+                <option value="BRIGHTNESS">
+                    <brief>
+                        Adjust the Brightness of the images only
+                    </brief>
+                    <description>
+                        This option will use an algorithm that only equalizes
+                        the brightness of the images.  This option should be
+                        used only if the variance/standard deviation of the
+                        images is close.
+                    </description>
+                </option>
+                <option value="CONTRAST">
+                    <brief>
+                        Adjust the Contrast of the images only
+                    </brief>
+                    <description>
+                        This option will use an algorithm that only equalizes
+                        the contrast of the images.  This option should only
+                        be used if the brightness of the images are already
+                        close.
+                    </description>
+                </option>                
+            </list>
+        </parameter>
+
+        <parameter name="MINCOUNT">
+            <type>integer</type>
+            <brief>
+                Minimum number of points in overlapping area required to be used
+                in the solution
+            </brief>
+            <description>
+                If the number of points in the overlapping area meets or exceeds
+                this value, the area will go into the least-squares solution as 
+                a "known".  Otherwise it will not be included in the 
+                calculations.
+            </description>
+            <default><item>1000</item></default>
+        </parameter>
+
+        <parameter name = "WEIGHT">
+            <type>boolean</type>
+            <brief>
+                Whether or not overlaps should be weighted
+            </brief>
+            <description>
+                This option allows the user to decide whether they want to  
+                weight the least squares solution based on how large the overlap 
+                area is, or if they want no weighting at all.  If this parameter 
+                is set to "true", then larger overlapping areas will have more 
+                of an impact on the corrective factors than smaller overlaps.
+            </description>
+            <default><item>FALSE</item></default>
+        </parameter>
+
+        <parameter name="PERCENT">
+            <type>double</type>
+            <brief>
+                Percentage of the lines to consider when gathering overall cube
+                statistics and overlap statistics
+            </brief>
+            <description>
+                The percentage of the lines in each area to consider in the 
+                process-by-line solutions for finding overall cube statistics 
+                and overlap statistics.  This value must be a decimal value 
+                between 0.0 (exclusive) and 100.0 (inclusive).
+            </description>
+            <default><item>100.0</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Calculate Statistics and Apply Correction</brief>
+      <description>
+        This example shows the most typical use of the equalizer application.  
+        The defaults are to perform both calculation and adjustment for both the
+        gain and offset.
+      </description>
+      <terminalInterface>
+        <commandLine> fromlist= FromList.lst holdlist= HoldList.lst
+        </commandLine>
+        <description>
+          Specify a list of images to equalize along with a holding list that enables the necessary
+          calculations to be performed.  All other options are at default
+          values.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/bothGui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to calculate the gain 
+              and offset, and then apply corrections.  Because the TOLIST 
+              parameter is set to its default value of "Automatic", each output 
+              image will be placed into the directory of its corresponding input
+              image.  Also, because the OUTSTATS parameter is set to its default 
+              value of "None", a record of the calculations performed will not 
+              be written anywhere but to the print file.
+            </description>
+            <thumbnail width="164" height="200" caption="equalizer gui" src="assets/thumbs/bothGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image src="assets/images/nonEqualizedMosaic.jpg" width="512" height="512">
+          <brief> Mosaic of the input images for equalizer</brief>
+          <description>
+              This is a a small section of the input images for the equalizer example mosaicked together.
+          </description>
+          <thumbnail caption=" Mosaic of unequalized input images" src="assets/thumbs/nonEqualizedMosaic.jpg" width="200" height="200"/>
+          <parameterName>FROMLIST</parameterName>
+        </image>
+      </inputImages>
+
+      <dataFiles>
+          <dataFile path="assets/FromList.lst">
+              <brief>Click here to see the list of input images to be equalized</brief>
+              <description>
+                  This list contains the names of three files to calculate 
+                  statistics upon, and then equalize.  The file names are
+                  separated by new lines.
+              </description>
+          </dataFile>
+          <dataFile path="assets/HoldList.lst">
+              <brief>Click here to see the list of input images to be held</brief>
+              <description>
+                  This list contains the name of one file from the FROMLIST to 
+                  be held during calculations.  When multiple images are held, 
+                  their file names are likewise separated by new lines.  
+              </description>
+          </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image src="assets/images/EqualizedMosaic.jpg" width="512" height="512">
+          <brief> Mosaic of the output images for equalizer</brief>
+          <description> 
+              This is a small section of the equalized output images mosaicked together.
+          </description>
+          <thumbnail caption="Mosaic showing results of the equalizer application." src="assets/thumbs/EqualizedMosaic.jpg" width="200" height="200"/>
+          <parameterName>TOLIST</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>Calculate Statistics</brief>
+      <description>
+        This example shows the use of the equalizer application for calculating 
+        equalization statistics and writing them to a file, and not applying the 
+        correction to the input images.
+      </description>
+      <terminalInterface>
+        <commandLine> fromlist= FromList.lst holdlist=/HoldList.lst 
+            outstats= stats.pvl process= calculate
+        </commandLine>
+        <description>
+          In addition to specifying a fromlist and a holdlist, we must also 
+          specify a location to write the output statistics pvl, and set the 
+          process type to "calculate".  Since no output images will be created, 
+          we do not (and can not), specify a tolist.  All other options are at 
+          default values.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/calcGui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to calculate 
+              equalization statistics on a set of input images.
+            </description>
+            <thumbnail width="164" height="200" caption="equalizer gui" src="assets/thumbs/calcGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image src="assets/images/nonEqualizedMosaic.jpg" width="512" height="512">
+          <brief> Mosaic of the input images for equalizer</brief>
+          <description>
+              This is a a small section of the input images for the equalizer example mosaicked together.
+          </description>
+          <thumbnail caption=" Mosaic of unequalized input images" src="assets/thumbs/nonEqualizedMosaic.jpg" width="200" height="200"/>
+          <parameterName>FROMLIST</parameterName>
+        </image>
+      </inputImages>
+
+      <dataFiles>
+          <dataFile path="assets/FromList.lst">
+              <brief>Click here to see the list of images to calculate statistics upon</brief>
+              <description>
+                  This list contains the names of three files to calculate 
+                  statistics upon.  The file names are
+                  separated by new lines.
+              </description>
+          </dataFile>
+          <dataFile path="assets/HoldList.lst">
+              <brief>Click here to see the list of input images to be held</brief>
+              <description>
+                  This list contains the name of one file from the FROMLIST to 
+                  be held during calculations.  When multiple images are held, 
+                  their file names are likewise separated by new lines.  
+              </description>
+          </dataFile>
+          <dataFile path="assets/stats.pvl">
+              <brief>Click here to see the output text file containing statistics for equalizing</brief>
+              <description>
+                  This pvl contains thorough equalization-related statistics 
+                  that can be used for applying correction to any or all images 
+                  used to generate this file.  
+              </description>
+          </dataFile>
+      </dataFiles>
+    </example>
+
+    <example>
+      <brief>Apply Correction</brief>
+      <description>
+        This example shows the use of the equalizer application for applying 
+        correction to a subset of the images used to produce a specified input 
+        statistics file.
+      </description>
+      <terminalInterface>
+        <commandLine> fromlist= Input.lst tolist= Output.lst instats= 
+            stats.pvl process= apply 
+        </commandLine>
+        <description>
+          Specify a fromlist that is a sublist of the fromlist from Example 2.  
+          Because calculations have already been performed, no holdlist is 
+          specified, and since we want to place the output images in a specific
+          location with specific names, a tolist is specified. Finally, we set
+          the value of the instats parameter to be the output statistics file
+          generated in Example 2, and set the process to "apply".  All other 
+          options are at default values.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/applyGui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to apply correction to a
+              subset of the images used to produce a specified input statistics 
+              file.
+            </description>
+            <thumbnail width="164" height="200" caption="equalizer gui" src="assets/thumbs/applyGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+          <dataFile path="assets/Input.lst">
+              <brief>Click here to see the list of images to be equalized</brief>
+              <description>
+                  This list contains the names of two files to equalize.  Both 
+                  file names appear in the FROMLIST file from the previous 
+                  example, and both file names have calculated gain and offset
+                  coefficients calculated for them in the INSTATS file. Since we
+                  do not wish to create a new file for the held image, however,
+                  we chose not to include it in this new list.  The file names 
+                  are separated by new lines.
+              </description>
+          </dataFile>
+          <dataFile path="assets/Output.lst">
+              <brief>Click here to see the list of images to write after equalization</brief>
+              <description>
+                  This list contains the names of two files to be written as 
+                  outputs from the equalization process.  The index of each file 
+                  name corresponds to the index of a file from this example's 
+                  FROMLIST file.  Here, the output images retain their original 
+                  names, but are written to the current directory.
+              </description>
+          </dataFile>
+          <dataFile path="assets/stats.pvl">
+              <brief>Click here to see the input text file containing statistics for equalizing</brief>
+              <description>
+                  This pvl contains thorough equalization-related statistics for 
+                  applying correction to any or all images used to generate this 
+                  file.  In this example, two of the three files used to 
+                  generate these statistics have been selected for equalization.
+              </description>
+          </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image src="assets/images/EqualizedMosaic.jpg" width="512" height="512">
+          <brief> Mosaic of the output images for equalizer</brief>
+          <description> 
+              This is a small section of the equalized output images and the 
+              held image from Example 2 mosaicked together.  Note that since we 
+              only chose to omit the held image from Example 2 when 
+              applying correction, that the results are the same as those in 
+              Example 1.
+          </description>
+          <thumbnail caption="Mosaic showing results of the equalizer application." src="assets/thumbs/EqualizedMosaic.jpg" width="200" height="200"/>
+          <parameterName>TOLIST</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

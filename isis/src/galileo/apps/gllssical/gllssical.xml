@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="gllssical" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Perform Radiometric correction on GALILEO-SSI Imaging
+  </brief>
+
+  <category>
+    <missionItem>Galileo</missionItem>
+  </category>
+
+  <description>
+    This program is used to radiometrically correct flight images using a linear
+    model of the light-transfer function.  This program is specific to the 
+    Galileo SSI camera.
+    
+    References:
+    
+    1) D-4264 MIPL Software Structural Design for the Instrument Calibration
+       of GLL SSI Science Processing.
+    
+    2) K. Klaasen, "Reduction in Number of Unique SSI Calibration Files",
+       29 May 1987.
+    
+    3) 625-210,"Galileo SSI Calibration Report Part 1", K. Klaasen, H. 
+       Breneman, November 1, 1988.
+    
+    
+    This program will radiometrically correct the input image, converting the
+    input DN values to some specified radiometric unit.  The program
+    requires a radiometric file generated from calibration data acquired at
+    the same filter position as the input image, and a dark-current file
+    acquired at the same camera gain-state, frame-rate, PNI, and BPM
+    settings.  Also, extended exposure mode frames require an
+    extended-exposure mode dark-current file.
+    
+    This program extracts the filter position, exposure time, and frame-rate
+    from the label of the input file to determine the required gain file
+    to use.  The file $ISIS3DATA/galileo/calibration/gll_gain.sav defines the 
+    gain file to use for the given filter, gain state, and frame mode.  The file
+    $ISIS3DATA/galileo/calibration/gll_dc.sav defines the DC file to use for the given, gain
+    state, frame mode, frame rate, blemish protection mode, clock mode, and
+    extended exposure mode.
+    
+    This program performs the following processing steps on each pixel:
+     
+     1. The radiometric correction is applied:
+    		e = z(d - dc)
+        where z is retrieved from the Radiometric File and dc is retrieved 
+        from the Dark-Current File.
+    
+     2. The output pixel is scaled to radiometric units R. 
+    
+    		           S1 	    K
+    		r = e * -------- * --- (D/5.2)**2
+    			A1(t-to)    Ko
+        where
+    
+    	S1 = filter-dependent conversion factor from ft-Lamberts to
+    	     I/F units for a reference distance of 5.2 AU from the Sun.
+    	t  = commanded exposure time of the input image (msec).
+            to = line-dependent shutter offset.
+            K  = system gain constant for the gain-state of the image.
+            Ko = system gain constant for the calibration file gain-state.
+    	D  = target distance from the Sun (in AU).
+    
+     5. The output DN is usually in the range of 
+        0.0 to 1.0. 
+    
+    If the uneven bit weighting correction is enabled, the input DN values (d) 
+    will be corrected for uneven-bit-weighting due to the ADC.  If the input 
+    dark-current file is in byte format (i.e. an individual dark-current frame), 
+    then the correction will be applied to the dark-current as well. The current 
+    correction table was supplied by Herb Breneman, 2 Mar 89, and is based on 
+    1975 calibration data.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2008-01-09">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>     
+    <group name = "Files">
+      <parameter name = "FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Input file</brief>
+        <description>
+          Input cube file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    
+    <parameter name = "TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>Output file</brief>
+        <description>
+          Output cube file
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Settings">
+      <parameter name="BITWEIGHTING">
+        <type>boolean</type>
+        <brief>
+          Correct for uneven bit weighting
+        </brief>
+        <default><item>false</item></default>
+        <description>Correct for uneven bit weighting</description>
+       </parameter>
+    </group>
+  </groups>
+
+</application>

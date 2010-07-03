@@ -1,0 +1,16 @@
+Testing invalid interpolator
+  Cought invalid interpolator error.
+**PROGRAMMER ERROR** Interpolator type not set
+Testing Nearest Neighbor
+  99.5 = 99.5000000000000
+Testing Bilinear
+  1.0 = 1.00000000000000
+  2.5 = 2.50000000000000
+  4.0 = 3.99999999999970
+  1.0 = 1.00000000000000
+Testing Cubic Convolution
+  6.0 = 6.00000000000000
+  8.50000000000000 = 8.50000000000000
+  11.0000000000000 = 10.9999999999990
+  10.0 = 9.99999999999960
+  6.0 = 11.0000000000000

@@ -1,0 +1,22 @@
+Default name: default profile
+Add access profile: 0
+Adding a couple profiles...
+Default profile name: 
+Setting a default name... 0
+Default profile name: default name
+Driver available [doesntexist]: 0
+Driver available [mysql]: 1
+Driver available [postgresql]: 1
+Driver available [sqlite]: 1
+Is Available: 0
+Is connected: 0
+Is persistant: 0
+Attempting to create a database connection
+**PROGRAMMER ERROR** Database [doesntexist] does not exist
+Adding a database... Done.
+Attempting to create a database connection... Done.
+Is Available: 0
+Is connected: 0
+Is persistant: 1
+Removing database... Done.
+Destroying database... Done.

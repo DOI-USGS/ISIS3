@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: mdis2isis.xml,v 1.13 2009/12/29 21:45:54 slambright Exp $ -->
+
+<application name="mdis2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Import MESSENGER/MIDS EDR/RDR products into ISIS cubes
+  </brief>
+
+  <description>
+    <p>
+       mdis2isis converts PDS labelled MESSENGER/MDIS EDRs to ISIS labels.
+      MDIS has a narrow angle camera (MDIS-NAC) and a wide angel camera (MDIS-WAC)
+      with twelve filters.  This application will convert all these observations to ISIS format.
+      The resulting ISIS cubes are ready for SPICE initialization and projection.
+    </p>
+    <p>
+      Some of the images are compressed onboard the spacecraft.  When this is 
+      detected, they are unlutted and each DN is converted to its precompressed 
+      12-bit DN value.  All output files are created in floating point DN 
+      format.
+    </p>
+    <p>
+      There are DN limits that are imposed on the output pixel.  For the NAC 
+      instrument, the valid range is 0 &lt; DN &lt; 3400.  The limit for the WAC 
+      is 0 &lt; DN &lt; 3600.  For both instruments, 0 values are mapped to the 
+      NULL special pixel value.  And values that exceed the maximum are set to 
+      the HIS (high instrument saturation) special pixel value.
+    </p>
+  </description>
+
+  <category>
+    <missionItem>Messenger</missionItem>
+  </category>
+
+  <history>
+    <change name="Kris Becker" date="2005-07-25">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-15">
+        Added appTest
+    </change>
+    <change name="Steven Lambright" date="2007-12-10">
+        Added lookup table capabilities
+    </change>
+    <change name="Steven Lambright" date="2007-12-11">
+        Fixed problem where labels went outside the IsisCube object
+    </change>
+    <change name="Kris Becker" date="2008-01-19">
+        Added validation of filter number here.  The number in the label is 
+        unreliable and requires validation as filter identification is critical 
+        in calibration and camera model (at a minimum).    If it cannot be 
+        determined, the number is set to "Unknown" which renders the file 
+        unusable for calibration and geometric operations.
+    </change>
+    <change name="Christopher Austin" date="2008-03-18">
+      Checks if input file is rdr.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Kris Becker" date="2008-09-03">
+       Reworked the lut inversion implementation to use a different dn table 
+       source.  This altered the resulting DNs a bit.  Also instituted DN limits 
+       for low (0) and high saturation levels for WAC (3600) and NAC (3400).  DN 
+       values that exceed these maximums are set to NULL and HIS (High 
+       Instrument Saturation), respectively.  Started the SOURCE_PRODUCT_ID 
+       pedigree  chain.
+    </change>
+    <change name="Steven Lambright" date="2009-12-29">
+      Now looking for mdisCalibration????.trn in $messenger/calibration instead of
+      $messenger/translations
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube file name
+        </brief>
+        <description>
+          The input MDIS EDR/RDR file
+        </description>
+        <filter>
+          *.IMG *.IMA
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          Output file converted from PDS EDR format to ISIS.  This ISIS file will have all the
+          information transferred from the PDS EDR file that is necessary to 
+          initialize for geometric processing (see spiceinit, cam2map, etc...).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+        <parameter name="TARGET">
+            <type>string</type>
+            <brief>Provide observation target if not in EDR</brief>
+            <description>
+                This parameter may be necessary as some EDR labels do not adequately defined
+                the TARGET_NAME keyword in the labels.  Messenger takes a very long trip to 
+                finally arrive at Mercury orbit in 2011.  During cruise, many flybys occur.  The
+                proper specification of the TARGET_NAME is critical to valid instantiation of
+                ISIS camera models.  
+
+                At the time of the original writing of this application, NULL was a frequently
+                occuring value of the TARGET_NAME keyword even for flyby encounters.
+                This keyword allows one to specify the observed body explicitiy for these cases.
+
+                The default is to honor the value in the EDR label as it is anticipated this will be
+                corrected in subsequent EDR generation.
+            </description>
+            <internalDefault>Label Value</internalDefault> 
+        </parameter>
+      <parameter name="UNLUT">
+        <type>boolean</type>
+        <brief>
+          Convert 8-bit values to 12-bit values
+        </brief>
+        <description>
+          If this is set to true, and the input cube is lutted, a lookup table 
+          will be used to convert the original DN values to their original 
+          12-bit values. This must be set to true for calibration.
+        </description>
+        <default>
+          <item>
+            true
+          </item>
+        </default>
+      </parameter>
+    </group>
+  </groups>
+
+</application>

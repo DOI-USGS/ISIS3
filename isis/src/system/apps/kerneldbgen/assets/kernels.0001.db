@@ -1,0 +1,233 @@
+Object = SpacecraftPointing
+  RunTime = 2005-08-05T15:46:38
+
+  Group = Dependencies
+    Spacecraft Clock Kernel = $Odyssey/kernels/sclk/ORB1_SCLKSCET.00113.tsc
+    Leapsecond Kernel       = $base/kernels/lsk/naif0008.tls
+  End_Group
+
+  Group = Selection
+    Time = ("2003 JUL 01 00:29:59.999 TDB", "2003 OCT 01 16:29:59.989 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map_rec_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2003 JUL 01 00:29:59.999 TDB", "2003 OCT 26 23:29:59.952 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2002 FEB 19 00:29:59.999 TDB", "2002 APR 01 00:59:59.999 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map1_rec_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2002 APR 01 00:29:59.998 TDB", "2002 JUL 01 00:59:59.998 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map2_rec_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2002 JUL 01 00:30:00.001 TDB", "2002 OCT 01 00:59:59.999 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map3_rec_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2002 OCT 01 00:29:59.999 TDB", "2003 JAN 01 01:00:00.000 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map4_rec_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2003 JAN 01 00:29:59.999 TDB", "2003 APR 01 01:01:04.187 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map5_rec_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2003 APR 01 00:29:59.998 TDB", "2003 JUL 01 01:01:04.183 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map6_rec_nadir.bc
+    Type = Nadir
+  End_Group
+
+  Group = Selection
+    Time = ("2003 JUL 26 00:01:08.957 TDB", "2003 JUL 27 00:00:59.685 TDB")
+    Time = ("2003 AUG 04 00:01:08.730 TDB", "2003 AUG 05 00:01:01.755 TDB")
+    Time = ("2003 AUG 05 00:01:07.755 TDB", "2003 AUG 06 00:00:58.475 TDB")
+    Time = ("2003 AUG 06 00:01:04.475 TDB", "2003 AUG 07 00:01:04.097 TDB")
+    Time = ("2003 AUG 07 00:01:10.097 TDB", "2003 AUG 08 00:01:02.610 TDB")
+    Time = ("2003 AUG 08 00:01:08.610 TDB", "2003 AUG 09 00:01:00.627 TDB")
+    Time = ("2003 AUG 09 00:01:06.627 TDB", "2003 AUG 10 00:01:04.042 TDB")
+    Time = ("2003 AUG 10 00:01:10.042 TDB", "2003 AUG 11 00:01:01.948 TDB")
+    Time = ("2003 AUG 11 00:01:07.948 TDB", "2003 AUG 12 00:01:03.753 TDB")
+    Time = ("2003 AUG 12 00:01:09.757 TDB", "2003 AUG 13 00:01:01.042 TDB")
+    Time = ("2003 AUG 13 00:01:07.042 TDB", "2003 AUG 14 00:00:58.729 TDB")
+    Time = ("2003 AUG 14 00:01:04.729 TDB", "2003 AUG 15 00:01:04.124 TDB")
+    Time = ("2003 AUG 15 00:01:10.124 TDB", "2003 AUG 16 00:01:01.860 TDB")
+    Time = ("2003 AUG 16 00:01:07.860 TDB", "2003 AUG 17 00:01:02.291 TDB")
+    Time = ("2003 AUG 17 00:01:08.291 TDB", "2003 AUG 18 00:01:02.320 TDB")
+    Time = ("2003 AUG 18 00:01:08.320 TDB", "2003 AUG 20 00:01:02.858 TDB")
+    Time = ("2003 AUG 20 00:01:08.858 TDB", "2003 AUG 21 00:01:00.476 TDB")
+    Time = ("2003 AUG 21 00:01:06.476 TDB", "2003 AUG 22 00:01:01.888 TDB")
+    Time = ("2003 AUG 22 00:01:07.888 TDB", "2003 AUG 23 00:00:59.502 TDB")
+    Time = ("2003 AUG 23 00:01:05.502 TDB", "2003 AUG 24 00:00:59.412 TDB")
+    Time = ("2003 AUG 24 00:01:05.412 TDB", "2003 AUG 25 00:01:03.021 TDB")
+    Time = ("2003 AUG 25 00:01:09.017 TDB", "2003 AUG 26 00:01:02.299 TDB")
+    Time = ("2003 AUG 26 00:01:08.299 TDB", "2003 AUG 27 00:00:39.006 TDB")
+    Time = ("2003 AUG 27 00:01:10.904 TDB", "2003 AUG 28 00:01:02.599 TDB")
+    Time = ("2003 AUG 28 00:01:08.599 TDB", "2003 AUG 29 00:01:01.299 TDB")
+    Time = ("2003 AUG 29 00:01:05.299 TDB", "2003 AUG 30 00:00:58.509 TDB")
+    Time = ("2003 AUG 30 00:01:04.509 TDB", "2003 AUG 31 00:01:03.209 TDB")
+    Time = ("2003 AUG 31 00:01:08.908 TDB", "2003 SEP 01 00:01:04.107 TDB")
+    Time = ("2003 SEP 01 00:01:08.408 TDB", "2003 SEP 02 00:01:00.509 TDB")
+    Time = ("2003 SEP 02 00:01:06.509 TDB", "2003 SEP 03 00:01:01.908 TDB")
+    Time = ("2003 SEP 03 00:01:04.506 TDB", "2003 SEP 04 00:01:00.990 TDB")
+    Time = ("2003 SEP 04 00:01:04.689 TDB", "2003 SEP 05 00:00:59.884 TDB")
+    Time = ("2003 SEP 05 00:01:05.884 TDB", "2003 SEP 06 00:01:03.381 TDB")
+    Time = ("2003 SEP 06 00:01:05.881 TDB", "2003 SEP 07 00:01:03.677 TDB")
+    Time = ("2003 SEP 07 00:01:05.377 TDB", "2003 SEP 08 00:00:58.763 TDB")
+    Time = ("2003 SEP 08 00:01:04.767 TDB", "2003 SEP 09 00:01:01.260 TDB")
+    Time = ("2003 SEP 09 00:01:04.357 TDB", "2003 SEP 10 00:01:03.845 TDB")
+    Time = ("2003 SEP 10 00:01:08.345 TDB", "2003 SEP 11 00:01:03.334 TDB")
+    Time = ("2003 SEP 11 00:01:07.135 TDB", "2003 SEP 12 00:01:03.623 TDB")
+    Time = ("2003 SEP 12 00:01:09.623 TDB", "2003 SEP 13 00:01:02.705 TDB")
+    Time = ("2003 SEP 13 00:01:08.705 TDB", "2003 SEP 14 00:01:01.783 TDB")
+    Time = ("2003 SEP 14 00:01:04.885 TDB", "2003 SEP 14 18:58:32.772 TDB")
+    Time = ("2003 SEP 15 00:01:08.662 TDB", "2003 SEP 16 00:01:04.137 TDB")
+    Time = ("2003 SEP 16 00:01:05.137 TDB", "2003 SEP 17 00:01:03.218 TDB")
+    Time = ("2003 SEP 17 00:01:04.218 TDB", "2003 SEP 18 00:01:03.595 TDB")
+    Time = ("2003 SEP 18 00:01:09.595 TDB", "2003 SEP 19 00:01:00.867 TDB")
+    Time = ("2003 SEP 19 00:01:06.867 TDB", "2003 SEP 20 00:01:04.041 TDB")
+    Time = ("2003 SEP 20 00:01:06.041 TDB", "2003 SEP 21 00:01:00.915 TDB")
+    Time = ("2003 SEP 21 00:01:05.516 TDB", "2003 SEP 22 00:01:01.491 TDB")
+    Time = ("2003 SEP 22 00:01:07.491 TDB", "2003 SEP 23 00:01:03.857 TDB")
+    Time = ("2003 SEP 23 00:01:06.959 TDB", "2003 SEP 24 00:01:03.723 TDB")
+    Time = ("2003 SEP 24 00:01:06.023 TDB", "2003 SEP 25 00:01:01.401 TDB")
+    Time = ("2003 SEP 25 00:01:07.401 TDB", "2003 SEP 26 00:00:59.263 TDB")
+    Time = ("2003 SEP 26 00:01:05.263 TDB", "2003 SEP 27 00:01:01.128 TDB")
+    Time = ("2003 SEP 27 00:01:07.128 TDB", "2003 SEP 28 00:01:00.990 TDB")
+    Time = ("2003 SEP 28 00:01:06.990 TDB", "2003 SEP 29 00:01:01.051 TDB")
+    Time = ("2003 SEP 29 00:01:07.051 TDB", "2003 SEP 30 00:01:00.811 TDB")
+    Time = ("2003 SEP 30 00:01:06.811 TDB", "2003 OCT 01 00:00:58.672 TDB")
+    Time = ("2003 OCT 01 00:01:04.672 TDB", "2003 OCT 02 00:01:01.525 TDB")
+    Time = ("2003 OCT 02 00:01:07.525 TDB", "2003 OCT 03 00:01:00.183 TDB")
+    Time = ("2003 OCT 03 00:01:06.183 TDB", "2003 OCT 04 00:01:00.935 TDB")
+    Time = ("2003 OCT 04 00:01:06.935 TDB", "2003 OCT 05 00:00:59.991 TDB")
+    Time = ("2003 OCT 05 00:01:05.991 TDB", "2003 OCT 06 00:01:01.145 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2002 FEB 19 03:40:51.593 TDB", "2002 APR 01 00:01:04.184 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map1_v2.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2002 APR 01 01:54:10.680 TDB", "2002 JUL 01 00:01:00.313 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map2.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2002 JUL 01 00:01:06.313 TDB", "2002 OCT 01 00:01:03.869 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map3.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2002 OCT 01 00:01:09.572 TDB", "2003 JAN 01 00:01:02.295 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map4.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2003 JAN 01 00:01:08.295 TDB", "2003 APR 01 00:01:03.872 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map5.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2003 APR 01 00:01:09.872 TDB", "2003 JUL 01 00:01:00.232 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map6.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2003 JUL 01 00:01:06.232 TDB", "2003 OCT 01 00:00:58.672 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map7.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2003 OCT 01 00:01:04.672 TDB", "2003 DEC 31 23:58:15.246 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map8.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2004 JAN 01 00:06:03.245 TDB", "2004 APR 01 00:00:59.732 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map9.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2004 APR 01 00:01:05.626 TDB", "2004 JUL 01 00:01:04.111 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map10.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2004 JUL 01 00:01:07.912 TDB", "2004 OCT 01 00:01:03.147 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_map11.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2001 OCT 24 00:01:05.116 TDB", "2001 NOV 01 00:01:03.760 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_ab0110.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2001 NOV 01 00:01:05.963 TDB", "2001 DEC 01 00:01:03.909 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_ab0111.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2001 DEC 01 00:01:07.909 TDB", "2002 JAN 01 00:01:01.552 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_ab0112.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2002 JAN 01 00:01:05.352 TDB", "2002 FEB 01 00:01:01.675 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_ab0201.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2002 FEB 01 00:01:05.675 TDB", "2002 FEB 18 22:37:39.733 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_ab0202.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2004 OCT 01 00:01:05.347 TDB", "2005 JAN 01 00:01:03.251 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_ext1.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 JAN 01 00:01:07.853 TDB", "2005 APR 01 00:01:03.821 TDB")
+    File = $Odyssey/kernels/ck/m01_sc_ext2.bc
+    Type = Reconstructed
+  End_Group
+End_Object
+End

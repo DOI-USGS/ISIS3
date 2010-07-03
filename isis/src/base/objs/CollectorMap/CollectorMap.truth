@@ -1,0 +1,108 @@
+
+Size of double map = 0
+Size of double map = 2
+One = 1
+Two = 2
+
+Test Const one = 1
+
+
+Create array of 10 doubles...
+Size of array map = 1
+Initializing 0 to 9...
+
+Checking values...
+Array[0] = 0
+Array[1] = 1
+Array[2] = 2
+Array[3] = 3
+Array[4] = 4
+Array[5] = 5
+Array[6] = 6
+Array[7] = 7
+Array[8] = 8
+Array[9] = 9
+
+
+Test Class copying activity and scoping...
+Done with 1, doing 2...
+Done with 2, removing 1...
+Removed 1, doing 3...
+Get ClassTest 2 via a copy
+Got it: 2
+Get ClassTest 3 via a reference
+Got it: 3
+
+
+Test CollectorMap copy operation...
+Copy size: 2
+ClassTest 2 copy Ident: 2
+Going out of scope for ClassTest 1
+
+
+Test ClassTest Pointers...
+Remove ClassTest 6
+
+
+Testing Const Iterators...
+Const Test Ident = 4
+Const Test Ident = 5
+Const Test Ident = 7
+
+
+Testing Non-Const Iterators...
+Non-Const Test Ident = 4
+Nth Test Ident       = 4
+Non-Const Test Ident = 5
+Nth Test Ident       = 5
+Non-Const Test Ident = 7
+Nth Test Ident       = 7
+
+
+Test copying of pointer object...
+Copied the pointer map, size: 3
+
+
+Testing internal class usage...
+Adding Class 10!
+Adding 10 to int list
+Int list size = 1
+Adding 10 to double list
+Double list size = 1
+Adding 10 to string list
+iString list size = 1
+
+
+Adding Class 11!
+Adding 11 to int list
+Int list size = 2
+Adding 11 to double list
+Double list size = 2
+Adding 11 to string list
+iString list size = 2
+Got element 10 and 10 - In string?: 1
+Exists in double list?: 1
+Got element 11 and 11 - In string? 1
+
+
+Testing Duplicate Keys...
+Size of Dup object: 6
+Number Ones:   3
+Number Twos:   2
+Number Threes: 1
+Number Fours:  0
+IntStr[0] = {1, One}, Index: 0
+Nth Test Ident       = One
+IntStr[1] = {1, One #2}, Index: 0
+Nth Test Ident       = One #2
+IntStr[2] = {1, One #3}, Index: 0
+Nth Test Ident       = One #3
+IntStr[3] = {2, Two}, Index: 3
+Nth Test Ident       = Two
+IntStr[4] = {2, Two #2}, Index: 3
+Nth Test Ident       = Two #2
+IntStr[5] = {3, Three}, Index: 5
+Nth Test Ident       = Three
+Non-existant Index: -1
+
+Terminating...

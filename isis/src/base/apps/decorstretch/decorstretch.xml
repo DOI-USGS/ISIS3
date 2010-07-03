@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="decorstretch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Apply a Decorrelation Stretch to a cube
+  </brief>
+
+  <description>
+      This programs applies a decorrelation stretch to a cube.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>ipca</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2006-05-05">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>    
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to stretch
+        </brief>
+        <description>
+            The input cube which will have the decorrelation stretch applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the image after being stretched.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

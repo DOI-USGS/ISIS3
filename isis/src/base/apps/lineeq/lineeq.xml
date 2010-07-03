@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lineeq" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+      This program will normalize a cube based on line averages.
+  </brief>
+
+  <description>
+    This program will normalize a cube based on line averages. <br /><br />
+
+    This is useful for linescan camera images where the signal drifts over time. It can also
+    be used for correcting for photometric changes when part of the image was taken during the day and
+    the other part was taken at night.<br /><br />
+
+    The boxcar size should be somewhere between 0% and 200%, where 200% will give you the same image back 
+    and 0% will remove all albedo and clean up all noise. The reason for the boxcar size being 200% is because the boxcar
+    folds at the border, meaning at line zero it's only incorporating 50% of the lines and at the center it's incorporating all of them. The
+    200% boxcar makes every pixel incorporates a boxcar of all of the data, causing only negligable change in the equation.<br /><br />
+
+    The normalization is achieved by collecting all of the line averages for any given band. A lowpass filter
+    is then run on these averages. Finally, the lines are normalized with their smoothed average. The
+    CSV output option will output a CSV file (readable by most spreadsheet programs such as Excel)
+    with the line averages before and after smoothing. Using this data, graphing the line averages will
+    reveal and identify problem data.
+  </description>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <history>
+    <change name="Steven Lambright" date="2007-07-26">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2007-08-06">
+      Added options and expanded examples
+    </change>
+    <change name="Steven Lambright" date="2007-12-10">
+      Fixed bug where batchlists failed after a few runs
+    </change>
+    <change name="Steven Lambright" date="2007-12-11">
+      Fixed problem with gaps in the images causing the program to fail
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+
+        <parameter name="FROM">
+          <type>cube</type>
+          <fileMode>input</fileMode>
+          <brief>
+            Cube to normalize
+          </brief>
+          <description>
+            Specify the cube to be normalized.
+          </description>
+        </parameter>
+
+        <parameter name="TO">
+          <type>cube</type>
+          <fileMode>output</fileMode>
+          <brief>
+              Normalized cube
+          </brief>
+          <description>
+            Specify the output (normalized) cube.
+          </description>
+        </parameter>
+
+        <parameter name="CSV">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <internalDefault>No Output</internalDefault>
+          <brief>
+              CSV formatted file of line averages output
+          </brief>
+          <description>
+            Specify the CSV file to output the line averages to. 
+          </description>
+          <filter>*.csv</filter>
+        </parameter>
+
+    </group>
+    <group name="Settings">
+
+      <parameter name="BOXTYPE">
+        <type>string</type>
+        <default><item>NONE</item></default>
+       <brief>
+         Boxcar height specified in pixels of percentage
+       </brief>
+       <description>
+         When overriding the default boxcar size, you can enter the new value as a percentage of the image height
+         or as an absolute size.
+       </description>
+       <list>
+         <option value="NONE">
+          <brief>The boxcar size will be computed automatically</brief>
+          <description>The boxcar size will be 10% (rounded up if even).</description>
+          <exclusions><item>BOXSIZE</item></exclusions>
+        </option>
+
+        <option value="ABSOLUTE">
+          <brief>Enter the boxcar size in lines</brief>
+          <description>The boxcar size will be exactly what you enter. No computations will be done.</description>
+          <inclusions><item>BOXSIZE</item></inclusions>
+        </option>
+
+        <option value="PERCENTAGE">
+          <brief>Enter the boxcar size in percentages</brief>
+          <description>This is the percent of the height of the image the boxcar size will be. </description>
+          <inclusions><item>BOXSIZE</item></inclusions>
+        </option>
+      </list>
+      </parameter>
+
+      <parameter name="BOXSIZE">
+        <type>integer</type>
+       <brief>
+        Boxcar size for smoothing
+       </brief>
+       <description>
+         This will override the default boxcar size when smoothing the line averages. The larger this size is, the less the image is affected.
+         The smaller the boxcar, the larger the effect. If entering an absolute line size, it must be odd (any even number will automatically be
+         rounded up).
+       </description>
+      </parameter>
+
+      <parameter name="AVERAGES">
+        <type>boolean</type>
+       <default><item>false</item></default>
+       <brief>
+         Output a CSV formatted file of the line averages 
+       </brief>
+       <description>
+         Output a CSV formatted file of the line averages and the smoothed averages.
+       </description>
+       <inclusions><item>CSV</item></inclusions>
+      </parameter>
+
+    </group>
+  </groups>
+
+  <examples>
+
+    <example>
+      <brief>Normalizing a cube</brief>
+      <description>
+        This shows how to normalize a cube using this program. The input is valid data with introduced noise.
+      </description>
+      <terminalInterface>
+        <commandLine>from=input.cub to=output.cub boxtype=absolute boxsize=1</commandLine>
+        <description>This is the command line to run this program, with a small boxcar, on input.cub.</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/ex1interface.jpg">
+            <brief>Running this program on input.cub</brief>
+            <description>
+              This screen shot shows how to run this program using a small boxcar on
+                input.cub.
+            </description>
+            <thumbnail width="164" height="200" caption="Running this program"  src="assets/thumbs/ex1interface.jpg" />
+            <parameterName>TO</parameterName>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/ex1input1.jpg" width="24" height="550">
+           <brief>Noise</brief>
+            <description>
+              This shows the noise that was introduced into the input image. It's values change line by line. This was introduced to input.cub by using fx and adding to the valid data.
+            </description>
+            <thumbnail width="9" height="200" caption="Noise"  src="assets/thumbs/ex1input1.jpg" />
+            <parameterName>FROM</parameterName>
+        </image>
+        <image src="assets/images/ex1input2.jpg" width="24" height="550">
+           <brief>Original Data</brief>
+            <description>
+              This is the original image, before anything  was done to it.
+            </description>
+            <thumbnail width="9" height="200" caption="Original"  src="assets/thumbs/ex1input2.jpg" />
+            <parameterName>FROM</parameterName>
+        </image>
+        <image src="assets/images/ex1input3.jpg" width="24" height="550">
+           <brief>Input Data</brief>
+            <description>
+              This is the original image with the noise added in.
+            </description>
+            <thumbnail width="9" height="200" caption="Before"  src="assets/thumbs/ex1input3.jpg" />
+            <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/ex1output.jpg" width="24" height="550">
+           <brief>Output Image</brief>
+            <description>
+              This shows the image after this program was run. Notice the image data is restored, but all albedo was lost.
+            </description>
+            <thumbnail width="9" height="200" caption="After"  src="assets/thumbs/ex1output.jpg" />
+            <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>Identifying a problem cube</brief>
+      <description>
+        This program does not properly handle all cubes. When the line averages spike, this program smoothes them,
+        but bad data could cause these spikes and this program will try to correct bad data incorrectly inthe areas with the spikes.
+      </description>
+      <terminalInterface>
+        <commandLine>from=I07762023RDR_CN.cub to=I07762023RDR_CN.norm.cub csv=I07762023RDR_CN.norm.csv boxtype=percentage boxsize=2 averages=yes</commandLine>
+        <description>This is the command line to run this program, with a small boxcar, on I07762023RDR_CN.norm.cub and output a CSV file.</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/ex2interface.jpg">
+            <brief>Running this program on I07762023RDR_CN.cub with CSV output</brief>
+            <description>
+              This screen shot shows how to run this program on
+               I07762023RDR_CN.cub and output the line averages as CSV.
+            </description>
+            <thumbnail width="164" height="200" caption="Running this program"  src="assets/thumbs/ex2interface.jpg" />
+            <parameterName>TO</parameterName>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/ex2input1.jpg" width="750" height="506">
+           <brief>CSV Graph</brief>
+            <description>
+              This shows the graph of the averages from the CSV file. Notice there is a large spike on the far left hand side of the data. This should be investigated further.
+            </description>
+            <thumbnail width="200" height="135" caption="Overall Graph"  src="assets/thumbs/ex2input1.jpg" />
+            <parameterName>CSV</parameterName>
+        </image>
+        <image src="assets/images/ex2input2.jpg" width="750" height="506">
+           <brief>CSV Graph (a closer look)</brief>
+            <description>
+              This shows the graph of the averages from the CSV file zoomed into the left side. Notice the smoothed average (pink) is significantly off from the averages (blue).
+              This tells us that the data in this region did not normalize properly.
+            </description>
+            <thumbnail width="200" height="135" caption="Zoomed In Graph"  src="assets/thumbs/ex2input2.jpg" />
+            <parameterName>CSV</parameterName>
+        </image>
+        <image src="assets/images/ex2input3.jpg" width="176" height="550">
+           <brief>The cube</brief>
+            <description>
+              This shows the first 1000 lines of the image before this program was run. Notice the bright area in this data corrosponds to the spike on the CSV graph.
+            </description>
+            <thumbnail width="64" height="200" caption="Input"  src="assets/thumbs/ex2input3.jpg" />
+            <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/ex2output.jpg" width="176" height="550">
+           <brief>Output Image</brief>
+            <description>
+              This shows the first 1000 lines of the image after this program was run. Notice the resulting effects of this incorrect normalization. A smaller boxcar would
+              balance this area, except for the lines with the bad data, but would also destroy any valid albedo.
+            </description>
+            <thumbnail width="64" height="200" caption="Output"  src="assets/thumbs/ex2output.jpg" />
+            <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>Deciding on a boxcar size</brief>
+      <description>
+        This shows how the boxcar size affects the output of this program.
+      </description>
+      <terminalInterface>
+        <commandLine>from=input.cub to=output.cub boxtype=percentage boxsize=??</commandLine>
+        <description>This is the command line to run this program in this example, where ?? becomes a relative boxcar size.</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/ex3interface1.jpg">
+            <brief>Running this program on input.cub with a 5% boxcar size</brief>
+            <description>
+              This screen shot shows how to run this program using a 5% boxcar on input.cub.
+            </description>
+            <thumbnail width="164" height="200" caption="Running this program at 5% boxcar"  src="assets/thumbs/ex3interface1.jpg" />
+            <parameterName>BOXSIZE</parameterName>
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/ex3interface2.jpg">
+            <brief>Running this program on input.cub with a 20% boxcar size</brief>
+            <description>
+              This screen shot shows how to run this program using a 20% boxcar on input.cub.
+            </description>
+            <thumbnail width="164" height="200" caption="Running this program at 20% boxcar"  src="assets/thumbs/ex3interface2.jpg" />
+            <parameterName>BOXSIZE</parameterName>
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/ex3interface3.jpg">
+            <brief>Running this program on input.cub with a 50% boxcar size</brief>
+            <description>
+              This screen shot shows how to run this program using a 50% boxcar on input.cub.
+            </description>
+            <thumbnail width="164" height="200" caption="Running this program at 50% boxcar"  src="assets/thumbs/ex3interface3.jpg" />
+            <parameterName>BOXSIZE</parameterName>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/ex3input.jpg" width="11" height="550">
+           <brief>Input Data</brief>
+            <description>
+              This is the original image. Notice it's very bright at the top and very dark at the bottom.
+            </description>
+            <thumbnail width="4" height="200" caption="Noise"  src="assets/thumbs/ex3input.jpg" />
+            <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/ex3output1.jpg" width="11" height="550">
+           <brief>Output Image</brief>
+            <description>
+              This shows the image after this program was run with a very small boxcar. Notice the loss of albedo.
+            </description>
+            <thumbnail width="4" height="200" caption="Very Small Boxcar"  src="assets/thumbs/ex3output1.jpg" />
+            <parameterName>TO</parameterName>
+        </image>
+        <image src="assets/images/ex3output2.jpg" width="11" height="550">
+           <brief>Output Image</brief>
+            <description>
+              This shows the image after this program was run with a small boxcar. Notice less of the data was properly normalized and there's more albedo.
+            </description>
+            <thumbnail width="4" height="200" caption="Small Boxcar"  src="assets/thumbs/ex3output2.jpg" />
+            <parameterName>TO</parameterName>
+        </image>
+        <image src="assets/images/ex3output3.jpg" width="11" height="550">
+           <brief>Output Image</brief>
+            <description>
+              This shows the image after this program was run with a larger boxcar. The albedo change from the last example to this one is minimal, but much more data was lost.
+            </description>
+            <thumbnail width="4" height="200" caption="Larger Boxcar"  src="assets/thumbs/ex3output3.jpg" />
+            <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+  </examples>
+</application>

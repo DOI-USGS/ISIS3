@@ -1,0 +1,97 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName          = Cassini-Huygens
+    InstrumentId            = ISSNA
+    TargetName              = Saturn
+    StartTime               = 2004-246T21:32:36.410
+    StopTime                = 2004-246T21:36:16.410
+    ExposureDuration        = 220000.0 <Milliseconds>
+    AntibloomingStateFlag   = On
+    BiasStripMean           = 17.250490
+    CompressionRatio        = 1.845952
+    CompressionType         = Lossless
+    DataConversionType      = Table
+    DelayedReadoutFlag      = No
+    FlightSoftwareVersionId = 1.3
+    GainModeId              = 12 <ElectronsPerDN>
+    GainState               = 3
+    ImageTime               = 2004-246T21:36:16.410
+    InstrumentDataRate      = 182.783997 <KilobitsPerSecond>
+    OpticsTemperature       = (0.712693, 1.905708 <DegreesCelcius>)
+    ReadoutCycleIndex       = 10
+    ShutterModeId           = NacOnly
+    SummingMode             = 1
+    InstrumentModeId        = Full
+    SpacecraftClockCount    = 1/1472853447.118
+    ReadoutOrder            = 0
+  End_Group
+
+  Group = Archive
+    DataSetId   = CO-S-ISSNA/ISSWA-2-EDR-V1.0
+    ProductId   = 1_N1472853667.118
+    ImageNumber = 1472853667
+  End_Group
+
+  Group = BandBin
+    FilterName   = CL1/CL2
+    OriginalBand = 1
+    Center       = 651.065
+    Width        = 340.923
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -82360
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name        = "ISS Prefix Pixels"
+  StartByte   = 2163179
+  Bytes       = 24576
+  Records     = 1024
+  ByteOrder   = Lsb
+  Association = Lines
+
+  Group = Field
+    Name = OverclockPixels
+    Type = Double
+    Size = 3
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2162689
+  Bytes     = 490
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 2187755
+  Bytes     = 9065
+End_Object
+End

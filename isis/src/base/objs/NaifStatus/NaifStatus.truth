@@ -1,0 +1,5 @@
+Unit Test for NaifStatus
+No Errors
+
+Empty String Error
+**SPICE ERROR** An empty string was passed into a naif routine. The short explanation provided by NAIF is [SPICE(EMPTYSTRING)]. The Naif error is [String "action" has length zero.]

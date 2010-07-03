@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="lrowac2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import LRO WAC EDR images into Isis cube format
+  </brief>
+
+  <description>
+  </description>
+
+  <history>
+    <change name="Jacob Danton" date="2009-12-14">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted LRO WAC EDR image file.
+        </brief>
+        <description>
+          Use this parameter to select the LRO WAC EDR image filename.
+        </description>
+        <filter>
+          *.img *.IMG
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the base output filename.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+      </group>
+      
+      <group name="Options">
+        <parameter name="VERSIONIDSTRING">
+          <type>string</type>
+          <brief>Group to modify</brief>
+          <description>
+            The user input ID string
+          </description>
+          <default><item>"N/A"</item></default>
+        </parameter>
+      </group>
+      
+  </groups>
+</application>

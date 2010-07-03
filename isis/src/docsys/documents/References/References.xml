@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+        <p>
+          We appreciate the acknowledgement of the authors and the USGS in publications that result from the use of the
+          Isis software package or in products that include this software in whole or in part.  Samples of the correct way
+          to acknowledge and reference the  appropriate parties follows. 
+        </p>
+
+        <h2>Acknowledgement</h2>
+        <p>
+          The correct acknowledgement for the ISIS software package is as follows: 
+        </p>
+        <pre>
+        This research has made use of the USGS Integrated Software for Imagers and Spectometers (ISIS). 
+        </pre>
+
+        <h2>References</h2>
+        <p>
+          If you need to make references to ISIS in a paper, here are some starting points:
+        </p>
+        <pre>
+Torson, J.M., and Becker, K.J., (1997) ISIS - A Software Architecture for Processing Planetary Images (abs.), 
+      LPSC XXVIII, pp. 1443-1444. 
+
+Gaddis, L.R., et al., (1997) An Overview of the Integrated Software for Imaging Spectrometers (abs.), 
+      LPSC XXVIII, pp. 387-388 
+
+Anderson, J.A., et al., (2004) Modernization of the Integrated Software for Imagers and Spectrometers (abs. 2039),
+      LPSC XXXV 
+        </pre>
+
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>References.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>about</categoryItem>
+  </category>
+
+  <audience>
+    <target>all</target>
+  </audience>
+
+  <bibliography>
+    <title>References</title>
+    <brief>Acknowledgements, Citations, and References for the Isis software package</brief>
+    <description>
+      A summary of acknowledgements, citations, and references for the Isis
+      software package
+    </description>
+    <author>Elizabeth Miller</author>
+    <date>2006-01-09</date>
+  </bibliography>
+</documentation>

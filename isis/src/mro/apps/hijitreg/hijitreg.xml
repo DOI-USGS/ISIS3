@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hijitreg" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+       Characterize HiRISE image jitter with co-registration
+  </brief>
+
+  <description>
+      <p>
+        This program co-registers two HiRISE image overlaping sections.  The
+        section of overlap of each image is determined by their relative positions
+        in the HiRISE focal plane assembly.   Its intended use is to characterize
+        spacecraft jitter, but may also have other uses, such as determining
+        relative gains and zero-level offsets of adjacent CCDs, this from the
+        linear regression data computed for each registration chip.
+      </p>
+      <p>
+        hijitreg requires the two images provided in FROM and MATCH have
+        some portion of overlap.  This is typically adjacent CCDs, such as RED4
+        and RED5 but individual CCD channels can be processed as well.
+        The appropriate channel will need to be provided, however.  For example,
+        RED4_0 and RED5_1 are overlapping channel files, but RED4_1 and
+        RED3_1 are not.  Furthermore, this application can be used to
+        characterize offsets of the color sets as well.  I will describe these
+        scenarios in more detail below. 
+      </p>
+      <p>
+        The offsets are determined using HiRISE focal plane locations for
+        each CCD.  Adjacent CCDs are designed to have at least 48 pixels
+        of overlap between them.
+        However, it has been determined the amount of overlap can vary under
+        most viewing conditions.  Thus, hijitreg can utilize the same sample and
+        line offset information used by <i>hiccdstitch</i> to adjust each CCD's
+        relative position within the HiRISE focal plane.  hijitreg then makes the
+        appropriate localized adjustments to determine the final overlap used to
+        characterize the two image sections.  See the documentation for the
+        SHIFTDEF parameter for <i>hiccdstitch</i> for further details.
+     </p>
+      <p>
+          The type of registration algorithm and appropriate parameters for its
+          use is determined by the REGDEF parameter.  This follows the Isis
+          standard.  Below is an example of the PVL-format that is expected
+          in the file provided.
+      </p>
+     <pre>
+         Object = AutoRegistration
+           Group = Algorithm
+             Name         = MaximumCorrelation
+             Tolerance    = 0.7
+           EndGroup
+
+           Group = PatternChip
+             Samples = 17
+             Lines   = 45
+           EndGroup
+
+           Group = SearchChip
+             Samples = 30
+             Lines   = 70
+           EndGroup
+         EndObject
+     </pre>
+     <p>
+         A chip registration grid is defined across the MATCH image using the
+         parameters ROWS  and COLUMNS.   If the user does not provide
+         values for the grid size, it will be automatically computed as
+         follows:  ROWS = (line overlap - 1) / search chip lines + 1.  The
+         default for COLUMNS is set to 1.  This default condition assumes
+         processing of overlapping regions that are approximately 48 pixels.
+         However, if you specify 0, then the computation for 
+         COLUMNS is the same as it is for ROWS only using sample overlap.
+         Conceptually,  the chip grid defined by ROWS and COLUMNS will be
+         laid on top of both images with even spacing between the rows (or
+         columns) and but no row will touch the top or bottom of the image.
+         That is, the grid is internal to the image.
+     </p>
+     <p>
+         At each grid intersection, a translation will be computed.  This is done
+         by centering the search chip at the grid intersection for the image to
+         be translated (FROM) and centering the pattern chip at the grid
+         intersection for the  held image (MATCH).  The pattern chip is walked
+         through the search chip to find the best registration (if any).   The
+         details of how this is done is described in the document "Automatic
+         Registation in Isis 3.0".  The local translation is recorded at all grid
+         intersections that had a successful registration.  It will be written to
+         the FLATFILE if requested.  The average and standard deviation of the
+         local translations is computed and reported as well..
+     </p>
+     <p>
+         Some tips to improve odds of a successful registration.  In general
+         don't go too small with the pattern chip size, 17x45 is the nomimal
+         starting point.  Also, the larger the translation, the larger the search
+         chip size will need to be.  So if your translation is only a couple of
+         pixels keep the search chip slightly bigger than the pattern 
+         (e.g., 25x55 vs 17x45).  However if the translation is large you will
+         need to expand the search area.  For example,  if the translation is
+         roughly 45 pixels and your pattern is 20x20 the search area should
+         be 20+2*45 or 110x110.
+     </p>
+     <p>
+         <b>A word of caution.</b>  In testing, we found that some of the correlations
+         reported were wildly huge.  This indicates that the best fitting offset is
+         at the very edge of the search chip.  When using the MaximumCorrelation
+         algorithm, they should be between -1 and 1.  There is a keyword added
+         to the log file called <i>NSuspects</i> that indicates the number of
+         occurances of this condition.  If this is not 0, then chances are this
+         issue occured.  This may only apply to the MaximumCorrelation
+         algorithm.
+
+         To rectify this problem,
+         examine the RegLine and RegSamp values and compare with the FromLine
+         and FromSamp, respectively.  If the registering sample or line is near
+         the search chip threshold (i.e., FromSamp+(SearchChip/Samples/2) or
+         FromLine+(SearchChip/Lines/2)) then increase the size of the search
+         chip dimensions appropriately.
+     </p>
+     <p>
+         A typical command line run of hijitreg will look like:
+         <PRE>
+          hijitreg FROM=AEB_000002_0050_RED5.cub MATCH=AEB_000002_0050_RED4.cub \
+                      REGDEF='$mro/calibration/hijitreg.p1745.s3070.def' \
+                      SHIFTDEF='$mro/calibration/hiccdstitch.000002_0050_RED.def' \
+                      FLATFILE=AEB_000002_0050_RED5.dat
+         </PRE>
+         To register RED to IR or BG images, you will typically need to insure
+         that, at a minumum, the summing modes are equivalent.  If they are not,
+         you must run <i>enlarge</i> or <i>reduce</i>, whichever makes sense,
+         and then use <i>editlab</i> to change the /IsisCube/Instrument/Summing
+         keyword to the appropriate mode.  The keyword values in both images
+         must be the same number.  Note that both samples and lines must be
+         increased or decreased in order to yield appropriate results.
+         Once equivalent summing modes are achieved, you will likely have to get
+         the images lined up using sample and line offsets.  This is done via the 
+         SHIFTDEF parameter.  Further adjustments should be considered.  For
+         example, now a much large portion of the images are overlapping.  You
+         may wish to specify 3 columns, evenly spaced, to register.  Set the
+         COLUMNS and ROWS parameters appropriately.
+     </p>
+  </description>
+
+  <category>
+      <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>  
+
+  <seeAlso>
+      <applications>
+          <item>autoregtemplate</item>
+          <item>coreg</item>
+      </applications>
+      <documents>
+          <document>
+              <title>Automatic Registration in Isis 3.0</title>
+          </document>
+      </documents>
+  </seeAlso>
+
+  <history>
+     <change name="Kris Becker" date="2006-05-04">
+         Original Version
+     </change>
+     <change name="Kris Becker" date="2006-05-31">
+         Added CNETFILE parameter to provide easier input into transform
+         applications such as the 1-D transform anticipated to operate on
+         the results of this application.
+     </change>
+     <change name="Kris Becker" date="2006-06-16">
+          Added specification of reference image in the control net file to
+          support subsequent use (e.g., 1-D transform). 
+      </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Brendan George" date="2006-10-03">
+        Modified calls to get current time to use Time class, instead of
+        Application class
+    </change>
+    <change name="Brendan George" date="2006-12-08">
+        Modified to conform to changes made to SerialNumber
+    </change>
+    <change name="Janet Barrett" date="2007-02-23">
+        Added support for noproj'ed files. The files are required to
+	have a summing mode of 1. Support for noproj'ed files with
+	other summing modes will be added later. Noproj'ed files are
+	also required to have 20000 samples. This will be fixed later.
+    </change>
+    <change name="Janet Barrett" date="2007-08-08">
+        Modified program so that noproj'ed files are no longer 
+	required to have a summing mode of 1. Support was also added
+	for noproj'ed IR and BG files.
+    </change>
+    <change name="Janet Barrett" date="2007-11-21">
+        Modified program to look at the PixelPitch keyword in the
+	Instrument group of noproj'ed images to determine what the
+	summing mode is. The PixelPitch value is divided by .012
+	to calculate the summing mode.
+    </change>
+    <change name="Steven Lambright" date="2008-06-23">
+        Updated to properly check AutoReg::Register()'s return status
+    </change>
+    <change name="Steven Koechle" date="2008-08-18">
+	Updated to work with Geos 3.0.0
+    </change>
+    <change name="Travis Addair" date="2009-08-10">
+        Auto registration parameters are now placed into the print file.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Input Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          HiRISE image that will have line/sample offsets computed for
+        </brief>
+        <description>
+          This cube will be registered to the MATCH cube and corresponds to
+          the search chip (the larger sized chip).   This file can be either a stitched
+          CCD or an individual CCD channel.  If a channel is provided, be sure it
+          one that shares common overlap with the MATCH cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          HiRISE image that will contain the pattern to match the FROM image
+        </brief>
+        <description>
+          This HiRISE cube will be held fixed in the registration process. The
+          FROM cube will be translated to match this cube. 
+          It corresponds to the pattern chip (the smaller sized chip).
+          This file can be either a stitched
+          CCD or an individual CCD channel.  If a channel is provided, be sure it
+          one that shares common overlap with the FROM cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="REGDEF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The Auto Registration template
+        </brief>
+        <description>
+          The registration template for correlations. Default will be MaximumCorrelation function
+          with a tolerance of 0.7, a search chip of 30X70 pixels, and a pattern chip of 17X45 pixels.
+          There may also be other templates available in the default MRO directory as well as
+          the base templates directory, $base/templates/autoreg.
+        </description>
+        <filter>
+          *.def
+        </filter>
+        <default><item>$mro/calibration/hijitreg.p1745.s3070.def</item></default>
+        <defaultPath>$mro/calibration</defaultPath>
+      </parameter>
+
+      <parameter name="SHIFTDEF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Pvl file containing absolute shifts for CCD lines and samples.
+        </brief>
+        <description>
+            <p>
+                For convenience and consistancy, the same offset file used in
+                the <i>hiccdstitch</i> application can be used here to specify line and
+                sample offsets for each HiRISE CCD.   The documentation below
+                is the same as it is for <i>hiccdstitch</i>.
+            </p>
+            <p>
+                This file contains groups for each CCD that requires a 
+                modification to its placement into the HiRISE
+                focal plane.  The name of each group is the CCD name for
+                which the shift in line or sample is needed.  For example, the
+                leftmost CCD, CCD 0 is named "RED0", the next "RED1" and
+                so on.  <i>hiccdstitch</i> searches for names of groups that match
+                the stitched input cube files and will apply offsets to the
+                default sample and line location of where the CCD is mapped to
+                in the focal plane.
+            </p>
+            <p>
+                Offsets for both line and sample can be supplied.  None, one or
+                both can be provided for any CCD.  Negative values shift the 
+                image left if a sample offset is given or up if a line offset is given.
+                Positive values in sample and line shift the image right and down,
+                respectively.
+            </p>
+            <p>
+                These shifts are absolute shifts and only apply to
+                the specified CCD and are not propagated to subsequent CCDs
+                left to right in the focal plane layout.  (HiRISE CCD arrangement
+                is always left to right as far as <i>hijitreg</i> is concerned.)
+             </p>
+            <p>
+                Below is an example of the format of the input file for the
+                SHIFTDEF file:
+            </p>
+            <pre>
+            Object = Hiccdstitch
+              Group = RED0
+                SampleOffset     = -10
+                LineOffset       = 5
+              End_Group
+
+              Group = RED3
+                SampleOffset     = 13
+                LineOffset       = -5
+              End_Group
+
+              Group = RED5
+                LineOffset       = 22
+              End_Group
+
+               Group = IR11
+                SampleOffset     = -4
+                LineOffset       = 2
+              End_Group
+
+              Group = BG12
+                SampleOffset     = 12
+              End_Group
+            End_Object
+            End
+            </pre>
+            <p>
+                The only keywords that hiccdstitch reads from this file
+                are <b>SampleOffset</b> and <b>LineOffset</b>.  All
+                other keywords are ignored.  Note that groups named
+                by CCD name must exist as well as all specified groups
+                must be contained within the <b>Hiccdstitch</b> object.
+            </p>
+            <p>
+                Note that this file is an optional parameter.  If it is not
+                provided, then all CCD files provided are mapped to
+                focal plane positions as specified in the HiRISE
+                Instrument Operations Handbook.  The size
+                of a HiRISE pixel is 0.012 millimeters and the measurements
+                in the handbook are also in millimeters.
+            </p>
+        </description>
+        <filter>
+          *.def
+        </filter>
+        <defaultPath>$mro/calibration</defaultPath>
+      </parameter>
+    </group>
+
+    <group name="Input Parameters">
+      <parameter name= "ROWS">
+          <type>integer</type>
+          <brief>
+              Number of Rows of grid points to use.
+          </brief>
+          <description>
+              The number of rows of grid points to use in the registration
+               process.  If not entered, it will default to
+               ROWS = (lines of overlap - 1) / search chip lines + 1.
+          </description>
+          <internalDefault>Automatic</internalDefault>
+          <minimum inclusive="true">1</minimum>
+      </parameter>
+
+      <parameter name= "COLUMNS">
+          <type>integer</type>
+          <brief>
+              Number of Columns grids points to register.
+          </brief>
+          <description>
+              The number of columns of grid points to use in the registration process.
+              If not entered, the default is set to 1.  This assumes we are registering
+              adjacent CCD overlap.  The user can have the application compute the
+              number of grid columns similar to how ROWS is done.  To use this
+              option, set COLUMNS = 0.  The application will then compute
+              the number of grid columns as 
+              COLUMNS = (samples of overlap - 1) / search chip samples + 1.
+          </description>
+          <default><item>1</item></default>
+          <minimum inclusive="true">0</minimum>
+      </parameter>
+    </group>
+
+    <group name="Output">
+        <parameter name="FLATFILE">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+               Text file of registration data
+          </brief>
+          <description>
+              <p>
+               This file will contain the data collected from the application. 
+               Data pertaining to the input images that may have relevance
+               to the analysis is provided in free form.  This includes lines,
+               samples, offsets, CPMM number, summing, TDI mode, overlap
+               and timing information.    In addition, there is registration data
+               included such as sample and line spacing (which is typically
+               a single column), registration algorithm and tolerances and
+               the results of the correlation processing.
+              </p>
+              <p>
+               In addition to the above general information, a table of information
+               follows where each row contains registration information for each
+               chip.  There are 12 columns of data for each chip (row).    Below is
+               a description of each column:
+              </p>
+              <p>
+                  <TABLE BORDER="1">
+                      <CAPTION>Column description for FLATFILE data</CAPTION>
+                      <TR>
+                        <TH>Heading</TH>
+                        <TH>Column Description</TH>
+                      </TR>
+                      <TR>
+                         <TD>FromTime</TD>
+                         <TD>
+                           The time the line in the FROM image was observed
+                           (scanned) expressed in ephemeris time
+                         </TD>
+                      </TR>
+                      <TR>
+                          <TD>FromSamp</TD>
+                          <TD>
+                              Image sample in the FROM file of the center of
+                              the correlation chip
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>FromLine</TD>
+                          <TD>
+                              Image line in the FROM file of the center of the
+                              correlation chip
+                          </TD>
+                      </TR>
+                      <TR>
+                         <TD>MatchTime</TD>
+                         <TD>
+                           The time the line in the MATCH image was observed
+                           (scanned) expressed in ephemeris time
+                         </TD>
+                      </TR>
+                      <TR>
+                          <TD>MatchSamp</TD>
+                          <TD>
+                              Image sample in the MATCH file of the center of
+                              the correlation chip
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>MatchLine</TD>
+                          <TD>
+                              Image line in the MATCH file of the center of the
+                              correlation chip
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>RegSamp</TD>
+                          <TD>
+                               Best registering sample in the FROM file resulting
+                               from the correlation.
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>RegLine</TD>
+                          <TD>
+                              Best registering line in the FROM file resulting
+                              from the correlation
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>RegCorr</TD>
+                          <TD>
+                              Correlation coefficient of the best registering sample
+                              and line in the FROM file.  This will typically be between
+                              1.0 and -1.0.  <B>NOTE:</B>  At times these values can
+                              be wildly huge, as indicated by the <i>NSuspects</i>
+                              log file keyword.  This typically indicates the specified
+                              search chip is not large enough.  Inspect the
+                              registering sample and line to determine which size
+                              to increase and rerun the correlation.
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>B0_Offset</TD>
+                          <TD>
+                              This is the offset in the linear regression analysis of the
+                              best registering chip
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>B1_Slope</TD>
+                          <TD>
+                              This is the slope in the linear regression analysis of the
+                              best registering chip
+                          </TD>
+                      </TR>
+                      <TR>
+                          <TD>B_RCorr</TD>
+                          <TD>
+                              This is the correlation coefficient resulting from the linear
+                              regression analysis of the best registering chip in the FROM
+                              image compared to the corresponding area from the MATCH
+                              chip.  The Linear Regression equation is:
+                              <PRE>
+                                  <i>y = B0_Offset + B1_Slope * x</i>
+                              </PRE>
+                              Here, <i>y</i> is the output FROM Dn and <i>x</i> is the
+                              FROM input Dn.   In theory, one could use <i>poly</i> to
+                              apply this to the FROM image and it will adjust FROM 
+                              to look closer to MATCH in brightness levels.
+                          </TD>
+                      </TR>
+                  </TABLE>
+              </p>
+              <p>
+                  Linear regression analysis is performed on each chip.  The best
+                  registering sample and line is computed at the sub-pixel level (this
+                  can be modified in the REGDEF file).  The best registered chip
+                  is read from the FROM file at the subpixel level and compared
+                  with the correlated search chip in the MATCH file.
+              </p>
+
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+            *.txt *.lis *.lst
+          </filter>
+        </parameter>
+
+        <parameter name="CNETFILE">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+             Crontrol net file for input into transform applications
+          </brief>
+          <description>
+             This file will contain the ControlNet created in the hijitreg application.  The data
+             will be in Pvl format.  This option is required if the subsequent transformations of
+             the FROM files is desired.  hijitreg is specifically designed to apply a 1-D
+             transform that shifts each line in the line and sample direction as indicated in
+             the control net.
+           </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+          *.txt *.lis *.lst
+          </filter>
+        </parameter>
+    </group>
+  </groups>
+</application>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="marciflip" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+    <brief>
+      Flip the framelets on an MRO MARCI image
+    </brief>
+
+    <description>
+        This program takes an image from the Mars Reconnaissance Orbiter Color Imager
+        and flips the framelets, which corrects image data taken on ascending orbits.
+    </description>
+
+    <history>
+        <change name="Steven Lambright" date="2007-10-04">
+            Original Version
+        </change>
+        <change name="Steven Lambright" date="2008-05-13">
+          Removed references to CubeInfo 
+        </change>
+    </history>
+
+    <category>
+      <missionItem>Mars Reconnaissance Orbiter</missionItem>
+    </category>
+
+    <groups>
+        <group name="Files">
+            <parameter name="FROM">
+                <type>cube</type>
+                <fileMode>input</fileMode>
+                <brief>
+                    Input file
+                </brief>
+                <description>
+                    The image to be processed
+                </description>
+                <filter>
+                    *.cub
+                </filter>
+            </parameter>
+
+            <parameter name="TO">
+                <type>cube</type>
+                 <pixelType>real</pixelType>
+                <fileMode>output</fileMode>
+                <brief>
+                  Output cube
+                </brief>
+                <description>
+                  This is the resultant cube, containing the image data with flipped framelets.
+                </description>
+                <filter>
+                    *.cub
+                </filter>
+            </parameter>
+        </group>
+    </groups>
+    
+    <examples>
+      <example>
+        <brief>
+          Correcting a MARCI image
+        </brief>
+        <description>
+          This example covers using marciflip on a typical MARCI image
+        </description>
+        <terminalInterface>
+          <commandLine>
+            FROM=T02_001000_1199_MC_00N230W.noflip.cub TO=T02_001000_1199_MC_00N230W.cub  
+          </commandLine>
+          <description>
+            This is the command line for running this program with a typical MARCI image.
+          </description>
+        </terminalInterface>
+        <guiInterfaces>
+          <guiInterface>
+            <image width="726" height="459" src="assets/images/gui.jpg">
+              <brief>Running with default options</brief>
+              <description>
+                This is what the interface should look like when running this program.
+              </description>
+              <thumbnail width="200" height="126" src="assets/thumbs/gui.jpg" caption="Running this program" />
+            </image>
+          </guiInterface>
+        </guiInterfaces>
+        <inputImages>
+          <image src="assets/images/T02_001000_1199_MC_00N230W.noflip.jpg" width="282" height="550">
+            <brief>The input image, not flipped, cropped and colorized for this example</brief>
+            <description>
+              Since this particular input image had a RED, GREEN, and ORANGE filter, it was possible to display the image
+              in color. To give a better picture of the output, because MARCI takes long strips of data, this image was
+              cropped. In order to show the same feature as the flipped image, the crop was at line 5800 to a height of 1000 pixels. 
+              This image was created with FLIP set to NO in marci2isis, because AUTO flipped the data. When you look closely, especially compared
+              to the flipped data, the features in this data are distorted.
+            </description>
+            <thumbnail src="assets/thumbs/T02_001000_1199_MC_00N230W.noflip.jpg" caption="Output Image Without FLIP" width="103" height="200" />
+          </image>
+        </inputImages>
+        <outputImages>
+          <image src="assets/images/T02_001000_1199_MC_00N230W.jpg" width="282" height="550">
+            <brief>The output image, cropped and colorized for this example</brief>
+            <description>
+              Since this particular input image had a RED, GREEN, and ORANGE filter, it was possible to display the image
+              in color. To give a better picture of the output, because MARCI takes long strips of data, this image was
+              cropped at line 2800 to a height of 1000 pixels. The distortions in the original image are now gone.
+            </description>
+            <thumbnail src="assets/thumbs/T02_001000_1199_MC_00N230W.jpg" caption="Output Image" width="103" height="200" />
+          </image>
+        </outputImages>
+      </example>
+    </examples>
+</application>

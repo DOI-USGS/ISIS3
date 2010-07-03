@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lrowac2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import LRO WAC EDR images into Isis cube format
+  </brief>
+
+  <description>
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2009-04-27">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2009-07-01">
+      Updated to work with multiple summing modes in one
+      image and added LUT capabilities.
+    </change>
+    <change name="Steven Lambright" date="2009-07-08">
+      Keywords are now being placed properly, moved all keyword
+      calculations back to the TranslateLabels method.
+    </change>
+    <change name="Steven Lambright" date="2009-09-09">
+      Updated wavelengths
+    </change>
+    <change name="Steven Lambright" date="2009-10-23">
+      Color offsets for BW mode images are now always zero.
+      Color offset does not make sense for single band cubes.
+    </change>
+    <change name="Steven Lambright" date="2009-10-23">
+      Removed flip, changed default of coloroffset to off.
+    </change>
+    <change name="Steven Lambright" date="2010-01-19">
+      Now propogating new keyword from labels v1.1 bandwidth
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted LRO WAC EDR image file.
+        </brief>
+        <description>
+          Use this parameter to select the LRO WAC EDR image filename.
+        </description>
+        <filter>
+          *.img *.IMG
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the base output filename.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+      </group>
+
+      <group name="Settings">
+        <parameter name="COLOROFFSET">
+          <type>boolean</type>
+          <brief>Add padding to align bands</brief>
+          <description>
+            The result of how MARCI takes pictures leaves a filter height offset in adjacent filters. This will correct that offset
+            by adding padding to the top of the image file, aligning color images correctly.
+          </description>
+          <default><item>false</item></default>
+          <inclusions><item>COLOROFFSETSIZE</item></inclusions>
+        </parameter>
+           
+        <parameter name="COLOROFFSETSIZE">
+          <type>integer</type>
+          <brief>Amount of filter heights to pad with for COLOROFFSET</brief>
+          <description>
+            The filters are offset by a certain number of filters, which is a multiple of their height. It appears
+            the filters are all offset by twice their height, or two filter heights. One filter height can be explained by
+            the method of taking pictures: the first filter on the first framelet is one higher than the second filter on
+            the first framelet.  
+          </description>
+          <default><item>2</item></default>
+          <minimum inclusive="false">0</minimum>
+        </parameter>
+           
+        <!--parameter name="FLIP">
+          <type>boolean</type>
+          <brief>Flip the framelets for pictures taken on ascending orbits</brief>
+          <description>This corrects pictures taken on an ascending orbit</description>
+          <default><item>false</item></default>
+        </parameter-->
+           
+        <parameter name="UNLUT">
+          <type>boolean</type>
+          <brief>Use the lookup table in the labels</brief>
+          <description>
+            If this is set to true, and the input cube is lutted, a lookup table
+            will be used to convert the raw DN values to their original
+            values. This must be set to true for calibration.
+          </description>
+          <default><item>true</item></default>
+        </parameter>
+      </group>
+  </groups>
+</application>

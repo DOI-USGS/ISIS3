@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnettable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Application to get Excel compatible statistics  
+  </brief>
+  <description>
+    This application takes a control net and outputs the same data avalible from 
+    campt for every control measure in the control net. It also outputs data 
+    about the measure and point. This data is formated as a flat file and is 
+    comma seperated so it can be imported to Excel. The columns titles in the 
+    file are:
+    <table>
+      <tr>
+        <td>
+          <UL>
+            <LI>ControlPointId</LI>
+            <LI>PointType</LI>
+            <LI>Ignored</LI>
+            <LI>Held</LI>
+            <LI>Invalid</LI>
+            <LI>UniversalLatitude</LI>
+            <LI>UniversalLongitude</LI>
+            <LI>Radius</LI>
+            <LI>Filename</LI>
+            <LI>Sample</LI>
+            <LI>Line</LI>
+            <LI>PixelValue</LI>
+            <LI>Declination</LI>
+            <LI>PlanetocentricLatitude</LI>
+            <LI>PlanetographicLatitude</LI>
+            <LI>PositiveEast360Longitude</LI>
+            <LI>PositiveEast180Longitude</LI>
+            <LI>PositiveWest360Longitude</LI>
+            <LI>PositiveWest180Longitude</LI>
+            <LI>BodyFixedCoordinateX</LI>
+            <LI>BodyFixedCoordinateY</LI>
+            <LI>BodyFixedCoordinateZ</LI>
+            <LI>LocalRadius</LI>
+            <LI>SampleResolution</LI>
+            <LI>LineResolution</LI>
+            <LI>SpacecraftPositionX</LI>
+            <LI>SpacecraftPositionY</LI>
+            <LI>SpacecraftPositionZ</LI>
+            <LI>SpacecraftAzimuth</LI>
+            <LI>SlantDistance</LI>
+            <LI>TargetCenterDistance</LI>
+            <LI>SubSpacecraftLatitude</LI>
+          </UL>
+        </td>
+        
+        <td>
+          <UL>
+            <LI>SubSpacecraftLongitude</LI>
+            <LI>SpacecraftAltitude</LI>
+            <LI>OffNadirAngle</LI>
+            <LI>SubSpacecraftGroundAzimuth</LI>
+            <LI>SunPositionX</LI>
+            <LI>SunPositionY</LI>
+            <LI>SunPositionZ</LI>
+            <LI>SubSolarAzimuth</LI>
+            <LI>SolarDistance</LI>
+            <LI>SubSolarLatitude</LI>
+            <LI>SubSolarLongitude</LI>
+            <LI>SubSolarGroundAzimuth</LI>
+            <LI>Phase</LI>
+            <LI>Incidence</LI>
+            <LI>Emission</LI>
+            <LI>NorthAzimuth</LI>
+            <LI>EphemerisTime</LI>
+            <LI>UTC</LI>
+            <LI>LocalSolarTime</LI>
+            <LI>SolarLongitude</LI>
+            <LI>ZScoreMin</LI>
+            <LI>ZScoreMax</LI>
+            <LI>SampleError</LI>
+            <LI>LineError</LI>
+            <LI>ErrorMagnitude</LI>
+            <LI>Type</LI>
+            <LI>IsMeasured</LI>
+            <LI>IsValidated</LI>
+            <LI>Ignore</LI>
+            <LI>GoodnessOfFit</LI>
+            <LI>Error</LI>
+          </UL>
+        </td>
+      </tr>
+    </table>
+  </description>
+  
+  <history>
+    <change name="Mackenzie Boyd" date="2009-09-11">
+      Original version
+    </change> 
+    <change name="Mackenzie Boyd" date="2010-03-12">
+      Added ALLOWOUTSIDE option
+      default behavior not modified at all. 
+    </change> 
+    <change name="Mackenzie Boyd" date="2010-03-25">
+      Change to CameraPointInfo added two parameters to output and modified 
+      two Output now had PositiveEast360Longitude and PositiveWest180Longitude. 
+      Also made append option more forgiving so that it will create a file if 
+      none exists.
+    </change>
+    <change name="Mackenzie Boyd" date="2010-05-24">
+      Added option to allow for errors so that instead of crashing the program 
+      continues and reports the errors in the output file.
+    </change>
+    <change name="Mackenzie Boyd" date="2010-06-07">
+      Updated and added to documentation.
+    </change>
+    <change name="Christopher Austin" date="2010-06-08">
+      Gave cnettable the ability to compile
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>
+        campt
+      </item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of cubes associated with control net 
+        </brief>
+        <description>
+          Use this parameter to select the filename of a list of cubes the 
+          cubes used to create the control net. 
+        </description>
+        <filter>
+          *.txt *.lis *.lst *.list
+        </filter>
+      </parameter>
+
+      <parameter name="CNET">
+        <type>filename</type> 
+        <fileMode>input</fileMode>
+        <brief>
+          A control net
+        </brief>
+        <description>
+          The control net from which to derive statistics.
+        </description>
+        <filter>
+          *.net *.cnet
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+           Text file containing the control net statistics
+        </brief>
+        <description>
+           This file will contain the statistics of all the control measures in 
+           the control net. 
+        </description>
+        <filter>
+          *.txt *.csv
+        </filter>
+      </parameter>
+
+      <parameter name="APPEND">
+        <type>boolean</type> 
+        <default><item>false</item></default>
+        <brief>
+          Append output to "TO" file
+        </brief>
+        <description>
+          If checked this option allows file output to be appended to a file or
+          create a new file. If the file already exists and append is off the 
+          program will overwrite the existing file.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Position">  
+      <parameter name="ALLOWOUTSIDE">
+        <type>boolean</type> 
+        <default><item>false</item></default>
+        <brief>
+          Allow sample/line values outside of the images 
+        </brief>
+        <description>
+          When checked sample/line values that are outside of the images (but 
+          close) will be extrapolated. For example a sample of -0.5 would be 
+          valid. If this is not checked a sample of -0.5 is not allowed. 
+        </description>
+      </parameter>
+    </group>  
+    
+      <group name="Errors">  
+      <parameter name="ALLOWERRORS">
+        <type>boolean</type> 
+        <default><item>false</item></default>
+        <brief>
+          Allow errors to occur without halting execution.
+        </brief>
+        <description>
+          If errors occur such as values not having an intersection with the 
+          body or sample line locations outside of the cube with ALLOWOUTSIDE 
+          not checked the program will continue and report the error and reason 
+          to the file. If no errors occur "N/A" is put into the column, 
+          otherwise, the reason for the error is written to the file.
+        </description> 
+      </parameter>
+    </group>
+  </groups>
+
+
+  <examples>
+    <example>
+      <brief>
+        Usage of cnettable application
+      </brief>
+      <description>
+        This is an example of how to use cnettable to produce a flatfile
+        or csv file for excel or other uses. The required elements are a list 
+        of cubes and a corresponding control network. The easiest way to get 
+        this is to run findimageoverlaps on a list of cubes and then autoseed 
+        this list with the overlaps. 
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          fromlist=cubeList.lst cnet=testNet.net to=output.csv
+        </commandLine>
+        <description>
+          These arguments will produce a flatfile containing infomation on all 
+          the points in the control net.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+            
+        <guiInterface>
+          <image width="519" height="511" src="assets/images/cnettableGUI.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to take a list of 
+              cubes a control network and output to a text file. 
+            </description> 
+            <thumbnail width="200" height="197" caption="cnettable GUI" 
+                       src="assets/thumbs/cnettableGUI.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/dataFiles/cnettableDataFile.csv">
+          <brief>
+            An small example file of the output of the application.
+          </brief>
+          <description>
+            This file contains the output of a run of cnettable on a very small 
+            control network. It shows all the expected data for the program and 
+            the format the data is in.
+          </description>
+        </dataFile>
+      </dataFiles>
+
+    </example>
+  </examples>
+</application>

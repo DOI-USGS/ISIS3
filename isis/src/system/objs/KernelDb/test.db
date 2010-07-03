@@ -1,0 +1,114 @@
+Object = LeapSecond
+  Group = Selection
+    File = ("base", "lsTest")
+  EndGroup
+EndObject
+
+Object = TargetAttitudeShape
+  Group = Selection
+    File = ("base", "pckIncorrect")
+  EndGroup
+  Group = Selection
+    File = ("base", "pckTest")
+  EndGroup
+EndObject
+
+Object = TargetPosition
+  Group = Selection
+    File = ("base", "spkTest1")
+    File = ("base", "spkTest2")
+  EndGroup
+EndObject
+
+Object = SpacecraftPointing
+  Group = Selection
+    Time = ("2005 JAN 01 01:00:00.000 TDB", "2006 JAN 01 01:00:00.000 TDB")
+    File = ("base", "ckIncorrect")
+    Type = Reconstructed
+  EndGroup
+  Group = Selection
+    Time = ("2005 JAN 01 01:00:00.000 TDB", "2006 JAN 01 01:00:00.000 TDB")
+    File = ("base", "ckTest")
+    Type = Reconstructed
+  EndGroup
+  
+  Group = Selection
+    Time = ("2004 JAN 01 01:00:00.000 TDB", "2005 JAN 01 01:00:00.000 TDB")
+    File = ("base", "ckIncorrect")
+    Type = Reconstructed
+  EndGroup
+EndObject
+
+Object = Instrument
+  Group = Selection
+    Match = ("TestGroup","TestKeyword","TestValue")
+    File  = ("base", "ikTest1")
+    File  = ("base", "ikTest2")
+    CameraVersion = "2"
+  EndGroup
+
+  Group = Selection
+    Match = ("TestGroup","TestKeyword","TestValue")
+    File  = ("base", "ikTest3")
+    File  = ("base", "ikTest4")
+    CameraVersion = "1"
+  EndGroup
+
+  Group = Selection
+    Match = ("TestGroup","TestKeyword","TestValue")
+    File  = ("base", "ikTest5")
+    File  = ("base", "ikTest6")
+    CameraVersion = "3"
+  EndGroup
+EndObject
+
+Object = SpacecraftClock
+  Group = Selection
+    File = ("base", "sclkTest")
+  EndGroup
+EndObject
+
+Object = SpacecraftPosition
+  Group = Selection
+    Time = ("2005 JAN 01 01:00:00.000 TDB", "2006 JAN 01 01:00:00.000 TDB")
+    File = ("base", "spkTest1")
+    File = ("base", "spkTest2")
+    Type = Reconstructed
+  EndGroup
+EndObject
+
+Object = Frame
+  Group = Selection
+    File = ("base", "fkTest")
+  EndGroup
+EndObject
+
+Object = InstrumentAddendum
+  Group = Selection
+    Match = ("TestGroup","TestKeyword","TestValue")
+    File  = ("base", "iakTest")
+  EndGroup
+  
+  Group = Selection
+    Match = ("TestGroup","TestKeyword","IncorrectValue")
+    File  = ("base", "iakIncorrect")
+  EndGroup
+  
+  Group = Selection
+    Match = ("TestGroup","IncorrectKeyword","TestValue")
+    File  = ("base", "iakIncorrect")
+  EndGroup
+  
+  Group = Selection
+    Match = ("IncorrectGroup","TestKeyword","TestValue")
+    File  = ("base", "iakIncorrect")
+  EndGroup
+EndObject
+
+Object = Dem
+  Group = Selection
+    Match = ("TestGroup","TestKeyword","TestValue")
+    File  = ("base", "demTest1")
+    File  = ("base", "demTest2")
+  EndGroup
+EndObject

@@ -1,0 +1,26 @@
+Unit Test for IssWACamera...
+Filename: W1525116136_1.cub
+CK Frame: 14082361
+
+For upper left corner ...
+Line, Sample: 0.5000, 0.5000
+Lat, Long:    19.8765, 301.2891
+WestLon:      58.7109
+
+For upper right corner ...
+Line, Sample: 0.5000, 512.5000
+Point not on planet!
+
+For lower left corner ...
+Line, Sample: 512.5000, 0.5000
+Lat, Long:    -4.9743, 356.8556
+WestLon:      3.1444
+
+For lower right corner ...
+Line, Sample: 512.5000, 512.5000
+Point not on planet!
+
+For center pixel position ...
+Line, Sample: 256.5000, 256.5000
+Lat, Long:    33.7641, 344.5575
+WestLon:      15.4425

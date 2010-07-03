@@ -1,0 +1,6 @@
+Group = MarsReconnaissanceOrbiter/Marci
+  Version = 1
+  Library = MarciCamera
+  Routine = MarciCameraPlugin
+EndGroup
+ 

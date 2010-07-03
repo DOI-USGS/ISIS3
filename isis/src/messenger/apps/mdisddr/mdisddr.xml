@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: mdisddr.xml,v 1.3 2009/09/08 21:35:48 kbecker Exp $ -->
+
+<application name="mdisddr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Creates a MESSENGER DDR PDS product from an MDIS image
+  </brief>
+  <description>
+      <p>
+        <b>mdisddr</b> will process a Messenger MDIS NAC or WAC image cube and 
+        export it to PDS/DDR format.  The resulting file will have a PDS 
+        compliant label and data object according to the description in SIS 
+        document, mdis_crd_rdrsis.pdf.  This file can be found in the PDS data 
+        archive CDROM under the <i>document</i> directory.  
+        <b>mdisddr</b> assumes the input file has been run through at a minimum
+        mdis2isis and spiceinit. This will ensure that proper values of the 
+        PRODUCT_ID and SOURCE_PRODUCT_ID are included in the output DDR 
+        label.
+      </p>
+      <p>
+          The Derived Data Record (DDR) data set consists of files that parallel 
+          CDRs in their directory structure. Each DDR has 5 layers of data 
+          containing geometric information (latitude, longitude, incidence angle, 
+          emission angle, phase angle) as 32-bit PC_REAL or IEEE_REAL. This 
+          information is derived from pixel spatial coordinates and associated SPICE 
+          files. A DDR label is attached and points to a single multiband image in 
+          the DDR.  x, y dimensions = 1024/(MESS:FPU_BIN * MESS:PIXELBIN)
+      </p>
+      <p>
+          The sequence of processing that creates a DDR is as follows. Gimbal 
+          positions are extracted from the gimbal C kernel. Using that and other 
+          SPICE kernels, the equipotential surface intercept is calculated for 
+          each spatial pixel. The angles of this pixel relative to the 
+          equatorial plane and reference longitude constitute the latitude and 
+          longitude of the pixel. For that latitude and longitude, solar 
+          incidence, emission, and phase angles are determined.  This is the 
+          order in which the bands are written to the output PDS image file.
+      </p>
+      </description>
+
+  <history>
+    <change name="Kris Becker" date="2009-06-24">
+        Original Version
+    </change>
+    <change name="Kris Becker" date="2009-09-08">
+        Added additional documentation.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Messenger</missionItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Input MESSENGER cube</brief>
+        <description>
+          Input filename of a MESSENGER cube file to be exported into a PDS DDR 
+          image.  The minimum requirement is that it must be initalized with 
+          SPICE (using the <B>spiceinit</B> application). 
+        </description>
+        <filter> *.cub </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+          <internalDefault>Derived</internalDefault>
+        <brief>Name of output file</brief>
+        <description>
+            <p>
+                 Output filename, by default the filename will be generated from the
+                input file contents using the PRODUCT_ID.   The user can specify the 
+                name if desired here, but to ensure consistancy with SIS 
+                specifications, the name of the file will be derived by the program.  
+                See the OPATH parameter for additional options of where the output 
+                file will be written.
+            </p>
+            <p>
+                The format of the derived filename will be of the form
+                DN0131770878M_DE_0.IMG where 'D' indicates it is a derived data 
+                product, the second letter will be 'N' for MDIS/NAC or 'W' for 
+                MDIS/WAC instrument;  the next ten characters will be numbers 
+                indicating the mission elasped time (MET) of the image;  the 
+                following character is the filter - 'M' for monochrome or the 
+                NAC, letters 'A' -'L' for WAC filters;  the two characters after 
+                the first underscore is always 'DE' indicating it is a derived 
+                data type;  and the last number after the second underscore is 
+                the version number.  The customary IMG extension is standard for
+                most all PDS image data products.
+            </p>
+        </description>
+      </parameter>
+
+      <parameter name="OPATH">
+        <type>string</type>
+          <internalDefault>Current</internalDefault>
+          <brief> Path to write output DDR file to when TO is not given</brief>
+          <description>
+            This parameter is provided to be used instead of the TO parameter if 
+            the filename convention is to be followed.  If TO is not given, then 
+            output filename is derived internally according to the description in 
+            the SIS and the output file is placed in the OPATH directory.  The 
+            default is to write it to the current directory.
+          </description>
+      </parameter>
+
+    </group>
+
+    <group name="Stretch">
+
+      <parameter name="TYPE">
+        <type>string</type>
+        <default><item>AUTOMATIC</item></default>
+        <brief>
+          Select the type of stretch
+        </brief>
+        <description>
+          This parameter is used to select one of two ways to stretch output
+          pixels.  The are AUTOMATIC or MANUAL.
+        </description>
+        <list>
+          <option value="AUTOMATIC">
+            <brief>Sets it to well defined angular ranges</brief>
+            <description>
+                This program computes geometric and photometric angles that have 
+                well defined/behaved ranges.  Selecting AUTOMATIC, in effect, 
+                will result in the range -360 to +360 no matter what the data 
+                ranges are in the file.
+            </description>
+            <exclusions>
+              <item>MIN</item> 
+              <item>MAX</item>
+            </exclusions>
+          </option>
+          <option value="MANUAL">
+            <brief>User defined stretch</brief>
+            <description>
+              Enables the user defined stretch for the output IMG.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MIN">
+          <type>double</type>
+          <brief>
+              Lower bound of the stretch
+          </brief>
+          <description>
+             Lower bound for the manually specified stretch.
+          </description>
+      </parameter>
+      <parameter name="MAX">
+          <type>double</type>
+          <brief>
+              Upper bound of the stretch
+          </brief>
+          <description>
+              Upper bound for the manually specified stretch.
+          </description>
+      </parameter>
+    </group>
+
+    <group name="Output Controls">
+
+        <parameter name="BITS">
+          <type>integer</type>
+          <default><item>32</item></default>
+          <brief>
+            Number of bits for the output DN
+          </brief>
+          <description>
+            The number of bits to compress the input data to. The valid data as
+            well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
+            compressed into this number of bits. The output data type will be
+            automaticity choosen using this value. A value of 8 will create 
+            unsigned byte output files. Values from 9 to 16 will create unsigned
+            word output files. Unused bits in the unsigned word output file will be
+            set to zero.
+          </description>
+          <minimum inclusive="yes">8</minimum>
+          <maximum inclusive="yes">32</maximum>
+        </parameter>
+      </group>
+  </groups>
+</application>
+

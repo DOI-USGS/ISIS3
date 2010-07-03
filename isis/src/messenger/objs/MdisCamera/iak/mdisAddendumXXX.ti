@@ -1,0 +1,248 @@
+Messenger/MDIS Instrument Kernel
+=============================================================
+
+This instrument kernel (I-kernel) contains parameters that
+describe the Messenger MDIS narrow angle (NAC) and wide angle (WAC)
+camera
+
+Version and Date
+-------------------------------------------------------------
+
+Version 2.0 -- July 31, 2005 -- Kris Becker, U.S. Geological Survey,
+    Flagstaff, AZ
+    Initial version.
+
+Version 3.0 -- April 24, 2007 -- Kris Becker, U.S. Geological Survey,
+    Updated for modifications/refinements to the framing kernel.  These
+    changes were introduced in msgr_v070.tf.
+
+Version 4.0 -- December 06, 2007 -- Kris Becker, U.S. Geological Survey,
+    Added initial camera distortion parameter for both NAC and WAC as
+    well as update the focal lengths.  This model is provided courtesy
+    of Scott Turner, JHU, on 2007/12/03.
+
+Version 5.0 -- January 17, 2008 - Kris Becker, U.S. Gelogical Survey
+    Turns out the MDIS WAC has different focal lengths for each
+    of the 12 filters.  The distortion model development was done
+    using filter 2, the clear filter.  The other filter focal lengths
+    are derived from the ratio of the published (SIS) length and
+    the new focal lenght of filter 2.
+
+$Id: mdisAddendumXXX.ti,v 1.3 2008/01/18 13:30:30 kbecker Exp $
+-------------------------------------------------------------
+
+The following is the definitions for the MDIS Narrow Angle Camera (MDIS-NAC).
+The platform ID is used to establish pointing times.  Some missions use have
+time offsets that are needed in order to correct for timing into the SPICE
+kernels.  Set the CK time tolerances used when searching for camera pointing
+attitude in the CK kernels.
+
+
+In general, the PLATFORM_ID is the NAIF code for the spacecraft instrument
+platform.  IN this case, it is analogous to the MSGR_SPACECRAFT frame id.
+
+SPK and CK time biases are used in cases where an offset exists in these
+kernels in relation to spacecraft clock time.  These times are expressed in
+seconds.  The CK_TIME_TOLERANCE is used as a direct argument in the NAIF
+routine (ckpg_c) that finds camera pointing.  This is expressed in spacecraft
+clock ticks.
+
+\begindata
+INS-236820_PLATFORM_ID        = -236000
+INS-236820_SPK_TIME_BIAS      = 0.0
+INS-236820_CK_TIME_BIAS       = 0.0
+INS-236820_CK_TIME_TOLERANCE  = 1
+
+\begintext
+
+The REFERENCE_FRAME and FRAME are used to specify the frames that translate
+from spacecraft instrument platform to the instrument orientation.  These
+are specific to each mission and are defined in the frame kernel (FK).
+For MESSENGER, these are defined in msgr_v???.tf.
+
+\begindata
+INS-236820_REFERENCE_FRAME    = 'MSGR_SPACECRAFT'
+INS-236820_FRAME              = 'MSGR_MDIS_NAC'
+
+
+\begintext
+Focal length and pixel pitch are specific to a particular instrument.  They
+are expressed in millimeters.
+
+The boresight samples and lines are used to specify the center of the detector
+device.  There are two methods to specify the center of the detector array.
+The BORESIGHT_SAMPLE and LINE and the detector mapping equations, ITRANSX and
+ITRANSY.  The BORESIGHT parameters are expressed in pixels.  For a 1024x1024
+array, the nominal center would be 512.5 sample and 512.5 line.  Pixel centers
+are exactly in the center of the pixel.  The upper left edge of the pixel is
+(0.5, 0.5).
+
+\begindata
+INS-236820_FOCAL_LENGTH       = 549.273
+INS-236820_PIXEL_PITCH        = 14.0E-3
+INS-236820_BORESIGHT_SAMPLE   = 512.5
+INS-236820_BORESIGHT_LINE     = 512.5
+
+
+\begintext
+The MDIS instruments both have a special binning mode that is performed in the
+FPGA unit.  According to the calibration document, the code to perform the
+binning of pixels does not perform as intended.  The values of the keywords
+INS-XXXXXX_FPUBIN_OFFSET_SAMPLE is mostly affected and can be modified to
+specify the first pixel in the sample element of the detector using this mode.
+The INS-XXXXXX_FPUBIN_OFFSET_LINE specifies the starting line of this offset.
+In addition, when this mode is used it sets the summing mode to 2 as every
+other sample and line is combined (averaged) to create the output image.
+
+\begindata
+INS-236820_FPUBIN_START_SAMPLE =  9.0
+INS-236820_FPUBIN_START_LINE   =  1.0
+
+\begintext
+The following provides a mapping of pixel location to detector coordinates
+(TRANSX, TRANSY), detector coordinates to pixels (ITRANSX, ITRANSY) and
+camera distortion parameters (OD_K).
+
+\begindata
+INS-236820_TRANSX  = ( 0.0, 14.0E-3,     0.0)
+INS-236820_TRANSY  = ( 0.0,  0.0,       14.0E-3)
+
+INS-236820_ITRANSS = ( 0.0, 71.42857143, 0.0)
+INS-236820_ITRANSL = ( 0.0,  0.0,       71.42857143)
+
+INS-236820_OD_K    = ( 0.0,  1.6902E-5, -5.4783E-7)
+
+\begintext
+This is the description of the Messenger MDIS wide angle camera (MDIS-WAC).
+It has twelve filters on a wheel, however, the transforms for pixel/detector
+coordinates are independantly defined to simplify maintainance of these
+values should the need arise during flight.
+
+\begindata
+INS-236800_PLATFORM_ID       = -236000
+INS-236800_SPK_TIME_BIAS     = 0.0
+INS-236800_CK_TIME_BIAS      = 0
+INS-236800_CK_TIME_TOLERANCE = 1
+
+INS-236800_REFERENCE_FRAME    = 'MSGR_SPACECRAFT'
+INS-236800_FRAME              = 'MSGR_MDIS_WAC'
+
+INS-236800_FOCAL_LENGTH       = 78.177
+INS-236800_PIXEL_PITCH        = 14.0E-3 
+INS-236800_BORESIGHT_SAMPLE   = 512.5
+INS-236800_BORESIGHT_LINE     = 512.5
+
+INS-236800_FPUBIN_START_SAMPLE =  9.0
+INS-236800_FPUBIN_START_LINE   =  1.0
+
+
+\begintext
+The following provides a mapping of pixel location to detector coordinates
+(TRANSX, TRANSY) and detector coordinates to pixels (ITRANSX, ITRANSY) and
+camera distortion parameters (OD_K).
+
+\begindata
+
+INS-236800_FRAME   = 'MSGR_MDIS_NADIR_SPACECRAFT'
+INS-236800_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236800_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236800_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236800_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236800_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236801_FRAME   = 'MSGR_MDIS_WAC_FILTER1'
+INS-236801_FOCAL_LENGTH =       78.232010
+INS-236801_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236801_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236801_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236801_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236801_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236802_FRAME   = 'MSGR_MDIS_WAC_FILTER2'
+INS-236802_FOCAL_LENGTH =       78.177000
+INS-236802_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236802_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236802_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236802_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236802_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236803_FRAME   = 'MSGR_MDIS_WAC_FILTER3'
+INS-236803_FOCAL_LENGTH =       78.000968
+INS-236803_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236803_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236803_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236803_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236803_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236804_FRAME   = 'MSGR_MDIS_WAC_FILTER4'
+INS-236804_FOCAL_LENGTH =       78.036975
+INS-236804_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236804_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236804_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236804_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236804_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236805_FRAME   = 'MSGR_MDIS_WAC_FILTER5'
+INS-236805_FOCAL_LENGTH =       78.122990
+INS-236805_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236805_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236805_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236805_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236805_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236806_FRAME   = 'MSGR_MDIS_WAC_FILTER6'
+INS-236806_FOCAL_LENGTH =       78.088984
+INS-236806_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236806_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236806_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236806_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236806_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236807_FRAME   = 'MSGR_MDIS_WAC_FILTER7'
+INS-236807_FOCAL_LENGTH =       78.232010
+INS-236807_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236807_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236807_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236807_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236807_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236808_FRAME   = 'MSGR_MDIS_WAC_FILTER8'
+INS-236808_FOCAL_LENGTH =       78.463051
+INS-236808_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236808_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236808_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236808_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236808_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236809_FRAME   = 'MSGR_MDIS_WAC_FILTER9'
+INS-236809_FOCAL_LENGTH =       78.524062
+INS-236809_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236809_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236809_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236809_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236809_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236810_FRAME   = 'MSGR_MDIS_WAC_FILTER10'
+INS-236810_FOCAL_LENGTH =       78.404041
+INS-236810_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236810_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236810_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236810_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236810_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+
+INS-236811_FRAME   = 'MSGR_MDIS_WAC_FILTER11'
+INS-236811_FOCAL_LENGTH =       78.549067
+INS-236811_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236811_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236811_ITRANSS = ( 0.0, 71.42857143 , 0.0)
+INS-236811_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236811_OD_K    = ( 0.0   1.6520E-5,  -1.2035E-7)
+
+INS-236812_FRAME   = 'MSGR_MDIS_WAC_FILTER12'
+INS-236812_FOCAL_LENGTH =       78.322026
+INS-236812_TRANSX  = ( 0.0, 14.0E-3,      0.0)
+INS-236812_TRANSY  = ( 0.0,  0.0,        14.0E-3)
+INS-236812_ITRANSS = ( 0.0, 71.42857143,  0.0)
+INS-236812_ITRANSL = ( 0.0,  0.0,        71.42857143)
+INS-236812_OD_K    = ( 0.0,  1.6520E-5,  -1.2035E-7)
+

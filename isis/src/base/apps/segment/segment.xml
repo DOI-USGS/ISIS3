@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="segment">  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief> Divides a cube object into multiple output cubes in the line direction. </brief>
+
+  <description>
+    This program takes an input cube and divides it into multiple output cubes in the line direction.
+    The total number of lines in these output cubes, as well as the number of lines these output cubes overlap, are be determined by user given parameters.
+    If the overlap parameter is greater than the total line number parameter, then a User Errror will be thrown.
+    If the final segment does not end on the same line that the input cube ends, then the final segment will be smaller than the other segments.
+    In other words, the final segment will simply be created to the end of the original cube, not being filled with null lines.
+    <p><b>Note:</b> The output cubes (which will here on be referred to as segments) will be created in the naming form of (InputCubeName).segment(#).cub
+    <br>i.e.  peaks.segment1.cub, peaks.segment2.cub, peaks.segment3.cub, peaks.segment4.cub, etc</br></p>
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Christopher Austin" date="2007-10-30">
+      Original version
+    </change>
+
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube file.
+        </brief>
+        <description>
+          Input cube to be segmented.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+     <group name="Output Parameters" >
+
+      <parameter name="NL">
+          <type>integer</type>
+	  <brief>Number of Lines for each new cube segment</brief>
+	  <description>
+	      Specifies the total number of lines each segment will contain.
+          This parameter must always be specified.
+	  </description>
+      </parameter>
+
+      <parameter name="OVERLAP">
+          <type>integer</type>
+	  <brief>Number of Overlapping Lines for each new cube</brief>
+	  <description>
+	      Specifies the total number of lines of overlap each segment will have with the previous segment as well as the next segment.
+          This parameter must always be specified.
+	  </description>
+      </parameter>
+
+    </group>
+  </groups>
+
+  <examples>
+      <example>
+        <brief>Segmented Peaks</brief>
+        <description>
+            This example shows how segment works on peaks.cub, a cube of Flagstaff's peaks.  It also demonstrates the automatic resizing of the final segment.
+        </description>
+
+        <terminalInterface>
+            <commandLine>FROM=peaks.cub NL=531 OVERLAP=88</commandLine>
+            <description>
+                Creates segments from peaks.cub which have a total of 531 lines each, and overlap by 88 lines.
+            </description>
+        </terminalInterface>
+
+      <inputImages>
+          <image src="assets/image/peaks.jpg" width="500" height="500">
+          <brief>The original image</brief>
+          <description> 
+              This is the input image peaks.cub
+          </description>
+          <thumbnail caption="peaks.cub" src="assets/image/peaks.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/peaks.segment1.jpg" width="500" height="500">
+          <brief>The first segment.</brief>
+          <description> 
+              This is the first segment created from peaks.cub
+              <p>It has the same sample width and band depth as peaks.cub, and has a total number of lines equal to the NL parameter, which is 531 in this example.</p>
+          </description>
+          <thumbnail caption="peaks.segment1.cub" src="assets/image/peaks.segment1.jpg" width="200" height="200"/>
+        </image>
+        <image src="assets/image/peaks.segment2.jpg" width="500" height="500">
+          <brief>The second segment.</brief>
+          <description> 
+              This is the second segment created from peaks.cub
+              <p>Like peaks.segment1.cub, it has 531 lines and the same sample width and band depth as peaks.cub.
+              The first 88 lines of this cube (peaks.segment2.cub) are identical to the last 88 lines of its previous cube (peaks.segment1.cub).
+              In the same manner, the last 88 lines of peaks.segment2.cub are identical to the first 88 lines of peaks.segment3.cub</p>
+          </description>
+          <thumbnail caption="peaks.segment2.cub" src="assets/image/peaks.segment2.jpg" width="200" height="200"/>
+        </image>
+        <image src="assets/image/peaks.segment3.jpg" width="500" height="500">
+          <brief>The third segment.</brief>
+          <description> 
+              This is the third segment created from peaks.cub
+              <p>Notice how this segment is smaller than the other 2 segements.  This is due to the fact that it reached the end of peaks.cub, nevertheless, it still has the same
+              sample width and band depth as peaks.cub
+              <br>This shortening of the segment will only happen in the final segment created from the input cube.</br></p>
+          </description>
+          <thumbnail caption="peaks.segment3.cub" src="assets/image/peaks.segment3.jpg" width="200" height="200"/>
+        </image>
+      </outputImages>
+
+
+      </example>
+  </examples>
+
+</application>

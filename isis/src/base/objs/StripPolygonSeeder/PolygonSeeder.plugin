@@ -1,0 +1,4 @@
+Group = Strip
+  Library = StripPolygonSeeder
+  Routine = StripPolygonSeederPlugin
+End_Group

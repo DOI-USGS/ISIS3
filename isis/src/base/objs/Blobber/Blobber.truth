@@ -1,0 +1,24 @@
+*** Blobber unitTest ***
+
+File Source: $base/testData/blobTruth.cub
+
+** Test Cube Class access...
+Blob Name:           Blobber
+Object Name:         HiRISE Calibration Ancillary
+Field Name:          DarkPixels
+Number Blob Lines:   168
+Number Blob Samples: 16
+Total Pixels:        2688
+
+** Blob Values...
+Pixel[0][0] = 1008
+Pixel[84][8] = 1115
+Pixel[167][15] = 1259
+
+** Test Blobber direct access (via filename)...
+
+** Test Blobber(Blobber) constructor...
+
+** Test Blobber copy assignment (constructor)...
+
+** Test Blobber deep copy...

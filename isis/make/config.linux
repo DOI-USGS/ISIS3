@@ -1,0 +1,25 @@
+#---------------------------------------------------------------------------
+#  Determine Linux Architecture.  Ensure the host architecture is set
+#  and then determine machine type
+#---------------------------------------------------------------------------
+HOST_ARCH ?= $(shell uname -s)
+HOST_MACH := $(shell uname -m)
+NODE_NAME := $(shell uname -n)
+
+#  This allows us to continue building on Suse 9 systems.  It makes some
+#  assumptions.  See the file $ISISROOT/make/config.linux-Suse9.
+ifeq ($(VENDOR),suse)
+  VERSION := $(basename $(shell fgrep -h -w VERSION /etc/SuSE-release | cut -d ' ' -f 3) )
+endif
+
+ifeq ($(HOST_ARCH),Linux)
+  ifeq ($(HOST_MACH),x86_64)
+    include $(ISISROOT)/make/config.linux-x86_64
+  else
+    ifneq ($(VERSION),9)
+      include $(ISISROOT)/make/config.linux-x86_32
+    else
+      include $(ISISROOT)/make/config.linux-Suse9
+    endif
+  endif
+endif

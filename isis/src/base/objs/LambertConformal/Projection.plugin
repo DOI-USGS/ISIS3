@@ -1,0 +1,9 @@
+Group = LambertConformal
+  Library = LambertConformal
+  Routine = LambertConformalPlugin
+  Keyword = CenterLongitude
+  Keyword = CenterLatitude
+  Keyword = FirstStandardParallel
+  Keyword = SecondStandardParallel
+EndGroup
+

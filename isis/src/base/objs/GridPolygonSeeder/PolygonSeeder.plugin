@@ -1,0 +1,4 @@
+Group = Grid
+  Library = GridPolygonSeeder
+  Routine = GridPolygonSeederPlugin
+End_Group

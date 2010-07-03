@@ -1,0 +1,33 @@
+UNIT TEST for Isotropic1 atmospheric function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name = Lambert
+  End_Group
+End_Object
+
+Object = AtmosphericModel
+  Group = Algorithm
+    Name = Isotropic1
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 (standard conditions) ...
+Pstd = 0
+Trans = 1
+Trans0 = 1
+Sbar = 0
+
+Test phase=86.7226722, incidence=51.7002388, emission=38.9414439 ...
+Pstd = 0.0788489
+Trans = 0.703373
+Trans0 = 0.444706
+Sbar = 0.165084
+
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Pstd = 0.130281
+Trans = 0.1462
+Trans0 = 5.19719e-07
+Sbar = 0.165084
+

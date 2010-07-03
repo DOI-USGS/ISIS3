@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="vikcal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Radiometric correction of VIKING Planetary images
+  </brief>
+
+  <description>
+    VIKCAL performs radiometric corrections to planetary images acquired by
+    the Viking orbiter cameras. VIKCAL performs a radiometric correction in
+    two steps. First, VIKCAL corrects for the varying response of the
+    vidicon across the field of view of the camera.  Multiplicative and
+    additive correction coefficients, as a function of line and sample
+    position, are applied to an image array to produce the results of an
+    'ideal' camera.  VIKCAL converts the image data to radiance factor
+    values.  The radiance factor is defined as the ratio of the observed
+    radiance and the radiance of a white screen, normal to the incident rays
+    of the Sun.
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>viknosalt</item>
+      <item>viknopepper</item>
+      <item>vikfixtrx</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2005-05-18">
+      Original version - Converted from Isis2
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-15">
+      Fixed problems caused by the split of the viking data area
+    </change>
+    <change name="Steven Lambright" date="2007-08-21">
+      Fixed poutput pvl to not have spaces in the keyword names
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Christopher Austin" date="2010-06-16">
+      Fixed pvl comments
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube file name
+        </brief>
+        <description>
+          The cube to be calibrated.  
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the calibrated data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+</application>

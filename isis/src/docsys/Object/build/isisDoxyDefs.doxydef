@@ -1,0 +1,579 @@
+// this file should not be shown in doxygen output if possible
+
+/**
+ * \file
+ * This file contains internal configuration settings
+ * for the %Isis API and Programmer documentation.
+ */
+
+
+/**
+ * \namespace Isis
+ *
+ * Namespace for all %Isis base objects
+ *
+ */
+/**
+ * \namespace Isis::Message
+ *
+ * Namespace containing standardized %Isis error messages
+ *
+ * IsisMessage is not a class. It only contains a namespace which consists of
+ * all the standardized Isis error messages. These messages should be used 
+ * when applicable instead of constructing the message string inside the 
+ * object or application.
+ *
+ */
+/**
+ * \namespace Galileo
+ *
+ * Namespace for all %Isis Galileo mission objects
+ *
+ */
+/**
+ * \namespace Isis::Mgs
+ *
+ * Namespace for all %Isis Mars Global Surveyor mission objects
+ *
+ */
+/**
+ * \namespace Isis::Mro
+ *
+ * Namespace for all %Isis Mars Reconnaissance Orbiter mission objects
+ *
+ */
+/**
+ * \namespace Isis::Odyssey
+ *
+ * Namespace for all %Isis Mars Odyssey mission objects
+ *
+ */
+
+/**
+ * \namespace Isis::Lo
+ *
+ * Namespace for all %Isis Lunar Orbiter mission objects
+ *
+ */
+/**
+ * \namespace Isis::Lro
+ *
+ * Namespace for all %Isis Lunar Reconnaissance Orbiter mission objects
+ *
+ */
+
+
+/**
+ * \namespace Qisis
+ *
+ * Namespace for the %Isis visualazation objects
+ *
+ */
+/**
+ * \namespace std
+ *
+ * Namespace for the standard library
+ *
+ */
+
+
+/** \internal
+ * isisDoxyDefs.doxydef
+ *
+ * This file contains doxygen commands for setting up
+ * global documentation options shared by all %Isis
+ * Objects, such as module/category definitions, main
+ * page content, etc.
+ *
+ * @author deborah lee soltesz 2004-11-03
+ * @history  2005-03-07 deborah lee soltesz - Completed main page content.
+ * @history  2005-03-07 deborah lee soltesz - Completed and refine module descriptions.
+ * @history  2006-08-10 deborah lee soltesz - Added "Radiometric and Photometric Corrections" and alphabetized mission-specific categories
+ * @history  2008-05-19 steven lambright - Fixed Mission End Group Tag
+ * @history  2008-05-19 steven lambright - Fixed Bad Namespace Documentation
+ *
+ * @todo Develop two different pages for API vs. Programmer
+ *       documentation. 2004-11-03
+ * @todo Make "std" namespace invisible... probably not gonna happen
+ */
+
+// BASE
+
+    // GEOMETRY
+    /**
+     * \defgroup  Geometry                     Geometry
+     *
+     * The Objects in this module are used in the performance of
+     * geometric transformations of a cube.
+     */
+
+    // HIGH LEVEL CUBE IO
+    /**
+     * \defgroup  HighLevelCubeIO              High Level Cube I/O
+     *
+     * The Objects in this module are used to read and write cube data.
+     *
+     */
+
+    // LOW LEVEL CUBE IO
+    /**
+     * \defgroup  LowLevelCubeIO               Low Level Cube I/O
+     *
+     * The Objects in this module are used to read and write cube data.
+     *
+     */
+
+    // MAP PROJECTION
+    /**
+     * \defgroup  MapProjection                Map Projection
+     *
+     * The Objects in this module are used to set, manipulate, and get
+     * projection information for a cube.
+     *
+     */
+
+    // PARSING
+    /**
+     * \defgroup  Parsing                      Parsing
+     *
+     * The Objects in this module provide a variety of text parsing functionality
+     * for reading, manipulating, and internalizing file lists, dates, PVL format,
+     * and other textual information.
+     *
+     */
+
+    // SPICE
+    /**
+     * \defgroup  SpiceInstrumentsAndCameras   Spice, Instruments, and Cameras
+     *
+     * The Objects in this module are used to read and manipulate Spice data.
+     *
+     */
+
+    // STATS
+    /**
+     * \defgroup  Statistics                   Statistics
+     *
+     * The Objects in this module are used to generate a variety of statistics
+     * from cube data.
+     *
+     */
+
+    // APPLICATION INTERFACE
+    /**
+     * \defgroup  ApplicationInterface                Application Interface
+     *
+     * Objects for managing and displaying the graphical and command line user
+     * interfaces of non-interactive Isis Applications.
+     *
+     */
+
+    // VISUALIZATION TOOLS
+    /**
+     * \defgroup  VisualizationTools                Visualization Tools
+     *
+     * Objects for building graphical user interfaces and other aspects of
+     * interactive Isis Visualization Applications.
+     *
+     */
+
+    // UI
+    /**
+     * \defgroup  UserInterface                User Interface
+     *
+     * Objects for managing and displaying the graphical and command line user
+     * interfaces.
+     *
+     * @deprecated Objects in this category should be moved to the ApplicationInteface
+     *             group
+     *
+     */
+
+    // UTILITY
+    /**
+     * \defgroup  Utility                      Utility
+     *
+     * Objects providing general functionality.
+     *
+     */
+
+    // SYSTEM
+    /**
+     * \defgroup  System                       System
+     *
+     * The Objects in this module manage, manipulate, or otherwise
+     * deal with the %Isis build/run environment.
+     *
+     */
+
+    // MATH
+    /**
+     * \defgroup  Math                         Math
+     *
+     * The Objects in this module perform math on cube data.
+     *
+     */
+
+    // RADIOMETRIC AND PHOTOMETRIC CORRECTION
+    /**
+     * \defgroup  RadiometricAndPhotometricCorrection Radiometric And Photometric Correction
+     *
+     * The Objects in this module perform radiometric correction, photometric modelling, and photmetric correction.
+     *
+     */
+
+
+   // PATTERN MATCHING
+   /**
+    * \defgroup PatternMatching                Pattern Matching
+    *
+    * The Objects in this module can be used to auto-correlate areas
+    * between images.
+    */
+
+   // CONTROL NETWORKS
+   /**
+    * \defgroup ControlNetworks               Control Networks
+    *
+    * The Objects in this module are used to define, record, and edit match points
+    * and control points between images.
+    */
+
+// MISSIONS
+
+    /**
+     * \defgroup Mission Mission Specific Objects
+     *
+     * These modules contain Objects specific to various mission data.
+     *
+     * @{
+     */
+
+          // CASSINI
+          /**
+           * \defgroup  Cassini                       Cassini
+           *
+           * These objects provide functionality for manipulating data from the
+           * Cassini-Huygens Mission to Saturn and its moons. Four NASA spacecraft
+           * have been sent to explore Saturn. Pioneer 11 was first to fly past
+           * Saturn in 1979. Voyager 1 flew past a year later, followed by its twin,
+           * Voyager 2, in 1981. The Cassini spacecraft is the first to explore the
+           * Saturn system of rings and moons from orbit. The European Space Agency's
+           * Huygens Probe dove into Titan's thick atmosphere in January 2005. The
+           * sophisticated instruments on both spacecraft are providing scientists with
+           * vital data and the best views ever of this mysterious, vast region of our
+           * solar system.
+           *
+           * Mission site: http://saturn.jpl.nasa.gov/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Cassini/
+           *
+           */
+
+          // CLEMENTINE
+          /**
+           * \defgroup  Clementine                    Clementine
+           *
+           * These objects provide functionality for manipulating data from the
+           * Clemtine mission to the Earth's Moon. Clementine was a joint project
+           * between the Strategic Defense Initiative Organization and NASA. The
+           * objective of the mission was to test sensors and spacecraft components
+           * under extended exposure to the space environment and to make scientific
+           * observations of the Moon and the near-Earth asteroid 1620 Geographos.
+           * The observations included imaging at various wavelengths including
+           * ultraviolet and infrared, laser ranging altimetry, and charged particle
+           * measurements. These observations were originally for the purposes of
+           * assessing the surface mineralogy of the Moon and Geographos, obtaining
+           * lunar altimetry from 60N to 60S latitude, and determining the size, shape,
+           * rotational characteristics, surface properties, and cratering statistics of
+           * Geographos.
+           *
+           * Mission site: http://nssdc.gsfc.nasa.gov/planetary/clementine.html
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Clementine/
+           */
+
+          // GALILEO
+          /**
+           * \defgroup  Galileo                       Galileo
+           *
+           * These objects provide functionality for manipulating data from the
+           * %Galileo mission to Jupiter. Launched in 1989, he %Galileo mission consisted of two spacecraft:
+           * an orbiter and an atmospheric probe. During the flybys of Venus and the Earth in transit to Jupiter,
+           * %Galileo scientists took the opportunity to study these two planets as well as
+           * the Moon, making some unprecedented observations as a result. In addition,
+           * following each Earth flyby, %Galileo made excursions as far out in the solar
+           * system as the asteroid belt, enabling scientists to make the first close-up
+           * studies of two asteroids, Gaspra and Ida. %Galileo scientists were fortunate to
+           * be the only ones with a direct view of the Comet Shoemaker-Levy 9 fragment impacts
+           * on Jupiter. The primary mission involved sending an atmospheric probe into Jupiter's
+           * atmosphere and studying Jupiter, its satellites, and its magnetosphere with the orbiter.
+           * In 2003, the orbiter was deliberately destroyed by plunging it into Jupiter's atmophere.
+           *
+           * Mission site: http://voyager.jpl.nasa.gov/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Galileo/
+           */
+
+          // MARINER
+          /**
+           * \defgroup  Mariner                       Mariner
+           *
+           * These objects provide functionality for manipulating data from the
+           * Mariner missions.  From 1962 to 1973, ten planetary spacecraft were
+           * launched under the name Mariner, targeting our neighbors, the inner
+           * planets Mercury, Venus, and Mars. There were six missions, most missions
+           * launching a pair of Mariner spacecrafts a few months apart. Of the ten
+           * launched Magellan spacecrafts, seven were successful in their missions,
+           * and three were lost due to launch vehicle failures.
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Mariner/
+           *
+           */
+
+          // MARS EXPLORATION ROVERS
+          /**
+           * \defgroup  MarsExplorationRover          Mars Exploration Rover
+           *
+           * These objects provide functionality for manipulating data from the
+           * 2003 Mars Exploration Rover mission. The Mars Exploration Rover
+           * mission launched in the summer of 2003. Rover Spirit landed 3 January
+           * 2004, and Rover Opportunity landed 24 January 2004. Both rovers have
+           * been very successful and are have had their missions extended beyond
+           * the initial three month mission plan.
+           *
+           * MER Athena science package site: http://athena.cornell.edu/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Rovers/
+           *
+           */
+
+          // MGS
+          /**
+           * \defgroup  MarsGlobalSurveyor            Mars Global Surveyor
+           *
+           * These objects provide functionality for manipulating data from the
+           * Mars Global Surveyor mission.
+           *
+           * Mission site: http://mars.jpl.nasa.gov/mgs/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/MarsGlobalSurveyor/
+           *
+           */
+
+          // MARS ODYSSEY
+          /**
+           * \defgroup  MarsOdyssey                   Mars Odyssey
+           *
+           * These objects provide functionality for manipulating data from the
+           * 2001 Mars Odyssey mission. Mars Odyssey is part of NASA's Mars Exploration
+           * Program, a long-term effort of robotic exploration of the red planet.
+           * Odyssey's primary science mission took place February 2002 through August 2004,
+           * and the orbiter began its extended mission on August 24, 2004. For the first time,
+           * the mission mapped the amount and distribution of chemical elements and minerals
+           * that make up the martian surface. The spacecraft globally mapped many elements,
+           * and the maps of hydrogen distribution led scientists to discover vast amounts of
+           * water ice in the polar regions burried just beneath the surface. Odyssey recorded
+           * the radiation environment in low Mars orbit to determine the radiation-related risk
+           * to any future human explorers who may one day go to Mars. All of these objectives
+           * support the four science goals of the Mars Exploration Program.
+           *
+           * Mission site: http://mars.jpl.nasa.gov/odyssey/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/More/#Odyssey
+           *
+           */
+
+
+          // MRO
+          /**
+           * \defgroup  MarsReconnaissanceOrbiter     Mars Reconnaissance Orbiter
+           *
+           * These objects provide functionality for manipulating data from the
+           * Mars Reconnaissance Orbiter mission.Mars Reconnaissance Orbiter,
+           * scheduled for launch in 2005, is on a search for evidence that water
+           * persisted on the surface of Mars for a long period of time. While other
+           * Mars missions have shown that water flowed across the surface in Mars'
+           * history, it remains a mystery whether water was ever around long enough
+           * to provide a habitat for life.
+           *
+           * Mission site: http://mars3.jpl.nasa.gov/mro/
+           *
+           */
+
+          // MESSENGER
+          /**
+           * \defgroup  MESSENGER                     Mercury MESSENGER
+           *
+           * These objects provide functionality for manipulating data from the
+           * MESSENGER Mission to Mercury. MESSENGER launched from Cape Canaveral
+           * Air Force Station, Fla., on August 3, 2004. It will fly past Venus
+           * twice, in October 2006 and June 2007.
+           * Three Mercury flybys, each followed about two months later by a course
+           * correction maneuver, put MESSENGER in position to enter Mercury orbit
+           * in March 2011. During the flybys MESSENGER will map nearly the entire
+           * planet in color, image most of the areas unseen by Mariner 10, and
+           * measure the composition of the surface, atmosphere and magnetosphere.
+           * It will be the first new data from Mercury in more than 30 years.
+           *
+           * Mission site: http://messenger.jhuapl.edu/
+           *
+           */
+
+          // VIKING
+          /**
+           * \defgroup  Viking                        Viking
+           *
+           * These objects provide functionality for manipulating data from the Mars
+           * Viking orbiters. Viking Mission to Mars was composed of two
+           * spacecraft, Viking 1 and Viking 2, each consisting of an orbiter and
+           * a lander. The primary mission objectives were to obtain high resolution
+           * images of the Martian surface, characterize the structure and composition
+           * of the atmosphere and surface, and search for evidence of life.
+           *
+           * Mission site: http://voyager.jpl.nasa.gov/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Viking/
+           */
+
+          // VOYAGER
+          /**
+           * \defgroup  Voyager                       Voyager
+           *
+           * These objects provide functionality for manipulating data from the
+           * Voyager mission to the outer planets. The primary mission was the exploration of Jupiter
+           * and Saturn. After making a string of discoveries there -- such as active
+           * volcanoes on Jupiter's moon Io and intricacies of Saturn's rings -- the
+           * mission was extended. Voyager 2 went on to explore Uranus and Neptune, and
+           * is still the only spacecraft to have visited those outer planets. The
+           * current mission, the Voyager Interstellar Mission (VIM) is exploring the outermost
+           * edge of the solar system and beyond.
+           *
+           * Mission site: http://voyager.jpl.nasa.gov/
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/Voyager/
+           *
+           */
+
+
+
+          // LUNAR ORBITER 
+          /**
+           * \defgroup  LunarOrbiter                      Lunar Orbiter 
+           *
+           * These objects provide functionality for manipulating data from the
+           * Lunar Orbiter missions of the 1960's.
+           *
+           * Mission summary: http://www.lpi.usra.edu/expmoon/orbiter/orbiter.html 
+           *
+           * USGS Astrogeology: http://astrogeology.usgs.gov/Missions/LunarOrbiter/
+           *
+           */
+
+          // LUNAR RECONNAISSANCE ORBITER
+          /**
+           * \defgroup  LunarReconnaissance Orbiter       Lunar Reconnaissance Orbiter
+           *
+           * These objects provide functionality for manipulating data from the
+           * Lunar Reconnaissance Orbiter (2008).
+           *
+           * Mission site: http://lunar.gsfc.nasa.gov/ 
+           *
+           */
+
+
+
+
+     /* @}  end of Missions group */
+
+
+// MAIN PAGE - content of the table-of-contents page for the %Isis 3.0 Object Documentation
+//  TODO: look at using doxy conditional processing to have different main page for
+//        API vs. Programmer Docs
+
+    /**
+     * \mainpage Isis 3.0 Object Documentation
+     *
+     * The %Isis 3.0 Developers' (API) and Programmers' References are provided on this
+     * site for developers to access information about the %Isis Objects that are the
+     * building blocks of the %Isis software package. %Isis 3.0 is written in the C++
+     * programming language. %Isis 3.0 Objects are in $ISISROOT/src/[module]/objs,
+     * where [module] is a subdirectory containing related Objects.
+     *
+     * The Developers' Reference, also called the Application Program Interface (API),
+     * is designed for %Isis application developers. Only information of use and interest
+     * to an application developer is provided, such as public and protected class members,
+     * deprecated items, known bugs, etc.
+     *
+     * The Programmers' Reference is designed primarily for our in-house %Isis programming team who
+     * develop and maintain %Isis Objects. Information provided in the Programmers' Reference includes
+     * internal documentation, to-do lists, private members, etc.
+     *
+     * Currently, Object documentation is under development as we move to a new documentation system
+     * and old documentation is converted to the new system, content is reviewed and updated, and
+     * new documentation is completed. The References will be updated frequently on the
+     * <a href="http://isis.astrogeology.usgs.gov" target="_top">%Isis 3.0 website</a> - access them via the
+     * %Isis 3.0 Technical Docs link on the home page.
+     *
+     * \section section1 Objects
+     * <table align="center">
+     *   <tr valign="top">
+     *     <td width="50%">
+     *       <h3>General</h3>
+     *       <p><a href="modules.html">Modules: Classes by Category</a></p>
+     *       <p><a href="classes.html">Alphabetical List of Classes</a></p>
+     *       <p><a href="whatsnew.html">What's New</a></p>
+     *     </td>
+     *     <td width="50%">
+     *       <h3>File I/O</h3>
+     *       <p><a href="group___high_level_cube_i_o.html">High Level Cube I/O</a></p>
+     *       <p><a href="group___low_level_cube_i_o.html">Low Level Cube I/O</a></p>
+     *       <p><a href="group___parsing.html">Parsing</a></p>
+     *     </td>
+     *   </tr>
+     *   <tr valign="top">
+     *     <td>
+     *       <h3>Math</h3>
+     *       <p><a href="group___math.html">Math</a></p>
+     *       <p><a href="group___statistics.html">Statistics</a></p>
+     *       <p><a href="group___geometry.html">Geometry</a></p>
+     *     </td>
+     *     <td>
+     *       <h3>Cartography</h3>
+     *       <p><a href="group___map_projection.html">Map Projection</a></p>
+     *       <p><a href="group___spice_instruments_and_cameras.html">Spice, Instruments, and Cameras</a></p>
+     *       <p><a href="group___control_networks.html">Control Networks</a></p>
+     *     </td>
+     *   </tr>
+     *   <tr valign="top">
+     *     <td>
+     *       <h3>Missions</h3>
+     *       <p>
+     *         <a href="group___mars_reconnaissance_orbiter.html">Mars Reconnaissance Orbiter</a>
+     *       </p>
+     *       <p>
+     *         <a href="group___mars_exploration_rover.html">Mars Exploration Rover</a>
+     *       </p>
+     *       <p>
+     *         <a href="group___cassini.html">Cassini-Huygens</a>
+     *       </p>
+     *       <p>
+     *         <a href="group___mission.html">All Mission Specific Objects</a>
+     *       </p>
+     *     </td>
+     *     <td>
+     *       <h3>Miscellaneous</h3>
+     *       <p><a href="group___radiometric_and_photometric_correction.html">Radiometric And Photometric Correction</a></p>
+     *       <p><a href="group___pattern_matching.html">Pattern Matching</a></p>
+     *       <p><a href="group___visualization_tools.html">Visualization Tools</a></p>
+     *       <p><a href="group___application_interface.html">Application Interface</a></p>
+     *       <p><a href="group___utility.html">Utility</a></p>
+     *       <p><a href="group___system.html">System</a></p>
+     *     </td>
+     *   </tr>
+     * </table>
+     */
+
+
+
+

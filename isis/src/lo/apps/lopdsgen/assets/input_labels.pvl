@@ -1,0 +1,112 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 8263
+      Lines   = 7840
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    TargetName               = Moon
+    SpacecraftName           = "Lunar Orbiter 3"
+    StartTime                = 1967-02-22T05:24:28.800
+    InstrumentId             = "High Resolution Camera"
+    FrameNumber              = 3200
+    FiducialCoordinateMicron = 50 <um>
+    FiducialID               = (1a, 2a, 46b, 93b, 94b, 26b, 70b, 27b, 47b,
+                                69b, 98b, 145b, 146b, 189b, 190b, 120b, 166b,
+                                123b, 165b, 99b, 192b, 193b, 245b, 246b, 285b,
+                                286b, 220b, 264b, 269b, 219b)
+    FiducialSamples          = (32093.000, 32096.000, 27242.000, 21970.000,
+                                21976.000, 29433.000, 24604.000, 29209.000,
+                                27018.000, 24604.000, 21537.000, 16271.000,
+                                16276.000, 11451.000, 11451.000, 19122.000,
+                                14082.000, 18681.000, 14078.000, 21312.000,
+                                11230.000, 11015.000, 5313.000, 5309.000,
+                                929.000, 927.000, 8160.000, 3338.000, 2679.000,
+                                8163.000) <pixels>
+    FiducialLines            = (8497.000, 579.000, 571.000, 8481.000, 565.000,
+                                579.000, 571.000, 8488.000, 8487.000, 8486.000,
+                                565.000, 8476.000, 560.000, 8475.000, 555.000,
+                                566.000, 558.000, 8476.000, 8476.000, 8482.000,
+                                557.000, 8474.000, 8471.000, 564.000, 8476.000,
+                                561.000, 557.000, 560.000, 8472.000,
+                                8474.000) <pixels>
+    FiducialXCoordinates     = (-108.396, -108.339, -74.548, -38.026, -37.964,
+                                -89.786, -56.272, -88.373, -73.101, -56.319,
+                                -34.929, 1.610, 1.642, 35.174, 35.198, -18.178,
+                                16.913, -15.149, 16.863, -33.441, 36.710,
+                                38.211, 77.875, 77.889, 108.365, 108.352,
+                                58.079, 91.579, 96.167, 58.045) <mm>
+    FiducialYCoordinates     = (27.470, -27.488, -27.493, 27.496, -27.490,
+                                -27.490, -27.489, 27.488, 27.498, 27.493,
+                                -27.490, 27.500, -27.492, 27.492, -27.486,
+                                -27.499, -27.483, 27.490, 27.499, 27.499,
+                                -27.493, 27.488, 27.484, -27.490, 27.480,
+                                -27.481, -27.487, -27.490, 27.480, 27.492) <mm>
+    SubFrame                 = 780
+  End_Group
+
+  Group = Archive
+    ProductId        = 3200H
+    ScanCreationDate = 2003-06-18T10:11:57
+    ScanResolution   = 25um
+    OutputMicron     = 50um
+    ScanDensityRange = 0.5_TO_3.0
+    RecordBytes      = 512
+    FileRecords      = 201733
+    LabelRecords     = 28
+  End_Group
+
+  Group = BandBin
+    FilterName   = none
+    Center       = 1.000
+    OriginalBand = 1
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -533001
+    CameraVersion = 1
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 11800
+    AlphaLines          = 8750
+    AlphaStartingSample = 3050.5
+    AlphaStartingLine   = 600.5
+    AlphaEndingSample   = 11313.5
+    AlphaEndingLine     = 8440.5
+    BetaSamples         = 8263
+    BetaLines           = 7840
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 66110190
+  Bytes     = 1593
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 66093057
+  Bytes     = 17133
+End_Object
+End

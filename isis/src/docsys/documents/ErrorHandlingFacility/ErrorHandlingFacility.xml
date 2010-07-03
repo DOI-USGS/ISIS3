@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+
+
+<h2><a name="Introduction">Introduction</a></h2>
+<p>
+Errors will occur when running Isis applications.  For example, the user may have entered invalid parameters 
+or <abbr title="Input/Output">I/O</abbr> to a file may have failed due to insufficient disk space.  This document discusses the various aspects 
+of the Isis Error Handling Facility.
+</p>
+
+<p>
+When an error occurs several elements can be reported.  They include:
+</p>
+
+	<ul>
+      <li>Program name</li>
+	  <li>Class of error</li>
+	  <li>Error code</li>
+	  <li>Specific message</li>
+	  <li>Source code file</li>
+	  <li>Line number in the source code file</li>
+    </ul>
+
+
+<p>
+How these elements are presented and where they are written is user selectable as described in the 
+<a href="../PreferenceDictionary/PreferenceDictionary.html">Isis Preference Dictionary</a>.
+</p>
+
+<h2><a name="StandardForm">Standard Form</a></h2>
+
+<p>
+The standard form of an error message is
+
+<pre style="padding-left:4em;">
+**CLASS** MESSAGE in FILE at LINE
+</pre>
+
+Two examples are given below,
+
+<pre style="padding-left:4em;">
+**USER ERROR** Parameter [TO] must be entered in IsisAml.cpp at 1613
+**<abbr title="Input/Output">I/O</abbr> ERROR** Unable to open cube [moon.cub] in IsisCube.cpp at 203
+</pre>
+</p>
+
+<p>
+The <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CLASS</code> 
+is a general identifier that can help the user narrow down the scope of the problem.  Other 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CLASSES</code> include 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">SYSTEM ERROR</code>, 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">PROJECTION ERROR</code>, and 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CAMERA ERROR</code>.  
+Because there are a variety of error 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CLASSES</code> we have developed the 
+<a href="../ErrorDictionary/ErrorDictionary.html">Isis Error Dictionary</a>. This dictionary gives
+users additional context regarding the error, which may direct them to a solution.
+</p>
+
+<p>
+The <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">MESSAGE</code> 
+gives more specific information regarding the error.  It is standard practice to place the offending 
+problem in square brackets.  This will help the user narrow the scope of the problem even further.
+</p>
+
+<p>
+The <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">FILE</code> at 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">LINE</code> is an element 
+of the message more useful for programmers.  This allows the programmer to track down problems more easily.  
+Some users may desire to turn this feature off and can do so by modifying their personal 
+Isis Preference file.
+
+<pre style="padding-left:4em;">
+Group = ErrorFacility
+  FileLine = On | Off
+EndGroup
+</pre>
+</p>
+
+<h2><a name="PVLForm"><abbr title="Parameter Value Language">PVL</abbr> Form</a></h2>
+<p>
+The standard form can be overridden by modifying the Preference file.  
+
+<pre style="padding-left:4em;">
+Group = ErrorFacility
+  Format = Standard | PVL
+EndGroup
+</pre>
+
+This forces the output of errors messages to be in Parameter Value Language format.  Our previous standard form example,
+
+<pre style="padding-left:4em;">
+**<abbr title="Input/Output">I/O</abbr> Error** Unable to open cube [moon.cub] in IsisCube.cpp at 203
+</pre>
+
+would be presented in the following format,
+
+<pre style="padding-left:4em;">
+Group = Error
+  Program = highpass
+  Class   = "I/O ERROR"
+  Code    = -3
+  Message = "Unable to open cube [moon.cub]"
+  Source  = IsisCube.cpp
+  Line    = 203
+EndGroup
+</pre>
+</p>
+
+<h2><a name="ErrorsAndTheGUI">Errors and the <abbr title="Graphical User Interface">GUI</abbr></a></h2>
+
+<table class="imageTable" align="left" style="width:200px;">
+  <tr>
+    <td>
+      <a href="assets/screenshot_guierror.gif">
+      <img src="assets/thumbs/screenshot_guierror.gif" width="200" height="167" alt="[GUI error screen shot]"/></a>
+      <p>
+        Screen shot of illustrating a GUI error message.
+      </p>
+      <p class="caption">
+        600x500, 15KB
+      </p>
+    </td>
+  </tr>
+</table>
+
+<p>
+When an error occurs in the <abbr title="Graphical User Interface">GUI</abbr> 
+it is written to the error dialog box.  Because the <abbr title="Graphical User Interface">GUI</abbr> is interactive, 
+the user has a chance to correct the problem and continue program execution.  
+</p>
+<p>
+<i><font color="RED">[Future Option]</font> Any of the message text appearing 
+inside of brackets will be show in red, further highlighting the offending problem.
+</i>
+</p>
+
+<br clear="all"/>
+
+<h2><a name="ErrorsAndTheCommandLine">Errors and the Command Line</a></h2>
+
+<p>
+When an error occurs under the command line or batch-processing mode.  The error report is written to the 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;"><abbr title="Standard Error">STDERR</abbr></code> stream.  
+Unlike the <abbr title="Graphical User Interface">GUI</abbr>, the program immediately terminates with a status code.
+Output to "standard error" allows redirection of erros to files using standard Unix commands. For example,
+
+<pre style="padding-left:4em;">
+highpass from=bad.cub &gt;&amp; error.txt
+</pre>
+</p>
+
+<h2><a name="ProgramExitStatus">Program Exit Status</a></h2>
+<p>
+Under the command line, programs that run successfully will exit with a zero status.  If an error is generated 
+then the program will exit with a non-zero status.  The status has a 1-to-1 correlation with the 
+<code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CLASS</code> of 
+error (e.g., <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">User, 
+<abbr title="Input/Output">I/O</abbr> ERROR</code>).  
+To find out the various <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CLASS</code> 
+versus <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CODE</code> relationships you should examine 
+the <a href="../ErrorDictionary/ErrorDictionary.html">Isis Error Dictionary</a>.
+</p>
+
+<p>
+Under the <abbr title="Graphical User Interface">GUI</abbr>, the program always exits successfully as the 
+user has the opportunity to correct errors.
+</p>
+
+<h2><a name="ErrorsAndTheSessionLog">Errors and the Session Log</a></h2>
+<p>
+When an error occurs it will be written in the standard or <abbr title="Parameter Value Language">PVL</abbr> form to the 
+<a href="../SessionLogs/SessionLogs.html">Session Log</a>. 
+That is, it may be written to the log file and/or the terminal screen depending upon the log settings 
+in the user preference file. 
+</p>
+
+<div class="highlightSection">
+<h2><a name="TipsForProgrammers">Tips For Programmers</a></h2>
+<p>
+Dealing with errors in Isis is generally quite simple.  Application programs will automatically trap 
+errors using C++ expections.  For example, the following program has no required error checking.  
+It will automatically report invalid user input or <abbr title="Input/Output">I/O</abbr> errors such as opening or allocating cubes.
+
+
+<pre style="padding-left:4em;"><code>
+using namespace std;
+#include "Isis.h"
+#include "IsisProcessByLine.h"
+#include "IsisSpecialPixel.h"
+
+void mirror (IsisBuffer &amp;in, IsisBuffer &amp;out);
+
+void IsisMain() {
+  // We will be processing by line
+  IsisProcessByLine p;
+                               
+  // Setup the input and output cubes
+  p.SetInputCube("FROM");
+  p.SetOutputCube ("TO");
+
+  // Start the processing
+  p.StartProcess(mirror);
+  p.EndProcess();
+}
+
+// Line processing routine
+void mirror (IsisBuffer &amp;in, IsisBuffer &amp;out) {
+  // Loop and flip pixels in the line.
+  int index = in.size() - 1;
+  for (int i=0; i&lt;in.size(); i++) {
+    out[i] = in[index - i];
+  }
+}
+</code></pre>
+</p>
+
+<p>
+On occasions the programmer may be required report an error.  This can be facilitated in the following manner:
+
+<pre style="padding-left:4em;"><code>
+IsisCubePacket *from = p.SetInputCube("FROM");
+
+if (from-&gt;Lines() / 2 == 0) {
+  string msg = "Input cube [" + from-&gt;Filename() +
+                "must have an odd number of lines" ;
+  throw <a href="../../Object/presentation/APITabbed/IsisError/IsisError.html">IsisErrorUser</a> (msg,_FILEINFO_);
+}
+</code></pre>
+</p>
+
+<p>
+  See the <a href="../../Object/index.html">Isis Developers Reference</a>.
+</p>
+
+</div>
+
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>ErrorHandlingFacility.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>guide</categoryItem>
+  </category>
+  <audience>
+    <target>intermediate</target>
+  </audience>
+  <bibliography>
+    <title>Error Handling Facility</title>
+    <brief>Guide to the various aspects of the Error Handling Facility</brief>
+    <description>General overview of the Error Handling Facility, what form error messages take, how error messages differ between the command line and GUI, and Tips For Programmers.</description>
+    <author>Jeff Anderson</author>
+    <date>2003-06-25</date>
+  </bibliography>
+</documentation>

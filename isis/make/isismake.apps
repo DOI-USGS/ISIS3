@@ -1,0 +1,159 @@
+include $(ISISROOT)/make/isismake.macros
+
+MOCINC       = $(wildcard *.h)
+MOCGEN	     = $(wildcard moc_*.cpp)
+PROTOS       = $(wildcard *.proto)
+PROTOSGEN    = $(wildcard *.pb.*)
+PROTOSOBJ    = $(wildcard *.pb.o)
+
+.SUFFIXES:
+.SUFFIXES: .cpp .o
+.SUFFIXES: .c .o
+.SUFFIXES: .xml .html
+.SUFFIXES: .proto .pb.h .pb.cc
+.SUFFIXES: .cc .o
+
+app: $(BINS)
+
+$(BINS): $(OBJS)
+	$(CXX) $(ALLLIBDIRS) $(ISISLDFLAGS) $(ISISLDRPATH) -o $@ $(OBJS) $(ALLLIBS)
+
+.cpp.o : qtmoc
+	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) $(CPPFLAGS) -c -o $@ $?
+
+.c.o :
+	$(CC) $(ALLINCDIRS) $(ISISCFLAGS) $(CFLAGS) -c -o $@ $?
+
+.cc.o: 
+	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
+
+.xml.html :
+	$(XALAN) -v -o $@ $? $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl
+
+protos:	$(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
+
+%.pb.cc %.pb.h: %.proto
+	protoc -I$(<D) --cpp_out=$(<D) $^
+
+qtmoc: $(MOCINC:%.h=moc_%.cpp)
+
+moc_%.cpp: %.h		
+	if [ "$(filter-out ' ', $(shell grep -sIE -m1 'Q_OBJECT' $(<F)))" == "Q_OBJECT" ]; \
+	then \
+	  $(MOC) $(MOCDEFINES) -o $@ $(<F); \
+	fi
+
+qrc_%.cpp: %.qrc
+	$(RCC) $(RCCDEFINES) -o $@ $(<F);
+
+clean:  localclean
+	-$(RM) $(OBJS) $(BINS) $(PROTOSGEN) $(MOCGEN) `basename $(CURDIR)`.html	
+	if [ -d "tsts" ]; \
+	then \
+	  if [ -f "tsts/Makefile" ]; \
+	    then \
+	    cd tsts; \
+	    $(MAKE) clean; \
+	    cd ..; \
+	  fi; \
+	fi
+
+localclean:
+	if [ "$(findstring cleanlocal,$(shell grep cleanlocal Makefile))" = "cleanlocal" ]; \
+	then \
+	   $(MAKE) cleanlocal; \
+	fi
+
+sanitize: clean
+	-$(RM) tttt* junk.* TEMP*
+
+install: app 
+	if [ ! -d "$(ISISROOT)/bin/xml" ];                                    \
+	then                                                                  \
+	  mkdir -p $(ISISROOT)/bin/xml;                                       \
+	fi;                                                                   \
+	                                                                      \
+	cp -p $(BINS) $(ISISROOT)/bin;                                        \
+	cp -p $(BINS).xml $(ISISROOT)/bin/xml;                                \
+	chmod 644 $(ISISROOT)/bin/xml/$(BINS).xml;                            \
+	                                                                      \
+	if [ "$(HOST_ARCH)" == "Linux" ]; then                                \
+	  dollar='$$';                                                        \
+	  newRpath=`echo "$${dollar}ORIGIN/../lib"`;                          \
+	  newRpath=`echo "$$newRpath:$${dollar}ORIGIN/../3rdParty/lib"`;      \
+	  $(PATCHELF) --set-rpath "$$newRpath" $(ISISROOT)/bin/$(BINS);       \
+	elif [ "$(HOST_ARCH)" == "Darwin" ]; then                             \
+	  $(ISISROOT)/scripts/SetRunTimePath --bins                           \
+	    --libmap=$(ISISROOT)/scripts/isis_bins_paths.lis                  \
+	    --liblog=$(ISISROOT)/scripts/DarwinLibs.lis                       \
+	    --relocdir=$(ISISROOT)/3rdParty/lib:$(ISISROOT)/3rdParty:$(ISISROOT) \
+	    --errlog=DarwinErrors.lis                                         \
+	    $(ISISROOT)/bin/$(BINS) > /dev/null;                              \
+	  if [ -f "DarwinErrors.lis" ]; then                                  \
+	    cat DarwinErrors.lis;                                             \
+	  fi;                                                                 \
+	  $(RM) DarwinErrors.lis;                                             \
+	fi
+	  
+
+validxml:
+	$(XALAN) -v -o /dev/null $(BINS).xml $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl;
+
+docs:
+	mkdir -p $(ISISROOT)/src/docsys/Application/data/`basename $(CURDIR)`
+	cp -p `basename $(CURDIR)`.xml $(ISISROOT)/src/docsys/Application/data/`basename $(CURDIR)`
+	if [ -d assets ]; \
+	then \
+	  cp -pr assets $(ISISROOT)/src/docsys/Application/data/`basename $(CURDIR)`; \
+	fi
+	chmod -R +w $(ISISROOT)/src/docsys/Application/data/`basename $(CURDIR)`
+
+test:
+	if [ ! -d "tsts" ]; \
+	then \
+	  echo ""; \
+	  printf %-6s ""; \
+	  echo "no tsts folder"; \
+	elif [ -f "tsts/Makefile" ]; \
+	then \
+	  cd tsts; $(MAKE) test; \
+	else \
+	  echo ""; \
+	  printf %-6s ""; \
+	  echo "no makefile"; \
+	fi
+
+testdir:
+	if [ ! -d "tsts" ]; \
+	then \
+	  $(MKDIR) tsts; \
+	  $(CP) $(ISISROOT)/make/Makefile.appstststree tsts/Makefile; \
+	else \
+	  echo ""; \
+	  printf %-6s ""; \
+	  echo "tsts folder already exists"; \
+	fi
+
+html:
+	$(MAKE) `basename $(CURDIR)`.html;
+
+help:
+	echo "Isis Make Application Commands"
+	echo "------------------------ "
+	echo "make                          : Builds the Application"
+	echo "make MODE=DEBUG[,NOMEMCHECK]  : Builds the Application for stack tracing and "
+	echo "                                  memory debugging"
+	echo "make install                  : Calls the make target and copies the application"
+	echo "                                  to $ISISROOT/bin/"
+	echo "make html                     : Builds the html page for the Application"
+	echo "make docs                     : Copies the .xml and assets folder to docsys area"
+	echo "                                  for full documentation building"
+	echo "make clean                    : Removes the application, *.html and *.o files."
+	echo "                                  Also cleans the test directories"
+	echo "make sanitize                 : Calls the clean target then removes tttt* junk.*"
+	echo "                                  and TEMP* files"
+	echo "make testdir                  : Make the test directory for new applications"
+	echo "make test                     : Run all app tests and print result, remove"
+	echo "                                  output"
+	echo "make test MODE=NOCLEAN        : Run test and print result, leave output"
+

@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="median" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Set pixels to median of surrounding pixel values
+  </brief>
+
+  <description>
+    This program accepts a user-defined boxcar and loops
+    through the input image. It finds the median pixel
+    value in the boxcar, and sets the output center pixel
+    to that median value.  This will acheive a
+    "blurring" effect, similar to the lowpass filter.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <history>
+    <change name="Brendan George" date="2005-11-04" >
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-06-05">
+        Added Minopt parameter, modified user interface
+    </change>
+    <change name="Brendan George" date="2006-06-19">
+        Modified user interface
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Cube
+        </brief>
+        <description>
+          This is the cube from which we will gather our data.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+  
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output Cube
+        </brief>
+        <description>
+          This is the cube to which we will write the modified
+          data.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>
+          Number of samples in Boxcar
+        </brief>
+        <description>
+          This will determine how many samples the boxcar will
+          have.   This value must be odd and cannot exceed 
+          twice the number of samples in the cube.  Note that
+          the larger the boxcar size, the slower the program
+          will run. The size of the boxcar will also have an
+          impact on the blurring effect. The larger the boxcar,
+          the greater the blurring.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+        <odd />
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>
+          Number of lines in Boxcar
+        </brief>
+        <description>
+          This will determine how many lines the boxcar will
+          have.   This value must be odd and cannot exceed 
+          twice the number of lines in the cube.  Note that
+          the larger the boxcar size, the slower the program
+          will run. The size of the boxcar will also have an
+          impact on the blurring effect. The larger the boxcar,
+          the greater the blurring.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+        <odd />
+      </parameter>
+    </group>
+
+    <group name="Boxcar settings">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          The minimum value of a valid pixel
+        </brief>
+        <description>
+          This value indicates the minimum value of a valid
+          pixel. If a pixel holds a value below the minimum
+          value, it will either be filtered or skipped over,
+          depending on user input in the "Filter Style" 
+          area.
+        </description>
+        <internalDefault>Use all</internalDefault>
+        <lessThan><item>HIGH</item></lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          The maximum value of a valid pixel
+        </brief>
+        <description>
+          This value indicates the maximum value of a valid
+          pixel. If a pixel holds a value over the maximum
+          value, it will either be excluded or included,
+          depending on user input in the "Filter Style" 
+          area.
+        </description>
+        <internalDefault>Use all</internalDefault>
+        <greaterThan><item>LOW</item></greaterThan>
+      </parameter>
+
+        <parameter name="MINOPT">
+          <type>string</type>
+          <default>
+              <item>COUNT</item>
+          </default>
+          <brief>
+             Sets minimum to be either a count or a percentage
+          </brief>
+          <description>
+              This parameter determines whether the minimum
+              parameter is to be interpreted as a count of pixels, or a
+              percentage of all pixels in the boxcar.
+          </description>
+
+          <list>
+              <option value="COUNT">
+                  <brief>
+                      Minimum valid pixel count
+                  </brief>
+                  <description>
+                      This option indicates that the minimum is a minimum
+                      count of pixels required for filtering.
+                  </description>
+              </option>
+              <option value="PERCENTAGE">
+                <brief>
+                    Minimum valid pixel percentage
+                </brief>
+                <description>
+                    This option indicates the the minimum parameter is to be
+                    interpreted as a percentage of the total pixels in the
+                    boxcar.
+                </description>
+              </option>
+          </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <default><item>1</item></default>
+        <brief>
+          Minimum boxcar pixels required for filter
+        </brief>
+        <description>
+          This is the minimum number of valid pixels
+          required in a boxcar for filtering to begin.
+        </description>
+      </parameter>
+
+      <parameter name="REPLACEMENT">
+        <type>string</type>
+        <default>
+          <item>CENTER</item>
+        </default>
+        <brief>
+          Replacement value if minimum number of pixels
+          does not exist
+        </brief>
+        <description>
+          This determines what to put in the center pixel,
+          if there are not  enough valid pixels in the boxcar
+          to meet the minimum requirement. The default is to
+          replace it with the current value, and the other option
+          will replace it with NULL.
+        </description>
+
+        <list>
+          <option value="CENTER">
+            <brief>
+              Center pixel value
+            </brief>
+            <description>
+              This sets the center pixel of the boxcar to the input
+              value if there are not enough valid pixels to meet
+              the minimum requirement.
+            </description>
+          </option>
+
+          <option value="NULL">
+            <brief>
+              Pixel value NULL
+            </brief>
+            <description>
+              This sets the center pixel of the boxcar to the special
+              pixel value of NULL, if there are not enough valid pixels
+              to meet minimum requirement.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Non-Special Pixel Filtering">
+      <parameter name="FILTER">
+        <type>string</type>
+        <default>
+          <item>ALL</item>
+        </default>
+        <brief>
+          The style of filtration
+        </brief>
+        <description>
+            These options determine which pixels are to be included in the filtering
+            process. ALL filters all pixels, regardless of value, VALID only filters 
+            those pixels with values between LOW and HIGH, and INVALID only
+            filters those pixels with values outside LOW and HIGH. Note that these
+            only determine which Non-Special pixels to filter. Also, the median will
+            only be calculated from pixel values between LOW and HIGH.
+        </description>
+
+        <list>
+          <option value="ALL">
+            <brief>
+              Filter All
+            </brief>
+            <description>
+              This option filters all Non-Special pixels, regardless of value. It only
+              filters Special Pixels indicated by the user, and the median will only be
+              calculated from pixel values between LOW and HIGH.
+            </description>
+          </option>
+
+          <option value="INSIDE">
+            <brief>
+              Filter Piexls Between Low and High
+            </brief>
+            <description>
+                This option filters only those pixels with values between LOW and
+                HIGH, as well as any Special Pixels indicated by the user, and the
+                median will only be calculated from pixel values between LOW and 
+                HIGH.
+            </description>
+          </option>
+
+          <option value="OUTSIDE">
+            <brief>
+              Filter Pixels Outside Low and High
+            </brief>
+            <description>
+              This option filters only those pixels with values outside LOW and HIGH,
+              as well as any Special Pixels indicated by the user, and the median will 
+              only be calculated from pixel values between LOW and HIGH.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Special Pixel Filtering">
+      <parameter name="NULL">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter NULL Pixels
+        </brief>
+        <description>
+          This determines whether NULL pixels are considered valid for the
+          purposes of filtering. This, along with the user input in the 
+          "Filter Style" section, will determine whether NULL pixels are
+          included in the filter.
+        </description>
+      </parameter>
+
+      <parameter name="HRS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter HRS Pixels
+        </brief>
+        <description>
+          This determines whether HRS pixels are considered valid for the
+          purposes of filtering. This, along with the user input in the 
+          "Filter Style" section, will determine whether HRS pixels are
+          included in the filter.
+        </description>
+      </parameter>
+
+      <parameter name="HIS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter HIS Pixels
+        </brief>
+        <description>
+          This determines whether HIS pixels are considered valid for the
+          purposes of filtering.  This, along with the user input in the 
+          "Filter Style" section, will determine whether HIS pixels are
+          included in the filter.
+        </description>
+      </parameter>
+
+      <parameter name="LRS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter LRS Pixels
+        </brief>
+        <description>
+          This determines whether LRS pixels are considered valid for the
+          purposes of filtering.  This, along with the user input in the 
+          "Filter Style" section, will determine whether LRS pixels are
+          included in the filter.
+        </description>
+      </parameter>
+
+      <parameter name="LIS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Filter LIS Pixels
+        </brief>
+        <description>
+          This determines whether LIS pixels are considered valid for the
+          purposes of filtering.  This, along with the user input in the 
+          "Filter Style" section, will determine whether LIS pixels are
+          included in the filter.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Running median with a 3x3 boxcar
+      </brief>
+      <description>
+        This demonstrates running the median program on a sample 
+        cube using a 3x3 boxcar. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from= peaks.cub
+          to=3x3median.cub
+          samples=3
+          lines=3
+        </commandLine>
+        <description>
+          This demonstrates the commands necessary to run median on
+          a file named "peaks.cub" with a 3x3 boxcar. The small size of the boxcar
+          will only produce a slight blur.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="456" height="627"
+            src="assets/images/3x3gui.jpg">
+            <brief>
+             Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI set to filter all pixels for the image
+              using a 3x3 boxcar.
+            </description>
+            <thumbnail width="145" height="206" caption="median gui"
+              src="assets/thumbs/3x3gui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/input.jpg">
+          <brief>
+            Input image before medain filter
+          </brief>
+          <description>
+            This is the original cube. The areas of greatest interest are
+            those with a great deal of contrast such as edges.
+          </description>
+          <thumbnail width="200" height="200" src="assets/thumbs/input.jpg" caption="input cube" />
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="500" height="500" src="assets/images/3x3median.jpg">
+          <brief>
+            Output of 3x3 boxcar median filter
+          </brief>
+          <description>
+            This is the image after the filter. You may notice that the whole
+            image is slightly softer, particularly around areas of sharp
+            contrast. Due to the small size of the boxcar, the effect is
+            subtle and difficult to notice.
+          </description>
+          <thumbnail width="200" height="200" 
+            src="assets/thumbs/3x3median.jpg" caption="median output"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+
+    <example>
+      <brief>
+        Running median with a 15x15 boxcar
+      </brief>
+      <description>
+        This demonstrates running the median program on a sample 
+        cube using a 15x15 boxcar. 
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from= peaks.cub
+          to=15x15median.cub
+          samples=15
+          lines=15
+        </commandLine>
+        <description>
+          This demonstrates the commands necessary to run median on
+          a file named "peaks.cub" with a 15x15 boxcar. The large size
+          of the boxcar produces a marked blurring effect.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="456" height="627"
+            src="assets/images/15x15gui.jpg">
+            <brief>
+             Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI set to filter all pixels for the image
+              using a 15x15 boxcar.
+            </description>
+            <thumbnail width="145" height="206" caption="median gui"
+              src="assets/thumbs/15x15gui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      
+      <inputImages>
+        <image width="500" height="500" src="assets/images/input.jpg">
+          <brief>
+            Input image before medain filter
+          </brief>
+          <description>
+            This is the original cube. The areas of greatest interest are
+            those with a great deal of contrast such as edges.
+          </description>
+          <thumbnail width="200" height="200" src="assets/thumbs/input.jpg" caption="input cube"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image width="500" height="500" src="assets/images/15x15median.jpg">
+          <brief>
+            Output of 3x3 boxcar median filter
+          </brief>
+          <description>
+            This is the output image for a 15x15 boxcar. You will notice
+            the entire image is noticeably blurrier. It is now virtually
+            impossible to make out any but the largest of features.
+          </description>
+          <thumbnail width="200" height="200" 
+            src="assets/thumbs/15x15median.jpg" caption="median output" />
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

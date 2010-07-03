@@ -1,0 +1,581 @@
+UNIT TEST for Isis::AtmosModel
+
+Testing missing AtmosphericModel object ...
+**PVL ERROR** Unable to find object [AtmosphericModel]
+
+Testing missing Algorithm group ...
+**PVL ERROR** Unable to find group [Algorithm]
+
+Testing missing Name keyword ...
+**PVL ERROR** Keyword [Name] does not exist in [Group = Algorithm]
+
+Testing supported atmospheric model ...
+
+Testing atmospheric model get methods ...
+AlgorithmName = Unknown
+AtmosTau = 0.28
+AtmosWha = 0.98
+AtmosHga = 0.68
+AtmosNulneg = 0
+AtmosNinc = 91
+
+Testing atmospheric model get methods in standard conditions...
+AlgorithmName = Unknown
+AtmosTau = 0
+AtmosWha = 0.95
+AtmosHga = 0.68
+AtmosNulneg = 0
+AtmosNinc = 91
+
+Testing boundary conditions of atmospheric model set methods ...
+**USER ERROR** Invalid value of Atmospheric tau [-1.0]
+**USER ERROR** Invalid value of Atmospheric wha [0.0]
+**USER ERROR** Invalid value of Atmospheric wha [2.0]
+**USER ERROR** Invalid value of Hapke atmospheric hga [-1.0]
+**USER ERROR** Invalid value of Hapke atmospheric hga [1.0]
+
+Testing atmospheric model InrFunc2Bint method ...
+Results from InrFunc2Bint = -5.26033e-07
+
+
+Results from InrFunc2Bint = -0.177426
+
+
+Testing atmospheric model r8trapzd method ...
+Results from r8trapzd = 35.1618 for i = 1
+Results from r8trapzd = 17.5809 for i = 2
+Results from r8trapzd = 17.5809 for i = 3
+Results from r8trapzd = 17.5809 for i = 4
+Results from r8trapzd = 17.5809 for i = 5
+Results from r8trapzd = 17.5809 for i = 6
+Results from r8trapzd = 17.5809 for i = 7
+Results from r8trapzd = 17.5809 for i = 8
+Results from r8trapzd = 17.5809 for i = 9
+
+Testing atmospheric model OutrFunc2Bint method ...
+Results from OutrFunc2Bint = 0.195344
+
+
+Testing atmospheric model r8qromb method ...
+Results from r8qromb = 35.1618
+
+
+Testing atmospheric model GenerateAhTable method ...
+Results from GenerateAhTable = 
+Ab = 0.999898
+i IncTable(i) = 0 0
+i IncTable(i) = 1 1
+i IncTable(i) = 2 2
+i IncTable(i) = 3 3
+i IncTable(i) = 4 4
+i IncTable(i) = 5 5
+i IncTable(i) = 6 6
+i IncTable(i) = 7 7
+i IncTable(i) = 8 8
+i IncTable(i) = 9 9
+i IncTable(i) = 10 10
+i IncTable(i) = 11 11
+i IncTable(i) = 12 12
+i IncTable(i) = 13 13
+i IncTable(i) = 14 14
+i IncTable(i) = 15 15
+i IncTable(i) = 16 16
+i IncTable(i) = 17 17
+i IncTable(i) = 18 18
+i IncTable(i) = 19 19
+i IncTable(i) = 20 20
+i IncTable(i) = 21 21
+i IncTable(i) = 22 22
+i IncTable(i) = 23 23
+i IncTable(i) = 24 24
+i IncTable(i) = 25 25
+i IncTable(i) = 26 26
+i IncTable(i) = 27 27
+i IncTable(i) = 28 28
+i IncTable(i) = 29 29
+i IncTable(i) = 30 30
+i IncTable(i) = 31 31
+i IncTable(i) = 32 32
+i IncTable(i) = 33 33
+i IncTable(i) = 34 34
+i IncTable(i) = 35 35
+i IncTable(i) = 36 36
+i IncTable(i) = 37 37
+i IncTable(i) = 38 38
+i IncTable(i) = 39 39
+i IncTable(i) = 40 40
+i IncTable(i) = 41 41
+i IncTable(i) = 42 42
+i IncTable(i) = 43 43
+i IncTable(i) = 44 44
+i IncTable(i) = 45 45
+i IncTable(i) = 46 46
+i IncTable(i) = 47 47
+i IncTable(i) = 48 48
+i IncTable(i) = 49 49
+i IncTable(i) = 50 50
+i IncTable(i) = 51 51
+i IncTable(i) = 52 52
+i IncTable(i) = 53 53
+i IncTable(i) = 54 54
+i IncTable(i) = 55 55
+i IncTable(i) = 56 56
+i IncTable(i) = 57 57
+i IncTable(i) = 58 58
+i IncTable(i) = 59 59
+i IncTable(i) = 60 60
+i IncTable(i) = 61 61
+i IncTable(i) = 62 62
+i IncTable(i) = 63 63
+i IncTable(i) = 64 64
+i IncTable(i) = 65 65
+i IncTable(i) = 66 66
+i IncTable(i) = 67 67
+i IncTable(i) = 68 68
+i IncTable(i) = 69 69
+i IncTable(i) = 70 70
+i IncTable(i) = 71 71
+i IncTable(i) = 72 72
+i IncTable(i) = 73 73
+i IncTable(i) = 74 74
+i IncTable(i) = 75 75
+i IncTable(i) = 76 76
+i IncTable(i) = 77 77
+i IncTable(i) = 78 78
+i IncTable(i) = 79 79
+i IncTable(i) = 80 80
+i IncTable(i) = 81 81
+i IncTable(i) = 82 82
+i IncTable(i) = 83 83
+i IncTable(i) = 84 84
+i IncTable(i) = 85 85
+i IncTable(i) = 86 86
+i IncTable(i) = 87 87
+i IncTable(i) = 88 88
+i IncTable(i) = 89 89
+i IncTable(i) = 90 90
+i AhTable(i) = 0 1
+i AhTable(i) = 1 1
+i AhTable(i) = 2 1
+i AhTable(i) = 3 1
+i AhTable(i) = 4 1
+i AhTable(i) = 5 1
+i AhTable(i) = 6 1
+i AhTable(i) = 7 1
+i AhTable(i) = 8 1
+i AhTable(i) = 9 1
+i AhTable(i) = 10 1
+i AhTable(i) = 11 1
+i AhTable(i) = 12 1
+i AhTable(i) = 13 1
+i AhTable(i) = 14 1
+i AhTable(i) = 15 1
+i AhTable(i) = 16 1
+i AhTable(i) = 17 1
+i AhTable(i) = 18 1
+i AhTable(i) = 19 1
+i AhTable(i) = 20 1
+i AhTable(i) = 21 1
+i AhTable(i) = 22 1
+i AhTable(i) = 23 1
+i AhTable(i) = 24 1
+i AhTable(i) = 25 1
+i AhTable(i) = 26 1
+i AhTable(i) = 27 1
+i AhTable(i) = 28 1
+i AhTable(i) = 29 1
+i AhTable(i) = 30 1
+i AhTable(i) = 31 1
+i AhTable(i) = 32 1
+i AhTable(i) = 33 1
+i AhTable(i) = 34 1
+i AhTable(i) = 35 1
+i AhTable(i) = 36 1
+i AhTable(i) = 37 1
+i AhTable(i) = 38 1
+i AhTable(i) = 39 1
+i AhTable(i) = 40 1
+i AhTable(i) = 41 1
+i AhTable(i) = 42 1
+i AhTable(i) = 43 1
+i AhTable(i) = 44 1
+i AhTable(i) = 45 1
+i AhTable(i) = 46 1
+i AhTable(i) = 47 1
+i AhTable(i) = 48 1
+i AhTable(i) = 49 1
+i AhTable(i) = 50 1
+i AhTable(i) = 51 1
+i AhTable(i) = 52 1
+i AhTable(i) = 53 1
+i AhTable(i) = 54 1
+i AhTable(i) = 55 1
+i AhTable(i) = 56 1
+i AhTable(i) = 57 1
+i AhTable(i) = 58 1
+i AhTable(i) = 59 1
+i AhTable(i) = 60 1
+i AhTable(i) = 61 1
+i AhTable(i) = 62 1
+i AhTable(i) = 63 1
+i AhTable(i) = 64 1
+i AhTable(i) = 65 1
+i AhTable(i) = 66 1
+i AhTable(i) = 67 1
+i AhTable(i) = 68 1
+i AhTable(i) = 69 1
+i AhTable(i) = 70 1
+i AhTable(i) = 71 1
+i AhTable(i) = 72 1
+i AhTable(i) = 73 1
+i AhTable(i) = 74 1
+i AhTable(i) = 75 1
+i AhTable(i) = 76 1
+i AhTable(i) = 77 1
+i AhTable(i) = 78 1
+i AhTable(i) = 79 1
+i AhTable(i) = 80 1
+i AhTable(i) = 81 1
+i AhTable(i) = 82 1
+i AhTable(i) = 83 1
+i AhTable(i) = 84 1
+i AhTable(i) = 85 1
+i AhTable(i) = 86 1
+i AhTable(i) = 87 1
+i AhTable(i) = 88 1
+i AhTable(i) = 89 1
+i AhTable(i) = 90 0
+
+Testing atmospheric model GenerateHahgTables method ...
+Results from GenerateHahgTables = 
+Hahgsb = -0.085266
+i IncTable(i) = 0 0
+i IncTable(i) = 1 1
+i IncTable(i) = 2 2
+i IncTable(i) = 3 3
+i IncTable(i) = 4 4
+i IncTable(i) = 5 5
+i IncTable(i) = 6 6
+i IncTable(i) = 7 7
+i IncTable(i) = 8 8
+i IncTable(i) = 9 9
+i IncTable(i) = 10 10
+i IncTable(i) = 11 11
+i IncTable(i) = 12 12
+i IncTable(i) = 13 13
+i IncTable(i) = 14 14
+i IncTable(i) = 15 15
+i IncTable(i) = 16 16
+i IncTable(i) = 17 17
+i IncTable(i) = 18 18
+i IncTable(i) = 19 19
+i IncTable(i) = 20 20
+i IncTable(i) = 21 21
+i IncTable(i) = 22 22
+i IncTable(i) = 23 23
+i IncTable(i) = 24 24
+i IncTable(i) = 25 25
+i IncTable(i) = 26 26
+i IncTable(i) = 27 27
+i IncTable(i) = 28 28
+i IncTable(i) = 29 29
+i IncTable(i) = 30 30
+i IncTable(i) = 31 31
+i IncTable(i) = 32 32
+i IncTable(i) = 33 33
+i IncTable(i) = 34 34
+i IncTable(i) = 35 35
+i IncTable(i) = 36 36
+i IncTable(i) = 37 37
+i IncTable(i) = 38 38
+i IncTable(i) = 39 39
+i IncTable(i) = 40 40
+i IncTable(i) = 41 41
+i IncTable(i) = 42 42
+i IncTable(i) = 43 43
+i IncTable(i) = 44 44
+i IncTable(i) = 45 45
+i IncTable(i) = 46 46
+i IncTable(i) = 47 47
+i IncTable(i) = 48 48
+i IncTable(i) = 49 49
+i IncTable(i) = 50 50
+i IncTable(i) = 51 51
+i IncTable(i) = 52 52
+i IncTable(i) = 53 53
+i IncTable(i) = 54 54
+i IncTable(i) = 55 55
+i IncTable(i) = 56 56
+i IncTable(i) = 57 57
+i IncTable(i) = 58 58
+i IncTable(i) = 59 59
+i IncTable(i) = 60 60
+i IncTable(i) = 61 61
+i IncTable(i) = 62 62
+i IncTable(i) = 63 63
+i IncTable(i) = 64 64
+i IncTable(i) = 65 65
+i IncTable(i) = 66 66
+i IncTable(i) = 67 67
+i IncTable(i) = 68 68
+i IncTable(i) = 69 69
+i IncTable(i) = 70 70
+i IncTable(i) = 71 71
+i IncTable(i) = 72 72
+i IncTable(i) = 73 73
+i IncTable(i) = 74 74
+i IncTable(i) = 75 75
+i IncTable(i) = 76 76
+i IncTable(i) = 77 77
+i IncTable(i) = 78 78
+i IncTable(i) = 79 79
+i IncTable(i) = 80 80
+i IncTable(i) = 81 81
+i IncTable(i) = 82 82
+i IncTable(i) = 83 83
+i IncTable(i) = 84 84
+i IncTable(i) = 85 85
+i IncTable(i) = 86 86
+i IncTable(i) = 87 87
+i IncTable(i) = 88 88
+i IncTable(i) = 89 89
+i IncTable(i) = 90 90
+i HahgtTable(i) = 0 0.0927882
+i HahgtTable(i) = 1 0.0927897
+i HahgtTable(i) = 2 0.0926801
+i HahgtTable(i) = 3 0.0922811
+i HahgtTable(i) = 4 0.0919356
+i HahgtTable(i) = 5 0.0920154
+i HahgtTable(i) = 6 0.09237
+i HahgtTable(i) = 7 0.0924426
+i HahgtTable(i) = 8 0.0925301
+i HahgtTable(i) = 9 0.0927414
+i HahgtTable(i) = 10 0.0928035
+i HahgtTable(i) = 11 0.0928777
+i HahgtTable(i) = 12 0.0928562
+i HahgtTable(i) = 13 0.0927912
+i HahgtTable(i) = 14 0.0929185
+i HahgtTable(i) = 15 0.093057
+i HahgtTable(i) = 16 0.0932062
+i HahgtTable(i) = 17 0.0933533
+i HahgtTable(i) = 18 0.0935115
+i HahgtTable(i) = 19 0.0936916
+i HahgtTable(i) = 20 0.093894
+i HahgtTable(i) = 21 0.094081
+i HahgtTable(i) = 22 0.0943062
+i HahgtTable(i) = 23 0.0944237
+i HahgtTable(i) = 24 0.0945789
+i HahgtTable(i) = 25 0.0948219
+i HahgtTable(i) = 26 0.0949008
+i HahgtTable(i) = 27 0.0950871
+i HahgtTable(i) = 28 0.0952767
+i HahgtTable(i) = 29 0.0954295
+i HahgtTable(i) = 30 0.0956298
+i HahgtTable(i) = 31 0.0958376
+i HahgtTable(i) = 32 0.0961333
+i HahgtTable(i) = 33 0.0963426
+i HahgtTable(i) = 34 0.0965614
+i HahgtTable(i) = 35 0.0967807
+i HahgtTable(i) = 36 0.0969975
+i HahgtTable(i) = 37 0.0972265
+i HahgtTable(i) = 38 0.0974282
+i HahgtTable(i) = 39 0.0976286
+i HahgtTable(i) = 40 0.097849
+i HahgtTable(i) = 41 0.098026
+i HahgtTable(i) = 42 0.0983025
+i HahgtTable(i) = 43 0.0984128
+i HahgtTable(i) = 44 0.0984969
+i HahgtTable(i) = 45 0.0985603
+i HahgtTable(i) = 46 0.0985962
+i HahgtTable(i) = 47 0.0986019
+i HahgtTable(i) = 48 0.0985743
+i HahgtTable(i) = 49 0.0985016
+i HahgtTable(i) = 50 0.0981902
+i HahgtTable(i) = 51 0.098033
+i HahgtTable(i) = 52 0.097828
+i HahgtTable(i) = 53 0.0975764
+i HahgtTable(i) = 54 0.0972561
+i HahgtTable(i) = 55 0.0968645
+i HahgtTable(i) = 56 0.0964032
+i HahgtTable(i) = 57 0.095861
+i HahgtTable(i) = 58 0.0952282
+i HahgtTable(i) = 59 0.0944953
+i HahgtTable(i) = 60 0.0936543
+i HahgtTable(i) = 61 0.0926872
+i HahgtTable(i) = 62 0.0915888
+i HahgtTable(i) = 63 0.0903436
+i HahgtTable(i) = 64 0.0889356
+i HahgtTable(i) = 65 0.0873557
+i HahgtTable(i) = 66 0.0855805
+i HahgtTable(i) = 67 0.0835888
+i HahgtTable(i) = 68 0.0813711
+i HahgtTable(i) = 69 0.0789007
+i HahgtTable(i) = 70 0.0761522
+i HahgtTable(i) = 71 0.0731
+i HahgtTable(i) = 72 0.0697142
+i HahgtTable(i) = 73 0.0659646
+i HahgtTable(i) = 74 0.061814
+i HahgtTable(i) = 75 0.0572283
+i HahgtTable(i) = 76 0.0521709
+i HahgtTable(i) = 77 0.0465849
+i HahgtTable(i) = 78 0.0404319
+i HahgtTable(i) = 79 0.0336589
+i HahgtTable(i) = 80 0.026218
+i HahgtTable(i) = 81 0.018064
+i HahgtTable(i) = 82 0.00917859
+i HahgtTable(i) = 83 -0.000461522
+i HahgtTable(i) = 84 -0.0107416
+i HahgtTable(i) = 85 -0.021546
+i HahgtTable(i) = 86 -0.0325029
+i HahgtTable(i) = 87 -0.0430034
+i HahgtTable(i) = 88 -0.052268
+i HahgtTable(i) = 89 -0.0598731
+i HahgtTable(i) = 90 -0.0660967
+i Hahgt0Table(i) = 0 0
+i Hahgt0Table(i) = 1 0.183398
+i Hahgt0Table(i) = 2 0.184652
+i Hahgt0Table(i) = 3 0.18459
+i Hahgt0Table(i) = 4 0.184491
+i Hahgt0Table(i) = 5 0.184482
+i Hahgt0Table(i) = 6 0.185425
+i Hahgt0Table(i) = 7 0.185348
+i Hahgt0Table(i) = 8 0.185338
+i Hahgt0Table(i) = 9 0.185338
+i Hahgt0Table(i) = 10 0.185447
+i Hahgt0Table(i) = 11 0.185436
+i Hahgt0Table(i) = 12 0.186154
+i Hahgt0Table(i) = 13 0.186379
+i Hahgt0Table(i) = 14 0.186915
+i Hahgt0Table(i) = 15 0.187235
+i Hahgt0Table(i) = 16 0.187655
+i Hahgt0Table(i) = 17 0.187964
+i Hahgt0Table(i) = 18 0.188358
+i Hahgt0Table(i) = 19 0.188741
+i Hahgt0Table(i) = 20 0.1891
+i Hahgt0Table(i) = 21 0.18959
+i Hahgt0Table(i) = 22 0.190036
+i Hahgt0Table(i) = 23 0.190499
+i Hahgt0Table(i) = 24 0.191015
+i Hahgt0Table(i) = 25 0.191582
+i Hahgt0Table(i) = 26 0.192163
+i Hahgt0Table(i) = 27 0.192775
+i Hahgt0Table(i) = 28 0.193384
+i Hahgt0Table(i) = 29 0.194042
+i Hahgt0Table(i) = 30 0.194717
+i Hahgt0Table(i) = 31 0.195453
+i Hahgt0Table(i) = 32 0.196211
+i Hahgt0Table(i) = 33 0.196989
+i Hahgt0Table(i) = 34 0.197781
+i Hahgt0Table(i) = 35 0.198584
+i Hahgt0Table(i) = 36 0.199389
+i Hahgt0Table(i) = 37 0.200202
+i Hahgt0Table(i) = 38 0.201015
+i Hahgt0Table(i) = 39 0.201825
+i Hahgt0Table(i) = 40 0.202628
+i Hahgt0Table(i) = 41 0.203422
+i Hahgt0Table(i) = 42 0.204203
+i Hahgt0Table(i) = 43 0.204968
+i Hahgt0Table(i) = 44 0.205713
+i Hahgt0Table(i) = 45 0.206433
+i Hahgt0Table(i) = 46 0.207124
+i Hahgt0Table(i) = 47 0.20778
+i Hahgt0Table(i) = 48 0.208396
+i Hahgt0Table(i) = 49 0.208963
+i Hahgt0Table(i) = 50 0.209475
+i Hahgt0Table(i) = 51 0.209922
+i Hahgt0Table(i) = 52 0.210296
+i Hahgt0Table(i) = 53 0.210586
+i Hahgt0Table(i) = 54 0.210779
+i Hahgt0Table(i) = 55 0.210862
+i Hahgt0Table(i) = 56 0.210453
+i Hahgt0Table(i) = 57 0.210269
+i Hahgt0Table(i) = 58 0.209931
+i Hahgt0Table(i) = 59 0.209421
+i Hahgt0Table(i) = 60 0.208721
+i Hahgt0Table(i) = 61 0.207808
+i Hahgt0Table(i) = 62 0.206662
+i Hahgt0Table(i) = 63 0.205258
+i Hahgt0Table(i) = 64 0.203571
+i Hahgt0Table(i) = 65 0.201573
+i Hahgt0Table(i) = 66 0.199236
+i Hahgt0Table(i) = 67 0.196529
+i Hahgt0Table(i) = 68 0.193417
+i Hahgt0Table(i) = 69 0.189868
+i Hahgt0Table(i) = 70 0.185844
+i Hahgt0Table(i) = 71 0.181308
+i Hahgt0Table(i) = 72 0.176222
+i Hahgt0Table(i) = 73 0.170547
+i Hahgt0Table(i) = 74 0.164243
+i Hahgt0Table(i) = 75 0.157272
+i Hahgt0Table(i) = 76 0.149598
+i Hahgt0Table(i) = 77 0.141185
+i Hahgt0Table(i) = 78 0.132006
+i Hahgt0Table(i) = 79 0.122039
+i Hahgt0Table(i) = 80 0.111276
+i Hahgt0Table(i) = 81 0.0997268
+i Hahgt0Table(i) = 82 0.0874385
+i Hahgt0Table(i) = 83 0.0745089
+i Hahgt0Table(i) = 84 0.0610982
+i Hahgt0Table(i) = 85 0.0475965
+i Hahgt0Table(i) = 86 0.034556
+i Hahgt0Table(i) = 87 0.0227539
+i Hahgt0Table(i) = 88 0.0130628
+i Hahgt0Table(i) = 89 0.00567603
+i Hahgt0Table(i) = 90 0
+
+Results from r8trapzd = 0.0781374 for interval (a,b) = (0,0.8)
+
+Results from r8trapzd = 0.0488359 for interval (a,b) = (0,0.5)
+
+Results from r8trapzd = 0.0195344 for interval (a,b) = (0,0.2)
+
+Results from r8trapzd = 0.0488359 for interval (a,b) = (0.3,0.8)
+
+Results from r8trapzd = 0.0195344 for interval (a,b) = (0.3,0.5)
+
+Results from r8trapzd = 0.0195344 for interval (a,b) = (0.6,0.8)
+
+Test En ...
+Results from En(1,0.28) = 0.957308
+           Actual value = 0.957308
+
+Results from En(1,0.733615937) = 0.35086
+                  Actual value = 0.35086
+
+Test Ei ...
+Results from Ei(0.234) = -0.626785
+          Actual value = -0.626785
+
+          Results from Ei(1.5) = 3.30129
+                  Actual value = 3.30129
+
+Results from Ei(2.6) = 7.57611
+        Actual value = 7.57611
+
+Results from Ei(0.01583) = -3.55274
+            Actual value = -3.55274
+
+Test G11Prime ...
+Results from G11Prime(0.28) = 0.79134
+               Actual value = 0.79134
+
+Results from G11Prime(1.5836) = 0.217167
+                 Actual value = 0.217167
+
+
+x	n	G11Prime(x)	Ei(x)	En(x)
+0.5	0	0.685535	0.45422	1.21306
+0.5	1	0.685535	0.45422	0.559774
+0.5	2	0.685535	0.45422	0.326644
+1	0	0.41451		1.89512	0.367879
+1	1	0.41451		1.89512	0.219384
+1	2	0.41451		1.89512	0.148496
+1.5	0	0.238472	3.30129	0.148753
+1.5	1	0.238472	3.30129	0.10002
+1.5	2	0.238472	3.30129	0.0731008
+EXCEPTIONS:
+**PROGRAMMER ERROR** AtmosModel::Ei() - Invalid argument. Definition requires x > 0.0. Entered x = 0.0
+**PROGRAMMER ERROR** AtmosModel::En() - Invalid arguments. Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). Entered x = 0.0 and n = 1
+**PROGRAMMER ERROR** AtmosModel::En() - Invalid arguments. Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). Entered x = -1.0 and n = 0
+	************************************************
+

@@ -1,0 +1,81 @@
+Unit Test For Sinusodial
+
+Test missing center longitude keyword ...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+
+Test SetGround method ... 
+Setting ground to (-50,-75)
+Latitude:               -50
+Longitude:              -75
+XCoord:                 0.1682814027008146
+YCoord:                 -0.8726646259971648
+
+Test SetCoordinate method ... 
+Setting coordinate to (0.1682814027008146,-0.8726646259971648)
+Latitude:               -50
+Longitude:              -75
+XCoord:                 0.1682814027008146
+YCoord:                 -0.8726646259971648
+
+Test XYRange method ... 
+Minimum X:  -1.570796326794897
+Maximum X:  4.71238898038469
+Minimum Y:  -1.570796326794897
+Maximum Y:  1.570796326794897
+
+Test Name and comparision method ... 
+Name:       Sinusoidal
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  ProjectionName     = Sinusoidal
+  CenterLongitude    = 0.0
+End_Group
+End
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = Sinusoidal
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  CenterLongitude    = -90.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -90.0
+  MaximumLatitude = 90.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = -90.0
+End_Group
+End
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 365-366

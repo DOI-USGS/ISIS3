@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="specpix" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Replace user specified pixels with Isis special pixel values
+  </brief>
+
+  <description>
+    This program will replace the user specified pixels to Isis special pixel
+    values.  Overlap between the ranges of differing special pixel values is
+    not allowed. Each special pixel range must be unique.
+  </description>
+
+  <history>
+    <change name="Jim Mathews" date="1994-02-14">
+      Original version
+    </change>
+
+    <change name="Tracie Sucharski" date="2002-09-15">
+      Ported to Isis 3.0
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Added modifications to apptest by Kim
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Stuart Sides" date="2003-11-07">
+      Modified results pvl to not include the results group
+    </change>
+
+  </history>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <seeAlso>
+      <applications>
+          <item>stretch</item>
+      </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the input filename. All bands within the
+          file will be checked for replacement of pixels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the cube with specified pixels replaced with
+          Isis special pixel values.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Ranges">
+      <parameter name="NULLMIN">
+        <internalDefault>Do not create NULL pixels</internalDefault>
+        <type>double</type>
+        <brief>The minimum value for NULL</brief>
+        <description>
+          This defines the minimum value of the defined range of pixels to
+          be replaced with the Isis Null value.
+        </description>
+        <lessThan>
+          <item>NULLMAX</item>
+        </lessThan>
+        <inclusions>
+          <item>NULLMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="NULLMAX">
+        <internalDefault>Do not create NULL pixels</internalDefault>
+        <type>double</type>
+        <brief>The maximum value for NULL</brief>
+        <description>
+          This defines the maximum value of the defined range of pixels to
+          be replaced with the Isis Null value.
+        </description>
+        <greaterThan>
+          <item>NULLMIN</item>
+        </greaterThan>
+        <inclusions>
+          <item>NULLMIN</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LRSMIN">
+        <internalDefault>Do not create LRS pixels</internalDefault>
+        <type>double</type>
+        <brief>The minimum value for LRS</brief>
+        <description>
+          This defines the minimum value of the defined range of pixels to
+          be replaced with the Isis LRS value.
+        </description>
+        <lessThan>
+          <item>LRSMAX</item>
+        </lessThan>
+        <inclusions>
+          <item>LRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LRSMAX">
+        <internalDefault>Do not create LRS pixels</internalDefault>
+        <type>double</type>
+        <brief>The maximum value for LRS</brief>
+        <description>
+          This defines the maximum value of the defined range of pixels to
+          be replaced with the Isis LRS value.
+        </description>
+        <greaterThan>
+          <item>LRSMIN</item>
+        </greaterThan>
+        <inclusions>
+          <item>LRSMIN</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HRSMIN">
+        <internalDefault>Do not create HRS pixels</internalDefault>
+        <type>double</type>
+        <brief>The minimum value for HRS</brief>
+        <description>
+          This defines the minimum value of the defined range of pixels to
+          be replaced with the Isis HRS value.
+        </description>
+        <lessThan>
+          <item>HRSMAX</item>
+        </lessThan>
+        <inclusions>
+          <item>HRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HRSMAX">
+        <internalDefault>Do not create HRS pixels</internalDefault>
+        <type>double</type>
+        <brief>The maximum value for HRS</brief>
+        <description>
+          This defines the maximum value of the defined range of pixels to
+          be replaced with the Isis HRS value.
+        </description>
+        <greaterThan>
+          <item>HRSMIN</item>
+        </greaterThan>
+        <inclusions>
+          <item>HRSMIN</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LISMIN">
+        <internalDefault>Do not create LIS pixels</internalDefault>
+        <type>double</type>
+        <brief>The minimum value for LIS</brief>
+        <description>
+          This defines the minimum value of the defined range of pixels to
+          be replaced with the Isis LIS value.
+        </description>
+        <lessThan>
+          <item>LISMAX</item>
+        </lessThan>
+        <inclusions>
+          <item>LISMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LISMAX">
+        <internalDefault>Do not create LIS pixels</internalDefault>
+        <type>double</type>
+        <brief>The maximum value for LIS</brief>
+        <description>
+          This defines the maximum value of the defined range of pixels to
+          be replaced with the Isis LIS value.
+        </description>
+        <greaterThan>
+          <item>LISMIN</item>
+        </greaterThan>
+        <inclusions>
+          <item>LISMIN</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HISMIN">
+        <internalDefault>Do not create HIS pixels</internalDefault>
+        <type>double</type>
+        <brief>The minimum value for HIS</brief>
+        <description>
+          This defines the minimum value of the defined range of pixels to
+          be replaced with the Isis HIS value.
+        </description>
+        <lessThan>
+          <item>HISMAX</item>
+        </lessThan>
+        <inclusions>
+          <item>HISMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HISMAX">
+        <internalDefault>Do not create HIS pixels</internalDefault>
+        <type>double</type>
+        <brief>The maximum value for HIS</brief>
+        <description>
+          This defines the maximum value of the defined range of pixels to
+          be replaced with the Isis HIS value.
+        </description>
+        <greaterThan>
+          <item>HISMIN</item>
+        </greaterThan>
+        <inclusions>
+          <item>HISMIN</item>
+        </inclusions>
+      </parameter>
+
+    </group>
+  </groups>
+</application>

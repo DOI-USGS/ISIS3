@@ -1,0 +1,8 @@
+Group = PointPerspective
+  Library = PointPerspective
+  Routine = PointPerspectivePlugin
+  Keyword = CenterLongitude
+  Keyword = CenterLatitude
+  Keyword = Distance
+EndGroup
+

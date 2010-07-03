@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="viknosalt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Initial Clean-up of Viking Orbiter Level 1 images
+  </brief>
+
+  <description>
+    This program will perform the first portion of the level 1 processing sequence on a Viking 
+    Orbiter PDS image, the cleanup of salt noise in the image.
+  </description>
+
+  <category>
+    <missionItem>Viking</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>vikfixtrx</item>
+      <item>viknopepper</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Elizabeth Ribelin" date="2004-04-25">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2005-11-22">
+      Fixed lowpass command (parameters were modified)
+    </change>
+    <change name="Elizabeth Miller" date="2006-05-16">
+      Added example
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be cleaned
+        </brief>
+        <description>
+          The cube to be cleaned.  The cube will be ran through a series of filters to
+          remove salt noise.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the cleaned data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    <group name="Option">
+        <parameter name="REMOVE">
+            <type>boolean</type>
+            <brief>
+                  Remove intermediate files
+            </brief>
+            <description>
+                Option to remove or leave intermediate cube files made by the application
+            </description>
+            <default><item>TRUE</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+    <examples>
+    <example>
+      <brief> Input Viking Image to have salt noise removed </brief>
+      <description>
+        This example shows the viknosalt application in action.  It removes all salt noise from the image.
+      </description>
+      <terminalInterface>
+        <commandLine> from=../IN/temp.cub to=OUT/out.cub
+        </commandLine>
+        <description>
+          Input a viking image to remove salt noise from and give it an output file name.
+        </description>
+      </terminalInterface>
+  
+      <inputImages>
+        <image src="assets/image/inputImage.jpg" width="584" height="512">
+          <brief> Viking Image to Remove Salt Noise from</brief>
+          <description>
+              This is the input viking image prior to the removal of white noise.
+          </description>
+          <thumbnail caption=" Input Viking Image" src="assets/thumb/inputImage.jpg" width="200" height="175"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+  
+      <outputImages>
+        <image src="assets/image/outputImage.jpg" width="584" height="512">
+          <brief> Output Image</brief>
+          <description> 
+              This is the viking image after the viknosalt application has been run.
+          </description>
+          <thumbnail caption="Output Viking Image after running the viknosalt application." src="assets/thumb/outputImage.jpg" width="200" height="175"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+  
+    </example>
+  </examples>
+ </application>
+

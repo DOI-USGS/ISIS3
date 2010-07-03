@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="findrx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Find and refine reseau points in a cube
+  </brief>
+
+  <description>
+    This program will read in a cube and refine the positions of the Reseau points. 
+    It will also modify the cube's label so the Reseaus are matched with sub-pixel accuracy.
+    The new reseau coordinate set is then set to "Refined", and the validity of the pixels that
+    have nothing wrong will be set to 1. 
+  </description>
+
+  <category>
+      <missionItem>Viking</missionItem>
+      <missionItem>Voyager</missionItem>
+      <missionItem>Mariner</missionItem>
+  </category>
+
+  <history>
+    <change name="Leah Dahmer" date="2005-05-06">
+      Original version
+    </change>
+    <change name="Elizabeth Miller" date="2005-10-05">
+        Moved from utilities into mission categories
+    </change>
+    <change name="Jacob Danton" date="2006-05-24">
+        Modified the registration algorithm on edge and corner reseaus.
+    </change>
+    <change name="Tracie Sucharski" date="2006-08-07">
+        Changed call to Chip::Load because a scale factor was added to the 
+        method.
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-06-23">
+        Updated to properly check AutoReg::Register()'s return status
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be read
+        </brief>
+        <description>
+          The cube to be used to extract Reseau points from.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="REGDEF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The Auto Registration template
+        </brief>
+        <description>
+          The template to use with the AutoReg class. Default will be maximum correlation function
+          with a tolerance of 0.7, a search cube of 21x21 pixels, and a pattern cube of 9x9 pixels.
+        </description>
+        <filter>
+          *.def
+        </filter>
+        <internalDefault>$base/templates/AutoReg/findrx.def</internalDefault>
+      </parameter>
+    </group>
+
+    <group name="Marking Options">
+        <parameter name ="MARK">
+            <type>boolean</type>
+            <brief>
+                Mark the reseaus with a centered white pixel?
+            </brief>
+            <description>
+                This option will enable marking onto the cube file, writing a tiny white pixel in the center
+                of the refined reseau. This is mostly used for testing purposes, but it can also be
+                used for verification.
+            </description>
+            <default><item>false</item></default>
+        </parameter>
+    </group>
+  </groups>
+
+</application>

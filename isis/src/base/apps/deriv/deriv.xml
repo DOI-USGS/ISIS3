@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="deriv" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply horizontal or vertical derivative
+  </brief>
+
+  <description>
+    <p>
+      This program will apply a horizontal or vertical derivative to a cube.
+      This will highlight edges in the image created by groups of contrasting
+      DN values.  The horizontal derivative utilizes a two sample by one line
+      boxcar convolution for its solution, and will highlight horizontal linear
+      changes.  The vertical derivative utilizes a one sample by two line boxcar
+      convolution for the output, and will highlight vertical linear changes.
+      Please refer to the following 2 by 2 pixel example image:
+    </p>
+      <image src="assets/image/derivExample.jpg" width="100" height="100">
+      </image>
+    <p>
+      In this image, the horizontal derivative for A would be:
+    </p>
+    <pre>
+        A_NewDN = A - B
+    </pre>
+    <p>
+      The vertical derivative for A would be:
+    </p>
+    <pre>
+        A_NewDN = A - C
+    </pre>
+    <p>
+      NOTE: If this program needs to do calculations where special pixels
+      are involved, it will simply output NULL. If this causes undesireable
+      results, you should run the image through the stretch program to change
+      all special pixels to valid data. For example, if you have a number of
+      HRS pixels, you might want to stretch those to 255 prior to running the
+      deriv filter.
+    </p>
+  </description>
+
+  <history>
+    <change name="Tracie Sucharski" date="2002-12-24">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2003-01-28">
+      Fixed application name in xml file, misnamed as gradient.
+    </change>
+    <change name="K Teal Thompson" date="2003-04-10">
+      Added examples.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Brendan George" date="2005-11-07">
+      Modified to handle special pixels
+    </change>
+    <change name="Jac Shinaman" date="2007-02-08">
+      Updated xml documentation with examples
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will have the derivative applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This is the output file.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Derivative Direction">
+      <parameter name="DIRECTION">
+        <type>string</type>
+        <brief>Direction of derivative</brief>
+        <default><item>HORZ</item></default>
+        <description>
+          This chooses the derivative direction.  The possibilities
+          are: HORZ which uses a 2x1 kernel and VERT which uses a 1x2
+	  kernel.
+        </description>
+	<list>
+	  <option value="HORZ">
+	    <brief>Horizontal derivative (2x1)</brief>
+	    <description>
+	      The horizontal derivative uses a 2x1 kernel.
+	    </description>
+	  </option>
+	  <option value="VERT">
+	    <brief>Vertical derivative (1x2)</brief>
+	    <description>
+	      The vertical derivative uses a 1 x 2 kernel.
+	    </description>
+	  </option>
+	</list>
+      </parameter>
+    </group>
+
+  </groups>
+  <examples>
+    <example>
+      <brief> Horizontal</brief>
+      <description>
+        Use horizontal derivative option.
+      </description>
+      <terminalInterface>
+        <commandLine> f=peaks.cub t=deriv.horz d=h
+        </commandLine>
+        <description>
+        In this example the derivative direction is horizontal.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.4.jpg" width="500" height="500">
+          <brief> Input image for deriv</brief>
+          <description>This is the input image for the horizontal direction option of deriv.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.4.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/deriv.horz.jpg" width="500" height="500">
+          <brief> Output image for deriv</brief>
+          <description> This is the output image for the horizontal example of deriv.  The horizontal features fade and vertical features are enhanced.
+          </description>
+          <thumbnail caption="Output image showing results of the deriv application with direction: horizontal." src="assets/thumb/deriv.horz.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="500" height="600" src="assets/image/derivHorzGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a horizontal derivative of the input image. </description>
+            <thumbnail width="200" height="252" caption="Derivative Gui" src="assets/thumb/derivHorzGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief> Vertical</brief>
+      <description>
+        Use vertical derivative option.
+      </description>
+      <terminalInterface>
+        <commandLine> f=peaks.cub t=deriv.vert d=v
+        </commandLine>
+        <description>
+        In this example the derivative direction is vertical.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/peaks.4.jpg" width="500" height="500">
+          <brief> Input image for deriv</brief>
+          <description>This is the input image for the vertical direction option of deriv.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.4.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/deriv.vert.jpg" width="500" height="500">
+          <brief> Output image for deriv</brief>
+          <description> This is the output image for the vertical example of deriv.  The vertical features fade and horizontal features are enhanced.
+          </description>
+          <thumbnail caption="Output image showing results of the deriv application with direction: vertical." src="assets/thumb/deriv.vert.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="500" height="600" src="assets/image/derivVertGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a vertical derivative of the input image. </description>
+            <thumbnail width="200" height="252" caption="Derivative Gui" src="assets/thumb/derivVertGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+  </examples>
+</application>

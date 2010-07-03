@@ -1,0 +1,4 @@
+Group = StandardDeviation
+  Library = StandardDeviationOperator
+  Routine = StandardDeviationOperatorPlugin
+End_Group

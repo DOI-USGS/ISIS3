@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="gauss" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Filter a cube through a kernel using Gaussian weight
+  </brief>
+
+  <description>
+    This program calculates weight based on the bell-shaped Gaussian 
+    curve. The weight is then applied to an image kernel in such a way as to
+    create a filter that will move a weighted average through the image. The
+     end result is a blurred image with reduced detail and noise. The Gaussian 
+     function that determines the weight for all of the values in the kernel is
+     as follows
+  <pre>
+                                                  /   x^2+y^2   \
+                                               - |  -----------  |
+                G(x,y) =           1              \ 2(STDDEV)^2 /
+      			    --------------- e^ 
+			    2(pi)(STDDEV)^2 
+  </pre>
+  This formula creates a kernel that then runs through the image. The center of
+  the kernel is at (0,0). This means that a 3x3 boxcar will be of the form
+  <pre>
+        The kernel coordinates	          
+  (-2,-2) (-1,-2) (0,-2) (1,-2) (2,-2)
+  (-2,-1) (-1,-1) (0,-1) (1,-1)	(2,-1)	
+  (-2, 0) (-1, 0) (0, 0) (1, 0) (2, 0)       
+  (-2, 1) (-1, 1) (0, 1) (1, 1) (2, 1)
+  (-2, 2) (-1, 2) (0, 2) (1, 2) (2, 2)
+  
+          The kernel values (approx)
+       1   4   7   4   1
+       4   16  26  16  4
+       7   26  41  26  7     x 1/273
+       4   16  26  16  4
+       1   4   7   4   1 
+  </pre> 
+  </description>
+
+  <seeAlso>
+    <applications>
+      <item>kernfilter</item>
+    </applications>
+  </seeAlso>
+  <history>
+    <change name="Drew Davidson" date="2004-08-05">
+      Original version
+    </change>
+    
+    <change name="Drew Davidson" date="2004-08-06">
+      Added application test
+    </change>
+    
+    <change name="Drew Davidson" date="2004-08-16">
+      Added examples
+    </change>
+    
+    <change name="Drew Davidson" date="2005-06-27">
+      Fixed bug in boxcar size
+    </change>
+
+    <change name="Brendan George" date="2006-09-21">
+        Documentation fixes
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to be filtered
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be filtered.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the filter, a blurred version
+	  of the input file.
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="boxcar">
+      <parameter name="SIZE">
+        <type>integer</type>
+        <default>
+          <item>3</item>
+        </default>
+	<odd/>	
+        <brief>Size of one side of the boxcar</brief>
+        <description>
+          This is the user specified size of the boxcar that
+	   will move through the image. The boxcar must be square, so the default
+	   value of 3 will result in a 3 x 3 boxcar. A value of five would result
+	   in a 5 x 5 boxcar moving through the image.
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Standard Deviation">
+      <parameter name="STDDEV">
+        <type>double</type>
+        <default>
+          <item>1.0</item>
+        </default>
+	<minimum inclusive="false">0</minimum>
+        <brief>Standard Deviation</brief>
+        <description>
+	  At the most basic level, standard deviation can be thought of in this 
+	  context as the intensity of the blur being applied to the image. The 
+	  higher this value, the more noise and detail will be removed.
+          At a deeper level, standard deviation is described as the average 
+	  distance from any single measurement of a set to the mean of that set. 
+	  
+        </description>
+      </parameter>
+    </group>
+  </groups>
+  <examples>
+    <example>
+        <brief>
+         Using a 3 x 3 boxcar 
+        </brief>
+        <description>
+      This example shows the use of the default standard deviation (1.0) and the 
+      default boxcar size (3). Since the boxcar must be square in this program,
+      this means that a 3 x 3 boxcar will be used.
+        </description>
+        <terminalInterface>
+          <commandLine>
+	    from= peaks.cub 
+	    to=gauss3x3.cub
+	    size=3
+	    STDDEV= 1.0
+	  </commandLine>
+	<description>
+	This example uses all of the default values specified by the program
+	</description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="440" height="625" src="assets/images/gauss3x3gui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI with parameters set to perform Gaussian 
+	      smoothing with a 3 x 3 boxcar.
+	    </description>
+	    <thumbnail width="220" height="312" caption="gauss gui" 
+	     src="assets/thumbs/gauss3x3gui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before gauss.
+	  </brief>
+	  <description>
+	    This is the image as it was taken originally. 
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/gauss3x3.jpg">
+	  <brief>
+	  Output image after gauss
+	  </brief>
+	  <description>
+	    This is the image after the gauss filter. Edges of the image are 
+	    now much softer. Detail and noise has been removed.
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/gauss3x3.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+    
+    <example>
+        <brief>
+         Using a 5 x 5 boxcar 
+        </brief>
+        <description>
+      This example shows the use of a larger standard deviation (2.0) and the 
+      larger boxcar (5). As with the last example, the single value of 5 will
+      be applied to both the line size and sample size of the boxcar.
+        </description>
+        <terminalInterface>
+          <commandLine>
+	    from= peaks.cub 
+	    to=bigblur.cub
+	    size=5
+	    STDDEV= 2.0
+	  </commandLine>
+	<description>
+	This example will create a more dramatic blur, as everything is larger 
+	than in the first example
+	</description>
+      </terminalInterface>
+   
+      <guiInterfaces>
+        <guiInterface>
+	  <image width="440" height="625" src="assets/images/gauss5x5gui.jpg">
+	    <brief>
+	    Example GUI
+	    </brief>
+	    <description>
+	      Screenshot of the GUI with parameters set to perform Gaussian 
+	      smoothing with a 5 x 5 boxcar and 2.0 as the standard deviation.
+	    </description>
+	    <thumbnail width="220" height="312" caption="gauss gui" 
+	     src="assets/thumbs/gauss5x5gui.jpg" />
+	  </image>
+	</guiInterface>
+      </guiInterfaces>
+ 
+      <inputImages>
+        <image width="500" height="500" src="assets/images/peaks.jpg">
+	  <brief>
+	    Input image before gauss.
+	  </brief>
+	  <description>
+	    This is the image as it was taken originally. 
+	  </description>
+	  <thumbnail caption= "The image before the filter" 
+	   src="assets/thumbs/peaks.jpg" width="200" height="200"/>
+	  <parameterName>FROM</parameterName>
+	</image>
+      </inputImages>
+      
+      <outputImages>
+        <image width="500" height="500" src="assets/images/gauss5x5.jpg">
+	  <brief>
+	  Output image after gauss
+	  </brief>
+	  <description>
+	    This is the image after the gauss filter. Edges of the image are 
+	    now much softer. The blur is much more noticeable on account both of
+	    the larger boxcar and the larger standard deviation.
+	  </description>
+	  <thumbnail caption= "The image after the filter" 
+	  src="assets/thumbs/gauss5x5.jpg" width="200" height="200"/>
+	  <parameterName>TO</parameterName>
+	</image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

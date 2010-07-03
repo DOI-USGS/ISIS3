@@ -1,0 +1,30 @@
+UNIT TEST for MoonAlbedo normalization function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name = LunarLambertMcEwen
+  End_Group
+End_Object
+
+Object = NormalizationModel
+  Group = Algorithm
+    Name = MoonAlbedo
+    D    = 0.0
+    E    = -0.218
+    F    = 0.5
+    G2   = 0.4
+    H    = 0.054
+    Bsh1 = 1.6
+  End_Group
+End_Object
+End
+
+Test phase=86.7207248, incidence=51.7031305, emission=38.9372914, dn=.0800618902 ...
+Normalization value = 0.165677
+
+Test phase=75.7207248, incidence=41.7031305, emission=28.9372914, dn=.0697334611 ...
+Normalization value = 0.118661
+
+Test phase=53.7187773, incidence=31.7060221, emission=18.9331391, dn=.0194225037 ...
+Normalization value = 0.0253739
+

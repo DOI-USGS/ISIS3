@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <p>This is a dummy file for the a Programmers Guide. </p>
+      </body>
+      <type>HTML</type>
+      <source>
+        <filename>ProgrammerGuide.html</filename>
+      </source>
+    </file>
+  </files>
+  <category>
+    <categoryItem>technicaldoc</categoryItem>
+    <categoryItem>guide</categoryItem>
+    <categoryItem>api</categoryItem>
+  </category>
+  <audience>
+    <target>programmer</target>
+  </audience>
+  <bibliography>
+    <title>Programmer Guide</title>
+    <brief>Guide to Programming the Isis software package</brief>
+    <description>Guide to the Isis software for Isis Programmers, using libraries, writing libraries and applications, working in the team development area, writing XML files, and winning lottery numbers.</description>
+    <author>Deborah Lee Soltesz</author>
+    <date>2002-12-09</date>
+  </bibliography>
+</documentation>

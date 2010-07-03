@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="poly" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Perform polynomial algebra on cube
+  </brief>
+
+  <description>
+    This program will perform polynomial algebra on a cube up to the eighth
+    order.  The equation used:
+       out = (in * mult1) + (in**2 * mult2) + ... +(in**8 *mult8) + add
+  </description>
+
+  <history>
+    <change name="Jim Mathews" date="1994-01-12">
+      Original version
+    </change>
+
+    <change name="Tracie Sucharski" date="2002-08-22">
+      Ported to Isis 3.0
+    </change>
+    <change name="Tracie Sucharski" date="2003-04-23">
+      Initialize the value of order to 0.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-05-30">
+      Added modifications to apptest by Kim
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Sean Crosby" date="2007-02-21">
+      Removed exceptions and corrected math logic.
+    </change>
+
+  </history>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+  <seeAlso>
+    <applications>
+      <item>algebra</item>
+      <item>ratio</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          First Input cube
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands selected from
+          the file will have the polynomial applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the polynomial.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Polynomial Coeficients">
+      <parameter name="MULT1">
+        <type>double</type>
+        <default>
+          <item> 1.0 </item>
+        </default>
+        <brief> Multiplicative constant for first order term </brief>
+        <description>
+          This defines the multiplicative constant for the first order term.
+        </description>
+      </parameter>
+
+      <parameter name="MULT2">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Multiplicative constant second order term </brief>
+        <description>
+          This defines the multiplicative constant for the second order term.
+        </description>
+      </parameter>
+
+      <parameter name="MULT3">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Multiplicative constant for third order term </brief>
+        <description>
+          This defines the multiplicative constant for the third order term.
+        </description>
+      </parameter>
+
+      <parameter name="MULT4">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Multiplicative constant for fourth order term </brief>
+        <description>
+          This defines the multiplicative constant for the fourth order term.
+        </description>
+      </parameter>
+
+      <parameter name="MULT5">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Multiplicative constant for fifth order term </brief>
+        <description>
+          This defines the multiplicative constant for the fifth order term.
+        </description>
+      </parameter>
+
+      <parameter name="MULT6">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Multiplicative constant for sixth order term </brief>
+        <description>
+          This defines the multiplicative constant for the sixth order term.
+        </description>
+      </parameter>
+
+      <parameter name="MULT7">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Multiplicative constant for seventh order term </brief>
+        <description>
+          This defines the multiplicative constant for the seventh order term.
+        </description>
+      </parameter>
+
+      <parameter name="MULT8">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief> Multiplicative constant for eighth order term </brief>
+        <description>
+          This defines the multiplicative constant for the eighth order term.
+        </description>
+      </parameter>
+
+      <parameter name="ADD">
+        <type>double</type>
+        <default>
+          <item> 0.0 </item>
+        </default>
+        <brief>
+          Additive constant
+        </brief>
+        <description>
+          Constant that is added to product.
+        </description>
+      </parameter>
+
+    </group>
+  </groups>
+</application>

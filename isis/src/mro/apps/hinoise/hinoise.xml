@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hinoise" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Check pause points and remove noise from HiRISE cubes.
+  </brief>
+
+  <description>
+    This application removes noise from HiRISE cubes.  It also checks the
+    pause points and removes any artifacts there.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Eric Hyer" date="2009-04-15">
+      Original version converted from Eric Eliason's Perl
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+          Input cube to remove noise from
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file
+        </brief>
+        <description>
+	  Output cube with noise removed
+        </description>
+      </parameter>
+    </group>
+    
+    
+    <group name="Low Pass Filter Options">
+      
+      <parameter name="LPFLINES">
+        <type>string</type>
+        <default><item>251</item></default>
+        <brief>lowpass LINES parameter</brief>
+        <description>
+          This is the LINES parameter for lowpass.  See the lowpass
+          application for details.
+        </description>
+      </parameter>
+      
+      <parameter name="LPFSAMPLES">
+        <type>string</type>
+        <default><item>3</item></default>
+        <brief>lowpass SAMPLES parameter</brief>
+        <description>
+          This is the Samples parameter for lowpass.  See the lowpass
+          application for details.
+        </description>
+      </parameter>
+      
+      <parameter name="LPFMINPER">
+        <type>string</type>
+        <default><item>5</item></default>
+        <brief>lowpass MINIMUM parameter (as a percentage)</brief>
+        <description>
+          lowpass is called such that MINOPT=PERCENTAGE and MINIMUM is this
+          parameter here.  See the lowpass application for details.
+        </description>
+      </parameter>
+
+    </group>
+    
+    <group name="High Pass Filter Options">
+
+      <parameter name="HPFLINES">
+        <type>string</type>
+        <default><item>251</item></default>
+        <brief>highpass LINES parameter</brief>
+        <description>
+          This is the LINES parameter for highpass.  See the highpass
+          application for details.
+        </description>
+      </parameter>
+      
+      <parameter name="HPFSAMPLES">
+        <type>string</type>
+        <default><item>1</item></default>
+        <brief>highpass SAMPLES parameter</brief>
+        <description>
+          This is the SAMPLES parameter for highpass.  See the highpass
+          application for details.
+        </description>
+      </parameter>
+
+      <parameter name="HPFMINPER">
+        <type>string</type>
+        <default><item>5</item></default>
+        <brief>highpass MINIMUM parameter (as a percentage)</brief>
+        <description>
+          highpass is called such that MINOPT=PERCENTAGE and MINIMUM is this
+          parameter here.  See the lowpass application for details.
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Noise Filter Options">
+      
+      <parameter name="NOISELINES">
+        <type>string</type>
+        <default><item>7</item></default>
+        <brief>noisefilter LINES parameter</brief>
+        <description>
+          This is the LINES parameter for noisefilter.  See the noisefilter
+          application for details.
+        </description>
+      </parameter>
+      
+      <parameter name="NOISESAMPLES">
+        <type>string</type>
+        <default><item>7</item></default>
+        <brief>noisefilter SAMPLES paramater</brief>
+        <description>
+          This is the SAMPLES parameter for noisefilter.  See the noisefilter
+          application for details.
+        </description>
+      </parameter>
+      
+      <parameter name="NONVALIDFRACTION">
+        <type>double</type>
+        <default><item>0.90</item></default>
+        <brief>Pause point tolerance fraction</brief>
+        <description>
+          For each column of the cube a count is calculated of the number of
+          valid pixels in the column.  If any columns count divided by the
+          maximum count is less than NONVALIDFRACTION then the pause points
+          are nulled out.  If the binning is anything other than one then all
+          columns are checked with only the failing columns getting nulled out.
+        </description>
+      </parameter>
+
+      <parameter name="MAXNORMALIZATION">
+        <type>string</type>
+        <default><item></item></default>
+        <brief>Maximum normalization</brief>
+        <description>
+        </description>
+      </parameter>
+
+      <parameter name="MINNORMALIZATION">
+        <type>string</type>
+        <default><item></item></default>
+        <brief>Minimum normalization</brief>
+        <description>
+        </description>
+      </parameter>
+
+      <parameter name="TOLMIN">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>noisefilter TOLMIN parameter</brief>
+        <description>
+          This is the TOLMIN parameter for noisefilter.  See the noisefilter
+          application for details.
+        </description>
+      </parameter>
+
+      <parameter name="TOLMAX">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>noisefilter TOLMAX parameter</brief>
+        <description>
+          This is the TOLMAX parameter for noisefilter.  See the noisefilter
+          application for details.
+        </description>
+      </parameter>
+
+      <parameter name="LOW">
+        <type>double</type>
+        <default><item>0</item></default>
+        <brief>noisefilter LOW parameter</brief>
+        <description>
+          This is the LOW parameter for noisefilter.  See the noisefilter
+          application for details.
+        </description>
+      </parameter>
+
+      <parameter name="HARDFILTERING">
+        <type>double</type>
+        <default><item>0.1</item></default>
+        <brief>Percent of LIS pixels to switch to hard noise filtering</brief>
+        <description>
+          Percent of LIS pixels to switch to hard noise filtering
+        </description>
+      </parameter>
+
+      <parameter name="HIGHENDPERCENT">
+        <type>double</type>
+        <default><item>99.999</item></default>
+        <brief>Fraction of high-end pixels to zap</brief>
+        <description>
+          Fraction of high-end pixels to zap
+        </description>
+      </parameter>
+
+      <parameter name="HARDHIGHENDPERCENT">
+        <type>double</type>
+        <default><item>99.99</item></default>
+        <brief>Fraction of high-end pixels to zap for hard noise filtering</brief>
+        <description>
+          Fraction of high-end pixels to zap for hard noise filtering
+        </description>
+      </parameter>
+
+      <parameter name="HARDTOLMIN">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>noisefilter TOLMIN parameter for hard noise filtering</brief>
+        <description>
+          Use this value for noisefilter's TOLMIN parameter when doing
+          hard noise filtering
+        </description>
+      </parameter>
+
+      <parameter name="HARDTOLMAX">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>noisefilter TOLMAX parameter for hard noise filtering</brief>
+        <description>
+          Use this value for noisefilter's TOLMAX parameter when doing
+          hard noise filtering
+        </description>
+      </parameter>
+
+      <parameter name="FLATTOL">
+        <type>double</type>
+        <default><item>1</item></default>
+        <brief>noisefilter FLATTOL parameter</brief>
+        <description>
+          This is the FLATTOL parameter for noisefilter.  See the noisefilter
+          application for details.
+        </description>
+      </parameter>
+
+      <parameter name="LPFZLINES">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>lowpass LINES parameter for LPFZ</brief>
+        <description>
+        </description>
+      </parameter>
+
+      <parameter name="LPFZSAMPLES">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>lowpass SAMPLES parameter for LPFZ</brief>
+        <description>
+        </description>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+</application>

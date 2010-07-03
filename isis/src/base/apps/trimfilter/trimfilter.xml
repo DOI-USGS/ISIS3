@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="trimfilter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a trim filter to a cube
+  </brief>
+
+  <description>
+    This program convolves an NxM boxcar through a cube and trims (or NULLs)
+    pixels.  A pixel at the center of the boxcar is trimmed in the output cube
+    if the number of valid pixels inside the boxcar is less than a user
+    specified minimum.  Valid pixels are defined as those which are 1) not
+    special pixels and 2) inside the range of the LOW and HIGH parameters.
+    This is a very powerful trimming tool although much
+    thought must be put into the parameters in order to obtain the optimal
+    trimming results.
+  </description>
+
+  <category>
+    <categoryItem>Filters</categoryItem>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>lowpass</item>
+      <item>highpass</item>
+      <item>sdfilter</item>
+      <item>varfilter</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Eric Eliason" date="1988-05-20">
+      Original version
+    </change>
+
+    <change name="Jeff Anderson" date="2002-08-01">
+      Ported to Isis 3.0
+    </change>
+
+    <change name="K Teal Thompson" date="2002-12-03">
+      Add example
+    </change>
+
+    <change name="K Teal Thompson" date="2003-03-28">
+      Make images smaller.
+    </change>
+    <change name="Stuart Sides" date="2003-04-04">
+      Fixed problem with isiscvs not checking in the thumb and image directories.
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Brendan George" date="2006-03-20">
+        Added Minopt parameter
+    </change>
+  </history>
+
+  <oldName>
+    <item>boxfilter</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+	        Input cube to filter
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output trimmed cube
+        </brief>
+        <description>
+	        The resultant trimmed cube
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Size">
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>
+          Number of samples in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of samples in the boxcar.
+          It must be odd and can not exceed twice the number of samples
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>
+          Number of lines in boxcar
+        </brief>
+
+        <description>
+	        This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly
+          slower.
+        </description>
+
+        <odd />
+
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Boxcar Restrictions">
+      <parameter name="LOW">
+        <type>double</type>
+        <brief>
+          Valid minimum pixel
+        </brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar counts.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <lessThan>
+          <item>HIGH</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="HIGH">
+        <type>double</type>
+        <brief>
+          Valid maximum pixel
+        </brief>
+        <description>
+          Valid maximum pixel value that will be used in boxcar computation.  If
+          a pixel value is greater than HIGH then it will not be used when
+          computing boxcar counts.
+        </description>
+        <internalDefault>
+          Use all pixels
+        </internalDefault>
+        <greaterThan>
+          <item>LOW</item>
+        </greaterThan>
+      </parameter>
+
+      <parameter name="MINOPT">
+          <type>string</type>
+          <default>
+              <item>COUNT</item>
+          </default>
+          <brief>
+             Sets minimum to be either a count or a percentage
+          </brief>
+          <description>
+              This parameter determines whether the minimum
+              parameter is to be interpreted as a count of pixels, or a
+              percentage of all pixels in the boxcar.
+          </description>
+
+          <list>
+              <option value="COUNT">
+                  <brief>
+                      Minimum valid pixel count
+                  </brief>
+                  <description>
+                      This option indicates that the minimum is a minimum
+                      count of pixels required for filtering.
+                  </description>
+              </option>
+              <option value="PERCENTAGE">
+                <brief>
+                    Minimum valid pixel percentage
+                </brief>
+                <description>
+                    This option indicates the the minimum parameter is to be
+                    interpreted as a percentage of the total pixels in the
+                    boxcar.
+                </description>
+              </option>
+          </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <brief>
+          Minimum boxcar pixel count
+        </brief>
+        <description>
+          This is the minimum number of valid pixels which must occur inside the
+          NxM boxcar in order to preserve the output pixel.
+          For example, a 3x5 boxcar has 15 pixels
+          inside.  If MINIMUM=10 then the trimming will occur if there are 9 or
+          less valid pixels.  A valid pixel is one that is not special (NULL, LIS,
+          etc) and is in the range defined by LOW to HIGH.
+        </description>
+        <default>
+          <item>1</item>
+        </default>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> run a trim filter </brief>
+      <description>
+        This example shows a trimfilter operation.
+      </description>
+      <terminalInterface>
+        <commandLine> f=../IN/lo880.crp.cub t=OUT/trmfltr s=1 li=301 high=241 min=95
+        </commandLine>
+        <description>
+        trimfilter a Lunar Orbiter image.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/lo880.crp.jpg" width="485" height="400">
+          <brief> Input image for trimfilter</brief>
+          <description>This is the input image for the trimfilter example.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/lo880.crp.jpg" width="200" height="165"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/trmfltr.jpg" width="485" height="400">
+          <brief> Output image for trimfilter</brief>
+          <description> This is the output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the trimfilter application." src="assets/thumb/trmfltr.jpg" width="200" height="165"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="463" height="368" src="assets/image/trimfilterGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform a trimfilter operation on the input image. </description>
+            <thumbnail width="200" height="159" caption="trimfilter Gui" src="assets/thumb/trimfilterGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

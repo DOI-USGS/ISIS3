@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<application name="mvstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Generate multivariate Statistics for a cube
+  </brief>
+
+  <description>
+    This application generates the correlation and covariance for a single cube which can be used
+    to evaluate the similarity and/or disimilarity between bands of a cube.   Each band of the cube 
+    is compared against every other band in the cube, generating a covariance matrix and a correlation
+    matrix,  which are output to CUBE  and/or FLATFILE.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <history>
+    <change name="Brendan George" date="2005-10-24">
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          The input file to draw the statistics from. It must contain at least
+          two bands. 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="CUBE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube containing the correlation and covariance matrices
+        </brief>
+        <internalDefault>
+          None
+        </internalDefault>
+        <description>
+          This output cube is a two band cube containing the correlation and covariance
+          matrices.  The dimensions of this cube will be NxNx2, where N is the number of bands in 
+          the input cube. The first band will contain the correlation matrix, and the second will contain
+          the covariance matrix.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="FLATFILE">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output text file containing  the correlation and covariance matrices
+        </brief>
+        <internalDefault>
+          None
+        </internalDefault>
+        <description>
+          This text file will contain the correlation and covariance matrices.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

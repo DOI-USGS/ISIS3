@@ -1,0 +1,109 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 1
+    ^Core       = unitTest.lab.cub
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1204
+      Lines   = 1056
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName       = VIKING_ORBITER_2
+    InstrumentId         = VISUAL_IMAGING_SUBSYSTEM_CAMERA_B
+    TargetName           = MARS
+    StartTime            = 1977-08-03T15:59:09
+    ExposureDuration     = 0.135800 <seconds>
+    SpacecraftClockCount = 53448121
+    FloodModeId          = ON
+    GainModeId           = LOW
+    OffsetModeId         = ON
+  End_Group
+
+  Group = Archive
+    DataSetId       = VO1/VO2-M-VIS-2-EDR-V2.0
+    ProductId       = 348B26
+    MissonPhaseName = EXTENDED_MISSION
+    ImageNumber     = 53448121
+    OrbitNumber     = 348
+  End_Group
+
+  Group = BandBin
+    FilterName = RED
+    FilterId   = 6
+  End_Group
+
+  Group = Kernels
+    LeapSecond          = $base/kernels/lsk/naif0008.tls
+    TargetAttitudeShape = $base/kernels/pck/pck00008.tpc
+    TargetPosition      = $base/kernels/spk/de405.bsp
+    InstrumentPointing  = $viking2/kernels/ck/vo2_sedr_ck2.bc
+    Instrument          = Null
+    SpacecraftClock     = ($viking2/kernels/sclk/vo2_fict.tsc, 
+                           $viking2/kernels/sclk/vo2_fsc.tsc)
+    InstrumentPosition  = $viking2/kernels/spk/vo2_rcon.bsp
+    Frame               = $viking2/kernels/fk/vo2_v10.tf
+    InstrumentAddendum  = $viking2/kernels/iak/vikingAddendum003.ti
+    ElevationModel      = Null
+    NaifFrameCode       = -30002
+  End_Group
+
+  Group = Reseaus
+    Line     = (5, 7, 9, 10, 11, 12, 14, 15, 17, 19, 20, 135, 136, 137, 138, 
+                139, 140, 142, 143, 144, 146, 148, 149, 265, 266, 267, 268, 
+                269, 270, 271, 272, 274, 276, 278, 395, 395, 397, 398, 398, 
+                399, 400, 401, 402, 404, 406, 407, 525, 526, 526, 527, 528, 
+                528, 529, 530, 531, 533, 535, 654, 655, 655, 656, 657, 657, 
+                658, 659, 660, 661, 663, 664, 784, 784, 785, 785, 786, 786, 
+                787, 788, 789, 790, 793, 914, 914, 914, 914, 915, 915, 916, 
+                916, 917, 918, 920, 922, 1043, 1043, 1043, 1043, 1044, 1044, 
+                1045, 1045, 1046, 1048, 1051)
+    Sample   = (23, 141, 257, 373, 489, 605, 720, 836, 952, 1068, 1185, 23, 
+                82, 199, 315, 431, 546, 662, 778, 894, 1010, 1126, 1184, 24, 
+                141, 257, 373, 489, 605, 720, 836, 952, 1068, 1184, 24, 82, 
+                199, 315, 432, 547, 663, 779, 895, 1011, 1127, 1184, 24, 141, 
+                258, 374, 490, 605, 721, 837, 953, 1070, 1185, 24, 83, 200, 
+                316, 432, 548, 664, 780, 896, 1012, 1128, 1185, 24, 142, 258, 
+                374, 490, 606, 722, 838, 954, 1070, 1186, 23, 82, 199, 316, 
+                432, 548, 664, 780, 896, 1013, 1129, 1186, 22, 140, 257, 374, 
+                489, 606, 722, 838, 954, 1071, 1187)
+    Type     = (1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 
+                5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 
+                5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 
+                5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 
+                4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 
+                5, 5, 6)
+    Valid    = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                0, 0, 0)
+    Template = $viking2/reseaus/vo2.visb.template.cub
+    Status   = Nominal
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 1
+  Bytes     = 805
+  ^History  = unitTest.IsisCube
+End_Object
+End

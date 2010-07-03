@@ -1,0 +1,4 @@
+Camera = Framing?   0
+Camera = LineScan?  0
+Camera = PushFrame? 1
+Camera = Radar?     0

@@ -1,0 +1,4 @@
+Group = Albedo
+  Library = Albedo
+  Routine = AlbedoPlugin
+End_Group

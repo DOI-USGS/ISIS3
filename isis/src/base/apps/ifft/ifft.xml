@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="ifft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Apply an Inverse Fourier Transform on a magnitude/phase pair of cubes
+  </brief>
+
+  <description>
+      This program accepts two cubes, most likely acquired from the fft program,
+      containing the magnitude and phase angle data of a Fourier transformed 
+      image and returns the inverse. 
+  </description>
+
+  <category>
+    <categoryItem>Fourier Domain</categoryItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>fft</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2005-11-28">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+      Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-10-16">
+      Fixed documentation: example GUI screenshots were missing,
+      they should now exist. The name of the GUI screenshot was incorrect,
+      "fft" was changed to "ifft."
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="MAGNITUDE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Magnitude input cube
+        </brief>
+        <description>
+          The input cube containing the image magnitude data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="PHASE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Phase input cube
+        </brief>
+        <description>
+          The input cube containing the image phase angle data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+         Output cube.
+        </brief>
+        <description>
+            The result of the inverse transform.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief> ifft example </brief>
+      <description>
+          Example of the inverse Fourier transform.
+      </description>
+      <terminalInterface>
+        <commandLine> magnitude=peaks_magnitude.cub phase=peaks_phase.cub to=peaks.cub </commandLine>
+        <description>
+            Compute the inverse Fourier transform of peaks_magnitude.cub and peaks_phase.cub and store the result in peaks.cub .
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/ifftMag.jpg" width="512" height="512">
+          <brief> Example magnitude output</brief>
+          <description> This is the magnitude output of the transform of peaks.cub.
+          </description>
+          <thumbnail caption="Magnitude image" src="assets/thumb/ifftMag.jpg" width="256" height="256"/>
+          <parameterName>MAGNITUDE</parameterName>
+        </image>
+
+        <image src="assets/image/ifftPhase.jpg" width="512" height="512">
+          <brief> Example phase output</brief>
+          <description> This is the phase output of the transform of peaks.cub.
+          </description>
+          <thumbnail caption="Phase image" src="assets/thumb/ifftPhase.jpg" width="256" height="256"/>
+          <parameterName>PHASE</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/peaks.jpg" width="512" height="512">
+          <brief> Example output</brief>
+          <description>This is the output image, peaks.cub.
+          </description>
+          <thumbnail caption=" Output image" src="assets/thumb/peaks.jpg" width="256" height="256"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="512" height="512" src="assets/image/ifftGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform the ifft application</description>
+            <thumbnail width="256" height="256" caption="ifft GUI" src="assets/thumb/ifftGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

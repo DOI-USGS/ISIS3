@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="comparisontemplate" xmlns:xsi=
+    "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=
+    "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    A template gui for lists and inclusions/exclusions
+  </brief>
+  <description>
+    The template gui illustrates the functionality of lists and inclusions and
+    exclusions.
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Elizabeth Miller" date="2005-11-03">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Minimum/Maximum Examples">
+
+      <parameter name="SQUAREROOT">
+        <type>integer</type>
+        <brief>
+          Value to take the square root of
+        </brief>
+        <description>
+          The value to take the square root of.  The value must be non-negative.
+        </description>
+        <minimum inclusive="true">0</minimum>
+      </parameter>
+
+      <parameter name="FACTORIAL">
+        <type>integer</type>
+        <brief>
+          Value to take the factorial of
+        </brief>
+        <description>
+          The value to compute the factorial of.  The value must be smaller than
+          65 in order to be computed.
+        </description>
+        <maximum inclusive="false">65</maximum>
+      </parameter>
+    </group>
+
+    <group name="Greater Than/Less Than Examples">
+
+      <parameter name="MINDN">
+        <type>integer</type>
+        <brief>
+          Minimum Pixel Value
+        </brief>
+        <description>
+          The minimum value a pixel can have.  It must be less than the maximum
+          pixel value.
+        </description>
+        <lessThan>
+          <item>MAXDN</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MAXDN">
+        <type>integer</type>
+        <brief>
+          Maximum Pixel Value
+        </brief>
+        <description>
+          The maximum value a pixel can have.  It must be greater than the
+          minimum pixel value.
+        </description>
+        <greaterThan>
+          <item>MINDN</item>
+        </greaterThan>
+      </parameter>
+    </group>
+
+    <group name="Oddity Check">
+
+      <parameter name="ODDNUMBER">
+        <type>integer</type>
+        <brief>
+          Odd Number
+        </brief>
+        <description>
+          This value must be an odd number.  If an even number is entered, an
+          error will be returned.
+        </description>
+        <odd />
+      </parameter>
+    </group>
+  </groups>
+</application>

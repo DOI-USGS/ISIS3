@@ -1,0 +1,27 @@
+Name   = PolynomialUnivariate
+Ncoefs = 2
+Vars   = 1
+0.5
+0.5
+---
+1.5
+1
+2
+---
+0
+1
+-1
+---- 2nd order ----
+Name   = PolynomialUnivariate
+Ncoefs = 3
+Vars   = 1
+1
+1
+-1
+1
+---- 2nd order ----
+Name   = PolynomialUnivariate
+Ncoefs = 3
+Vars   = 1
+Variable Derivative = 4.5
+Coefficient 2 Derivative = 4

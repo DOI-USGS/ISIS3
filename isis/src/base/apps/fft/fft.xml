@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="fft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Apply a Fourier Transform on a cube
+  </brief>
+
+  <description>
+      This programs takes a single input cube, applies a Fourier Transform, 
+      and stores the result in two bands of an output cube containing the magnitude and 
+      phase angle data. If the original image has dimensions that are not powers
+      of two, it is automatically padded with zeroes. These images can then be 
+      used in the ifft program to recover the original.
+  </description>
+
+  <category>
+    <categoryItem>Fourier Domain</categoryItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>ifft</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2005-11-28">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+      Documentation fixes
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Steven Lambright" date="2008-10-16">
+      Documentation fixes: Created images for the GUI screenshots,
+      which were missing.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to apply the transform to
+        </brief>
+        <description>
+            The input cube on which the Fourier transform is applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MAGNITUDE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Magnitude output cube
+        </brief>
+        <description>
+          The resultant cube containing the image magnitude data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="PHASE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Phase output cube
+        </brief>
+        <description>
+          The resultant cube containing the image phase angle data..
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+
+    <group name="Handling Special Pixels">
+      <parameter name="REPLACEMENT">
+        <type>string</type>
+        <default>
+          <item>ZEROES</item>
+        </default>
+        <brief>Replacement value</brief>
+        <description>
+          This option specifies what special pixels will be replaced with.
+        </description>
+        <list>
+          <option value="ZEROES">
+            <brief>Replace with Zeroes</brief>
+            <description>
+                Replaces all special pixels with zeroes.
+            </description>
+          </option>
+          <option value="MINMAX">
+            <brief>Replace with max and min</brief>
+            <description>
+                Replaces HRS and HIS pixels with the maximum value of the cube and LRS and LIS pixels with the minimum.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> fft example </brief>
+      <description>
+          Example of the Fourier transform.
+      </description>
+      <terminalInterface>
+        <commandLine> from=peaks.cub magnitude=peaks_magnitude.cub phase=peaks_phase.cub </commandLine>
+        <description>
+            Compute the Fourier transform of peaks.cub and store the results in peaks_magnitude.cub and peaks_phase.cub
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/peaks.jpg" width="512" height="512">
+          <brief> Input image for fft</brief>
+          <description>This is the input image, peaks.cub.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/peaks.jpg" width="256" height="256"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/fftMag.jpg" width="512" height="512">
+          <brief> Example magnitude output</brief>
+          <description> This is the magnitude output of the transform of peaks.cub.
+          </description>
+          <thumbnail caption="Magnitude image" src="assets/thumb/fftMag.jpg" width="256" height="256"/>
+          <parameterName>MAGNITUDE</parameterName>
+        </image>
+
+        <image src="assets/image/fftPhase.jpg" width="512" height="512">
+          <brief> Example phase output</brief>
+          <description> This is the phase output of the transform of peaks.cub.
+          </description>
+          <thumbnail caption="Phase image" src="assets/thumb/fftPhase.jpg" width="256" height="256"/>
+          <parameterName>PHASE</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="512" height="512" src="assets/image/fftGui.jpg">
+            <brief>Example GUI</brief>
+            <description>Screenshot of GUI with parameters filled in to perform the fft application</description>
+            <thumbnail width="256" height="256" caption="fft GUI" src="assets/thumb/fftGui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+
+</application>

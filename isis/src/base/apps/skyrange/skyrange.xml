@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="skyrange" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Compute the ra/dec range of a camera image
+  </brief>
+
+  <description>
+    This program will report the ra/dec range of a camera image.  It will also compute the ra/dec at the center of the cube, the pixel resolution in
+    degrees per pixel, and an orientation angle to celestial north (90 declination) in the image plane.  This angle, CelestialNorthClockAngle, is
+    from the center of the image off of the Y-axis (12 o'clock) in a clockwise direction.
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2005-06-24">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2005-10-13">
+      Added computation of CelestialNorthClockAngle and center ra/dec
+    </change>
+    <change name="Brendan George" date="2005-11-08">
+      Added application test
+    </change>
+    <change name="Jacob Danton" date="2006-01-23">
+        Fixed appTest to comply to changes in String
+    </change>
+    <change name="Elizabeth Miller" date="2006-03-23">
+      Fixed appTest to comply with changes made to all camera model
+    </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to compute range
+        </brief>
+        <description>
+          Use this parameter to select the filename of a cube with
+          camera labels.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output label
+        </brief>
+        <description>
+          This file will contain the ra/dec range of the cube
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>

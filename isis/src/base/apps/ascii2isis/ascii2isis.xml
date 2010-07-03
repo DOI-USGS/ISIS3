@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+<application name="ascii2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import ascii file as a cube</brief>
+
+  <description>
+    This program will read an ascii file and create a cube.  The ascii values
+    can be delimited by spaces, tabs, commas or any other character that is
+    not a number, a period, or a plus or minus sign.
+  </description>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <history>
+    <change name="Tracie L Sucharski" date="2006-08-05">
+      Original version
+    </change>
+    <change name="Brendan George" date="2006-09-28">
+        Documentation fixes
+    </change>
+    <change name="Brendan George" date="2007-01-11">
+        Fixed problems with mixed separators. Added appTest.
+    </change>
+    <change name="Steven Koechle" date="2008-08-30">
+        Added ability to change special pixel ranges. Added example.
+    </change>
+  </history>
+
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>Input ascii file</brief>
+        <description>
+	      The file name of the input ascii file to be converted to cube.
+        </description>
+        <filter>*.txt</filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>Output cube</brief>
+        <description>
+	      The file name of the output cube.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+
+    <group name="Ascii file dimensions">
+      <parameter name="ORDER">
+        <type>string</type>
+        <default>
+          <item>BSQ</item>
+        </default>
+        <brief>Storage order of data</brief>
+        <description>
+          Storage order of image data defines which dimension varies the
+          fastest and the third varying the slowest (sample, line or band).
+          BSQ = Band Sequential (sample, line, band)
+          BIL = Band Interleaved by Line (sample, band, line)
+          BIP = Band Interleaved by Pixel (band, sample, line)
+        </description>
+        <list>
+          <option value="BSQ">
+            <brief>Band Sequential (sample, line, band)</brief>
+            <description>
+              The data is stored with the sample dimension varying the fastest,
+              followed by the line dimension, then the band dimension.
+              All samples for the first line are followed by all samples for
+              the second line and so on until the final line for band 1.  This
+              pattern is then repeated for each band.
+            </description>
+          </option>
+          <option value="BIL">
+            <brief>Band Interleaved by Line (sample, band, line)</brief>
+            <description>
+              The data is stored with the sample dimension varying the fastest,
+              followed by the band dimension, then the line dimension.
+              All samples for line 1 band 1 are followed by all samples for
+              line 1 band 2 and so on until the final band.  This pattern 
+              is then repeated for each line.
+            </description>
+          </option>
+          <option value="BIP">
+            <brief>Band Interleaved by Pixel (band, sample, line)</brief>
+            <description>
+              The data is stored with the band dimension varying the fastest,
+              followed by the sample dimension, then the line dimension.
+              Sample 1 for all bands are followed by sample 2 for all bands
+              and so on for all samples for line 1.  This pattern is then
+              repeated for each line.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="SAMPLES">
+        <type>integer</type>
+        <brief>Number of samples in ascii</brief>
+        <description>
+          This defines the number of samples in the ascii.
+        </description>
+      </parameter>
+
+      <parameter name="LINES">
+        <type>integer</type>
+        <brief>Number of lines in raw image</brief>
+        <description>
+          This defines the number of lines in the raw image.
+        </description>
+      </parameter>
+
+      <parameter name="BANDS">
+        <type>integer</type>
+        <default>
+          <item>1</item>
+        </default>
+        <brief>Number of bands in raw image</brief>
+        <description>
+          This defines the number of bands in the raw image.  If
+          greater than 1, the image is assumed to be in band sequential
+          order.
+        </description>
+      </parameter>
+
+      <parameter name="SKIP">
+        <type>integer</type>
+        <default>
+          <item>0</item>
+        </default>
+        <brief>Number of bytes to skip before reading data</brief>
+        <description>
+          This defines the number of bytes to skip before the actual image
+          data is read.  This would be for raw images with header data.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="SETNULLRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>NULLMIN</item>
+          <item>NULLMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="NULLMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>HRSMIN</item>
+          <item>HRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="HRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Create special pixel values</brief>
+        <description>
+	    If this option is used input raw pixels below minimum and
+        above maximum will be converted to LRS and HRS respectively.  Otherwise
+        pixels in the input raw file will be left unchanged in most cases.  For
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
+        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
+        be NULL and 255 will be HRS.
+        </description>
+        <inclusions>
+          <item>LRSMIN</item>
+          <item>LRSMAX</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="LRSMIN">
+        <type>double</type>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMAX">
+        <type>double</type>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Converting an ascii file to an Isis Cube
+      </brief>
+      <description>
+        This example will show the conversion from a ascii file to a cube.
+      </description>
+      <terminalInterface>
+        <commandLine>
+            FROM=input.txt TO=out.cub
+            samples=10 lines=10 skip=35
+        </commandLine>
+        <description>Convert the image input.txt to the Isis Cube out.cub</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/ascii2isisGUI.jpg" width="450" height="550">
+            <brief>Convert the image input.txt to the Isis Cube out.cub</brief>
+            <description>
+              The is the GUI for ascii2isis when converting the ascii file input.txt to the Isis Cube out.cub
+            </description>
+            <thumbnail caption="Convert ascii.txt to the Isis Cube out.cub" src="assets/thumbs/ascii2isisGUI.jpg" width="200" height="200" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/input.txt">
+          <brief>
+	    Ascii input file.
+          </brief>
+          <description>
+	    This is the ascii data
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image width="550" height="550" src="assets/images/out.jpg">
+          <brief>Output Isis Cube</brief>
+          <description>
+            The is the output Isis Cube peaks.cub generated from this example.
+          </description>
+          <thumbnail src="assets/thumbs/out.jpg" width="200" height="200" caption="Output Image" />
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+</application>

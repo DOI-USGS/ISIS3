@@ -1,0 +1,97 @@
+UNIT TEST FOR PointPerspective
+
+Test missing center longitude keyword ...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+
+Test missing center latitude keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+
+Test missing distance keyword...
+**I/O ERROR** Invalid label group [Mapping]
+**PVL ERROR** Keyword [Distance] does not exist in [Group = Mapping]
+
+Test TrueScaleLatitude method... 
+TrueScaleLatitude = 39
+
+Test SetGround method ... 
+Setting ground to (41,-74)
+Latitude:               41
+Longitude:              -74
+XCoord:                 251640.079
+YCoord:                 226487.551
+
+Test SetCoordinate method ... 
+Setting coordinate to (251640.079, 226487.551)
+Latitude:               41
+Longitude:              -74
+XCoord:                 251640.079
+YCoord:                 226487.551
+
+Test XYRange method ... 
+Minimum X:  -5874155.27
+Maximum X:  3.88277327e-10
+Minimum Y:  2252833.7
+Maximum Y:  5006411.82
+
+Test Name and comparision method ... 
+Name:       PointPerspective
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius   = 6371000.0
+  PolarRadius        = 6371000.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  ProjectionName     = PointPerspective
+  Distance           = 500000.0
+  CenterLongitude    = 0.0
+  CenterLatitude     = 0.0
+End_Group
+End
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = PointPerspective
+  EquatorialRadius   = 6371000.0
+  PolarRadius        = 6371000.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  CenterLatitude     = 39.0
+  CenterLongitude    = -77.0
+  Distance           = 500000.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -90.0
+  MaximumLatitude = 90.0
+  CenterLatitude  = 39.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = -77.0
+End_Group
+End
+
+Unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  Pages 320-321

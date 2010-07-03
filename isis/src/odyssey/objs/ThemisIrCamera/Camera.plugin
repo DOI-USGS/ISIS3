@@ -1,0 +1,6 @@
+Group = Mars_Odyssey/Themis_Ir
+  Version = 2
+  Library = ThemisIrCamera
+  Routine = ThemisIrCameraPlugin
+EndGroup
+ 

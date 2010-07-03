@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="isis2gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    output a GML polygon from an ISIS cube
+  </brief>
+
+  <description>
+    This program calculates a lat. lon polygon and outputs a graphical markup
+     language(GML) file.  the input to this program can be in camera space (level1) or 
+     a map projected image (level2).  the output is a lat. lon. polygon with a GML header.
+     The user can use the label parameter to add a value to the ID tag in the header.
+     The ID tag is used by some GIS packages to produce a text label for the footprint.
+  </description>
+
+  <history>
+    <change name="Robert Sucharski" date="2007-01-22">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input  file
+        </brief>
+        <description>
+          Input cube to use in polygon generation 
+        </description>
+        <filter>
+          *.cub *.CUB
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          GML formatted polygon
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+            Use this parameter to specify the name of the output image.  the output file
+            is a lon. lat. polygon with a geographic markup language (GML) header. 
+        </description>
+        <filter>
+          *.gml *.GML
+        </filter>
+      </parameter>
+      </group>
+      <group name="options">
+        <parameter name="LABEL">
+          <type>string</type>
+          <brief>
+            Added to the header in ID tag 
+          </brief>
+          <description>
+            This value is placed in the GML header within theID tags.  The information within
+            the ID tag is used by arcmap to allows the user to utilize a labeling switch that displays
+            the ID of the footprint.
+          </description>
+        </parameter>
+      </group>
+   </groups>
+</application>
+

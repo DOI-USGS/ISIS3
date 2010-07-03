@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mapsize" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Compute size or scale of map
+  </brief>
+
+  <description>
+    This application outputs the size of a map in inches given the scale
+    (e.g., 1:1000000) or given the size in inches outputs the scale.  Also,
+    the size of an output cube, number of samples and lines, will be
+    computed.  This can be used prior to running programs such as map2map or
+    cam2map to ensure the output image is not too large. The mapping parameters
+    used to calculate the information above are also output.
+  </description>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+  </category>
+
+  <history>
+    <change name="Kay Edwards" date="1989-03-21">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-02-20">
+      Converted to Isis 3.0
+    </change>
+    <change name="Jeff Anderson" date="2003-04-03">
+      Fixed compiler warning
+    </change>
+    <change name="Kim Sides" date="2003-05-13">
+      Added application test
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema location from astogeology... to isis.astrogeology..."
+    </change>
+    <change name="Jeff Anderson" date="2003-06-02">
+      Fixed problem with application test due to compiler optimization
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2003-08-27">
+      Changed default extension handling mechanism
+    </change>
+    <change name="Stuart Sides" date="2003-11-07">
+      Modified to create Results as an object instead of group in the PVL
+      output.
+    </change>
+    <change name="Jeff Anderson" date="2003-11-25">
+      Added units of inches to the output width and height
+    </change>
+    <change name="Brendan George" date="2005-11-09">
+      Added output of map size in Kilobytes
+    </change>
+    <change name="Brendan George" date="2005-11-21">
+      Added application test
+    </change>      
+    <change name="Elizabeth Miller" date="2006-05-18">
+      Depricated CubeProjection and ProjectionManager to ProjectionFactory
+    </change>
+    <change name="Stuart Sides" date="2006-09-25">
+      Mofidied to output the mapping group used to calculate the results.
+    </change>
+    <change name="Steven Koechle" date="2007-10-17">
+      Casted file size calculations to a Isis::BigInt to fix an integer overflow problem
+    </change>
+  </history>
+
+  <oldName>
+    <item>size</item>
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="MAP">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Label file containing a valid Mapping group
+        </brief>
+        <description>
+          This file must contain a valid mapping group.  It can come
+          from the labels of a cube, a hand-generated mapping group, or
+          from the program "mapinit".
+        </description>
+        <filter>*.map *.cub</filter>
+      </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Text file output
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          This file will contain the size and scale of the map in
+          a standard label format.
+        </description>
+        <filter>*.txt</filter>
+      </parameter>
+    </group>
+
+    <group name="Map Definition">
+      <parameter name="OPTION">
+        <type>string</type>
+        <brief>Define map size using scale or paper size</brief>
+        <description>
+          This parameter is used to indicate if the user will
+          define the map size with either the map scale or the
+          size of the paper in inches.
+        </description>
+        <default><item>SCALE</item></default>
+        <list>
+          <option value="SCALE">
+            <brief>Define map scale and output paper size</brief>
+            <description>
+              Use this option to indicate you will be defining the map
+              scale and the program will compute the paper size.
+            </description>
+            <exclusions>
+              <item>WIDTH</item>
+              <item>HEIGHT</item>
+            </exclusions>
+            <inclusions><item>SCALE</item></inclusions>
+          </option>
+          <option value="PAPER">
+            <brief>Define paper size and output map scale</brief>
+            <description>
+              Use this option to indicate you will be defining the paper
+              map size and the program will compute the map scale.
+            </description>
+            <inclusions>
+              <item>WIDTH</item>
+              <item>HEIGHT</item>
+            </inclusions>
+            <exclusions><item>SCALE</item></exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="SCALE">
+        <type>double</type>
+        <brief>
+          The scale of the map
+        </brief>
+        <description>
+          Map scales are a unitless representation of how many times
+          the body was was reduced to fit on the piece of paper (map).
+          Thus a 1:10000 implies that reduction was by 10000.  It
+          also implies that 1 inch on the map = 10000 inches on the
+          body.  Because the scale is unitless, 1 foot on the map
+          would be 10000 feet on the body.  When entering the value for
+          scale only enter the portion after the colon as one is always
+          assumed (i.e., SCALE=10000 implies 1:10000).
+        </description>
+      </parameter>
+
+      <parameter name="WIDTH">
+        <type>double</type>
+        <brief>
+          Width of the paper in inches
+        </brief>
+        <description>
+          This defines the maximum width of your map in inches.  Note
+          that the results of the computation will likely reduce one
+          of width or height in order to preserve the aspect ratio of
+          the map.
+        </description>
+      </parameter>
+
+      <parameter name="HEIGHT">
+        <type>double</type>
+        <brief>
+          Height of the paper in inches
+        </brief>
+        <description>
+          This defines the maximum height of your map in inches.  Note
+          that the results of the computation will likely reduce one
+          of width or height in order to preserve the aspect ratio of
+          the map.
+        </description>
+        <inclusions><item>WIDTH</item></inclusions>
+        <exclusions><item>SCALE</item></exclusions>
+      </parameter>
+    </group>
+  </groups>
+</application>

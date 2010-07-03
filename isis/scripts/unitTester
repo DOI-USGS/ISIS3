@@ -1,0 +1,73 @@
+#!/bin/sh
+#---------------------------------------------------------------------------
+# This script is used by the Isis make system to execute the unitTest for
+# objects in the Isis API.  It simply builds the unitTest, executes the
+# unitTest, and compares the difference between the output and the truth
+# file.  If any portion of the script fails or there are differences the
+# the script exits with failure otherwise it exits with success.
+#
+#	Error Code	Meaning
+#	0		Success
+#	1		No truth file
+#	2		No unitTest
+#	3		Couldn't build unitTest
+#	4		UnitTest crashed
+#	5		Truth file and results differ
+#	99		Unexpected System error
+#
+#---------------------------------------------------------------------------
+if [ -f /usr/xpg4/bin/grep ] 
+then
+  GREP=/usr/xpg4/bin/grep
+else
+  GREP=grep
+fi
+  
+if [ ! -f unitTest.cpp ]
+then
+  exit 2
+fi
+
+CWD=`pwd`
+if [ $1 = "" ]; then
+  TRUTH=`basename $CWD`_`uname -s`_`uname -p`.truth || exit 99;
+else
+  TRUTH=`basename $CWD`_`uname -s`_`uname -p`_${1}.truth || exit 99;
+fi
+  
+if [ ! -f $TRUTH ]
+then
+  TRUTH=`basename $CWD`.truth || exit 99
+  if [ ! -f $TRUTH ]
+  then
+    exit 1
+  fi
+fi
+
+make unitTest || exit 3
+RESULTS="unitTest.output"
+/bin/rm -f $RESULTS
+if [ ! -f unitTest.exclude ]
+then
+  ./unitTest 1>$RESULTS 2>&1 || exit 4 
+  if `diff $TRUTH $RESULTS 1>/dev/null 2>&1`
+  then
+    /bin/rm $RESULTS 
+    exit 0
+  else
+    exit 5
+  fi
+else
+  ./unitTest 2>&1 | $GREP -v -f unitTest.exclude 1>$RESULTS 2>&1 || exit 4 
+  TRUTH2="temporary.unitTest.truth"
+  /bin/rm -f $TRUTH2 
+  cat $TRUTH | $GREP -v -f unitTest.exclude 1>$TRUTH2 2>&1 || exit 99 
+  if `diff $TRUTH2 $RESULTS 1>/dev/null 2>&1`
+  then
+    /bin/rm $RESULTS $TRUTH2 
+    exit 0
+  else
+    /bin/rm $TRUTH2
+    exit 5
+  fi
+fi

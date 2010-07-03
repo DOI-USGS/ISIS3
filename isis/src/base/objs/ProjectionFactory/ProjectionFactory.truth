@@ -1,0 +1,69 @@
+Unit test for Isis::ProjectionFactory
+Test for missing pixel resolution ... 
+**PROJECTION ERROR** Unable to initialize cube projection
+**PVL ERROR** Keyword [PixelResolution] does not exist in [Group = Mapping]
+
+**PROJECTION ERROR** Unable to create projection
+**PVL ERROR** Keyword [Scale] does not exist in [Group = Mapping]
+**PVL ERROR** Keyword [PixelResolution] does not exist in [Group = Mapping]
+
+Test for missing upper left X ... 
+**PROJECTION ERROR** Unable to initialize cube projection
+**PVL ERROR** Keyword [UpperLeftCornerX] does not exist in [Group = Mapping]
+
+Test for missing upper left Y ... 
+**PROJECTION ERROR** Unable to initialize cube projection
+**PVL ERROR** Keyword [UpperLeftCornerY] does not exist in [Group = Mapping]
+
+Testing conversion from image to ground ... 
+Latitude:  22.82592837303
+Longitude: 227.94605488817
+
+Testing conversion from ground to image ... 
+Sample:    244.5
+Line:      354.5
+
+Testing missing ground range on create method ... 
+**PROJECTION ERROR** Unable to create projection
+**PROJECTION ERROR** Invalid ground range [MinimumLatitude,MaximumLatitude,MinimumLongitude,MaximumLongitude] missing or invalid
+
+Testing create method ... 
+Lines:       708
+Samples:     489
+UpperLeftX:  -18000
+UpperLeftY:  2062000
+
+Testing create method with existing cube labels
+Lines:       400
+Samples:     600
+UpperLeftX:  -16000
+UpperLeftY:  2060000
+
+Label results
+Object = IsisCube
+  Object = Core
+    Group = Dimensions
+      Lines   = 400
+      Samples = 600
+    End_Group
+  End_Object
+
+  Group = Mapping
+    EquatorialRadius   = 3396190.0 <meters>
+    PolarRadius        = 3376200.0 <meters>
+    LatitudeType       = Planetographic
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    ProjectionName     = SimpleCylindrical
+    CenterLongitude    = 220.0
+    PixelResolution    = 2000.0 <meters/pixel>
+    Scale              = 29.637348761653 <pixels/degree>
+    MinimumLatitude    = 10.892053992414
+    MaximumLatitude    = 34.760396006021
+    MinimumLongitude   = 219.72432466275
+    MaximumLongitude   = 236.18605024441
+    UpperLeftCornerX   = -16000.0 <meters>
+    UpperLeftCornerY   = 2060000.0 <meters>
+  End_Group
+End_Object
+End
