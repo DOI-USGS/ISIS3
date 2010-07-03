@@ -49,13 +49,15 @@ namespace Isis {
    * @author  2010-02-15 Kris Becker
    *
    */
-  class Hillier : public PhotometricFunction{
+  class Hillier : public PhotometricFunction {
     public:
       /**
        * @brief Create Hilier photometric object
        *
        */
-      Hillier (PvlObject &pvl, Cube &cube) : PhotometricFunction(pvl, cube) {init(pvl, cube);};
+      Hillier(PvlObject &pvl, Cube &cube) : PhotometricFunction(pvl, cube) {
+        init(pvl, cube);
+      };
 
       //! Destructor
       virtual ~Hillier() {};
@@ -71,11 +73,13 @@ namespace Isis {
        */
       struct Parameters {
         Parameters() : b0(0.0), b1(0.0), a0(0.0), a1(0.0), a2(0.0), a3(0.0),
-                       a4(0.0), wavelength(0.0), tolerance(0.0),
-                       units("Degrees"), phaUnit(1.0), band(0), phoStd(0.0),
-                       iProfile(-1) { }
+          a4(0.0), wavelength(0.0), tolerance(0.0),
+          units("Degrees"), phaUnit(1.0), band(0), phoStd(0.0),
+          iProfile(-1) { }
         ~Parameters() { }
-        bool IsValid() const { return (iProfile != -1); }
+        bool IsValid() const {
+          return (iProfile != -1);
+        }
         double b0, b1, a0, a1, a2, a3, a4;  //<! Hillier parameters
         double wavelength;                  //<! Wavelength for correction
         double tolerance;                   //<! Wavelenght Range/Tolerance
@@ -91,7 +95,7 @@ namespace Isis {
 
       void init(PvlObject &pvl, Cube &cube);
 
-      virtual double photometry(const Parameters &parms, double i, double e,double g) const;
+      virtual double photometry(const Parameters &parms, double i, double e, double g) const;
 
       Parameters findParameters(const double wavelength) const;
       Parameters extract(const DbProfile &profile) const;

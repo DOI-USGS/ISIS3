@@ -24,10 +24,10 @@ namespace Qisis {
 
   /**
    * Constructor, creates and sets up widgets for this tool.
-   * 
-   * @param parent 
+   *
+   * @param parent
    */
-  StatisticsTool::StatisticsTool (QWidget *parent) : Qisis::Tool(parent) {
+  StatisticsTool::StatisticsTool(QWidget *parent) : Qisis::Tool(parent) {
     p_boxSamps = 3;
     p_boxLines = 3;
 
@@ -170,16 +170,16 @@ namespace Qisis {
 
   /**
    * Attaches this tool to the toolpad
-   * 
-   * @param toolpad 
-   * 
-   * @return QAction* 
+   *
+   * @param toolpad
+   *
+   * @return QAction*
    */
   QAction *StatisticsTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
-    action->setIcon(QPixmap(toolIconDir()+"/statistics.png"));
+    action->setIcon(QPixmap(toolIconDir() + "/statistics.png"));
     action->setToolTip("Statistics");
-    QObject::connect(action,SIGNAL(activated()),p_dialog,SLOT(show()));
+    QObject::connect(action, SIGNAL(activated()), p_dialog, SLOT(show()));
 
     QString text  = "";
 
@@ -189,12 +189,12 @@ namespace Qisis {
 
   /**
    * Attaches this tool to the toolbar
-   * 
-   * @param parent 
-   * 
-   * @return QWidget* 
+   *
+   * @param parent
+   *
+   * @return QWidget*
    */
-  QWidget *StatisticsTool::createToolBarWidget (QStackedWidget *parent) {
+  QWidget *StatisticsTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *hbox = new QWidget(parent);
 
     QIntValidator *ival = new QIntValidator(hbox);
@@ -209,7 +209,7 @@ namespace Qisis {
     samps.setNum(p_boxSamps);
 
     p_sampsEdit->setText(samps);
-    connect(p_sampsEdit,SIGNAL(editingFinished()),this,SLOT(changeBoxSamples()));
+    connect(p_sampsEdit, SIGNAL(editingFinished()), this, SLOT(changeBoxSamples()));
 
     QLabel *lineLabel = new QLabel("Box Lines:");
     p_linesEdit = new QLineEdit(hbox);
@@ -220,7 +220,7 @@ namespace Qisis {
     lines.setNum(p_boxLines);
 
     p_linesEdit->setText(lines);
-    connect(p_linesEdit,SIGNAL(editingFinished()),this,SLOT(changeBoxLines()));
+    connect(p_linesEdit, SIGNAL(editingFinished()), this, SLOT(changeBoxLines()));
 
     QToolButton *showButton = new QToolButton();
     showButton->setText("Show");
@@ -228,7 +228,7 @@ namespace Qisis {
     QString text = "";
     showButton->setWhatsThis(text);
 
-    connect(showButton,SIGNAL(clicked()),p_dialog,SLOT(show()));
+    connect(showButton, SIGNAL(clicked()), p_dialog, SLOT(show()));
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setMargin(0);
@@ -244,9 +244,9 @@ namespace Qisis {
 
   /**
    * Called when a mouse button is released
-   * 
-   * @param p 
-   * @param s 
+   *
+   * @param p
+   * @param s
    */
   void StatisticsTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     if(s == Qt::LeftButton) {
@@ -256,8 +256,8 @@ namespace Qisis {
 
   /**
    * Hide/Show the visual display
-   * 
-   * @param hide 
+   *
+   * @param hide
    */
   void StatisticsTool::hideDisplay(bool hide) {
     if(hide) {
@@ -281,35 +281,35 @@ namespace Qisis {
   }
 
   /**
-   * Retrieve the statistics based on the box size 
-   * and point on the cube. 
-   * 
-   * @param p 
+   * Retrieve the statistics based on the box size
+   * and point on the cube.
+   *
+   * @param p
    */
   void StatisticsTool::getStatistics(QPoint p) {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
 
-    double sample,line;
-    cvp->viewportToCube(p.x(),p.y(),sample,line);
+    double sample, line;
+    cvp->viewportToCube(p.x(), p.y(), sample, line);
 
     // If we are outside of the cube, do nothing
-    if ((sample < 0.5) || (line < 0.5) || 
-        (sample > cvp->cubeSamples()+0.5) || (line > cvp->cubeLines()+0.5)) {
-     return;
+    if((sample < 0.5) || (line < 0.5) ||
+        (sample > cvp->cubeSamples() + 0.5) || (line > cvp->cubeLines() + 0.5)) {
+      return;
     }
 
     int isamp = (int)(sample + 0.5);
     int iline = (int)(line + 0.5);
 
     Isis::Statistics stats;
-    Isis::Brick *brick = new Isis::Brick(1,1,1,cvp->cube()->PixelType());
+    Isis::Brick *brick = new Isis::Brick(1, 1, 1, cvp->cube()->PixelType());
 
-    
+
     QVector<QVector<double> > pixelData(p_boxLines, QVector<double>(p_boxSamps, 0));
 
-    double lineDiff = p_boxLines/2.0;
-    double sampDiff = p_boxSamps/2.0;
+    double lineDiff = p_boxLines / 2.0;
+    double sampDiff = p_boxSamps / 2.0;
 
     p_ulSamp = isamp - (int)floor(sampDiff);
     p_ulLine = iline - (int)floor(lineDiff);
@@ -321,13 +321,13 @@ namespace Qisis {
     for(int i = 0; i < p_boxLines; i++) {
       x = p_ulSamp;
       if(y < 1 || y > cvp->cubeLines()) {
-         y++; 
-         continue; 
+        y++;
+        continue;
       }
       for(int j = 0; j < p_boxSamps; j++) {
         if(x < 1 || x > cvp->cubeSamples()) {
           x++;
-          continue; 
+          continue;
         }
         brick->SetBasePosition(x, y, cvp->grayBand());
         cvp->cube()->Read(*brick);
@@ -353,7 +353,7 @@ namespace Qisis {
 
   /**
    * Change the box sample size.
-   * 
+   *
    */
   void StatisticsTool::changeBoxSamples() {
     QString samps = p_sampsEdit->text();
@@ -373,12 +373,12 @@ namespace Qisis {
 
   /**
    * Change the box line size.
-   * 
+   *
    */
   void StatisticsTool::changeBoxLines() {
     QString lines = p_linesEdit->text();
     if(lines != "" && lines.toInt() != p_boxLines && lines.toInt() > 0) {
-      p_boxLines = lines.toInt(); 
+      p_boxLines = lines.toInt();
       QString samps;
       samps.setNum(p_boxSamps);
       p_boxLabel->setText(samps + "x" + lines);
@@ -393,7 +393,7 @@ namespace Qisis {
 
   /**
    * Resize the scroll bars and center the point clicked.
-   * 
+   *
    */
   void StatisticsTool::resizeScrollbars() {
     QScrollBar *hbar = p_visualScroll->horizontalScrollBar();
@@ -404,22 +404,22 @@ namespace Qisis {
 
   /**
    * Constructor for visual display.
-   * 
-   * @param parent 
+   *
+   * @param parent
    */
-  VisualDisplay::VisualDisplay(QWidget *parent) : QWidget(parent), 
-                                                  p_boxSamps(3), 
-                                                  p_boxLines(3), 
-                                                  p_boxWidth(20), 
-                                                  p_boxHeight(20),
-                                                  p_oldWidth(20),
-                                                  p_oldHeight(20),
-                                                  p_ulSamp(-1), 
-                                                  p_ulLine(-1), 
-                                                  p_set(false),
-                                                  p_showText(true),
-                                                  p_showPixels(false),
-                                                  p_showDeviation(false) {
+  VisualDisplay::VisualDisplay(QWidget *parent) : QWidget(parent),
+    p_boxSamps(3),
+    p_boxLines(3),
+    p_boxWidth(20),
+    p_boxHeight(20),
+    p_oldWidth(20),
+    p_oldHeight(20),
+    p_ulSamp(-1),
+    p_ulLine(-1),
+    p_set(false),
+    p_showText(true),
+    p_showPixels(false),
+    p_showDeviation(false) {
 
     p_stretch.SetNull(0.0);
     p_stretch.SetLis(0.0);
@@ -437,9 +437,9 @@ namespace Qisis {
 
   /**
    * Size hint for this widget
-   * 
-   * 
-   * @return QSize 
+   *
+   *
+   * @return QSize
    */
   QSize VisualDisplay::sizeHint() const {
     return QSize(460, 460);
@@ -447,8 +447,8 @@ namespace Qisis {
 
   /**
    * Set box sample size
-   * 
-   * @param samps 
+   *
+   * @param samps
    */
   void VisualDisplay::setSamples(int samps) {
     p_boxSamps = samps;
@@ -461,8 +461,8 @@ namespace Qisis {
 
   /**
    * Set box line size
-   * 
-   * @param lines 
+   *
+   * @param lines
    */
   void VisualDisplay::setLines(int lines) {
     p_boxLines = lines;
@@ -475,8 +475,8 @@ namespace Qisis {
 
   /**
    * Set box size in pixels
-   * 
-   * @param size 
+   *
+   * @param size
    */
   void VisualDisplay::setBoxSize(int size) {
     p_boxWidth = 2 * size;
@@ -488,7 +488,7 @@ namespace Qisis {
 
   /**
    * Update the size of the box
-   * 
+   *
    */
   void VisualDisplay::updateSize() {
     if(p_boxSamps > this->sizeHint().width() / p_boxWidth) {
@@ -500,7 +500,7 @@ namespace Qisis {
 
     if(p_boxLines > this->sizeHint().height() / p_boxHeight) {
       resize(this->size().width(), this->sizeHint().height() + (p_boxHeight * (p_boxLines - this->sizeHint().height() / p_boxHeight)));
-    } 
+    }
     else {
       resize(this->size().width(), this->sizeHint().height());
     }
@@ -511,8 +511,8 @@ namespace Qisis {
 
   /**
    * Show/Hide text
-   * 
-   * @param b 
+   *
+   * @param b
    */
   void VisualDisplay::showText(bool b) {
     p_showText = b;
@@ -528,8 +528,8 @@ namespace Qisis {
 
   /**
    * Show/Hide pixels
-   * 
-   * @param b 
+   *
+   * @param b
    */
   void VisualDisplay::showPixels(bool b) {
     p_showPixels = b;
@@ -544,8 +544,8 @@ namespace Qisis {
 
   /**
    * Show/Hide deviation
-   * 
-   * @param b 
+   *
+   * @param b
    */
   void VisualDisplay::showDeviation(bool b) {
     p_showDeviation = b;
@@ -560,10 +560,10 @@ namespace Qisis {
 
   /**
    * Set pixel data and upper left sample/line
-   * 
-   * @param data 
-   * @param samp 
-   * @param line 
+   *
+   * @param data
+   * @param samp
+   * @param line
    */
   void VisualDisplay::setPixelData(QVector<QVector<double> > data, int samp, int line) {
     p_pixelData = data;
@@ -572,34 +572,34 @@ namespace Qisis {
 
     p_stats.Reset();
 
-    for (int i=0; i < data.size(); i++) {
-      for(int j=0; j < data[i].size(); j++) {
+    for(int i = 0; i < data.size(); i++) {
+      for(int j = 0; j < data[i].size(); j++) {
         if(p_ulSamp + j < 0 || p_ulLine + i < 0) continue;
         p_stats.AddData(data[i][j]);
       }
     }
 
-  	if(fabs(p_stats.BestMinimum()) < DBL_MAX && fabs(p_stats.BestMaximum()) < DBL_MAX) {
-        Isis::Histogram hist(p_stats.BestMinimum(),p_stats.BestMaximum());
-        for (int i=0; i < data.size(); i++) {
-          hist.AddData(data[i].data(), data[i].size());
-        }
-  
-        p_stretch.ClearPairs();
-        if (hist.Percent(0.5) != hist.Percent(99.5)) {
-          p_stretch.AddPair(hist.Percent(0.5),0.0);
-          p_stretch.AddPair(hist.Percent(99.5),255.0);
-        }
-        else {
-          p_stretch.AddPair(-DBL_MAX,0.0);
-          p_stretch.AddPair(DBL_MAX,255.0);
-        }
-  	}
-  	else {
-  	  p_stretch.ClearPairs();
-      p_stretch.AddPair(-DBL_MAX,0.0);
-      p_stretch.AddPair(DBL_MAX,255.0);
-  	}
+    if(fabs(p_stats.BestMinimum()) < DBL_MAX && fabs(p_stats.BestMaximum()) < DBL_MAX) {
+      Isis::Histogram hist(p_stats.BestMinimum(), p_stats.BestMaximum());
+      for(int i = 0; i < data.size(); i++) {
+        hist.AddData(data[i].data(), data[i].size());
+      }
+
+      p_stretch.ClearPairs();
+      if(hist.Percent(0.5) != hist.Percent(99.5)) {
+        p_stretch.AddPair(hist.Percent(0.5), 0.0);
+        p_stretch.AddPair(hist.Percent(99.5), 255.0);
+      }
+      else {
+        p_stretch.AddPair(-DBL_MAX, 0.0);
+        p_stretch.AddPair(DBL_MAX, 255.0);
+      }
+    }
+    else {
+      p_stretch.ClearPairs();
+      p_stretch.AddPair(-DBL_MAX, 0.0);
+      p_stretch.AddPair(DBL_MAX, 255.0);
+    }
 
     p_set = true;
     paintPixmap();
@@ -607,7 +607,7 @@ namespace Qisis {
 
   /**
    * Paint the pixmap
-   * 
+   *
    */
   void VisualDisplay::paintPixmap() {
     p_pixmap = QPixmap(p_boxSamps * p_boxWidth, p_boxLines * p_boxHeight);
@@ -615,8 +615,8 @@ namespace Qisis {
     QPainter p(&p_pixmap);
     QRect rect(0, 0, p_boxWidth, p_boxHeight);
 
-    int midX = p_pixmap.width()/2 - ((p_boxWidth/2) * (p_boxSamps % 2));
-    int midY = p_pixmap.height()/2 - ((p_boxHeight/2) * (p_boxLines % 2));
+    int midX = p_pixmap.width() / 2 - ((p_boxWidth / 2) * (p_boxSamps % 2));
+    int midY = p_pixmap.height() / 2 - ((p_boxHeight / 2) * (p_boxLines % 2));
 
     int x, y;
     y = 0;
@@ -630,7 +630,7 @@ namespace Qisis {
           if(p_showDeviation) {
             if(!Isis::IsSpecial(dn) && p_stats.TotalPixels() > 0 && p_stats.StandardDeviation() != 0) {
               double diff;
-  
+
               if(dn < p_stats.Average()) {
                 diff = p_stats.Average() - dn;
                 diff /= p_stats.Average() - p_stats.Minimum();
@@ -639,14 +639,14 @@ namespace Qisis {
                 diff = dn - p_stats.Average();
                 diff /= p_stats.Maximum() - p_stats.Average();
               }
-  
+
               int i = (int)(diff * 255.0);
               c = QColor(i, 255 - i, 0);
             }
             else {
               c = QColor(0, 0, 0);
             }
-          } 
+          }
           else {
             c = QColor((int)p_stretch.Map(dn), (int)p_stretch.Map(dn), (int)p_stretch.Map(dn));
           }
@@ -657,7 +657,7 @@ namespace Qisis {
         if(p_showText) {
           p.drawRect(rect);
           p.drawText(rect, Qt::AlignCenter, QString("%1").arg(dn));
-        } 
+        }
         else {
           p.fillRect(rect, c);
         }
@@ -678,27 +678,27 @@ namespace Qisis {
 
   /**
    * Paint pixmap to the widget
-   * 
-   * @param event 
+   *
+   * @param event
    */
   void VisualDisplay::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
 
-    int midX = width()/2 - (p_boxWidth * (int)floor(p_boxSamps/2) + (p_boxWidth/2));
-    int midY = height()/2 - (p_boxHeight * (int)floor(p_boxLines/2) + (p_boxHeight/2));
+    int midX = width() / 2 - (p_boxWidth * (int)floor(p_boxSamps / 2) + (p_boxWidth / 2));
+    int midY = height() / 2 - (p_boxHeight * (int)floor(p_boxLines / 2) + (p_boxHeight / 2));
 
     painter.drawPixmap(midX, midY, p_pixmap);
   }
 
   /**
    * Called when the mouse moves over this widget
-   * 
-   * @param event 
+   *
+   * @param event
    */
   void VisualDisplay::mouseMoveEvent(QMouseEvent *event) {
-    double startX = width()/2 - (p_boxWidth * (int)floor(p_boxSamps/2) + (p_boxWidth/2));
-    double startY = height()/2 - (p_boxHeight * (int)floor(p_boxLines/2) + (p_boxHeight/2));
+    double startX = width() / 2 - (p_boxWidth * (int)floor(p_boxSamps / 2) + (p_boxWidth / 2));
+    double startY = height() / 2 - (p_boxHeight * (int)floor(p_boxLines / 2) + (p_boxHeight / 2));
 
     int x = (int)ceil((event->x() - startX) / p_boxWidth);
     int y = (int)ceil((event->y() - startY) / p_boxHeight);
@@ -709,10 +709,10 @@ namespace Qisis {
       emit setDn("DN: n/a");
     }
     else {
-      emit setSample(QString("Sample: %1").arg(p_ulSamp + x-1));
-      emit setLine(QString("Line: %1").arg(p_ulLine + y-1));
+      emit setSample(QString("Sample: %1").arg(p_ulSamp + x - 1));
+      emit setLine(QString("Line: %1").arg(p_ulLine + y - 1));
       double dn = p_pixelData[y-1][x-1];
-      if(Isis::IsSpecial(dn)) 
+      if(Isis::IsSpecial(dn))
         emit setDn(QString("DN: %1").arg(Isis::PixelToString(dn).c_str()));
       else
         emit setDn(QString("DN: %1").arg(dn));
@@ -721,8 +721,8 @@ namespace Qisis {
 
   /**
    * Mouse left widget, update labels
-   * 
-   * @param event 
+   *
+   * @param event
    */
   void VisualDisplay::leaveEvent(QEvent *event) {
     emit setSample("Sample: n/a");

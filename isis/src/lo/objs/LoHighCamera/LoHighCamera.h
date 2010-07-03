@@ -25,7 +25,7 @@
 using namespace std;
 
 namespace Isis {
-  namespace Lo { 
+  namespace Lo {
     /**
      * @brief Defines the Lunar Orbiter High Resolution camera class
      *
@@ -48,9 +48,9 @@ namespace Isis {
      */
     class LoHighCamera : public Isis::FramingCamera {
       public:
-        LoHighCamera (Isis::Pvl &lab);
-        ~LoHighCamera () {}; 
-    }; 
+        LoHighCamera(Isis::Pvl &lab);
+        ~LoHighCamera() {};
+    };
   };
 };
 #endif

@@ -23,10 +23,10 @@ class QWidget;
 using namespace std;
 
 namespace Qisis {
-class ControlPointEdit;
-class MdiCubeViewport;
-class QnetHoldPointDialog;
-class ToolPad;
+  class ControlPointEdit;
+  class MdiCubeViewport;
+  class QnetHoldPointDialog;
+  class ToolPad;
   /**
    * @brief Qnet tool operations
    *
@@ -105,15 +105,15 @@ class ToolPad;
    *                          top of all other points in the image.  Replaced
    *                          #includes with forward class declarations and moved
    *                          #include to .cpp file.
-   *  
+   *
    */
   class QnetTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetTool (QWidget *parent);
+      QnetTool(QWidget *parent);
 //      void addTo (QMenu *menu);
-      void paintViewport (MdiCubeViewport *cvp,QPainter *painter);
+      void paintViewport(MdiCubeViewport *cvp, QPainter *painter);
 
     signals:
       void qnetToolSave();
@@ -128,39 +128,39 @@ class ToolPad;
     public slots:
       void updateList();
       void updateNet(QString cNetFilename);
-      void createPoint(double lat,double lon);
+      void createPoint(double lat, double lon);
       void modifyPoint(Isis::ControlPoint *point);
       void deletePoint(Isis::ControlPoint *point);
       void refresh();
 
     protected:
       QAction *toolPadAction(ToolPad *pad);
-      bool eventFilter(QObject *o,QEvent *e);
+      bool eventFilter(QObject *o, QEvent *e);
 
     protected slots:
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
-      QWidget *createToolBarWidget (QStackedWidget *parent);
+      QWidget *createToolBarWidget(QStackedWidget *parent);
 
     private slots:
-      void paintAllViewports (string pointId);
+      void paintAllViewports(string pointId);
       void saveNet();
       void addMeasure();
-      void setIgnorePoint (bool ignore);
-      void newHoldPoint (Isis::ControlPoint &point);
-      void setHoldPoint (bool hold);
-      void cancelHoldPoint ();
-      void newGroundPoint (Isis::ControlPoint &point);
-      void setGroundPoint (bool ground);
-      void setIgnoreLeftMeasure (bool ignore);
-      void setIgnoreRightMeasure (bool ignore);
-      void showNavWindow ();
+      void setIgnorePoint(bool ignore);
+      void newHoldPoint(Isis::ControlPoint &point);
+      void setHoldPoint(bool hold);
+      void cancelHoldPoint();
+      void newGroundPoint(Isis::ControlPoint &point);
+      void setGroundPoint(bool ground);
+      void setIgnoreLeftMeasure(bool ignore);
+      void setIgnoreRightMeasure(bool ignore);
+      void showNavWindow();
 
-      void selectLeftMeasure (int index);
-      void selectRightMeasure (int index);
-      void updateLeftMeasureInfo ();
-      void updateRightMeasureInfo ();
+      void selectLeftMeasure(int index);
+      void selectRightMeasure(int index);
+      void updateLeftMeasureInfo();
+      void updateRightMeasureInfo();
 
-      void pointSaved ();
+      void pointSaved();
 
       void setTemplateFile();
       void viewTemplateFile();
@@ -173,10 +173,10 @@ class ToolPad;
       void createMenus();
 
       void loadPoint();
-      void drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter);
+      void drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter);
 
 
-      vector<string> findPointFiles(double lat,double lon);
+      vector<string> findPointFiles(double lat, double lon);
 
       QAction *p_createPoint;
       QAction *p_modifyPoint;

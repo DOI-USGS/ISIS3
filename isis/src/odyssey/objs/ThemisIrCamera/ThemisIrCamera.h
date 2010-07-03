@@ -12,7 +12,7 @@ namespace Isis {
      *
      * This is the camera class for the THEMIS IR camera
      *
-     * @ingroup MarsOdyssey 
+     * @ingroup MarsOdyssey
      *
      * @author  2005-01-01 Jeff Anderson
      *
@@ -31,15 +31,17 @@ namespace Isis {
     class ThemisIrCamera : public Isis::LineScanCamera {
       public:
         // constructors
-        ThemisIrCamera (Isis::Pvl &lab);
-    
+        ThemisIrCamera(Isis::Pvl &lab);
+
         // destructor
-        ~ThemisIrCamera () {};
-        
-        // Band dependent 
-        void SetBand (const int band);
-        bool IsBandIndependent () { return false; };
-        
+        ~ThemisIrCamera() {};
+
+        // Band dependent
+        void SetBand(const int band);
+        bool IsBandIndependent() {
+          return false;
+        };
+
       private:
         double p_etStart;
         double p_lineRate;

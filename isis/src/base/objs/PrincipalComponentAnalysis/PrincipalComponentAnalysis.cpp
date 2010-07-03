@@ -1,24 +1,24 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.2 $                                                             
- * $Date: 2009/12/22 02:09:54 $                                                                 
- *                                                                        
+/**
+ * @file
+ * $Revision: 1.2 $
+ * $Date: 2009/12/22 02:09:54 $
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
- *                                                                        
+ *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.                                                           
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,              
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include "PrincipalComponentAnalysis.h"
 #include "jama/jama_eig.h"
@@ -26,15 +26,14 @@
 
 using namespace std;
 
-namespace Isis
-{
+namespace Isis {
   //! Constructs the PrincipalComponentAnalysis object.
-  PrincipalComponentAnalysis::PrincipalComponentAnalysis (const int n) {
+  PrincipalComponentAnalysis::PrincipalComponentAnalysis(const int n) {
     p_dimensions = n;
     p_statistics.clear();
-    p_statistics.resize(n*n);
-    for (int i=0; i<n; i++) {
-      for (int j=0; j<=i; j++) {
+    p_statistics.resize(n * n);
+    for(int i = 0; i < n; i++) {
+      for(int j = 0; j <= i; j++) {
         p_statistics[n*i+j] = new Isis::MultivariateStatistics();
         p_statistics[n*j+i] = p_statistics[n*i+j];
       }
@@ -44,10 +43,10 @@ namespace Isis
   };
 
   // create a pca object from the trabsform matrix
-  PrincipalComponentAnalysis::PrincipalComponentAnalysis (TNT::Array2D<double> transform) {
-    if (transform.dim1() != transform.dim2()) {
-      std::string m="Illegal transform matrix";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+  PrincipalComponentAnalysis::PrincipalComponentAnalysis(TNT::Array2D<double> transform) {
+    if(transform.dim1() != transform.dim2()) {
+      std::string m = "Illegal transform matrix";
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     p_dimensions = transform.dim1();
@@ -58,19 +57,19 @@ namespace Isis
   }
 
   // Add data for all dimensions
-  //  Note: the data should be stored as an array containing 
+  //  Note: the data should be stored as an array containing
   //   the first dimension in order, then the second, ...
   void PrincipalComponentAnalysis::AddData(const double *data, const unsigned int count) {
     // If this PCA object has a transform matrix
     //  we cannot add more data
-    if (p_hasTransform) {
-      std::string m="Cannot add data to a PCA that has a defined transform matrix";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    if(p_hasTransform) {
+      std::string m = "Cannot add data to a PCA that has a defined transform matrix";
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // add the data to the multivariate stats objects
-    for (int i=0; i<p_dimensions; i++) {
-      for (int j=0; j<=i; j++) {
+    for(int i = 0; i < p_dimensions; i++) {
+      for(int j = 0; j <= i; j++) {
         p_statistics[p_dimensions*i+j]->AddData(&data[count*i], &data[count*j], count);
       }
     }
@@ -78,14 +77,14 @@ namespace Isis
 
   // Use VDV' decomposition to obtain the eigenvectors
   void PrincipalComponentAnalysis::ComputeTransform() {
-    if (p_hasTransform) {
-      std::string m="This PCA already has a computed transform";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    if(p_hasTransform) {
+      std::string m = "This PCA already has a computed transform";
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    TNT::Array2D<double> C(p_dimensions,p_dimensions);
-    for (int i=0; i< p_dimensions; i++) {
-      for (int j=0; j<p_dimensions; j++) {
+    TNT::Array2D<double> C(p_dimensions, p_dimensions);
+    for(int i = 0; i < p_dimensions; i++) {
+      for(int j = 0; j < p_dimensions; j++) {
         C[i][j] = (p_statistics[p_dimensions*i+j])->Correlation();
       }
     }
@@ -101,9 +100,9 @@ namespace Isis
     //  sorted in *descending* order
     //  So we need to reverse the order of V
     //   which is sorted in *ascending* order
-    for (int i=0; i<V.dim1(); i++) {
-      for (int j=0; j<V.dim2(); j++) {
-        p_transform[i][j]=V[i][V.dim2()-j-1];
+    for(int i = 0; i < V.dim1(); i++) {
+      for(int j = 0; j < V.dim2(); j++) {
+        p_transform[i][j] = V[i][V.dim2()-j-1];
       }
     }
 
@@ -115,36 +114,36 @@ namespace Isis
   // Use LU decomposition to compute the inverse
   void PrincipalComponentAnalysis::ComputeInverse() {
     TNT::Array2D<double> id(p_transform.dim1(), p_transform.dim2(), 0.0);
-    for (int i = 0; i < p_transform.dim1(); i++) id[i][i] = 1;
+    for(int i = 0; i < p_transform.dim1(); i++) id[i][i] = 1;
 
     JAMA::LU<double> lu(p_transform);
-    if (lu.det() == 0.0) {
-      std::string m="Cannot take the inverse of the transform matrix";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    if(lu.det() == 0.0) {
+      std::string m = "Cannot take the inverse of the transform matrix";
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     p_inverse = lu.solve(id);
   }
 
   // Transform the vector into principal component space
-  TNT::Array2D<double> PrincipalComponentAnalysis::Transform (TNT::Array2D<double> data) {
-    if (data.dim1() !=1 || data.dim2() != p_dimensions) {
-      std::string m="Transform input must be of dimension 1 x " + p_dimensions;
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+  TNT::Array2D<double> PrincipalComponentAnalysis::Transform(TNT::Array2D<double> data) {
+    if(data.dim1() != 1 || data.dim2() != p_dimensions) {
+      std::string m = "Transform input must be of dimension 1 x " + p_dimensions;
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // the vector times the transform matrix
-    return TNT::matmult(data,p_transform);
+    return TNT::matmult(data, p_transform);
   }
 
   // Transform the vector from principal component space
-  TNT::Array2D<double> PrincipalComponentAnalysis::Inverse (TNT::Array2D<double> data) {
-    if (data.dim1() !=1 || data.dim2() != p_dimensions) {
-      std::string m="Transform input must be of dimension 1 x " + p_dimensions;
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+  TNT::Array2D<double> PrincipalComponentAnalysis::Inverse(TNT::Array2D<double> data) {
+    if(data.dim1() != 1 || data.dim2() != p_dimensions) {
+      std::string m = "Transform input must be of dimension 1 x " + p_dimensions;
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // the vector times the inverse matrix
-    return TNT::matmult(data,p_inverse);
+    return TNT::matmult(data, p_inverse);
   }
 }

@@ -10,8 +10,7 @@
 using namespace std;
 using namespace Isis;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
   Isis::Calculator c;
   QVector<double> v1;
@@ -20,7 +19,7 @@ int main(int argc, char *argv[])
   QVector<double> v4;
   double scalar = 2.0;
   double big = DBL_EPSILON;
-  
+
   v1.push_back(1);
   v1.push_back(2);
   v1.push_back(3);
@@ -51,9 +50,9 @@ int main(int argc, char *argv[])
   cout << "Big: ";
   c.PrintTop();
   c.Clear();
-  
+
   cout << "-------------------------------------------------------" << endl;
-  
+
   c.Push(v1);
   c.Negative();
   cout << "Negative (-v1): ";
@@ -66,7 +65,7 @@ int main(int argc, char *argv[])
   cout << "Multiply (v1*v2): ";
   c.PrintTop();
   c.Clear();
-  
+
   c.Push(v1);
   c.Push(scalar);
   c.Multiply();
@@ -87,7 +86,7 @@ int main(int argc, char *argv[])
   cout << "Add (v1+v2): ";
   c.PrintTop();
   c.Clear();
-  
+
   c.Push(v1);
   c.Push(scalar);
   c.Add();
@@ -129,7 +128,7 @@ int main(int argc, char *argv[])
   cout << "Divide (1/0): ";
   c.PrintTop();
   c.Clear();
-  
+
   c.Push(-1.0);
   c.Push(0.0);
   c.Divide();

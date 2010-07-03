@@ -6,7 +6,7 @@
 #include "Preference.h"
 
 using namespace std;
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 
   Isis::Preference::Preferences(true);
 
@@ -15,7 +15,7 @@ int main (int argc, char *argv[]) {
   try {
     cout << setprecision(9);
     string test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *time = new Isis::iTime (test);
+    Isis::iTime *time = new Isis::iTime(test);
     cout << "  Test of date = " << test << endl;
     cout << "   Year        = " << time->YearString() << endl;
     cout << "   Year        = " << time->Year() << endl;
@@ -35,8 +35,8 @@ int main (int argc, char *argv[]) {
     cout << "   Et          = " << time->Et() << endl;
     cout << "   UTC         = " << time->UTC() << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
 
@@ -67,8 +67,8 @@ int main (int argc, char *argv[]) {
     cout << "   UTC         = " << time.UTC() << endl;
     saveEt = time.Et();
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
 
@@ -95,8 +95,8 @@ int main (int argc, char *argv[]) {
     cout << "   Et          = " << time.Et() << endl;
     cout << "   UTC         = " << time.UTC() << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
 
@@ -105,20 +105,20 @@ int main (int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of Isis::iTime operator>= member" << endl;
     string test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t1 = new Isis::iTime (test);
+    Isis::iTime *t1 = new Isis::iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t2 = new Isis::iTime (test);
+    Isis::iTime *t2 = new Isis::iTime(test);
     cout << "    " << t1->EtString() << " >= " << t2->EtString() << " = ";
     cout << (*t1 >= *t2) << endl;
-    Isis::iTime *t3 = new Isis::iTime ("2003/01/02 12:15:01.12345");
+    Isis::iTime *t3 = new Isis::iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " >= " << t3->EtString() << " = ";
     cout << (*t1 >= *t3) << endl;
-    Isis::iTime *t4 = new Isis::iTime ("2003/01/02 12:15:01.1230");
+    Isis::iTime *t4 = new Isis::iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " >= " << t4->EtString() << " = ";
     cout << (*t1 >= *t4) << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
   try {
@@ -126,20 +126,20 @@ int main (int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of Isis::iTime operator<= member" << endl;
     string test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t1 = new Isis::iTime (test);
+    Isis::iTime *t1 = new Isis::iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t2 = new Isis::iTime (test);
+    Isis::iTime *t2 = new Isis::iTime(test);
     cout << "    " << t1->EtString() << " <= " << t2->EtString() << " = ";
     cout << (*t1 <= *t2) << endl;
-    Isis::iTime *t3 = new Isis::iTime ("2003/01/02 12:15:01.12345");
+    Isis::iTime *t3 = new Isis::iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " <= " << t3->EtString() << " = ";
     cout << (*t1 <= *t3) << endl;
-    Isis::iTime *t4 = new Isis::iTime ("2003/01/02 12:15:01.1230");
+    Isis::iTime *t4 = new Isis::iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " <= " << t4->EtString() << " = ";
     cout << (*t1 <= *t4) << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
 
@@ -148,20 +148,20 @@ int main (int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of Isis::iTime operator> member" << endl;
     string test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t1 = new Isis::iTime (test);
+    Isis::iTime *t1 = new Isis::iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t2 = new Isis::iTime (test);
+    Isis::iTime *t2 = new Isis::iTime(test);
     cout << "    " << t1->EtString() << " > " << t2->EtString() << " = ";
     cout << (*t1 > *t2) << endl;
-    Isis::iTime *t3 = new Isis::iTime ("2003/01/02 12:15:01.12345");
+    Isis::iTime *t3 = new Isis::iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " > " << t3->EtString() << " = ";
     cout << (*t1 > *t3) << endl;
-    Isis::iTime *t4 = new Isis::iTime ("2003/01/02 12:15:01.1230");
+    Isis::iTime *t4 = new Isis::iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " > " << t4->EtString() << " = ";
     cout << (*t1 > *t4) << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
   try {
@@ -169,20 +169,20 @@ int main (int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of Isis::iTime operator< member" << endl;
     string test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t1 = new Isis::iTime (test);
+    Isis::iTime *t1 = new Isis::iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t2 = new Isis::iTime (test);
+    Isis::iTime *t2 = new Isis::iTime(test);
     cout << "    " << t1->EtString() << " < " << t2->EtString() << " = ";
     cout << (*t1 < *t2) << endl;
-    Isis::iTime *t3 = new Isis::iTime ("2003/01/02 12:15:01.12345");
+    Isis::iTime *t3 = new Isis::iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " < " << t3->EtString() << " = ";
     cout << (*t1 < *t3) << endl;
-    Isis::iTime *t4 = new Isis::iTime ("2003/01/02 12:15:01.1230");
+    Isis::iTime *t4 = new Isis::iTime("2003/01/02 12:15:01.1230");
     cout << "    " << t1->EtString() << " < " << t4->EtString() << " = ";
     cout << (*t1 < *t4) << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
   try {
@@ -190,17 +190,17 @@ int main (int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of Isis::iTime operator!= member" << endl;
     string test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t1 = new Isis::iTime (test);
+    Isis::iTime *t1 = new Isis::iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t2 = new Isis::iTime (test);
+    Isis::iTime *t2 = new Isis::iTime(test);
     cout << "    " << t1->EtString() << " != " << t2->EtString() << " = ";
     cout << (*t1 != *t2) << endl;
-    Isis::iTime *t3 = new Isis::iTime ("2003/01/02 12:15:01.12345");
+    Isis::iTime *t3 = new Isis::iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " != " << t3->EtString() << " = ";
     cout << (*t1 != *t3) << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
   try {
@@ -208,17 +208,17 @@ int main (int argc, char *argv[]) {
     cout << setprecision(9);
     cout << "  Test of Isis::iTime operator== member" << endl;
     string test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t1 = new Isis::iTime (test);
+    Isis::iTime *t1 = new Isis::iTime(test);
     test = "2003/01/02 12:15:01.1234";
-    Isis::iTime *t2 = new Isis::iTime (test);
+    Isis::iTime *t2 = new Isis::iTime(test);
     cout << "    " << t1->EtString() << " == " << t2->EtString() << " = ";
     cout << (*t1 == *t2) << endl;
-    Isis::iTime *t3 = new Isis::iTime ("2003/01/02 12:15:01.12345");
+    Isis::iTime *t3 = new Isis::iTime("2003/01/02 12:15:01.12345");
     cout << "    " << t1->EtString() << " == " << t3->EtString() << " = ";
     cout << (*t1 == *t3) << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
 

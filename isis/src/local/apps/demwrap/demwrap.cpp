@@ -7,10 +7,10 @@
 #include "History.h"
 #include "Table.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void DoWrap (Buffer &in);
+void DoWrap(Buffer &in);
 
 Cube *ocube;
 
@@ -22,7 +22,7 @@ int bottomPad;
 void IsisMain() {
   // We will be use a mosaic technique so get the size of the input file
   ProcessByLine p;
-  Cube *icube = p.SetInputCube ("FROM");
+  Cube *icube = p.SetInputCube("FROM");
   int ins = icube->Samples();
   int inl = icube->Lines();
   int inb = icube->Bands();
@@ -60,21 +60,21 @@ void IsisMain() {
   double upperLeftCorner = mapgrp["UpperLeftCornerX"];
   upperLeftCorner -= leftPad * proj->Resolution();
   mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerX", upperLeftCorner, "meters"),
-                       Pvl::Replace);
+                    Pvl::Replace);
 
   upperLeftCorner = mapgrp["UpperLeftCornerY"];
   upperLeftCorner += topPad * proj->Resolution();
   mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerY", upperLeftCorner, "meters"),
-                                      Pvl::Replace);
+                    Pvl::Replace);
 
 
-  p.SetOutputCube ("TO", ns, nl, nb);
+  p.SetOutputCube("TO", ns, nl, nb);
   // Make sure everything is propagated and closed
   p.EndProcess();
 
   // Now we'll really be processing our input cube
   p.SetInputCube("FROM");
-  
+
   // We need to create the output file
   ocube = new Cube();
   ocube->Open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
@@ -89,9 +89,9 @@ void IsisMain() {
   delete ocube;
 }
 
-void DoWrap (Buffer &in) {
+void DoWrap(Buffer &in) {
   LineManager outMan(*ocube);
-  
+
   outMan.SetLine(in.Line() + topPad);
   int inputSize = in.size();
   int outputSize = outMan.size();
@@ -116,7 +116,7 @@ void DoWrap (Buffer &in) {
     for(int outLine = 1; outLine <= topPad; outLine++) {
       outMan.SetLine(outLine);
       ocube->Write(outMan);
-    } 
+    }
   }
 
   // last line goes the bottom n lines
@@ -125,6 +125,6 @@ void DoWrap (Buffer &in) {
     for(int outLine = 1; outLine <= bottomPad; outLine++) {
       outMan.SetLine(outLine + topPad + inl);
       ocube->Write(outMan);
-    } 
+    }
   }
 }

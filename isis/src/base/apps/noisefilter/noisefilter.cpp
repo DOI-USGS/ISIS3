@@ -3,12 +3,12 @@
 #include "UserInterface.h"
 
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
-void RemoveNoiseViaStd (Buffer &in, Buffer &out, QuickFilter &filter);
-void RemoveNoiseViaDn (Buffer &in, Buffer &out, QuickFilter &filter);
+void RemoveNoiseViaStd(Buffer &in, Buffer &out, QuickFilter &filter);
+void RemoveNoiseViaDn(Buffer &in, Buffer &out, QuickFilter &filter);
 
 double tolmin;
 double tolmax;
@@ -35,25 +35,25 @@ void IsisMain() {
 
   //  Read tolerances
   UserInterface &ui = Application::GetUserInterface();
-  tolmin = ui.GetDouble ("TOLMIN");
-  tolmax = ui.GetDouble ("TOLMAX");
+  tolmin = ui.GetDouble("TOLMIN");
+  tolmax = ui.GetDouble("TOLMAX");
 
   //  Will noise pixels be replaced with boxcar average or Null?
   replaceWithAverage = true;
-  if (ui.GetString("REPLACE") == "NULL") replaceWithAverage = false;
+  if(ui.GetString("REPLACE") == "NULL") replaceWithAverage = false;
 
   // Find out how to handle special pixels
-  nullIsNoise = ui.GetBoolean ("NULLISNOISE");
-  hisIsNoise = ui.GetBoolean ("HISISNOISE");
-  hrsIsNoise = ui.GetBoolean ("HRSISNOISE");
-  lisIsNoise = ui.GetBoolean ("LISISNOISE");
-  lrsIsNoise = ui.GetBoolean ("LRSISNOISE");
+  nullIsNoise = ui.GetBoolean("NULLISNOISE");
+  hisIsNoise = ui.GetBoolean("HISISNOISE");
+  hrsIsNoise = ui.GetBoolean("HRSISNOISE");
+  lisIsNoise = ui.GetBoolean("LISISNOISE");
+  lrsIsNoise = ui.GetBoolean("LRSISNOISE");
 
   // Process each line
   brightPixelsReplaced = 0;
   darkPixelsReplaced = 0;
   specialPixelsReplaced = 0;
-  if (ui.GetString("TOLDEF") == "STDDEV") {
+  if(ui.GetString("TOLDEF") == "STDDEV") {
     flattol = ui.GetDouble("FLATTOL");
     p.StartProcess(RemoveNoiseViaStd);
   }
@@ -63,33 +63,33 @@ void IsisMain() {
 
   // Generate a results group and log it
   PvlGroup results("Results");
-  results += PvlKeyword("DarkPixelsReplaced",darkPixelsReplaced);
-  results += PvlKeyword("BrightPixelsReplaced",brightPixelsReplaced);
-  results += PvlKeyword("SpecialPixelsReplaced",specialPixelsReplaced);
+  results += PvlKeyword("DarkPixelsReplaced", darkPixelsReplaced);
+  results += PvlKeyword("BrightPixelsReplaced", brightPixelsReplaced);
+  results += PvlKeyword("SpecialPixelsReplaced", specialPixelsReplaced);
   int pixelsReplaced = darkPixelsReplaced + brightPixelsReplaced + specialPixelsReplaced;
-  results += PvlKeyword("TotalPixelsReplaced",pixelsReplaced);
-  double pct = ((double)pixelsReplaced/
-                ((double)icube->Samples()*(double)icube->Lines())) * 100.;
-  pct = (int) (pct * 10.0) / 10.0;
-  results += PvlKeyword("PercentChanged",pct);
+  results += PvlKeyword("TotalPixelsReplaced", pixelsReplaced);
+  double pct = ((double)pixelsReplaced /
+                ((double)icube->Samples() * (double)icube->Lines())) * 100.;
+  pct = (int)(pct * 10.0) / 10.0;
+  results += PvlKeyword("PercentChanged", pct);
   Application::Log(results);
   p.EndProcess();
 }
 
 // Standard deviation line processing routine
-void RemoveNoiseViaStd (Buffer &in, Buffer &out, QuickFilter &filter) {
-  for (int i=0; i<filter.Samples(); i++) {
+void RemoveNoiseViaStd(Buffer &in, Buffer &out, QuickFilter &filter) {
+  for(int i = 0; i < filter.Samples(); i++) {
     // Get the average first and remove the center pixel if possible
     double avg = filter.Average(i);
     double goodAvg = NULL8;
-    if ((avg != NULL8) && (filter.Count(i) != 1)) {
+    if((avg != NULL8) && (filter.Count(i) != 1)) {
       double sum = (avg * filter.Count(i)) - in[i];
       goodAvg = sum / (filter.Count(i) - 1.0);
     }
 
     // Deal with special pixels at the middle of the boxcar
-    if (IsSpecial(in[i])) {
-      if ((IsNullPixel(in[i]) && nullIsNoise) ||
+    if(IsSpecial(in[i])) {
+      if((IsNullPixel(in[i]) && nullIsNoise) ||
           (IsHisPixel(in[i])  && hisIsNoise)   ||
           (IsHrsPixel(in[i])  && hrsIsNoise)   ||
           (IsLisPixel(in[i])  && lisIsNoise)   ||
@@ -105,7 +105,7 @@ void RemoveNoiseViaStd (Buffer &in, Buffer &out, QuickFilter &filter) {
 
     // If the average is NULL or if the input pixel varies from the average by
     // less than the flat tolerance, we can't do anything
-    if (goodAvg == NULL8 || (fabs(in[i]-goodAvg) < flattol)) {
+    if(goodAvg == NULL8 || (fabs(in[i] - goodAvg) < flattol)) {
       out[i] = in[i];
       continue;
     }
@@ -115,10 +115,10 @@ void RemoveNoiseViaStd (Buffer &in, Buffer &out, QuickFilter &filter) {
     double diff = in[i] - avg;  // don't use goodAvg here
     double sqrDiff = diff * diff;
     double tol = (diff > 0.0) ? tolmax : tolmin;
-    if (sqrDiff > tol * tol * filter.Variance(i)) noisy = true;
+    if(sqrDiff > tol * tol * filter.Variance(i)) noisy = true;
 
     // If we have noise replace it
-    if (noisy) {
+    if(noisy) {
       out[i] = (replaceWithAverage) ? goodAvg : NULL8;
       (diff > 0.0) ? brightPixelsReplaced++ : darkPixelsReplaced++;
     }
@@ -133,19 +133,19 @@ void RemoveNoiseViaStd (Buffer &in, Buffer &out, QuickFilter &filter) {
 }
 
 // DN noise filter line processing routine
-void RemoveNoiseViaDn (Buffer &in, Buffer &out, QuickFilter &filter) {
-  for (int i=0; i<filter.Samples(); i++) {
+void RemoveNoiseViaDn(Buffer &in, Buffer &out, QuickFilter &filter) {
+  for(int i = 0; i < filter.Samples(); i++) {
     // Get the average first and remove the center pixel if possible
     double avg = filter.Average(i);
     double goodAvg = NULL8;
-    if ((avg != NULL8) && (filter.Count(i) != 1)) {
+    if((avg != NULL8) && (filter.Count(i) != 1)) {
       double sum = (avg * filter.Count(i)) - in[i];
       goodAvg = sum / (filter.Count(i) - 1.0);
     }
 
     // Deal with special pixels at the middle of the boxcar
-    if (IsSpecial(in[i])) {
-      if ((IsNullPixel(in[i]) && nullIsNoise) ||
+    if(IsSpecial(in[i])) {
+      if((IsNullPixel(in[i]) && nullIsNoise) ||
           (IsHisPixel(in[i])  && hisIsNoise)   ||
           (IsHrsPixel(in[i])  && hrsIsNoise)   ||
           (IsLisPixel(in[i])  && lisIsNoise)   ||
@@ -160,7 +160,7 @@ void RemoveNoiseViaDn (Buffer &in, Buffer &out, QuickFilter &filter) {
     }
 
     // If the average is NULL we can't do anything
-    if (goodAvg == NULL8) {
+    if(goodAvg == NULL8) {
       out[i] = in[i];
       continue;
     }
@@ -169,10 +169,10 @@ void RemoveNoiseViaDn (Buffer &in, Buffer &out, QuickFilter &filter) {
     bool noisy = false;
     double diff = in[i] - goodAvg;
     double tol = (diff > 0.0) ? tolmax : tolmin;
-    if (abs(diff) > tol) noisy = true;
+    if(abs(diff) > tol) noisy = true;
 
     // If we have noise replace it
-    if (noisy) {
+    if(noisy) {
       out[i] = (replaceWithAverage) ? goodAvg : NULL8;
       (diff > 0.0) ? brightPixelsReplaced++ : darkPixelsReplaced++;
     }

@@ -3,8 +3,8 @@
 
 #include "FramingCamera.h"
 
-namespace Clementine { 
-  /**                                                                       
+namespace Clementine {
+  /**
    * @brief Camera class
    *
    * This is the camera class for the HiresCamera
@@ -19,8 +19,8 @@ namespace Clementine {
    */
   class HiresCamera : public Isis::FramingCamera {
     public:
-      HiresCamera (Isis::Pvl &lab);
-      ~HiresCamera () {};      
+      HiresCamera(Isis::Pvl &lab);
+      ~HiresCamera() {};
   };
 };
 #endif

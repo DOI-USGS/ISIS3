@@ -35,11 +35,11 @@ namespace Isis {
    * @brief Obtain rotation angles for a line scan camera pixel offsets
    *
    * This class will obtain the rotation from existing camera pointing to
-   * "corrected" camera pointing calculated from a table of pixel offsets 
-   * and time (sample line et) 
+   * "corrected" camera pointing calculated from a table of pixel offsets
+   * and time (sample line et)
    *
-   * This class was created to calculate the rotation matrix needed to 
-   * remove jitter from a hirise image based on the table of offsets. 
+   * This class was created to calculate the rotation matrix needed to
+   * remove jitter from a hirise image based on the table of offsets.
    *
    * @ingroup SpiceInstrumentsAndCameras
    *
@@ -50,39 +50,39 @@ namespace Isis {
    *  @history 2008-12-19  Debbie A. Cook Removed couts to prepare for commiting
    *  @history 2009-10-01  Debbie A. Cook Cleaned up extrapolation code
    *  @history 2010-05-17  Debbie A. Cook Recoded extrapolation to add 2
-   *           extra points on each end of the input data.  The first point 
+   *           extra points on each end of the input data.  The first point
    *           added on each end should be the start and end time of the
    *           observation.  The added points are linearly interpolated from
-   *           the beginning and final 2 points of input data. 
+   *           the beginning and final 2 points of input data.
    */
   class PixelOffset {
     public:
       //! Constructors
-      PixelOffset( const std::string &tableList, double fl, double pixPitch, double baseTime,
-                   double timeScale, int degree );
+      PixelOffset(const std::string &tableList, double fl, double pixPitch, double baseTime,
+                  double timeScale, int degree);
 
       //! Destructor
       virtual ~PixelOffset() { }
 
       //! Load the angles by interpolating the pixel offsets and converting to angles
-      void LoadAngles ( std::vector<double> cacheTime );
+      void LoadAngles(std::vector<double> cacheTime);
 
       //! Compute cubic interpolation for current time et
-      void Interp ();
+      void Interp();
 
       //! Compute coefficients for a polynomial fit to each angle based on scaled time
-      void SetPolynomial ();
+      void SetPolynomial();
 
-      void SetEphemerisTime(const double et );
+      void SetEphemerisTime(const double et);
 
-      std::vector<double> SetEphemerisTimeHPF(const double et );
+      std::vector<double> SetEphemerisTimeHPF(const double et);
 
-      double WrapAngle (double compareAngle, double angle);
+      double WrapAngle(double compareAngle, double angle);
 //      std::vector<double> &Matrix() { return p_TC; };
 
- 
 
-  private:
+
+    private:
       std::vector<double> p_samples;
       std::vector<double> p_lines;
       std::vector<double> p_times;
@@ -91,16 +91,16 @@ namespace Isis {
       double p_pixPitch;                //!< Pixel pitch of instrument in mm/pixel
       double p_et;                      //!< Current ephemeris time
 
-      std::vector<double> p_cacheAngle1;         //! 
+      std::vector<double> p_cacheAngle1;         //!
       std::vector<double> p_cacheAngle2;
       std::vector<double> p_cacheTime;
-                                        //   rotation at et
+      //   rotation at et
       double p_baseTime;                //!< Base time used in fit equations
       double p_timeScale;               //!< Time scale used in fit equations
       std::vector<double> p_ang1Coefficients;
       std::vector<double> p_ang2Coefficients;
-                                        //!< Coefficients of polynomials fit to
-                                        //    each of three rotation angles
+      //!< Coefficients of polynomials fit to
+      //    each of three rotation angles
       int p_degree;                     //!< Degree of fit polynomial for angles
       double p_angle1;                  //!< Angle1 for current et in radians
       double p_angle2;                  //!< Angle2 for current et in radians

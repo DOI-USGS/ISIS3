@@ -8,7 +8,7 @@
 
 namespace Isis {
   //! Constructor
-  GuiLog::GuiLog(QWidget *parent) : QWidget (parent) {
+  GuiLog::GuiLog(QWidget *parent) : QWidget(parent) {
 
     QVBoxLayout *lo = new QVBoxLayout;
     setLayout(lo);
@@ -42,8 +42,8 @@ namespace Isis {
 
   //! Save the contents of the log widget to a file
   void GuiLog::Save() {
-    QString s = QFileDialog::getSaveFileName(this,"Save log to file");
-    if (s != "") {
+    QString s = QFileDialog::getSaveFileName(this, "Save log to file");
+    if(s != "") {
       std::ofstream fout;
       std::string filename(s.toStdString());
       fout.open(filename.c_str());

@@ -38,7 +38,7 @@ namespace Isis {
    */
   bool RadarPulseMap::SetDetector(const double sample,
                                   const double line) {
-    if (!CameraDetectorMap::SetDetector(sample,line)) return false;
+    if(!CameraDetectorMap::SetDetector(sample, line)) return false;
     double etDiff = p_camera->EphemerisTime() - p_etStart;
     p_parentLine = etDiff / p_lineRate + 1.0;
     return true;
@@ -58,7 +58,7 @@ namespace Isis {
   bool RadarPulseMap::SetParent(const double sample,
                                 const double line) {
     // Apply base class summing/first sample corrections
-    if (!CameraDetectorMap::SetParent(sample,line)) return false;
+    if(!CameraDetectorMap::SetParent(sample, line)) return false;
 
     // line is really a function of time so set detector line to zero
     p_detectorLine = 0;

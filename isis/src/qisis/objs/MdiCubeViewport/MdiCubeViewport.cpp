@@ -36,11 +36,9 @@ using namespace Isis;
 using namespace std;
 
 
-namespace Qisis
-{
-  MdiCubeViewport::MdiCubeViewport(Cube * cube, QWidget * parent) :
-      CubeViewport(cube, parent)
-  {
+namespace Qisis {
+  MdiCubeViewport::MdiCubeViewport(Cube *cube, QWidget *parent) :
+    CubeViewport(cube, parent) {
     p_linked = false;
 
     string unlinkedIcon = Filename("$base/icons/unlinked.png").Expanded();
@@ -49,8 +47,7 @@ namespace Qisis
 
   }
 
-  MdiCubeViewport::~MdiCubeViewport()
-  {
+  MdiCubeViewport::~MdiCubeViewport() {
 
   }
 
@@ -60,8 +57,7 @@ namespace Qisis
    *
    * @param tool
    */
-  void MdiCubeViewport::registerTool(Tool * tool)
-  {
+  void MdiCubeViewport::registerTool(Tool *tool) {
     p_toolList.push_back(tool);
   }
 
@@ -72,9 +68,8 @@ namespace Qisis
    *
    * @param b
    */
-  void MdiCubeViewport::setLinked(bool b)
-  {
-    if (!parentWidget() || !parentWidget()->parentWidget())
+  void MdiCubeViewport::setLinked(bool b) {
+    if(!parentWidget() || !parentWidget()->parentWidget())
       return;
 
     string unlinkedIcon = Filename("$base/icons/unlinked.png").Expanded();
@@ -83,20 +78,18 @@ namespace Qisis
     static QIcon linked(linkedIcon.c_str());
 
     bool notify = false;
-    if (b != p_linked)
+    if(b != p_linked)
       notify = true;
 
     p_linked = b;
-    if (p_linked)
-    {
+    if(p_linked) {
       parentWidget()->parentWidget()->setWindowIcon(linked);
     }
-    else
-    {
+    else {
       parentWidget()->parentWidget()->setWindowIcon(unlinked);
     }
 
-    if (notify)
+    if(notify)
       emit linkChanging(b);
   }
 
@@ -111,58 +104,49 @@ namespace Qisis
    * @history  2007-04-30  Tracie Sucharski - Add the QPainter to the call to
    *                           Tool::paintViewport.
    */
-  void MdiCubeViewport::paintEvent(QPaintEvent * e)
-  {
+  void MdiCubeViewport::paintEvent(QPaintEvent *e) {
     CubeViewport::paintEvent(e);
-    
+
     QPainter painter(viewport());
     painter.drawPixmap(0, 0, p_pixmap);
     emit viewportUpdated();
 
     // Draw anything the tools might need
-    for (int i = 0; i < p_toolList.size(); i++)
-    {
+    for(int i = 0; i < p_toolList.size(); i++) {
       p_toolList[i]->paintViewport(this, &painter);
     }
 
     painter.end();
   }
-  
-  
-  void MdiCubeViewport::viewGray(int band)
-  {
+
+
+  void MdiCubeViewport::viewGray(int band) {
     CubeViewport::viewGray(band);
-    
-    for (int i = 0; i < p_toolList.size(); i++)
+
+    for(int i = 0; i < p_toolList.size(); i++)
       p_toolList[i]->updateTool();
   }
-  
-  
-  void MdiCubeViewport::viewRGB(int rband, int gband, int bband)
-  {
+
+
+  void MdiCubeViewport::viewRGB(int rband, int gband, int bband) {
     CubeViewport::viewRGB(rband, gband, bband);
-    
-    for (int i = 0; i < p_toolList.size(); i++)
+
+    for(int i = 0; i < p_toolList.size(); i++)
       p_toolList[i]->updateTool();
   }
-  
-  
-  void MdiCubeViewport::restretch(ViewportBuffer *buffer)
-  {
-    if (buffer == grayBuffer())
-    {
+
+
+  void MdiCubeViewport::restretch(ViewportBuffer *buffer) {
+    if(buffer == grayBuffer()) {
       emit requestRestretch(this, (int)StretchTool::Gray);
     }
-    else if (buffer == redBuffer())
-    {
+    else if(buffer == redBuffer()) {
       emit requestRestretch(this, (int)StretchTool::Red);
     }
-    else if (buffer == greenBuffer())
-    {
+    else if(buffer == greenBuffer()) {
       emit requestRestretch(this, (int)StretchTool::Green);
     }
-    else if (buffer == blueBuffer())
-    {
+    else if(buffer == blueBuffer()) {
       emit requestRestretch(this, (int)StretchTool::Blue);
     }
   }

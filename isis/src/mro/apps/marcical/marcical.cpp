@@ -16,7 +16,7 @@ using namespace std;
 
 Stretch stretch;
 
-void IsisMain () {
+void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
@@ -31,24 +31,24 @@ void IsisMain () {
   // Make sure it is a Marci cube
   Filename inFilename = ui.GetFilename("FROM");
   try {
-    if (icube.GetGroup("Instrument")["InstrumentID"][0] != "Marci") {
-      throw iException::Message(iException::User,"",_FILEINFO_);
+    if(icube.GetGroup("Instrument")["InstrumentID"][0] != "Marci") {
+      throw iException::Message(iException::User, "", _FILEINFO_);
     }
 
     if(!icube.GetGroup("Archive").HasKeyword("SampleBitModeId")) {
-      throw iException::Message(iException::User,"",_FILEINFO_);
+      throw iException::Message(iException::User, "", _FILEINFO_);
     }
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Clear();
     string msg = "This program is intended for use on MARCI images only. [";
     msg += inFilename.Expanded() + "] does not appear to be a MARCI image.";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   if(icube.GetGroup("Archive")["SampleBitModeId"][0] != "SQROOT") {
     string msg = "Sample bit mode [" + icube.GetGroup("Archive")["SampleBitModeId"][0] + "] is not supported.";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   // Read in calibration coefficients
@@ -81,12 +81,12 @@ void IsisMain () {
 
   // Create the stretch pairs
   stretch.ClearPairs();
-  for (int i=0; i<stretchPairs.LineCount(); i++) {
+  for(int i = 0; i < stretchPairs.LineCount(); i++) {
     iString line;
-    stretchPairs.GetLine(line,true);
+    stretchPairs.GetLine(line, true);
     int temp1 = line.Token(" ");
     int temp2 = line.Trim(" ");
-    stretch.AddPair(temp1,temp2);
+    stretch.AddPair(temp1, temp2);
   }
 
   stretchPairs.Close();
@@ -94,11 +94,11 @@ void IsisMain () {
   // This file stores radiance/spectral distance coefficients
   Pvl calibrationData(calFile.Expanded());
 
-  // This will store the radiance coefficient and solar spectral distance coefficients 
+  // This will store the radiance coefficient and solar spectral distance coefficients
   // for each band.
   //   calibrationCoeffs[band].first gives the radiance coefficient
   //   calibrationCoeffs[band].second gives the spectral distance
-  vector< pair<double,double> > calibrationCoeffs;
+  vector< pair<double, double> > calibrationCoeffs;
 
   // Check our coefficient file
   if(calibrationData.Objects() != 7) {
@@ -111,12 +111,12 @@ void IsisMain () {
   for(int obj = 0; obj < calibrationData.Objects(); obj ++) {
     PvlObject &calObj = calibrationData.Object(obj);
 
-    if((int)calObj["FilterNumber"] != obj+1) {
+    if((int)calObj["FilterNumber"] != obj + 1) {
       iString msg = "Calibration file [" + calFile.Expanded() + "] must have the filters in ascending order";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    pair<double,double> calData(calObj["RadianceCoefficient"], calObj["SolarSpectralDistance"]);
+    pair<double, double> calData(calObj["RadianceCoefficient"], calObj["SolarSpectralDistance"]);
     calibrationCoeffs.push_back(calData);
   }
 
@@ -141,7 +141,7 @@ void IsisMain () {
       continue;
     }
 
-    filePattern += "flat_band" + iString(band+1);
+    filePattern += "flat_band" + iString(band + 1);
     filePattern += "_summing" + iString(summing) + "_v???.cub";
 
     Filename flatFile(filePattern);
@@ -151,7 +151,7 @@ void IsisMain () {
     flatcubes.push_back(fcube);
 
     LineManager *fcubeMgr = new LineManager(*fcube);
-    fcubeMgr->SetLine(1,1);
+    fcubeMgr->SetLine(1, 1);
     fcubeMgrs.push_back(fcubeMgr);
   }
 
@@ -175,13 +175,13 @@ void IsisMain () {
 
   // Conversion from filter name to filter index
   map<string, int> filterNameToFilterIndex;
-  filterNameToFilterIndex.insert(pair<string,int>("BLUE",     1));
-  filterNameToFilterIndex.insert(pair<string,int>("GREEN",    2));
-  filterNameToFilterIndex.insert(pair<string,int>("ORANGE",   3));
-  filterNameToFilterIndex.insert(pair<string,int>("RED",      4));
-  filterNameToFilterIndex.insert(pair<string,int>("NIR",      5));
-  filterNameToFilterIndex.insert(pair<string,int>("SHORT_UV", 6));
-  filterNameToFilterIndex.insert(pair<string,int>("LONG_UV",  7));
+  filterNameToFilterIndex.insert(pair<string, int>("BLUE",     1));
+  filterNameToFilterIndex.insert(pair<string, int>("GREEN",    2));
+  filterNameToFilterIndex.insert(pair<string, int>("ORANGE",   3));
+  filterNameToFilterIndex.insert(pair<string, int>("RED",      4));
+  filterNameToFilterIndex.insert(pair<string, int>("NIR",      5));
+  filterNameToFilterIndex.insert(pair<string, int>("SHORT_UV", 6));
+  filterNameToFilterIndex.insert(pair<string, int>("LONG_UV",  7));
 
   PvlKeyword &filtNames = icube.Label()->FindGroup("BandBin", Pvl::Traverse)["FilterName"];;
   for(int i = 0; i < filtNames.Size(); i++) {
@@ -206,7 +206,7 @@ void IsisMain () {
   }
 
   LineManager ocubeMgr(ocube);
-  ocubeMgr.SetLine(1,1);
+  ocubeMgr.SetLine(1, 1);
 
   Progress prog;
   prog.SetText("Calibrating Image");
@@ -252,7 +252,7 @@ void IsisMain () {
       (*fcubeMgrs[i]) ++;
 
       if(fcubeMgrs[i]->end()) {
-        fcubeMgrs[i]->SetLine(1,1);
+        fcubeMgrs[i]->SetLine(1, 1);
         newFramelet = true;
       }
     }

@@ -46,11 +46,11 @@ namespace Isis {
    * <p>
    * An important functionality of this class is the ability to cache the
    * positions so they do not have to be constantly read from the NAIF kernels.
-   * Onced the data is cached the NAIF kernels can be unloaded too. 
-   *  
-   * @code 
-   *  
-   * @endcode 
+   * Onced the data is cached the NAIF kernels can be unloaded too.
+   *
+   * @code
+   *
+   * @endcode
    *
    * @ingroup SpiceInstrumentsAndCameras
    *
@@ -63,7 +63,7 @@ namespace Isis {
    *                      if the time did not change.  Should speed up line
    *			  scan cameras
    *  @history 2007-07-10 Debbie A. Cook Added else to method SetAberrationCorrection
-   *                      to separate error section from the rest of the code 
+   *                      to separate error section from the rest of the code
    *  @history 2007-08-24 Debbie A. Cook Added members p_coefficients, enums PartialType and Coefficient,
    *                      and methods ReloadCache, SetPolynomial, GetPolynomial, ComputeBaseTime,
    *                      DPolynomial, and CoordinatePartial to support solving for instrument position
@@ -104,7 +104,7 @@ namespace Isis {
       //! Destructor
       virtual ~SpicePosition() {}
 
-      void SetTimeBias (double timeBias);
+      void SetTimeBias(double timeBias);
       void SetAberrationCorrection(const std::string &correction);
       const std::vector<double> &SetEphemerisTime(double et);
 
@@ -112,57 +112,67 @@ namespace Isis {
 //      enum PartialType {WRT_X0,WRT_X1,WRT_X2,
 //                        WRT_Y0,WRT_Y1,WRT_Y2,
 //                        WRT_Z0,WRT_Z1,WRT_Z2};
-      enum PartialType {WRT_X,WRT_Y,WRT_Z};
+      enum PartialType {WRT_X, WRT_Y, WRT_Z};
 
 
       enum Coefficient { A, B, C };
 
       //! Return the current ephemeris time
-      double EphemerisTime() const { return p_et; };
+      double EphemerisTime() const {
+        return p_et;
+      };
 
       //! Return the current J2000 position
-      const std::vector<double> &Coordinate() { return p_coordinate; };
+      const std::vector<double> &Coordinate() {
+        return p_coordinate;
+      };
 
       //! Return the current J2000 velocity
       const std::vector<double> &Velocity();
 
       //! Return the flag indicating whether the velocity exists
-      bool HasVelocity() { return p_hasVelocity; };
+      bool HasVelocity() {
+        return p_hasVelocity;
+      };
 
-      void LoadCache (double startTime, double endTime, int size);
-      void LoadCache (double time);
+      void LoadCache(double startTime, double endTime, int size);
+      void LoadCache(double time);
       void LoadCache(Table &table);
-      void ReloadCache( Isis::PolynomialUnivariate &function1,Isis::PolynomialUnivariate &function2,
-                      Isis::PolynomialUnivariate &function3);
+      void ReloadCache(Isis::PolynomialUnivariate &function1, Isis::PolynomialUnivariate &function2,
+                       Isis::PolynomialUnivariate &function3);
       void ReloadCache(Table &table);
 
       Table Cache(const std::string &tableName);
 
       //! Is this position cached
-      bool IsCached() const { return (p_cache.size() > 0); };
+      bool IsCached() const {
+        return (p_cache.size() > 0);
+      };
 
-      void SetPolynomial ();
+      void SetPolynomial();
 
-      void SetPolynomial ( const std::vector<double>& XC,
-                           const std::vector<double>& YC,
-                           const std::vector<double>& ZC );
+      void SetPolynomial(const std::vector<double>& XC,
+                         const std::vector<double>& YC,
+                         const std::vector<double>& ZC);
 
-      void GetPolynomial ( std::vector<double>& XC,
-                           std::vector<double>& YC,
-                           std::vector<double>& ZC );
+      void GetPolynomial(std::vector<double>& XC,
+                         std::vector<double>& YC,
+                         std::vector<double>& ZC);
 
-      void ComputeBaseTime ();
+      void ComputeBaseTime();
 
       //! Return the base time for the position
-      double GetBaseTime (){ return p_baseTime; };
+      double GetBaseTime() {
+        return p_baseTime;
+      };
 
-      void SetOverrideBaseTime ( double baseTime );
+      void SetOverrideBaseTime(double baseTime);
 
-      double DPolynomial ( const Coefficient coeffIndex );
+      double DPolynomial(const Coefficient coeffIndex);
 
-      std::vector<double> CoordinatePartial( SpicePosition::PartialType partialVar, int coeffIndex );
+      std::vector<double> CoordinatePartial(SpicePosition::PartialType partialVar, int coeffIndex);
 
-      std::vector<double> VelocityPartial( SpicePosition::PartialType partialVar, int coeffIndex );
+      std::vector<double> VelocityPartial(SpicePosition::PartialType partialVar, int coeffIndex);
 
 
       //??? jw
@@ -172,7 +182,7 @@ namespace Isis {
       enum Source { Spice,      //!< Object is reading directly from the kernels
                     Memcache,   //!< Object is reading from cached table
                     HermiteCache //!< Object is reading from splined table
-      };
+                  };
       void Memcache2HermiteCache(double tolerance);
     protected:
       void SetEphemerisTimeMemcache();

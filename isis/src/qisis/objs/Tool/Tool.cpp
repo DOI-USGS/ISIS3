@@ -58,7 +58,7 @@ namespace Qisis {
     addToPermanent(pViewPortMnWin->permanentToolBar());
     addToActive(pViewPortMnWin->activeToolBar());
     addTo(pViewPortMnWin->toolPad());
-    if (!menuName().isEmpty()) {
+    if(!menuName().isEmpty()) {
       QMenu *menu = pViewPortMnWin->getMenu(menuName());
 //      if (menu->actions().size() > 0) menu->addSeparator();
       addTo(menu);
@@ -75,7 +75,7 @@ namespace Qisis {
    */
   void Tool::addTo(Qisis::ToolPad *toolpad) {
     p_toolPadAction = toolPadAction(toolpad);
-    if (p_toolPadAction != NULL) {
+    if(p_toolPadAction != NULL) {
       toolpad->addAction(p_toolPadAction);
       connect(p_toolPadAction, SIGNAL(toggled(bool)), this, SLOT(activate(bool)));
     }
@@ -88,13 +88,13 @@ namespace Qisis {
    * @param toolbar
    */
   void Tool::addToActive(QToolBar *toolbar) {
-    if (p_activeToolBarStack == NULL) {
+    if(p_activeToolBarStack == NULL) {
       p_activeToolBarStack = new QStackedWidget(toolbar);
       toolbar->addWidget(p_activeToolBarStack);
     }
 
     p_toolBarWidget = createToolBarWidget(p_activeToolBarStack);
-    if (p_toolBarWidget != NULL) {
+    if(p_toolBarWidget != NULL) {
       p_activeToolBarStack->addWidget(p_toolBarWidget);
     }
     disableToolBar();
@@ -107,20 +107,20 @@ namespace Qisis {
    * @param on
    */
   void Tool::activate(bool on) {
-    if (p_active) {
+    if(p_active) {
       emit clearWarningSignal();
-      if (on)
+      if(on)
         return;
       removeViewportConnections();
       disableToolBar();
-      if (p_toolPadAction != NULL)
+      if(p_toolPadAction != NULL)
         p_toolPadAction->setChecked(false);
       p_active = false;
     }
     else {
-      if (!on)
+      if(!on)
         return;
-      if (p_toolPadAction != NULL)
+      if(p_toolPadAction != NULL)
         p_toolPadAction->setChecked(true);
       addViewportConnections();
       enableToolBar();
@@ -135,17 +135,17 @@ namespace Qisis {
    * @param cvp
    */
   void Tool::setCubeViewport(Qisis::MdiCubeViewport *cvp) {
-    if (cvp == p_cvp) {
+    if(cvp == p_cvp) {
       updateTool();
       return;
     }
 
-    if (p_active)
+    if(p_active)
       removeViewportConnections();
 
     p_cvp = cvp;
 
-    if (p_active) {
+    if(p_active) {
       addViewportConnections();
       enableToolBar();
     }
@@ -162,7 +162,7 @@ namespace Qisis {
    *
    */
   void Tool::addViewportConnections() {
-    if (p_cvp == NULL)
+    if(p_cvp == NULL)
       return;
 
     connect(p_cvp, SIGNAL(scaleChanged()),
@@ -197,7 +197,7 @@ namespace Qisis {
 
     addConnections(p_cvp);
 
-    if (p_toolPadAction != NULL) {
+    if(p_toolPadAction != NULL) {
       enableRubberBandTool();
     }
   }
@@ -208,7 +208,7 @@ namespace Qisis {
    *
    */
   void Tool::removeViewportConnections() {
-    if (p_cvp == NULL)
+    if(p_cvp == NULL)
       return;
 
     disconnect(p_cvp, SIGNAL(scaleChanged()),
@@ -250,7 +250,7 @@ namespace Qisis {
    *
    */
   void Tool::disableToolBar() {
-    if (p_toolBarWidget == NULL)
+    if(p_toolBarWidget == NULL)
       return;
 //    if (p_toolBarWidget->isVisible()) p_toolBarWidget->hide();
     p_toolBarWidget->setEnabled(false);
@@ -263,9 +263,9 @@ namespace Qisis {
    */
   void Tool::enableToolBar() {
     updateTool();
-    if (p_toolBarWidget == NULL)
+    if(p_toolBarWidget == NULL)
       return;
-    if (cubeViewport() == NULL) {
+    if(cubeViewport() == NULL) {
       p_toolBarWidget->setEnabled(false);
     }
     else {

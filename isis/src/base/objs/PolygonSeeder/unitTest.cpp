@@ -11,12 +11,12 @@
 using namespace Isis;
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   try {
     PvlGroup alg("PolygonSeederAlgorithm");
-    alg += PvlKeyword("Name","Grid");
+    alg += PvlKeyword("Name", "Grid");
     alg += PvlKeyword("MinimumThickness", 0.5);
     alg += PvlKeyword("MinimumArea", 10);
     alg += PvlKeyword("XSpacing", 11);
@@ -41,7 +41,7 @@ int main () {
     std::cout << "No reason to test GridPolygonSeeder, so we're done" << std::endl;
 
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 

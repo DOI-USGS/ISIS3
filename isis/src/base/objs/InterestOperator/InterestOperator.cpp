@@ -692,45 +692,44 @@ namespace Isis {
   }
 
   /**
-   * Find image overlaps by getting intersection of the individual image footprints 
-   * when an exact match in the overlaplist fails 
-   * 
+   * Find image overlaps by getting intersection of the individual image footprints
+   * when an exact match in the overlaplist fails
+   *
    * @author sprasad (7/1/2010)
-   * 
-   * @param pCnetPoint 
-   * 
-   * @return const geos::geom::MultiPolygon* 
+   *
+   * @param pCnetPoint
+   *
+   * @return const geos::geom::MultiPolygon*
    */
-  const geos::geom::MultiPolygon *InterestOperator::FindOverlapByImageFootPrint(Isis::ControlPoint &pCnetPoint)
-  {
+  const geos::geom::MultiPolygon *InterestOperator::FindOverlapByImageFootPrint(Isis::ControlPoint &pCnetPoint) {
     ImagePolygon measPolygon1, measPolygon2, measPolygon3;
-    geos::geom::Geometry* geomIntersect1, *geomIntersect2;
-    
+    geos::geom::Geometry *geomIntersect1, *geomIntersect2;
+
     // Create Multipolygon for the first Control Measure
     std::string sn1 = pCnetPoint[0].CubeSerialNumber();
     Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn1));
     inCube1->Read((Blob &)measPolygon1);
-    
+
     // Create Multipolygon for the Second Control Measure
     std::string sn2 = pCnetPoint[1].CubeSerialNumber();
     Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn2));
     inCube2->Read((Blob &)measPolygon2);
-    
+
     // Get the interesection for the first 2 polgons
-    geomIntersect1 = PolygonTools::Intersect((const geos::geom::Geometry*)measPolygon1.Polys(), (const geos::geom::Geometry*)measPolygon2.Polys());
-    
+    geomIntersect1 = PolygonTools::Intersect((const geos::geom::Geometry *)measPolygon1.Polys(), (const geos::geom::Geometry *)measPolygon2.Polys());
+
     for(int measureIndex = 2; measureIndex < pCnetPoint.Size(); measureIndex ++) {
       std::string sn3 = pCnetPoint[measureIndex].CubeSerialNumber();
       Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn3));
       inCube3->Read((Blob &)measPolygon3);
 
       // Get the intersection of the intersection and the measure Image Polygon
-      geomIntersect2 = PolygonTools::Intersect(geomIntersect1, (const geos::geom::Geometry*)measPolygon3.Polys());
+      geomIntersect2 = PolygonTools::Intersect(geomIntersect1, (const geos::geom::Geometry *)measPolygon3.Polys());
       geomIntersect1 = geomIntersect2;
     }
-    return (geos::geom::MultiPolygon*)geomIntersect1;
+    return (geos::geom::MultiPolygon *)geomIntersect1;
   }
-  
+
   /**
    * This virtual method must return if the 1st fit is equal to or better
    * than the second fit.

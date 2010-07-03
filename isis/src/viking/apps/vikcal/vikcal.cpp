@@ -10,10 +10,10 @@
 using namespace std;
 using namespace Isis;
 
-void cal (vector<Buffer *> &in, 
-          vector<Buffer *> &out);
+void cal(vector<Buffer *> &in,
+         vector<Buffer *> &out);
 
-CalParameters* calParam;
+CalParameters *calParam;
 static bool linear;
 
 void IsisMain() {
@@ -24,10 +24,10 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // The linear option can never be true in Isis2, if it is needed, comment out
-  // the following line, and uncomment the line below it. Also, add the code 
+  // the following line, and uncomment the line below it. Also, add the code
   // segment found in the CalParameters documentation to the vikcal.xml file
   linear = false;
- // linear = ui.GetBoolean("LINEAR");
+// linear = ui.GetBoolean("LINEAR");
   const string in = ui.GetFilename("FROM");
 
   calParam = new CalParameters(in);
@@ -38,10 +38,10 @@ void IsisMain() {
   Progress prog;
 
   // If the file has already been calibrated, throw an error
-  if (icube.HasGroup("Radiometry")) {
+  if(icube.HasGroup("Radiometry")) {
     string msg = "The Viking image [" + icube.Filename() + "] has already been ";
     msg += "radiometrically calibrated";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   CubeAttributeInput dcf;
@@ -64,24 +64,24 @@ void IsisMain() {
   calgrp.AddComment("DI(l,s) = (1.0/(exp*w1))*G(l,s)*(gain*DR(l,s)+DC(l,s)+offt+offc)");
   calgrp.AddComment("with  w1 = w0*((dist0*dist0) / (dist1*dist1))");
   calgrp.AddComment("and  offt(l,s) = A*l + B*l*l + C*s + D*l*s + E");
-  calgrp += PvlKeyword("offc",calParam->Offset());
-  calgrp += PvlKeyword("exp",calParam->Exposure());
-  calgrp += PvlKeyword("gain",calParam->Gain());
+  calgrp += PvlKeyword("offc", calParam->Offset());
+  calgrp += PvlKeyword("exp", calParam->Exposure());
+  calgrp += PvlKeyword("gain", calParam->Gain());
   calgrp += PvlKeyword("DR", in);
-  calgrp += PvlKeyword("DC",calParam->OffsetFile());
-  calgrp += PvlKeyword("G",calParam->GainFile());
+  calgrp += PvlKeyword("DC", calParam->OffsetFile());
+  calgrp += PvlKeyword("G", calParam->GainFile());
 
-  calgrp += PvlKeyword("w0",calParam->Omega0());
-  calgrp += PvlKeyword("w1",calParam->Omega1());
-  calgrp += PvlKeyword("dist0",calParam->Distance());
-  calgrp += PvlKeyword("dist1",calParam->Dist1());
-  calgrp += PvlKeyword("1.0/exp*w1",1.0 / (calParam->Exposure() * calParam->Omega1()));
+  calgrp += PvlKeyword("w0", calParam->Omega0());
+  calgrp += PvlKeyword("w1", calParam->Omega1());
+  calgrp += PvlKeyword("dist0", calParam->Distance());
+  calgrp += PvlKeyword("dist1", calParam->Dist1());
+  calgrp += PvlKeyword("1.0/exp*w1", 1.0 / (calParam->Exposure() * calParam->Omega1()));
 
-  calgrp += PvlKeyword("Acoeff",calParam->Acoeff());
-  calgrp += PvlKeyword("Bcoeff",calParam->Bcoeff());
-  calgrp += PvlKeyword("Ccoeff",calParam->Ccoeff());
-  calgrp += PvlKeyword("Dcoeff",calParam->Dcoeff());
-  calgrp += PvlKeyword("Ecoeff",calParam->Ecoeff());
+  calgrp += PvlKeyword("Acoeff", calParam->Acoeff());
+  calgrp += PvlKeyword("Bcoeff", calParam->Bcoeff());
+  calgrp += PvlKeyword("Ccoeff", calParam->Ccoeff());
+  calgrp += PvlKeyword("Dcoeff", calParam->Dcoeff());
+  calgrp += PvlKeyword("Ecoeff", calParam->Ecoeff());
 
   ocube->PutGroup(calgrp);
 
@@ -90,33 +90,33 @@ void IsisMain() {
   p.EndProcess();
 }
 
-void cal (vector<Buffer *> &in,
-            vector<Buffer *> &out) {
+void cal(vector<Buffer *> &in,
+         vector<Buffer *> &out) {
 
   Buffer &inp = *in[0];      // Input Cube
   Buffer &dcf = *in[1];      // Dark Current File
   Buffer &fff = *in[2];      // Flat Field File
   Buffer &outp = *out[0];    // Output Cube
 
-  
+
   // Loop for each pixel in the line.
-  for (int i=0; i<inp.size(); i++) {
-    if (IsSpecial(inp[i])) {
+  for(int i = 0; i < inp.size(); i++) {
+    if(IsSpecial(inp[i])) {
       outp[i] = inp[i];
     }
-    else if (IsSpecial(fff[i]) || IsSpecial(dcf[i])) {
+    else if(IsSpecial(fff[i]) || IsSpecial(dcf[i])) {
       outp[i] = Isis::Null;
     }
     else {
-      double offc = calParam->TimeBasedOffset(inp.Line(),i+1);
+      double offc = calParam->TimeBasedOffset(inp.Line(), i + 1);
       double dnraw = (inp[i] * calParam->Gain()) + dcf[i] + offc;
 
-      // The linear option can never be true in isis2, and therefore, this 
+      // The linear option can never be true in isis2, and therefore, this
       // section of the code has not been tested.
-      if (linear == true) {
-        double temp = (dnraw/calParam->NormalizingPower());
-        for (int i = 1; i < calParam->LinearityPower(); i++) {
-          temp *= (dnraw/calParam->NormalizingPower());
+      if(linear == true) {
+        double temp = (dnraw / calParam->NormalizingPower());
+        for(int i = 1; i < calParam->LinearityPower(); i++) {
+          temp *= (dnraw / calParam->NormalizingPower());
         }
         dnraw = calParam->Acoeff() * dnraw + calParam->Bcoeff() * temp;
       }

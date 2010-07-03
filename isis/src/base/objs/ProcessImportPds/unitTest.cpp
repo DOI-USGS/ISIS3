@@ -26,14 +26,14 @@ void IsisMain() {
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->Statistics();
     cout << stat->Average() << endl;
-    cout << stat->Variance() << endl; 
+    cout << stat->Variance() << endl;
     p2.EndProcess();
     Isis::OriginalLabel ol(file);
     Isis::Pvl label = ol.ReturnLabels();
     cout << label << endl;
     remove(file.c_str());
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
 
@@ -48,7 +48,7 @@ void IsisMain() {
     p.StartProcess();
     p.OmitOriginalLabel();
     p.EndProcess();
-  
+
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
@@ -56,17 +56,17 @@ void IsisMain() {
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->Statistics();
     cout << stat->Average() << endl;
-    cout << stat->Variance() << endl; 
+    cout << stat->Variance() << endl;
     p2.EndProcess();
     try {
       Isis::OriginalLabel ol(file);
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       e.Report(false);
     }
     remove(file.c_str());
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
 
@@ -80,14 +80,14 @@ void IsisMain() {
     p.SetOutputCube("TO");
     p.StartProcess();
     Isis::Pvl ilab;
-    p.TranslateIsis2Labels (ilab);
+    p.TranslateIsis2Labels(ilab);
     p.EndProcess();
 
     cout << ilab << endl;
     string file = Isis::Application::GetUserInterface().GetFilename("TO");
     remove(file.c_str());
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
 }

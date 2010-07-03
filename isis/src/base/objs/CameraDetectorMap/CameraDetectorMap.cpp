@@ -34,7 +34,7 @@ namespace Isis {
     p_detectorSampleSumming = 1.0;
     p_detectorLineSumming = 1.0;
     Compute();
-    if (parent != 0) {
+    if(parent != 0) {
       p_camera->SetDetectorMap(this);
     }
   }

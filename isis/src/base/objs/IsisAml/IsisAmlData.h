@@ -1,25 +1,25 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.1.1.1 $                                                             
- * $Date: 2006/10/31 23:18:07 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+/**
+ * @file
+ * $Revision: 1.1.1.1 $
+ * $Date: 2006/10/31 23:18:07 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #ifndef IsisAmlData_h
 #define IsisAmlData_h
@@ -37,8 +37,8 @@ class IsisListOptionData {
     std::vector<std::string> exclude;
     std::vector<std::string> include;
 
-  IsisListOptionData ();
-  ~IsisListOptionData ();
+    IsisListOptionData();
+    ~IsisListOptionData();
 };
 
 class IsisHelperData {
@@ -49,8 +49,8 @@ class IsisHelperData {
     std::string description;
     std::string function;
 
-  IsisHelperData();
-  ~IsisHelperData();
+    IsisHelperData();
+    ~IsisHelperData();
 };
 
 class IsisParameterData {
@@ -84,8 +84,8 @@ class IsisParameterData {
     std::string pixelType;
     std::vector<IsisHelperData> helpers;
 
-    IsisParameterData ();
-    ~IsisParameterData ();
+    IsisParameterData();
+    ~IsisParameterData();
 };
 
 
@@ -94,8 +94,8 @@ class IsisGroupData {
     std::string name;
     std::vector<IsisParameterData> parameters;
 
-    IsisGroupData ();
-    ~IsisGroupData ();
+    IsisGroupData();
+    ~IsisGroupData();
 };
 
 class IsisChangeData {
@@ -104,8 +104,8 @@ class IsisChangeData {
     std::string date;
     std::string description;
 
-    IsisChangeData ();
-    ~IsisChangeData ();
+    IsisChangeData();
+    ~IsisChangeData();
 };
 
 
@@ -118,8 +118,8 @@ class IsisAmlData {
     std::vector<std::string> categorys;
     std::vector<IsisChangeData> changes;
 
-    IsisAmlData ();
-    ~IsisAmlData ();
+    IsisAmlData();
+    ~IsisAmlData();
 
 };
 

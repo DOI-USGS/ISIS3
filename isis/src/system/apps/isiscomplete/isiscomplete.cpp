@@ -4,7 +4,7 @@
 #include "FileList.h"
 #include "iString.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void MakeCompletion(const string &appName);
@@ -12,7 +12,7 @@ string GetParamCompletion(int grp, int param);
 string BuildStaticCompletes(std::string paramList);
 void PrintHelp();
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   if(argc < 2) {
     PrintHelp();
     return 0;
@@ -37,7 +37,7 @@ void PrintHelp() {
 void MakeCompletion(const string &appName) {
   static char *argv[2];
   static int argc(2);
-  argv[0] = (char*)appName.c_str();
+  argv[0] = (char *)appName.c_str();
   argv[1] = "-nogui";
 
   // Do not complete image-viewer applications
@@ -57,7 +57,7 @@ void MakeCompletion(const string &appName) {
   // Do not complete self
   if(appName.compare("isiscomplete") == 0) return;
 
-  Application app(argc,argv);
+  Application app(argc, argv);
   UserInterface &ui = Application::GetUserInterface();
   string paramList = "";
   string completeCommand;
@@ -144,7 +144,7 @@ string GetParamCompletion(int grp, int param) {
     completion += "f";
   }
   else {
-    completion += "(" + ui.ParamDefault(grp,param) + ")";
+    completion += "(" + ui.ParamDefault(grp, param) + ")";
   }
 
   completion += "/";

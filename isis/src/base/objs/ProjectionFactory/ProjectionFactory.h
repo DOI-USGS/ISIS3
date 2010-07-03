@@ -26,66 +26,66 @@
 #include "Cube.h"
 
 namespace Isis {
- /**
-  * @brief Initialize a map projection
-  *
-  * This factory class is used to obtain a Projection object given a PVL which
-  * contains a valid Mapping group. The Mapping group can come from an
-  * image/cube or a hand-created PVL file. The projection is loaded based on
-  * information using the ProjectionName contained in the Mapping group. It is
-  * plugin oriented. That is, this class looks in
-  * $ISISROOT/lib/Projection.plugin to convert the ProjectionName into a
-  * pointer to the appropriate projection class (e.g., Sinusoidal,
-  * SimpleCylindrical). This allows programmers who develop new projection to
-  * create a plugin without the need for recompiling all the Isis cartographic
-  * programs (cam2map, map2map, mappos, etc).
-  *
-  * @ingroup MapProjection
-  *
-  * @author 2005-06-22 Elizabeth Ribelin
-  *
-  *
-  * @internal
-  *   @history 2005-06-22 Elizabeth Ribelin - Merged ProjectionManager and
-  *                                           CubeProjection into a single class
-  *   @history 2006-01-27 Jacob Danton - Renamed PixelMapper to PFPixelMapper\
-  *   @history 2006-05-19 Elizabeth Miller - Depricated ProjectionManager and
-  *                                          CubeProjection.  Renamed
-  *                                          ProjectionManager.plugin to
-  *                                          Projection.plugin
-  *   @history 2006-09-07 Elizabeth Miller - Added the bool sizeMatch
-  *                                          parameter to CreateForCube()
-  *   @history 2007-03-13 Jeff Anderson - Added new method CreateForCube using a
-  *                                          camera
-  *   @history 2007-06-29 Steven Lambright - Removed TrueScaleLatitude keyword from CreateForCube
-  *                                          methods, added units to Scale and PixelResolution
-  *                                          keywords
-  *   @history 2008-06-18 Steven Koechle - Fixed Documentation Error
-  *   @history 2009-06-18 Jeff Anderson - Modified the CreateForCube method to
-  *   make sure extra pixels were not included in the image size due to
-  *   machine precision roundoff problems.
-  *
-  */
+  /**
+   * @brief Initialize a map projection
+   *
+   * This factory class is used to obtain a Projection object given a PVL which
+   * contains a valid Mapping group. The Mapping group can come from an
+   * image/cube or a hand-created PVL file. The projection is loaded based on
+   * information using the ProjectionName contained in the Mapping group. It is
+   * plugin oriented. That is, this class looks in
+   * $ISISROOT/lib/Projection.plugin to convert the ProjectionName into a
+   * pointer to the appropriate projection class (e.g., Sinusoidal,
+   * SimpleCylindrical). This allows programmers who develop new projection to
+   * create a plugin without the need for recompiling all the Isis cartographic
+   * programs (cam2map, map2map, mappos, etc).
+   *
+   * @ingroup MapProjection
+   *
+   * @author 2005-06-22 Elizabeth Ribelin
+   *
+   *
+   * @internal
+   *   @history 2005-06-22 Elizabeth Ribelin - Merged ProjectionManager and
+   *                                           CubeProjection into a single class
+   *   @history 2006-01-27 Jacob Danton - Renamed PixelMapper to PFPixelMapper\
+   *   @history 2006-05-19 Elizabeth Miller - Depricated ProjectionManager and
+   *                                          CubeProjection.  Renamed
+   *                                          ProjectionManager.plugin to
+   *                                          Projection.plugin
+   *   @history 2006-09-07 Elizabeth Miller - Added the bool sizeMatch
+   *                                          parameter to CreateForCube()
+   *   @history 2007-03-13 Jeff Anderson - Added new method CreateForCube using a
+   *                                          camera
+   *   @history 2007-06-29 Steven Lambright - Removed TrueScaleLatitude keyword from CreateForCube
+   *                                          methods, added units to Scale and PixelResolution
+   *                                          keywords
+   *   @history 2008-06-18 Steven Koechle - Fixed Documentation Error
+   *   @history 2009-06-18 Jeff Anderson - Modified the CreateForCube method to
+   *   make sure extra pixels were not included in the image size due to
+   *   machine precision roundoff problems.
+   *
+   */
   class ProjectionFactory {
     public:
-      static Isis::Projection *Create(Isis::Pvl &label, bool allowDefaults=false);
+      static Isis::Projection *Create(Isis::Pvl &label, bool allowDefaults = false);
       static Isis::Projection *CreateFromCube(Isis::Cube &cube);
       static Isis::Projection *CreateFromCube(Isis::Pvl &label); // Load Method in cm
       static Isis::Projection *CreateForCube(Isis::Pvl &label, int &ns, int &nl,
-                                             bool sizeMatch=true);   // Create method in cm
-      static Isis::Projection *CreateForCube (Isis::Pvl &label,
-                                              int &samples, int &lines,
-                                              Camera &cam);
+                                             bool sizeMatch = true); // Create method in cm
+      static Isis::Projection *CreateForCube(Isis::Pvl &label,
+                                             int &samples, int &lines,
+                                             Camera &cam);
 
     private:
-     /**
-      * Constructor (Its private, so you cannot use it.)  Use the Create method
-      * instead
-      */
-      ProjectionFactory () {};
+      /**
+       * Constructor (Its private, so you cannot use it.)  Use the Create method
+       * instead
+       */
+      ProjectionFactory() {};
 
       //! Destroys the ProjectionFactory object
-      ~ProjectionFactory () {};
+      ~ProjectionFactory() {};
 
   };
 
@@ -142,11 +142,11 @@ namespace Isis {
        * @return double The y projection value
        */
       double ProjectionY(const double line) const {
-         return p_upperLeftY - (line - 0.5) * p_pixelResolution;
+        return p_upperLeftY - (line - 0.5) * p_pixelResolution;
       };
 
       //! Returns the pixel resolution
-      double Resolution () const {
+      double Resolution() const {
         return p_pixelResolution;
       }
 

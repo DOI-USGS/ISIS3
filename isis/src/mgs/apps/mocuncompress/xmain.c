@@ -16,7 +16,7 @@ provided that (i) you must include this notice with all copies of the
 Software to be distributed; (ii) you may not remove or alter any
 proprietary notices contained in the Software; (iii) you may not charge any
 third party for the Software; and (iv) you will not export the Software
-without the appropriate United States and foreign government licenses.  
+without the appropriate United States and foreign government licenses.
 
 You acknowledge that no title to the intellectual property in the Software
 is transferred to you.  You further acknowledge that title and full
@@ -28,11 +28,11 @@ SOFTWARE, AND SPECIFICALLY DISCLAIMS THE IMPLIED WARRANTIES OF
 NON-INFRINGEMENT OF THIRD PARTY RIGHTS, MERCHANTABILITY AND FITNESS FOR A
 PARTICULAR PURPOSE.  SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR
 LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO SUCH LIMITATIONS OR
-EXCLUSIONS MAY NOT APPLY TO YOU.  
+EXCLUSIONS MAY NOT APPLY TO YOU.
 
 Your use or reproduction of the Software constitutes your agreement to the
 terms of this Notice.  If you do not agree with the terms of this notice,
-promptly return or destroy all copies of the Software in your possession.  
+promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
@@ -72,100 +72,101 @@ uint32 spacing;
 uint32 numLevels;
 {
 
-uint32 xSize = width, ySize = height;
-uint32 level;
-uint32 numBlocks;
-uint8 *image;
-int32 hsize;
-int32 header[3];
-BITSTRUCT *bitStuff;
-uint32 *groups;
-uint32 *occ;
-uint32 x,y;
-uint32 var[256];
-int used;
+  uint32 xSize = width, ySize = height;
+  uint32 level;
+  uint32 numBlocks;
+  uint8 *image;
+  int32 hsize;
+  int32 header[3];
+  BITSTRUCT *bitStuff;
+  uint32 *groups;
+  uint32 *occ;
+  uint32 x, y;
+  uint32 var[256];
+  int used;
 
-	bitStuff = initBits(data, len);
+  bitStuff = initBits(data, len);
 
-	if ((image = (uint8 *)malloc((uint32)(xSize * ySize * sizeof(*image)))) == NULL) {
-		(void)fprintf(stderr,"Not enough memory for image\n");
-		return;
-	};
+  if((image = (uint8 *)malloc((uint32)(xSize * ySize * sizeof(*image)))) == NULL) {
+    (void)fprintf(stderr, "Not enough memory for image\n");
+    return;
+  };
 
-	if ((occ = (uint32 *)malloc((uint32)(numLevels * sizeof(*occ)))) == NULL) {
-		(void)fprintf(stderr,"Not enough memory to decoding of image\n");
-		return;
-	};
+  if((occ = (uint32 *)malloc((uint32)(numLevels * sizeof(*occ)))) == NULL) {
+    (void)fprintf(stderr, "Not enough memory to decoding of image\n");
+    return;
+  };
 
-	for (level = 0; level < numLevels; level++) {
-		occ[level] = 0;
-	};
+  for(level = 0; level < numLevels; level++) {
+    occ[level] = 0;
+  };
 
-	if(setjmp(on_error)) {
-	    goto out;
-	}
+  if(setjmp(on_error)) {
+    goto out;
+  }
 
-	numBlocks = (xSize * ySize) >> 8;
+  numBlocks = (xSize * ySize) >> 8;
 
-	groups = readGroups(numBlocks,bitStuff);
+  groups = readGroups(numBlocks, bitStuff);
 
-	{
-	uint32 block;
-	uint32 *scanGroups;
+  {
+    uint32 block;
+    uint32 *scanGroups;
 
-	scanGroups = groups;
+    scanGroups = groups;
 
-	for (block = 0; block < numBlocks; block++) {
-		if (*scanGroups >= numLevels) {
-			(void)fprintf(stderr,"Group level too large: %d > %d\n",*scanGroups,numLevels-1);
-			bzero(image, width*height);
-			return image;
-		};
+    for(block = 0; block < numBlocks; block++) {
+      if(*scanGroups >= numLevels) {
+        (void)fprintf(stderr, "Group level too large: %d > %d\n", *scanGroups, numLevels - 1);
+        bzero(image, width * height);
+        return image;
+      };
 
-		occ[*(scanGroups++)]++;
-	};
-	};
+      occ[*(scanGroups++)]++;
+    };
+  };
 
-	initBlock();
+  initBlock();
 
-	for (level = 0; level < numLevels; level++) {
-		if (occ[level] != 0) {
-		uint16 minDC,maxDC,rangeDC;
-		uint32 *scanGroups,*scanVar;
-		uint32 i;
+  for(level = 0; level < numLevels; level++) {
+    if(occ[level] != 0) {
+      uint16 minDC, maxDC, rangeDC;
+      uint32 *scanGroups, *scanVar;
+      uint32 i;
 
-			minDC = readBits(16,bitStuff);
-			maxDC = readBits(16,bitStuff);
+      minDC = readBits(16, bitStuff);
+      maxDC = readBits(16, bitStuff);
 
-			rangeDC = maxDC - minDC;
+      rangeDC = maxDC - minDC;
 
-			scanVar = var+1;
+      scanVar = var + 1;
 
-			for (i = 1; i < 256; i++) {
-				*(scanVar++) = readBits(3,bitStuff);
-			};
+      for(i = 1; i < 256; i++) {
+        *(scanVar++) = readBits(3, bitStuff);
+      };
 
-			scanGroups = groups;
+      scanGroups = groups;
 
-			for (x = 0; x < xSize; x += 16) {
-				for (y = 0; y < ySize; y += 16) {
-					if (*(scanGroups++) == level) {
-						readBlock(transform,spacing,minDC,rangeDC,var,x,y,xSize,image,bitStuff);
-					};
-				};
-			};
-		};
-	};
+      for(x = 0; x < xSize; x += 16) {
+        for(y = 0; y < ySize; y += 16) {
+          if(*(scanGroups++) == level) {
+            readBlock(transform, spacing, minDC, rangeDC, var, x, y, xSize, image, bitStuff);
+          };
+        };
+      };
+    };
+  };
 
-	/* note that under some normal circumstances byteCount can get
-	   reset to 0 -- this is OK, problems will be indicated by an
-	   EOF from readBits above somewhere. */
-	used = bitStuff->byteCount;
-	if(used != len && used > 0) {
-	    fprintf(stderr, "Error: only used %d bytes out of %d\n",
-		    used, len);
-	}
-out:	free(occ);
-	freeAllTrees();
-	return image;
+  /* note that under some normal circumstances byteCount can get
+     reset to 0 -- this is OK, problems will be indicated by an
+     EOF from readBits above somewhere. */
+  used = bitStuff->byteCount;
+  if(used != len && used > 0) {
+    fprintf(stderr, "Error: only used %d bytes out of %d\n",
+            used, len);
+  }
+out:
+  free(occ);
+  freeAllTrees();
+  return image;
 }

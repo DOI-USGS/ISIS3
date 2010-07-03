@@ -23,44 +23,44 @@ Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 
 using namespace PIRL;
 
-  const char* const
-	StaticStats::ID =
-	   "PIRL::StaticStats ($Revision: 1.1 $ $Date: 2007/01/11 20:59:17 $)";
-  StaticStats::StaticStats(double meanIn, double stdDevIn, int validPixelsIn,
-  			   double minimumIn, double maximumIn){
-    myMean = meanIn;
-    myStandardDeviation = stdDevIn;
-    myValidPixels = validPixelsIn;
-    myMinimum = minimumIn;
-    myMaximum = maximumIn;
-  }
-  double StaticStats::Average(){
-    return myMean;
-  }
-  void StaticStats::setMean(double meanIn){
-    myMean = meanIn;
-  }
-  double StaticStats::StandardDeviation(){
-    return myStandardDeviation;
-  }
-  void StaticStats::setStandardDeviation(double standardDeviationIn){
-    myStandardDeviation = standardDeviationIn;
-  }
-  int StaticStats::ValidPixels(){
-    return myValidPixels;
-  }
-  void StaticStats::setValidPixels(int validPixelsIn){
-    myValidPixels = validPixelsIn;
-  }
-  double StaticStats::Minimum(){
-    return myMinimum;
-  }
-  void StaticStats::setMinimum(double minimumIn){
-    myMinimum = minimumIn;
-  }
-  double StaticStats::Maximum(){
-    return myMaximum;
-  }
-  void StaticStats::setMaximum(double maximumIn){
-    myMaximum = maximumIn;
-  }
+const char *const
+StaticStats::ID =
+  "PIRL::StaticStats ($Revision: 1.1 $ $Date: 2007/01/11 20:59:17 $)";
+StaticStats::StaticStats(double meanIn, double stdDevIn, int validPixelsIn,
+                         double minimumIn, double maximumIn) {
+  myMean = meanIn;
+  myStandardDeviation = stdDevIn;
+  myValidPixels = validPixelsIn;
+  myMinimum = minimumIn;
+  myMaximum = maximumIn;
+}
+double StaticStats::Average() {
+  return myMean;
+}
+void StaticStats::setMean(double meanIn) {
+  myMean = meanIn;
+}
+double StaticStats::StandardDeviation() {
+  return myStandardDeviation;
+}
+void StaticStats::setStandardDeviation(double standardDeviationIn) {
+  myStandardDeviation = standardDeviationIn;
+}
+int StaticStats::ValidPixels() {
+  return myValidPixels;
+}
+void StaticStats::setValidPixels(int validPixelsIn) {
+  myValidPixels = validPixelsIn;
+}
+double StaticStats::Minimum() {
+  return myMinimum;
+}
+void StaticStats::setMinimum(double minimumIn) {
+  myMinimum = minimumIn;
+}
+double StaticStats::Maximum() {
+  return myMaximum;
+}
+void StaticStats::setMaximum(double maximumIn) {
+  myMaximum = maximumIn;
+}

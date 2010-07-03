@@ -6,7 +6,7 @@
 #include "Preference.h"
 
 using namespace std;
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   Isis::Filename file("$lo/testData/3133_h1.cub");

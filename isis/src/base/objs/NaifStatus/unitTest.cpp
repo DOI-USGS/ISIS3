@@ -18,7 +18,7 @@ int main() {
     erract_c("SET", (SpiceInt)0, "");
     NaifStatus::CheckErrors();
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report(false);
   }
 

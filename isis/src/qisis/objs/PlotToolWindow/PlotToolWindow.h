@@ -31,13 +31,11 @@ template< class T > class QVector;
 
 class QwtPlotMarker;
 
-namespace Isis
-{
+namespace Isis {
   class PvlKeyword;
 }
 
-namespace Qisis
-{
+namespace Qisis {
   /**
    * @brief Widget to display Isis cubes for qt apps
    *
@@ -49,19 +47,18 @@ namespace Qisis
    *  @history 2010-06-26 - Eric Hyer - Now uses MdiCubeViewport instead of
    *           CubeViewport.  Fixed multiple include problems.
    */
-  class PlotToolWindow : public PlotWindow
-  {
+  class PlotToolWindow : public PlotWindow {
       Q_OBJECT
 
     public:
-      PlotToolWindow(QString title, QWidget * parent);
-      PlotToolWindow(const PlotToolWindow & other);
+      PlotToolWindow(QString title, QWidget *parent);
+      PlotToolWindow(const PlotToolWindow &other);
       virtual ~PlotToolWindow();
       bool bandMarkersVisible();
       void setViewport(CubeViewport *cvp);
       void setPlotType(QString plotType);
       bool p_markersVisible;
-      const PlotToolWindow & operator=(PlotToolWindow other);
+      const PlotToolWindow &operator=(PlotToolWindow other);
 
 
     public slots:
@@ -74,13 +71,13 @@ namespace Qisis
 
     private:
       void setAutoScaleOption(bool autoScale = false);
-      QwtPlotMarker * p_grayBandLine;
-      QwtPlotMarker * p_redBandLine;
-      QwtPlotMarker * p_greenBandLine;
-      QwtPlotMarker * p_blueBandLine;
-      CubeViewport  * p_cvp;
-      QString * p_plotType;
-      Isis::PvlKeyword * p_wavelengths;
+      QwtPlotMarker *p_grayBandLine;
+      QwtPlotMarker *p_redBandLine;
+      QwtPlotMarker *p_greenBandLine;
+      QwtPlotMarker *p_blueBandLine;
+      CubeViewport   *p_cvp;
+      QString *p_plotType;
+      Isis::PvlKeyword *p_wavelengths;
       bool p_autoScale;
       QVector< double > * p_stdDevArray;
   };

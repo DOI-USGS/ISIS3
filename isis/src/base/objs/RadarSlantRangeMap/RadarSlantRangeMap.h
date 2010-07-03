@@ -42,9 +42,9 @@ namespace Isis {
    * @author 2008-06-16 Jeff Anderson
    * Original version
    *
-   *  @history 2009-07-01 Janet Barrett - Changed the bracketing method 
+   *  @history 2009-07-01 Janet Barrett - Changed the bracketing method
    *                      used to solve for the root of the function that
-   *                      determines ground range given slant range; 
+   *                      determines ground range given slant range;
    *                      fixed code that determines the range coefficients
    *                      to used based on current ephemeris time
    *  @history 2010-03-19 Debbie A. Cook - Added comments about the units
@@ -52,7 +52,7 @@ namespace Isis {
    *                      to be in meters instead of km
    *
    */
-    class RadarSlantRangeMap : public CameraDistortionMap {
+  class RadarSlantRangeMap : public CameraDistortionMap {
     public:
       RadarSlantRangeMap(Camera *parent, double groundRangeResolution);
 
@@ -81,7 +81,7 @@ namespace Isis {
       double p_tolerance;
       double p_initialMinGroundRangeGuess;
       double p_initialMaxGroundRangeGuess;
-  
+
       double p_rangeSigma;
       double p_dopplerSigma;
       Camera *p_camera;

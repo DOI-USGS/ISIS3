@@ -4,7 +4,7 @@ Isis::UserInterface &ui = Isis::Application::GetUserInterface();
 
 std::cout << ui.GetInteger("INTEGER") << std::endl;
 
-if (ui.WasEntered("DOUBLE")) {
+if(ui.WasEntered("DOUBLE")) {
   std::cout << ui.GetDouble("DOUBLE") << std::endl;
 }
 else {
@@ -17,7 +17,7 @@ std::cout << ui.GetFilename("FILE") << std::endl;
 
 std::cout << ui.GetFilename("INPUTCUBE") << std::endl;
 
-if (ui.WasEntered("OUTPUTCUBE")) {
+if(ui.WasEntered("OUTPUTCUBE")) {
   std::cout << ui.GetDouble("OUTPUTCUBE") << std::endl;
 }
 

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   Isis::PolynomialBivariate b(1);
@@ -17,7 +17,7 @@ int main () {
   cout << "Name   = " << b.Name() << endl;
   cout << "Ncoefs = " << b.Coefficients() << endl;
   cout << "Vars   = " << b.Variables() << endl;
-  for (int i=0; i<b.Coefficients(); i++) {
+  for(int i = 0; i < b.Coefficients(); i++) {
     cout << b.Coefficient(i) << endl;
   }
 
@@ -26,7 +26,7 @@ int main () {
   vars.push_back(2.0);
   vars.push_back(3.0);
   cout << b.Evaluate(vars) << endl;
-  for (int i=0; i<b.Coefficients(); i++) {
+  for(int i = 0; i < b.Coefficients(); i++) {
     cout << b.Term(i) << endl;
   }
 
@@ -34,7 +34,7 @@ int main () {
   vars[0] = 1.0;
   vars[1] = -2.0;
   cout << b.Evaluate(vars) << endl;
-  for (int i=0; i<b.Coefficients(); i++) {
+  for(int i = 0; i < b.Coefficients(); i++) {
     cout << b.Term(i) << endl;
   }
 
@@ -50,7 +50,7 @@ int main () {
   coefs.push_back(1.0);
   c.SetCoefficients(coefs);
   cout << c.Evaluate(vars) << endl;
-  for (int i=0; i<c.Coefficients(); i++) {
+  for(int i = 0; i < c.Coefficients(); i++) {
     cout << c.Term(i) << endl;
   }
 }

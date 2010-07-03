@@ -17,18 +17,20 @@ namespace Qisis {
    *    	control net loading
    */
   class MosaicControlNetTool : public Qisis::MosaicTool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      MosaicControlNetTool (MosaicWidget *parent);
+      MosaicControlNetTool(MosaicWidget *parent);
       void addToMenu(QMenu *menu);
 
-     public slots:
+    public slots:
 
     protected:
       QAction *toolPadAction(ToolPad *toolpad);
       //! Returns the name of the menu.
-      QString menuName() const { return "&View"; };
+      QString menuName() const {
+        return "&View";
+      };
       QWidget *createToolBarWidget(QStackedWidget *parent);
 
     protected slots:
@@ -37,7 +39,7 @@ namespace Qisis {
       void loadControlNet();
       void displayControlNet();
       void displayConnectivity();
-      
+
     private:
       void createDialog(QWidget *parent);
       QDialog *p_dialog;
@@ -46,7 +48,7 @@ namespace Qisis {
 
       QPushButton *p_loadControlNetButton;
       QPushButton *p_displayControlNetButton;
-      QPushButton *p_displayConnectivity; 
+      QPushButton *p_displayConnectivity;
       QAction *p_connectivity;
   };
 };

@@ -4,11 +4,11 @@
 #include "SpecialPixel.h"
 #include "Filename.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void IsisMain () {
-  UserInterface &ui = Application::GetUserInterface ();
+void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
   ProcessImport p;
   iString from = ui.GetFilename("FROM");
   EndianSwapper swp("MSB");
@@ -22,23 +22,23 @@ void IsisMain () {
 
   ifstream fin;
   fin.open(from.c_str(), ios::in | ios::binary);
-  if (!fin.is_open()) {
+  if(!fin.is_open()) {
     string msg = "Cannot open input file [" + from + "]";
-    throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
   }
 
-/**
- *  0-rel byte offset   value
- *       0          32-bit integer magic number
- *       4          32-bit integer number of image lines
- *       8          32-bit integer number of bytes per image line
- *      12          32-bit integer number of bits per image elements
- *      16          32-bit integer currently unused
- *      20          32-bit integer currently unused
- *      24          ASCII label up to 1000 characters long
- *                  The label is NUL-terminated
- *
- */
+  /**
+   *  0-rel byte offset   value
+   *       0          32-bit integer magic number
+   *       4          32-bit integer number of image lines
+   *       8          32-bit integer number of bytes per image line
+   *      12          32-bit integer number of bits per image elements
+   *      16          32-bit integer currently unused
+   *      20          32-bit integer currently unused
+   *      24          ASCII label up to 1000 characters long
+   *                  The label is NUL-terminated
+   *
+   */
 
   // Verify the magic number
   fin.seekg(0);
@@ -47,7 +47,7 @@ void IsisMain () {
 
   if(readBytes.readLong != 0x67B) {
     string msg = "Input file [" + from + "] does not appear to be in ddd format";
-    throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
   }
 
   fin.read(readBytes.readChars, 4);
@@ -63,12 +63,12 @@ void IsisMain () {
 
   if(fin.fail() || fin.eof()) {
     string msg = "An error ocurred when reading the input file [" + from + "]";
-    throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
   }
 
   fin.close();
 
-  switch (readBytes.readLong) {
+  switch(readBytes.readLong) {
     case 8:
       p.SetPixelType(Isis::UnsignedByte);
       break;
@@ -85,14 +85,14 @@ void IsisMain () {
 
   nsamples /= (readBytes.readLong / 8);
 
-  p.SetDimensions(nsamples,nlines,nbands);
+  p.SetDimensions(nsamples, nlines, nbands);
   p.SetFileHeaderBytes(1024);
   p.SetByteOrder(Isis::Msb);
-  p.SetInputFile (ui.GetFilename("FROM"));
+  p.SetInputFile(ui.GetFilename("FROM"));
   p.SetOutputCube("TO");
 
-  p.StartProcess ();
-  p.EndProcess ();
+  p.StartProcess();
+  p.EndProcess();
 
   return;
 }

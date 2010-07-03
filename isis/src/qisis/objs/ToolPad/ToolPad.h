@@ -6,30 +6,30 @@
 
 namespace Qisis {
   class ToolPad : public QToolBar {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
       /**
        * Toolpad constructor.
-       * 
-       * 
-       * @param label 
-       * @param parent 
+       *
+       *
+       * @param label
+       * @param parent
        */
-      ToolPad (const QString &label, QWidget *parent) : QToolBar(label,parent) {
+      ToolPad(const QString &label, QWidget *parent) : QToolBar(label, parent) {
         p_actionGroup = new QActionGroup(parent);
         p_actionGroup->setExclusive(true);
-        setIconSize(QSize(22,22));
+        setIconSize(QSize(22, 22));
       }
 
 
       /**
        * Adds an action to the action group and tool bar.
-       * 
-       * 
-       * @param action 
+       *
+       *
+       * @param action
        */
-      void addAction (QAction *action) {
+      void addAction(QAction *action) {
         action->setCheckable(true);
         p_actionGroup->addAction(action);
         QToolBar::addAction(action);

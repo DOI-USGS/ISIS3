@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 int channel, bin;
@@ -18,17 +18,17 @@ struct furrow {
   vector<MultivariateStatistics> mvstats;
 };
 vector<furrow> furrows;
-  
+
 void furrowCheck(Buffer &in, Buffer &out);
 void getStats(Buffer &in);
 
 void IsisMain() {
   // We will be processing by line
   ProcessByLine p;
-  
+
   // Setup the input and output cubes
-  Cube* icube = p.SetInputCube("FROM");
-  
+  Cube *icube = p.SetInputCube("FROM");
+
   UserInterface &ui = Application::GetUserInterface();
   correlation = ui.GetDouble("CORRELATION");
   HiLab hiInfo(icube);
@@ -42,15 +42,15 @@ void IsisMain() {
     furrows[0].startSample = 5;
     furrows[0].endSample = 1;
     furrows[0].increment = -1;
-    
+
     furrows[1].startSample = 255;
     furrows[1].endSample = 251;
     furrows[1].increment = -1;
-    
+
     furrows[2].startSample = 518;
     furrows[2].endSample = 514;
     furrows[2].increment = -1;
-    
+
     furrows[3].startSample = 781;
     furrows[3].endSample = 777;
     furrows[3].increment = -1;
@@ -72,34 +72,34 @@ void IsisMain() {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
-  
+
   for(int i = 0; i < (int)furrows.size(); i++) {
     int n = abs(furrows[i].startSample - furrows[i].endSample);
     furrows[i].mvstats.resize(n);
   }
-  
+
   p.StartProcess(getStats);
   PvlGroup stats("Correlations");
-  p.SetOutputCube ("TO");
-    
-  // Add correlation data to cube label  
+  p.SetOutputCube("TO");
+
+  // Add correlation data to cube label
   for(int i = 0; i < (int)furrows.size(); i++) {
     for(int j = 0; j < (int)furrows[i].mvstats.size(); j++) {
       string label, begin, finish;
-      stringstream ss; 
+      stringstream ss;
 
       if(channel == 0) {
-        ss << furrows[i].startSample-j;
-        ss >> begin;  
+        ss << furrows[i].startSample - j;
+        ss >> begin;
         ss.clear();
-        ss << furrows[i].startSample-j-1;
+        ss << furrows[i].startSample - j - 1;
         ss >> finish;
       }
       else if(channel == 1) {
-        ss << furrows[i].startSample+j;
-        ss >> begin; 
+        ss << furrows[i].startSample + j;
+        ss >> begin;
         ss.clear();
-        ss << furrows[i].startSample+j+1;
+        ss << furrows[i].startSample + j + 1;
         ss >> finish;
       }
       label += "Column" + begin + "to" + finish;
@@ -107,7 +107,7 @@ void IsisMain() {
     }
   }
   Application::Log(stats);
-  
+
   p.StartProcess(furrowCheck);
   p.EndProcess();
 }
@@ -117,7 +117,7 @@ void getStats(Buffer &in) {
   for(int i = 0; i < (int)furrows.size(); i++) {
     for(int j = 0; j < (int)furrows[i].mvstats.size(); j++) {
       int index = furrows[i].startSample + j * furrows[i].increment - 1;
-      furrows[i].mvstats[j].AddData(&in[index], 
+      furrows[i].mvstats[j].AddData(&in[index],
                                     &in[index+furrows[i].increment], 1);
     }
   }
@@ -135,10 +135,10 @@ void furrowCheck(Buffer &in, Buffer &out) {
       if(furrows[i].mvstats[j-1].Correlation() < correlation || bFurrows == true) {
         bFurrows = true;
         if(channel == 0) {
-          out[furrows[i].startSample-j-1] = Isis::Null;
+          out[furrows[i].startSample - j - 1] = Isis::Null;
         }
         else {
-          out[furrows[i].startSample+j-1] = Isis::Null;
+          out[furrows[i].startSample + j - 1] = Isis::Null;
         }
       }
     }

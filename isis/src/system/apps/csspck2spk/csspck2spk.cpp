@@ -11,7 +11,7 @@
 using namespace Isis;
 using namespace std;
 
-void IsisMain(){
+void IsisMain() {
   /* Ingesting the pck2spk into mapped key/values; first grap latest file name,
      and then the individual lines for parsing into the map */
   string pckfile("$cassini/kernels/pck/pck2spk_????.map");
@@ -20,12 +20,12 @@ void IsisMain(){
   TextFile txt(pckFilenm.Expanded());
   iString line;
   map< string, string> lookuparray;
-  while (txt.GetLine(line)) {
+  while(txt.GetLine(line)) {
     iString pck = line.Token(",");
     pck.Trim("\n\r\t\v\f ");        // stripping the extraneous characters
     iString spk = line;
     spk.Trim("\n\r\t\v\f ");
-    pair<string, string> pckspk(spk,pck);
+    pair<string, string> pckspk(spk, pck);
     lookuparray.insert(pckspk);
   }
 
@@ -35,7 +35,7 @@ void IsisMain(){
   string inDBfile;
   if(ui.WasEntered("FROM")) {
     inDBfile = ui.GetFilename("FROM");
-  } 
+  }
   else {
     string exDBfile("$cassini/kernels/spk/kernels.????.db");
     Filename exDBfilenm(exDBfile);
@@ -47,8 +47,8 @@ void IsisMain(){
   basepckPath.HighestVersion();
 
   // Read SPK db file into a PVL
-  Pvl spkdb (inDBfile);
-  Pvl basepck (basepckPath.Expanded());
+  Pvl spkdb(inDBfile);
+  Pvl basepck(basepckPath.Expanded());
   PvlKeyword basefile = basepck.FindObject("TargetAttitudeShape").Group(0)["File"];
 
   //Search PVL for main object
@@ -58,22 +58,22 @@ void IsisMain(){
   /* Search for the Selection Groups, and the based on the File Keyword, add
      the appropriate pck file keyword.  First check to see if the input file has
      already been updated from an old version of the program. */
-  for (int grpIndex =0; grpIndex < mainob.Groups(); grpIndex ++) {
+  for(int grpIndex = 0; grpIndex < mainob.Groups(); grpIndex ++) {
     PvlGroup &grp = mainob.Group(grpIndex);
-    if (grp.IsNamed("Selection")) {
+    if(grp.IsNamed("Selection")) {
 
       int count = 0;
-      for (int keyIndex = 0; keyIndex < grp.Keywords(); keyIndex ++) {        
-        if ( grp[keyIndex].IsNamed("File")){
+      for(int keyIndex = 0; keyIndex < grp.Keywords(); keyIndex ++) {
+        if(grp[keyIndex].IsNamed("File")) {
           count ++;
 
           // Older versions of this program added the file to the SPK kernels DB file instead
           //   of creating a new one in the PCK directory. Check for this.
-          if (count > 1) {
+          if(count > 1) {
             string msg = "This file has already been updated [";
             msg += iString(inDBfile) + "] by an old version of this program.";
             msg += " This is not a valid input.";
-            throw iException::Message(iException::User,msg,_FILEINFO_);
+            throw iException::Message(iException::User, msg, _FILEINFO_);
           }
         }
       }
@@ -81,12 +81,12 @@ void IsisMain(){
       string value = (string)grp["File"];
       Filename fnm(value);
       string filename = fnm.Basename();
-      if ( lookuparray[filename] == "" ) {
+      if(lookuparray[filename] == "") {
         std::string msg = "Spk [" + filename + "] does not exist in [" + pckFilenm.Name() + "]";
-        throw iException::Message(iException::User,msg,_FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
       else {
-        PvlKeyword newfile("File", "$cassini/kernels/pck/"+lookuparray[filename]);
+        PvlKeyword newfile("File", "$cassini/kernels/pck/" + lookuparray[filename]);
         grp.AddKeyword(basefile, Pvl::Replace);
         grp.AddKeyword(newfile);
         grp.DeleteKeyword("Type");
@@ -99,7 +99,7 @@ void IsisMain(){
   if(ui.WasEntered("TO")) {
     outDBfile = ui.GetFilename("TO");
   }
-  else{
+  else {
     outDBfile = "$cassini/kernels/pck/kernels.????.db";
     outDBfile.NewVersion();
   }

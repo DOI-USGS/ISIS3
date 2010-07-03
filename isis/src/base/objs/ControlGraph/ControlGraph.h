@@ -29,8 +29,7 @@ template< class A, class B > class QPair;
 template< class A> class QVector;
 class QString;
 
-namespace Isis
-{
+namespace Isis {
 
   // Isis forward declarations
   class ControlNet;
@@ -53,40 +52,39 @@ namespace Isis
    * @see ControlNet ControlPoint ControlMeasure GroupedStatistics
    *
    * @internal
-   *                              
+   *
    */
-  class ControlGraph 
-  {
+  class ControlGraph {
     public:
-      ControlGraph(ControlNet * someControlNet);
-      ControlGraph(const ControlGraph & other);
+      ControlGraph(ControlNet *someControlNet);
+      ControlGraph(const ControlGraph &other);
       ~ControlGraph();
-      
+
       const bool IsConnected() const;
       const int GetIslandCount() const;
-      const QVector< QString > GetCubesOnIsland(const int & island) const;
+      const QVector< QString > GetCubesOnIsland(const int &island) const;
       const QVector< QString > GetCubeList() const;
-      const GroupedStatistics & GetMeasureStats(const QString &
+      const GroupedStatistics &GetMeasureStats(const QString &
           CubeSerialNumber) const;
-      
-      ControlGraph & operator=(const ControlGraph & other);
+
+      ControlGraph &operator=(const ControlGraph &other);
 
     private:
       // nested class forward declaration
       class AdjacentCubeList;
-      
-      void HashCubesAndPopulateGraph(ControlNet * someControlNet);
+
+      void HashCubesAndPopulateGraph(ControlNet *someControlNet);
       void CalculateIslands();
 
       //! ControlNet to make a graph from
-      ControlNet * cnet;
-      
+      ControlNet *cnet;
+
       //! Used to get an index from a cube serial number
       QHash< QString, int > * cubeIdToIndexHash;
-      
+
       //! Used to get a cube serial number from an index
       QHash< int, QString > * cubeIndexToIdHash;
-      
+
       /**
        *  THE GRAPH!!  It is a map of cube indices to a pair.  The first pair
        *  element is a list that contains not only all the cubes which are
@@ -95,16 +93,16 @@ namespace Isis
        *  this cube.
        */
       QMap< int, QPair< AdjacentCubeList, GroupedStatistics > > * graph;
-      
+
       /**
        *  Stores the state of the graphs connectivity so that connectivity must
        *  only be calculated once.
        */
       bool connected;
-      
+
       //! Stores a list of islands which are themselves a list of cube indices
       QVector< QVector< int > > * islands;
-      
+
       /**
        * @brief Control Graph nested class
        *
@@ -117,21 +115,20 @@ namespace Isis
        * @see ControlGraph
        *
        * @internal
-       *                              
+       *
        */
-      class AdjacentCubeList
-      {
+      class AdjacentCubeList {
         public:
-          AdjacentCubeList(const int & cubeIndex, const int & cpIndex, const int
-              & cmIndex);
-          AdjacentCubeList(const AdjacentCubeList & other);
+          AdjacentCubeList(const int &cubeIndex, const int &cpIndex, const int
+                           & cmIndex);
+          AdjacentCubeList(const AdjacentCubeList &other);
           ~AdjacentCubeList();
-          
+
           const QVector< int > GetAdjacentCubes() const;
-          void AddConnection(const int & cubeIndex, const int & cpIndex, const
-              int & cmIndex);
-          AdjacentCubeList & operator=(const AdjacentCubeList & other);
-           
+          void AddConnection(const int &cubeIndex, const int &cpIndex, const
+                             int &cmIndex);
+          AdjacentCubeList &operator=(const AdjacentCubeList &other);
+
         private:
           //! stores all edges or connections for an adjacent cube
           QMap< int, QVector< QPair< int, int > > > * connections;

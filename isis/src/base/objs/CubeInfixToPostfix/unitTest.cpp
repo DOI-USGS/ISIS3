@@ -6,8 +6,7 @@
 using namespace std;
 using namespace Isis;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   cout << "-------------------------------------------------------" << endl;
   cout << "Test CubeInfixToPostfix" << endl;
 
@@ -42,7 +41,7 @@ int main(int argc, char *argv[])
 
   CubeInfixToPostfix converter;
   for(int equation = 0; equation < NUM_EQUATIONS; equation ++) {
-    cout << endl << endl << equation+1 << ": Convert '" << equations[equation] << "' to postfix" << endl;
+    cout << endl << endl << equation + 1 << ": Convert '" << equations[equation] << "' to postfix" << endl;
 
     try {
       iString tokenized = converter.TokenizeEquation(equations[equation]);

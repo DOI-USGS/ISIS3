@@ -6,7 +6,7 @@
 #include "EndianSwapper.h"
 #include "UserInterface.h"
 #include "iException.h"
-#include "ProcessByLine.h"          
+#include "ProcessByLine.h"
 #include "iString.h"
 #include "LineManager.h"
 #include "Table.h"
@@ -19,10 +19,10 @@ using namespace Isis;
 using namespace std;
 
 //! map from <sample, band> to dark correction value
-map< pair<int,int>, double > sampleBasedDarkCorrections; 
+map< pair<int, int>, double > sampleBasedDarkCorrections;
 
 //! map from <line, band> to dark correction value
-map< pair<int,int>, double > lineBasedDarkCorrections; 
+map< pair<int, int>, double > lineBasedDarkCorrections;
 
 //! specific energy corrections for each band of the cube
 vector<double> specificEnergyCorrections;
@@ -53,7 +53,7 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset);
 // This is the results group
 PvlGroup calibInfo;
 
-void IsisMain(){
+void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   tempFiles.clear();
@@ -73,7 +73,7 @@ void IsisMain(){
   try {
     isVims = (icube->Label()->FindGroup("Instrument", Pvl::Traverse)["InstrumentId"][0] == "VIMS");
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Clear();
     isVims = false;
   }
@@ -95,7 +95,7 @@ void IsisMain(){
   chooseFlatFile(icube, &p);
   calculateSpecificEnergy(icube);
 
-  calibInfo += PvlKeyword("OutputUnits", ((iof)? "I/F" : "Specific Energy"));
+  calibInfo += PvlKeyword("OutputUnits", ((iof) ? "I/F" : "Specific Energy"));
 
   Application::Log(calibInfo);
 
@@ -112,9 +112,9 @@ void IsisMain(){
 
 /**
  * This applies the calculated calibration coefficients to the file.
- * 
- * @param inBuffers 
- * @param outBuffers 
+ *
+ * @param inBuffers
+ * @param outBuffers
  */
 void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
   Buffer *inBuffer = inBuffers[0];
@@ -134,19 +134,19 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
 
     if(IsSpecial((*outBuffer)[i])) continue;
 
-    map< pair<int,int>, double>::iterator darkCorrection = 
-        sampleBasedDarkCorrections.find(pair<int,int>(i+1, inBuffer->Band()));
+    map< pair<int, int>, double>::iterator darkCorrection =
+      sampleBasedDarkCorrections.find(pair<int, int>(i + 1, inBuffer->Band()));
 
     if(darkCorrection != sampleBasedDarkCorrections.end()) {
       (*outBuffer)[i] -= darkCorrection->second;
     }
 
-    darkCorrection = lineBasedDarkCorrections.find(pair<int,int>(inBuffer->Line(), inBuffer->Band()));
+    darkCorrection = lineBasedDarkCorrections.find(pair<int, int>(inBuffer->Line(), inBuffer->Band()));
 
     if(darkCorrection != lineBasedDarkCorrections.end()) {
       (*outBuffer)[i] -= darkCorrection->second;
     }
-    
+
     if(!IsSpecial((*flatFieldBuffer)[i])) {
       (*outBuffer)[i] /= (*flatFieldBuffer)[i];
     }
@@ -162,14 +162,14 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
 }
 
 /**
- * This calculates the values necessary to convert from 
- * specific energy to I/F. A cube is used as part of the 
- * equation (which probably* just contains a vector of values) 
- * so p->SetInputCube(...) will be called with the appropriate 
- * filename. 
- * 
- * @param icube 
- * @param p 
+ * This calculates the values necessary to convert from
+ * specific energy to I/F. A cube is used as part of the
+ * equation (which probably* just contains a vector of values)
+ * so p->SetInputCube(...) will be called with the appropriate
+ * filename.
+ *
+ * @param icube
+ * @param p
  */
 void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   UserInterface &ui = Application::GetUserInterface();
@@ -181,15 +181,15 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     cam = icube->Camera();
   }
   catch(iException &e) {
-    iString msg = "Unable to create a camera from [" + 
-      icube->Filename() + "]. Please run spiceinit on this file";
+    iString msg = "Unable to create a camera from [" +
+                  icube->Filename() + "]. Please run spiceinit on this file";
     throw iException::Message(iException::Camera, msg, _FILEINFO_);
   }
 
   solarRemoveCoefficient = -1.0;
 
   // try center first
-  if(cam->SetImage(icube->Samples()/2, icube->Lines()/2)) {
+  if(cam->SetImage(icube->Samples() / 2, icube->Lines() / 2)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
@@ -211,19 +211,19 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   }
 
   // try center of 4 edges
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples()/2, 1.0)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples() / 2, 1.0)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples(), icube->Lines()/2)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples(), icube->Lines() / 2)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples()/2, icube->Lines())) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples() / 2, icube->Lines())) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->Lines()/2)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->Lines() / 2)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
@@ -311,21 +311,21 @@ void calculateSpecificEnergy(Cube *icube) {
     Statistics waveCalStats;
 
     if(vis) {
-      specEnergyMgr.SetLine(1, i+1);
-      waveCalMgr.SetLine(1, i+1);
+      specEnergyMgr.SetLine(1, i + 1);
+      waveCalMgr.SetLine(1, i + 1);
     }
     else {
-      specEnergyMgr.SetLine(1, i+1);
+      specEnergyMgr.SetLine(1, i + 1);
       // ir starts at band 97
-      waveCalMgr.SetLine(1, i+96+1);
+      waveCalMgr.SetLine(1, i + 96 + 1);
     }
 
     specEnergyCube.Read(specEnergyMgr);
     waveCalCube.Read(waveCalMgr);
-    
+
     specEnergyStats.AddData(specEnergyMgr.DoubleBuffer(), specEnergyMgr.size());
     waveCalStats.AddData(waveCalMgr.DoubleBuffer(), waveCalMgr.size());
-    
+
     double bandCoefficient = coefficient * specEnergyStats.Average() * waveCalStats.Average();
 
     specificEnergyCorrections.push_back(bandCoefficient);
@@ -333,16 +333,16 @@ void calculateSpecificEnergy(Cube *icube) {
 }
 
 /**
- * This decides if we have a VIS or IR dark current correction and calls the 
- * appropriate method. 
- * 
- * @param currCube 
+ * This decides if we have a VIS or IR dark current correction and calls the
+ * appropriate method.
+ *
+ * @param currCube
  */
 void calculateDarkCurrent(Cube *icube) {
   PvlGroup &inst = icube->Label()->FindGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
 
-  calibInfo += PvlKeyword("Vis", ((vis)? "true" : "false"));
+  calibInfo += PvlKeyword("Vis", ((vis) ? "true" : "false"));
 
   if(vis) {
     calculateVisDarkCurrent(icube);
@@ -353,12 +353,12 @@ void calculateDarkCurrent(Cube *icube) {
 }
 
 /**
- * This populates darkCorrections with the result of the equation: 
+ * This populates darkCorrections with the result of the equation:
  *   dark = a + x * b
- * for each line,band. a, b are from the "vis_*_dark_model.tab" files 
- * and x is the ExposureDuration. 
- * 
- * @param icube 
+ * for each line,band. a, b are from the "vis_*_dark_model.tab" files
+ * and x is the ExposureDuration.
+ *
+ * @param icube
  */
 void calculateVisDarkCurrent(Cube *icube) {
   PvlGroup &inst = icube->Label()->FindGroup("Instrument", Pvl::Traverse);
@@ -393,11 +393,11 @@ void calculateVisDarkCurrent(Cube *icube) {
   GetOffsets(*icube->Label(), sampleOffset, lineOffset);
 
   /**
-   * Reading in one parameter at a time: 
+   * Reading in one parameter at a time:
    *   parameter 1 = constant coefficient
    *   parameter 2 = exposure coefficient
    *   param1 + param2*exposure = dark correction
-   *  
+   *
    * Do byte swapping where necessary.
    */
   for(int parameter = 1; parameter <= 2; parameter ++) {
@@ -414,14 +414,14 @@ void calculateVisDarkCurrent(Cube *icube) {
         int associatedSample = sample - sampleOffset + 1;
 
         calData = swapper.Float(&calData);
-        pair<int,int> index = pair<int,int>(associatedSample, band);
+        pair<int, int> index = pair<int, int>(associatedSample, band);
 
-        map< pair<int,int>, double>::iterator pos = sampleBasedDarkCorrections.find(index);
+        map< pair<int, int>, double>::iterator pos = sampleBasedDarkCorrections.find(index);
         if(pos == sampleBasedDarkCorrections.end()) {
-          sampleBasedDarkCorrections.insert( pair< pair<int,int>, double>(index, calData) );
+          sampleBasedDarkCorrections.insert(pair< pair<int, int>, double>(index, calData));
         }
         else {
-          (*pos).second =  (*pos).second + visExposure * calData; 
+          (*pos).second = (*pos).second + visExposure * calData;
         }
       }
     }
@@ -456,15 +456,15 @@ void calculateVisDarkCurrent(Cube *icube) {
 }
 
 /**
- * This calculates the dark current corrections for IR. If 
- * IRDARKAVG is false, then it translates the sideplane data 
- * into the lineBasedDarkCorrections map directly and does nothing further 
- * with the data. Otherwise, this will apply a least squares linear 
- * fit (the original script did chi-squared, but this is okay) for 
- * each band and uses the points on the line instead of the sideplane 
- * data directly. 
- * 
- * @param icube 
+ * This calculates the dark current corrections for IR. If
+ * IRDARKAVG is false, then it translates the sideplane data
+ * into the lineBasedDarkCorrections map directly and does nothing further
+ * with the data. Otherwise, this will apply a least squares linear
+ * fit (the original script did chi-squared, but this is okay) for
+ * each band and uses the points on the line instead of the sideplane
+ * data directly.
+ *
+ * @param icube
  */
 void calculateIrDarkCurrent(Cube *icube) {
   UserInterface &ui = Application::GetUserInterface();
@@ -491,10 +491,10 @@ void calculateIrDarkCurrent(Cube *icube) {
   //   just return.
   PvlGroup &archive = icube->Label()->FindGroup("Archive", Pvl::Traverse);
 
-  // If dark subtracted (compressorid is valid) and cant do linear 
+  // If dark subtracted (compressorid is valid) and cant do linear
   //   correction (spectral editing flag on) then do not do dark
   if(archive["CompressorId"][0] != "N/A" &&
-     archive["SpectralEditingFlag"][0] == "ON") {
+      archive["SpectralEditingFlag"][0] == "ON") {
     calibInfo += PvlKeyword("SideplaneCorrection", "None");
     return;
   }
@@ -504,16 +504,16 @@ void calculateIrDarkCurrent(Cube *icube) {
     calibInfo += PvlKeyword("SideplaneCorrection", "None");
     return;
   }
-  
+
   if(archive["SpectralSummingFlag"][0] == "ON") return;
 
   // Insert the sideplane data into our lineBasedDarkCorrections map (line,band to correction)
   for(int line = 1; line <= icube->Lines(); line++) {
     for(int band = 1; band <= icube->Bands(); band++) {
-      pair<int, int> index = pair<int,int>(line,band);
+      pair<int, int> index = pair<int, int>(line, band);
       int value = (int)sideplane[(line-1)*icube->Bands() + (band-1)][2];
 
-      lineBasedDarkCorrections.insert(pair< pair<int,int>, double>(index,value));
+      lineBasedDarkCorrections.insert(pair< pair<int, int>, double>(index, value));
     }
   }
 
@@ -528,8 +528,8 @@ void calculateIrDarkCurrent(Cube *icube) {
     LeastSquares lsq(basis);
 
     for(int line = 1; line <= icube->Lines(); line++) {
-      pair<int, int> index = pair<int,int>(line,band);
-      map< pair<int,int>, double>::iterator val = lineBasedDarkCorrections.find(index);
+      pair<int, int> index = pair<int, int>(line, band);
+      map< pair<int, int>, double>::iterator val = lineBasedDarkCorrections.find(index);
 
       vector<double> input;
       input.push_back(line);
@@ -546,9 +546,9 @@ void calculateIrDarkCurrent(Cube *icube) {
     };
 
     for(int line = 1; line <= icube->Lines(); line++) {
-      pair<int, int> index = pair<int,int>(line,band);
+      pair<int, int> index = pair<int, int>(line, band);
 
-      map< pair<int,int>, double>::iterator val = lineBasedDarkCorrections.find(index);
+      map< pair<int, int>, double>::iterator val = lineBasedDarkCorrections.find(index);
       double currentDark = val->second;
 
       double newDark = coefficients[0] + line * coefficients[1];
@@ -573,11 +573,11 @@ void calculateIrDarkCurrent(Cube *icube) {
 }
 
 /**
- * This calls p->SetInputCube with the appropriate flat file needed for 
- * icube. 
- * 
- * @param icube 
- * @param p 
+ * This calls p->SetInputCube with the appropriate flat file needed for
+ * icube.
+ *
+ * @param icube
+ * @param p
  */
 void chooseFlatFile(Cube *icube, ProcessByLine *p) {
   PvlGroup &inst = icube->Label()->FindGroup("Instrument", Pvl::Traverse);
@@ -610,13 +610,13 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
 }
 
 /**
- * This makes our calibration files match the input cube described 
- * by the swath keywords. 
- * 
- * @param icube 
- * @param cubeFilename 
- * 
- * @return iString 
+ * This makes our calibration files match the input cube described
+ * by the swath keywords.
+ *
+ * @param icube
+ * @param cubeFilename
+ *
+ * @return iString
  */
 iString createCroppedFile(Cube *icube, iString cubeFilename, bool flatFile) {
   int sampOffset = 1;
@@ -625,7 +625,7 @@ iString createCroppedFile(Cube *icube, iString cubeFilename, bool flatFile) {
   if(flatFile) {
     GetOffsets(*icube->Label(), sampOffset, lineOffset);
   }
-  
+
 
   iString appArgs = "from=" + cubeFilename + " ";
   appArgs += "sample=" + iString(sampOffset) + " ";
@@ -658,36 +658,36 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
   finalLineOffset = lineOffset;
 
   string samplingMode = iString((string)inst ["SamplingMode"]).UpCase();
-  if (vis) {
-    if (samplingMode == "NORMAL") {
+  if(vis) {
+    if(samplingMode == "NORMAL") {
       finalSampOffset = sampOffset - 1;
       finalLineOffset = lineOffset - 1;
     }
-    else if (samplingMode == "HI-RES") {
-      finalSampOffset = (3 * ((sampOffset - 1) + swathWidth/2)) - swathWidth/2;
-      finalLineOffset = (3 * (lineOffset + swathLength/2)) - swathLength/2;
+    else if(samplingMode == "HI-RES") {
+      finalSampOffset = (3 * ((sampOffset - 1) + swathWidth / 2)) - swathWidth / 2;
+      finalLineOffset = (3 * (lineOffset + swathLength / 2)) - swathLength / 2;
     }
     else {
       string msg = "Unsupported sampling mode [" + samplingMode + "]";
-      throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
   }
   else {
-    if (samplingMode == "NORMAL") {
+    if(samplingMode == "NORMAL") {
       finalSampOffset = sampOffset - 1;
       finalLineOffset = lineOffset - 1;
     }
-    else if (samplingMode == "HI-RES") {
-      finalSampOffset = 2* ((sampOffset-1) + ((swathWidth - 1)/4));
+    else if(samplingMode == "HI-RES") {
+      finalSampOffset = 2 * ((sampOffset - 1) + ((swathWidth - 1) / 4));
       finalLineOffset = lineOffset - 1;
     }
-    else if (samplingMode == "NYQUIST") {
+    else if(samplingMode == "NYQUIST") {
       string msg = "Cannot process NYQUIST (undersampled) mode ";
-      throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
     else {
       string msg = "Unsupported sampling mode [" + samplingMode + "]";
-      throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
   }
 

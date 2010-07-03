@@ -3,10 +3,10 @@
 
 #include "FramingCamera.h"
 
-namespace Dawn { 
+namespace Dawn {
   /**
    * @ingroup SpiceInstrumentsAndCameras
-   * 
+   *
    * @brief Camera class
    *
    * This is the camera class for the FC camera
@@ -18,8 +18,8 @@ namespace Dawn {
    */
   class DawnFcCamera : public Isis::FramingCamera {
     public:
-      DawnFcCamera (Isis::Pvl &lab);
-      ~DawnFcCamera () {};
+      DawnFcCamera(Isis::Pvl &lab);
+      ~DawnFcCamera() {};
   };
 };
 #endif

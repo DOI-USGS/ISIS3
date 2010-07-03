@@ -27,9 +27,9 @@
 using namespace std;
 namespace Isis {
   //! Constructs an IsisStats object with accumulators and counters set to zero.
-  Statistics::Statistics () {
+  Statistics::Statistics() {
     SetValidRange();
-    Reset ();    
+    Reset();
   }
 
   //! Reset all accumulators and counters to zero.
@@ -51,20 +51,20 @@ namespace Isis {
   }
 
   //! Destroys the IsisStats object.
-  Statistics::~Statistics () {};
+  Statistics::~Statistics() {};
 
   /**
    * Add an array of doubles to the accumulators and counters.
    * This method can be invoked multiple times (for example: once
    * for each line in a cube) before obtaining statistics.
    *
-   * @param data The data to be added to the data set used for statistical 
+   * @param data The data to be added to the data set used for statistical
    *    calculations.
    *
    * @param count The number of elements in the incoming data to be added.
    */
-  void Statistics::AddData (const double *data, const unsigned int count) {
-    for (unsigned int i=0; i<count; i++) {
+  void Statistics::AddData(const double *data, const unsigned int count) {
+    for(unsigned int i = 0; i < count; i++) {
       double value = data[i];
       //Calls the inline AddData method  --see .h file.
       AddData(value);
@@ -77,7 +77,7 @@ namespace Isis {
    * Note that is invalidates the absolute minimum and maximum. They
    * will no longer be usable.
    *
-   * @param data The data to be removed from data set used for statistical 
+   * @param data The data to be removed from data set used for statistical
    *    calculations.
    *
    * @param count The number of elements in the data to be removed.
@@ -85,53 +85,60 @@ namespace Isis {
    * @throws Isis::iException::Message RemoveData is trying to remove data that
    *    doesn't exist.
    */
-  void Statistics::RemoveData (const double *data, const unsigned int count) {
+  void Statistics::RemoveData(const double *data, const unsigned int count) {
     p_removedData = true;
 
-    for (unsigned int i=0; i<count; i++) {
+    for(unsigned int i = 0; i < count; i++) {
       p_totalPixels--;
 
-      if (Isis::IsValidPixel(data[i]) && InRange(data[i])) {
+      if(Isis::IsValidPixel(data[i]) && InRange(data[i])) {
         p_sum -= data[i];
         p_sumsum -= data[i] * data[i];
         p_validPixels--;
-      } else if (Isis::IsNullPixel(data[i])) {
+      }
+      else if(Isis::IsNullPixel(data[i])) {
         p_nullPixels--;
-      } else if (Isis::IsHisPixel(data[i])) {
+      }
+      else if(Isis::IsHisPixel(data[i])) {
         p_hisPixels--;
-      } else if (Isis::IsHrsPixel(data[i])) {
+      }
+      else if(Isis::IsHrsPixel(data[i])) {
         p_hrsPixels--;
-      } else if (Isis::IsLisPixel(data[i])) {
+      }
+      else if(Isis::IsLisPixel(data[i])) {
         p_lisPixels--;
-      } else if (Isis::IsLrsPixel(data[i])) {
+      }
+      else if(Isis::IsLrsPixel(data[i])) {
         p_lrsPixels--;
-      } else if(AboveRange(data[i])) {
+      }
+      else if(AboveRange(data[i])) {
         p_overRangePixels--;
-      } else {
+      }
+      else {
         p_underRangePixels--;
       }
     }
 
-    if (p_totalPixels < 0) {
-      string m="You are removing non-existant data in [Statistics::RemoveData]";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+    if(p_totalPixels < 0) {
+      string m = "You are removing non-existant data in [Statistics::RemoveData]";
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
   }
 
-  void Statistics::RemoveData (const double data) {
-    RemoveData(&data,1);
+  void Statistics::RemoveData(const double data) {
+    RemoveData(&data, 1);
   }
 
   void Statistics::SetValidRange(const double minimum, const double maximum) {
     p_validMinimum = minimum;
     p_validMaximum = maximum;
 
-    if (p_validMaximum < p_validMinimum) {
-      // get the min and max DN values in the chosen range              
+    if(p_validMaximum < p_validMinimum) {
+      // get the min and max DN values in the chosen range
       iString sMin(minimum);
-      iString sMax(maximum);        
-      std::string m= "Invalid Range: Minimum [" + sMin +"] must be less than the Maximum [" + sMax +"]";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      iString sMax(maximum);
+      std::string m = "Invalid Range: Minimum [" + sMin + "] must be less than the Maximum [" + sMax + "]";
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
   }
   /**
@@ -140,8 +147,8 @@ namespace Isis {
    *
    * @return The Average
    */
-  double Statistics::Average () const {
-    if (p_validPixels < 1) return Isis::NULL8;
+  double Statistics::Average() const {
+    if(p_validPixels < 1) return Isis::NULL8;
     return p_sum / p_validPixels;
   }
 
@@ -151,8 +158,8 @@ namespace Isis {
    *
    * @return The standard deviation
    */
-  double Statistics::StandardDeviation () const {
-    if (p_validPixels <= 1) return Isis::NULL8;
+  double Statistics::StandardDeviation() const {
+    if(p_validPixels <= 1) return Isis::NULL8;
     return sqrt(Variance());
   }
 
@@ -166,10 +173,10 @@ namespace Isis {
    * @history 2003-08-27 Jeff Anderson - Modified Variance method to compute
    *                                     using n*(n-1) instead of n*n.
    */
-  double Statistics::Variance () const {
-    if (p_validPixels <= 1) return Isis::NULL8;
+  double Statistics::Variance() const {
+    if(p_validPixels <= 1) return Isis::NULL8;
     double temp = p_validPixels * p_sumsum - p_sum * p_sum;
-    if (temp < 0.0) temp = 0.0; // This should happen unless roundoff occurs
+    if(temp < 0.0) temp = 0.0;  // This should happen unless roundoff occurs
     return temp / ((p_validPixels - 1.0) * p_validPixels);
   }
 
@@ -182,13 +189,13 @@ namespace Isis {
    * @throws Isis::iException::Message The data set is blank, so the minimum is
    *    invalid.
    */
-  double Statistics::Minimum () const {
-    if (p_removedData) {
+  double Statistics::Minimum() const {
+    if(p_removedData) {
       string m = "Minimum is invalid since you removed data";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    if (p_validPixels < 1) return Isis::NULL8;
+    if(p_validPixels < 1) return Isis::NULL8;
     return p_minimum;
   }
 
@@ -202,13 +209,13 @@ namespace Isis {
    * @throws Isis::iException::Message The data set is blank, so the maximum is
    *    invalid.
    */
-  double Statistics::Maximum () const {
-    if (p_removedData) {
+  double Statistics::Maximum() const {
+    if(p_removedData) {
       string m = "Maximum is invalid since you removed data";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    if (p_validPixels < 1) return Isis::NULL8;
+    if(p_validPixels < 1) return Isis::NULL8;
     return p_maximum;
   }
 
@@ -218,7 +225,7 @@ namespace Isis {
    *
    * @return The number of pixels (data) processed
    */
-  BigInt Statistics::TotalPixels () const {
+  BigInt Statistics::TotalPixels() const {
     return p_totalPixels;
   }
 
@@ -230,7 +237,7 @@ namespace Isis {
    *
    * @return The number of valid pixels (data) processed
    */
-  BigInt Statistics::ValidPixels () const {
+  BigInt Statistics::ValidPixels() const {
     return p_validPixels;
   }
 
@@ -240,7 +247,7 @@ namespace Isis {
    *
    * @return The number of pixels less than the ValidMaximum() processed
    */
-  BigInt Statistics::OverRangePixels () const {
+  BigInt Statistics::OverRangePixels() const {
     return p_overRangePixels;
   }
 
@@ -250,7 +257,7 @@ namespace Isis {
    *
    * @return The number of pixels less than the ValidMinimum() processed
    */
-  BigInt Statistics::UnderRangePixels () const {
+  BigInt Statistics::UnderRangePixels() const {
     return p_underRangePixels;
   }
 
@@ -259,7 +266,7 @@ namespace Isis {
    *
    * @return The number of NULL pixels (data) processed
    */
-  BigInt Statistics::NullPixels () const {
+  BigInt Statistics::NullPixels() const {
     return p_nullPixels;
   }
 
@@ -269,7 +276,7 @@ namespace Isis {
    *
    * @return The number of LIS pixels (data) processed
    */
-  BigInt Statistics::LisPixels () const {
+  BigInt Statistics::LisPixels() const {
     return p_lisPixels;
   }
 
@@ -279,7 +286,7 @@ namespace Isis {
    *
    * @return The number of LRS pixels (data) processed
    */
-  BigInt Statistics::LrsPixels () const {
+  BigInt Statistics::LrsPixels() const {
     return p_lrsPixels;
   }
 
@@ -289,7 +296,7 @@ namespace Isis {
    *
    * @return The number of HIS pixels (data) processed
    */
-  BigInt Statistics::HisPixels () const {
+  BigInt Statistics::HisPixels() const {
     return p_hisPixels;
   }
 
@@ -299,7 +306,7 @@ namespace Isis {
    *
    * @return The number of HRS pixels (data) processed
    */
-  BigInt Statistics::HrsPixels () const {
+  BigInt Statistics::HrsPixels() const {
     return p_hrsPixels;
   }
 
@@ -309,7 +316,7 @@ namespace Isis {
    *
    * @return The number of Out of Range pixels (data) processed
    */
-  BigInt Statistics::OutOfRangePixels () const {
+  BigInt Statistics::OutOfRangePixels() const {
     return p_overRangePixels + p_underRangePixels;
   }
 
@@ -328,14 +335,14 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  double Statistics::ChebyshevMinimum (const double percent) const {
-    if ((percent <= 0.0) || (percent >= 100.0)) {
+  double Statistics::ChebyshevMinimum(const double percent) const {
+    if((percent <= 0.0) || (percent >= 100.0)) {
       string m = "Invalid value for percent";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    if (p_validPixels < 1) return Isis::NULL8;
-    double k = sqrt (1.0 / (1.0 - percent / 100.0));
+    if(p_validPixels < 1) return Isis::NULL8;
+    double k = sqrt(1.0 / (1.0 - percent / 100.0));
     return Average() - k * StandardDeviation();
   }
 
@@ -354,14 +361,14 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  double Statistics::ChebyshevMaximum (const double percent) const {
-    if ((percent <= 0.0) || (percent >= 100.0)) {
+  double Statistics::ChebyshevMaximum(const double percent) const {
+    if((percent <= 0.0) || (percent >= 100.0)) {
       string m = "Invalid value for percent";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    if (p_validPixels < 1) return Isis::NULL8;
-    double k = sqrt (1.0 / (1.0 - percent / 100.0));
+    if(p_validPixels < 1) return Isis::NULL8;
+    double k = sqrt(1.0 / (1.0 - percent / 100.0));
     return Average() + k * StandardDeviation();
   }
 
@@ -379,10 +386,10 @@ namespace Isis {
    * @see Statistics::Minimum
    *      Statistics::ChebyshevMinimum
    */
-  double Statistics::BestMinimum (const double percent) const {
-    if (p_validPixels < 1) return Isis::NULL8;
-    double min = ChebyshevMinimum (percent);
-    if (Minimum() > min) min = Minimum();
+  double Statistics::BestMinimum(const double percent) const {
+    if(p_validPixels < 1) return Isis::NULL8;
+    double min = ChebyshevMinimum(percent);
+    if(Minimum() > min) min = Minimum();
     return min;
   }
 
@@ -401,10 +408,10 @@ namespace Isis {
    * @see Statistics::Maximum
    *      Statistics::ChebyshevMaximum
    */
-  double Statistics::BestMaximum (const double percent) const {
-    if (p_validPixels < 1) return Isis::NULL8;
-    double max = ChebyshevMaximum (percent);
-    if (Maximum() < max) max = Maximum();
+  double Statistics::BestMaximum(const double percent) const {
+    if(p_validPixels < 1) return Isis::NULL8;
+    double max = ChebyshevMaximum(percent);
+    if(Maximum() < max) max = Maximum();
     return max;
   }
 
@@ -420,16 +427,16 @@ namespace Isis {
    * @return z-score
    *
    */
-  double Statistics::ZScore (const double value) const {
-    if (StandardDeviation()==0) {
-      if (value==Maximum()) return 0;
+  double Statistics::ZScore(const double value) const {
+    if(StandardDeviation() == 0) {
+      if(value == Maximum()) return 0;
       else {
         string m = "Undefined Z-score. Standard deviation is zero and";
-        m+=" the input value["+Isis::iString(value)+"] is out of range ["+Isis::iString(Maximum())+"].";
-        throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+        m += " the input value[" + Isis::iString(value) + "] is out of range [" + Isis::iString(Maximum()) + "].";
+        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
       }
     }
-    return (value-Average())/StandardDeviation();
+    return (value - Average()) / StandardDeviation();
   }
 
 } // end namespace isis

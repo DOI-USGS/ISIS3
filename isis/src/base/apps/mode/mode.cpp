@@ -21,7 +21,7 @@ void FilterAll(Buffer &in, double &v);
 void FilterValid(Buffer &in, double &v);
 void FilterInvalid(Buffer &in, double &v);
 
-void IsisMain(){
+void IsisMain() {
   //Set up ProcessByBoxcar
   ProcessByBoxcar p;
 
@@ -29,7 +29,7 @@ void IsisMain(){
   p.SetInputCube("FROM");
   p.SetOutputCube("TO");
 
-  //Set up Boxcar size 
+  //Set up Boxcar size
   UserInterface &ui = Application::GetUserInterface();
   int samples = ui.GetInteger("SAMPLES");
   int lines = ui.GetInteger("LINES");
@@ -42,20 +42,20 @@ void IsisMain(){
   filterLrs  = ui.GetBoolean("LRS");
   filterHis  = ui.GetBoolean("HIS");
   filterLis  = ui.GetBoolean("LIS");
-  if (ui.GetString("MINOPT") == "PERCENTAGE") {
+  if(ui.GetString("MINOPT") == "PERCENTAGE") {
     int size = lines * samples;
     double perc = ui.GetDouble("MINIMUM") / 100;
-    minimum = (int) (size * perc);
+    minimum = (int)(size * perc);
   }
   else {
     minimum = (int) ui.GetDouble("MINIMUM");
   }
   low       = -DBL_MAX;
   high      = DBL_MAX;
-  if (ui.WasEntered("LOW")){
+  if(ui.WasEntered("LOW")) {
     low = ui.GetDouble("LOW");
   }
-  if (ui.WasEntered("HIGH")){
+  if(ui.WasEntered("HIGH")) {
     high = ui.GetDouble("HIGH");
   }
 
@@ -65,15 +65,15 @@ void IsisMain(){
 
 
   //Check for filter style, and process accordingly
-  if (ui.GetString("PIXELS") == "ALL"){
+  if(ui.GetString("PIXELS") == "ALL") {
     p.StartProcess(FilterAll);
     p.EndProcess();
   }
-  else if (ui.GetString("PIXELS") == "INSIDE"){
+  else if(ui.GetString("PIXELS") == "INSIDE") {
     p.StartProcess(FilterValid);
     p.EndProcess();
   }
-  else if (ui.GetString("PIXELS") == "OUTSIDE"){
+  else if(ui.GetString("PIXELS") == "OUTSIDE") {
     p.StartProcess(FilterInvalid);
     p.EndProcess();
   }
@@ -82,7 +82,7 @@ void IsisMain(){
 //Function which loops through every pixel int the boxcar,
 //and outputs the mode value to the center pixel, if
 //the center pixel is valid
-void FilterValid(Buffer &in, double &v){
+void FilterValid(Buffer &in, double &v) {
   double centerPixel = in[(in.size()-1)/2];
 
   //Check if the center pixel is valid
@@ -90,29 +90,29 @@ void FilterValid(Buffer &in, double &v){
   //valid type, or a normal value between low and high.
   //If the center pixel does not meet these requirements,
   //write the original value to the center and move on
-  if ( IsSpecial(centerPixel) ){
-    if ((IsNullPixel(centerPixel)) && (!filterNull)) {
+  if(IsSpecial(centerPixel)) {
+    if((IsNullPixel(centerPixel)) && (!filterNull)) {
       v = centerPixel;
       return;
     }
-    else if ((IsLisPixel(centerPixel)) && (!filterLis)) {
+    else if((IsLisPixel(centerPixel)) && (!filterLis)) {
       v = centerPixel;
       return;
     }
-    else if ((IsLrsPixel(centerPixel)) && (!filterLrs)) {
+    else if((IsLrsPixel(centerPixel)) && (!filterLrs)) {
       v = centerPixel;
       return;
     }
-    else if ((IsHisPixel(centerPixel)) && (!filterHis)) {
+    else if((IsHisPixel(centerPixel)) && (!filterHis)) {
       v = centerPixel;
       return;
     }
-    else if ((IsHrsPixel(centerPixel)) && (!filterHrs)) {
+    else if((IsHrsPixel(centerPixel)) && (!filterHrs)) {
       v = centerPixel;
       return;
     }
   }
-  else if (centerPixel<low || centerPixel>high){
+  else if(centerPixel < low || centerPixel > high) {
     v = centerPixel;
   }
 
@@ -120,16 +120,16 @@ void FilterValid(Buffer &in, double &v){
   //the mode, provided there are enough for filtering
   std::vector<double> boxdata(0);
 
-  for (int i=0; i<in.size(); i++){
-    if (!IsSpecial(in[i]) && in[i]>=low && in[i]<=high){
+  for(int i = 0; i < in.size(); i++) {
+    if(!IsSpecial(in[i]) && in[i] >= low && in[i] <= high) {
       boxdata.push_back(in[i]);
     }
-    else{
+    else {
       continue;
     }
   }
-  if (boxdata.size()<minimum){
-    if (propagate){
+  if(boxdata.size() < minimum) {
+    if(propagate) {
       v = centerPixel;
       return;
     }
@@ -144,12 +144,12 @@ void FilterValid(Buffer &in, double &v){
   sort(boxdata.begin(), boxdata.end());
   int count = 1;
   int maxCount = 1;
-  for (unsigned int i=1; i<boxdata.size(); i++){
-    if (boxdata[i] == boxdata[i-1]){
+  for(unsigned int i = 1; i < boxdata.size(); i++) {
+    if(boxdata[i] == boxdata[i-1]) {
       count++;
     }
-    else{
-      if (count>maxCount){
+    else {
+      if(count > maxCount) {
         modeVal = boxdata[i-1];
         maxCount = count;
       }
@@ -163,7 +163,7 @@ void FilterValid(Buffer &in, double &v){
 //Function to loop through the boxcar and find and write
 //the mode value to the center pixel, but only if the
 //center pixel is invalid
-void FilterInvalid(Buffer &in, double &v){
+void FilterInvalid(Buffer &in, double &v) {
   double centerPixel = in[(in.size()-1)/2];
 
   //Check if the center pixel is valid
@@ -171,48 +171,48 @@ void FilterInvalid(Buffer &in, double &v){
   //valid type, or a normal value between low and high.
   //If the center is valid, write the original value to the
   //center, and move the boxcar
-  if (IsSpecial(centerPixel)){
-    if ((IsNullPixel(centerPixel)) && (!filterNull)) {
+  if(IsSpecial(centerPixel)) {
+    if((IsNullPixel(centerPixel)) && (!filterNull)) {
       v = centerPixel;
       return;
     }
-    else if ((IsLisPixel(centerPixel)) && (!filterLis)) {
+    else if((IsLisPixel(centerPixel)) && (!filterLis)) {
       v = centerPixel;
       return;
     }
-    else if ((IsLrsPixel(centerPixel)) && (!filterLrs)) {
+    else if((IsLrsPixel(centerPixel)) && (!filterLrs)) {
       v = centerPixel;
       return;
     }
-    else if ((IsHisPixel(centerPixel)) && (!filterHis)) {
+    else if((IsHisPixel(centerPixel)) && (!filterHis)) {
       v = centerPixel;
       return;
     }
-    else if ((IsHrsPixel(centerPixel)) && (!filterHrs)) {
+    else if((IsHrsPixel(centerPixel)) && (!filterHrs)) {
       v = centerPixel;
       return;
     }
   }
-  else if (centerPixel>=low && centerPixel<=high){
+  else if(centerPixel >= low && centerPixel <= high) {
     v = centerPixel;
   }
 
-  //Now, build a vector containing non-Special pixels, 
+  //Now, build a vector containing non-Special pixels,
   //and, if there are enough, process the vector to
   //determine the mode. If there aren't enough, write
   //a user selected value to the center.
   std::vector<double> boxdata(0);
 
-  for (int i=0; i<in.size(); i++){
-    if (!IsSpecial(in[i]) && in[i]>=low && in[i]<=high){
+  for(int i = 0; i < in.size(); i++) {
+    if(!IsSpecial(in[i]) && in[i] >= low && in[i] <= high) {
       boxdata.push_back(in[i]);
     }
-    else{
+    else {
       continue;
     }
   }
-  if (boxdata.size()<minimum){
-    if (propagate){
+  if(boxdata.size() < minimum) {
+    if(propagate) {
       v = centerPixel;
       return;
     }
@@ -221,17 +221,17 @@ void FilterInvalid(Buffer &in, double &v){
       return;
     }
   }
-   //Sort the vector, and determine the mode pixel value
+  //Sort the vector, and determine the mode pixel value
   double modeVal = centerPixel;
   sort(boxdata.begin(), boxdata.end());
-  int count = 1; 
+  int count = 1;
   int maxCount = 1;
-  for (unsigned int i=1; i<boxdata.size(); i++){
-    if (boxdata[i] == boxdata[i-1]){
+  for(unsigned int i = 1; i < boxdata.size(); i++) {
+    if(boxdata[i] == boxdata[i-1]) {
       count++;
     }
-    else{
-      if (count>maxCount){
+    else {
+      if(count > maxCount) {
         modeVal = boxdata[i-1];
         maxCount = count;
       }
@@ -243,7 +243,7 @@ void FilterInvalid(Buffer &in, double &v){
 
 //Function to process the boxcar and determine the mode,
 //regardless of validity of the center pixel
-void FilterAll(Buffer &in, double &v){
+void FilterAll(Buffer &in, double &v) {
   double centerPixel = in[(in.size()-1)/2];
 
   //Check if the center pixel is valid
@@ -251,45 +251,45 @@ void FilterAll(Buffer &in, double &v){
   //valid type, or a normal value between low and high.
   //If the center is valid, write the original value to the
   //center, and move the boxcar
-  if (IsSpecial(centerPixel)){
-    if ((IsNullPixel(centerPixel)) && (!filterNull)) {
+  if(IsSpecial(centerPixel)) {
+    if((IsNullPixel(centerPixel)) && (!filterNull)) {
       v = centerPixel;
       return;
     }
-    else if ((IsLisPixel(centerPixel)) && (!filterLis)) {
+    else if((IsLisPixel(centerPixel)) && (!filterLis)) {
       v = centerPixel;
       return;
     }
-    else if ((IsLrsPixel(centerPixel)) && (!filterLrs)) {
+    else if((IsLrsPixel(centerPixel)) && (!filterLrs)) {
       v = centerPixel;
       return;
     }
-    else if ((IsHisPixel(centerPixel)) && (!filterHis)) {
+    else if((IsHisPixel(centerPixel)) && (!filterHis)) {
       v = centerPixel;
       return;
     }
-    else if ((IsHrsPixel(centerPixel)) && (!filterHrs)) {
+    else if((IsHrsPixel(centerPixel)) && (!filterHrs)) {
       v = centerPixel;
       return;
     }
   }
 
-  //Now, build a vector containing non-Special pixels, 
+  //Now, build a vector containing non-Special pixels,
   //and, if there are enough, process the vector to
   //determine the mode. If there aren't enough, write
   //a user selected value to the center.
   std::vector<double> boxdata(0);
 
-  for (int i=0; i<in.size(); i++){
-    if (!IsSpecial(in[i]) && in[i]>=low && in[i]<=high){
+  for(int i = 0; i < in.size(); i++) {
+    if(!IsSpecial(in[i]) && in[i] >= low && in[i] <= high) {
       boxdata.push_back(in[i]);
     }
-    else{
+    else {
       continue;
     }
   }
-  if (boxdata.size()<minimum){
-    if (propagate){
+  if(boxdata.size() < minimum) {
+    if(propagate) {
       v = centerPixel;
       return;
     }
@@ -298,19 +298,19 @@ void FilterAll(Buffer &in, double &v){
       return;
     }
   }
-   //Sort the vector, and determine the mode pixel value
+  //Sort the vector, and determine the mode pixel value
   double modeVal = centerPixel;
   sort(boxdata.begin(), boxdata.end());
   int count = 1;
   int maxCount = 1;
-  for (unsigned int i=1; i<boxdata.size(); i++){
-   if (boxdata[i] == boxdata[i-1]){
+  for(unsigned int i = 1; i < boxdata.size(); i++) {
+    if(boxdata[i] == boxdata[i-1]) {
       count++;
     }
-    else{
-      if (count>maxCount){
+    else {
+      if(count > maxCount) {
         modeVal = boxdata[i-1];
-        maxCount = count; 
+        maxCount = count;
       }
       count = 1;
     }

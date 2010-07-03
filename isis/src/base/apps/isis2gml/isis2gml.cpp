@@ -12,7 +12,7 @@
 using namespace std;
 using namespace Isis;
 
-void IsisMain(){
+void IsisMain() {
 
 
   UserInterface &ui = Application::GetUserInterface();
@@ -36,7 +36,7 @@ void IsisMain(){
 
   string outfile;
   ofstream fout;
-  if (ui.WasEntered("TO")) {
+  if(ui.WasEntered("TO")) {
     outfile = ui.GetFilename("TO");
   }
   else {
@@ -45,7 +45,7 @@ void IsisMain(){
     inputFile.AddExtension("gml");
     outfile = inputFile.Name();
   }
-  fout.open (outfile.c_str());
+  fout.open(outfile.c_str());
 
   fout << polyString << endl;
 

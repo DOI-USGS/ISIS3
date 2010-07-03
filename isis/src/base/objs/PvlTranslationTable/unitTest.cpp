@@ -8,7 +8,7 @@
 using namespace std;
 using namespace Isis;
 
-int main (void) {
+int main(void) {
   Preference::Preferences(true);
 
   try {
@@ -66,20 +66,20 @@ int main (void) {
 
     PvlTranslationTable table(in);
 
-    string group,key;
+    string group, key;
 
     cout << "Unit test for Isis::PvlTranslationTable" << endl << endl;
 
     cout << "  Test InputGroup :" << endl;
 
     cout << "    InputGroup (\"DataFileName\") = " <<
-            table.InputGroup("DataFileName")[0] << endl;
+         table.InputGroup("DataFileName")[0] << endl;
     cout << "    InputGroup (\"CoreLines\") = " <<
-            table.InputGroup("CoreLines")[0] << endl;
+         table.InputGroup("CoreLines")[0] << endl;
     try {
-      table.InputGroup ("tttt1");
+      table.InputGroup("tttt1");
     }
-    catch (iException &e) {
+    catch(iException &e) {
       cerr << "    ";
       e.Report(false);
       cerr << endl;
@@ -88,13 +88,13 @@ int main (void) {
     cout << "  Test InputKey :" << endl;
 
     cout << "    InputKeywordName (\"DataFileName\") = " <<
-            table.InputKeywordName ("DataFileName") << endl;
+         table.InputKeywordName("DataFileName") << endl;
     cout << "    InputKeywordName (\"CoreLines\") = " <<
-            table.InputKeywordName ("CoreLines") << endl;
+         table.InputKeywordName("CoreLines") << endl;
     try {
-      table.InputKeywordName ("tttt2");
+      table.InputKeywordName("tttt2");
     }
-    catch (iException &e) {
+    catch(iException &e) {
       cerr << "    ";
       e.Report(false);
       cerr << endl;
@@ -103,13 +103,13 @@ int main (void) {
     cout << "  Test InputDefault :" << endl;
 
     cout << "    InputDefault (\"DataFileName\") = " <<
-            table.InputDefault ("DataFileName") << endl;
+         table.InputDefault("DataFileName") << endl;
     cout << "    InputDefault (\"CoreBitsPerPixel\") = " <<
-            table.InputDefault ("CoreBitsPerPixel") << endl;
+         table.InputDefault("CoreBitsPerPixel") << endl;
     try {
-      table.InputDefault ("tttt3");
+      table.InputDefault("tttt3");
     }
-    catch (iException &e) {
+    catch(iException &e) {
       cerr << "    ";
       e.Report(false);
       cerr << endl;
@@ -118,33 +118,33 @@ int main (void) {
     cout << "  Test Translate :" << endl;
 
     cout << "    Translate (\"DataFilename\", \"tttt4\") = " <<
-            table.Translate ("DataFilename", "tttt4") << endl;
+         table.Translate("DataFilename", "tttt4") << endl;
     cout << "    Translate (\"CoreByteOrder\",\"MSB_INTEGER\") = " <<
-            table.Translate ("CoreByteOrder","MSB_INTEGER") << endl;
+         table.Translate("CoreByteOrder", "MSB_INTEGER") << endl;
     cout << "    Translate (\"CorePixelType\") = " <<
-            table.Translate ("CorePixelType") << endl;
+         table.Translate("CorePixelType") << endl;
     cout << "    Translate (\"CorePixelType\") = " <<
-            table.Translate ("CorePixelType","baddata") << endl;
+         table.Translate("CorePixelType", "baddata") << endl;
     try {
-      table.Translate ("tttt6");
+      table.Translate("tttt6");
     }
-    catch (iException &e) {
+    catch(iException &e) {
       cerr << "    ";
       e.Report(false);
     }
 
     try {
-      table.Translate ("DataFileRecordBytes");
+      table.Translate("DataFileRecordBytes");
     }
-    catch (iException &e) {
+    catch(iException &e) {
       cerr << "    ";
       e.Report(false);
     }
 
     try {
-      table.Translate ("CoreBitsPerPixel", "31");
+      table.Translate("CoreBitsPerPixel", "31");
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       cerr << "    ";
       e.Report(false);
       cerr << endl;
@@ -164,12 +164,12 @@ int main (void) {
     table.AddTable(in);
 
     cout << "    Translate (\"CoreLinePrefixBytes\", \"128\") = " <<
-            table.Translate ("CoreLinePrefixBytes", "128") << endl << endl;
+         table.Translate("CoreLinePrefixBytes", "128") << endl << endl;
 
 
     class protectedTester : public Isis::PvlTranslationTable {
       public:
-        void tester () {
+        void tester() {
           stringstream in2;
           in2 << "Group = DataFileName" << endl;
           in2 << "  InputKey = ^IMAGE" << endl;
@@ -189,36 +189,36 @@ int main (void) {
           in2 << "  Translation = (32,32)" << endl;
           in2 << "EndGroup" << endl;
           in2 << "End" << endl;
-      
+
           AddTable(in2);
 
           cout << "  Test IsAuto :" << endl;
           cout << "    IsAuto (\"DataFileName\") = " <<
-                  IsAuto("DataFileName") << endl;
+               IsAuto("DataFileName") << endl;
           cout << "    IsAuto (\"CoreBitsPerPixel\") = " <<
-                  IsAuto("CoreBitsPerPixel") << endl << endl;
+               IsAuto("CoreBitsPerPixel") << endl << endl;
 
           cout << "  Test IsOptional :" << endl;
           cout << "    IsAuto (\"DataFileName\") = " <<
-                  IsOptional("DataFileName") << endl;
+               IsOptional("DataFileName") << endl;
           cout << "    IsAuto (\"CoreBitsPerPixel\") = " <<
-                  IsOptional("CoreBitsPerPixel") << endl << endl;
+               IsOptional("CoreBitsPerPixel") << endl << endl;
 
           cout << "  Test OutputPosition :" << endl;
           cout << "    OutputPosition (\"CoreBitsPerPixel\") yields : " <<
-                  OutputPosition("CoreBitsPerPixel") << endl << endl;
+               OutputPosition("CoreBitsPerPixel") << endl << endl;
 
           cout << "  Test OutputName :" << endl;
           cout << "    OutputName (\"CoreBitsPerPixel\") = " <<
-                  OutputName("CoreBitsPerPixel") << endl << endl;
+               OutputName("CoreBitsPerPixel") << endl << endl;
 
-      };
+        };
     };
     protectedTester t;
     t.tester();
 
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 

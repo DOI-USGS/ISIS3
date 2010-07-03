@@ -39,22 +39,22 @@
 
 namespace Isis {
   //! Convenience access to dialog
-  int GuiOutputAttribute::GetAttributes (const std::string &defaultAttribute,
+  int GuiOutputAttribute::GetAttributes(const std::string &defaultAttribute,
                                         std::string &newAttribute,
                                         const std::string &title,
                                         bool allowProp,
                                         QWidget *parent) {
     // Construct dialog if necessary
     static GuiOutputAttribute *p_dialog = 0;
-    if (p_dialog == 0) {
-      p_dialog = new GuiOutputAttribute (parent);
+    if(p_dialog == 0) {
+      p_dialog = new GuiOutputAttribute(parent);
     }
     p_dialog->setWindowTitle((iString)title);
     p_dialog->SetPropagation(allowProp);
 
     // Load default attributes and then get the new ones
     p_dialog->SetAttributes(defaultAttribute);
-    if (p_dialog->exec() == QDialog::Accepted) {
+    if(p_dialog->exec() == QDialog::Accepted) {
       newAttribute = p_dialog->GetAttributes();
       return 1;
     }
@@ -63,7 +63,7 @@ namespace Isis {
   }
 
   //! Constuctor
-  GuiOutputAttribute::GuiOutputAttribute (QWidget *parent) : QDialog (parent) {
+  GuiOutputAttribute::GuiOutputAttribute(QWidget *parent) : QDialog(parent) {
     // Create the pixel type group
     p_propagate = new QRadioButton("&Propagate");
     p_propagate->setToolTip("Propagate pixel type from input cube");
@@ -81,30 +81,30 @@ namespace Isis {
     buttonGroup->addButton(p_real);
     buttonGroup->setExclusive(true);
 
-    p_minEdit = new QLineEdit ();
-    p_maxEdit = new QLineEdit ();
+    p_minEdit = new QLineEdit();
+    p_maxEdit = new QLineEdit();
     QLabel *minLabel = new QLabel("Minimum");
     QLabel *maxLabel = new QLabel("Maximum");
-    connect (p_propagate,SIGNAL(toggled(bool)),p_minEdit,SLOT(setDisabled(bool)));
-    connect (p_propagate,SIGNAL(toggled(bool)),p_maxEdit,SLOT(setDisabled(bool)));
-    connect (p_unsignedByte,SIGNAL(toggled(bool)),p_minEdit,SLOT(setEnabled(bool)));
-    connect (p_unsignedByte,SIGNAL(toggled(bool)),p_maxEdit,SLOT(setEnabled(bool)));
-    connect (p_signedWord,SIGNAL(toggled(bool)),p_minEdit,SLOT(setEnabled(bool)));
-    connect (p_signedWord,SIGNAL(toggled(bool)),p_maxEdit,SLOT(setEnabled(bool)));
-    connect (p_real,SIGNAL(toggled(bool)),p_minEdit,SLOT(setDisabled(bool)));
-    connect (p_real,SIGNAL(toggled(bool)),p_maxEdit,SLOT(setDisabled(bool)));
+    connect(p_propagate, SIGNAL(toggled(bool)), p_minEdit, SLOT(setDisabled(bool)));
+    connect(p_propagate, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setDisabled(bool)));
+    connect(p_unsignedByte, SIGNAL(toggled(bool)), p_minEdit, SLOT(setEnabled(bool)));
+    connect(p_unsignedByte, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
+    connect(p_signedWord, SIGNAL(toggled(bool)), p_minEdit, SLOT(setEnabled(bool)));
+    connect(p_signedWord, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
+    connect(p_real, SIGNAL(toggled(bool)), p_minEdit, SLOT(setDisabled(bool)));
+    connect(p_real, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setDisabled(bool)));
     p_minEdit->setValidator(new QDoubleValidator(p_minEdit));
     p_maxEdit->setValidator(new QDoubleValidator(p_maxEdit));
 
-    QGridLayout *gridLayout = new QGridLayout ();
-    gridLayout->addWidget(p_propagate,0,0);
-    gridLayout->addWidget(p_unsignedByte,1,0);
-    gridLayout->addWidget(p_signedWord,2,0);
-    gridLayout->addWidget(p_real,3,0);
-    gridLayout->addWidget(minLabel,0,1);
-    gridLayout->addWidget(p_minEdit,1,1);
-    gridLayout->addWidget(maxLabel,2,1);
-    gridLayout->addWidget(p_maxEdit,3,1);
+    QGridLayout *gridLayout = new QGridLayout();
+    gridLayout->addWidget(p_propagate, 0, 0);
+    gridLayout->addWidget(p_unsignedByte, 1, 0);
+    gridLayout->addWidget(p_signedWord, 2, 0);
+    gridLayout->addWidget(p_real, 3, 0);
+    gridLayout->addWidget(minLabel, 0, 1);
+    gridLayout->addWidget(p_minEdit, 1, 1);
+    gridLayout->addWidget(maxLabel, 2, 1);
+    gridLayout->addWidget(p_maxEdit, 3, 1);
 
     QGroupBox *pixelTypeBox = new QGroupBox("Pixel Type");
     pixelTypeBox->setLayout(gridLayout);
@@ -165,10 +165,10 @@ namespace Isis {
     byteOrderBox->setLayout(layout);
 
     // Create the action buttons
-    QPushButton *okButton = new QPushButton ("Ok");
+    QPushButton *okButton = new QPushButton("Ok");
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 
-    QPushButton* cancelButton = new QPushButton ("Cancel");
+    QPushButton *cancelButton = new QPushButton("Cancel");
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
     // Put the buttons in a horizontal orientation
@@ -187,27 +187,27 @@ namespace Isis {
 
 
   // Destructor
-  GuiOutputAttribute::~GuiOutputAttribute () {}
+  GuiOutputAttribute::~GuiOutputAttribute() {}
 
 
   // Return the attributes in the dialog
-  std::string GuiOutputAttribute::GetAttributes () {
+  std::string GuiOutputAttribute::GetAttributes() {
     std::string att;
-    if (p_lsb->isChecked()) att += "+lsb";
-    if (p_msb->isChecked()) att += "+msb";
+    if(p_lsb->isChecked()) att += "+lsb";
+    if(p_msb->isChecked()) att += "+msb";
 
-    if (p_tiled->isChecked()) att += "+tiled";
-    if (p_bsq->isChecked()) att += "+bsq";
+    if(p_tiled->isChecked()) att += "+tiled";
+    if(p_bsq->isChecked()) att += "+bsq";
 
-    if (p_attached->isChecked()) att += "+attached";
-    if (p_detached->isChecked()) att += "+detached";
+    if(p_attached->isChecked()) att += "+attached";
+    if(p_detached->isChecked()) att += "+detached";
 
-    if (p_real->isChecked()) att += "+real";
-    if (p_unsignedByte->isChecked()) att += "+8bit";
-    if (p_signedWord->isChecked()) att += "+16bit";
+    if(p_real->isChecked()) att += "+real";
+    if(p_unsignedByte->isChecked()) att += "+8bit";
+    if(p_signedWord->isChecked()) att += "+16bit";
 
-    if (p_unsignedByte->isChecked() || p_signedWord->isChecked()) {
-      if ((p_minEdit->text() != "") && (p_maxEdit->text() != "")) {
+    if(p_unsignedByte->isChecked() || p_signedWord->isChecked()) {
+      if((p_minEdit->text() != "") && (p_maxEdit->text() != "")) {
         att += "+";
         att += p_minEdit->text().toStdString();
         att += ":";
@@ -222,43 +222,43 @@ namespace Isis {
   }
 
   // Set the attributes in the dialog
-  void GuiOutputAttribute::SetAttributes (const std::string &value) {
+  void GuiOutputAttribute::SetAttributes(const std::string &value) {
     Isis::CubeAttributeOutput att(value);
-    if (att.FileFormat() == Isis::Tile) {
+    if(att.FileFormat() == Isis::Tile) {
       p_tiled->setChecked(true);
     }
     else {
       p_bsq->setChecked(true);
     }
 
-    if (att.ByteOrder() == Isis::Lsb) {
+    if(att.ByteOrder() == Isis::Lsb) {
       p_lsb->setChecked(true);
     }
     else {
       p_msb->setChecked(true);
     }
 
-    if (att.AttachedLabel()) {
+    if(att.AttachedLabel()) {
       p_attached->setChecked(true);
     }
     else {
       p_detached->setChecked(true);
     }
 
-    if (att.PropagatePixelType()) {
+    if(att.PropagatePixelType()) {
       p_propagate->setChecked(true);
     }
-    else if (att.PixelType() == Isis::UnsignedByte) {
+    else if(att.PixelType() == Isis::UnsignedByte) {
       p_unsignedByte->setChecked(true);
     }
-    else if (att.PixelType() == Isis::SignedWord) {
+    else if(att.PixelType() == Isis::SignedWord) {
       p_signedWord->setChecked(true);
     }
     else {
       p_real->setChecked(true);
     }
 
-    if (!att.PropagateMinimumMaximum()) {
+    if(!att.PropagateMinimumMaximum()) {
       p_minEdit->setText(QString::number(att.Minimum()));
       p_maxEdit->setText(QString::number(att.Maximum()));
     }

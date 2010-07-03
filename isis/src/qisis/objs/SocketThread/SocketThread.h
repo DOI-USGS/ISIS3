@@ -5,27 +5,29 @@
 
 namespace Qisis {
   class SocketThread : public QThread {
-    Q_OBJECT
+      Q_OBJECT
 
-  public:
-    SocketThread(QObject *parent = 0);
-    ~SocketThread();
+    public:
+      SocketThread(QObject *parent = 0);
+      ~SocketThread();
 
-    void run();
-    void stop() { p_done = true;};
+      void run();
+      void stop() {
+        p_done = true;
+      };
 
     signals:
-    /**
-     * New image signal. 
-     * 
-     * @param image 
-     */
-    void newImage(const QString &image);
-    //! Application has focus signal.
-    void focusApp();
+      /**
+       * New image signal.
+       *
+       * @param image
+       */
+      void newImage(const QString &image);
+      //! Application has focus signal.
+      void focusApp();
 
-  private:
-    bool p_done;
+    private:
+      bool p_done;
   };
 };
 

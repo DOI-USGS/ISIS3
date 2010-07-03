@@ -27,34 +27,34 @@ void IsisMain() {
   try {
     p.SetOutputCube("TO");
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
 
   cout << "Testing SetOutputCube with bogus samples ..." << endl;
   try {
-    p.SetOutputCube("TO",0,1,1);
+    p.SetOutputCube("TO", 0, 1, 1);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
 
   cout << "Testing SetOutputCube with bogus lines ..." << endl;
   try {
-    p.SetOutputCube("TO",1,0,1);
+    p.SetOutputCube("TO", 1, 0, 1);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
 
   cout << "Testing SetOutputCube with bogus bands ..." << endl;
   try {
-    p.SetOutputCube("TO",1,1,0);
+    p.SetOutputCube("TO", 1, 1, 0);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
@@ -68,67 +68,67 @@ void IsisMain() {
 
   cout << "Testing SetInputWorkCube OneBand Error ..." << endl;
   try {
-    p.SetInputCube("FROM",Isis::OneBand);
+    p.SetInputCube("FROM", Isis::OneBand);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     cout << "An exception was thrown!" << endl;
     e.Clear();
   }
   cout << endl;
-  
+
   cout << "Testing SetInputWorkCube SizeMatch error for bands ..." << endl;
   try {
     Isis::CubeAttributeInput att("+1");
     p.SetInputCube("unitTest.cub",
-                   att,Isis::SizeMatch);
+                   att, Isis::SizeMatch);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
-  
+
   cout << "Testing SetInputWorkCube SizeMatch error for lines ..." << endl;
   Isis::Cube cube;
-  cube.SetDimensions(126,100,2);
+  cube.SetDimensions(126, 100, 2);
   cube.Create("/tmp/isisprocess_01");
   cube.Close();
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_01",att);
-    p2.SetInputCube("unitTest.cub",att,
+    p2.SetInputCube("/tmp/isisprocess_01", att);
+    p2.SetInputCube("unitTest.cub", att,
                     Isis::SizeMatch);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
 
   cout << "Testing SetInputWorkCube SizeMatch error for samples ..." << endl;
-  cube.SetDimensions(100,126,2);
+  cube.SetDimensions(100, 126, 2);
   cube.Create("/tmp/isisprocess_02");
   cube.Close();
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_02",att);
-    p2.SetInputCube("unitTest.cub",att,
-                        Isis::SizeMatch);
+    p2.SetInputCube("/tmp/isisprocess_02", att);
+    p2.SetInputCube("unitTest.cub", att,
+                    Isis::SizeMatch);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
- 
+
   cout << "Testing SetInputWorkCube SpatialMatch error for lines ..." << endl;
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_01",att);
-    p2.SetInputCube("unitTest.cub",att,
-                        Isis::SpatialMatch);
+    p2.SetInputCube("/tmp/isisprocess_01", att);
+    p2.SetInputCube("unitTest.cub", att,
+                    Isis::SpatialMatch);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
@@ -137,51 +137,51 @@ void IsisMain() {
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_02",att);
-    p2.SetInputCube("unitTest.cub",att,
-                        Isis::SpatialMatch);
+    p2.SetInputCube("/tmp/isisprocess_02", att);
+    p2.SetInputCube("unitTest.cub", att,
+                    Isis::SpatialMatch);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
 
   cout << "Testing SetInputWorkCube BandMatchOrOne error ..." << endl;
-  cube.SetDimensions(126,126,3);
+  cube.SetDimensions(126, 126, 3);
   cube.Create("/tmp/isisprocess_03");
   cube.Close();
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_03",att);
-    p2.SetInputCube("unitTest.cub",att,
-                        Isis::BandMatchOrOne);
+    p2.SetInputCube("/tmp/isisprocess_03", att);
+    p2.SetInputCube("unitTest.cub", att,
+                    Isis::BandMatchOrOne);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
 
   cout << "Testing SetInputWorkCube AllMatchOrOne error ..." << endl;
-   cube.SetDimensions(126,126,3);
-   cube.Create("/tmp/isisprocess_03");
-   cube.Close();
-   try {
-     Isis::Process p2;
-     Isis::CubeAttributeInput att;
-     p2.SetInputCube("/tmp/isisprocess_03",att);
-     p2.SetInputCube("unitTest.cub",att,
-                         Isis::AllMatchOrOne);
-   }
-   catch (Isis::iException &e) {
-     e.Report(false);
-   }
-   cout << endl;
+  cube.SetDimensions(126, 126, 3);
+  cube.Create("/tmp/isisprocess_03");
+  cube.Close();
+  try {
+    Isis::Process p2;
+    Isis::CubeAttributeInput att;
+    p2.SetInputCube("/tmp/isisprocess_03", att);
+    p2.SetInputCube("unitTest.cub", att,
+                    Isis::AllMatchOrOne);
+  }
+  catch(Isis::iException &e) {
+    e.Report(false);
+  }
+  cout << endl;
 
   cout << "Testing Logging ..." << endl;
   Isis::PvlGroup results("Results");
-  results += Isis::PvlKeyword("Test","Me");
-  results += Isis::PvlKeyword("No","Way");
+  results += Isis::PvlKeyword("Test", "Me");
+  results += Isis::PvlKeyword("No", "Way");
   Isis::Application::Log(results);
   cout << endl;
 
@@ -190,13 +190,13 @@ void IsisMain() {
   p3.SetInputCube("FROM");
   Isis::Cube *ocube = p3.SetOutputCube("TO");
   Isis::PvlGroup lab = ocube->GetGroup("Test");
-  cout << lab["Keyword"] << endl; 
+  cout << lab["Keyword"] << endl;
   cout << endl;
 
   cout << "Testing label propagation (off) ..." << endl;
   p3.PropagateLabels(false);
-  Isis::Cube *ocube4 = p3.SetOutputCube("TO4",126,126,1);
-  if (!ocube4->HasGroup("Test")) {
+  Isis::Cube *ocube4 = p3.SetOutputCube("TO4", 126, 126, 1);
+  if(!ocube4->HasGroup("Test")) {
     cout << "Group Test does not exist" << endl;
   }
   p3.EndProcess();
@@ -212,8 +212,8 @@ void IsisMain() {
 
   cout << "Testing OriginalLabel propagation (off) ..." << endl;
   p4.PropagateOriginalLabel(false);
-  Isis::Cube *ocube5 = p4.SetOutputCube("TO4",126,126,1);
-  if (!ocube5->HasGroup("OriginalLabel")) {
+  Isis::Cube *ocube5 = p4.SetOutputCube("TO4", 126, 126, 1);
+  if(!ocube5->HasGroup("OriginalLabel")) {
     cout << "Group OriginalLabel does not exist" << endl;
   }
   p4.EndProcess();
@@ -225,15 +225,15 @@ void IsisMain() {
   Isis::Cube *ocube6 = p5.SetOutputCube("TO");
   Isis::Table table("Table");
   ocube6->Read(table);
-  
+
   cout << "Number of record = " << table.Records() << endl;
   cout << "Record Size = " << table.RecordSize() << endl;
   cout << endl;
 
   cout << "Testing Table propagation (off) ..." << endl;
   p4.PropagateTables(false);
-  Isis::Cube *ocube7 = p5.SetOutputCube("TO4",126,126,1);
-  if (!ocube7->HasGroup("Table")) {
+  Isis::Cube *ocube7 = p5.SetOutputCube("TO4", 126, 126, 1);
+  if(!ocube7->HasGroup("Table")) {
     cout << "Group Table does not exist" << endl;
   }
   p5.EndProcess();
@@ -245,8 +245,8 @@ void IsisMain() {
   Isis::Cube *ocube8 = p6.SetOutputCube("TO");
 
   Isis::Pvl *inlab1 = ocube8->Label();
-  for (int i=0; i<inlab1->Objects(); i++) {
-    if (inlab1->Object(i).IsNamed("Polygon")) {
+  for(int i = 0; i < inlab1->Objects(); i++) {
+    if(inlab1->Object(i).IsNamed("Polygon")) {
       cout << "Image Polygon does exist" << endl;
       cout << "Size: " << (int)inlab1->Object(i)["Bytes"] << endl;
       // We cannot instantiate without spice data, so we won't try.
@@ -256,10 +256,10 @@ void IsisMain() {
   cout << "Testing Polygon propagation (off) ..." << endl;
   p6.PropagatePolygons(false);
   bool exists = false;
-  Isis::Cube *ocube9 = p6.SetOutputCube("TO4",126,126,1);
+  Isis::Cube *ocube9 = p6.SetOutputCube("TO4", 126, 126, 1);
   Isis::Pvl *inlab2 = ocube9->Label();
-  for (int i=0; i<inlab2->Objects(); i++) {
-    if (inlab2->Object(i).IsNamed("Polygon")) {
+  for(int i = 0; i < inlab2->Objects(); i++) {
+    if(inlab2->Object(i).IsNamed("Polygon")) {
       cout << "Image Polygon does exist" << endl;
       exists = true;
     }

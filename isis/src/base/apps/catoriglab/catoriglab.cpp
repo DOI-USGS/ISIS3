@@ -7,7 +7,7 @@ using namespace std;
 
 void IsisMain() {
 
-  // Get user entered file name & mode 
+  // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
   string file = ui.GetFilename("FROM");
 

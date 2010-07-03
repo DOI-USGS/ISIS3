@@ -30,19 +30,19 @@
 
 namespace Isis {
 
-/**
- * @brief Converter for math equations
- *
- * This class converts infix equations to postfix
- *
- * @ingroup Math
- *
- * @author 2007-08-21 Steven Lambright
- * 
- * @internal 
- *   @history 2010-02-23 Steven Lambright Updated to use InfixOperator class
- *              method instead of direct access to member
- */
+  /**
+   * @brief Converter for math equations
+   *
+   * This class converts infix equations to postfix
+   *
+   * @ingroup Math
+   *
+   * @author 2007-08-21 Steven Lambright
+   *
+   * @internal
+   *   @history 2010-02-23 Steven Lambright Updated to use InfixOperator class
+   *              method instead of direct access to member
+   */
   class CubeInfixToPostfix : public InfixToPostfix {
     public:
       CubeInfixToPostfix() {} ;

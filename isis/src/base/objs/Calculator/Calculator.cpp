@@ -1,24 +1,24 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.14 $                                                             
- * $Date: 2010/04/08 15:05:24 $                                                                 
- *                                                                        
+/**
+ * @file
+ * $Revision: 1.14 $
+ * $Date: 2010/04/08 15:05:24 $
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
- *                                                                        
+ *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.                                                           
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,              
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */    
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include <cmath>
 
@@ -34,7 +34,7 @@
 using namespace std;
 
 namespace Isis {
-  /** 
+  /**
    * The code that performs math operations is designed
    *   to call a function and use the result. These helper
    *   methods convert standard operators into functions which
@@ -44,214 +44,254 @@ namespace Isis {
 
   /**
    * Returns the nagative of the input parameter.
-   * 
+   *
    * @param a Input double
-   * 
+   *
    * @return double negative of a
    */
-  double NegateOperator(double a) { return -1*a; }
+  double NegateOperator(double a) {
+    return -1 * a;
+  }
 
 
   /**
    * Returns the result of a multiplied by b.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return double result of a*b
    */
-  double MultiplyOperator(double a, double b) { return a*b; }
+  double MultiplyOperator(double a, double b) {
+    return a * b;
+  }
 
 
   /**
    * Returns the result of dividing a by b
-   * 
+   *
    * @param a Input double
    * @param b Intput double
-   * 
+   *
    * @return double result of a/b
    */
-  double DivideOperator(double a, double b) { return a/b; }
+  double DivideOperator(double a, double b) {
+    return a / b;
+  }
 
 
   /**
    * Returns the result of additing a with b.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return double result of a+b
    */
-  double AddOperator(double a, double b) { return a+b; }
+  double AddOperator(double a, double b) {
+    return a + b;
+  }
 
 
   /**
    * Returns the result of subtracting b from a.
-   * 
-   * @param a Input subtractee 
+   *
+   * @param a Input subtractee
    * @param b Input subtractor
-   * 
+   *
    * @return double result of a-b
    */
-  double SubtractOperator(double a, double b) { return a-b; }
+  double SubtractOperator(double a, double b) {
+    return a - b;
+  }
 
 
   /**
    * Returns 1.0 if a is greater than b.  Otherwise 0.0 is returned.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return 1.0 if a>b
    */
-  double GreaterThanOperator(double a, double b) { return a > b ? 1.0 : 0.0; }
+  double GreaterThanOperator(double a, double b) {
+    return a > b ? 1.0 : 0.0;
+  }
 
 
   /**
    * Returns 1.0 if a is less than b.  Otherwise 0.0 is returned.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return 1.0 if a<b
    */
-  double LessThanOperator(double a, double b) { return a < b ? 1.0 : 0.0; }
+  double LessThanOperator(double a, double b) {
+    return a < b ? 1.0 : 0.0;
+  }
 
 
   /**
    * Returns 1.0 if a is equal ot b.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return 1.0 if a==b
    */
-  double EqualOperator(double a, double b) { return a == b ? 1.0 : 0.0; }
+  double EqualOperator(double a, double b) {
+    return a == b ? 1.0 : 0.0;
+  }
 
 
   /**
    * Returns 1.0 if a is greater than or equal to b.  Otherwise 0.0 is returned.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return 1.0 if a>=b
    */
-  double GreaterThanOrEqualOperator(double a, double b) { return a >= b ? 1.0 : 0.0; }
+  double GreaterThanOrEqualOperator(double a, double b) {
+    return a >= b ? 1.0 : 0.0;
+  }
 
 
   /**
    * Returns 1.0 if a is less than or eqaul to b.  Otherwise 0.0 is returned.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return 1.0 if a<=b
    */
-  double LessThanOrEqualOperator(double a, double b) { return a <= b ? 1.0 : 0.0; }
+  double LessThanOrEqualOperator(double a, double b) {
+    return a <= b ? 1.0 : 0.0;
+  }
 
 
   /**
    * Returns 1.0 is a is not equal to b.  Otherwise 0.0 is returned.
-   * 
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return 1.0 if a!=b
    */
-  double NotEqualOperator(double a, double b) { return a != b ? 1.0 : 0.0; }
+  double NotEqualOperator(double a, double b) {
+    return a != b ? 1.0 : 0.0;
+  }
 
 
   /**
    * Returns the cosecant of the input a
-   * 
+   *
    * @param a Input double
-   * 
+   *
    * @return the double result of the cosecant of a
    */
-  double CosecantOperator(double a) { return 1.0 / sin(a); }
+  double CosecantOperator(double a) {
+    return 1.0 / sin(a);
+  }
 
 
   /**
    * Returns the secant of the input a
-   * 
+   *
    * @param a Input double
-   * 
+   *
    * @return the double result of the secant of a
    */
-  double SecantOperator(double a) { return 1.0 / cos(a); }
+  double SecantOperator(double a) {
+    return 1.0 / cos(a);
+  }
 
   /**
    * Returns the cotangent of the input a
-   * 
+   *
    * @param a Input double
-   * 
+   *
    * @return the double result of the cotangent of a
    */
-  double CotangentOperator(double a) { return 1.0 / tan(a); }
+  double CotangentOperator(double a) {
+    return 1.0 / tan(a);
+  }
 
 
   /**
    * Returns the result of rounding the input a to the closest integer.
-   * 
+   *
    * @param a Inut double
-   * 
+   *
    * @return the int result of rounding a to the closest whole number
    */
-  int Round(double a) { return (a>0)? (int)(a+0.5) : (int)(a-0.5); }
+  int Round(double a) {
+    return (a > 0) ? (int)(a + 0.5) : (int)(a - 0.5);
+  }
 
 
   /**
-   * Returns the result of a bitwise AND accross a and b 
-   * 
+   * Returns the result of a bitwise AND accross a and b
+   *
    * @param a Input double
    * @param b Input double
-   * 
+   *
    * @return the double result of a bitwise AND operation
    */
-  double BitwiseAndOperator(double a, double b) { return (double)(Round(a)&Round(b)); }
+  double BitwiseAndOperator(double a, double b) {
+    return (double)(Round(a)&Round(b));
+  }
 
 
   /**
    * Returns the result of a bitwise OR across a and b
-   * 
+   *
    * @param a Input double
    * @param b INput double
-   * 
+   *
    * @return the double result of a bitwise OR operation
    */
-  double BitwiseOrOperator(double a, double b) { return (double)(Round(a)|Round(b)); }
+  double BitwiseOrOperator(double a, double b) {
+    return (double)(Round(a) | Round(b));
+  }
 
 
   /**
    * Returns the modulus of a by b
-   * 
+   *
    * @param a Input modulee
    * @param b Input modulator
-   * 
+   *
    * @return double result of a%b
    */
-  double ModulusOperator(double a, double b) { return (double)(Round(a)%Round(b)); }
+  double ModulusOperator(double a, double b) {
+    return (double)(Round(a) % Round(b));
+  }
 
   /**
-   * Returns the max of a and b 
-   *  
-   * @param a First input value 
-   * @param b Second input value 
-   *  
-   * @return The larger of the two 
+   * Returns the max of a and b
+   *
+   * @param a First input value
+   * @param b Second input value
+   *
+   * @return The larger of the two
    */
-  double MaximumOperator(double a, double b) { return (a > b)? a : b; }
+  double MaximumOperator(double a, double b) {
+    return (a > b) ? a : b;
+  }
 
   /**
-   * Returns the min of a and b 
-   *  
-   * @param a First input value 
-   * @param b Second input value 
-   *  
-   * @return The smaller of the two 
+   * Returns the min of a and b
+   *
+   * @param a First input value
+   * @param b Second input value
+   *
+   * @return The smaller of the two
    */
-  double MinimumOperator(double a, double b) { return (a < b)? a : b; }
+  double MinimumOperator(double a, double b) {
+    return (a < b) ? a : b;
+  }
 
 
   //! Constructor
@@ -289,15 +329,15 @@ namespace Isis {
     QVector<double> result;
 
     PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), MultiplyOperator);
-    Push(result); 
+    Push(result);
   }
 
 
   /**
    * Pops two elements, adds them, then pushes the sum on the stack
    */
-  void Calculator::Add() { 
-    QVector<double> y = Pop(); 
+  void Calculator::Add() {
+    QVector<double> y = Pop();
     QVector<double> x = Pop();
     QVector<double> result;
     PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), AddOperator);
@@ -308,7 +348,7 @@ namespace Isis {
   /**
    * Pops two elements, subtracts them, then pushes the difference on the stack
    */
-  void Calculator::Subtract() { 
+  void Calculator::Subtract() {
     QVector<double> y = Pop();
     QVector<double> x = Pop();
     QVector<double> result;
@@ -320,7 +360,7 @@ namespace Isis {
   /**
    * Pops two, divides them, then pushes the quotient on the stack
    */
-  void Calculator::Divide() { 
+  void Calculator::Divide() {
     QVector<double> y = Pop();
     QVector<double> x = Pop();
     QVector<double> result;
@@ -332,7 +372,7 @@ namespace Isis {
   /**
    * Pops two elements, mods them, then pushes the result on the stack
    */
-  void Calculator::Modulus() { 
+  void Calculator::Modulus() {
     QVector<double> y = Pop();
     QVector<double> x = Pop();
     QVector<double> result;
@@ -345,7 +385,7 @@ namespace Isis {
   /**
    * Pops two elements, computes the power then pushes the result on the stack
    * The exponent has to be a scalar.
-   * 
+   *
    * @throws Isis::iException::Math
    */
   void Calculator::Exponent() {
@@ -360,7 +400,7 @@ namespace Isis {
 
   /**
    * Pop an element, compute its square root, then push the root on the stack
-   * 
+   *
    * @throws Isis::iException::Math
    */
   void Calculator::SquareRoot() {
@@ -382,11 +422,11 @@ namespace Isis {
 
   /**
    * Pop an element, compute its log, then push the result on the stack
-   * 
+   *
    * @throws Isis::iException::Math
    */
   void Calculator::Log() {
-     QVector<double> result = Pop();
+    QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), log);
     Push(result);
   }
@@ -404,7 +444,7 @@ namespace Isis {
 
   /**
    * Pop the top element, then perform a left shift with zero fill
-   * 
+   *
    * @throws Isis::iException::Math
    */
   void Calculator::LeftShift() {
@@ -413,10 +453,10 @@ namespace Isis {
       std::string msg = "Must use scalars for shifting.";
       throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
     }
-    else { 
+    else {
       QVector<double> x = Pop();
-  
-      if((int)y[0] > (int)x.size()) { 
+
+      if((int)y[0] > (int)x.size()) {
         std::string msg = "Shift value must be <= to number of samples.";
         throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
       }
@@ -426,7 +466,7 @@ namespace Isis {
         result.resize(x.size());
 
         for(int i = 0; i < result.size(); i++) {
-          if(i+shift < x.size() && i+shift >= 0)
+          if(i + shift < x.size() && i + shift >= 0)
             result[i] = x[i+shift];
           else
             result[i] = sqrt(-1.0); // create a NaN
@@ -440,7 +480,7 @@ namespace Isis {
 
   /**
    * Pop the top element, then perform a right shift with zero fill
-   * 
+   *
    * @throws Isis::iException::Math
    */
   void Calculator::RightShift() {
@@ -449,10 +489,10 @@ namespace Isis {
       std::string msg = "Must use scalars for shifting.";
       throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
     }
-    else { 
+    else {
       QVector<double> x = Pop();
-  
-      if((int)y[0] > (int)x.size()) { 
+
+      if((int)y[0] > (int)x.size()) {
         std::string msg = "Shift value must be <= to number of samples.";
         throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
       }
@@ -462,7 +502,7 @@ namespace Isis {
         result.resize(x.size());
 
         for(int i = 0; i < (int)result.size(); i++) {
-          if(i-shift < (int)x.size() && i-shift >= 0) {
+          if(i - shift < (int)x.size() && i - shift >= 0) {
             result[i] = x[i-shift];
           }
           else {
@@ -514,30 +554,30 @@ namespace Isis {
 
 
   /**
-   * Pop two elements, then push the minimum on a pixel by pixel 
-   * basis back on the stack 
+   * Pop two elements, then push the minimum on a pixel by pixel
+   * basis back on the stack
    */
   void Calculator::MinimumPixel() {
     QVector<double> x = Pop();
     QVector<double> y = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      MinimumOperator);
     Push(result);
   }
 
 
   /**
-   * Pop two elements, then push the maximum on a pixel by pixel 
-   * basis back on the stack 
+   * Pop two elements, then push the maximum on a pixel by pixel
+   * basis back on the stack
    */
   void Calculator::MaximumPixel() {
     QVector<double> x = Pop();
     QVector<double> y = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      MaximumOperator);
     Push(result);
   }
@@ -552,7 +592,7 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      GreaterThanOperator);
     Push(result);
   }
@@ -567,7 +607,7 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      LessThanOperator);
     Push(result);
   }
@@ -582,7 +622,7 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      EqualOperator);
     Push(result);
   }
@@ -597,7 +637,7 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      GreaterThanOrEqualOperator);
     Push(result);
   }
@@ -612,7 +652,7 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      LessThanOrEqualOperator);
     Push(result);
   }
@@ -627,13 +667,13 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      NotEqualOperator);
     Push(result);
   }
 
 
-  // Commented out because bitwise ops only work with integers instead of 
+  // Commented out because bitwise ops only work with integers instead of
   // doubles
 
   /**
@@ -644,13 +684,13 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      BitwiseAndOperator);
     Push(result);
   }
 
 
-  /** 
+  /**
    * Pop two elements, OR them, then push the result on the stack
    */
   void Calculator::Or() {
@@ -658,7 +698,7 @@ namespace Isis {
     QVector<double> x = Pop();
     QVector<double> result;
 
-    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(), 
+    PerformOperation(result, x.begin(), x.end(), y.begin(), y.end(),
                      BitwiseOrOperator);
     Push(result);
   }
@@ -667,7 +707,7 @@ namespace Isis {
   /**
    * Pops one element  and push the sine
    */
-  void Calculator::Sine() { 
+  void Calculator::Sine() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), sin);
     Push(result);
@@ -677,7 +717,7 @@ namespace Isis {
   /**
    * Pops one element  and push the cosine
    */
-  void Calculator::Cosine() { 
+  void Calculator::Cosine() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), cos);
     Push(result);
@@ -687,7 +727,7 @@ namespace Isis {
   /**
    * Pops one element  and push the tangent
    */
-  void Calculator::Tangent() { 
+  void Calculator::Tangent() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), tan);
     Push(result);
@@ -697,7 +737,7 @@ namespace Isis {
   /**
    * Pops one element  and push the cosecant
    */
-  void Calculator::Cosecant() { 
+  void Calculator::Cosecant() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), CosecantOperator);
     Push(result);
@@ -707,7 +747,7 @@ namespace Isis {
   /**
    * Pops one element  and push the secant
    */
-  void Calculator::Secant() { 
+  void Calculator::Secant() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), SecantOperator);
     Push(result);
@@ -717,7 +757,7 @@ namespace Isis {
   /**
    * Pops one element  and push the cotangent
    */
-  void Calculator::Cotangent() { 
+  void Calculator::Cotangent() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), CotangentOperator);
     Push(result);
@@ -727,7 +767,7 @@ namespace Isis {
   /**
    * Pops one element  and push the arcsine
    */
-  void Calculator::Arcsine() { 
+  void Calculator::Arcsine() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), asin);
     Push(result);
@@ -737,7 +777,7 @@ namespace Isis {
   /**
    * Pops one element  and push the arccosine
    */
-  void Calculator::Arccosine() { 
+  void Calculator::Arccosine() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), acos);
     Push(result);
@@ -747,7 +787,7 @@ namespace Isis {
   /**
    * Pops one element  and push the arctangent
    */
-  void Calculator::Arctangent() { 
+  void Calculator::Arctangent() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), atan);
     Push(result);
@@ -800,7 +840,7 @@ namespace Isis {
   /**
    * Pops one element  and push the hyperbolic sine
    */
-  void Calculator::SineH() { 
+  void Calculator::SineH() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), sinh);
     Push(result);
@@ -810,7 +850,7 @@ namespace Isis {
   /**
    * Pops one element  and push the hyperbolic cosine
    */
-  void Calculator::CosineH() { 
+  void Calculator::CosineH() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), cosh);
     Push(result);
@@ -820,7 +860,7 @@ namespace Isis {
   /**
    * Pops one element  and push the hyperbolic tangent
    */
-  void Calculator::TangentH() { 
+  void Calculator::TangentH() {
     QVector<double> result = Pop();
     PerformOperation(result, result.begin(), result.end(), tanh);
     Push(result);
@@ -830,13 +870,13 @@ namespace Isis {
   // Stack methods
 
   //! Get the current stack size
-  int Calculator::StackSize() { 
-    return p_valStack->size(); 
+  int Calculator::StackSize() {
+    return p_valStack->size();
   }
 
   /**
    * Push a vector onto the stack
-   * 
+   *
    * @param vect The vector that will be pushed on the stack
    */
   void Calculator::Push(QVector<double> &vect) {
@@ -846,7 +886,7 @@ namespace Isis {
 
   /**
    * Push a scalar onto the stack
-   * 
+   *
    * @param scalar The scalar that will be pushed on the stack
    */
   void Calculator::Push(double scalar) {
@@ -858,15 +898,15 @@ namespace Isis {
 
   /**
    * Push a buffer onto the stack
-   * 
+   *
    * @param buff The buffer that will be pushed on the stack
    */
   void Calculator::Push(Buffer &buff) {
     QVector<double> b(buff.size());
-  
+
     for(int i = 0; i < buff.size(); i++) {
       // Test for special pixels and map them to valid values
-      if(IsSpecial(buff[i])) { 
+      if(IsSpecial(buff[i])) {
         if(Isis::IsNullPixel(buff[i])) {
           //b[i] = NAN;
           b[i] = sqrt(-1.0);
@@ -888,7 +928,7 @@ namespace Isis {
           b[i] = -DBL_MAX * 2;
         }
       }
-      else    
+      else
         b[i] = buff[i];
     }
 
@@ -898,11 +938,11 @@ namespace Isis {
 
   /**
    * Pop an element off the stack
-   * 
+   *
    * @param keepSpecials If true, special pixels will be
    *                     preserved; otherwise, they will be mapped
    *                     to double values
-   * 
+   *
    * @return The top of the stack, which gets popped
    */
   QVector<double> Calculator::Pop(bool keepSpecials) {
@@ -928,12 +968,12 @@ namespace Isis {
         else if(top[i] < -DBL_MAX) {
           top[i] = Isis::Lrs;
         }
-        else { 
-          // Do nothing 
+        else {
+          // Do nothing
         }
       }
     }
-    
+
     p_valStack->pop();
 
 
@@ -946,7 +986,7 @@ namespace Isis {
    */
   void Calculator::PrintTop() {
     if(p_valStack->empty()) return;
-    
+
     std::cout << "[ ";
     QVector<double> top = p_valStack->top();
     for(int i = 0; i < (int)top.size(); i++) {
@@ -958,7 +998,7 @@ namespace Isis {
 
   /**
    * Check if the stack is empty
-   * 
+   *
    * @return bool True if the stack is empty
    */
   bool Calculator::Empty() {
@@ -978,63 +1018,62 @@ namespace Isis {
 
   /**
    * Performs the mathematical operations on each argument.
-   * 
+   *
    * @param results [out] The results of the performed operation
    * @param arg1Start The first argument to have the operation done on
-   * @param arg1End One argument beyond the final argument to have the operation 
+   * @param arg1End One argument beyond the final argument to have the operation
    *                done upon
-   * @param operation The operation to be done on all arguments 
+   * @param operation The operation to be done on all arguments
    */
   void Calculator::PerformOperation(QVector<double> &results,
-                                    QVector<double>::iterator arg1Start, 
+                                    QVector<double>::iterator arg1Start,
                                     QVector<double>::iterator arg1End,
-                                    double operation(double))
-  {
-    results.resize(arg1End-arg1Start);
+                                    double operation(double)) {
+    results.resize(arg1End - arg1Start);
 
     for(int pos = 0; pos < results.size(); pos++) {
       results[pos] = operation(*arg1Start);
-      
+
       arg1Start++;
     }
   }
 
 
   /**
-   * Performs the mathematical operation on each pair of arguments, or a set of 
+   * Performs the mathematical operation on each pair of arguments, or a set of
    * agruments against a single argument.
-   * 
+   *
    * @param results [out] The results of the performed operation
-   * @param arg1Start The first of the primary argument to have the operation done 
+   * @param arg1Start The first of the primary argument to have the operation done
    *                  on
-   * @param arg1End One arguement beyond the final primary argument to have the 
+   * @param arg1End One arguement beyond the final primary argument to have the
    *                operation done upon
-   * @param arg2Start The first of the secondaty argument to have the operation 
+   * @param arg2Start The first of the secondaty argument to have the operation
    *                  done on
-   * @param arg2End One arguement beyond the final secondary argument to have the 
+   * @param arg2End One arguement beyond the final secondary argument to have the
    *                operation done upon
-   * @param operation The operation to be done on all pairs of arguments  
+   * @param operation The operation to be done on all pairs of arguments
    */
   void Calculator::PerformOperation(QVector<double> &results,
-                                    QVector<double>::iterator arg1Start, 
+                                    QVector<double>::iterator arg1Start,
                                     QVector<double>::iterator arg1End,
                                     QVector<double>::iterator arg2Start,
                                     QVector<double>::iterator arg2End,
                                     double operation(double, double)) {
-    if(arg1End-arg1Start != 1 && arg2End-arg2Start != 1 && 
-       arg1End-arg1Start != arg2End-arg2Start) {
+    if(arg1End - arg1Start != 1 && arg2End - arg2Start != 1 &&
+        arg1End - arg1Start != arg2End - arg2Start) {
       std::string msg = "Cannot operate on vectors of differing sizes.";
       throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
     }
 
-    int iSize = max(arg1End-arg1Start, arg2End-arg2Start);
+    int iSize = max(arg1End - arg1Start, arg2End - arg2Start);
     results.resize(iSize);
 
     for(int pos = 0; pos < results.size(); pos++) {
       results[pos] = operation(*arg1Start, *arg2Start);
 
-      if(arg1Start+1 != arg1End) arg1Start++;
-      if(arg2Start+1 != arg2End) arg2Start++;
+      if(arg1Start + 1 != arg1End) arg1Start++;
+      if(arg2Start + 1 != arg2End) arg2Start++;
     }
   }
 } // End of namespace Isis

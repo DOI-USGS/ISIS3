@@ -5,7 +5,7 @@
  * @file
  * $Revision: 1.6 $
  * $Date: 2010/06/17 00:08:45 $
- * 
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -35,59 +35,69 @@
 class QImage;
 
 namespace Qisis {
-/**
-  * @brief Viewport for Isis Chips
-  *
-  * @ingroup Visualization Tools
-  *
-  * @author 2007-05-01 Tracie Sucharski 
-  *
-  * @internal 
-  * @history 2008-09-09 Tracie Sucharski - Added setCircle and setCircleSize 
-  *                          methods. 
-  * @history 2010-06-16 Jeannie Walldren - Modified geomChip(), nogeomChip(), 
-  *                        rotateChip() and reloadChip() to catch possible 
-  *                        iExceptions from Chip's Load() method and display
-  *                        Error in QMessageBox
-  *
-  */
+  /**
+    * @brief Viewport for Isis Chips
+    *
+    * @ingroup Visualization Tools
+    *
+    * @author 2007-05-01 Tracie Sucharski
+    *
+    * @internal
+    * @history 2008-09-09 Tracie Sucharski - Added setCircle and setCircleSize
+    *                          methods.
+    * @history 2010-06-16 Jeannie Walldren - Modified geomChip(), nogeomChip(),
+    *                        rotateChip() and reloadChip() to catch possible
+    *                        iExceptions from Chip's Load() method and display
+    *                        Error in QMessageBox
+    *
+    */
 
   class ChipViewport : public QWidget {
-    Q_OBJECT
+      Q_OBJECT
 
 
     public:
-      ChipViewport (int width, int height, QWidget *parent=0);
-      ~ChipViewport ();
+      ChipViewport(int width, int height, QWidget *parent = 0);
+      ~ChipViewport();
 
       //!  Set chip
-      void setChip (Isis::Chip *chip, Isis::Cube *chipCube);
+      void setChip(Isis::Chip *chip, Isis::Cube *chipCube);
 
       //!  Load with another ChipViewport
       void loadView(ChipViewport &newView);
 
       //!  Return chip
-      Isis::Chip *chip() const { return p_chip; };
+      Isis::Chip *chip() const {
+        return p_chip;
+      };
 
       //! Return the number of samples in the chip
-      int chipSamples() const { return p_chip->Samples(); };
+      int chipSamples() const {
+        return p_chip->Samples();
+      };
 
       //! Return the number of lines in the chip
-      int chipLines() const { return p_chip->Lines(); };
+      int chipLines() const {
+        return p_chip->Lines();
+      };
 
       //! Return the gray band currently viewed
-      int grayBand() const { return p_gray.band; };
+      int grayBand() const {
+        return p_gray.band;
+      };
 
       //!  Return the position of cube under cross hair
-      double tackSample ();
-      double tackLine ();
+      double tackSample();
+      double tackLine();
 
       //!  Draw X on point
       //void markPoint (double sample, double line);
 
 
       //! Return the gray band stretch
-      Isis::Stretch grayStretch () const { return p_gray.stretch; };
+      Isis::Stretch grayStretch() const {
+        return p_gray.stretch;
+      };
 
     signals:
       //!< Signal sent when tack point changes
@@ -95,14 +105,14 @@ namespace Qisis {
 
     public slots:
 
-      void autoStretch ();
-      void setCross (bool checked);
-      void rotateChip (int rotation);
-      void setCircle (bool checked);
-      void setCircleSize (int size);
+      void autoStretch();
+      void setCross(bool checked);
+      void rotateChip(int rotation);
+      void setCircle(bool checked);
+      void setCircleSize(int size);
 
-      void geomChip (Isis::Chip *matchChip, Isis::Cube *matchChipCube);
-      void nogeomChip ();
+      void geomChip(Isis::Chip *matchChip, Isis::Cube *matchChipCube);
+      void nogeomChip();
 
       void panUp();
       void panDown();
@@ -113,10 +123,10 @@ namespace Qisis {
       void zoomOut();
       void zoom1();
 
-      void refreshView(double tackSample,double tackLine);
+      void refreshView(double tackSample, double tackLine);
 
     protected:
-      void paintEvent (QPaintEvent *e);
+      void paintEvent(QPaintEvent *e);
       void enterEvent(QEvent *e);
       void keyPressEvent(QKeyEvent *e);
       void mousePressEvent(QMouseEvent *event);
@@ -124,7 +134,7 @@ namespace Qisis {
     protected slots:
 
     private:
-      void reloadChip (double tackSample=0.,double tackLine=0.);
+      void reloadChip(double tackSample = 0., double tackLine = 0.);
 
       void computeStretch(Isis::Stretch &stretch);
       void paintImage();

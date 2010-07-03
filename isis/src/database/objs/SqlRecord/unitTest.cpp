@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   if(!testdb.open()) {
     iException::Message(iException::User, "Connection failed", _FILEINFO_);
   }
-  
+
   string table = "CREATE TABLE testTable ("
                  " v1 TEXT,"
                  " v2 INTEGER,"
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   string query = "SELECT * FROM testTable;";
   SqlQuery create(testdb);
   create.setThrowOnFailure();
- 
+
   try {
     create.exec(table);
     create.exec(insert);
@@ -46,24 +46,24 @@ int main(int argc, char *argv[]) {
   catch(iException &e) {
     e.Report(false);
   }
- 
-  
+
+
   SqlRecord record(create);
   cout << "Size: " << record.size() << endl;
   cout << "Has field(v2): " << record.hasField("v2") << endl;
   cout << "Field index(v3): " << record.getFieldIndex("v3") << endl;
 
   cout << "The mac systems report the double fields as string fields. " <<
-          "Until the problematic 3rd party software is fixed, " <<
-          "the mac systems will need OS truth data." << endl;
+       "Until the problematic 3rd party software is fixed, " <<
+       "the mac systems will need OS truth data." << endl;
 
   for(int i = 0; i < record.size(); i++) {
     iString value = record.getValue(i);
     cout << "Col " << i << ") " << "Name: " << record.getFieldName(i) <<
-            ", Type: " << record.getType(i) << endl;
-            
+         ", Type: " << record.getType(i) << endl;
+
   }
- 
+
   remove("/tmp/test.db");
   return 0;
 }

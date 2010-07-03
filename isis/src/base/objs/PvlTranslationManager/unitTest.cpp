@@ -6,7 +6,7 @@
 #include "Preference.h"
 
 using namespace std;
-int main (void) {
+int main(void) {
   Isis::Preference::Preferences(true);
 
   try {
@@ -151,7 +151,7 @@ int main (void) {
 
     trnsStrm << "End" << endl;
 
-    Isis::PvlTranslationManager transMgr (fLabel, trnsStrm);
+    Isis::PvlTranslationManager transMgr(fLabel, trnsStrm);
 
     cout << "Testing Isis::PvlTranslationManager object" << endl;
 
@@ -162,16 +162,16 @@ int main (void) {
     cout << "    PixelResolution = " << transMgr.InputKeyword("PixelResolution")[0] << endl;
     cout << "    Error messages:" << endl;
     try {
-      transMgr.InputKeyword ("BadGroup");
+      transMgr.InputKeyword("BadGroup");
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       cerr << "    ";
       e.Report(false);
     }
     try {
-      transMgr.InputKeyword ("GoodGroupBadKey");
+      transMgr.InputKeyword("GoodGroupBadKey");
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       cerr << "    ";
       e.Report(false);
     }
@@ -182,16 +182,16 @@ int main (void) {
     cout << "    NumberOfBands   = " << transMgr.InputKeyword("NumberOfBands").Unit() << endl;
     cout << "    Error messages:" << endl;
     try {
-      transMgr.InputKeyword ("BadGroup").Unit();
+      transMgr.InputKeyword("BadGroup").Unit();
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       cerr << "    ";
       e.Report(false);
     }
     try {
-      transMgr.InputKeyword ("GoodGroupBadKey").Unit();
+      transMgr.InputKeyword("GoodGroupBadKey").Unit();
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       cerr << "    ";
       e.Report(false);
     }
@@ -204,22 +204,22 @@ int main (void) {
     try {
       transMgr.InputKeyword("BadGroup").Size();
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       cerr << "    ";
       e.Report(false);
     }
     try {
       transMgr.InputKeyword("GoodGroupBadKey").Size();
     }
-    catch (Isis::iException &e) {
+    catch(Isis::iException &e) {
       cerr << "    ";
       e.Report(false);
     }
     cout << endl;
 
     cout << "  Testing InputHasKeyword member" << endl;
-    cout << "    BandName        = " << transMgr.InputHasKeyword ("BandName") << endl;
-    cout << "    GoodGroupBadKey = " << transMgr.InputHasKeyword ("GoodGroupBadKey") << endl;
+    cout << "    BandName        = " << transMgr.InputHasKeyword("BandName") << endl;
+    cout << "    GoodGroupBadKey = " << transMgr.InputHasKeyword("GoodGroupBadKey") << endl;
     cout << endl;
 
 //    cout << "  Testing InputHasGroup member" << endl;
@@ -228,9 +228,9 @@ int main (void) {
 //    cout << endl;
 
     cout << "  Testing Translate member" << endl;
-    cout << "    DataFilename = " << transMgr.Translate ("DataFilename") << endl;
-    cout << "    ImageStartByte   = " << transMgr.Translate ("ImageStartByte", 1) << endl;
-    cout << "    Lines = " << transMgr.Translate ("NumberOfLines") << endl;
+    cout << "    DataFilename = " << transMgr.Translate("DataFilename") << endl;
+    cout << "    ImageStartByte   = " << transMgr.Translate("ImageStartByte", 1) << endl;
+    cout << "    Lines = " << transMgr.Translate("NumberOfLines") << endl;
     cout << endl;
 
     cout << "  Testing Auto member" << endl;
@@ -240,7 +240,7 @@ int main (void) {
 
 
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
 

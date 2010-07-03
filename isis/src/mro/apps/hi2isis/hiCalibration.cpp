@@ -5,7 +5,7 @@
 #include "Buffer.h"
 #include "Table.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 extern int gapCount[6];
@@ -19,12 +19,12 @@ extern int section;
 
 // Construct two BLOBs one to hold the Hirise calibration line prefix/suffix data
 // and the other to hold the calibration image line
-void SaveHiriseCalibrationData (ProcessImportPds &process, Cube *ocube,
-                                Pvl &pdsLabel) {
+void SaveHiriseCalibrationData(ProcessImportPds &process, Cube *ocube,
+                               Pvl &pdsLabel) {
 
-  vector<int> ConvertCalibrationPixels (int samples,
-                                        Isis::PixelType pixelType,
-                                        unsigned char *data);
+  vector<int> ConvertCalibrationPixels(int samples,
+                                       Isis::PixelType pixelType,
+                                       unsigned char * data);
 
   // Create the Table to hold the prefix/suffix data
   TableField gap("GapFlag", TableField::Integer);
@@ -59,7 +59,7 @@ void SaveHiriseCalibrationData (ProcessImportPds &process, Cube *ocube,
 
   // Loop through the calibration lines and extract the info needed for the
   // tables.
-  for (unsigned int l=0; l<(unsigned int)calsize; l++) {
+  for(unsigned int l = 0; l < (unsigned int)calsize; l++) {
 
     // Pull out the gap byte (in byte 0)
     calAncillaryRecord[0] = (int)(*header++);
@@ -77,24 +77,24 @@ void SaveHiriseCalibrationData (ProcessImportPds &process, Cube *ocube,
 
     // Pull the 12 buffer pixels (same type as image data)
     section = 0;
-    calAncillaryRecord[2] = ConvertCalibrationPixels (12, process.PixelType(),
-                                                      header);
+    calAncillaryRecord[2] = ConvertCalibrationPixels(12, process.PixelType(),
+                            header);
     header += 12 * SizeOf(process.PixelType());
 
     // Don't add this record to the table yet. It still needs the dark pixels.
 
     // Pull the calibration pixels out (same type as image data)
     section = 1;
-    calImageRecord[0] = ConvertCalibrationPixels (ocube->Samples(),
-                                                  process.PixelType(), header);
+    calImageRecord[0] = ConvertCalibrationPixels(ocube->Samples(),
+                        process.PixelType(), header);
     header += ocube->Samples() * SizeOf(process.PixelType());
     calImageTable += calImageRecord;
 
 
     // Pull the 16 dark pixels (same type as image data)
     section = 2;
-    calAncillaryRecord[3] = ConvertCalibrationPixels (16, process.PixelType(),
-                                                      header);
+    calAncillaryRecord[3] = ConvertCalibrationPixels(16, process.PixelType(),
+                            header);
     header += 16 * SizeOf(process.PixelType());
 
     // Add this record to the table
@@ -108,11 +108,11 @@ void SaveHiriseCalibrationData (ProcessImportPds &process, Cube *ocube,
 
 
 
-vector<int> ConvertCalibrationPixels (int samples,
-                                      Isis::PixelType pixelType,
-                                      unsigned char *data) {
-  void FixDns8(Buffer &buf);
-  void FixDns16(Buffer &buf);
+vector<int> ConvertCalibrationPixels(int samples,
+                                     Isis::PixelType pixelType,
+                                     unsigned char *data) {
+  void FixDns8(Buffer & buf);
+  void FixDns16(Buffer & buf);
 
 
   // Pull the calibration pixels out (same type as image data)
@@ -120,38 +120,38 @@ vector<int> ConvertCalibrationPixels (int samples,
   // buffer, but are looking for original data ranges and specific values
   Isis::Buffer pixelBuf(samples, 1, 1, Isis::SignedWord);
 
-  for (int b=0; b<samples; b++) {
+  for(int b = 0; b < samples; b++) {
     short int pixel = 0;
     int shift = 8 * (SizeOf(pixelType) - 1);
-    for (int byte=0; byte<SizeOf(pixelType); byte++) {
+    for(int byte = 0; byte < SizeOf(pixelType); byte++) {
       pixel += ((unsigned int)(*data++)) << shift;
       shift -= 8;
     }
 
-    ((short int*)pixelBuf.RawBuffer())[b] = pixel;
+    ((short int *)pixelBuf.RawBuffer())[b] = pixel;
 
     pixelBuf[b] = pixel;
   }
 
   // Convert gaps, HiRISE special pixels... to 16 bit
-  if (pixelType == Isis::UnsignedByte) {
-    FixDns8 (pixelBuf);
+  if(pixelType == Isis::UnsignedByte) {
+    FixDns8(pixelBuf);
   }
   else {
-    FixDns16 (pixelBuf);
+    FixDns16(pixelBuf);
   }
 
   // Move the calibration pixels from the buffer to a vector
   vector<int> calibrationPixels;
   double pixel;
-  for (int b=0; b<samples; b++) {
+  for(int b = 0; b < samples; b++) {
     pixel = pixelBuf[b];
-    if (pixel == NULL8) calibrationPixels.push_back(NULL2);
-    else if (pixel == LOW_REPR_SAT8) calibrationPixels.push_back(LOW_REPR_SAT2);
-    else if (pixel == LOW_INSTR_SAT8) calibrationPixels.push_back(LOW_INSTR_SAT2);
-    else if (pixel == HIGH_INSTR_SAT8) calibrationPixels.push_back(HIGH_INSTR_SAT2);
-    else if (pixel == HIGH_REPR_SAT8) calibrationPixels.push_back(HIGH_REPR_SAT2);
-    else calibrationPixels.push_back((int)(pixel+0.5));
+    if(pixel == NULL8) calibrationPixels.push_back(NULL2);
+    else if(pixel == LOW_REPR_SAT8) calibrationPixels.push_back(LOW_REPR_SAT2);
+    else if(pixel == LOW_INSTR_SAT8) calibrationPixels.push_back(LOW_INSTR_SAT2);
+    else if(pixel == HIGH_INSTR_SAT8) calibrationPixels.push_back(HIGH_INSTR_SAT2);
+    else if(pixel == HIGH_REPR_SAT8) calibrationPixels.push_back(HIGH_REPR_SAT2);
+    else calibrationPixels.push_back((int)(pixel + 0.5));
   }
 
   return calibrationPixels;

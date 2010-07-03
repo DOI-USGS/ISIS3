@@ -10,17 +10,17 @@ namespace Isis {
 
   class GuiListParameter : public GuiParameter {
 
-    Q_OBJECT
+      Q_OBJECT
 
     public:
 
-      GuiListParameter (QGridLayout *grid, UserInterface &ui,
-                        int group, int param);
-      ~GuiListParameter ();
+      GuiListParameter(QGridLayout *grid, UserInterface &ui,
+                       int group, int param);
+      ~GuiListParameter();
 
-      iString Value ();
+      iString Value();
 
-      void Set (iString newValue);
+      void Set(iString newValue);
 
       virtual std::vector<std::string> Exclusions();
 

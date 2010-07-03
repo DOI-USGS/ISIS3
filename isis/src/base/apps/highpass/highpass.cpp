@@ -2,13 +2,13 @@
 #include "ProcessByQuickFilter.h"
 #include "UserInterface.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
 bool propagate;
 double addback;
-void highpass (Buffer &in, Buffer &out, QuickFilter &filter);
+void highpass(Buffer &in, Buffer &out, QuickFilter &filter);
 
 // The highpass main routine
 void IsisMain() {
@@ -22,10 +22,10 @@ void IsisMain() {
 
   // Find out how to handle special pixels
   UserInterface &ui = Application::GetUserInterface();
-  propagate = ui.GetBoolean ("PROPAGATE");
+  propagate = ui.GetBoolean("PROPAGATE");
 
   // Get the addback
-  addback = ui.GetDouble ("ADDBACK") / 100.0;
+  addback = ui.GetDouble("ADDBACK") / 100.0;
 
   //Set the boxcar parameters
   int lines = ui.GetInteger("LINES");
@@ -33,33 +33,33 @@ void IsisMain() {
   double low = -DBL_MAX;
   double high = DBL_MAX;
   int minimum;
-  if (ui.WasEntered("LOW")) {
+  if(ui.WasEntered("LOW")) {
     low = ui.GetDouble("LOW");
   }
-  if (ui.WasEntered("HIGH")) {
+  if(ui.WasEntered("HIGH")) {
     high = ui.GetDouble("HIGH");
   }
-  if (ui.GetString("MINOPT") == "PERCENTAGE") {
+  if(ui.GetString("MINOPT") == "PERCENTAGE") {
     int size = lines * samples;
     double perc = ui.GetDouble("MINIMUM") / 100;
-    minimum = (int) (size * perc);
+    minimum = (int)(size * perc);
   }
   else {
     minimum = (int)ui.GetDouble("MINIMUM");
   }
   p.SetFilterParameters(samples, lines, low, high, minimum);
-  
+
   // Process each line
   p.StartProcess(highpass);  // Line processing function
   p.EndProcess();           // Cleanup
 }
 
 // Line processing routine
-void highpass (Buffer &in, Buffer &out, QuickFilter &filter) {
-  for (int i=0; i<filter.Samples(); i++) {
+void highpass(Buffer &in, Buffer &out, QuickFilter &filter) {
+  for(int i = 0; i < filter.Samples(); i++) {
     // We have a special pixel
-    if (IsSpecial(in[i])) {
-      if (propagate) {
+    if(IsSpecial(in[i])) {
+      if(propagate) {
         out[i] = in[i];
       }
       else {
@@ -70,7 +70,7 @@ void highpass (Buffer &in, Buffer &out, QuickFilter &filter) {
     else {
       out[i] = filter.Average(i);  // will be NULL if uncomputable or count invalid
       // If the average could be computed then subtract it from the input
-      if (!IsSpecial(out[i])) out[i] = in[i] - out[i] + addback * in[i];
+      if(!IsSpecial(out[i])) out[i] = in[i] - out[i] + addback * in[i];
     }
   }
 }

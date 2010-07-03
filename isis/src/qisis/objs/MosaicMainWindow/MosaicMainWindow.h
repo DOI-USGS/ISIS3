@@ -13,37 +13,47 @@
 
 namespace Qisis {
   /**
-  * @brief 
+  * @brief
   *
   * @ingroup Visualization Tools
   *
   * @author Stacy Alley
   *
   * @internal
-  *  
+  *
   *  @history 2010-05-10 Christopher Austin - added cnet connectivity
   *  	      functionality
   */
   class ToolPad;
 
   class MosaicMainWindow : public Qisis::MainWindow {
-    Q_OBJECT
+      Q_OBJECT
     public:
-      MosaicMainWindow (QString title, QWidget *parent=0);
-      QToolBar *permanentToolBar () { return p_permToolbar; };
-      QToolBar *activeToolBar () { return p_activeToolbar; };
-      Qisis::ToolPad *toolPad() { return p_toolpad; };
-      QProgressBar *progressBar() { return p_progressBar; };
-       /**
-       * Returns the View menu.
-       * 
-       * 
-       * @return QMenu* 
-       */
-      QMenu *viewMenu() const { return p_viewMenu; };
+      MosaicMainWindow(QString title, QWidget *parent = 0);
+      QToolBar *permanentToolBar() {
+        return p_permToolbar;
+      };
+      QToolBar *activeToolBar() {
+        return p_activeToolbar;
+      };
+      Qisis::ToolPad *toolPad() {
+        return p_toolpad;
+      };
+      QProgressBar *progressBar() {
+        return p_progressBar;
+      };
+      /**
+      * Returns the View menu.
+      *
+      *
+      * @return QMenu*
+      */
+      QMenu *viewMenu() const {
+        return p_viewMenu;
+      };
 
     protected:
-      bool eventFilter(QObject *o,QEvent *e);
+      bool eventFilter(QObject *o, QEvent *e);
       void readSettings();
       void writeSettings();
 
@@ -56,15 +66,15 @@ namespace Qisis {
       void loadProject();
       void exportView();
       void hideShowColumns(QAction *action);
- 
+
     private:
       void setupMenus();
-      void setupPvlToolBar(); 
+      void setupPvlToolBar();
 
       QToolBar *p_permToolbar; //!< Tool bar attached to mainwindow
       Qisis::ToolPad *p_toolpad; //!< Tool pad on this mainwindow
       QToolBar *p_activeToolbar; //!< The active toolbar
-      std::map<QString,QMenu *> p_menus; //!< Maps Menus to string names
+      std::map<QString, QMenu *> p_menus; //!< Maps Menus to string names
       std::string p_appName; //!< The main application
       QString p_filename;
 
@@ -79,12 +89,12 @@ namespace Qisis {
       QAction *p_resolutionColumn;
       QAction *p_emissionAngleColumn;
       QAction *p_incidenceAngleColumn;
-QAction *p_islandColumn;
+      QAction *p_islandColumn;
       QAction *p_notesColumn;
       QAction *p_referenceFootprint;
 
       QMenu *p_viewMenu;
-      
+
   };
 };
 

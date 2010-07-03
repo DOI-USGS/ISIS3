@@ -15,9 +15,9 @@ namespace Isis {
 
 
   /**
-   * This is the one and only Pipeline constructor. This will initialize a 
-   * pipeline object. 
-   * 
+   * This is the one and only Pipeline constructor. This will initialize a
+   * pipeline object.
+   *
    * @param procAppName This is an option parameter that gives the pipeline a name
    */
   Pipeline::Pipeline(const iString &procAppName) {
@@ -29,9 +29,9 @@ namespace Isis {
 
   /**
    * This destroys the pipeline
-   * 
+   *
    */
-  Pipeline::~Pipeline(){
+  Pipeline::~Pipeline() {
     for(int i = 0; i < (int)p_apps.size(); i++) {
       delete p_apps[i];
     }
@@ -45,7 +45,7 @@ namespace Isis {
    * PipelineApplication to learn about itself and calculate necessary filenames,
    * execution calls, etc... Pipeline error checking happens in here, so if a
    * Pipeline is invalid this method will throw the iException.
-   * 
+   *
    */
   void Pipeline::Prepare() {
     // Nothing in the pipeline? quit
@@ -69,7 +69,7 @@ namespace Isis {
 
       // Keep track of temp files for conflicts
       vector<iString> tmpFiles;
-  
+
       // Loop through all the pipeline apps, look for a good place to remove virtual
       //   bands and tell the apps the prepare themselves. Double check the first program
       //   is not branched (expecting multiple inputs).
@@ -82,7 +82,7 @@ namespace Isis {
 
           p_apps[i]->SetVirtualBands(p_virtualBands);
           mustElimBands = false;
-  
+
           // We might have added the "cubeatt" program to eliminate bands,
           //   remove it if we found something else to do the virtual bands.
           // **This causes a failure in our calculations, start over.
@@ -102,20 +102,20 @@ namespace Isis {
           vector<iString> empty;
           p_apps[i]->SetVirtualBands(empty);
         }
-  
+
         // This instructs the pipeline app to prepare itself; all previous pipeline apps must
         //   be already prepared. Future pipeline apps do not have to be.
         p_apps[i]->BuildParamString();
-  
+
         // keep track of tmp files
         vector<iString> theseTempFiles = p_apps[i]->TemporaryFiles();
         for(int tmpFile = 0; tmpFile < (int)theseTempFiles.size(); tmpFile++) {
           tmpFiles.push_back(theseTempFiles[tmpFile]);
         }
-  
+
         if(!foundFirst && p_apps[i]->Enabled()) {
           foundFirst = true;
-  
+
           if(p_apps[i]->InputBranches().size() != OriginalBranches().size()) {
             string msg = "The program [" + p_apps[i]->Name() + "] can not be the first in the pipeline";
             msg += " because it must be run multiple times with unspecified varying inputs";
@@ -129,10 +129,10 @@ namespace Isis {
         string msg = "No applications are enabled in the pipeline";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
-  
+
       // Make sure all tmp files are unique!
       for(int i = 0; successfulPrepare && i < (int)tmpFiles.size(); i++) {
-        for(int j = i+1; j < (int)tmpFiles.size(); j++) {
+        for(int j = i + 1; j < (int)tmpFiles.size(); j++) {
           if(tmpFiles[i] == tmpFiles[j]) {
             string msg = "There is a conflict with the temporary file naming. The temporary file [";
             msg += tmpFiles[i] + "] is created twice.";
@@ -140,7 +140,7 @@ namespace Isis {
           }
         }
       }
-  
+
       // We failed at eliminating bands, add stretch to our programs and try again
       if(successfulPrepare && mustElimBands) {
         AddToPipeline("cubeatt", "~PIPELINE_RESERVED_FOR_BANDS~");
@@ -162,7 +162,7 @@ namespace Isis {
    * This method executes the pipeline. When you're ready to start your proc
    * program, call this method.
    */
-  void Pipeline::Run(){
+  void Pipeline::Run() {
     // Prepare the pipeline programs
     Prepare();
 
@@ -174,7 +174,7 @@ namespace Isis {
         for(int j = 0; j < (int)params.size(); j++) {
 
           // check for non-program run special strings
-          iString special(params[j].substr(0,7));
+          iString special(params[j].substr(0, 7));
 
           // If ">>LIST", then we need to make a list file
           if(special == ">>LIST ") {
@@ -211,11 +211,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the original input file. This file is the first 
-   * program's input, and the virtual bands will be taken directly from this 
-   * parameter. 
-   * 
-   * @param inputParam The parameter to get from the user interface that contains 
+   * This method is used to set the original input file. This file is the first
+   * program's input, and the virtual bands will be taken directly from this
+   * parameter.
+   *
+   * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
    */
   void Pipeline::SetInputFile(const iString &inputParam) {
@@ -227,10 +227,10 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the original input file. No virtual bands will 
-   * be read, and the inputFile parameter will be read as a path to a file instead 
-   * of as a parameter. 
-   * 
+   * This method is used to set the original input file. No virtual bands will
+   * be read, and the inputFile parameter will be read as a path to a file instead
+   * of as a parameter.
+   *
    * @param inputParam A filename object containing the location of the input file
    */
   void Pipeline::SetInputFile(const Filename &inputFile) {
@@ -241,17 +241,17 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the original input files. These files are the 
+   * This method is used to set the original input files. These files are the
    * first program's input, a branch will be added for every line in the file, and
-   * the virtual bands will be taken directly from this parameter. 
-   * 
-   * @param inputParam The parameter to get from the user interface that contains 
+   * the virtual bands will be taken directly from this parameter.
+   *
+   * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
    */
   void Pipeline::SetInputListFile(const iString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
 
-    TextFile filelist( Filename(ui.GetFilename(inputParam)).Expanded() );
+    TextFile filelist(Filename(ui.GetFilename(inputParam)).Expanded());
     string filename;
     int branch = 1;
 
@@ -269,13 +269,13 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the original input files. These files are the 
+   * This method is used to set the original input files. These files are the
    * first program's input, a branch will be added for every line in the file.
-   * 
+   *
    * @param inputParam The filename of the list file contains the input files
    */
   void Pipeline::SetInputListFile(const Filename &inputFilename) {
-    TextFile filelist( inputFilename.Expanded() );
+    TextFile filelist(inputFilename.Expanded());
     string filename;
     int branch = 1;
 
@@ -293,12 +293,12 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the original input file. This file is the first 
-   * program's input. 
-   * 
-   * @param inputParam The parameter to get from the user interface that contains 
+   * This method is used to set the original input file. This file is the first
+   * program's input.
+   *
+   * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
-   * @param virtualBandsParam The parameter to get from the user interface that 
+   * @param virtualBandsParam The parameter to get from the user interface that
    *                          contains the virtual bands list; internal default is
    *                          supported. Empty string if no virtual bands
    *                          parameter exists.
@@ -318,12 +318,12 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the final output file. If no programs generate 
-   * output, the final output file will not be used. If the output file was not 
-   * entered, one will be generated automatically and placed into the current 
-   * working folder. 
-   * 
-   * @param outputParam The parameter to get from the user interface that contains 
+   * This method is used to set the final output file. If no programs generate
+   * output, the final output file will not be used. If the output file was not
+   * entered, one will be generated automatically and placed into the current
+   * working folder.
+   *
+   * @param outputParam The parameter to get from the user interface that contains
    *                    the output file; internal default is supported.
    */
   void Pipeline::SetOutputFile(const iString &outputParam) {
@@ -337,11 +337,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the final output file. If no programs generate 
-   * output, the final output file will not be used. If the output file was not 
-   * entered, one will be generated automatically and placed into the current 
+   * This method is used to set the final output file. If no programs generate
+   * output, the final output file will not be used. If the output file was not
+   * entered, one will be generated automatically and placed into the current
    * working folder.
-   * 
+   *
    * @param outputFile The filename of the output file; NOT the parameter name.
    */
   void Pipeline::SetOutputFile(const Filename &outputFile) {
@@ -351,11 +351,11 @@ namespace Isis {
 
 
   /**
-   * This method is used to set an output list file. Basically, this means the 
-   * output filenames are specified in the list file. Internal defaults/automatic 
-   * name calculations are supported. 
-   * 
-   * @param outputFilenameList Parameter name containing the path to the output 
+   * This method is used to set an output list file. Basically, this means the
+   * output filenames are specified in the list file. Internal defaults/automatic
+   * name calculations are supported.
+   *
+   * @param outputFilenameList Parameter name containing the path to the output
    *                           list file
    */
   void Pipeline::SetOutputListFile(const iString &outputFilenameParam) {
@@ -378,15 +378,15 @@ namespace Isis {
 
 
   /**
-   * This method is used to set an output list file. Basically, this means the 
-   * output filenames are specified in the list file.  
-   * 
+   * This method is used to set an output list file. Basically, this means the
+   * output filenames are specified in the list file.
+   *
    * @param outputFilenameList List file with output cube names
    */
   void Pipeline::SetOutputListFile(const Filename &outputFilenameList) {
     p_finalOutput.clear();
 
-    TextFile filelist( outputFilenameList.Expanded() );
+    TextFile filelist(outputFilenameList.Expanded());
     string filename;
 
     while(filelist.GetLineNoFilter(filename)) {
@@ -398,10 +398,10 @@ namespace Isis {
 
 
   /**
-   * Set whether or not to keep temporary files (files generated in the middle of 
-   * the pipeline that are neither the original input nor the final output). 
-   * 
-   * @param keep True means don't delete, false means delete. 
+   * Set whether or not to keep temporary files (files generated in the middle of
+   * the pipeline that are neither the original input nor the final output).
+   *
+   * @param keep True means don't delete, false means delete.
    */
   void Pipeline::KeepTemporaryFiles(bool keep) {
     p_keepTemporary = keep;
@@ -409,12 +409,12 @@ namespace Isis {
 
 
   /**
-   * Add a new program to the pipeline. This method must be called before calling 
+   * Add a new program to the pipeline. This method must be called before calling
    * Pipeline::Application(...) to access it. The string identifier will access
    * this program.
-   * 
-   * @param appname The name of the new application 
-   * @param identifier The program's identifier for when calling 
+   *
+   * @param appname The name of the new application
+   * @param identifier The program's identifier for when calling
    *                   Pipeline::Application
    */
   void Pipeline::AddToPipeline(const iString &appname, const iString &identifier) {
@@ -433,8 +433,8 @@ namespace Isis {
     if(p_addedCubeatt) {
       cubeAtt = p_apps[p_apps.size()-1];
       cubeAttId = p_appIdentifiers[p_appIdentifiers.size()-1];
-      p_apps.resize(p_apps.size()-1);
-      p_appIdentifiers.resize(p_appIdentifiers.size()-1);
+      p_apps.resize(p_apps.size() - 1);
+      p_appIdentifiers.resize(p_appIdentifiers.size() - 1);
       p_apps[p_apps.size()-1]->SetNext(NULL);
     }
 
@@ -447,7 +447,7 @@ namespace Isis {
     }
 
     p_appIdentifiers.push_back(identifier);
-    
+
     // If we have stretch, put it back where it belongs
     if(cubeAtt) {
       p_apps[p_apps.size()-1]->SetNext(cubeAtt);
@@ -459,10 +459,10 @@ namespace Isis {
 
 
   /**
-   * Add a new program to the pipeline. This method must be called before calling 
-   * Pipeline::Application(...) to access it. The string used to access this 
-   * program will be the program's name. 
-   * 
+   * Add a new program to the pipeline. This method must be called before calling
+   * Pipeline::Application(...) to access it. The string used to access this
+   * program will be the program's name.
+   *
    * @param appname The name of the new application
    */
   void Pipeline::AddToPipeline(const iString &appname) {
@@ -481,8 +481,8 @@ namespace Isis {
     if(p_addedCubeatt) {
       cubeAtt = p_apps[p_apps.size()-1];
       cubeAttId = p_appIdentifiers[p_appIdentifiers.size()-1];
-      p_apps.resize(p_apps.size()-1);
-      p_appIdentifiers.resize(p_appIdentifiers.size()-1);
+      p_apps.resize(p_apps.size() - 1);
+      p_appIdentifiers.resize(p_appIdentifiers.size() - 1);
       p_apps[p_apps.size()-1]->SetNext(NULL);
     }
 
@@ -495,7 +495,7 @@ namespace Isis {
     }
 
     p_appIdentifiers.push_back(appname);
-    
+
     // If we have stretch, put it back where it belongs
     if(cubeAtt) {
       p_apps[p_apps.size()-1]->SetNext(cubeAtt);
@@ -507,12 +507,12 @@ namespace Isis {
 
 
   /**
-   * This is an accessor to get a specific PipelineApplication. This is the 
-   * recommended accessor. 
-   * 
+   * This is an accessor to get a specific PipelineApplication. This is the
+   * recommended accessor.
+   *
    * @param identifier The identifier (usually name) of the application to access,
    *                such as "spiceinit"
-   * 
+   *
    * @return PipelineApplication& The application's representation in the pipeline
    */
   PipelineApplication &Pipeline::Application(const iString &identifier) {
@@ -530,7 +530,7 @@ namespace Isis {
 
     if(!found) {
       iString msg = "Application identified by [" + identifier + "] has not been added to the pipeline";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     return *p_apps[index];
@@ -538,17 +538,17 @@ namespace Isis {
 
 
   /**
-   * This is an accessor to get a specific PipelineApplication. This accessor is 
-   * mainly in place for the output operator; it is not recommended. 
-   * 
+   * This is an accessor to get a specific PipelineApplication. This accessor is
+   * mainly in place for the output operator; it is not recommended.
+   *
    * @param index The index of the pipeline application
-   * 
+   *
    * @return PipelineApplication& The pipeline application
    */
   PipelineApplication &Pipeline::Application(const int &index) {
     if(index > Size()) {
       iString msg = "Index [" + iString(index) + "] out of bounds";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     return *p_apps[index];
@@ -556,11 +556,11 @@ namespace Isis {
 
 
   /**
-   * This method disables all applications up to this one. Effectively, the 
-   * application specified becomes the first application. This is not a guarantee 
+   * This method disables all applications up to this one. Effectively, the
+   * application specified becomes the first application. This is not a guarantee
    * that the application specified is enabled, it only guarantees no applications
-   * before it will be run. 
-   * 
+   * before it will be run.
+   *
    * @param appname The program to start with
    */
   void Pipeline::SetFirstApplication(const iString &appname) {
@@ -577,11 +577,11 @@ namespace Isis {
 
 
   /**
-   * This method disables all applications after to this one. Effectively, the 
-   * application specified becomes the last application. This is not a guarantee 
+   * This method disables all applications after to this one. Effectively, the
+   * application specified becomes the last application. This is not a guarantee
    * that the application specified is enabled, it only guarantees no applications
-   * after it will be run. 
-   * 
+   * after it will be run.
+   *
    * @param appname The program to end with
    */
   void Pipeline::SetLastApplication(const iString &appname) {
@@ -598,16 +598,16 @@ namespace Isis {
 
 
   /**
-   * This gets the final output for the specified branch; this is necessary for 
-   * the PipelineApplications to calculate the correct outputs to use. 
-   * 
+   * This gets the final output for the specified branch; this is necessary for
+   * the PipelineApplications to calculate the correct outputs to use.
+   *
    * @param branch Branch index to get the final output for
    * @param addModifiers Whether or not to add the last name modifier
-   * 
+   *
    * @return iString The final output string
    */
   iString Pipeline::FinalOutput(int branch, bool addModifiers) {
-    iString output = ((p_finalOutput.size() != 0)? p_finalOutput[0] : "");
+    iString output = ((p_finalOutput.size() != 0) ? p_finalOutput[0] : "");
 
     if(p_apps.size() == 0) return output;
 
@@ -653,16 +653,16 @@ namespace Isis {
 
         if(addModifiers && p_finalOutput.size() > 1)
           output += "." + last->OutputNameModifier();
-        
+
         output += "." + last->OutputExtension();
       }
     }
     else if(addModifiers) {
       PipelineApplication *last = p_apps[p_apps.size()-1];
       if(!last->Enabled()) last = last->Previous();
-    
+
       output = Filename(p_finalOutput[0]).Path() + "/" +
-               Filename(p_finalOutput[0]).Basename() + "." + 
+               Filename(p_finalOutput[0]).Basename() + "." +
                last->OutputBranches()[branch] + ".";
 
       if(p_finalOutput.size() > 1) {
@@ -671,15 +671,15 @@ namespace Isis {
 
       output += last->OutputExtension();
     }
-    
+
     return output;
   }
 
 
   /**
-   * This method returns the user's temporary folder for temporary files. It's 
-   * simply a conveinient accessor to the user's preferences. 
-   * 
+   * This method returns the user's temporary folder for temporary files. It's
+   * simply a conveinient accessor to the user's preferences.
+   *
    * @return iString The temporary folder
    */
   iString Pipeline::TemporaryFolder() {
@@ -691,7 +691,7 @@ namespace Isis {
   /**
    * This method re-enables all applications. This resets the effects of
    * PipelineApplication::Disable, SetFirstApplication and SetLastApplication.
-   * 
+   *
    */
   void Pipeline::EnableAllApplications() {
     for(int i = 0; i < Size(); i++) {
@@ -701,29 +701,29 @@ namespace Isis {
 
 
   /**
-   * This is the output operator for a Pipeline, which enables things such as: 
-   * @code 
-   *   Pipeline p; 
+   * This is the output operator for a Pipeline, which enables things such as:
+   * @code
+   *   Pipeline p;
    *   cout <<  p << endl;
    * @endcode
-   * 
-   * @param os The output stream (usually cout) 
+   *
+   * @param os The output stream (usually cout)
    * @param pipeline The pipeline object to output
-   * 
+   *
    * @return ostream& The modified output stream
    */
   ostream &operator<<(ostream &os, Pipeline &pipeline) {
     pipeline.Prepare();
 
     if(!pipeline.Name().empty()) {
-      os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" <<endl;
+      os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" << endl;
     }
 
     for(int i = 0; i < pipeline.Size(); i++) {
       if(pipeline.Application(i).Enabled()) {
         const vector<iString> &params = pipeline.Application(i).ParamString();
         for(int j = 0; j < (int)params.size(); j++) {
-          iString special(params[j].substr(0,7));
+          iString special(params[j].substr(0, 7));
           if(special == ">>LIST ") {
             iString cmd = params[j].substr(7);
             iString file = cmd.Token(" ");
@@ -748,7 +748,7 @@ namespace Isis {
     }
 
     if(!pipeline.Name().empty()) {
-      os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" <<endl;
+      os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" << endl;
     }
 
     return os;

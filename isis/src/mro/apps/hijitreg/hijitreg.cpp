@@ -22,7 +22,7 @@
 #include "SerialNumber.h"
 #include "ControlMeasure.h"
 #include "iTime.h"
-                           
+
 using namespace std;
 using namespace Isis;
 
@@ -70,7 +70,7 @@ void IsisMain() {
 
 //  Open the shift definitions file
   Pvl shiftdef;
-  if (ui.WasEntered("SHIFTDEF")) {
+  if(ui.WasEntered("SHIFTDEF")) {
     shiftdef.Read(ui.GetFilename("SHIFTDEF"));
   }
   else {
@@ -87,7 +87,7 @@ void IsisMain() {
   trans.SetVirtualBands(bandTrans);
   trans.OpenCube(ui.GetFilename("FROM"), stitch);
 
- 
+
   // Open the second cube, it is held in place.  We will be matching the
   // first to this one by attempting to compute a sample/line translation
   HiJitCube match;
@@ -97,18 +97,18 @@ void IsisMain() {
   match.OpenCube(ui.GetFilename("MATCH"), stitch);
 
 //  Ensure only one band
-  if ((trans.Bands() != 1) || (match.Bands() != 1)) {
+  if((trans.Bands() != 1) || (match.Bands() != 1)) {
     string msg = "Input Cubes must have only one band!";
-    throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
 //  Now test compatability (basically summing)
   trans.Compatable(match);
 
 //  Determine intersection
-  if (!trans.intersects(match)) {
+  if(!trans.intersects(match)) {
     string msg = "Input Cubes do not overlap!";
-    throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
 //  Get overlapping regions of each cube
@@ -120,13 +120,13 @@ void IsisMain() {
   cout << "FROM Poly:  " << trans.PolyToString() << std::endl;
   cout << "MATCH Poly: " << match.PolyToString() << std::endl;
   cout << "From Overlap:  (" << fcorns.topLeft.sample << ","
-                             << fcorns.topLeft.line   << "), ("
-                             << fcorns.lowerRight.sample << "," 
-                             << fcorns.lowerRight.line << ")\n" ;
+       << fcorns.topLeft.line   << "), ("
+       << fcorns.lowerRight.sample << ","
+       << fcorns.lowerRight.line << ")\n" ;
   cout << "Match Overlap: (" << mcorns.topLeft.sample << ","
-                             << mcorns.topLeft.line   << "), ("
-                             << mcorns.lowerRight.sample << "," 
-                             << mcorns.lowerRight.line << ")\n" ;
+       << mcorns.topLeft.line   << "), ("
+       << mcorns.lowerRight.sample << ","
+       << mcorns.lowerRight.line << ")\n" ;
 #endif
 
 
@@ -145,7 +145,7 @@ void IsisMain() {
   // Get row and column variables, if not entered, default to 1% of the input
   // image size
   int rows(1), cols(1);
-  if (ui.WasEntered("ROWS")) {
+  if(ui.WasEntered("ROWS")) {
     rows = ui.GetInteger("ROWS");
   }
   else {
@@ -153,7 +153,7 @@ void IsisMain() {
   }
 
   cols = ui.GetInteger("COLUMNS");
-  if (cols == 0) {
+  if(cols == 0) {
     cols = (int)(((fsamps - 1.0) / ar->SearchChip()->Samples()) + 1);
   }
 
@@ -204,38 +204,38 @@ void IsisMain() {
   // Loop through grid of points and get statistics to compute
   // translation values
   RegList reglist;
-  double fline0(fcorns.topLeft.line-1.0), fsamp0(fcorns.topLeft.sample-1.0);
-  double mline0(mcorns.topLeft.line-1.0), msamp0(mcorns.topLeft.sample-1.0);
+  double fline0(fcorns.topLeft.line - 1.0), fsamp0(fcorns.topLeft.sample - 1.0);
+  double mline0(mcorns.topLeft.line - 1.0), msamp0(mcorns.topLeft.sample - 1.0);
 
-  for (int r=0; r<rows; r++) {
+  for(int r = 0; r < rows; r++) {
     int line = (int)(lSpacing / 2.0 + lSpacing * r + 0.5);
-    for (int c=0; c<cols; c++) {
+    for(int c = 0; c < cols; c++) {
       int samp = (int)(sSpacing / 2.0 + sSpacing * c + 0.5);
 
-      ar->PatternChip()->TackCube(msamp0+samp, mline0+line);
+      ar->PatternChip()->TackCube(msamp0 + samp, mline0 + line);
       ar->PatternChip()->Load(match);
-      ar->SearchChip()->TackCube(fsamp0+samp, fline0+line);
+      ar->SearchChip()->TackCube(fsamp0 + samp, fline0 + line);
       ar->SearchChip()->Load(trans);
 
-     // Set up ControlMeasure for cube to translate
+      // Set up ControlMeasure for cube to translate
       ControlMeasure cmTrans;
       cmTrans.SetCubeSerialNumber(transSN);
-      cmTrans.SetCoordinate(msamp0+samp, mline0+line, 
+      cmTrans.SetCoordinate(msamp0 + samp, mline0 + line,
                             ControlMeasure::Unmeasured);
       cmTrans.SetChooserName("hijitreg");
       cmTrans.SetReference(false);
 
-      // Set up ControlMeasure for the pattern/Match cube 
+      // Set up ControlMeasure for the pattern/Match cube
       ControlMeasure cmMatch;
       cmMatch.SetCubeSerialNumber(matchSN);
-      cmMatch.SetCoordinate(fsamp0+samp, fline0+line, 
+      cmMatch.SetCoordinate(fsamp0 + samp, fline0 + line,
                             ControlMeasure::Automatic);
       cmMatch.SetChooserName("hijitreg");
       cmMatch.SetReference(true);
 
 
       // Match found
-      if (ar->Register()==AutoReg::Success) {
+      if(ar->Register() == AutoReg::Success) {
         RegData reg;
         reg.fLine = fline0 + line;
         reg.fSamp = fsamp0 + samp;
@@ -248,15 +248,15 @@ void IsisMain() {
         reg.regCorr = ar->GoodnessOfFit();
 
 
-        if (fabs(reg.regCorr) > 1.0) jparms.nSuspects++;
+        if(fabs(reg.regCorr) > 1.0) jparms.nSuspects++;
 
         double sDiff = reg.fSamp - reg.regSamp;
         double lDiff = reg.fLine - reg.regLine;
-        jparms.sStats.AddData(&sDiff,(unsigned int)1);
-        jparms.lStats.AddData(&lDiff,(unsigned int)1);
+        jparms.sStats.AddData(&sDiff, (unsigned int)1);
+        jparms.lStats.AddData(&lDiff, (unsigned int)1);
 
 //  Record the translation in the control point
-        cmTrans.SetCoordinate(ar->CubeSample(), ar->CubeLine(), 
+        cmTrans.SetCoordinate(ar->CubeSample(), ar->CubeLine(),
                               ControlMeasure::Automatic);
         cmTrans.SetError(sDiff, lDiff);
         cmTrans.SetGoodnessOfFit(ar->GoodnessOfFit());
@@ -281,10 +281,10 @@ void IsisMain() {
 #endif
 
           MultivariateStatistics mstats;
-          for (int line = 1 ; line <= fchip.Lines() ; line++) {
+          for(int line = 1 ; line <= fchip.Lines() ; line++) {
             for(int sample = 1; sample < fchip.Samples(); sample++) {
-              double fchipValue = fchip.GetValue(sample,line);
-              double pchipValue = pchip.GetValue(sample,line);
+              double fchipValue = fchip.GetValue(sample, line);
+              double pchipValue = pchip.GetValue(sample, line);
               mstats.AddData(&fchipValue, &pchipValue, 1);
             }
           }
@@ -292,14 +292,14 @@ void IsisMain() {
 //  Get regression and correlation values
           mstats.LinearRegression(reg.B0, reg.B1);
           reg.Bcorr = mstats.Correlation();
-          if (IsSpecial(reg.B0)) throw 1;
-          if (IsSpecial(reg.B1)) throw 2;
-          if (IsSpecial(reg.Bcorr)) throw 3;
-        } 
-        catch (...) {
+          if(IsSpecial(reg.B0)) throw 1;
+          if(IsSpecial(reg.B1)) throw 2;
+          if(IsSpecial(reg.Bcorr)) throw 3;
+        }
+        catch(...) {
 //  If fails, flag this condition
           reg.B0 = 0.0;
-          reg.B1= 0.0;
+          reg.B1 = 0.0;
           reg.Bcorr = 0.0;
         }
 
@@ -312,7 +312,7 @@ void IsisMain() {
       cp.SetType(ControlPoint::Tie);
       cp.Add(cmTrans);
       cp.Add(cmMatch);
-      if (!cmTrans.IsMeasured()) cp.SetIgnore(true);
+      if(!cmTrans.IsMeasured()) cp.SetIgnore(true);
       cn.Add(cp);
       prog.CheckStatus();
     }
@@ -321,16 +321,16 @@ void IsisMain() {
   // If flatfile was entered, create the flatfile
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
-  if (ui.WasEntered("FLATFILE")) {
+  if(ui.WasEntered("FLATFILE")) {
     string fFile = ui.GetFilename("FLATFILE");
     ofstream os;
     string fFileExpanded = Filename(fFile).Expanded();
-    os.open(fFileExpanded.c_str(),ios::out);
+    os.open(fFileExpanded.c_str(), ios::out);
     dumpResults(os, reglist, jparms, *ar);
   }
 
   // If a cnet file was entered, write the ControlNet pvl to the file
-  if (ui.WasEntered("CNETFILE")) {
+  if(ui.WasEntered("CNETFILE")) {
     cn.Write(ui.GetFilename("CNETFILE"));
   }
 
@@ -341,31 +341,31 @@ void IsisMain() {
 
   // Write translation to log
   PvlGroup results("AverageTranslation");
-  if (jparms.sStats.ValidPixels() > 0) {
+  if(jparms.sStats.ValidPixels() > 0) {
     double sTrans = (int)(jparms.sStats.Average() * 100.0) / 100.0;
     double lTrans = (int)(jparms.lStats.Average() * 100.0) / 100.0;
-    results += PvlKeyword ("Sample",sTrans);
-    results += PvlKeyword ("Line",lTrans);
-    results += PvlKeyword ("NSuspects",jparms.nSuspects);
+    results += PvlKeyword("Sample", sTrans);
+    results += PvlKeyword("Line", lTrans);
+    results += PvlKeyword("NSuspects", jparms.nSuspects);
   }
   else {
-    results += PvlKeyword ("Sample","NULL");
-    results += PvlKeyword ("Line","NULL");
+    results += PvlKeyword("Sample", "NULL");
+    results += PvlKeyword("Line", "NULL");
   }
 
   Application::Log(results);
 
   // add the auto registration information to print.prt
-  PvlGroup autoRegTemplate = ar->RegTemplate(); 
-  Application::Log(autoRegTemplate); 
+  PvlGroup autoRegTemplate = ar->RegTemplate();
+  Application::Log(autoRegTemplate);
 
   return;
 }
 
 
-static ostream &dumpResults(ostream &out, const RegList &regs, 
+static ostream &dumpResults(ostream &out, const RegList &regs,
                             const JitterParms &jparms, const AutoReg &ar) {
-                                                       
+
   std::ios::fmtflags oldFlags = out.flags();
   out.setf(std::ios::fixed);
 
@@ -388,20 +388,20 @@ static ostream &dumpResults(ostream &out, const RegList &regs,
   out << "#    Summing:     " << fJit.summing << endl;
   out << "#    TdiMode:     " << fJit.tdiMode << endl;
   out << "#    Channel:     " << fJit.channelNumber << endl;
-  out << "#    LineRate:    " << setprecision(8) << fJit.linerate 
-                              << " <seconds>" << endl;
-  out << "#    TopLeft:     " << setw(7) << setprecision(0) 
-                              << fcorns.topLeft.sample << " " 
-                              << setw(7) << setprecision(0) 
-                              << fcorns.topLeft.line << endl;
-  out << "#    LowerRight:  " << setw(7) << setprecision(0) 
-                              << fcorns.lowerRight.sample << " " 
-                              << setw(7) << setprecision(0) 
-                              << fcorns.lowerRight.line << endl;
+  out << "#    LineRate:    " << setprecision(8) << fJit.linerate
+      << " <seconds>" << endl;
+  out << "#    TopLeft:     " << setw(7) << setprecision(0)
+      << fcorns.topLeft.sample << " "
+      << setw(7) << setprecision(0)
+      << fcorns.topLeft.line << endl;
+  out << "#    LowerRight:  " << setw(7) << setprecision(0)
+      << fcorns.lowerRight.sample << " "
+      << setw(7) << setprecision(0)
+      << fcorns.lowerRight.line << endl;
   out << "#    StartTime:   " << fJit.UTCStartTime << " <UTC>" << endl;
   out << "#    SCStartTime: " << fJit.scStartTime << " <SCLK>" << endl;
-  out << "#    StartTime:   " << setprecision(8) << fJit.obsStartTime 
-                              << " <seconds>" << endl;
+  out << "#    StartTime:   " << setprecision(8) << fJit.obsStartTime
+      << " <seconds>" << endl;
   out << "\n";
   out << "#  MATCH: " << mJit.filename << endl;
   out << "#    Lines:       " << setprecision(0) << mJit.lines << endl;
@@ -413,43 +413,43 @@ static ostream &dumpResults(ostream &out, const RegList &regs,
   out << "#    Summing:     " << mJit.summing << endl;
   out << "#    TdiMode:     " << mJit.tdiMode << endl;
   out << "#    Channel:     " << mJit.channelNumber << endl;
-  out << "#    LineRate:    " << setprecision(8) << mJit.linerate 
-                              << " <seconds>" << endl;
-  out << "#    TopLeft:     " << setw(7) << setprecision(0) 
-                              << mcorns.topLeft.sample << " " 
-                              << setw(7) << setprecision(0) 
-                              << mcorns.topLeft.line << endl;
-  out << "#    LowerRight:  " << setw(7) << setprecision(0) 
-                              << mcorns.lowerRight.sample  << " "  
-                              << setw(7) << setprecision(0) 
-                              << mcorns.lowerRight.line << endl;
+  out << "#    LineRate:    " << setprecision(8) << mJit.linerate
+      << " <seconds>" << endl;
+  out << "#    TopLeft:     " << setw(7) << setprecision(0)
+      << mcorns.topLeft.sample << " "
+      << setw(7) << setprecision(0)
+      << mcorns.topLeft.line << endl;
+  out << "#    LowerRight:  " << setw(7) << setprecision(0)
+      << mcorns.lowerRight.sample  << " "
+      << setw(7) << setprecision(0)
+      << mcorns.lowerRight.line << endl;
   out << "#    StartTime:   " << mJit.UTCStartTime << " <UTC>" << endl;
   out << "#    SCStartTime: " << mJit.scStartTime << " <SCLK>" << endl;
-  out << "#    StartTime:   " << setprecision(8) << mJit.obsStartTime 
-                              << " <seconds>" << endl;
+  out << "#    StartTime:   " << setprecision(8) << mJit.obsStartTime
+      << " <seconds>" << endl;
   out << "\n";
 
   double nlines(fcorns.lowerRight.line - fcorns.topLeft.line + 1);
   double nsamps(fcorns.lowerRight.sample - fcorns.topLeft.sample + 1);
   out << "\n#  **** Registration Data ****\n";
   out << "#   RegFile: " << jparms.regFile << endl;
-  out << "#   OverlapSize:      " << setw(7) << (int) nsamps << " " 
-                                  << setw(7) << (int) nlines << "\n";
+  out << "#   OverlapSize:      " << setw(7) << (int) nsamps << " "
+      << setw(7) << (int) nlines << "\n";
   out << "#   Sample Spacing:   " << setprecision(1) << jparms.sSpacing << endl;
   out << "#   Line Spacing:     " << setprecision(1) << jparms.lSpacing << endl;
   out << "#   Columns, Rows:    " << jparms.cols << " " << jparms.rows << endl;
   out << "#   Corr. Algorithm:  " << ar.AlgorithmName() << endl;
   out << "#   Corr. Tolerance:  " << setprecision(2) << ar.Tolerance() << endl;
-  out << "#   Total Registers:  " << regs.size() << " of " 
+  out << "#   Total Registers:  " << regs.size() << " of "
       << (jparms.rows * jparms.cols) << endl;
   out << "#   Number Suspect:   " << jparms.nSuspects << endl;
-  if (jparms.sStats.ValidPixels() > 0) {
-    out << "#   Average Sample Offset: " << setprecision(4) 
-                                        << jparms.sStats.Average() 
+  if(jparms.sStats.ValidPixels() > 0) {
+    out << "#   Average Sample Offset: " << setprecision(4)
+        << jparms.sStats.Average()
         << "  StdDev: " << setprecision(4) << jparms.sStats.StandardDeviation()
         << endl;
-    out << "#   Average Line Offset:   " << setprecision(4) 
-                                        << jparms.lStats.Average() 
+    out << "#   Average Line Offset:   " << setprecision(4)
+        << jparms.lStats.Average()
         << " StdDev: " << setprecision(4) << jparms.lStats.StandardDeviation()
         << endl;
   }
@@ -461,13 +461,13 @@ static ostream &dumpResults(ostream &out, const RegList &regs,
   out << "\n#  Column Headers and Data\n";
 
 //  Write headers
-  out 
+  out
       << setw(20) << "FromTime"
       << setw(10) << "FromSamp"
       << setw(10) << "FromLine"
       << setw(20) << "MatchTime"
       << setw(10) << "MatchSamp"
-      << setw(10) << "MatchLine" 
+      << setw(10) << "MatchLine"
       << setw(15) << "RegSamp"
       << setw(15) << "RegLine"
       << setw(10) << "RegCorr"
@@ -475,9 +475,9 @@ static ostream &dumpResults(ostream &out, const RegList &regs,
       << setw(15) << "B1_Slope"
       << setw(10) << "B_RCorr"
       << endl;
-  
+
   RegList::const_iterator reg;
-  for (reg = regs.begin() ; reg != regs.end() ; ++reg) {
+  for(reg = regs.begin() ; reg != regs.end() ; ++reg) {
     out << setw(20) << setprecision(8) << reg->fLTime
         << setw(10) << setprecision(0) << reg->fSamp
         << setw(10) << setprecision(0) << reg->fLine
@@ -486,7 +486,7 @@ static ostream &dumpResults(ostream &out, const RegList &regs,
         << setw(10) << setprecision(0) << reg->mLine
         << setw(15) << setprecision(4) << reg->regSamp
         << setw(15) << setprecision(4) << reg->regLine
-        << setw(10) << setprecision(6) << reg->regCorr 
+        << setw(10) << setprecision(6) << reg->regCorr
         << setw(15) << setprecision(6) << reg->B0
         << setw(15) << setprecision(6) << reg->B1
         << setw(10) << setprecision(6) << reg->Bcorr

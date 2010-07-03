@@ -4,8 +4,8 @@
 
 #include "FramingCamera.h"
 
-namespace Cassini { 
-  /**                                                                       
+namespace Cassini {
+  /**
    * @brief Cassini ISS Narrow Angle Camera class
    *
    * This is the camera class for the IssNACamera
@@ -31,8 +31,8 @@ namespace Cassini {
    */
   class IssNACamera : public Isis::FramingCamera {
     public:
-      IssNACamera (Isis::Pvl &lab);
-      ~IssNACamera () {};      
+      IssNACamera(Isis::Pvl &lab);
+      ~IssNACamera() {};
   };
 };
 #endif

@@ -3,13 +3,13 @@
 #include "Camera.h"
 #include "SpecialPixel.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
 Camera *cam;
 
-void doIt (Buffer &in, Buffer &out);
+void doIt(Buffer &in, Buffer &out);
 
 enum OutputType {
   Lat,
@@ -46,13 +46,13 @@ void IsisMain() {
   else if(format == "LINE") {
     OutputFormat = Line;
   }
-  
+
   p.StartProcess(doIt);
   p.EndProcess();
 }
 
 // Line processing routine
-void doIt (Buffer &in, Buffer &out) {
+void doIt(Buffer &in, Buffer &out) {
   if(in.Line() == 1) {
     cam->SetBand(in.Band());
   }
@@ -85,7 +85,7 @@ void doIt (Buffer &in, Buffer &out) {
       else {
         double deltaS = cam->Sample() - samp;
         double deltaL = cam->Line() - in.Line();
-        out[samp] = pow( deltaS*deltaS + deltaL*deltaL, 0.5);
+        out[samp] = pow(deltaS * deltaS + deltaL * deltaL, 0.5);
       }
 
     }

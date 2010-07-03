@@ -8,18 +8,18 @@ class QStatusBar;
 
 namespace Qisis {
   class MosaicTrackTool : public Qisis::MosaicTool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      MosaicTrackTool (QStatusBar *parent);
+      MosaicTrackTool(QStatusBar *parent);
       void updateLabels(QPointF p);
 
     public slots:
       virtual void mouseMove(QPoint p);
       virtual void mouseLeave();
-     
+
     private:
-      
+
       void clearLabels();
       QStatusBar *p_sbar;   //!< Status bar
       QLabel *p_latLabel;  //!< Latitude label

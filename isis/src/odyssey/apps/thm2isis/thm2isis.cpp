@@ -22,8 +22,7 @@ int frameletLines;
 void TranslateLabels(Pvl &labelFile, Pvl &isis3, int numBands);
 void separateFrames(Buffer &in);
 
-void IsisMain()
-{
+void IsisMain() {
   // Grab the file to import
   ProcessImportPds p;
   outputCubes.clear();
@@ -33,8 +32,7 @@ void IsisMain()
 
   // Make sure it is a Themis EDR/RDR
   bool projected;
-  try
-  {
+  try {
     Pvl lab(in.Expanded());
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
     iString id;
@@ -42,14 +40,12 @@ void IsisMain()
     id.ConvertWhiteSpace();
     id.Compress();
     id.Trim(" ");
-    if(id.find("ODY-M-THM") == string::npos)
-    {
+    if(id.find("ODY-M-THM") == string::npos) {
       string msg = "Invalid DATA_SET_ID [" + id + "]";
       throw iException::Message(iException::Pvl, msg, _FILEINFO_);
     }
   }
-  catch(iException &e)
-  {
+  catch(iException &e) {
     string msg = "Input file [" + in.Expanded() +
                  "] does not appear to be " +
                  "in Themis EDR/RDR format";
@@ -57,8 +53,7 @@ void IsisMain()
   }
 
   //Checks if in file is rdr
-  if(projected)
-  {
+  if(projected) {
     string msg = "[" + in.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -77,8 +72,7 @@ void IsisMain()
   Filename outFile(ui.GetFilename("TO"));
   PvlGroup &inst = isis3Lab.FindGroup("Instrument", Pvl::Traverse);
 
-  if((string)inst["InstrumentId"] == "THEMIS_VIS")
-  {
+  if((string)inst["InstrumentId"] == "THEMIS_VIS") {
     Cube *even = new Cube();
     Cube *odd = new Cube();
 
@@ -98,8 +92,7 @@ void IsisMain()
     outputCubes.push_back(odd);
     outputCubes.push_back(even);
   }
-  else
-  {
+  else {
     Cube *outCube = new Cube();
     outCube->SetDimensions(p.Samples(), p.Lines(), p.Bands());
     outCube->SetPixelType(Isis::Real);
@@ -112,14 +105,11 @@ void IsisMain()
   p.StartProcess(separateFrames);
   p.EndProcess();
 
-  for(int i = 0; i < (int)outputCubes.size(); i++)
-  {
-    for(int grp = 0; grp < isis3Lab.Groups(); grp++)
-    {
+  for(int i = 0; i < (int)outputCubes.size(); i++) {
+    for(int grp = 0; grp < isis3Lab.Groups(); grp++) {
 
       // vis image?
-      if(outputCubes.size() != 1)
-      {
+      if(outputCubes.size() != 1) {
         int numFramelets = p.Lines() / frameletLines;
         isis3Lab.FindGroup("Instrument").AddKeyword(
           PvlKeyword("NumFramelets", numFramelets), Pvl::Replace
@@ -143,8 +133,7 @@ void IsisMain()
 }
 
 //! Separates each of the individual VIS frames into their own file
-void separateFrames(Buffer &in)
-{
+void separateFrames(Buffer &in) {
   // (line-1)/frameletHeight % numOutImages
   int outputCube = (in.Line() - 1) / frameletLines % outputCubes.size();
   LineManager mgr(*outputCubes[outputCube]);
@@ -157,15 +146,13 @@ void separateFrames(Buffer &in)
   outputCubes[outputCube]->Write(mgr);
 
   // Null out every other cube
-  for(int i = 0; i < (int)outputCubes.size(); i++)
-  {
+  for(int i = 0; i < (int)outputCubes.size(); i++) {
     if(i == outputCube) continue;
 
     LineManager mgr(*outputCubes[i]);
     mgr.SetLine(in.Line(), in.Band());
 
-    for(int j = 0; j < mgr.size(); j++)
-    {
+    for(int j = 0; j < mgr.size(); j++) {
       mgr[j] = Isis::Null;
     }
 
@@ -173,8 +160,7 @@ void separateFrames(Buffer &in)
   }
 }
 
-void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands)
-{
+void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   // Create the Instrument Group
   PvlGroup inst("Instrument");
   inst += PvlKeyword("SpacecraftName", "MARS_ODYSSEY");
@@ -189,20 +175,17 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands)
                      (string) pdsLab["SpacecraftClockStartCount"]);
 
   PvlObject &sqube = pdsLab.FindObject("SPECTRAL_QUBE");
-  if(instId == "THEMIS_IR")
-  {
+  if(instId == "THEMIS_IR") {
     inst += PvlKeyword("GainNumber", (string)sqube["GainNumber"]);
     inst += PvlKeyword("OffsetNumber", (string)sqube["OffsetNumber"]);
     inst += PvlKeyword("MissingScanLines", (string)sqube["MissingScanLines"]);
     inst += PvlKeyword("TimeDelayIntegration",
                        (string)sqube["TimeDelayIntegrationFlag"]);
-    if(sqube.HasKeyword("SpatialSumming"))
-    {
+    if(sqube.HasKeyword("SpatialSumming")) {
       inst += PvlKeyword("SpatialSumming", (string)sqube["SpatialSumming"]);
     }
   }
-  else
-  {
+  else {
     inst += PvlKeyword("ExposureDuration", (string)sqube["ExposureDuration"]);
     inst += PvlKeyword("InterframeDelay", (string)sqube["InterframeDelay"]);
     inst += PvlKeyword("SpatialSumming", (string)sqube["SpatialSumming"]);
@@ -218,8 +201,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands)
   // Create the Band bin Group
   PvlGroup bandBin("BandBin");
   PvlKeyword originalBand("OriginalBand");
-  for(int i = 1; i <= numBands; i++)
-  {
+  for(int i = 1; i <= numBands; i++) {
     originalBand.AddValue(i);
   }
   bandBin += originalBand;
@@ -251,12 +233,10 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands)
 
   // Create the Kernel Group
   PvlGroup kerns("Kernels");
-  if(instId == "THEMIS_IR")
-  {
+  if(instId == "THEMIS_IR") {
     kerns += PvlKeyword("NaifFrameCode", -53031);
   }
-  else
-  {
+  else {
     kerns += PvlKeyword("NaifFrameCode", -53032);
   }
   isis3.AddGroup(kerns);

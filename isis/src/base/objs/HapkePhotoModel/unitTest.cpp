@@ -7,9 +7,9 @@ using namespace Isis;
 class TestHapke : public HapkePhotoModel {
   public:
     TestHapke(Pvl &alg) : HapkePhotoModel(alg) {}
-  
+
   protected:
-    virtual double PhotoModelAlgorithm(double,double,double) {
+    virtual double PhotoModelAlgorithm(double, double, double) {
       return 0.0;
     }
 };
@@ -25,7 +25,7 @@ int main() {
     TestHapke model(alg);
     std::cout << "SUCCESS" << std::endl;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report(false);
     e.Clear();
   }
@@ -39,14 +39,14 @@ int main() {
     TestHapke model(alg);
     std::cout << "SUCCESS" << std::endl;
     std::cout << std::endl;
-    std::cout << model.PhotoWh() << "," 
-              << model.PhotoHh() << "," 
-              << model.PhotoB0() << "," 
-              << model.PhotoTheta() << "," 
-              << model.Hfunc(1,2) << std::endl; 
+    std::cout << model.PhotoWh() << ","
+              << model.PhotoHh() << ","
+              << model.PhotoB0() << ","
+              << model.PhotoTheta() << ","
+              << model.Hfunc(1, 2) << std::endl;
     std::cout << std::endl;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report(false);
     e.Clear();
   }
@@ -63,14 +63,14 @@ int main() {
     TestHapke model(alg);
     std::cout << "SUCCESS" << std::endl;
     std::cout << std::endl;
-    std::cout << model.PhotoWh() << "," 
-              << model.PhotoHh() << "," 
-              << model.PhotoB0() << "," 
-              << model.PhotoTheta() << "," 
-              << model.Hfunc(1,2) << std::endl; 
+    std::cout << model.PhotoWh() << ","
+              << model.PhotoHh() << ","
+              << model.PhotoB0() << ","
+              << model.PhotoTheta() << ","
+              << model.Hfunc(1, 2) << std::endl;
     std::cout << std::endl;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report(false);
     e.Clear();
   }

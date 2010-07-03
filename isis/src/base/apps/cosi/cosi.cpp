@@ -12,7 +12,7 @@ Camera *cam;
 double maxinc;
 void divide(Buffer &in, Buffer &out);
 
-void IsisMain () {
+void IsisMain() {
 
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM");
@@ -24,18 +24,18 @@ void IsisMain () {
 }
 
 void divide(Buffer &in, Buffer &out) {
-  for (int i=0; i<in.size(); i++) {
-    if (cam->SetImage(i+1,in.Line())) {
-      if (IsSpecial(in[i])) {
+  for(int i = 0; i < in.size(); i++) {
+    if(cam->SetImage(i + 1, in.Line())) {
+      if(IsSpecial(in[i])) {
         out[i] = in[i];
       }
       else {
         double incidence = cam->IncidenceAngle();
-        if (abs(incidence) >= maxinc) {
+        if(abs(incidence) >= maxinc) {
           out[i] = Isis::Null;
         }
         else {
-          out[i] = in[i] / cos(incidence*Isis::PI/180.0);
+          out[i] = in[i] / cos(incidence * Isis::PI / 180.0);
         }
       }
     }

@@ -15,18 +15,18 @@ class cam2map : public Isis::Transform {
 
   public:
     // constructor
-    cam2map (const int inputSamples, const int inputLines, Isis::Camera *incam, 
-             const int outputSamples, const int outputLines, Isis::Projection *outmap,
-             bool trim);
-    
+    cam2map(const int inputSamples, const int inputLines, Isis::Camera *incam,
+            const int outputSamples, const int outputLines, Isis::Projection *outmap,
+            bool trim);
+
     // destructor
-    ~cam2map () {};
+    ~cam2map() {};
 
     // Implementations for parent's pure virtual members
-    bool Xform (double &inSample, double &inLine,
-                    const double outSample, const double outLine);
-    int OutputSamples () const;
-    int OutputLines () const;
+    bool Xform(double &inSample, double &inLine,
+               const double outSample, const double outLine);
+    int OutputSamples() const;
+    int OutputLines() const;
 };
 
 #endif

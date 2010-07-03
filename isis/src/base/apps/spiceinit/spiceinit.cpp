@@ -15,11 +15,11 @@ using namespace std;
 using namespace Isis;
 
 bool TryKernels(Cube *icube, Process &p,
-                Kernel lk, Kernel pck, 
+                Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
-                Kernel fk, Kernel ik, 
-                Kernel sclk, Kernel spk, 
-                Kernel iak, Kernel dem, 
+                Kernel fk, Kernel ik,
+                Kernel sclk, Kernel spk,
+                Kernel iak, Kernel dem,
                 Kernel exk);
 
 void GetUserEnteredKernel(const string &param, Kernel &kernel);
@@ -32,33 +32,34 @@ void IsisMain() {
   Cube *icube = p.SetInputCube(ui.GetFilename("FROM"), cai, ReadWrite);
 
   // Make sure at least one CK & SPK quality was selected
-  if (!ui.GetBoolean("CKPREDICTED") && !ui.GetBoolean("CKRECON") && !ui.GetBoolean("CKSMITHED") && !ui.GetBoolean("CKNADIR")) {
+  if(!ui.GetBoolean("CKPREDICTED") && !ui.GetBoolean("CKRECON") && !ui.GetBoolean("CKSMITHED") && !ui.GetBoolean("CKNADIR")) {
     string msg = "At least one CK quality must be selected";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
-  if (!ui.GetBoolean("SPKPREDICTED") && !ui.GetBoolean("SPKRECON") && !ui.GetBoolean("SPKSMITHED")) {
+  if(!ui.GetBoolean("SPKPREDICTED") && !ui.GetBoolean("SPKRECON") && !ui.GetBoolean("SPKSMITHED")) {
     string msg = "At least one SPK quality must be selected";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   // Make sure it is not projected
   Projection *proj = NULL;
   try {
     proj = icube->Projection();
-  } catch (iException &e) {
+  }
+  catch(iException &e) {
     proj = NULL;
     e.Clear();
   }
 
-  if (proj != NULL) {
+  if(proj != NULL) {
     string msg = "Can not initialize SPICE for a map projected cube";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   Pvl lab = *icube->Label();
 
   // if cube has existing polygon delete it
-  if (icube->Label()->HasObject("Polygon")) {
+  if(icube->Label()->HasObject("Polygon")) {
     icube->Label()->DeleteObject("Polygon");
   }
 
@@ -67,25 +68,25 @@ void IsisMain() {
   string transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
 
   // Get the mission translation manager ready
-  PvlTranslationManager missionXlater (lab, transFile);
+  PvlTranslationManager missionXlater(lab, transFile);
 
   // Get the mission name so we can search the correct DB's for kernels
-  string mission = missionXlater.Translate ("MissionName");
+  string mission = missionXlater.Translate("MissionName");
 
   // Get system base kernels
   unsigned int allowed = 0;
   unsigned int allowedCK = 0;
   unsigned int allowedSPK = 0;
-  if (ui.GetBoolean("CKPREDICTED"))  allowedCK |= spiceInit::kernelTypeEnum("PREDICTED");
-  if (ui.GetBoolean("CKRECON"))      allowedCK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
-  if (ui.GetBoolean("CKSMITHED"))    allowedCK |= spiceInit::kernelTypeEnum("SMITHED");
-  if (ui.GetBoolean("CKNADIR"))      allowedCK |= spiceInit::kernelTypeEnum("NADIR");
-  if (ui.GetBoolean("SPKPREDICTED")) allowedSPK |= spiceInit::kernelTypeEnum("PREDICTED");
-  if (ui.GetBoolean("SPKRECON"))     allowedSPK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
-  if (ui.GetBoolean("SPKSMITHED"))   allowedSPK |= spiceInit::kernelTypeEnum("SMITHED");
-  KernelDb baseKernels (allowed);
-  KernelDb ckKernels (allowedCK);
-  KernelDb spkKernels (allowedSPK);
+  if(ui.GetBoolean("CKPREDICTED"))  allowedCK |= spiceInit::kernelTypeEnum("PREDICTED");
+  if(ui.GetBoolean("CKRECON"))      allowedCK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
+  if(ui.GetBoolean("CKSMITHED"))    allowedCK |= spiceInit::kernelTypeEnum("SMITHED");
+  if(ui.GetBoolean("CKNADIR"))      allowedCK |= spiceInit::kernelTypeEnum("NADIR");
+  if(ui.GetBoolean("SPKPREDICTED")) allowedSPK |= spiceInit::kernelTypeEnum("PREDICTED");
+  if(ui.GetBoolean("SPKRECON"))     allowedSPK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
+  if(ui.GetBoolean("SPKSMITHED"))   allowedSPK |= spiceInit::kernelTypeEnum("SMITHED");
+  KernelDb baseKernels(allowed);
+  KernelDb ckKernels(allowedCK);
+  KernelDb spkKernels(allowedSPK);
 
   baseKernels.LoadSystemDb(mission);
   ckKernels.LoadSystemDb(mission);
@@ -103,7 +104,7 @@ void IsisMain() {
   ck        = ckKernels.SpacecraftPointing(lab);
   spk       = spkKernels.SpacecraftPosition(lab);
 
-  if (ui.GetBoolean("CKNADIR")) {
+  if(ui.GetBoolean("CKNADIR")) {
     // Only add nadir if no spacecraft pointing found
     std::vector<std::string> kernels;
     kernels.push_back("Nadir");
@@ -122,18 +123,19 @@ void IsisMain() {
   GetUserEnteredKernel("EXTRA", exk);
 
   // Get shape kernel
-  if (ui.GetString ("SHAPE") == "USER") {
+  if(ui.GetString("SHAPE") == "USER") {
     GetUserEnteredKernel("MODEL", dem);
-  } else if (ui.GetString("SHAPE") == "SYSTEM") {
+  }
+  else if(ui.GetString("SHAPE") == "SYSTEM") {
     dem = baseKernels.Dem(lab);
   }
 
   bool kernelSuccess = false;
 
-  if (ck.size() == 0 && !ui.WasEntered("CK")) {
-    throw iException::Message(iException::Camera, 
-                              "No Camera Kernel found for the image ["+ui.GetFilename("FROM")
-                              +"]", 
+  if(ck.size() == 0 && !ui.WasEntered("CK")) {
+    throw iException::Message(iException::Camera,
+                              "No Camera Kernel found for the image [" + ui.GetFilename("FROM")
+                              + "]",
                               _FILEINFO_);
   }
   else if(ui.WasEntered("CK")) {
@@ -146,22 +148,22 @@ void IsisMain() {
     Kernel realCkKernel = ck.top();
     ck.pop();
 
-    if (ui.WasEntered("CK")) {
+    if(ui.WasEntered("CK")) {
       ui.GetAsString("CK", realCkKernel.kernels);
     }
 
     // Merge SpacecraftPointing and Frame into ck
-    for (int i = 0; i < fk.size(); i++) {
+    for(int i = 0; i < fk.size(); i++) {
       realCkKernel.push_back(fk[i]);
     }
 
     kernelSuccess = TryKernels(icube, p, lk, pck, targetSpk,
-                   realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
+                               realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
   }
 
   if(!kernelSuccess) {
-    throw iException::Message(iException::Camera, 
-                              "Unable to initialize camera model", 
+    throw iException::Message(iException::Camera,
+                              "Unable to initialize camera model",
                               _FILEINFO_);
   }
 
@@ -169,17 +171,17 @@ void IsisMain() {
 }
 
 /**
- * If the user entered the parameter param, then 
- * kernel is replaced by the user's values and 
- * quality is reset to 0. 
- * 
- * @param param 
- * @param kernel 
+ * If the user entered the parameter param, then
+ * kernel is replaced by the user's values and
+ * quality is reset to 0.
+ *
+ * @param param
+ * @param kernel
  */
 void GetUserEnteredKernel(const string &param, Kernel &kernel) {
   UserInterface &ui = Application::GetUserInterface();
 
-  if (ui.WasEntered(param))  {
+  if(ui.WasEntered(param))  {
     kernel = Kernel();
     // NOTE: This is using GetAsString so that vars like $mgs can be used.
     ui.GetAsString(param, kernel.kernels);
@@ -187,10 +189,10 @@ void GetUserEnteredKernel(const string &param, Kernel &kernel) {
 }
 
 bool TryKernels(Cube *icube, Process &p,
-                Kernel lk, Kernel pck, 
+                Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
-                Kernel fk, Kernel ik, Kernel sclk, 
-                Kernel spk, Kernel iak, 
+                Kernel fk, Kernel ik, Kernel sclk,
+                Kernel spk, Kernel iak,
                 Kernel dem, Kernel exk) {
   Pvl lab = *icube->Label();
 
@@ -206,34 +208,34 @@ bool TryKernels(Cube *icube, Process &p,
   PvlKeyword demKeyword("ShapeModel");
   PvlKeyword exkKeyword("Extra");
 
-  for (int i=0; i<lk.size(); i++) {
+  for(int i = 0; i < lk.size(); i++) {
     lkKeyword.AddValue(lk[i]);
   }
-  for (int i=0; i<pck.size(); i++) {
+  for(int i = 0; i < pck.size(); i++) {
     pckKeyword.AddValue(pck[i]);
   }
-  for (int i=0; i<targetSpk.size(); i++) {
+  for(int i = 0; i < targetSpk.size(); i++) {
     targetSpkKeyword.AddValue(targetSpk[i]);
   }
-  for (int i=0; i<ck.size(); i++) {
+  for(int i = 0; i < ck.size(); i++) {
     ckKeyword.AddValue(ck[i]);
   }
-  for (int i=0; i<ik.size(); i++) {
+  for(int i = 0; i < ik.size(); i++) {
     ikKeyword.AddValue(ik[i]);
   }
-  for (int i=0; i<sclk.size(); i++) {
+  for(int i = 0; i < sclk.size(); i++) {
     sclkKeyword.AddValue(sclk[i]);
   }
-  for (int i=0; i<spk.size(); i++) {
+  for(int i = 0; i < spk.size(); i++) {
     spkKeyword.AddValue(spk[i]);
   }
-  for (int i=0; i<iak.size(); i++) {
+  for(int i = 0; i < iak.size(); i++) {
     iakKeyword.AddValue(iak[i]);
   }
-  for (int i=0; i<dem.size(); i++) {
+  for(int i = 0; i < dem.size(); i++) {
     demKeyword.AddValue(dem[i]);
   }
-  for (int i=0; i<exk.size(); i++) {
+  for(int i = 0; i < exk.size(); i++) {
     exkKeyword.AddValue(exk[i]);
   }
 
@@ -258,44 +260,44 @@ bool TryKernels(Cube *icube, Process &p,
   ckQuality.AddValue(spiceInit::kernelTypeEnum(ck.kernelType));
   currentKernels.AddKeyword(ckQuality, Pvl::Replace);
 
-  if (!exkKeyword.IsNull()) {
+  if(!exkKeyword.IsNull()) {
     currentKernels.AddKeyword(exkKeyword, Pvl::Replace);
   }
-  else if( currentKernels.HasKeyword("EXTRA") ) {
-    currentKernels.DeleteKeyword( "EXTRA" );
+  else if(currentKernels.HasKeyword("EXTRA")) {
+    currentKernels.DeleteKeyword("EXTRA");
   }
 
   // Get rid of old keywords from previously inited cubes
-  if (currentKernels.HasKeyword("SpacecraftPointing")) {
+  if(currentKernels.HasKeyword("SpacecraftPointing")) {
     currentKernels.DeleteKeyword("SpacecraftPointing");
   }
-  if (currentKernels.HasKeyword("SpacecraftPosition")) {
+  if(currentKernels.HasKeyword("SpacecraftPosition")) {
     currentKernels.DeleteKeyword("SpacecraftPosition");
   }
-  if (currentKernels.HasKeyword("ElevationModel")) {
+  if(currentKernels.HasKeyword("ElevationModel")) {
     currentKernels.DeleteKeyword("ElevationModel");
   }
-  if (currentKernels.HasKeyword("Frame")) {
+  if(currentKernels.HasKeyword("Frame")) {
     currentKernels.DeleteKeyword("Frame");
   }
-  if (currentKernels.HasKeyword("StartPadding")) {
+  if(currentKernels.HasKeyword("StartPadding")) {
     currentKernels.DeleteKeyword("StartPadding");
   }
-  if (currentKernels.HasKeyword("EndPadding")) {
+  if(currentKernels.HasKeyword("EndPadding")) {
     currentKernels.DeleteKeyword("EndPadding");
   }
 
   UserInterface &ui = Application::GetUserInterface();
   // Add any time padding the user specified to the spice group
   if(ui.GetDouble("STARTPAD") > DBL_EPSILON) {
-     currentKernels.AddKeyword(PvlKeyword("StartPadding", ui.GetDouble("STARTPAD"), "seconds"));
+    currentKernels.AddKeyword(PvlKeyword("StartPadding", ui.GetDouble("STARTPAD"), "seconds"));
   }
 
   if(ui.GetDouble("ENDPAD") > DBL_EPSILON) {
-     currentKernels.AddKeyword(PvlKeyword("EndPadding", ui.GetDouble("ENDPAD"), "seconds"));
+    currentKernels.AddKeyword(PvlKeyword("EndPadding", ui.GetDouble("ENDPAD"), "seconds"));
   }
 
-  currentKernels.AddKeyword(PvlKeyword("CameraVersion",CameraFactory::CameraVersion(lab)), Pvl::Replace);
+  currentKernels.AddKeyword(PvlKeyword("CameraVersion", CameraFactory::CameraVersion(lab)), Pvl::Replace);
 
   // Add the modified Kernels group to the input cube labels
   icube->PutGroup(currentKernels);
@@ -306,23 +308,24 @@ bool TryKernels(Cube *icube, Process &p,
     try {
       cam = icube->Camera();
       Application::Log(currentKernels);
-    } catch (iException &e) {
+    }
+    catch(iException &e) {
       Pvl errPvl = e.PvlErrors();
 
       if(errPvl.Groups() > 0) {
-        currentKernels += PvlKeyword("Error", errPvl.Group(errPvl.Groups()-1)["Message"][0]); 
+        currentKernels += PvlKeyword("Error", errPvl.Group(errPvl.Groups() - 1)["Message"][0]);
       }
-      
+
       Application::Log(currentKernels);
       icube->PutGroup(originalKernels);
       throw e;
     }
-    if (ui.GetBoolean("ATTACH")) {
+    if(ui.GetBoolean("ATTACH")) {
       Table ckTable = cam->InstrumentRotation()->Cache("InstrumentPointing");
       ckTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       ckTable.Label() += PvlKeyword("Kernels");
 
-      for (int i=0; i<ckKeyword.Size(); i++) {
+      for(int i = 0; i < ckKeyword.Size(); i++) {
         ckTable.Label()["Kernels"].AddValue(ckKeyword[i]);
       }
       icube->Write(ckTable);
@@ -330,7 +333,7 @@ bool TryKernels(Cube *icube, Process &p,
       Table spkTable = cam->InstrumentPosition()->Cache("InstrumentPosition");
       spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       spkTable.Label() += PvlKeyword("Kernels");
-      for (int i=0; i<spkKeyword.Size(); i++) {
+      for(int i = 0; i < spkKeyword.Size(); i++) {
         spkTable.Label()["Kernels"].AddValue(spkKeyword[i]);
       }
       icube->Write(spkTable);
@@ -338,10 +341,10 @@ bool TryKernels(Cube *icube, Process &p,
       Table bodyTable = cam->BodyRotation()->Cache("BodyRotation");
       bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       bodyTable.Label() += PvlKeyword("Kernels");
-      for (int i=0; i<targetSpkKeyword.Size(); i++) {
+      for(int i = 0; i < targetSpkKeyword.Size(); i++) {
         bodyTable.Label()["Kernels"].AddValue(targetSpkKeyword[i]);
       }
-      for (int i=0; i<pckKeyword.Size(); i++) {
+      for(int i = 0; i < pckKeyword.Size(); i++) {
         bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
       }
       bodyTable.Label() += PvlKeyword("SolarLongitude", cam->SolarLongitude());
@@ -350,7 +353,7 @@ bool TryKernels(Cube *icube, Process &p,
       Table sunTable = cam->SunPosition()->Cache("SunPosition");
       sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       sunTable.Label() += PvlKeyword("Kernels");
-      for (int i=0; i<targetSpkKeyword.Size(); i++) {
+      for(int i = 0; i < targetSpkKeyword.Size(); i++) {
         sunTable.Label()["Kernels"].AddValue(targetSpkKeyword[i]);
       }
       icube->Write(sunTable);
@@ -361,15 +364,15 @@ bool TryKernels(Cube *icube, Process &p,
       PvlKeyword origTargPos = currentKernels["TargetPosition"];
 
       currentKernels["InstrumentPointing"] = "Table";
-      for (int i=0; i<origCk.Size(); i++) {
+      for(int i = 0; i < origCk.Size(); i++) {
         currentKernels["InstrumentPointing"].AddValue(origCk[i]);
       }
       currentKernels["InstrumentPosition"] = "Table";
-      for (int i=0; i<origSpk.Size(); i++) {
+      for(int i = 0; i < origSpk.Size(); i++) {
         currentKernels["InstrumentPosition"].AddValue(origSpk[i]);
       }
       currentKernels["TargetPosition"] = "Table";
-      for (int i=0; i<origTargPos.Size(); i++) {
+      for(int i = 0; i < origTargPos.Size(); i++) {
         currentKernels["TargetPosition"].AddValue(origTargPos[i]);
       }
       icube->PutGroup(currentKernels);
@@ -377,29 +380,35 @@ bool TryKernels(Cube *icube, Process &p,
     //modify Kernels group only
     else {
       Pvl *label = icube->Label();
-      int i=0;
-      while (i < label->Objects()) {
+      int i = 0;
+      while(i < label->Objects()) {
         PvlObject currObj = label->Object(i);
-        if (currObj.IsNamed("Table")) {
-          if (currObj["Name"][0] == iString("InstrumentPointing")) {
+        if(currObj.IsNamed("Table")) {
+          if(currObj["Name"][0] == iString("InstrumentPointing")) {
             label->DeleteObject(i);
-          } else if (currObj["Name"][0] == iString("InstrumentPosition")) {
+          }
+          else if(currObj["Name"][0] == iString("InstrumentPosition")) {
             label->DeleteObject(i);
-          } else if (currObj["Name"][0] == iString("BodyRotation")) {
+          }
+          else if(currObj["Name"][0] == iString("BodyRotation")) {
             label->DeleteObject(i);
-          } else if (currObj["Name"][0] == iString("SunPosition")) {
+          }
+          else if(currObj["Name"][0] == iString("SunPosition")) {
             label->DeleteObject(i);
-          } else {
+          }
+          else {
             i++;
           }
-        } else {
+        }
+        else {
           i++;
         }
       }
     }
 
     p.WriteHistory(*icube);
-  } catch (iException &e) {
+  }
+  catch(iException &e) {
     e.Clear();
     icube->PutGroup(originalKernels);
     return false;

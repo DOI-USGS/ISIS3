@@ -27,7 +27,7 @@
 namespace Isis {
   /**
    * @brief Utility class for creating and using cartesean line equations
-   * 
+   *
    * This class contains utility methods for creating and using cartesean
    * line equations.  If both points have the same value for the independent
    * variable (vertical line) an error is thrown.
@@ -35,36 +35,44 @@ namespace Isis {
    * @ingroup Utility
    *
    * @author 2006-10-19 Debbie A. Cook
-   * 
+   *
    * @todo Add constructor with arguments (double slope, double intercept)
    *       Add method to double y = EvaluateLine( double x )
    *
    */
   class LineEquation {
-  public:
+    public:
 //! Constructors
-    LineEquation();
-    LineEquation( double x1, double y1, double x2, double y2 );
+      LineEquation();
+      LineEquation(double x1, double y1, double x2, double y2);
 
 //! Destroys the LineEquation object
-    ~LineEquation() {}
-    void AddPoint(double x, double y);
-    double Slope();
-    double Intercept();
-    int Points() { return p_x.size(); };
-    bool HaveSlope() { return p_slopeDefined; };
-    bool HaveIntercept() { return p_interceptDefined; };
-    bool Defined() { return p_defined; };
+      ~LineEquation() {}
+      void AddPoint(double x, double y);
+      double Slope();
+      double Intercept();
+      int Points() {
+        return p_x.size();
+      };
+      bool HaveSlope() {
+        return p_slopeDefined;
+      };
+      bool HaveIntercept() {
+        return p_interceptDefined;
+      };
+      bool Defined() {
+        return p_defined;
+      };
 
-  private:
-    std::vector<double> p_x;       //!< Independent variables
-    std::vector<double> p_y;       //!< Dependent variables
-    bool p_defined;           //!< Variable indicating if line is defined yet
-    bool p_slopeDefined;      //!< Variable indicating if slope is defined yet
-    bool p_interceptDefined;  //!< Variable indicating if intercept is defined yet
-    double p_slope;
-    double p_intercept;
-                                          
+    private:
+      std::vector<double> p_x;       //!< Independent variables
+      std::vector<double> p_y;       //!< Dependent variables
+      bool p_defined;           //!< Variable indicating if line is defined yet
+      bool p_slopeDefined;      //!< Variable indicating if slope is defined yet
+      bool p_interceptDefined;  //!< Variable indicating if intercept is defined yet
+      double p_slope;
+      double p_intercept;
+
   }; // end of LineEquation class
 }
 #endif

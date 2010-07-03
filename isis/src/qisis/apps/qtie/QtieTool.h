@@ -26,29 +26,29 @@ class QMainWindow;
 namespace Qisis {
   class MdiCubeViewport;
 
-/**
-  * @brief Tool for picking Tie points
-  *
-  * @ingroup Visualization Tools
-  *
-  * @author 2008-09-09 Tracie Sucharski 
-  *  
-  * @history 2008-11-19  Tracie Sucharski - Addition option to constructor 
-  *                          to allow mouse events on leftChipViewport.
-  * @history 2009-06-10  Tracie Sucharski - Added new slot, clearFiles which 
-  *                          allow new files to be opened.
-  * @history  2010-05-18 Jeannie Walldren - Modified createPoint() method Point ID
-  *                           Dialog to return if "Cancel" is clicked.
-  * @history 2010-05-18  Tracie Sucharski - Added pointId to the Tie tool 
-  *                          Dialog.
-  *
-  */
+  /**
+    * @brief Tool for picking Tie points
+    *
+    * @ingroup Visualization Tools
+    *
+    * @author 2008-09-09 Tracie Sucharski
+    *
+    * @history 2008-11-19  Tracie Sucharski - Addition option to constructor
+    *                          to allow mouse events on leftChipViewport.
+    * @history 2009-06-10  Tracie Sucharski - Added new slot, clearFiles which
+    *                          allow new files to be opened.
+    * @history  2010-05-18 Jeannie Walldren - Modified createPoint() method Point ID
+    *                           Dialog to return if "Cancel" is clicked.
+    * @history 2010-05-18  Tracie Sucharski - Added pointId to the Tie tool
+    *                          Dialog.
+    *
+    */
   class QtieTool : public Qisis::Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QtieTool (QWidget *parent);
-      void paintViewport (MdiCubeViewport *cvp,QPainter *painter);
+      QtieTool(QWidget *parent);
+      void paintViewport(MdiCubeViewport *cvp, QPainter *painter);
 //      void addTo (QMenu *menu);
       static QString lastPtIdValue;
 
@@ -58,9 +58,9 @@ namespace Qisis {
       void newSolution(Isis::Table *cmatrix);
 
     public slots:
-      void setFiles(Isis::Cube &baseCube,Isis::Cube &matchCube,Isis::ControlNet &cnet);
+      void setFiles(Isis::Cube &baseCube, Isis::Cube &matchCube, Isis::ControlNet &cnet);
       void clearFiles();
-      void createPoint(double lat,double lon);
+      void createPoint(double lat, double lon);
       void modifyPoint(Isis::ControlPoint *point);
       void deletePoint(Isis::ControlPoint *point);
 
@@ -76,13 +76,17 @@ namespace Qisis {
       void writeNewCmatrix(Isis::Table *cmatrix);
       void saveNet();
 
-      void pointSaved ();
+      void pointSaved();
 
       void setTemplateFile();
       void viewTemplateFile();
       //void setInterestOp();
-      void setTwist(bool twist) { p_twist = twist; };
-      void setIterations(int maxIterations) { p_maxIterations = maxIterations; };
+      void setTwist(bool twist) {
+        p_twist = twist;
+      };
+      void setIterations(int maxIterations) {
+        p_maxIterations = maxIterations;
+      };
       //void setTolerance () { p_tolerance = p_tolValue->text().toDouble(); };
 
     private:

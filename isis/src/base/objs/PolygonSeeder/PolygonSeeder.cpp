@@ -14,14 +14,14 @@
 namespace Isis {
   /**
    * Create PolygonSeeder object.  Because this is a pure virtual class you can
-   * not create an PolygonSeeder class directly.  Instead, see the 
+   * not create an PolygonSeeder class directly.  Instead, see the
    * PolygonSeederFactory class.
-   * 
+   *
    * @param pvl  A pvl object containing a valid PolygonSeeder specification
-   * 
+   *
    * @todo
    */
-  PolygonSeeder::PolygonSeeder (Pvl &pvl) {
+  PolygonSeeder::PolygonSeeder(Pvl &pvl) {
     invalidInput = NULL;
     invalidInput = new Pvl(pvl);
 
@@ -32,7 +32,7 @@ namespace Isis {
 
 
   //! Copy constructor
-  PolygonSeeder::PolygonSeeder(const PolygonSeeder & other) {
+  PolygonSeeder::PolygonSeeder(const PolygonSeeder &other) {
     p_algorithmName = other.p_algorithmName;
     p_minimumThickness = other.p_minimumThickness;
     p_minimumArea = other.p_minimumArea;
@@ -41,17 +41,17 @@ namespace Isis {
 
   //! Destroy PolygonSeeder object
   PolygonSeeder::~PolygonSeeder() {
-    if (invalidInput) {
+    if(invalidInput) {
       delete invalidInput;
       invalidInput = NULL;
     }
   }
 
 
-  /** 
+  /**
    * Initialize parameters in the PolygonSeeder class using a PVL specification.
    * An example of the PVL required for this is:
-   * 
+   *
    * @code
    * Object = AutoSeed
    *   Group = Algorithm
@@ -60,10 +60,10 @@ namespace Isis {
    *   EndGroup
    * EndObject
    * @endcode
-   * 
+   *
    * There are many other options that can be set via the pvl and are
    * described in other documentation (see below).
-   * 
+   *
    * @param pvl The pvl object containing the specification
    **/
   void PolygonSeeder::Parse(Pvl &pvl) {
@@ -73,43 +73,43 @@ namespace Isis {
     try {
       // Get info from Algorithm group
       errorSpot = "Algorithm";
-      PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm",Pvl::Traverse);
-      
+      PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm", Pvl::Traverse);
+
       // algo is such a cool name for a PvlGroup that it begs to be out done
-      PvlGroup & invalgo = invalidInput->FindGroup("PolygonSeederAlgorithm",
-                                                   Pvl::Traverse);
+      PvlGroup &invalgo = invalidInput->FindGroup("PolygonSeederAlgorithm",
+                          Pvl::Traverse);
 
       // Set the algorithm name
       errorSpot = "Name";
       p_algorithmName = (std::string) algo["Name"];
-      
-      if (invalgo.HasKeyword("Name"))
+
+      if(invalgo.HasKeyword("Name"))
         invalgo.DeleteKeyword("Name");
 
       // Set the minimum thickness (Area / max(extent X, extent Y)**2
       errorSpot = "MinimumThickness";
       p_minimumThickness = 0.0;
-      if (algo.HasKeyword("MinimumThickness")) {
+      if(algo.HasKeyword("MinimumThickness")) {
         p_minimumThickness = (double) algo["MinimumThickness"];
       }
 
-      if (invalgo.HasKeyword("MinimumThickness"))
+      if(invalgo.HasKeyword("MinimumThickness"))
         invalgo.DeleteKeyword("MinimumThickness");
 
-      // Set the minimum area 
+      // Set the minimum area
       errorSpot = "MinimumArea";
       p_minimumArea = 0.0;
-      if (algo.HasKeyword("MinimumArea")) {
+      if(algo.HasKeyword("MinimumArea")) {
         p_minimumArea = (double) algo["MinimumArea"];
       }
 
-      if (invalgo.HasKeyword("MinimumArea"))
+      if(invalgo.HasKeyword("MinimumArea"))
         invalgo.DeleteKeyword("MinimumArea");
     }
-    catch (iException &e) {
+    catch(iException &e) {
       std::string msg = "Improper format for PolygonSeeder PVL [";
       msg +=  pvl.Filename() + "]. Location [" + errorSpot + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     return;
@@ -122,22 +122,22 @@ namespace Isis {
    * @param xymp The multipoly containing the coordinates in x/y units instead
    *             of lon/lat
    * @param xyBoundBox The bounding box of the multipoly
-   * 
+   *
    * @return std::string A string with an appropriate message to throw if
    * a test was unsuccessful or an empty string if all tests passed.
    */
   std::string PolygonSeeder::StandardTests(const geos::geom::MultiPolygon *xymp,
-                                           const geos::geom::Envelope *xyBoundBox) {
-    if (xymp->getArea() < MinimumArea()) {
+      const geos::geom::Envelope *xyBoundBox) {
+    if(xymp->getArea() < MinimumArea()) {
       std::string msg = "Polygon did not meet the minimum area of [";
       msg += Isis::iString(MinimumArea()) + "]";
       return msg;
     }
 
-    double thickness = 
-        xymp->getArea() /
-        pow(std::max(xyBoundBox->getWidth(), xyBoundBox->getHeight()), 2.0);
-    if (thickness < MinimumThickness()) {
+    double thickness =
+      xymp->getArea() /
+      pow(std::max(xyBoundBox->getWidth(), xyBoundBox->getHeight()), 2.0);
+    if(thickness < MinimumThickness()) {
       std::string msg = "Polygon did not meet the minimum thickness ratio of [";
       msg += Isis::iString(MinimumThickness()) + "]";
       return msg;
@@ -149,7 +149,7 @@ namespace Isis {
 
   /**
    * Return the minimum allowed thickness of the polygon. This value is set
-   * from the "MinimumThickness" keyword in the PVL. The seeding algorithm 
+   * from the "MinimumThickness" keyword in the PVL. The seeding algorithm
    * will not seed polygons that have a thickness ratio less than this
    */
   double PolygonSeeder::MinimumThickness() {
@@ -165,7 +165,7 @@ namespace Isis {
   double PolygonSeeder::MinimumArea() {
     return p_minimumArea;
   }
-  
+
   PvlGroup PolygonSeeder::PluginParameters(std::string grpName) {
     PvlGroup pluginInfo(grpName);
 
@@ -191,7 +191,7 @@ namespace Isis {
 
 
   //! Assignment operator
-  const PolygonSeeder & PolygonSeeder::operator=(const PolygonSeeder & other) {
+  const PolygonSeeder &PolygonSeeder::operator=(const PolygonSeeder &other) {
     p_algorithmName = other.p_algorithmName;
     p_minimumThickness = other.p_minimumThickness;
     p_minimumArea = other.p_minimumArea;

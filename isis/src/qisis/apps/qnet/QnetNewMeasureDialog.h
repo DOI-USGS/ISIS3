@@ -14,22 +14,22 @@ class QPushButton;
 using namespace std;
 namespace Qisis {
   /**
-   * 
-   * @internal 
+   *
+   * @internal
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
-   *                          to null in constructor.  Removed "std::" 
+   *                          to null in constructor.  Removed "std::"
    *                          since "using namespace std" in
    *                          header and .cpp files.
-   *                          
+   *
    */
 
   class QnetNewMeasureDialog : public QDialog {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetNewMeasureDialog (QWidget *parent=0);
-      void SetFiles (const Isis::ControlPoint &point,
-                     vector<string> &pointFiles);
+      QnetNewMeasureDialog(QWidget *parent = 0);
+      void SetFiles(const Isis::ControlPoint &point,
+                    vector<string> &pointFiles);
 
       QListWidget *fileList;
 

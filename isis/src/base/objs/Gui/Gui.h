@@ -47,47 +47,47 @@
 #include "GuiParameterFactory.h"
 
 namespace Isis {
-/**
- * @brief Gui for Isis Applications
- *
- * This is the main GUI for all Isis Applications.
- *
- * @author  2003-01-01 Stuart Sides
- *
- * @internal
- *  @history 2007-07-19  Steven Lambright Fixed bugs: Command Line not checked
- *                       but displayed initially and Command Line edit was not
- *                       read only.
- *  @history 2008-06-06  Steven Lambright Fixed bug with corrupt parameter
- *                       history file causing the program to crash
- *  @history 2008-07-29  Steven Lambright Fixed memory leaks and naming
- *                       convention
- *  @history 2009-11-19 Kris Becker - Made argc pass by reference since Qt's
- *           QApplication/QCoreApplication requires it
- *  @history 2010-03-17 Stuart Sides - Added the location of the Qt plugins
- *                                     into the library path
- */
+  /**
+   * @brief Gui for Isis Applications
+   *
+   * This is the main GUI for all Isis Applications.
+   *
+   * @author  2003-01-01 Stuart Sides
+   *
+   * @internal
+   *  @history 2007-07-19  Steven Lambright Fixed bugs: Command Line not checked
+   *                       but displayed initially and Command Line edit was not
+   *                       read only.
+   *  @history 2008-06-06  Steven Lambright Fixed bug with corrupt parameter
+   *                       history file causing the program to crash
+   *  @history 2008-07-29  Steven Lambright Fixed memory leaks and naming
+   *                       convention
+   *  @history 2009-11-19 Kris Becker - Made argc pass by reference since Qt's
+   *           QApplication/QCoreApplication requires it
+   *  @history 2010-03-17 Stuart Sides - Added the location of the Qt plugins
+   *                                     into the library path
+   */
 
   class Gui : public QMainWindow {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      static Gui *Create (Isis::UserInterface &ui, int &argc, char *argv[]);
+      static Gui *Create(Isis::UserInterface &ui, int &argc, char *argv[]);
 
-      void ProgressText (const std::string &text);
-      void Progress (int percent);
+      void ProgressText(const std::string &text);
+      void Progress(int percent);
 
-      int Exec (void (*funct)());
-      bool ProcessEvents ();
+      int Exec(void (*funct)());
+      bool ProcessEvents();
 
-      void LoadMessage (const std::string &message);
-      int ShowWarning ();
+      void LoadMessage(const std::string &message);
+      int ShowWarning();
 
-      void ShowLog () {};
-      void Log (const std::string &text);
+      void ShowLog() {};
+      void Log(const std::string &text);
 
-      Gui (Isis::UserInterface &ui);
-      ~Gui ();
+      Gui(Isis::UserInterface &ui);
+      ~Gui();
 
       bool eventFilter(QObject *o, QEvent *e);
 
@@ -96,19 +96,19 @@ namespace Isis {
     private:
       static Gui *p_gui;
 
-      GuiParameter* AddParameter (Isis::UserInterface &ui, int group, int param);
-      void Preferences ();
-      void CreateAreas ();
+      GuiParameter *AddParameter(Isis::UserInterface &ui, int group, int param);
+      void Preferences();
+      void CreateAreas();
 
-      QAction *CreateProcessAction ();
-      QAction *CreateStopAction ();
-      QAction *CreateExitAction ();
-      QAction *CreateResetAction ();
-      QAction *CreatePreviousHistoryAction ();
-      QAction *CreateNextHistoryAction ();
-      QAction *CreateSaveLogAction ();
-      QAction *CreateClearLogAction ();
-      QAction *CreateWhatsThisAction ();
+      QAction *CreateProcessAction();
+      QAction *CreateStopAction();
+      QAction *CreateExitAction();
+      QAction *CreateResetAction();
+      QAction *CreatePreviousHistoryAction();
+      QAction *CreateNextHistoryAction();
+      QAction *CreateSaveLogAction();
+      QAction *CreateClearLogAction();
+      QAction *CreateWhatsThisAction();
 
       void (*p_funct)(); // Function to be called for procesing phase
 
@@ -129,7 +129,7 @@ namespace Isis {
       QAction *p_previousHistoryAction;
       QAction *p_nextHistoryAction;
 
-      QMap<std::string, QGridLayout*> p_grids;
+      QMap<std::string, QGridLayout *> p_grids;
 
       std::vector<GuiParameter *> p_parameters;
 
@@ -142,7 +142,7 @@ namespace Isis {
       QLineEdit *p_commandLineEdit;
 
     private slots:
-      void StartProcess ();
+      void StartProcess();
       void StopProcessing();
 
       void ResetParameters();

@@ -27,13 +27,11 @@
 
 template< class T > class QVector;
 
-namespace Isis
-{
+namespace Isis {
   class Cube;
 }
 
-namespace Qisis
-{
+namespace Qisis {
   class MdiCubeViewport;
 
   /**
@@ -62,16 +60,15 @@ namespace Qisis
   * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
   *          CubeViewport.  Also fixed include issues.
   */
-  class Workspace : public QMdiArea
-  {
+  class Workspace : public QMdiArea {
       Q_OBJECT
 
     public:
-      Workspace(QWidget * parent = 0);
-      Workspace(const Workspace & other);
+      Workspace(QWidget *parent = 0);
+      Workspace(const Workspace &other);
       virtual ~Workspace();
       QVector< MdiCubeViewport * > * cubeViewportList();
-      const Workspace & operator=(Workspace other);
+      const Workspace &operator=(Workspace other);
 
     signals:
       void cubeViewportAdded(Qisis::MdiCubeViewport *);
@@ -79,12 +76,12 @@ namespace Qisis
 
     public slots:
       void addCubeViewport(QString cube);
-      MdiCubeViewport * addCubeViewport(Isis::Cube *cube);
+      MdiCubeViewport *addCubeViewport(Isis::Cube *cube);
 
       void addBrowseView(QString cube);
 
     protected slots:
-      void activateViewport(QMdiSubWindow * w);
+      void activateViewport(QMdiSubWindow *w);
 
     private:
       QVector< MdiCubeViewport * > * p_cubeViewportList;

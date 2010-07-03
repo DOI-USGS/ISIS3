@@ -13,9 +13,9 @@ namespace Isis {
      */
     class LroNarrowAngleCamera : public LineScanCamera {
       public:
-    	  LroNarrowAngleCamera (Isis::Pvl &lab);
+        LroNarrowAngleCamera(Isis::Pvl &lab);
 
-        ~LroNarrowAngleCamera () {};
+        ~LroNarrowAngleCamera() {};
     };
   };
 };

@@ -2,13 +2,13 @@
 #include "ProcessByQuickFilter.h"
 #include "UserInterface.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
 bool propagate;
 bool stdDev;
-void svfilter (Buffer &in, Buffer &out, QuickFilter &filter);
+void svfilter(Buffer &in, Buffer &out, QuickFilter &filter);
 
 // The svfilter main routine
 void IsisMain() {
@@ -22,22 +22,22 @@ void IsisMain() {
 
   // Find out how to handle special pixels
   UserInterface &ui = Application::GetUserInterface();
-  propagate = ui.GetBoolean ("PROPAGATE");
-  string filt = ui.GetString ("FILTER"); 
+  propagate = ui.GetBoolean("PROPAGATE");
+  string filt = ui.GetString("FILTER");
   stdDev = false;
-  if (filt == "STDDEV") stdDev = true;
-  
+  if(filt == "STDDEV") stdDev = true;
+
   // Process each line
   p.StartProcess(svfilter);  // Line processing function
   p.EndProcess();           // Cleanup
 }
 
 // Line processing routine
-void svfilter (Buffer &in, Buffer &out, QuickFilter &filter) {
-  for (int i=0; i<filter.Samples(); i++) {
+void svfilter(Buffer &in, Buffer &out, QuickFilter &filter) {
+  for(int i = 0; i < filter.Samples(); i++) {
     // We have a special pixel
-    if (IsSpecial(in[i])) {
-      if (propagate) {
+    if(IsSpecial(in[i])) {
+      if(propagate) {
         out[i] = in[i];
       }
       else {
@@ -49,7 +49,7 @@ void svfilter (Buffer &in, Buffer &out, QuickFilter &filter) {
       out[i] = filter.Variance(i);  // will be NULL if uncomputable or count invalid
       // If the standard deviation flag is set, return standard deviation instead of
       // variance.
-      if (stdDev && IsValidPixel(out[i])) out[i] = sqrt (out[i]);
+      if(stdDev && IsValidPixel(out[i])) out[i] = sqrt(out[i]);
     }
   }
 }

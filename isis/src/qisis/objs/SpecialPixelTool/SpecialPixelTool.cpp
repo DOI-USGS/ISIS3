@@ -22,11 +22,11 @@
 namespace Qisis {
   /**
    * SpecialPixelTool constructor
-   * 
-   * 
-   * @param parent 
+   *
+   *
+   * @param parent
    */
-  SpecialPixelTool::SpecialPixelTool (QWidget *parent) : Qisis::Tool(parent) {
+  SpecialPixelTool::SpecialPixelTool(QWidget *parent) : Qisis::Tool(parent) {
     // Create the SpecialPixel window
     p_parent = parent;
 
@@ -34,37 +34,37 @@ namespace Qisis {
     p_dialog->setWindowTitle("Special Pixel Tool");
     p_dialog->setSizeGripEnabled(true);
     p_spWindow = new QWidget(p_dialog);
-    p_spWindow->setMinimumSize(492,492);
+    p_spWindow->setMinimumSize(492, 492);
     p_spWindow->installEventFilter(this);
 
-    QWidget *buttons = new QWidget (p_dialog);
-    QWidget *colors = new QWidget (p_dialog);
-    QWidget *labels = new QWidget (p_dialog);
-    QWidget *defaults = new QWidget (p_dialog);
-    QWidget *main = new QWidget (p_dialog);
+    QWidget *buttons = new QWidget(p_dialog);
+    QWidget *colors = new QWidget(p_dialog);
+    QWidget *labels = new QWidget(p_dialog);
+    QWidget *defaults = new QWidget(p_dialog);
+    QWidget *main = new QWidget(p_dialog);
 
     QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(defaults,0);
-    layout->addWidget(main,0);
-    layout->addWidget(buttons,0);
+    layout->addWidget(defaults, 0);
+    layout->addWidget(main, 0);
+    layout->addWidget(buttons, 0);
     p_dialog->setLayout(layout);
 
-    QPushButton *ok = new QPushButton("Ok",buttons);
+    QPushButton *ok = new QPushButton("Ok", buttons);
     ok->setShortcut(Qt::Key_Enter);
-    connect(ok,SIGNAL(released()),this,SLOT(apply()));
-    connect(ok,SIGNAL(released()),p_dialog,SLOT(hide()));
+    connect(ok, SIGNAL(released()), this, SLOT(apply()));
+    connect(ok, SIGNAL(released()), p_dialog, SLOT(hide()));
 
-    QPushButton *apply = new QPushButton("Apply",buttons);
-    connect(apply,SIGNAL(released()),this,SLOT(apply()));
+    QPushButton *apply = new QPushButton("Apply", buttons);
+    connect(apply, SIGNAL(released()), this, SLOT(apply()));
 
-    QPushButton *cancel = new QPushButton("Cancel",buttons);
-    connect(cancel,SIGNAL(released()),p_dialog,SLOT(hide()));
+    QPushButton *cancel = new QPushButton("Cancel", buttons);
+    connect(cancel, SIGNAL(released()), p_dialog, SLOT(hide()));
 
-    QPushButton *defaultBlackWhite = new QPushButton("Default B&W",defaults);
-    connect(defaultBlackWhite,SIGNAL(released()),this,SLOT(defaultBW()));
+    QPushButton *defaultBlackWhite = new QPushButton("Default B&W", defaults);
+    connect(defaultBlackWhite, SIGNAL(released()), this, SLOT(defaultBW()));
 
-    QPushButton *defaultColor = new QPushButton("Default Color",defaults);
-    connect(defaultColor,SIGNAL(released()),this,SLOT(defaultColor()));
+    QPushButton *defaultColor = new QPushButton("Default Color", defaults);
+    connect(defaultColor, SIGNAL(released()), this, SLOT(defaultColor()));
 
     QHBoxLayout *hlayout = new QHBoxLayout();
     hlayout->addWidget(ok);
@@ -79,47 +79,47 @@ namespace Qisis {
     defaults->setLayout(h2layout);
 
     p_nullColor = new QToolButton(p_dialog);
-    connect(p_nullColor,SIGNAL(released()),this,SLOT(setNullColor()));
-    QSize *size = new QSize(25,25);
+    connect(p_nullColor, SIGNAL(released()), this, SLOT(setNullColor()));
+    QSize *size = new QSize(25, 25);
     QLabel *nullLabel = new QLabel("Null");
     p_nullColor->setFixedSize(*size);
 
     p_lisColor = new QToolButton(p_dialog);
-    connect(p_lisColor,SIGNAL(released()),this,SLOT(setLisColor()));
+    connect(p_lisColor, SIGNAL(released()), this, SLOT(setLisColor()));
     QLabel *lisLabel = new QLabel("Low Instrument Saturation");
     p_lisColor->setFixedSize(*size);
 
     p_lrsColor = new QToolButton(p_dialog);
-    connect(p_lrsColor,SIGNAL(released()),this,SLOT(setLrsColor()));
+    connect(p_lrsColor, SIGNAL(released()), this, SLOT(setLrsColor()));
     QLabel *lrsLabel = new QLabel("Low Representation Saturation");
     p_lrsColor->setFixedSize(*size);
 
     p_ldsColor = new QToolButton(p_dialog);
-    connect(p_ldsColor,SIGNAL(released()),this,SLOT(setLdsColor()));
+    connect(p_ldsColor, SIGNAL(released()), this, SLOT(setLdsColor()));
     QLabel *ldsLabel = new QLabel("Low Display Saturation");
     p_ldsColor->setFixedSize(*size);
 
     p_hisColor = new QToolButton(p_dialog);
-    connect(p_hisColor,SIGNAL(released()),this,SLOT(setHisColor()));
+    connect(p_hisColor, SIGNAL(released()), this, SLOT(setHisColor()));
     QLabel *hisLabel = new QLabel("High Instrument Saturation");
     p_hisColor->setFixedSize(*size);
 
     p_hrsColor = new QToolButton(p_dialog);
-    connect(p_hrsColor,SIGNAL(released()),this,SLOT(setHrsColor()));
+    connect(p_hrsColor, SIGNAL(released()), this, SLOT(setHrsColor()));
     QLabel *hrsLabel = new QLabel("High Representation Saturation");
     p_hrsColor->setFixedSize(*size);
 
     p_hdsColor = new QToolButton(p_dialog);
-    connect(p_hdsColor,SIGNAL(released()),this,SLOT(setHdsColor()));
+    connect(p_hdsColor, SIGNAL(released()), this, SLOT(setHdsColor()));
     QLabel *hdsLabel = new QLabel("High Display Saturation");
     p_hdsColor->setFixedSize(*size);
 
     p_bgColor = new QToolButton(p_dialog);
-    connect(p_bgColor,SIGNAL(released()),this,SLOT(setBgColor()));
+    connect(p_bgColor, SIGNAL(released()), this, SLOT(setBgColor()));
     QLabel *bgLabel = new QLabel("Background");
     p_bgColor->setFixedSize(*size);
 
-    connect(this,SIGNAL(setDefaultColors()),this,SLOT(defaultBW()));
+    connect(this, SIGNAL(setDefaultColors()), this, SLOT(defaultBW()));
     emit setDefaultColors();
 
     QVBoxLayout *vlayout = new QVBoxLayout();
@@ -153,15 +153,15 @@ namespace Qisis {
     p_action = new QAction(parent);
     //p_action->setShortcut(Qt::CTRL+Qt::Key_C);
     p_action->setText("&Special Pixel Tool ...");
-    p_action->setIcon(QPixmap(toolIconDir()+"/colorize.png"));
+    p_action->setIcon(QPixmap(toolIconDir() + "/colorize.png"));
     p_action->setToolTip("SpecialPixelTool");
     QString text =
-    "<b>Function:</b> Opens a window that allows you to chose what color to \
+      "<b>Function:</b> Opens a window that allows you to chose what color to \
        display each different type of special pixel \
        <p><b>Shortcut:</b> Ctrl+C</p>";
     p_action->setWhatsThis(text);
     p_action->setEnabled(false);
-    connect(p_action,SIGNAL(triggered()),p_dialog,SLOT(show()));
+    connect(p_action, SIGNAL(triggered()), p_dialog, SLOT(show()));
 
     readSettings();
   }
@@ -169,32 +169,32 @@ namespace Qisis {
 
   /**
    * Adds the tool to the given menu.
-   * 
-   * 
-   * @param menu 
+   *
+   *
+   * @param menu
    */
-  void SpecialPixelTool::addTo (QMenu *menu) {
+  void SpecialPixelTool::addTo(QMenu *menu) {
     menu->addAction(p_action);
   }
 
 
   /**
    * Adds the tool to the permanent tool bar.
-   * 
-   * 
-   * @param perm 
+   *
+   *
+   * @param perm
    */
-  void SpecialPixelTool::addToPermanent (QToolBar *perm) {
+  void SpecialPixelTool::addToPermanent(QToolBar *perm) {
     perm->addAction(p_action);
   }
 
 
   /**
    * Applies the colors picked for the special pixels.
-   * 
+   *
    */
   void SpecialPixelTool::apply() {
-    for (int i=0; i<(int)cubeViewportList()->size(); i++) {
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       MdiCubeViewport *cvp = (*(cubeViewportList()))[i];
 
       // Get the Stretch objects from the cubeViewport
@@ -205,8 +205,8 @@ namespace Qisis {
       // Apply selected null color
       QPalette palette = p_nullColor->palette();
       QColor nullColor = palette.color(QPalette::Button);
-      int r,g,b;
-      nullColor.getRgb(&r,&g,&b);
+      int r, g, b;
+      nullColor.getRgb(&r, &g, &b);
       redStretch.SetNull(r);
       greenStretch.SetNull(g);
       blueStretch.SetNull(b);
@@ -214,7 +214,7 @@ namespace Qisis {
       // Apply selected lis
       palette = p_lisColor->palette();
       QColor lisColor = palette.color(QPalette::Button);
-      lisColor.getRgb(&r,&g,&b);
+      lisColor.getRgb(&r, &g, &b);
       redStretch.SetLis(r);
       greenStretch.SetLis(g);
       blueStretch.SetLis(b);
@@ -222,7 +222,7 @@ namespace Qisis {
       // Apply selected lrs
       palette = p_lrsColor->palette();
       QColor lrsColor = palette.color(QPalette::Button);
-      lrsColor.getRgb(&r,&g,&b);
+      lrsColor.getRgb(&r, &g, &b);
       redStretch.SetLrs(r);
       greenStretch.SetLrs(g);
       blueStretch.SetLrs(b);
@@ -230,7 +230,7 @@ namespace Qisis {
       // Apply selected lds
       palette = p_ldsColor->palette();
       QColor ldsColor = palette.color(QPalette::Button);
-      ldsColor.getRgb(&r,&g,&b);
+      ldsColor.getRgb(&r, &g, &b);
       redStretch.SetMinimum(r);
       greenStretch.SetMinimum(g);
       blueStretch.SetMinimum(b);
@@ -238,7 +238,7 @@ namespace Qisis {
       // Apply selected his
       palette = p_hisColor->palette();
       QColor hisColor = palette.color(QPalette::Button);
-      hisColor.getRgb(&r,&g,&b);
+      hisColor.getRgb(&r, &g, &b);
       redStretch.SetHis(r);
       greenStretch.SetHis(g);
       blueStretch.SetHis(b);
@@ -246,7 +246,7 @@ namespace Qisis {
       // Apply selected hrs
       palette = p_hrsColor->palette();
       QColor hrsColor = palette.color(QPalette::Button);
-      hrsColor.getRgb(&r,&g,&b);
+      hrsColor.getRgb(&r, &g, &b);
       redStretch.SetHrs(r);
       greenStretch.SetHrs(g);
       blueStretch.SetHrs(b);
@@ -254,7 +254,7 @@ namespace Qisis {
       // Apply selected hds
       palette = p_hdsColor->palette();
       QColor hdsColor = palette.color(QPalette::Button);
-      hdsColor.getRgb(&r,&g,&b);
+      hdsColor.getRgb(&r, &g, &b);
       redStretch.SetMaximum(r);
       greenStretch.SetMaximum(g);
       blueStretch.SetMaximum(b);
@@ -262,8 +262,8 @@ namespace Qisis {
       // Apply selected background
       palette = p_bgColor->palette();
       QColor bgColor = palette.color(QPalette::Button);
-      bgColor.getRgb(&r,&g,&b);
-      
+      bgColor.getRgb(&r, &g, &b);
+
       cvp->setBackground(bgColor);
       cvp->stretchRed(redStretch);
       cvp->stretchGreen(greenStretch);
@@ -287,7 +287,7 @@ namespace Qisis {
 
   /**
    * Sets the color for null pixels.
-   * 
+   *
    */
   void SpecialPixelTool::setNullColor() {
     setColor(p_nullColor);
@@ -296,7 +296,7 @@ namespace Qisis {
 
   /**
    * Sets the color for Lis pixels.
-   * 
+   *
    */
   void SpecialPixelTool::setLisColor() {
     setColor(p_lisColor);
@@ -305,7 +305,7 @@ namespace Qisis {
 
   /**
    * Sets the color for Lrs pixels.
-   * 
+   *
    */
   void SpecialPixelTool::setLrsColor() {
     setColor(p_lrsColor);
@@ -314,7 +314,7 @@ namespace Qisis {
 
   /**
    * Sets the color for Lds pixels.
-   * 
+   *
    */
   void SpecialPixelTool::setLdsColor() {
     setColor(p_ldsColor);
@@ -323,7 +323,7 @@ namespace Qisis {
 
   /**
    * Sets the color for His pixels.
-   * 
+   *
    */
   void SpecialPixelTool::setHisColor() {
     setColor(p_hisColor);
@@ -332,7 +332,7 @@ namespace Qisis {
 
   /**
    * Sets the color for Hrs pixels.
-   * 
+   *
    */
   void SpecialPixelTool::setHrsColor() {
     setColor(p_hrsColor);
@@ -341,7 +341,7 @@ namespace Qisis {
 
   /**
    * Sets the color for Hds pixels.
-   * 
+   *
    */
   void SpecialPixelTool::setHdsColor() {
     setColor(p_hdsColor);
@@ -353,18 +353,18 @@ namespace Qisis {
 
   /**
    * Gets the selected color from the color dialog.
-   * 
-   * 
-   * @param button 
+   *
+   *
+   * @param button
    */
   void SpecialPixelTool::setColor(QToolButton *button) {
     // Let the user pick a color
     QColor color = QColorDialog::getColor();
 
     // Set the color if they didnt cancel out of the window
-    if (color.isValid()) {
+    if(color.isValid()) {
       QPalette *palette = new QPalette();
-      palette->setColor(QPalette::Button,color);
+      palette->setColor(QPalette::Button, color);
       button->setPalette(*palette);
     }
 
@@ -373,19 +373,19 @@ namespace Qisis {
 
   /**
    * Reset the default black/white colors.
-   * 
+   *
    */
   void SpecialPixelTool::defaultBW() {
     p_color = false;
     QPalette *palette = new QPalette();
-    palette->setColor(QPalette::Button,Qt::black);
+    palette->setColor(QPalette::Button, Qt::black);
     p_nullColor->setPalette(*palette);
     p_lisColor->setPalette(*palette);
     p_lrsColor->setPalette(*palette);
     p_ldsColor->setPalette(*palette);
     p_bgColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,Qt::white);
+    palette->setColor(QPalette::Button, Qt::white);
     p_hisColor->setPalette(*palette);
     p_hrsColor->setPalette(*palette);
     p_hdsColor->setPalette(*palette);
@@ -394,43 +394,43 @@ namespace Qisis {
 
   /**
    * Reset the default color colors.
-   * 
+   *
    */
   void SpecialPixelTool::defaultColor() {
     p_color = true;
     QPalette *palette = new QPalette();
-    palette->setColor(QPalette::Button,p_nullDefault);
+    palette->setColor(QPalette::Button, p_nullDefault);
     p_nullColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,p_lisDefault);
+    palette->setColor(QPalette::Button, p_lisDefault);
     p_lisColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,p_lrsDefault);
+    palette->setColor(QPalette::Button, p_lrsDefault);
     p_lrsColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,p_ldsDefault);
+    palette->setColor(QPalette::Button, p_ldsDefault);
     p_ldsColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,p_hisDefault);
+    palette->setColor(QPalette::Button, p_hisDefault);
     p_hisColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,p_hrsDefault);
+    palette->setColor(QPalette::Button, p_hrsDefault);
     p_hrsColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,p_hdsDefault);
+    palette->setColor(QPalette::Button, p_hdsDefault);
     p_hdsColor->setPalette(*palette);
 
-    palette->setColor(QPalette::Button,p_bgDefault);
+    palette->setColor(QPalette::Button, p_bgDefault);
     p_bgColor->setPalette(*palette);
   }
 
 
   /**
    * Updates special pixel tool.
-   * 
+   *
    */
   void SpecialPixelTool::updateTool() {
-    if (cubeViewport() == NULL) {
+    if(cubeViewport() == NULL) {
       p_action->setEnabled(false);
     }
     else {
@@ -439,12 +439,12 @@ namespace Qisis {
   }
 
 
-  /** 
+  /**
    * This method reads in the default special pixel value colors
    * from a config file.
-   * 
+   *
    */
-  void SpecialPixelTool::readSettings(){
+  void SpecialPixelTool::readSettings() {
     /*Now read the settings that are specific to this window.*/
     std::string appName = p_parent->windowTitle().toStdString();
 
@@ -523,10 +523,10 @@ namespace Qisis {
   }
 
 
-  /** 
+  /**
    * This methods writes the default special pixel values to a
    * config file that will be read by the readSettings() method.
-   * 
+   *
    */
   void SpecialPixelTool::writeSettings() {
     std::string appName = p_parent->windowTitle().toStdString();

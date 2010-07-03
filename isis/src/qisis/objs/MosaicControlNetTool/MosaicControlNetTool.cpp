@@ -7,29 +7,29 @@ namespace Qisis {
 
   /**
    * MosaicControlNetTool constructor
-   * 
-   * @param parent 
+   *
+   * @param parent
    */
-  MosaicControlNetTool::MosaicControlNetTool (MosaicWidget *parent) : Qisis::MosaicTool(parent) {
-    connect(this,SIGNAL(activated(bool)),this,SLOT(updateTool()));
+  MosaicControlNetTool::MosaicControlNetTool(MosaicWidget *parent) : Qisis::MosaicTool(parent) {
+    connect(this, SIGNAL(activated(bool)), this, SLOT(updateTool()));
     p_parent = parent;
 //setParent(parent); //The way it SHOULD be done
 
     p_connectivity = new QAction(parent);
     p_connectivity->setShortcut(Qt::Key_I);
     p_connectivity->setText("Show Islands (I)");
-    p_connectivity->setIcon(QPixmap(toolIconDir()+"/viewmag+.png"));
-    connect(p_connectivity,SIGNAL(activated()),this,SLOT(displayConnectivity()));
+    p_connectivity->setIcon(QPixmap(toolIconDir() + "/viewmag+.png"));
+    connect(p_connectivity, SIGNAL(activated()), this, SLOT(displayConnectivity()));
 
     createDialog(parent);
   }
 
 
-   /**
-   * Creates the dialog used by this tool
-   *
-   * @param parent
-   */
+  /**
+  * Creates the dialog used by this tool
+  *
+  * @param parent
+  */
   void MosaicControlNetTool::createDialog(QWidget *parent) {
 
     p_dialog = new QDialog(parent);
@@ -44,19 +44,19 @@ namespace Qisis {
     gridLayout->addWidget(p_lonLineEdit, 1, 1);*/
 
     // Create the action buttons
-    p_loadControlNetButton = new QPushButton ();
+    p_loadControlNetButton = new QPushButton();
     p_loadControlNetButton->setIcon(QPixmap((QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str()) + "/HILLBLU_molecola.png")));
     connect(p_loadControlNetButton, SIGNAL(clicked()), this, SLOT(loadControlNet()));
 
-    p_displayControlNetButton = new QPushButton ("Display");
+    p_displayControlNetButton = new QPushButton("Display");
     p_displayControlNetButton->setCheckable(true);
     connect(p_displayControlNetButton, SIGNAL(clicked()), this, SLOT(displayControlNet()));
 
-    p_displayConnectivity = new QPushButton ("Connectivity");
+    p_displayConnectivity = new QPushButton("Connectivity");
     p_displayConnectivity->setCheckable(true);
     connect(p_displayConnectivity, SIGNAL(clicked()), this, SLOT(displayConnectivity()));
 
-    QPushButton* cancelButton = new QPushButton ("Done");
+    QPushButton *cancelButton = new QPushButton("Done");
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(hideTool()));
 
     // Make |X| button close properly
@@ -78,8 +78,8 @@ namespace Qisis {
 
   /**
    * Adds the control net action to the given menu.
-   * 
-   * @param menu 
+   *
+   * @param menu
    */
   void MosaicControlNetTool::addToMenu(QMenu *menu) {
     menu->addAction(p_connectivity);
@@ -88,10 +88,10 @@ namespace Qisis {
 
   /**
    * Adds the action to the toolpad.
-   * 
-   * @param toolpad 
-   * 
-   * @return QAction* 
+   *
+   * @param toolpad
+   *
+   * @return QAction*
    */
   QAction *MosaicControlNetTool::toolPadAction(ToolPad *toolpad) {
     p_action = new QAction(toolpad);
@@ -109,18 +109,18 @@ namespace Qisis {
 
   /**
    * Creates the widget to add to the tool bar.
-   * 
-   * @param parent 
-   * 
-   * @return QWidget* 
+   *
+   * @param parent
+   *
+   * @return QWidget*
    */
-  QWidget *MosaicControlNetTool::createToolBarWidget (QStackedWidget *parent) {
+  QWidget *MosaicControlNetTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *hbox = new QWidget(parent);
     return hbox;
   }
 
 
-  /** 
+  /**
    * This slot opens and reopens this tool properly
    */
   void MosaicControlNetTool::updateTool() {
@@ -146,13 +146,13 @@ namespace Qisis {
    */
   void MosaicControlNetTool::hideTool() {
     // Hide the control net
-    if( p_displayControlNetButton->isChecked() ) {
+    if(p_displayControlNetButton->isChecked()) {
       p_displayControlNetButton->setCheckable(false);
       displayControlNet();
     }
 
     // Revert to individual colors
-    if( p_displayConnectivity->isChecked() ) {
+    if(p_displayConnectivity->isChecked()) {
       p_displayConnectivity->setCheckable(false);
       displayConnectivity();
     }
@@ -164,24 +164,24 @@ namespace Qisis {
 
   /**
    * Displays the connectivity of Control Points
-   * 
+   *
    */
-  void MosaicControlNetTool::displayConnectivity(){
+  void MosaicControlNetTool::displayConnectivity() {
     p_parent->displayConnectivity(p_displayConnectivity->isChecked());
   }
 
 
   /**
    * Loads a control net from a file
-   * 
+   *
    */
   void MosaicControlNetTool::loadControlNet() {
 
     // Bring up a file dialog for user to select their cnet file.
-    QString netFile = FileDialog::getOpenFileName(p_parent, 
-                                                  "Select Control Net. File", 
-                                                  QDir::current().dirName(), 
-                                                  "*.net");
+    QString netFile = FileDialog::getOpenFileName(p_parent,
+                      "Select Control Net. File",
+                      QDir::current().dirName(),
+                      "*.net");
 
     //--------------------------------------------------------------
     // if the file is not empty attempt to load in the control points
@@ -191,14 +191,14 @@ namespace Qisis {
 
       try {
         Isis::Filename controlNetFile(netFile.toStdString());
-        p_parent->setControlNet( controlNetFile );
+        p_parent->setControlNet(controlNetFile);
       }
-      catch (Isis::iException &e) {
+      catch(Isis::iException &e) {
         QString message = "Invalid control network.  \n";
         std::string errors = e.Errors();
         message += errors.c_str();
-        e.Clear ();
-        QMessageBox::information(p_parent,"Error",message);
+        e.Clear();
+        QMessageBox::information(p_parent, "Error", message);
         QApplication::restoreOverrideCursor();
         p_loadControlNetButton->setChecked(false);
         return;
@@ -213,8 +213,9 @@ namespace Qisis {
       }
 
       p_displayControlNetButton->setChecked(true);
-       
-    } else {
+
+    }
+    else {
       //---------------------------------------------------
       // this means the user canceled out of the dialog box
       //---------------------------------------------------

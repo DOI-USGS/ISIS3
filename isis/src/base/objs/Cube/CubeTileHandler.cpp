@@ -29,21 +29,21 @@
 using namespace std;
 namespace Isis {
   CubeTileHandler::CubeTileHandler(IsisCubeDef &cube) :
-                       Isis::CubeIoHandler(cube) {
+    Isis::CubeIoHandler(cube) {
 
 
     Isis::PvlObject &core = p_cube->label.FindObject("IsisCube").FindObject("Core");
 
-    if (core.HasKeyword("Format")) {
+    if(core.HasKeyword("Format")) {
       p_tileSamples = core["TileSamples"];
       p_tileLines = core["TileLines"];
     }
     else {
-      core += Isis::PvlKeyword("Format","Tile");
+      core += Isis::PvlKeyword("Format", "Tile");
       p_tileSamples = 128;
       p_tileLines = 128;
-      core += Isis::PvlKeyword("TileSamples",p_tileSamples);
-      core += Isis::PvlKeyword("TileLines",p_tileLines);
+      core += Isis::PvlKeyword("TileSamples", p_tileSamples);
+      core += Isis::PvlKeyword("TileLines", p_tileLines);
     }
 
     p_bytesPerTile = p_tileLines * p_tileSamples * Isis::SizeOf(p_cube->pixelType);
@@ -51,8 +51,8 @@ namespace Isis {
     p_lineTiles = (p_cube->lines - 1) / p_tileLines + 1;
 
     p_maxTiles = p_lineTiles;
-    if (p_maxTiles < p_sampleTiles) p_maxTiles = p_sampleTiles;
-    if (p_maxTiles < p_cube->bands) p_maxTiles = p_cube->bands;
+    if(p_maxTiles < p_sampleTiles) p_maxTiles = p_sampleTiles;
+    if(p_maxTiles < p_cube->bands) p_maxTiles = p_cube->bands;
 
     p_cube->dataBytes = (streampos) p_sampleTiles *
                         (streampos) p_lineTiles *
@@ -73,21 +73,21 @@ namespace Isis {
   void CubeTileHandler::Create(bool overwrite) {
     Isis::CubeIoHandler::Create(overwrite);
 
-    p_tileAllocated.resize(p_sampleTiles*p_lineTiles*p_cube->bands);
+    p_tileAllocated.resize(p_sampleTiles * p_lineTiles * p_cube->bands);
     unsigned int ntiles = p_tileAllocated.size();
-    for (unsigned int i=0; i<ntiles; i++) {
+    for(unsigned int i = 0; i < ntiles; i++) {
       p_tileAllocated[i] = false;
     }
   }
 
   void CubeTileHandler::Close(const bool removeFile) {
     // Don't do much if the file wasn't opened
-    if (!p_cube->stream.is_open()) return;
+    if(!p_cube->stream.is_open()) return;
 
     // Empty the cache
     unsigned int listSize = p_cacheList.size();
-    for (unsigned int i=0; i<listSize; i++) {
-      if (p_cacheList[i]->buf != NULL) {
+    for(unsigned int i = 0; i < listSize; i++) {
+      if(p_cacheList[i]->buf != NULL) {
         InternalCache *cache = p_cacheList[i];
         WriteCache(cache);
         delete [] cache->buf;
@@ -100,11 +100,11 @@ namespace Isis {
     p_bufList.clear();
 
     // Write any tiles which where never allocated
-    if (p_nullCache.buf == NULL) MakeNullCache();
+    if(p_nullCache.buf == NULL) MakeNullCache();
     unsigned int ntiles = p_tileAllocated.size();
-    for (unsigned int i=0; i<ntiles; i++) {
-      if (!p_tileAllocated[i]) {
-        WriteTile(p_nullCache.buf,i+1);
+    for(unsigned int i = 0; i < ntiles; i++) {
+      if(!p_tileAllocated[i]) {
+        WriteTile(p_nullCache.buf, i + 1);
       }
     }
 
@@ -114,7 +114,7 @@ namespace Isis {
 
     // Close the stream and possible remove
     p_cube->stream.close();
-    if (removeFile) remove (p_cube->dataFile.c_str());
+    if(removeFile) remove(p_cube->dataFile.c_str());
   }
 
   void CubeTileHandler::Read(Isis::Buffer &rbuf) {
@@ -127,9 +127,9 @@ namespace Isis {
     int sband = rbuf.Band();
 
     // Ending corner in the Isis::Buffer
-    int esamp = rbuf.Sample(rbuf.size()-1);
-    int eline = rbuf.Line(rbuf.size()-1);
-    int eband = rbuf.Band(rbuf.size()-1);
+    int esamp = rbuf.Sample(rbuf.size() - 1);
+    int eline = rbuf.Line(rbuf.size() - 1);
+    int eband = rbuf.Band(rbuf.size() - 1);
 
     // Current corner of a cache we will work on
     p_sample = ssamp;
@@ -138,9 +138,9 @@ namespace Isis {
 
     InternalCache *cache;
     char *rawbuf = (char *) rbuf.RawBuffer();
-    int ss,es,sl,el;
+    int ss, es, sl, el;
 
-    while (tempBand <= eband) {
+    while(tempBand <= eband) {
       p_band = p_cube->virtualBandList[tempBand-1];
       cache = FindCache();
 
@@ -152,22 +152,22 @@ namespace Isis {
       // Don't worry about fixing the NULL cache index since everything is
       // NULL in the buffer
       int cacheIndex = (sl - cache->startLine) * p_tileSamples +
-                        ss - cache->startSamp;
-      int rawIndex = rbuf.Index(ss,sl,tempBand);
+                       ss - cache->startSamp;
+      int rawIndex = rbuf.Index(ss, sl, tempBand);
       int rawAdd = rbuf.SampleDimension();
       int ns = es - ss + 1;
 
-      for (int line = sl; line<=el; line++) {
-        Move(rawbuf,rawIndex,cache->buf,cacheIndex,ns);
+      for(int line = sl; line <= el; line++) {
+        Move(rawbuf, rawIndex, cache->buf, cacheIndex, ns);
         cacheIndex += p_tileSamples;
         rawIndex += rawAdd;
       }
 
       p_sample = cache->endSamp + 1;
-      if (p_sample > esamp) {
+      if(p_sample > esamp) {
         p_sample = ssamp;
         p_line = cache->endLine + 1;
-        if (p_line > eline) {
+        if(p_line > eline) {
           p_line = sline;
           tempBand++;
         }
@@ -182,15 +182,15 @@ namespace Isis {
     GrowCache(wbuf);
 
     // Starting corner in the Isis::Buffer
-    // We don't care about pixels outside the cube 
+    // We don't care about pixels outside the cube
     int ssamp = (wbuf.Sample() < 1) ? 1 : wbuf.Sample();
     int sline = (wbuf.Line() < 1) ? 1 : wbuf.Line();
     int sband = (wbuf.Band() < 1) ? 1 : wbuf.Band();
 
     // Ending corner in the Isis::Buffer
-    int esamp = (wbuf.Sample(wbuf.size()-1) > p_cube->samples) ? p_cube->samples : wbuf.Sample(wbuf.size()-1);
-    int eline = (wbuf.Line(wbuf.size()-1) > p_cube->lines) ? p_cube->lines : wbuf.Line(wbuf.size()-1);
-    int eband = (wbuf.Band(wbuf.size()-1) > p_cube->bands) ? p_cube->bands : wbuf.Band(wbuf.size()-1);
+    int esamp = (wbuf.Sample(wbuf.size() - 1) > p_cube->samples) ? p_cube->samples : wbuf.Sample(wbuf.size() - 1);
+    int eline = (wbuf.Line(wbuf.size() - 1) > p_cube->lines) ? p_cube->lines : wbuf.Line(wbuf.size() - 1);
+    int eband = (wbuf.Band(wbuf.size() - 1) > p_cube->bands) ? p_cube->bands : wbuf.Band(wbuf.size() - 1);
 
     // Current corner of a cache we will work on
     p_sample = ssamp;
@@ -199,9 +199,9 @@ namespace Isis {
 
     InternalCache *cache;
     char *rawbuf = (char *) wbuf.RawBuffer();
-    int ss,es,sl,el;
+    int ss, es, sl, el;
 
-    while (p_band <= eband) {
+    while(p_band <= eband) {
       cache = FindCache();
       cache->dirty = true;
 
@@ -214,22 +214,22 @@ namespace Isis {
       // Don't worry about fixing the NULL cache index since everything is
       // NULL in the buffer
       int cacheIndex = (sl - cache->startLine) * p_tileSamples +
-                        ss - cache->startSamp;
-      int rawIndex = wbuf.Index(ss,sl,p_band);
+                       ss - cache->startSamp;
+      int rawIndex = wbuf.Index(ss, sl, p_band);
       int rawAdd = wbuf.SampleDimension();
       int ns = es - ss + 1;
 
-      for (int line = sl; line<=el; line++) {
-        Move(cache->buf,cacheIndex,rawbuf,rawIndex,ns);
+      for(int line = sl; line <= el; line++) {
+        Move(cache->buf, cacheIndex, rawbuf, rawIndex, ns);
         cacheIndex += p_tileSamples;
         rawIndex += rawAdd;
       }
 
       p_sample = cache->endSamp + 1;
-      if (p_sample > esamp) {
+      if(p_sample > esamp) {
         p_sample = ssamp;
         p_line = cache->endLine + 1;
-        if (p_line > eline) {
+        if(p_line > eline) {
           p_line = sline;
           p_band++;
         }
@@ -241,14 +241,14 @@ namespace Isis {
     // The old method created a new cache for every new buffer used
     // on a cube
 #if 0
-    if (p_nullCache.buf == NULL) MakeNullCache();
+    if(p_nullCache.buf == NULL) MakeNullCache();
 
-    for (unsigned int i=0; i<p_bufList.size(); i++) {
-      if (&buf == p_bufList[i]) return;
+    for(unsigned int i = 0; i < p_bufList.size(); i++) {
+      if(&buf == p_bufList[i]) return;
     }
     p_bufList.push_back(&buf);
 
-    for (int i=0; i<p_maxTiles; i++) {
+    for(int i = 0; i < p_maxTiles; i++) {
       InternalCache *cache = new InternalCache;
       cache->buf = NULL;
       p_cacheList.push_back(cache);
@@ -257,10 +257,10 @@ namespace Isis {
 
     // The new method makes six tiles sets worth of caches total.
     // Six was used to ensure large highpass filters don't thrash
-    if (p_nullCache.buf != NULL) return;
+    if(p_nullCache.buf != NULL) return;
     MakeNullCache();
-    for (int j=0; j<6; j++) {
-      for (int i=0; i<p_maxTiles; i++) {
+    for(int j = 0; j < 6; j++) {
+      for(int i = 0; i < p_maxTiles; i++) {
         InternalCache *cache = new InternalCache;
         cache->buf = NULL;
         p_cacheList.push_back(cache);
@@ -268,19 +268,19 @@ namespace Isis {
     }
   }
 
-  CubeTileHandler::InternalCache *CubeTileHandler::FindCache () {
+  CubeTileHandler::InternalCache *CubeTileHandler::FindCache() {
     // See if its outside the image
-    if ((p_sample < 1) || (p_line < 1) || (p_band < 1) ||
+    if((p_sample < 1) || (p_line < 1) || (p_band < 1) ||
         (p_sample > p_cube->samples) || (p_line > p_cube->lines) || (p_band > p_cube->bands)) {
 
-      if (p_sample <= 0) {
+      if(p_sample <= 0) {
         p_nullCache.startSamp = (p_sample - p_tileSamples) / p_tileSamples * p_tileSamples + 1;
       }
       else {
         p_nullCache.startSamp = (p_sample - 1) / p_tileSamples * p_tileSamples + 1;
       }
 
-      if (p_line <= 0) {
+      if(p_line <= 0) {
         p_nullCache.startLine = (p_line - p_tileLines) / p_tileLines * p_tileLines + 1;
       }
       else {
@@ -297,30 +297,30 @@ namespace Isis {
 
     // Look through the cache list to see if we already have the cache
     // but check the last cache first
-    if (p_lastCache >= 0) {
+    if(p_lastCache >= 0) {
       InternalCache *cache;
       int next = p_lastCache;
       int count = p_cacheList.size();
-      for (int i=0; i<count; i++) {
+      for(int i = 0; i < count; i++) {
         cache = p_cacheList[next];
-        if (cache->buf != NULL) {
-          if ((p_sample >= cache->startSamp) && (p_sample <= cache->endSamp) &&
+        if(cache->buf != NULL) {
+          if((p_sample >= cache->startSamp) && (p_sample <= cache->endSamp) &&
               (p_line >= cache->startLine)   && (p_line <= cache->endLine)   &&
               (p_band == cache->band)) {
-           p_lastCache = next;
-           return cache;
+            p_lastCache = next;
+            return cache;
           }
         }
         next++;
-        if (next >= count) next = 0;
+        if(next >= count) next = 0;
       }
     }
 
     // Ok its not in the cache see if there is an open slot
     InternalCache *cache = NULL;
     unsigned int listSize = p_cacheList.size();
-    for (unsigned int i=0; i<listSize; i++) {
-      if (p_cacheList[i]->buf == NULL) {
+    for(unsigned int i = 0; i < listSize; i++) {
+      if(p_cacheList[i]->buf == NULL) {
         cache = p_cacheList[i];
         cache->buf = new char [p_bytesPerTile];
         cache->dirty = false;
@@ -330,9 +330,9 @@ namespace Isis {
     }
 
     // If there are no open slots so chose one to get rid of
-    if (cache == NULL) {
+    if(cache == NULL) {
       p_lastCache++;
-      if (p_lastCache >= (int)p_cacheList.size()) p_lastCache = 0;
+      if(p_lastCache >= (int)p_cacheList.size()) p_lastCache = 0;
       cache = p_cacheList[p_lastCache];
     }
 
@@ -353,9 +353,9 @@ namespace Isis {
 
     // If this cube is being created the tile may not exist so we
     // shouldn't try to read it
-    if (p_tileAllocated.size() > 0) {
-      if (!p_tileAllocated[startTile-1]) {
-        memmove(cache->buf,p_nullCache.buf,p_bytesPerTile);
+    if(p_tileAllocated.size() > 0) {
+      if(!p_tileAllocated[startTile-1]) {
+        memmove(cache->buf, p_nullCache.buf, p_bytesPerTile);
         p_tileAllocated[startTile-1] = true;
         cache->dirty = true;
         return cache;
@@ -363,19 +363,19 @@ namespace Isis {
     }
 
     // Ok looks like we need to read the tile
-    streampos sbyte = (streampos) (p_cube->startByte - 1) +
-                      (streampos) (startTile - 1) * (streampos) p_bytesPerTile;
-    p_cube->stream.seekg(sbyte,std::ios::beg);
-    if (!p_cube->stream.good()) {
+    streampos sbyte = (streampos)(p_cube->startByte - 1) +
+                      (streampos)(startTile - 1) * (streampos) p_bytesPerTile;
+    p_cube->stream.seekg(sbyte, std::ios::beg);
+    if(!p_cube->stream.good()) {
       string msg = "Error preparing to read data from cube";
-      throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
 
     int bytes = p_bytesPerTile;
-    p_cube->stream.read(cache->buf,bytes);
-    if (!p_cube->stream.good()) {
+    p_cube->stream.read(cache->buf, bytes);
+    if(!p_cube->stream.good()) {
       string msg = "Error reading data from cube";
-      throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
 
     // We have a cache containing the line sample
@@ -386,32 +386,32 @@ namespace Isis {
                              char *src, int sindex,
                              int nelements) {
     // Don't change the null cache
-    if (dest == p_nullCache.buf) return;
+    if(dest == p_nullCache.buf) return;
 
     int nbytes = Isis::SizeOf(p_cube->pixelType);
-    if ((p_native) || (nbytes == 1) || (!p_native && (src == p_nullCache.buf))) {
-      memmove(&dest[dindex*nbytes],&src[sindex*nbytes],nelements*nbytes);
+    if((p_native) || (nbytes == 1) || (!p_native && (src == p_nullCache.buf))) {
+      memmove(&dest[dindex*nbytes], &src[sindex*nbytes], nelements * nbytes);
     }
-    else if (nbytes == 2) {
-      int d = dindex*nbytes;
-      int s = sindex*nbytes;
-      for (int i=0; i<nelements; i++) {
+    else if(nbytes == 2) {
+      int d = dindex * nbytes;
+      int s = sindex * nbytes;
+      for(int i = 0; i < nelements; i++) {
         dest[d] = src[s+1];
         dest[d+1] = src[s];
-        d+=2;
-        s+=2;
+        d += 2;
+        s += 2;
       }
     }
     else {
-      int d = dindex*nbytes;
-      int s = sindex*nbytes;
-      for (int i=0; i<nelements; i++) {
+      int d = dindex * nbytes;
+      int s = sindex * nbytes;
+      for(int i = 0; i < nelements; i++) {
         dest[d] = src[s+3];
         dest[d+1] = src[s+2];
         dest[d+2] = src[s+1];
         dest[d+3] = src[s];
-        d+=4;
-        s+=4;
+        d += 4;
+        s += 4;
       }
     }
   }
@@ -419,49 +419,49 @@ namespace Isis {
   void CubeTileHandler::MakeNullCache() {
     p_nullCache.buf = new char[p_bytesPerTile];
 
-    for (int i=0; i<p_tileSamples*p_tileLines; i++) {
-      if (p_cube->pixelType == Isis::UnsignedByte) {
+    for(int i = 0; i < p_tileSamples * p_tileLines; i++) {
+      if(p_cube->pixelType == Isis::UnsignedByte) {
         ((unsigned char *)p_nullCache.buf)[i] = Isis::NULL1;
       }
-      else if (p_cube->pixelType == Isis::SignedWord) {
+      else if(p_cube->pixelType == Isis::SignedWord) {
         ((short *)p_nullCache.buf)[i] = Isis::NULL2;
       }
-      else if (p_cube->pixelType == Isis::Real) {
+      else if(p_cube->pixelType == Isis::Real) {
         ((float *)p_nullCache.buf)[i] = Isis::NULL4;
       }
       else {
         string msg = "Unsupported pixel type";
-        throw Isis::iException::Message(Isis::iException::Programmer,msg,_FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
       }
     }
 
   }
 
-  void CubeTileHandler::WriteCache (CubeTileHandler::InternalCache *cache) {
+  void CubeTileHandler::WriteCache(CubeTileHandler::InternalCache *cache) {
     // Do nothing if the cache isn't dirty
-    if (!cache->dirty) return;
+    if(!cache->dirty) return;
 
     // Otherwise compute tile number and write it
     int tile = (cache->band - 1) * p_sampleTiles * p_lineTiles +
                (cache->startLine - 1) / p_tileLines * p_sampleTiles +
                (cache->startSamp - 1) / p_tileSamples + 1;
-    WriteTile(cache->buf,tile);
+    WriteTile(cache->buf, tile);
   }
 
-  void CubeTileHandler::WriteTile (char *buf, int tile) {
+  void CubeTileHandler::WriteTile(char *buf, int tile) {
     streampos sbyte = (streampos)(p_cube->startByte - 1) +
                       (streampos)(tile - 1) * (streampos)p_bytesPerTile;
-    p_cube->stream.seekp(sbyte,std::ios::beg);
-    if (!p_cube->stream.good()) {
+    p_cube->stream.seekp(sbyte, std::ios::beg);
+    if(!p_cube->stream.good()) {
       string msg = "Error preparing to write data to cube";
-      throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
 
     int bytes = p_bytesPerTile;
-    p_cube->stream.write(buf,bytes);
-    if (!p_cube->stream.good()) {
+    p_cube->stream.write(buf, bytes);
+    if(!p_cube->stream.good()) {
       string msg = "Error writing data to cube";
-      throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
   }
 }

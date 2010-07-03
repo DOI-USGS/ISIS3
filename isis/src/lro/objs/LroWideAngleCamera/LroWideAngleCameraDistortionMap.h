@@ -38,7 +38,7 @@ namespace Isis {
      *
      * @author 2008-08-22 Steven Lambright
      *
-     * @internal 
+     * @internal
      *   @history 2009-11-19 Kris Becker - Changed the convergence tolerance
      *            from 1/10,000 of a pixel to 1/100 of a pixel
      *   @history 2010-05-05 Ken Edmundson - Corrected distorted and undistorted
@@ -49,24 +49,24 @@ namespace Isis {
      *            the IK based upon analysis of the VIS and UV.
      */
     class LroWideAngleCameraDistortionMap : public CameraDistortionMap {
-    public:
-      LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode);
+      public:
+        LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode);
 
-      //! Destructor
-      virtual ~LroWideAngleCameraDistortionMap() {};
+        //! Destructor
+        virtual ~LroWideAngleCameraDistortionMap() {};
 
-      virtual bool SetFocalPlane(const double dx, const double dy);
+        virtual bool SetFocalPlane(const double dx, const double dy);
 
-      virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
+        virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
-      void SetFilter(int filter) {
-        p_filter = filter;
-      }
+        void SetFilter(int filter) {
+          p_filter = filter;
+        }
 
-    private:
-      int p_filter;
-      double p_k1;
-      double p_k2;
+      private:
+        int p_filter;
+        double p_k1;
+        double p_k2;
     };
   };
 };

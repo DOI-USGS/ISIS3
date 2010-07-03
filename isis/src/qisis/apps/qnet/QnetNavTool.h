@@ -95,14 +95,14 @@ namespace Qisis {
    *                          button or "Show Nav Tool" button are activated.
    *                          Replaced #includes with forward class declarations
    *                          and moved #include to .cpp file.
-   *  
-   *  
+   *
+   *
    */
   class QnetNavTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetNavTool (QWidget *parent);
+      QnetNavTool(QWidget *parent);
 
       enum FilterIndex {
         Points,
@@ -145,8 +145,8 @@ namespace Qisis {
       void showNavTool();
 
     signals:
-      void loadPoint (Isis::ControlPoint *);
-      void loadImage (const QString &);
+      void loadPoint(Isis::ControlPoint *);
+      void loadImage(const QString &);
       void modifyPoint(Isis::ControlPoint *);
       void ignoredPoints();
       void deletedPoints();

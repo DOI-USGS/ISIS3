@@ -26,43 +26,43 @@
 
 #include "Buffer.h"
 
-// I'm not sure how to forward declare the iterators 
-#include <QVector> 
+// I'm not sure how to forward declare the iterators
+#include <QVector>
 
 template<class T> class QStack;
 template<class T> class QVector;
 
 namespace Isis {
-/**
- * @brief Calculator for arrays
- *
- * This class is a RPN calculator on arrays.  It uses classic
- * push/pop/operator methods.  That is, push array1, push
- * array2, add, pop arrayResult.
- *
- * @ingroup Math
- *
- * @author 2007-04-01 Sean Crosby
- *
- * @internal
- *  @history 2007-06-11 Jeff Anderson - Fixed bug in
- *           Push(Buffer) method.  NAN was not computed
- *           properly.
- *  @history 2007-08-21 Steven Lambright - Moved the infix to postfix
- *           conversion into its own class.
- *  @history 2008-01-28 Steven Lambright - Added more support for the
- *           power operator
- *  @history 2008-03-28 Steven Lambright - Condensed math methods to
- *           just call PerformOperation(...). Converted valarray's to vectors
- *           (in order to use iterators)
- *  @history 2008-06-18 Christopher Austin - Added as well as fixed
- *           documentation
- *  @history 2010-02-23 Steven Lambright - Added Minimum2, Maximum2 and all
- *           min/max operations now ignore special pixels.
- *  @history 2010-04-08 Steven Lambright - Made min, max have proper
- *           implementations and vectors are now QVectors.
- *
- */
+  /**
+   * @brief Calculator for arrays
+   *
+   * This class is a RPN calculator on arrays.  It uses classic
+   * push/pop/operator methods.  That is, push array1, push
+   * array2, add, pop arrayResult.
+   *
+   * @ingroup Math
+   *
+   * @author 2007-04-01 Sean Crosby
+   *
+   * @internal
+   *  @history 2007-06-11 Jeff Anderson - Fixed bug in
+   *           Push(Buffer) method.  NAN was not computed
+   *           properly.
+   *  @history 2007-08-21 Steven Lambright - Moved the infix to postfix
+   *           conversion into its own class.
+   *  @history 2008-01-28 Steven Lambright - Added more support for the
+   *           power operator
+   *  @history 2008-03-28 Steven Lambright - Condensed math methods to
+   *           just call PerformOperation(...). Converted valarray's to vectors
+   *           (in order to use iterators)
+   *  @history 2008-06-18 Christopher Austin - Added as well as fixed
+   *           documentation
+   *  @history 2010-02-23 Steven Lambright - Added Minimum2, Maximum2 and all
+   *           min/max operations now ignore special pixels.
+   *  @history 2010-04-08 Steven Lambright - Made min, max have proper
+   *           implementations and vectors are now QVectors.
+   *
+   */
   class Calculator {
     public:
       Calculator();   // Constructor
@@ -128,11 +128,11 @@ namespace Isis {
 
     protected:
       void PerformOperation(QVector<double> &results,
-                            QVector<double>::iterator arg1Start, 
+                            QVector<double>::iterator arg1Start,
                             QVector<double>::iterator arg1End,
                             double operation(double));
       void PerformOperation(QVector<double> &results,
-                            QVector<double>::iterator arg1Start, 
+                            QVector<double>::iterator arg1Start,
                             QVector<double>::iterator arg1End,
                             QVector<double>::iterator arg2Start,
                             QVector<double>::iterator arg2End,

@@ -27,16 +27,14 @@
 using namespace Isis;
 using namespace std;
 
-namespace Qisis
-{
+namespace Qisis {
   /**
    * StretchTool constructor
    *
    *
    * @param parent
    */
-  StretchTool::StretchTool(QWidget *parent) : Tool::Tool(parent)
-  {
+  StretchTool::StretchTool(QWidget *parent) : Tool::Tool(parent) {
     p_preGlobalStretches = NULL;
     p_advancedStretch = NULL;
     p_advancedStretch = new AdvancedStretchDialog(parent);
@@ -69,10 +67,8 @@ namespace Qisis
   /**
    * Destructor
    */
-  StretchTool::~StretchTool()
-  {
-    if (p_preGlobalStretches)
-    {
+  StretchTool::~StretchTool() {
+    if(p_preGlobalStretches) {
       delete [] p_preGlobalStretches;
       p_preGlobalStretches = NULL;
     }
@@ -87,8 +83,7 @@ namespace Qisis
    *
    * @return QAction*
    */
-  QAction *StretchTool::toolPadAction(ToolPad *pad)
-  {
+  QAction *StretchTool::toolPadAction(ToolPad *pad) {
     QAction *action = new QAction(pad);
     action->setIcon(QPixmap(toolIconDir() + "/stretch_global.png"));
     action->setToolTip("Stretch (S)");
@@ -108,8 +103,7 @@ namespace Qisis
    *
    * @param menu
    */
-  void StretchTool::addTo(QMenu *menu)
-  {
+  void StretchTool::addTo(QMenu *menu) {
     menu->addAction(p_stretchGlobal);
     menu->addAction(p_stretchRegional);
   }
@@ -123,8 +117,7 @@ namespace Qisis
    *
    * @return QWidget*
    */
-  QWidget *StretchTool::createToolBarWidget(QStackedWidget *parent)
-  {
+  QWidget *StretchTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *hbox = new QWidget(parent);
 
     QToolButton *butt = new QToolButton(hbox);
@@ -283,50 +276,40 @@ namespace Qisis
    * This updates the visible histograms in the advanced stretch,
    * if present.
    */
-  void StretchTool::updateHistograms()
-  {
-    if (p_advancedStretch->isVisible())
-    {
+  void StretchTool::updateHistograms() {
+    if(p_advancedStretch->isVisible()) {
       MdiCubeViewport *cvp = cubeViewport();
 
-      if (!cvp) return;
+      if(!cvp) return;
 
-      if (cvp->isGray() && !cvp->grayBuffer()->working())
-      {
-        if (p_advancedStretch->isRgbMode())
-        {
+      if(cvp->isGray() && !cvp->grayBuffer()->working()) {
+        if(p_advancedStretch->isRgbMode()) {
           updateTool();
         }
-        else
-        {
+        else {
           Isis::Histogram hist(histFromBuffer(cvp->grayBuffer()));
 
-          if (hist.ValidPixels() > 0)
-          {
+          if(hist.ValidPixels() > 0) {
             p_advancedStretch->updateHistogram(hist);
           }
         }
       }
       //Otherwise it is in color mode
-      else if (!cvp->isGray() &&
-               !cvp->redBuffer()->working() &&
-               !cvp->greenBuffer()->working() &&
-               !cvp->blueBuffer()->working())
-      {
-        if (!p_advancedStretch->isRgbMode())
-        {
+      else if(!cvp->isGray() &&
+              !cvp->redBuffer()->working() &&
+              !cvp->greenBuffer()->working() &&
+              !cvp->blueBuffer()->working()) {
+        if(!p_advancedStretch->isRgbMode()) {
           updateTool();
         }
-        else
-        {
+        else {
           Isis::Histogram redHist(histFromBuffer(cvp->redBuffer()));
           Isis::Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
           Isis::Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
 
-          if (redHist.ValidPixels() > 0 &&
+          if(redHist.ValidPixels() > 0 &&
               grnHist.ValidPixels() > 0 &&
-              bluHist.ValidPixels() > 0)
-          {
+              bluHist.ValidPixels() > 0) {
             p_advancedStretch->updateHistograms(redHist, grnHist, bluHist);
           }
         }
@@ -338,8 +321,7 @@ namespace Qisis
   /**
    * This is called when the visible area changes.
    */
-  void StretchTool::screenPixelsChanged()
-  {
+  void StretchTool::screenPixelsChanged() {
     updateHistograms();
   }
 
@@ -349,26 +331,22 @@ namespace Qisis
    *
    * @param cvp
    */
-  void StretchTool::setCubeViewport(CubeViewport *cvp)
-  {
-    if (p_advancedStretch->isVisible())
-    {
+  void StretchTool::setCubeViewport(CubeViewport *cvp) {
+    if(p_advancedStretch->isVisible()) {
       p_advancedStretch->enable(true);
 
       //If the viewport is in gray mode
-      if (cvp->isGray() && !cvp->grayBuffer()->working())
-      {
+      if(cvp->isGray() && !cvp->grayBuffer()->working()) {
         Isis::Histogram hist(histFromBuffer(cvp->grayBuffer()));
         Isis::Stretch stretch(cvp->grayStretch());
 
         p_advancedStretch->enableGrayMode(stretch, hist);
       }
       //Otherwise it is in color mode
-      else if (!cvp->isGray() &&
-               !cvp->redBuffer()->working() &&
-               !cvp->greenBuffer()->working() &&
-               !cvp->blueBuffer()->working())
-      {
+      else if(!cvp->isGray() &&
+              !cvp->redBuffer()->working() &&
+              !cvp->greenBuffer()->working() &&
+              !cvp->blueBuffer()->working()) {
         Isis::Histogram redHist(histFromBuffer(cvp->redBuffer()));
         Isis::Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
         Isis::Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
@@ -380,13 +358,11 @@ namespace Qisis
                                          grnStretch, grnHist,
                                          bluStretch, bluHist);
       }
-      else
-      {
+      else {
         p_advancedStretch->enable(false);
       }
     }
-    else
-    {
+    else {
       p_advancedStretch->enable(false);
     }
   }
@@ -396,50 +372,40 @@ namespace Qisis
    * Updates the stretch tool.
    *
    */
-  void StretchTool::updateTool()
-  {
+  void StretchTool::updateTool() {
     CubeViewport *cvp = cubeViewport();
 
-    if (cvp == NULL)
-    {
+    if(cvp == NULL) {
       //If the current viewport is NULL and the advanced dialog is visible, hide it
-      if (p_advancedStretch->isVisible())
-      {
+      if(p_advancedStretch->isVisible()) {
         p_advancedStretch->hide();
       }
     }
-    else
-    {
-      if (!p_advancedStretch->enabled() ||
-          p_advancedStretch->isRgbMode() != !cvp->isGray())
-      {
+    else {
+      if(!p_advancedStretch->enabled() ||
+          p_advancedStretch->isRgbMode() != !cvp->isGray()) {
         setCubeViewport(cvp);
       }
     }
 
-    if (cvp && cvp->isGray())
-    {
+    if(cvp && cvp->isGray()) {
       p_copyBands->setEnabled(true);
       p_stretchBandComboBox->setShown(false);
     }
-    else if (cvp)
-    {
+    else if(cvp) {
       p_copyBands->setEnabled(false);
       p_stretchBandComboBox->setShown(true);
     }
-    else
-    {
+    else {
       p_copyBands->setEnabled(false);
       p_stretchBandComboBox->setShown(false);
     }
 
-    if (p_advancedStretch->isVisible())
-    {
+    if(p_advancedStretch->isVisible()) {
       p_stretchMinEdit->setEnabled(false);
       p_stretchMaxEdit->setEnabled(false);
     }
-    else
-    {
+    else {
       p_stretchMinEdit->setEnabled(true);
       p_stretchMaxEdit->setEnabled(true);
     }
@@ -456,66 +422,53 @@ namespace Qisis
    * @param cvp
    * @param bandId
    */
-  void StretchTool::stretchRequested(MdiCubeViewport *cvp, int bandId)
-  {
+  void StretchTool::stretchRequested(MdiCubeViewport *cvp, int bandId) {
     // Yeah this is a hack... but it's necessary to make this tool
     //   do anything while its not the active tool.
     connect(cvp, SIGNAL(screenPixelsChanged()), this, SLOT(updateHistograms()));
 
     QRect rect(0, 0, cvp->viewport()->width(), cvp->viewport()->height());
 
-    if (bandId == (int)Gray)
-    {
-      if (cvp->grayBuffer() && cvp->grayBuffer()->hasEntireCube())
-      {
+    if(bandId == (int)Gray) {
+      if(cvp->grayBuffer() && cvp->grayBuffer()->hasEntireCube()) {
         Stretch newStretch = cvp->grayStretch();
         newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
         cvp->stretchGray(newStretch);
       }
-      else
-      {
+      else {
         Stretch newStretch = stretchBand(cvp, (StretchBand)bandId);
         cvp->stretchGray(newStretch);
       }
     }
-    else if (bandId == (int)Red)
-    {
-      if (cvp->redBuffer() && cvp->redBuffer()->hasEntireCube())
-      {
+    else if(bandId == (int)Red) {
+      if(cvp->redBuffer() && cvp->redBuffer()->hasEntireCube()) {
         Stretch newStretch = cvp->redStretch();
         newStretch.CopyPairs(stretchBuffer(cvp->redBuffer(), rect));
         cvp->stretchRed(newStretch);
       }
-      else
-      {
+      else {
         Stretch newStretch = stretchBand(cvp, (StretchBand)bandId);
         cvp->stretchRed(newStretch);
       }
     }
-    else if (bandId == (int)Green)
-    {
-      if (cvp->greenBuffer() && cvp->greenBuffer()->hasEntireCube())
-      {
+    else if(bandId == (int)Green) {
+      if(cvp->greenBuffer() && cvp->greenBuffer()->hasEntireCube()) {
         Stretch newStretch = cvp->greenStretch();
         newStretch.CopyPairs(stretchBuffer(cvp->greenBuffer(), rect));
         cvp->stretchGreen(newStretch);
       }
-      else
-      {
+      else {
         Stretch newStretch = stretchBand(cvp, (StretchBand)bandId);
         cvp->stretchGreen(newStretch);
       }
     }
-    else if (bandId == (int)Blue)
-    {
-      if (cvp->blueBuffer() && cvp->blueBuffer()->hasEntireCube())
-      {
+    else if(bandId == (int)Blue) {
+      if(cvp->blueBuffer() && cvp->blueBuffer()->hasEntireCube()) {
         Stretch newStretch = cvp->blueStretch();
         newStretch.CopyPairs(stretchBuffer(cvp->blueBuffer(), rect));
         cvp->stretchBlue(newStretch);
       }
-      else
-      {
+      else {
         Stretch newStretch = stretchBand(cvp, (StretchBand)bandId);
         cvp->stretchBlue(newStretch);
       }
@@ -530,15 +483,12 @@ namespace Qisis
    * text fields to the correct values.
    *
    */
-  void StretchTool::stretchChanged()
-  {
+  void StretchTool::stretchChanged() {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
-    if (p_flashButton->isDown())
-    {
-      if (!p_preGlobalStretches)
-      {
+    if(p_flashButton->isDown()) {
+      if(!p_preGlobalStretches) {
         p_preGlobalStretches = new Stretch[4];
         p_preGlobalStretches[0] = cvp->grayStretch();
         p_preGlobalStretches[1] = cvp->redStretch();
@@ -549,14 +499,11 @@ namespace Qisis
       cvp->stretchKnownGlobal();
       return;
     }
-    else if (p_preGlobalStretches)
-    {
-      if (cvp->isGray())
-      {
+    else if(p_preGlobalStretches) {
+      if(cvp->isGray()) {
         cvp->stretchGray(p_preGlobalStretches[0]);
       }
-      else
-      {
+      else {
         cvp->stretchRed(p_preGlobalStretches[1]);
         cvp->stretchGreen(p_preGlobalStretches[2]);
         cvp->stretchBlue(p_preGlobalStretches[3]);
@@ -568,8 +515,7 @@ namespace Qisis
 
     double min = 0, max = 0;
     //If the viewport is in gray mode
-    if (cvp->isGray())
-    {
+    if(cvp->isGray()) {
       //Get the min/max from the current stretch
       Isis::Stretch stretch = cvp->grayStretch();
       min = stretch.Input(0);
@@ -577,25 +523,21 @@ namespace Qisis
     }
 
     //Otherwise it is in color mode
-    else
-    {
+    else {
       Isis::Stretch rstretch = cvp->redStretch();
       Isis::Stretch gstretch = cvp->greenStretch();
       Isis::Stretch bstretch = cvp->blueStretch();
 
       //Get the min/max from the current stretch
-      if (p_stretchBand == Red)
-      {
+      if(p_stretchBand == Red) {
         min = rstretch.Input(0);
         max = rstretch.Input(rstretch.Pairs() - 1);
       }
-      else if (p_stretchBand == Green)
-      {
+      else if(p_stretchBand == Green) {
         min = gstretch.Input(0);
         max = gstretch.Input(gstretch.Pairs() - 1);
       }
-      else if (p_stretchBand == Blue)
-      {
+      else if(p_stretchBand == Blue) {
         min = bstretch.Input(0);
         max = bstretch.Input(bstretch.Pairs() - 1);
       }
@@ -610,8 +552,7 @@ namespace Qisis
     strMax.setNum(max);
     p_stretchMaxEdit->setText(strMax);
 
-    if (p_advancedStretch->isVisible())
-    {
+    if(p_advancedStretch->isVisible()) {
       p_advancedStretch->updateStretch(cvp);
     }
   }
@@ -621,20 +562,17 @@ namespace Qisis
    * This is called when one of the advanced stretches changed.
    * Give the stretch to the viewport.
    */
-  void StretchTool::advancedStretchChanged()
-  {
+  void StretchTool::advancedStretchChanged() {
     CubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
-    if (!p_advancedStretch->isRgbMode())
-    {
+    if(!p_advancedStretch->isRgbMode()) {
       Stretch grayStretch = cvp->grayStretch();
       grayStretch.ClearPairs();
       grayStretch.CopyPairs(p_advancedStretch->getGrayStretch());
       cvp->stretchGray(grayStretch);
     }
-    else
-    {
+    else {
       Stretch redStretch = cvp->redStretch();
       redStretch.ClearPairs();
       redStretch.CopyPairs(p_advancedStretch->getRedStretch());
@@ -660,25 +598,22 @@ namespace Qisis
    * text fields to the correct values.
    *
    */
-  void StretchTool::changeStretch()
-  {
+  void StretchTool::changeStretch() {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
     // Make sure the user didn't enter bad min/max and if so fix it
     double min = p_stretchMinEdit->text().toDouble();
     double max = p_stretchMaxEdit->text().toDouble();
 
-    if (min >= max || p_stretchMinEdit->text() == "" ||
-        p_stretchMaxEdit->text() == "")
-    {
+    if(min >= max || p_stretchMinEdit->text() == "" ||
+        p_stretchMaxEdit->text() == "") {
       updateTool();
       return;
     }
 
     //The viewport is in gray mode
-    if (cvp->isGray())
-    {
+    if(cvp->isGray()) {
       Isis::Stretch stretch = cvp->grayStretch();
       stretch.ClearPairs();
       stretch.AddPair(min, 0.0);
@@ -687,26 +622,22 @@ namespace Qisis
       cvp->stretchGray(stretch);
     }
     //Otherwise the viewport is in color mode
-    else
-    {
+    else {
       Isis::Stretch redStretch = cvp->redStretch();
       Isis::Stretch greenStretch = cvp->greenStretch();
       Isis::Stretch blueStretch = cvp->blueStretch();
 
-      if (p_stretchBand == Red)
-      {
+      if(p_stretchBand == Red) {
         redStretch.ClearPairs();
         redStretch.AddPair(min, 0.0);
         redStretch.AddPair(max, 255.0);
       }
-      if (p_stretchBand == Green)
-      {
+      if(p_stretchBand == Green) {
         greenStretch.ClearPairs();
         greenStretch.AddPair(min, 0.0);
         greenStretch.AddPair(max, 255.0);
       }
-      if (p_stretchBand == Blue)
-      {
+      if(p_stretchBand == Blue) {
         blueStretch.ClearPairs();
         blueStretch.AddPair(min, 0.0);
         blueStretch.AddPair(max, 255.0);
@@ -725,12 +656,10 @@ namespace Qisis
    * This methods shows and updates the advanced dialog.
    *
    */
-  void StretchTool::showAdvancedDialog()
-  {
-    if (p_advancedStretch->isVisible()) return;
+  void StretchTool::showAdvancedDialog() {
+    if(p_advancedStretch->isVisible()) return;
 
-    if (cubeViewport())
-    {
+    if(cubeViewport()) {
       p_advancedStretch->updateStretch(cubeViewport());
       p_advancedStretch->show();
     }
@@ -744,10 +673,9 @@ namespace Qisis
    * Does a global stretch for the active viewport.
    *
    */
-  void StretchTool::stretchGlobal()
-  {
+  void StretchTool::stretchGlobal() {
     CubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
     stretchGlobal(cvp);
   }
@@ -756,10 +684,9 @@ namespace Qisis
   /**
    * This resets the stretch across all bands
    */
-  void StretchTool::stretchGlobalAllBands()
-  {
+  void StretchTool::stretchGlobalAllBands() {
     CubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
     cvp->forgetStretches();
     stretchGlobal(cvp);
@@ -770,8 +697,7 @@ namespace Qisis
    * Does a global stretch for the specified viewport.
    *
    */
-  void StretchTool::stretchGlobal(CubeViewport *cvp)
-  {
+  void StretchTool::stretchGlobal(CubeViewport *cvp) {
     cvp->stretchKnownGlobal();
     stretchChanged();
   }
@@ -781,10 +707,8 @@ namespace Qisis
    * Does a global stretch for all the viewports.
    *
    */
-  void StretchTool::stretchGlobalAllViewports()
-  {
-    for (int i = 0; i < (int)cubeViewportList()->size(); i++)
-    {
+  void StretchTool::stretchGlobalAllViewports() {
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       CubeViewport *cvp = cubeViewportList()->at(i);
 
       stretchGlobal(cvp);
@@ -796,10 +720,9 @@ namespace Qisis
    * Does a regional stretch for the active viewport.
    *
    */
-  void StretchTool::stretchRegional()
-  {
+  void StretchTool::stretchRegional() {
     CubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
     stretchRegional(cvp);
   }
@@ -808,8 +731,7 @@ namespace Qisis
    * Does a regional stretch for the specified viewport.
    *
    */
-  void StretchTool::stretchRegional(CubeViewport *cvp)
-  {
+  void StretchTool::stretchRegional(CubeViewport *cvp) {
     QRect rect(0, 0, cvp->viewport()->width(), cvp->viewport()->height());
 
     Stretch newStretch = cvp->grayStretch();
@@ -826,50 +748,43 @@ namespace Qisis
    * accordingly.
    *
    */
-  void StretchTool::rubberBandComplete()
-  {
+  void StretchTool::rubberBandComplete() {
     CubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
-    if (!RubberBandTool::isValid()) return;
+    if(cvp == NULL) return;
+    if(!RubberBandTool::isValid()) return;
 
     QRect rubberBandRect = RubberBandTool::rectangle();
     //Return if the width or height is zero
-    if (rubberBandRect.width() == 0 || rubberBandRect.height() == 0) return;
+    if(rubberBandRect.width() == 0 || rubberBandRect.height() == 0) return;
 
     Stretch newStretch;
 
-    if (cvp->isGray())
-    {
+    if(cvp->isGray()) {
       newStretch = cvp->grayStretch();
       newStretch.ClearPairs();
       newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rubberBandRect));
       cvp->stretchGray(newStretch);
     }
-    else
-    {
-      if (p_stretchBand == Red)
-      {
+    else {
+      if(p_stretchBand == Red) {
         newStretch = cvp->redStretch();
         newStretch.ClearPairs();
         newStretch.CopyPairs(stretchBuffer(cvp->redBuffer(), rubberBandRect));
         cvp->stretchRed(newStretch);
       }
-      else if (p_stretchBand == Green)
-      {
+      else if(p_stretchBand == Green) {
         newStretch = cvp->greenStretch();
         newStretch.ClearPairs();
         newStretch.CopyPairs(stretchBuffer(cvp->greenBuffer(), rubberBandRect));
         cvp->stretchGreen(newStretch);
       }
-      else if (p_stretchBand == Blue)
-      {
+      else if(p_stretchBand == Blue) {
         newStretch = cvp->blueStretch();
         newStretch.ClearPairs();
         newStretch.CopyPairs(stretchBuffer(cvp->blueBuffer(), rubberBandRect));
         cvp->stretchBlue(newStretch);
       }
-      else
-      {
+      else {
         throw iException::Message(iException::Programmer,
                                   "Unknown stretch band", _FILEINFO_);
       }
@@ -886,17 +801,15 @@ namespace Qisis
    * @param start
    * @param s
    */
-  void StretchTool::mouseButtonRelease(QPoint start, Qt::MouseButton s)
-  {
+  void StretchTool::mouseButtonRelease(QPoint start, Qt::MouseButton s) {
     CubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
     // Call the parent Tool function to reset the Warning as different activity is
     // taking place
     Qisis::Tool::mouseButtonRelease(start, s);
 
-    if (s == Qt::RightButton)
-    {
+    if(s == Qt::RightButton) {
       stretchGlobal(cvp);
 
       // Resets the RubberBandTool on screen.
@@ -908,8 +821,7 @@ namespace Qisis
    * This method enables the RubberBandTool.
    *
    */
-  void StretchTool::enableRubberBandTool()
-  {
+  void StretchTool::enableRubberBandTool() {
     RubberBandTool::enable(RubberBandTool::Rectangle);
   }
 
@@ -919,10 +831,9 @@ namespace Qisis
    * the current stretch
    *
    */
-  void StretchTool::setStretchAcrossBands()
-  {
+  void StretchTool::setStretchAcrossBands() {
     CubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
+    if(cvp == NULL) return;
 
     double min = p_stretchMinEdit->text().toDouble();
     double max = p_stretchMaxEdit->text().toDouble();
@@ -941,17 +852,14 @@ namespace Qisis
    * stretch in the active viewport.
    *
    */
-  void StretchTool::setStretchAllViewports()
-  {
-    for (int i = 0; i < (int)cubeViewportList()->size(); i++)
-    {
+  void StretchTool::setStretchAllViewports() {
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       CubeViewport *cvp = cubeViewportList()->at(i);
       double min = p_stretchMinEdit->text().toDouble();
       double max = p_stretchMaxEdit->text().toDouble();
 
       //The viewport is in gray mode
-      if (cvp->isGray())
-      {
+      if(cvp->isGray()) {
         Isis::Stretch stretch = cvp->grayStretch();
         stretch.ClearPairs();
         stretch.AddPair(min, 0.0);
@@ -959,14 +867,12 @@ namespace Qisis
         cvp->stretchGray(stretch);
       }
       //Otherwise the viewport is in color mode
-      else
-      {
+      else {
 
         Isis::Stretch greenStretch = cvp->greenStretch();
         Isis::Stretch blueStretch = cvp->blueStretch();
 
-        if (p_stretchBand == Red)
-        {
+        if(p_stretchBand == Red) {
           Isis::Stretch redStretch = cvp->redStretch();
 
           redStretch.ClearPairs();
@@ -975,8 +881,7 @@ namespace Qisis
 
           cvp->stretchRed(redStretch);
         }
-        else if (p_stretchBand == Green)
-        {
+        else if(p_stretchBand == Green) {
           Isis::Stretch greenStretch = cvp->redStretch();
 
           greenStretch.ClearPairs();
@@ -985,8 +890,7 @@ namespace Qisis
 
           cvp->stretchGreen(greenStretch);
         }
-        else if (p_stretchBand == Blue)
-        {
+        else if(p_stretchBand == Blue) {
           Isis::Stretch blueStretch = cvp->blueStretch();
 
           blueStretch.ClearPairs();
@@ -1008,27 +912,23 @@ namespace Qisis
    * @param buffer
    * @param rect
    */
-  Isis::Stretch StretchTool::stretchBuffer(ViewportBuffer *buffer, QRect rect)
-  {
+  Isis::Stretch StretchTool::stretchBuffer(ViewportBuffer *buffer, QRect rect) {
     //Get the statistics and histogram from the region
     Isis::Statistics stats = statsFromBuffer(buffer, rect);
     Isis::Stretch stretch;
 
-    if (stats.ValidPixels() > 1 &&
-        fabs(stats.Minimum() - stats.Maximum()) > DBL_EPSILON)
-    {
+    if(stats.ValidPixels() > 1 &&
+        fabs(stats.Minimum() - stats.Maximum()) > DBL_EPSILON) {
       Isis::Histogram hist = histFromBuffer(buffer, rect,
                                             stats.BestMinimum(), stats.BestMaximum());
 
-      if (fabs(hist.Percent(0.5) - hist.Percent(99.5)) > DBL_EPSILON)
-      {
+      if(fabs(hist.Percent(0.5) - hist.Percent(99.5)) > DBL_EPSILON) {
         stretch.AddPair(hist.Percent(0.5), 0.0);
         stretch.AddPair(hist.Percent(99.5), 255.0);
       }
     }
 
-    if (stretch.Pairs() == 0)
-    {
+    if(stretch.Pairs() == 0) {
       stretch.AddPair(-DBL_MAX, 0.0);
       stretch.AddPair(DBL_MAX, 255.0);
     }
@@ -1043,23 +943,19 @@ namespace Qisis
    * @param cvp
    * @param band Band to stretch
    */
-  Isis::Stretch StretchTool::stretchBand(CubeViewport *cvp, StretchBand band)
-  {
+  Isis::Stretch StretchTool::stretchBand(CubeViewport *cvp, StretchBand band) {
     int bandNum = cvp->grayBand();
     Isis::Stretch stretch = cvp->grayStretch();
 
-    if (band == Red)
-    {
+    if(band == Red) {
       bandNum = cvp->redBand();
       stretch = cvp->redStretch();
     }
-    else if (band == Green)
-    {
+    else if(band == Green) {
       bandNum = cvp->greenBand();
       stretch = cvp->greenStretch();
     }
-    else if (band == Blue)
-    {
+    else if(band == Blue) {
       bandNum = cvp->blueBand();
       stretch = cvp->blueStretch();
     }
@@ -1069,13 +965,11 @@ namespace Qisis
                                          stats.BestMinimum(), stats.BestMaximum());
 
     stretch.ClearPairs();
-    if (fabs(hist.Percent(0.5) - hist.Percent(99.5)) > DBL_EPSILON)
-    {
+    if(fabs(hist.Percent(0.5) - hist.Percent(99.5)) > DBL_EPSILON) {
       stretch.AddPair(hist.Percent(0.5), 0.0);
       stretch.AddPair(hist.Percent(99.5), 255.0);
     }
-    else
-    {
+    else {
       stretch.AddPair(-DBL_MAX, 0.0);
       stretch.AddPair(DBL_MAX, 255.0);
     }
@@ -1092,13 +986,11 @@ namespace Qisis
    *
    * @return Isis::Statistics
    */
-  Isis::Statistics StretchTool::statsFromCube(Isis::Cube *cube, int band)
-  {
+  Isis::Statistics StretchTool::statsFromCube(Isis::Cube *cube, int band) {
     Isis::Statistics stats;
     Isis::Brick brick(cube->Samples(), 1, 1, cube->PixelType());
 
-    for (int line = 0; line < cube->Lines(); line++)
-    {
+    for(int line = 0; line < cube->Lines(); line++) {
       brick.SetBasePosition(0, line, band);
       cube->Read(brick);
       stats.AddData(brick.DoubleBuffer(), cube->Samples());
@@ -1118,10 +1010,8 @@ namespace Qisis
    * @return Isis::Statistics
    */
   Isis::Statistics StretchTool::statsFromBuffer(ViewportBuffer *buffer,
-      QRect rect)
-  {
-    if (buffer->working())
-    {
+      QRect rect) {
+    if(buffer->working()) {
       throw iException::Message(iException::User,
                                 "Cannot stretch while the cube is still loading", _FILEINFO_);
     }
@@ -1129,14 +1019,12 @@ namespace Qisis
     QRect dataArea = QRect(buffer->bufferXYRect().intersected(rect));
     Isis::Statistics stats;
 
-    for (int y = dataArea.top();
-         !dataArea.isNull() && y <= dataArea.bottom();
-         y++)
-    {
+    for(int y = dataArea.top();
+        !dataArea.isNull() && y <= dataArea.bottom();
+        y++) {
       const std::vector<double> &line = buffer->getLine(y - buffer->bufferXYRect().top());
 
-      for (int x = dataArea.left(); x < dataArea.right(); x++)
-      {
+      for(int x = dataArea.left(); x < dataArea.right(); x++) {
         stats.AddData(line[x - buffer->bufferXYRect().left()]);
       }
     }
@@ -1156,13 +1044,11 @@ namespace Qisis
    * @return Isis::Histogram
    */
   Isis::Histogram StretchTool::histFromCube(Isis::Cube *cube, int band,
-      double min, double max)
-  {
+      double min, double max) {
     Isis::Histogram hist(min, max);
     Isis::Brick brick(cube->Samples(), 1, 1, cube->PixelType());
 
-    for (int line = 0; line < cube->Lines(); line++)
-    {
+    for(int line = 0; line < cube->Lines(); line++) {
       brick.SetBasePosition(0, line, band);
       cube->Read(brick);
       hist.AddData(brick.DoubleBuffer(), cube->Samples());
@@ -1179,8 +1065,7 @@ namespace Qisis
    *
    * @return Isis::Histogram
    */
-  Isis::Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer)
-  {
+  Isis::Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer) {
     Isis::Statistics stats = statsFromBuffer(buffer, buffer->bufferXYRect());
     return histFromBuffer(buffer, buffer->bufferXYRect(),
                           stats.BestMinimum(), stats.BestMaximum());
@@ -1200,24 +1085,20 @@ namespace Qisis
    * @return Isis::Histogram
    */
   Isis::Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer,
-      QRect rect, double min, double max)
-  {
+      QRect rect, double min, double max) {
     QRect dataArea = QRect(buffer->bufferXYRect().intersected(rect));
 
-    try
-    {
+    try {
       Isis::Histogram hist(min, max);
 
-      for (int y = dataArea.top(); !dataArea.isNull() && y <= dataArea.bottom(); y++)
-      {
+      for(int y = dataArea.top(); !dataArea.isNull() && y <= dataArea.bottom(); y++) {
         const std::vector<double> &line = buffer->getLine(y - buffer->bufferXYRect().top());
         hist.AddData(&line.front() + (dataArea.left() - buffer->bufferXYRect().left()), dataArea.width());
       }
 
       return hist;
     }
-    catch (Isis::iException &e)
-    {
+    catch(Isis::iException &e) {
       // get the min and max DN values of the data area
       Isis::iString sMin(min);
       Isis::iString sMax(max);
@@ -1236,8 +1117,7 @@ namespace Qisis
   /**
    * The selected band for stretching changed.
    */
-  void StretchTool::stretchBandChanged(int)
-  {
+  void StretchTool::stretchBandChanged(int) {
     p_stretchBand = (StretchBand) p_stretchBandComboBox->itemData(
                       p_stretchBandComboBox->currentIndex()
                     ).toInt();

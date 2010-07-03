@@ -16,18 +16,18 @@ class map2map : public Isis::Transform {
 
   public:
     // constructor
-    map2map (const int inputSamples, const int inputLines, Isis::Projection *inmap, 
-           const int outputSamples, const int outputLines, Isis::Projection *outmap,
-           bool trim);
-    
+    map2map(const int inputSamples, const int inputLines, Isis::Projection *inmap,
+            const int outputSamples, const int outputLines, Isis::Projection *outmap,
+            bool trim);
+
     // destructor
-    ~map2map () {};
+    ~map2map() {};
 
     // Implementations for parent's pure virtual members
-    bool Xform (double &inSample, double &inLine,
-                    const double outSample, const double outLine);
-    int OutputSamples () const;
-    int OutputLines () const;
+    bool Xform(double &inSample, double &inLine,
+               const double outSample, const double outLine);
+    int OutputSamples() const;
+    int OutputLines() const;
 };
 
 #endif

@@ -1,11 +1,11 @@
 #include <sstream>
 #include "PvlToken.h"
-#include "PvlTokenizer.h" 
+#include "PvlTokenizer.h"
 #include "iException.h"
 #include "Preference.h"
 
 using namespace std;
-int main (void) {
+int main(void) {
   Isis::Preference::Preferences(true);
 
 //*****************************************************************************
@@ -15,7 +15,7 @@ int main (void) {
   Isis::PvlTokenizer tizer;
 
 //*****************************************************************************
-// Create a stream and load it 
+// Create a stream and load it
 //*****************************************************************************
 
   stringstream os;
@@ -37,19 +37,19 @@ int main (void) {
      << "ApostNewLine=\'abcd\nefgh \nijk\n lmn\'";
 
   try {
-    tizer.Load (os);
+    tizer.Load(os);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
 
   vector<Isis::PvlToken> t = tizer.GetTokenList();
 
   cout << "TESTING TOKENIZER" << endl;
-  int i,j;
-  for (i=0; i<(int)t.size(); i++) {
+  int i, j;
+  for(i = 0; i < (int)t.size(); i++) {
     cout << t[i].GetKey() << " is ";
-    for (j=0; j<t[i].ValueSize(); j++) {
+    for(j = 0; j < t[i].ValueSize(); j++) {
       cout << t[i].GetValue(j) << " ";
     }
     cout << endl;
@@ -57,7 +57,7 @@ int main (void) {
   cout << endl;
 
   cout << "TESTING TOKENIZER CLEAR" << endl;
-  tizer.Clear ();
+  tizer.Clear();
   vector<Isis::PvlToken> t2 = tizer.GetTokenList();
   cout << t2.size() << endl << endl;
 
@@ -65,10 +65,10 @@ int main (void) {
   os2 << "PHRASE = \"The quick brown fox jumped over the lazy dog";
   cout << "TESTING TOKEN ERROR [" << os2.str() << "]" << endl;
   try {
-    tizer.Load (os2);
+    tizer.Load(os2);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
   cout << endl;
 
@@ -76,10 +76,10 @@ int main (void) {
   os3 << "PHRASE = {To Be or Not To Be That is the Question";
   cout << "TESTING TOKEN ERROR [" << os3.str() << "]" << endl;
   try {
-    tizer.Load (os3);
+    tizer.Load(os3);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
   cout << endl;
 
@@ -87,10 +87,10 @@ int main (void) {
   os4 << "PHRASE = (I came, I saw, I conquered";
   cout << "TESTING TOKEN ERROR [" << os4.str() << "]" << endl;
   try {
-    tizer.Load (os4);
+    tizer.Load(os4);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
   cout << endl;
 
@@ -98,10 +98,10 @@ int main (void) {
   os5 << "FOOD = (\"french\",\"fries,\"good\") ";
   cout << "TESTING TOKEN ERROR [" << os5.str() << "]" << endl;
   try {
-    tizer.Load (os5);
+    tizer.Load(os5);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
   cout << endl;
 
@@ -109,10 +109,10 @@ int main (void) {
   os6 << "FOOD = (\"burgers\",\"hotdogs,\"good\")";
   cout << "TESTING TOKEN ERROR [" << os6.str() << "]" << endl;
   try {
-    tizer.Load (os6);
+    tizer.Load(os6);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
   cout << endl;
 
@@ -120,10 +120,10 @@ int main (void) {
   os7 << "FOOD = (\"pickels,pizza\")";
   cout << "TESTING TOKEN ERROR [" << os7.str() << "]" << endl;
   try {
-    tizer.Load (os7);
+    tizer.Load(os7);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
   cout << endl;
 
@@ -131,10 +131,10 @@ int main (void) {
   os8 << "FISH = (\"trout\",\"pizz\"a)";
   cout << "TESTING TOKEN ERROR [" << os8.str() << "]" << endl;
   try {
-    tizer.Load (os8);
+    tizer.Load(os8);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
   cout << endl;
 

@@ -6,19 +6,19 @@
 #include "Histogram.h"
 #include "Stretch.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void convert(vector<Buffer *> &in, 
+void convert(vector<Buffer *> &in,
              vector<Buffer *> &out);
 
 Stretch hueStretch, satStretch, valStretch;
 double valueScalar;
 
 void IsisMain() {
-	UserInterface &ui = Application::GetUserInterface();
-	valueScalar = ui.GetDouble("SCALAR");
-	
+  UserInterface &ui = Application::GetUserInterface();
+  valueScalar = ui.GetDouble("SCALAR");
+
   // Clear out stretch pairs to handle multiple runs
   hueStretch.ClearPairs();
   satStretch.ClearPairs();
@@ -42,7 +42,7 @@ void IsisMain() {
   valStretch.SetHis(1.0);
 
   // Start the processing
-  ProcessByLine p;  
+  ProcessByLine p;
   p.SetInputCube("HUE", Isis::OneBand);
   p.SetInputCube("SATURATION", Isis::OneBand);
   p.SetInputCube("VALUE", Isis::OneBand);
@@ -53,13 +53,13 @@ void IsisMain() {
 
   p.StartProcess(convert);
   p.EndProcess();
-}  
+}
 
-// Line processing routine 
+// Line processing routine
 // This works by building an HSV QColor from the input buffers.  This is
 // converted to RGB format, then the RGB data is sent to the output file buffers.
-void convert (vector<Buffer *> &in,
-              vector<Buffer *> &out) {
+void convert(vector<Buffer *> &in,
+             vector<Buffer *> &out) {
   // Input file buffers
   Buffer &hue = *in[0];
   Buffer &saturation = *in[1];
@@ -70,18 +70,18 @@ void convert (vector<Buffer *> &in,
   Buffer &green = *out[1];
   Buffer &blue = *out[2];
 
-  for (int i = 0; i < hue.size(); i++) {
+  for(int i = 0; i < hue.size(); i++) {
     // Convert range: [0, 360] -> [0, 1]
 
     /**
      * HSV Stores colors in terms of hue, saturation, and value. The hue determines the color,
-     * which is an angle around the color wheel. However, QColor::fromHsvF() in the qt library expects a 
-     * percentage around the color wheel and not an angle. For example, 0% means the origin and 
-     * 50% means 180 degrees around the circle. The hue is in degrees and we went it in percentages, so to convert 
-     * this value we divide by 360 degrees. The basic colors are: 0 degrees = RED, 
-     * 60 degrees = YELLOW, 120 degrees = GREEN, 180 degrees = CYAN, 240 degrees = BLUE and 
-     * 300 degrees = PURPLE. 
-     * The saturation is how much grey is in the color (intensity of the color). A saturation value of zero means it's perfect, 
+     * which is an angle around the color wheel. However, QColor::fromHsvF() in the qt library expects a
+     * percentage around the color wheel and not an angle. For example, 0% means the origin and
+     * 50% means 180 degrees around the circle. The hue is in degrees and we went it in percentages, so to convert
+     * this value we divide by 360 degrees. The basic colors are: 0 degrees = RED,
+     * 60 degrees = YELLOW, 120 degrees = GREEN, 180 degrees = CYAN, 240 degrees = BLUE and
+     * 300 degrees = PURPLE.
+     * The saturation is how much grey is in the color (intensity of the color). A saturation value of zero means it's perfect,
      * while a saturation value of 1 would cause any color to become pure grey. As an example, the color RGB(255,0,0)
      * is pure so the saturation would be zero. The value is how bright the color is. A value of 0 is always black,
      * and 100 is the color (if not saturated).
@@ -89,7 +89,7 @@ void convert (vector<Buffer *> &in,
      * HUE = COLOR (degrees around the color wheel)
      * SATURATION = INTENSITY (0-1, 0 being no color/grey)
      * VALUE = BRIGHTNESS (0 being black)
-     * 
+     *
      * For more information, see
      * http://en.wikipedia.org/wiki/Color_spaces
      */
@@ -102,7 +102,7 @@ void convert (vector<Buffer *> &in,
     double hueVal = hueStretch.Map(hue[i]);
 
     // while hue is less than 0 degrees, increase it (example: -10 degrees would become 350 degrees)
-    while(hueVal < 0) { 
+    while(hueVal < 0) {
       hueVal += 360;
     }
 
@@ -113,7 +113,7 @@ void convert (vector<Buffer *> &in,
 
     // QColor::fromHsvF expects a percentage around the circle and not degrees, so we divide by 360.
     hueVal /= 360.0;
- 
+
     double sat = satStretch.Map(saturation[i]);
 
     // Saturation should be between zero and one
@@ -137,10 +137,10 @@ void convert (vector<Buffer *> &in,
     val *= valueScalar;
 
     QColor hsv = QColor::fromHsvF(hueVal, sat, val);
-    QColor rgb = hsv.toRgb(); 
+    QColor rgb = hsv.toRgb();
 
     red[i] = rgb.redF();
     green[i] = rgb.greenF();
     blue[i] = rgb.blueF();
   }
-}   
+}

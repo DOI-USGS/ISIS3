@@ -9,22 +9,22 @@
 #include "BandManager.h"
 
 using namespace std;
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 
   Isis::Preference::Preferences(true);
 
   string fname = "$base/testData/isisTruth.cub";
   Isis::Cube cube;
-  cube.Open (fname);
-  
+  cube.Open(fname);
+
   Isis::BandManager band(cube);
-  cout << "Buffer Size:  " << 
-          band.SampleDimension() << " " <<
-          band.LineDimension() << " " <<
-          band.BandDimension() << endl;
+  cout << "Buffer Size:  " <<
+       band.SampleDimension() << " " <<
+       band.LineDimension() << " " <<
+       band.BandDimension() << endl;
   cout << endl;
 
-  for (band.begin(); !band.end(); band++) {
+  for(band.begin(); !band.end(); band++) {
     cout << "  Current sample, line, band is:  "
          << band.Sample() << " "
          << band.Line() << " "
@@ -32,14 +32,14 @@ int main (int argc, char *argv[]) {
   }
   cout << endl;
 
-  Isis::BandManager bandReverse(cube,true);
-  cout << "Buffer Size:  " << 
-          bandReverse.SampleDimension() << " " <<
-          bandReverse.LineDimension() << " " <<
-          bandReverse.BandDimension() << endl;
+  Isis::BandManager bandReverse(cube, true);
+  cout << "Buffer Size:  " <<
+       bandReverse.SampleDimension() << " " <<
+       bandReverse.LineDimension() << " " <<
+       bandReverse.BandDimension() << endl;
   cout << endl;
 
-  for (bandReverse.begin(); !bandReverse.end(); bandReverse++) {
+  for(bandReverse.begin(); !bandReverse.end(); bandReverse++) {
     cout << "  Current sample, line, band is:  "
          << bandReverse.Sample() << " "
          << bandReverse.Line() << " "
@@ -63,21 +63,21 @@ int main (int argc, char *argv[]) {
 
   try {
     cout << "Testing errors ... " << endl;
-    band.SetBand(0,0);
+    band.SetBand(0, 0);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
     cout << endl;
   }
 
   try {
     cout << "Testing errors ... " << endl;
-    band.SetBand(1,0);
+    band.SetBand(1, 0);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
     cout << endl;
   }
 
-  cube.Close ();
+  cube.Close();
 }

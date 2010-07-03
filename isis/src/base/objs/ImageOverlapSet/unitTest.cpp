@@ -13,9 +13,9 @@
 
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
-  void PrintImageOverlap (const Isis::ImageOverlap *poi);
+  void PrintImageOverlap(const Isis::ImageOverlap * poi);
 
   // Create 6 multi polygons
   //     01 02 03 04 05 06 07 08 09 10 11 12 13 14 15
@@ -27,10 +27,10 @@ int main () {
   //     |     |     |g |     d        |h |     |  |
   // 07  |     +-----|--|--------------|--+  e  |  |
   //     |           |  |              |        |  |
-  // 06  |           |b |    D       +-|-----+  |  | 
+  // 06  |           |b |    D       +-|-----+  |  |
   //     |           |  |            | |  f  |  |  |
   // 05  |           |  |            | +-----|--|--+
-  //     |           |  |            |   E   |  |  
+  //     |           |  |            |   E   |  |
   // 04  +-----------|--+            +-------+  |
   //                 |                          |
   // 03              |                          |
@@ -61,107 +61,107 @@ int main () {
   cout << "Test 1" << endl;
 
   // Fill a vector of MultiPolygon* and serial numbers
-  vector<geos::geom::MultiPolygon*> boundaries;
+  vector<geos::geom::MultiPolygon *> boundaries;
   vector<string> sns;
 
   // Reusable variables
   geos::geom::CoordinateSequence *pts;
-  vector<geos::geom::Geometry*> polys;
+  vector<geos::geom::Geometry *> polys;
 
   // Create the A polygon
-  pts = new geos::geom::CoordinateArraySequence ();
-  pts->add (geos::geom::Coordinate (1,9));
-  pts->add (geos::geom::Coordinate (6,9));
-  pts->add (geos::geom::Coordinate (6,4));
-  pts->add (geos::geom::Coordinate (1,4));
-  pts->add (geos::geom::Coordinate (1,9));
+  pts = new geos::geom::CoordinateArraySequence();
+  pts->add(geos::geom::Coordinate(1, 9));
+  pts->add(geos::geom::Coordinate(6, 9));
+  pts->add(geos::geom::Coordinate(6, 4));
+  pts->add(geos::geom::Coordinate(1, 4));
+  pts->add(geos::geom::Coordinate(1, 9));
 
-  polys.push_back (Isis::globalFactory.createPolygon (
-                   Isis::globalFactory.createLinearRing(pts),NULL));
+  polys.push_back(Isis::globalFactory.createPolygon(
+                    Isis::globalFactory.createLinearRing(pts), NULL));
 
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon (polys));
+  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
 
-  for (unsigned int i=0; i<polys.size(); ++i) delete polys[i];
+  for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
   sns.push_back("A");
 
   // Create the B polygon
-  pts = new geos::geom::DefaultCoordinateSequence ();
-  pts->add (geos::geom::Coordinate (3,10));
-  pts->add (geos::geom::Coordinate (12,10));
-  pts->add (geos::geom::Coordinate (12,7));
-  pts->add (geos::geom::Coordinate (3,7));
-  pts->add (geos::geom::Coordinate (3,10));
+  pts = new geos::geom::DefaultCoordinateSequence();
+  pts->add(geos::geom::Coordinate(3, 10));
+  pts->add(geos::geom::Coordinate(12, 10));
+  pts->add(geos::geom::Coordinate(12, 7));
+  pts->add(geos::geom::Coordinate(3, 7));
+  pts->add(geos::geom::Coordinate(3, 10));
 
-  polys.push_back (Isis::globalFactory.createPolygon (
-                    Isis::globalFactory.createLinearRing (pts),NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon (polys));
+  polys.push_back(Isis::globalFactory.createPolygon(
+                    Isis::globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
 
-  for (unsigned int i=0; i<polys.size(); ++i) delete polys[i];
+  for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
   sns.push_back("B");
 
   // Create the C polygon
-  pts = new geos::geom::CoordinateArraySequence ();
-  pts->add (geos::geom::Coordinate (11,5));
-  pts->add (geos::geom::Coordinate (11,9));
-  pts->add (geos::geom::Coordinate (15,9));
-  pts->add (geos::geom::Coordinate (15,5));
-  pts->add (geos::geom::Coordinate (11,5));
+  pts = new geos::geom::CoordinateArraySequence();
+  pts->add(geos::geom::Coordinate(11, 5));
+  pts->add(geos::geom::Coordinate(11, 9));
+  pts->add(geos::geom::Coordinate(15, 9));
+  pts->add(geos::geom::Coordinate(15, 5));
+  pts->add(geos::geom::Coordinate(11, 5));
 
-  polys.push_back (Isis::globalFactory.createPolygon (
-                    Isis::globalFactory.createLinearRing (pts),NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon (polys));
+  polys.push_back(Isis::globalFactory.createPolygon(
+                    Isis::globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
 
-  for (unsigned int i=0; i<polys.size(); ++i) delete polys[i];
+  for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
   sns.push_back("C");
 
   // Create the D polygon
-  pts = new geos::geom::CoordinateArraySequence ();
-  pts->add (geos::geom::Coordinate (14,8));
-  pts->add (geos::geom::Coordinate (14,2));
-  pts->add (geos::geom::Coordinate (5,2));
-  pts->add (geos::geom::Coordinate (5,8));
-  pts->add (geos::geom::Coordinate (14,8));
+  pts = new geos::geom::CoordinateArraySequence();
+  pts->add(geos::geom::Coordinate(14, 8));
+  pts->add(geos::geom::Coordinate(14, 2));
+  pts->add(geos::geom::Coordinate(5, 2));
+  pts->add(geos::geom::Coordinate(5, 8));
+  pts->add(geos::geom::Coordinate(14, 8));
 
-  polys.push_back (Isis::globalFactory.createPolygon (
-                    Isis::globalFactory.createLinearRing (pts),NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon (polys));
+  polys.push_back(Isis::globalFactory.createPolygon(
+                    Isis::globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
 
-  for (unsigned int i=0; i<polys.size(); ++i) delete polys[i];
+  for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
   sns.push_back("D");
 
   // Create the E polygon
-  pts = new geos::geom::CoordinateArraySequence ();
-  pts->add (geos::geom::Coordinate (10,6));
-  pts->add (geos::geom::Coordinate (13,6));
-  pts->add (geos::geom::Coordinate (13,4));
-  pts->add (geos::geom::Coordinate (10,4));
-  pts->add (geos::geom::Coordinate (10,6));
+  pts = new geos::geom::CoordinateArraySequence();
+  pts->add(geos::geom::Coordinate(10, 6));
+  pts->add(geos::geom::Coordinate(13, 6));
+  pts->add(geos::geom::Coordinate(13, 4));
+  pts->add(geos::geom::Coordinate(10, 4));
+  pts->add(geos::geom::Coordinate(10, 6));
 
-  polys.push_back (Isis::globalFactory.createPolygon (
-                    Isis::globalFactory.createLinearRing (pts),NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon (polys));
+  polys.push_back(Isis::globalFactory.createPolygon(
+                    Isis::globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
 
-  for (unsigned int i=0; i<polys.size(); ++i) delete polys[i];
+  for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
   sns.push_back("E");
 
   // Create the F polygon
-  pts = new geos::geom::CoordinateArraySequence ();
-  pts->add (geos::geom::Coordinate (1,1));
-  pts->add (geos::geom::Coordinate (1,2));
-  pts->add (geos::geom::Coordinate (4,2));
-  pts->add (geos::geom::Coordinate (4,1));
-  pts->add (geos::geom::Coordinate (1,1));
+  pts = new geos::geom::CoordinateArraySequence();
+  pts->add(geos::geom::Coordinate(1, 1));
+  pts->add(geos::geom::Coordinate(1, 2));
+  pts->add(geos::geom::Coordinate(4, 2));
+  pts->add(geos::geom::Coordinate(4, 1));
+  pts->add(geos::geom::Coordinate(1, 1));
 
-  polys.push_back (Isis::globalFactory.createPolygon (
-                    Isis::globalFactory.createLinearRing (pts),NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon (polys));
+  polys.push_back(Isis::globalFactory.createPolygon(
+                    Isis::globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
 
-  for (unsigned int i=0; i<polys.size(); ++i) delete polys[i];
+  for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
   sns.push_back("F");
 
@@ -177,7 +177,7 @@ int main () {
   remove("unitTest.tmp");
 
   // Print each overlap area
-  for (int i=0; i<overlapSet2.Size(); i++) {
+  for(int i = 0; i < overlapSet2.Size(); i++) {
     PrintImageOverlap(overlapSet2[i]);
   }
 
@@ -188,7 +188,7 @@ int main () {
 
 
 // Print an ImageOverlap
-void PrintImageOverlap (const Isis::ImageOverlap *poi) {
+void PrintImageOverlap(const Isis::ImageOverlap *poi) {
 
   // Write the wkt version of the multi polygon to the screen
   const geos::geom::MultiPolygon *mp = poi->Polygon();
@@ -196,7 +196,7 @@ void PrintImageOverlap (const Isis::ImageOverlap *poi) {
   cout << "  " << mp->toString() << endl;
   cout << "  Number of serial numbers: " << poi->Size() << endl;;
   cout << "  Serial numbers: " << endl;
-  for (int i=0; i<poi->Size(); i++) {
+  for(int i = 0; i < poi->Size(); i++) {
     cout << "    " << (*poi)[i] << endl;
   }
   cout << endl;

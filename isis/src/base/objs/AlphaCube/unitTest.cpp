@@ -5,9 +5,9 @@
 
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
-  Isis::AlphaCube c(4,8,2,3,1.5,2.5,3.5,5.5);
+  Isis::AlphaCube c(4, 8, 2, 3, 1.5, 2.5, 3.5, 5.5);
   cout << "1st Test Alpha" << endl;
   cout << c.AlphaSamples() << endl;
   cout << c.AlphaLines() << endl;
@@ -17,8 +17,8 @@ int main () {
   cout << c.AlphaLine(c.BetaLines()) << endl;
   cout << c.AlphaSample(0.5) << endl;
   cout << c.AlphaLine(0.5) << endl;
-  cout << c.AlphaSample(c.BetaSamples()+0.5) << endl;
-  cout << c.AlphaLine(c.BetaLines()+0.5) << endl;
+  cout << c.AlphaSample(c.BetaSamples() + 0.5) << endl;
+  cout << c.AlphaLine(c.BetaLines() + 0.5) << endl;
   cout << endl;
 
   cout << "1st Test Beta" << endl;
@@ -29,8 +29,8 @@ int main () {
   cout << c.BetaSample(c.AlphaSamples()) << endl;
   cout << c.BetaLine(c.AlphaLines()) << endl;
   cout << endl;
-  
-  Isis::AlphaCube d(2,3,2,4,1.5,1.5,2.5,3.5);
+
+  Isis::AlphaCube d(2, 3, 2, 4, 1.5, 1.5, 2.5, 3.5);
   cout << "2nd Alpha Test" << endl;
   cout << d.AlphaSamples() << endl;
   cout << d.AlphaLines() << endl;
@@ -40,8 +40,8 @@ int main () {
   cout << d.AlphaLine(d.BetaLines()) << endl;
   cout << d.AlphaSample(0.5) << endl;
   cout << d.AlphaLine(0.5) << endl;
-  cout << d.AlphaSample(d.BetaSamples()+0.5) << endl;
-  cout << d.AlphaLine(d.BetaLines()+0.5) << endl;
+  cout << d.AlphaSample(d.BetaSamples() + 0.5) << endl;
+  cout << d.AlphaLine(d.BetaLines() + 0.5) << endl;
   cout << endl;
 
   cout << "2nd Beta Test" << endl;
@@ -63,8 +63,8 @@ int main () {
   cout << c.AlphaLine(c.BetaLines()) << endl;
   cout << c.AlphaSample(0.5) << endl;
   cout << c.AlphaLine(0.5) << endl;
-  cout << c.AlphaSample(c.BetaSamples()+0.5) << endl;
-  cout << c.AlphaLine(c.BetaLines()+0.5) << endl;
+  cout << c.AlphaSample(c.BetaSamples() + 0.5) << endl;
+  cout << c.AlphaLine(c.BetaLines() + 0.5) << endl;
   cout << endl;
 
   cout << "3rd Test Beta" << endl;
@@ -77,17 +77,17 @@ int main () {
   cout << endl;
 
   try {
-  Isis::Pvl lab;
-  lab.AddObject(Isis::PvlObject("IsisCube"));
-  Isis::PvlObject &isiscube = lab.FindObject("IsisCube");
-  isiscube.AddGroup(Isis::PvlGroup("Dimensions"));
-  Isis::PvlGroup &dims = isiscube.FindGroup("Dimensions");
-  dims += Isis::PvlKeyword("Samples",4);
-  dims += Isis::PvlKeyword("Lines",8);
-  c.UpdateGroup(lab);
-  cout << lab << endl;
+    Isis::Pvl lab;
+    lab.AddObject(Isis::PvlObject("IsisCube"));
+    Isis::PvlObject &isiscube = lab.FindObject("IsisCube");
+    isiscube.AddGroup(Isis::PvlGroup("Dimensions"));
+    Isis::PvlGroup &dims = isiscube.FindGroup("Dimensions");
+    dims += Isis::PvlKeyword("Samples", 4);
+    dims += Isis::PvlKeyword("Lines", 8);
+    c.UpdateGroup(lab);
+    cout << lab << endl;
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
 

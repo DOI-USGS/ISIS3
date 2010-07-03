@@ -5,11 +5,11 @@
 namespace Qisis {
   /**
    * Constructor, creates a new HistogramToolWindow
-   * 
-   * @param title 
-   * @param parent 
+   *
+   * @param title
+   * @param parent
    */
-  HistogramToolWindow::HistogramToolWindow(QString title,QWidget *parent) : PlotWindow(title, parent) {
+  HistogramToolWindow::HistogramToolWindow(QString title, QWidget *parent) : PlotWindow(title, parent) {
     p_plot->enableAxis(QwtPlot::yRight);
     QwtText *leftLabel = new QwtText("Frequency",
                                      QwtText::PlainText);
@@ -21,7 +21,7 @@ namespace Qisis {
     leftLabel->setFont(font);
     p_plot->setAxisTitle(QwtPlot::yLeft, *leftLabel);
 
-    p_dock = new QDockWidget("Histogram Info",this);
+    p_dock = new QDockWidget("Histogram Info", this);
     p_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     p_dock->setFloating(false);
     p_dock->setObjectName("DockWidget");
@@ -35,11 +35,11 @@ namespace Qisis {
     font.setPointSize(13);
     font.setBold(true);
     rtLabel->setFont(font);
-    p_plot->setAxisTitle(QwtPlot::yRight,*rtLabel);    
+    p_plot->setAxisTitle(QwtPlot::yRight, *rtLabel);
 
-    setAxisLabel(QwtPlot::xBottom,"Pixel Value (DN)");
+    setAxisLabel(QwtPlot::xBottom, "Pixel Value (DN)");
 
-    setScale(QwtPlot::yRight,0,100);
+    setScale(QwtPlot::yRight, 0, 100);
 
     setPlotBackground(Qt::white);
   }
@@ -47,10 +47,10 @@ namespace Qisis {
 
   /**
    * This method adds a PlotToolCurve to the window.
-   * 
-   * @param pc 
+   *
+   * @param pc
    */
-  void HistogramToolWindow::add(PlotToolCurve *pc){
+  void HistogramToolWindow::add(PlotToolCurve *pc) {
     PlotWindow::add(pc);
     p_plot->replot();
   }
@@ -58,11 +58,11 @@ namespace Qisis {
 
   /**
    * Add a HistogramItem to the plot.
-   * 
-   * 
-   * @param hi 
+   *
+   *
+   * @param hi
    */
-  void HistogramToolWindow::add(HistogramItem *hi){
+  void HistogramToolWindow::add(HistogramItem *hi) {
     hi->attach(p_plot);
     p_plot->replot();
     p_histItems.push_back(hi);
@@ -70,10 +70,10 @@ namespace Qisis {
 
 
   /**
-   * 
-   * 
+   *
+   *
    */
-  void HistogramToolWindow::addViewMenu(){
+  void HistogramToolWindow::addViewMenu() {
     QMenu *viewMenu = new QMenu("&View");
     QAction *viewInfo = new QAction("View Info", this);
     connect(viewInfo, SIGNAL(activated()), p_dock, SLOT(show()));
@@ -81,13 +81,13 @@ namespace Qisis {
     p_mainWindow->menuBar()->addMenu(viewMenu);
   }
 
-  /** 
-   * This class needs to know which viewport the user is looking 
-   * at so it can appropriately draw in the band lines. 
-   * 
+  /**
+   * This class needs to know which viewport the user is looking
+   * at so it can appropriately draw in the band lines.
+   *
    * @param cvp
    */
-  void HistogramToolWindow::setViewport(CubeViewport *cvp){
+  void HistogramToolWindow::setViewport(CubeViewport *cvp) {
     if(cvp == NULL) return;
     p_cvp = cvp;
   }

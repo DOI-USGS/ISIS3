@@ -43,17 +43,17 @@ namespace Isis {
 
 namespace Qisis {
   class MdiCubeViewport;
-  
+
   /**
    * @brief Interactive image edit tool
    *
    * This tool is part of the Qisis namespace and allows interactive editing
    * of displayed images.
-   * 
+   *
    * @ingroup Visualization Tools
-   * 
+   *
    * @author  2006-06-09  Tracie Sucharski
-   * 
+   *
    * @internal
    *  @todo  The following fix is a bandaid- there is probably a bug in
    *         tiling class, buffer class?  The following fix is for rectangle
@@ -75,7 +75,7 @@ namespace Qisis {
    *
    */
   class EditTool : public Qisis::Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     signals:
       void cubeChanged(bool); //!< Emitted when cube changed
@@ -83,7 +83,7 @@ namespace Qisis {
       void saveAs(); //!< Emitted when cube should be saved as another file
 
     public:
-      EditTool (QWidget *parent);
+      EditTool(QWidget *parent);
 
       /**
        * Enum for possible shapes
@@ -112,7 +112,7 @@ namespace Qisis {
     protected:
 //      QString menuName() const { return "&Options"; };
       QAction *toolPadAction(ToolPad *pad);
-      QWidget *createToolBarWidget (QStackedWidget *active);
+      QWidget *createToolBarWidget(QStackedWidget *active);
       void updateTool();
 
     protected slots:
@@ -130,7 +130,7 @@ namespace Qisis {
       void removeViewport(QObject *vp);
 
     private:
-      QList<QPoint *> *LineToPoints(const QLine & line);
+      QList<QPoint *> *LineToPoints(const QLine &line);
       void writeToCube(int iesamp, int issamp, int ieline, int isline, QList<QPoint *> *linePts);
       QComboBox *p_shapeComboBox; //!< Shape combobox
       QComboBox *p_valTypeComboBox; //!< Value type combobox

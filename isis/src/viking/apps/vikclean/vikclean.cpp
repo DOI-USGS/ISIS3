@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "Pipeline.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void IsisMain() {
@@ -13,7 +13,7 @@ void IsisMain() {
   p.SetOutputFile("TO");
   p.KeepTemporaryFiles(!ui.GetBoolean("REMOVE"));
 
-  // Run viknosalt on the cube to remove the salt 
+  // Run viknosalt on the cube to remove the salt
   p.AddToPipeline("viknosalt");
   p.Application("viknosalt").SetInputParameter("FROM", true);
   p.Application("viknosalt").SetOutputParameter("TO", "nosalt");

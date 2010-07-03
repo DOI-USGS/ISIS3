@@ -30,21 +30,21 @@
 
 namespace Isis {
   class GuiInputAttribute : public QDialog {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      GuiInputAttribute (QWidget *parent=0);
+      GuiInputAttribute(QWidget *parent = 0);
 
-      ~GuiInputAttribute ();
+      ~GuiInputAttribute();
 
-      std::string GetAttributes ();
+      std::string GetAttributes();
 
-      void SetAttributes (const std::string &value);
+      void SetAttributes(const std::string &value);
 
-      static int GetAttributes (const std::string &defaultAttribute,
-                                std::string &newAttribute,
-                                const std::string &title,
-                                QWidget *parent);
+      static int GetAttributes(const std::string &defaultAttribute,
+                               std::string &newAttribute,
+                               const std::string &title,
+                               QWidget *parent);
     private:
       QLineEdit *p_lineEdit;
       QButtonGroup *p_buttonGroup;

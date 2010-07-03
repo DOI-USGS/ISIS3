@@ -62,12 +62,12 @@ namespace Qisis {
   CubeViewport::CubeViewport(Isis::Cube *cube, QWidget *parent) :
     QAbstractScrollArea(parent) {
     // Is the cube usable?
-    if (cube == NULL) {
+    if(cube == NULL) {
       throw iException::Message(iException::Programmer,
                                 "Can not view NULL cube pointer",
                                 _FILEINFO_);
     }
-    else if (!cube->IsOpen()) {
+    else if(!cube->IsOpen()) {
       throw iException::Message(iException::Programmer,
                                 "Can not view unopened cube",
                                 _FILEINFO_);
@@ -127,19 +127,19 @@ namespace Qisis {
     try {
       p_groundMap = new UniversalGroundMap(*p_cube);
     }
-    catch (iException &e) {
+    catch(iException &e) {
       e.Clear();
     }
 
-    if (p_groundMap != NULL) {
+    if(p_groundMap != NULL) {
       // Setup the camera or the projection
-      if (p_groundMap->Camera() != NULL) {
+      if(p_groundMap->Camera() != NULL) {
         p_camera = p_groundMap->Camera();
-        if (p_camera->HasProjection()) {
+        if(p_camera->HasProjection()) {
           try {
             p_projection = cube->Projection();
           }
-          catch (iException &e) {
+          catch(iException &e) {
             e.Clear();
           }
         }
@@ -185,7 +185,7 @@ namespace Qisis {
     p_knownStretches = new QVector< Isis::Stretch * >();
     p_globalStretches = new QVector< Isis::Stretch * >();
 
-    while (p_cube->Bands() > p_knownStretches->size()) {
+    while(p_cube->Bands() > p_knownStretches->size()) {
       p_knownStretches->push_back(NULL);
       p_globalStretches->push_back(NULL);
     }
@@ -202,7 +202,7 @@ namespace Qisis {
    *
    */
   void CubeViewport::showEvent(QShowEvent *event) {
-    if (p_scale == -1) {
+    if(p_scale == -1) {
       double sampScale = (double) sizeHint().width() / (double) cubeSamples();
       double lineScale = (double) sizeHint().height() / (double) cubeLines();
       double scale = sampScale < lineScale ? sampScale : lineScale;
@@ -210,7 +210,7 @@ namespace Qisis {
       setScale(scale, cubeSamples() / 2.0, cubeLines() / 2.0);
     }
 
-    if (p_grayBuffer && !p_grayBuffer->enabled()) {
+    if(p_grayBuffer && !p_grayBuffer->enabled()) {
       p_grayBuffer->enable(true);
 
       // gives a proper initial stretch (entire cube)
@@ -233,34 +233,34 @@ namespace Qisis {
     double progress = 0.0;
     bool completed = false;
 
-    if (p_grayBuffer) {
+    if(p_grayBuffer) {
       progress += p_grayBuffer->currentProgress();
       completed = !p_grayBuffer->working();
     }
 
-    if (p_redBuffer) {
+    if(p_redBuffer) {
       progress += p_redBuffer->currentProgress() / 3.0;
       completed = !p_redBuffer->working();
     }
 
-    if (p_greenBuffer) {
+    if(p_greenBuffer) {
       progress += p_greenBuffer->currentProgress() / 3.0;
       completed = completed && !p_greenBuffer->working();
     }
 
-    if (p_blueBuffer) {
+    if(p_blueBuffer) {
       progress += p_blueBuffer->currentProgress() / 3.0;
       completed = completed && !p_blueBuffer->working();
     }
 
     int realProgress = (int)(progress * 100.0);
 
-    if (completed) {
+    if(completed) {
       realProgress = 100;
       p_progressTimer->stop();
       emit screenPixelsChanged();
     }
-    else if (realProgress == 100) {
+    else if(realProgress == 100) {
       realProgress = 99;
     }
 
@@ -273,81 +273,81 @@ namespace Qisis {
    *
    */
   CubeViewport::~CubeViewport() {
-    if (p_redBrick) {
+    if(p_redBrick) {
       delete p_redBrick;
       p_redBrick = NULL;
     }
 
-    if (p_grnBrick) {
+    if(p_grnBrick) {
       delete p_grnBrick;
       p_grnBrick = NULL;
     }
 
-    if (p_bluBrick) {
+    if(p_bluBrick) {
       delete p_bluBrick;
       p_bluBrick = NULL;
     }
 
-    if (p_gryBrick) {
+    if(p_gryBrick) {
       delete p_gryBrick;
       p_gryBrick = NULL;
     }
 
-    if (p_pntBrick) {
+    if(p_pntBrick) {
       delete p_pntBrick;
       p_pntBrick = NULL;
     }
 
-    if (p_groundMap) {
+    if(p_groundMap) {
       delete p_groundMap;
       p_groundMap = NULL;
     }
 
-    if (p_grayBuffer) {
+    if(p_grayBuffer) {
       delete p_grayBuffer;
       p_grayBuffer = NULL;
     }
 
-    if (p_redBuffer) {
+    if(p_redBuffer) {
       delete p_redBuffer;
       p_redBuffer = NULL;
     }
 
-    if (p_greenBuffer) {
+    if(p_greenBuffer) {
       delete p_greenBuffer;
       p_greenBuffer = NULL;
     }
 
-    if (p_blueBuffer) {
+    if(p_blueBuffer) {
       delete p_blueBuffer;
       p_blueBuffer = NULL;
     }
 
     // p_cubeData MUST be deleted AFTER all viewport buffers!!!
-    if (p_cubeData) {
+    if(p_cubeData) {
       p_cubeData->RemoveChangeListener();
       delete p_cubeData;
       p_cubeData = NULL;
     }
 
     // p_cube MUST be deleted AFTER all viewport buffers!!!
-    if (p_cube) {
+    if(p_cube) {
       delete p_cube;
       p_cube = NULL;
     }
 
-    if (p_progressTimer) {
+    if(p_progressTimer) {
       delete p_progressTimer;
       p_progressTimer = NULL;
     }
 
-    if (p_image) {
+    if(p_image) {
       delete p_image;
       p_image = NULL;
     }
 
-    if (p_pixmapPaintRects) {
-      for (int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {
+    if(p_pixmapPaintRects) {
+      for(int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {
         delete(*p_pixmapPaintRects)[rect];
       }
 
@@ -355,9 +355,9 @@ namespace Qisis {
       p_pixmapPaintRects = NULL;
     }
 
-    if (p_knownStretches) {
-      for (int stretch = 0; stretch < p_knownStretches->size(); stretch ++) {
-        if ((*p_knownStretches)[stretch] != NULL) {
+    if(p_knownStretches) {
+      for(int stretch = 0; stretch < p_knownStretches->size(); stretch ++) {
+        if((*p_knownStretches)[stretch] != NULL) {
           delete(*p_knownStretches)[stretch];
           (*p_knownStretches)[stretch] = NULL;
         }
@@ -369,9 +369,9 @@ namespace Qisis {
       p_knownStretches = NULL;
     }
 
-    if (p_globalStretches) {
-      for (int stretch = 0; stretch < p_globalStretches->size(); stretch ++) {
-        if ((*p_globalStretches)[stretch] != NULL) {
+    if(p_globalStretches) {
+      for(int stretch = 0; stretch < p_globalStretches->size(); stretch ++) {
+        if((*p_globalStretches)[stretch] != NULL) {
           delete(*p_globalStretches)[stretch];
           (*p_globalStretches)[stretch] = NULL;
         }
@@ -421,43 +421,43 @@ namespace Qisis {
    * @param data New data
    */
   void CubeViewport::cubeDataChanged(int cubeId, const Isis::Brick *data) {
-    if (cubeId == p_cubeId) {
+    if(cubeId == p_cubeId) {
       double ss, sl, es, el;
       ss = data->Sample();
       sl = data->Line();
       es = data->Sample() + data->SampleDimension();
       el = data->Line() + data->LineDimension();
-      if (ss < 0.5)
+      if(ss < 0.5)
         ss = 0.5;
-      if (sl < 0.5)
+      if(sl < 0.5)
         sl = 0.5;
-      if (es > cube()->Samples() + 0.5)
+      if(es > cube()->Samples() + 0.5)
         es = cube()->Samples() + 0.5;
-      if (el > cube()->Lines() + 0.5)
+      if(el > cube()->Lines() + 0.5)
         el = cube()->Lines() + 0.5;
 
       int sx, sy, ex, ey;
 
       cubeToViewport(ss, sl, sx, sy);
       cubeToViewport(es, el, ex, ey);
-      if (sx < 0)
+      if(sx < 0)
         sx = 0;
-      if (sy < 0)
+      if(sy < 0)
         sy = 0;
-      if (ex > viewport()->width())
+      if(ex > viewport()->width())
         ex = viewport()->width();
-      if (ey > viewport()->height())
+      if(ey > viewport()->height())
         ey = viewport()->height();
       QRect vpRect(sx, sy, ex - sx + 1, ey - sy + 1);
 
       p_updatingBuffers = true;
-      if (p_grayBuffer)
+      if(p_grayBuffer)
         p_grayBuffer->fillBuffer(vpRect, data);
-      if (p_redBuffer)
+      if(p_redBuffer)
         p_redBuffer->fillBuffer(vpRect, data);
-      if (p_greenBuffer)
+      if(p_greenBuffer)
         p_greenBuffer->fillBuffer(vpRect, data);
-      if (p_blueBuffer)
+      if(p_blueBuffer)
         p_blueBuffer->fillBuffer(vpRect, data);
       p_updatingBuffers = false;
 
@@ -477,13 +477,13 @@ namespace Qisis {
    * @param event
    */
   void CubeViewport::closeEvent(QCloseEvent *event) {
-    if (p_saveEnabled) {
-      switch (QMessageBox::information(this, "Qview",
-                                       "The document contains unsaved changes\n"
-                                       "Do you want to save the changes before exiting?",
-                                       "&Save", "&Discard", "Cancel",
-                                       0,    // Enter == button 0
-                                       2))
+    if(p_saveEnabled) {
+      switch(QMessageBox::information(this, "Qview",
+                                      "The document contains unsaved changes\n"
+                                      "Do you want to save the changes before exiting?",
+                                      "&Save", "&Discard", "Cancel",
+                                      0,    // Enter == button 0
+                                      2))
         // Escape == button 2
       {
           //Save changes and close viewport
@@ -533,9 +533,9 @@ namespace Qisis {
    */
   void CubeViewport::setScale(double scale) {
     // Sanitize the scale value
-    if (scale == p_scale)
+    if(scale == p_scale)
       return;
-    if (scale > 16.0)
+    if(scale > 16.0)
       scale = 16.0;
     //if (scale < 1.0/16.0) scale = 1.0/16.0;
 
@@ -552,13 +552,13 @@ namespace Qisis {
     updateScrollBars(x, y);
 
     p_updatingBuffers = true;
-    if (p_grayBuffer)
+    if(p_grayBuffer)
       p_grayBuffer->scaleChanged();
-    if (p_redBuffer)
+    if(p_redBuffer)
       p_redBuffer->scaleChanged();
-    if (p_greenBuffer)
+    if(p_greenBuffer)
       p_greenBuffer->scaleChanged();
-    if (p_blueBuffer)
+    if(p_blueBuffer)
       p_blueBuffer->scaleChanged();
     p_updatingBuffers = false;
 
@@ -604,21 +604,21 @@ namespace Qisis {
 
     bool wasEnabled = false;
 
-    if ((p_grayBuffer && p_grayBuffer->enabled()) ||
+    if((p_grayBuffer && p_grayBuffer->enabled()) ||
         (p_redBuffer && p_redBuffer->enabled())) {
       wasEnabled = true;
     }
 
-    if (p_grayBuffer)
+    if(p_grayBuffer)
       p_grayBuffer->enable(false);
-    if (p_redBuffer)
+    if(p_redBuffer)
       p_redBuffer->enable(false);
-    if (p_greenBuffer)
+    if(p_greenBuffer)
       p_greenBuffer->enable(false);
-    if (p_blueBuffer)
+    if(p_blueBuffer)
       p_blueBuffer->enable(false);
 
-    if (p_paintPixmap) {
+    if(p_paintPixmap) {
       p_paintPixmap = false;
       setScale(scale);
       p_paintPixmap = true;
@@ -629,13 +629,13 @@ namespace Qisis {
 
     center(sample, line);
 
-    if (p_grayBuffer)
+    if(p_grayBuffer)
       p_grayBuffer->enable(wasEnabled);
-    if (p_redBuffer)
+    if(p_redBuffer)
       p_redBuffer->enable(wasEnabled);
-    if (p_greenBuffer)
+    if(p_greenBuffer)
       p_greenBuffer->enable(wasEnabled);
-    if (p_blueBuffer)
+    if(p_blueBuffer)
       p_blueBuffer->enable(wasEnabled);
 
     paintPixmap();
@@ -678,13 +678,13 @@ namespace Qisis {
     updateScrollBars(x, y);
 
     p_updatingBuffers = true;
-    if (p_grayBuffer)
+    if(p_grayBuffer)
       p_grayBuffer->pan(panX, panY);
-    if (p_redBuffer)
+    if(p_redBuffer)
       p_redBuffer->pan(panX, panY);
-    if (p_greenBuffer)
+    if(p_greenBuffer)
       p_greenBuffer->pan(panX, panY);
-    if (p_blueBuffer)
+    if(p_blueBuffer)
       p_blueBuffer->pan(panX, panY);
     p_updatingBuffers = false;
 
@@ -701,7 +701,7 @@ namespace Qisis {
    * buffer, and paints them.
    */
   void CubeViewport::paintPixmapRects() {
-    for (int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {
+    for(int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {
       paintPixmap(*(*p_pixmapPaintRects)[rect]);
     }
 
@@ -793,24 +793,24 @@ namespace Qisis {
   void CubeViewport::scrollBy(int dx, int dy) {
     // Make sure we don't generate bad values outside of the scroll range
     int x = horizontalScrollBar()->value() + dx;
-    if (x <= 1) {
+    if(x <= 1) {
       dx = 1 - horizontalScrollBar()->value();
     }
-    else if (x >= horizontalScrollBar()->maximum()) {
+    else if(x >= horizontalScrollBar()->maximum()) {
       dx = horizontalScrollBar()->maximum() - horizontalScrollBar()->value();
     }
 
     // Make sure we don't generate bad values outside of the scroll range
     int y = verticalScrollBar()->value() + dy;
-    if (y <= 1) {
+    if(y <= 1) {
       dy = 1 - verticalScrollBar()->value();
     }
-    else if (y >= verticalScrollBar()->maximum()) {
+    else if(y >= verticalScrollBar()->maximum()) {
       dy = verticalScrollBar()->maximum() - verticalScrollBar()->value();
     }
 
     // Do we do anything?
-    if ((dx == 0) && (dy == 0))
+    if((dx == 0) && (dy == 0))
       return;
 
     // We do so update the scroll bars
@@ -832,7 +832,7 @@ namespace Qisis {
   void CubeViewport::scrollContentsBy(int dx, int dy) {
 
     // We shouldn't do anything if scrollbars are being updated
-    if (viewport()->signalsBlocked()) {
+    if(viewport()->signalsBlocked()) {
       return;
     }
 
@@ -849,24 +849,24 @@ namespace Qisis {
 
     p_updatingBuffers = true;
 
-    if (p_grayBuffer) {
+    if(p_grayBuffer) {
       p_grayBuffer->pan(dx, dy);
       panQueued |= p_grayBuffer->working();
       bufferXYRect = p_grayBuffer->bufferXYRect();
     }
 
-    if (p_redBuffer) {
+    if(p_redBuffer) {
       p_redBuffer->pan(dx, dy);
       panQueued |= p_redBuffer->working();
       bufferXYRect = p_redBuffer->bufferXYRect();
     }
 
-    if (p_greenBuffer) {
+    if(p_greenBuffer) {
       p_greenBuffer->pan(dx, dy);
       panQueued |= p_greenBuffer->working();
     }
 
-    if (p_blueBuffer) {
+    if(p_blueBuffer) {
       p_blueBuffer->pan(dx, dy);
       panQueued |= p_blueBuffer->working();
     }
@@ -874,7 +874,7 @@ namespace Qisis {
     p_updatingBuffers = false;
 
     // shift the pixmap by x,y if the viewport buffer didn't do it immediately
-    if (panQueued) {
+    if(panQueued) {
       shiftPixmap(dx, dy);
     }
     else {
@@ -893,7 +893,7 @@ namespace Qisis {
    * loading.
    */
   void CubeViewport::enableProgress() {
-    if (!p_progressTimer->isActive()) {
+    if(!p_progressTimer->isActive()) {
       p_progressTimer->start();
 
       emit progressChanged(0);
@@ -912,7 +912,7 @@ namespace Qisis {
     str += QString::number(p_scale * 100.0);
     str += QString("% ");
 
-    if (p_color) {
+    if(p_color) {
       str += QString("(RGB = ");
       str += QString::number(p_red.band);
       str += QString(",");
@@ -928,7 +928,7 @@ namespace Qisis {
     }
 
     //If changes have been made make sure to add '*' to the end
-    if (p_saveEnabled) {
+    if(p_saveEnabled) {
       str += "*";
     }
 
@@ -952,20 +952,20 @@ namespace Qisis {
     //   bufferUpdated. We don't want to have bufferUpdated ever when all
     //   buffers don't have their appropriate actions queued. It can't succeed.
     p_updatingBuffers = true;
-    if (p_grayBuffer)
+    if(p_grayBuffer)
       p_grayBuffer->resizedViewport();
-    if (p_redBuffer)
+    if(p_redBuffer)
       p_redBuffer->resizedViewport();
-    if (p_greenBuffer)
+    if(p_greenBuffer)
       p_greenBuffer->resizedViewport();
-    if (p_blueBuffer)
+    if(p_blueBuffer)
       p_blueBuffer->resizedViewport();
     p_updatingBuffers = false;
 
     paintPixmapRects();
 
     // Change the size of the image and pixmap
-    if (p_image) {
+    if(p_image) {
       delete p_image;
       p_image = NULL;
     }
@@ -1005,7 +1005,7 @@ namespace Qisis {
    *                           Tool::paintViewport.
    */
   void CubeViewport::paintEvent(QPaintEvent *e) {
-    if (!p_cubeShown || !viewport()->isVisible())
+    if(!p_cubeShown || !viewport()->isVisible())
       return;
   }
 
@@ -1026,13 +1026,13 @@ namespace Qisis {
     //   and a pan (or other operation?) completes. What would happen is
     //   the first would reset to black then other buffers still working so
     //   not restored to DN values.
-    if (p_grayBuffer && p_grayBuffer->working())
+    if(p_grayBuffer && p_grayBuffer->working())
       return;
-    if (p_redBuffer && p_redBuffer->working())
+    if(p_redBuffer && p_redBuffer->working())
       return;
-    if (p_greenBuffer && p_greenBuffer->working())
+    if(p_greenBuffer && p_greenBuffer->working())
       return;
-    if (p_blueBuffer && p_blueBuffer->working())
+    if(p_blueBuffer && p_blueBuffer->working())
       return;
 
     viewport()->repaint(rect);
@@ -1052,15 +1052,15 @@ namespace Qisis {
    * @param rect
    */
   void CubeViewport::paintPixmap(QRect rect) {
-    if (!p_paintPixmap)
+    if(!p_paintPixmap)
       return;
 
-    if (p_updatingBuffers) {
+    if(p_updatingBuffers) {
       p_pixmapPaintRects->push_back(new QRect(rect));
       return;
     }
 
-    if (p_pixmap.isNull())
+    if(p_pixmap.isNull())
       return;
 
     QPainter p(&p_pixmap);
@@ -1069,36 +1069,36 @@ namespace Qisis {
 
     QRect dataArea;
 
-    if (p_grayBuffer && p_grayBuffer->enabled()) {
-      if (p_grayBuffer->working())
+    if(p_grayBuffer && p_grayBuffer->enabled()) {
+      if(p_grayBuffer->working())
         return;
 
       dataArea = QRect(p_grayBuffer->bufferXYRect().intersected(rect));
 
-      for (int y = dataArea.top();
-           !dataArea.isNull() && y <= dataArea.bottom();
-           y++) {
+      for(int y = dataArea.top();
+          !dataArea.isNull() && y <= dataArea.bottom();
+          y++) {
         const vector< double > & line =
           p_grayBuffer->getLine(y - p_grayBuffer->bufferXYRect().top());
 
-        if (line.size() == 0)
+        if(line.size() == 0)
           break;
 
         QRgb *rgb = (QRgb *) p_image->scanLine(y);
 
-        for (int x = dataArea.left(); x <= dataArea.right(); x++) {
+        for(int x = dataArea.left(); x <= dataArea.right(); x++) {
           int bufferLeft = p_grayBuffer->bufferXYRect().left();
           int bufferX = x - bufferLeft;
 
-          if (bufferX >= (int)line.size())
+          if(bufferX >= (int)line.size())
             break;
 
-          if (bufferX < 0) {
+          if(bufferX < 0) {
             throw iException::Message(iException::Programmer, "bufferX < 0",
                                       _FILEINFO_);
           }
 
-          if (x >= p_image->width()) {
+          if(x >= p_image->width()) {
             throw iException::Message(iException::Programmer, "bufferX too big",
                                       _FILEINFO_);
           }
@@ -1115,23 +1115,23 @@ namespace Qisis {
       }
     }
     else {
-      if (p_redBuffer && p_redBuffer->enabled()) {
-        if (p_redBuffer->working() || p_greenBuffer->working() ||
+      if(p_redBuffer && p_redBuffer->enabled()) {
+        if(p_redBuffer->working() || p_greenBuffer->working() ||
             p_blueBuffer->working()) {
           return;
         }
 
 
-        if ((p_greenBuffer->bufferXYRect().top() !=
-             p_redBuffer->bufferXYRect().top()) ||
+        if((p_greenBuffer->bufferXYRect().top() !=
+            p_redBuffer->bufferXYRect().top()) ||
             (p_greenBuffer->bufferXYRect().top() !=
              p_blueBuffer->bufferXYRect().top())) {
           throw iException::Message(iException::Programmer,
                                     "Buffer rects mismatched", _FILEINFO_);
         }
 
-        if ((p_greenBuffer->bufferXYRect().left() !=
-             p_redBuffer->bufferXYRect().left()) ||
+        if((p_greenBuffer->bufferXYRect().left() !=
+            p_redBuffer->bufferXYRect().left()) ||
             (p_greenBuffer->bufferXYRect().left() !=
              p_blueBuffer->bufferXYRect().left())) {
           throw iException::Message(iException::Programmer,
@@ -1140,16 +1140,16 @@ namespace Qisis {
 
         dataArea = QRect(p_redBuffer->bufferXYRect().intersected(rect));
 
-        for (int y = dataArea.top();
-             !dataArea.isNull() && y <= dataArea.bottom();
-             y++) {
+        for(int y = dataArea.top();
+            !dataArea.isNull() && y <= dataArea.bottom();
+            y++) {
           int bufferLine = y - p_redBuffer->bufferXYRect().top();
 
           const vector<double> &redLine   = p_redBuffer->getLine(bufferLine);
           const vector<double> &greenLine = p_greenBuffer->getLine(bufferLine);
           const vector<double> &blueLine  = p_blueBuffer->getLine(bufferLine);
 
-          if ((int)redLine.size() < dataArea.width() ||
+          if((int)redLine.size() < dataArea.width() ||
               (int)greenLine.size() < dataArea.width() ||
               (int)blueLine.size() < dataArea.width()) {
             throw iException::Message(iException::Programmer,
@@ -1158,7 +1158,7 @@ namespace Qisis {
 
           QRgb *rgb = (QRgb *) p_image->scanLine(y);
 
-          for (int x = dataArea.left(); x <= dataArea.right(); x++) {
+          for(int x = dataArea.left(); x <= dataArea.right(); x++) {
             int redPix = (int)(p_red.getStretch().Map(redLine[ x - p_redBuffer->bufferXYRect().left()]) + 0.5);
             int greenPix = (int)(p_green.getStretch().Map(greenLine[ x - p_greenBuffer->bufferXYRect().left()]) + 0.5);
             int bluePix = (int)(p_blue.getStretch().Map(blueLine[ x - p_blueBuffer->bufferXYRect().left()]) + 0.5);
@@ -1169,7 +1169,7 @@ namespace Qisis {
       }
     }
 
-    if (!dataArea.isNull())
+    if(!dataArea.isNull())
       p.drawImage(dataArea.topLeft(), *p_image, dataArea);
 
     // Change whats this info
@@ -1184,20 +1184,20 @@ namespace Qisis {
    * @param dy
    */
   void CubeViewport::shiftPixmap(int dx, int dy) {
-    if (!p_paintPixmap || !p_pixmap)
+    if(!p_paintPixmap || !p_pixmap)
       return;
 
     // Prep to scroll the pixmap
     int drawStartX = dx;
     int pixmapStartX = 0;
-    if (drawStartX < 0) {
+    if(drawStartX < 0) {
       drawStartX = 0;
       pixmapStartX = -dx;
     }
 
     int drawStartY = dy;
     int pixmapStartY = 0;
-    if (dy < 0) {
+    if(dy < 0) {
       drawStartY = 0;
       pixmapStartY = -dy;
     }
@@ -1220,32 +1220,32 @@ namespace Qisis {
     QRect xFillRect;
     QRect yFillRect;
 
-    if (dx > 0) {
+    if(dx > 0) {
       xFillRect = QRect(QPoint(0, 0),
                         QPoint(dx, p_pixmap.height()));
     }
     else {
-      if (dx < 0)
+      if(dx < 0)
         xFillRect = QRect(QPoint(p_pixmap.width() + dx, 0),
                           QPoint(p_pixmap.width(), p_pixmap.height()));
     }
 
     // Fill in the top or bottom side
-    if (dy > 0) {
+    if(dy > 0) {
       yFillRect = QRect(QPoint(0, 0),
                         QPoint(p_pixmap.width(), dy));
     }
     else {
-      if (dy < 0)
+      if(dy < 0)
         yFillRect = QRect(QPoint(0, p_pixmap.height() + dy),
                           QPoint(p_pixmap.width(), p_pixmap.height()));
     }
 
-    if (dx != 0) {
+    if(dx != 0) {
       paintPixmap(xFillRect);
     }
 
-    if (dy != 0) {
+    if(dy != 0) {
       paintPixmap(yFillRect);
     }
 
@@ -1260,16 +1260,16 @@ namespace Qisis {
   void CubeViewport::updateWhatsThis() {
     double sl, ss;
     viewportToCube(0, 0, ss, sl);
-    if (ss < 1.0)
+    if(ss < 1.0)
       ss = 1.0;
-    if (sl < 1.0)
+    if(sl < 1.0)
       sl = 1.0;
 
     double el, es;
     viewportToCube(viewport()->width() - 1, viewport()->height() - 1, es, el);
-    if (es > cubeSamples())
+    if(es > cubeSamples())
       es = cubeSamples();
-    if (el > cubeLines())
+    if(el > cubeLines())
       el = cubeLines();
 
     QString area =
@@ -1383,8 +1383,8 @@ namespace Qisis {
    */
   bool CubeViewport::eventFilter(QObject *o, QEvent *e) {
     // Handle standard mouse tracking on the viewport
-    if (o == viewport()) {
-      switch (e->type()) {
+    if(o == viewport()) {
+      switch(e->type()) {
         case QEvent::Enter: {
             viewport()->setMouseTracking(true);
             emit mouseEnter();
@@ -1441,29 +1441,29 @@ namespace Qisis {
    * @param e
    */
   void CubeViewport::keyPressEvent(QKeyEvent *e) {
-    if (e->key() == Qt::Key_Plus) {
+    if(e->key() == Qt::Key_Plus) {
       double scale = p_scale * 2.0;
       setScale(scale);
       e->accept();
     }
-    else if (e->key() == Qt::Key_Minus) {
+    else if(e->key() == Qt::Key_Minus) {
       double scale = p_scale / 2.0;
       setScale(scale);
       e->accept();
     }
-    else if (e->key() == Qt::Key_Up) {
+    else if(e->key() == Qt::Key_Up) {
       moveCursor(0, -1);
       e->accept();
     }
-    else if (e->key() == Qt::Key_Down) {
+    else if(e->key() == Qt::Key_Down) {
       moveCursor(0, 1);
       e->accept();
     }
-    else if (e->key() == Qt::Key_Left) {
+    else if(e->key() == Qt::Key_Left) {
       moveCursor(-1, 0);
       e->accept();
     }
-    else if (e->key() == Qt::Key_Right) {
+    else if(e->key() == Qt::Key_Right) {
       moveCursor(1, 0);
       e->accept();
     }
@@ -1482,13 +1482,13 @@ namespace Qisis {
   bool CubeViewport::cursorInside() const {
     QPoint g = QCursor::pos();
     QPoint v = viewport()->mapFromGlobal(g);
-    if (v.x() < 0)
+    if(v.x() < 0)
       return false;
-    if (v.y() < 0)
+    if(v.y() < 0)
       return false;
-    if (v.x() >= viewport()->width())
+    if(v.x() >= viewport()->width())
       return false;
-    if (v.y() >= viewport()->height())
+    if(v.y() >= viewport()->height())
       return false;
     return true;
   }
@@ -1517,13 +1517,13 @@ namespace Qisis {
     QPoint g = QCursor::pos();
     g += QPoint(x, y);
     QPoint v = viewport()->mapFromGlobal(g);
-    if (v.x() < 0)
+    if(v.x() < 0)
       return;
-    if (v.y() < 0)
+    if(v.y() < 0)
       return;
-    if (v.x() >= viewport()->width())
+    if(v.x() >= viewport()->width())
       return;
-    if (v.y() >= viewport()->height())
+    if(v.y() >= viewport()->height())
       return;
     QCursor::setPos(g);
   }
@@ -1563,7 +1563,7 @@ namespace Qisis {
     horizontalScrollBar()->setMaximum((int)(ceil(cubeSamples() * p_scale) + 0.5));
     horizontalScrollBar()->setPageStep(viewport()->width() / 2);
 
-    if (horizontalScrollBar()->value() != x || verticalScrollBar()->value() != y) {
+    if(horizontalScrollBar()->value() != x || verticalScrollBar()->value() != y) {
       horizontalScrollBar()->setValue(x);
       verticalScrollBar()->setValue(y);
       emit scaleChanged();
@@ -1585,27 +1585,27 @@ namespace Qisis {
     p_color = false;
     setCaption();
 
-    if (!p_grayBuffer)
+    if(!p_grayBuffer)
       p_grayBuffer = new ViewportBuffer(this, p_cubeData,
                                         p_cubeId);
 
-    if (p_redBuffer)
+    if(p_redBuffer)
       delete p_redBuffer;
     p_redBuffer = NULL;
 
-    if (p_greenBuffer)
+    if(p_greenBuffer)
       delete p_greenBuffer;
     p_greenBuffer = NULL;
 
-    if (p_blueBuffer)
+    if(p_blueBuffer)
       delete p_blueBuffer;
     p_blueBuffer = NULL;
 
-    if (p_grayBuffer->getBand() != band) {
+    if(p_grayBuffer->getBand() != band) {
       int oldBand = p_grayBuffer->getBand();
 
-      if (oldBand >= 0) {
-        if ((*p_knownStretches)[oldBand - 1]) {
+      if(oldBand >= 0) {
+        if((*p_knownStretches)[oldBand - 1]) {
           delete(*p_knownStretches)[oldBand - 1];
         }
 
@@ -1615,7 +1615,7 @@ namespace Qisis {
       p_grayBuffer->setBand(band);
       p_gray.band = band;
 
-      if ((*p_knownStretches)[band - 1]) {
+      if((*p_knownStretches)[band - 1]) {
         stretchGray(*(*p_knownStretches)[band - 1]);
       }
       else {
@@ -1624,7 +1624,7 @@ namespace Qisis {
     }
 
 
-    if (p_camera) {
+    if(p_camera) {
       p_camera->SetBand(band);
     }
 
@@ -1632,8 +1632,8 @@ namespace Qisis {
   }
 
   void CubeViewport::forgetStretches() {
-    for (int stretch = 0; stretch < p_knownStretches->size(); stretch++) {
-      if ((*p_knownStretches)[stretch]) {
+    for(int stretch = 0; stretch < p_knownStretches->size(); stretch++) {
+      if((*p_knownStretches)[stretch]) {
         delete(*p_knownStretches)[stretch];
         (*p_knownStretches)[stretch] = NULL;
       }
@@ -1642,8 +1642,8 @@ namespace Qisis {
 
 
   void CubeViewport::setAllBandStretches(Isis::Stretch stretch) {
-    for (int index = 0; index < p_knownStretches->size(); index ++) {
-      if ((*p_knownStretches)[index]) {
+    for(int index = 0; index < p_knownStretches->size(); index ++) {
+      if((*p_knownStretches)[index]) {
         delete(*p_knownStretches)[index];
       }
 
@@ -1667,24 +1667,24 @@ namespace Qisis {
     p_color = true;
     setCaption();
 
-    if (!p_redBuffer) {
+    if(!p_redBuffer) {
       p_redBuffer = new ViewportBuffer(this, p_cubeData, p_cubeId);
     }
 
-    if (!p_greenBuffer) {
+    if(!p_greenBuffer) {
       p_greenBuffer = new ViewportBuffer(this, p_cubeData, p_cubeId);
     }
 
-    if (!p_blueBuffer) {
+    if(!p_blueBuffer) {
       p_blueBuffer = new ViewportBuffer(this, p_cubeData, p_cubeId);
     }
 
-    if (p_redBuffer->getBand() != rband) {
+    if(p_redBuffer->getBand() != rband) {
       int oldBand = p_redBuffer->getBand();
 
       // Remember current stretch for future band changes
-      if (oldBand >= 0) {
-        if ((*p_knownStretches)[oldBand - 1]) {
+      if(oldBand >= 0) {
+        if((*p_knownStretches)[oldBand - 1]) {
           delete(*p_knownStretches)[oldBand - 1];
         }
 
@@ -1694,7 +1694,7 @@ namespace Qisis {
       p_redBuffer->setBand(rband);
       p_red.band = rband;
 
-      if ((*p_knownStretches)[rband - 1]) {
+      if((*p_knownStretches)[rband - 1]) {
         p_red.setStretch(*(*p_knownStretches)[rband - 1]);
       }
       else {
@@ -1702,12 +1702,12 @@ namespace Qisis {
       }
     }
 
-    if (p_greenBuffer->getBand() != gband) {
+    if(p_greenBuffer->getBand() != gband) {
       int oldBand = p_greenBuffer->getBand();
 
       // Remember current stretch for future band changes
-      if (oldBand >= 0) {
-        if ((*p_knownStretches)[oldBand - 1]) {
+      if(oldBand >= 0) {
+        if((*p_knownStretches)[oldBand - 1]) {
           delete(*p_knownStretches)[oldBand - 1];
         }
 
@@ -1717,7 +1717,7 @@ namespace Qisis {
       p_greenBuffer->setBand(gband);
       p_green.band = gband;
 
-      if ((*p_knownStretches)[gband - 1]) {
+      if((*p_knownStretches)[gband - 1]) {
         p_green.setStretch(*(*p_knownStretches)[gband - 1]);
       }
       else {
@@ -1725,12 +1725,12 @@ namespace Qisis {
       }
     }
 
-    if (p_blueBuffer->getBand() != bband) {
+    if(p_blueBuffer->getBand() != bband) {
       int oldBand = p_blueBuffer->getBand();
 
       // Remember current stretch for future band changes
-      if (oldBand >= 0) {
-        if ((*p_knownStretches)[oldBand - 1]) {
+      if(oldBand >= 0) {
+        if((*p_knownStretches)[oldBand - 1]) {
           delete(*p_knownStretches)[oldBand - 1];
         }
 
@@ -1740,7 +1740,7 @@ namespace Qisis {
       p_blueBuffer->setBand(bband);
       p_blue.band = bband;
 
-      if ((*p_knownStretches)[bband - 1]) {
+      if((*p_knownStretches)[bband - 1]) {
         p_blue.setStretch(*(*p_knownStretches)[bband - 1]);
       }
       else {
@@ -1748,11 +1748,11 @@ namespace Qisis {
       }
     }
 
-    if (p_grayBuffer)
+    if(p_grayBuffer)
       delete p_grayBuffer;
     p_grayBuffer = NULL;
 
-    if (p_camera) {
+    if(p_camera) {
       p_camera->SetBand(rband);
     }
   }
@@ -1811,24 +1811,24 @@ namespace Qisis {
    * This stretches to the global stretch
    */
   void CubeViewport::stretchKnownGlobal() {
-    if (!p_globalStretches)
+    if(!p_globalStretches)
       return;
 
-    if (isGray()) {
-      if ((*p_globalStretches)[grayBand() - 1]) {
+    if(isGray()) {
+      if((*p_globalStretches)[grayBand() - 1]) {
         stretchGray(*(*p_globalStretches)[grayBand() - 1]);
       }
     }
     else {
-      if ((*p_globalStretches)[redBand() - 1]) {
+      if((*p_globalStretches)[redBand() - 1]) {
         stretchRed(*(*p_globalStretches)[redBand() - 1]);
       }
 
-      if ((*p_globalStretches)[greenBand() - 1]) {
+      if((*p_globalStretches)[greenBand() - 1]) {
         stretchGreen(*(*p_globalStretches)[greenBand() - 1]);
       }
 
-      if ((*p_globalStretches)[blueBand() - 1]) {
+      if((*p_globalStretches)[blueBand() - 1]) {
         stretchBlue(*(*p_globalStretches)[blueBand() - 1]);
       }
     }
@@ -1847,7 +1847,7 @@ namespace Qisis {
     p_blue.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
-    if ((*p_globalStretches)[grayBand() - 1] == NULL) {
+    if((*p_globalStretches)[grayBand() - 1] == NULL) {
       (*p_globalStretches)[grayBand() - 1] = new Stretch(p_gray.getStretch());
     }
 
@@ -1865,7 +1865,7 @@ namespace Qisis {
     p_red.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
-    if ((*p_globalStretches)[redBand() - 1] == NULL) {
+    if((*p_globalStretches)[redBand() - 1] == NULL) {
       (*p_globalStretches)[redBand() - 1] = new Stretch(p_red.getStretch());
     }
 
@@ -1883,7 +1883,7 @@ namespace Qisis {
     p_green.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
-    if ((*p_globalStretches)[greenBand() - 1] == NULL) {
+    if((*p_globalStretches)[greenBand() - 1] == NULL) {
       (*p_globalStretches)[greenBand() - 1] = new Stretch(p_green.getStretch());
     }
 
@@ -1901,7 +1901,7 @@ namespace Qisis {
     p_blue.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
-    if ((*p_globalStretches)[blueBand() - 1] == NULL) {
+    if((*p_globalStretches)[blueBand() - 1] == NULL) {
       (*p_globalStretches)[blueBand() - 1] = new Stretch(p_blue.getStretch());
     }
 
@@ -1965,37 +1965,37 @@ namespace Qisis {
     sl = (double)(cubeRect.top()) - 1.;
     es = (double)(cubeRect.right()) + 1.;
     el = (double)(cubeRect.bottom()) + 1.;
-    if (ss < 1)
+    if(ss < 1)
       ss = 0.5;
-    if (sl < 1)
+    if(sl < 1)
       sl = 0.5;
-    if (es > cube()->Samples())
+    if(es > cube()->Samples())
       es = cube()->Samples() + 0.5;
-    if (el > cube()->Lines())
+    if(el > cube()->Lines())
       el = cube()->Lines() + 0.5;
 
     int sx, sy, ex, ey;
 
     cubeToViewport(ss, sl, sx, sy);
     cubeToViewport(es, el, ex, ey);
-    if (sx < 0)
+    if(sx < 0)
       sx = 0;
-    if (sy < 0)
+    if(sy < 0)
       sy = 0;
-    if (ex > viewport()->width())
+    if(ex > viewport()->width())
       ex = viewport()->width();
-    if (ey > viewport()->height())
+    if(ey > viewport()->height())
       ey = viewport()->height();
     QRect vpRect(sx, sy, ex - sx + 1, ey - sy + 1);
 
     p_updatingBuffers = true;
-    if (p_grayBuffer)
+    if(p_grayBuffer)
       p_grayBuffer->fillBuffer(vpRect);
-    if (p_redBuffer)
+    if(p_redBuffer)
       p_redBuffer->fillBuffer(vpRect);
-    if (p_greenBuffer)
+    if(p_greenBuffer)
       p_greenBuffer->fillBuffer(vpRect);
-    if (p_blueBuffer)
+    if(p_blueBuffer)
       p_blueBuffer->fillBuffer(vpRect);
     p_updatingBuffers = false;
 
@@ -2034,7 +2034,7 @@ namespace Qisis {
 
 
   CubeViewport::BandInfo::~BandInfo() {
-    if (stretch) {
+    if(stretch) {
       delete stretch;
       stretch = NULL;
     }

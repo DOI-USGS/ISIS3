@@ -13,41 +13,41 @@
 
 using namespace Isis;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   try {
-  PvlGroup op("Operator");
-  op += PvlKeyword("Name","Moravec");
-  op += PvlKeyword("DeltaSamp", 100);
-  op += PvlKeyword("DeltaLine", 100);
-  op += PvlKeyword("Samples", 15);
-  op += PvlKeyword("Lines", 15);
-  op += PvlKeyword("MinimumDN", 0.0);
-  op += PvlKeyword("MaximumDN", 1.0);
-  op += PvlKeyword("MinimumInterest", 0.0);
+    PvlGroup op("Operator");
+    op += PvlKeyword("Name", "Moravec");
+    op += PvlKeyword("DeltaSamp", 100);
+    op += PvlKeyword("DeltaLine", 100);
+    op += PvlKeyword("Samples", 15);
+    op += PvlKeyword("Lines", 15);
+    op += PvlKeyword("MinimumDN", 0.0);
+    op += PvlKeyword("MaximumDN", 1.0);
+    op += PvlKeyword("MinimumInterest", 0.0);
 
-  PvlObject o("InterestOperator");
-  o.AddGroup(op);
+    PvlObject o("InterestOperator");
+    o.AddGroup(op);
 
-  Pvl pvl;
-  pvl.AddObject(o);
-  std::cout << pvl << std::endl;
+    Pvl pvl;
+    pvl.AddObject(o);
+    std::cout << pvl << std::endl;
 
-  InterestOperator *iop = InterestOperatorFactory::Create(pvl);
+    InterestOperator *iop = InterestOperatorFactory::Create(pvl);
 
-  Cube c;
-  c.Open("$mgs/testData/ab102401.cub");
+    Cube c;
+    c.Open("$mgs/testData/ab102401.cub");
 
-  //iop->Operate(c, 100, 350);
-	 UniversalGroundMap univGrndMap(c);
-  iop->Operate(c,  univGrndMap, 100, 350);
+    //iop->Operate(c, 100, 350);
+    UniversalGroundMap univGrndMap(c);
+    iop->Operate(c,  univGrndMap, 100, 350);
 
-  std::cout << "Sample: " << iop->CubeSample() << std::endl
-            << "Line : " << iop->CubeLine() << std::endl
-            << "Interest: " << iop->InterestAmount() << std::endl;
+    std::cout << "Sample: " << iop->CubeSample() << std::endl
+              << "Line : " << iop->CubeLine() << std::endl
+              << "Interest: " << iop->InterestAmount() << std::endl;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 

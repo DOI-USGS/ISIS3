@@ -1,24 +1,24 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.3 $                                                             
- * $Date: 2010/04/08 15:14:13 $                                                                 
- *                                                                        
+/**
+ * @file
+ * $Revision: 1.3 $
+ * $Date: 2010/04/08 15:14:13 $
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
- *                                                                        
+ *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.                                                           
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,              
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */    
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include "InfixToPostfix.h"
 #include "iException.h"
@@ -38,7 +38,7 @@ namespace Isis {
 
   /**
    * This populates the known operators/functions list. If the operators list
-   * is not empty, this function will do nothing. 
+   * is not empty, this function will do nothing.
    */
   void InfixToPostfix::Initialize() {
     p_operators.push_back(new InfixOperator(7, "^"));
@@ -56,7 +56,7 @@ namespace Isis {
     p_operators.push_back(new InfixOperator(1, "!="));
     p_operators.push_back(new InfixOperator(-1, "("));
 
-    // This makes multiple argument functions work 
+    // This makes multiple argument functions work
     p_operators.push_back(new InfixOperator(-1, ","));
 
     p_operators.push_back(new InfixFunction("--",     1));
@@ -110,11 +110,11 @@ namespace Isis {
    * delimiters. In order words, it compresses the spaces. This is used
    * to keep strings small, clean, and remove the necessity to check for
    * empty tokens constantly.
-   * 
+   *
    * That is, if your string is "a  b" the result will be "a b".
-   * 
+   *
    * @param equation A space-delimited string with excessive spaces
-   * 
+   *
    * @return iString A space-delimited string with data between every pair of spaces
    */
   iString InfixToPostfix::CleanSpaces(iString equation) {
@@ -125,7 +125,7 @@ namespace Isis {
         continue;
       }
 
-      if(clean.empty()){
+      if(clean.empty()) {
         clean = data;
       }
       else {
@@ -138,12 +138,12 @@ namespace Isis {
 
   /**
    * This method converts infix to postfix. It uses an enhanced verion of
-   * the algorithm found on page 159 of "Data Structures & Algorithms in Java" 
+   * the algorithm found on page 159 of "Data Structures & Algorithms in Java"
    * Second Edition by Robert Lafore. First, we prep the equation with
-   * TokenizeEquation and then parse through it using the known-good algorithm. 
-   * 
+   * TokenizeEquation and then parse through it using the known-good algorithm.
+   *
    * @param infix The infix equation
-   * 
+   *
    * @return iString The postfix equation
    */
   iString InfixToPostfix::Convert(const iString &infix) {
@@ -167,7 +167,7 @@ namespace Isis {
     //   and the string is empty.
     while(!equation.empty()) {
 
-      // There will be no empty tokens, so don't worry about checking for it. 
+      // There will be no empty tokens, so don't worry about checking for it.
       //   TokenizeEquation cleans excess spaces in it's return value.
       iString data = equation.Token(" ");
 
@@ -183,7 +183,7 @@ namespace Isis {
         if(IsFunction(data)) {
           // For a general check, zero single argument functions the
           //   same as an operand.
-          if(((InfixFunction*)FindOperator(data))->ArgumentCount() == 0) {
+          if(((InfixFunction *)FindOperator(data))->ArgumentCount() == 0) {
             numConsecutiveOperators = 0;
             numConsecutiveOperands ++;
           }
@@ -230,8 +230,8 @@ namespace Isis {
 
       // Any opening parentheses here are invalid at this point
       if(op == "(") {
-        throw iException::Message(iException::User, 
-                                  "There are too many opening parentheses ('(') in the equation.", 
+        throw iException::Message(iException::User,
+                                  "There are too many opening parentheses ('(') in the equation.",
                                   _FILEINFO_);
       }
 
@@ -250,9 +250,9 @@ namespace Isis {
   /**
    * This method will return true if it believes the argument represents
    *   a valid function or operator.
-   * 
+   *
    * @param representation The symbolic representation of the operator, such as 'sin'
-   * 
+   *
    * @return bool True if it looks valid, false if it's not known
    */
   bool InfixToPostfix::IsKnownSymbol(iString representation) {
@@ -267,9 +267,9 @@ namespace Isis {
 
   /**
    * This method will return true if 'representation' is a known function.
-   * 
+   *
    * @param representation The symbolic representation of a function, such as 'abs'
-   * 
+   *
    * @return bool True if it's a known function, false otherwise
    */
   bool InfixToPostfix::IsFunction(iString representation) {
@@ -282,9 +282,9 @@ namespace Isis {
   }
 
   /**
-   * This is straight from the algorithm found on page 159 of "Data Structures & Algorithms in Java" 
+   * This is straight from the algorithm found on page 159 of "Data Structures & Algorithms in Java"
    * Second Edition by Robert Lafore.
-   * 
+   *
    * @param postfix The postix generated thus far
    * @param op The operator
    * @param theStack The operator stack
@@ -312,9 +312,9 @@ namespace Isis {
   }
 
   /**
-   * This is straight from the algorithm found on page 159 of "Data Structures & Algorithms in Java" 
+   * This is straight from the algorithm found on page 159 of "Data Structures & Algorithms in Java"
    * Second Edition by Robert Lafore.
-   * 
+   *
    * @param postfix The postix generated thus far
    * @param theStack The operator stack
    */
@@ -334,8 +334,8 @@ namespace Isis {
     }
 
     if(!openingFound) {
-      throw iException::Message(iException::User, 
-                                "There are too many closing parentheses (')') in the equation.", 
+      throw iException::Message(iException::User,
+                                "There are too many closing parentheses (')') in the equation.",
                                 _FILEINFO_);
     }
   }
@@ -344,9 +344,9 @@ namespace Isis {
    * This method will return a pointer to the operator represented by
    *   'representation.' Because in this model a function is an operator,
    *   this will return a pointer to functions as well (in a base class pointer).
-   * 
+   *
    * @param representation The symbolic representation of the operator, such as '+'
-   * 
+   *
    * @return InfixOperator* A pointer to the operator object that contains known information about the operator
    */
   InfixOperator *InfixToPostfix::FindOperator(iString representation) {
@@ -363,18 +363,18 @@ namespace Isis {
   /**
    * This method will add spaces between all operators and numbers, making it
    * possible to get each element of the equation one by one. It will also parse
-   * out the function calls, adding parenthesis where needed so the user doesn't 
+   * out the function calls, adding parenthesis where needed so the user doesn't
    * have to. The result is an equation ready for parsing (but NOT fully parenthesized,
    * just enough to make sure our algorithm makes no mistakes).
-   * 
+   *
    * @param equation An unformatted infix equation
-   * 
+   *
    * @return iString A tokenized equation with additional parentheses
    */
   iString InfixToPostfix::TokenizeEquation(const iString &equation) {
     iString output = "";
 
-    // Insert whitespace, make everything lowercase, and change all braces to 
+    // Insert whitespace, make everything lowercase, and change all braces to
     // parenthesis
     for(unsigned int i = 0; i < equation.size(); i++) {
       // Ensure there is whitespace in the equation
@@ -387,31 +387,31 @@ namespace Isis {
           output += " ) ";
         }
         // Test for multicharacter operators
-        else if(i < equation.size()-1 && equation[i] == '-' && equation[i+1] == '-') {
+        else if(i < equation.size() - 1 && equation[i] == '-' && equation[i+1] == '-') {
           output += " -- ";
           i++;
         }
-        else if(i < equation.size()-1 && equation[i] == '<' && equation[i+1] == '<') {
+        else if(i < equation.size() - 1 && equation[i] == '<' && equation[i+1] == '<') {
           output += " << ";
           i++;
         }
-        else if(i < equation.size()-1 && equation[i] == '>' && equation[i+1] == '>') {
+        else if(i < equation.size() - 1 && equation[i] == '>' && equation[i+1] == '>') {
           output += " >> ";
           i++;
         }
-        else if(i < equation.size()-1 && equation[i] == '>' && equation[i+1] == '=') {
+        else if(i < equation.size() - 1 && equation[i] == '>' && equation[i+1] == '=') {
           output += " >= ";
           i++;
         }
-        else if(i < equation.size()-1 && equation[i] == '<' && equation[i+1] == '=') {
+        else if(i < equation.size() - 1 && equation[i] == '<' && equation[i+1] == '=') {
           output += " <= ";
           i++;
         }
-        else if(i < equation.size()-1 && equation[i] == '=' && equation[i+1] == '=') {
+        else if(i < equation.size() - 1 && equation[i] == '=' && equation[i+1] == '=') {
           output += " == ";
           i++;
         }
-        else if(i < equation.size()-1 && equation[i] == '!' && equation[i+1] == '=') {
+        else if(i < equation.size() - 1 && equation[i] == '!' && equation[i+1] == '=') {
           output += " != ";
           i++;
         }
@@ -430,7 +430,7 @@ namespace Isis {
             }
 
             if(equation[index] != '(' && equation[index] != '/' &&
-               equation[index] != '*' && equation[index] != '+') {
+                equation[index] != '*' && equation[index] != '+') {
               isNegative = false;
               break;
             }
@@ -467,9 +467,9 @@ namespace Isis {
    * This ensures order of operations holds for cases like sin(.5)^2. This method might add
    * too many parentheses, but that is harmless. This does not affect operators (excepting --) or
    * numbers. Only functions. The input should be space-delimited.
-   * 
+   *
    * @param equation The unparenthesized equation
-   * 
+   *
    * @return iString The parenthesized equation
    */
   iString InfixToPostfix::FormatFunctionCalls(iString equation) {
@@ -486,7 +486,7 @@ namespace Isis {
       if(IsFunction(element)) {
         // Point to the function. We know if IsFunction returned true,
         //   the result is really a InfixFunction*
-        InfixFunction *func = (InfixFunction*)FindOperator(element);
+        InfixFunction *func = (InfixFunction *)FindOperator(element);
 
         // We want to wrap the entire thing in parentheses, and it's argument string.
         //   So sin(.5)^2 becomes (sin(.5))^2
@@ -523,9 +523,9 @@ namespace Isis {
 
           // Make sure the user put parentheses around these, otherwise we're left in the dark.
           if(func->ArgumentCount() > 1 && equation.Token(" ") != "(") {
-            throw iException::Message(iException::User, 
+            throw iException::Message(iException::User,
                                       "Missing parenthesis after " + func->InputString(),
-                                      _FILEINFO_); 
+                                      _FILEINFO_);
           }
 
           // Single argument missing parenthesis?
@@ -538,7 +538,7 @@ namespace Isis {
               //   my job to figure out what they mean!
               if(func->InputString() != "--") {
                 throw iException::Message(iException::User,
-                                         "Missing parenthesis after " + func->InputString(),
+                                          "Missing parenthesis after " + func->InputString(),
                                           _FILEINFO_);
               }
 
@@ -552,8 +552,8 @@ namespace Isis {
                 // We are negating a function result. We must do a mini-parse to figure out
                 //   the function and resursively call, then append the negation.
                 iString functionName = argument;
-                iString openParen = equation.Token(" "); 
-                
+                iString openParen = equation.Token(" ");
+
                 // No open parens? Call ourself again with this supposed function
                 if(openParen != "(") {
                   output += " " + FormatFunctionCalls(functionName) + " ) ) ";
@@ -573,7 +573,7 @@ namespace Isis {
                   if(newElem == "") {
                     throw iException::Message(iException::User,
                                               "Missing closing parentheses after '" + argument + "'.",
-                                              _FILEINFO_);                                      
+                                              _FILEINFO_);
                   }
 
                   if(newElem == "(") numParens++;
@@ -591,7 +591,7 @@ namespace Isis {
           /**
            * This code block is for multi-parameter functions. Functions with 1+ parameters
            * are parsed here, excepting the negation (with no parentheses) which is done just above.
-           * 
+           *
            * We figure out the arguments by looking for commas, outside of all parentheses, for each argument
            * up until the last one. We look for an extra closing parenthesis for the last argument. When we figure
            * out what an argument is, we recursively call FormatFunctionCalls to format any and all functionality
@@ -606,7 +606,7 @@ namespace Isis {
             // Ran out of data, the function call is not complete.
             if(elem == "") {
               throw iException::Message(iException::User,
-                         "The definition of '" + func->InputString() + "' is not complete.",
+                                        "The definition of '" + func->InputString() + "' is not complete.",
                                         _FILEINFO_);
             }
 
@@ -632,7 +632,7 @@ namespace Isis {
               // Too many arguments? We don't expect a comma delimiter on the last argument.
               if(argNum == func->ArgumentCount()) {
                 throw iException::Message(iException::User,
-                         "There were too many arguments supplied to the function '" + func->InputString() + "'.",
+                                          "There were too many arguments supplied to the function '" + func->InputString() + "'.",
                                           _FILEINFO_);
               }
             }
@@ -651,7 +651,7 @@ namespace Isis {
             // Closed the function early?
             else if(numParens == -1) {
               throw iException::Message(iException::User,
-                         "There were not enough arguments supplied to the function '" + func->InputString() + "'.",
+                                        "There were not enough arguments supplied to the function '" + func->InputString() + "'.",
                                         _FILEINFO_);
             }
           }
@@ -673,7 +673,7 @@ namespace Isis {
 
     if(argument == "") {
       throw iException::Message(iException::User,
-               "Argument " + (iString)(argNum+1) + " in function " + funcName + " must not be empty.",
+                                "Argument " + (iString)(argNum + 1) + " in function " + funcName + " must not be empty.",
                                 _FILEINFO_);
     }
   }

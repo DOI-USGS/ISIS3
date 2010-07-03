@@ -29,29 +29,33 @@
 namespace Isis {
   /**
    * @brief Format ascii tables
-   * 
+   *
    * This class takes in a series of string vectors and writes them out to a
    * file as a table. Formatting options are up to the user.
-   * 
+   *
    * @ingroup Utility
-   * 
+   *
    * @author 2007-05-01 Brendan George
    */
   class WriteTabular {
     public:
       // Constructor and Destructor
-      WriteTabular(std::ostream &strm, std::vector <Column> cols );
-      WriteTabular(std::ostream &strm );
+      WriteTabular(std::ostream &strm, std::vector <Column> cols);
+      WriteTabular(std::ostream &strm);
 
-      void SetColumns( std::vector <Column> cols );
+      void SetColumns(std::vector <Column> cols);
       void Write();
-      void Write (int item);
-      void Write (std::string item);
-      void Write (double item);
+      void Write(int item);
+      void Write(std::string item);
+      void Write(double item);
       void SetDelimiter(std::string delim);
 
-      int Columns() {return p_cols.size();};
-      int Rows() {return p_rows;};
+      int Columns() {
+        return p_cols.size();
+      };
+      int Rows() {
+        return p_rows;
+      };
 
     private:
       std::string p_delimiter;

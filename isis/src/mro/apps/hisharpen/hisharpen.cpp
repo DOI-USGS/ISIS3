@@ -18,9 +18,9 @@ bool IsPowerOf2(unsigned int num);
 //! True if PSF was originally specified
 bool manualPsf;
 
-void IsisMain () {
+void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
- 
+
   manualPsf = ui.WasEntered("PSF");
 
   // This is the equation that hisharpen needs to perform
@@ -94,11 +94,11 @@ void IsisMain () {
 
 
 /**
- * This method creates a point spread function file if one is needed. A 
- * point spread function file is a picture, taken by the instrument, of 
- * a point of light. This file needs to be normalized, and the point of light 
- * should be at the edges of the image: 
- *  
+ * This method creates a point spread function file if one is needed. A
+ * point spread function file is a picture, taken by the instrument, of
+ * a point of light. This file needs to be normalized, and the point of light
+ * should be at the edges of the image:
+ *
  *  Typical Picture of a point         Expected File
  *    ------------------           ------------------
  *    |                |           |*              *|
@@ -108,14 +108,14 @@ void IsisMain () {
  *    |                |           |                |
  *    |                |           |*              *|
  *    ------------------           ------------------
- *  
+ *
  *  where the blank areas in these cubes are zeros, and the *'s are data with a
  *  sum of 1. What's meant by creating these cubes, and what this function does,
  *  is find a valid point spread function and pads the center of the image with
  *  zeros. This allows for the sum of the image to not change, and there
  *  shouldnt be more light away from the point of light.
- *  
- *  
+ *
+ *
  * @param p The pipeline; not modified, only used to get correct temp folder
  */
 void CreatePsf(Pipeline &p) {
@@ -143,7 +143,7 @@ void CreatePsf(Pipeline &p) {
       throw iException::Message(iException::User, message, _FILEINFO_);
     }
   }
-  catch (iException &e) {
+  catch(iException &e) {
     iString message = "The [FROM] file is not a valid HIRISE cube. "
                       "Please make sure it was imported using hi2isis.";
     throw iException::Message(iException::User, message, _FILEINFO_);
@@ -153,7 +153,7 @@ void CreatePsf(Pipeline &p) {
     iString message = "This program only works on square cubes, the number of samples [" +
                       iString(fromCube.Samples()) + "] must match the number of lines [" +
                       iString(fromCube.Lines()) + "]";
-    throw iException::Message(iException::User,message,_FILEINFO_);
+    throw iException::Message(iException::User, message, _FILEINFO_);
   }
 
   // Let's figure out which point spread function we're supposed to be using
@@ -182,17 +182,17 @@ void CreatePsf(Pipeline &p) {
   if(psfCube.Lines() > fromCube.Lines()) {
     iString message = "The input cube dimensions must be at least [" + iString(psfCube.Lines());
     message += "] pixels in the line and sample dimensions";
-    throw iException::Message(iException::User,message,_FILEINFO_);
+    throw iException::Message(iException::User, message, _FILEINFO_);
   }
 
   if(!IsPowerOf2(fromCube.Lines())) {
-    iString message = "The input cube dimensions must be a power of 2 (found [" + 
-                       iString(fromCube.Lines()) + "])";
-    throw iException::Message(iException::User,message,_FILEINFO_);
+    iString message = "The input cube dimensions must be a power of 2 (found [" +
+                      iString(fromCube.Lines()) + "])";
+    throw iException::Message(iException::User, message, _FILEINFO_);
   }
 
   LineManager psfMgr(psfCube);
-  psfMgr.SetLine(1,1);
+  psfMgr.SetLine(1, 1);
 
   // We also need the output temp psf cube
   Cube outPsfCube;
@@ -200,7 +200,7 @@ void CreatePsf(Pipeline &p) {
   outPsfCube.Create(tmpFile);
 
   LineManager outMgr(outPsfCube);
-  outMgr.SetLine(1,1);
+  outMgr.SetLine(1, 1);
 
   Progress progress;
   progress.SetText("Creating PSF File");
@@ -225,10 +225,10 @@ void CreatePsf(Pipeline &p) {
 
     outPsfCube.Write(outMgr);
 
-    if(line < psfCube.Lines()/2) {
+    if(line < psfCube.Lines() / 2) {
       psfMgr ++;
     }
-    else if(line >= outPsfCube.Lines() - psfCube.Lines()/2) {
+    else if(line >= outPsfCube.Lines() - psfCube.Lines() / 2) {
       psfMgr ++;
     }
 

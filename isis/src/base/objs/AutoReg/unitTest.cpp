@@ -13,13 +13,13 @@ using namespace Isis;
 
 AutoReg *p_ar;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
-  void Doit(Isis::PvlObject &obj);
+  void Doit(Isis::PvlObject & obj);
   void DoRegister();
 
   cout << "Unit test for Isis::AutoReg ..." << endl << endl;
-  
+
   cout << "---------------------------------" << endl;
   cout << "Test for missing Algorithm Group" << endl;
   cout << "---------------------------------" << endl;
@@ -52,14 +52,14 @@ int main () {
   cout << "-----------------------------------" << endl;
   cout << "Test for missing PatternChip Group" << endl;
   cout << "-----------------------------------" << endl;
-  mg += Isis::PvlKeyword("Tolerance",0.3);
+  mg += Isis::PvlKeyword("Tolerance", 0.3);
   Doit(obj);
   cout << endl;
 
   cout << "-----------------------------------" << endl;
   cout << "Test for wrong ChipInterpolator Keyword value" << endl;
   cout << "-----------------------------------" << endl;
-  mg += Isis::PvlKeyword("ChipInterpolator","None");
+  mg += Isis::PvlKeyword("ChipInterpolator", "None");
   Doit(obj);
   mg["ChipInterpolator"] = "BiLinearType";
   cout << endl;
@@ -98,12 +98,12 @@ int main () {
   pc["Lines"] = 90;
   pc["Samples"] = -90;
   Doit(obj);
-  cout << endl;  
-  
+  cout << endl;
+
   cout << "----------------------------------" << endl;
   cout << "Test for missing SearchChip group" << endl;
   cout << "----------------------------------" << endl;
-   pc["Samples"] = 90;
+  pc["Samples"] = 90;
   Doit(obj);
   cout << endl;
 
@@ -154,9 +154,9 @@ int main () {
   cout << "\n------------------------------" << endl;
   cout << "Testing Error = FitChipNoData" << endl;
   cout << "------------------------------" << endl;
-  for (int line=1; line<=p_ar->SearchChip()->Lines(); line++) {
-    for (int samp=1; samp<=p_ar->SearchChip()->Samples(); samp++) {
-      p_ar->SearchChip()->SetValue(samp,line,Isis::Null);
+  for(int line = 1; line <= p_ar->SearchChip()->Lines(); line++) {
+    for(int samp = 1; samp <= p_ar->SearchChip()->Samples(); samp++) {
+      p_ar->SearchChip()->SetValue(samp, line, Isis::Null);
     }
   }
   DoRegister();
@@ -179,7 +179,7 @@ int main () {
   //Reset the surface model Window size
   p_ar->SetSurfaceModelWindowSize(5);
   Doit(obj);
- 
+
   cout << "\n----------------------------------------------------" << endl;
   cout << "Testing Error = SurfaceModelEccentricityRatioNotMet" << endl;
   cout << "----------------------------------------------------" << endl;
@@ -188,7 +188,7 @@ int main () {
   //Reset the surface model Eccentricity ratio
   p_ar->SetSurfaceModelEccentricityRatio(2);
   Doit(obj);
- 
+
   cout << "\n----------------------------------------------------" << endl;
   cout << "Testing Error = SurfaceModelResidualToleranceNotMet" << endl;
   cout << "----------------------------------------------------" << endl;
@@ -211,44 +211,44 @@ int main () {
   cout << "Testing Success" << endl;
   cout << "----------------" << endl;
   DoRegister();
-  
+
   delete p_ar;
   return 0;
 
 }
 
-void Doit (Isis::PvlObject &obj) {
+void Doit(Isis::PvlObject &obj) {
   try {
     Pvl lab;
     lab.AddObject(obj);
     p_ar = AutoRegFactory::Create(lab);
     Cube c;
     c.Open("$base/testData/search.cub");
-    p_ar->SearchChip()->TackCube(75.0,75.0);
+    p_ar->SearchChip()->TackCube(75.0, 75.0);
     p_ar->SearchChip()->Load(c);
     Cube d;
     d.Open("$base/testData/pattern.cub");
-    p_ar->PatternChip()->TackCube(45.0,45.0);
+    p_ar->PatternChip()->TackCube(45.0, 45.0);
     p_ar->PatternChip()->Load(d);
     p_ar->SetEccentricityTesting(true);
     p_ar->SetResidualTesting(true);
   }
-  catch (Isis::iException &error) {
+  catch(Isis::iException &error) {
     error.Clear();
     iString err = error.what();
-    
+
     // We need to get rid of the contents of the second []  on each line to ensure
     //  file paths do not persist.
     iString thisLine;
     iString formattedErr;
-    
+
     while((thisLine = err.Token("\n")) != "") {
       formattedErr += thisLine.Token("[");
-    
+
       if(!thisLine.empty()) {
         formattedErr += "[" + thisLine.Token("]") + "]";
       }
-      
+
       if(!thisLine.empty() && thisLine.find('[') != string::npos) {
         formattedErr += thisLine.Token("[") + "[]";
         thisLine.Token("]");
@@ -257,20 +257,20 @@ void Doit (Isis::PvlObject &obj) {
       else {
         formattedErr += thisLine;
       }
-      
+
       formattedErr += "\n";
     }
-    
+
 
     std::cerr << formattedErr;
   }
 }
 
-void DoRegister(){
-    AutoReg::RegisterStatus status = p_ar->Register();
-    if(status == AutoReg::Success) {
-      std::cout << "Position = " << p_ar->CubeSample() << " " <<  p_ar->CubeLine() << std::endl;
-    }
-    Pvl regstats = p_ar->RegistrationStatistics();
-    std::cout  << regstats << std::endl;
+void DoRegister() {
+  AutoReg::RegisterStatus status = p_ar->Register();
+  if(status == AutoReg::Success) {
+    std::cout << "Position = " << p_ar->CubeSample() << " " <<  p_ar->CubeLine() << std::endl;
+  }
+  Pvl regstats = p_ar->RegistrationStatistics();
+  std::cout  << regstats << std::endl;
 }

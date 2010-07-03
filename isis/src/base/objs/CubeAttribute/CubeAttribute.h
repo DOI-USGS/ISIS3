@@ -1,25 +1,25 @@
-/**                                                                       
- * @file                                                                 
- * $Revision: 1.2 $                                                            
- * $Date: 2007/01/30 22:12:22 $                                                                
- *                                                                       
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related 
- *   information.                                                        
- *                                                                       
- *   Although Isis has been used by the USGS, no warranty, expressed or  
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution    
+/**
+ * @file
+ * $Revision: 1.2 $
+ * $Date: 2007/01/30 22:12:22 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                       
- *                                                                       
- *   For additional information, launch                                  
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html               
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                   
- */                                                                      
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #ifndef CubeAttribute_h
 #define CubeAttribute_h
@@ -53,12 +53,12 @@ namespace Isis {
    *
    * @return A string representation of the rangeType parameter
    */
-  inline std::string RangeTypeName (RangeType rangeType) {
-    if (rangeType == PropagateRange) return "Propagate";
-    if (rangeType == RangeSet) return "Set";
+  inline std::string RangeTypeName(RangeType rangeType) {
+    if(rangeType == PropagateRange) return "Propagate";
+    if(rangeType == RangeSet) return "Set";
 
     std::string msg = "Invalid output range type [" + Isis::iString(rangeType) + "]";
-    throw Isis::iException::Message(Isis::iException::Parse,msg, _FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
   }
 
 
@@ -70,14 +70,14 @@ namespace Isis {
    *
    * @return The RangeType enum corresponding to the string parameter
    */
-  inline RangeType RangeTypeEnumeration (const std::string &rangeType) {
+  inline RangeType RangeTypeEnumeration(const std::string &rangeType) {
     Isis::iString temp(rangeType);
     temp = temp.UpCase();
-    if (temp == "PROPAGATE") return PropagateRange;
-    if (temp == "SET") return RangeSet;
+    if(temp == "PROPAGATE") return PropagateRange;
+    if(temp == "SET") return RangeSet;
 
     std::string msg = "Invalid output range type string [" + rangeType + "]";
-    throw Isis::iException::Message(Isis::iException::Parse,msg, _FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
   }
 
 
@@ -103,12 +103,12 @@ namespace Isis {
    *
    * @return A string representation of the parameter
    */
-  inline std::string LabelAttachmentName (LabelAttachment labelType) {
-    if (labelType == AttachedLabel) return "Attached";
-    if (labelType == DetachedLabel) return "Detached";
+  inline std::string LabelAttachmentName(LabelAttachment labelType) {
+    if(labelType == AttachedLabel) return "Attached";
+    if(labelType == DetachedLabel) return "Detached";
 
     std::string msg = "Invalid label attachment type [" + Isis::iString(labelType) + "]";
-    throw Isis::iException::Message(Isis::iException::Parse,msg, _FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
   }
 
 
@@ -120,59 +120,59 @@ namespace Isis {
    *
    * @return The RangeType enum corresponding to the string parameter
    */
-  inline LabelAttachment LabelAttachmentEnumeration (const std::string &labelType) {
+  inline LabelAttachment LabelAttachmentEnumeration(const std::string &labelType) {
     Isis::iString temp(labelType);
     temp = temp.UpCase();
-    if (temp == "ATTACHED") return AttachedLabel;
-    if (temp == "DETACHED") return DetachedLabel;
+    if(temp == "ATTACHED") return AttachedLabel;
+    if(temp == "DETACHED") return DetachedLabel;
 
     std::string msg = "Invalid label attachment type string [" + labelType + "]";
-    throw Isis::iException::Message(Isis::iException::Parse,msg, _FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
   }
 
 
 
-/**
- * @brief Parent class for CubeAttributeInput and CubeAttributeOutput.
- *
- * This class provides common functionality for the CubeAttributeInput and
- * CubeAttributeOutput classes. These classes are used to parse and
- * manipulate attribute information attached to the end of a cube filename.
- *
- * @see IsisAml IsisGui
- *
- * @ingroup Parsing
- *
- * @internal
- * @history 2003-07-09 Stuart Sides
- * Original version
- *
- * @history 2003-07-17 Stuart Sides
- * Added input file band attribute capabilities.
- *
- * @history 2003-07-29 Stuart Sides
- * Separated the input and output attributes into two separated class
- * deriving off a base class, instead of one class for all cases.
- *
- * @history 2003-10-03 Stuart Sides
- * Added members HasPixelType. It was needed by the IsisCube so it could do
- * an easy check. Added IsMsb, IsLsb, HasOrder, ByteOrderStr, ByteOrderType,
- * Order and Order. These were needed to allow users to specify a
- * byte order for output cubes.
- *
- * @history 2004-02-03 Stuart Sides
- * Refactor for IsisProcess and cube changes
- *
- * @history 2004-03-03 Stuart Sides
- * Modified IsisCubeAttributeOutput::Write so min and max don't get written
- *      when the pixel type is real.
- *
- */
+  /**
+   * @brief Parent class for CubeAttributeInput and CubeAttributeOutput.
+   *
+   * This class provides common functionality for the CubeAttributeInput and
+   * CubeAttributeOutput classes. These classes are used to parse and
+   * manipulate attribute information attached to the end of a cube filename.
+   *
+   * @see IsisAml IsisGui
+   *
+   * @ingroup Parsing
+   *
+   * @internal
+   * @history 2003-07-09 Stuart Sides
+   * Original version
+   *
+   * @history 2003-07-17 Stuart Sides
+   * Added input file band attribute capabilities.
+   *
+   * @history 2003-07-29 Stuart Sides
+   * Separated the input and output attributes into two separated class
+   * deriving off a base class, instead of one class for all cases.
+   *
+   * @history 2003-10-03 Stuart Sides
+   * Added members HasPixelType. It was needed by the IsisCube so it could do
+   * an easy check. Added IsMsb, IsLsb, HasOrder, ByteOrderStr, ByteOrderType,
+   * Order and Order. These were needed to allow users to specify a
+   * byte order for output cubes.
+   *
+   * @history 2004-02-03 Stuart Sides
+   * Refactor for IsisProcess and cube changes
+   *
+   * @history 2004-03-03 Stuart Sides
+   * Modified IsisCubeAttributeOutput::Write so min and max don't get written
+   *      when the pixel type is real.
+   *
+   */
   class CubeAttribute {
     public:
 
       //! Constructs an empty CubeAttribute
-      CubeAttribute ();
+      CubeAttribute();
 
 
       /**
@@ -186,11 +186,11 @@ namespace Isis {
        *               before the first "+" are assumed to be the filename
        *               and are ignored.
        */
-      CubeAttribute (const Isis::iString &att);
+      CubeAttribute(const Isis::iString &att);
 
 
       //! Destroys the object
-      virtual ~CubeAttribute ();
+      virtual ~CubeAttribute();
 
 
       /**
@@ -223,36 +223,36 @@ namespace Isis {
 
 #ifndef DOXY_INTERNAL
 
- /**
-  * @brief Manipulate and parse attributes of input cube filenames.
-  *
-  * This class provides parsing and manipulation of attributes associated
-  * with input cube filenames. Input cube filenames can have an attribute
-  * of "band(s) specification"
-  *
-  * @see IsisAml IsisGui
-  *
-  * @ingroup Parsing
-  *
-  * @internal
-  * @history 2003-07-29 Stuart Sides
-  * Separated the input and output attributes into two seprated class
-  * deriving off a base class, instead of one class for all cases.
-  *
-  * @history 2004-02-03 Stuart Sides
-  * Refactor for IsisProcess and cube changes
-  *
-  * @history 2006-01-05 Stuart Sides
-  * Fixed bug when the input attribute was "+7-10". In this case the Write
-  * members were not putting the "+" at the beginning.
-  *
-  */
+  /**
+   * @brief Manipulate and parse attributes of input cube filenames.
+   *
+   * This class provides parsing and manipulation of attributes associated
+   * with input cube filenames. Input cube filenames can have an attribute
+   * of "band(s) specification"
+   *
+   * @see IsisAml IsisGui
+   *
+   * @ingroup Parsing
+   *
+   * @internal
+   * @history 2003-07-29 Stuart Sides
+   * Separated the input and output attributes into two seprated class
+   * deriving off a base class, instead of one class for all cases.
+   *
+   * @history 2004-02-03 Stuart Sides
+   * Refactor for IsisProcess and cube changes
+   *
+   * @history 2006-01-05 Stuart Sides
+   * Fixed bug when the input attribute was "+7-10". In this case the Write
+   * members were not putting the "+" at the beginning.
+   *
+   */
   class CubeAttributeInput : public CubeAttribute {
 
     public:
 
       //! Constructs an empty CubeAttributeInput
-      CubeAttributeInput ();
+      CubeAttributeInput();
 
 
       /**
@@ -264,11 +264,11 @@ namespace Isis {
        *
        * @param att The attribute string to be parsed.
       **/
-      CubeAttributeInput (const Isis::iString &att);
+      CubeAttributeInput(const Isis::iString &att);
 
 
       //! Destroys the object
-      ~CubeAttributeInput ();
+      ~CubeAttributeInput();
 
 
       /**
@@ -280,15 +280,15 @@ namespace Isis {
        *                before the first "+" are assumed to be the filename
        *                and are ignored.
       **/
-      void Set (const std::string &att);
+      void Set(const std::string &att);
 
 
       //! Set the input attributes to the default state (i.e., empty)
-      void Reset ();
+      void Reset();
 
 
-       //! Return an STL vector of the input bands specified
-      std::vector<std::string> Bands () const;
+      //! Return an STL vector of the input bands specified
+      std::vector<std::string> Bands() const;
 
       /**
        * @brief Return a string representation of all the bands
@@ -304,10 +304,10 @@ namespace Isis {
       std::string BandsStr() const;
 
       //! Set the band attribute according to the list of bands
-      void Bands (const std::vector<std::string> &bands);
+      void Bands(const std::vector<std::string> &bands);
 
       //! Set the band attribute according the string parameter
-      void Bands (const std::string &bands);
+      void Bands(const std::string &bands);
 
       //! Write the attributes to a stream
       void Write(std::ostream &ostr) const;
@@ -330,46 +330,46 @@ namespace Isis {
        *               before the first "+" are assumed to be the filename
        *               and are ignored.
        */
-      void Parse (const std::string &att);
+      void Parse(const std::string &att);
   };
 
 
- /**
-  * @brief Manipulate and parse attributes of output cube filenames.
-  *
-  * This class provides parsing and manipulation of attributes associated
-  * with output cube filenames. Output cube filenames can have an attributes
-  * of "minimum:maximum", "pixel type", "file format", "byte order", and
-  * "label placement"
-  *
-  * @see IsisAml IsisGui
-  *
-  * @ingroup Parsing
-  *
-  * @internal
-  * @history 2003-07-29 Stuart Sides
-  * Separated the input and output attributes into two separated class
-  * deriving off a base class, instead of one class for all cases.
-  *
-  * @history 2003-10-03 Stuart Sides
-  * Added members HasPixelType. It was needed by the IsisCube so it could do
-  * an easy check. Added IsMsb, IsLsb, HasOrder, ByteOrderStr, ByteOrderType,
-  * Order and Order. These were needed to allow users to specify a
-  * byte order for output cubes.
-  *
-  * @history 2004-02-03 Stuart Sides
-  * Refactor for IsisProcess and cube changes
-  *
-  * @history 2004-03-03 Stuart Sides
-  * Modified IsisCubeAttributeOutput::Write so min and max don't get written
-  * when the pixel type is real.
-  *
-  */
+  /**
+   * @brief Manipulate and parse attributes of output cube filenames.
+   *
+   * This class provides parsing and manipulation of attributes associated
+   * with output cube filenames. Output cube filenames can have an attributes
+   * of "minimum:maximum", "pixel type", "file format", "byte order", and
+   * "label placement"
+   *
+   * @see IsisAml IsisGui
+   *
+   * @ingroup Parsing
+   *
+   * @internal
+   * @history 2003-07-29 Stuart Sides
+   * Separated the input and output attributes into two separated class
+   * deriving off a base class, instead of one class for all cases.
+   *
+   * @history 2003-10-03 Stuart Sides
+   * Added members HasPixelType. It was needed by the IsisCube so it could do
+   * an easy check. Added IsMsb, IsLsb, HasOrder, ByteOrderStr, ByteOrderType,
+   * Order and Order. These were needed to allow users to specify a
+   * byte order for output cubes.
+   *
+   * @history 2004-02-03 Stuart Sides
+   * Refactor for IsisProcess and cube changes
+   *
+   * @history 2004-03-03 Stuart Sides
+   * Modified IsisCubeAttributeOutput::Write so min and max don't get written
+   * when the pixel type is real.
+   *
+   */
   class CubeAttributeOutput : public CubeAttribute {
     public:
 
       //! Constructs an empty CubeAttributeOutput
-      CubeAttributeOutput ();
+      CubeAttributeOutput();
 
       /**
        *
@@ -383,24 +383,24 @@ namespace Isis {
        *               before the first "+" are assumed to be the filename
        *               and are ignored.
       **/
-      CubeAttributeOutput (const Isis::iString &att);
+      CubeAttributeOutput(const Isis::iString &att);
 
 
       //! Destroys the object
-      ~CubeAttributeOutput ();
+      ~CubeAttributeOutput();
 
 
       //! Return true if the pixel type is to be propagated from an input cube
-      inline bool PropagatePixelType () const {
-        if (p_pixelTypeDef == "PROPAGATE") {
+      inline bool PropagatePixelType() const {
+        if(p_pixelTypeDef == "PROPAGATE") {
           return true;
         }
         return false;
       };
 
       //! Return true if the min/max are to be propagated from an input cube
-      inline bool PropagateMinimumMaximum () const {
-        if (p_rangeType == Isis::PropagateRange) {
+      inline bool PropagateMinimumMaximum() const {
+        if(p_rangeType == Isis::PropagateRange) {
           return true;
         }
         return false;
@@ -415,14 +415,14 @@ namespace Isis {
        *                before the first "+" are assumed to be the filename
        *                and are ignored.
       **/
-      void Set (const std::string &att);
+      void Set(const std::string &att);
 
       /**
        * Set the output attributes to the default state
        *
        * @see Initialize
       **/
-      void Reset ();
+      void Reset();
 
       //! Return the file format as a string
       std::string FileFormatStr() const;
@@ -431,7 +431,7 @@ namespace Isis {
       Isis::CubeFormat FileFormat() const;
 
       //! Set the format to the fmt parameter
-      void Format (const Isis::CubeFormat fmt);
+      void Format(const Isis::CubeFormat fmt);
 
       //! Return the byte order as a string
       std::string ByteOrderStr() const;
@@ -440,7 +440,7 @@ namespace Isis {
       Isis::ByteOrder ByteOrder() const;
 
       //! Set the order according to the parameter order
-      void Order (const Isis::ByteOrder order);
+      void Order(const Isis::ByteOrder order);
 
       //! Return the output cube attribute minimum
       double Minimum() const;
@@ -449,25 +449,31 @@ namespace Isis {
       double Maximum() const;
 
       //! Set the output cube attribute minimum
-      void Minimum (const double min);
+      void Minimum(const double min);
 
       //! Set the output cube attribute maximum
-      void Maximum (const double max);
+      void Maximum(const double max);
 
       //! Return the pixel type as an Isis::PixelType
       Isis::PixelType PixelType() const;
 
       //! Set the label attachment type to the parameter value
-      void Label(Isis::LabelAttachment attachment) { p_labelAttachment = attachment; };
+      void Label(Isis::LabelAttachment attachment) {
+        p_labelAttachment = attachment;
+      };
 
       //! Return true if the attachement type is "Attached"
-      bool AttachedLabel() const { return p_labelAttachment == Isis::AttachedLabel; };
+      bool AttachedLabel() const {
+        return p_labelAttachment == Isis::AttachedLabel;
+      };
 
       //! Return true if the attachement type is "Detached"
-      bool DetachedLabel() const { return p_labelAttachment == Isis::DetachedLabel; };
+      bool DetachedLabel() const {
+        return p_labelAttachment == Isis::DetachedLabel;
+      };
 
       //! Set the pixel type to that given by the parameter
-      void PixelType (const Isis::PixelType type);
+      void PixelType(const Isis::PixelType type);
 
       //! Write the output attributes to a stream
       void Write(std::ostream &ostr) const;
@@ -506,13 +512,13 @@ namespace Isis {
        * accordingly
        * @param att
        */
-      void Parse (const std::string &att);
+      void Parse(const std::string &att);
 
       //! Initialize the output cube attribute to default values
-      void Initialize ();
+      void Initialize();
 
   };
-  #endif //DOXY_INTERNAL
+#endif //DOXY_INTERNAL
 };
 
 #endif

@@ -6,7 +6,7 @@
 #include "Cube.h"
 #include "iException.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void Operate(Isis::Buffer &in, Isis::Buffer &out);
@@ -19,8 +19,8 @@ UniversalGroundMap *unvGMap;
 void IsisMain() {
   // We will be processing by line
   ProcessByBrick p;
-  p.SetBrickSize(1,1,1);
-  p.SetOutputBrickSize(1,1,1);
+  p.SetBrickSize(1, 1, 1);
+  p.SetOutputBrickSize(1, 1, 1);
   UserInterface &ui = Application::GetUserInterface();
 
   // Basic settings
@@ -33,16 +33,17 @@ void IsisMain() {
   try {
     // Get info from the operator group
     // Set the pvlkeywords that need to be set to zero
-    PvlGroup &op = pvl.FindGroup("Operator",Pvl::Traverse);
+    PvlGroup &op = pvl.FindGroup("Operator", Pvl::Traverse);
     boxcarSamples = op["Samples"];
     boxcarLines = op["Lines"];
-    op["DeltaLine"]=0;
-    op["DeltaSamp"]=0;
-    op["MinimumInterest"]=0.0;
+    op["DeltaLine"] = 0;
+    op["DeltaSamp"] = 0;
+    op["MinimumInterest"] = 0.0;
     Application::Log(op);
-  } catch (iException &e) {
-    std::string msg = "Improper format for InterestOperator PVL ["+pvl.Filename()+"]";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+  }
+  catch(iException &e) {
+    std::string msg = "Improper format for InterestOperator PVL [" + pvl.Filename() + "]";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   iop = InterestOperatorFactory::Create(pvl);
@@ -67,7 +68,8 @@ void Operate(Isis::Buffer &in, Isis::Buffer &out) {
 
     out[0] = iop->InterestAmount();
 
-  } catch (iException &e) {
+  }
+  catch(iException &e) {
     e.Report();
   }
 }

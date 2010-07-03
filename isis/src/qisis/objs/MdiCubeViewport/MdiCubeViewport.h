@@ -32,13 +32,11 @@
 class QPaintEvent;
 template < class T > class QList;
 
-namespace Isis
-{
+namespace Isis {
   class Cube;
 }
 
-namespace Qisis
-{
+namespace Qisis {
   class Tool;
   class ViewportBuffer;
 
@@ -53,25 +51,23 @@ namespace Qisis
    *
    * @see Workspace CubeViewport
    */
-  class MdiCubeViewport : public CubeViewport
-  {
+  class MdiCubeViewport : public CubeViewport {
       Q_OBJECT
 
     public:
-      MdiCubeViewport(Isis::Cube * cube, QWidget * parent = 0);
+      MdiCubeViewport(Isis::Cube *cube, QWidget *parent = 0);
       ~MdiCubeViewport();
 
       void forceAbstract() {}
 
       //! Is the viewport linked with other viewports
-      bool isLinked() const
-      {
+      bool isLinked() const {
         return p_linked;
       };
 
-      void registerTool(Tool * tool);
-      void paintEvent(QPaintEvent * e);
-      void restretch(ViewportBuffer * buffer);
+      void registerTool(Tool *tool);
+      void paintEvent(QPaintEvent *e);
+      void restretch(ViewportBuffer *buffer);
 
 
     signals:

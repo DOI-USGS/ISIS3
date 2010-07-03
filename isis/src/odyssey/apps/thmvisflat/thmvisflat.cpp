@@ -8,7 +8,7 @@
 using namespace Isis;
 using namespace std;
 
-void IsisMain () {
+void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
@@ -23,16 +23,16 @@ void IsisMain () {
   // Make sure it is a Themis EDR/RDR
   Filename inFilename = ui.GetFilename("FROM");
   try {
-    if (icube.GetGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(icube.GetGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       string msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
-  catch (iException &e) {
-      string msg = "This program is intended for use on THEMIS VIS images only. [";
-      msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
+  catch(iException &e) {
+    string msg = "This program is intended for use on THEMIS VIS images only. [";
+    msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   vector<Cube *> flatcubes;
@@ -41,7 +41,7 @@ void IsisMain () {
 
   for(int filt = 0; filt < 5; filt++) {
     string filePattern = "$odyssey/calibration/flat_filter_";
-    filePattern += iString(filt+1) + "_summing_";
+    filePattern += iString(filt + 1) + "_summing_";
     filePattern += iString(summing) + "_v????.cub";
     Filename flatFile(filePattern);
     flatFile.HighestVersion();
@@ -50,7 +50,7 @@ void IsisMain () {
     flatcubes.push_back(fcube);
 
     LineManager *fcubeMgr = new LineManager(*fcube);
-    fcubeMgr->SetLine(1,1);
+    fcubeMgr->SetLine(1, 1);
     fcubeMgrs.push_back(fcubeMgr);
   }
 
@@ -75,7 +75,7 @@ void IsisMain () {
   }
 
   LineManager ocubeMgr(ocube);
-  ocubeMgr.SetLine(1,1);
+  ocubeMgr.SetLine(1, 1);
 
   Progress prog;
   prog.SetText("Applying Flat-Field Correction");
@@ -110,7 +110,7 @@ void IsisMain () {
       (*fcubeMgrs[i]) ++;
 
       if(fcubeMgrs[i]->end()) {
-        fcubeMgrs[i]->SetLine(1,1);
+        fcubeMgrs[i]->SetLine(1, 1);
       }
     }
 

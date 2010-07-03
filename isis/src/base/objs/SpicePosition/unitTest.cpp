@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   cout << setprecision(10);
@@ -15,9 +15,9 @@ int main (int argc, char *argv[]) {
 
   Isis::Filename f("$base/testData/kernels");
   string dir = f.Expanded() + "/";
-  string moc(dir+"moc.bsp");
-  string de(dir+"de405.bsp");
-  string pck(dir+"pck00006.tpc");
+  string moc(dir + "moc.bsp");
+  string de(dir + "de405.bsp");
+  string pck(dir + "pck00006.tpc");
   furnsh_c(moc.c_str());
   furnsh_c(de.c_str());
   furnsh_c(pck.c_str());
@@ -26,11 +26,11 @@ int main (int argc, char *argv[]) {
   double endTime = -69382512.0;
   double slope = (endTime - startTime) / (10 - 1);
 
-  Isis::SpicePosition pos(-94,499);
+  Isis::SpicePosition pos(-94, 499);
 
   // Normal testing (no cache)
   cout << "Testing without cache ... " << endl;
-  for (int i=0; i<10; i++) {
+  for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     vector<double> p = pos.SetEphemerisTime(t);
     vector<double> v = pos.Velocity();
@@ -43,8 +43,8 @@ int main (int argc, char *argv[]) {
 
   // Testing with cache
   cout << "Testing with cache ... " << endl;
-  pos.LoadCache(startTime,endTime,10);
-  for (int i=0; i<10; i++) {
+  pos.LoadCache(startTime, endTime, 10);
+  for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     vector<double> p = pos.SetEphemerisTime(t);
     vector<double> v = pos.Velocity();
@@ -57,9 +57,9 @@ int main (int argc, char *argv[]) {
   // Test table options
   cout << "Testing tables ... " << endl;
   Isis::Table tab = pos.Cache("Test");
-  Isis::SpicePosition pos2(-94,499);
+  Isis::SpicePosition pos2(-94, 499);
   pos2.LoadCache(tab);
-  for (int i=0; i<10; i++) {
+  for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     pos2.SetEphemerisTime(t);
     vector<double> p = pos2.Coordinate();

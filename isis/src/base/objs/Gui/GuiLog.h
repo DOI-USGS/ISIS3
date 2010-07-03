@@ -8,12 +8,12 @@ namespace Isis {
 
   class GuiLog : public QWidget {
 
-    Q_OBJECT
+      Q_OBJECT
 
     public:
 
-      GuiLog (QWidget *parent=0);
-      ~GuiLog ();
+      GuiLog(QWidget *parent = 0);
+      ~GuiLog();
 
       void Write(const QString &string);
 

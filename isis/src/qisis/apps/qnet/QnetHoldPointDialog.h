@@ -13,8 +13,8 @@ class QPushButton;
 
 namespace Qisis {
   /**
-   * Dialog box to help user choose how to determine lat/lon/rad 
-   * for selected hold point. 
+   * Dialog box to help user choose how to determine lat/lon/rad
+   * for selected hold point.
    *
    * @internal
    *   @history 2008-12-29 Jeannie Walldren - Changed name from
@@ -27,20 +27,20 @@ namespace Qisis {
    *                          QnetTool's setHoldPoint() method.
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null in constructor
-   *  
+   *
    */
   class QnetHoldPointDialog : public QDialog {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetHoldPointDialog (QWidget *parent=0);
-      void setPoint (Isis::ControlPoint &point);
+      QnetHoldPointDialog(QWidget *parent = 0);
+      void setPoint(Isis::ControlPoint &point);
 
 
     signals:
-      void holdPoint (Isis::ControlPoint &point);
+      void holdPoint(Isis::ControlPoint &point);
       void holdCancelled();
-      
+
     private:
 
       QRadioButton *p_avg;
@@ -52,9 +52,9 @@ namespace Qisis {
       Isis::ControlPoint *p_point;
 
     private slots:
-      void selectMeasures ();
-      void accept ();
-      void reject ();
+      void selectMeasures();
+      void accept();
+      void reject();
   };
 };
 

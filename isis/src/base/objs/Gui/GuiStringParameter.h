@@ -12,17 +12,17 @@ namespace Isis {
 
   class GuiStringParameter : public GuiParameter {
 
-    Q_OBJECT
+      Q_OBJECT
 
     public:
 
-      GuiStringParameter (QGridLayout *grid, UserInterface &ui, 
-                        int group, int param);
-      ~GuiStringParameter ();
+      GuiStringParameter(QGridLayout *grid, UserInterface &ui,
+                         int group, int param);
+      ~GuiStringParameter();
 
-      iString Value ();
+      iString Value();
 
-      void Set (iString newValue);
+      void Set(iString newValue);
 
     private:
       QLineEdit *p_lineEdit;

@@ -24,8 +24,8 @@ namespace Isis {
    *
    * @param testObject The CubeDataThread instance to be tested
    */
-  CubeDataThreadTester::CubeDataThreadTester(CubeDataThread *testObject) : 
-      QThread() {
+  CubeDataThreadTester::CubeDataThreadTester(CubeDataThread *testObject) :
+    QThread() {
     p_cachedDoneBricks = NULL;
     p_cubeDataThread = testObject;
     p_numTestsDone = 0;
@@ -44,19 +44,19 @@ namespace Isis {
    * and slots.
    */
   void CubeDataThreadTester::Connect() {
-    connect(this, 
-            SIGNAL(RequestReadCube(int, int, int, int, int, int, void*)), 
-            p_cubeDataThread, 
-            SLOT(ReadCube(int, int, int, int, int, int, void*)));
-  
-    connect(this, 
-            SIGNAL(RequestReadWriteCube(int, int, int, int, int, int, void*)), 
-            p_cubeDataThread, 
-            SLOT(ReadWriteCube(int, int, int, int, int, int, void*)));
-  
-    connect(this, SIGNAL(NotifyDoneWithData(int, const Isis::Brick *)), 
+    connect(this,
+            SIGNAL(RequestReadCube(int, int, int, int, int, int, void *)),
+            p_cubeDataThread,
+            SLOT(ReadCube(int, int, int, int, int, int, void *)));
+
+    connect(this,
+            SIGNAL(RequestReadWriteCube(int, int, int, int, int, int, void *)),
+            p_cubeDataThread,
+            SLOT(ReadWriteCube(int, int, int, int, int, int, void *)));
+
+    connect(this, SIGNAL(NotifyDoneWithData(int, const Isis::Brick *)),
             p_cubeDataThread, SLOT(DoneWithData(int, const Isis::Brick *)));
-  
+
     connect(p_cubeDataThread, SIGNAL(ReadReady(void *, int, const Isis::Brick *)),
             this, SLOT(ReadBrick(void *, int, const Isis::Brick *)));
 
@@ -104,7 +104,7 @@ namespace Isis {
    */
   void CubeDataThreadTester::ReadCubeTest2(int cubeId1, int cubeId2) {
     cout << "=============== Testing Multiple Non-Conflicting Cube Reads " <<
-        "===============" << endl;
+         "===============" << endl;
 
     p_notifyDone = false;
     emit RequestReadCube(cubeId1, 1, 1, 3, 2, 1, this);
@@ -118,8 +118,8 @@ namespace Isis {
    * @param cubeId The identifier given by the data thread for the file to test
    */
   void CubeDataThreadTester::ReadCubeTest3(int cubeId) {
-    cout << "=============== Testing Exact Overlap Cube Reads ===============" 
-      << endl << endl;
+    cout << "=============== Testing Exact Overlap Cube Reads ==============="
+         << endl << endl;
 
     p_notifyDone = false;
     emit RequestReadCube(cubeId, 1, 2, 2, 2, 1, this);
@@ -147,7 +147,7 @@ namespace Isis {
    */
   void CubeDataThreadTester::WriteCubeTest2(int cubeId1, int cubeId2) {
     cout << "=============== Testing Multiple Non-Conflicting Cube R/W " <<
-      "===============" << endl << endl;
+         "===============" << endl << endl;
 
     p_notifyDone = false;
     emit RequestReadWriteCube(cubeId1, 1, 1, 3, 1, 1, this);
@@ -164,8 +164,8 @@ namespace Isis {
    * @param cubeId The identifier given by the data thread for the file to test
    */
   void CubeDataThreadTester::WriteCubeTest3(int cubeId) {
-    cout << "=============== Testing Conflicting Cube R/W ===============" 
-      << endl;
+    cout << "=============== Testing Conflicting Cube R/W ==============="
+         << endl;
 
     p_notifyDone = false;
     emit RequestReadWriteCube(cubeId, 1, 1, 3, 1, 1, this);
@@ -198,14 +198,14 @@ namespace Isis {
    * @param cubeId The identifier given by the data thread for the file to test
    */
   void CubeDataThreadTester::NotifyChangeTest(int cubeId) {
-    cout << "=============== Testing Change Notification ===============" 
-      << endl;
+    cout << "=============== Testing Change Notification ==============="
+         << endl;
 
     connect(p_cubeDataThread,
             SIGNAL(BrickChanged(int, const Isis::Brick *)),
             this,
             SLOT(BrickChanged(int, const Isis::Brick *))
-            );
+           );
 
     p_cubeDataThread->AddChangeListener();
     emit RequestReadWriteCube(cubeId, 5, 1, 5, 1, 1, this);
@@ -219,12 +219,12 @@ namespace Isis {
    * @param cubeId Cube identifier
    * @param data Brick of data read
    */
-  void CubeDataThreadTester::ReadBrick(void *requester, int cubeId, 
+  void CubeDataThreadTester::ReadBrick(void *requester, int cubeId,
                                        const Isis::Brick *data) {
     cout << "  CubeDataThreadTester::ReadBrick" << endl;
 
-    cout << "    Requester is me? " << ((this == requester)? "Yes" : "No") 
-        << endl;
+    cout << "    Requester is me? " << ((this == requester) ? "Yes" : "No")
+         << endl;
 
     if(this != requester) return;
 
@@ -232,7 +232,7 @@ namespace Isis {
 
     for(int i = 0; i < data->size(); i++) {
       if(i == 0) cout << "      ";
-      if(i % 6 == 6-1 && i != data->size() - 1) {
+      if(i % 6 == 6 - 1 && i != data->size() - 1) {
         cout << data->at(i) << endl << "      ";
       }
       else if(i == data->size() - 1) {
@@ -274,16 +274,16 @@ namespace Isis {
    * @param cubeId Cube identifier
    * @param data Brick of data read
    */
-  void CubeDataThreadTester::ReadWriteBrick(void *requester, int cubeId, 
-                                            Isis::Brick *data) {
+  void CubeDataThreadTester::ReadWriteBrick(void *requester, int cubeId,
+      Isis::Brick *data) {
     cout << "  CubeDataThreadTester::ReadWriteBrick" << endl;
-    
+
     // This was a nice idea, but has race conditions that are difficult
     //   at best to resolve.
-    
-    //cout << "    Managed Bricks in Memory = " << 
+
+    //cout << "    Managed Bricks in Memory = " <<
     //  p_cubeDataThread->BricksInMemory() << endl;
-  
+
     cout << "    Changing Brick : Index 0 Becoming 5" << endl;
     cout << endl;
 
@@ -291,7 +291,7 @@ namespace Isis {
 
     for(int i = 0; i < data->size(); i++) {
       if(i == 0) cout << "      ";
-      if(i % 6 == 6-1 && i != data->size() - 1) {
+      if(i % 6 == 6 - 1 && i != data->size() - 1) {
         cout << data->at(i) << endl << "      ";
       }
       else if(i == data->size() - 1) {
@@ -308,7 +308,7 @@ namespace Isis {
 
     for(int i = 0; i < data->size(); i++) {
       if(i == 0) cout << "      ";
-      if(i % 6 == 6-1 && i != data->size() - 1) {
+      if(i % 6 == 6 - 1 && i != data->size() - 1) {
         cout << data->at(i) << endl << "      ";
       }
       else if(i == data->size() - 1) {
@@ -357,7 +357,7 @@ namespace Isis {
 
     for(int i = 0; i < data->size(); i++) {
       if(i == 0) cout << "      ";
-      if(i % 6 == 6-1 && i != data->size() - 1) {
+      if(i % 6 == 6 - 1 && i != data->size() - 1) {
         cout << data->at(i) << endl << "       ";
       }
       else if(i == data->size() - 1) {

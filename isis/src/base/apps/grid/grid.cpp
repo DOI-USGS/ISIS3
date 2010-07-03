@@ -135,7 +135,7 @@ void imageGrid(Buffer &in, Buffer &out) {
         int sampleTest = samp - tickSize;
         int lineTest = in.Line() - tickSize;
 
-        while((out[samp-1] != Isis::Hrs) && 
+        while((out[samp-1] != Isis::Hrs) &&
               (lineTest <= in.Line() + tickSize) &&
               (sampleTest <= samp + tickSize)) {
           if(imageDrawLine(lineTest) && imageDrawSample(sampleTest)) {
@@ -150,7 +150,7 @@ void imageGrid(Buffer &in, Buffer &out) {
         sampleTest = samp + tickSize;
         lineTest = in.Line() - tickSize;
 
-        while((out[samp-1] != Isis::Hrs) && 
+        while((out[samp-1] != Isis::Hrs) &&
               (lineTest <= in.Line() + tickSize) &&
               (sampleTest >= samp - tickSize)) {
           if(imageDrawLine(lineTest) && imageDrawSample(sampleTest)) {

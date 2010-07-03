@@ -4,21 +4,21 @@
 namespace Isis {
   class GuiHelperAction : public QAction {
 
-    Q_OBJECT
+      Q_OBJECT
 
-      public:
+    public:
 
-        GuiHelperAction(QObject *parent, const QString &funct);
-        ~GuiHelperAction();
+      GuiHelperAction(QObject *parent, const QString &funct);
+      ~GuiHelperAction();
 
-      signals:
-        void trigger(const QString &funct);
+    signals:
+      void trigger(const QString &funct);
 
-      private slots:
-        void retrigger();
+    private slots:
+      void retrigger();
 
-      private:
-        QString p_funct;
+    private:
+      QString p_funct;
   };
 }
 

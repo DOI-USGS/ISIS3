@@ -5,8 +5,7 @@
 
 class QAction;
 
-namespace Qisis
-{
+namespace Qisis {
   class MdiCubeViewport;
 
   /**
@@ -14,25 +13,23 @@ namespace Qisis
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewPort.  Fixed include issues
    */
-  class WindowTool : public Qisis::Tool
-  {
+  class WindowTool : public Qisis::Tool {
       Q_OBJECT
 
     public:
-      WindowTool(QWidget * parent);
-      void addTo(QMenu * menu);
+      WindowTool(QWidget *parent);
+      void addTo(QMenu *menu);
       void addTo(Workspace *ws);
-      void addToPermanent(QToolBar * toolbar);
+      void addToPermanent(QToolBar *toolbar);
 
     protected:
       //! Returns the menu name.
-      QString menuName() const
-      {
+      QString menuName() const {
         return "&Window";
       };
       void updateTool();
-      void addConnections(MdiCubeViewport * cvp);
-      void removeConnections(MdiCubeViewport * cvp);
+      void addConnections(MdiCubeViewport *cvp);
+      void removeConnections(MdiCubeViewport *cvp);
 
     private slots:
       void linkWindows();

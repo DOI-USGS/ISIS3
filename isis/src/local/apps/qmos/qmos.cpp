@@ -13,26 +13,25 @@
 void startMonitoringMemory();
 void stopMonitoringMemory();
 
-int main (int argc, char *argv[]) {
-  #ifdef CWDEBUG
-    startMonitoringMemory();
-  #endif
- 
+int main(int argc, char *argv[]) {
+#ifdef CWDEBUG
+  startMonitoringMemory();
+#endif
+
   try {
-    QApplication *app = new QApplication(argc,argv);
+    QApplication *app = new QApplication(argc, argv);
     QApplication::setApplicationName("qmos");
 
     // check for forcing of gui style
-    Isis::PvlGroup & uiPref = Isis::Preference::Preferences().FindGroup(
-        "UserInterface");
-    if (uiPref.HasKeyword("GuiStyle"))
-    {
+    Isis::PvlGroup &uiPref = Isis::Preference::Preferences().FindGroup(
+                               "UserInterface");
+    if(uiPref.HasKeyword("GuiStyle")) {
       std::string style = uiPref["GuiStyle"];
       QApplication::setStyle((Isis::iString) style);
     }
 
     // Add the Qt plugin directory to the library path
-    Isis::Filename qtpluginpath ("$ISISROOT/3rdParty/plugins");
+    Isis::Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
     QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
 
 
@@ -44,13 +43,13 @@ int main (int argc, char *argv[]) {
       mapping += Isis::PvlKeyword("CenterLatitude", "45.0");
       mapping += Isis::PvlKeyword("CenterLongitude", "0.0");
       mapping += Isis::PvlKeyword("TargetName", "Mars");
-      mapping += Isis::PvlKeyword("LatitudeType","Planetocentric");
+      mapping += Isis::PvlKeyword("LatitudeType", "Planetocentric");
       mapping += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
       mapping += Isis::PvlKeyword("LongitudeDomain", "360");
     }
 
     Isis::Pvl pvl;
-    pvl.AddGroup(mapping);  
+    pvl.AddGroup(mapping);
     Isis::Projection *proj = Isis::ProjectionFactory::Create(pvl);
 
     Qisis::MosaicWidget *mos = new Qisis::MosaicWidget(mainWindow);
@@ -66,7 +65,7 @@ int main (int argc, char *argv[]) {
 
     return status;
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report();
   }
 
@@ -78,12 +77,12 @@ void startMonitoringMemory() {
 #ifndef NOMEMCHECK
   MyMutex *mutex = new MyMutex();
   std::fstream *alloc_output = new std::fstream("/dev/null");
-  Debug( make_all_allocations_invisible_except(NULL) );
-  ForAllDebugChannels( if (debugChannel.is_on()) debugChannel.off() );
-  Debug( dc::malloc.on() );
-  Debug( libcw_do.on() );
-  Debug( libcw_do.set_ostream(alloc_output) );
-  Debug( libcw_do.set_ostream(alloc_output, mutex) );
+  Debug(make_all_allocations_invisible_except(NULL));
+  ForAllDebugChannels(if(debugChannel.is_on()) debugChannel.off());
+  Debug(dc::malloc.on());
+  Debug(libcw_do.on());
+  Debug(libcw_do.set_ostream(alloc_output));
+  Debug(libcw_do.set_ostream(alloc_output, mutex));
   atexit(stopMonitoringMemory);
 #endif
 #endif

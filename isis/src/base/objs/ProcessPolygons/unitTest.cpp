@@ -7,10 +7,10 @@
 using namespace Isis;
 using namespace std;
 
-bool threeVectors(std::vector<double> &samples, std::vector<double> &lines, 
+bool threeVectors(std::vector<double> &samples, std::vector<double> &lines,
                   std::vector<double> &value);
-bool oneBandOneValue(std::vector<double> &samples, std::vector<double> &lines, 
-                     int &band,double &value);
+bool oneBandOneValue(std::vector<double> &samples, std::vector<double> &lines,
+                     int &band, double &value);
 void writeAscii(Isis::Buffer &in);
 
 std::vector<double> diamondSamples, diamondLines, values1, values2;
@@ -32,37 +32,37 @@ void IsisMain() {
 
   samples.clear();
   lines.clear();
-  
+
   double value = 0;
-  for (int b = 1; b<3; b++) {
-    for(int l = 0; l<4; l++) {
-      for(int s = 0; s<4; s++) { 
-    
+  for(int b = 1; b < 3; b++) {
+    for(int l = 0; l < 4; l++) {
+      for(int s = 0; s < 4; s++) {
+
         samples.push_back(s);
-        samples.push_back(s+5.0);
+        samples.push_back(s + 5.0);
         samples.push_back(s);
-        samples.push_back(s-5.0);
-       
-        lines.push_back(l-5.0);
+        samples.push_back(s - 5.0);
+
+        lines.push_back(l - 5.0);
         lines.push_back(l);
-        lines.push_back(l+5.0);
+        lines.push_back(l + 5.0);
         lines.push_back(l);
-        value = s+l+b;
+        value = s + l + b;
 
         p.Rasterize(samples, lines, b, value);
-    
+
         samples.clear();
         lines.clear();
       }
     }
   }
-  
+
   p.EndProcess();
 
 
   /*   Write out the data    */
 
- CubeAttributeInput atts;
+  CubeAttributeInput atts;
 
   cout << "Filename: " << output1 << endl;
   pbl.SetInputCube(output1, atts, 0);
@@ -78,20 +78,20 @@ void IsisMain() {
   remove(output2.c_str());
 }
 
-/** 
- * This method reads in the cube file line by line and prints 
- * out the DN value of each non-null pixel. 
- * 
+/**
+ * This method reads in the cube file line by line and prints
+ * out the DN value of each non-null pixel.
+ *
  * @param in
  */
-void writeAscii (Isis::Buffer &in) {
-  bool notNull= false; 
+void writeAscii(Isis::Buffer &in) {
+  bool notNull = false;
   int index = in.size() - 1;
-  for (int i=0; i<in.size(); i++) {
+  for(int i = 0; i < in.size(); i++) {
     if(in[index -i] > 0) {
-      cout <<"Band: " << in.Band() << " DN: " << in[index -i] << " ";
+      cout << "Band: " << in.Band() << " DN: " << in[index -i] << " ";
       notNull = true;
-    }   
+    }
   }
   if(notNull) {
     cout << std::endl;

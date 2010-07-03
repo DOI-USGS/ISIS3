@@ -6,16 +6,14 @@
 #include "MainWindow.h"
 #include "Workspace.h"
 
-namespace Qisis
-{
+namespace Qisis {
   /**
    * WindowTool constructor.
    *
    *
    * @param parent
    */
-  WindowTool::WindowTool(QWidget *parent) : Qisis::Tool(parent)
-  {
+  WindowTool::WindowTool(QWidget *parent) : Qisis::Tool(parent) {
     p_cascadeWindows = new QAction(parent);
     p_cascadeWindows->setText("&Cascade");
     p_cascadeWindows->setEnabled(false);
@@ -112,8 +110,7 @@ namespace Qisis
    *
    * @param ws
    */
-  void WindowTool::addTo(Workspace *ws)
-  {
+  void WindowTool::addTo(Workspace *ws) {
     Tool::addTo(ws);
     connect(p_cascadeWindows, SIGNAL(activated()), ws, SLOT(cascadeSubWindows()));
     connect(p_tileWindows, SIGNAL(activated()), ws, SLOT(tileSubWindows()));
@@ -130,8 +127,7 @@ namespace Qisis
    *
    * @param perm
    */
-  void WindowTool::addToPermanent(QToolBar *perm)
-  {
+  void WindowTool::addToPermanent(QToolBar *perm) {
     perm->addAction(p_linkWindow);
   }
 
@@ -144,8 +140,7 @@ namespace Qisis
    *
    * @param menu
    */
-  void WindowTool::addTo(QMenu *menu)
-  {
+  void WindowTool::addTo(QMenu *menu) {
     menu->addAction(p_cascadeWindows);
     menu->addAction(p_tileWindows);
     menu->addAction(p_resizeWindows);
@@ -172,8 +167,7 @@ namespace Qisis
    *
    * @param cvp
    */
-  void WindowTool::addConnections(MdiCubeViewport *cvp)
-  {
+  void WindowTool::addConnections(MdiCubeViewport *cvp) {
     connect(p_linkWindow, SIGNAL(toggled(bool)),
             cubeViewport(), SLOT(setLinked(bool)));
     connect(cvp, SIGNAL(linkChanging(bool)), p_linkWindow, SLOT(setChecked(bool)));
@@ -186,8 +180,7 @@ namespace Qisis
    *
    * @param cvp
    */
-  void WindowTool::removeConnections(MdiCubeViewport *cvp)
-  {
+  void WindowTool::removeConnections(MdiCubeViewport *cvp) {
     disconnect(p_linkWindow, SIGNAL(toggled(bool)),
                cubeViewport(), SLOT(setLinked(bool)));
     disconnect(cvp, SIGNAL(linkChanging(bool)), p_linkWindow, SLOT(setChecked(bool)));
@@ -198,11 +191,9 @@ namespace Qisis
    * Links all viewport windows in the workspace.
    *
    */
-  void WindowTool::linkWindows()
-  {
+  void WindowTool::linkWindows() {
     MdiCubeViewport *d;
-    for (int i = 0; i < (int)cubeViewportList()->size(); i++)
-    {
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       d = (*(cubeViewportList()))[i];
       d->setLinked(true);
     }
@@ -213,11 +204,9 @@ namespace Qisis
    * Unlinks all the viewport windows in the workspace.
    *
    */
-  void WindowTool::unlinkWindows()
-  {
+  void WindowTool::unlinkWindows() {
     MdiCubeViewport *d;
-    for (int i = 0; i < (int)cubeViewportList()->size(); i++)
-    {
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       d = (*(cubeViewportList()))[i];
       d->setLinked(false);
     }
@@ -227,19 +216,15 @@ namespace Qisis
    * toggles the cursor from an arrow to a crosshair.
    *
    */
-  void WindowTool::changeCursor()
-  {
+  void WindowTool::changeCursor() {
     MdiCubeViewport *d;
-    for (int i = 0; i < (int)cubeViewportList()->size(); i++)
-    {
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       d = (*(cubeViewportList()))[i];
-      if (d->viewport()->cursor().shape() == Qt::CrossCursor)
-      {
+      if(d->viewport()->cursor().shape() == Qt::CrossCursor) {
         d->changeCursor(QCursor(Qt::ArrowCursor));
         p_changeCursor->setText("Change cursor to crosshair.");
       }
-      else
-      {
+      else {
         d->changeCursor(QCursor(Qt::CrossCursor));
         p_changeCursor->setText("Change cursor to arrow.");
       }
@@ -252,15 +237,13 @@ namespace Qisis
    * window size.
    *
    */
-  void WindowTool::resizeWindows()
-  {
+  void WindowTool::resizeWindows() {
     MdiCubeViewport *d;
     QSize size = cubeViewport()->parentWidget()->size();
 
-    for (int i = 0; i < (int)cubeViewportList()->size(); i++)
-    {
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       d = (*(cubeViewportList()))[i];
-      if (d->isLinked()) d->parentWidget()->parentWidget()->resize(size);
+      if(d->isLinked()) d->parentWidget()->parentWidget()->resize(size);
     }
   }
 
@@ -269,10 +252,8 @@ namespace Qisis
    * Updates the WindowTool.
    *
    */
-  void WindowTool::updateTool()
-  {
-    if (cubeViewport() == NULL)
-    {
+  void WindowTool::updateTool() {
+    if(cubeViewport() == NULL) {
       p_linkWindow->setChecked(false);
       p_linkWindow->setEnabled(false);
       p_linkAllWindows->setEnabled(false);
@@ -286,8 +267,7 @@ namespace Qisis
       p_prevWindow->setEnabled(false);
       p_changeCursor->setEnabled(false);
     }
-    else
-    {
+    else {
       p_cascadeWindows->setEnabled(true);
       p_tileWindows->setEnabled(true);
       p_resizeWindows->setEnabled(true);
@@ -295,8 +275,7 @@ namespace Qisis
       p_closeAllWindows->setEnabled(true);
       p_changeCursor->setEnabled(true);
 
-      if (cubeViewportList()->size() > 1)
-      {
+      if(cubeViewportList()->size() > 1) {
         p_linkWindow->setEnabled(true);
         p_linkAllWindows->setEnabled(true);
         p_unlinkAllWindows->setEnabled(true);
@@ -304,8 +283,7 @@ namespace Qisis
         p_prevWindow->setEnabled(true);
         p_linkWindow->setChecked(cubeViewport()->isLinked());
       }
-      else
-      {
+      else {
         p_linkWindow->setEnabled(false);
         p_linkAllWindows->setEnabled(false);
         p_unlinkAllWindows->setEnabled(false);

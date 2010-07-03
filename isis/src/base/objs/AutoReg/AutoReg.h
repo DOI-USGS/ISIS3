@@ -145,7 +145,7 @@ namespace Isis {
 
   class AutoReg {
     public:
-      AutoReg (Pvl &pvl);
+      AutoReg(Pvl &pvl);
 
       virtual ~AutoReg();
 
@@ -155,7 +155,7 @@ namespace Isis {
        * values can be used to provide the user with more specific feedback on why
        * registration did not succeed.
        */
-      enum RegisterStatus{
+      enum RegisterStatus {
         Success, //!< Success
         PatternChipNotEnoughValidData, //!< Not enough valid data in pattern chip
         FitChipNoData, //!< Fit chip did not have any valid data
@@ -170,30 +170,42 @@ namespace Isis {
       };
 
       //! Return pointer to pattern chip
-      inline Chip *PatternChip () { return &p_patternChip; };
+      inline Chip *PatternChip() {
+        return &p_patternChip;
+      };
 
       //! Return pointer to search chip
-      inline Chip *SearchChip() { return &p_searchChip; };
+      inline Chip *SearchChip() {
+        return &p_searchChip;
+      };
 
       //! Return pointer to fit chip
-      inline Chip *FitChip() { return &p_fitChip; };
+      inline Chip *FitChip() {
+        return &p_fitChip;
+      };
 
       //! Return pointer to reduced pattern chip
-      inline Chip *ReducedPatternChip() { return &p_reducedPatternChip; };
+      inline Chip *ReducedPatternChip() {
+        return &p_reducedPatternChip;
+      };
 
       //! Return pointer to reduced search chip
-      inline Chip *ReducedSearchChip() { return &p_reducedSearchChip; };
+      inline Chip *ReducedSearchChip() {
+        return &p_reducedSearchChip;
+      };
 
       //! Return pointer to reduced fix chip
-      inline Chip *ReducedFitChip() { return &p_reducedFitChip; };
+      inline Chip *ReducedFitChip() {
+        return &p_reducedFitChip;
+      };
 
       void SetSubPixelAccuracy(bool on);
       void SetPatternValidPercent(const double percent);
       void SetTolerance(double tolerance);
       void SetChipInterpolator(const string interpolator);
-      void SetSurfaceModelWindowSize (int size);
-      void SetSurfaceModelDistanceTolerance (double distance);
-      void SetReductionFactor (int reductionFactor);
+      void SetSurfaceModelWindowSize(int size);
+      void SetSurfaceModelDistanceTolerance(double distance);
+      void SetReductionFactor(int reductionFactor);
       void SetPatternZScoreMinimum(double minimum);
       void SetSurfaceModelEccentricityRatio(double ratioTolerance);
       void SetSurfaceModelResidualTolerance(double residualTolerance);
@@ -202,36 +214,50 @@ namespace Isis {
        * Determine if eccentricity tests should be performed during registration
        * @param test Indicates whether to perform test
        */
-      inline void SetEccentricityTesting(bool test) { p_testEccentricity = test; };
+      inline void SetEccentricityTesting(bool test) {
+        p_testEccentricity = test;
+      };
 
       /**
        * Determine  if residual tests should be performed during registration
        * @param test Indicates whether to perform test
        */
-      inline void SetResidualTesting(bool test) { p_testResidual = test; };
+      inline void SetResidualTesting(bool test) {
+        p_testResidual = test;
+      };
 
       //! Return pattern valid percent
-      double PatternValidPercent() const { return p_patternValidPercent; };
+      double PatternValidPercent() const {
+        return p_patternValidPercent;
+      };
 
       //! Return match algorithm tolerance
-      inline double Tolerance () const { return p_tolerance; };
+      inline double Tolerance() const {
+        return p_tolerance;
+      };
 
       //! Return distance tolerance
-      double DistanceTolerance () const { return p_distanceTolerance; };
+      double DistanceTolerance() const {
+        return p_distanceTolerance;
+      };
 
       //! Return eccentricity tolerance represented as the A component in an A;1 ratio
-      double EccentricityRatioTolerance () const { return p_surfaceModelEccentricityRatioTolerance; };
+      double EccentricityRatioTolerance() const {
+        return p_surfaceModelEccentricityRatioTolerance;
+      };
 
       //! Return residual tolerance
-      double ResidualTolerance () const { return p_surfaceModelResidualTolerance; };
+      double ResidualTolerance() const {
+        return p_surfaceModelResidualTolerance;
+      };
 
       /**
-       * Return the distance point moved 
-       *  
-       * @param sampDistance Sample movement 
+       * Return the distance point moved
+       *
+       * @param sampDistance Sample movement
        * @param lineDistance Line movement
        */
-      void Distance(double &sampDistance,double &lineDistance) {
+      void Distance(double &sampDistance, double &lineDistance) {
         sampDistance = p_sampMovement;
         lineDistance = p_lineMovement;
       }
@@ -239,33 +265,51 @@ namespace Isis {
       AutoReg::RegisterStatus Register();
 
       //! Return the goodness of fit of the match algorithm
-      inline double GoodnessOfFit () const { return p_goodnessOfFit; };
+      inline double GoodnessOfFit() const {
+        return p_goodnessOfFit;
+      };
 
       //! Return the eccentricity of the surface model, null if not calculated
-      inline double Eccentricity() const { return p_surfaceModelEccentricity; };
+      inline double Eccentricity() const {
+        return p_surfaceModelEccentricity;
+      };
 
       //! Return the eccentricity of the surface model as the A component of an of an A:1 ratio
-      inline double EccentricityRatio() const { return p_surfaceModelEccentricityRatio; };
+      inline double EccentricityRatio() const {
+        return p_surfaceModelEccentricityRatio;
+      };
 
       //! Return the average residual of the surface model, null if not calculated
-      inline double AverageResidual() const { return p_surfaceModelAvgResidual; };
+      inline double AverageResidual() const {
+        return p_surfaceModelAvgResidual;
+      };
 
       inline bool IsIdeal(double fit);
 
       //! Return the search chip sample that best matched
-      inline double ChipSample() const { return p_chipSample; };
+      inline double ChipSample() const {
+        return p_chipSample;
+      };
 
       //! Return the search chip line that best matched
-      inline double ChipLine() const { return p_chipLine; };
+      inline double ChipLine() const {
+        return p_chipLine;
+      };
 
       //! Return the search chip cube sample that best matched
-      inline double CubeSample() const { return p_cubeSample; };
+      inline double CubeSample() const {
+        return p_cubeSample;
+      };
 
       //! Return the search chip cube line that best matched
-      inline double CubeLine() const { return p_cubeLine; };
+      inline double CubeLine() const {
+        return p_cubeLine;
+      };
 
       //! Return minimumPatternZScore
-      double MinimumZScore() const { return p_minimumPatternZScore; };
+      double MinimumZScore() const {
+        return p_minimumPatternZScore;
+      };
 
       /**
        * Return the ZScores of the pattern chip
@@ -274,12 +318,12 @@ namespace Isis {
        * @param score2 Second Z Score
        */
       void ZScores(double &score1, double &score2) const {
-        score1=p_ZScore1;
-        score2=p_ZScore2;
+        score1 = p_ZScore1;
+        score2 = p_ZScore2;
       }
 
       //! Return eccentricity tolerance
-      double EccentricityTolerance() const { 
+      double EccentricityTolerance() const {
         return p_surfaceModelEccentricityTolerance;
       };
 
@@ -289,13 +333,15 @@ namespace Isis {
        * Return if the algorithm is an adaptive pattern matching
        * technique
        */
-      virtual bool IsAdaptive() { return false; }
+      virtual bool IsAdaptive() {
+        return false;
+      }
 
       /**
        * Returns the name of the algorithm.
-       * 
-       * 
-       * @return std::string 
+       *
+       *
+       * @return std::string
        */
       virtual std::string AlgorithmName() const = 0;
 
@@ -303,51 +349,57 @@ namespace Isis {
 
     protected:
       /**
-       * Sets the search chip subpixel sample that matches the pattern 
-       * tack sample. 
-       * 
-       * 
+       * Sets the search chip subpixel sample that matches the pattern
+       * tack sample.
+       *
+       *
        * @param sample Value to set for search chip subpixel sample
        */
-      inline void SetChipSample(double sample){ p_chipSample = sample; };
+      inline void SetChipSample(double sample) {
+        p_chipSample = sample;
+      };
 
       /**
-       * Sets the search chip subpixel line that matches the pattern 
-       * tack line. 
-       * 
-       * 
+       * Sets the search chip subpixel line that matches the pattern
+       * tack line.
+       *
+       *
        * @param line Value to set for search chip subpixel line
        */
-      inline void SetChipLine(double line){ p_chipLine = line; };
+      inline void SetChipLine(double line) {
+        p_chipLine = line;
+      };
 
       /**
-       * Sets the goodness of fit for adaptive algorithms 
-       *  
+       * Sets the goodness of fit for adaptive algorithms
+       *
        * @param fit Fit value to set
        */
-      inline void SetGoodnessOfFit(double fit){ p_bestFit = fit; };
+      inline void SetGoodnessOfFit(double fit) {
+        p_bestFit = fit;
+      };
 
-      virtual AutoReg::RegisterStatus AdaptiveRegistration(Chip &sChip, 
-                                                           Chip &pChip, 
-                                                           Chip &fChip,
-                                                           int startSamp,
-                                                           int startLine,
-                                                           int endSamp,
-                                                           int endLine,
-                                                           int bestSamp,
-                                                           int bestLine);
+      virtual AutoReg::RegisterStatus AdaptiveRegistration(Chip &sChip,
+          Chip &pChip,
+          Chip &fChip,
+          int startSamp,
+          int startLine,
+          int endSamp,
+          int endLine,
+          int bestSamp,
+          int bestLine);
       void Parse(Pvl &pvl);
       virtual bool CompareFits(double fit1, double fit2);
       bool ModelSurface(std::vector<double> &x, std::vector<double> &y,
-                       std::vector<double> &z);
+                        std::vector<double> &z);
       Chip Reduce(Chip &chip, int reductionFactor);
 
       /**
        * Returns the ideal (perfect) fit that could be returned by the
-       * MatchAlgorithm. 
-       * 
-       * 
-       * @return double 
+       * MatchAlgorithm.
+       *
+       *
+       * @return double
        */
       virtual double IdealFit() const = 0;
 
@@ -356,35 +408,37 @@ namespace Isis {
        *  indicates how well they match.  For example, a correlation
        *  match algorithm would return a correlation coefficient
        *  ranging from -1 to 1.
-       * 
-       * 
-       * @param pattern 
-       * @param subsearch 
-       * 
-       * @return double 
+       *
+       *
+       * @param pattern
+       * @param subsearch
+       *
+       * @return double
        */
-      virtual double MatchAlgorithm (Chip &pattern, Chip &subsearch) = 0;
+      virtual double MatchAlgorithm(Chip &pattern, Chip &subsearch) = 0;
 
       PvlObject p_template; //!<AutoRegistration object that created this projection
 
       /**
        * @brief Provide (adaptive) algorithms a chance to report results
-       *  
-       * Provide Adaptive objects the opportunity to report behavior.  It is 
-       * called at the final step prior to program termination. 
-       *  
+       *
+       * Provide Adaptive objects the opportunity to report behavior.  It is
+       * called at the final step prior to program termination.
+       *
        * @param pvl Pvl structure to add report to
-       * 
+       *
        * @return Pvl Results
        */
-      virtual Pvl AlgorithmStatistics(Pvl &pvl) { return (pvl); }
+      virtual Pvl AlgorithmStatistics(Pvl &pvl) {
+        return (pvl);
+      }
 
     private:
       /**
-       * Empty copy constructor. 
-       * @param original AutoReg object 
+       * Empty copy constructor.
+       * @param original AutoReg object
        */
-      AutoReg (const AutoReg &original){};
+      AutoReg(const AutoReg &original) {};
       void Match(Chip &sChip, Chip &pChip, Chip &fChip, int startSamp, int endSamp, int startLine, int endLine);
       bool ComputeChipZScore(Chip &chip);
       void Init();
@@ -395,7 +449,7 @@ namespace Isis {
       Chip p_reducedPatternChip;                        //!< Pattern Chip with reduction factor
       Chip p_reducedSearchChip;                         //!< Search Chip with reduction factor
       Chip p_reducedFitChip;                            //!< Fit Chip with reduction factor
-                                                        
+
       bool p_subpixelAccuracy;                          //!< Indicates whether sub-pixel accuracy is enabled. Default is true.
       bool p_testEccentricity;                          //!< Indicates whether eccentricity tests should be performed.
       bool p_testResidual;                              //!< Indicates whether residual tests should be performed.
@@ -412,20 +466,20 @@ namespace Isis {
       int p_SurfaceModelDistanceInvalid;                //!< Registration statistics SurfaceModelDistanceInvalid keyword.
       int p_SurfaceModelEccentricityRatioNotMet;        //!< Registration statistics SurfaceModelEccentricityRatioNotMet keyword.
       int p_SurfaceModelResidualToleranceNotMet;        //!< Registration statistics SurfaceModelResidualToleranceNotMet keyword.
-                                                        
+
       double p_ZScore1;                                 //!< First Z-Score of pattern chip
       double p_ZScore2;                                 //!< Second Z-Score of pattern chip
-                                                        
+
       double p_minimumPatternZScore;                    //!< Minimum pattern Z-Score
       double p_patternValidPercent;                     //!< Percentage of data in pattern chip that must be valid
-                                                         
+
       double p_chipSample;                              //!< Chip sample
       double p_chipLine;                                //!< Chip line
       double p_cubeSample;                              //!< Cube sample
       double p_cubeLine;                                //!< Cube line
       double p_goodnessOfFit;                           //!< Goodness of fit of the match algorithm
       double p_tolerance;                               //!< Tolerance for acceptable goodness of fit in match algorithm
-                                                         
+
       int p_windowSize;                                 //!< Surface model window size
       double p_distanceTolerance;                       //!< Maximum distance the surface model solution may be from the best whole pixel fit in the fit chip
       double p_surfaceModelResidualTolerance;           //!< Defaults to 0.1 in case enabled directly by programmer
@@ -433,8 +487,8 @@ namespace Isis {
 
       double p_surfaceModelEccentricityTolerance;       //!< Surface model eccentricity tolerance. Defaults to 2:1 in case enabled directly by programmer
       double p_surfaceModelEccentricityRatioTolerance;  //!< Surface model eccentricity ratio tolerance. Defaults to 2:1 in case enabled directly by programmer
-      double p_surfaceModelEccentricity;                //!< Surface model eccentricity. 
-      double p_surfaceModelEccentricityRatio;           //!< Surface model eccentricity ratio. 
+      double p_surfaceModelEccentricity;                //!< Surface model eccentricity.
+      double p_surfaceModelEccentricityRatio;           //!< Surface model eccentricity ratio.
       double p_bestFit;                                 //!< Goodness of fit for adaptive algorithms.
       int p_bestSamp;                                   //!< Sample value of best fit.
       int p_bestLine;                                   //!< Line value of best fit.

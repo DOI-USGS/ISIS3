@@ -12,12 +12,12 @@
 
 
 namespace Qisis {
-  /** 
-   * Filter for control point type. The user must choose Ground, 
-   * Ignore, or Hold.  This class is designed to remove points 
-   * from the current filtered list that are not of the selected 
-   * type. 
-   *  
+  /**
+   * Filter for control point type. The user must choose Ground,
+   * Ignore, or Hold.  This class is designed to remove points
+   * from the current filtered list that are not of the selected
+   * type.
+   *
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Fixed comment in
    *                          filter() method.
@@ -34,10 +34,10 @@ namespace Qisis {
    *                          null in constructor
    */
   class QnetPointTypeFilter : public QnetFilter {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetPointTypeFilter (QWidget *parent=0);
+      QnetPointTypeFilter(QWidget *parent = 0);
       virtual void filter();
 
     private:

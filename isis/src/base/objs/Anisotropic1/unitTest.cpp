@@ -11,24 +11,24 @@
 
 using namespace Isis;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
   double pstd;
   double trans;
   double trans0;
   double sbar;
 
-  std::cout << "UNIT TEST for Anisotropic1 atmospheric function" << 
-      std::endl << std::endl;
+  std::cout << "UNIT TEST for Anisotropic1 atmospheric function" <<
+            std::endl << std::endl;
 
   PvlGroup algp("Algorithm");
-  algp += PvlKeyword("Name","Lambert");
+  algp += PvlKeyword("Name", "Lambert");
 
   PvlObject op("PhotometricModel");
   op.AddGroup(algp);
 
   PvlGroup alga("Algorithm");
-  alga += PvlKeyword("Name","Anisotropic1");
+  alga += PvlKeyword("Name", "Anisotropic1");
   alga += PvlKeyword("Tau", 0.28);
   alga += PvlKeyword("Bha", 0.85);
   alga += PvlKeyword("Hnorm", 0.003);
@@ -43,11 +43,11 @@ int main () {
 
   try {
     PhotoModel *pm = PhotoModelFactory::Create(pvl);
-    AtmosModel *am = AtmosModelFactory::Create(pvl,*pm);
-  
+    AtmosModel *am = AtmosModelFactory::Create(pvl, *pm);
+
     am->SetStandardConditions(true);
     std::cout << "Test phase=0.0, incidence=0.0, emission=0.0 (standard conditions) ..." << std::endl;
-    am->CalcAtmEffect(0.0,0.0,0.0,&pstd,&trans,&trans0,&sbar);
+    am->CalcAtmEffect(0.0, 0.0, 0.0, &pstd, &trans, &trans0, &sbar);
     std::cout << "Pstd = " << pstd << std::endl;
     std::cout << "Trans = " << trans << std::endl;
     std::cout << "Trans0 = " << trans0 << std::endl;
@@ -55,20 +55,20 @@ int main () {
     am->SetStandardConditions(false);
 
     std::cout << "Test phase=86.7226722, incidence=51.7002388, emission=38.9414439 ..." << std::endl;
-    am->CalcAtmEffect(86.7226722,51.7002388,38.9414439,&pstd,&trans,&trans0,&sbar);
+    am->CalcAtmEffect(86.7226722, 51.7002388, 38.9414439, &pstd, &trans, &trans0, &sbar);
     std::cout << "Pstd = " << pstd << std::endl;
     std::cout << "Trans = " << trans << std::endl;
     std::cout << "Trans0 = " << trans0 << std::endl;
     std::cout << "Sbar = " << sbar << std::endl << std::endl;
-  
+
     std::cout << "Test phase=180.0, incidence=90.0, emission=90.0 ..." << std::endl;
-    am->CalcAtmEffect(180.0,90.0,90.0,&pstd,&trans,&trans0,&sbar);
+    am->CalcAtmEffect(180.0, 90.0, 90.0, &pstd, &trans, &trans0, &sbar);
     std::cout << "Pstd = " << pstd << std::endl;
     std::cout << "Trans = " << trans << std::endl;
     std::cout << "Trans0 = " << trans0 << std::endl;
     std::cout << "Sbar = " << sbar << std::endl << std::endl;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 

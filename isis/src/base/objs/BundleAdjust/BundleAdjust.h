@@ -23,10 +23,10 @@
  *   http://www.usgs.gov/privacy.html.
  *
  * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
- * 
+ *
  * @internal
  *   @history 2005-05-30 Jeff Anderson, Debbie A. Cook & Tracie Sucharski Original version
- *   @history 2007-05-29 Debbie A. Cook  Added new method IterationSummary and 
+ *   @history 2007-05-29 Debbie A. Cook  Added new method IterationSummary and
  *                       changed points on held images to held instead of ground
  *   @history 2007-07-12 Debbie A. Cook  Fixed bug in iteration statistics calculations in the
  *                       case of a single control point that was causing a divide by zero error
@@ -34,7 +34,7 @@
  *   @history 2007-09-17 Debbie A. Cook Added ability to process in observation mode for Lunar Orbiter
  *   @history 2007-11-17 Debbie A. Cook Added method SetSolution Method.
  *   @history 2007-12-21 Debbie A. Cook Added member p_Degree and methods p_solveCamDegree and ckDegree
- *   @history 2008-01-11 Debbie A. Cook Added observation mode functionality for spacecraft position 
+ *   @history 2008-01-11 Debbie A. Cook Added observation mode functionality for spacecraft position
  *                       and upgraded ObservationNumber methods for compatability
  *   @history 2008-01-14 Debbie A. Cook Added code to solve for local radii
  *   @history 2008-04-18 Debbie A. Cook Added progress for ControlNet
@@ -51,11 +51,11 @@
  *                          scan cameras based on the lat/lon/radius and the new time is used to retrieve Spice.
  *                          The updated software uses the Spice at the time of the measurement.
  *   @history 2009-02-15 Debbie A. Cook Corrected focal length to include its sign and removed obsolete calls to X/Y
- *                          direction methods.  Also modified PointPartial to use lat/lon/radius from the point 
+ *                          direction methods.  Also modified PointPartial to use lat/lon/radius from the point
  *                          instead of the camera.
  *   @history 2009-08-13 Debbie A. Cook Corrected calculations of cudx and cudy so that they use the signed focal length
  *                          also
- *   @history 2009-10-14 Debbie A. Cook Modified AddPartials method to use new CameraGroundMap method, GetXY 
+ *   @history 2009-10-14 Debbie A. Cook Modified AddPartials method to use new CameraGroundMap method, GetXY
  *   @history 2009-10-30 Debbie A. Cook Improved error message in AddPartials
  *   @history 2009-12-14 Debbie A. Cook Updated SpicePosition enumerated partial type constants
  *   @history 2010-03-19 Debbie A. Cook Moved partials to GroundMap classes to support Radar sensors and modified
@@ -78,20 +78,24 @@ namespace Isis {
   class BundleAdjust {
     public:
       BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
-                   bool printSummary=true);
+                   bool printSummary = true);
       BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
-                   const std::string &heldList,bool printSummary=true);
+                   const std::string &heldList, bool printSummary = true);
       BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
-                   bool printSummary=true);
+                   bool printSummary = true);
       BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
-                   Isis::SerialNumberList &heldsnlist,bool printSummary=true);
+                   Isis::SerialNumberList &heldsnlist, bool printSummary = true);
       ~BundleAdjust();
 
       double Solve(double tol, int maxIterations);
 
-      Isis::ControlNet *ControlNet() { return p_cnet; };
+      Isis::ControlNet *ControlNet() {
+        return p_cnet;
+      };
 
-      Isis::SerialNumberList *SerialNumberList() { return p_snlist; };
+      Isis::SerialNumberList *SerialNumberList() {
+        return p_snlist;
+      };
       int Images() const;
       int Observations() const;
       std::string Filename(int index);
@@ -120,36 +124,52 @@ namespace Isis {
       void SetSolveSpacecraftPosition(SpacecraftPositionSolveType type);
 
       //! Set the degree of the polynomial to fit to the camera angles
-      void SetCkDegree( int degree ) { p_ckDegree = degree; };
+      void SetCkDegree(int degree) {
+        p_ckDegree = degree;
+      };
 
       //! Set the degree of the polynomial to adjust in the solution
-      void SetSolveCamDegree( int degree ) { p_solveCamDegree = degree; };
+      void SetSolveCamDegree(int degree) {
+        p_solveCamDegree = degree;
+      };
 
       int BasisColumns() const;
 
-      double Error() const { return p_error; };
-      double Iteration() const { return p_iteration; };
+      double Error() const {
+        return p_error;
+      };
+      double Iteration() const {
+        return p_iteration;
+      };
 
-      int HeldPoints() const { return p_heldPoints; };
-      int IgnoredPoints() const { return p_ignoredPoints; };
-      int GroundPoints() const { return p_groundPoints; };
-      void SetObservationMode ( bool observationMode );
+      int HeldPoints() const {
+        return p_heldPoints;
+      };
+      int IgnoredPoints() const {
+        return p_ignoredPoints;
+      };
+      int GroundPoints() const {
+        return p_groundPoints;
+      };
+      void SetObservationMode(bool observationMode);
 
       //! Set the solution method to use for solving the matrix
-      void SetSolutionMethod ( std::string solutionMethod ) { p_solutionMethod = solutionMethod;};
+      void SetSolutionMethod(std::string solutionMethod) {
+        p_solutionMethod = solutionMethod;
+      };
 
     private:
-      void Init(Progress *progress=0);
+      void Init(Progress *progress = 0);
 
       void ComputeNumberPartials();
 
-      void AddPartials (LeastSquares &lsq,
-                        int point);
-      void Update (BasisFunction &basis);
+      void AddPartials(LeastSquares &lsq,
+                       int point);
+      void Update(BasisFunction &basis);
 
-      int PointIndex (int i) const;
+      int PointIndex(int i) const;
 
-      int ImageIndex (int i) const;
+      int ImageIndex(int i) const;
 
       void CheckHeldList();
       void ApplyHeldList();

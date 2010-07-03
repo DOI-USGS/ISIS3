@@ -1,24 +1,24 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision: 1.11 $
  * $Date: 2009/08/31 15:12:30 $
- * 
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
- *                                                                        
+ *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.                                                           
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,              
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include "MdisCamera.h"
 #include "iString.h"
 #include "iException.h"
@@ -35,53 +35,53 @@ namespace Isis {
   namespace Messenger {
     /**
      * @brief Initialize the MDIS camera model for NAC and WAC
-     * 
+     *
      * This constructor reads the Messenger/MDIS instrument addendum for many of
      * its default parameters.
-     * 
+     *
      * This camera model does not support subframes of jailbar imaging modes.
      * An exception is thrown in those cases.
-     * 
+     *
      * @param lab The label provided to initialize the camera model for.
-     * 
+     *
      * @throws iException:User - when images are subframes or jailbars.
      */
-    MdisCamera::MdisCamera (Isis::Pvl &lab) : Isis::FramingCamera(lab) {
+    MdisCamera::MdisCamera(Isis::Pvl &lab) : Isis::FramingCamera(lab) {
 
       // Set up detector constants
       const int MdisWac(-236800);
 //    const int MdisNac(-236820);
 
-      PvlGroup &inst = lab.FindGroup ("Instrument",Isis::Pvl::Traverse);
+      PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
 
       // Clarification on MDIS subframe image mode provides us the ability to
       // support this mode now.  The entire MDIS frame is geometrically valid
       // but only portions of the full frame actually contain image data.  The
-      // portions outside subframes should be NULL and not interfere in 
+      // portions outside subframes should be NULL and not interfere in
       // downstream processing, such as mosaics.
 #if defined(MDIS_SUBFRAMES_UNSUPPORTED)
       int subFrameMode = inst["SubFrameMode"];
-      if (subFrameMode != 0) {
+      if(subFrameMode != 0) {
         string msg = "Subframe imaging mode is not supported!";
-        throw iException::Message(iException::User,msg, _FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 #endif
 
       //  According to the MDIS team, this is nothing to be concerned with and
-      //  should be treated as other normal observations.  So the test to 
+      //  should be treated as other normal observations.  So the test to
       // disallow it has been effectively removed 2007-09-05 (KJB).
 #if defined(MDIS_JAILBARS_UNSUPPORTED)
       int jailBars = inst["JailBars"];
-      if (jailBars != 0) {
+      if(jailBars != 0) {
         string msg = "Jail bar observations are not currently supported!";
-        throw iException::Message(iException::Programmer,msg, _FILEINFO_);
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 #endif
 
       //  Determine filter number.  Only conditional code required for
       //  NAC and WAC support!
       int filterNumber(0);    //  Default appropriate for MDIS-NAC
-      if (NaifIkCode() == MdisWac) {
+      if(NaifIkCode() == MdisWac) {
         PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
         filterNumber = bandBin["Number"];
       }
@@ -121,14 +121,14 @@ namespace Isis {
       double expTime = inst["ExposureDuration"];
 
       SpiceDouble etStart;
-      scs2e_c (NaifSpkCode(),stime.c_str(),&etStart);
+      scs2e_c(NaifSpkCode(), stime.c_str(), &etStart);
 
       //  Setup camera detector map
       CameraDetectorMap *detMap = new CameraDetectorMap(this);
 
       // Setup focal plane map, and detector origin for the instrument that
       // may have a filter (WAC only!).
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this,fnCode);
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, fnCode);
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
       ikernKey = "INS" + ikCode + "_BORESIGHT_SAMPLE";
@@ -138,9 +138,9 @@ namespace Isis {
       double lineBoreSight = GetDouble(ikernKey);
 
       //  Apply the boresight
-      focalMap->SetDetectorOrigin(sampleBoreSight,lineBoreSight);
+      focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
-      // Determine summing.  MDIS has two sources of summing or binning.  
+      // Determine summing.  MDIS has two sources of summing or binning.
       // One is performed in the FPU and the in the MP, post-observation,
       // on-board after coming out of the FPGAs, where the FPU binning is
       // performed.  The FPU binning was programmed incorrectly and the
@@ -148,7 +148,7 @@ namespace Isis {
       // designed this camera model such that the offsets can be managed
       // external to the code.  See the MDIS instrument kernel addendum
       // in $ISIS3DATA/messenger/kernels/iak/mdisAddendum???.ti for the
-      // offsets for *each* detector.  Note that an offset is only applied 
+      // offsets for *each* detector.  Note that an offset is only applied
       // when FPU binning is performed.
       int fpuBinMode   = inst["FpuBinningMode"];
       int pixelBinMode = inst["PixelBinningMode"];
@@ -156,7 +156,7 @@ namespace Isis {
       int summing(1 + (1 * pixelBinMode));
       //  FPU binning was performed, retrieve the FPU binning offsets and
       //  apply them to the focal plane mapping.
-      if (fpuBinMode == 1) {
+      if(fpuBinMode == 1) {
         ikernKey = "INS" + ikCode + "_FPUBIN_START_SAMPLE";
         double fpuStartingSample = GetDouble(ikernKey);
         detMap->SetStartingDetectorSample(fpuStartingSample);
@@ -179,15 +179,16 @@ namespace Isis {
       // parameters.
       // NAC has a new implementation of its distortion contributed by
       // Scott Turner and Lillian Nguyen at JHUAPL.
-      if (NaifIkCode() == MdisWac) {
+      if(NaifIkCode() == MdisWac) {
         CameraDistortionMap *distortionMap = new CameraDistortionMap(this);
         distortionMap->SetDistortion(fnCode);
       }
       else {  // Camera is the NAC, use new distortion model
         try {
-          TaylorCameraDistortionMap *distortionMap = new TaylorCameraDistortionMap(this); 
+          TaylorCameraDistortionMap *distortionMap = new TaylorCameraDistortionMap(this);
           distortionMap->SetDistortion(NaifIkCode());
-        } catch (iException &ie) {
+        }
+        catch(iException &ie) {
           string msg = "New MDIS/NAC distortion model invalidates previous "
                        "SPICE - you must rerun spiceinit to get new kernels";
           ie.Message(iException::User, msg, _FILEINFO_);
@@ -209,18 +210,18 @@ namespace Isis {
       double obsTime(etStart + ((expTime / 2.0) / 1000.0));
       SetEphemerisTime(obsTime);
       LoadCache();
-    }    
+    }
   }
 }
 
 /**
- * This is the function that is called in order to instantiate a MdisCamera 
- * object. 
- * 
+ * This is the function that is called in order to instantiate a MdisCamera
+ * object.
+ *
  * @param lab Cube labels
- * 
+ *
  * @return Isis::Camera* MdisCamera
  */
-extern "C" Isis::Camera *MdisCameraPlugin (Isis::Pvl &lab) {
+extern "C" Isis::Camera *MdisCameraPlugin(Isis::Pvl &lab) {
   return new Isis::Messenger::MdisCamera(lab);
 }

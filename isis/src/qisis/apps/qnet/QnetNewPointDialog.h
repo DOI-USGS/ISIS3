@@ -23,16 +23,16 @@ namespace Qisis {
    *                          header and .cpp files.
    */
   class QnetNewPointDialog : public QDialog {
-    Q_OBJECT
+      Q_OBJECT
 
 
     public:
       static QString lastPtIdValue;
 
-      QnetNewPointDialog (QWidget *parent=0);
+      QnetNewPointDialog(QWidget *parent = 0);
 
       QLineEdit *ptIdValue;
-      void SetFiles (vector<string> &pointFiles);
+      void SetFiles(vector<string> &pointFiles);
 
       QListWidget *fileList;
 

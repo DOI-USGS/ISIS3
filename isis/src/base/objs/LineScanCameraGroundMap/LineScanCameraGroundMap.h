@@ -53,7 +53,7 @@ namespace Isis {
    *            image are now being used to estimate the correct line if the
    *            bounding check fails the first time through.
    *   @history 2010-06-17 Steven Lambright - More tolerant of failures in the
-   *            distortion models for finding the bounds of the search in 
+   *            distortion models for finding the bounds of the search in
    *            FindSpacecraftDistance
    *
    */

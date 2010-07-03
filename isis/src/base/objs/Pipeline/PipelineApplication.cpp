@@ -11,7 +11,7 @@ using namespace std;
 namespace Isis {
   /**
    * Constructs the first pipeline application.
-   * 
+   *
    * @param appName The name of this application
    * @param pipe The pipeline
    */
@@ -35,7 +35,7 @@ namespace Isis {
 
   /**
    * Constructs subsequent pipeline applications
-   * 
+   *
    * @param appName The name of this application
    * @param previous The previously last pipeline application
    */
@@ -53,10 +53,10 @@ namespace Isis {
 
 
   /**
-   * Set the input parameter for this application and whether or not this 
-   * application supports the virtual bands functionality. It supports the virtual 
-   * bands functionality if the input is an Isis 3 cube. 
-   * 
+   * Set the input parameter for this application and whether or not this
+   * application supports the virtual bands functionality. It supports the virtual
+   * bands functionality if the input is an Isis 3 cube.
+   *
    * @param inputParamName Name of the input parameter, typically "FROM"
    * @param supportsVirtualBands True if this application supports virtual bands
    */
@@ -68,12 +68,12 @@ namespace Isis {
 
 
   /**
-   * Set the input parameter for this application and whether or not this 
-   * application supports the virtual bands functionality. It supports the virtual 
-   * bands functionality if the input is an Isis 3 cube. 
-   * 
-   * @param inputParamName Name of the input parameter, typically "FROM" 
-   * @param value Custom parameter value; Recommended to use an alternate 
+   * Set the input parameter for this application and whether or not this
+   * application supports the virtual bands functionality. It supports the virtual
+   * bands functionality if the input is an Isis 3 cube.
+   *
+   * @param inputParamName Name of the input parameter, typically "FROM"
+   * @param value Custom parameter value; Recommended to use an alternate
    *              SetInputParameter instead of specifying LastOutput
    * @param supportsVirtualBands True if this application supports virtual bands
    */
@@ -94,17 +94,17 @@ namespace Isis {
 
 
   /**
-   * Set the output parameter for a branch of this application and it's naming 
-   * convention. This is meant for an application that splits the input into two 
-   * output files via two output parameters. 
-   *  
-   * @param branch Branch this output parameter applies to 
+   * Set the output parameter for a branch of this application and it's naming
+   * convention. This is meant for an application that splits the input into two
+   * output files via two output parameters.
+   *
+   * @param branch Branch this output parameter applies to
    * @param outputParamName Name of the output parameter
    * @param outNameModifier Modifier to add to the cube name, such as "lev1"
    * @param outFileExtension Extension of the output file (usually "cub" for cube)
    */
-  void PipelineApplication::SetOutputParameter(const iString &branch, const iString &outputParamName, 
-                          const iString &outNameModifier, const iString &outFileExtension) {
+  void PipelineApplication::SetOutputParameter(const iString &branch, const iString &outputParamName,
+      const iString &outNameModifier, const iString &outFileExtension) {
     p_output.push_back(PipelineParameter(FindBranch(branch, false), outputParamName));
     p_outputMod = outNameModifier;
     p_outputExtension = outFileExtension;
@@ -113,7 +113,7 @@ namespace Isis {
 
   /**
    * Set the output parameter for this application and it's naming convention.
-   * 
+   *
    * @param outputParamName Name of the output parameter
    * @param outNameModifier Modifier to add to the cube name, such as "lev1"
    * @param outFileExtension Extension of the output file (usually "cub" for cube)
@@ -127,19 +127,19 @@ namespace Isis {
 
 
   /**
-   * This method adds branch to this program. A branch means with one input, 
-   * multiple outputs are automatically created. 
-   *  
-   * Example: 
-   * @code 
+   * This method adds branch to this program. A branch means with one input,
+   * multiple outputs are automatically created.
+   *
+   * Example:
+   * @code
    *   thm2isis from=input.img to=output.cub
    * @endcode
-   *  
-   * In this code, thm2isis could actually create output.even.cub and 
-   * output.odd.cub. The branches are then "even" and "odd". This is used only for 
-   * the case where the program outputs multiple images based upon one "TO" 
-   * parameter. 
-   *  
+   *
+   * In this code, thm2isis could actually create output.even.cub and
+   * output.odd.cub. The branches are then "even" and "odd". This is used only for
+   * the case where the program outputs multiple images based upon one "TO"
+   * parameter.
+   *
    * @param modString Branch name
    * @param type Modifier type; currently only supports constant strings
    */
@@ -160,7 +160,7 @@ namespace Isis {
       p_outBranches.push_back(modString);
     }
     else if(p_inBranches.size() == p_outBranches.size()) {
-      for(int outBranch = p_outBranches.size()-1; outBranch >= 0; outBranch --) {
+      for(int outBranch = p_outBranches.size() - 1; outBranch >= 0; outBranch --) {
         if(p_inBranches[outBranch] == p_outBranches[outBranch]) {
           p_outBranches[outBranch] = p_inBranches[outBranch] + "." + modString;
         }
@@ -178,9 +178,9 @@ namespace Isis {
 
 
   /**
-   * This method adds knowledge of a parameter to the application. The 
-   * parameter value is taken directly from the user interface. 
-   * 
+   * This method adds knowledge of a parameter to the application. The
+   * parameter value is taken directly from the user interface.
+   *
    * @param inputParamName Parameter in the proc program
    * @param appParamName Parameter in this application
    */
@@ -194,10 +194,10 @@ namespace Isis {
 
 
   /**
-   * This method adds knowledge of a parameter to this application, that will only 
-   * affect the specified branch. The parameter value is taken directly from the 
-   * user interface; internal defaults are supported by not using the parameter. 
-   * 
+   * This method adds knowledge of a parameter to this application, that will only
+   * affect the specified branch. The parameter value is taken directly from the
+   * user interface; internal defaults are supported by not using the parameter.
+   *
    * @param branch The branch this parameter affects
    * @param inputParamName Parameter in the proc program
    * @param appParamName Parameter in the this application
@@ -212,9 +212,9 @@ namespace Isis {
 
 
   /**
-   * This method adds a parameter to this application with a known value (does not 
-   * get it from the user interface, must be specified). 
-   * 
+   * This method adds a parameter to this application with a known value (does not
+   * get it from the user interface, must be specified).
+   *
    * @param appParamName Name of the parameter
    * @param appParamValue Value of the parameter
    */
@@ -236,10 +236,10 @@ namespace Isis {
 
 
   /**
-   * This method adds a parameter to this application with a known value (does not 
-   * get it from the user interface, must be specified) that only affects a single 
-   * branch. 
-   * 
+   * This method adds a parameter to this application with a known value (does not
+   * get it from the user interface, must be specified) that only affects a single
+   * branch.
+   *
    * @param branch Branch this parameter affects
    * @param appParamName Name of the parameter
    * @param appParamValue Value of the parameter
@@ -250,10 +250,10 @@ namespace Isis {
 
 
   /**
-   * This method adds a parameter with a calculated value (special) to this 
-   * application. 
-   * 
-   * @param appParamName Parameter name 
+   * This method adds a parameter with a calculated value (special) to this
+   * application.
+   *
+   * @param appParamName Parameter name
    * @param value Value type
    */
   void PipelineApplication::AddParameter(const iString &appParamName, CustomParameterValue value) {
@@ -262,11 +262,11 @@ namespace Isis {
 
 
   /**
-   * This method adds a parameter with a calculated value (special) to this 
+   * This method adds a parameter with a calculated value (special) to this
    * application that only affects the specified branch
-   *  
-   * @param branch Branch this parameter affects 
-   * @param appParamName Parameter name 
+   *
+   * @param branch Branch this parameter affects
+   * @param appParamName Parameter name
    * @param value Value type
    */
   void PipelineApplication::AddParameter(const iString &branch, const iString &appParamName, CustomParameterValue value) {
@@ -277,7 +277,7 @@ namespace Isis {
   /**
    * This method calculates the inputs, outputs and necessary calls to this
    * program for the pipeline. This should only be used by Pipeline.
-   * 
+   *
    */
   void PipelineApplication::BuildParamString() {
     p_paramString.clear();
@@ -329,7 +329,7 @@ namespace Isis {
         for(int param = 0; param < (int)p_params.size() && !needList; param++) {
           needList = (p_params[param].IsSpecial() && p_params[param].Special() == LastAppOutputList);
         }
-  
+
         // If we need a list file, create a parameter that starts with ">>LIST" to say it's a list file.
         //   The first element is the list file, the rest is the contents of the list file.
         if(needList) {
@@ -344,11 +344,11 @@ namespace Isis {
 
           iString input = p_pipeline->TemporaryFolder() + "/" + Filename(listName).Basename() + ".lis";
           params = ">>LIST " + input + " ";
-  
+
           for(int i = 0; i < (int)Previous()->GetOutputs().size(); i++) {
             params += " " + Previous()->GetOutputs()[i];
           }
-          
+
           p_tempFiles.push_back(input);
           p_paramString.push_back(params);
           params = "";
@@ -458,9 +458,9 @@ namespace Isis {
 
   /**
    * This method calculates the input file for the specified branch.
-   * 
+   *
    * @param branch Branch this input file affects
-   * 
+   *
    * @return iString Input filename
    */
   iString PipelineApplication::CalculateInputFile(int branch) {
@@ -493,16 +493,16 @@ namespace Isis {
 
   /**
    * This method calculates the output file for the specified branch
-   * 
+   *
    * @param branch Branch this output file is for
-   * 
+   *
    * @return iString The output file
    */
   iString PipelineApplication::CalculateOutputFile(int branch) {
     iString outputFile;
     iString outFolder = p_pipeline->TemporaryFolder();
 
-    // We need to know this to know if we actually need to add modifiers to the 
+    // We need to know this to know if we actually need to add modifiers to the
     //   output name
     bool usedBranch = false;
     unsigned int usedBranchIndex = 0;
@@ -534,11 +534,11 @@ namespace Isis {
 
     if(!LastApplicationWithOutput()) {
       iString lastOutput = p_pipeline->FinalOutput(branch, false);
-      outputFile = outFolder + "/" + 
+      outputFile = outFolder + "/" +
                    Filename(lastOutput).Basename() + "." + p_outputMod + "." + p_outputExtension;
 
       if(p_outputMod.empty()) {
-        outputFile = outFolder + "/" + 
+        outputFile = outFolder + "/" +
                      Filename(lastOutput).Basename() + "." + p_outputExtension;
       }
     }
@@ -569,7 +569,7 @@ namespace Isis {
         }
 
         // If branches is false, then we need to tell the truth about the output file.
-        //   REASONING: thm2isis needs to be lied to (Branches() == true), for example, 
+        //   REASONING: thm2isis needs to be lied to (Branches() == true), for example,
         //   because it modifies output names on its own.
         if(!Branches()) {
           // tell the truth
@@ -598,8 +598,8 @@ namespace Isis {
 
   /**
    * Returns true if this is the last application with output
-   * 
-   * 
+   *
+   *
    * @return bool False if another application later on creates output
    */
   bool PipelineApplication::LastApplicationWithOutput() {
@@ -607,7 +607,7 @@ namespace Isis {
       return true;
     }
     if(!Next() && p_output.empty()) {
-      return false; 
+      return false;
     }
 
     // If any future app creates output, then I'm not last
@@ -617,8 +617,8 @@ namespace Isis {
 
   /**
    * Returns true if a future application creates output
-   * 
-   * 
+   *
+   *
    * @return bool Future application creates output
    */
   bool PipelineApplication::FutureOutputFileCreated() {
@@ -636,9 +636,9 @@ namespace Isis {
 
   /**
    * This gets the input parameter for the specified branch
-   * 
+   *
    * @param branch Branch the input parameter is for
-   * 
+   *
    * @return PipelineParameter& The input parameter
    */
   PipelineParameter &PipelineApplication::GetInputParameter(int branch) {
@@ -650,21 +650,21 @@ namespace Isis {
 
     if(p_inBranches[0] != "") {
       string msg = "Application [" + Name() + "] in the pipeline does not have an input for branch [" + p_inBranches[branch] + "]";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
     else {
       string msg = "Application [" + Name() + "] in the pipeline does not have an input";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   }
 
 
   /**
    * The method, given a string, finds the index of a branch
-   * 
-   * @param name Branch name 
-   * @param input True if input branch, false if output branch 
-   * 
+   *
+   * @param name Branch name
+   * @param input True if input branch, false if output branch
+   *
    * @return int Branch index
    */
   int PipelineApplication::FindBranch(iString name, bool input) {
@@ -691,7 +691,7 @@ namespace Isis {
         }
       }
     }
-    
+
     if(!found) {
       string msg = "Branch [" + name + "] does not exist in the pipeline application [" + Name() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -703,8 +703,8 @@ namespace Isis {
 
   /**
    * This method returns a list of the temporary files generated by this program
-   * 
-   * 
+   *
+   *
    * @return vector<iString> The temporary files
    */
   vector<iString> PipelineApplication::TemporaryFiles() {
@@ -725,12 +725,12 @@ namespace Isis {
 
 
   /**
-   * This method is used to calculate the value for 
-   * CustomParameterValue::LastOutput 
-   * 
-   * @param skipOne Skip the very last output; this is used to skip the output of 
+   * This method is used to calculate the value for
+   * CustomParameterValue::LastOutput
+   *
+   * @param skipOne Skip the very last output; this is used to skip the output of
    *                the current run
-   * 
+   *
    * @return iString The last output file
    */
   iString PipelineApplication::GetRealLastOutput(bool skipOne) {
@@ -748,8 +748,8 @@ namespace Isis {
 
   /**
    * Returns true if virtual bands are supported
-   * 
-   * 
+   *
+   *
    * @return bool Virtual bands supported
    */
   bool PipelineApplication::SupportsVirtualBands() {
@@ -760,8 +760,8 @@ namespace Isis {
 
   /**
    * Set the virtual bands that this application is to apply. Empty for none.
-   * 
-   * @param bands The virtual bands string, excluding the "+". For example, 
+   *
+   * @param bands The virtual bands string, excluding the "+". For example,
    *              "2,4-5,8"
    */
   void PipelineApplication::SetVirtualBands(vector<iString> bands) {
@@ -769,9 +769,9 @@ namespace Isis {
   }
 
   //! This returns this application's output files. Only valid after BuildParamString is called.
-  vector<iString> &PipelineApplication::GetOutputs() { 
+  vector<iString> &PipelineApplication::GetOutputs() {
     if(Enabled() && p_outputs.size() != 0) {
-      return p_outputs; 
+      return p_outputs;
     }
     else if(Previous()) {
       return Previous()->GetOutputs();

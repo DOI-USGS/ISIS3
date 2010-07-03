@@ -31,43 +31,45 @@ namespace Qisis {
   class PlotToolWindow;
   class PlotWindow;
   class RubberBandComboBox;
-  
-  /**                                                                       
+
+  /**
    * @brief plot tool
-   *                                                                        
+   *
    * This class is a plot tool.
-   *                                                                        
+   *
    * @author Stacy Alley
-   *  
-   * @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0 
-   * @history 2008-09-05 Stacy Alley allowed spectral plotting of 
+   *
+   * @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0
+   * @history 2008-09-05 Stacy Alley allowed spectral plotting of
    *          a single point.
-   * @history 2009-01-29 Steven Lambright - Added RotatedRectangle to the spatial 
+   * @history 2009-01-29 Steven Lambright - Added RotatedRectangle to the spatial
    *          plot
    * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *          CubeViewport.  Fixed some include issues (many still remain!).
    */
   class PlotTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      PlotTool (QWidget *parent);
-      virtual void paintViewport(MdiCubeViewport *vp,QPainter *painter);
-      
+      PlotTool(QWidget *parent);
+      virtual void paintViewport(MdiCubeViewport *vp, QPainter *painter);
+
     protected:
       //!< Returns the menu name.
-      QString menuName() const { return "&Options"; };
-      QWidget *createToolBarWidget (QStackedWidget *parent);
+      QString menuName() const {
+        return "&Options";
+      };
+      QWidget *createToolBarWidget(QStackedWidget *parent);
       QAction *toolPadAction(ToolPad *pad);
       QAction *p_showHideLines;//!< Hide/show lines action
       QAction *p_autoScale;//!< Auto scale the plot
       QComboBox *plotType;//!< Plot type combobox
-      void addTo (QMenu *menu);
+      void addTo(QMenu *menu);
       void enableRubberBandTool();
       void updateTool();
-      
+
     protected slots:
-      void createWindow();      
+      void createWindow();
       virtual void rubberBandComplete();
       void updateViewPort();
       void viewportSelected();
@@ -80,21 +82,21 @@ namespace Qisis {
       void pasteCurve(Qisis::PlotWindow *);
       void pasteCurveSpecial(Qisis::PlotWindow *);
       void removeWindow(QObject *);
-           
-   private slots:
-     void bilinearInterpolationChanged();
-     void changePlotType(int newType);
-     void cubicInterpolationChanged();
-     void nearestInterpolationChanged();
-     void newPlotWindow();
-     void showHideLines();
-     void setPlotType();
+
+    private slots:
+      void bilinearInterpolationChanged();
+      void changePlotType(int newType);
+      void cubicInterpolationChanged();
+      void nearestInterpolationChanged();
+      void newPlotWindow();
+      void showHideLines();
+      void setPlotType();
 
     private:
-      void getSpectralStatistics(std::vector< double > & labels, 
+      void getSpectralStatistics(std::vector< double > & labels,
                                  std::vector< Isis::Statistics > & data);
-      void getSpatialStatistics(std::vector< double >  & labels, 
-                                std::vector< double > & data, double & xmax);
+      void getSpatialStatistics(std::vector< double >  & labels,
+                                std::vector< double > & data, double &xmax);
       void setupPlotCurves();
 
       /**
@@ -110,7 +112,7 @@ namespace Qisis {
       PlotToolWindow *p_plotToolWindow;//!< Plot Tool Window Widget
       QMainWindow *p_tableWin; //!< Window for the table
       QComboBox *p_plotTypeCombo;//!< Plot type combobox
-    
+
       QMap<QString, QString> p_headerToMenu;//!< Head to menu map
 
       QAction *p_cubicInterp; //!< Cubic interpolation action
@@ -129,7 +131,7 @@ namespace Qisis {
       PlotToolCurve *p_copyCurve;//!< Plot curve for copying curves
       PlotToolCurve *p_paintCurve;//!< Plot curve for painting
       PlotToolCurve *p_dnCurve;//!< Plot curve for DN values
-      
+
       QList <QColor> p_colors;//!< List of colors
       QList<PlotWindow *> p_plotWindows;//!< List of all plot windows
       RubberBandComboBox *p_spectralRubberBand;//!< Spectral plot rubber band combo box

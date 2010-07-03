@@ -22,8 +22,8 @@ namespace Isis {
 
   /**
    * @brief Encapsulation of Cube I/O with Change Notifications
-   * 
-   * The main purpose of this class is to create cube change notifications, 
+   *
+   * The main purpose of this class is to create cube change notifications,
    * ideal for GUI's with changing cubes. This class is designed to encapsulate
    * Cube I/O into a separate thread and serializes each cube I/O. This class
    * also speeds up I/O by reusing bricks instead of always reading from the
@@ -36,82 +36,82 @@ namespace Isis {
    * and it is up to the users of this class to avoid such conditions.
    *
    * @author 2010-01-15 Steven Lambright
-   * 
+   *
    * @internal
    *   @history 2010-04-12 Eric Hyer - Added check for valid cube ID's for slots
    *                                   ReadCube and ReadWriteCube
    *
    *   @todo Add state recording/reverting functionality
-   * 
+   *
    */
   class CubeDataThread : public QThread {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
       CubeDataThread();
       virtual ~CubeDataThread();
 
-      int AddCube(const Isis::Filename &fileName, 
+      int AddCube(const Isis::Filename &fileName,
                   bool mustOpenReadWrite = false);
-                  
+
       int AddCube(Isis::Cube *cube);
-                  
+
       void AddChangeListener();
       void RemoveChangeListener();
 
       int BricksInMemory();
 
     public slots:
-      void ReadCube(int cubeId, int startSample, int startLine, 
+      void ReadCube(int cubeId, int startSample, int startLine,
                     int endSample, int endLine, int band, void *caller);
-      void ReadWriteCube(int cubeId, int startSample, int startLine, 
-                    int endSample, int endLine, int band, void *caller);
+      void ReadWriteCube(int cubeId, int startSample, int startLine,
+                         int endSample, int endLine, int band, void *caller);
 
       void DoneWithData(int, const Isis::Brick *);
 
     signals:
       /**
        * This signal will be emitted when ReadCube has finished processing.
-       *  
+       *
        * When done with the data, given you are the requester, you call the
        * DoneWithData slot (via a signal).
-       * 
-       * @param requester Pointer to the calling class (must ignore all 
-       *   ReadReady signals where this != requester) 
-       * @param cubeId Cube ID of the cube the data is from 
+       *
+       * @param requester Pointer to the calling class (must ignore all
+       *   ReadReady signals where this != requester)
+       * @param cubeId Cube ID of the cube the data is from
        * @param data The data in the cube
        */
       void ReadReady(void *requester, int cubeId, const Isis::Brick *data);
 
       /**
-       * This signal will be emitted when ReadWriteCube has finished processing. 
-       *  
+       * This signal will be emitted when ReadWriteCube has finished processing.
+       *
        * When done with the data, given you are the requester, you call the
        * DoneWithData slot (via a signal).
-       * 
-       * @param requester Pointer to the calling class (must ignore all 
-       *   ReadReady signals where this != requester) 
-       * @param cubeId Cube ID of the cube the data is from 
+       *
+       * @param requester Pointer to the calling class (must ignore all
+       *   ReadReady signals where this != requester)
+       * @param cubeId Cube ID of the cube the data is from
        * @param data The data in the cube, also where you should write changes
        */
       void ReadWriteReady(void *requester, int cubeId, Isis::Brick *data);
 
-      /** 
-       * DO NOT CONNECT TO THIS SIGNAL WITHOUT CALLING AddChangeListener(). 
-       *  
-       * When a write occurs, and change listeners exist, this signal is emitted 
+      /**
+       * DO NOT CONNECT TO THIS SIGNAL WITHOUT CALLING AddChangeListener().
+       *
+       * When a write occurs, and change listeners exist, this signal is emitted
        *   with the new data.
-       *  
+       *
        * When done with the data, given you are the requester, you call the
        *   DoneWithData slot (via a signal).
-       * 
-       * @param cubeId Cube ID of the change 
-       * @param data Area written to the cube 
+       *
+       * @param cubeId Cube ID of the change
+       * @param data Area written to the cube
        */
       void BrickChanged(int cubeId, const Isis::Brick *data);
 
     private:
-      int OverlapIndex(const Isis::Brick *initial, int cubeId, 
+      int OverlapIndex(const Isis::Brick *initial, int cubeId,
                        int instanceNum, bool &exact);
 
       void GetCubeData(int cubeId, int ss, int sl, int es, int el, int band,
@@ -124,14 +124,14 @@ namespace Isis {
       /**
        * This is a list of the opened cubes. Since opening cubes is allowed in
        * other threads (via AddCube(...)) and is accessed with many threads, all
-       * operations on this map must be serialized (non-simultaneous). The 
-       * p_managedCubesMutex enables this. 
-       * 
+       * operations on this map must be serialized (non-simultaneous). The
+       * p_managedCubesMutex enables this.
+       *
        */
       QMap< int, QPair< bool, Isis::Cube * > > * p_managedCubes;
 
       //! This locks the member variable p_managedCubes
-      QMutex * p_managedCubesMutex;
+      QMutex *p_managedCubesMutex;
 
       /**
        * This is a list of bricks in memory and their locks. The following
@@ -154,7 +154,7 @@ namespace Isis {
        *   8) New bricks must be appended to the end of this list.
        *   8) Searches for conflicts must start at the beginning of this list
        *        and proceed to the end.
-       *   10) No NULL or invalid pointers may exist in this list. 
+       *   10) No NULL or invalid pointers may exist in this list.
        */
       QList< QPair<QReadWriteLock *, Isis::Brick *> > * p_managedData;
 
@@ -164,11 +164,11 @@ namespace Isis {
       //! This is the number of shaded locks to put on a brick when changes made
       int p_numChangeListeners;
 
-      //! This is the unique id counter for cubes 
+      //! This is the unique id counter for cubes
       unsigned int p_currentId;
 
       /**
-       * Number of locks being attempted that re-entered the event loop. As long 
+       * Number of locks being attempted that re-entered the event loop. As long
        * as this isn't zero, no bricks should be removed from p_managedData.
        */
       unsigned int p_currentLocksWaiting;

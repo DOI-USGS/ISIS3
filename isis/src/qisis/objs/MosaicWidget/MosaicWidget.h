@@ -16,97 +16,107 @@ class QToolButton;
 #include "Projection.h"
 
 namespace Qisis {
-class MosaicItem;      
-class MosaicMainWindow;
-class MosaicZoomTool;  
-class MosaicPanTool;   
-class MosaicSelectTool;
-class MosaicTrackTool; 
-class MosaicPointTool; 
-class MosaicControlNetTool; 
-class MosaicFindTool;
+  class MosaicItem;
+  class MosaicMainWindow;
+  class MosaicZoomTool;
+  class MosaicPanTool;
+  class MosaicSelectTool;
+  class MosaicTrackTool;
+  class MosaicPointTool;
+  class MosaicControlNetTool;
+  class MosaicFindTool;
 
   class MosaicWidget : public QSplitter {
-    /**
-    * @brief 
-    *
-    * @ingroup Visualization Tools
-    *
-    * @author Stacy Alley
-    *
-    * @internal
-    *  
-    *  @history 2010-05-10 Christopher Austin - added cnet connectivity
-    *  	      functionality and fixed a few design issues
-    */
-    Q_OBJECT
+      /**
+      * @brief
+      *
+      * @ingroup Visualization Tools
+      *
+      * @author Stacy Alley
+      *
+      * @internal
+      *
+      *  @history 2010-05-10 Christopher Austin - added cnet connectivity
+      *  	      functionality and fixed a few design issues
+      */
+      Q_OBJECT
 
     public:
       MosaicWidget(QWidget *parent = 0);
 
       /**
        * Returns the selected projection type.
-       * 
-       * 
-       * @return Isis::Projection* 
+       *
+       *
+       * @return Isis::Projection*
        */
-      Isis::Projection *projection() const { return p_projection; };
+      Isis::Projection *projection() const {
+        return p_projection;
+      };
 
       /**
-       * 
-       * 
-       * 
-       * @return Isis::ControlNet* 
+       *
+       *
+       *
+       * @return Isis::ControlNet*
        */
-      Isis::ControlNet *controlNet() const { return p_cn; };
-      void setControlNet( Isis::Filename cnet );
+      Isis::ControlNet *controlNet() const {
+        return p_cn;
+      };
+      void setControlNet(Isis::Filename cnet);
 
       void hideControlPoints();
-      void displayConnectivity( bool connected );
+      void displayConnectivity(bool connected);
 
       /**
        * Returns the graphics scene.
-       * 
-       * 
-       * @return QGraphicsScene* 
+       *
+       *
+       * @return QGraphicsScene*
        */
-      QGraphicsScene *scene() const { return p_graphicsScene; };
+      QGraphicsScene *scene() const {
+        return p_graphicsScene;
+      };
 
       /**
-       * 
-       * 
-       * 
-       * @return double 
+       *
+       *
+       *
+       * @return double
        */
-      double screenResolution() { return p_screenResolution; };
+      double screenResolution() {
+        return p_screenResolution;
+      };
 
       /**
        * Returns a list of all the mosaic items.
-       * 
-       * 
-       * @return QList* 
+       *
+       *
+       * @return QList*
        */
-      const QList<MosaicItem *> &mosaicItems() const { return p_mosaicItems; };
-      
+      const QList<MosaicItem *> &mosaicItems() const {
+        return p_mosaicItems;
+      };
+
 
       QList<MosaicItem *> allMosaicItems();
       void updateScreenResolution(double resolution);
 
       // This is the column number for each column
       enum ColumnIndex {
-	NameColumn = 0,
-	ItemColumn = 1,
-	FootprintColumn = 2,
-	OutlineColumn = 3,
-	ImageColumn = 4,
-	LabelColumn = 5,
-	ResolutionColumn = 6,
-	EmissionColumn = 7,
-	IncidenceColumn = 8,
-	IslandColumn = 9,
-	NotesColumn = 10
+        NameColumn = 0,
+        ItemColumn = 1,
+        FootprintColumn = 2,
+        OutlineColumn = 3,
+        ImageColumn = 4,
+        LabelColumn = 5,
+        ResolutionColumn = 6,
+        EmissionColumn = 7,
+        IncidenceColumn = 8,
+        IslandColumn = 9,
+        NotesColumn = 10
       };
-                                              
+
     public slots:
       void addGroup(const QString &groupName);
       void deleteGroup(const QString &groupName);
@@ -117,7 +127,7 @@ class MosaicFindTool;
       void open();
       void openList();
 
-      void setProjection(Isis::Projection *proj); 
+      void setProjection(Isis::Projection *proj);
       void setLonDomain(QString domain);
 
       void updateGraphicsView(QTreeWidgetItem *item, int column);
@@ -130,12 +140,16 @@ class MosaicFindTool;
 
       /**
        * Returns the number of items currently in the scene.
-       * 
-       * 
-       * @return int 
+       *
+       *
+       * @return int
        */
-      int numItems() const { return p_graphicsScene->items().size(); };
-      void setLabelText(QString text){p_mapDisplay->setText(text);}
+      int numItems() const {
+        return p_graphicsScene->items().size();
+      };
+      void setLabelText(QString text) {
+        p_mapDisplay->setText(text);
+      }
 
       void reprojectItems();
       void saveList(QString filename);
@@ -148,7 +162,7 @@ class MosaicFindTool;
 
     private slots:
       //void itemChanged(QTreeWidgetItem * item, int column);
-      void groupChanged(QTreeWidgetItem * item, int column);
+      void groupChanged(QTreeWidgetItem *item, int column);
       void dropAction(QPoint point);
       void bringToFront();
       void sendToBack();
@@ -175,7 +189,7 @@ class MosaicFindTool;
       void hideFootprint();
       void showFootprint();
       void setLabelFont();
-      void contextMenuEvent(QContextMenuEvent * event);
+      void contextMenuEvent(QContextMenuEvent *event);
       void changeLevelOfDetail(int detail);
       void deleteCube();
       void deleteAllCubes();
@@ -191,10 +205,10 @@ class MosaicFindTool;
       void sortByIsland();
       void zoomToItem();
 
-  private:
+    private:
       void initWidget();
       void insertCube(MosaicItem *item);
-      bool eventFilter(QObject *o,QEvent *e);
+      bool eventFilter(QObject *o, QEvent *e);
 
       void bringToFront(MosaicItem *item);
       void bringToFront(QTreeWidgetItem *group);
@@ -218,14 +232,14 @@ class MosaicFindTool;
       void createReferenceFootprint();
       void findPoint(QPointF p);
 
-      void sortBy( ColumnIndex index );
+      void sortBy(ColumnIndex index);
 
       QList<QTreeWidgetItem *> selectedGroups(); //!< List of the selected groups in the tree widget.
       QList<MosaicItem *> selectedMosaicItems(); //!< List of the selected items in the tree widget.
 
       MosaicMainWindow *p_parent; //!< This object's parent
 
-      QMenu* contextMenu();//!< The menu that pops up with a right mouse click.
+      QMenu *contextMenu();//!< The menu that pops up with a right mouse click.
       Isis::Projection *p_projection; //!< The current projection type.
       QGraphicsScene *p_graphicsScene; //!< The graphics scene that makes up this widget.
       QGraphicsView *p_graphicsView; //!< The graphics view
@@ -234,10 +248,10 @@ class MosaicFindTool;
       QTreeWidgetItem *p_pasteGroup; //!< The group at which the paste items would like to be pasted in.
       QGraphicsTextItem *p_textItem; // !< A graphics items used to display messages in the graphics scene.
 
-      QMap<QString, QTreeWidgetItem *> p_groupToTreeMap;//!< 
+      QMap<QString, QTreeWidgetItem *> p_groupToTreeMap;//!<
       QList<MosaicItem *> p_mosaicItems; //!< A list of all the currently display mosaic items.
       QMap<QTreeWidgetItem *, MosaicItem *> p_treeToMosaicMap;
-      
+
       double p_xmin; //!< The graphics view's min x value.
       double p_xmax; //!< The graphics view's max x value.
       double p_ymin; //!< The graphics view's min y value.
@@ -277,10 +291,10 @@ class MosaicFindTool;
 
   };
 
-  bool sortResolution(QTreeWidgetItem *a,QTreeWidgetItem *b);
-  bool sortEmission(QTreeWidgetItem *a,QTreeWidgetItem *b);
-  bool sortIncidence(QTreeWidgetItem *a,QTreeWidgetItem *b);
-  bool sortIsland(QTreeWidgetItem *a,QTreeWidgetItem *b);
+  bool sortResolution(QTreeWidgetItem *a, QTreeWidgetItem *b);
+  bool sortEmission(QTreeWidgetItem *a, QTreeWidgetItem *b);
+  bool sortIncidence(QTreeWidgetItem *a, QTreeWidgetItem *b);
+  bool sortIsland(QTreeWidgetItem *a, QTreeWidgetItem *b);
 };
 
 #endif

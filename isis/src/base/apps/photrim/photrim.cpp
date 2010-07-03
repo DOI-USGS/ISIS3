@@ -3,7 +3,7 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Global variables
@@ -17,7 +17,7 @@ double minIncidence;
 double maxIncidence;
 int lastBand;
 
-void photrim (Buffer &in, Buffer &out);
+void photrim(Buffer &in, Buffer &out);
 
 void IsisMain() {
   // We will be processing by line
@@ -28,17 +28,17 @@ void IsisMain() {
   cam = icube->Camera();
 
   // Create the output cube
-  p.SetOutputCube ("TO");
+  p.SetOutputCube("TO");
 
   // Get the trim angles
   UserInterface &ui = Application::GetUserInterface();
 
-  minPhase = ui.GetDouble ("MINPHASE");
-  maxPhase = ui.GetDouble ("MAXPHASE");
-  minEmission = ui.GetDouble ("MINEMISSION");
-  maxEmission = ui.GetDouble ("MAXEMISSION");
-  minIncidence = ui.GetDouble ("MININCIDENCE");
-  maxIncidence = ui.GetDouble ("MAXINCIDENCE");
+  minPhase = ui.GetDouble("MINPHASE");
+  maxPhase = ui.GetDouble("MAXPHASE");
+  minEmission = ui.GetDouble("MINEMISSION");
+  maxEmission = ui.GetDouble("MAXEMISSION");
+  minIncidence = ui.GetDouble("MININCIDENCE");
+  maxIncidence = ui.GetDouble("MAXINCIDENCE");
 
   // Start the processing
   lastBand = 0;
@@ -48,29 +48,29 @@ void IsisMain() {
 
 
 // Line processing routine
-void photrim (Buffer &in, Buffer &out) {
+void photrim(Buffer &in, Buffer &out) {
   // See if there is a change in band which would change the camera model
-  if (in.Band() != lastBand) {
+  if(in.Band() != lastBand) {
     lastBand = in.Band();
     cam->SetBand(icube->PhysicalBand(lastBand));
   }
 
   // Loop for each pixel in the line.
-  double samp,phase,emission,incidence;
+  double samp, phase, emission, incidence;
   double line = in.Line();
-  for (int i=0; i<in.size(); i++) {
+  for(int i = 0; i < in.size(); i++) {
     samp = in.Sample(i);
-    cam->SetImage(samp,line);
-    if (cam->HasSurfaceIntersection()) {
-      if (((phase = cam->PhaseAngle()) < minPhase) || (phase > maxPhase)) {
+    cam->SetImage(samp, line);
+    if(cam->HasSurfaceIntersection()) {
+      if(((phase = cam->PhaseAngle()) < minPhase) || (phase > maxPhase)) {
         out[i] = Isis::NULL8;
       }
-      else if (((emission = cam->EmissionAngle()) < minEmission) ||
-               (emission > maxEmission)) {
+      else if(((emission = cam->EmissionAngle()) < minEmission) ||
+              (emission > maxEmission)) {
         out[i] = Isis::NULL8;
       }
-      else if (((incidence = cam->IncidenceAngle()) < minIncidence) ||
-               (incidence > maxIncidence)) {
+      else if(((incidence = cam->IncidenceAngle()) < minIncidence) ||
+              (incidence > maxIncidence)) {
         out[i] = Isis::NULL8;
       }
       else {

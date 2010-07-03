@@ -5,11 +5,11 @@
 #include "Statistics.h"
 #include "AlphaCube.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void FFT1 (vector<Buffer *> &in, vector<Buffer *> &out);
-void FFT2 (vector<Buffer *> &in, vector<Buffer *> &out);
+void FFT1(vector<Buffer *> &in, vector<Buffer *> &out);
+void FFT2(vector<Buffer *> &in, vector<Buffer *> &out);
 void getMinMax(Buffer &in);
 
 FourierTransform fft;
@@ -19,8 +19,7 @@ double HPixel = 0.0, LPixel = 0.0, NPixel = 0.0;
 
 Statistics stats;
 
-void IsisMain()
-{
+void IsisMain() {
   // We will be processing by sample first
   ProcessByTile sProc;
 
@@ -34,13 +33,13 @@ void IsisMain()
 
   // create an AlphaCube containing the resizing information
   // which will be used during the inverse
-  AlphaCube aCube(icube->Samples(),icube->Lines(),
-                  icube->Samples(),icube->Lines());
+  AlphaCube aCube(icube->Samples(), icube->Lines(),
+                  icube->Samples(), icube->Lines());
 
   UserInterface &ui = Application::GetUserInterface();
 
   string replacement = ui.GetString("REPLACEMENT");
-  if (replacement == "ZEROES") {
+  if(replacement == "ZEROES") {
     HPixel = 0.0;
     LPixel = 0.0;
     NPixel = 0.0;
@@ -58,8 +57,8 @@ void IsisMain()
   Isis::CubeAttributeOutput cao;
   cao.PixelType(Isis::Real);
 
-  sProc.SetOutputCube (tmpMagFilename, cao, numSamples, numLines, numBands);
-  sProc.SetOutputCube (tmpPhaseFilename, cao, numSamples, numLines, numBands);
+  sProc.SetOutputCube(tmpMagFilename, cao, numSamples, numLines, numBands);
+  sProc.SetOutputCube(tmpPhaseFilename, cao, numSamples, numLines, numBands);
 
   // Start the sample processing
   sProc.StartProcess(FFT1);
@@ -94,21 +93,20 @@ void IsisMain()
 }
 
 // Processing routine for the fft with one input cube
-void FFT1 (vector<Buffer *> &in, vector<Buffer *> &out)
-{
+void FFT1(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &image = *in[0];
 
   int n = image.size();
   std::vector< std::complex<double> > input(n);
 
   // copy the input data into a complex vector
-  for (int i=0; i<n; i++) {
-    if (IsSpecial(image[i])) {
-      if (IsHrsPixel(image[i]) || IsHisPixel(image[i])) input[i] = HPixel;
-      else if (IsLrsPixel(image[i]) || IsLisPixel(image[i])) input[i] = LPixel;
+  for(int i = 0; i < n; i++) {
+    if(IsSpecial(image[i])) {
+      if(IsHrsPixel(image[i]) || IsHisPixel(image[i])) input[i] = HPixel;
+      else if(IsLrsPixel(image[i]) || IsLisPixel(image[i])) input[i] = LPixel;
       else input[i] = NPixel;
     }
-    else input[i]=std::complex<double>(image[i]);
+    else input[i] = std::complex<double>(image[i]);
   }
 
   // perform the fourier transform
@@ -119,7 +117,7 @@ void FFT1 (vector<Buffer *> &in, vector<Buffer *> &out)
   Buffer &imagCube = *out[1];
 
   // copy the data into the two output cubes so that it is centered at the origin
-  for (int i=0; i<n/2; i++) {
+  for(int i = 0; i < n / 2; i++) {
     realCube[i] = real(output[n/2+i]);
     imagCube[i] = imag(output[n/2+i]);
 
@@ -129,8 +127,7 @@ void FFT1 (vector<Buffer *> &in, vector<Buffer *> &out)
 }
 
 // Processing routine for the fft with two input cubes
-void FFT2 (vector<Buffer *> &in, vector<Buffer *> &out)
-{
+void FFT2(vector<Buffer *> &in, vector<Buffer *> &out) {
   // Set the input cubes
   Buffer &inReal = *in[0];
   Buffer &inImag = *in[1];
@@ -139,8 +136,8 @@ void FFT2 (vector<Buffer *> &in, vector<Buffer *> &out)
   int n = inReal.size();
   std::vector< std::complex<double> > input(n);
 
-  for (int i=0; i<n; i++) {
-    input[i]=std::complex<double>(inReal[i], inImag[i]);
+  for(int i = 0; i < n; i++) {
+    input[i] = std::complex<double>(inReal[i], inImag[i]);
   }
 
   // perform the fourier transform
@@ -151,7 +148,7 @@ void FFT2 (vector<Buffer *> &in, vector<Buffer *> &out)
   Buffer &phaseCube = *out[1];
 
   // copy the data into the two output cubes so that it is centered at the origin
-  for (int i=0; i<n/2; i++) {
+  for(int i = 0; i < n / 2; i++) {
     magCube[i] = abs(output[n/2+i]);
     phaseCube[i] = arg(output[n/2+i]);
 
@@ -160,7 +157,6 @@ void FFT2 (vector<Buffer *> &in, vector<Buffer *> &out)
   }
 }
 
-void getMinMax(Buffer &in)
-{
+void getMinMax(Buffer &in) {
   stats.AddData(in.DoubleBuffer(), in.size());
 }

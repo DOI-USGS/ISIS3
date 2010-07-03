@@ -23,23 +23,23 @@
 #include <vector>
 #include "CameraDistortionMap.h"
 
-namespace Isis {    
+namespace Isis {
   namespace Lo {
     /** Distort/undistort focal plane coordinates
-     * 
-     * Creates a map for adding/removing optical distortions 
-     * from the focal plane of the Lunar Orbiter high resolution camera.  
-     * 
+     *
+     * Creates a map for adding/removing optical distortions
+     * from the focal plane of the Lunar Orbiter high resolution camera.
+     *
      * @ingroup Camera
-     * 
+     *
      * @see Camera
-     * 
+     *
      * @internal
-     * 
+     *
      * @history 2007-06-29 Debbie A. Cook - Original version
      * @history 2008-02-04 Jeff Anderson - Made change to allow for
-     * variable focal length in THEMIS IR 
-     * @history 2008-07-25 Steven Lambright - Fixed constructor; CameraDistortionMap 
+     * variable focal length in THEMIS IR
+     * @history 2008-07-25 Steven Lambright - Fixed constructor; CameraDistortionMap
      *          is responsible both for setting the p_camera protected member and
      *          calling Camera::SetDistortionMap. When the parent called
      *          Camera::SetDistortionMap the Camera took ownership of the instance
@@ -50,17 +50,17 @@ namespace Isis {
     class LoHighDistortionMap : public CameraDistortionMap {
       public:
         LoHighDistortionMap(Camera *parent);
-  
+
         void SetDistortion(const int naifIkCode);
         virtual bool SetFocalPlane(const double dx, const double dy);
-  
-        virtual bool SetUndistortedFocalPlane(const double ux, const double uy);  
+
+        virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
       private:
         double p_xPerspective;                /* Perspective correction factor in x */
         double p_yPerspective;                /* Perspective correction factor in y */
         double p_x0;                          /* Center of distortion on x axis */
-        double p_y0;                          /* Center of distortion on y axis */ 
+        double p_y0;                          /* Center of distortion on y axis */
         std::vector<double> p_coefs;
         std::vector<double> p_icoefs;
     };

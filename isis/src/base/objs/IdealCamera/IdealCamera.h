@@ -48,14 +48,14 @@ namespace Isis {
   class IdealCamera : public Isis::Camera {
     public:
       // Constructs a HiriseCamera object
-      IdealCamera (Isis::Pvl &lab);
+      IdealCamera(Isis::Pvl &lab);
 
       // Destroys the HiriseCamera object
-      ~IdealCamera ();
+      ~IdealCamera();
 
       /**
        * Returns the type of camera that was created.
-       * 
+       *
        * @return CameraType
        */
       virtual CameraType GetCameraType() const {

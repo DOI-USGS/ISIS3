@@ -30,16 +30,16 @@ using namespace std;
 namespace Isis {
 
   /**
-   * Constructs a histogram object. Only data between the minimum and maximum 
-   * will be binned, and the bin range will be from the minimum to the maximum. 
+   * Constructs a histogram object. Only data between the minimum and maximum
+   * will be binned, and the bin range will be from the minimum to the maximum.
    *
    * @param minimum Minimum value for binning the data into the histogram.
    * @param maximum Maximum value for binning the data into the histogram.
    * @param nbins The number of bins to use
    */
-  Histogram::Histogram (const double minimum, const double maximum,
-                        const int nbins) {
-    SetValidRange(minimum,maximum);
+  Histogram::Histogram(const double minimum, const double maximum,
+                       const int nbins) {
+    SetValidRange(minimum, maximum);
     SetBinRange(minimum, maximum);
     SetBins(nbins);
   }
@@ -53,41 +53,41 @@ namespace Isis {
    *   achieve better histogram statistics.
    *
    * @param cube  The cube to used to determine min/max and bins
-   * @param band  The band number the histogram will be collected from 
-   * @param progress  The Isis::Progress object to be used to output the percent 
+   * @param band  The band number the histogram will be collected from
+   * @param progress  The Isis::Progress object to be used to output the percent
    *                  processed information
    */
-  Histogram::Histogram (Cube &cube, const int band, Progress *progress) {
+  Histogram::Histogram(Cube &cube, const int band, Progress *progress) {
     InitializeFromCube(cube, band, progress);
   }
 
 
   void Histogram::InitializeFromCube(Cube &cube, const int band, Progress *progress) {
     // Make sure band is valid
-    if ((band < 0) || (band > cube.Bands())) {
+    if((band < 0) || (band > cube.Bands())) {
       string msg = "Invalid band in [Histogram constructor]";
-      throw Isis::iException::Message(Isis::iException::Programmer,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
 
-    double min,max;
+    double min, max;
     int nbins;
 
-    if (cube.PixelType() == Isis::UnsignedByte) {
+    if(cube.PixelType() == Isis::UnsignedByte) {
       min = 0.0 * cube.Multiplier() + cube.Base();
       max = 255.0 * cube.Multiplier() + cube.Base();
       nbins = 256;
     }
-    else if (cube.PixelType() == Isis::SignedWord) {
+    else if(cube.PixelType() == Isis::SignedWord) {
       min = -32768.0 * cube.Multiplier() + cube.Base();
       max = 32767.0 * cube.Multiplier() + cube.Base();
       nbins = 65536;
     }
-    else if (cube.PixelType() == Isis::Real) {
+    else if(cube.PixelType() == Isis::Real) {
       // Determine the band for statistics
       int bandStart = band;
       int bandStop = band;
       int maxSteps = cube.Lines();
-      if (band == 0){
+      if(band == 0) {
         bandStart = 1;
         bandStop = cube.Bands();
         maxSteps = cube.Lines() * cube.Bands();
@@ -98,42 +98,42 @@ namespace Isis {
       Statistics stats = Statistics();
 
       // Prep for reporting progress if necessary
-      if (progress != NULL) {
-        string save = progress->Text ();
+      if(progress != NULL) {
+        string save = progress->Text();
         progress->SetText("Computing min/max for histogram");
         progress->SetMaximumSteps(maxSteps);
         progress->CheckStatus();
       }
 
-      for (int useBand = bandStart ; useBand <= bandStop ; useBand++){
+      for(int useBand = bandStart ; useBand <= bandStop ; useBand++) {
         // Loop and get the statistics for a good minimum/maximum
-        for (int i=1; i<=cube.Lines(); i++) {
-          line.SetLine(i,useBand);
+        for(int i = 1; i <= cube.Lines(); i++) {
+          line.SetLine(i, useBand);
           cube.Read(line);
-          stats.AddData (line.DoubleBuffer(),line.size());
-          if (progress != NULL) progress->CheckStatus();
+          stats.AddData(line.DoubleBuffer(), line.size());
+          if(progress != NULL) progress->CheckStatus();
         }
       }
 
       // Get the min/max for constructing a histogram object
-      if (stats.ValidPixels() == 0) {
+      if(stats.ValidPixels() == 0) {
         min = 0.0;
         max = 1.0;
       }
       else {
-        min = stats.BestMinimum ();
-        max = stats.BestMaximum ();
+        min = stats.BestMinimum();
+        max = stats.BestMaximum();
       }
 
       nbins = 65536;
     }
     else {
       std::string msg = "Unsupported pixel type";
-      throw iException::Message(Isis::iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
 
     // Set the bins and range
-    SetBinRange(min,max);
+    SetBinRange(min, max);
     SetBins(nbins);
   }
 
@@ -144,9 +144,9 @@ namespace Isis {
 
   void Histogram::SetBinRange(double binStart, double binEnd) {
     if(binEnd < binStart) {
-      string msg = "The binning range start [" + iString(binStart) + 
-        " must be less than the end [" + iString(binEnd) + ".";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      string msg = "The binning range start [" + iString(binStart) +
+                   " must be less than the end [" + iString(binEnd) + ".";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     p_binRangeStart = binStart;
@@ -155,9 +155,9 @@ namespace Isis {
 
 
   //! Resets histogram counters to zero.
-  void Histogram::Reset () {
+  void Histogram::Reset() {
     Isis::Statistics::Reset();
-    for (int i=0; i<(int)p_bins.size(); i++) {
+    for(int i = 0; i < (int)p_bins.size(); i++) {
       p_bins[i] = 0;
     }
   }
@@ -177,23 +177,23 @@ namespace Isis {
    * @param data Pointer to array of double to add.
    * @param count Number of doubles to process.
    */
-  void Histogram::AddData (const double *data,
-                               const unsigned int count) {
-    Isis::Statistics::AddData (data,count);
+  void Histogram::AddData(const double *data,
+                          const unsigned int count) {
+    Isis::Statistics::AddData(data, count);
 
     int nbins = p_bins.size();
     int index;
-    for (unsigned int i=0; i<count; i++) {
-      if (Isis::IsValidPixel(data[i]) && InRange(data[i])) {
-        if (BinRangeStart() == BinRangeEnd()) {
+    for(unsigned int i = 0; i < count; i++) {
+      if(Isis::IsValidPixel(data[i]) && InRange(data[i])) {
+        if(BinRangeStart() == BinRangeEnd()) {
           index = 0;
         }
         else {
-          index = (int) floor((double) (nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
-                        (data[i] - BinRangeStart()) + 0.5);
+          index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
+                              (data[i] - BinRangeStart()) + 0.5);
         }
-        if (index < 0) index = 0;
-        if (index >= nbins) index = nbins - 1;
+        if(index < 0) index = 0;
+        if(index >= nbins) index = nbins - 1;
         p_bins[index] += 1;
       }
     }
@@ -208,23 +208,23 @@ namespace Isis {
    * @param data Pointer to array of doubles to remove.
    * @param count number of doubles to process.
    */
-  void Histogram::RemoveData (const double *data,
-                                  const unsigned int count) {
-    Isis::Statistics::RemoveData (data,count);
+  void Histogram::RemoveData(const double *data,
+                             const unsigned int count) {
+    Isis::Statistics::RemoveData(data, count);
 
     int nbins = p_bins.size();
     int index;
-    for (unsigned int i=0; i<count; i++) {
-      if (Isis::IsValidPixel(data[i])) {
-        if (BinRangeStart() == BinRangeEnd()) {
+    for(unsigned int i = 0; i < count; i++) {
+      if(Isis::IsValidPixel(data[i])) {
+        if(BinRangeStart() == BinRangeEnd()) {
           index = 0;
         }
         else {
-          index = (int) floor((double) (nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
-                         (data[i] - BinRangeStart()) + 0.5);
+          index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
+                              (data[i] - BinRangeStart()) + 0.5);
         }
-        if (index < 0) index = 0;
-        if (index >= nbins) index = nbins - 1;
+        if(index < 0) index = 0;
+        if(index >= nbins) index = nbins - 1;
         p_bins[index] -= 1;
       }
     }
@@ -235,24 +235,24 @@ namespace Isis {
    *
    * @returns The median
    */
-  double Histogram::Median () const {
-    return Percent (50.0);
+  double Histogram::Median() const {
+    return Percent(50.0);
   }
 
   /**
    * Returns the mode.
    *
    * @returns The mode
-   */  
-  double Histogram::Mode () const {
+   */
+  double Histogram::Mode() const {
     int mode = 0;
-    for (int i=0; i<(int)p_bins.size(); i++) {
-      if (p_bins[i] > p_bins[mode]) mode = i;
+    for(int i = 0; i < (int)p_bins.size(); i++) {
+      if(p_bins[i] > p_bins[mode]) mode = i;
     }
 
-    if (p_bins[mode] < 1) return Isis::NULL8;
+    if(p_bins[mode] < 1) return Isis::NULL8;
 
-    return BinMiddle (mode);
+    return BinMiddle(mode);
   }
 
 
@@ -266,27 +266,27 @@ namespace Isis {
    *
    * @returns The value at X percent of the histogram.
    */
-  double Histogram::Percent (double percent) const {
-    if ((percent < 0.0) || (percent > 100.0)) {
+  double Histogram::Percent(double percent) const {
+    if((percent < 0.0) || (percent > 100.0)) {
       string m = "Argument percent outside of the range 0 to 100 in";
       m += " [Histogram::Percent]";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    if (ValidPixels() < 1) return Isis::NULL8;
+    if(ValidPixels() < 1) return Isis::NULL8;
 
     Isis::BigInt currentPixels = 0;
     double currentPercent;
 
-    for (int i=0; i<(int)p_bins.size(); i++) {
+    for(int i = 0; i < (int)p_bins.size(); i++) {
       currentPixels += p_bins[i];
       currentPercent = (double) currentPixels / (double) ValidPixels() * 100.0;
-      if (currentPercent >= percent) {
-        return BinMiddle (i);
+      if(currentPercent >= percent) {
+        return BinMiddle(i);
       }
     }
 
-    return BinMiddle ((int)p_bins.size() - 1);
+    return BinMiddle((int)p_bins.size() - 1);
   }
 
 
@@ -298,9 +298,9 @@ namespace Isis {
    * @return The skew.
    */
   double Histogram::Skew() const {
-    if (ValidPixels() < 1) return Isis::NULL8;
+    if(ValidPixels() < 1) return Isis::NULL8;
     double sdev = StandardDeviation();
-    if (sdev == 0.0) return 0.0;
+    if(sdev == 0.0) return 0.0;
     return 3.0 * (Average() - Median()) / sdev;
   }
 
@@ -312,10 +312,10 @@ namespace Isis {
    *
    * @return The count at a bin position in the histogram.
    */
-  BigInt Histogram::BinCount (const int index) const {
-    if ((index < 0) || (index >= (int)p_bins.size())) {
+  BigInt Histogram::BinCount(const int index) const {
+    if((index < 0) || (index >= (int)p_bins.size())) {
       string message = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
 
     return p_bins[index];
@@ -333,14 +333,14 @@ namespace Isis {
    * @param low The value at the left edge of the requested bin.
    * @param high The value at the right edge of the requested bin.
    */
-  void Histogram::BinRange (const int index,
-                                double &low, double &high) const {
-    if ((index < 0) || (index >= (int)p_bins.size())) {
+  void Histogram::BinRange(const int index,
+                           double &low, double &high) const {
+    if((index < 0) || (index >= (int)p_bins.size())) {
       string message = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
 
-    double binSize = (BinRangeEnd() - BinRangeStart()) / (double) (p_bins.size() - 1);
+    double binSize = (BinRangeEnd() - BinRangeStart()) / (double)(p_bins.size() - 1);
     low = BinRangeStart() - binSize / 2.0 + binSize * (double) index;
     high = low + binSize;
   }
@@ -354,14 +354,14 @@ namespace Isis {
    *
    * @returns The middle value of the bin.
    */
-  double Histogram::BinMiddle (const int index) const {
-    if ((index < 0) || (index >= (int)p_bins.size())) {
+  double Histogram::BinMiddle(const int index) const {
+    if((index < 0) || (index >= (int)p_bins.size())) {
       string message = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
 
-    double low,high;
-    BinRange (index,low,high);
+    double low, high;
+    BinRange(index, low, high);
     return (low + high) / 2.0;
   }
 
@@ -373,9 +373,9 @@ namespace Isis {
    *
    * @return The size of the individual bin.
    */
-  double Histogram::BinSize () const {
-    double low,high;
-    BinRange (0,low,high);
+  double Histogram::BinSize() const {
+    double low, high;
+    BinRange(0, low, high);
     return high - low;
   }
 
@@ -385,7 +385,7 @@ namespace Isis {
    *
    * @return The number of bins in the histogram.
    */
-  int Histogram::Bins () const {
+  int Histogram::Bins() const {
     return (int)p_bins.size();
   }
 
@@ -395,11 +395,11 @@ namespace Isis {
    *
    * @return The highest bin count.
    */
-  BigInt Histogram::MaxBinCount () const {
+  BigInt Histogram::MaxBinCount() const {
 
     Isis::BigInt maxBinCount = 0;
-    for (int i=0; i<(int)p_bins.size(); i++) {
-      if (p_bins[i] > maxBinCount) maxBinCount = p_bins[i];
+    for(int i = 0; i < (int)p_bins.size(); i++) {
+      if(p_bins[i] > maxBinCount) maxBinCount = p_bins[i];
     }
 
     return maxBinCount;

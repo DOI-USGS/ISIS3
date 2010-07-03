@@ -28,50 +28,60 @@
 namespace Isis {
   /**
    * @brief Format ascii tables
-   * 
+   *
    * This class takes in a series of string vectors and writes them out to a
    * file as a table. Formatting options are up to the user.
-   * 
+   *
    * @ingroup Utility
-   * 
+   *
    * @author 2007-05-01 Brendan George
-   * 
+   *
    * @internal
    *   @history 2007-06-18 Brendan George Fixed error message outputs and
    *           unitTest
    */
   class Column {
-  public:
+    public:
 
-    enum Align { NoAlign = 0,
-                 Right = 1, 
-                 Left = 2, 
-                 Decimal = 3 };
-    enum Type { NoType = 0,
-                Integer = 1,
-                Real = 2,
-                String = 3,
-                Pixel = 4 };
-    Column ();
-    Column (std::string name, int width, Column::Type type, Align align=Column::Right);
-    void SetName (std::string name);
-    void SetWidth (unsigned int width);
-    void SetType (Column::Type type);
-    void SetAlignment (Column::Align alignment);
-    void SetPrecision (unsigned int precision);
+      enum Align { NoAlign = 0,
+                   Right = 1,
+                   Left = 2,
+                   Decimal = 3
+                 };
+      enum Type { NoType = 0,
+                  Integer = 1,
+                  Real = 2,
+                  String = 3,
+                  Pixel = 4
+                };
+      Column();
+      Column(std::string name, int width, Column::Type type, Align align = Column::Right);
+      void SetName(std::string name);
+      void SetWidth(unsigned int width);
+      void SetType(Column::Type type);
+      void SetAlignment(Column::Align alignment);
+      void SetPrecision(unsigned int precision);
 
-    std::string Name () {return p_name;};
-    unsigned int Width (){return p_width;};
-    Column::Type DataType ();
-    Column::Align Alignment (){return p_align;};
-    unsigned int Precision (){return p_precision;};
+      std::string Name() {
+        return p_name;
+      };
+      unsigned int Width() {
+        return p_width;
+      };
+      Column::Type DataType();
+      Column::Align Alignment() {
+        return p_align;
+      };
+      unsigned int Precision() {
+        return p_precision;
+      };
 
-  private:
-    std::string p_name;
-    unsigned int p_width;
-    Column::Type p_type;
-    Column::Align p_align;
-    unsigned int p_precision;
+    private:
+      std::string p_name;
+      unsigned int p_width;
+      Column::Type p_type;
+      Column::Align p_align;
+      unsigned int p_precision;
   };
 };
 

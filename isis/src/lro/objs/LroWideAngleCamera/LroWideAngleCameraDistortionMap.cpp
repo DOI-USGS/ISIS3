@@ -41,7 +41,7 @@ namespace Isis {
      */
     LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode) : CameraDistortionMap(parent) {
       std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
-      for( int i = 0; i < 2; i++ ) {
+      for(int i = 0; i < 2; i++) {
         p_odk.push_back(p_camera->GetDouble(odkkey, i));
       }
     }
@@ -65,16 +65,16 @@ namespace Isis {
       double dk1 = p_odk[0];
       double dk2 = p_odk[1];
 
-      double rr = dx*dx + dy*dy;
+      double rr = dx * dx + dy * dy;
       double r = sqrt(rr);
 
-      double dr = 1.0 + dk1*rr + dk2*r*rr;
-      if( dr == 0.0 )
+      double dr = 1.0 + dk1 * rr + dk2 * r * rr;
+      if(dr == 0.0)
         return false;
 
       // Compute the undistorted positions
-      p_undistortedFocalPlaneX = dx/dr;
-      p_undistortedFocalPlaneY = dy/dr;
+      p_undistortedFocalPlaneX = dx / dr;
+      p_undistortedFocalPlaneY = dy / dr;
 
       return true;
     }
@@ -100,9 +100,9 @@ namespace Isis {
       double xt = ux;
       double yt = uy;
 
-      double r,rr,dr;
-      double xdistorted,ydistorted;
-      double xprevious,yprevious;
+      double r, rr, dr;
+      double xdistorted, ydistorted;
+      double xprevious, yprevious;
 
       xprevious = 1000000.0;
       yprevious = 1000000.0;
@@ -116,12 +116,12 @@ namespace Isis {
       // iterating to introduce distortion...
       // we stop when the difference between distorted coordinates
       // in successive iterations is at or below the given tolerance
-      for( int i = 0; i < 50; i++ ) {
-        rr = xt*xt + yt*yt;
+      for(int i = 0; i < 50; i++) {
+        rr = xt * xt + yt * yt;
         r = sqrt(rr);
 
         // dr is the radial distortion contribution
-        dr = 1.0 + dk1*rr + dk2*r*rr;
+        dr = 1.0 + dk1 * rr + dk2 * r * rr;
 
         // introducing distortion
         xt = ux * dr;
@@ -132,7 +132,7 @@ namespace Isis {
         ydistorted = yt;
 
         // check for convergence
-        if( (fabs(xt - xprevious) <= tolerance) && (fabs(yt - yprevious) <= tolerance) ) {
+        if((fabs(xt - xprevious) <= tolerance) && (fabs(yt - yprevious) <= tolerance)) {
           bConverged = true;
           break;
         }
@@ -141,7 +141,7 @@ namespace Isis {
         yprevious = yt;
       }
 
-      if( bConverged ) {
+      if(bConverged) {
         p_focalPlaneX = xdistorted;
         p_focalPlaneY = ydistorted;
       }

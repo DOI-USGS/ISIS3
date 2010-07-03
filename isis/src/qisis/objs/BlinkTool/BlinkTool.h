@@ -23,26 +23,28 @@ namespace Qisis {
    *            CubeViewport.  Fixed misuse of includes.
    */
   class BlinkTool : public Qisis::Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      BlinkTool (QWidget *parent);
-      void addTo (QMenu *menu);
-      void addToPermanent (QToolBar *perm);
-      void writeSettings();  
+      BlinkTool(QWidget *parent);
+      void addTo(QMenu *menu);
+      void addToPermanent(QToolBar *perm);
+      void writeSettings();
       void readSettings();
 
 
     protected:
       /**
        * Returns the menu name.
-       * 
-       * 
-       * @return QString 
+       *
+       *
+       * @return QString
        */
-      QString menuName() const { return "&Options"; };
+      QString menuName() const {
+        return "&Options";
+      };
       void updateTool();
-      bool eventFilter (QObject *o, QEvent *e);
+      bool eventFilter(QObject *o, QEvent *e);
 
     private slots:
       void toggleLink(QListWidgetItem *item);
@@ -52,7 +54,7 @@ namespace Qisis {
       void advance();
       void timeout();
       void updateWindow();
-      
+
     private:
       QAction *p_action; //!< The action associated with this tool
       QWidget *p_blinkWindow;//!< The blink tool widget

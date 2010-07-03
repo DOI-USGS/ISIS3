@@ -21,12 +21,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-  #include "SpecialPixel.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
   /**
    * @brief Manipulate pixel values
-   * 
+   *
    * This class contains utility methods for testing and modifying pixel and
    * special pixel values.
    *
@@ -49,134 +49,134 @@ namespace Isis {
    *           for clarity
    */
   class Pixel {
-  public:
-    static unsigned char To8Bit(const double d);
-    static short int To16Bit(const double d);
-    static float To32Bit(const double d);
+    public:
+      static unsigned char To8Bit(const double d);
+      static short int To16Bit(const double d);
+      static float To32Bit(const double d);
 
-    static double ToDouble(const unsigned char t);
-    static double ToDouble(const short int t);
-    static double ToDouble(const float t);
+      static double ToDouble(const unsigned char t);
+      static double ToDouble(const short int t);
+      static double ToDouble(const float t);
 
-    static float ToFloat(const unsigned char d);
-    static float ToFloat(const short int d);
-    static float ToFloat(const double d);
+      static float ToFloat(const unsigned char d);
+      static float ToFloat(const short int d);
+      static float ToFloat(const double d);
 
-    static std::string ToString(double d);
+      static std::string ToString(double d);
 
-    /**
-     * Returns true if the input pixel is special. Not special implies it is valid to
-     * use in computations.
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsSpecial(const double d) {
-      return(d < VALID_MIN8);
-    }
+      /**
+       * Returns true if the input pixel is special. Not special implies it is valid to
+       * use in computations.
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsSpecial(const double d) {
+        return(d < VALID_MIN8);
+      }
 
-    /**
-     * Returns true if the input pixel is special. Not special implies it is valid to
-     * use in computations. This method applies to a 4-byte floating point rather
-     * than an 8-byte double.
-     *
-     * @param f Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsSpecial(const float f) {
-      return(f < VALID_MIN4);
-    }
+      /**
+       * Returns true if the input pixel is special. Not special implies it is valid to
+       * use in computations. This method applies to a 4-byte floating point rather
+       * than an 8-byte double.
+       *
+       * @param f Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsSpecial(const float f) {
+        return(f < VALID_MIN4);
+      }
 
-    /**
-     * Returns true if the input pixel is valid.  Valid implies the 
-     * pixel is neither hrs, lrs, his, lis, nor null. 
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsValid(const double d) {
-      return(d >= VALID_MIN8);
-    }
+      /**
+       * Returns true if the input pixel is valid.  Valid implies the
+       * pixel is neither hrs, lrs, his, lis, nor null.
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsValid(const double d) {
+        return(d >= VALID_MIN8);
+      }
 
-    /**
-     * Returns true if the input pixel is null
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsNull(const double d) {
-      return(d == NULL8);
-    }
+      /**
+       * Returns true if the input pixel is null
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsNull(const double d) {
+        return(d == NULL8);
+      }
 
-    /**
-     * Returns true if the input pixel is one of the high saturation types
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsHigh(const double d) {
-      return(d == HIGH_REPR_SAT8) || (d == HIGH_INSTR_SAT8);
-    }
+      /**
+       * Returns true if the input pixel is one of the high saturation types
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsHigh(const double d) {
+        return(d == HIGH_REPR_SAT8) || (d == HIGH_INSTR_SAT8);
+      }
 
-    /**
-     * Returns true if the input pixel is one of the low saturation types
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsLow(const double d) {
-      return(d == LOW_REPR_SAT8) || (d == LOW_INSTR_SAT8);
-    }
+      /**
+       * Returns true if the input pixel is one of the low saturation types
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsLow(const double d) {
+        return(d == LOW_REPR_SAT8) || (d == LOW_INSTR_SAT8);
+      }
 
-    /**
-     * Returns true if the input pixel is high representation saturation
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsHrs(const double d) {
-      return(d == HIGH_REPR_SAT8);
-    }
+      /**
+       * Returns true if the input pixel is high representation saturation
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsHrs(const double d) {
+        return(d == HIGH_REPR_SAT8);
+      }
 
-    /**
-     * Returns true if the input pixel is high instrument saturation
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsHis(const double d) {
-      return(d == HIGH_INSTR_SAT8);
-    }
+      /**
+       * Returns true if the input pixel is high instrument saturation
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsHis(const double d) {
+        return(d == HIGH_INSTR_SAT8);
+      }
 
-    /**
-     * Returns true if the input pixel is low instrument saturation
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsLis(const double d) {
-      return(d == LOW_INSTR_SAT8);
-    }
+      /**
+       * Returns true if the input pixel is low instrument saturation
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsLis(const double d) {
+        return(d == LOW_INSTR_SAT8);
+      }
 
-    /**
-     * Returns true if the input pixel is low representation saturation
-     *
-     * @param d Pixel value to test
-     *
-     * @return bool
-     */
-    static inline bool IsLrs(const double d) {
-      return(d == LOW_REPR_SAT8);
-    }
+      /**
+       * Returns true if the input pixel is low representation saturation
+       *
+       * @param d Pixel value to test
+       *
+       * @return bool
+       */
+      static inline bool IsLrs(const double d) {
+        return(d == LOW_REPR_SAT8);
+      }
 
   }; // end of pixel class
 }

@@ -16,25 +16,27 @@ namespace Qisis {
    *   @history
    */
   class MosaicSelectTool : public Qisis::MosaicTool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      MosaicSelectTool (QWidget *parent);
+      MosaicSelectTool(QWidget *parent);
       void addToMenu(QMenu *menu);
 
     protected slots:
       void updateTool();
-      
+
     protected:
       QAction *toolPadAction(ToolPad *toolpad);
       //! Returns the name of the menu.
-      QString menuName() const { return "&View"; };
+      QString menuName() const {
+        return "&View";
+      };
       QWidget *createToolBarWidget(QStackedWidget *parent);
 
     public slots:
-      
+
     private:
-      
+
   };
 };
 

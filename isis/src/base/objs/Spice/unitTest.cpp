@@ -9,15 +9,15 @@
 using namespace std;
 /**
  * UnitTest for Spice class.
- * 
- * @internal 
- * @history 2009-03-23  Tracie Sucharski - Removed old keywords 
+ *
+ * @internal
+ * @history 2009-03-23  Tracie Sucharski - Removed old keywords
  *          SpacecraftPosition and SpacecraftPointing with the corrected
- *          InstrumentPosition and InstrumentPointing. 
+ *          InstrumentPosition and InstrumentPointing.
  */
 class MySpice : public Isis::Spice {
   public:
-    MySpice (Isis::Pvl &lab) : Isis::Spice (lab) {
+    MySpice(Isis::Pvl &lab) : Isis::Spice(lab) {
       cout << "BodyCode        = " << NaifBodyCode() << endl;
       cout << "SpkCode         = " << NaifSpkCode() << endl;
       cout << "CkCode          = " << NaifCkCode() << endl;
@@ -25,31 +25,31 @@ class MySpice : public Isis::Spice {
       cout << endl;
     }
 
-    int MyInteger (string key) {
-      return GetInteger(key,0);
+    int MyInteger(string key) {
+      return GetInteger(key, 0);
     }
 
-    double MyDouble (string key) {
-      return GetDouble(key,0);
+    double MyDouble(string key) {
+      return GetDouble(key, 0);
     }
 
-    string MyString (string key) {
-      return GetString(key,0);
+    string MyString(string key) {
+      return GetString(key, 0);
     }
 
-    void MyOutput () {
+    void MyOutput() {
       cout << "BJ is " << endl;
       vector<double> BJ = BodyRotation()->Matrix();
-      for (int i=0; i<(int)BJ.size(); i++) {
+      for(int i = 0; i < (int)BJ.size(); i++) {
         cout << BJ[i] << endl;
       }
       vector<double> IJ = InstrumentRotation()->Matrix();
       vector<double> BI = IJ;
-      mxmt_c((SpiceDouble (*)[3])&BJ[0],(SpiceDouble (*)[3])&IJ[0],
-             (SpiceDouble (*)[3])&BI[0]);
+      mxmt_c((SpiceDouble( *)[3])&BJ[0], (SpiceDouble( *)[3])&IJ[0],
+             (SpiceDouble( *)[3])&BI[0]);
 
       cout << "BP is " << endl;
-      for (int i=0; i<(int)BI.size(); i++) {
+      for(int i = 0; i < (int)BI.size(); i++) {
         cout << BI[i] << endl;
       }
     };
@@ -57,28 +57,28 @@ class MySpice : public Isis::Spice {
 
 
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
-cout << setprecision(10);
-cout << "Unit test for Isis::Spice" << endl;
+  cout << setprecision(10);
+  cout << "Unit test for Isis::Spice" << endl;
 
   Isis::PvlGroup inst("Instrument");
-  inst += Isis::PvlKeyword("TargetName","Mard");
+  inst += Isis::PvlKeyword("TargetName", "Mard");
 
   Isis::PvlGroup kern("Kernels");
   Isis::Filename f("$base/testData/kernels");
   string dir = f.Expanded() + "/";
-  kern += Isis::PvlKeyword("NaifFrameCode",-94031);
-  kern += Isis::PvlKeyword("LeapSecond",dir+"naif0007.tls");
-  kern += Isis::PvlKeyword("SpacecraftClock",dir+"MGS_SCLKSCET.00045.tsc");
-  kern += Isis::PvlKeyword("TargetPosition",dir+"de405.bsp");
-  kern += Isis::PvlKeyword("TargetAttitudeShape",dir+"pck00006.tpc");
-  kern += Isis::PvlKeyword("Instrument",dir+"mocSpiceUnitTest.ti");
-  kern += Isis::PvlKeyword("InstrumentAddendum",dir+"mocAddendum.ti");
-  kern += Isis::PvlKeyword("InstrumentPosition",dir+"moc.bsp");
-  kern += Isis::PvlKeyword("InstrumentPointing",dir+"moc.bc");
-  kern += Isis::PvlKeyword("Frame","");
+  kern += Isis::PvlKeyword("NaifFrameCode", -94031);
+  kern += Isis::PvlKeyword("LeapSecond", dir + "naif0007.tls");
+  kern += Isis::PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
+  kern += Isis::PvlKeyword("TargetPosition", dir + "de405.bsp");
+  kern += Isis::PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
+  kern += Isis::PvlKeyword("Instrument", dir + "mocSpiceUnitTest.ti");
+  kern += Isis::PvlKeyword("InstrumentAddendum", dir + "mocAddendum.ti");
+  kern += Isis::PvlKeyword("InstrumentPosition", dir + "moc.bsp");
+  kern += Isis::PvlKeyword("InstrumentPointing", dir + "moc.bc");
+  kern += Isis::PvlKeyword("Frame", "");
 
   // Time Setup
   double startTime = -69382819.0;
@@ -97,14 +97,14 @@ cout << "Unit test for Isis::Spice" << endl;
     cout << "Testing unknown target ..." << endl;
     MySpice spi(lab);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
     cout << endl;
   }
 
   // Test bad getInteger
   Isis::PvlGroup &temp = lab.FindGroup("Instrument");
-  temp.AddKeyword(Isis::PvlKeyword("TargetName","Mars"),Isis::Pvl::Replace);
+  temp.AddKeyword(Isis::PvlKeyword("TargetName", "Mars"), Isis::Pvl::Replace);
   cout << "Creating Spice object ..." << endl;
   MySpice spi(lab);
   spi.InstrumentRotation()->SetTimeBias(-1.15);
@@ -114,7 +114,7 @@ cout << "Unit test for Isis::Spice" << endl;
     cout << "Testing unknown integer keyword ... " << endl;
     spi.MyInteger("BadInteger");
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
     cout << endl;
   }
@@ -124,7 +124,7 @@ cout << "Unit test for Isis::Spice" << endl;
     cout << "Testing unknown double keyword ... " << endl;
     spi.MyDouble("BadDouble");
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
     cout << endl;
   }
@@ -134,7 +134,7 @@ cout << "Unit test for Isis::Spice" << endl;
     cout << "Testing unknown string keyword ... " << endl;
     spi.MyString("BadString");
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
     cout << endl;
   }
@@ -157,7 +157,7 @@ cout << "Unit test for Isis::Spice" << endl;
 
   // Normal testing (no cache)
   cout << "Testing without cache ... " << endl;
-  for (int i=0; i<10; i++) {
+  for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     spi.SetEphemerisTime(t);
     cout << "Time           = " << spi.EphemerisTime() << endl;
@@ -170,19 +170,19 @@ cout << "Unit test for Isis::Spice" << endl;
     spi.SunPosition(p);
     cout << "Sun        (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     spi.MyOutput();
-    double lat,lon;
-    spi.SubSpacecraftPoint (lat,lon);
+    double lat, lon;
+    spi.SubSpacecraftPoint(lat, lon);
     cout << "SubSpacecraft  = " << lat << " " << lon << endl;
-    spi.SubSolarPoint (lat,lon);
+    spi.SubSolarPoint(lat, lon);
     cout << "SubSolar       = " << lat << " " << lon << endl;
   }
   cout << endl;
 
   // Testing with cache
   cout << "Testing with cache ... " << endl;
-  double tol=.0022; //estimate resolution pixelPitch*alt/fl*1000.
-  spi.CreateCache(startTime+slope,endTime-slope,10,tol);
-  for (int i=0; i<10; i++) {
+  double tol = .0022; //estimate resolution pixelPitch*alt/fl*1000.
+  spi.CreateCache(startTime + slope, endTime - slope, 10, tol);
+  for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     spi.SetEphemerisTime(t);
     cout << "Time           = " << spi.EphemerisTime() << endl;
@@ -199,5 +199,5 @@ cout << "Unit test for Isis::Spice" << endl;
   cout << endl;
 
   cout << "Testing Utility methods" << endl;
-  cout << "Target Name = " << spi.Target () << endl;
+  cout << "Target Name = " << spi.Target() << endl;
 }

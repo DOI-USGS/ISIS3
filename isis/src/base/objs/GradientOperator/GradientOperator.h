@@ -38,9 +38,9 @@ namespace Isis {
    *
    * @see InterestOperator
    *
-	  * @author 2006-02-11 Jacob Danton 
-	  *  
-	  * @history 2010-06-10 Sharmila Prasad  Updated to accomadate CnetValidMeasure base class
+    * @author 2006-02-11 Jacob Danton
+    *
+    * @history 2010-06-10 Sharmila Prasad  Updated to accomadate CnetValidMeasure base class
    */
   class GradientOperator : public InterestOperator {
     public:

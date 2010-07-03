@@ -7,7 +7,7 @@
 #include "Preference.h"
 
 using namespace std;
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   try {
@@ -93,7 +93,7 @@ int main (int argc, char *argv[]) {
     cout << "Testing environment variable expansion" << endl;
     Isis::Filename g("$base/testData/isisTruth.cub");
     cout << "Original filename: " << "$base/testData/isisTruth.cub" << endl;
-    if (g.Exists()) {
+    if(g.Exists()) {
       cout << "Filename was expanded correctly" << endl;
     }
     else {
@@ -142,7 +142,7 @@ int main (int argc, char *argv[]) {
     cout << "Testing file name without a path" << endl;
     Isis::Filename i("unitTest.cpp");
     cout << "Original filename: " << "unitTest.cpp" << endl;
-    if (i.Exists()) {
+    if(i.Exists()) {
       cout << "Filename was expanded correctly" << endl;
     }
     else {
@@ -162,7 +162,7 @@ int main (int argc, char *argv[]) {
     cout << "Testing file name with . as the path" << endl;
     Isis::Filename j("./unitTest.cpp");
     cout << "Original filename: " << "./unitTest.cpp" << endl;
-    if (j.Exists()) {
+    if(j.Exists()) {
       cout << "Filename was expanded correctly" << endl;
     }
     else {
@@ -183,7 +183,7 @@ int main (int argc, char *argv[]) {
       cout << "Testing file name with no path and no extension" << endl;
       Isis::Filename k("Makefile");
       cout << "Original filename: " << "Makefile" << endl;
-      if (k.Exists()) {
+      if(k.Exists()) {
         cout << "Filename was expanded correctly" << endl;
       }
       else {
@@ -267,84 +267,84 @@ int main (int argc, char *argv[]) {
 
     // Use the files created in the last two tests to
     // test the HighestVersion member
-    system ("touch tttt000001");
-    system ("touch tttt000001.tmp");
-    system ("touch tttt000005.tmp");
-    system ("touch tttt000006.tmp");
-    system ("touch tttt000008.tmp");
-    system ("touch 1tttt000008.tmp");
-    system ("touch 2tttt000008.tmp");
+    system("touch tttt000001");
+    system("touch tttt000001.tmp");
+    system("touch tttt000005.tmp");
+    system("touch tttt000006.tmp");
+    system("touch tttt000008.tmp");
+    system("touch 1tttt000008.tmp");
+    system("touch 2tttt000008.tmp");
 
-    Isis::Filename p ("tttt??????.tmp");
+    Isis::Filename p("tttt??????.tmp");
     cout << "Testing HighestVersion for file " << p.Name() << endl;
     try {
-      p.HighestVersion ();
+      p.HighestVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << "  " << p.Name() << endl;
     cout << endl;
 
-    Isis::Filename q ("tttt??????");
+    Isis::Filename q("tttt??????");
     cout << "Testing HighestVersion for file " << q.Name() << endl;
     try {
-      q.HighestVersion ();
+      q.HighestVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << "  " << q.Name() << endl;
     cout << endl;
 
-    Isis::Filename q2 ("?tttt000008.tmp");
+    Isis::Filename q2("?tttt000008.tmp");
     cout << "Testing HighestVersion for file " << q2.Name() << endl;
     try {
-      q2.HighestVersion ();
+      q2.HighestVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << "  " << q2.Name() << endl;
     cout << endl;
 
 
-    remove ("tttt000001");
-    remove ("tttt000001.tmp");
-    remove ("tttt000005.tmp");
-    remove ("tttt000006.tmp");
-    remove ("tttt000008.tmp");
-    remove ("1tttt000008.tmp");
-    remove ("2tttt000008.tmp");
+    remove("tttt000001");
+    remove("tttt000001.tmp");
+    remove("tttt000005.tmp");
+    remove("tttt000006.tmp");
+    remove("tttt000008.tmp");
+    remove("1tttt000008.tmp");
+    remove("2tttt000008.tmp");
 
-    Isis::Filename r ("tttt");
+    Isis::Filename r("tttt");
     cout << "Testing HighestVersion for file " << r.Name() << endl;
     try {
-      r.HighestVersion ();
+      r.HighestVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       cout << "No version string in tttt" << endl;
       error.Clear();
     }
     cout << endl;
 
-    Isis::Filename s ("??tttt");
+    Isis::Filename s("??tttt");
     cout << "Testing HighestVersion for file " << s.Name() << endl;
     try {
-      s.HighestVersion ();
+      s.HighestVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       cout << "No version available for ??tttt" << endl;
       error.Clear();
     }
     cout << endl;
-    system ("touch junk06.tmp");
-    system ("touch junk09.tmp");
+    system("touch junk06.tmp");
+    system("touch junk09.tmp");
 
     Isis::Filename junk("junk?.tmp");
     junk.HighestVersion();
-    cout << "Testing HighestVersion to expand 1 \"?\" into 2 digits" <<endl;
-    cout << junk.Name() <<endl <<endl;
+    cout << "Testing HighestVersion to expand 1 \"?\" into 2 digits" << endl;
+    cout << junk.Name() << endl << endl;
 
     system("rm junk06.tmp");
     system("rm junk09.tmp");
@@ -352,81 +352,81 @@ int main (int argc, char *argv[]) {
 // Use the files previously created to
 // test the NewVersion member
 
-    system ("touch tttt000001");
-    system ("touch tttt000001.tmp");
-    system ("touch tttt000005.tmp");
-    system ("touch tttt000006.tmp");
-    system ("touch tttt000008.tmp");
-    system ("touch 1tttt000008.tmp");
-    system ("touch 2tttt000008.tmp");
+    system("touch tttt000001");
+    system("touch tttt000001.tmp");
+    system("touch tttt000005.tmp");
+    system("touch tttt000006.tmp");
+    system("touch tttt000008.tmp");
+    system("touch 1tttt000008.tmp");
+    system("touch 2tttt000008.tmp");
 
-    Isis::Filename pNew ("tttt??????.tmp");
+    Isis::Filename pNew("tttt??????.tmp");
     cout << "Testing NewVersion for file " << pNew.Name() << endl;
     try {
-      pNew.NewVersion ();
+      pNew.NewVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << "  " << pNew.Name() << endl;
     cout << endl;
 
-    Isis::Filename qNew ("tttt??????");
+    Isis::Filename qNew("tttt??????");
     cout << "Testing NewVersion for file " << qNew.Name() << endl;
     try {
-      qNew.NewVersion ();
+      qNew.NewVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << "  " << qNew.Name() << endl;
     cout << endl;
 
-    Isis::Filename q2New ("?tttt000008.tmp");
+    Isis::Filename q2New("?tttt000008.tmp");
     cout << "Testing NewVersion for file " << q2New.Name() << endl;
     try {
-      q2New.NewVersion ();
+      q2New.NewVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << " " << q2New.Name() << endl;
     cout << endl;
 
 
-    remove ("tttt000001");
-    remove ("tttt000001.tmp");
-    remove ("tttt000005.tmp");
-    remove ("tttt000006.tmp");
-    remove ("tttt000008.tmp");
-    remove ("1tttt000008.tmp");
-    remove ("2tttt000008.tmp");
+    remove("tttt000001");
+    remove("tttt000001.tmp");
+    remove("tttt000005.tmp");
+    remove("tttt000006.tmp");
+    remove("tttt000008.tmp");
+    remove("1tttt000008.tmp");
+    remove("2tttt000008.tmp");
 
-    Isis::Filename rNew ("tttt");
+    Isis::Filename rNew("tttt");
     cout << "Testing NewVersion for file " << rNew.Name() << endl;
     try {
-      rNew.NewVersion ();
+      rNew.NewVersion();
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       cout << "No version string in tttt" << endl;
       error.Clear();
     }
     cout << endl;
 
-    Isis::Filename sNew ("??tttt");
+    Isis::Filename sNew("??tttt");
     cout << "Testing NewVersion for file " << sNew.Name() << endl;
     sNew.NewVersion();
-    cout<< " " << sNew.Name() << endl;
+    cout << " " << sNew.Name() << endl;
     cout << endl;
 //////////////////////////////////////////////////////////
     cout << "Testing Exists() for a file that should exist:" << endl;
-    Isis::Filename t ("$ISISROOT/src/Makefile");
+    Isis::Filename t("$ISISROOT/src/Makefile");
     try {
-      if (t.Exists()) {
+      if(t.Exists()) {
         cout << "  The test file for \"Exists()\" was located" << endl;
       }
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << endl;
@@ -434,37 +434,37 @@ int main (int argc, char *argv[]) {
     cout << "Testing Exists() for a file that does NOT exist:" << endl;
     t.AddExtension("elifekaM");
     try {
-      if (!t.Exists()) {
+      if(!t.Exists()) {
         cout << "  The test file for \"!Exists()\" was not located (this is correct)" << endl;
       }
     }
-    catch (Isis::iException &error) {
+    catch(Isis::iException &error) {
       error.Report(false);
     }
     cout << endl;
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     try {
       e.Report(true);
     }
-    catch (...) {
+    catch(...) {
       cout << "Unknown error in Isis::iException.Report" << endl;
     }
     exit(1);
   }
-  catch (...) {
+  catch(...) {
     cout << "Unknown error" << endl;
     exit(1);
   }
 
   // Test the makeDirectory method
-  Isis::Filename d ("/tmp/IsisFilenameTest");
+  Isis::Filename d("/tmp/IsisFilenameTest");
   cout << "Testing MakeDirctory for " << d.Expanded() << endl;
   try {
-    d.MakeDirectory ();
+    d.MakeDirectory();
     cout << "  The directory create succeed" << endl;
   }
-  catch (Isis::iException &error) {
+  catch(Isis::iException &error) {
     error.Report(false);
   }
   cout << endl;
@@ -472,15 +472,15 @@ int main (int argc, char *argv[]) {
   // Test the makeDirectory method when the dir already exists
   cout << "Testing MakeDirectory for " << d.Expanded() << endl;
   try {
-    d.MakeDirectory ();
+    d.MakeDirectory();
   }
-  catch (Isis::iException &error) {
+  catch(Isis::iException &error) {
     error.Report(false);
   }
   cout << endl;
 
   string d_str(d.Expanded());
-  remove (d_str.c_str());
+  remove(d_str.c_str());
 
   return 0;
 }

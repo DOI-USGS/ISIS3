@@ -14,12 +14,12 @@
 #include "iString.h"
 #include "Pixel.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void compare (vector<Buffer *> &in, vector<Buffer *> &out);
+void compare(vector<Buffer *> &in, vector<Buffer *> &out);
 
-void diffTable (ofstream &target, int precision);
+void diffTable(ofstream &target, int precision);
 
 // This is only used for the difference table
 struct Difference {
@@ -32,7 +32,7 @@ struct Difference {
 double tolerance;
 bool filesEqual = true;
 bool firstDifferenceFound = false; // Set to true when first DN value difference is found
-int sample,line,band,spCount,diffCount,colWidth;
+int sample, line, band, spCount, diffCount, colWidth;
 Statistics stats;
 bool doTable;
 unsigned int sigFigAccuracy = DBL_DIG; // DBL_DIG is maximum accuracy for a double
@@ -41,7 +41,7 @@ int sigFigLine = 0;
 int sigFigSample = 0;
 int sigFigBand = 0;
 
-int gMaxDiffLine=0, gMaxDiffSample=0, gMaxDiffBand=0;
+int gMaxDiffLine = 0, gMaxDiffSample = 0, gMaxDiffBand = 0;
 double gMaxDiff;
 
 void IsisMain() {
@@ -52,20 +52,20 @@ void IsisMain() {
 
   // Read tolerance value
   UserInterface &ui = Application::GetUserInterface();
-  if (ui.WasEntered ("TOLERANCE")) {
+  if(ui.WasEntered("TOLERANCE")) {
     tolerance = ui.GetDouble("TOLERANCE");
   }
   else {
     tolerance = DBL_EPSILON;
-  } 
+  }
 
   // See if we should output the difference table
-  if (ui.GetBoolean("OUTPUTDIFFS")){
+  if(ui.GetBoolean("OUTPUTDIFFS")) {
     doTable = true;
     diffCount = ui.GetInteger("COUNT");
-    if (!ui.WasEntered("TO")) {
+    if(!ui.WasEntered("TO")) {
       string message = "A target file is required for difference output";
-      throw iException::Message(iException::User,message,_FILEINFO_);
+      throw iException::Message(iException::User, message, _FILEINFO_);
     }
 
   }
@@ -75,53 +75,54 @@ void IsisMain() {
   spCount = 0;
   stats.Reset();
   colWidth = 0;
-  gMaxDiff=tolerance;
+  gMaxDiff = tolerance;
   p.StartProcess(compare);
 
   // Write to log indicating if two files are filesEqual.
   PvlGroup results("Results");
-  if (filesEqual) {
-    results += PvlKeyword ("Compare","Identical");
+  if(filesEqual) {
+    results += PvlKeyword("Compare", "Identical");
   }
   else {
-    results += PvlKeyword ("Compare","Different");
-    results += PvlKeyword ("Sample",sample);
-    results += PvlKeyword ("Line",line);
-    results += PvlKeyword ("Band",band);
+    results += PvlKeyword("Compare", "Different");
+    results += PvlKeyword("Sample", sample);
+    results += PvlKeyword("Line", line);
+    results += PvlKeyword("Band", band);
     if(stats.TotalPixels() < 1) {
-      results += PvlKeyword ("AverageDifference",0);
-      results += PvlKeyword ("StandardDeviation",0);
-      results += PvlKeyword ("Variance",0);
-      results += PvlKeyword ("MinimumDifference",0);
-      results += PvlKeyword ("MaximumDifference",0);
-    } else {
-      results += PvlKeyword ("AverageDifference",(double)stats.Average());
-      results += PvlKeyword ("StandardDeviation",(double)stats.StandardDeviation());
-      results += PvlKeyword ("Variance",(double)stats.Variance());
-      results += PvlKeyword ("MinimumDifference",(double)stats.Minimum());
-      results += PvlKeyword ("MaximumDifference",(double)stats.Maximum());      
-      results += PvlKeyword ("MaxDifferenceSample",(int)gMaxDiffSample);
-      results += PvlKeyword ("MaxDifferenceLine",(int)gMaxDiffLine);
-      results += PvlKeyword ("MaxDifferenceBand",(int)gMaxDiffBand);
+      results += PvlKeyword("AverageDifference", 0);
+      results += PvlKeyword("StandardDeviation", 0);
+      results += PvlKeyword("Variance", 0);
+      results += PvlKeyword("MinimumDifference", 0);
+      results += PvlKeyword("MaximumDifference", 0);
     }
-    results += PvlKeyword ("ValidPixelDifferences",stats.TotalPixels());
-    results += PvlKeyword ("SpecialPixelDifferences",spCount);
-    results += PvlKeyword ("SigFigAccuracy", (int)sigFigAccuracy);
-    results += PvlKeyword ("SigFigMaxDifferenceSample", (int)sigFigSample);
-    results += PvlKeyword ("SigFigMaxDifferenceLine", (int)sigFigLine);
-    results += PvlKeyword ("SigFigMaxDifferenceBand", (int)sigFigBand);
+    else {
+      results += PvlKeyword("AverageDifference", (double)stats.Average());
+      results += PvlKeyword("StandardDeviation", (double)stats.StandardDeviation());
+      results += PvlKeyword("Variance", (double)stats.Variance());
+      results += PvlKeyword("MinimumDifference", (double)stats.Minimum());
+      results += PvlKeyword("MaximumDifference", (double)stats.Maximum());
+      results += PvlKeyword("MaxDifferenceSample", (int)gMaxDiffSample);
+      results += PvlKeyword("MaxDifferenceLine", (int)gMaxDiffLine);
+      results += PvlKeyword("MaxDifferenceBand", (int)gMaxDiffBand);
+    }
+    results += PvlKeyword("ValidPixelDifferences", stats.TotalPixels());
+    results += PvlKeyword("SpecialPixelDifferences", spCount);
+    results += PvlKeyword("SigFigAccuracy", (int)sigFigAccuracy);
+    results += PvlKeyword("SigFigMaxDifferenceSample", (int)sigFigSample);
+    results += PvlKeyword("SigFigMaxDifferenceLine", (int)sigFigLine);
+    results += PvlKeyword("SigFigMaxDifferenceBand", (int)sigFigBand);
   }
   Application::Log(results);
 
   // Output a file if the user request it
-  if (ui.WasEntered ("TO")) {
+  if(ui.WasEntered("TO")) {
     Pvl lab;
     lab.AddGroup(results);
-    lab.Write (ui.GetFilename("TO","txt"));
+    lab.Write(ui.GetFilename("TO", "txt"));
   }
-  if (doTable) {
-    string filename = Filename(ui.GetFilename("TO","txt")).Expanded();
-    ofstream ofile(filename.c_str(),ios_base::app);
+  if(doTable) {
+    string filename = Filename(ui.GetFilename("TO", "txt")).Expanded();
+    ofstream ofile(filename.c_str(), ios_base::app);
     diffTable(ofile, ui.GetInteger("PRECISION"));
   }
 
@@ -129,13 +130,13 @@ void IsisMain() {
   filesEqual = true;
 }
 
-void compare (vector<Buffer *> &in,vector<Buffer *> &out) {
+void compare(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &input1 = *in[0];
   Buffer &input2 = *in[1];
   int inputSize = input1.size();
   double MaxDiffTemp;
-  
-  for (int index = 0; index < inputSize; index ++) {
+
+  for(int index = 0; index < inputSize; index ++) {
     bool pixelDifferent = false;
     bool pixelSpecial = false;
 
@@ -161,13 +162,13 @@ void compare (vector<Buffer *> &in,vector<Buffer *> &out) {
       MaxDiffTemp = abs(input1[index] - input2[index]);
       if(MaxDiffTemp > tolerance) {
         // This pixel is different.
-        pixelDifferent = true;       
-      
+        pixelDifferent = true;
+
         // Add the difference in dn to the stats object
         stats.AddData(MaxDiffTemp);
 
-        // Store line, sample and band of max difference 
-        if (MaxDiffTemp > gMaxDiff) {
+        // Store line, sample and band of max difference
+        if(MaxDiffTemp > gMaxDiff) {
           gMaxDiff = MaxDiffTemp;
           gMaxDiffLine   = input1.Line(index);
           gMaxDiffSample = input1.Sample(index);
@@ -182,7 +183,7 @@ void compare (vector<Buffer *> &in,vector<Buffer *> &out) {
 
       // Check positive/negative and ensure both positive
       if((input1[index] < 0 && input2[index] > 0) ||
-         (input1[index] > 0 && input2[index] < 0)) {
+          (input1[index] > 0 && input2[index] < 0)) {
         accuracy = 1;
       }
       else {
@@ -216,8 +217,8 @@ void compare (vector<Buffer *> &in,vector<Buffer *> &out) {
 
     if(pixelDifferent) {
       filesEqual = false;
-      
-      if (!firstDifferenceFound) {
+
+      if(!firstDifferenceFound) {
         firstDifferenceFound = true;
         sample = input1.Sample(index);
         line = input1.Line(index);
@@ -225,9 +226,9 @@ void compare (vector<Buffer *> &in,vector<Buffer *> &out) {
       }
     }
 
-    // If the user indicated that we should make the table, add this entry  
-    if (pixelDifferent && doTable) {
-      if ((int)diffset.size() < diffCount) {
+    // If the user indicated that we should make the table, add this entry
+    if(pixelDifferent && doTable) {
+      if((int)diffset.size() < diffCount) {
         Difference currDiff;
         currDiff.lineNum = input1.Line(index);
         currDiff.sampNum = input1.Sample(index);
@@ -238,10 +239,10 @@ void compare (vector<Buffer *> &in,vector<Buffer *> &out) {
         // Check the character lengths of the values
         int val1Length = iString((int)currDiff.cube1Val).length();
         int val2Length = iString((int)currDiff.cube2Val).length();
-        if (val1Length < colWidth) {
+        if(val1Length < colWidth) {
           colWidth = val1Length;
         }
-        if (val2Length < colWidth) {
+        if(val2Length < colWidth) {
           colWidth = val2Length;
         }
       }
@@ -249,23 +250,23 @@ void compare (vector<Buffer *> &in,vector<Buffer *> &out) {
   }
 }
 
-//Function to prepare the table to append to the 
+//Function to prepare the table to append to the
 void diffTable(ofstream &target, int precision) {
   vector<int> temp;
 
   //Make a list of all samples present
-  for (unsigned int i=0; i<diffset.size(); i++) {
+  for(unsigned int i = 0; i < diffset.size(); i++) {
     temp.push_back(diffset[i].sampNum);
   }
 
   //Sort the list
-  sort(temp.begin(),temp.end());
+  sort(temp.begin(), temp.end());
 
   //Remove duplicates
   vector<int> samps;
   samps.push_back(temp[0]);
-  for (unsigned int i=1; i<temp.size(); i++) {
-    if ( temp[i] != samps.back()) {
+  for(unsigned int i = 1; i < temp.size(); i++) {
+    if(temp[i] != samps.back()) {
       samps.push_back(temp[i]);
     }
   }
@@ -274,11 +275,11 @@ void diffTable(ofstream &target, int precision) {
   Column first("Line#", 7, Column::Integer);
   cols.push_back(first);
 
-  for (unsigned int i=0; i<samps.size(); i++) {
+  for(unsigned int i = 0; i < samps.size(); i++) {
     Column currCol;
     //Prepare and add the first file's column
     currCol.SetName(iString("File1_") + iString(samps[i]));
-    if ((unsigned int)(colWidth + precision + 1) < currCol.Name().length()) {
+    if((unsigned int)(colWidth + precision + 1) < currCol.Name().length()) {
       currCol.SetWidth(currCol.Name().length() + 1);
     }
     else currCol.SetWidth(colWidth + precision + 1);
@@ -296,10 +297,10 @@ void diffTable(ofstream &target, int precision) {
   WriteTabular diffs(target, cols);
 
   //Go through the entire list of differences and make the table
-  for (unsigned int i=0; i<diffset.size(); i++) {
+  for(unsigned int i = 0; i < diffset.size(); i++) {
     diffs.Write(diffset[i].lineNum);
-    for (unsigned int j=0; j<samps.size(); j++) {
-      if (diffset[i].sampNum == samps[j]) {
+    for(unsigned int j = 0; j < samps.size(); j++) {
+      if(diffset[i].sampNum == samps[j]) {
         diffs.Write(diffset[i].cube1Val);
         diffs.Write(diffset[i].cube2Val);
       }

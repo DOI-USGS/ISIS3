@@ -7,7 +7,7 @@
 #include "SpecialPixel.h"
 #include "iException.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 static NumericalApproximation::InterpType iType(NumericalApproximation::CubicNatural);
@@ -25,57 +25,57 @@ void IsisMain() {
 
   // set spline interpolation to user requested type
   string splineType = ui.GetString("INTERP");
-  if (splineType == "LINEAR") {
-    iType = NumericalApproximation::Linear; 
-  } 
-  else if (splineType == "AKIMA") {
-    iType = NumericalApproximation::Akima; 
+  if(splineType == "LINEAR") {
+    iType = NumericalApproximation::Linear;
+  }
+  else if(splineType == "AKIMA") {
+    iType = NumericalApproximation::Akima;
   }
   else {
-    iType = NumericalApproximation::CubicNatural; 
+    iType = NumericalApproximation::CubicNatural;
   }
 
   //Set null direction to the user defined direction
- string  Dir = ui.GetString("DIRECTION");
-  if(Dir == "SAMPLE"){
+  string  Dir = ui.GetString("DIRECTION");
+  if(Dir == "SAMPLE") {
     ProcessBySample p;
     p.SetInputCube("FROM");
-    p.SetOutputCube("TO");  
+    p.SetOutputCube("TO");
     p.StartProcess(fill);
     p.EndProcess();
   }
-  else if (Dir == "LINE") {
+  else if(Dir == "LINE") {
     ProcessByLine p;
     p.SetInputCube("FROM");
-    p.SetOutputCube("TO");   
+    p.SetOutputCube("TO");
     p.StartProcess(fill);
-    p.EndProcess(); 
-  } 
-  else if (Dir == "BAND") {
+    p.EndProcess();
+  }
+  else if(Dir == "BAND") {
     ProcessBySpectra p;
     //Check number of bands to see if this will be allowed.
     p.SetInputCube("FROM");
-    p.SetOutputCube("TO");   
+    p.SetOutputCube("TO");
     p.StartProcess(fill);
-    p.EndProcess(); 
+    p.EndProcess();
   }
   // if any pixels were not filled, let user know by adding message to the log
-  if (numSpecPixKept > 0) {
+  if(numSpecPixKept > 0) {
     PvlGroup mLog("Messages");
-    mLog+=PvlKeyword("Warning", 
-                     "Unable to fill " + iString(numSpecPixKept) + " special pixels.");
+    mLog += PvlKeyword("Warning",
+                       "Unable to fill " + iString(numSpecPixKept) + " special pixels.");
     Application::Log(mLog);
   }
-  return; 
+  return;
 }
 
 /**
  * @brief Fill in gaps of image using an interpolation on the DN
  *        values.
- * 
+ *
  * @param in Input Buffer
  * @param out Output Buffer
- * @internal 
+ * @internal
  *   @history 2009-04-21 Jeannie Walldren - Added a try/catch
  *            statement to the Evaluate() method.  The only
  *            reason for Evaluate to throw an error should be
@@ -90,29 +90,29 @@ void IsisMain() {
  *            can keep a count of how many pixels were not
  *            filled by this app.
  */
-void fill(Buffer &in, Buffer &out) { 
+void fill(Buffer &in, Buffer &out) {
 
   // Fill the data set with valid pixel values
   NumericalApproximation spline(iType);
-  for (int i=0; i < in.size(); i++) {
-    if (!IsSpecial(in[i])) {
-      spline.AddData((double) (i+1),in[i]);
+  for(int i = 0; i < in.size(); i++) {
+    if(!IsSpecial(in[i])) {
+      spline.AddData((double)(i + 1), in[i]);
     }
   }
 
   // loop through output buffer
-  for (int j = 0 ; j < out.size() ; j++) {
+  for(int j = 0 ; j < out.size() ; j++) {
     // if the input pixel is valid, copy it
-    if (!IsSpecial(in[j])) {
+    if(!IsSpecial(in[j])) {
       out[j] = in[j];
     }
     // otherwise, try to interpolate from the valid values
-    else{
-      try{
-        out[j] = spline.Evaluate((double) (j+1));
+    else {
+      try {
+        out[j] = spline.Evaluate((double)(j + 1));
       }
       // if Evaluate() fails, copy the input value and increment numSpecPixKept
-      catch (iException &e){
+      catch(iException &e) {
         out[j] = in[j];
         numSpecPixKept++;
       }

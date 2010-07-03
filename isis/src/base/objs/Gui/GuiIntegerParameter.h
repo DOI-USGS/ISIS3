@@ -13,17 +13,17 @@ namespace Isis {
 
   class GuiIntegerParameter : public GuiParameter {
 
-    Q_OBJECT
+      Q_OBJECT
 
     public:
 
-      GuiIntegerParameter (QGridLayout *grid, UserInterface &ui, 
-                        int group, int param);
-      ~GuiIntegerParameter ();
+      GuiIntegerParameter(QGridLayout *grid, UserInterface &ui,
+                          int group, int param);
+      ~GuiIntegerParameter();
 
-      iString Value ();
+      iString Value();
 
-      void Set (iString newValue);
+      void Set(iString newValue);
 
     private:
       QLineEdit *p_lineEdit;

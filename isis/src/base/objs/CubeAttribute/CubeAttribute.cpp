@@ -1,25 +1,25 @@
-/**                                                                     
- * @file                                                                
- * $Revision: 1.2 $                                                           
- * $Date: 2007/01/30 22:12:22 $                                                               
- *                                                                      
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related 
- *   information.                                                       
- *                                                                      
- *   Although Isis has been used by the USGS, no warranty, expressed or 
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution   
+/**
+ * @file
+ * $Revision: 1.2 $
+ * $Date: 2007/01/30 22:12:22 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                      
- *                                                                      
- *   For additional information, launch                                 
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html              
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                  
- */                                                                     
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <iostream>
 
 #include "iException.h"
@@ -31,34 +31,34 @@
 using namespace std;
 namespace Isis {
 
-  CubeAttribute::CubeAttribute () {
+  CubeAttribute::CubeAttribute() {
     p_attribute.clear();
   }
 
 
-  CubeAttribute::CubeAttribute (const Isis::iString &att) {
+  CubeAttribute::CubeAttribute(const Isis::iString &att) {
     // Strip off the filename if there is one
     std::string::size_type pos = att.find('+');
-    if (pos == 0) {
+    if(pos == 0) {
       p_attribute = att;
     }
-    else if (pos != std::string::npos) {
-      p_attribute = att.substr(pos-1);
+    else if(pos != std::string::npos) {
+      p_attribute = att.substr(pos - 1);
     }
-    else if (att.length() == 0) {
+    else if(att.length() == 0) {
       p_attribute = "";
     }
-    else if (pos == std::string::npos) {
+    else if(pos == std::string::npos) {
       p_attribute = "";
     }
     else {
       string msg = "Invalid cube attribute string [" + att + "]";
-      throw Isis::iException::Message(Isis::iException::Parse,msg, _FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
     }
   }
 
 
-  CubeAttribute::~CubeAttribute () {}
+  CubeAttribute::~CubeAttribute() {}
 
 
   void CubeAttribute::Write(std::ostream &ostr) const {
@@ -81,30 +81,30 @@ namespace Isis {
   //---------------------------------------------------------------------------
   // CubeAttributeInput Implementation
   //---------------------------------------------------------------------------
-  CubeAttributeInput::CubeAttributeInput () {
+  CubeAttributeInput::CubeAttributeInput() {
     p_bands.clear();
   }
 
 
-  CubeAttributeInput::CubeAttributeInput (const Isis::iString &att)
-      : CubeAttribute(att) {
+  CubeAttributeInput::CubeAttributeInput(const Isis::iString &att)
+    : CubeAttribute(att) {
     p_bands.clear();
-    Parse (p_attribute);
+    Parse(p_attribute);
   }
 
 
-  CubeAttributeInput::~CubeAttributeInput () {}
+  CubeAttributeInput::~CubeAttributeInput() {}
 
 
-  void CubeAttributeInput::Set (const std::string &att) {
+  void CubeAttributeInput::Set(const std::string &att) {
     Parse(att);
   }
 
 
   string CubeAttributeInput::BandsStr() const {
     string str;
-    for (unsigned int i=0; i<p_bands.size(); i++) {
-      if (i>0) str += ",";
+    for(unsigned int i = 0; i < p_bands.size(); i++) {
+      if(i > 0) str += ",";
       str += p_bands[i];
     }
 
@@ -113,21 +113,21 @@ namespace Isis {
 
 
   vector<string> CubeAttributeInput::Bands() const {
-      return p_bands;
+    return p_bands;
   }
 
 
-  void CubeAttributeInput::Bands (const std::vector<std::string> &bands) {
+  void CubeAttributeInput::Bands(const std::vector<std::string> &bands) {
     p_bands.clear();
-    for (unsigned int i=0; i<bands.size(); i++) {
+    for(unsigned int i = 0; i < bands.size(); i++) {
       p_bands.push_back(bands[i]);
     }
   }
 
 
-  void CubeAttributeInput::Bands (const std::string &bands) {
+  void CubeAttributeInput::Bands(const std::string &bands) {
     p_bands.clear();
-    Parse (bands);
+    Parse(bands);
   }
 
 
@@ -139,11 +139,11 @@ namespace Isis {
 
 
   void CubeAttributeInput::Write(std::string &str) const {
-    if (p_bands.size() > 0) {
+    if(p_bands.size() > 0) {
       str = "+";
     }
-    for (unsigned int i=0; i<p_bands.size(); i++) {
-      if (i>0) str += ",";
+    for(unsigned int i = 0; i < p_bands.size(); i++) {
+      if(i > 0) str += ",";
       str += p_bands[i];
     }
   }
@@ -151,7 +151,7 @@ namespace Isis {
 
   void CubeAttributeInput::Write(Isis::Pvl &pvl) const {
     Isis::PvlKeyword bands("Bands");
-    for (unsigned int b=0; b<p_bands.size(); b++) {
+    for(unsigned int b = 0; b < p_bands.size(); b++) {
       bands += p_bands[b];
     }
     Isis::PvlGroup inatts("InputAttributes");
@@ -171,7 +171,7 @@ namespace Isis {
 
     // Strip off the leading "+" and put the attributes in a temporary
     std::string::size_type pos = str.find('+');
-    if (pos != std::string::npos) {
+    if(pos != std::string::npos) {
       str = str.substr(pos);
     }
     else {
@@ -183,20 +183,20 @@ namespace Isis {
     str.Compress();
     str.Remove(" ");
     str.UpCase();
-    str.TrimHead ("+");
+    str.TrimHead("+");
 
     // Look at each comma delimited token
     Isis::iString commaTok;
-    while ((commaTok = str.Token(",")).length() > 0) {
+    while((commaTok = str.Token(",")).length() > 0) {
       // Is this token a range of bands
-      if (commaTok.find('-') != std::string::npos) {
+      if(commaTok.find('-') != std::string::npos) {
         Isis::iString dashTok;
         int start = commaTok.Token("-").ToInteger();
         int end = commaTok.Token("-").ToInteger();
         int direction;
-        direction = (start<=end) ? 1 : -1;
+        direction = (start <= end) ? 1 : -1;
         // Save the entire range of bands
-        for (int band = start; band != end; band+=direction) {
+        for(int band = start; band != end; band += direction) {
           p_bands.push_back(Isis::iString(band));
         }
         p_bands.push_back(Isis::iString(end));
@@ -212,24 +212,24 @@ namespace Isis {
   //---------------------------------------------------------------------------
   // CubeAttributeOutput Implementation
   //---------------------------------------------------------------------------
-  CubeAttributeOutput::CubeAttributeOutput () {
-    Initialize ();
+  CubeAttributeOutput::CubeAttributeOutput() {
+    Initialize();
   }
 
 
-  CubeAttributeOutput::CubeAttributeOutput (const Isis::iString &att)
-      : CubeAttribute (att) {
+  CubeAttributeOutput::CubeAttributeOutput(const Isis::iString &att)
+    : CubeAttribute(att) {
 
-    Initialize ();
+    Initialize();
     p_attribute = att;
-    Parse (p_attribute);
+    Parse(p_attribute);
   }
 
 
-  CubeAttributeOutput::~CubeAttributeOutput () {}
+  CubeAttributeOutput::~CubeAttributeOutput() {}
 
 
-  void CubeAttributeOutput::Set (const std::string &att) {
+  void CubeAttributeOutput::Set(const std::string &att) {
     Parse(att);
   }
 
@@ -244,48 +244,48 @@ namespace Isis {
   }
 
 
-  void CubeAttributeOutput::Format (const Isis::CubeFormat fmt) {
+  void CubeAttributeOutput::Format(const Isis::CubeFormat fmt) {
     p_format = fmt;
   }
 
 
-  double CubeAttributeOutput::Minimum () const {
+  double CubeAttributeOutput::Minimum() const {
     return p_minimum;
   }
 
 
-  double CubeAttributeOutput::Maximum () const {
+  double CubeAttributeOutput::Maximum() const {
     return p_maximum;
   }
 
 
-  void CubeAttributeOutput::Minimum (const double min) {
+  void CubeAttributeOutput::Minimum(const double min) {
     p_minimum = min;
     p_rangeType = Isis::RangeSet;
   }
 
 
-  void CubeAttributeOutput::Maximum (const double max) {
+  void CubeAttributeOutput::Maximum(const double max) {
     p_maximum = max;
     p_rangeType = Isis::RangeSet;
   }
 
 
   Isis::PixelType CubeAttributeOutput::PixelType() const {
-    if (p_pixelType == Isis::None) {
+    if(p_pixelType == Isis::None) {
       string msg;
       msg = msg + "Request for CubeAttributeOutput::PixelType failed. " +
-             "PixelType has not been set. Use PropagatePixelType or " +
-             "UserPixelType to determine how to set PixelType.";
-      throw Isis::iException::Message(Isis::iException::Programmer,msg, _FILEINFO_);
+            "PixelType has not been set. Use PropagatePixelType or " +
+            "UserPixelType to determine how to set PixelType.";
+      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
     return p_pixelType;
   }
 
 
-  void CubeAttributeOutput::PixelType (const Isis::PixelType type) {
+  void CubeAttributeOutput::PixelType(const Isis::PixelType type) {
     p_pixelType = type;
-    if (p_pixelType == Isis::None) {
+    if(p_pixelType == Isis::None) {
       p_pixelTypeDef = "PROPAGATE";
     }
     else {
@@ -304,7 +304,7 @@ namespace Isis {
   }
 
 
-  void CubeAttributeOutput::Order (const Isis::ByteOrder order) {
+  void CubeAttributeOutput::Order(const Isis::ByteOrder order) {
     p_order = order;
   }
 
@@ -318,26 +318,26 @@ namespace Isis {
 
   void CubeAttributeOutput::Write(std::string &str) const {
     str.clear();
-    if (p_pixelTypeDef != "PROPAGATE") {
-      str += "+" + Isis::PixelTypeName (p_pixelType);
+    if(p_pixelTypeDef != "PROPAGATE") {
+      str += "+" + Isis::PixelTypeName(p_pixelType);
     }
-    if (p_pixelType != Isis::Real && p_pixelType != Isis::None) {
+    if(p_pixelType != Isis::Real && p_pixelType != Isis::None) {
       str += "+" + Isis::iString(p_minimum) + ":" + Isis::iString(p_maximum);
     }
     str += "+" + FileFormatStr();
     str += "+" + ByteOrderStr();
-    str += "+" + Isis::LabelAttachmentName (p_labelAttachment);
+    str += "+" + Isis::LabelAttachmentName(p_labelAttachment);
   }
 
 
   void CubeAttributeOutput::Write(Isis::Pvl &pvl) const {
     Isis::PvlGroup outatt("OutputCubeAttributes");
 
-    if (p_pixelTypeDef != "PROPAGATE") {
+    if(p_pixelTypeDef != "PROPAGATE") {
       outatt += Isis::PvlKeyword("Type", PixelTypeName(p_pixelType));
     }
     outatt += Isis::PvlKeyword("Format",  FileFormatStr());
-    if (p_pixelType != Isis::Real) {
+    if(p_pixelType != Isis::Real) {
       outatt += Isis::PvlKeyword("Minimum", p_minimum);
       outatt += Isis::PvlKeyword("Maximum", p_maximum);
     }
@@ -353,13 +353,13 @@ namespace Isis {
   }
 
 
-  void CubeAttributeOutput::Parse (const std::string &att) {
+  void CubeAttributeOutput::Parse(const std::string &att) {
 
     Isis::iString str(att);
 
     // Strip off the leading "+" and put the attributes in a temporary
     std::string::size_type pos = str.find('+');
-    if (pos != std::string::npos) {
+    if(pos != std::string::npos) {
       str = str.substr(pos);
     }
     else {
@@ -371,19 +371,19 @@ namespace Isis {
     str.Compress();
     str.Remove(" ");
     str.UpCase();
-    str.TrimHead ("+");
+    str.TrimHead("+");
 
     // Look at each "+" separate attribute
     Isis::iString tok;
-    while ((tok = str.Token("+")).length() > 0) {
+    while((tok = str.Token("+")).length() > 0) {
 
       // If there is a ":" in this token then it is assumed to be a min:max
-      if (tok.find(":") != std::string::npos) {
+      if(tok.find(":") != std::string::npos) {
 
         // Pull out the minimum
         Isis::iString colonTok = tok;
         Isis::iString min = colonTok.Token(":");
-        if (min.length() > 0) {
+        if(min.length() > 0) {
           p_minimum = min.ToDouble();
         }
         else {
@@ -392,7 +392,7 @@ namespace Isis {
 
         // Pull out the maximum
         Isis::iString max = colonTok.Token(":");
-        if (max.length() > 0) {
+        if(max.length() > 0) {
           p_maximum = max.ToDouble();
         }
         else {
@@ -402,51 +402,51 @@ namespace Isis {
       }
 
       // Parse any pixel type attributes
-      else if (tok == "8BIT" || tok == "8-BIT" || tok == "UNSIGNEDBYTE") {
+      else if(tok == "8BIT" || tok == "8-BIT" || tok == "UNSIGNEDBYTE") {
         p_pixelType = Isis::UnsignedByte;
         p_pixelTypeDef = "SET";
       }
-      else if (tok == "16BIT" || tok == "16-BIT" || tok == "SIGNEDWORD") {
+      else if(tok == "16BIT" || tok == "16-BIT" || tok == "SIGNEDWORD") {
         p_pixelType = Isis::SignedWord;
         p_pixelTypeDef = "SET";
       }
-      else if (tok == "32BIT" || tok == "32-BIT" || tok == "REAL") {
+      else if(tok == "32BIT" || tok == "32-BIT" || tok == "REAL") {
         p_pixelType = Isis::Real;
         p_pixelTypeDef = "SET";
       }
-      else if (tok == "PROPAGATE") {
+      else if(tok == "PROPAGATE") {
         p_pixelType = Isis::None;
         p_pixelTypeDef = "PROPAGATE";
       }
 
       // Parse any file formats
-      else if (tok == "TILE") {
+      else if(tok == "TILE") {
         p_format = Isis::Tile;
       }
-      else if (tok == "BSQ" || tok == "BANDSEQUENTIAL") {
+      else if(tok == "BSQ" || tok == "BANDSEQUENTIAL") {
         p_format = Isis::Bsq;
       }
 
       // Parse any byte order
-      else if (tok == "LSB") {
+      else if(tok == "LSB") {
         p_order = Isis::Lsb;
       }
-      else if (tok == "MSB") {
+      else if(tok == "MSB") {
         p_order = Isis::Msb;
       }
 
       // Parse any label type
-      else if (tok == "ATTACHED") {
+      else if(tok == "ATTACHED") {
         p_labelAttachment = Isis::AttachedLabel;
       }
-      else if (tok == "DETACHED") {
+      else if(tok == "DETACHED") {
         p_labelAttachment = Isis::DetachedLabel;
       }
     }
   }
 
 
-  void CubeAttributeOutput::Initialize () {
+  void CubeAttributeOutput::Initialize() {
     p_pixelType = Isis::None;
     p_pixelTypeDef = "PROPAGATE";
     p_rangeType = Isis::PropagateRange;
@@ -455,7 +455,7 @@ namespace Isis {
     p_format = Isis::Tile;
 
     // The byte order default is dependant on the hardware
-    if (Isis::IsLsb()) {
+    if(Isis::IsLsb()) {
       p_order = Isis::Lsb;
     }
     else {
@@ -464,6 +464,6 @@ namespace Isis {
 
     // The type of label to produce is dependent on the preference file
     Isis::PvlGroup &cust = Isis::Preference::Preferences().FindGroup("CubeCustomization");
-    p_labelAttachment = Isis::LabelAttachmentEnumeration (cust["Format"]);
+    p_labelAttachment = Isis::LabelAttachmentEnumeration(cust["Format"]);
   }
 }

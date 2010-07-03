@@ -5,7 +5,7 @@
 #include <Table.h>
 #include <cmath>
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 Table *table;
@@ -54,19 +54,19 @@ void IsisMain() {
 void readTable(Isis::Buffer &outcube) {
   for(int record = startRecord; record < startRecord + numRecords; record ++) {
     for(int element = startElement; element < startElement + numElements; element ++) {
-      int index = (numElements * (record-1)) + (element - startElement);
+      int index = (numElements * (record - 1)) + (element - startElement);
 
-      if((*table)[record-1][field].IsReal()){
+      if((*table)[record-1][field].IsReal()) {
         std::vector<float> data = (*table)[record-1][field];
-        outcube[index] = data.at(element-1);
+        outcube[index] = data.at(element - 1);
       }
-      else if((*table)[record-1][field].IsInteger()){
+      else if((*table)[record-1][field].IsInteger()) {
         std::vector<int> data = (*table)[record-1][field];
-        outcube[index] = data.at(element-1);
+        outcube[index] = data.at(element - 1);
       }
-      else if((*table)[record-1][field].IsDouble()){
+      else if((*table)[record-1][field].IsDouble()) {
         std::vector<double> data = (*table)[record-1][field];
-        outcube[index] = data.at(element-1);
+        outcube[index] = data.at(element - 1);
       }
     }
   }

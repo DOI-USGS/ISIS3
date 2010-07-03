@@ -6,8 +6,7 @@
 using namespace std;
 using namespace Isis;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   cout << "-------------------------------------------------------" << endl;
@@ -44,7 +43,7 @@ int main(int argc, char *argv[])
 
   InfixToPostfix converter;
   for(int equation = 0; equation < NUM_EQUATIONS; equation ++) {
-    cout << endl << endl << equation+1 << ": Convert '" << equations[equation] << "' to postfix" << endl;
+    cout << endl << endl << equation + 1 << ": Convert '" << equations[equation] << "' to postfix" << endl;
 
     try {
       iString tokenized = converter.TokenizeEquation(equations[equation]);

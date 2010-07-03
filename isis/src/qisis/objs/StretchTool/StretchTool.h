@@ -11,12 +11,11 @@ class QLineEdit;
 class QRect;
 class QToolButton;
 
-namespace Isis
-{
+namespace Isis {
   class Cube;
   class Histogram;
   class Statistics;
-  class Stretch; 
+  class Stretch;
 }
 
 /**
@@ -41,8 +40,7 @@ namespace Isis
  *   http://www.usgs.gov/privacy.html.
  */
 
-namespace Qisis
-{
+namespace Qisis {
   class CubeViewport;
   class AdvancedStretchDialog;
   class ViewportBuffer;
@@ -71,8 +69,7 @@ namespace Qisis
    *    @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    *                                  - Fixed all include abuses
    */
-  class StretchTool : public Qisis::Tool
-  {
+  class StretchTool : public Qisis::Tool {
       Q_OBJECT
 
     public:
@@ -83,8 +80,7 @@ namespace Qisis
       /**
        * Enum to store the bands.
        */
-      enum StretchBand
-      {
+      enum StretchBand {
         Gray,  //!< Gray Band
         Red,   //!< Red Band
         Green, //!< Green Band
@@ -119,8 +115,7 @@ namespace Qisis
        *
        * @return Name of the Menu
        */
-      QString menuName() const
-      {
+      QString menuName() const {
         return "&View";
       };
       QAction *toolPadAction(ToolPad *pad);

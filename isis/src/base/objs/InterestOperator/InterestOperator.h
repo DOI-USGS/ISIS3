@@ -166,7 +166,7 @@ namespace Isis {
 
       //!< Find if a point is in the overlap
       const geos::geom::MultiPolygon *FindOverlap(Isis::ControlPoint &pCnetPoint);
-      
+
       //<! Find imageoverlaps by finding the intersection of image footprints
       const geos::geom::MultiPolygon *FindOverlapByImageFootPrint(Isis::ControlPoint &pCnetPoint);
 

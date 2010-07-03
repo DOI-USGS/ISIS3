@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <sys/un.h>   
+#include <sys/un.h>
 #include <fcntl.h>
 
 #include "QIsisApplication.h"
@@ -42,53 +42,53 @@
 void startMonitoringMemory();
 void stopMonitoringMemory();
 
-int main (int argc, char *argv[]) {
-  #ifdef CWDEBUG
-    startMonitoringMemory();
-  #endif
+int main(int argc, char *argv[]) {
+#ifdef CWDEBUG
+  startMonitoringMemory();
+#endif
 
   // Check to see if the user wants to force a new window
   int newWindow = -1;
-  for (int i=1; i<argc; i++) {
-    if (Isis::iString(argv[i]).UpCase() == "-NEW") {
+  for(int i = 1; i < argc; i++) {
+    if(Isis::iString(argv[i]).UpCase() == "-NEW") {
       newWindow = i;
     }
   }
 
-  if (newWindow < 0) {
-    std::string p_socketFile = "/tmp/isis_qview_" + Isis::Application::UserName(); 
+  if(newWindow < 0) {
+    std::string p_socketFile = "/tmp/isis_qview_" + Isis::Application::UserName();
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
-    strcpy(p_socketName.sun_path,p_socketFile.c_str());
+    strcpy(p_socketName.sun_path, p_socketFile.c_str());
     int p_socket;
-    
-    if (((Isis::Filename)p_socketFile).Exists()) {
+
+    if(((Isis::Filename)p_socketFile).Exists()) {
       // Create a socket
-      if ((p_socket = socket(PF_UNIX,SOCK_STREAM,0)) < 0) {
+      if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
         std::string msg = "Unable to create socket";
         std::cout << msg << std::endl;
         exit(0);
       }
 
       // Try to connect to the socket
-      if ((connect(p_socket,(struct sockaddr *)&p_socketName,
-                   sizeof(p_socketName))) >= 0) {
+      if((connect(p_socket, (struct sockaddr *)&p_socketName,
+                  sizeof(p_socketName))) >= 0) {
         std::string temp;
-        for (int i=1; i<argc; i++) {
+        for(int i = 1; i < argc; i++) {
           temp +=  Isis::Filename(argv[i]).Expanded() + " ";
         }
         temp += "raise ";
 
         // Try to send data to the socket
-        if (send (p_socket,temp.c_str(),temp.size(),0) < 0) {
+        if(send(p_socket, temp.c_str(), temp.size(), 0) < 0) {
           std::string msg = "Unable to write to socket";
           std::cout << msg << std::endl;
           exit(0);
         }
 
         exit(0);
-      } 
-   
+      }
+
       //If the file already exists but we can't connect to it, assume the socket
       //is no longer running & remove the tmp file...it falls out & create a new one
       else {
@@ -98,20 +98,19 @@ int main (int argc, char *argv[]) {
   }
 
   // Creates the qview application window
-  Qisis::QIsisApplication *app = new Qisis::QIsisApplication(argc,argv);
+  Qisis::QIsisApplication *app = new Qisis::QIsisApplication(argc, argv);
   QApplication::setApplicationName("qview");
 
   // check for forcing of gui style
-  Isis::PvlGroup & uiPref = Isis::Preference::Preferences().FindGroup(
-      "UserInterface");
-  if (uiPref.HasKeyword("GuiStyle"))
-  {
+  Isis::PvlGroup &uiPref = Isis::Preference::Preferences().FindGroup(
+                             "UserInterface");
+  if(uiPref.HasKeyword("GuiStyle")) {
     std::string style = uiPref["GuiStyle"];
     QApplication::setStyle((Isis::iString) style);
   }
 
   // Add the Qt plugin directory to the library path
-  Isis::Filename qtpluginpath ("$ISISROOT/3rdParty/plugins");
+  Isis::Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
   QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
 
   Qisis::ViewportMainWindow *vw = new Qisis::ViewportMainWindow("qview");
@@ -122,19 +121,19 @@ int main (int argc, char *argv[]) {
   Qisis::Tool *ftool = new Qisis::FileTool(vw);
   ftool->addTo(vw);
   vw->permanentToolBar()->addSeparator();
- 
+
   Qisis::Tool *btool = new Qisis::BandTool(vw);
   btool->addTo(vw);
- 
+
   Qisis::Tool *ztool = new Qisis::ZoomTool(vw);
   ztool->addTo(vw);
   ztool->activate(true);
   vw->getMenu("&View")->addSeparator();
- 
+
   Qisis::Tool *ptool = new Qisis::PanTool(vw);
   ptool->addTo(vw);
   vw->getMenu("&View")->addSeparator();
- 
+
   Qisis::Tool *stool = new Qisis::StretchTool(vw);
   stool->addTo(vw);
 
@@ -143,10 +142,10 @@ int main (int argc, char *argv[]) {
 
   Qisis::Tool *blinktool = new Qisis::BlinkTool(vw);
   blinktool->addTo(vw);
- 
+
   Qisis::Tool *attool = new Qisis::AdvancedTrackTool(vw);
   attool->addTo(vw);
- 
+
   Qisis::Tool *edittool = new Qisis::EditTool(vw);
   edittool->addTo(vw);
 
@@ -173,20 +172,20 @@ int main (int argc, char *argv[]) {
 
   // Show the application window & open the cubes
   vw->show();
-  for (int i=1; i<argc; i++) {
-    if (i != newWindow) {
+  for(int i = 1; i < argc; i++) {
+    if(i != newWindow) {
       vw->workspace()->addCubeViewport(QString(argv[i]));
     }
   }
 
-  Qisis::SocketThread *temp = NULL; 
+  Qisis::SocketThread *temp = NULL;
 //  Doesn't yet work on Mac OS X 10.4 (Tiger) systems for some reason.
 #if !defined(__APPLE__)
   // We don't want to start a thread if the user is forcing a new window
-  if (newWindow < 0) {
+  if(newWindow < 0) {
     temp = new Qisis::SocketThread();
     temp->connect(temp, SIGNAL(newImage(const QString &)),
-              vw->workspace(), SLOT(addCubeViewport(const QString &)));
+                  vw->workspace(), SLOT(addCubeViewport(const QString &)));
     temp->connect(temp, SIGNAL(focusApp()), vw, SLOT(raise()));
     temp->start();
   }
@@ -238,12 +237,12 @@ void startMonitoringMemory() {
 #ifndef NOMEMCHECK
   MyMutex *mutex = new MyMutex();
   std::fstream *alloc_output = new std::fstream("/dev/null");
-  Debug( make_all_allocations_invisible_except(NULL) );
-  ForAllDebugChannels( if (debugChannel.is_on()) debugChannel.off() );
-  Debug( dc::malloc.on() );
-  Debug( libcw_do.on() );
-  Debug( libcw_do.set_ostream(alloc_output) );
-  Debug( libcw_do.set_ostream(alloc_output, mutex) );
+  Debug(make_all_allocations_invisible_except(NULL));
+  ForAllDebugChannels(if(debugChannel.is_on()) debugChannel.off());
+  Debug(dc::malloc.on());
+  Debug(libcw_do.on());
+  Debug(libcw_do.set_ostream(alloc_output));
+  Debug(libcw_do.set_ostream(alloc_output, mutex));
   atexit(stopMonitoringMemory);
 #endif
 #endif

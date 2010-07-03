@@ -6,7 +6,7 @@
 #include "Filename.h"
 
 namespace Qisis {
-   /**
+  /**
   * @brief Base class for the Qisis main windows
   *
   * @ingroup Visualization Tools
@@ -14,12 +14,12 @@ namespace Qisis {
   * @author Stacy Alley
   *
   */
- 
+
 
   class MainWindow : public QMainWindow {
-    Q_OBJECT
+      Q_OBJECT
     public:
-      MainWindow (QString title, QWidget *parent=0, Qt::WFlags flags=0);
+      MainWindow(QString title, QWidget *parent = 0, Qt::WFlags flags = 0);
       virtual ~MainWindow();
       virtual void closeEvent(QCloseEvent *event);
 
@@ -28,7 +28,7 @@ namespace Qisis {
       virtual void writeSettings();
 
     protected:
-      virtual bool eventFilter(QObject *o,QEvent *e);
+      virtual bool eventFilter(QObject *o, QEvent *e);
 
     private:
       std::string p_appName; //!< Application name.

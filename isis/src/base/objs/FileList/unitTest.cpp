@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int main (void) {
+int main(void) {
   Isis::Preference::Preferences(true);
   cout << "Testing on unitTest.list:" << endl;
   Isis::FileList fl2("unitTest.list");
@@ -14,7 +14,7 @@ int main (void) {
   try {
     Isis::FileList fl2("NoWayThisFileExists");
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
 //    e.Report(false);
     cerr << "Unable to open the file" << endl;
   }

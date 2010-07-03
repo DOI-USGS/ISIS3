@@ -1,9 +1,9 @@
 #include <vector>
 #include "PvlKeyword.h"
-#include "PvlSequence.h" 
+#include "PvlSequence.h"
 #include "Preference.h"
 
-int main (void) {
+int main(void) {
   Isis::Preference::Preferences(true);
 
   Isis::PvlKeyword key("Key");
@@ -35,8 +35,8 @@ int main (void) {
   seq += dlist;
 
   std::cout << seq.Size() << std::endl;
-  for (int i=0; i<seq.Size(); i++) {
-    for (int j=0; j<(int)seq[i].size(); j++) {
+  for(int i = 0; i < seq.Size(); i++) {
+    for(int j = 0; j < (int)seq[i].size(); j++) {
       std::cout << seq[i][j] << " ";
     }
     std::cout << std::endl;

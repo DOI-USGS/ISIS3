@@ -1,25 +1,25 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.5 $                                                             
- * $Date: 2010/06/07 22:42:38 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+/**
+ * @file
+ * $Revision: 1.5 $
+ * $Date: 2010/06/07 22:42:38 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 #ifndef CameraPointInfo_h
 #define CameraPointInfo_h
 
@@ -33,16 +33,16 @@ namespace Isis {
 
 
   /**
-   * @brief CameraPointInfo provides quick access to the majority of 
+   * @brief CameraPointInfo provides quick access to the majority of
    *        information avaliable from a camera on a point.
-   *  
-   * CameraPointInfo provides the functionality which was a part of 
-   * campt in class form. This functionality is access to the 
-   * majoirty of information avaliable on any given point on an 
+   *
+   * CameraPointInfo provides the functionality which was a part of
+   * campt in class form. This functionality is access to the
+   * majoirty of information avaliable on any given point on an
    * image. The main difference is the use of a CubeManager within
-   * CameraPointInfo for effeciency when working with control nets and 
-   * the opening of cubes several times. 
-   * 
+   * CameraPointInfo for effeciency when working with control nets and
+   * the opening of cubes several times.
+   *
    * @author 2009-08-25 Mackenzie Boyd
    *
    * @internal
@@ -53,7 +53,7 @@ namespace Isis {
    *                                        currentCube isn't NULL.
    *   @history 2010-03-25 MNB - Modified longitude output to have
    *                             Positive East and West, 360 and 180
-   *                             longitudes. 
+   *                             longitudes.
    *   @history 2010-05-25 MNB - Many changes, primary changes had
    *                             to do with how errors are
    *                             handled. Depending on the options
@@ -87,23 +87,23 @@ namespace Isis {
       CameraPointInfo();
       virtual ~CameraPointInfo();
 
-      void SetCube(const std::string & cubeFilename);
-      PvlGroup * SetImage(const double sample, const double line,
+      void SetCube(const std::string &cubeFilename);
+      PvlGroup *SetImage(const double sample, const double line,
+                         const bool outside = false, const bool error = false);
+      PvlGroup *SetCenter(const bool outside = false, const bool error = false);
+      PvlGroup *SetSample(const double sample, const bool outside = false,
+                          const bool error = false);
+      PvlGroup *SetLine(const double line, const bool outside = false,
+                        const bool error = false);
+      PvlGroup *SetGround(const double latitude, const double longitude,
                           const bool outside = false, const bool error = false);
-      PvlGroup * SetCenter(const bool outside = false, const bool error = false);
-      PvlGroup * SetSample(const double sample, const bool outside = false,
-                           const bool error = false);
-      PvlGroup * SetLine(const double line, const bool outside = false,
-                         const bool error = false);
-      PvlGroup * SetGround(const double latitude, const double longitude,
-                           const bool outside = false, const bool error = false);
 
     private:
       bool CheckCube();
-      PvlGroup * GetPointInfo(bool passed, bool outside, bool errors);
-      CubeManager * usedCubes;
-      Cube * currentCube;
-      Camera * camera;
+      PvlGroup *GetPointInfo(bool passed, bool outside, bool errors);
+      CubeManager *usedCubes;
+      Cube *currentCube;
+      Camera *camera;
   };
 };
 

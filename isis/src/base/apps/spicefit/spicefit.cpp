@@ -13,23 +13,23 @@ void IsisMain() {
   try {
     // Open the cube
     Cube cube;
-    cube.Open(ui.GetFilename("FROM"),"rw");
+    cube.Open(ui.GetFilename("FROM"), "rw");
 
     //check for existing polygon, if exists delete it
-    if (cube.Label()->HasObject("Polygon")){
+    if(cube.Label()->HasObject("Polygon")) {
       cube.Label()->DeleteObject("Polygon");
     }
 
     // Get the camera, interpolate to a parabola
     Camera *cam = cube.Camera();
-    if (cam->DetectorMap()->LineRate() == 0.0) {
+    if(cam->DetectorMap()->LineRate() == 0.0) {
       string msg = "[" + ui.GetFilename("FROM") + "] is not a line scan camera";
-      throw iException::Message(Isis::iException::User,msg,_FILEINFO_);
+      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
     cam->InstrumentRotation()->SetPolynomial();
 
     // Get the instrument pointing keyword from the kernels group and update its value to table.
-    Isis::PvlGroup kernels = cube.Label()->FindGroup("Kernels",Isis::Pvl::Traverse);
+    Isis::PvlGroup kernels = cube.Label()->FindGroup("Kernels", Isis::Pvl::Traverse);
 
     // Write out the "Table" label to the tabled kernels in the kernels group
     kernels["InstrumentPointing"] = "Table";
@@ -41,8 +41,8 @@ void IsisMain() {
     cube.Write(cmatrix);
     cube.Close();
   }
-  catch (iException &e) {
+  catch(iException &e) {
     string msg = "Unable to fit pointing for [" + ui.GetFilename("FROM") + "]";
-    throw iException::Message(Isis::iException::User,msg,_FILEINFO_);
+    throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 }

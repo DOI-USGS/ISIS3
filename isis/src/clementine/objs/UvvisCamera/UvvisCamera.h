@@ -3,15 +3,15 @@
 
 #include "FramingCamera.h"
 
-namespace Clementine { 
-  /**                                                                       
+namespace Clementine {
+  /**
    * @brief Camera class
    *
    * This is the camera class for the UvvisCamera
    *
    * @ingroup Clementine
    *
-   * @author  2007-07-10 Tracie Sucharski 
+   * @author  2007-07-10 Tracie Sucharski
    *
    * @internal
    *   @history 2007-07-10 Steven Lambright - Imported to Isis 3
@@ -22,11 +22,11 @@ namespace Clementine {
    *            CreateCache(...).
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
    *            inherit directly from Camera
-   */ 
+   */
   class UvvisCamera : public Isis::FramingCamera {
     public:
-      UvvisCamera (Isis::Pvl &lab);
-      ~UvvisCamera () {};      
+      UvvisCamera(Isis::Pvl &lab);
+      ~UvvisCamera() {};
   };
 };
 #endif

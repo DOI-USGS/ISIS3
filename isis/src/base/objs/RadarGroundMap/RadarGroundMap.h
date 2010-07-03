@@ -30,13 +30,13 @@
 namespace Isis {
 
 #ifndef RADAR_LOOK_DIR
-namespace Radar {
-  enum LookDirection { Left, Right };
-}
+  namespace Radar {
+    enum LookDirection { Left, Right };
+  }
 #define RADAR_LOOK_DIR
 #endif
 
-  /** Convert between undistorted focal plane coordinate (slant range) 
+  /** Convert between undistorted focal plane coordinate (slant range)
    *  and ground coordinates
    *
    * This class is used to convert between undistorted focal plane
@@ -66,9 +66,9 @@ namespace Radar {
    *                      plane coordinate falls. This fixed the mirror image
    *                      problem that occurred when projecting the image.
    *  @history 2009-12-14 Debbie A. Cook - Added ComputeXY method
-   *  @history 2010-03-19 Debbe A. Cook - added class members p_wavelength, p_lookB, 
-   *            p_sB, p_slantRange, and p_dopplerFreq; and methods SlantRangeSigma, 
-   *            WaveLength, DopplerSigma, SetSlantRangeSigma, GetXY, 
+   *  @history 2010-03-19 Debbe A. Cook - added class members p_wavelength, p_lookB,
+   *            p_sB, p_slantRange, and p_dopplerFreq; and methods SlantRangeSigma,
+   *            WaveLength, DopplerSigma, SetSlantRangeSigma, GetXY,
    *            GetXYdPosition, and GetXYdPoint.  Removed method SetWeightFactors.
    *
    */
@@ -87,24 +87,34 @@ namespace Radar {
       virtual bool GetXY(const double lat, const double lon, const double radius,
                          double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
-                         double *cudx, double *cudy);
+                                   double *cudx, double *cudy);
       virtual bool GetdXYdPoint(double lat, double lon, double radius, PartialType wrt,
-                                  double *dx, double *dy);
+                                double *dx, double *dy);
 
       //!Set the range sigma
-      void SetRangeSigma( double rangeSigma ) { p_rangeSigma = rangeSigma; };
+      void SetRangeSigma(double rangeSigma) {
+        p_rangeSigma = rangeSigma;
+      };
 
       //! Return the range sigma
-      double RangeSigma() { return p_rangeSigma; };
+      double RangeSigma() {
+        return p_rangeSigma;
+      };
 
       //! Set the doppler sigma
-      void SetDopplerSigma( double dopplerSigma ) { p_dopplerSigma = dopplerSigma; };
+      void SetDopplerSigma(double dopplerSigma) {
+        p_dopplerSigma = dopplerSigma;
+      };
 
       //! Return the doppler sigma
-      double YScale() { return p_dopplerSigma; };
+      double YScale() {
+        return p_dopplerSigma;
+      };
 
       //! Return the wavelength
-      double WaveLength() { return p_waveLength; };
+      double WaveLength() {
+        return p_waveLength;
+      };
 
     private:
       double ComputeXv(SpiceDouble X[3]);

@@ -24,15 +24,15 @@
  */
 
 namespace Isis {
-/**
- * @brief Class for checking for errors in the NAIF library
- *
- * The Naif Status class looks for errors that have occurred in NAIF calls. If 
- * an error has occurred, it will be converted to an iException.
- * 
- * @author 2008-06-13 Steven Lambright
- *
- */
+  /**
+   * @brief Class for checking for errors in the NAIF library
+   *
+   * The Naif Status class looks for errors that have occurred in NAIF calls. If
+   * an error has occurred, it will be converted to an iException.
+   *
+   * @author 2008-06-13 Steven Lambright
+   *
+   */
   class NaifStatus {
     public:
       static void CheckErrors(bool resetNaif = true);

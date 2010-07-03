@@ -1,5 +1,5 @@
 /**
- * @file  
+ * @file
  * This class describes a non-radial distortion map. The distortion
  * map is a third-order Taylor series expansion of a generic function.
  *
@@ -28,7 +28,7 @@ namespace Isis {
    *
    * @internal
    */
-    class TaylorCameraDistortionMap : public CameraDistortionMap {
+  class TaylorCameraDistortionMap : public CameraDistortionMap {
     public:
       TaylorCameraDistortionMap(Camera *parent, double zDirection = 1.0);
 
@@ -45,8 +45,8 @@ namespace Isis {
       std::vector<double> p_odtx; //!< distortion x coefficients
       std::vector<double> p_odty; //!< distortion y coefficients
 
-      void DistortionFunction(double ux, double uy, double* dx, double* dy);
-      void DistortionFunctionJacobian(double x, double y, double* Jxx, double* Jxy, double* Jyx, double* Jyy);
+      void DistortionFunction(double ux, double uy, double *dx, double *dy);
+      void DistortionFunctionJacobian(double x, double y, double *Jxx, double *Jxy, double *Jyx, double *Jyy);
   };
 };
 

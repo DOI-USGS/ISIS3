@@ -29,7 +29,7 @@ namespace Isis {
    *
    * @param lab Pvl label used to create the parent Camera object
    */
-  LineScanCamera::LineScanCamera (Isis::Pvl &lab) : Camera (lab) {
+  LineScanCamera::LineScanCamera(Isis::Pvl &lab) : Camera(lab) {
   }
 };
 

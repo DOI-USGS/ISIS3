@@ -20,8 +20,8 @@ namespace Isis {
      * @throws Isis::iException::User - The image does not appear to be a Lunar
      *             Reconaissance Orbiter Wide Angle Camera image
      */
-    LroWideAngleCamera::LroWideAngleCamera ( Isis::Pvl &lab ) :
-    Isis::PushFrameCamera(lab) {
+    LroWideAngleCamera::LroWideAngleCamera(Isis::Pvl &lab) :
+      Isis::PushFrameCamera(lab) {
       // Set up the camera characteristics
       InstrumentRotation()->SetFrame(-85620);
       SetFocalLength();
@@ -34,7 +34,7 @@ namespace Isis {
       scs2e_c(NaifSclkCode(), stime.c_str(), &et);
 
       p_exposureDur = inst["ExposureDuration"];
-      // TODO:  Changed et - exposure to et + exposure.  
+      // TODO:  Changed et - exposure to et + exposure.
       //   Think about if this is correct
       p_etStart = et + ((p_exposureDur / 1000.0) / 2.0);
 
@@ -44,17 +44,17 @@ namespace Isis {
       int frameletSize = 14;
       int sumMode = 1;
 
-      if( instId == "WAC-UV" ) {
+      if(instId == "WAC-UV") {
         sumMode = 4;
         frameletSize = 16;
       }
-      else if( instId == "WAC-VIS" ) {
+      else if(instId == "WAC-VIS") {
         sumMode = 1;
         frameletSize = 14;
       }
       else {
-        string msg = "Invalid value [" + instId 
-            + "] for keyword [InstrumentId]";
+        string msg = "Invalid value [" + instId
+                     + "] for keyword [InstrumentId]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
@@ -65,9 +65,9 @@ namespace Isis {
       const PvlGroup &bandBin = lab.FindGroup("BandBin", Isis::Pvl::Traverse);
       const PvlKeyword &filtNames = bandBin["Center"];
       // Sanity check
-      if( nbands != filtNames.Size() ) {
+      if(nbands != filtNames.Size()) {
         ostringstream mess;
-        mess << "Number bands in (file) label (" << nbands 
+        mess << "Number bands in (file) label (" << nbands
              << ") do not match number of values in BandBin/Center keyword ("
              << filtNames.Size() << ") - required for band-dependant geoemtry";
         throw iException::Message(iException::User, mess.str(), _FILEINFO_);
@@ -97,79 +97,79 @@ namespace Isis {
 
       int frameletOffsetFactor = inst["ColorOffset"];
 
-      if( inst["DataFlipped"][0].UpCase() == "YES" )
+      if(inst["DataFlipped"][0].UpCase() == "YES")
         frameletOffsetFactor *= -1;
 
       std::map<int, int> filterToFrameletOffset;
       // the UV order is based on position in the cube
       filterToFrameletOffset.insert(
-        std::pair<int, int>(321, 0 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(321, 0 * frameletOffsetFactor)
+      );
       filterToFrameletOffset.insert(
-        std::pair<int, int>(315, 0 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(315, 0 * frameletOffsetFactor)
+      );
 
       filterToFrameletOffset.insert(
-        std::pair<int, int>(360, 1 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(360, 1 * frameletOffsetFactor)
+      );
 
       filterToFrameletOffset.insert(
-        std::pair<int, int>(415, 0 * frameletOffsetFactor ));
+        std::pair<int, int>(415, 0 * frameletOffsetFactor));
 
       filterToFrameletOffset.insert(
-        std::pair<int, int>(566, 1 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(566, 1 * frameletOffsetFactor)
+      );
       filterToFrameletOffset.insert(
-        std::pair<int, int>(565, 1 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(565, 1 * frameletOffsetFactor)
+      );
 
       filterToFrameletOffset.insert(
-        std::pair<int, int>(604, 2 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(604, 2 * frameletOffsetFactor)
+      );
       filterToFrameletOffset.insert(
-        std::pair<int, int>(600, 2 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(600, 2 * frameletOffsetFactor)
+      );
 
       filterToFrameletOffset.insert(
-        std::pair<int, int>(643, 3 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(643, 3 * frameletOffsetFactor)
+      );
       filterToFrameletOffset.insert(
-        std::pair<int, int>(640, 3 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(640, 3 * frameletOffsetFactor)
+      );
 
       filterToFrameletOffset.insert(
-        std::pair<int, int>(689, 4 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(689, 4 * frameletOffsetFactor)
+      );
       filterToFrameletOffset.insert(
-        std::pair<int, int>(680, 4 * frameletOffsetFactor )
-        );
+        std::pair<int, int>(680, 4 * frameletOffsetFactor)
+      );
 
-      for( int i = 0; i < filtNames.Size(); i++ ) {
-        if( filterToDetectorOffset.find((int) filtNames[i]) == 
-            filterToDetectorOffset.end() ) {
+      for(int i = 0; i < filtNames.Size(); i++) {
+        if(filterToDetectorOffset.find((int) filtNames[i]) ==
+            filterToDetectorOffset.end()) {
           string msg = "Unrecognized filter name [" + filtNames[i] + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
 
         p_detectorStartLines.push_back(
           filterToDetectorOffset.find(filtNames[i])->second
-          );
+        );
         p_frameletOffsets.push_back(
           filterToFrameletOffset.find(filtNames[i])->second
-          );
+        );
       }
 
       // Setup detector map
       double frameletRate = (double) inst["InterframeDelay"] / 1000.0;
-      PushFrameCameraDetectorMap *dmap = new PushFrameCameraDetectorMap(this, 
-                                         p_etStart, frameletRate, frameletSize);
+      PushFrameCameraDetectorMap *dmap = new PushFrameCameraDetectorMap(this,
+          p_etStart, frameletRate, frameletSize);
       dmap->SetDetectorSampleSumming(sumMode);
       dmap->SetDetectorLineSumming(sumMode);
 
       bool flippedFramelets = false;
 
       // flipping disabled
-      if( iString((string) inst["DataFlipped"]).UpCase() == "YES" )
+      if(iString((string) inst["DataFlipped"]).UpCase() == "YES")
         flippedFramelets = true;
 
       dmap->SetFlippedFramelets(flippedFramelets, p_nframelets);
@@ -190,7 +190,7 @@ namespace Isis {
       ikernKey = "INS" + iString((int) NaifIkCode()) + "_BORESIGHT_LINE";
       double lineBoreSight = GetDouble(ikernKey);
 
-      if( instId == "WAC-UV" ) {
+      if(instId == "WAC-UV") {
         /**
          * The detector origin sample is from
          *   LRO Wide Angle Geometric Calibration
@@ -205,9 +205,9 @@ namespace Isis {
       }
       else {
         iString instModeId;
-        instModeId = ((iString) (string) inst["InstrumentModeId"]).UpCase();
+        instModeId = ((iString)(string) inst["InstrumentModeId"]).UpCase();
 
-        if( instModeId == "COLOR" || instModeId == "VIS" ) {
+        if(instModeId == "COLOR" || instModeId == "VIS") {
           /**
            * The detector origin sample is from
            *   LRO Wide Angle Geometric Calibration
@@ -220,9 +220,9 @@ namespace Isis {
           detectorOriginSamp = sampleBoreSight - 8 - 160;
           detectorOriginLine = lineBoreSight;
         }
-        else if( instModeId == "BW" ) {
+        else if(instModeId == "BW") {
 
-          iString mode = ((iString) (string) inst["Mode"]).UpCase();
+          iString mode = ((iString)(string) inst["Mode"]).UpCase();
 
           /**
            * The detector origin sample is from
@@ -233,7 +233,7 @@ namespace Isis {
            */
 
           // Mode 0 and 1 are not Polar (i.e. they are only 704 pixels wide)
-          if( mode == "0" || mode == "1" ) {
+          if(mode == "0" || mode == "1") {
             // The 160 other ignored pixels off the left side of the detector
             //   which are not in the image. These numbers added to compensate
             //   for the non-polar mode.
@@ -241,7 +241,7 @@ namespace Isis {
             detectorOriginLine = lineBoreSight;
           }
           // Mode 2 and 3 are Polar (i.e. they are 1024 pixels wide)
-          else if( mode == "2" || mode == "3" ) {
+          else if(mode == "2" || mode == "3") {
             detectorOriginSamp = sampleBoreSight - 8;
             detectorOriginLine = lineBoreSight;
           }
@@ -255,28 +255,28 @@ namespace Isis {
           p_frameletOffsets[0] = 0;
         }
         else {
-          string msg = "Invalid value [" + instModeId + 
-            "] for keyword [InstrumentModeId]";
+          string msg = "Invalid value [" + instModeId +
+                       "] for keyword [InstrumentModeId]";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
       }
 
-      FocalPlaneMap()->SetDetectorOrigin(detectorOriginSamp, 
+      FocalPlaneMap()->SetDetectorOrigin(detectorOriginSamp,
                                          detectorOriginLine);
 
       // Setup distortion map
       new LroWideAngleCameraDistortionMap(this, NaifIkCode());
 
       // Setup the ground and sky map
-      bool evenFramelets = (iString((string) inst["Framelets"][0]).UpCase() 
-                              == "EVEN");
+      bool evenFramelets = (iString((string) inst["Framelets"][0]).UpCase()
+                            == "EVEN");
 
       new PushFrameCameraGroundMap(this, evenFramelets);
 
       new CameraSkyMap(this);
       LoadCache();
 
-      if( instId == "WAC-UV" ) {
+      if(instId == "WAC-UV") {
         // geometric tiling is not worth trying for 4-line framelets
         SetGeometricTilingHint(2, 2);
       }
@@ -290,14 +290,14 @@ namespace Isis {
      *
      * @param vband The band number to set
      */
-    void LroWideAngleCamera::SetBand ( const int vband ) {
+    void LroWideAngleCamera::SetBand(const int vband) {
 
       // Sanity check on requested band
       int maxbands = min(p_detectorStartLines.size(), p_frameletOffsets.size());
-      if( (vband <= 0) || (vband > maxbands) ) {
+      if((vband <= 0) || (vband > maxbands)) {
         ostringstream mess;
-        mess << "Requested virtual band (" << vband 
-             << ") outside valid (BandBin/Center) limits (1 - " << maxbands 
+        mess << "Requested virtual band (" << vband
+             << ") outside valid (BandBin/Center) limits (1 - " << maxbands
              <<  ")";
         throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
       }
@@ -313,6 +313,6 @@ namespace Isis {
 }
 
 // Plugin
-extern "C" Isis::Camera *LroWideAngleCameraPlugin ( Isis::Pvl &lab ) {
+extern "C" Isis::Camera *LroWideAngleCameraPlugin(Isis::Pvl &lab) {
   return new Isis::Lro::LroWideAngleCamera(lab);
 }

@@ -38,11 +38,11 @@ namespace Isis {
    * @return conversion successful
    */
   bool PushFrameCameraDetectorMap::SetDetector(const double sample,
-                                               const double line) {
+      const double line) {
     // Sometime folks want to write the framelets flipped in the EDR so
     // features match.  Take care of this.
     double unsummedFrameletLine;
-    if (p_flippedFramelets) {
+    if(p_flippedFramelets) {
       unsummedFrameletLine = p_bandStartDetector + p_frameletHeight - line;
     }
     else {
@@ -53,7 +53,7 @@ namespace Isis {
 
     // Convert framelet sample/line to summed framelet sample/line,
     // parent sample will be computed correctly
-    if (!CameraDetectorMap::SetDetector(unsummedFrameletSample,unsummedFrameletLine)) {
+    if(!CameraDetectorMap::SetDetector(unsummedFrameletSample, unsummedFrameletLine)) {
       return false;
     }
 
@@ -84,7 +84,7 @@ namespace Isis {
   /** Compute detector position from a parent image coordinate
    *
    * This method will compute the detector position and framelet position
-   * from the parent line/sample coordinate. The parent line will be used 
+   * from the parent line/sample coordinate. The parent line will be used
    * to set the appropriate time in the parent camera.
    *
    * @param sample Sample number in the parent image
@@ -93,7 +93,7 @@ namespace Isis {
    * @return conversion successful
    */
   bool PushFrameCameraDetectorMap::SetParent(const double sample,
-                                             const double line) {
+      const double line) {
     // Compute the height of a framelet taking into account the summing mode
     int actualFrameletHeight = (int)(p_frameletHeight / LineScaleFactor());
 
@@ -109,14 +109,14 @@ namespace Isis {
     p_frameletSample = sample;
 
     // Convert the framelet line/sample to an unsummed framelet line/sample
-    if (!CameraDetectorMap::SetParent(p_frameletSample, p_frameletLine)) return false;
+    if(!CameraDetectorMap::SetParent(p_frameletSample, p_frameletLine)) return false;
     double unsummedFrameletLine = p_detectorLine;
 
     // Sometime folks want to write the framelets flipped in the EDR so
     // features match.  Take care of this. p_bandStartDetector is 0-based and
-    // unsummedFrameletLine is the correct base for p_detectorLine so these calculations 
+    // unsummedFrameletLine is the correct base for p_detectorLine so these calculations
     // are valid.
-    if (p_flippedFramelets) {
+    if(p_flippedFramelets) {
       p_detectorLine = p_bandStartDetector + p_frameletHeight - unsummedFrameletLine;
     }
     else {
@@ -145,7 +145,7 @@ namespace Isis {
     double etTime = 0.0;
 
     // Use this information to compute the time of the framelet
-    if (p_timeAscendingFramelets) {
+    if(p_timeAscendingFramelets) {
       etTime = p_etStart + (adjustedFramelet - 1) * p_frameletRate;
     }
     else {

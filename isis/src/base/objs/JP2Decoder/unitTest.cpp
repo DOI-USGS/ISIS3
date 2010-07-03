@@ -3,11 +3,11 @@
 
 using namespace std;
 
-int main(){
+int main() {
   Isis::Preference::Preferences(true);
 
-  cout << "Testing Isis::JP2Decoder ..." <<endl;
-  cout << "Test deferred to the appTest for std2isis" <<endl;
+  cout << "Testing Isis::JP2Decoder ..." << endl;
+  cout << "Test deferred to the appTest for std2isis" << endl;
 
   return (0);
 }

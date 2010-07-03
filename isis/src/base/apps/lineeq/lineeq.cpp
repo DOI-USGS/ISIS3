@@ -23,8 +23,8 @@ void IsisMain() {
   lineAverages.resize(icube->Bands());
 
   for(int i = 0; i < icube->Bands(); i++) {
-	cubeAverage[i] = 0;
-	lineAverages[i] = NULL;
+    cubeAverage[i] = 0;
+    lineAverages[i] = NULL;
   }
 
   int boxcarSize;
@@ -71,7 +71,7 @@ void IsisMain() {
   QuickFilter filter(icube->Lines(), boxcarSize, 1);
 
   if(icube->Lines() <= numIgnoredLines) {
-	throw iException::Message(iException::User, "Image does not contain any valid data.", _FILEINFO_);
+    throw iException::Message(iException::User, "Image does not contain any valid data.", _FILEINFO_);
   }
 
   for(int band = 0; band < icube->Bands(); band ++) {
@@ -81,7 +81,7 @@ void IsisMain() {
     for(int line = 0; line < icube->Lines(); line ++) {
       p.Progress()->CheckStatus();
 
-	  double filteredLine = filter.Average(line);
+      double filteredLine = filter.Average(line);
 
       if(csvOutput != NULL) {
         csvOutput->PutLine((iString)lineAverages[band][line] + (iString)"," + (iString)filteredLine);
@@ -123,7 +123,7 @@ void gatherAverages(Buffer &in) {
     cubeAverage[in.Band() - 1] += average;
   }
   else {
-	numIgnoredLines ++;
+    numIgnoredLines ++;
   }
 }
 

@@ -21,15 +21,15 @@ namespace Isis {
 
 namespace Qisis {
   class MdiCubeViewport;
-  
+
   /**
   * @brief Tool for measuring distances
   *
   * @ingroup Visualization Tools
   *
   * @author Unknown
-  *  
-  * @internal 
+  *
+  * @internal
   *   @history 2007-11-19 Stacy Alley
   *                       added the capability of the qisis
   *                       windows to remember size and location
@@ -51,10 +51,10 @@ namespace Qisis {
   *            CubeViewport.  Fixed some include issues (some still remain!)
   */
   class MeasureTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      MeasureTool (QWidget *parent);
+      MeasureTool(QWidget *parent);
       void addTo(QMenu *menu);
 
     protected slots:
@@ -64,22 +64,24 @@ namespace Qisis {
 
     protected:
       //! Returns the menu name.
-      QString menuName() const { return "&Options"; };
-      QWidget *createToolBarWidget (QStackedWidget *parent);
+      QString menuName() const {
+        return "&Options";
+      };
+      QWidget *createToolBarWidget(QStackedWidget *parent);
       QAction *toolPadAction(ToolPad *pad);
       void updateTool();
       void removeConnections(MdiCubeViewport *cvp);
       void enableRubberBandTool();
-      
+
     private slots:
-      
+
       void updateUnitsCombo();
       void updateDistEdit();
 
     private:
       QAction *p_action;          //!< Measure tool's action
       QLineEdit *p_distLineEdit;  //!< Distance line edit
-      QComboBox *p_unitsComboBox; //!< Units selection      
+      QComboBox *p_unitsComboBox; //!< Units selection
       int miComboUnit;            // Store the previous unit chosen
 
       void updateDist(MdiCubeViewport *cvp, int row);
@@ -121,7 +123,7 @@ namespace Qisis {
         StartLineIndex,//!< Starting line index
         EndSampIndex,//!< Ending sample index
         EndLineIndex,//!< Ending line index
-        DistanceKmIndex,//!< Distance in kilometers index 
+        DistanceKmIndex,//!< Distance in kilometers index
         DistanceMIndex,//!< Distance in meters index
         DistancePixIndex,//!< Distance in pixels index
         AngleDegIndex,//!< Angle in degrees index

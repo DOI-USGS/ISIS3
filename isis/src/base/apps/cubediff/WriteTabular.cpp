@@ -37,7 +37,7 @@ namespace Isis {
    * Constructor
    * @param filename The name of the file where the table will be written
    */
-  WriteTabular::WriteTabular( std::ostream &strm ) : p_outfile (strm) {
+  WriteTabular::WriteTabular(std::ostream &strm) : p_outfile(strm) {
     p_rows = 0;
     p_delimiter = ",";
     p_curCol = 0;
@@ -49,48 +49,48 @@ namespace Isis {
    *                 formatted
    * @param cols The Column headers, containing information about the Columns
    */
-  WriteTabular::WriteTabular( std::ostream &strm, std::vector<Column> cols) : p_outfile(strm) {
+  WriteTabular::WriteTabular(std::ostream &strm, std::vector<Column> cols) : p_outfile(strm) {
     p_rows = 0;
     p_delimiter = ",";
     p_curCol = 0;
-    SetColumns (cols);
+    SetColumns(cols);
   }
 
   /**
    * Sets the vector of Columns and writes out the first row of the file.
-   * 
+   *
    * @param cols A vector of Columns, setting the format of the table
    */
-  void WriteTabular::SetColumns(std::vector <Column> cols ){
-    for (unsigned int index=0; index < cols.size(); index++) {
+  void WriteTabular::SetColumns(std::vector <Column> cols) {
+    for(unsigned int index = 0; index < cols.size(); index++) {
       Column thisCol = cols[index];
       std::string thisTitle = thisCol.Name();
 
-      if (thisTitle.length() > thisCol.Width()) {
+      if(thisTitle.length() > thisCol.Width()) {
         std::string message = "Column header [" + thisTitle + "] is wider " +
-          "than the set width for column [" + iString((int)index) + "]";
-          throw Isis::iException::Message(Isis::iException::User,message,_FILEINFO_);
+                              "than the set width for column [" + iString((int)index) + "]";
+        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
       }
 
       int iteration = 0;
-      while (thisTitle.length() < thisCol.Width()) {
-        if (thisCol.Alignment() == Column::Left) {
+      while(thisTitle.length() < thisCol.Width()) {
+        if(thisCol.Alignment() == Column::Left) {
           thisTitle += " ";
         }
-        else if (thisCol.Alignment() == Column::Right ||
-                 thisCol.Alignment() == Column::Decimal) {
+        else if(thisCol.Alignment() == Column::Right ||
+                thisCol.Alignment() == Column::Decimal) {
           thisTitle = " " + thisTitle;
         }
         else {
           std::string message = "Alignment is improperly set";
-          throw Isis::iException::Message(Isis::iException::User,message,_FILEINFO_);
+          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
         }
         iteration++;
       }//end while
 
       p_cols.push_back(thisCol);
       p_outfile << thisTitle;
-      if (index < (cols.size()-1)) {
+      if(index < (cols.size() - 1)) {
         p_outfile << p_delimiter;
       }
     }//end for
@@ -111,11 +111,11 @@ namespace Isis {
     tempStream << item;
     item = tempStream.str();
 
-    if (p_curCol == 0) {
+    if(p_curCol == 0) {
       p_rows++;
     }
 
-    if (p_curCol < (p_cols.size()-1)) {
+    if(p_curCol < (p_cols.size() - 1)) {
       item += p_delimiter;
       p_curCol++;
     }
@@ -128,25 +128,25 @@ namespace Isis {
 
   /**
    * Add an integer value to the next column in this row
-   * 
+   *
    * @param item The integer value to put in this column.
    */
-  void WriteTabular::Write(int item){
+  void WriteTabular::Write(int item) {
     Column thisCol = p_cols[p_curCol];
-    if (thisCol.DataType() != Column::Integer &&
+    if(thisCol.DataType() != Column::Integer &&
         thisCol.DataType() != Column::Pixel) {
-      if (thisCol.DataType() == Column::Real ||
+      if(thisCol.DataType() == Column::Real ||
           thisCol.DataType() == Column::Pixel) {
         Write((double)item);
         return;
       }
       std::string message = "Wrong data type for this Column";
-      throw Isis::iException::Message(Isis::iException::User,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
     }
     iString thisItem(item);
-    if (thisItem.length() > thisCol.Width()) {
+    if(thisItem.length() > thisCol.Width()) {
       thisItem = "*";
-      while (thisItem.length() < thisCol.Width()) {
+      while(thisItem.length() < thisCol.Width()) {
         thisItem += "*";
       }
     }
@@ -154,7 +154,7 @@ namespace Isis {
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
 
-    if (thisCol.Alignment() == Column::Left) {
+    if(thisCol.Alignment() == Column::Left) {
       tempStream.setf(std::ios::left);
     }
     else tempStream.setf(std::ios::right);
@@ -162,11 +162,11 @@ namespace Isis {
     tempStream << thisItem;
     thisItem = tempStream.str();
 
-    if (p_curCol == 0) {
+    if(p_curCol == 0) {
       p_rows++;
     }
 
-    if (p_curCol < (p_cols.size()-1)) {
+    if(p_curCol < (p_cols.size() - 1)) {
       thisItem += p_delimiter;
       p_curCol++;
     }
@@ -179,19 +179,19 @@ namespace Isis {
 
   /**
    * Writes a string to the next column in the current row
-   * 
+   *
    * @param item The string to write out
    */
-  void WriteTabular::Write(std::string item){
+  void WriteTabular::Write(std::string item) {
     Column thisCol = p_cols[p_curCol];
-    if (thisCol.DataType() != Column::String &&
+    if(thisCol.DataType() != Column::String &&
         thisCol.DataType() != Column::Pixel) {
       std::string message = "Wrong data type for this Column";
-      throw Isis::iException::Message(Isis::iException::User,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
     }
-    if (item.length() > thisCol.Width()) {
+    if(item.length() > thisCol.Width()) {
       item = "*";
-      while (item.length() < thisCol.Width()) {
+      while(item.length() < thisCol.Width()) {
         item += "*";
       }
     }
@@ -199,7 +199,7 @@ namespace Isis {
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
 
-    if (thisCol.Alignment() == Column::Left) {
+    if(thisCol.Alignment() == Column::Left) {
       tempStream.setf(std::ios::left);
     }
     else tempStream.setf(std::ios::right);
@@ -207,11 +207,11 @@ namespace Isis {
     tempStream << item;
     item = tempStream.str();
 
-    if (p_curCol == 0) {
+    if(p_curCol == 0) {
       p_rows++;
     }
 
-    if (p_curCol < (p_cols.size()-1)) {
+    if(p_curCol < (p_cols.size() - 1)) {
       item += p_delimiter;
       p_curCol++;
     }
@@ -224,36 +224,36 @@ namespace Isis {
 
   /**
    * Writes a floating-point value out to the next column in the current row
-   * 
+   *
    * @param item The value to be printed out
    */
-  void WriteTabular::Write(double item){
+  void WriteTabular::Write(double item) {
     Column thisCol = p_cols[p_curCol];
-    if (thisCol.DataType() != Column::Real &&
+    if(thisCol.DataType() != Column::Real &&
         thisCol.DataType() != Column::Pixel) {
       std::string message = "Wrong data type for this Column";
-      throw Isis::iException::Message(Isis::iException::User,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
     }
 
     //Check for special pixels, if it's a pixel column
-    if (thisCol.DataType() == Column::Pixel && IsSpecial(item)) {
-      if (IsNullPixel(item)) {
+    if(thisCol.DataType() == Column::Pixel && IsSpecial(item)) {
+      if(IsNullPixel(item)) {
         Write("Null");
         return;
       }
-      if (IsHisPixel(item)) {
+      if(IsHisPixel(item)) {
         Write("His");
         return;
       }
-      if (IsHrsPixel(item)) {
+      if(IsHrsPixel(item)) {
         Write("Hrs");
         return;
       }
-      if (IsLisPixel(item)) {
+      if(IsLisPixel(item)) {
         Write("Lis");
         return;
       }
-      if (IsLrsPixel(item)) {
+      if(IsLrsPixel(item)) {
         Write("Lrs");
         return;
       }
@@ -262,7 +262,7 @@ namespace Isis {
     iString thisItem(item);
 
 
-    if (thisCol.Alignment() == Column::Decimal) {
+    if(thisCol.Alignment() == Column::Decimal) {
 
       //Format and round the number
 
@@ -271,7 +271,7 @@ namespace Isis {
       iString intPart = tempString.Token(".");
       //Make the fractional portion appear as such, so the iomanipulators
       //handle it properly
-      if (tempString != "") {
+      if(tempString != "") {
         tempString = "0." + tempString;
       }
       else tempString = "0.0";
@@ -285,7 +285,7 @@ namespace Isis {
 
       //if the rounding causes a rollover (i.e. the decimal portion is greater
       //than 0.95) increment the integer portion
-      if (iString(b.str()).ToDouble() >= 1) {
+      if(iString(b.str()).ToDouble() >= 1) {
         intPart = iString(intPart.ToInteger() + 1);
       }
 
@@ -293,7 +293,7 @@ namespace Isis {
       tempString = b.str();
       tempString.Token(".");
       //Add any zeros necessary to pad the number
-      while (tempString.size() < thisCol.Precision()) {
+      while(tempString.size() < thisCol.Precision()) {
         tempString += "0";
       }
 
@@ -304,7 +304,7 @@ namespace Isis {
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
 
-    if (thisCol.Alignment() == Column::Left) {
+    if(thisCol.Alignment() == Column::Left) {
       tempStream.setf(std::ios::left);
     }
     else tempStream.setf(std::ios::right);
@@ -312,19 +312,19 @@ namespace Isis {
     tempStream << thisItem;
     thisItem = tempStream.str();
 
-    if (p_curCol == 0) {
+    if(p_curCol == 0) {
       p_rows++;
     }
 
     //If the number is too wide for the column, replace with a string of stars
-    if (thisItem.length() > thisCol.Width()) {
+    if(thisItem.length() > thisCol.Width()) {
       thisItem = "*";
-      while (thisItem.length() < thisCol.Width()) {
+      while(thisItem.length() < thisCol.Width()) {
         thisItem += "*";
       }
     }
 
-    if (p_curCol < (p_cols.size()-1)) {
+    if(p_curCol < (p_cols.size() - 1)) {
       thisItem += p_delimiter;
       p_curCol++;
     }
@@ -338,10 +338,10 @@ namespace Isis {
 
   /**
    * Sets the string to be put between columns for this table
-   * 
+   *
    * @param delim The string to separate columns
    */
-  void WriteTabular::SetDelimiter( std::string delim ) {
+  void WriteTabular::SetDelimiter(std::string delim) {
     p_delimiter = delim;
   }
 

@@ -34,148 +34,148 @@
 
 namespace Isis {
 
-    /** Implement templatized MIN fumnction */
-    template<typename T> inline T MIN ( const T &A, const T &B ) {
-        if (A < B) {
-            return (A);
-        }
-        else {
-            return (B);
-        }
+  /** Implement templatized MIN fumnction */
+  template<typename T> inline T MIN(const T &A, const T &B) {
+    if(A < B) {
+      return (A);
     }
-
-    /** Implement templatized MAX function */
-    template<typename T> inline T MAX ( const T &A, const T &B ) {
-        if (A > B) {
-            return (A);
-        }
-        else {
-            return (B);
-        }
+    else {
+      return (B);
     }
+  }
 
-    class PvlObject;
-    class Camera;
+  /** Implement templatized MAX function */
+  template<typename T> inline T MAX(const T &A, const T &B) {
+    if(A > B) {
+      return (A);
+    }
+    else {
+      return (B);
+    }
+  }
 
-    /**
-     * @brief An implementation of the PhotometricFunction photometric function
-     *
-     * This class implements the PhotometricFunction-Buratti-Hill photometric
-     * equation as outline in thier paper "Multispectral Photometry
-     * of the Moon and Absolute Calibration of the Clementine UV/VIS
-     * Camera", published in Icaris v141, pg. 205-255 (1999).
-     *
-     * @author  2010-02-15 Kris Becker
-     *
-     */
-    class PhotometricFunction {
-        public:
-            /**
-             * @brief Create Hilier photometric object
-             *
-             */
-            PhotometricFunction ( PvlObject &pvl, Cube &cube );
+  class PvlObject;
+  class Camera;
 
-            //! Destructor
-            virtual ~PhotometricFunction () {
-            }
-            ;
+  /**
+   * @brief An implementation of the PhotometricFunction photometric function
+   *
+   * This class implements the PhotometricFunction-Buratti-Hill photometric
+   * equation as outline in thier paper "Multispectral Photometry
+   * of the Moon and Absolute Calibration of the Clementine UV/VIS
+   * Camera", published in Icaris v141, pg. 205-255 (1999).
+   *
+   * @author  2010-02-15 Kris Becker
+   *
+   */
+  class PhotometricFunction {
+    public:
+      /**
+       * @brief Create Hilier photometric object
+       *
+       */
+      PhotometricFunction(PvlObject &pvl, Cube &cube);
 
-            void setCamera ( Camera *cam ) {
-                _camera = cam;
-            }
+      //! Destructor
+      virtual ~PhotometricFunction() {
+      }
+      ;
 
-            static iString AlgorithmName ( const PvlObject &pvl ) {
-                return pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse).FindKeyword("Name")[0];
-            }
+      void setCamera(Camera *cam) {
+        _camera = cam;
+      }
 
-            virtual double Compute ( const double &line, const double &sample, int band = 1 );
-            virtual double photometry ( double i, double e, double g, int band = 1 ) const = 0;
-            virtual void Report ( PvlContainer &pvl ) = 0;
+      static iString AlgorithmName(const PvlObject &pvl) {
+        return pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse).FindKeyword("Name")[0];
+      }
 
-            void SetMinimumIncidenceAngle (double angle) {
-                p_minimumIncidenceAngle = angle;
-            }
-            void SetMaximumIncidenceAngle (double angle) {
-                 p_maximumIncidenceAngle = angle;
-            }
-            void SetMinimumEmissionAngle (double angle) {
-                 p_minimumEmissionAngle = angle;
-            }
-            void SetMaximumEmissionAngle (double angle) {
-                 p_maximumEmissionAngle = angle;
-            }
-            void SetMinimumPhaseAngle (double angle) {
-                 p_minimumPhaseAngle = angle;
-            }
-            void SetMaximumPhaseAngle (double angle) {
-                 p_maximumPhaseAngle = angle;
-            }
+      virtual double Compute(const double &line, const double &sample, int band = 1);
+      virtual double photometry(double i, double e, double g, int band = 1) const = 0;
+      virtual void Report(PvlContainer &pvl) = 0;
 
-            double MinimumIncidenceAngle () {
-                return p_minimumIncidenceAngle;
-            }
-            double MaximumIncidenceAngle () {
-                return p_maximumIncidenceAngle;
-            }
-            double MinimumEmissionAngle () {
-                return p_minimumEmissionAngle;
-            }
-            double MaximumEmissionAngle () {
-                return p_maximumEmissionAngle;
-            }
-            double MinimumPhaseAngle () {
-                return p_minimumPhaseAngle;
-            }
-            double MaximumPhaseAngle () {
-                return p_maximumPhaseAngle;
-            }
+      void SetMinimumIncidenceAngle(double angle) {
+        p_minimumIncidenceAngle = angle;
+      }
+      void SetMaximumIncidenceAngle(double angle) {
+        p_maximumIncidenceAngle = angle;
+      }
+      void SetMinimumEmissionAngle(double angle) {
+        p_minimumEmissionAngle = angle;
+      }
+      void SetMaximumEmissionAngle(double angle) {
+        p_maximumEmissionAngle = angle;
+      }
+      void SetMinimumPhaseAngle(double angle) {
+        p_minimumPhaseAngle = angle;
+      }
+      void SetMaximumPhaseAngle(double angle) {
+        p_maximumPhaseAngle = angle;
+      }
 
-        protected:
+      double MinimumIncidenceAngle() {
+        return p_minimumIncidenceAngle;
+      }
+      double MaximumIncidenceAngle() {
+        return p_maximumIncidenceAngle;
+      }
+      double MinimumEmissionAngle() {
+        return p_minimumEmissionAngle;
+      }
+      double MaximumEmissionAngle() {
+        return p_maximumEmissionAngle;
+      }
+      double MinimumPhaseAngle() {
+        return p_minimumPhaseAngle;
+      }
+      double MaximumPhaseAngle() {
+        return p_maximumPhaseAngle;
+      }
 
-            Camera *_camera;
-            double _iRef; //!<  Incidence refernce angle
-            double _eRef; //  Emission  reference angle
-            double _gRef; //  Phase     reference angle
+    protected:
 
-            double p_minimumIncidenceAngle;
-            double p_maximumIncidenceAngle;
-            double p_minimumEmissionAngle;
-            double p_maximumEmissionAngle;
-            double p_minimumPhaseAngle;
-            double p_maximumPhaseAngle;
+      Camera *_camera;
+      double _iRef; //!<  Incidence refernce angle
+      double _eRef; //  Emission  reference angle
+      double _gRef; //  Phase     reference angle
 
-            DbProfile _normProf;
+      double p_minimumIncidenceAngle;
+      double p_maximumIncidenceAngle;
+      double p_minimumEmissionAngle;
+      double p_maximumEmissionAngle;
+      double p_minimumPhaseAngle;
+      double p_maximumPhaseAngle;
 
-            /**
-             * @brief Helper method to initialize parameters
-             *
-             * This method will check the existance of a keyword and extract the value
-             * if it exists to the passed parameter (type).  If it doesn't exist, the
-             * default values is returned.
-             *
-             * @param T Templated variable type
-             * @param conf Parameter profile container
-             * @param keyname Name of keyword to get a value from
-             * @param defval Default value it keyword/value doesn't exist
-             * @param index Optional index of the value for keyword arrays
-             *
-             * @return T Return type
-             */
-            template<typename T>
-            T ConfKey ( const DbProfile &conf, const std::string &keyname, const T &defval, int index = 0 ) const {
-                if (!conf.exists(keyname)) {
-                    return (defval);
-                }
-                if (conf.count(keyname) < index) {
-                    return (defval);
-                }
-                iString iValue(conf.value(keyname, index));
-                T value = iValue; // This makes it work with a string?
-                return (value);
-            }
+      DbProfile _normProf;
 
-    };
+      /**
+       * @brief Helper method to initialize parameters
+       *
+       * This method will check the existance of a keyword and extract the value
+       * if it exists to the passed parameter (type).  If it doesn't exist, the
+       * default values is returned.
+       *
+       * @param T Templated variable type
+       * @param conf Parameter profile container
+       * @param keyname Name of keyword to get a value from
+       * @param defval Default value it keyword/value doesn't exist
+       * @param index Optional index of the value for keyword arrays
+       *
+       * @return T Return type
+       */
+      template<typename T>
+      T ConfKey(const DbProfile &conf, const std::string &keyname, const T &defval, int index = 0) const {
+        if(!conf.exists(keyname)) {
+          return (defval);
+        }
+        if(conf.count(keyname) < index) {
+          return (defval);
+        }
+        iString iValue(conf.value(keyname, index));
+        T value = iValue; // This makes it work with a string?
+        return (value);
+      }
+
+  };
 
 }
 ;

@@ -44,12 +44,12 @@ namespace Isis {
 
       double dk1 = -p_odk[0];
 
-      double den = 1+dk1*dy*dy;                       // r = dy*dy = distance from the focal plane center
-      if( den == 0.0 )
+      double den = 1 + dk1 * dy * dy;                 // r = dy*dy = distance from the focal plane center
+      if(den == 0.0)
         return false;
 
       p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = dy/den;
+      p_undistortedFocalPlaneY = dy / den;
 
       return true;
     }
@@ -71,7 +71,7 @@ namespace Isis {
 
       double yt = uy;
 
-      double rr,dr;
+      double rr, dr;
       double ydistorted;
       double yprevious = 1000000.0;
       double tolerance = 1.0e-10;
@@ -83,11 +83,11 @@ namespace Isis {
       // iterating to introduce distortion (in sample only)...
       // we stop when the difference between distorted coordinate
       // in successive iterations is at or below the given tolerance
-      for( int i = 0; i < 50; i++ ) {
-        rr = yt*yt;
+      for(int i = 0; i < 50; i++) {
+        rr = yt * yt;
 
         //  dr is the radial distortion contribution
-        dr = 1.0 + dk1*rr;
+        dr = 1.0 + dk1 * rr;
 
         // distortion at the current sample location
         yt = uy * dr;
@@ -96,7 +96,7 @@ namespace Isis {
         ydistorted = yt;
 
         // check for convergence
-        if( fabs(yt - yprevious) <= tolerance ) {
+        if(fabs(yt - yprevious) <= tolerance) {
           bConverged = true;
           break;
         }
@@ -104,7 +104,7 @@ namespace Isis {
         yprevious = yt;
       }
 
-      if( bConverged ) {
+      if(bConverged) {
         p_focalPlaneX = p_undistortedFocalPlaneX;
         p_focalPlaneY = ydistorted;
       }

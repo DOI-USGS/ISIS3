@@ -40,7 +40,7 @@ namespace Isis {
    *
    * @internal
    */
-    class MarciDistortionMap : public CameraDistortionMap {
+  class MarciDistortionMap : public CameraDistortionMap {
     public:
       MarciDistortionMap(Camera *parent, int naifIkCode);
 
@@ -51,7 +51,9 @@ namespace Isis {
 
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
-      void SetFilter(int filter) { p_filter = filter; }
+      void SetFilter(int filter) {
+        p_filter = filter;
+      }
 
     private:
       double GuessDx(double uX);

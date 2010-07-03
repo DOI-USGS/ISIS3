@@ -33,11 +33,11 @@
 
 namespace Qisis {
   /**
-   * Defines the Cube Name filter for the QnetNavTool's 
-   * Points section. The user must choose from a list of cubes. 
-   * This class is designed to remove points from the current 
+   * Defines the Cube Name filter for the QnetNavTool's
+   * Points section. The user must choose from a list of cubes.
+   * This class is designed to remove points from the current
    * filtered list if no measures match the chosen image.
-   *  
+   *
    * @author 2009-01-26 Jeannie Walldren
    * @internal
    *   @history 2009-01-26 Jeannie Walldren - Original Version
@@ -46,10 +46,10 @@ namespace Qisis {
    */
 
   class QnetPointCubeNameFilter : public QnetFilter {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetPointCubeNameFilter (QWidget *parent=0);
+      QnetPointCubeNameFilter(QWidget *parent = 0);
       virtual void filter();
 
     public slots:

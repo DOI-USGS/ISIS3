@@ -2,12 +2,12 @@
 #include "ProcessByQuickFilter.h"
 #include "UserInterface.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
 bool propagate;
-void sharpen (Buffer &in, Buffer &out, QuickFilter &filter);
+void sharpen(Buffer &in, Buffer &out, QuickFilter &filter);
 
 // The sharpen main routine
 void IsisMain() {
@@ -21,7 +21,7 @@ void IsisMain() {
 
   // Find out how to handle special pixels
   UserInterface &ui = Application::GetUserInterface();
-  propagate = ui.GetBoolean ("PROPAGATE");
+  propagate = ui.GetBoolean("PROPAGATE");
 
   // Process each line
   p.StartProcess(sharpen);  // Line processing function
@@ -29,11 +29,11 @@ void IsisMain() {
 }
 
 // Line processing routine
-void sharpen (Buffer &in, Buffer &out, QuickFilter &filter) {
-  for (int i=0; i<filter.Samples(); i++) {
+void sharpen(Buffer &in, Buffer &out, QuickFilter &filter) {
+  for(int i = 0; i < filter.Samples(); i++) {
     // We have a special pixel
-    if (IsSpecial(in[i])) {
-      if (propagate) {
+    if(IsSpecial(in[i])) {
+      if(propagate) {
         out[i] = in[i];
       }
       else {
@@ -42,11 +42,11 @@ void sharpen (Buffer &in, Buffer &out, QuickFilter &filter) {
     }
     // We have a normal pixel
     else {
-      out[i] = filter.Average(i);  
+      out[i] = filter.Average(i);
       // out[i] will be NULL if uncomputable or count invalid
       // If the average could be computed then sharpen by adding the
       // original + hpf
-      if (!IsSpecial(out[i])) out[i] = in[i] + (in[i] - out[i]);
+      if(!IsSpecial(out[i])) out[i] = in[i] + (in[i] - out[i]);
     }
   }
 }

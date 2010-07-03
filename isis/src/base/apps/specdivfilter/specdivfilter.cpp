@@ -4,7 +4,7 @@
 #include "QuickFilter.h"
 #include "UserInterface.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Which pixel types to filter
@@ -13,7 +13,7 @@ double low ;
 double high;
 
 // Prototype
-void Filter (Buffer &in, Buffer &out);
+void Filter(Buffer &in, Buffer &out);
 
 void IsisMain() {
   //Set up ProcessBySpectra
@@ -26,30 +26,30 @@ void IsisMain() {
   bands = ui.GetInteger("BANDS");
 
   //Check for cases of too many bands
-  if (bands > maxBands) {
+  if(bands > maxBands) {
     iString msg = "Parameter bands [" + iString(bands) + "] exceeds maximum allowable size "
-      + "of [" + iString(maxBands) + "] for cube [" + icube->Filename() + "]";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
+                  + "of [" + iString(maxBands) + "] for cube [" + icube->Filename() + "]";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
- 
+
   //Set the Boxcar Parameters
   low = -DBL_MAX;
   high = DBL_MAX;
 
-  if (ui.WasEntered("LOW")) {
+  if(ui.WasEntered("LOW")) {
     low = ui.GetDouble("LOW");
   }
-  if (ui.WasEntered("HIGH")) {
+  if(ui.WasEntered("HIGH")) {
     high = ui.GetDouble("HIGH");
   }
- 
+
   //Obtain output cube
   p.SetOutputCube("TO");
 
   //Start the filter method
   p.StartProcess(Filter);
   p.EndProcess();
-  
+
 }
 
 /**
@@ -57,12 +57,12 @@ void IsisMain() {
  * average value of the pixels around each valid pixel, writing that
  * average to the output at the pixel index
  */
-void Filter (Buffer &in, Buffer &out) {
+void Filter(Buffer &in, Buffer &out) {
   Isis::QuickFilter filter(in.size(), bands, 1);
   filter.SetMinMax(low, high);
   filter.AddLine(in.DoubleBuffer());
 
-  for (int i = 0; i < in.size(); i ++) {
+  for(int i = 0; i < in.size(); i ++) {
     out[i] = in[i] / filter.Average(i);
   }
 }

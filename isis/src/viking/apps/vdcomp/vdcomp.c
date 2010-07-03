@@ -1,10 +1,10 @@
 /**
 * Modified by Jeff Anderson, May 19, 2005
-* 64-bit Solaris port required replacing long with int and 
-* adding malloc.h 
-*  
-* Modified by Jeannie Walldren, March 23, 2009 
-* Allow string length of 1024 characters for input and output 
+* 64-bit Solaris port required replacing long with int and
+* adding malloc.h
+*
+* Modified by Jeannie Walldren, March 23, 2009
+* Allow string length of 1024 characters for input and output
 * filenames, inname[] and outname[]
 */
 
@@ -124,28 +124,27 @@
 #define TRUE                  1
 #define FALSE                 0
 
-                                    /* pc i/o defines               */
+/* pc i/o defines               */
 #define O_RDONLY         0x0000     /* open for reading only        */
 #define O_BINARY         0x8000     /* file mode is binary          */
 
-                                    /* vax i/o defines              */
+/* vax i/o defines              */
 #define RECORD_TYPE      "rfm=fix"  /* VAX fixed length output      */
 #define CTX              "ctx=bin"  /* no translation of \n         */
 #define FOP          "fop=cif,sup"  /* file processing ops          */
 
-typedef struct leaf
-  {
-   struct leaf *right;
-   short int dn;
-   struct leaf *left;
-  } NODE;
+typedef struct leaf {
+  struct leaf *right;
+  short int dn;
+  struct leaf *left;
+} NODE;
 
 /*************************************************************************
  Declare the tree pointer. This pointer will hold the root of the tree
  once the tree is created by the accompanying routine huff_tree.
 **************************************************************************/
 
-  NODE *tree;
+NODE *tree;
 
 /* subroutine definitions                                           */
 
@@ -165,7 +164,7 @@ void               free_tree();
 
 int                infile;
 FILE               *outfile;
-char               inname[1025],outname[1025];
+char               inname[1025], outname[1025];
 int                output_format;
 int                record_bytes, max_lines;
 int                line_samples, fits_pad;
@@ -173,14 +172,14 @@ int               label_checksum = 0L, checksum = 0L;
 
 
 /*************************************************/
-int main(argc,argv)
-     int  argc;
-     char **argv;
+int main(argc, argv)
+int  argc;
+char **argv;
 {
-  unsigned char ibuf[65536],obuf[65536];
-  unsigned char blank=32;
-  short         host,total_bytes,line,i;
-  int           length,x,long_length,hist[511];
+  unsigned char ibuf[65536], obuf[65536];
+  unsigned char blank = 32;
+  short         host, total_bytes, line, i;
+  int           length, x, long_length, hist[511];
   int           count;
 
   /*********************************************************************/
@@ -189,32 +188,32 @@ int main(argc,argv)
   /*                                                                   */
   /*********************************************************************/
 
-  strcpy(inname,"   ");  
-  strcpy(outname,"   ");
+  strcpy(inname, "   ");
+  strcpy(outname, "   ");
   output_format = 0;
 
-  if (argc == 1);                     /* prompt user for parameters */
-  else if (argc == 2 && (strncmp(argv[1],"help",4) == 0 || 
-			 strncmp(argv[1],"HELP",4) == 0 ||
-			 strncmp(argv[1],"?",1)    == 0)) {
+  if(argc == 1);                      /* prompt user for parameters */
+  else if(argc == 2 && (strncmp(argv[1], "help", 4) == 0 ||
+                        strncmp(argv[1], "HELP", 4) == 0 ||
+                        strncmp(argv[1], "?", 1)    == 0)) {
     fprintf(stderr,
-	    "PDS Image Decompression Program.  Command line format:\n\n");
-    fprintf(stderr,"VDCOMP [infile] [outfile] [format code]\n");
-    fprintf(stderr,"   infile        - name of compressed image file. \n");
-    fprintf(stderr,"   outfile       - name of uncompressed output file.\n");
-    fprintf(stderr,"   output format - selected from the following list:\n");
-    fprintf(stderr,"\n");   
-    fprintf(stderr,"     1  SFDU/PDS format [DEFAULT].\n");   
-    fprintf(stderr,"     2  FITS format.              \n");   
-    fprintf(stderr,"     3  VICAR format.             \n");   
-    fprintf(stderr,"     4  Unlabelled binary array.  \n\n");   
+            "PDS Image Decompression Program.  Command line format:\n\n");
+    fprintf(stderr, "VDCOMP [infile] [outfile] [format code]\n");
+    fprintf(stderr, "   infile        - name of compressed image file. \n");
+    fprintf(stderr, "   outfile       - name of uncompressed output file.\n");
+    fprintf(stderr, "   output format - selected from the following list:\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "     1  SFDU/PDS format [DEFAULT].\n");
+    fprintf(stderr, "     2  FITS format.              \n");
+    fprintf(stderr, "     3  VICAR format.             \n");
+    fprintf(stderr, "     4  Unlabelled binary array.  \n\n");
     exit(1);
-  }  
+  }
   else {
-    strcpy(inname,argv[1]);  
-    if (argc >= 3) strcpy(outname,argv[2]); 
-    if (argc == 3) output_format = 1;
-    if (argc == 4) sscanf(argv[3],"%d",&output_format); 
+    strcpy(inname, argv[1]);
+    if(argc >= 3) strcpy(outname, argv[2]);
+    if(argc == 3) output_format = 1;
+    if(argc == 4) sscanf(argv[3], "%d", &output_format);
   }
 
   host = check_host();
@@ -226,20 +225,28 @@ int main(argc,argv)
   /*                                                                   */
   /*********************************************************************/
 
-  switch (output_format) {
-    case 1: pds_labels(host);    break;
-    case 2: fits_labels(host);   break;
-    case 3: vicar_labels(host);  break;
-    case 4: no_labels(host);     break;
+  switch(output_format) {
+    case 1:
+      pds_labels(host);
+      break;
+    case 2:
+      fits_labels(host);
+      break;
+    case 3:
+      vicar_labels(host);
+      break;
+    case 4:
+      no_labels(host);
+      break;
   }
 
-  if (record_bytes == 836) {  /* set up values for image sizes */ 
+  if(record_bytes == 836) {   /* set up values for image sizes */
     max_lines    =  800;
     fits_pad     = 2240;
     line_samples =  800;
   }
   else {
-    max_lines    = 1056;         
+    max_lines    = 1056;
     fits_pad     = 1536;
     line_samples = 1204;
   }
@@ -252,33 +259,33 @@ int main(argc,argv)
 
   /* need to know record_bytes,hist_count,hist_item_type,item_count.*/
   total_bytes = 0;
-  length = read_var((char *)hist,host);
+  length = read_var((char *)hist, host);
   total_bytes = total_bytes + length;
 
-  if (record_bytes == 836) {  /* read one more time for Voyager image */
-    length = read_var((char *)hist+record_bytes,host);
+  if(record_bytes == 836) {   /* read one more time for Voyager image */
+    length = read_var((char *)hist + record_bytes, host);
     total_bytes = total_bytes + length;
   }
 
-  if (host == 2 || host == 5)             /* If non-byte swapped    */
-    for (i=0; i<256; i++)                 /* host, swap bytes in    */
+  if(host == 2 || host == 5)              /* If non-byte swapped    */
+    for(i = 0; i < 256; i++)              /* host, swap bytes in    */
       hist[i] = swap_long(hist[i]);       /* the output histogram   */
 
-  if (output_format == 1) {
-    if (record_bytes == 836) {
-      fwrite((char *)hist,    record_bytes,1,outfile);
-      fwrite((char *)hist+record_bytes,length,1,outfile);
+  if(output_format == 1) {
+    if(record_bytes == 836) {
+      fwrite((char *)hist,    record_bytes, 1, outfile);
+      fwrite((char *)hist + record_bytes, length, 1, outfile);
     }
     else {
-      fwrite((char *)hist,    1024,1,outfile);
+      fwrite((char *)hist,    1024, 1, outfile);
       total_bytes = 1024;
     }
 
     /*  pad out the histogram to a multiple of record bytes */
-    if (record_bytes == 836)
-      for (i=total_bytes; i<record_bytes*2; i++) fputc(blank,outfile);
+    if(record_bytes == 836)
+      for(i = total_bytes; i < record_bytes * 2; i++) fputc(blank, outfile);
     else
-      for (i=total_bytes; i<record_bytes; i++) fputc(blank,outfile);
+      for(i = total_bytes; i < record_bytes; i++) fputc(blank, outfile);
   }
 
   /*********************************************************************/
@@ -287,14 +294,14 @@ int main(argc,argv)
   /* don't have to byte-swap because DECOMP.C does it for us           */
   /*                                                                   */
   /*********************************************************************/
-  if (record_bytes == 836) {
-    length = read_var((char *)hist,host);
-    length = read_var((char *)hist+836,host);
-    length = read_var((char *)hist+1672,host);
+  if(record_bytes == 836) {
+    length = read_var((char *)hist, host);
+    length = read_var((char *)hist + 836, host);
+    length = read_var((char *)hist + 1672, host);
   }
   else {
-    length = read_var((char *)hist,host);
-    length = read_var((char *)hist+1204,host);
+    length = read_var((char *)hist, host);
+    length = read_var((char *)hist + 1204, host);
   }
 
   /*********************************************************************/
@@ -304,14 +311,14 @@ int main(argc,argv)
   /*********************************************************************/
 
   total_bytes = 0;
-  length = read_var(ibuf,host);
+  length = read_var(ibuf, host);
 
-  if (output_format == 1) {
-    fwrite(ibuf,length,1,outfile);
+  if(output_format == 1) {
+    fwrite(ibuf, length, 1, outfile);
     total_bytes = total_bytes + length;
 
     /*  pad out engineering to multiple of record_bytes */
-    for (i=total_bytes;i<record_bytes;i++) fputc(blank,outfile);
+    for(i = total_bytes; i < record_bytes; i++) fputc(blank, outfile);
   }
 
   /*********************************************************************/
@@ -320,19 +327,19 @@ int main(argc,argv)
   /*                                                                   */
   /*********************************************************************/
 
-  if (record_bytes == 1204) {
+  if(record_bytes == 1204) {
     long_length = 0;
     int line1Bytes = 0;
-    for (i = 0; i < 1056; i++) {
-      length = read_var(ibuf,host);
+    for(i = 0; i < 1056; i++) {
+      length = read_var(ibuf, host);
 
       // Check to see that all lines are the same number of bytes.
-      if (i == 0) {
+      if(i == 0) {
         line1Bytes = length;
       }
       else {
-        if (length != line1Bytes) {
-          fprintf(stderr,"\n\ninput file has invalid or corrupted line header table!\n\n");
+        if(length != line1Bytes) {
+          fprintf(stderr, "\n\ninput file has invalid or corrupted line header table!\n\n");
           exit(42);
           // 42 is a good number! .... Also,
           // vik2isis will handle 42 by throwing an iExeption with the
@@ -340,15 +347,15 @@ int main(argc,argv)
         }
       }
 
-      if (output_format == 1) {
-	fwrite(ibuf,length,1,outfile);
-	long_length = long_length + length;
+      if(output_format == 1) {
+        fwrite(ibuf, length, 1, outfile);
+        long_length = long_length + length;
       }
     }
 
     /*  pad out engineering to multiple of record_bytes */
-    if (output_format == 1)
-      for (x=long_length;x<1204L*55L;x++) fputc(blank,outfile);
+    if(output_format == 1)
+      for(x = long_length; x < 1204L * 55L; x++) fputc(blank, outfile);
   }
 
   /*********************************************************************/
@@ -357,10 +364,10 @@ int main(argc,argv)
   /*                                                                   */
   /*********************************************************************/
 
-/*
-  if (outfile != stdout)
-    fprintf(stderr,"\nInitializing decompression routine...");
-*/
+  /*
+    if (outfile != stdout)
+      fprintf(stderr,"\nInitializing decompression routine...");
+  */
   decmpinit(hist);
 
 
@@ -371,51 +378,52 @@ int main(argc,argv)
   /*********************************************************************/
 
 //  if (outfile!=stdout) fprintf(stderr,"\nDecompressing data...");
-  line=0;
+  line = 0;
 
   do {
-    length = read_var(ibuf,host);
-    if (length <= 0) break;
+    length = read_var(ibuf, host);
+    if(length <= 0) break;
     long_length = (int)length;
     line += 1;
-    decompress(ibuf, obuf,&long_length, &record_bytes);
+    decompress(ibuf, obuf, &long_length, &record_bytes);
 
-    if (output_format == 1) {
-      count = fwrite(obuf,record_bytes,1,outfile);
-      if (count != 1) {
-	fprintf(stderr,"\nError writing output file.  Aborting program.");
-	fprintf(stderr,"\nCheck disk space or for duplicate filename.");
-	exit(2);
+    if(output_format == 1) {
+      count = fwrite(obuf, record_bytes, 1, outfile);
+      if(count != 1) {
+        fprintf(stderr, "\nError writing output file.  Aborting program.");
+        fprintf(stderr, "\nCheck disk space or for duplicate filename.");
+        exit(2);
       }
     }
     else  {
-      count = fwrite(obuf,line_samples,1,outfile); /* VICAR/FITS/etc */
-      if (count != 1) {
-	fprintf(stderr,"\nError writing output file.  Aborting program.");
-	fprintf(stderr,"\nCheck disk space or for duplicate filename.");
-	exit(2);
+      count = fwrite(obuf, line_samples, 1, outfile); /* VICAR/FITS/etc */
+      if(count != 1) {
+        fprintf(stderr, "\nError writing output file.  Aborting program.");
+        fprintf(stderr, "\nCheck disk space or for duplicate filename.");
+        exit(2);
       }
     }
 
-    if (record_bytes == 1204) /* do checksum for viking */
-      for (i=0; i<record_bytes; i++) checksum += (int)obuf[i];
-/*
-    if ((line % 100 == 0) && (outfile != stdout)) 
-      fprintf(stderr,"\nline %d",line);
-*/
+    if(record_bytes == 1204)  /* do checksum for viking */
+      for(i = 0; i < record_bytes; i++) checksum += (int)obuf[i];
+    /*
+        if ((line % 100 == 0) && (outfile != stdout))
+          fprintf(stderr,"\nline %d",line);
+    */
 
-  } while (length > 0 && line < max_lines);
+  }
+  while(length > 0 && line < max_lines);
 
-  if (record_bytes == 1204  && (outfile  != stdout)) 
+  if(record_bytes == 1204  && (outfile  != stdout))
     /* print checksum for viking */
-/*
-    fprintf(stderr,"\n Image label checksum = %ld computed checksum = %ld\n",
-	    label_checksum,checksum);
-*/
+    /*
+        fprintf(stderr,"\n Image label checksum = %ld computed checksum = %ld\n",
+    	    label_checksum,checksum);
+    */
 
-  /*  pad out FITS file to a multiple of 2880 */
-  if (output_format == 2)
-    for (i=0;i<fits_pad;i++) fputc(blank,outfile);
+    /*  pad out FITS file to a multiple of 2880 */
+    if(output_format == 2)
+      for(i = 0; i < fits_pad; i++) fputc(blank, outfile);
 
 //  if (outfile!=stdout) printf("\n");
   free_tree(&long_length);
@@ -437,21 +445,21 @@ int host;
 {
   short   shortint;
 
-  if (inname[0] == ' ') {
+  if(inname[0] == ' ') {
     printf("\nEnter name of file to be decompressed: ");
     // gets (inname);  JAA - Replaced with scanf
-    scanf ("%s",inname);
+    scanf("%s", inname);
   }
 
-  if (host == 1 | host == 2) {
-    if ((infile = open(inname,O_RDONLY | O_BINARY)) <= 0) {
-      fprintf(stderr,"\ncan't open input file: %s\n",inname);
+  if(host == 1 | host == 2) {
+    if((infile = open(inname, O_RDONLY | O_BINARY)) <= 0) {
+      fprintf(stderr, "\ncan't open input file: %s\n", inname);
       exit(3);
     }
   }
-  else if (host == 3 | host == 5) {
-    if ((infile = open(inname,O_RDONLY)) <= 0) {
-      fprintf(stderr,"\ncan't open input file: %s\n",inname);
+  else if(host == 3 | host == 5) {
+    if((infile = open(inname, O_RDONLY)) <= 0) {
+      fprintf(stderr, "\ncan't open input file: %s\n", inname);
       exit(3);
     }
 
@@ -463,18 +471,18 @@ int host;
     /* systems with standard comm programs (kermit, for example).   */
     /****************************************************************/
 
-     if (host == 3) {
-       read(infile, &shortint, (size_t) 2);
-       if (shortint > 0 && shortint < 80) {
-	 host = 4;              /* change host to 4                */
+    if(host == 3) {
+      read(infile, &shortint, (size_t) 2);
+      if(shortint > 0 && shortint < 80) {
+        host = 4;              /* change host to 4                */
 //	 printf("This is not a VAX variable length file.");
-       }
+      }
 //       else printf("This is a VAX variable length file.");
-       lseek(infile, (off_t) 0, SEEK_SET);        /* reposition to beginning of file */
-     }
+      lseek(infile, (off_t) 0, SEEK_SET);        /* reposition to beginning of file */
+    }
   }
 
-  if (output_format == 0)
+  if(output_format == 0)
     do {
       printf("\nEnter a number for the output format desired:\n");
       printf("\n  1.  SFDU/PDS format.");
@@ -483,14 +491,15 @@ int host;
       printf("\n  4.  Unlabelled binary array.\n");
       printf("\n  Enter format number:");
       // gets(inname); - JAA replaced with scanf
-      scanf ("%s",inname);
+      scanf("%s", inname);
       output_format = atoi(inname);
-    } while (output_format < 1 || output_format > 4);
+    }
+    while(output_format < 1 || output_format > 4);
 
-  if (outname[0] == ' ') {
+  if(outname[0] == ' ') {
     printf("\nEnter name of uncompressed output file: ");
     // gets (outname); - JAA replaced with scanf
-    scanf ("%s",outname);
+    scanf("%s", outname);
   }
 
   return(host);
@@ -507,68 +516,68 @@ int host;
 void open_files(host)
 int *host;
 {
-  if (*host == 1 || *host == 2 || *host == 5)  {
-    if (outname[0] == '-') outfile=stdout;
-    else if ((outfile = fopen(outname,"wb"))==NULL) {
-      fprintf(stderr,"\ncan't open output file: %s\n",outname);
+  if(*host == 1 || *host == 2 || *host == 5)  {
+    if(outname[0] == '-') outfile = stdout;
+    else if((outfile = fopen(outname, "wb")) == NULL) {
+      fprintf(stderr, "\ncan't open output file: %s\n", outname);
       exit(4);
     }
   }
 
-  else if (*host == 3 || *host == 4) {
-    if (output_format == 1) {     /* write PDS format blocks */
-      if (record_bytes == 836) { 
-	if ((outfile=fopen(outname,"w"
+  else if(*host == 3 || *host == 4) {
+    if(output_format == 1) {      /* write PDS format blocks */
+      if(record_bytes == 836) {
+        if((outfile = fopen(outname, "w"
 #ifdef VMS
-			   ,"mrs=836",FOP,CTX,RECORD_TYPE
+                            , "mrs=836", FOP, CTX, RECORD_TYPE
 #endif
-			   ))==NULL) {
-	  fprintf(stderr,"\ncan't open output file: %s\n",outname);
-	  exit(4);
-	}
+                           )) == NULL) {
+          fprintf(stderr, "\ncan't open output file: %s\n", outname);
+          exit(4);
+        }
       }
       else {
-	if ((outfile=fopen(outname,"w"
+        if((outfile = fopen(outname, "w"
 #ifdef VMS
-			   ,"mrs=1204",FOP,CTX,RECORD_TYPE
+                            , "mrs=1204", FOP, CTX, RECORD_TYPE
 #endif
-			   ))==NULL) {
-	  fprintf(stderr,"\ncan't open output file: %s\n",outname);
-	  exit(4);
-	}
+                           )) == NULL) {
+          fprintf(stderr, "\ncan't open output file: %s\n", outname);
+          exit(4);
+        }
       }
     }
-    else if (output_format == 2) {  /* write FITS format blocks */
-      if ((outfile=fopen(outname,"w"
+    else if(output_format == 2) {   /* write FITS format blocks */
+      if((outfile = fopen(outname, "w"
 #ifdef VMS
-			 ,"mrs=2880",FOP,CTX,RECORD_TYPE
+                          , "mrs=2880", FOP, CTX, RECORD_TYPE
 #endif
-			 ))==NULL) {
-	fprintf(stderr,"\ncan't open output file: %s\n",outname);
-	exit(4);
+                         )) == NULL) {
+        fprintf(stderr, "\ncan't open output file: %s\n", outname);
+        exit(4);
       }
     }
 
     else {                       /* write fixed length records */
-      if (record_bytes == 836) { 
-	if ((outfile=fopen(outname,"w"
+      if(record_bytes == 836) {
+        if((outfile = fopen(outname, "w"
 #ifdef VMS
-			   ,"mrs=800",FOP,CTX,RECORD_TYPE
+                            , "mrs=800", FOP, CTX, RECORD_TYPE
 #endif
-			   ))==NULL) {
-	  fprintf(stderr,"\ncan't open output file: %s\n",outname);
-	  exit(4);
-	}
+                           )) == NULL) {
+          fprintf(stderr, "\ncan't open output file: %s\n", outname);
+          exit(4);
+        }
       }
       else {
-	if ((outfile=fopen(outname,"w"
+        if((outfile = fopen(outname, "w"
 #ifdef VMS
-			   ,"mrs=1204",FOP,CTX,RECORD_TYPE
+                            , "mrs=1204", FOP, CTX, RECORD_TYPE
 #endif
-			   ))==NULL) {
-	  fprintf(stderr,"\ncan't open output file: %s\n",outname);
-	  exit(4);
-	}
+                           )) == NULL) {
+          fprintf(stderr, "\ncan't open output file: %s\n", outname);
+          exit(4);
+        }
       }
     }
   }
@@ -582,20 +591,20 @@ int *host;
 /*********************************************************************/
 
 void pds_labels(host)
-     int host;
+int host;
 {
-  char          outstring[80],ibuf[2048];
-  unsigned char cr=13,lf=10,blank=32;
-  short         length,nlen,total_bytes,line,i;
+  char          outstring[80], ibuf[2048];
+  unsigned char cr = 13, lf = 10, blank = 32;
+  short         length, nlen, total_bytes, line, i;
 
 
   total_bytes = 0;
   do {
-    length = read_var(ibuf,host);
+    length = read_var(ibuf, host);
 #ifdef VMS
     ibuf[length] = 0;
 #else
-    // FIXED 2008/10/29, "NULL" was improper, \0 needed to be the specifier for a null terminator. 
+    // FIXED 2008/10/29, "NULL" was improper, \0 needed to be the specifier for a null terminator.
     //   - Steven Lambright, pointed out by "novas0x2a" (Support Forum Member)
     ibuf[length] = '\0';
 #endif
@@ -604,192 +613,193 @@ void pds_labels(host)
     /*  edit labels which need to be changed                          */
     /******************************************************************/
 
-    if      ((i = strncmp(ibuf,"NJPL1I00PDS1",12))     == 0);
-    else if ((i = strncmp(ibuf,"CCSD3ZF00001",12))     == 0);
-    else if ((i = strncmp(ibuf,"/*          FILE",16)) == 0);
-    else if ((i = strncmp(ibuf,"RECORD_TYPE",11))      == 0);
+    if((i = strncmp(ibuf, "NJPL1I00PDS1", 12))     == 0);
+    else if((i = strncmp(ibuf, "CCSD3ZF00001", 12))     == 0);
+    else if((i = strncmp(ibuf, "/*          FILE", 16)) == 0);
+    else if((i = strncmp(ibuf, "RECORD_TYPE", 11))      == 0);
 
     /*****************************************************************/
     /* don't write any of these labels out until we get the record   */
     /* bytes parameter.                                              */
     /*****************************************************************/
 
-    else if ((i = strncmp(ibuf,"RECORD_BYTES",12)) == 0) {
+    else if((i = strncmp(ibuf, "RECORD_BYTES", 12)) == 0) {
       /*****************************************************************/
       /* get the record_bytes value                                    */
       /*****************************************************************/
 
-      sscanf(ibuf+35,"%d",&record_bytes);
-      if (record_bytes != 836) record_bytes = 1204;
+      sscanf(ibuf + 35, "%d", &record_bytes);
+      if(record_bytes != 836) record_bytes = 1204;
       open_files(&host);
 
       /* now we can write out the SFDU, comment and Record Type labels. */
-      if (record_bytes == 836)
+      if(record_bytes == 836)
         fwrite("CCSD3ZF0000100000001NJPL3IF0PDS200000001 = SFDU_LABEL",
-	       53,1,outfile);
+               53, 1, outfile);
       else
         fwrite("CCSD3ZF0000100000001NJPL3IF0PDS200000001 = SFDU_LABEL",
-	       53,1,outfile);      
+               53, 1, outfile);
 
-      fprintf(outfile,"%c%c",cr,lf);
-      fwrite("/*          FILE FORMAT AND LENGTH */",37,1,outfile);      
-      fprintf(outfile,"%c%c",cr,lf);
-      fwrite("RECORD_TYPE                      = FIXED_LENGTH",47,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fprintf(outfile, "%c%c", cr, lf);
+      fwrite("/*          FILE FORMAT AND LENGTH */", 37, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
+      fwrite("RECORD_TYPE                      = FIXED_LENGTH", 47, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
 
       /* fix record_bytes parameter for Viking images */
-      if (record_bytes == 1204) strcpy(ibuf+35,"1204");
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      if(record_bytes == 1204) strcpy(ibuf + 35, "1204");
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 57 + 39 + 49;
     }
 
-    else if ((i = strncmp(ibuf,"FILE_RECORDS",12)) == 0) {
+    else if((i = strncmp(ibuf, "FILE_RECORDS", 12)) == 0) {
       /*****************************************************************/
       /* change the file_records count                                 */
       /*****************************************************************/
 
-      if (record_bytes == 836) strcpy(ibuf+35,"806");
-      else                     strcpy(ibuf+35,"1115");
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      if(record_bytes == 836) strcpy(ibuf + 35, "806");
+      else                     strcpy(ibuf + 35, "1115");
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
 
-    else if ((i = strncmp(ibuf,"LABEL_RECORDS",13)) == 0) {
+    else if((i = strncmp(ibuf, "LABEL_RECORDS", 13)) == 0) {
       /*****************************************************************/
       /* change the label_records count from 56 to 3                   */
       /*****************************************************************/
 
-      if (record_bytes == 836) strcpy(ibuf+35,"3");
-      else                     strcpy(ibuf+35,"2");
+      if(record_bytes == 836) strcpy(ibuf + 35, "3");
+      else                     strcpy(ibuf + 35, "2");
       length -= 1;
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
 
-    else if ((i = strncmp(ibuf,"^IMAGE_HISTOGRAM",16)) == 0) {
+    else if((i = strncmp(ibuf, "^IMAGE_HISTOGRAM", 16)) == 0) {
       /*****************************************************************/
       /* change the location pointer of image_histogram to record 4    */
       /*****************************************************************/
 
-      if (record_bytes == 836) strcpy(ibuf+35,"4");
-      else                     strcpy(ibuf+35,"3");
+      if(record_bytes == 836) strcpy(ibuf + 35, "4");
+      else                     strcpy(ibuf + 35, "3");
       length -= 1;
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
 
-    else if ((i = strncmp(ibuf,"^ENCODING_HISTOGRAM)",19)) == 0);
+    else if((i = strncmp(ibuf, "^ENCODING_HISTOGRAM)", 19)) == 0);
 
     /*****************************************************************/
     /* delete the encoding_histogram location pointer                */
     /*****************************************************************/
 
-    else if ((i = strncmp(ibuf,"^ENGINEERING_TABLE",18)) == 0) {
+    else if((i = strncmp(ibuf, "^ENGINEERING_TABLE", 18)) == 0) {
       /*****************************************************************/
       /* change the location pointer of engineering_summary to record 6*/
       /*****************************************************************/
 
-      if (record_bytes == 836) strcpy(ibuf+35,"6");
-      else                     strcpy(ibuf+35,"4");
+      if(record_bytes == 836) strcpy(ibuf + 35, "6");
+      else                     strcpy(ibuf + 35, "4");
       length -= 1;
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
 
-    else if ((i = strncmp(ibuf,"^LINE_HEADER_TABLE",18)) == 0) {
+    else if((i = strncmp(ibuf, "^LINE_HEADER_TABLE", 18)) == 0) {
       /*****************************************************************/
       /* change the location pointer of line header table to record 5  */
       /*****************************************************************/
 
-      strcpy(ibuf+35,"5");
+      strcpy(ibuf + 35, "5");
       length -= 1;
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
 
-    else if ((i = strncmp(ibuf,"^IMAGE",6)) == 0) {
+    else if((i = strncmp(ibuf, "^IMAGE", 6)) == 0) {
       /*****************************************************************/
       /* change the location pointer of image to record 7              */
       /*****************************************************************/
 
-      if (record_bytes == 836) {
-	strcpy(ibuf+35,"7");
-	length=length-1;
+      if(record_bytes == 836) {
+        strcpy(ibuf + 35, "7");
+        length = length - 1;
       }
       else {
-	strcpy(ibuf+35,"60");
-	length = length - 2; 
+        strcpy(ibuf + 35, "60");
+        length = length - 2;
       }
 
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
-    else if ((i = strncmp(ibuf,"OBJECT                           = ENCODING",
-			  43)) == 0) {
+    else if((i = strncmp(ibuf, "OBJECT                           = ENCODING",
+                         43)) == 0) {
 
       /*****************************************************************/
       /* delete the 4 encoding histogram labels                        */
       /*****************************************************************/
 
-      for (i=0; i<4; i++) {   /* ignore these labels */
-	length = read_var(ibuf,host);
+      for(i = 0; i < 4; i++) { /* ignore these labels */
+        length = read_var(ibuf, host);
       }
     }
 
-    else if ((i = strncmp(ibuf," ENCODING",9)) == 0);
-    
+    else if((i = strncmp(ibuf, " ENCODING", 9)) == 0);
+
     /*****************************************************************/
     /* delete the encoding type label in the image object            */
     /*****************************************************************/
 
-    else if ((host == 2 || host == 5) && (i = strncmp(ibuf,
-             " ITEM_TYPE                       = VAX_INTEGER",46)) == 0) {
+    else if((host == 2 || host == 5) && (i = strncmp(ibuf,
+                                         " ITEM_TYPE                       = VAX_INTEGER", 46)) == 0) {
       /*****************************************************************/
       /* change the record_type value from variable to fixed           */
       /*****************************************************************/
 
-      strcpy(ibuf+35,"INTEGER");
+      strcpy(ibuf + 35, "INTEGER");
       length = length - 4;
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
 
     /*****************************************************************/
     /* find the checksum and store in label_checksum                 */
     /*****************************************************************/
-    else if ((i = strncmp(ibuf," CHECKSUM",9)) == 0) {
+    else if((i = strncmp(ibuf, " CHECKSUM", 9)) == 0) {
       ibuf[length]   = '\0';
-      label_checksum = atol(ibuf+35);
+      label_checksum = atol(ibuf + 35);
     }
 
     /*****************************************************************/
     /* if none of above write out the label to the output file       */
     /*****************************************************************/
     else {
-      fwrite(ibuf,length,1,outfile);
-      fprintf(outfile,"%c%c",cr,lf);
+      fwrite(ibuf, length, 1, outfile);
+      fprintf(outfile, "%c%c", cr, lf);
       total_bytes = total_bytes + length + 2;
     }
 
     /*****************************************************************/
     /* test for the end of the PDS labels                            */
     /*****************************************************************/
-    if ((i = strncmp(ibuf,"END",3)) == 0 && length == 3) break;
-  } while (length > 0);
+    if((i = strncmp(ibuf, "END", 3)) == 0 && length == 3) break;
+  }
+  while(length > 0);
 
   /* pad out the labels with blanks to multiple of record_bytes */
-  if (record_bytes == 836)
-    for (i=total_bytes; i<record_bytes*3; i++) fputc(blank,outfile);
+  if(record_bytes == 836)
+    for(i = total_bytes; i < record_bytes * 3; i++) fputc(blank, outfile);
   else
-    for (i=total_bytes; i<record_bytes*2; i++) fputc(blank,outfile);
+    for(i = total_bytes; i < record_bytes * 2; i++) fputc(blank, outfile);
 }
 
 
@@ -802,86 +812,87 @@ void pds_labels(host)
 void fits_labels(host)
 int host;
 {
-  char          ibuf[2048],outstring[80];
-  short         length,nlen,total_bytes,line,i;
-  unsigned char cr=13,lf=10,blank=32;
+  char          ibuf[2048], outstring[80];
+  short         length, nlen, total_bytes, line, i;
+  unsigned char cr = 13, lf = 10, blank = 32;
 
   do {
-    length = read_var(ibuf,host);
+    length = read_var(ibuf, host);
 
     /*****************************************************************/
     /* find the checksum and store in label_checksum                 */
     /*****************************************************************/
-    if ((i = strncmp(ibuf," CHECKSUM",9)) == 0) { 
+    if((i = strncmp(ibuf, " CHECKSUM", 9)) == 0) {
       ibuf[length]   = '\0';
-      label_checksum = atol(ibuf+35);
+      label_checksum = atol(ibuf + 35);
     }
 
-    else if ((i = strncmp(ibuf,"RECORD_BYTES",12)) == 0) {
+    else if((i = strncmp(ibuf, "RECORD_BYTES", 12)) == 0) {
       /*****************************************************************/
       /* get the record_bytes value                                    */
       /*****************************************************************/
 
-      sscanf(ibuf+35,"%d",&record_bytes);
-      if (record_bytes != 836) record_bytes = 1204;
+      sscanf(ibuf + 35, "%d", &record_bytes);
+      if(record_bytes != 836) record_bytes = 1204;
     }
 
     /*****************************************************************/
     /* read to the end of the PDS labels                             */
     /*****************************************************************/
-    if ((i = strncmp(ibuf,"END",3)) == 0 && length == 3) break;
-  } while (length > 0);
+    if((i = strncmp(ibuf, "END", 3)) == 0 && length == 3) break;
+  }
+  while(length > 0);
 
   open_files(&host);
   total_bytes = 0;
 
-  strcpy(outstring,"SIMPLE  =                    T");
-  strcat(outstring,"                                               ");
-  fwrite(outstring,78,1,outfile);
-  fprintf(outfile,"%c%c",cr,lf);
+  strcpy(outstring, "SIMPLE  =                    T");
+  strcat(outstring, "                                               ");
+  fwrite(outstring, 78, 1, outfile);
+  fprintf(outfile, "%c%c", cr, lf);
   total_bytes = total_bytes + 80;
 
-  strcpy(outstring,"BITPIX  =                    8");
-  strcat(outstring,"                                               ");
-  fwrite(outstring,78,1,outfile);
-  fprintf(outfile,"%c%c",cr,lf);
+  strcpy(outstring, "BITPIX  =                    8");
+  strcat(outstring, "                                               ");
+  fwrite(outstring, 78, 1, outfile);
+  fprintf(outfile, "%c%c", cr, lf);
   total_bytes = total_bytes + 80;
 
-  strcpy(outstring,"NAXIS   =                    2");
-  strcat(outstring,"                                               ");
-  fwrite(outstring,78,1,outfile);
-  fprintf(outfile,"%c%c",cr,lf);
+  strcpy(outstring, "NAXIS   =                    2");
+  strcat(outstring, "                                               ");
+  fwrite(outstring, 78, 1, outfile);
+  fprintf(outfile, "%c%c", cr, lf);
   total_bytes = total_bytes + 80;
 
-  if (record_bytes == 836)
-    strcpy(outstring,"NAXIS1  =                  800");
-  else 
-    strcpy(outstring,"NAXIS1  =                 1204");
-
-  strcat(outstring,"                                               ");
-  fwrite(outstring,78,1,outfile);
-  fprintf(outfile,"%c%c",cr,lf);
-  total_bytes = total_bytes + 80;
-
-  if (record_bytes == 836)
-    strcpy(outstring,"NAXIS2  =                  800");
+  if(record_bytes == 836)
+    strcpy(outstring, "NAXIS1  =                  800");
   else
-    strcpy(outstring,"NAXIS2  =                 1056");
+    strcpy(outstring, "NAXIS1  =                 1204");
 
-  strcat(outstring,"                                               ");
-  fwrite(outstring,78,1,outfile);
-  fprintf(outfile,"%c%c",cr,lf);
+  strcat(outstring, "                                               ");
+  fwrite(outstring, 78, 1, outfile);
+  fprintf(outfile, "%c%c", cr, lf);
   total_bytes = total_bytes + 80;
 
-  strcpy(outstring,"END                             ");
-  strcat(outstring,"                                               ");
-  
-  fwrite(outstring,78,1,outfile);
-  fprintf(outfile,"%c%c",cr,lf);
+  if(record_bytes == 836)
+    strcpy(outstring, "NAXIS2  =                  800");
+  else
+    strcpy(outstring, "NAXIS2  =                 1056");
+
+  strcat(outstring, "                                               ");
+  fwrite(outstring, 78, 1, outfile);
+  fprintf(outfile, "%c%c", cr, lf);
+  total_bytes = total_bytes + 80;
+
+  strcpy(outstring, "END                             ");
+  strcat(outstring, "                                               ");
+
+  fwrite(outstring, 78, 1, outfile);
+  fprintf(outfile, "%c%c", cr, lf);
   total_bytes = total_bytes + 80;
 
   /* pad out the labels with blanks to multiple of 2880 for FITS */
-  for (i=total_bytes; i<2880; i++) fputc(blank,outfile);
+  for(i = total_bytes; i < 2880; i++) fputc(blank, outfile);
 }
 
 /*********************************************************************/
@@ -894,65 +905,66 @@ void vicar_labels(host)
 int host;
 
 {
-  char          ibuf[2048],outstring[80];
-  short         length,nlen,total_bytes,line,i;
-  unsigned char cr=13,lf=10,blank=32;
+  char          ibuf[2048], outstring[80];
+  short         length, nlen, total_bytes, line, i;
+  unsigned char cr = 13, lf = 10, blank = 32;
 
   do {
-    length = read_var(ibuf,host);
+    length = read_var(ibuf, host);
     /*****************************************************************/
     /* find the checksum and store in label_checksum                 */
     /*****************************************************************/
-    if ((i = strncmp(ibuf," CHECKSUM",9)) == 0) { 
+    if((i = strncmp(ibuf, " CHECKSUM", 9)) == 0) {
       ibuf[length]   = '\0';
-      label_checksum = atol(ibuf+35);
+      label_checksum = atol(ibuf + 35);
     }
 
-    else if ((i = strncmp(ibuf,"RECORD_BYTES",12)) == 0) {
+    else if((i = strncmp(ibuf, "RECORD_BYTES", 12)) == 0) {
       /*****************************************************************/
       /* get the record_bytes value                                    */
       /*****************************************************************/
 
-      sscanf(ibuf+35,"%d",&record_bytes);
-      if (record_bytes != 836) record_bytes = 1204;
+      sscanf(ibuf + 35, "%d", &record_bytes);
+      if(record_bytes != 836) record_bytes = 1204;
     }
 
     /*****************************************************************/
     /* read to the end of the PDS labels                             */
     /*****************************************************************/
-    if ((i = strncmp(ibuf,"END",3)) == 0 && length == 3) break;
-  } while (length > 0);
+    if((i = strncmp(ibuf, "END", 3)) == 0 && length == 3) break;
+  }
+  while(length > 0);
 
   open_files(&host);
   total_bytes = 0;
 
-  if (record_bytes == 836)
+  if(record_bytes == 836)
     strcpy(outstring,
-  "LBLSIZE=800             FORMAT='BYTE'  TYPE='IMAGE'  BUFSIZ=800  DIM=2  ");
+           "LBLSIZE=800             FORMAT='BYTE'  TYPE='IMAGE'  BUFSIZ=800  DIM=2  ");
 
   else
     strcpy(outstring,
-  "LBLSIZE=1204            FORMAT='BYTE'  TYPE='IMAGE'  BUFSIZ=1204 DIM=2  ");
+           "LBLSIZE=1204            FORMAT='BYTE'  TYPE='IMAGE'  BUFSIZ=1204 DIM=2  ");
 
-  fwrite(outstring,72,1,outfile);
+  fwrite(outstring, 72, 1, outfile);
   total_bytes = total_bytes + 72;
 
-  if (record_bytes == 836)
+  if(record_bytes == 836)
     strcpy(outstring,
-  "EOL=0  RECSIZE=800  ORG='BSQ'  NL=800  NS=800  NB=1  N1=0  N2=0  N3=0  ");
+           "EOL=0  RECSIZE=800  ORG='BSQ'  NL=800  NS=800  NB=1  N1=0  N2=0  N3=0  ");
   else
     strcpy(outstring,
-  "EOL=0  RECSIZE=1204 ORG='BSQ'  NL=1056 NS=1204 NB=1  N1=0  N2=0  N3=0  ");
+           "EOL=0  RECSIZE=1204 ORG='BSQ'  NL=1056 NS=1204 NB=1  N1=0  N2=0  N3=0  ");
 
   total_bytes = total_bytes + 71;
-  fwrite(outstring,71,1,outfile);
-  strcpy(outstring,"N4=0  NBB=0  NLB=0");
-  fwrite(outstring,18,1,outfile);
-  fprintf(outfile,"%c%c",cr,lf);
+  fwrite(outstring, 71, 1, outfile);
+  strcpy(outstring, "N4=0  NBB=0  NLB=0");
+  fwrite(outstring, 18, 1, outfile);
+  fprintf(outfile, "%c%c", cr, lf);
   total_bytes = total_bytes + 20;
 
   /* pad out the labels with blanks to multiple of record_bytes        */
-  for (i=total_bytes;i<record_bytes;i++) fputc(blank,outfile);
+  for(i = total_bytes; i < record_bytes; i++) fputc(blank, outfile);
 }
 
 
@@ -965,34 +977,35 @@ int host;
 void no_labels(host)
 int host;
 {
-  char          ibuf[2048],outstring[80];
-  short         length,nlen,total_bytes,line,i;
+  char          ibuf[2048], outstring[80];
+  short         length, nlen, total_bytes, line, i;
 
   do {
-    length = read_var(ibuf,host);
+    length = read_var(ibuf, host);
 
     /*****************************************************************/
     /* find the checksum and store in label_checksum                 */
     /*****************************************************************/
-    if ((i = strncmp(ibuf," CHECKSUM",9)) == 0) { 
+    if((i = strncmp(ibuf, " CHECKSUM", 9)) == 0) {
       ibuf[length]   = '\0';
-      label_checksum = atol(ibuf+35);
+      label_checksum = atol(ibuf + 35);
     }
 
-    else if ((i = strncmp(ibuf,"RECORD_BYTES",12)) == 0) {
+    else if((i = strncmp(ibuf, "RECORD_BYTES", 12)) == 0) {
       /*****************************************************************/
       /* get the record_bytes value                                    */
       /*****************************************************************/
 
-      sscanf(ibuf+35,"%d",&record_bytes);
-      if (record_bytes != 836) record_bytes = 1204;
+      sscanf(ibuf + 35, "%d", &record_bytes);
+      if(record_bytes != 836) record_bytes = 1204;
     }
 
     /*****************************************************************/
     /* read to the end of the PDS labels                             */
     /*****************************************************************/
-    if ((i = strncmp(ibuf,"END",3)) == 0 && length == 3) break;
-  } while (length > 0);
+    if((i = strncmp(ibuf, "END", 3)) == 0 && length == 3) break;
+  }
+  while(length > 0);
 
   open_files(&host);
 }
@@ -1003,73 +1016,72 @@ int host;
 /*                                                                   */
 /*********************************************************************/
 
-read_var(ibuf,host)
+read_var(ibuf, host)
 char  *ibuf;
 int   host;
 {
-  int   length,result,nlen;
+  int   length, result, nlen;
   char  temp;
-  union /* this union is used to swap 16 and 32 bit integers          */
-    {
-      char  ichar[4];
-      short slen;
-      int  llen;
-    } onion;
+  union { /* this union is used to swap 16 and 32 bit integers          */
+    char  ichar[4];
+    short slen;
+    int  llen;
+  } onion;
 
-  switch (host) {
-  case 1: /*******************************************************/
-          /* IBM PC host                                         */
-          /*******************************************************/
-    length = 0;
-    result = read(infile, &length, (size_t) 2);
-    nlen =   read(infile, ibuf, (size_t) (length + (length % 2)));
-    return (length);
+  switch(host) {
+    case 1: /*******************************************************/
+      /* IBM PC host                                         */
+      /*******************************************************/
+      length = 0;
+      result = read(infile, &length, (size_t) 2);
+      nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
+      return (length);
 
-  case 2: /*******************************************************/
-          /* Macintosh host                                      */
-          /*******************************************************/
+    case 2: /*******************************************************/
+      /* Macintosh host                                      */
+      /*******************************************************/
 
-    length = 0;
-    result = read(infile, onion.ichar, (size_t) 2);
-    /*     byte swap the length field                            */
-    temp   = onion.ichar[0];
-    onion.ichar[0]=onion.ichar[1];
-    onion.ichar[1]=temp;
-    length = onion.slen;       /* left out of earlier versions   */
-    nlen =   read(infile, ibuf, (size_t) (length + (length % 2)));
-    return (length);
+      length = 0;
+      result = read(infile, onion.ichar, (size_t) 2);
+      /*     byte swap the length field                            */
+      temp   = onion.ichar[0];
+      onion.ichar[0] = onion.ichar[1];
+      onion.ichar[1] = temp;
+      length = onion.slen;       /* left out of earlier versions   */
+      nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
+      return (length);
 
-  case 3: /*******************************************************/
-          /* VAX host with variable length support               */
-          /*******************************************************/
-    length = read(infile, ibuf, (size_t) 2048); /* 2048 is upper bound */
-    return (length);
+    case 3: /*******************************************************/
+      /* VAX host with variable length support               */
+      /*******************************************************/
+      length = read(infile, ibuf, (size_t) 2048); /* 2048 is upper bound */
+      return (length);
 
-  case 4: /*******************************************************/
-          /* VAX host, but not a variable length file            */
-          /*******************************************************/
-    length = 0;
-    result = read(infile, &length, (size_t) 2);
-    nlen =   read(infile, ibuf, (size_t) (length + (length % 2)));
+    case 4: /*******************************************************/
+      /* VAX host, but not a variable length file            */
+      /*******************************************************/
+      length = 0;
+      result = read(infile, &length, (size_t) 2);
+      nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
 
-    /* check to see if we crossed a vax record boundary          */
-    while (nlen < length)
-      nlen += read(infile, ibuf + nlen, (size_t) (length + (length % 2) - nlen));
+      /* check to see if we crossed a vax record boundary          */
+      while(nlen < length)
+        nlen += read(infile, ibuf + nlen, (size_t)(length + (length % 2) - nlen));
 
-    return (length);
+      return (length);
 
-  case 5: /*******************************************************/
-          /* Unix workstation host (non-byte-swapped 32 bit host)*/
-          /*******************************************************/
-    length = 0;
-    result = read(infile, onion.ichar, (size_t) 2);
-    /*     byte swap the length field                            */
-    temp   = onion.ichar[0];
-    onion.ichar[0]=onion.ichar[1];
-    onion.ichar[1]=temp;
-    length = onion.slen;
-    nlen =   read(infile, ibuf, (size_t) (length + (length % 2)));
-    return (length);
+    case 5: /*******************************************************/
+      /* Unix workstation host (non-byte-swapped 32 bit host)*/
+      /*******************************************************/
+      length = 0;
+      result = read(infile, onion.ichar, (size_t) 2);
+      /*     byte swap the length field                            */
+      temp   = onion.ichar[0];
+      onion.ichar[0] = onion.ichar[1];
+      onion.ichar[1] = temp;
+      length = onion.slen;
+      nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
+      return (length);
   }
 }
 
@@ -1079,50 +1091,48 @@ int   host;
 /*                                                                   */
 /*********************************************************************/
 
-int check_host()
-{
+int check_host() {
   /*  This subroutine checks the attributes of the host computer and
       returns a host code number.
       */
   char hostname[80];
 
-  int swap,host,bits,var;
-  union
-    {
-      char  ichar[2];
-      short ilen;
-    } onion;
+  int swap, host, bits, var;
+  union {
+    char  ichar[2];
+    short ilen;
+  } onion;
 
-  if (sizeof(var) == 4) bits = 32;
+  if(sizeof(var) == 4) bits = 32;
   else bits = 16;
 
   onion.ichar[0] = 1;
   onion.ichar[1] = 0;
 
-  if (onion.ilen == 1) swap = TRUE;
+  if(onion.ilen == 1) swap = TRUE;
   else                 swap = FALSE;
 
-  if (bits == 16 && swap == TRUE ) {
+  if(bits == 16 && swap == TRUE) {
     host = 1; /* IBM PC host  */
     strcpy(hostname,
-	   "Host 1 - 16 bit integers with swapping, no var len support.");
+           "Host 1 - 16 bit integers with swapping, no var len support.");
   }
 
-  if (bits == 16 && swap == FALSE ) {
+  if(bits == 16 && swap == FALSE) {
     host = 2; /* Non byte swapped 16 bit host  */
     strcpy(hostname,
-	   "Host 2 - 16 bit integers without swapping, no var len support.");
+           "Host 2 - 16 bit integers without swapping, no var len support.");
   }
 
-  if (bits == 32 && swap == TRUE ) {
+  if(bits == 32 && swap == TRUE) {
     host = 3; /* VAX host with var length support */
-    strcpy(hostname,"Host 3,4 - 32 bit integers with swapping.");
- }
+    strcpy(hostname, "Host 3,4 - 32 bit integers with swapping.");
+  }
 
-  if (bits == 32 && swap == FALSE  ) {
+  if(bits == 32 && swap == FALSE) {
     host = 5; /* OTHER 32-bit host  */
     strcpy(hostname,
-	   "Host 5 - 32 bit integers without swapping, no var len support.");
+           "Host 5 - 32 bit integers without swapping, no var len support.");
   }
 
 //  if ((*outname)!='-') fprintf(stderr,"%s\n",hostname);
@@ -1130,35 +1140,34 @@ int check_host()
 }
 
 int swap_long(inval)  /* swap 4 byte integer                       */
-     int inval;
+int inval;
 {
-  union /* this union is used to swap 16 and 32 bit integers          */
-    {
-      char  ichar[4];
-      short slen;
-      int  llen;
-    } onion;
+  union { /* this union is used to swap 16 and 32 bit integers          */
+    char  ichar[4];
+    short slen;
+    int  llen;
+  } onion;
   char   temp;
 
   /* byte swap the input field                                      */
   onion.llen   = inval;
   temp   = onion.ichar[0];
-  onion.ichar[0]=onion.ichar[3];
-  onion.ichar[3]=temp;
+  onion.ichar[0] = onion.ichar[3];
+  onion.ichar[3] = temp;
   temp   = onion.ichar[1];
-  onion.ichar[1]=onion.ichar[2];
-  onion.ichar[2]=temp;
+  onion.ichar[1] = onion.ichar[2];
+  onion.ichar[2] = temp;
   return (onion.llen);
 }
 
-void decompress(ibuf,obuf,nin,nout)
+void decompress(ibuf, obuf, nin, nout)
 /****************************************************************************
 *_TITLE decompress - decompresses image lines stored in compressed format   *
 *_ARGS  TYPE       NAME      I/O        DESCRIPTION                         */
-        char       *ibuf;  /* I         Compressed data buffer              */
-        char       *obuf;  /* O         Decompressed image line             */
-        int   *nin;   /* I         Number of bytes on input buffer     */
-        int   *nout;  /* I         Number of bytes in output buffer    */
+char       *ibuf;  /* I         Compressed data buffer              */
+char       *obuf;  /* O         Decompressed image line             */
+int   *nin;   /* I         Number of bytes on input buffer     */
+int   *nout;  /* I         Number of bytes in output buffer    */
 
 {
   /* The external root pointer to tree */
@@ -1172,8 +1181,8 @@ void decompress(ibuf,obuf,nin,nout)
     routine dcmprs.
    **************************************************************************/
 
-  dcmprs(ibuf,obuf,nin,nout,tree);
-  
+  dcmprs(ibuf, obuf, nin, nout, tree);
+
   return;
 }
 
@@ -1182,7 +1191,7 @@ void decmpinit(hist)
 /***************************************************************************
 *_TITLE decmpinit - initializes the Huffman tree                           *
 *_ARGS  TYPE       NAME      I/O        DESCRIPTION                        */
-        int   *hist;  /* I         First-difference histogram.        */
+int   *hist;  /* I         First-difference histogram.        */
 
 {
   extern NODE *tree;          /* Huffman tree root pointer */
@@ -1193,7 +1202,7 @@ void decmpinit(hist)
   /**************************************************************************
     Simply call the huff_tree routine and return.
    **************************************************************************/
-  
+
   tree = huff_tree(hist);
 
   return;
@@ -1204,7 +1213,7 @@ NODE *huff_tree(hist)
 /****************************************************************************
 *_TITLE huff_tree - constructs the Huffman tree; returns pointer to root    *
 *_ARGS  TYPE          NAME        I/O   DESCRIPTION                         */
-        int     *hist;     /* I    First difference histogram          */
+int     *hist;     /* I    First difference histogram          */
 
 {
   /*  Local variables used */
@@ -1236,14 +1245,14 @@ NODE *huff_tree(hist)
    **************************************************************************/
 
   fp = freq_list;
-  node_list = (NODE **) malloc(sizeof(temp)*512);
-  if (node_list == NULL) {
-    fprintf(stderr,"\nOut of memory in huff_tree!\n");
+  node_list = (NODE **) malloc(sizeof(temp) * 512);
+  if(node_list == NULL) {
+    fprintf(stderr, "\nOut of memory in huff_tree!\n");
     exit(5);
   }
   np = node_list;
 
-  for (num_nodes=1, cnt=512 ; cnt-- ; num_nodes++) {
+  for(num_nodes = 1, cnt = 512 ; cnt-- ; num_nodes++) {
 
     /***********************************************************************
       The following code has been added to standardize the VAX byte order
@@ -1254,8 +1263,8 @@ NODE *huff_tree(hist)
     unsigned char *cp = (unsigned char *) hist++;
     unsigned int j;
     short int i;
-    for (i=4 ; --i >= 0 ; j = (j << 8) | *(cp+i));
-    
+    for(i = 4 ; --i >= 0 ; j = (j << 8) | *(cp + i));
+
     /* Now make the assignment */
     *fp++ = j;
     temp = new_node(num_nodes);
@@ -1269,12 +1278,12 @@ NODE *huff_tree(hist)
    *************************************************************************/
 
   num_freq = 512;
-  sort_freq(freq_list,node_list,num_freq);
+  sort_freq(freq_list, node_list, num_freq);
 
   fp = freq_list;
   np = node_list;
 
-  for (num_freq=512 ; (*fp) == 0 && (num_freq) ; fp++, np++, num_freq--);
+  for(num_freq = 512 ; (*fp) == 0 && (num_freq) ; fp++, np++, num_freq--);
 
   /*************************************************************************
     Now create the tree.  Note that if there is only one difference value,
@@ -1285,14 +1294,14 @@ NODE *huff_tree(hist)
     nodes and it's frequency is the sum of the two combining nodes.
    *************************************************************************/
 
-  for (temp=(*np) ; (num_freq--) > 1 ; ) {
+  for(temp = (*np) ; (num_freq--) > 1 ;) {
     temp = new_node(znull);
     temp->right = (*np++);
     temp->left = (*np);
     *np = temp;
-    *(fp+1) = *(fp+1) + *fp;
+    *(fp + 1) = *(fp + 1) + *fp;
     *fp++ = 0;
-    sort_freq(fp,np,num_freq);
+    sort_freq(fp, np, num_freq);
   }
 
   return temp;
@@ -1303,7 +1312,7 @@ NODE *new_node(value)
 /****************************************************************************
 *_TITLE new_node - allocates a NODE structure and returns a pointer to it   *
 *_ARGS  TYPE        NAME        I/O     DESCRIPTION                         */
-        short int   value;    /* I      Value to assign to DN field         */
+short int   value;    /* I      Value to assign to DN field         */
 
 {
   NODE *temp;         /* Pointer to the memory block */
@@ -1317,26 +1326,26 @@ NODE *new_node(value)
 
   temp = (NODE *) malloc(sizeof(NODE));
 
-  if (temp != NULL) {
+  if(temp != NULL) {
     temp->right = NULL;
     temp->dn = value;
     temp->left = NULL;
   }
   else {
-    fprintf(stderr,"\nOut of memory in new_node!\n");
+    fprintf(stderr, "\nOut of memory in new_node!\n");
     exit(6);
   }
 
   return temp;
 }
 
-void sort_freq(freq_list,node_list,num_freq)
+void sort_freq(freq_list, node_list, num_freq)
 /****************************************************************************
 *_TITLE sort_freq - sorts frequency and node lists in increasing freq. order*
 *_ARGS  TYPE       NAME            I/O  DESCRIPTION                         */
-        int   *freq_list;   /* I   Pointer to frequency list           */
-        NODE       **node_list;  /* I   Pointer to array of node pointers   */
-        int   num_freq;     /* I   Number of values in freq list       */
+int   *freq_list;   /* I   Pointer to frequency list           */
+NODE       **node_list;  /* I   Pointer to array of node pointers   */
+int   num_freq;     /* I   Number of values in freq list       */
 
 {
   /* Local Variables */
@@ -1358,34 +1367,34 @@ void sort_freq(freq_list,node_list,num_freq)
     element at this point in list.
    *********************************************************************/
 
-  if (num_freq <= 0) return;      /* If no elements or invalid, return */
+  if(num_freq <= 0) return;       /* If no elements or invalid, return */
 
-  for (i=freq_list, k=node_list, cnt=num_freq ; --cnt ; *j=temp1, *l=temp2) {
+  for(i = freq_list, k = node_list, cnt = num_freq ; --cnt ; *j = temp1, *l = temp2) {
     temp1 = *(++i);
     temp2 = *(++k);
 
-    for (j = i, l = k ;  *(j-1) > temp1 ; ) {
-      *j = *(j-1);
-      *l = *(l-1);
+    for(j = i, l = k ;  * (j - 1) > temp1 ;) {
+      *j = *(j - 1);
+      *l = *(l - 1);
       j--;
       l--;
-      if ( j <= freq_list) break;
+      if(j <= freq_list) break;
     }
-    
+
   }
   return;
 }
 
 
-void dcmprs(ibuf,obuf,nin,nout,root)
+void dcmprs(ibuf, obuf, nin, nout, root)
 /****************************************************************************
 *_TITLE dcmprs - decompresses Huffman coded compressed image lines          *
 *_ARGS  TYPE       NAME       I/O       DESCRIPTION                         */
-        char       *ibuf;   /* I        Compressed data buffer              */
-        char       *obuf;   /* O        Decompressed image line             */
-        int   *nin;    /* I        Number of bytes on input buffer     */
-        int   *nout;   /* I        Number of bytes in output buffer    */
-        NODE       *root;   /* I        Huffman coded tree                  */
+char       *ibuf;   /* I        Compressed data buffer              */
+char       *obuf;   /* O        Decompressed image line             */
+int   *nin;    /* I        Number of bytes on input buffer     */
+int   *nout;   /* I        Number of bytes in output buffer    */
+NODE       *root;   /* I        Huffman coded tree                  */
 
 {
   /* Local Variables */
@@ -1402,10 +1411,10 @@ void dcmprs(ibuf,obuf,nin,nout,root)
     Check for valid input values for nin, nout and make initial assignments.
    **************************************************************************/
 
-  if (ilim > ibuf && olim > obuf)
+  if(ilim > ibuf && olim > obuf)
     odn = *obuf++ = *ibuf++;
   else {
-    fprintf(stderr,"\nInvalid byte count in dcmprs!\n");
+    fprintf(stderr, "\nInvalid byte count in dcmprs!\n");
     exit(7);
   }
 
@@ -1416,15 +1425,15 @@ void dcmprs(ibuf,obuf,nin,nout,root)
     go to right else go to left.
    ************************************************************************/
 
-  for (idn=(*ibuf) ; ibuf < ilim  ; idn =(*++ibuf)) {
-    for (test=0x80 ; test ; test >>= 1) {
+  for(idn = (*ibuf) ; ibuf < ilim  ; idn = (*++ibuf)) {
+    for(test = 0x80 ; test ; test >>= 1) {
       ptr = (test & idn) ? ptr->left : ptr->right;
 
-      if (ptr->dn != -1)  {
-	if (obuf >= olim) return;
-	odn -= ptr->dn + 256;
-	*obuf++ = odn;
-	ptr = root;
+      if(ptr->dn != -1)  {
+        if(obuf >= olim) return;
+        odn -= ptr->dn + 256;
+        *obuf++ = odn;
+        ptr = root;
       }
     }
   }
@@ -1436,7 +1445,7 @@ void free_tree(nfreed)
 /****************************************************************************
 *_TITLE free_tree - free memory of all allocated nodes                      *
 *_ARGS  TYPE       NAME       I/O        DESCRIPTION                        */
-        int   *nfreed;  /* O        Return of total count of nodes     *
+int   *nfreed;  /* O        Return of total count of nodes     *
 *                                        freed.                             */
 
 /*
@@ -1464,18 +1473,18 @@ void free_tree(nfreed)
     Simply call the free_node routine and return the result.
    ****************************************************************/
 
-  *nfreed = free_node(tree,total_free);
+  *nfreed = free_node(tree, total_free);
 
   return;
 }
 
 
-int free_node(pnode,total_free)
+int free_node(pnode, total_free)
 /***************************************************************************
 *_TITLE free_node - deallocates an allocated NODE pointer
 *_ARGS  TYPE     NAME          I/O   DESCRIPTION                           */
-        NODE     *pnode;       /* I  Pointer to node to free               */
-        int total_free;   /* I  Total number of freed nodes           */
+NODE     *pnode;       /* I  Pointer to node to free               */
+int total_free;   /* I  Total number of freed nodes           */
 
 /*
 *_DESCR  free_node will check both right and left pointers of a node       *
@@ -1492,13 +1501,13 @@ int free_node(pnode,total_free)
 *        and is not done by any of these routines.                         *
 *_HIST   16-AUG-89  Kris Becker U.S.G.S  Flagstaff Original Version        */
 {
-  if (pnode == (NODE *) NULL) return(total_free);
-  
-  if (pnode->right != (NODE *) NULL)
-    total_free = free_node(pnode->right,total_free);
-  if (pnode->left != (NODE *) NULL)
-    total_free = free_node(pnode->left,total_free);
-  
+  if(pnode == (NODE *) NULL) return(total_free);
+
+  if(pnode->right != (NODE *) NULL)
+    total_free = free_node(pnode->right, total_free);
+  if(pnode->left != (NODE *) NULL)
+    total_free = free_node(pnode->left, total_free);
+
   free((char *) pnode);
   return(total_free + 1);
 }

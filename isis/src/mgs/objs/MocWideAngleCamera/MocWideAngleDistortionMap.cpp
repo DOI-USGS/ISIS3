@@ -4,25 +4,25 @@ using namespace std;
 namespace Isis {
   namespace Mgs {
     /** Constructor for MocWideAngleDistortionMap class
-     * 
+     *
      * Define the distortion model coefficients for a Moc Wide
      * Angle camera.
-     * 
+     *
      * @param parent    A pointer to the parent camera object
      * @param red       A flag indicating whether the filter is red or not
-     *                  
+     *
      * @internal
-     * 
+     *
      * @history 2005-02-01 Jeff Anderson Original version
      * @history 2007-02-24 Debbie A. Cook Changed to p_scale value for -1 to 1
      *                        to reflect the change to the affine coefficients
      *                        in the new MocAddendum003.ti file
-     * 
+     *
      */
-    MocWideAngleDistortionMap::MocWideAngleDistortionMap (Camera *parent, bool red) :
-      CameraDistortionMap (parent,1.0) {
+    MocWideAngleDistortionMap::MocWideAngleDistortionMap(Camera *parent, bool red) :
+      CameraDistortionMap(parent, 1.0) {
       // Set up distortion coefficients
-      if (red) {
+      if(red) {
         p_coefs.push_back(0.9993258);
         p_coefs.push_back(0.4655529);
         p_coefs.push_back(-0.1548756);
@@ -56,8 +56,8 @@ namespace Isis {
     }
 
 
-    bool MocWideAngleDistortionMap::SetFocalPlane(const double dx, 
-                                                  const double dy) {
+    bool MocWideAngleDistortionMap::SetFocalPlane(const double dx,
+        const double dy) {
       // Apply scale factor
       p_focalPlaneX = dx;
       p_focalPlaneY = dy;
@@ -65,7 +65,7 @@ namespace Isis {
 
       // See if we are close to the boresight which implies no distortion
       double s2 = dx * dx + sdy * sdy;
-      if (s2 <= 1.0E-6) {
+      if(s2 <= 1.0E-6) {
         p_undistortedFocalPlaneX = dx;
         p_undistortedFocalPlaneY = sdy;
         return true;
@@ -76,7 +76,7 @@ namespace Isis {
       double ang = atan(s / p_camera->FocalLength());
       double ang2 = ang * ang;
       double angp = p_coefs[p_numCoefs-1];
-      for (int i=p_numCoefs-2; i>=0; i--) {
+      for(int i = p_numCoefs - 2; i >= 0; i--) {
         angp = angp * ang2 + p_coefs[i];
       }
       angp = angp * ang;
@@ -85,15 +85,15 @@ namespace Isis {
       p_undistortedFocalPlaneY = sdy * sp / s;
       return true;
     }
-    
-    bool MocWideAngleDistortionMap::SetUndistortedFocalPlane(const double ux, 
-                                                             const double uy) {
+
+    bool MocWideAngleDistortionMap::SetUndistortedFocalPlane(const double ux,
+        const double uy) {
       p_undistortedFocalPlaneX = ux;
       p_undistortedFocalPlaneY = uy;
 
       // See if we are close to boresight
       double sp2 = ux * ux + uy * uy;
-      if (sp2 <= 1.0E-6) {
+      if(sp2 <= 1.0E-6) {
         p_focalPlaneX = ux;
         p_focalPlaneY = uy * p_scale;
         return true;
@@ -104,7 +104,7 @@ namespace Isis {
       double angp = atan(sp / p_camera->FocalLength());
       double angp2 = angp * angp;
       double ang = p_icoefs[p_numCoefs-1];
-      for (int i=p_numCoefs-2; i>=0; i--) { 
+      for(int i = p_numCoefs - 2; i >= 0; i--) {
         ang = ang * angp2 + p_icoefs[i];
       }
       ang = ang * angp;

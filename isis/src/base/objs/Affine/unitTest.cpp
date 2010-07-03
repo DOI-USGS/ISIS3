@@ -8,19 +8,19 @@
 using namespace std;
 using namespace TNT;
 
-int main () {
+int main() {
   typedef Isis::Affine::AMatrix AMatrix;
   Isis::Preference::Preferences(true);
 
   Isis::Affine a;
 
   // Test translate
-  a.Translate (1.0,-1.0);
-  a.Compute(0.0,0.0);
+  a.Translate(1.0, -1.0);
+  a.Compute(0.0, 0.0);
   std::cout << setprecision(1) << std::endl;
   std::cout <<  std::fixed << a.xp() << std::endl;
   std::cout <<  std::fixed << a.yp() << std::endl;
-  a.ComputeInverse(a.xp(),a.yp());
+  a.ComputeInverse(a.xp(), a.yp());
   std::cout <<  std::fixed << a.x() << std::endl;
   std::cout <<  std::fixed << a.y() << std::endl;
   std::cout << "---" << std::endl;
@@ -28,10 +28,10 @@ int main () {
   // Test rotate
   a.Identity();
   a.Rotate(90.0);
-  a.Compute(0.0,1.0);
+  a.Compute(0.0, 1.0);
   std::cout <<  std::fixed << a.xp() << std::endl;
   std::cout <<  std::fixed << a.yp() << std::endl;
-  a.ComputeInverse(a.xp(),a.yp());
+  a.ComputeInverse(a.xp(), a.yp());
   std::cout <<  std::fixed << a.x() << std::endl;
   std::cout <<  std::fixed << a.y() << std::endl;
   std::cout << "---" << std::endl;
@@ -42,43 +42,43 @@ int main () {
   double xp[] = { 3.0, 1.0, 3.0 };
   double yp[] = { 3.0, 1.0, 1.0 };
 
-  a.Solve(x,y,xp,yp,3);
+  a.Solve(x, y, xp, yp, 3);
   std::cout << "Forward: 1.0, 1.0\n";
-  a.Compute(1.0,1.0);
+  a.Compute(1.0, 1.0);
   std::cout <<  std::fixed << a.xp() << std::endl;
   std::cout <<  std::fixed << a.yp() << std::endl;
   std::cout << "Inverse: " << a.xp() << "," << a.yp() << std::endl;
-  a.ComputeInverse(a.xp(),a.yp());
+  a.ComputeInverse(a.xp(), a.yp());
   std::cout <<  std::fixed << a.x() << std::endl;
   std::cout <<  std::fixed << a.y() << std::endl;
   std::cout << "---" << std::endl;
 
   std::cout << "Forward: 3.0, 3.0\n";
-  a.Compute(3.0,3.0);
+  a.Compute(3.0, 3.0);
   std::cout <<  std::fixed << a.xp() << std::endl;
   std::cout <<  std::fixed << a.yp() << std::endl;
   std::cout << "Inverse: " << a.xp() << "," << a.yp() << std::endl;
-  a.ComputeInverse(a.xp(),a.yp());
+  a.ComputeInverse(a.xp(), a.yp());
   std::cout <<  std::fixed << a.x() << std::endl;
   std::cout <<  std::fixed << a.y() << std::endl;
   std::cout << "---" << std::endl;
 
   std::cout << "Forward: 1.0, 3.0\n";
-  a.Compute(1.0,3.0);
+  a.Compute(1.0, 3.0);
   std::cout <<  std::fixed << a.xp() << std::endl;
   std::cout <<  std::fixed << a.yp() << std::endl;
   std::cout << "Inverse: " << a.xp() << "," << a.yp() << std::endl;
-  a.ComputeInverse(a.xp(),a.yp());
+  a.ComputeInverse(a.xp(), a.yp());
   std::cout <<  std::fixed << a.x() << std::endl;
   std::cout <<  std::fixed << a.y() << std::endl;
   std::cout << "---" << std::endl;
 
   std::cout << "Forward: 3.0, 1.0\n";
-  a.Compute(3.0,1.0);
+  a.Compute(3.0, 1.0);
   std::cout <<  std::fixed << a.xp() << std::endl;
   std::cout <<  std::fixed << a.yp() << std::endl;
   std::cout << "Inverse: " << a.xp() << "," << a.yp() << std::endl;
-  a.ComputeInverse(a.xp(),a.yp());
+  a.ComputeInverse(a.xp(), a.yp());
   std::cout <<  std::fixed << a.x() << std::endl;
   std::cout <<  std::fixed << a.y() << std::endl;
   std::cout << "---" << std::endl;
@@ -119,11 +119,11 @@ int main () {
   std::cout << "\nMatrix Constructor\n";
   Isis::Affine b(forward);
   std::cout << "Forward: 1.0, 3.0\n";
-  b.Compute(1.0,3.0);
+  b.Compute(1.0, 3.0);
   std::cout <<  std::fixed << b.xp() << std::endl;
   std::cout <<  std::fixed << b.yp() << std::endl;
   std::cout << "Inverse: " << b.xp() << "," << b.yp() << std::endl;
-  a.ComputeInverse(b.xp(),b.yp());
+  a.ComputeInverse(b.xp(), b.yp());
   std::cout <<  std::fixed << b.x() << std::endl;
   std::cout <<  std::fixed << b.y() << std::endl;
   std::cout << "---" << std::endl;

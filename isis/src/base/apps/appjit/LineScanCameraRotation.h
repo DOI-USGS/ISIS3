@@ -69,8 +69,8 @@ namespace Isis {
    *                       if the time did not change to improve speed.
    *  @history 2006-10-18  Debbie A. Cook Added method, WrapAngle, to wrap
    *                        angles around 2 pi
-   *  @history 2007-12-05  Debbie A. Cook added method SetPolynomialDegree to 
-   *                        allow the degree of the polynomials fit to the 
+   *  @history 2007-12-05  Debbie A. Cook added method SetPolynomialDegree to
+   *                        allow the degree of the polynomials fit to the
    *                        camera angles to be changed.  Also changed the
    *                        polynomial from a fixed 2nd order polynomial to
    *                        an nth degree polynomial with one independent
@@ -100,17 +100,23 @@ namespace Isis {
     public:
       //! Constructors
 //      LineScanCameraRotation( int frameCode, SpiceRotation *crot, SpiceRotation *prot, SpicePosition *spos );
-      LineScanCameraRotation( int frameCode,  Isis::Pvl &lab, std::vector<double> timeCache, double tol);
+      LineScanCameraRotation(int frameCode,  Isis::Pvl &lab, std::vector<double> timeCache, double tol);
 
       //! Destructor
 //      virtual ~LineScanCameraRotation() { };
       virtual ~LineScanCameraRotation();
 
       void LoadCache();
-      void SetJitter( PixelOffset *jitter) { p_jitter = jitter; };
+      void SetJitter(PixelOffset *jitter) {
+        p_jitter = jitter;
+      };
       void ReloadCache();
-      void ResetPitchRate( double pitchRate ) { p_pitchRate = pitchRate; };
-      void ResetYaw( double yaw ) { p_yaw = yaw; };
+      void ResetPitchRate(double pitchRate) {
+        p_pitchRate = pitchRate;
+      };
+      void ResetYaw(double yaw) {
+        p_yaw = yaw;
+      };
 
     private:
       Isis::Spice *p_spi;

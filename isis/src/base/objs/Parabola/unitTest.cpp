@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   Isis::Parabola b("Parabola");
@@ -17,7 +17,7 @@ int main () {
   cout << "Name   = " << b.Name() << endl;
   cout << "Ncoefs = " << b.Coefficients() << endl;
   cout << "Vars   = " << b.Variables() << endl;
-  for (int i=0; i<b.Coefficients(); i++) {
+  for(int i = 0; i < b.Coefficients(); i++) {
     cout << b.Coefficient(i) << endl;
   }
 
@@ -25,14 +25,14 @@ int main () {
   vector<double> vars;
   vars.push_back(2.0);
   cout << b.Evaluate(vars) << endl;
-  for (int i=0; i<b.Coefficients(); i++) {
+  for(int i = 0; i < b.Coefficients(); i++) {
     cout << b.Term(i) << endl;
   }
 
   cout << "---" << endl;
   vars[0] = -2.0;
   cout << b.Evaluate(vars) << endl;
-  for (int i=0; i<b.Coefficients(); i++) {
+  for(int i = 0; i < b.Coefficients(); i++) {
     cout << b.Term(i) << endl;
   }
 }

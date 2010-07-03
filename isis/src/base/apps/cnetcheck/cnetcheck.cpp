@@ -19,33 +19,33 @@
 #include "SerialNumberList.h"
 #include "UserInterface.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 map< string, set<string> > constructPointSets(set<string> &index,
-                                              ControlNet &innet);
-vector< set<string> > findIslands(set<string> &index, map< string,
-                                            set<string> > &adjCubes);
-void WriteOutput( SerialNumberList num2cube, string suffix,
-                  set<string> &sns, map< string, set<string> > &cps );
+    ControlNet &innet);
+vector< set<string> > findIslands(set<string> &index, map < string,
+                                  set<string> > &adjCubes);
+void WriteOutput(SerialNumberList num2cube, string suffix,
+                 set<string> &sns, map< string, set<string> > &cps);
 
 // Main program
 void IsisMain() {
 
   Progress progress;
   UserInterface &ui = Application::GetUserInterface();
-  ControlNet innet( ui.GetFilename("CNET"), NULL, true );
+  ControlNet innet(ui.GetFilename("CNET"), NULL, true);
   iString prefix(ui.GetString("PREFIX"));
   bool ignore = ui.GetBoolean("IGNORE");
 
   // Sets up the list of serial numbers for
   FileList inlist(ui.GetFilename("FROMLIST"));
   set<iString> inListNums;
-  map<iString,int> netSerialNumCount;
+  map<iString, int> netSerialNumCount;
   vector<iString> listedSerialNumbers;
   SerialNumberList num2cube;
 
-  if (inlist.size() > 0) {
+  if(inlist.size() > 0) {
     progress.SetText("Initializing");
     progress.SetMaximumSteps(inlist.size());
     progress.CheckStatus();
@@ -74,7 +74,7 @@ void IsisMain() {
   map< string, int > cubeMeasureCount;
 
   // Set calculating progress
-  if (innet.Size() > 0) {
+  if(innet.Size() > 0) {
     progress.SetText("Calculating");
     progress.SetMaximumSteps(innet.Size());
     progress.CheckStatus();
@@ -90,23 +90,24 @@ void IsisMain() {
     ControlPoint controlpt(innet[cp]);
 
     // Checks for lat/Lon production
-    if( ui.GetBoolean("NOLATLON") ) {
+    if(ui.GetBoolean("NOLATLON")) {
 
       // Loop through all control measures in control points
-      for (int cm = 0; cm < controlpt.Size(); cm ++) {
+      for(int cm = 0; cm < controlpt.Size(); cm ++) {
         ControlMeasure controlms = controlpt[cm];
 
         // If we have the cube, check it out
-        if (num2cube.HasSerialNumber(controlms.CubeSerialNumber())) {
-          Cube * cube = cbman.OpenCube(num2cube.Filename(controlms.CubeSerialNumber()));
-          Camera * cam = NULL;
+        if(num2cube.HasSerialNumber(controlms.CubeSerialNumber())) {
+          Cube *cube = cbman.OpenCube(num2cube.Filename(controlms.CubeSerialNumber()));
+          Camera *cam = NULL;
           bool createFail = false;
           bool setPassed = true;
 
           // Try to create
           try {
             cam = cube->Camera();
-          } catch(iException &e) {
+          }
+          catch(iException &e) {
             createFail = true;
             e.Clear();
           }
@@ -119,7 +120,7 @@ void IsisMain() {
           // Record it if it failed at anything
           if(createFail || !setPassed) {
             noLatLonSerialNumbers.insert(controlms.CubeSerialNumber());
-            noLatLonControlPoints[controlms.CubeSerialNumber()].insert( controlpt.Id() );
+            noLatLonControlPoints[controlms.CubeSerialNumber()].insert(controlpt.Id());
           }
         }
       }
@@ -128,7 +129,7 @@ void IsisMain() {
     if(controlpt.NumValidMeasures() == 1) {
       string sn = controlpt[0].CubeSerialNumber();
       singleMeasureSerialNumbers.insert(sn);
-      singleMeasureControlPoints[sn].insert( controlpt.Id() );
+      singleMeasureControlPoints[sn].insert(controlpt.Id());
 
       // Records how many times a cube is in the ControlNet
       cubeMeasureCount[sn] ++;
@@ -137,7 +138,7 @@ void IsisMain() {
       // Checks for duplicate Measures for the same SerialNumber
       vector<ControlMeasure> controlMeasures;
       for(int cm = 0; cm < controlpt.Size(); cm ++) {
-        if( ignore  &&  controlpt[cm].Ignore() ) continue;
+        if(ignore  &&  controlpt[cm].Ignore()) continue;
 
         controlMeasures.push_back(controlpt[cm]);
         iString currentsn = controlpt[cm].CubeSerialNumber();
@@ -146,15 +147,15 @@ void IsisMain() {
         cubeMeasureCount[currentsn] ++;
 
         // Compares previous ControlMeasure SerialNumbers with the current
-        for(int pre_cm = controlMeasures.size()-1-1; pre_cm >= 0; pre_cm --) {
-          if( controlMeasures[pre_cm].CubeSerialNumber() == currentsn ) {
+        for(int pre_cm = controlMeasures.size() - 1 - 1; pre_cm >= 0; pre_cm --) {
+          if(controlMeasures[pre_cm].CubeSerialNumber() == currentsn) {
             duplicateSerialNumbers.insert(currentsn); //serial number duplication
-            duplicateControlPoints[currentsn].insert( controlpt.Id() );
+            duplicateControlPoints[currentsn].insert(controlpt.Id());
           }
         }
 
         // Removes from the serial number list, cubes that are included in the cnet
-        inListNums.erase( currentsn );
+        inListNums.erase(currentsn);
         netSerialNumCount[currentsn] ++;
 
         // Records if the currentsnum is not in the input cube list
@@ -189,16 +190,16 @@ void IsisMain() {
   // Output islands in the file-by-file format
   //  Islands that have no cubes listed in the input list will
   //  not be shown.
-  for(int i=0; i < (int)islands.size(); i++) {
-    string name(Filename(prefix + "Island." + iString(i+1)).Expanded());
+  for(int i = 0; i < (int)islands.size(); i++) {
+    string name(Filename(prefix + "Island." + iString(i + 1)).Expanded());
     ofstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
-    out_stream.seekp(0,std::ios::beg); //Start writing from beginning of file
+    out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
 
     bool hasList = false;
     for(set<string>::iterator island = islands[i].begin();
-         island != islands[i].end(); island++) {
-      if (num2cube.HasSerialNumber(*island)) { 
+        island != islands[i].end(); island++) {
+      if(num2cube.HasSerialNumber(*island)) {
         out_stream << (num2cube.HasSerialNumber(*island) ? Filename(num2cube.Filename(*island)).Name() : "") << " " << *island;
         out_stream << "\n";
 
@@ -208,7 +209,7 @@ void IsisMain() {
 
     out_stream.close();
 
-    if (!hasList) {
+    if(!hasList) {
       remove(name.c_str());
     }
   }
@@ -218,11 +219,11 @@ void IsisMain() {
 
   PvlGroup results("Results");
 
-  stringstream ss (stringstream::in | stringstream::out);
+  stringstream ss(stringstream::in | stringstream::out);
 
-  results.AddKeyword( PvlKeyword("Islands",iString((BigInt)islands.size())) );
+  results.AddKeyword(PvlKeyword("Islands", iString((BigInt)islands.size())));
   ss << endl << "----------------------------------------" \
-                "----------------------------------------" << endl;
+     "----------------------------------------" << endl;
   if(islands.size() == 1) {
     ss << "The cubes are fully connected by the Control Network." << endl;
   }
@@ -236,16 +237,16 @@ void IsisMain() {
   }
 
   if(ui.GetBoolean("SINGLEMEASURE")  &&  singleMeasureSerialNumbers.size() > 0) {
-    results.AddKeyword( 
-      PvlKeyword("SingleMeasure",iString((BigInt)singleMeasureSerialNumbers.size())) );
+    results.AddKeyword(
+      PvlKeyword("SingleMeasure", iString((BigInt)singleMeasureSerialNumbers.size())));
 
     string name(Filename(prefix + "SinglePointCubes.txt").Expanded());
-    WriteOutput( num2cube, name,
-                 singleMeasureSerialNumbers, singleMeasureControlPoints );
+    WriteOutput(num2cube, name,
+                singleMeasureSerialNumbers, singleMeasureControlPoints);
 
     int serials = singleMeasureSerialNumbers.size();
     ss << "----------------------------------------" \
-          "----------------------------------------" << endl;
+       "----------------------------------------" << endl;
     ss << "There " << ((serials == 1) ? "is " : "are ") << singleMeasureSerialNumbers.size();
     ss << ((serials == 1) ? " cube" : " cubes") << " in Control Points with only a single";
     ss << " Control Measure." << endl;
@@ -255,14 +256,14 @@ void IsisMain() {
 
   if(ui.GetBoolean("DUPLICATE")  &&  duplicateSerialNumbers.size() > 0) {
     results.AddKeyword(
-      PvlKeyword("DuplicateMeasures",iString((BigInt)duplicateSerialNumbers.size())) );
+      PvlKeyword("DuplicateMeasures", iString((BigInt)duplicateSerialNumbers.size())));
 
     string name(Filename(prefix + "DuplicateMeasures.txt").Expanded());
-    WriteOutput( num2cube, name,
-                 duplicateSerialNumbers, duplicateControlPoints );
+    WriteOutput(num2cube, name,
+                duplicateSerialNumbers, duplicateControlPoints);
 
     ss << "----------------------------------------" \
-          "----------------------------------------" << endl;
+       "----------------------------------------" << endl;
     ss << "There are " << duplicateSerialNumbers.size();
     ss << " duplicate Control Measures in the";
     ss << " Control Net." << endl;
@@ -272,14 +273,14 @@ void IsisMain() {
 
   if(ui.GetBoolean("NOLATLON")  &&  noLatLonSerialNumbers.size() > 0) {
     results.AddKeyword(
-      PvlKeyword("NoLatLonCubes",iString((BigInt)noLatLonSerialNumbers.size())) );
+      PvlKeyword("NoLatLonCubes", iString((BigInt)noLatLonSerialNumbers.size())));
 
     string name(Filename(prefix + "NoLatLon.txt").Expanded());
-    WriteOutput( num2cube, name,
-                 noLatLonSerialNumbers, noLatLonControlPoints );
+    WriteOutput(num2cube, name,
+                noLatLonSerialNumbers, noLatLonControlPoints);
 
     ss << "----------------------------------------" \
-          "----------------------------------------" << endl;
+       "----------------------------------------" << endl;
     ss << "There are " << noLatLonSerialNumbers.size();
     ss << " serial numbers in the Control Network which are listed in the";
     ss << " input list and cannot compute latitude and longitudes." << endl;
@@ -289,25 +290,25 @@ void IsisMain() {
 
   // At this point, inListNums is the list of cubes NOT included in the
   //  ControlNet, and inListNums are their those cube's serial numbers.
-  if(ui.GetBoolean("NOCONTROL") && !inListNums.empty() ) {
-    results.AddKeyword( PvlKeyword("NoControl",iString((BigInt)inListNums.size())) );
+  if(ui.GetBoolean("NOCONTROL") && !inListNums.empty()) {
+    results.AddKeyword(PvlKeyword("NoControl", iString((BigInt)inListNums.size())));
 
     string name(Filename(prefix + "NoControl.txt").Expanded());
     ofstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
-    out_stream.seekp(0,std::ios::beg); //Start writing from beginning of file
-    
-    for( set<iString>::iterator sn = inListNums.begin();
-         sn != inListNums.end();
-         sn ++) {
+    out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
+
+    for(set<iString>::iterator sn = inListNums.begin();
+        sn != inListNums.end();
+        sn ++) {
       out_stream << (*sn);
       out_stream << "\t" << (num2cube.HasSerialNumber(*sn) ? Filename(num2cube.Filename(*sn)).Name() : "");
-      out_stream << "\n";                       
+      out_stream << "\n";
     }
     out_stream.close();
-    
+
     ss << "----------------------------------------" \
-          "----------------------------------------" << endl;
+       "----------------------------------------" << endl;
     ss << "There are " << inListNums.size();
     ss << " cubes in the input list [" << Filename(ui.GetFilename("FROMLIST")).Name();
     ss << "] which do not exist or are ignored in the Control Network [";
@@ -320,14 +321,14 @@ void IsisMain() {
   //  cube in the input list.
   if(ui.GetBoolean("NOCUBE")  &&  nonListedSerialNumbers.size() > 0) {
     results.AddKeyword(
-      PvlKeyword("NoCube",iString((BigInt)nonListedSerialNumbers.size())) );
+      PvlKeyword("NoCube", iString((BigInt)nonListedSerialNumbers.size())));
 
     string name(Filename(prefix + "NoCube.txt").Expanded());
     ofstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
-    out_stream.seekp(0,std::ios::beg); //Start writing from beginning of file
+    out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
 
-    for(int sn=0; sn < (int)nonListedSerialNumbers.size(); sn++) {
+    for(int sn = 0; sn < (int)nonListedSerialNumbers.size(); sn++) {
       out_stream << nonListedSerialNumbers[sn];
       out_stream << "\n";
     }
@@ -335,7 +336,7 @@ void IsisMain() {
     out_stream.close();
 
     ss << "----------------------------------------" \
-          "----------------------------------------" << endl;
+       "----------------------------------------" << endl;
     ss << "There are " << nonListedSerialNumbers.size();
     ss << " serial numbers in the Control Net [";
     ss << Filename(ui.GetFilename("CNET")).Basename();
@@ -347,26 +348,28 @@ void IsisMain() {
 
   // At this point cubeMeasureCount should be equal to the number of
   //  ControlMeasures associated with each serial number.
-  if( ui.GetBoolean("SINGLECUBE") ) {
+  if(ui.GetBoolean("SINGLECUBE")) {
     set<string> singleMeasureCubes;
-    for( map<string,int>::iterator cube = cubeMeasureCount.begin();
-         cube != cubeMeasureCount.end();
-         cube ++ ) {
-      if( cube->second == 1 ) { singleMeasureCubes.insert( cube->first ); }
+    for(map<string, int>::iterator cube = cubeMeasureCount.begin();
+        cube != cubeMeasureCount.end();
+        cube ++) {
+      if(cube->second == 1) {
+        singleMeasureCubes.insert(cube->first);
+      }
     }
 
-    if( singleMeasureCubes.size() > 0 ) {
+    if(singleMeasureCubes.size() > 0) {
       results.AddKeyword(
-        PvlKeyword("SingleCube",iString((BigInt)singleMeasureCubes.size())) );
+        PvlKeyword("SingleCube", iString((BigInt)singleMeasureCubes.size())));
 
       string name(Filename(prefix + "SingleCube.txt").Expanded());
       ofstream out_stream;
       out_stream.open(name.c_str(), std::ios::out);
-      out_stream.seekp(0,std::ios::beg); //Start writing from beginning of file
+      out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
 
-      for( set<string>::iterator sn = singleMeasureCubes.begin();
-           sn != singleMeasureCubes.end();
-           sn ++ ) {
+      for(set<string>::iterator sn = singleMeasureCubes.begin();
+          sn != singleMeasureCubes.end();
+          sn ++) {
         out_stream << (*sn);
         out_stream << "\t" << (num2cube.HasSerialNumber(*sn) ? Filename(num2cube.Filename(*sn)).Name() : "");
         out_stream << "\n";
@@ -375,7 +378,7 @@ void IsisMain() {
       out_stream.close();
 
       ss << "----------------------------------------" \
-            "----------------------------------------" << endl;
+         "----------------------------------------" << endl;
       ss << "There are " << singleMeasureCubes.size();
       ss << " serial numbers in the Control Net [";
       ss << Filename(ui.GetFilename("CNET")).Basename();
@@ -386,11 +389,11 @@ void IsisMain() {
   }
 
   ss << "----------------------------------------" \
-        "----------------------------------------" << endl << endl;
+     "----------------------------------------" << endl << endl;
   std::string log = ss.str();
   Application::Log(results);
 
-  if (ui.IsInteractive()) {
+  if(ui.IsInteractive()) {
     Application::GuiLog(log);
   }
   else {
@@ -402,11 +405,11 @@ void IsisMain() {
 
 // Links cubes to other cubes it shares control points with
 map< string, set<string> > constructPointSets(set<string> &index,
-                                               ControlNet &innet) {
+    ControlNet &innet) {
   map< string, set<string > > adjPoints;
 
   bool ignore = Application::GetUserInterface().GetBoolean("IGNORE");
-  for(int cp=0; cp < innet.Size(); cp++) {
+  for(int cp = 0; cp < innet.Size(); cp++) {
 
     if(ignore && innet[cp].Ignore()) continue;
 
@@ -414,16 +417,16 @@ map< string, set<string> > constructPointSets(set<string> &index,
 
     ControlPoint controlpt = innet[cp];
     // Map SerialNumbers together based on ControlMeasures
-    for(int cm1=0; cm1 < controlpt.Size(); cm1++) {
+    for(int cm1 = 0; cm1 < controlpt.Size(); cm1++) {
       if(ignore && controlpt.Ignore()) continue;
 
       std::string sn = controlpt[cm1].CubeSerialNumber();
       index.insert(sn);
-      for(int cm2=0; cm2 < controlpt.Size(); cm2++) {
+      for(int cm2 = 0; cm2 < controlpt.Size(); cm2++) {
         if(ignore && controlpt[cm2].Ignore()) continue;
 
         if(cm1 != cm2) {
-          adjPoints[ sn ].insert( controlpt[cm2].CubeSerialNumber() );
+          adjPoints[ sn ].insert(controlpt[cm2].CubeSerialNumber());
         }
       }
     }
@@ -436,7 +439,7 @@ map< string, set<string> > constructPointSets(set<string> &index,
 
 // Uses a depth-first search to construct the islands
 vector< set<string> > findIslands(set<string> &index,
-                                   map< string, set<string> > &adjCubes) {
+                                  map< string, set<string> > &adjCubes) {
   vector< set<string> > islands;
 
   while(index.size() != 0) {
@@ -450,18 +453,18 @@ vector< set<string> > findIslands(set<string> &index,
     while(true) {
       index.erase(str_stack.top());
       connectedSet.insert(str_stack.top());
-            
+
       // Find the first connected unvisited node
       std::string nextNode = "";
       set<string> neighbors = adjCubes[str_stack.top()];
-      for (set<string>::iterator i = neighbors.begin(); i != neighbors.end(); i++) {
-        if (index.count(*i) == 1) {
+      for(set<string>::iterator i = neighbors.begin(); i != neighbors.end(); i++) {
+        if(index.count(*i) == 1) {
           nextNode = *i;
           break;
         }
       }
-            
-      if (nextNode != "") {
+
+      if(nextNode != "") {
         // Push the unvisited node
         str_stack.push(nextNode);
       }
@@ -469,7 +472,7 @@ vector< set<string> > findIslands(set<string> &index,
         // Pop the visited node
         str_stack.pop();
 
-        if (str_stack.size() == 0) break;
+        if(str_stack.size() == 0) break;
       }
     }
 
@@ -481,20 +484,20 @@ vector< set<string> > findIslands(set<string> &index,
 
 
 // Writes the list of cubes [ SerialNumber, Filename, ControlPoints ] to the output file
-void WriteOutput( SerialNumberList num2cube, string filename,
-                  set<string> &sns, map< string, set<string> > &cps ) {
+void WriteOutput(SerialNumberList num2cube, string filename,
+                 set<string> &sns, map< string, set<string> > &cps) {
 
   UserInterface &ui = Application::GetUserInterface();
 
   // Set the character to separate the entries
   string delimit;
-  if (ui.GetString("DELIMIT") == "TAB") {
+  if(ui.GetString("DELIMIT") == "TAB") {
     delimit = "\t";
   }
-  else if (ui.GetString("DELIMIT") == "COMMA") {
+  else if(ui.GetString("DELIMIT") == "COMMA") {
     delimit = ",";
   }
-  else if (ui.GetString("DELIMIT") == "SPACE") {
+  else if(ui.GetString("DELIMIT") == "SPACE") {
     delimit = " ";
   }
   else {
@@ -504,15 +507,15 @@ void WriteOutput( SerialNumberList num2cube, string filename,
   // Set up the output file for writing
   ofstream out_stream;
   out_stream.open(filename.c_str(), std::ios::out);
-  out_stream.seekp(0,std::ios::beg); //Start writing from beginning of file
+  out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
 
-  for( set<string>::iterator sn = sns.begin();
-                      sn != sns.end(); sn++ ) {
+  for(set<string>::iterator sn = sns.begin();
+      sn != sns.end(); sn++) {
     // Serial Number of cube
     out_stream << *sn;
 
     // Filename of cube if given
-    if( num2cube.HasSerialNumber(*sn) ) {
+    if(num2cube.HasSerialNumber(*sn)) {
       out_stream << delimit << Filename(num2cube.Filename(*sn)).Name();
     }
     else {
@@ -520,8 +523,8 @@ void WriteOutput( SerialNumberList num2cube, string filename,
     }
 
     // Control Points where the cube was found to have the issue
-    for( set<string>::iterator cp = cps[*sn].begin();
-         cp != cps[*sn].end(); cp++ ) {
+    for(set<string>::iterator cp = cps[*sn].begin();
+        cp != cps[*sn].end(); cp++) {
       out_stream << "\t" << *cp;
     }
 

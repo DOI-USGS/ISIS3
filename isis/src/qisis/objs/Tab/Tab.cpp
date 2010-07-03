@@ -9,9 +9,8 @@ using namespace Qisis;
 
 
 //! constructs a Tab
-Tab::Tab(QWidget * associatedWidget, QWidget * parent) :
-    QToolButton(parent)
-{
+Tab::Tab(QWidget *associatedWidget, QWidget *parent) :
+  QToolButton(parent) {
   this->associatedWidget = NULL;
   this->associatedWidget = associatedWidget;
 
@@ -24,10 +23,9 @@ Tab::Tab(QWidget * associatedWidget, QWidget * parent) :
 
 
 //! copy constructs a Tab
-Tab::Tab(const Tab & other)
-{
+Tab::Tab(const Tab &other) {
   associatedWidget = NULL;
-  
+
   associatedWidget = other.associatedWidget;
   position = other.position;
   radioGroup = other.radioGroup;
@@ -36,22 +34,19 @@ Tab::Tab(const Tab & other)
 
 
 //! destructs a Tab
-Tab::~Tab()
-{
+Tab::~Tab() {
   associatedWidget = NULL;
 }
 
 
 //! set the position of the Tab within a TabBar
-void Tab::setPosition(const int & newPosition)
-{
+void Tab::setPosition(const int &newPosition) {
   position = newPosition;
 }
 
 
 //! get the position of the Tab within a TabBar
-const int & Tab::getPosition() const
-{
+const int &Tab::getPosition() const {
   return position;
 }
 
@@ -62,8 +57,7 @@ const int & Tab::getPosition() const
  *
  * @param newRadioGroup The new radio group to which the Tab should belong
  */
-void Tab::setRadioGroup(const int & newRadioGroup)
-{
+void Tab::setRadioGroup(const int &newRadioGroup) {
   radioGroup = newRadioGroup;
 }
 
@@ -74,8 +68,7 @@ void Tab::setRadioGroup(const int & newRadioGroup)
  *
  * @returns The radio group which this Tab belongs to
  */
-const int & Tab::getRadioGroup() const
-{
+const int &Tab::getRadioGroup() const {
   return radioGroup;
 }
 
@@ -87,8 +80,7 @@ const int & Tab::getRadioGroup() const
  *
  * @param newStatus True if the Tab should be selected, false otherwise
  */
-void Tab::setSelected(bool newStatus)
-{
+void Tab::setSelected(bool newStatus) {
   setDown(newStatus);
   newStatus ? associatedWidget->show() : associatedWidget->hide();
   selectedStatus = newStatus;
@@ -102,8 +94,7 @@ void Tab::setSelected(bool newStatus)
  *
  * @returns True if the Tab is selected, false otherwise
  */
-bool Tab::isSelected()
-{
+bool Tab::isSelected() {
   return selectedStatus;
 }
 
@@ -114,7 +105,6 @@ bool Tab::isSelected()
  * use this index to determine which Tab was clicked (TabBars store their Tabs
  * in a QVector).
  */
-void Tab::handleTriggered()
-{
+void Tab::handleTriggered() {
   emit clicked(position);
 }

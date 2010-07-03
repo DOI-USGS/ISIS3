@@ -11,16 +11,16 @@
 #include "PvlGroup.h"
 #include "iException.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Global variables
 Hillier *pho;
 
-void hillier (Buffer &in, Buffer &out);
+void hillier(Buffer &in, Buffer &out);
 
 void IsisMain() {
-  // We will be processing by line 
+  // We will be processing by line
   ProcessByLine p;
 
   // Set up the input cube and get camera information
@@ -33,7 +33,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   // Get the name of the parameter file
   Pvl par(ui.GetFilename("PHOPAR"));
-  auto_ptr<Hillier> photom = auto_ptr<Hillier> (new Hillier(par,  *icube)); 
+  auto_ptr<Hillier> photom = auto_ptr<Hillier> (new Hillier(par,  *icube));
   pho = photom.get();
 
   // Start the processing
@@ -47,27 +47,27 @@ void IsisMain() {
 }
 
 /**
- * @brief Apply Hillier photometric correction 
- *  
- * Short function dispatched for each line to apply the Hillier photometrc 
- * correction function. 
- *  
+ * @brief Apply Hillier photometric correction
+ *
+ * Short function dispatched for each line to apply the Hillier photometrc
+ * correction function.
+ *
  * @author kbecker (2/20/2010)
- * 
+ *
  * @param in Buffer containing input data
  * @param out Buffer of photometrically corrected data
  */
 void hillier(Buffer &in, Buffer &out) {
 
-  for (int i=0; i<in.size(); i++) {
+  for(int i = 0; i < in.size(); i++) {
     //  Don't correct special pixels
-    if (IsSpecial(in[i])) {
+    if(IsSpecial(in[i])) {
       out[i] = in[i];
     }
     else {
       // Get correction and test for validity
       double ph = pho->Compute(in.Line(i), in.Sample(i), in.Band(i));
-      out[i] = (IsSpecial(ph) ?  Null : in[i] * ph); 
+      out[i] = (IsSpecial(ph) ?  Null : in[i] * ph);
     }
   }
   return;

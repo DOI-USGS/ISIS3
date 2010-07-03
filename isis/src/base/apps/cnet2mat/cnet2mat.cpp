@@ -16,44 +16,44 @@ using namespace Isis;
 
 void IsisMain() {
 
-  std::map <int,string> fscMap;
-  std::map <string,int> snMap;
+  std::map <int, string> fscMap;
+  std::map <string, int> snMap;
 
   UserInterface &ui = Application::GetUserInterface();
 
   FileList list2(ui.GetFilename("LIST2"));
 
   SerialNumberList snl(ui.GetFilename("LIST3"));
-  for (unsigned int f=0; f<list2.size(); f++) {
-    iString currFile (list2[f]);
-    Pvl lab (currFile);
-    PvlObject qube (lab.FindObject("QUBE"));
+  for(unsigned int f = 0; f < list2.size(); f++) {
+    iString currFile(list2[f]);
+    Pvl lab(currFile);
+    PvlObject qube(lab.FindObject("QUBE"));
     string fsc;
-    if (qube.HasKeyword("IMAGE_NUMBER")) {
+    if(qube.HasKeyword("IMAGE_NUMBER")) {
       fsc = qube.FindKeyword("IMAGE_NUMBER")[0];
     }
-    else if (qube.HasKeyword("IMAGE_ID")) {
+    else if(qube.HasKeyword("IMAGE_ID")) {
       fsc = qube.FindKeyword("IMAGE_ID")[0];
     }
     else {
       string msg = "Unable to find keyword [\"IMAGE_NUMBER\" or \"IMAGE_ID\"] in file [";
       msg += fsc + "]";
-      throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
-    iString sn (snl.SerialNumber(f));
-    fscMap.insert(std::pair<int,string>(f,fsc));
-    snMap.insert(std::pair<string,int>(sn,f));
+    iString sn(snl.SerialNumber(f));
+    fscMap.insert(std::pair<int, string>(f, fsc));
+    snMap.insert(std::pair<string, int>(sn, f));
   }
 
   ControlNet cnet(ui.GetFilename("CONTROL"));
 
   int mpTotal = 0;
 
-  for (int i=0; i<cnet.Size(); i++) {
+  for(int i = 0; i < cnet.Size(); i++) {
     mpTotal += cnet[i].Size();
   }
 
-  TextFile mpFile(ui.GetFilename("MATCH"),"Overwrite","");
+  TextFile mpFile(ui.GetFilename("MATCH"), "Overwrite", "");
 
   ostringstream str;
   iString textLine;
@@ -107,10 +107,10 @@ void IsisMain() {
   mpFile.PutLine(textLine);
 
   // Loop for each point in the control network
-  for (int i=0; i<cnet.Size(); i++){
+  for(int i = 0; i < cnet.Size(); i++) {
 
     // Loop for each measure in the control point
-    for (int m=0; m<cnet[i].Size(); m++) {
+    for(int m = 0; m < cnet[i].Size(); m++) {
       ostringstream formatter;
       ControlMeasure currMeas = cnet[i][m];
 
@@ -155,22 +155,22 @@ void IsisMain() {
       //Set Class
       string ptClass;
       ControlMeasure::MeasureType mType = currMeas.Type();
-      if (mType == ControlMeasure::Unmeasured) {
+      if(mType == ControlMeasure::Unmeasured) {
         ptClass = "U   ";
       }
-      else if (mType == ControlMeasure::ValidatedManual) {
+      else if(mType == ControlMeasure::ValidatedManual) {
         ptClass = "M   ";
       }
-      else if (mType == ControlMeasure::ValidatedAutomatic) {
+      else if(mType == ControlMeasure::ValidatedAutomatic) {
         ptClass = "S   ";
       }
       else {
         ptClass = "M   "; //! U was causing qmatch "havoc"
       }
-      if (currMeas.IsReference()) {
+      if(currMeas.IsReference()) {
         ptClass = "T   ";
       }
-      if (currMeas.Ignore() || cnet[i].Ignore()) {
+      if(currMeas.Ignore() || cnet[i].Ignore()) {
         ptClass = "U   ";
       }
       textLine += ptClass;
@@ -181,7 +181,7 @@ void IsisMain() {
       formatter.width(16);
       formatter.setf(ios::right);
       iString diam;
-      if (currMeas.Diameter() == Isis::Null) {
+      if(currMeas.Diameter() == Isis::Null) {
         diam = 0.0;
       }
       else {

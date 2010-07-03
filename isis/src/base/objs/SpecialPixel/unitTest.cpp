@@ -5,11 +5,11 @@
 #include "Preference.h"
 
 using namespace std;
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   cout << "Unit test for IsisSpecialPixel" << endl;
-  
+
   cout << "Valid minimum (1 byte):           " << (int) Isis::VALID_MIN1 << endl;
   cout << "Null (1 byte):                    " << (int) Isis::NULL1 << endl;
   cout << "Low Representation (1 byte):      " << (int) Isis::LOW_REPR_SAT1 << endl;
@@ -18,7 +18,7 @@ int main (int argc, char *argv[]) {
   cout << "High Instrument (1 byte):         " << (int) Isis::HIGH_INSTR_SAT1 << endl;
   cout << "Valid maximum (1 byte):           " << (int) Isis::VALID_MAX1 << endl;
   cout << endl;
-  
+
   cout << "Valid minimum (2 byte):           " << Isis::VALID_MIN2 << endl;
   cout << "Null (2 byte):                    " << Isis::NULL2 << endl;
   cout << "Low Representation (2 byte):      " << Isis::LOW_REPR_SAT2 << endl;
@@ -36,7 +36,7 @@ int main (int argc, char *argv[]) {
   cout << "High Instrument (4 byte):         " << Isis::HIGH_INSTR_SAT4 << endl;
   cout << "Valid maximum (4 byte):           " << Isis::VALID_MAX4 << endl;
   cout << endl;
-  
+
   cout << setprecision(16);
   cout << "Valid minimum (8 byte):           " << Isis::VALID_MIN8 << endl;
   cout << "Null (8 byte):                    " << Isis::NULL8 << endl;
@@ -59,7 +59,7 @@ int main (int argc, char *argv[]) {
   cout << "IsLrsPixel:    " << Isis::IsLrsPixel(d) << endl;
   cout << "IsLisPixel:    " << Isis::IsLisPixel(d) << endl;
   cout << endl;
-  
+
   d = Isis::Null;
   cout << "Testing Isis::Null ... " << endl;
   cout << "IsSpecial:     " << Isis::IsSpecial(d) << endl;
@@ -126,39 +126,39 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
 #if 0
-  cout << Isis::IsEqual(Isis::NULL4,Isis::NULL4) << endl;
-  cout << Isis::IsEqual(Isis::NULL4,Isis::LOW_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::NULL4,Isis::LOW_REPR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::NULL4,Isis::HIGH_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::NULL4,Isis::HIGH_REPR_SAT4) << endl;
-  cout << endl;
-  
-  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4,Isis::NULL4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4,Isis::LOW_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4,Isis::LOW_REPR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4,Isis::HIGH_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4,Isis::HIGH_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::NULL4, Isis::NULL4) << endl;
+  cout << Isis::IsEqual(Isis::NULL4, Isis::LOW_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::NULL4, Isis::LOW_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::NULL4, Isis::HIGH_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::NULL4, Isis::HIGH_REPR_SAT4) << endl;
   cout << endl;
 
-  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4,Isis::NULL4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4,Isis::LOW_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4,Isis::LOW_REPR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4,Isis::HIGH_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4,Isis::HIGH_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4, Isis::NULL4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4, Isis::LOW_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4, Isis::LOW_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4, Isis::HIGH_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_INSTR_SAT4, Isis::HIGH_REPR_SAT4) << endl;
   cout << endl;
 
-  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4,Isis::NULL4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4,Isis::LOW_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4,Isis::LOW_REPR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4,Isis::HIGH_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4,Isis::HIGH_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4, Isis::NULL4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4, Isis::LOW_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4, Isis::LOW_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4, Isis::HIGH_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::LOW_REPR_SAT4, Isis::HIGH_REPR_SAT4) << endl;
   cout << endl;
 
-  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4,Isis::NULL4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4,Isis::LOW_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4,Isis::LOW_REPR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4,Isis::HIGH_INSTR_SAT4) << endl;
-  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4,Isis::HIGH_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4, Isis::NULL4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4, Isis::LOW_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4, Isis::LOW_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4, Isis::HIGH_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_INSTR_SAT4, Isis::HIGH_REPR_SAT4) << endl;
+  cout << endl;
+
+  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4, Isis::NULL4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4, Isis::LOW_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4, Isis::LOW_REPR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4, Isis::HIGH_INSTR_SAT4) << endl;
+  cout << Isis::IsEqual(Isis::HIGH_REPR_SAT4, Isis::HIGH_REPR_SAT4) << endl;
   cout << endl;
 #endif
 
@@ -217,60 +217,60 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing illegal shortcuts/expressions for StringToPixel(string):" << endl;
-  try{
+  try {
     s = "Nl";
     Isis::StringToPixel(s);
   }
   catch(Isis::iException &e) {
     e.Report(false);
   }
-  try{
+  try {
     s = "Nulll";
     Isis::StringToPixel(s);
   }
-  catch (Isis::iException &e){
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   try {
     s = "L";
     Isis::StringToPixel(s);
-  } 
-  catch (Isis::iException &e) {
+  }
+  catch(Isis::iException &e) {
     e.Report(false);
   }
-  try{
+  try {
     s = "Ls";
     Isis::StringToPixel(s);
   }
-  catch (Isis::iException &e){
+  catch(Isis::iException &e) {
     e.Report(false);
   }
-  try{
+  try {
     s = "H";
     Isis::StringToPixel(s);
   }
-  catch (Isis::iException &e){
+  catch(Isis::iException &e) {
     e.Report(false);
   }
-  try{
+  try {
     s = "Hs";
     Isis::StringToPixel(s);
   }
-  catch (Isis::iException &e){
+  catch(Isis::iException &e) {
     e.Report(false);
   }
-  try{
+  try {
     s = "Hrsr";
     Isis::StringToPixel(s);
   }
-  catch (Isis::iException &e){
+  catch(Isis::iException &e) {
     e.Report(false);
   }
-  try{
+  try {
     s = "nonsense";
     Isis::StringToPixel(s);
   }
-  catch (Isis::iException &e){
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;

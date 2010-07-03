@@ -3,12 +3,12 @@
 #include "UserInterface.h"
 #include "iException.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // prototypes and globals
 bool trimmed;
-void trimfilter (Buffer &in, Buffer &out, QuickFilter &filter);
+void trimfilter(Buffer &in, Buffer &out, QuickFilter &filter);
 
 // The trimfilter main routine
 void IsisMain() {
@@ -27,10 +27,10 @@ void IsisMain() {
   double low = -DBL_MAX;
   double high = DBL_MAX;
   int minimum;
-  if (ui.GetString("MINOPT") == "PERCENTAGE") {
+  if(ui.GetString("MINOPT") == "PERCENTAGE") {
     int size = lines * samples;
     double perc = ui.GetDouble("MINIMUM") / 100;
-    minimum = (int) (size * perc);
+    minimum = (int)(size * perc);
   }
   else {
     minimum = (int) ui.GetDouble("MINIMUM");
@@ -43,16 +43,16 @@ void IsisMain() {
   p.EndProcess();              // Cleanup
 
   // If trimming did not occur tell the user
-  if (!trimmed) {
+  if(!trimmed) {
     string msg = "Your selected parameters did not trim any data from the cube";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 }
 
 // Line processing routine
-void trimfilter (Buffer &in, Buffer &out, QuickFilter &filter) {
-  for (int i=0; i<filter.Samples(); i++) {
-    if (filter.Count(i) >= filter.MinimumPixels()) {
+void trimfilter(Buffer &in, Buffer &out, QuickFilter &filter) {
+  for(int i = 0; i < filter.Samples(); i++) {
+    if(filter.Count(i) >= filter.MinimumPixels()) {
       out[i] = in[i];
     }
     else {

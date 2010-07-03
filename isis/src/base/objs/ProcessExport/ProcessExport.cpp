@@ -37,7 +37,7 @@ using namespace std;
 namespace Isis {
 
   //! Constructs an Export object
-  ProcessExport::ProcessExport () : Isis::Process() {
+  ProcessExport::ProcessExport() : Isis::Process() {
 
     p_outputMinimum = 0.0;
     p_outputMiddle = 0.5;
@@ -49,8 +49,8 @@ namespace Isis {
 
     p_endianSwap = NULL;
 
-    SetFormat( BSQ );
-    SetOutputEndian(Isis::IsLsb()? Isis::Lsb : Isis::Msb);
+    SetFormat(BSQ);
+    SetOutputEndian(Isis::IsLsb() ? Isis::Lsb : Isis::Msb);
     SetOutputType(Isis::Real);
 
     p_Null_Set = false;
@@ -59,46 +59,46 @@ namespace Isis {
     p_His_Set = false;
     p_Hrs_Set = false;
 
-    p_progress->SetText ("Exporting");
+    p_progress->SetText("Exporting");
   }
 
 
   //! Destructor
-  ProcessExport::~ProcessExport() { 
-    if (p_endianSwap != NULL) {
+  ProcessExport::~ProcessExport() {
+    if(p_endianSwap != NULL) {
       delete p_endianSwap;
     }
-    for( unsigned int i = 0; i < p_str.size(); i++ ) {
+    for(unsigned int i = 0; i < p_str.size(); i++) {
       delete p_str[i];
     }
     p_str.clear();
   }
 
 
- /**
-  * @brief Set input pixel range from to a linear stretch
-  *
-  * This method allows the programmer to define what range of input pixels in
-  * the input cube get mapped to the output range in the Buffer. By default the
-  * output range is 0.0 to 1.0 (can be overridden using the SetOutputRange
-  * method). This version of SetInputRange allows the programmer to perform a
-  * simple linear stretch. That is, "minimum:0.0 maximum:1.0" or minimum is
-  * mapped to 0.0, maximum is mapped to 1.0 everything inbetween is mapped
-  * linearly (e.g., (minimum+maximum)/2.0:0.5). Also, everything less than the
-  * minimum is mapped to 0.0 and everything more than the maximum is mapped to
-  * 1.0.  If you are uncertain about how stretches operate see the Stretch
-  * object. If the input range is never set, no stretch will occur.
-  *
-  * @param minimum Minimum pixel value in the input cube to be mapped to the
-  *                minimum value in the Buffer
-  *
-  * @param maximum Maximum pixel value in the input cube to be mapped to the
-  *                maximum value in the Buffer
-  *
-  * @throws Isis::iException::Message
-  */
+  /**
+   * @brief Set input pixel range from to a linear stretch
+   *
+   * This method allows the programmer to define what range of input pixels in
+   * the input cube get mapped to the output range in the Buffer. By default the
+   * output range is 0.0 to 1.0 (can be overridden using the SetOutputRange
+   * method). This version of SetInputRange allows the programmer to perform a
+   * simple linear stretch. That is, "minimum:0.0 maximum:1.0" or minimum is
+   * mapped to 0.0, maximum is mapped to 1.0 everything inbetween is mapped
+   * linearly (e.g., (minimum+maximum)/2.0:0.5). Also, everything less than the
+   * minimum is mapped to 0.0 and everything more than the maximum is mapped to
+   * 1.0.  If you are uncertain about how stretches operate see the Stretch
+   * object. If the input range is never set, no stretch will occur.
+   *
+   * @param minimum Minimum pixel value in the input cube to be mapped to the
+   *                minimum value in the Buffer
+   *
+   * @param maximum Maximum pixel value in the input cube to be mapped to the
+   *                maximum value in the Buffer
+   *
+   * @throws Isis::iException::Message
+   */
   void ProcessExport::SetInputRange(const double minimum, const double maximum) {
-    double middle = (minimum+maximum)/2.0;
+    double middle = (minimum + maximum) / 2.0;
     SetInputRange(minimum, middle, maximum);
   }
 
@@ -127,47 +127,47 @@ namespace Isis {
   * @throws Isis::iException::Message
   */
   void ProcessExport::SetInputRange(const double minimum, const double maximum, const int index) {
-    double middle = (minimum+maximum)/2.0;
+    double middle = (minimum + maximum) / 2.0;
     SetInputRange(minimum, middle, maximum, index);
   }
 
- /**
-  * @brief Set input pixel range from to a piecewise linear stretch
-  *
-  * This method allows the programmer to define what range of input pixels in
-  * the input cube get mapped to the output range in the Buffer. By default the
-  * output range is 0.0 to 1.0 (can be overridden using the SetOutputRange
-  * method). This version of SetInputRange allows the programmer to perform a
-  * piecewise linear stretch. That is,"minimum:0.0 middle:0.5 maximum:1.0". The
-  * pixels from the input cube between minimum and middle are mapped to 0.0 and
-  * 0.5 linearly, while pixels between middle and maximum are mapped to 0.5 and
-  * 1.0 linearly. Those outside the range of minimum and maximum are mapped to
-  * 0.0 and 1.0 respectively. If you are uncertain about how stretches operate
-  * see the Stretch object. If the input range is never set, no stretch will
-  * occur.
-  *
-  * @param minimum Minimum pixel value in the input cube to be mapped to the
-  *                minimum value in the Buffer
-  *
-  * @param middle Middle pixel value in the input cube to be mapped to the
-  *               (minimum+maximum)/2.0 value in the Buffer
-  *
-  * @param maximum Maximum pixel value in the input cube to be mapped to the
-  *                maximum value in the Buffer
-  *
-  * @throws Isis::iException::Message
-  */
+  /**
+   * @brief Set input pixel range from to a piecewise linear stretch
+   *
+   * This method allows the programmer to define what range of input pixels in
+   * the input cube get mapped to the output range in the Buffer. By default the
+   * output range is 0.0 to 1.0 (can be overridden using the SetOutputRange
+   * method). This version of SetInputRange allows the programmer to perform a
+   * piecewise linear stretch. That is,"minimum:0.0 middle:0.5 maximum:1.0". The
+   * pixels from the input cube between minimum and middle are mapped to 0.0 and
+   * 0.5 linearly, while pixels between middle and maximum are mapped to 0.5 and
+   * 1.0 linearly. Those outside the range of minimum and maximum are mapped to
+   * 0.0 and 1.0 respectively. If you are uncertain about how stretches operate
+   * see the Stretch object. If the input range is never set, no stretch will
+   * occur.
+   *
+   * @param minimum Minimum pixel value in the input cube to be mapped to the
+   *                minimum value in the Buffer
+   *
+   * @param middle Middle pixel value in the input cube to be mapped to the
+   *               (minimum+maximum)/2.0 value in the Buffer
+   *
+   * @param maximum Maximum pixel value in the input cube to be mapped to the
+   *                maximum value in the Buffer
+   *
+   * @throws Isis::iException::Message
+   */
   void ProcessExport::SetInputRange(const double minimum, const double middle,
                                     const double maximum) {
-    if (minimum >= middle) {
+    if(minimum >= middle) {
       string message =
         "minimum must be less than the middle [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
-    if (middle >= maximum) {
+    if(middle >= maximum) {
       string message =
         "middle must be less than the maximum [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
     p_inputMinimum.clear();
     p_inputMinimum.resize(InputCubes.size(), minimum);
@@ -207,171 +207,171 @@ namespace Isis {
   */
   void ProcessExport::SetInputRange(const double minimum, const double middle,
                                     const double maximum, const int index) {
-    if (minimum >= middle) {
+    if(minimum >= middle) {
       string message =
         "minimum must be less than the middle [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
-    if (middle >= maximum) {
+    if(middle >= maximum) {
       string message =
         "middle must be less than the maximum [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
-    if (index >= (int)InputCubes.size() || index < 0) {
+    if(index >= (int)InputCubes.size() || index < 0) {
       string message =
         "index out of bounds";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
 
-    p_inputMinimum.resize(index+1, minimum);
-    p_inputMiddle.resize(index+1, middle);
-    p_inputMaximum.resize(index+1, maximum);
+    p_inputMinimum.resize(index + 1, minimum);
+    p_inputMiddle.resize(index + 1, middle);
+    p_inputMaximum.resize(index + 1, maximum);
     p_inputMinimum[index] = minimum;
     p_inputMiddle[index] = middle;
     p_inputMaximum[index] = maximum;
   }
 
-   /**
-    * @brief Set input pixel range from user
-    *
-    * This method performs the same function as SetInputRange(min,max) and
-    * SetInputRange(min,mid,max). However, the information for min/mid/max is
-    * obtained from the user via the command line. Therefore you must include
-    * the following parameter group in your application XML file:
-    *      @code
-    *       <group name="Stretch Options">
-    *         <parameter name="STRETCH">
-    *           <type>string</type>
-    *           <default>
-    *             <item>LINEAR</item>
-    *           </default>
-    *           <brief>Type of stretch</brief>
-    *           <description>
-    *             This parameter is used to select one of three ways to stretch
-    *             (or map) output pixels.  They are LINEAR, PIECEWISE, or MANUAL.
-    *           </description>
-    *
-    *           <list>
-    *             <option value="LINEAR">
-    *               <brief> Linear stretch </brief>
-    *               <description>
-    *                 A minimum and maximum are automatically computed based on
-    *                 the statistics of the selected band.  A histogram of the
-    *                 band is used to pick the minimum at 0.5% of the data and
-    *                 the maximum at 99.5% of the data. Input pixels less than
-    *                 or equal to the minimum are stretched to black while
-    *                 pixels greater than the or equal to the maximum are
-    *                 stretched to white. A linear mapping occurs between the
-    *                 minimum and maximum.
-    *               </description>
-    *               <inclusions>
-    *                 <item>MINPERCENT</item>
-    *                 <item>MAXPERCENT</item>
-    *               </inclusions>
-    *               <exclusions>
-    *                 <item>MINIMUM</item>
-    *                 <item>MAXIMUM</item>
-    *               </exclusions>
-    *             </option>
-    *             <option value="PIECEWISE">
-    *               <brief> Piecewise-linear stretch </brief>
-    *               <description>
-    *                 This option is similar to the LINEAR option. A minimum and
-    *                 maximum are automatically computed. Additionally, the
-    *                 median is computed and it is mapped to the middle gray
-    *                 value (halfway between white and black). Therefore, it is
-    *                 a piecewise-linear stretch with input pixels mapped
-    *                 linearly between either 1) the minimum/median or 2) the
-    *                 median/maximum. This option is  useful for contrast
-    *                 stretching cubes with skewed histograms to ensure a
-    *                 balanced contrast.
-    *               </description>
-    *               <inclusions>
-    *                 <item>MINPERCENT</item>
-    *                 <item>MAXPERCENT</item>
-    *               </inclusions>
-    *               <exclusions>
-    *                 <item>MINIMUM</item>
-    *                 <item>MAXIMUM</item>
-    *               </exclusions>
-    *             </option>
-    *             <option value="MANUAL">
-    *               <brief> Manual stretch </brief>
-    *               <description>
-    *                 This option allows you to pick your own stretch.  You must
-    *                 enter a value for MINIMUM and MAXIMUM
-    *               </description>
-    *               <inclusions>
-    *                 <item>MINIMUM</item>
-    *                 <item>MAXIMUM</item>
-    *               </inclusions>
-    *               <exclusions>
-    *                 <item>MINPERCENT</item>
-    *                 <item>MAXPERCENT</item>
-    *               </exclusions>
-    *             </option>
-    *           </list>
-    *         </parameter>
-    *
-    *         <parameter name="MINIMUM">
-    *           <type>double</type>
-    *           <brief>Minimum pixel value</brief>
-    *           <description>
-    *             The minimum input pixel value which will be mapped to black.
-    *           </description>
-    *           <lessThan>
-    *            <item>MAXIMUM</item>
-    *           </lessThan>
-    *         </parameter>
-    *
-    *         <parameter name="MAXIMUM">
-    *           <type>double</type>
-    *           <brief>Maximum pixel value</brief>
-    *           <description>
-    *             The maximum input pixel value which will be mapped to white.
-    *           </description>
-    *           <greaterThan>
-    *             <item>MINIMUM</item>
-    *           </greaterThan>
-    *         </parameter>
-    *
-    *         <parameter name="MINPERCENT">
-    *           <type>double</type>
-    *           <brief>Minimum Percent</brief>
-    *           <description>
-    *             The percentage of data in the histogram used to compute
-    *             the minimum pixel value in the stretch.
-    *           </description>
-    *           <default><item>0.5</item></default>
-    *           <lessThan>
-    *             <item>MAXPERCENT</item>
-    *           </lessThan>
-    *         </parameter>
-    *
-    *         <parameter name="MAXPERCENT">
-    *           <type>double</type>
-    *           <brief>Maximum Percent</brief>
-    *           <description>
-    *             The percentage of data in the histogram used to compute
-    *             the maximum pixel value in the stretch.
-    *           </description>
-    *           <default><item>99.5</item></default>
-    *           <greaterThan>
-    *             <item>MINPERCENT</item>
-    *           </greaterThan>
-    *         </parameter>
-    *       </group>
-    *  @endcode
-    */
+  /**
+   * @brief Set input pixel range from user
+   *
+   * This method performs the same function as SetInputRange(min,max) and
+   * SetInputRange(min,mid,max). However, the information for min/mid/max is
+   * obtained from the user via the command line. Therefore you must include
+   * the following parameter group in your application XML file:
+   *      @code
+   *       <group name="Stretch Options">
+   *         <parameter name="STRETCH">
+   *           <type>string</type>
+   *           <default>
+   *             <item>LINEAR</item>
+   *           </default>
+   *           <brief>Type of stretch</brief>
+   *           <description>
+   *             This parameter is used to select one of three ways to stretch
+   *             (or map) output pixels.  They are LINEAR, PIECEWISE, or MANUAL.
+   *           </description>
+   *
+   *           <list>
+   *             <option value="LINEAR">
+   *               <brief> Linear stretch </brief>
+   *               <description>
+   *                 A minimum and maximum are automatically computed based on
+   *                 the statistics of the selected band.  A histogram of the
+   *                 band is used to pick the minimum at 0.5% of the data and
+   *                 the maximum at 99.5% of the data. Input pixels less than
+   *                 or equal to the minimum are stretched to black while
+   *                 pixels greater than the or equal to the maximum are
+   *                 stretched to white. A linear mapping occurs between the
+   *                 minimum and maximum.
+   *               </description>
+   *               <inclusions>
+   *                 <item>MINPERCENT</item>
+   *                 <item>MAXPERCENT</item>
+   *               </inclusions>
+   *               <exclusions>
+   *                 <item>MINIMUM</item>
+   *                 <item>MAXIMUM</item>
+   *               </exclusions>
+   *             </option>
+   *             <option value="PIECEWISE">
+   *               <brief> Piecewise-linear stretch </brief>
+   *               <description>
+   *                 This option is similar to the LINEAR option. A minimum and
+   *                 maximum are automatically computed. Additionally, the
+   *                 median is computed and it is mapped to the middle gray
+   *                 value (halfway between white and black). Therefore, it is
+   *                 a piecewise-linear stretch with input pixels mapped
+   *                 linearly between either 1) the minimum/median or 2) the
+   *                 median/maximum. This option is  useful for contrast
+   *                 stretching cubes with skewed histograms to ensure a
+   *                 balanced contrast.
+   *               </description>
+   *               <inclusions>
+   *                 <item>MINPERCENT</item>
+   *                 <item>MAXPERCENT</item>
+   *               </inclusions>
+   *               <exclusions>
+   *                 <item>MINIMUM</item>
+   *                 <item>MAXIMUM</item>
+   *               </exclusions>
+   *             </option>
+   *             <option value="MANUAL">
+   *               <brief> Manual stretch </brief>
+   *               <description>
+   *                 This option allows you to pick your own stretch.  You must
+   *                 enter a value for MINIMUM and MAXIMUM
+   *               </description>
+   *               <inclusions>
+   *                 <item>MINIMUM</item>
+   *                 <item>MAXIMUM</item>
+   *               </inclusions>
+   *               <exclusions>
+   *                 <item>MINPERCENT</item>
+   *                 <item>MAXPERCENT</item>
+   *               </exclusions>
+   *             </option>
+   *           </list>
+   *         </parameter>
+   *
+   *         <parameter name="MINIMUM">
+   *           <type>double</type>
+   *           <brief>Minimum pixel value</brief>
+   *           <description>
+   *             The minimum input pixel value which will be mapped to black.
+   *           </description>
+   *           <lessThan>
+   *            <item>MAXIMUM</item>
+   *           </lessThan>
+   *         </parameter>
+   *
+   *         <parameter name="MAXIMUM">
+   *           <type>double</type>
+   *           <brief>Maximum pixel value</brief>
+   *           <description>
+   *             The maximum input pixel value which will be mapped to white.
+   *           </description>
+   *           <greaterThan>
+   *             <item>MINIMUM</item>
+   *           </greaterThan>
+   *         </parameter>
+   *
+   *         <parameter name="MINPERCENT">
+   *           <type>double</type>
+   *           <brief>Minimum Percent</brief>
+   *           <description>
+   *             The percentage of data in the histogram used to compute
+   *             the minimum pixel value in the stretch.
+   *           </description>
+   *           <default><item>0.5</item></default>
+   *           <lessThan>
+   *             <item>MAXPERCENT</item>
+   *           </lessThan>
+   *         </parameter>
+   *
+   *         <parameter name="MAXPERCENT">
+   *           <type>double</type>
+   *           <brief>Maximum Percent</brief>
+   *           <description>
+   *             The percentage of data in the histogram used to compute
+   *             the maximum pixel value in the stretch.
+   *           </description>
+   *           <default><item>99.5</item></default>
+   *           <greaterThan>
+   *             <item>MINPERCENT</item>
+   *           </greaterThan>
+   *         </parameter>
+   *       </group>
+   *  @endcode
+   */
   void ProcessExport::SetInputRange() {
     p_inputMinimum.clear();
     p_inputMiddle.clear();
     p_inputMaximum.clear();
 
-    for (unsigned int i=0; i<InputCubes.size(); i++) {
+    for(unsigned int i = 0; i < InputCubes.size(); i++) {
       // Get the manual stretch parameters if needed
       string strType = Application::GetUserInterface().GetString("STRETCH");
-      if (strType == "MANUAL") {
+      if(strType == "MANUAL") {
         p_inputMinimum.push_back(Application::GetUserInterface().GetDouble("MINIMUM"));
         p_inputMaximum.push_back(Application::GetUserInterface().GetDouble("MAXIMUM"));
 
@@ -379,57 +379,57 @@ namespace Isis {
       }
 
       // Or get the automatic parameters
-      else if (strType != "NONE") {
+      else if(strType != "NONE") {
         Isis::Histogram *hist = InputCubes[i]->Histogram(0);
         p_inputMinimum.push_back(hist->Percent(
-          Application::GetUserInterface().GetDouble("MINPERCENT")));
+                                   Application::GetUserInterface().GetDouble("MINPERCENT")));
         p_inputMaximum.push_back(hist->Percent(
-          Application::GetUserInterface().GetDouble("MAXPERCENT")));
+                                   Application::GetUserInterface().GetDouble("MAXPERCENT")));
         p_inputMiddle.push_back(Isis::NULL8);
         Application::GetUserInterface().Clear("MINIMUM");
         Application::GetUserInterface().Clear("MAXIMUM");
-        Application::GetUserInterface().PutDouble ("MINIMUM",p_inputMinimum[i]);
-        Application::GetUserInterface().PutDouble ("MAXIMUM",p_inputMaximum[i]);
+        Application::GetUserInterface().PutDouble("MINIMUM", p_inputMinimum[i]);
+        Application::GetUserInterface().PutDouble("MAXIMUM", p_inputMaximum[i]);
 
-        if (strType == "PIECEWISE") {
+        if(strType == "PIECEWISE") {
           p_inputMiddle[i] = hist->Median();
 
           // If the median is the min or max, back off to linear
-          if(p_inputMiddle[i] == p_inputMinimum[i] || 
-             p_inputMiddle[i] == p_inputMaximum[i]) {
+          if(p_inputMiddle[i] == p_inputMinimum[i] ||
+              p_inputMiddle[i] == p_inputMaximum[i]) {
             p_inputMiddle[i] = Isis::NULL8;
           }
         }
 
         // Make sure the image isn't constant
-        if (p_inputMinimum[i] == p_inputMaximum[i]) {
+        if(p_inputMinimum[i] == p_inputMaximum[i]) {
           p_inputMaximum[i] = p_inputMinimum[i] + 1.0;
-          if (strType == "PIECEWISE") p_inputMiddle[i] = p_inputMinimum[i] + 0.5;
+          if(strType == "PIECEWISE") p_inputMiddle[i] = p_inputMinimum[i] + 0.5;
         }
       }
     }
   }
 
- /**
-  * @brief Set output pixel range in Buffer
-  *
-  * This method allows the programmer to specify the acceptable range of values
-  * contained in the Buffer. If this method is never invoked, all pixel values
-  * received in the Buffer of the export function will be in the range of 0.0
-  * to 1.0. However, this can be overridden, for example, to 0.0 and 255.0, by
-  * invoking this method.
-  *
-  * @param minimum Desired minimum pixel value in the Buffer
-  *
-  * @param maximum Desired maximum pixel value in the Buffer
-  *
-  * @throws Isis::iException::Message
-  */
+  /**
+   * @brief Set output pixel range in Buffer
+   *
+   * This method allows the programmer to specify the acceptable range of values
+   * contained in the Buffer. If this method is never invoked, all pixel values
+   * received in the Buffer of the export function will be in the range of 0.0
+   * to 1.0. However, this can be overridden, for example, to 0.0 and 255.0, by
+   * invoking this method.
+   *
+   * @param minimum Desired minimum pixel value in the Buffer
+   *
+   * @param maximum Desired maximum pixel value in the Buffer
+   *
+   * @throws Isis::iException::Message
+   */
   void ProcessExport::SetOutputRange(const double minimum, const double maximum) {
-    if (minimum >= maximum) {
+    if(minimum >= maximum) {
       string message =
         "minimum must be less than the maximum [ProcessExport::SetOutputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
 
     p_outputMinimum = minimum;
@@ -440,14 +440,14 @@ namespace Isis {
 
   /**
    * Set output special pixel value for NULL
-   * 
+   *
    * Sets the value for output special pixel NULLs. NULL pixels values from the
    * input cube will be set to this value. Be default this value will be set to
    * the minimum out value set with SetOutputRange
    *
    * @param value The output pixel value for all NULL pixels
    */
-  void ProcessExport::SetOutputNull (const double value) {
+  void ProcessExport::SetOutputNull(const double value) {
     p_Null = value;
     p_Null_Set = true;
   }
@@ -455,14 +455,14 @@ namespace Isis {
 
   /**
    * Set output special pixel value for LIS
-   * 
+   *
    * Sets the value for output special pixel LISs. LIS pixels values from the
    * input cube will be set to this value. Be default this value will be set to
    * the minimum out value set with SetOutputRange
    *
    * @param value The output pixel value for all LIS pixels
    */
-  void ProcessExport::SetOutputLis (const double value) {
+  void ProcessExport::SetOutputLis(const double value) {
     p_Lis = value;
     p_Lis_Set = true;
   }
@@ -470,14 +470,14 @@ namespace Isis {
 
   /**
    * Set output special pixel value for LRS
-   * 
+   *
    * Sets the value for output special pixel LRSs. LRS8 pixels values from the
    * input cube will be set to this value. Be default this value will be set to
    * the minimum out value set with SetOutputRange
    *
    * @param value The output pixel value for all LRS pixels
    */
-  void ProcessExport::SetOutputLrs (const double value) {
+  void ProcessExport::SetOutputLrs(const double value) {
     p_Lrs = value;
     p_Lrs_Set = true;
   }
@@ -485,14 +485,14 @@ namespace Isis {
 
   /**
    * Set output special pixel value for HIS
-   * 
+   *
    * Sets the value for output special pixel HISs. HIS pixels values from the
    * input cube will be set to this value. Be default this value will be set to
    * the maximum out value set with SetOutputRange
    *
    * @param value The output pixel value for all HIS pixels
    */
-  void ProcessExport::SetOutputHis (const double value) {
+  void ProcessExport::SetOutputHis(const double value) {
     p_His = value;
     p_His_Set = true;
   }
@@ -500,14 +500,14 @@ namespace Isis {
 
   /**
    * Set output special pixel value for HRS
-   * 
+   *
    * Sets the value for output special pixel HRSs. HRS pixels values from the
    * input cube will be set to this value. Be default this value will be set to
    * the maximum out value set with SetOutputRange
    *
    * @param value The output pixel value for all HRS pixels
    */
-  void ProcessExport::SetOutputHrs (const double value) {
+  void ProcessExport::SetOutputHrs(const double value) {
     p_Hrs = value;
     p_Hrs_Set = true;
   }
@@ -516,7 +516,7 @@ namespace Isis {
   /**
    * Return the output special pixel value for NULL
    */
-  double ProcessExport::OutputNull () {
+  double ProcessExport::OutputNull() {
     return p_Null_Set ? p_Null : p_outputMinimum;
   }
 
@@ -524,7 +524,7 @@ namespace Isis {
   /**
    * Return the output special pixel value for LIS
    */
-  double ProcessExport::OutputLis () {
+  double ProcessExport::OutputLis() {
     return p_Lis_Set ? p_Lis : p_outputMinimum;
   }
 
@@ -532,7 +532,7 @@ namespace Isis {
   /**
    * Return the output special pixel value for LRS
    */
-  double ProcessExport::OutputLrs () {
+  double ProcessExport::OutputLrs() {
     return p_Lrs_Set ? p_Lrs : p_outputMinimum;
   }
 
@@ -540,7 +540,7 @@ namespace Isis {
   /**
    * Return the output special pixel value for HIS
    */
-  double ProcessExport::OutputHis () {
+  double ProcessExport::OutputHis() {
     return p_His_Set ? p_His : p_outputMaximum;
   }
 
@@ -548,7 +548,7 @@ namespace Isis {
   /**
    * Return the output special pixel value for HRS
    */
-  double ProcessExport::OutputHrs () {
+  double ProcessExport::OutputHrs() {
     return p_Hrs_Set ? p_Hrs : p_outputMaximum;
   }
 
@@ -568,7 +568,7 @@ namespace Isis {
   * SetOutputRange method is invoked, all pixel values received in the Buffer
   * of the export function will be in the range of 0.0 to 1.0.
   *
-  * NOTE: You must set the format type of the output data with SetFormat before 
+  * NOTE: You must set the format type of the output data with SetFormat before
   * calling this method. Otherwise, you will get an error.
   *
   * @param pixelIn this is an enumeration of the different pixel
@@ -582,29 +582,30 @@ namespace Isis {
   void ProcessExport::SetOutputType(Isis::PixelType pixelIn) {
     p_pixelType = pixelIn;
 
-    if (p_format < 0 || p_format > 3) {
+    if(p_format < 0 || p_format > 3) {
       string message =
         "Format of the output file must be set prior to calling this method [ProcessExport::SetOutputType]";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
-    if (pixelIn == Isis::UnsignedByte)
+    if(pixelIn == Isis::UnsignedByte)
       SetOutputRange((double)VALID_MIN1, (double)VALID_MAX1);
-    else if (pixelIn == Isis::UnsignedWord)
+    else if(pixelIn == Isis::UnsignedWord)
       SetOutputRange((double)VALID_MINU2, (double)VALID_MAXU2);
-    else if (pixelIn == Isis::SignedWord)
+    else if(pixelIn == Isis::SignedWord)
       SetOutputRange((double)VALID_MIN2, (double)VALID_MAX2);
-    else if (pixelIn == Isis::Real)
-      if (p_format == JP2) {
+    else if(pixelIn == Isis::Real)
+      if(p_format == JP2) {
         string message =
           "Unsupported bit type for JP2 formatted files [ProcessExport::SetOutputType]";
-        throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
-      } else {
+        throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      }
+      else {
         SetOutputRange(-DBL_MAX, DBL_MAX);
       }
-    else{
+    else {
       string message =
         "Unsupported bit type [ProcessExport::SetOutputType]";
-      throw Isis::iException::Message(Isis::iException::Programmer,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
   }
 
@@ -619,68 +620,67 @@ namespace Isis {
   *
   * @param byteOrderIn enumeration of the endianness (MSB or LSB)
   */
-    void ProcessExport::SetOutputEndian(enum ByteOrder byteOrderIn) {
-      if (p_endianSwap != NULL) {
-        delete p_endianSwap;
-      }
-      p_endianType = byteOrderIn;
-      if (byteOrderIn == Isis::NoByteOrder) {
-        p_endianSwap = new EndianSwapper("NoByteOrder");
-      }
-      else if (byteOrderIn == Isis::Lsb) {
-        p_endianSwap = new EndianSwapper("LSB");
-      }
-      else if (byteOrderIn == Isis::Msb) {
-        p_endianSwap = new EndianSwapper("MSB");
-      }
+  void ProcessExport::SetOutputEndian(enum ByteOrder byteOrderIn) {
+    if(p_endianSwap != NULL) {
+      delete p_endianSwap;
     }
+    p_endianType = byteOrderIn;
+    if(byteOrderIn == Isis::NoByteOrder) {
+      p_endianSwap = new EndianSwapper("NoByteOrder");
+    }
+    else if(byteOrderIn == Isis::Lsb) {
+      p_endianSwap = new EndianSwapper("LSB");
+    }
+    else if(byteOrderIn == Isis::Msb) {
+      p_endianSwap = new EndianSwapper("MSB");
+    }
+  }
 
 
   /**
   * @brief Set cube up for processing
   *
   * This method is called from startProcess() to validate the input cube
-  * before processing and to ready the input cube for reading line 
-  * by line in the cases of BSQ and BIL, or reading band by band 
+  * before processing and to ready the input cube for reading line
+  * by line in the cases of BSQ and BIL, or reading band by band
   * in the case of BIP.
   *
   * @throws Isis::iException::Message - No input cube was specified
   */
-  void ProcessExport::InitProcess()
-  {
-    if (InputCubes.size() < 1) {
+  void ProcessExport::InitProcess() {
+    if(InputCubes.size() < 1) {
       string m = "You have not specified any input cubes";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // Construct a line buffer manager
-    if( p_format == BIP ) {
-      p_progress->SetMaximumSteps((InputCubes[0]->Samples())*(InputCubes[0]->Lines()));
+    if(p_format == BIP) {
+      p_progress->SetMaximumSteps((InputCubes[0]->Samples()) * (InputCubes[0]->Lines()));
     }
     else {
-      p_progress->SetMaximumSteps((InputCubes[0]->Lines())*(InputCubes[0]->Bands()));
+      p_progress->SetMaximumSteps((InputCubes[0]->Lines()) * (InputCubes[0]->Bands()));
     }
 
 
     // Setup a stretch object
     p_str.clear();
-    for (unsigned int i=0; i<InputCubes.size(); i++) {
+    for(unsigned int i = 0; i < InputCubes.size(); i++) {
       p_str.push_back(new Stretch());
-      if (p_inputMinimum.size() > 0) {
-        if (Isis::IsValidPixel(p_inputMinimum[i])) {
-          p_str[i]->AddPair (p_inputMinimum[i],p_outputMinimum);
-          if (Isis::IsValidPixel(p_inputMiddle[i])) {
-            p_str[i]->AddPair (p_inputMiddle[i],p_outputMiddle);
+      if(p_inputMinimum.size() > 0) {
+        if(Isis::IsValidPixel(p_inputMinimum[i])) {
+          p_str[i]->AddPair(p_inputMinimum[i], p_outputMinimum);
+          if(Isis::IsValidPixel(p_inputMiddle[i])) {
+            p_str[i]->AddPair(p_inputMiddle[i], p_outputMiddle);
           }
-          p_str[i]->AddPair (p_inputMaximum[i],p_outputMaximum);
+          p_str[i]->AddPair(p_inputMaximum[i], p_outputMaximum);
         }
       }
 
-      p_str[i]->SetNull (p_Null_Set ? p_Null : p_outputMinimum);
-      p_str[i]->SetLis (p_Lis_Set ? p_Lis : p_outputMinimum);
-      p_str[i]->SetLrs (p_Lrs_Set ? p_Lrs : p_outputMinimum);
-      p_str[i]->SetHis (p_His_Set ? p_His : p_outputMaximum);
-      p_str[i]->SetHrs (p_Hrs_Set ? p_Hrs : p_outputMaximum);
+      p_str[i]->SetNull(p_Null_Set ? p_Null : p_outputMinimum);
+      p_str[i]->SetLis(p_Lis_Set ? p_Lis : p_outputMinimum);
+      p_str[i]->SetLrs(p_Lrs_Set ? p_Lrs : p_outputMinimum);
+      p_str[i]->SetHis(p_His_Set ? p_His : p_outputMaximum);
+      p_str[i]->SetHrs(p_Hrs_Set ? p_Hrs : p_outputMaximum);
     }
 
     p_progress->CheckStatus();
@@ -688,90 +688,90 @@ namespace Isis {
   }
 
 
-  /** 
-  *  
-  * This method invokes the process operation over a single input 
-  * cube.  In the cases of BSQ and BIL this is a process by line. 
-  * In the case of BIP, this is a process by band.  A single 
-  * buffer of input data will be padd to the buffer processing 
-  * function.  Note the data will be stretched based on the 
-  * invocations of the SetInputRange and SetpOutputRange methods. 
-  *  
-  * @param funct (Isis::Buffer &b) Name of your buffer processing 
+  /**
+  *
+  * This method invokes the process operation over a single input
+  * cube.  In the cases of BSQ and BIL this is a process by line.
+  * In the case of BIP, this is a process by band.  A single
+  * buffer of input data will be padd to the buffer processing
+  * function.  Note the data will be stretched based on the
+  * invocations of the SetInputRange and SetpOutputRange methods.
+  *
+  * @param funct (Isis::Buffer &b) Name of your buffer processing
   *                                function. The buffer in will
   *                                contain stretched input cube
   *                                pixels for an entire buffer.
   *                                These pixels must be written to
   *                                the foreign output file (e.g,
   *                                jpg, tif, etc).
-  *  
+  *
   */
-  void ProcessExport::StartProcess (void funct(Isis::Buffer &in)) {
+  void ProcessExport::StartProcess(void funct(Isis::Buffer &in)) {
     InitProcess();
 
     Isis::BufferManager *buff;
-    if ( p_format == BSQ ) {
+    if(p_format == BSQ) {
       buff = new Isis::LineManager(*InputCubes[0]);
     }
-    else if( p_format == BIL || p_format == JP2 ) {
-      buff = new Isis::LineManager(*InputCubes[0],true);
+    else if(p_format == BIL || p_format == JP2) {
+      buff = new Isis::LineManager(*InputCubes[0], true);
     }
-    else if( p_format == BIP ) {
+    else if(p_format == BIP) {
       buff = new Isis::BandManager(*InputCubes[0]);
     }
     else {
       string m = "Invalid storage order.";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // Loop and let the app programmer fiddle with the buffers
-    for (buff->begin(); !buff->end(); buff->next()) {
+    for(buff->begin(); !buff->end(); buff->next()) {
       // Read a line of data
       InputCubes[0]->Read(*buff);
       // Stretch the pixels into the desired range
-      for (int i=0; i<buff->size(); i++) {
+      for(int i = 0; i < buff->size(); i++) {
         (*buff)[i] = p_str[0]->Map((*buff)[i]);
       }
       // Invoke the user function
-      funct (*buff);
+      funct(*buff);
       p_progress->CheckStatus();
     }
   }
 
 
-  /** 
-  *  
-  * This method invokes the process operation over a single input 
-  * cube.  In the cases of BSQ and BIL this is a process by line. 
-  * In the case of BIP, this is a process by band.  A single 
-  * buffer of input data will be padd to the buffer processing 
-  * function.  Note the data will be stretched based on the 
-  * invocations of the SetInputRange and SetpOutputRange methods. 
-  *  
-  * @param funct (Isis::Buffer &b) Name of your buffer processing 
+  /**
+  *
+  * This method invokes the process operation over a single input
+  * cube.  In the cases of BSQ and BIL this is a process by line.
+  * In the case of BIP, this is a process by band.  A single
+  * buffer of input data will be padd to the buffer processing
+  * function.  Note the data will be stretched based on the
+  * invocations of the SetInputRange and SetpOutputRange methods.
+  *
+  * @param funct (Isis::Buffer &b) Name of your buffer processing
   *                                function. The buffer in will
   *                                contain stretched input cube
   *                                pixels for an entire buffer.
   *                                These pixels must be written to
   *                                the foreign output file (e.g,
-  *                                jpg, tif, etc). 
-  *  
+  *                                jpg, tif, etc).
+  *
   */
-  void ProcessExport::StartProcess (void
-                                    funct(std::vector<Isis::Buffer *> &in)) {
+  void ProcessExport::StartProcess(void
+                                   funct(std::vector<Isis::Buffer *> &in)) {
 
-    if ( p_format == BSQ ) {
-      StartProcessBSQ( funct );
+    if(p_format == BSQ) {
+      StartProcessBSQ(funct);
     }
-    else if( p_format == BIL || p_format == JP2 ) {
-      StartProcessBIL( funct );
+    else if(p_format == BIL || p_format == JP2) {
+      StartProcessBIL(funct);
     }
-    else if( p_format == BIP ) {
-      StartProcessBIP( funct );
+    else if(p_format == BIP) {
+      StartProcessBIP(funct);
     }
     else {
       string m = "Invalid storage order.";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
   }
@@ -792,35 +792,35 @@ namespace Isis {
   *                                etc).
   *
   */
-  void ProcessExport::StartProcessBSQ (void
-                                    funct(std::vector<Isis::Buffer *> &in)) {
+  void ProcessExport::StartProcessBSQ(void
+                                      funct(std::vector<Isis::Buffer *> &in)) {
     InitProcess();
 
     int samples = InputCubes[0]->Samples();
     int lines = InputCubes[0]->Lines();
     vector<Isis::LineManager *> imgrs;
 
-    for (unsigned int i = 0; i<InputCubes.size(); i++) {
-      if ((InputCubes[i]->Samples() == samples) && (InputCubes[i]->Lines() == lines)) {
+    for(unsigned int i = 0; i < InputCubes.size(); i++) {
+      if((InputCubes[i]->Samples() == samples) && (InputCubes[i]->Lines() == lines)) {
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i]);
         iline->begin();
         imgrs.push_back(iline);
       }
       else {
         string m = "All input cubes must have the same dimensions";
-        throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
       }
     }
 
     // Loop and let the app programmer fiddle with the lines
-    for (int line=1; line<=lines; line++) {
+    for(int line = 1; line <= lines; line++) {
       std::vector<Isis::Buffer *> ibufs;
 
-      for (unsigned int j=0; j<InputCubes.size(); j++) {
+      for(unsigned int j = 0; j < InputCubes.size(); j++) {
         // Read a line of data
         InputCubes[j]->Read(*imgrs[j]);
         // Stretch the pixels into the desired range
-        for (int i=0; i<samples; i++) {
+        for(int i = 0; i < samples; i++) {
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
         }
 
@@ -828,9 +828,9 @@ namespace Isis {
       }
 
       // Invoke the user function
-      funct (ibufs);
+      funct(ibufs);
 
-      for (unsigned int i=0; i<imgrs.size(); i++) {
+      for(unsigned int i = 0; i < imgrs.size(); i++) {
         imgrs[i]->next();
       }
       p_progress->CheckStatus();
@@ -838,51 +838,51 @@ namespace Isis {
   }
 
 
- /**
-  * A single line of input data from each input cube will be
-  * passed to the line processing function. Note the data will be
-  * stretched based on the invocations of the SetInputRange and
-  * SetOutputRange methods.
-  *
-  * @param funct (Isis::Buffer &b) Name of your line processing 
-  *                                function. The buffer in will
-  *                                contain stretched input cube
-  *                                pixels for an entire line of
-  *                                each input cube. These pixels
-  *                                must be written to the foreign
-  *                                output file (e.g, jpg, tif,
-  *                                etc).
-  *
-  */
-  void ProcessExport::StartProcessBIL (void
-                                    funct(std::vector<Isis::Buffer *> &in)) {
+  /**
+   * A single line of input data from each input cube will be
+   * passed to the line processing function. Note the data will be
+   * stretched based on the invocations of the SetInputRange and
+   * SetOutputRange methods.
+   *
+   * @param funct (Isis::Buffer &b) Name of your line processing
+   *                                function. The buffer in will
+   *                                contain stretched input cube
+   *                                pixels for an entire line of
+   *                                each input cube. These pixels
+   *                                must be written to the foreign
+   *                                output file (e.g, jpg, tif,
+   *                                etc).
+   *
+   */
+  void ProcessExport::StartProcessBIL(void
+                                      funct(std::vector<Isis::Buffer *> &in)) {
     InitProcess();
 
     int samples = InputCubes[0]->Samples();
     int lines = InputCubes[0]->Lines();
     vector<Isis::LineManager *> imgrs;
 
-    for (unsigned int i = 0; i<InputCubes.size(); i++) {
-      if ((InputCubes[i]->Samples() == samples) && (InputCubes[i]->Lines() == lines)) {
-        Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i],true);
+    for(unsigned int i = 0; i < InputCubes.size(); i++) {
+      if((InputCubes[i]->Samples() == samples) && (InputCubes[i]->Lines() == lines)) {
+        Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i], true);
         iline->begin();
         imgrs.push_back(iline);
       }
       else {
         string m = "All input cubes must have the same dimensions";
-        throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
       }
     }
 
     // Loop and let the app programmer fiddle with the lines
-    for (int line=1; line<=lines; line++) {
+    for(int line = 1; line <= lines; line++) {
       std::vector<Isis::Buffer *> ibufs;
 
-      for (unsigned int j=0; j<InputCubes.size(); j++) {
+      for(unsigned int j = 0; j < InputCubes.size(); j++) {
         // Read a line of data
         InputCubes[j]->Read(*imgrs[j]);
         // Stretch the pixels into the desired range
-        for (int i=0; i<samples; i++) {
+        for(int i = 0; i < samples; i++) {
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
         }
 
@@ -890,60 +890,60 @@ namespace Isis {
       }
 
       // Invoke the user function
-      funct (ibufs);
+      funct(ibufs);
 
-      for (unsigned int i=0; i<imgrs.size(); i++) {
+      for(unsigned int i = 0; i < imgrs.size(); i++) {
         imgrs[i]->next();
       }
       p_progress->CheckStatus();
     }
   }
 
- /**
-  * A single band of input data from each input cube will be 
-  * passed to the band processing function. Note the data will be
-  * stretched based on the invocations of the SetInputRange and 
-  * SetOutputRange methods. 
-  *
-  * @param funct (Isis::Buffer &b) Name of your band processing 
-  *                                function. The buffer in will
-  *                                contain stretched input cube
-  *                                pixels for an entire line of
-  *                                each input cube. These pixels
-  *                                must be written to the foreign
-  *                                output file (e.g, jpg, tif,
-  *                                etc).
-  *
-  */
-  void ProcessExport::StartProcessBIP (void
-                                    funct(std::vector<Isis::Buffer *> &in)) {
+  /**
+   * A single band of input data from each input cube will be
+   * passed to the band processing function. Note the data will be
+   * stretched based on the invocations of the SetInputRange and
+   * SetOutputRange methods.
+   *
+   * @param funct (Isis::Buffer &b) Name of your band processing
+   *                                function. The buffer in will
+   *                                contain stretched input cube
+   *                                pixels for an entire line of
+   *                                each input cube. These pixels
+   *                                must be written to the foreign
+   *                                output file (e.g, jpg, tif,
+   *                                etc).
+   *
+   */
+  void ProcessExport::StartProcessBIP(void
+                                      funct(std::vector<Isis::Buffer *> &in)) {
     InitProcess();
 
     int bands = InputCubes[0]->Bands();
     int samples = InputCubes[0]->Samples();
     vector<Isis::BandManager *> imgrs;
 
-    for (unsigned int i = 0; i<InputCubes.size(); i++) {
-      if ((InputCubes[i]->Bands() == bands) && (InputCubes[i]->Samples() == samples)) {
+    for(unsigned int i = 0; i < InputCubes.size(); i++) {
+      if((InputCubes[i]->Bands() == bands) && (InputCubes[i]->Samples() == samples)) {
         Isis::BandManager *iband = new Isis::BandManager(*InputCubes[i]);
         iband->begin();
         imgrs.push_back(iband);
       }
       else {
         string m = "All input cubes must have the same dimensions";
-        throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
       }
     }
 
     // Loop and let the app programmer fiddle with the lines
-    for (int band=1; band<=bands; band++) {
+    for(int band = 1; band <= bands; band++) {
       std::vector<Isis::Buffer *> ibufs;
 
-      for (unsigned int j=0; j<InputCubes.size(); j++) {
+      for(unsigned int j = 0; j < InputCubes.size(); j++) {
         // Read a line of data
         InputCubes[j]->Read(*imgrs[j]);
         // Stretch the pixels into the desired range
-        for (int i=0; i<bands; i++) {
+        for(int i = 0; i < bands; i++) {
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
         }
 
@@ -951,9 +951,9 @@ namespace Isis {
       }
 
       // Invoke the user function
-      funct (ibufs);
+      funct(ibufs);
 
-      for (unsigned int i=0; i<imgrs.size(); i++) {
+      for(unsigned int i = 0; i < imgrs.size(); i++) {
         imgrs[i]->next();
       }
       p_progress->CheckStatus();
@@ -979,35 +979,35 @@ namespace Isis {
     InitProcess();
 
     Isis::BufferManager *buff;
-    if( p_format == BSQ ) {
+    if(p_format == BSQ) {
       buff = new Isis::LineManager(*InputCubes[0]);
     }
-    else if( p_format == BIL ) {
-      buff = new Isis::LineManager(*InputCubes[0],true);
+    else if(p_format == BIL) {
+      buff = new Isis::LineManager(*InputCubes[0], true);
     }
-    else if( p_format == BIP ) {
+    else if(p_format == BIP) {
       buff = new Isis::BandManager(*InputCubes[0]);
     }
     else {
       string m = "Output stream cannot be generated for requested storage order type.";
-      throw Isis::iException::Message(Isis::iException::Programmer,m,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // Loop for each line of data
-    for (buff->begin(); !buff->end(); buff->next()) {
+    for(buff->begin(); !buff->end(); buff->next()) {
       // Read a line of data
       InputCubes[0]->Read(*buff);
       // Stretch the pixels into the desired range
-      for (int i=0; i<buff->size(); i++) {
+      for(int i = 0; i < buff->size(); i++) {
         (*buff)[i] = p_str[0]->Map((*buff)[i]);
       }
-      if (p_pixelType == Isis::UnsignedByte)
+      if(p_pixelType == Isis::UnsignedByte)
         isisOut8(*buff, fout);
-      else if (p_pixelType == Isis::UnsignedWord)
+      else if(p_pixelType == Isis::UnsignedWord)
         isisOut16u(*buff, fout);
-      else if (p_pixelType == Isis::SignedWord)
+      else if(p_pixelType == Isis::SignedWord)
         isisOut16s(*buff, fout);
-      else if (p_pixelType == Isis::Real)
+      else if(p_pixelType == Isis::Real)
         isisOut32(*buff, fout);
       p_progress->CheckStatus();
     }
@@ -1024,7 +1024,7 @@ namespace Isis {
   * output file buffer that the user specifies. The user can only expect to
   * access this method indirectly by calling the StartProcess method
   *
-  * @param &in Reference to a single buffer of pixel data. Note 
+  * @param &in Reference to a single buffer of pixel data. Note
   *            that this buffer will already have had the necessary
   *            stretching operations, though it will have the
   *            native endianness of the system.
@@ -1032,21 +1032,21 @@ namespace Isis {
   * @param &fout  Name of the file stream to which the buffer
   *               of pixel data will be written.
   */
-  void ProcessExport::isisOut8 (Buffer &in, std::ofstream &fout) {
-    char * out8 = new char[in.size()];
-    for (int samp=0; samp<in.size(); samp++){
+  void ProcessExport::isisOut8(Buffer &in, std::ofstream &fout) {
+    char *out8 = new char[in.size()];
+    for(int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
-      if (pixel <= 0.0){
+      if(pixel <= 0.0) {
         out8[samp] = 0;
       }
-      else if (pixel >= 255.0){
+      else if(pixel >= 255.0) {
         out8[samp] = 255;
       }
-      else{
-        out8[samp] = (char)(in[samp]+0.5);    //Rounds
+      else {
+        out8[samp] = (char)(in[samp] + 0.5);  //Rounds
       }
     }
-    fout.write (out8,in.size());
+    fout.write(out8, in.size());
     delete[] out8;
     return;
   }
@@ -1055,13 +1055,13 @@ namespace Isis {
   /**
   * @brief Write a buffer of 16-bit signed pixel data to a stream
   *
-  * This method takes a buffer of data and assumes that it is 
-  * 16-bit signed pixel data. It will apply the necessary endian 
-  * swap to the data and write it out to the output file buffer 
-  * that the user specifies. The user can only expect to access 
-  * this method indirectly by calling the StartProcess method. 
+  * This method takes a buffer of data and assumes that it is
+  * 16-bit signed pixel data. It will apply the necessary endian
+  * swap to the data and write it out to the output file buffer
+  * that the user specifies. The user can only expect to access
+  * this method indirectly by calling the StartProcess method.
   *
-  * @param &in Reference to a single buffer of pixel data. Note 
+  * @param &in Reference to a single buffer of pixel data. Note
   *            that this buffer will already have had the
   *            necessary stretching operations, though it will
   *            have the native endianness of the system.
@@ -1069,30 +1069,30 @@ namespace Isis {
   * @param &fout Name of the file stream to which the buffer of pixel data will
   *              be written.
   */
-  void ProcessExport::isisOut16s (Buffer &in, std::ofstream &fout) {
-    short * out16s = new short[in.size()];
-    for (int samp=0; samp<in.size(); samp++) {
+  void ProcessExport::isisOut16s(Buffer &in, std::ofstream &fout) {
+    short *out16s = new short[in.size()];
+    for(int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
       short tempShort;
-      if (pixel <= -32768.0){
+      if(pixel <= -32768.0) {
         tempShort = -(short)32768;
       }
-      else if (pixel >= 32767.0){
+      else if(pixel >= 32767.0) {
         tempShort = (short)32767;
       }
-      else{
+      else {
         //Rounds
-        if( in[samp] < 0.0 ) {
-          tempShort = (short)(in[samp]-0.5);
+        if(in[samp] < 0.0) {
+          tempShort = (short)(in[samp] - 0.5);
         }
         else {
-          tempShort = (short)(in[samp]+0.5);
+          tempShort = (short)(in[samp] + 0.5);
         }
       }
-      void * p_swap = &tempShort;
+      void *p_swap = &tempShort;
       out16s[samp] = p_endianSwap->ShortInt(p_swap);
     }
-    fout.write ((char*)out16s,in.size()*2);
+    fout.write((char *)out16s, in.size() * 2);
     delete[] out16s;
     return;
   }
@@ -1101,11 +1101,11 @@ namespace Isis {
   /**
   * @brief Write a bufferof 16-bit unsigned pixel data to a stream
   *
-  * This method takes a buffer of data and assumes that it is 16-bit 
-  * unsigned pixel data. It will apply the necessary endian swap 
-  * to the data and write it out to the output file buffer that 
-  * the user specifies. The user can only expect to access this 
-  * method indirectly by calling the StartProcess method. 
+  * This method takes a buffer of data and assumes that it is 16-bit
+  * unsigned pixel data. It will apply the necessary endian swap
+  * to the data and write it out to the output file buffer that
+  * the user specifies. The user can only expect to access this
+  * method indirectly by calling the StartProcess method.
   *
   * @param &in Reference to a single buffer of pixel data. Note that this buffer
   *          will already have had the necessary stretching operations, though
@@ -1113,27 +1113,27 @@ namespace Isis {
   *
   * @param &fout Name of the file stream to which the buffer of pixel data will
   *              be written.
-  *        
+  *
   */
-  void ProcessExport::isisOut16u (Buffer &in, std::ofstream &fout) {
+  void ProcessExport::isisOut16u(Buffer &in, std::ofstream &fout) {
     unsigned short *out16u = new unsigned short[in.size()];
-    for (int samp=0; samp<in.size(); samp++) {
+    for(int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
       unsigned short tempShort;
-      if (pixel <= 0.0) {
+      if(pixel <= 0.0) {
         tempShort = 0;
       }
-      else if (pixel >= 65535.0) {
+      else if(pixel >= 65535.0) {
         tempShort = 65535;
       }
       else {
-        tempShort = (unsigned short)(in[samp]+0.5);   //Rounds
+        tempShort = (unsigned short)(in[samp] + 0.5); //Rounds
       }
-      unsigned short * p_swap = &tempShort;
+      unsigned short *p_swap = &tempShort;
       out16u[samp] = p_endianSwap->UnsignedShortInt(p_swap);
     }
 
-    fout.write ((char*)out16u,in.size()*2);
+    fout.write((char *)out16u, in.size() * 2);
     delete[] out16u;
     return;
   }
@@ -1155,24 +1155,24 @@ namespace Isis {
   *              be written.
   *
   */
-  void ProcessExport::isisOut32 (Buffer &in, std::ofstream &fout) {
-    int * out32 = new int[in.size()];
-    for (int samp=0; samp<in.size(); samp++) {
+  void ProcessExport::isisOut32(Buffer &in, std::ofstream &fout) {
+    int *out32 = new int[in.size()];
+    for(int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
       float tempFloat;
-      if (pixel <= -((double)FLT_MAX)){
+      if(pixel <= -((double)FLT_MAX)) {
         tempFloat = -((double)FLT_MAX);
       }
-      else if (pixel >= (double)FLT_MAX){
+      else if(pixel >= (double)FLT_MAX) {
         tempFloat = (double)FLT_MAX;
       }
       else {
         tempFloat = (double)in[samp];
       }
-      void * p_swap = &tempFloat;
+      void *p_swap = &tempFloat;
       out32[samp] = p_endianSwap->ExportFloat(p_swap);
     }
-    fout.write ((char*)out32,in.size()*4);
+    fout.write((char *)out32, in.size() * 4);
     delete[] out32;
     return;
   }
@@ -1183,40 +1183,40 @@ namespace Isis {
   *
   * This method creates a standard world file from the mapping group of the
   * input cube.
-  * 
+  *
   * @param worldFile [in] Reference to a string containing the name of a file
   *          to write the world information to.
   *
   */
-  void ProcessExport::CreateWorldFile (const std::string &worldFile) {
+  void ProcessExport::CreateWorldFile(const std::string &worldFile) {
     try {
       Projection *proj = InputCubes[0]->Projection();
-      proj->SetWorld(1.0,1.0);
+      proj->SetWorld(1.0, 1.0);
       ofstream os;
-      os.open(worldFile.c_str(),ios::out);
-  
+      os.open(worldFile.c_str(), ios::out);
+
       // X resolution
       os << std::fixed << setprecision(15)
          << proj->Resolution() << endl;
       // scale and rotation
       os << 0.0 << endl;
       os << 0.0 << endl;
-  
+
       // Y resolution
       os << std::fixed << setprecision(15)
          << -proj->Resolution() << endl;
-  
+
       // Upper left x at pixel middle
       os << std::fixed << setprecision(15)
          << proj->XCoord() << endl;
-  
+
       // Upper left y at pixel middle
       os << std::fixed << setprecision(15)
          << proj->YCoord() << endl;
-  
+
       os.close();
     }
-    catch (iException &e) {
+    catch(iException &e) {
       e.Clear();
     }
   }

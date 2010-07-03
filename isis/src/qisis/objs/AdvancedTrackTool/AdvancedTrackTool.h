@@ -30,18 +30,18 @@ class QAction;
 namespace Qisis {
   class TableMainWindow;
   class MdiCubeViewport;
-  
+
   /**
    * @brief Tool to display info for a point on a cube
    *
-   * This tool is part of the Qisis namespace and allows the user to view and 
-   * record information from a point on a cube such as line, sample, band, lats, 
-   * longs, etc. 
-   * 
+   * This tool is part of the Qisis namespace and allows the user to view and
+   * record information from a point on a cube such as line, sample, band, lats,
+   * longs, etc.
+   *
    * @ingroup Visualization Tools
-   * 
+   *
    * @author  ?? Unknown
-   * 
+   *
    * @internal
    *  @history 2008-06-25 Noah Hilt - Added enumeration for different column
    *           values.
@@ -59,27 +59,29 @@ namespace Qisis {
    *           include issues
    */
   class AdvancedTrackTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      AdvancedTrackTool (QWidget *parent);
+      AdvancedTrackTool(QWidget *parent);
       void addTo(QMenu *menu);
-      void addToPermanent (QToolBar *perm);
-      bool eventFilter(QObject *o,QEvent *e);
+      void addToPermanent(QToolBar *perm);
+      bool eventFilter(QObject *o, QEvent *e);
 
     public slots:
       virtual void mouseMove(QPoint p);
       virtual void mouseLeave();
       void record(QPoint p);
-     
+
     protected:
       /**
        * This method returns the menu name associated with this tool.
-       * 
-       * 
-       * @return QString 
+       *
+       *
+       * @return QString
        */
-      QString menuName() const { return "&Options"; };
+      QString menuName() const {
+        return "&Options";
+      };
 
     private slots:
       void updateRow(QPoint p);
@@ -87,8 +89,8 @@ namespace Qisis {
       void record();
       void updateID();
       void TrackMosaicOrigin(MdiCubeViewport *cvp, int piLine, int piSample,
-                             int & piOrigin, std::string & psSrcFileName,
-                             std::string & psSrcSerialNum);
+                             int &piOrigin, std::string &psSrcFileName,
+                             std::string &psSrcSerialNum);
 
     private:
       /**
@@ -115,7 +117,7 @@ namespace Qisis {
         RIGHT_ASCENSION,        //!< The right ascension for this point
         DECLINATION,            //!< The declination for this point
         RESOLUTION,             //!< The resoultion for this point
-        PHASE,                  //!< The phase for this point 
+        PHASE,                  //!< The phase for this point
         INCIDENCE,              //!< The incidence for this point
         EMISSION,               //!< The emission for this point
         NORTH_AZIMUTH,          //!< The north azimuth for this cube
@@ -132,16 +134,16 @@ namespace Qisis {
         PATH,                   //!< The path for this cube
         FILENAME,               //!< The filename for this cube
         SERIAL_NUMBER,          //!< The serial number for this cube
-				TRACK_MOSAIC_INDEX,     //!< Track the origin of the Mosaic, display the zero based index 
-				TRACK_MOSAIC_FILENAME,  //!< Track the origin of the Mosaic, display file name		
-				TRACK_MOSAIC_SERIAL_NUM,//!< Track the origin of the Mosaic, display file name		
+        TRACK_MOSAIC_INDEX,     //!< Track the origin of the Mosaic, display the zero based index
+        TRACK_MOSAIC_FILENAME,  //!< Track the origin of the Mosaic, display file name
+        TRACK_MOSAIC_SERIAL_NUM,//!< Track the origin of the Mosaic, display file name
         NOTES                   //!< Any notes for this record
       };
       QAction *p_action;                   //!< Action to bring up the track tool
       int p_numRows;                       //!< The number of rows in the table
-      int p_id;                            //!< The record id 
+      int p_id;                            //!< The record id
       Qisis::TableMainWindow *p_tableWin;  //!< The table window
- 
+
   };
 
 };

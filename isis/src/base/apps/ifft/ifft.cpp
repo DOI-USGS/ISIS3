@@ -4,11 +4,11 @@
 #include "ProcessByTile.h"
 #include "AlphaCube.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void IFFT1 (vector<Buffer *> &in, vector<Buffer *> &out);
-void IFFT2 (vector<Buffer *> &in, vector<Buffer *> &out);
+void IFFT1(vector<Buffer *> &in, vector<Buffer *> &out);
+void IFFT2(vector<Buffer *> &in, vector<Buffer *> &out);
 
 FourierTransform fft;
 string tmpMagFilename = "Temporary_IFFT_Magnitude.cub";
@@ -38,8 +38,8 @@ void IsisMain() {
   // error checking for valid input cubes
   // i.e. the dimensions of the magnitude and phase cubes
   // are the same and are powers of two
-  if (!fft.IsPowerOfTwo(numSamples) || !fft.IsPowerOfTwo(numLines) 
-      || magCube->Samples()!=phaseCube->Samples() || magCube->Lines()!=phaseCube->Lines()) {
+  if(!fft.IsPowerOfTwo(numSamples) || !fft.IsPowerOfTwo(numLines)
+      || magCube->Samples() != phaseCube->Samples() || magCube->Lines() != phaseCube->Lines()) {
     cerr << "Invalid Cubes: the dimensions of both cubes must be equal powers of 2." << endl;
     return;
   }
@@ -48,8 +48,8 @@ void IsisMain() {
 
   Isis::CubeAttributeOutput cao;
 
-  lProc.SetOutputCube (tmpMagFilename, cao, numSamples, numLines, numBands);
-  lProc.SetOutputCube (tmpPhaseFilename, cao, numSamples, numLines, numBands);
+  lProc.SetOutputCube(tmpMagFilename, cao, numSamples, numLines, numBands);
+  lProc.SetOutputCube(tmpPhaseFilename, cao, numSamples, numLines, numBands);
 
   // Start the line processing
   lProc.StartProcess(IFFT2);
@@ -78,8 +78,7 @@ void IsisMain() {
 }
 
 // Processing routine for the inverse fft
-void IFFT1 (vector<Buffer *> &in, vector<Buffer *> &out)
-{
+void IFFT1(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &inReal = *in[0];
   Buffer &inImag = *in[1];
 
@@ -88,7 +87,7 @@ void IFFT1 (vector<Buffer *> &in, vector<Buffer *> &out)
 
   // copy and rearrange the data to fit the algorithm
   // the image is centered at zero, the array begins at zero
-  for (int i=0; i<n/2; i++) {
+  for(int i = 0; i < n / 2; i++) {
     input[i] = complex<double>(inReal[i+n/2], inImag[i+n/2]);
     input[i+n/2] = complex<double>(inReal[i], inImag[i]);
   }
@@ -98,14 +97,13 @@ void IFFT1 (vector<Buffer *> &in, vector<Buffer *> &out)
 
   Buffer &image = *out[0];
   // and copy the result to the output cube
-  for ( int i=0; i<n; i++) {
-    image[i]=real(output[i]);
+  for(int i = 0; i < n; i++) {
+    image[i] = real(output[i]);
   }
 }
 
 // Processing routine for the inverse fft with two output cubes
-void IFFT2 (vector<Buffer *> &in, vector<Buffer *> &out)
-{
+void IFFT2(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &mag = *in[0];
   Buffer &phase = *in[1];
 
@@ -114,7 +112,7 @@ void IFFT2 (vector<Buffer *> &in, vector<Buffer *> &out)
 
   // copy and rearrange the data to fit the algorithm
   // the image is centered at zero, the array begins at zero
-  for (int i=0; i<n/2; i++) {
+  for(int i = 0; i < n / 2; i++) {
     input[i] = complex<double>(polar(mag[i+n/2], phase[i+n/2]));
     input[i+n/2] = complex<double>(polar(mag[i], phase[i]));
   }
@@ -125,7 +123,7 @@ void IFFT2 (vector<Buffer *> &in, vector<Buffer *> &out)
   Buffer &realCube = *out[0];
   Buffer &imagCube = *out[1];
   // and copy the result to the output cubes
-  for ( int i=0; i<n; i++) {
+  for(int i = 0; i < n; i++) {
     realCube[i] = real(output[i]);
     imagCube[i] = imag(output[i]);
   }

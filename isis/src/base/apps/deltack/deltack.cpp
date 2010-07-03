@@ -26,22 +26,22 @@ void IsisMain() {
   double lat1 = ui.GetDouble("LAT1");
   double lon1 = ui.GetDouble("LON1");
   double rad1;
-  if (ui.WasEntered("RAD1")) {
+  if(ui.WasEntered("RAD1")) {
     rad1 = ui.GetDouble("RAD1");
   }
   else {
-    rad1 = GetRadius(ui.GetFilename("FROM"),lat1,lon1);
+    rad1 = GetRadius(ui.GetFilename("FROM"), lat1, lon1);
   }
 
   // In order to use the bundle adjustment class we will need a control
   // network
   ControlMeasure m;
   m.SetCubeSerialNumber(serialNumberList.SerialNumber(0));
-  m.SetCoordinate(samp1,line1);
+  m.SetCoordinate(samp1, line1);
   m.SetType(ControlMeasure::Manual);
 
   ControlPoint p;
-  p.SetUniversalGround(lat1,lon1,rad1);
+  p.SetUniversalGround(lat1, lon1, rad1);
   p.SetId("Point1");
   p.SetType(ControlPoint::Ground);
   p.Add(m);
@@ -51,26 +51,26 @@ void IsisMain() {
   cnet.Add(p);
 
   // See if they wanted to solve for twist
-  if (ui.GetBoolean("TWIST")) {
+  if(ui.GetBoolean("TWIST")) {
     double samp2 = ui.GetDouble("SAMP2");
     double line2 = ui.GetDouble("LINE2");
     double lat2 = ui.GetDouble("LAT2");
     double lon2 = ui.GetDouble("LON2");
     double rad2;
-    if (ui.WasEntered("RAD2")) {
+    if(ui.WasEntered("RAD2")) {
       rad2 = ui.GetDouble("RAD2");
     }
     else {
-      rad2 = GetRadius(ui.GetFilename("FROM"),lat2,lon2);
+      rad2 = GetRadius(ui.GetFilename("FROM"), lat2, lon2);
     }
 
     ControlMeasure m;
     m.SetCubeSerialNumber(serialNumberList.SerialNumber(0));
-    m.SetCoordinate(samp2,line2);
+    m.SetCoordinate(samp2, line2);
     m.SetType(ControlMeasure::Manual);
 
     ControlPoint p;
-    p.SetUniversalGround(lat2,lon2,rad2);
+    p.SetUniversalGround(lat2, lon2, rad2);
     p.SetId("Point2");
     p.SetType(ControlPoint::Ground);
     p.Add(m);
@@ -80,17 +80,17 @@ void IsisMain() {
 
   // Bundle adjust to solve for new pointing
   try {
-    BundleAdjust b(cnet,serialNumberList);
+    BundleAdjust b(cnet, serialNumberList);
     b.SetSolveTwist(ui.GetBoolean("TWIST"));
     double tol = ui.GetDouble("TOL");
     int maxIterations = ui.GetInteger("MAXITS");
-    b.Solve(tol,maxIterations);
+    b.Solve(tol, maxIterations);
 
     Cube c;
-    c.Open(filename,"rw");
+    c.Open(filename, "rw");
 
     //check for existing polygon, if exists delete it
-    if (c.Label()->HasObject("Polygon")){
+    if(c.Label()->HasObject("Polygon")) {
       c.Label()->DeleteObject("Polygon");
     }
 
@@ -108,13 +108,13 @@ void IsisMain() {
     h.AddEntry();
     c.Write(h);
     c.Close();
-    PvlGroup gp( "DeltackResults" );
-    gp += PvlKeyword("Status","Camera pointing updated");
-    Application::Log( gp );
+    PvlGroup gp("DeltackResults");
+    gp += PvlKeyword("Status", "Camera pointing updated");
+    Application::Log(gp);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     string msg = "Unable to update camera pointing for [" + filename + "]";
-    throw iException::Message(Isis::iException::Camera,msg,_FILEINFO_);
+    throw iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
   }
 
 }
@@ -123,12 +123,12 @@ void IsisMain() {
 double GetRadius(std::string filename, double lat, double lon) {
   Pvl lab(filename);
   Sensor sensor(lab);
-  sensor.SetUniversalGround(lat,lon);
+  sensor.SetUniversalGround(lat, lon);
   double radius = sensor.LocalRadius();
-  if (IsSpecial(radius)) {
+  if(IsSpecial(radius)) {
     string msg = "Could not determine radius from DEM at lat/lon [";
     msg += iString(lat) + "," + iString(lon) + "]";
-    throw iException::Message(Isis::iException::Camera,msg,_FILEINFO_);
+    throw iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
   }
   return radius;
 }

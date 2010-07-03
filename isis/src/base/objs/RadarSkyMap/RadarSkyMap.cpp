@@ -43,7 +43,7 @@ namespace Isis {
    * @return conversion was successful
    */
   bool RadarSkyMap::SetFocalPlane(const double ux, const double uy,
-                                   double uz) {
+                                  double uz) {
     return false;
   }
 

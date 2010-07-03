@@ -6,8 +6,8 @@
 using namespace std;
 using namespace Isis;
 
-int main (int argc, char *argv[]) {
-try {
+int main(int argc, char *argv[]) {
+  try {
     cout << endl << "Unit test for CissLabels" << endl << endl;
 
     Pvl p1("$cassini/testData/W1294561261_1.c2i.nospice.cub");
@@ -116,7 +116,7 @@ try {
     cout  << endl;
     return 0;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 }

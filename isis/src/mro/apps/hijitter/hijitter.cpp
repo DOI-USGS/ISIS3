@@ -8,7 +8,7 @@
 #include "Camera.h"
 #include "CameraDetectorMap.h"
 #include "CameraFactory.h"
-                           
+
 using namespace std;
 using namespace Isis;
 
@@ -20,7 +20,7 @@ Filename FindRed(FileList &inList, int n);
 void ProcessNoprojFiles(Pipeline &p);
 
 // avgOffsets[i][Sample = 0, Line = 1]
-//   where i is in the table just above 
+//   where i is in the table just above
 //   lineOff's declaration
 double avgOffsets[9][2];
 
@@ -40,15 +40,15 @@ double avgOffsets[9][2];
  8 |   8-9   |  607
 */
 const double lineOff[9] = {
-   574,
+  574,
   -622,
-   620,
+  620,
   -586,
-   584,
+  584,
   -600,
-   597,
+  597,
   -576,
-   607
+  607
 };
 
 void IsisMain() {
@@ -97,7 +97,7 @@ void IsisMain() {
   matchfilePipeline.Application("spicefit").SetInputParameter("FROM", false);
 
   matchfilePipeline.Run();
-  
+
   Pipeline p("hijitter");
 
   p.SetInputListFile("FROM");
@@ -105,8 +105,8 @@ void IsisMain() {
 
   for(int i = 0; i < numFiles; i++) {
     tempFiles.push_back(
-      Filename("$TEMPORARY/noproj.FROM" + iString(i+1) +".noproj.cub").Expanded() 
-      );
+      Filename("$TEMPORARY/noproj.FROM" + iString(i + 1) + ".noproj.cub").Expanded()
+    );
   }
 
   p.KeepTemporaryFiles(false);
@@ -123,7 +123,7 @@ void IsisMain() {
   p.Application("appjit").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputListNoMerge, false);
   p.Application("appjit").AddParameter("JITTER", "JITTER");
   p.Application("appjit").AddParameter("DEGREE", "DEGREE");
-  
+
   p.AddToPipeline("noproj");
   p.Application("noproj").SetInputParameter("FROM", true);
   p.Application("noproj").AddConstParameter("MATCH", Filename("$TEMPORARY/matchMaster.cub").Expanded());
@@ -135,11 +135,11 @@ void IsisMain() {
   p.Application("appjit").AddConstParameter("MASTER", masterFile);
 
   p.Run();
-  
+
 
   // the outputs are temporary files
   for(int redNum = 0; redNum < numFiles; redNum++) {
-    tempFiles.push_back(Filename("$TEMPORARY/noproj.FROM" + iString(redNum+1) + ".cub").Expanded());
+    tempFiles.push_back(Filename("$TEMPORARY/noproj.FROM" + iString(redNum + 1) + ".cub").Expanded());
   }
 
   // Do some calculations, delete the final outputs from the pipeline
@@ -154,7 +154,7 @@ void IsisMain() {
   p.Application("appjit").AddConstParameter("MASTER", masterFile);
 
   p.Run();
-  
+
 
   for(unsigned int tempFile = 0; tempFile < tempFiles.size(); tempFile++) {
     remove(tempFiles[tempFile].c_str());
@@ -165,13 +165,13 @@ void IsisMain() {
 }
 
 /**
- * This method will initialize global variables when it is 
- * called for the first time and will return the filename of CCD n given 
- * the file list. 
- * 
+ * This method will initialize global variables when it is
+ * called for the first time and will return the filename of CCD n given
+ * the file list.
+ *
  * @param inList Input file list
  * @param n Red CCD to return
- * 
+ *
  * @return Filename Name of the CCD file
  */
 Filename FindRed(FileList &inList, int n) {
@@ -221,7 +221,7 @@ Filename FindRed(FileList &inList, int n) {
 
       redFiles[redNumber] = inList[i];
     }
-    catch (iException &e) {
+    catch(iException &e) {
       nonMroFile = inList[i];
     }
   }
@@ -253,28 +253,28 @@ void ProcessNoprojFiles(Pipeline &p) {
   UserInterface &ui = Application::GetUserInterface();
 
   // This will be decremented on error, it's easier this way
-  int count = numFiles-1;
+  int count = numFiles - 1;
 
-  for(int i = 0; i < numFiles-1; i++) {
+  for(int i = 0; i < numFiles - 1; i++) {
     iString tempDir = Filename("$TEMPORARY").Expanded();
-    iString flatFileLoc = tempDir + "/first" + iString(firstFilter+i) + "-" + iString(firstFilter+i+1) + ".flat";
+    iString flatFileLoc = tempDir + "/first" + iString(firstFilter + i) + "-" + iString(firstFilter + i + 1) + ".flat";
 
-    iString params = "FROM=" + tempDir + "/noproj.FROM" + iString(i+1) + ".cub";
-    params += " MATCH=" + tempDir + "/noproj.FROM" + iString(i+2) + ".cub";
+    iString params = "FROM=" + tempDir + "/noproj.FROM" + iString(i + 1) + ".cub";
+    params += " MATCH=" + tempDir + "/noproj.FROM" + iString(i + 2) + ".cub";
     params += " REGDEF=" + ui.GetFilename("REGDEF");
     params += " FLAT=" + flatFileLoc;
 
     try {
       Isis::iApp->Exec("hijitreg", params);
     }
-    catch (iException &e) {
+    catch(iException &e) {
       e.Clear();
       count --;
       continue;
     }
 
     // Read offsets
-    
+
     TextFile flatFile(flatFileLoc);
     tempFiles.push_back(flatFileLoc);
 
@@ -287,27 +287,27 @@ void ProcessNoprojFiles(Pipeline &p) {
             (avgOffsets[i][0] == Isis::Null || avgOffsets[i][1] == Isis::Null)) {
         line = iString(line).Compress();
         string::size_type pos = line.find("Average Sample Offset: ");
-  
+
         if(pos != string::npos) {
           // cut off text before our number (start pos + strlen + 1)
           line = line.substr(pos + strlen("Average Sample Offset: "));
-  
+
           // cut off text after our number
           line = line.substr(0, line.find(" "));
-  
+
           avgOffsets[i][0] = (double)(iString)line;
           pos = string::npos;
         }
-   
+
         pos = line.find("Average Line Offset: ");
-  
+
         if(pos != string::npos) {
           // cut off text before our number (start pos + strlen + 1)
           line = line.substr(pos + strlen("Average Line Offset: "));
-  
+
           // cut off text after our number
           line = line.substr(0, line.find(" "));
-  
+
           avgOffsets[i][1] = (double)(iString)line;
           pos = string::npos;
         }
@@ -349,7 +349,7 @@ void ProcessNoprojFiles(Pipeline &p) {
     if(IsSpecial(avgOffsets[i][0]) || IsSpecial(avgOffsets[i][1])) continue;
 
     pitchRate += 0.000001 * (avgOffsets[i][1] / (lineOff[i] * lineRate)) / (double)count;
-    yaw += atan( avgOffsets[i][0] / lineOff[i] ) / (double)count;
+    yaw += atan(avgOffsets[i][0] / lineOff[i]) / (double)count;
   }
 
   p.Application("appjit").AddConstParameter("PITCHRATE", iString(pitchRate));

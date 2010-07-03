@@ -32,7 +32,7 @@ namespace Isis {
 
         virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
-        void SetBand (int band);
+        void SetBand(int band);
 
       private:
         double p_k;

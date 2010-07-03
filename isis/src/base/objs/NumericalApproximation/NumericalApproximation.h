@@ -11,23 +11,23 @@
 using namespace std;
 
 namespace Isis {
-  /**                                          
-   * @brief NumericalApproximation provides various numerical 
+  /**
+   * @brief NumericalApproximation provides various numerical
    *        analysis methods of interpolation, extrapolation and
    *        approximation of a tabulated set of @a x, @a y data.
-   *  
-   * This class contains a merged version of the Isis3 classes 
-   * @b DataInterp and @b NumericalMethods.  In addition, 
+   *
+   * This class contains a merged version of the Isis3 classes
+   * @b DataInterp and @b NumericalMethods.  In addition,
    * some methods from @b AtmosModel were moved to this class, the
-   * @a CubicNeighborhood interpolation type was 
-   * adapted from the IDL routine called @b interpol (using the 
-   * "/spline" keyword), and several differentiation and 
-   * integration approximation methods were created. 
-   *  
-   * NumericalApproximation contains 9 types of data interpolation 
-   * routines.  These routines act on x, y pairs of data points. 
-   * The following forms of data interpolation are supported: 
-   * 
+   * @a CubicNeighborhood interpolation type was
+   * adapted from the IDL routine called @b interpol (using the
+   * "/spline" keyword), and several differentiation and
+   * integration approximation methods were created.
+   *
+   * NumericalApproximation contains 9 types of data interpolation
+   * routines.  These routines act on x, y pairs of data points.
+   * The following forms of data interpolation are supported:
+   *
    * <table>
    *   <tr>
    *     <th>Name</th>
@@ -41,12 +41,12 @@ namespace Isis {
    *     <td>2</td>
    *     <td>
    *        Linear interpolation approximates a curve by
-   *        concatinating line segments between known data        
+   *        concatinating line segments between known data
    *        points.  This results in a continuous curve with a
    *        discontinuities of the derivative at the known data
    *        points.  This interpolation type uses the GSL
    *        library routines.
-   *        
+   *
    *     </td>
    *   </tr>
    *   <tr>
@@ -171,23 +171,23 @@ namespace Isis {
    *       derivatives,
    *       @a f '(@a x<sub>0</sub>) and @a f '(@a
    *       x<sub>1</sub>). The Hermite cubic polynomial is defined
-   *       @f[ H_3(x) = 
+   *       @f[ H_3(x) =
    *       f(x_0)h_0(x)+f(x_1)h_1(x)
    *       +f\prime(x_0)\hat{h}_0(x)+f\prime(x_1)\hat{h}_1(x)
    *       @f]
    *       where
-   *       @f$ h_k(x) = 
+   *       @f$ h_k(x) =
    *       [1-2(x-x_k)L\prime_k(x_k)](L_k(x))^2
    *       @f$
    *       and
-   *       @f$ \hat{h}_k(x) = 
+   *       @f$ \hat{h}_k(x) =
    *       (x-x_k)(L_k(x))^2
    *       @f$
    *       for the kth-Lagrange coefficient polynomials of degree
    *       n = 1,
-   *       @f$ L_0(x) = \frac{x- x_1}{x_0-x_1}@f$ and 
+   *       @f$ L_0(x) = \frac{x- x_1}{x_0-x_1}@f$ and
    *       @f$ L_1(x) = \frac{x- x_0}{x_1-x_0}@f$.
-   *       
+   *
    *     </td>
    *   </tr>
    *   <tr>
@@ -213,32 +213,32 @@ namespace Isis {
    *     </td>
    *   </tr>
    * </table>
-   *  
-   *  
-   * Numerical analysis approximation methods for differentiating 
-   * and integrating unknown functions represented by a data set 
-   * are implemented by using the interpolations on the data set 
+   *
+   *
+   * Numerical analysis approximation methods for differentiating
+   * and integrating unknown functions represented by a data set
+   * are implemented by using the interpolations on the data set
    * created with a NumericalApproximation object. The Lagrange polynomial,
-   *       @f[ L(x) = 
+   *       @f[ L(x) =
    *       \sum_{k=0}^{n} \left(f(x_k) \prod_{i=0,i \neq k}^{n}
    *            \frac{x- x_i}{x_k-x_i}\right)
    *       @f]
-   * is used to determine formulas for numerical differentiation 
+   * is used to determine formulas for numerical differentiation
    * and integration.
    * @n
-   * @b Numerical Differentiation 
-   * @n 
+   * @b Numerical Differentiation
+   * @n
    * The differentiation methods use difference formulas to
-   * approximate first and second derivatives at a domain value 
-   * for a given a set of known (@a x,@a y) data points. Once all 
-   * of the data points are added, a Isis::NumericalApproximation 
-   * interpolation is used on the dataset to estimate the 
-   * function, @f$f:x \to y@f$, mapping @a x values to 
-   * corresponding @a y values. Then, the derivative of 
-   * @e f evaluated at @a x<sub>0</sub> is approximated. 
-   * To do so, a uniform step size of @a h is chosen to 
-   * determine the distance between @a x<sub>i</sub> and @a 
-   * x<sub>i+1</sub>. 
+   * approximate first and second derivatives at a domain value
+   * for a given a set of known (@a x,@a y) data points. Once all
+   * of the data points are added, a Isis::NumericalApproximation
+   * interpolation is used on the dataset to estimate the
+   * function, @f$f:x \to y@f$, mapping @a x values to
+   * corresponding @a y values. Then, the derivative of
+   * @e f evaluated at @a x<sub>0</sub> is approximated.
+   * To do so, a uniform step size of @a h is chosen to
+   * determine the distance between @a x<sub>i</sub> and @a
+   * x<sub>i+1</sub>.
    * <table>
    *   <caption> Differentiation methods require the parameters
    *     @a a (domain value at which the derivative will be
@@ -255,7 +255,7 @@ namespace Isis {
    *   <tr>
    *     <td>Backward Difference </td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> 2-point backward difference.
    *           @f[
    *                f\prime(x_0) \approx \frac{1}{h}[f(x_0) - f(x_0 - h)]
@@ -290,7 +290,7 @@ namespace Isis {
    *   <tr>
    *     <td>Forward Difference </td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> 2-point forward difference.
    *           @f[
    *                f\prime(x_0) \approx \frac{1}{h}[f(x_0 + h) - f(x_0)]
@@ -325,7 +325,7 @@ namespace Isis {
    *   <tr>
    *     <td>Center Difference </td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> 3-point center difference.
    *           @f[
    *                f\prime(x_0) \approx \frac{1}{2h}[f(x_0 + h) -
@@ -382,37 +382,37 @@ namespace Isis {
    *       @a AkimaPeriodic.
    *     </td>
    *   </tr>
-   * </table> 
-   * @n  
+   * </table>
+   * @n
    * @b Numerical Integration
-   * @n 
-   * The integration methods were derived using 
-   * @b Newton-Cotes, or @a quadrature, formulas for 
-   * approximating integrals given a set of known (@a x,@a y) 
-   * data points.  The @a x values may be irregularly spaced, but 
-   * must be unique and added to the dataset in ascending order. 
-   * Once all of the data points are added, a 
-   * Isis::NumericalApproximation interpolation is used on 
-   * the dataset to estimate the function, @f$f:x \to y@f$, 
-   * mapping @a x values to corresponding @a y values. 
-   * Then, the integral of @e f on the interval from @a a 
-   * to @a b is approximated. To do so, an algorithm for creating 
-   * a composite formula by applying the original formula to 
-   * segments that share a boundary point is used. The 
-   * NumericalApproximation::InterpType chosen for 
-   * interpolation computation seems to have little affect on the 
-   * error between the actual integral and the return values of 
-   * the integration methods. The BoolesRule() method varies the 
-   * most in error. Although errors are not high for any of the 
-   * interpolation types, 
-   * @a CubicNatural spline interpolations seem to 
-   * have the smallest error most often with BoolesRule(). For any 
-   * other numerical integration method, the errors appear to be 
-   * identical for any NumericalApproximation::InterpType except 
-   * @a Polynomial, which usually has a slightly larger 
-   * error than the other interpolation types. Note: A portion of 
-   * this algorithm is derived from the IDL function int_tabulated 
-   * for Boole's Method. 
+   * @n
+   * The integration methods were derived using
+   * @b Newton-Cotes, or @a quadrature, formulas for
+   * approximating integrals given a set of known (@a x,@a y)
+   * data points.  The @a x values may be irregularly spaced, but
+   * must be unique and added to the dataset in ascending order.
+   * Once all of the data points are added, a
+   * Isis::NumericalApproximation interpolation is used on
+   * the dataset to estimate the function, @f$f:x \to y@f$,
+   * mapping @a x values to corresponding @a y values.
+   * Then, the integral of @e f on the interval from @a a
+   * to @a b is approximated. To do so, an algorithm for creating
+   * a composite formula by applying the original formula to
+   * segments that share a boundary point is used. The
+   * NumericalApproximation::InterpType chosen for
+   * interpolation computation seems to have little affect on the
+   * error between the actual integral and the return values of
+   * the integration methods. The BoolesRule() method varies the
+   * most in error. Although errors are not high for any of the
+   * interpolation types,
+   * @a CubicNatural spline interpolations seem to
+   * have the smallest error most often with BoolesRule(). For any
+   * other numerical integration method, the errors appear to be
+   * identical for any NumericalApproximation::InterpType except
+   * @a Polynomial, which usually has a slightly larger
+   * error than the other interpolation types. Note: A portion of
+   * this algorithm is derived from the IDL function int_tabulated
+   * for Boole's Method.
    * <table>
    *   <caption> Integration methods require the parameters @a a,
    *     @a b (interval of domain over which to integrate).
@@ -426,7 +426,7 @@ namespace Isis {
    *   <tr>
    *     <td>Trapezoidal Rule</td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> 2-point Newton-Cotes trapezoidal rule:
    *            @f[
    *           \int_{a}^b f(x)dx \approx \frac{h}{2}[f(a) + f(b)]
@@ -453,7 +453,7 @@ namespace Isis {
    *   <tr>
    *     <td>Simpson's Rule, or Simpson's 3-Point Rule </td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> 3-point Newton-Cotes, Simpson's Rule
    *           @f[
    *             \int_{a}^b f(x)dx \approx \frac{h}{3}[f(a) +
@@ -481,7 +481,7 @@ namespace Isis {
    *   <tr>
    *     <td>Simpson's 3/8 Rule, or Simpson's 4-Point Rule </td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> 4-point Newton-Cotes, Simpson's 3/8 Rule
    *           @f[
    *             \int_{a}^b f(x)dx \approx \frac{3h}{8}[f(a) +
@@ -497,7 +497,7 @@ namespace Isis {
    *     </td>
    *     <td>
    *       The 4-point closed rule, known as Simpson's 3/8 Rule or
-   *       Simpson's 4-Point Rule, uses cubic curves between 
+   *       Simpson's 4-Point Rule, uses cubic curves between
    *       known data points to estimate the area under the curve
    *       (integral). This Newton-Cotes formula uses a uniform
    *       step-size of @e h = (@a b - @a a)/3 and is derived by
@@ -509,13 +509,13 @@ namespace Isis {
    *   <tr>
    *     <td>Boole's Rule </td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> 5-point Newton-Cotes, Boole's Rule
    *           @f[
    *             \int_{a}^b f(x)dx \approx \frac{2h}{45}[7f(a) +
    *                 32f(a+h) + 12f(a+2h) + 32f(a+3h) + 7f(a+4h)]
    *           @f]
-   *           where @e h = (@a b - @a a)/4. 
+   *           where @e h = (@a b - @a a)/4.
    *       </UL>
    *     </td>
    *     <td>
@@ -537,7 +537,7 @@ namespace Isis {
    *   <tr>
    *     <td>Refinements of Extended Trapezoidal Rule </td>
    *     <td>
-   *       <UL> 
+   *       <UL>
    *         <LI> Extended closed trapezoidal rule
    *           @f[
    *             \int_{a}^b f(x)dx \approx h[\frac12 f(x_0) +
@@ -596,13 +596,13 @@ namespace Isis {
    *       @a AkimaPeriodic.
    *     </td>
    *   </tr>
-   * </table> 
-   *  
-   *  
+   * </table>
+   *
+   *
    * Below is an example demonstating the use of this class:
    * @code
    *    inline double f(double x) { return (x + cos ((x * x))); }
-   * 
+   *
    *    NumericalApproximation
    *    spline(NumericalApproximation::CubicClamped);
    *    for (int x = 0; x < 200 ; x++) {
@@ -616,67 +616,67 @@ namespace Isis {
    *    double integ =
    *        spline.RombergsMethod(spline.DomainMinimum(),spline.DomainMaximum());
    * @endcode
-   * 
+   *
    * To compute the same data set using the Akima spline, just use the following:
-   * @code 
-   *    spline.Reset(NumericalApproximation::Akima); 
+   * @code
+   *    spline.Reset(NumericalApproximation::Akima);
    *    double yinterp = spline.Evaluate(50.7);
    *    double yextrap =
    *        spline.Evaluate(201,NumericalApproximation::NearestEndpoint);
    *    double deriv = spline.CenterFirstDifference(10);
    *    double integ =
-   *        spline.RombergsMethod(spline.DomainMinimum(),spline.DomainMaximum()); 
+   *        spline.RombergsMethod(spline.DomainMinimum(),spline.DomainMaximum());
    * @endcode
-   * 
+   *
    * <h1>Caveats</h1>
-   * When using this class, there are some important details that 
-   * require consideration.  Several interpolation types of this 
-   * class use the GSL library. In addition, the GSL library 
-   * default error handling scheme has implications when used in 
-   * C++ objects.  The default behavior is to terminate the 
-   * application when an error occurs.  Options for developers are 
-   * to turn off error trapping within the GSL, which means users 
-   * of the library must do their own error checking, or a 
-   * specific handler can be specified to replace the default 
-   * mode.  Neither option is well suited in object-oriented 
-   * implementations because they apply globally, to all users of 
-   * the library. The approach used here is to turn off error 
-   * handling and require users to handle their own error 
-   * checking.  This is not entirely safe as any user that does 
-   * not follow this strategy could change this behavior at 
-   * runtime.  Other options should be explored. An additional 
-   * option is that the default behavior can be altered prior to 
-   * building GSL but this is also problematic since this behavior 
-   * cannot be guaranteed universally. 
-   *  
-   * For these types, interpolation is strictly adhered to and 
-   * extrapolation is not handled well. If the input to be 
-   * evaluated is outside of the 
-   * minimum and maximum @a x values of the original data 
-   * points, then the @a y value corresponding to the 
-   * @a x value that is nearest to that input is returned. 
-   * However, for sufficiently close values, the clamped cubic and 
-   * polynomial Neville's types are fairly accurate in their 
-   * extrapolation techniques.  All differentiation and 
-   * integration methods throw an error if the value passed is 
-   * outside of the domain. 
-   * 
-   * @ingroup Math                      
-   * @author 2008-11-05 Janet Barrett, Kris Becker, K Teal 
+   * When using this class, there are some important details that
+   * require consideration.  Several interpolation types of this
+   * class use the GSL library. In addition, the GSL library
+   * default error handling scheme has implications when used in
+   * C++ objects.  The default behavior is to terminate the
+   * application when an error occurs.  Options for developers are
+   * to turn off error trapping within the GSL, which means users
+   * of the library must do their own error checking, or a
+   * specific handler can be specified to replace the default
+   * mode.  Neither option is well suited in object-oriented
+   * implementations because they apply globally, to all users of
+   * the library. The approach used here is to turn off error
+   * handling and require users to handle their own error
+   * checking.  This is not entirely safe as any user that does
+   * not follow this strategy could change this behavior at
+   * runtime.  Other options should be explored. An additional
+   * option is that the default behavior can be altered prior to
+   * building GSL but this is also problematic since this behavior
+   * cannot be guaranteed universally.
+   *
+   * For these types, interpolation is strictly adhered to and
+   * extrapolation is not handled well. If the input to be
+   * evaluated is outside of the
+   * minimum and maximum @a x values of the original data
+   * points, then the @a y value corresponding to the
+   * @a x value that is nearest to that input is returned.
+   * However, for sufficiently close values, the clamped cubic and
+   * polynomial Neville's types are fairly accurate in their
+   * extrapolation techniques.  All differentiation and
+   * integration methods throw an error if the value passed is
+   * outside of the domain.
+   *
+   * @ingroup Math
+   * @author 2008-11-05 Janet Barrett, Kris Becker, K Teal
    *         Thompson, Jeannie Walldren
-   * @internal 
-   *   @history 1999-08-11 K Teal Thompson - Original version of 
+   * @internal
+   *   @history 1999-08-11 K Teal Thompson - Original version of
    *            NumericalMethods subroutines in Isis2.
    *   @history 2006-06-14 Kris Becker - Created DataInterp class
-   *   @history 2007-02-20 Janet Barrett - Created NumericalMethods 
+   *   @history 2007-02-20 Janet Barrett - Created NumericalMethods
    *            class from Isis2 subroutines
-   *   @history 2007-02-20 Janet Barrett - Created AtmosModel class 
+   *   @history 2007-02-20 Janet Barrett - Created AtmosModel class
    *            from Isis2 subroutines
-   *   @history 2008-06-18 Christopher Austin - Fixed documentation 
+   *   @history 2008-06-18 Christopher Austin - Fixed documentation
    *            for DataInterp
-   *   @history 2008-06-18 Steven Koechle - Updated NumericalMethods 
+   *   @history 2008-06-18 Steven Koechle - Updated NumericalMethods
    *            unitTest.
-   *   @history 2008-11-05 Jeannie Walldren - Merged DataInterp 
+   *   @history 2008-11-05 Jeannie Walldren - Merged DataInterp
    *            class, NumericalMethods class, and methods from
    *            AtmosModel.  Modified methods from various classes
    *            to be able to function similarly. Added InterpType
@@ -709,8 +709,8 @@ namespace Isis {
    *   @history 2009-08-03 Jeannie Walldren - Clean up code,
    *            documentation and check in changes from
    *            2009-06-10, 2009-07-02, 2009-07-09
-   *  
-   */                                                                       
+   *
+   */
 
   class NumericalApproximation {
     public:
@@ -720,140 +720,144 @@ namespace Isis {
       enum InterpType { Linear,               //!< Linear interpolation.
                         Polynomial,           //!< Polynomial interpolation.
                         PolynomialNeville,    //!< Polynomial interpolation using Neville's algorithm.
-                        CubicNatural,         //!< Cubic Spline interpolation with natural boundary conditions.  
-                        CubicClamped,         //!< Cubic Spline interpolation with clamped boundary conditions.  
+                        CubicNatural,         //!< Cubic Spline interpolation with natural boundary conditions.
+                        CubicClamped,         //!< Cubic Spline interpolation with clamped boundary conditions.
                         CubicNatPeriodic,     //!< Cubic Spline interpolation with periodic boundary conditions.
                         CubicNeighborhood,    //!< Cubic Spline interpolation using 4-pt Neighborhoods with natural boundary conditions.
                         CubicHermite,         //!< Cubic Spline interpolation using the Hermite cubic polynomial.
-                        Akima,                //!< Non-rounded Akima Spline interpolation with natural boundary conditions.  
-                        AkimaPeriodic         //!< Non-rounded Akima Spline interpolation with periodic boundary conditions.  
-      };
-      
+                        Akima,                //!< Non-rounded Akima Spline interpolation with natural boundary conditions.
+                        AkimaPeriodic         //!< Non-rounded Akima Spline interpolation with periodic boundary conditions.
+                      };
+
       // CONSTRUCTORS
-      NumericalApproximation(const InterpType &itype=CubicNatural) throw (iException &);
-      NumericalApproximation(unsigned int n, double *x, double *y, 
-                             const InterpType &itype=CubicNatural) throw (iException &);
-      NumericalApproximation(const vector <double> &x, const vector <double> &y, 
-                             const InterpType &itype=CubicNatural)throw (iException &);
+      NumericalApproximation(const InterpType &itype = CubicNatural) throw(iException &);
+      NumericalApproximation(unsigned int n, double *x, double *y,
+                             const InterpType &itype = CubicNatural) throw(iException &);
+      NumericalApproximation(const vector <double> &x, const vector <double> &y,
+                             const InterpType &itype = CubicNatural)throw(iException &);
       NumericalApproximation(const NumericalApproximation &dint);
-      // ASSIGNMENT OPERATOR 
+      // ASSIGNMENT OPERATOR
       NumericalApproximation &operator=(const NumericalApproximation &numApMeth);
       // DESTRUCTOR
-      virtual ~NumericalApproximation ();
+      virtual ~NumericalApproximation();
 
 
       // ACCESSOR METHODS FOR OBJECT PROPERTIES
       string Name() const;
-     /**
-      * @brief Returns the enumerated type of interpolation chosen
-      * 
-      * This method can be selected after all the points are added in the
-      * interpolation by using Compute() method.  
-      * Note that this prints out as an integer representaion of the 
-      * enumerated type: 
-      *   <UL>
-      *     <LI> Linear             = 0
-      *     <LI> Polynomial         = 1
-      *     <LI> PolynomialNeville  = 2
-      *     <LI> CubicNatural       = 3
-      *     <LI> CubicClamped       = 4
-      *     <LI> CubicNatPeriodic   = 5
-      *     <LI> CubicNeighborhood  = 6
-      *     <LI> CubicHermite       = 7
-      *     <LI> Akima              = 8
-      *     <LI> AkimaPeriodic      = 9
-      *    </UL>
-      * 
-      * @return NumericalApproximation::InterpType Currently assigned
-      *         interpolation type
-      */
-      inline InterpType   InterpolationType() { return (p_itype); }
+      /**
+       * @brief Returns the enumerated type of interpolation chosen
+       *
+       * This method can be selected after all the points are added in the
+       * interpolation by using Compute() method.
+       * Note that this prints out as an integer representaion of the
+       * enumerated type:
+       *   <UL>
+       *     <LI> Linear             = 0
+       *     <LI> Polynomial         = 1
+       *     <LI> PolynomialNeville  = 2
+       *     <LI> CubicNatural       = 3
+       *     <LI> CubicClamped       = 4
+       *     <LI> CubicNatPeriodic   = 5
+       *     <LI> CubicNeighborhood  = 6
+       *     <LI> CubicHermite       = 7
+       *     <LI> Akima              = 8
+       *     <LI> AkimaPeriodic      = 9
+       *    </UL>
+       *
+       * @return NumericalApproximation::InterpType Currently assigned
+       *         interpolation type
+       */
+      inline InterpType   InterpolationType() {
+        return (p_itype);
+      }
       int MinPoints();
-      int MinPoints(InterpType itype) throw (iException &);
+      int MinPoints(InterpType itype) throw(iException &);
 
       // ADD DATA TO OBJECT
       void AddData(const double x, const double y);
       void AddData(unsigned int n, double *x, double *y);
-      void AddData(const vector <double> &x, const vector <double> &y) throw (iException &);
-      void SetCubicClampedEndptDeriv(const double yp1, const double ypn) throw (iException &);
-      void AddCubicHermiteDeriv(unsigned int n, double *fprimeOfx) throw (iException &);
-      void AddCubicHermiteDeriv(const vector <double> &fprimeOfx) throw (iException &);
-      void AddCubicHermiteDeriv(const double fprimeOfx) throw (iException &);
+      void AddData(const vector <double> &x, const vector <double> &y) throw(iException &);
+      void SetCubicClampedEndptDeriv(const double yp1, const double ypn) throw(iException &);
+      void AddCubicHermiteDeriv(unsigned int n, double *fprimeOfx) throw(iException &);
+      void AddCubicHermiteDeriv(const vector <double> &fprimeOfx) throw(iException &);
+      void AddCubicHermiteDeriv(const double fprimeOfx) throw(iException &);
 
       //ACCESSOR METHODS AFTER DATA IS ENTERED
       double DomainMinimum();
       double DomainMaximum();
       bool Contains(double x);
-     /**
-      * Returns the number of the coordinates added to the data set.
-      * 
-      * @return @b unsigned @b int Size of data set.
-      */
-      inline unsigned int Size() { return(p_x.size()); }
-      
-       /**
-       * This enum defines the manner in which a value outside of the 
-       * domain should be handled if passed to the Evaluate() method. 
+      /**
+       * Returns the number of the coordinates added to the data set.
+       *
+       * @return @b unsigned @b int Size of data set.
        */
+      inline unsigned int Size() {
+        return(p_x.size());
+      }
+
+      /**
+      * This enum defines the manner in which a value outside of the
+      * domain should be handled if passed to the Evaluate() method.
+      */
       enum ExtrapType { ThrowError,     //!< Evaluate() throws an error if @a a is outside of the domain.
                         Extrapolate,    //!< Evaluate() attempts to extrapolate if @a a is outside of the domain.
-                                        //!< This is only valid for NumericalApproximation::InterpType @a CubicClamped or @a PolynomialNeville 
-                                        //!< and the result will be accurate only if sufficiently close to the domain boundary.
+                        //!< This is only valid for NumericalApproximation::InterpType @a CubicClamped or @a PolynomialNeville
+                        //!< and the result will be accurate only if sufficiently close to the domain boundary.
                         NearestEndpoint //!< Evaluate() returns the y-value of the nearest endpoint if @a a is outside of the domain.
-      };
+                      };
       // INTERPOLATION AND EXTRAPOLATION RESULTS
-      double          Evaluate (const double          a, const ExtrapType &etype=ThrowError) throw (iException &);
-      vector <double> Evaluate (const vector <double> &a, const ExtrapType &etype=ThrowError) throw (iException &);
-      vector <double> PolynomialNevilleErrorEstimate() throw (iException &);
-      vector <double> CubicClampedSecondDerivatives() throw (iException &);
+      double          Evaluate(const double          a, const ExtrapType &etype = ThrowError) throw(iException &);
+      vector <double> Evaluate(const vector <double> &a, const ExtrapType &etype = ThrowError) throw(iException &);
+      vector <double> PolynomialNevilleErrorEstimate() throw(iException &);
+      vector <double> CubicClampedSecondDerivatives() throw(iException &);
       double EvaluateCubicHermiteFirstDeriv(const double a);
       double EvaluateCubicHermiteSecDeriv(const double a);
 
       // DIFFERENTIATION METHODS
-      double GslFirstDerivative(const double a) throw (iException &);
-      double BackwardFirstDifference(const double a, const unsigned int n=3, 
-                                     const double h=0.1) throw (iException &);
-      double ForwardFirstDifference(const double a, const unsigned int n=3, 
-                                    const double h=0.1) throw (iException &);
-      double CenterFirstDifference(const double a, const unsigned int n=5, 
-                                   const double h=0.1) throw (iException &);
+      double GslFirstDerivative(const double a) throw(iException &);
+      double BackwardFirstDifference(const double a, const unsigned int n = 3,
+                                     const double h = 0.1) throw(iException &);
+      double ForwardFirstDifference(const double a, const unsigned int n = 3,
+                                    const double h = 0.1) throw(iException &);
+      double CenterFirstDifference(const double a, const unsigned int n = 5,
+                                   const double h = 0.1) throw(iException &);
 
-      double GslSecondDerivative(const double a) throw (iException &);
-      double BackwardSecondDifference(const double a, const unsigned int n=3, 
-                                      const double h=0.1) throw (iException &);
-      double ForwardSecondDifference(const double a, const unsigned int n=3, 
-                                     const double h=0.1) throw (iException &);
-      double CenterSecondDifference(const double a, const unsigned int n=5, 
-                                    const double h=0.1) throw (iException &);
+      double GslSecondDerivative(const double a) throw(iException &);
+      double BackwardSecondDifference(const double a, const unsigned int n = 3,
+                                      const double h = 0.1) throw(iException &);
+      double ForwardSecondDifference(const double a, const unsigned int n = 3,
+                                     const double h = 0.1) throw(iException &);
+      double CenterSecondDifference(const double a, const unsigned int n = 5,
+                                    const double h = 0.1) throw(iException &);
 
       // INTERGRATION METHODS
-      double GslIntegral(const double a, const double b) throw (iException &);
+      double GslIntegral(const double a, const double b) throw(iException &);
       double TrapezoidalRule(const double a, const double b);
       double Simpsons3PointRule(const double a, const double b);
       double Simpsons4PointRule(const double a, const double b);
       double BoolesRule(const double a, const double b);
-      double RefineExtendedTrap (double a, double b, double s, unsigned int n) throw (iException &);
-      double RombergsMethod (double a, double b) throw (iException &);
+      double RefineExtendedTrap(double a, double b, double s, unsigned int n) throw(iException &);
+      double RombergsMethod(double a, double b) throw(iException &);
 
       // ASSIGNMENT OPERATORS
       void Reset();
-      void Reset(InterpType itype) throw (iException &);
-      void SetInterpType(InterpType itype) throw (iException &);
+      void Reset(InterpType itype) throw(iException &);
+      void SetInterpType(InterpType itype) throw(iException &);
 
     protected:
       // == CLASS VARIABLES
       // VARIABLES FOR ALL INTERP TYPES
       InterpType        p_itype;                            //!< Interpolation type
-      vector<double>    p_x;                                //!< List of X values                                                                           
-      vector<double>    p_y;                                //!< List of Y values                                                     
+      vector<double>    p_x;                                //!< List of X values
+      vector<double>    p_y;                                //!< List of Y values
       bool              p_dataValidated;                    //!< Flag variable to determine whether ValidateDataSet() has been called
       // GSL INTERP VARIABLES
-      typedef const gsl_interp_type * InterpFunctor;        //!< GSL Interpolation specs                                                 
+      typedef const gsl_interp_type *InterpFunctor;         //!< GSL Interpolation specs
       typedef map<InterpType, InterpFunctor> FunctorList;   //!< Set up a std::map of GSL interpolator functors.  List of function types
       typedef FunctorList::const_iterator FunctorConstIter; //!< GSL Iterator
-      gsl_interp_accel *p_acc;                              //!< Lookup accelorator                                                 
-      gsl_spline       *p_interp;                           //!< Currently active interpolator                                      
-      FunctorList       p_interpFunctors;                   //!< Maintains list of interpolator options                                                     
+      gsl_interp_accel *p_acc;                              //!< Lookup accelorator
+      gsl_spline       *p_interp;                           //!< Currently active interpolator
+      FunctorList       p_interpFunctors;                   //!< Maintains list of interpolator options
       // CUBIC CLAMPED VARIABLES
       bool              p_clampedEndptsSet;                 //!< Flag variable to determine whether SetCubicClampedEndptDeriv() has been called after all data was added for @a CubicClamped interpolation.
       bool              p_clampedComputed;                  //!< Flag variable to determine whether ComputeCubicClamped() has been called.
@@ -869,32 +873,32 @@ namespace Isis {
       // == PROTECTED METHODS
       // CREATING, DESTROYING OBJECT
       void Init(InterpType itype);
-      bool GslInterpType(InterpType itype) const; 
+      bool GslInterpType(InterpType itype) const;
       void GslAllocation(unsigned int npoints);
       void GslDeallocation();
-      InterpFunctor GslFunctor(InterpType itype) const throw (iException &);
-      // VERIFICATION METHODS 
-      void GslIntegrityCheck(int gsl_status, char *src, 
-                             int line) throw (iException &);
-      void ValidateDataSet() throw (iException &);
+      InterpFunctor GslFunctor(InterpType itype) const throw(iException &);
+      // VERIFICATION METHODS
+      void GslIntegrityCheck(int gsl_status, char *src,
+                             int line) throw(iException &);
+      void ValidateDataSet() throw(iException &);
       bool InsideDomain(const double a);
       // COMPUTATION AND EVALUATION METHODS
       bool   GslComputed() const;
-      void   ComputeGsl() throw (iException &);
-      void   ComputeCubicClamped() throw (iException &);
+      void   ComputeGsl() throw(iException &);
+      void   ComputeCubicClamped() throw(iException &);
       double ValueToExtrapolate(const double a, const ExtrapType &etype);
       double          EvaluateCubicNeighborhood(const double a);
       vector <double> EvaluateCubicNeighborhood(const vector <double> &a, const ExtrapType &etype);
-      double          EvaluateCubicClamped(const double a) throw (iException &);
-      double          EvaluateCubicHermite(const double a) throw (iException &);
-      double          EvaluatePolynomialNeville(const double a) throw (iException &);
-      vector <double> EvaluateForIntegration(const double a, const double b, 
-                                                const unsigned int n) throw (iException &);
+      double          EvaluateCubicClamped(const double a) throw(iException &);
+      double          EvaluateCubicHermite(const double a) throw(iException &);
+      double          EvaluatePolynomialNeville(const double a) throw(iException &);
+      vector <double> EvaluateForIntegration(const double a, const double b,
+                                             const unsigned int n) throw(iException &);
       int FindIntervalLowerIndex(const double a);
       // STANDARDIZE ERRORS
-      void ReportException(iException::errType type, const string &method, 
-                       const string &message, char *filesrc, 
-                       int lineno) const throw (iException &);
+      void ReportException(iException::errType type, const string &method,
+                           const string &message, char *filesrc,
+                           int lineno) const throw(iException &);
   };
 };
 

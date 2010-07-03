@@ -1,25 +1,25 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.13 $                                                             
- * $Date: 2009/07/29 21:16:39 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+/**
+ * @file
+ * $Revision: 1.13 $
+ * $Date: 2009/07/29 21:16:39 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include "IsisDebug.h"
 
@@ -38,8 +38,8 @@ namespace Isis {
    * Constructs a blank iException. Checks if file and line number should be
    * output, and whether the exception should be reported in PVL format.
    */
-  iException::iException () {
-    // See if we should output the file and line number  
+  iException::iException() {
+    // See if we should output the file and line number
     Isis::PvlGroup &ef = Isis::Preference::Preferences().FindGroup("ErrorFacility");
     Isis::iString fileline = (std::string) ef["FileLine"];
     p_reportFileLine = (fileline.UpCase() == "ON");
@@ -65,20 +65,20 @@ namespace Isis {
    * @param l The line number
    * @return The modified exception object.
    */
-  iException &iException::Message(iException::errType t, const std::string &m, 
+  iException &iException::Message(iException::errType t, const std::string &m,
                                   const char *f, int l) {
-    if (p_exception == NULL) {
+    if(p_exception == NULL) {
       p_exception = new iException();
     }
 
     PvlGroup &errPref = Preference::Preferences().FindGroup("ErrorFacility");
     bool printTrace = false;
 
-    if (errPref.HasKeyword("StackTrace")) {
+    if(errPref.HasKeyword("StackTrace")) {
       printTrace = (((iString)errPref["StackTrace"][0]).UpCase() == "ON");
     }
 
-    if (printTrace && p_list.empty()) {
+    if(printTrace && p_list.empty()) {
       createStackTrace();
     }
 
@@ -96,23 +96,23 @@ namespace Isis {
   }
 
   //! Throws and destroys the iException object.
-  iException::~iException() throw () {
+  iException::~iException() throw() {
   }
 
   /**
    * Stores what happened in a member std::string.
    */
   void iException::describe() {
-    if (p_list.size() > 0) {
+    if(p_list.size() > 0) {
       std::string message;
-      for (int i=p_list.size()-1; i>=0; i--) {
-        message += "**" + enumString(p_list[i].type) + "** " + 
+      for(int i = p_list.size() - 1; i >= 0; i--) {
+        message += "**" + enumString(p_list[i].type) + "** " +
                    p_list[i].message;
-        if (p_reportFileLine) {
-          message += " in " + p_list[i].filename + 
+        if(p_reportFileLine) {
+          message += " in " + p_list[i].filename +
                      " at " + Isis::iString(p_list[i].lineNumber);
         }
-        if (i != 0) message += "\n";
+        if(i != 0) message += "\n";
       }
 
       p_what = message;
@@ -123,13 +123,13 @@ namespace Isis {
   }
 
   /**
-   * Returns what happened in output format. This pointer is valid as 
-   * long as no new iException objects are created (iException::Message is not 
-   * called again). 
-   *  
+   * Returns what happened in output format. This pointer is valid as
+   * long as no new iException objects are created (iException::Message is not
+   * called again).
+   *
    * @return The message stating what happened and where.
    */
-  const char *iException::what() const throw () {
+  const char *iException::what() const throw() {
     if(p_what != "") {
       return p_what.c_str();
     }
@@ -143,7 +143,7 @@ namespace Isis {
    * @return The type of exception (None if no type).
    */
   iException::errType iException::Type() const {
-    if (p_list.size() > 0) {
+    if(p_list.size() > 0) {
       int i = p_list.size() - 1;
       return p_list[i].type;
     }
@@ -170,17 +170,17 @@ namespace Isis {
   }
 
   /**
-   * Reports the exception to output. 
-   * @param fileinfo Allows the caller to overide the users preference setting 
+   * Reports the exception to output.
+   * @param fileinfo Allows the caller to overide the users preference setting
    *                 for file name and line number where the error was thrown
    * @return The type of exception.
    */
-  int iException::Report (bool fileinfo) {
+  int iException::Report(bool fileinfo) {
     // Loop and present each message
     bool saveFileLine = p_reportFileLine;
     p_reportFileLine = fileinfo & p_reportFileLine;
 
-    if (IsPvlFormat()) {
+    if(IsPvlFormat()) {
       Isis::Pvl errors = PvlErrors();
       std::cerr << errors << std::endl;
     }
@@ -195,21 +195,21 @@ namespace Isis {
   }
 
   /**
-   * Adds a new PvlGroup called "Error" and appends it to the file (if PVL 
+   * Adds a new PvlGroup called "Error" and appends it to the file (if PVL
    * format output is enabled)
    */
   Pvl iException::PvlErrors() {
     Isis::Pvl errors;
 
-    for (int i=p_list.size()-1; i>=0; i--) {
+    for(int i = p_list.size() - 1; i >= 0; i--) {
       PvlGroup errGroup("Error");
 
-      errGroup += Isis::PvlKeyword ("Program",Isis::Application::Name());
-      errGroup += Isis::PvlKeyword ("Class",enumString(p_list[i].type));
-      errGroup += Isis::PvlKeyword ("Code",(int)p_list[i].type);
-      errGroup += Isis::PvlKeyword ("Message",p_list[i].message);
-      errGroup += Isis::PvlKeyword ("File",p_list[i].filename);
-      errGroup += Isis::PvlKeyword ("Line",p_list[i].lineNumber);
+      errGroup += Isis::PvlKeyword("Program", Isis::Application::Name());
+      errGroup += Isis::PvlKeyword("Class", enumString(p_list[i].type));
+      errGroup += Isis::PvlKeyword("Code", (int)p_list[i].type);
+      errGroup += Isis::PvlKeyword("Message", p_list[i].message);
+      errGroup += Isis::PvlKeyword("File", p_list[i].filename);
+      errGroup += Isis::PvlKeyword("Line", p_list[i].lineNumber);
 
       errors.AddGroup(errGroup);
     }
@@ -222,21 +222,21 @@ namespace Isis {
    */
   std::string iException::Errors() {
     std::string message;
-    for (int i=p_list.size()-1; i>=0; i--) {
+    for(int i = p_list.size() - 1; i >= 0; i--) {
       // Construct the line-based message
-      message += "**" + enumString(p_list[i].type) + "** " + 
+      message += "**" + enumString(p_list[i].type) + "** " +
                  p_list[i].message;
-      if (p_reportFileLine) {
-        message += " in " + p_list[i].filename + 
+      if(p_reportFileLine) {
+        message += " in " + p_list[i].filename +
                    " at " + Isis::iString(p_list[i].lineNumber);
       }
-      if (i != 0) message += "\n";
+      if(i != 0) message += "\n";
     }
     return message;
   }
 
   //! Clears the list of exceptions
-  void iException::Clear () {
+  void iException::Clear() {
     p_list.clear();
   }
 
@@ -245,7 +245,7 @@ namespace Isis {
    * @return "USER ERROR" if user error type, etc.
    */
   std::string iException::enumString(iException::errType t) const {
-    switch (t) {
+    switch(t) {
       case User:
         return "USER ERROR";
 
@@ -289,16 +289,16 @@ namespace Isis {
    * @return If the string reads "USER ERROR", will return type User.
    */
   iException::errType iException::enumString(const std::string &s) const {
-    if (s == "USER ERROR") return User;
-    if (s == "PROGRAMMER ERROR") return Programmer;
-    if (s == "PVL ERROR") return Pvl;
-    if (s == "I/O ERROR") return Io;
-    if (s == "CAMERA ERROR") return Camera;
-    if (s == "PROJECTION ERROR") return Projection;
-    if (s == "PARSE ERROR") return Parse;
-    if (s == "MATH ERROR") return Math;
-    if (s == "CANCEL") return Cancel;
-    if (s == "SYSTEM ERROR") return System;
+    if(s == "USER ERROR") return User;
+    if(s == "PROGRAMMER ERROR") return Programmer;
+    if(s == "PVL ERROR") return Pvl;
+    if(s == "I/O ERROR") return Io;
+    if(s == "CAMERA ERROR") return Camera;
+    if(s == "PROJECTION ERROR") return Projection;
+    if(s == "PARSE ERROR") return Parse;
+    if(s == "MATH ERROR") return Math;
+    if(s == "CANCEL") return Cancel;
+    if(s == "SYSTEM ERROR") return System;
     return None;
   }
 

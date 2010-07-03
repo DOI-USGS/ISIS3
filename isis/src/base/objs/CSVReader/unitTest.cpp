@@ -8,28 +8,28 @@ using namespace std;
 using namespace Isis;
 
 CSVReader::CSVTable summarize(const CSVReader &csv) {
-    cout << "Number of lines read: " << csv.size() << endl;
-    cout << "Number of table rows: " << csv.rows() << endl;
-    cout << "Number lines skipped: " << csv.getSkip() << endl;
-    cout << "Got a header:         " << csv.haveHeader() << endl;
+  cout << "Number of lines read: " << csv.size() << endl;
+  cout << "Number of table rows: " << csv.rows() << endl;
+  cout << "Number lines skipped: " << csv.getSkip() << endl;
+  cout << "Got a header:         " << csv.haveHeader() << endl;
 
-    CSVReader::CSVAxis header = csv.getHeader();
-    cout << "Size of header:       " << header.dim() << endl;
-    if (header.dim() > 0) {
-      cout << "  First header value: " << header[0] << endl;
-    }
+  CSVReader::CSVAxis header = csv.getHeader();
+  cout << "Size of header:       " << header.dim() << endl;
+  if(header.dim() > 0) {
+    cout << "  First header value: " << header[0] << endl;
+  }
 
-    CSVReader::CSVTable table = csv.getTable();
-    CSVReader::CSVColumnSummary summary = csv.getColumnSummary(table);
-    cout << "Number of columns:     " <<  csv.columns(table) << endl;
-    cout << "Number distinct columns: " << summary.size() << endl;
-    for (int ncols = 0 ; ncols < summary.size() ; ncols++) {
-      cout << "--> " << summary.getNth(ncols) << " rows have " 
-           << summary.key(ncols) << " columns." << endl;
-    }
-    
-    cout << "Table integrity OK: " << csv.isTableValid(table) << endl;
-    return (table);
+  CSVReader::CSVTable table = csv.getTable();
+  CSVReader::CSVColumnSummary summary = csv.getColumnSummary(table);
+  cout << "Number of columns:     " <<  csv.columns(table) << endl;
+  cout << "Number distinct columns: " << summary.size() << endl;
+  for(int ncols = 0 ; ncols < summary.size() ; ncols++) {
+    cout << "--> " << summary.getNth(ncols) << " rows have "
+         << summary.key(ncols) << " columns." << endl;
+  }
+
+  cout << "Table integrity OK: " << csv.isTableValid(table) << endl;
+  return (table);
 }
 
 int main(int argc, char *argv[]) {
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "\n\nProcessing comma table...\n";
     std::string csvfile("comma.csv");
-    CSVReader csv(csvfile,true,2);
+    CSVReader csv(csvfile, true, 2);
     CSVReader::CSVTable table = summarize(csv);
 
     //  Convert column 0/1 to double
@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
     CSVReader::CSVDblVector dcol = csv.convert<double>(scol);
     cout.setf(ios::fixed);
     cout << "Size of column 0/1: " << scol.dim() << endl;
-    for (int i = 0 ; i < dcol.dim() ; i++ ) {
-      cout << "iString: " << setw(10) << scol[i] 
+    for(int i = 0 ; i < dcol.dim() ; i++) {
+      cout << "iString: " << setw(10) << scol[i]
            << " \tDouble: " << setprecision(4) << dcol[i] << endl;
     }
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     isCsv.close();
 
   }
-  catch (iException &ie) {
+  catch(iException &ie) {
     ie.Report();
   }
 

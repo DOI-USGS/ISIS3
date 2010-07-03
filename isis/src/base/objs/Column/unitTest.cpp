@@ -9,12 +9,11 @@
 using namespace std;
 using namespace Isis;
 
-int main()
-{
+int main() {
   cerr << "\nUnit Test for Column!!!\n\n";
   Preference::Preferences(true);
 
-  Column * testColumn = new Column("test column", 15, Column::Integer);
+  Column *testColumn = new Column("test column", 15, Column::Integer);
 
   cerr << "Name() returns: " << testColumn->Name() << "\n\n";
   cerr << "Width() returns: " << testColumn->Width() << "\n\n";

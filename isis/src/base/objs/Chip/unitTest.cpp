@@ -19,7 +19,7 @@
 using namespace std;
 using namespace Isis;
 
-int main () {
+int main() {
   Preference::Preferences(true);
   void ReportError(iString err);
   Chip chip(51, 50);
@@ -47,26 +47,26 @@ int main () {
 
   cout << "Test assignment of chip data to constant" << endl;
   chip.SetAllValues(10.0);
-  for (int i = 1; i <= chip.Lines(); i++) {
-    for (int j = 1; j <= chip.Samples(); j++) {
+  for(int i = 1; i <= chip.Lines(); i++) {
+    for(int j = 1; j <= chip.Samples(); j++) {
       double value = chip.GetValue(j, i);
-      if (value != 10.0) {
+      if(value != 10.0) {
         cout << "bad constant (!= 10) at " << j << ", " << i << endl;
       }
     }
   }
 
   cout << "Test loading chip data" << endl;
-  for (int i = 1; i <= chip.Lines(); i++) {
-    for (int j = 1; j <= chip.Samples(); j++) {
-      chip.SetValue(j, i, (double) (i*100 + j));
+  for(int i = 1; i <= chip.Lines(); i++) {
+    for(int j = 1; j <= chip.Samples(); j++) {
+      chip.SetValue(j, i, (double)(i * 100 + j));
     }
   }
 
-  for (int i = 1; i <= chip.Lines(); i++) {
-    for (int j = 1; j <= chip.Samples(); j++) {
+  for(int i = 1; i <= chip.Lines(); i++) {
+    for(int j = 1; j <= chip.Samples(); j++) {
       double value = chip.GetValue(j, i);
-      if (value != (double) (i*100 + j)) {
+      if(value != (double)(i * 100 + j)) {
         cout << "bad at " << j << ", " << i << endl;
       }
     }
@@ -80,7 +80,7 @@ int main () {
   // is chip valid at 51, 50?
   cout << chip.IsValid(chip.Samples(), chip.Lines()) << endl;
   // is chip valid at 50, 50?
-  cout << chip.IsValid(chip.Samples()-1, chip.Lines()) << endl;
+  cout << chip.IsValid(chip.Samples() - 1, chip.Lines()) << endl;
   // is at least 95% of chip values valid?
   cout << chip.IsValid(95.0) << endl;
   // is at least 99.99% of chip values valid?
@@ -89,8 +89,8 @@ int main () {
   cout << "Extract test" << endl;
   // Extract 4 by 3 subchip at 26, 25
   Chip sub = chip.Extract(4, 3, chip.TackSample(), chip.TackLine());
-  for (int i = 1; i <= sub.Lines(); i++) {
-    for (int j = 1; j <= sub.Samples(); j++) {
+  for(int i = 1; i <= sub.Lines(); i++) {
+    for(int j = 1; j <= sub.Samples(); j++) {
       cout << sub.GetValue(j, i) << " ";
     }
     cout << endl;
@@ -103,12 +103,12 @@ int main () {
   junk.Open("junk.cub");
   LineManager line(junk);
 
-  for (int i = 1; i <= chip.Lines(); i++) {
+  for(int i = 1; i <= chip.Lines(); i++) {
     line.SetLine(i);
     junk.Read(line);
-    for (int j = 1; j <= chip.Samples(); j++) {
+    for(int j = 1; j <= chip.Samples(); j++) {
       double value = chip.GetValue(j, i);
-      if (value != line[j-1]) {
+      if(value != line[j-1]) {
         cout << "bad at " << j << ", " << i << endl;
       }
     }
@@ -117,8 +117,8 @@ int main () {
   cout << "Test load chip from cube with rotation" << endl;
   chip.TackCube(26.0, 25.0);
   chip.Load(junk, 45.0);
-  for (int i = 1; i <= chip.Lines(); i++) {
-    for (int j = 1; j <= chip.Samples(); j++) {
+  for(int i = 1; i <= chip.Lines(); i++) {
+    for(int j = 1; j <= chip.Samples(); j++) {
       cout << std::setw(14) << chip.GetValue(j, i) << " ";
     }
     cout << endl;
@@ -127,21 +127,21 @@ int main () {
   cout << "Test load chip from cube with rotation and clipping polygon " << endl;
   chip.TackCube(26.0, 25.0);
 
-  geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence ();
-  pts->add (geos::geom::Coordinate (23.0, 22.0));
-  pts->add (geos::geom::Coordinate (28.0, 22.0));
-  pts->add (geos::geom::Coordinate (28.0, 27.0));
-  pts->add (geos::geom::Coordinate (25.0, 28.0));
-  pts->add (geos::geom::Coordinate (23.0, 22.0));
+  geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+  pts->add(geos::geom::Coordinate(23.0, 22.0));
+  pts->add(geos::geom::Coordinate(28.0, 22.0));
+  pts->add(geos::geom::Coordinate(28.0, 27.0));
+  pts->add(geos::geom::Coordinate(25.0, 28.0));
+  pts->add(geos::geom::Coordinate(23.0, 22.0));
   vector<geos::geom::Geometry *> polys;
   geos::geom::GeometryFactory gf;
-  polys.push_back (gf.createPolygon (gf.createLinearRing (pts), NULL));
-  geos::geom::MultiPolygon* mPolygon = gf.createMultiPolygon (polys);
+  polys.push_back(gf.createPolygon(gf.createLinearRing(pts), NULL));
+  geos::geom::MultiPolygon *mPolygon = gf.createMultiPolygon(polys);
 
   chip.SetClipPolygon(*mPolygon);
   chip.Load(junk, 45.0);
-  for (int i = 1; i <= chip.Lines(); i++) {
-    for (int j = 1; j <= chip.Samples(); j++) {
+  for(int i = 1; i <= chip.Lines(); i++) {
+    for(int j = 1; j <= chip.Samples(); j++) {
       cout << std::setw(14) << chip.GetValue(j, i) << " ";
     }
     cout << endl;
@@ -156,31 +156,31 @@ int main () {
   mychip.TackCube(26.0, 25.0);
   mychip.Load(junk);
   mychip.SetChipPosition(mychip.TackSample(), mychip.TackLine());
-  cout << "Cube Sample, Line = " << mychip.CubeSample() << ", " 
-            << mychip.CubeLine() << endl;
+  cout << "Cube Sample, Line = " << mychip.CubeSample() << ", "
+       << mychip.CubeLine() << endl;
   Chip shift(25, 25);
   mychip.Extract(shift, affine);
   shift.SetChipPosition(shift.TackSample(), shift.TackLine());
-  cout << "Shift Cube Sample, Line = " << shift.CubeSample() << ", " 
-            << shift.CubeLine() << endl;
+  cout << "Shift Cube Sample, Line = " << shift.CubeSample() << ", "
+       << shift.CubeLine() << endl;
 
   Chip io = shift;
   io.TackCube(25.0, 24.0);
   io.Load(junk);
   io.SetChipPosition(io.TackSample(), io.TackLine());
-  cout << "New Cube Sample, Line = " << io.CubeSample() << ", " 
-            << io.CubeLine() << endl;
+  cout << "New Cube Sample, Line = " << io.CubeSample() << ", "
+       << io.CubeLine() << endl;
 
   int ioNull(0), shiftNull(0);
   double sumDiff(0.0);
-  for (int il = 1 ; il <= io.Lines() ; il++) {
-    for (int is = 1 ; is <= io.Samples() ; is++) {
-      if (IsSpecial(io.GetValue(is, il))) {
+  for(int il = 1 ; il <= io.Lines() ; il++) {
+    for(int is = 1 ; is <= io.Samples() ; is++) {
+      if(IsSpecial(io.GetValue(is, il))) {
         ioNull++;
       }
-      else if (IsSpecial(shift.GetValue(is, il))) {
+      else if(IsSpecial(shift.GetValue(is, il))) {
         shiftNull++;
-      } 
+      }
       else {
         sumDiff += io.GetValue(is, il) - shift.GetValue(is, il);
       }
@@ -196,21 +196,21 @@ int main () {
   affchip.TackCube(25.0, 24.0);
   affchip.SetTransform(io.GetTransform());
   affchip.SetChipPosition(affchip.TackSample(), affchip.TackLine());
-  cout << "Affine Cube Sample, Line = " << affchip.CubeSample() << ", " 
-            << affchip.CubeLine() << endl;
+  cout << "Affine Cube Sample, Line = " << affchip.CubeSample() << ", "
+       << affchip.CubeLine() << endl;
 
   cout << "\nTest reading with new Affine transform...\n";
   affchip.Load(junk, io.GetTransform());
   ioNull = shiftNull = 0;
   sumDiff = 0.0;
-  for (int il = 1 ; il <= io.Lines() ; il++) {
-    for (int is = 1 ; is <= io.Samples() ; is++) {
-      if (IsSpecial(io.GetValue(is, il))) {
+  for(int il = 1 ; il <= io.Lines() ; il++) {
+    for(int is = 1 ; is <= io.Samples() ; is++) {
+      if(IsSpecial(io.GetValue(is, il))) {
         ioNull++;
       }
-      else if (IsSpecial(affchip.GetValue(is, il))) {
+      else if(IsSpecial(affchip.GetValue(is, il))) {
         shiftNull++;
-      } 
+      }
       else {
         sumDiff += io.GetValue(is, il) - affchip.GetValue(is, il);
       }
@@ -222,8 +222,8 @@ int main () {
   cout << "Sum Diff:    " << sumDiff << endl;
 
   affchip.SetChipPosition(affchip.TackSample(), affchip.TackLine());
-  cout << "Affine Cube loaded at Sample, Line = " << affchip.CubeSample() << ", " 
-            << affchip.CubeLine() << endl;
+  cout << "Affine Cube loaded at Sample, Line = " << affchip.CubeSample() << ", "
+       << affchip.CubeLine() << endl;
 
 
   // Test Load using match chip method
@@ -234,33 +234,33 @@ int main () {
   Chip matchChip(4, 4);
   matchChip.TackCube(1000, 500);
   matchChip.Load(junkCube);
-  cout << "\nMatch chip values..."<< endl;
-  for (int i = 1; i <= matchChip.Lines(); i++) {
-    for (int j = 1; j <= matchChip.Samples(); j++) {
+  cout << "\nMatch chip values..." << endl;
+  for(int i = 1; i <= matchChip.Lines(); i++) {
+    for(int j = 1; j <= matchChip.Samples(); j++) {
       cout << std::setw(14) << matchChip.GetValue(j, i) << " ";
     }
     cout << endl;
   }
-  // make sure that if we create a new chip from the same cube that is matched to the match chip, 
+  // make sure that if we create a new chip from the same cube that is matched to the match chip,
   Chip newChip(4, 4);
   newChip.TackCube(1000, 500);
   newChip.Load(junkCube, matchChip, junkCube);
   cout << "\nNew chip values..." << endl;
-  for (int i = 1; i <= newChip.Lines(); i++) {
-    for (int j = 1; j <= newChip.Samples(); j++) {
+  for(int i = 1; i <= newChip.Lines(); i++) {
+    for(int j = 1; j <= newChip.Samples(); j++) {
       cout << std::setw(14) << newChip.GetValue(j, i) << " ";
     }
     cout << endl;
   }
   // the chips should be almost identical
   cout << "Passes if difference is less than EPSILON = " << 2E-6 << endl;
-  for (int i = 1; i <= newChip.Lines(); i++) {
-    for (int j = 1; j <= newChip.Samples(); j++) {
+  for(int i = 1; i <= newChip.Lines(); i++) {
+    for(int j = 1; j <= newChip.Samples(); j++) {
       double difference = newChip.GetValue(j, i) - matchChip.GetValue(j, i);
       cout << std::setw(14) << difference << "\t";
-      if (fabs(difference) > 2E-6) {
+      if(fabs(difference) > 2E-6) {
         cout << "bad at " << j << ", " << i << endl;
-        cout << "difference at " <<j << ", " << i << " is " << difference << endl;
+        cout << "difference at " << j << ", " << i << " is " << difference << endl;
       }
     }
     cout  << endl;
@@ -277,7 +277,7 @@ int main () {
   cout << "bilinear: " << chip.GetReadInterpolator() << endl;
   chip.SetReadInterpolator(Isis::Interpolator::CubicConvolutionType);
   cout << "cubic convolution: " << chip.GetReadInterpolator() << endl;
-  
+
   cout << endl;
   cout << endl;
   cout << "Generate Errors:" << endl;
@@ -288,66 +288,66 @@ int main () {
   matchChip.Load(junkCube2);
 
   cout << "Try to set interpolator to type 0 (Interpolator::None):" << endl;
-  try{
+  try {
     chip.SetReadInterpolator(Isis::Interpolator::None);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
   cout << "Try to set interpolator to type 3 (enum value not assigned):" << endl;
-  try{
+  try {
     chip.SetReadInterpolator((Isis::Interpolator::interpType) 3);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
   cout << "Try to set chip size with input parameter equal to 0:" << endl;
-  try{
+  try {
     newChip.SetSize(0, 1);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
   cout << "Try to load a cube that is not camera or map projection:" << endl;
-  try{
+  try {
     newChip.Load(junk, matchChip, junkCube);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
   cout << "Try to load a cube with a match cube that is not camera or map projection:" << endl;
-  try{
+  try {
     newChip.Load(junkCube, matchChip, junk);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
   cout << "Try to load a cube with match chip and cube that can not find at least 3 points for Affine Transformation:" << endl;
-  try{
+  try {
     newChip.Load(junkCube, matchChip, junkCube2);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
   cout << "Try to set valid range with larger number passed in as first parameter:" << endl;
-  try{
+  try {
     newChip.SetValidRange(4, 3);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
   cout << "Try to extract a sub-chip with samples or lines greater than original chip:" << endl;
-  try{
+  try {
     newChip.Extract(2, 5, 1, 1);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     ReportError(iString(e.Errors()));
     e.Clear();
   }
@@ -363,17 +363,17 @@ int main () {
     junk.Open("/work2/janderso/moc/ab102401.lev1.cub");
     chip.TackCube(453.0, 567.0);
     chip.Load(junk);
-  
+
     Cube junk2;
     junk2.Open("/work2/janderso/moc/ab102402.lev0.cub");
     Chip chip2(75, 70);
     chip2.TackCube(166.0, 567.0);
     chip2.Load(junk2, chip);
-  
+
     chip.Write("junk3.cub");
     chip2.Write("junk4.cub");
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 #endif
@@ -383,23 +383,23 @@ int main () {
 
 /**
  * Reports error messages from Isis:iException without full paths of filenames
- * @param err Error string of iException 
- * @author Jeannie Walldren 
- * @internal 
- *   @history 2010-06-15 Jeannie Walldren - Original version. 
+ * @param err Error string of iException
+ * @author Jeannie Walldren
+ * @internal
+ *   @history 2010-06-15 Jeannie Walldren - Original version.
  */
 void ReportError(iString err) {
   iString report = ""; // report will be modified error message
   iString errorLine = ""; // read message one line at a time
   Filename expandedfile;
-  while (err != "") {
+  while(err != "") {
     // pull off first line
     errorLine = err.Token("\n");
-    while (errorLine != "") {
+    while(errorLine != "") {
       size_t openBrace = errorLine.find('[');
-      if(openBrace != string::npos){
+      if(openBrace != string::npos) {
         // if open brace is found, look to see if a filename is inside (indicated by '/')
-        if(errorLine.at(openBrace+1) == '/') {
+        if(errorLine.at(openBrace + 1) == '/') {
           // add message up to and including [
           report += errorLine.Token("[");
           report += "[";

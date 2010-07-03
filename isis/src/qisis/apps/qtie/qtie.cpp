@@ -16,10 +16,10 @@
 
 #define IN_QTIE
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 
   try {
-    QApplication *app = new QApplication(argc,argv);
+    QApplication *app = new QApplication(argc, argv);
     QApplication::setApplicationName("qtie");
     app->setStyle("windows");
 
@@ -63,10 +63,10 @@ int main (int argc, char *argv[]) {
     tieTool->addTo(mw);
     tieTool->activate(true);
 
-    QObject::connect(ftool,SIGNAL(cubesOpened(Isis::Cube &,Isis::Cube &,Isis::ControlNet &)),
-                     tieTool,SLOT(setFiles(Isis::Cube &,Isis::Cube &,Isis::ControlNet &)));
+    QObject::connect(ftool, SIGNAL(cubesOpened(Isis::Cube &, Isis::Cube &, Isis::ControlNet &)),
+                     tieTool, SLOT(setFiles(Isis::Cube &, Isis::Cube &, Isis::ControlNet &)));
 
-    QObject::connect(ftool,SIGNAL(newFiles()),tieTool,SLOT(clearFiles()));
+    QObject::connect(ftool, SIGNAL(newFiles()), tieTool, SLOT(clearFiles()));
 
     QObject::connect(mw, SIGNAL(closeWindow()), ftool, SLOT(exit()));
 
@@ -74,7 +74,7 @@ int main (int argc, char *argv[]) {
 
     return app->exec();
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report();
   }
 }

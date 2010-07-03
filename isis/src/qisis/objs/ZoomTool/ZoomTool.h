@@ -54,10 +54,10 @@ namespace Qisis {
    *            CubeViewport.  Fixed some include issues.
    */
   class ZoomTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      ZoomTool (QWidget *parent);
+      ZoomTool(QWidget *parent);
       void addTo(QMenu *menu);
 
     protected slots:
@@ -66,7 +66,9 @@ namespace Qisis {
     protected:
       QAction *toolPadAction(ToolPad *toolpad);
       //! Returns the name of the menu.
-      QString menuName() const { return "&View"; };
+      QString menuName() const {
+        return "&View";
+      };
       void updateTool();
       QWidget *createToolBarWidget(QStackedWidget *parent);
       void enableRubberBandTool();
@@ -80,17 +82,17 @@ namespace Qisis {
       void zoomOut4X();
       void zoomOut8X();
 
-      void zoomActual ();
-      void zoomFit ();
-      void zoomFitWidth ();
-      void zoomFitHeight ();
-      void zoomManual ();
-      
+      void zoomActual();
+      void zoomFit();
+      void zoomFitWidth();
+      void zoomFitHeight();
+      void zoomManual();
+
       void mouseButtonPress(QPoint p, Qt::MouseButton s);
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
 
     private:
-      void zoomBy (double factor);
+      void zoomBy(double factor);
 
       QAction *p_zoomIn2X; //!< Zoom in 2 times.
       QAction *p_zoomIn4X; //!< Zoom in 4 times.

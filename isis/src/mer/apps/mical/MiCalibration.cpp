@@ -3,7 +3,7 @@
 #include "MiCalibration.h"
 
 using namespace std;
-namespace Isis{
+namespace Isis {
   namespace Mer {
 
     //Construct with cube and calkernel(filename)
@@ -23,8 +23,8 @@ namespace Isis{
      * needed for the calibration equations.
      */
 
-    void MiCalibration::ReadLabels(Cube &image){
-      PvlGroup labelgrp = image.Label()->FindGroup("Instrument",Pvl::Traverse);
+    void MiCalibration::ReadLabels(Cube &image) {
+      PvlGroup labelgrp = image.Label()->FindGroup("Instrument", Pvl::Traverse);
       p_exposureDuration = labelgrp["ExposureDuration"];
       p_instrumentSerialNumber = labelgrp["InstrumentSerialNumber"];
       p_CCDTemperature = labelgrp["InstrumentTemperature"][6];
@@ -38,13 +38,13 @@ namespace Isis{
      * Get values from the calibration kernel
      * use the instrumentSerialnumber to determain what rover
      * the image is from that get the values for that rover.
-     * 
+     *
      * @param kernel - the kernal from the  data area or user
      *               entered.
      */
-    void MiCalibration::ReadKernel(Pvl &kernel){
+    void MiCalibration::ReadKernel(Pvl &kernel) {
       string rover = "MI_" + Isis::iString(p_instrumentSerialNumber);
-      PvlGroup kernelgrp = kernel.FindGroup(rover,Pvl::Traverse);
+      PvlGroup kernelgrp = kernel.FindGroup(rover, Pvl::Traverse);
       p_DELCCDTa = kernelgrp["DELCCDTa"];
       p_DELCCDTb = kernelgrp["DELCCDTb"];
       p_RPVOFFa = kernelgrp["RPVOFFa"];
@@ -72,10 +72,10 @@ namespace Isis{
      * CCDtemperatrue. Values used in the calculation come from the
      * calibration kernel
      */
-    void MiCalibration::SetCCDTemperature(double temperature){
+    void MiCalibration::SetCCDTemperature(double temperature) {
       p_CCDTemperature = temperature;
-      p_CCDTemperatureCorrect = (p_CCDTemperature + p_temperatureOffset) + 
-                                p_DELCCDTa * 
+      p_CCDTemperatureCorrect = (p_CCDTemperature + p_temperatureOffset) +
+                                p_DELCCDTa *
                                 (1 - exp(p_exposureDuration / p_DELCCDTb));
     }
 
@@ -83,7 +83,7 @@ namespace Isis{
      * Returns the PCB temperature
      * @param temperature
      */
-    void MiCalibration::SetPCBTemperature(double temperature){
+    void MiCalibration::SetPCBTemperature(double temperature) {
       p_PCBTemperature = temperature;
     }
 
@@ -91,11 +91,11 @@ namespace Isis{
      * Calculates the Omega Naught.  Is dependent on which rover the
      * data is from.
      */
-    void MiCalibration::SetOmegaNaught(){
-      if (p_instrumentSerialNumber == 105) {
+    void MiCalibration::SetOmegaNaught() {
+      if(p_instrumentSerialNumber == 105) {
         p_OmegaNaught = 8.53e+05 - 2.50e+03 * p_CCDTemperatureCorrect;
       }
-      else if (p_instrumentSerialNumber == 110) {
+      else if(p_instrumentSerialNumber == 110) {
         p_OmegaNaught = 8.21e+05 - 2.99e03 * p_CCDTemperatureCorrect;
       }
     }
@@ -105,11 +105,11 @@ namespace Isis{
      * the algarithem come for the image labels and calibration
      * kernel.
      */
-    void MiCalibration::SetReferencePixelModel(){
+    void MiCalibration::SetReferencePixelModel() {
       p_ReferencePixelModel = (p_RPVOFFa - p_OffsetModeId) * p_RPVOFFb +
                               (p_RPPCBTa + p_RPPCBTb * p_exposureDuration) *
                               exp(p_RPPCBTc * p_PCBTemperature) +
-                              (p_RPCCDTa + p_RPCCDTb *p_exposureDuration) *
+                              (p_RPCCDTa + p_RPCCDTb * p_exposureDuration) *
                               exp(p_RPCCDTc * p_CCDTemperatureCorrect);
 
     }
@@ -118,17 +118,17 @@ namespace Isis{
      * Calculates the zero exposure value.  The inputs come from the
      * image label and calibration kernel.
      */
-    void MiCalibration::SetZeroExposureValue(){
-      p_ZeroExposureValue = 
-      p_ZEROEXPa * exp(p_ZEROEXPb * p_CCDTemperatureCorrect);
+    void MiCalibration::SetZeroExposureValue() {
+      p_ZeroExposureValue =
+        p_ZEROEXPa * exp(p_ZEROEXPb * p_CCDTemperatureCorrect);
     }
 
     /**
      * Caluculate the active aere value.  the inputs come from the
      * image label and calibration kernel.
      */
-    void MiCalibration::SetActiveAreaValue(){
-      p_ActiveAreaValue = p_exposureDuration * p_ACTAREAa * 
+    void MiCalibration::SetActiveAreaValue() {
+      p_ActiveAreaValue = p_exposureDuration * p_ACTAREAa *
                           exp(p_ACTAREAb * p_CCDTemperatureCorrect);
     }
 

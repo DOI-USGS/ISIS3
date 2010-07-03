@@ -23,11 +23,11 @@ void IsisMain() {
 
   // Setup the histogram
   UserInterface &ui = Application::GetUserInterface();
-  Histogram hist(*icube,1,p.Progress());
-  if (ui.WasEntered("MINIMUM")) {
-    hist.SetValidRange(ui.GetDouble("MINIMUM"),ui.GetDouble("MAXIMUM"));
+  Histogram hist(*icube, 1, p.Progress());
+  if(ui.WasEntered("MINIMUM")) {
+    hist.SetValidRange(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"));
   }
-  if (ui.WasEntered("NBINS")) {
+  if(ui.WasEntered("NBINS")) {
     hist.SetBins(ui.GetInteger("NBINS"));
   }
 
@@ -36,24 +36,24 @@ void IsisMain() {
   p.Progress()->SetMaximumSteps(icube->Lines());
   p.Progress()->CheckStatus();
   LineManager line(*icube);
-  for (int i=1; i<=icube->Lines(); i++) {
+  for(int i = 1; i <= icube->Lines(); i++) {
     line.SetLine(i);
     icube->Read(line);
-    hist.AddData(line.DoubleBuffer(),line.size());
+    hist.AddData(line.DoubleBuffer(), line.size());
     p.Progress()->CheckStatus();
   }
 
   if(!ui.IsInteractive() || ui.WasEntered("TO")) {
     // Write the results
 
-    if (!ui.WasEntered("TO")) {
+    if(!ui.WasEntered("TO")) {
       string msg = "The [TO] parameter must be entered";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     string outfile = ui.GetFilename("TO");
     ofstream fout;
-    fout.open (outfile.c_str());
-   
+    fout.open(outfile.c_str());
+
     fout << "Cube:           " << ui.GetFilename("FROM") << endl;
     fout << "Band:           " << icube->Bands() << endl;
     fout << "Average:        " << hist.Average() << endl;
@@ -72,21 +72,21 @@ void IsisMain() {
     fout << "Lrs Pixels:      " << hist.LrsPixels() << endl;
     fout << "His Pixels:      " << hist.HisPixels() << endl;
     fout << "Hrs Pixels:      " << hist.HrsPixels() << endl;
-   
+
     //  Write histogram in tabular format
     fout << endl;
     fout << endl;
     fout << "DN,Pixels,CumulativePixels,Percent,CumulativePercent" << endl;
-   
+
     Isis::BigInt total = 0;
     double cumpct = 0.0;
-   
-    for (int i=0; i<hist.Bins(); i++) {
-      if (hist.BinCount(i) > 0) {
+
+    for(int i = 0; i < hist.Bins(); i++) {
+      if(hist.BinCount(i) > 0) {
         total += hist.BinCount(i);
         double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
         cumpct += pct;
-   
+
         fout << hist.BinMiddle(i) << ",";
         fout << hist.BinCount(i) << ",";
         fout << total << ",";
@@ -97,10 +97,10 @@ void IsisMain() {
     fout.close();
   }
   // If we are in gui mode, create a histogram plot
-  if (ui.IsInteractive()) {
+  if(ui.IsInteractive()) {
     // Set the title for the dialog
     string title;
-    if (ui.WasEntered("TITLE")) {
+    if(ui.WasEntered("TITLE")) {
       title = ui.GetString("TITLE");
     }
     else {
@@ -112,28 +112,28 @@ void IsisMain() {
     Qisis::HistogramToolWindow *plot = new Qisis::HistogramToolWindow(title.c_str(), ui.TheGui());
 
     // Set the xaxis title if they entered one
-    if (ui.WasEntered("XAXIS")) {
+    if(ui.WasEntered("XAXIS")) {
       string xaxis(ui.GetString("XAXIS"));
-      plot->setAxisLabel(QwtPlot::xBottom,xaxis.c_str());
+      plot->setAxisLabel(QwtPlot::xBottom, xaxis.c_str());
     }
 
     // Set the yLeft axis title if they entered one
-    if (ui.WasEntered("Y1AXIS")) {
+    if(ui.WasEntered("Y1AXIS")) {
       string yaxis(ui.GetString("Y1AXIS"));
-      plot->setAxisLabel(QwtPlot::yLeft,yaxis.c_str());
+      plot->setAxisLabel(QwtPlot::yLeft, yaxis.c_str());
     }
 
     // Set the yRight axis title if they entered one
-    if (ui.WasEntered("Y2AXIS")) {
+    if(ui.WasEntered("Y2AXIS")) {
       string y2axis(ui.GetString("Y2AXIS"));
-      plot->setAxisLabel(QwtPlot::yRight,y2axis.c_str());
+      plot->setAxisLabel(QwtPlot::yRight, y2axis.c_str());
     }
 
     //Transfer data from histogram to the plotcurve
-    std::vector<double> xarray,yarray,y2array;
+    std::vector<double> xarray, yarray, y2array;
     double cumpct = 0.0;
-    for (int i=0; i<hist.Bins(); i++) {
-      if (hist.BinCount(i) > 0) {
+    for(int i = 0; i < hist.Bins(); i++) {
+      if(hist.BinCount(i) > 0) {
         xarray.push_back(hist.BinMiddle(i));
         yarray.push_back(hist.BinCount(i));
 
@@ -163,37 +163,37 @@ void IsisMain() {
     QwtArray<double> values(yarray.size());
     double maxYValue = DBL_MIN;
     double minYValue = DBL_MAX;
-    // --------------------------------------------- 
+    // ---------------------------------------------
 
     for(unsigned int y = 0; y < yarray.size(); y++) {
 
       intervals[y] = QwtDoubleInterval(xarray[y], xarray[y] + hist.BinSize());
-  
-      values[y] = yarray[y];  
-      if(values[y] > maxYValue) maxYValue = values[y]; 
+
+      values[y] = yarray[y];
+      if(values[y] > maxYValue) maxYValue = values[y];
       if(values[y] < minYValue) minYValue = values[y];
     }
-    
+
     histCurve->setData(QwtIntervalData(intervals, values));
-    cdfCurve->setData(&xarray[0],&y2array[0],xarray.size());
+    cdfCurve->setData(&xarray[0], &y2array[0], xarray.size());
 
     plot->add(histCurve);
     plot->add(cdfCurve);
     plot->fillTable();
 
-    plot->setScale(QwtPlot::yLeft,0,maxYValue);
-    plot->setScale(QwtPlot::xBottom,hist.Minimum(),hist.Maximum());
+    plot->setScale(QwtPlot::yLeft, 0, maxYValue);
+    plot->setScale(QwtPlot::xBottom, hist.Minimum(), hist.Maximum());
 
     QLabel *label = new QLabel("  Average = " + QString::number(hist.Average()) + '\n' +
-    "\n  Minimum = " + QString::number(hist.Minimum()) + '\n' +
-    "\n  Maximum = " + QString::number(hist.Maximum()) + '\n' +
-    "\n  Stand. Dev.= " + QString::number(hist.StandardDeviation()) + '\n' +
-    "\n  Variance = " + QString::number(hist.Variance()) + '\n' +
-    "\n  Median = " + QString::number(hist.Median()) + '\n' +
-    "\n  Mode = " + QString::number(hist.Mode()) +'\n' +
-    "\n  Skew = " + QString::number(hist.Skew()), plot);
+                               "\n  Minimum = " + QString::number(hist.Minimum()) + '\n' +
+                               "\n  Maximum = " + QString::number(hist.Maximum()) + '\n' +
+                               "\n  Stand. Dev.= " + QString::number(hist.StandardDeviation()) + '\n' +
+                               "\n  Variance = " + QString::number(hist.Variance()) + '\n' +
+                               "\n  Median = " + QString::number(hist.Median()) + '\n' +
+                               "\n  Mode = " + QString::number(hist.Mode()) + '\n' +
+                               "\n  Skew = " + QString::number(hist.Skew()), plot);
     plot->getDockWidget()->setWidget(label);
- 
+
     plot->showWindow();
   }
   p.EndProcess();

@@ -15,7 +15,7 @@ int filterHeight = 16;
 
 void flipCube(Isis::Buffer &data);
 
-void IsisMain (){
+void IsisMain() {
   ProcessByBrick p;
 
   Cube *icube = p.SetInputCube("FROM");
@@ -59,6 +59,6 @@ void flipCube(Isis::Buffer &data) {
   currentLine -= filterHeight;
   Brick outBrick(data.SampleDimension(), data.LineDimension(), data.BandDimension(), data.PixelType());
   outBrick.Copy(data);
-  outBrick.SetBasePosition(1, currentLine+1, data.Band());
+  outBrick.SetBasePosition(1, currentLine + 1, data.Band());
   outputCube->Write(outBrick);
 }

@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   cout << "Size: " << p.size() << endl;
   p.setName("test profile");
   cout << "Name: " << p.Name() << endl;
-  cout << "Adding a key..." << endl; 
+  cout << "Adding a key..." << endl;
   p.add("foo", "bar");
   cout << "Valid: " << p.isValid() << endl;
   cout << "Size: " << p.size() << endl;
@@ -28,7 +28,8 @@ int main(int argc, char *argv[]) {
   try {
     cout << "BadKey =";
     cout << p("BadKey") << endl;
-  } catch ( iException &ie ) {
+  }
+  catch(iException &ie) {
     ie.Report();
   }
 

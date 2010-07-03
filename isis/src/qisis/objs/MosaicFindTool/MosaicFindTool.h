@@ -16,25 +16,27 @@ namespace Qisis {
    *   @history
    */
   class MosaicFindTool : public Qisis::MosaicTool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      MosaicFindTool (QWidget *parent);
+      MosaicFindTool(QWidget *parent);
       void addToMenu(QMenu *menu);
 
     protected slots:
       void updateTool();
-      
+
     protected:
       QAction *toolPadAction(ToolPad *toolpad);
       //! Returns the name of the menu.
-      QString menuName() const { return "&View"; };
+      QString menuName() const {
+        return "&View";
+      };
       QWidget *createToolBarWidget(QStackedWidget *parent);
 
     public slots:
       void getUserGroundPoint();
       void clearPoint();
-      
+
     private:
       void createDialog(QWidget *parent);
       QDialog *p_dialog;
@@ -51,7 +53,7 @@ namespace Qisis {
       MosaicWidget *p_parent;
       QGraphicsEllipseItem *p_findSpot;
       QAction *p_action;
-      
+
   };
 };
 

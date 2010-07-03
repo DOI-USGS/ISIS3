@@ -6,28 +6,29 @@
 #include "Progress.h"
 
 class QUrl;
-namespace Isis{
+namespace Isis {
 
-  class HttpGet : public QObject
-  {
+  class HttpGet : public QObject {
       Q_OBJECT
-  
-  public:
+
+    public:
       HttpGet(QObject *parent = 0);
-  
+
       bool getFile(const QUrl &url, std::string topath);
 
-      bool error() const{return p_error;};
-      
-  
-  signals:
+      bool error() const {
+        return p_error;
+      };
+
+
+    signals:
       void done();
-  
-  private slots:
+
+    private slots:
       void httpDone(bool error);
       void httpProgress(int done, int total);
-  
-  private:
+
+    private:
       QHttp p_http;
       QFile p_file;
       bool p_error;

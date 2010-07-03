@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <string>
-#include <vector> 
+#include <vector>
 #include <algorithm>
 #include <sstream>
 #include <iostream>
@@ -23,7 +23,7 @@ using namespace Isis;
 using namespace std;
 
 
-void IsisMain(){
+void IsisMain() {
 
 //  Input parameters
   UserInterface &ui = Application::GetUserInterface();
@@ -31,25 +31,25 @@ void IsisMain(){
   Filename from(sourceFile);
 
   string to;
-  if (ui.WasEntered("TO")) to = ui.GetAsString("TO");
+  if(ui.WasEntered("TO")) to = ui.GetAsString("TO");
   bool delete_from(false);
 
 //  Is there a separate file containing keywords to report?
   string keylist;
-  if (ui.WasEntered("KEYLIST")) keylist = ui.GetAsString("KEYLIST");
+  if(ui.WasEntered("KEYLIST")) keylist = ui.GetAsString("KEYLIST");
   else keylist = to;
 
 //  Get PVL parameter
   string pvl;
-  if (ui.WasEntered("PVL")) pvl = ui.GetAsString("PVL");
+  if(ui.WasEntered("PVL")) pvl = ui.GetAsString("PVL");
 
 // Run mdis2isis if necessary.  If this step must be done, we must also
 //  run spiceinit to initialize it with spice.
-  if (iString::UpCase(from.Extension()) != "CUB") {
+  if(iString::UpCase(from.Extension()) != "CUB") {
     Filename temp;
     temp.Temporary(from.Basename(), "cub");
     string params = "from=" + from.Expanded()  + " to=" + temp.Expanded();
-  
+
     try {
       iApp->Exec("mdis2isis", params);
 
@@ -61,12 +61,13 @@ void IsisMain(){
       cube.Close();
 
       //  Run spiceinit on it
-      iApp->Exec("spiceinit", "from="+temp.Expanded());
-    } catch (iException &ie ) {
+      iApp->Exec("spiceinit", "from=" + temp.Expanded());
+    }
+    catch(iException &ie) {
       string tempName(temp.Expanded());
-      remove (tempName.c_str());
-      ie.Message(iException::User,"Failed to execute mdis2isis/spiceinit",
-                  _FILEINFO_);
+      remove(tempName.c_str());
+      ie.Message(iException::User, "Failed to execute mdis2isis/spiceinit",
+                 _FILEINFO_);
       throw;
     }
 
@@ -90,69 +91,69 @@ void IsisMain(){
     PvlGroup mdiskeys("MdisPdsKeys");
 
 //  Only process the PDS EDR keyword mapping if KEYMAP (or TO) is entered.
-    if (!keylist.empty()) {
+    if(!keylist.empty()) {
       Filename kmap(keylist);
-      if (!kmap.Exists()) {
-        string mess = "EDR keyword map source file, " + kmap.Expanded() 
-                       + ", does not exist!";
+      if(!kmap.Exists()) {
+        string mess = "EDR keyword map source file, " + kmap.Expanded()
+                      + ", does not exist!";
         throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
       }
-  
-  // Get the keylist source line
+
+      // Get the keylist source line
       string kmapName(kmap.Expanded());
       ifstream ifile(kmapName.c_str(), ios::in);
-      if (!ifile) {
+      if(!ifile) {
         string mess = "Unable to open key map source file " + kmap.Expanded();
         throw iException::Message(iException::User, mess, _FILEINFO_);
       }
-  
+
       string keystring;
-      if (!getline(ifile, keystring)) {
+      if(!getline(ifile, keystring)) {
         string mess = "I/O error reading key map line from  " + kmap.Expanded();
         throw iException::Message(iException::User, mess, _FILEINFO_);
       }
-  
+
       ifile.close();
-  
+
       //  Split the line using semi-colons as the delimiter
       vector<string> keys;
       iString::Split(';', keystring, keys);
       std::string keyvalues = edrkeys.extract(keys, geom.getNull(), &mdiskeys);
 
-      if (!to.empty()) {
+      if(!to.empty()) {
         //  Now open the output file and write the result
         Filename tomap(to);
         string tomapName(tomap.Expanded());
         bool toExists = tomap.Exists();
         ofstream ofile;
-        if (toExists) {
-          ofile.open(tomapName.c_str(), std::ios::out|std::ios::app);
+        if(toExists) {
+          ofile.open(tomapName.c_str(), std::ios::out | std::ios::app);
         }
         else {
           ofile.open(tomapName.c_str(), std::ios::out);
         }
-    
-        if (!ofile) {
-          string mess = "Could not open or create output TO file " + 
+
+        if(!ofile) {
+          string mess = "Could not open or create output TO file " +
                         tomapName;
           throw iException::Message(iException::User, mess, _FILEINFO_);
         }
-    
+
         //  Write the header if requested by the user
-        if (!toExists) ofile << keystring << endl;
+        if(!toExists) ofile << keystring << endl;
         ofile << keyvalues << endl;
         ofile.close();
       }
     }
     else {
       PvlContainer::PvlKeywordIterator keyIter = geomkeys.Begin();
-      for ( ; keyIter != geomkeys.End() ;  ++keyIter) {
+      for(; keyIter != geomkeys.End() ;  ++keyIter) {
         mdiskeys.AddKeyword(*keyIter);
       }
     }
 
 //  See if the user wants to write out the PVL keywords
-    if (!pvl.empty()) {
+    if(!pvl.empty()) {
       Pvl pout;
       pout.AddGroup(mdiskeys);
       pout.Write(pvl);
@@ -160,16 +161,16 @@ void IsisMain(){
 
 //  Log the results to the log/terminal/gui
     Application::Log(mdiskeys);
-  } 
-  catch (iException &ie) {
+  }
+  catch(iException &ie) {
 
     string fromName(from.Expanded());
-    if (delete_from) remove (fromName.c_str());
+    if(delete_from) remove(fromName.c_str());
     throw;
   }
-  
+
 // Delete the from file if it was temporarily created from an EDR
   string fromName(from.Expanded());
-  if (delete_from) remove (fromName.c_str());
+  if(delete_from) remove(fromName.c_str());
 }
 

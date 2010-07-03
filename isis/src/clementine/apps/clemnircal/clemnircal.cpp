@@ -6,7 +6,7 @@
 #include "Table.h"
 #include <cmath>
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 const double digitalOffset = 8.30690;
@@ -24,12 +24,12 @@ double optimalExposureDuration;
 int numCoefficients = -1; // This will almost always be 1 or 2
 int offsetModeID = 0;
 
-bool convertToNull = false; 
+bool convertToNull = false;
 bool doThermalCorrection = false;
 
 std::vector<double> thermBgCoefficients;
 
-void NirCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &out); 
+void NirCal(std::vector< Isis::Buffer * > &in, std::vector< Isis::Buffer * > &out);
 
 void IsisMain() {
   // We will be processing by line
@@ -44,13 +44,13 @@ void IsisMain() {
 
   // Do files (filter + product ID matters)
   Cube *icube = p.SetInputCube("FROM");
-  Cube *ocube =p.SetOutputCube("TO");
-  Cube *ffcube, *ofcube, *afcube, *dccube, *biascube, *bpcube;  
+  Cube *ocube = p.SetOutputCube("TO");
+  Cube *ffcube, *ofcube, *afcube, *dccube, *biascube, *bpcube;
 
   iString filter = (string)(icube->GetGroup("BandBin"))["FilterName"];
   filter = filter.DownCase();
   iString productID = (string)(icube->GetGroup("Archive"))["ProductID"];
-  iString orbit = productID.substr(productID.find('.')+1, productID.length()-1);
+  iString orbit = productID.substr(productID.find('.') + 1, productID.length() - 1);
 
   // If hemisphere code greater than 'I' set to 'n' else set to 's'
   char hemisphereCode = (productID[productID.find('.')-1] > 'I') ? 'n' : 's';
@@ -62,18 +62,20 @@ void IsisMain() {
   optimalExposureDuration = (exposureDuration * 0.984675) + 0.233398;
   cryocoolerDuration = (icube->GetGroup("Instrument"))["CryocoolerDuration"];
 
-  if (ui.WasEntered("FFFILE")) {
+  if(ui.WasEntered("FFFILE")) {
     ffcube = p.SetInputCube("FFFILE");
-  } else {
+  }
+  else {
     string fffileLoc = "$clementine1/calibration/nir/";
     fffileLoc += "newnir_flat_" + filter + ".cub";
     CubeAttributeInput cubeAtt;
     ffcube = p.SetInputCube(fffileLoc, cubeAtt);
   }
 
-  if (ui.WasEntered("OFFILE")) {
+  if(ui.WasEntered("OFFILE")) {
     ofcube = p.SetInputCube("OFFILE");
-  } else {
+  }
+  else {
     string fffileLoc = "$clementine1/calibration/nir/nirorbitflats/";
     fffileLoc += "nir_orbflat_" + orbit + "_" + filter + ".cub";
     CubeAttributeInput cubeAtt;
@@ -81,31 +83,32 @@ void IsisMain() {
   }
 
   string afFileTableLoc = "";
-  if (ui.WasEntered("AFFILE")) {
+  if(ui.WasEntered("AFFILE")) {
     afcube = p.SetInputCube("AFFILE");
-  } else {
+  }
+  else {
     string affileLoc;
     afFileTableLoc = "$clementine1/calibration/nir/nir.addflats.dat";
 
     TextFile aFFileTable(afFileTableLoc);
     int numLines = aFFileTable.LineCount();
-    for (int i=0; i<numLines; i++) {
+    for(int i = 0; i < numLines; i++) {
       iString line;
       aFFileTable.GetLine(line, true);
       line = line.Compress();
-      if (orbit.compare(line.Token(" ")) == 0 &&
+      if(orbit.compare(line.Token(" ")) == 0 &&
           filter.compare(line.Token(" ")) == 0 &&
           gainModeID == (int)line.Token(" ") &&
           offsetModeID == (int)line.Token(" ") &&
           (int)exposureDuration == (int)line.Token(" ") &&
-          hemisphereCode == line.Token(" ")[0] ) {
+          hemisphereCode == line.Token(" ")[0]) {
         line.Token(" "); // strip unused data
         affileLoc = line.Token(" ");
         break;
       }
     }
 
-    if (affileLoc.compare("") == 0){
+    if(affileLoc.compare("") == 0) {
       affileLoc = "zeros.cub";
     }
 
@@ -136,14 +139,16 @@ void IsisMain() {
     afcube = p.SetInputCube(affileLoc, cubeAtt);
   }
 
-  if (ui.WasEntered("DCFILE")) {
+  if(ui.WasEntered("DCFILE")) {
     dccube = p.SetInputCube("DCFILE");
-  } else {
+  }
+  else {
     string dcfileLoc = "$clementine1/calibration/nir/";
 
-    if (compressionType.compare("CLEM-JPEG-0") == 0) {
+    if(compressionType.compare("CLEM-JPEG-0") == 0) {
       dcfileLoc += "dark_nir_cmp0.cub";
-    } else {
+    }
+    else {
       dcfileLoc += "dark_nir.cub";
     }
 
@@ -151,14 +156,16 @@ void IsisMain() {
     dccube = p.SetInputCube(dcfileLoc, cubeAtt);
   }
 
-  if (ui.WasEntered("BIASFILE")) {
+  if(ui.WasEntered("BIASFILE")) {
     biascube = p.SetInputCube("BIASFILE");
-  } else {
+  }
+  else {
     string biasfileLoc = "$clementine1/calibration/nir/";
 
-    if (compressionType.compare("CLEM-JPEG-0") == 0) {
+    if(compressionType.compare("CLEM-JPEG-0") == 0) {
       biasfileLoc += "bias_nir_cmp0.cub";
-    } else {
+    }
+    else {
       biasfileLoc += "bias_nir.cub";
     }
 
@@ -166,13 +173,15 @@ void IsisMain() {
     biascube = p.SetInputCube(biasfileLoc, cubeAtt);
   }
 
-  if (ui.WasEntered("BPFILE")) {
+  if(ui.WasEntered("BPFILE")) {
     bpcube = p.SetInputCube("BPFILE");
-  } else {
+  }
+  else {
     string bpfileLoc = "$clementine1/calibration/nir/";
-    if (compressionType.compare("CLEM-JPEG-0") == 0) {
+    if(compressionType.compare("CLEM-JPEG-0") == 0) {
       bpfileLoc += "badpix_nir_cmp0.v3.cub";
-    } else {
+    }
+    else {
       bpfileLoc += "badpix_nir.v3.cub";
     }
 
@@ -187,7 +196,7 @@ void IsisMain() {
   TextFile thermTable(thermTbl);
   int numLines = thermTable.LineCount();
   iString line;
-  for (int i=0; i<numLines; i++) {
+  for(int i = 0; i < numLines; i++) {
     thermTable.GetLine(line);
 
     // In some lines there's a beginning space, and in others there isn't. To make it consitent,
@@ -213,40 +222,40 @@ void IsisMain() {
 
   if(numCoefficients == 0) {
     iString err = "The orbit [" + orbit + "] could not be located in the thermal corrections table [" + thermTbl + "].";
-    throw iException::Message(iException::Programmer, err, _FILEINFO_);                 
-  }  
+    throw iException::Message(iException::Programmer, err, _FILEINFO_);
+  }
 
   // Start the processing
   p.StartProcess(NirCal);
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
-  calgrp += PvlKeyword("FlatFieldFile",ffcube->Filename());
-  calgrp += PvlKeyword("OrbitFlatFieldFile",ofcube->Filename());
-  calgrp += PvlKeyword("AdditiveFile",afcube->Filename());
-  calgrp += PvlKeyword("DarkCurrentFile",dccube->Filename());
-  calgrp += PvlKeyword("BiasFile",biascube->Filename());
-  calgrp += PvlKeyword("BadPixelFile",bpcube->Filename());
+  calgrp += PvlKeyword("FlatFieldFile", ffcube->Filename());
+  calgrp += PvlKeyword("OrbitFlatFieldFile", ofcube->Filename());
+  calgrp += PvlKeyword("AdditiveFile", afcube->Filename());
+  calgrp += PvlKeyword("DarkCurrentFile", dccube->Filename());
+  calgrp += PvlKeyword("BiasFile", biascube->Filename());
+  calgrp += PvlKeyword("BadPixelFile", bpcube->Filename());
 
   //Table files
-  calgrp += PvlKeyword("ThermalCorrectionTable",thermTbl);
-  calgrp += PvlKeyword("AdditiveFileTable",afFileTableLoc);
+  calgrp += PvlKeyword("ThermalCorrectionTable", thermTbl);
+  calgrp += PvlKeyword("AdditiveFileTable", afFileTableLoc);
 
-  calgrp += PvlKeyword("DigitalOffset",digitalOffset);
-  calgrp += PvlKeyword("GlobalBias",globalBias);
-  calgrp += PvlKeyword("GlobalDarkCoefficient",globalDarkCoefficient);
-  calgrp += PvlKeyword("V",vConstant);
+  calgrp += PvlKeyword("DigitalOffset", digitalOffset);
+  calgrp += PvlKeyword("GlobalBias", globalBias);
+  calgrp += PvlKeyword("GlobalDarkCoefficient", globalDarkCoefficient);
+  calgrp += PvlKeyword("V", vConstant);
   //Calculated in processing routine
-  calgrp += PvlKeyword("GainFactor",gainFactor);
-  calgrp += PvlKeyword("AbsoluteCoefficient",absoluteCoefficient);
-  calgrp += PvlKeyword("CryoNorm",cryonorm);
-  calgrp += PvlKeyword("OptimalExposureDuration",optimalExposureDuration);
+  calgrp += PvlKeyword("GainFactor", gainFactor);
+  calgrp += PvlKeyword("AbsoluteCoefficient", absoluteCoefficient);
+  calgrp += PvlKeyword("CryoNorm", cryonorm);
+  calgrp += PvlKeyword("OptimalExposureDuration", optimalExposureDuration);
 
   ocube->PutGroup(calgrp);
   p.EndProcess();
 }
 
-void NirCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &out) {
+void NirCal(std::vector< Isis::Buffer * > &in, std::vector< Isis::Buffer * > &out) {
   Isis::Buffer &incube = *in[0];
   Isis::Buffer &ffcube = *in[1];
   Isis::Buffer &ofcube = *in[2];

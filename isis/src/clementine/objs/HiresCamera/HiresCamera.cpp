@@ -9,26 +9,26 @@
 using namespace std;
 using namespace Isis;
 namespace Clementine {
-  HiresCamera::HiresCamera (Pvl &lab) : FramingCamera(lab) {
+  HiresCamera::HiresCamera(Pvl &lab) : FramingCamera(lab) {
 
     // Get the camera characteristics
     iString filter = (string)(lab.FindGroup("BandBin", Pvl::Traverse))["FilterName"];
     filter = filter.UpCase();
 
-    SetFocalLength ();
-    SetPixelPitch ();
+    SetFocalLength();
+    SetPixelPitch();
 
     // Get the start time in et
-    PvlGroup inst = lab.FindGroup ("Instrument",Pvl::Traverse);
+    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
     string stime = inst["StartTime"];
 
-    double time; 
-    str2et_c(stime.c_str(),&time);
+    double time;
+    str2et_c(stime.c_str(), &time);
 
 
 
     // Do not correct time for center of the exposure duration. This is because
-    // the kernels were built to accept the start times of the images. 
+    // the kernels were built to accept the start times of the images.
     // time += ((double)inst["ExposureDuration"] / 1000.0) / 2.0; // Add half
     // exposure duration in milliseconds
 
@@ -36,15 +36,15 @@ namespace Clementine {
     new CameraDetectorMap(this);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this,NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
 
-    focalMap->SetDetectorOrigin (
-                   Spice::GetDouble("INS" + (iString)(int)NaifIkCode() +
-                                    "_BORESIGHT_SAMPLE"), 
-                   Spice::GetDouble("INS" + (iString)(int)NaifIkCode() +
-                                    "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(
+      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() +
+                       "_BORESIGHT_SAMPLE"),
+      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() +
+                       "_BORESIGHT_LINE"));
 
-    // Setup distortion map 
+    // Setup distortion map
     new CameraDistortionMap(this);
 
     // Setup the ground and sky map

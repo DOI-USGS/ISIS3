@@ -29,9 +29,9 @@
 namespace Isis {
 
 #ifndef RADAR_LOOK_DIR
-namespace Radar {
-  enum LookDirection { Left, Right };
-}
+  namespace Radar {
+    enum LookDirection { Left, Right };
+  }
 #define RADAR_LOOK_DIR
 #endif
 

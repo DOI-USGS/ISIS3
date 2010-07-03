@@ -19,11 +19,11 @@ void IsisMain() {
 
   // Output to file if entered
   if(ui.WasEntered("TO")) {
-    label.Write( ui.GetFilename("TO") );
+    label.Write(ui.GetFilename("TO"));
   }
 
   // Print label to the gui log if it is interactive
-  else if (ui.IsInteractive()) {
+  else if(ui.IsInteractive()) {
     Application::GuiLog(label);
   }
 
@@ -33,5 +33,5 @@ void IsisMain() {
   }
 
 }
-       
+
 

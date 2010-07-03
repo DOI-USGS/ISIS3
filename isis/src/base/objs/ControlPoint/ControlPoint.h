@@ -29,9 +29,9 @@
 #include "ControlMeasure.h"
 
 namespace Isis {
-  
+
   class PvlObject;
-  
+
   /**
    * @brief A single control point
    *
@@ -84,21 +84,21 @@ namespace Isis {
    *   @history 2009-10-13 Jeannie Walldren - Added detail to
    *            error messages.
    *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors with call to
-	 *  					 CameraGroundMap->GetXY
-	 *   @history 2010-05-11 Sharmila Prasad Added API's Copy Constructor to copy one point to another and
-	 *  					ReferenceIndexNoException not to throw Exception if there are no reference point or
-	 *   			    no measures in a Control Point.
-   *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString() 
+   *  					 CameraGroundMap->GetXY
+   *   @history 2010-05-11 Sharmila Prasad Added API's Copy Constructor to copy one point to another and
+   *  					ReferenceIndexNoException not to throw Exception if there are no reference point or
+   *   			    no measures in a Control Point.
+   *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString()
    */
   class ControlPoint {
     public:
       ControlPoint();
-      ControlPoint (const std::string &id);
+      ControlPoint(const std::string &id);
 
       //! Destroy a control point
-      ~ControlPoint () {};
+      ~ControlPoint() {};
 
-      void Load(PvlObject &p, bool forceBuild=false);
+      void Load(PvlObject &p, bool forceBuild = false);
 
       PvlObject CreatePvlObject();
 
@@ -107,16 +107,20 @@ namespace Isis {
        *
        * @param id Control Point Id
        */
-      void SetId(const std::string &id) { p_id = id; };
+      void SetId(const std::string &id) {
+        p_id = id;
+      };
 
       /**
        * Return the Id of the control point
        *
        * @return Control Point Id
        */
-      std::string Id() const { return p_id; };
+      std::string Id() const {
+        return p_id;
+      };
 
-      void Add(const ControlMeasure &measure, bool forceBuild=false);
+      void Add(const ControlMeasure &measure, bool forceBuild = false);
       void Delete(int index);
 
       /**
@@ -126,7 +130,9 @@ namespace Isis {
        *
        * @return The Control Measure at the provided index
        */
-      ControlMeasure &operator[](int index) { return p_measures[index]; };
+      ControlMeasure &operator[](int index) {
+        return p_measures[index];
+      };
 
       /**
        * Return the ith measurement of the control point
@@ -135,7 +141,9 @@ namespace Isis {
        *
        * @return The Control Measure at the provided index
        */
-      const ControlMeasure &operator[](int index) const { return p_measures[index]; };
+      const ControlMeasure &operator[](int index) const {
+        return p_measures[index];
+      };
 
       //! Return the measurement for the given serial number
       ControlMeasure &operator[](const std::string &serialNumber);
@@ -144,34 +152,46 @@ namespace Isis {
       const ControlMeasure &operator[](const std::string &serialNumber) const;
 
       //! Does Serial Number exist in point
-      bool HasSerialNumber (std::string &serialNumber);
+      bool HasSerialNumber(std::string &serialNumber);
 
       //! Return the number of measurements in the control point
-      int Size () const { return p_measures.size(); };
-      int NumValidMeasures ();
+      int Size() const {
+        return p_measures.size();
+      };
+      int NumValidMeasures();
 
       /**
        * Set whether to ignore or use control point
        *
        * @param ignore True to ignore this Control Point, False to un-ignore
        */
-      void SetIgnore(bool ignore) { p_ignore = ignore; };
+      void SetIgnore(bool ignore) {
+        p_ignore = ignore;
+      };
 
       //! Return if the control point should be ignored
-      bool Ignore() const { return p_ignore; };
+      bool Ignore() const {
+        return p_ignore;
+      };
 
       //! Return if the control point is invalid
-      bool Invalid() const { return p_invalid; }
+      bool Invalid() const {
+        return p_invalid;
+      }
 
       /**
        * Set the control point as held to its lat/lon
        *
        * @param held True to hold this Control Point, False to release
        */
-      void SetHeld(bool held) { p_held = held; };
+      void SetHeld(bool held) {
+        p_held = held;
+      };
 
       //! Is the control point lat/lon held?
-      bool Held() const { return p_held; };
+      bool Held() const {
+        return p_held;
+      };
 
       /**
        * A control point can have one of two types, either Ground or Tie.
@@ -192,30 +212,40 @@ namespace Isis {
          * common type of control point.
          */
         Tie
-        };
+      };
 
       /**
        * Change the type of the control point
        *
        * @param type The type for this Control Point
        */
-      void SetType (PointType type) { p_type = type; };
+      void SetType(PointType type) {
+        p_type = type;
+      };
 
       //! Return the type of the point
-      PointType Type () const { return p_type; };
-      
+      PointType Type() const {
+        return p_type;
+      };
+
       const std::string PointTypeToString() const;
 
-      void SetUniversalGround (double lat, double lon, double radius);
+      void SetUniversalGround(double lat, double lon, double radius);
 
       //! Return the planetocentric latitude of the point
-      double UniversalLatitude () const { return p_latitude; };
+      double UniversalLatitude() const {
+        return p_latitude;
+      };
 
       //! Return the planetocentric longitude of the point
-      double UniversalLongitude () const { return p_longitude; };
+      double UniversalLongitude() const {
+        return p_longitude;
+      };
 
       //! Return the radius of the point in meters
-      double Radius () const { return p_radius; };
+      double Radius() const {
+        return p_radius;
+      };
 
       double AverageError() const;
 
@@ -226,7 +256,7 @@ namespace Isis {
 
       int ReferenceIndex();
 
-	    int ReferenceIndexNoException();
+      int ReferenceIndexNoException();
 
       void ComputeApriori();
 
@@ -234,11 +264,11 @@ namespace Isis {
 
       double MaximumError() const;
 
-      double WrapLongitude ( double lon, double baselon);
+      double WrapLongitude(double lon, double baselon);
 
-	    bool operator == (const Isis::ControlPoint &pPoint) const;
-		  bool operator != (const Isis::ControlPoint &pPoint) const;
-		  ControlPoint & operator =  (const Isis::ControlPoint &pPoint);
+      bool operator == (const Isis::ControlPoint &pPoint) const;
+      bool operator != (const Isis::ControlPoint &pPoint) const;
+      ControlPoint &operator = (const Isis::ControlPoint &pPoint);
 
 
     private:

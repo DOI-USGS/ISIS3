@@ -38,25 +38,25 @@ namespace Isis {
    * @param standardDeviation The standard deviation of the output
    *               distribution
    */
-  GaussianStretch::GaussianStretch (Histogram &histogram, const double mean, const double standardDeviation) {
+  GaussianStretch::GaussianStretch(Histogram &histogram, const double mean, const double standardDeviation) {
     GaussianDistribution dis(mean, standardDeviation);
 
     p_stretch.ClearPairs();
     p_stretch.AddPair(histogram.Minimum(), histogram.Minimum());
     double lastvalue = histogram.Minimum();
-    for (int i=1; i<=histogram.Bins()-1; i++) {
+    for(int i = 1; i <= histogram.Bins() - 1; i++) {
       double percent = 100.0 * (double)i / (double)histogram.Bins();
       double input = histogram.Percent(percent);
       // stretch pairs must be monotonically increasing
-      if (lastvalue + DBL_EPSILON > input) continue;
-      if (fabs(input - lastvalue) < 100.0 * DBL_EPSILON) continue;
+      if(lastvalue + DBL_EPSILON > input) continue;
+      if(fabs(input - lastvalue) < 100.0 * DBL_EPSILON) continue;
       double output = dis.InverseCumulativeDistribution(percent);
       p_stretch.AddPair(input, output);
       lastvalue = input;
     }
 
-    if (histogram.Maximum() > lastvalue) {
-      if (abs(histogram.Maximum() - lastvalue) > 100 * DBL_EPSILON) {
+    if(histogram.Maximum() > lastvalue) {
+      if(abs(histogram.Maximum() - lastvalue) > 100 * DBL_EPSILON) {
         p_stretch.AddPair(histogram.Maximum(), histogram.Maximum());
       }
     }
@@ -70,7 +70,7 @@ namespace Isis {
   *
   * @return double The mapped output value is returned by this method
   */
-  double GaussianStretch::Map (const double value) const {
+  double GaussianStretch::Map(const double value) const {
     return p_stretch.Map(value);
   }
 }

@@ -7,14 +7,14 @@
 
 namespace Qisis {
   /**
-  * @brief a subclass of the qisis mainwindow, tablemainwindow 
-  *        handles all of the table tasks. 
+  * @brief a subclass of the qisis mainwindow, tablemainwindow
+  *        handles all of the table tasks.
   *
   * @ingroup Visualization Tools
   *
   * @author Stacy Alley
   *
-  * @internal 
+  * @internal
   *  @history 2008-06-12 Noah Hilt - Changed the save/load
   *            functions to work with blank entries.
   *  @history 2008-06-25 Noah Hilt - Fixed the delete rows method to search the
@@ -29,92 +29,104 @@ namespace Qisis {
 
 
   class TableMainWindow : public Qisis::MainWindow {
-    Q_OBJECT
+      Q_OBJECT
     public:
       /**
-       * Returns the table 
-       * 
-       * @return QTableWidget* 
+       * Returns the table
+       *
+       * @return QTableWidget*
        */
-      QTableWidget *table() const { return p_table; }; 
+      QTableWidget *table() const {
+        return p_table;
+      };
 
       /**
-       * 
-       * Returns the item list 
-       * 
-       * @return QList<QListWidgetItem*> 
+       *
+       * Returns the item list
+       *
+       * @return QList<QListWidgetItem*>
        */
-      QList<QListWidgetItem*> itemList() const { return p_itemList;}; 
+      QList<QListWidgetItem *> itemList() const {
+        return p_itemList;
+      };
 
       /**
-       * 
-       * Returns the list widget 
-       * 
-       * @return QListWidget* 
+       *
+       * Returns the list widget
+       *
+       * @return QListWidget*
        */
-      QListWidget *listWidget() const { return p_listWidget; }; 
+      QListWidget *listWidget() const {
+        return p_listWidget;
+      };
 
       /**
-       * 
+       *
        * Returns the selected rows
-       * 
-       * @return int 
+       *
+       * @return int
        */
-      int selectedRows() const { return  p_selectedRows; }; 
+      int selectedRows() const {
+        return  p_selectedRows;
+      };
 
       /**
-       * 
+       *
        * Returns the current index
-       * 
-       * @return int 
+       *
+       * @return int
        */
-      int currentIndex() const { return  p_currentIndex; };
+      int currentIndex() const {
+        return  p_currentIndex;
+      };
 
       /**
-       * 
+       *
        * Returns the current row
-       * 
-       * @return int 
+       *
+       * @return int
        */
-      int currentRow() const { return  p_currentRow; }; 
-      
-      TableMainWindow (QString title, QWidget *parent=0);
-      void addToTable (bool setOn, const QString &heading,
-                       const QString &menuText = "", int insertAt = -1, 
-                       Qt::Orientation o = Qt::Horizontal, QString toolTip = "");
+      int currentRow() const {
+        return  p_currentRow;
+      };
+
+      TableMainWindow(QString title, QWidget *parent = 0);
+      void addToTable(bool setOn, const QString &heading,
+                      const QString &menuText = "", int insertAt = -1,
+                      Qt::Orientation o = Qt::Horizontal, QString toolTip = "");
       void deleteColumn(int item);
       void setStatusMessage(QString message);
       void closeEvent(QCloseEvent *event);
       void hideEvent(QHideEvent *event);
-      
+
     public slots:
       void showTable();
       void syncColumns();
       void syncRows();
       void saveAsTable();
-      void saveTable ();
-      void clearTable ();
+      void saveTable();
+      void clearTable();
       void deleteRows();
       void clearRow(int row);
       void setCurrentRow(int row);
       void setCurrentIndex(int currentIndex);
       void setTrackListItems(bool track = false);
       bool trackListItems();
-      void loadTable ();
+      void loadTable();
       void writeSettings();
 
-  signals:
+    signals:
       /**
        * Signal emitted when a file has loaded
-       * 
+       *
        */
       void fileLoaded();
-      
+
     protected:
-      bool eventFilter(QObject *o,QEvent *e);  
-      void createTable();      
+      bool eventFilter(QObject *o, QEvent *e);
+      void createTable();
       void readSettings();
-      void readItemSettings(QString heading, QListWidgetItem *item );
+      void readItemSettings(QString heading, QListWidgetItem *item);
 
     private:
       std::string p_appName; //!< The application name
@@ -126,12 +138,12 @@ namespace Qisis {
       QFile p_currentFile; //!< The current file
 
       QTableWidget *p_table; //!< The table
-      QList<QListWidgetItem*> p_itemList; //!< List of widget items 
+      QList<QListWidgetItem *> p_itemList; //!< List of widget items
       QListWidget *p_listWidget; //!< List widget
       int p_selectedRows; //!< Number of selected rows
       int p_currentIndex; //!< Current index
       int p_currentRow; //!< Current row
-      
+
       int p_visibleColumns; //!< Number of visible columns
       QList<int>p_startColumn; //!< List of start columns
       QList<int>p_endColumn; //!< List of end columns

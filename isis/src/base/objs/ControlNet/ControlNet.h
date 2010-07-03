@@ -78,108 +78,138 @@ namespace Isis {
    *            network to compute those values at the time the
    *            method is called, not when the control network is
    *            first initialized
-   *                              
+   *
    */
   class ControlNet {
     public:
       // Constuctors
-      ControlNet ();
-      ControlNet(const std::string &ptfile, Progress *progress=0, bool forceBuild=false );
+      ControlNet();
+      ControlNet(const std::string &ptfile, Progress *progress = 0, bool forceBuild = false);
 
       //! Destroy the control network
-      ~ControlNet () {};
+      ~ControlNet() {};
 
-     /**
-      * Enumeration defining network type 
-      */ 
+      /**
+       * Enumeration defining network type
+       */
       enum NetworkType { Singleton,    //!<Singleton is a network that identifies unique points such as reseaus, tic-marks, etc
                          ImageToImage, //!<ImageToImage is a network used to tie two or more images together using line/sample coordinates only
                          ImageToGround //!<ImageToGround is a network used to tie one or more images (typically many) between each other and a target (e.g., Mars)
-        };
+                       };
 
-      /** 
-       * Set the type of network 
-       *  
+      /**
+       * Set the type of network
+       *
        * @param type This Control Network's type
        */
-      void SetType (const NetworkType &type) { p_type = type; };
+      void SetType(const NetworkType &type) {
+        p_type = type;
+      };
 
       //! Return the type of network
-      NetworkType Type () const { return p_type; };
+      NetworkType Type() const {
+        return p_type;
+      };
 
-      /** 
-       * Set the target name 
-       *  
-       * @param target The name of the target of this Control Network 
+      /**
+       * Set the target name
+       *
+       * @param target The name of the target of this Control Network
        */
-      void SetTarget (const std::string &target) { p_targetName = target; };
+      void SetTarget(const std::string &target) {
+        p_targetName = target;
+      };
 
       //! Return the target name
-      std::string Target() const { return p_targetName; };
+      std::string Target() const {
+        return p_targetName;
+      };
 
-      /** 
-       * Set the network id 
-       *  
+      /**
+       * Set the network id
+       *
        * @param id The Id of this Control Network
        */
-      void SetNetworkId(const std::string &id) { p_networkId = id; };
+      void SetNetworkId(const std::string &id) {
+        p_networkId = id;
+      };
 
       //! Return the network id
-      std::string NetworkId() const { return p_networkId; };
+      std::string NetworkId() const {
+        return p_networkId;
+      };
 
-      /** 
-       * Set the user name 
-       *  
+      /**
+       * Set the user name
+       *
        * @param name The name of the user creating or modifying this Control Net
        */
-      void SetUserName(const std::string &name) { p_userName = name; };
+      void SetUserName(const std::string &name) {
+        p_userName = name;
+      };
 
       //! Return the user name
-      std::string UserName() const { return p_userName; };
+      std::string UserName() const {
+        return p_userName;
+      };
 
-      /** 
-       * Set the description of the network 
-       *  
+      /**
+       * Set the description of the network
+       *
        * @param desc The description of this Control Network
        */
-      void SetDescription(const std::string &desc) { p_description = desc; };
+      void SetDescription(const std::string &desc) {
+        p_description = desc;
+      };
 
-      /** 
-       * Return the description of the network 
-       *  
-       * @return The description of this Control Network 
+      /**
+       * Return the description of the network
+       *
+       * @return The description of this Control Network
        */
-      std::string Description() const { return p_description; };
+      std::string Description() const {
+        return p_description;
+      };
 
-      /** 
-       * Set the creation time 
-       *  
-       * @param date The date this Control Network was created 
+      /**
+       * Set the creation time
+       *
+       * @param date The date this Control Network was created
        */
-      void SetCreatedDate(const std::string &date) { p_created = date; };
+      void SetCreatedDate(const std::string &date) {
+        p_created = date;
+      };
 
-      /** 
-       * Set the last modified date 
-       * 
+      /**
+       * Set the last modified date
+       *
        * @param date The last date this Control Network was modified
        */
-      void SetModifiedDate(const std::string &date) { p_modified = date; };
+      void SetModifiedDate(const std::string &date) {
+        p_modified = date;
+      };
 
-      /** 
-       * Return the ith control point 
-       *  
-       * @param index Control Point index 
-       *  
+      /**
+       * Return the ith control point
+       *
+       * @param index Control Point index
+       *
        * @return The Control Point at the provided index
        */
-      ControlPoint &operator[](int index) { return p_pointsHash[p_pointIds[index]]; };
+      ControlPoint &operator[](int index) {
+        return p_pointsHash[p_pointIds[index]];
+      };
 
       //! Return the number of control points in the network
-      int Size() const { return p_pointsHash.size(); };
-      int NumValidPoints ();
+      int Size() const {
+        return p_pointsHash.size();
+      };
+      int NumValidPoints();
 
       //! Return if the control point is invalid
-      bool Invalid() const { return p_invalid; }
+      bool Invalid() const {
+        return p_invalid;
+      }
 
       int NumMeasures();
 
@@ -187,19 +217,19 @@ namespace Isis {
 
       int NumIgnoredMeasures();
 
-      void Add (const ControlPoint &point, bool forceBuild=false);
-      void Delete (int index);
-      void Delete (const std::string &id);
+      void Add(const ControlPoint &point, bool forceBuild = false);
+      void Delete(int index);
+      void Delete(const std::string &id);
 
-      void ReadControl(const std::string &ptfile, Progress *progress=0, bool forceBuild=false);
+      void ReadControl(const std::string &ptfile, Progress *progress = 0, bool forceBuild = false);
       void Write(const std::string &ptfile);
 
       ControlPoint *Find(const std::string &id);
 
       ControlPoint *FindClosest(const std::string &serialNumber,
-                                    double sample, double line);
+                                double sample, double line);
 
-      bool Exists( ControlPoint &point );
+      bool Exists(ControlPoint &point);
 
       double AverageError();
       double MaximumError();
@@ -207,17 +237,19 @@ namespace Isis {
       void ComputeErrors();
       void ComputeApriori();
 
-      void SetImages (const std::string &imageListFile);
-      void SetImages (SerialNumberList &list, Progress *progress=0);
+      void SetImages(const std::string &imageListFile);
+      void SetImages(SerialNumberList &list, Progress *progress = 0);
 
       /**
        * Returns the camera list from the given image number
-       * 
+       *
        * @param index The image number
-       * 
+       *
        * @return Isis::Camera* The pointer to the resultant camera list
        */
-      Isis::Camera *Camera(int index) { return p_cameraList[index]; };
+      Isis::Camera *Camera(int index) {
+        return p_cameraList[index];
+      };
 
     private:
       QVector<QString> p_pointIds;  //!< QVector of ControlPoint Ids
@@ -230,7 +262,7 @@ namespace Isis {
       std::string p_userName;              //!< The user who created the network
       NetworkType p_type;                  //!< The type of network being used
       int p_numIgnoredMeasures;            //!< Number of ignored measures
-      std::map<std::string,Isis::Camera *> p_cameraMap;    //!< A map from serialnumber to camera
+      std::map<std::string, Isis::Camera *> p_cameraMap;   //!< A map from serialnumber to camera
       std::vector<Isis::Camera *> p_cameraList;            //!< Vector of image number to camera
 
       bool p_invalid;  //!< If the Control Network is currently invalid

@@ -31,30 +31,30 @@ namespace Isis {
   class InfixOperator;
   class InfixFunction;
 
-/**
- * @brief Converter for math equations
- *
- * This class converts infix equations to postfix
- *
- * @ingroup Math
- *
- * @author 2007-08-21 Steven Lambright
- * 
- * @internal
- *   @history 2007-08-22 Steven Lambright - Changed p_operators from
- *                   vector to QList (static std::vector is unsafe)
- *   @history 2008-01-23 Steven Lambright - Added the operators (constants)
- *                   PI and e
- *   @history 2010-02-23 Steven Lambright - Operator/Function input strings and
- *                   output strings now separated
- *   @history 2010-04-08 Steven Lambright - Min, max functions expanded upon
- */
+  /**
+   * @brief Converter for math equations
+   *
+   * This class converts infix equations to postfix
+   *
+   * @ingroup Math
+   *
+   * @author 2007-08-21 Steven Lambright
+   *
+   * @internal
+   *   @history 2007-08-22 Steven Lambright - Changed p_operators from
+   *                   vector to QList (static std::vector is unsafe)
+   *   @history 2008-01-23 Steven Lambright - Added the operators (constants)
+   *                   PI and e
+   *   @history 2010-02-23 Steven Lambright - Operator/Function input strings and
+   *                   output strings now separated
+   *   @history 2010-04-08 Steven Lambright - Min, max functions expanded upon
+   */
   class InfixToPostfix {
     public:
       InfixToPostfix();
       virtual ~InfixToPostfix();
 
-      iString Convert(const iString &infix); 
+      iString Convert(const iString &infix);
       iString TokenizeEquation(const iString &equation);
 
     protected:
@@ -62,7 +62,7 @@ namespace Isis {
       virtual bool IsKnownSymbol(iString representation);
       virtual InfixOperator *FindOperator(iString representation);
 
-      QList<InfixOperator*> p_operators;
+      QList<InfixOperator *> p_operators;
     private:
       void Initialize();
       void Uninitialize();
@@ -81,18 +81,18 @@ namespace Isis {
    */
   class InfixOperator {
     public:
-      InfixOperator(int prec, iString inString, bool isFunc = false) { 
+      InfixOperator(int prec, iString inString, bool isFunc = false) {
         m_precedence = prec;
-        m_inputString = inString; 
-        m_outputString = inString; 
+        m_inputString = inString;
+        m_outputString = inString;
         m_isFunction = isFunc;
       }
 
       InfixOperator(int prec, iString inString, iString outString,
-                    bool isFunc = false) { 
+                    bool isFunc = false) {
         m_precedence = prec;
-        m_inputString = inString; 
-        m_outputString = outString; 
+        m_inputString = inString;
+        m_outputString = outString;
         m_isFunction = isFunc;
       }
 
@@ -112,7 +112,7 @@ namespace Isis {
         return m_isFunction;
       }
 
-  
+
     private:
       int m_precedence;
       iString m_inputString;
@@ -123,19 +123,19 @@ namespace Isis {
   class InfixFunction : public InfixOperator {
     public:
       InfixFunction(iString inString, int argCount) :
-        InfixOperator(-1,inString,true) {
+        InfixOperator(-1, inString, true) {
         m_numArguments = argCount;
       }
 
       InfixFunction(iString inString, iString outString, int argCount) :
-        InfixOperator(-1,inString,outString,true) {
+        InfixOperator(-1, inString, outString, true) {
         m_numArguments = argCount;
       }
 
       int ArgumentCount() const {
         return m_numArguments;
       }
-  
+
     private:
       int m_numArguments;
   };

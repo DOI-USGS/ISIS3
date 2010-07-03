@@ -18,7 +18,7 @@ typedef TNT::Array1D<double> HiVector;       //!<  1-D Buffer
 using namespace Isis;
 using namespace std;
 
-void histitch (vector<Buffer *> &in, vector<Buffer *> &out);
+void histitch(vector<Buffer *> &in, vector<Buffer *> &out);
 void getStats(std::vector<Isis::Buffer *> &in,
               std::vector<Isis::Buffer *> &out);
 
@@ -32,12 +32,12 @@ struct ChannelInfo {
   unsigned nSamples;
   unsigned offset;
   HiVector mult, add;
-  ChannelInfo() : ChnNumber(1), nLines(0),nSamples(0), offset(0) { }
+  ChannelInfo() : ChnNumber(1), nLines(0), nSamples(0), offset(0) { }
 };
 
 static ChannelInfo fromData[2];
 double average0 = Isis::Null;
-double average1= Isis::Null;
+double average1 = Isis::Null;
 HiVector f0LineAvg;
 HiVector f1LineAvg;
 double coeff;
@@ -50,7 +50,7 @@ inline HiVector filter(const HiVector &v, int width) {
   QuickFilter lowpass(v.dim(), width, 1);
   lowpass.AddLine(&v[0]);
   HiVector vout(v.dim());
-  for (int i = 0 ; i < v.dim() ; i ++) {
+  for(int i = 0 ; i < v.dim() ; i ++) {
     vout[i] = lowpass.Average(i);
   }
   return (vout);
@@ -59,18 +59,18 @@ inline HiVector filter(const HiVector &v, int width) {
 //2008-11-05 Jeannie Walldren Replaced references to DataInterp class with NumericalApproximation.
 inline HiVector filler(const HiVector &v, int &nfilled) {
   NumericalApproximation spline(NumericalApproximation::CubicNatural);
-  for (int i = 0 ; i < v.dim() ; i++) {
-    if (!IsSpecial(v[i])) {
-      spline.AddData(i, v[i]); 
+  for(int i = 0 ; i < v.dim() ; i++) {
+    if(!IsSpecial(v[i])) {
+      spline.AddData(i, v[i]);
     }
   }
 
   //  Compute the spline and fill missing data
   HiVector vout(v.dim());
   nfilled = 0;
-  for (int j = 0 ; j < v.dim() ; j++) {
-    if (IsSpecial(v[j])) {
-      vout[j] = spline.Evaluate(j,NumericalApproximation::NearestEndpoint); 
+  for(int j = 0 ; j < v.dim() ; j++) {
+    if(IsSpecial(v[j])) {
+      vout[j] = spline.Evaluate(j, NumericalApproximation::NearestEndpoint);
       nfilled++;
     }
     else {
@@ -83,8 +83,8 @@ inline HiVector filler(const HiVector &v, int &nfilled) {
 HiVector compRatio(const HiVector &c0, const HiVector &c1, int &nNull) {
   nNull = 0;
   HiVector vout(c0.dim());
-  for (int i = 0 ; i < c0.dim() ; i++) {
-    if (IsSpecial(c0[i]) || IsSpecial(c1[i]) || (c1[i] == 0.0)) {
+  for(int i = 0 ; i < c0.dim() ; i++) {
+    if(IsSpecial(c0[i]) || IsSpecial(c1[i]) || (c1[i] == 0.0)) {
       vout[i] = 1.0;
       nNull++;
     }
@@ -98,8 +98,8 @@ HiVector compRatio(const HiVector &c0, const HiVector &c1, int &nNull) {
 HiVector compAdd(const HiVector &c0, const HiVector &c1, int &nNull) {
   nNull = 0;
   HiVector vout(c0.dim());
-  for (int i = 0 ; i < c0.dim() ; i++) {
-    if (IsSpecial(c0[i]) || IsSpecial(c1[i])) {
+  for(int i = 0 ; i < c0.dim() ; i++) {
+    if(IsSpecial(c0[i]) || IsSpecial(c1[i])) {
       vout[i] = 0.0;
       nNull++;
     }
@@ -117,7 +117,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   balance = ui.GetString("BALANCE");
   seamSize = ui.GetInteger("SEAMSIZE");
-  skipSize = ui.GetInteger ("SKIP");
+  skipSize = ui.GetInteger("SKIP");
   int filterWidth = ui.GetInteger("WIDTH");
   bool fillNull = ui.GetBoolean("FILL");
   int hiChannel = ui.GetInteger("CHANNEL");
@@ -126,7 +126,7 @@ void IsisMain() {
 
   // Define the processing to be by line
   ProcessByLine p;
-  
+
   //Set string to gather ProductIds.
   string stitchedProductIds;
 
@@ -153,20 +153,20 @@ void IsisMain() {
   stitchedProductIds = (string)from1Archive["ProductId"][0];
 
 //  Set initial conditions for one input file
-  if (fromData[0].ChnNumber == 1) { 
+  if(fromData[0].ChnNumber == 1) {
     fromData[0].offset = 0;
   }
   else  {
-    if (fromData[0].ChnNumber != 0) {
+    if(fromData[0].ChnNumber != 0) {
       string msg = "FROM1 channel number must be 1 or 2";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     fromData[0].offset = fromData[0].nSamples;
   }
 
 //  Only get the second input file if entered by the user
-  if (ui.WasEntered("FROM2")) {
-    Cube *icube2 = p.SetInputCube("FROM2");   
+  if(ui.WasEntered("FROM2")) {
+    Cube *icube2 = p.SetInputCube("FROM2");
     fromData[1].nLines   = icube2->Lines();
     fromData[1].nSamples = icube2->Samples();
     fromData[1].mult = HiVector(icube2->Lines(), 1.0);
@@ -185,9 +185,9 @@ void IsisMain() {
     //Make sure observation id's are the same
     string from1ObsId = from1Archive["ObservationId"];
     string from2ObsId = from2Archive["ObservationId"];
-    if ( from1ObsId != from2ObsId ) {
+    if(from1ObsId != from2ObsId) {
       string msg = "The input files Observation Id's are not compatable";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     stitchedProductIds = "(" + stitchedProductIds + ", " +
                          (string)from2Archive["ProductId"][0] + ")";
@@ -197,21 +197,21 @@ void IsisMain() {
     //Make sure CCD Id's are the same
     string from1CcdId = from1Instrument["CCDId"];
     string from2CcdId = from2Instrument["CCDId"];
-    if ( from1CcdId != from2CcdId ) {
+    if(from1CcdId != from2CcdId) {
       string msg = "The input files CCD Id's are not compatable";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     //Make sure channel numbers are equal to 0 & 1
     fromData[1].ChnNumber = from2Instrument["ChannelNumber"];
-    if ( !((fromData[0].ChnNumber == 0) && (fromData[1].ChnNumber == 1)) && 
-         !((fromData[0].ChnNumber == 1) && (fromData[1].ChnNumber == 0)) ) {
+    if(!((fromData[0].ChnNumber == 0) && (fromData[1].ChnNumber == 1)) &&
+        !((fromData[0].ChnNumber == 1) && (fromData[1].ChnNumber == 0))) {
       string msg = "The input files Channel numbers must be equal to 0 and 1";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
 //  Set up offsets
-    if (fromData[0].ChnNumber == 1) {
+    if(fromData[0].ChnNumber == 1) {
       fromData[0].offset = 0;
       fromData[1].offset = fromData[0].nSamples;
     }
@@ -225,14 +225,14 @@ void IsisMain() {
   unsigned int SampsOut = fromData[0].nSamples + fromData[1].nSamples;
   unsigned int BandsOut = 1;
 
-  Cube *ocube = p.SetOutputCube("TO",SampsOut, LinesOut, BandsOut);
+  Cube *ocube = p.SetOutputCube("TO", SampsOut, LinesOut, BandsOut);
 
   // Change Channel Number on output cube to 2
   PvlGroup &InstrumentOut = ocube->GetGroup("INSTRUMENT");
   InstrumentOut["ChannelNumber"] = 2;
 
   // Set StitchedChannels and Stitched ProductIds keywords
-  if (ui.WasEntered("FROM2")) {
+  if(ui.WasEntered("FROM2")) {
     InstrumentOut += PvlKeyword("StitchedChannels", "(0,1)");
     InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds);
   }
@@ -244,9 +244,9 @@ void IsisMain() {
   //  Do balance correction
   PvlGroup results("Results");
   results += PvlKeyword("Balance", balance);
-  if ((balance == "TRUE") || (balance == "EQUALIZE")) {
+  if((balance == "TRUE") || (balance == "EQUALIZE")) {
     ProcessByLine pAvg;
-    
+
     if(ui.WasEntered("FROM2")) {
 
 
@@ -263,25 +263,25 @@ void IsisMain() {
         pAvg.SetInputCube("FROM2");
         pAvg.SetInputCube("FROM1");
       }
-      
+
       stats.Reset();
       f0LineAvg = HiVector(icube1->Lines());
       f1LineAvg = HiVector(icube1->Lines());
-      pAvg.StartProcess (getStats);
-      pAvg.EndProcess ();
+      pAvg.StartProcess(getStats);
+      pAvg.EndProcess();
 
-      if (balance == "TRUE") {
+      if(balance == "TRUE") {
         average0 = stats.X().Average();
         average1 = stats.Y().Average();
-        if (hiChannel == 0) {
-          if(average1 != Isis::Null) {  
-            coeff = average0/average1;
+        if(hiChannel == 0) {
+          if(average1 != Isis::Null) {
+            coeff = average0 / average1;
             fromData[ch1Index].mult = coeff;
           }
         }
         else {
-          if(average0 != Isis::Null) {  
-            coeff = average1/average0;
+          if(average0 != Isis::Null) {
+            coeff = average1 / average0;
             fromData[ch0Index].mult = coeff;
           }
         }
@@ -294,13 +294,13 @@ void IsisMain() {
         HiVector ch1_org = f1LineAvg;
 
         results += PvlKeyword("FilterWidth", filterWidth);
-        if (filterWidth > 0) {
+        if(filterWidth > 0) {
           f0LineAvg = filter(f0LineAvg, filterWidth);
           f1LineAvg = filter(f1LineAvg, filterWidth);
         }
 
         results += PvlKeyword("Fill", ((fillNull) ? "TRUE" : "FALSE"));
-        if (fillNull) {
+        if(fillNull) {
           int nfilled;
           f0LineAvg = filler(f0LineAvg, nfilled);
           results += PvlKeyword("Channel0Filled", nfilled);
@@ -313,18 +313,18 @@ void IsisMain() {
         int nunfilled(0);
         HiVector ch0_fixed(icube1->Lines(), 1.0);
         HiVector ch1_fixed(icube1->Lines(), 1.0);
-        if (fixop == "MULTIPLY") {
-          if (hiChannel == 0) {
-            fromData[ch1Index].mult = compRatio(f0LineAvg, f1LineAvg, nunfilled); 
+        if(fixop == "MULTIPLY") {
+          if(hiChannel == 0) {
+            fromData[ch1Index].mult = compRatio(f0LineAvg, f1LineAvg, nunfilled);
             ch1_fixed = fromData[ch1Index].mult;
           }
           else {
-            fromData[ch0Index].mult = compRatio(f1LineAvg, f0LineAvg, nunfilled); 
+            fromData[ch0Index].mult = compRatio(f1LineAvg, f0LineAvg, nunfilled);
             ch0_fixed = fromData[ch0Index].mult;
           }
         }
         else {
-          if (hiChannel == 0) {
+          if(hiChannel == 0) {
             fromData[ch1Index].add = compAdd(f0LineAvg, f1LineAvg, nunfilled);
             ch1_fixed = fromData[ch1Index].add;
             ch0_fixed = 0.0;
@@ -334,7 +334,7 @@ void IsisMain() {
             ch0_fixed = fromData[ch0Index].mult;
             ch1_fixed = 0.0;
           }
-        }               
+        }
         results += PvlKeyword("UnFilled", nunfilled);
 
         //  Add a table to the output file of the data values
@@ -348,7 +348,7 @@ void IsisMain() {
         rec += f3;
         rec += f4;
         Table table("HistitchStats", rec);
-        for (int i = 0 ; i < ch1_org.dim() ; i++) {
+        for(int i = 0 ; i < ch1_org.dim() ; i++) {
           rec[0] = ch1_org[i];
           rec[1] = ch0_org[i];
           rec[2] = ch1_fixed[i];
@@ -378,16 +378,16 @@ void IsisMain() {
 void getStats(std::vector<Buffer *> &in, std::vector<Buffer *> &out) {
   Buffer &channel0 = *in[0];
   Buffer &channel1 = *in[1];
-  double x,y;
+  double x, y;
 
   Statistics c0, c1;
-  for (int i = 0; i < seamSize+1; i++) {
+  for(int i = 0; i < seamSize + 1; i++) {
 
-    // set the x value 
+    // set the x value
     x = channel0[skipSize + i];
     c0.AddData(x);
 
-    // set the y value 
+    // set the y value
     y = channel1[channel1.size() - (skipSize + 1) - i] ;
     c1.AddData(y);
 
@@ -399,26 +399,27 @@ void getStats(std::vector<Buffer *> &in, std::vector<Buffer *> &out) {
 }
 
 // Line processing routine
-void histitch (vector<Buffer *> &in, vector<Buffer *> &out) {
+void histitch(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &ot = *out[0];
 
 //  Initialize the buffer
-  for (int n = 0 ; n < ot.size() ; n++) ot[n] = NULL8;
+  for(int n = 0 ; n < ot.size() ; n++) ot[n] = NULL8;
 
 //  Place the channel data into the output buffer
   vector<Buffer *>::iterator ibuf;
   int ifrom;
-  int line = ot.Line()-1;
-  for (ibuf = in.begin(), ifrom = 0 ; ibuf != in.end() ; ++ibuf, ++ifrom) {
+  int line = ot.Line() - 1;
+  for(ibuf = in.begin(), ifrom = 0 ; ibuf != in.end() ; ++ibuf, ++ifrom) {
     Buffer &inbuf = *(*ibuf);
     const HiVector &mult = fromData[ifrom].mult;
     const HiVector &add = fromData[ifrom].add;
 
     unsigned int oIndex(fromData[ifrom].offset);
-    for (int i = 0; i < inbuf.size(); i++, oIndex++) {
-      if(Isis::IsSpecial(inbuf[i])){  
+    for(int i = 0; i < inbuf.size(); i++, oIndex++) {
+      if(Isis::IsSpecial(inbuf[i])) {
         ot[oIndex] = inbuf[i];
-      } else {
+      }
+      else {
         ot[oIndex] =  inbuf[i] * mult[line] + add[line];
       }
     }

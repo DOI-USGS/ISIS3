@@ -6,19 +6,19 @@
 #include "Filename.h"
 
 namespace Qisis {
- 
+
 
   class PaletteWindow : public QMainWindow {
-    Q_OBJECT
+      Q_OBJECT
     public:
-      PaletteWindow (QWidget *parent=0);
+      PaletteWindow(QWidget *parent = 0);
       void closeEvent(QCloseEvent *event);
       void hideEvent(QHideEvent *event);
       void readSettings();
       void writeSettings();
 
     protected:
-      bool eventFilter(QObject *o,QEvent *e);
+      bool eventFilter(QObject *o, QEvent *e);
 
     private:
       std::string p_appName; //!< Application name.

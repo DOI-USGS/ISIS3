@@ -42,7 +42,7 @@ namespace Isis {
      *            the frequency and wavelength of the instrument are made
      *            available to Radar classes.
      *   @history 2009-07-31 Debbie A. Cook and Jeannie Walldren - Added
-     *            new tolerance argument to LoadCache call to be compatible 
+     *            new tolerance argument to LoadCache call to be compatible
      *            with update to Spice class
      *   @history 2009-08-05 Debbie A. Cook - corrected altitude in tolerance
      *            calculation
@@ -53,9 +53,9 @@ namespace Isis {
      */
     class MiniRF : public RadarCamera {
       public:
-        MiniRF (Isis::Pvl &lab);
+        MiniRF(Isis::Pvl &lab);
 
-        ~MiniRF () {};
+        ~MiniRF() {};
     };
   };
 };

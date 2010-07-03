@@ -35,7 +35,7 @@ namespace Isis {
    * (sample/line) and detector coordinates for a line scan camera.
    *
    * @author 2008-08-08 Steven Lambright
-   * 
+   *
    * @ingroup Camera
    * @see Camera
    *
@@ -46,13 +46,13 @@ namespace Isis {
    */
   class VariableLineScanCameraDetectorMap : public LineScanCameraDetectorMap {
     public:
-      /** 
+      /**
        * Constructs a VariableLineScanCameraDetectorMap.
-       * 
+       *
        * @param parent The camera
-       * @param p_lineRates This should be a vector with an entry for every 
+       * @param p_lineRates This should be a vector with an entry for every
        *          scan rate change in it. The pair consists of the line number and
-       *          ET of the changed time; the first entry should be line 1 and the last 
+       *          ET of the changed time; the first entry should be line 1 and the last
        *          entry should be one line past the end of the image. See
        *          HrscCamera for an example.
        */
@@ -77,9 +77,15 @@ namespace Isis {
         p_rate = rate;
       };
 
-      int GetStartLine() { return p_line; }
-      double GetStartEt() { return p_stime; }
-      double GetLineScanRate() { return p_rate; }
+      int GetStartLine() {
+        return p_line;
+      }
+      double GetStartEt() {
+        return p_stime;
+      }
+      double GetLineScanRate() {
+        return p_rate;
+      }
 
     private:
       int p_line;

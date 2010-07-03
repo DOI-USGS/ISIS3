@@ -8,8 +8,7 @@
 
 using namespace Isis;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
   Isis::CubeCalculator c;
   Isis::ProcessByLine p;

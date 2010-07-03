@@ -12,16 +12,14 @@
 
 
 
-namespace Qisis
-{
+namespace Qisis {
 
   /**
    * Workspace constructor
    *
    * @param parent
    */
-  Workspace::Workspace(QWidget *parent) : QMdiArea(parent)
-  {
+  Workspace::Workspace(QWidget *parent) : QMdiArea(parent) {
     p_cubeViewportList = NULL;
     p_cubeViewportList = new QVector< MdiCubeViewport * >;
 
@@ -29,19 +27,16 @@ namespace Qisis
             this, SLOT(activateViewport(QMdiSubWindow *)));
     setActivationOrder(ActivationHistoryOrder);
   }
-  
-  
-  Workspace::Workspace(const Workspace & other) : p_cubeViewportList(NULL)
-  {
+
+
+  Workspace::Workspace(const Workspace &other) : p_cubeViewportList(NULL) {
     p_cubeViewportList =
-        new QVector< MdiCubeViewport * >(*other.p_cubeViewportList);
+      new QVector< MdiCubeViewport * >(*other.p_cubeViewportList);
   }
 
 
-  Workspace::~Workspace()
-  {
-    if (p_cubeViewportList)
-    {
+  Workspace::~Workspace() {
+    if(p_cubeViewportList) {
       delete p_cubeViewportList;
       p_cubeViewportList = NULL;
     }
@@ -53,15 +48,12 @@ namespace Qisis
    *
    * @param w
    */
-  void Workspace::activateViewport(QMdiSubWindow *w)
-  {
-    if (w)
-    {
+  void Workspace::activateViewport(QMdiSubWindow *w) {
+    if(w) {
       emit cubeViewportActivated((Qisis::MdiCubeViewport *) w->widget()->layout()->itemAt(0)->widget());
     }
     //Check if there is no current window (on close)
-    else if (!currentSubWindow())
-    {
+    else if(!currentSubWindow()) {
       emit cubeViewportActivated((Qisis::MdiCubeViewport *)NULL);
     }
   }
@@ -72,14 +64,12 @@ namespace Qisis
    *
    * @return std::vector<MdiCubeViewport*>*
    */
-  QVector< MdiCubeViewport * > * Workspace::cubeViewportList()
-  {
+  QVector< MdiCubeViewport * > * Workspace::cubeViewportList() {
     p_cubeViewportList->clear();
 
-    for (int i = 0; i < subWindowList().size(); i++)
-    {
+    for(int i = 0; i < subWindowList().size(); i++) {
       p_cubeViewportList->push_back((MdiCubeViewport *)
-                                   subWindowList()[i]->widget()->layout()->itemAt(0)->widget());
+                                    subWindowList()[i]->widget()->layout()->itemAt(0)->widget());
     }
 
     return p_cubeViewportList;
@@ -110,8 +100,7 @@ namespace Qisis
    *           addCubeViewport(cube).
    *
    */
-  void Workspace::addCubeViewport(QString cubename)
-  {
+  void Workspace::addCubeViewport(QString cubename) {
     Isis::Cube *cube = new Isis::Cube;
 
     //Read in the CubeAttribueInput from the cube name
@@ -124,8 +113,7 @@ namespace Qisis
     MdiCubeViewport *cvp = addCubeViewport(cube);
 
     // Check for RGB format (#R,#G,#B)
-    if (bands.size() == 3)
-    {
+    if(bands.size() == 3) {
       Isis::iString st = Isis::iString(bands.at(0));
       int index_red = st.ToInteger();
       st = Isis::iString(bands.at(1));
@@ -154,16 +142,14 @@ namespace Qisis
    *          close the MdiCubeViewport if showCube() is not
    *          successful.
    */
-  MdiCubeViewport* Workspace::addCubeViewport(Isis::Cube *cube)
-  {
+  MdiCubeViewport *Workspace::addCubeViewport(Isis::Cube *cube) {
     Qisis::MdiCubeViewport *cvp = NULL;
 
     QMdiSubWindow *window = new QMdiSubWindow;
     window->setOption(QMdiSubWindow::RubberBandResize, true);
     window->setOption(QMdiSubWindow::RubberBandMove, true);
 
-    try
-    {
+    try {
       QWidget *centralWidget = new QWidget(this);
       QVBoxLayout *layout = new QVBoxLayout();
 
@@ -184,8 +170,7 @@ namespace Qisis
 
       window->show();
     }
-    catch (Isis::iException &e)
-    {
+    catch(Isis::iException &e) {
       // close MdiCubeViewport window
       cvp->close();
       // add a new message to the caught exception and throw
@@ -200,23 +185,20 @@ namespace Qisis
     return cvp;
   }
 
-  void Workspace::addBrowseView(QString cubename)
-  {
+  void Workspace::addBrowseView(QString cubename) {
     /* Close the last browse window if necessary.  */
-    if (subWindowList().size() > 0)
-    {
+    if(subWindowList().size() > 0) {
       removeSubWindow(subWindowList()[0]);
     }
 
     addCubeViewport(cubename);
   }
-  
-  
-  const Workspace & Workspace::operator=(Workspace other)
-  {
+
+
+  const Workspace &Workspace::operator=(Workspace other) {
     delete p_cubeViewportList;
     p_cubeViewportList = NULL;
-    
+
     p_cubeViewportList = new QVector< MdiCubeViewport * >;
     *p_cubeViewportList = *other.p_cubeViewportList;
     return *this;

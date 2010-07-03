@@ -23,25 +23,25 @@
 #include <vector>
 
 namespace Isis {
-    /**
-    * @brief This class is used to perform filter operations on vectors.
-    *
-    * This class performs boxcar filter operations on vectors. The boxcar
-    * will be a one dimensional Nx1 boxcar where N is a positive odd 
-    * integer.
-    *
-    * For an example of how the VecFilter object is used in %Isis, see the
-    * hicubenorm.cpp application.
-    *
-    * @ingroup Statistics
-    *
-    * @author Janet Barrett - 2009-03-13
-    *
-    */
+  /**
+  * @brief This class is used to perform filter operations on vectors.
+  *
+  * This class performs boxcar filter operations on vectors. The boxcar
+  * will be a one dimensional Nx1 boxcar where N is a positive odd
+  * integer.
+  *
+  * For an example of how the VecFilter object is used in %Isis, see the
+  * hicubenorm.cpp application.
+  *
+  * @ingroup Statistics
+  *
+  * @author Janet Barrett - 2009-03-13
+  *
+  */
   class VecFilter {
     public:
-      VecFilter ();
-      ~VecFilter ();
+      VecFilter();
+      ~VecFilter();
 
       std::vector<double> LowPass(std::vector<double> invec, int boxsize);
       std::vector<double> HighPass(std::vector<double> invec1, std::vector<double> invec2);

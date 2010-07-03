@@ -7,7 +7,7 @@
 #include "FileTool.h"
 
 namespace Qisis {
-   /**
+  /**
   * @brief Class for browsing cubes.
   *
   * @ingroup Visualization Tools
@@ -15,34 +15,34 @@ namespace Qisis {
   * @author Stacy Alley
   *
   * @internal
-  *  
+  *
    * @history 2008-01-18 Stacy Alley - Changed the constructor to
    * accept a QStringList which serves as the default filters for
    * the file dialog boxes.
-   * 
+   *
    * @history 2008-01-28 Stacy Alley - Changed the constructor
    *          again to accept a QDir which is the default directory
    *          the file dialog box should point to.
   */
- 
+
 
   class FileDialog : public QFileDialog {
-    Q_OBJECT
+      Q_OBJECT
     public:
-      FileDialog (QString title, QStringList &filterList, QDir &directory, QWidget *parent=0);
+      FileDialog(QString title, QStringList &filterList, QDir &directory, QWidget *parent = 0);
       void closeEvent(QCloseEvent *event);
       void readSettings();
       void writeSettings();
-      
+
     protected:
-      bool eventFilter(QObject *o,QEvent *e);
+      bool eventFilter(QObject *o, QEvent *e);
 
     protected slots:
       void sendSignal();
       void done();
       void cancel();
       void saveFilter();
-      
+
     signals:
       void fileSelected(QString);
       void filterSelected(QString);

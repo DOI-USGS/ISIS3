@@ -6,28 +6,28 @@
 namespace Qisis {
   /**
    * MosaicPanTool constructor
-   * 
-   * 
-   * @param parent 
+   *
+   *
+   * @param parent
    */
-  MosaicPanTool::MosaicPanTool (QWidget *parent) : Qisis::MosaicTool(parent) {
+  MosaicPanTool::MosaicPanTool(QWidget *parent) : Qisis::MosaicTool(parent) {
     p_parent = (MosaicWidget *)parent;
-    connect(this,SIGNAL(activated(bool)),this,SLOT(updateTool()));
+    connect(this, SIGNAL(activated(bool)), this, SLOT(updateTool()));
 
   }
 
 
   /**
    * Adds the action to the toolpad.
-   * 
-   * 
-   * @param toolpad 
-   * 
-   * @return QAction* 
+   *
+   *
+   * @param toolpad
+   *
+   * @return QAction*
    */
   QAction *MosaicPanTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
-    action->setIcon(QPixmap(toolIconDir()+"/move.png"));
+    action->setIcon(QPixmap(toolIconDir() + "/move.png"));
     //action->setIcon(QPixmap("/work1/salley/icons/mActionMoveVertex.png"));
     action->setToolTip("Pan (P)");
     action->setShortcut(Qt::Key_P);
@@ -41,35 +41,35 @@ namespace Qisis {
 
   /**
    * Adds the pan action to the given menu.
-   * 
-   * 
-   * @param menu 
+   *
+   *
+   * @param menu
    */
   void MosaicPanTool::addToMenu(QMenu *menu) {
-    
+
   }
 
 
   /**
    * Creates the widget to add to the tool bar.
-   * 
-   * 
-   * @param parent 
-   * 
-   * @return QWidget* 
+   *
+   *
+   * @param parent
+   *
+   * @return QWidget*
    */
-  QWidget *MosaicPanTool::createToolBarWidget (QStackedWidget *parent) {
+  QWidget *MosaicPanTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *hbox = new QWidget(parent);
     return hbox;
   }
 
- 
- /** 
-  *
-  * 
-  */
+
+  /**
+   *
+   *
+   */
   void MosaicPanTool::updateTool() {
-   
+
     const QList<MosaicItem *> items =  p_parent->allMosaicItems();
     //const QList<MosaicItem *> &items =  p_parent->mosaicItems();
     if(isActive()) {
@@ -77,9 +77,10 @@ namespace Qisis {
         items[i]->setFlag(QGraphicsItem::ItemIsSelectable, false);
       }
       getGraphicsView()->setDragMode(QGraphicsView::ScrollHandDrag);
-    } else {
+    }
+    else {
       for(int i = 0; i < items.size(); i++) {
-       items[i]->setFlag(QGraphicsItem::ItemIsSelectable, true);
+        items[i]->setFlag(QGraphicsItem::ItemIsSelectable, true);
       }
       getGraphicsView()->setDragMode(QGraphicsView::NoDrag);
     }

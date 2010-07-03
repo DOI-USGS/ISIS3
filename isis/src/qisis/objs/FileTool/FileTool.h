@@ -17,61 +17,67 @@ namespace Isis {
 
 namespace Qisis {
   class MdiCubeViewport;
-  
+
   /**
-   * 
+   *
    * @internal
    *   @history 2008-12-10 Jeannie Walldren - Added "What's this?"
    *              and shortcut to "Save" action
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    */
   class FileTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
-    signals:      
+    signals:
       void fileSelected(QString); //!< This signal is called when a file is selected
       /**
        * This signal is called when changes should be saved
-       * 
-       * @param vp 
+       *
+       * @param vp
        */
-      void saveChanges(MdiCubeViewport *vp); 
+      void saveChanges(MdiCubeViewport *vp);
       /**
        * This signal is called when changes should be discarded
-       * 
-       * @param vp 
+       *
+       * @param vp
        */
-      void discardChanges(MdiCubeViewport *vp); 
+      void discardChanges(MdiCubeViewport *vp);
 
     public:
-      FileTool (QWidget *parent);
-      void addTo (QMenu *menu);
-      void addTo (Workspace *ws);
-      void addToPermanent (QToolBar *perm);
+      FileTool(QWidget *parent);
+      void addTo(QMenu *menu);
+      void addTo(Workspace *ws);
+      void addToPermanent(QToolBar *perm);
       //! Returns the open action
-      QAction *openAction() { return p_open; };
+      QAction *openAction() {
+        return p_open;
+      };
       //! Returns the save as action
-      QAction *saveAction() { return p_saveAs; };
+      QAction *saveAction() {
+        return p_saveAs;
+      };
       QStringList p_filterList; //!< Filter List
       QDir p_dir; //!< Directory
       QStringList p_fileList; //!< File list
 
     public slots:
-      virtual void open(); 
-      virtual void browse(); 
-      void print(); 
+      virtual void open();
+      virtual void browse();
+      void print();
       void confirmSave();
-      virtual void save(); 
-      virtual void saveAs(); 
-      virtual void exportView(); 
+      virtual void save();
+      virtual void saveAs();
+      virtual void exportView();
       virtual bool closeAll();
       virtual void exit();
-      void enableSave(bool enable); 
-      void discard(); 
+      void enableSave(bool enable);
+      void discard();
 
     protected:
       //! Returns the menu name for the file tool
-      QString menuName() const { return "&File"; };
+      QString menuName() const {
+        return "&File";
+      };
       //! Updates the tool
       void updateTool();
 

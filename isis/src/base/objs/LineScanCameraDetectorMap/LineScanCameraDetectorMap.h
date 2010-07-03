@@ -46,7 +46,7 @@ namespace Isis {
   class LineScanCameraDetectorMap : public CameraDetectorMap {
     public:
       /** Construct a detector map for line scan cameras
-       * 
+       *
        * @param parent    The parent camera model for the detector map
        * @param etStart   starting ephemeris time in seconds
        *                  at the top of the first line
@@ -73,7 +73,9 @@ namespace Isis {
        * @param etStart starting ephemeris time in seconds
        *
        */
-      void SetStartTime (const double etStart) { p_etStart = etStart; };
+      void SetStartTime(const double etStart) {
+        p_etStart = etStart;
+      };
 
       /** Reset the line rate
        *
@@ -83,10 +85,14 @@ namespace Isis {
        * @param lineRate the time in seconds between lines
        *
        */
-      void SetLineRate (const double lineRate) { p_lineRate = lineRate; };
+      void SetLineRate(const double lineRate) {
+        p_lineRate = lineRate;
+      };
 
       //! Return the time in seconds between scan lines
-      double LineRate () const { return p_lineRate; };
+      double LineRate() const {
+        return p_lineRate;
+      };
 
       virtual bool SetParent(const double sample, const double line);
 

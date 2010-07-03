@@ -46,8 +46,8 @@ namespace Isis {
    *            Interest was compairing the uninitialized value of
    *            pixels[n] to see if it was a special pixel.
    *   @history 2007-08-02 Steven Koechle - Removed
-	  *            CompareInterests virtual method.
-	  *   @history 2010-06-10 Sharmila Prasad - Changes to accomodate CnetValidMeasure base class
+    *            CompareInterests virtual method.
+    *   @history 2010-06-10 Sharmila Prasad - Changes to accomodate CnetValidMeasure base class
    */
   class StandardDeviationOperator : public InterestOperator {
     public:

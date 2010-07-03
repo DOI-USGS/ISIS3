@@ -15,18 +15,18 @@ namespace Qisis {
   // initialize static variable
   QString QnetNewPointDialog::lastPtIdValue = "";
 
-  /** 
-   * QnetNewPointDialog constructor 
+  /**
+   * QnetNewPointDialog constructor
    * @param parent The parent widget for the
    *               cube points filter
-   *  
-   * @internal 
+   *
+   * @internal
    *   @history 2008-11-26 Jeannie Walldren - Set lastPointIdValue
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null.
-   *  
-   */ 
-  QnetNewPointDialog::QnetNewPointDialog (QWidget *parent) : QDialog (parent) {
+   *
+   */
+  QnetNewPointDialog::QnetNewPointDialog(QWidget *parent) : QDialog(parent) {
 
     ptIdValue = NULL;
     fileList = NULL;
@@ -39,8 +39,8 @@ namespace Qisis {
     p_ptIdLabel->setBuddy(ptIdValue);
     ptIdValue->setText(lastPtIdValue);
     ptIdValue->selectAll();
-    connect(ptIdValue,SIGNAL(textChanged(const QString &)),
-            this,SLOT(enableOkButton(const QString &)));
+    connect(ptIdValue, SIGNAL(textChanged(const QString &)),
+            this, SLOT(enableOkButton(const QString &)));
 
     QLabel *listLabel = new QLabel("Select Files:");
 
@@ -78,35 +78,35 @@ namespace Qisis {
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::"
    *            since "using namespace std"
    */
-  void QnetNewPointDialog::SetFiles (vector<string> &pointFiles) {
+  void QnetNewPointDialog::SetFiles(vector<string> &pointFiles) {
     //  TODO::  make pointFiles const???
     p_pointFiles = &pointFiles;
 
     //  Add all files to list , selecting those in pointFiles which are
     //  those files which contain the point.
-    for (int i=0; i<g_serialNumberList->Size(); i++) {
+    for(int i = 0; i < g_serialNumberList->Size(); i++) {
       QListWidgetItem *item = new QListWidgetItem(fileList);
       string tempFilename = g_serialNumberList->Filename(i);
       item->setText(QString(tempFilename.c_str()));
       vector<string>::iterator pos;
-      pos = std::find(p_pointFiles->begin(),p_pointFiles->end(),
-                 g_serialNumberList->Filename(i));
-      if (pos != p_pointFiles->end()) {
-        fileList->setItemSelected(item,true);
+      pos = std::find(p_pointFiles->begin(), p_pointFiles->end(),
+                      g_serialNumberList->Filename(i));
+      if(pos != p_pointFiles->end()) {
+        fileList->setItemSelected(item, true);
       }
     }
 
   }
 
 
-  /** 
-   *  
-   * @param text 
-   * @internal 
+  /**
+   *
+   * @param text
+   * @internal
    *   @history 2008-11-26 Jeannie Walldren - Set lastPointIdValue
-   *            to the p_ptIdValue 
+   *            to the p_ptIdValue
    */
-  void QnetNewPointDialog::enableOkButton (const QString &text) {
+  void QnetNewPointDialog::enableOkButton(const QString &text) {
     QnetNewPointDialog::lastPtIdValue = ptIdValue->text();
     p_okButton->setEnabled(!text.isEmpty());
   }

@@ -49,8 +49,8 @@ void multiply(Buffer &in, Buffer &out);
 void subtract(Buffer &in, Buffer &out);
 void pvlOut(const string &pv);
 void tableOut(const string &pv);
-void PVLIn(const Isis::Filename & filename);
-void tableIn(const Isis::Filename & filename);
+void PVLIn(const Isis::Filename &filename);
+void tableIn(const Isis::Filename &filename);
 void subSame();
 void multSame();
 
@@ -59,9 +59,9 @@ void IsisMain() {
   // ERROR CHECK:  The user must specify at least the TO or STATS
   // parameters.
   UserInterface &ui = Application::GetUserInterface();
-  if (!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
+  if(!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
     string msg = "User must specify a TO and/or STATS file.";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   // We will be processing by tile.  This is nice since we change change the
@@ -77,7 +77,7 @@ void IsisMain() {
 
   // Setup the tile size based on the direction of normalization
   direction = ui.GetString("DIRECTION");
-  if (direction == "COLUMN") {
+  if(direction == "COLUMN") {
     p.SetTileSize(1, totalLines);
     rowcol = totalSamples;
   }
@@ -90,43 +90,43 @@ void IsisMain() {
   normalizeUsingAverage = ui.GetString("NORMALIZER") == "AVERAGE";
 
   //gather statistics
-  if (ui.GetString("STATSOURCE") == "CUBE"){
+  if(ui.GetString("STATSOURCE") == "CUBE") {
     p.StartProcess(getStats);
   }
-  else if (ui.GetString("STATSOURCE") == "TABLE"){
+  else if(ui.GetString("STATSOURCE") == "TABLE") {
     tableIn(ui.GetFilename("FROMSTATS"));
   }
-  else{
+  else {
     PVLIn(ui.GetFilename("FROMSTATS"));
   }
- 
+
   //check to make sure the first vector has as many elements as the last
   // vector, and that there is a vector element for each row/col
-  if ((band.size() != (unsigned int)(rowcol*totalBands)) || 
-  	(st.size() != (unsigned int)(rowcol*totalBands))){
-    string message = "You have entered an invalid input file " + 
-      ui.GetFilename("FROMSTATS");
+  if((band.size() != (unsigned int)(rowcol * totalBands)) ||
+      (st.size() != (unsigned int)(rowcol * totalBands))) {
+    string message = "You have entered an invalid input file " +
+                     ui.GetFilename("FROMSTATS");
     throw  iException::Message(Isis::iException::Io, message,
-    	 _FILEINFO_);
+                               _FILEINFO_);
   }
 
   //If a STATS file was specified then create statistics file
-  if (ui.WasEntered("STATS")) {
-     string op = ui.GetString("FORMAT");
-     if (op == "PVL")    pvlOut(ui.GetFilename("STATS"));
-     if (op == "TABLE")  tableOut(ui.GetFilename("STATS"));
+  if(ui.WasEntered("STATS")) {
+    string op = ui.GetString("FORMAT");
+    if(op == "PVL")    pvlOut(ui.GetFilename("STATS"));
+    if(op == "TABLE")  tableOut(ui.GetFilename("STATS"));
   }
 
   // If an output file was specified then normalize the cube
-  if (ui.WasEntered ("TO")) {
+  if(ui.WasEntered("TO")) {
     // Before creating a normalized cube check to see if there
     // are any column averages less than or equal to zero.
-    if (ui.GetString("MODE") == "MULTIPLY") {
-      for (unsigned int i=0; i<st.size(); i++) {
-        if (IsValidPixel(normalizer[i]) && normalizer[i]<=0.0) {
+    if(ui.GetString("MODE") == "MULTIPLY") {
+      for(unsigned int i = 0; i < st.size(); i++) {
+        if(IsValidPixel(normalizer[i]) && normalizer[i] <= 0.0) {
           string msg = "Cube file can not be normalized with [MULTIPLY] ";
           msg += "option, some column averages <= 0.0";
-          throw iException::Message(iException::User,msg,_FILEINFO_);
+          throw iException::Message(iException::User, msg, _FILEINFO_);
         }
       }
     }
@@ -136,8 +136,8 @@ void IsisMain() {
     p.SetOutputCube("TO");
 
     // Should we preserve the average/median of the input image???
-    if (ui.GetBoolean("PRESERVE")) {
-      if (ui.GetString("MODE") == "SUBTRACT") {
+    if(ui.GetBoolean("PRESERVE")) {
+      if(ui.GetString("MODE") == "SUBTRACT") {
         subSame();
       }
       else {
@@ -146,7 +146,7 @@ void IsisMain() {
     }
 
     // Process based on the mode
-    if (ui.GetString("MODE") == "SUBTRACT") {
+    if(ui.GetString("MODE") == "SUBTRACT") {
       p.StartProcess(subtract);
     }
     else {
@@ -169,14 +169,14 @@ void IsisMain() {
 //**********************************************************
 void getStats(Buffer &in) {
   Statistics stats;
-  stats.AddData(in.DoubleBuffer(),in.size());
-  
-  StaticStats newStat(stats.Average(), stats.StandardDeviation(), 
+  stats.AddData(in.DoubleBuffer(), in.size());
+
+  StaticStats newStat(stats.Average(), stats.StandardDeviation(),
                       stats.ValidPixels(), stats.Minimum(), stats.Maximum());
-  
+
   st.push_back(newStat);
   band.push_back(in.Band());
-  if (direction == "COLUMN") {
+  if(direction == "COLUMN") {
     element.push_back(in.Sample());
   }
   else {
@@ -185,17 +185,17 @@ void getStats(Buffer &in) {
 
   // Sort the input buffer
   vector<double> pixels;
-  for (int i=0; i<in.size(); i++) {
-    if (IsValidPixel(in[i])) pixels.push_back(in[i]);
+  for(int i = 0; i < in.size(); i++) {
+    if(IsValidPixel(in[i])) pixels.push_back(in[i]);
   }
-  sort(pixels.begin(),pixels.end());
+  sort(pixels.begin(), pixels.end());
 
   // Now obtain the median value and store in the median vector
   int size = pixels.size();
-  if (size != 0) {
-    int med = size/2;
-    if (size%2 == 0) {
-      median.push_back((pixels[med-1]+pixels[med])/2.0);
+  if(size != 0) {
+    int med = size / 2;
+    if(size % 2 == 0) {
+      median.push_back((pixels[med-1] + pixels[med]) / 2.0);
     }
     else {
       median.push_back(pixels[med]);
@@ -206,7 +206,7 @@ void getStats(Buffer &in) {
   }
 
   // Determine the normalizer
-  if (normalizeUsingAverage) {
+  if(normalizeUsingAverage) {
     normalizer.push_back(stats.Average());
   }
   else {
@@ -218,24 +218,24 @@ void getStats(Buffer &in) {
 // Create PVL output of statistics
 //*******************************************************
 void pvlOut(const string &StatFile) {
-  PvlGroup results ("Results");
-  for (unsigned int i=0; i <st.size(); i++) {
-    results += PvlKeyword("Band",band[i]);
-    results += PvlKeyword("RowCol",element[i]);
-    results += PvlKeyword("ValidPixels",st[i].ValidPixels());
-    if (st[i].ValidPixels() > 0) {
-      results += PvlKeyword("Mean",st[i].Average());
-      results += PvlKeyword("Median",median[i]);
-      results += PvlKeyword("Std",st[i].StandardDeviation());
-      results += PvlKeyword("Minimum",st[i].Minimum());
-      results += PvlKeyword("Maximum",st[i].Maximum());
+  PvlGroup results("Results");
+  for(unsigned int i = 0; i < st.size(); i++) {
+    results += PvlKeyword("Band", band[i]);
+    results += PvlKeyword("RowCol", element[i]);
+    results += PvlKeyword("ValidPixels", st[i].ValidPixels());
+    if(st[i].ValidPixels() > 0) {
+      results += PvlKeyword("Mean", st[i].Average());
+      results += PvlKeyword("Median", median[i]);
+      results += PvlKeyword("Std", st[i].StandardDeviation());
+      results += PvlKeyword("Minimum", st[i].Minimum());
+      results += PvlKeyword("Maximum", st[i].Maximum());
     }
     else {
-      results += PvlKeyword("Mean",0.0);
-      results += PvlKeyword("Median",0.0);
-      results += PvlKeyword("Std",0.0);
-      results += PvlKeyword("Minimum",0.0);
-      results += PvlKeyword("Maximum",0.0);
+      results += PvlKeyword("Mean", 0.0);
+      results += PvlKeyword("Median", 0.0);
+      results += PvlKeyword("Std", 0.0);
+      results += PvlKeyword("Minimum", 0.0);
+      results += PvlKeyword("Maximum", 0.0);
     }
   }
 
@@ -251,7 +251,7 @@ void tableOut(const string &StatFile) {
   // Open output file
   // TODO check status and throw error
   ofstream out;
-  out.open(StatFile.c_str(),std::ios::out);
+  out.open(StatFile.c_str(), std::ios::out);
 
   // Output a header
   out << std::setw(8)  << "Band";
@@ -265,15 +265,15 @@ void tableOut(const string &StatFile) {
   out << endl;
 
   // Print out the table results
-  for (unsigned int i=0; i<st.size(); i++) {
+  for(unsigned int i = 0; i < st.size(); i++) {
     out << std::setw(8)  << band[i];
     out << std::setw(8)  << element[i];
     out << std::setw(15) << st[i].ValidPixels();
-    if (st[i].ValidPixels() > 0) {
+    if(st[i].ValidPixels() > 0) {
       out << std::setw(15) << st[i].Average();
       out << std::setw(15) << median[i];
       //Make sure the table's SD is 0 for RowCols with 1 or less valid pixels
-      if( st[i].ValidPixels() > 1 ) {
+      if(st[i].ValidPixels() > 1) {
         out << std::setw(15) << st[i].StandardDeviation();
       }
       else {
@@ -297,14 +297,14 @@ void tableOut(const string &StatFile) {
 //********************************************************
 // Gather statistics from a PVL input file
 //*******************************************************
-void PVLIn(const Isis::Filename &filename){
+void PVLIn(const Isis::Filename &filename) {
   Pvl pvlFileIn;
   pvlFileIn.Read(filename.Name());
   PvlGroup results = pvlFileIn.FindGroup("Results");
   PvlObject::PvlKeywordIterator itr = results.Begin();
-  
-  while (itr != results.End()){
-    StaticStats newStat;  
+
+  while(itr != results.End()) {
+    StaticStats newStat;
     band.push_back((*itr)[0]);
     itr++;
     element.push_back((*itr)[0]);
@@ -322,12 +322,12 @@ void PVLIn(const Isis::Filename &filename){
     newStat.setMaximum((*itr)[0]);
     itr++;
     st.push_back(newStat);
-  
-  // Determine the normalizer
-  if (normalizeUsingAverage) {
-    normalizer.push_back(newStat.Average());
-  }
-  else {
+
+    // Determine the normalizer
+    if(normalizeUsingAverage) {
+      normalizer.push_back(newStat.Average());
+    }
+    else {
       normalizer.push_back(median[median.size()-1]);
     }
   }
@@ -336,30 +336,30 @@ void PVLIn(const Isis::Filename &filename){
 //********************************************************
 // Gather statistics from a table input file
 //*******************************************************
-void tableIn(const Isis::Filename & filename){
+void tableIn(const Isis::Filename &filename) {
   ifstream in;
   string expanded(filename.Expanded());
-  in.open(expanded.c_str(),std::ios::in);
-  
-  
-  if (!in){
+  in.open(expanded.c_str(), std::ios::in);
+
+
+  if(!in) {
     string message = "Error opening " + filename.Expanded();
     throw  iException::Message(Isis::iException::Io, message,
-    	 _FILEINFO_);
+                               _FILEINFO_);
   }
-  
+
   //skip the header (106 bytes)
   in.seekg(106);
-  
+
 
   //read it
   StaticStats newStat;
   iString inString;
-  while (in >> inString){
+  while(in >> inString) {
     band.push_back(inString);
-    in>> inString;
+    in >> inString;
     element.push_back(inString);
-    in>> inString;
+    in >> inString;
     newStat.setValidPixels(inString);
     in >> inString;
     newStat.setMean(inString);
@@ -373,11 +373,11 @@ void tableIn(const Isis::Filename & filename){
     newStat.setMaximum(inString);
     st.push_back(newStat);
     //Make sure Standard Deviation is not < 0 when reading in from a table
-    if( newStat.StandardDeviation() < 0 ) {
-      newStat.setStandardDeviation( 0 );
+    if(newStat.StandardDeviation() < 0) {
+      newStat.setStandardDeviation(0);
     }
     // Determine the normalizer
-    if (normalizeUsingAverage) {
+    if(normalizeUsingAverage) {
       normalizer.push_back(newStat.Average());
     }
     else {
@@ -392,12 +392,12 @@ void tableIn(const Isis::Filename & filename){
 // of the output image stays the same
 void subSame() {
   // Loop for each band
-  for (int iband=1; iband<=totalBands; iband++) {
+  for(int iband = 1; iband <= totalBands; iband++) {
     double sumAverage = 0.0;
     double sumValidPixels = 0;
-    for (int i=0; i<rowcol; i++) {
+    for(int i = 0; i < rowcol; i++) {
       int index = (iband - 1) * rowcol + i;
-      if (IsValidPixel(normalizer[index])) {
+      if(IsValidPixel(normalizer[index])) {
         sumAverage += normalizer[index] * st[index].ValidPixels();
         sumValidPixels += st[index].ValidPixels();
       }
@@ -405,10 +405,10 @@ void subSame() {
 
     // Neither sumValidPixels nor totalAverage will be zero
     // because of a test done earlier in IsisMain
-    double totalAverage = sumAverage/sumValidPixels;
-    for (int i=0; i<rowcol; i++) {
+    double totalAverage = sumAverage / sumValidPixels;
+    for(int i = 0; i < rowcol; i++) {
       int index = (iband - 1) * rowcol + i;
-      if (IsValidPixel(normalizer[index])) {
+      if(IsValidPixel(normalizer[index])) {
         normalizer[index] = normalizer[index] - totalAverage;
       }
     }
@@ -419,12 +419,12 @@ void subSame() {
 // the average or median of the output image stays the same
 void multSame() {
   // Loop for each band
-  for (int iband=1; iband<=totalBands; iband++) {
+  for(int iband = 1; iband <= totalBands; iband++) {
     double sumAverage = 0.0;
     double sumValidPixels = 0;
-    for (int i=0; i<rowcol; i++) {
+    for(int i = 0; i < rowcol; i++) {
       int index = (iband - 1) * rowcol + i;
-      if (IsValidPixel(normalizer[index])) {
+      if(IsValidPixel(normalizer[index])) {
         sumAverage += normalizer[index] * st[index].ValidPixels();
         sumValidPixels += st[index].ValidPixels();
       }
@@ -432,11 +432,11 @@ void multSame() {
 
     // Neither sumValidPixels nor totalAverage will be zero
     // because of a test done earlier in IsisMain
-    double totalAverage = sumAverage/sumValidPixels;
+    double totalAverage = sumAverage / sumValidPixels;
 
-    for (int i=0; i<rowcol; i++) {
+    for(int i = 0; i < rowcol; i++) {
       int index = (iband - 1) * rowcol + i;
-      if (IsValidPixel(normalizer[index])) {
+      if(IsValidPixel(normalizer[index])) {
         normalizer[index] = normalizer[index] / totalAverage;
       }
     }
@@ -449,7 +449,7 @@ void multiply(Buffer &in, Buffer &out) {
   // We have to tweak the index based on the shape of the buffer
   // either a column or line
   int index;
-  if (in.SampleDimension() == 1) {
+  if(in.SampleDimension() == 1) {
     index = (in.Band() - 1) * totalSamples;   // Get to the proper band
     index += in.Sample() - 1;                 // Get to the proper column
   }
@@ -460,14 +460,14 @@ void multiply(Buffer &in, Buffer &out) {
   double coeff = normalizer[index];
 
   // Now loop and apply the coefficents
-  for (int i=0; i<in.size(); i++) {
-    if (IsSpecial(in[i])) {
+  for(int i = 0; i < in.size(); i++) {
+    if(IsSpecial(in[i])) {
       out[i] = in[i];
     }
     else {
       out[i] = Null;
-      if (coeff != 0.0 && IsValidPixel(coeff)) {
-        out[i] = in[i]/coeff;
+      if(coeff != 0.0 && IsValidPixel(coeff)) {
+        out[i] = in[i] / coeff;
       }
     }
   }
@@ -479,7 +479,7 @@ void subtract(Buffer &in, Buffer &out) {
   // We have to tweak the index based on the shape of the buffer
   // either a column or line
   int index;
-  if (in.SampleDimension() == 1) {
+  if(in.SampleDimension() == 1) {
     index = (in.Band() - 1) * totalSamples;   // Get to the proper band
     index += in.Sample() - 1;                 // Get to the proper column
   }
@@ -490,13 +490,13 @@ void subtract(Buffer &in, Buffer &out) {
   double coeff = normalizer[index];
 
   // Now loop and apply the coefficents
-  for (int i=0; i<in.size(); i++) {
-    if (IsSpecial(in[i])) {
+  for(int i = 0; i < in.size(); i++) {
+    if(IsSpecial(in[i])) {
       out[i] = in[i];
     }
     else {
       out[i] = Null;
-      if (IsValidPixel(coeff)) {
+      if(IsValidPixel(coeff)) {
         out[i] = in[i] - coeff;
       }
     }

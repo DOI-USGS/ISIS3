@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   cout << "All testing deferred to NormModel and it's extended classes." << endl;

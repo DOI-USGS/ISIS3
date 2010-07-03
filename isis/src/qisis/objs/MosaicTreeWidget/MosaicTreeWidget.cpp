@@ -6,13 +6,13 @@
 namespace Qisis {
 
   /**
-   * MosaicTreeWidget constructor. 
+   * MosaicTreeWidget constructor.
    * MosaicTreeWidget is derived from QTreeWidget
-   * 
-   * 
-   * @param parent 
+   *
+   *
+   * @param parent
    */
-  MosaicTreeWidget::MosaicTreeWidget (QWidget *parent) : QTreeWidget(parent) {
+  MosaicTreeWidget::MosaicTreeWidget(QWidget *parent) : QTreeWidget(parent) {
 
   }
 

@@ -22,13 +22,13 @@ void IsisMain() {
   addAtmosModel(p);
   addNormalModel(p);
 
-  // Get the output file name from the GUI and write the pvl 
+  // Get the output file name from the GUI and write the pvl
   // to the file. If no extension is given, '.pvl' will be used.
-  UserInterface &ui = Application::GetUserInterface(); 
+  UserInterface &ui = Application::GetUserInterface();
   Filename out = ui.GetFilename("PVL");
   string output = ui.GetFilename("PVL");
-  if (out.Extension() == "") {
-    output += ".pvl"; 
+  if(out.Extension() == "") {
+    output += ".pvl";
   }
 
   p.Write(output);
@@ -45,9 +45,9 @@ void addPhoModel(Pvl &pvl) {
 
   //Get the photometric model and any parameters specific to that
   //model and write it to the algorithm group
- 
+
   //Hapke Henyey Greenstein Photometric Model
-  if (ui.GetString("PHOTOMETRIC") == "HAPKEHEN") {
+  if(ui.GetString("PHOTOMETRIC") == "HAPKEHEN") {
     phoAlgo.AddKeyword(PvlKeyword("Name", "Hapkehen"));
 
     double theta = ui.GetDouble("THETA");
@@ -106,9 +106,9 @@ void addAtmosModel(Pvl &pvl) {
 
   //If the normalization model is one with an atmospheric model
   //then create an atmospheric model and add it to the PVL.
-  if((ui.GetString("NORMALIZATION") == "ATMALBEDO" | 
-     ui.GetString("NORMALIZATION") == "ATMSHADE" ||
-     ui.GetString("NORMALIZATION") == "ATMTOPO")) {
+  if((ui.GetString("NORMALIZATION") == "ATMALBEDO" |
+      ui.GetString("NORMALIZATION") == "ATMSHADE" ||
+      ui.GetString("NORMALIZATION") == "ATMTOPO")) {
 
     //Create an object for the atmospheric model
     PvlObject atmosModel("AtmosphericModel");
@@ -119,12 +119,12 @@ void addAtmosModel(Pvl &pvl) {
     //model and write it to the algorithm group
 
     //Anisotropic 1 Atmospheric Model
-    if (ui.GetString("ATMOSPHERIC") == "ANISOTROPIC1") {
+    if(ui.GetString("ATMOSPHERIC") == "ANISOTROPIC1") {
       atmosAlgo.AddKeyword(PvlKeyword("Name", "Anisotropic1"));
 
       bool nulneg = ui.GetBoolean("NULNEG");
 
-      //if NULNEG is checked add it to the group, otherwise the 
+      //if NULNEG is checked add it to the group, otherwise the
       //default is to leave it out
       if(nulneg) {
         atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "YES"));
@@ -165,7 +165,7 @@ void addAtmosModel(Pvl &pvl) {
 
       bool nulneg = ui.GetBoolean("NULNEG");
 
-      //if NULNEG is checked add it to the group, otherwise the 
+      //if NULNEG is checked add it to the group, otherwise the
       //default is to leave it out
       if(nulneg) {
         atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
@@ -206,7 +206,7 @@ void addAtmosModel(Pvl &pvl) {
 
       bool nulneg = ui.GetBoolean("NULNEG");
 
-      //if NULNEG is checked add it to the group, otherwise the 
+      //if NULNEG is checked add it to the group, otherwise the
       //default is to leave it out
       if(nulneg) {
         atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
@@ -247,7 +247,7 @@ void addAtmosModel(Pvl &pvl) {
 
       bool nulneg = ui.GetBoolean("NULNEG");
 
-      //if NULNEG is checked add it to the group, otherwise the 
+      //if NULNEG is checked add it to the group, otherwise the
       //default is to leave it out
       if(nulneg) {
         atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
@@ -288,7 +288,7 @@ void addAtmosModel(Pvl &pvl) {
 
       bool nulneg = ui.GetBoolean("NULNEG");
 
-      //if NULNEG is checked add it to the group, otherwise the 
+      //if NULNEG is checked add it to the group, otherwise the
       //default is to leave it out
       if(nulneg) {
         atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
@@ -319,7 +319,7 @@ void addAtmosModel(Pvl &pvl) {
 
       bool nulneg = ui.GetBoolean("NULNEG");
 
-      //if NULNEG is checked add it to the group, otherwise the 
+      //if NULNEG is checked add it to the group, otherwise the
       //default is to leave it out
       if(nulneg) {
         atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
@@ -364,7 +364,7 @@ void addNormalModel(Pvl &pvl) {
   //model and write it to the algorithm group
 
   //Albedo Normalization Model
-  if (ui.GetString("NORMALIZATION") == "ALBEDO") {
+  if(ui.GetString("NORMALIZATION") == "ALBEDO") {
     normalAlgo.AddKeyword(PvlKeyword("Name", "Albedo"));
 
     double incref = ui.GetDouble("INCREF");

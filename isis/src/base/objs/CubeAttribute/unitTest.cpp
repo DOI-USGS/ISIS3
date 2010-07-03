@@ -8,16 +8,16 @@
  * $Date: 2006/10/31 23:18:06 $
  *
  */
- 
- /***********************************************************************
- *				PLEASE NOTE				*
- * This unit test modifies the truth file that it is meant to be tested *
- * against. The reason for this is that the output of the unit test is  *
- * dependent upon the system architecture, so an unchanged truth file   *
- * will only be correct on LSB xor MSB machines. To see the code that   *
- * changes CubeAttriube.truth, go to lines 254 - ###			*
- *									*
- ***********************************************************************/
+
+/***********************************************************************
+*				PLEASE NOTE				*
+* This unit test modifies the truth file that it is meant to be tested *
+* against. The reason for this is that the output of the unit test is  *
+* dependent upon the system architecture, so an unchanged truth file   *
+* will only be correct on LSB xor MSB machines. To see the code that   *
+* changes CubeAttriube.truth, go to lines 254 - ###			*
+*									*
+***********************************************************************/
 
 #include <iostream>
 #include <string>
@@ -29,9 +29,9 @@
 
 using namespace std;
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 
-  void ReportOutput (Isis::CubeAttributeOutput *att, string oh);
+  void ReportOutput(Isis::CubeAttributeOutput * att, string oh);
 
   Isis::Preference::Preferences(true);
 
@@ -43,8 +43,8 @@ int main (int argc, char *argv[]) {
     delete att;
     cout << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
@@ -61,8 +61,8 @@ int main (int argc, char *argv[]) {
     cout << pvl << endl;
     cout << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
@@ -70,12 +70,12 @@ int main (int argc, char *argv[]) {
   cout << "Test of system default output cube attributes" << endl;
   try {
     Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput();
-    ReportOutput (att, "SYS");
+    ReportOutput(att, "SYS");
     cout << endl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (true);
+  catch(Isis::iException &error) {
+    error.Report(true);
   }
   cout << endl << endl;
 
@@ -83,25 +83,25 @@ int main (int argc, char *argv[]) {
   cout << "Test of output attribute \"+8bit+Tile+0.0:100.1+MSB\"" << endl;
   try {
     Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+8bit+Tile+0.0:100.1+MSB");
-    ReportOutput (att, "MSB");
+    ReportOutput(att, "MSB");
     cout << endl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (true);
+  catch(Isis::iException &error) {
+    error.Report(true);
   }
   cout << endl << endl;
 
 
   cout << "Test of output attribute \"+16bit+Bsq+-10000.0:-100.1+lsb\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput ("+16bit+Bsq+-100000.0:-100.1+lsb");
-    ReportOutput (att, "LSB");
+    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+16bit+Bsq+-100000.0:-100.1+lsb");
+    ReportOutput(att, "LSB");
     cout << endl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
@@ -109,51 +109,51 @@ int main (int argc, char *argv[]) {
   cout << "Test of output attribute \"+32bit\"" << endl;
   try {
     Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+32bit+tile+999:9999");
-    ReportOutput (att,"SYS");
+    ReportOutput(att, "SYS");
     cout << endl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
 
   cout << "Test of output attribute \"+0.0:100.1+detached\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput ("+0.0:100.1+detached");
-    ReportOutput (att,"SYS");
+    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+0.0:100.1+detached");
+    ReportOutput(att, "SYS");
     cout << endl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
 
   cout << "Test of output attribute \"+8bit+Tile\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput ("+8bit+Tile");
-    ReportOutput (att, "SYS");
+    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+8bit+Tile");
+    ReportOutput(att, "SYS");
     cout << endl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
   cout << "Test of output attribute \"Defaults\" with Set" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput ();
+    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput();
     att->Set("+8-bit+Detached");
-    ReportOutput (att, "SYS");
+    ReportOutput(att, "SYS");
     cout << endl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
@@ -171,8 +171,8 @@ int main (int argc, char *argv[]) {
     cout << pvl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
@@ -189,8 +189,8 @@ int main (int argc, char *argv[]) {
     cout << pvl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
@@ -207,11 +207,11 @@ int main (int argc, char *argv[]) {
     cout << pvl << endl;
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
-  
+
 
   cout << "Testing put members (strings)" << endl;
   try {
@@ -225,8 +225,8 @@ int main (int argc, char *argv[]) {
     att->Write(cout);
     delete att;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
   cout << endl << endl;
 
@@ -234,7 +234,7 @@ int main (int argc, char *argv[]) {
 
 
 // Function to report everything about an output cube attribute
-void ReportOutput (Isis::CubeAttributeOutput *att, string orderHint) {
+void ReportOutput(Isis::CubeAttributeOutput *att, string orderHint) {
   att->Write(cout);
   cout << endl;
   Isis::Pvl pvl;
@@ -246,7 +246,7 @@ void ReportOutput (Isis::CubeAttributeOutput *att, string orderHint) {
     string tmp =   Isis::PixelTypeName(att->PixelType());
     cout << "PixelType            = " << tmp << endl;
   }
-  catch (Isis::iException &error) {
+  catch(Isis::iException &error) {
     error.Report(false);
   }
   cout << "Propagate Min/Max    = " << att->PropagateMinimumMaximum() << endl;
@@ -258,8 +258,8 @@ void ReportOutput (Isis::CubeAttributeOutput *att, string orderHint) {
 //  cout << "ByteOrderStr         = " << att->ByteOrderStr() << endl;
 //  cout << "ByteOrder enum       = " << Isis::ByteOrderName(att->ByteOrder()) << endl;
   Isis::ByteOrder oh;
-  if (orderHint == "SYS") {
-    if (Isis::IsLsb()) {
+  if(orderHint == "SYS") {
+    if(Isis::IsLsb()) {
       oh = Isis::Lsb;
     }
     else {
@@ -270,7 +270,7 @@ void ReportOutput (Isis::CubeAttributeOutput *att, string orderHint) {
     oh = Isis::ByteOrderEnumeration(orderHint);
   }
   Isis::ByteOrder order =  att->ByteOrder();
-  if (order == oh) {
+  if(order == oh) {
     cout << "ByteOrder            = ok" << endl;
   }
   else  {
@@ -278,16 +278,16 @@ void ReportOutput (Isis::CubeAttributeOutput *att, string orderHint) {
   }
 
   cout << "Label attachment     = ";
-  if (att->AttachedLabel()) cout << LabelAttachmentName(Isis::AttachedLabel) << endl;
-  if (att->DetachedLabel()) cout << LabelAttachmentName(Isis::DetachedLabel) << endl;
+  if(att->AttachedLabel()) cout << LabelAttachmentName(Isis::AttachedLabel) << endl;
+  if(att->DetachedLabel()) cout << LabelAttachmentName(Isis::DetachedLabel) << endl;
 
 #if 0
-  fstream stream("CubeAttribute.truth", ios::in| ios::out);
+  fstream stream("CubeAttribute.truth", ios::in | ios::out);
   int positions[] = {203, 1520, 1877, 2388, 2767, 3213};
-  if (stream.is_open()){
-    for (int i = 0 ; i < 6 ; i++){
+  if(stream.is_open()) {
+    for(int i = 0 ; i < 6 ; i++) {
       stream.seekg(positions[i]);
-      if (Isis::IsLsb())
+      if(Isis::IsLsb())
         stream.put('L');
       else
         stream.put('M');

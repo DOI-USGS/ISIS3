@@ -89,33 +89,33 @@ int *got_height;
   uint8 *lastsync;
   uint16 gotsync;
   extern int errors;
-  extern uint8 *findsync(uint8 *p, int len, uint16 sync);
+  extern uint8 *findsync(uint8 * p, int len, uint16 sync);
 
 
   pred_past_eof = 0;
 
   /* Allocate space for decompression */
-  if ((prevLine = (uint8 *)malloc(width * sizeof(*prevLine))) == NULL) {
-    (void)fprintf(stderr,"Unable to get enough memory for line buffers\n");
+  if((prevLine = (uint8 *)malloc(width * sizeof(*prevLine))) == NULL) {
+    (void)fprintf(stderr, "Unable to get enough memory for line buffers\n");
     exit(1);
   };
 
-  for (y = 0; y < width; y++) {
+  for(y = 0; y < width; y++) {
     prevLine[y] = 0;
   };
 
-  if ((curLine = (uint8 *)malloc(width * sizeof(*curLine))) == NULL) {
-    (void)fprintf(stderr,"Unable to get enough memory for line buffers\n");
+  if((curLine = (uint8 *)malloc(width * sizeof(*curLine))) == NULL) {
+    (void)fprintf(stderr, "Unable to get enough memory for line buffers\n");
     exit(1);
   };
 
-  if ((result = (uint8 *) malloc(height*width)) == NULL) {
+  if((result = (uint8 *) malloc(height * width)) == NULL) {
     fprintf(stderr, "can't get memory for output image\n");
     exit(1);
   }
 
-  if (xpred) compType |= XPRED;
-  if (ypred) compType |= YPRED;
+  if(xpred) compType |= XPRED;
+  if(ypred) compType |= YPRED;
 
   bitStuff.output     = data;
   bitStuff.bitQueue = *(bitStuff.output);
@@ -123,13 +123,13 @@ int *got_height;
 
   lastsync = data;
 
-  for (y = 0; y < height; y++) {
-    if ((y % 128 == 0) && (doSync == 1)) {
-      if (bitStuff.bitCount != 0) {
+  for(y = 0; y < height; y++) {
+    if((y % 128 == 0) && (doSync == 1)) {
+      if(bitStuff.bitCount != 0) {
         bitStuff.bitCount = 0;
         bitStuff.output++;
       };
-      if (((bitStuff.output - data) & 0x1) == 0x1) {
+      if(((bitStuff.output - data) & 0x1) == 0x1) {
         bitStuff.output++;
       };
       bitStuff.bitQueue = *(bitStuff.output);
@@ -137,19 +137,19 @@ int *got_height;
          NOTE this is kind of a funny place to do this,
          but it's simplest to do it here due to the
          structure of the code. mc, 11/11/98 */
-      gotsync = *(bitStuff.output) | (*(bitStuff.output+1)<<8);
-      if (gotsync != sync) {
+      gotsync = *(bitStuff.output) | (*(bitStuff.output + 1) << 8);
+      if(gotsync != sync) {
         fprintf(stderr, "lost sync, line %d -- ", y);
         errors += 1;
 #define AUTOSYNC
 #ifdef AUTOSYNC
-        if (!(lastsync = (uint8*)findsync(lastsync,
-                                  len-(lastsync-data), sync))) {
+        if(!(lastsync = (uint8 *)findsync(lastsync,
+                                          len - (lastsync - data), sync))) {
 #else
-        if (1) {
+        if(1) {
 #endif
           *got_height = y;
-          if (bitStuff.output-data > len) {
+          if(bitStuff.output - data > len) {
             /* we tried to read beyond the end of
                the data. */
             pred_past_eof = 1;
@@ -166,13 +166,13 @@ int *got_height;
         lastsync = bitStuff.output;
       }
 
-      predictiveDecompressor(curLine,prevLine,width,compType | SYNC,code,left,right,sync,&bitStuff);
+      predictiveDecompressor(curLine, prevLine, width, compType | SYNC, code, left, right, sync, &bitStuff);
     }
     else {
-      predictiveDecompressor(curLine,prevLine,width,compType,code,left,right,sync,&bitStuff);
+      predictiveDecompressor(curLine, prevLine, width, compType, code, left, right, sync, &bitStuff);
     };
 
-    bcopy(curLine, result+y*width, width);
+    bcopy(curLine, result + y * width, width);
   };
 
   /* Free the temporary storage */

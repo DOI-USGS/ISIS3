@@ -42,9 +42,9 @@ typedef struct moc_xts_table {
   int starting_pixel;      // Starting hardware detector
   int ending_pixel;        // Ending hardware detector
   double center_pixel;     // Center hardware detector
-  double pixel_difference; // Difference between current 
-                           // center_pixel and previous 
-			                     // center_pixel
+  double pixel_difference; // Difference between current
+  // center_pixel and previous
+  // center_pixel
 } MOC_XTS_TABLE;
 /// @endcond
 

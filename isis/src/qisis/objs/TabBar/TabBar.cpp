@@ -28,11 +28,10 @@ using namespace Qisis;
  *
  * @param parent Optionally specify the parent of this TabBar
  */
-TabBar::TabBar(const bool & useDefaultViewSettings,
-               QWidget * parent) : QToolBar(parent)
-{
+TabBar::TabBar(const bool &useDefaultViewSettings,
+               QWidget *parent) : QToolBar(parent) {
   tabs = NULL;
-  
+
   tabs = new QVector< Tab * >();
   radioStyleTabs = false;
   useDefaults = useDefaultViewSettings;
@@ -40,10 +39,8 @@ TabBar::TabBar(const bool & useDefaultViewSettings,
 
 
 //! destruct a TabBar
-TabBar::~TabBar()
-{
-  if (tabs)
-  {
+TabBar::~TabBar() {
+  if(tabs) {
     delete tabs;
     tabs = NULL;
   }
@@ -56,19 +53,18 @@ TabBar::~TabBar()
  *
  * @param newTab New Tab to be added
  */
-void TabBar::addTab(Tab * newTab)
-{
-  const int & tabCountBeforeAddition = tabs->size();
+void TabBar::addTab(Tab *newTab) {
+  const int &tabCountBeforeAddition = tabs->size();
   newTab->setPosition(tabCountBeforeAddition);
   connect(newTab, SIGNAL(clicked(const int &)), this,
           SLOT(tabClicked(const int &)));
   tabs->push_back(newTab);
-  
-  if (useDefaults)
+
+  if(useDefaults)
     newTab->setSelected(!tabCountBeforeAddition);
   else
     newTab->setSelected(false);
-  
+
   addWidget(newTab);
 }
 
@@ -82,8 +78,7 @@ void TabBar::addTab(Tab * newTab)
  *
  * @param radioStyle True if radio style should be used, false otherwise
  */
-void TabBar::setRadioStyle(const bool & radioStyle)
-{
+void TabBar::setRadioStyle(const bool &radioStyle) {
   radioStyleTabs = radioStyle;
 }
 
@@ -91,8 +86,7 @@ void TabBar::setRadioStyle(const bool & radioStyle)
 /**
  * @returns The current radio style being used
  */
-bool TabBar::radioStyle()
-{
+bool TabBar::radioStyle() {
   return radioStyleTabs;
 }
 
@@ -100,7 +94,9 @@ bool TabBar::radioStyle()
 /**
  * @returns The number of Tabs currently in the TabBar
  */
-const int TabBar::size() const { return tabs->size(); }
+const int TabBar::size() const {
+  return tabs->size();
+}
 
 
 /**
@@ -111,9 +107,8 @@ const int TabBar::size() const { return tabs->size(); }
  *
  * @param status True if the Tab should be selected, false otherwise
  */
-void TabBar::setSelected(const int & index, const bool & status)
-{
-  if (index >= 0 && index < tabs->size())
+void TabBar::setSelected(const int &index, const bool &status) {
+  if(index >= 0 && index < tabs->size())
     (*tabs)[index]->setSelected(status);
 }
 
@@ -121,14 +116,13 @@ void TabBar::setSelected(const int & index, const bool & status)
 /**
  * @param index Index of the Tab.  The first Tab added to the bar has an index
  *              of 0.  The last Tab added has an index of size() - 1.
- *  
+ *
  * @returns True if the Tab at the given index is selected, false otherwise
  */
-bool TabBar::isSelected(const int & index)
-{
-  if (index >= 0 && index < tabs->size() && (*tabs)[index]->isSelected())
+bool TabBar::isSelected(const int &index) {
+  if(index >= 0 && index < tabs->size() && (*tabs)[index]->isSelected())
     return true;
-    
+
   return false;
 }
 
@@ -136,12 +130,11 @@ bool TabBar::isSelected(const int & index)
 /**
  * @returns True if no Tabs are currently selected, false otherwise
  */
-bool TabBar::noneSelected()
-{
-  for (int i = 0; i < tabs->size(); i++)
-    if ((*tabs)[i]->isSelected())
+bool TabBar::noneSelected() {
+  for(int i = 0; i < tabs->size(); i++)
+    if((*tabs)[i]->isSelected())
       return false;
-    
+
   return true;
 }
 
@@ -161,14 +154,11 @@ bool TabBar::noneSelected()
  *
  * @param index Index of the Tab which emitted the clicked SIGNAL.
  */
-void TabBar::tabClicked(const int & index)
-{
-  if (!radioStyleTabs || noOthersInGrpSelected(index))
-  {
+void TabBar::tabClicked(const int &index) {
+  if(!radioStyleTabs || noOthersInGrpSelected(index)) {
     (*tabs)[index]->setSelected(!(*tabs)[index]->isSelected());
   }
-  else
-  {
+  else {
     deselectOthersInGrp(index);
     (*tabs)[index]->setSelected(true);
   }
@@ -182,15 +172,12 @@ void TabBar::tabClicked(const int & index)
  * @returns True if there are no other Tabs in the given Tab's radio group which
  *          are selected, false otherwise.
  */
-bool TabBar::noOthersInGrpSelected(const int & index) const
-{
-  const int & thisGrp = tabs->at(index)->getRadioGroup();
-  for (int i = 0; i < tabs->size(); i++)
-  {
-    if (index != i)
-    {
-      const int & otherGrp = tabs->at(i)->getRadioGroup();
-      if (otherGrp == thisGrp && tabs->at(i)->isSelected())
+bool TabBar::noOthersInGrpSelected(const int &index) const {
+  const int &thisGrp = tabs->at(index)->getRadioGroup();
+  for(int i = 0; i < tabs->size(); i++) {
+    if(index != i) {
+      const int &otherGrp = tabs->at(i)->getRadioGroup();
+      if(otherGrp == thisGrp && tabs->at(i)->isSelected())
         return false;
     }
   }
@@ -204,15 +191,12 @@ bool TabBar::noOthersInGrpSelected(const int & index) const
  *
  * Deselects any other selected Tabs in the given Tab's radio group
  */
-void TabBar::deselectOthersInGrp(const int & index)
-{
-  const int & thisGrp = tabs->at(index)->getRadioGroup();
-  for (int i = 0; i < tabs->size(); i++)
-  {
-    if (index != i)
-    {
-      const int & otherGrp = tabs->at(i)->getRadioGroup();
-      if (otherGrp == thisGrp)
+void TabBar::deselectOthersInGrp(const int &index) {
+  const int &thisGrp = tabs->at(index)->getRadioGroup();
+  for(int i = 0; i < tabs->size(); i++) {
+    if(index != i) {
+      const int &otherGrp = tabs->at(i)->getRadioGroup();
+      if(otherGrp == thisGrp)
         (*tabs)[i]->setSelected(false);
     }
   }

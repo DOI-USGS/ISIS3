@@ -6,7 +6,7 @@ using namespace Isis;
 
 class MyCamera : public LineScanCamera {
   public:
-    MyCamera(Isis::Pvl& lab) : Isis::LineScanCamera(lab) { }
+    MyCamera(Isis::Pvl &lab) : Isis::LineScanCamera(lab) { }
 };
 
 int main() {

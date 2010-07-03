@@ -8,15 +8,15 @@
 #include "Pvl.h"
 #include "SessionLog.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 //helper button functins in the code
 void helperButtonLog();
 
-map <string,void*> GuiHelpers(){
-  map <string,void*> helper;
-  helper ["helperButtonLog"] = (void*) helperButtonLog;
+map <string, void *> GuiHelpers() {
+  map <string, void *> helper;
+  helper ["helperButtonLog"] = (void *) helperButtonLog;
   return helper;
 }
 void IsisMain() {
@@ -26,7 +26,7 @@ void IsisMain() {
 
   // Use a regular Process
   Process p;
-  
+
   // Get the input file from the user interface
   UserInterface &ui = Application::GetUserInterface();
   string labelFile = ui.GetFilename("FROM");
@@ -38,56 +38,58 @@ void IsisMain() {
 
   // Set up the requested object
   PvlKeyword key;
-  if (ui.WasEntered("OBJNAME")) {
+  if(ui.WasEntered("OBJNAME")) {
     string obj = ui.GetString("OBJNAME");
 
     // Get the keyword from the entered group
-    if (ui.WasEntered("GRPNAME")) {
-      PvlObject object = lab.FindObject(obj,Pvl::Traverse);
+    if(ui.WasEntered("GRPNAME")) {
+      PvlObject object = lab.FindObject(obj, Pvl::Traverse);
       string grp = ui.GetString("GRPNAME");
-      key = object.FindGroup(grp,Pvl::Traverse)[ui.GetString("KEYWORD")];
+      key = object.FindGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
     }
     // Find the keyword in the object
     else {
-      if(recursive){
-        key = lab.FindObject(obj,Pvl::Traverse).FindKeyword(ui.GetString("KEYWORD"),Pvl::Traverse);
-      } else {
-        key = lab.FindObject(obj,Pvl::Traverse)[ui.GetString("KEYWORD")];
+      if(recursive) {
+        key = lab.FindObject(obj, Pvl::Traverse).FindKeyword(ui.GetString("KEYWORD"), Pvl::Traverse);
+      }
+      else {
+        key = lab.FindObject(obj, Pvl::Traverse)[ui.GetString("KEYWORD")];
       }
     }
   }
 
   // Set up the requested group
-  else if (ui.WasEntered("GRPNAME")) {
+  else if(ui.WasEntered("GRPNAME")) {
     string grp = ui.GetString("GRPNAME");
-    key = lab.FindGroup(grp,Pvl::Traverse)[ui.GetString("KEYWORD")];
+    key = lab.FindGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
   }
 
   // Find the keyword in the label, outside of any object or group
   else {
-    if(recursive){
-        key = lab.FindKeyword(ui.GetString("KEYWORD"),Pvl::Traverse);
-      } else {
-        key = lab[ui.GetString("KEYWORD")];
-      }
+    if(recursive) {
+      key = lab.FindKeyword(ui.GetString("KEYWORD"), Pvl::Traverse);
+    }
+    else {
+      key = lab[ui.GetString("KEYWORD")];
+    }
   }
 
   iString value;
-  if (ui.WasEntered("KEYINDEX")) {
+  if(ui.WasEntered("KEYINDEX")) {
     int i = ui.GetInteger("KEYINDEX");
 
     // Make sure they requested a value inside the range of the list
-    if (key.Size() < i) {
+    if(key.Size() < i) {
       string msg = "The value entered for [KEYINDEX] is out of the array ";
       msg += "bounds for the keyword [" + ui.GetString("KEYWORD") + "]";
-      throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
     // Get the keyword value
     else value = key[i-1];
   }
   else {
     // Push the whole list into a iString and clean it up before returning it
-    if (key.Size() > 1) {
+    if(key.Size() > 1) {
       ostringstream os;
       os << key;
       iString temp = os.str();
@@ -98,15 +100,15 @@ void IsisMain() {
     }
     // Just get the keyword value since it isnt a list
     else value = (string)key;
-  }     
+  }
 
-  if (ui.GetBoolean("UPPER")) value.UpCase();
+  if(ui.GetBoolean("UPPER")) value.UpCase();
 
   // Construct a label with the results
   PvlGroup results("Results");
-  results += PvlKeyword ("From", labelFile);
-  results += PvlKeyword (ui.GetString("KEYWORD"),value);
-  if (ui.IsInteractive()) {
+  results += PvlKeyword("From", labelFile);
+  results += PvlKeyword(ui.GetString("KEYWORD"), value);
+  if(ui.IsInteractive()) {
     Application::GuiLog(results);
   }
   else {
@@ -117,7 +119,7 @@ void IsisMain() {
 }
 
 //Helper function to output the input file to log.
-void helperButtonLog () {
+void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
   string file(ui.GetFilename("FROM"));
   Pvl p;

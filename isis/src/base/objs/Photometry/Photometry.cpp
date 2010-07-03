@@ -12,21 +12,22 @@
 namespace Isis {
   /**
    * Create Photometry object.
-   * 
+   *
    * @param pvl  A pvl object containing a valid Photometry specification
-   * 
+   *
    * @see photometry.doc
    */
-  Photometry::Photometry (Pvl &pvl) {
+  Photometry::Photometry(Pvl &pvl) {
     p_phtAmodel = NULL;
     p_phtPmodel = NULL;
     p_phtNmodel = NULL;
     p_phtPmodel = PhotoModelFactory::Create(pvl);
-    if (pvl.HasObject("AtmosphericModel")) {
+    if(pvl.HasObject("AtmosphericModel")) {
       p_phtAmodel = AtmosModelFactory::Create(pvl, *p_phtPmodel);
       p_phtNmodel = NormModelFactory::Create(pvl, *p_phtPmodel,
-          *p_phtAmodel);
-    } else {
+                                             *p_phtAmodel);
+    }
+    else {
       p_phtNmodel = NormModelFactory::Create(pvl, *p_phtPmodel);
     }
   }
@@ -60,31 +61,31 @@ namespace Isis {
 
   /**
    * Calculate the surface brightness using only ellipsoid
-   * 
-   * @return  Returns the surface brightness 
-   *          
+   *
+   * @return  Returns the surface brightness
+   *
    */
   void Photometry::Compute(double pha, double inc, double ema,
                            double dn, double &albedo, double &mult,
-			   double &base) {
+                           double &base) {
 
     // Calculate the surface brightness
-    p_phtNmodel->CalcNrmAlbedo(pha,inc,ema,dn,albedo,mult,base);
+    p_phtNmodel->CalcNrmAlbedo(pha, inc, ema, dn, albedo, mult, base);
     return;
   }
 
   /**
    * Calculate the surface brightness using ellipsoid and dem
-   * 
-   * @return  Returns the surface brightness 
-   *          
+   *
+   * @return  Returns the surface brightness
+   *
    */
   void Photometry::Compute(double pha, double inc, double ema,
                            double deminc, double demema, double dn,
-			   double &albedo, double &mult, double &base) {
+                           double &albedo, double &mult, double &base) {
 
     // Calculate the surface brightness
-    p_phtNmodel->CalcNrmAlbedo(pha,inc,ema,deminc,demema,dn,albedo,mult,base);
+    p_phtNmodel->CalcNrmAlbedo(pha, inc, ema, deminc, demema, dn, albedo, mult, base);
     return;
   }
 }

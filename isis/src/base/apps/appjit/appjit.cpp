@@ -30,21 +30,21 @@ void IsisMain() {
   FileList list;
   list.Read(ui.GetFilename("FROMLIST"));
 
-  if (list.size() < 1) {
+  if(list.size() < 1) {
     string msg = "The input list file [" + ui.GetFilename("FROMLIST") + "is empty";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   int ifile = 0;
   // Make sure the master file is included in the input file list
-  while (ifile < (int) list.size() && Filename(list[ifile]).Expanded() != Filename(ui.GetFilename("MASTER")).Expanded()) {
+  while(ifile < (int) list.size() && Filename(list[ifile]).Expanded() != Filename(ui.GetFilename("MASTER")).Expanded()) {
     ifile++;
   }
 
-  if (ifile >= (int) list.size()) {
-    string msg = "The master file, [" + Filename(ui.GetFilename("MASTER")).Expanded() + " is not included in " + 
-      "the input list file " + ui.GetFilename("FROMLIST") + "]";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+  if(ifile >= (int) list.size()) {
+    string msg = "The master file, [" + Filename(ui.GetFilename("MASTER")).Expanded() + " is not included in " +
+                 "the input list file " + ui.GetFilename("FROMLIST") + "]";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   bool step2 = false;
@@ -55,34 +55,34 @@ void IsisMain() {
   try {
     // Open the master cube
     Cube cube;
-    cube.Open(ui.GetFilename("MASTER"),"rw");
-    
+    cube.Open(ui.GetFilename("MASTER"), "rw");
+
     //check for existing polygon, if exists delete it
-    if (cube.Label()->HasObject("Polygon")){
+    if(cube.Label()->HasObject("Polygon")) {
       cube.Label()->DeleteObject("Polygon");
     }
 
     // Get the camera
     Camera *cam = cube.Camera();
-    if (cam->DetectorMap()->LineRate() == 0.0) {
+    if(cam->DetectorMap()->LineRate() == 0.0) {
       string msg = "[" + ui.GetFilename("MASTER") + "] is not a line scan camera image";
-      throw iException::Message(Isis::iException::User,msg,_FILEINFO_);
+      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
-    // Create the master rotation to be corrected 
+    // Create the master rotation to be corrected
     int frameCode = cam->InstrumentRotation()->Frame();
-    cam->SetImage(int(cube.Samples()/2), int(cube.Lines()/2) );
+    cam->SetImage(int(cube.Samples() / 2), int(cube.Lines() / 2));
     double tol = cam->PixelResolution();
 
-    if (tol < 0.) {
+    if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
-      tol = cam->PixelPitch()*cam->SpacecraftAltitude()*1000./cam->FocalLength()/100.;
+      tol = cam->PixelPitch() * cam->SpacecraftAltitude() * 1000. / cam->FocalLength() / 100.;
     }
-    LineScanCameraRotation crot(frameCode, *(cube.Label()), cam->InstrumentRotation()->GetFullCacheTime(), tol );
+    LineScanCameraRotation crot(frameCode, *(cube.Label()), cam->InstrumentRotation()->GetFullCacheTime(), tol);
     crot.SetPolynomialDegree(ui.GetInteger("DEGREE"));
     crot.SetAxes(1, 2, 3);
-    if (ui.WasEntered("PITCHRATE")) crot.ResetPitchRate(ui.GetDouble("PITCHRATE"));
-    if (ui.WasEntered("YAW")) crot.ResetYaw(ui.GetDouble("YAW"));
+    if(ui.WasEntered("PITCHRATE")) crot.ResetPitchRate(ui.GetDouble("PITCHRATE"));
+    if(ui.WasEntered("YAW")) crot.ResetYaw(ui.GetDouble("YAW"));
     crot.SetPolynomial();
     double baseTime = crot.GetBaseTime();
     double timeScale = crot.GetTimeScale();
@@ -96,7 +96,7 @@ void IsisMain() {
     jitter.SetPolynomial();
 
     // Set the jitter and apply to the instrument rotation
-    crot.SetJitter( &jitter );
+    crot.SetJitter(&jitter);
     crot.ReloadCache();
 
     // Pull out the pointing cache as a table and write it
@@ -105,30 +105,30 @@ void IsisMain() {
     cube.Write(cmatrix);
 
     // Write out the instrument position table
-    Isis::PvlGroup kernels = cube.Label()->FindGroup("Kernels",Isis::Pvl::Traverse);
+    Isis::PvlGroup kernels = cube.Label()->FindGroup("Kernels", Isis::Pvl::Traverse);
 
     // Write out the "Table" label to the tabled kernels in the kernels group
     kernels["InstrumentPointing"] = "Table";
 //    kernels["InstrumentPosition"] = "Table";
     cube.PutGroup(kernels);
     cube.Close();
-    gp += PvlKeyword("StatusMaster",ui.GetFilename("MASTER") + ":  camera pointing updated");
+    gp += PvlKeyword("StatusMaster", ui.GetFilename("MASTER") + ":  camera pointing updated");
 
     // Apply the dejittered pointing to the rest of the files
     step2 = true;
-    for (int ifile = 0; ifile < (int) list.size(); ifile++) {
-      if (list[ifile] != ui.GetFilename("MASTER")) {
+    for(int ifile = 0; ifile < (int) list.size(); ifile++) {
+      if(list[ifile] != ui.GetFilename("MASTER")) {
         // Open the cube
-        cube.Open(list[ifile],"rw");
+        cube.Open(list[ifile], "rw");
         //check for existing polygon, if exists delete it
-        if (cube.Label()->HasObject("Polygon")){
+        if(cube.Label()->HasObject("Polygon")) {
           cube.Label()->DeleteObject("Polygon");
         }
         // Get the camera and make sure it is a line scan camera
         Camera *cam = cube.Camera();
-        if (cam->DetectorMap()->LineRate() == 0.0) {
+        if(cam->DetectorMap()->LineRate() == 0.0) {
           string msg = "[" + ui.GetFilename("FROM") + "] is not a line scan camera";
-          throw iException::Message(Isis::iException::User,msg,_FILEINFO_);
+          throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
         }
         // Pull out the pointing cache as a table and write it
         cube.Write(cmatrix);
@@ -137,16 +137,16 @@ void IsisMain() {
         gp += PvlKeyword("Status" + iString(ifile), list[ifile] + ":  camera pointing updated");
       }
     }
-    Application::Log( gp );
+    Application::Log(gp);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     string msg;
-    if (!step2) {
+    if(!step2) {
       msg = "Unable to fit pointing for [" + ui.GetFilename("MASTER") + "]";
     }
     else {
       msg = "Unable to update pointing for nonMaster file(s)";
     }
-    throw iException::Message(Isis::iException::User,msg,_FILEINFO_);
+    throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 }

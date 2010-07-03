@@ -19,7 +19,7 @@ int frameletTopTrimSize, frameletBottomTrimSize,
 
 void CalculateBottomTrim(Cube *icube);
 
-void IsisMain () {
+void IsisMain() {
   // Grab the file to import
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
@@ -29,16 +29,16 @@ void IsisMain () {
   // Make sure it is a Themis EDR/RDR
   Filename inFilename = ui.GetFilename("FROM");
   try {
-    if (icube->GetGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(icube->GetGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       string msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
-  catch (iException &e) {
-      string msg = "This program is intended for use on THEMIS VIS images only. [";
-      msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
+  catch(iException &e) {
+    string msg = "This program is intended for use on THEMIS VIS images only. [";
+    msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   frameletSize = 192 / (int)icube->GetGroup("Instrument")["SpatialSumming"][0];
@@ -76,11 +76,11 @@ void TrimFramelets(Buffer &inBuffer, Buffer &outBuffer) {
 }
 
 bool NeedsTrimmed(int line) {
-  int frameletLine = (line-1) % frameletSize + 1;
-  return (frameletLine <= frameletTopTrimSize) || (frameletLine > (frameletSize-frameletBottomTrimSize));
+  int frameletLine = (line - 1) % frameletSize + 1;
+  return (frameletLine <= frameletTopTrimSize) || (frameletLine > (frameletSize - frameletBottomTrimSize));
 }
 
-/** 
+/**
  * This method uses the cube's camera to determine how much
  *   overlap exists. The lat,lon for the beginning of the
  *   second framelet is calculated, and then we determine where
@@ -88,7 +88,7 @@ bool NeedsTrimmed(int line) {
  *   minus the framelet size is how much vertical overlap there is.
  *   The top overlap is subtracted from the overlap because there is
  *   that much less vertical overlap.
- * 
+ *
  * @param icube The input themis vis cube
  */
 void CalculateBottomTrim(Cube *icube) {
@@ -97,10 +97,10 @@ void CalculateBottomTrim(Cube *icube) {
   if(icube->Camera() == NULL) {
     string msg = "A camera is required to automatically ";
     msg += "calculate the bottom trim of a cube. Please run spiceinit on the input cube";
-    throw iException::Message(iException::Camera,msg,_FILEINFO_);
+    throw iException::Message(iException::Camera, msg, _FILEINFO_);
   }
 
-  // We really don't care at all about the original camera. What's needed is 
+  // We really don't care at all about the original camera. What's needed is
   //   a known even-framelet camera and a known odd-framelet camera. In order
   //   to get these, we change the cube labels in a local copy and create an
   //   odd framelet and an even framelet camera.
@@ -113,7 +113,7 @@ void CalculateBottomTrim(Cube *icube) {
   Camera *camOdd = CameraFactory::Create(cubeLabels);
 
   // Framelet 2 is even, so let's use the even camera to find the lat,lon at it's beginning
-  if(camEven->SetImage(1,frameletSize+1)) {
+  if(camEven->SetImage(1, frameletSize + 1)) {
     double framelet2StartLat = camEven->UniversalLatitude();
     double framelet2StartLon = camEven->UniversalLongitude();
 

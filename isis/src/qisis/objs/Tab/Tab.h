@@ -31,8 +31,7 @@
 class QWidget;
 class QPaintEvent;
 
-namespace Qisis
-{
+namespace Qisis {
   /**
    * A Tab is simply a QToolButton which shows or hides some other QWidget,
    * which we call associatedWidget.  The Tab does not own this widget, it
@@ -53,34 +52,33 @@ namespace Qisis
    * @internal
    * @history 2010-05-06 Eric Hyer - Original Version
    */
-  class Tab : public QToolButton
-  {
+  class Tab : public QToolButton {
       Q_OBJECT
-  
+
     public:
-      Tab(QWidget * associatedWidget, QWidget * parent = 0);
-      Tab(const Tab & other);
-      
+      Tab(QWidget *associatedWidget, QWidget *parent = 0);
+      Tab(const Tab &other);
+
       virtual ~Tab();
-      
-      void setPosition(const int & newPosition);
-      const int & getPosition() const;
-      void setRadioGroup(const int & newRadioGroup);
-      const int & getRadioGroup() const;
+
+      void setPosition(const int &newPosition);
+      const int &getPosition() const;
+      void setRadioGroup(const int &newRadioGroup);
+      const int &getRadioGroup() const;
       void setSelected(bool newStatus);
       bool isSelected();
-      
-      
+
+
     signals:
       void clicked(const int &);
-      
-      
+
+
     private slots:
       void handleTriggered();
-      
-      
+
+
     private:
-      QWidget * associatedWidget;
+      QWidget *associatedWidget;
       int position;
       int radioGroup;
       int location;

@@ -62,7 +62,7 @@ namespace Isis {
     private:
       QStringList mqCpList;
       std::vector<bool> mbFound;	 // holds one to one correspondence with "mqCpList" on
-                                  // whether the point was valid
+      // whether the point was valid
   };
 };
 

@@ -17,22 +17,22 @@ using namespace std;
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 namespace Isis {
   /**
-   * Create an AtmosModel object.  Because this is a pure virtual 
-   * class you can not create an AtmosModel class directly.  Instead, 
+   * Create an AtmosModel object.  Because this is a pure virtual
+   * class you can not create an AtmosModel class directly.  Instead,
    * see the @b Isis::AtmosModelFactory class.
-   * 
+   *
    * @param pvl  @b Isis::Pvl object containing a valid AtmosModel
    *             specification
-   * @param pmodel PhotoModel object containing valud AtmosModel 
+   * @param pmodel PhotoModel object containing valud AtmosModel
    *               data
-   * 
-   * @see atmosphericModels.doc 
-   * @internal 
+   *
+   * @see atmosphericModels.doc
+   * @internal
    *   @history 2008-11-05 Jeannie Walldren - Replaced arrays with
    *          vectors
-   *  
+   *
    */
-  AtmosModel::AtmosModel (Pvl &pvl, PhotoModel &pmodel) {
+  AtmosModel::AtmosModel(Pvl &pvl, PhotoModel &pmodel) {
     p_atmosAlgorithmName = "Unknown";
     p_atmosPM = &pmodel;
 
@@ -63,63 +63,66 @@ namespace Isis {
     p_trans0 = 0.0;
     p_standardConditions = false;
 
-    PvlGroup &algorithm = pvl.FindObject("AtmosphericModel").FindGroup("Algorithm",Pvl::Traverse);
+    PvlGroup &algorithm = pvl.FindObject("AtmosphericModel").FindGroup("Algorithm", Pvl::Traverse);
 
-    if (algorithm.HasKeyword("Nulneg")) {
-      SetAtmosNulneg( ((string)algorithm["Nulneg"]).compare("YES") == 0 );
+    if(algorithm.HasKeyword("Nulneg")) {
+      SetAtmosNulneg(((string)algorithm["Nulneg"]).compare("YES") == 0);
     }
     else {
       p_atmosNulneg = false;
     }
 
-    if (algorithm.HasKeyword("Tau")) {
-      SetAtmosTau( algorithm["Tau"] );
+    if(algorithm.HasKeyword("Tau")) {
+      SetAtmosTau(algorithm["Tau"]);
     }
     p_atmosTausave = p_atmosTau;
 
-    if (algorithm.HasKeyword("Tauref")) {
-      SetAtmosTauref( algorithm["Tauref"] );
+    if(algorithm.HasKeyword("Tauref")) {
+      SetAtmosTauref(algorithm["Tauref"]);
     }
 
-    if (algorithm.HasKeyword("Wha")) {
-      SetAtmosWha( algorithm["Wha"] );
+    if(algorithm.HasKeyword("Wha")) {
+      SetAtmosWha(algorithm["Wha"]);
     }
     p_atmosWhasave = p_atmosWha;
 
-    if (algorithm.HasKeyword("Wharef")) {
-      SetAtmosWharef( algorithm["Wharef"] );
-    } else {
+    if(algorithm.HasKeyword("Wharef")) {
+      SetAtmosWharef(algorithm["Wharef"]);
+    }
+    else {
       p_atmosWharef = p_atmosWha;
     }
 
-    if (algorithm.HasKeyword("Hga")) {
-      SetAtmosHga( algorithm["Hga"] );
+    if(algorithm.HasKeyword("Hga")) {
+      SetAtmosHga(algorithm["Hga"]);
     }
     p_atmosHgasave = p_atmosHga;
 
-    if (algorithm.HasKeyword("Hgaref")) {
-      SetAtmosHgaref( algorithm["Hgaref"] );
-    } else {
+    if(algorithm.HasKeyword("Hgaref")) {
+      SetAtmosHgaref(algorithm["Hgaref"]);
+    }
+    else {
       p_atmosHgaref = p_atmosHga;
     }
 
-    if (algorithm.HasKeyword("Bha")) {
-      SetAtmosBha( algorithm["Bha"] );
+    if(algorithm.HasKeyword("Bha")) {
+      SetAtmosBha(algorithm["Bha"]);
     }
     p_atmosBhasave = p_atmosBha;
 
-    if (algorithm.HasKeyword("Bharef")) {
-      SetAtmosBharef( algorithm["Bharef"] );
-    } else {
+    if(algorithm.HasKeyword("Bharef")) {
+      SetAtmosBharef(algorithm["Bharef"]);
+    }
+    else {
       p_atmosBharef = p_atmosBha;
     }
 
-    if (algorithm.HasKeyword("Inc")) {
-      SetAtmosInc( algorithm["Inc"] );
+    if(algorithm.HasKeyword("Inc")) {
+      SetAtmosInc(algorithm["Inc"]);
     }
 
-    if (algorithm.HasKeyword("Phi")) {
-      SetAtmosPhi( algorithm["Phi"] );
+    if(algorithm.HasKeyword("Phi")) {
+      SetAtmosPhi(algorithm["Phi"]);
     }
   }
 
@@ -127,17 +130,17 @@ namespace Isis {
   /**
    * Perform Chandra and Van de Hulst's series approximation
    * for the g'11 function needed in second order scattering
-   * theory. 
+   * theory.
    *
-   * @param tau  normal optical depth of atmosphere 
-   * @returns @b double Value of the g'11 function evaluated 
+   * @param tau  normal optical depth of atmosphere
+   * @returns @b double Value of the g'11 function evaluated
    *        at the given @b tau
-   * @internal 
-   *   @history 1998-12-21 Randy Kirk, USGS - Flagstaff - Original 
+   * @internal
+   *   @history 1998-12-21 Randy Kirk, USGS - Flagstaff - Original
    *            code in Isis2 pht_am_functions
-   *   @history 1999-03-12 K Teal Thompson - Port to Unix/ISIS; 
+   *   @history 1999-03-12 K Teal Thompson - Port to Unix/ISIS;
    *            declare vars; c	add implicit none.
-   *   @history 2007-02-20 Janet Barrett - Imported from Isis2 to 
+   *   @history 2007-02-20 Janet Barrett - Imported from Isis2 to
    *            Isis3 in NumericalMethods class.
    *   @history 2008-11-05 Jeannie Walldren - Moved this method from
    *           NumericalMethods class.
@@ -162,66 +165,66 @@ namespace Isis {
     icnt = 1;
     fac = -tau;
     term = fac;
-    while (fabs(term) > fabs(sum)*tol) {
+    while(fabs(term) > fabs(sum)*tol) {
       sum = sum + term;
       icnt = icnt + 1;
       fi = (double) icnt;
       fac = fac * (-tau) / fi;
       term = fac / (fi * fi);
     }
-    elog = log(MAX(1.0e-30,tau)) + eulgam;
+    elog = log(MAX(1.0e-30, tau)) + eulgam;
     e1_2 = sum + PI * PI / 12.0 + 0.5 *
-        pow(elog,2.0);
-    result = 2.0 * (AtmosModel::En(1,tau) 
-                    + elog * AtmosModel::En(2,tau) 
+           pow(elog, 2.0);
+    result = 2.0 * (AtmosModel::En(1, tau)
+                    + elog * AtmosModel::En(2, tau)
                     - tau * e1_2);
     return(result);
-  } 
+  }
 
   /**
-   * This routine computes the exponential integral, 
-   * @a Ei(x). This is defined as 
-   * @f[ 
+   * This routine computes the exponential integral,
+   * @a Ei(x). This is defined as
+   * @f[
    *    Ei(x) = - \int_{-x}^{\infty}
    *    \frac{e^{-t}}{t}\mathrm{d}t
    *    = \int_{-\infty}^{x}
    *    \frac{e^{t}}{t}\mathrm{d}t
-   * @f] 
-   * for @a x > 0. 
-   *  
+   * @f]
+   * for @a x > 0.
+   *
    * For small @a x, this method uses the power series,
-   * @f[ 
+   * @f[
    *    Ei(x) = \gamma + \ln x + \frac{x}{1*1!} + \frac{x^2}{2*2!}
    *    + ...
-   * @f] where @f$ \gamma = 0.5772156649... @f$ is Euler's 
-   * constant, and for large @a x, the asymptotic series is 
-   * used, 
-   * @f[ 
+   * @f] where @f$ \gamma = 0.5772156649... @f$ is Euler's
+   * constant, and for large @a x, the asymptotic series is
+   * used,
+   * @f[
    *    Ei(x) \sim \frac{e^x}{x} (1 + \frac{1!}{x} +
    *    \frac{2!}{x^2} + ...)
-   * @f] 
-   * 
-   * @see mathworld.wolfram.com/ExponentialIntegral.html 
+   * @f]
+   *
+   * @see mathworld.wolfram.com/ExponentialIntegral.html
 
-   * @param x  Value at which the exponential integral will be 
+   * @param x  Value at which the exponential integral will be
    *           computed, @a x > 0.0
    * @returns @b double The exponential integral for the given
    *        @a x.
-   * @throws Isis::iException::Programmer "Invalid arguments. 
+   * @throws Isis::iException::Programmer "Invalid arguments.
    *             Definition requires x > 0.0."
-   * @throws Isis::iException::Math "Power series failed to 
+   * @throws Isis::iException::Math "Power series failed to
    *             converge"
-   * @internal 
-   *   @history 1999-08-11 K Teal Thompson - Original 
+   * @internal
+   *   @history 1999-08-11 K Teal Thompson - Original
    *               version named pht_r8ei in Isis2.
-   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 in 
+   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 in
    *            NumericalMethods class named r8ei().
-    *  @history 2008-11-05 Jeannie Walldren - Renamed and modified 
+    *  @history 2008-11-05 Jeannie Walldren - Renamed and modified
     *           input parameters.  Added documentation.
    */
-  double AtmosModel::Ei (double x) throw (iException &){
+  double AtmosModel::Ei(double x) throw(iException &) {
     //static double r8ei(double x) in original NumericalMethods class
-    // This method was derived from an algorithm in the text 
+    // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
     // Section 6.3 by Flannery, Press, Teukolsky, and Vetterling
     double result;
@@ -229,53 +232,53 @@ namespace Isis {
     double euler; // Euler's constant, lower-case gamma
     double epsilon;   // desired relative error (tolerance)
     int maxit;    // maximum number of iterations allowed
-    double sum,fact,term,prev;
+    double sum, fact, term, prev;
 
     fpmin = 1.0e-30;
     maxit = 100;
     epsilon = 6.0e-8;
     euler = 0.57721566;
 
-    if (x <= 0.0) {
+    if(x <= 0.0) {
       throw iException::Message(iException::Programmer,
                                 "AtmosModel::Ei() - Invalid argument. Definition requires x > 0.0. Entered x = "
                                 + iString(x),
                                 _FILEINFO_);
     }
-    if (x < fpmin) { //special case: avoid failure of convergence test because underflow
+    if(x < fpmin) {  //special case: avoid failure of convergence test because underflow
       result = log(x) + euler;
-    } 
-    else if (x <= -log(epsilon)) { //Use power series
+    }
+    else if(x <= -log(epsilon)) {  //Use power series
       sum = 0.0;
       fact = 1.0;
-      for (int k=1; k<=maxit; k++) {
+      for(int k = 1; k <= maxit; k++) {
         fact = fact * x / k;
         term = fact / k;
         sum = sum + term;
-        if (term < epsilon*sum) {
+        if(term < epsilon * sum) {
           result = sum + log(x) + euler;
           return(result);
         }
       }
       throw iException::Message(iException::Math,
-                                "AtmosModel::Ei() - Power series failed to converge in " 
+                                "AtmosModel::Ei() - Power series failed to converge in "
                                 + iString(maxit) + " iterations. Unable to calculate exponential integral.",
                                 _FILEINFO_);
-    } 
+    }
     else { // Use asymptotic series
       sum = 0.0;
       term = 1.0;
-      for (int k=1; k<=maxit; k++) {
+      for(int k = 1; k <= maxit; k++) {
         prev = term;
         term = term * k / x;
-        if (term < epsilon) {
+        if(term < epsilon) {
           result = exp(x) * (1.0 + sum) / x;
           return(result);
-        } 
+        }
         else {
-          if (term < prev) { // still converging: add new term
+          if(term < prev) {  // still converging: add new term
             sum = sum + term;
-          } 
+          }
           else { // diverging: subtract previous term and exit
             sum = sum - prev;
             result = exp(x) * (1.0 + sum) / x;
@@ -288,93 +291,93 @@ namespace Isis {
     return(result);
   }
 
-  /** 
-   * This routine evaluates the generalized exponential integral, 
-   * @a E<sub>n</sub>(x). This is defined as 
-   * @f[ 
+  /**
+   * This routine evaluates the generalized exponential integral,
+   * @a E<sub>n</sub>(x). This is defined as
+   * @f[
    *    E_n(x) = \int_{1}^{\infty} \frac{e^{-xt}}{t^n}\mathrm{d}t
    *       \mathrm{ for } x \in \mathbb{R }, n \in \mathbb{Z }
    *           \mathrm{such that } x \ge 0.0, n \ge 0
-   * @f] 
-   * Notice that if @a x = 0, then the equation is not defined 
-   * for @a n = 0 or @a n = 1, as these will result in @f$ 
-   * E_n(x) = \infty @f$. 
-   *  
+   * @f]
+   * Notice that if @a x = 0, then the equation is not defined
+   * for @a n = 0 or @a n = 1, as these will result in @f$
+   * E_n(x) = \infty @f$.
+   *
    * This method uses the following for cases:
    * <UL>
-   *   <LI>For n > 1 and x = 0.0, 
-   *   @f[ 
+   *   <LI>For n > 1 and x = 0.0,
+   *   @f[
    *      E_n(0) = \frac{1}{n-1}
-   *   @f] 
-   *    
+   *   @f]
+   *
    *   <LI>For n = 0 and x > 0.0,
-   *   @f[ 
+   *   @f[
    *      E_0(x) = \frac{e^{-x}}{x}
-   *   @f] 
-   *    
+   *   @f]
+   *
    *   <LI>For @f$ x >\sim 1.0 @f$, Lentz's continued fraction
    *   algorithm is used,
-   *   @f[ 
+   *   @f[
    *      E_n(x) = e^{-x}(\frac{1}{x + n - \frac{1*n}{x + n + 2 -
    *      \frac{2(n+1)}{x + n + 4 - ...}}})
-   *   @f] 
-   *    
+   *   @f]
+   *
    *   <LI>For @f$ 0.0 < x <\sim 1.0 @f$, series representation is
    *   used,
-   *   @f[ 
+   *   @f[
    *      E_n(x) = \frac{(-x)^{n-1}}{(n-1)!}[- \ln x + \psi (n)] -
    *      \sum_{m=0, m \neq n-1}^{\infty}\frac{(-x)^m}{(m-n+1)m!}
-   *   @f] where @f$ \psi (1) = \gamma @f$ and @f$ \psi (n) = - 
+   *   @f] where @f$ \psi (1) = \gamma @f$ and @f$ \psi (n) = -
    *   \gamma + \sum_{m=1}^{n-1} \frac{1}{m}@f$ and @f$ \gamma =
-   *   0.5772156649... @f$ is Euler's constant. 
+   *   0.5772156649... @f$ is Euler's constant.
    * </UL>
-   *  
-   * The parameter @a n is of type @b unsigned @b int since @a n 
-   * cannot be negative. 
-   *  
-   * The routine allows fast evaluation of 
-   * @a E<sub>n</sub>(x) to any accuracy, @f$\epsilon@f$, 
-   * within the reach of your machine's word length for 
-   * floating-point numbers. The only modification required for 
-   * increased accuracy is to supply Euler's constant with enough 
-   * significant digits. 
-   *  
-   * @see mathworld.wolfram.com/En-Function.html 
-   *  
-   * @param n  Integer value at which the exponential integral 
+   *
+   * The parameter @a n is of type @b unsigned @b int since @a n
+   * cannot be negative.
+   *
+   * The routine allows fast evaluation of
+   * @a E<sub>n</sub>(x) to any accuracy, @f$\epsilon@f$,
+   * within the reach of your machine's word length for
+   * floating-point numbers. The only modification required for
+   * increased accuracy is to supply Euler's constant with enough
+   * significant digits.
+   *
+   * @see mathworld.wolfram.com/En-Function.html
+   *
+   * @param n  Integer value at which the exponential integral
    *           will be evaluated (n >= 0)
-   * @param x  The exponential integral En(x) will be evaluated 
-   * @returns @b double Value of the exponential integral for 
+   * @param x  The exponential integral En(x) will be evaluated
+   * @returns @b double Value of the exponential integral for
    *        the give n and x.
-   * @throws Isis::iException::Programmer "Invalid arguments. 
+   * @throws Isis::iException::Programmer "Invalid arguments.
    *             Definition requires (x > 0.0 and n >=0 ) or (x >=
    *             0.0 and n > 1)."
-   * @throws Isis::iException::Math "Continued fraction failed to 
+   * @throws Isis::iException::Math "Continued fraction failed to
    *             converge"
-   * @throws Isis::iException::Math "Series representation failed to converge" 
-   * @internal 
-   *   @history 1999-08-10 K Teal Thompson - Original version in 
+   * @throws Isis::iException::Math "Series representation failed to converge"
+   * @internal
+   *   @history 1999-08-10 K Teal Thompson - Original version in
    *            named pht_r8expint Isis2.
-   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 in 
+   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 in
    *            NumericalMethods class named r8expint().
-   *   @history 2008-11-05 Jeannie Walldren - Renamed and modified 
+   *   @history 2008-11-05 Jeannie Walldren - Renamed and modified
    *            input parameters.  Added documentation.
    */
-  double AtmosModel::En (unsigned int n, double x) throw (iException &){
+  double AtmosModel::En(unsigned int n, double x) throw(iException &) {
     //static double r8expint(int n, double x) in original NumericalMethods class
-    // This method was derived from an algorithm in the text 
+    // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
     // Section 6.3 by Flannery, Press, Teukolsky, and Vetterling
     int nm1;
     double result;
-    double a,b,c,d,h;
+    double a, b, c, d, h;
     double delta;
     double fact;
     double psi;
-    double fpmin;  // close to smallest representable floating-point number 
-    double maxit;  // maximum number of iterations allowed                  
-    double epsilon;    // desired relative error (tolerance)                    
-    double euler;  // Euler's constant, gamma                               
+    double fpmin;  // close to smallest representable floating-point number
+    double maxit;  // maximum number of iterations allowed
+    double epsilon;    // desired relative error (tolerance)
+    double euler;  // Euler's constant, gamma
 
     fpmin = 1.0e-30;
     maxit = 100;
@@ -382,63 +385,63 @@ namespace Isis {
     euler = 0.5772156649;
 
     nm1 = n - 1;
-    if (n < 0 || x < 0.0 || (x == 0.0 && (n == 0 || n == 1))) {
+    if(n < 0 || x < 0.0 || (x == 0.0 && (n == 0 || n == 1))) {
       iString msg = "AtmosModel::En() - Invalid arguments. ";
-        msg+= "Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). ";
-        msg+= "Entered x = " + iString(x) + " and n = " + iString((int) n);
-      throw iException::Message(iException::Programmer,msg,
+      msg += "Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). ";
+      msg += "Entered x = " + iString(x) + " and n = " + iString((int) n);
+      throw iException::Message(iException::Programmer, msg,
                                 _FILEINFO_);
-    } 
-    else if (n == 0) { // special case, this implies x > 0 by logic above
+    }
+    else if(n == 0) {  // special case, this implies x > 0 by logic above
       result = exp(-x) / x;
-    } 
-    else if (x == 0.0) { // special case, this implies n > 1
+    }
+    else if(x == 0.0) {  // special case, this implies n > 1
       result = 1.0 / nm1;
-    } 
-    else if (x > 1.0) { // Lentz's algorithm, this implies n > 0
+    }
+    else if(x > 1.0) {  // Lentz's algorithm, this implies n > 0
       b = x + n;
       c = 1.0 / fpmin;
       d = 1.0 / b;
       h = d;
-      for (int i=1; i<=maxit; i++) {
+      for(int i = 1; i <= maxit; i++) {
         a = -i * (nm1 + i);
         b = b + 2.0;
         d = 1.0 / (a * d + b);
         c = b + a / c;
         delta = c * d;
         h = h * delta;
-        if (fabs(delta-1.0) < epsilon) {
+        if(fabs(delta - 1.0) < epsilon) {
           result = h * exp(-x);
           return(result);
         }
       }
       throw iException::Message(iException::Math,
                                 "AtmosModel::En() - Continued fraction failed to converge in "
-                                + iString(maxit) + " iterations. Unable to calculate exponential integral.", 
+                                + iString(maxit) + " iterations. Unable to calculate exponential integral.",
                                 _FILEINFO_);
-    } 
+    }
     else { // evaluate series
-      if (nm1 != 0) {
+      if(nm1 != 0) {
         result = 1.0 / nm1;
-      } 
+      }
       else {
         result = -log(x) - euler;
       }
       fact = 1.0;
-      for (int i=1; i<=maxit; i++) {
+      for(int i = 1; i <= maxit; i++) {
         fact = -fact * x / i;
-        if (i != nm1) {
+        if(i != nm1) {
           delta = -fact / (i - nm1);
-        } 
+        }
         else {
           psi = -euler;
-          for (int ii=1; ii<=nm1; ii++) {
+          for(int ii = 1; ii <= nm1; ii++) {
             psi = psi + 1.0 / ii;
           }
           delta = fact * (-log(x) + psi);
         }
         result = result + delta;
-        if (fabs(delta) < fabs(result)*epsilon) {
+        if(fabs(delta) < fabs(result)*epsilon) {
           return(result);
         }
       }
@@ -451,23 +454,23 @@ namespace Isis {
   }
 
   /**
-   * Calculate the atmospheric scattering effect using photometric angle 
+   * Calculate the atmospheric scattering effect using photometric angle
    * information
-   * 
+   *
    * @param pha  phase angle
    * @param inc  incidence angle
    * @param ema  emission angle
-   * @param pstd pure atmospheric-scattering term 
-   * @param trans transmission of surface reflected light through 
+   * @param pstd pure atmospheric-scattering term
+   * @param trans transmission of surface reflected light through
    *              the atmosphere overall
    * @param trans0 transmission of surface reflected light
    *        through the atmosphere with no scatterings in the
    *        atmosphere
    * @param sbar illumination of the ground by the sky
-   * @throw Isis::iException::User "Invalid photometric angles" 
+   * @throw Isis::iException::User "Invalid photometric angles"
    */
-  void AtmosModel::CalcAtmEffect(double pha, double inc, double ema, 
-        double *pstd, double *trans, double *trans0, double *sbar) {
+  void AtmosModel::CalcAtmEffect(double pha, double inc, double ema,
+                                 double *pstd, double *trans, double *trans0, double *sbar) {
 
     // Check validity of photometric angles
     //if (pha > 180.0 || inc > 90.0 || ema > 90.0 || pha < 0.0 ||
@@ -477,19 +480,19 @@ namespace Isis {
     //}
 
     // Apply atmospheric function
-    AtmosModelAlgorithm(pha,inc,ema);
+    AtmosModelAlgorithm(pha, inc, ema);
     *pstd = p_pstd;
     *trans = p_trans;
     *trans0 = p_trans0;
     *sbar = p_sbar;
   }
 
-  /** 
+  /**
    * Used to calculate atmosphere at standard conditions
    */
   void AtmosModel::SetStandardConditions(bool standard) {
     p_standardConditions = standard;
-    if (p_standardConditions) {
+    if(p_standardConditions) {
       p_atmosBhasave = p_atmosBha;
       p_atmosBha = p_atmosBharef;
       p_atmosHgasave = p_atmosHga;
@@ -498,7 +501,8 @@ namespace Isis {
       p_atmosTau = p_atmosTauref;
       p_atmosWhasave = p_atmosWha;
       p_atmosWha = p_atmosWharef;
-    } else {
+    }
+    else {
       p_atmosBha = p_atmosBhasave;
       p_atmosHga = p_atmosHgasave;
       p_atmosTau = p_atmosTausave;
@@ -506,39 +510,39 @@ namespace Isis {
     }
   }
 
-  /** 
-   * This method computes the values of the atmospheric Ah 
-   * table and sets the properties of the atmospheric Ah spline. 
-   * It obtains the hemispheric albedo by integrating the 
-   * photometric function times mu over mu = 0 to 1 and then over 
-   * phi = 0 to 2*pi to calculate the hemispheric reflectance Ah 
-   * needed for the photometric model with atmosphere. The 
-   * Trapezoid rule is applied to the table of Ah to obtain 
+  /**
+   * This method computes the values of the atmospheric Ah
+   * table and sets the properties of the atmospheric Ah spline.
+   * It obtains the hemispheric albedo by integrating the
+   * photometric function times mu over mu = 0 to 1 and then over
+   * phi = 0 to 2*pi to calculate the hemispheric reflectance Ah
+   * needed for the photometric model with atmosphere. The
+   * Trapezoid rule is applied to the table of Ah to obtain
    * bihemispheric albedo Ab. The parameter @a p_atmosAtmSwitch is
-   * set to 0 to integrate Ah. 
-   *  
-   * @internal 
-   *   @history 1998-12-21 Randy Kirk - USGS, Flagstaff - Original 
+   * set to 0 to integrate Ah.
+   *
+   * @internal
+   *   @history 1998-12-21 Randy Kirk - USGS, Flagstaff - Original
    *            specs
    *   @history 1999-01-15 K Teal Thompson - Original code
-   *   @history 2000-12-29 Randy Kirk - Modified /hide_inc/ so phi 
+   *   @history 2000-12-29 Randy Kirk - Modified /hide_inc/ so phi
    *            gets passed, etc. moved factors to outside
    *            integration
-   *   @history 2006-05-30 Randy Kirk - Added code to report the 
+   *   @history 2006-05-30 Randy Kirk - Added code to report the
    *            directional hemispheric albedo that relates to
    *            thermal balance for simulating Themis images
-   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 from 
+   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 from
    *            Isis2 pht_get_ah_table
    *   @history 2008-11-05 Jeannie Walldren - Modified references to
    *            NumericalMethods and replaced r8qromb() with
    *            NumericalAtmosApprox::RombergsMethod().  Changed
    *            name from PhtGetAhTable().
    */
-  void AtmosModel::GenerateAhTable() { 
+  void AtmosModel::GenerateAhTable() {
     int inccnt;     //for loop incidence angle count, 1:ninc
     double fun_temp;//temporary variable for integral
     double factor;  //factor for integration: 1 except at ends of interval where it's 1/2
-    double yp1,yp2; //first derivatives of first and last x values of @a p_atmosIncTable
+    double yp1, yp2; //first derivatives of first and last x values of @a p_atmosIncTable
 
     NumericalAtmosApprox::IntegFunc sub;
     sub = NumericalAtmosApprox::OuterFunction;
@@ -548,43 +552,43 @@ namespace Isis {
     //Create NumericalAtmosApprox object here for RombergsMethod used in for loop
     NumericalAtmosApprox qromb;
 
-    for (inccnt=0; inccnt<p_atmosNinc; inccnt++) {
+    for(inccnt = 0; inccnt < p_atmosNinc; inccnt++) {
       p_atmosInc = (double) inccnt;
       p_atmosIncTable[inccnt] = p_atmosInc;
-      p_atmosMunot = cos((PI/180.0)*p_atmosInc);
-      p_atmosSini = sin((PI/180.0)*p_atmosInc);
+      p_atmosMunot = cos((PI / 180.0) * p_atmosInc);
+      p_atmosSini = sin((PI / 180.0) * p_atmosInc);
 
       iString phtName = p_atmosPM->AlgorithmName();
       phtName.UpCase();
-      if (p_atmosInc == 90.0) {
+      if(p_atmosInc == 90.0) {
         p_atmosAhTable[inccnt] = 0.0;
       }
-      else if (phtName == "LAMBERT") {
+      else if(phtName == "LAMBERT") {
         p_atmosAhTable[inccnt] = 1.0;
       }
-      else if (phtName == "LOMMELSEELIGER") {
-        p_atmosAhTable[inccnt] = 2.0 * log((1.0/p_atmosMunot)/p_atmosMunot);
+      else if(phtName == "LOMMELSEELIGER") {
+        p_atmosAhTable[inccnt] = 2.0 * log((1.0 / p_atmosMunot) / p_atmosMunot);
       }
-      else if (phtName == "MINNAERT") {
-        p_atmosAhTable[inccnt] = (pow(p_atmosMunot,((Minnaert*)p_atmosPM)->PhotoK()))/((Minnaert*)p_atmosPM)->PhotoK();
+      else if(phtName == "MINNAERT") {
+        p_atmosAhTable[inccnt] = (pow(p_atmosMunot, ((Minnaert *)p_atmosPM)->PhotoK())) / ((Minnaert *)p_atmosPM)->PhotoK();
       }
-      else if (phtName == "LUNARLAMBERT") {
-        p_atmosAhTable[inccnt] = 2.0 * ((LunarLambert*)p_atmosPM)->PhotoL() * 
-                                 log((1.0+p_atmosMunot)/p_atmosMunot) + 1.0 - 
-                                 ((LunarLambert*)p_atmosPM)->PhotoL();
+      else if(phtName == "LUNARLAMBERT") {
+        p_atmosAhTable[inccnt] = 2.0 * ((LunarLambert *)p_atmosPM)->PhotoL() *
+                                 log((1.0 + p_atmosMunot) / p_atmosMunot) + 1.0 -
+                                 ((LunarLambert *)p_atmosPM)->PhotoL();
       }
       else {
-        // numerically integrate the other photometric models    
-        // outer integral is over phi from 0 to pi rad = 180 deg 
+        // numerically integrate the other photometric models
+        // outer integral is over phi from 0 to pi rad = 180 deg
         p_atmosAtmSwitch = 0;
         // integrate AtmosModel function from 0 to 180
-        fun_temp = qromb.RombergsMethod(this,sub,0,180);
+        fun_temp = qromb.RombergsMethod(this, sub, 0, 180);
         // the correct normalization with phi in degrees is:
-        p_atmosAhTable[inccnt] = fun_temp / (90.0*p_atmosMunot);
+        p_atmosAhTable[inccnt] = fun_temp / (90.0 * p_atmosMunot);
       }
       // Let's get our estimate of Ab by integrating (summing)
-      // A (i)sinicosi over our A  table                      
-      if ((inccnt == 0) || (inccnt == p_atmosNinc-1)) {
+      // A (i)sinicosi over our A  table
+      if((inccnt == 0) || (inccnt == p_atmosNinc - 1)) {
         factor = 0.5;
       }
       else {
@@ -594,7 +598,7 @@ namespace Isis {
       p_atmosAb = p_atmosAb + p_atmosAhTable[inccnt] * p_atmosMunot * p_atmosSini * factor;
     }
 
-    factor = 2.0 * PI/180.0;
+    factor = 2.0 * PI / 180.0;
     p_atmosAb = p_atmosAb * factor;
 
     // set up clamped cubic spline
@@ -602,44 +606,44 @@ namespace Isis {
     yp2 = 1.0e30;
     p_atmosAhSpline.Reset();
     p_atmosAhSpline.SetInterpType(NumericalApproximation::CubicClamped);
-    p_atmosAhSpline.AddData(p_atmosIncTable,p_atmosAhTable);
-    p_atmosAhSpline.SetCubicClampedEndptDeriv(yp1,yp2);
+    p_atmosAhSpline.AddData(p_atmosIncTable, p_atmosAhTable);
+    p_atmosAhSpline.SetCubicClampedEndptDeriv(yp1, yp2);
   }
 
   /**
-   * This method computes the values of the atmospheric Hahg and 
-   * Hahg0 tables and sets the properties of the atmospheric Hahg 
-   * and Hahg0 splines. It integrates functions involving the 
-   * single particle phase function (assumed to be Hapke 
-   * Henyey-Greenstein) over mu = 0 to 1 and then over phi = 0 to 
-   * 2*pi to calculate the corrections needed for the anisotropic 
-   * photometric model with atmosphere. The Trapezoid rule is 
-   * applied to the table of Ah to obtain bihemispheric albedo Ab. 
-   * The parameter @a p_atmosAtmSwitch is set to 1, 2, 3 to 
-   * evaluate the 3 required integrals. 
-   *  
-   * @internal 
-   *   @history 1998-12-21 Randy Kirk - USGS, Flagstaff - Original 
+   * This method computes the values of the atmospheric Hahg and
+   * Hahg0 tables and sets the properties of the atmospheric Hahg
+   * and Hahg0 splines. It integrates functions involving the
+   * single particle phase function (assumed to be Hapke
+   * Henyey-Greenstein) over mu = 0 to 1 and then over phi = 0 to
+   * 2*pi to calculate the corrections needed for the anisotropic
+   * photometric model with atmosphere. The Trapezoid rule is
+   * applied to the table of Ah to obtain bihemispheric albedo Ab.
+   * The parameter @a p_atmosAtmSwitch is set to 1, 2, 3 to
+   * evaluate the 3 required integrals.
+   *
+   * @internal
+   *   @history 1998-12-21 Randy Kirk - USGS, Flagstaff - Original
    *            specs
    *   @history 1999-01-15 K Teal Thompson - Original code
-   *   @history 2006-07-07 Randy Kirk - Modify get_ah_table to get 
+   *   @history 2006-07-07 Randy Kirk - Modify get_ah_table to get
    *            other integrals
-   *   @history 2000-12-29 Randy Kirk - Modified /hide_inc/ so phi 
+   *   @history 2000-12-29 Randy Kirk - Modified /hide_inc/ so phi
    *            gets passed, etc. moved factors to outside
    *            integration
-   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 from 
+   *   @history 2007-02-20 Janet Barrett - Imported to Isis3 from
    *            Isis2 pht_get_ah_table
    *   @history 2008-11-05 Jeannie Walldren - Modified references to
    *            NumericalMethods and replaced r8qromb() with
    *            NumericalAtmosApprox::RombergsMethod(). Changed
-   *            name from GetHahgTables(). 
+   *            name from GetHahgTables().
    */
-  void AtmosModel::GenerateHahgTables() { 
+  void AtmosModel::GenerateHahgTables() {
     int inccnt;         // for loop incidence angle count,1:ninc
     double fun_temp;    // temporary variable for integral
     double hahgsb_temp; // save increment to hahgsb
     double factor;      // factor for integration: 1 except at ends of interval where it's 1/2
-    double yp1,yp2;     // derivatives of endpoints of data set
+    double yp1, yp2;    // derivatives of endpoints of data set
 
     NumericalAtmosApprox::IntegFunc sub;
     sub = NumericalAtmosApprox::OuterFunction;
@@ -647,25 +651,25 @@ namespace Isis {
     p_atmosHahgsb = 0.0;
     NumericalAtmosApprox qromb;
 
-    for (inccnt = 0; inccnt < p_atmosNinc; inccnt++) {
+    for(inccnt = 0; inccnt < p_atmosNinc; inccnt++) {
       p_atmosInc = (double) inccnt;
       p_atmosIncTable[inccnt] = p_atmosInc;
-      p_atmosMunot = cos((PI/180.0)*p_atmosInc);
-      p_atmosSini = sin((PI/180.0)*p_atmosInc);
+      p_atmosMunot = cos((PI / 180.0) * p_atmosInc);
+      p_atmosSini = sin((PI / 180.0) * p_atmosInc);
 
       p_atmosAtmSwitch = 1;
 
       qromb.Reset();
-      fun_temp = qromb.RombergsMethod(this,sub,0,180);
+      fun_temp = qromb.RombergsMethod(this, sub, 0, 180);
 
       p_atmosHahgtTable[inccnt] = fun_temp * AtmosWha() / 360.0;
       p_atmosAtmSwitch = 2;
 
-      fun_temp = qromb.RombergsMethod(this,sub,0,180);
+      fun_temp = qromb.RombergsMethod(this, sub, 0, 180);
 
       hahgsb_temp = fun_temp * AtmosWha() / 360.0;
 
-      if ((inccnt == 0) || (inccnt == p_atmosNinc-1)) {
+      if((inccnt == 0) || (inccnt == p_atmosNinc - 1)) {
         factor = 0.5;
       }
       else {
@@ -673,17 +677,17 @@ namespace Isis {
       }
 
       p_atmosHahgsb = p_atmosHahgsb + p_atmosSini * factor * hahgsb_temp;
-      if (p_atmosInc == 0.0) {
+      if(p_atmosInc == 0.0) {
         p_atmosHahgt0Table[inccnt] = 0.0;
       }
       else {
         p_atmosAtmSwitch = 3;
-        fun_temp = qromb.RombergsMethod(this,sub,0,180);
+        fun_temp = qromb.RombergsMethod(this, sub, 0, 180);
         p_atmosHahgt0Table[inccnt] = fun_temp * AtmosWha() * p_atmosMunot / (360.0 * p_atmosSini);
       }
     }
 
-    factor = 2.0 * PI/180.0;
+    factor = 2.0 * PI / 180.0;
     p_atmosHahgsb = p_atmosHahgsb * factor;
 
     // set up clamped cubic splines
@@ -691,30 +695,30 @@ namespace Isis {
     yp2 = 1.0e30;
     p_atmosHahgtSpline.Reset();
     p_atmosHahgtSpline.SetInterpType(NumericalApproximation::CubicClamped);
-    p_atmosHahgtSpline.AddData(p_atmosIncTable,p_atmosHahgtTable); 
-    p_atmosHahgtSpline.SetCubicClampedEndptDeriv(yp1,yp2);
+    p_atmosHahgtSpline.AddData(p_atmosIncTable, p_atmosHahgtTable);
+    p_atmosHahgtSpline.SetCubicClampedEndptDeriv(yp1, yp2);
 
     p_atmosHahgt0Spline.Reset();
     p_atmosHahgt0Spline.SetInterpType(NumericalApproximation::CubicClamped);
-    p_atmosHahgt0Spline.AddData(p_atmosIncTable,p_atmosHahgt0Table);
-    p_atmosHahgt0Spline.SetCubicClampedEndptDeriv(yp1,yp2);
+    p_atmosHahgt0Spline.AddData(p_atmosIncTable, p_atmosHahgt0Table);
+    p_atmosHahgt0Spline.SetCubicClampedEndptDeriv(yp1, yp2);
   }
 
-    /**
-   * Set the switch that controls the function that will be 
-   * integrated. This method is only used for testing the 
-   * methods in this class. This parameter is limited to the 
-   * values 0, 1, 2, and 3.
-   *
-   * @param atmswitch  Internal atmospheric function parameter,
-   *                   there is no default
-   * @throw Isis::iException::User "Invalid value of atmospheric 
-   *        atmswitch"
-   */
-  void AtmosModel::SetAtmosAtmSwitch (const int atmswitch) {
-    if (atmswitch < 0 || atmswitch > 3) {
+  /**
+  * Set the switch that controls the function that will be
+  * integrated. This method is only used for testing the
+  * methods in this class. This parameter is limited to the
+  * values 0, 1, 2, and 3.
+  *
+  * @param atmswitch  Internal atmospheric function parameter,
+  *                   there is no default
+  * @throw Isis::iException::User "Invalid value of atmospheric
+  *        atmswitch"
+  */
+  void AtmosModel::SetAtmosAtmSwitch(const int atmswitch) {
+    if(atmswitch < 0 || atmswitch > 3) {
       string msg = "Invalid value of atmospheric atmswitch [" + iString(atmswitch) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosAtmSwitch = atmswitch;
@@ -728,14 +732,14 @@ namespace Isis {
    *
    * @param bha  Anisotropic atmospheric function parameter,
    *             default is 0.85
-   * @throw Isis::iException::User "Invalid value of atmospheric 
-   *        bha" 
+   * @throw Isis::iException::User "Invalid value of atmospheric
+   *        bha"
    */
-  void AtmosModel::SetAtmosBha (const double bha) {
-    if (bha < -1.0 || bha > 1.0) {
+  void AtmosModel::SetAtmosBha(const double bha) {
+    if(bha < -1.0 || bha > 1.0) {
       string msg = "Invalid value of Anisotropic atmospheric bha [" +
-                        iString(bha) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+                   iString(bha) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosBha = bha;
@@ -743,19 +747,19 @@ namespace Isis {
 
   /**
    * Set the Atmospheric function parameter. This specifies the
-   * reference value of Bha to which the image will be normalized. 
+   * reference value of Bha to which the image will be normalized.
    * If no value is given, then this parameter defaults to the
    * value provided for Bha. This parameter is limited to values
    * that are >=-1 and <=1.
    *
-   * @param bharef  Atmospheric function parameter, no default 
-   * @throw Isis::iException::User "Invalid value of atmospheric 
-   *        bharef" 
+   * @param bharef  Atmospheric function parameter, no default
+   * @throw Isis::iException::User "Invalid value of atmospheric
+   *        bharef"
    */
-  void AtmosModel::SetAtmosBharef (const double bharef) {
-    if (bharef < -1.0 || bharef > 1.0) {
+  void AtmosModel::SetAtmosBharef(const double bharef) {
+    if(bharef < -1.0 || bharef > 1.0) {
       string msg = "Invalid value of Atmospheric bharef [" + iString(bharef) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosBharef = bharef;
@@ -769,13 +773,13 @@ namespace Isis {
    *
    * @param hga  Hapke atmospheric function parameter,
    *             default is 0.68
-   * @throw Isis::iException::User "Invalid value of atmospheric 
-   *        hga" 
+   * @throw Isis::iException::User "Invalid value of atmospheric
+   *        hga"
    */
-  void AtmosModel::SetAtmosHga (const double hga) {
-    if (hga <= -1.0 || hga >= 1.0) {
+  void AtmosModel::SetAtmosHga(const double hga) {
+    if(hga <= -1.0 || hga >= 1.0) {
       string msg = "Invalid value of Hapke atmospheric hga [" + iString(hga) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosHga = hga;
@@ -783,19 +787,19 @@ namespace Isis {
 
   /**
    * Set the Atmospheric function parameter. This specifies the
-   * reference value of Hga to which the image will be normalized. 
+   * reference value of Hga to which the image will be normalized.
    * If no value is given, then this parameter defaults to the
    * value provided for Hga. This parameter is limited to values
    * that are >-1 and <1.
    *
-   * @param hgaref  Hapke atmospheric function parameter, no default 
-   * @throw Isis::iException::User "Invalid value of atmospheric 
-   *        hgaref" 
+   * @param hgaref  Hapke atmospheric function parameter, no default
+   * @throw Isis::iException::User "Invalid value of atmospheric
+   *        hgaref"
    */
-  void AtmosModel::SetAtmosHgaref (const double hgaref) {
-    if (hgaref <= -1.0 || hgaref >= 1.0) {
+  void AtmosModel::SetAtmosHgaref(const double hgaref) {
+    if(hgaref <= -1.0 || hgaref >= 1.0) {
       string msg = "Invalid value of Atmospheric hgaref [" + iString(hgaref) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosHgaref = hgaref;
@@ -808,18 +812,18 @@ namespace Isis {
    *
    * @param inc  Internal atmospheric function parameter,
    *             there is no default
-   * @throw Isis::iException::User "Invalid value of atmospheric 
+   * @throw Isis::iException::User "Invalid value of atmospheric
    *        inc"
    */
-  void AtmosModel::SetAtmosInc (const double inc) {
-    if (inc < 0.0 || inc > 90.0) {
+  void AtmosModel::SetAtmosInc(const double inc) {
+    if(inc < 0.0 || inc > 90.0) {
       string msg = "Invalid value of atmospheric inc [" + iString(inc) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosInc = inc;
-    p_atmosMunot = cos(inc*PI/180.0);
-    p_atmosSini = sin(inc*PI/180.0);
+    p_atmosMunot = cos(inc * PI / 180.0);
+    p_atmosSini = sin(inc * PI / 180.0);
   }
 
   /**
@@ -828,21 +832,21 @@ namespace Isis {
    * will be set to NULL. This parameter is limited to values
    * of YES or NO.
    *
-   * @param nulneg  Atmospheric function parameter, default is NO 
-   * @throw Isis::iException::User "Invalid value of atmospheric 
+   * @param nulneg  Atmospheric function parameter, default is NO
+   * @throw Isis::iException::User "Invalid value of atmospheric
    *        nulneg"
-   *  
+   *
    */
-  void AtmosModel::SetAtmosNulneg (const string nulneg) {
+  void AtmosModel::SetAtmosNulneg(const string nulneg) {
     iString temp(nulneg);
     temp = temp.UpCase();
 
-    if (temp != "NO" && temp != "YES") {
+    if(temp != "NO" && temp != "YES") {
       string msg = "Invalid value of Atmospheric nulneg [" + temp + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    SetAtmosNulneg( temp.compare("YES") == 0 );
+    SetAtmosNulneg(temp.compare("YES") == 0);
   }
 
   /**
@@ -852,18 +856,18 @@ namespace Isis {
    *
    * @param phi  Internal atmospheric function parameter,
    *             there is no default
-   * @throw Isis::iException::User "Invalid value of atmospheric 
+   * @throw Isis::iException::User "Invalid value of atmospheric
    *        phi"
-   *  
+   *
    */
-  void AtmosModel::SetAtmosPhi (const double phi) {
-    if (phi < 0.0 || phi > 360.0) {
+  void AtmosModel::SetAtmosPhi(const double phi) {
+    if(phi < 0.0 || phi > 360.0) {
       string msg = "Invalid value of atmospheric phi [" + iString(phi) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosPhi = phi;
-    p_atmosCosphi = cos(phi*PI/180.0);
+    p_atmosCosphi = cos(phi * PI / 180.0);
   }
 
   /**
@@ -871,14 +875,14 @@ namespace Isis {
    * normal optical depth of the atmosphere. This parameter is
    * limited to values that are >=0.
    *
-   * @param tau  Atmospheric function parameter, default is 0.28 
-   * @throw Isis::iException::User "Invalid value of atmospheric 
-   *        tau" 
+   * @param tau  Atmospheric function parameter, default is 0.28
+   * @throw Isis::iException::User "Invalid value of atmospheric
+   *        tau"
    */
-  void AtmosModel::SetAtmosTau (const double tau) {
-    if (tau < 0.0) {
+  void AtmosModel::SetAtmosTau(const double tau) {
+    if(tau < 0.0) {
       string msg = "Invalid value of Atmospheric tau [" + iString(tau) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosTau = tau;
@@ -890,14 +894,14 @@ namespace Isis {
    * will be normalized. This parameter is limited to values that
    * are >=0.
    *
-   * @param tauref  Atmospheric function parameter, default is 0.0 
-   * @throw Isis::iException::User "Invalid value of atmospheric 
-   *        tauref" 
+   * @param tauref  Atmospheric function parameter, default is 0.0
+   * @throw Isis::iException::User "Invalid value of atmospheric
+   *        tauref"
    */
-  void AtmosModel::SetAtmosTauref (const double tauref) {
-    if (tauref < 0.0) {
+  void AtmosModel::SetAtmosTauref(const double tauref) {
+    if(tauref < 0.0) {
       string msg = "Invalid value of Atmospheric tauref [" + iString(tauref) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosTauref = tauref;
@@ -908,15 +912,15 @@ namespace Isis {
    * scattering albedo of atmospheric particles. This parameter
    * is limited to values that are >0 and <=1.
    *
-   * @param wha  Atmospheric function parameter, default is 0.95 
-   * @throw Isis::iException::User "Invalid value of atmospheric 
+   * @param wha  Atmospheric function parameter, default is 0.95
+   * @throw Isis::iException::User "Invalid value of atmospheric
    *        wha"
-   *  
+   *
    */
-  void AtmosModel::SetAtmosWha (const double wha) {
-    if (wha <= 0.0 || wha > 1.0) {
+  void AtmosModel::SetAtmosWha(const double wha) {
+    if(wha <= 0.0 || wha > 1.0) {
       string msg = "Invalid value of Atmospheric wha [" + iString(wha) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosWha = wha;
@@ -928,14 +932,14 @@ namespace Isis {
    * the image will be normalized. This parameter is limited to
    * values that are >0 and <=1.
    *
-   * @param wharef  Atmospheric function parameter, no default 
-   * @throw Isis::iException::User "Invalid value of atmospheric 
+   * @param wharef  Atmospheric function parameter, no default
+   * @throw Isis::iException::User "Invalid value of atmospheric
    *        wharef"
    */
-  void AtmosModel::SetAtmosWharef (const double wharef) {
-    if (wharef <= 0.0 || wharef > 1.0) {
+  void AtmosModel::SetAtmosWharef(const double wharef) {
+    if(wharef <= 0.0 || wharef > 1.0) {
       string msg = "Invalid value of Atmospheric wharef [" + iString(wharef) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_atmosWharef = wharef;

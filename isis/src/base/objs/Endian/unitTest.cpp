@@ -4,12 +4,12 @@
 
 using namespace std;
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   cout << "Unit test for IsisEndian" << endl;
 
-  if (Isis::IsLittleEndian() == true) {
+  if(Isis::IsLittleEndian() == true) {
     cout << Isis::IsLittleEndian() << endl;
     cout << Isis::IsBigEndian() << endl;
   }
@@ -18,7 +18,7 @@ int main (int argc, char *argv[]) {
     cout << Isis::IsLittleEndian() << endl;
   }
 
-  if (Isis::IsLsb() == true) {
+  if(Isis::IsLsb() == true) {
     cout << Isis::IsLsb() << endl;
     cout << Isis::IsMsb() << endl;
   }

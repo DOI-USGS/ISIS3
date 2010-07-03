@@ -34,12 +34,12 @@
 
 namespace Qisis {
   /**
-   * Defines the Error filter for the QnetNavTool's Points 
-   * section.  The user may enter values for Less Than and/or 
+   * Defines the Error filter for the QnetNavTool's Points
+   * section.  The user may enter values for Less Than and/or
    * Greater Than. This class is designed to remove points from
-   * the current filtered list that lie outside of the given 
-   * range. 
-   * 
+   * the current filtered list that lie outside of the given
+   * range.
+   *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
    *                          method to remove new filter points
@@ -50,21 +50,21 @@ namespace Qisis {
    *                          checked.
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null in constructor.
-   *  
-   *                          
+   *
+   *
    */
   class QnetPointErrorFilter : public QnetFilter {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetPointErrorFilter (QWidget *parent=0);
+      QnetPointErrorFilter(QWidget *parent = 0);
       virtual void filter();
 
     public slots:
 
     private:
-      QCheckBox *p_lessThanCB; 
-      QCheckBox *p_greaterThanCB;  
+      QCheckBox *p_lessThanCB;
+      QCheckBox *p_greaterThanCB;
       QLineEdit *p_lessErrorEdit;
       QLineEdit *p_greaterErrorEdit;
 

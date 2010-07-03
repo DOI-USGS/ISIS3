@@ -2,7 +2,7 @@
 
 #include "Pipeline.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void IsisMain() {
@@ -55,7 +55,7 @@ void IsisMain() {
   p.Application("trim").AddConstParameter("TOP", "5");
   p.Application("trim").AddConstParameter("LEFT", "11");
   p.Application("trim").AddConstParameter("RIGHT", "8");
-  
+
   p.Run();
 }
 

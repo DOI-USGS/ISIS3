@@ -117,7 +117,7 @@ void PipeBranched() {
   if(ui.GetBoolean("INGESTION")) {
     p.SetFirstApplication("thm2isis");
   }
-  else{
+  else {
     p.SetFirstApplication("spiceinit");
   }
 
@@ -176,7 +176,7 @@ void PipeSimple() {
   if(ui.GetBoolean("INGESTION")) {
     p.SetFirstApplication("thm2isis");
   }
-  else{
+  else {
     p.SetFirstApplication("spiceinit");
   }
 
@@ -260,7 +260,7 @@ void PipeListed() {
 
   p.Application("appjit").AddConstParameter("MASTER", "MASTER.cub");
   p.Application("appjit").AddConstParameter("DEGREE", "1");
-  
+
   p.AddToPipeline("noproj");
   p.Application("noproj").SetInputParameter("FROM", true);
   p.Application("noproj").AddConstParameter("MATCH", "MATCH.cub");

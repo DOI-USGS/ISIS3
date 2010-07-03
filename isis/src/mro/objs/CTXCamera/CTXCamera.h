@@ -25,9 +25,9 @@ namespace Isis {
      */
     class CTXCamera : public LineScanCamera {
       public:
-        CTXCamera (Isis::Pvl &lab);
+        CTXCamera(Isis::Pvl &lab);
 
-        ~CTXCamera () {};
+        ~CTXCamera() {};
     };
   };
 };

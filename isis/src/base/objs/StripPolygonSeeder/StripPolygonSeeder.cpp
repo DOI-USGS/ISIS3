@@ -1,24 +1,24 @@
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.11 $                                                             
- * $Date: 2010/05/05 21:31:14 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+/**
+ * @file
+ * $Revision: 1.11 $
+ * $Date: 2010/05/05 21:31:14 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
+ *   http://www.usgs.gov/privacy.html.
  */
 
 #include <string>
@@ -35,46 +35,46 @@ namespace Isis {
 
   /**
    * @brief Construct a StripPolygonSeeder algorithm
-   * 
-   * 
-   * @param pvl  A Pvl object that contains a valid polygon point 
+   *
+   *
+   * @param pvl  A Pvl object that contains a valid polygon point
    * seeding definition
    */
-  StripPolygonSeeder::StripPolygonSeeder (Pvl &pvl) : PolygonSeeder(pvl) {
+  StripPolygonSeeder::StripPolygonSeeder(Pvl &pvl) : PolygonSeeder(pvl) {
     Parse(pvl);
   };
 
 
   /**
    * @brief Seed a polygon with points
-   * 
-   * Seed the supplied polygon with points in a staggered pattern. The spacing 
+   *
+   * Seed the supplied polygon with points in a staggered pattern. The spacing
    * is determined by the PVL group "PolygonSeederAlgorithm"
-   * 
+   *
    * @param lonLatPoly The polygon to be seeded with
    *                  points.
-   * 
+   *
    * @return A vector of points which have been
    * seeded into the polygon. The caller assumes responsibility for deleteing
    *  these.
-   * 
+   *
    *  @internal
    *   @history 2007-05-09 Tracie Sucharski Changed a single spacing value
    *                            to a separate value for x and y.
    *   @history 2008-06-18 Steven Lambright Fixed documentation
-   *  
+   *
    */
-  std::vector<geos::geom::Point*> StripPolygonSeeder::Seed(const geos::geom::MultiPolygon *multiPoly) {
+  std::vector<geos::geom::Point *> StripPolygonSeeder::Seed(const geos::geom::MultiPolygon *multiPoly) {
 
     // Storage for the points to be returned
-    std::vector<geos::geom::Point*> points;
+    std::vector<geos::geom::Point *> points;
 
     // Create some things we will need shortly
     const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
     std::string msg = StandardTests(multiPoly, polyBoundBox);
-    if (!msg.empty()) {
+    if(!msg.empty()) {
       return points;
     }
 
@@ -88,25 +88,25 @@ namespace Isis {
     double centerY = centroid->getY();
     delete centroid;
 
-    int xStepsToCentroid = (int)((centerX-polyBoundBox->getMinX())/p_Xspacing + 0.5);
-    int yStepsToCentroid = (int)((centerY-polyBoundBox->getMinY())/p_Yspacing + 0.5);
+    int xStepsToCentroid = (int)((centerX - polyBoundBox->getMinX()) / p_Xspacing + 0.5);
+    int yStepsToCentroid = (int)((centerY - polyBoundBox->getMinY()) / p_Yspacing + 0.5);
     double dRealMinX = centerX - (xStepsToCentroid * p_Xspacing);
     double dRealMinY = centerY - (yStepsToCentroid * p_Yspacing);
-    double dDeltaXToReal = p_Xspacing * 1.0/6.0;
-    double dDeltaYToReal = p_Yspacing * 1.0/6.0;
+    double dDeltaXToReal = p_Xspacing * 1.0 / 6.0;
+    double dDeltaYToReal = p_Yspacing * 1.0 / 6.0;
 
-    for (double y=dRealMinY; y <= polyBoundBox->getMaxY(); y += p_Yspacing) {
+    for(double y = dRealMinY; y <= polyBoundBox->getMaxY(); y += p_Yspacing) {
       //printf("Grid Line,%.10f,%.10f,Through,%.10f,%.10f\n",dRealMinX, y, xyBoundBox->getMaxX(), y);
-      for (double x=dRealMinX; x <= polyBoundBox->getMaxX(); x +=p_Xspacing) {
-        geos::geom::Coordinate c(x+dDeltaXToReal,y+dDeltaYToReal);
+      for(double x = dRealMinX; x <= polyBoundBox->getMaxX(); x += p_Xspacing) {
+        geos::geom::Coordinate c(x + dDeltaXToReal, y + dDeltaYToReal);
         geos::geom::Point *p = Isis::globalFactory.createPoint(c);
-        if (p->within(multiPoly)) {
+        if(p->within(multiPoly)) {
           points.push_back(Isis::globalFactory.createPoint(c));
         }
 
-        geos::geom::Coordinate c2(x-dDeltaXToReal,y-dDeltaYToReal);
+        geos::geom::Coordinate c2(x - dDeltaXToReal, y - dDeltaYToReal);
         p = Isis::globalFactory.createPoint(c2);
-        if (p->within(multiPoly)) {
+        if(p->within(multiPoly)) {
           points.push_back(Isis::globalFactory.createPoint(c2));
         }
       }
@@ -117,7 +117,7 @@ namespace Isis {
 
   /**
    * @brief Parse the StripSeeder spicific parameters from the PVL
-   * 
+   *
    * @param pvl The PVL object containing the control parameters for this
    * polygon seeder.
    */
@@ -128,15 +128,15 @@ namespace Isis {
     // Pull parameters specific to this algorithm out
     try {
       // Get info from Algorithm group
-      PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm",Pvl::Traverse);
-      PvlGroup & invalgo = invalidInput->FindGroup("PolygonSeederAlgorithm",
-                                                   Pvl::Traverse);
+      PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm", Pvl::Traverse);
+      PvlGroup &invalgo = invalidInput->FindGroup("PolygonSeederAlgorithm",
+                          Pvl::Traverse);
 
-      // Set the spacing 
+      // Set the spacing
       p_Xspacing = 0.0;
-      if (algo.HasKeyword("XSpacing")) {
+      if(algo.HasKeyword("XSpacing")) {
         p_Xspacing = (double) algo["XSpacing"];
-        if (invalgo.HasKeyword("XSpacing")) {
+        if(invalgo.HasKeyword("XSpacing")) {
           invalgo.DeleteKeyword("XSpacing");
         }
       }
@@ -147,9 +147,9 @@ namespace Isis {
       }
 
       p_Yspacing = 0.0;
-      if (algo.HasKeyword("YSpacing")) {
+      if(algo.HasKeyword("YSpacing")) {
         p_Yspacing = (double) algo["YSpacing"];
-        if (invalgo.HasKeyword("YSpacing")) {
+        if(invalgo.HasKeyword("YSpacing")) {
           invalgo.DeleteKeyword("YSpacing");
         }
       }
@@ -159,17 +159,17 @@ namespace Isis {
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
-    catch (iException &e) {
-      std::string msg = "Improper format for PolygonSeeder PVL ["+pvl.Filename()+"]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
-    }
-
-    if (p_Xspacing <= 0.0) {
-      iString msg = "X Spacing must be greater that 0.0 [(" + iString(p_Xspacing) + "]"; 
+    catch(iException &e) {
+      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.Filename() + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
-    if (p_Yspacing <= 0.0) {
-      iString msg = "Y Spacing must be greater that 0.0 [(" + iString(p_Yspacing) + "]"; 
+
+    if(p_Xspacing <= 0.0) {
+      iString msg = "X Spacing must be greater that 0.0 [(" + iString(p_Xspacing) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    if(p_Yspacing <= 0.0) {
+      iString msg = "Y Spacing must be greater that 0.0 [(" + iString(p_Yspacing) + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
@@ -197,16 +197,16 @@ namespace Isis {
 
 /**
  * @brief Create a StripSeeder object
- * 
+ *
  * Used to create a StripSeeder object from a PolygonSeeder plugin PVL
  * file.
- * 
+ *
  * @param pvl The Pvl object that describes how the new object should be
  *           initialized.
- * 
+ *
  * @return A pointer to the new object
  */
-extern "C" Isis::PolygonSeeder *StripPolygonSeederPlugin (Isis::Pvl &pvl) {
+extern "C" Isis::PolygonSeeder *StripPolygonSeederPlugin(Isis::Pvl &pvl) {
   return new Isis::StripPolygonSeeder(pvl);
 }
 

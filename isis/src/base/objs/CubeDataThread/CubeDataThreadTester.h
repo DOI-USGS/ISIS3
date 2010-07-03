@@ -11,17 +11,21 @@ namespace Isis {
   class CubeDataThread;
 
   class CubeDataThreadTester : public QThread {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
       CubeDataThreadTester(CubeDataThread *);
       virtual ~CubeDataThreadTester();
 
       //! Returns the number of tests done (testing methods count as several)
-      int NumberOfTestsDone() { return p_numTestsDone; }
+      int NumberOfTestsDone() {
+        return p_numTestsDone;
+      }
 
       //! Returns the cube data thread being tested
-      CubeDataThread *DataThread() { return p_cubeDataThread; }
+      CubeDataThread *DataThread() {
+        return p_cubeDataThread;
+      }
 
       void Connect();
       void ReadCubeTest(int);
@@ -50,8 +54,8 @@ namespace Isis {
        * @param band Brick band
        * @param caller A this pointer
        */
-      void RequestReadCube(int cubeId, int startSample, int startLine, 
-                    int endSample, int endLine, int band, void *caller);
+      void RequestReadCube(int cubeId, int startSample, int startLine,
+                           int endSample, int endLine, int band, void *caller);
 
 
       /**
@@ -65,8 +69,8 @@ namespace Isis {
        * @param band Brick band
        * @param caller A this pointer
        */
-      void RequestReadWriteCube(int cubeId, int startSample, int startLine, 
-                    int endSample, int endLine, int band, void *caller);
+      void RequestReadWriteCube(int cubeId, int startSample, int startLine,
+                                int endSample, int endLine, int band, void *caller);
 
 
       /**
@@ -82,12 +86,12 @@ namespace Isis {
       //! The count of completed tests
       int p_numTestsDone;
 
-      //! The data thread being tested 
+      //! The data thread being tested
       CubeDataThread *p_cubeDataThread;
 
       //! True if this thread is started
       bool p_execStarted;
-      
+
       //! True if we will notify done on the next brick received for R/W
       bool p_notifyDone;
 

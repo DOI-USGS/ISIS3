@@ -5,40 +5,35 @@
 #include <QVector>
 #include <QString>
 
-namespace Isis
-{
+namespace Isis {
 
   //! construct a GroupedStatistics object
-  GroupedStatistics::GroupedStatistics()
-  {
+  GroupedStatistics::GroupedStatistics() {
     groupedStats = NULL;
     groupedStats = new QMap< QString, Statistics >();
   }
-  
-  
+
+
   /**
    *  copy construct a GroupedStatistics object
    *
    *  @param other The GroupedStatistics to copy
    */
-  GroupedStatistics::GroupedStatistics(const GroupedStatistics & other)
-  {
+  GroupedStatistics::GroupedStatistics(const GroupedStatistics &other) {
     groupedStats = NULL;
     groupedStats = new QMap< QString, Statistics >(*other.groupedStats);
   }
-  
-  
+
+
   //! destroy a GroupedStatistics object
-  GroupedStatistics::~GroupedStatistics()
-  {
-    if (groupedStats)
-    {
+  GroupedStatistics::~GroupedStatistics() {
+    if(groupedStats) {
       delete groupedStats;
       groupedStats = NULL;
     }
   }
-  
- 
+
+
   /**
    *  Add a new data entry for a given type of data
    *
@@ -47,13 +42,12 @@ namespace Isis
    *  @param newStat New statistical data to be added
    *
    */
-  void GroupedStatistics::AddStatistic(const QString & statType, const
-      double & newStat)
-  {
+  void GroupedStatistics::AddStatistic(const QString &statType, const
+                                       double &newStat) {
     (*groupedStats)[statType].AddData(newStat);
   }
-  
-  
+
+
   /**
    *  Get statistics for a given type of data
    *
@@ -63,24 +57,22 @@ namespace Isis
    *
    *  @throws iException When the given type of data does not exist
    */
-  const Statistics & GroupedStatistics::GetStatistics(const QString & statType)
-      const
-  {
+  const Statistics &GroupedStatistics::GetStatistics(const QString &statType)
+  const {
     QMap< QString, Statistics >::const_iterator i;
     i = groupedStats->constFind(statType);
-    
-    if (i == groupedStats->constEnd())
-    {
+
+    if(i == groupedStats->constEnd()) {
       std::string msg = statType.toStdString();
       msg += " passed to GetStats but does not exist within the map";
       throw Isis::iException::Message(Isis::iException::Programmer, msg,
                                       _FILEINFO_);
     }
-    
+
     return i.value();
   }
-  
-  
+
+
   /**
    *  Return a list of all the different statistic tyes that this
    *  GroupedStatistics has
@@ -88,35 +80,32 @@ namespace Isis
    *  @returns A list of statistic types that this GroupedStatistics has
    */
   const QVector< QString > GroupedStatistics::GetStatisticTypes()
-      const
-  {
+  const {
     QVector< QString > statTypes;
-    
-    // for each key in the groupedStats QMap add the key to a vector    
+
+    // for each key in the groupedStats QMap add the key to a vector
     QMap< QString, Statistics >::const_iterator i = groupedStats->constBegin();
-    while (i != groupedStats->constEnd())
-    {
+    while(i != groupedStats->constEnd()) {
       statTypes.push_back(i.key());
       i++;
     }
-    
+
     return statTypes;
   }
-  
-    
+
+
   /**
    *  Assign a GroupedStatistics with another GroupedStatistics using =
    *
    *  @param other The GroupedStatistics to copy
    */
-  GroupedStatistics & GroupedStatistics::operator=(const GroupedStatistics
-      & other)
-  {
+  GroupedStatistics &GroupedStatistics::operator=(const GroupedStatistics
+      & other) {
     delete groupedStats;
     groupedStats = NULL;
 
     groupedStats = new QMap< QString, Statistics >(*other.groupedStats);
-    
+
     return *this;
-  }  
+  }
 }

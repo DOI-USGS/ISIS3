@@ -1,38 +1,38 @@
 #include "Isis.h"
 
 #include <string>
-#include <cmath> 
+#include <cmath>
 
 #include "iException.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   double eq1[] = {
-    ui.GetDouble("XCONSTCOEF"), 
+    ui.GetDouble("XCONSTCOEF"),
     ui.GetDouble("XSAMPLECOEF"),
     ui.GetDouble("XLINECOEF"),
   };
   double eq2[] = {
-    ui.GetDouble("YCONSTCOEF"), 
+    ui.GetDouble("YCONSTCOEF"),
     ui.GetDouble("YSAMPLECOEF"),
     ui.GetDouble("YLINECOEF"),
   };
 
-  double res1[3] = {0.0,0.0,0.0};
-  double res2[3] = {0.0,0.0,0.0};
+  double res1[3] = {0.0, 0.0, 0.0};
+  double res2[3] = {0.0, 0.0, 0.0};
 
   bool solutionFound = false;
 
   /**
-   * Do this loop in order to shorten the number of solutions we have 
+   * Do this loop in order to shorten the number of solutions we have
    *  to program in. This halves the number of cases by saying "What if equation 1
    *  is really equation 2, and equation 2 is really equation 1?" The solution
    *  will also be flipped, which is handled if order becomes 1.
-   *  
+   *
    *  order = 0 means the equations are in their original form, order = 1 means
    *  they were swapped.
    */
@@ -54,45 +54,45 @@ void IsisMain() {
     }
 
     solutionFound = true;
-  
+
     // These are used to test solution dependencies, they become zero if the
     //   equations are parallel and thus unsolvable
-    double denomX = (F==0)? 0.0 : B - (E * C / F);
-    double denomY = (E==0)? 0.0 : C - (F * B / E);
+    double denomX = (F == 0) ? 0.0 : B - (E * C / F);
+    double denomY = (E == 0) ? 0.0 : C - (F * B / E);
     if(B != 0 && E != 0 && F != 0 && denomX != 0 && denomY != 0) {
       /**
-       * Input Equations: 
-       * X = A + BS + CL 
-       * Y = D + ES + FL 
-       *  
-       * Dependencies: 
+       * Input Equations:
+       * X = A + BS + CL
+       * Y = D + ES + FL
+       *
+       * Dependencies:
        *   B != 0, E != 0, F != 0, (B-EC/F) != 0, (C-FB/E) != 0
-       *  
-       * Inverses: 
+       *
+       * Inverses:
        * S = ((DC/F-A)/(B-EC/F)) + (1/(B-EC/F))X + ((-C/F)/(B-EC/F))Y
        * L = (DB/E-A)/(C-FB/E) + (1/(C-FB/E))X + ((-B/E)/(C-FB/E))Y
        */
       res1[0] = (D * C / F - A) / denomX;
       res1[1] = 1.0 / denomX;
       res1[2] = -(C / F) / denomX;
-      res2[0] = (D * B/ E - A) / denomY;
+      res2[0] = (D * B / E - A) / denomY;
       res2[1] = 1.0 / denomY;
       res2[2] = (-B / E) / denomY;
     }
     else if(C != 0 && E != 0 && B == 0) {
       /**
-       * Input Equations: 
-       * X = A + CL 
-       * Y = D + ES + FL 
-       *  
-       * Dependencies: 
-       *   C != 0, E != 0, B == 0 
-       *  
-       * Inverses: 
-       * S = ((FA)/(CE) - D/E) + (-F/(CE))X + (1/E)Y 
-       * L = (-A/C) + (1/C)X + 0.0Y 
+       * Input Equations:
+       * X = A + CL
+       * Y = D + ES + FL
+       *
+       * Dependencies:
+       *   C != 0, E != 0, B == 0
+       *
+       * Inverses:
+       * S = ((FA)/(CE) - D/E) + (-F/(CE))X + (1/E)Y
+       * L = (-A/C) + (1/C)X + 0.0Y
        */
-      res1[0] = (F * A)/(C * E) - D / E;
+      res1[0] = (F * A) / (C * E) - D / E;
       res1[1] = -F / (C * E);
       res1[2] = 1.0 / E;
       res2[0] = -A / C;

@@ -32,16 +32,18 @@ namespace Qisis {
    *            CubeViewport.  Also fixed some include issues.
    */
   class SpecialPixelTool : public Qisis::Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      SpecialPixelTool (QWidget *parent);
-      void addTo (QMenu *menu);
-      void addToPermanent (QToolBar *perm);
+      SpecialPixelTool(QWidget *parent);
+      void addTo(QMenu *menu);
+      void addToPermanent(QToolBar *perm);
 
     protected:
       //! Returns the menu name.
-      QString menuName() const { return "&Options"; };
+      QString menuName() const {
+        return "&Options";
+      };
       void updateTool();
       void setColor(QToolButton *button);
       void readSettings();

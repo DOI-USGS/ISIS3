@@ -17,19 +17,19 @@
 using namespace std;
 using namespace Isis;
 
-void PrintMap ();
+void PrintMap();
 void ComputePixRes();
 void LoadMapRes();
 void ComputeInputRange();
 void LoadMapRange();
 
-map <string,void*> GuiHelpers(){
-  map <string,void*> helper;
-  helper ["PrintMap"] = (void*) PrintMap;
-  helper ["ComputePixRes"] = (void*) ComputePixRes;
-  helper ["LoadMapRes"] = (void*) LoadMapRes;
-  helper ["ComputeInputRange"] = (void*) ComputeInputRange;
-  helper ["LoadMapRange"] = (void*) LoadMapRange;
+map <string, void *> GuiHelpers() {
+  map <string, void *> helper;
+  helper ["PrintMap"] = (void *) PrintMap;
+  helper ["ComputePixRes"] = (void *) ComputePixRes;
+  helper ["LoadMapRes"] = (void *) LoadMapRes;
+  helper ["ComputeInputRange"] = (void *) ComputeInputRange;
+  helper ["LoadMapRange"] = (void *) LoadMapRange;
   return helper;
 }
 
@@ -38,14 +38,14 @@ void IsisMain() {
   //Create a process to create the input cubes
   Process p;
   //Create the input cubes, matching sample/lines
-  Cube *inCube = p.SetInputCube ("FROM");
+  Cube *inCube = p.SetInputCube("FROM");
   Cube *latCube = p.SetInputCube("LATCUB", SpatialMatch);
   Cube *lonCube = p.SetInputCube("LONCUB", SpatialMatch);
 
   //A 1x1 brick to read in the latitude and longitude DN values from
   //the specified cubes
-  Brick latBrick(1,1,1, latCube->PixelType());
-  Brick lonBrick(1,1,1, lonCube->PixelType());
+  Brick latBrick(1, 1, 1, latCube->PixelType());
+  Brick lonBrick(1, 1, 1, lonCube->PixelType());
 
   UserInterface &ui = Application::GetUserInterface();
 
@@ -64,7 +64,7 @@ void IsisMain() {
   int degree = ui.GetInteger("DEGREE");
 
   //We are using a polynomial with two variables
-  PolynomialBivariate sampFunct(degree); 
+  PolynomialBivariate sampFunct(degree);
   PolynomialBivariate lineFunct(degree);
 
   //We will be solving the function using the least squares method
@@ -76,28 +76,28 @@ void IsisMain() {
   //y = cos(lat_center) * sin(latitude) - sin(lat_center) * cos(latitude) * cos(longitude - lon_center)
 
   //Get the center lat and long from the input cubes
-  double lat_center = latCube->Statistics()->Average() * PI/180.0;
-  double lon_center = lonCube->Statistics()->Average() * PI/180.0;
+  double lat_center = latCube->Statistics()->Average() * PI / 180.0;
+  double lon_center = lonCube->Statistics()->Average() * PI / 180.0;
 
 
   /**
    * Loop through lines and samples projecting the latitude and longitude at those
-   * points to stereographic x and y and adding these points to the LeastSquares 
-   * matrix. 
+   * points to stereographic x and y and adding these points to the LeastSquares
+   * matrix.
    */
-  for(int i = 1; i <= inCube->Lines(); i+= linc) {
-    for(int j = 1; j <= inCube->Samples(); j+= sinc) {
+  for(int i = 1; i <= inCube->Lines(); i += linc) {
+    for(int j = 1; j <= inCube->Samples(); j += sinc) {
       latBrick.SetBasePosition(j, i, 1);
       latCube->Read(latBrick);
       if(IsSpecial(latBrick.at(0))) continue;
-      double lat = latBrick.at(0) * PI/180.0;
+      double lat = latBrick.at(0) * PI / 180.0;
       lonBrick.SetBasePosition(j, i, 1);
       lonCube->Read(lonBrick);
       if(IsSpecial(lonBrick.at(0))) continue;
-      double lon = lonBrick.at(0) * PI/180.0;
+      double lon = lonBrick.at(0) * PI / 180.0;
 
       //Project lat and lon to x and y using a stereographic projection
-      double k = 2/(1 + sin(lat_center) * sin(lat) + cos(lat_center)*cos(lat)*cos(lon - lon_center));
+      double k = 2 / (1 + sin(lat_center) * sin(lat) + cos(lat_center) * cos(lat) * cos(lon - lon_center));
       double x = k * cos(lat) * sin(lon - lon_center);
       double y = k * (cos(lat_center) * sin(lat)) - (sin(lat_center) * cos(lat) * cos(lon - lon_center));
 
@@ -116,7 +116,7 @@ void IsisMain() {
     }
     //If the line increment goes past the last line in the cube, we want to
     //always read the last line..
-    if(i != inCube->Lines() && i + linc > inCube->Lines()) {    
+    if(i != inCube->Lines() && i + linc > inCube->Lines()) {
       i = inCube->Lines() - linc;
     }
   }
@@ -165,18 +165,18 @@ void IsisMain() {
   oFile.Close();
 
   //Records the error to the log
-  PvlGroup error( "Error" );
-  error += PvlKeyword( "Degree", degree );
-  error += PvlKeyword( "NumberOfPoints", (int)sampResiduals.size() );
-  error += PvlKeyword( "SampleMinimumError", sampErr.Minimum() );
-  error += PvlKeyword( "SampleAverageError", sampErr.Average() );
-  error += PvlKeyword( "SampleMaximumError", sampErr.Maximum() );
-  error += PvlKeyword( "SampleStdDeviationError", sampErr.StandardDeviation() );
-  error += PvlKeyword( "LineMinimumError", lineErr.Minimum() );
-  error += PvlKeyword( "LineAverageError", lineErr.Average() );
-  error += PvlKeyword( "LineMaximumError", lineErr.Maximum() );
-  error += PvlKeyword( "LineStdDeviationError", lineErr.StandardDeviation() );
-  Application::Log( error );
+  PvlGroup error("Error");
+  error += PvlKeyword("Degree", degree);
+  error += PvlKeyword("NumberOfPoints", (int)sampResiduals.size());
+  error += PvlKeyword("SampleMinimumError", sampErr.Minimum());
+  error += PvlKeyword("SampleAverageError", sampErr.Average());
+  error += PvlKeyword("SampleMaximumError", sampErr.Maximum());
+  error += PvlKeyword("SampleStdDeviationError", sampErr.StandardDeviation());
+  error += PvlKeyword("LineMinimumError", lineErr.Minimum());
+  error += PvlKeyword("LineAverageError", lineErr.Average());
+  error += PvlKeyword("LineMaximumError", lineErr.Maximum());
+  error += PvlKeyword("LineStdDeviationError", lineErr.StandardDeviation());
+  Application::Log(error);
 
   //Close the input cubes for cleanup
   p.EndProcess();
@@ -186,7 +186,7 @@ void IsisMain() {
     //Creates the mapping group
     Pvl mapFile;
     mapFile.Read(ui.GetFilename("MAP"));
-    PvlGroup &mapGrp = mapFile.FindGroup("Mapping",Pvl::Traverse);
+    PvlGroup &mapGrp = mapFile.FindGroup("Mapping", Pvl::Traverse);
 
     //Reopen the lat and long cubes
     latCube = new Cube();
@@ -234,18 +234,18 @@ void IsisMain() {
       SpiceInt code;
       SpiceBoolean found;
 
-      bodn2c_c (target.c_str(), &code, &found);
+      bodn2c_c(target.c_str(), &code, &found);
 
-      if (!found) {
+      if(!found) {
         string msg = "Could not convert Target [" + target +
                      "] to NAIF code";
-        throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
       }
 
       SpiceInt n;
       SpiceDouble radii[3];
 
-      bodvar_c(code,"RADII",&n,radii);
+      bodvar_c(code, "RADII", &n, radii);
 
       equRadius = PvlKeyword("EquatorialRadius", radii[0] * 1000);
       polRadius = PvlKeyword("PolarRadius", radii[2] * 1000);
@@ -258,35 +258,35 @@ void IsisMain() {
     //If the latitude type is not in the mapping group, copy it from the input
     if(!mapGrp.HasKeyword("LatitudeType")) {
       if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
-        mapGrp.AddKeyword(PvlKeyword("LatitudeType","Planetocentric"), Pvl::Replace);
+        mapGrp.AddKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
       }
       else {
-        mapGrp.AddKeyword(PvlKeyword("LatitudeType","Planetographic"), Pvl::Replace);
+        mapGrp.AddKeyword(PvlKeyword("LatitudeType", "Planetographic"), Pvl::Replace);
       }
     }
 
     //If the longitude direction is not in the mapping group, copy it from the input
     if(!mapGrp.HasKeyword("LongitudeDirection")) {
       if(ui.GetString("LONDIR") == "POSITIVEEAST") {
-        mapGrp.AddKeyword(PvlKeyword("LongitudeDirection","PositiveEast"), Pvl::Replace);
+        mapGrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"), Pvl::Replace);
       }
       else {
-        mapGrp.AddKeyword(PvlKeyword("LongitudeDirection","PositiveWest"), Pvl::Replace);
+        mapGrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
       }
     }
 
     //If the longitude domain is not in the mapping group, assume it is 360
     if(!mapGrp.HasKeyword("LongitudeDomain")) {
-      mapGrp.AddKeyword(PvlKeyword("LongitudeDomain","360"), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
     }
 
     //If the default range is to be computed, use the input lat/long cubes to determine the range
     if(ui.GetString("DEFAULTRANGE") == "COMPUTE") {
-      //NOTE - When computing the min/max longitude this application does not account for the 
+      //NOTE - When computing the min/max longitude this application does not account for the
       //longitude seam if it exists. Since the min/max are calculated from the statistics of
       //the input longitude cube and then converted to the mapping group's domain they may be
-      //invalid for cubes containing the longitude seam. 
-    
+      //invalid for cubes containing the longitude seam.
+
       Statistics *latStats = latCube->Statistics();
       Statistics *lonStats = lonCube->Statistics();
 
@@ -294,7 +294,7 @@ void IsisMain() {
       double maxLat = latStats->Maximum();
 
       bool isOcentric = ((std::string)mapGrp.FindKeyword("LatitudeType")) == "Planetocentric";
- 
+
       if(isOcentric) {
         if(ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
           minLat = Projection::ToPlanetocentric(minLat, (double)equRadius, (double)polRadius);
@@ -313,7 +313,7 @@ void IsisMain() {
       double maxLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Maximum()) : Projection::To180Domain(lonStats->Maximum());
 
       bool isPosEast = ((std::string)mapGrp.FindKeyword("LongitudeDirection")) == "PositiveEast";
-      
+
       if(isPosEast) {
         if(ui.GetString("LONDIR") != "POSITIVEEAST") {
           minLon = Projection::ToPositiveEast(minLon, lonDomain);
@@ -333,94 +333,94 @@ void IsisMain() {
         maxLon = temp;
       }
 
-      mapGrp.AddKeyword(PvlKeyword("MinimumLatitude", minLat),Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude", maxLat),Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MinimumLongitude", minLon),Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MaximumLongitude", maxLon),Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MinimumLatitude", minLat), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude", maxLat), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MinimumLongitude", minLon), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MaximumLongitude", maxLon), Pvl::Replace);
     }
 
     //If the user decided to enter a ground range then override
-    if (ui.WasEntered("MINLAT")) {
+    if(ui.WasEntered("MINLAT")) {
       mapGrp.AddKeyword(PvlKeyword("MinimumLatitude",
-                                        ui.GetDouble("MINLAT")),Pvl::Replace);
-    }
-  
-    if (ui.WasEntered("MAXLAT")) {
-      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude",
-                                        ui.GetDouble("MAXLAT")),Pvl::Replace);
+                                   ui.GetDouble("MINLAT")), Pvl::Replace);
     }
 
-    if (ui.WasEntered("MINLON")) {
+    if(ui.WasEntered("MAXLAT")) {
+      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude",
+                                   ui.GetDouble("MAXLAT")), Pvl::Replace);
+    }
+
+    if(ui.WasEntered("MINLON")) {
       mapGrp.AddKeyword(PvlKeyword("MinimumLongitude",
-                                        ui.GetDouble("MINLON")),Pvl::Replace);
+                                   ui.GetDouble("MINLON")), Pvl::Replace);
     }
-  
-    if (ui.WasEntered("MAXLON")) {
+
+    if(ui.WasEntered("MAXLON")) {
       mapGrp.AddKeyword(PvlKeyword("MaximumLongitude",
-                                        ui.GetDouble("MAXLON")),Pvl::Replace);
+                                   ui.GetDouble("MAXLON")), Pvl::Replace);
     }
-  
+
     //If the pixel resolution is to be computed, compute the pixels/degree from the input
-    if (ui.GetString("PIXRES") == "COMPUTE") {
-      latBrick.SetBasePosition(1,1,1);
+    if(ui.GetString("PIXRES") == "COMPUTE") {
+      latBrick.SetBasePosition(1, 1, 1);
       latCube->Read(latBrick);
 
-      lonBrick.SetBasePosition(1,1,1);
+      lonBrick.SetBasePosition(1, 1, 1);
       lonCube->Read(lonBrick);
 
       //Read the lat and long at the upper left corner
-      double a = latBrick.at(0) * PI/180.0;
-      double c = lonBrick.at(0) * PI/180.0;
-  
-      latBrick.SetBasePosition(latCube->Samples(),latCube->Lines(),1);
+      double a = latBrick.at(0) * PI / 180.0;
+      double c = lonBrick.at(0) * PI / 180.0;
+
+      latBrick.SetBasePosition(latCube->Samples(), latCube->Lines(), 1);
       latCube->Read(latBrick);
 
-      lonBrick.SetBasePosition(lonCube->Samples(),lonCube->Lines(),1);     
+      lonBrick.SetBasePosition(lonCube->Samples(), lonCube->Lines(), 1);
       lonCube->Read(lonBrick);
 
       //Read the lat and long at the lower right corner
-      double b = latBrick.at(0) * PI/180.0;
-      double d = lonBrick.at(0) * PI/180.0;
+      double b = latBrick.at(0) * PI / 180.0;
+      double d = lonBrick.at(0) * PI / 180.0;
 
       //Determine the angle between the two points
       double angle = acos(cos(a) * cos(b) * cos(c - d) + sin(a) * sin(b));
       //double angle = acos((cos(a1) * cos(b1) * cos(b2)) + (cos(a1) * sin(b1) * cos(a2) * sin(b2)) + (sin(a1) * sin(a2)));
-      angle *= 180/PI;
+      angle *= 180 / PI;
 
       //Determine the number of pixels between the two points
-      double pixels = sqrt(pow(latCube->Samples() -1.0, 2.0) + pow(latCube->Lines() -1.0, 2.0));
+      double pixels = sqrt(pow(latCube->Samples() - 1.0, 2.0) + pow(latCube->Lines() - 1.0, 2.0));
 
       //Add the scale in pixels/degree to the mapping group
       mapGrp.AddKeyword(PvlKeyword("Scale",
-                                        pixels/angle, "pixels/degree"),
-                                        Pvl::Replace);
-      if (mapGrp.HasKeyword("PixelResolution")) {
+                                   pixels / angle, "pixels/degree"),
+                        Pvl::Replace);
+      if(mapGrp.HasKeyword("PixelResolution")) {
         mapGrp.DeleteKeyword("PixelResolution");
       }
     }
 
 
     // If the user decided to enter a resolution then override
-    if (ui.GetString("PIXRES") == "MPP") {
+    if(ui.GetString("PIXRES") == "MPP") {
       mapGrp.AddKeyword(PvlKeyword("PixelResolution",
-                                        ui.GetDouble("RESOLUTION"), "meters/pixel"),
-                                        Pvl::Replace);
-      if (mapGrp.HasKeyword("Scale")) {
+                                   ui.GetDouble("RESOLUTION"), "meters/pixel"),
+                        Pvl::Replace);
+      if(mapGrp.HasKeyword("Scale")) {
         mapGrp.DeleteKeyword("Scale");
       }
     }
-    else if (ui.GetString("PIXRES") == "PPD") {
+    else if(ui.GetString("PIXRES") == "PPD") {
       mapGrp.AddKeyword(PvlKeyword("Scale",
-                                        ui.GetDouble("RESOLUTION"), "pixels/degree"),
-                                        Pvl::Replace);
-      if (mapGrp.HasKeyword("PixelResolution")) {
+                                   ui.GetDouble("RESOLUTION"), "pixels/degree"),
+                        Pvl::Replace);
+      if(mapGrp.HasKeyword("PixelResolution")) {
         mapGrp.DeleteKeyword("PixelResolution");
       }
     }
 
     //Create a projection using the map file we created
-    int samples,lines;
-    Projection *outmap = ProjectionFactory::CreateForCube(mapFile,samples,lines,false);
+    int samples, lines;
+    Projection *outmap = ProjectionFactory::CreateForCube(mapFile, samples, lines, false);
 
     //Write the map file to the log
     Application::GuiLog(mapGrp);
@@ -434,39 +434,39 @@ void IsisMain() {
     double tolerance = ui.GetDouble("TOLERANCE") * outmap->Resolution();
 
     //Create a new transform object
-    Transform *transform = new nocam2map (sampSol, lineSol, outmap,
-                                          latCube, lonCube,
-                                          ui.GetString("LATTYPE") == "PLANETOCENTRIC",
-                                          ui.GetString("LONDIR") == "POSITIVEEAST",
-                                          tolerance, ui.GetInteger("ITERATIONS"),
-                                          inCube->Samples(), inCube->Lines(),
-                                          samples, lines);
-  
+    Transform *transform = new nocam2map(sampSol, lineSol, outmap,
+                                         latCube, lonCube,
+                                         ui.GetString("LATTYPE") == "PLANETOCENTRIC",
+                                         ui.GetString("LONDIR") == "POSITIVEEAST",
+                                         tolerance, ui.GetInteger("ITERATIONS"),
+                                         inCube->Samples(), inCube->Lines(),
+                                         samples, lines);
+
     //Allocate the output cube and add the mapping labels
-    Cube *oCube = r.SetOutputCube ("TO", transform->OutputSamples(),
-                                              transform->OutputLines(),
-                                              inCube->Bands());
+    Cube *oCube = r.SetOutputCube("TO", transform->OutputSamples(),
+                                  transform->OutputLines(),
+                                  inCube->Bands());
     oCube->PutGroup(mapGrp);
 
     //Determine which interpolation to use
     Interpolator *interp = NULL;
-    if (ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
+    if(ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
       interp = new Interpolator(Interpolator::NearestNeighborType);
     }
-    else if (ui.GetString("INTERP") == "BILINEAR") {
+    else if(ui.GetString("INTERP") == "BILINEAR") {
       interp = new Interpolator(Interpolator::BiLinearType);
     }
-    else if (ui.GetString("INTERP") == "CUBICCONVOLUTION") {
+    else if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
       interp = new Interpolator(Interpolator::CubicConvolutionType);
     }
-  
+
     //Warp the cube
     r.StartProcess(*transform, *interp);
     r.EndProcess();
 
     // add mapping to print.prt
-    PvlGroup mapping = outmap->Mapping(); 
-    Application::Log(mapping); 
+    PvlGroup mapping = outmap->Mapping();
+    Application::Log(mapping);
 
     //Clean up
     delete latCube;
@@ -480,12 +480,12 @@ void IsisMain() {
 
 
 // Transform object constructor
-nocam2map::nocam2map (LeastSquares sample, LeastSquares line, Projection *outmap,
-                      Cube *latCube, Cube *lonCube,
-                      bool isOcentric, bool isPosEast,
-                      double tolerance, int iterations,
-                      const int inputSamples, const int inputLines,
-                      const int outputSamples, const int outputLines) {
+nocam2map::nocam2map(LeastSquares sample, LeastSquares line, Projection *outmap,
+                     Cube *latCube, Cube *lonCube,
+                     bool isOcentric, bool isPosEast,
+                     double tolerance, int iterations,
+                     const int inputSamples, const int inputLines,
+                     const int outputSamples, const int outputLines) {
 
   p_sampleSol = &sample;
   p_lineSol = &line;
@@ -500,17 +500,17 @@ nocam2map::nocam2map (LeastSquares sample, LeastSquares line, Projection *outmap
   p_isPosEast = isPosEast;
   p_tolerance = tolerance;
   p_iterations = iterations;
-  p_latCenter = p_latCube->Statistics()->Average() * PI/180.0;
-  p_lonCenter = p_lonCube->Statistics()->Average() * PI/180.0;
+  p_latCenter = p_latCube->Statistics()->Average() * PI / 180.0;
+  p_lonCenter = p_lonCube->Statistics()->Average() * PI / 180.0;
   p_radius = p_outmap->LocalRadius(p_latCenter);
 }
 
 
 
 // Transform method mapping output line/samps to lat/lons to input line/samps
-bool nocam2map::Xform (double &inSample, double &inLine,
-                         const double outSample, const double outLine) {
-  if (!p_outmap->SetWorld(outSample,outLine)) return false;
+bool nocam2map::Xform(double &inSample, double &inLine,
+                      const double outSample, const double outLine) {
+  if(!p_outmap->SetWorld(outSample, outLine)) return false;
 
   if(outSample > p_outputSamples) return false;
   if(outLine > p_outputLines) return false;
@@ -537,11 +537,11 @@ bool nocam2map::Xform (double &inSample, double &inLine,
     else lon_known = p_outmap->Longitude();
   }
 
-  lat_known *= PI/180.0;
-  lon_known *= PI/180.0;
+  lat_known *= PI / 180.0;
+  lon_known *= PI / 180.0;
 
   //Project the known lat/long to x/y using the stereographic projection
-  double k_known = 2/(1 + sin(p_latCenter) * sin(lat_known) + cos(p_latCenter)*cos(lat_known)*cos(lon_known - p_lonCenter));
+  double k_known = 2 / (1 + sin(p_latCenter) * sin(lat_known) + cos(p_latCenter) * cos(lat_known) * cos(lon_known - p_lonCenter));
   double x_known = k_known * cos(lat_known) * sin(lon_known - p_lonCenter);
   double y_known = k_known * (cos(p_latCenter) * sin(lat_known)) - (sin(p_latCenter) * cos(lat_known) * cos(lon_known - p_lonCenter));
 
@@ -554,41 +554,41 @@ bool nocam2map::Xform (double &inSample, double &inLine,
   double line_guess = p_lineSol->Evaluate(data_known);
 
   //If the sample/line guess is out of bounds return false
-  if (sample_guess < -1.5) return false;
-  if (line_guess < -1.5) return false;
-  if (sample_guess > p_inputSamples + 1.5) return false;
-  if (line_guess > p_inputLines + 1.5) return false;
+  if(sample_guess < -1.5) return false;
+  if(line_guess < -1.5) return false;
+  if(sample_guess > p_inputSamples + 1.5) return false;
+  if(line_guess > p_inputLines + 1.5) return false;
 
-  if (sample_guess < 0.5) sample_guess = 1;
-  if (line_guess < 0.5) line_guess = 1;
-  if (sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples; 
-  if (line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
+  if(sample_guess < 0.5) sample_guess = 1;
+  if(line_guess < 0.5) line_guess = 1;
+  if(sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples;
+  if(line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
 
   //Create a bilinear interpolator
   Interpolator interp(Interpolator::BiLinearType);
 
   //Create a 2x2 buffer to read the lat and long cubes
   Portal latPortal(interp.Samples(), interp.Lines(),
-                        p_latCube->PixelType() ,
-                        interp.HotSample(), interp.HotLine());
+                   p_latCube->PixelType() ,
+                   interp.HotSample(), interp.HotLine());
 
   Portal lonPortal(interp.Samples(), interp.Lines(),
-                        p_lonCube->PixelType() ,
-                        interp.HotSample(), interp.HotLine());
+                   p_lonCube->PixelType() ,
+                   interp.HotSample(), interp.HotLine());
 
   //Set the buffers positions to the sample/line guess and read from the lat/long cubes
-  latPortal.SetPosition (sample_guess, line_guess, 1);
+  latPortal.SetPosition(sample_guess, line_guess, 1);
   p_latCube->Read(latPortal);
 
-  lonPortal.SetPosition (sample_guess, line_guess, 1);
+  lonPortal.SetPosition(sample_guess, line_guess, 1);
   p_lonCube->Read(lonPortal);
 
   //Get the lat/long guess from the interpolator
-  double lat_guess = interp.Interpolate(sample_guess, line_guess, latPortal.DoubleBuffer()) * PI/180.0;
-  double lon_guess = interp.Interpolate(sample_guess, line_guess, lonPortal.DoubleBuffer()) * PI/180.0;
+  double lat_guess = interp.Interpolate(sample_guess, line_guess, latPortal.DoubleBuffer()) * PI / 180.0;
+  double lon_guess = interp.Interpolate(sample_guess, line_guess, lonPortal.DoubleBuffer()) * PI / 180.0;
 
   //Project the lat/long guess to x/y using the stereographic projection
-  double k_guess = 2/(1 + sin(p_latCenter) * sin(lat_guess) + cos(p_latCenter)*cos(lat_guess)*cos(lon_guess - p_lonCenter));
+  double k_guess = 2 / (1 + sin(p_latCenter) * sin(lat_guess) + cos(p_latCenter) * cos(lat_guess) * cos(lon_guess - p_lonCenter));
   double x_guess = k_guess * cos(lat_guess) * sin(lon_guess - p_lonCenter);
   double y_guess = k_guess * (cos(p_latCenter) * sin(lat_guess)) - (sin(p_latCenter) * cos(lat_guess) * cos(lon_guess - p_lonCenter));
 
@@ -602,33 +602,33 @@ bool nocam2map::Xform (double &inSample, double &inLine,
     if(iteration++ >= p_iterations) return false;
 
     //Create a 1st order polynomial function
-    PolynomialBivariate sampFunct(1); 
+    PolynomialBivariate sampFunct(1);
     PolynomialBivariate lineFunct(1);
 
-    //Create a least squares solution 
+    //Create a least squares solution
     LeastSquares sampConverge(sampFunct);
     LeastSquares lineConverge(lineFunct);
 
     //Add the points around the line/sample guess point to the least squares matrix
-    for(int i = (int)(line_guess + 0.5) -1; i <= (int)(line_guess + 0.5) + 1; i++) {
+    for(int i = (int)(line_guess + 0.5) - 1; i <= (int)(line_guess + 0.5) + 1; i++) {
       //If the line is out of bounds, then skip it
-      if (i < 1 || i > p_inputLines) continue;
-      for(int j = (int)(sample_guess + 0.5) -1; j <= (int)(sample_guess + 0.5) + 1; j++) {
+      if(i < 1 || i > p_inputLines) continue;
+      for(int j = (int)(sample_guess + 0.5) - 1; j <= (int)(sample_guess + 0.5) + 1; j++) {
         //If the sample is out of bounds, then skip it
         if(j < 1 || j > p_inputSamples) continue;
 
-        latPortal.SetPosition (j, i, 1);
+        latPortal.SetPosition(j, i, 1);
         p_latCube->Read(latPortal);
         if(IsSpecial(latPortal.at(0))) continue;
-        double n_lat = latPortal.at(0) * PI/180.0;
+        double n_lat = latPortal.at(0) * PI / 180.0;
 
-        lonPortal.SetPosition (j, i, 1);
+        lonPortal.SetPosition(j, i, 1);
         p_lonCube->Read(lonPortal);
-        if(IsSpecial(lonPortal.at(0))) continue;   
-        double n_lon = lonPortal.at(0) * PI/180.0;
+        if(IsSpecial(lonPortal.at(0))) continue;
+        double n_lon = lonPortal.at(0) * PI / 180.0;
 
         //Conver the lat/lon to x/y using the stereographic projection
-        double n_k = 2/(1 + sin(p_latCenter) * sin(n_lat) + cos(p_latCenter)*cos(n_lat)*cos(n_lon - p_lonCenter));
+        double n_k = 2 / (1 + sin(p_latCenter) * sin(n_lat) + cos(p_latCenter) * cos(n_lat) * cos(n_lon - p_lonCenter));
         double n_x = n_k * cos(n_lat) * sin(n_lon - p_lonCenter);
         double n_y = n_k * (cos(p_latCenter) * sin(n_lat)) - (sin(p_latCenter) * cos(n_lat) * cos(n_lon - p_lonCenter));
 
@@ -651,15 +651,15 @@ bool nocam2map::Xform (double &inSample, double &inLine,
     line_guess = lineConverge.Evaluate(data_known);
 
     //If the new sample/line is out of bounds return false
-    if (sample_guess < -1.5) return false;
-    if (line_guess < -1.5) return false;
-    if (sample_guess > p_inputSamples + 1.5) return false;
-    if (line_guess > p_inputLines + 1.5) return false;
-  
-    if (sample_guess < 0.5) sample_guess = 1;
-    if (line_guess < 0.5) line_guess = 1;
-    if (sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples; 
-    if (line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
+    if(sample_guess < -1.5) return false;
+    if(line_guess < -1.5) return false;
+    if(sample_guess > p_inputSamples + 1.5) return false;
+    if(line_guess > p_inputLines + 1.5) return false;
+
+    if(sample_guess < 0.5) sample_guess = 1;
+    if(line_guess < 0.5) line_guess = 1;
+    if(sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples;
+    if(line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
 
     //Set the buffers positions to the sample/line guess and read from the lat/long cubes
     latPortal.SetPosition(sample_guess, line_guess, 1);
@@ -669,11 +669,11 @@ bool nocam2map::Xform (double &inSample, double &inLine,
     p_lonCube->Read(lonPortal);
 
     //Get the lat/long guess from the interpolator
-    lat_guess = interp.Interpolate(sample_guess, line_guess, latPortal.DoubleBuffer()) * PI/180.0;
-    lon_guess = interp.Interpolate(sample_guess, line_guess, lonPortal.DoubleBuffer()) * PI/180.0;
+    lat_guess = interp.Interpolate(sample_guess, line_guess, latPortal.DoubleBuffer()) * PI / 180.0;
+    lon_guess = interp.Interpolate(sample_guess, line_guess, lonPortal.DoubleBuffer()) * PI / 180.0;
 
     //Project the lat/long guess to x/y using the stereographic projection
-    k_guess = 2/(1 + sin(p_latCenter) * sin(lat_guess) + cos(p_latCenter)*cos(lat_guess)*cos(lon_guess - p_lonCenter));
+    k_guess = 2 / (1 + sin(p_latCenter) * sin(lat_guess) + cos(p_latCenter) * cos(lat_guess) * cos(lon_guess - p_lonCenter));
     x_guess = k_guess * cos(lat_guess) * sin(lon_guess - p_lonCenter);
     y_guess = k_guess * (cos(p_latCenter) * sin(lat_guess)) - (sin(p_latCenter) * cos(lat_guess) * cos(lon_guess - p_lonCenter));
 
@@ -690,11 +690,11 @@ bool nocam2map::Xform (double &inSample, double &inLine,
   return true;
 }
 
-int nocam2map::OutputSamples () const {
+int nocam2map::OutputSamples() const {
   return p_outputSamples;
 }
 
-int nocam2map::OutputLines () const {
+int nocam2map::OutputLines() const {
   return p_outputLines;
 }
 
@@ -705,82 +705,82 @@ void PrintMap() {
   // Get mapping group from map file
   Pvl userMap;
   userMap.Read(ui.GetFilename("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping",Pvl::Traverse);
+  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);
 }
 
 //Helper function to get camera resolution.
-void ComputePixRes () {
+void ComputePixRes() {
   Process p;
   UserInterface &ui = Application::GetUserInterface();
   Cube *latCube = p.SetInputCube("LATCUB");
   Cube *lonCube = p.SetInputCube("LONCUB");
-  Brick latBrick(1,1,1,latCube->PixelType());
-  Brick lonBrick(1,1,1,lonCube->PixelType());
-  latBrick.SetBasePosition(1,1,1);
+  Brick latBrick(1, 1, 1, latCube->PixelType());
+  Brick lonBrick(1, 1, 1, lonCube->PixelType());
+  latBrick.SetBasePosition(1, 1, 1);
   latCube->Read(latBrick);
 
-  lonBrick.SetBasePosition(1,1,1);
+  lonBrick.SetBasePosition(1, 1, 1);
   lonCube->Read(lonBrick);
-      
-  double a = latBrick.at(0) * PI/180.0;
-  double c = lonBrick.at(0) * PI/180.0;
-  
-  latBrick.SetBasePosition(latCube->Samples(),latCube->Lines(),1);
+
+  double a = latBrick.at(0) * PI / 180.0;
+  double c = lonBrick.at(0) * PI / 180.0;
+
+  latBrick.SetBasePosition(latCube->Samples(), latCube->Lines(), 1);
   latCube->Read(latBrick);
 
-  lonBrick.SetBasePosition(lonCube->Samples(),lonCube->Lines(),1);     
+  lonBrick.SetBasePosition(lonCube->Samples(), lonCube->Lines(), 1);
   lonCube->Read(lonBrick);
 
-  double b = latBrick.at(0) * PI/180.0;
-  double d = lonBrick.at(0) * PI/180.0;
+  double b = latBrick.at(0) * PI / 180.0;
+  double d = lonBrick.at(0) * PI / 180.0;
 
   double angle = acos(cos(a) * cos(b) * cos(c - d) + sin(a) * sin(b));
-  angle *= 180/PI;
+  angle *= 180 / PI;
 
-  double pixels = sqrt(pow(latCube->Samples() -1.0, 2.0) + pow(latCube->Lines() -1.0, 2.0));
+  double pixels = sqrt(pow(latCube->Samples() - 1.0, 2.0) + pow(latCube->Lines() - 1.0, 2.0));
 
   p.EndProcess();
 
   ui.Clear("RESOLUTION");
-  ui.PutDouble("RESOLUTION", pixels/angle);
+  ui.PutDouble("RESOLUTION", pixels / angle);
 
   ui.Clear("PIXRES");
-  ui.PutAsString("PIXRES","PPD");
+  ui.PutAsString("PIXRES", "PPD");
 }
 
 // Helper function to get mapping resolution.
-void LoadMapRes () {
+void LoadMapRes() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get mapping group from map file
   Pvl userMap;
   userMap.Read(ui.GetFilename("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping",Pvl::Traverse);
+  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
-  if (userGrp.HasKeyword("Scale")) {
+  if(userGrp.HasKeyword("Scale")) {
     ui.Clear("RESOLUTION");
-    ui.PutDouble("RESOLUTION",userGrp["Scale"]);
+    ui.PutDouble("RESOLUTION", userGrp["Scale"]);
     ui.Clear("PIXRES");
-    ui.PutAsString("PIXRES","PPD");
+    ui.PutAsString("PIXRES", "PPD");
   }
-  else if (userGrp.HasKeyword("PixelResolution")) {
+  else if(userGrp.HasKeyword("PixelResolution")) {
     ui.Clear("RESOLUTION");
-    ui.PutDouble("RESOLUTION",userGrp["PixelResolution"]);
+    ui.PutDouble("RESOLUTION", userGrp["PixelResolution"]);
     ui.Clear("PIXRES");
-    ui.PutAsString("PIXRES","MPP");
+    ui.PutAsString("PIXRES", "MPP");
   }
   else {
     string msg = "No resolution value found in [" + ui.GetFilename("MAP") + "]";
-    throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 }
 
 //Helper function to compute input range.
-void ComputeInputRange () {
+void ComputeInputRange() {
   Process p;
   Cube *latCub = p.SetInputCube("LATCUB");
   Cube *lonCub = p.SetInputCube("LONCUB");
@@ -788,7 +788,7 @@ void ComputeInputRange () {
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
   userMap.Read(ui.GetFilename("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping",Pvl::Traverse);
+  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   Statistics *latStats = latCub->Statistics();
   Statistics *lonStats = lonCub->Statistics();
@@ -822,7 +822,7 @@ void ComputeInputRange () {
 
       string target;
 
-      //If user entered target 
+      //If user entered target
       if(ui.WasEntered("TARGET")) {
         target = ui.GetString("TARGET");
       }
@@ -836,18 +836,18 @@ void ComputeInputRange () {
       SpiceInt code;
       SpiceBoolean found;
 
-      bodn2c_c (target.c_str(), &code, &found);
+      bodn2c_c(target.c_str(), &code, &found);
 
-      if (!found) {
+      if(!found) {
         string msg = "Could not convert Target [" + target +
                      "] to NAIF code";
-        throw Isis::iException::Message(Isis::iException::Io,msg,_FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
       }
 
       SpiceInt n;
       SpiceDouble radii[3];
 
-      bodvar_c(code,"RADII",&n,radii);
+      bodvar_c(code, "RADII", &n, radii);
 
       equRadius = radii[0] * 1000;
       polRadius = radii[2] * 1000;
@@ -910,7 +910,7 @@ void ComputeInputRange () {
 
   // Set default ground range param to camera
   ui.Clear("DEFAULTRANGE");
-  ui.PutAsString("DEFAULTRANGE","COMPUTE");
+  ui.PutAsString("DEFAULTRANGE", "COMPUTE");
 }
 
 //Helper function to get ground range from map file.
@@ -920,7 +920,7 @@ void LoadMapRange() {
   // Get map file
   Pvl userMap;
   userMap.Read(ui.GetFilename("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping",Pvl::Traverse);
+  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
   int count = 0;
@@ -928,30 +928,30 @@ void LoadMapRange() {
   ui.Clear("MAXLAT");
   ui.Clear("MINLON");
   ui.Clear("MAXLON");
-  if (userGrp.HasKeyword("MinimumLatitude")) {
-    ui.PutDouble("MINLAT",userGrp["MinimumLatitude"]);
+  if(userGrp.HasKeyword("MinimumLatitude")) {
+    ui.PutDouble("MINLAT", userGrp["MinimumLatitude"]);
     count++;
   }
-  if (userGrp.HasKeyword("MaximumLatitude")) {
-    ui.PutDouble("MAXLAT",userGrp["MaximumLatitude"]);
+  if(userGrp.HasKeyword("MaximumLatitude")) {
+    ui.PutDouble("MAXLAT", userGrp["MaximumLatitude"]);
     count++;
   }
-  if (userGrp.HasKeyword("MinimumLongitude")) {
-    ui.PutDouble("MINLON",userGrp["MinimumLongitude"]);
+  if(userGrp.HasKeyword("MinimumLongitude")) {
+    ui.PutDouble("MINLON", userGrp["MinimumLongitude"]);
     count++;
   }
-  if (userGrp.HasKeyword("MaximumLongitude")) {
-    ui.PutDouble("MAXLON",userGrp["MaximumLongitude"]);
+  if(userGrp.HasKeyword("MaximumLongitude")) {
+    ui.PutDouble("MAXLON", userGrp["MaximumLongitude"]);
     count++;
   }
 
   // Set default ground range param to map
   ui.Clear("DEFAULTRANGE");
-  ui.PutAsString("DEFAULTRANGE","MAP");
+  ui.PutAsString("DEFAULTRANGE", "MAP");
 
-  if (count < 4) {
+  if(count < 4) {
     string msg = "One or more of the values for the ground range was not found";
     msg += " in [" + ui.GetFilename("MAP") + "]";
-    throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 }

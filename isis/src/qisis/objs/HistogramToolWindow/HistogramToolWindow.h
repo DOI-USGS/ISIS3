@@ -10,21 +10,27 @@
 
 namespace Qisis {
   class HistogramToolWindow : public Qisis::PlotWindow {
-    Q_OBJECT
+      Q_OBJECT
 
-    public:     
-      HistogramToolWindow(QString title,QWidget *parent);
+    public:
+      HistogramToolWindow(QString title, QWidget *parent);
       void add(PlotToolCurve *pc);
       void add(HistogramItem *hi);
       void addViewMenu();
       void setViewport(CubeViewport *cvp);
-      int getNumItems() { return p_histItems.size(); }
-      HistogramItem *getHistItem(int index) { return p_histItems[index]; }
-      QDockWidget *getDockWidget() { return p_dock; }
+      int getNumItems() {
+        return p_histItems.size();
+      }
+      HistogramItem *getHistItem(int index) {
+        return p_histItems[index];
+      }
+      QDockWidget *getDockWidget() {
+        return p_dock;
+      }
 
-  public slots:
+    public slots:
 
-   
+
     private:
       CubeViewport  *p_cvp; //!< The current viewport
       QList<HistogramItem *> p_histItems;

@@ -12,9 +12,9 @@ namespace Qisis {
   *
   * @ingroup Visualization Tools
   *
-  * @author 2007-09-11 Steven Lambright 
-  *  
-  * @internal 
+  * @author 2007-09-11 Steven Lambright
+  *
+  * @internal
   *   @history 2008-09-26 Steven Lambright Added Segmented line, reordered banding
   *            options at Stuart's Request
   *   @history 2008-10-01 Steven Lambright Fixed bug with segmented line, if
@@ -23,7 +23,7 @@ namespace Qisis {
   */
 
   class RubberBandComboBox : public QComboBox {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
       RubberBandComboBox(unsigned int bandingOptions, unsigned int defaultOption, bool showIndicatorColors = false);
@@ -36,14 +36,16 @@ namespace Qisis {
         Ellipse          = 2,   //!< Ellipse
         Rectangle        = 4,   //!< Rectangle
         RotatedRectangle = 8,   //!< RotatedRectangle
-        Polygon          = 16,  //!< Polygon                    
+        Polygon          = 16,  //!< Polygon
         Line             = 32,  //!< Line
-        SegmentedLine    = 64,  //!< Segmented Line                                     
+        SegmentedLine    = 64,  //!< Segmented Line
         Angle            = 128  //!< Angle
       };
 
       //! Returns the icon directory.
-      QString toolIconDir() const { return RubberBandTool::getInstance()->toolIconDir(); }
+      QString toolIconDir() const {
+        return RubberBandTool::getInstance()->toolIconDir();
+      }
       void reset();
 
     protected slots:
@@ -51,24 +53,40 @@ namespace Qisis {
 
     private:
       //! This is used to figure out which option should be defaulted
-      unsigned int getDefault(unsigned int defaultOption, unsigned int bandingOptions); 
+      unsigned int getDefault(unsigned int defaultOption, unsigned int bandingOptions);
 
       //! Enables the angle shape
-      void showAngle()             { RubberBandTool::enable(RubberBandTool::Angle, p_showIndicatorColors);            };
+      void showAngle()             {
+        RubberBandTool::enable(RubberBandTool::Angle, p_showIndicatorColors);
+      };
       //! Enables the circle shape
-      void showCircle()            { RubberBandTool::enable(RubberBandTool::Circle, p_showIndicatorColors);           };
+      void showCircle()            {
+        RubberBandTool::enable(RubberBandTool::Circle, p_showIndicatorColors);
+      };
       //! Enables the ellipse shape
-      void showEllipse()           { RubberBandTool::enable(RubberBandTool::Ellipse, p_showIndicatorColors);          };
+      void showEllipse()           {
+        RubberBandTool::enable(RubberBandTool::Ellipse, p_showIndicatorColors);
+      };
       //! Enables the line
-      void showLine()              { RubberBandTool::enable(RubberBandTool::Line, p_showIndicatorColors);             };
+      void showLine()              {
+        RubberBandTool::enable(RubberBandTool::Line, p_showIndicatorColors);
+      };
       //! Enables the rectangle shape
-      void showRectangle()         { RubberBandTool::enable(RubberBandTool::Rectangle, p_showIndicatorColors);        };
+      void showRectangle()         {
+        RubberBandTool::enable(RubberBandTool::Rectangle, p_showIndicatorColors);
+      };
       //! Enables the rotated rectangle shape
-      void showRotatedRectangle()  { RubberBandTool::enable(RubberBandTool::RotatedRectangle, p_showIndicatorColors); };
+      void showRotatedRectangle()  {
+        RubberBandTool::enable(RubberBandTool::RotatedRectangle, p_showIndicatorColors);
+      };
       //! Enables the polygon shape
-      void showPolygon()           { RubberBandTool::enable(RubberBandTool::Polygon, p_showIndicatorColors);          };
+      void showPolygon()           {
+        RubberBandTool::enable(RubberBandTool::Polygon, p_showIndicatorColors);
+      };
       //! Enables the segmented line shape
-      void showSegmentedLine()     { RubberBandTool::enable(RubberBandTool::SegmentedLine, p_showIndicatorColors);          };
+      void showSegmentedLine()     {
+        RubberBandTool::enable(RubberBandTool::SegmentedLine, p_showIndicatorColors);
+      };
 
       QStringList p_bandingOptionStrings; //!< List of rubberband options
       bool p_showIndicatorColors; //!< Show colors?

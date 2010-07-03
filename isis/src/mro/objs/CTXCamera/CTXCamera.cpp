@@ -11,16 +11,16 @@ using namespace std;
 namespace Isis {
   namespace Mro {
     // constructors
-    CTXCamera::CTXCamera (Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
+    CTXCamera::CTXCamera(Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
       // Set up the camera info from ik/iak kernels
       SetFocalLength();
       SetPixelPitch();
 
       // Get the start time from labels
-      Isis::PvlGroup &inst = lab.FindGroup ("Instrument",Isis::Pvl::Traverse);
+      Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
       string stime = inst["SpacecraftClockCount"];
       SpiceDouble etStart;
-      scs2e_c (NaifSpkCode(),stime.c_str(),&etStart);
+      scs2e_c(NaifSpkCode(), stime.c_str(), &etStart);
 
       // Get other info from labels
       double csum = inst["SpatialSumming"];
@@ -31,12 +31,12 @@ namespace Isis {
 
       // Setup detector map
       LineScanCameraDetectorMap *detectorMap =
-        new LineScanCameraDetectorMap(this,etStart,lineRate);
+        new LineScanCameraDetectorMap(this, etStart, lineRate);
       detectorMap->SetDetectorSampleSumming(csum);
       detectorMap->SetStartingDetectorSample(ss);
 
       // Setup focal plane map
-      CameraFocalPlaneMap *focalMap =new CameraFocalPlaneMap(this,NaifIkCode());
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
       iString ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_SAMPLE";
@@ -46,7 +46,7 @@ namespace Isis {
       double lineBoreSight = GetDouble(ikernKey);
 
       focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
-      focalMap->SetDetectorOffset(0.0,0.0);
+      focalMap->SetDetectorOffset(0.0, 0.0);
 
       // Setup distortion map
       CameraDistortionMap *distMap = new CameraDistortionMap(this);
@@ -62,6 +62,6 @@ namespace Isis {
   }
 }
 
-extern "C" Isis::Camera *CTXCameraPlugin (Isis::Pvl &lab) {
+extern "C" Isis::Camera *CTXCameraPlugin(Isis::Pvl &lab) {
   return new Isis::Mro::CTXCamera(lab);
 }

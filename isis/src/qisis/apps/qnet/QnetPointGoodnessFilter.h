@@ -34,12 +34,12 @@
 
 namespace Qisis {
   /**
-   * Defines the Goodness of Fit filter for the QnetNavTool's 
-   * Points section. The user may enter Less Than and Greater 
-   * Than.  This class is designed to remove points from the 
-   * current filtered list if all measures have goodness of fit 
-   * values that lie outside the given range. 
-   *  
+   * Defines the Goodness of Fit filter for the QnetNavTool's
+   * Points section. The user may enter Less Than and Greater
+   * Than.  This class is designed to remove points from the
+   * current filtered list if all measures have goodness of fit
+   * values that lie outside the given range.
+   *
    * @author 2008-11-26 Jeannie Walldren
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Original Version
@@ -55,17 +55,17 @@ namespace Qisis {
    */
 
   class QnetPointGoodnessFilter : public QnetFilter {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetPointGoodnessFilter (QWidget *parent=0);
+      QnetPointGoodnessFilter(QWidget *parent = 0);
       virtual void filter();
 
     public slots:
 
     private:
-      QCheckBox *p_lessThanCB; 
-      QCheckBox *p_greaterThanCB;  
+      QCheckBox *p_lessThanCB;
+      QCheckBox *p_greaterThanCB;
       QLineEdit *p_maxValueEdit;
       QLineEdit *p_minValueEdit;
 

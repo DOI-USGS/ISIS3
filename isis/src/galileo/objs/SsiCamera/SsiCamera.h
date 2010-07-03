@@ -3,10 +3,10 @@
 
 #include "FramingCamera.h"
 
-namespace Galileo { 
+namespace Galileo {
   /**
    * @ingroup SpiceInstrumentsAndCameras
-   * 
+   *
    * @brief Camera class
    *
    * This is the camera class for the IssNACamera
@@ -27,8 +27,8 @@ namespace Galileo {
    */
   class SsiCamera : public Isis::FramingCamera {
     public:
-      SsiCamera (Isis::Pvl &lab);
-      ~SsiCamera () {};
+      SsiCamera(Isis::Pvl &lab);
+      ~SsiCamera() {};
   };
 };
 #endif

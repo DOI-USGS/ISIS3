@@ -7,13 +7,13 @@
 namespace Isis {
   class GuiParameterFactory {
     public:
-      static GuiParameter* Create (QGridLayout *grid,
-                                   Isis::UserInterface &ui,
-                                   int group, int param);
+      static GuiParameter *Create(QGridLayout *grid,
+                                  Isis::UserInterface &ui,
+                                  int group, int param);
 
     private:
-      GuiParameterFactory () {};
-      virtual ~GuiParameterFactory () {};
+      GuiParameterFactory() {};
+      virtual ~GuiParameterFactory() {};
   };
 };
 

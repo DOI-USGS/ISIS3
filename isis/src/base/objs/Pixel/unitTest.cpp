@@ -5,11 +5,11 @@
 #include "Preference.h"
 
 using namespace std;
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   cout << "Unit test for Pixel" << endl;
-  
+
   double d = 0.0;
   cout << "Testing 0.0 ... " << endl;
   cout << "IsSpecial:     " << Isis::Pixel::IsSpecial(d) << endl;
@@ -22,7 +22,7 @@ int main (int argc, char *argv[]) {
   cout << "IsLrs:    " << Isis::Pixel::IsLrs(d) << endl;
   cout << "IsLis:    " << Isis::Pixel::IsLis(d) << endl;
   cout << endl;
-  
+
   d = Isis::Null;
   cout << "Testing Isis::Null ... " << endl;
   cout << "IsSpecial:     " << Isis::Pixel::IsSpecial(d) << endl;

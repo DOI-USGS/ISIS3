@@ -5,86 +5,86 @@
 
 namespace Qisis {
   QStackedWidget *MosaicTool::p_activeToolBarStack = NULL;
-  /** 
+  /**
    * Tool constructor
-   * 
+   *
    * @param parent
    */
-  MosaicTool::MosaicTool (QWidget *parent) : QObject(parent) {      
+  MosaicTool::MosaicTool(QWidget *parent) : QObject(parent) {
     p_toolPadAction = NULL;
     p_toolBarWidget = NULL;
     p_active = false;
     std::string tempFilename = Isis::Filename("$base/icons").Expanded();
     p_toolIconDir = tempFilename.c_str();
-    
+
   }
 
 
   /**
    * Adds the tool to the qmos application
-   * 
-   * 
-   * @param mmw 
+   *
+   *
+   * @param mmw
    */
-  void MosaicTool::addTo (Qisis::MosaicMainWindow *mmw) {
+  void MosaicTool::addTo(Qisis::MosaicMainWindow *mmw) {
     addToPermanent(mmw->permanentToolBar());
     addToActive(mmw->activeToolBar());
     addTo(mmw->toolPad());
     //if (!menuName().isEmpty()) {
-      //QMenu *menu = mmw->getMenu(menuName());
-      //addTo(menu);
+    //QMenu *menu = mmw->getMenu(menuName());
+    //addTo(menu);
     //}
   }
 
 
-  /** 
+  /**
    * Adds the MosaicTool to the toolpad
-   * 
+   *
    * @param toolpad
    */
-  void MosaicTool::addTo (Qisis::ToolPad *toolpad) {
+  void MosaicTool::addTo(Qisis::ToolPad *toolpad) {
     p_toolPadAction = toolPadAction(toolpad);
-    if (p_toolPadAction != NULL) {
+    if(p_toolPadAction != NULL) {
       toolpad->addAction(p_toolPadAction);
-      connect (p_toolPadAction,SIGNAL(toggled(bool)),this,SLOT(activate(bool)));
+      connect(p_toolPadAction, SIGNAL(toggled(bool)), this, SLOT(activate(bool)));
     }
   }
 
-  
-  /** 
-   * 
-   * 
+
+  /**
+   *
+   *
    * @param toolbar
    */
-  void MosaicTool::addToActive (QToolBar *toolbar) {
-    if (p_activeToolBarStack == NULL) {
+  void MosaicTool::addToActive(QToolBar *toolbar) {
+    if(p_activeToolBarStack == NULL) {
       p_activeToolBarStack = new QStackedWidget(toolbar);
       toolbar->addWidget(p_activeToolBarStack);
     }
 
     p_toolBarWidget = createToolBarWidget(p_activeToolBarStack);
-    if (p_toolBarWidget != NULL) {
+    if(p_toolBarWidget != NULL) {
       p_activeToolBarStack->addWidget(p_toolBarWidget);
     }
     disableToolBar();
   }
 
 
-  /** 
+  /**
    * Activates the tool.
-   * 
+   *
    * @param on
    */
-  void MosaicTool::activate (bool on) {
-    if (p_active) {
-      if (on) return;
+  void MosaicTool::activate(bool on) {
+    if(p_active) {
+      if(on) return;
       disableToolBar();
-      if (p_toolPadAction != NULL) p_toolPadAction->setChecked(false);
+      if(p_toolPadAction != NULL) p_toolPadAction->setChecked(false);
       p_active = false;
     }
     else {
-      if (!on) return;
-      if (p_toolPadAction != NULL) p_toolPadAction->setChecked(true);
+      if(!on) return;
+      if(p_toolPadAction != NULL) p_toolPadAction->setChecked(true);
       enableToolBar();
       p_active = true;
     }
@@ -96,20 +96,20 @@ namespace Qisis {
   }
 
 
-  /** 
+  /**
    * Disables entire tool bar.
-   * 
+   *
    */
   void MosaicTool::disableToolBar() {
-    if (p_toolBarWidget == NULL) return;
+    if(p_toolBarWidget == NULL) return;
 //    if (p_toolBarWidget->isVisible()) p_toolBarWidget->hide();
     p_toolBarWidget->setEnabled(false);
   }
 
 
-  /** 
+  /**
    * Enables entire tool bar.
-   * 
+   *
    */
   void MosaicTool::enableToolBar() {
     if(p_toolBarWidget == NULL) return;
@@ -120,13 +120,13 @@ namespace Qisis {
 
 
   /**
-   * This allows the programmer to access which widget created 
-   * a tool, since the parent of this tool is a tool bar. 
-   * 
-   * 
-   * @param widget 
+   * This allows the programmer to access which widget created
+   * a tool, since the parent of this tool is a tool bar.
+   *
+   *
+   * @param widget
    */
-  void MosaicTool::setWidget(MosaicWidget *widget){
+  void MosaicTool::setWidget(MosaicWidget *widget) {
     p_widget = widget;
   }
 

@@ -14,14 +14,14 @@ class QTextEdit;
 #include <vector>
 
 namespace Isis {
-  /** 
-   * PvlEditDialog creates a QDialog window in which a QTextEdit 
-   * box displays the contents of a pvl file.  This file may be 
-   * viewed or edited and saved as a new pvl file. 
-   *  
+  /**
+   * PvlEditDialog creates a QDialog window in which a QTextEdit
+   * box displays the contents of a pvl file.  This file may be
+   * viewed or edited and saved as a new pvl file.
+   *
    *  @ingroup ApplicationInterface
-   *  
-   * @author 2008-12-10 Jeannie Walldren 
+   *
+   * @author 2008-12-10 Jeannie Walldren
    * @internal
    *   @history 2008-12-10 Jeannie Walldren - Original version
    *            written to view and edit the template file in the
@@ -36,11 +36,11 @@ namespace Isis {
     *            error throws with QMessage warning boxes.
    */
   class PvlEditDialog : public QDialog {
-    Q_OBJECT
+      Q_OBJECT
 
 
     public:
-      PvlEditDialog (Pvl &pvl, QWidget *parent=0);
+      PvlEditDialog(Pvl &pvl, QWidget *parent = 0);
 
     private:
       QTextEdit *p_textEdit;

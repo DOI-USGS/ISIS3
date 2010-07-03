@@ -45,7 +45,7 @@ namespace Isis {
    *
    * @internal
    */
-    class CameraDistortionMap {
+  class CameraDistortionMap {
     public:
       CameraDistortionMap(Camera *parent, double zDirection = 1.0);
 
@@ -59,20 +59,29 @@ namespace Isis {
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
       //! Return distorted focal plane x
-      inline double FocalPlaneX() const { return p_focalPlaneX; };
+      inline double FocalPlaneX() const {
+        return p_focalPlaneX;
+      };
 
       //! Return distorted focal plane y
-      inline double FocalPlaneY() const { return p_focalPlaneY; };
+      inline double FocalPlaneY() const {
+        return p_focalPlaneY;
+      };
 
       //! Return undistorted focal plane x
-      inline double UndistortedFocalPlaneX() const { return p_undistortedFocalPlaneX; };
+      inline double UndistortedFocalPlaneX() const {
+        return p_undistortedFocalPlaneX;
+      };
 
       //! Return undistorted focal plane y
-      inline double UndistortedFocalPlaneY() const { return p_undistortedFocalPlaneY; };
+      inline double UndistortedFocalPlaneY() const {
+        return p_undistortedFocalPlaneY;
+      };
 
       //! Return undistorted focal plane z
-      inline double UndistortedFocalPlaneZ() const
-        { return p_zDirection * p_camera->FocalLength(); };
+      inline double UndistortedFocalPlaneZ() const {
+        return p_zDirection * p_camera->FocalLength();
+      };
 
     protected:
       Camera *p_camera;

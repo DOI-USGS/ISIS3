@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   try {
@@ -57,7 +57,7 @@ int main () {
     cout << "Offset = " << lab2.Offset() << endl << endl;
 
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report();
   }
 }

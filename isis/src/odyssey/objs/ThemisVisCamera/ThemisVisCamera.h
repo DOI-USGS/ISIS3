@@ -31,22 +31,24 @@ namespace Isis {
     class ThemisVisCamera : public Isis::PushFrameCamera {
       public:
         // constructor
-        ThemisVisCamera (Isis::Pvl &lab);
+        ThemisVisCamera(Isis::Pvl &lab);
 
         //! Destroys the Themis Vis Camera object
-        ~ThemisVisCamera () {};
+        ~ThemisVisCamera() {};
 
         // Sets the band to the band number given
-        void SetBand (const int band);
+        void SetBand(const int band);
 
         double BandEphemerisTimeOffset(int vband);
 
-       /**
-        * The camera model is band dependent, so this method returns false
-        *
-        * @return bool False
-        */
-        bool IsBandIndependent () { return false; };
+        /**
+         * The camera model is band dependent, so this method returns false
+         *
+         * @return bool False
+         */
+        bool IsBandIndependent() {
+          return false;
+        };
 
       private:
         double p_etStart;              //!<Ephemeris Start iTime

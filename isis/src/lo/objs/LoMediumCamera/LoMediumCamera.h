@@ -25,7 +25,7 @@
 using namespace std;
 
 namespace Isis {
-  namespace Lo { 
+  namespace Lo {
     /**
      * @brief Defines the Lunar Orbiter Medium Resolution camera class
      *
@@ -47,12 +47,12 @@ namespace Isis {
      *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
      *            inherit directly from Camera
      */
-   class LoMediumCamera : public Isis::FramingCamera {
+    class LoMediumCamera : public Isis::FramingCamera {
       public:
-        LoMediumCamera (Isis::Pvl &lab);
-        ~LoMediumCamera () {}; 
-        enum FocalPlaneMapType {Fiducial,Boresight,None};
-    }; 
+        LoMediumCamera(Isis::Pvl &lab);
+        ~LoMediumCamera() {};
+        enum FocalPlaneMapType {Fiducial, Boresight, None};
+    };
   };
 };
 #endif

@@ -3,8 +3,8 @@
 
 /**
  *   @file
- *   $Revision: 1.1.1.1 $                                                             
- *   $Date: 2006/10/31 23:18:07 $      
+ *   $Revision: 1.1.1.1 $
+ *   $Date: 2006/10/31 23:18:07 $
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
  *   for intellectual property information, user agreements, and related
@@ -25,35 +25,35 @@
 
 #include <string>
 
-namespace Isis{
-  /**                                                   
+namespace Isis {
+  /**
    * @brief   Creates sequential IDs
-   * 
+   *
    * This class generates IDs in numerical sequence, from an input
    * string. The input must contain one, and only one, series of
    * question marks, which will be replaced with numbers in the
    * generation of IDs. The default start value is 1, but this can
    * be changed.
-   * 
+   *
    * @ingroup Utility
-   *                                                    
+   *
    * @author 2006-07-05 Brendan George
-   *                                                    
+   *
    * @internal
-   */  
-  class ID{
-  public:
-    ID(const std::string &name, int basenum=1);
+   */
+  class ID {
+    public:
+      ID(const std::string &name, int basenum = 1);
 
-    ~ID();
+      ~ID();
 
-    std::string Next();
+      std::string Next();
 
-  private:
-    std::string p_namebase;
-    int p_current;
-    int p_numLength;
-    int p_numStart;
+    private:
+      std::string p_namebase;
+      int p_current;
+      int p_numLength;
+      int p_numStart;
   };
 }
 

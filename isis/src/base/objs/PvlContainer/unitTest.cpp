@@ -2,10 +2,10 @@
 #include "PvlContainer.h"
 #include "Preference.h"
 using namespace std;
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
-  Isis::PvlKeyword dog("DOG",5.2,"meters");
+  Isis::PvlKeyword dog("DOG", 5.2, "meters");
   Isis::PvlKeyword cat("CATTLE");
   cat = "Meow";
   cat.AddComment("Cats shed");
@@ -16,7 +16,7 @@ int main () {
   ani.AddComment("/* Pets are cool */");
 
 //  cout << "1 ..." << endl;
-  cout << ani << endl; 
+  cout << ani << endl;
 
 //  cout << "2 ..." << endl;
   cout << (double) ani["dog"] << endl;

@@ -18,36 +18,36 @@
 using namespace Isis;
 using namespace std;
 
-void LoadMatchSummingMode ();
-void LoadInputSummingMode ();
+void LoadMatchSummingMode();
+void LoadInputSummingMode();
 
-map <string,void*> GuiHelpers(){
-  map <string,void*> helper;
-  helper ["LoadMatchSummingMode"] = (void*) LoadMatchSummingMode;
-  helper ["LoadInputSummingMode"] = (void*) LoadInputSummingMode;
+map <string, void *> GuiHelpers() {
+  map <string, void *> helper;
+  helper ["LoadMatchSummingMode"] = (void *) LoadMatchSummingMode;
+  helper ["LoadInputSummingMode"] = (void *) LoadInputSummingMode;
   return helper;
 }
 
-void IsisMain(){
-            
+void IsisMain() {
+
   // Create a process so we can output the noproj'd labels without overwriting
   Process p;
 
   // Open the user interface and get the input file and the ideal specs file
   UserInterface &ui = Application::GetUserInterface();
-  Cube *mcube,*icube;
+  Cube *mcube, *icube;
 
   // If a MATCH cube is entered, make sure to SetInputCube it first to get the SPICE blobs
   // from it propagated to the TO labels
 
   // Until polygon blobs are detached without "/" don't propagate them
-  p.PropagatePolygons ( false );
+  p.PropagatePolygons(false);
 
-  if ((ui.WasEntered ("MATCH"))) {
+  if((ui.WasEntered("MATCH"))) {
     mcube = p.SetInputCube("MATCH");
     icube = p.SetInputCube("FROM");
   }
-  else{
+  else {
     mcube = icube = p.SetInputCube("FROM");
   }
 
@@ -61,45 +61,45 @@ void IsisMain(){
 
   // Get Ideal camera specifications
   Filename specs;
-  if ((ui.WasEntered ("SPECS"))) {
+  if((ui.WasEntered("SPECS"))) {
     specs = ui.GetFilename("SPECS");
   }
   else {
     specs = "$base/applications/noprojInstruments???.pvl";
     specs.HighestVersion();
   }
-  Pvl idealSpecs( specs.Expanded() );
+  Pvl idealSpecs(specs.Expanded());
   PvlObject obSpecs = idealSpecs.FindObject("IdealInstrumentsSpecifications");
 
   PvlGroup idealGp = obSpecs.FindGroup(groupName);
-  double transx,transy,transl,transs;
+  double transx, transy, transl, transs;
   transx = transy = transl = transs = 0.;
-  if (idealGp.HasKeyword("TransX")) transx = idealGp["TransX"];
-  if (idealGp.HasKeyword("TransY")) transy = idealGp["TransY"];
-  if (idealGp.HasKeyword("ItransL")) transl = idealGp["ItransL"];
-  if (idealGp.HasKeyword("ItransS")) transs = idealGp["ItransS"];
+  if(idealGp.HasKeyword("TransX")) transx = idealGp["TransX"];
+  if(idealGp.HasKeyword("TransY")) transy = idealGp["TransY"];
+  if(idealGp.HasKeyword("ItransL")) transl = idealGp["ItransL"];
+  if(idealGp.HasKeyword("ItransS")) transs = idealGp["ItransS"];
   int detectorSamples = mcube->Samples();
-  if (idealGp.HasKeyword("DetectorSamples")) detectorSamples = idealGp["DetectorSamples"];
+  if(idealGp.HasKeyword("DetectorSamples")) detectorSamples = idealGp["DetectorSamples"];
   int numberLines = mcube->Lines();
   int numberBands = mcube->Bands();
 
-  if (idealGp.HasKeyword("DetectorLines")) numberLines = idealGp["DetectorLines"];
+  if(idealGp.HasKeyword("DetectorLines")) numberLines = idealGp["DetectorLines"];
 
   int xDepend = incam->FocalPlaneMap()->FocalPlaneXDependency();
 
   // Get output summing mode
-  if (ui.GetString("SOURCE") == "FROMMATCH") {
+  if(ui.GetString("SOURCE") == "FROMMATCH") {
     LoadMatchSummingMode();
   }
-  else if (ui.GetString("SOURCE") == "FROMINPUT") {
+  else if(ui.GetString("SOURCE") == "FROMINPUT") {
     LoadInputSummingMode();
   }
 
-  double pixPitch = incam->PixelPitch()*ui.GetDouble("SUMMINGMODE");
-  detectorSamples /= (int) (ui.GetDouble("SUMMINGMODE"));
+  double pixPitch = incam->PixelPitch() * ui.GetDouble("SUMMINGMODE");
+  detectorSamples /= (int)(ui.GetDouble("SUMMINGMODE"));
   // Get the user options
-  int sampleExpansion = int((ui.GetDouble("SAMPEXP")/100.)*detectorSamples + .5);
-  int lineExpansion = int((ui.GetDouble("LINEEXP")/100.)*numberLines + .5);
+  int sampleExpansion = int((ui.GetDouble("SAMPEXP") / 100.) * detectorSamples + .5);
+  int lineExpansion = int((ui.GetDouble("LINEEXP") / 100.) * numberLines + .5);
   string instType;
   double exposure;
 
@@ -115,11 +115,11 @@ void IsisMain(){
   int detectorLines;
   int expandFlag;
 
-  if (incam->DetectorMap()->LineRate() != 0.0) {
-    instType= "LINESCAN";
-    // Isis3 line rate is always in seconds so convert to milliseconds for the 
+  if(incam->DetectorMap()->LineRate() != 0.0) {
+    instType = "LINESCAN";
+    // Isis3 line rate is always in seconds so convert to milliseconds for the
     // Ideal instrument
-    exposure = incam->DetectorMap()->LineRate()*1000.;
+    exposure = incam->DetectorMap()->LineRate() * 1000.;
     detectorLines = 1;
     expandFlag = 1;
   }
@@ -132,14 +132,14 @@ void IsisMain(){
 
   // Adjust focal plane translations with line expansion for scanners since
   // the CCD is only 1 line
-  if (expandFlag) {
-    transl += lineExpansion/2;
+  if(expandFlag) {
+    transl += lineExpansion / 2;
 
-    if (xDepend == CameraFocalPlaneMap::Line) {
-      transx -= lineExpansion/2.*pixPitch*expandFlag;
+    if(xDepend == CameraFocalPlaneMap::Line) {
+      transx -= lineExpansion / 2.*pixPitch * expandFlag;
     }
     else {
-      transy -= lineExpansion/2.*pixPitch*expandFlag;
+      transy -= lineExpansion / 2.*pixPitch * expandFlag;
     }
   }
 
@@ -147,7 +147,7 @@ void IsisMain(){
   AlphaCube alpha(*(icube->Label()));
   double sample = alpha.BetaSample(.5);
   double line = alpha.BetaLine(.5);
-  incam->SetImage(sample,line);
+  incam->SetImage(sample, line);
   double et = incam->EphemerisTime();
 
   // Get the output file name and set its attributes
@@ -161,12 +161,12 @@ void IsisMain(){
   // Determine the output image size from
   //   1) the idealInstrument pvl if there or
   //   2) the input size expanded by user specified percentage
-  Cube *ocube = p.SetOutputCube("match.cub",cao,1, 1, 1);
+  Cube *ocube = p.SetOutputCube("match.cub", cao, 1, 1, 1);
 
   // Extract the times and the target from the instrument group
   string startTime = inst["StartTime"];
   string stopTime;
-  if (inst.HasKeyword("StopTime")) stopTime = (string) inst["StopTime"];
+  if(inst.HasKeyword("StopTime")) stopTime = (string) inst["StopTime"];
 
   string target = inst["TargetName"];
 
@@ -185,97 +185,97 @@ void IsisMain(){
   inst.Clear();
 
   // Add keywords for the "Ideal" instrument
-  Isis::PvlKeyword key("SpacecraftName", "IdealSpacecraft" );
-  inst.AddKeyword( key);   
+  Isis::PvlKeyword key("SpacecraftName", "IdealSpacecraft");
+  inst.AddKeyword(key);
 
   key.SetName("InstrumentId");
-  key.SetValue( "IdealCamera" );
-  inst.AddKeyword( key);   
+  key.SetValue("IdealCamera");
+  inst.AddKeyword(key);
 
   key.SetName("TargetName");
-  key.SetValue( target );
-  inst.AddKeyword( key );
+  key.SetValue(target);
+  inst.AddKeyword(key);
 
   key.SetName("SampleDetectors");
-  key.SetValue( Isis::iString( detectorSamples ));
-  inst.AddKeyword( key);   
+  key.SetValue(Isis::iString(detectorSamples));
+  inst.AddKeyword(key);
 
   key.SetName("LineDetectors");
-  key.SetValue( Isis::iString( detectorLines ));
-  inst.AddKeyword( key);   
+  key.SetValue(Isis::iString(detectorLines));
+  inst.AddKeyword(key);
 
-  key.SetName("InstrumentType" );
-  key.SetValue( instType );
-  inst.AddKeyword( key);   
+  key.SetName("InstrumentType");
+  key.SetValue(instType);
+  inst.AddKeyword(key);
 
   key.SetName("FocalLength");
-  key.SetValue( Isis::iString( incam->FocalLength()), "millimeters" );
-  inst.AddKeyword( key );
+  key.SetValue(Isis::iString(incam->FocalLength()), "millimeters");
+  inst.AddKeyword(key);
 
   key.SetName("PixelPitch");
-  key.SetValue( Isis::iString( incam->PixelPitch()*
-                              ui.GetDouble("SUMMINGMODE")), "millimeters" );
-  inst.AddKeyword( key );
+  key.SetValue(Isis::iString(incam->PixelPitch()*
+                             ui.GetDouble("SUMMINGMODE")), "millimeters");
+  inst.AddKeyword(key);
 
-  key.SetName("EphemerisTime"); 
-  key.SetValue( Isis::iString( et ), "seconds" );
-  inst.AddKeyword( key );
+  key.SetName("EphemerisTime");
+  key.SetValue(Isis::iString(et), "seconds");
+  inst.AddKeyword(key);
 
   key.SetName("StartTime");
-  key.SetValue( startTime );
-  inst.AddKeyword( key );
+  key.SetValue(startTime);
+  inst.AddKeyword(key);
 
-  if (stopTime != "") {
+  if(stopTime != "") {
     key.SetName("StopTime");
-    key.SetValue( stopTime );
-    inst.AddKeyword( key );
+    key.SetValue(stopTime);
+    inst.AddKeyword(key);
   }
 
   key.SetName("FocalPlaneXDependency");
-  key.SetValue( incam->FocalPlaneMap()->FocalPlaneXDependency() );
-  inst.AddKeyword( key );
+  key.SetValue(incam->FocalPlaneMap()->FocalPlaneXDependency());
+  inst.AddKeyword(key);
 
-  if (transx != 0) {
+  if(transx != 0) {
     key.SetName("TransX0");
-    key.SetValue( transx );
-    inst.AddKeyword( key );
+    key.SetValue(transx);
+    inst.AddKeyword(key);
   }
 
-  if (transy != 0) {
+  if(transy != 0) {
     key.SetName("TransY0");
-    key.SetValue( transy );
-    inst.AddKeyword( key );
+    key.SetValue(transy);
+    inst.AddKeyword(key);
   }
 
-  if (transs != 0) {
+  if(transs != 0) {
     key.SetName("TransS0");
-    key.SetValue( transs );
-    inst.AddKeyword( key );
+    key.SetValue(transs);
+    inst.AddKeyword(key);
   }
 
-  if (transl != 0) {
-     key.SetName("TransL0");
-     key.SetValue( transl );
-     inst.AddKeyword( key );
+  if(transl != 0) {
+    key.SetName("TransL0");
+    key.SetValue(transl);
+    inst.AddKeyword(key);
   }
 
   key.SetName("TransX");
-  key.SetValue( incam->FocalPlaneMap()->SignMostSigX() );
-  inst.AddKeyword( key );
+  key.SetValue(incam->FocalPlaneMap()->SignMostSigX());
+  inst.AddKeyword(key);
 
   key.SetName("TransY");
-  key.SetValue( incam->FocalPlaneMap()->SignMostSigY() );
-  inst.AddKeyword( key );
+  key.SetValue(incam->FocalPlaneMap()->SignMostSigY());
+  inst.AddKeyword(key);
 
-  if (instType == "LINESCAN") {
+  if(instType == "LINESCAN") {
     key.SetName("ExposureDuration");
-    key.SetValue( Isis::iString( incam->DetectorMap()->LineRate()*1000.), "milliseconds" );
-    inst.AddKeyword( key );
+    key.SetValue(Isis::iString(incam->DetectorMap()->LineRate() * 1000.), "milliseconds");
+    inst.AddKeyword(key);
   }
 
   key.SetName("MatchedCube");
-  key.SetValue( mcube->Filename() ); 
-  inst.AddKeyword( key );
+  key.SetValue(mcube->Filename());
+  inst.AddKeyword(key);
 
   ocube->PutGroup(inst);
 
@@ -285,19 +285,19 @@ void IsisMain(){
 // taking all the space it would require for the image data
   Pvl label;
   label.Read("match.lbl");
-  PvlGroup &dims = label.FindGroup("Dimensions",Pvl::Traverse);
+  PvlGroup &dims = label.FindGroup("Dimensions", Pvl::Traverse);
   dims["Lines"] = numberLines;
   dims["Samples"] = detectorSamples;
   dims["Bands"] = numberBands;
   label.Write("match.lbl");
-  
+
 // And run cam2cam to apply the transformation
   string parameters;
   parameters += " FROM= " + ui.GetFilename("FROM");
   parameters += " MATCH= " + string("match.cub");
   parameters += " TO= " + ui.GetFilename("TO");
   parameters += " INTERP=" + ui.GetString("INTERP");
-  Isis::iApp ->Exec("cam2cam",parameters);
+  Isis::iApp ->Exec("cam2cam", parameters);
 
 //  Cleanup by deleting the match files
   remove("match.History.IsisCube");
@@ -318,31 +318,31 @@ void IsisMain(){
 // Extract label and create cube object
   Pvl *toLabel = toCube.Label();
   PvlObject &o = toLabel->FindObject("IsisCube");
-  o.DeleteGroup( "OriginalInstrument" );
+  o.DeleteGroup("OriginalInstrument");
   o.AddGroup(fromInst);
   toCube.Close();
 }
 
- // Helper function to get output summing mode from cube to MATCH 
-void LoadMatchSummingMode () {
+// Helper function to get output summing mode from cube to MATCH
+void LoadMatchSummingMode() {
   string file;
   UserInterface &ui = Application::GetUserInterface();
 
   // Get camera from cube to match
-  if ((ui.GetString ("SOURCE") =="FROMMATCH") && (ui.WasEntered("MATCH"))) {
+  if((ui.GetString("SOURCE") == "FROMMATCH") && (ui.WasEntered("MATCH"))) {
     file = ui.GetFilename("MATCH");
   }
   else {
     file = ui.GetFilename("FROM");
   }
 
- // Open the input cube and get the camera object
+// Open the input cube and get the camera object
   Cube c;
   c.Open(file);
   Camera *cam = c.Camera();
 
   ui.Clear("SUMMINGMODE");
-  ui.PutDouble("SUMMINGMODE",cam->DetectorMap()->SampleScaleFactor());
+  ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());
 
   ui.Clear("SOURCE");
   ui.PutAsString("SOURCE", "FROMUSER");
@@ -350,18 +350,18 @@ void LoadMatchSummingMode () {
 
 
 // Helper function to get output summing mode from input cube (FROM)
-void LoadInputSummingMode () {
+void LoadInputSummingMode() {
   UserInterface &ui = Application::GetUserInterface();
 
- // Get camera from cube to match
+// Get camera from cube to match
   string file = ui.GetFilename("FROM");
- // Open the input cube and get the camera object
+// Open the input cube and get the camera object
   Cube c;
   c.Open(file);
   Camera *cam = c.Camera();
 
   ui.Clear("SUMMINGMODE");
-  ui.PutDouble("SUMMINGMODE",cam->DetectorMap()->SampleScaleFactor());
+  ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());
 
   ui.Clear("SOURCE");
   ui.PutAsString("SOURCE", "FROMUSER");

@@ -21,7 +21,7 @@
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
- * 
+ *
  */
 
 #include <string>
@@ -34,11 +34,11 @@ namespace Isis {
 
   /**
    * @brief Needs Documentation
-   * 
+   *
    * Needs Documentation
-   * 
+   *
    * @author 2007-09-17 Debbie A. Cook
-   * 
+   *
    * @internal
    *   @history 2007-09-17 Debbie A. Cook - Original version
    *   @history 2008-01-11 Christopher Austin - Made class more
@@ -53,23 +53,23 @@ namespace Isis {
    */
   class ObservationNumberList : public Isis::SerialNumberList {
     public:
-      ObservationNumberList (const std::string &list, bool checkTarget=true);
+      ObservationNumberList(const std::string &list, bool checkTarget = true);
       ObservationNumberList(Isis::SerialNumberList *snlist);
       ~ObservationNumberList();
 
-      void Add (int isn, const int observationIndex,std::string observationNumber) ;
-      int ObservationSize () const;
+      void Add(int isn, const int observationIndex, std::string observationNumber) ;
+      int ObservationSize() const;
 
-      int ObservationNumberMapIndex(const int serialNumberIndex );
+      int ObservationNumberMapIndex(const int serialNumberIndex);
 
-      void Remove ( Isis::SerialNumberList *snlist );
-      void Remove (const std::string &listfile);
+      void Remove(Isis::SerialNumberList *snlist);
+      void Remove(const std::string &listfile);
 
-      bool HasObservationNumber (const std::string &on);
+      bool HasObservationNumber(const std::string &on);
 
       std::string ObservationNumber(const std::string &filename);
-      std::string ObservationNumber (int index);
-      std::vector<std::string> PossibleFilenames (const std::string &on);
+      std::string ObservationNumber(int index);
+      std::vector<std::string> PossibleFilenames(const std::string &on);
 
     private:
       struct ObservationSet {
@@ -78,10 +78,10 @@ namespace Isis {
         std::string observationNumber;
       };
 
-      void init ( Isis::SerialNumberList *snlist );
+      void init(Isis::SerialNumberList *snlist);
 
       std::vector<ObservationSet> p_sets;
-      std::multimap<int,int> p_indexMap;
+      std::multimap<int, int> p_indexMap;
       int p_numberObservations;
   };
 };

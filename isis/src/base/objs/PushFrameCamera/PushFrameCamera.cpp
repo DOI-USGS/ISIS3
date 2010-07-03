@@ -29,7 +29,7 @@ namespace Isis {
    *
    * @param lab Pvl label used to create the parent Camera object
    */
-  PushFrameCamera::PushFrameCamera (Isis::Pvl &lab) : Camera (lab) {
+  PushFrameCamera::PushFrameCamera(Isis::Pvl &lab) : Camera(lab) {
   }
 };
 

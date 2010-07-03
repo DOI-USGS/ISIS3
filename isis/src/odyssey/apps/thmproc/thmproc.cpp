@@ -6,14 +6,14 @@ using namespace Isis;
 void ProcessVis(bool isRdr);
 void ProcessIr();
 
-void IsisMain () {
+void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  if (!ui.GetBoolean("INGESTION") && !ui.GetBoolean("MAPPING")) {
+  if(!ui.GetBoolean("INGESTION") && !ui.GetBoolean("MAPPING")) {
     string msg = "You must pick one of [INGESTION,MAPPING]";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
- 
+
   if(ui.GetBoolean("INGESTION")) {
     Pvl labels(ui.GetFilename("FROM"));
 
@@ -96,7 +96,7 @@ void ProcessVis(bool isRdr) {
   if(ui.GetBoolean("INGESTION")) {
     p.SetFirstApplication("thm2isis");
   }
-  else{
+  else {
     p.SetFirstApplication("spiceinit");
   }
 
@@ -145,7 +145,7 @@ void ProcessIr() {
   if(ui.GetBoolean("INGESTION")) {
     p.SetFirstApplication("thm2isis");
   }
-  else{
+  else {
     p.SetFirstApplication("spiceinit");
   }
 

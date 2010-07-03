@@ -12,19 +12,19 @@
 using namespace std;
 class MyProjection : public Isis::Projection {
   public:
-    MyProjection (Isis::Pvl &lab) :
-      Isis::Projection (lab) {
+    MyProjection(Isis::Pvl &lab) :
+      Isis::Projection(lab) {
     }
     bool XYRange(double &minX, double &maxX, double &minY, double &maxY) {
       minX = DBL_MAX;
       minY = DBL_MAX;
       maxX = -DBL_MAX;
       maxY = -DBL_MAX;
-      if (!p_groundRangeGood) return false;
-      XYRangeCheck(p_minimumLatitude,p_minimumLongitude);
-      XYRangeCheck(p_minimumLatitude,p_maximumLongitude);
-      XYRangeCheck(p_maximumLatitude,p_minimumLongitude);
-      XYRangeCheck(p_maximumLatitude,p_maximumLongitude);
+      if(!p_groundRangeGood) return false;
+      XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
+      XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
+      XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
+      XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
       minX = p_minimumX;
       minY = p_minimumY;
       maxX = p_maximumX;
@@ -32,7 +32,7 @@ class MyProjection : public Isis::Projection {
       return true;
     }
     bool SetGround(const double lat, const double lon) {
-      if ((lat < -90.0) || (lat > 90.0)) {
+      if((lat < -90.0) || (lat > 90.0)) {
         p_good = false;
       }
       else {
@@ -40,13 +40,13 @@ class MyProjection : public Isis::Projection {
         p_longitude = lon;
         double x = lon * 10.0;
         double y = lat + 90.0;
-        SetComputedXY(x,y);
+        SetComputedXY(x, y);
         p_good = true;
       }
       return p_good;
     }
     virtual bool SetCoordinate(const double x, const double y) {
-      SetXY(x,y);
+      SetXY(x, y);
       p_longitude = GetX() / 10.0;
       p_latitude = GetY() - 90.0;
       p_good = true;
@@ -57,15 +57,19 @@ class MyProjection : public Isis::Projection {
       return 45.0;
     }
 
-    std::string Name() const { return "None"; }
-    std::string Version() const { return "1.0"; }
+    std::string Name() const {
+      return "None";
+    }
+    std::string Version() const {
+      return "1.0";
+    }
 
     void Output() const {
-      cout << tCompute(0.0,0.0) << endl;
-      cout << tCompute(Isis::HALFPI/2.0,sin(Isis::HALFPI/2.0)) << endl;
-      cout << tCompute(Isis::HALFPI,sin(Isis::HALFPI)) << endl;
-      cout << mCompute(sin(0.0),cos(0.0)) << endl;
-      cout << mCompute(sin(Isis::HALFPI/2.0),cos(Isis::HALFPI/2.0)) << endl;
+      cout << tCompute(0.0, 0.0) << endl;
+      cout << tCompute(Isis::HALFPI / 2.0, sin(Isis::HALFPI / 2.0)) << endl;
+      cout << tCompute(Isis::HALFPI, sin(Isis::HALFPI)) << endl;
+      cout << mCompute(sin(0.0), cos(0.0)) << endl;
+      cout << mCompute(sin(Isis::HALFPI / 2.0), cos(Isis::HALFPI / 2.0)) << endl;
       cout << e4Compute() << endl;
       cout << phi2Compute(0.0) << endl;
       cout << phi2Compute(10.0) << endl;
@@ -76,29 +80,43 @@ class MyProjection : public Isis::Projection {
 
 class EmptyProjection : public Isis::Projection {
   public:
-    EmptyProjection (Isis::Pvl &lab) :
-      Isis::Projection (lab) {
+    EmptyProjection(Isis::Pvl &lab) :
+      Isis::Projection(lab) {
     }
 
-    std::string Name() const { return "None"; }
-    std::string Version() const { return "1.0"; }
+    std::string Name() const {
+      return "None";
+    }
+    std::string Version() const {
+      return "1.0";
+    }
 };
 
 
 class MyMapper : public Isis::WorldMapper {
   public:
     MyMapper() : Isis::WorldMapper() {};
-    double ProjectionX(const double worldX) const { return worldX / 2.0; };
-    double ProjectionY(const double worldY) const { return worldY / 3.0; };
-    double WorldX(const double projectionX) const { return projectionX * 2.0; };
-    double WorldY(const double projectionY) const { return projectionY * 3.0; };
-    virtual double Resolution() const { return 0.5; }
+    double ProjectionX(const double worldX) const {
+      return worldX / 2.0;
+    };
+    double ProjectionY(const double worldY) const {
+      return worldY / 3.0;
+    };
+    double WorldX(const double projectionX) const {
+      return projectionX * 2.0;
+    };
+    double WorldY(const double projectionY) const {
+      return projectionY * 3.0;
+    };
+    virtual double Resolution() const {
+      return 0.5;
+    }
 };
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
-  void Doit(Isis::Pvl &lab);
+  void Doit(Isis::Pvl & lab);
 
   cout.precision(13);
   cout << "Unit test for Isis::Projection ..." << endl << endl;
@@ -120,13 +138,13 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for invalid Equatoral Radius" << endl;
-  mg += Isis::PvlKeyword("PolarRadius",-0.95);
+  mg += Isis::PvlKeyword("PolarRadius", -0.95);
   Doit(lab);
   cout << endl;
 
   cout << "Test for invalid polar radius" << endl;
   mg["EquatorialRadius"] = 1.0;
-  mg += Isis::PvlKeyword("PolarRadius",-0.95);
+  mg += Isis::PvlKeyword("PolarRadius", -0.95);
   Doit(lab);
   cout << endl;
 
@@ -136,7 +154,7 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for invalid latitude type" << endl;
-  mg += Isis::PvlKeyword("LatitudeType","Planeto");
+  mg += Isis::PvlKeyword("LatitudeType", "Planeto");
   Doit(lab);
   cout << endl;
 
@@ -146,7 +164,7 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for invalid longitude direction" << endl;
-  mg += Isis::PvlKeyword("LongitudeDirection","Up");
+  mg += Isis::PvlKeyword("LongitudeDirection", "Up");
   Doit(lab);
   cout << endl;
 
@@ -156,7 +174,7 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for invalid longitude domain" << endl;
-  mg += Isis::PvlKeyword("LongitudeDomain",75);
+  mg += Isis::PvlKeyword("LongitudeDomain", 75);
   Doit(lab);
   cout << endl;
   mg["LongitudeDomain"] = 360;
@@ -207,10 +225,10 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing unordered latitude range" << endl;
-  mg += Isis::PvlKeyword("MinimumLatitude",45.0);
-  mg += Isis::PvlKeyword("MaximumLatitude",-80.0);
-  mg += Isis::PvlKeyword("MinimumLongitude",15.0);
-  mg += Isis::PvlKeyword("MaximumLongitude",-190.0);
+  mg += Isis::PvlKeyword("MinimumLatitude", 45.0);
+  mg += Isis::PvlKeyword("MaximumLatitude", -80.0);
+  mg += Isis::PvlKeyword("MinimumLongitude", 15.0);
+  mg += Isis::PvlKeyword("MaximumLongitude", -190.0);
   Doit(lab);
   cout << endl;
 
@@ -238,8 +256,8 @@ int main (int argc, char *argv[]) {
   cout << "Minimum longitude:       " << p2.MinimumLongitude() << endl;
   cout << "Maximum longitude:       " << p2.MaximumLongitude() << endl;
 
-  double minX,maxX,minY,maxY;
-  p2.XYRange(minX,maxX,minY,maxY);
+  double minX, maxX, minY, maxY;
+  p2.XYRange(minX, maxX, minY, maxY);
   cout << "Minimum X:              " << minX << endl;
   cout << "Maximum X:              " << maxX << endl;
   cout << "Minimum Y:              " << minY << endl;
@@ -247,11 +265,11 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing Ground coordinate routines" << endl;
-  cout << "Setting latitude to (-91,  0):  " << p2.SetGround(-91.0,0.0) << endl;
+  cout << "Setting latitude to (-91,  0):  " << p2.SetGround(-91.0, 0.0) << endl;
   cout << "Is Good:                        " << p2.IsGood() << endl;
-  cout << "Setting latitude to ( 91,  0):  " << p2.SetGround(91.0,0.0) << endl;
+  cout << "Setting latitude to ( 91,  0):  " << p2.SetGround(91.0, 0.0) << endl;
   cout << "Is Good:                        " << p2.IsGood() << endl;
-  cout << "Setting position to (60,  -5):  " << p2.SetGround(60.0,-5.0) << endl;
+  cout << "Setting position to (60,  -5):  " << p2.SetGround(60.0, -5.0) << endl;
   cout << "Is Good:                        " << p2.IsGood() << endl;
   cout << "Latitude:                       " << p2.Latitude() << endl;
   cout << "Longitude:                      " << p2.Longitude() << endl;
@@ -263,7 +281,7 @@ int main (int argc, char *argv[]) {
 
 
   cout << "Testing Universal Ground coordinate routines" << endl;
-  cout << "Setting position to (57.3920057293825,  355):  " << p2.SetUniversalGround(57.3920057293825,-5.0) << endl;
+  cout << "Setting position to (57.3920057293825,  355):  " << p2.SetUniversalGround(57.3920057293825, -5.0) << endl;
   cout << "Is Good:                                       " << p2.IsGood() << endl;
   cout << "Latitude:                                      " << p2.Latitude() << endl;
   cout << "Longitude:                                     " << p2.Longitude() << endl;
@@ -274,7 +292,7 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing projection coordinate routines" << endl;
-  cout << "Setting x/y position to (-2550,15):  " << p2.SetCoordinate(-2250.0,15.0) << endl;
+  cout << "Setting x/y position to (-2550,15):  " << p2.SetCoordinate(-2250.0, 15.0) << endl;
   cout << "Is Good:                             " << p2.IsGood() << endl;
   cout << "Latitude:                            " << p2.Latitude() << endl;
   cout << "Longitude:                           " << p2.Longitude() << endl;
@@ -289,7 +307,7 @@ int main (int argc, char *argv[]) {
   p2.SetWorldMapper(new MyMapper());
 
   cout << "Testing world coordinate routines" << endl;
-  cout << "Setting world x/y position to (-4500,45):  " << p2.SetWorld(-4500.0,45.0) << endl;
+  cout << "Setting world x/y position to (-4500,45):  " << p2.SetWorld(-4500.0, 45.0) << endl;
   cout << "Is Good:                                   " << p2.IsGood() << endl;
   cout << "Latitude:                                  " << p2.Latitude() << endl;
   cout << "Longitude:                                 " << p2.Longitude() << endl;
@@ -310,7 +328,7 @@ int main (int argc, char *argv[]) {
 
   cout << "Testing IsSky method" << endl;
   cout << p2.IsSky() << endl;
-  mg += Isis::PvlKeyword("TargetName","SKY");
+  mg += Isis::PvlKeyword("TargetName", "SKY");
   Doit(lab);
   MyProjection p3(lab);
   cout << p3.IsSky() << endl;
@@ -333,7 +351,7 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing no projection" << endl;
-  noproj.SetUniversalGround(45.0,270.0);
+  noproj.SetUniversalGround(45.0, 270.0);
   cout << "Latitude:    " << noproj.Latitude() << endl;
   cout << "Longitude:   " << noproj.Longitude() << endl;
   cout << endl;
@@ -378,25 +396,25 @@ int main (int argc, char *argv[]) {
 
   cout << "Testing other static methods " << endl;
   try {
-    Isis::PvlGroup radii = Isis::Projection::TargetRadii ("Mars");
+    Isis::PvlGroup radii = Isis::Projection::TargetRadii("Mars");
     cout << "Mars equatorial radius: " << radii["EquatorialRadius"] << endl;
     cout << "Mars polar radius: " << radii["PolarRadius"] << endl;
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 
   cout << "Rotation Tests" << endl;
-  mg += Isis::PvlKeyword("Rotation",90.0);
+  mg += Isis::PvlKeyword("Rotation", 90.0);
   mg["LongitudeDirection"] = "PositiveEast";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;
   cout << "Testing Ground coordinate routines" << endl;
-  cout << "Setting latitude to (-91,  0):  " << p4.SetGround(-91.0,0.0) << endl;
+  cout << "Setting latitude to (-91,  0):  " << p4.SetGround(-91.0, 0.0) << endl;
   cout << "Is Good:                        " << p4.IsGood() << endl;
-  cout << "Setting latitude to ( 91,  0):  " << p4.SetGround(91.0,0.0) << endl;
+  cout << "Setting latitude to ( 91,  0):  " << p4.SetGround(91.0, 0.0) << endl;
   cout << "Is Good:                        " << p4.IsGood() << endl;
-  cout << "Setting position to (60,  -5):  " << p4.SetGround(60.0,-5.0) << endl;
+  cout << "Setting position to (60,  -5):  " << p4.SetGround(60.0, -5.0) << endl;
   cout << "Is Good:                        " << p4.IsGood() << endl;
   cout << "Latitude:                       " << p4.Latitude() << endl;
   cout << "Longitude:                      " << p4.Longitude() << endl;
@@ -407,7 +425,7 @@ int main (int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing projection coordinate routines" << endl;
-  cout << "Setting x/y position to (150,50):  " << p4.SetCoordinate(150.0,50.0) << endl;
+  cout << "Setting x/y position to (150,50):  " << p4.SetCoordinate(150.0, 50.0) << endl;
   cout << "Is Good:                             " << p4.IsGood() << endl;
   cout << "Latitude:                            " << p4.Latitude() << endl;
   cout << "Longitude:                           " << p4.Longitude() << endl;
@@ -437,11 +455,11 @@ int main (int argc, char *argv[]) {
 }
 
 
-void Doit (Isis::Pvl &lab) {
+void Doit(Isis::Pvl &lab) {
   try {
     MyProjection p(lab);
   }
-  catch (Isis::iException &error) {
-    error.Report (false);
+  catch(Isis::iException &error) {
+    error.Report(false);
   }
 }

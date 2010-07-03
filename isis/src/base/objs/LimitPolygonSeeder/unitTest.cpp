@@ -20,7 +20,7 @@
 using namespace std;
 using namespace Isis;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
   try {
     cout << "Test 1, create a seeder" << endl;
@@ -28,7 +28,7 @@ int main () {
     PvlGroup alg("PolygonSeederAlgorithm");
 
     if(!alg.HasKeyword("Name")) {
-      alg += PvlKeyword("Name","Limit");
+      alg += PvlKeyword("Name", "Limit");
       alg += PvlKeyword("MinimumThickness", 0.3);
       alg += PvlKeyword("MinimumArea", 5);
       alg += PvlKeyword("MajorAxisPoints", 2);
@@ -53,35 +53,35 @@ int main () {
     try {
       // Call the seed member with a polygon
       geos::geom::CoordinateSequence *pts;
-      vector<geos::geom::Geometry*> polys;
-  
+      vector<geos::geom::Geometry *> polys;
+
       // Create the A polygon
-      pts = new geos::geom::CoordinateArraySequence ();
-      pts->add (geos::geom::Coordinate (0, 0));
-      pts->add (geos::geom::Coordinate (0, 1));
-      pts->add (geos::geom::Coordinate (0.5, 0.5));
-      pts->add (geos::geom::Coordinate (1, 0));
-      pts->add (geos::geom::Coordinate (0, 0));
-  
-      polys.push_back (Isis::globalFactory.createPolygon (
-                       Isis::globalFactory.createLinearRing(pts),NULL));
-  
-      geos::geom::MultiPolygon *mp = Isis::globalFactory.createMultiPolygon (polys);
-  
+      pts = new geos::geom::CoordinateArraySequence();
+      pts->add(geos::geom::Coordinate(0, 0));
+      pts->add(geos::geom::Coordinate(0, 1));
+      pts->add(geos::geom::Coordinate(0.5, 0.5));
+      pts->add(geos::geom::Coordinate(1, 0));
+      pts->add(geos::geom::Coordinate(0, 0));
+
+      polys.push_back(Isis::globalFactory.createPolygon(
+                        Isis::globalFactory.createLinearRing(pts), NULL));
+
+      geos::geom::MultiPolygon *mp = Isis::globalFactory.createMultiPolygon(polys);
+
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
       PvlGroup radii = Projection::TargetRadii("MARS");
       Isis::Pvl maplab;
       maplab.AddGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
-      mapGroup += Isis::PvlKeyword("EquatorialRadius",(string)radii["EquatorialRadius"]);
-      mapGroup += Isis::PvlKeyword("PolarRadius",(string)radii["PolarRadius"]);
-      mapGroup += Isis::PvlKeyword("LatitudeType","Planetocentric");
-      mapGroup += Isis::PvlKeyword("LongitudeDirection","PositiveEast");
-      mapGroup += Isis::PvlKeyword("LongitudeDomain",360);
-      mapGroup += Isis::PvlKeyword("CenterLatitude",0);
-      mapGroup += Isis::PvlKeyword("CenterLongitude",0);
-      mapGroup += Isis::PvlKeyword("ProjectionName","Sinusoidal");
+      mapGroup += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
+      mapGroup += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+      mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
+      mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
+      mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
+      mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
+      mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+      mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
 
       Projection *proj = Isis::ProjectionFactory::Create(maplab);
 
@@ -89,25 +89,25 @@ int main () {
       vector<geos::geom::Point *> seedValues = ps->Seed(xymp);
 
       vector<geos::geom::Point *> points;
-      for( unsigned int pt = 0; pt < seedValues.size(); pt ++) {
-        if (proj->SetCoordinate(seedValues[pt]->getX(),seedValues[pt]->getY())) {
+      for(unsigned int pt = 0; pt < seedValues.size(); pt ++) {
+        if(proj->SetCoordinate(seedValues[pt]->getX(), seedValues[pt]->getY())) {
           points.push_back(Isis::globalFactory.createPoint(
-              geos::geom::Coordinate(proj->UniversalLongitude(),
-                                     proj->UniversalLatitude())));
+                             geos::geom::Coordinate(proj->UniversalLongitude(),
+                                 proj->UniversalLatitude())));
         }
         else {
-          iString msg = "Unable to convert to a (lon,lat)"; 
+          iString msg = "Unable to convert to a (lon,lat)";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
       }
 
       cout << setprecision(13);
-      for (unsigned int i=0; i<points.size(); i++) {
+      for(unsigned int i = 0; i < points.size(); i++) {
         cout << "  POINT (";
         cout << points[i]->getX() << " " << points[i]->getY() << ")" << endl;
       }
     }
-    catch (iException &e) {
+    catch(iException &e) {
       e.Report();
     }
 
@@ -115,20 +115,20 @@ int main () {
     try {
       // Call the seed member with a polygon
       geos::geom::CoordinateSequence *pts;
-      vector<geos::geom::Geometry*> polys;
+      vector<geos::geom::Geometry *> polys;
 
       // Create the A polygon
-      pts = new geos::geom::CoordinateArraySequence ();
-      pts->add (geos::geom::Coordinate (0, 0));
-      pts->add (geos::geom::Coordinate (0, 0.5));
-      pts->add (geos::geom::Coordinate (0.0125, 0.5));
-      pts->add (geos::geom::Coordinate (0.0125, 0));
-      pts->add (geos::geom::Coordinate (0, 0));
+      pts = new geos::geom::CoordinateArraySequence();
+      pts->add(geos::geom::Coordinate(0, 0));
+      pts->add(geos::geom::Coordinate(0, 0.5));
+      pts->add(geos::geom::Coordinate(0.0125, 0.5));
+      pts->add(geos::geom::Coordinate(0.0125, 0));
+      pts->add(geos::geom::Coordinate(0, 0));
 
-      polys.push_back (Isis::globalFactory.createPolygon (
-                       Isis::globalFactory.createLinearRing(pts),NULL));
+      polys.push_back(Isis::globalFactory.createPolygon(
+                        Isis::globalFactory.createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory.createMultiPolygon (polys);
+      geos::geom::MultiPolygon *mp = Isis::globalFactory.createMultiPolygon(polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
@@ -137,27 +137,27 @@ int main () {
       Isis::Pvl maplab;
       maplab.AddGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
-      mapGroup += Isis::PvlKeyword("EquatorialRadius",(string)radii["EquatorialRadius"]);
-      mapGroup += Isis::PvlKeyword("PolarRadius",(string)radii["PolarRadius"]);
-      mapGroup += Isis::PvlKeyword("LatitudeType","Planetocentric");
-      mapGroup += Isis::PvlKeyword("LongitudeDirection","PositiveEast");
-      mapGroup += Isis::PvlKeyword("LongitudeDomain",360);
-      mapGroup += Isis::PvlKeyword("CenterLatitude",0);
-      mapGroup += Isis::PvlKeyword("CenterLongitude",0);
-      mapGroup += Isis::PvlKeyword("ProjectionName","Sinusoidal");
+      mapGroup += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
+      mapGroup += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+      mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
+      mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
+      mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
+      mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
+      mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+      mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
       //Projection *proj = Isis::ProjectionFactory::Create(maplab);
 
       // NOTHING SHOULD BE PRINTED (the thickness test should not have been met)
       vector<geos::geom::Point *> seedValues = ps->Seed(mp);
-      for (unsigned int i=0; i<seedValues.size(); i++) {
+      for(unsigned int i = 0; i < seedValues.size(); i++) {
         cout << "Point(" << i << ") = " << seedValues[i]->toString() << endl;
       }
     }
-    catch (iException &e) {
+    catch(iException &e) {
       e.Report();
     }
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 

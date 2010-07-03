@@ -8,12 +8,12 @@
 
 namespace Qisis {
   class BandSpinBox : public QSpinBox {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      BandSpinBox (QWidget *parent = 0);
-      void setBandBin (Isis::Pvl &pvl, const QString &key = "BandNumber");
-      QStringList BandBinKeys ();
+      BandSpinBox(QWidget *parent = 0);
+      void setBandBin(Isis::Pvl &pvl, const QString &key = "BandNumber");
+      QStringList BandBinKeys();
       QSize sizeHint() const;
       QValidator::State validate(QString &input, int &pos) const;
 
@@ -22,8 +22,8 @@ namespace Qisis {
       void setKey(int key);
 
     protected:
-      QString textFromValue (int val) const;
-      int valueFromText (const QString &text) const;
+      QString textFromValue(int val) const;
+      int valueFromText(const QString &text) const;
 
     private:
       int p_bands;  //!< Number of bands

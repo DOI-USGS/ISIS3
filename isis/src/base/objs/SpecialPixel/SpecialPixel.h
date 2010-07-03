@@ -71,10 +71,10 @@ namespace Isis {
    *                      and modified StringToPixel() to allow
    *                      the user to enter any legal and unique
    *                      shortened version of special pixels.
-   *  
+   *
    *
    *  @todo 2005-02-15 Kris Becker - finish class documentation
-   * 
+   *
    */
 
 /// @cond INTERNAL
@@ -157,162 +157,162 @@ namespace Isis {
   const float VALID_MAX4       = FLT_MAX;
 
   // 2-byte signed special pixel values
-  const short VALID_MIN2     = ((short) (-32752));
-  const short NULL2          = ((short) (-32768));
-  const short LOW_REPR_SAT2  = ((short) (-32767));
-  const short LOW_INSTR_SAT2 = ((short) (-32766));
-  const short HIGH_INSTR_SAT2 =((short) (-32765));
-  const short HIGH_REPR_SAT2  =((short) (-32764));
-  const short VALID_MAX2      =((short)   32767 );
+  const short VALID_MIN2     = ((short)(-32752));
+  const short NULL2          = ((short)(-32768));
+  const short LOW_REPR_SAT2  = ((short)(-32767));
+  const short LOW_INSTR_SAT2 = ((short)(-32766));
+  const short HIGH_INSTR_SAT2 = ((short)(-32765));
+  const short HIGH_REPR_SAT2  = ((short)(-32764));
+  const short VALID_MAX2      = ((short)   32767);
 
   // 2-byte unsigned special pixel values
   const unsigned short VALID_MINU2     = ((unsigned short)       3);
   const unsigned short NULLU2          = ((unsigned short)       0);
   const unsigned short LOW_REPR_SATU2  = ((unsigned short)       1);
   const unsigned short LOW_INSTR_SATU2 = ((unsigned short)       2);
-  const unsigned short HIGH_INSTR_SATU2 =((unsigned short)   65534);
-  const unsigned short HIGH_REPR_SATU2  =((unsigned short)   65535);
-  const unsigned short VALID_MAXU2      =((unsigned short)   65522);
+  const unsigned short HIGH_INSTR_SATU2 = ((unsigned short)   65534);
+  const unsigned short HIGH_REPR_SATU2  = ((unsigned short)   65535);
+  const unsigned short VALID_MAXU2      = ((unsigned short)   65522);
 
   // 1-byte special pixel values
-  const unsigned char VALID_MIN1  =    ((unsigned char) 1);
-  const unsigned char NULL1       =    ((unsigned char) 0);
-  const unsigned char LOW_REPR_SAT1 =  ((unsigned char) 0);
+  const unsigned char VALID_MIN1  = ((unsigned char) 1);
+  const unsigned char NULL1       = ((unsigned char) 0);
+  const unsigned char LOW_REPR_SAT1 = ((unsigned char) 0);
   const unsigned char LOW_INSTR_SAT1 = ((unsigned char) 0);
-  const unsigned char HIGH_INSTR_SAT1 =((unsigned char) 255);
+  const unsigned char HIGH_INSTR_SAT1 = ((unsigned char) 255);
   const unsigned char HIGH_REPR_SAT1 = ((unsigned char) 255);
-  const unsigned char VALID_MAX1    =  ((unsigned char) 254);
+  const unsigned char VALID_MAX1    = ((unsigned char) 254);
 
- /**
-  * Returns if the input pixel is special. Not special implies it is valid to
-  * use in computations.
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is special. Not special implies it is valid to
+   * use in computations.
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsSpecial(const double d) {
     return (d < VALID_MIN8);
   }
 
- /**
-  * Returns if the input pixel is special. Not special implies it is valid to
-  * use in computations. This method applies to a 4-byte floating point rather
-  * than an 8-byte double
-  *
-  * @param f Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is special. Not special implies it is valid to
+   * use in computations. This method applies to a 4-byte floating point rather
+   * than an 8-byte double
+   *
+   * @param f Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsSpecial(const float f) {
     return (f < VALID_MIN4);
   }
 
- /**
-  * Returns if the input pixel is valid
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is valid
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsValidPixel(const double d) {
     return (d >= VALID_MIN8);
   }
 
- /**
-  * Returns if the input pixel is null
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is null
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsNullPixel(const double d) {
     return (d == NULL8);
   }
 
- /**
-  * Returns if the input pixel is one of the high saturation types
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is one of the high saturation types
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsHighPixel(const double d) {
     return (d == HIGH_REPR_SAT8) || (d == HIGH_INSTR_SAT8);
   }
 
- /**
-  * Returns if the input pixel is one of the low saturation types
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is one of the low saturation types
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsLowPixel(const double d) {
     return (d == LOW_REPR_SAT8) || (d == LOW_INSTR_SAT8);
   }
 
- /**
-  * Returns if the input pixel is high representation saturation
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is high representation saturation
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsHrsPixel(const double d) {
     return (d == HIGH_REPR_SAT8);
   }
 
- /**
-  * Returns if the input pixel is high instrument saturation
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is high instrument saturation
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsHisPixel(const double d) {
     return (d == HIGH_INSTR_SAT8);
   }
 
- /**
-  * Returns if the input pixel is low instrument saturation
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is low instrument saturation
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsLisPixel(const double d) {
     return (d == LOW_INSTR_SAT8);
   }
 
- /**
-  * Returns if the input pixel is low representation saturation
-  *
-  * @param d Pixel value to test
-  *
-  * @return bool
-  */
+  /**
+   * Returns if the input pixel is low representation saturation
+   *
+   * @param d Pixel value to test
+   *
+   * @return bool
+   */
   inline bool IsLrsPixel(const double d) {
     return (d == LOW_REPR_SAT8);
   }
 
- /**
-  * Converts float pixels to double pixels with special pixel translations
-  *
-  * @param t Float pixel value to be converted to a double
-  *
-  * @return double The double pixel value
-  */
+  /**
+   * Converts float pixels to double pixels with special pixel translations
+   *
+   * @param t Float pixel value to be converted to a double
+   *
+   * @return double The double pixel value
+   */
   inline double TestPixel(const float t) {
-    if (t < VALID_MIN4) {
-      if (t == NULL4) return (NULL8);
-      if (t == LOW_REPR_SAT4) return (LOW_REPR_SAT8);
-      if (t == LOW_INSTR_SAT4) return (LOW_INSTR_SAT8);
-      if (t == HIGH_REPR_SAT4) return (HIGH_REPR_SAT8);
-      if (t == HIGH_INSTR_SAT4) return (HIGH_INSTR_SAT8);
+    if(t < VALID_MIN4) {
+      if(t == NULL4) return (NULL8);
+      if(t == LOW_REPR_SAT4) return (LOW_REPR_SAT8);
+      if(t == LOW_INSTR_SAT4) return (LOW_INSTR_SAT8);
+      if(t == HIGH_REPR_SAT4) return (HIGH_REPR_SAT8);
+      if(t == HIGH_INSTR_SAT4) return (HIGH_INSTR_SAT8);
       return (LOW_REPR_SAT8);
     }
-    else if (t > VALID_MAX4) {
+    else if(t > VALID_MAX4) {
       return (HIGH_REPR_SAT8);
     }
     else {
@@ -320,24 +320,24 @@ namespace Isis {
     }
   }
 
- /**
-  * Converts double to float with special pixel translations and
-  * care for overflows (underflows are assumed to cast to 0!)
-  *
-  * @param t Double pixel value to be converted to a float
-  *
-  * @return float The float pixel value
-  */
+  /**
+   * Converts double to float with special pixel translations and
+   * care for overflows (underflows are assumed to cast to 0!)
+   *
+   * @param t Double pixel value to be converted to a float
+   *
+   * @return float The float pixel value
+   */
   inline float TestPixel(const double t) {
-    if (t < (double) VALID_MIN4) {
-      if (t == NULL8) return (NULL4);
-      if (t == LOW_REPR_SAT8) return (LOW_REPR_SAT4);
-      if (t == LOW_INSTR_SAT8) return (LOW_INSTR_SAT4);
-      if (t == HIGH_INSTR_SAT8) return (HIGH_INSTR_SAT4);
-      if (t == HIGH_REPR_SAT8) return (HIGH_REPR_SAT4);
+    if(t < (double) VALID_MIN4) {
+      if(t == NULL8) return (NULL4);
+      if(t == LOW_REPR_SAT8) return (LOW_REPR_SAT4);
+      if(t == LOW_INSTR_SAT8) return (LOW_INSTR_SAT4);
+      if(t == HIGH_INSTR_SAT8) return (HIGH_INSTR_SAT4);
+      if(t == HIGH_REPR_SAT8) return (HIGH_REPR_SAT4);
       return (LOW_REPR_SAT4);
     }
-    else if (t > (double) VALID_MAX4) {
+    else if(t > (double) VALID_MAX4) {
       return (HIGH_REPR_SAT8);
     }
     else {
@@ -345,38 +345,38 @@ namespace Isis {
     }
   }
 
- /**
-  * Takes a double pixel value and returns the name of the pixel type as a
-  * string
-  *
-  * @param d Pixel value
-  *
-  * @return string The name of the pixel type
-  */
+  /**
+   * Takes a double pixel value and returns the name of the pixel type as a
+   * string
+   *
+   * @param d Pixel value
+   *
+   * @return string The name of the pixel type
+   */
   inline std::string PixelToString(double d) {
-    if (Isis::IsSpecial(d)) {
-      if (Isis::IsNullPixel(d)) return std::string("Null");
-      if (Isis::IsLrsPixel(d)) return std::string("Lrs");
-      if (Isis::IsHrsPixel(d)) return std::string("Hrs");
-      if (Isis::IsHisPixel(d)) return std::string("His");
-      if (Isis::IsLisPixel(d)) return std::string("Lis");
+    if(Isis::IsSpecial(d)) {
+      if(Isis::IsNullPixel(d)) return std::string("Null");
+      if(Isis::IsLrsPixel(d)) return std::string("Lrs");
+      if(Isis::IsHrsPixel(d)) return std::string("Hrs");
+      if(Isis::IsHisPixel(d)) return std::string("His");
+      if(Isis::IsLisPixel(d)) return std::string("Lis");
       return std::string("Invalid");
     }
 
     QString result;
     return result.setNum(d).toStdString();
   }
- /**
-  * Takes the name of the pixel type as a string and returns a 
-  * double pixel value. 
-  *
-  * @param str The name of the pixel type 
-  *
-  * @return double Pixel value
-  */
-  inline double StringToPixel(const std::string & str) {
+  /**
+   * Takes the name of the pixel type as a string and returns a
+   * double pixel value.
+   *
+   * @param str The name of the pixel type
+   *
+   * @return double Pixel value
+   */
+  inline double StringToPixel(const std::string &str) {
 
-    iString s (str);
+    iString s(str);
     s.UpCase();
 
     std::vector<std::string> legal;
@@ -386,30 +386,30 @@ namespace Isis {
     legal.push_back("HIS");
     legal.push_back("LIS");
     int matches = 0;
-    for (int i = 0; i < (int) legal.size(); i++){
-      if(legal[i].substr(0,s.size()) == s) {
-          matches++;
+    for(int i = 0; i < (int) legal.size(); i++) {
+      if(legal[i].substr(0, s.size()) == s) {
+        matches++;
       }
     }
-    if (matches > 1) {
+    if(matches > 1) {
       std::string msg = "Input [" + str + "] is not a unique abbreviation. Use " + s + "I or " + s + "R.";
-      throw iException::Message(iException::User,msg,_FILEINFO_); 
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
-    if (matches == 0) {
-      try{
+    if(matches == 0) {
+      try {
         return s.ToDouble();
       }
       catch(iException &e) {
         std::string msg = "Input [" + str + "] does not appear to be a legal special pixel abbreviation or double value.";
-        throw iException::Message(iException::User,msg,_FILEINFO_); 
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
-    if (s[0] == 'N') return Null;
-    if (s.substr(0,2) == "HR") return Hrs;
-    if (s.substr(0,2) == "LR") return Lrs;
-    if (s.substr(0,2) == "HI") return His;
+    if(s[0] == 'N') return Null;
+    if(s.substr(0, 2) == "HR") return Hrs;
+    if(s.substr(0, 2) == "LR") return Lrs;
+    if(s.substr(0, 2) == "HI") return His;
     else  return Lis;//(s.substr(0,2) == "LI")
-   
+
   }
 }
 

@@ -4,8 +4,7 @@
 #include "Preference.h"
 
 using namespace std;
-int main (int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   Isis::Statistics s;
@@ -29,7 +28,7 @@ int main (int argc, char *argv[])
   a[8] = 10.0;
   a[9] = -1.0;
 
-  s.AddData(a,8);
+  s.AddData(a, 8);
   cout << "Average:        " << s.Average() << endl;
   cout << "Variance:       " << s.Variance() << endl;
   cout << "Std Deviation:  " << s.StandardDeviation() << endl;
@@ -56,7 +55,7 @@ int main (int argc, char *argv[])
   b[2] = 6.0;
   b[3] = Isis::NULL8;
 
-  s.AddData (b,4);
+  s.AddData(b, 4);
   cout << "Average:        " << s.Average() << endl;
   cout << "Variance:       " << s.Variance() << endl;
   cout << "Std Deviation:  " << s.StandardDeviation() << endl;
@@ -77,7 +76,7 @@ int main (int argc, char *argv[])
   cout << "SumSquare:      " << s.SumSquare() << endl;
   cout << endl;
 
-  s.RemoveData (a,3);
+  s.RemoveData(a, 3);
   cout << "Average:        " << s.Average() << endl;
   cout << "Variance:       " << s.Variance() << endl;
   cout << "Std Deviation:  " << s.StandardDeviation() << endl;
@@ -112,37 +111,37 @@ int main (int argc, char *argv[])
   cout << endl;
 
   try {
-    s.RemoveData (a,8);
+    s.RemoveData(a, 8);
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
-  }
-
-  try {
-    s.Minimum ();
-  }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
 
   try {
-    s.Maximum ();
+    s.Minimum();
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
-  }
-  
-  try {
-    s.ChebyshevMinimum (0.0);
-  }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
 
   try {
-    s.ChebyshevMaximum (100.0);
+    s.Maximum();
   }
-  catch (Isis::iException &e) {
-    e.Report (false);
+  catch(Isis::iException &e) {
+    e.Report(false);
+  }
+
+  try {
+    s.ChebyshevMinimum(0.0);
+  }
+  catch(Isis::iException &e) {
+    e.Report(false);
+  }
+
+  try {
+    s.ChebyshevMaximum(100.0);
+  }
+  catch(Isis::iException &e) {
+    e.Report(false);
   }
 }

@@ -22,7 +22,7 @@ void IsisMain() {
   int readOnly2 = cubeData->AddCube(Filename("$base/testData/blobTruth.cub"));
   int readWrite1 = cubeData->AddCube(Filename("./unitTest2.cub"));
   int readWrite2 = cubeData->AddCube(Filename("./unitTest3.cub"));
-  
+
   Cube someCube;
   cubeData->AddCube(&someCube);
 
@@ -38,7 +38,7 @@ void IsisMain() {
     QThread::yieldCurrentThread();
   }
   // Test 1 is complete
-  
+
   cout << endl << endl;
 
   // Simultaneous Read Test (increments NumberOfTestsDone() twice)
@@ -68,9 +68,9 @@ void IsisMain() {
   // Basic Write Test (increments NumberOfTestsDone() twice)
   tester->WriteCubeTest(readWrite1);
 
-  // Wait for test 4 complete 
+  // Wait for test 4 complete
   while(cubeData->BricksInMemory() != 0 ||
-        tester->NumberOfTestsDone() != 7) { 
+        tester->NumberOfTestsDone() != 7) {
     QThread::yieldCurrentThread();
   }
   // Test 4 is complete
@@ -82,16 +82,16 @@ void IsisMain() {
 
   // Wait for test 5 complete
   while(cubeData->BricksInMemory() != 0 ||
-        tester->NumberOfTestsDone() != 9) { 
+        tester->NumberOfTestsDone() != 9) {
     QThread::yieldCurrentThread();
   }
   // Test 5 is complete
 
   cout << endl << endl;
 
-  // Conflicting Write Test -- deadlocks (increments NumberOfTestsDone() once, 
+  // Conflicting Write Test -- deadlocks (increments NumberOfTestsDone() once,
   //   deadlocks, then again)
-  tester->WriteCubeTest3(readWrite1); 
+  tester->WriteCubeTest3(readWrite1);
 
   // Wait for test 6 deadlock
   while(cubeData->BricksInMemory() != 1 ||
@@ -105,7 +105,7 @@ void IsisMain() {
   // Wait for test 6 complete
   while(cubeData->BricksInMemory() != 0 ||
         tester->NumberOfTestsDone() != 11) {
-        QThread::yieldCurrentThread();
+    QThread::yieldCurrentThread();
   }
   // Test 6 is complete
 

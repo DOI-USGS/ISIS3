@@ -5,34 +5,34 @@
 #include "PvlGroup.h"
 #include "PvlSequence.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void cubeavg (vector<Buffer *> &in,
-              vector<Buffer *> &out);
+void cubeavg(vector<Buffer *> &in,
+             vector<Buffer *> &out);
 
-void removekeywords ( PvlGroup & pvlg );
+void removekeywords(PvlGroup &pvlg);
 
-void compute (vector<double> centers,
-              vector<double> widths,
-              Cube *ocube );
+void compute(vector<double> centers,
+             vector<double> widths,
+             Cube *ocube);
 
 void IsisMain() {
   ProcessBySpectra p;
-  p.SetType( ProcessBySpectra::PerPixel );
+  p.SetType(ProcessBySpectra::PerPixel);
   Cube *icube = p.SetInputCube("FROM");
   Cube *ocube = p.SetOutputCube("TO", icube->Samples(), icube->Lines(), 1);
 
   //Get user parameters and sets outputcube's BandBin
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("BANDBIN") == "COMPUTE") {
-    if( icube->HasGroup("BandBin") ) {
+    if(icube->HasGroup("BandBin")) {
       PvlGroup &pvlg = icube->GetGroup("BandBin");
-      removekeywords( pvlg );
+      removekeywords(pvlg);
       if(pvlg.HasKeyword("Center")) {
         bool hasWidth = pvlg.HasKeyword("Width");
         PvlKeyword &pvlCenter = pvlg.FindKeyword("Center");
-        PvlKeyword * pvlWidth = NULL;
+        PvlKeyword *pvlWidth = NULL;
         if(hasWidth) {
           pvlWidth = & pvlg.FindKeyword("Width");
         }
@@ -40,9 +40,9 @@ void IsisMain() {
         centers.resize(icube->Bands());
         std::vector<double> widths;
         widths.resize(icube->Bands());
-        for( int i=0; i<pvlCenter.Size(); i++ ) {
+        for(int i = 0; i < pvlCenter.Size(); i++) {
           centers[i] = pvlCenter[i];
-          if( hasWidth )
+          if(hasWidth)
             widths[i] = (*pvlWidth)[i];
           else
             widths[i] = 0.0;
@@ -51,12 +51,12 @@ void IsisMain() {
       }
       else {
         string message = "The BandBin in your input cube does not have a Center value.";
-        throw Isis::iException::Message(Isis::iException::User,message,_FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
       }
     }
-    else{
+    else {
       string message = "There is not a BandBin Group in the input cube.";
-      throw Isis::iException::Message(Isis::iException::User,message,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
     }
   }
 
@@ -82,7 +82,7 @@ void IsisMain() {
     pvlCenter.SetValue(ui.GetAsString("CENTER"), Units);
     pvlg.AddKeyword(pvlCenter);
     PvlKeyword pvlWidth;
-    if( pvlg.HasKeyword("Width") ) {
+    if(pvlg.HasKeyword("Width")) {
       pvlWidth = pvlg.FindKeyword("Width");
       Units = pvlWidth.Unit();
       pvlg.DeleteKeyword("Width");
@@ -92,7 +92,7 @@ void IsisMain() {
     pvlWidth.SetValue(ui.GetAsString("WIDTH"), Units);
     pvlg.AddKeyword(pvlWidth);
     //Destroys the old and adds the new BandBin Group
-    if( ocube->HasGroup("BandBin") ) {
+    if(ocube->HasGroup("BandBin")) {
       ocube->DeleteGroup("BandBin");
     }
     ocube->PutGroup(pvlg);
@@ -109,52 +109,52 @@ void IsisMain() {
 }
 
 // Band processing routine
-void cubeavg ( vector<Buffer *> &in, vector<Buffer *> &out ) {
+void cubeavg(vector<Buffer *> &in, vector<Buffer *> &out) {
   Statistics sts;
-  sts.AddData( (*in[0]).DoubleBuffer() , (*in[0]).size() );
+  sts.AddData((*in[0]).DoubleBuffer() , (*in[0]).size());
   (*out[0]) = sts.Average();
 }
 
-/** 
+/**
  * Removes the PvlKeywords that can't be processed
- * 
+ *
  * @param pvlg the group from which the keywords are removed
  */
-void removekeywords ( PvlGroup & pvlg ) {
-  if( pvlg.HasKeyword("OriginalBand") ) {
+void removekeywords(PvlGroup &pvlg) {
+  if(pvlg.HasKeyword("OriginalBand")) {
     pvlg.DeleteKeyword("OriginalBand");
   }
-  if( pvlg.HasKeyword("Name") ) {
+  if(pvlg.HasKeyword("Name")) {
     pvlg.DeleteKeyword("Name");
   }
 }
 
 //BandBin Computeing
-void compute( vector<double> centers, vector<double> widths,
-              Cube *ocube ) {
+void compute(vector<double> centers, vector<double> widths,
+             Cube *ocube) {
   PvlGroup &pvlg = ocube->GetGroup("BandBin");
   PvlKeyword &pvlCenter = pvlg.FindKeyword("Center");
   string centerUnit = pvlCenter.Unit();
   bool hasWidth  = pvlg.HasKeyword("Width");
-  double large = centers[0] + widths[0]/2;
-  double small = centers[0] - widths[0]/2;
-  for( int i=1; i<pvlCenter.Size(); i++ ) {
-    if( large < (double)centers[i] + (double)widths[i]/2.0 ) {
-      large = (double)centers[i] + (double)widths[i]/2.0;
+  double large = centers[0] + widths[0] / 2;
+  double small = centers[0] - widths[0] / 2;
+  for(int i = 1; i < pvlCenter.Size(); i++) {
+    if(large < (double)centers[i] + (double)widths[i] / 2.0) {
+      large = (double)centers[i] + (double)widths[i] / 2.0;
     }
-    if( small > (double)centers[i] - (double)widths[i]/2.0 ) {
-      small = (double)centers[i] - (double)widths[i]/2.0;
+    if(small > (double)centers[i] - (double)widths[i] / 2.0) {
+      small = (double)centers[i] - (double)widths[i] / 2.0;
     }
   }
-  pvlCenter.SetValue( iString( (large-small)/2 + small ), centerUnit );
-  if( hasWidth ) {
+  pvlCenter.SetValue(iString((large - small) / 2 + small), centerUnit);
+  if(hasWidth) {
     PvlKeyword &pvlWidth  = pvlg.FindKeyword("Width");
-    pvlWidth.SetValue( large-small, pvlWidth.Unit() );
+    pvlWidth.SetValue(large - small, pvlWidth.Unit());
   }
   else {
     PvlKeyword pvlWidth = PvlKeyword("Width");
-    pvlWidth.SetValue( large-small, centerUnit );
+    pvlWidth.SetValue(large - small, centerUnit);
     pvlg.AddKeyword(pvlWidth);
   }
-  
+
 }

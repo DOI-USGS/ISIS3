@@ -8,7 +8,7 @@
 #include "iException.h"
 
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 bool filesMatch;
@@ -20,8 +20,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
 void CompareObjects(const PvlObject &pvl1, const PvlObject &pvl2);
 void CompareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2);
 
-void IsisMain ()
-{
+void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   tolerances = PvlGroup();
@@ -67,7 +66,7 @@ void IsisMain ()
 }
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
-  if(pvl1.Name().compare( pvl2.Name() ) != 0) {
+  if(pvl1.Name().compare(pvl2.Name()) != 0) {
     filesMatch = false;
     differenceReason = "Keyword '" + pvl1.Name() + "' does not match keyword '" + pvl2.Name() + "'";
   }
@@ -78,20 +77,20 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     return;
   }
 
-  if (tolerances.HasKeyword(pvl1.Name()) && 
-      tolerances[pvl1.Name()].Size() > 1 && 
+  if(tolerances.HasKeyword(pvl1.Name()) &&
+      tolerances[pvl1.Name()].Size() > 1 &&
       pvl1.Size() != tolerances[pvl1.Name()].Size()) {
     string msg = "Size of keyword '" + pvl1.Name() + "' does not match with ";
     msg += "its number of tolerances in the DIFF file.";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  if (ignorekeys.HasKeyword(pvl1.Name()) && 
-      ignorekeys[pvl1.Name()].Size() > 1 &&  
+  if(ignorekeys.HasKeyword(pvl1.Name()) &&
+      ignorekeys[pvl1.Name()].Size() > 1 &&
       pvl1.Size() != ignorekeys[pvl1.Name()].Size()) {
     string msg = "Size of keyword '" + pvl1.Name() + "' does not match with ";
     msg += "its number of ignore keys in the DIFF file.";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   for(int i = 0; i < pvl1.Size() && filesMatch; i++) {
@@ -101,55 +100,55 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     iString unit2 = pvl2.Unit(i);
 
     int ignoreIndex = 0;
-    if (ignorekeys.HasKeyword(pvl1.Name()) && ignorekeys[pvl1.Name()].Size() > 1) {
+    if(ignorekeys.HasKeyword(pvl1.Name()) && ignorekeys[pvl1.Name()].Size() > 1) {
       ignoreIndex = i;
     }
 
     try {
-      if(!ignorekeys.HasKeyword(pvl1.Name()) ||  
-	 ignorekeys[pvl1.Name()][ignoreIndex] == "false") { 
+      if(!ignorekeys.HasKeyword(pvl1.Name()) ||
+          ignorekeys[pvl1.Name()][ignoreIndex] == "false") {
 
-	if(!unit1.Equal(unit2)) {
-	  filesMatch = false;
-	  differenceReason = "Keyword '" + pvl1.Name() + "': units do not match.";
-	  return;
-	}
+        if(!unit1.Equal(unit2)) {
+          filesMatch = false;
+          differenceReason = "Keyword '" + pvl1.Name() + "': units do not match.";
+          return;
+        }
 
-	double tolerance = 0.0;
-	double difference = abs((double)val1 - (double)val2);
-  
-	if(tolerances.HasKeyword(pvl1.Name())) { 
-	  tolerance = (tolerances[pvl1.Name()].Size() == 1) ? 
-	    tolerances[pvl1.Name()][0] : tolerances[pvl1.Name()][i];
-	}
-  
-	if(difference > tolerance) {
-	  filesMatch = false;
-	  if (pvl1.Size() == 1) {
-	    differenceReason = "Keyword '" + pvl1.Name() + "': difference is " + 
-	      iString(difference);
-	  }
-	  else {
-	    differenceReason = "Keyword '" + pvl1.Name() + "' at index " + 
-	      iString(i) + ": difference is " + iString(difference);
-	  }
-	  differenceReason += " (tolerance is " + iString(tolerance) + ")";
-	}
+        double tolerance = 0.0;
+        double difference = abs((double)val1 - (double)val2);
+
+        if(tolerances.HasKeyword(pvl1.Name())) {
+          tolerance = (tolerances[pvl1.Name()].Size() == 1) ?
+                      tolerances[pvl1.Name()][0] : tolerances[pvl1.Name()][i];
+        }
+
+        if(difference > tolerance) {
+          filesMatch = false;
+          if(pvl1.Size() == 1) {
+            differenceReason = "Keyword '" + pvl1.Name() + "': difference is " +
+                               iString(difference);
+          }
+          else {
+            differenceReason = "Keyword '" + pvl1.Name() + "' at index " +
+                               iString(i) + ": difference is " + iString(difference);
+          }
+          differenceReason += " (tolerance is " + iString(tolerance) + ")";
+        }
       }
     }
     catch(iException e) {
       iException::Clear();
 
       if(!val1.Equal(val2)) {
-	filesMatch = false;
-	differenceReason = "Keyword '" + pvl1.Name() + "': values do not match.";
+        filesMatch = false;
+        differenceReason = "Keyword '" + pvl1.Name() + "': values do not match.";
       }
     }
   }
 }
 
 void CompareObjects(const PvlObject &pvl1, const PvlObject &pvl2) {
-  if(pvl1.Name().compare( pvl2.Name() ) != 0) {
+  if(pvl1.Name().compare(pvl2.Name()) != 0) {
     filesMatch = false;
     differenceReason = "Object " + pvl1.Name() + " does not match " + pvl2.Name();
   }

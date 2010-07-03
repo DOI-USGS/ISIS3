@@ -4,7 +4,7 @@
 #include "ProcessBySample.h"
 #include "SpecialPixel.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Glocal declarations
@@ -23,20 +23,20 @@ void IsisMain() {
   // Need to pick good min/maxs to ensure the user's value
   // doesn't get saturated
   CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-  if (IsValidPixel(dn1) && IsValidPixel(dn2)) {
-    if (dn1 <= dn2) {
+  if(IsValidPixel(dn1) && IsValidPixel(dn2)) {
+    if(dn1 <= dn2) {
       att.Minimum(dn1);
       att.Maximum(dn2);
-    }  
+    }
     else {
       att.Minimum(dn2);
       att.Maximum(dn1);
     }
   }
   else {
-    throw iException::Message(iException::User,"Must enter valid pixel DN values.", _FILEINFO_);
+    throw iException::Message(iException::User, "Must enter valid pixel DN values.", _FILEINFO_);
   }
-      
+
   // Get the size of the cube and create the cube
   int samps = ui.GetInteger("SAMPLES");
   int lines = ui.GetInteger("LINES");
@@ -44,26 +44,26 @@ void IsisMain() {
   // Create a ProcessByBrick pointer
   ProcessByBrick *p;
   // Determine whether to process by line or by sample
-  if (ui.GetString("DIRECTION") == "HORIZONTAL") {
-      p = new ProcessByLine;
-      // we will only process 1 line at a time
-      p->SetBrickSize (samps,1,1);
+  if(ui.GetString("DIRECTION") == "HORIZONTAL") {
+    p = new ProcessByLine;
+    // we will only process 1 line at a time
+    p->SetBrickSize(samps, 1, 1);
   }
   else {
-      p = new ProcessBySample;
-      // we will only process 1 sample at a time
-      p->SetBrickSize (1,lines,1);
+    p = new ProcessBySample;
+    // we will only process 1 sample at a time
+    p->SetBrickSize(1, lines, 1);
   }
   //Make the cube
-  p->SetOutputCube (ui.GetFilename("TO"),att,samps,lines);
+  p->SetOutputCube(ui.GetFilename("TO"), att, samps, lines);
   p->StartProcess(GreyScale);
   p->EndProcess();
 
 }
 
-void GreyScale (Buffer &out) {
+void GreyScale(Buffer &out) {
   int size = out.size();
-  for (int i=0; i<size; i++) {
-    out[i] = dn1 + (dn2-dn1)*i/(size-1); 
+  for(int i = 0; i < size; i++) {
+    out[i] = dn1 + (dn2 - dn1) * i / (size - 1);
   }
 }

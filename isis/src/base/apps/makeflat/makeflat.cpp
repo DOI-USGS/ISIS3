@@ -34,7 +34,7 @@ void ResetGlobals();
 
 /**
  * This enum holds the supported camera types.
- * 
+ *
  * The variable cameraType will be one of these values, which
  * will represent the current camera type.
  */
@@ -44,8 +44,8 @@ enum CameraType {
   Framing
 };
 
-/** 
- * The number of samples in the temp file 
+/**
+ * The number of samples in the temp file
  * will always equal that of the input cube,
  * but the lines will vary. This variable stores
  * the number of lines in the temp file; it will
@@ -53,35 +53,35 @@ enum CameraType {
  */
 BigInt tempFileLength;
 
-/** 
+/**
  * This will keep track of which files are excluded. The
  * int is the file number in the input list (0 = first file),
  * and the boolean is whether or not it's excluded (always true).
- * Files that arent excluded will not be added to this map in 
+ * Files that arent excluded will not be added to this map in
  * order to increase efficiency.
  */
 map<int, bool> excludedFiles;
 
-/** 
+/**
  * This will keep track of which framelets are excluded. The
  * pair<int,int> is the key, the first number being the file
  * in the input list (0 = first), the second being the framelet
  * in the file (0 = first). The double is the standard deviation
- * of the framelet. Framelets that arent excluded will not be added 
+ * of the framelet. Framelets that arent excluded will not be added
  * to this map in order to increase efficiency.
  */
-map<pair<int,int>, double> excludedFramelets;
+map<pair<int, int>, double> excludedFramelets;
 
-/** 
- * This object will be used to keep track of exclusions found during 
+/**
+ * This object will be used to keep track of exclusions found during
  * the creating of the temporary file. The main method will add an object
- * onto this list for every pass, with basic keywords such as filename, and 
+ * onto this list for every pass, with basic keywords such as filename, and
  * the CreateTemporaryData will add a group for every exclusion found. The main
  * method will trim objects with no exclusion groups.
  */
 vector<PvlObject> excludedDetails;
 
-/** 
+/**
  * This is used for the line scan camera temporary data. Because
  * the line scan temporary data creation is done by frame column,
  * the data in the previous columns of data needs to be stored until
@@ -90,13 +90,13 @@ vector<PvlObject> excludedDetails;
  */
 vector<double> outputTmpAverages;
 
-/** 
+/**
  * This is closely tied with outputTmpAverages, except it keeps track
  * of valid pixel counts used in the averages.
  */
 vector<double> outputTmpCounts;
 
-/** 
+/**
  * This keeps track of the averages of the input framelets for framing
  * and push frame cameras. For framing cameras, the average is in framelet
  * zero. This is necessary in order to normalize the temporary data (second pass)
@@ -104,7 +104,7 @@ vector<double> outputTmpCounts;
  */
 vector< vector<double> > inputFrameletAverages;
 
-/** 
+/**
  * This keeps the statistics for each frame in a line scan camera. This is collected
  * during the second pass of the data because in a line scan camera, all of the frame
  * DNs are read before being written to the temporary file (which is possible because
@@ -112,7 +112,7 @@ vector< vector<double> > inputFrameletAverages;
  */
 Statistics inputFrameStats;
 
-/** 
+/**
  * This is the standard deviation tolerance. For framing cameras, this is the maximum
  * standard deviation of an image before it is excluded. For push frame cameras, this is
  * the maximum standard deviation of a framelet. For framing cameras, this is the maximum
@@ -121,25 +121,25 @@ Statistics inputFrameStats;
  */
 double maxStdev;
 
-/** 
+/**
  * This variable is used in two ways. During pass 2, where the temporary file is being
  * created, this is the temporary file. During pass 3, where the final output is being
  * created, this is the final output.
  */
 Cube *ocube = NULL;
 
-/** 
+/**
  * This is a line manager that is always associated with ocube.
  */
 LineManager *oLineMgr = NULL;
 
-/** 
+/**
  * This is the number of samples in the input images, temporary file,and final output
  * cubes (one in the same!).
  */
 int numOutputSamples;
 
-/** 
+/**
  * This is the number of lines per frame. For line scans, this is how many lines
  * that are combined into one section for the standard deviation tolerance. For
  * push frame cameras, this is the number of lines per framelet. For framing
@@ -147,7 +147,7 @@ int numOutputSamples;
  */
 int numFrameLines;
 
-/** 
+/**
  * This keeps track of special pixel counts for pass 3 of line scan cameras.
  * This is the count of total valid input DNs for each column of data that is
  * in the temporary data (sum in the line direction of band 2 of the temporary
@@ -155,29 +155,29 @@ int numFrameLines;
  */
 vector<BigInt> numInputDns;
 
-/** 
+/**
  * This keeps track of which camera type we're processing. See CameraType.
  */
 CameraType cameraType;
 
-/** 
+/**
  * Since in framing and push frame cameras we don't know if the temporary cube has been
- * initialized, and the operations all depend on both the input data and current 
+ * initialized, and the operations all depend on both the input data and current
  * temporary data, this boolean keeps track of whether or not the temporary cube has been
  * initialized.
  */
 bool cubeInitialized;
 
-/** 
+/**
  * This is the image that is currently being processed. This is necessary in order for
  * the processing methods to determine exclusions and pre-calculated statistics of each
  * image.
  */
 unsigned int currImage;
 
-/** 
+/**
  * This is the main method. Makeflat runs in three steps:
- * 
+ *
  * 1) Calculate statistics
  *   - For all cameras, this checks for one band and matching
  *       sample counts.
@@ -185,14 +185,14 @@ unsigned int currImage;
  *       the images and records the averages of each image
  *   - For push frame cameras, this calls CheckFramelets for each
  *       image.
- * 
+ *
  * 2) Create the temporary file, collect more detailed statistics
  *   - For all cameras, this generates the temporary file and calculates
  *       the final exclusion list
- *   - For framing/push frame cameras, the temporary file is 
+ *   - For framing/push frame cameras, the temporary file is
  *       2 bands, where the first is a sum of DNs from each image/framelet
  *       and the second band is a count of valid DNs that went into each sum
- * 
+ *
  *  3) Create the final flat field file
  *   - For all cameras, this processes the temporary file to create the final flat
  *       field file.
@@ -268,7 +268,7 @@ void IsisMain() {
 
     /**
      * Try and validate the image, quick tests first!
-     * 
+     *
      * (imageValid &= means imageValid = imageValid && ...)
      */
     bool imageValid = true;
@@ -281,7 +281,7 @@ void IsisMain() {
 
     // For push frame cameras, there must be valid all framelets
     if(cameraType == PushFrame) {
-      imageValid &=  (tmp.Lines() % numFrameLines == 0);
+      imageValid &= (tmp.Lines() % numFrameLines == 0);
     }
 
     // For framing cameras, we need to figure out the size...
@@ -303,14 +303,14 @@ void IsisMain() {
     //   entire images, and push frame framelet exclusion stats can not be collected
     //   during pass 2 cleanly
     if((cameraType == Framing || cameraType == PushFrame) && imageValid) {
-      string prog = "Calculating Standard Deviation " + iString((int)currImage+1) + "/";
+      string prog = "Calculating Standard Deviation " + iString((int)currImage + 1) + "/";
       prog += iString((int)inList.size()) + " (" + Filename(inList[currImage]).Name() + ")";
 
       if(cameraType == Framing) {
         Statistics *stats = tmp.Statistics(1, prog);
         imageValid &= !IsSpecial(stats->StandardDeviation());
         imageValid &= !IsSpecial(stats->Average());
-        imageValid &= stats->StandardDeviation() <= maxStdev; 
+        imageValid &= stats->StandardDeviation() <= maxStdev;
 
         vector<double> fileStats;
         fileStats.push_back(stats->Average());
@@ -356,7 +356,7 @@ void IsisMain() {
    */
   if(numOutputSamples <= 0) {
     string msg = "No valid input cubes were found";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   /**
@@ -365,7 +365,7 @@ void IsisMain() {
    */
   if(tempFileLength <= 0) {
     string msg = "No valid input data was found";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   /**
@@ -421,7 +421,7 @@ void IsisMain() {
     }
 
     p.SetInputCube(inList[currImage], inAtt);
-    iString progText = "Calculating Averages " + iString((int)currImage+1);
+    iString progText = "Calculating Averages " + iString((int)currImage + 1);
     progText += "/" + iString((int)inList.size());
     progText += " (" + Filename(inList[currImage]).Name() + ")";
     p.Progress()->SetText(progText);
@@ -431,7 +431,7 @@ void IsisMain() {
     p.ClearInputCubes();
 
     if(excludedDetails[excludedDetails.size()-1].Groups() == 0) {
-      excludedDetails.resize(excludedDetails.size()-1);
+      excludedDetails.resize(excludedDetails.size() - 1);
     }
   }
 
@@ -524,7 +524,7 @@ void IsisMain() {
   ResetGlobals();
 }
 
-/** 
+/**
  * This method initializes all of the global variables
  */
 void ResetGlobals() {
@@ -556,13 +556,13 @@ void ResetGlobals() {
   }
 }
 
-/** 
+/**
  * This method performs pass1 on one image. It analyzes each framelet's
  * statistics and populates the necessary global variable.
- * 
+ *
  * @param progress Progress message
  * @param theCube Current cube that needs processing
- * 
+ *
  * @return bool True if the file contains a valid framelet
  */
 bool CheckFramelets(string progress, Cube &theCube) {
@@ -575,13 +575,13 @@ bool CheckFramelets(string progress, Cube &theCube) {
 
   vector<double> frameletAvgs;
   // We need to store off the framelet information, because if no good
-  //   framelets were found then no data should be added to the 
-  //   global variable for framelets, just files. 
-  vector< pair<int,double> > excludedFrameletsTmp;
+  //   framelets were found then no data should be added to the
+  //   global variable for framelets, just files.
+  vector< pair<int, double> > excludedFrameletsTmp;
   Statistics frameletStats;
 
   for(int line = 1; line <= theCube.Lines(); line++) {
-    if((line-1) % numFrameLines == 0) {
+    if((line - 1) % numFrameLines == 0) {
       frameletStats.Reset();
     }
 
@@ -589,12 +589,12 @@ bool CheckFramelets(string progress, Cube &theCube) {
     theCube.Read(mgr);
     frameletStats.AddData(mgr.DoubleBuffer(), mgr.size());
 
-    if((line-1) % numFrameLines == numFrameLines-1) {
+    if((line - 1) % numFrameLines == numFrameLines - 1) {
       if(IsSpecial(frameletStats.StandardDeviation()) ||
-         frameletStats.StandardDeviation() > maxStdev) {
+          frameletStats.StandardDeviation() > maxStdev) {
         excludedFrameletsTmp.push_back(
-            pair<int,double>((line-1)/numFrameLines, frameletStats.StandardDeviation())
-            );
+          pair<int, double>((line - 1) / numFrameLines, frameletStats.StandardDeviation())
+        );
       }
       else {
         foundValidFramelet = true;
@@ -610,24 +610,24 @@ bool CheckFramelets(string progress, Cube &theCube) {
 
   if(foundValidFramelet) {
     for(unsigned int i = 0; i < excludedFrameletsTmp.size(); i++) {
-      excludedFramelets.insert(pair< pair<int,int>, double>(
-              pair<int,int>(currImage, excludedFrameletsTmp[i].first), 
-              excludedFrameletsTmp[i].second
-              )
-            );
+      excludedFramelets.insert(pair< pair<int, int>, double>(
+                                 pair<int, int>(currImage, excludedFrameletsTmp[i].first),
+                                 excludedFrameletsTmp[i].second
+                               )
+                              );
     }
-    
+
   }
 
   return foundValidFramelet;
 }
 
-/** 
+/**
  * This method is the pass 2 processing routine. A ProcessByBrick
- * will call this method for sets of data (depending on the camera 
+ * will call this method for sets of data (depending on the camera
  * type) and this method is responsible for writing the entire output
  * temporary cube.
- * 
+ *
  * @param in Input raw image data, not including excluded files
  */
 void CreateTemporaryData(Buffer &in) {
@@ -657,7 +657,7 @@ void CreateTemporaryData(Buffer &in) {
     if(in.Sample() == numOutputSamples) {
       // Decide if we want this data
       if(IsSpecial(inputFrameStats.StandardDeviation()) ||
-         inputFrameStats.StandardDeviation() > maxStdev) {
+          inputFrameStats.StandardDeviation() > maxStdev) {
         // We don't want this data...
         //   CreateNullData is a helper method for this case that
         //   nulls out the stats
@@ -667,18 +667,18 @@ void CreateTemporaryData(Buffer &in) {
         PvlGroup currExclusion("ExcludedLines");
         currExclusion += PvlKeyword("FrameStartLine", iString(in.Line()));
         currExclusion += PvlKeyword("ValidPixels", iString(inputFrameStats.ValidPixels()));
-  
+
         if(!IsSpecial(inputFrameStats.StandardDeviation()))
           currExclusion += PvlKeyword("StandardDeviation", inputFrameStats.StandardDeviation());
         else
           currExclusion += PvlKeyword("StandardDeviation", "N/A");
-  
+
         excludedDetails[excludedDetails.size()-1].AddGroup(currExclusion);
       }
 
       // Let's write our data... CreateNullData took care of nulls for us
       // Band 1 is our normalized average
-      oLineMgr->SetLine(oLineMgr->Line(),1);
+      oLineMgr->SetLine(oLineMgr->Line(), 1);
       for(int i = 0; i < (int)outputTmpAverages.size(); i++) {
         if(!IsSpecial(outputTmpAverages[i])) {
           (*oLineMgr)[i] = outputTmpAverages[i] / inputFrameStats.Average();
@@ -687,16 +687,16 @@ void CreateTemporaryData(Buffer &in) {
           (*oLineMgr)[i] = Isis::Null;
         }
       }
-  
+
       ocube->Write(*oLineMgr);
-      oLineMgr->SetLine(oLineMgr->Line(),2);
+      oLineMgr->SetLine(oLineMgr->Line(), 2);
 
       // band 2 is our valid dn counts
       for(int i = 0; i < (int)outputTmpCounts.size(); i++) {
         (*oLineMgr)[i] = outputTmpCounts[i];
         numInputDns[i] += (int)(outputTmpCounts[i] + 0.5);
       }
-  
+
       ocube->Write(*oLineMgr);
       (*oLineMgr) ++;
 
@@ -707,28 +707,28 @@ void CreateTemporaryData(Buffer &in) {
     // Framing cameras and push frames are treated identically;
     //   the framelet size for a framelet in the framing camera
     //   is the entire image!
-    int framelet = (in.Line()-1) / numFrameLines;
+    int framelet = (in.Line() - 1) / numFrameLines;
     double stdev;
     bool excluded = Excluded(currImage, framelet, stdev);
 
-    if(excluded && ((in.Line()-1) % numFrameLines == 0)) {
+    if(excluded && ((in.Line() - 1) % numFrameLines == 0)) {
       PvlGroup currExclusion("ExcludedFramelet");
       currExclusion += PvlKeyword("FrameletStartLine", iString(in.Line()));
-      currExclusion += PvlKeyword("FrameletNumber", (in.Line()-1) / numFrameLines);
+      currExclusion += PvlKeyword("FrameletNumber", (in.Line() - 1) / numFrameLines);
 
       if(!IsSpecial(stdev)) {
-        currExclusion += PvlKeyword("StandardDeviation", 
+        currExclusion += PvlKeyword("StandardDeviation",
                                     stdev);
       }
       else {
-        currExclusion += PvlKeyword("StandardDeviation", 
+        currExclusion += PvlKeyword("StandardDeviation",
                                     "N/A");
       }
 
       excludedDetails[excludedDetails.size()-1].AddGroup(currExclusion);
     }
 
-    // Since this is a line by line iterative process, we need to get the current 
+    // Since this is a line by line iterative process, we need to get the current
     //   data in the temp file
     oLineMgr->SetLine(((in.Line() - 1) % numFrameLines) + 1, 1);
 
@@ -746,12 +746,12 @@ void CreateTemporaryData(Buffer &in) {
 
     if(!excluded || !cubeInitialized) {
       isValidData.resize(in.size());
-  
+
       for(int samp = 0; samp < in.size(); samp++) {
         if(IsSpecial((*oLineMgr)[samp]) && !IsSpecial(in[samp])) {
           (*oLineMgr)[samp] = 0.0;
         }
-  
+
         if(!IsSpecial(in[samp])) {
           isValidData[samp] = true;
           (*oLineMgr)[samp] += in[samp] / inputFrameletAverages[currImage][framelet];
@@ -786,7 +786,7 @@ void CreateTemporaryData(Buffer &in) {
         if(IsSpecial((*oLineMgr)[i])) {
           (*oLineMgr)[i] = 0.0;
         }
-  
+
         if(isValidData[i]) {
           (*oLineMgr)[i] ++;
         }
@@ -799,11 +799,11 @@ void CreateTemporaryData(Buffer &in) {
   }
 }
 
-/** 
+/**
  * This method is the pass 3 processing routine. This compresses
  * the temporary file into the final flat file. ocube is the final
  * out file, the Buffer argument is the temp file.
- * 
+ *
  * @param in Line of data in the temporary file generated in pass 2
  */
 void ProcessTemporaryData(Buffer &in) {
@@ -817,14 +817,14 @@ void ProcessTemporaryData(Buffer &in) {
     cubeInitialized = true;
 
     for(int i = 0; i < (*oLineMgr).size(); i++) {
-      int avgIndex = in.Index(i+1, in.Line(), 1);
-      int validIndex = in.Index(i+1, in.Line(), 2);
-      
+      int avgIndex = in.Index(i + 1, in.Line(), 1);
+      int validIndex = in.Index(i + 1, in.Line(), 2);
+
       if(!IsSpecial(in[avgIndex]) && !IsSpecial(in[validIndex])) {
         if(IsSpecial((*oLineMgr)[i])) {
           (*oLineMgr)[i] = 0.0;
         }
-  
+
         (*oLineMgr)[i] += in[avgIndex] * (int)(in[validIndex] + 0.5) / (double)numInputDns[i];
       }
     }
@@ -833,8 +833,8 @@ void ProcessTemporaryData(Buffer &in) {
     oLineMgr->SetLine(((in.Line() - 1) % numFrameLines) + 1);
 
     for(int i = 0; i < (*oLineMgr).size(); i++) {
-      int sumIndex = in.Index(i+1, in.Line(), 1);
-      int validIndex = in.Index(i+1, in.Line(), 2);
+      int sumIndex = in.Index(i + 1, in.Line(), 1);
+      int validIndex = in.Index(i + 1, in.Line(), 2);
 
       if(!IsSpecial(in[sumIndex]) && !IsSpecial(in[validIndex])) {
         (*oLineMgr)[i] = in[sumIndex] / in[validIndex];
@@ -848,7 +848,7 @@ void ProcessTemporaryData(Buffer &in) {
   }
 }
 
-/** 
+/**
  * This is a helper method for line scan cameras. It removes the
  * statistics from the global variables that contain the current
  * frame's data.
@@ -860,11 +860,11 @@ void CreateNullData() {
   }
 }
 
-/** 
+/**
  * This method tests if a file was excluded.
- * 
+ *
  * @param fileNum Zero-indexed file from the FROMLIST (often just currFile)
- * 
+ *
  * @return bool True if file was excluded
  */
 bool Excluded(int fileNum) {
@@ -878,20 +878,20 @@ bool Excluded(int fileNum) {
   }
 }
 
-/** 
+/**
  * This method tests if a framelet in a file was excluded.
- * 
+ *
  * @param fileNum Zero-indexed file from the FROMLIST (often just currFile)
  * @param frameletNum Framelet to test in the current file
  * @param stdev This will be set to the standard deviation of the framelet
  *                if the framelet was excluded
- * 
+ *
  * @return bool True if the framelet was excluded
  */
 bool Excluded(int fileNum, int frameletNum, double &stdev) {
   if(Excluded(fileNum)) return true;
 
-  map< pair<int,int>, double>::iterator it = excludedFramelets.find(pair<int,int>(fileNum,frameletNum));
+  map< pair<int, int>, double>::iterator it = excludedFramelets.find(pair<int, int>(fileNum, frameletNum));
 
   if(it == excludedFramelets.end()) {
     return false;

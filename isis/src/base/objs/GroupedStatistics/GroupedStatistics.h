@@ -26,17 +26,16 @@ template< class A, class B > class QMap;
 template< class A > class QVector;
 class QString;
 
-namespace Isis
-{
+namespace Isis {
 
   // Isis forward declarations
   class Statistics;
-  
+
   /**
    * @brief Grouped Statistics
    *
    * This class is used to store statistics on a group of related items.
-   * 
+   *
    * This class is include safe meaning that includers of this class will only
    * get this class.
    *
@@ -50,20 +49,19 @@ namespace Isis
    *  @history 2009-09-14 Eric Hyer - Original Version
    *  @history 2009-09-18 Eric Hyer - Fixed some comments / documentation
    *  @history 2009-10-15 Eric Hyer - Added GetStatisticTypes method
-   *                              
+   *
    */
-  class GroupedStatistics 
-  {
+  class GroupedStatistics {
     public:
       GroupedStatistics();
-      GroupedStatistics(const GroupedStatistics & other);
+      GroupedStatistics(const GroupedStatistics &other);
       ~GroupedStatistics();
-      
-      void AddStatistic(const QString & statType, const double & newStat);
-      const Statistics & GetStatistics(const QString & statType) const;
+
+      void AddStatistic(const QString &statType, const double &newStat);
+      const Statistics &GetStatistics(const QString &statType) const;
       const QVector< QString > GetStatisticTypes() const;
 
-      GroupedStatistics & operator=(const GroupedStatistics & other);
+      GroupedStatistics &operator=(const GroupedStatistics &other);
 
     private:
       //! Map from statistic type to Statistics object

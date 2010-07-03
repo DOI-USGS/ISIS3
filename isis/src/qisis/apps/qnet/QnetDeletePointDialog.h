@@ -6,10 +6,10 @@
 #include "ui_QnetDeletePointDialog.h"
 
 class QnetDeletePointDialog : public QDialog, public Ui::QnetDeletePointDialog {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-    QnetDeletePointDialog(QWidget *parent=0);
+    QnetDeletePointDialog(QWidget *parent = 0);
 
 };
 

@@ -10,10 +10,10 @@
 
 namespace Isis {
   //! Construct a control point
-  ControlPoint::ControlPoint () : p_invalid(false) {
+  ControlPoint::ControlPoint() : p_invalid(false) {
     SetId("");
     SetType(Tie);
-    SetUniversalGround(Isis::Null,Isis::Null,Isis::Null);
+    SetUniversalGround(Isis::Null, Isis::Null, Isis::Null);
     SetIgnore(false);
     SetHeld(false);
   }
@@ -23,127 +23,127 @@ namespace Isis {
    *
    * @param id Control Point Id
    */
-  ControlPoint::ControlPoint (const std::string &id) : p_invalid(false) {
+  ControlPoint::ControlPoint(const std::string &id) : p_invalid(false) {
     SetId(id);
     SetType(Tie);
-    SetUniversalGround(Isis::Null,Isis::Null,Isis::Null);
+    SetUniversalGround(Isis::Null, Isis::Null, Isis::Null);
     SetIgnore(false);
     SetHeld(false);
   }
 
- /**
-  * Loads the PvlObject into a ControlPoint
-  *
-  * @param p PvlObject containing ControlPoint information
-  * @param forceBuild Forces invalid Control Measures to be added to this Control
-  *                   Point
-  *
-  * @throws Isis::iException::User - Invalid Point Type
-  * @throws Isis::iException::User - Unable to add ControlMeasure to ControlPoint
-  *
-  * @history 2008-06-18  Tracie Sucharski/Jeannie Walldren, Fixed bug with
-  *                              checking for "True" vs "true", change to
-  *                              lower case for comparison.
-  */
+  /**
+   * Loads the PvlObject into a ControlPoint
+   *
+   * @param p PvlObject containing ControlPoint information
+   * @param forceBuild Forces invalid Control Measures to be added to this Control
+   *                   Point
+   *
+   * @throws Isis::iException::User - Invalid Point Type
+   * @throws Isis::iException::User - Unable to add ControlMeasure to ControlPoint
+   *
+   * @history 2008-06-18  Tracie Sucharski/Jeannie Walldren, Fixed bug with
+   *                              checking for "True" vs "true", change to
+   *                              lower case for comparison.
+   */
   void ControlPoint::Load(PvlObject &p, bool forceBuild) {
     SetId(p["PointId"]);
-    if (p.HasKeyword("Latitude")) {
+    if(p.HasKeyword("Latitude")) {
       SetUniversalGround(p["Latitude"], p["Longitude"], p["Radius"]);
     }
-    if ((std::string)p["PointType"] == "Ground") SetType(Ground);
-    else if ((std::string)p["PointType"] == "Tie") SetType(Tie);
+    if((std::string)p["PointType"] == "Ground") SetType(Ground);
+    else if((std::string)p["PointType"] == "Tie") SetType(Tie);
     else {
       std::string msg = "Invalid Point Type, [" + (std::string)p["PointType"] + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
-    if (p.HasKeyword("Held")) {
+    if(p.HasKeyword("Held")) {
       iString held = (std::string)p["Held"];
-      if (held.DownCase() == "true") SetHeld(true);
+      if(held.DownCase() == "true") SetHeld(true);
     }
-    if (p.HasKeyword("Ignore")) {
+    if(p.HasKeyword("Ignore")) {
       iString ignore = (std::string)p["Ignore"];
-      if (ignore.DownCase() == "true") SetIgnore(true);
+      if(ignore.DownCase() == "true") SetIgnore(true);
     }
-    for (int g=0; g<p.Groups(); g++) {
+    for(int g = 0; g < p.Groups(); g++) {
       try {
-        if (p.Group(g).IsNamed("ControlMeasure")) {
+        if(p.Group(g).IsNamed("ControlMeasure")) {
           ControlMeasure cm;
           cm.Load(p.Group(g));
-          Add(cm,forceBuild);
+          Add(cm, forceBuild);
         }
       }
-      catch (iException &e) {
+      catch(iException &e) {
         std::string msg = "Unable to add Control Measure to ControlPoint [" +
-          Id() + "]";
-        throw iException::Message(iException::User,msg,_FILEINFO_);
+                          Id() + "]";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
   }
 
- /**
-  * Creates a PvlObject from the ControlPoint
-  *
-  * @return The PvlObject created
-  *
-  * @throws Isis::iException::Programmer - Invalid Point Enumeration 
-  * @internal 
-  *   @history 2009-10-13 Jeannie Walldren - Added detail to
-  *            error message.
-  */
+  /**
+   * Creates a PvlObject from the ControlPoint
+   *
+   * @return The PvlObject created
+   *
+   * @throws Isis::iException::Programmer - Invalid Point Enumeration
+   * @internal
+   *   @history 2009-10-13 Jeannie Walldren - Added detail to
+   *            error message.
+   */
   PvlObject ControlPoint::CreatePvlObject() {
     PvlObject p("ControlPoint");
-    if (p_type == Ground) {
+    if(p_type == Ground) {
       p += PvlKeyword("PointType", "Ground");
     }
-    else if (p_type == Tie) {
+    else if(p_type == Tie) {
       p += PvlKeyword("PointType", "Tie");
     }
     else {
       std::string msg = "Invalid Point Enumeration, [" + iString(p_type) + "] for ControlPoint [" + Id() + "].";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     p += PvlKeyword("PointId", Id());
-    if (p_latitude != Isis::Null && p_longitude != Isis::Null && p_radius != Isis::Null) {
-       p += PvlKeyword("Latitude", p_latitude);
-       p += PvlKeyword("Longitude", p_longitude);
-       p += PvlKeyword("Radius", p_radius);
+    if(p_latitude != Isis::Null && p_longitude != Isis::Null && p_radius != Isis::Null) {
+      p += PvlKeyword("Latitude", p_latitude);
+      p += PvlKeyword("Longitude", p_longitude);
+      p += PvlKeyword("Radius", p_radius);
     }
-    if (p_held == true) {
+    if(p_held == true) {
       p += PvlKeyword("Held", "True");
     }
-    if (p_ignore == true) {
+    if(p_ignore == true) {
       p += PvlKeyword("Ignore", "True");
     }
 
-    for (int g=0; g<Size(); g++) {
+    for(int g = 0; g < Size(); g++) {
       p.AddGroup(this->operator[](g).CreatePvlGroup());
     }
 
     return p;
   }
 
- /**
-  * Add a measurement to the control point
-  *
-  * @param measure The ControlMeasure to add
-  * @param forceBuild Forces the Control Measure to be added reguardless of
-  *                   validity
-  * @internal 
-  *   @history 2009-10-13 Jeannie Walldren - Added detail to
-  *            error message.
-  */
+  /**
+   * Add a measurement to the control point
+   *
+   * @param measure The ControlMeasure to add
+   * @param forceBuild Forces the Control Measure to be added reguardless of
+   *                   validity
+   * @internal
+   *   @history 2009-10-13 Jeannie Walldren - Added detail to
+   *            error message.
+   */
   void ControlPoint::Add(const ControlMeasure &measure, bool forceBuild) {
-    for (int i=0; i<Size(); i++) {
-      if (this->operator[](i).CubeSerialNumber() == measure.CubeSerialNumber()) {
-        if( forceBuild ) {
+    for(int i = 0; i < Size(); i++) {
+      if(this->operator[](i).CubeSerialNumber() == measure.CubeSerialNumber()) {
+        if(forceBuild) {
           p_invalid |= true;
           break;
         }
         else {
           std::string msg = "The SerialNumber is not unique. A measure with serial number [";
           msg += measure.CubeSerialNumber() + "] already exists for ControlPoint [" + Id() + "].";
-          throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
       }
     }
@@ -156,14 +156,14 @@ namespace Isis {
    * @param index The index of the control point to delete
    */
   void ControlPoint::Delete(int index) {
-    p_measures.erase(p_measures.begin()+index);
+    p_measures.erase(p_measures.begin() + index);
 
     // Check if the control point is still invalid or not
     if(p_invalid) {
       p_invalid = false;
-      for (int i=0; i<Size() && !p_invalid; i++) {
-        for (int j=i+1; j<Size() && !p_invalid; j++) {
-          if (this->operator[](i).CubeSerialNumber() == this->operator[](j).CubeSerialNumber()) {
+      for(int i = 0; i < Size() && !p_invalid; i++) {
+        for(int j = i + 1; j < Size() && !p_invalid; j++) {
+          if(this->operator[](i).CubeSerialNumber() == this->operator[](j).CubeSerialNumber()) {
             p_invalid = true;
           }
         }
@@ -172,47 +172,47 @@ namespace Isis {
     }
   }
 
- /**
-  *  Return the measurement for the given serial number
-  *
-  *  @param serialNumber The serial number
-  *
-  *  @return The ControlMeasure corresponding to the give serial number
-  * @internal 
-  *   @history 2009-10-13 Jeannie Walldren - Added detail to
-  *            error message.
-  */
+  /**
+   *  Return the measurement for the given serial number
+   *
+   *  @param serialNumber The serial number
+   *
+   *  @return The ControlMeasure corresponding to the give serial number
+   * @internal
+   *   @history 2009-10-13 Jeannie Walldren - Added detail to
+   *            error message.
+   */
   ControlMeasure &ControlPoint::operator[](const std::string &serialNumber) {
-    for (int m=0; m<this->Size(); m++) {
-      if (this->operator[](m).CubeSerialNumber() == serialNumber) {
+    for(int m = 0; m < this->Size(); m++) {
+      if(this->operator[](m).CubeSerialNumber() == serialNumber) {
         return this->operator [](m);
       }
     }
     std::string msg = "Requested measurement serial number [" + serialNumber + "] ";
     msg += "does not exist in ControlPoint [" + Id() + "].";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
 
   }
 
- /**
-  *  Return the measurement for the given serial number
-  *
-  *  @param serialNumber The serial number
-  *
-  *  @return The ControlMeasure corresponding to the give serial number
-  * @internal 
-  *   @history 2009-10-13 Jeannie Walldren - Added detail to
-  *            error message.
-  */
-  const ControlMeasure &ControlPoint::operator[](const std::string &serialNumber) const{
-    for (int m=0; m<this->Size(); m++) {
-      if (this->operator[](m).CubeSerialNumber() == serialNumber) {
+  /**
+   *  Return the measurement for the given serial number
+   *
+   *  @param serialNumber The serial number
+   *
+   *  @return The ControlMeasure corresponding to the give serial number
+   * @internal
+   *   @history 2009-10-13 Jeannie Walldren - Added detail to
+   *            error message.
+   */
+  const ControlMeasure &ControlPoint::operator[](const std::string &serialNumber) const {
+    for(int m = 0; m < this->Size(); m++) {
+      if(this->operator[](m).CubeSerialNumber() == serialNumber) {
         return this->operator [](m);
       }
     }
     std::string msg = "Requested measurement serial number [" + serialNumber + "] ";
     msg += "does not exist in ControlPoint [" + Id() + "].";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
 
   }
 
@@ -223,30 +223,30 @@ namespace Isis {
    *  @return True if point contains serial number, false if not
    */
   bool ControlPoint::HasSerialNumber(std::string &serialNumber) {
-    for (int m=0; m<this->Size(); m++) {
-      if (this->operator[](m).CubeSerialNumber() == serialNumber) {
+    for(int m = 0; m < this->Size(); m++) {
+      if(this->operator[](m).CubeSerialNumber() == serialNumber) {
         return true;
       }
     }
     return false;
 
   }
-  
-  
- /**
-  *  Obtain a string representation of a given PointType
-  *
-  *  @returns A string representation of type
-  *
-  *  @throws iException::Programmer When unable to translate type
-  * @internal 
-  *   @history 2009-10-13 Jeannie Walldren - Added detail to
-  *            error message.
-  *   @history 2010-06-04 Eric Hyer - removed parameter
-  */
+
+
+  /**
+   *  Obtain a string representation of a given PointType
+   *
+   *  @returns A string representation of type
+   *
+   *  @throws iException::Programmer When unable to translate type
+   * @internal
+   *   @history 2009-10-13 Jeannie Walldren - Added detail to
+   *            error message.
+   *   @history 2010-06-04 Eric Hyer - removed parameter
+   */
   const std::string ControlPoint::PointTypeToString() const {
     std::string str = "";
-    switch (p_type) {
+    switch(p_type) {
       case Ground:
         str = "Ground";
         break;
@@ -254,14 +254,14 @@ namespace Isis {
         str = "Tie";
         break;
       default:
-        str = "Unable to translate PointType [" + iString(p_type) 
-        + "] inside PointTypeToString for ControlPoint [" + Id() + "].";
+        str = "Unable to translate PointType [" + iString(p_type)
+              + "] inside PointTypeToString for ControlPoint [" + Id() + "].";
         throw iException::Message(iException::Programmer, str, _FILEINFO_);
     }
-    
-    return str;    
+
+    return str;
   }
-  
+
 
   /**
    * Set the ground coordinate of a control point
@@ -270,7 +270,7 @@ namespace Isis {
    * @param lon     planetocentric longitude in degrees
    * @param radius  radius at coordinate in meters
    */
-  void ControlPoint::SetUniversalGround (double lat, double lon, double radius) {
+  void ControlPoint::SetUniversalGround(double lat, double lon, double radius) {
     p_latitude = lat;
     p_longitude = lon;
     p_radius = radius;
@@ -280,14 +280,14 @@ namespace Isis {
   double ControlPoint::AverageError() const {
     double cerr = 0.0;
     int count = 0;
-    for (int i=0; i<(int)p_measures.size(); i++) {
-      if (p_measures[i].Ignore()) continue;
-      if (p_measures[i].Type() == ControlMeasure::Unmeasured) continue;
+    for(int i = 0; i < (int)p_measures.size(); i++) {
+      if(p_measures[i].Ignore()) continue;
+      if(p_measures[i].Type() == ControlMeasure::Unmeasured) continue;
       cerr += p_measures[i].ErrorMagnitude();
       count++;
     }
 
-    if (count == 0) return 0.0;
+    if(count == 0) return 0.0;
     return cerr / (double) count;
   }
 
@@ -301,14 +301,14 @@ namespace Isis {
    */
   bool ControlPoint::HasReference() {
 
-    if (p_measures.size() == 0) {
+    if(p_measures.size() == 0) {
       std::string msg = "There are no ControlMeasures in the ControlPoint [" + Id() + "]";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     // Return true if reference measure is found
-    for (unsigned int i=0; i<p_measures.size(); i++) {
-      if (p_measures[i].IsReference()) return true;
+    for(unsigned int i = 0; i < p_measures.size(); i++) {
+      if(p_measures[i].IsReference()) return true;
     }
     return false;
   }
@@ -320,84 +320,83 @@ namespace Isis {
   * @return The PvlObject created
   */
   int ControlPoint::ReferenceIndex() {
-    if (p_measures.size() == 0) {
+    if(p_measures.size() == 0) {
       std::string msg = "There are no ControlMeasures in the ControlPoint [" + Id() + "]";
-      throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     // Return the first ControlMeasure that is a reference
-    for (unsigned int i=0; i<p_measures.size(); i++) {
-      if (p_measures[i].IsReference()) return i;
+    for(unsigned int i = 0; i < p_measures.size(); i++) {
+      if(p_measures[i].IsReference()) return i;
     }
 
     // Or return the first measured ControlMeasure
-    for (unsigned int i=0; i<p_measures.size(); i++) {
-      if (p_measures[i].IsMeasured()) return i;
+    for(unsigned int i = 0; i < p_measures.size(); i++) {
+      if(p_measures[i].IsMeasured()) return i;
     }
 
     std::string msg = "There are no Measured ControlMeasures in the ControlPoint [" + Id() + "]";
-    throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
   /**
-   * Returns a Reference Index of the Control Point. If none then returns the 
-   * first measure as Reference. If there are no measures then returns -1; 
-   * 
+   * Returns a Reference Index of the Control Point. If none then returns the
+   * first measure as Reference. If there are no measures then returns -1;
+   *
    * @author sprasad (5/11/2010)
-   * 
-   * @return int 
+   *
+   * @return int
    */
-  int ControlPoint::ReferenceIndexNoException(void)
-  {
-    if (p_measures.size() == 0) {
+  int ControlPoint::ReferenceIndexNoException(void) {
+    if(p_measures.size() == 0) {
       return -1;
     }
 
     // Return the first ControlMeasure that is a reference
-    for (unsigned int i=0; i<p_measures.size(); i++) {
-      if (p_measures[i].IsReference()) return i;
+    for(unsigned int i = 0; i < p_measures.size(); i++) {
+      if(p_measures[i].IsReference()) return i;
     }
 
     return 0;
   }
- /**
-  * This method computes the apriori lat/lon for a point.  It computes this
-  * by determining the average lat/lon of all the measures.  Note that this
-  * does not change held, ignored, or ground points.  Also, it does not
-  * use unmeasured or ignored measures when computing the lat/lon.
-  * @internal 
-  *   @history 2008-06-18  Tracie Sucharski/Jeannie Walldren,
-  *                               Changed error messages for
-  *                               Held/Ground points.
-  *   @history 2009-10-13 Jeannie Walldren - Added detail to
-  *            error message.
-  */
+  /**
+   * This method computes the apriori lat/lon for a point.  It computes this
+   * by determining the average lat/lon of all the measures.  Note that this
+   * does not change held, ignored, or ground points.  Also, it does not
+   * use unmeasured or ignored measures when computing the lat/lon.
+   * @internal
+   *   @history 2008-06-18  Tracie Sucharski/Jeannie Walldren,
+   *                               Changed error messages for
+   *                               Held/Ground points.
+   *   @history 2009-10-13 Jeannie Walldren - Added detail to
+   *            error message.
+   */
   void ControlPoint::ComputeApriori() {
     // Should we ignore the point altogether?
-    if (Ignore()) return;
+    if(Ignore()) return;
 
     // Don't goof with ground points.  The lat/lon is what it is ... if
     // it exists!
-    if (Type() == Ground) {
-      if (p_latitude == Isis::Null ||
+    if(Type() == Ground) {
+      if(p_latitude == Isis::Null ||
           p_longitude == Isis::Null ||
           p_radius == Isis::Null) {
         std::string msg = "ControlPoint [" + Id() + "] is a ground point ";
         msg += "and requires lat/lon/radius";
-        throw iException::Message(iException::User,msg,_FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
       // Don't return until after the FocalPlaneMeasures have been set
       //      return;
     }
 
     // A held point is basically a ground point.  So don't mess with it either
-    if (Held()) {
-      if (p_latitude == Isis::Null &&
+    if(Held()) {
+      if(p_latitude == Isis::Null &&
           p_longitude == Isis::Null &&
           p_radius == Isis::Null) {
         std::string msg = "ControlPoint [" + Id() + "] is held and ";
         msg += "requires lat/lon/radius";
-        throw iException::Message(iException::User,msg,_FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
       // Don't return until after the FocalPlaneMeasures have been set
       //      return;
@@ -410,21 +409,21 @@ namespace Isis {
     double baselon = 180.;
 
     // Loop for each measure and compute the sum of the lat/lon/radii
-    for (int j=0; j<(int)p_measures.size(); j++) {
+    for(int j = 0; j < (int)p_measures.size(); j++) {
       ControlMeasure &m = p_measures[j];
-      if (m.Type() == ControlMeasure::Unmeasured ) {
+      if(m.Type() == ControlMeasure::Unmeasured) {
         // TODO: How do we deal with unmeasured measures
       }
-      else if (m.Ignore()) {
+      else if(m.Ignore()) {
         // TODO: How do we deal with ignored measures
       }
       else {
         Camera *cam = m.Camera();
-        if( cam == NULL ) {
+        if(cam == NULL) {
           std::string msg = "The Camera must be set prior to calculating apriori";
-          throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
-        if (cam->SetImage(m.Sample(),m.Line())) {
+        if(cam->SetImage(m.Sample(), m.Line())) {
           goodMeasures++;
           lat += cam->UniversalLatitude();
 
@@ -435,18 +434,18 @@ namespace Isis {
           rad += cam->LocalRadius();
           double x = cam->DistortionMap()->UndistortedFocalPlaneX();
           double y = cam->DistortionMap()->UndistortedFocalPlaneY();
-          m.SetFocalPlaneMeasured(x,y);
+          m.SetFocalPlaneMeasured(x, y);
           m.SetMeasuredEphemerisTime(cam->EphemerisTime());
         }
         else {
           // JAA: Don't stop if we know the lat/lon.  The SetImage may fail
           // but the FocalPlane measures have been set
-          if (Type() == ControlPoint::Ground || Held()) continue;
+          if(Type() == ControlPoint::Ground || Held()) continue;
 
           // TODO: What do we do
           std::string msg = "Cannot compute lat/lon for ControlPoint [" +
-            Id() + "], measure [" + m.CubeSerialNumber() + "]";
-          throw iException::Message(iException::User,msg,_FILEINFO_);
+                            Id() + "], measure [" + m.CubeSerialNumber() + "]";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
 
           // m.SetFocalPlaneMeasured(?,?);
         }
@@ -454,23 +453,23 @@ namespace Isis {
     }
 
     // Don't update the lat/lon for held or ground points
-    if (Held()) return;
-    if (Type() == ControlPoint::Ground) return;
+    if(Held()) return;
+    if(Type() == ControlPoint::Ground) return;
 
     // Did we have any measures?
-    if (goodMeasures == 0) {
+    if(goodMeasures == 0) {
       std::string msg = "ControlPoint [" + Id() + "] has no measures which ";
       msg += "project to latitude/longitude";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // Compute the averages
     lat = lat / goodMeasures;
     lon = lon / goodMeasures;
-    if (lon < 0)  lon += 360.;
+    if(lon < 0)  lon += 360.;
     rad = rad / goodMeasures;
 
-    SetUniversalGround(lat,lon,rad);
+    SetUniversalGround(lat, lon, rad);
   }
 
 
@@ -482,42 +481,42 @@ namespace Isis {
    */
 
   void ControlPoint::ComputeErrors() {
-    if (Ignore()) return;
+    if(Ignore()) return;
 
     double lat = UniversalLatitude();
     double lon = UniversalLongitude();
     double rad = Radius();
 
     // Loop for each measure to compute the error
-    for (int j=0; j<(int)p_measures.size(); j++) {
+    for(int j = 0; j < (int)p_measures.size(); j++) {
       ControlMeasure &m = p_measures[j];
-      if (m.Ignore()) continue;
-      if (m.Type() == ControlMeasure::Unmeasured) continue;
+      if(m.Ignore()) continue;
+      if(m.Type() == ControlMeasure::Unmeasured) continue;
 
       // TODO:  Should we use crater diameter?
       Camera *cam = m.Camera();
-      cam->SetImage(m.Sample(),m.Line());
+      cam->SetImage(m.Sample(), m.Line());
       // Map the lat/lon/radius of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.  This must be
       // done manually because the camera will compute a new time for line scanners,
       // instead of using the measured time.
       // First compute the look vector in body-fixed coordinates
       std::vector<double> look(3);
-      double cudx,cudy;
+      double cudx, cudy;
       cam->GroundMap()->GetXY(lat, lon, rad, &cudx, &cudy);
-      m.SetFocalPlaneComputed ( cudx, cudy );
+      m.SetFocalPlaneComputed(cudx, cudy);
 
       CameraFocalPlaneMap *fpmap = m.Camera()->FocalPlaneMap();
 
-      if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
+      if(cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Now things get tricky.  We want to produce errors in pixels not mm
         // but some of the camera maps could fail.  One that won't is the
         // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
         // distortion map and have residuals in undistorted pixels.
-        if (!fpmap->SetFocalPlane(m.FocalPlaneComputedX(), m.FocalPlaneComputedY())) {
+        if(!fpmap->SetFocalPlane(m.FocalPlaneComputedX(), m.FocalPlaneComputedY())) {
           std::string msg = "Sanity check #1 for ControlPoint [" +
                             Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
       }
@@ -526,40 +525,40 @@ namespace Isis {
         // For radar, we can't skip the "distortion map" because it really converts
         //  slant range to ground range.
         // Convert slant range/ doppler shift x/y to ground range x/y
-        m.Camera()->DistortionMap()->SetUndistortedFocalPlane(cudx,cudy);
+        m.Camera()->DistortionMap()->SetUndistortedFocalPlane(cudx, cudy);
 
         // Convert ground range x/y to detector position
         double focalPlaneX = m.Camera()->DistortionMap()->FocalPlaneX();
         double focalPlaneY = m.Camera()->DistortionMap()->FocalPlaneY();
 
-        if (!fpmap->SetFocalPlane(focalPlaneX,focalPlaneY)) { 
+        if(!fpmap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
           std::string msg = "Sanity check #1 for ControlPoint [" +
-                        Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+                            Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
       }
       double cuSamp = fpmap->DetectorSample();
       double cuLine = fpmap->DetectorLine();
 
-      if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
+      if(cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
-        if (!fpmap->SetFocalPlane(m.FocalPlaneMeasuredX(),m.FocalPlaneMeasuredY())) {
+        if(!fpmap->SetFocalPlane(m.FocalPlaneMeasuredX(), m.FocalPlaneMeasuredY())) {
           std::string msg = "Sanity check #2 for ControlPoint [" +
-                        Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+                            Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
       }
-      else{
+      else {
         // In the radar case we can't skip this step since it is really converting slant range to ground range
-        m.Camera()->DistortionMap()->SetUndistortedFocalPlane(m.FocalPlaneMeasuredX(),m.FocalPlaneMeasuredY());
+        m.Camera()->DistortionMap()->SetUndistortedFocalPlane(m.FocalPlaneMeasuredX(), m.FocalPlaneMeasuredY());
         double focalPlaneX = m.Camera()->DistortionMap()->FocalPlaneX();
         double focalPlaneY = m.Camera()->DistortionMap()->FocalPlaneY();
 
-        if (!fpmap->SetFocalPlane(focalPlaneX,focalPlaneY)) {
+        if(!fpmap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
           std::string msg = "Sanity check #2 for ControlPoint [" +
                             Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
       }
       double muSamp = fpmap->DetectorSample();
@@ -572,12 +571,12 @@ namespace Isis {
       double sampError = muSamp - cuSamp;
       double lineError = muLine - cuLine;
 
-      if (cam->GetCameraType()  != Isis::Camera::Radar) {
+      if(cam->GetCameraType()  != Isis::Camera::Radar) {
         sampError /= cdmap->SampleScaleFactor();
         lineError /=   cdmap->LineScaleFactor();
       }
 
-      m.SetError(sampError,lineError);
+      m.SetError(sampError, lineError);
     }
     return;
   }
@@ -586,14 +585,14 @@ namespace Isis {
    * Return the maximum error magnitude of the measures in the point.
    * Ignored and unmeasured measures will not be included.
    */
-  double ControlPoint::MaximumError () const {
+  double ControlPoint::MaximumError() const {
     double maxError = 0.0;
-    if (Ignore()) return maxError;
+    if(Ignore()) return maxError;
 
-    for (int j=0; j<(int) p_measures.size(); j++) {
-      if (p_measures[j].Ignore()) continue;
-      if (p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
-      if (p_measures[j].ErrorMagnitude() > maxError) {
+    for(int j = 0; j < (int) p_measures.size(); j++) {
+      if(p_measures[j].Ignore()) continue;
+      if(p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
+      if(p_measures[j].ErrorMagnitude() > maxError) {
         maxError = p_measures[j].ErrorMagnitude();
       }
     }
@@ -602,20 +601,20 @@ namespace Isis {
   }
 
 
- /**
-  * Wraps the input longitude toward a base longitude
-  *
-  * @param  lon     Input longitude to be wrapped
-  * @param  baselon Longitude to compare
-  * @return The wrapped longitude
-  */
-  double ControlPoint::WrapLongitude( double lon, double baselon) {
+  /**
+   * Wraps the input longitude toward a base longitude
+   *
+   * @param  lon     Input longitude to be wrapped
+   * @param  baselon Longitude to compare
+   * @return The wrapped longitude
+   */
+  double ControlPoint::WrapLongitude(double lon, double baselon) {
     double diff = baselon - lon;
 
-    if (diff <= 180.  &&  diff >= -180.) { // No wrap needed
+    if(diff <= 180.  &&  diff >= -180.) {  // No wrap needed
       return lon;
     }
-    else if (diff > 180.) {
+    else if(diff > 180.) {
       return (lon + 360.);
     }
     else {  // (diff < -180.)
@@ -639,70 +638,67 @@ namespace Isis {
 
   /**
    * Copy Constructor
-   * 
+   *
    * @author sprasad (5/11/2010)
-   * 
-   * @param pPoint 
-   * 
-   * @return ControlPoint& 
+   *
+   * @param pPoint
+   *
+   * @return ControlPoint&
    */
-  ControlPoint & ControlPoint::operator=  (const Isis::ControlPoint &pPoint)
-  {
-      p_id        = pPoint.p_id;       
-      p_type      = pPoint.p_type; 
-      p_ignore    = pPoint.p_ignore;    
-      p_held      = pPoint.p_held;      
-      p_latitude  = pPoint.p_latitude;  
-      p_longitude = pPoint.p_longitude; 
-      p_radius    = pPoint.p_radius;    
-      p_invalid   = pPoint.p_invalid; 
+  ControlPoint &ControlPoint::operator= (const Isis::ControlPoint &pPoint) {
+    p_id        = pPoint.p_id;
+    p_type      = pPoint.p_type;
+    p_ignore    = pPoint.p_ignore;
+    p_held      = pPoint.p_held;
+    p_latitude  = pPoint.p_latitude;
+    p_longitude = pPoint.p_longitude;
+    p_radius    = pPoint.p_radius;
+    p_invalid   = pPoint.p_invalid;
 
-      //!< List of Control Measures
-      for (int i=0; i<Size(); i++) {
-         p_measures[i] = pPoint.p_measures[i]; 
-      }
-     
-      return *this;
+    //!< List of Control Measures
+    for(int i = 0; i < Size(); i++) {
+      p_measures[i] = pPoint.p_measures[i];
+    }
+
+    return *this;
   }
 
   /**
    * Compare two Control Points for inequality
-   * 
+   *
    * @author sprasad (4/20/2010)
-   * 
-   * @param pPoint 
-   * 
-   * @return bool 
+   *
+   * @param pPoint
+   *
+   * @return bool
    */
-  bool ControlPoint::operator != (const Isis::ControlPoint &pPoint) const 
-  {
+  bool ControlPoint::operator != (const Isis::ControlPoint &pPoint) const {
     return !(*this == pPoint);
   }
 
   /**
    * Compare two Control Points for equality
-   * 
+   *
    * @author sprasad (4/20/2010)
-   * 
+   *
    * @param pPoint to be compared against
-   * 
-   * @return bool 
+   *
+   * @return bool
    */
-  bool ControlPoint::operator == (const Isis::ControlPoint &pPoint) const 
-  {
-    if ( pPoint.Size() != Size() || pPoint.p_id != p_id || pPoint.p_type != p_type || 
-         pPoint.p_ignore != p_ignore || pPoint.p_held != p_held || pPoint.p_latitude != p_latitude || 
-         pPoint.p_longitude != p_longitude || pPoint.p_radius != p_radius || pPoint.p_invalid != p_invalid ) {
+  bool ControlPoint::operator == (const Isis::ControlPoint &pPoint) const {
+    if(pPoint.Size() != Size() || pPoint.p_id != p_id || pPoint.p_type != p_type ||
+        pPoint.p_ignore != p_ignore || pPoint.p_held != p_held || pPoint.p_latitude != p_latitude ||
+        pPoint.p_longitude != p_longitude || pPoint.p_radius != p_radius || pPoint.p_invalid != p_invalid) {
 
       return false;
     }
 
-    for (int i=0; i<Size(); i++) {
-      if (pPoint.p_measures[i] != p_measures[i]) {
+    for(int i = 0; i < Size(); i++) {
+      if(pPoint.p_measures[i] != p_measures[i]) {
         return false;
       }
     }
-    
+
     return true;
   }
 }

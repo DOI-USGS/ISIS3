@@ -18,7 +18,7 @@ Table calfix("HiRISE Calibration Ancillary");
 Table calimg("HiRISE Calibration Image");
 
 bool flip;
-void glob (Buffer &out);
+void glob(Buffer &out);
 
 void IsisMain() {
   ProcessByLine p;
@@ -61,13 +61,13 @@ void IsisMain() {
   int chan = ins["ChannelNumber"];
 
   iString flipChan = ui.GetString("FLIP");
-  if (flipChan.UpCase() != "NONE") {
-    if (flipChan.ToInteger() == chan) flip = true;
+  if(flipChan.UpCase() != "NONE") {
+    if(flipChan.ToInteger() == chan) flip = true;
   }
 
   // Allocate the output file and make sure things get propogated nicely
   p.PropagateTables(false);
-  p.SetOutputCube ("TO",samples,lines,bands);
+  p.SetOutputCube("TO", samples, lines, bands);
   p.ClearInputCubes();
 
   // Create a buffer for reading the input cube
@@ -83,35 +83,35 @@ void IsisMain() {
 }
 
 // Line processing routine
-void glob (Buffer &out) {
-  double int2ToDouble (int value);
+void glob(Buffer &out) {
+  double int2ToDouble(int value);
 
   // Transfer the calibration buffer, image, and dark pixels
-  if (out.Line() <= calimg.Records()) {
+  if(out.Line() <= calimg.Records()) {
     int outPos = 0;
 
     // Buffer pixels
     vector<int> buf = calfix[out.Line()-1]["BufferPixels"];
-    for (int i=0; i<(int)buf.size(); i++) {
+    for(int i = 0; i < (int)buf.size(); i++) {
       out[outPos++] = int2ToDouble(buf[i]);
     }
 
     // Main calibration pixels
     vector<int> cal = calimg[out.Line()-1]["Calibration"];
-    if (flip) {
-      for (int i=(int)cal.size()-1; i>=0; i--) {
+    if(flip) {
+      for(int i = (int)cal.size() - 1; i >= 0; i--) {
         out[outPos++] = int2ToDouble(cal[i]);
       }
     }
     else {
-      for (int i=0; i<(int)cal.size(); i++) {
+      for(int i = 0; i < (int)cal.size(); i++) {
         out[outPos++] = int2ToDouble(cal[i]);
       }
     }
 
     // Dark pixels
     vector<int> dark = calfix[out.Line()-1]["DarkPixels"];
-    for (int i=0; i<(int)dark.size(); i++) {
+    for(int i = 0; i < (int)dark.size(); i++) {
       out[outPos++] = int2ToDouble(dark[i]);
     }
 
@@ -124,40 +124,40 @@ void glob (Buffer &out) {
 
     // Buffer pixels
     vector<int> buf = hifix[out.Line()-calimg.Records()-1]["BufferPixels"];
-    for (int i=0; i<(int)buf.size(); i++) {
+    for(int i = 0; i < (int)buf.size(); i++) {
       out[outPos++] = int2ToDouble(buf[i]);
     }
 
     // Main observation pixels
-    in->SetLine(out.Line()-calimg.Records(), 1);
+    in->SetLine(out.Line() - calimg.Records(), 1);
     cube.Read(*in);
 
-    if (flip) {
-      for (int i=in->size()-1; i>=0; i--) {
+    if(flip) {
+      for(int i = in->size() - 1; i >= 0; i--) {
         out[outPos++] = (*in)[i];
       }
     }
     else {
-      for (int i=0; i<in->size(); i++) {
+      for(int i = 0; i < in->size(); i++) {
         out[outPos++] = (*in)[i];
       }
     }
 
     // Dark pixels
     vector<int> dark = hifix[out.Line()-calimg.Records()-1]["DarkPixels"];
-    for (int i=0; i<(int)dark.size(); i++) {
+    for(int i = 0; i < (int)dark.size(); i++) {
       out[outPos++] = int2ToDouble(dark[i]);
     }
 
   } // End main image else
 } // End function
 
-double int2ToDouble (int value) {
-  if (value == NULL2) return NULL8;
-  else if (value == LOW_REPR_SAT2) return LOW_REPR_SAT8;
-  else if (value == LOW_INSTR_SAT2) return LOW_INSTR_SAT8;
-  else if (value == HIGH_INSTR_SAT2) return HIGH_INSTR_SAT8;
-  else if (value == HIGH_REPR_SAT2) return HIGH_REPR_SAT8;
+double int2ToDouble(int value) {
+  if(value == NULL2) return NULL8;
+  else if(value == LOW_REPR_SAT2) return LOW_REPR_SAT8;
+  else if(value == LOW_INSTR_SAT2) return LOW_INSTR_SAT8;
+  else if(value == HIGH_INSTR_SAT2) return HIGH_INSTR_SAT8;
+  else if(value == HIGH_REPR_SAT2) return HIGH_REPR_SAT8;
   else return value;
 
 }

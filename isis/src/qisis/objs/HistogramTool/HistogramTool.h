@@ -11,18 +11,16 @@
 class QAction;
 class QWidget;
 
-namespace Isis
-{
+namespace Isis {
   class Brick;
 }
 
 
-namespace Qisis
-{
+namespace Qisis {
   class HistogramItem;
   class HistogramToolWindow;
   class MdiCubeViewport;
-  
+
   /**
   * @brief Tool for histograms
   *
@@ -33,8 +31,7 @@ namespace Qisis
   * @internal
   *  @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0
   */
-  class HistogramTool : public PlotTool
-  {
+  class HistogramTool : public PlotTool {
       Q_OBJECT
 
     public:
@@ -43,8 +40,7 @@ namespace Qisis
 
     protected:
       //!< Returns the menu name.
-      QString menuName() const
-      {
+      QString menuName() const {
         return "&Options";
       };
       QWidget *createToolBarWidget(QStackedWidget *parent);

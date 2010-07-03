@@ -14,17 +14,17 @@ class cam2cam : public Isis::Transform {
 
   public:
     // constructor
-    cam2cam (const int inputSamples, const int inputLines, Isis::Camera *incam, 
-             const int outputSamples, const int outputLines, Isis::Camera *outcam);
-    
+    cam2cam(const int inputSamples, const int inputLines, Isis::Camera *incam,
+            const int outputSamples, const int outputLines, Isis::Camera *outcam);
+
     // destructor
-    ~cam2cam () {};
+    ~cam2cam() {};
 
     // Implementations for parent's pure virtual members
-    bool Xform (double &inSample, double &inLine,
-                    const double outSample, const double outLine);
-    int OutputSamples () const;
-    int OutputLines () const;
+    bool Xform(double &inSample, double &inLine,
+               const double outSample, const double outLine);
+    int OutputSamples() const;
+    int OutputLines() const;
 };
 
 #endif

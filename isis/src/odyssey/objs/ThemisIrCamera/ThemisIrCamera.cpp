@@ -9,7 +9,7 @@ using namespace std;
 
 namespace Isis {
   namespace Odyssey {
-    ThemisIrCamera::ThemisIrCamera (Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
+    ThemisIrCamera::ThemisIrCamera(Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
       // Set the detector size
       SetPixelPitch(0.05);
       SetFocalLength(203.9213);
@@ -17,18 +17,18 @@ namespace Isis {
       // Get the start time.  This includes adding a time offset that could
       // have been put in the labels during ingestion (thm2isis).  This is meant
       // to handle a random timing errors which can be up to four pixels
-      Isis::PvlGroup &inst = lab.FindGroup ("Instrument",Isis::Pvl::Traverse);
+      Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
       string stime = inst["SpacecraftClockCount"];
-      scs2e_c (NaifSclkCode(),stime.c_str(),&p_etStart);
+      scs2e_c(NaifSclkCode(), stime.c_str(), &p_etStart);
       double offset = inst["SpacecraftClockOffset"];
       p_etStart += offset;
 
       // If bands have been extracted from the original image then we
       // need to read the band bin group so we can map from the cube band
       // number to the instrument band number
-      Isis::PvlGroup &bandBin = lab.FindGroup("BandBin",Isis::Pvl::Traverse);
+      Isis::PvlGroup &bandBin = lab.FindGroup("BandBin", Isis::Pvl::Traverse);
       Isis::PvlKeyword &orgBand = bandBin["FilterNumber"];
-      for (int i=0; i<orgBand.Size(); i++) {
+      for(int i = 0; i < orgBand.Size(); i++) {
         p_originalBand.push_back(orgBand[i]);
       }
 
@@ -38,7 +38,7 @@ namespace Isis {
       // Duxbury model it is 33.2871 based on 1/22/2009 email with a readout
       // rate of 30.0417 lines/second
       int sumMode = 1;
-      if (inst.HasKeyword("SpatialSumming")) {
+      if(inst.HasKeyword("SpatialSumming")) {
         sumMode = inst["SpatialSumming"];
       }
       p_lineRate = 33.2871 / 1000.0 * sumMode;
@@ -51,20 +51,20 @@ namespace Isis {
       // The detector map tells us how to convert from image coordinates to
       // detector coordinates.  In our case, a (sample,line) to a (sample,time)
       // This is band dependent so it will change in SetBand
-      LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this,p_etStart,p_lineRate);
+      LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, p_etStart, p_lineRate);
       detectorMap->SetDetectorSampleSumming(sumMode);
       detectorMap->SetDetectorLineSumming(sumMode);
 
       // The focal plane map tells us how to go from detector position
       // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
       // This is band dependent so it will change in SetBand
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this,NaifIkCode());
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
 
       // The boresight sample in the K-T model was 164.25.  In Duxbury's it is
       // 160.5 or half the detector width.  The detector offset varies by band
       // and is set to the proper value for band 1 for now
-      focalMap->SetDetectorOrigin(160.5,0.0);
-      focalMap->SetDetectorOffset(0.0,120.5-8.5);
+      focalMap->SetDetectorOrigin(160.5, 0.0);
+      focalMap->SetDetectorOffset(0.0, 120.5 - 8.5);
 
       // The camera has a distortion map which scales in the X direction,
       // effectively a variable focal length, and an independent Y direction.
@@ -86,22 +86,22 @@ namespace Isis {
      *
      * @param vband
      */
-    void ThemisIrCamera::SetBand (const int vband) {
+    void ThemisIrCamera::SetBand(const int vband) {
       // Lookup the original band from the band bin group.  Unless there is
       // a reference band which means the data has all been aligned in the
       // band dimension
       int band;
-      if (HasReferenceBand()) {
+      if(HasReferenceBand()) {
         band = ReferenceBand();
-        if ((band < 1) || (band > 10)) {
+        if((band < 1) || (band > 10)) {
           string msg = "Invalid Reference Band [" + iString(band) + "]";
-          throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+          throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
         }
       }
       else {
-        if (vband > (int) p_originalBand.size()) {
+        if(vband > (int) p_originalBand.size()) {
           string msg = "Band number out of array bounds in ThemisIRCamera";
-          throw Isis::iException::Message(Isis::iException::Programmer,msg,_FILEINFO_);
+          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
         }
         band = p_originalBand[vband-1];
       }
@@ -114,13 +114,14 @@ namespace Isis {
       // at 52.  Also, Duxbury's 1/22/09 email used 128.5 vs 129.5 for the
       // center of the TDI enable detector line positions.
       double detectorLine;
-      if (p_tdiMode == "ENABLED") {
-        double bandDetector_TDI[] = {8.5,24.5,50.5,76.5,102.5,
-                                     128.5,154.5,180.5,205.5,231.5};
+      if(p_tdiMode == "ENABLED") {
+        double bandDetector_TDI[] = {8.5, 24.5, 50.5, 76.5, 102.5,
+                                     128.5, 154.5, 180.5, 205.5, 231.5
+                                    };
         detectorLine = bandDetector_TDI[band-1];
       }
       else {
-        int bandDetector_noTDI[] = {9,24,52,77,102,129,155,181,206,232};
+        int bandDetector_noTDI[] = {9, 24, 52, 77, 102, 129, 155, 181, 206, 232};
         detectorLine = (double) bandDetector_noTDI[band-1];
       }
 
@@ -145,27 +146,29 @@ namespace Isis {
       // Adjust alongtrackOffset using Kirk's empirically fitted numbers from
       // Apr 2009
       double empiricalOffset[] = { -0.076, -0.098, -0.089, -0.022, 0.0,
-                                   -0.020, -0.005, -0.069, 0.025, 0.0 };
+                                   -0.020, -0.005, -0.069, 0.025, 0.0
+                                 };
       alongtrackOffset += empiricalOffset[band-1];
-      this->FocalPlaneMap()->SetDetectorOffset(0.0,alongtrackOffset);
+      this->FocalPlaneMap()->SetDetectorOffset(0.0, alongtrackOffset);
 
       // Adjust the sample boresight using Kirk's empirically fitted numbers
       // from Apr 2009
       double sampleBoresight = 160.5;
       double empiricalBoresightOffset[] = { 0.021, 0.027, 0.005, 0.005, 0.0,
-                                            -0.007, -0.012, -0.039, -0.045, 0.0 };
+                                            -0.007, -0.012, -0.039, -0.045, 0.0
+                                          };
       sampleBoresight -= empiricalBoresightOffset[band-1];
-      this->FocalPlaneMap()->SetDetectorOrigin(sampleBoresight,0.0);
+      this->FocalPlaneMap()->SetDetectorOrigin(sampleBoresight, 0.0);
 
       // Finally, adjust the optical distortion model based on the band
       ThemisIrDistortionMap *distMap =
-                            (ThemisIrDistortionMap *) DistortionMap();
+        (ThemisIrDistortionMap *) DistortionMap();
       distMap->SetBand(band);
     }
   }
 }
 
 // Plugin
-extern "C" Isis::Camera *ThemisIrCameraPlugin (Isis::Pvl &lab) {
+extern "C" Isis::Camera *ThemisIrCameraPlugin(Isis::Pvl &lab) {
   return new Isis::Odyssey::ThemisIrCamera(lab);
 }

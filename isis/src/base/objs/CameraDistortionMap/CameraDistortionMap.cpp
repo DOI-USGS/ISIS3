@@ -63,7 +63,7 @@ namespace Isis {
    */
   void CameraDistortionMap::SetDistortion(const int naifIkCode) {
     std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
-    for (int i = 0; i < 3; ++i) {
+    for(int i = 0; i < 3; ++i) {
       p_odk.push_back(p_camera->Spice::GetDouble(odkkey, i));
     }
   }
@@ -89,7 +89,7 @@ namespace Isis {
     p_focalPlaneY = dy;
 
     // No coefficients == no distortion
-    if (p_odk.size() <= 0) {
+    if(p_odk.size() <= 0) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
       return true;
@@ -97,8 +97,8 @@ namespace Isis {
 
     // Get the distance from the focal plane center and if we are close
     // then skip the distortion
-    double r2 = (dx * dx) + (dy *dy);
-    if (r2 <= 1.0E-6) {
+    double r2 = (dx * dx) + (dy * dy);
+    if(r2 <= 1.0E-6) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
       return true;
@@ -130,12 +130,12 @@ namespace Isis {
    * @todo Figure out a better solution for divergence condition
    */
   bool CameraDistortionMap::SetUndistortedFocalPlane(const double ux,
-                                                     const double uy) {
+      const double uy) {
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
     // No coefficients == nodistortion
-    if (p_odk.size() <= 0) {
+    if(p_odk.size() <= 0) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
       return true;
@@ -144,7 +144,7 @@ namespace Isis {
     // Compute the distance from the focal plane center and if we are
     // close to the center then no distortion is required
     double rp2 = (ux * ux) + (uy * uy);
-    if (rp2 <= 1.0E-6) {
+    if(rp2 <= 1.0E-6) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
       return true;
@@ -166,7 +166,7 @@ namespace Isis {
       // of the focal plane.  Just set the distorted position to the
       // undistorted position. Also, make sure the focal plane is less
       // than 1km, it is unreasonable for it to grow larger than that.
-      if (iteration >= 15 || r > 1E9) {
+      if(iteration >= 15 || r > 1E9) {
         drOverR = 0.0;
         break;
       }
@@ -179,7 +179,8 @@ namespace Isis {
 
       r = rp + (drOverR * r_prev);  // Compute new estimate of r
       iteration++;
-    } while (fabs(r - r_prev) > tolMilliMeters);
+    }
+    while(fabs(r - r_prev) > tolMilliMeters);
 
     p_focalPlaneX = ux / (1.0 - drOverR);
     p_focalPlaneY = uy / (1.0 - drOverR);

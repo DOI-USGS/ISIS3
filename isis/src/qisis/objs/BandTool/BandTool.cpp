@@ -20,23 +20,23 @@ namespace Qisis {
 
   /**
    * BandTool constructor.
-   * 
-   * 
-   * @param parent 
+   *
+   *
+   * @param parent
    */
-  BandTool::BandTool (QWidget *parent) : Qisis::Tool(parent) {
+  BandTool::BandTool(QWidget *parent) : Qisis::Tool(parent) {
   }
 
-  /** 
-   * 
-   * 
+  /**
+   *
+   *
    * @param pad
-   * 
+   *
    * @return QAction*
    */
   QAction *BandTool::toolPadAction(ToolPad *pad) {
     QAction *action = new QAction(pad);
-    action->setIcon(QPixmap(toolIconDir()+"/rgb.png"));
+    action->setIcon(QPixmap(toolIconDir() + "/rgb.png"));
     action->setToolTip("Band Selection (B)");
     action->setShortcut(Qt::Key_B);
     QString text  =
@@ -46,15 +46,15 @@ namespace Qisis {
     return action;
   }
 
-  /** 
-   * 
-   * 
+  /**
+   *
+   *
    * @param active
-   * 
+   *
    * @return QWidget*
    */
-  QWidget *BandTool::createToolBarWidget (QStackedWidget *active) {
-    QWidget*hbox = new QWidget(active);
+  QWidget *BandTool::createToolBarWidget(QStackedWidget *active) {
+    QWidget *hbox = new QWidget(active);
 
     p_rgbButton = new QRadioButton(hbox);
     p_blackwhiteButton = new QRadioButton(hbox);
@@ -62,20 +62,20 @@ namespace Qisis {
 
     QMenu *copyMenu = new QMenu();
     QAction *copyLinked = new QAction(active);
-    copyLinked->setText("to Linked Viewports");    
-    connect(copyLinked,SIGNAL(triggered(bool)),this,SLOT(copyLinkedViewports()));
-    
+    copyLinked->setText("to Linked Viewports");
+    connect(copyLinked, SIGNAL(triggered(bool)), this, SLOT(copyLinkedViewports()));
+
     QAction *copyAll = new QAction(active);
-    copyAll->setText("to All Viewports");   
-    connect(copyAll,SIGNAL(triggered(bool)),this,SLOT(copyAllViewports()));
+    copyAll->setText("to All Viewports");
+    connect(copyAll, SIGNAL(triggered(bool)), this, SLOT(copyAllViewports()));
 
     copyMenu->addAction(copyLinked);
     copyMenu->addAction(copyAll);
 
     QToolButton *copyButton = new QToolButton(hbox);
     copyButton->setAutoRaise(true);
-    copyButton->setIconSize(QSize(22,22));
-    copyButton->setPopupMode(QToolButton::MenuButtonPopup);    
+    copyButton->setIconSize(QSize(22, 22));
+    copyButton->setPopupMode(QToolButton::MenuButtonPopup);
     copyButton->setMenu(copyMenu);
     copyButton->setDefaultAction(copyAll);
     copyButton->setIcon(QPixmap(toolIconDir() + "/copy_bands.png"));
@@ -86,15 +86,15 @@ namespace Qisis {
 
     QIcon colorIcon;
     QIcon grayIcon;
-    colorIcon.addPixmap(toolIconDir()+"/rgb.png",QIcon::Normal,QIcon::On);
-    grayIcon.addPixmap(toolIconDir()+"/gray.png",QIcon::Normal,QIcon::Off);
+    colorIcon.addPixmap(toolIconDir() + "/rgb.png", QIcon::Normal, QIcon::On);
+    grayIcon.addPixmap(toolIconDir() + "/gray.png", QIcon::Normal, QIcon::Off);
     p_rgbButton->setIcon(colorIcon);
     p_rgbButton->setText("RGB");
     p_blackwhiteButton->setIcon(grayIcon);
     p_blackwhiteButton->setText("Gray");
     p_rgbButton->setCheckable(true);
-    p_rgbButton->setIconSize(QSize(22,22));
-    p_blackwhiteButton->setIconSize(QSize(22,22));
+    p_rgbButton->setIconSize(QSize(22, 22));
+    p_blackwhiteButton->setIconSize(QSize(22, 22));
     p_rgbButton->setToolTip("Change to RGB");
     p_blackwhiteButton->setToolTip("Change to grayscale");
     text =
@@ -149,7 +149,7 @@ namespace Qisis {
     p_greenDisplay->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     p_blueDisplay->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     p_stack2->addWidget(colorWidget);
- 
+
 
     QHBoxLayout *displayLayout = new QHBoxLayout(grayWidget);
     displayLayout->addWidget(p_grayDisplay);
@@ -173,7 +173,7 @@ namespace Qisis {
     layout->addWidget(p_redSpin);
     layout->addWidget(p_grnSpin);
     layout->addWidget(p_bluSpin);
-    
+
     stuff2->setLayout(layout);
 
     p_stack->setCurrentIndex(0);
@@ -201,33 +201,34 @@ namespace Qisis {
   }
 
 
-  /** 
+  /**
    * This method sets the p_lineEditValueList to the proper values
    * according to what the user has selected in the p_comboBox.
    * These are the values shown in the gray boxes.
    */
   void BandTool::setList() {
-    if (p_pvl.FindObject("IsisCube").HasGroup("BandBin") && 
+    if(p_pvl.FindObject("IsisCube").HasGroup("BandBin") &&
         p_comboBox->count() > 0) {
 
       Isis::PvlGroup &bandBin = p_pvl.FindObject("IsisCube")
-                                   .FindGroup("BandBin");
+                                .FindGroup("BandBin");
       p_comboBox->setVisible(true);
       p_grayDisplay->setVisible(true);
       p_redDisplay->setVisible(true);
       p_greenDisplay->setVisible(true);
       p_blueDisplay->setVisible(true);
 
-      for (int i=0; i<bandBin.Keywords(); i++) {
-        if (bandBin[i].Name() == p_comboBox->currentText().toStdString()) {
+      for(int i = 0; i < bandBin.Keywords(); i++) {
+        if(bandBin[i].Name() == p_comboBox->currentText().toStdString()) {
           p_lineEditValueList.clear();
-          for (int j=0; j<bandBin[i].Size(); j++) {
+          for(int j = 0; j < bandBin[i].Size(); j++) {
             p_lineEditValueList.push_back(QString(bandBin[i][j].c_str()));
           }
         }
       }
-    } else {
-      for (int i=1; i<=p_bands; i++) {
+    }
+    else {
+      for(int i = 1; i <= p_bands; i++) {
         p_lineEditValueList.push_back(QString::number(i));
       }
       p_comboBox->setVisible(false);
@@ -239,19 +240,19 @@ namespace Qisis {
   }
 
 
-  /** 
-   * This method fills the p_comboBox with the keywords from the 
+  /**
+   * This method fills the p_comboBox with the keywords from the
    * band bin group of the currently selected cube.  If there are
-   * values for 'Center', that is choosen as the default. 
-   * 
+   * values for 'Center', that is choosen as the default.
+   *
    * @param pvl
    */
-  void BandTool::setBandBin (Isis::Pvl &pvl) {
+  void BandTool::setBandBin(Isis::Pvl &pvl) {
 
     // Get the number of bands and setup the spin box
     Isis::PvlGroup &dim = pvl.FindObject("IsisCube")
-                             .FindObject("Core")
-                             .FindGroup("Dimensions");
+                          .FindObject("Core")
+                          .FindGroup("Dimensions");
     p_pvl = pvl;
     p_bands = dim["Bands"];
 
@@ -273,19 +274,19 @@ namespace Qisis {
     p_grnSpin->setMaximum(p_bands);
 
     p_comboBox->clear();
-    if (pvl.FindObject("IsisCube").HasGroup("BandBin")) {
+    if(pvl.FindObject("IsisCube").HasGroup("BandBin")) {
       Isis::PvlGroup &bandBin = pvl.FindObject("IsisCube")
                                 .FindGroup("BandBin");
-      for (int i=0; i<bandBin.Keywords(); i++) {
-        //only add band bin keywords have a size that equals the number of bands 
-        if(bandBin[i].Size() == p_bands){
+      for(int i = 0; i < bandBin.Keywords(); i++) {
+        //only add band bin keywords have a size that equals the number of bands
+        if(bandBin[i].Size() == p_bands) {
           std::string bandBinName = bandBin[i].Name();
           p_comboBox->addItem(QString(bandBinName.c_str()));
         }
 
       }
 
-      if (p_comboBox->findText("Center") > 0) {
+      if(p_comboBox->findText("Center") > 0) {
         p_comboBox->setCurrentIndex(p_comboBox->findText("Center"));
       }
     }
@@ -293,32 +294,32 @@ namespace Qisis {
   }
 
 
-  /** 
+  /**
    * This method is connected to the qspinboxes.  When the user
    * selects a new band, the viewport needs to be updated and the
    * values display next to the p_comboBox also need to be
    * updated.
-   * 
+   *
    */
-  void BandTool::changeView () {
+  void BandTool::changeView() {
     MdiCubeViewport *v = cubeViewport();
 
-    if (v == NULL) return;
+    if(v == NULL) return;
 
-    if (p_rgbButton->isChecked()) {
+    if(p_rgbButton->isChecked()) {
       p_stack->setCurrentIndex(1);
       p_stack2->setCurrentIndex(1);
-      if (v->isGray() ||
+      if(v->isGray() ||
           p_redSpin->value() != v->redBand() ||
           p_grnSpin->value() != v->greenBand() ||
           p_bluSpin->value() != v->blueBand()) {
-          v->viewRGB(p_redSpin->value(),p_grnSpin->value(),p_bluSpin->value());
+        v->viewRGB(p_redSpin->value(), p_grnSpin->value(), p_bluSpin->value());
       }
     }
     else {
       p_stack->setCurrentIndex(0);
       p_stack2->setCurrentIndex(0);
-      if (v->isColor() || p_graySpin->value() != v->grayBand()) {
+      if(v->isColor() || p_graySpin->value() != v->grayBand()) {
         v->viewGray(p_graySpin->value());
       }
     }
@@ -328,137 +329,141 @@ namespace Qisis {
   }
 
 
-  /** 
+  /**
    * This method updates the values displayed in the gray boxes.
    * Called from changeView.
    */
-  void BandTool::setDisplay(){
+  void BandTool::setDisplay() {
     //Gray
-    if(p_graySpin->value()-1 < p_lineEditValueList.size()) {
+    if(p_graySpin->value() - 1 < p_lineEditValueList.size()) {
       p_grayDisplay->setText
-       (p_lineEditValueList[p_graySpin->value()-1]);
-    } else {
+      (p_lineEditValueList[p_graySpin->value()-1]);
+    }
+    else {
       p_grayDisplay->setText("N/A");
     }
     p_grayDisplay->adjustSize();
 
     //Red
-    if(p_redSpin->value()-1 < p_lineEditValueList.size()){
-       p_redDisplay->setText
-         (p_lineEditValueList[p_redSpin->value()-1]);
-    } else {
+    if(p_redSpin->value() - 1 < p_lineEditValueList.size()) {
+      p_redDisplay->setText
+      (p_lineEditValueList[p_redSpin->value()-1]);
+    }
+    else {
       p_redDisplay->setText("N/A");
     }
-     p_redDisplay->adjustSize();
+    p_redDisplay->adjustSize();
 
-     //Green
-     if(p_grnSpin->value()-1 < p_lineEditValueList.size()){ 
-       p_greenDisplay->setText
-         (p_lineEditValueList[p_grnSpin->value()-1]);
-     } else{
-       p_greenDisplay->setText("N/A");
-     }
-     p_greenDisplay->adjustSize();
+    //Green
+    if(p_grnSpin->value() - 1 < p_lineEditValueList.size()) {
+      p_greenDisplay->setText
+      (p_lineEditValueList[p_grnSpin->value()-1]);
+    }
+    else {
+      p_greenDisplay->setText("N/A");
+    }
+    p_greenDisplay->adjustSize();
 
-     //Blue
-     if(p_bluSpin->value()-1 < p_lineEditValueList.size()){
-       p_blueDisplay->setText
-         (p_lineEditValueList[p_bluSpin->value()-1]);
-     } else {
-       p_blueDisplay->setText("N/A");
-     }
-     p_blueDisplay->adjustSize();
+    //Blue
+    if(p_bluSpin->value() - 1 < p_lineEditValueList.size()) {
+      p_blueDisplay->setText
+      (p_lineEditValueList[p_bluSpin->value()-1]);
+    }
+    else {
+      p_blueDisplay->setText("N/A");
+    }
+    p_blueDisplay->adjustSize();
 
   }
 
   /**
    * This method copies the selected bands to all linked viewports.
-   * 
+   *
    */
   void BandTool::copyLinkedViewports() {
-   if(!cubeViewport()->isLinked()) return;
+    if(!cubeViewport()->isLinked()) return;
 
-   for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
-    MdiCubeViewport *cvp = cubeViewportList()->at(i);
-    if(!cvp->isLinked() || cvp == cubeViewport()) continue;
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+      MdiCubeViewport *cvp = cubeViewportList()->at(i);
+      if(!cvp->isLinked() || cvp == cubeViewport()) continue;
 
-    int bands = cvp->cubeBands();
+      int bands = cvp->cubeBands();
 
-    if (p_rgbButton->isChecked()) {
-      if (cvp->isGray() ||
-          p_redSpin->value() != cvp->redBand() ||
-          p_grnSpin->value() != cvp->greenBand() ||
-          p_bluSpin->value() != cvp->blueBand()) {
+      if(p_rgbButton->isChecked()) {
+        if(cvp->isGray() ||
+            p_redSpin->value() != cvp->redBand() ||
+            p_grnSpin->value() != cvp->greenBand() ||
+            p_bluSpin->value() != cvp->blueBand()) {
 
-          if(p_redSpin->value() > bands || 
-             p_grnSpin->value() > bands || 
-             p_bluSpin->value() > bands) continue;
+          if(p_redSpin->value() > bands ||
+              p_grnSpin->value() > bands ||
+              p_bluSpin->value() > bands) continue;
 
-          cvp->viewRGB(p_redSpin->value(),p_grnSpin->value(),p_bluSpin->value());
+          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(), p_bluSpin->value());
+        }
+      }
+      else {
+        if(cvp->isColor() || p_graySpin->value() != cvp->grayBand()) {
+          if(p_graySpin->value() > bands) continue;
+
+          cvp->viewGray(p_graySpin->value());
+        }
       }
     }
-    else {
-      if (cvp->isColor() || p_graySpin->value() != cvp->grayBand()) {
-        if(p_graySpin->value() > bands) continue;
-
-        cvp->viewGray(p_graySpin->value());
-      }
-    }
-   }
   }
 
   /**
    * This methods copies the selected bands to all viewports.
-   * 
+   *
    */
   void BandTool::copyAllViewports() {
-   for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
-    MdiCubeViewport *cvp = cubeViewportList()->at(i);
+    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+      MdiCubeViewport *cvp = cubeViewportList()->at(i);
 
-    int bands = cvp->cubeBands();
+      int bands = cvp->cubeBands();
 
-    if (p_rgbButton->isChecked()) {
-      if (cvp->isGray() ||
-          p_redSpin->value() != cvp->redBand() ||
-          p_grnSpin->value() != cvp->greenBand() ||
-          p_bluSpin->value() != cvp->blueBand()) {
+      if(p_rgbButton->isChecked()) {
+        if(cvp->isGray() ||
+            p_redSpin->value() != cvp->redBand() ||
+            p_grnSpin->value() != cvp->greenBand() ||
+            p_bluSpin->value() != cvp->blueBand()) {
 
-          if(p_redSpin->value() > bands || 
-             p_grnSpin->value() > bands || 
-             p_bluSpin->value() > bands) continue;
+          if(p_redSpin->value() > bands ||
+              p_grnSpin->value() > bands ||
+              p_bluSpin->value() > bands) continue;
 
-          cvp->viewRGB(p_redSpin->value(),p_grnSpin->value(),p_bluSpin->value());
+          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(), p_bluSpin->value());
+        }
+      }
+      else {
+        if(cvp->isColor() || p_graySpin->value() != cvp->grayBand()) {
+          if(p_graySpin->value() > bands) continue;
+
+          cvp->viewGray(p_graySpin->value());
+        }
       }
     }
-    else {
-      if (cvp->isColor() || p_graySpin->value() != cvp->grayBand()) {
-        if(p_graySpin->value() > bands) continue;
-
-        cvp->viewGray(p_graySpin->value());
-      }
-    }
-   }
   }
 
-  /** 
+  /**
    * updates the band tool
-   * 
+   *
    */
   void BandTool::updateTool() {
 
-    disconnect (p_comboBox,0,0,0);
-    disconnect (p_graySpin,0,0,0);
-    disconnect (p_redSpin,0,0,0);
-    disconnect (p_grnSpin,0,0,0);
-    disconnect (p_bluSpin,0,0,0);
-    disconnect(p_rgbButton,0,0,0);
+    disconnect(p_comboBox, 0, 0, 0);
+    disconnect(p_graySpin, 0, 0, 0);
+    disconnect(p_redSpin, 0, 0, 0);
+    disconnect(p_grnSpin, 0, 0, 0);
+    disconnect(p_bluSpin, 0, 0, 0);
+    disconnect(p_rgbButton, 0, 0, 0);
 
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp != NULL) {
-    
+    if(cvp != NULL) {
+
       setBandBin(*cvp->cube()->Label());
 
-      if (cvp->isGray()) {
+      if(cvp->isGray()) {
 
         p_rgbButton->setChecked(false);
         p_blackwhiteButton->setChecked(true);
@@ -487,15 +492,15 @@ namespace Qisis {
 
       changeView();
 
-      connect(p_comboBox,SIGNAL(activated(int)),this,SLOT(setList()));
-      connect(p_comboBox,SIGNAL(activated(int)),this,SLOT(setDisplay()));
+      connect(p_comboBox, SIGNAL(activated(int)), this, SLOT(setList()));
+      connect(p_comboBox, SIGNAL(activated(int)), this, SLOT(setDisplay()));
 
-      connect(p_graySpin,SIGNAL(valueChanged(int)),this,SLOT(changeView()));
-      connect(p_redSpin,SIGNAL(valueChanged(int)),this,SLOT(changeView()));
-      connect(p_grnSpin,SIGNAL(valueChanged(int)),this,SLOT(changeView()));
-      connect(p_bluSpin,SIGNAL(valueChanged(int)),this,SLOT(changeView()));
+      connect(p_graySpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
+      connect(p_redSpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
+      connect(p_grnSpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
+      connect(p_bluSpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
 
-      connect(p_rgbButton,SIGNAL(toggled(bool)),this,SLOT(changeView()));
+      connect(p_rgbButton, SIGNAL(toggled(bool)), this, SLOT(changeView()));
     }
   }
 

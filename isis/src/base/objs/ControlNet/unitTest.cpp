@@ -8,7 +8,7 @@
 #include <iostream>
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;
   Isis::ControlMeasure cm;
@@ -22,7 +22,7 @@ int main () {
 
   Isis::ControlMeasure cm1;
   cm1.SetCoordinate(15.5, 23.2, Isis::ControlMeasure::Manual);
-  cm1.SetError(1.0,1.0);
+  cm1.SetError(1.0, 1.0);
   cm1.SetCubeSerialNumber("Id1");
   cm1.SetDiameter(7900.4);
   cm1.SetChooserName("janeDoe");
@@ -30,7 +30,7 @@ int main () {
 
   Isis::ControlMeasure cm2;
   cm2.SetCoordinate(13.5, 168.3, Isis::ControlMeasure::Automatic);
-  cm2.SetError(0.5,0.5);
+  cm2.SetError(0.5, 0.5);
   cm2.SetCubeSerialNumber("Id2");
 
   Isis::ControlPoint cp2("G0001");
@@ -42,25 +42,25 @@ int main () {
 
   Isis::ControlMeasure cm3;
   cm3.SetCoordinate(45.2, 135.4, Isis::ControlMeasure::ValidatedManual);
-  cm3.SetError(0.25,0.25);
+  cm3.SetError(0.25, 0.25);
   cm3.SetCubeSerialNumber("Id1");
 
   Isis::ControlMeasure cm4;
   cm4.SetCoordinate(53.8, 110.5, Isis::ControlMeasure::ValidatedAutomatic);
-  cm4.SetError(0.1,0.1);
+  cm4.SetError(0.1, 0.1);
   cm4.SetCubeSerialNumber("Id2");
 
   Isis::ControlMeasure cm5;
   cm5.SetCoordinate(70.1, 118.7, Isis::ControlMeasure::Estimated);
-  cm5.SetError(0.75,0.75);
+  cm5.SetError(0.75, 0.75);
   cm5.SetCubeSerialNumber("Id3");
   cm5.SetIgnore(true);
 
   Isis::ControlMeasure cm6;
   cm6.SetCoordinate(84.1, 168.7, Isis::ControlMeasure::Estimated);
-  cm6.SetError(0.75,0.75);
+  cm6.SetError(0.75, 0.75);
   cm6.SetCubeSerialNumber("Id3");
-    
+
   Isis::ControlPoint cp3("G0002");
   cp3.SetType(Isis::ControlPoint::Ground);
   cp3.SetUniversalGround(63.5, 168.2, 3950.2);
@@ -82,11 +82,11 @@ int main () {
   cn1.SetTarget("Mars");
   cn1.SetNetworkId("Test");
   cn1.SetUserName("jdoe");
-  cn1.SetCreatedDate( "2009-02-05T14:20:15" );
-  cn1.SetModifiedDate( "2009-02-05T14:20:55" );
+  cn1.SetCreatedDate("2009-02-05T14:20:15");
+  cn1.SetModifiedDate("2009-02-05T14:20:55");
   cn1.SetDescription("UnitTest of ControlNetwork");
   cn1.Add(cp1);
-  cn1.Add(cp2); 
+  cn1.Add(cp2);
   cn1.Add(cp3);
   cn1.Add(cp5);
 
@@ -94,7 +94,7 @@ int main () {
   try {
     cn1.Add(cp4);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
@@ -103,7 +103,7 @@ int main () {
   try {
     cn1.Write("temp.txt");
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
@@ -115,7 +115,7 @@ int main () {
   try {
     cn1.Delete(cp5.Id());
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
@@ -124,7 +124,7 @@ int main () {
   try {
     cn1.Delete(7);
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report(false);
   }
   cout << endl;
@@ -141,15 +141,15 @@ int main () {
   t1.Open(f1);
   t2.Open(f2);
 
-  if (t1.LineCount() != t2.LineCount()) {
+  if(t1.LineCount() != t2.LineCount()) {
     cout << "ERROR: Text Files are not the same!" << endl;
   }
   else {
-    for (int l=0; l<t1.LineCount(); l++) {
+    for(int l = 0; l < t1.LineCount(); l++) {
       string line1, line2;
       t1.GetLine(line1);
       t2.GetLine(line2);
-      if (!(line1 == line2)) {
+      if(!(line1 == line2)) {
         cout <<  "ERROR: Text Files are not the same!" << endl;
       }
     }

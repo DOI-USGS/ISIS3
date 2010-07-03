@@ -32,10 +32,9 @@ class QLineEdit;
 class QTabWidget;
 class QToolButton;
 
-namespace Qisis
-{
+namespace Qisis {
   class MdiCubeViewport;
-  
+
   /**
    * @brief Tool to locate a point on a cube that is projected and/or has a camera
    *        model
@@ -71,55 +70,51 @@ namespace Qisis
    *  @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *           CubeViewport.  Also fixed include issues.
    */
-  class GroundTab : public QWidget
-  {
+  class GroundTab : public QWidget {
       Q_OBJECT
 
     public:
-      GroundTab(QWidget * parent = 0);
+      GroundTab(QWidget *parent = 0);
 
-      QLineEdit * p_lonLineEdit; //!< Input for longitude
-      QLineEdit * p_latLineEdit; //!< Input for latitude
+      QLineEdit *p_lonLineEdit;  //!< Input for longitude
+      QLineEdit *p_latLineEdit;  //!< Input for latitude
   };
 
-  class ImageTab : public QWidget
-  {
+  class ImageTab : public QWidget {
       Q_OBJECT
 
     public:
-      ImageTab(QWidget * parent = 0);
+      ImageTab(QWidget *parent = 0);
 
-      QLineEdit * p_sampLineEdit; //!< Input for sample
-      QLineEdit * p_lineLineEdit; //!< Input for line
+      QLineEdit *p_sampLineEdit;  //!< Input for sample
+      QLineEdit *p_lineLineEdit;  //!< Input for line
   };
 
-  class FindTool : public Qisis::Tool
-  {
+  class FindTool : public Qisis::Tool {
       Q_OBJECT
 
     public:
-      FindTool(QWidget * parent);
+      FindTool(QWidget *parent);
       ~FindTool();
-      void addTo(QMenu * menu);
-      void paintViewport(MdiCubeViewport * vp, QPainter * painter);
+      void addTo(QMenu *menu);
+      void paintViewport(MdiCubeViewport *vp, QPainter *painter);
     signals:
       void recordPoint(QPoint p); //!< Emitted when point should be recorded
 
     protected:
-      QAction * toolPadAction(ToolPad * toolpad);
+      QAction *toolPadAction(ToolPad *toolpad);
       /**
        * This method returns the menu name associated with this tool.
        *
        *
        * @return QString
        */
-      QString menuName() const
-      {
+      QString menuName() const {
         return "&Options";
       };
-      QWidget * createToolBarWidget(QStackedWidget * parent);
+      QWidget *createToolBarWidget(QStackedWidget *parent);
       void updateTool();
-      void createDialog(QWidget * parent);
+      void createDialog(QWidget *parent);
 
     protected slots:
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
@@ -135,25 +130,25 @@ namespace Qisis
       void refresh();
 
     private:
-      QDialog * p_dialog;
-      QAction * p_findPoint;
-      QToolButton * p_showDialogButton;
-      QToolButton * p_linkViewportsButton;
-      QToolButton * p_togglePointVisibleButton;
-      QCheckBox * p_syncScale;
-      QLineEdit * p_statusEdit;
-      QTabWidget * p_tabWidget;
-      GroundTab * p_groundTab;
-      ImageTab * p_imageTab;
-      
+      QDialog *p_dialog;
+      QAction *p_findPoint;
+      QToolButton *p_showDialogButton;
+      QToolButton *p_linkViewportsButton;
+      QToolButton *p_togglePointVisibleButton;
+      QCheckBox *p_syncScale;
+      QLineEdit *p_statusEdit;
+      QTabWidget *p_tabWidget;
+      GroundTab *p_groundTab;
+      ImageTab *p_imageTab;
+
 
     private:
       double p_line;
       double p_samp;
-      
+
       double p_lat;
       double p_lon;
-      
+
       bool p_pointVisible;
   };
 

@@ -68,7 +68,7 @@ namespace Isis {
     // then skip the distortion
     double radialDist2 = (dxPix * dxPix) + (dyPix * dyPix);
 
-    if (radialDist2 <= 1.0E-3) {
+    if(radialDist2 <= 1.0E-3) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
       return true;
@@ -78,11 +78,11 @@ namespace Isis {
     double radialDist4 = radialDist2 * radialDist2;
     double radialDist6 = radialDist4 * radialDist2;
 
-    double uRadialDist = p_odk[0] + radialDist2 * p_odk[1] + 
-                                    radialDist4 * p_odk[2] + 
-                                    radialDist6 * p_odk[3];
+    double uRadialDist = p_odk[0] + radialDist2 * p_odk[1] +
+                         radialDist4 * p_odk[2] +
+                         radialDist6 * p_odk[3];
 
-   // double radialDist = sqrt(radialDist2);
+    // double radialDist = sqrt(radialDist2);
     double uxPix = dxPix * uRadialDist;
     double uyPix = dyPix * uRadialDist;
 
@@ -106,7 +106,7 @@ namespace Isis {
    * @todo Figure out a better solution for divergence condition
    */
   bool MarciDistortionMap::SetUndistortedFocalPlane(const double ux,
-                                                    const double uy) {
+      const double uy) {
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
@@ -118,9 +118,9 @@ namespace Isis {
 
     // Get the distance from the focal plane center and if we are close
     // then skip the distortion
-    double Ru = sqrt((uxPix * uxPix) + (uyPix *uyPix));
+    double Ru = sqrt((uxPix * uxPix) + (uyPix * uyPix));
 
-    if (Ru <= 1.0E-6) {
+    if(Ru <= 1.0E-6) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
       return true;
@@ -129,7 +129,7 @@ namespace Isis {
     double delta = 1.0;
     int iter = 0;
 
-    double Rd = sqrt((dxPix * dxPix) + (dyPix *dyPix));
+    double Rd = sqrt((dxPix * dxPix) + (dyPix * dyPix));
 
     while(fabs(delta) > 1E-9) {
       if(fabs(delta) > 1E30 || iter > 50) {
@@ -142,11 +142,11 @@ namespace Isis {
       double Rd5 = Rd4 * Rd;
       double Rd6 = Rd5 * Rd;
 
-      double fRd = p_odk[0] + Rd2 * p_odk[1] + 
-                              Rd4 * p_odk[2] + 
-                              Rd6 * p_odk[3] - Ru * (1.0 / Rd);
+      double fRd = p_odk[0] + Rd2 * p_odk[1] +
+                   Rd4 * p_odk[2] +
+                   Rd6 * p_odk[3] - Ru * (1.0 / Rd);
 
-      double fRd2 = 2 * p_odk[1] * Rd + 
+      double fRd2 = 2 * p_odk[1] * Rd +
                     4 * p_odk[2] * Rd3 +
                     6 * p_odk[3] * Rd5 +
                     Ru * (1.0 / Rd2);

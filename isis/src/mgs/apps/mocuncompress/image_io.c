@@ -16,7 +16,7 @@ provided that (i) you must include this notice with all copies of the
 Software to be distributed; (ii) you may not remove or alter any
 proprietary notices contained in the Software; (iii) you may not charge any
 third party for the Software; and (iv) you will not export the Software
-without the appropriate United States and foreign government licenses.  
+without the appropriate United States and foreign government licenses.
 
 You acknowledge that no title to the intellectual property in the Software
 is transferred to you.  You further acknowledge that title and full
@@ -28,11 +28,11 @@ SOFTWARE, AND SPECIFICALLY DISCLAIMS THE IMPLIED WARRANTIES OF
 NON-INFRINGEMENT OF THIRD PARTY RIGHTS, MERCHANTABILITY AND FITNESS FOR A
 PARTICULAR PURPOSE.  SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR
 LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO SUCH LIMITATIONS OR
-EXCLUSIONS MAY NOT APPLY TO YOU.  
+EXCLUSIONS MAY NOT APPLY TO YOU.
 
 Your use or reproduction of the Software constitutes your agreement to the
 terms of this Notice.  If you do not agree with the terms of this notice,
-promptly return or destroy all copies of the Software in your possession.  
+promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
@@ -46,20 +46,20 @@ static char *sccsid = "@(#)image_io.c	1.1 10/04/99";
 image_change_header(header)
 struct image_header *header;
 {
-    static int hdr_buf[IMAGE_HEADER_LENGTH / sizeof(int)];
-    
-    hdr_buf[0] = MAGIC;
-    hdr_buf[1] = header->height;
-    hdr_buf[2] = header->width;
-    hdr_buf[3] = header->bpe;
-    sprintf((char *)hdr_buf+IMAGE_LABEL_OFFSET, "%s", header->label);
+  static int hdr_buf[IMAGE_HEADER_LENGTH / sizeof(int)];
 
-    /* write the new header */
-    lseek(header->fd, 0L, 0);
-    if(write(header->fd, hdr_buf, IMAGE_HEADER_LENGTH) < IMAGE_HEADER_LENGTH) {
-	printf("image_change_header : unable to write new header\n");
-	exit(1);
-    }
+  hdr_buf[0] = MAGIC;
+  hdr_buf[1] = header->height;
+  hdr_buf[2] = header->width;
+  hdr_buf[3] = header->bpe;
+  sprintf((char *)hdr_buf + IMAGE_LABEL_OFFSET, "%s", header->label);
+
+  /* write the new header */
+  lseek(header->fd, 0L, 0);
+  if(write(header->fd, hdr_buf, IMAGE_HEADER_LENGTH) < IMAGE_HEADER_LENGTH) {
+    printf("image_change_header : unable to write new header\n");
+    exit(1);
+  }
 }
 
 image_open(filename, header, mode)
@@ -67,77 +67,77 @@ char *filename;
 struct image_header *header;
 char *mode;
 {
-    int len;
-    char buf[64];
-    static int hdr_buf[IMAGE_HEADER_LENGTH / sizeof(int)];
-    int  fd;
-    char *text_ptr;
+  int len;
+  char buf[64];
+  static int hdr_buf[IMAGE_HEADER_LENGTH / sizeof(int)];
+  int  fd;
+  char *text_ptr;
 
-    /* check to see if the filename ends in ".ddd" */
-    len = strlen(filename);
-    if( (len > 4) && (!strcmp(&(filename[len-4]), ".ddd")) ) {
-	strcpy(buf, filename);
+  /* check to see if the filename ends in ".ddd" */
+  len = strlen(filename);
+  if((len > 4) && (!strcmp(&(filename[len-4]), ".ddd"))) {
+    strcpy(buf, filename);
+  }
+  else {
+    sprintf(buf, "%s.ddd", filename);
+  }
+  if(((*mode == 'r') && (mode[1] != 'w')) || (*mode == 'u')) {
+    if(strcmp(buf, "-.ddd")) fd = open(buf, (*mode == 'r') ? 0 : 2);
+    else fd = 0;
+    if(fd < 0) {
+      printf("image_open : Unable to open %s\n", buf);
+      exit(1);
     }
-    else {
-	sprintf(buf, "%s.ddd", filename);
+    if(read(fd, hdr_buf, IMAGE_HEADER_LENGTH) < IMAGE_HEADER_LENGTH) {
+      printf("image_open : %s is not a valid image file\n", buf);
+      exit(1);
     }
-    if(((*mode == 'r')&&(mode[1] != 'w')) || (*mode == 'u')) {
-	if(strcmp(buf, "-.ddd")) fd = open(buf, (*mode == 'r') ? 0 : 2);
-	else fd = 0;
-	if(fd < 0) {
-	    printf("image_open : Unable to open %s\n", buf);
-	    exit(1);
-	}
-	if(read(fd, hdr_buf, IMAGE_HEADER_LENGTH) < IMAGE_HEADER_LENGTH) {
-	    printf("image_open : %s is not a valid image file\n", buf);
-	    exit(1);
-	}
-	if((*hdr_buf) != MAGIC) {
-	    printf("image_open : %s is not a valid image file\n", buf);
-	    exit(1);
-	}
-	header->height = hdr_buf[1];
-	header->width = hdr_buf[2];
-	header->bpe = hdr_buf[3];
-	if(header->bpe == 0)
-	  header->bpe = 8;
-	text_ptr = (char *) malloc(strlen(((char *)hdr_buf)+IMAGE_LABEL_OFFSET));
-	strcpy(text_ptr, (char *) (((char *)hdr_buf)+IMAGE_LABEL_OFFSET));
-	header->label = text_ptr;
-	header->fd = fd;
+    if((*hdr_buf) != MAGIC) {
+      printf("image_open : %s is not a valid image file\n", buf);
+      exit(1);
     }
-    else if((*mode == 'w') || (!strncmp(mode, "rw", 2))) {
-	if((header->width == 0) || (header->height == 0)) {
-	    printf("image_open : Invalid size for image\n");
-	    exit(1);
-	}
-	fd = creat(buf, 0666);
-	if(fd < 0) {
-	    printf("image_open : Unable to create %s\n", buf);
-	    exit(1);
-	}
-	if(*mode != 'w') {
-	    close(fd);
-	    fd = open(buf, 2);
-	    if(fd < 0) {
-		printf("image_open : Unable ot open %s\n", buf);
-		exit(1);
-	    }
-	}
-	header->fd = fd;
-	hdr_buf[0] = MAGIC;
-	hdr_buf[1] = header->height;
-	hdr_buf[2] = header->width;
-	hdr_buf[3] = header->bpe;
-	sprintf((char *)hdr_buf+IMAGE_LABEL_OFFSET, "%s", header->label);
-	if(write(fd, hdr_buf, IMAGE_HEADER_LENGTH) < IMAGE_HEADER_LENGTH) {
-	    printf("image_open : unable to write header for %s\n", buf);
-	    exit(1);
-	}
+    header->height = hdr_buf[1];
+    header->width = hdr_buf[2];
+    header->bpe = hdr_buf[3];
+    if(header->bpe == 0)
+      header->bpe = 8;
+    text_ptr = (char *) malloc(strlen(((char *)hdr_buf) + IMAGE_LABEL_OFFSET));
+    strcpy(text_ptr, (char *)(((char *)hdr_buf) + IMAGE_LABEL_OFFSET));
+    header->label = text_ptr;
+    header->fd = fd;
+  }
+  else if((*mode == 'w') || (!strncmp(mode, "rw", 2))) {
+    if((header->width == 0) || (header->height == 0)) {
+      printf("image_open : Invalid size for image\n");
+      exit(1);
     }
-    else {
-	printf("image_open : Invalid mode (%s)\n", mode);
-	exit(1);
+    fd = creat(buf, 0666);
+    if(fd < 0) {
+      printf("image_open : Unable to create %s\n", buf);
+      exit(1);
     }
+    if(*mode != 'w') {
+      close(fd);
+      fd = open(buf, 2);
+      if(fd < 0) {
+        printf("image_open : Unable ot open %s\n", buf);
+        exit(1);
+      }
+    }
+    header->fd = fd;
+    hdr_buf[0] = MAGIC;
+    hdr_buf[1] = header->height;
+    hdr_buf[2] = header->width;
+    hdr_buf[3] = header->bpe;
+    sprintf((char *)hdr_buf + IMAGE_LABEL_OFFSET, "%s", header->label);
+    if(write(fd, hdr_buf, IMAGE_HEADER_LENGTH) < IMAGE_HEADER_LENGTH) {
+      printf("image_open : unable to write header for %s\n", buf);
+      exit(1);
+    }
+  }
+  else {
+    printf("image_open : Invalid mode (%s)\n", mode);
+    exit(1);
+  }
 }
 

@@ -12,11 +12,11 @@ int main() {
 
   // The class being tested
   Isis::CameraPointInfo cpi;
- 
+
   // It is necessary to delete the Filename keyword for the test to pass
   // this is because the directory it is run from may change
   // under normal usage Filename is always included
-   
+
   cpi.SetCube("unitTest1.cub");
   Isis::PvlGroup *grp = cpi.SetImage(1, 1);
   grp->DeleteKeyword("Filename");

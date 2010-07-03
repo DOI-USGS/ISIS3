@@ -110,268 +110,312 @@ namespace Isis {
   class Projection {
     public:
       // constructor
-      Projection (Isis::Pvl &label);
+      Projection(Isis::Pvl &label);
 
       //! Destroys the Projection object
-      virtual ~Projection () { if(p_mapper) delete p_mapper; };
+      virtual ~Projection() {
+        if(p_mapper) delete p_mapper;
+      };
 
-     /**
-      * If desired the programmer can use this method to set a world mapper to
-      * be used in the SetWorld, WorldX, and WorldY methods. Mappers typically
-      * transform a projection coordinate (x/y) into the desired working
-      * coordinate system, for example, cube pixels or inches on a piece of
-      * paper. They transform in both directions (world to projection and
-      * projection to world). This allows for conversions from line/sample to
-      * latitude/longitude and vice versa. This projection will take ownership 
-      * of the WorldMapper pointer. 
-      *
-      * @param mapper Pointer to the mapper
-      */
-      void SetWorldMapper(Isis::WorldMapper *mapper) { p_mapper = mapper; };
+      /**
+       * If desired the programmer can use this method to set a world mapper to
+       * be used in the SetWorld, WorldX, and WorldY methods. Mappers typically
+       * transform a projection coordinate (x/y) into the desired working
+       * coordinate system, for example, cube pixels or inches on a piece of
+       * paper. They transform in both directions (world to projection and
+       * projection to world). This allows for conversions from line/sample to
+       * latitude/longitude and vice versa. This projection will take ownership
+       * of the WorldMapper pointer.
+       *
+       * @param mapper Pointer to the mapper
+       */
+      void SetWorldMapper(Isis::WorldMapper *mapper) {
+        p_mapper = mapper;
+      };
 
       // Set world position
-      bool SetWorld (const double x, const double y);
+      bool SetWorld(const double x, const double y);
 
       // Set ground position
-      virtual bool SetGround (const double lat, const double lon);
+      virtual bool SetGround(const double lat, const double lon);
 
       // Set x/y coordinate
-      virtual bool SetCoordinate (const double x, const double y);
+      virtual bool SetCoordinate(const double x, const double y);
 
-     /**
-      * This indicates if the last invocation of SetGround, SetCoordinate, or
-      * SetUniversalGround was with successful or not. If there was success then
-      * the Latitude, Longitude, XCoord, YCoord, UniversalLatitude,
-      * UniversalLongitude, WorldX, and WorldY methods can be utilized.
-      *
-      * @return bool
-      */
-      inline bool IsGood() const { return p_good; };
+      /**
+       * This indicates if the last invocation of SetGround, SetCoordinate, or
+       * SetUniversalGround was with successful or not. If there was success then
+       * the Latitude, Longitude, XCoord, YCoord, UniversalLatitude,
+       * UniversalLongitude, WorldX, and WorldY methods can be utilized.
+       *
+       * @return bool
+       */
+      inline bool IsGood() const {
+        return p_good;
+      };
 
       // Return computed world X/Y after successful SetGround
       double WorldX() const;
       double WorldY() const;
 
-     /**
-      * This returns a longitude with correct longitude direction and domain as
-      * specified in the label object. The method can only be used if SetGround,
-      * SetCoordinate, SetUniversalGround, or SetWorld return with success.
-      * Success can also be checked using the IsGood method.
-      *
-      * @return double
-      */
-      inline double Longitude() const { return p_longitude; };
+      /**
+       * This returns a longitude with correct longitude direction and domain as
+       * specified in the label object. The method can only be used if SetGround,
+       * SetCoordinate, SetUniversalGround, or SetWorld return with success.
+       * Success can also be checked using the IsGood method.
+       *
+       * @return double
+       */
+      inline double Longitude() const {
+        return p_longitude;
+      };
 
-     /**
-      * This returns a latitude with correct latitude type as specified in the
-      * label object. The method can only be used if SetGround, SetCoordinate,
-      * SetUniversalGround, or SetWorld return with success. Success can also
-      * be checked using the IsGood method.
-      *
-      * @return double
-      */
-      inline double Latitude() const { return p_latitude; };
+      /**
+       * This returns a latitude with correct latitude type as specified in the
+       * label object. The method can only be used if SetGround, SetCoordinate,
+       * SetUniversalGround, or SetWorld return with success. Success can also
+       * be checked using the IsGood method.
+       *
+       * @return double
+       */
+      inline double Latitude() const {
+        return p_latitude;
+      };
 
-     /**
-      * This returns the projection X provided SetGround, SetCoordinate,
-      * SetUniversalGround, or SetWorld returned with success. Success can also
-      * be checked using the IsGood method. The units of X will be in the same .
-      * units as the radii obtained from the label.
-      *
-      * @return double
-      */
-      inline double XCoord() const { return p_x; };
-
-
-     /**
-      * This returns the projection Y provided SetGround, SetCoordinate,
-      * SetUniversalGround, or SetWorld returned with success. Success can also
-      * be checked using the IsGood method. The units of Y will be in the same
-      * units as the radii obtained from the label.
-      *
-      * @return double
-      */
-      inline double YCoord() const { return p_y; };
-
-     /**
-      * This returns the equatorial radius of the target. The radius was
-      * obtained from the label during object construction.
-      *
-      * @return double
-      */
-      inline double EquatorialRadius() const { return p_equatorialRadius; };
-
-     /**
-      * This returns the polar radius of the target. The radius was obtained
-      * from the label during object construction.
-      *
-      * @return double
-      */
-      inline double PolarRadius() const { return p_polarRadius; };
+      /**
+       * This returns the projection X provided SetGround, SetCoordinate,
+       * SetUniversalGround, or SetWorld returned with success. Success can also
+       * be checked using the IsGood method. The units of X will be in the same .
+       * units as the radii obtained from the label.
+       *
+       * @return double
+       */
+      inline double XCoord() const {
+        return p_x;
+      };
 
 
-     /**
-      * This returns the eccentricity of the target
-      *
-      * @return double
-      */
-      inline double Eccentricity() const { return p_eccentricity; };
+      /**
+       * This returns the projection Y provided SetGround, SetCoordinate,
+       * SetUniversalGround, or SetWorld returned with success. Success can also
+       * be checked using the IsGood method. The units of Y will be in the same
+       * units as the radii obtained from the label.
+       *
+       * @return double
+       */
+      inline double YCoord() const {
+        return p_y;
+      };
+
+      /**
+       * This returns the equatorial radius of the target. The radius was
+       * obtained from the label during object construction.
+       *
+       * @return double
+       */
+      inline double EquatorialRadius() const {
+        return p_equatorialRadius;
+      };
+
+      /**
+       * This returns the polar radius of the target. The radius was obtained
+       * from the label during object construction.
+       *
+       * @return double
+       */
+      inline double PolarRadius() const {
+        return p_polarRadius;
+      };
+
+
+      /**
+       * This returns the eccentricity of the target
+       *
+       * @return double
+       */
+      inline double Eccentricity() const {
+        return p_eccentricity;
+      };
 
       // Obtain latitude type
       enum LatitudeType { Planetographic, Planetocentric };
 
-     /**
-      * This indicates if the latitude type is planetographic (as opposed to
-      * planetocentric). The latitude type was obtained from the label during
-      * object construction.
-      *
-      * @return bool
-      */
-      inline bool IsPlanetographic() const { return p_latitudeType == Planetographic; };
+      /**
+       * This indicates if the latitude type is planetographic (as opposed to
+       * planetocentric). The latitude type was obtained from the label during
+       * object construction.
+       *
+       * @return bool
+       */
+      inline bool IsPlanetographic() const {
+        return p_latitudeType == Planetographic;
+      };
 
 
-     /**
-      * This indicates if the latitude type is planetocentric (as opposed to
-      * planetographic). The latitude type was obtained from the label during
-      * object construction.
-      *
-      * @return bool
-      */
-      inline bool IsPlanetocentric() const { return p_latitudeType == Planetocentric; };
+      /**
+       * This indicates if the latitude type is planetocentric (as opposed to
+       * planetographic). The latitude type was obtained from the label during
+       * object construction.
+       *
+       * @return bool
+       */
+      inline bool IsPlanetocentric() const {
+        return p_latitudeType == Planetocentric;
+      };
 
       // Obtain latitude type as a string
-      std::string LatitudeTypeString () const;
+      std::string LatitudeTypeString() const;
 
       // Obtain longitude directions as a string
-      std::string LongitudeDirectionString () const;
+      std::string LongitudeDirectionString() const;
 
       // Obtain longitude domain as a string
-      std::string LongitudeDomainString () const;
+      std::string LongitudeDomainString() const;
 
       // Obtain longitude direction
       enum LongitudeDirection { PositiveEast, PositiveWest };
 
-     /**
-      * This indicates if the longitude direction type is positive east (as
-      * opposed to postive west). The longitude type was obtained from the label
-      * during object construction.
-      *
-      * @return bool
-      */
-      inline bool IsPositiveWest() const { return p_longitudeDirection == PositiveWest; };
+      /**
+       * This indicates if the longitude direction type is positive east (as
+       * opposed to postive west). The longitude type was obtained from the label
+       * during object construction.
+       *
+       * @return bool
+       */
+      inline bool IsPositiveWest() const {
+        return p_longitudeDirection == PositiveWest;
+      };
 
-     /**
-      * This indicates if the longitude direction type is positive west (as
-      * opposed to postive east). The longitude type was obtained from the label
-      * during object construction.
-      *
-      * @return bool
-      */
-      inline bool IsPositiveEast() const { return p_longitudeDirection == PositiveEast; };
+      /**
+       * This indicates if the longitude direction type is positive west (as
+       * opposed to postive east). The longitude type was obtained from the label
+       * during object construction.
+       *
+       * @return bool
+       */
+      inline bool IsPositiveEast() const {
+        return p_longitudeDirection == PositiveEast;
+      };
 
-     /**
-      * This indicates if the longitude domain is 0 to 360 (as opposed to -180
-      * to 180). The longitude domain was obtained from the label during object
-      * construction.
-      *
-      * @return bool
-      */
-      inline bool Has360Domain () const { return p_longitudeDomain == 360; };
+      /**
+       * This indicates if the longitude domain is 0 to 360 (as opposed to -180
+       * to 180). The longitude domain was obtained from the label during object
+       * construction.
+       *
+       * @return bool
+       */
+      inline bool Has360Domain() const {
+        return p_longitudeDomain == 360;
+      };
 
 
-     /**
-      * This indicates if the longitude domain is -180 to 180 (as opposed to 0
-      * to 360). The longitude domain was obtained from the label during object
-      * construction.
-      *
-      * @return bool
-      */
-      inline bool Has180Domain () const { return p_longitudeDomain == 180; };
+      /**
+       * This indicates if the longitude domain is -180 to 180 (as opposed to 0
+       * to 360). The longitude domain was obtained from the label during object
+       * construction.
+       *
+       * @return bool
+       */
+      inline bool Has180Domain() const {
+        return p_longitudeDomain == 180;
+      };
 
-     /**
-      * This indicates that the labels contained minimum and maximum latitudes
-      * and longitudes (e.g., a ground range coverage). If the projection has
-      * ground range coverage then the MinimumLatitude, MaximumLatitude,
-      * MinimumLongitude, and MaximumLongitude methods can be used. The ground
-      * range coverage essentially defines the area of user interest.
-      *
-      * @return bool
-      */
-      inline bool HasGroundRange() const { return p_groundRangeGood; };
+      /**
+       * This indicates that the labels contained minimum and maximum latitudes
+       * and longitudes (e.g., a ground range coverage). If the projection has
+       * ground range coverage then the MinimumLatitude, MaximumLatitude,
+       * MinimumLongitude, and MaximumLongitude methods can be used. The ground
+       * range coverage essentially defines the area of user interest.
+       *
+       * @return bool
+       */
+      inline bool HasGroundRange() const {
+        return p_groundRangeGood;
+      };
 
-     /**
-      * This returns the minimum latitude of the area of interest. The value was
-      * obtained from the labels during object construction. This method can
-      * only be used if HasGroundRange returns a true.
-      *
-      * @return double
-      */
-      inline double MinimumLatitude() const { return p_minimumLatitude; };
+      /**
+       * This returns the minimum latitude of the area of interest. The value was
+       * obtained from the labels during object construction. This method can
+       * only be used if HasGroundRange returns a true.
+       *
+       * @return double
+       */
+      inline double MinimumLatitude() const {
+        return p_minimumLatitude;
+      };
 
-     /**
-      * This returns the maximum latitude of the area of interest. The value was
-      * obtained from the labels during object construction. This method can
-      * only be used if HasGroundRange returns a true.
-      *
-      * @return double
-      */
-      inline double MaximumLatitude() const { return p_maximumLatitude; };
+      /**
+       * This returns the maximum latitude of the area of interest. The value was
+       * obtained from the labels during object construction. This method can
+       * only be used if HasGroundRange returns a true.
+       *
+       * @return double
+       */
+      inline double MaximumLatitude() const {
+        return p_maximumLatitude;
+      };
 
-     /**
-      * This returns the minimum longitude of the area of interest. The value
-      * was obtained from the labels during object construction. This method can
-      * only be used if HasGroundRange returns a true.
-      *
-      * @return double
-      */
-      inline double MinimumLongitude() const { return p_minimumLongitude; };
+      /**
+       * This returns the minimum longitude of the area of interest. The value
+       * was obtained from the labels during object construction. This method can
+       * only be used if HasGroundRange returns a true.
+       *
+       * @return double
+       */
+      inline double MinimumLongitude() const {
+        return p_minimumLongitude;
+      };
 
-     /**
-      * This returns the maximum longitude of the area of interest. The value
-      * was obtained from the labels during object construction. This method can
-      * only be used if HasGroundRange returns a true.
-      *
-      * @return double
-      */
-      inline double MaximumLongitude() const { return p_maximumLongitude; };
+      /**
+       * This returns the maximum longitude of the area of interest. The value
+       * was obtained from the labels during object construction. This method can
+       * only be used if HasGroundRange returns a true.
+       *
+       * @return double
+       */
+      inline double MaximumLongitude() const {
+        return p_maximumLongitude;
+      };
 
       // Return the x/y range which covers the lat/lon range in the labels
-      virtual bool XYRange (double &minX,double &maxX,double &minY,double &maxY);
+      virtual bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
 
 
-     /**
-      * Return the rotation of the map
-      *
-      * @return double
-      */
-      inline double Rotation() const { return p_rotation; };
+      /**
+       * Return the rotation of the map
+       *
+       * @return double
+       */
+      inline double Rotation() const {
+        return p_rotation;
+      };
 
       // Return the universal ground coordinate after successful SetCoordinate
       double UniversalLatitude();
       double UniversalLongitude();
 
       // Set the universal ground coordinate
-      bool SetUniversalGround (const double lat, const double lon);
+      bool SetUniversalGround(const double lat, const double lon);
 
       // Convert latitude value from Planetographic to Planetocentric and vice versa
-      double ToPlanetocentric (const double lat) const;
-      double ToPlanetographic (const double lat) const;
+      double ToPlanetocentric(const double lat) const;
+      double ToPlanetographic(const double lat) const;
 
       // Convert longitude value from (0:360) to (-180:180) or vice versa
-      static double To360Domain (const double lon);
-      static double To180Domain (const double lon);
+      static double To360Domain(const double lon);
+      static double To180Domain(const double lon);
 
       // Convert longitude value from positive east to positive west or vice verse
-      static double ToPositiveEast (const double lon, const int domain);
-      static double ToPositiveWest (const double lon, const int domain);
+      static double ToPositiveEast(const double lon, const int domain);
+      static double ToPositiveWest(const double lon, const int domain);
 
-      double ToWorldX (const double projectionX) const;
-      double ToWorldY (const double projectionY) const;
-      double ToProjectionX (const double worldX) const;
-      double ToProjectionY (const double worldY) const;
-      double Resolution () const;
-      double Scale () const;
-      virtual double TrueScaleLatitude () const;
+      double ToWorldX(const double projectionX) const;
+      double ToWorldY(const double projectionY) const;
+      double ToProjectionX(const double worldX) const;
+      double ToProjectionY(const double worldY) const;
+      double Resolution() const;
+      double Scale() const;
+      virtual double TrueScaleLatitude() const;
       virtual PvlGroup Mapping();
       virtual PvlGroup MappingLatitudes();
       virtual PvlGroup MappingLongitudes();
@@ -379,29 +423,33 @@ namespace Isis {
       virtual bool operator== (const Projection &proj);
       bool operator!= (const Projection &proj);
 
-      /** 
-       * This method returns true if the projection is 
+      /**
+       * This method returns true if the projection is
        *   equatorial cylindrical. In other words, if an image
        *   projected at 0 is the same as an image projected at 360.
-       * 
-       * 
+       *
+       *
        * @return bool true if the projection is equatorial cylindrical
        */
-      virtual bool IsEquatorialCylindrical() { return false; }
+      virtual bool IsEquatorialCylindrical() {
+        return false;
+      }
 
-     /**
-      * This method returns the name of the map projection
-      *
-      * @return string
-      */
-      virtual std::string Name () const = 0;
-      virtual std::string Version () const = 0;
+      /**
+       * This method returns the name of the map projection
+       *
+       * @return string
+       */
+      virtual std::string Name() const = 0;
+      virtual std::string Version() const = 0;
 
-      double LocalRadius () const;
-      double LocalRadius (double lat) const;
+      double LocalRadius() const;
+      double LocalRadius(double lat) const;
 
       //! Returns true if projection is sky and false if it is land
-      bool IsSky () const { return p_sky; };
+      bool IsSky() const {
+        return p_sky;
+      };
 
       // Static conversion methods
       static double ToHours(double angle);
@@ -411,8 +459,8 @@ namespace Isis {
                                      double eRadius, double pRadius);
       static double ToPlanetocentric(double lat,
                                      double eRadius, double pRadius);
-      static PvlGroup TargetRadii (std::string target);
-      static PvlGroup TargetRadii (Pvl &cubeLab, PvlGroup &mapGroup);
+      static PvlGroup TargetRadii(std::string target);
+      static PvlGroup TargetRadii(Pvl &cubeLab, PvlGroup &mapGroup);
 
     protected:
       Isis::WorldMapper *p_mapper;  /**<This points to a mapper passed into the
@@ -503,10 +551,10 @@ namespace Isis {
       double tCompute(const double phi, const double sinphi) const;
       double phi2Compute(const double t) const;
 
-      void SetXY (double x, double y);
-      void SetComputedXY (double x, double y);
-      double GetX () const;
-      double GetY () const;
+      void SetXY(double x, double y);
+      void SetComputedXY(double x, double y);
+      double GetX() const;
+      double GetY() const;
 
     private:
       double p_rotation;   //! Rotation of map (usually zero)

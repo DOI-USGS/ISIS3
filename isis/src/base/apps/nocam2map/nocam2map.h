@@ -24,21 +24,21 @@ class nocam2map : public Isis::Transform {
 
   public:
     // constructor
-    nocam2map (Isis::LeastSquares sample, Isis::LeastSquares line, Isis::Projection *outmap,
-               Isis::Cube *latCube, Isis::Cube *lonCube,
-               bool isOcentric ,bool isPosEast,
-               double tolerance, int iterations,
-               const int inputSamples, const int inputLines,
-               const int outputSamples, const int outputLines);
-    
+    nocam2map(Isis::LeastSquares sample, Isis::LeastSquares line, Isis::Projection *outmap,
+              Isis::Cube *latCube, Isis::Cube *lonCube,
+              bool isOcentric , bool isPosEast,
+              double tolerance, int iterations,
+              const int inputSamples, const int inputLines,
+              const int outputSamples, const int outputLines);
+
     // destructor
-    ~nocam2map () {};
+    ~nocam2map() {};
 
     // Implementations for parent's pure virtual members
-    bool Xform (double &inSample, double &inLine,
-                    const double outSample, const double outLine);
-    int OutputSamples () const;
-    int OutputLines () const;
+    bool Xform(double &inSample, double &inLine,
+               const double outSample, const double outLine);
+    int OutputSamples() const;
+    int OutputLines() const;
 };
 
 #endif

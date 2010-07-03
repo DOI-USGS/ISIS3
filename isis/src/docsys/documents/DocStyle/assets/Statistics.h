@@ -24,46 +24,46 @@
 #include "SpecialPixel.h"
 
 namespace Isis {
-    /**
-    * @brief This class is used to accumulate statistics on double arrays.
-    *
-    * This class is used to accumulate statistics on double arrays. In
-    * particular, it is highly useful for obtaining statistics on cube data.
-    * Parameters which can be computed are 1) @b average, 2) @b standard
-    * @b deviation, 3) @b variance, 4) @b minimum, 5) @b maximum and 6)
-    * @b various @b counts of valid and/or special pixels.
-    *
-    * The following example shows a simple set up and usage of the Statistics
-    * class to calculate the average of a set of values:
-    *
-    * @code
-    *   Statistics myStats ;
-    *   double myData [] = { 1.0, 3.0, 2.4, 7.5 } ;
-    *
-    *   myStats.AddData (myData, 4) ;
-    *   double myAverage = myStats.Average () ;
-    *   cout << "The average of the data is " << myAverage << endl ;
-    * @endcode
-    *
-    * For an example of how the Statistics object is used in %Isis, see the
-    * Histogram object (inherits from Statistics) and the stats application,
-    * stats.cpp (uses the Statistics child class Histogram).
-    *
-    * @ingroup Statistics
-    *
-    * @author Jeff Anderson - 2002-05-06
-    *
-    * @whatsnew 2002-05-06 The current sum and squared sum of the data can be retrieved
-    *                      with the Sum and SumSquare methods.
-    *
-    * @internal
-    * @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best minimum/maximum methods.
-    * @history 2004-05-11 Jeff Anderson - Moved Reset, AddData and RemoveData methods into public space.
-    * @history 2004-06-28 Jeff Anderson - Added Sum and SumSquare methods.
-    *
-    * @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
-    *
-    */
+  /**
+  * @brief This class is used to accumulate statistics on double arrays.
+  *
+  * This class is used to accumulate statistics on double arrays. In
+  * particular, it is highly useful for obtaining statistics on cube data.
+  * Parameters which can be computed are 1) @b average, 2) @b standard
+  * @b deviation, 3) @b variance, 4) @b minimum, 5) @b maximum and 6)
+  * @b various @b counts of valid and/or special pixels.
+  *
+  * The following example shows a simple set up and usage of the Statistics
+  * class to calculate the average of a set of values:
+  *
+  * @code
+  *   Statistics myStats ;
+  *   double myData [] = { 1.0, 3.0, 2.4, 7.5 } ;
+  *
+  *   myStats.AddData (myData, 4) ;
+  *   double myAverage = myStats.Average () ;
+  *   cout << "The average of the data is " << myAverage << endl ;
+  * @endcode
+  *
+  * For an example of how the Statistics object is used in %Isis, see the
+  * Histogram object (inherits from Statistics) and the stats application,
+  * stats.cpp (uses the Statistics child class Histogram).
+  *
+  * @ingroup Statistics
+  *
+  * @author Jeff Anderson - 2002-05-06
+  *
+  * @whatsnew 2002-05-06 The current sum and squared sum of the data can be retrieved
+  *                      with the Sum and SumSquare methods.
+  *
+  * @internal
+  * @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best minimum/maximum methods.
+  * @history 2004-05-11 Jeff Anderson - Moved Reset, AddData and RemoveData methods into public space.
+  * @history 2004-06-28 Jeff Anderson - Added Sum and SumSquare methods.
+  *
+  * @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
+  *
+  */
   class Statistics {
     private:
       double p_sum;           //!< Sum accumulator.
@@ -81,31 +81,31 @@ namespace Isis {
                                    p_minimum and p_maximum are invalid. */
 
     public:
-      Statistics ();
-      ~Statistics ();
+      Statistics();
+      ~Statistics();
 
-      void Reset ();
-      void AddData (const double *data, const unsigned int count);
-      void RemoveData (const double *data, const unsigned int count);
+      void Reset();
+      void AddData(const double *data, const unsigned int count);
+      void RemoveData(const double *data, const unsigned int count);
 
-      double Average () const;
-      double StandardDeviation () const;
-      double Variance () const;
+      double Average() const;
+      double StandardDeviation() const;
+      double Variance() const;
 
-      double Minimum () const;
-      double Maximum () const;
-      double ChebyshevMinimum (const double percent=99.5) const;
-      double ChebyshevMaximum (const double percent=99.5) const;
-      double BestMinimum (const double percent=99.5) const;
-      double BestMaximum (const double percent=99.5) const;
+      double Minimum() const;
+      double Maximum() const;
+      double ChebyshevMinimum(const double percent = 99.5) const;
+      double ChebyshevMaximum(const double percent = 99.5) const;
+      double BestMinimum(const double percent = 99.5) const;
+      double BestMaximum(const double percent = 99.5) const;
 
-      double TotalPixels () const;
-      double ValidPixels () const;
-      double NullPixels () const;
-      double LisPixels () const;
-      double LrsPixels () const;
-      double HisPixels () const;
-      double HrsPixels () const;
+      double TotalPixels() const;
+      double ValidPixels() const;
+      double NullPixels() const;
+      double LisPixels() const;
+      double LrsPixels() const;
+      double HisPixels() const;
+      double HrsPixels() const;
 
 
       /**
@@ -113,14 +113,18 @@ namespace Isis {
        *
        * @return (double) Sum of the data
        */
-      double Sum() const { return p_sum; };
+      double Sum() const {
+        return p_sum;
+      };
 
       /**
        * Returns the sum of all the squared data
        *
        * @return (double) Sum of the squared data
        */
-      double SumSquare () const { return p_sumsum; };
+      double SumSquare() const {
+        return p_sumsum;
+      };
   };
 } // end namespace isis
 

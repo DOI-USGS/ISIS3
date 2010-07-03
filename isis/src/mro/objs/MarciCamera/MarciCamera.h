@@ -15,7 +15,7 @@ namespace Isis {
      *
      * @author 2008-10-23 Steven Lambright
      *
-     * @internal 
+     * @internal
      *   @history 2008-11-19 Steven Lambright - Added distortion model, made VIS
      *                      bands other than orange work
      *   @history 2008-11-25 Steven Lambright - The coloroffset now works properly;
@@ -31,20 +31,22 @@ namespace Isis {
     class MarciCamera : public Isis::PushFrameCamera {
       public:
         // constructor
-        MarciCamera (Isis::Pvl &lab);
+        MarciCamera(Isis::Pvl &lab);
 
         //! Destroys the Themis Vis Camera object
-        ~MarciCamera () {};
+        ~MarciCamera() {};
 
         // Sets the band to the band number given
-        void SetBand (const int band);
+        void SetBand(const int band);
 
-       /**
-        * The camera model is band dependent, so this method returns false
-        *
-        * @return bool False
-        */
-        bool IsBandIndependent () { return false; };
+        /**
+         * The camera model is band dependent, so this method returns false
+         *
+         * @return bool False
+         */
+        bool IsBandIndependent() {
+          return false;
+        };
 
       private:
         void StoreCoefficients(int naifIkCode);

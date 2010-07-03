@@ -7,7 +7,7 @@
 #include "Preference.h"
 
 using namespace std;
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   Isis::PvlGroup g("Instrument");
@@ -23,7 +23,7 @@ int main (int argc, char *argv[]) {
 
   std::cout << Isis::SerialNumber::Compose(p) << std::endl;
 
-  p.FindGroup("Instrument",Isis::Pvl::Traverse).DeleteKeyword("InstrumentId");
+  p.FindGroup("Instrument", Isis::Pvl::Traverse).DeleteKeyword("InstrumentId");
   std::cout << Isis::SerialNumber::Compose(p) << std::endl;
 
   Isis::Cube cube;

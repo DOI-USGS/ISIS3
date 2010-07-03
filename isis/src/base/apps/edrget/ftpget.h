@@ -6,29 +6,30 @@
 #include "Progress.h"
 
 class QUrl;
-namespace Isis{
+namespace Isis {
 
-  class FtpGet : public QObject
-  {
+  class FtpGet : public QObject {
       Q_OBJECT
-  
-  public:
+
+    public:
       FtpGet(QObject *parent = 0);
-  
+
       bool getFile(const QUrl &url, std::string topath);
 
-      bool error() const{return p_error;};
+      bool error() const {
+        return p_error;
+      };
 
-      
-  
-  signals:
+
+
+    signals:
       void done();
-  
-  private slots:
+
+    private slots:
       void ftpDone(bool error);
       void ftpProgress(qint64 done, qint64 total);
-  
-  private:
+
+    private:
       QFtp p_ftp;
       QFile p_file;
       bool p_error;

@@ -32,42 +32,42 @@ template<class T> class QVector;
 namespace Isis {
   class DataValue;
 
-/**
- * @brief Calculator for arrays
- *
- * This class is a RPN calculator on cubes. The base Calculator class
- *   is used in conjunction with methods to retrieve data from a cube
- *   and perform calculations.
- *
- * @ingroup Math
- *
- * @author 2008-03-26 Steven Lambright
- *
- * @internal
- *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo    
- *  @history 2008-06-18 Steven Lambright - Fixed documentation     
- *  @history 2009-03-03 Steven Lambright - Added missing secant method call
- *  @history 2010-02-23 Steven Lambright - Added min2,max2
- *  @history 2010-04-08 Steven Lambright - Replaced min2,max2 with proper 
- *    implementations of cubemin, cubemax, linemin, linemax, min and max.
- *    Added support for getting statistics of a cube for constants.
- */
+  /**
+   * @brief Calculator for arrays
+   *
+   * This class is a RPN calculator on cubes. The base Calculator class
+   *   is used in conjunction with methods to retrieve data from a cube
+   *   and perform calculations.
+   *
+   * @ingroup Math
+   *
+   * @author 2008-03-26 Steven Lambright
+   *
+   * @internal
+   *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
+   *  @history 2008-06-18 Steven Lambright - Fixed documentation
+   *  @history 2009-03-03 Steven Lambright - Added missing secant method call
+   *  @history 2010-02-23 Steven Lambright - Added min2,max2
+   *  @history 2010-04-08 Steven Lambright - Replaced min2,max2 with proper
+   *    implementations of cubemin, cubemax, linemin, linemax, min and max.
+   *    Added support for getting statistics of a cube for constants.
+   */
   class CubeCalculator : Calculator {
     public:
       CubeCalculator();
 
-      /** 
+      /**
        * This method completely resets the calculator. The prepared
        *   calculations will be erased when this is called.
        */
       void Clear();
 
-      void PrepareCalculations(iString equation, 
-                               QVector<Cube *> &inCubes, 
+      void PrepareCalculations(iString equation,
+                               QVector<Cube *> &inCubes,
                                Cube *outCube);
 
-      QVector<double> RunCalculations(QVector<Buffer *> &cubeData, 
-                                          int line, int band);
+      QVector<double> RunCalculations(QVector<Buffer *> &cubeData,
+                                      int line, int band);
 
     private:
       /**
@@ -82,38 +82,38 @@ namespace Isis {
         pushNextData
       };
 
-      void AddMethodCall(void (Calculator::*method)( void ));
+      void AddMethodCall(void (Calculator::*method)(void));
 
       int LastPushToCubeStats(QVector<Cube *> &inCubes);
 
-      /** 
+      /**
        * This is what RunCalculations(...) will loop over.
        *   The action to perform (push data or execute calculation)
        *   is defined in this vector.
        */
       QVector< calculations > *p_calculations;
 
-      /** 
-       * This stores the addresses to the methods RunCalculations(...) 
+      /**
+       * This stores the addresses to the methods RunCalculations(...)
        * will call
        */
-      QVector< void (Calculator::*)( void ) > *p_methods;
+      QVector< void (Calculator:: *)(void) > *p_methods;
 
-      /** 
-       * This stores the addressed to the methods RunCalculations(...) 
+      /**
+       * This stores the addressed to the methods RunCalculations(...)
        * will push (constants), along with placeholders for simplicity to
        * keep synchronized with the data definitions.
        */
       QVector< QVector<double> > *p_data;
 
-      /** 
+      /**
        * This defines what kind of data RunCalculations(...) will push
        * onto the calculator. Constants will be taken from p_data, which
        * is synchronized (index-wise) with this vector.
        */
       QVector< DataValue > *p_dataDefinitions;
 
-      QVector<Statistics *> *p_cubeStats; 
+      QVector<Statistics *> *p_cubeStats;
 
       int p_outputSamples;
   };
@@ -122,7 +122,7 @@ namespace Isis {
     public:
       /**
        * This is used to tell what kind of data to
-       *   push onto the RPN calculator. 
+       *   push onto the RPN calculator.
        */
       enum dataValueType {
         constant, //!< a single constant value
@@ -133,7 +133,7 @@ namespace Isis {
       };
 
       DataValue() {
-        p_type = (dataValueType)-1;
+        p_type = (dataValueType) - 1;
         p_cubeIndex = -1;
         p_constantValue = 0.0;
       }
@@ -142,7 +142,7 @@ namespace Isis {
         p_type = type;
         p_constantValue = 0.0;
         p_cubeIndex = -1;
-      }  
+      }
 
       DataValue(dataValueType type, int cubeIndex) {
         p_type = type;

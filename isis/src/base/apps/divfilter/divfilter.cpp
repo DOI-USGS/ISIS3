@@ -7,7 +7,7 @@ using namespace Isis;
 
 // Globals and prototypes
 bool propagate;
-void divfilter (Buffer &in, Buffer &out, QuickFilter &filter);
+void divfilter(Buffer &in, Buffer &out, QuickFilter &filter);
 
 // The divfilter main routine
 void IsisMain() {
@@ -24,29 +24,29 @@ void IsisMain() {
   int lines = ui.GetInteger("LINES");
   int samples = ui.GetInteger("SAMPLES");
   int minimum;
-  if (ui.GetString("MINOPT") == "PERCENTAGE") {
+  if(ui.GetString("MINOPT") == "PERCENTAGE") {
     int size = lines * samples;
     double perc = ui.GetInteger("MINIMUM") / 100;
-    minimum = (int) (size * perc);
+    minimum = (int)(size * perc);
   }
   else {
     minimum = ui.GetInteger("MINIMUM");
   }
 
   // Find out how to handle special pixels
-  propagate = ui.GetBoolean ("PROPAGATE");
-  
+  propagate = ui.GetBoolean("PROPAGATE");
+
   // Process each line
   p.StartProcess(divfilter);  // Line processing function
   p.EndProcess();           // Cleanup
 }
 
 // Line processing routine
-void divfilter (Buffer &in, Buffer &out, QuickFilter &filter) {
-  for (int i=0; i<filter.Samples(); i++) {
+void divfilter(Buffer &in, Buffer &out, QuickFilter &filter) {
+  for(int i = 0; i < filter.Samples(); i++) {
     // We have a special pixel
-    if (IsSpecial(in[i])) {
-      if (propagate) {
+    if(IsSpecial(in[i])) {
+      if(propagate) {
         out[i] = in[i];
       }
       else {
@@ -55,12 +55,12 @@ void divfilter (Buffer &in, Buffer &out, QuickFilter &filter) {
     }
     // We have a normal pixel
     else {
-      if (filter.Average (i) == NULL8) {
+      if(filter.Average(i) == NULL8) {
         out[i] = NULL8;
       }
       else {
         out[i] = in[i] / filter.Average(i);  // will be NULL if uncomputable or count invalid
       }
-    }       
+    }
   }
 }

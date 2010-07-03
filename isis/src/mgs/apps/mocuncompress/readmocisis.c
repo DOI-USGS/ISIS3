@@ -86,7 +86,7 @@ static char *sccsid = "@(#)readmocisis.c	1.2 04/10/00";
 #include "array.h"
 #include "msdp.h"
 
-extern FILE *write_header(int width, int height, 
+extern FILE *write_header(int width, int height,
                           FILE *infile, char *outfname);
 static int in;/*, out;*/
 static FILE *out;
@@ -144,15 +144,15 @@ char **argv;
 
   sync = 0xf0ca;
 
-  if (argc < 3) {
+  if(argc < 3) {
     printf("\nEnter name of file to be decompressed: ");
-    fgets(infname,256,stdin);
-    int inLen = strlen(infname)-1;
-    if (inLen == '\n') infname[inLen] = '\0';
+    fgets(infname, 256, stdin);
+    int inLen = strlen(infname) - 1;
+    if(inLen == '\n') infname[inLen] = '\0';
     printf("\nEnter name of uncompressed output file: ");
-    int outLen = strlen(outfname)-1;
-    if (outLen == '\n') outfname[outLen] = '\0';
-    fgets(outfname,256,stdin);
+    int outLen = strlen(outfname) - 1;
+    if(outLen == '\n') outfname[outLen] = '\0';
+    fgets(outfname, 256, stdin);
   }
   else {
     strcpy(infname, argv[1]);
@@ -160,11 +160,11 @@ char **argv;
   }
 
   infile = fopen(infname, "r");
-  if (infile == 0) {
+  if(infile == 0) {
     fprintf(stderr, "Can't open %s\n", argv[1]);
   }
 
-  while (1) {
+  while(1) {
     int count;
     int len;
     static int first = 1;
@@ -173,91 +173,91 @@ char **argv;
     byte *indat, *chunk;
 
     lasth = h;
-    i = fseek(infile, total+2048, 0);
+    i = fseek(infile, total + 2048, 0);
     count = fread(&h, sizeof(h), 1, infile);
     i = MAKELONG(h.len);
-    if (count && MAKELONG(h.len) == 0) {
+    if(count && MAKELONG(h.len) == 0) {
       /* simulate the EOF even though there's padding */
       count = 0;
       h = lasth;
     }
-    i = h.status&2;
-    if (count == 0 && MocCompress == PRED && (h.status&2) == 0) {
+    i = h.status & 2;
+    if(count == 0 && MocCompress == PRED && (h.status & 2) == 0) {
       /* image was short -- last flag missing */
       h.status = 2;
       frag = decode(h, indat, 0, &len, mbr);
-/*	    write(out, frag, len);*/
+      /*	    write(out, frag, len);*/
       i = fwrite(frag, 1, len, out);
       total_image += len;
     }
-    if (count == 0) break;
-    if (MAKELONG(h.len) == 0) break;
+    if(count == 0) break;
+    if(MAKELONG(h.len) == 0) break;
     sequence += 1;
 
-    if (first && !multi) {
+    if(first && !multi) {
       int edit[2];
 
-      width = h.edit_length*16;
+      width = h.edit_length * 16;
       init_output(h);
       first = 0;
-      height = MAKESHORT(h.down_total)*16;
+      height = MAKESHORT(h.down_total) * 16;
     }
-    h.edit_length = width/16;
-    if (mbr) width = 512;
+    h.edit_length = width / 16;
+    if(mbr) width = 512;
 
     datlen = MAKELONG(h.len);
 
-    if (sequence%n_processors != processor) {
+    if(sequence % n_processors != processor) {
       total += sizeof(struct msdp_header) + datlen + 1;
       continue;
     }
 
-    if (!multi && MAKESHORT(h.fragment) != last_frag+1) {
-      int n_pad = MAKESHORT(h.fragment)-last_frag-1;
-      char *frag = (char *) malloc(240*1024);
+    if(!multi && MAKESHORT(h.fragment) != last_frag + 1) {
+      int n_pad = MAKESHORT(h.fragment) - last_frag - 1;
+      char *frag = (char *) malloc(240 * 1024);
       /* don't pad predictively-compressed data */
-      if (!(h.compression[0] & 3) && n_pad > 0) {
+      if(!(h.compression[0] & 3) && n_pad > 0) {
         errors += 1;
         status |= STAT_BADSEQ;
-        bzero(frag, 240*1024);
-        total_image += n_pad*240*1024;
-        if (verbose) fprintf(stderr, "padding %d frags\n", n_pad);
-/*		while(n_pad--) write(out, frag, 240*1024);*/
-        while (n_pad--) i = fwrite(frag, 1, 240*1024, out);
+        bzero(frag, 240 * 1024);
+        total_image += n_pad * 240 * 1024;
+        if(verbose) fprintf(stderr, "padding %d frags\n", n_pad);
+        /*		while(n_pad--) write(out, frag, 240*1024);*/
+        while(n_pad--) i = fwrite(frag, 1, 240 * 1024, out);
       }
       free(frag);
     }
     last_frag = MAKESHORT(h.fragment);
 
-    if (verbose) fprintf(stderr, "id %d/%d, len %d\n", MAKESHORT(h.id),
-                         MAKESHORT(h.fragment), MAKELONG(h.len));
-    chunk = (byte *) malloc(datlen+sizeof(struct msdp_header)+1);
-    indat = chunk+sizeof(struct msdp_header);
+    if(verbose) fprintf(stderr, "id %d/%d, len %d\n", MAKESHORT(h.id),
+                          MAKESHORT(h.fragment), MAKELONG(h.len));
+    chunk = (byte *) malloc(datlen + sizeof(struct msdp_header) + 1);
+    indat = chunk + sizeof(struct msdp_header);
     count = fread(indat, 1, datlen, infile);
-    if (count != datlen) {
-      if (verbose) fprintf(stderr,
-                           "Error: short read (%d) of data part of fragment\n",
-                           count);
+    if(count != datlen) {
+      if(verbose) fprintf(stderr,
+                            "Error: short read (%d) of data part of fragment\n",
+                            count);
       errors += 1;
       break;
     }
 
     /* check MSDP checksum */
-    if (cs_check) {
+    if(cs_check) {
       bcopy(&h, chunk, sizeof(h));
-      fread(chunk+datlen+sizeof(h), 1, 1, infile);
-      if (!CS8EACC2(chunk, datlen+sizeof(h)+1)) {
-        if (verbose) fprintf(stderr, "Error: bad MSDP checksum\n");
+      fread(chunk + datlen + sizeof(h), 1, 1, infile);
+      if(!CS8EACC2(chunk, datlen + sizeof(h) + 1)) {
+        if(verbose) fprintf(stderr, "Error: bad MSDP checksum\n");
         status |= STAT_BADCS;
         errors += 1;
-        if (pad_cs) {
-          char *frag = (char *) malloc(240*1024);
-          bzero(frag, 240*1024);
-          total_image += 240*1024;
+        if(pad_cs) {
+          char *frag = (char *) malloc(240 * 1024);
+          bzero(frag, 240 * 1024);
+          total_image += 240 * 1024;
           total += sizeof(struct msdp_header) + datlen + 1;
-          if (verbose) fprintf(stderr, "trashing bad frag\n");
-/*		    write(out, frag, 240*1024);*/
-          i = fwrite(frag, 1, 240*1024, out);
+          if(verbose) fprintf(stderr, "trashing bad frag\n");
+          /*		    write(out, frag, 240*1024);*/
+          i = fwrite(frag, 1, 240 * 1024, out);
           free(frag);
           continue;
         }
@@ -267,33 +267,33 @@ char **argv;
     frag = decode(h, indat, datlen, &len, mbr);
     i = sizeof(frag);
     total_image += len;
-    if (verbose) fprintf(stderr, "fragment len %d => %d\n", datlen, len);
+    if(verbose) fprintf(stderr, "fragment len %d => %d\n", datlen, len);
     total += sizeof(struct msdp_header) + datlen + 1;
-/*	write(out, frag, len);*/
+    /*	write(out, frag, len);*/
     i = fwrite(frag, 1, len, out);
-    if (0) free(frag);
+    if(0) free(frag);
     free(chunk);
-    if (h.status&2) break;
+    if(h.status & 2) break;
   }
   fclose(out);
 
-  actual_height = total_image/width;
-  if (!multi && actual_height != height) {
-    if (verbose) fprintf(stderr,
-                         "Error: total MSDP height (%d) != actual height (%d)\n",
-                         height, actual_height);
+  actual_height = total_image / width;
+  if(!multi && actual_height != height) {
+    if(verbose) fprintf(stderr,
+                          "Error: total MSDP height (%d) != actual height (%d)\n",
+                          height, actual_height);
     (void) write_header(width, actual_height, infile, outfname);
     errors += 1;
     status |= STAT_SHORT;
   }
 
-  if (status && verbose) fprintf(stderr, "error status %c%c%c%c\n",
-                                 MocCompress==RAW?'r':(MocCompress==PRED?'p':'t'),
-                                 status&STAT_BADCS?'c':'-',
-                                 status&STAT_BADSEQ?'n':'-',
-                                 status&STAT_SHORT?'s':'-'
-                                );
-  if (errors) exit((MocCompress << 4) | status | (errors?1:0));
+  if(status && verbose) fprintf(stderr, "error status %c%c%c%c\n",
+                                  MocCompress == RAW ? 'r' : (MocCompress == PRED ? 'p' : 't'),
+                                  status & STAT_BADCS ? 'c' : '-',
+                                  status & STAT_BADSEQ ? 'n' : '-',
+                                  status & STAT_SHORT ? 's' : '-'
+                                 );
+  if(errors) exit((MocCompress << 4) | status | (errors ? 1 : 0));
   else exit(0);
 }
 
@@ -312,80 +312,78 @@ int mbr;
   static int init_decode;
   int huffman_table;
 
-  if (mbr) {
+  if(mbr) {
     width = 512;
     height = 480;
     xcomp = 0;
     pcomp = 0;
   }
   else {
-    width = h.edit_length*16;
-    height = MAKESHORT(h.down_length)*16;
+    width = h.edit_length * 16;
+    height = MAKESHORT(h.down_length) * 16;
     xcomp = (h.compression[0] >> 2) & 3;
     pcomp = (h.compression[0] & 3);
     spacing = h.compression[4] | (h.compression[5] << 8);
-    levels = (h.compression[1] >> 5)+1;
-    huffman_table = h.compression[1]&0xf;
+    levels = (h.compression[1] >> 5) + 1;
+    huffman_table = h.compression[1] & 0xf;
   }
 
-  *len = width*height;
+  *len = width * height;
 
-  if (pcomp && xcomp) {
+  if(pcomp && xcomp) {
     fprintf(stderr, "error: both pcomp and xcomp set\n");
     exit(1);
   }
-  if (pcomp) MocCompress = PRED;
-  if (xcomp) MocCompress = XFORM;
+  if(pcomp) MocCompress = PRED;
+  if(xcomp) MocCompress = XFORM;
 
-  if (!rawencode && pcomp == 0 && xcomp == 0) {
+  if(!rawencode && pcomp == 0 && xcomp == 0) {
     /* raw image */
     image = data;
-    if (datlen > *len) {
-      if (verbose) fprintf(stderr, "Warning: MSDP line count (%d) < implied (%d), using latter\n", height, datlen/width);
+    if(datlen > *len) {
+      if(verbose) fprintf(stderr, "Warning: MSDP line count (%d) < implied (%d), using latter\n", height, datlen / width);
       *len = datlen;
-      height = datlen/width;
+      height = datlen / width;
     }
-    if (verbose) fprintf(stderr, "%d wide by %d high ", width, height);
-    if (verbose) fprintf(stderr, "raw fragment%s\n", mbr?" (MBR)":"");
+    if(verbose) fprintf(stderr, "%d wide by %d high ", width, height);
+    if(verbose) fprintf(stderr, "raw fragment%s\n", mbr ? " (MBR)" : "");
   }
-  else
-    if (verbose) fprintf(stderr, "%d wide by %d high ", width, height);
+  else if(verbose) fprintf(stderr, "%d wide by %d high ", width, height);
 
-  if (xcomp > 0) {
+  if(xcomp > 0) {
     /* transform compressed; 2 = DCT, 1 = WHT */
-    if (verbose) fprintf(stderr, "%s transformed fragment (%d groups, %.2f requant)\n",
-                         xcomp == 2 ? "dct" : "wht", levels, spacing/16.0);
+    if(verbose) fprintf(stderr, "%s transformed fragment (%d groups, %.2f requant)\n",
+                          xcomp == 2 ? "dct" : "wht", levels, spacing / 16.0);
     image = transform_decomp_main(data, datlen, height, width,
-                                  xcomp-1, spacing, levels);
+                                  xcomp - 1, spacing, levels);
   }
 
-  if (rawencode || pcomp > 0) {
+  if(rawencode || pcomp > 0) {
     /* predictively compressed */
-    if (rawencode)
-      if (verbose) fprintf(stderr, "raw encoded fragment\n");
-      else
-        if (verbose) fprintf(stderr, "%s%s predictive fragment, table %d\n",
-                             pcomp&1 ? "x" : "", (pcomp&2)>>1 ? "y" : "",
-                             huffman_table);
+    if(rawencode)
+      if(verbose) fprintf(stderr, "raw encoded fragment\n");
+      else if(verbose) fprintf(stderr, "%s%s predictive fragment, table %d\n",
+                                 pcomp & 1 ? "x" : "", (pcomp & 2) >> 1 ? "y" : "",
+                                 huffman_table);
 
-      /* set up decode arrays */
-    if (!init_decode) {
-      if (*decode_file) decodeLoad(decode_file);
+    /* set up decode arrays */
+    if(!init_decode) {
+      if(*decode_file) decodeLoad(decode_file);
       else decodeInit(huffman_table);
     }
 
-    if (test_pred) {
+    if(test_pred) {
       int dummy;
 
       image = predictive_decomp_main(data, datlen, height, width,
                                      (sync != 0), sync,
-                                     pcomp&1, (pcomp&2) >> 1,
+                                     pcomp & 1, (pcomp & 2) >> 1,
                                      &dummy);
     }
     else {
       /* squirrel data away */
-      if (!tbuf) tbuf = array_new(datlen*8);
-      if (datlen && !array_append(tbuf, data, datlen)) {
+      if(!tbuf) tbuf = array_new(datlen * 8);
+      if(datlen && !array_append(tbuf, data, datlen)) {
         // FIXED 2008/10/29, "datalen" was part of the print statement and no arguments
         //   were provided for the %d. - Steven Lambright, pointed out by "novas0x2a" (Support Forum Member)
         fprintf(stderr, "can't allocate temp space (%d bytes)\n", datlen);
@@ -393,26 +391,26 @@ int mbr;
       }
       image = 0;
       *len = 0;
-      if (h.status & 2) {
+      if(h.status & 2) {
         int got_height;
         extern int pred_past_eof;
-        int want_h = MAKESHORT(h.down_total)*16;;
-        if (verbose) fprintf(stderr, "decompressing %d wide by %d high image\n",
-                             width, want_h);
+        int want_h = MAKESHORT(h.down_total) * 16;;
+        if(verbose) fprintf(stderr, "decompressing %d wide by %d high image\n",
+                              width, want_h);
         image =
-        predictive_decomp_main(array_data(tbuf),
-                               array_len(tbuf),
-                               want_h, width,
-                               (sync != 0), sync,
-                               pcomp&1, (pcomp&2) >> 1,
-                               &got_height);
+          predictive_decomp_main(array_data(tbuf),
+                                 array_len(tbuf),
+                                 want_h, width,
+                                 (sync != 0), sync,
+                                 pcomp & 1, (pcomp & 2) >> 1,
+                                 &got_height);
         /* This is tricky.  We can get bad sync even without
            checksum errors if anomaly 8 occurs.  We want to
            distinguish between this case and the case where
            we just ran out of fragments during the NA image.
            So if we run into a sync error and haven't run off
            the end of the image, we force BADCS on. */
-        if (got_height != want_h && !pred_past_eof)
+        if(got_height != want_h && !pred_past_eof)
           status |= STAT_BADCS;
         *len = got_height * width;
       }
@@ -429,18 +427,18 @@ int worklist_init() {
   int height, width, xcomp;
   int datlen;
 
-  while (1) {
+  while(1) {
     count = fread(&h, sizeof(h), 1, infile);
-    if (count == 0) break;
+    if(count == 0) break;
     xcomp = (h.compression[0] >> 2) & 3;
-    if (!xcomp) return 0;
-    height = MAKESHORT(h.down_length)*16;
-    width = h.edit_length*16;
+    if(!xcomp) return 0;
+    height = MAKESHORT(h.down_length) * 16;
+    width = h.edit_length * 16;
     datlen = MAKELONG(h.len);
     init_output(h);
-    frag_offset[frag+1] = frag_offset[frag]+height*width;
+    frag_offset[frag+1] = frag_offset[frag] + height * width;
     frag += 1;
-    fseek(infile, datlen+1, 1);
+    fseek(infile, datlen + 1, 1);
   }
   return 1;
 }
@@ -453,17 +451,17 @@ struct msdp_header h;
   int i;
   char buf[1024];
 
-  height = MAKESHORT(h.down_total)*16;
-  width = h.edit_length*16;
+  height = MAKESHORT(h.down_total) * 16;
+  width = h.edit_length * 16;
   sprintf(label, "decompressed-from %s\nid %d time %u:%d\ngain 0x%x \
 offset %d\nstart %d cross %d down %d\ncmd ", infname,
           MAKESHORT(h.id),
-          MAKELONG(h.time+1), h.time[0],
+          MAKELONG(h.time + 1), h.time[0],
           h.gain, h.offset,
-          h.edit_start*16,
-          h.edit_length*16,
-          MAKESHORT(h.down_total)*16);
-  switch (h.cmd[0]) {
+          h.edit_start * 16,
+          h.edit_length * 16,
+          MAKESHORT(h.down_total) * 16);
+  switch(h.cmd[0]) {
     case 1:
     case 2:
       strcat(label, "na ");
@@ -490,14 +488,14 @@ offset %d\nstart %d cross %d down %d\ncmd ", infname,
       strcat(label, "unknown ");
       break;
   }
-  for (i = 0; i < 17; i++) {
+  for(i = 0; i < 17; i++) {
     sprintf(s, "%02x", h.cmd[i]);
     strcat(label, s);
   }
 
   sprintf(buf, "\nsensor %d clocking %d system-id 0x%x",
           MAKESHORT(h.sensors),
-          MAKESHORT(h.other+1),
+          MAKESHORT(h.other + 1),
           h.other[3]);
   strcat(label, buf);
 

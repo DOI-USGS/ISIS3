@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
                  " v2 INTEGER,"
                  " v3 REAL );";
   string  insert = "INSERT INTO testTable (v1, v2, v3) "
-                    " VALUES ('test txt', 7, 123.4);";
+                   " VALUES ('test txt', 7, 123.4);";
   string  query = "SELECT * FROM testTable;";
 
   if(!testdb.open()) {
@@ -37,14 +37,14 @@ int main(int argc, char *argv[]) {
     cout << "Executing SELECT command: " << q.exec(query) << endl;
     cout << "Query: " << q.getQuery() << endl;
 
-  }  
+  }
   catch(iException &e) {
     e.Report(false);
   }
 
   cout << "The mac systems report the double fields as string fields. " <<
-          "Until the problematic 3rd party software is fixed, " <<
-          "the mac systems will need OS truth data." << endl;
+       "Until the problematic 3rd party software is fixed, " <<
+       "the mac systems will need OS truth data." << endl;
 
   vector<string> nameList = q.fieldNameList();
   vector<string> typeList = q.fieldTypeList();

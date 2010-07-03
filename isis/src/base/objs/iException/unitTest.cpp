@@ -6,33 +6,33 @@
 using namespace std;
 using namespace Isis;
 
-int main (void) {
+int main(void) {
   Isis::Preference::Preferences(true);
 
-// Load up the error stack 
+// Load up the error stack
 
   iException::Message(iException::None,
-                      "Testing unknown (none) errors",_FILEINFO_);
+                      "Testing unknown (none) errors", _FILEINFO_);
   iException::Message(iException::User,
-                      "Testing user errors",_FILEINFO_);
+                      "Testing user errors", _FILEINFO_);
   iException::Message(iException::Programmer,
-                      "Testing programmer errors",_FILEINFO_);
+                      "Testing programmer errors", _FILEINFO_);
   iException::Message(iException::Pvl,
-                      "Testing PVL errors",_FILEINFO_);
+                      "Testing PVL errors", _FILEINFO_);
   iException::Message(iException::Io,
-                      "Testing I/O errors",_FILEINFO_);
+                      "Testing I/O errors", _FILEINFO_);
   iException::Message(iException::Camera,
-                      "Testing camera errors",_FILEINFO_);
+                      "Testing camera errors", _FILEINFO_);
   iException::Message(iException::Projection,
-                      "Testing projection errors",_FILEINFO_);
+                      "Testing projection errors", _FILEINFO_);
   iException::Message(iException::Parse,
-                      "Testing parse errors",_FILEINFO_);
+                      "Testing parse errors", _FILEINFO_);
   iException::Message(iException::Spice,
-                      "Testing spice errors",_FILEINFO_);
+                      "Testing spice errors", _FILEINFO_);
   iException::Message(iException::System,
-                      "Testing system errors",_FILEINFO_);
+                      "Testing system errors", _FILEINFO_);
   iException &e =  iException::Message(iException::Math,
-                                        "Testing math errors",_FILEINFO_);
+                                       "Testing math errors", _FILEINFO_);
 
 // Only have to report one because we have generated a large stack
 // of errors
@@ -40,11 +40,11 @@ int main (void) {
   cout << "TEST CASES FOR ERROR OBJECTS" << endl;
   cout << "----------------------------" << endl;
 
-  e.Report (false);
+  e.Report(false);
 
-  e = iException::Message(iException::Cancel,"",_FILEINFO_);
+  e = iException::Message(iException::Cancel, "", _FILEINFO_);
   cout << "Testing cancel option ..." << endl;
-  e.Report (false);
+  e.Report(false);
 
   return 0;
 }

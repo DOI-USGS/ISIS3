@@ -3,7 +3,7 @@
 #include "Preference.h"
 
 using namespace std;
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   cout << Isis::SizeOf(Isis::None) << endl;

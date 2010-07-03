@@ -27,8 +27,7 @@
 #include "Constants.h"
 
 using namespace std;
-namespace Isis
-{
+namespace Isis {
   /**
   * Constructs a LunarAzimuthalEqualArea object
   *
@@ -40,31 +39,27 @@ namespace Isis
   * @throws Isis::iException::Io
   */
   LunarAzimuthalEqualArea::LunarAzimuthalEqualArea(
-      Isis::Pvl & label) : Isis::Projection::Projection(label)
-  {
-    try
-    {
+    Isis::Pvl &label) : Isis::Projection::Projection(label) {
+    try {
       // Try to read the mapping group
-      Isis::PvlGroup & mapGroup = label.FindGroup("Mapping",
-          Isis::Pvl::Traverse);
-  
+      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping",
+                                 Isis::Pvl::Traverse);
+
       // Get the max libration
       p_maxLibration = mapGroup["MaximumLibration"];
       p_maxLibration *= PI / 180.0;
     }
-    catch (Isis::iException & e)
-    {
+    catch(Isis::iException &e) {
       string message = "Invalid label group [Mapping]";
       throw Isis::iException::Message(Isis::iException::Io, message,
-          _FILEINFO_);
+                                      _FILEINFO_);
     }
   }
-  
+
   //! Destroys the LunarAzimuthalEqualArea object
-  LunarAzimuthalEqualArea::~LunarAzimuthalEqualArea()
-  {
+  LunarAzimuthalEqualArea::~LunarAzimuthalEqualArea() {
   }
-  
+
   /**
   * This method is used to set the latitude/longitude (assumed to be of the
   * correct LatitudeType, LongitudeDirection, and LongitudeDomain. The Set
@@ -78,52 +73,50 @@ namespace Isis
   * @return bool
   */
   bool LunarAzimuthalEqualArea::SetGround(const double lat,
-      const double lon)
-  {
+                                          const double lon) {
     // Convert longitude to radians
     p_longitude = lon;
     double lonRadians = lon * Isis::PI / 180.0;
-    if (p_longitudeDirection == PositiveWest)
+    if(p_longitudeDirection == PositiveWest)
       lonRadians *= -1.0;
-  
+
     // Now convert latitude to radians... it must be planetographic
     p_latitude = lat;
     double latRadians = lat;
-    if (IsPlanetocentric())
+    if(IsPlanetocentric())
       latRadians = ToPlanetographic(latRadians);
     latRadians *= Isis::PI / 180.0;
 
     double x, y;
-    if (lonRadians == 0.0 && latRadians == 0.0)
-    {
+    if(lonRadians == 0.0 && latRadians == 0.0) {
       x = 0.0;
       y = 0.0;
       SetComputedXY(x, y);
       p_good = true;
       return true;
     }
-    
+
     double E = acos(cos(latRadians) * cos(lonRadians));
     double test = (sin(lonRadians) * cos(latRadians)) / sin(E);
-    
-    if (test > 1.0) test = 1.0;
-    else if (test < -1.0) test = -1.0;
-    
+
+    if(test > 1.0) test = 1.0;
+    else if(test < -1.0) test = -1.0;
+
     double D = HALFPI - asin(test);
-    if (latRadians < 0.0)
+    if(latRadians < 0.0)
       D = -D;
-    
+
     double radius = p_equatorialRadius;
     double PFAC = (HALFPI + p_maxLibration) / HALFPI;
     double RP = radius * sin(E / PFAC);
-    
+
     x = RP * cos(D);
     y = RP * sin(D);
-    
+
     SetComputedXY(x, y);
     p_good = true;
     return true;
-    
+
   } // of SetGround
 
 
@@ -141,70 +134,64 @@ namespace Isis
   * @return bool
   */
   bool LunarAzimuthalEqualArea::SetCoordinate(const double x,
-      const double y)
-  {
+      const double y) {
     // Save the coordinate
     SetXY(x, y);
-    
+
     double RP = sqrt((x * x) + (y * y));
-    
+
     double lat, lon;
-    if (y == 0.0 && x == 0.0)
-    {
+    if(y == 0.0 && x == 0.0) {
       lat = 0.0;
       lon = 0.0;
       return true;
     }
-    
+
     double radius = p_equatorialRadius;
-    
+
     double D = atan2(y, x);
     double test = RP / radius;
     double IERROR;
-    if (abs(test) > 1.0)
-    {
+    if(abs(test) > 1.0) {
       IERROR = 1001;  // throw exception or something ??
       return false;
     }
-    
+
     double EPSILON = 0.0000000001;
     double PFAC = (HALFPI + p_maxLibration) / HALFPI;
     double E = PFAC * asin(RP / radius);
-    
+
     lat = HALFPI - (acos(sin(D) * sin(E)));
-    
-    if (abs(HALFPI - abs(lat)) <= EPSILON)
-    {
+
+    if(abs(HALFPI - abs(lat)) <= EPSILON) {
       lon = 0.0;
     }
-    else
-    {
+    else {
       test = sin(E) * cos(D) / sin(HALFPI - lat);
-      if (test > 1.0) test = 1.0;
-      else if (test < -1.0) test = -1.0;
+      if(test > 1.0) test = 1.0;
+      else if(test < -1.0) test = -1.0;
 
       lon = asin(test);
     }
-    
-    if (E >= HALFPI)
-    {
-      if (lon <= 0.0) lon = -PI - lon;
+
+    if(E >= HALFPI) {
+      if(lon <= 0.0) lon = -PI - lon;
       else lon = PI - lon;
     }
-    
+
     // Convert to degrees
     p_latitude = lat * 180.0 / Isis::PI;
     p_longitude = lon * 180.0 / Isis::PI;
-    
+
     // Cleanup the latitude
-    if (IsPlanetocentric())
+    if(IsPlanetocentric())
       p_latitude = ToPlanetocentric(p_latitude);
-    
+
     p_good = true;
     return p_good;
   }
-  
-  
+
+
   /**
   * This method is used to determine the x/y range which completely covers the
   * area of interest specified by the lat/lon range. The latitude/longitude
@@ -228,33 +215,30 @@ namespace Isis
   *
   * @return bool
   */
-  bool LunarAzimuthalEqualArea::XYRange(double & minX, double & maxX,
-      double & minY, double & maxY)
-  {
+  bool LunarAzimuthalEqualArea::XYRange(double &minX, double &maxX,
+                                        double &minY, double &maxY) {
     // Check the corners of the lat/lon range
-    XYRangeCheck (p_minimumLatitude,p_minimumLongitude);
-    XYRangeCheck (p_maximumLatitude,p_minimumLongitude);
-    XYRangeCheck (p_minimumLatitude,p_maximumLongitude);
-    XYRangeCheck (p_maximumLatitude,p_maximumLongitude);
-  
+    XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
+    XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
+    XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
+    XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
+
     // If the latitude range contains 0
-    if ((p_minimumLatitude < 0.0) && (p_maximumLatitude > 0.0))
-    {
-      XYRangeCheck (0.0, p_minimumLongitude);
-      XYRangeCheck (0.0, p_maximumLongitude);
+    if((p_minimumLatitude < 0.0) && (p_maximumLatitude > 0.0)) {
+      XYRangeCheck(0.0, p_minimumLongitude);
+      XYRangeCheck(0.0, p_maximumLongitude);
     }
-    
+
     // If the longitude range contains 0
-    if ((p_minimumLongitude < 0.0) && (p_maximumLongitude > 0.0))
-    {
-      XYRangeCheck (p_minimumLatitude, 0.0);
-      XYRangeCheck (p_maximumLatitude, 0.0);
+    if((p_minimumLongitude < 0.0) && (p_maximumLongitude > 0.0)) {
+      XYRangeCheck(p_minimumLatitude, 0.0);
+      XYRangeCheck(p_maximumLatitude, 0.0);
     }
-    
+
     // Make sure everything is ordered
-    if (p_minimumX >= p_maximumX) return false;
-    if (p_minimumY >= p_maximumY) return false;
-  
+    if(p_minimumX >= p_maximumX) return false;
+    if(p_minimumY >= p_maximumY) return false;
+
     // Return X/Y min/maxs
     minX = p_minimumX;
     maxX = p_maximumX;
@@ -265,16 +249,15 @@ namespace Isis
 
   /**
   * This function returns the keywords that this projection uses.
-  * 
+  *
   * @return PvlGroup The keywords that this projection uses
   */
-  PvlGroup LunarAzimuthalEqualArea::Mapping()
-  {
+  PvlGroup LunarAzimuthalEqualArea::Mapping() {
     PvlGroup mapping = Projection::Mapping();
     mapping += p_mappingGrp["MaximumLibration"];
     return mapping;
   }
-  
+
   /**
   * Compares two Projection objects to see if they are equal
   *
@@ -283,24 +266,22 @@ namespace Isis
   * @return bool Returns true if the Projection objects are equal, and false if
   *              they are not
   */
-  bool LunarAzimuthalEqualArea::operator== (const Isis::Projection & proj)
-  {
-    if (!Isis::Projection::operator==(proj))
+  bool LunarAzimuthalEqualArea::operator== (const Isis::Projection &proj) {
+    if(!Isis::Projection::operator==(proj))
       return false;
     // dont use != (it is a recusive plunge)
     //  if (Isis::Projection::operator!=(proj)) return false;
-    
-    LunarAzimuthalEqualArea * LKAEA = (LunarAzimuthalEqualArea *) &proj;
-    if (LKAEA->p_maxLibration != this->p_maxLibration)
+
+    LunarAzimuthalEqualArea *LKAEA = (LunarAzimuthalEqualArea *) &proj;
+    if(LKAEA->p_maxLibration != this->p_maxLibration)
       return false;
     return true;
   }
 
-  
+
 } // end namespace isis
 
-extern "C" Isis::Projection *LunarAzimuthalEqualAreaPlugin (Isis::Pvl &lab,
-    bool allowDefaults)
-{
+extern "C" Isis::Projection *LunarAzimuthalEqualAreaPlugin(Isis::Pvl &lab,
+    bool allowDefaults) {
   return new Isis::LunarAzimuthalEqualArea(lab);
 }

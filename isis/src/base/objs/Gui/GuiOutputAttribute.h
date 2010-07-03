@@ -30,22 +30,22 @@
 
 namespace Isis {
   class GuiOutputAttribute : public QDialog {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      GuiOutputAttribute (QWidget *parent=0);
+      GuiOutputAttribute(QWidget *parent = 0);
 
-      ~GuiOutputAttribute ();
+      ~GuiOutputAttribute();
 
-      std::string GetAttributes ();
+      std::string GetAttributes();
 
-      void SetAttributes (const std::string &value);
+      void SetAttributes(const std::string &value);
 
-      static int GetAttributes (const std::string &defaultAttribute,
-                                std::string &newAttribute,
-                                const std::string &title,
-                                bool allowProp,
-                                QWidget *parent);
+      static int GetAttributes(const std::string &defaultAttribute,
+                               std::string &newAttribute,
+                               const std::string &title,
+                               bool allowProp,
+                               QWidget *parent);
 
       void SetPropagation(bool enabled);
 

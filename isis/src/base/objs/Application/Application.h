@@ -81,7 +81,7 @@ namespace Isis {
    *   @history 2010-03-17 Stuart Sides - Added the location of the Qt plugins
    *                                      into the library path
    *   @history 2010-06-29 Steven Lambright - Added a setlocale to english for
-   *            numeric values 
+   *            numeric values
    */
   class Application {
     public:

@@ -3,15 +3,14 @@
 enum FmodeDef { INPUT, OUTPUT };
 typedef enum FmodeDef Fmode;
 
-struct ByteStreamDef
-{
-	Fmode   mode;
-	short   stat;
-	FILE    *file;
+struct ByteStreamDef {
+  Fmode   mode;
+  short   stat;
+  FILE    *file;
 };
 typedef struct ByteStreamDef ByteStream;
 
-extern void *cByteStream( ByteStream *, char *FileName, Fmode FileMode );
+extern void *cByteStream(ByteStream *, char *FileName, Fmode FileMode);
 extern void *dByteStream(ByteStream *);
 extern short ByteStream_read(ByteStream *);
 extern short ByteStream_write(ByteStream *, short c);
@@ -31,19 +30,18 @@ extern short ByteStream_status(ByteStream *);
 #define FAR
 #endif
 
-struct BitStreamDef
-{
-	ByteStream	bytestream;
-	short		BitBuffer;      /* Bit I/O buffer */
-	short     	BitBuffMask;    /* Bit I/O buffer mask */
-	CHARH		*outstring;
-	char    mode;
-	unsigned long	bytesout;
-	unsigned short	bitmask[17];
+struct BitStreamDef {
+  ByteStream	bytestream;
+  short		BitBuffer;      /* Bit I/O buffer */
+  short     	BitBuffMask;    /* Bit I/O buffer mask */
+  CHARH		*outstring;
+  char    mode;
+  unsigned long	bytesout;
+  unsigned short	bitmask[17];
 };
 typedef struct BitStreamDef BitStream;
 
-extern void *cBitStream( BitStream *, char *fn, Fmode fm );
+extern void *cBitStream(BitStream *, char *fn, Fmode fm);
 extern void *dBitStream(BitStream *);
 extern short BitStream_write(BitStream *, short bits, short width);
 extern short BitStream_read(BitStream *, short bits);
@@ -58,4 +56,4 @@ extern char	dchuffval[12], achuffval[162];
 extern void inithuffcode();
 extern void encode(short *, BitStream *);
 extern void decode(short *, BitStream *);
-extern void decomp(BitStream *bs,CHARH *Image,long rows,long cols);
+extern void decomp(BitStream *bs, CHARH *Image, long rows, long cols);

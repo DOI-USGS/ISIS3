@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   cout << "Default profile name: " << d.getDefaultProfileName() << endl;
   DbProfile dup = d.getProfile(0);
   cout << "Duplicate profile name: " << dup.Name() << endl;
-  
+
   cout << "DbProfile valid: " << p.isValid() << endl;
   cout << "Size: " << d.size() << endl;
   cout << "Setting name: ";

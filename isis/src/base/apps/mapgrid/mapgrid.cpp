@@ -9,9 +9,9 @@
 using namespace std;
 using namespace Isis;
 
-void StartNewLine(std::ofstream&);
-void AddPointToLine(std::ofstream&, double, double);
-void EndLine(std::ofstream&);
+void StartNewLine(std::ofstream &);
+void AddPointToLine(std::ofstream &, double, double);
+void EndLine(std::ofstream &);
 void CheckContinuous(double latlon, double latlon_start, double X, double Y, double lastX, double lastY, double maxChange, std::ofstream &os);
 
 void IsisMain() {
@@ -31,7 +31,7 @@ void IsisMain() {
   // Get mapfile, add values for range and create projection
   string mapFile = ui.GetFilename("MAPFILE");
   Pvl p(mapFile);
-  PvlGroup &mapping = p.FindGroup("Mapping",Pvl::Traverse);
+  PvlGroup &mapping = p.FindGroup("Mapping", Pvl::Traverse);
 
   if(mapping.HasKeyword("MinimumLatitude")) {
     mapping.DeleteKeyword("MinimumLatitude");
@@ -49,30 +49,30 @@ void IsisMain() {
     mapping.DeleteKeyword("MaximumLongitude");
   }
 
-  mapping += PvlKeyword("MinimumLatitude",latStart);
-  mapping += PvlKeyword("MaximumLatitude",latEnd);
-  mapping += PvlKeyword("MinimumLongitude",lonStart);
-  mapping += PvlKeyword("MaximumLongitude",lonEnd);
+  mapping += PvlKeyword("MinimumLatitude", latStart);
+  mapping += PvlKeyword("MaximumLatitude", latEnd);
+  mapping += PvlKeyword("MinimumLongitude", lonStart);
+  mapping += PvlKeyword("MaximumLongitude", lonEnd);
 
   Projection *proj;
   try {
     proj = ProjectionFactory::Create(p);
   }
-  catch (iException &e) {
-    string msg = "Cannot create grid - MapFile [" + mapFile +                               
-      "] does not contain necessary information to create a projection";
-    throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+  catch(iException &e) {
+    string msg = "Cannot create grid - MapFile [" + mapFile +
+                 "] does not contain necessary information to create a projection";
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
 
   // Write grid to well known text output
-  string out = Filename(ui.GetFilename("TO")).Expanded();  
+  string out = Filename(ui.GetFilename("TO")).Expanded();
   std::ofstream os;
-  os.open(out.c_str(),std::ios::out);
+  os.open(out.c_str(), std::ios::out);
 
   // Display the progress...10% 20% etc.
   Progress prog;
-  int steps = (int)(abs((latEnd - latStart) / latSpacing) + 
+  int steps = (int)(abs((latEnd - latStart) / latSpacing) +
                     abs((lonEnd - lonStart) / lonSpacing) + 0.5) + 3;
   prog.SetMaximumSteps(steps);
   prog.CheckStatus();
@@ -83,20 +83,20 @@ void IsisMain() {
    */
   os << "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" << endl;
   os << "<ogr:FeatureCollection " << endl <<
-        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" << endl <<
-        "xsi:schemaLocation=\"http://org.maptools.org/\"" << endl <<
-        "xmlns:ogr=\"http://org.maptools.org/\"" << endl << 
-        "xmlns:gml=\"http://www.opengis.net/gml\">" << endl;
+     "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" << endl <<
+     "xsi:schemaLocation=\"http://org.maptools.org/\"" << endl <<
+     "xmlns:ogr=\"http://org.maptools.org/\"" << endl <<
+     "xmlns:gml=\"http://www.opengis.net/gml\">" << endl;
 
   /**
    * Draw the interior longitude lines by looping through the longitude
    * range and drawing across each latitude line using the longitude increment. The first
-   * and last line will be skipped for now. 
+   * and last line will be skipped for now.
    */
-  for (double j=lonStart+lonSpacing; j<lonEnd; j+=lonSpacing) {
+  for(double j = lonStart + lonSpacing; j < lonEnd; j += lonSpacing) {
     StartNewLine(os);
-    for (double k=latStart; k<=latEnd; k+=lonInc) {
-      proj->SetGround(k,j);
+    for(double k = latStart; k <= latEnd; k += lonInc) {
+      proj->SetGround(k, j);
       AddPointToLine(os, proj->XCoord(), proj->YCoord());
     }
 
@@ -108,10 +108,10 @@ void IsisMain() {
    * Draw the exterior longitude boundary lines. This happens by drawing just the first and
    * last longitude lines.
    */
-  for (double r=lonStart; r<=lonEnd; r+=(lonEnd-lonStart)) {
+  for(double r = lonStart; r <= lonEnd; r += (lonEnd - lonStart)) {
     StartNewLine(os);
-    for (double s=latStart; s<=latEnd; s+=lonInc) {
-      proj->SetGround(s,r);
+    for(double s = latStart; s <= latEnd; s += lonInc) {
+      proj->SetGround(s, r);
       AddPointToLine(os, proj->XCoord(), proj->YCoord());
     }
     EndLine(os);
@@ -121,14 +121,14 @@ void IsisMain() {
   /**
    * Draw the interior latitude lines by looping through the latitude
    * range and drawing across each longitude line using the latitude increment. The first
-   * and last line will be skipped for now. 
+   * and last line will be skipped for now.
    */
-  for (double i=latStart+latSpacing; i<latEnd; i+=latSpacing) {
+  for(double i = latStart + latSpacing; i < latEnd; i += latSpacing) {
 
     // Get Latitude Line
     StartNewLine(os);
-    for (double l=lonStart; l<=lonEnd; l+=latInc) {
-      proj->SetGround(i,l);
+    for(double l = lonStart; l <= lonEnd; l += latInc) {
+      proj->SetGround(i, l);
       AddPointToLine(os, proj->XCoord(), proj->YCoord());
     }
     EndLine(os);
@@ -139,11 +139,11 @@ void IsisMain() {
    * Draw the exterior latitude boundary lines. This happens by drawing just the first and
    * last longitude lines.
    */
-  for (double m=latStart; m<=latEnd; m+=(latEnd-latStart)) {
+  for(double m = latStart; m <= latEnd; m += (latEnd - latStart)) {
     StartNewLine(os);
 
-    for (double n=lonStart; n<=lonEnd; n+=latInc) {
-      proj->SetGround(m,n);
+    for(double n = lonStart; n <= lonEnd; n += latInc) {
+      proj->SetGround(m, n);
       AddPointToLine(os, proj->XCoord(), proj->YCoord());
     }
 
@@ -154,9 +154,9 @@ void IsisMain() {
   /**
    * Draw the bounding box using a series of lines.
    */
-  if (ui.GetBoolean("BOUNDED")) {
-    double minX,maxX,minY,maxY;
-    proj->XYRange(minX,maxX,minY,maxY);
+  if(ui.GetBoolean("BOUNDED")) {
+    double minX, maxX, minY, maxY;
+    proj->XYRange(minX, maxX, minY, maxY);
 
     StartNewLine(os);
     AddPointToLine(os, minX, minY);
@@ -182,22 +182,22 @@ void IsisMain() {
   os << "</ogr:FeatureCollection>" << endl;
 
   // add mapping to print.prt
-  PvlGroup projMapping = proj->Mapping(); 
-  Application::Log(projMapping); 
+  PvlGroup projMapping = proj->Mapping();
+  Application::Log(projMapping);
 }
 
 /**
  * This will prepare a new line start in GML. This should be called every time a new line is
  * started and generates unique IDs for each line.
- * 
+ *
  * @param os output file stream
  */
 void StartNewLine(std::ofstream &os) {
   static int lineID = 0;
 
   os << "<gml:featureMember>" << endl;
-  os << "  <ogr:mapLine fid=\"F" << lineID << "\">" << endl; 
-  os << "    <ogr:ID>" << lineID << "</ogr:ID>" << endl; 
+  os << "  <ogr:mapLine fid=\"F" << lineID << "\">" << endl;
+  os << "    <ogr:ID>" << lineID << "</ogr:ID>" << endl;
   os << "    <ogr:geometryProperty>" << "<gml:LineString>" << "<gml:coordinates>";
 
   lineID ++;
@@ -207,7 +207,7 @@ void StartNewLine(std::ofstream &os) {
  * This will add a point to a line started with StartNewLine. StartNewLine must be
  * called before using this method, and EndLine after all of the points in the line have
  * been added.
- * 
+ *
  * @param os output file stream
  * @param x x coordinate
  * @param y y coordinate
@@ -219,12 +219,12 @@ void AddPointToLine(std::ofstream &os, const double x, const double y) {
 /**
  * This will end a line in GML. This should be called after each line has the necessary points
  * added using AddPointToLine.
- * 
+ *
  * @param os output file stream
  */
 void EndLine(std::ofstream &os) {
   os << "</gml:coordinates>" << "</gml:LineString>" << "</ogr:geometryProperty>" << endl;
-  os << "  </ogr:mapLine>" << endl; 
+  os << "  </ogr:mapLine>" << endl;
   os << "</gml:featureMember>" << endl;
 }
 
@@ -232,7 +232,7 @@ void EndLine(std::ofstream &os) {
  * This function was created to deal with potential discontinuities in mapping patterns in order to not
  * connect them. It will create a new line if there is more than a maxChange difference in the points.
  * This was coded for ObliqueCylindrical.
- * 
+ *
  * @param latlon Current latitude or longitude value
  * @param latlon_start Initial latitude or longitude value of this line
  * @param X X coordinate of this point

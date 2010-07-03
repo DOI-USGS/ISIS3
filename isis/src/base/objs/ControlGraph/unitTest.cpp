@@ -13,10 +13,9 @@
 using namespace std;
 using namespace Isis;
 
-int main()
-{
+int main() {
   cerr << "\nUnit Test for ControlGraph!!!\n\n"
-               "building the following ControlNet for testing...\n\n";
+       "building the following ControlNet for testing...\n\n";
   Preference::Preferences(true);
 
   // control point 0
@@ -42,8 +41,8 @@ int main()
   cp1.Add(cp1cm1);
   cp1.Add(cp1cm2);
   cp1.Add(cp1cm3);
-  
-  
+
+
   // control point 2
   ControlMeasure cp2cm1;
   cp2cm1.SetCubeSerialNumber("A");
@@ -95,63 +94,58 @@ int main()
   // now build controlnet
   ControlNet cnet;
   cnet.Add(cp0);
-  cnet.Add(cp1); 
+  cnet.Add(cp1);
   cnet.Add(cp2);
   cnet.Add(cp3);
-  cnet.Add(cp4); 
+  cnet.Add(cp4);
   cnet.Add(cp5);
 
   cerr << "  ControlPoint  |  Images\n"
-               "----------------|--------------------------";
-  for (int i = 0; i < cnet.Size(); i++)
-  {
+       "----------------|--------------------------";
+  for(int i = 0; i < cnet.Size(); i++) {
     cerr << "\n\t" << cnet[i].Id() << "\t|";
-    for (int j = 0; j < cnet[i].Size(); j++)
-    {
+    for(int j = 0; j < cnet[i].Size(); j++) {
       cerr << "\t" << cnet[i][j].CubeSerialNumber();
     }
   }
   cerr << "\n\nControlNet built!\n\n"
-               "constructing a ControlGraph...\n";
+       "constructing a ControlGraph...\n";
 
   ControlGraph cg(&cnet);
   cerr << "ControlGraph constructed!\n\n"
-               "IsConnected() returns: ";
-  
-  if (cg.IsConnected())
+       "IsConnected() returns: ";
+
+  if(cg.IsConnected())
     cerr << "true\n\n";
   else
     cerr << "false\n\n";
 
   cerr << "GetIslandCount returns: " << cg.GetIslandCount() << "\n\n"
-               "GetCubesOnIsland(0) returns:";
+       "GetCubesOnIsland(0) returns:";
   QVector< QString > cubesOnIsland = cg.GetCubesOnIsland(0);
-  for (int i = 0; i < cubesOnIsland.size(); i++)
-    cerr << "  " << cubesOnIsland[i].toStdString();
-  
-  cerr << "\n\nGetCubesOnIsland(1) returns:";
-  cubesOnIsland = cg.GetCubesOnIsland(1);
-  for (int i = 0; i < cubesOnIsland.size(); i++)
+  for(int i = 0; i < cubesOnIsland.size(); i++)
     cerr << "  " << cubesOnIsland[i].toStdString();
 
-  try
-  {
+  cerr << "\n\nGetCubesOnIsland(1) returns:";
+  cubesOnIsland = cg.GetCubesOnIsland(1);
+  for(int i = 0; i < cubesOnIsland.size(); i++)
+    cerr << "  " << cubesOnIsland[i].toStdString();
+
+  try {
     cerr << "\n\nGetCubesOnIsland(42) returns:";
     cubesOnIsland = cg.GetCubesOnIsland(42);
   }
-  catch (iException e)
-  {
+  catch(iException e) {
     e.Report();
   }
-  
+
   cerr << "\nGetCubeList() returns:\n";
   QVector< QString > cubeList = cg.GetCubeList();
-  for (int i = 0; i < cubeList.size(); i++)
-  {
+  for(int i = 0; i < cubeList.size(); i++) {
     cerr << "    " << cubeList[i].toStdString() << "\n";
   }
-  
+
   cerr << "\n";
-  
+
   return 0;
 }

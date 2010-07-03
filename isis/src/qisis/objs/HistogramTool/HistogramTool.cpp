@@ -10,16 +10,14 @@
 #include "ToolPad.h"
 
 
-namespace Qisis
-{
+namespace Qisis {
 
   /**
    * Constructor creates a new HistogramTool object.
    *
    * @param parent
    */
-  HistogramTool::HistogramTool(QWidget *parent) : Qisis::PlotTool(parent)
-  {
+  HistogramTool::HistogramTool(QWidget *parent) : Qisis::PlotTool(parent) {
     p_rubberBand = NULL;
     RubberBandTool::allowPoints(1);
     p_parent = parent;
@@ -42,10 +40,8 @@ namespace Qisis
    *   activate or change the rubber banding mode to be either
    *   rectangle or line, depending on the current plot type.
    */
-  void HistogramTool::enableRubberBandTool()
-  {
-    if (p_rubberBand)
-    {
+  void HistogramTool::enableRubberBandTool() {
+    if(p_rubberBand) {
       p_rubberBand->reset();
       p_rubberBand->setEnabled(true);
     }
@@ -58,8 +54,7 @@ namespace Qisis
    *
    * @return QAction*
    */
-  QAction *HistogramTool::toolPadAction(ToolPad *toolpad)
-  {
+  QAction *HistogramTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
     action->setIcon(QPixmap(toolIconDir() + "/histogram.png"));
     action->setToolTip("Histogram (H)");
@@ -84,8 +79,7 @@ namespace Qisis
    *
    * @return QWidget*
    */
-  QWidget *HistogramTool::createToolBarWidget(QStackedWidget *parent)
-  {
+  QWidget *HistogramTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *hbox = new QWidget(parent);
 
     p_rubberBand = new RubberBandComboBox(
@@ -133,17 +127,14 @@ namespace Qisis
    * This method updates the histogram tool.
    *
    */
-  void HistogramTool::updateTool()
-  {
+  void HistogramTool::updateTool() {
     //If there is no viewport, disable the action
-    if (cubeViewport() == NULL)
-    {
+    if(cubeViewport() == NULL) {
       p_action->setEnabled(false);
     }
     //Else enable it and set the window's viewport to
     //the current viewport
-    else
-    {
+    else {
       p_action->setEnabled(true);
 
       MdiCubeViewport *cvp = cubeViewport();
@@ -156,8 +147,7 @@ namespace Qisis
   * displays the plot window
   *
   */
-  void HistogramTool::showPlotWindow()
-  {
+  void HistogramTool::showPlotWindow() {
     p_histToolWindow->showWindow();
   }
 
@@ -166,8 +156,7 @@ namespace Qisis
    * This method creates the default histogram plot window.
    *
    */
-  void HistogramTool::createWindow()
-  {
+  void HistogramTool::createWindow() {
     p_histToolWindow = new HistogramToolWindow("Active Histogram Window", p_parent);
     p_histToolWindow->setDestroyOnClose(false);
     p_histToolWindow->setDeletable(false);
@@ -182,10 +171,8 @@ namespace Qisis
      actionButtons are the buttons directly below.*/
     p_histToolWindow->getDefaultMenus(menu, actionButtons);
 
-    for (int i = 0; i < menu.size(); i++)
-    {
-      if (menu[i]->title() == "&Options")
-      {
+    for(int i = 0; i < menu.size(); i++) {
+      if(menu[i]->title() == "&Options") {
         p_autoScale = new QAction(p_histToolWindow);
         p_autoScale->setText("AutoScale");
         p_autoScale->setCheckable(true);
@@ -211,15 +198,12 @@ namespace Qisis
    * rubber band.
    *
    */
-  void HistogramTool::rubberBandComplete()
-  {
+  void HistogramTool::rubberBandComplete() {
     p_histToolWindow->raise();
-    if (RubberBandTool::isValid())
-    {
+    if(RubberBandTool::isValid()) {
       changePlot();
     }
-    else
-    {
+    else {
       QMessageBox::information(p_histToolWindow, "Error",
                                "The selected Area contains no valid pixels",
                                QMessageBox::Ok);
@@ -231,8 +215,7 @@ namespace Qisis
    * This method creates and displays a blank plot window in which
    * users can paste curves to and copy curves from.
    */
-  void HistogramTool::newPlotWindow()
-  {
+  void HistogramTool::newPlotWindow() {
     HistogramToolWindow *blankWindow = new HistogramToolWindow("Histogram Window", p_parent);
     blankWindow->setDestroyOnClose(true);
     connect(blankWindow, SIGNAL(curvePaste(Qisis::PlotWindow *)), this,
@@ -264,27 +247,23 @@ namespace Qisis
   /**
    * This method plots the selected data in a histogram window.
    */
-  void HistogramTool::changePlot()
-  {
+  void HistogramTool::changePlot() {
     MdiCubeViewport *cvp = cubeViewport();
     /* Delete any current curves*/
     p_histToolWindow->clearPlotCurves();
 
     QList<QPoint> vertices;
 
-    if (RubberBandTool::getMode() == RubberBandTool::Circle)
-    {
+    if(RubberBandTool::getMode() == RubberBandTool::Circle) {
       geos::geom::Geometry *p = RubberBandTool::geometry();
       geos::geom::CoordinateSequence *c = p->getCoordinates();
-      for (int i = 0; i < (int)c->getSize(); i++)
-      {
+      for(int i = 0; i < (int)c->getSize(); i++) {
         QPoint point((int)(c->getX(i) + 0.5), (int)(c->getY(i) + 0.5));
         vertices.append(point);
       }
       delete p;
     }
-    else
-    {
+    else {
       vertices = RubberBandTool::getVertices();
     }
 
@@ -294,15 +273,14 @@ namespace Qisis
     p_cdfCurve->setViewPort(cvp);
     p_cdfCurve->setVertices(vertices);
 
-    if (vertices.size() < 1) return;
+    if(vertices.size() < 1) return;
 
     Isis::Cube *cube = cvp->cube();
     int band = cvp->grayBand();
     Isis::Histogram hist(*cube, 1);
 
     //If the rubber band is a line
-    if (RubberBandTool::getMode() == RubberBandTool::Line)
-    {
+    if(RubberBandTool::getMode() == RubberBandTool::Line) {
       double ssamp, sline, esamp, eline;
       cvp->viewportToCube(vertices[0].rx(), vertices[0].ry(),
                           ssamp, sline);
@@ -324,34 +302,28 @@ namespace Qisis
       int ex = line.p2().x();
       int sy = line.p1().y();
       int ey = line.p2().y();
-      if (sx > ex)
-      {
+      if(sx > ex) {
         xsize = sx - ex + 1;
         xinc = -1;
       }
-      else
-      {
+      else {
         xsize = ex - sx + 1;
         xinc = 1;
       }
 
-      if (sy > ey)
-      {
+      if(sy > ey) {
         ysize = sy - ey + 1;
         yinc = -1;
       }
-      else
-      {
+      else {
         ysize = ey - sy + 1;
         yinc = 1;
       }
 
-      if (ysize > xsize)
-      {
+      if(ysize > xsize) {
         slope = (double)(ex - sx) / (double)(ey - sy);
         y = sy;
-        for (i = 0; i < ysize; i++)
-        {
+        for(i = 0; i < ysize; i++) {
           x = (int)(slope * (double)(y - sy) + (double) sx + 0.5);
 
           QPoint *pt = new QPoint;
@@ -361,19 +333,16 @@ namespace Qisis
           y += yinc;
         }
       }
-      else if (xsize == 1)
-      {
+      else if(xsize == 1) {
         QPoint *pt = new QPoint;
         pt->setX(sx);
         pt->setY(sy);
         linePts->push_back(pt);
       }
-      else
-      {
+      else {
         slope = (double)(ey - sy) / (double)(ex - sx);
         x = sx;
-        for (i = 0; i < xsize; i++)
-        {
+        for(i = 0; i < xsize; i++) {
           y = (int)(slope * (double)(x - sx) + (double) sy + 0.5);
 
           QPoint *pt = new QPoint;
@@ -384,8 +353,7 @@ namespace Qisis
         }
       }
 
-      if (linePts->empty())
-      {
+      if(linePts->empty()) {
         QMessageBox::information((QWidget *)parent(),
                                  "Error", "No points in edit line");
         return;
@@ -394,8 +362,7 @@ namespace Qisis
       Isis::Brick *brick = new Isis::Brick(*cube, 1, 1, 1);
 
       //For each point read that value from the cube and add it to the histogram
-      for (int i = 0; linePts && i < (int)linePts->size(); i++)
-      {
+      for(int i = 0; linePts && i < (int)linePts->size(); i++) {
         QPoint *pt = (*linePts)[i];
         int is = pt->x();
         int il = pt->y();
@@ -409,8 +376,7 @@ namespace Qisis
 
     }
     //If rubber band is a rectangle
-    else if (RubberBandTool::getMode() == RubberBandTool::Rectangle)
-    {
+    else if(RubberBandTool::getMode() == RubberBandTool::Rectangle) {
       double ssamp, sline, esamp, eline;
 
       // Convert them to line sample values
@@ -423,13 +389,12 @@ namespace Qisis
       eline = eline + 0.5;
 
       int nsamps = (int)(esamp - ssamp + 1);
-      if (nsamps < 1) nsamps = -nsamps;
+      if(nsamps < 1) nsamps = -nsamps;
 
       Isis::Brick *brick = new Isis::Brick(*cube, nsamps, 1, 1);
 
       //For each line read nsamps and add it to the histogram
-      for (int line = (int)std::min(sline, eline); line <= (int)std::max(sline, eline); line++)
-      {
+      for(int line = (int)std::min(sline, eline); line <= (int)std::max(sline, eline); line++) {
         brick->SetBasePosition((int)ssamp, line, band);
         cube->Read(*brick);
         hist.AddData(brick->DoubleBuffer(), nsamps);
@@ -437,23 +402,19 @@ namespace Qisis
       delete brick;
     }
     //If rubber band is a polygon or circle
-    else
-    {
+    else {
       geos::geom::Geometry *polygon = RubberBandTool::geometry();
 
       std::vector <int> x_contained, y_contained;
-      if (polygon != NULL)
-      {
+      if(polygon != NULL) {
         const geos::geom::Envelope *envelope = polygon->getEnvelopeInternal();
         double ssamp, esamp, sline, eline;
         cvp->viewportToCube((int)floor(envelope->getMinX()), (int)floor(envelope->getMinY()), ssamp, sline);
         cvp->viewportToCube((int)ceil(envelope->getMaxX()), (int)ceil(envelope->getMaxY()), esamp, eline);
 
 
-        for (int y = (int)sline; y <= (int)eline; y++)
-        {
-          for (int x = (int)ssamp; x <= (int)esamp; x++)
-          {
+        for(int y = (int)sline; y <= (int)eline; y++) {
+          for(int x = (int)ssamp; x <= (int)esamp; x++) {
             int x1, y1;
             cvp->cubeToViewport(x, y, x1, y1);
             geos::geom::Coordinate c(x1, y1);
@@ -461,8 +422,7 @@ namespace Qisis
             bool contains = p->within(polygon);
             delete p;
 
-            if (contains)
-            {
+            if(contains) {
               x_contained.push_back(x);
               y_contained.push_back(y);
             }
@@ -474,8 +434,7 @@ namespace Qisis
         Isis::Brick *brick = new Isis::Brick(*cube, 1, 1, 1);
 
         //Read each point from the cube and add it to the histogram
-        for (unsigned int j = 0; j < x_contained.size(); j++)
-        {
+        for(unsigned int j = 0; j < x_contained.size(); j++) {
           brick->SetBasePosition(x_contained[j], y_contained[j], band);
           cube->Read(*brick);
           hist.AddData(brick->DoubleBuffer(), 1);
@@ -488,10 +447,8 @@ namespace Qisis
     //Transfer data from histogram to the plotcurve
     std::vector<double> xarray, yarray, y2array;
     double cumpct = 0.0;
-    for (int i = 0; i < hist.Bins(); i++)
-    {
-      if (hist.BinCount(i) > 0)
-      {
+    for(int i = 0; i < hist.Bins(); i++) {
+      if(hist.BinCount(i) > 0) {
         xarray.push_back(hist.BinMiddle(i));
         yarray.push_back(hist.BinCount(i));
 
@@ -513,8 +470,7 @@ namespace Qisis
     double minYValue = DBL_MAX;
     // ---------------------------------------------
 
-    for (unsigned int y = 0; y < yarray.size(); y++)
-    {
+    for(unsigned int y = 0; y < yarray.size(); y++) {
 
       intervals[y] = QwtDoubleInterval(xarray[y], xarray[y] + hist.BinSize());
 
@@ -524,8 +480,8 @@ namespace Qisis
       //std::cout << "& " << xarray[y] + hist.BinSize() << std::endl;
 
       values[y] = yarray[y];
-      if (values[y] > maxYValue) maxYValue = values[y];
-      if (values[y] < minYValue) minYValue = values[y];
+      if(values[y] > maxYValue) maxYValue = values[y];
+      if(values[y] < minYValue) minYValue = values[y];
     }
 
     QwtScaleDiv scaleDiv;
@@ -540,8 +496,7 @@ namespace Qisis
     p_histToolWindow->add(p_cdfCurve);
     p_histToolWindow->fillTable();
 
-    if (p_autoScale->isChecked())
-    {
+    if(p_autoScale->isChecked()) {
       p_histToolWindow->setScale(QwtPlot::yLeft, 0, maxYValue);
       p_histToolWindow->setScale(QwtPlot::xBottom, hist.Minimum(), hist.Maximum());
       //p_histToolWindow->setScale(QwtPlot::xBottom,0,hist.Maximum());
@@ -577,14 +532,12 @@ namespace Qisis
    *
    * @param pc
    */
-  void HistogramTool::copyCurve(Qisis::PlotCurve *pc)
-  {
+  void HistogramTool::copyCurve(Qisis::PlotCurve *pc) {
     p_copyCurve = new HistogramItem();
     p_copyCurve->copyCurveProperties(p_histCurve);
   }
 
-  void HistogramTool::copyCurve()
-  {
+  void HistogramTool::copyCurve() {
     p_copyCurve = new HistogramItem();
     p_copyCurve->copyCurveProperties(p_histCurve);
   }
@@ -596,8 +549,7 @@ namespace Qisis
    * command has taken place inside the window.
    * @param pw
    */
-  void HistogramTool::pasteCurve(Qisis::PlotWindow *pw)
-  {
+  void HistogramTool::pasteCurve(Qisis::PlotWindow *pw) {
     p_cvp = cubeViewport();
     ((HistogramToolWindow *)pw)->add(p_copyCurve);
     updateViewPort(p_cvp);
@@ -610,18 +562,14 @@ namespace Qisis
    * curve a different color than the copied curve.
    * @param pw
    */
-  void HistogramTool::pasteCurveSpecial(Qisis::PlotWindow *pw)
-  {
+  void HistogramTool::pasteCurveSpecial(Qisis::PlotWindow *pw) {
     p_cvp = cubeViewport();
-    if (p_color < p_colors.size())
-    {
+    if(p_color < p_colors.size()) {
       p_copyCurve->setColor(p_colors[p_color]);
     }
-    else
-    {
+    else {
       QColor c = QColorDialog::getColor(Qt::white, p_histToolWindow);
-      if (c.isValid())
-      {
+      if(c.isValid()) {
         p_copyCurve->setColor(c);
       }
     }
@@ -641,8 +589,7 @@ namespace Qisis
    * will be used when the user copies and pastes (special) into
    * another plot window.
    */
-  void HistogramTool::setupPlotCurves()
-  {
+  void HistogramTool::setupPlotCurves() {
     p_histCurve = new HistogramItem();
     p_histCurve->setColor(Qt::darkCyan);
     //If we give the curve a title, it will show up on the legend.
@@ -682,27 +629,22 @@ namespace Qisis
    * @param vp
    * @param painter
    */
-  void HistogramTool::paintViewport(MdiCubeViewport *vp, QPainter *painter)
-  {
+  void HistogramTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
 
     int sample1, line1, sample2, line2;
 
-    for (int i = 0; i < p_plotWindows.size(); i++)
-    {
-      for (int c = 0; c < p_plotWindows[i]->getNumItems(); c++)
-      {
+    for(int i = 0; i < p_plotWindows.size(); i++) {
+      for(int c = 0; c < p_plotWindows[i]->getNumItems(); c++) {
         HistogramItem *histItem = p_plotWindows[i]->getHistItem(c);
 
-        if (histItem->getViewPort() == vp)
-        {
+        if(histItem->getViewPort() == vp) {
           QPen pen(histItem->color());
           pen.setWidth(2);
           pen.setStyle(Qt::SolidLine);
           painter->setPen(pen);
           QList <QPointF> points = histItem->getVertices();
 
-          for (int p = 1; p < points.size(); p++)
-          {
+          for(int p = 1; p < points.size(); p++) {
             vp->cubeToViewport(points[p-1].x(), points[p-1].y(), sample1, line1);
             vp->cubeToViewport(points[p].x(), points[p].y(), sample2, line2);
             painter->drawLine(QPoint(sample1, line1), QPoint(sample2,  line2));
@@ -727,8 +669,7 @@ namespace Qisis
    *
    * @param cvp
    */
-  void HistogramTool::updateViewPort(MdiCubeViewport * cvp)
-  {
+  void HistogramTool::updateViewPort(MdiCubeViewport *cvp) {
     cvp->repaint();
   }
 

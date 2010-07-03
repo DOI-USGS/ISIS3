@@ -11,7 +11,7 @@ using namespace std;
 namespace Isis {
   namespace Lro {
     // constructors
-    LroNarrowAngleCamera::LroNarrowAngleCamera (Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
+    LroNarrowAngleCamera::LroNarrowAngleCamera(Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
       // Set up the camera info from ik/iak kernels
       SetFocalLength();
       SetPixelPitch();
@@ -34,11 +34,11 @@ namespace Isis {
       multiplicativeLineTimeError = GetDouble(ikernKey);
 
       // Get the start time from labels
-      Isis::PvlGroup &inst = lab.FindGroup ("Instrument",Isis::Pvl::Traverse);
+      Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
       iString stime = (string)inst["SpacecraftClockPrerollCount"];
       SpiceDouble etStart;
-      if( stime != "NULL" ) {
-        scs2e_c (NaifSclkCode(),stime.c_str(),&etStart);
+      if(stime != "NULL") {
+        scs2e_c(NaifSclkCode(), stime.c_str(), &etStart);
       }
       else {
         stime = (string)inst["PrerollTime"];
@@ -53,18 +53,18 @@ namespace Isis {
 
       lineRate *= 1.0 + multiplicativeLineTimeError;
       lineRate += additiveLineTimeError;
-      etStart += additionalPreroll*lineRate;
+      etStart += additionalPreroll * lineRate;
       etStart += constantTimeOffset;
 
       SetEphemerisTime(etStart);
 
       // Setup detector map
-      LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this,etStart,lineRate);
+      LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart, lineRate);
       detectorMap->SetDetectorSampleSumming(csum);
       detectorMap->SetStartingDetectorSample(ss);
 
       // Setup focal plane map
-      CameraFocalPlaneMap *focalMap =new CameraFocalPlaneMap(this,NaifIkCode());
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
       ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_SAMPLE";
@@ -74,11 +74,11 @@ namespace Isis {
       double lineBoreSight = GetDouble(ikernKey);
 
       focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
-      focalMap->SetDetectorOffset(0.0,0.0);
+      focalMap->SetDetectorOffset(0.0, 0.0);
 
       // Setup distortion map
       LroNarrowAngleDistortionMap *distMap = new LroNarrowAngleDistortionMap(this);
-      distMap->SetDistortion( NaifIkCode());
+      distMap->SetDistortion(NaifIkCode());
 
       // Setup the ground and sky map
       new LineScanCameraGroundMap(this);
@@ -89,6 +89,6 @@ namespace Isis {
   }
 }
 
-extern "C" Isis::Camera *LroNarrowAngleCameraPlugin (Isis::Pvl &lab) {
+extern "C" Isis::Camera *LroNarrowAngleCameraPlugin(Isis::Pvl &lab) {
   return new Isis::Lro::LroNarrowAngleCamera(lab);
 }

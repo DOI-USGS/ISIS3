@@ -6,7 +6,7 @@
 using namespace std;
 using namespace Isis;
 
-int main(){
+int main() {
   Isis::Preference::Preferences(true);
 
   //create a dummy Isis::Progress object
@@ -16,9 +16,9 @@ int main(){
   cout << "Testing constructor ...\n";
   HiLab hiLab(&cube);
   cout << "Testing getCpmmNumber() ...\n";
-  cout << "CpmmNumber " << hiLab.getCpmmNumber() <<endl;
+  cout << "CpmmNumber " << hiLab.getCpmmNumber() << endl;
   cout << "Testing getChannel() ...\n";
-  cout << "Channel "  << hiLab.getChannel() <<endl;
+  cout << "Channel "  << hiLab.getChannel() << endl;
   cout << "Testing getBin() ...\n";
   cout << "Bin " << hiLab.getBin() << endl;
   cout << "Testing getTdi() ...\n";

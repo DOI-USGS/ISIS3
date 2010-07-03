@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <string>
-#include <vector> 
+#include <vector>
 #include <algorithm>
 #include <sstream>
 #include <iostream>
@@ -41,11 +41,11 @@ MatrixList *calVars = 0;
 
 /**
  * @brief Apply calibration to each HiRISE image line
- * 
+ *
  * This function applies the calbration equation to each input image line.  It
  * gets matrices and constants from the \b calVars container that is established
  * in the main with some user input via the configuration (CONF) parameter.
- * 
+ *
  * @param in  Input raw image line buffer
  * @param out Output calibrated image line buffer
  */
@@ -60,15 +60,17 @@ void calibrate(Buffer &in, Buffer &out) {
   double Ziof           = calVars->get("Ziof")[0];
 
   //  Set current line (index)
-  int line(in.Line()-1);
-  if (calVars->exists("LastGoodLine")) {
-    int lastline = ((int) (calVars->get("LastGoodLine"))[0]) - 1;
-    if ( line > lastline ) { line = lastline; }
+  int line(in.Line() - 1);
+  if(calVars->exists("LastGoodLine")) {
+    int lastline = ((int)(calVars->get("LastGoodLine"))[0]) - 1;
+    if(line > lastline) {
+      line = lastline;
+    }
   }
 
   //  Apply correction
-  for (int i = 0 ; i < in.size() ; i++) {
-    if (IsSpecial(in[i])) {
+  for(int i = 0 ; i < in.size() ; i++) {
+    if(IsSpecial(in[i])) {
       out[i] = in[i];
     }
     else {
@@ -82,7 +84,7 @@ void calibrate(Buffer &in, Buffer &out) {
 }
 
 
-void IsisMain(){
+void IsisMain() {
 
   const std::string hical_program = "hical";
   const std::string hical_version = "3.5";
@@ -107,19 +109,19 @@ void IsisMain(){
 
 // Check for label propagation and set the output cube
     Cube *ocube = p.SetOutputCube("TO");
-    if ( !IsTrueValue(hiprof,"PropagateTables", "TRUE") ) {
+    if(!IsTrueValue(hiprof, "PropagateTables", "TRUE")) {
       RemoveHiBlobs(*(ocube->Label()));
     }
 
 //  Set specified profile if entered by user
-    if (ui.WasEntered("PROFILE")) {
+    if(ui.WasEntered("PROFILE")) {
       hiconf.selectProfile(ui.GetAsString("PROFILE"));
     }
 
 
 //  Add OPATH parameter to profiles
-    if (ui.WasEntered("OPATH")) {
-      hiconf.add("OPATH",ui.GetAsString("OPATH"));
+    if(ui.WasEntered("OPATH")) {
+      hiconf.add("OPATH", ui.GetAsString("OPATH"));
     }
     else {
       //  Set default to output directory
@@ -145,13 +147,13 @@ void IsisMain(){
     hiconf.selectProfile("Zf");
     hiprof = hiconf.getMatrixProfile();
     HiHistory ZfHist;
-    ZfHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZfHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       DriftBuffer driftB(caldata, hiconf);
       calVars->add("Zf", driftB.ref());
       ZfHist = driftB.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        driftB.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      if(hiprof.exists("DumpModuleFile")) {
+        driftB.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -164,18 +166,18 @@ void IsisMain(){
 /////////////////////////////////////////////////////////////////////
 // DriftCorrect (Z_d)
 //  Now compute the equation of fit
-// 
+//
     procStep = "Zd module";
     HiHistory ZdHist;
     hiconf.selectProfile("Zd");
     hiprof = hiconf.getMatrixProfile();
-    ZdHist.add("Profile["+ hiprof.Name()+"]");
-    if (!SkipModule(hiconf.getMatrixProfile("Zd")) ) { 
+    ZdHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiconf.getMatrixProfile("Zd"))) {
       DriftCorrect driftC(hiconf);
       calVars->add("Zd", driftC.Normalize(driftC.Solve(calVars->get("Zf"))));
       ZdHist = driftC.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        driftC.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      if(hiprof.exists("DumpModuleFile")) {
+        driftC.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -184,19 +186,19 @@ void IsisMain(){
     }
 
 
- ////////////////////////////////////////////////////////////////////
- //  ZeroCorrect (Z_z)  Get reverse clock 
+////////////////////////////////////////////////////////////////////
+//  ZeroCorrect (Z_z)  Get reverse clock
     procStep = "Zz module";
-    hiconf.selectProfile("Zz"); 
+    hiconf.selectProfile("Zz");
     hiprof = hiconf.getMatrixProfile();
     HiHistory ZzHist;
-    ZzHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZzHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       OffsetCorrect zoff(caldata, hiconf);
       calVars->add("Zz", zoff.ref());
       ZzHist = zoff.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        zoff.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      if(hiprof.exists("DumpModuleFile")) {
+        zoff.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -206,18 +208,18 @@ void IsisMain(){
 
 /////////////////////////////////////////////////////////////////
 // DarkSubtract (Z_b) Remove dark current
-// 
+//
     procStep = "Zb module";
     hiconf.selectProfile("Zb");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory ZbHist;
-    ZbHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZbHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       DarkSubtractComp dark(hiconf);
       calVars->add("Zb", dark.ref());
       ZbHist = dark.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        dark.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      if(hiprof.exists("DumpModuleFile")) {
+        dark.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -227,18 +229,18 @@ void IsisMain(){
 
 ////////////////////////////////////////////////////////////////////
 // GainVLineCorrect (Z_g) Correct for gain-based drift
-// 
+//
     procStep = "Zg module";
     hiconf.selectProfile("Zg");
     hiprof = hiconf.getMatrixProfile();
     HiHistory ZgHist;
-    ZgHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZgHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       GainVLineComp gainV(hiconf);
       calVars->add("Zg", gainV.ref());
       ZgHist = gainV.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        gainV.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      if(hiprof.exists("DumpModuleFile")) {
+        gainV.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -248,26 +250,28 @@ void IsisMain(){
 
 
 ////////////////////////////////////////////////////////////////////
-//  GainCorrect (Z_gg)  Correct for gain with the G matrix 
+//  GainCorrect (Z_gg)  Correct for gain with the G matrix
     procStep = "Zgg module";
-    hiconf.selectProfile("Zgg"); 
+    hiconf.selectProfile("Zgg");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory ZggHist;
-    ZggHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZggHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       double bin = ToDouble(hiprof("Summing"));
       double tdi = ToDouble(hiprof("Tdi"));
-      double factor = 128.0 / tdi / (bin*bin);
+      double factor = 128.0 / tdi / (bin * bin);
       HiVector zgg =  hiconf.getMatrix("G", hiprof);
-      for ( int i = 0 ; i < zgg.dim() ; i++ ) { zgg[i] *= factor; }
+      for(int i = 0 ; i < zgg.dim() ; i++) {
+        zgg[i] *= factor;
+      }
       calVars->add("Zgg", zgg);;
-      ZggHist.add("LoadMatrix(G[" + hiconf.getMatrixSource("G",hiprof) +
-                  "],Band[" + ToString(hiconf.getMatrixBand(hiprof)) + 
-                  "],Factor[" + ToString(factor) + "])"); 
-      if ( hiprof.exists("DumpModuleFile") ) { 
+      ZggHist.add("LoadMatrix(G[" + hiconf.getMatrixSource("G", hiprof) +
+                  "],Band[" + ToString(hiconf.getMatrixBand(hiprof)) +
+                  "],Factor[" + ToString(factor) + "])");
+      if(hiprof.exists("DumpModuleFile")) {
         Component zg("GMatrix", ZggHist);
         zg.Process(zgg);
-        zg.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+        zg.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -278,16 +282,16 @@ void IsisMain(){
 ////////////////////////////////////////////////////////////////////
 //  FlatField (Z_a)  Flat field correction with A matrix
     procStep = "Za module";
-    hiconf.selectProfile("Za"); 
+    hiconf.selectProfile("Za");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory ZaHist;
-    ZaHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZaHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       FlatFieldComp flat(hiconf);
       calVars->add("Za", flat.ref());
       ZaHist = flat.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        flat.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      if(hiprof.exists("DumpModuleFile")) {
+        flat.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -298,16 +302,16 @@ void IsisMain(){
 ////////////////////////////////////////////////////////////////////
 //  FlatField (Z_t)  Temperature-dependant gain correction
     procStep = "Zt module";
-    hiconf.selectProfile("Zt"); 
+    hiconf.selectProfile("Zt");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory ZtHist;
-    ZtHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZtHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       TempGainCorrect tcorr(hiconf);
       calVars->add("Zt", tcorr.ref());
       ZtHist = tcorr.History();
-      if ( hiprof.exists("DumpModuleFile") ) {
-        tcorr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      if(hiprof.exists("DumpModuleFile")) {
+        tcorr.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
       }
     }
     else {
@@ -318,15 +322,15 @@ void IsisMain(){
 
 ////////////////////////////////////////////////////////////////////
 //  I/FCorrect (Z_iof) Conversion to I/F
-// 
+//
     procStep = "Ziof module";
     hiconf.selectProfile("Ziof");
     hiprof = hiconf.getMatrixProfile();
     HiHistory ZiofHist;
-    ZiofHist.add("Profile["+ hiprof.Name()+"]");
-    if ( !SkipModule(hiprof) ) {
+    ZiofHist.add("Profile[" + hiprof.Name() + "]");
+    if(!SkipModule(hiprof)) {
       double sed = ToDouble(hiprof("ScanExposureDuration"));  // units = us
-      if ( IsEqual(units, "IOF") ) {
+      if(IsEqual(units, "IOF")) {
         //  Add solar I/F correction parameters
         double au = hiconf.sunDistanceAU();
         ZiofHist.add("SunDist[" + ToString(au) + " (AU)]");
@@ -339,13 +343,13 @@ void IsisMain(){
         double zgain = ToDouble(hiprof("FilterGainCorrection"));
         ZiofHist.add("FilterGainCorrection[" + ToString(zgain) + "]");
         ZiofHist.add("ScanExposureDuration[" + ToString(sed) + "]");
-        double ziof = (zbin * zgain) * (sed * 1.0e-6)  * suncorr; 
+        double ziof = (zbin * zgain) * (sed * 1.0e-6)  * suncorr;
 
         calVars->add("Ziof", HiVector(1, ziof));
         ZiofHist.add("I/F_Factor[" + ToString(ziof) + "]");
         ZiofHist.add("Units[I/F Reflectance]");
       }
-      else if (  IsEqual(units, "DN/US") ) {
+      else if(IsEqual(units, "DN/US")) {
         // Ziof is a divisor in calibration equation
         double ziof = sed;
         calVars->add("Ziof", HiVector(1, ziof));
@@ -362,7 +366,7 @@ void IsisMain(){
       }
     }
     else {
-      calVars->add("Ziof", HiVector(1,1.0));
+      calVars->add("Ziof", HiVector(1, 1.0));
       ZiofHist.add("Debug::SkipModule invoked!");
       ZiofHist.add("Units[Unknown]");
     }
@@ -371,7 +375,7 @@ void IsisMain(){
     hiconf.selectProfile();
 
 //----------------------------------------------------------------------
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 //  Call the processing function
     procStep = "calibration phase";
@@ -383,13 +387,13 @@ void IsisMain(){
 
     // Quitely dumps parameter history to alternative format file.  This
     // is completely controlled by the configuration file
-    if ( hiprof.exists("DumpHistoryFile") ) {
+    if(hiprof.exists("DumpHistoryFile")) {
       procStep = "logging/reporting phase";
-      Filename hdump(hiconf.getMatrixSource("DumpHistoryFile",hiprof));
+      Filename hdump(hiconf.getMatrixSource("DumpHistoryFile", hiprof));
       string hdumpFile = hdump.Expanded();
       ofstream ofile(hdumpFile.c_str(), ios::out);
-      if (!ofile) {
-        string mess = "Unable to open/create history dump file " + 
+      if(!ofile) {
+        string mess = "Unable to open/create history dump file " +
                       hdump.Expanded();
         iException::Message(iException::User, mess, _FILEINFO_).Report();
       }
@@ -405,7 +409,7 @@ void IsisMain(){
 
         ofile << "/* " << hical_program << " application equation */" << endl
               << "/* hdn = (idn - Zd(Zf) - Zz - Zb) */"
-              << endl << "/* odn = hdn / Zg * Zgg * Za * Zt / Ziof */" 
+              << endl << "/* odn = hdn / Zg * Zgg * Za * Zt / Ziof */"
               << endl << endl;
 
         ofile << "****** PARAMETER GENERATION HISTORY *******" << endl;
@@ -425,7 +429,7 @@ void IsisMain(){
 
 //  Ensure the RadiometricCalibration group is out there
     const std::string rcalGroup("RadiometricCalibration");
-    if (!ocube->HasGroup(rcalGroup)) {
+    if(!ocube->HasGroup(rcalGroup)) {
       PvlGroup temp(rcalGroup);
       ocube->PutGroup(temp);
     }
@@ -433,8 +437,8 @@ void IsisMain(){
     PvlGroup &rcal = ocube->GetGroup(rcalGroup);
     rcal += PvlKeyword("Program", hical_program);
     rcal += PvlKeyword("RunTime", hical_runtime);
-    rcal += PvlKeyword("Version",hical_version);
-    rcal += PvlKeyword("Revision",hical_revision);
+    rcal += PvlKeyword("Version", hical_version);
+    rcal += PvlKeyword("Revision", hical_revision);
 
     PvlKeyword key("Conf", conf_file);
     key.AddCommentWrapped("/* " + hical_program + " application equation */");
@@ -445,7 +449,7 @@ void IsisMain(){
     //  Record parameter generation history.  Controllable in configuration
     //  file.  Note this is optional because of a BUG!! in the ISIS label
     //  writer as this application was initially developed
-    if ( IsEqual(ConfKey(hiprof,"LogParameterHistory",string("TRUE")),"TRUE")) { 
+    if(IsEqual(ConfKey(hiprof, "LogParameterHistory", string("TRUE")), "TRUE")) {
       rcal += ZfHist.makekey("Zf");
       rcal += ZdHist.makekey("Zd");
       rcal += ZzHist.makekey("Zz");
@@ -457,15 +461,15 @@ void IsisMain(){
     }
 
     p.EndProcess();
-  } 
-  catch (iException &ie) {
+  }
+  catch(iException &ie) {
     delete calVars;
     calVars = 0;
     string mess = "Failed in " + procStep;
     ie.Message(iException::User, mess.c_str(), _FILEINFO_);
     throw;
   }
-  
+
 // Clean up parameters
   delete calVars;
   calVars = 0;

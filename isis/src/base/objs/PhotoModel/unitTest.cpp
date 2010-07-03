@@ -9,22 +9,22 @@
 
 using namespace Isis;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
-  void doit(Pvl &lab);
+  void doit(Pvl & lab);
 
-  std::cout << "UNIT TEST for Isis::PhotoModel" << 
-      std::endl << std::endl;
+  std::cout << "UNIT TEST for Isis::PhotoModel" <<
+            std::endl << std::endl;
 
   std::cout << "Testing missing PhotometricModel object ..." <<
-      std::endl;
+            std::endl;
   Pvl lab;
   doit(lab);
 
   lab.AddObject(PvlObject("PhotometricModel"));
   std::cout << "Testing missing Algorithm group ..." <<
-      std::endl;
+            std::endl;
   doit(lab);
 
   lab.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
@@ -37,49 +37,49 @@ int main () {
   //    AddKeyword(PvlKeyword("Name","Bogus"));
   //std::cout << "Testing unsupported photometric model ..." << std::endl;
   //doit(lab);
-  
+
   lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-      AddKeyword(PvlKeyword("Name","Minnaert"), Pvl::Replace);
+  AddKeyword(PvlKeyword("Name", "Minnaert"), Pvl::Replace);
 
   std::cout << "Testing supported photometric model ..." << std::endl;
   doit(lab);
 
   lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-      AddKeyword(PvlKeyword("Name","Lambert"), Pvl::Replace);
+  AddKeyword(PvlKeyword("Name", "Lambert"), Pvl::Replace);
   PhotoModel *pm = PhotoModelFactory::Create(lab);
 
   std::cout << "Testing photometric model PhtTopder method ..." << std::endl;
   try {
     double result;
-    result = pm->PhtTopder(0.0,0.0,0.0);
+    result = pm->PhtTopder(0.0, 0.0, 0.0);
     std::cout << "Results from PhtTopder = " << result <<
-        std::endl << std::endl;
-    result = pm->PhtTopder(86.7226722,51.7002388,38.9414439);
+              std::endl << std::endl;
+    result = pm->PhtTopder(86.7226722, 51.7002388, 38.9414439);
     std::cout << "Results from PhtTopder = " << result <<
-        std::endl << std::endl;
+              std::endl << std::endl;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report(false);
   }
 
   std::cout << "Test PhtAcos ..." << std::endl;
   try {
-  double result;
+    double result;
 
-  result = PhotoModel::PhtAcos(1.0);
-  std::cout << "Results from PhtAcos = " << result << std::endl;             
-  std::cout << "        Actual value = " << 0      << std::endl
-      << std::endl;                                                           
-  result = PhotoModel::PhtAcos(.999999939);                        
-  std::cout << "Results from PhtAcos = " << result      << std::endl;
-  std::cout << "        Actual value = " << 0.000349285 << std::endl
-      << std::endl;                                                
-  result = PhotoModel::PhtAcos(-.861393443);
-  std::cout << "Results from PhtAcos = " << result      << std::endl;
-  std::cout << "        Actual value = " << 2.608802982 << std::endl
-      << std::endl;
+    result = PhotoModel::PhtAcos(1.0);
+    std::cout << "Results from PhtAcos = " << result << std::endl;
+    std::cout << "        Actual value = " << 0      << std::endl
+              << std::endl;
+    result = PhotoModel::PhtAcos(.999999939);
+    std::cout << "Results from PhtAcos = " << result      << std::endl;
+    std::cout << "        Actual value = " << 0.000349285 << std::endl
+              << std::endl;
+    result = PhotoModel::PhtAcos(-.861393443);
+    std::cout << "Results from PhtAcos = " << result      << std::endl;
+    std::cout << "        Actual value = " << 2.608802982 << std::endl
+              << std::endl;
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 
@@ -93,7 +93,7 @@ void doit(Pvl &lab) {
     //PhotoModel *pm = PhotoModelFactory::Create(lab);
     PhotoModelFactory::Create(lab);
   }
-  catch (iException &error) {
+  catch(iException &error) {
     error.Report(false);
   }
   std::cout << std::endl;

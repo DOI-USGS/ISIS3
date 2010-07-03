@@ -3,7 +3,7 @@
 #include "TableRecord.h"
 #include "Table.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 extern int gapCount[6];
@@ -15,11 +15,11 @@ extern int validCount[6];
 extern int section;
 
 // Construct a BLOb to contain the Hirise main line suffix and prefix data
-void SaveHiriseAncillaryData (ProcessImportPds &process, Cube *ocube) {
+void SaveHiriseAncillaryData(ProcessImportPds &process, Cube *ocube) {
 
-  vector<int> ConvertCalibrationPixels (int samples,
-                                        Isis::PixelType pixelType,
-                                        unsigned char *data);
+  vector<int> ConvertCalibrationPixels(int samples,
+                                       Isis::PixelType pixelType,
+                                       unsigned char * data);
 
 
   // Setup a Table to hold the main image prefix/suffix data
@@ -35,7 +35,7 @@ void SaveHiriseAncillaryData (ProcessImportPds &process, Cube *ocube) {
   rec += dark;
 
   Table table("HiRISE Ancillary", rec);
-  table.SetAssociation (Table::Lines);
+  table.SetAssociation(Table::Lines);
 
   // Loop through all the prefix and suffix data and construct the table records
   // In the case of HiRISE there is only one band so the outside vector
@@ -50,7 +50,7 @@ void SaveHiriseAncillaryData (ProcessImportPds &process, Cube *ocube) {
   progress.SetMaximumSteps(prefix.size());
   progress.CheckStatus();
 
-  for (unsigned int l=0; l<prefix.size(); l++) {
+  for(unsigned int l = 0; l < prefix.size(); l++) {
 
     unsigned char *linePrefix = (unsigned char *)(prefix[l]);
 
@@ -68,14 +68,14 @@ void SaveHiriseAncillaryData (ProcessImportPds &process, Cube *ocube) {
     // from the image prefix area
     linePrefix += 6;
     section = 3;
-    rec[2] = ConvertCalibrationPixels (12, process.PixelType(),linePrefix);
+    rec[2] = ConvertCalibrationPixels(12, process.PixelType(), linePrefix);
     linePrefix += 12 * SizeOf(process.PixelType());
 
     // Pull the 16 dark pixels (same type as image data)
     // from the image suffix area
     unsigned char *lineSuffix = (unsigned char *)(suffix[l]);
     section = 5;
-    rec[3] = ConvertCalibrationPixels (16, process.PixelType(),lineSuffix);
+    rec[3] = ConvertCalibrationPixels(16, process.PixelType(), lineSuffix);
     lineSuffix += 16 * SizeOf(process.PixelType());
 
     // Add this record to the table

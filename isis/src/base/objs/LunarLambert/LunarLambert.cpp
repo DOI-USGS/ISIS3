@@ -2,14 +2,14 @@
 #include "LunarLambert.h"
 
 namespace Isis {
-  LunarLambert::LunarLambert (Pvl &pvl) : PhotoModel(pvl) {
+  LunarLambert::LunarLambert(Pvl &pvl) : PhotoModel(pvl) {
     PvlGroup &algo = pvl.FindObject("PhotometricModel")
-                     .FindGroup("Algorithm",Pvl::Traverse);
+                     .FindGroup("Algorithm", Pvl::Traverse);
     // Set default value
     SetPhotoL(1.0);
 
     // Get value from user
-    if (algo.HasKeyword("L")) SetPhotoL(algo["L"]);
+    if(algo.HasKeyword("L")) SetPhotoL(algo["L"]);
   }
 
   /**
@@ -22,34 +22,37 @@ namespace Isis {
    *
    * @param l  Lunar-Lambert function weight, default is 1.0
    */
-  void LunarLambert::SetPhotoL (const double l) {
+  void LunarLambert::SetPhotoL(const double l) {
     p_photoL = l;
   }
 
-  double LunarLambert::PhotoModelAlgorithm (double phase, double incidence,
-        double emission) {
+  double LunarLambert::PhotoModelAlgorithm(double phase, double incidence,
+      double emission) {
     double pht_lunlam;
     double incrad = incidence * Isis::PI / 180.0;
     double emarad = emission * Isis::PI / 180.0;
     double munot = cos(incrad);
     double mu = cos(emarad);
 
-    if (munot <= 0.0 || mu <= 0.0 || incidence == 90.0 ||
+    if(munot <= 0.0 || mu <= 0.0 || incidence == 90.0 ||
         emission == 90.0) {
       pht_lunlam = 0.0;
-    } else if (p_photoL == 0.0) {
+    }
+    else if(p_photoL == 0.0) {
       pht_lunlam = munot;
-    } else if (p_photoL == 1.0) {
+    }
+    else if(p_photoL == 1.0) {
       pht_lunlam = 2.0 * munot / (munot + mu);
-    } else {
+    }
+    else {
       pht_lunlam = munot * ((1.0 - p_photoL) + 2.0 *
-                   p_photoL / (munot + mu));
+                            p_photoL / (munot + mu));
     }
 
     return pht_lunlam;
   }
 }
 
-extern "C" Isis::PhotoModel *LunarLambertPlugin (Isis::Pvl &pvl) {
+extern "C" Isis::PhotoModel *LunarLambertPlugin(Isis::Pvl &pvl) {
   return new Isis::LunarLambert(pvl);
 }

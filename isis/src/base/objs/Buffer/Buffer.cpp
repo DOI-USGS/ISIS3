@@ -98,7 +98,7 @@ namespace Isis {
    *
    * @return the current Buffer
    */
-  Buffer & Buffer::operator=(const double &d) {
+  Buffer &Buffer::operator=(const double &d) {
     for(int i = 0 ; i < p_npixels ; i++) {
       p_buf[i] = d;
     }

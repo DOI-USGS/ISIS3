@@ -6,7 +6,7 @@
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
 namespace Isis {
-  Albedo::Albedo (Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl,pmodel) {
+  Albedo::Albedo(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {
     PvlGroup &algorithm = pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse);
 
     SetNormIncref(0.0);
@@ -15,19 +15,19 @@ namespace Isis {
     SetNormAlbedo(1.0);
 
     // Get value from user
-    if (algorithm.HasKeyword("Incref")) {
+    if(algorithm.HasKeyword("Incref")) {
       SetNormIncref(algorithm["Incref"]);
     }
 
-    if (algorithm.HasKeyword("Incmat")) {
+    if(algorithm.HasKeyword("Incmat")) {
       SetNormIncmat(algorithm["Incmat"]);
     }
 
-    if (algorithm.HasKeyword("Thresh")) {
+    if(algorithm.HasKeyword("Thresh")) {
       SetNormThresh(algorithm["Thresh"]);
     }
 
-    if (algorithm.HasKeyword("Albedo")) {
+    if(algorithm.HasKeyword("Albedo")) {
       SetNormAlbedo(algorithm["Albedo"]);
     }
 
@@ -37,10 +37,9 @@ namespace Isis {
     GetPhotoModel()->SetStandardConditions(false);
   }
 
-  void Albedo::NormModelAlgorithm (double phase, double incidence,
-      double emission, double dn, double &albedo, double &mult,
-      double &base)
-  {
+  void Albedo::NormModelAlgorithm(double phase, double incidence,
+                                  double emission, double dn, double &albedo, double &mult,
+                                  double &base) {
     double psurf;
     double result;
 
@@ -48,40 +47,40 @@ namespace Isis {
     psurf = GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
 
     // thresh is a parameter limiting how much we amplify the dns
-    if (p_normPsurfref > psurf*p_normThresh) {
+    if(p_normPsurfref > psurf * p_normThresh) {
       result = NULL8;
       albedo = NULL8;
       mult = 0.0;
       base = 0.0;
     }
     else {
-      if (psurf == 0.0) {
+      if(psurf == 0.0) {
         std::string msg = "Divide by zero error";
-        throw iException::Message(iException::Math,msg,_FILEINFO_);
+        throw iException::Message(iException::Math, msg, _FILEINFO_);
       }
       else {
         result = dn * p_normPsurfref / psurf;
-	albedo = result;
-	mult = p_normPsurfref / psurf;
-	base = 0.0;
+        albedo = result;
+        mult = p_normPsurfref / psurf;
+        base = 0.0;
       }
     }
   }
 
- /**
-   * Set the normalization function parameter. This is the
-   * reference incidence angle to which the image photometry will
-   * be normalized. This parameter is limited to values that are
-   * >=0 and <90.
-   * 
-   * @param incref  Normalization function parameter, default
-   *                is 0.0
-   */
-  void Albedo::SetNormIncref (const double incref) {
-    if (incref < 0.0 || incref >= 90.0) {
+  /**
+    * Set the normalization function parameter. This is the
+    * reference incidence angle to which the image photometry will
+    * be normalized. This parameter is limited to values that are
+    * >=0 and <90.
+    *
+    * @param incref  Normalization function parameter, default
+    *                is 0.0
+    */
+  void Albedo::SetNormIncref(const double incref) {
+    if(incref < 0.0 || incref >= 90.0) {
       std::string msg = "Invalid value of normalization incref [" +
-          iString(incref) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+                        iString(incref) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_normIncref = incref;
   }
@@ -92,11 +91,11 @@ namespace Isis {
    *
    * @param incmat  Normalization function parameter, default is 0.0
    */
-  void Albedo::SetNormIncmat (const double incmat) {
-    if (incmat < 0.0 || incmat >= 90.0) {
+  void Albedo::SetNormIncmat(const double incmat) {
+    if(incmat < 0.0 || incmat >= 90.0) {
       std::string msg = "Invalid value of normalization incmat [" +
-          iString(incmat) + "]";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+                        iString(incmat) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_normIncmat = incmat;
   }
@@ -109,7 +108,7 @@ namespace Isis {
    *
    * @param albedo  Normalization function parameter
    */
-  void Albedo::SetNormAlbedo (const double albedo) {
+  void Albedo::SetNormAlbedo(const double albedo) {
     p_normAlbedo = albedo;
   }
 
@@ -127,11 +126,11 @@ namespace Isis {
    * @param thresh  Normalization function parameter, default
    *                is 30.0
    */
-  void Albedo::SetNormThresh (const double thresh) {
+  void Albedo::SetNormThresh(const double thresh) {
     p_normThresh = thresh;
   }
 }
 
-extern "C" Isis::NormModel *AlbedoPlugin (Isis::Pvl &pvl, Isis::PhotoModel &pmodel) {
-  return new Isis::Albedo(pvl,pmodel);
+extern "C" Isis::NormModel *AlbedoPlugin(Isis::Pvl &pvl, Isis::PhotoModel &pmodel) {
+  return new Isis::Albedo(pvl, pmodel);
 }

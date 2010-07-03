@@ -9,15 +9,14 @@ using namespace std;
 
 void TestLineSamp(Isis::Camera *cam, double samp, double line);
 
-int main (void)
-{
+int main(void) {
   Isis::Preference::Preferences(true);
 
   cout << "Unit Test for HiriseCamera..." << endl;
   /** HIRISE: The line,samp to lat,lon to line,samp tolerance was increased for this
    *  camera model test.
    */
-  try{
+  try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
@@ -29,7 +28,7 @@ int main (void)
     Isis::Pvl p("$mro/testData/PSP_001446_1790_BG12_0.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
     cout << setprecision(9);
-   
+
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
     TestLineSamp(cam, 1.0, 1.0);
@@ -47,7 +46,7 @@ int main (void)
     double line = cam->Lines() / 2;
     cout << "For center pixel position ..." << endl;
 
-    if(!cam->SetImage(samp,line)) {
+    if(!cam->SetImage(samp, line)) {
       std::cout << "ERROR" << std::endl;
       return 0;
     }
@@ -66,13 +65,13 @@ int main (void)
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
   }
-  catch (Isis::iException &e) {
+  catch(Isis::iException &e) {
     e.Report();
   }
 }
 
 void TestLineSamp(Isis::Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp,line);
+  bool success = cam->SetImage(samp, line);
 
   if(success) {
     success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
@@ -81,8 +80,8 @@ void TestLineSamp(Isis::Camera *cam, double samp, double line) {
   if(success) {
     double deltaSamp = samp - cam->Sample();
     double deltaLine = line - cam->Line();
-    if (fabs(deltaSamp) < 0.08) deltaSamp = 0;
-    if (fabs(deltaLine) < 0.08) deltaLine = 0;
+    if(fabs(deltaSamp) < 0.08) deltaSamp = 0;
+    if(fabs(deltaLine) < 0.08) deltaLine = 0;
     cout << "DeltaSample = " << deltaSamp << endl;
     cout << "DeltaLine = " << deltaLine << endl << endl;
   }

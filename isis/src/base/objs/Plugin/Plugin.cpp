@@ -32,25 +32,25 @@
 using namespace std;
 namespace Isis {
   //! Constructs a Plugin object.
-  Plugin::Plugin () : Isis::Pvl() {
+  Plugin::Plugin() : Isis::Pvl() {
   }
 
-/**
- * This method returns a void pointer to a C function (i.e., the plugin) It
- * does this by looking in itself (Pvl) for the keyword LIBRARY and the
- * keyword ROUTINE.  When you write this function make sure to place extern
- * "C" infront of it to eliminate C++ symbol mangling.
- *
- * @param group The group name.
- *
- * @return A void pointer to a C function (i.e., the plugin) 
- *  
- * @history 2010-03-16  Tracie Sucharski,  Added paths to plugin.  First 
- *                            try to load from current working directory,
- *                            then from $ISISROOT/lib.
- */
-  void *Plugin::GetPlugin (const std::string &group) {
-  // Get the library and plugin to load
+  /**
+   * This method returns a void pointer to a C function (i.e., the plugin) It
+   * does this by looking in itself (Pvl) for the keyword LIBRARY and the
+   * keyword ROUTINE.  When you write this function make sure to place extern
+   * "C" infront of it to eliminate C++ symbol mangling.
+   *
+   * @param group The group name.
+   *
+   * @return A void pointer to a C function (i.e., the plugin)
+   *
+   * @history 2010-03-16  Tracie Sucharski,  Added paths to plugin.  First
+   *                            try to load from current working directory,
+   *                            then from $ISISROOT/lib.
+   */
+  void *Plugin::GetPlugin(const std::string &group) {
+    // Get the library and plugin to load
     Isis::PvlGroup &g = FindGroup(group);
     string library = g["Library"];
 
@@ -64,24 +64,24 @@ namespace Isis {
     // so the scope of lib does not matter.
     QLibrary lib(libraryFile.Expanded().c_str());
     bool loadedOk = lib.load();
-    if (!loadedOk) {
+    if(!loadedOk) {
       path = "$ISISROOT/lib/";
       libraryFile = path + library;
     }
     lib.setFileName(libraryFile.Expanded().c_str());
 
     void *plugin = lib.resolve(pluginName.c_str());
-    if (plugin == 0) {
+    if(plugin == 0) {
       string msg = "Unable to find plugin [" + pluginName +
                    "] in shared library [" + lib.fileName().toStdString() + "]";
-      throw Isis::iException::Message(Isis::iException::System,msg,_FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
     }
 
     return plugin;
   }
 } // end namespace isis
 
-extern "C" int *PluginPlugin () {
+extern "C" int *PluginPlugin() {
   cout << "Hello world" << endl;
   static int k = 5;
   return &k;

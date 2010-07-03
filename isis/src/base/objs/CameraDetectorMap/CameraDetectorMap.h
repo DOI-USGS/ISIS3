@@ -45,7 +45,7 @@ namespace Isis {
    */
   class CameraDetectorMap {
     public:
-      CameraDetectorMap(Camera *parent=0);
+      CameraDetectorMap(Camera *parent = 0);
 
       //! Destructor
       virtual ~CameraDetectorMap() {};
@@ -55,16 +55,24 @@ namespace Isis {
       virtual bool SetDetector(const double sample, const double line);
 
       //! Return parent sample
-      inline double ParentSample() const { return p_parentSample; };
+      inline double ParentSample() const {
+        return p_parentSample;
+      };
 
       //! Return parent line
-      inline double ParentLine() const { return p_parentLine; };
+      inline double ParentLine() const {
+        return p_parentLine;
+      };
 
       //! Return detector sample
-      inline double DetectorSample() const { return p_detectorSample; };
+      inline double DetectorSample() const {
+        return p_detectorSample;
+      };
 
       //! Return detector line
-      inline double DetectorLine() const { return p_detectorLine; };
+      inline double DetectorLine() const {
+        return p_detectorLine;
+      };
 
       /** Set the starting detector sample
        *
@@ -74,7 +82,7 @@ namespace Isis {
        * @param sample Starting detector sample
        *
        */
-      inline void SetStartingDetectorSample (const double sample) {
+      inline void SetStartingDetectorSample(const double sample) {
         p_startingDetectorSample = sample;
         Compute();
       };
@@ -87,7 +95,7 @@ namespace Isis {
        * @param line Starting detector line
        *
        */
-      inline void SetStartingDetectorLine (const double line) {
+      inline void SetStartingDetectorLine(const double line) {
         p_startingDetectorSample = line;
         Compute();
       };
@@ -101,7 +109,7 @@ namespace Isis {
        * @param summing Sample summing mode
        *
        */
-      inline void SetDetectorSampleSumming (const double summing) {
+      inline void SetDetectorSampleSumming(const double summing) {
         p_detectorSampleSumming = summing;
         Compute();
       };
@@ -115,23 +123,25 @@ namespace Isis {
        * @param summing Line summing mode
        *
        */
-      inline void SetDetectorLineSumming (const double summing) {
+      inline void SetDetectorLineSumming(const double summing) {
         p_detectorLineSumming = summing;
         Compute();
       };
 
       //! Return scaling factor for computing sample resolution
-      virtual double SampleScaleFactor () const {
+      virtual double SampleScaleFactor() const {
         return p_detectorSampleSumming;
       };
 
       //! Return scaling factor for computing line resolution
-      virtual double LineScaleFactor () const {
+      virtual double LineScaleFactor() const {
         return p_detectorLineSumming;
       };
 
       //! Return the line collection rate (0 for framing cameras)
-      virtual double LineRate () const { return 0.0; };
+      virtual double LineRate() const {
+        return 0.0;
+      };
     protected:
       Camera *p_camera;
 

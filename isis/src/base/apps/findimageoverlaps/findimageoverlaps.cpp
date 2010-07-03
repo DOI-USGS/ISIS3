@@ -44,15 +44,15 @@ void IsisMain() {
   overlaps.FindImageOverlaps(serialNumbers);
 
   // Error if the overlaps are empty
-  if( overlaps.Size() == serialNumbers.Size() ) {
+  if(overlaps.Size() == serialNumbers.Size()) {
     std::cerr << "No Overlaps Calculated" << std::endl;
     string msg = "No overlaps were calculated from the input cubes in the [FROMLIST].";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   overlaps.WriteImageOverlaps(Filename(ui.GetFilename("TO")).Expanded());
 
-  // This will only occur when "CONTINUE" was true, so we can assume "ERRORS" was 
+  // This will only occur when "CONTINUE" was true, so we can assume "ERRORS" was
   //   an entered parameter.
   if(overlaps.Errors().size() != 0 && ui.WasEntered("ERRORS")) {
     Pvl outFile;

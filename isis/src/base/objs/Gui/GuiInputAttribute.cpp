@@ -36,20 +36,20 @@
 
 namespace Isis {
   //! Convenience access to dialog
-  int GuiInputAttribute::GetAttributes (const std::string &defaultAttribute,
-                                        std::string &newAttribute,
-                                        const std::string &title,
-                                        QWidget *parent) {
+  int GuiInputAttribute::GetAttributes(const std::string &defaultAttribute,
+                                       std::string &newAttribute,
+                                       const std::string &title,
+                                       QWidget *parent) {
     // Construct dialog if necessary
     static GuiInputAttribute *p_dialog = 0;
-    if (p_dialog == 0) {
-      p_dialog = new GuiInputAttribute (parent);
+    if(p_dialog == 0) {
+      p_dialog = new GuiInputAttribute(parent);
     }
     p_dialog->setWindowTitle(title.c_str());
 
     // Load default attributes and then get the new ones
     p_dialog->SetAttributes(defaultAttribute);
-    if (p_dialog->exec() == QDialog::Accepted) {
+    if(p_dialog->exec() == QDialog::Accepted) {
       newAttribute = p_dialog->GetAttributes();
       return 1;
     }
@@ -58,7 +58,7 @@ namespace Isis {
   }
 
   //! Constuctor
-  GuiInputAttribute::GuiInputAttribute (QWidget *parent) : QDialog (parent) {
+  GuiInputAttribute::GuiInputAttribute(QWidget *parent) : QDialog(parent) {
     // Create the two radio buttons
     QRadioButton *allBands = new QRadioButton("&All Bands");
     allBands->setToolTip("Select all bands from the input cube");
@@ -73,21 +73,21 @@ namespace Isis {
     p_buttonGroup->setExclusive(true);
 
     // Create the text field for list toggle button
-    p_lineEdit = new QLineEdit ();
+    p_lineEdit = new QLineEdit();
     connect(allBands, SIGNAL(toggled(bool)), p_lineEdit, SLOT(setDisabled(bool)));
     allBands->setChecked(true);
 
     // Put the buttons and text field in a gridlayout
-    QGridLayout *gridLayout = new QGridLayout ();
-    gridLayout->addWidget(allBands,0,0);
-    gridLayout->addWidget(listBands,1,0);
+    QGridLayout *gridLayout = new QGridLayout();
+    gridLayout->addWidget(allBands, 0, 0);
+    gridLayout->addWidget(listBands, 1, 0);
     gridLayout->addWidget(p_lineEdit, 1, 1);
 
     // Create the action buttons
-    QPushButton *okButton = new QPushButton ("Ok");
+    QPushButton *okButton = new QPushButton("Ok");
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 
-    QPushButton* cancelButton = new QPushButton ("Cancel");
+    QPushButton *cancelButton = new QPushButton("Cancel");
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 #if 0
@@ -110,16 +110,16 @@ namespace Isis {
 
 
   // Destructor
-  GuiInputAttribute::~GuiInputAttribute () {}
+  GuiInputAttribute::~GuiInputAttribute() {}
 
 
   // Return the attributes in the dialog
-  std::string GuiInputAttribute::GetAttributes () {
-    if (p_lineEdit->isEnabled()) {
+  std::string GuiInputAttribute::GetAttributes() {
+    if(p_lineEdit->isEnabled()) {
       Isis::iString s = p_lineEdit->text().toStdString();
       s.Remove(" ");
       s.Trim("+");
-      if (s == "") return s;
+      if(s == "") return s;
       return (std::string)"+" + s;
     }
     else {
@@ -128,10 +128,10 @@ namespace Isis {
   }
 
   // Set the attributes in the dialog
-  void GuiInputAttribute::SetAttributes (const std::string &value) {
+  void GuiInputAttribute::SetAttributes(const std::string &value) {
     Isis::CubeAttributeInput att(value);
     std::vector<std::string> bands = att.Bands();
-    if (bands.size() == 0) {
+    if(bands.size() == 0) {
       p_buttonGroup->buttons()[0]->setChecked(true);
       p_lineEdit->setText("");
     }

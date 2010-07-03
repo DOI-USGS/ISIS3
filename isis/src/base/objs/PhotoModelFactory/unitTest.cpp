@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int main () {
+int main() {
   Isis::Preference::Preferences(true);
 
   cout << "All testing deferred to PhotoModel and it's extended classes." << endl;

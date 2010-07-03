@@ -15,11 +15,11 @@
 namespace Qisis {
   /**
    * TrackTool constructor
-   * 
-   * 
-   * @param parent 
+   *
+   *
+   * @param parent
    */
-  TrackTool::TrackTool (QStatusBar *parent) : Tool(parent) {
+  TrackTool::TrackTool(QStatusBar *parent) : Tool(parent) {
     p_sbar = parent;
 
     p_sampLabel = new QLabel(p_sbar);
@@ -75,8 +75,8 @@ namespace Qisis {
     p_bluLabel->setToolTip("Blue Pixel Value");
     p_sbar->addPermanentWidget(p_bluLabel);
 
-    mWarningWidget = new Qisis::WarningWidget(p_sbar);    
-    connect(p_sbar, SIGNAL(messageChanged (const QString &)),mWarningWidget, SLOT(checkMessage()));
+    mWarningWidget = new Qisis::WarningWidget(p_sbar);
+    connect(p_sbar, SIGNAL(messageChanged(const QString &)), mWarningWidget, SLOT(checkMessage()));
 
     clearLabels();
 
@@ -84,40 +84,37 @@ namespace Qisis {
   }
 
   /**
-   * Display the Warning icon in case of an exception, sent from 
-   * the tool where the exception occured 
-   *  
-   * @param pStr   - Topmost Exception Message String 
-   * @param pExStr - Propagated exception message string 
-   */	  
-  void TrackTool::displayWarning(std::string & pStr,  const std::string  & pExStr) 
-  {    
+   * Display the Warning icon in case of an exception, sent from
+   * the tool where the exception occured
+   *
+   * @param pStr   - Topmost Exception Message String
+   * @param pExStr - Propagated exception message string
+   */
+  void TrackTool::displayWarning(std::string &pStr,  const std::string   &pExStr) {
     mWarningWidget->viewWarningWidgetIcon(pStr, pExStr);
   }
 
-  /** 
-   * Resets the warning status on the status bar to default 
-   */ 
-  void TrackTool::resetStatusWarning(void)
-  {
-    if (mWarningWidget != NULL) {
+  /**
+   * Resets the warning status on the status bar to default
+   */
+  void TrackTool::resetStatusWarning(void) {
+    if(mWarningWidget != NULL) {
       mWarningWidget->resetWarning();
     }
   }
 
   /**
    * Updates the labels anytime the mouse moves.
-   * 
-   * 
-   * @param p 
+   *
+   *
+   * @param p
    */
   void TrackTool::mouseMove(QPoint p) {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) return;
-  
+    if(cvp == NULL) return;
+
     if(p.x() > 0 && p.x() < cvp->width() &&
-       p.y() > 0 && p.y() < cvp->height())
-    {
+        p.y() > 0 && p.y() < cvp->height()) {
       updateLabels(p);
     }
   }
@@ -125,7 +122,7 @@ namespace Qisis {
 
   /**
    * Clears the labels if the mouse leaves the application.
-   * 
+   *
    */
   void TrackTool::mouseLeave() {
     clearLabels();
@@ -134,44 +131,44 @@ namespace Qisis {
 
   /**
    * Updates the tracking labels.
-   * 
-   * 
-   * @param p 
+   *
+   *
+   * @param p
    */
-  void TrackTool::updateLabels (QPoint p) {
+  void TrackTool::updateLabels(QPoint p) {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) {
+    if(cvp == NULL) {
       clearLabels();
       return;
     }
 
-    double sample,line;
-    cvp->viewportToCube(p.x(),p.y(),sample,line);
-    if ((sample < 0.5) || (line < 0.5) ||
-        (sample > cvp->cubeSamples()+0.5) ||
-        (line > cvp->cubeLines()+0.5)) {
+    double sample, line;
+    cvp->viewportToCube(p.x(), p.y(), sample, line);
+    if((sample < 0.5) || (line < 0.5) ||
+        (sample > cvp->cubeSamples() + 0.5) ||
+        (line > cvp->cubeLines() + 0.5)) {
       clearLabels();
       return;
     }
 
-    int isamp = (int) (sample + 0.5);
+    int isamp = (int)(sample + 0.5);
     QString text;
     text.setNum(isamp);
     text = "S " + text;
     p_sampLabel->setText(text);
 
-    int iline = (int) (line + 0.5);
+    int iline = (int)(line + 0.5);
     text.setNum(iline);
     text = "L " + text;
     p_lineLabel->setText(text);
 
 
     // Do we have a projection?
-    if (cvp->projection() != NULL) {
+    if(cvp->projection() != NULL) {
       p_latLabel->show();
       p_lonLabel->show();
 
-      if (cvp->projection()->SetWorld(sample,line)) {
+      if(cvp->projection()->SetWorld(sample, line)) {
         double lat = cvp->projection()->Latitude();
         double lon = cvp->projection()->Longitude();
         p_latLabel->setText(QString("Lat %1").arg(lat));
@@ -183,11 +180,11 @@ namespace Qisis {
       }
     }
     // Do we have a camera model?
-    else if (cvp->camera() != NULL) {
+    else if(cvp->camera() != NULL) {
       p_latLabel->show();
       p_lonLabel->show();
 
-      if (cvp->camera()->SetImage(sample,line)) {
+      if(cvp->camera()->SetImage(sample, line)) {
         double lat = cvp->camera()->UniversalLatitude();
         double lon = cvp->camera()->UniversalLongitude();
         p_latLabel->setText(QString("Lat %1").arg(lat));
@@ -203,14 +200,14 @@ namespace Qisis {
       p_latLabel->hide();
       p_lonLabel->hide();
     }
-    
-    if (cvp->isGray()) {
+
+    if(cvp->isGray()) {
       p_grayLabel->show();
       p_redLabel->hide();
       p_grnLabel->hide();
       p_bluLabel->hide();
 
-      ViewportBuffer * grayBuf = cvp->grayBuffer();
+      ViewportBuffer *grayBuf = cvp->grayBuffer();
 
       if(grayBuf->working()) {
         p_grayLabel->setText("BUSY");
@@ -219,12 +216,11 @@ namespace Qisis {
         const QRect rect(grayBuf->bufferXYRect());
 
         if(p.x() >= 0 && p.x() < rect.right() &&
-           p.y() >= 0 && p.y() < rect.bottom())
-        {
+            p.y() >= 0 && p.y() < rect.bottom()) {
           const int bufX = p.x() - rect.left();
           const int bufY = p.y() - rect.top();
           QString pixelString = Isis::iString(Isis::PixelToString(
-              grayBuf->getLine(bufY)[bufX])).ToQt();
+                                                grayBuf->getLine(bufY)[bufX])).ToQt();
           p_grayLabel->setText(pixelString);
         }
       }
@@ -234,8 +230,8 @@ namespace Qisis {
       p_redLabel->show();
       p_grnLabel->show();
       p_bluLabel->show();
-      
-      ViewportBuffer * redBuf = cvp->redBuffer();
+
+      ViewportBuffer *redBuf = cvp->redBuffer();
 
       if(redBuf->working()) {
         p_grayLabel->setText("BUSY");
@@ -244,18 +240,17 @@ namespace Qisis {
         const QRect rRect = redBuf->bufferXYRect();
 
         if(p.x() >= 0 && p.x() < rRect.right() &&
-           p.y() >= 0 && p.y() < rRect.bottom())
-        {
+            p.y() >= 0 && p.y() < rRect.bottom()) {
           const int rBufX = p.x() - rRect.left();
           const int rBufY = p.y() - rRect.top();
           QString rLab = "R ";
           rLab += Isis::iString(Isis::PixelToString(
-              redBuf->getLine(rBufY)[rBufX])).ToQt();
+                                  redBuf->getLine(rBufY)[rBufX])).ToQt();
           p_redLabel->setText(rLab);
         }
       }
-      
-      ViewportBuffer * greenBuf = cvp->greenBuffer();
+
+      ViewportBuffer *greenBuf = cvp->greenBuffer();
 
       if(greenBuf->working()) {
         p_grayLabel->setText("BUSY");
@@ -264,18 +259,17 @@ namespace Qisis {
         const QRect gRect = greenBuf->bufferXYRect();
 
         if(p.x() >= 0 && p.x() < gRect.right() &&
-           p.y() >= 0 && p.y() < gRect.bottom())
-        {
+            p.y() >= 0 && p.y() < gRect.bottom()) {
           const int gBufX = p.x() - gRect.left();
           const int gBufY = p.y() - gRect.top();
           QString gLab = "G ";
           gLab += Isis::iString(Isis::PixelToString(
-              greenBuf->getLine(gBufY)[gBufX])).ToQt();
+                                  greenBuf->getLine(gBufY)[gBufX])).ToQt();
           p_grnLabel->setText(gLab);
         }
       }
 
-      ViewportBuffer * blueBuf = cvp->blueBuffer();
+      ViewportBuffer *blueBuf = cvp->blueBuffer();
 
       if(blueBuf->working()) {
         p_grayLabel->setText("BUSY");
@@ -284,13 +278,12 @@ namespace Qisis {
         const QRect bRect = blueBuf->bufferXYRect();
 
         if(p.x() >= 0 && p.x() < bRect.right() &&
-           p.y() >= 0 && p.y() < bRect.bottom())
-        {
+            p.y() >= 0 && p.y() < bRect.bottom()) {
           const int bBufX = p.x() - bRect.left();
           const int bBufY = p.y() - bRect.top();
           QString bLab = "B ";
           bLab += Isis::iString(Isis::PixelToString(
-              blueBuf->getLine(bBufY)[bBufX])).ToQt();
+                                  blueBuf->getLine(bBufY)[bBufX])).ToQt();
           p_bluLabel->setText(bLab);
         }
       }
@@ -300,9 +293,9 @@ namespace Qisis {
 
   /**
    * Clears the labels.
-   * 
+   *
    */
-  void TrackTool::clearLabels () {
+  void TrackTool::clearLabels() {
     p_sampLabel->setText("S n/a");
     p_lineLabel->setText("L n/a");
     p_latLabel->setText("Lat n/a");
@@ -316,45 +309,44 @@ namespace Qisis {
 
   /**
    * Finds the cursor position.
-   * 
+   *
    */
-  void TrackTool::locateCursor () {
-    if (cubeViewport() == NULL) return;
+  void TrackTool::locateCursor() {
+    if(cubeViewport() == NULL) return;
     QPoint p = cubeViewport()->viewport()->mapFromGlobal(QCursor::pos());
-    if (p.x() < 0) return;
-    if (p.y() < 0) return;
-    if (p.x() >= cubeViewport()->viewport()->width()) return;
-    if (p.y() >= cubeViewport()->viewport()->height()) return;
+    if(p.x() < 0) return;
+    if(p.y() < 0) return;
+    if(p.x() >= cubeViewport()->viewport()->width()) return;
+    if(p.y() >= cubeViewport()->viewport()->height()) return;
     updateLabels(p);
   }
 
 
   /**
    * Adds the connections to the given viewport.
-   * 
-   * 
-   * @param cvp 
+   *
+   *
+   * @param cvp
    */
-  void TrackTool::addConnections (MdiCubeViewport *cvp) {
-    connect(cubeViewport(),SIGNAL(viewportUpdated()),
-            this,SLOT(locateCursor()));
+  void TrackTool::addConnections(MdiCubeViewport *cvp) {
+    connect(cubeViewport(), SIGNAL(viewportUpdated()),
+            this, SLOT(locateCursor()));
   }
 
 
   /**
    * Removes the connections from the given viewport.
-   * 
-   * 
-   * @param cvp 
+   *
+   *
+   * @param cvp
    */
-  void TrackTool::removeConnections (MdiCubeViewport *cvp) {
-    disconnect(cubeViewport(),SIGNAL(viewportUpdated()),
-               this,SLOT(locateCursor()));
+  void TrackTool::removeConnections(MdiCubeViewport *cvp) {
+    disconnect(cubeViewport(), SIGNAL(viewportUpdated()),
+               this, SLOT(locateCursor()));
   }
-  
-  
-  QStatusBar * TrackTool::getStatusBar(void)
-  {
+
+
+  QStatusBar *TrackTool::getStatusBar(void) {
     return p_sbar;
   }
 }

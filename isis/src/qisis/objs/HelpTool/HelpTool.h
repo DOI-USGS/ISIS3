@@ -24,29 +24,31 @@
 #include "Tool.h"
 
 namespace Qisis {
-   /**
-   * @brief Qisis Help Tool
-   *
-   * @ingroup Visualization Tools
-   *
-   * @author Jeff Anderson
-   *
-   * @internal @history 2007-06-12 Tracie Sucharski - Added aboutProgram method
-   * 
-   */
- class HelpTool : public Tool {
-    Q_OBJECT
+  /**
+  * @brief Qisis Help Tool
+  *
+  * @ingroup Visualization Tools
+  *
+  * @author Jeff Anderson
+  *
+  * @internal @history 2007-06-12 Tracie Sucharski - Added aboutProgram method
+  *
+  */
+  class HelpTool : public Tool {
+      Q_OBJECT
 
     public:
-      HelpTool (QWidget *parent);
-      void addTo (QMenu *menu);
-      void addToPermanent (QToolBar *perm);
+      HelpTool(QWidget *parent);
+      void addTo(QMenu *menu);
+      void addToPermanent(QToolBar *perm);
 
     public slots:
       void whatsThis();
 
     protected:
-      QString menuName() const { return "&Help"; };
+      QString menuName() const {
+        return "&Help";
+      };
 
     private:
       QAction *p_whatsThis;

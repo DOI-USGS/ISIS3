@@ -6,10 +6,10 @@
 #include "Statistics.h"
 #include "MultivariateStatistics.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
-void FindGaps ( Buffer &in );
+void FindGaps(Buffer &in);
 
 // The Correlation Tollerance variable
 double corTol;
@@ -27,7 +27,7 @@ void IsisMain() {
   ProcessByLine p;
 
   // Setup the input cube and lastLine array
-  Cube *icube = p.SetInputCube( "FROM" );
+  Cube *icube = p.SetInputCube("FROM");
   previousLine.resize(icube->Samples());
   lineNum = icube->Lines();
 
@@ -36,12 +36,12 @@ void IsisMain() {
   corTol = ui.GetDouble("CORTOL");
 
   // Starts the find gaps process
-  p.StartProcess( FindGaps );
+  p.StartProcess(FindGaps);
   //In case the last gap runs to the end of the cube
-  if ( inGap ) {
-    pvl.AddKeyword( PvlKeyword( "ToEndOfBand", lineNum ) );
+  if(inGap) {
+    pvl.AddKeyword(PvlKeyword("ToEndOfBand", lineNum));
   }
-  toDisplay.Write( ui.GetFilename("TO") );
+  toDisplay.Write(ui.GetFilename("TO"));
   toDisplay.Clear();
   inGap = false;
   p.EndProcess();
@@ -52,41 +52,41 @@ void IsisMain() {
  * accordingly, posting bad results in Log.
  * @param in
  */
-void FindGaps ( Buffer &in ) {
+void FindGaps(Buffer &in) {
   // Copys line 1 into previousLine since it is the top of the Band
-  if ( in.Line() == 1 ) {
-    for (int i=0; i<in.size(); i++) previousLine[i] = in[i];
+  if(in.Line() == 1) {
+    for(int i = 0; i < in.size(); i++) previousLine[i] = in[i];
     return;
   }
 
   // Uses MultivariateStatistics to compare the last line with the current
   MultivariateStatistics mSt;
-  mSt.AddData( &previousLine[0], in.DoubleBuffer(), in.size() );
+  mSt.AddData(&previousLine[0], in.DoubleBuffer(), in.size());
   double correlation = mSt.Correlation();
-  if ( std::fabs( correlation ) < corTol  ||  correlation == Isis::Null ) {
+  if(std::fabs(correlation) < corTol  ||  correlation == Isis::Null) {
     // Then current line is a Gap, and acts accordingly
-    if ( !inGap ) {
+    if(!inGap) {
       inGap = true;
-      pvl.AddKeyword( PvlKeyword( "NewGapInBand", in.Band() ) );
-      pvl.AddKeyword( PvlKeyword( "StartLine", in.Line() ) );
-      if( correlation == Isis::Null ) {
+      pvl.AddKeyword(PvlKeyword("NewGapInBand", in.Band()));
+      pvl.AddKeyword(PvlKeyword("StartLine", in.Line()));
+      if(correlation == Isis::Null) {
         correlation = 0.0;
       }
-      pvl.AddKeyword( PvlKeyword( "Correlation", correlation ) ); 
+      pvl.AddKeyword(PvlKeyword("Correlation", correlation));
     }
   }
-  else if ( inGap ) {
+  else if(inGap) {
     // Then it was the last line of the gap 2 lines ago, since this line and its pervious line correlate
     inGap = false;
-    if( in.Line()-2 == 0 ) {
-      pvl.AddKeyword( PvlKeyword( "ToEndOfBand", lineNum ) );
+    if(in.Line() - 2 == 0) {
+      pvl.AddKeyword(PvlKeyword("ToEndOfBand", lineNum));
     }
     else {
-      pvl.AddKeyword( PvlKeyword( "LastGapLine", in.Line()-2 ) );
+      pvl.AddKeyword(PvlKeyword("LastGapLine", in.Line() - 2));
     }
-    toDisplay.AddGroup( pvl );
+    toDisplay.AddGroup(pvl);
     pvl = PvlGroup("Gap");
   }
   // Sets upt previousLine for next pass
-  for (int i=0; i<in.size(); i++) previousLine[i] = in[i];
+  for(int i = 0; i < in.size(); i++) previousLine[i] = in[i];
 }

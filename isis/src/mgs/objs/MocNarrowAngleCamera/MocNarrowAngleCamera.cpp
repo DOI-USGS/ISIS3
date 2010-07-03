@@ -11,7 +11,7 @@ using namespace std;
 namespace Isis {
   namespace Mgs {
     // constructors
-    MocNarrowAngleCamera::MocNarrowAngleCamera (Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
+    MocNarrowAngleCamera::MocNarrowAngleCamera(Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
       // Set up the camera info from ik/iak kernels
 //      LoadEulerMounting();
       SetFocalLength();
@@ -19,10 +19,10 @@ namespace Isis {
       InstrumentRotation()->SetTimeBias(-1.15);
 
       // Get the start time from labels
-      Isis::PvlGroup &inst = lab.FindGroup ("Instrument",Isis::Pvl::Traverse);
+      Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
       string stime = inst["SpacecraftClockCount"];
       SpiceDouble etStart;
-      scs2e_c (NaifSpkCode(),stime.c_str(),&etStart);
+      scs2e_c(NaifSpkCode(), stime.c_str(), &etStart);
 
       // Get other info from labels
       double csum = inst["CrosstrackSumming"];
@@ -33,16 +33,16 @@ namespace Isis {
 
       // Setup detector map
       LineScanCameraDetectorMap *detectorMap =
-        new LineScanCameraDetectorMap(this,etStart,lineRate);
+        new LineScanCameraDetectorMap(this, etStart, lineRate);
       detectorMap->SetDetectorSampleSumming(csum);
       detectorMap->SetDetectorLineSumming(dsum);
       detectorMap->SetStartingDetectorSample(ss);
 
       // Setup focal plane map
       CameraFocalPlaneMap *focalMap =
-        new CameraFocalPlaneMap(this,NaifIkCode());
-      focalMap->SetDetectorOrigin(1024.5,0.0);
-      focalMap->SetDetectorOffset(0.0,0.0);
+        new CameraFocalPlaneMap(this, NaifIkCode());
+      focalMap->SetDetectorOrigin(1024.5, 0.0);
+      focalMap->SetDetectorOffset(0.0, 0.0);
 
       // Setup distortion map
       new CameraDistortionMap(this);
@@ -56,6 +56,6 @@ namespace Isis {
   }
 }
 
-extern "C" Isis::Camera *MocNarrowAngleCameraPlugin (Isis::Pvl &lab) {
+extern "C" Isis::Camera *MocNarrowAngleCameraPlugin(Isis::Pvl &lab) {
   return new Isis::Mgs::MocNarrowAngleCamera(lab);
 }

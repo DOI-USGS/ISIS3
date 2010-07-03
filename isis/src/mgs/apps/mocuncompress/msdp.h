@@ -16,7 +16,7 @@ provided that (i) you must include this notice with all copies of the
 Software to be distributed; (ii) you may not remove or alter any
 proprietary notices contained in the Software; (iii) you may not charge any
 third party for the Software; and (iv) you will not export the Software
-without the appropriate United States and foreign government licenses.  
+without the appropriate United States and foreign government licenses.
 
 You acknowledge that no title to the intellectual property in the Software
 is transferred to you.  You further acknowledge that title and full
@@ -28,11 +28,11 @@ SOFTWARE, AND SPECIFICALLY DISCLAIMS THE IMPLIED WARRANTIES OF
 NON-INFRINGEMENT OF THIRD PARTY RIGHTS, MERCHANTABILITY AND FITNESS FOR A
 PARTICULAR PURPOSE.  SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR
 LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO SUCH LIMITATIONS OR
-EXCLUSIONS MAY NOT APPLY TO YOU.  
+EXCLUSIONS MAY NOT APPLY TO YOU.
 
 Your use or reproduction of the Software constitutes your agreement to the
 terms of this Notice.  If you do not agree with the terms of this notice,
-promptly return or destroy all copies of the Software in your possession.  
+promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
@@ -70,26 +70,25 @@ Offset  Length  Name    Definition
 62+SDLEN 1      SDCS    The checksum redundancy of this datagram.
 */
 
-struct msdp_header
-{
-    byte id[2];
-    byte fragment[2];
-    byte down_offset[2];
-    byte down_length[2];
-    byte time[5];
-    byte status;
-    byte cmd[17];
-    byte context[5];
-    byte gain;
-    byte offset;
-    byte gain_count[2];
-    byte down_total[2];
-    byte edit_start;
-    byte edit_length; /* units of 16 pixels */
-    byte compression[8];
-    byte sensors[2];
-    byte other[4];
-    byte len[4];
+struct msdp_header {
+  byte id[2];
+  byte fragment[2];
+  byte down_offset[2];
+  byte down_length[2];
+  byte time[5];
+  byte status;
+  byte cmd[17];
+  byte context[5];
+  byte gain;
+  byte offset;
+  byte gain_count[2];
+  byte down_total[2];
+  byte edit_start;
+  byte edit_length; /* units of 16 pixels */
+  byte compression[8];
+  byte sensors[2];
+  byte other[4];
+  byte len[4];
 };
 
 #define MAKESHORT(p) ((p)[0] | ((p)[1] << 8))

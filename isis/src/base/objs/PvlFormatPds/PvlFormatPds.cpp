@@ -2,23 +2,23 @@
  * @file
  * $Revision: 1.10 $
  * $Date: 2009/09/15 21:13:25 $
- * 
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
- *   For additional information, launch 
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website, 
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
- */                                                                       
+ */
 
 #include <sstream>
 #include <iomanip>
@@ -47,7 +47,7 @@ namespace Isis {
   /*
   * Constructs a PvlFormatPds using the file name to ingest to fill the keyword
   * to type map.
-  * 
+  *
   * @param file A file name with keyword=type. Where KEYWORD is the name of a
   * keyword and TYPE is one of [string | integer | float | ...]
   */
@@ -59,7 +59,7 @@ namespace Isis {
   /*
   * Constructs a PvlFormatPds using the specified pre populated map of keyword name
   * (std::string) vs keyword type (KeywordType).
-  * 
+  *
   * @param keywordType A map with keyword, type. Where keyword is the name of a
   * keyword in a PvlKeyword and type is one of [string | integer | float ]
   */
@@ -75,15 +75,15 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted in "PDS" format
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatValue (const PvlKeyword &keyword, int num) {
+  std::string PvlFormatPds::FormatValue(const PvlKeyword &keyword, int num) {
 
     iString name = keyword.Name();
     name.UpCase();
-    if (name == "OBJECT" || (name == "GROUP")) {
+    if(name == "OBJECT" || (name == "GROUP")) {
       iString val = (string)keyword;
       return val.UpCase();
     }
@@ -91,7 +91,7 @@ namespace Isis {
     // Find out what type this keyword is
     KeywordType type = Type(keyword);
 
-    switch (type) {
+    switch(type) {
       case StringKeyword:
         return FormatString(keyword, num);
         break;
@@ -122,54 +122,54 @@ namespace Isis {
 
       case NoTypeKeyword:
       default:
-        return FormatUnknown(keyword,num);
+        return FormatUnknown(keyword, num);
         break;
     }
-    return FormatUnknown(keyword,num);
+    return FormatUnknown(keyword, num);
   }
 
 
   /*
   * Returns the keyword value formatted as a "PDS" string
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
-  * @param num Use the ith value of the keyword 
-  * @internal 
+  * @param num Use the ith value of the keyword
+  * @internal
   *   @history 2009-09-15 Jeannie Walldren - Moved the call to AddQuotes()
   *                                          inside the else-statement since
   *                                          the if portion of the code already
   *                                          adds quotes automatically
   */
-  std::string PvlFormatPds::FormatString (const PvlKeyword &keyword, int num) {
+  std::string PvlFormatPds::FormatString(const PvlKeyword &keyword, int num) {
 
     iString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
       val += keyword[num];
-      val = AddQuotes (val);
+      val = AddQuotes(val);
     }
 
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val = "(" + val;
+    if((keyword.Size() > 1) && (num == 0)) {
+      val = "(" + val;
     }
 
     // Add the units to this value
-    if ((!singleUnit) && (keyword.Unit(num).size() > 0)) { 
+    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
       //      unit.UpCase();
@@ -177,16 +177,16 @@ namespace Isis {
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if ((singleUnit) && (num == keyword.Size()-1) && 
+    if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
@@ -200,7 +200,7 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted as a "PDS" real number
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
@@ -212,22 +212,22 @@ namespace Isis {
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val += "(";
+    if((keyword.Size() > 1) && (num == 0)) {
+      val += "(";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
-    else if (places >= 0) {
+    else if(places >= 0) {
       stringstream out;
       out << setiosflags(ios::fixed) << setprecision(places) << (double)keyword[num];
       val += out.str();
@@ -237,23 +237,23 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if ((!singleUnit) && (keyword.Unit(num).size() > 0)) { 
+    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if ((singleUnit) && (num == keyword.Size()-1) && 
+    if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
@@ -266,30 +266,30 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted as a "PDS" enumeration
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatEnum (const PvlKeyword &keyword, int num) {
+  std::string PvlFormatPds::FormatEnum(const PvlKeyword &keyword, int num) {
 
     iString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val += "(";
+    if((keyword.Size() > 1) && (num == 0)) {
+      val += "(";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
@@ -297,23 +297,23 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if ((!singleUnit) && (keyword.Unit(num).size() > 0)) { 
+    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
-    // unit.UpCase();
+      // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if ((singleUnit) && (num == keyword.Size()-1) && 
+    if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
@@ -326,61 +326,61 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted without any knowledge of its type
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
-  * @internal 
+  * @internal
   *   @history 2009-09-15 Jeannie Walldren - Moved the call to AddQuotes()
   *                                          inside the else-statement since
   *                                          the if portion of the code already
   *                                          adds quotes automatically
   */
-  std::string PvlFormatPds::FormatUnknown (const PvlKeyword &keyword, int num) {
+  std::string PvlFormatPds::FormatUnknown(const PvlKeyword &keyword, int num) {
 
     iString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
       val += keyword[num];
-      val = PvlFormat::AddQuotes (val);
+      val = PvlFormat::AddQuotes(val);
     }
 
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val = "(" + val;
+    if((keyword.Size() > 1) && (num == 0)) {
+      val = "(" + val;
     }
 
     // Add the units to this value
-    if ((!singleUnit) && (keyword.Unit(num).size() > 0)) { 
+    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if ((singleUnit) && (num == keyword.Size()-1) && 
+    if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
@@ -393,30 +393,30 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted as an integer
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatInteger (const PvlKeyword &keyword, int num, int bytes) {
+  std::string PvlFormatPds::FormatInteger(const PvlKeyword &keyword, int num, int bytes) {
 
     iString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val += "(";
+    if((keyword.Size() > 1) && (num == 0)) {
+      val += "(";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
@@ -424,23 +424,23 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if ((!singleUnit) && (keyword.Unit(num).size() > 0)) { 
+    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if ((singleUnit) && (num == keyword.Size()-1) && 
+    if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
@@ -453,11 +453,11 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted as a binary value
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatBinary (const PvlKeyword &keyword, int num, int bits) {
+  std::string PvlFormatPds::FormatBinary(const PvlKeyword &keyword, int num, int bits) {
 
     iString val;
     val.clear();
@@ -465,19 +465,19 @@ namespace Isis {
 
     // Create a Null value if the value index is greater than the number of values
     stringstream ss;
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val += "(";
+    if((keyword.Size() > 1) && (num == 0)) {
+      val += "(";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
@@ -487,7 +487,8 @@ namespace Isis {
       do {
         tmp = binDig[value % 2] + tmp;
         value /= 2;
-      } while (value);
+      }
+      while(value);
 
       ss << right << setfill('0') << setw(bits) << tmp;
       tmp = ss.str();
@@ -495,23 +496,23 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if ((!singleUnit) && (keyword.Unit(num).size() > 0)) { 
+    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if ((singleUnit) && (num == keyword.Size()-1) && 
+    if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
@@ -524,40 +525,40 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted as a hexidecimal value
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
 
 
-  std::string PvlFormatPds::FormatHex (const PvlKeyword &keyword, int num, int bytes) {
+  std::string PvlFormatPds::FormatHex(const PvlKeyword &keyword, int num, int bytes) {
 
     iString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val += "(";
+    if((keyword.Size() > 1) && (num == 0)) {
+      val += "(";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
       stringstream ss;
-      if (bytes == 2) {
+      if(bytes == 2) {
         ss << hex << (unsigned short int)(int)keyword[num];
       }
-      else if (bytes == 4) {
+      else if(bytes == 4) {
         ss << hex << (unsigned int)(int)keyword[num];
       }
       else {
@@ -569,23 +570,23 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if ((!singleUnit) && (keyword.Unit(num).size() > 0)) { 
+    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if ((singleUnit) && (num == keyword.Size()-1) && 
+    if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
       iString unit = keyword.Unit(num);
       // unit.UpCase();
@@ -598,29 +599,29 @@ namespace Isis {
 
   /*
   * Returns the keyword value formatted as a boolean value
-  * 
+  *
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatBool (const PvlKeyword &keyword, int num) {
+  std::string PvlFormatPds::FormatBool(const PvlKeyword &keyword, int num) {
 
     iString val;
     val.clear();
 
     // Create a Null value if the value index is greater than the number of values
-    if ((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if ((keyword.Size() > 1) && (num == 0)) {
-        val += "(";
+    if((keyword.Size() > 1) && (num == 0)) {
+      val += "(";
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
     iString tmp = keyword[num];
     tmp.UpCase();
-    if ((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
+    if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
@@ -628,11 +629,11 @@ namespace Isis {
     }
 
     // Add a comma for arrays
-    if (num != keyword.Size()-1) {
+    if(num != keyword.Size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if (keyword.Size() > 1) {
+    else if(keyword.Size() > 1) {
       val += ")";
     }
 
@@ -644,10 +645,10 @@ namespace Isis {
 
   /*
   * Format the name of this container
-  * 
+  *
   * @param keyword The keyword (i.e., the Object or Group)
   */
-  std::string PvlFormatPds::FormatName (const PvlKeyword &keyword) {
+  std::string PvlFormatPds::FormatName(const PvlKeyword &keyword) {
     iString text = keyword.Name();
     text.UpCase();
     return text;
@@ -656,12 +657,12 @@ namespace Isis {
 
   /*
   * Format the end of a group or object
-  * 
+  *
   * @param name A string representing the end text.
   * @param keyword The keyword (i.e., the Object or Group) that is ending
   */
-  std::string PvlFormatPds::FormatEnd (const std::string name,
-                                       const PvlKeyword &keyword) {
+  std::string PvlFormatPds::FormatEnd(const std::string name,
+                                      const PvlKeyword &keyword) {
     iString left = name;
     left.UpCase();
     left += " = ";
@@ -674,21 +675,21 @@ namespace Isis {
   /*
   * Put quotes around the value of a keyword of type string according to PDS
   * standards. All keywords identified as "string" are quoted for PDS labels.
-  * 
-  * @param value The value of a PvlKeyword to be formatted. 
-  * @internal 
+  *
+  * @param value The value of a PvlKeyword to be formatted.
+  * @internal
   *   @history 2009-09-15 Jeannie Walldren - Added case to skip add quotes if
   *                                          the first character of the
   *                                          string is " or '
   */
-  std::string PvlFormatPds::AddQuotes (const std::string value) {
+  std::string PvlFormatPds::AddQuotes(const std::string value) {
 
     std::string val = value;
 
     bool quoteValue = true;
     bool singleQuoteValue = false;
-    if (val.find(" ") != std::string::npos) {
-      if (val.find("\"") != std::string::npos) {
+    if(val.find(" ") != std::string::npos) {
+      if(val.find("\"") != std::string::npos) {
         singleQuoteValue = true;
         quoteValue = false;
       }
@@ -696,23 +697,23 @@ namespace Isis {
 
     // Turn the quoting back off if this value looks like a sequence
     // In this case the internal values should already be quoted.
-    if (val[0] == '(') {
+    if(val[0] == '(') {
       singleQuoteValue = false;
       quoteValue = false;
     }
-    else if (val[0] == '"') {
+    else if(val[0] == '"') {
       singleQuoteValue = false;
       quoteValue = false;
     }
-    else if (val[0] == '\'') {
+    else if(val[0] == '\'') {
       singleQuoteValue = false;
       quoteValue = false;
     }
 
-    if (quoteValue) {
+    if(quoteValue) {
       val = "\"" + val + "\"";
     }
-    else if (singleQuoteValue) {
+    else if(singleQuoteValue) {
       val = "'" + val + "'";
     }
 

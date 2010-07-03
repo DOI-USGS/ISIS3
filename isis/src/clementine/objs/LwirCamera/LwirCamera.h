@@ -3,12 +3,12 @@
 
 #include "FramingCamera.h"
 
-namespace Clementine { 
-  /**                                                                       
+namespace Clementine {
+  /**
    * @brief LWIR Camera class
    *
-   * This is the camera class for Clementine's long wavelength 
-   * infared camera. 
+   * This is the camera class for Clementine's long wavelength
+   * infared camera.
    *
    * @ingroup Clementine
    *
@@ -21,8 +21,8 @@ namespace Clementine {
    */
   class LwirCamera : public Isis::FramingCamera {
     public:
-      LwirCamera (Isis::Pvl &lab);
-      ~LwirCamera () {};      
+      LwirCamera(Isis::Pvl &lab);
+      ~LwirCamera() {};
   };
 };
 #endif

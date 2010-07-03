@@ -32,7 +32,7 @@ namespace Isis {
    *
    */
   CameraFocalPlaneMap::CameraFocalPlaneMap(Camera *parent, const int naifIkCode) {
-    Init(parent,naifIkCode);
+    Init(parent, naifIkCode);
   }
 
   /** Construct mapping between detectors and focal plane x/y
@@ -41,7 +41,7 @@ namespace Isis {
    *
    */
   CameraFocalPlaneMap::CameraFocalPlaneMap(const int naifIkCode) {
-    Init(0,naifIkCode);
+    Init(0, naifIkCode);
   }
 
   void CameraFocalPlaneMap::Init(Camera *parent, const int naifIkCode) {
@@ -51,12 +51,12 @@ namespace Isis {
     p_detectorLineOffset = 0.0;
     p_camera = parent;
 
-    if (naifIkCode != 0) {
+    if(naifIkCode != 0) {
       std::string xkey  = "INS" + Isis::iString(naifIkCode) + "_TRANSX";
       std::string ykey  = "INS" + Isis::iString(naifIkCode) + "_TRANSY";
       std::string ixkey = "INS" + Isis::iString(naifIkCode) + "_ITRANSS";
       std::string iykey = "INS" + Isis::iString(naifIkCode) + "_ITRANSL";
-      for (int i = 0; i < 3; ++i) {
+      for(int i = 0; i < 3; ++i) {
         p_transx[i]  = Spice::GetDouble(xkey, i);
         p_transy[i]  = Spice::GetDouble(ykey, i);
         p_itranss[i] = Spice::GetDouble(ixkey, i);
@@ -64,19 +64,19 @@ namespace Isis {
       }
     }
     else {
-       std::string xkey  = "IDEAL_TRANSX";
-       std::string ykey  = "IDEAL_TRANSY";
-       std::string ixkey = "IDEAL_TRANSS";
-       std::string iykey = "IDEAL_TRANSL";
-       for (int i = 0; i < 3; ++i) {
-         p_transx[i]  = Spice::GetDouble(xkey, i);
-         p_transy[i]  = Spice::GetDouble(ykey, i);
-         p_itranss[i] = Spice::GetDouble(ixkey, i);
-         p_itransl[i] = Spice::GetDouble(iykey, i);
-       }
+      std::string xkey  = "IDEAL_TRANSX";
+      std::string ykey  = "IDEAL_TRANSY";
+      std::string ixkey = "IDEAL_TRANSS";
+      std::string iykey = "IDEAL_TRANSL";
+      for(int i = 0; i < 3; ++i) {
+        p_transx[i]  = Spice::GetDouble(xkey, i);
+        p_transy[i]  = Spice::GetDouble(ykey, i);
+        p_itranss[i] = Spice::GetDouble(ixkey, i);
+        p_itransl[i] = Spice::GetDouble(iykey, i);
+      }
     }
 
-    if (parent != 0) {
+    if(parent != 0) {
       p_camera->SetFocalPlaneMap(this);
     }
   }
@@ -96,9 +96,9 @@ namespace Isis {
     p_focalPlaneY = dy;
 
     p_centeredDetectorSample = p_itranss[0] + (p_itranss[1] * dx)
-                                            + (p_itranss[2] * dy);
+                               + (p_itranss[2] * dy);
     p_centeredDetectorLine   = p_itransl[0] + (p_itransl[1] * dx)
-                                            + (p_itransl[2] * dy);
+                               + (p_itransl[2] * dy);
     ComputeUncentered();
     return true;
   }
@@ -118,9 +118,9 @@ namespace Isis {
     p_detectorLine = line;
     ComputeCentered();
     p_focalPlaneX = p_transx[0] + (p_transx[1] * p_centeredDetectorSample)
-                                + (p_transx[2] * p_centeredDetectorLine) ;
+                    + (p_transx[2] * p_centeredDetectorLine) ;
     p_focalPlaneY = p_transy[0] + (p_transy[1] * p_centeredDetectorSample)
-                                + (p_transy[2] * p_centeredDetectorLine) ;
+                    + (p_transy[2] * p_centeredDetectorLine) ;
     return true;
   }
 
@@ -128,12 +128,12 @@ namespace Isis {
    *
    * This method returns the image variable (sample or line) on
    * which the focal plane x depends.
-   * 
+   *
    * @return dependency variable
    */
 //  CameraFocalPlaneMap::FocalPlaneXDependencyType CameraFocalPlaneMap::FocalPlaneXDependency() {
   int CameraFocalPlaneMap::FocalPlaneXDependency() {
-    if (p_transx[1] > p_transx[2]) {
+    if(p_transx[1] > p_transx[2]) {
       return Sample;
     }
     else {
@@ -144,22 +144,22 @@ namespace Isis {
 
   /** Return the sign of the p_transx coefficient with the greatest magnitude
    *
-   * This method returns a +1. or -1. based on the sign of the p_transx 
+   * This method returns a +1. or -1. based on the sign of the p_transx
    * coefficient with the greatest magnitude.  Only p_transx[1] and
-   * p_transx[2] are compared since p_transx[0] is used as a constant in the 
+   * p_transx[2] are compared since p_transx[0] is used as a constant in the
    * affine transformation.
-   * 
+   *
    * @return sign of most significant coefficient
    */
   double CameraFocalPlaneMap::SignMostSigX()  {
     double magCoef1 = fabs(p_transx[1]);
     double magCoef2 = fabs(p_transx[2]);
 
-    if (magCoef1 > magCoef2) {
-      return (magCoef1/p_transx[1]);
+    if(magCoef1 > magCoef2) {
+      return (magCoef1 / p_transx[1]);
     }
     else {
-      return (magCoef2/p_transx[2]);
+      return (magCoef2 / p_transx[2]);
     }
   }
 
@@ -167,22 +167,22 @@ namespace Isis {
 
   /** Return the sign of the p_transy coefficient with the greatest magnitude
    *
-   * This method returns a +1 or -1 based on the sign of the p_transy 
+   * This method returns a +1 or -1 based on the sign of the p_transy
    * coefficient with the greatest magnitude.  Only p_transy[1] and
-   * p_transy[2] are compared since p_transy[0] is used as a constant in the 
+   * p_transy[2] are compared since p_transy[0] is used as a constant in the
    * affine transformation.
-   * 
+   *
    * @return sign of most significant coefficient
    */
   double CameraFocalPlaneMap::SignMostSigY()  {
     double magCoef1 = fabs(p_transy[1]);
     double magCoef2 = fabs(p_transy[2]);
 
-    if (magCoef1 > magCoef2) {
-      return (magCoef1/p_transy[1]);
+    if(magCoef1 > magCoef2) {
+      return (magCoef1 / p_transy[1]);
     }
     else {
-      return (magCoef2/p_transy[2]);
+      return (magCoef2 / p_transy[2]);
     }
   }
 

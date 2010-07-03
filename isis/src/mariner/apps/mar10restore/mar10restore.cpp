@@ -6,7 +6,7 @@
 #include "Pipeline.h"
 #include "Statistics.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void IsisMain() {
@@ -16,11 +16,11 @@ void IsisMain() {
   cube.Open(ui.GetFilename("FROM"));
 
   // Check that the cube actually needs reconstruction
-  Chip cp(5,5);
-  cp.TackCube(25,25);
+  Chip cp(5, 5);
+  cp.TackCube(25, 25);
   cp.Load(cube);
   Statistics *stats = cp.Statistics();
-  if (stats->ValidPixels() > 8) {
+  if(stats->ValidPixels() > 8) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not need reconstruction";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -83,7 +83,7 @@ void IsisMain() {
   p.Application("lowpass1").AddConstParameter("NULL", "true");
   p.Application("lowpass1").AddConstParameter("LIS", "true");
   p.Application("lowpass1").AddConstParameter("HIS", "true");
-  p.Application("lowpass1").AddConstParameter("LRS", "true"); 
+  p.Application("lowpass1").AddConstParameter("LRS", "true");
 
   // Run a low pass filter on the invalid data in the cube
   p.AddToPipeline("lowpass", "lowpass2");
@@ -96,7 +96,7 @@ void IsisMain() {
   p.Application("lowpass2").AddConstParameter("NULL", "true");
   p.Application("lowpass2").AddConstParameter("LIS", "true");
   p.Application("lowpass2").AddConstParameter("HIS", "true");
-  p.Application("lowpass2").AddConstParameter("LRS", "true"); 
+  p.Application("lowpass2").AddConstParameter("LRS", "true");
 
   // Run a low pass filter on the invalid data in the cube
   p.AddToPipeline("lowpass", "lowpass3");

@@ -38,7 +38,7 @@ namespace Isis {
    * @internal
    *   @history 2010-05-06 Steven Lambright Added Split Lat/Lon
    *            Functionality
-   *   @history 2010-06-22 Steven Lambright Improved handling of resolutions 
+   *   @history 2010-06-22 Steven Lambright Improved handling of resolutions
    */
   class GroundGrid {
     public:

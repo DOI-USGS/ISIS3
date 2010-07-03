@@ -8,7 +8,7 @@
 #include "iException.h"
 #include "Table.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 bool conv;
@@ -28,12 +28,12 @@ const double ACO = 1.062;
 const double BCO = -0.1153E-02;
 const double CCO = 0.6245E-05;
 const double DCO = -0.1216E-07;
-const double C3 = 7.13; 
+const double C3 = 7.13;
 const double C4 = -8.177; // Post-readout offset
-const double C5 = 15.56; 
+const double C5 = 15.56;
 const double DT = .00068;
 
-void UvVisCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &out); 
+void UvVisCal(std::vector< Isis::Buffer * > &in, std::vector< Isis::Buffer * > &out);
 void FixTemp(int);
 
 void IsisMain() {
@@ -48,9 +48,10 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   Cube *dccube;
-  if (ui.WasEntered("DCFILE")) {
+  if(ui.WasEntered("DCFILE")) {
     dccube = p.SetInputCube("DCFILE");
-  } else {
+  }
+  else {
     string dcfileloc = "$clementine1/calibration/uvvis/";
     dcfileloc += "dark_5_15_96.cub";
     CubeAttributeInput cubeAtt;
@@ -61,19 +62,21 @@ void IsisMain() {
   filter = filter.DownCase();
 
   Cube *ffcube;
-  if (ui.WasEntered("FFFILE")) {
+  if(ui.WasEntered("FFFILE")) {
     ffcube = p.SetInputCube("FFFILE");
-  } else {
+  }
+  else {
     // compute default fffile
     double compressRatio = (icube->GetGroup("Instrument"))["EncodingCompressionRatio"];
 
     // check to see if cube is compressed or uncompressed
-    if (compressRatio == 1.0) {
+    if(compressRatio == 1.0) {
       string fffileLoc = "$clementine1/calibration/uvvis/";
       fffileLoc += "lu" + filter + "_uncomp_flat_long.cub";
       CubeAttributeInput cubeAtt;
       ffcube = p.SetInputCube(fffileLoc, cubeAtt);
-    } else {
+    }
+    else {
       string fffileLoc = "$clementine1/calibration/uvvis/";
       fffileLoc += "lu" + filter + "_comp_flat_long.cub";
       CubeAttributeInput cubeAtt;
@@ -83,14 +86,15 @@ void IsisMain() {
 
   Cube *ocube = p.SetOutputCube("TO");
 
-  avgFF = uvvisDef.FindGroup("Filter"+filter.UpCase())["AVGFF"];
-  cr = uvvisDef.FindGroup("Filter"+filter.UpCase())["CO"];
-  gain = uvvisDef.FindGroup(iString("GainModeID")+iString(icube->GetGroup("Instrument")["GainModeID"][0]))["GAIN"];
+  avgFF = uvvisDef.FindGroup("Filter" + filter.UpCase())["AVGFF"];
+  cr = uvvisDef.FindGroup("Filter" + filter.UpCase())["CO"];
+  gain = uvvisDef.FindGroup(iString("GainModeID") + iString(icube->GetGroup("Instrument")["GainModeID"][0]))["GAIN"];
 
   useDcconst = ui.WasEntered("DCCONST");
-  if (useDcconst) {
+  if(useDcconst) {
     dcconst = ui.GetDouble("DCCONST");
-  } else {
+  }
+  else {
     dcconst = 0.0;
   }
 
@@ -98,15 +102,16 @@ void IsisMain() {
   exposureDuration = icube->GetGroup("Instrument")["ExposureDuration"];
   offsetModeID = icube->GetGroup("Instrument")["OffsetModeID"];
 
-  if (((string)icube->GetGroup("Instrument")["FocalPlaneTemperature"]).compare("UNK") == 0) {
+  if(((string)icube->GetGroup("Instrument")["FocalPlaneTemperature"]).compare("UNK") == 0) {
     //if FocalPlaneTemp is unknown set it to zero
     focalPlaneTemp = 0.0;
-  } else {
+  }
+  else {
     focalPlaneTemp = icube->GetGroup("Instrument")["FocalPlaneTemperature"];
   }
 
   Camera *cam = icube->Camera();
-  bool camSuccess = cam->SetImage(icube->Samples()/2,icube->Lines()/2);
+  bool camSuccess = cam->SetImage(icube->Samples() / 2, icube->Lines() / 2);
 
   if(!camSuccess) {
     throw iException::Message(iException::Camera, "Unable to calculate the Solar Distance for this cube.", _FILEINFO_);
@@ -115,24 +120,27 @@ void IsisMain() {
   dist = cam->SolarDistance();
 
   // If temp. correction set to true, or focal plane temp is zero then use temperature correction
-  if (ui.GetBoolean("TCOR") || abs(focalPlaneTemp) <= DBL_EPSILON) {
-    // Temperature correction requires the use of the mission phase 
+  if(ui.GetBoolean("TCOR") || abs(focalPlaneTemp) <= DBL_EPSILON) {
+    // Temperature correction requires the use of the mission phase
     //   (PRELAUNCH, EARTH, LUNAR) and the product ID.
     string productID = (string)(icube->GetGroup("Archive")["ProductID"]);
     char missionPhase = ((string)((icube->GetGroup("Archive"))["MissionPhase"])).at(0);
-    string n1substring(productID.substr(productID.find('.')+1, productID.length()-1));
-    string n2substring(productID.substr(4, productID.find('.')-1));
-    int n1 = atoi( n1substring.c_str() );
-    int n2 = atoi( n2substring.c_str() );
+    string n1substring(productID.substr(productID.find('.') + 1, productID.length() - 1));
+    string n2substring(productID.substr(4, productID.find('.') - 1));
+    int n1 = atoi(n1substring.c_str());
+    int n2 = atoi(n2substring.c_str());
     int phase = 0;
 
-    if (missionPhase == 'L') {
+    if(missionPhase == 'L') {
       phase = 0;
-    } else if (missionPhase == 'E') {
+    }
+    else if(missionPhase == 'E') {
       phase = 1;
-    } else if (missionPhase == 'P') {
+    }
+    else if(missionPhase == 'P') {
       phase = 2;
-    } else {
+    }
+    else {
       throw iException::Message(iException::Pvl, "Invalid Mission Phase", _FILEINFO_);
     }
 
@@ -143,7 +151,7 @@ void IsisMain() {
     FixTemp(imageID);
   }
 
-  if (focalPlaneTemp <= 0.0) {
+  if(focalPlaneTemp <= 0.0) {
     focalPlaneTemp = 272.5;
   }
 
@@ -173,7 +181,7 @@ void IsisMain() {
   calgrp += PvlKeyword("Gain", gain);
   calgrp += PvlKeyword("CorrectedExposureDuration", correctedExposureDuration);
   calgrp += PvlKeyword("ConvertToRadiance", conv);
-  
+
   calgrp += PvlKeyword("ACO", ACO);
   calgrp += PvlKeyword("BCO", BCO);
   calgrp += PvlKeyword("CCO", CCO);
@@ -183,13 +191,13 @@ void IsisMain() {
   p.EndProcess();
 }
 
-void UvVisCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &out) {
+void UvVisCal(std::vector< Isis::Buffer * > &in, std::vector< Isis::Buffer * > &out) {
 #define INPUT_CUBE (*in[0])
 #define DC_CUBE (*in[1])
 #define FF_CUBE (*in[2])
 #define OUTPUT_CUBE (*out[0])
 
-  C2 = 0.003737 * exp(0.0908 * (focalPlaneTemp - 273.15)); 
+  C2 = 0.003737 * exp(0.0908 * (focalPlaneTemp - 273.15));
   correctedExposureDuration = exposureDuration + 0.0494;
 
   double dc = 0.0;
@@ -199,35 +207,38 @@ void UvVisCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &ou
   sum = new double[INPUT_CUBE.SampleDimension()];
   ro = new double[INPUT_CUBE.SampleDimension()];
 
-  for (int iSample = 0; iSample < INPUT_CUBE.SampleDimension(); iSample++) {
+  for(int iSample = 0; iSample < INPUT_CUBE.SampleDimension(); iSample++) {
     ro[iSample] = 0.0;
     sum[iSample] = 0.0;
 
-    for (int iLine = 0; iLine < INPUT_CUBE.LineDimension(); iLine ++) {
+    for(int iLine = 0; iLine < INPUT_CUBE.LineDimension(); iLine ++) {
       valid = false;
       int index = INPUT_CUBE.SampleDimension() * iLine + iSample;
 
-      if (Pixel::IsSpecial(INPUT_CUBE[index])) {
+      if(Pixel::IsSpecial(INPUT_CUBE[index])) {
         OUTPUT_CUBE[index] = INPUT_CUBE[index];
 
-        if (Pixel::IsHigh(INPUT_CUBE[index])) {
+        if(Pixel::IsHigh(INPUT_CUBE[index])) {
           sum[iSample] += 255;
         }
-      } else {
-        if (Pixel::IsSpecial(FF_CUBE[index])) { //check DCFILE
+      }
+      else {
+        if(Pixel::IsSpecial(FF_CUBE[index])) {  //check DCFILE
           OUTPUT_CUBE[index] = Isis::Null;
           sum[iSample] += INPUT_CUBE[index];
-        } else {
+        }
+        else {
           valid = true;
-          if (!useDcconst) {
+          if(!useDcconst) {
             dc = DC_CUBE[index];
-          } else {
+          }
+          else {
             dc = dcconst;
           }
         }
       }
 
-      if (valid) {
+      if(valid) {
         //Global Offset Corrections
         double step1_dn = INPUT_CUBE[index] - (C4 * offsetModeID) - C5;
         //Gain Correction
@@ -235,7 +246,7 @@ void UvVisCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &ou
         //Pixel dependent dark current correction
         double step3_dn = step2_dn - (dc + C3);
         //Non-linearity correction
-        double xmul = ACO + (BCO * step3_dn) + (CCO * pow(step3_dn, 2)) + (DCO*pow(step3_dn, 3));
+        double xmul = ACO + (BCO * step3_dn) + (CCO * pow(step3_dn, 2)) + (DCO * pow(step3_dn, 3));
         double corstep3_dn = step3_dn * xmul;
         //Tempurature-dependent offset correction
         double rotim = 60.05 + 0.05 * iLine;
@@ -249,18 +260,19 @@ void UvVisCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &ou
     ro[iSample] = sum[iSample] * DT / (correctedExposureDuration + (288.0 * DT));
   }
 
-  for (int iLine = 0; iLine < INPUT_CUBE.LineDimension(); iLine ++) {
-    for (int iSample = 0; iSample < INPUT_CUBE.SampleDimension(); iSample++) {
+  for(int iLine = 0; iLine < INPUT_CUBE.LineDimension(); iLine ++) {
+    for(int iSample = 0; iSample < INPUT_CUBE.SampleDimension(); iSample++) {
       valid = false;
       int index = INPUT_CUBE.SampleDimension() * iLine + iSample;
-      if (!Pixel::IsSpecial(INPUT_CUBE[index])) {
-        if (Pixel::IsSpecial(FF_CUBE[index])) { //check FFFILE
+      if(!Pixel::IsSpecial(INPUT_CUBE[index])) {
+        if(Pixel::IsSpecial(FF_CUBE[index])) {  //check FFFILE
           OUTPUT_CUBE[index] = Isis::Null;
-        } else {
+        }
+        else {
           valid = true;
         }
 
-        if (valid) {
+        if(valid) {
           // Frame transfer correction
           double step5_dn = OUTPUT_CUBE[index] - ro[iSample];
           // Flat-field and exposure time normalization (Units=counts/ms)
@@ -270,9 +282,10 @@ void UvVisCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &ou
           // Conversion to radience (L=mW/sr-cm*cm)
           double L = step7_dn / avgFF;
           // Conversion to reflectance
-          if (conv) {
+          if(conv) {
             OUTPUT_CUBE[index] = step7_dn * cr;
-          } else {
+          }
+          else {
             OUTPUT_CUBE[index] = L;
           }
         }
@@ -285,12 +298,12 @@ void UvVisCal(std::vector< Isis::Buffer* > &in, std::vector< Isis::Buffer* > &ou
 }
 
 /*
- * In the ISIS2 Fortran we noticed FIXTEMP uses a REAL*4 to store the RIMGID. 
+ * In the ISIS2 Fortran we noticed FIXTEMP uses a REAL*4 to store the RIMGID.
  * This results in the last digit being lost precision. The table that
  * it looks in for data is also store as a REAL*4 again resulting
  * in a loss in precision. We believe this makes the lookup table inaccurate.
  */
-void FixTemp(int imgID){
+void FixTemp(int imgID) {
   string table = "$clementine1/calibration/uvvis/uvvisTemperature.tbl";
   Table t("FocalPlaneTemperatures", table);
   float currID = t[0]["ImageID"];
@@ -299,26 +312,27 @@ void FixTemp(int imgID){
   do {
     currID = t[currIndex]["ImageID"];
     currIndex ++;
-  } while ((imgID > currID) && (currIndex < t.Records()));
+  }
+  while((imgID > currID) && (currIndex < t.Records()));
   currIndex --;  // Fixes an out-of-bounds segmentation fault
 
   // Make sure currIndex makes sense
-  if (currIndex < 0 || currIndex >= t.Records()) {
+  if(currIndex < 0 || currIndex >= t.Records()) {
     focalPlaneTemp = 0;
     return;
   }
 
   // Value too small - look up in the table and see if we're closer
-  if (currID < imgID) {
+  if(currID < imgID) {
     double diff = imgID - currID;
-    if ((currIndex + 1 < t.Records()) && abs((float)t[currIndex + 1]["ImageID"] - imgID) < diff) {
+    if((currIndex + 1 < t.Records()) && abs((float)t[currIndex + 1]["ImageID"] - imgID) < diff) {
       currIndex ++;
     }
   }
   // Value too big - look down in the table and see if we're closer
-  else if (currID > imgID) {
+  else if(currID > imgID) {
     double diff = currID - imgID;
-    if (currIndex - 1 >=0 && abs((float)t[currIndex - 1]["ImageID"] - imgID) < diff) {
+    if(currIndex - 1 >= 0 && abs((float)t[currIndex - 1]["ImageID"] - imgID) < diff) {
       currIndex --;
     }
   }

@@ -9,13 +9,13 @@
 using namespace std;
 using namespace Isis;
 
-void PrintMap ();
+void PrintMap();
 void LoadMapRange();
 
-map <string,void*> GuiHelpers(){
-  map <string,void*> helper;
-  helper ["PrintMap"] = (void*) PrintMap;
-  helper ["LoadMapRange"] = (void*) LoadMapRange;
+map <string, void *> GuiHelpers() {
+  map <string, void *> helper;
+  helper ["PrintMap"] = (void *) PrintMap;
+  helper ["LoadMapRange"] = (void *) LoadMapRange;
   return helper;
 }
 
@@ -26,10 +26,10 @@ void IsisMain() {
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
   Pvl userPvl(ui.GetFilename("MAP"));
-  PvlGroup &userMappingGrp = userPvl.FindGroup("Mapping",Pvl::Traverse);
+  PvlGroup &userMappingGrp = userPvl.FindGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube and get the projection
-  Cube *icube = p.SetInputCube ("FROM");
+  Cube *icube = p.SetInputCube("FROM");
 
   // Get the mapping group
   PvlGroup fromMappingGrp = icube->GetGroup("Mapping");
@@ -58,19 +58,19 @@ void IsisMain() {
   // Deal with user overrides entered in the GUI. Do this by changing the user's mapping group, which
   // will then overlay anything in the output mapping group.
   if(ui.WasEntered("MINLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword( PvlKeyword("MinimumLatitude", ui.GetDouble("MINLAT")), Pvl::Replace );
+    userMappingGrp.AddKeyword(PvlKeyword("MinimumLatitude", ui.GetDouble("MINLAT")), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword( PvlKeyword("MaximumLatitude", ui.GetDouble("MAXLAT")), Pvl::Replace );
+    userMappingGrp.AddKeyword(PvlKeyword("MaximumLatitude", ui.GetDouble("MAXLAT")), Pvl::Replace);
   }
 
   if(ui.WasEntered("MINLON") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword( PvlKeyword("MinimumLongitude", ui.GetDouble("MINLON")), Pvl::Replace );
+    userMappingGrp.AddKeyword(PvlKeyword("MinimumLongitude", ui.GetDouble("MINLON")), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLON") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword( PvlKeyword("MaximumLongitude", ui.GetDouble("MAXLON")), Pvl::Replace );
+    userMappingGrp.AddKeyword(PvlKeyword("MaximumLongitude", ui.GetDouble("MAXLON")), Pvl::Replace);
   }
 
   /**
@@ -118,7 +118,8 @@ void IsisMain() {
       outMappingGrp.DeleteKeyword("PixelResolution");
     }
 
-    if(fromMappingGrp.HasKeyword("Scale")); {
+    if(fromMappingGrp.HasKeyword("Scale"));
+    {
       fromMappingGrp.DeleteKeyword("Scale");
     }
 
@@ -263,15 +264,15 @@ void IsisMain() {
         if(!userMappingGrp.HasKeyword(latitudes[index].Name())) {
           if(((string)userMappingGrp["LatitudeType"]).compare("Planetographic") == 0) {
             outMappingGrp[latitudes[index].Name()] = Projection::ToPlanetographic(
-                                                      (double)fromMappingGrp[latitudes[index].Name()],
-                                                      (double)fromMappingGrp["EquatorialRadius"],
-                                                      (double)fromMappingGrp["PolarRadius"]);
+                  (double)fromMappingGrp[latitudes[index].Name()],
+                  (double)fromMappingGrp["EquatorialRadius"],
+                  (double)fromMappingGrp["PolarRadius"]);
           }
           else {
             outMappingGrp[latitudes[index].Name()] = Projection::ToPlanetocentric(
-                                                      (double)fromMappingGrp[latitudes[index].Name()],
-                                                      (double)fromMappingGrp["EquatorialRadius"],
-                                                      (double)fromMappingGrp["PolarRadius"]);
+                  (double)fromMappingGrp[latitudes[index].Name()],
+                  (double)fromMappingGrp["EquatorialRadius"],
+                  (double)fromMappingGrp["PolarRadius"]);
           }
         }
       }
@@ -284,14 +285,14 @@ void IsisMain() {
     if(!ui.WasEntered("MINLON") || !ui.WasEntered("MAXLON")) {
       string msg = "Unable to determine the correct [MinimumLongitude,MaximumLongitude].";
       msg += " Please specify these values in the [MINLON,MAXLON] parameters";
-      throw iException::Message(iException::Pvl,msg,_FILEINFO_);
+      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
     }
   }
 
-  int samples,lines;
+  int samples, lines;
   Pvl mapData;
   // Copy to preserve cube labels so we can match cube size
-  if (userPvl.HasObject("IsisCube")) {
+  if(userPvl.HasObject("IsisCube")) {
     mapData = userPvl;
     mapData.FindObject("IsisCube").DeleteGroup("Mapping");
     mapData.FindObject("IsisCube").AddGroup(outMappingGrp);
@@ -302,50 +303,50 @@ void IsisMain() {
 
   // *NOTE: The UpperLeftX,UpperLeftY keywords will not be used in the CreateForCube
   //   method, and they will instead be recalculated. This is correct.
-  Projection *outproj = ProjectionFactory::CreateForCube(mapData,samples,lines,
-                                                         ui.GetBoolean("MATCHMAP"));
+  Projection *outproj = ProjectionFactory::CreateForCube(mapData, samples, lines,
+                        ui.GetBoolean("MATCHMAP"));
 
   // Set up the transform object which will simply map
   // output line/samps -> output lat/lons -> input line/samps
-  Transform *transform = new map2map (icube->Samples(),
-                                       icube->Lines(),
-                                       icube->Projection(),
-                                       samples,
-                                       lines,
-                                       outproj,
-                                       ui.GetBoolean("TRIM"));
+  Transform *transform = new map2map(icube->Samples(),
+                                     icube->Lines(),
+                                     icube->Projection(),
+                                     samples,
+                                     lines,
+                                     outproj,
+                                     ui.GetBoolean("TRIM"));
 
   // Allocate the output cube and add the mapping labels
-  Cube *ocube = p.SetOutputCube ("TO", transform->OutputSamples(),
-                                            transform->OutputLines(),
-                                            icube->Bands());
+  Cube *ocube = p.SetOutputCube("TO", transform->OutputSamples(),
+                                transform->OutputLines(),
+                                icube->Bands());
 
   PvlGroup cleanOutGrp = outproj->Mapping();
 
   // ProjectionFactory::CreateForCube updated mapData to have the correct
   //   upperleftcornerx, upperleftcornery, scale and resolution. Use these
   //   updated numbers.
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping",Pvl::Traverse)["UpperLeftCornerX"], Pvl::Replace);
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping",Pvl::Traverse)["UpperLeftCornerY"], Pvl::Replace);
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping",Pvl::Traverse)["Scale"], Pvl::Replace);
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping",Pvl::Traverse)["PixelResolution"], Pvl::Replace);
+  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["UpperLeftCornerX"], Pvl::Replace);
+  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["UpperLeftCornerY"], Pvl::Replace);
+  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["Scale"], Pvl::Replace);
+  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["PixelResolution"], Pvl::Replace);
 
   ocube->PutGroup(cleanOutGrp);
 
   // Set up the interpolator
   Interpolator *interp;
-  if (ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
+  if(ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
     interp = new Interpolator(Interpolator::NearestNeighborType);
   }
-  else if (ui.GetString("INTERP") == "BILINEAR") {
+  else if(ui.GetString("INTERP") == "BILINEAR") {
     interp = new Interpolator(Interpolator::BiLinearType);
   }
-  else if (ui.GetString("INTERP") == "CUBICCONVOLUTION") {
+  else if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
     string msg = "Unknow value for INTERP [" + ui.GetString("INTERP") + "]";
-    throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
   // Warp the cube
@@ -360,9 +361,9 @@ void IsisMain() {
 }
 
 // Transform object constructor
-map2map::map2map (const int inputSamples, const int inputLines, Projection *inmap,
-              const int outputSamples, const int outputLines, Projection *outmap,
-              bool trim) {
+map2map::map2map(const int inputSamples, const int inputLines, Projection *inmap,
+                 const int outputSamples, const int outputLines, Projection *outmap,
+                 bool trim) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;
   p_inmap = inmap;
@@ -383,28 +384,28 @@ map2map::map2map (const int inputSamples, const int inputLines, Projection *inma
     wrapPossible = wrapPossible && inmap->SetUniversalGround(0, 180);
     int worldEnd = (int)(inmap->WorldX() + 0.5);
 
-    p_inputWorldSize = abs(worldEnd - worldStart)*2;
+    p_inputWorldSize = abs(worldEnd - worldStart) * 2;
   }
 }
 
 // Transform method mapping output line/samps to lat/lons to input line/samps
-bool map2map::Xform (double &inSample, double &inLine,
-                       const double outSample, const double outLine) {
+bool map2map::Xform(double &inSample, double &inLine,
+                    const double outSample, const double outLine) {
   // See if the output image coordinate converts to lat/lon
-  if (!p_outmap->SetWorld(outSample,outLine)) return false;
+  if(!p_outmap->SetWorld(outSample, outLine)) return false;
 
   // See if we should trim
-  if ((p_trim) && (p_outmap->HasGroundRange())) {
-    if (p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
-    if (p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
-    if (p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
-    if (p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
+  if((p_trim) && (p_outmap->HasGroundRange())) {
+    if(p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
+    if(p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
+    if(p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
+    if(p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
   }
 
   // Get the universal lat/lon and see if it can be converted to input line/samp
   double lat = p_outmap->UniversalLatitude();
   double lon = p_outmap->UniversalLongitude();
-  if (!p_inmap->SetUniversalGround(lat,lon)) return false;
+  if(!p_inmap->SetUniversalGround(lat, lon)) return false;
 
   inSample = p_inmap->WorldX();
   inLine = p_inmap->WorldY();
@@ -424,20 +425,20 @@ bool map2map::Xform (double &inSample, double &inLine,
   }
 
   // Make sure the point is inside the input image
-  if (inSample < 0.5) return false;
-  if (inLine < 0.5) return false;
-  if (inSample > p_inputSamples + 0.5) return false;
-  if (inLine > p_inputLines + 0.5) return false;
+  if(inSample < 0.5) return false;
+  if(inLine < 0.5) return false;
+  if(inSample > p_inputSamples + 0.5) return false;
+  if(inLine > p_inputLines + 0.5) return false;
 
   // Everything is good
   return true;
 }
 
-int map2map::OutputSamples () const {
+int map2map::OutputSamples() const {
   return p_outputSamples;
 }
 
-int map2map::OutputLines () const {
+int map2map::OutputLines() const {
   return p_outputLines;
 }
 
@@ -449,7 +450,7 @@ void PrintMap() {
   // Get mapping group from map file
   Pvl userMap;
   userMap.Read(ui.GetFilename("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping",Pvl::Traverse);
+  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);
@@ -464,7 +465,7 @@ void LoadMapRange() {
   try {
     userMap.Read(ui.GetFilename("MAP"));
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Clear();
   }
 
@@ -474,7 +475,7 @@ void LoadMapRange() {
   try {
     fromMap.Read(ui.GetFilename("FROM"));
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Clear();
   }
 
@@ -484,7 +485,7 @@ void LoadMapRange() {
   try {
     fromMapping = fromMap.FindGroup("Mapping", Pvl::Traverse);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Clear();
   }
 
@@ -493,7 +494,7 @@ void LoadMapRange() {
   try {
     userMapping = userMap.FindGroup("Mapping", Pvl::Traverse);
   }
-  catch (iException &e) {
+  catch(iException &e) {
     e.Clear();
   }
 
@@ -526,23 +527,23 @@ void LoadMapRange() {
     if(((string)userMapping["LatitudeType"]).compare(fromMapping["LatitudeType"]) != 0) { // new lat type different?
       if(((string)userMapping["LatitudeType"]).compare("Planetographic") == 0) {
         fromMapping["MinimumLatitude"] = Projection::ToPlanetographic(
-                                                  (double)fromMapping["MinimumLatitude"],
-                                                  (double)fromMapping["EquatorialRadius"],
-                                                  (double)fromMapping["PolarRadius"]);
+                                           (double)fromMapping["MinimumLatitude"],
+                                           (double)fromMapping["EquatorialRadius"],
+                                           (double)fromMapping["PolarRadius"]);
         fromMapping["MaximumLatitude"] = Projection::ToPlanetographic(
-                                                  (double)fromMapping["MaximumLatitude"],
-                                                  (double)fromMapping["EquatorialRadius"],
-                                                  (double)fromMapping["PolarRadius"]);
+                                           (double)fromMapping["MaximumLatitude"],
+                                           (double)fromMapping["EquatorialRadius"],
+                                           (double)fromMapping["PolarRadius"]);
       }
       else {
         fromMapping["MinimumLatitude"] = Projection::ToPlanetocentric(
-                                                  (double)fromMapping["MinimumLatitude"],
-                                                  (double)fromMapping["EquatorialRadius"],
-                                                  (double)fromMapping["PolarRadius"]);
+                                           (double)fromMapping["MinimumLatitude"],
+                                           (double)fromMapping["EquatorialRadius"],
+                                           (double)fromMapping["PolarRadius"]);
         fromMapping["MaximumLatitude"] = Projection::ToPlanetocentric(
-                                                  (double)fromMapping["MaximumLatitude"],
-                                                  (double)fromMapping["EquatorialRadius"],
-                                                  (double)fromMapping["PolarRadius"]);
+                                           (double)fromMapping["MaximumLatitude"],
+                                           (double)fromMapping["EquatorialRadius"],
+                                           (double)fromMapping["PolarRadius"]);
       }
     }
   }
@@ -553,7 +554,7 @@ void LoadMapRange() {
       fromMapping["MinimumLongitude"] = fromMap.FindGroup("Mapping", Pvl::Traverse)["MinimumLongitude"];
       fromMapping["MaximumLongitude"] = fromMap.FindGroup("Mapping", Pvl::Traverse)["MaximumLongitude"];
     }
-    catch (iException &e) {
+    catch(iException &e) {
       e.Clear();
     }
   }

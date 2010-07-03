@@ -20,7 +20,7 @@ using namespace Isis;
 bool full = false;
 bool tab = false;
 
-std::string FormatString( double input, int head, int tail );
+std::string FormatString(double input, int head, int tail);
 
 void IsisMain() {
 
@@ -34,45 +34,45 @@ void IsisMain() {
 
   // Progress
   Progress progress;
-  progress.SetMaximumSteps( overlaps.Size() );
+  progress.SetMaximumSteps(overlaps.Size());
   progress.CheckStatus();
 
   // Sets up the no overlap list
   set<string> nooverlap;
-  for ( int i = 0; i < serialNumbers.Size(); i ++ ) {
-    nooverlap.insert( serialNumbers.SerialNumber(i) );
+  for(int i = 0; i < serialNumbers.Size(); i ++) {
+    nooverlap.insert(serialNumbers.SerialNumber(i));
   }
 
   // Create the output
 
-  stringstream output (stringstream::in | stringstream::out);
+  stringstream output(stringstream::in | stringstream::out);
   output.precision(16);
   output.setf(ios::showpoint);
 
   string delim = "";
   string pretty = ""; // Makes tab tables look pretty, ignored in CSV
   bool singleLine = false;
-  if ( ui.WasEntered("DETAIL") ) {
-    if ( ui.GetString("TABLETYPE") == "CSV" ) {
+  if(ui.WasEntered("DETAIL")) {
+    if(ui.GetString("TABLETYPE") == "CSV") {
       delim = ",";
       singleLine = ui.GetBoolean("SINGLELINE");
       // This line was removed because reability (ios::showpoint) was more
       // important than an extra decimal place of precision.
       //output.setf(ios::scientific,ios::floatfield);
     }
-    else if ( ui.GetString("TABLETYPE") == "TAB" ) {
+    else if(ui.GetString("TABLETYPE") == "TAB") {
       delim = "\t";
       pretty = "\t";
 
       tab = true;
     }
-  
-    full = ( ui.GetString("DETAIL") == "FULL" );
+
+    full = (ui.GetString("DETAIL") == "FULL");
   }
 
   bool firstFullOutput = true;
 
-  stringstream errors (stringstream::in | stringstream::out);
+  stringstream errors(stringstream::in | stringstream::out);
   int errorNum = 0;
 
   // Extracts the stats of each overlap and adds to the table
@@ -80,18 +80,18 @@ void IsisMain() {
   Statistics area;
   Statistics sncount;
   int overlapnum = 0;//Makes sure there are overlaps
-  for ( int index = 0; index < overlaps.Size(); index ++ ) {
+  for(int index = 0; index < overlaps.Size(); index ++) {
 
-    if ( overlaps[index]->Size() > 1 ) {
+    if(overlaps[index]->Size() > 1) {
       overlapnum++;
 
       // Removes the overlapping Serial Numbers for the nooverlap set
-      for ( int i = 0; i < overlaps[index]->Size(); i ++ ) {
-        nooverlap.erase( (*overlaps[index])[i] );
+      for(int i = 0; i < overlaps[index]->Size(); i ++) {
+        nooverlap.erase((*overlaps[index])[i]);
       }
 
       // Sets up the serial number stats
-      sncount.AddData( overlaps[index]->Size() );
+      sncount.AddData(overlaps[index]->Size());
 
       // Sets up the thickness stats by doing A over E
       const geos::geom::MultiPolygon *mpLatLon = overlaps[index]->Polygon();
@@ -104,28 +104,28 @@ void IsisMain() {
       Isis::Pvl maplab;
       maplab.AddGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
-      mapGroup += Isis::PvlKeyword("EquatorialRadius",(string)radii["EquatorialRadius"]);
-      mapGroup += Isis::PvlKeyword("PolarRadius",(string)radii["PolarRadius"]);
-      mapGroup += Isis::PvlKeyword("LatitudeType","Planetocentric");
-      mapGroup += Isis::PvlKeyword("LongitudeDirection","PositiveEast");
-      mapGroup += Isis::PvlKeyword("LongitudeDomain",360);
-      mapGroup += Isis::PvlKeyword("CenterLatitude",0);
-      mapGroup += Isis::PvlKeyword("CenterLongitude",0);
-      mapGroup += Isis::PvlKeyword("ProjectionName","Sinusoidal");
+      mapGroup += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
+      mapGroup += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+      mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
+      mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
+      mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
+      mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
+      mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+      mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
       Projection *proj = Isis::ProjectionFactory::Create(maplab);
 
       // Sets up the thickness and area stats
       try {
-        geos::geom::MultiPolygon *mpXY = PolygonTools::LatLonToXY( *mpLatLon, proj );
+        geos::geom::MultiPolygon *mpXY = PolygonTools::LatLonToXY(*mpLatLon, proj);
 
-        double thicknessValue = PolygonTools::Thickness( mpXY );
-        thickness.AddData( thicknessValue );
+        double thicknessValue = PolygonTools::Thickness(mpXY);
+        thickness.AddData(thicknessValue);
 
         double areaValue = mpXY->getArea();
-        area.AddData( areaValue );
+        area.AddData(areaValue);
 
-        if( full ) {
-          if( firstFullOutput ) {
+        if(full) {
+          if(firstFullOutput) {
             output << "Overlap ID";
             output << delim << "Thickness";
             output << delim << pretty << "Area";
@@ -137,21 +137,22 @@ void IsisMain() {
           }
           output << index << pretty;
           output << delim << thicknessValue;
-          if( tab ) {
-            output << delim << FormatString( areaValue, 18, 4 );
-          } else {
+          if(tab) {
+            output << delim << FormatString(areaValue, 18, 4);
+          }
+          else {
             output << delim << areaValue;
           }
           output << delim << overlaps[index]->Size() << pretty;
           output << delim << (*overlaps[index])[0];
-          output << delim << serialNumbers.Filename( (*overlaps[index])[0] );
-          for( int sn=1; sn < overlaps[index]->Size(); sn ++ ) {
-            if( !singleLine ) {
+          output << delim << serialNumbers.Filename((*overlaps[index])[0]);
+          for(int sn = 1; sn < overlaps[index]->Size(); sn ++) {
+            if(!singleLine) {
               output << endl << pretty << delim << pretty << delim << pretty << delim;
               output << pretty << pretty;
             }
             output << delim << pretty << (*overlaps[index])[sn];
-            output << delim << serialNumbers.Filename( (*overlaps[index])[sn] );
+            output << delim << serialNumbers.Filename((*overlaps[index])[sn]);
           }
           output << endl;
         }
@@ -159,20 +160,22 @@ void IsisMain() {
         delete mpXY;
         mpXY = NULL;
 
-      } catch ( iException &e ) {
+      }
+      catch(iException &e) {
 
-        if( ui.WasEntered("ERRORS") ) {
+        if(ui.WasEntered("ERRORS")) {
 
-          if( errorNum > 0 ) {
+          if(errorNum > 0) {
             errors << endl;
           }
           errorNum ++;
 
           errors << e.PvlErrors().Group(0).FindKeyword("Message")[0];
-          for (int serNum = 0; serNum < overlaps[index]->Size(); serNum++) {
-            if( serNum == 0 ) {
+          for(int serNum = 0; serNum < overlaps[index]->Size(); serNum++) {
+            if(serNum == 0) {
               errors << ": ";
-            } else {
+            }
+            else {
               errors << ", ";
             }
             errors << (*overlaps[index])[serNum];
@@ -184,7 +187,7 @@ void IsisMain() {
         progress.CheckStatus();
         continue;
       }
-      
+
     }
 
     progress.CheckStatus();
@@ -192,70 +195,70 @@ void IsisMain() {
   }
 
   // Checks if there were overlaps to output results from
-  if ( overlapnum == 0 ) {
+  if(overlapnum == 0) {
     std::string msg = "The overlap file [";
     msg += Filename(ui.GetFilename("OVERLAPLIST")).Name();
     msg += "] does not contain any overlaps across the provided cubes [";
     msg += Filename(ui.GetFilename("FROMLIST")).Name() + "]";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
 
   //Create and Log the BRIEF description
   PvlGroup brief("Results");
 
-  brief += PvlKeyword( "ThicknessMinimum", thickness.Minimum() );
-  brief += PvlKeyword( "ThicknessMaximum", thickness.Maximum() );
-  brief += PvlKeyword( "ThicknessAverage", thickness.Average() );
-  brief += PvlKeyword( "ThicknessStandardDeviation", thickness.StandardDeviation() );
-  brief += PvlKeyword( "ThicknessVariance", thickness.Variance() );
+  brief += PvlKeyword("ThicknessMinimum", thickness.Minimum());
+  brief += PvlKeyword("ThicknessMaximum", thickness.Maximum());
+  brief += PvlKeyword("ThicknessAverage", thickness.Average());
+  brief += PvlKeyword("ThicknessStandardDeviation", thickness.StandardDeviation());
+  brief += PvlKeyword("ThicknessVariance", thickness.Variance());
 
-  brief += PvlKeyword( "AreaMinimum", area.Minimum() );
-  brief += PvlKeyword( "AreaMaximum", area.Maximum() );
-  brief += PvlKeyword( "AreaAverage", area.Average() );
-  brief += PvlKeyword( "AreaStandardDeviation", area.StandardDeviation() );
-  brief += PvlKeyword( "AreaVariance", area.Variance() );
+  brief += PvlKeyword("AreaMinimum", area.Minimum());
+  brief += PvlKeyword("AreaMaximum", area.Maximum());
+  brief += PvlKeyword("AreaAverage", area.Average());
+  brief += PvlKeyword("AreaStandardDeviation", area.StandardDeviation());
+  brief += PvlKeyword("AreaVariance", area.Variance());
 
-  brief += PvlKeyword( "ImageStackMinimum", sncount.Minimum() );
-  brief += PvlKeyword( "ImageStackMaximum", sncount.Maximum() );
-  brief += PvlKeyword( "ImageStackAverage", sncount.Average() );
-  brief += PvlKeyword( "ImageStackStandardDeviation", sncount.StandardDeviation() );
-  brief += PvlKeyword( "ImageStackVariance", sncount.Variance() );
+  brief += PvlKeyword("ImageStackMinimum", sncount.Minimum());
+  brief += PvlKeyword("ImageStackMaximum", sncount.Maximum());
+  brief += PvlKeyword("ImageStackAverage", sncount.Average());
+  brief += PvlKeyword("ImageStackStandardDeviation", sncount.StandardDeviation());
+  brief += PvlKeyword("ImageStackVariance", sncount.Variance());
 
-  brief += PvlKeyword( "PolygonCount", overlaps.Size() );
+  brief += PvlKeyword("PolygonCount", overlaps.Size());
 
   // Add non-overlapping cubes to the output
-  if ( !nooverlap.empty() ) {
-    for ( set<string>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++ ) {
-      brief += PvlKeyword( "NoOverlap", serialNumbers.Filename(*itt) );
+  if(!nooverlap.empty()) {
+    for(set<string>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
+      brief += PvlKeyword("NoOverlap", serialNumbers.Filename(*itt));
     }
   }
 
-  Application::Log( brief );
+  Application::Log(brief);
 
 
   //Log the ERRORS file
-  if( ui.WasEntered("ERRORS") ) {
+  if(ui.WasEntered("ERRORS")) {
     string errorname = ui.GetFilename("ERRORS");
     std::ofstream errorsfile;
-    errorsfile.open( errorname.c_str() );
+    errorsfile.open(errorname.c_str());
     errorsfile << errors.str();
     errorsfile.close();
   }
 
   //Log error num in print.prt if there were errors
-  if( errorNum > 0 ) {
-    PvlGroup grp( "OverlapStats" );
-    PvlKeyword key( "ErrorNumber", iString(errorNum) );
-    grp.AddKeyword( key );
-    Application::Log( grp );
+  if(errorNum > 0) {
+    PvlGroup grp("OverlapStats");
+    PvlKeyword key("ErrorNumber", iString(errorNum));
+    grp.AddKeyword(key);
+    Application::Log(grp);
   }
 
   // Display FULL output
-  if( full ) {
+  if(full) {
     string outname = ui.GetFilename("TO");
     std::ofstream outfile;
-    outfile.open( outname.c_str() );
+    outfile.open(outname.c_str());
     outfile << output.str();
     outfile.close();
     if(outfile.fail()) {
@@ -268,30 +271,30 @@ void IsisMain() {
 
 
 /**
- * Takes a string and formats the length of that string around the decimal 
- * point. 
- * 
+ * Takes a string and formats the length of that string around the decimal
+ * point.
+ *
  * @param input The input double to be formatted
- * @param head  The desired character length for the double prior to the 
+ * @param head  The desired character length for the double prior to the
  *              decimal point. It will be filled with " " (white space)
- * @param tail  The desired character length for the double after the decimal 
+ * @param tail  The desired character length for the double after the decimal
  *              point. It will be filled with "0".
- * 
+ *
  * @return std::string The formatted double for display
  */
-std::string FormatString( double input, int head, int tail ) {
+std::string FormatString(double input, int head, int tail) {
 
-  iString result( input );
+  iString result(input);
 
   int point = result.find_first_of(".");
-  iString resultHead( result.substr(0,point) );
-  iString resultTail( result.substr(point+1,result.size()-point-1) );
+  iString resultHead(result.substr(0, point));
+  iString resultTail(result.substr(point + 1, result.size() - point - 1));
 
-  for( int place = resultHead.size(); place < head; place ++ ) {
+  for(int place = resultHead.size(); place < head; place ++) {
     resultHead = " " + resultHead;
   }
 
-  for( int place = resultTail.size(); place < tail; place ++ ) {
+  for(int place = resultTail.size(); place < tail; place ++) {
     resultTail = resultTail + "0";
   }
 

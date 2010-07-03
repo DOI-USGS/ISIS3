@@ -38,28 +38,28 @@
 
 namespace Qisis {
 
-/**
- * @brief Qtie File operations
- *
- * @ingroup Visualization Tools
- *
- * @author 2007-08-09 Tracie Sucharski, adapted from QnetFileTool
- *
- * @internal 
- * @history 2009-06-10 Tracie Sucharski - Added new signal for opening new 
- *                        files.
- *
- */
+  /**
+   * @brief Qtie File operations
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2007-08-09 Tracie Sucharski, adapted from QnetFileTool
+   *
+   * @internal
+   * @history 2009-06-10 Tracie Sucharski - Added new signal for opening new
+   *                        files.
+   *
+   */
 
   class QtieFileTool : public FileTool {
-    Q_OBJECT
+      Q_OBJECT
 
     signals:
-      void cubesOpened(Isis::Cube &baseCube,Isis::Cube &matchCube,Isis::ControlNet &cnet);
+      void cubesOpened(Isis::Cube &baseCube, Isis::Cube &matchCube, Isis::ControlNet &cnet);
       void newFiles();
 
     public:
-      QtieFileTool (QWidget *parent);
+      QtieFileTool(QWidget *parent);
 
     public slots:
       virtual void open();
@@ -67,7 +67,7 @@ namespace Qisis {
 
     private:
 
- };
+  };
 };
 
 #endif

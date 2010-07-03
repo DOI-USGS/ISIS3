@@ -27,27 +27,29 @@ namespace Qisis {
    *            CubeViewport
    */
   class BandTool : public Qisis::Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      BandTool (QWidget *parent);
+      BandTool(QWidget *parent);
 
     protected:
       /**
        * returns the name of the menu.
-       * 
-       * 
-       * @return QString 
+       *
+       *
+       * @return QString
        */
-      QString menuName() const { return "&View"; };
+      QString menuName() const {
+        return "&View";
+      };
       QAction *toolPadAction(ToolPad *pad);
-      QWidget *createToolBarWidget (QStackedWidget *active);
+      QWidget *createToolBarWidget(QStackedWidget *active);
       void updateTool();
 
     private slots:
       void changeView();
       void setList();
-      void setBandBin (Isis::Pvl &pvl);
+      void setBandBin(Isis::Pvl &pvl);
       void setDisplay();
       void copyLinkedViewports();
       void copyAllViewports();

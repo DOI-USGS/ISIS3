@@ -8,11 +8,10 @@
 class QLabel;
 class QStatusBar;
 
-namespace Qisis
-{
+namespace Qisis {
   class MdiCubeViewport;
   class WarningWidget;
-  
+
   /**
    * @brief This tool is part of the Qisis namespace and displays the statusbar of the window.
    *      The status bar tracks the line, sample, lat ,lon and pixel values. Also displays Warning
@@ -30,15 +29,14 @@ namespace Qisis
    * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *          CubeViewport.  Fixed include issues.
    */
-  class TrackTool : public Tool
-  {
+  class TrackTool : public Tool {
       Q_OBJECT
 
     public:
       TrackTool(QStatusBar *parent);
-      void displayWarning(std::string & pStr,  const std::string  & pExStr);
+      void displayWarning(std::string &pStr,  const std::string   &pExStr);
       void resetStatusWarning(void);
-      QStatusBar * getStatusBar(void);
+      QStatusBar *getStatusBar(void);
 
     public slots:
       virtual void mouseMove(QPoint p);
@@ -64,7 +62,7 @@ namespace Qisis
       QLabel *p_redLabel;           //!< Red label
       QLabel *p_grnLabel;           //!< Green label
       QLabel *p_bluLabel;           //!< Blue label
-      WarningWidget * mWarningWidget; //!< Warning Widget
+      WarningWidget *mWarningWidget;  //!< Warning Widget
   };
 };
 

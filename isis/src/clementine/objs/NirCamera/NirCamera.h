@@ -3,8 +3,8 @@
 
 #include "FramingCamera.h"
 
-namespace Clementine { 
-  /**                                                                       
+namespace Clementine {
+  /**
    * @brief Camera class
    *
    * This is the camera class for the NirCamera
@@ -25,8 +25,8 @@ namespace Clementine {
    */
   class NirCamera : public Isis::FramingCamera {
     public:
-      NirCamera (Isis::Pvl &lab);
-      ~NirCamera () {};      
+      NirCamera(Isis::Pvl &lab);
+      ~NirCamera() {};
   };
 };
 #endif

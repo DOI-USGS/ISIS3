@@ -4,7 +4,7 @@
 namespace Isis {
   GuiHelperAction::GuiHelperAction(QObject *parent, const QString &funct) : QAction(parent) {
     p_funct = funct;
-    connect(this,SIGNAL(triggered(bool)),this,SLOT(retrigger()));
+    connect(this, SIGNAL(triggered(bool)), this, SLOT(retrigger()));
   }
 
   GuiHelperAction::~GuiHelperAction() {};

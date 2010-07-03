@@ -42,22 +42,22 @@ namespace Qisis {
   /**
    * @brief Tool to visualize statistics in an n * m box.
    *
-   * This tool is used to visualize statistics in an n * m box specified 
-   * by the user. It allows for textual and visual representation of the 
-   * DN values in the region as well as the standard deviation over the box. 
-   * 
+   * This tool is used to visualize statistics in an n * m box specified
+   * by the user. It allows for textual and visual representation of the
+   * DN values in the region as well as the standard deviation over the box.
+   *
    * @ingroup Visualization Tools
-   * 
+   *
    * @author  Noah Hilt
-   * 
+   *
    * @internal
 
    *  @history 2009-10-07 Noah Hilt - Original version.
-   *  
+   *
    *  @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    */
   class VisualDisplay : public QWidget {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
       VisualDisplay(QWidget *parent = 0);
@@ -77,27 +77,27 @@ namespace Qisis {
       void mouseMoveEvent(QMouseEvent *event);
       void leaveEvent(QEvent *event);
 
-   signals:
+    signals:
       /**
        * Signal to set the DN label to st.
-       * 
-       * @param st 
+       *
+       * @param st
        */
       void setDn(const QString st);
       /**
        * Signal to set the Sample label to st.
-       * 
-       * @param st 
+       *
+       * @param st
        */
       void setSample(const QString st);
       /**
        * Signal to set the Line label to st.
-       * 
-       * @param st 
+       *
+       * @param st
        */
       void setLine(const QString st);
 
-   protected slots:
+    protected slots:
       void setBoxSize(int size);
       void showText(bool b);
       void showPixels(bool b);
@@ -124,10 +124,10 @@ namespace Qisis {
   };
 
   class StatisticsTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      StatisticsTool (QWidget *parent);
+      StatisticsTool(QWidget *parent);
 
     protected:
       QAction *toolPadAction(ToolPad *toolpad);
@@ -162,7 +162,7 @@ namespace Qisis {
 
       int p_ulSamp; //!< Upper left sample of region
       int p_ulLine; //!< Upper left line of region
- 
+
       bool p_set; //!< Boolean to see if data is set
 
     private slots:

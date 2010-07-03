@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   string insert = "INSERT INTO testTable (v1, v2, v3) "
                   " VALUES ('test text', 7, 123.4);";
   string query = "SELECT * FROM testTable;";
-  
+
   SqlQuery create(testdb);
   create.setThrowOnFailure();
 
@@ -51,8 +51,8 @@ int main(int argc, char *argv[]) {
   cout << "Calling makePersistant()..." << endl;
   testdb.makePersistant();
   cout << "Persistant: " << testdb.isPersistant() << endl;
-  
-  Database c = testdb.clone("unittestdb clone"); 
+
+  Database c = testdb.clone("unittestdb clone");
   cout << "Clone name: " << c.Name() << endl;
 
   cout << "Tables: ";
