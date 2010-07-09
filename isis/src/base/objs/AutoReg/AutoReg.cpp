@@ -74,8 +74,8 @@ namespace Isis {
   void AutoReg::Init() {
     // Set computed parameters to NULL so we don't use values from a previous
     // run
-    p_ZScore1 = Isis::Null;
-    p_ZScore2 = Isis::Null;
+    p_ZScoreMin = Isis::Null;
+    p_ZScoreMax = Isis::Null;
     p_goodnessOfFit = Isis::Null;
     p_surfaceModelEccentricity = Isis::Null;
     p_surfaceModelEccentricityRatio = Isis::Null;
@@ -747,11 +747,13 @@ namespace Isis {
     }
 
     // If it does not pass, return
-    p_ZScore1 = patternStats.ZScore(patternStats.Minimum());
-    p_ZScore2 = patternStats.ZScore(patternStats.Maximum());
+    p_ZScoreMin = patternStats.ZScore(patternStats.Minimum());
+    p_ZScoreMax = patternStats.ZScore(patternStats.Maximum());
 
-    if(p_ZScore2 < p_minimumPatternZScore ||
-        p_ZScore1 > -1 * p_minimumPatternZScore) {
+    // p_ZScoreMin is made negative here so as to make it the equivalent of
+    // taking the absolute value (because p_ZScoreMin is guaranteed to be
+    // negative)
+    if (p_ZScoreMax < p_minimumPatternZScore && -p_ZScoreMin < p_minimumPatternZScore) {
       return false;
     }
     else {
@@ -1030,13 +1032,13 @@ namespace Isis {
     //item.setStatus(p_status);
     item.setGoodnessOfFit(p_goodnessOfFit);
     item.setEccentricity(p_surfaceModelEccentricity);
-    item.setZScoreOne(p_ZScore1);
-    item.setZScoreTwo(p_ZScore2);
+    item.setZScoreOne(p_ZScoreMin);
+    item.setZScoreTwo(p_ZScoreMax);
 
     /*if(p_goodnessOfFit != Isis::Null)item.setGoodnessOfFit(p_goodnessOfFit);
     if(p_surfaceModelEccentricity != Isis::Null) item.setEccentricity(p_surfaceModelEccentricity);
-    if(p_ZScore1 != Isis::Null)item.setZScoreOne(p_ZScore1);
-    if(p_ZScore2 != Isis::Null)item.setZScoreTwo(p_ZScore2);*/
+    if(p_ZScoreMin != Isis::Null)item.setZScoreOne(p_ZScoreMin);
+    if(p_ZScoreMax != Isis::Null)item.setZScoreTwo(p_ZScoreMax);*/
 
     // Set the autoRegItem's change in line/sample numbers.
     if(p_status == Success) {

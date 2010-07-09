@@ -138,6 +138,9 @@ namespace Isis {
    *             Interpolator type from the pvl and set the pattern and search
    *             chips' Read() methods to use this Interpolator type. Updated
    *             documentation and unitTest.
+   *    @history 2010-07-09 Travis Addair - ComputeChipZScore now requires that
+   *             both p_ZScoreMin and p_ZScoreMax are less than the pattern
+   *             stats minimum z-score in order to fail.
    *
    */
   class Pvl;
@@ -318,8 +321,8 @@ namespace Isis {
        * @param score2 Second Z Score
        */
       void ZScores(double &score1, double &score2) const {
-        score1 = p_ZScore1;
-        score2 = p_ZScore2;
+        score1 = p_ZScoreMin;
+        score2 = p_ZScoreMax;
       }
 
       //! Return eccentricity tolerance
@@ -467,8 +470,8 @@ namespace Isis {
       int p_SurfaceModelEccentricityRatioNotMet;        //!< Registration statistics SurfaceModelEccentricityRatioNotMet keyword.
       int p_SurfaceModelResidualToleranceNotMet;        //!< Registration statistics SurfaceModelResidualToleranceNotMet keyword.
 
-      double p_ZScore1;                                 //!< First Z-Score of pattern chip
-      double p_ZScore2;                                 //!< Second Z-Score of pattern chip
+      double p_ZScoreMin;                                 //!< First Z-Score of pattern chip
+      double p_ZScoreMax;                                 //!< Second Z-Score of pattern chip
 
       double p_minimumPatternZScore;                    //!< Minimum pattern Z-Score
       double p_patternValidPercent;                     //!< Percentage of data in pattern chip that must be valid
