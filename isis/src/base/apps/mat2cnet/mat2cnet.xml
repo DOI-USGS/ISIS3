@@ -15,7 +15,7 @@
       pvl name, a network ID, a target and a description.  The user may also 
       choose whether to input a RAND PPP file containing latitude, longitude 
       and radius for each corresponding point ID and to create an output RAND 
-      PPP log.  This program converst the radius values in these files from km
+      PPP log.  This program converts the radius values in these files from km
       to meters before adding them to the output control network.  If a RAND 
       PPP file is not entered, all the points in the MATCH file will be set to 
       type TIE.  If a RAND PPP is input, then any points not found in this file 
