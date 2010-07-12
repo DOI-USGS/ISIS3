@@ -5,7 +5,7 @@
  *	There is no warranty.
  *
  *	Feb. 12. 2005
- *	Benjamin Grüdelbach
+ *	Benjamin Grï¿½delbach
  */
 
 /*
@@ -38,19 +38,20 @@
 
 //----------------------------------------------------------------------
 //STL includes
+#include "stdint.h"
 #include <string>
 
 //----------------------------------------------------------------------
 //typedefs
-typedef unsigned char *POINTER;
+typedef uint8_t *POINTER;
 
 /*
  * MD5 context.
  */
 typedef struct {
-  unsigned long int state[4];   	      /* state (ABCD) */
-  unsigned long int count[2]; 	      /* number of bits, modulo 2^64 (lsb first) */
-  unsigned char buffer[64];	      /* input buffer */
+  uint32_t state[4];   	      /* state (ABCD) */
+  uint32_t count[2]; 	      /* number of bits, modulo 2^64 (lsb first) */
+  uint8_t buffer[64];	      /* input buffer */
 } MD5_CTX;
 
 /*
@@ -60,17 +61,17 @@ class MD5 {
 
   private:
 
-    void MD5Transform(unsigned long int state[4], unsigned char block[64]);
-    void Encode(unsigned char *, unsigned long int *, unsigned int);
-    void Decode(unsigned long int *, unsigned char *, unsigned int);
-    void MD5_memcpy(POINTER, POINTER, unsigned int);
-    void MD5_memset(POINTER, int, unsigned int);
+    void MD5Transform(uint32_t state[4], uint8_t block[64]);
+    void Encode(uint8_t *, uint32_t *, uint32_t);
+    void Decode(uint32_t *, uint8_t *, uint32_t);
+    void MD5_memcpy(POINTER, POINTER, uint32_t);
+    void MD5_memset(POINTER, int32_t, uint32_t);
 
   public:
 
     void MD5Init(MD5_CTX *);
-    void MD5Update(MD5_CTX *, unsigned char *, unsigned int);
-    void MD5Final(unsigned char [16], MD5_CTX *);
+    void MD5Update(MD5_CTX *, uint8_t *, uint32_t);
+    void MD5Final(uint8_t [16], MD5_CTX *);
 
     MD5() {};
 };
