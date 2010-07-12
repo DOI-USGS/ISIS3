@@ -138,6 +138,7 @@ void Import(Buffer &in) {
 
   // Do the decompanding
   for(int pixin = 0; pixin < in.size(); pixin++) {
+
     // if pixin < xtermo0, then it is in "segment 0"
     if(in[pixin] < g_xterm[0])
       buf[pixin] = (int) in[pixin];
@@ -155,8 +156,10 @@ void Import(Buffer &in) {
       // Check if the bin is on the upper boundary of the last segment
       if(upper > MAX_INPUT_VALUE)
         upper = MAX_INPUT_VALUE;
-      else if(segment < g_xterm.size() && upper >= g_xterm[segment])
-        upper = g_xterm[segment] - 1;
+      else if(segment < g_xterm.size() && upper >= g_xterm[segment]) {
+        if((int)(g_bterm[segment] + g_mterm[segment]*upper) != in[pixin])
+          upper = g_xterm[segment] - 1;
+      }
 
       // Check if it is on the lower boundary of a segment
       if(lower < g_xterm[segment-1])
@@ -164,6 +167,7 @@ void Import(Buffer &in) {
 
       // Output the middle bin value
       buf[pixin] = (upper + lower) / 2.0;
+
     }
   }
 
