@@ -31,15 +31,16 @@ void RadiometricCalibration(Buffer &in);
 #define MAXNONLIN 600
 #define SOLAR_RADIUS 695500
 #define KM_PER_AU 149597871
+#define MASKED_PIXEL_VALUES 8
 
-vector<int> g_oddMaskedPixels, g_evenMaskedPixels, g_summedMaskedPixels;
+vector<int> g_maskedPixelsLeft, g_maskedPixelsRight;
 
 double g_radianceLeft, g_radianceRight, g_iofLeft, g_iofRight;
 
 double g_exposure; // Exposure duration
 double g_solarDistance; // average distance in [AU]
 
-bool g_summed, g_masked, g_maskedLeft, g_dark, g_nonlinear, g_flatfield, g_radiometric, g_iof, g_isLeftNac;
+bool g_summed, g_masked, g_maskedLeftOnly, g_dark, g_nonlinear, g_flatfield, g_radiometric, g_iof, g_isLeftNac;
 
 vector<double> g_averageDarkLine, g_linearOffsetLine, g_flatfieldLine;
 
@@ -77,6 +78,11 @@ void IsisMain() {
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
+  if(lab.FindObject("IsisCube").HasGroup("AlphaCube")) {
+    string msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
   if(instId == "NACL")
     g_isLeftNac = true;
   else
@@ -89,7 +95,12 @@ void IsisMain() {
 
   g_exposure = inst["LineExposureDuration"];
 
-  p.SetInputCube("FROM", OneBand);
+  Cube *iCube = p.SetInputCube("FROM", OneBand);
+
+  // If there is any pixel in the image with a DN > 1000
+  //  then the "left" masked pixels are likely wiped out and useless
+  if(iCube->Statistics()->Maximum() > 1000)
+    g_maskedLeftOnly = true;
 
   iString darkFile, flatFile, offsetFile, coefficientFile;
 
@@ -97,7 +108,7 @@ void IsisMain() {
     iString maskedFile = ui.GetAsString("MASKEDFILE");
 
     if(maskedFile.Equal("Default") || maskedFile.length() == 0)
-      maskedFile = "$lro/calibration/" + instId + "_MaskedPixels.0001.pvl";
+      maskedFile = "$lro/calibration/" + instId + "_MaskedPixels.????.pvl";
 
     Filename maskedFilename(maskedFile);
     if((maskedFilename.Expanded()).find("?") != string::npos)
@@ -108,20 +119,22 @@ void IsisMain() {
     }
 
     Pvl maskedPvl(maskedFilename.Expanded());
-
+    PvlKeyword maskedPixels;
+    int cutoff;
     if(g_summed) {
-      PvlKeyword summedPixels = maskedPvl["Summed"];
-      for(int i = 0; i < summedPixels.Size(); i++)
-        g_summedMaskedPixels.push_back(summedPixels[i]);
+      maskedPixels = maskedPvl["Summed"];
+      cutoff = LINE_SIZE / 4;
     }
     else {
-      PvlKeyword evenPixels = maskedPvl["Even"];
-      for(int i = 0; i < evenPixels.Size(); i++)
-        g_evenMaskedPixels.push_back(evenPixels[i]);
-      PvlKeyword oddPixels = maskedPvl["Odd"];
-      for(int i = 0; i < oddPixels.Size(); i++)
-        g_oddMaskedPixels.push_back(oddPixels[i]);
+      maskedPixels = maskedPvl["FullResolution"];
+      cutoff = LINE_SIZE / 2;
     }
+
+    for(int i = 0; i < maskedPixels.Size(); i++)
+      if((g_isLeftNac && (int) maskedPixels[i] < cutoff) || (!g_isLeftNac && (int) maskedPixels[i] > cutoff))
+        g_maskedPixelsLeft.push_back(maskedPixels[i]);
+      else
+        g_maskedPixelsRight.push_back(maskedPixels[i]);
   }
 
   if(g_dark) {
@@ -229,25 +242,12 @@ void IsisMain() {
 
   PvlGroup calgrp("Radiometry");
   if(g_masked) {
-    if(g_summed) {
-      PvlKeyword darkColumns("DarkColumns");
-      for(unsigned int i = 0; i < g_summedMaskedPixels.size(); i++)
-        darkColumns += g_summedMaskedPixels[i];
-      calgrp += darkColumns;
-    }
-    // Even and Odd seperately
-    else {
-      PvlKeyword evenDarkColumns("EvenDarkColumns");
-      PvlKeyword oddDarkColumns("OddDarkColumns");
-
-      for(unsigned int i = 0; i < g_evenMaskedPixels.size(); i++)
-        evenDarkColumns += g_evenMaskedPixels[i];
-      for(unsigned int i = 0; i < g_oddMaskedPixels.size(); i++)
-        oddDarkColumns += g_oddMaskedPixels[i];
-
-      calgrp += evenDarkColumns;
-      calgrp += oddDarkColumns;
-    }
+    PvlKeyword darkColumns("DarkColumns");
+    for(unsigned int i = 0; i < g_maskedPixelsLeft.size(); i++)
+      darkColumns += g_maskedPixelsLeft[i];
+    for(unsigned int i = 0; i < g_maskedPixelsRight.size(); i++)
+      darkColumns += g_maskedPixelsRight[i];
+    calgrp += darkColumns;
   }
   if(g_dark)
     calgrp += PvlKeyword("DarkFile", darkFile);
@@ -282,9 +282,8 @@ void ResetGlobals() {
   g_exposure = 1.0; // Exposure duration
   g_solarDistance = 1.01; // average distance in [AU]
 
-  g_oddMaskedPixels.clear();
-  g_evenMaskedPixels.clear();
-  g_summedMaskedPixels.clear();
+  g_maskedPixelsLeft.clear();
+  g_maskedPixelsRight.clear();
 
   g_radianceLeft = 1.0;
   g_radianceRight = 1.0;
@@ -299,6 +298,7 @@ void ResetGlobals() {
   g_radiometric = true;
   g_iof = true;
   g_isLeftNac = true;
+  g_maskedLeftOnly = false;
   g_averageDarkLine.clear();
   g_linearOffsetLine.clear();
   g_flatfieldLine.clear();
@@ -390,32 +390,43 @@ void ReadTextDataFile(string &fileString, vector<vector<double> > &data) {
 }
 
 void RemoveMaskedOffset(Buffer &in) {
-  if(g_summed) {
-    Statistics stats;
-    for(unsigned int i = 0; i < g_summedMaskedPixels.size(); i++)
-      stats.AddData(&in[g_summedMaskedPixels[i]], 1);
+  int numMasked = MASKED_PIXEL_VALUES;
+  if(g_summed)
+    numMasked /= 2;
 
-    double mean = stats.Average();
+  vector<Statistics> statsLeft(numMasked, Statistics());
+  vector<Statistics> statsRight(numMasked, Statistics());
 
-    for(int i = 0; i < in.size(); i++)
-      in[i] -= mean;
+  vector<int> leftRef(numMasked, 0);
+  vector<int> rightRef(numMasked, 0);
+
+  for(unsigned int i = 0; i < g_maskedPixelsLeft.size(); i++) {
+    statsLeft[g_maskedPixelsLeft[i] % numMasked].AddData(&in[g_maskedPixelsLeft[i]], 1);
+    leftRef[g_maskedPixelsLeft[i] % numMasked] += g_maskedPixelsLeft[i];
   }
-  // Even and Odd seperately
+
+  for(unsigned int i = 0; i < g_maskedPixelsRight.size(); i++) {
+    statsRight[g_maskedPixelsRight[i] % numMasked].AddData(&in[g_maskedPixelsRight[i]], 1);
+    rightRef[g_maskedPixelsRight[i] % numMasked] += g_maskedPixelsRight[i];
+  }
+
+  // left/rightRef is the center (average) of all the masked pixels in the set
+  for(int i = 0; i < numMasked; i++) {
+    leftRef[i] /= statsLeft[i].TotalPixels();
+    rightRef[i] /= statsRight[i].TotalPixels();
+  }
+
+  if(g_maskedLeftOnly) {
+    for(int i = 0; i < in.size(); i++) {
+      in[i] -= statsLeft[i % numMasked].Average();
+    }
+  }
   else {
+    // If we are using both sides, we interpolate between them
 
-    Statistics evenStats, oddStats;
-
-    for(unsigned int i = 0; i < g_evenMaskedPixels.size(); i++)
-      evenStats.AddData(&in[g_evenMaskedPixels[i]], 1);
-    for(unsigned int i = 0; i < g_oddMaskedPixels.size(); i++)
-      oddStats.AddData(&in[g_oddMaskedPixels[i]], 1);
-
-    double evenMean = evenStats.Average();
-    double oddMean = oddStats.Average();
-
-    for(int i = 0; i < in.size(); i += 2) {
-      in[i] -= evenMean;
-      in[i + 1] -= oddMean;
+    for(int i = 0; i < in.size(); i++) {
+      in[i] -= (statsLeft[i % numMasked].Average() * (rightRef[i % numMasked] - i) + statsRight[i % numMasked].Average()
+                * (i - leftRef[i % numMasked])) / (rightRef[i % numMasked] - leftRef[i % numMasked]);
     }
   }
 }
@@ -434,6 +445,13 @@ void CorrectNonlinearity(Buffer &in) {
     if(!IsSpecial(in[i])) {
       in[i] += g_linearOffsetLine[i];
 
+      double sign = 1.0;
+      if(in[i] < 0.0) {
+        sign = -1.0;
+      }
+
+      in[i] *= sign;
+
       if(in[i] < MAXNONLIN) {
         if(g_summed)
           in[i] -= (1.0 / (g_linearityCoefficients[2* i ][0] * pow(g_linearityCoefficients[2* i ][1], in[i])
@@ -443,6 +461,8 @@ void CorrectNonlinearity(Buffer &in) {
           in[i] -= 1.0 / (g_linearityCoefficients[i][0] * pow(g_linearityCoefficients[i][1], in[i])
                           + g_linearityCoefficients[i][2]);
       }
+
+      in[i] *= sign;
     }
     else
       in[i] = Isis::Null;
