@@ -40,18 +40,20 @@ namespace Qisis {
    * @author  Jeff Anderson -  ???
    *
    * @internal
-   *   @history 2007-03-21  Tracie Sucharski - Added zoomFitWidth
-   *                         and zoomFitHeight slots and changed
-   *                         the zoomFit button to contain a popup
-   *                         menu for "Fit to Width" & "Fit to
-   *                         Height".
-   *   @history 2008-05-23 Noah Hilt - Added RubberBandTool
-   *            functionality and changed the mouseButtonReleased
-   *            Method.
-   *   @history 2009-02-12 Steven Lambright - Fixed zooming in/out
-   *            with rectangle rubber band
+   *   @history 2007-03-21  Tracie Sucharski - Added zoomFitWidth and
+   *                         zoomFitHeight slots and changed the zoomFit button
+   *                         to contain a popup menu for "Fit to Width" & "Fit
+   *                         to Height".
+   *   @history 2008-05-23 Noah Hilt - Added RubberBandTool functionality and
+   *                          changed the mouseButtonReleased Method.
+   *   @history 2009-02-12 Steven Lambright - Fixed zooming in/out with
+   *                          rectangle rubber band
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-   *            CubeViewport.  Fixed some include issues.
+   *                          CubeViewport.  Fixed some include issues.
+   *   @history 2010-07-12 Jeannie Walldren - Created setScale() methods to
+   *                          display a QMessageBox if a scale value could not
+   *                          be set.
+   *            
    */
   class ZoomTool : public Tool {
       Q_OBJECT
@@ -90,6 +92,11 @@ namespace Qisis {
 
       void mouseButtonPress(QPoint p, Qt::MouseButton s);
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
+
+
+      double setScale(MdiCubeViewport *d, double newScale);
+      double setScale(MdiCubeViewport *d, double newScale, int x, int y);
+      double setScale(MdiCubeViewport *d, double newScale, double samp, double line);
 
     private:
       void zoomBy(double factor);

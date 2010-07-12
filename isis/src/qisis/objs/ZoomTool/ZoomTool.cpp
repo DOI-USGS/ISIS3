@@ -26,13 +26,16 @@
 #include <QHBoxLayout>
 #include <QApplication>
 
+#include "iException.h"
+#include "iString.h"
+#include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "RubberBandTool.h"
-#include "MainWindow.h"
 #include "ToolPad.h"
 #include "Workspace.h"
 #include "ZoomTool.h"
 
+using namespace std;
 namespace Qisis {
   /**
    * ZoomTool constructor
@@ -316,8 +319,7 @@ namespace Qisis {
     MdiCubeViewport *d = cubeViewport();
     if(d == NULL) return;
     double newScale = d->scale() * factor;
-    if(newScale == 0.0) newScale = 1.0;
-    d->setScale(newScale);
+    setScale(d, newScale);
     updateTool();
 
     if(cubeViewport()->isLinked()) {
@@ -326,8 +328,7 @@ namespace Qisis {
         if(d == cubeViewport()) continue;
         if(d->isLinked()) {
           newScale = d->scale() * factor;
-          if(newScale == 0.0) newScale = 1.0;
-          d->setScale(newScale);
+          setScale(d, newScale);
         }
       }
     }
@@ -341,7 +342,7 @@ namespace Qisis {
   void ZoomTool::zoomFit() {
     MdiCubeViewport *d = cubeViewport();
     if(d == NULL) return;
-    d->setScale(d->fitScale(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+    setScale(d, d->fitScale(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
     updateTool();
 
     if(d->isLinked()) {
@@ -349,7 +350,7 @@ namespace Qisis {
         d = (*(cubeViewportList()))[i];
         if(d == cubeViewport()) continue;
         if(d->isLinked()) {
-          d->setScale(d->fitScale(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+          setScale(d, d->fitScale(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
         }
       }
     }
@@ -365,7 +366,7 @@ namespace Qisis {
   void ZoomTool::zoomFitWidth() {
     MdiCubeViewport *d = cubeViewport();
     if(d == NULL) return;
-    d->setScale(d->fitScaleWidth(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+    setScale(d, d->fitScaleWidth(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
     updateTool();
 
     if(d->isLinked()) {
@@ -373,7 +374,7 @@ namespace Qisis {
         d = (*(cubeViewportList()))[i];
         if(d == cubeViewport()) continue;
         if(d->isLinked()) {
-          d->setScale(d->fitScaleWidth(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+          setScale(d, d->fitScaleWidth(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
         }
       }
     }
@@ -388,7 +389,7 @@ namespace Qisis {
   void ZoomTool::zoomFitHeight() {
     MdiCubeViewport *d = cubeViewport();
     if(d == NULL) return;
-    d->setScale(d->fitScaleHeight(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+    setScale(d, d->fitScaleHeight(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
     updateTool();
 
     if(d->isLinked()) {
@@ -396,7 +397,7 @@ namespace Qisis {
         d = (*(cubeViewportList()))[i];
         if(d == cubeViewport()) continue;
         if(d->isLinked()) {
-          d->setScale(d->fitScaleHeight(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
+          setScale(d, d->fitScaleHeight(), d->cubeSamples() / 2.0, d->cubeLines() / 2.0);
         }
       }
     }
@@ -412,8 +413,8 @@ namespace Qisis {
     MdiCubeViewport *d = cubeViewport();
     if(d == NULL) return;
     QString strScale = p_zoomLineEdit->text();
-    double scale = strScale.toDouble() / 100.;
-    d->setScale(scale);
+    double newScale = strScale.toDouble() / 100.;
+    setScale(d, newScale);
     d->setFocus();
     updateTool();
 
@@ -421,7 +422,7 @@ namespace Qisis {
       for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
         d = (*(cubeViewportList()))[i];
         if(d == cubeViewport()) continue;
-        if(d->isLinked()) d->setScale(scale);
+        if(d->isLinked()) setScale(d, newScale);
       }
     }
   }
@@ -468,7 +469,7 @@ namespace Qisis {
         double scale = xscale < yscale ? xscale : yscale;
         if(RubberBandTool::mouseButton() & Qt::RightButton) scale = 1.0 / scale;
         scale *= d->scale();
-        d->setScale(scale, x, y);
+        setScale(d, scale, x, y);
         updateTool();
         if(d->isLinked()) {
           for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
@@ -482,7 +483,7 @@ namespace Qisis {
               double scale = xscale < yscale ? xscale : yscale;
               if(RubberBandTool::mouseButton() & Qt::RightButton) scale = 1.0 / scale;
               scale *= d->scale();
-              d->setScale(scale, x, y);
+              setScale(d, scale, x, y);
             }
           }
         }
@@ -498,9 +499,8 @@ namespace Qisis {
       if(RubberBandTool::mouseButton() == Qt::MidButton + Qt::ControlModifier) factor = 0.0;
       MdiCubeViewport *d = cubeViewport();
       double scale = d->scale() * factor;
-      if(scale == 0.0) scale = 1.0;
       QPoint p = RubberBandTool::getVertices()[0];
-      d->setScale(scale, p.x(), p.y());
+      setScale(d, scale, p.x(), p.y());
       updateTool();
 
       if(d->isLinked()) {
@@ -509,8 +509,7 @@ namespace Qisis {
           if(d == cubeViewport()) continue;
           if(d->isLinked()) {
             scale = d->scale() * factor;
-            if(scale == 0.0) scale = 1.0;
-            d->setScale(scale, p.x(), p.y());
+            scale = setScale(d, scale, p.x(), p.y());
           }
         }
       }
@@ -559,6 +558,107 @@ namespace Qisis {
   void ZoomTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     //set the cursor back to the original cursor shape.
     cubeViewport()->viewport()->setCursor(p_userCursor);
+  }
+
+  /**
+   * This method will attempt to reset the scale for the given MdiCubeViewport
+   * using the new scale value.  If this fails, a message box will pop up.
+   * 
+   * @param d Pointer to MdiCubeViewport
+   * @param newScale New scale value of the cube
+   * @return @b double The scale value used.  If the passed in value fails, this 
+   *         will be the previous scale value.
+   * @internal 
+   * @author Jeannie Walldren 
+   *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   * 
+   */
+  double ZoomTool::setScale(MdiCubeViewport *d, double newScale) {
+    double oldScale = d->scale();
+    try {
+      d->setScale(newScale);
+    }
+    catch (Isis::iException &e) {
+      e.Message(Isis::iException::User, 
+        "Unable to rescale image to [" 
+        + Isis::iString(newScale*100) + "]", _FILEINFO_);
+      QString message = e.Errors().c_str();
+      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+      e.Clear();
+      newScale = oldScale;
+      d->setScale(newScale);
+    }
+    return newScale;
+  }
+
+
+  /**
+   * This method will attempt to reset the scale for the given MdiCubeViewport at 
+   * the x, y values using the new scale value.  If this fails, a message box will
+   * pop up. 
+   * 
+   * @param d Pointer to MdiCubeViewport
+   * @param newScale New scale value of the cube 
+   * @param x 
+   * @param y 
+   * @return @b double The scale value used.  If the passed in value fails, this 
+   *         will be the previous scale value.
+   * @internal 
+   * @author Jeannie Walldren 
+   *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   * 
+   */
+
+  double ZoomTool::setScale(MdiCubeViewport *d, double newScale, int x, int y) {
+    double oldScale = d->scale();
+    try {
+      d->setScale(newScale, x, y);
+    }
+    catch (Isis::iException &e) {
+      e.Message(Isis::iException::User, 
+        "Unable to rescale image to [" 
+        + Isis::iString(newScale*100) + "]", _FILEINFO_);
+      QString message = e.Errors().c_str();
+      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+      e.Clear();
+      newScale = oldScale;
+      d->setScale(newScale, x, y);
+    }
+    return newScale;
+  }
+
+  /**
+   * This method will attempt to reset the scale for the given MdiCubeViewport at 
+   * the x, y values using the new scale value.  If this fails, a message box will
+   * pop up. 
+   * 
+   * @param d Pointer to MdiCubeViewport
+   * @param newScale New scale value of the cube 
+   * @param samp
+   * @param line
+   * @return @b double The scale value used.  If the passed in value fails, this 
+   *         will be the previous scale value.
+   * @internal 
+   * @author Jeannie Walldren 
+   *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   */
+
+  double ZoomTool::setScale(MdiCubeViewport *d, double newScale, double samp, double line) {
+    double oldScale = d->scale();
+    try {
+      d->setScale(newScale, samp, line);
+    }
+    catch (Isis::iException &e) {
+      e.Message(Isis::iException::User, 
+        "Unable to rescale image to [" 
+        + Isis::iString(newScale*100) + "]", _FILEINFO_);
+      QString message = e.Errors().c_str();
+      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+      e.Clear();
+      newScale = oldScale;
+      d->setScale(newScale, samp, line);
+    }
+    return newScale;
   }
 
 }
