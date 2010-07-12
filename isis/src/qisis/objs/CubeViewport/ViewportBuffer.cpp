@@ -1187,14 +1187,23 @@ namespace Qisis {
 
   /**
    * Call this when zoomed, re-reads visible area.
-   *
+   *  
+   * @throw iException - "Unable to change scale" 
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Added exception to help track
+   *                          errors.
    */
   void ViewportBuffer::scaleChanged() {
     if(!p_enabled)
       return;
 
-    updateBoundingRects();
-    reinitialize();
+    try {
+      updateBoundingRects();
+      reinitialize();
+    }
+    catch (iException &e) {
+      throw iException::Message(iException::Programmer, "Unable to change scale.", _FILEINFO_);
+    }
   }
 
 
@@ -1237,54 +1246,61 @@ namespace Qisis {
 
   /**
    * This resizes and fills entire buffer.
-   *
+   * @throw iException - "Unable to resize and fill buffer." 
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Added exception to help track
+   *                          errors.
    */
   void ViewportBuffer::reinitialize() {
-    // If we're in the middle of a process, we got an okay stretch on startup,
-    // then we can stop what we're doing.
-    if(working() && p_initialStretchDone) {
-      // We only need to handle the current action, can ignore others
-      ViewportBufferAction *curAction = p_actions->head();
 
-      // Delete older actions
-      for(int i = p_actions->size() - 1; i > 0; i--) {
-        delete(*p_actions)[i];
-        p_actions->pop_back();
-      }
-
-      // Deal with current action
-      if(curAction->started()) {
-        if(curAction->getActionType() == ViewportBufferAction::fill) {
-          ViewportBufferFill *fill = (ViewportBufferFill *)curAction;
-
-          fill->stop();
-
-          p_requestedFillArea = fill->getRect()->height() *
-                                fill->getRect()->width();
+    try {
+      // If we're in the middle of a process, we got an okay stretch on startup,
+      // then we can stop what we're doing.
+      if(working() && p_initialStretchDone) {
+        // We only need to handle the current action, can ignore others
+        ViewportBufferAction *curAction = p_actions->head();
+      
+        // Delete older actions
+        for(int i = p_actions->size() - 1; i > 0; i--) {
+          delete(*p_actions)[i];
+          p_actions->pop_back();
+        }
+      
+        // Deal with current action
+        if(curAction->started()) {
+          if(curAction->getActionType() == ViewportBufferAction::fill) {
+            ViewportBufferFill *fill = (ViewportBufferFill *)curAction;
+      
+            fill->stop();
+      
+            p_requestedFillArea = fill->getRect()->height() *
+                                  fill->getRect()->width();
+          }
+        }
+        else {
+          delete curAction;
+          p_actions->clear();
+          p_requestedFillArea = 0.0;
         }
       }
-      else {
-        delete curAction;
-        p_actions->clear();
-        p_requestedFillArea = 0.0;
-      }
+      
+      
+      p_bufferInitialized = true;
+      
+      ViewportBufferTransform *reset = new ViewportBufferTransform();
+      reset->setResize(0, 0);
+      enqueueAction(reset);
+      
+      ViewportBufferTransform *transform = new ViewportBufferTransform();
+      transform->setResize(p_XYBoundingRect.width(), p_XYBoundingRect.height());
+      enqueueAction(transform);
+      ViewportBufferFill *fill = createViewportBufferFill(p_XYBoundingRect,
+                                 false);
+      enqueueAction(fill);
+      doQueuedActions();
     }
-
-
-    p_bufferInitialized = true;
-
-    ViewportBufferTransform *reset = new ViewportBufferTransform();
-    reset->setResize(0, 0);
-    enqueueAction(reset);
-
-    ViewportBufferTransform *transform = new ViewportBufferTransform();
-    transform->setResize(p_XYBoundingRect.width(), p_XYBoundingRect.height());
-    enqueueAction(transform);
-
-    ViewportBufferFill *fill = createViewportBufferFill(p_XYBoundingRect,
-                               false);
-    enqueueAction(fill);
-
-    doQueuedActions();
+    catch (iException &e) {
+      throw iException::Message(iException::Programmer, "Unable to resize and fill buffer.", _FILEINFO_);
+    }
   }
 } // of namespace Qisis

@@ -61,13 +61,15 @@ namespace Qisis {
    *
    * @internal
    *   @history 2009-04-21 Steven Lambright - Fixed problem with only half of the
-   *            side pixels being loaded in
+   *                          side pixels being loaded in
    *   @history 2010-04-08 Steven Lambright and Eric Hyer - Added support for
-   *            using CubeDataThread for reads.
+   *                          using CubeDataThread for reads.
    *   @history 2010-05-11 Eric Hyer - Fixed issue with invalid bounding rects
-   *                                   in resizedViewport()
+   *                          in resizedViewport()
    *   @history 2010-05-24 Eric Hyer - Fixed bug in previous bug fix (checks
-   *            were in wrong order)
+   *                          were in wrong order)
+   *   @history 2010-07-12 Jeannie Walldren - Added exceptiona to help track
+   *                          errors.
    */
   class ViewportBuffer : public QObject {
       Q_OBJECT
