@@ -125,6 +125,9 @@ namespace Isis {
    *                                - Added assignment operator
    *  @history 2010-06-25 Steven Lambright - Quicker to give up
    *            counting line numbers on error
+   *  @history 2010-07-12 Steven Lambright - It's a bad idea to copy 
+   *            p_internalTemplate in the copy constructor since it describes
+   *            whether or not to delete an internal pointer.
    *
    *  @todo 2005-02-14 add coded example to class documentation.
    */

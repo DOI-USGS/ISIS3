@@ -52,7 +52,6 @@ namespace Isis {
 
   //! Copy constructor
   Pvl::Pvl(const Pvl &other) : PvlObject::PvlObject(other) {
-    p_internalTemplate = other.p_internalTemplate;
     p_terminator = other.p_terminator;
   }
 
