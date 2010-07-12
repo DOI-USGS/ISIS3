@@ -3,7 +3,8 @@ APPNAME = lrowac2pds
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/wac-color.lis \
+	$(LS) $(INPUT)/wac0002dd70.* > $(OUTPUT)/wac-color.lis;
+	$(APPNAME) from=$(OUTPUT)/wac-color.lis \
 	  to=$(OUTPUT)/wac0002dd70.img > /dev/null;
 	catlab from=$(OUTPUT)/wac0002dd70.img \
 	  to=$(OUTPUT)/wac0002dd70_full.pvl > /dev/null;
@@ -13,3 +14,4 @@ commands:
 	  to=$(OUTPUT)/wac0002dd70.cub > /dev/null;
 	$(RM) $(OUTPUT)/wac0002dd70.img;
 	$(RM) $(OUTPUT)/wac0002dd70_full.pvl;
+	$(RM) $(OUTPUT)/wac-color.lis;
