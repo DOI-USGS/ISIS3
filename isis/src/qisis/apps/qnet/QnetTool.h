@@ -109,6 +109,10 @@ namespace Qisis {
    *                          To prevent a seg fault, set p_controlPoint to NULL
    *                          and emit editPointChanged with an empty string if
    *                          the entire point is deleted.
+   *   @history 2010-07-12 Jeannie Walldren - Fixed bug in newHoldPoint() method
+   *                          that was causing the Hold Point Dialog to call the
+   *                          reject() command.  Updated documentation.
+   *  
    *
    */
   class QnetTool : public Tool {

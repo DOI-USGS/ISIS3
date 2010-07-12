@@ -46,7 +46,7 @@ namespace Qisis {
   /**
    * Consructs the Qnet Tool window
    *
-   * @param parent The parent widget for the Qnet tool
+   * @param parent Pointer to the parent widget for the Qnet tool
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers to null.
    *
@@ -98,7 +98,9 @@ namespace Qisis {
 
   }
 
-  /**
+  /** 
+   * Called by constructor to create Qnet Tool. 
+   * @param parent Pointer to parent QWidget 
    * @internal
    *   @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to right
    *                           and left measure info.
@@ -406,6 +408,7 @@ namespace Qisis {
   /**
    * Set point's "Ignore" keyword to the value of the input
    * parameter.
+   * @param ignore Boolean value that determines the Ignore value for this point.
    */
   void QnetTool::setIgnorePoint(bool ignore) {
     if(p_controlPoint != NULL) {
@@ -453,6 +456,35 @@ namespace Qisis {
 
 
   /**
+   *
+   * Makes a new control point identical to input with Held=True.
+   *
+   * @param point Control point to be copied
+   * @author 2008-12-29 Jeannie Walldren
+   * @internal
+   *   @history 2008-12-29 Jeannie Walldren - Original Version
+   *   @history 2008-12-30 Jeannie Walldren - Replaced reference to
+   *                          ignoreChanged() with ignorePointChanged().
+   *   @history 2008-12-30 Jeannie Walldren - Removed call to close the Hold
+   *                          Point Dialog that caused the reject() command to
+   *                          be called.
+   */
+  void QnetTool::newHoldPoint(Isis::ControlPoint &point) {
+    //  If setting as hold or ground point ,make sure point isn't ignored, ground
+    if(p_controlPoint->Ignore()) {
+      p_controlPoint->SetIgnore(false);
+      emit ignorePointChanged();
+    }
+    p_controlPoint = &point;
+
+    // this line causes hold point dialog to call "reject()"
+    // not sure why it was orginally included
+    //p_holdPointDialog->close();
+
+  }
+
+
+  /**
    *  This method sets Held=False and unchecks hold CheckBox if
    *  the "Cancel" button is clicked in the Hold Point Dialog.
    *
@@ -471,9 +503,8 @@ namespace Qisis {
    * Sets the "PointType" keyword of the control point.  If ground
    * is true the point type will be set to "Ground".  If ground is
    * false, it will be set to "Tie".
-   *
-   * @param ground Boolean value that determines value "PointType"
-   *               will be set.
+   * @param ground Boolean value that determines whether the PointType will be set
+   *               to ground.  If false, PointType will be set to Tie.
    * @author
    * @internal
    */
@@ -495,32 +526,10 @@ namespace Qisis {
 
   }
 
-  /**
-   *
-   * Makes a new control point identical to input with Held=True.
-   *
-   * @param point Control point to be copied
-   * @author 2008-12-29 Jeannie Walldren
-   * @internal
-   *   @history 2008-12-29 Jeannie Walldren - Original Version
-   *   @history 2008-12-30 Jeannie Walldren - Replaced reference to
-   *                          ignoreChanged() with ignorePointChanged().
-   */
-  void QnetTool::newHoldPoint(Isis::ControlPoint &point) {
-
-    //  If setting as hold or ground point ,make sure point isn't ignored, ground
-    if(p_controlPoint->Ignore()) {
-      p_controlPoint->SetIgnore(false);
-      emit ignorePointChanged();
-    }
-
-    p_controlPoint = &point;
-    p_holdPointDialog->close();
-
-  }
 
   /**
    * Create a new ground point using input point.
+   * @param point The new ground control point
    */
   void QnetTool::newGroundPoint(Isis::ControlPoint &point) {
 
@@ -530,10 +539,11 @@ namespace Qisis {
   }
 
 
-
   /**
    * Set the "Ignore" keyword of the measure shown in the left
    * viewport to the value of the input parameter.
+   * @param ignore Boolean value that determines the Ignore value for the left 
+   *               measure.
    * @internal
    *   @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
    *                          Moved the check whether p_rightMeasure is null
@@ -558,7 +568,9 @@ namespace Qisis {
 
   /**
    * Set the "Ignore" keyword of the measure shown in the right
-   * viewport to the value of the input parameter.
+   * viewport to the value of the input parameter. 
+   * @param ignore Boolean value that determines the Ignore value for the right 
+   *               measure.
    * @internal
    *   @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
    *                          Moved the check whether p_leftMeasure is null before
@@ -625,7 +637,9 @@ namespace Qisis {
 
   /**
    * Adds the Tie tool action to the tool pad.  When the Tie tool is selected, the
-   * Navigation Tool will automatically open.
+   * Navigation Tool will automatically open. 
+   * @param pad Tool pad
+   * @return @b QAction* Pointer to Tie tool action 
    * @internal
    *   @history 2010-07-01 Jeannie Walldren - Added connection between qnet's
    *                          TieTool button and the showNavWindow() method
@@ -706,7 +720,12 @@ namespace Qisis {
   }
 
 
-  /**
+  /** 
+   * Finds point files 
+   * @param lat Latitude used to find sample/line values
+   * @param lon Longitude used to find sample/line values
+   * @return @b vector @b <string> Point files found.
+   *  
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
@@ -741,6 +760,8 @@ namespace Qisis {
 
   /**
    *   Create new control point
+   * @param lat Latitude value of control point to be created. 
+   * @param lon Longitude value of control point to be created. 
    *   @internal
    *   @history 2008-11-20 Jeannie Walldren - Added message box if pointID value
    *                          entered already exists for another ControlPoint.
@@ -862,6 +883,7 @@ namespace Qisis {
 
   /**
    * Delete control point
+   * @param point Pointer to control point to be deleted. 
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                           namespace std"
@@ -940,7 +962,8 @@ namespace Qisis {
 
 
   /**
-   * Modify control point
+   * Modify control point 
+   * @param point Pointer to control point to be modified. 
    *
    * @history 2009-09-15 Tracie Sucharski - Add error check for points
    *                       with no measures.
@@ -1064,11 +1087,12 @@ namespace Qisis {
 
 
   /** 
+   * Select left measure 
+   * @param index Index of file from the point files vector 
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    */
-
   void QnetTool::selectLeftMeasure(int index) {
     string file = p_pointFiles[index];
 
@@ -1088,13 +1112,13 @@ namespace Qisis {
   }
 
 
-  /**
+  /** 
+   * Select right measure 
+   * @param index  Index of file from the point files vector
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    */
-
-
   void QnetTool::selectRightMeasure(int index) {
 
     string file = p_pointFiles[index];
@@ -1184,6 +1208,9 @@ namespace Qisis {
   }
 
 
+  /**
+   * Add measure to point
+   */
   void QnetTool::addMeasure() {
 
     //  Create list of list box of all files highlighting those that
@@ -1254,6 +1281,16 @@ namespace Qisis {
   }
 
 
+  /**
+   * Event filter for QnetTool.  Determines whether to update left or right 
+   * measure info. 
+   * 
+   * @param o Pointer to QObject
+   * @param e Pointer to QEvent
+   * 
+   * @return @b bool Indicates whether the event type is "Leave".
+   * 
+   */
   bool QnetTool::eventFilter(QObject *o, QEvent *e) {
     if(e->type() != QEvent::Leave) return false;
     if(o == p_leftCombo->view()) {
@@ -1268,8 +1305,12 @@ namespace Qisis {
   }
 
 
-  // Take care of drawing things on a viewPort.
-  // This is overiding the parents paintViewport member.
+  /**
+   * Take care of drawing things on a viewPort.
+   * This is overiding the parents paintViewport member.
+   * @param vp Pointer to Viewport to be painted
+   * @param painter 
+   */
   void QnetTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
 
     drawAllMeasurments(vp, painter);
@@ -1277,7 +1318,9 @@ namespace Qisis {
   }
 
 
-  /**
+  /** 
+   * This method will repaint the given Point ID in each viewport. 
+   * @param pointId
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
@@ -1297,6 +1340,8 @@ namespace Qisis {
 
   /**
    * Draw all measurments which are on this viewPort
+   * @param vp Viewport whose measurements will be drawn
+   * @param painter
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
@@ -1480,8 +1525,8 @@ namespace Qisis {
    * This method creates the widgets for the tool bar.  A "Show Nav Tool" button
    * is created so that the navigation tool may be reopened if it has been closed.
    *
-   * @param parent
-   * @return QWidget*
+   * @param parent The parent QStackedWidget
+   * @return @b QWidget*
    *
    * @internal
    * @todo Find a way to enable Show Nav Button even when there are no images open

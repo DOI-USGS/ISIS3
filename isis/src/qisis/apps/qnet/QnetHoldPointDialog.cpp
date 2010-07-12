@@ -34,6 +34,7 @@ namespace Qisis {
     p_select = NULL;
     p_fileList = NULL;
     p_okButton = NULL;
+    p_cancelButton = NULL;
     p_point = NULL;
 
     p_avg = new QRadioButton("Average Measures");
@@ -53,13 +54,13 @@ namespace Qisis {
     p_okButton = new QPushButton("OK");
     p_okButton->setDefault(true);
     p_okButton->setEnabled(true);
-    QPushButton *cancelButton = new QPushButton("Cancel");
+    p_cancelButton = new QPushButton("Cancel");
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(p_okButton);
-    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(p_cancelButton);
 
     connect(p_okButton, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(p_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addWidget(p_avg);
@@ -116,7 +117,6 @@ namespace Qisis {
         QMessageBox::information((QWidget *)parent(), "Error", msg);
         return;
       }
-
     }
 
     p_point->SetHeld(true);
