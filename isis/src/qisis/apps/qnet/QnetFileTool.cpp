@@ -223,6 +223,8 @@ namespace Qisis {
    *   @history 2008-12-10 Jeannie Walldren - Fixed documentation
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
+   *  @history 2010-07-12 Jeannie Walldren - Updated setActiveSubWindow call due
+   *           to change in Workspace class
    *
    */
   void QnetFileTool::loadImage(const QString &serialNumber) {
@@ -235,7 +237,8 @@ namespace Qisis {
       for(int i = 0; i < (int)cvpList->size(); i++) {
         string sn = Isis::SerialNumber::Compose(*((*cvpList)[i]->cube()));
         if(sn == serialNumber.toStdString()) {
-          g_vpMainWindow->workspace()->setActiveSubWindow((QMdiSubWindow *)(*cvpList)[i]->parentWidget());
+          g_vpMainWindow->workspace()->
+            setActiveSubWindow((QMdiSubWindow *)(*cvpList)[i]->parentWidget()->parent());
           found = true;
           break;
         }

@@ -1,4 +1,5 @@
 #include <QAction>
+#include <QBrush>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -323,7 +324,9 @@ namespace Qisis {
       p_leftMeasure->SetReference(true);
     }
 
+    // emit signal so the nav tool can update edit point
     emit editPointChanged(p_controlPoint->Id());
+    // emit a signal to alert user to save when exiting 
     emit netChanged();
   }
 
@@ -408,6 +411,7 @@ namespace Qisis {
     if(p_controlPoint != NULL) {
       p_controlPoint->SetIgnore(ignore);
     }
+    // emit a signal to alert user to save when exiting 
     emit netChanged();
   }
 
@@ -443,6 +447,7 @@ namespace Qisis {
               this, SLOT(cancelHoldPoint()));
       p_holdPointDialog->exec();
     }
+    // emit a signal to alert user to save when exiting 
     emit netChanged();
   }
 
@@ -537,6 +542,7 @@ namespace Qisis {
    */
   void QnetTool::setIgnoreLeftMeasure(bool ignore) {
     if(p_leftMeasure != NULL) p_leftMeasure->SetIgnore(ignore);
+    // emit a signal to alert user to save when exiting 
     emit netChanged();
 
     //  If the right chip is the same as the left chip , update the right
@@ -561,6 +567,7 @@ namespace Qisis {
    */
   void QnetTool::setIgnoreRightMeasure(bool ignore) {
     if(p_rightMeasure != NULL) p_rightMeasure->SetIgnore(ignore);
+    // emit a signal to alert user to save when exiting 
     emit netChanged();
 
     //  If the right chip is the same as the left chip , update the right
@@ -841,9 +848,12 @@ namespace Qisis {
       loadPoint();
       p_qnetTool->setShown(true);
       p_qnetTool->raise();
-
+    
+      // emit a signal to alert user to save when exiting 
       emit netChanged();
+      // emit signal so the nave tool refreshes the list
       emit refreshNavList();
+      // emit signal so the nav tool can update edit point
       emit editPointChanged(p_controlPoint->Id());
     }
   }
@@ -855,12 +865,16 @@ namespace Qisis {
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                           namespace std"
+   *   @history 2010-07-12 Jeannie Walldren - Fixed bug by setting control point
+   *                          to NULL if removed from the control net and check
+   *                          for NULL points before emitting editPointChanged
    *
    */
   void QnetTool::deletePoint(Isis::ControlPoint *point) {
 
-    //  Change point in viewport to red so user can see what point they are
-    //  about to delete.
+    // Change point in viewport to red 
+    // so user can see what point they are about to delete.
+    // the nav tool will update edit point
     emit editPointChanged(point->Id());
 
     p_controlPoint = point;
@@ -884,7 +898,10 @@ namespace Qisis {
         //int i = g_controlNetwork->
         //g_filteredPoints.
         p_qnetTool->setShown(false);
+        // remove this point from the control network
         g_controlNetwork->Delete(p_controlPoint->Id());
+        p_controlPoint = NULL;
+        // emit signal so the nav tool refreshes the list
         emit refreshNavList();
       }
       //  Otherwise, delete measures located on images chosen
@@ -905,8 +922,19 @@ namespace Qisis {
       }
     }
 
+    // emit a signal to alert user to save when exiting 
     emit netChanged();
-    emit editPointChanged(p_controlPoint->Id());
+
+    // emit signal so the nav tool can update edit point
+    if(p_controlPoint != NULL) {
+      emit editPointChanged(p_controlPoint->Id());
+    }
+    else {
+      // if the entire point is deleted, update with point Id = ""
+      // this signal is connected to QnetTool::paintAllViewports
+      // and QnetNavTool::updateEditPoint
+      emit editPointChanged("");
+    }
   }
 
 
@@ -924,7 +952,15 @@ namespace Qisis {
       QString message = "This point has no measures.";
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
       // update nav list to re-highlight old point
-      if(p_controlPoint != NULL) emit editPointChanged(p_controlPoint->Id());
+      if(p_controlPoint != NULL) {
+        // emit signal so the nav tool can update edit point
+        emit editPointChanged(p_controlPoint->Id());
+      }
+      else {
+        // this signal is connected to QnetTool::paintAllViewports 
+        // and QnetNavTool::updateEditPoint
+        emit editPointChanged("");
+      }
       return;
     }
     p_controlPoint = point;
@@ -935,6 +971,7 @@ namespace Qisis {
     loadPoint();
     p_qnetTool->setShown(true);
     p_qnetTool->raise();
+    // emit signal so the nav tool can update edit point
     emit editPointChanged(p_controlPoint->Id());
   }
 
@@ -950,7 +987,7 @@ namespace Qisis {
   void QnetTool::loadPoint() {
 
     //  If Ground point print error
-//    if (p_controlPoint->Type() == Isis::ControlPoint::Ground) {
+//    if(p_controlPoint->Type() == Isis::ControlPoint::Ground) {
 //      QString message = "Cannot edit ground points with a single measure at this
 //    }
 
@@ -1025,7 +1062,8 @@ namespace Qisis {
     selectRightMeasure(rightIndex);
   }
 
-  /**
+
+  /** 
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
@@ -1208,10 +1246,11 @@ namespace Qisis {
       p_qnetTool->setShown(true);
       p_qnetTool->raise();
 
+      // emit a signal to alert user to save when exiting 
       emit netChanged();
+      // emit signal so the nav tool can update edit point
       emit editPointChanged(p_controlPoint->Id());
     }
-
   }
 
 
@@ -1246,6 +1285,7 @@ namespace Qisis {
   void QnetTool::paintAllViewports(string pointId) {
     // Take care of drawing things on all viewPorts.
     // Calling update will cause the Tool class to call all registered tools
+    // if point has been deleted, this will remove it from the main window
     MdiCubeViewport *vp;
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       vp = (*(cubeViewportList()))[i];

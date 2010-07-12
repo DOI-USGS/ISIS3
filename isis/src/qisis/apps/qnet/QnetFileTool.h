@@ -59,6 +59,8 @@ namespace Qisis {
    *                         input control network. Replaced #includes with
    *                            forward class declarations and moved #include to
    *                            .cpp file.
+   *  @history 2010-07-12 Jeannie Walldren - Updated setActiveSubWindow call in
+   *                         loadImage() method due to change in Workspace class
    *
    */
 

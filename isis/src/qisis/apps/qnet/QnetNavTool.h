@@ -95,6 +95,7 @@ namespace Qisis {
    *                          button or "Show Nav Tool" button are activated.
    *                          Replaced #includes with forward class declarations
    *                          and moved #include to .cpp file.
+   *   @history 2010-07-12 Jeannie Walldren - Fixed documentation.
    *
    *
    */

@@ -105,6 +105,10 @@ namespace Qisis {
    *                          top of all other points in the image.  Replaced
    *                          #includes with forward class declarations and moved
    *                          #include to .cpp file.
+   *   @history 2010-07-12 Jeannie Walldren - Fixed bug in deletePoint() method.
+   *                          To prevent a seg fault, set p_controlPoint to NULL
+   *                          and emit editPointChanged with an empty string if
+   *                          the entire point is deleted.
    *
    */
   class QnetTool : public Tool {

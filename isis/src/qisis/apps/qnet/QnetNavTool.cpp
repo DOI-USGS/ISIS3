@@ -418,13 +418,14 @@ namespace Qisis {
 
 
   /**
-   * Update the list showing the new point highlighted.
+   * Update the list with the edited point highlighted.
    *
    * @param pointId Value of the PointId keyword for the new point.
    * @internal
    *   @history  2008-12-30 Jeannie Walldren - Modified to setCurrentItem() rather
    *                           than simply highlight the new point using
    *                           setItemSelected() and scrollToItem().
+   *   @history 2010-07-12 Jeannie Walldren - Fixed documentation.
    */
   void QnetNavTool::updateEditPoint(string pointId) {
 
@@ -650,7 +651,7 @@ namespace Qisis {
                                  + QString::number(selected.size())
                                  + " point(s) to ignore. Do you want to continue?",
                                  "&Yes", "&No", 0, 0)) {
-      case 0: // Yes was clicked or Enter was pressed, delete points
+      case 0: // Yes was clicked or Enter was pressed, ignore points
         QApplication::setOverrideCursor(Qt::WaitCursor);
         for(int i = 0; i < selected.size(); i++) {
           int index = p_listBox->row(selected[i]);
