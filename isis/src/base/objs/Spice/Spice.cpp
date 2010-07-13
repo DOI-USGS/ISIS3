@@ -52,7 +52,10 @@ namespace Isis {
 
   // TODO: DOCUMENT EVERYTHING
   Spice::Spice(Isis::Pvl &lab) {
-    Init(lab, false);
+    Isis::PvlGroup kernels = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
+    bool hasTables = (kernels["TargetPosition"][0] == "Table");
+
+    Init(lab, !hasTables);
   }
 
   Spice::Spice(Isis::Pvl &lab, bool notab) {
@@ -91,9 +94,11 @@ namespace Isis {
 //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
 //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
 //  ephemerides. (2008-02-27 (KJB))
-    Load(kernels["TargetPosition"], notab);
-    Load(kernels["InstrumentPosition"], notab);
-    Load(kernels["InstrumentPointing"], notab);
+    if(notab) {
+      Load(kernels["TargetPosition"], notab);
+      Load(kernels["InstrumentPosition"], notab);
+      Load(kernels["InstrumentPointing"], notab);
+    }
 
     if(kernels.HasKeyword("Frame")) {
       Load(kernels["Frame"], notab);
