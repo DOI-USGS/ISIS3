@@ -179,6 +179,9 @@
       idl cisscal program version, 3.6.  Updated documentation and app test to 
       reflect these changes.
     </change>
+    <change name="Jeannie Walldren" date="2010-07-13">
+      Added new in-flight calibration document to "See Also".
+    </change>
   </history>
 
   <category>
@@ -248,6 +251,17 @@
         </source>
         <author>Alfred McEwen and James Winburn</author>
         <publisher>Planetary Data System Rings Node</publisher>
+      </document>
+      <document>
+        <title>
+          In-flight Calibration of the Cassini Imaging Science Subsystem Cameras
+        </title>
+        <source>
+          <filename>Cal_paper_submitted_5_24_2010.pdf</filename>
+          <path>assets/</path>
+        </source>
+        <author>Robert West, Benjamin Knowles, et al.</author>
+        <publisher></publisher>
       </document>
     </documents>
   </seeAlso>
