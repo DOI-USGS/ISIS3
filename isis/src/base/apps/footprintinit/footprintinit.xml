@@ -91,6 +91,9 @@
     <change name="Christopher Austin" date="2010-05-18">
       Prevented an infinite loop caused by Naif error handling.
     </change>
+    <change name="Christopher Austin" date="2010-07-13">
+      Fixed error reporting.
+    </change>
   </history>
 
   <groups>

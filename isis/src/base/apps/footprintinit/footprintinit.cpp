@@ -59,8 +59,10 @@ void IsisMain() {
         e.Clear();
       }
       else {
-        e.Report();
-        return; // Prevents infinite loops caused by **SPICE ERROR**
+        e.Report(); // This should be an NAIF error
+        string msg = "Cannot generate polygon for [";
+        msg += ui.GetFilename("FROM") + "]";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -112,8 +114,10 @@ void IsisMain() {
           e.Clear();
         }
         else {
-          e.Report();
-          return; // Prevents infinite loops caused by **SPICE ERROR**
+          e.Report(); // This should be an NAIF error
+          string msg = "Cannot calculate XY for [";
+          msg += ui.GetFilename("FROM") + "]";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
         }
       }
     }
