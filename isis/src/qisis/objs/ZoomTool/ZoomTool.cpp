@@ -35,13 +35,12 @@
 #include "Workspace.h"
 #include "ZoomTool.h"
 
-using namespace std;
 namespace Qisis {
   /**
    * ZoomTool constructor
    *
    *
-   * @param parent
+   * @param parent Parent widget
    */
   ZoomTool::ZoomTool(QWidget *parent) : Qisis::Tool(parent) {
     p_userCursor = QCursor();
@@ -93,12 +92,13 @@ namespace Qisis {
   }
 
   /**
-   * Adds the action to the toolpad.
+   * Adds the action to the toolpad.  The icon used will be the magnifying 
+   * glass.  The tool tip reads "Zoom (Z)" with shortcut key "Z". 
    *
    *
-   * @param toolpad
+   * @param toolpad Toolpad to which the zoom tool will be added
    *
-   * @return QAction*
+   * @return QAction* ZoomTool action defined by the cursor, ToolTip, 
    */
   QAction *ZoomTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
@@ -114,10 +114,12 @@ namespace Qisis {
 
 
   /**
-   * Adds the zoom action to the given menu.
+   * Adds the zoom action to the given menu.  This will include the Zoom In (by 
+   * factor of 2), Zoom Out (by factor of 1/2), Zoom Actual (1:1) and Zoom Fit 
+   * actions. 
    *
    *
-   * @param menu
+   * @param menu Pointer to the QMenu
    */
   void ZoomTool::addTo(QMenu *menu) {
     menu->addAction(p_zoomFit);
@@ -128,12 +130,22 @@ namespace Qisis {
 
 
   /**
-   * Creates the widget to add to the tool bar.
+   * Creates the widget to add to the tool bar.  For each button, this method
+   * assigns the icons, ToolTips, WhatsThis, and connects a slot to the clicked 
+   * signal.  The following buttons are included 
+   * <UL> 
+   *   <LI> Zoom In - uses the magnifying glass with "+" icon and shortcut +
+   *   <LI> Zoom Out - uses the magnifying glass with "-" icon and shortcut -
+   *   <LI> Zoom 1:1 - uses the magnifying glass with "1:1" icon and shortcut /
+   *   <LI> Fit in viewport - uses the magnifying glass with "dotted square"
+   *   icon, shortcut * and drop down menu to choose to "Fit Width" or "Fit
+   *   Height"
+   *   <LI> Scale - Text box to manually enter scale
+   * </UL>
    *
+   * @param parent Parent stacked widget
    *
-   * @param parent
-   *
-   * @return QWidget*
+   * @return QWidget* Horizontal box to which the zoom tools icons will be added
    */
   QWidget *ZoomTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *hbox = new QWidget(parent);
@@ -305,6 +317,8 @@ namespace Qisis {
    *
    */
   void ZoomTool::zoomActual() {
+    // zoom factor passed in is 0 
+    // this will indicate to set new scale to 1 in zoomBy() 
     zoomBy(0.0);
   }
 
@@ -313,12 +327,22 @@ namespace Qisis {
    * Zoom by the given factor.
    *
    *
-   * @param factor
+   * @param factor Zoom factor value 
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
+   *                          setScale method.
+   *   @history 2010-07-12 Jeannie Walldren - Replaced checks for newScale==0
+   *                          accidentally removed in previous commit.
    */
   void ZoomTool::zoomBy(double factor) {
     MdiCubeViewport *d = cubeViewport();
     if(d == NULL) return;
     double newScale = d->scale() * factor;
+    if(newScale == 0.0) {
+      // if zoomActual was called (1:1) the factor was set to 0.
+      // change scale to 1.0 
+      newScale = 1.0;
+    }
     setScale(d, newScale);
     updateTool();
 
@@ -328,6 +352,11 @@ namespace Qisis {
         if(d == cubeViewport()) continue;
         if(d->isLinked()) {
           newScale = d->scale() * factor;
+          if(newScale == 0.0) {
+            // if zoomActual was called (1:1) the factor was set to 0.
+            // change scale to 1.0 
+            newScale = 1.0;
+          }
           setScale(d, newScale);
         }
       }
@@ -337,7 +366,9 @@ namespace Qisis {
 
   /**
    * Fits the cube in the viewport.
-   *
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
+   *                          setScale method.
    */
   void ZoomTool::zoomFit() {
     MdiCubeViewport *d = cubeViewport();
@@ -361,7 +392,9 @@ namespace Qisis {
   /**
    * Slot for the "Fit to Width" menu item on the Fit button.  This will
    * display the cube so that the entire cube width is displayed.
-   *
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
+   *                          setScale method.
    */
   void ZoomTool::zoomFitWidth() {
     MdiCubeViewport *d = cubeViewport();
@@ -385,6 +418,9 @@ namespace Qisis {
    * Slot for the "Fit to Heighth" menu item on the Fit button.  This will display
    * the cube so that the entire cube heighth is displayed.
    *
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
+   *                          setScale method.
    */
   void ZoomTool::zoomFitHeight() {
     MdiCubeViewport *d = cubeViewport();
@@ -408,6 +444,9 @@ namespace Qisis {
    * This method zooms by the value input in the line edit next to
    * the zoom tools.
    *
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
+   *                          setScale method.
    */
   void ZoomTool::zoomManual() {
     MdiCubeViewport *d = cubeViewport();
@@ -452,6 +491,11 @@ namespace Qisis {
    * by the RubberBandTool or will handle different zoom methods
    * specified by the last RubberBandTool's  mouse button.
    *
+   * @internal 
+   *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
+   *                          setScale method.
+   *   @history 2010-07-12 Jeannie Walldren - Replaced checks for newScale==0
+   *                          accidentally removed in previous commit.
    */
   void ZoomTool::rubberBandComplete() {
     QApplication::processEvents();
@@ -466,10 +510,12 @@ namespace Qisis {
         int y = r.y() + r.height() / 2;
         double xscale = (double) d->viewport()->width() / r.width();
         double yscale = (double) d->viewport()->height() / r.height();
-        double scale = xscale < yscale ? xscale : yscale;
-        if(RubberBandTool::mouseButton() & Qt::RightButton) scale = 1.0 / scale;
-        scale *= d->scale();
-        setScale(d, scale, x, y);
+        double newScale = xscale < yscale ? xscale : yscale;
+        if(RubberBandTool::mouseButton() & Qt::RightButton) {
+          newScale = 1.0 / newScale;
+        }
+        newScale *= d->scale();
+        setScale(d, newScale, x, y);
         updateTool();
         if(d->isLinked()) {
           for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
@@ -480,10 +526,12 @@ namespace Qisis {
               int y = r.y() + r.height() / 2;
               double xscale = (double) d->viewport()->width() / r.width();
               double yscale = (double) d->viewport()->height() / r.height();
-              double scale = xscale < yscale ? xscale : yscale;
-              if(RubberBandTool::mouseButton() & Qt::RightButton) scale = 1.0 / scale;
-              scale *= d->scale();
-              setScale(d, scale, x, y);
+              double newScale = xscale < yscale ? xscale : yscale;
+              if(RubberBandTool::mouseButton() & Qt::RightButton) {
+                newScale = 1.0 / newScale;
+              }
+              newScale *= d->scale();
+              setScale(d, newScale, x, y);
             }
           }
         }
@@ -492,15 +540,30 @@ namespace Qisis {
     // The RubberBandTool has a point (mouse click)
     else {
       double factor = 2.0;
-      if(RubberBandTool::mouseButton() & Qt::ControlModifier) factor = 4.0;
-      if(RubberBandTool::mouseButton() & Qt::ShiftModifier) factor = 8.0;
-      if(RubberBandTool::mouseButton() & Qt::RightButton) factor = 1.0 / factor;
-      if(RubberBandTool::mouseButton() & Qt::MidButton) factor = 1.0;
-      if(RubberBandTool::mouseButton() == Qt::MidButton + Qt::ControlModifier) factor = 0.0;
-      MdiCubeViewport *d = cubeViewport();
-      double scale = d->scale() * factor;
+      if(RubberBandTool::mouseButton() & Qt::ControlModifier) {
+        factor = 4.0;
+      }
+      if(RubberBandTool::mouseButton() & Qt::ShiftModifier) {
+        factor = 8.0;
+      }
+      if(RubberBandTool::mouseButton() & Qt::RightButton) {
+        factor = 1.0 / factor;
+      }
+      if(RubberBandTool::mouseButton() & Qt::MidButton) {
+        factor = 1.0;
+      }
+      if(RubberBandTool::mouseButton() == Qt::MidButton + Qt::ControlModifier) {
+        factor = 0.0;
+      }
+//      MdiCubeViewport *d = cubeViewport();
+      double newScale = d->scale() * factor;
+      if(newScale == 0.0) {
+        // ctrl+middle (1:1) the factor was set to 0.
+        // change scale to 1.0 
+        newScale = 1.0;
+      }
       QPoint p = RubberBandTool::getVertices()[0];
-      setScale(d, scale, p.x(), p.y());
+      setScale(d, newScale, p.x(), p.y());
       updateTool();
 
       if(d->isLinked()) {
@@ -508,14 +571,18 @@ namespace Qisis {
           d = (*(cubeViewportList()))[i];
           if(d == cubeViewport()) continue;
           if(d->isLinked()) {
-            scale = d->scale() * factor;
-            scale = setScale(d, scale, p.x(), p.y());
+            newScale = d->scale() * factor;
+            if(newScale == 0.0) {
+              // ctrl+middle (1:1) the factor was set to 0.
+              // change scale to 1.0 
+              newScale = 1.0;
+            }
+            newScale = setScale(d, newScale, p.x(), p.y());
           }
         }
       }
-      p_lastScale = scale;
+      p_lastScale = newScale;
     }
-
   }
 
 
@@ -532,11 +599,15 @@ namespace Qisis {
 
 
   /**
+   * Sets the appropriate cursor when the mouse buttons are pressed.  If the 
+   * user right clicks on the image, the cursor is set to the magnifying glass 
+   * with a "-" next to it to indicate zoom out.  If the user left clicks on the
+   * image, the cursor is set to the magnifying glass with a "+" to indicate 
+   * zoom in. 
    *
    *
-   *
-   * @param p
-   * @param s
+   * @param p QPoint
+   * @param s Mouse button
    */
   void ZoomTool::mouseButtonPress(QPoint p, Qt::MouseButton s) {
     if(s == Qt::RightButton) {
@@ -549,11 +620,12 @@ namespace Qisis {
 
 
   /**
+   * Sets the cursor to the original arrow cursor shape when the mouse button is
+   * released. 
    *
    *
-   *
-   * @param p
-   * @param s
+   * @param p QPoint
+   * @param s Mouse button.
    */
   void ZoomTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     //set the cursor back to the original cursor shape.
@@ -568,14 +640,23 @@ namespace Qisis {
    * @param newScale New scale value of the cube
    * @return @b double The scale value used.  If the passed in value fails, this 
    *         will be the previous scale value.
+   * @throw iException::User "Scale value must be greater than 0." 
+   * @throw iException::User "Unable to rescale image." 
    * @internal 
    * @author Jeannie Walldren 
    *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   *   @history 2010-07-14 Jeannie Walldren - Added error message if the new
+   *                          scale value is less than or equal to 0.
    * 
    */
   double ZoomTool::setScale(MdiCubeViewport *d, double newScale) {
+
     double oldScale = d->scale();
     try {
+      if (newScale <= 0.0) {
+        throw Isis::iException::Message(Isis::iException::User,
+          "Scale value must be greater than 0.", _FILEINFO_);
+      }
       d->setScale(newScale);
     }
     catch (Isis::iException &e) {
@@ -603,15 +684,22 @@ namespace Qisis {
    * @param y 
    * @return @b double The scale value used.  If the passed in value fails, this 
    *         will be the previous scale value.
+   * @throw iException::User "Scale value must be greater than 0." 
+   * @throw iException::User "Unable to rescale image." 
    * @internal 
    * @author Jeannie Walldren 
    *   @history 2010-07-12 Jeannie Walldren - Original version. 
-   * 
+   *   @history 2010-07-14 Jeannie Walldren - Added error message if the new
+   *                          scale value is less than or equal to 0.
    */
 
   double ZoomTool::setScale(MdiCubeViewport *d, double newScale, int x, int y) {
     double oldScale = d->scale();
     try {
+      if (newScale <= 0.0) {
+        throw Isis::iException::Message(Isis::iException::User,
+          "Scale value must be greater than 0.", _FILEINFO_);
+      }
       d->setScale(newScale, x, y);
     }
     catch (Isis::iException &e) {
@@ -638,14 +726,22 @@ namespace Qisis {
    * @param line
    * @return @b double The scale value used.  If the passed in value fails, this 
    *         will be the previous scale value.
+   * @throw iException::User "Scale value must be greater than 0." 
+   * @throw iException::User "Unable to rescale image." 
    * @internal 
    * @author Jeannie Walldren 
    *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   *   @history 2010-07-14 Jeannie Walldren - Added error message if the new
+   *                          scale value is less than or equal to 0.
    */
 
   double ZoomTool::setScale(MdiCubeViewport *d, double newScale, double samp, double line) {
     double oldScale = d->scale();
     try {
+      if (newScale <= 0.0) {
+        throw Isis::iException::Message(Isis::iException::User,
+          "Scale value must be greater than 0.", _FILEINFO_);
+      }
       d->setScale(newScale, samp, line);
     }
     catch (Isis::iException &e) {

@@ -53,6 +53,9 @@ namespace Qisis {
    *   @history 2010-07-12 Jeannie Walldren - Created setScale() methods to
    *                          display a QMessageBox if a scale value could not
    *                          be set.
+   *   @history 2010-07-14 Jeannie Walldren - Fixed bug that caused 1:1 to fail.
+   *                          Added iExceptions if value is manually entered in
+   *                          text box is invalid. Updated documentation.
    *            
    */
   class ZoomTool : public Tool {
