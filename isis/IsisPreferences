@@ -82,6 +82,19 @@ Group = CubeCustomization
 EndGroup
 
 ########################################################
+# Customize how other files are created
+#
+# Overwrite = Error | Allow
+#
+# If Error, then overwrites of any non-cube
+# file will be disallowed and an error will be thrown
+########################################################
+
+Group = FileCustomization
+  Overwrite  = Allow
+EndGroup
+
+########################################################
 # Customize the location of mission specific data
 # files (calibration and spice kernels).  Usually this
 # should be left to the Isis administrator
