@@ -9,7 +9,7 @@ install: libs plugins
 libs:
 	@for library in $(THIRDPARTYLIBS); do                                \
 	  $(INSTALL3P) $(INSTALL3POPTS) $$library $(ISISROOT)/3rdParty/lib/; \
-	  echo "  [Installing $$library...]";                                \
+	  echo "  Installing [$$library]";                                \
 	  if [ "$(HOST_ARCH)" == "Linux" ]; then                             \
 	    for file in $$library; do                                        \
 	      localFile=$(ISISROOT)/3rdParty/lib/`basename $$file`;          \
@@ -18,7 +18,7 @@ libs:
 	      dollar='$$';                                                   \
 	      newRpath=`echo "$${dollar}ORIGIN"`;                            \
 	      if [ "$$existingRpath" == "usgs/pkgs/local" ]; then            \
-	        echo "    [Patching" `basename $$file` "...]";               \
+	        echo "    Patching [" `basename $$file` "]";               \
 	        $(PATCHELF) --set-rpath "$$newRpath" $$localFile;            \
 	      fi                                                             \
 	   done;                                                             \
@@ -51,7 +51,7 @@ libs:
 
 plugins:
 	@for plugs in $(THIRDPARTYPLUGINS); do                               \
-	  echo "  [Installing $$plugs...]";                                  \
+	  echo "  Installing [$$plugs...]";                                  \
 	  $(INSTALL3P) $(INSTALL3POPTS) $$plugs $(ISISROOT)/3rdParty/plugins/; \
 	done;                                                                \
 	if [ "$(HOST_ARCH)" == "Darwin" ]; then                              \
