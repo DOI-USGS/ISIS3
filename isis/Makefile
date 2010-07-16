@@ -132,7 +132,6 @@ docs:
 #----------------------------------------------------------------------------
 clean: cleansrc
 	echo "Cleaning Isis"
-	cd src; $(MAKE) clean
 	rm -rf inc
 	rm -rf doc
 	rm -rf bin
@@ -181,8 +180,9 @@ HOST_ARCH ?= $(shell uname -s)
 HOST_MACH  = $(shell uname -m)
 
 thirdParty:
-	echo "Installing 3rdParty Libraries"
+	echo "Installing 3rdParty libraries"
 	rm -f $(ISISROOT)/3rdParty/lib/lib*
-	echo $(HOST_ARCH)
 	$(MAKE) -C $(ISISROOT)/3rdParty install
+	echo "Finished installing 3rdParty libraries"
+	echo " "
 
