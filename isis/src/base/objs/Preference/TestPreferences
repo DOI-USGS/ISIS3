@@ -82,6 +82,20 @@ Group = CubeCustomization
 EndGroup
 
 ########################################################
+# Customize how other files are created
+#
+# Overwrite = Error | Allow
+# History = On | Off
+# MaximumSize = max # of gigabytes
+########################################################
+
+Group = FileCustomization
+  Overwrite  =  Allow
+  History    =  On
+  MaximumSize = 12
+EndGroup
+
+########################################################
 # Customize the location of mission specific data
 # files (calibration and spice kernels).  Usually this
 # should be left to the Isis administrator
