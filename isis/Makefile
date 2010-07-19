@@ -68,8 +68,11 @@ api:
 	echo "Building Isis API" 
 	mkdir -p lib
 	cd src; $(MAKE) objects
+	echo "Finished building Isis API"
+	echo ""
+	echo "Adding API objects
 	cd src; $(MAKE) api
-	echo "Finished building Isis API" 
+	echo "Finished adding API objects" 
 	echo " "
 
 #	echo "Building Isis API with debugging" 
