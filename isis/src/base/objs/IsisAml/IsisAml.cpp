@@ -20,7 +20,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-using namespace std;
 
 #include <sstream>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -33,6 +32,8 @@ using namespace std;
 #include "IsisXMLChTrans.h"
 #include "iString.h"
 #include "Preference.h"
+
+using namespace std;
 
 /**
  * @internal
@@ -1779,15 +1780,16 @@ void IsisAml::Clear(const std::string &paramName) {
  *
  * @return CubeAttributeInput
  *
- * @throws iException::Programmer (Parameter is not a cube)
- * @throws iException::Programmer (Parameter does nto contain an input file)
+ * @throws iException::Programmer "Parameter is not a cube."
+ * @throws iException::Programmer "Parameter in not an input cube" 
  */
 Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const std::string &paramName) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
   if(param->type != "cube") {
-    string message = "Parameter [" + paramName + "] is not a cube.";
+    string message = "Unable to get input cube attributes.  Parameter [" 
+      + paramName + "] is not a cube. Parameter type = [" + param->type + "].";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
 
@@ -1810,7 +1812,8 @@ Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const std::string &paramNam
     param->inCubeAtt.Set(value);
   }
   else {
-    string message = "Parameter [" + paramName + "] does not contain an [input] file";
+    string message = "Unable to get input cube attributes.  Parameter [" 
+      + paramName + "] is not an input. Parameter fileMode = [" + param->fileMode + "].";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
   return param->inCubeAtt;
@@ -1823,15 +1826,16 @@ Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const std::string &paramNam
  *
  * @return CubeAttributeOutput
  *
- * @throws iException::Programmer (Parameter is not a cube)
- * @throws iException::Programmer (Parameter does nto contain an output file)
+ * @throws iException::Programmer "Parameter is not a cube"
+ * @throws iException::Programmer "Parameter in not an output"
  */
 Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const std::string &paramName) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
   if(param->type != "cube") {
-    string message = "Parameter [" + paramName + "] is not a cube.";
+    string message = "Unable to get output cube attributes.  Parameter [" 
+      + paramName + "] is not a cube. Parameter type = [" + param->type + "].";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
 
@@ -1855,7 +1859,8 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const std::string &paramN
     param->outCubeAtt.Set(value);
   }
   else {
-    string message = "Parameter [" + paramName + "] does not contain an [output] file";
+    string message = "Unable to get output cube attributes.  Parameter [" 
+      + paramName + "] is not an output. Parameter fileMode = [" + param->fileMode + "].";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
   return param->outCubeAtt;
@@ -1968,7 +1973,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
       Isis::Filename name(value);
       value = name.Expanded();
       if(name.Exists() && param->fileMode == "output") {
-        CheckFilenamePreference(value);
+        CheckFilenamePreference(value, param->name);
       }
     }
     // THIS IS CURRENTLY HANDLED IN THE CUBE CLASS, see CubeIoHandler.cpp 
@@ -1980,7 +1985,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     //    value = name.Expanded();
     //    if (name.Exists() && param->fileMode == "output"
     //        && Isis::Preference::Preferences().FindGroup("CubeCustomization").FindKeyword("Overwrite")[0] == "Error") {
-    //      string message = "The cube file [" + value + "] already exists.  " +
+    //      string message = "Invalid output cube for [" + param->name + "]. The cube file [" + value + "] already exists.  " +
     //                       "The user preference cube customization group is set to disallow cube overwrites.";
     //      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
     //    }
@@ -2033,7 +2038,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
         Isis::Filename name(value);
         value = name.Expanded();
         if(name.Exists() && param->fileMode == "output") {
-          CheckFilenamePreference(value);
+          CheckFilenamePreference(value, param->name);
         }
       }
     }
@@ -2265,14 +2270,19 @@ void IsisAml::Verify(const IsisParameterData *param) {
  * of existing files.  It should be called if the parameter is an output and the
  * given file name exists. 
  *  
- * @param filename Name of the file to be overwritten. 
+ * @param filename Name of the file to be overwritten.
+ * @param paramname Name of the output file parameter.
  *  
  * @throw iException::User -  "The file already exists. The user preference file
  *        customization group is set to disallow file overwrites."
  * @throw iException::User - "Invalid entry in user preference file
  *        FileCustomization group."
+ *  
+ * @author 2010-07-19 Jeannie Walldren 
+ * @internal 
+ *   @history 2010-07-19 Jeannie Walldren - Original version. 
  */
-void IsisAml::CheckFilenamePreference(string filename) {
+void IsisAml::CheckFilenamePreference(string filename, string paramname) {
   Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
   Isis::iString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0];
   overwritePreference.ConvertWhiteSpace();
@@ -2280,7 +2290,7 @@ void IsisAml::CheckFilenamePreference(string filename) {
   overwritePreference.Trim(" ");
   string temp = overwritePreference;
   if(overwritePreference.UpCase() == "ERROR") {
-    string message = "The file [" + filename + "] already exists.  " +
+    string message = "Invalid output filename for [" + paramname + "]. The file [" + filename + "] already exists.  " +
                      "The user preference file customization group is set to disallow file overwrites.";
     throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
   }

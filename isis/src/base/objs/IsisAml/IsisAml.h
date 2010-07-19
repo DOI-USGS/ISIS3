@@ -331,7 +331,7 @@ class IsisAml : protected IsisAmlData {
     const IsisParameterData *ReturnParam(const std::string &paramName) const;
 
     void Verify(const IsisParameterData *param);
-    void CheckFilenamePreference(string filename);
+    void CheckFilenamePreference(std::string filename, std::string paramname);
 };
 
 

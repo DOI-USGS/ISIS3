@@ -16,7 +16,7 @@ Create the aml object
       maximum = 
       maximum inclusive = 
       filter = *.cub
-      file mode = 
+      file mode = input
       odd = 
       Values:
       Default Values:
@@ -42,7 +42,7 @@ Create the aml object
       maximum = 
       maximum inclusive = 
       filter = 
-      file mode = 
+      file mode = output
       odd = 
       Values:
       Default Values:
@@ -910,7 +910,7 @@ Create the aml object
       maximum = 
       maximum inclusive = 
       filter = 
-      file mode = 
+      file mode = input
       odd = 
       Values:
       Default Values:
@@ -934,7 +934,7 @@ Create the aml object
       maximum = 
       maximum inclusive = 
       filter = 
-      file mode = 
+      file mode = output
       odd = 
       Values:
       Default Values:
@@ -964,7 +964,7 @@ Parameter information:
       Default: 
       Internal default: 
       Filter: *.cub
-      File Mode: 
+      File Mode: input
       Helper Information:
       List Information:
     Parameter number: 1
@@ -974,7 +974,7 @@ Parameter information:
       Default: /my/dir/file.cub
       Internal default: 
       Filter: 
-      File Mode: 
+      File Mode: output
       Helper Information:
       List Information:
   Group number: 1
@@ -1358,7 +1358,7 @@ Parameter information:
       Default: 
       Internal default: 
       Filter: 
-      File Mode: 
+      File Mode: input
       Helper Information:
         Name: H6
         Brief: Helper 6
@@ -1373,7 +1373,7 @@ Parameter information:
       Default: 
       Internal default: 
       Filter: 
-      File Mode: 
+      File Mode: output
       Helper Information:
       List Information:
 Get/Put/Clear/WasEntered tests
@@ -1437,7 +1437,8 @@ Exact and partial name match tests:
   FR's value = FR
 
 
----------- Test error throwing ----------  PutAsString:
+---------- Test error throwing ----------
+  PutAsString:
 **USER ERROR** A value for this parameter [G1P0] has already been entered.
 
   PutString:
@@ -1451,8 +1452,8 @@ Exact and partial name match tests:
 **PROGRAMMER ERROR** Parameter [G2P4] is not a filename.
 
   Cube tests:
-**PROGRAMMER ERROR** Parameter [CUBE1] does not contain an [input] file
-**PROGRAMMER ERROR** Parameter [CUBE2] does not contain an [output] file
+**PROGRAMMER ERROR** Unable to get input cube attributes.  Parameter [CUBE2] is not an input. Parameter fileMode = [output].
+**PROGRAMMER ERROR** Unable to get output cube attributes.  Parameter [CUBE1] is not an output. Parameter fileMode = [input].
 
   PutInteger:
 **PROGRAMMER ERROR** A value for this parameter [G6P2] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
@@ -1543,5 +1544,12 @@ End
 ----- Check for value in an option/list/excluded parameter -----
 **USER ERROR** Parameter [G2P0] can not be entered if parameter [G1P0] is equal to [G1P0L0]
 
----------- Check error for unknow parameter ----------
+---------- Check error for unknown parameter ----------
 **USER ERROR** Unknown parameter [xyz].
+
+---------- Check errors for user file overwrite preferences ----------
+   ---- Overwrite = Error ----
+**USER ERROR** Invalid output filename for [G0P1]. The file [/work1/jwalldren/isis3/trunk/isis/src/base/objs/IsisAml/junk.txt] already exists.  The user preference file customization group is set to disallow file overwrites.
+   ---- Overwrite = Err ----
+**USER ERROR** Invalid entry in user preference file FileCustomization group.  Overwrite = [Err].  Valid values: [Allow] or [Error].
+

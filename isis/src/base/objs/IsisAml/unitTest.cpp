@@ -6,6 +6,7 @@
 #include "Filename.h"
 #include "Pvl.h"
 #include "Preference.h"
+#include "TextFile.h"
 
 
 using namespace std;
@@ -314,7 +315,7 @@ int main(void) {
 
   // Test the error catching for public members
 
-  cout << "---------- Test error throwing ----------";
+  cout << "---------- Test error throwing ----------" << endl;
 
   try {
     cout << "  PutAsString:" << endl;
@@ -364,19 +365,20 @@ int main(void) {
     }
 
     cout << endl << "  Cube tests:" << endl;
+    
     try {
-      aml->PutFilename("CUBE1", "xxxxxxx.cub+1,2-4");
-      Isis::CubeAttributeInput &att = aml->GetInputAttribute("CUBE1");
+      aml->PutFilename("CUBE2", "xxxxxxx.cub+1,2-4");
+      Isis::CubeAttributeInput &att = aml->GetInputAttribute("CUBE2");
       cout << "    " << att.BandsStr() << endl;
     }
     catch(Isis::iException &error) {
       error.Report(false);
     }
-    aml->Clear("CUBE1");
+    aml->Clear("CUBE2");
 
     try {
-      aml->PutFilename("CUBE2", "yyyyyyy.cub+8-bit+BSQ+detached");
-      Isis::CubeAttributeOutput &att = aml->GetOutputAttribute("CUBE2");
+      aml->PutFilename("CUBE1", "yyyyyyy.cub+8-bit+BSQ+detached");
+      Isis::CubeAttributeOutput &att = aml->GetOutputAttribute("CUBE1");
       string strng;
       att.Write(strng);
       cout << "    Att string  = " << strng << endl;
@@ -386,10 +388,7 @@ int main(void) {
     catch(Isis::iException &error) {
       error.Report(false);
     }
-    aml->Clear("CUBE2");
-
-
-
+    aml->Clear("CUBE1");
 
     cout << endl << "  PutInteger:" << endl;
     try {
@@ -722,12 +721,52 @@ int main(void) {
   aml->Clear("G2P0");
   cout << endl;
 
-  cout << "---------- Check error for unknow parameter ----------" << endl;
+  cout << "---------- Check error for unknown parameter ----------" << endl;
   try {
     aml->Clear("xyz");
   }
   catch(Isis::iException &error) {
     error.Report(false);
   }
+
+  cout << endl;
+  cout << "---------- Check errors for user file overwrite preferences ----------" << endl;
+  // Create a file
+  string testFile = "junk.txt";
+  string lines[3];
+  lines[0] = "1";
+  vector<string> strvect;
+  strvect.push_back(lines[0]);
+  Isis::TextFile f1(testFile, "overwrite", strvect);
+  aml->Clear("G0P1");
+  // set output parameter to equal existing file
+  aml->PutAsString("G0P1", "junk.txt");
+  Isis::Preference &testpref = Isis::Preference::Preferences();
+
+  try {
+    // change preference to Overwrite = Error
+    testpref.FindGroup("FileCustomization").FindKeyword("Overwrite")[0] = "Error";
+    cout << "   ---- Overwrite = " 
+      << testpref.FindGroup("FileCustomization").FindKeyword("Overwrite")[0] 
+      << " ----" << endl;
+    aml->VerifyAll();
+  }
+  catch(Isis::iException &error) {
+    error.Report(false);
+  }
+
+  try {
+    // change preference to Overwrite = Err (invalid value)
+    testpref.FindGroup("FileCustomization").FindKeyword("Overwrite")[0] = "Err";
+    cout << "   ---- Overwrite = " 
+      << testpref.FindGroup("FileCustomization").FindKeyword("Overwrite")[0] 
+      << " ----" << endl;
+    aml->VerifyAll();
+  }
+  catch(Isis::iException &error) {
+    error.Report(false);
+  }
+  remove("junk.txt");
+  cout << endl;
 }
 
