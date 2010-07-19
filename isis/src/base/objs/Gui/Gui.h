@@ -25,19 +25,19 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <vector>
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 
-#include <QWidget>
-#include <QMainWindow>
-#include <QScrollArea>
-#include <QGroupBox>
-#include <QLayout>
 #include <QAction>
+#include <QGroupBox>
 #include <QLabel>
-#include <QProgressBar>
+#include <QLayout>
 #include <QLineEdit>
+#include <QMainWindow>
+#include <QProgressBar>
+#include <QScrollArea>
+#include <QWidget>
 
 #include "PvlObject.h"
 #include "PvlGroup.h"
@@ -56,16 +56,21 @@ namespace Isis {
    *
    * @internal
    *  @history 2007-07-19  Steven Lambright Fixed bugs: Command Line not checked
-   *                       but displayed initially and Command Line edit was not
-   *                       read only.
+   *                          but displayed initially and Command Line edit was
+   *                          not read only.
    *  @history 2008-06-06  Steven Lambright Fixed bug with corrupt parameter
-   *                       history file causing the program to crash
+   *                          history file causing the program to crash
    *  @history 2008-07-29  Steven Lambright Fixed memory leaks and naming
-   *                       convention
+   *                          convention
    *  @history 2009-11-19 Kris Becker - Made argc pass by reference since Qt's
-   *           QApplication/QCoreApplication requires it
+   *                         QApplication/QCoreApplication requires it
    *  @history 2010-03-17 Stuart Sides - Added the location of the Qt plugins
    *                                     into the library path
+   *  @history 2010-07-19 Jeannie Walldren - Modified SelectFile() in
+   *                         GuiFilenameParameter.cpp and removed SelectFile()
+   *                         from GuiCubeParameter. Cube and File customization
+   *                         preferences are now being handled in Cube's
+   *                         CubeIoHandler and IsisAml classes.  
    */
 
   class Gui : public QMainWindow {

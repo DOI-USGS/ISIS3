@@ -26,13 +26,22 @@
 #include <QHBoxLayout>
 
 #include "GuiFilenameParameter.h"
-
 #include "iString.h"
 #include "UserInterface.h"
 
 
 namespace Isis {
 
+  /**
+   * Construct a GuiFilenameParameter object
+   * 
+   * @param grid Pointer to QGridLayout
+   * @param ui User interface object
+   * @param group Index of group
+   * @param param Index of parameter
+   *
+   * @internal
+   */
   GuiFilenameParameter::GuiFilenameParameter(QGridLayout *grid, UserInterface &ui,
       int group, int param) :
     GuiParameter(grid, ui, group, param) {
@@ -65,45 +74,61 @@ namespace Isis {
   }
 
 
+  /**
+   * Destructor of GuiFilenameParameter object
+   */
   GuiFilenameParameter::~GuiFilenameParameter() {}
 
 
+  /**
+   * Sets the line edit text box to value passed in by this method
+   * 
+   * @param newValue  
+   */
   void GuiFilenameParameter::Set(iString newValue) {
     p_lineEdit->setText(newValue.ToQt());
   }
 
 
+  /** 
+   * Gets the value found in the line edit text box. 
+   *  
+   * @return @b iString Value found in line edit text box
+   */
   iString GuiFilenameParameter::Value() {
     return p_lineEdit->text().toStdString();
   }
 
   /**
+   * Gets an input/output file from a GUI filechooser or typed in filename.
+   *
+   * This method determines which directory to look in, sets up extension
+   * filters, and gets the filename.
    *
    * @internal
-   * @history  2007-05-16 Tracie Sucharski - For files located in CWD, do
-   *                           not include path in the lineEdit.
-   * @history  2007-06-05 Steven Koechle - Corrected problem where
-   *                           output Filename was being opened
-   *                           not saved. Defaulted to output mode
-   *                           if not specified.
-   * @history  2009-11-02 Mackenzie Boyd - Corrected building of
-   *                           filter string to match
-   *                           GuiCubeParameter.cpp and, if no
-   *                           filters specified, to specify
-   *                           "Any(*)" not ";;Any(*)" as it had
-   *                           been doing.
+   *   @history  2007-05-16 Tracie Sucharski - For files located in CWD, do not
+   *                           include path in the lineEdit.
+   *   @history  2007-06-05 Steven Koechle - Corrected problem where output
+   *                           Filename was being opened not saved. Defaulted to
+   *                           output mode if not specified.
+   *   @history  2009-11-02 Mackenzie Boyd - Corrected building of filter string
+   *                           to match GuiCubeParameter.cpp and, if no filters
+   *                           specified, to specify "Any(*)" not ";;Any(*)" as
+   *                           it had been doing.
+   *   @history  2010-07-19 Jeannie Walldren - Modified to allow users to
+   *                           view files in the directory. 
    */
   void GuiFilenameParameter::SelectFile() {
     // What directory do we look in?
     QString dir;
     if((p_lineEdit->text().length() > 0) &&
         (p_lineEdit->text().toStdString() != p_ui->ParamInternalDefault(p_group, p_param))) {
-      Isis::Filename f(p_lineEdit->text().toStdString());
-      dir = (QString)(iString)f.Expanded();
+      Isis::Filename fname(p_lineEdit->text().toStdString());
+      dir = (QString)(iString)fname.Expanded();
     }
     else if(p_ui->ParamPath(p_group, p_param).length() > 0) {
-      Isis::Filename f(p_ui->ParamPath(p_group, p_param));
-      dir = (QString)(iString)f.Expanded();
+      Isis::Filename fname(p_ui->ParamPath(p_group, p_param));
+      dir = (QString)(iString)fname.Expanded();
     }
 
     // Set up the filter
@@ -116,22 +141,29 @@ namespace Isis {
     }
 
     // Get the filename
-    QString s;
+    QString fnameQString;
 
     if(p_ui->ParamFileMode(p_group, p_param) == "input") {
-      s = QFileDialog::getOpenFileName(p_fileButton, "Select file", dir, filter);
+      fnameQString = QFileDialog::getOpenFileName(p_fileButton, "Select file", dir, filter);
     }
     else {
-      QFlags<QFileDialog::Option> options(QFileDialog::ShowDirsOnly);
-      s = QFileDialog::getSaveFileName(p_fileButton, "Select file", dir, filter, 0, options);
+      // The IsisPreference file has groups "FileCustomization" and
+      // "CubeCustomization" with keyword "Overwrite" and possible values
+      // "Allow" or "Error".
+      // Qt does not provide an option to disallow overwrites, so we are unable
+      // to handle this preference here.  Instead, the IsisAml class and the
+      // Cube class CubeIoHandler checks these preferences, respectively, and
+      // throws an error if overwrites are not allowed
+      // 2010-07-15 Jeannie Walldren
+      QFlags<QFileDialog::Option> options(QFileDialog::DontConfirmOverwrite);
+      fnameQString = QFileDialog::getSaveFileName(p_fileButton, "Select file", dir, filter, 0, options);
     }
-
-    if(s != "") {
-      Isis::Filename f(s.toStdString());
-      if(f.absoluteDir() == QDir::currentPath()) {
-        s = (QString)(iString)f.Name();
+    if(fnameQString != "") {
+      Isis::Filename fname(fnameQString.toStdString());
+      if(fname.absoluteDir() == QDir::currentPath()) {
+        fnameQString = (QString)(iString)fname.Name();
       }
-      Set(s.toStdString());
+      Set(fnameQString.toStdString());
     }
   }
 }

@@ -33,12 +33,11 @@
 #include <QTextEdit>
 #include <QToolButton>
 
-#include "GuiCubeParameter.h"
 
 #include "Application.h"
 #include "Cube.h"
 #include "Filename.h"
-#include "Preference.h"
+#include "GuiCubeParameter.h"
 #include "GuiInputAttribute.h"
 #include "GuiOutputAttribute.h"
 #include "iException.h"
@@ -49,6 +48,14 @@
 
 namespace Isis {
 
+  /**
+   * @brief Constructs GuiCubeParameter object
+   * 
+   * @param grid Pointer to QGridLayout
+   * @param ui User interface object
+   * @param group Index of group
+   * @param param Index of parameter
+   */
   GuiCubeParameter::GuiCubeParameter(QGridLayout *grid, UserInterface &ui,
                                      int group, int param) :
     GuiFilenameParameter(grid, ui, group, param) {
@@ -85,73 +92,17 @@ namespace Isis {
   }
 
 
+  /**
+   *  Destructor of GuiCubeParameter object.
+   */
   GuiCubeParameter::~GuiCubeParameter() {
     delete p_menu;
   }
 
 
   /**
-   * Gets an input/output file from a GUI filechooser or typed in
-   * filename.
-   *
-   * @internal
-   * @history  2007-05-16 Tracie Sucharski - For cubes located in CWD, do
-   *                           not include path in the lineEdit.
-   * @history  2007-06-05 Steven Koechle - Corrected problem where
-   *                           output cube was being opened not
-   *                           saved.
+   * Select cube attributes.
    */
-  void GuiCubeParameter::SelectFile() {
-    // What directory do we look in?
-    QString dir;
-    if((p_lineEdit->text().length() > 0) &&
-        (p_lineEdit->text().toStdString() != p_ui->ParamInternalDefault(p_group, p_param))) {
-      Isis::Filename f(p_lineEdit->text().toStdString());
-      dir = (QString)(iString)f.Expanded();
-    }
-    else if(p_ui->ParamPath(p_group, p_param).length() > 0) {
-      Isis::Filename f(p_ui->ParamPath(p_group, p_param));
-      dir = (QString)(iString)Filename(p_ui->ParamPath(p_group, p_param)).Expanded();
-    }
-
-    // Set up the filter
-    QString filter = (iString)p_ui->ParamFilter(p_group, p_param);
-    if(filter.isEmpty()) {
-      filter = "Any(*)";
-    }
-    else {
-      filter += ";;Any(*)";
-    }
-
-
-    // Get the filename
-    QString s;
-    if(p_ui->ParamFileMode(p_group, p_param) == "input") {
-      s = QFileDialog::getOpenFileName(p_fileButton, "Select file", dir, filter);
-    }
-    else {
-      // if/else statements are functionally identical, but left in case
-      // different file selection capabilities are desired for different
-      // preferences later
-      if(Preference::Preferences().FindGroup("CubeCustomization").FindKeyword("Overwrite")[0] == "Allow") {
-        QFlags<QFileDialog::Option> options(QFileDialog::DontConfirmOverwrite);
-        s = QFileDialog::getSaveFileName(p_fileButton, "Select file", dir, filter, 0, options);
-      }
-      else {
-        QFlags<QFileDialog::Option> options(QFileDialog::DontConfirmOverwrite);
-        s = QFileDialog::getSaveFileName(p_fileButton, "Select file", dir, filter, 0, options);
-      }
-    }
-
-    if(s != "") {
-      Isis::Filename f(s.toStdString());
-      if(f.absoluteDir() == QDir::currentPath()) {
-        s = (QString)(iString)f.Name();
-      }
-      Set(s.toStdString());
-    }
-  }
-
   void GuiCubeParameter::SelectAttribute() {
     if(p_ui->ParamFileMode(p_group, p_param) == "input") {
       Isis::CubeAttributeInput att(p_lineEdit->text().toStdString());
@@ -186,6 +137,10 @@ namespace Isis {
     return;
   }
 
+  /** 
+   * Opens cube in qview. 
+   * @throws Isis::Exception::User "You must enter a cube name to open"
+   */
   void GuiCubeParameter::ViewCube() {
     try {
       // Make sure the user entered a value
@@ -212,6 +167,10 @@ namespace Isis {
     }
   }
 
+  /** 
+   * Displays cube label in the GUI log.
+   * @throws Isis::Exception::User "You must enter a cube name to open"
+   */
   void GuiCubeParameter::ViewLabel() {
     try {
       // Make sure the user entered a value
