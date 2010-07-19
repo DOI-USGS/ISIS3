@@ -32,7 +32,7 @@ Group=UserInterface
   GuiHeight          = 600
   HistoryPath        = $HOME/.Isis/history
   HistoryRecording   = On
-  HistoryLength      = 10  
+  HistoryLength      = 10
 EndGroup
 
 ########################################################
@@ -85,14 +85,13 @@ EndGroup
 # Customize how other files are created
 #
 # Overwrite = Error | Allow
-# History = On | Off
-# MaximumSize = max # of gigabytes
+#
+# If Error, then overwrites of any non-cube
+# file will be disallowed and an error will be thrown
 ########################################################
 
 Group = FileCustomization
   Overwrite  =  Allow
-  History    =  On
-  MaximumSize = 12
 EndGroup
 
 ########################################################
