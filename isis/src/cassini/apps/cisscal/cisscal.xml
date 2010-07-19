@@ -182,6 +182,10 @@
     <change name="Jeannie Walldren" date="2010-07-13">
       Added new in-flight calibration document to "See Also".
     </change>
+    <change name="Jeannie Walldren" date="2010-07-19">
+      Updated documentation in cpp file and moved call to set output cube to 
+      top of main method to check user preferences before computations.
+    </change>
   </history>
 
   <category>

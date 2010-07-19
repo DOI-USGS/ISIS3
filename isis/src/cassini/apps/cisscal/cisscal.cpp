@@ -83,6 +83,7 @@ void IsisMain() {
   // Initialize Globals
   UserInterface &ui = Application::GetUserInterface();
   gbl::cissLab = new CissLabels(ui.GetFilename("FROM"));
+  gbl::incube = NULL;
   gbl::stretch.ClearPairs();
   gbl::numberOfOverclocks = 0;
   gbl::bias.clear();
@@ -94,7 +95,7 @@ void IsisMain() {
   gbl::flatCorrection = false;
   gbl::trueGain = 1.0;
   gbl::divideByExposure = false;
-  gbl::offset = 0; // set pointer to null
+  gbl::offset = NULL; // initialize pointer to null or 0?
   gbl::solidAngle = 1.0;
   gbl::opticsArea = 1.0;
   gbl::sumFactor  = 1.0;
@@ -102,10 +103,22 @@ void IsisMain() {
   gbl::polarizationFactor = 1.0;
   gbl::correctionFactor = 1.0;
 
-  // Set up our ProcessByLine
+  // Set up our ProcessByLine objects
+  // we will take 2 passes through the input cube
   ProcessByLine firstpass;
-  // initialize global input cube variable
-  gbl::incube = firstpass.SetInputCube("FROM");
+  ProcessByLine secondpass;
+  // for the first pass, use the input cube.
+  gbl::incube = firstpass.SetInputCube("FROM"); // CopyInput() or BitweightCorrect() parameter in
+  // for the second pass, set input cube to "FROM" due to requirements of 
+  // ProcessByLine that there be at least 1 input buffer before setting the
+  // output buffer, however this cube is not used in the Calibrate method, 
+  // instead the bitweightCorrected vector is used as the initial values before
+  // the rest of the calibration steps are performed.
+  gbl::incube = secondpass.SetInputCube("FROM"); // Calibrate() parameter in[0]
+  // we need to set output cube at the beginning of the program to check right 
+  // away for CubeCustomization IsisPreference and throw an error, if necessary.
+  Cube *outcube = secondpass.SetOutputCube("TO"); // Calibrate() parameter out[0]
+
   // resize 2dimensional vectors
   gbl::bitweightCorrected.resize(gbl::incube->Samples());
   gbl::dark_DN.resize(gbl::incube->Samples());
@@ -116,6 +129,8 @@ void IsisMain() {
 
   // Add the radiometry group
   gbl::calgrp.SetName("Radiometry");
+
+  // The first ProcessByLine pass will either compute bitweight values or copy input values
 
   // BITWEIGHT CORRECTION
   gbl::calgrp += PvlKeyword("BitweightCorrectionPerformed", "Yes");
@@ -158,14 +173,9 @@ void IsisMain() {
       firstpass.StartProcess(gbl::BitweightCorrect);
       firstpass.EndProcess();
     }
-  }
+  }// THIS ENDS FIRST PROCESS
 
-  // Reset the input cube for rest of calibration steps
-  ProcessByLine secondpass;
-  CubeAttributeInput att;
-  //set input cube to "FROM" due to requirements of processbyline that there be at least 1 input buffer
-  //we are actually using gbl::image as the input
-  gbl::incube = secondpass.SetInputCube("FROM");
+  // Compute global values needed for the rest of the calibration steps
 
   //Subtract bias (debias)
   gbl::ComputeBias();
@@ -206,17 +216,19 @@ void IsisMain() {
   gbl::FindEfficiencyFactor(ui.GetString("FLUXUNITS"));
 
   //Correction Factor
+  // Set the remaining necessary input cube files for second pass
+  CubeAttributeInput att;
   gbl::FindCorrectionFactors();
-  if(gbl::flatCorrection) {
+  if(gbl::flatCorrection) { // Calibrate() parameter in[1]
     secondpass.SetInputCube(flatFile.Expanded(), att);
   }
-  if(gbl::dustCorrection) {
+  if(gbl::dustCorrection) { // Calibrate() parameter in[2]
     secondpass.SetInputCube(gbl::dustFile.Expanded(), att);
   }
-  if(gbl::mottleCorrection) {
+  if(gbl::mottleCorrection) { // Calibrate() parameter in[3]
     secondpass.SetInputCube(gbl::mottleFile.Expanded(), att);
   }
-  Cube *outcube = secondpass.SetOutputCube("TO");
+  // this pass will call the Calibrate method
   secondpass.Progress()->SetText("Calibrating image...");
   outcube->PutGroup(gbl::calgrp);
   secondpass.StartProcess(gbl::Calibrate);
@@ -316,7 +328,7 @@ void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
       // 6a DN to Electrons
       outLine[sampIndex] = outLine[sampIndex] * gbl::trueGain;
       // 6b Divide By Exposure Time
-      //	JPL confirm that these values must be subtracted thus:
+      //  JPL confirm that these values must be subtracted thus:
       if(gbl::divideByExposure) {
         double exposureTime = gbl::cissLab->ExposureDuration() - (*gbl::offset)[gbl::offset->Index(sampIndex+1, 1, 1)];
         // IDL documentation:
@@ -336,7 +348,7 @@ void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
           ConstOffset = 1.8;
         }
         exposureTime = exposureTime - ConstOffset;
-        outLine[sampIndex] = outLine[sampIndex] * 1000 / exposureTime;	// 1000 to scale ms to seconds
+        outLine[sampIndex] = outLine[sampIndex] * 1000 / exposureTime;  // 1000 to scale ms to seconds
       }
       // 6c Divide By Area Pixel
       outLine[sampIndex] = outLine[sampIndex] * gbl::sumFactor / (gbl::solidAngle * gbl::opticsArea);
@@ -452,10 +464,10 @@ void gbl::CreateBitweightStretch(Filename bitweightTable) {
  * cassimg_bitweightcorrect.pro.  The purpose is to find the
  * look up table file name for this image.
  *
- *	The table to be used depends on:
- *		Camera		NAC or WAC
- *		GainState	1, 2 or 3 <=> GainModeId 95, 29, or 12
- *    Optics temp.	-10, +5 or +25
+ *  The table to be used depends on:
+ *    Camera    NAC or WAC
+ *    GainState  1, 2 or 3 <=> GainModeId 95, 29, or 12 Optics temp.  -10, +5 or
+ *     +25
  *
  * @return <B>Filename</B> Name of the bitweight file
  *
@@ -653,11 +665,11 @@ vector<double> gbl::OverclockFit() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  */
 void gbl::Linearize() {
-//	These are the correction factor tables from the referenced documents
-//	For each gain state there are a list of DNs where measurements
-//	  were performed and the corresponding correction factors C
-//	The correction is then performed as DN'=DN*Cdn
-//	Where Cdn is an interpolation for C from the tabulated values
+//  These are the correction factor tables from the referenced documents
+//  For each gain state there are a list of DNs where measurements
+//    were performed and the corresponding correction factors C
+//  The correction is then performed as DN'=DN*Cdn
+//  Where Cdn is an interpolation for C from the tabulated values
 
   iString lut;
   int gainState = gbl::cissLab->GainState();
@@ -724,9 +736,9 @@ void gbl::Linearize() {
   }
   pairs->Close();
 
-  //	ASSUMPTION: C will not change significantly over fractional DN
-  //	If this is not the case, then can perform simple second interpolation
-  //	between DNs while mapping LUT onto the image
+  //  ASSUMPTION: C will not change significantly over fractional DN
+  //  If this is not the case, then can perform simple second interpolation
+  //  between DNs while mapping LUT onto the image
   NumericalApproximation linearInterp(NumericalApproximation::Linear);
   for(unsigned int i = 0; i < DN_VALS.size(); i++) {
     linearInterp.AddData(DN_VALS[i], C_VALS[i]);
@@ -738,7 +750,7 @@ void gbl::Linearize() {
     double j = linearInterp.Evaluate((double) i);
     gbl::stretch.AddPair(i, j);
   }
-  //	Map LUT onto image, defending against out-of-range DN values
+  //  Map LUT onto image, defending against out-of-range DN values
   return;
 }
 //=====End Linearize Methods=====================================================================//
@@ -763,7 +775,7 @@ void gbl::Linearize() {
  *            labels.
  */
 void gbl::FindDustRingParameters() {
-  //	No dustring or mottle correction for WAC
+  //  No dustring or mottle correction for WAC
   if(gbl::cissLab->WideAngle()) {
     gbl::dustCorrection = false;
     gbl::mottleCorrection = false;
@@ -962,9 +974,9 @@ void gbl::FindDustRingParameters() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  */
 Filename gbl::FindFlatFile() {
-  //	There is a text database file in the slope files directory
-  //	 that maps filter combinations (and camera temperature)
-  //	 to the corresponding slope field files.
+  //  There is a text database file in the slope files directory
+  //   that maps filter combinations (and camera temperature)
+  //   to the corresponding slope field files.
   // according to slope_info.txt, slope_db_1 is original, slope_db_2 is the best and slope_db_3 is newest but has some issues
   Filename flatFile;
   Filename slopeDatabaseName(gbl::GetCalibrationDirectory("slope") + "slope_db_2.tab");
@@ -979,7 +991,7 @@ Filename gbl::FindFlatFile() {
   gbl::flatCorrection = true;
 
   // Find the best-match flat file
-  //	Choose a nominal optics temp name as per ISSCAL
+  //  Choose a nominal optics temp name as per ISSCAL
   iString frontOpticsTemp("");
   if(gbl::cissLab->FrontOpticsTemp() < -5.0) {
     frontOpticsTemp += "m10";
@@ -990,7 +1002,7 @@ Filename gbl::FindFlatFile() {
   else {
     frontOpticsTemp += "p25";
   }
-  //	Require match for instrument, temperature range name, Filter1, filter2
+  //  Require match for instrument, temperature range name, Filter1, filter2
   CisscalFile *slopeDB = new CisscalFile(slopeDatabaseName.Expanded());
   iString col1, col2, col3, col4, col5, col6, col7, col8;
   for(int i = 0; i < slopeDB->LineCount(); i++) {
@@ -1083,15 +1095,15 @@ void gbl::DNtoElectrons() {
   gbl::calgrp += PvlKeyword("DNtoFluxPerformed", "Yes");
   gbl::calgrp.FindKeyword("DNtoFluxPerformed").AddComment("DN to Flux Parameters");
   gbl::calgrp += PvlKeyword("DNtoElectrons", "Yes");
-  //	Gain used for an image is documented by the GainModID attribute
-  //	of the image. Nominal values are as follow:
+  //  Gain used for an image is documented by the GainModID attribute
+  //  of the image. Nominal values are as follow:
   //
-  //	Attribute	Gain	Usual	Nominal Gain
-  //	 Value	state	  mode	(e- per DN)
-  //	"1400K"		0	    SUM4	    215
-  //	 "400K"		1	    SUM2	     95
-  //	 "100K"		2	    FULL	     29
-  //	  "40K"		3	    FULL	     12
+  //  Attribute  Gain  Usual  Nominal Gain
+  //   Value  state    mode  (e- per DN)
+  //  "1400K"    0      SUM4      215
+  //   "400K"    1      SUM2       95
+  //   "100K"    2      FULL       29
+  //    "40K"    3      FULL       12
   if(gbl::cissLab->NarrowAngle()) {
     switch(gbl::cissLab->GainState()) {
       case 0:
@@ -1147,7 +1159,7 @@ void gbl::DNtoElectrons() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  */
 void gbl::FindShutterOffset() {
-  //	Don't do this for zero-exposure images!
+  //  Don't do this for zero-exposure images!
   if(gbl::cissLab->ExposureDuration() == 0.0) { // exposuretime = 0, stop calibration
     throw iException::Message(iException::Pvl,
                               "Unable to calibrate image.  Cannot divide by exposure time for zero exposure image.",
@@ -1155,7 +1167,7 @@ void gbl::FindShutterOffset() {
   }
   gbl::calgrp += PvlKeyword("DividedByExposureTime", "Yes");
   gbl::divideByExposure = true;
-  //	Define whereabouts of shutter offset files
+  //  Define whereabouts of shutter offset files
   iString offsetFileName("");
   if(gbl::cissLab->NarrowAngle()) {
     offsetFileName += (gbl::GetCalibrationDirectory("offset") + "nacfm_so_");
@@ -1200,11 +1212,11 @@ void gbl::FindShutterOffset() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  */
 void gbl::DivideByAreaPixel() {
-  //	These values as per ISSCAL
-  //	SolidAngle is (FOV of Optics) / (Number of Pixels)
-  //	OpticsArea is (Diameter of Primary Mirror)^2 * Pi/4
-  //	We will adjust here for the effects of SUM modes
-  //	(which effectively give pixels of 4 or 16 times normal size)
+  //  These values as per ISSCAL
+  //  SolidAngle is (FOV of Optics) / (Number of Pixels)
+  //  OpticsArea is (Diameter of Primary Mirror)^2 * Pi/4
+  //  We will adjust here for the effects of SUM modes
+  //  (which effectively give pixels of 4 or 16 times normal size)
 
   gbl::calgrp += PvlKeyword("DividedByAreaPixel", "Yes");
   if(gbl::cissLab->NarrowAngle()) {
@@ -1215,7 +1227,7 @@ void gbl::DivideByAreaPixel() {
     gbl::solidAngle = 3.6 * pow(10.0, -9);
     gbl::opticsArea = 29.32;
   }
-  //	Normalize summed images to real pixels
+  //  Normalize summed images to real pixels
 
   // sumFactor is the inverse of the square of the summing mode,
   // it was expressed in IDL as the following:

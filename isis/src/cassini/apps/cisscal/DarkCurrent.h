@@ -42,13 +42,14 @@ namespace Isis {
    * @author 2008-11-05 Jeannie Walldren
    * @internal
    *  @history 2008-11-05 Jeannie Walldren - Original Version
-    * @history 2009-01-26 Jeannie Walldren - Changed declarations
-    *            of 2 dimensional vectors
-   *  @history 2009-05-27 Jeannie Walldren - Added
-   *           p_flightSoftware variable.  Updated
-   *           ComputeLineTime() code with algorithm from the new
-   *           version of linetime.pro in idl cisscal 3.6.  Fixed
-   *           instrument data rate value in the constructor.
+   *  @history 2009-01-26 Jeannie Walldren - Changed declarations of 2
+   *           dimensional vectors
+   *  @history 2009-05-27 Jeannie Walldren - Added p_flightSoftware variable.
+   *                         Updated ComputeLineTime() code with algorithm from
+   *                         the new version of linetime.pro in idl cisscal 3.6.
+   *                         Fixed instrument data rate value in the
+   *                         constructor.
+   *  @history 2010-07-19 Jeannie Walldren - Fixed formatting.
    */
   class DarkCurrent {
     public:
@@ -57,12 +58,14 @@ namespace Isis {
       ~DarkCurrent() {};  //!< Empty Destructor
 
       vector <vector <double> > ComputeDarkDN();
+      //! Retrieves the name of the bias distortion table
       Filename BiasDistortionTable() {
         return p_bdpath;
-      };      //!<Retrieves the name of the bias distortion table
+      };      
+      //! Retrieves the name of the dark parameters file
       Filename DarkParameterFile()  {
         return p_dparamfile;
-      };  //!<Retrieves the name of the dark parameters file
+      };  
 
 
     private:

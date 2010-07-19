@@ -47,8 +47,8 @@ namespace Isis {
   *                   invalid InstrumentDataRate or SummingMode.
   * @internal
   *   @history 2008-11-05 Jeannie Walldren - Original Version
-  *   @history 2009-05-27 Jeannie Walldren - Updated instrument
-  *            data rate range for telemetry rate of 32.
+  *   @history 2009-05-27 Jeannie Walldren - Updated instrument data rate range
+  *                          for telemetry rate of 32.
   */
   DarkCurrent::DarkCurrent(Isis::CissLabels &cissLab) {
     p_compType = cissLab.CompressionType();
@@ -142,8 +142,8 @@ namespace Isis {
   *
   * @internal
   *   @history 2008-11-05 Jeannie Walldren - Original Version
-  *   @history 2009-01-26 Jeannie Walldren - Changed declarations
-  *            of 2 dimensional vectors
+  *   @history 2009-01-26 Jeannie Walldren - Changed declarations of 2
+  *                          dimensional vectors
   */
   vector <vector <double> > DarkCurrent::ComputeDarkDN() { //get dark_DN
     if(p_readoutIndex == -999) {
@@ -251,8 +251,8 @@ namespace Isis {
   *             invalid ReadoutCycleIndex.
   * @internal
   *   @history 2008-11-05 Jeannie Walldren - Original Version
-  *   @history 2009-05-27 Jeannie Walldren - Updated with new idl
-  *            cisscal version, 3.6, linetime code.
+  *   @history 2009-05-27 Jeannie Walldren - Updated with new idl cisscal
+  *                          version, 3.6, linetime code.
   */
   double DarkCurrent::ComputeLineTime(int lline) { //returns the time for this line, takes the line number
     // this method mimics linetime.pro from idl's cisscal program
@@ -265,10 +265,10 @@ namespace Isis {
     double linetime;
     double tlm = p_telemetryRate / 8;
     // updated idl code - change t0 initial value:
-    double t0 = p_expDur / 1000 + 0.020;		//time from erase to first line
+    double t0 = p_expDur / 1000 + 0.020;    //time from erase to first line
     t0 = t0 + 0.68 * (p_lines - lline) / ((double) p_lines);
     //time due to 680ms erase
-    int line = lline - 1; 			//lline is from 1 to 1024 => line is from 0 to 1023
+    int line = lline - 1;       //lline is from 1 to 1024 => line is from 0 to 1023
     if(line < 0 || line > 1023) {
       iString msg = "DarkCurrent: For ComputeLineTime(lline), lline must be between 1 and 1024." + iString(lline) + " out of range";
       throw iException::Message(iException::Programmer, msg.c_str() , _FILEINFO_);
@@ -325,177 +325,213 @@ namespace Isis {
       if(p_dataConvType == "12Bit") { // not converted
         switch(p_lines) {
           case 1024: {  // full, not converted
-              rate_nc = 67.49;
-              if(fsw >= 1.4) {
-                correction = 1.0027;
-              }
-              telem_nc0 = 1.0161;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_nc = 1.0128;
-                  break;
-                case 16:
-                  telem_nc = 1.0095;
-                  break;
-                case 24:
-                  telem_nc = 1.0082;
-                  break;
-                case 32:
-                  telem_nc = 1.0031;
-                  break;
-                case 40:
-                  telem_nc = 1.0033;
-                  break;
-                case 48:
-                  telem_nc = 1.0;
-                  break;
-              }
-              break;
+            rate_nc = 67.49;
+            if(fsw >= 1.4) {
+              correction = 1.0027;
             }
+            telem_nc0 = 1.0161;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_nc = 1.0128;
+                break;
+              }
+              case 16: {
+                telem_nc = 1.0095;
+                break;
+              }
+              case 24: {
+                telem_nc = 1.0082;
+                break;
+              }
+              case 32: {
+                telem_nc = 1.0031;
+                break;
+              }
+              case 40: {
+                telem_nc = 1.0033;
+                break;
+              }
+              case 48: {
+                telem_nc = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 512: {  // sum2, not converted
-              rate_nc = 85.11;
-              if(fsw >= 1.4) {
-                correction = 1.0073;
-              }
-              telem_nc0 =  1.0297;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_nc = 1.0296;
-                  break;
-                case 16:
-                  telem_nc = 1.0252;
-                  break;
-                case 24:
-                  telem_nc = 1.0148;
-                  break;
-                case 32:
-                  telem_nc = 1.0114;
-                  break;
-                case 40:
-                  telem_nc = 1.0071;
-                  break;
-                case 48:
-                  telem_nc = 1.0;
-                  break;
-              }
-              break;
+            rate_nc = 85.11;
+            if(fsw >= 1.4) {
+              correction = 1.0073;
             }
+            telem_nc0 =  1.0297;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_nc = 1.0296;
+                break;
+              }
+              case 16: {
+                telem_nc = 1.0252;
+                break;
+              }
+              case 24: {
+                telem_nc = 1.0148;
+                break;
+              }
+              case 32: {
+                telem_nc = 1.0114;
+                break;
+              }
+              case 40: {
+                telem_nc = 1.0071;
+                break;
+              }
+              case 48: {
+                telem_nc = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 256: {  // sum4, not converted
-              rate_nc = 142.54;
-              if(fsw >= 1.4) {
-                correction = 1.0087;
-              }
-              telem_nc0 = 1.0356;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_nc = 1.0320;
-                  break;
-                case 16:
-                  telem_nc = 1.0260;
-                  break;
-                case 24:
-                  telem_nc = 1.0201;
-                  break;
-                case 32:
-                  telem_nc = 1.0128;
-                  break;
-                case 40:
-                  telem_nc = 1.0057;
-                  break;
-                case 48:
-                  telem_nc = 1.0;
-                  break;
-              }
-              break;
+            rate_nc = 142.54;
+            if(fsw >= 1.4) {
+              correction = 1.0087;
             }
+            telem_nc0 = 1.0356;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_nc = 1.0320;
+                break;
+              }
+              case 16: {
+                telem_nc = 1.0260;
+                break;
+              }
+              case 24: {
+                telem_nc = 1.0201;
+                break;
+              }
+              case 32: {
+                telem_nc = 1.0128;
+                break;
+              }
+              case 40: {
+                telem_nc = 1.0057;
+                break;
+              }
+              case 48: {
+                telem_nc = 1.0;
+                break;
+              }
+            }
+            break;
+          }
         }
       }
       else { // converted
         switch(p_lines) {
           case 1024: {  // full, converted
-              rate_nc = 71.96;
-              if(fsw >= 1.4) {
-                correction = 1.0016;
-              }
-              telem_nc0 = 1.0194;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_nc = 1.0148;
-                  break;
-                case 16:
-                  telem_nc = 1.0028;
-                  break;
-                case 24:
-                  telem_nc = 1.0011;
-                  break;
-                case 32:
-                  telem_nc = 1.0014;
-                  break;
-                case 40:
-                  telem_nc = 1.0009;
-                  break;
-                case 48:
-                  telem_nc = 1.0;
-                  break;
-              }
-              break;
+            rate_nc = 71.96;
+            if(fsw >= 1.4) {
+              correction = 1.0016;
             }
+            telem_nc0 = 1.0194;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_nc = 1.0148;
+                break;
+              }
+              case 16: {
+                telem_nc = 1.0028;
+                break;
+              }
+              case 24: {
+                telem_nc = 1.0011;
+                break;
+              }
+              case 32: {
+                telem_nc = 1.0014;
+                break;
+              }
+              case 40: {
+                telem_nc = 1.0009;
+                break;
+              }
+              case 48: {
+                telem_nc = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 512: {  // sum2, converted
-              rate_nc = 88.99;
-              if(fsw >= 1.4) {
-                correction = 1.0042;
-              }
-              telem_nc0 = 1.0248;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_nc = 1.0219;
-                  break;
-                case 16:
-                  telem_nc = 1.0173;
-                  break;
-                case 24:
-                  telem_nc = 1.0151;
-                  break;
-                case 32:
-                  telem_nc = 1.0097;
-                  break;
-                case 40:
-                  telem_nc = 1.0057;
-                  break;
-                case 48:
-                  telem_nc = 1.0;
-                  break;
-              }
-              break;
+            rate_nc = 88.99;
+            if(fsw >= 1.4) {
+              correction = 1.0042;
             }
+            telem_nc0 = 1.0248;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_nc = 1.0219;
+                break;
+              }
+              case 16: {
+                telem_nc = 1.0173;
+                break;
+              }
+              case 24: {
+                telem_nc = 1.0151;
+                break;
+              }
+              case 32: {
+                telem_nc = 1.0097;
+                break;
+              }
+              case 40: {
+                telem_nc = 1.0057;
+                break;
+              }
+              case 48: {
+                telem_nc = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 256: {  // sum4, converted
-              rate_nc = 152.12;
-              if(fsw >= 1.4) {
-                correction = 0.9946;
-              }
-              telem_nc0 = 1.0010;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_nc = 1.0000;
-                  break;
-                case 16:
-                  telem_nc = 0.9970;
-                  break;
-                case 24:
-                  telem_nc = 0.9910;
-                  break;
-                case 32:
-                  telem_nc = 0.9821;
-                  break;
-                case 40:
-                  telem_nc = 0.9763;
-                  break;
-                case 48:
-                  telem_nc = 1.0;
-                  break;
-              }
-              break;
+            rate_nc = 152.12;
+            if(fsw >= 1.4) {
+              correction = 0.9946;
             }
+            telem_nc0 = 1.0010;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_nc = 1.0000;
+                break;
+              }
+              case 16: {
+                telem_nc = 0.9970;
+                break;
+              }
+              case 24: {
+                telem_nc = 0.9910;
+                break;
+              }
+              case 32: {
+                telem_nc = 0.9821;
+                break;
+              }
+              case 40: {
+                telem_nc = 0.9763;
+                break;
+              }
+              case 48: {
+                telem_nc = 1.0;
+                break;
+              }
+            }
+            break;
+          }
         }
       }
       r1 = rate_nc * telem_nc * correction;
@@ -519,186 +555,222 @@ namespace Isis {
       if(p_dataConvType == "12Bit") { // not converted
         switch(p_lines) {
           case 1024: {  // full, not converted
-              rate0 = 67.673;
-              slope = 1.6972; // +/- 0.0102
+            rate0 = 67.673;
+            slope = 1.6972; // +/- 0.0102
 
-              if(fsw >= 1.4) {
-                correction = 0.9999;
-              }
-              telem_L0 = 1.0276;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_L = 1.0284;
-                  break;
-                case 16:
-                  telem_L = 1.0182;
-                  break;
-                case 24:
-                  telem_L = 1.0122;
-                  break;
-                case 32:
-                  telem_L = 1.0048;
-                  break;
-                case 40:
-                  telem_L = 1.0016;
-                  break;
-                case 48:
-                  telem_L = 1.0;
-                  break;
-              }
-              break;
+            if(fsw >= 1.4) {
+              correction = 0.9999;
             }
+            telem_L0 = 1.0276;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_L = 1.0284;
+                break;
+              }
+              case 16: {
+                telem_L = 1.0182;
+                break;
+              }
+              case 24: {
+                telem_L = 1.0122;
+                break;
+              }
+              case 32: {
+                telem_L = 1.0048;
+                break;
+              }
+              case 40: {
+                telem_L = 1.0016;
+                break;
+              }
+              case 48: {
+                telem_L = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 512: {  // sum2, not converted
-              rate0 = 90.568;
-              slope = 0.3671; // +/- 0.0255
-
-              if(fsw >= 1.4) {
-                correction = 1.0034;
-              }
-              telem_L0 = 1.0030;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_L = 0.9979;
-                  break;
-                case 16:
-                  telem_L = 0.9933;
-                  break;
-                case 24:
-                  telem_L = 0.9854;
-                  break;
-                case 32:
-                  telem_L = 0.9884;
-                  break;
-                case 40:
-                  telem_L = 1.0023;
-                  break;
-                case 48:
-                  telem_L = 1.0;
-                  break;
-              }
-              break;
+            rate0 = 90.568;
+            slope = 0.3671; // +/- 0.0255
+            
+            if(fsw >= 1.4) {
+              correction = 1.0034;
             }
+            telem_L0 = 1.0030;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_L = 0.9979;
+                break;
+              }
+              case 16: {
+                telem_L = 0.9933;
+                break;
+              }
+              case 24: {
+                telem_L = 0.9854;
+                break;
+              }
+              case 32: {
+                telem_L = 0.9884;
+                break;
+              }
+              case 40: {
+                telem_L = 1.0023;
+                break;
+              }
+              case 48: {
+                telem_L = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 256: {  // sum4, not converted
-              rate0 = 150.593;
-              slope = 0.4541;  // +/-0.0450
+            rate0 = 150.593;
+            slope = 0.4541;  // +/-0.0450
 
-              if(fsw >= 1.4) {
-                correction = 1.0073;
-              }
-              telem_L0 = 1.0011;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_L = 0.9976;
-                  break;
-                case 16:
-                  telem_L = 0.9894;
-                  break;
-                case 24:
-                  telem_L = 0.9864;
-                  break;
-                case 32:
-                  telem_L = 1.0000;
-                  break;
-                case 40:
-                  telem_L = 1.0000;
-                  break;
-                case 48:
-                  telem_L = 1.0;
-                  break;
-              }
-              break;
+            if(fsw >= 1.4) {
+              correction = 1.0073;
             }
+            telem_L0 = 1.0011;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_L = 0.9976;
+                break;
+              }
+              case 16: {
+                telem_L = 0.9894;
+                break;
+              }
+              case 24: {
+                telem_L = 0.9864;
+                break;
+              }
+              case 32: {
+                telem_L = 1.0000;
+                break;
+              }
+              case 40: {
+                telem_L = 1.0000;
+                break;
+              }
+              case 48: {
+                telem_L = 1.0;
+                break;
+              }
+            }
+            break;
+          }
         }
       }
       else { // converted
         switch(p_lines) {
           case 1024: {  // full, converted
-              rate0 = 74.862;
-              slope = 0.4918; // +/- 0.0069
-              if(fsw >= 1.4) {
-                correction = 1.0019;
-              }
-              telem_L0 = 1.0013;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_L = 1.0004;
-                  break;
-                case 16:
-                  telem_L = 0.9935;
-                  break;
-                case 24:
-                  telem_L = 0.9920;
-                  break;
-                case 32:
-                  telem_L = 1.0002;
-                  break;
-                case 40:
-                  telem_L = 0.9992;
-                  break;
-                case 48:
-                  telem_L = 1.0;
-                  break;
-              }
-              break;
+            rate0 = 74.862;
+            slope = 0.4918; // +/- 0.0069
+            if(fsw >= 1.4) {
+              correction = 1.0019;
             }
+            telem_L0 = 1.0013;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_L = 1.0004;
+                break;
+              }
+              case 16: {
+                telem_L = 0.9935;
+                break;
+              }
+              case 24: {
+                telem_L = 0.9920;
+                break;
+              }
+              case 32: {
+                telem_L = 1.0002;
+                break;
+              }
+              case 40: {
+                telem_L = 0.9992;
+                break;
+              }
+              case 48: {
+                telem_L = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 512: {  // sum2, converted
-              rate0 = 91.429;
-              slope = 0.4411; // +/- 0.0182
-              if(fsw >= 1.4) {
-                correction = 1.0050;
-              }
-              telem_L0 = 1.0013;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_L = 0.9950;
-                  break;
-                case 16:
-                  telem_L = 1.0000;
-                  break;
-                case 24:
-                  telem_L = 1.0000;
-                  break;
-                case 32:
-                  telem_L = 1.0000;
-                  break;
-                case 40:
-                  telem_L = 1.0001;
-                  break;
-                case 48:
-                  telem_L = 1.0;
-                  break;
-              }
-              break;
+            rate0 = 91.429;
+            slope = 0.4411; // +/- 0.0182
+            if(fsw >= 1.4) {
+              correction = 1.0050;
             }
+            telem_L0 = 1.0013;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_L = 0.9950;
+                break;
+              }
+              case 16: {
+                telem_L = 1.0000;
+                break;
+              }
+              case 24: {
+                telem_L = 1.0000;
+                break;
+              }
+              case 32: {
+                telem_L = 1.0000;
+                break;
+              }
+              case 40: {
+                telem_L = 1.0001;
+                break;
+              }
+              case 48: {
+                telem_L = 1.0;
+                break;
+              }
+            }
+            break;
+          }
           case 256: {  // sum4, converted
-              rate0 = 152.350;
-              slope = 0.5417; // +/-  0.0697
-              if(fsw >= 1.4) {
-                correction = 1.0080;
-              }
-              telem_L0 = 0.9986;
-              switch(p_telemetryRate) {
-                case 8:
-                  telem_L = 0.9863;
-                  break;
-                case 16:
-                  telem_L = 1.0017;
-                  break;
-                case 24:
-                  telem_L = 1.0021;
-                  break;
-                case 32:
-                  telem_L = 1.0010;
-                  break;
-                case 40:
-                  telem_L = 1.0017;
-                  break;
-                case 48:
-                  telem_L = 1.0;
-                  break;
-              }
-              break;
+            rate0 = 152.350;
+            slope = 0.5417; // +/-  0.0697
+            if(fsw >= 1.4) {
+              correction = 1.0080;
             }
+            telem_L0 = 0.9986;
+            switch(p_telemetryRate) {
+              case 8: {
+                telem_L = 0.9863;
+                break;
+              }
+              case 16: {
+                telem_L = 1.0017;
+                break;
+              }
+              case 24: {
+                telem_L = 1.0021;
+                break;
+              }
+              case 32: {
+                telem_L = 1.0010;
+                break;
+              }
+              case 40: {
+                telem_L = 1.0017;
+                break;
+              }
+              case 48: {
+                telem_L = 1.0;
+                break;
+              }
+            }
+            break;
+          }
         }
       }
       double ro_ratefit = rate0 + slope * p_compRatio;
@@ -1051,8 +1123,8 @@ namespace Isis {
    *
    *  @internal
    *   @history 2008-11-05 Jeannie Walldren - Original Version
-   *   @history 2009-01-26 Jeannie Walldren - Changed declarations
-   *            of 2 dimensional vectors
+   *   @history 2009-01-26 Jeannie Walldren - Changed declarations of 2
+   *                          dimensional vectors
    */
   vector <vector <double> > DarkCurrent::MakeDarkArray() { //return dark_e
     // this method mimics makedarkarray method of cassimg_subtractdark.pro from idl's cisscal program
@@ -1180,8 +1252,8 @@ namespace Isis {
   *
   * @internal
   *   @history 2008-11-05 Jeannie Walldren - Original Version
-  *   @history 2009-01-26 Jeannie Walldren - Changed declarations
-  *            of 2 dimensional vectors
+  *   @history 2009-01-26 Jeannie Walldren - Changed declarations of 2
+  *                          dimensional vectors
   */
   vector <vector <double> > DarkCurrent::MakeManyLineDark(Brick &darkBrick) { //returns dark_e
     // this method mimics make_manyline_dark method of cassimg_subtractdark.pro from idl's cisscal program
@@ -1241,9 +1313,9 @@ namespace Isis {
         // rather than interpolated
         timespan[0] = p_startTime[jline][kline];
         timespan[1] = p_endTime[jline][kline];
-        //	Interpolate by fitting a cubic spline to the
-        //	  4 point neighborhood (x[i-1], x[i], x[i+1], x[i+2]) surrounding
-        //	  the interval, x[i] <= u < x[i+1].
+        //  Interpolate by fitting a cubic spline to the
+        //    4 point neighborhood (x[i-1], x[i], x[i+1], x[i+2]) surrounding
+        //    the interval, x[i] <= u < x[i+1].
         NumericalApproximation spline(NumericalApproximation::CubicNeighborhood);
         for(int j = 0; j < num_params; j++) {
           spline.AddData(tgrid, v1[j]);
