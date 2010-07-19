@@ -1,8 +1,6 @@
 include $(ISISROOT)/make/isismake.macros
 
-DIRONLY = $(subst /,,$(shell ls -d */))
-CVS := CVS
-TESTS = $(filter-out $(CVS), $(DIRONLY))
+TESTS = $(shell ls -d * | grep -v Makefile)
 
 #----------------------------------------------------------------------------
 # Target = help
@@ -29,15 +27,17 @@ test: force
 	then \
 	  echo ""; \
 	  for i in $(TESTS); do \
-	    cd $$i; \
-	    if [ -f "Makefile" ]; \
-	    then \
-	      $(MAKE) test CASE=$$i BLANKS=$(BLANKS); \
-	    else \
-	      printf $(BLANKS) ""; \
-	      echo "no makefile"; \
-	    fi ; \
-	    cd ..; \
+	    if [ -d "$$i" ]; then \
+	      cd $$i; \
+	      if [ -f "Makefile" ]; \
+	      then \
+	        $(MAKE) test CASE=$$i BLANKS=$(BLANKS); \
+	      else \
+	        printf $(BLANKS) ""; \
+	        echo "No makefile in case [$$i]"; \
+	      fi ; \
+	      cd ..; \
+	    fi; \
 	  done \
 	else \
 	  echo ""; \
