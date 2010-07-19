@@ -70,7 +70,7 @@ api:
 	cd src; $(MAKE) objects
 	echo "Finished building Isis API"
 	echo ""
-	echo "Adding API objects
+	echo "Adding API objects"
 	cd src; $(MAKE) api
 	echo "Finished adding API objects" 
 	echo " "
