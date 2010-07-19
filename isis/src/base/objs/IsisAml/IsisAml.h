@@ -1,3 +1,6 @@
+#ifndef IsisAml_h
+#define IsisAml_h
+
 /**
  * @file
  * $Revision: 1.3 $
@@ -20,8 +23,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef IsisAml_h
-#define IsisAml_h
 
 #include <string>
 #include <vector>
@@ -30,8 +31,8 @@
 
 #include "IsisXMLApplication.h"
 #include "IsisAmlData.h"
-#include "Pvl.h"
 #include "iString.h"
+#include "Pvl.h"
 
 /**
  * @brief Application program XML file parameter manager.
@@ -128,6 +129,8 @@
  *                                      command line help
  *   @history 2006-02-13 Elizabeth Miller - Added GuiHelper Capabilities
  *   @history 2006-10-17 Steven Lambright - Fixed problem with boolean inclusion/exclusion
+ *   @history 2010-07-19 Jeannie Walldren - Added check whether user preferences
+ *                          are set to allow file overwrite in Verify() method
  */
 class IsisAml : protected IsisAmlData {
 
@@ -328,6 +331,7 @@ class IsisAml : protected IsisAmlData {
     const IsisParameterData *ReturnParam(const std::string &paramName) const;
 
     void Verify(const IsisParameterData *param);
+    void CheckFilenamePreference(string filename);
 };
 
 

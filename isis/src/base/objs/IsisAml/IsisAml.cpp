@@ -27,11 +27,12 @@ using namespace std;
 #include <xercesc/util/TransService.hpp>
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 
+#include "Filename.h"
 #include "iException.h"
 #include "IsisAml.h"
 #include "IsisXMLChTrans.h"
-#include "Filename.h"
 #include "iString.h"
+#include "Preference.h"
 
 /**
  * @internal
@@ -117,7 +118,7 @@ void IsisAml::PutAsString(const std::string &paramName,
 }
 
 
-// Public: Sets the value member of a parameter of type string whos name
+// Public: Sets the value member of a parameter of type string whose name
 // starts with paramName
 
 /**
@@ -158,7 +159,7 @@ void IsisAml::PutString(const std::string &paramName, const std::string &value) 
 }
 
 
-// Public: Sets the value member of a parameter of type string whos name
+// Public: Sets the value member of a parameter of type string whose name
 // starts with paramName
 /**
  * Allows the insertion of a value for a parameter of type "string". A validity
@@ -191,7 +192,7 @@ void IsisAml::PutString(const std::string &paramName,
 }
 
 
-// Public: Sets the value member of a parameter of type filename whos name
+// Public: Sets the value member of a parameter of type filename whose name
 // starts with paramName
 
 /**
@@ -226,7 +227,7 @@ void IsisAml::PutFilename(const std::string &paramName,
 }
 
 
-// Public: Sets the value member of a parameter of type filename whos name
+// Public: Sets the value member of a parameter of type filename whose name
 // starts with paramName
 
 /**
@@ -268,7 +269,7 @@ void IsisAml::PutFilename(const std::string &paramName,
 }
 
 
-// Public: Sets the value member of a parameter of type integer whos name
+// Public: Sets the value member of a parameter of type integer whose name
 // starts with paramName
 
 /**
@@ -306,7 +307,7 @@ void IsisAml::PutInteger(const std::string &paramName,
 }
 
 
-// Public: Sets the value member of a parameter of type integer whos name
+// Public: Sets the value member of a parameter of type integer whose name
 // starts with paramName
 
 /**
@@ -351,7 +352,7 @@ void IsisAml::PutInteger(const std::string &paramName,
 
 
 
-// Public: Sets the value member of a parameter of type double whos name
+// Public: Sets the value member of a parameter of type double whose name
 // starts with paramName
 /**
  * Allows the insertion of a value for a parameter of type "double". A
@@ -392,7 +393,7 @@ void IsisAml::PutDouble(const std::string &paramName,
 }
 
 
-// Public: Sets the value member of a parameter of type double whos name
+// Public: Sets the value member of a parameter of type double whose name
 // starts with paramName
 /**
  * Allows the insertion of a value for a parameter of type "double". A
@@ -436,7 +437,7 @@ void IsisAml::PutDouble(const std::string &paramName,
 
 
 
-// Public: Sets the value member of a parameter of type boolean whos name
+// Public: Sets the value member of a parameter of type boolean whose name
 // starts with paramName
 /**
  * Allows the insertion of a value for a parameter of type "boolean". A
@@ -482,7 +483,7 @@ void IsisAml::PutBoolean(const std::string &paramName,
 }
 
 
-// Public: Sets the value member of a parameter of type boolean whos name
+// Public: Sets the value member of a parameter of type boolean whose name
 // starts with paramName
 /**
  * Allows the insertion of a value for a parameter of type "boolean". A
@@ -564,7 +565,7 @@ string IsisAml::GetAsString(const std::string &paramName) const {
   return value;
 }
 
-// Public: Returns the value member of a parameter whos name starts with paramName
+// Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<string>
 /**
  * Allows the retrieval of a value for a parameter of any type. The value will
@@ -602,7 +603,7 @@ void IsisAml::GetAsString(const std::string &paramName,
 }
 
 
-// Public: Returns the first element of the value member of a parameter whos
+// Public: Returns the first element of the value member of a parameter whose
 // name starts with paramName as a string/filename
 /**
  * Allows the retrieval of a value for a parameter of type "filename".
@@ -645,7 +646,7 @@ string IsisAml::GetFilename(const std::string &paramName, std::string extension)
 }
 
 
-// Public: Returns the value member of a parameter whos name starts with paramName
+// Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<string/filename>
 /**
  * Allows the retrieval of a value for a parameter of type "filename".
@@ -753,7 +754,7 @@ string IsisAml::GetString(const std::string &paramName) const {
 }
 
 
-// Public: Returns the value member of a parameter whos name starts with paramName
+// Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<string>
 /**
  * Allows the retrieval of a value for a parameter of type "string".
@@ -835,7 +836,7 @@ int IsisAml::GetInteger(const std::string &paramName) const {
 }
 
 
-// Public: Returns the value member of a parameter whos name starts with paramName
+// Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<int>
 /**
  * Allows the retrieval of a value for a parameter of type "integer".
@@ -918,7 +919,7 @@ double IsisAml::GetDouble(const std::string &paramName) const {
   return value.ToDouble();
 }
 
-// Public: Returns the value member of a parameter whos name starts with paramName
+// Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<doubble>
 /**
  * Allows the retrieval of a value for a parameter of type "double".
@@ -1002,7 +1003,7 @@ bool IsisAml::GetBoolean(const std::string &paramName) const {
 }
 
 
-// Public: Returns the value member of a parameter whos name starts with paramName
+// Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<bool>
 /**
  * Allows the retrieval of a value for a parameter of type "boolean".
@@ -1861,7 +1862,7 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const std::string &paramN
 }
 
 /**
- * Returns a pointer to a parameter whos name starts with paramName
+ * Returns a pointer to a parameter whose name starts with paramName
  *
  * @param paramName The name of the parameter to return
  *
@@ -1918,6 +1919,9 @@ const IsisParameterData *IsisAml::ReturnParam(const std::string &paramName) cons
  * @param param The parameter data
  *
  * @throws iException::User
+ * @internal 
+ *   @history 2010-07-19 Jeannie Walldren - Added check for FileCustomization
+ *                          preference if an existing output file is selected
  */
 void IsisAml::Verify(const IsisParameterData *param) {
 
@@ -1958,8 +1962,29 @@ void IsisAml::Verify(const IsisParameterData *param) {
       }
     }
     else if(param->type == "filename") {
-      // Put something here once we figure out what to do with filenames
+      // If this is an output file and a file with this name already exists, 
+      // check user filename customization preferences.
+      Isis::iString value(param->values[i]);
+      Isis::Filename name(value);
+      value = name.Expanded();
+      if(name.Exists() && param->fileMode == "output") {
+        CheckFilenamePreference(value);
+      }
     }
+    // THIS IS CURRENTLY HANDLED IN THE CUBE CLASS, see CubeIoHandler.cpp 
+    // 2010-07-15 Jeannie Walldren
+    // 
+    //  else if(param->type == "cube") {
+    //    Isis::iString value(param->values[i]);
+    //    Isis::Filename name(value);
+    //    value = name.Expanded();
+    //    if (name.Exists() && param->fileMode == "output"
+    //        && Isis::Preference::Preferences().FindGroup("CubeCustomization").FindKeyword("Overwrite")[0] == "Error") {
+    //      string message = "The cube file [" + value + "] already exists.  " +
+    //                       "The user preference cube customization group is set to disallow cube overwrites.";
+    //      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    //    }
+    //  }
   }
 
   // Check the default values if there were no values
@@ -2004,6 +2029,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
       }
       else if(param->type == "filename") {
         // Put something here once we figure out what to do with filenames
+        Isis::iString value(param->defaultValues[i]);
+        Isis::Filename name(value);
+        value = name.Expanded();
+        if(name.Exists() && param->fileMode == "output") {
+          CheckFilenamePreference(value);
+        }
       }
     }
   }
@@ -2229,7 +2260,41 @@ void IsisAml::Verify(const IsisParameterData *param) {
 }
 
 
-//! Verify all parameters
+/**
+ * This method checks whether the user preferences are set to allow overwrites
+ * of existing files.  It should be called if the parameter is an output and the
+ * given file name exists. 
+ *  
+ * @param filename Name of the file to be overwritten. 
+ *  
+ * @throw iException::User -  "The file already exists. The user preference file
+ *        customization group is set to disallow file overwrites."
+ * @throw iException::User - "Invalid entry in user preference file
+ *        FileCustomization group."
+ */
+void IsisAml::CheckFilenamePreference(string filename) {
+  Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
+  Isis::iString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0];
+  overwritePreference.ConvertWhiteSpace();
+  overwritePreference.Compress();
+  overwritePreference.Trim(" ");
+  string temp = overwritePreference;
+  if(overwritePreference.UpCase() == "ERROR") {
+    string message = "The file [" + filename + "] already exists.  " +
+                     "The user preference file customization group is set to disallow file overwrites.";
+    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+  }
+  else if(overwritePreference.UpCase() != "ALLOW") { // not set to ERROR or ALLOW 
+    string message = "Invalid entry in user preference file FileCustomization group.";
+    message += "  Overwrite = [" + temp + "].  Valid values: [Allow] or [Error].";
+    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+  }
+}
+
+
+/**
+ * Verify all parameters
+ */
 void IsisAml::VerifyAll() {
   for(unsigned int g = 0; g < groups.size(); g++) {
     for(unsigned int p = 0; p < groups[g].parameters.size(); p++) {
