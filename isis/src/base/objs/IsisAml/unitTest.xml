@@ -20,6 +20,9 @@
     <change name="Stuart Sides" date="2003-05-16">
       Modified schema from astrogeology... isis.astrogeology...
     </change>
+    <change name="Jeannie Walldren" date="2010-07-20">
+      Replaced filemode tags with fileMode and button attributes with name
+    </change>
   </history>
 
   <category>
@@ -31,7 +34,7 @@
     <group name="GROUP 0">
       <parameter name="G0p0">
         <type>filename</type>
-        <filemode>input</filemode>
+        <fileMode>input</fileMode>
         <brief>
           G0P0 Filename
         </brief>
@@ -49,7 +52,7 @@
 
       <parameter name="G0P1">
         <type>filename</type>
-        <filemode>output</filemode>
+        <fileMode>output</fileMode>
         <brief>
           G0P1 Filename
         </brief>
@@ -119,14 +122,14 @@
           Description for G1P1
         </description>
         <helpers>
-          <helper button="H1">
+          <helper name="H1">
             <brief>Helper 1</brief>
             <description>
               This helper button does.....
             </description>
             <function>myHelper</function>
           </helper>
-          <helper button="H2">
+          <helper name="H2">
             <brief>Helper 2</brief>
             <description>
               This helper buttion will...
@@ -267,7 +270,7 @@
           Description for G3P1.
         </description>
         <helpers>
-          <helper button="H3">
+          <helper name="H3">
             <brief>Helper 3</brief>
             <description>
               Long Description for Helper 3
@@ -460,7 +463,7 @@
           Description for G6P0.
         </description>
         <helpers>
-          <helper button="H4">
+          <helper name="H4">
             <brief>Helper 4</brief>
             <description>
               Long Description for Helper 4...
@@ -522,7 +525,7 @@
           Description for FROM1.
         </description>
         <helpers>
-          <helper button="H5">
+          <helper name="H5">
             <brief>Helper 5</brief>
             <description>
               Long Description for Helper 5...
@@ -551,13 +554,13 @@
     <group name="Group 8, Cube test">
       <parameter name="CUBE1">
         <type>cube</type>
-        <filemode>input</filemode>
+        <fileMode>input</fileMode>
         <brief>Brief for parameter CUBE1</brief>
         <description>
           Description for CUBE1.
         </description>
         <helpers>
-          <helper button="H6">
+          <helper name="H6">
             <brief>Helper 6</brief>
             <description>
               Long Description for Helper 6...
@@ -569,7 +572,7 @@
 
       <parameter name="CUBE2">
         <type>cube</type>
-        <filemode>output</filemode>
+        <fileMode>output</fileMode>
         <brief>Brief for parameter CUBE2</brief>
         <description>
           Description for CUBE2.
