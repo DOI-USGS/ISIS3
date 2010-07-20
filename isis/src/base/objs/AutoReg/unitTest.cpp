@@ -132,14 +132,104 @@ int main() {
   cout << endl;
 
   cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for PatternChip ValidPercent" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetPatternValidPercent(-1);
+  }
+  catch (iException e) {
+    e.Report();
+  }
+  cout << endl;
+  cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for SearchChip SubchipValidPercent" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetSubsearchValidPercent(102);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+  cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for PatternChip ZScoreMinimum" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetPatternZScoreMinimum(0);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+  cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for PatternChip WindowSize" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetSurfaceModelWindowSize(1);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+  try {
+    p_ar->SetSurfaceModelWindowSize(4);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+  cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for SurfaceModel EccentricityRatio" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetSurfaceModelEccentricityRatio(.5);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+  cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for SurfaceModel ResidualTolerance" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetSurfaceModelResidualTolerance(-1);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+  cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for SurfaceModel DistanceTolerance" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetSurfaceModelDistanceTolerance(0);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+  cout << "-------------------------------------------" << endl;
+  cout << "Testing for invalid value for Algorithm ReductionFactor" << endl;
+  cout << "-------------------------------------------" << endl;
+  try {
+    p_ar->SetReductionFactor(0);
+  }
+  catch (iException &e) {
+    e.Report();
+  }
+  cout << endl;
+
+  cout << "-------------------------------------------" << endl;
   cout << "Testing Error = PatternNotEnoughValidData" << endl;
   cout << "-------------------------------------------" << endl;
   p_ar->PatternChip()->SetValidRange(0.009, 0.01);
   p_ar->SetPatternValidPercent(100);
   DoRegister();
-  //Reset the range and the valid percent
+
+  //Reset the range and the valid percents
   p_ar->PatternChip()->SetValidRange(0, 1);
   p_ar->SetPatternValidPercent(50);
+  p_ar->SetSubsearchValidPercent(50);
   Doit(obj);
 
   cout << "\n------------------------------------" << endl;

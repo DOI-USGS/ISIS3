@@ -141,6 +141,9 @@ namespace Isis {
    *    @history 2010-07-09 Travis Addair - ComputeChipZScore now requires that
    *             both p_ZScoreMin and p_ZScoreMax are less than the pattern
    *             stats minimum z-score in order to fail.
+   *    @history 2010-07-20 Jeannie Walldren - Added ability to set a valid
+   *             percentage for the search chip's subchip. Updated documentation
+   *             and unitTest.
    *
    */
   class Pvl;
@@ -204,6 +207,7 @@ namespace Isis {
 
       void SetSubPixelAccuracy(bool on);
       void SetPatternValidPercent(const double percent);
+      void SetSubsearchValidPercent(const double percent);
       void SetTolerance(double tolerance);
       void SetChipInterpolator(const string interpolator);
       void SetSurfaceModelWindowSize(int size);
@@ -229,9 +233,14 @@ namespace Isis {
         p_testResidual = test;
       };
 
-      //! Return pattern valid percent
+      //! Return pattern chip valid percent
       double PatternValidPercent() const {
         return p_patternValidPercent;
+      };
+
+      //! Return subsearch chip valid percent
+      double SubsearchValidPercent() const {
+        return p_subsearchValidPercent;
       };
 
       //! Return match algorithm tolerance
@@ -475,6 +484,7 @@ namespace Isis {
 
       double p_minimumPatternZScore;                    //!< Minimum pattern Z-Score
       double p_patternValidPercent;                     //!< Percentage of data in pattern chip that must be valid
+      double p_subsearchValidPercent;                   //!< Percentage of data in subsearch chip that must be valid
 
       double p_chipSample;                              //!< Chip sample
       double p_chipLine;                                //!< Chip line

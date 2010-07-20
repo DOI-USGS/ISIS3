@@ -77,6 +77,48 @@ Test for missing Samples Keyword
 
 
 -------------------------------------------
+Testing for invalid value for PatternChip ValidPercent
+-------------------------------------------
+**USER ERROR** Invalid value for PatternChip ValidPercent [-1.0].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).
+
+-------------------------------------------
+Testing for invalid value for SearchChip SubchipValidPercent
+-------------------------------------------
+**USER ERROR** Invalid value for SearchChip SubchipValidPercent [102.0]].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).
+
+-------------------------------------------
+Testing for invalid value for PatternChip ZScoreMinimum
+-------------------------------------------
+**USER ERROR** Invalid value for PatternChip MinimumZScore [0.0].  Must be greater than 0.0. (Default is 1.0).
+
+-------------------------------------------
+Testing for invalid value for PatternChip WindowSize
+-------------------------------------------
+**USER ERROR** Invalid value for SurfaceModel WindowSize [1].  Must be an odd number greater than or equal to 3
+
+**USER ERROR** Invalid value for SurfaceModel WindowSize [4].  Must be an odd number greater than or equal to 3
+
+-------------------------------------------
+Testing for invalid value for SurfaceModel EccentricityRatio
+-------------------------------------------
+**USER ERROR** Invalid value for SurfaceModel EccentricityRatio [0.5].  Must greater than or equal to 1.0.
+
+-------------------------------------------
+Testing for invalid value for SurfaceModel ResidualTolerance
+-------------------------------------------
+**USER ERROR** Invalid value for SurfaceModel ResidualTolerance [-1.0].  Must greater than or equal to 0.0.
+
+-------------------------------------------
+Testing for invalid value for SurfaceModel DistanceTolerance
+-------------------------------------------
+**USER ERROR** Invalid value for SurfaceModel DistanceTolerance [0.0].  Must greater than 0.0.
+
+-------------------------------------------
+Testing for invalid value for Algorithm ReductionFactor
+-------------------------------------------
+**USER ERROR** Invalid value for Algorithm ReductionFactor [0].  Must greater than or equal to 1.
+
+-------------------------------------------
 Testing Error = PatternNotEnoughValidData
 -------------------------------------------
 Group = AutoRegStatistics

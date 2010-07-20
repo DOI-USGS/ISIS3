@@ -32,6 +32,7 @@ namespace Isis {
     p_reducedFitChip.SetSize(5, 5);
 
     SetPatternValidPercent(50.0);
+    SetSubsearchValidPercent(50.0);
     SetPatternZScoreMinimum(1.0);
     SetTolerance(Isis::Null);
 
@@ -146,10 +147,13 @@ namespace Isis {
    * @see patternMatch.doc under the coreg
    *      application
    *
-   * @param pvl The pvl object containing the specification
+   * @param pvl The pvl object containing the specification 
+   * @throw  iException::User "Improper format for AutoReg PVL."
    * @internal
    *   @history 2010-06-15 Jeannie Walldren - Added ability to read
    *                          ChipInterpolator keyword from the Algorithm group.
+   *   @history 2010-07-20 Jeannie Walldren - Added ability to read search sub
+   *                          chip valid percent
   **/
   void AutoReg::Parse(Pvl &pvl) {
     try {
@@ -181,6 +185,9 @@ namespace Isis {
       if(pchip.HasKeyword("MinimumZScore")) {
         SetPatternZScoreMinimum((double)pchip["MinimumZScore"]);
       }
+      if(pchip.HasKeyword("ValidPercent")) {
+        SetPatternValidPercent((double)pchip["ValidPercent"]);
+      }
 
       // Setup the search chip
       PvlGroup &schip = pvl.FindGroup("SearchChip", Pvl::Traverse);
@@ -191,12 +198,11 @@ namespace Isis {
       if(schip.HasKeyword("ValidMinimum")) minimum = schip["ValidMinimum"];
       if(schip.HasKeyword("ValidMaximum")) maximum = schip["ValidMaximum"];
       SearchChip()->SetValidRange(minimum, maximum);
-
-      // What percentage of the pattern chip should be valid
-      if(pchip.HasKeyword("ValidPercent")) {
-        SetPatternValidPercent((double)pchip["ValidPercent"]);
+      if(schip.HasKeyword("SubchipValidPercent")) {
+        SetSubsearchValidPercent((double)schip["SubchipValidPercent"]);
       }
 
+      // Setup surface model
       PvlObject ar = pvl.FindObject("AutoRegistration");
       if(ar.HasGroup("SurfaceModel")) {
         PvlGroup &smodel = ar.FindGroup("SurfaceModel", Pvl::Traverse);
@@ -258,14 +264,40 @@ namespace Isis {
    *
    * @param percent   Percentage of valid data between 0 and 100,
    *                  default is 50% if never invoked
+   * @throw iException::User - "Invalid value for PatternChip ValidPercent." 
    */
   void AutoReg::SetPatternValidPercent(const double percent) {
     if((percent <= 0.0) || (percent > 100.0)) {
-      std::string msg = "Invalid value of PatternValidPercent [" +
-                        iString(percent) + "]";
+      std::string msg = "Invalid value for PatternChip ValidPercent [" 
+        + iString(percent) 
+        + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_patternValidPercent = percent;
+  }
+
+
+  /**
+   * Set the amount of data in the search chip's subchip that must be valid. 
+   *
+   *
+   * @param percent   Percentage of valid data between 0 and 100,
+   *                  default is 50% if never invoked
+   * @see SetPatternValidPercent() 
+   * @throw iException::User - "Invalid value for SearchChip 
+   *        SubchipValidPercent."
+   * @internal 
+   *   @author 2010-07-20 Jeannie Walldren
+   *   @history 2010-07-20 Jeannie Walldren - Original Version.
+   */
+  void AutoReg::SetSubsearchValidPercent(const double percent) {
+    if((percent <= 0.0) || (percent > 100.0)) {
+      std::string msg = "Invalid value for SearchChip SubchipValidPercent [" 
+        + iString(percent) + "]"
+        + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    p_subsearchValidPercent = percent;
   }
 
 
@@ -279,10 +311,13 @@ namespace Isis {
    *
    * @param minimum The minimum zscore value for the pattern chip.
    *                 Default is 1.0
+   * @throw iException::User - "Invalid value for PatternChip MinimumZScore." 
    */
   void AutoReg::SetPatternZScoreMinimum(double minimum) {
     if(minimum <= 0.0) {
-      std::string msg = "MinimumZScore must be greater than 0";
+      std::string msg = "Invalid value for PatternChip MinimumZScore ["
+        + iString(minimum)
+        + "].  Must be greater than 0.0. (Default is 1.0).";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_minimumPatternZScore = minimum;
@@ -312,6 +347,7 @@ namespace Isis {
    *
    * @param interpolator Name of interpolator type to be used.  This is taken from
    *                     the Pvl's ChipInterpolator keyword value.
+   * @throw iException::User - "Invalid Interpolator type." 
    * @author Jeannie Walldren
    * @internal
    *   @history 2010-06-15 Jeannie Walldren - Original version.
@@ -351,10 +387,12 @@ namespace Isis {
    *
    * @param size The size of the window must be three or greater
    *             and odd.
+   * @throw iException::User - "Invalid value for SurfaceModel WindowSize." 
    */
   void AutoReg::SetSurfaceModelWindowSize(int size) {
     if(size % 2 != 1 || size < 3) {
-      std::string msg = "WindowSize must be an odd number greater than or equal to 3";
+      std::string msg = "Invalid value for SurfaceModel WindowSize ["
+        + iString(size) + "].  Must be an odd number greater than or equal to 3";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_windowSize = size;
@@ -368,10 +406,13 @@ namespace Isis {
    *
    * @param eccentricityRatio Eccentricity ratio.  Must be greater than or equal
    *                          to 1.
-   */
+   * @throw iException::User - "Invalid value for SurfaceModel 
+   *        EccentricityRatio."
+                                                                               */
   void AutoReg::SetSurfaceModelEccentricityRatio(double eccentricityRatio) {
     if(eccentricityRatio < 1) {
-      std::string msg = "EccentricityRatio must be 1 or larger.";
+      std::string msg = "Invalid value for SurfaceModel EccentricityRatio [" 
+        + iString(eccentricityRatio) + "].  Must greater than or equal to 1.0.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_surfaceModelEccentricityRatioTolerance = eccentricityRatio;
@@ -388,10 +429,13 @@ namespace Isis {
    * z minus actual z) and dividing by the number of residuals.
    *
    * @param residualTolerance Residual tolerance.  Must be greater than 0.
+   * @throw iException::User - "Invalid value for SurfaceModel 
+   *        ResidualTolerance."
    */
   void AutoReg::SetSurfaceModelResidualTolerance(double residualTolerance) {
     if(residualTolerance < 0) {
-      std::string msg = "ResidualTolerance must be 0 or larger.";
+      std::string msg = "Invalid value for SurfaceModel ResidualTolerance [" 
+        + iString(residualTolerance) + "].  Must greater than or equal to 0.0.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_surfaceModelResidualTolerance = residualTolerance;
@@ -403,10 +447,13 @@ namespace Isis {
    *
    * @param distance The distance allowed to move in pixels.  Must
    *                 be greater than 0.
+   * @throw iException::User - "Invalid value for SurfaceModel 
+   *        DistanceTolerance."
    */
   void AutoReg::SetSurfaceModelDistanceTolerance(double distance) {
     if(distance <= 0.0) {
-      std::string msg = "DistanceTolerance must be greater than 0";
+      std::string msg = "Invalid value for SurfaceModel DistanceTolerance [" 
+        + iString(distance) + "].  Must greater than 0.0.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_distanceTolerance = distance;
@@ -418,10 +465,12 @@ namespace Isis {
    * matching algorithm.
    *
    * @param factor Reduction factor.  Must be greater than or equal to 1.
+   * @throw iException::User - "Invalid value for Algorithm ReductionFactor." 
    */
   void AutoReg::SetReductionFactor(int factor) {
     if(factor < 1) {
-      std::string msg = "ReductionFactor must be 1 or greater.";
+      std::string msg = "Invalid value for Algorithm ReductionFactor ["
+        + iString(factor) + "].  Must greater than or equal to 1.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_reduceFactor = factor;
@@ -479,7 +528,11 @@ namespace Isis {
    * Walk the pattern chip through the search chip to find the best registration
    *
    * @return @b AutoReg::RegisterStatus  Returns the status of the registration.
-   *
+   * @throw iException::User - "Search chips samples must be at least N pixels 
+   *        wider than the pattern chip samples for successful surface modeling"
+   * @throw iException::User - "Search chips lines must be at least N pixels 
+   *        taller than the pattern chip lines for successful surface modeling"
+   * @throw iException::User - "Reduction factor is too large"
    */
   AutoReg::RegisterStatus AutoReg::Register() {
     // The search chip must be bigger than the pattern chip by N pixels in
@@ -774,13 +827,18 @@ namespace Isis {
    * @param startSamp Start sample
    * @param endSamp End sample
    * @param startLine Start line
-   * @param endLine End line
+   * @param endLine End line 
+   *  
+   * @throw iException::Programmer - "StartSample = EndSample and StartLine = 
+   *        EndLine."
    *
    */
   void AutoReg::Match(Chip &sChip, Chip &pChip, Chip &fChip, int startSamp, int endSamp, int startLine, int endLine) {
     // Sanity check.  Should have been caught by the two previous tests
     if(startSamp == endSamp && startLine == endLine) {
-      std::string msg = "Sanity check, this shouldn't happen!";
+      std::string msg = "StartSample [" + iString(startSamp) + "] = EndSample ["
+        + iString(endSamp) + "] and StartLine [" + iString(startLine) + " = EndLine ["
+        + iString(endLine) + "].";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -801,7 +859,7 @@ namespace Isis {
         // Extract the subsearch chip and make sure it has enough valid data
         sChip.Extract(samp, line, subsearch);
 
-        if(!subsearch.IsValid(p_patternValidPercent)) continue;
+        if(!subsearch.IsValid(p_subsearchValidPercent)) continue;
 
         // Try to match the two subchips
         double fit = MatchAlgorithm(pChip, subsearch);
@@ -1130,7 +1188,7 @@ namespace Isis {
    * @param bestSamp Best sample
    * @param bestLine Best line
    *
-   * @return @b AutoReg::RegisterStatus  Status of match
+   * @return @b AutoReg::RegisterStatus  Status of match 
    */
   AutoReg::RegisterStatus AutoReg::AdaptiveRegistration(Chip &sChip,
       Chip &pChip,
@@ -1191,6 +1249,10 @@ namespace Isis {
     }
     if(schip.HasKeyword("ValidMaximum")) {
       reg += PvlKeyword("SearchMaximum", schip["ValidMaximum"][0]);
+    }
+    if(schip.HasKeyword("SubchipValidPercent")) {
+      SetSubsearchValidPercent((double)schip["SubchipValidPercent"]);
+      reg += PvlKeyword("SubchipValidPercent", schip["SubchipValidPercent"][0]);
     }
 
     if(p_template.HasGroup("SurfaceModel")) {
