@@ -2,6 +2,7 @@
 #include "iException.h"
 #include "KernelDb.h"
 #include "Preference.h"
+#include "Pvl.h"
 
 using namespace std;
 
@@ -18,7 +19,8 @@ int main(int argc, char *argv[]) {
   Isis::PvlKeyword startKey("StartTime", "2005 JUN 15 12:00:00.000 TDB");
   Isis::PvlKeyword spacecraft("SpacecraftName", "IdealSpacecraft");
   Isis::PvlKeyword instrument("InstrumentId", "IdealCamera");
-  Isis::PvlKeyword endKey("EndTime", "2005 DEC 15 12:00:00.000 TDB");
+  Isis::PvlKeyword endKey("StopTime", "2005 DEC 15 12:00:00.000 TDB");
+  Isis::PvlKeyword endKey2("StopTime", "2005 JUN 15 12:14:00.000 TDB");
   group2.AddKeyword(keyword);
   group.AddKeyword(startKey);
   group.AddKeyword(endKey);
@@ -28,6 +30,13 @@ int main(int argc, char *argv[]) {
   obj.AddGroup(group2);
   lab.AddObject(obj);
   std::vector<std::string> temp;
+
+  Isis::Pvl lab2;
+  Isis::PvlObject obj2("IsisCube");
+  group.AddKeyword(endKey2, Isis::Pvl::Replace);
+  obj2.AddGroup(group);
+  obj2.AddGroup(group2);
+  lab2.AddObject(obj2);
 
   temp.clear();
   temp = kdb.LeapSecond(lab).kernels;
@@ -53,6 +62,13 @@ int main(int argc, char *argv[]) {
   temp.clear();
   temp = kdb.SpacecraftPointing(lab).top().kernels;
   cout << endl << "SpacecraftPointing: " << endl;
+  for(unsigned int i = 0; i < temp.size(); i++) {
+    cout << temp[i] << endl;
+  }
+
+  temp.clear();
+  temp = kdb.SpacecraftPointing(lab2).top().kernels;
+  cout << endl << "SpacecraftPointing 2: " << endl;
   for(unsigned int i = 0; i < temp.size(); i++) {
     cout << temp[i] << endl;
   }

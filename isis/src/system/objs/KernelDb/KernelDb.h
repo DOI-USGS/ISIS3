@@ -76,12 +76,14 @@ class Kernel;
  *
  * @internal
  * @history 2005-12-27 Jacob Danton - Added support for multiple
- * files and fixed a bug in SearchMatch.
+ *                                    files and fixed a bug in SearchMatch.
  * @history 2007-07-09 Steven Lambright - Removed inheritance from PVL
  * @history 2007-10-25 Steven Koechle - Corrected Smithed Enum
- * fixed search methods.
- * @history 2007-07-09 Steven Lambright - Added Kernel class and multiple-ck return
+ *                                      fixed search methods.
+ * @history 2007-07-09 Steven Lambright - Added Kernel class and multiple-ck
+ *                                        return
  * @history 2009-05-12 Steven Lambright - Added Camera Version Checking
+ * @history 2010-07-19 Steven Lambright - Added kernel selection merging
  */
 class KernelDb {
 
@@ -107,14 +109,18 @@ class KernelDb {
     Kernel Dem(Isis::Pvl &lab);
 
     Kernel FindLast(const std::string &entry, Isis::Pvl &lab);
-    std::priority_queue< Kernel > FindAll(const std::string &entry, Isis::Pvl &lab);
+    std::priority_queue< Kernel > FindAll(const std::string &entry,
+                                          Isis::Pvl &lab);
 
     void LoadSystemDb(const std::string &mission);
 
     // Returns true if the newType is allowed and better than
     // the oldType
     const bool Better(const std::string newType, const std::string oldType);
-    const bool Better(const spiceInit::kernelTypes newType, const spiceInit::kernelTypes oldType);
+    const bool Better(const spiceInit::kernelTypes newType,
+                      const spiceInit::kernelTypes oldType);
+    const bool Matches(Isis::Pvl &lab, Isis::PvlGroup &kernelDbGrp,
+                       Isis::iTime timeToMatch);
 
   protected:
     std::string p_filename;

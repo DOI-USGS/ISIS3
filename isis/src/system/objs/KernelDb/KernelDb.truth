@@ -9,7 +9,11 @@ $base/spkTest1
 $base/spkTest2
 
 SpacecraftPointing: 
-$base/ckTest
+$base/ckTest1
+
+SpacecraftPointing 2: 
+$base/ckTest2.1
+$base/ckTest2.2
 
 Instrument: 
 $base/ikTest3

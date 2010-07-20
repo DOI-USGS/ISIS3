@@ -27,6 +27,9 @@
 #include "Filename.h"
 #include "iString.h"
 #include "KernelDb.h"
+#include "PvlObject.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 using namespace Isis;
@@ -131,15 +134,13 @@ Kernel KernelDb::FindLast(const std::string &entry, Isis::Pvl &lab) {
   return last;
 }
 
-std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry, Isis::Pvl &lab) {
+std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
+    Isis::Pvl &lab) {
   std::priority_queue< Kernel > filesFound;
-  int cameraVersion = CameraFactory::CameraVersion(lab);
   Isis::PvlObject &cube = lab.FindObject("IsisCube");
 
   // Make sure the entry has been loaded into memory
-  if(!p_kernelData.HasObject(entry)) {
-    return filesFound;
-  }
+  if(!p_kernelData.HasObject(entry)) return filesFound;
 
   // Get the start and end time for the cube
   iTime start(((string) cube.FindGroup("Instrument")["StartTime"]));
@@ -151,30 +152,15 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry, Isis::
     end = ((string) cube.FindGroup("Instrument")["StartTime"]);
   }
 
-  // lastType will be used to check if the new group's type is better/worse than the last match
-  string lastType;
-  lastType.clear();
-
   // Get the object and search through it's groups
   PvlObject &obj = p_kernelData.FindObject(entry);
-  for(int group = obj.Groups() - 1; group >= 0; group--) {
-    // Get the group and start testing the cases in the keywords to see if they all match this cube
-    PvlGroup &grp = obj.Group(group);
-
-    // These are the conditions that make this test pass:
-    //   1) No time OR At least one matching time
-    //   2) All keyword matches are true OR No keyword matches present
-    //
-    // In order to accomplish this, matchTime is initialized to true and remains as such if and only if
-    // there are no time conditionals. If Time keywords exist, one of them has to set matchTime to true.
-    // The matchKeywords is true until a mismatch is found.
-    bool matchTime = !grp.HasKeyword("Time");
-    bool matchKeywords = true;
+  for(int groupIndex = obj.Groups() - 1; groupIndex >= 0; groupIndex --) {
+    // Get the group and start testing the cases in the keywords
+    // to see if they all match this cube
+    PvlGroup &grp = obj.Group(groupIndex);
 
     // If the group name isn't selection, skip it.
-    if(!grp.IsNamed("Selection")) {
-      continue;
-    }
+    if(!grp.IsNamed("Selection")) continue;
 
     iString type = "";
 
@@ -186,97 +172,198 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry, Isis::
       }
     }
 
-    // First, the time search. Loop through the keywords, if the name isn't Time then
-    // skip it. If it is, then get the start/end times and keep looking until one is found.
-    for(int keyword = 0; keyword < grp.Keywords(); keyword ++) {
-      PvlKeyword key = grp[keyword];
+    bool startMatches = Matches(lab, grp, start);
+    bool endMatches = Matches(lab, grp, end);
 
-      if(key.IsNamed("Time")) {
-        // Pull the selections start and end time out
-        iTime kernelStart = (string) key[0];
-        iTime kernelEnd   = (string) key[1];
-
-        // If the kernel times inside of the requested times we
-        // set the matchTime to be true.
-        if((kernelStart <= start) && (kernelEnd >= end)) {
-          matchTime = true;
-        }
-      }
-      else if(key.IsNamed("Match")) {
-        try {
-          iString matchGroup = key[0];
-          iString matchKey   = key[1];
-          iString matchValue = key[2];
-
-          iString cubeValue = (string)cube.FindGroup(matchGroup)[matchKey];
-          cubeValue.ConvertWhiteSpace();
-          cubeValue.Compress();
-          cubeValue.Trim(" ");
-          cubeValue.UpCase();
-
-          matchValue.ConvertWhiteSpace();
-          matchValue.Compress();
-          matchValue.Trim(" ");
-          matchValue.UpCase();
-
-          // If strings are not the same, match automatically fails
-          if(cubeValue.compare(matchValue) != 0) {
-            matchKeywords = false;
-          }
-        }
-        catch(Isis::iException &e) {
-          // This error is thrown if the group or keyword do not exist in 'lab'
-          matchKeywords = false;
-        }
-      }
-      else if(key.IsNamed("CameraVersion")) {
-        try {
-          for(int camVersionKeyIndex = 0; camVersionKeyIndex < key.Size(); camVersionKeyIndex++) {
-            bool versionMatch = false;
-            iString val = (std::string)key[camVersionKeyIndex];
-            iString commaTok;
-
-            while((commaTok = val.Token(",")).length() > 0) {
-              if(commaTok.find('-') != std::string::npos) {
-                iString dashTok;
-                int start = commaTok.Token("-").ToInteger();
-                int end = commaTok.Token("-").ToInteger();
-                int direction;
-                direction = (start <= end) ? 1 : -1;
-                // Save the entire range of bands
-                for(int version = start; version != end + direction; version += direction) {
-                  if(version == cameraVersion) {
-                    versionMatch = true;
-                  }
-                }
-              }
-              // This token is a single band specification
-              else {
-                if(commaTok.ToInteger() == cameraVersion) {
-                  versionMatch = true;
-                }
-              }
-            }
-
-            if(!versionMatch)  {
-              matchKeywords = false;
-            }
-
-          }
-        }
-        catch(Isis::iException &e) {
-          matchKeywords = false;
-        }
-      }
-    }
-
-    if(matchKeywords && matchTime) {
-      lastType = type;
+    if(startMatches && endMatches) {
+      // Simple case - the selection simply matches
       filesFound.push(Kernel(spiceInit::kernelTypeEnum(type), GetFile(grp)));
+    }
+    else if(startMatches) {
+      // Well, the selection start matched but not the end.
+      // Let's look for a second selection to handle overlap areas.
+      for(int endTimeIndex = obj.Groups() - 1;
+          endTimeIndex >= 0;
+          endTimeIndex--) {
+        PvlGroup &endTimeGrp = obj.Group(endTimeIndex);
+
+        // The second selection must:
+        //   Not be the current selection
+        //   Be a selection
+        //   Be of the same quality
+        //   Match the end time
+        //
+        // *If start time is also matched, do not merge and simply take the
+        // secondary match
+        if(endTimeIndex == groupIndex) continue;
+        if(!endTimeGrp.IsNamed("Selection")) continue;
+        if(grp.HasKeyword("Type") != endTimeGrp.HasKeyword("Type")) continue;
+        if(grp.HasKeyword("Type") &&
+            grp["Type"] != endTimeGrp["Type"]) continue;
+        if(!Matches(lab, endTimeGrp, end)) continue;
+
+        // Better match is true if we find a full overlap
+        bool betterMatch = false;
+
+        // True if we have matching time ranges = we want to merge
+        bool endTimesMatch = true;
+
+        // Check for matching time ranges
+        for(int keyIndex = 0;
+            !betterMatch && keyIndex < grp.Keywords();
+            keyIndex++) {
+          PvlKeyword &key = grp[keyIndex];
+
+          if(!key.IsNamed("Time")) continue;
+
+          iTime timeRangeStart((string)key[0]);
+          iTime timeRangeEnd((string)key[1]);
+
+          bool thisEndMatches = Matches(lab, endTimeGrp, timeRangeEnd);
+          endTimesMatch = endTimesMatch && thisEndMatches;
+
+          if(Matches(lab, endTimeGrp, start) && Matches(lab, endTimeGrp, end)) {
+            // If we run into a continuous kernel, we want to take that in all
+            //   cases.
+            betterMatch = true;
+          }
+        }
+
+        // No exact match but time ranges overlap, merge the selections
+        if(!betterMatch && endTimesMatch) {
+          std::vector< std::string > startMatchFiles = GetFile(grp);
+          std::vector< std::string > endMatchFiles = GetFile(endTimeGrp);
+
+          while(endMatchFiles.size()) {
+            startMatchFiles.push_back(
+              endMatchFiles[endMatchFiles.size() - 1]
+            );
+            endMatchFiles.pop_back();
+          }
+
+          filesFound.push(
+            Kernel(spiceInit::kernelTypeEnum(type), startMatchFiles)
+          );
+        }
+        // Found an exact match, use it
+        else if(betterMatch) {
+          filesFound.push(
+            Kernel(spiceInit::kernelTypeEnum(type), GetFile(endTimeGrp))
+          );
+        }
+      }
     }
   }
 
   return filesFound;
+}
+
+const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
+                             iTime timeToMatch) {
+  // These are the conditions that make this test pass:
+  //   1) No time OR At least one matching time
+  //   2) All keyword matches are true OR No keyword matches present
+  //
+  // In order to accomplish this, matchTime is initialized to true and remains
+  // as such if and only if there are no time conditionals. If Time keywords
+  // exist, one of them has to set matchTime to true. The matchKeywords is
+  // true until a mismatch is found.
+  Isis::PvlObject &cube = lab.FindObject("IsisCube");
+  int cameraVersion = CameraFactory::CameraVersion(lab);
+  bool matchTime = !kernelDbGrp.HasKeyword("Time");
+  bool matchKeywords = true;
+
+  // First, the time search. Loop through the keywords, if the name isn't
+  //  Time then skip it. If it is, then get the start/end times and keep
+  //  looking until one is found.
+  for(int keyword = 0; keyword < kernelDbGrp.Keywords(); keyword ++) {
+    PvlKeyword key = kernelDbGrp[keyword];
+
+    if(key.IsNamed("Time")) {
+      // Pull the selections start and end time out
+      iTime kernelStart = (string) key[0];
+      iTime kernelEnd   = (string) key[1];
+
+      // If the kernel times inside of the requested times we
+      // set the matchTime to be true.
+      if((kernelStart <= timeToMatch) && (kernelEnd >= timeToMatch)) {
+        matchTime = true;
+      }
+    }
+    else if(key.IsNamed("Match")) {
+      try {
+        iString matchGroup = key[0];
+        iString matchKey   = key[1];
+        iString matchValue = key[2];
+
+        iString cubeValue = (string)cube.FindGroup(matchGroup)[matchKey];
+        cubeValue.ConvertWhiteSpace();
+        cubeValue.Compress();
+        cubeValue.Trim(" ");
+        cubeValue.UpCase();
+
+        matchValue.ConvertWhiteSpace();
+        matchValue.Compress();
+        matchValue.Trim(" ");
+        matchValue.UpCase();
+
+        // If strings are not the same, match automatically fails
+        if(cubeValue.compare(matchValue) != 0) {
+          matchKeywords = false;
+        }
+      }
+      catch(Isis::iException &e) {
+        // This error is thrown if the group or keyword do not exist in 'lab'
+        matchKeywords = false;
+      }
+    }
+    else if(key.IsNamed("CameraVersion")) {
+      try {
+        for(int camVersionKeyIndex = 0;
+            camVersionKeyIndex < key.Size();
+            camVersionKeyIndex++) {
+
+          bool versionMatch = false;
+          iString val = (std::string)key[camVersionKeyIndex];
+          iString commaTok;
+
+          while((commaTok = val.Token(",")).length() > 0) {
+            if(commaTok.find('-') != std::string::npos) {
+              iString dashTok;
+              int start = commaTok.Token("-").ToInteger();
+              int end = commaTok.Token("-").ToInteger();
+              int direction;
+              direction = (start <= end) ? 1 : -1;
+              // Save the entire range of bands
+              for(int version = start;
+                  version != end + direction;
+                  version += direction) {
+                if(version == cameraVersion) {
+                  versionMatch = true;
+                }
+              }
+            }
+            // This token is a single band specification
+            else {
+              if(commaTok.ToInteger() == cameraVersion) {
+                versionMatch = true;
+              }
+            }
+          }
+
+          if(!versionMatch) {
+            matchKeywords = false;
+          }
+
+        }
+      }
+      catch(Isis::iException &e) {
+        matchKeywords = false;
+      }
+    }
+  }
+
+  return matchKeywords && matchTime;
 }
 
 // Load the DB with the defined BASE and MISSION info for each type of kernel
@@ -371,13 +458,15 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
       string pref = kfile[0];
       string version = kfile[1];
       Isis::Filename filename("$" + pref + "/" + version);
-      if(filename.Expanded().find('?') != string::npos) filename.HighestVersion();
+      if(filename.Expanded().find('?') != string::npos)
+        filename.HighestVersion();
       files.push_back(filename.OriginalPath() + "/" + filename.Name());
     }
     // One value in "File" indicates a full file spec
     else if(kfile.Size() == 1) {
       Isis::Filename filename(kfile[0]);
-      if(filename.Expanded().find('?') != string::npos) filename.HighestVersion();
+      if(filename.Expanded().find('?') != string::npos)
+        filename.HighestVersion();
       files.push_back(filename.OriginalPath() + "/" + filename.Name());
     }
     else {
@@ -391,11 +480,14 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
   return files;
 }
 
-const bool KernelDb::Better(const std::string newType, const std::string oldType) {
-  return Better(spiceInit::kernelTypeEnum(newType), spiceInit::kernelTypeEnum(oldType));
+const bool KernelDb::Better(const std::string newType,
+                            const std::string oldType) {
+  return Better(spiceInit::kernelTypeEnum(newType),
+                spiceInit::kernelTypeEnum(oldType));
 }
 
-const bool KernelDb::Better(const spiceInit::kernelTypes nType, const spiceInit::kernelTypes oType) {
+const bool KernelDb::Better(const spiceInit::kernelTypes nType,
+                            const spiceInit::kernelTypes oType) {
   if((nType & p_kernelTypes) && (nType >= oType)) return true;
 
   return false;
