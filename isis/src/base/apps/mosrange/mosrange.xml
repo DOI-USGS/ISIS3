@@ -72,6 +72,10 @@ End
     <change name="Kris Becker" date="2009-09-18">
         Added TargetName to output map file.
     </change>
+    <change name="Mackenzie Boyd" date="2010-07-19">
+        Modified program to have output go to print.prt file in addition to 
+        other outputs.
+    </change>
 </history>
 
   <groups>

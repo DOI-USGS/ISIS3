@@ -211,7 +211,7 @@ void IsisMain() {
   mapping += PvlKeyword("PreciseMaximumLongitude", longitudeStat.Maximum());
 
 
-  Application::GuiLog(mapping);
+  Application::Log(mapping);
 
   // Write the output file if requested
   if(ui.WasEntered("TO")) {
