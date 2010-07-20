@@ -69,7 +69,15 @@ commands:
 	  pline=15 \
 	  ssamp=31 \
 	  sline=31 \
-	  validpercent=0 2>> $(OUTPUT)/error.txt > /dev/null;
+	  pvalidpercent=0 2>> $(OUTPUT)/error.txt > /dev/null;
+	$(APPNAME) to=$(OUTPUT)/autoregtemplateTruth.txt \
+	  algorithm=MaximumCorrelation \
+	  tolerance=0.7  \
+	  psamp=15 \
+	  pline=15 \
+	  ssamp=31 \
+	  sline=31 \
+	  ssubchipvalidpercent=0 2>> $(OUTPUT)/error.txt > /dev/null;
 	$(APPNAME) to=$(OUTPUT)/autoregtemplateTruth.txt \
 	  algorithm=MaximumCorrelation \
 	  tolerance=0.7  \

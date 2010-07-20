@@ -21,11 +21,12 @@ void IsisMain() {
   string algoName = ui.GetString("ALGORITHM");
   if(!algos.HasGroup(algoName)) {
     // Give the user a list of possible algorithms
-    string msg = "Invalid Algorithm Name [" + algoName + "] " +
-                 "Possible Algorithms are: ";
+    string msg = "Invalid value for [ALGORITHM] entered [" + algoName + "].  " 
+      + "Must be one of [";
     for(int i = 0; i < algos.Groups(); i++) {
       msg += algos.Group(i).Name();
       if(i < algos.Groups() - 1) msg += ", ";
+      else msg += "].";
     }
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
@@ -44,7 +45,8 @@ void IsisMain() {
     algorithm += PvlKeyword("ReductionFactor", iString(reduction));
 
     if(reduction < 1) {
-      string msg = "REDUCTIONFACTOR must be greater than or equal to 1 (Default = 1)";
+      string msg = "Invalid value for [REDUCTIONFACTOR] entered ["
+        + iString(reduction) + "].  Must be greater than or equal to 1 (Default = 1)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
@@ -67,7 +69,7 @@ void IsisMain() {
   }
   else {
     if(ui.WasEntered("INTERPOLATORTYPE")) {
-      string msg = "[CHIPINTERPOLATOR] parameter must be set to TRUE to enter [INTERPOLATORTYPE] parameter";
+      string msg = "CHIPINTERPOLATOR parameter must be set to TRUE to enter INTERPOLATORTYPE parameter";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
@@ -114,9 +116,19 @@ void IsisMain() {
     patternChip += PvlKeyword("MinimumZScore", iString(minimum));
 
     if(minimum <= 0.0) {
-      string msg = "MINIMUMZSCORE must be greater than 0.0 (Default = 1.0)";
+      string msg = "Invalid value for [MINIMUMZSCORE] entered [" 
+        + iString(minimum) + "].  Must be greater than 0.0 (Default = 1.0)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
+  }
+  if(ui.WasEntered("PVALIDPERCENT")) {
+    double percent = ui.GetDouble("PVALIDPERCENT");
+    if((percent <= 0.0) || (percent > 100.0)) {
+      string msg = "Invalid value for [PVALIDPERCENT] entered ["
+        + iString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    patternChip += PvlKeyword("ValidPercent", iString(percent));
   }
 
   // Set up the search chip group
@@ -129,14 +141,14 @@ void IsisMain() {
   if(ui.WasEntered("SMAX")) {
     searchChip += PvlKeyword("ValidMaximum", iString(ui.GetInteger("SMAX")));
   }
-  if(ui.WasEntered("VALIDPERCENT")) {
-    double percent = ui.GetDouble("VALIDPERCENT");
-    searchChip += PvlKeyword("ValidPercent", iString(percent));
-
+  if(ui.WasEntered("SSUBCHIPVALIDPERCENT")) {
+    double percent = ui.GetDouble("SSUBCHIPVALIDPERCENT");
     if((percent <= 0.0) || (percent > 100.0)) {
-      string msg = "VALIDPERCENT must be between 0.0 and 100.0 (Default = 50.0)";
+      string msg = "Invalid value for [SSUBCHIPVALIDPERCENT] entered ["
+        + iString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
+    searchChip += PvlKeyword("SubchipValidPercent", iString(percent));
   }
 
   // Add groups to the autoreg object
@@ -151,7 +163,8 @@ void IsisMain() {
     surfaceModel += PvlKeyword("DistanceTolerance", iString(distanceTol));
 
     if(distanceTol <= 0.0) {
-      string msg = "DISTANCETOLERANCE must be greater than 0.0 (Default = 1.5)";
+      string msg = "Invalid value for [DISTANCETOLERANCE] entered ["
+        + iString(distanceTol) + "].  Must be greater than 0.0 (Default = 1.5)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -160,13 +173,15 @@ void IsisMain() {
 
     // Make sure the window size is at least 3
     if(winSize < 3) {
-      string msg = "WINDOWSIZE must be greater than or equal to 3 (Default = 5)";
+      string msg = "Invalid value for [WINDOWSIZE] entered ["
+        + iString(winSize) + "].  Must be greater than or equal to 3 (Default = 5)";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
     // Make sure the window size is odd
     if(winSize % 2 == 0) {
-      string msg = "WINDOWSIZE must be an odd number (Default = 5)";
+      string msg = "Invalid value for [WINDOWSIZE] entered ["
+        + iString(winSize) + "].  Must be an odd number (Default = 5)";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
@@ -175,7 +190,8 @@ void IsisMain() {
       surfaceModel += PvlKeyword("EccentricityRatio", iString(eccRatio));
 
       if(eccRatio < 1) {
-        string msg = "ECCENTRICITYRATIO must be 1.0 or larger (Default = 2.0)";
+        string msg = "Invalid value for [ECCENTRICITYRATIO] entered ["
+          + iString(eccRatio) + "].  Must be 1.0 or larger (Default = 2.0)";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
@@ -184,7 +200,8 @@ void IsisMain() {
       surfaceModel += PvlKeyword("ResidualTolerance", iString(residualTol));
 
       if(residualTol < 0) {
-        string msg = "RESIDUALTOLERANCE must be 0.0 or larger (Default = 0.1)";
+        string msg = "Invalid value for [RESIDUALTOLERANCE] entered ["
+          + iString(residualTol) + "].  Must be 0.0 or larger (Default = 0.1)";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
