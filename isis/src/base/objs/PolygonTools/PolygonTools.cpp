@@ -385,7 +385,7 @@ namespace Isis {
    *         lon,lat format vertices and GML header
    */
 
-  string PolygonTools::ToGML(const geos::geom::MultiPolygon *mpolygon, string idString) {
+  string PolygonTools::ToGML(const geos::geom::MultiPolygon *mpolygon, std::string idString) {
 
     ostringstream os;
 
