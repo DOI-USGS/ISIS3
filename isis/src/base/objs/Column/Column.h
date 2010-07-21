@@ -46,34 +46,29 @@ namespace Isis {
   class Column {
     public:
 
-      //! Alignment of data in the Column
+      /**
+       * Alignment of data in the Column
+       */
       enum Align {
-        //! no alignment
-        NoAlign = 0,
-        //! right alignment
-        Right = 1,
-        //! left alignment
-        Left = 2,
-        //! decimal alignment
-        Decimal = 3
+        NoAlign = 0,  //!< no alignment
+        Right   = 1,  //!< right alignment
+        Left    = 2,  //!< left alignment
+        Decimal = 3   //!< decimal alignment
       };
 
-      //! Type of data in the Column
+      /**
+       * Type of data in the Column
+       */
       enum Type {
-        //! No data type
-        NoType = 0,
-        //! Integer data type
-        Integer = 1,
-        //! Real data type
-        Real = 2,
-        //! String data type
-        String = 3,
-        //! Pixel data type
-        Pixel = 4
+        NoType  = 0,  //! No data type
+        Integer = 1,  //! Integer data type
+        Real    = 2,  //! Real data type
+        String  = 3,  //! String data type
+        Pixel   = 4   //! Pixel data type
       };
 
       Column();
-      Column(std::string name, int width, Column::Type type, Align align = Column::Right);
+      Column(std::string name, int width, Column::Type type, Column::Align align = Right);
       void SetName(std::string name);
       void SetWidth(unsigned int width);
       void SetType(Column::Type type);
