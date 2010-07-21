@@ -131,6 +131,7 @@
  *   @history 2006-10-17 Steven Lambright - Fixed problem with boolean inclusion/exclusion
  *   @history 2010-07-19 Jeannie Walldren - Added check whether user preferences
  *                          are set to allow file overwrite in Verify() method
+ *   @history 2010-07-21 Sharmila Prasad - Modified for doxygen documentation Warning
  */
 class IsisAml : protected IsisAmlData {
 
@@ -331,6 +332,7 @@ class IsisAml : protected IsisAmlData {
     const IsisParameterData *ReturnParam(const std::string &paramName) const;
 
     void Verify(const IsisParameterData *param);
+    
     void CheckFilenamePreference(std::string filename, std::string paramname);
 };
 

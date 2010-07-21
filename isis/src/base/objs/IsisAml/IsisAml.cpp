@@ -2282,7 +2282,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
  * @internal 
  *   @history 2010-07-19 Jeannie Walldren - Original version. 
  */
-void IsisAml::CheckFilenamePreference(string filename, string paramname) {
+void IsisAml::CheckFilenamePreference(std::string filename, std::string paramname) {
   Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
   Isis::iString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0];
   overwritePreference.ConvertWhiteSpace();
