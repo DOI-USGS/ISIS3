@@ -709,7 +709,7 @@ namespace Isis {
    *   @history 2009-08-03 Jeannie Walldren - Clean up code,
    *            documentation and check in changes from
    *            2009-06-10, 2009-07-02, 2009-07-09
-   *
+   *   @history 2010-07-21 Sharmila Prasad - Remove doxygen documentation warnings
    */
 
   class NumericalApproximation {
@@ -730,11 +730,11 @@ namespace Isis {
                       };
 
       // CONSTRUCTORS
-      NumericalApproximation(const InterpType &itype = CubicNatural) throw(iException &);
+      NumericalApproximation(const NumericalApproximation::InterpType &itype = CubicNatural) throw(iException &);
       NumericalApproximation(unsigned int n, double *x, double *y,
-                             const InterpType &itype = CubicNatural) throw(iException &);
+                             const NumericalApproximation::InterpType &itype = CubicNatural) throw(iException &);
       NumericalApproximation(const vector <double> &x, const vector <double> &y,
-                             const InterpType &itype = CubicNatural)throw(iException &);
+                             const NumericalApproximation::InterpType &itype = CubicNatural)throw(iException &);
       NumericalApproximation(const NumericalApproximation &dint);
       // ASSIGNMENT OPERATOR
       NumericalApproximation &operator=(const NumericalApproximation &numApMeth);
@@ -771,7 +771,7 @@ namespace Isis {
         return (p_itype);
       }
       int MinPoints();
-      int MinPoints(InterpType itype) throw(iException &);
+      int MinPoints(NumericalApproximation::InterpType itype) throw(iException &);
 
       // ADD DATA TO OBJECT
       void AddData(const double x, const double y);
@@ -841,8 +841,8 @@ namespace Isis {
 
       // ASSIGNMENT OPERATORS
       void Reset();
-      void Reset(InterpType itype) throw(iException &);
-      void SetInterpType(InterpType itype) throw(iException &);
+      void Reset(NumericalApproximation::InterpType itype) throw(iException &);
+      void SetInterpType(NumericalApproximation::InterpType itype) throw(iException &);
 
     protected:
       // == CLASS VARIABLES
@@ -872,11 +872,11 @@ namespace Isis {
 
       // == PROTECTED METHODS
       // CREATING, DESTROYING OBJECT
-      void Init(InterpType itype);
-      bool GslInterpType(InterpType itype) const;
+      void Init(NumericalApproximation::InterpType itype);
+      bool GslInterpType(NumericalApproximation::InterpType itype) const;
       void GslAllocation(unsigned int npoints);
       void GslDeallocation();
-      InterpFunctor GslFunctor(InterpType itype) const throw(iException &);
+      InterpFunctor GslFunctor(NumericalApproximation::InterpType itype) const throw(iException &);
       // VERIFICATION METHODS
       void GslIntegrityCheck(int gsl_status, char *src,
                              int line) throw(iException &);
