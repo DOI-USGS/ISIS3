@@ -328,6 +328,7 @@ namespace Isis {
     bool inDoubleQuotes = false;
     bool inSingleQuotes = false;
     bool arrayClosed = false;
+    bool nextElementStarted = false;
     iString currElement = "";
 
     for(unsigned int strPos = 0; strPos < arrayString.size(); strPos++) {
@@ -342,7 +343,7 @@ namespace Isis {
 
       // take literally anything that is escaped and not quoted
       if(arrayString[strPos] == '\\' && strPos + 1 < arrayString.size() &&
-          !inDoubleQuotes && !inSingleQuotes) {
+          (inDoubleQuotes || inSingleQuotes)) {
         currElement += arrayString[strPos+1];
         strPos ++;
         continue;
@@ -360,6 +361,12 @@ namespace Isis {
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
 
+        nextElementStarted = (nextElementStarted || arrayString[strPos] != ' ');
+
+        if(!nextElementStarted) {
+          continue;
+        }
+
         if(arrayString[strPos] == '"') {
           inDoubleQuotes = true;
         }
@@ -369,13 +376,31 @@ namespace Isis {
         else if(arrayString[strPos] == ',') {
           values.push_back(currElement);
           currElement = "";
+          nextElementStarted = false;
         }
         else if(arrayString[strPos] == ')') {
           values.push_back(currElement);
           currElement = "";
           arrayClosed = true;
+          nextElementStarted = false;
         }
-        else {
+        else if(nextElementStarted && arrayString[strPos] == ' ') {
+          // Make sure there's something before the next ',' or ')'
+          bool onlyWhite = true;
+          int closingPos = strPos + 1;
+
+          for(unsigned int pos = strPos;
+              onlyWhite && arrayString[pos] != ',' && arrayString[pos] != ')' &&
+              pos < arrayString.size(); pos++) {
+            closingPos ++;
+            onlyWhite &= (arrayString[pos] == ' ');
+          }
+
+          if(!onlyWhite) {
+            currElement += arrayString[strPos];
+          }
+        }
+        else if(nextElementStarted) {
           currElement += arrayString[strPos];
         }
       }
@@ -397,6 +422,7 @@ namespace Isis {
         }
       }
     }
+
 
     if(!arrayClosed || currElement != "") {
       string msg = "Invalid array format [" + arrayString + "]";

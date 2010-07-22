@@ -96,10 +96,12 @@ namespace Isis {
    *           problems such as "  " (2 spaces) being interpretted properly. Array
    *           parameter values support improved.
    *  @history 2009-11-19 Kris Becker - Made argc pass by reference since Qt's
-   *  		 QApplication/QCoreApplication requires it
+   *           QApplication/QCoreApplication requires it
    *  @history 2010-03-26 Sharmila Prasad - Remove the restriction of the number of
    *           columns in the batchlist file to 10.
    *  @history 2010-05-28 Steven Lambright - History fails silently now
+   *  @history 2010-07-20 Steven Lambright - Array format on the command line is
+   *           more tolerant to white space now.
    *  @todo 2005-02-22 Jeff Anderson - add coded and implementation examples to
    *                                   class documentation
    *
