@@ -41,15 +41,28 @@ namespace Isis {
    * @history 2009-05-31 Kris Becker - Included the number of bands in the
    *          computation of the number of FILE_RECORDS for fixed PDS type
    *          products.  It assumed only 1 band.
-   * @history 2010-02-24 Janet Barrett - Added code to support JPEG2000.
+   * @history 2010-02-24 Janet Barrett - Added code to support JPEG2000. 
+   * @history 2010-07-21 Sharmila Prasad - Fixed error while converting resolution from Meters to Kilometers 
    */
   class ProcessExportPds : public Isis::ProcessExport {
     public:
+      /** 
+       * Pds File Type      
+       */
+      enum PdsFileType   {Image, Qube, SpectralQube, JP2Image};
+      
+      /**
+       * Resolution
+       */
+      enum PdsResolution {Meter, Kilometer};
+      
+      /**
+       * Export Type
+       */
+      enum PdsExportType {Stream, Fixed};
+      
       ProcessExportPds();
       ~ProcessExportPds();
-      enum PdsFileType   {Image, Qube, SpectralQube, JP2Image};
-      enum PdsResolution {Meter, Kilometer};
-      enum PdsExportType {Stream, Fixed};
 
       // Work with PDS labels for all data set types
       void StandardAllMapping(Pvl &mainPvl);
@@ -69,7 +82,7 @@ namespace Isis {
         p_exportType = type;
       };
 
-      virtual Pvl &StandardPdsLabel(PdsFileType type);
+      virtual Pvl &StandardPdsLabel(ProcessExportPds::PdsFileType type);
       void OutputLabel(std::ofstream &os);
       void OutputDetatchedLabel(void);
 
@@ -131,7 +144,7 @@ namespace Isis {
       int LineBytes();
       int LabelSize();
       virtual void CreateImageLabel();
-      void CreateQubeLabel();
+      void CreateQubeLabel(void);
       void CreateSpectralQubeLabel();
 
       std::string ProjectionName(Pvl &inputLabel);

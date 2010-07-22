@@ -38,6 +38,10 @@
 using namespace std;
 
 namespace Isis {
+  /**
+   * Default Constructor - Set to default the data members
+   * 
+   */
   ProcessExportPds::ProcessExportPds() {
     p_label       = NULL;
     p_formatter   = NULL;
@@ -62,6 +66,10 @@ namespace Isis {
     p_detachedLabel = false;
   }
 
+  /**
+   * Destructor
+   * 
+   */
   ProcessExportPds::~ProcessExportPds() {
     if(p_label != NULL) {
       delete p_label;
@@ -151,7 +159,7 @@ namespace Isis {
   /**
    * Create a standard PDS label for type QUBE
    */
-  void ProcessExportPds::CreateQubeLabel() {
+  void ProcessExportPds::CreateQubeLabel(void) {
     Pvl &mainPvl = *p_label;
 
 //    StandardQubeRoot (mainPvl);
@@ -676,17 +684,23 @@ namespace Isis {
     PvlKeyword &aRadius = pdsMapObj["A_AXIS_RADIUS"];
     iString unit = aRadius.Unit();
     if(unit.UpCase() == "METERS") {
-      aRadius.SetValue((double)aRadius / 1000.0, "KM");
+      double dValue = (double)aRadius;
+      dValue /= 1000.0;
+      aRadius.SetValue(dValue, "KM");
     }
     PvlKeyword &bRadius = pdsMapObj["B_AXIS_RADIUS"];
     unit = bRadius.Unit();
     if(unit.UpCase() == "METERS") {
-      bRadius.SetValue((double)bRadius / 1000.0, "KM");
+      double dValue = (double)bRadius;
+      dValue /= 1000.0;
+      bRadius.SetValue(dValue, "KM");
     }
     PvlKeyword &cRadius = pdsMapObj["C_AXIS_RADIUS"];
     unit = cRadius.Unit();
     if(unit.UpCase() == "METERS") {
-      cRadius.SetValue((double)cRadius / 1000.0, "KM");
+      double dValue = (double)cRadius;
+      dValue /= 1000.0;
+      cRadius.SetValue(dValue, "KM");
     }
 
     // Modify the units on MAP_SCALE and MAP_RESOLUTION
@@ -694,7 +708,9 @@ namespace Isis {
     unit = mapScale.Unit();
     if((unit.UpCase() == "METERS/PIX") || (unit.UpCase() == "METERS/PIXEL")) {
       if(meResolution == Kilometer) {
-        mapScale.SetValue((double)mapScale / 1000.0, "KM/PIXEL");
+        double dValue = (double)mapScale;
+        dValue /= 1000.0;
+        mapScale.SetValue(dValue, "KM/PIXEL");
       }
       else {
         mapScale.SetValue((double)mapScale, "METERS/PIXEL");
