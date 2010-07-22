@@ -32,7 +32,8 @@
       Added category: Map Projection
     </change>
     <change name="Steven Lambright" date="2008-04-22">
-      Fixed problems with mapping outside of the projection space and with 0lat/0lon boundaries.
+      Fixed problems with mapping outside of the projection space and with
+      0lat/0lon boundaries.
     </change>
     <change name="Steven Lambright" date="2008-05-12">
       Removed references to CubeInfo 
@@ -45,6 +46,9 @@
     </change>
     <change name="Steven Lambright" date="2010-05-06">
       Added TICKS options
+    </change>
+    <change name="Steven Lambright" date="2010-07-22">
+      Added LINEWIDTH option
     </change>
   </history>
 
@@ -172,7 +176,7 @@
         </description>
         <minimum inclusive="yes">1</minimum>
       </parameter>
-      
+
       <parameter name="SINC">
         <type>integer</type>
         <default><item>100</item></default>
@@ -183,16 +187,16 @@
         <minimum inclusive="yes">1</minimum>
       </parameter>
     </group>
-    
+
     <group name="Ground Grid Parameters">
       <parameter name="BASELAT">
         <type>double</type>
         <default><item>0.0</item></default>
         <brief>Starting latitude</brief>
         <description>
-          This is a latitude line the grid will lie on. If it is not in the image, 
-          then it is a latitude line the grid would lie on if the image were larger.
-          This is not a minimum latitude for the grid.
+          This is a latitude line the grid will lie on. If it is not in the
+          image, then it is a latitude line the grid would lie on if the image
+          were larger. This is not a minimum latitude for the grid.
         </description>
         <minimum inclusive="yes">-90.0</minimum>
       </parameter>
@@ -202,9 +206,9 @@
         <default><item>0.0</item></default>
         <brief>Starting longitude</brief>
         <description>
-          This is a longitude line the grid will lie on. If it is not in the image, 
-          then it is a longitude line the grid would lie on if the image were larger.
-          This is not a minimum longitude for the grid.
+          This is a longitude line the grid will lie on. If it is not in the 
+          image,  then it is a longitude line the grid would lie on if the image 
+          were larger. This is not a minimum longitude for the grid.
         </description>
         <minimum inclusive="yes">-360.0</minimum>
       </parameter>
@@ -218,7 +222,7 @@
         </description>
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
-      
+
       <parameter name="LONINC">
         <type>double</type>
         <default><item>1.0</item></default>
@@ -229,15 +233,29 @@
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
     </group>
-    
+
+    <group name="Line Parameters">
+      <parameter name="LINEWIDTH">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Thickness of lines</brief>
+        <description>
+          This defines the thickness of grid lines in pixels.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+        <odd />
+      </parameter>
+      <odd />
+    </group>
+
     <group name="Tick Parameters">
       <parameter name="DIAGONALTICKS">
         <type>boolean</type>
         <default><item>false</item></default>
         <brief>Draw tick marks diagonally</brief>
         <description>
-          Instead of drawing the tick marks vertically and horizonally, creating a '+', 
-          draw the tick marks diagonally creating an 'x'
+          Instead of drawing the tick marks vertically and horizonally, 
+          creating a '+', draw the tick marks diagonally creating an 'x'
         </description>
       </parameter>
 
@@ -246,7 +264,8 @@
         <default><item>5</item></default>
         <brief>Size of tickmarks</brief>
         <description>
-          This defines the width and height (which are always equal) of the tick marks in pixels.
+          This defines the width and height (which are always equal) of the tick
+          marks in pixels.
         </description>
         <minimum inclusive="yes">1</minimum>
         <odd />

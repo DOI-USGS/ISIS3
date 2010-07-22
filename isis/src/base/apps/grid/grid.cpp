@@ -19,7 +19,7 @@ void groundGrid(Buffer &in, Buffer &out);
 void createGroundImage(Camera *cam, Projection *proj);
 
 bool outline, ticks, diagonalTicks;
-int baseLine, baseSample, lineInc, sampleInc, tickSize;
+int baseLine, baseSample, lineInc, sampleInc, tickSize, lineWidth;
 double baseLat, baseLon, latInc, lonInc;
 
 int inputSamples, inputLines;
@@ -42,6 +42,8 @@ void IsisMain() {
     tickSize = ui.GetInteger("TICKSIZE") / 2;
     diagonalTicks = ui.GetBoolean("DIAGONALTICKS");
   }
+
+  lineWidth = ui.GetInteger("LINEWIDTH") / 2;
 
   inputSamples = icube->Samples();
   inputLines   = icube->Lines();
@@ -87,11 +89,23 @@ void IsisMain() {
 }
 
 bool imageDrawLine(int line) {
-  return (line % lineInc == baseLine % lineInc);
+  bool drawLine = false;
+
+  for(int y = line - lineWidth; y <= line + lineWidth; y ++) {
+    drawLine = drawLine || (y % lineInc == baseLine % lineInc);
+  }
+
+  return drawLine;
 }
 
-bool imageDrawSample(int sample) {
-  return (sample % sampleInc == baseSample % sampleInc);
+bool imageDrawSample(int samp) {
+  bool drawSamp = false;
+
+  for(int x = samp - lineWidth; x <= samp + lineWidth; x ++) {
+    drawSamp = drawSamp || (x % sampleInc == baseSample % sampleInc);
+  }
+
+  return drawSamp;
 }
 
 // Line processing routine
@@ -100,8 +114,9 @@ void imageGrid(Buffer &in, Buffer &out) {
     out[samp - 1] = in[samp - 1];
 
     if(!ticks) {
-      if(imageDrawSample(samp) || imageDrawLine(in.Line()))
+      if(imageDrawSample(samp) || imageDrawLine(in.Line())) {
         out[samp - 1] = Isis::Hrs;
+      }
     }
     // ticks!
     else {
@@ -178,11 +193,25 @@ void imageGrid(Buffer &in, Buffer &out) {
   }
 }
 
+bool groundDrawPoint(int samp, int line, bool latGrid = true) {
+  bool drawPoint = false;
+
+  for(int x = samp - lineWidth; x <= samp + lineWidth; x ++) {
+    drawPoint = drawPoint || latLonGrid->PixelOnGrid(x - 1, line - 1, latGrid);
+  }
+
+  for(int y = line - lineWidth; y <= line + lineWidth; y ++) {
+    drawPoint = drawPoint || latLonGrid->PixelOnGrid(samp - 1, y - 1, latGrid);
+  }
+
+  return drawPoint;
+}
+
 // Line processing routine
 void groundGrid(Buffer &in, Buffer &out) {
   for(int samp = 1; samp <= in.SampleDimension(); samp++) {
     if(!ticks) {
-      if(latLonGrid->PixelOnGrid(samp - 1, in.Line() - 1)) {
+      if(groundDrawPoint(samp, in.Line())) {
         out[samp-1] = Isis::Hrs;
       }
       else {
@@ -200,21 +229,21 @@ void groundGrid(Buffer &in, Buffer &out) {
       // Vertical/Horizontal Ticks
       if(!diagonalTicks) {
         // horizontal test
-        for(int sampleTest = samp - 1 - tickSize;
-            (sampleTest < samp + tickSize) && (out[samp-1] != Isis::Hrs);
+        for(int sampleTest = samp - tickSize;
+            (sampleTest <= samp + tickSize) && (out[samp-1] != Isis::Hrs);
             sampleTest ++) {
-          if(latLonGrid->PixelOnGrid(sampleTest, in.Line() - 1, true) &&
-              latLonGrid->PixelOnGrid(sampleTest, in.Line() - 1, false)) {
+          if(groundDrawPoint(sampleTest, in.Line(), true) &&
+              groundDrawPoint(sampleTest, in.Line(), false)) {
             out[samp-1] = Isis::Hrs;
           }
         }
 
         // vertical test
-        for(int lineTest = in.Line() - 1 - tickSize;
-            (lineTest < in.Line() + tickSize) && (out[samp-1] != Isis::Hrs);
+        for(int lineTest = in.Line() - tickSize;
+            (lineTest <= in.Line() + tickSize) && (out[samp-1] != Isis::Hrs);
             lineTest ++) {
-          if(latLonGrid->PixelOnGrid(samp - 1, lineTest, true) &&
-              latLonGrid->PixelOnGrid(samp - 1, lineTest, false)) {
+          if(groundDrawPoint(samp, lineTest, true) &&
+              groundDrawPoint(samp, lineTest, false)) {
             out[samp-1] = Isis::Hrs;
           }
         }
@@ -222,14 +251,15 @@ void groundGrid(Buffer &in, Buffer &out) {
       // Diagonal ticks
       else {
         // top left to bottom right
-        int sampleTest = samp - 1 - tickSize;
-        int lineTest = in.Line() - 1 - tickSize;
+        int sampleTest = samp - tickSize;
+        int lineTest = in.Line() - tickSize;
 
 
-        while((out[samp-1] != Isis::Hrs) && (lineTest < in.Line() + tickSize) &&
-              (sampleTest < samp + tickSize)) {
-          if(latLonGrid->PixelOnGrid(sampleTest, lineTest, true) &&
-              latLonGrid->PixelOnGrid(sampleTest, lineTest, false)) {
+        while((out[samp-1] != Isis::Hrs) &&
+              (lineTest <= in.Line() + tickSize) &&
+              (sampleTest <= samp + tickSize)) {
+          if(groundDrawPoint(sampleTest, lineTest, true) &&
+              groundDrawPoint(sampleTest, lineTest, false)) {
             out[samp-1] = Isis::Hrs;
           }
 
@@ -238,13 +268,14 @@ void groundGrid(Buffer &in, Buffer &out) {
         }
 
         // top right to bottom left
-        sampleTest = samp - 1 + tickSize;
-        lineTest = in.Line() - 1 - tickSize;
+        sampleTest = samp + tickSize;
+        lineTest = in.Line() - tickSize;
 
-        while((out[samp-1] != Isis::Hrs) && (lineTest < in.Line() + tickSize) &&
-              (sampleTest >= samp - 1 - tickSize)) {
-          if(latLonGrid->PixelOnGrid(sampleTest, lineTest, true) &&
-              latLonGrid->PixelOnGrid(sampleTest, lineTest, false)) {
+        while((out[samp-1] != Isis::Hrs) &&
+              (lineTest <= in.Line() + tickSize) &&
+              (sampleTest >= samp - tickSize)) {
+          if(groundDrawPoint(sampleTest, lineTest, true) &&
+              groundDrawPoint(sampleTest, lineTest, false)) {
             out[samp-1] = Isis::Hrs;
           }
 
