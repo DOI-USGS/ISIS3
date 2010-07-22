@@ -2837,12 +2837,26 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
       const IsisParameterData *param = ReturnParam(ParamName(g, p));
       // If this param has a value add it to the command line
       if(param->values.size() > 0) {
-        group += Isis::PvlKeyword(param->name, param->values[0]);
+        Isis::PvlKeyword paramKeyword(param->name);
+        
+        for(unsigned int value = 0; value < param->values.size(); value++) {
+          paramKeyword.AddValue(param->values[value]);
+        }
+        
+        group += paramKeyword;
       }
 
       // Or if it has a default value add it to the command line
       else if(param->defaultValues.size() > 0) {
-        group += Isis::PvlKeyword(param->name, param->defaultValues[0]);
+        Isis::PvlKeyword paramKeyword(param->name);
+        
+        for(unsigned int value = 0; 
+           value < param->defaultValues.size();
+           value++) {
+          paramKeyword.AddValue(param->defaultValues[value]);
+        }
+        
+        group += paramKeyword;
       }
     }
   }

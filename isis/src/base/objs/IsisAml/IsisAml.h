@@ -128,10 +128,14 @@
  *                                      to retrieve info needed for gui and
  *                                      command line help
  *   @history 2006-02-13 Elizabeth Miller - Added GuiHelper Capabilities
- *   @history 2006-10-17 Steven Lambright - Fixed problem with boolean inclusion/exclusion
+ *   @history 2006-10-17 Steven Lambright - Fixed problem with boolean
+ *                                          inclusion/exclusion
  *   @history 2010-07-19 Jeannie Walldren - Added check whether user preferences
  *                          are set to allow file overwrite in Verify() method
- *   @history 2010-07-21 Sharmila Prasad - Modified for doxygen documentation Warning
+ *   @history 2010-07-21 Sharmila Prasad - Modified for doxygen documentation
+ *                                         Warning
+ *   @history 2010-07-22 Steven Lambright - Array values for parameters are now
+ *                                         written to the history file
  */
 class IsisAml : protected IsisAmlData {
 
