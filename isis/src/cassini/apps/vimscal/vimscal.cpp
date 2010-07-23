@@ -186,7 +186,8 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     throw iException::Message(iException::Camera, msg, _FILEINFO_);
   }
 
-  solarRemoveCoefficient = -1.0;
+
+  solarRemoveCoefficient = -1;
 
   // try center first
   if(cam->SetImage(icube->Samples() / 2, icube->Lines() / 2)) {
@@ -202,7 +203,8 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples(), icube->Lines())) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples(),
+      icube->Lines())) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
@@ -215,11 +217,13 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples(), icube->Lines() / 2)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples(),
+      icube->Lines() / 2)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples() / 2, icube->Lines())) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->Samples() / 2,
+      icube->Lines())) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
@@ -227,15 +231,20 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
+  // Default to original vimscal's solar distance if we can't find a target
   if(solarRemoveCoefficient < 0) {
+    solarRemoveCoefficient = 81.595089 * 81.595089;
+    /*
     string msg = "Unable to project image at four corners, center of edges or ";
     msg += "at center. The solar distance can not be calculated, try using";
     msg += " [UNITS=SPECENERGY] on [";
     msg += icube->Filename() + "]";
     throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    */
   }
 
-  bool vis = (icube->Label()->FindGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
+  bool vis = (icube->Label()->
+              FindGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
 
   iString attributes;
 

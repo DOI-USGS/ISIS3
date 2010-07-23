@@ -55,6 +55,10 @@
     <change name="Steven Lambright" date="2010-02-19">
       Now closing calibration files when done with them
     </change>
+    <change name="Steven Lambright" date="2010-07-23">
+      If the solar remove coefficient cannot be calculated then a default
+      value will be used now instead of giving an error
+    </change>
   </history>
 
   <category>
