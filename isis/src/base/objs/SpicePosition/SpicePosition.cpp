@@ -1023,7 +1023,7 @@ namespace Isis {
    *   @history 2009-08-14 Debbie A. Cook - Corrected indexing
    *            error in loop.
    */
-  vector<int> SpicePosition::HermiteIndices(double tolerance, vector <int> indexList) {
+  std::vector<int> SpicePosition::HermiteIndices(double tolerance, std::vector <int> indexList) {
 
     unsigned int n = indexList.size();
 
