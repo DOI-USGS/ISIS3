@@ -1,5 +1,5 @@
 Create the aml object
---------- Tests for private data ----------
+---------- Tests for private data ----------
   App name = unittest
   App brief = Brief description
   App description = This program tests the IsisAml class and its supporting classes.
@@ -950,7 +950,7 @@ Application information
 Program name : unittest
 Brief description: Brief description
 Full description: This program tests the IsisAml class and its supporting classes.
-Version date: 2003-05-16
+Version date: 2010-07-20
 
 Number of parameter groups : 9
 
@@ -1453,6 +1453,7 @@ Exact and partial name match tests:
 
   Cube tests:
 **PROGRAMMER ERROR** Unable to get input cube attributes.  Parameter [CUBE2] is not an input. Parameter fileMode = [output].
+
 **PROGRAMMER ERROR** Unable to get output cube attributes.  Parameter [CUBE1] is not an output. Parameter fileMode = [input].
 
   PutInteger:
@@ -1495,9 +1496,11 @@ Exact and partial name match tests:
 
   GetBoolean:
 **USER ERROR** Parameter [G6P0] has no value.
+
 **PROGRAMMER ERROR** Invalid boolean value [CCCC].
 
 **PROGRAMMER ERROR** Parameter [G1P1] is not a boolean.
+
 **USER ERROR** Parameter [F] is not unique.
 
 ---------- Validate a correctly loaded set of parameters ----------
@@ -1538,18 +1541,19 @@ End_Group
 End
 
 
---- Check for NO value in an option/list/included parameter ---
+---------- Check for NO value in an option/list/included parameter ----------
 **USER ERROR** Parameter [G1P3] must be entered if parameter [G1P0] is equal to [G1P0L1X]
 
------ Check for value in an option/list/excluded parameter -----
+---------- Check for value in an option/list/excluded parameter ----------
 **USER ERROR** Parameter [G2P0] can not be entered if parameter [G1P0] is equal to [G1P0L0]
 
 ---------- Check error for unknown parameter ----------
 **USER ERROR** Unknown parameter [xyz].
 
 ---------- Check errors for user file overwrite preferences ----------
-   ---- Overwrite = Error ----
-**USER ERROR** Invalid output filename for [G0P1]. The file [/work1/jwalldren/isis3/trunk/isis/src/base/objs/IsisAml/junk.txt] already exists.  The user preference file customization group is set to disallow file overwrites.
-   ---- Overwrite = Err ----
+  Overwrite not allowed:
+**USER ERROR** Invalid output filename for [G0P1]. The file [junk.txt] already exists.  The user preference file customization group is set to disallow file overwrites.
+
+  Invalid Overwrite preference value:
 **USER ERROR** Invalid entry in user preference file FileCustomization group.  Overwrite = [Err].  Valid values: [Allow] or [Error].
 
