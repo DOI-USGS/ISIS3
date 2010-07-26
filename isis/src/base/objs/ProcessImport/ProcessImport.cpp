@@ -822,7 +822,7 @@ namespace Isis {
    * @param pixelMin The minimum value of the special pixel range
    * @param pixelMax The maximum value of the special pixel range
    */
-  void ProcessImport::CheckPixelRange(string pixelName, double pixelMin, double pixelMax) {
+  void ProcessImport::CheckPixelRange(std::string pixelName, double pixelMin, double pixelMax) {
     if(pixelMin == DBL_MAX || pixelMax == -DBL_MAX) return;
 
     if(p_null_min != DBL_MAX && p_null_max != -DBL_MAX && (   // Checks if null has been set
