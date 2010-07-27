@@ -2,9 +2,11 @@
 
 #include <sstream>
 
-#include "Pvl.h"
-#include "History.h"
+#include "Filename.h"
 #include "iString.h"
+#include "History.h"
+#include "Pvl.h"   
+#include "TextFile.h"
 
 using namespace Isis;
 using namespace std;
@@ -13,17 +15,32 @@ void IsisMain() {
 
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFilename("FROM");
+  Filename fromfile(ui.GetFilename("FROM"));
   string mode = ui.GetString("MODE");
 
+  Filename tofile;
+  bool append = false;
+  if (ui.WasEntered("TO")) {
+    tofile = Filename(ui.GetFilename("TO"));
+    append = ui.GetBoolean("APPEND");
+  }
+
   // Extract history from file
-  History hist("IsisCube", file);
+  History hist("IsisCube", fromfile.Expanded());
   Pvl pvl = hist.ReturnHist();
 
   // Print full history
   if(mode == "FULL") {
     if(ui.IsInteractive()) {
       Application::GuiLog(pvl);
+    }
+    else if (ui.WasEntered("TO")) {
+      if (append) {
+        pvl.Append(tofile.Expanded());
+      }
+      else {
+        pvl.Write(tofile.Expanded());
+      }
     }
     else {
       cout << pvl << endl;
@@ -32,6 +49,15 @@ void IsisMain() {
 
   // Print brief history in command line form
   else if(mode == "BRIEF") {
+    TextFile * text = NULL;
+    if (ui.WasEntered("TO")) {
+      if (append) {
+        text = new TextFile(tofile.Expanded(),"append");
+      }
+      else {
+        text = new TextFile(tofile.Expanded(),"overwrite");
+      }
+    }
     for(int i = 0; i < pvl.Objects(); ++i) {
       string all = pvl.Object(i).Name() + " ";
       PvlGroup user = pvl.Object(i).FindGroup("UserParameters");
@@ -47,9 +73,17 @@ void IsisMain() {
       if(ui.IsInteractive()) {
         Application::GuiLog(all);
       }
+      else if (ui.WasEntered("TO")) {
+        text->PutLine(all);
+      }
       else {
         cout << all << endl;
       }
+    }
+    if (text) {
+      text->Close();
+      delete text;
+      text = NULL;
     }
   }
 }

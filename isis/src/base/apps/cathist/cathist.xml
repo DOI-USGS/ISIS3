@@ -34,6 +34,9 @@
     <change name="Elizabeth Miller" date="2007-02-26">
       Modified to output results in gui log if the gui is open
     </change>
+    <change name="Mackenzie Boyd" date="2010-07-26">
+      Added to and append options.      
+    </change>
   </history>
 
   <groups>
@@ -51,30 +54,58 @@
           *.cub
         </filter>
       </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Output file for the history     
+        </brief>
+        <description>
+          This is the file which the PVL history for the input cube will go to.
+        </description>
+        <filter>
+          *.pvl *.txt *.prt
+        </filter>
+      </parameter> 
     </group>
+
     <group name="Output Options">
-        <parameter name="MODE">
-           <type>string</type>
-           <brief>Mode types</brief>
-           <description>
-               Different modes that cathist can run in.
-           </description>
-           <default><item>FULL</item></default>
-            <list>  
-               <option value="FULL">
-                    <brief>Full history listing</brief>
-                    <description>
-                        Lists the full history of the file in the PVL format.
-                    </description>
-               </option>
-                <option value="BRIEF">
-                    <brief>Brief history listing</brief>
-                    <description>
-                        Lists a brief history of the file in a command line format.
-                    </description>
-               </option>
-            </list>
-        </parameter>
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Append output to file
+        </brief>
+        <description>
+          This option allows output to be appened to an already existing file. 
+          If this option is not checked and the file exists, it will be 
+          overwritten.
+        </description>
+      </parameter>
+
+      <parameter name="MODE">
+        <type>string</type>
+        <brief>Mode types</brief>
+        <description>
+          Different modes that cathist can run in.
+        </description>
+        <default><item>FULL</item></default>
+        <list>  
+          <option value="FULL">
+            <brief>Full history listing</brief>
+              <description>
+                Lists the full history of the file in the PVL format.
+              </description>
+            </option>
+            <option value="BRIEF">
+            <brief>Brief history listing</brief>
+            <description>
+              Lists a brief history of the file in a command line format. 
+            </description>
+          </option>
+        </list>
+      </parameter>
     </group>
   </groups>
 
