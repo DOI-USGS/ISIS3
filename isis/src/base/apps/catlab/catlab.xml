@@ -44,6 +44,9 @@
     <change name="Jeannie Walldren" date="2010-06-24"> 
       Added more filters for FROM and TO.  Updated documentation.
     </change>
+    <change name="Mackenzie Boyd" date="2010-07-26"> 
+      Added APPEND option.
+    </change>
   </history>
 
   <groups>
@@ -68,7 +71,7 @@
           Optional output file.
         </brief>
         <internalDefault>
-          No Output file will be created
+          None
         </internalDefault>
         <description>
           The text file to which the result Pvl will be written. 
@@ -76,6 +79,21 @@
         <filter>
           *.txt *.prt *.pvl 
         </filter>
+      </parameter>
+    </group>
+
+    <group name="Output Options">
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Append output to file
+        </brief>
+        <description>
+          This option allows output to be appened to an already existing file. 
+          If this option is not checked and the file exists, it will be 
+          overwritten.
+        </description>
       </parameter>
     </group>
   </groups>

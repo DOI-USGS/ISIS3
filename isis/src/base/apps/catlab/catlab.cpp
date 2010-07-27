@@ -2,7 +2,9 @@
 
 #include <iostream>
 
+#include "Filename.h"
 #include "Pvl.h"
+#include "UserInterface.h"
 
 using namespace Isis;
 using namespace std;
@@ -13,13 +15,18 @@ void IsisMain() {
   // Get filename provided by the user
   UserInterface &ui = Application::GetUserInterface();
   string file = ui.GetFilename("FROM");
-
+  
   // Extract label from file
   Pvl label(file);
 
   // Output to file if entered
   if(ui.WasEntered("TO")) {
-    label.Write(ui.GetFilename("TO"));
+    if (ui.GetBoolean("APPEND")) {
+      label.Append(Filename(ui.GetFilename("TO")).Expanded());
+    }
+    else {
+      label.Write(Filename(ui.GetFilename("TO")).Expanded());
+    }
   }
 
   // Print label to the gui log if it is interactive
