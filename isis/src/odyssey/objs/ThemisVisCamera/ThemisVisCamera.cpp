@@ -87,6 +87,14 @@ namespace Isis {
       dmap->SetStartTime(p_etStart + BandEphemerisTimeOffset(vband));
     }
 
+    /**
+     * Calculates time offset for the given band.
+     * 
+     * @param vband The band number.
+     * 
+     * @return @b double The time offset value.
+     * 
+     */
     double ThemisVisCamera::BandEphemerisTimeOffset(int vband) {
       int waveToTimeBand[] = {2, 5, 3, 4, 1};
       int visBandFirstRow[] = {4, 203, 404, 612, 814};
