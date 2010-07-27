@@ -3,13 +3,13 @@ APPNAME = cnettable
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	find $(INPUT)/*.cub > $(INPUT)/cubeList.lst; \
-	$(APPNAME) fromlist=$(INPUT)/cubeList.lst \
+	find $(INPUT)/*.cub > $(OUTPUT)/cubeList.lst; \
+	$(APPNAME) fromlist=$(OUTPUT)/cubeList.lst \
 	cnet=$(INPUT)/testNet.net \
 	to=$(OUTPUT)/cnetstats.txt \
 	allowErrors = true \
 	> /dev/null;
-	rm -f $(INPUT)/cubeList.lst > /dev/null;
+	rm -f $(OUTPUT)/cubeList.lst > /dev/null;
 	cat $(OUTPUT)/cnetstats.txt | sed s/,\[^,]\*\.cub,/,.cub,/ \
 	> $(OUTPUT)/output.txt
 	rm -f $(OUTPUT)/cnetstats.txt > /dev/null;
