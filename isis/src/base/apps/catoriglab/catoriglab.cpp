@@ -14,5 +14,18 @@ void IsisMain() {
   // Extract history from file
   OriginalLabel origLab(file);
   Pvl pvl = origLab.ReturnLabels();
-  cout << pvl << endl;
+  if (ui.IsInteractive()) {
+    Application::GuiLog(pvl);
+  }
+  else if (ui.WasEntered("TO")) {
+    if (ui.GetBoolean("APPEND")) {
+      pvl.Append(Filename(ui.GetFilename("TO")).Expanded());
+    }
+    else {
+      pvl.Write(Filename(ui.GetFilename("TO")).Expanded());
+    }
+  } 
+  else {
+    cout << pvl << endl;
+  }
 }

@@ -43,6 +43,37 @@
           *.cub
         </filter>
       </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Optional output file
+        </brief>
+        <internalDefault>
+          None
+        </internalDefault>
+        <description>
+          The text file to which the original labels will be written. 
+        </description>
+        <filter>
+          *.txt *.prt *.pvl 
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Output Options">
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Append output to file
+        </brief>
+        <description>
+          This option allows output to be appened to an already existing file. 
+          If this option is not checked and the file exists, it will be 
+          overwritten.
+        </description>
+      </parameter>
     </group>
   </groups>
 
