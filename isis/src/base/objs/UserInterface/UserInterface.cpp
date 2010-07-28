@@ -342,14 +342,13 @@ namespace Isis {
       }
 
       // take literally anything that is escaped and not quoted
-      if(arrayString[strPos] == '\\' && strPos + 1 < arrayString.size() &&
-          (inDoubleQuotes || inSingleQuotes)) {
+      if(arrayString[strPos] == '\\' && strPos + 1 < arrayString.size()) {
         currElement += arrayString[strPos+1];
         strPos ++;
         continue;
       }
       // ends in a backslash??
-      else if(arrayString[strPos] == '\\' && !(inDoubleQuotes || inSingleQuotes)) {
+      else if(arrayString[strPos] == '\\') {
         string msg = "Invalid array format [" + arrayString + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -758,8 +757,14 @@ namespace Isis {
           Isis::PvlGroup &up = lab.Group(g);
           for(int k = 0; k < up.Keywords(); k++) {
             string keyword = up[k].Name();
-            string value = up[k][0];
-            PutAsString(keyword, value);
+
+            vector<string> values;
+
+            for(int i = 0; i < up[k].Size(); i++) {
+              values.push_back(up[k][i]);
+            }
+
+            PutAsString(keyword, values);
           }
           return;
         }

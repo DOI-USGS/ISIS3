@@ -77,11 +77,35 @@ int main(int argc, char *argv[]) {
       cout << endl;
     }
 
+    cout << "Testing Common Array Argument" << endl;
+    {
+      const int myArgc = 7;
+      char *myArgv[myArgc] = {"highpass", "from=dog",
+                              "to=( \"dog\" , \"cat\", \" cow \", 'frog')",
+                              "line=", "3", "samp=", "3"
+                             };
+
+      int myArgcQ = myArgc;
+      Isis::UserInterface ui(highpass, myArgcQ, myArgv);
+      vector<string> vals;
+      cout << "FROM:    " << ui.GetAsString("FROM") << endl;
+      cout << "TO:      " << endl;
+      ui.GetAsString("TO", vals);
+
+      for(unsigned int i = 0; i < vals.size(); i++) {
+        cout << " >> '" << vals[i] << "'" << endl;
+      }
+
+      cout << endl;
+      cout << "GUI:     " << ui.IsInteractive() << endl;
+      cout << endl;
+    }
+
     cout << "Testing Complicated Array Argument" << endl;
     {
       const int myArgc = 7;
       char *myArgv[myArgc] = {"highpass", "from=dog",
-                              "to=(biscuit\\,,'bread,',\",b,\\,iscuit2,\"\\,,)",
+                              "to=(biscuit\\\\,,'bread,',\",b,\\\\,iscuit2,\"\\,,)",
                               "line=", "3", "samp=", "3"
                              };
 

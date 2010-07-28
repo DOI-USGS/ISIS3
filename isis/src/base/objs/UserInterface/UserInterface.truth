@@ -19,10 +19,21 @@ FROM:    dog
 TO:      biscuit,bread
 GUI:     0
 
+Testing Common Array Argument
+FROM:    dog
+TO:      
+ >> 'dog'
+ >> 'cat'
+ >> ' cow '
+ >> 'frog'
+
+GUI:     0
+
 Testing Complicated Array Argument
 FROM:    dog
 TO:      
- >> biscuit,
+ >> biscuit\
+ >> 
  >> bread,
  >> ,b,\,iscuit2,,
  >> 

@@ -102,6 +102,8 @@ namespace Isis {
    *  @history 2010-05-28 Steven Lambright - History fails silently now
    *  @history 2010-07-20 Steven Lambright - Array format on the command line is
    *           more tolerant to white space now.
+   *  @history 2010-07-28 Steven Lambright - Fixed complicated escape sequence
+   *           cases on array format parsing that have existed for a while now
    *  @todo 2005-02-22 Jeff Anderson - add coded and implementation examples to
    *                                   class documentation
    *
