@@ -46,7 +46,8 @@ namespace Isis {
    *
    * @param argv[] Array of arguments
    */
-  UserInterface::UserInterface(const std::string &xmlfile, int &argc, char *argv[]) :
+  UserInterface::UserInterface(const std::string &xmlfile, int &argc,
+                               char *argv[]) :
     IsisAml::IsisAml(xmlfile) {
     p_interactive = false;
     p_info = false;
@@ -113,12 +114,12 @@ namespace Isis {
     }
 
     p_cmdline.clear();
-    for(int i = 0; i < argc; i++) {
+    for(int i = 0; i < argc; i ++) {
       p_cmdline.push_back(argv[i]);
     }
 
     // Check for special tokens (those beginning with a dash)
-    vector<string> options;
+    vector< string > options;
     options.push_back("-GUI");
     options.push_back("-NOGUI");
     options.push_back("-BATCHLIST");
@@ -137,32 +138,55 @@ namespace Isis {
 
     bool usedDashLast = false;
 
-    for(unsigned int currArgument = 1; currArgument < (unsigned)argc; currArgument ++) {
+    // Use an initial pass to find conflicting parameters
+    for(unsigned int currArgument = 1; currArgument < (unsigned) argc; currArgument ++) {
       string paramName;
-      vector<string> paramValue;
+      vector< string > paramValue;
+
+      GetNextParameter(currArgument, paramName, paramValue);
+
+      paramName = ((iString) paramName).UpCase();
+
+      // -LAST needs to be evaluated first to prevent incorrect errors from IsisAml
+      if(paramName == "-LAST") {
+        EvaluateOption(paramName, "");
+        break;
+      }
+    }
+
+    for(unsigned int currArgument = 1; currArgument < (unsigned) argc; currArgument ++) {
+      string paramName;
+      vector< string > paramValue;
 
       GetNextParameter(currArgument, paramName, paramValue);
 
       // we now have a name,value pair
       if(paramName[0] == '-') {
-        paramName = ((iString)paramName).UpCase();
+        paramName = ((iString) paramName).UpCase();
+
+        // Prevent double handling of conflicting parameters handled in first pass
+        if(paramName == "-LAST") {
+          continue;
+        }
 
         if(paramValue.size() > 1) {
-          string msg = "Invalid value for reserve parameter [" +
-                       paramName + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          string msg = "Invalid value for reserve parameter ["
+                       + paramName + "]";
+          throw iException::Message(iException::User, msg,
+                                    _FILEINFO_);
         }
 
         // We have an option (not a parameter)...
         int matchOption = -1;
 
-        for(int option = 0; option < (int)options.size(); option++) {
+        for(int option = 0; option < (int) options.size(); option ++) {
           // If our option starts with the parameter name so far, this is it
           if(options[option].find(paramName) == 0) {
             if(matchOption >= 0) {
-              string msg = "Ambiguous Reserve Parameter [" +
-                           paramName + "]. Please clarify.";
-              throw iException::Message(iException::User, msg, _FILEINFO_);
+              string msg = "Ambiguous Reserve Parameter ["
+                           + paramName + "]. Please clarify.";
+              throw iException::Message(iException::User, msg,
+                                        _FILEINFO_);
             }
 
             matchOption = option;
@@ -170,11 +194,11 @@ namespace Isis {
         }
 
         if(matchOption < 0) {
-          string msg = "Invalid Reserve Parameter Option [" +
-                       paramName + "]. Choices are ";
+          string msg = "Invalid Reserve Parameter Option ["
+                       + paramName + "]. Choices are ";
 
           iString msgOptions;
-          for(int option = 0; option < (int)options.size() - 1; option++) {
+          for(int option = 0; option < (int) options.size() - 1; option ++) {
             // Make sure not to show -PID as an option
             if(options[option].compare("-PID") != 0) {
               continue;
@@ -189,7 +213,8 @@ namespace Isis {
 
           msg += " [" + msgOptions + "]";
 
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw iException::Message(iException::User, msg,
+                                    _FILEINFO_);
         }
 
         paramName = options[matchOption];
@@ -200,7 +225,8 @@ namespace Isis {
 
         iString realValue = "";
 
-        if(paramValue.size()) realValue = paramValue[0];
+        if(paramValue.size())
+          realValue = paramValue[0];
 
         EvaluateOption(paramName, realValue);
         continue;
@@ -211,26 +237,30 @@ namespace Isis {
         PutAsString(paramName, paramValue);
       }
       catch(Isis::iException &e) {
-        throw Isis::iException::Message(Isis::iException::User, "Invalid command line", _FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::User,
+                                        "Invalid command line", _FILEINFO_);
       }
     }
 
     // Can't use the batchlist with the gui, save, last or restore option
     if(BatchListSize() != 0 && (p_interactive || usedDashLast
                                 || p_saveFile != "")) {
-      string msg = "-BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, ";
+      string msg =
+        "-BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, ";
       msg += "or -LAST";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::System, msg,
+                                      _FILEINFO_);
     }
 
     // Must use batchlist if using errorlist or onerror=continue
     if((BatchListSize() == 0) && (!p_abortOnError || p_errList != "")) {
-      string msg = "-ERRLIST and -ONERROR=continue cannot be used without ";
+      string msg =
+        "-ERRLIST and -ONERROR=continue cannot be used without ";
       msg += " the -BATCHLIST option";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::System, msg,
+                                      _FILEINFO_);
     }
   }
-
 
   /**
    * This gets the next parameter in the list of arguments. curPos will be changed
@@ -241,8 +271,8 @@ namespace Isis {
    * @param name Resulting parameter name
    * @param value Resulting array of parameter values (usually just 1 element)
    */
-  void UserInterface::GetNextParameter(unsigned int &curPos, std::string &name,
-                                       std::vector<std::string> &value) {
+  void UserInterface::GetNextParameter(unsigned int &curPos,
+                                       std::string &name, std::vector< std::string > &value) {
     iString paramName = p_cmdline[curPos];
     iString paramValue = "";
 
@@ -254,8 +284,8 @@ namespace Isis {
       //   the next argument is not an equals sign by
       //   itself
       if(curPos < p_cmdline.size() - 2) {
-        if(string(p_cmdline[curPos+1]).compare("=") == 0) {
-          paramValue = p_cmdline[curPos+2];
+        if(string(p_cmdline[curPos + 1]).compare("=") == 0) {
+          paramValue = p_cmdline[curPos + 2];
 
           // increment extra to skip 2 elements next time around
           curPos += 2;
@@ -267,22 +297,25 @@ namespace Isis {
       paramName = paramName.substr(0, paramName.size() - 1);
 
       if(curPos + 1 < p_cmdline.size()) {
-        paramValue = p_cmdline[curPos+1];
+        paramValue = p_cmdline[curPos + 1];
       }
 
       // increment extra to skip next element next time around
-      curPos ++;
+      curPos ++ ;
     }
     // we found "=" in the middle
     else if(paramName.find("=") != 0) {
       string parameterLiteral = p_cmdline[curPos];
-      paramName = parameterLiteral.substr(0, parameterLiteral.find("="));
-      paramValue = parameterLiteral.substr(parameterLiteral.find("=") + 1);
+      paramName
+      = parameterLiteral.substr(0, parameterLiteral.find("="));
+      paramValue = parameterLiteral.substr(parameterLiteral.find("=")
+                                           + 1);
     }
     // We found "=" at the beginning - did we find "appname param =value" ?
     else {
       // parameters can not start with "="
-      string msg = "Unknown parameter [" + string(p_cmdline[curPos]) + "]";
+      string msg = "Unknown parameter [" + string(p_cmdline[curPos])
+                   + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -297,11 +330,13 @@ namespace Isis {
       //  an open paren, undo their escape
 
       // escape: \( result: (
-      if(paramValue.length() > 1 && paramValue.substr(0, 2).compare("\\(") == 0) {
+      if(paramValue.length() > 1 && paramValue.substr(0, 2).compare(
+            "\\(") == 0) {
         paramValue = paramValue.substr(1);
       }
       // escape: \\( result: \(
-      else if(paramValue.length() > 2 && paramValue.substr(0, 4).compare("\\\\(") == 0) {
+      else if(paramValue.length() > 2
+              && paramValue.substr(0, 4).compare("\\\\(") == 0) {
         paramValue = paramValue.substr(1);
       }
 
@@ -313,7 +348,6 @@ namespace Isis {
     }
   }
 
-
   /**
    * This interprets an array value from the command line.
    *
@@ -322,8 +356,8 @@ namespace Isis {
    *
    * @return std::vector<std::string> Values in the array string
    */
-  std::vector<std::string> UserInterface::ReadArray(iString arrayString) {
-    std::vector<std::string> values;
+  std::vector< std::string > UserInterface::ReadArray(iString arrayString) {
+    std::vector< std::string > values;
 
     bool inDoubleQuotes = false;
     bool inSingleQuotes = false;
@@ -331,11 +365,12 @@ namespace Isis {
     bool nextElementStarted = false;
     iString currElement = "";
 
-    for(unsigned int strPos = 0; strPos < arrayString.size(); strPos++) {
+    for(unsigned int strPos = 0; strPos < arrayString.size(); strPos ++) {
       if(strPos == 0) {
         if(arrayString[strPos] != '(') {
           string msg = "Invalid array format [" + arrayString + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw iException::Message(iException::User, msg,
+                                    _FILEINFO_);
         }
 
         continue;
@@ -357,7 +392,8 @@ namespace Isis {
       if(!inDoubleQuotes && !inSingleQuotes) {
         if(arrayClosed) {
           string msg = "Invalid array format [" + arrayString + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw iException::Message(iException::User, msg,
+                                    _FILEINFO_);
         }
 
         nextElementStarted = (nextElementStarted || arrayString[strPos] != ' ');
@@ -431,14 +467,14 @@ namespace Isis {
     return values;
   }
 
-
   /**
    * This interprets the "-" options for reserved parameters
    *
    * @param name "-OPTIONNAME"
    * @param value Value of the option, if supplied (-name=value)
    */
-  void UserInterface::EvaluateOption(const std::string name, const std::string value) {
+  void UserInterface::EvaluateOption(const std::string name,
+                                     const std::string value) {
     Preference &p = Preference::Preferences();
 
     if(name == "-GUI") {
@@ -452,7 +488,8 @@ namespace Isis {
     }
     else if(name == "-LAST") {
       PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
-      iString histFile = grp["HistoryPath"][0] + "/" + Filename(p_progName).Name() + ".par";
+      iString histFile = grp["HistoryPath"][0] + "/" + Filename(
+                           p_progName).Name() + ".par";
 
       LoadHistory(histFile);
     }
@@ -460,10 +497,12 @@ namespace Isis {
       LoadHistory(value);
     }
     else if(name == "-WEBHELP") {
-      Isis::PvlGroup &pref = Isis::Preference::Preferences().FindGroup("UserInterface");
+      Isis::PvlGroup &pref = Isis::Preference::Preferences().FindGroup(
+                               "UserInterface");
       string command = pref["GuiHelpBrowser"];
       command += " $ISISROOT/doc/Application/presentation/Tabbed/";
-      command += Filename(p_progName).Name() + "/" + Filename(p_progName).Name() + ".html";
+      command += Filename(p_progName).Name() + "/" + Filename(
+                   p_progName).Name() + ".html";
       Isis::System(command);
       exit(0);
     }
@@ -479,17 +518,20 @@ namespace Isis {
       if(value.size() == 0) {
         Pvl params;
         params.SetTerminator("");
-        for(int k = 0; k < NumGroups(); k++) {
-          for(int j = 0; j < NumParams(k); j++) {
+        for(int k = 0; k < NumGroups(); k ++) {
+          for(int j = 0; j < NumParams(k); j ++) {
             if(ParamListSize(k, j) == 0) {
-              params += PvlKeyword(ParamName(k, j), ParamDefault(k, j));
+              params += PvlKeyword(ParamName(k, j),
+                                   ParamDefault(k, j));
             }
             else {
               PvlKeyword key(ParamName(k, j));
               string def = ParamDefault(k, j);
-              for(int l = 0; l < ParamListSize(k, j); l++) {
-                if(ParamListValue(k, j, l) == def) key.AddValue("*" + def);
-                else key.AddValue(ParamListValue(k, j, l));
+              for(int l = 0; l < ParamListSize(k, j); l ++) {
+                if(ParamListValue(k, j, l) == def)
+                  key.AddValue("*" + def);
+                else
+                  key.AddValue(ParamListValue(k, j, l));
               }
               params += key;
             }
@@ -501,81 +543,93 @@ namespace Isis {
         Pvl param;
         param.SetTerminator("");
         string key = value;
-        for(int k = 0; k < NumGroups(); k++) {
-          for(int j = 0; j < NumParams(k); j++) {
+        for(int k = 0; k < NumGroups(); k ++) {
+          for(int j = 0; j < NumParams(k); j ++) {
             if(ParamName(k, j) == key) {
               param += PvlKeyword("ParameterName", key);
               param += PvlKeyword("Brief", ParamBrief(k, j));
               param += PvlKeyword("Type", ParamType(k, j));
               if(PixelType(k, j) != "") {
-                param += PvlKeyword("PixelType", PixelType(k, j));
+                param += PvlKeyword("PixelType", PixelType(k,
+                                    j));
               }
               if(ParamInternalDefault(k, j) != "") {
                 param += PvlKeyword("InternalDefault",
                                     ParamInternalDefault(k, j));
               }
-              else param += PvlKeyword("Default", ParamDefault(k, j));
+              else
+                param += PvlKeyword("Default", ParamDefault(
+                                      k, j));
               if(ParamMinimum(k, j) != "") {
                 if(ParamMinimumInclusive(k, j) == "YES") {
-                  param += PvlKeyword("GreaterThanOrEqual", ParamMinimum(k, j));
+                  param += PvlKeyword("GreaterThanOrEqual",
+                                      ParamMinimum(k, j));
                 }
                 else {
-                  param += PvlKeyword("GreaterThan", ParamMinimum(k, j));
+                  param += PvlKeyword("GreaterThan",
+                                      ParamMinimum(k, j));
                 }
               }
               if(ParamMaximum(k, j) != "") {
                 if(ParamMaximumInclusive(k, j) == "YES") {
-                  param += PvlKeyword("LessThanOrEqual", ParamMaximum(k, j));
+                  param += PvlKeyword("LessThanOrEqual",
+                                      ParamMaximum(k, j));
                 }
                 else {
-                  param += PvlKeyword("LessThan", ParamMaximum(k, j));
+                  param += PvlKeyword("LessThan",
+                                      ParamMaximum(k, j));
                 }
               }
               if(ParamLessThanSize(k, j) > 0) {
                 PvlKeyword key("LessThan");
-                for(int l = 0; l < ParamLessThanSize(k, j); l++) {
+                for(int l = 0; l < ParamLessThanSize(k, j); l ++) {
                   key.AddValue(ParamLessThan(k, j, l));
                 }
                 param += key;
               }
               if(ParamLessThanOrEqualSize(k, j) > 0) {
                 PvlKeyword key("LessThanOrEqual");
-                for(int l = 0; l < ParamLessThanOrEqualSize(k, j); l++) {
-                  key.AddValue(ParamLessThanOrEqual(k, j, l));
+                for(int l = 0; l < ParamLessThanOrEqualSize(
+                      k, j); l ++) {
+                  key.AddValue(
+                    ParamLessThanOrEqual(k, j, l));
                 }
                 param += key;
               }
               if(ParamNotEqualSize(k, j) > 0) {
                 PvlKeyword key("NotEqual");
-                for(int l = 0; l < ParamNotEqualSize(k, j); l++) {
+                for(int l = 0; l < ParamNotEqualSize(k, j); l ++) {
                   key.AddValue(ParamNotEqual(k, j, l));
                 }
                 param += key;
               }
               if(ParamGreaterThanSize(k, j) > 0) {
                 PvlKeyword key("GreaterThan");
-                for(int l = 0; l < ParamGreaterThanSize(k, j); l++) {
+                for(int l = 0; l
+                    < ParamGreaterThanSize(k, j); l ++) {
                   key.AddValue(ParamGreaterThan(k, j, l));
                 }
                 param += key;
               }
               if(ParamGreaterThanOrEqualSize(k, j) > 0) {
                 PvlKeyword key("GreaterThanOrEqual");
-                for(int l = 0; l < ParamGreaterThanOrEqualSize(k, j); l++) {
-                  key.AddValue(ParamGreaterThanOrEqual(k, j, l));
+                for(int l = 0; l
+                    < ParamGreaterThanOrEqualSize(k, j); l ++) {
+                  key.AddValue(ParamGreaterThanOrEqual(k,
+                                                       j, l));
                 }
                 param += key;
               }
               if(ParamIncludeSize(k, j) > 0) {
                 PvlKeyword key("Inclusions");
-                for(int l = 0; l < ParamIncludeSize(k, j); l++) {
+                for(int l = 0; l < ParamIncludeSize(k, j); l ++) {
                   key.AddValue(ParamInclude(k, j, l));
                 }
                 param += key;
               }
               if(ParamExcludeSize(k, j) > 0) {
                 PvlKeyword key("Exclusions");
-                for(int l = 0; l < ParamExcludeSize(k, j); l++) {
+                for(int l = 0; l < ParamExcludeSize(k, j); l ++) {
                   key.AddValue(ParamExclude(k, j, l));
                 }
                 param += key;
@@ -584,20 +638,25 @@ namespace Isis {
                 param += PvlKeyword("Odd", ParamOdd(k, j));
               }
               if(ParamListSize(k, j) != 0) {
-                for(int l = 0; l < ParamListSize(k, j); l++) {
+                for(int l = 0; l < ParamListSize(k, j); l ++) {
                   PvlGroup grp(ParamListValue(k, j, l));
-                  grp += PvlKeyword("Brief", ParamListBrief(k, j, l));
+                  grp += PvlKeyword("Brief", ParamListBrief(
+                                      k, j, l));
                   if(ParamListIncludeSize(k, j, l) != 0) {
                     PvlKeyword include("Inclusions");
-                    for(int m = 0; m < ParamListIncludeSize(k, j, l); m++) {
-                      include.AddValue(ParamListInclude(k, j, l, m));
+                    for(int m = 0; m
+                        < ParamListIncludeSize(k, j, l); m ++) {
+                      include.AddValue(ParamListInclude(
+                                         k, j, l, m));
                     }
                     grp += include;
                   }
                   if(ParamListExcludeSize(k, j, l) != 0) {
                     PvlKeyword exclude("Exclusions");
-                    for(int m = 0; m < ParamListExcludeSize(k, j, l); m++) {
-                      exclude.AddValue(ParamListExclude(k, j, l, m));
+                    for(int m = 0; m
+                        < ParamListExcludeSize(k, j, l); m ++) {
+                      exclude.AddValue(ParamListExclude(
+                                         k, j, l, m));
                     }
                     grp += exclude;
                   }
@@ -636,9 +695,12 @@ namespace Isis {
       }
 
       else {
-        string msg = "[" + value +
-                     "] is an invalid value for -ONERROR, options are ABORT or CONTINUE";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        string
+        msg =
+          "[" + value
+          + "] is an invalid value for -ONERROR, options are ABORT or CONTINUE";
+        throw Isis::iException::Message(Isis::iException::User, msg,
+                                        _FILEINFO_);
       }
     }
     else if(name == "-SAVE") {
@@ -668,10 +730,10 @@ namespace Isis {
     // Can't have a parent id and the gui
     if(p_parentId > 0 && p_interactive) {
       string msg = "-GUI and -PID are incompatible arguments";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw Isis::iException::Message(Isis::iException::System, msg,
+                                      _FILEINFO_);
     }
   }
-
 
   /**
    * Loads the user entered batchlist file into a private variable for later use
@@ -679,9 +741,9 @@ namespace Isis {
    * @param file The batchlist file to load
    *
    *  @history 2010-03-26 Sharmila Prasad - Remove the restriction of the number of
-  *           columns in the batchlist file to 10.
-    * @throws Isis::iException::User - The batchlist does not contain any data
-    */
+   *           columns in the batchlist file to 10.
+   * @throws Isis::iException::User - The batchlist does not contain any data
+   */
   void UserInterface::LoadBatchList(const std::string file) {
     // Read in the batch list
     TextFile temp;
@@ -689,13 +751,14 @@ namespace Isis {
       temp.Open(file);
     }
     catch(iException &e) {
-      string msg = "The batchlist file [" + file + "] could not be opened";
+      string msg = "The batchlist file [" + file
+                   + "] could not be opened";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_batchList.resize(temp.LineCount());
 
-    for(int i = 0; i < temp.LineCount(); i++) {
+    for(int i = 0; i < temp.LineCount(); i ++) {
       iString t;
       temp.GetLine(t);
 
@@ -705,10 +768,10 @@ namespace Isis {
       t.Compress();
       t.Trim(" ");
       // Allow " ," " , " or ", " as a valid single seperator
-      t.Replace(" ," , "," , true);
-      t.Replace(", " , "," , true);
+      t.Replace(" ,", ",", true);
+      t.Replace(", ", ",", true);
       // Convert all spaces to "," the use "," as delimiter
-      t.Replace(" ", "," , true);
+      t.Replace(" ", ",", true);
       int j = 0;
       iString token = t.Token(",");
 
@@ -717,23 +780,25 @@ namespace Isis {
         token = token.Remove("\"'");
         p_batchList[i].push_back(token);
         token = t.Token(",");
-        j++;
+        j ++ ;
       }
       p_batchList[i].resize(j);
       // Every row in the batchlist must have the same number of columns
-      if(i == 0) continue;
-      if(p_batchList[i-1].size() != p_batchList[i].size()) {
-        string msg = "The number of columns must be constant in batchlist";
+      if(i == 0)
+        continue;
+      if(p_batchList[i - 1].size() != p_batchList[i].size()) {
+        string msg =
+          "The number of columns must be constant in batchlist";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
     // The batchlist cannot be empty
     if(p_batchList.size() < 1) {
-      string msg = "The list file [" + file + "] does not contain any data";
+      string msg = "The list file [" + file
+                   + "] does not contain any data";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
-
 
   /**
    * Loads the previous history for the program
@@ -755,7 +820,7 @@ namespace Isis {
         int g = lab.Groups() - 1;
         if(g >= 0 && lab.Group(g).IsNamed("UserParameters")) {
           Isis::PvlGroup &up = lab.Group(g);
-          for(int k = 0; k < up.Keywords(); k++) {
+          for(int k = 0; k < up.Keywords(); k ++) {
             string keyword = up[k].Name();
 
             vector<string> values;
@@ -769,13 +834,13 @@ namespace Isis {
           return;
         }
 
-        for(int o = lab.Objects() - 1; o >= 0; o--) {
+        for(int o = lab.Objects() - 1; o >= 0; o --) {
           if(lab.Object(o).IsNamed(ProgramName())) {
             Isis::PvlObject &obj = lab.Object(o);
-            for(int g = obj.Groups() - 1; g >= 0; g--) {
+            for(int g = obj.Groups() - 1; g >= 0; g --) {
               Isis::PvlGroup &up = obj.Group(g);
               if(up.IsNamed("UserParameters")) {
-                for(int k = 0; k < up.Keywords(); k++) {
+                for(int k = 0; k < up.Keywords(); k ++) {
                   string keyword = up[k].Name();
                   string value = up[k][0];
                   PutAsString(keyword, value);
@@ -786,20 +851,21 @@ namespace Isis {
           }
         }
 
-        string msg = "[" + hist.Expanded() +
-                     "] does not contain any parameters to restore";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        /*string msg = "[" + hist.Expanded() +
+         "] does not contain any parameters to restore";
+         throw Isis::iException::Message( Isis::iException::User, msg, _FILEINFO_ );*/
       }
       catch(...) {
-        string msg = "A corrupt parameter history file [" + file +
-                     "] has been detected. Please fix or remove this file";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        string msg = "A corrupt parameter history file [" + file
+                     + "] has been detected. Please fix or remove this file";
+        throw Isis::iException::Message(Isis::iException::User, msg,
+                                        _FILEINFO_);
       }
     }
     else {
-      string msg = "Parameter history file [" + file +
-                   "] does not exist";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      string msg = "Parameter history file [" + file + "] does not exist";
+      throw Isis::iException::Message(Isis::iException::User, msg,
+                                      _FILEINFO_);
     }
   }
 
@@ -812,13 +878,16 @@ namespace Isis {
     // If history recording is off, return
     Preference &p = Preference::Preferences();
     PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
-    if(grp["HistoryRecording"][0] == "Off") return;
+    if(grp["HistoryRecording"][0] == "Off")
+      return;
 
     // Get the current history file
-    Isis::Filename histFile(grp["HistoryPath"][0] + "/" + ProgramName() + ".par");
+    Isis::Filename histFile(grp["HistoryPath"][0] + "/" + ProgramName()
+                            + ".par");
 
     // If a save file is specified, override the default file path
-    if(p_saveFile != "") histFile = p_saveFile;
+    if(p_saveFile != "")
+      histFile = p_saveFile;
 
     // Get the current command line
     Isis::Pvl cmdLine;
@@ -842,7 +911,7 @@ namespace Isis {
     hist.AddGroup(cmdLine.FindGroup("UserParameters"));
 
     // See if we have exceeded history length
-    while(hist.Groups() > (int)grp["HistoryLength"][0]) {
+    while(hist.Groups() > (int) grp["HistoryLength"][0]) {
       hist.DeleteGroup("UserParameters");
     }
 
@@ -864,8 +933,8 @@ namespace Isis {
    */
   void UserInterface::SetBatchList(int i) {
     //Clear all parameters currently in the gui
-    for(int k = 0; k < NumGroups(); k++) {
-      for(int j = 0; j < NumParams(k); j++) {
+    for(int k = 0; k < NumGroups(); k ++) {
+      for(int j = 0; j < NumParams(k); j ++) {
         Clear(ParamName(k, j));
       }
     }
@@ -873,14 +942,15 @@ namespace Isis {
     //Load the new parameters into the gui
     cout << p_progName << " ";
 
-    for(unsigned int currArgument = 1; currArgument < p_cmdline.size(); currArgument++) {
+    for(unsigned int currArgument = 1; currArgument < p_cmdline.size(); currArgument ++) {
       string paramName;
-      vector<string> paramValue;
+      vector< string > paramValue;
 
       try {
         GetNextParameter(currArgument, paramName, paramValue);
 
-        if(paramName[0] == '-') continue;
+        if(paramName[0] == '-')
+          continue;
 
         for(unsigned int value = 0; value < paramValue.size(); value ++) {
           iString thisValue = paramValue[value];
@@ -890,19 +960,22 @@ namespace Isis {
 
           while(thisValue != "") {
             newValue += token;
-            int j = iString(thisValue.substr(0, 1)).ToInteger() - 1;
+            int j = iString(thisValue.substr(0, 1)).ToInteger()
+                    - 1;
             newValue += p_batchList[i][j];
             thisValue.replace(0, 1, "");
             token = thisValue.Token("$");
           }
 
-          if(token != "") newValue += token;
+          if(token != "")
+            newValue += token;
 
           paramValue[value] = newValue;
         }
       }
       catch(Isis::iException &e) {
-        throw Isis::iException::Message(Isis::iException::User, "Invalid command line", _FILEINFO_);
+        throw Isis::iException::Message(Isis::iException::User,
+                                        "Invalid command line", _FILEINFO_);
       }
 
       PutAsString(paramName, paramValue);
@@ -916,7 +989,8 @@ namespace Isis {
         cout << "=(";
 
         for(unsigned int value = 0; value < paramValue.size(); value ++) {
-          if(value != 0) cout << ",";
+          if(value != 0)
+            cout << ",";
 
           cout << paramValue[value] << endl;
         }
@@ -944,12 +1018,15 @@ namespace Isis {
       os.open(fileName.c_str(), std::ios::app);
 
       if(!os.good()) {
-        string msg = "Unable to create error list [" + p_errList +
-                     "] Disk may be full or directory permissions not writeable";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        string
+        msg =
+          "Unable to create error list [" + p_errList
+          + "] Disk may be full or directory permissions not writeable";
+        throw Isis::iException::Message(Isis::iException::User, msg,
+                                        _FILEINFO_);
       }
 
-      for(int j = 0; j < (int)p_batchList[i].size(); j++) {
+      for(int j = 0; j < (int) p_batchList[i].size(); j ++) {
         os << p_batchList[i][j] << " ";
       }
 

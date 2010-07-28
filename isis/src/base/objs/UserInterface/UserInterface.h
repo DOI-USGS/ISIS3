@@ -104,6 +104,8 @@ namespace Isis {
    *           more tolerant to white space now.
    *  @history 2010-07-28 Steven Lambright - Fixed complicated escape sequence
    *           cases on array format parsing that have existed for a while now
+   *  @history 2010-07-28 Christopher Austin - Fixed a -LAST issue causing IsisAml
+   *                                           to throw an incorrect exception.
    *  @todo 2005-02-22 Jeff Anderson - add coded and implementation examples to
    *                                   class documentation
    *
