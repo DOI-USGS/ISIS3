@@ -1,0 +1,21 @@
+Group = VOYAGER_1/NARROW_ANGLE_CAMERA
+  Version = 1
+  Library = VoyagerCamera
+  Routine = VoyagerCameraPlugin
+EndGroup
+Group = VOYAGER_1/WIDE_ANGLE_CAMERA
+  Version = 1
+  Library = VoyagerCamera
+  Routine = VoyagerCameraPlugin
+EndGroup
+Group = VOYAGER_2/NARROW_ANGLE_CAMERA 
+  Version = 1
+  Library = VoyagerCamera
+  Routine = VoyagerCameraPlugin
+EndGroup
+Group = VOYAGER_2/WIDE_ANGLE_CAMERA 
+  Version = 1
+  Library = VoyagerCamera
+  Routine = VoyagerCameraPlugin
+EndGroup
+
