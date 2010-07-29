@@ -138,6 +138,22 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Add needed keywords that are not in the translation table
   PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
 
+  // Add Camera_State_1 and Camera_State_2
+  // Camera_State_1 is the first number in ScanModeId
+  // Camera_State_2 is from ShutterModeId and is 1 or 0, it is only 1 if
+  // it is WA and BSIMAN or BOTSIM
+  PvlKeyword sModeId = inst["ScanModeId"];
+  string cs1 = sModeId[0].Token(":");
+  inst.AddKeyword(PvlKeyword("Camera_State_1",cs1));
+
+  string shutterMode = inst["ShutterModeId"];
+  string cam = inst["InstrumentId"];
+  if (cam == "WIDE_ANGLE_CAMERA" && (shutterMode == "BOTSIM" || shutterMode == "BSIMAN")) {
+    inst.AddKeyword(PvlKeyword("Camera_State_2","1"));
+  }
+  else {
+    inst.AddKeyword(PvlKeyword("Camera_State_2","0"));
+  }
 
   // Add units of measurement to keywords from translation table
   double exposureDuration = inst.FindKeyword("ExposureDuration");
@@ -155,16 +171,16 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
       kern += PvlKeyword("NaifFrameCode", spacecraftCode);
       instId = "issna";
     }
-    else { //if (instId == "WIDE_ANGLE_CAMERA") {
+    else if (instId == "WIDE_ANGLE_CAMERA") {
       spacecraftCode = -31102;
       kern += PvlKeyword("NaifFrameCode", spacecraftCode);
       instId = "isswa";
     }
-    //else {
-    //  string msg = "Instrument ID [" + instId + "] does not match Narrow or" +
-    //               "Wide angle camera";
-    //  iException::Message(iException::User, msg, _FILEINFO_);
-    //}
+    else {
+      string msg = "Instrument ID [" + instId + "] does not match Narrow or" +
+                   "Wide angle camera";
+      iException::Message(iException::User, msg, _FILEINFO_);
+    }
   }
   else if((string) inst.FindKeyword("SpacecraftName") == "VOYAGER_2") {
     spacecraftNumber = "2";
@@ -173,22 +189,22 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
       kern += PvlKeyword("NaifFrameCode", spacecraftCode);
       instId = "issna";
     }
-    else { //if (instId == "WIDE_ANGLE_CAMERA") {
+    else if (instId == "WIDE_ANGLE_CAMERA") {
       spacecraftCode = -32102;
       kern += PvlKeyword("NaifFrameCode", spacecraftCode);
       instId = "isswa";
     }
-    //else {
-    //  string msg = "Instrument ID [" + instId + "] does not match Narrow or" +
-    //               "Wide angle camera";
-    //  iException::Message(iException::User, msg, _FILEINFO_);
-    //}
+    else {
+      string msg = "Instrument ID [" + instId + "] does not match Narrow or" +
+                   "Wide angle camera";
+      iException::Message(iException::User, msg, _FILEINFO_);
+    }
   }
-  //else {
-  //  string msg = "Spacecraft name [" + (string)inst.FindKeyword("SpacecraftName") +
-  //               "] does not match Voyager1 or Voyager2 spacecraft";
-  //  iException::Message(iException::User, msg, _FILEINFO_);
-  //}
+  else {
+    string msg = "Spacecraft name [" + (string)inst.FindKeyword("SpacecraftName") +
+                 "] does not match Voyager1 or Voyager2 spacecraft";
+    iException::Message(iException::User, msg, _FILEINFO_);
+  }
   ocube->PutGroup(kern);
 
   // Modify time to remove Z from end

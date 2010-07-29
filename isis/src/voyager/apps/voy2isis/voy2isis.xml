@@ -34,6 +34,9 @@
     <change name="Steven Lambright" date="2010-06-17">
       Updated to make input IMQ's PVL labels parsable by our PVL classes
     </change>
+    <change name="Mackenzie Boyd" date="2010-07-29">
+      Added keywords Camera_State_1 and Camera_State_2.
+    </change>
   </history>
 
   <category>
