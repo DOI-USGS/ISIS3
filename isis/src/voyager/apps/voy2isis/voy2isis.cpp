@@ -144,15 +144,15 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // it is WA and BSIMAN or BOTSIM
   PvlKeyword sModeId = inst["ScanModeId"];
   string cs1 = sModeId[0].Token(":");
-  inst.AddKeyword(PvlKeyword("Camera_State_1",cs1));
+  inst.AddKeyword(PvlKeyword("CameraState1",cs1));
 
   string shutterMode = inst["ShutterModeId"];
   string cam = inst["InstrumentId"];
   if (cam == "WIDE_ANGLE_CAMERA" && (shutterMode == "BOTSIM" || shutterMode == "BSIMAN")) {
-    inst.AddKeyword(PvlKeyword("Camera_State_2","1"));
+    inst.AddKeyword(PvlKeyword("CameraState2","1"));
   }
   else {
-    inst.AddKeyword(PvlKeyword("Camera_State_2","0"));
+    inst.AddKeyword(PvlKeyword("CameraState2","0"));
   }
 
   // Add units of measurement to keywords from translation table
