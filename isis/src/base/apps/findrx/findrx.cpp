@@ -67,7 +67,8 @@ void IsisMain() {
     (*white)[0] = Isis::Hrs;
   }
 
-  double percent = ar->PatternValidPercent();
+  double patternValidPercent = ar->PatternValidPercent();
+  double subsearchValidPercent = ar->SubsearchValidPercent();
 
   // And the loop...
   for(int res = 0; res < nres; ++res) {
@@ -77,11 +78,20 @@ void IsisMain() {
     ar->PatternChip()->Load(pattern, 0, 1.0, res + 1);
     int type = iString(reseaus["Type"][res]);
     // If the reseaus is in the center (type 5) use full percent value
-    if(type == 5) ar->SetPatternValidPercent(percent);
+    if(type == 5) {
+      ar->SetPatternValidPercent(patternValidPercent);
+      ar->SetSubsearchValidPercent(subsearchValidPercent);
+    }
     // else if the reseaus is on an edge (type 2,4,6, or 8) use half percent value
-    else if(type % 2 == 0) ar->SetPatternValidPercent(percent / 2.0);
+    else if(type % 2 == 0) {
+      ar->SetPatternValidPercent(patternValidPercent / 2.0);
+      ar->SetSubsearchValidPercent(subsearchValidPercent / 2.0);
+    }
     // else the reseaus on a corner (type 1,3,7, or 9) use a quarter percent value
-    else ar->SetPatternValidPercent(percent / 4.0);
+    else {
+      ar->SetPatternValidPercent(patternValidPercent / 4.0);
+      ar->SetSubsearchValidPercent(subsearchValidPercent / 4.0);
+    }
     if(ar->Register() == AutoReg::Success) {
       reseaus["Sample"][res] = ar->CubeSample();
       reseaus["Line"][res] = ar->CubeLine();

@@ -38,6 +38,9 @@
     <change name="Steven Lambright" date="2008-06-23">
         Updated to properly check AutoReg::Register()'s return status
     </change>
+    <change name="Jeannie Walldren" date="2010-08-02">
+        Updated to use new SearchChip SubchipValidPercent value from the template.
+    </change>
   </history>
 
   <groups>
