@@ -1,5 +1,5 @@
-#ifndef FramingCamera_h
-#define FramingCamera_h
+#ifndef PUSHFRAMECAMERA_H
+#define PUSHFRAMECAMERA_H
 /**
  * @file
  * $Revision: 1.1 $
@@ -35,16 +35,24 @@ namespace Isis {
    * This class is used to abstract out push frame camera functionality from
    * children classes.
    *
+   * @ingroup SpiceInstrumentsAndCameras
    * @author 2009-08-26 Steven Lambright
    *
    * @internal
    *   @todo Implement more functionality in this class and abstract away from the children
+   *   @history 2010-08-04 Jeannie Walldren - Fixed the \#ifndef identifier to
+   *                          define PushFrameCamera_h.  Updated documentation.
    */
 
   class PushFrameCamera : public Camera {
     public:
       PushFrameCamera(Isis::Pvl &lab);
 
+      /** 
+       * Returns the PushFrame type of camera, as enumerated in the Camera 
+       * class. 
+       * @return @b CameraType PushFrame camera type.
+       */
       virtual CameraType GetCameraType() const {
         return PushFrame;
       }
