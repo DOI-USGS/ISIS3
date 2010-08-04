@@ -1,3 +1,5 @@
+#ifndef AutoReg_h
+#define AutoReg_h
 /**
  * @file
  * $Revision: 1.27 $
@@ -20,8 +22,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef AutoReg_h
-#define AutoReg_h
 
 
 #include <string>
@@ -29,8 +29,9 @@
 
 #include "Chip.h"
 #include "Statistics.h"
-//#include "AutoRegItem.h"
 
+
+using namespace std;
 namespace Isis {
   /**
    * @brief Auto Registration class
@@ -144,6 +145,7 @@ namespace Isis {
    *    @history 2010-07-20 Jeannie Walldren - Added ability to set a valid
    *             percentage for the search chip's subchip. Updated documentation
    *             and unitTest.
+   *    @history 2010-08-04 Jeannie Walldren - Updated documentation.
    *
    */
   class Pvl;
@@ -163,16 +165,16 @@ namespace Isis {
        */
       enum RegisterStatus {
         Success, //!< Success
-        PatternChipNotEnoughValidData, //!< Not enough valid data in pattern chip
-        FitChipNoData, //!< Fit chip did not have any valid data
-        FitChipToleranceNotMet, //!< Goodness of fit tolerance not satisfied
-        SurfaceModelNotEnoughValidData, //!< Not enough points to fit a surface model for sub-pixel accuracy
-        SurfaceModelSolutionInvalid, //!< Could not model surface for sub-pixel accuracy
-        SurfaceModelDistanceInvalid, //!< Surface model moves registration more than one pixel
-        PatternZScoreNotMet, //!< Pattern data max or min does not pass the z-score test
+        PatternChipNotEnoughValidData,       //!< Not enough valid data in pattern chip
+        FitChipNoData,                       //!< Fit chip did not have any valid data
+        FitChipToleranceNotMet,              //!< Goodness of fit tolerance not satisfied
+        SurfaceModelNotEnoughValidData,      //!< Not enough points to fit a surface model for sub-pixel accuracy
+        SurfaceModelSolutionInvalid,         //!< Could not model surface for sub-pixel accuracy
+        SurfaceModelDistanceInvalid,         //!< Surface model moves registration more than one pixel
+        PatternZScoreNotMet,                 //!< Pattern data max or min does not pass the z-score test
         SurfaceModelEccentricityRatioNotMet, //!< Ellipse eccentricity of the surface model not satisfied
         SurfaceModelResidualToleranceNotMet, //!< Average residual of the surface model not satisfied
-        AdaptiveAlgorithmFailed  //!< Error occured in Adaptive algorithm
+        AdaptiveAlgorithmFailed              //!< Error occured in Adaptive algorithm
       };
 
       //! Return pointer to pattern chip
@@ -218,7 +220,12 @@ namespace Isis {
       void SetSurfaceModelResidualTolerance(double residualTolerance);
 
       /**
-       * Determine if eccentricity tests should be performed during registration
+       * Determine if eccentricity tests should be performed during 
+       * registration. 
+       *  
+       * If this method is not called, eccentricity testing defaults to test = 
+       * false in the AutoReg object constructor. 
+       * 
        * @param test Indicates whether to perform test
        */
       inline void SetEccentricityTesting(bool test) {
@@ -226,14 +233,18 @@ namespace Isis {
       };
 
       /**
-       * Determine  if residual tests should be performed during registration
+       * Determine  if residual tests should be performed during registration 
+       *  
+       * If this method is not called, residual testing defaults to test = 
+       * false in the AutoReg object constructor. 
+       *  
        * @param test Indicates whether to perform test
        */
       inline void SetResidualTesting(bool test) {
         p_testResidual = test;
       };
 
-      //! Return pattern chip valid percent
+      //! Return pattern chip valid percent.  The default value is 
       double PatternValidPercent() const {
         return p_patternValidPercent;
       };
@@ -355,7 +366,7 @@ namespace Isis {
        *
        * @return std::string
        */
-      virtual std::string AlgorithmName() const = 0;
+      virtual string AlgorithmName() const = 0;
 
       PvlGroup RegTemplate();
 
@@ -363,7 +374,6 @@ namespace Isis {
       /**
        * Sets the search chip subpixel sample that matches the pattern
        * tack sample.
-       *
        *
        * @param sample Value to set for search chip subpixel sample
        */
@@ -392,18 +402,18 @@ namespace Isis {
       };
 
       virtual AutoReg::RegisterStatus AdaptiveRegistration(Chip &sChip,
-          Chip &pChip,
-          Chip &fChip,
-          int startSamp,
-          int startLine,
-          int endSamp,
-          int endLine,
-          int bestSamp,
-          int bestLine);
+                                                           Chip &pChip,
+                                                           Chip &fChip,
+                                                           int startSamp,
+                                                           int startLine,
+                                                           int endSamp,
+                                                           int endLine,
+                                                           int bestSamp,
+                                                           int bestLine);
       void Parse(Pvl &pvl);
       virtual bool CompareFits(double fit1, double fit2);
-      bool ModelSurface(std::vector<double> &x, std::vector<double> &y,
-                        std::vector<double> &z);
+      bool ModelSurface(vector<double> &x, vector<double> &y,
+                        vector<double> &z);
       Chip Reduce(Chip &chip, int reductionFactor);
 
       /**
@@ -422,14 +432,14 @@ namespace Isis {
        *  ranging from -1 to 1.
        *
        *
-       * @param pattern
-       * @param subsearch
+       * @param pattern Pattern chip to match against
+       * @param subsearch Subchip of the search chip to match with
        *
        * @return double
        */
       virtual double MatchAlgorithm(Chip &pattern, Chip &subsearch) = 0;
 
-      PvlObject p_template; //!<AutoRegistration object that created this projection
+      PvlObject p_template; //!< AutoRegistration object that created this projection
 
       /**
        * @brief Provide (adaptive) algorithms a chance to report results
@@ -451,7 +461,13 @@ namespace Isis {
        * @param original AutoReg object
        */
       AutoReg(const AutoReg &original) {};
-      void Match(Chip &sChip, Chip &pChip, Chip &fChip, int startSamp, int endSamp, int startLine, int endLine);
+      void Match(Chip &sChip, 
+                 Chip &pChip, 
+                 Chip &fChip, 
+                 int startSamp, 
+                 int endSamp, 
+                 int startLine, 
+                 int endLine);
       bool ComputeChipZScore(Chip &chip);
       void Init();
 

@@ -1,3 +1,21 @@
+/**
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include "AutoReg.h"
 #include "Chip.h"
 #include "Filename.h"
@@ -10,11 +28,49 @@
 #include "PolynomialBivariate.h"
 #include "Pvl.h"
 
+using namespace std;
 namespace Isis {
   /**
    * Create AutoReg object.  Because this is a pure virtual class you can
    * not create an AutoReg class directly.  Instead, see the AutoRegFactory
-   * class.
+   * class.  The default settings include: 
+   * <ul> 
+   *   <li> PatternChip
+   *     <ul>
+   *       <li>Samples = 3
+   *       <li>Lines = 3
+   *       <li>ValidPercent = 50.0
+   *       <li>MinimumZScore = 1.0
+   *     </ul>
+   *   <li> SearchChip
+   *     <ul>
+   *       <li>Samples = 5
+   *       <li>Lines = 5
+   *       <li>SubchipValidPercent = 50.0
+   *     </ul>
+   *   <li> FitChip
+   *     <ul>
+   *       <li>Samples = 5
+   *       <li>Lines = 5
+   *     </ul>
+   *  <li> Algorithm
+   *     <ul>
+   *       <li>Tolerance = Isis::Null
+   *       <li>SubpixelAccuracy = True
+   *       <li>ReductionFactor = 1
+   *     </ul>
+   *  <li> SurfaceModel
+   *     <ul>
+   *       <li>DistanceTolerance = 1.5
+   *       <li>WindowSize = 5
+   *       <li>EccentricityTesting = False
+   *       <li>EccentricityRatio = 2 (2:1)
+   *       <li>ResidualTesting = False
+   *       <li>ResidualTolerance = 0.1
+   *     </ul>
+   * </ul> 
+   * The reduced chips are initially set to the same size as their corresponding 
+   * chips in the constructor. 
    *
    * @param pvl  A pvl object containing a valid AutoReg specification
    *
@@ -161,11 +217,11 @@ namespace Isis {
       PvlGroup &algo = pvl.FindGroup("Algorithm", Pvl::Traverse);
       SetTolerance(algo["Tolerance"]);
       if(algo.HasKeyword("ChipInterpolator")) {
-        SetChipInterpolator((std::string)algo["ChipInterpolator"]);
+        SetChipInterpolator((string)algo["ChipInterpolator"]);
       }
 
       if(algo.HasKeyword("SubpixelAccuracy")) {
-        SetSubPixelAccuracy((std::string)algo["SubpixelAccuracy"] == "True");
+        SetSubPixelAccuracy((string)algo["SubpixelAccuracy"] == "True");
       }
 
       if(algo.HasKeyword("ReductionFactor")) {
@@ -202,6 +258,7 @@ namespace Isis {
         SetSubsearchValidPercent((double)schip["SubchipValidPercent"]);
       }
 
+
       // Setup surface model
       PvlObject ar = pvl.FindObject("AutoRegistration");
       if(ar.HasGroup("SurfaceModel")) {
@@ -229,7 +286,7 @@ namespace Isis {
 
     }
     catch(iException &e) {
-      std::string msg = "Improper format for AutoReg PVL [" + pvl.Filename() + "]";
+      string msg = "Improper format for AutoReg PVL [" + pvl.Filename() + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     return;
@@ -238,7 +295,10 @@ namespace Isis {
   /**
    * If the sub-pixel accuracy is enabled, the Register() method will attempt to
    * match the pattern chip to the search chip at sub-pixel accuracy, otherwise it
-   * will be registered at whole pixel accuracy.
+   * will be registered at whole pixel accuracy. 
+   *  
+   * If this method is not called, the sub pixel accuracy defaults to on = true 
+   * in the AutoReg object constructor. 
    *
    * @param on Set the state of registration accuracy.  The
    *           default is sub-pixel accuracy is on
@@ -260,15 +320,19 @@ namespace Isis {
    * apply to all reduced patterns.  Additionally, the pattern sampling
    * effects the pixel count.  For example if pattern sampling is 50% then
    * only 220 pixels in the 21x21 pattern are considered so 165 must be
-   * valid.
-   *
+   * valid. 
+   *  
+   * If this method is not called, the PatternChip ValidPercent defaults to 50 
+   * in the AutoReg object constructor. 
+   *  
+   * @see SetValidRange() 
    * @param percent   Percentage of valid data between 0 and 100,
    *                  default is 50% if never invoked
    * @throw iException::User - "Invalid value for PatternChip ValidPercent." 
    */
   void AutoReg::SetPatternValidPercent(const double percent) {
     if((percent <= 0.0) || (percent > 100.0)) {
-      std::string msg = "Invalid value for PatternChip ValidPercent [" 
+      string msg = "Invalid value for PatternChip ValidPercent [" 
         + iString(percent) 
         + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
       throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -279,6 +343,10 @@ namespace Isis {
 
   /**
    * Set the amount of data in the search chip's subchip that must be valid. 
+   *  
+   * 
+   * If this method is not called, the SearchChip SubchipValidPercent defaults 
+   * to 50 in the AutoReg object constructor. 
    *
    *
    * @param percent   Percentage of valid data between 0 and 100,
@@ -292,7 +360,7 @@ namespace Isis {
    */
   void AutoReg::SetSubsearchValidPercent(const double percent) {
     if((percent <= 0.0) || (percent > 100.0)) {
-      std::string msg = "Invalid value for SearchChip SubchipValidPercent [" 
+      string msg = "Invalid value for SearchChip SubchipValidPercent [" 
         + iString(percent) + "]"
         + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
       throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -307,7 +375,11 @@ namespace Isis {
    * deviation). If the minimum or maximum pixel value in the
    * pattern chip does not meet the minimum zscore value (see a
    * statisitcs book for definition of zscore) then invalid
-   * registration will occur.
+   * registration will occur. 
+   *  
+   * 
+   * If this method is not called, the z-score minimum defaults to 1.0 in the 
+   * AutoReg object constructor. 
    *
    * @param minimum The minimum zscore value for the pattern chip.
    *                 Default is 1.0
@@ -315,7 +387,7 @@ namespace Isis {
    */
   void AutoReg::SetPatternZScoreMinimum(double minimum) {
     if(minimum <= 0.0) {
-      std::string msg = "Invalid value for PatternChip MinimumZScore ["
+      string msg = "Invalid value for PatternChip MinimumZScore ["
         + iString(minimum)
         + "].  Must be greater than 0.0. (Default is 1.0).";
       throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -325,7 +397,11 @@ namespace Isis {
 
 
   /**
-   * Set the tolerance for an acceptable goodness of fit
+   * Set the tolerance for an acceptable goodness of fit 
+   *  
+   * 
+   * If this method is not called, the tolerance value defaults to Isis::Null in
+   * the AutoReg object constructor. 
    *
    * @param tolerance   This tolerance is used to test against the goodness
    *                    of fit returned by the MatchAlgorith method after
@@ -344,7 +420,10 @@ namespace Isis {
    *   <LI>BiLinearType</LI>
    *   <LI>CubicConvolutionType</LI>
    * </UL>
-   *
+   *  
+   * If this method is not called, the chip interpolator type defaults to 
+   * CubicConvolutionType in the Chip class. 
+   *  
    * @param interpolator Name of interpolator type to be used.  This is taken from
    *                     the Pvl's ChipInterpolator keyword value.
    * @throw iException::User - "Invalid Interpolator type." 
@@ -383,15 +462,18 @@ namespace Isis {
    * Set the surface model window size. The pixels in this window
    * will be used to fit a surface model in order to compute
    * sub-pixel accuracy.  In some cases the default (3x3) and
-   * produces erroneous sub-pixel accuracy values.
-   *
-   * @param size The size of the window must be three or greater
+   * produces erroneous sub-pixel accuracy values. 
+   *  
+   * If this method is not called, the window size defaults to 5 in the AutoReg 
+   * object constructor. 
+   *  
+   *  @param size The size of the window must be three or greater
    *             and odd.
    * @throw iException::User - "Invalid value for SurfaceModel WindowSize." 
    */
   void AutoReg::SetSurfaceModelWindowSize(int size) {
     if(size % 2 != 1 || size < 3) {
-      std::string msg = "Invalid value for SurfaceModel WindowSize ["
+      string msg = "Invalid value for SurfaceModel WindowSize ["
         + iString(size) + "].  Must be an odd number greater than or equal to 3";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -403,7 +485,10 @@ namespace Isis {
    * A 1:1 ratio represents a perfect circle.  Allowing the user
    * to set this ratio lets them determine which points to throw
    * out if the surface model gets too elliptical.
-   *
+   *  
+   * If this method is not called, the eccentricity ratio defaults to 2:1 in the
+   * AutoReg object constructor. 
+   * 
    * @param eccentricityRatio Eccentricity ratio.  Must be greater than or equal
    *                          to 1.
    * @throw iException::User - "Invalid value for SurfaceModel 
@@ -411,7 +496,7 @@ namespace Isis {
                                                                                */
   void AutoReg::SetSurfaceModelEccentricityRatio(double eccentricityRatio) {
     if(eccentricityRatio < 1) {
-      std::string msg = "Invalid value for SurfaceModel EccentricityRatio [" 
+      string msg = "Invalid value for SurfaceModel EccentricityRatio [" 
         + iString(eccentricityRatio) + "].  Must greater than or equal to 1.0.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -428,13 +513,16 @@ namespace Isis {
    * by summing the absolute values of all the residuals (computed
    * z minus actual z) and dividing by the number of residuals.
    *
+   * If this method is not called, the residual tolerance defaults to 0.1 in the 
+   * AutoReg object constructor. 
+   *  
    * @param residualTolerance Residual tolerance.  Must be greater than 0.
    * @throw iException::User - "Invalid value for SurfaceModel 
    *        ResidualTolerance."
    */
   void AutoReg::SetSurfaceModelResidualTolerance(double residualTolerance) {
     if(residualTolerance < 0) {
-      std::string msg = "Invalid value for SurfaceModel ResidualTolerance [" 
+      string msg = "Invalid value for SurfaceModel ResidualTolerance [" 
         + iString(residualTolerance) + "].  Must greater than or equal to 0.0.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -445,6 +533,9 @@ namespace Isis {
    * Set a distance the surface model solution is allowed to move
    * away from the best whole pixel fit in the fit chip.
    *
+   * If this method is not called, the distance tolerance defaults to 1.5 in the 
+   * AutoReg object constructor. 
+   *  
    * @param distance The distance allowed to move in pixels.  Must
    *                 be greater than 0.
    * @throw iException::User - "Invalid value for SurfaceModel 
@@ -452,7 +543,7 @@ namespace Isis {
    */
   void AutoReg::SetSurfaceModelDistanceTolerance(double distance) {
     if(distance <= 0.0) {
-      std::string msg = "Invalid value for SurfaceModel DistanceTolerance [" 
+      string msg = "Invalid value for SurfaceModel DistanceTolerance [" 
         + iString(distance) + "].  Must greater than 0.0.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -464,12 +555,15 @@ namespace Isis {
    * Set the reduction factor used to speed up the pattern
    * matching algorithm.
    *
+   * If this method is not called, the reduction factor defaults to 1 in the 
+   * AutoReg object constructor. 
+   *  
    * @param factor Reduction factor.  Must be greater than or equal to 1.
    * @throw iException::User - "Invalid value for Algorithm ReductionFactor." 
    */
   void AutoReg::SetReductionFactor(int factor) {
     if(factor < 1) {
-      std::string msg = "Invalid value for Algorithm ReductionFactor ["
+      string msg = "Invalid value for Algorithm ReductionFactor ["
         + iString(factor) + "].  Must greater than or equal to 1.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -540,7 +634,7 @@ namespace Isis {
     int N = p_windowSize / 2 + 1;
 
     if(p_searchChip.Samples() < p_patternChip.Samples() + N) {
-      std::string msg = "Search chips samples [";
+      string msg = "Search chips samples [";
       msg += iString(p_searchChip.Samples()) + "] must be at ";
       msg += "least [" + iString(N) + "] pixels wider than the pattern chip samples [";
       msg += iString(p_patternChip.Samples()) + "] for successful surface modeling";
@@ -548,7 +642,7 @@ namespace Isis {
     }
 
     if(p_searchChip.Lines() < p_patternChip.Lines() + N) {
-      std::string msg = "Search chips lines [";
+      string msg = "Search chips lines [";
       msg += iString(p_searchChip.Lines()) + "] must be at ";
       msg += "least [" + iString(N) + "] pixels taller than the pattern chip lines [";
       msg += iString(p_patternChip.Lines()) + "] for successful surface modeling";
@@ -586,7 +680,7 @@ namespace Isis {
     // we won't produce a chip of a bad size.
     // ----------------------------------------------------------------------
     if(p_patternChip.Samples() / p_reduceFactor < 2 || p_patternChip.Lines() / p_reduceFactor < 2) {
-      std::string msg = "Reduction factor is too large";
+      string msg = "Reduction factor is too large";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -722,7 +816,7 @@ namespace Isis {
 
     // Try to fit a model for sub-pixel accuracy if necessary
     if(p_subpixelAccuracy && !IsIdeal(p_bestFit)) {
-      std::vector<double> samps, lines, fits;
+      vector<double> samps, lines, fits;
       for(int line = p_bestLine - p_windowSize / 2; line <= p_bestLine + p_windowSize / 2; line++) {
         if(line < 1) continue;
         if(line > p_fitChip.Lines()) continue;
@@ -836,7 +930,7 @@ namespace Isis {
   void AutoReg::Match(Chip &sChip, Chip &pChip, Chip &fChip, int startSamp, int endSamp, int startLine, int endLine) {
     // Sanity check.  Should have been caught by the two previous tests
     if(startSamp == endSamp && startLine == endLine) {
-      std::string msg = "StartSample [" + iString(startSamp) + "] = EndSample ["
+      string msg = "StartSample [" + iString(startSamp) + "] = EndSample ["
         + iString(endSamp) + "] and StartLine [" + iString(startLine) + " = EndLine ["
         + iString(endLine) + "].";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -859,6 +953,7 @@ namespace Isis {
         // Extract the subsearch chip and make sure it has enough valid data
         sChip.Extract(samp, line, subsearch);
 
+//        if(!subsearch.IsValid(p_patternValidPercent)) continue;
         if(!subsearch.IsValid(p_subsearchValidPercent)) continue;
 
         // Try to match the two subchips
@@ -902,13 +997,13 @@ namespace Isis {
    * @return @b bool  Indicates whether the surface model solution is valid
    *           with residual tolerance and eccentricity ratio is met.
    */
-  bool AutoReg::ModelSurface(std::vector<double> &x,
-                             std::vector<double> &y,
-                             std::vector<double> &z) {
+  bool AutoReg::ModelSurface(vector<double> &x,
+                             vector<double> &y,
+                             vector<double> &z) {
     PolynomialBivariate p(2);
     LeastSquares lsq(p);
     for(int i = 0; i < (int)x.size(); i++) {
-      std::vector<double> xy;
+      vector<double> xy;
       xy.push_back(x[i]);
       xy.push_back(y[i]);
       lsq.AddKnown(xy, z[i]);
@@ -1047,7 +1142,7 @@ namespace Isis {
     // Compute our chip position to sub-pixel accuracy
     p_chipSample = (c * e - 2.0 * b * f) / det;
     p_chipLine   = (b * e - 2.0 * c * d) / det;
-    std::vector<double> temp;
+    vector<double> temp;
     temp.push_back(p_chipSample);
     temp.push_back(p_chipLine);
     p_goodnessOfFit = lsq.Evaluate(temp);
@@ -1199,7 +1294,7 @@ namespace Isis {
       int endLine,
       int bestSamp,
       int bestLine) {
-    std::string msg = "Programmer needs to write their own virtual AdaptiveRegistration method";
+    string msg = "Programmer needs to write their own virtual AdaptiveRegistration method";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     return Success;
   }
