@@ -98,6 +98,7 @@ namespace Isis {
     return false;
   }
 
+
   /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
    *
    * This method will compute the undistorted focal plane coordinate for
@@ -114,6 +115,27 @@ namespace Isis {
   bool CameraGroundMap::GetXY(const double lat, const double lon, const double radius,
                               double *cudx, double *cudy) {
 
+    // Compute the look vector in body-fixed coordinates
+    double pB[3]; // Point on surface
+    latrec_c(radius / 1000.0, lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
+    return GetXY (pB, cudx, cudy);
+  }
+
+  /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
+   *
+   * This method will compute the undistorted focal plane coordinate for
+   * a ground position, using the current Spice settings (time and kernels)
+   * without resetting the current point values for lat/lon/radius/p_pB/x/y.  The
+   * class value for p_look is set by this method.
+   *
+   * @param lat planetocentric latitude in degrees
+   * @param lon planetocentric longitude in degrees
+   * @param radius local radius in m
+   *
+   * @return conversion was successful
+   */
+  bool CameraGroundMap::GetXY(const double pB[3], double *cudx, double *cudy) {
+
     // Check for Sky images
     if(p_camera->IsSky()) {
       return false;
@@ -122,8 +144,8 @@ namespace Isis {
     // Should a check be added to make sure SetImage has been called???
 
     // Compute the look vector in body-fixed coordinates
-    double pB[3]; // Point on surface
-    latrec_c(radius / 1000.0, lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
+//    double pB[3]; // Point on surface
+//    latrec_c(radius / 1000.0, lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
 
     // Get spacecraft vector in body-fixed coordinates
     SpiceRotation *bodyRot = p_camera->BodyRotation();
