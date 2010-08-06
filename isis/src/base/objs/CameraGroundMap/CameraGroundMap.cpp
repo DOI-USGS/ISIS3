@@ -22,6 +22,7 @@
  */
 #include "CameraGroundMap.h"
 #include "NaifStatus.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
   CameraGroundMap::CameraGroundMap(Camera *parent) {
@@ -116,9 +117,13 @@ namespace Isis {
                               double *cudx, double *cudy) {
 
     // Compute the look vector in body-fixed coordinates
-    double pB[3]; // Point on surface
-    latrec_c(radius / 1000.0, lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
-    return GetXY (pB, cudx, cudy);
+    SurfacePoint point;
+    SurfacePoint::Ocentric oc={lat, lon, radius};
+//    double pB[3]; // Point on surface
+//    latrec_c(radius / 1000.0, lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
+    point.SetOcentricPoint ( oc );
+    SurfacePoint::Rectangular rect = point.RectangularPoint();
+    return GetXY (rect, cudx, cudy);
   }
 
   /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
@@ -134,7 +139,12 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool CameraGroundMap::GetXY(const double pB[3], double *cudx, double *cudy) {
+  bool CameraGroundMap::GetXY(const SurfacePoint::Rectangular rect, double *cudx, double *cudy) {
+
+    double pB[3];
+    pB[0] = rect.x;
+    pB[1] = rect.y;
+    pB[2] = rect.z;
 
     // Check for Sky images
     if(p_camera->IsSky()) {

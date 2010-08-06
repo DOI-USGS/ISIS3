@@ -27,6 +27,7 @@
 #include "Camera.h"
 #include "CameraDistortionMap.h"
 #include "SpicePosition.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
   /** Convert between undistorted focal plane and ground coordinates
@@ -80,7 +81,7 @@ namespace Isis {
       virtual bool SetGround(const double lat, const double lon, const double radius);
       bool GetXY(const double lat, const double lon, const double radius,
                          double *cudx, double *cudy);
-      virtual bool GetXY(const double pB[3], double *cudx, double *cudy);
+      virtual bool GetXY(const SurfacePoint::Rectangular rect, double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
                                    double *cudx, double *cudy);
       virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType, int coefIndex,
