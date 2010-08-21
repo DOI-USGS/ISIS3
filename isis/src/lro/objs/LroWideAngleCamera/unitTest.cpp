@@ -16,14 +16,28 @@ int main(void) {
   cout << "Unit Test for LroWideAngleCamera..." << endl;
 
   try {
+
+    // Support different camera model versions thusly...
+    Isis::Pvl p("$lro/testData/wacCameraTest.cub");
+    int cmVersion = Isis::CameraFactory::CameraVersion(p);
+
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -70.69638475050628;
-    double knownLon =  244.3314992195277;
+    double knownLat, knownLon;
+
+    if (cmVersion == 1) {
+     knownLat = -70.69638475050628;
+     knownLon =  244.3314992195277;
+     p.Read("$lro/testData/wacCameraTest.cub.cv1");
+    }
+    else {
+      // Version 2 difference caused by new CK and comprehensive IK kernel support
+      knownLat = -70.69638837731182;
+      knownLon = 244.3314994958043;
+    }
 
 
-    Isis::Pvl p("$lro/testData/wacCameraTest.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
     cout << setprecision(9);
 

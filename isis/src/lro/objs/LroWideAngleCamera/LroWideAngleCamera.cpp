@@ -7,6 +7,7 @@
 #include "PushFrameCameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "LroWideAngleCameraDistortionMap.h"
+#include "CollectorMap.h"
 
 using namespace std;
 
@@ -69,94 +70,50 @@ namespace Isis {
         ostringstream mess;
         mess << "Number bands in (file) label (" << nbands
              << ") do not match number of values in BandBin/Center keyword ("
-             << filtNames.Size() << ") - required for band-dependant geoemtry";
+             << filtNames.Size() << ") - required for band-dependent geoemtry";
         throw iException::Message(iException::User, mess.str(), _FILEINFO_);
       }
 
+      // Is the data flipped?
+      bool dataflipped = (inst["DataFlipped"][0].UpCase() == "YES");
+
       //  Now create detector offsets
-      std::map<int, int> filterToDetectorOffset;
+      iString instCode = "INS" + iString((int) NaifIkCode());
+      iString ikernKey = instCode + "_FILTER_BANDCENTER";
+      std::vector<int> fbc = GetVector(ikernKey);
+      ikernKey = instCode + "_FILTER_OFFSET";
+      std::vector<int> foffset = GetVector(ikernKey);
 
-      filterToDetectorOffset.insert(std::pair<int, int>(315, 244));
-      filterToDetectorOffset.insert(std::pair<int, int>(321, 244));
 
-      filterToDetectorOffset.insert(std::pair<int, int>(360, 302));
+      // Create a map of filter wavelength to offset.  Also needs a reverse
+      // lookup to order the offset into the CCD (ascending sort provided
+      // automagically be CollectorMap).
+      CollectorMap<int, int> filterToDetectorOffset, wavel;
+      for(unsigned int i = 0 ; i < foffset.size() ; i++) {
+        filterToDetectorOffset.add(fbc[i], foffset[i]);
+        wavel.add(foffset[i], fbc[i]);
+      }
 
-      filterToDetectorOffset.insert(std::pair<int, int>(415, 702));
-
-      filterToDetectorOffset.insert(std::pair<int, int>(565, 727));
-      filterToDetectorOffset.insert(std::pair<int, int>(566, 727));
-
-      filterToDetectorOffset.insert(std::pair<int, int>(600, 753));
-      filterToDetectorOffset.insert(std::pair<int, int>(604, 753));
-
-      filterToDetectorOffset.insert(std::pair<int, int>(640, 780));
-      filterToDetectorOffset.insert(std::pair<int, int>(643, 780));
-
-      filterToDetectorOffset.insert(std::pair<int, int>(680, 805));
-      filterToDetectorOffset.insert(std::pair<int, int>(689, 805));
-
+      // Construct special format for framelet offsets into CCD.  Uses the above
+      // reverse map.  Need only get the value (wavelength) of the map as the
+      // key (offset) is sorted above.
       int frameletOffsetFactor = inst["ColorOffset"];
+      if(dataflipped) frameletOffsetFactor *= -1;
+      CollectorMap<int, int> filterToFrameletOffset;
+      for(int j = 0 ; j < wavel.size() ; j++) {
+        int wavelen = wavel.getNth(j);
+        filterToFrameletOffset.add(wavelen, j * frameletOffsetFactor);
+      }
 
-      if(inst["DataFlipped"][0].UpCase() == "YES")
-        frameletOffsetFactor *= -1;
-
-      std::map<int, int> filterToFrameletOffset;
-      // the UV order is based on position in the cube
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(321, 0 * frameletOffsetFactor)
-      );
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(315, 0 * frameletOffsetFactor)
-      );
-
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(360, 1 * frameletOffsetFactor)
-      );
-
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(415, 0 * frameletOffsetFactor));
-
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(566, 1 * frameletOffsetFactor)
-      );
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(565, 1 * frameletOffsetFactor)
-      );
-
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(604, 2 * frameletOffsetFactor)
-      );
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(600, 2 * frameletOffsetFactor)
-      );
-
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(643, 3 * frameletOffsetFactor)
-      );
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(640, 3 * frameletOffsetFactor)
-      );
-
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(689, 4 * frameletOffsetFactor)
-      );
-      filterToFrameletOffset.insert(
-        std::pair<int, int>(680, 4 * frameletOffsetFactor)
-      );
-
+      //  Now map the actual filter that exist in cube
       for(int i = 0; i < filtNames.Size(); i++) {
-        if(filterToDetectorOffset.find((int) filtNames[i]) ==
-            filterToDetectorOffset.end()) {
+        if(!filterToDetectorOffset.exists(filtNames[i])) {
           string msg = "Unrecognized filter name [" + filtNames[i] + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
 
-        p_detectorStartLines.push_back(
-          filterToDetectorOffset.find(filtNames[i])->second
-        );
-        p_frameletOffsets.push_back(
-          filterToFrameletOffset.find(filtNames[i])->second
-        );
+        p_detectorStartLines.push_back(filterToDetectorOffset.get(filtNames[i]));
+        p_frameletOffsets.push_back(filterToFrameletOffset.get(filtNames[i]));
       }
 
       // Setup detector map
@@ -166,12 +123,8 @@ namespace Isis {
       dmap->SetDetectorSampleSumming(sumMode);
       dmap->SetDetectorLineSumming(sumMode);
 
-      bool flippedFramelets = false;
-
-      // flipping disabled
-      if(iString((string) inst["DataFlipped"]).UpCase() == "YES")
-        flippedFramelets = true;
-
+      // flipping disabled if already flipped
+      bool flippedFramelets = dataflipped;
       dmap->SetFlippedFramelets(flippedFramelets, p_nframelets);
 
       // Setup focal plane map
@@ -183,83 +136,30 @@ namespace Isis {
 
       dmap->SetGeometricallyFlippedFramelets(false);
 
-      iString ikernKey;
-      ikernKey = "INS" + iString((int) NaifIkCode()) + "_BORESIGHT_SAMPLE";
+      ikernKey = instCode + "_BORESIGHT_SAMPLE";
       double sampleBoreSight = GetDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int) NaifIkCode()) + "_BORESIGHT_LINE";
+      ikernKey = instCode + "_BORESIGHT_LINE";
       double lineBoreSight = GetDouble(ikernKey);
 
-      if(instId == "WAC-UV") {
-        /**
-         * The detector origin sample is from
-         *   LRO Wide Angle Geometric Calibration
-         *   document by Peter Thomas and accounts
-         *   for the 8 pixels off the left side of
-         *   the detector and the 256 other ignored
-         *   pixels off the left side of the detector
-         *   which are not in the image.
-         */
-        detectorOriginSamp = sampleBoreSight - 8 - 256;
-        detectorOriginLine = lineBoreSight;
+      ikernKey = instCode + "_CCD_SAMPLE_OFFSET";
+      int ccdStartSamp = GetInteger(ikernKey);
+
+      //  get instrument-specific sample offset
+      iString instModeId = ((iString)(string) inst["InstrumentModeId"]).UpCase();
+      // For BW mode, add the mode (0,1 (non-polar) or 2,3 (polar)) used to
+      // acquire image 
+      if (instModeId == "BW") {
+        instModeId += inst["Mode"][0];
+        // There are no offsets for BW mode.. there can only be 1 filter
+        //   and there must be 1 filter.
+        p_frameletOffsets[0] = 0;
       }
-      else {
-        iString instModeId;
-        instModeId = ((iString)(string) inst["InstrumentModeId"]).UpCase();
+      ikernKey = instCode + "_" + instModeId + "_SAMPLE_OFFSET";
+      int sampOffset = GetInteger(ikernKey);
 
-        if(instModeId == "COLOR" || instModeId == "VIS") {
-          /**
-           * The detector origin sample is from
-           *   LRO Wide Angle Geometric Calibration
-           *   document by Peter Thomas and accounts
-           *   for the 8 pixels off the left side of
-           *   the detector and the 160 other ignored
-           *   pixels off the left side of the detector
-           *   which are not in the image.
-           */
-          detectorOriginSamp = sampleBoreSight - 8 - 160;
-          detectorOriginLine = lineBoreSight;
-        }
-        else if(instModeId == "BW") {
-
-          iString mode = ((iString)(string) inst["Mode"]).UpCase();
-
-          /**
-           * The detector origin sample is from
-           *   LRO Wide Angle Geometric Calibration
-           *   document by Peter Thomas and accounts
-           *   for the 8 pixels off the left side of
-           *   the detector.
-           */
-
-          // Mode 0 and 1 are not Polar (i.e. they are only 704 pixels wide)
-          if(mode == "0" || mode == "1") {
-            // The 160 other ignored pixels off the left side of the detector
-            //   which are not in the image. These numbers added to compensate
-            //   for the non-polar mode.
-            detectorOriginSamp = sampleBoreSight - 8 - 160;
-            detectorOriginLine = lineBoreSight;
-          }
-          // Mode 2 and 3 are Polar (i.e. they are 1024 pixels wide)
-          else if(mode == "2" || mode == "3") {
-            detectorOriginSamp = sampleBoreSight - 8;
-            detectorOriginLine = lineBoreSight;
-          }
-          else {
-            string msg = "Invalid value [" + mode + "] for keyword [Mode]";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
-          }
-
-          // There are no offsets for BW mode.. there can only be 1 filter
-          //   and there must be 1 filter.
-          p_frameletOffsets[0] = 0;
-        }
-        else {
-          string msg = "Invalid value [" + instModeId +
-                       "] for keyword [InstrumentModeId]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
-        }
-      }
+      detectorOriginSamp = sampleBoreSight - ccdStartSamp - sampOffset;
+      detectorOriginLine = lineBoreSight;
 
       FocalPlaneMap()->SetDetectorOrigin(detectorOriginSamp,
                                          detectorOriginLine);
@@ -309,6 +209,32 @@ namespace Isis {
       dmap->SetBandFirstDetectorLine(p_detectorStartLines[vband - 1]);
       dmap->SetFrameletOffset(p_frameletOffsets[vband - 1]);
     }
+
+    int LroWideAngleCamera::PoolKeySize(const std::string &key) const {
+      SpiceBoolean found;
+      SpiceInt n;
+      SpiceChar ctype[1];
+      dtpool_c(key.c_str(), &found, &n, ctype);
+      if(!found) n = 0;
+      return (n);
+    }
+
+    std::vector<int> LroWideAngleCamera::GetVector(const std::string &key) 
+                                                   const {
+      int nvals = PoolKeySize(key);
+      if(nvals <= 0) {
+        string mess = "Kernel pool keyword " + key + " not found!";
+        throw iException::Message(iException::Programmer, mess, _FILEINFO_);
+      }
+
+      std::vector<int> parms;
+      for(int i = 0 ; i < nvals ; i++) {
+        parms.push_back(GetInteger(key, i));
+      }
+
+      return (parms);
+    }
+
   }
 }
 

@@ -27,6 +27,13 @@ namespace Isis {
      *            valid band is selected in SetBand() method;  Rewrote the
      *            camera distortion model that also requires negative
      *            coefficients in IK kernel.
+     *   @history 2010-08-21 Kris Becker - Reworked the camera model to
+     *          utilize the contents of the IK, which is new. The LRO/LROC IK
+     *          lro_lroc_v14.ti and higher contain the appropriate parameters to
+     *          coincide with the code changes made here. IMPORTANT:  This
+     *          results in Version = 2 of the LroWideAngleCamera as depicted in
+     *          the Camera.plugin for both WAC-UV and WAC-VIS.
+     *  
      */
     class LroWideAngleCamera : public Isis::PushFrameCamera {
       public:
@@ -56,6 +63,9 @@ namespace Isis {
         int p_nframelets;                 //!<Number of framelets in whole image
         std::vector<int> p_detectorStartLines;
         std::vector<int> p_frameletOffsets;
+
+        int PoolKeySize(const std::string &key) const;
+        std::vector<int> GetVector(const std::string &key) const;
     };
   };
 };
