@@ -1,11 +1,11 @@
 Group = LUNAR_RECONNAISSANCE_ORBITER/NACL
-  Version = 1
+  Version = 2
   Library = LroNarrowAngleCamera
   Routine = LroNarrowAngleCameraPlugin
 EndGroup
 
 Group = LUNAR_RECONNAISSANCE_ORBITER/NACR
-  Version = 1
+  Version = 2
   Library = LroNarrowAngleCamera
   Routine = LroNarrowAngleCameraPlugin
 EndGroup

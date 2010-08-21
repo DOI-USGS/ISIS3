@@ -42,7 +42,7 @@ namespace Isis {
       p_focalPlaneX = dx;
       p_focalPlaneY = dy;
 
-      double dk1 = -p_odk[0];
+      double dk1 = p_odk[0];
 
       double den = 1 + dk1 * dy * dy;                 // r = dy*dy = distance from the focal plane center
       if(den == 0.0)
@@ -78,7 +78,7 @@ namespace Isis {
 
       bool bConverged = false;
 
-      double dk1 = -p_odk[0];
+      double dk1 = p_odk[0];
 
       // iterating to introduce distortion (in sample only)...
       // we stop when the difference between distorted coordinate

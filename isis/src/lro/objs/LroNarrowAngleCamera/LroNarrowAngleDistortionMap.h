@@ -19,7 +19,12 @@ namespace Isis {
      * @author 2009-07-03 Jacob Danton
      * @history 2010-05-10 Ken Edmundson - Corrected computation of distorted
      *          and undistorted locations
-     *
+     * @history 2010-08-21 Kris Becker - Changed the sign of the distortion 
+     *          parameter to match the calibration report.  The LRO/LROC IK
+     *          lro_lroc_v14.ti and above contain the appropriate parameters
+     *          to coincide with the code change made here.  IMPORTANT:  This
+     *          results in Version = 2 of the LroNarrowAngleCamera as depicted
+     *          in the Camera.plugin for both NAC-L and NAC-R.
      * @internal
      */
     class LroNarrowAngleDistortionMap : public CameraDistortionMap {
