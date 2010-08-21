@@ -19,19 +19,27 @@ int main(void) {
    */
 
   try {
+
+
+    // Support different camera model versions thusly...
+    Isis::Pvl p("$lro/testData/M111607830RE_crop.cub");
+    int cmVersion = Isis::CameraFactory::CameraVersion(p);
+
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-#if defined(Version_1)
-    double knownLat = -83.229473272165;
-    double knownLon = 353.93153626711;
-#else
-    double knownLat = -83.2598101446504;
-    double knownLon = 353.91934392144;
+    double knownLat, knownLon;
 
-#endif
+    if (cmVersion == 1) {
+      knownLat = -83.229473272165;
+      knownLon = 353.93153626711;
+      p.Read("$lro/testData/M111607830RE_crop.cub.cv1");
+    }
+    else {
+      knownLat = -83.2598101446504;
+      knownLon = 353.91934392144;
+    }
 
-    Isis::Pvl p("$lro/testData/M111607830RE_crop.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
     cout << setprecision(9);
 
