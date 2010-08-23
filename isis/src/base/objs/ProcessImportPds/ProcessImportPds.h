@@ -165,6 +165,8 @@ namespace Isis {
    *                          a valid Pvl
    *  @history 2009-12-18 Janet Barrett - Added capability to process JPEG2000
    *                          files with a detached PDS label
+   *  @history 2010-08-23 Steven Lambright - Non-numeric string values for
+   *                          PDS projection rotations are now supported.
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example

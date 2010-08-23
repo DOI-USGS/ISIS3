@@ -1052,8 +1052,15 @@ namespace Isis {
     str = pdsXlater.Translate("Scale");
     p_scaleFactor = str.ToDouble();
 
-    str = pdsXlater.Translate("Rotation");
-    p_rotation = str.ToDouble();
+    try {
+      str = pdsXlater.Translate("Rotation");
+      p_rotation = str.ToDouble();
+    }
+    catch(iException &e) {
+      // assume no rotation if the value isn't a number
+      p_rotation = 0.0;
+      e.Clear(); 
+    }
 
     //  Look for projection offsets/mults to convert between line/samp and x/y
     double xoff, yoff, xmult, ymult;
