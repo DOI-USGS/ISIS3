@@ -142,9 +142,6 @@ namespace Isis {
       ikernKey = instCode + "_BORESIGHT_LINE";
       double lineBoreSight = GetDouble(ikernKey);
 
-      ikernKey = instCode + "_CCD_SAMPLE_OFFSET";
-      int ccdStartSamp = GetInteger(ikernKey);
-
       //  get instrument-specific sample offset
       iString instModeId = ((iString)(string) inst["InstrumentModeId"]).UpCase();
       // For BW mode, add the mode (0,1 (non-polar) or 2,3 (polar)) used to
@@ -158,11 +155,12 @@ namespace Isis {
       ikernKey = instCode + "_" + instModeId + "_SAMPLE_OFFSET";
       int sampOffset = GetInteger(ikernKey);
 
-      detectorOriginSamp = sampleBoreSight - ccdStartSamp - sampOffset;
-      detectorOriginLine = lineBoreSight;
+      detectorOriginSamp = sampleBoreSight + 1;
+      detectorOriginLine = lineBoreSight + 1;
 
       FocalPlaneMap()->SetDetectorOrigin(detectorOriginSamp,
                                          detectorOriginLine);
+      dmap->SetStartingDetectorSample(sampOffset+1);
 
       // Setup distortion map
       new LroWideAngleCameraDistortionMap(this, NaifIkCode());
