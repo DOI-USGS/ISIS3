@@ -230,14 +230,9 @@ void IsisMain() {
     }
   }
 
-  // The minimum/maximum longitudes should be in order now. However, if the user entered a
-  // maximum that was lower than the minimum, or a minimum that was higher than the maximum this
-  // may still fail. Let it throw an error when we instantiate the projection.
-
   // Second, longitude domain
   if(userMappingGrp.HasKeyword("LongitudeDomain")) { // user set a new domain?
     if((int)userMappingGrp["LongitudeDomain"] != (int)fromMappingGrp["LongitudeDomain"]) { // new domain different?
-
       PvlGroup longitudes = inproj->MappingLongitudes();
 
       for(int index = 0; index < longitudes.Keywords(); index ++) {
@@ -278,6 +273,27 @@ void IsisMain() {
       }
 
     }
+  }
+
+  // Try a couple equivalent longitudes to fix the ordering of min,max for border cases
+  if ((double)outMappingGrp["MinimumLongitude"] >=
+      (double)outMappingGrp["MaximumLongitude"]) {
+
+    if ((string)outMappingGrp["MinimumLongitude"] == "180.0" && 
+        (int)userMappingGrp["LongitudeDomain"] == 180)
+      outMappingGrp["MinimumLongitude"] = "-180";
+
+    if ((string)outMappingGrp["MaximumLongitude"] == "-180.0" &&
+        (int)userMappingGrp["LongitudeDomain"] == 180)
+      outMappingGrp["MaximumLongitude"] = "180";
+
+    if ((string)outMappingGrp["MinimumLongitude"] == "360.0" &&
+        (int)userMappingGrp["LongitudeDomain"] == 360)
+      outMappingGrp["MinimumLongitude"] = "0";
+
+    if ((string)outMappingGrp["MaximumLongitude"] == "0.0" &&
+        (int)userMappingGrp["LongitudeDomain"] == 360)
+      outMappingGrp["MaximumLongitude"] = "360";
   }
 
   // If MinLon/MaxLon out of order, we weren't able to calculate the correct values

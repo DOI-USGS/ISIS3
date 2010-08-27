@@ -103,6 +103,9 @@
     <change name="Christopher Austin" date="2008-03-12">
       Added a default path as well as a helper function for the MAP parameter.
     </change>
+    <change name="Steven Lambright" date="2010-08-27">
+      Made automatic calculation of longitude range more likely to succeed
+    </change>
   </history>
 
   <oldName>
