@@ -167,6 +167,9 @@ namespace Isis {
    *                          files with a detached PDS label
    *  @history 2010-08-23 Steven Lambright - Non-numeric string values for
    *                          PDS projection rotations are now supported.
+   *  @history 2010-08-27 Steven Lambright - Longitude domain correction added 
+   *                          for center and pole longitude keywords in PDS
+   *                          projections
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example

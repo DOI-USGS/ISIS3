@@ -838,6 +838,22 @@ namespace Isis {
     lab.AddGroup(mapGroup);
     specificXlater.Auto(lab);
 
+    if(lab.FindGroup("Mapping").HasKeyword("CenterLongitude")) {
+      PvlKeyword &centerLon = lab.FindGroup("Mapping")["CenterLongitude"];
+      if(p_longitudeDomain == 180) 
+        centerLon = Projection::To180Domain((double)centerLon);
+      else
+        centerLon = Projection::To360Domain((double)centerLon);
+    }
+
+    if(lab.FindGroup("Mapping").HasKeyword("PoleLongitude")) {
+      PvlKeyword &poleLon = lab.FindGroup("Mapping")["PoleLongitude"];
+      if(p_longitudeDomain == 180) 
+        poleLon = Projection::To180Domain((double)poleLon);
+      else
+        poleLon = Projection::To360Domain((double)poleLon);
+    }
+
     OutputCubes[0]->PutGroup(lab.FindGroup("Mapping"));
   }
 
