@@ -1,6 +1,10 @@
 include $(ISISROOT)/make/isismake.macros
 
-TESTS = $(shell ls -d * | grep -v Makefile)
+.NOTPARALLEL:
+
+DIRONLY = $(subst /,,$(shell ls -d */))
+CVS := CVS
+TESTS = $(filter-out $(CVS), $(DIRONLY))
 
 #----------------------------------------------------------------------------
 # Target = help

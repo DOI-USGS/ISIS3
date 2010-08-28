@@ -1,7 +1,7 @@
-INCS = LeastSquares.h
-SRCS = LeastSquares.cpp
-OBJS = $(SRCS:%.cpp=%.o)
-
-XTRAINCDIRS += $(TNTINCDIR)
-
-include $(ISISROOT)/make/isismake.objs
+ifeq ($(ISISROOT), $(BLANK))
+.SILENT:
+error:
+	echo "Please set ISISROOT";
+else
+	include $(ISISROOT)/make/isismake.objs
+endif

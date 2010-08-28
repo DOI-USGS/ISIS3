@@ -4,6 +4,8 @@
 
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 # File extensions that valid file types to compare
 BINFILES =  jpg tif bin fits raw bmp png bc img imq
 PVLFILES =  pvl
@@ -398,36 +400,42 @@ force: ;
 # against a similiarly named file in the output directory.
 #----------------------------------------------------------------------------
 %.cub: force
-	if [ ! -f $(OUTPUT)/$@ ]; \
-	then \
-	  msg='$(FILENOTFOUND)'; \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	  $$msg >> casefailed.txt; \
-	else \
-	  tolerancestr=""; \
-	  ignorestr="";\
-	  if [ "$($@.TOLERANCE)" != "" ]; \
-	  then \
-	    tolerancestr="tolerance=$($@.TOLERANCE)"; \
-	  fi; \
-	  if [ "$($@.IGNORESPECIAL)" != "" ]; \
-	  then \
-	    ignorestr="ignorespecial=$($@.IGNORESPECIAL)"; \
-	  fi; \
-	  $(ISISROOT)/bin/cubediff from=$(TRUTH)/$@ \
-	          from2=$(OUTPUT)/$@ \
-	          to=compare.txt \
-		  $$tolerancestr  \
-		  $$ignorestr > /dev/null; \
-	  compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results keyword=Compare`; \
-	  command="";\
-	  if [ "$$compResult" = "DIFFERENT" ]; \
-	  then \
-	    msg='$(TESTFILEFAILED)'; \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	    $$msg >> casefailed.txt; \
-	  fi ; \
-	  $(RM) compare.txt; \
+	if [ ! -f $(OUTPUT)/$@ ];                               \
+	then                                                    \
+	  msg='$(FILENOTFOUND)';                                \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;            \
+	  $$msg >> casefailed.txt;                              \
+	else                                                    \
+	  tolerancestr="";                                      \
+	  ignorestr="";                                         \
+	  if [ "$($@.TOLERANCE)" != "" ];                       \
+	  then                                                  \
+	    tolerancestr="tolerance=$($@.TOLERANCE)";           \
+	  fi;                                                   \
+	  if [ "$($@.IGNORESPECIAL)" != "" ];                   \
+	  then                                                  \
+	    ignorestr="ignorespecial=$($@.IGNORESPECIAL)";      \
+	  fi;                                                   \
+	  msg='$(TESTFILEFAILED)';                              \
+	  $(ISISROOT)/bin/cubediff from=$(TRUTH)/$@             \
+	    from2=$(OUTPUT)/$@                                  \
+	    to=compare.txt                                      \
+	    $$tolerancestr                                      \
+	    $$ignorestr >& /dev/null;                           \
+	  if [ "$$?" == "0" ]; then                             \
+	    compResult=`$(ISISROOT)/bin/getkey from=compare.txt \
+	      grp=Results keyword=Compare`;                     \
+	    command="";                                         \
+	    if [ "$$compResult" = "DIFFERENT" ];                \
+	    then                                                \
+	      $(PRINTF) "$(BLANKS)  " >> casefailed.txt;        \
+	      $$msg >> casefailed.txt;                          \
+	    fi ;                                                \
+	    $(RM) compare.txt;                                  \
+	  else                                                  \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt;          \
+	    $$msg >> casefailed.txt;                            \
+	  fi;                                                   \
 	fi;
 
 #----------------------------------------------------------------------------
@@ -558,10 +566,15 @@ checkin:
 	    if [ "$$truthdir" != "" ]; \
 	    then \
 	      $(RM) -rf $(TESTDATA_PATH); \
-              $(MKDIR) -m775 $(TESTDATA_PATH); \
+	      oldMask=`umask -S`; \
+	      umask u=rwx,g=rws,o=rx; \
+	      $(MKDIR) $(TESTDATA_PATH); \
+	      umask $$oldMask; \
 	      if [ -d "$(LOCAL_INPUT)" ]; \
 	      then \
-	        $(MKDIR) -m775 $(TESTDATA_PATH)/input; \
+	        umask u=rwx,g=rws,o=rx; \
+	        $(MKDIR) $(TESTDATA_PATH)/input; \
+	        umask $$oldMask; \
 	        find $(TESTDATA_PATH)/../.. -type d -user `whoami` -exec chmod 2775 {} \; ; \
 	        inputdir=`$(LS) $(LOCAL_INPUT)`; \
 	        if [ "$$inputdir" != "" ]; \
@@ -599,7 +612,10 @@ checkin:
 #----------------------------------------------------------------------------
 copyInTruth:
 	for i in $(wildcard truth*); do \
-	  $(MKDIR) -m2775 $(DEST)$$i; \
+	  oldMask=`umask -S`; \
+	  umask u=rwx,g=rws,o=rx; \
+	  $(MKDIR) $(DEST)$$i; \
+	  umask $$oldMask; \
 	  files=`$(LS) $$i`; \
 	  if [ "$$files" != "" ]; \
 	  then \

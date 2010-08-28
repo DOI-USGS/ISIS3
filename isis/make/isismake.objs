@@ -1,3 +1,53 @@
+ifneq ($(SRCS), $(BLANK))
+error:
+	echo "Please use an updated makefile.";
+	echo "This can be found at $$ISISROOT/make/Makefile.objs";
+endif
+
+
+INCS  := $(wildcard *.h)
+
+# Figure out Qt Q_OBJECTS
+
+# QT - get all header files with 'Q_OBJECT' Output: '%.h: QOBJECT'
+ifneq ($(INCS), $(BLANK))
+  QOBJ  := $(shell grep -HI -m1 'Q_OBJECT' $(INCS))
+
+  # filter out 'Q_OBJECT' from '%.h: QOBJECT'
+  QCOLN := $(filter-out Q_OBJECT, $(QOBJ))
+
+  # filter out ':' from '%.h:'
+  QINC  := $(subst  :, , $(QCOLN))
+endif
+
+# Get CPPs that dont include intermediate files or the unit test (if object)
+CPPS  := $(filter-out moc_%.cpp, $(wildcard *.cpp *.cc))
+CPPS  := $(filter-out unitTest.cpp, $(CPPS))
+
+# Handle Qt resource files (qrc)
+QRCS := $(wildcard *.qrc)
+
+QTRESOURCEFILES := $(QRCS:%.qrc=qrc_%.cpp)
+
+# Protocol buffer files
+PROTOS := $(wildcard *.proto)
+
+# Sort removes duplicates... make sure we have proto headers
+INCS   := $(sort $(INCS) $(PROTOS:%.proto=%.pb.h))
+
+# Sources include Qt moc files and qrc files
+SRCS  := $(QTRESOURCEFILES) $(QINC:%.h=moc_%.cpp) $(PROTOS:%.proto=%.pb.cc) $(CPPS)
+SRCS  := $(sort $(SRCS))
+
+# Ui Files
+UIFILES   := $(wildcard *.ui)
+UIHEADERS := $(UIFILES:%.ui=ui_%.h)
+
+# Every cpp/cc/c generates an object (.o)
+OBJS  := $(SRCS:%.cpp=%.o)
+OBJS  := $(OBJS:%.cc=%.o)
+OBJS  := $(OBJS:%.c=%.o)
+
 include $(ISISROOT)/make/isismake.macros
 
 ROOTINCLUDES = $(addprefix $(ISISROOT)/inc/, $(INCS))
@@ -19,7 +69,10 @@ MOCGEN	     = $(wildcard moc_*.cpp)
 .SUFFIXES: .proto .pb.h .pb.cc
 .SUFFIXES: .cc .o
 
-object: $(OBJS) $(PROTOS:%.proto=%.pb.o)
+object: protos
+	if [ "$(OBJS)" != "" ]; then   \
+	  $(MAKE) $(OBJS);             \
+	fi
 
 .cpp.o: protos qtmoc
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
@@ -46,8 +99,11 @@ object: $(OBJS) $(PROTOS:%.proto=%.pb.o)
 incs: protos $(ROOTINCLUDES)
 
 $(ROOTINCLUDES): $(INCS)
-	cp -p ${@F} $(ISISROOT)/inc
-	chmod 644 $(ISISROOT)/inc/${@F}
+	if [ ! -d $(ISISROOT)/inc ]; then \
+	  mkdir -p $(ISISROOT)/inc;       \
+	fi;                               \
+	cp -p ${@F} $(ISISROOT)/inc/;     \
+	chmod 644 $(ISISROOT)/inc/${@F};
 
 #  For plugins, it is the $(LIBRARY) (more precisely $(SHAREDLIB))
 install: object
@@ -68,7 +124,7 @@ force: ;
 protos:	$(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
 
 %.pb.cc %.pb.h: %.proto
-	protoc -I$(<D) --cpp_out=$(<D) $^
+	$(PROTOC) -I$(<D) --cpp_out=$(<D) $^
 
 qtmoc: $(MOCINC:%.h=moc_%.cpp)
 
@@ -137,8 +193,11 @@ html: force
 	echo "View your documentation by opening the file html/index.html in a browser"
 
 clean:  localclean
-	-$(RM) $(OBJS) $(PROTOSGEN) $(MOCGEN) unitTest.o unitTest print.prt $(ARCHIVELIB) $(SHAREDLIB)
-	-$(RM) -rf html
+	$(RM) $(OBJS) $(PROTOSGEN) $(MOCGEN) unitTest.o unitTest print.prt   \
+	  $(ARCHIVELIB) $(SHAREDLIB) libisis$(ISISLIBVERSION).a              \
+	  libisis$(ISISLIBVERSION).so libisis$(ISISLIBVERSION).dylib         \
+	  unitTest.output;                                                   \
+	$(RM) -rf html .objs
 
 localclean:
 	if [ "$(findstring cleanlocal,$(shell grep cleanlocal Makefile))" = "cleanlocal" ]; \
@@ -152,7 +211,7 @@ clean_protos:
 sanitize: clean
 	-$(RM) tttt* junk.* TEMP*
 
-test:
+test: unitTest
 	$(ISISROOT)/scripts/unitTester $(HOST_OS) ; \
 	temp=$$? ; \
 	if test $$temp -eq 0 ; \
@@ -178,7 +237,34 @@ test:
 	fi
 
 unitTest: $(OBJS) unitTest.o
-	$(CXX) $(ALLLIBDIRS) $(ISISLDFLAGS) -o $@ unitTest.o $(OBJS) $(ALLLIBS)
+	if [ "$(HOST_ARCH)" == "Linux" ]; then                                       \
+	  $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                           \
+	      libisis$(ISISLIBVERSION).a;                                            \
+	  ar $(ISISARFLAGS) -crs libisis$(ISISLIBVERSION).a $(OBJS);                 \
+	  $(RANLIB) libisis$(ISISLIBVERSION).a;                                      \
+	  $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                             \
+	      -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISLIBVERSION).a \
+	      $(ISISSHAREDOFF);                                                      \
+	  $(RM) libisis$(ISISLIBVERSION).a;                                          \
+	  dollar='$$';                                                               \
+	  $(CXX) $(ALLLIBDIRS)                                                       \
+	      -Xlinker "-rpath"                                                      \
+	      -Xlinker "$${dollar}ORIGIN" $(ISISLDFLAGS)                             \
+	      -o $@ unitTest.o $(ALLLIBS);                                           \
+	elif [ "$(HOST_ARCH)" == "Darwin" ]; then                                    \
+	  $(MKDIR) .objs;                                                            \
+	  cd .objs;                                                                  \
+	  ar x $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a;                           \
+	  cd ..;                                                                     \
+	  $(CP) $(OBJS) .objs/;                                                      \
+	  $(LDSHARED) $(DYLIBFLAGS) $(ISISSHAREDON)                                  \
+	      -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT)                            \
+	      -install_name $(CURDIR)/libisis$(ISISLIBVERSION).$(SHAREDLIBEXT)       \
+	      $(DYLIBVERSION) .objs/*.o $(ISISSHAREDOFF);                            \
+	  $(CXX) $(ALLLIBDIRS) $(ISISLDFLAGS)                                        \
+	      -o $@ unitTest.o $(ALLLIBS);                                           \
+	  $(RM) -rd .objs;                                                           \
+	fi;
 
 plugin: $(OBJS)
 	$(LDSHARED) $(ALLLIBDIRS) $(ISISSHAREDFLAGS) $(ISISSHAREDON) \

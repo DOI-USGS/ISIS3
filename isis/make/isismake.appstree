@@ -1,31 +1,139 @@
 include $(ISISROOT)/make/isismake.macros
 
-DIRONLY = $(subst /,,$(shell ls -d */))
+DIRONLY = $(shell ls -d * | grep -v Makefile)
 CVS := CVS
 
 APPLICATIONS = $(filter-out $(CVS), $(DIRONLY)) 
 
-applications:
-	for i in $(APPLICATIONS); do \
-          echo "    Building and installing [$$i] ("`date +%T`")"; \
-	  cd $$i; $(MAKE) install; cd ..; \
-	done
+# This makefile does parallel builds with serialized output. Let's go ahead and
+# set this up.
 
-documentation:
-	for i in $(APPLICATIONS); do \
-          echo "    Installing application documentation [$$i]"; \
-	  cd $$i; $(MAKE) docs; cd ..; \
-	done
+# We want targets for each possible parallelized build. The parallel builds work
+# by parallelizing non-dependant targets. To accomplish our task, let's set up
+# the arrays of dependencies for some of our build types.
+APPSCLEAN := $(APPLICATIONS:%=%-clean)
+APPSBUILD := $(APPLICATIONS:%=%-build)
+APPSTEST  := $(APPLICATIONS:%=%-test)
+APPSDOCS  := $(APPLICATIONS:%=%-docs)
 
+# For serializing output, we have log and lock files. Let's define some helpful
+# targets for managing these.
 
-clean:
-	for i in $(APPLICATIONS); do \
-	  echo "    Cleaning [$$i]"; \
-	  cd $$i; $(MAKE) clean; cd ..; \
-	done
+# This deletes the lock file. This should not be called when anything could be
+# using the file.
+cleanuplockfile:
+	BUILDNAME=`dirname $$ISISROOT`;                                           \
+	BUILDNAME=`basename $$BUILDNAME`;                                         \
+	if [ -f "/tmp/.isisbuild.$$USER.$$BUILDNAME" ]; then                      \
+	  $(RM) "/tmp/.isisbuild.$$USER.$$BUILDNAME";                             \
+	fi;
 
-test:
-	for i in $(APPLICATIONS); do \
-          printf %-46s "    Testing [$$i]"; \
-	  cd $$i; $(MAKE) test; cd ..; \
-	done
+# When we make appname-print it should print the app's log. This acquires the
+# appropriate lock before printing. There is a 30s timeout on the lock before 
+# breaking it.
+%-print:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-print//'`;                               \
+	                                                                          \
+	BUILDNAME=`dirname $$ISISROOT`;                                           \
+	BUILDNAME=`basename $$BUILDNAME`;                                         \
+	trap "rm -f /tmp/.isisbuild.$$USER.$$BUILDNAME; exit $$?" INT TERM EXIT;  \
+	                                                                          \
+	LOCKED=0;                                                                 \
+	COUNTER=0;                                                                \
+	while [ "$$LOCKED" -eq "0" ]; do                                          \
+	  if [ "$$COUNTER" -gt 300 ]; then                                        \
+	    $(RM) /tmp/.isisbuild.$$USER.$$BUILDNAME;                             \
+	    COUNTER=0;                                                            \
+	    echo "Warning: Acquiring lock to print to screen timed out";          \
+	  fi;                                                                     \
+	                                                                          \
+	  ( set -o noclobber &&                                                   \
+	    echo "$$$$" > /tmp/.isisbuild.$$USER.$$BUILDNAME ) &>/dev/null;       \
+	  if [ "$$?" -eq "0" ]; then                                              \
+	    LOCKED=1;                                                             \
+	  else                                                                    \
+	    COUNTER=`expr $$COUNTER + 1`;                                         \
+	    sleep 0.1;                                                            \
+	  fi;                                                                     \
+	done;                                                                     \
+	                                                                          \
+	if [ -f .$$APPNAME.stdall.log ]; then                                     \
+	  $(CAT) .$$APPNAME.stdall.log;                                           \
+	else                                                                      \
+	  $(CAT) .$$APPNAME.stdout.log;                                           \
+	  $(CAT) .$$APPNAME.stderr.log >&2;                                       \
+	fi;                                                                       \
+	                                                                          \
+	$(RM) /tmp/.isisbuild.$$USER.$$BUILDNAME;                                 \
+	                                                                          \
+	$(MAKE) $$APPNAME-cleanupprint;
+
+# Cleanup log files if they exist. This should be called BEFORE the files are
+# redirected to and AFTER they are printed.
+%-cleanupprint:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-cleanupprint//'`; \
+	                                                   \
+	if [ -f ".$$APPNAME.stdout.log" ]; then            \
+	  $(RM) ".$$APPNAME.stdout.log";                   \
+	fi;                                                \
+	                                                   \
+	if [ -f ".$$APPNAME.stderr.log" ]; then            \
+	  $(RM) ".$$APPNAME.stderr.log";                   \
+	fi;                                                \
+	                                                   \
+	if [ -f ".$$APPNAME.stdall.log" ]; then            \
+	  $(RM) ".$$APPNAME.stdall.log";                   \
+	fi;
+
+# Our overhead targets are now handled.
+
+# Now let's handle our real targets. Applications depends on each application
+# being compiled (parallel-capable because they are all dependencies).
+applications: $(APPSBUILD)
+	$(MAKE) cleanuplockfile
+
+# This compiles a single application (APPSBUILD names this target for each app)
+%-build:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-build//'`;                               \
+	$(MAKE) $$APPNAME-bld-cleanupprint;                                       \
+	echo "    Building and installing [$$APPNAME] ("`date +%T`")"             \
+	  > .$$APPNAME-bld.stdout.log;                                            \
+	$(MAKE) --directory=$$APPNAME install                                     \
+	  1>>.$$APPNAME-bld.stdout.log 2>.$$APPNAME-bld.stderr.log;               \
+	$(MAKE) $$APPNAME-bld-print;
+
+documentation: $(APPSDOCS)
+
+%-docs:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-clean//'`;                               \
+	$(MAKE) $$OBJNAME-doc-cleanupprint;                                       \
+	echo "    Installing application documentation [$$APPNAME]"               \
+	  > .$$OBJNAME-doc.stdout.log;                                            \
+	$(MAKE) --directory=$$APPNAME clean                                       \
+	  1>>.$$APPNAME-doc.stdout.log 2>.$$APPNAME-doc.stderr.log;               \
+	$(MAKE) $$APPNAME-doc-print;
+
+# Do the same for this as we did docs.
+clean: $(APPSCLEAN)
+
+%-clean:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-clean//'`;                               \
+	$(MAKE) $$APPNAME-cln-cleanupprint;                                       \
+	echo "    Cleaning [$$APPNAME]"                                           \
+	  > .$$APPNAME-cln.stdout.log;                                            \
+	$(MAKE) --directory=$$APPNAME clean                                       \
+	  1>>.$$APPNAME-cln.stdout.log 2>.$$APPNAME-cln.stderr.log;               \
+	$(MAKE) $$APPNAME-cln-print;
+
+# Modelled after the applications target
+test: $(APPSTEST)
+	$(MAKE) cleanuplockfile
+	
+# This runs a single app test (APPSTEST names this target for each app)
+%-test:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-test//'`;                                \
+	$(MAKE) $$APPNAME-tst-cleanupprint;                                       \
+	printf %-46s "    Testing [$$APPNAME]"  > .$$APPNAME-tst.stdall.log;      \
+	$(MAKE) --directory=$$APPNAME test                                        \
+	  1>> .$$APPNAME-tst.stdall.log 2>> .$$APPNAME-tst.stdall.log;            \
+	$(MAKE) $$APPNAME-tst-print;

@@ -1,87 +1,82 @@
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 OBJECTS = $(filter-out objs/Makefile objs/CVS, $(wildcard objs/*))
 APPS = $(filter-out apps/Makefile apps/CVS, $(wildcard apps/*))
 NOAPPS = "no apps"
 
 applications: 
-	if [ "$(APPS)" != "" ]; \
-	then \
-	  echo ""; \
-	  cd apps; $(MAKE) applications; \
-	else \
-	  echo ""; \
-	  printf %-4s ""; \
-	  echo "$(NOAPPS)"; \
+	if [ "$(APPS)" != "" ];                  \
+	then                                     \
+	  $(MAKE) --directory=apps applications; \
+	else                                     \
+	  printf %-4s "";                        \
+	  echo "$(NOAPPS)";                      \
 	fi
 
 api: 
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	  cd objs; $(MAKE) api; \
+	if [ "$(OBJECTS)" != "" ];        \
+	then                              \
+	  $(MAKE) --directory=objs api;   \
 	fi
 
 includes:
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	  cd objs; $(MAKE) includes; \
+	if [ "$(OBJECTS)" != "" ];             \
+	then                                   \
+	  $(MAKE) --directory=objs includes;   \
 	fi
 
 objects:
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	  cd objs; $(MAKE) objects; \
+	if [ "$(OBJECTS)" != "" ];            \
+	then                                  \
+	  $(MAKE) --directory=objs objects;   \
 	fi
 
 documentation:
-	if [ "$(APPS)" != "" ]; \
-	then \
-	  echo ""; \
-	  cd apps; $(MAKE) documentation; \
-	else \
-	  echo ""; \
-	  printf %-4s ""; \
-	  echo "$(NOAPPS)"; \
+	if [ "$(APPS)" != "" ];                     \
+	then                                        \
+	  $(MAKE) --directory=apps documentation;   \
+	else                                        \
+	  printf %-4s "";                           \
+	  echo "$(NOAPPS)";                         \
 	fi
 
 clean:
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	  cd objs; $(MAKE) clean; \
-	fi
-
-	if [ "$(APPS)" != "" ]; \
-	then \
-	  cd apps; $(MAKE) clean; \
+	if [ "$(OBJECTS)" != "" ];          \
+	then                                \
+	  $(MAKE) --directory=objs clean;   \
+	fi;                                 \
+	                                    \
+	if [ "$(APPS)" != "" ];             \
+	then                                \
+	  $(MAKE) --directory=apps clean;   \
 	fi
 
 unitTest:
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	  cd objs; $(MAKE) test; \
+	if [ "$(OBJECTS)" != "" ];         \
+	then                               \
+	  $(MAKE) --directory=objs test;   \
 	fi
 
 appTest:
-	if [ "$(APPS)" != "" ]; \
-	then \
-	  echo ""; \
-	  cd apps; $(MAKE) test; \
-	else \
-	  echo ""; \
-	  printf %-4s ""; \
-	  echo "$(NOAPPS)"; \
+	if [ "$(APPS)" != "" ];            \
+	then                               \
+	  $(MAKE) --directory=apps test;   \
+	else                               \
+	  printf %-4s "";                  \
+	  echo "$(NOAPPS)";                \
 	fi
 
 catTest:
-	if [ ! -d "tsts" ]; \
-	then \
-	  echo ""; \
-	  printf %-4s ""; \
-	  echo "no tsts folder"; \
-	elif [ -f "tsts/Makefile" ]; \
-	then \
-	  cd tsts; $(MAKE) test; \
-	else \
-	  echo "no makefile"; \
+	if [ ! -d "tsts" ];                \
+	then                               \
+	  printf %-4s "";                  \
+	  echo "no tsts folder";           \
+	elif [ -f "tsts/Makefile" ];       \
+	then                               \
+	  $(MAKE) --directory=tsts test;   \
+	else                               \
+	  echo "no makefile";              \
 	fi
 

@@ -1,5 +1,7 @@
-SRCS = $(wildcard *.c)
-OBJS = $(SRCS:%.c=%.o)
-BINS = $(shell basename `pwd`)
-
-include $(ISISROOT)/make/isismake.apps
+ifeq ($(ISISROOT), $(BLANK))
+.SILENT:
+error:
+	echo "Please set ISISROOT";
+else
+	include $(ISISROOT)/make/isismake.apps
+endif

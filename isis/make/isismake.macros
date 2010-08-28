@@ -45,6 +45,7 @@ CXX            ?= g++
 CC             ?= gcc
 LDSHARED       ?= $(CXX)
 MOC            ?= moc
+PROTOC         ?= protoc
 UIC            ?= uic
 XALAN          ?= Xalan
 LS             ?= /bin/ls

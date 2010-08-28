@@ -189,6 +189,7 @@ endif
 PROTOBUFINCDIR = -I$(ISIS3OPT)/include/google
 PROTOBUFLIBDIR = -L$(ISIS3OPT)/lib
 PROTOBUFLIB    = -lprotobuf
+PROTOC         = $(ISIS3OPT)/bin/protoc
 
 #---------------------------------------------------------------------------
 # Set up for kakadu

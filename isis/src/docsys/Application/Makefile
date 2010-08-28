@@ -69,7 +69,7 @@ categories: ../Schemas/Application/application.xsd build/IsisApplicationCategori
 
 clean:
 	rm -f build/toc.xml 
-	cd data	; make clean ; cd .. ;
+	cd data	; $(MAKE) clean ; cd .. ;
 
 
 #TODO

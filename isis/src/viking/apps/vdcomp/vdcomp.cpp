@@ -82,8 +82,8 @@
 /*                                                                  */
 /* HIST                                                             */
 /*  datri@convex.com, 11-15-91 added recognition of - as stdout for */
-/*  	output filename; disabled various messages; directed        */
-/*	messages to stderr; added exit status			    */
+/*      output filename; disabled various messages; directed        */
+/*    messages to stderr; added exit status                */
 /*  JUN04 Jeff Anderson - Removed compiler warnings                 */
 /*  DEC89 Modified program to handle both Voyager and Viking images.*/
 /*  OCT89 Converted Voyager decompression program to handle Viking  */
@@ -118,14 +118,16 @@
 /********************************************************************/
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
 
 #define TRUE                  1
 #define FALSE                 0
 
 /* pc i/o defines               */
-#define O_RDONLY         0x0000     /* open for reading only        */
+//#define O_RDONLY         0x0000     /* open for reading only        */
 #define O_BINARY         0x8000     /* file mode is binary          */
 
 /* vax i/o defines              */
@@ -148,17 +150,18 @@ NODE *tree;
 
 /* subroutine definitions                                           */
 
-void               pds_labels();
-void               fits_labels();
-void               vicar_labels();
-void               no_labels();
+void               pds_labels(int);
+void               fits_labels(int);
+void               vicar_labels(int);
+void               no_labels(int);
 int                check_host();
-int                get_files();
-void               open_files();
-int               swap_long();
-void               decompress();
-void               decmpinit();
-void               free_tree();
+int                get_files(int);
+void               open_files(int *);
+int               swap_long(int);
+void               decompress(char * ibuf, char * obuf, int * nin, int * nout);
+void               decmpinit(int *);
+void               free_tree(int *);
+int               read_var(char *, int);
 
 /* global variables                                                 */
 
@@ -172,9 +175,7 @@ int               label_checksum = 0L, checksum = 0L;
 
 
 /*************************************************/
-int main(argc, argv)
-int  argc;
-char **argv;
+int main(int argc, char ** argv)
 {
   unsigned char ibuf[65536], obuf[65536];
   unsigned char blank = 32;
@@ -311,7 +312,7 @@ char **argv;
   /*********************************************************************/
 
   total_bytes = 0;
-  length = read_var(ibuf, host);
+  length = read_var((char*)ibuf, host);
 
   if(output_format == 1) {
     fwrite(ibuf, length, 1, outfile);
@@ -331,7 +332,7 @@ char **argv;
     long_length = 0;
     int line1Bytes = 0;
     for(i = 0; i < 1056; i++) {
-      length = read_var(ibuf, host);
+      length = read_var((char*)ibuf, host);
 
       // Check to see that all lines are the same number of bytes.
       if(i == 0) {
@@ -381,11 +382,11 @@ char **argv;
   line = 0;
 
   do {
-    length = read_var(ibuf, host);
+    length = read_var((char *)ibuf, host);
     if(length <= 0) break;
     long_length = (int)length;
     line += 1;
-    decompress(ibuf, obuf, &long_length, &record_bytes);
+    decompress((char*)ibuf, (char*)obuf, &long_length, &record_bytes);
 
     if(output_format == 1) {
       count = fwrite(obuf, record_bytes, 1, outfile);
@@ -418,7 +419,7 @@ char **argv;
     /* print checksum for viking */
     /*
         fprintf(stderr,"\n Image label checksum = %ld computed checksum = %ld\n",
-    	    label_checksum,checksum);
+            label_checksum,checksum);
     */
 
     /*  pad out FITS file to a multiple of 2880 */
@@ -440,8 +441,8 @@ char **argv;
 /*                                                                   */
 /*********************************************************************/
 
-int get_files(host)
-int host;
+int get_files(int host)
+//int host;
 {
   short   shortint;
 
@@ -475,7 +476,7 @@ int host;
       read(infile, &shortint, (size_t) 2);
       if(shortint > 0 && shortint < 80) {
         host = 4;              /* change host to 4                */
-//	 printf("This is not a VAX variable length file.");
+//     printf("This is not a VAX variable length file.");
       }
 //       else printf("This is a VAX variable length file.");
       lseek(infile, (off_t) 0, SEEK_SET);        /* reposition to beginning of file */
@@ -513,8 +514,8 @@ int host;
 /*                                                                   */
 /*********************************************************************/
 
-void open_files(host)
-int *host;
+void open_files(int * host)
+//int *host;
 {
   if(*host == 1 || *host == 2 || *host == 5)  {
     if(outname[0] == '-') outfile = stdout;
@@ -590,12 +591,12 @@ int *host;
 /*                                                                   */
 /*********************************************************************/
 
-void pds_labels(host)
-int host;
+void pds_labels(int host)
+//int host;
 {
-  char          outstring[80], ibuf[2048];
+  char         /* outstring[80],*/ ibuf[2048];
   unsigned char cr = 13, lf = 10, blank = 32;
-  short         length, nlen, total_bytes, line, i;
+  short         length, /*nlen,*/ total_bytes, /*line,*/ i;
 
 
   total_bytes = 0;
@@ -809,11 +810,11 @@ int host;
 /*                                                                   */
 /*********************************************************************/
 
-void fits_labels(host)
-int host;
+void fits_labels(int host)
+//int host;
 {
   char          ibuf[2048], outstring[80];
-  short         length, nlen, total_bytes, line, i;
+  short         length, /*nlen,*/ total_bytes, /*line,*/ i;
   unsigned char cr = 13, lf = 10, blank = 32;
 
   do {
@@ -901,12 +902,12 @@ int host;
 /*                                                                   */
 /*********************************************************************/
 
-void vicar_labels(host)
-int host;
+void vicar_labels(int host)
+//int host;
 
 {
   char          ibuf[2048], outstring[80];
-  short         length, nlen, total_bytes, line, i;
+  short         length, /*nlen,*/ total_bytes, /*line,*/ i;
   unsigned char cr = 13, lf = 10, blank = 32;
 
   do {
@@ -974,11 +975,11 @@ int host;
 /*                                                                   */
 /*********************************************************************/
 
-void no_labels(host)
-int host;
+void no_labels(int host)
+//int host;
 {
-  char          ibuf[2048], outstring[80];
-  short         length, nlen, total_bytes, line, i;
+  char          ibuf[2048]/*, outstring[80]*/;
+  short         length, /*nlen, total_bytes, line,*/ i;
 
   do {
     length = read_var(ibuf, host);
@@ -1016,9 +1017,9 @@ int host;
 /*                                                                   */
 /*********************************************************************/
 
-read_var(ibuf, host)
-char  *ibuf;
-int   host;
+int read_var(char *ibuf, int host)
+//char  *ibuf;
+//int   host;
 {
   int   length, result, nlen;
   char  temp;
@@ -1083,6 +1084,8 @@ int   host;
       nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
       return (length);
   }
+
+  return 0;
 }
 
 /*********************************************************************/
@@ -1139,8 +1142,8 @@ int check_host() {
   return(host);
 }
 
-int swap_long(inval)  /* swap 4 byte integer                       */
-int inval;
+int swap_long(int inval)  /* swap 4 byte integer                       */
+//int inval;
 {
   union { /* this union is used to swap 16 and 32 bit integers          */
     char  ichar[4];
@@ -1160,21 +1163,21 @@ int inval;
   return (onion.llen);
 }
 
-void decompress(ibuf, obuf, nin, nout)
+void decompress(char * ibuf, char * obuf, int * nin, int * nout)
 /****************************************************************************
 *_TITLE decompress - decompresses image lines stored in compressed format   *
 *_ARGS  TYPE       NAME      I/O        DESCRIPTION                         */
-char       *ibuf;  /* I         Compressed data buffer              */
-char       *obuf;  /* O         Decompressed image line             */
-int   *nin;   /* I         Number of bytes on input buffer     */
-int   *nout;  /* I         Number of bytes in output buffer    */
+//char       *ibuf;  /* I         Compressed data buffer              */
+//char       *obuf;  /* O         Decompressed image line             */
+//int   *nin;   /* I         Number of bytes on input buffer     */
+//int   *nout;  /* I         Number of bytes in output buffer    */
 
 {
   /* The external root pointer to tree */
   extern NODE *tree;
 
   /* Declare functions called from this routine */
-  void dcmprs();
+  void dcmprs(char *ibuf, char *obuf, int *nin, int *nout, NODE *root);
 
   /*************************************************************************
     This routine is fairly simple as it's only function is to call the
@@ -1187,17 +1190,17 @@ int   *nout;  /* I         Number of bytes in output buffer    */
 }
 
 
-void decmpinit(hist)
+void decmpinit(int * hist)
 /***************************************************************************
 *_TITLE decmpinit - initializes the Huffman tree                           *
 *_ARGS  TYPE       NAME      I/O        DESCRIPTION                        */
-int   *hist;  /* I         First-difference histogram.        */
+//int   *hist;  /* I         First-difference histogram.        */
 
 {
   extern NODE *tree;          /* Huffman tree root pointer */
 
   /* Specify the calling function to initialize the tree */
-  NODE *huff_tree();
+  NODE *huff_tree(int *);
 
   /**************************************************************************
     Simply call the huff_tree routine and return.
@@ -1209,11 +1212,11 @@ int   *hist;  /* I         First-difference histogram.        */
 }
 
 
-NODE *huff_tree(hist)
+NODE *huff_tree(int * hist)
 /****************************************************************************
 *_TITLE huff_tree - constructs the Huffman tree; returns pointer to root    *
 *_ARGS  TYPE          NAME        I/O   DESCRIPTION                         */
-int     *hist;     /* I    First difference histogram          */
+//int     *hist;     /* I    First difference histogram          */
 
 {
   /*  Local variables used */
@@ -1224,7 +1227,7 @@ int     *hist;     /* I    First difference histogram          */
   register NODE **np;           /* Node list pointer */
 
   register int num_freq;   /* Number non-zero frequencies in histogram */
-  int sum;                 /* Sum of all frequencies */
+  //int sum;                 /* Sum of all frequencies */
 
   register short int num_nodes; /* Counter for DN initialization */
   register short int cnt;       /* Miscellaneous counter */
@@ -1234,8 +1237,8 @@ int     *hist;     /* I    First difference histogram          */
   register NODE *temp;          /* Temporary node pointer */
 
   /* Functions called */
-  void sort_freq();
-  NODE *new_node();
+  void sort_freq(int *freq_list, NODE **node_list, int num_freq);
+  NODE *new_node(short int);
 
   /**************************************************************************
     Allocate the array of nodes from memory and initialize these with numbers
@@ -1261,7 +1264,7 @@ int     *hist;     /* I    First difference histogram          */
       **********************************************************************/
 
     unsigned char *cp = (unsigned char *) hist++;
-    unsigned int j;
+    unsigned int j = 0;
     short int i;
     for(i = 4 ; --i >= 0 ; j = (j << 8) | *(cp + i));
 
@@ -1308,11 +1311,11 @@ int     *hist;     /* I    First difference histogram          */
 }
 
 
-NODE *new_node(value)
+NODE *new_node(short int value)
 /****************************************************************************
 *_TITLE new_node - allocates a NODE structure and returns a pointer to it   *
 *_ARGS  TYPE        NAME        I/O     DESCRIPTION                         */
-short int   value;    /* I      Value to assign to DN field         */
+//short int   value;    /* I      Value to assign to DN field         */
 
 {
   NODE *temp;         /* Pointer to the memory block */
@@ -1339,13 +1342,13 @@ short int   value;    /* I      Value to assign to DN field         */
   return temp;
 }
 
-void sort_freq(freq_list, node_list, num_freq)
+void sort_freq(int *freq_list, NODE **node_list, int num_freq)
 /****************************************************************************
 *_TITLE sort_freq - sorts frequency and node lists in increasing freq. order*
 *_ARGS  TYPE       NAME            I/O  DESCRIPTION                         */
-int   *freq_list;   /* I   Pointer to frequency list           */
-NODE       **node_list;  /* I   Pointer to array of node pointers   */
-int   num_freq;     /* I   Number of values in freq list       */
+//int   *freq_list;   /* I   Pointer to frequency list           */
+//NODE       **node_list;  /* I   Pointer to array of node pointers   */
+//int   num_freq;     /* I   Number of values in freq list       */
 
 {
   /* Local Variables */
@@ -1386,15 +1389,15 @@ int   num_freq;     /* I   Number of values in freq list       */
 }
 
 
-void dcmprs(ibuf, obuf, nin, nout, root)
+void dcmprs(char *ibuf, char *obuf, int *nin, int *nout, NODE *root)
 /****************************************************************************
 *_TITLE dcmprs - decompresses Huffman coded compressed image lines          *
 *_ARGS  TYPE       NAME       I/O       DESCRIPTION                         */
-char       *ibuf;   /* I        Compressed data buffer              */
-char       *obuf;   /* O        Decompressed image line             */
-int   *nin;    /* I        Number of bytes on input buffer     */
-int   *nout;   /* I        Number of bytes in output buffer    */
-NODE       *root;   /* I        Huffman coded tree                  */
+//char       *ibuf;   /* I        Compressed data buffer              */
+//char       *obuf;   /* O        Decompressed image line             */
+//int   *nin;    /* I        Number of bytes on input buffer     */
+//int   *nout;   /* I        Number of bytes in output buffer    */
+//NODE       *root;   /* I        Huffman coded tree                  */
 
 {
   /* Local Variables */
@@ -1441,12 +1444,12 @@ NODE       *root;   /* I        Huffman coded tree                  */
 }
 
 
-void free_tree(nfreed)
+void free_tree(int *nfreed)
 /****************************************************************************
 *_TITLE free_tree - free memory of all allocated nodes                      *
 *_ARGS  TYPE       NAME       I/O        DESCRIPTION                        */
-int   *nfreed;  /* O        Return of total count of nodes     *
-*                                        freed.                             */
+//int   *nfreed;  /* O        Return of total count of nodes     */
+/*                                        freed.                             */
 
 /*
 *_DESCR This routine is supplied to the programmer to free up all the       *
@@ -1467,7 +1470,7 @@ int   *nfreed;  /* O        Return of total count of nodes     *
   extern NODE *tree;      /* Huffman tree root pointer */
 
   /* Specify the function to free the tree */
-  int free_node();
+  int free_node(NODE * pnode, int total_free);
 
   /****************************************************************
     Simply call the free_node routine and return the result.
@@ -1479,12 +1482,12 @@ int   *nfreed;  /* O        Return of total count of nodes     *
 }
 
 
-int free_node(pnode, total_free)
+int free_node(NODE * pnode, int total_free)
 /***************************************************************************
 *_TITLE free_node - deallocates an allocated NODE pointer
 *_ARGS  TYPE     NAME          I/O   DESCRIPTION                           */
-NODE     *pnode;       /* I  Pointer to node to free               */
-int total_free;   /* I  Total number of freed nodes           */
+//NODE     *pnode;       /* I  Pointer to node to free               */
+//int total_free;   /* I  Total number of freed nodes           */
 
 /*
 *_DESCR  free_node will check both right and left pointers of a node       *

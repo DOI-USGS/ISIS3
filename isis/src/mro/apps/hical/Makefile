@@ -1,7 +1,7 @@
-SRCS = hical.cpp HiCalConf.cpp NonLinearLSQ.cpp DriftCorrect.cpp
-OBJS = $(SRCS:%.cpp=%.o)
-BINS = hical
-
-include $(ISISROOT)/make/isismake.apps
-
-
+ifeq ($(ISISROOT), $(BLANK))
+.SILENT:
+error:
+	echo "Please set ISISROOT";
+else
+	include $(ISISROOT)/make/isismake.apps
+endif

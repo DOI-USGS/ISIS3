@@ -1,7 +1,59 @@
+ifneq ($(SRCS), $(BLANK))
+error:
+	echo "Please use an updated makefile.";
+	echo "This can be found at $$ISISROOT/make/Makefile.apps";
+endif
+
+INCS  := $(wildcard *.h)
+
+# Figure out Qt Q_OBJECTS
+
+# QT - get all header files with 'Q_OBJECT' Output: '%.h: QOBJECT'
+ifneq ($(INCS), $(BLANK))
+	QOBJ  := $(shell grep -HI -m1 'Q_OBJECT' $(INCS))
+
+	# filter out 'Q_OBJECT' from '%.h: QOBJECT'
+	QCOLN := $(filter-out Q_OBJECT, $(QOBJ))
+
+	# filter out ':' from '%.h:'
+	QINC  := $(subst  :, , $(QCOLN))
+endif
+
+# Get CPPs that dont include intermediate files or the unit test (if object)
+CPPS  := $(filter-out moc_%.cpp, $(wildcard *.cpp *.cc *.c))
+CPPS  := $(filter-out unitTest.cpp, $(CPPS))
+
+# Handle Qt resource files (qrc)
+QRCS := $(wildcard *.qrc)
+
+QTRESOURCEFILES := $(QRCS:%.qrc=qrc_%.cpp)
+
+# Protocol buffer files
+PROTOS := $(wildcard *.proto)
+
+# Sort removes duplicates... make sure we have proto headers
+INCS   := $(sort $(INCS) $(PROTOS:%.proto=%.pb.h))
+
+# Sources include Qt moc files and qrc files
+SRCS  := $(QTRESOURCEFILES) $(QINC:%.h=moc_%.cpp) $(PROTOS:%.proto=%.pb.cc) $(CPPS)
+SRCS  := $(sort $(SRCS))
+
+# Ui Files
+UIFILES   := $(wildcard *.ui)
+UIHEADERS := $(UIFILES:%.ui=ui_%.h)
+
+# Every cpp/cc/c generates an object (.o)
+OBJS  := $(SRCS:%.cpp=%.o)
+OBJS  := $(OBJS:%.cc=%.o)
+OBJS  := $(OBJS:%.c=%.o)
+
+BINS  := $(shell basename `pwd`)
+
+
 include $(ISISROOT)/make/isismake.macros
 
 MOCINC       = $(wildcard *.h)
-MOCGEN	     = $(wildcard moc_*.cpp)
+MOCGEN       = $(wildcard moc_*.cpp)
 PROTOS       = $(wildcard *.proto)
 PROTOSGEN    = $(wildcard *.pb.*)
 PROTOSOBJ    = $(wildcard *.pb.o)
@@ -13,12 +65,13 @@ PROTOSOBJ    = $(wildcard *.pb.o)
 .SUFFIXES: .proto .pb.h .pb.cc
 .SUFFIXES: .cc .o
 
-app: $(BINS)
+app:
+	$(MAKE) $(BINS)
 
-$(BINS): $(OBJS)
+$(BINS): $(UIHEADERS) $(QTRESOURCEFILES) protos $(OBJS)
 	$(CXX) $(ALLLIBDIRS) $(ISISLDFLAGS) $(ISISLDRPATH) -o $@ $(OBJS) $(ALLLIBS)
 
-.cpp.o : qtmoc
+.cpp.o: qtmoc
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) $(CPPFLAGS) -c -o $@ $?
 
 .c.o :
@@ -30,14 +83,17 @@ $(BINS): $(OBJS)
 .xml.html :
 	$(XALAN) -v -o $@ $? $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl
 
-protos:	$(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
+protos: $(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
 
 %.pb.cc %.pb.h: %.proto
 	protoc -I$(<D) --cpp_out=$(<D) $^
 
+ui_%.h: %.ui
+	$(UIC) -o $@ $^
+
 qtmoc: $(MOCINC:%.h=moc_%.cpp)
 
-moc_%.cpp: %.h		
+moc_%.cpp: %.h
 	if [ "$(filter-out ' ', $(shell grep -sIE -m1 'Q_OBJECT' $(<F)))" == "Q_OBJECT" ]; \
 	then \
 	  $(MOC) $(MOCDEFINES) -o $@ $(<F); \
@@ -47,25 +103,26 @@ qrc_%.cpp: %.qrc
 	$(RCC) $(RCCDEFINES) -o $@ $(<F);
 
 clean:  localclean
-	-$(RM) $(OBJS) $(BINS) $(PROTOSGEN) $(MOCGEN) `basename $(CURDIR)`.html	
-	if [ -d "tsts" ]; \
-	then \
-	  if [ -f "tsts/Makefile" ]; \
-	    then \
-	    cd tsts; \
-	    $(MAKE) clean; \
-	    cd ..; \
-	  fi; \
+	$(RM) $(OBJS) $(BINS) $(PROTOSGEN) $(MOCGEN) `basename $(CURDIR)`.html \
+	  $(UIHEADERS) $(QTRESOURCEFILES);                                     \
+	if [ -d "tsts" ];                                                      \
+	then                                                                   \
+	  if [ -f "tsts/Makefile" ];                                           \
+	  then                                                                 \
+	    cd tsts;                                                           \
+	    $(MAKE) clean;                                                     \
+	    cd ..;                                                             \
+	  fi;                                                                  \
 	fi
 
 localclean:
 	if [ "$(findstring cleanlocal,$(shell grep cleanlocal Makefile))" = "cleanlocal" ]; \
-	then \
-	   $(MAKE) cleanlocal; \
+	then                                                                                \
+	  $(MAKE) cleanlocal;                                                               \
 	fi
 
 sanitize: clean
-	-$(RM) tttt* junk.* TEMP*
+	$(RM) tttt* junk.* TEMP*
 
 install: app 
 	if [ ! -d "$(ISISROOT)/bin/xml" ];                                    \
@@ -94,7 +151,7 @@ install: app
 	  fi;                                                                 \
 	  $(RM) DarwinErrors.lis;                                             \
 	fi
-	  
+
 
 validxml:
 	$(XALAN) -v -o /dev/null $(BINS).xml $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl;
@@ -109,29 +166,29 @@ docs:
 	chmod -R +w $(ISISROOT)/src/docsys/Application/data/`basename $(CURDIR)`
 
 test:
-	if [ ! -d "tsts" ]; \
-	then \
-	  echo ""; \
-	  printf %-6s ""; \
-	  echo "no tsts folder"; \
+	if [ ! -d "tsts" ];          \
+	then                         \
+	  echo "";                   \
+	  printf %-6s "";            \
+	  echo "no tsts folder";     \
 	elif [ -f "tsts/Makefile" ]; \
-	then \
-	  cd tsts; $(MAKE) test; \
-	else \
-	  echo ""; \
-	  printf %-6s ""; \
-	  echo "no makefile"; \
+	then                         \
+	  cd tsts; $(MAKE) test;     \
+	else                         \
+	  echo "";                   \
+	  printf %-6s "";            \
+	  echo "no makefile";        \
 	fi
 
 testdir:
-	if [ ! -d "tsts" ]; \
-	then \
-	  $(MKDIR) tsts; \
+	if [ ! -d "tsts" ];                                           \
+	then                                                          \
+	  $(MKDIR) tsts;                                              \
 	  $(CP) $(ISISROOT)/make/Makefile.appstststree tsts/Makefile; \
-	else \
-	  echo ""; \
-	  printf %-6s ""; \
-	  echo "tsts folder already exists"; \
+	else                                                          \
+	  echo "";                                                    \
+	  printf %-6s "";                                             \
+	  echo "tsts folder already exists";                          \
 	fi
 
 html:

@@ -44,7 +44,7 @@ then
   fi
 fi
 
-make unitTest || exit 3
+#make unitTest || exit 3
 RESULTS="unitTest.output"
 /bin/rm -f $RESULTS
 if [ ! -f unitTest.exclude ]

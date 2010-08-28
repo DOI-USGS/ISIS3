@@ -80,7 +80,7 @@ upperlevel:
 	echo " "
 	echo "      Building Documents"
 	mkdir -p $(DOCDIR)/documents
-	cd documents ; make docs ; cd .. ;
+	cd documents ; $(MAKE) docs ; cd .. ;
 	echo "      Finished Building Documents"
 
 	echo "    Finished Building Upper Level Documentation"
@@ -88,12 +88,12 @@ upperlevel:
 
 
 	echo "    Building Application Documentation"
-	cd Application ; make docs ; cd .. ;
+	cd Application ; $(MAKE) docs ; cd .. ;
 	echo "    Finished Building Application Documentation"
 	echo " "
 
 	echo "    Building Object Documentation"
-	cd Object ; make docs ; cd .. ;
+	cd Object ; $(MAKE) docs ; cd .. ;
 	echo "    Finished Building Object Documentation"
 	echo " "
 
@@ -128,9 +128,9 @@ clean:
 	cd Schemas        && rm -f *.html     ; cd .. ;
 	cd build          && rm -f doctoc.xml ; cd .. ;
 
-	cd Application ; make clean ; cd .. ;
-	cd Object ; make clean ; cd .. ;
-	cd documents ; make clean ; cd .. ;
+	cd Application ; $(MAKE) clean ; cd .. ;
+	cd Object ; $(MAKE) clean ; cd .. ;
+	cd documents ; $(MAKE) clean ; cd .. ;
 
 cleandocs:
 	rm -r $(DOCDIR)/*
@@ -170,8 +170,8 @@ syncall:
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "~                                  SYNC ALL                                   ~"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	make wwwdoc
-	make devdoc
+	$(MAKE) wwwdoc
+	$(MAKE) devdoc
 	
 syncdev:
 	echo " "
@@ -179,5 +179,5 @@ syncdev:
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "~                                  SYNC DEV                                   ~"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	make devdoc
+	$(MAKE) devdoc
 

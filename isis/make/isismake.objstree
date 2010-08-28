@@ -5,6 +5,91 @@ CVS := CVS
 
 OBJECTS = $(filter-out $(CVS), $(DIRONLY))
 
+
+# This makefile does parallel builds with serialized output. Let's go ahead and
+# set this up.
+
+# We want targets for each possible parallelized build. The parallel builds work
+# by parallelizing non-dependant targets. To accomplish our task, let's set up
+# the arrays of dependencies for some of our build types.
+OBJSCLEAN := $(OBJECTS:%=%-clean)
+OBJSINCS  := $(OBJECTS:%=%-incs)
+OBJSBUILD := $(OBJECTS:%=%-build)
+OBJSTEST  := $(OBJECTS:%=%-test)
+
+# For serializing output, we have log and lock files. Let's define some helpful
+# targets for managing these.
+
+# This deletes the lock file. This should not be called when anything could be
+# using the file.
+cleanuplockfile:
+	BUILDNAME=`dirname $$ISISROOT`;                                           \
+	BUILDNAME=`basename $$BUILDNAME`;                                         \
+	if [ -f "/tmp/.isisbuild.$$USER.$$BUILDNAME" ]; then                      \
+	  $(RM) "/tmp/.isisbuild.$$USER.$$BUILDNAME";                             \
+	fi;
+
+# When we make appname-print it should print the app's log. This acquires the
+# appropriate lock before printing. There is a 30s timeout on the lock before 
+# breaking it.
+%-print:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-print//'`;                               \
+	                                                                          \
+	BUILDNAME=`dirname $$ISISROOT`;                                           \
+	BUILDNAME=`basename $$BUILDNAME`;                                         \
+	trap "rm -f /tmp/.isisbuild.$$USER.$$BUILDNAME; exit $$?" INT TERM EXIT;  \
+	                                                                          \
+	LOCKED=0;                                                                 \
+	COUNTER=0;                                                                \
+	while [ "$$LOCKED" -eq "0" ]; do                                          \
+	  if [ "$$COUNTER" -gt 300 ]; then                                        \
+	    $(RM) /tmp/.isisbuild.$$USER.$$BUILDNAME;                             \
+	    COUNTER=0;                                                            \
+	    echo "Warning: Acquiring lock to print to screen timed out";          \
+	  fi;                                                                     \
+	                                                                          \
+	  ( set -o noclobber &&                                                   \
+	    echo "$$$$" > /tmp/.isisbuild.$$USER.$$BUILDNAME ) &>/dev/null;       \
+	  if [ "$$?" -eq "0" ]; then                                              \
+	    LOCKED=1;                                                             \
+	  else                                                                    \
+	    COUNTER=`expr $$COUNTER + 1`;                                         \
+	    sleep 0.1;                                                            \
+	  fi;                                                                     \
+	done;                                                                     \
+	                                                                          \
+	if [ -f .$$APPNAME.stdall.log ]; then                                     \
+	  $(CAT) .$$APPNAME.stdall.log;                                           \
+	else                                                                      \
+	  $(CAT) .$$APPNAME.stdout.log;                                           \
+	  $(CAT) .$$APPNAME.stderr.log >&2;                                       \
+	fi;                                                                       \
+	                                                                          \
+	$(RM) /tmp/.isisbuild.$$USER.$$BUILDNAME;                                 \
+	                                                                          \
+	$(MAKE) $$APPNAME-cleanupprint;
+
+# Cleanup log files if they exist. This should be called BEFORE the files are
+# redirected to and AFTER they are printed.
+%-cleanupprint:
+	OBJNAME=`$(ECHO) $@ | $(SED) 's/-cleanupprint//'`; \
+	                                                   \
+	if [ -f ".$$OBJNAME.stdout.log" ]; then            \
+	  $(RM) ".$$OBJNAME.stdout.log";                   \
+	fi;                                                \
+	                                                   \
+	if [ -f ".$$OBJNAME.stderr.log" ]; then            \
+	  $(RM) ".$$OBJNAME.stderr.log";                   \
+	fi;                                                \
+	                                                   \
+	if [ -f ".$$OBJNAME.stdall.log" ]; then            \
+	  $(RM) ".$$OBJNAME.stdall.log";                   \
+	fi;
+
+# Our overhead targets are now handled.
+
+# Api cannot be done in parallel, as the "ar" command doesn't work. Do it with
+#  a for loop so make can't run it in parallel.
 api:
 	if [ "$(OBJECTS)" != "" ]; \
 	then \
@@ -14,38 +99,58 @@ api:
 	done \
 	fi
 
-objects:
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	for i in $(OBJECTS); do \
-	  echo "    Building object [$$i] ("`date +%T`")"; \
-	  cd $$i; $(MAKE) object; cd ..; \
-	done \
-	fi
+# Now let's handle our real targets. Objects depends on each object
+# being compiled (parallel-capable because they are all dependencies).
+objects: $(OBJSBUILD)
+	$(MAKE) cleanuplockfile
 
-includes:
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	for i in $(OBJECTS); do \
-	  echo "    Installing includes [$$i]"; \
-	  cd $$i; $(MAKE) incs; cd ..; \
-	done \
-	fi
+# Compile an object. This works by redirecting output to stdout and stderr
+# files then printing the logs.
+%-build:
+	OBJNAME=`$(ECHO) $@ | $(SED) 's/-build//'`;                               \
+	                                                                          \
+	$(MAKE) $$OBJNAME-bld-cleanupprint;                                       \
+	echo "    Building object [$$OBJNAME] ("`date +%T`")"                     \
+	  > .$$OBJNAME-bld.stdout.log;                                            \
+	$(MAKE) --directory=$$OBJNAME object                                      \
+	  1>>.$$OBJNAME-bld.stdout.log 2>.$$OBJNAME-bld.stderr.log;               \
+	$(MAKE) $$OBJNAME-bld-print;                                              \
+	$(MAKE) $$OBJNAME-bld-cleanupprint;
 
-clean:
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	for i in $(OBJECTS); do \
-	  echo "    Cleaning [$$i]"; \
-	  cd $$i; $(MAKE) clean; cd ..; \
-	done \
-	fi
+# Modelled after objects target
+includes: $(OBJSINCS)
+	$(MAKE) cleanuplockfile
 
-test: 
-	if [ "$(OBJECTS)" != "" ]; \
-	then \
-	for i in $(OBJECTS); do \
-	  printf %-60s "    Testing [$$i] ("`date +%T`")"; \
-	  cd $$i; $(MAKE) test; cd ..; \
-	done \
-	fi
+%-incs:
+	OBJNAME=`$(ECHO) $@ | $(SED) 's/-incs//'`;                                \
+	$(MAKE) $$OBJNAME-inc-cleanupprint;                                       \
+	echo "    Installing includes [$$OBJNAME]"                                \
+	  > .$$OBJNAME-inc.stdout.log;                                            \
+	$(MAKE) --directory=$$OBJNAME incs                                        \
+	  1>>.$$OBJNAME-inc.stdout.log 2>.$$OBJNAME-inc.stderr.log;               \
+	$(MAKE) $$OBJNAME-inc-print;
+
+
+clean: $(OBJSCLEAN)
+
+%-clean:
+	OBJNAME=`$(ECHO) $@ | $(SED) 's/-clean//'`;                               \
+	$(MAKE) $$OBJNAME-cln-cleanupprint;                                       \
+	echo "    Cleaning [$$OBJNAME]"                                           \
+	  > .$$OBJNAME-cln.stdout.log;                                            \
+	$(MAKE) --directory=$$OBJNAME clean                                       \
+	  1>>.$$OBJNAME-cln.stdout.log 2>.$$OBJNAME-cln.stderr.log;               \
+	$(MAKE) $$OBJNAME-cln-print;                                              \
+	$(MAKE) $$OBJNAME-cln-cleanupprint;
+
+# Modelled after objects target
+test: $(OBJSTEST)
+
+%-test:
+	OBJNAME=`$(ECHO) $@ | $(SED) 's/-test//'`;                                \
+	$(MAKE) $$OBJNAME-tst-cleanupprint;                                       \
+	printf %-60s "    Testing [$$OBJNAME] ("`date +%T`")"                     \
+	  > .$$OBJNAME-tst.stdout.log;                                            \
+	$(MAKE) --directory=$$OBJNAME test                                        \
+	  1>>.$$OBJNAME-tst.stdout.log 2>.$$OBJNAME-tst.stderr.log;               \
+	$(MAKE) $$OBJNAME-tst-print;

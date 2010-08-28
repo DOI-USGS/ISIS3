@@ -1,5 +1,7 @@
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 #----------------------------------------------------------------------------
 # Let the user know how to use the system
 #----------------------------------------------------------------------------
@@ -40,7 +42,7 @@ all: incs thirdParty api apps docs
 incs:
 	echo "Installing include files"
 	mkdir -p inc
-	cd src; $(MAKE) includes
+	$(MAKE) --directory=src includes
 	echo "Finished installing include files"
 	echo " "
 
@@ -97,7 +99,7 @@ api:
 # (src/base/apps) and builds/installs each application.  Of course the
 # API must be built for this to work properly
 #----------------------------------------------------------------------------
-apps: 
+apps:
 	echo "Building Isis Applications" 
 	mkdir -p bin/xml
 	cd src; $(MAKE) applications
@@ -133,17 +135,18 @@ docs:
 #
 # This walks the src tree and removes ".o" files and binary files
 #----------------------------------------------------------------------------
-clean: cleansrc
+clean:
 	echo "Cleaning Isis"
+	$(MAKE) cleansrc
 	rm -rf inc
 	rm -rf doc
 	rm -rf bin
 	rm -rf lib
-	cd 3rdParty; $(MAKE) clean
-	echo "Finished Cleaning Isis"
+	$(MAKE) --directory=3rdParty clean
+	echo "Finished cleaning Isis"
 
 cleansrc:
-	cd src; $(MAKE) clean
+	$(MAKE) --directory=src clean
 
 #----------------------------------------------------------------------------
 # Target = unitTest appTest appTest2 catTest
