@@ -734,11 +734,7 @@ namespace Qisis {
   void StretchTool::stretchRegional(CubeViewport *cvp) {
     QRect rect(0, 0, cvp->viewport()->width(), cvp->viewport()->height());
 
-    Stretch newStretch = cvp->grayStretch();
-    newStretch.ClearPairs();
-    newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
-    cvp->stretchGray(newStretch);
-    stretchChanged();
+    stretchRect(cvp, rect);
   }
 
 
@@ -756,42 +752,56 @@ namespace Qisis {
     QRect rubberBandRect = RubberBandTool::rectangle();
     //Return if the width or height is zero
     if(rubberBandRect.width() == 0 || rubberBandRect.height() == 0) return;
-
-    Stretch newStretch;
-
-    if(cvp->isGray()) {
-      newStretch = cvp->grayStretch();
-      newStretch.ClearPairs();
-      newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rubberBandRect));
-      cvp->stretchGray(newStretch);
-    }
-    else {
-      if(p_stretchBand == Red) {
-        newStretch = cvp->redStretch();
+    
+    stretchRect(cvp, rubberBandRect);
+  }
+  
+  
+  /**
+   * stretch the specified CubeViewport with the given rect
+   *
+   * @param cvp The CubeViewport to stretch
+   * @param rect The rect with which to stretch the CubeViewport
+   */
+   void StretchTool::stretchRect(CubeViewport *cvp, QRect rect) {
+     Stretch newStretch;
+   
+     if(cvp->isGray()) {
+        newStretch = cvp->grayStretch();
         newStretch.ClearPairs();
-        newStretch.CopyPairs(stretchBuffer(cvp->redBuffer(), rubberBandRect));
-        cvp->stretchRed(newStretch);
-      }
-      else if(p_stretchBand == Green) {
-        newStretch = cvp->greenStretch();
-        newStretch.ClearPairs();
-        newStretch.CopyPairs(stretchBuffer(cvp->greenBuffer(), rubberBandRect));
-        cvp->stretchGreen(newStretch);
-      }
-      else if(p_stretchBand == Blue) {
-        newStretch = cvp->blueStretch();
-        newStretch.ClearPairs();
-        newStretch.CopyPairs(stretchBuffer(cvp->blueBuffer(), rubberBandRect));
-        cvp->stretchBlue(newStretch);
+        newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
+        cvp->stretchGray(newStretch);
       }
       else {
-        throw iException::Message(iException::Programmer,
-                                  "Unknown stretch band", _FILEINFO_);
+        switch(p_stretchBand) {
+          case Red:
+            newStretch = cvp->redStretch();
+            newStretch.ClearPairs();
+            newStretch.CopyPairs(stretchBuffer(cvp->redBuffer(), rect));
+            cvp->stretchRed(newStretch);
+            break;
+          case Green:
+            newStretch = cvp->greenStretch();
+            newStretch.ClearPairs();
+            newStretch.CopyPairs(stretchBuffer(cvp->greenBuffer(), rect));
+            cvp->stretchGreen(newStretch);
+            break;
+          case Blue:
+            newStretch = cvp->blueStretch();
+            newStretch.ClearPairs();
+            newStretch.CopyPairs(stretchBuffer(cvp->blueBuffer(), rect));
+            cvp->stretchBlue(newStretch);
+            break;
+          default:
+            throw iException::Message(iException::Programmer,
+                                      "Unknown stretch band", _FILEINFO_);
+        }
       }
-    }
-
-    stretchChanged();
-  }
+      
+      stretchChanged();
+   }
+  
+  
 
 
   /**

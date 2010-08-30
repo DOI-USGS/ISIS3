@@ -68,6 +68,11 @@ namespace Qisis {
    *             advanced stretch... without a viewport map!
    *    @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    *                                  - Fixed all include abuses
+   *    @history 2010-08-30 Eric Hyer
+   *             - Added RGB support for stretchRegional
+   *             - stretchRegional and rubberBandComplete
+   *                 now use the new private method stretchRect in order to
+   *                 avoid duplicate code. 
    */
   class StretchTool : public Qisis::Tool {
       Q_OBJECT
@@ -90,7 +95,7 @@ namespace Qisis {
 
       static Isis::Stretch stretchBuffer(ViewportBuffer *buffer, QRect rect);
       static Isis::Stretch stretchBand(CubeViewport *cvp, StretchBand band);
-
+      
       static Isis::Statistics statsFromCube(Isis::Cube *cube, int band);
       static Isis::Statistics statsFromBuffer(ViewportBuffer *buffer, QRect rect);
       static Isis::Histogram histFromCube(Isis::Cube *cube, int band,
@@ -150,6 +155,9 @@ namespace Qisis {
        * @param pExStr
        */
       void warningSignal(std::string   &pStr, const std::string pExStr);
+      
+    private:
+      void stretchRect(CubeViewport *cvp, QRect rect);
 
     private:
       AdvancedStretchDialog *p_advancedStretch; //!< The advanced dialog
