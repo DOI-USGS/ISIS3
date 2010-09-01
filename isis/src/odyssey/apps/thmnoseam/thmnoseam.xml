@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="thmnoseam" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Smooths the transitions between framelets.
+  </brief>
+
+  <description>
+    This program should be run on unprojected themis RDR cubes. When the data is
+    projected later, the seams should be minimized. This works by using a 
+    biased average, based on how far through the overlap the DN is, in the
+    overlapping space between framelets. The averaging favors the tops of 
+    the framelets over the bottoms of framelets because the tops of framelets
+    are generally of better quality for this data set.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2010-08-31">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Mars Odyssey</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="INEVEN">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Even framelet input cube
+        </brief>
+        <description>
+          This is the input cube that contains all of the even framelets.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="INODD">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Odd framelet input cube
+        </brief>
+        <description>
+          This is the input cube that contains all of the odd framelets.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="OUTEVEN">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Even framelet output cube
+         </brief>
+         <description>
+           This is the noseam'd output cube containing the even framelets.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+       
+       <parameter name="OUTODD">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Odd framelet output cube
+         </brief>
+         <description>
+           This is the noseam'd output cube containing the odd framelets.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+   </groups>
+</application>
