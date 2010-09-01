@@ -1,10 +1,78 @@
 include $(ISISROOT)/make/isismake.macros
 
-.NOTPARALLEL:
-
 DIRONLY = $(subst /,,$(shell ls -d */))
 CVS := CVS
 TESTS = $(filter-out $(CVS), $(DIRONLY))
+
+# This makefile does parallel builds with serialized output. Let's go ahead and
+# set this up.
+
+# We want targets for each possible parallelized build. The parallel builds work
+# by parallelizing non-dependant targets. To accomplish our task, let's set up
+# the arrays of dependencies for some of our build types.
+CASESTEST := $(TESTS:%=%-test)
+
+# For serializing output, we have log and lock files. Let's define some helpful
+# targets for managing these.
+
+# This deletes the lock file. This should not be called when anything could be
+# using the file.
+cleanuplockfile:
+	BUILDNAME=`dirname $$ISISROOT`;                                           \
+	BUILDNAME=`basename $$BUILDNAME`;                                         \
+	if [ -f ".isisbuild.$$USER.$$BUILDNAME" ]; then                           \
+	  $(RM) ".isisbuild.$$USER.$$BUILDNAME";                                  \
+	fi;
+
+# When we make casename-print it should print the cases' log. This acquires the
+# appropriate lock before printing. There is a 30s timeout on the lock before 
+# breaking it.
+%-print:
+	CASENAME=`$(ECHO) $@ | $(SED) 's/-print//'`;                        \
+	                                                                    \
+	BUILDNAME=`dirname $$ISISROOT`;                                     \
+	BUILDNAME=`basename $$BUILDNAME`;                                   \
+	trap "rm -f .isisbuild.$$USER.$$BUILDNAME; exit $$?" INT TERM EXIT; \
+	                                                                    \
+	LOCKED=0;                                                           \
+	COUNTER=0;                                                          \
+	while [ "$$LOCKED" -eq "0" ]; do                                    \
+	  if [ "$$COUNTER" -gt 300 ]; then                                  \
+	    $(RM) .isisbuild.$$USER.$$BUILDNAME;                            \
+	    COUNTER=0;                                                      \
+	    echo "Warning: Acquiring lock to print to screen timed out";    \
+	  fi;                                                               \
+                                                                        \
+	  ( set -o noclobber &&                                             \
+	    echo "$$$$" > .isisbuild.$$USER.$$BUILDNAME ) &>/dev/null;      \
+	  if [ "$$?" -eq "0" ]; then                                        \
+	    LOCKED=1;                                                       \
+	  else                                                              \
+	    COUNTER=`expr $$COUNTER + 1`;                                   \
+	    sleep 0.1;                                                      \
+	  fi;                                                               \
+	done;                                                               \
+	                                                                    \
+	if [ -f .$$CASENAME.stdall.log ]; then                              \
+	  $(CAT) .$$CASENAME.stdall.log;                                    \
+	fi;                                                                 \
+	                                                                    \
+	$(RM) .isisbuild.$$USER.$$BUILDNAME;                                \
+	                                                                    \
+	$(MAKE) $$CASENAME-cleanupprint;
+
+
+# Cleanup log files if they exist. This should be called BEFORE the files are
+# redirected to and AFTER they are printed.
+%-cleanupprint:
+	CASENAME=`$(ECHO) $@ | $(SED) 's/-cleanupprint//'`; \
+	                                                    \
+	if [ -f ".$$CASENAME.stdall.log" ]; then            \
+	  $(RM) ".$$CASENAME.stdall.log";                   \
+	fi;
+
+# Our overhead targets are now handled.
+
 
 #----------------------------------------------------------------------------
 # Target = help
@@ -26,28 +94,27 @@ help:
 # has no makefile or there is no tests a message is
 # printed saying so.
 #----------------------------------------------------------------------------
-test: force
-	if [ "$(TESTS)" != "" ]; \
-	then \
-	  echo ""; \
-	  for i in $(TESTS); do \
-	    if [ -d "$$i" ]; then \
-	      cd $$i; \
-	      if [ -f "Makefile" ]; \
-	      then \
-	        $(MAKE) test CASE=$$i BLANKS=$(BLANKS); \
-	      else \
-	        printf $(BLANKS) ""; \
-	        echo "No makefile in case [$$i]"; \
-	      fi ; \
-	      cd ..; \
-	    fi; \
-	  done \
-	else \
-	  echo ""; \
-	  printf $(BLANKS) ""; \
+test: $(CASESTEST)
+	$(MAKE) cleanuplockfile; \
+	if [ "$CASESTEST" = "" ]; then \
 	  echo "no tests"; \
-	fi
+	fi;
+
+%-test:
+	CASENAME=`$(ECHO) $@ | $(SED) 's/-test//'`;                            \
+	$(MAKE) $$CASENAME-cleanupprint;                                       \
+	                                                                       \
+	if [ -f "Makefile" ]; then                                             \
+	  echo "" > .$$CASENAME.stdall.log;                                    \
+	  $(MAKE) --directory=$$CASENAME test CASE=$$CASENAME BLANKS=$(BLANKS) \
+	    1>>.$$CASENAME.stdall.log 2>.$$CASENAME.stdall.log;                \
+	else                                                                   \
+	  printf "$(BLANKS)No makefile in case [$$CASENAME]"                   \
+	    1>>.$$CASENAME.stdall.log;                                         \
+	fi;                                                                    \
+	                                                                       \
+	$(MAKE) $$CASENAME-print;
+
 force: ;
 
 #----------------------------------------------------------------------------
