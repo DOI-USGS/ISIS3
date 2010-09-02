@@ -2,7 +2,10 @@ include $(ISISROOT)/make/isismake.macros
 
 # Although we're capable of parallel builds at this level, let's not for the
 # sake of the logs - keep apps & objects under the correct package.
+ifeq ($(findstring MULTIPACKAGE, $(MODE)),MULTIPACKAGE)
+else
 .NOTPARALLEL:
+endif
 
 PACKAGES = $(filter-out Makefile docsys CVS IsisObjectConvert.xsl, $(wildcard *))
 
