@@ -21,7 +21,8 @@ ifneq ($(INCS), $(BLANK))
 endif
 
 # Get CPPs that dont include intermediate files or the unit test (if object)
-CPPS  := $(filter-out moc_%.cpp, $(wildcard *.cpp *.cc))
+CPPS  := $(wildcard *.cpp *.cc) # List of all compilable extensions!
+CPPS  := $(filter-out moc_%.cpp,    $(CPPS))
 CPPS  := $(filter-out unitTest.cpp, $(CPPS))
 
 # Handle Qt resource files (qrc)
@@ -59,9 +60,10 @@ PROTOS       = $(wildcard *.proto)
 PROTOSGEN    = $(wildcard *.pb.*)
 PROTOSOBJ    = $(wildcard *.pb.o)
 MOCINC       = $(wildcard *.h)
-MOCGEN	     = $(wildcard moc_*.cpp)
+MOCGEN       = $(wildcard moc_*.cpp)
 
-
+#TODO: This is obsolete. We need to not require these any more.
+#  These cause targets such as .cpp.o to work properly.
 .SUFFIXES:			#eliminate default suffixes
 .SUFFIXES: .cpp .o
 .SUFFIXES: .xml .html
@@ -77,7 +79,7 @@ object: protos
 .cpp.o: protos qtmoc
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
 
-.cc.o: 
+.cc.o:
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
 
 #  Its not necessarily $(LIBRARY)!
@@ -121,20 +123,20 @@ install: object
 
 force: ;
 
-protos:	$(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
+protos: $(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
 
 %.pb.cc %.pb.h: %.proto
 	$(PROTOC) -I$(<D) --cpp_out=$(<D) $^
 
 qtmoc: $(MOCINC:%.h=moc_%.cpp)
 
-moc_%.cpp: %.h		
+moc_%.cpp: %.h
 	if [ "$(filter-out ' ', $(shell grep -sIE -m1 'Q_OBJECT' $(<F)))" == "Q_OBJECT" ]; \
 	then \
 	  $(MOC) $(MOCDEFINES) -o $@ $(<F); \
 	fi
 
-qrc_%.cpp: %.qrc		
+qrc_%.cpp: %.qrc
 	$(RCC) $(RCCDEFINES) -o $@ $(<F);
 	
 help:
