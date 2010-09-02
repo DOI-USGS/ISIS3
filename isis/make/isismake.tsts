@@ -4,6 +4,8 @@
 
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 # File extensions that valid file types to compare
 BINFILES =  jpg tif bin fits raw bmp png bc img imq
 PVLFILES =  pvl
