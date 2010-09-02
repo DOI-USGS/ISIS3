@@ -57,7 +57,7 @@ ISIS3LOCAL  ?= /usgs/pkgs/local/isis$(ISISVERSION)
 #---------------------------------------------------------------------------
 # Set up for cwd
 #---------------------------------------------------------------------------
-CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd/libcwd1.0.3
+CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd/libcwd-1.0.4
 CWDLIBDIR = -L$(ISIS3LOCAL)/lib
 CWDLIB    = -lcwd_r
 
