@@ -75,7 +75,7 @@ endif
 ifeq "$(shell test -f  ../../$(APPNAME) && echo YES)" "YES"
    APPNAME := ../../$(APPNAME)
 else
-  APPNAME := $(APPNAME)
+  APPNAME := $(ISISROOT)/bin/$(APPNAME)
 endif
 
 # set the output variable to the output directory
