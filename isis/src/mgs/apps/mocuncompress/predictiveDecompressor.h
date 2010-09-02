@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)predictiveDecompressor.h	1.1 10/04/99
+SCCSID @(#)predictiveDecompressor.h  1.1 10/04/99
 */
 /* SCCShid @(#)predictiveDecompressor.h (predictiveDecompressor.h) 1.4 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)predictiveDecompressor.h	1.1 10/04/99
 
 #define predictiveDecompressor_h
 
-extern void predictiveDecompressor();
+extern void predictiveDecompressor(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint8 type, uint8 *code, uint8 *left, uint8 *right, uint16 sync, BITSTRUCT *bitStuff);
 
 #endif

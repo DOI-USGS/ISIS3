@@ -36,44 +36,41 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)findsync.c	1.1 10/04/99";
+//static char *sccsid = "@(#)readGroups.c  1.1 10/04/99";
+#if (!defined(NOSCCSID) && (!defined(LINT)))
+#endif
+/*
+* DESCRIPTION
+*
+* COMMENTARY
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "fs.h"
 
-static int maxdelta = 64;
+#include "readBits.h"
+#include "readGroups.h"
 
-static int delta_ok(p)
-uint8 *p;
+extern void exit();
+
+uint32 *readGroups(register uint32 numBlocks, register BITSTRUCT *bitStuff)
 {
-  int i, delta, md = 0;
+  register uint32 block;
+  uint32 *groups;
+  register uint32 *scanGroups;
 
-  for(i = 1; i < 32; i++) {
-    delta = p[i] - p[i+1];
-    if(delta < 0) delta = -delta;
-    if(delta > md) md = delta;
-  }
-  return md <= maxdelta;
-}
+  if((groups = (uint32 *)malloc((uint32)(numBlocks * sizeof(*groups)))) == NULL) {
+    (void)fprintf(stderr, "Not enough memory for decoding of image\n");
+    exit(1);
+  };
 
-/* locate the first sync line following the location pointed to by p.
-   Note that a valid sync line must start with the 16-bit sync pattern
-   and that the uncompressed pixels following must pass a test based
-   on the maximum delta value pixel-to-pixel, which is forced to be <=
-   maxdelta. */
-uint8 *findsync(p, len, sync)
-uint8 *p;
-int len;
-uint16 sync;
-{
-  uint16 s;
+  scanGroups = groups;
 
-  p += 2; /* skip the previous sync value and search forward for the next */
-  len -= 2;
-  while(len--) {
-    s = *p | (*(p + 1) << 8);
-    if(s == sync && delta_ok(p + 2)) {
-      return p;
-    }
-    else p += 1;
-  }
-  return 0;
+  for(block = 0; block < numBlocks; block++) {
+    *(scanGroups++) = readBits(3, bitStuff);
+  };
+
+  return(groups);
 }

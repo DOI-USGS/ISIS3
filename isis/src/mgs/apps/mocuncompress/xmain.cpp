@@ -36,12 +36,12 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)xmain.c	1.1 10/04/99";
+//static char *sccsid = "@(#)xmain.c  1.1 10/04/99";
 
 /*
     MOC transform decompressor main routine
     Mike Caplinger, MOC GDS Design Scientist
-    SCCS @(#)main.c	1.2 1/5/94
+    SCCS @(#)main.c  1.2 1/5/94
 
     Adapted from a version by Terry Ligocki with SCCS
     @(#)decompress.c (decompress.c) 1.6
@@ -64,20 +64,15 @@ extern void exit();
 
 jmp_buf on_error;
 
-uint8 *transform_decomp_main(data, len, height, width, transform, spacing, numLevels)
-uint8 *data;
-int height, width;
-uint32 transform;
-uint32 spacing;
-uint32 numLevels;
+uint8 *transform_decomp_main(uint8 *data, int len, int height, int width, uint32 transform, uint32 spacing, uint32 numLevels)
 {
 
   uint32 xSize = width, ySize = height;
   uint32 level;
   uint32 numBlocks;
   uint8 *image;
-  int32 hsize;
-  int32 header[3];
+//  int32 hsize;
+  //int32 header[3];
   BITSTRUCT *bitStuff;
   uint32 *groups;
   uint32 *occ;
@@ -89,12 +84,12 @@ uint32 numLevels;
 
   if((image = (uint8 *)malloc((uint32)(xSize * ySize * sizeof(*image)))) == NULL) {
     (void)fprintf(stderr, "Not enough memory for image\n");
-    return;
+    return 0;
   };
 
   if((occ = (uint32 *)malloc((uint32)(numLevels * sizeof(*occ)))) == NULL) {
     (void)fprintf(stderr, "Not enough memory to decoding of image\n");
-    return;
+    return 0;
   };
 
   for(level = 0; level < numLevels; level++) {

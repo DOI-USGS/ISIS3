@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)readBits.c	1.1 10/04/99";
+//static char *sccsid = "@(#)readBits.c  1.1 10/04/99";
 
 /*
     This is a low-level bit stream reader.  It's adapted from a version
@@ -64,7 +64,7 @@ extern void exit();
 extern jmp_buf on_error;
 
 #ifdef FILEBITS
-BITSTRUCT *initBits(file) FILE *file;
+BITSTRUCT *initBits(FILE * file)
 {
   BITSTRUCT *bitStuff;
 
@@ -82,7 +82,7 @@ BITSTRUCT *initBits(file) FILE *file;
   return(bitStuff);
 }
 #else
-BITSTRUCT *initBits(data, len) uint8 *data;
+BITSTRUCT *initBits(uint8 *data, int len)
 {
   BITSTRUCT *bitStuff;
 
@@ -101,8 +101,7 @@ BITSTRUCT *initBits(data, len) uint8 *data;
 }
 #endif
 
-uint32 readBits(bitCount, bitStuff) register uint8 bitCount;
-register BITSTRUCT *bitStuff;
+uint32 readBits(register uint8 bitCount, register BITSTRUCT *bitStuff)
 {
   register uint32 bitQueue;
   register uint32 bitQueueCount;

@@ -36,16 +36,16 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)predictiveDecompressor.c	1.1 10/04/99";
+//static char *sccsid = "@(#)predictiveDecompressor.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 /*
 * DESCRIPTION
 *
-*	This module produces a single line of decompressed data from
-*	data that has been predictively compressed.  The input is a bit
-*	stream, a huffman tree, and the previous line.  The output is a
-*	line 8 bit pixels.
+*  This module produces a single line of decompressed data from
+*  data that has been predictively compressed.  The input is a bit
+*  stream, a huffman tree, and the previous line.  The output is a
+*  line 8 bit pixels.
 *
 * COMMENTARY
 */
@@ -62,12 +62,7 @@ static char *sccsid = "@(#)predictiveDecompressor.c	1.1 10/04/99";
 
 #include "predictiveDecompressor.h"
 
-void predictiveDecompressor(curLine, prevLine, size, type, code, left, right, sync, bitStuff) register uint8 *curLine, *prevLine;
-register uint32 size;
-uint8 type;
-uint8 *code, *left, *right;
-uint16 sync;
-BITSTRUCT *bitStuff;
+void predictiveDecompressor(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint8 type, uint8 *code, uint8 *left, uint8 *right, uint16 sync, BITSTRUCT *bitStuff)
 {
   /*
   * This function produces a single line of decompressed data from data
@@ -76,22 +71,22 @@ BITSTRUCT *bitStuff;
   * pixels.
   *
   * pre:
-  *	"curLine" - a place for the decoded, decompressed 8 bit output line.
-  *	"prevLine" - the previous output line (for vertical decompression).
-  *	"size" - the size of the above two lines of pixels.
-  *	"type" - the type of predictive compression done to this line (NOTE:
-  *		the "REQUANT" bit must not be set).
-  *	"code" - part of the huffman tree in table form (set above).
-  *	"left" - part of the huffman tree in table form (set above).
-  *	"right" - part of the huffman tree in table form (set above).
-  *	"sync" - the sync pattern.
-  *	"bitStuff" - the bit stream containing the encoded, compressed data.
+  *  "curLine" - a place for the decoded, decompressed 8 bit output line.
+  *  "prevLine" - the previous output line (for vertical decompression).
+  *  "size" - the size of the above two lines of pixels.
+  *  "type" - the type of predictive compression done to this line (NOTE:
+  *    the "REQUANT" bit must not be set).
+  *  "code" - part of the huffman tree in table form (set above).
+  *  "left" - part of the huffman tree in table form (set above).
+  *  "right" - part of the huffman tree in table form (set above).
+  *  "sync" - the sync pattern.
+  *  "bitStuff" - the bit stream containing the encoded, compressed data.
   *
   * post:
-  *	"curLine" - the decoded, decompressed 8 bit output line.
-  *	"prevLine" - same a "curLine" (used for next call).
-  *	"bitStuff" - now references the first bit on the next line of encoded,
-  *		compressed data.
+  *  "curLine" - the decoded, decompressed 8 bit output line.
+  *  "prevLine" - same a "curLine" (used for next call).
+  *  "bitStuff" - now references the first bit on the next line of encoded,
+  *    compressed data.
   */
 
   /* "Decode" the compression options */

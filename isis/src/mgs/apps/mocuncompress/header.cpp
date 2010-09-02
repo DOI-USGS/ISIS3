@@ -36,24 +36,21 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)header.c	1.2 10/06/99";
+//static char *sccsid = "@(#)header.c  1.2 10/06/99";
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "image_io.h"
 #include <errno.h>
 
-int prefix(s, pre)
-char *s, *pre;
+int prefix(char *s, char *pre)
 {
   return strncmp(s, pre, strlen(pre)) == 0;
 }
 
 /* write the image header and return the file descriptor to the open file */
 /*int write_header(width, height, infile, outfname)*/
-FILE *write_header(width, height, infile, outfname)
-FILE *infile;
-char *outfname;
+FILE *write_header(int width, int height, FILE *infile, char *outfname)
 {
   static int out = -1;
   int pos;
@@ -69,10 +66,10 @@ char *outfname;
       fprintf(stderr, "can't create %s\n", outfname);
       exit(1);
     }
-    /*	if((out = creat(outfname, 0666)) < 0) {
-    	    fprintf(stderr, "can't create %s\n", outfname);
-    	    exit(1);
-    	}*/
+    /*  if((out = creat(outfname, 0666)) < 0) {
+          fprintf(stderr, "can't create %s\n", outfname);
+          exit(1);
+      }*/
     outf = fopen(outfname, "w+");
   }
   /*    i = lseek(out, 0l, 0);*/
@@ -115,7 +112,7 @@ char *outfname;
       break;
     }
     else {
-      /*	    i = fputs(line, outf); */
+      /*      i = fputs(line, outf); */
       i = fprintf(outf, "%s", line);
     }
   }

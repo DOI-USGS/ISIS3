@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)predDecompCommon.h	1.1 10/04/99
+SCCSID @(#)predDecompCommon.h  1.1 10/04/99
 */
 /* SCCShid @(#)predDecompCommon.h (predDecompCommon.h) 1.1 */
 
@@ -46,7 +46,7 @@ SCCSID @(#)predDecompCommon.h	1.1 10/04/99
 
 /* Flags indication left (or right) branch is not a leaf for decompression */
 
-#define LEFT	0x01		/* Left  branch is not a leaf */
-#define RIGHT	0x02		/* Right branch is not a leaf */
+#define LEFT  0x01    /* Left  branch is not a leaf */
+#define RIGHT  0x02    /* Right branch is not a leaf */
 
 #endif

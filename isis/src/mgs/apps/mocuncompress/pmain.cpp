@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)pmain.c	1.2 03/30/00";
+//static char *sccsid = "@(#)pmain.c  1.2 03/30/00";
 
 /*
 * DESCRIPTION
@@ -57,7 +57,7 @@ static char *sccsid = "@(#)pmain.c	1.2 03/30/00";
 
 extern void exit();
 
-#define BUFFERSIZE	4096
+#define BUFFERSIZE  4096
 
 /* Huffman tree (in table form) */
 uint8 code[256];
@@ -70,21 +70,16 @@ int pred_past_eof;
     NOTE: the globals code, left, and right should be set up prior
     to calling this routine.
 */
-uint8 *predictive_decomp_main(data, len, height, width,
-                              doSync, sync, xpred, ypred, got_height)
-uint8 *data;
-int len;
-uint8 doSync;     /* Use sync pattern */
-uint16 sync;      /* Sync pattern to use */
-int *got_height;
+uint8 *predictive_decomp_main(uint8 *data, int len, int height, int width,
+                              uint8 doSync, uint16 sync, int xpred, int ypred, int *got_height)
 {
   uint8 *curLine;     /* Current line */
   uint8 *prevLine;    /* Previous line */
   BITSTRUCT bitStuff;   /* Output bit stream structure */
   uint8 compType = 0;   /* Type of compression */
-  uint32 decodeSize;    /* Size of huffman tables */
+  //uint32 decodeSize;    /* Size of huffman tables */
   uint32 y;     /* Looping variable */
-  uint32 index;     /* Indexing variable */
+  //uint32 index;     /* Indexing variable */
   uint8 *result;
   uint8 *lastsync;
   uint16 gotsync;
@@ -100,7 +95,7 @@ int *got_height;
     exit(1);
   };
 
-  for(y = 0; y < width; y++) {
+  for(y = 0; y < (unsigned)width; y++) {
     prevLine[y] = 0;
   };
 
@@ -123,7 +118,7 @@ int *got_height;
 
   lastsync = data;
 
-  for(y = 0; y < height; y++) {
+  for(y = 0; y < (unsigned)height; y++) {
     if((y % 128 == 0) && (doSync == 1)) {
       if(bitStuff.bitCount != 0) {
         bitStuff.bitCount = 0;

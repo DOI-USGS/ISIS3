@@ -36,81 +36,40 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)readBlock.c	1.1 10/04/99";
-#if (!defined(NOSCCSID) && (!defined(LINT)))
-#endif
-/*
-* DESCRIPTION
-*
-* COMMENTARY
-*/
-
+//static char *sccsid = "@(#)findsync.c  1.1 10/04/99";
 #include "fs.h"
 
-#include "readBits.h"
-#include "initBlock.h"
-#include "readBlock.h"
-#include "readCoef.h"
-#include "reorder.h"
-#include "invFwht16x16.h"
-#include "invFdct16x16.h"
+static int maxdelta = 64;
 
-void readBlock(transform, spacing, minDC, rangeDC, var, x, y, xSize, image, bitStuff) uint32 transform, spacing;
-uint16 minDC, rangeDC;
-uint32 *var;
-uint32 x, y, xSize;
-uint8 *image;
-BITSTRUCT *bitStuff;
+static int delta_ok(uint8 *p)
 {
-  int16 block[256], *scanBlock, *lastCoef;
-  uint32 i;
-  uint32 x0, y0;
-  uint16 dc;
-  uint16 numZeros;
+  int i, delta, md = 0;
 
-  dc = readBits(8, bitStuff);
+  for(i = 1; i < 32; i++) {
+    delta = p[i] - p[i+1];
+    if(delta < 0) delta = -delta;
+    if(delta > md) md = delta;
+  }
+  return md <= maxdelta;
+}
 
-  /* The following line of code was fixed on March 26, 2004
-     by Janet Barrett. The uint16 cast was added to get
-     consistent results between Linux and Solaris */
-  block[0] = (uint16)((double)dc * rangeDC / 255.0 + minDC);
-  var++;
+/* locate the first sync line following the location pointed to by p.
+   Note that a valid sync line must start with the 16-bit sync pattern
+   and that the uncompressed pixels following must pass a test based
+   on the maximum delta value pixel-to-pixel, which is forced to be <=
+   maxdelta. */
+uint8 *findsync(uint8 *p, int len, uint16 sync)
+{
+  uint16 s;
 
-  numZeros = readBits(8, bitStuff);
-
-  scanBlock = &block[255];
-
-  for(i = 0; i < numZeros; i++) {
-    *(scanBlock--) = 0;
-  };
-
-  lastCoef = &block[255 - numZeros];
-
-  for(scanBlock = &block[1]; scanBlock <= lastCoef;) {
-    *(scanBlock++) = readCoef(encodeTrees[*(var++)], bitStuff) * spacing;
-  };
-
-  scanBlock = block;
-
-  reorder(block);
-
-  scanBlock = block;
-
-  switch(transform) {
-    case 0:
-      invFwht16x16(block, block);
-      break;
-
-    case 1:
-      invFdct16x16(block, block);
-      break;
-  };
-
-  scanBlock = block;
-
-  for(y0 = 0; y0 < 16; y0++) {
-    for(x0 = 0; x0 < 16; x0++) {
-      image[(y + y0) * xSize + (x + x0)] = *(scanBlock++);
-    };
-  };
+  p += 2; /* skip the previous sync value and search forward for the next */
+  len -= 2;
+  while(len--) {
+    s = *p | (*(p + 1) << 8);
+    if(s == sync && delta_ok(p + 2)) {
+      return p;
+    }
+    else p += 1;
+  }
+  return 0;
 }

@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)CheckSum.h	1.1 10/04/99
+SCCSID @(#)CheckSum.h  1.1 10/04/99
 */
 /* SCCShid @(#)CheckSum.h (CheckSum.h) 1.5 */
 #if !defined(CheckSum_h)
@@ -44,12 +44,12 @@ SCCSID @(#)CheckSum.h	1.1 10/04/99
 extern uint8 CS8EAC();
 extern void CS8EACA1();
 extern void CS8EACA2();
-extern UINT CS8EACC1();
-extern UINT CS8EACC2();
+extern unsigned int CS8EACC1();
+extern unsigned int CS8EACC2();
 extern uint16 CS16EAC();
 extern void CS16EACA1();
 extern void CS16EACA2();
-extern UINT CS16EACC1();
-extern UINT CS16EACC2();
-extern UINT ParityOf();
+extern unsigned int CS16EACC1();
+extern unsigned int CS16EACC2();
+extern unsigned int ParityOf();
 #endif

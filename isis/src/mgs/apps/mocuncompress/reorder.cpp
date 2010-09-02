@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)readGroups.c	1.1 10/04/99";
+//static char *sccsid = "@(#)reorder.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 /*
@@ -45,33 +45,60 @@ static char *sccsid = "@(#)readGroups.c	1.1 10/04/99";
 * COMMENTARY
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "fs.h"
+#include "reorder.static.h"
 
-#include "readBits.h"
-#include "readGroups.h"
+#include "reorder.h"
 
-extern void exit();
-
-uint32 *readGroups(numBlocks, bitStuff) register uint32 numBlocks;
-register BITSTRUCT *bitStuff;
+void reorder(int16 *block)
 {
-  register uint32 block;
-  uint32 *groups;
-  register uint32 *scanGroups;
+  int16 temp[256];
+  register int16 *scanBlock, *scanTemp;
+  register uint8 *scanTrans;
+  register uint32 i;
 
-  if((groups = (uint32 *)malloc((uint32)(numBlocks * sizeof(*groups)))) == NULL) {
-    (void)fprintf(stderr, "Not enough memory for decoding of image\n");
-    exit(1);
+  scanBlock = block;
+  scanTrans = trans;
+  scanTemp  = temp;
+
+  for(i = 0; i < 16; i++) {
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
+    *(scanTemp++) = scanBlock[*(scanTrans++)];
   };
 
-  scanGroups = groups;
+  scanBlock = block;
+  scanTemp  = temp;
 
-  for(block = 0; block < numBlocks; block++) {
-    *(scanGroups++) = readBits(3, bitStuff);
+  for(i = 0; i < 16; i++) {
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
+    *(scanBlock++) = *(scanTemp++);
   };
-
-  return(groups);
 }

@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)reorder.h	1.1 10/04/99
+SCCSID @(#)reorder.h  1.1 10/04/99
 */
 /* SCCShid @(#)reorder.h (reorder.h) 1.2 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)reorder.h	1.1 10/04/99
 
 #define reorder_h
 
-extern void reorder();
+extern void reorder(int16 *block);
 
 #endif

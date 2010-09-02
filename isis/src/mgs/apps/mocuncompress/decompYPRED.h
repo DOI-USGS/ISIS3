@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)decompYPRED.h	1.1 10/04/99
+SCCSID @(#)decompYPRED.h  1.1 10/04/99
 */
 /* SCCShid @(#)decompYPRED.h (decompYPRED.h) 1.2 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)decompYPRED.h	1.1 10/04/99
 
 #define decompYPRED_h
 
-extern void decompYPRED();
+extern void decompYPRED(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff);
 
 #endif

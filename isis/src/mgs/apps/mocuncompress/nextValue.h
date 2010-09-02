@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)nextValue.h	1.1 10/04/99
+SCCSID @(#)nextValue.h  1.1 10/04/99
 */
 /* SCCShid @(#)nextValue.h (nextValue.h) 1.3 */
 
@@ -51,86 +51,86 @@ SCCSID @(#)nextValue.h	1.1 10/04/99
 #define nextValue(DEFvalue,DEFcode,DEFleft,DEFright,DEFcur,DEFbitCount,DEFdata) \
 { \
 register uint8 *LCLcode,*LCLleft,*LCLright; \
-register uint32 LCLindex;		/* Current internal node index */ \
+register uint32 LCLindex;    /* Current internal node index */ \
  \
-	LCLcode  = (DEFcode); \
-	LCLleft  = (DEFleft); \
-	LCLright = (DEFright); \
+  LCLcode  = (DEFcode); \
+  LCLleft  = (DEFleft); \
+  LCLright = (DEFright); \
  \
-	/* Start at the top of the huffman "tree" */ \
-	LCLindex = 0; \
+  /* Start at the top of the huffman "tree" */ \
+  LCLindex = 0; \
  \
-	/* Proceed with decoding */ \
-	while (1) { \
-		/* Examine current bit of encoded byte */ \
-		if ((DEFcur & 0x1) == 0x0) { \
-		/* If current bit is a zero go "left" */ \
-			/* Decide if "left" is another internal node or a leaf */ \
-			if ((LCLcode[LCLindex] & LEFT) == 0) { \
-			/* "left" is a leaf */ \
-				/* Save decoded value and break out of loop */ \
-				(DEFvalue) = LCLleft[LCLindex]; \
-				break; \
-			} else { \
-			/* "left" is an internal node */ \
-				/* Move to new node */ \
-				LCLindex = LCLleft[LCLindex]; \
-			} \
-		} else { \
-		/* If current bit is a one go "right" */ \
-			/* Decide if "right" is another internal node or a leaf */ \
-			if ((LCLcode[LCLindex] & RIGHT) == 0) { \
-			/* "right" is a leaf */ \
-				/* Save decoded value and break out of loop */ \
-				(DEFvalue) = LCLright[LCLindex]; \
-				break; \
-			} else { \
-			/* "right" is an internal node */ \
-				/* Move to new node */ \
-				LCLindex = LCLright[LCLindex]; \
-			} \
-		}; \
+  /* Proceed with decoding */ \
+  while (1) { \
+    /* Examine current bit of encoded byte */ \
+    if ((DEFcur & 0x1) == 0x0) { \
+    /* If current bit is a zero go "left" */ \
+      /* Decide if "left" is another internal node or a leaf */ \
+      if ((LCLcode[LCLindex] & LEFT) == 0) { \
+      /* "left" is a leaf */ \
+        /* Save decoded value and break out of loop */ \
+        (DEFvalue) = LCLleft[LCLindex]; \
+        break; \
+      } else { \
+      /* "left" is an internal node */ \
+        /* Move to new node */ \
+        LCLindex = LCLleft[LCLindex]; \
+      } \
+    } else { \
+    /* If current bit is a one go "right" */ \
+      /* Decide if "right" is another internal node or a leaf */ \
+      if ((LCLcode[LCLindex] & RIGHT) == 0) { \
+      /* "right" is a leaf */ \
+        /* Save decoded value and break out of loop */ \
+        (DEFvalue) = LCLright[LCLindex]; \
+        break; \
+      } else { \
+      /* "right" is an internal node */ \
+        /* Move to new node */ \
+        LCLindex = LCLright[LCLindex]; \
+      } \
+    }; \
  \
-		/* Move to next bit */ \
-		DEFbitCount++; \
+    /* Move to next bit */ \
+    DEFbitCount++; \
  \
-		/* Are there any more bits in the current byte */ \
-		if (DEFbitCount > 7) { \
-		/* No more bits in current byte */ \
-			/* Start at the beginning of the next byte */ \
-			DEFbitCount = 0; \
+    /* Are there any more bits in the current byte */ \
+    if (DEFbitCount > 7) { \
+    /* No more bits in current byte */ \
+      /* Start at the beginning of the next byte */ \
+      DEFbitCount = 0; \
  \
-			/* Move pointer */ \
-			DEFdata++; \
+      /* Move pointer */ \
+      DEFdata++; \
  \
-			/* Get new byte */ \
-			DEFcur = *DEFdata; \
-		} else { \
-		/* More bits in current byte */ \
-			/* Shift next bit into position */ \
-			DEFcur >>= 1; \
-		} \
-	}; \
+      /* Get new byte */ \
+      DEFcur = *DEFdata; \
+    } else { \
+    /* More bits in current byte */ \
+      /* Shift next bit into position */ \
+      DEFcur >>= 1; \
+    } \
+  }; \
  \
-	/* Move to next bit */ \
-	DEFbitCount++; \
+  /* Move to next bit */ \
+  DEFbitCount++; \
  \
-	/* Are there any more bits in the current byte */ \
-	if (DEFbitCount > 7) { \
-	/* No more bits in current byte */ \
-		/* Start at the beginning of the next byte */ \
-		DEFbitCount = 0; \
+  /* Are there any more bits in the current byte */ \
+  if (DEFbitCount > 7) { \
+  /* No more bits in current byte */ \
+    /* Start at the beginning of the next byte */ \
+    DEFbitCount = 0; \
  \
-		/* Move pointer */ \
-		DEFdata++; \
+    /* Move pointer */ \
+    DEFdata++; \
  \
-		/* Get new byte */ \
-		DEFcur = *DEFdata; \
-	} else { \
-	/* More bits in current byte */ \
-		/* Shift next bit into position */ \
-		DEFcur >>= 1; \
-	}; \
+    /* Get new byte */ \
+    DEFcur = *DEFdata; \
+  } else { \
+  /* More bits in current byte */ \
+    /* Shift next bit into position */ \
+    DEFcur >>= 1; \
+  }; \
 }
 
 #endif

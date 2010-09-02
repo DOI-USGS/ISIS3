@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)decompXPREDYPRED.c	1.1 10/04/99";
+//static char *sccsid = "@(#)decompXPRED.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 
@@ -44,43 +44,35 @@ static char *sccsid = "@(#)decompXPREDYPRED.c	1.1 10/04/99";
 #include "bitsOut.h"
 #include "nextValue.h"
 
-#include "decompXPREDYPRED.h"
+#include "decompXPRED.h"
 
-void decompXPREDYPRED(curLine, prevLine, size, code, left, right, bitStuff) register uint8 *curLine, *prevLine;
-register uint32 size;
-uint8 *code, *left, *right;
-BITSTRUCT *bitStuff;
+void decompXPRED(register uint8 *curLine, uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff)
 {
-  register uint8 prevDiff;	/* Previous vertical difference */
+  register uint8 prev;    /* Previous pixel */
   register uint32 bitCount;
   register uint8 *data;
   register uint8 cur;
+
+  /* The first "previous pixel" is zero */
+  prev = 0;
 
   data     = bitStuff->output;
   bitCount = bitStuff->bitCount;
 
   cur = (*data) >> bitCount;
 
-  /* The first "previous difference" is zero */
-  prevDiff = 0;
-
   /* Decode and decompress all pixels in this line */
   while(size > 0) {
-    register uint8 prev;		/* The previous pixel */
-
-    /* Decode and decompress this pixel */
-    nextValue(prev, code, left, right, cur, bitCount, data);
-    prevDiff += prev;
-
-    /* Get the previous pixel */
-    prev = *prevLine;
-    prev += prevDiff;
+    register uint8 temp;
+    /*
+    * Decode and decompress this pixel and store it
+    * as the next pixel's previous pixel
+    */
+    nextValue(temp, code, left, right, cur, bitCount, data);
+    prev += temp;
 
     /* Store the current pixel */
     *(curLine++) = prev;
-
-    /* Store as the next pixel's previous pixel */
-    *(prevLine++) = prev;
 
     size--;
   };
@@ -99,17 +91,17 @@ void initReverse(trans) uint8 *trans;
   * pre:
   *
   * post:
-  *	The array "tran" contains the bit reversal of each index in that
-  *	index's location (e.g. trans[0x05] = 0xa0).
+  *  The array "tran" contains the bit reversal of each index in that
+  *  index's location (e.g. trans[0x05] = 0xa0).
   */
-  register uint32 t;		/* Current index */
+  register uint32 t;    /* Current index */
 
   /* Do all 8 bit numbers */
   for(t = 0; t < 256; t++) {
-    register uint8 r;	/* Reversed byte */
-    register uint8 b;	/* Bit count */
-    register uint8 mask;	/* Current bit in index */
-    register uint8 bit;	/* Current bit in reversed byte */
+    register uint8 r;  /* Reversed byte */
+    register uint8 b;  /* Bit count */
+    register uint8 mask;  /* Current bit in index */
+    register uint8 bit;  /* Current bit in reversed byte */
 
     /* Reverse all 8 bits */
     r = 0;
@@ -149,44 +141,36 @@ void createIdentTree(code, left, right) uint8 *code, *left, *right;
   };
 }
 
-#define MAXLINE		2048
+#define MAXLINE    2048
 
 uint8 reverse[256];
 uint8 data[2 * MAXLINE + 4];
 
-uint32 tryXYpred(code, left, right, bitStuff) uint8 *code, *left, *right;
+uint32 tryXpred(code, left, right, bitStuff) uint8 *code, *left, *right;
 BITSTRUCT *bitStuff;
 {
   uint32 nerror;
-  uint8 prevLine[MAXLINE];
   uint8 curLine[MAXLINE];
   uint32 i;
-  uint8 known, actual, prev, sum;
+  uint8 known, actual, sum;
 
   nerror = 0;
 
   for(i = 0; i < MAXLINE; i++) {
-    prevLine[i] = curLine[i] = 0;
+    curLine[i] = 0;
   };
 
-  decompXPREDYPRED(curLine, prevLine, MAXLINE, code, left, right, bitStuff);
+  decompXPRED(curLine, MAXLINE, code, left, right, bitStuff);
 
-  prev = 0;
+  sum = 0;
 
   for(i = 0; i < MAXLINE; i++) {
-    prev += ~reverse[(~i) & 0xFF];
-    known = prev;
+    sum += ~reverse[(~i) & 0xFF];
+    known = sum;
     actual = curLine[i];
 
     if(known != actual) {
-      printf("XY Pred: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
-      nerror += 1;
-    };
-
-    actual = prevLine[i];
-
-    if(known != actual) {
-      printf("XY Pred: Prev pixel: %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
+      printf("X Pred: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
       nerror += 1;
     };
   };
@@ -195,26 +179,17 @@ BITSTRUCT *bitStuff;
     curLine[i] = 0;
   };
 
-  decompXPREDYPRED(curLine, prevLine, MAXLINE, code, left, right, bitStuff);
+  decompXPRED(curLine, MAXLINE, code, left, right, bitStuff);
 
   sum = 0;
-  prev = 0;
 
   for(i = 0; i < MAXLINE; i++) {
-    sum += ~reverse[(~i) & 0xFF];
-    known = (~reverse[(~(i+MAXLINE)) & 0xFF]) + sum + prev;
-    prev = known - sum;
+    sum += ~reverse[(~(i+MAXLINE)) & 0xFF];
+    known = sum;
     actual = curLine[i];
 
     if(known != actual) {
-      printf("XY Pred: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
-      nerror += 1;
-    };
-
-    actual = prevLine[i];
-
-    if(known != actual) {
-      printf("XY Pred: Prev pixel: %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
+      printf("X Pred: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
       nerror += 1;
     };
   };
@@ -248,7 +223,7 @@ main() {
   bitStuff.data = data;
   bitStuff.bitQueue = 0;
   bitStuff.bitCount = 0;
-  nerror = tryXYpred(code, left, right, &bitStuff);
+  nerror = tryXpred(code, left, right, &bitStuff);
 
   /* If no errors print message */
   if(nerror == 0) {

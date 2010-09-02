@@ -67,12 +67,12 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)readmocisis.c	1.2 04/10/00";
+//static char *sccsid = "@(#)readmocisis.c  1.2 04/10/00";
 
 /*
     SDP interpretation program
     Mike Caplinger, MOC GDS Design Scientist
-    SCCS @(#)readmocisis.c	1.2 04/10/00
+    SCCS @(#)readmocisis.c  1.2 04/10/00
 
     Reads and decompresses MOC SDP files to create PDS images.
     Derived from the GDS readmsdp program.
@@ -85,12 +85,13 @@ static char *sccsid = "@(#)readmocisis.c	1.2 04/10/00";
 #include "image_io.h"
 #include "array.h"
 #include "msdp.h"
+#include "fs.h"
 
 extern FILE *write_header(int width, int height,
                           FILE *infile, char *outfname);
-static int in;/*, out;*/
+//static int in;, out;
 static FILE *out;
-static struct image_header inf;
+//static struct image_header inf;
 static FILE *infile;
 int errors;
 static int test_pred;
@@ -103,7 +104,9 @@ static int frag_offset[128];
 static char infname[256], outfname[256];
 static int mbr = 0;
 
-byte *decode();
+byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr);
+void init_output(struct msdp_header h);
+extern unsigned int CS8EACC2(register unsigned char *dat, unsigned int len);
 
 #define FRAGSIZE (256*1024)
 
@@ -118,26 +121,24 @@ static int status;
 #define STAT_BADSEQ 4
 #define STAT_BADCS 8
 
-enum {
+enum MocCompressEnum {
   RAW = 0, PRED, XFORM
 } MocCompress = RAW;
 
-int main(argc, argv)
-int argc;
-char **argv;
+int main(int argc, char **argv)
 {
-  int height, width;
-  int frag_lines, n_frags;
+  int height = 0, width = 0;
+  //int frag_lines, n_frags;
   pixel *frag;
-  int f;
-  float quant;
+  //int f;
+  //float quant;
   int actual_height;
   int total_image = 0;
   int total = 0;
   int cs_check = 1;
   int pad_cs = 0;
   int i;
-  char s[8];
+  //char s[8];
   int multi = 0;
   int sequence = -1, processor = 0, n_processors = 1;
   int last_frag = -1;
@@ -170,7 +171,7 @@ char **argv;
     static int first = 1;
     struct msdp_header h, lasth;
     int datlen;
-    byte *indat, *chunk;
+    byte *indat = 0, *chunk = 0;
 
     lasth = h;
     i = fseek(infile, total + 2048, 0);
@@ -186,7 +187,7 @@ char **argv;
       /* image was short -- last flag missing */
       h.status = 2;
       frag = decode(h, indat, 0, &len, mbr);
-      /*	    write(out, frag, len);*/
+      /*      write(out, frag, len);*/
       i = fwrite(frag, 1, len, out);
       total_image += len;
     }
@@ -195,7 +196,7 @@ char **argv;
     sequence += 1;
 
     if(first && !multi) {
-      int edit[2];
+      //int edit[2];
 
       width = h.edit_length * 16;
       init_output(h);
@@ -222,7 +223,7 @@ char **argv;
         bzero(frag, 240 * 1024);
         total_image += n_pad * 240 * 1024;
         if(verbose) fprintf(stderr, "padding %d frags\n", n_pad);
-        /*		while(n_pad--) write(out, frag, 240*1024);*/
+        /*    while(n_pad--) write(out, frag, 240*1024);*/
         while(n_pad--) i = fwrite(frag, 1, 240 * 1024, out);
       }
       free(frag);
@@ -256,7 +257,7 @@ char **argv;
           total_image += 240 * 1024;
           total += sizeof(struct msdp_header) + datlen + 1;
           if(verbose) fprintf(stderr, "trashing bad frag\n");
-          /*		    write(out, frag, 240*1024);*/
+          /*        write(out, frag, 240*1024);*/
           i = fwrite(frag, 1, 240 * 1024, out);
           free(frag);
           continue;
@@ -269,7 +270,7 @@ char **argv;
     total_image += len;
     if(verbose) fprintf(stderr, "fragment len %d => %d\n", datlen, len);
     total += sizeof(struct msdp_header) + datlen + 1;
-    /*	write(out, frag, len);*/
+    /*  write(out, frag, len);*/
     i = fwrite(frag, 1, len, out);
     if(0) free(frag);
     free(chunk);
@@ -297,20 +298,17 @@ char **argv;
   else exit(0);
 }
 
-byte *decode(h, data, datlen, len, mbr)
-struct msdp_header h;
-byte *data;
-int datlen, *len;
-int mbr;
+byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr)
 {
   int height, width;
-  unsigned int xcomp, pcomp, spacing, levels;
-  byte *transform_decomp_main();
-  byte *predictive_decomp_main();
-  byte *image;
+  unsigned int xcomp, pcomp, spacing = 0, levels = 0;
+  uint8 *transform_decomp_main(uint8 *data, int len, int height, int width, uint32 transform, uint32 spacing, uint32 numLevels);
+  uint8 *predictive_decomp_main(uint8 *data, int len, int height, int width,
+                              uint8 doSync, uint16 sync, int xpred, int ypred, int *got_height);
+  byte *image = 0;
   static Array *tbuf;
   static int init_decode;
-  int huffman_table;
+  int huffman_table = 0;
 
   if(mbr) {
     width = 512;
@@ -367,6 +365,8 @@ int mbr;
                                  huffman_table);
 
     /* set up decode arrays */
+    extern void decodeLoad(char *);
+    extern void decodeInit(int);
     if(!init_decode) {
       if(*decode_file) decodeLoad(decode_file);
       else decodeInit(huffman_table);
@@ -383,7 +383,7 @@ int mbr;
     else {
       /* squirrel data away */
       if(!tbuf) tbuf = array_new(datlen * 8);
-      if(datlen && !array_append(tbuf, data, datlen)) {
+      if(datlen && !array_append(tbuf, (char*)data, datlen)) {
         // FIXED 2008/10/29, "datalen" was part of the print statement and no arguments
         //   were provided for the %d. - Steven Lambright, pointed out by "novas0x2a" (Support Forum Member)
         fprintf(stderr, "can't allocate temp space (%d bytes)\n", datlen);
@@ -398,11 +398,11 @@ int mbr;
         if(verbose) fprintf(stderr, "decompressing %d wide by %d high image\n",
                               width, want_h);
         image =
-          predictive_decomp_main(array_data(tbuf),
+          predictive_decomp_main((uint8*)array_data(tbuf),
                                  array_len(tbuf),
                                  want_h, width,
                                  (sync != 0), sync,
-                                 pcomp & 1, (pcomp & 2) >> 1,
+                                 (pcomp & 1), ((pcomp & 2) >> 1),
                                  &got_height);
         /* This is tricky.  We can get bad sync even without
            checksum errors if anomaly 8 occurs.  We want to
@@ -423,7 +423,7 @@ int mbr;
 int worklist_init() {
   struct msdp_header h;
   int count;
-  int frag;
+  int frag = 0;
   int height, width, xcomp;
   int datlen;
 
@@ -443,8 +443,7 @@ int worklist_init() {
   return 1;
 }
 
-int init_output(h)
-struct msdp_header h;
+void init_output(struct msdp_header h)
 {
   int height, width;
   char s[8];

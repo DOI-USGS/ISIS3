@@ -36,21 +36,21 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)invFwht16x16.c	1.1 10/04/99";
+//static char *sccsid = "@(#)invFwht16x16.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 /*
 * DESCRIPTION
-* 	This module calcutes a "sequency" ordered, two dimensional
-* 	inverse Walsh-Hadamard transform (WHT) on 16 x 16 blocks of
-* 	data.  It is done as two one dimensional transforms (one of the
-* 	rows followed by one of the columns).  Each one dimensional
-* 	transform is implemented as a 16 point, 4 stage "butterfly".
+*   This module calcutes a "sequency" ordered, two dimensional
+*   inverse Walsh-Hadamard transform (WHT) on 16 x 16 blocks of
+*   data.  It is done as two one dimensional transforms (one of the
+*   rows followed by one of the columns).  Each one dimensional
+*   transform is implemented as a 16 point, 4 stage "butterfly".
 *
 * COMMENTARY
-*	These routines have been highly optimized to produce very fast
-*	32000 executable code but still use C for coding (thus allowing
-*	compilation on other machines).
+*  These routines have been highly optimized to produce very fast
+*  32000 executable code but still use C for coding (thus allowing
+*  compilation on other machines).
 */
 
 #include <stdio.h>
@@ -68,15 +68,15 @@ extern void exit();
 * the 32000's registers.  Eight of these are required to do a 16 point,
 * one dimensional WHT.  The "simple" formulas for this "butterfly" are:
 *
-*	n0 = i0 + i1
-*	n1 = i0 - i1	First stage
-*	n2 = i2 + i3
-*	n3 = i2 - i3
+*  n0 = i0 + i1
+*  n1 = i0 - i1  First stage
+*  n2 = i2 + i3
+*  n3 = i2 - i3
 *
-*	o0 = n0 + n2
-*	o1 = n1 + n3	Second stage
-*	o2 = n0 - n2
-*	o3 = n1 - n3
+*  o0 = n0 + n2
+*  o1 = n1 + n3  Second stage
+*  o2 = n0 - n2
+*  o3 = n1 - n3
 *
 * All data (in and out) is assumed to be 16 bit integers.  "in" is the
 * base address of the input data array and "ii" is the scaling factor to
@@ -90,42 +90,42 @@ extern void exit();
 * the unscaled indexes into "out".
 */
 
-#define BUTTERFLY4(in,ii,i0,i1,i2,i3,out,oi,o0,o1,o2,o3)	\
-	{							\
-		register int32 t0,t1,t2,t3,t4;			\
-								\
-		/* Load input into registers */			\
-		t0 = in[(ii)*(i0)];				\
-		t1 = in[(ii)*(i1)];				\
-		t2 = in[(ii)*(i2)];				\
-		t3 = in[(ii)*(i3)];				\
-								\
-		/* Do first stage */				\
-		t4 = t0;					\
-		t4 += t1;					\
-		t0 -= t1;					\
-								\
-		t1 = t2;					\
-		t1 += t3;					\
-		t2 -= t3;					\
-								\
-		/* Do second stage */				\
-		t3 = t4;					\
-		t3 += t1;					\
-		t4 -= t1;					\
-								\
-		t1 = t0;					\
-		t1 += t2;					\
-		t0 -= t2;					\
-								\
-		/* Store results from registers */		\
-		out[(oi)*(o0)] = t3;				\
-		out[(oi)*(o1)] = t1;				\
-		out[(oi)*(o2)] = t4;				\
-		out[(oi)*(o3)] = t0;				\
-	}
+#define BUTTERFLY4(in,ii,i0,i1,i2,i3,out,oi,o0,o1,o2,o3)  \
+  {              \
+    register int32 t0,t1,t2,t3,t4;      \
+                \
+    /* Load input into registers */      \
+    t0 = in[(ii)*(i0)];        \
+    t1 = in[(ii)*(i1)];        \
+    t2 = in[(ii)*(i2)];        \
+    t3 = in[(ii)*(i3)];        \
+                \
+    /* Do first stage */        \
+    t4 = t0;          \
+    t4 += t1;          \
+    t0 -= t1;          \
+                \
+    t1 = t2;          \
+    t1 += t3;          \
+    t2 -= t3;          \
+                \
+    /* Do second stage */        \
+    t3 = t4;          \
+    t3 += t1;          \
+    t4 -= t1;          \
+                \
+    t1 = t0;          \
+    t1 += t2;          \
+    t0 -= t2;          \
+                \
+    /* Store results from registers */    \
+    out[(oi)*(o0)] = t3;        \
+    out[(oi)*(o1)] = t1;        \
+    out[(oi)*(o2)] = t4;        \
+    out[(oi)*(o3)] = t0;        \
+  }
 
-static void invFwht16_row(in, out) register int32 *in, *out;
+static void invFwht16_row(register int32 *in, register int32 *out)
 {
   /*
   * This function does a 16 point, one dimensional inverse WHT on 16, 32
@@ -134,12 +134,12 @@ static void invFwht16_row(in, out) register int32 *in, *out;
   * is not normalized but is in "sequency" order.
   *
   * pre:
-  *	"in" - the 16 inputs stored as 32 bit integers in a vector.
+  *  "in" - the 16 inputs stored as 32 bit integers in a vector.
   * post:
-  *	"out" - the 16 outputs stored as 32 bit integers in a vector.
+  *  "out" - the 16 outputs stored as 32 bit integers in a vector.
   */
-  int32 data[32];			/* Temporary storage used between stages */
-  register int32 *tmp;		/* Register pointer to the temporary storage */
+  int32 data[32];      /* Temporary storage used between stages */
+  register int32 *tmp;    /* Register pointer to the temporary storage */
 
   /* Point at temporary storage */
   tmp = data;
@@ -160,7 +160,7 @@ static void invFwht16_row(in, out) register int32 *in, *out;
   BUTTERFLY4(tmp, 1, 3, 7, 11, 15, out, 1, 8, 11, 9, 10);
 }
 
-static void invFwht16_col(in, out) register int32 *in, *out;
+static void invFwht16_col(register int32 *in, register int32 *out)
 {
   /*
   * This function does a 16 point, one dimensional inverse WHT on 16, 32
@@ -170,12 +170,12 @@ static void invFwht16_col(in, out) register int32 *in, *out;
   * not normalized but is in "sequency" order.
   *
   * pre:
-  *	"in" - the 16 inputs stored as 32 bit integers in every 16th location.
+  *  "in" - the 16 inputs stored as 32 bit integers in every 16th location.
   * post:
-  *	"out" - the 16 outputs stored as 32 bit integers in every 16th location.
+  *  "out" - the 16 outputs stored as 32 bit integers in every 16th location.
   */
-  int32 data[16];			/* Temporary storage used between stages */
-  register int32 *tmp;		/* Register pointer to the temporary storage */
+  int32 data[16];      /* Temporary storage used between stages */
+  register int32 *tmp;    /* Register pointer to the temporary storage */
 
   /* Point at temporary storage */
   tmp = data;
@@ -196,7 +196,7 @@ static void invFwht16_col(in, out) register int32 *in, *out;
   BUTTERFLY4(tmp, 1, 3, 7, 11, 15, out, 16, 8, 11, 9, 10);
 }
 
-void invFwht16x16(in, out) register int16 *in, *out;
+void invFwht16x16(register int16 *in, register int16 *out)
 {
   /*
   * This function does a "sequency" ordered WHT on a 16 x 16 array of data
@@ -207,12 +207,12 @@ void invFwht16x16(in, out) register int16 *in, *out;
   * is all 8 bit, unsigned integers.
   *
   * pre:
-  *	"in" - the 16 x 16 input block data stored as 16 bit integers.
+  *  "in" - the 16 x 16 input block data stored as 16 bit integers.
   * post:
-  *	"out" - the 16 x 16 output block data stored as 16 bit integers.
+  *  "out" - the 16 x 16 output block data stored as 16 bit integers.
   */
-  uint32 i;			/* Generic looping variable */
-  int32 data[256];		/* Temporary storage for transform */
+  uint32 i;      /* Generic looping variable */
+  int32 data[256];    /* Temporary storage for transform */
 
   /* Convert 16 bit integers to 32 bit integers */
   {
@@ -230,7 +230,7 @@ void invFwht16x16(in, out) register int16 *in, *out;
   };
 
   {
-    register int32 *scanData;	/* Current row start in "data" */
+    register int32 *scanData;  /* Current row start in "data" */
 
     /*
     * Pass each row in "data" array (as a vector of size 16) to the
@@ -244,7 +244,7 @@ void invFwht16x16(in, out) register int16 *in, *out;
   };
 
   {
-    register int32 *scanData;	/* Current column start in "data" */
+    register int32 *scanData;  /* Current column start in "data" */
 
     /*
     * Inverse transform each column in the 16 x 16 block stored by rows

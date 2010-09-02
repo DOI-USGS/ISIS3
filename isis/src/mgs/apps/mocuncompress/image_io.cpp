@@ -36,15 +36,17 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)image_io.c	1.1 10/04/99";
+//static char *sccsid = "@(#)image_io.c  1.1 10/04/99";
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 #include "image_io.h"
 
-image_change_header(header)
-struct image_header *header;
+void image_change_header(struct image_header *header)
 {
   static int hdr_buf[IMAGE_HEADER_LENGTH / sizeof(int)];
 
@@ -62,10 +64,7 @@ struct image_header *header;
   }
 }
 
-image_open(filename, header, mode)
-char *filename;
-struct image_header *header;
-char *mode;
+void image_open(char *filename, struct image_header *header, char *mode)
 {
   int len;
   char buf[64];

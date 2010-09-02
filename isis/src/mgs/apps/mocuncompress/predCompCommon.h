@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)predCompCommon.h	1.1 10/04/99
+SCCSID @(#)predCompCommon.h  1.1 10/04/99
 */
 /* SCCShid @(#)predCompCommon.h (predCompCommon.h) 1.2 */
 
@@ -46,10 +46,10 @@ SCCSID @(#)predCompCommon.h	1.1 10/04/99
 
 /* Possible "orthogonal" types of predictive compression */
 
-#define NONE		0x00	/* No prediction (raw data) */
-#define REQUANT		0x01	/* Requantize data (before encoding) */
-#define XPRED		0x02	/* Prediction in the crosstrack direction */
-#define YPRED		0x04	/* Prediction in the downtrack  direction */
-#define SYNC		0x08	/* Output a "sync" pattern on this line */
+#define NONE    0x00  /* No prediction (raw data) */
+#define REQUANT    0x01  /* Requantize data (before encoding) */
+#define XPRED    0x02  /* Prediction in the crosstrack direction */
+#define YPRED    0x04  /* Prediction in the downtrack  direction */
+#define SYNC    0x08  /* Output a "sync" pattern on this line */
 
 #endif

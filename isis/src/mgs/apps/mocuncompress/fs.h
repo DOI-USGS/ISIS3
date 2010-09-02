@@ -36,21 +36,21 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)fs.h	1.1 10/04/99
+SCCSID @(#)fs.h  1.1 10/04/99
 */
 /* SCCShid @(#)fs.h (fs.h) 1.1 */
 
 /*
 * DESCRIPTION
 *
-*	Typedefs for commonly used signed and unsigned integers of
-*	different length (in bits).
+*  Typedefs for commonly used signed and unsigned integers of
+*  different length (in bits).
 *
 * COMMENTARY
 *
-*	It is intended that these definitions refer to integers of
-*	the exact length specified and can be used as primitives in
-*	such things as arithmetic operations.
+*  It is intended that these definitions refer to integers of
+*  the exact length specified and can be used as primitives in
+*  such things as arithmetic operations.
 */
 
 #if !defined(fs_h)
@@ -59,21 +59,21 @@ SCCSID @(#)fs.h	1.1 10/04/99
 
 /* Unsigned integers of lengths 32, 16, and 8 bits, respectively */
 
-typedef unsigned int	uint32;
-typedef unsigned short	uint16;
-typedef unsigned char	uint8;
+typedef unsigned int  uint32;
+typedef unsigned short  uint16;
+typedef unsigned char  uint8;
 
 /* An unsigned integer of unspecified length */
 /* The '#ifndef _TYPES_' is to avoid clash with <sys/types.h> */
 
 #if !defined(_TYPES_) && !defined(_SYS_BSD_TYPES_H)
-typedef unsigned int	UINT;
+typedef unsigned int  UINT;
 #endif
 
 /* Signed integers of lengths 32, 16, and 8 bits, respectively */
 
-typedef int		int32;
-typedef short		int16;
-typedef char		int8;
+typedef int    int32;
+typedef short    int16;
+typedef char    int8;
 
 #endif

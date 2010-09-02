@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)readBlock.h	1.1 10/04/99
+SCCSID @(#)readBlock.h  1.1 10/04/99
 */
 /* SCCShid @(#)readBlock.h (readBlock.h) 1.4 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)readBlock.h	1.1 10/04/99
 
 #define readBlock_h
 
-extern void readBlock();
+extern void readBlock(uint32 transform, uint32 spacing, uint16 minDC, uint16 rangeDC, uint32 *var, uint32 x, uint32 y, uint32 xSize, uint8 *image, BITSTRUCT *bitStuff);
 
 #endif

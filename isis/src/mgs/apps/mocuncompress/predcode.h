@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)predcode.h	1.1 10/04/99
+SCCSID @(#)predcode.h  1.1 10/04/99
 */
 /* SCCSID @(#)predcode.h (predcode.h) 1.2 */
 

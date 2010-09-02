@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)invFdct16x16.c	1.1 10/04/99";
+//static char *sccsid = "@(#)invFdct16x16.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 /*
@@ -49,7 +49,7 @@ static char *sccsid = "@(#)invFdct16x16.c	1.1 10/04/99";
 
 #include "invFdct16x16.h"
 
-#define MULTDOUBLE(r,v,c)	(r) = (v) * (c);
+#define MULTDOUBLE(r,v,c)  (r) = (v) * (c);
 
 static double cosineDouble[16] = {
   1.00000000000000000000e+00,
@@ -70,7 +70,7 @@ static double cosineDouble[16] = {
   9.80171403295606040000e-02,
 };
 
-static void DCTinv16Double(in, out) double *in, *out;
+static void DCTinv16Double(double *in, double *out)
 {
   double tmp[16];
   register double tmp1, tmp2;
@@ -222,7 +222,7 @@ static void DCTinv16Double(in, out) double *in, *out;
   out[15] = -tmp[15] + tmp[0];
 }
 
-void invFdct16x16(in, out) int16 *in, *out;
+void invFdct16x16(int16 *in, int16 *out)
 {
   uint32 i, j;
   double data[256], *scanData, *other;
@@ -272,7 +272,7 @@ void invFdct16x16(in, out) int16 *in, *out;
 
   for(i = 0, scanData = data; i < 256; i++) {
     int16 cur;
-    cur = *(scanData++) / 127.0 + 0.5;
+    cur = (int16)(*(scanData++) / 127.0 + 0.5);
 
     if(cur < 0) {
       cur = 0;

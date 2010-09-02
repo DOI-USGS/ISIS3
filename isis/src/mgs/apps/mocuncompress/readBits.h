@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)readBits.h	1.1 10/04/99
+SCCSID @(#)readBits.h  1.1 10/04/99
 */
 /* SCCShid @(#)readBits.h (readBits.h) 1.2 */
 
@@ -48,7 +48,7 @@ SCCSID @(#)readBits.h	1.1 10/04/99
 
 #include "fs.h"
 
-#define MAXQUEUESIZE	4096
+#define MAXQUEUESIZE  4096
 
 typedef struct bitStruct BITSTRUCT;
 
@@ -65,7 +65,7 @@ struct bitStruct {
   uint32 queueSize;
 };
 
-extern BITSTRUCT *initBits();
-extern uint32 readBits();
+extern BITSTRUCT *initBits(uint8 *data, int len);
+extern uint32 readBits(register uint8 bitCount, register BITSTRUCT *bitStuff);
 
 #endif

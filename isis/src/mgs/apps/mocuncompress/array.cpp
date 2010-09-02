@@ -36,12 +36,12 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)array.c	1.1 10/04/99";
+//static char *sccsid = "@(#)array.c  1.1 10/04/99";
 
 /*
     Auto-expanding array package
     Mike Caplinger, MOC GDS Design Scientist
-    SCCS @(#)array.c	1.2 10/18/91
+    SCCS @(#)array.c  1.2 10/18/91
 
     Implements a simple auto-expanding array data structure.  Include
     "array.h" to use.
@@ -55,30 +55,26 @@ static char *sccsid = "@(#)array.c	1.1 10/04/99";
     Create a new array with an initial allocation of len (0 will work if
     you can't make a better guess) and return it.
 */
-Array *array_new(len)
-int len;
+Array *array_new(int len)
 {
-  Array *new = (Array *) malloc(sizeof(Array));
+  Array *newA = (Array *) malloc(sizeof(Array));
 
-  if(new == 0) return 0;
+  if(newA == 0) return 0;
 
-  new->len = 0;
-  new->free = len;
-  new->data = (char *) malloc(len);
+  newA->len = 0;
+  newA->free = len;
+  newA->data = (char *) malloc(len);
 
-  if(new->data == 0) return 0;
+  if(newA->data == 0) return 0;
 
-  return new;
+  return newA;
 }
 
 /*
     Append len bytes of data at the end of the array.  Returns 0 if the
     operation fails, otherwise a positive number.
 */
-int array_append(a, data, len)
-Array *a;
-char *data;
-int len;
+int array_append(Array *a, char *data, int len)
 {
   if(a->free < len) {
     /* expand array */
@@ -100,9 +96,7 @@ int len;
     if any, down.  Returns 0 if the operation fails, otherwise a
     positive number.
 */
-int array_slot_delete(a, slot, len)
-Array *a;
-int slot, len;
+int array_slot_delete(Array *a, int slot, int len)
 {
   if(a->len < (slot + 1)*len) return 0;
   bcopy(&a->data[(slot+1)*len], &a->data[(slot)*len],
@@ -115,8 +109,7 @@ int slot, len;
 /*
     Returns the current size of the array in bytes.
 */
-int array_len(a)
-Array *a;
+int array_len(Array *a)
 {
   return a->len;
 }
@@ -125,8 +118,7 @@ Array *a;
     Returns the data contained in the array.  This is a contiguous vector
     of bytes guaranteed to be array_len(a) in size.
 */
-char *array_data(a)
-Array *a;
+char *array_data(Array *a)
 {
   return a->data;
 }
@@ -134,8 +126,7 @@ Array *a;
 /*
     Deallocate an array and its data.
 */
-void array_free(a)
-Array *a;
+void array_free(Array *a)
 {
   free(a->data);
   free(a);

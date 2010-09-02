@@ -36,12 +36,12 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)getdecode.c	1.1 10/04/99";
+//static char *sccsid = "@(#)getdecode.c  1.1 10/04/99";
 
 /*
     Huffman code tree module
     Mike Caplinger, MOC GDS Design Scientist
-    SCCS @(#)getdecode.c	1.1 11/19/91
+    SCCS @(#)getdecode.c  1.1 11/19/91
 
     This module manages the Ligocki-style Huffman decoding trees for
     the predictive decompressor.  It is a little roundabout in that
@@ -71,10 +71,9 @@ typedef struct ht_node {
 /* in TJL terminology, left is 0 and right is 1. */
 extern uint8 code[], left[], right[];
 
-decodeLoad(decodefile)
-char *decodefile;
+void decodeLoad(char *decodefile)
 {
-  int decodeSize;
+  unsigned int decodeSize;
   FILE *fd;
 
   if((fd = fopen(decodefile, "r")) == NULL) {
@@ -106,9 +105,7 @@ char *decodefile;
   (void)fclose(fd);
 }
 
-Huffman_node *ht_insert(root, value, code, len)
-Huffman_node *root;
-int value, code, len;
+Huffman_node *ht_insert(Huffman_node *root, int value, int code, int len)
 {
   int bit;
   Huffman_node **branch;
@@ -138,9 +135,7 @@ int value, code, len;
   return root;
 }
 
-int ht_lookup(root, code, len)
-Huffman_node *root;
-int code, len;
+int ht_lookup(Huffman_node *root, int code, int len)
 {
   int bit;
 
@@ -150,9 +145,7 @@ int code, len;
   else return ht_lookup(root->one, code >> 1, len - 1);
 }
 
-ht_dump(root, code, len)
-Huffman_node *root;
-int code, len;
+void ht_dump(Huffman_node *root, int code, int len)
 {
   if(root->zero == 0 && root->one == 0) {
     printf("%d %x(%d)\n", root->value, code, len);
@@ -174,24 +167,22 @@ int code, len;
     Convert a Huffman tree to TJL table form. Call initially
     with index = 0.
 */
-ht_tablefy(root, flags, zero, one, index)
-Huffman_node *root;
-unsigned char *flags, *zero, *one;
+int ht_tablefy(Huffman_node *root, unsigned char *flags, unsigned char *zero, unsigned char *one, unsigned char *index)
 {
-  int local_index = index;
+  int local_index = (int)(long)(index);
   int i;
 
   if(root->zero) {
     if(root->zero->zero == 0 && root->zero->one == 0) {
-      flags[index] &= ~ZERO;
-      zero[index] = root->zero->value;
+      flags[(int)(long)index] &= ~ZERO;
+      zero[(int)(long)index] = root->zero->value;
     }
     else {
       i = ZERO;
       flags[local_index] |= ZERO;
       index += 1;
-      zero[local_index] = index;
-      index = ht_tablefy(root->zero, flags, zero, one, index);
+      zero[local_index] = (char)(long)index;
+      index = (unsigned char*)ht_tablefy(root->zero, flags, zero, one, index);
     }
   }
   if(root->one) {
@@ -202,15 +193,14 @@ unsigned char *flags, *zero, *one;
     else {
       flags[local_index] |= ONE;
       index += 1;
-      one[local_index] = index;
-      index = ht_tablefy(root->one, flags, zero, one, index);
+      one[local_index] = (char)(long)index;
+      index = (unsigned char*)ht_tablefy(root->one, flags, zero, one, index);
     }
   }
-  return index;
+  return (int)(long)index;
 }
 
-Huffman_node *ht_tree_gen(i)
-int i;
+Huffman_node *ht_tree_gen(int i)
 {
   Huffman_node *tree = 0;
   uint16 *code;
@@ -237,18 +227,17 @@ int i;
   return tree;
 }
 
-ht_free(root)
-Huffman_node *root;
+void ht_free(Huffman_node *root)
 {
   if(root->zero) ht_free(root->zero);
   if(root->one) ht_free(root->one);
   free(root);
 }
 
-decodeInit(n) {
+void decodeInit(int n) {
   Huffman_node *tree = 0;
   int i;
-  uint8 flags[256], zero[256], one[256];
+//  uint8 flags[256], zero[256], one[256];
 
   tree = ht_tree_gen(n);
   /* i is the # of slots actually used... */

@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)CheckSum.c	1.1 10/04/99";
+//static char *sccsid = "@(#)CheckSum.c  1.1 10/04/99";
 
 /*
 * DESCRIPTION
@@ -47,39 +47,38 @@ static char *sccsid = "@(#)CheckSum.c	1.1 10/04/99";
 #include "fs.h"
 #include "CheckSum.h"
 
-uint8 CS8EAC(d, l)register uint8 *d;
-register uint32 l;
+uint8 CS8EAC(register uint8 *d, register uint32 l)
 {
   /*
   * Compute the eight bit end-around-carry checksum of a data vector.
   *
   * Pre:
-  *	0 < l < 1<<24
-  *	d[0..(l-1)] is data to compute checksum of.
+  *  0 < l < 1<<24
+  *  d[0..(l-1)] is data to compute checksum of.
   * Post:
-  *	rv is checksum of d[0..(l-1)]
+  *  rv is checksum of d[0..(l-1)]
   * Notes:
   *
-  *	There are two typical applications of this algorithm: Method 1
-  *	is save checksum of data part in known location (the PDS method)
-  *	and method 2 is cause the checksum of the data and cs field to
-  *	be some known value (MOC method, known value is 0xff).
+  *  There are two typical applications of this algorithm: Method 1
+  *  is save checksum of data part in known location (the PDS method)
+  *  and method 2 is cause the checksum of the data and cs field to
+  *  be some known value (MOC method, known value is 0xff).
   *
-  *	In both cases, assume a checksum is to be put on uint8 data[n],
-  *	with the checksum octet to be placed in data[n-1].
+  *  In both cases, assume a checksum is to be put on uint8 data[n],
+  *  with the checksum octet to be placed in data[n-1].
   *
-  *	APPLY CS METHOD 1:
-  *		uint8 t;
-  *		t = CS8EAC(data,n-1);
-  *		*(uint8*)&data[n-1] = t;
-  *	CHECK CS METHOD 1:
-  *		if(CS8EAC(data,n-1) != *(uint8*)&data[n-1])bad();
-  *	APPLY CS METHOD 2:
-  *		uint8 t;
-  *		t = 0xff - CS8EAC(data,n-1);
-  *		*(uint8*)&data[n-1] = t;
-  *	CHECK CS METHOD 2:
-  *		if(CS8EAC(data,n) != 0xff)bad();
+  *  APPLY CS METHOD 1:
+  *    uint8 t;
+  *    t = CS8EAC(data,n-1);
+  *    *(uint8*)&data[n-1] = t;
+  *  CHECK CS METHOD 1:
+  *    if(CS8EAC(data,n-1) != *(uint8*)&data[n-1])bad();
+  *  APPLY CS METHOD 2:
+  *    uint8 t;
+  *    t = 0xff - CS8EAC(data,n-1);
+  *    *(uint8*)&data[n-1] = t;
+  *  CHECK CS METHOD 2:
+  *    if(CS8EAC(data,n) != 0xff)bad();
   */
   register uint32 cs = 0;
   while(l--) {
@@ -107,16 +106,15 @@ register uint32 l;
 }
 #endif
 
-void CS8EACA1(dat, len)register uint8 *dat;
-uint32 len;
+void CS8EACA1(register uint8 *dat, uint32 len)
 {
   /*
   * Apply type 1 CS8EAC checksum to dat.
   * Pre:
-  *	dat[0..len-2] is value to checksum.
-  *	dat[len-1] is place to put checksum.
+  *  dat[0..len-2] is value to checksum.
+  *  dat[len-1] is place to put checksum.
   * Post:
-  *	CS8EAC(dat,len-1) == dat[len-1]
+  *  CS8EAC(dat,len-1) == dat[len-1]
   * Notes:
   */
   uint8 t;
@@ -124,16 +122,15 @@ uint32 len;
   *(uint8 *)&dat[len-1] = t;
 }
 
-void CS8EACA2(dat, len)register uint8 *dat;
-uint32 len;
+void CS8EACA2(register uint8 *dat, uint32 len)
 {
   /*
   * Apply type 2 CS8EAC checksum to dat.
   * Pre:
-  *	dat[0..len-2] is value to checksum.
-  *	dat[len-1] is place to put checksum.
+  *  dat[0..len-2] is value to checksum.
+  *  dat[len-1] is place to put checksum.
   * Post:
-  *	CS8EAC(dat,len) == 0xff
+  *  CS8EAC(dat,len) == 0xff
   * Notes:
   */
   uint8 t;
@@ -141,80 +138,77 @@ uint32 len;
   *(uint8 *)&dat[len-1] = 0xff - t;
 }
 
-UINT CS8EACC1(dat, len)register uint8 *dat;
-UINT len;
+unsigned int CS8EACC1(register uint8 *dat, unsigned int len)
 {
   /*
   * Check type 1 checksum.
   * Pre:
-  *	dat[0..len-1] is data to check checksum of.
-  *	CS8EACA1() or equivalent used to apply checksum.
+  *  dat[0..len-1] is data to check checksum of.
+  *  CS8EACA1() or equivalent used to apply checksum.
   * Post:
-  *	rv nz iff checksum valid.
+  *  rv nz iff checksum valid.
   * Notes:
   */
-  UINT rv = 1;
+  unsigned int rv = 1;
   if(CS8EAC(dat, len - 1) != dat[len-1]) {
     return rv = 0;
   };
   return rv;
 }
 
-UINT CS8EACC2(dat, len)register uint8 *dat;
-UINT len;
+unsigned int CS8EACC2(register uint8 *dat, unsigned int len)
 {
   /*
   * Check type 2 checksum.
   * Pre:
-  *	dat[0..len-1] is data to check checksum of.
-  *	CS8EACA2() or equivalent used to apply checksum.
+  *  dat[0..len-1] is data to check checksum of.
+  *  CS8EACA2() or equivalent used to apply checksum.
   * Post:
-  *	rv nz iff checksum valid.
+  *  rv nz iff checksum valid.
   * Notes:
   */
-  UINT rv = 1;
+  unsigned int rv = 1;
   if(CS8EAC(dat, len) != 0xff) {
     return rv = 0;
   };
   return rv;
 }
 
-uint16 CS16EAC(d, len)register uint8 *d;
-uint32 len;
+uint16 CS16EAC(register uint8 *d, uint32 len)
 {
   /*
   * Compute the sixteen bit end-around-carry checksum of a data vector.
   *
   * Pre:
-  *	d[0..(l-1)] is data to compute checksum of.
+  *  d[0..(l-1)] is data to compute checksum of.
   * Post:
-  *	rv is checksum of d[0..(l-1)]
+  *  rv is checksum of d[0..(l-1)]
   * Notes:
-  *	If l is odd then last word summed has last byte in d[] in
-  *	its low byte, zero in its high byte.
+  *  If l is odd then last word summed has last byte in d[] in
+  *  its low byte, zero in its high byte.
   *
-  *	There are two typical applications of this algorithm: Method 1
-  *	is save checksum of data part in known location (the PDS method)
-  *	and method 2 is cause the checksum of the data and cs field to
-  *	be some known value (MOC method, known value is 0xffff).
+  *  There are two typical applications of this algorithm: Method 1
+  *  is save checksum of data part in known location (the PDS method)
+  *  and method 2 is cause the checksum of the data and cs field to
+  *  be some known value (MOC method, known value is 0xffff).
   *
-  *	In both cases, assume a checksum is to be put on uint8 data[n],
-  *	with the two checksum octets to be placed in data[n-2] and
-  *	data[n-1].
+  *  In both cases, assume a checksum is to be put on uint8 data[n],
+  *  with the two checksum octets to be placed in data[n-2] and
+  *  data[n-1].
   *
-  *	APPLY CS METHOD 1:
-  *		uint16 t;
-  *		t = CS16EAC(data,n-2);
-  *		*(uint16*)&data[n-2] = t;
-  *	CHECK CS METHOD 1:
-  *		if(CS16EAC(data,n-2) != *(uint16*)&data[n-2])bad();
-  *	APPLY CS METHOD 2:
-  *		uint16 t;
-  *		t = 0xffff - CS16EAC(data,n-2);
-  *		if(n&1)t = (t<<8)|(t>>8);
-  *		*(uint16*)&data[n-2] = t;
-  *	CHECK CS METHOD 2:
-  *		if(CS16EAC(data,n) != 0xffff)bad();
+  *  APPLY CS METHOD 1:
+  *    uint16 t;
+  *    t = CS16EAC(data,n-2);
+  *    *(uint16*)&data[n-2] = t;
+  *  CHECK CS METHOD 1:
+  *    if(CS16EAC(data,n-2) != *(uint16*)&data[n-2])bad();
+  *  APPLY CS METHOD 2:
+  *    uint16 t;
+  *    t = 0xffff - CS16EAC(data,n-2);
+  *    if(n&1)t = (t<<8)|(t>>8);
+  *    *(uint16*)&data[n-2] = t;
+  *  CHECK CS METHOD 2:
+  *    if(CS16EAC(data,n) != 0xffff)bad();
   */
   register uint32 cs = 0;
   register uint32 l;
@@ -253,16 +247,15 @@ register uint32 l;
 }
 #endif
 
-void CS16EACA1(dat, len)register uint8 *dat;
-uint32 len;
+void CS16EACA1(register uint8 *dat, uint32 len)
 {
   /*
   * Apply type 1 CS16EAC checksum to dat.
   * Pre:
-  *	dat[0..len-3] is value to checksum.
-  *	dat[len-2..len-1] is place to put checksum.
+  *  dat[0..len-3] is value to checksum.
+  *  dat[len-2..len-1] is place to put checksum.
   * Post:
-  *	CS16EAC(dat,len-2) == dat[len-2..len-1]
+  *  CS16EAC(dat,len-2) == dat[len-2..len-1]
   * Notes:
   */
   uint16 t;
@@ -272,16 +265,15 @@ uint32 len;
   /* *(uint16*)&(dat[len-2]) = t; */
 }
 
-void CS16EACA2(dat, len)register uint8 *dat;
-uint32 len;
+void CS16EACA2(register uint8 *dat, uint32 len)
 {
   /*
   * Apply type 2 CS16EAC checksum to dat.
   * Pre:
-  *	dat[0..len-3] is value to checksum.
-  *	dat[len-2..len-1] is place to put checksum.
+  *  dat[0..len-3] is value to checksum.
+  *  dat[len-2..len-1] is place to put checksum.
   * Post:
-  *	CS16EAC(dat,len) == 0xffff
+  *  CS16EAC(dat,len) == 0xffff
   * Notes:
   */
   uint16 t;
@@ -292,19 +284,18 @@ uint32 len;
   /* *(uint16*)&(dat[len-2]) = t; */
 }
 
-UINT CS16EACC1(dat, len)register uint8 *dat;
-UINT len;
+unsigned int CS16EACC1(register uint8 *dat, unsigned int len)
 {
   /*
   * Check type 1 checksum.
   * Pre:
-  *	dat[0..len-1] is data to check checksum of.
-  *	CS16EACA1() or equivalent used to apply checksum.
+  *  dat[0..len-1] is data to check checksum of.
+  *  CS16EACA1() or equivalent used to apply checksum.
   * Post:
-  *	rv nz iff checksum valid.
+  *  rv nz iff checksum valid.
   * Notes:
   */
-  UINT rv = 1;
+  unsigned int rv = 1;
   uint16 t;
 
   t = dat[len-2] | (dat[len-1] << 8);
@@ -314,43 +305,41 @@ UINT len;
   return rv;
 }
 
-UINT CS16EACC2(dat, len)register uint8 *dat;
-UINT len;
+unsigned int CS16EACC2(register uint8 *dat, unsigned int len)
 {
   /*
   * Check type 2 checksum.
   * Pre:
-  *	dat[0..len-1] is data to check checksum of.
-  *	CS16EACA2() or equivalent used to apply checksum.
+  *  dat[0..len-1] is data to check checksum of.
+  *  CS16EACA2() or equivalent used to apply checksum.
   * Post:
-  *	rv nz iff checksum valid.
+  *  rv nz iff checksum valid.
   * Notes:
   */
-  UINT rv = 1;
+  unsigned int rv = 1;
   if(CS16EAC(dat, len) != 0xffff) {
     return rv = 0;
   };
   return rv;
 }
 
-UINT ParityOf(d, l)register uint8 *d;
-register uint32 l;
+unsigned int ParityOf(register uint8 *d, register uint32 l)
 {
   /*
   * Compute parity of data vector.
   * Pre:
-  *	d[0..(l-1)] is data to compute parity of.
+  *  d[0..(l-1)] is data to compute parity of.
   * Post:
-  *	rv is number of "one" bits in d[0..(l-1)] modulo 2.
+  *  rv is number of "one" bits in d[0..(l-1)] modulo 2.
   * Notes:
-  *	"Odd parity" means that there are an odd number of "one" bits
-  *	in the data covered by the parity.  "Even parity" means that
-  *	there are an even number of "one" bits in the data covered by
-  *	the parity.  It follows that this routine returns one if the
-  *	data is odd parity, and zero if it is even parity.
-  *	REFINE make ParityOf() faster if used often or with large l endREFINE
+  *  "Odd parity" means that there are an odd number of "one" bits
+  *  in the data covered by the parity.  "Even parity" means that
+  *  there are an even number of "one" bits in the data covered by
+  *  the parity.  It follows that this routine returns one if the
+  *  data is odd parity, and zero if it is even parity.
+  *  REFINE make ParityOf() faster if used often or with large l endREFINE
   */
-  register UINT cs = 0;
+  register unsigned int cs = 0;
   register uint8 t;
   while(l--) {
     t = *d++;
@@ -376,10 +365,10 @@ register uint32 l;
 #include <stdio.h>
 main() {
   uint8 d[100];
-  UINT i, ii, iii;
-  UINT cs1, cs2;
-  UINT oldii = 0;
-  UINT nbad = 0;
+  unsigned int i, ii, iii;
+  unsigned int cs1, cs2;
+  unsigned int oldii = 0;
+  unsigned int nbad = 0;
 #if defined(TESTCS8) || defined(TESTCS16)
   for(i = 0; i <= sizeof(d) * 255; i += 1 /*65537*/) {
     ii = 0;
@@ -464,7 +453,7 @@ main() {
 
 #if defined(TESTPARITY)
   for(i = 0; i < 256 * 256; i += 1) {
-    UINT t, cs;
+    unsigned int t, cs;
     if(!(i % 256)) {
       printf("Parity test %d of %d\n", i, 65536);
     };

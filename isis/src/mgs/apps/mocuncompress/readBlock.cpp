@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)reorder.c	1.1 10/04/99";
+//static char *sccsid = "@(#)readBlock.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 /*
@@ -46,59 +46,66 @@ static char *sccsid = "@(#)reorder.c	1.1 10/04/99";
 */
 
 #include "fs.h"
-#include "reorder.static.h"
 
+#include "readBits.h"
+#include "initBlock.h"
+#include "readBlock.h"
+#include "readCoef.h"
 #include "reorder.h"
+#include "invFwht16x16.h"
+#include "invFdct16x16.h"
 
-void reorder(block) int16 *block;
+void readBlock(uint32 transform, uint32 spacing, uint16 minDC, uint16 rangeDC, uint32 *var, uint32 x, uint32 y, uint32 xSize, uint8 *image, BITSTRUCT *bitStuff)
 {
-  int16 temp[256];
-  register int16 *scanBlock, *scanTemp;
-  register uint8 *scanTrans;
-  register uint32 i;
+  int16 block[256], *scanBlock, *lastCoef;
+  uint32 i;
+  uint32 x0, y0;
+  uint16 dc;
+  uint16 numZeros;
 
-  scanBlock = block;
-  scanTrans = trans;
-  scanTemp  = temp;
+  dc = readBits(8, bitStuff);
 
-  for(i = 0; i < 16; i++) {
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
-    *(scanTemp++) = scanBlock[*(scanTrans++)];
+  /* The following line of code was fixed on March 26, 2004
+     by Janet Barrett. The uint16 cast was added to get
+     consistent results between Linux and Solaris */
+  block[0] = (uint16)((double)dc * rangeDC / 255.0 + minDC);
+  var++;
+
+  numZeros = readBits(8, bitStuff);
+
+  scanBlock = &block[255];
+
+  for(i = 0; i < numZeros; i++) {
+    *(scanBlock--) = 0;
+  };
+
+  lastCoef = &block[255 - numZeros];
+
+  for(scanBlock = &block[1]; scanBlock <= lastCoef;) {
+    *(scanBlock++) = readCoef(encodeTrees[*(var++)], bitStuff) * spacing;
   };
 
   scanBlock = block;
-  scanTemp  = temp;
 
-  for(i = 0; i < 16; i++) {
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
-    *(scanBlock++) = *(scanTemp++);
+  reorder(block);
+
+  scanBlock = block;
+
+  switch(transform) {
+    case 0:
+      invFwht16x16(block, block);
+      break;
+
+    case 1:
+      invFdct16x16(block, block);
+      break;
+  };
+
+  scanBlock = block;
+
+  for(y0 = 0; y0 < 16; y0++) {
+    for(x0 = 0; x0 < 16; x0++) {
+      image[(y + y0) * xSize + (x + x0)] = *(scanBlock++);
+    };
   };
 }

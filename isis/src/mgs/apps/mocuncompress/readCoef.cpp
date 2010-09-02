@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)readCoef.c	1.1 10/04/99";
+//static char *sccsid = "@(#)readCoef.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 /*
@@ -51,8 +51,7 @@ static char *sccsid = "@(#)readCoef.c	1.1 10/04/99";
 #include "initBlock.h"
 #include "readCoef.h"
 
-int16 readCoef(encoding, bitStuff) BITTREE *encoding;
-BITSTRUCT *bitStuff;
+int16 readCoef(BITTREE *encoding, BITSTRUCT *bitStuff)
 {
   int16 coef;
 

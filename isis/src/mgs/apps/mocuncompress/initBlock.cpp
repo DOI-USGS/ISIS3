@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)initBlock.c	1.1 10/04/99";
+//static char *sccsid = "@(#)initBlock.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 /*
@@ -58,7 +58,7 @@ extern void exit();
 
 BITTREE *encodeTrees[MAXCODES];
 
-static uint32 bitReverse(num) register uint32 num;
+static uint32 bitReverse(register uint32 num)
 {
   register uint32 rev;
   register uint32 i;
@@ -81,8 +81,10 @@ static uint32 bitReverse(num) register uint32 num;
   return(rev);
 }
 
-static int32 compare(e1, e2) BITTREE *e1, *e2;
+static int compare(const void *v1, const void *v2)
 {
+  BITTREE *e1 = (BITTREE *)v1;
+  BITTREE *e2 = (BITTREE *)v2; 
   register uint32 c1, c2;
   c1 = e1->code;
   c2 = e2->code;
@@ -100,9 +102,7 @@ static int32 compare(e1, e2) BITTREE *e1, *e2;
   };
 }
 
-BITTREE *makeTree(start, size, bit) BITTREE *start;
-uint32 size;
-uint32 bit;
+BITTREE *makeTree(BITTREE *start, uint32 size, uint32 bit)
 {
   BITTREE *cur;
   uint32 count;
@@ -179,16 +179,14 @@ void initBlock() {
   };
 }
 
-freeTree(p)
-BITTREE *p;
+void freeTree(BITTREE *p)
 {
   if(p->zero) freeTree(p->zero);
   if(p->one) freeTree(p->one);
   free(p);
 }
 
-dumpTree(p, top)
-BITTREE *p;
+void dumpTree(BITTREE *p, int top)
 {
   if(top) printf("dumping root ");
   if(p->zero) dumpTree(p->zero, 0);
@@ -197,7 +195,7 @@ BITTREE *p;
   if(top) putchar('\n');
 }
 
-freeAllTrees() {
+void freeAllTrees() {
   int i;
 
   for(i = 0; i < MAXCODES; i++) {

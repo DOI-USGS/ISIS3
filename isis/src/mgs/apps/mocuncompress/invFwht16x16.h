@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)invFwht16x16.h	1.1 10/04/99
+SCCSID @(#)invFwht16x16.h  1.1 10/04/99
 */
 /* SCCShid @(#)invFwht16x16.h (invFwht16x16.h) 1.2 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)invFwht16x16.h	1.1 10/04/99
 
 #define invFwht16x16_h
 
-extern void invFwht16x16();
+extern void invFwht16x16(register int16 *in, register int16 *out);
 
 #endif

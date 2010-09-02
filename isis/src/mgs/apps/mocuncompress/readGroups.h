@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)readGroups.h	1.1 10/04/99
+SCCSID @(#)readGroups.h  1.1 10/04/99
 */
 /* SCCShid @(#)readGroups.h (readGroups.h) 1.2 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)readGroups.h	1.1 10/04/99
 
 #define readGroups_h
 
-extern uint32 *readGroups();
+extern uint32 *readGroups(register uint32 numBlocks, register BITSTRUCT *bitStuff);
 
 #endif

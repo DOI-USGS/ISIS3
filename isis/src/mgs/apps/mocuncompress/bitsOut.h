@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)bitsOut.h	1.1 10/04/99
+SCCSID @(#)bitsOut.h  1.1 10/04/99
 */
 /* SCCShid @(#)bitsOut.h (bitsOut.h) 1.4 */
 
@@ -46,12 +46,12 @@ SCCSID @(#)bitsOut.h	1.1 10/04/99
 
 #include "fs.h"
 
-typedef struct bitStruct BITSTRUCT;	/* Shorthand for the following struct */
+typedef struct bitStruct BITSTRUCT;  /* Shorthand for the following struct */
 
 struct bitStruct {
-  uint8 *output;		/* Next available output byte location */
-  uint32 bitQueue;	/* Currented queued bits (up to 32) */
-  uint32 bitCount;	/* Number of bits queued in "bitQueue" */
+  uint8 *output;    /* Next available output byte location */
+  uint32 bitQueue;  /* Currented queued bits (up to 32) */
+  uint32 bitCount;  /* Number of bits queued in "bitQueue" */
 };
 
 extern void bitsOutStart();

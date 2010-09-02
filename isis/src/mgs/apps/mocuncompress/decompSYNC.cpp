@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)decompNONE.c	1.1 10/04/99";
+//static char *sccsid = "@(#)decompSYNC.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
 
@@ -44,138 +44,99 @@ static char *sccsid = "@(#)decompNONE.c	1.1 10/04/99";
 #include "bitsOut.h"
 #include "nextValue.h"
 
-#include "decompNONE.h"
+#include "decompSYNC.h"
 
-void decompNONE(curLine, size, code, left, right, bitStuff) register uint8 *curLine;
-register uint32 size;
-uint8 *code, *left, *right;
-BITSTRUCT *bitStuff;
+void decompSYNC(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint16 sync, BITSTRUCT *bitStuff)
 {
-  register uint32 bitCount;
-  register uint8 *data;
-  register uint8 cur;
+  register uint32 count;    /* Pixel counter */
+  register uint8 *scan;    /* Pixel copying pointer */
 
-  data     = bitStuff->output;
-  bitCount = bitStuff->bitCount;
+  /* Skip sync pattern (assumes alignment) */
+  bitStuff->output += 2;
 
-  cur = (*data) >> bitCount;
+  /* Prepare to copy data */
+  scan = bitStuff->output;
 
-  /* Decode all pixels in this line */
-  while(size > 0) {
-    /* Store decoded value */
-    nextValue(*curLine, code, left, right, cur, bitCount, data);
-    curLine++;
-    size--;
+  /* Copy all pixels on this line */
+  for(count = 0; count < size; count++) {
+    register uint8 cur;    /* Current pixel value */
+
+    /* Get current pixel value */
+    cur = *(scan++);
+
+    /* Store the current pixel */
+    *(curLine++) = cur;
+
+    /* Store as the next pixel's previous pixel */
+    *(prevLine++) = cur;
   };
 
-  bitStuff->output     = data;
-  bitStuff->bitCount = bitCount;
+  /* Update bit stream and align */
+  bitStuff->output = scan;
+  bitStuff->bitCount = 0;
 }
 
 #ifdef TEST
 
-void initReverse(trans) uint8 *trans;
-{
-  /*
-  * This function generate the bit reversal array "trans" above
-  *
-  * pre:
-  *
-  * post:
-  *	The array "tran" contains the bit reversal of each index in that
-  *	index's location (e.g. trans[0x05] = 0xa0).
-  */
-  register uint32 t;		/* Current index */
+#define MAXLINE    2048
 
-  /* Do all 8 bit numbers */
-  for(t = 0; t < 256; t++) {
-    register uint8 r;	/* Reversed byte */
-    register uint8 b;	/* Bit count */
-    register uint8 mask;	/* Current bit in index */
-    register uint8 bit;	/* Current bit in reversed byte */
-
-    /* Reverse all 8 bits */
-    r = 0;
-    for(b = 0, mask = 0x1, bit = 0x80; b < 8; b++) {
-      /*
-      * If the bit in index is set, set the corresponding
-      * bit in the reversed byte
-      */
-      if(t & mask) {
-        r |= bit;
-      };
-
-      /* Move bit in index up and bit in reversed byte down */
-      mask = mask << 1;
-      bit  = bit  >> 1;
-    };
-
-    /* Store the reversed byte */
-    trans[t] = r;
-  };
-}
-
-void createIdentTree(code, left, right) uint8 *code, *left, *right;
-{
-  uint32 index;
-
-  for(index = 0; index < 127; index++) {
-    code[index] = LEFT | RIGHT;
-    left[index] = 2 * index + 1;
-    right[index] = 2 * index + 2;
-  };
-
-  for(index = 127; index < 255; index++) {
-    code[index] = 0;
-    left[index]  = ~(2 * (index - 127));
-    right[index] = ~(2 * (index - 127) + 1);
-  };
-}
-
-#define MAXLINE		2048
-
-uint8 reverse[256];
 uint8 data[2 * MAXLINE + 4];
 
-uint32 tryNone(code, left, right, bitStuff) uint8 *code, *left, *right;
-BITSTRUCT *bitStuff;
+uint32 trySync(BITSTRUCT *bitStuff)
 {
   uint32 nerror;
+  uint16 sync;
+  uint8 prevLine[MAXLINE];
   uint8 curLine[MAXLINE];
   uint32 i;
   uint8 known, actual;
 
   nerror = 0;
 
+  sync = 0;
+
   for(i = 0; i < MAXLINE; i++) {
-    curLine[i] = 0;
+    prevLine[i] = curLine[i] = 0;
   };
 
-  decompNONE(curLine, MAXLINE, code, left, right, bitStuff);
+  decompSYNC(curLine, prevLine, MAXLINE, sync, bitStuff);
 
   for(i = 0; i < MAXLINE; i++) {
-    known = ~reverse[(~i) & 0xFF];
+    known = ~(i + 2);
     actual = curLine[i];
 
     if(known != actual) {
-      printf("None: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
+      printf("Sync: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
       nerror += 1;
     };
 
+    actual = prevLine[i];
+
+    if(known != actual) {
+      printf("Sync: Prev pixel: %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
+      nerror += 1;
+    };
   };
 
   for(i = 0; i < MAXLINE; i++) {
-    curLine[i] = 0;
+    prevLine[i] = curLine[i] = 0;
   };
 
-  decompNONE(curLine, MAXLINE, code, left, right, bitStuff);
+  decompSYNC(curLine, prevLine, MAXLINE, sync, bitStuff);
 
   for(i = 0; i < MAXLINE; i++) {
-    known = ~reverse[(~(i+MAXLINE)) & 0xFF];
+    known = ~(i + MAXLINE + 4);
     actual = curLine[i];
 
     if(known != actual) {
-      printf("None: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
+      printf("Sync: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
+      nerror += 1;
+    };
+
+    actual = prevLine[i];
+
+    if(known != actual) {
+      printf("Sync: Prev pixel: %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
       nerror += 1;
     };
   };
@@ -185,9 +146,6 @@ BITSTRUCT *bitStuff;
 
 main() {
   uint32 nerror;
-  uint8 code[256];
-  uint8 left[256];
-  uint8 right[256];
   BITSTRUCT bitStuff;
   uint32 i;
 
@@ -195,10 +153,6 @@ main() {
   nerror = 0;
 
   printf("Test started\n");
-
-  initReverse(reverse);
-
-  createIdentTree(code, left, right);
 
   /* Check decompression */
 
@@ -209,7 +163,7 @@ main() {
   bitStuff.data = data;
   bitStuff.bitQueue = 0;
   bitStuff.bitCount = 0;
-  nerror = tryNone(code, left, right, &bitStuff);
+  nerror = trySync(&bitStuff);
 
   /* If no errors print message */
   if(nerror == 0) {

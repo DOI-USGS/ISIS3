@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)decompSYNC.h	1.1 10/04/99
+SCCSID @(#)decompSYNC.h  1.1 10/04/99
 */
 /* SCCShid @(#)decompSYNC.h (decompSYNC.h) 1.2 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)decompSYNC.h	1.1 10/04/99
 
 #define decompSYNC_h
 
-extern void decompSYNC();
+extern void decompSYNC(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint16 sync, BITSTRUCT *bitStuff);
 
 #endif

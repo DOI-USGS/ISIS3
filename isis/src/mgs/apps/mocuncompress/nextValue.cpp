@@ -36,137 +36,133 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 */
-static char *sccsid = "@(#)decompSYNC.c	1.1 10/04/99";
+//static char *sccsid = "@(#)nextValue.c  1.1 10/04/99";
 #if (!defined(NOSCCSID) && (!defined(LINT)))
 #endif
+/*
+* DESCRIPTION
+*
+* COMMENTARY
+*/
 
 #include "fs.h"
-#include "bitsOut.h"
+
 #include "nextValue.h"
-
-#include "decompSYNC.h"
-
-void decompSYNC(curLine, prevLine, size, sync, bitStuff) register uint8 *curLine, *prevLine;
-register uint32 size;
-uint16 sync;
-BITSTRUCT *bitStuff;
-{
-  register uint32 count;		/* Pixel counter */
-  register uint8 *scan;		/* Pixel copying pointer */
-
-  /* Skip sync pattern (assumes alignment) */
-  bitStuff->output += 2;
-
-  /* Prepare to copy data */
-  scan = bitStuff->output;
-
-  /* Copy all pixels on this line */
-  for(count = 0; count < size; count++) {
-    register uint8 cur;		/* Current pixel value */
-
-    /* Get current pixel value */
-    cur = *(scan++);
-
-    /* Store the current pixel */
-    *(curLine++) = cur;
-
-    /* Store as the next pixel's previous pixel */
-    *(prevLine++) = cur;
-  };
-
-  /* Update bit stream and align */
-  bitStuff->output = scan;
-  bitStuff->bitCount = 0;
-}
 
 #ifdef TEST
 
-#define MAXLINE		2048
-
-uint8 data[2 * MAXLINE + 4];
-
-uint32 trySync(bitStuff) BITSTRUCT *bitStuff;
+void initReverse(trans) uint8 *trans;
 {
-  uint32 nerror;
-  uint16 sync;
-  uint8 prevLine[MAXLINE];
-  uint8 curLine[MAXLINE];
-  uint32 i;
-  uint8 known, actual;
+  /*
+  * This function generate the bit reversal array "trans" above
+  *
+  * pre:
+  *
+  * post:
+  *  The array "tran" contains the bit reversal of each index in that
+  *  index's location (e.g. trans[0x05] = 0xa0).
+  */
+  register uint32 t;    /* Current index */
 
-  nerror = 0;
+  /* Do all 8 bit numbers */
+  for(t = 0; t < 256; t++) {
+    register uint8 r;  /* Reversed byte */
+    register uint8 b;  /* Bit count */
+    register uint8 mask;  /* Current bit in index */
+    register uint8 bit;  /* Current bit in reversed byte */
 
-  sync = 0;
+    /* Reverse all 8 bits */
+    r = 0;
+    for(b = 0, mask = 0x1, bit = 0x80; b < 8; b++) {
+      /*
+      * If the bit in index is set, set the corresponding
+      * bit in the reversed byte
+      */
+      if(t & mask) {
+        r |= bit;
+      };
 
-  for(i = 0; i < MAXLINE; i++) {
-    prevLine[i] = curLine[i] = 0;
-  };
-
-  decompSYNC(curLine, prevLine, MAXLINE, sync, bitStuff);
-
-  for(i = 0; i < MAXLINE; i++) {
-    known = ~(i + 2);
-    actual = curLine[i];
-
-    if(known != actual) {
-      printf("Sync: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
-      nerror += 1;
+      /* Move bit in index up and bit in reversed byte down */
+      mask = mask << 1;
+      bit  = bit  >> 1;
     };
 
-    actual = prevLine[i];
-
-    if(known != actual) {
-      printf("Sync: Prev pixel: %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
-      nerror += 1;
-    };
+    /* Store the reversed byte */
+    trans[t] = r;
   };
-
-  for(i = 0; i < MAXLINE; i++) {
-    prevLine[i] = curLine[i] = 0;
-  };
-
-  decompSYNC(curLine, prevLine, MAXLINE, sync, bitStuff);
-
-  for(i = 0; i < MAXLINE; i++) {
-    known = ~(i + MAXLINE + 4);
-    actual = curLine[i];
-
-    if(known != actual) {
-      printf("Sync: Cur pixel:  %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
-      nerror += 1;
-    };
-
-    actual = prevLine[i];
-
-    if(known != actual) {
-      printf("Sync: Prev pixel: %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff->data - data, bitStuff->bitCount, known, known, actual, actual);
-      nerror += 1;
-    };
-  };
-
-  return(nerror);
 }
+
+void createIdentTree(code, left, right) uint8 *code, *left, *right;
+{
+  uint32 index;
+
+  for(index = 0; index < 127; index++) {
+    code[index] = LEFT | RIGHT;
+    left[index] = 2 * index + 1;
+    right[index] = 2 * index + 2;
+  };
+
+  for(index = 127; index < 255; index++) {
+    code[index] = 0;
+    left[index]  = ~(2 * (index - 127));
+    right[index] = ~(2 * (index - 127) + 1);
+  };
+}
+
+#define MAXLINE    2048
+
+uint8 reverse[256];
+uint8 data[2 * MAXLINE + 4];
 
 main() {
   uint32 nerror;
+  uint8 code[256];
+  uint8 left[256];
+  uint8 right[256];
   BITSTRUCT bitStuff;
   uint32 i;
+  uint8 known, actual;
 
   /* No errors yet */
   nerror = 0;
 
   printf("Test started\n");
 
-  /* Check decompression */
+  initReverse(reverse);
 
-  for(i = 0; i < 2 * MAXLINE + 4; i++) {
-    data[i] = ~i;
+  createIdentTree(code, left, right);
+
+  /* Check decoding function */
+  for(i = 0; i < MAXLINE; i++) {
+    data[i] = i;
   };
 
   bitStuff.data = data;
   bitStuff.bitQueue = 0;
   bitStuff.bitCount = 0;
-  nerror = trySync(&bitStuff);
+
+  for(i = 0; i < MAXLINE; i++) {
+    uint32 bitQueue;
+    uint32 bitCount;
+    uint8 *bitData;
+
+    known = ~reverse[i & 0xFF];
+
+    bitData  = bitStuff.data;
+    bitQueue = bitStuff.bitQueue;
+    bitCount = bitStuff.bitCount;
+
+    nextValue(actual, code, left, right, bitQueue, bitCount, bitData);
+
+    bitStuff.data     = bitData;
+    bitStuff.bitQueue = bitQueue;
+    bitStuff.bitCount = bitCount;
+
+    if(known != actual) {
+      printf("Decode: Pixel: %4d (%4d %1d), expected: %3d (%02x), got: %3d (%02x)\n", i, bitStuff.data - data, bitStuff.bitCount, known, known, actual, actual);
+      nerror += 1;
+    };
+  };
 
   /* If no errors print message */
   if(nerror == 0) {

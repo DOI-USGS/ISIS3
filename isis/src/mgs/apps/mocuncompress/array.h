@@ -36,9 +36,9 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)array.h	1.1 10/04/99
+SCCSID @(#)array.h  1.1 10/04/99
 */
-/* SCCS @(#)array.h	1.2 10/18/91 */
+/* SCCS @(#)array.h  1.2 10/18/91 */
 
 typedef struct {
   int len;
@@ -46,9 +46,9 @@ typedef struct {
   char *data;
 } Array;
 
-Array *array_new();
-int array_append();
-int array_len();
-char *array_data();
-void array_free();
-int array_slot_delete();
+extern Array *array_new(int);
+extern int array_append(Array *a, char *data, int len);
+extern int array_len(Array *a);
+extern char *array_data(Array *a);
+extern void array_free(Array *a);
+extern int array_slot_delete(Array *a, int slot, int len);

@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)readCoef.h	1.1 10/04/99
+SCCSID @(#)readCoef.h  1.1 10/04/99
 */
 /* SCCShid @(#)readCoef.h (readCoef.h) 1.2 */
 
@@ -44,6 +44,6 @@ SCCSID @(#)readCoef.h	1.1 10/04/99
 
 #define readCoef_h
 
-extern int16 readCoef();
+extern int16 readCoef(BITTREE *encoding, BITSTRUCT *bitStuff);
 
 #endif

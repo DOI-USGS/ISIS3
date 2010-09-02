@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)types.h	1.1 10/04/99
+SCCSID @(#)types.h  1.1 10/04/99
 */
 /* SCCShid @(#)types.h (types.h) 1.1 */
 
@@ -78,16 +78,16 @@ struct double_complex {
 
 /* Header constant (the third) flagging picture data type */
 
-#define CHAR_REAL	0
-#define SHORT_REAL	1
-#define INT_REAL	2
-#define FLOAT_REAL	3
-#define DOUBLE_REAL	4
+#define CHAR_REAL  0
+#define SHORT_REAL  1
+#define INT_REAL  2
+#define FLOAT_REAL  3
+#define DOUBLE_REAL  4
 
-#define CHAR_COMPLEX	5
-#define SHORT_COMPLEX	6
-#define INT_COMPLEX	7
-#define FLOAT_COMPLEX	8
-#define DOUBLE_COMPLEX	9
+#define CHAR_COMPLEX  5
+#define SHORT_COMPLEX  6
+#define INT_COMPLEX  7
+#define FLOAT_COMPLEX  8
+#define DOUBLE_COMPLEX  9
 
 #endif

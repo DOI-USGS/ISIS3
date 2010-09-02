@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)initBlock.h	1.1 10/04/99
+SCCSID @(#)initBlock.h  1.1 10/04/99
 */
 /* SCCShid @(#)initBlock.h (initBlock.h) 1.2 */
 
@@ -44,8 +44,8 @@ SCCSID @(#)initBlock.h	1.1 10/04/99
 
 #define initBlock_h
 
-#define LARGE_NEGATIVE	0x1000000
-#define LARGE_POSITIVE	0x2000000
+#define LARGE_NEGATIVE  0x1000000
+#define LARGE_POSITIVE  0x2000000
 
 typedef struct bittree BITTREE;
 
@@ -59,5 +59,6 @@ struct bittree {
 extern BITTREE *encodeTrees[];
 
 extern void initBlock();
+extern void freeAllTrees();
 
 #endif

@@ -36,7 +36,7 @@ promptly return or destroy all copies of the Software in your possession.
 
 Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
-SCCSID @(#)limits.h	1.1 10/04/99
+SCCSID @(#)limits.h  1.1 10/04/99
 */
 /* SCCShid @(#)limits.h (limits.h) 1.4 */
 
@@ -52,11 +52,11 @@ SCCSID @(#)limits.h	1.1 10/04/99
 * number of times, etc.  This is defined here so SOME dependencies can use
 * a common definition.
 */
-#define BLOCKSIZE	 256
+#define BLOCKSIZE   256
 /* The log (base 2) of the block size (used to avoid calculation overflow) */
-#define LOGBLOCKSIZE	   8
+#define LOGBLOCKSIZE     8
 /* The size of the image block in the x and y direction */
-#define BLOCKDIMENSION	  16
+#define BLOCKDIMENSION    16
 
 /*
 * The maximum number of blocks in an image (and its log base 2).  IMPORTANT
@@ -65,8 +65,8 @@ SCCSID @(#)limits.h	1.1 10/04/99
 * in their allocated word sizes, etc.  This is defined here so SOME
 * dependencies can use a common definition.
 */
-#define MAXBLOCKS	1024
-#define LOGMAXBLOCKS	  10
+#define MAXBLOCKS  1024
+#define LOGMAXBLOCKS    10
 
 /*
 * The maximum number of ranking groups (and its log base 2).  IMPORTANT
@@ -74,8 +74,8 @@ SCCSID @(#)limits.h	1.1 10/04/99
 * compressor is necessary.  This is defined here so SEVERAL dependencies
 * can use a common definition.
 */
-#define MAXGROUPS	   8
-#define LOGMAXGROUPS	   3
+#define MAXGROUPS     8
+#define LOGMAXGROUPS     3
 
 /*
 * The maximum number of encoding tables (and its log base 2).  IMPORTANT
@@ -83,8 +83,8 @@ SCCSID @(#)limits.h	1.1 10/04/99
 * compressor is necessary.  This is defined here so SEVERAL dependencies
 * can use a common definition.
 */
-#define MAXCODES	   8
-#define LOGMAXCODES	   3
+#define MAXCODES     8
+#define LOGMAXCODES     3
 
 /*
 * The maximum size of an entry in the weighting table for the "AC energy"
@@ -92,7 +92,7 @@ SCCSID @(#)limits.h	1.1 10/04/99
 * number re-thinking of the transform compressor is necessary.  This is
 * defined here so SEVERAL dependencies can use a common definition.
 */
-#define MAXWEIGHT	  32
-#define LOGMAXWEIGHT	   5
+#define MAXWEIGHT    32
+#define LOGMAXWEIGHT     5
 
 #endif
