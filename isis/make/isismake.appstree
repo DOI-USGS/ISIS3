@@ -109,7 +109,7 @@ documentation: $(APPSDOCS)
 	$(MAKE) $$APPNAME-doc-cleanupprint;                         \
 	echo "    Installing application documentation [$$APPNAME]" \
 	  > .$$APPNAME-doc.stdout.log;                              \
-	$(MAKE) --directory=$$APPNAME clean                         \
+	$(MAKE) --directory=$$APPNAME docs                         \
 	  1>>.$$APPNAME-doc.stdout.log 2>.$$APPNAME-doc.stderr.log; \
 	$(MAKE) $$APPNAME-doc-print;
 
