@@ -88,6 +88,13 @@ namespace Isis {
     //   of "." where it might count.
     setlocale(LC_NUMERIC, "en_US");
 
+    // Verify ISISROOT was set
+    if (getenv("ISISROOT") == NULL || iString(getenv("ISISROOT")) == "") {
+      std::string message = "Please set ISISROOT before running any Isis applications";
+      std::cerr << message << std::endl;
+      abort();
+    }
+
     // Get the starting cpu time, direct I/Os, page faults, and swaps
     p_startClock = clock();
     p_startDirectIO = DirectIO();
@@ -96,31 +103,31 @@ namespace Isis {
 
     // Create user interface and log
     try {
-      Isis::Filename f = std::string(argv[0]) + ".xml";
+      Filename f = std::string(argv[0]) + ".xml";
 
       // Create preferences
-      Isis::Preference::Preferences(f.Name() == "unitTest.xml");
+      Preference::Preferences(f.Name() == "unitTest.xml");
 
       if(!f.Exists()) {
         f = "$ISISROOT/bin/xml/" + f.Name();
         if(!f.Exists()) {
-          std::string message = Isis::Message::FileOpen(f.Expanded());
-          throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+          std::string message = Message::FileOpen(f.Expanded());
+          throw iException::Message(iException::Io, message, _FILEINFO_);
         }
       }
       std::string xmlfile = f.Expanded();
 
-      p_ui = new Isis::UserInterface(xmlfile, argc, argv);
+      p_ui = new UserInterface(xmlfile, argc, argv);
       if(!p_ui->IsInteractive()) {
         new QCoreApplication(argc, argv);
 
         // Add the Qt plugin directory to the library path
-        Isis::Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
+        Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
         QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
       }
 
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       exit(e.Report());
     }
 
@@ -176,7 +183,7 @@ namespace Isis {
               Application::FunctionCleanup();
               p_BatchlistPass++;
             }
-            catch(Isis::iException &e) {
+            catch(iException &e) {
               p_ui->SetErrorList(i);
               status = Application::FunctionError(e);
               if(p_ui->AbortOnError()) {
@@ -199,7 +206,7 @@ namespace Isis {
         }
       }
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       status = Application::FunctionError(e);
     }
 
@@ -226,17 +233,17 @@ namespace Isis {
    */
   PvlObject Application::History() {
     PvlObject history(p_ui->ProgramName());
-    history += Isis::PvlKeyword("IsisVersion", Isis::version);
-    history += Isis::PvlKeyword("ProgramVersion", p_ui->Version());
+    history += PvlKeyword("IsisVersion", Isis::version);
+    history += PvlKeyword("ProgramVersion", p_ui->Version());
     QString path = QCoreApplication::applicationDirPath();
-    history += Isis::PvlKeyword("ProgramPath", path);
-    history += Isis::PvlKeyword("ExecutionDateTime", p_datetime);
-    history += Isis::PvlKeyword("HostName", HostName());
-    history += Isis::PvlKeyword("UserName", UserName());
-    history += Isis::PvlKeyword("Description", p_ui->Brief());
+    history += PvlKeyword("ProgramPath", path);
+    history += PvlKeyword("ExecutionDateTime", p_datetime);
+    history += PvlKeyword("HostName", HostName());
+    history += PvlKeyword("UserName", UserName());
+    history += PvlKeyword("Description", p_ui->Brief());
 
     // Add the user parameters
-    Isis::Pvl pvl;
+    Pvl pvl;
     p_ui->CommandLine(pvl);
     history.AddGroup(pvl.FindGroup("UserParameters"));
 
@@ -272,8 +279,8 @@ namespace Isis {
 
     // Add this information to the log
     PvlGroup acct("Accounting");
-    acct += Isis::PvlKeyword("ConnectTime", conTime);
-    acct += Isis::PvlKeyword("CpuTime", cpuTime);
+    acct += PvlKeyword("ConnectTime", conTime);
+    acct += PvlKeyword("CpuTime", cpuTime);
 
     // Not sure if these are really valuable.  If deemed so then
     // uncomment and complete private methods (DirectIO, Pagefaults, and
@@ -467,7 +474,7 @@ namespace Isis {
   void Application::SendParentData(const std::string code, const std::string &message) {
     // See if we need to connect to the parent
     if(p_childSocket < 0) {
-      std::string socketFile = "/tmp/isis_" + Isis::iString(iApp->GetUserInterface().ParentId());
+      std::string socketFile = "/tmp/isis_" + iString(iApp->GetUserInterface().ParentId());
       sockaddr_un socketName;
       socketName.sun_family = AF_UNIX;
       strcpy(socketName.sun_path, socketFile.c_str());
@@ -476,7 +483,7 @@ namespace Isis {
         std::string msg = "Unable to create child-to-parent socket [" +
                           socketFile + "]";
         std::cout << msg << std::endl;
-        throw Isis::iException::Message(Isis::iException::System,
+        throw iException::Message(Isis::iException::System,
                                         msg, _FILEINFO_);
       }
 
@@ -485,10 +492,10 @@ namespace Isis {
       int status = connect(p_childSocket, (struct sockaddr *)&socketName, len);
       if(status == -1) {
         std::string msg = "Unable to connect to parent [" +
-                          Isis::iString(iApp->GetUserInterface().ParentId()) + "] errno = " +
+                          iString(iApp->GetUserInterface().ParentId()) + "] errno = " +
                           iString(errno);
         std::cout << msg << std::endl;
-        throw Isis::iException::Message(Isis::iException::System,
+        throw iException::Message(Isis::iException::System,
                                         msg, _FILEINFO_);
       }
     }
@@ -503,9 +510,9 @@ namespace Isis {
 
     if(send(p_childSocket, data.c_str(), data.size(), 0) < 0) {
       std::string msg = "Unable to send to parent [" +
-                        Isis::iString(iApp->GetUserInterface().ParentId()) + "]";
+                        iString(iApp->GetUserInterface().ParentId()) + "]";
       std::cout << msg << std::endl;
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw iException::Message(iException::System, msg, _FILEINFO_);
     }
   }
 
@@ -547,8 +554,8 @@ namespace Isis {
         ss << SessionLog::TheLog();
         ss.clear();
         ss >> log;
-        PvlGroup uname = Isis::GetUnameInfo();
-        PvlGroup env = Isis::GetEnviromentInfo();
+        PvlGroup uname = GetUnameInfo();
+        PvlGroup env = GetEnviromentInfo();
         log.AddGroup(uname);
         log.AddGroup(env);
       }
@@ -560,7 +567,7 @@ namespace Isis {
           std::ofstream debugingLog(filename.c_str());
           if(!debugingLog.good()) {
             std::string msg = "Error opening debugging log file [" + filename + "]";
-            throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
           }
           debugingLog << log << std::endl;
           debugingLog << "\n############### User Preferences ################\n" << std::endl;
@@ -643,8 +650,8 @@ namespace Isis {
         ss << SessionLog::TheLog();
         ss.clear();
         ss >> log;
-        PvlGroup uname = Isis::GetUnameInfo();
-        PvlGroup env = Isis::GetEnviromentInfo();
+        PvlGroup uname = GetUnameInfo();
+        PvlGroup env = GetEnviromentInfo();
         log.AddGroup(uname);
         log.AddGroup(env);
       }
@@ -655,7 +662,7 @@ namespace Isis {
           std::ofstream debugingLog(filename.c_str());
           if(!debugingLog.good()) {
             std::string msg = "Error opening debugging log file [" + filename + "]";
-            throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw iException::Message(iException::System, msg, _FILEINFO_);
           }
           debugingLog << log << std::endl;
           debugingLog << "\n############### User Preferences ################\n" << std::endl;
@@ -701,7 +708,7 @@ namespace Isis {
    */
   void Application::GuiReportError(Isis::iException &e) {
     Pvl errors = e.PvlErrors();
-    if(e.Type() == Isis::iException::Cancel) {
+    if(e.Type() == iException::Cancel) {
       e.Clear();
       p_ui->TheGui()->ProgressText("Stopped");
     }
@@ -760,7 +767,7 @@ namespace Isis {
    */
   void Application::UpdateProgress(int percent, bool print) {
     if(HasParent()) {
-      std::string data = Isis::iString(percent);
+      std::string data = iString(percent);
       SendParentData(std::string("PROGRESS"), data);
     }
     else if(p_ui->IsInteractive()) {
@@ -796,10 +803,10 @@ namespace Isis {
           if(status) {
             std::string msg = "Program execution canceled, child returned nonzero status ["
                               + (iString)status + "]";
-            throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
           }
         }
-        throw Isis::iException::Message(Isis::iException::Cancel, "", _FILEINFO_);
+        throw iException::Message(Isis::iException::Cancel, "", _FILEINFO_);
       }
     }
   }
@@ -816,7 +823,7 @@ namespace Isis {
    */
   void Application::Exec(const std::string &program, const std::string &parameters) {
     // Setup the command line
-    Isis::Filename bin(program);
+    Filename bin(program);
     if(!bin.Exists()) {
       bin = "$ISISROOT/bin/" + program;
     }
@@ -831,7 +838,7 @@ namespace Isis {
       // fork and save off our child
       if((p_childPid = fork()) == -1) {
         std::string msg = "Unable to execute command [" + command + "]";
-        throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+        throw iException::Message(iException::System, msg, _FILEINFO_);
       }
 
       // Parent code
@@ -851,7 +858,7 @@ namespace Isis {
           p_childCaught = true;
           if(status) {
             std::string msg = "Child process return status was nonzero, something went wrong";
-            throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
           }
         }
 
@@ -866,13 +873,13 @@ namespace Isis {
       SendParentData("DISCONNECT", "");
       close(p_childSocket);
       p_childSocket = -1;
-      command += " -pid=" + Isis::iString((int)p_ui->ParentId());
-      Isis::System(command);
+      command += " -pid=" + iString((int)p_ui->ParentId());
+      System(command);
       SendParentData("RECONNECT", "");
     }
     // Otherwise just execute the command and wait for it to finish
     else {
-      Isis::System(command);
+      System(command);
     }
   }
 
@@ -891,11 +898,11 @@ namespace Isis {
     // Create a socket
     if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) == -1) {
       std::string msg = "Unable to create socket";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
     }
 
     // Get the process id and create a unique filename
-    p_socketFile = "/tmp/isis_" + Isis::iString((int)p_pid);
+    p_socketFile = "/tmp/isis_" + iString((int)p_pid);
 
     // Bind the file to the socket
     p_socketName.sun_family = AF_UNIX;
@@ -903,13 +910,13 @@ namespace Isis {
     int len = strlen(p_socketName.sun_path) + sizeof(p_socketName.sun_family);
     if(bind(p_socket, (struct sockaddr *)&p_socketName, len) == -1) {
       std::string msg = "Unable to bind to socket [" + p_socketFile + "]";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw iException::Message(iException::System, msg, _FILEINFO_);
     }
 
     // Set up to listen to the socket
     if(listen(p_socket, 5) == -1) {
       std::string msg = "Unable to listen to socket [" + p_socketFile + "]";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw iException::Message(iException::System, msg, _FILEINFO_);
     }
   }
 
@@ -923,7 +930,7 @@ namespace Isis {
     p_socket = -1;
 
     // Append the pid as an argument
-    std::string command = commandLine + " -pid=" + Isis::iString((int)p_pid);
+    std::string command = commandLine + " -pid=" + iString((int)p_pid);
 
     // Run the command
     int status = system(command.c_str());
@@ -936,7 +943,7 @@ namespace Isis {
 
     sockaddr_un socketName;
     socketName.sun_family = AF_UNIX;
-    iString socketFile = "/tmp/isis_" + Isis::iString((int)p_pid);
+    iString socketFile = "/tmp/isis_" + iString((int)p_pid);
     strcpy(socketName.sun_path, socketFile.c_str());
 
     int len = strlen(socketName.sun_path) + sizeof(socketName.sun_family);
@@ -997,7 +1004,7 @@ namespace Isis {
             p_childCaught = true;
             if(status == 255) {
               std::string msg = "Error in connection between processes";
-              throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+              throw iException::Message(iException::System, msg, _FILEINFO_);
             }
           }
         }
@@ -1009,7 +1016,7 @@ namespace Isis {
             std::cout << "accept errno = " << errno << std::endl << std::flush;
             std::string msg = "Unable to accept socket connection [" +
                               p_socketFile + "] from child process";
-            throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw iException::Message(iException::System, msg, _FILEINFO_);
           }
         }
       }
@@ -1029,7 +1036,7 @@ namespace Isis {
             p_childCaught = true;
             if(status == 255) {
               std::string msg = "Error in connection between processes";
-              throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+              throw iException::Message(iException::System, msg, _FILEINFO_);
             }
           }
         }
@@ -1055,7 +1062,7 @@ namespace Isis {
             // Should only happen if child fork could not fire off the process
             p_queue.erase(p_queue.begin());
             std::string msg = "Unable to execute command [" + command + "]";
-            throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw iException::Message(iException::System, msg, _FILEINFO_);
           }
           else if(p_queue[0] == "ERROR") {
             p_queue.erase(p_queue.begin());
@@ -1064,18 +1071,18 @@ namespace Isis {
             str << p_queue[0];
             p_queue.erase(p_queue.begin());
 
-            Isis::Pvl error;
+            Pvl error;
             str >> error;
 
             for(int i = 0; i < error.Groups(); i++) {
-              Isis::PvlGroup &g = error.Group(i);
+              PvlGroup &g = error.Group(i);
               std::string eclass = g["Class"];
               std::string emsg = g["Message"];
               int ecode = g["Code"];
               std::string efile = g["File"];
               int eline = g["Line"];
 
-              Isis::iException::Message((Isis::iException::errType)ecode,
+              iException::Message((iException::errType)ecode,
                                         emsg, (char *)efile.c_str(), eline);
             }
           }
@@ -1089,7 +1096,7 @@ namespace Isis {
           else if(p_queue[0] == "PROGRESS") {
             p_queue.erase(p_queue.begin());
             while(p_queue.size() == 0) WaitForCommand(childSocket);
-            p_ui->TheGui()->Progress(Isis::iString(p_queue[0]).ToInteger());
+            p_ui->TheGui()->Progress(iString(p_queue[0]).ToInteger());
             p_queue.erase(p_queue.begin());
           }
           else if(p_queue[0] == "LOG") {
@@ -1105,7 +1112,7 @@ namespace Isis {
           else {
             std::string msg = "Unknown command [" + p_queue[0];
             msg += "] on socket [" + p_socketFile + "]";
-            throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw iException::Message(iException::System, msg, _FILEINFO_);
           }
           ProcessGuiEvents();
           // Last check for any bad return status from child
@@ -1115,7 +1122,7 @@ namespace Isis {
               p_childCaught = true;
               if(status == 255) {
                 std::string msg = "Error in connection between processes";
-                throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+                throw iException::Message(iException::System, msg, _FILEINFO_);
               }
             }
           }
@@ -1142,7 +1149,7 @@ namespace Isis {
     char buf[1024*1024];
     if((bytes = recv(childSocket, &buf, 1024 * 1024, 0)) < 0) {
       std::string msg = "Unable to read from socket [" + p_socketFile + "]";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw iException::Message(iException::System, msg, _FILEINFO_);
     }
 
     // Push everything onto our string buffer
