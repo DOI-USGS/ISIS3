@@ -6,7 +6,24 @@
   </brief>
 
   <description>
-    This program will remove noise from Mariner10 images. 
+    <p>
+      This program will remove noise from Mariner10 images. The program works by 
+      running noisefilters for high noise and then low noise repeatedly. Any data 
+      that is determined to be noise is set to null. Some noise may be left 
+      over and it is possible that good data can be picked up, however, this 
+      should be a very small precentage. Further filtering can be achieved with 
+      the noisefilter application.
+    </p>
+    <p>
+      Mar10nonoise is meant for uncompressed Mariner10 images only and will not 
+      be effective in removing noise from previously compressed images. See 
+      mar10restore for more on these images. 
+    </p>
+    <p>
+      Mar10nonoise is executed in the pipeline performed by mar10clean and 
+      shouldn't be necessary to be run when processing Mariner10 
+      images if using mar10clean. 
+    </p>
   </description>
 
   <category>
@@ -16,6 +33,7 @@
   <seeAlso>
     <applications>
       <item>mar10clean</item>
+      <item>mar10restore</item>
       <item>noisefilter</item>
     </applications>
   </seeAlso>
@@ -23,6 +41,9 @@
   <history>
     <change name="Mackenzie Boyd" date="2009-08-06">
       Original version
+    </change>
+    <change name="Mackenzie Boyd" date="2010-08-03">
+      Added to documentation 
     </change>
   </history>
 
@@ -79,7 +100,9 @@
       </brief>
       <description>
         This example shows the application in action. It removes most noise.
-        Noise is replaced with Isis::Null.
+        Noise is replaced with null data. The brightness difference visible is 
+        due to a difference in stretches between the two images due to the noise 
+        in the first.
       </description>
       <terminalInterface>
         <commandLine> 
@@ -127,7 +150,7 @@
           <description> 
               This is the Mariner10 image after the application has been run. 
               The red represents null pixels which could be removed using a 
-              lowpass or left as is.
+              lowpass filter or left as is.
           </description>
           <thumbnail caption="Output Mariner10 image after running the application" src="assets/thumbs/nonoise.png" width="200" height="168"/>
           <parameterName>TO</parameterName>

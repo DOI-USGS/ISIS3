@@ -1,15 +1,27 @@
-
 #include "Isis.h"
 
+#include "Cube.h"
+#include "iException.h"
 #include "Pipeline.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
 
 void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Check that it is a Mariner10 cube.
+  Cube iCube;
+  iCube.Open(ui.GetFilename("FROM"));
+  Pvl * labels = iCube.Label();
+  if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
+    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
+      " to be a Mariner10 cube";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
 
   // Open the input cube
-  UserInterface &ui = Application::GetUserInterface();
   Pipeline p("mar10nonoise");
   p.SetInputFile("FROM");
   p.SetOutputFile("TO");
