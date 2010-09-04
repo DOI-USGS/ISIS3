@@ -1,14 +1,51 @@
 #include "Isis.h"
 
+#include "Chip.h"
+#include "Cube.h"
+#include "iException.h"
 #include "Pipeline.h"
+#include "Statistics.h"
 
 using namespace std;
 using namespace Isis;
 
 void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Check that it is a Mariner10 cube.
+  Cube iCube;
+  iCube.Open(ui.GetFilename("FROM"));
+  Pvl * labels = iCube.Label();
+  if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
+    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
+      " to be a Mariner10 cube";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
+  // Check that the cube actually needs cleaning. This verifies that it 
+  // wasn't a "compressed" cube and that it hasn't been cleaned.
+  Chip cp(5, 5);
+  cp.TackCube(2.5, 2.5);
+  cp.Load(iCube);
+  Statistics *stats = NULL;
+  stats = cp.Statistics();
+  cout << "Valid pixels: "<< stats->ValidPixels() << endl;
+  if (stats->ValidPixels() == 7) {
+    string msg = "The cube [" + ui.GetFilename("FROM") + "] needs" +
+      " reconstruction, try mar10restore instead";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+  else if (stats->ValidPixels() == 0) {
+    string msg = "The cube [" + ui.GetFilename("FROM") + "]" +
+      " appears to have already been cleaned";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+  if (stats != NULL) {
+    delete stats;
+    stats = NULL;
+  }
 
   // Open the input cube
-  UserInterface &ui = Application::GetUserInterface();
   Pipeline p("mar10clean");
   p.SetInputFile("FROM");
   p.SetOutputFile("TO");
@@ -21,7 +58,7 @@ void IsisMain() {
 
   // Run findrx on the cube to find the actual position of the reseaus
   p.AddToPipeline("findrx");
-  p.Application("findrx").SetInputParameter("FROM", true);
+  p.Application("findrx").SetInputParameter("FROM", false);
 
   // Run remrx on the cube to remove the reseaus
   p.AddToPipeline("remrx");
@@ -56,6 +93,7 @@ void IsisMain() {
   p.Application("trim").AddConstParameter("LEFT", "11");
   p.Application("trim").AddConstParameter("RIGHT", "8");
 
+  cout << p;
   p.Run();
 }
 

@@ -2,12 +2,26 @@
 
 <application name="mar10clean" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Clean-up of Mariner10 images 
+    Clean-up application for Mariner10 images 
   </brief>
 
   <description>
-    This program performs the clean up of Mariner10 images. This includes salt 
-    and pepper noise, removing reseaus, and trimming edges of invalid data.
+    <p>
+      Mar10clean performs the clean up of Mariner10 images. This includes salt 
+      and pepper noise, removing reseaus, and trimming edges of invalid data. 
+      The program runs mar10nonoise to clean up noise followed by findrx and 
+      remrx. Several lowpass filters fill in the null areas left by the noise 
+      removal. Finally a trim is also completed which nulls the top 5 rows of 
+      pixels, left 11 columns pixels, and the bottom 8 rows of pixels.
+    </p>
+    <p>
+      This program only allows itself to be run once on an image. It is 
+      intended for non-compressed images only and will not run on compressed 
+      images. Compressed images, technically previously compressed, are 
+      distinctive because they are mostly null data with good data in a 
+      checkerboard patter, see mar10restore for more info. Mar10clean should be 
+      run immediately after importing and before calibration.
+    </p>
   </description>
 
   <category>
@@ -19,8 +33,9 @@
       <item>findrx</item>
       <item>remrx</item>
       <item>trim</item>
-      <item>mar10nonoise</item>
-    </applications>
+      <item>lowpass</item>
+      <item>mar10nonoise</item> 
+      <item>mar10restore</item> </applications> 
   </seeAlso>
 
   <history>
@@ -33,6 +48,10 @@
     <change name="Mackenzie Boyd" date="2009-08-12">
       Modified order of runs to remove noise before finding and removing 
       reseaus.
+    </change>
+    <change name="Mackenzie Boyd" date="2009-08-12">
+       Added documentation, added a check for being a Mariner10 image, added a 
+       check for already cleand cubes.
     </change>
   </history>
 
@@ -115,7 +134,10 @@
       </brief>
       <description>
         This example shows the application in action.  It removes all salt and
-        pepper noise as well as reseaus.
+        pepper noise as well as reseaus, and trims invalid data around the 
+        edges. The brightness difference visible is caused by different 
+        stretchs for each image due to the presence of extreme noise values 
+        in the input cube.
       </description>
       <terminalInterface>
         <commandLine> 
@@ -147,7 +169,7 @@
           </brief>                   
           <description> 
             This is the Mariner10 image after the cleaning sequence has taken 
-            place.
+            place. 
           </description>
           <thumbnail caption="Cleaned Mariner10 image" src="assets/thumbs/clean.jpg" width="200" height="168"/>
           <parameterName>TO</parameterName>
