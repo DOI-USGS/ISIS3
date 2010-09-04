@@ -1,10 +1,12 @@
 #include "Isis.h"
+
 #include "Chip.h"
 #include "Cube.h"
 #include "iException.h"
 #include "iString.h"
 #include "Pipeline.h"
 #include "Statistics.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
@@ -15,17 +17,30 @@ void IsisMain() {
   Cube cube;
   cube.Open(ui.GetFilename("FROM"));
 
+  // Check that it is a Mariner10 cube.
+  Pvl * labels = cube.Label();
+  if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
+    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
+      " to be a Mariner10 cube";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
   // Check that the cube actually needs reconstruction
   Chip cp(5, 5);
   cp.TackCube(25, 25);
   cp.Load(cube);
-  Statistics *stats = cp.Statistics();
+  Statistics *stats = NULL;
+  stats = cp.Statistics();
+  // Maximum possible number of good pixels in a 5x5
   if(stats->ValidPixels() > 8) {
-    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not need reconstruction";
+    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not need" +
+      " reconstruction, try mar10clean instead";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
-  delete stats;
-  stats = NULL;
+  if (stats != NULL) {
+    delete stats;
+    stats = NULL;
+  }
 
   // Open the input cube
   Pipeline p("mar10restore");

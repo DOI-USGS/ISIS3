@@ -6,10 +6,23 @@
   </brief>
 
   <description>
-    This application makes full images out of previously compressed images. The 
-    compressed images don't appear compressed when imported, they appear dark 
-    because there are 3/4 nulls. By removing noise and then averaging these 
-    cubes a decent image can be produced.
+    <p>
+      This application makes full images out of previously compressed images. 
+      Mar10restore will only run on previously compressed images. A previously 
+      compressed image is distinctive because it is 3/4s null data, with good 
+      data in a sort of checker board pattern. The compressed images may appear 
+      dark until zoomed in on. By removing noise and then averaging the good 
+      data, a decent image can be produced. 
+    </p>
+    <p>
+      Mar10restore provides similar functionality to mar10clean, except for 
+      previously compressed images. The steps are, noise removal with 
+      noisefilter, averaging with lowpass, and a trim for bad data around the 
+      edges. Reseaus are lost, between the loss in the compression and the noise 
+      filtering, they are not visible or removed and so cannot be found, or 
+      directly removed. Mar10restore should be used in the same way mar10clean 
+      is used, it should only be run once and used before calibration. 
+    </p>
   </description>
 
   <category>
@@ -20,6 +33,8 @@
     <applications>
       <item>noisefilter</item>
       <item>lowpass</item>
+      <item>trim</item>
+      <item>mar10clean</item>
     </applications>
   </seeAlso>
 
@@ -27,8 +42,12 @@
     <change name="Travis Addair" date="2009-06-10">
       Original version
     </change>
-    <change name="Mackneize Boyd" date="2009-08-12">
+    <change name="Mackenzie Boyd" date="2009-08-12">
        Added trim to pipeline, updated documentation, added example, added test
+    </change>
+    <change name="Mackenzie Boyd" date="2010-08-03">
+      Added to documentation, added check for Mariner10 image, fixed the 
+      spelling of my name in this change log.
     </change>
   </history>
 
