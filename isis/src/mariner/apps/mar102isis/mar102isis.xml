@@ -38,6 +38,9 @@
     <change name="Tracie Sucharski" date="2010-02-03">
       Changed SpacecraftName from Mariner10 to Mariner_10.
     </change>
+    <change name="Mackenzie Boyd" date="2010-08-03">
+      Moved original labels to correct location in cube, removed cout.
+    </change>
   </history>
 
   <groups>

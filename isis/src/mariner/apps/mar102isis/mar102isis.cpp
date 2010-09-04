@@ -4,6 +4,7 @@
 #include "Filename.h"
 #include "iString.h"
 #include "iTime.h"
+#include "OriginalLabel.h"
 #include "PixelType.h"
 #include "ProcessImport.h"
 #include "ProcessImportPds.h"
@@ -313,7 +314,10 @@ void UpdateLabels(Cube *cube, const string &labels) {
 
   PvlObject original("OriginalLabel");
   original += PvlKeyword("Label", labels);
-  cubeLabels->AddObject(original);
+  Pvl olabel;
+  olabel.AddObject(original);
+  OriginalLabel ol(olabel);
+  cube->Write(ol);
 }
 
 // Translate Isis 2 labels into Isis 3 labels.
@@ -435,7 +439,6 @@ string EbcdicToAscii(unsigned char *header) {
 
   // Put in a end of string mark and return
   header[215] = 0;
-  printf("Header: %s\n", header);
   return string((const char *)header);
 }
 
