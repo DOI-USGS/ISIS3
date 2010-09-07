@@ -1,5 +1,7 @@
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 # ISIS DOCS MAKEFILE
 #   Create XML table of contents for the documents
 #   and generate upper level navigation pages
@@ -25,7 +27,7 @@ $(DOCDIR)/$(DOC): $(DOC).xml ../../build/IsisInlineDocumentBuild.xsl ../../build
 	touch $(DOCDIR)/$(DOC) 
 	touch $(DOCDIR) 
 	$(XALAN) -p menuPath "'../../'" -p dirParam "'$(DOC)'" -o Makefile-temp $(DOC).xml ../../build/IsisInlineDocumentBuild.xsl 
-	make -f Makefile-temp docs 
+	$(MAKE) -f Makefile-temp docs 
 	rsync -lHptr --delete --rsh=ssh * $(DOCDIR)/$(DOC)/
 
 

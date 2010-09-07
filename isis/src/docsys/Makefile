@@ -1,5 +1,7 @@
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 # ISIS DOCS MAKEFILE
 #   Move assets and static documents to doc root
 #   and kick off lower makefiles

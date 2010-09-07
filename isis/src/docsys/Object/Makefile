@@ -1,5 +1,7 @@
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 # ISIS DOCS MAKEFILE
 #   Create tables of contents for the Object
 #   documentation and kicks off lower makefiles

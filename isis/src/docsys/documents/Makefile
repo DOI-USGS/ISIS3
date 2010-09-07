@@ -1,5 +1,7 @@
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 # ISIS DOCS MAKEFILE
 #   Create XML table of contents for the documents
 #   and generate upper level navigation pages
@@ -23,7 +25,7 @@ documents:
 	echo "        Building Individual Documents"
 	for dirname in $(DOCUMENTS); do \
 	  cd $$dirname ; \
-	  make -f ../Makefile-documents docbuild ; \
+	  $(MAKE) -f ../Makefile-documents docbuild ; \
 	  cd .. ; \
 	done
 	echo "        Finished Building Individual Documents"
