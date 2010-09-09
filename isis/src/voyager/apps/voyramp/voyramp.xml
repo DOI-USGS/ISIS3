@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="voyramp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Corrects Voyager 1 Io images from plasma torus irradiation
+  </brief>
+
+  <description>
+    <p>
+      Removes parabolic (top to bottom) additive error from Voyager
+      800 x 800 frames.
+    </p>
+
+    <p>
+      Calculate the DN offset values for each line to correct additional dark current 
+      buildup on the vidicon detectors on Voyager 1 during a 15 hour passage through 
+      the Io plasma torus.  The additive error increased from top to bottom of each 
+      frame and is directly related to the spacecraft event time. Three 
+      two-dimensional [DN offset/Spacecraft event] plots (ICARUS 73,385-426(1988) 
+      Global Color and Albedo Variations on IO, by Alfred S. McEwen) reveal the DN 
+      offset values based on hour by hour event times, one for top of the frame, 
+      middle and bottom. 
+      
+      Full 16 hour points have been identified of each plot and loaded into 
+      three arrays. The event time is given to this routine in GMT hour, minutes 
+      and seconds. The arrays are referenced by the whole integer hour passed. 
+      Two points are identified by x1 = hour and y1 = array(hour); x2 = hour + 1 
+      and y2 = array(hour + 1); where x = event time and y = * DN value.  The 
+      hour, minute and seconds of the event time are also converted to a real 
+      value and then all is passed on to a routine which will perform a linear 
+      interpolation between the two points and return the associated DN value 
+      for the real event time. 
+      
+      This program is meant to be run after voycal has been 
+      run on the image, as it provides additional corrections for a specific 
+      time period. 
+    </p>
+  </description>
+
+  <history>
+    <change name="Mackenzie Boyd" date="2010-09-08">
+      Original version - Converted from Isis2
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Voyager</missionItem>
+  </category>
+
+  <seeAlso>
+    <application>
+      <item>
+        voycal
+      </item>
+    </application>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube, must be a calibrated Voyager 1 cube
+        </brief>
+        <description>
+          The input cube which must be Voyager 1, calibrated, and within the 
+          correct time range, of Io.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          A further calibrated cube corrected for plasma torus irradiation near 
+          the moon Io.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+  </groups>
+</application>
