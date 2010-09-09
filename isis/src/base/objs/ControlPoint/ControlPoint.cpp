@@ -7,9 +7,14 @@
 #include "PvlObject.h"
 #include "ControlMeasure.h"
 #include "CameraGroundMap.h"
+#include "SerialNumberList.h"
+#include "Cube.h"
 
 namespace Isis {
-  //! Construct a control point
+  /**
+   * Construct a control point 
+   *
+   */
   ControlPoint::ControlPoint() : p_invalid(false) {
     SetId("");
     SetType(Tie);
@@ -343,7 +348,7 @@ namespace Isis {
    * Returns a Reference Index of the Control Point. If none then returns the
    * first measure as Reference. If there are no measures then returns -1;
    *
-   * @author sprasad (5/11/2010)
+   * @author Sharmila Prasad (5/11/2010)
    *
    * @return int
    */
@@ -359,6 +364,67 @@ namespace Isis {
 
     return 0;
   }
+  
+  /**
+   * Returns the Universal Latitude of the Reference Measure
+   * Returns Isis::Null if Camera is NULL 
+   *  
+   * @author Sharmila Prasad (8/31/2010)
+   * 
+   * @param pCamera 
+   * 
+   * @return double 
+   */
+  double ControlPoint::LatitudeByReference(Camera *pCamera)
+  {    
+    if(pCamera != NULL) {
+      ControlMeasure & cMeasure = p_measures[ReferenceIndex()];
+      pCamera->SetImage(cMeasure.Sample(), cMeasure.Line());
+      return pCamera->UniversalLatitude();
+    }
+    return Isis::Null;
+  }
+  
+  /**
+   * Returns the Universal Longitude of the Reference Measure. 
+   * Returns Isis::Null if Camera is NULL 
+   * 
+   * @author Sharmila Prasad (8/31/2010)
+   * 
+   * @param pCamera 
+   * 
+   * @return double 
+   */
+  double ControlPoint::LongitudeByReference(Camera *pCamera)
+  {    
+    if(pCamera != NULL) {
+      ControlMeasure & cMeasure = p_measures[ReferenceIndex()];
+      pCamera->SetImage(cMeasure.Sample(), cMeasure.Line());
+      return pCamera->UniversalLongitude();
+    }
+    return Isis::Null;
+  }
+
+  /**
+   * Returns the Radius of the Reference Measure. 
+   * Returns Isis::Null if Camera is NULL 
+   * 
+   * @author Sharmila Prasad (8/31/2010)
+   * 
+   * @param pCamera 
+   * 
+   * @return double 
+   */
+  double ControlPoint::RadiusByReference(Camera *pCamera)
+  {    
+    if(pCamera != NULL) {
+      ControlMeasure & cMeasure = p_measures[ReferenceIndex()];
+      pCamera->SetImage(cMeasure.Sample(), cMeasure.Line());
+      return pCamera->LocalRadius();
+    }
+    return Isis::Null;
+  }
+  
   /**
    * This method computes the apriori lat/lon for a point.  It computes this
    * by determining the average lat/lon of all the measures.  Note that this
@@ -575,7 +641,6 @@ namespace Isis {
         sampError /= cdmap->SampleScaleFactor();
         lineError /=   cdmap->LineScaleFactor();
       }
-
       m.SetError(sampError, lineError);
     }
     return;
@@ -592,14 +657,135 @@ namespace Isis {
     for(int j = 0; j < (int) p_measures.size(); j++) {
       if(p_measures[j].Ignore()) continue;
       if(p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
-      if(p_measures[j].ErrorMagnitude() > maxError) {
-        maxError = p_measures[j].ErrorMagnitude();
+
+      double dErr = p_measures[j].ErrorMagnitude(); 
+      if(dErr > maxError) {
+        maxError = dErr;
       }
     }
-
     return maxError;
   }
 
+  /**
+   * Return the minimum error magnitude of the measures in the point.
+   * Ignored and Unmeasured measures will not be included
+   * 
+   * @author Sharmila Prasad (8/26/2010)
+   * 
+   * @return double 
+   */
+  double ControlPoint::MinimumError() const
+  {
+    double dMinError = VALID_MAX4;
+    if(Ignore()) return dMinError;
+
+    for(int j = 0; j < (int) p_measures.size(); j++) {
+      if(p_measures[j].Ignore()) continue;
+      if(p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
+
+      double dErr = p_measures[j].ErrorMagnitude();
+      if(dErr < dMinError) {
+        dMinError = dErr;
+      }
+    }
+    return dMinError;
+  }
+
+  /**
+   * Get the Minimum ErrorLine for the Control Point
+   * 
+   * @author Sharmila Prasad (8/26/2010)
+   * 
+   * @return double 
+   */
+  double ControlPoint::MinimumErrorLine()
+  {
+    double dMinError = VALID_MAX4;
+    if(Ignore()) return dMinError;
+
+    for(int j = 0; j < (int) p_measures.size(); j++) {
+      if(p_measures[j].Ignore()) continue;
+      if(p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
+      
+      double dErr = p_measures[j].LineError();
+      if(dErr < dMinError) {
+        dMinError = dErr;
+      }
+    }
+    return dMinError;
+  }
+  
+  /**
+   * Get the Minimum ErrorSample for the Control Point
+   * 
+   * @author Sharmila Prasad (8/26/2010)
+   * 
+   * @return double 
+   */
+  double ControlPoint::MinimumErrorSample()
+  {
+    double dMinError = VALID_MAX4;
+    if(Ignore()) return dMinError;
+
+    for(int j = 0; j < (int) p_measures.size(); j++) {
+      if(p_measures[j].Ignore()) continue;
+      if(p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
+      
+      double dErr = p_measures[j].SampleError();
+      if(dErr < dMinError) {
+        dMinError = dErr;
+      }
+    }
+    return dMinError;
+  }
+      
+  /**
+   * Get the Maximum ErrorLine for the Control Point
+   * 
+   * @author Sharmila Prasad (8/26/2010)
+   * 
+   * @return double 
+   */
+  double ControlPoint::MaximumErrorLine()
+  {
+    double dMaxError = 0.0;
+    if(Ignore()) return dMaxError;
+
+    for(int j = 0; j < (int) p_measures.size(); j++) {
+      if(p_measures[j].Ignore()) continue;
+      if(p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
+
+      double dErr = p_measures[j].LineError(); 
+      if(dErr > dMaxError) {
+        dMaxError = dErr;
+      }
+    }
+    return dMaxError;
+  }
+      
+  /**
+   * Get the Maximum ErrorSample for the Control Point
+   * 
+   * @author Sharmila Prasad (8/26/2010)
+   * 
+   * @return double 
+   */
+  double ControlPoint::MaximumErrorSample()
+  {
+    double dMaxError = 0.0;
+    if(Ignore()) return dMaxError;
+
+    for(int j = 0; j < (int) p_measures.size(); j++) {
+      if(p_measures[j].Ignore()) continue;
+      if(p_measures[j].Type() == ControlMeasure::Unmeasured) continue;
+
+      double dErr = p_measures[j].SampleError(); 
+      if(dErr > dMaxError) {
+        dMaxError = dErr;
+      }
+    }
+    return dMaxError;
+  }
 
   /**
    * Wraps the input longitude toward a base longitude
@@ -639,7 +825,7 @@ namespace Isis {
   /**
    * Copy Constructor
    *
-   * @author sprasad (5/11/2010)
+   * @author Sharmila Prasad (5/11/2010)
    *
    * @param pPoint
    *
@@ -666,7 +852,7 @@ namespace Isis {
   /**
    * Compare two Control Points for inequality
    *
-   * @author sprasad (4/20/2010)
+   * @author Sharmila Prasad (4/20/2010)
    *
    * @param pPoint
    *
@@ -679,7 +865,7 @@ namespace Isis {
   /**
    * Compare two Control Points for equality
    *
-   * @author sprasad (4/20/2010)
+   * @author Sharmila Prasad (4/20/2010)
    *
    * @param pPoint to be compared against
    *

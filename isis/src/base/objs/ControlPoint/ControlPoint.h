@@ -84,11 +84,13 @@ namespace Isis {
    *   @history 2009-10-13 Jeannie Walldren - Added detail to
    *            error messages.
    *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors with call to
-   *  					 CameraGroundMap->GetXY
+   *                              CameraGroundMap->GetXY
    *   @history 2010-05-11 Sharmila Prasad Added API's Copy Constructor to copy one point to another and
-   *  					ReferenceIndexNoException not to throw Exception if there are no reference point or
-   *   			    no measures in a Control Point.
+   *                       ReferenceIndexNoException not to throw Exception if there are no reference point or
+   *                       no measures in a Control Point.
    *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString()
+   *   @history 2010-09-09 Sharmila Prasad - Added API's to get Latitude, Logitude, Radius from the
+   *                       Reference Measure in the Point. Also to get the min & max Line & Sample Errors
    */
   class ControlPoint {
     public:
@@ -235,18 +237,27 @@ namespace Isis {
       //! Return the planetocentric latitude of the point
       double UniversalLatitude() const {
         return p_latitude;
-      };
+      }
 
       //! Return the planetocentric longitude of the point
       double UniversalLongitude() const {
         return p_longitude;
-      };
-
+      }
+      
       //! Return the radius of the point in meters
       double Radius() const {
         return p_radius;
-      };
-
+      }
+      
+      //! Returns the Universal Latitude of the Reference Measure
+      double LatitudeByReference(Camera *pCamera);
+      
+      //! Returns the Universal Longitude of the Reference Measure
+      double LongitudeByReference(Camera *pCamera);
+      
+      //! Returns the Radius of the Reference Measure
+      double RadiusByReference(Camera *pCamera);
+      
       double AverageError() const;
 
       // std::string Thumbnail() const;
@@ -263,6 +274,21 @@ namespace Isis {
       void ComputeErrors();
 
       double MaximumError() const;
+      
+      //! Get the Minimum Error Magnitude for the Control Point
+      double MinimumError() const;
+      
+      //! Get the Minimum ErrorLine for the Control Point
+      double MinimumErrorLine();
+      
+      //! Get the Minimum ErrorSample for the Control Point
+      double MinimumErrorSample();
+      
+      //! Get the Maximum ErrorLine for the Control Point
+      double MaximumErrorLine();
+      
+      //! Get the Maximum ErrorSample for the Control Point
+      double MaximumErrorSample();
 
       double WrapLongitude(double lon, double baselon);
 
