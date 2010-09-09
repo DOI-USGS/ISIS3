@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="demprep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    This program prepares DEMs for use as shape models. It is not valid to run this program on anything but a DEM.
+  </brief>
+
+  <description>
+    This program performs the necessary preparation of a DEM file so that it can be used as a shape model. The
+    method used to find the intersection of a look vector with a DEM surface has recently changed (9/2010) to
+    take care of problems that were encountered at the poles of the DEM file that were caused by artifacts
+    generated near the poles when the DEM was produced. This new intersection algorithm requires that the DEM
+    have a padded line at any pole that exists in the DEM file. If the DEM is a global DEM, then the left and
+    right edges are also padded with a single column of pixels. The padding allows the bilinear interpolation
+    to work properly at the poles. The new algorithm also requires that the DEM have a table blob in its labels
+    ("ShapeModelStatistics") which contains the minimum and maximum radii that occcur in the DEM file. This
+    information is required in order to bracket the solution where the look vector intersects the DEM. This 
+    information helps to make the algorithm run much faster. The DEM is required to be a Planetocentric file
+    in Simple Cylindrical projection. If it is not, then the demprep program will fail. This program will first
+    check to see if the DEM has been padded. If padding has already occurred, then no further padding will be
+    added. It is not valid to run this program on anything but a DEM.
+    this program on anything but a DEM.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2008-09-15">
+      Original version (demwrap)
+    </change>
+    <change name="Steven Lambright" date="2008-10-03">
+      Added additional checks for valid projections and fixed the implementation of the north and south poles.
+    </change>
+    <change name="Janet Barrett" date="2010-09-09">
+      Original version (demprep) Used the demwrap program as a model for the demprep program.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input DEM cube
+        </brief>
+        <description>
+  	      The DEM cube which will be padded
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output padded DEM cube
+        </brief>
+        <description>
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>
