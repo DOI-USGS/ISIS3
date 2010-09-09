@@ -73,6 +73,7 @@ namespace Isis {
    *   @history 2009-11-05 Jeannie Walldren - Modified number
    *                          of maximum steps for Progress flag
    *                          in Constructor
+   *  @history 2010-09-09 Sharmila Prasad - Added API to delete serial# off of the list given Serial #
    */
 
   class SerialNumberList {
@@ -83,6 +84,9 @@ namespace Isis {
 
       void Add(const std::string &filename);
       bool HasSerialNumber(const std::string &sn);
+      
+      //!< Delete a serial number off of the list
+      void Delete(const std::string &sn);
 
       int Size() const;
       std::string Filename(const std::string &sn);

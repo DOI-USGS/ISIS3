@@ -60,6 +60,24 @@ namespace Isis {
 
 
   /**
+   * Delete a serial number off of the list given the Serial Number
+   * 
+   * @author Sharmila Prasad (9/9/2010)
+   * 
+   * @param sn - serial number
+   */
+  void SerialNumberList::Delete(const std::string &sn)
+  {
+    int index = SerialNumberIndex(sn);
+    std::string sFileName = Filename(sn);
+
+    // Delete the reference to this serial number in the
+    // vector and the maps
+    p_pairs.erase(p_pairs.begin() + index);
+    p_serialMap.erase(sn);
+    p_fileMap.erase(sFileName);
+  }
+  /**
    * Adds a new filename / serial number pair to the
    * SerialNumberList
    *
