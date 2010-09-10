@@ -4,6 +4,8 @@
 #include "CameraFactory.h"
 #include "iTime.h"
 
+#include <QtAlgorithms>
+
 namespace Isis {
   //!Creates an empty ControlNet object
   ControlNet::ControlNet() {
@@ -66,7 +68,7 @@ namespace Isis {
       if(p_invalid && p_pointsHash[p_pointIds[index]].Invalid()) check = true;
 
       p_pointsHash.remove(p_pointIds[index]);
-      p_pointIds.remove(index);
+      p_pointIds.removeAt(index);
 
       // Check validity if needed
       if(check) {
@@ -107,7 +109,7 @@ namespace Isis {
     // If the QVector contains the point with this id, then
     // remove it from p_pointIds.
     if(p_pointIds.contains(QString::fromStdString(id))) {
-      p_pointIds.remove(p_pointIds.indexOf(QString::fromStdString(id)));
+      p_pointIds.removeAt(p_pointIds.indexOf(QString::fromStdString(id)));
     }
     else {
       // If a match was not found, throw an error
@@ -355,7 +357,6 @@ namespace Isis {
     return maxError;
   }
 
-
   /**
    * Compute the average error of all points in the network
    * @return <B>double</B> Average error of points
@@ -372,7 +373,6 @@ namespace Isis {
     if(count == 0) return avgError;
     return avgError / count;
   }
-
 
   /**
    * Creates the ControlNet's image cameras based on an input file
@@ -498,5 +498,15 @@ namespace Isis {
       numIgnoredMeasures += pt.Size() - pt.NumValidMeasures();
     }
     return numIgnoredMeasures;
+  }
+    
+  /**
+   * Sort the entire Control Net by Point ID using Quick sort
+   * 
+   * @author sprasad (8/26/2010)
+   */
+  void ControlNet::SortControlNet()
+  {
+    p_pointIds.sort();
   }
 }

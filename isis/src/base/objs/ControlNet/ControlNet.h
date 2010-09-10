@@ -78,11 +78,13 @@ namespace Isis {
    *            network to compute those values at the time the
    *            method is called, not when the control network is
    *            first initialized
+   *   @history 2010-09-09 Sharmila Prasad - Added API to sort Control Net by Point ID
+   *                                         Changed PointID's vector to StringList
    *
    */
   class ControlNet {
     public:
-      // Constuctors
+      //! Constuctors
       ControlNet();
       ControlNet(const std::string &ptfile, Progress *progress = 0, bool forceBuild = false);
 
@@ -97,6 +99,9 @@ namespace Isis {
                          ImageToGround //!<ImageToGround is a network used to tie one or more images (typically many) between each other and a target (e.g., Mars)
                        };
 
+      //! Sort the Control Net by Point ID
+      void SortControlNet();
+      
       /**
        * Set the type of network
        *
@@ -204,6 +209,7 @@ namespace Isis {
       int Size() const {
         return p_pointsHash.size();
       };
+      
       int NumValidPoints();
 
       //! Return if the control point is invalid
@@ -226,12 +232,13 @@ namespace Isis {
 
       ControlPoint *Find(const std::string &id);
 
-      ControlPoint *FindClosest(const std::string &serialNumber,
-                                double sample, double line);
+      ControlPoint *FindClosest(const std::string &serialNumber, double sample, double line);
 
       bool Exists(ControlPoint &point);
 
       double AverageError();
+      
+      //! Get the max Error Magnitude for the Control Network
       double MaximumError();
 
       void ComputeErrors();
@@ -252,7 +259,8 @@ namespace Isis {
       };
 
     private:
-      QVector<QString> p_pointIds;  //!< QVector of ControlPoint Ids
+      //QVector<QString> p_pointIds;  //!< QVector of ControlPoint Ids
+      QStringList p_pointIds;                     //!< String List of ControlPoint Ids
       QHash <QString, ControlPoint> p_pointsHash; //!< Hash table of Control Points.
       std::string p_targetName;            //!< Name of the target
       std::string p_networkId;             //!< The Network Id
@@ -266,7 +274,6 @@ namespace Isis {
       std::vector<Isis::Camera *> p_cameraList;            //!< Vector of image number to camera
 
       bool p_invalid;  //!< If the Control Network is currently invalid
-
   };
 };
 
