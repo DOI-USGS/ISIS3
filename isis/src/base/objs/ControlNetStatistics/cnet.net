@@ -1,0 +1,178 @@
+Object = ControlNetwork
+  NetworkId    = AS15_Rev16_22_38_50_63_70
+  NetworkType  = ImageToGround
+  TargetName   = MOON
+  UserName     = tbecker
+  Created      = 2010-05-21T16:41:55
+  LastModified = 2010-05-21T16:41:55
+  Description  = AS15_Rev16_22_38_50_63_70
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = AS15_00002
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:17:53.221
+      MeasureType    = Estimated
+      Sample         = 15309.759694323
+      Line           = 11278.59216961
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:08
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:18:18.594
+      MeasureType    = Estimated
+      Sample         = 20261.597205282
+      Line           = 11254.196033939
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:08
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = AS15_00007
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:18:43.622
+      MeasureType    = Estimated
+      Sample         = 17918.382277285
+      Line           = 17543.356672539
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:08
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:19:08.899
+      MeasureType    = Estimated
+      Sample         = 22734.527147937
+      Line           = 17353.281182514
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:08
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = AS15_00013
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:17:53.221
+      MeasureType    = Estimated
+      Sample         = 1958.2843492319
+      Line           = 207.02932507837
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:09
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:18:18.594
+      MeasureType    = Estimated
+      Sample         = 6769.2505618335
+      Line           = 118.71439203925
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:09
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = AS15_00014
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:18:43.622
+      MeasureType    = Estimated
+      Sample         = 3995.8240379769
+      Line           = 187.49348923876
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:09
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:19:34.074
+      MeasureType    = Estimated
+      Sample         = 13724.482837277
+      Line           = 115.33065913539
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:09
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object	 
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = AS15_00015
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:18:18.594
+      MeasureType    = Estimated
+      Sample         = 1760.3236552148
+      Line           = 376.88172816484
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:09
+      ChooserName    = "Application autoseed"
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:18:43.622
+      MeasureType    = Estimated
+      Sample         = 6495.8156413762
+      Line           = 109.68354601642
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:09
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = APOLLO15/METRIC/1971-07-31T01:19:34.074
+      MeasureType    = Estimated
+      Sample         = 16255.327072996
+      Line           = 115.86897288942
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2010-05-21T16:00:09
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object  
+End_Object
+End
