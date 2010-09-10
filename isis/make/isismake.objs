@@ -262,7 +262,9 @@ unitTest: $(OBJS) unitTest.o
 	  ar x libisis$(ISISLIBVERSION).a;                                           \
 	  $(RM) libisis$(ISISLIBVERSION).a;                                          \
 	  cd ..;                                                                     \
-	  $(CP) $(OBJS) .objs/;                                                      \
+	  if [ "$(OBJS)" != "" ]; then                                               \
+	    $(CP) $(OBJS) .objs/;                                                    \
+	  fi;                                                                        \
 	  $(LDSHARED) $(DYLIBFLAGS) $(ISISSHAREDON)                                  \
 	      -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT)                            \
 	      -install_name $(CURDIR)/libisis$(ISISLIBVERSION).$(SHAREDLIBEXT)       \
