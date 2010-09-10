@@ -33,8 +33,8 @@ int main(void) {
     }
     else {
       // Version 2 difference caused by new CK and comprehensive IK kernel support
-      knownLat = -70.69638837731182;
-      knownLon = 244.3314994958043;
+      knownLat = -70.69650506131094;
+      knownLon = 244.30134137129;
     }
 
 
