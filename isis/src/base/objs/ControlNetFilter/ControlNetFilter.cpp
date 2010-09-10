@@ -489,8 +489,14 @@ namespace Isis {
   void ControlNetFilter::PointDistanceFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
     double dMinDistance=0;
-    if (pvlGrp.HasKeyword("MinDistance")){
-      dMinDistance = pvlGrp["MinDistance"][0];
+    string sUnits = "pixels";
+    
+    if (pvlGrp.HasKeyword("MaxDistance")){
+      dMinDistance = pvlGrp["MaxDistance"][0];
+    }
+    
+    if (pvlGrp.HasKeyword("Units")){
+      sUnits = pvlGrp["Units"][0];
     }
     
     if (pbLastFilter) {
@@ -502,19 +508,32 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     for (int i=(iNumPoints-1); i>=0; i--) {
       ControlPoint cp1 = (*mCNet)[i];
-      double dUnivLat1 = cp1.UniversalLatitude();
-      double dUnivLon1 = cp1.UniversalLongitude(); 
-      double dRadius1  = cp1.Radius();
+      double dUnivLat1=0, dUnivLon1=0, dRadius1=0;
+      Camera *cam1;
       
-      if ((dUnivLat1 == Isis::Null) || (dUnivLon1 == Isis::Null)) {
-        string sn1 = cp1[cp1.ReferenceIndex()].CubeSerialNumber();
-        string filename1 = mSerialNumList.Filename(sn1);
-        Pvl pvl1(filename1);
-        Camera *cam1 = CameraFactory::Create(pvl1);
+      double dSample1=Isis::Null, dLine1=Isis::Null;
+      
+      int iRefIndex1 = cp1.ReferenceIndex();
+      
+      if (sUnits == "meters") {
+        dUnivLat1 = cp1.UniversalLatitude();
+        dUnivLon1 = cp1.UniversalLongitude(); 
+        dRadius1  = cp1.Radius();
+      
+        if ((dUnivLat1 == Isis::Null) || (dUnivLon1 == Isis::Null)) {
+          string sn1 = cp1[iRefIndex1].CubeSerialNumber();
+          string filename1 = mSerialNumList.Filename(sn1);
+          Pvl pvl1(filename1);
+          cam1 = CameraFactory::Create(pvl1);
         
-        dRadius1  = cp1.RadiusByReference(cam1);
-        dUnivLat1 = cp1.LatitudeByReference(cam1);
-        dUnivLon1 = cp1.LongitudeByReference(cam1);
+          dRadius1  = cp1.RadiusByReference(cam1);
+          dUnivLat1 = cp1.LatitudeByReference(cam1);
+          dUnivLon1 = cp1.LongitudeByReference(cam1);
+        }
+      }
+      else { // pixels
+        dSample1 = cp1[iRefIndex1].Sample();
+        dLine1 = cp1[iRefIndex1].Line();
       }
       
       for (int j=(mCNet->Size()-1); j>=0; j--) {
@@ -522,28 +541,47 @@ namespace Isis {
           continue;
         }
         ControlPoint cp2 = (*mCNet)[j];
-        double dUnivLat2 = cp2.UniversalLatitude();
-        double dUnivLon2 = cp2.UniversalLongitude();
-      
-        if ((dUnivLat2 == Isis::Null) || (dUnivLon2 == Isis::Null)) {
-          string sn2 = cp2[cp2.ReferenceIndex()].CubeSerialNumber();
-          string filename2 = mSerialNumList.Filename(sn2);
-          Pvl pvl2(filename2);
-          Camera *cam2 = CameraFactory::Create(pvl2);
+        double dUnivLat2=0, dUnivLon2=0;
+        Camera *cam2;
+        double dDist=0;
         
-          dUnivLat2 = cp2.LatitudeByReference(cam2);
-          dUnivLon2 = cp2.LongitudeByReference(cam2);
+        double dSample2=Isis::Null, dLine2=Isis::Null;
+      
+        int iRefIndex2 = cp2.ReferenceIndex();
+        
+        if (sUnits == "meters") {
+          dUnivLat2 = cp2.UniversalLatitude();
+          dUnivLon2 = cp2.UniversalLongitude();
+        
+          if ((dUnivLat2 == Isis::Null) || (dUnivLon2 == Isis::Null)) {
+            string sn2 = cp2[cp2.ReferenceIndex()].CubeSerialNumber();
+            string filename2 = mSerialNumList.Filename(sn2);
+            Pvl pvl2(filename2);
+            cam2 = CameraFactory::Create(pvl2);
+          
+            dUnivLat2 = cp2.LatitudeByReference(cam2);
+            dUnivLon2 = cp2.LongitudeByReference(cam2);
+          }
+          
+          // Get the distance from the camera class
+          dDist = Camera::Distance(dUnivLat1, dUnivLon1, dUnivLat2, dUnivLon2, dRadius1);
+        }
+        else { // pixels
+          dSample2 = cp2[iRefIndex2].Sample();
+          dLine2 = cp2[iRefIndex2].Line();
+          
+          double dDeltaSamp = dSample1 - dSample2;
+          double dDeltaLine = dLine1 - dLine2;
+            // use the distance formula for cartesian coordinates
+          dDist = sqrt((dDeltaSamp * dDeltaSamp) + (dDeltaLine * dDeltaLine));
         }
         
-        // Get the distance from the camera class
-        double dist = Camera::Distance(dUnivLat1, dUnivLon1, dUnivLat2, dUnivLon2, dRadius1);
-        if (dist <= dMinDistance) {
-          
+        if (dDist <= dMinDistance) {
           if (pbLastFilter){
             if (!bMinDistance) {
               PointStats(cp1);
             }
-            mOstm << cp2.Id() << "#" << dist << ", ";
+            mOstm << cp2.Id() << "#" << dDist << ", ";
             bMinDistance = true;
           }
         }
@@ -958,10 +996,10 @@ namespace Isis {
   void ControlNetFilter::CubeDistanceFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
     double dDistance = 0;
-    string sUnits = "meters";
+    string sUnits = "pixels";
     
-    if (pvlGrp.HasKeyword("PointDistance")){
-      dDistance = pvlGrp["PointDistance"][0];
+    if (pvlGrp.HasKeyword("MaxDistance")){
+      dDistance = pvlGrp["MaxDistance"][0];
     }
     
     if (pvlGrp.HasKeyword("Units")){
