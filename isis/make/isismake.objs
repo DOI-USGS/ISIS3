@@ -238,6 +238,8 @@ test: unitTest
 	  echo "Unexpected system error"; \
 	fi
 
+# The .a file is copied in Darwin because the ar command does not like
+#   to extract the same archive twice, regardless of permissions or symlink
 unitTest: $(OBJS) unitTest.o
 	if [ "$(HOST_ARCH)" == "Linux" ]; then                                       \
 	  $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                           \
@@ -256,7 +258,9 @@ unitTest: $(OBJS) unitTest.o
 	elif [ "$(HOST_ARCH)" == "Darwin" ]; then                                    \
 	  $(MKDIR) .objs;                                                            \
 	  cd .objs;                                                                  \
-	  ar x $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a;                           \
+	  cp $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a .;                           \
+	  ar x libisis$(ISISLIBVERSION).a;                                           \
+	  $(RM) libisis$(ISISLIBVERSION).a;                                          \
 	  cd ..;                                                                     \
 	  $(CP) $(OBJS) .objs/;                                                      \
 	  $(LDSHARED) $(DYLIBFLAGS) $(ISISSHAREDON)                                  \
