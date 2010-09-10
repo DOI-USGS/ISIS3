@@ -220,6 +220,10 @@ namespace Isis {
       Isis::Portal *p_portal;       //!< Buffer used to read from the model
       Isis::Interpolator *p_interp; //!< Use bilinear interpolation from dem
       bool SetGroundLocal(bool backCheck);   //!<Computes look vector
+
+      double p_minRadius;  //!< Minimum radius value in DEM file
+      double p_maxRadius;  //!< Maximum radius value in DEM file
+      double p_demScale;   //!< Scale of DEM file in pixels per degree
   };
 };
 
