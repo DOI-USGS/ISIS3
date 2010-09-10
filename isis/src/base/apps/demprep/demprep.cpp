@@ -19,8 +19,8 @@ int rightPad;
 int topPad;
 int bottomPad;
 int inl;
-double minRadius = DBL_MAX;
-double maxRadius = DBL_MIN;
+double minRadius;
+double maxRadius;
 
 void IsisMain() {
   // We will be using a mosaic technique so get the size of the input file
@@ -97,10 +97,34 @@ void IsisMain() {
       if (proj->IsGood() && insideImage == 4) isGlobal = true;
     } else {
       proj->SetGround(90.0,-180.0);
-      if (proj->IsGood()) proj->SetGround(90.0,180.0);
-      if (proj->IsGood()) proj->SetGround(-90.0,-180.0);
-      if (proj->IsGood()) proj->SetGround(-90.0,180.0);
-      if (proj->IsGood()) isGlobal = true;
+      if (proj->IsGood()) {
+        if (proj->WorldX() > 0.0 && proj->WorldX() < ins+1 &&
+            proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
+          insideImage = insideImage + 1;
+        }
+        proj->SetGround(90.0,180.0);
+      }
+      if (proj->IsGood()) {
+        if (proj->WorldX() > 0.0 && proj->WorldX() < ins+1 &&
+            proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
+          insideImage = insideImage + 1;
+        }
+        proj->SetGround(-90.0,-180.0);
+      }
+      if (proj->IsGood()) { 
+        if (proj->WorldX() > 0.0 && proj->WorldX() < ins+1 &&
+            proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
+          insideImage = insideImage + 1;
+        }
+        proj->SetGround(-90.0,180.0);
+      }
+      if (proj->IsGood()) { 
+        if (proj->WorldX() > 0.0 && proj->WorldX() < ins+1 &&
+            proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
+          insideImage = insideImage + 1;
+        }
+      }
+      if (proj->IsGood() && insideImage == 4) isGlobal = true;
     }
   }
 
@@ -111,14 +135,14 @@ void IsisMain() {
       } else {
         proj->SetGround(90.0,360.0);
       }
-      if (proj->WorldX() > .5 && proj->WorldY() > .5) isPadded = true;
+      if (proj->WorldX() >= 1.0 && proj->WorldY() >= 1.0) isPadded = true;
     } else {
       if (proj->LongitudeDirectionString() == "PositiveEast") {
         proj->SetGround(90.0,-180.0);
       } else {
         proj->SetGround(90.0,180.0);
       }
-      if (proj->WorldX() > .5 && proj->WorldY() > .5) isPadded = true;
+      if (proj->WorldX() >= 1.0 && proj->WorldY() >= 1.0) isPadded = true;
     }
   }
 
@@ -127,24 +151,35 @@ void IsisMain() {
   bool hasSPole = false;
   bool hasNPole = false;
   if (!isGlobal) {
-    proj->SetWorld(.5,.5);
+    proj->SetGround(90.0,0.0);
     if (proj->IsGood()) {
-      if (proj->UniversalLatitude() == 90.0) hasNPole = true;
+      if (proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
+        hasNPole = true;
+        if (proj->WorldY() >= 1.0) isPadded = true;
+      }
     }
-    proj->SetWorld(.5,inl+.5);
+    proj->SetGround(-90.0,0.0);
     if (proj->IsGood()) {
-      if (proj->UniversalLatitude() == -90.0) hasSPole = true;
+      if (proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
+        hasSPole = true;
+        if (proj->WorldY() <= inl) isPadded = true;
+      }
     }
   }
 
   // Set the padding parameters
+  leftPad = 0;
+  rightPad = 0;
+  topPad = 0;
+  bottomPad = 0;
+
   if (isGlobal && !isPadded) {
     leftPad = 1;
     rightPad = 1;
     topPad = 1;
     bottomPad = 1;
   }
-  if (!isGlobal) {
+  if (!isGlobal && !isPadded) {
     leftPad = 0;
     rightPad = 0;
     if (hasNPole) {
@@ -187,6 +222,8 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   ocube->Open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
 
+  minRadius = DBL_MAX;
+  maxRadius = DBL_MIN;
   p.StartProcess(DoWrap);
 
   // Update mapping grp
