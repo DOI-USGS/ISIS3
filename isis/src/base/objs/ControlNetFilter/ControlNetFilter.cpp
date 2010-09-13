@@ -763,7 +763,7 @@ namespace Isis {
 
 
   /**
-   * Filter points based on the image names - Group by Point 
+   * Filter points based on the image serial # - Group by Point 
    * 
    * @author Sharmila Prasad (8/16/2010)
    * 
@@ -782,6 +782,8 @@ namespace Isis {
       sCubeNames.push_back(pvlGrp[sCubeIndex][0]);
       sIndex = ++index;
       sCubeIndex = "Cube" + sIndex;
+      
+      //odb << index << "." << sCubeNames[index-2] << endl;
     }
     
     int size = sCubeNames.size();
@@ -804,6 +806,7 @@ namespace Isis {
       bool bMatch=false;
       for (int j=0; j<iNumMeasures; j++) {
         ControlMeasure cMeasure = cPoint[j];
+        //odb << "Point" << i << ". Measure"  << j << ". Cube =" << cMeasure.CubeSerialNumber() << endl;
         for (int k=0; k<size; k++) {
           if (cMeasure.CubeSerialNumber() == sCubeNames[k] ) {
             bMatch = true;
@@ -973,7 +976,9 @@ namespace Isis {
         }
       }
       
-      if (iPointsTotal <= iGreaterPoints || iPointsTotal >= iLessPoints) {
+      if ((bGreaterFlag && bLessFlag && !(iPointsTotal > iGreaterPoints && iPointsTotal < iLessPoints)) ||
+          (bGreaterFlag && !(iPointsTotal > iGreaterPoints)) ||
+          (bLessFlag && !(iPointsTotal < iLessPoints)) ) {
         mSerialNumFilter.Delete(sSerialNum);
       }
       else if (pbLastFilter) {

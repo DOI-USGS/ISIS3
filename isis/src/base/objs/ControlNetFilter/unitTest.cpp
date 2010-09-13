@@ -1,3 +1,7 @@
+
+#include "Isis.h"
+#include "IsisDebug.h"
+#include "Application.h"
 #include "ControlNet.h"
 #include "ControlNetFilter.h"
 #include "iException.h"
@@ -14,20 +18,24 @@
 
 using namespace std;
 
-int main() 
+void IsisMain()
 {
   Isis::Preference::Preferences(true);
   cout << "UnitTest for ControlNetFilter ...." << endl << endl;
+
+  Isis::UserInterface &ui = Isis::Application::GetUserInterface();
   
-  Isis::ControlNet cnetOrig("cnet.net");
+  cout << "CNET=" << ui.GetFilename("CNET") << endl;
+  cout << "Serial File=" << ui.GetFilename("FROMLIST") << endl;
+  Isis::ControlNet cnetOrig(ui.GetFilename("CNET"));
   Isis::ControlNet cnet = cnetOrig;
 
   //test filter
   Isis::PvlGroup filterGrp("Point_NumMeasures");
-  Isis::PvlKeyword keyword("GreaterThan", 2);
+  Isis::PvlKeyword keyword("GreaterThan", 3);
   filterGrp += keyword;
   
-  std::string sSerialFile = "serialNum.lis";
+  std::string sSerialFile = ui.GetFilename("FROMLIST");
   Isis::ControlNetFilter cnetFilter(&cnet, sSerialFile);
   cnetFilter.PointMeasuresFilter(filterGrp,  false);
   cnet.Write("cnetNew.net");  
