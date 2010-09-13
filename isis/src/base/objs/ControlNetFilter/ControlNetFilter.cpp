@@ -40,10 +40,11 @@ namespace Isis {
   /**
    * ControlNetFilter Constructor
    * 
-   * @author Sharmila Prasad (8/11/2010)
+   * @author Sharmila Prasad (8/27/2010)
    * 
-   * @param pCNet 
-   * @param psFileName 
+   * @param pCNet  - input Control Net
+   * @param psSerialNumFile - Corresponding Serial Num List
+   * @param pProgress - Progress of the processing
    */
   ControlNetFilter::ControlNetFilter(ControlNet *pCNet, string & psSerialNumFile, Progress *pProgress) :
                                                             ControlNetStatistics(pCNet, psSerialNumFile, pProgress)
