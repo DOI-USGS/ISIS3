@@ -337,11 +337,11 @@ namespace Isis {
               // to the intersection point
               double v = (r1-g1len) / (g2len*r1/r2 - g1len);
               SpiceDouble p[3];
-              p[0] = g1[0] + v * dd * ulookB[0];
-              p[1] = g1[1] + v * dd * ulookB[1];
-              p[2] = g1[2] + v * dd * ulookB[2];
-              plen = vnorm_c(p);
-              reclat_c(p,&pradius,&plon,&plat);
+              p_pB[0] = g1[0] + v * dd * ulookB[0];
+              p_pB[1] = g1[1] + v * dd * ulookB[1];
+              p_pB[2] = g1[2] + v * dd * ulookB[2];
+              plen = vnorm_c(p_pB);
+              reclat_c(p_pB,&pradius,&plon,&plat);
               plat *= 180.0 / Isis::PI;
               plon *= 180.0 / Isis::PI;
               if (plon < 0.0) plon += 360.0;
