@@ -1,9 +1,10 @@
+#include "Isis.h"
+#include "IsisDebug.h"
 #include "ControlNet.h"
 #include "ControlNetFilter.h"
 #include "ControlNetStatistics.h"
 #include "PvlGroup.h"
 #include "iException.h"
-#include "Isis.h"
 #include "Progress.h"
 #include "Pvl.h"
 

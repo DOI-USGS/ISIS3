@@ -1,0 +1,6 @@
+ Object = Filters
+    Group = Cube_NumPoints
+        GreaterThan = 10
+    EndGroup
+  EndObject
+

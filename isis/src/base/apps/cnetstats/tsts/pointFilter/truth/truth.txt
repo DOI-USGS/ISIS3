@@ -1,0 +1,9 @@
+PointID, Type, Ignore, Held, NumMeasures, NumIgnoredMeasures, 
+
+P019, Tie, False, False, 3, 0, 
+P018, Tie, False, False, 3, 0, 
+P014, Tie, False, False, 2, 0, 
+P013, Tie, False, False, 2, 0, 
+P012, Tie, False, False, 2, 0, 
+P011, Tie, False, False, 2, 0, 
+P010, Tie, False, False, 2, 0, 
