@@ -1,20 +1,22 @@
 UnitTest for ControlNetStatistics ....
 
+CNET=/usgs/cpkgs/isis3/data/base/testData/cnet/cnet.net
+Serial File=/usgs/cpkgs/isis3/data/base/testData/cnet/serialNum.lis
 Group = ControlNetSummary
-  TotalImages       = 9
-  TotalPoints       = 5
-  ValidPoints       = 5
+  TotalImages       = 5
+  TotalPoints       = 26
+  ValidPoints       = 26
   IgnoredPoints     = 0
   GroundPoints      = 0
   HeldPoints        = 0
   AverageError      = 0.0
   MinErrorMagnitude = 0.0
   MaxErrorMagnitude = N/A
-  TotalMeasures     = 11
-  ValidMeasures     = 11
+  TotalMeasures     = 67
+  ValidMeasures     = 67
   IgnoredMeasures   = 0
   MinLineError      = N/A
   MinSampleError    = N/A
-  MaxLineError      = 3.40282346638529e+38
+  MaxLineError      = N/A
   MaxSampleError    = N/A
 End_Group

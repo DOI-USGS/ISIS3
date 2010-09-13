@@ -114,7 +114,7 @@ namespace Isis {
     //! Determine the minimum sample error of all points in the network
     double MinimumErrorSample();
     
-    //!< Determine the maximum line error of all points in the network
+    //! Determine the maximum line error of all points in the network
     double MaximumErrorLine();
     
     //! Determine the maximum sample error of all points in the network

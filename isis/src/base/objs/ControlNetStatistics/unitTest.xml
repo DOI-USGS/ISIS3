@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://astrogeology.usgs.gov/Projects/IsisXML/Schemas/Application/application.xsd">
+  <brief>
+    Unit test for ControlNetFilter class
+  </brief>
+
+  <description>
+    Just a test only a test
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Sharmila Prasad" date="2010-09-13">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Serial Number List
+        </brief>
+        <description>
+          Serial Number List
+        </description>
+        <filter>
+          *.lis
+        </filter>
+       <default><item>$base/testData/cnet/serialNum.lis</item></default>
+      </parameter>
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Control Net
+        </brief>
+        <description>
+          Control Net
+        </description>
+        <filter>
+          *.net
+        </filter>
+        <default><item>$base/testData/cnet/cnet.net</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>
+

@@ -1,3 +1,6 @@
+#include "Isis.h"
+#include "IsisDebug.h"
+#include "Application.h"
 #include "ControlNet.h"
 #include "ControlNetStatistics.h"
 #include "iException.h"
@@ -15,14 +18,20 @@
 using namespace std;
 using namespace Isis;
 
-int main() 
+void IsisMain() 
 {
   Preference::Preferences(true);
   cout << "UnitTest for ControlNetStatistics ...." << endl << endl;
+
+  Isis::UserInterface &ui = Isis::Application::GetUserInterface();
   
-  ControlNet cnet("cnet.net");
+  cout << "CNET=" << ui.GetFilename("CNET") << endl;
+  cout << "Serial File=" << ui.GetFilename("FROMLIST") << endl;
+
+  Isis::ControlNet cnetOrig(ui.GetFilename("CNET"));
+  Isis::ControlNet cnet = cnetOrig;
   
-  string sSerialFile = "serialNum.lis";
+  std::string sSerialFile = ui.GetFilename("FROMLIST");
   ControlNetStatistics cnetStats(&cnet, sSerialFile);
   
   PvlGroup statsGrp;

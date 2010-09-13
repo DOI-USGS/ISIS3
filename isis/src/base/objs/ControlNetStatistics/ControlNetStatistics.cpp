@@ -94,7 +94,7 @@ namespace Isis {
     mCNet->SortControlNet();
     
     // Initialise the Progress object
-    if(mProgress != NULL) {
+    if(mProgress != NULL && iNumPoints > 0) {
       mProgress->SetText("Image Stats: Loading Control Points...");
       mProgress->SetMaximumSteps(iNumPoints);
       mProgress->CheckStatus();
@@ -177,12 +177,11 @@ namespace Isis {
     string outName(outFile.Expanded());
     ostm.open(outName.c_str(), std::ios::out);
     ostm << "Point Id, " << "Type, " << " Ignore, " << "Held, " << "Num Measures, " << "Ignored Measures" << endl;
-    ostm << endl;
     
     int iNumPoints = mCNet->Size();
     
     // Initialise the Progress object
-    if(mProgress != NULL) {
+    if(mProgress != NULL && iNumPoints > 0) {
       mProgress->SetText("Point Stats: Loading Control Points...");
       mProgress->SetMaximumSteps(iNumPoints);
       mProgress->CheckStatus();
@@ -457,7 +456,7 @@ namespace Isis {
    */
   double ControlNetStatistics::MaximumErrorLine()
   {
-    double dMaxError = VALID_MAX4;
+    double dMaxError = 0.0;
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
