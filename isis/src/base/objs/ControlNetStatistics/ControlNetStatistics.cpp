@@ -9,10 +9,10 @@ using namespace std;
 
 namespace Isis {
   
-  //!< String names for Point Type
+  //! String names for Point Type
   string sPointType [] = { "Ground", "Tie" };
 
-  //!< String values for Boolean
+  //! String values for Boolean
   string sBoolean[]    = { "False", "True" };
   
   /**
@@ -22,7 +22,7 @@ namespace Isis {
    *  
    * @param pCNet - Input Control network
    * @param psSerialNumFile - Serial Number List file
-   * @param progress - Check Progress if not Null
+   * @param pProgress - Check Progress if not Null
    */
   ControlNetStatistics::ControlNetStatistics(ControlNet * pCNet, const string & psSerialNumFile, Progress *pProgress)
   {

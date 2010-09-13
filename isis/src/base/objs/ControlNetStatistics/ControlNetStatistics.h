@@ -37,9 +37,10 @@ namespace Isis {
   class Progress;
   class PvlGroup;
 
+  //! Size of the PointDetails Array 
   #define IMAGE_POINT_SIZE 4
 
-  //!< Enumeration for Point Statistics
+  //! Enumeration for Point Statistics
   enum ePointDetails { total, ignore, held, ground };
   
   /**
@@ -70,7 +71,15 @@ namespace Isis {
     //! Print the Image Stats into specified output file
     void PrintImageStats(const string & psImageFile);
     
-    //! Returns the Image Stats by Serial Number
+    /**
+     * Returns the Image Stats by Serial Number
+     * 
+     * @author Sharmila Prasad (9/13/2010)
+     * 
+     * @param psSerialNum - Serial Number for which stats are required
+     * 
+     * @return int* 
+     */
     int* GetImageStatsBySerialNum(string psSerialNum) {
       return mImagePointMap[psSerialNum];
     }
