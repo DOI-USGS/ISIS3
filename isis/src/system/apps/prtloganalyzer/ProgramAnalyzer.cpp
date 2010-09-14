@@ -1,0 +1,594 @@
+/**                                                                       
+ * @file                                                                  
+ * $Revision: 1.3 $                                                             
+ * $Date: 2010/02/25 18:39:05 $                                                                 
+ *                                                                        
+ *   Unless noted otherwise, the portions of Isis written by the USGS are 
+ *   public domain. See individual third-party library and package descriptions 
+ *   for intellectual property information, user agreements, and related  
+ *   information.                                                         
+ *                                                                        
+ *   Although Isis has been used by the USGS, no warranty, expressed or   
+ *   implied, is made by the USGS as to the accuracy and functioning of such 
+ *   software and related material nor shall the fact of distribution     
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.                                        
+ *                                                                        
+ *   For additional information, launch                                   
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.                                    
+ */                                                                       
+#include <memory>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+
+#include "ProgramAnalyzer.h"
+#include "iString.h"
+#include "Pvl.h"
+#include "PvlObject.h"
+
+
+using namespace std;
+
+namespace Isis {
+
+/** Default constructor */
+ProgramAnalyzer::ProgramAnalyzer() {
+  init();
+}
+
+/**
+ * Analyzes the given log file on construction
+ * 
+ * @param logfile A print.prt file
+ */
+ProgramAnalyzer::ProgramAnalyzer(const std::string &logfile) {
+  init();
+  add(logfile);
+}
+
+/**
+ * @brief Set the list of program exclusions 
+ *  
+ *  When provided, the string should contain names of ISIS programs that will be
+ *  excluded in the analysis.  If more than one program is desired, separate
+ *  them by commas.
+ *  
+ *  The exclusion list takes precedence over any applications added in the
+ *  inclusion list.  In other words, if the same program is included in both the
+ *  inclusion and exclusion list, it will be excluded.
+ *  
+ *  Note this method can be called repeatedly to add names.
+ *
+ * @param name Comma separated list of names of programs to exclude
+ */
+void ProgramAnalyzer::setExclude(const std::string &name) {
+
+  vector<string> names;
+  iString::Split(',', name, names);
+  for ( unsigned i = 0 ; i < names.size() ; i++ ) {
+    exclude(names[i]);
+  }
+  return;
+}
+
+/**
+ * @brief Loads a list of excluded program names from a file
+ *  
+ * The file is expected to contain the name of an ISIS program, one per line. 
+ * These programs will be logged but not included in the analysis. 
+ *  
+ * The exclusion list takes precedence over any applications added in the
+ * inclusion list.  In other words, if the same program is included in both the
+ * inclusion and exclusion list, it will be excluded.
+ *  
+ * Note this method can be called repeatedly to add names.
+ *  
+ * @param name  Name of file containing program list to exclude
+ */
+void ProgramAnalyzer::exclude(const std::string &name) {
+  string prog = iString(name).Trim(" \t\n");
+  if ( !_excludes.exists(prog) ) {
+    _excludes.add(prog, 0);
+  }
+  return;
+}
+
+
+/**
+ * @brief Set the list of program inclusions 
+ *  
+ * When provided, the string should contain names of ISIS programs that will be
+ * included in the analysis.  If more than one program is desired, separate
+ * them by commas.
+ *  
+ * If this option is used, it will only included programs given in this list. 
+ * It operates as both an inclusive and exclusive list, so there is no need to 
+ * also utilize the exclude features of this class. 
+ *  
+ * However, if you do use the exclusion features of this clas, the exclusion 
+ * list takes precedence over any applications added in the inclusion list.  In 
+ * other words, if the same program is included in both the inclusion and 
+ * exclusion list, it will be excluded. 
+ *  
+ * Note this method can be called repeatedly to add names.
+ *  
+ * @param name Comma separated list of names of programs to include
+ */
+void ProgramAnalyzer::setInclude(const std::string &name) {
+  vector<string> names;
+  iString::Split(',', name, names);
+  for ( unsigned i = 0 ; i < names.size() ; i++ ) {
+    include(names[i]);
+  }
+  return;
+}
+
+/**
+ * @brief Loads a list of included program names from a file
+ *  
+ * The file is expected to contain the name of an ISIS program, one per line. 
+ * These programs will be included in the analysis. 
+ *  
+ * If this option is used, it will only included programs given in this list. 
+ * It operates as both an inclusive and exclusive list, so there is no need to 
+ * also utilize the exclude features of this class. 
+ *  
+ * However, if you do use the exclusion feartures, the exclusion list takes 
+ * precedence over any applications added in the inclusion list.  In other 
+ * words, if the same program is included in both the inclusion and exclusion 
+ * list, it will be excluded. 
+ *  
+ * Note this method can be called repeatedly to add names.
+ *  
+ * @param name  Name of file containing program list to include
+ */
+void ProgramAnalyzer::include(const std::string &name) {
+  string prog = iString(name).Trim(" \t\n");
+  if ( !_includes.exists(prog) ) {
+    _includes.add(prog, 0);
+  }
+  return;
+}
+
+/**
+ * @brief Adds a print.prt file to the analysis 
+ *  
+ * The programs contained in the log file, assumed to be a print.prt file, will 
+ * be added to the list of programs to be analyzed.  They are subject to the 
+ * exclude and include program lists. 
+ * 
+ * @param logfile An ISIS3 print.prt file
+ */
+void ProgramAnalyzer::add(const std::string &logfile) {
+  Pvl plog(logfile);
+  for(int i = 0; i < plog.Objects(); i++) {
+    add(plog.Object(i));
+  }
+}
+
+/**
+ * @brief Adds a program object originating from a print.prt file 
+ *  
+ * The PvlObject provided is assumed to orginate from an ISIS3 print.prt log 
+ * file.  It contains information that will be extracted and analyzed according 
+ * to the features of this class. 
+ * 
+ * 
+ * @param program Pvl object containing the output log of an ISIS3 application
+ */
+void ProgramAnalyzer::add(PvlObject &program) {
+  _count++;
+  string prog(program.Name());
+  if ( _excludes.exists(prog) ) {
+    _excludes.get(prog)++;
+    return;
+  }
+
+  if ( _includes.size() > 0 ) {
+    if ( !_includes.exists(prog)  ) {
+      return;
+    }
+    _includes.get(prog)++;
+  }
+
+  ProgramData pdata;
+  pdata.name = prog;
+  pdata.runtime = getKey(program, "ExecutionDateTime");
+  pdata.from = getKey(program, "From", "UserParameters");
+  pdata.to   = getKey(program, "To", "UserParameters");
+  accounting(program, pdata);
+  analyze(pdata);
+  return;
+}
+ 
+/**
+ * @brief Reports program counters for the current state
+ *  
+ * This method reports counts of programs as they were added to the object.  It 
+ * reports total programs, numbers for analyzed, included, excluded, unique, 
+ * valid, errors, zero CPU/Connect times and incomplete or invalid (typcially 
+ * negative times) for programs it evaluted. 
+ * 
+ * @param name Name of Pvl group to create
+ * 
+ * @return PvlGroup Pvl group containing program numbers/counts
+ */
+PvlGroup ProgramAnalyzer::review(const std::string &name) const {
+  PvlGroup pvl(name);
+
+  pvl += PvlKeyword("Programs", size());
+  pvl += PvlKeyword("Unique", Programs());
+  pvl += PvlKeyword("Included", LimitTotals(_includes));
+  pvl += PvlKeyword("Excluded", LimitTotals(_excludes));
+  pvl += PvlKeyword("Valid", valid());
+  pvl += PvlKeyword("Errors", errors());
+  pvl += PvlKeyword("ZeroTime", zerotime());
+  pvl += PvlKeyword("NoData", nodata());
+  pvl += PvlKeyword("BadData", baddata());
+  pvl += PvlKeyword("Total", count());
+  return (pvl);
+}
+
+
+/**
+ * @brief Reports cumulative runtime performance statistics for programs 
+ *  
+ * This method formats the contents of the program analysis in a Pvl group that 
+ * provides information for all programs regardin CPU, connect and I/O times. 
+ * 
+ * 
+ * @param name Name of Pvl group to create
+ * 
+ * @return PvlGroup Pvl group containing cumulative program analysis
+ */
+PvlGroup ProgramAnalyzer::cumulative(const std::string &name) const {
+  return (toPvl(_totals, name));
+}
+
+/**
+ * @brief Reports analysis for a specific program 
+ *  
+ * This object maintains individual statistics for each unique program.  This 
+ * method reports the analysis for a particular program. 
+ * 
+ * 
+ * @param name Name of the program to analyze
+ * 
+ * @return PvlGroup Pvl group containing program analysis
+ */
+PvlGroup ProgramAnalyzer::summarize(const std::string &name) const {
+  return (toPvl(_programs.get(name)));
+}
+
+/**
+ * @brief Reports analysis for the nth occuring application in the list
+ * 
+ * This object maintains individual statistics for each unique program.  This 
+ * method reports the analysis for a program that occurs in the list at the 
+ * given index. 
+ 
+ * @param index Index of the application to summerize
+ * 
+ * @return PvlGroup Pvl group containing the program analysis
+ */
+PvlGroup ProgramAnalyzer::summarize(const int index) const {
+  return (toPvl(_programs.getNth(index)));
+}
+
+/**
+ * @brief Writes a header in CVS format to a ostream
+ * 
+ * @param out Output stream to write the header
+ * 
+ * @return ostream& Returns the stream
+ */
+ostream &ProgramAnalyzer::header(ostream &out) const {
+  out << "Program,From,To,ExecutionDateTime,ConnectTime,CpuTime,IOTime\n";
+  return (out);
+}
+
+/**
+ * @brief Writes the analysis to the stream in CSV format 
+ *  
+ * This method provides the analysis in CSV format for more traditional 
+ * manipulation.  This format is well suited to be plotted for further analysis 
+ * of the program/system performance. 
+ *  
+ * The columns provided are:  Program name, FROM file, TO file, runtime, connect 
+ * time, CPU time, and I/O time (difference in runtime and CPU time). 
+ * 
+ * 
+ * @param out Output stream to write data to
+ * 
+ * @return ostream& The output stream
+ */
+ostream &ProgramAnalyzer::listify(ostream &out) const {
+  vector<ProgramData>::const_iterator progs = _pdata.begin();
+  while (progs != _pdata.end()) {
+    if ( progs->status == VALID ) {
+      out << format(progs->name) << ",";
+      out << format(progs->from) << ",";
+      out << format(progs->to) << ",";
+      out << format(progs->runtime) << ",";
+      out << DblToStr(progs->connectTime, 2) << ",";
+      out << DblToStr(progs->cpuTime, 2) << ",";
+      out << DblToStr(progs->connectTime-progs->cpuTime, 2) << "\n";
+    }
+   ++progs;
+  }
+  return (out);
+}
+
+
+/**
+ * @brief Initializes the class
+ * 
+ * This init function is reintrant and will reset all internal parameters to the
+ * empty state.
+ */
+void ProgramAnalyzer::init() {
+  _count = 0;
+  _excludes = LogList();
+  _includes = LogList();
+  _programs = RunList();
+  _totals = RunTimeStats("Cumulative");
+  _pdata.clear();
+}
+
+
+/**
+ * @brief Provides a count of analyzed programs
+ *  
+ * Iterates through all programs included in the analysis and provides a count 
+ * fo the total.  It will search through for a given status and only includes 
+ * those which have the indicated status.  The valid status to check are those 
+ * defined in the Status enum list. 
+ * 
+ * @param status Status of the program to count
+ * 
+ * @return int 
+ */
+int ProgramAnalyzer::getCount (ProgramAnalyzer::Status status) const {
+  vector<ProgramData>::const_iterator progs = _pdata.begin();
+  int n(0);
+  while (progs != _pdata.end()) {
+    if ( progs->status == status ) n++;
+    ++progs;
+  }
+  return (n);
+}
+ 
+ 
+/**
+ * @brief Extracts a keyword value from the Pvl object 
+ * 
+ * 
+ * @param obj Pvl object to search for the keyword
+ * @param key Name of keyword to find
+ * @param grp Optional group within the object to find the keyword
+ *  
+ * @return string Value of the keyword if the keyword exists, otherwise an empty 
+ *                string is returned.
+ */
+string ProgramAnalyzer::getKey(PvlObject &obj, const std::string &key, 
+                               const std::string &grp) const {
+
+  string value("");
+  if ( !grp.empty() ) {
+    PvlGroup &g = obj.FindGroup(grp);
+    value = findKey(g, key);
+  }
+  else {
+    value = findKey(obj, key);
+  }
+  return (value);
+}
+
+/**
+ * @brief Converts times represented in text to digital values 
+ *  
+ * The text string, atime, is expected to be of the format "HH:MM:SS.sss" where 
+ * "HH" is hours, "MM" is minutes and "SS.sss" is seconds.milliseconds.  The 
+ * units returned are in seconds. 
+ * 
+ * @param atime Text string containing time to convert
+ * @param dtime Time in seconds
+ * 
+ * @return ProgramAnalyzer::Status Returns BADDATA if the text string is empty 
+ *                                 or malformed, or VALID if the conversion
+ *                                 succeeds.
+ */
+ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const std::string &atime, 
+                                                     double &dtime) const {
+  if ( atime.empty() ) return (BADDATA);
+  vector<string> t;
+  iString::Split(':', atime, t);
+  if ( t.size() != 3 ) {
+    return (BADDATA);
+  }
+
+  //  Convert to seconds
+  double toSeconds(3600.0);
+  dtime = 0.0;
+  for ( unsigned int i = 0 ; i < 3 ; i++ ) {
+    dtime += iString(t[i]).ToDouble() * toSeconds;
+    toSeconds /= 60.0;
+  }
+
+  return (VALID);
+}
+
+/**
+ * @brief Compute analysis of program entry 
+ *  
+ * This method accepts a Pvl object that is assumed to orignate from an ISIS3 
+ * print.prt log file and conforms to the format in the log file. 
+ *  
+ * Data is extracted from certain keywords in the object.  Invalid objects or 
+ * error conditions are detected and are indicated in the status of the program 
+ * analysis structure, pdata.  Other conditions of no time for runtimes or CPU 
+ * times is also detected and indicated. 
+ * 
+ * 
+ * @param obj   Object containing program data
+ * @param pdata Structure to return derived values from the program data
+ * 
+ * @return bool True if successful, false otherwise.
+ */
+bool ProgramAnalyzer::accounting(PvlObject &obj, 
+                                 ProgramAnalyzer::ProgramData &pdata) const {
+
+  //  Assume an error occured if the Accounting group is missing
+  if ( !obj.HasGroup("Accounting") ) {
+    pdata.status = ERRORS;
+    return (false);
+  }
+  
+  PvlGroup &acc = obj.FindGroup("Accounting");
+  Status status = convertTime(findKey(acc,"ConnectTime"), pdata.connectTime);
+  pdata.status = convertTime(findKey(acc, "CpuTime"), pdata.cpuTime);
+
+  //  Test a few remaining times
+  if ( status != VALID ) pdata.status = status;
+  else if ( pdata.connectTime <= 0.0 ) pdata.status = ZEROTIME;
+
+  return (pdata.status == VALID);
+}
+
+
+
+/**
+ * @brief Performs the analysis of a program 
+ *  
+ * This method accepts a program data structure, determines validity for 
+ * inclusion in the analysis and computes statistics from the data content. 
+ * 
+ * @param data Structure containing program data
+ * 
+ * @return bool True if valid and included, false otherwize
+ */
+bool ProgramAnalyzer::analyze(const ProgramAnalyzer::ProgramData &data) {
+
+  bool good(false);
+  if ( data.status == VALID ) {
+    if ( !_programs.exists(data.name) ) {
+       _programs.add(data.name, RunTimeStats(data.name));
+    }
+    RunTimeStats &stats = _programs.get(data.name);
+    stats.contime.AddData(data.connectTime);
+    stats.cputime.AddData(data.cpuTime);
+    stats.iotime.AddData(data.connectTime - data.cpuTime);
+
+    _totals.contime.AddData(data.connectTime);
+    _totals.cputime.AddData(data.cpuTime);
+    _totals.iotime.AddData(data.connectTime - data.cpuTime);
+
+    good = true;
+  }
+  _pdata.push_back(data);
+  return (good);
+}
+
+/**
+ * @brief Produces report of run time statistics for the given structure
+ * 
+ *  
+ * The data contained with the RunTimeStats is externalized to a Pvl group with 
+ * some resonable formatting. 
+ *  
+ * @param stats Run time stats for the given data
+ * @param name  Optional name of the PvlGroup results
+ * 
+ * @return PvlGroup Pvl group of runtime statistics
+ */
+PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats, 
+                                const std::string &name) const {
+  PvlGroup pvl((name.empty() ? stats.pname : name));
+
+  pvl += PvlKeyword("Hits", stats.contime.TotalPixels());
+  pvl += PvlKeyword("ConnectTimeMinimum", DblToStr(stats.contime.Minimum(), 2));
+  pvl += PvlKeyword("ConnectTimeMaximum", DblToStr(stats.contime.Maximum(), 2));
+  pvl += PvlKeyword("ConnectTimeAverage", DblToStr(stats.contime.Average(), 2));
+  pvl += PvlKeyword("ConnectTimeStdDev", DblToStr(stats.contime.StandardDeviation(), 4));
+
+  pvl += PvlKeyword("CpuTimeMinimum", DblToStr(stats.cputime.Minimum(), 2));
+  pvl += PvlKeyword("CpuTimeMaximum", DblToStr(stats.cputime.Maximum(), 2));
+  pvl += PvlKeyword("CpuTimeAverage", DblToStr(stats.cputime.Average(), 2));
+  pvl += PvlKeyword("CpuTimeStdDev", DblToStr(stats.cputime.StandardDeviation(), 4));
+
+  pvl += PvlKeyword("IOTimeMinimum", DblToStr(stats.iotime.Minimum(), 2));
+  pvl += PvlKeyword("IOTimeMaximum", DblToStr(stats.iotime.Maximum(), 2));
+  pvl += PvlKeyword("IOTimeAverage", DblToStr(stats.iotime.Average(), 2));
+  pvl += PvlKeyword("IOTimeStdDev", DblToStr(stats.iotime.StandardDeviation(), 4));
+
+  return (pvl);
+}
+
+/**
+ * @brief Returns NULL for empty strings to ensure meaningful content
+ * 
+ * @param s  String to test for content
+ * 
+ * @return iString Returns existing content if present, NULL if empty
+ */
+iString ProgramAnalyzer::format(const std::string &s) const {
+ if ( s.empty() )  return (iString("NULL"));
+ return (s);
+}
+
+
+  /**
+   * @brief Convert a double value to a string subject to precision specs
+   *
+   * This method converts a double value to a string that has a prefined digitis
+   * of precision.  Fixed float form is used with the specified number of digits
+   * of precision.
+   *
+   * @param value Double value to convert to string
+   *
+   * @return iString Returns the converted string
+   */
+  iString ProgramAnalyzer::DblToStr(const double &value, const int precision) 
+                                    const {
+    if(IsSpecial(value)) {
+      return (iString("0.0"));
+    }
+
+    //  Format the string to specs
+    ostringstream strcnv;
+    strcnv.setf(std::ios::fixed);
+    strcnv << setprecision(precision) << value;
+    return (iString(strcnv.str()));
+  }
+
+  /**
+   * @brief Returns the count of all programs in the log list 
+   *  
+   * This method computes a count of all programs that exist in the list of 
+   * applications that encurred a limit in the analysis.  It is not enough to 
+   * just report the number of entries in the list - each list contains a count 
+   * of occurances.  These occurances are summed and return to the caller. 
+   * 
+   * @param limit List of applications incurring a limit
+   * 
+   * @return int Total number of occurances all programs in the list
+   */
+  int ProgramAnalyzer::LimitTotals(const ProgramAnalyzer::LogList &limit) 
+                                   const {
+    int total(0);
+    for ( int i = 0 ; i < limit.size() ; i++ ) {
+      total += limit.getNth(i);
+    }
+    return (total);
+  }
+
+} // namespace Isis
+
+
