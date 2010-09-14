@@ -11,7 +11,7 @@ class MyCamera : public PushFrameCamera {
 
 int main() {
   Isis::Preference::Preferences(true);
-  string inputFile = "$ISIS3DATA/mgs/testData/ab102401.lev2.cub";
+  string inputFile = "$mgs/testData/ab102401.lev2.cub";
   Pvl pvl(inputFile);
   MyCamera cam(pvl);
 
