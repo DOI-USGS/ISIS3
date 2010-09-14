@@ -6,9 +6,9 @@ Object = ControlNetwork
   NetworkId    = Clementine
   NetworkType  = ImageToGround
   TargetName   = MOON
-  UserName     = skoechle
-  Created      = 2010-09-13T15:56:16
-  LastModified = 2010-09-13T15:56:16
+  UserName     = sprasad
+  Created      = current
+  LastModified = current
   Description  = "Orbit 80/213"
 
   Object = ControlPoint

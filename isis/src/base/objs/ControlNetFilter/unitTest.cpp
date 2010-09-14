@@ -38,6 +38,8 @@ void IsisMain()
   std::string sSerialFile = ui.GetFilename("FROMLIST");
   Isis::ControlNetFilter cnetFilter(&cnet, sSerialFile);
   cnetFilter.PointMeasuresFilter(filterGrp,  false);
+  cnet.SetModifiedDate("current");
+  cnet.SetCreatedDate("current");
   cnet.Write("cnetNew.net");  
 
   system ("cat cnetNew.net");
