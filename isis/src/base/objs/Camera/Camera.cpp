@@ -965,7 +965,7 @@ namespace Isis {
    * @return double North Azimuth
    */
   double Camera::NorthAzimuth() {
-    return ComputeAzimuth(p_radii[2], 90.0, 0.0);
+    return ComputeAzimuth(LocalRadius(), 90.0, 0.0);
   }
 
   /**
