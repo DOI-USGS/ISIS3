@@ -336,7 +336,6 @@ namespace Isis {
               // Calculate the fractional distance "v" to move along the look vector
               // to the intersection point
               double v = (r1-g1len) / (g2len*r1/r2 - g1len);
-              SpiceDouble p[3];
               p_pB[0] = g1[0] + v * dd * ulookB[0];
               p_pB[1] = g1[1] + v * dd * ulookB[1];
               p_pB[2] = g1[2] + v * dd * ulookB[2];
@@ -357,9 +356,9 @@ namespace Isis {
               // so reset g1=p and r1=pradius
               if (palt > tolerance) {
                 it = it + 1;
-                g1[0] = p[0];
-                g1[1] = p[1];
-                g1[2] = p[2];
+                g1[0] = p_pB[0];
+                g1[1] = p_pB[1];
+                g1[2] = p_pB[2];
                 g1len = plen;
                 r1 = pradius;
                 dd = dd * (1.0 - v);
@@ -368,9 +367,9 @@ namespace Isis {
               // so reset g2=p and r2=pradius
               } else if (palt < -tolerance) {
                 it = it + 1;
-                g2[0] = p[0];
-                g2[1] = p[1];
-                g2[2] = p[2];
+                g2[0] = p_pB[0];
+                g2[1] = p_pB[1];
+                g2[2] = p_pB[2];
                 g2len = plen;
                 r2 = pradius;
                 dd = dd * v;
