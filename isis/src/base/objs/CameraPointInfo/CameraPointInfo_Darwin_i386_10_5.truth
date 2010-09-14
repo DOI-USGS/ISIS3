@@ -12,9 +12,9 @@ Group = GroundPoint
   PositiveWest180Longitude   = -12.099790311414
   BodyFixedCoordinate        = (155.17944862822, 33.266997191508,
                                 -1729.7476298847) <km>
-  LocalRadius                = 1737013.0159186 <m>
-  SampleResolution           = 187.5857977999 <m>
-  LineResolution             = 187.5857977999 <m>
+  LocalRadius                = 1737013.0159186 <meters>
+  SampleResolution           = 187.5857977999 <meters/pixel>
+  LineResolution             = 187.5857977999 <meters/pixel>
 
   # Spacecraft Information
   SpacecraftPosition         = (216.76438021064, 54.256829537357,
@@ -64,9 +64,9 @@ Group = GroundPoint
   PositiveWest180Longitude   = -15.0
   BodyFixedCoordinate        = (160.94890808189, 43.126129943212,
                                 -1730.4831018617) <km>
-  LocalRadius                = 1738486.75 <m>
-  SampleResolution           = 187.22618189816 <m>
-  LineResolution             = 187.22618189816 <m>
+  LocalRadius                = 1738486.75 <meters>
+  SampleResolution           = 187.22618189816 <meters/pixel>
+  LineResolution             = 187.22618189816 <meters/pixel>
 
   # Spacecraft Information
   SpacecraftPosition         = (216.76438021064, 54.256829537357,

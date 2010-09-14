@@ -80,6 +80,8 @@ namespace Isis {
    *   @history 2010-06-07 MNB - Changed Error keyword so that it
    *                             is always present when
    *                             allowErrors is true.
+   *   @history 2010-09-13 Steven Lambright - Corrected units for
+   *                             SampleResolution and LineResolution
    */
   class CameraPointInfo {
 

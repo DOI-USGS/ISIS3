@@ -327,9 +327,9 @@ namespace Isis {
         gp->FindKeyword("BodyFixedCoordinate").AddValue(pB[1], "km");
         gp->FindKeyword("BodyFixedCoordinate").AddValue(pB[2], "km");
 
-        gp->FindKeyword("LocalRadius").SetValue(camera->LocalRadius(), "m");
-        gp->FindKeyword("SampleResolution").SetValue(camera->SampleResolution(), "m");
-        gp->FindKeyword("LineResolution").SetValue(camera->LineResolution(), "m");
+        gp->FindKeyword("LocalRadius").SetValue(camera->LocalRadius(), "meters");
+        gp->FindKeyword("SampleResolution").SetValue(camera->SampleResolution(), "meters/pixel");
+        gp->FindKeyword("LineResolution").SetValue(camera->LineResolution(), "meters/pixel");
 
         camera->InstrumentPosition(spB);
         gp->FindKeyword("SpacecraftPosition").AddValue(spB[0], "km");
