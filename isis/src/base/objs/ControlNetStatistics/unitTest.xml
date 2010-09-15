@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://astrogeology.usgs.gov/Projects/IsisXML/Schemas/Application/application.xsd">
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Unit test for ControlNetFilter class
   </brief>
