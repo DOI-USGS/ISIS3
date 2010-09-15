@@ -31,22 +31,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    //    double knownLat = -64.50313745696818;
-    //    double knownLon = 43.52322196365473;
-    //    double knownLat = -64.50313965814711;
-    //    double knownLon = 43.5232222641892;
-    //    double knownLat = -64.50313975280879;  //blackflag
-    //    double knownLon = 43.52322225395123;
-    //    double knownLat = -64.50312208873054;
-    //    double knownLon = 43.52322362019364;
-    //    double knownLat = -64.50312199406929;
-    //    double knownLon = 43.52322363043155;
-    //    double knownLat = -64.50312208873054;
-    //    double knownLon = 43.52322362019364;
-    double knownLat = -64.50314015330002;//blackflag
-    double knownLon = 43.52322224602578;
-    //    double knownLat = -64.50312208873054;//hiclops
-    //    double knownLon = 43.52322362019364;
+    double knownLat = -64.65285095105098;
+    double knownLon = 43.45346379015531;
 
     Isis::Pvl p("$mex/testData/h2254_0000_s12.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
