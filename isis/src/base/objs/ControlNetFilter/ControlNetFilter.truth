@@ -1,7 +1,5 @@
 UnitTest for ControlNetFilter ....
 
-CNET=/usgs/cpkgs/isis3/data/base/testData/cnet/cnet.net
-Serial File=/usgs/cpkgs/isis3/data/base/testData/cnet/serialNum.lis
 Object = ControlNetwork
   NetworkId    = Clementine
   NetworkType  = ImageToGround
@@ -10,6 +8,231 @@ Object = ControlNetwork
   Created      = current
   LastModified = current
   Description  = "Orbit 80/213"
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P004
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 313.5936307567
+      Line           = 180.41157454379
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 0.5
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:17:21.337
+      MeasureType    = Estimated
+      Sample         = 169.33126828027
+      Line           = 263.10091910939
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:18:07.957
+      MeasureType    = Estimated
+      Sample         = 170.02968446616
+      Line           = 15.04713834217
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P005
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 200.23851435878
+      Line           = 183.13865585651
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 2.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:17:21.337
+      MeasureType    = Estimated
+      Sample         = 114.39373958351
+      Line           = 262.13154036317
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:18:07.957
+      MeasureType    = Estimated
+      Sample         = 114.64701571976
+      Line           = 13.859889504439
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P006
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 86.42326197005
+      Line           = 184.23954201821
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 3.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:17:21.337
+      MeasureType    = Estimated
+      Sample         = 59.417761996489
+      Line           = 261.02861759337
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:18:07.957
+      MeasureType    = Estimated
+      Sample         = 59.224229207292
+      Line           = 12.682077163562
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P018
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:03:40.056
+      MeasureType    = Estimated
+      Sample         = 296.85994973633
+      Line           = 222.23934061458
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 1.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:17:21.337
+      MeasureType    = Estimated
+      Sample         = 168.14810688432
+      Line           = 210.89349384009
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 308.19899278398
+      Line           = 67.674765769663
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P020
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:03:40.056
+      MeasureType    = Estimated
+      Sample         = 81.886132217529
+      Line           = 228.3368548459
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 1.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:17:21.337
+      MeasureType    = Estimated
+      Sample         = 58.716015559642
+      Line           = 208.85561089501
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 80.988792069154
+      Line           = 71.040685574617
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
 
   Object = ControlPoint
     PointType = Tie
@@ -25,6 +248,7 @@ Object = ControlNetwork
       ErrorMagnitude = 0.0
       DateTime       = 2008-09-24T13:07:59
       ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 1.5
       Reference      = True
     End_Group
 
@@ -82,6 +306,7 @@ Object = ControlNetwork
       ErrorMagnitude = 0.0
       DateTime       = 2008-09-24T13:07:59
       ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 2.0
       Reference      = True
     End_Group
 
@@ -139,6 +364,7 @@ Object = ControlNetwork
       ErrorMagnitude = 0.0
       DateTime       = 2008-09-24T13:07:59
       ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 2.0
       Reference      = True
     End_Group
 
@@ -165,6 +391,7 @@ Object = ControlNetwork
       ErrorMagnitude = 0.0
       DateTime       = 2008-09-24T13:07:59
       ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 1.0
       Reference      = False
     End_Group
 
@@ -173,6 +400,141 @@ Object = ControlNetwork
       MeasureType    = Estimated
       Sample         = 49.390290302338
       Line           = 31.741192808483
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P024
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:05:19.806
+      MeasureType    = Estimated
+      Sample         = 316.436551928
+      Line           = 53.755902313225
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 1.5
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:18:07.957
+      MeasureType    = Estimated
+      Sample         = 169.87108690579
+      Line           = 52.117853063763
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 315.41508823523
+      Line           = 261.14932968478
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P025
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:05:19.806
+      MeasureType    = Estimated
+      Sample         = 202.05804026652
+      Line           = 55.654912818818
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 1.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:18:07.957
+      MeasureType    = Estimated
+      Sample         = 114.32273205672
+      Line           = 51.186692332784
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 202.03899679546
+      Line           = 264.02393462941
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = P026
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:05:19.806
+      MeasureType    = Estimated
+      Sample         = 87.281808396826
+      Line           = 56.072674820993
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      GoodnessOfFit  = 3.0
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-04-05T12:18:07.957
+      MeasureType    = Estimated
+      Sample         = 58.739833253924
+      Line           = 50.062003674838
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-09-24T13:07:59
+      ChooserName    = "Application autoseed"
+      Reference      = False
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Clementine1/UVVIS/1994-03-08T20:04:59.856
+      MeasureType    = Estimated
+      Sample         = 88.269273577293
+      Line           = 265.2152902713
       ErrorLine      = 0.0
       ErrorSample    = 0.0
       ErrorMagnitude = 0.0

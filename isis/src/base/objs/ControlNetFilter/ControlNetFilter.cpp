@@ -53,7 +53,6 @@ namespace Isis {
     
     #ifdef _DEBUG_
     StartDebug();
-    #endif
     /*for (int i=0; i<mCNet->Size(); i++) {
       ControlPoint cp = (*mCNet)[i];
       for (int j=0; j<cp.Size(); j++) {
@@ -62,6 +61,7 @@ namespace Isis {
         odb << "serial num=" << sn << "  File=" << mSerialNumList.Filename(sn) << endl;
       }
     }*/
+    #endif
   }
   
   /**
@@ -614,14 +614,14 @@ namespace Isis {
     string sType = "";
     iString isType;
     
-    if (pvlGrp.HasKeyword("Ignored")){
+    if (pvlGrp.HasKeyword("Ignore")){
       iIgnoredFlag = 0;
       if (pvlGrp["Ignored"][0]=="true")
         iIgnoredFlag = 1;
     }
 
-    if (pvlGrp.HasKeyword("Type")){
-      sType = pvlGrp["Type"][0];
+    if (pvlGrp.HasKeyword("MeasureType")){
+      sType = pvlGrp["MeasureType"][0];
       sType = isType.DownCase(sType);
     }
 
@@ -716,6 +716,10 @@ namespace Isis {
     if (pbLastFilter) {
       mOstm << "PointID, Type, Ignore, Filename, SerialNum, GoodnessOfFit, MeasureIgnore, Reference" << endl << endl;
     }
+    #ifdef _DEBUG_
+    odb << "Lessthan=" << bLesserFlag << "  value=" << dLesserValue << endl;
+    odb << "GreaterThan=" << bGreaterFlag << "  value=" << dGreaterValue << endl;
+    #endif
     
     int iNumPoints = mCNet->Size();
     for (int i=(iNumPoints-1); i>=0; i--) {
@@ -726,7 +730,9 @@ namespace Isis {
               
       for (int j=0; j<iNumMeasures; j++) {
         double dGFit = cPoint[j].GoodnessOfFit();
-
+        #ifdef _DEBUG_
+        odb << " Point." << i << "  Measure." << j << "   GoodnessFit=" << dGFit << endl;
+        #endif
         if (dGFit != Isis::Null) {
           if (bLesserFlag && bGreaterFlag) {
             if (dGFit < dLesserValue && dGFit > dGreaterValue) {
