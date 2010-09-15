@@ -21,8 +21,8 @@ int main(void) {
     // and "Longitude off by: " values directly into these variables.
     //    double knownLat = -87.58875692974748;
     //    double knownLon =  21.19902564370578;
-    double knownLat = -87.58875742697279;
-    double knownLon =  21.198690065427;
+    double knownLat = -87.59000574363817;
+    double knownLon =  19.99808691873470;
 
     Isis::Pvl p("$mro/testData/P12_005911_3396_MA_00N009W.cropped.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
