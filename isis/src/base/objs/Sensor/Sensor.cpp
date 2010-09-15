@@ -206,7 +206,7 @@ namespace Isis {
     double plen=0.0;
     SpiceDouble plat, plon, pradius;
     if(p_hasElevationModel) {
-     
+
       // Separate iteration algorithms are used for different projections -
       // use this iteration for equatorial cylindrical type projections 
       if (p_demProj->IsEquatorialCylindrical()) {
@@ -281,8 +281,8 @@ namespace Isis {
         // Set default to limb observation until we determine that it is a nadir observation
         int ptype = 0;
 
-        // Set the tolerance for 1/100 of a pixel in meters
-        double tolerance = Resolution() / 100.0;
+        // Set the tolerance to 1/100th of a meter in altitude
+        double tolerance = 1E-5;
 
         // Main iteration loop
         // Loop from g1 to gm stepping by angles of dalpha until intersection is found
@@ -384,12 +384,17 @@ namespace Isis {
             }
           }
         }
-        // If an intersection was found, return the information
-        p_hasIntersection = true;
+
         p_latitude = plat;
         p_longitude = plon;
         p_radius = plen;
-        return p_hasIntersection;
+
+        surfpt_c((SpiceDouble *)&sB[0], p_lookB, p_radius, p_radius, p_radius,
+                  p_pB, &found);
+        if(!found) {
+          p_hasIntersection = false;
+          return p_hasIntersection;
+        }
       } else {
         // Set hasIntersection flag to true so Resolution can be calculated
         p_hasIntersection = true;
@@ -449,6 +454,7 @@ namespace Isis {
         }
       }
     }
+
     // Convert x/y/z to lat/lon and radius
     p_hasIntersection = true;
     reclat_c(p_pB, &p_radius, &p_longitude, &p_latitude);
