@@ -30,10 +30,10 @@ void IsisMain() {
 
   grid.CreateGrid(0, 0, 0.1, 0.1, &progress, 0.5, 0.5);
 
-  cout << "First line on grid: " << endl;
+  cout << "\n\nFirst line on grid: \n" << endl;
   for(int i = 0; i < someCube.Samples(); i++) {
-    cout << grid.PixelOnGrid(i, 0) << "\t";
-    if(i % 10 == 0) cout << endl;
+    cout << grid.PixelOnGrid(i, 0) << " ";
+    if(i % 35 == 0) cout << endl;
   }
 
   cout << endl;
