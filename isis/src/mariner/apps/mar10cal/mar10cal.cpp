@@ -65,7 +65,7 @@ void IsisMain() {
   //double etStart = startTime.Et();
 
   double exposure = inst["ExposureDuration"];
-  double exposureOffset;
+  double exposureOffset = 0.0;
   if (ui.WasEntered("EXPOFF")) {
     exposureOffset = ui.GetDouble("EXPOFF");
   }
