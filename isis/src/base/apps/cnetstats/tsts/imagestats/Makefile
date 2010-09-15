@@ -9,7 +9,5 @@ commands:
 	  filter=no \
 	  create_image_stats=yes \
 	  image_stats_file=$(OUTPUT)/imagestats.txt \
-	  create_point_stats=yes \
-	  point_stats_file=$(OUTPUT)/pointstats.txt \
-	  type=csv > /dev/null;
+	  create_point_stats=no > /dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;
