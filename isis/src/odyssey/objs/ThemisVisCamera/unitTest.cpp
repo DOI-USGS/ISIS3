@@ -22,8 +22,8 @@ int main(void) {
     // and "Longitude off by: " values directly into these variables.
     //    double knownLat = 48.53342079272975;
     //    double knownLon = 332.0434164961534;
-    double knownLat = 48.53342078845403;
-    double knownLon = 332.0434164973285;
+    double knownLat =  48.53477763371114; 
+    double knownLon = 332.0435632412456;
 
     Isis::Pvl p("$odyssey/testData/V14093008RDR.even.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
@@ -31,10 +31,10 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 1.0, 193.0);
+    TestLineSamp(cam, 1.0, 191.0);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, cam->Samples(), 193.0);
+    TestLineSamp(cam, cam->Samples(), 191.0);
 
     cout << "For lower left corner ..." << endl;
     TestLineSamp(cam, 1.0, cam->Lines());
