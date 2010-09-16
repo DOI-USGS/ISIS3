@@ -17,8 +17,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownCtrLat = 20.089177228428;
-    double knownCtrLon = 40.539951455237;
+    double knownCenterLat = 20.08911426300818;
+    double knownCenterLon = 40.53997118770481;
 
     Isis::Pvl p("$clementine1/testData/lla4263l.153.lev1.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
@@ -46,18 +46,18 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam->UniversalLatitude() - knownCtrLat) < 1E-10) {
+    if(abs(cam->UniversalLatitude() - knownCenterLat) < 1E-10) {
       cout << "Latitude OK" << endl;
     }
     else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownCtrLat << endl;
+      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownCenterLat << endl;
     }
 
-    if(abs(cam->UniversalLongitude() - knownCtrLon) < 1E-10) {
+    if(abs(cam->UniversalLongitude() - knownCenterLon) < 1E-10) {
       cout << "Longitude OK" << endl;
     }
     else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownCtrLon << endl;
+      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownCenterLon << endl;
     }
   }
   catch(Isis::iException &e) {
