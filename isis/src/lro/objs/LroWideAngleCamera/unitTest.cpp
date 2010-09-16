@@ -26,6 +26,8 @@ int main(void) {
     // and "Longitude off by: " values directly into these variables.
     double knownLat, knownLon;
 
+    // Camera Version 1's test is provided here for easy testing with an old version of the camera,
+    //   this is generally not executed
     if (cmVersion == 1) {
      knownLat = -70.69638475050628;
      knownLon =  244.3314992195277;
@@ -33,8 +35,9 @@ int main(void) {
     }
     else {
       // Version 2 difference caused by new CK and comprehensive IK kernel support
-      knownLat = -70.69650506131094;
-      knownLon = 244.30134137129;
+      //   and no longer using a DEM
+      knownLat = -70.70796484931643;
+      knownLon = 244.3050652237698;
     }
 
 
@@ -62,11 +65,6 @@ int main(void) {
       std::cout << "ERROR" << std::endl;
       return 0;
     }
-
-#if 0
-    cout << "Latitude  = " << setprecision(16) << cam->UniversalLatitude() << endl;
-    cout << "Longitude = " << setprecision(16) << cam->UniversalLongitude() << endl;
-#endif
 
     if(abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
       cout << "Latitude OK" << endl;
