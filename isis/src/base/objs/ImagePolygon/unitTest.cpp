@@ -26,26 +26,7 @@ int main() {
   */
 
   //   simple MOC image
-  string inFile = "/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub";
-  //string inFile = "/work1/tsucharski/poly/I17621017RDR_lev2.cub";
-  //  same MOC image, but sinusoidal projection
-  //string inFile = "/farm/prog1/tsucharski/isis3/ab102401.lev2.cub";
-
-  //  same MOC image, but sinusoidal projection , doctored left edge
-  //string inFile = "/farm/prog1/tsucharski/isis3/ab102401.lev2.leftTrim.cub";
-
-  //   MOC north pole image
-  //string inFile = "/work1/tsucharski/isis3/poly/e0202226.lev1.cub";
-
-  //  MOC image with 0/360 boundary
-  //  orkin
-  //string inFile = "/farm/prog1/tsucharski/isis3/cubes/m0101631.lev1.cub";
-  // blackflag
-  //string inFile = "/work1/tsucharski/isis3/poly/m0101631.lev1.cub";
-
-  // galileo ssi image
-  //string inFile = "/farm/prog1/tsucharski/isis3/6700r.cub";
-
+  string inFile = "$mgs/testData/ab102401.cub";
 
   // Open the cube
   Cube cube;
