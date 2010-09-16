@@ -37,13 +37,18 @@ namespace Isis {
    * @author  2006-10-17 Jeff Anderson and Debbie Cook
    *
    * @internal
-   *  @history 2007-10-18 Debbie A. Cook Corrected coding error with TransS0 and TransL0 and
+   *  @history 2007-10-18 Debbie A. Cook  -Corrected coding error with TransS0
+   *                         and TransL0 and added ldir and sdir.
    *  @history 2008-06-18 Stuart Sides - Fixed doc error
-   *  @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
-   *           change. Also, now using the new LoadCache(...) method instead of
-   *           CreateCache(...).
+   *  @history 2008-08-08 Steven Lambright - Made the unit test work with a
+   *                         Sensor change. Also, now using the new
+   *                         LoadCache(...) method instead of CreateCache(...).
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *            inherit directly from Camera
+   *                          inherit directly from Camera
+   *   @history 2010-09-16 Jeannie Walldren - Modified test cube to run properly
+   *                          with ShapeModel changes to Sensor class and
+   *                          updated unitTest known lat/lon values.
+   *  
    */
   class IdealCamera : public Isis::Camera {
     public:
