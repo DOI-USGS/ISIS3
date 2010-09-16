@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[2] = { -22.00025221053369, -15.08767100514901};
-    double knownLon[2] = {307.9151038426381, 309.8666470890192};
+    double knownLat[2] = { -22.00026732942671, -15.08829558278137 };
+    double knownLon[2] = { 307.9160921848336, 309.8677351454377 };
     char files[2][1024] = { "$mro/testData/ctx_pmoi_i_00003.bottom.cub", "$mro/testData/ctx_pmoi_i_00003.top.cub" };
 
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
