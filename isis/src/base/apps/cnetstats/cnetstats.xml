@@ -412,7 +412,7 @@
     </group>
 
     <group name ="Format">
-      <parameter name="TYPE">
+      <parameter name="FORMAT">
         <type>string</type>
         <default><item>CSV</item></default>
         <brief>Format of the output flat file </brief>

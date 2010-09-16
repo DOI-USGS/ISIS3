@@ -29,7 +29,7 @@ void IsisMain() {
     ControlNet newNet(origNet);
     
     // Get the output file and the format
-    string sFileType = ui.GetString("TYPE") ;
+    string sFileType = ui.GetString("FORMAT") ;
     bool bPvl = true;
     if (sFileType == "CVS") {
       bPvl = false;
