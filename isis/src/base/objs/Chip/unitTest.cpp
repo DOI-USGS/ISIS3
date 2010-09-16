@@ -241,26 +241,24 @@ int main() {
     }
     cout << endl;
   }
-  // make sure that if we create a new chip from the same cube that is matched to the match chip,
+  // make sure that if we create a new chip from the same cube that is matched
+  // to the match chip, the chips should be almost identical
   Chip newChip(4, 4);
   newChip.TackCube(1000, 500);
   newChip.Load(junkCube, matchChip, junkCube);
-  cout << "\nNew chip values..." << endl;
-  for(int i = 1; i <= newChip.Lines(); i++) {
-    for(int j = 1; j <= newChip.Samples(); j++) {
-      cout << std::setw(14) << newChip.GetValue(j, i) << " ";
-    }
-    cout << endl;
-  }
-  // the chips should be almost identical
+  cout << "\nLoading new chip values from match chip..." << endl;
   cout << "Passes if difference is less than EPSILON = " << 2E-6 << endl;
   for(int i = 1; i <= newChip.Lines(); i++) {
     for(int j = 1; j <= newChip.Samples(); j++) {
       double difference = newChip.GetValue(j, i) - matchChip.GetValue(j, i);
-      cout << std::setw(14) << difference << "\t";
       if(fabs(difference) > 2E-6) {
         cout << "bad at " << j << ", " << i << endl;
         cout << "difference at " << j << ", " << i << " is " << difference << endl;
+      }
+      else{
+        cout << "\tPASS\t\t";
+        // the following comment prints actual difference.
+        // cout << std::setw(14) << difference << "\t";
       }
     }
     cout  << endl;

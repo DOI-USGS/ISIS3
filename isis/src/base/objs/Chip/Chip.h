@@ -48,6 +48,9 @@ namespace Isis {
    *
    * @author 2005-05-05 Jeff Anderson
    *
+   * @see AutoReg
+   * @see AutoRegFactory
+   *  
    * @internal
    *   @history 2006-07-11  Tracie Sucharski - Added reLoad method to use
    *                          p_cube instead of cube passed in.
@@ -98,9 +101,11 @@ namespace Isis {
    *   @history 2010-06-15  Jeannie Walldren - Added set and accessor methods for
    *                          Read() method's Interpolator::interpType.  Updated
    *                          documentation and unitTest.
+   *   @history 2010-09-16  Jeannie Walldren - Updated unitTest, truth file and
+   *                          test cube to run properly with ShapeModel changes
+   *                          to Sensor class.
+   *  
    *
-   * @see AutoReg
-   * @see AutoRegFactory
    */
   class Chip {
     public:

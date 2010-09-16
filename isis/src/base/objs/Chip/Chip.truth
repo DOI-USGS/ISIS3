@@ -150,16 +150,12 @@ Match chip values...
      0.0319391      0.0316342      0.0313629      0.0312892 
      0.0331934      0.0326919      0.0317496      0.0313146 
 
-New chip values...
-     0.0318187      0.0311423      0.0310775       0.031607 
-     0.0317859      0.0313744      0.0311243      0.0312174 
-     0.0319395      0.0316345      0.0313631      0.0312893 
-     0.0331939      0.0326931      0.0317508      0.0313149 
+Loading new chip values from match chip...
 Passes if difference is less than EPSILON = 2e-06
-  -1.94545e-07	  -3.20125e-07	   2.07761e-07	   1.26571e-07	
-   7.14045e-09	             0	  -2.17735e-09	  -2.72403e-09	
-   3.85854e-07	   2.50248e-07	   1.44934e-07	   6.02544e-08	
-   4.61695e-07	   1.25204e-06	   1.17625e-06	   2.32237e-07	
+	PASS			PASS			PASS			PASS		
+	PASS			PASS			PASS			PASS		
+	PASS			PASS			PASS			PASS		
+	PASS			PASS			PASS			PASS		
 
 
 Test interpolator set/get methods
