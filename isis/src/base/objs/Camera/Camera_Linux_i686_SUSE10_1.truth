@@ -18,13 +18,13 @@ IsBandIndependent called...
 ReferenceBand: 0
 HasReferenceBand: 0
 SetBand called, band: 7
-Sample: 408.126
+Sample: 408.128
 Line: 962.452
 GroundRange: 0
 IntersectsLongitudeDomain: 0
-PixelResolution: 628.042
-LineResolution: 628.042
-SampleResolution: 628.042
+PixelResolution: 628.044
+LineResolution: 628.044
+SampleResolution: 628.044
 DetectorResolution: 157.011
 LowestImageResolution: 2047.19
 HighestImageResolution: 429.526
@@ -88,17 +88,19 @@ Object = IsisCube
   End_Group
 
   Group = Kernels
-    NaifFrameCode       = -94032
-    LeapSecond          = $base/kernels/lsk/naif0008.tls
-    TargetAttitudeShape = $base/kernels/pck/pck00008.tpc
-    TargetPosition      = $base/kernels/spk/de405.bsp
-    Instrument          = $mgs/kernels/ik/moc20.ti
-    SpacecraftClock     = $mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
-    InstrumentAddendum  = $mgs/kernels/iak/mocAddendum004.ti
-    InstrumentPointing  = $mgs/kernels/ck/mgs_sc_ab1.bc
-    InstrumentPosition  = $mgs/kernels/spk/mgs_ab1.bsp
-    ShapeModel          = $base/dems/molaMarsPlanetaryRadius0002.cub
-    CameraVersion       = 1
+    NaifFrameCode             = -94032
+    LeapSecond                = $base/kernels/lsk/naif0008.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00008.tpc
+    TargetPosition            = $base/kernels/spk/de405.bsp
+    Instrument                = $mgs/kernels/ik/moc20.ti
+    SpacecraftClock           = $mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+    InstrumentAddendum        = $mgs/kernels/iak/mocAddendum004.ti
+    InstrumentPointing        = $mgs/kernels/ck/mgs_sc_ab1.bc
+    InstrumentPosition        = $mgs/kernels/spk/mgs_ab1.bsp
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0004.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
   End_Group
 
   Group = Radiometry
@@ -161,7 +163,7 @@ End_Object
 Object = History
   Name      = IsisCube
   StartByte = 5832705
-  Bytes     = 2611
+  Bytes     = 4341
 End_Object
 
 Group = Mapping
@@ -199,6 +201,18 @@ Longitude = 226.671
 Radius = 3.41403e+06
 Point = -2225.2 -2358.93 1067.51
 
+Test Forward/Reverse Camera Calculations At Center Of Image...
+Sample = 479.5
+Line = 702
+SetImage (sample, line): 1
+Latitude = 22.615
+Longitude = 227.939
+Radius = 3.3988e+06
+Point = -2101.87 -2329.34 1306.97
+SetUniversalGround (c->UniveraslLatitude(), c->UniversalLongitude(), c->LocalRadius()): 1
+Sample = 479.5
+Line = 702
+
 Test Polar Boundary Conditions
 
 Basic Mapping: 
@@ -209,11 +223,11 @@ Group = Mapping
   LatitudeType       = Planetocentric
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 360
-  MinimumLatitude    = 87.796624435692
+  MinimumLatitude    = 87.796623049558
   MaximumLatitude    = 90.0
   MinimumLongitude   = 0.0
   MaximumLongitude   = 360.0
-  PixelResolution    = 193.58289321251
+  PixelResolution    = 193.58279339242
   ProjectionName     = Sinusoidal
 End_Group
 End
@@ -221,3 +235,16 @@ End
 180 Domain Range: 
 Latitude Range: 87.7966 to 90
 Longitude Range: -180 to 180
+
+Test Forward/Reverse Camera Calculations At Center Of Image...
+Sample = 192
+Line = 144
+SetImage (sample, line): 1
+Latitude = 89.1764
+Longitude = 13.5424
+Radius = 1.73638e+06
+Point = 24.2643 5.84434 1736.2
+SetUniversalGround (cam2->UniversalLatitude(), cam2->UniversalLongitude()): 1
+Sample = 192
+Line = 144
+
