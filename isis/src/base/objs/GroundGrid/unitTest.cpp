@@ -19,7 +19,7 @@ void IsisMain() {
   Cube someCube;
 
   cout << "Reading cube..." << endl;
-  someCube.Open("$base/testData/ab102401_ideal.cub");
+  someCube.Open("$mgs/testData/ab102401.cub");
 
   cout << "Create universal ground map..." << endl;
   UniversalGroundMap gmap(someCube);
@@ -28,12 +28,18 @@ void IsisMain() {
   Progress progress;
   GroundGrid grid(&gmap, false, someCube.Samples(), someCube.Lines());
 
-  grid.CreateGrid(0, 0, 0.1, 0.1, &progress, 0.5, 0.5);
+  grid.CreateGrid(0, 0, 0.2, 0.2, &progress, 0.1, 0.01);
 
-  cout << "\n\nFirst line on grid: \n" << endl;
-  for(int i = 0; i < someCube.Samples(); i++) {
-    cout << grid.PixelOnGrid(i, 0) << " ";
-    if(i % 35 == 0) cout << endl;
+  cout << "\n\nGrid cutout: \n" << endl;
+
+  for(int line = 0; line < someCube.Lines() / 4; line++) {
+
+    for(int i = (int)(someCube.Samples() * 3.0 / 7.0);
+            i < (someCube.Samples() * 3.5 / 7.0); i++) {
+      cout << grid.PixelOnGrid(i, line);
+    }
+    
+    cout << endl;
   }
 
   cout << endl;
