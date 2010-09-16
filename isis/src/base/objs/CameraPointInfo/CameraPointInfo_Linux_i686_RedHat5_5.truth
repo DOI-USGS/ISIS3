@@ -2,102 +2,102 @@ Group = GroundPoint
   Sample                     = 1.0
   Line                       = 1.0
   PixelValue                 = 0.0144526
-  RightAscension             = 261.05448074442
-  Declination                = 64.973136000721
-  PlanetocentricLatitude     = -84.757759763392
-  PlanetographicLatitude     = -84.757759763392
-  PositiveEast360Longitude   = 12.099795996467
-  PositiveEast180Longitude   = 12.099795996467
-  PositiveWest360Longitude   = 347.90020400353
-  PositiveWest180Longitude   = -12.099795996467
-  BodyFixedCoordinate        = (155.17957598007, 33.267040597887,
-                                -1729.7491443625) <km>
-  LocalRadius                = 1737012.7186626 <meters>
-  SampleResolution           = 187.5854098893 <meters/pixel>
-  LineResolution             = 187.5854098893 <meters/pixel>
+  RightAscension             = 261.12240102162
+  Declination                = 65.057158287883
+  PlanetocentricLatitude     = -84.741291512608
+  PlanetographicLatitude     = -84.741291512608
+  PositiveEast360Longitude   = 12.469820542285
+  PositiveEast180Longitude   = 12.469820542285
+  PositiveWest360Longitude   = 347.53017945771
+  PositiveWest180Longitude   = -12.469820542285
+  BodyFixedCoordinate        = (155.48143215269, 34.383491686879,
+                                -1730.0872983047) <km>
+  LocalRadius                = 1737400.0 <meters>
+  SampleResolution           = 187.48511798825 <meters/pixel>
+  LineResolution             = 187.48511798825 <meters/pixel>
 
   # Spacecraft Information
   SpacecraftPosition         = (216.76438021037, 54.256829538645,
                                 -2462.1179579968) <km>
-  SpacecraftAzimuth          = 199.50893004876
-  SlantDistance              = 735.25324789219 <km>
+  SpacecraftAzimuth          = 211.30410136422
+  SlantDistance              = 734.86014724525 <km>
   TargetCenterDistance       = 2472.2369302253 <km>
   SubSpacecraftLatitude      = -84.814280390523
   SubSpacecraftLongitude     = 14.052595361351
-  SpacecraftAltitude         = 734.47764898913 <km>
-  OffNadirAngle              = 0.439977299449
-  SubSpacecraftGroundAzimuth = 106.69243625717
+  SpacecraftAltitude         = 734.83693022532 <km>
+  OffNadirAngle              = 0.38180598860653
+  SubSpacecraftGroundAzimuth = 116.0794235261
 
   # Sun Information
   SunPosition                = (142092302.24738, 46513072.418956,
                                 3175615.049146) <km>
-  SubSolarAzimuth            = 91.687595896666
-  SolarDistance              = 0.99964724201774 <AU>
+  SubSolarAzimuth            = 91.898419271085
+  SolarDistance              = 0.99964723782732 <AU>
   SubSolarLatitude           = 1.2167758823866
   SubSolarLongitude          = 18.125552305876
-  SubSolarGroundAzimuth      = 0.55088747824114
+  SubSolarGroundAzimuth      = 0.5188043965268
 
   # Illumination and Other
-  Phase                      = 86.140995879364
-  Incidence                  = 86.004188017076
-  Emission                   = 0.62621185419717
-  NorthAzimuth               = 87.247743154542
+  Phase                      = 86.187914936426
+  Incidence                  = 85.984352390204
+  Emission                   = 0.54329574339681
+  NorthAzimuth               = 87.645652990006
 
   # Time
   EphemerisTime              = -182103311.79772 <seconds>
   UTC                        = 1994-03-25T19:43:48.0166464
-  LocalSolarTime             = 11.598282912706 <hour>
+  LocalSolarTime             = 11.622951215761 <hour>
   SolarLongitude             = 129.01790468942
 End_Group
 
 Group = GroundPoint
-  Sample                     = 0.89012260558259
-  Line                       = 1.1511384074412
+  Sample                     = 0.90348451909767
+  Line                       = 1.1397670004594
   PixelValue                 = 0.0144526
-  RightAscension             = 262.29095189628
-  Declination                = 65.693495329881
+  RightAscension             = 262.28734450187
+  Declination                = 65.692832609474
   PlanetocentricLatitude     = -84.5
   PlanetographicLatitude     = -84.5
   PositiveEast360Longitude   = 15.0
   PositiveEast180Longitude   = 15.0
   PositiveWest360Longitude   = 345.0
   PositiveWest180Longitude   = -15.0
-  BodyFixedCoordinate        = (160.94890808189, 43.126129943212,
-                                -1730.4831018617) <km>
-  LocalRadius                = 1738486.75 <meters>
-  SampleResolution           = 187.22618189857 <meters/pixel>
-  LineResolution             = 187.22618189857 <meters/pixel>
+  BodyFixedCoordinate        = (160.84829688893, 43.09917125531,
+                                -1729.4013550431) <km>
+  LocalRadius                = 1737400.0 <meters>
+  SampleResolution           = 187.50339379912 <meters/pixel>
+  LineResolution             = 187.50339379912 <meters/pixel>
 
   # Spacecraft Information
   SpacecraftPosition         = (216.76438021037, 54.256829538645,
                                 -2462.1179579968) <km>
-  SpacecraftAzimuth          = 280.85337972555
-  SlantDistance              = 733.84970631663 <km>
+  SpacecraftAzimuth          = 281.0452412939
+  SlantDistance              = 734.93178063402 <km>
   TargetCenterDistance       = 2472.2369302253 <km>
   SubSpacecraftLatitude      = -84.814280390523
   SubSpacecraftLongitude     = 14.052595361351
-  SpacecraftAltitude         = 734.47764898913 <km>
-  OffNadirAngle              = 0.77330380082735
-  SubSpacecraftGroundAzimuth = 195.20807178632
+  SpacecraftAltitude         = 734.83693022532 <km>
+  OffNadirAngle              = 0.77167767891116
+  SubSpacecraftGroundAzimuth = 195.20807559822
 
   # Sun Information
   SunPosition                = (142092302.24738, 46513072.418956,
                                 3175615.049146) <km>
-  SubSolarAzimuth            = 91.713137419916
-  SolarDistance              = 0.99964718498189 <AU>
+  SubSolarAzimuth            = 91.888489308722
+  SolarDistance              = 0.99964718552167 <AU>
   SubSolarLatitude           = 1.2167758823866
   SubSolarLongitude          = 18.125552305876
-  SubSolarGroundAzimuth      = 0.30025831568346
+  SubSolarGroundAzimuth      = 0.3002589379713
 
   # Illumination and Other
-  Phase                      = 86.801052121453
-  Incidence                  = 85.725627016786
-  Emission                   = 1.0997233543303
-  NorthAzimuth               = 89.48620865503
+  Phase                      = 86.799461484504
+  Incidence                  = 85.725629389695
+  Emission                   = 1.0980943778398
+  NorthAzimuth               = 89.563964394994
 
   # Time
   EphemerisTime              = -182103311.79772 <seconds>
   UTC                        = 1994-03-25T19:43:48.0166464
-  LocalSolarTime             = 11.791630528336 <hour>
+  LocalSolarTime             = 11.791629991401 <hour>
   SolarLongitude             = 129.01790468942
 End_Group
