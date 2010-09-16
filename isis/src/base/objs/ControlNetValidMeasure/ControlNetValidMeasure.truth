@@ -1,0 +1,15 @@
+**USER ERROR** MinDN must be less than MaxDN
+**USER ERROR** Min EmissionAngle must be less than Max EmissionAngle
+**USER ERROR** Invalid Max Incidence Angle, Valid Range is [0-135]
+**USER ERROR** Invalid Resolution value(s), Resolution must be greater than zero
+Group = StandardOptions
+  MinDN         = -1.0
+  MaxDN         = 1.0
+  MinEmission   = 0.0
+  MaxEmission   = 135.0
+  MinIncidence  = 0.0
+  MaxIncidence  = 135.0
+  MinResolution = 100.0
+  MaxResolution = 500.0
+End_Group
+End
