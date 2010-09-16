@@ -132,9 +132,25 @@ int main() {
   cout << "Radius = " << c->LocalRadius() << endl;
   double p[3];
   c->Coordinate(p);
-  cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
+  cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl << endl;
 
-  std::cout << std::endl;
+  cout << "Test Forward/Reverse Camera Calculations At Center Of Image..." << std::endl;
+  sample = c->Samples() / 2.0;
+  line = c->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << c->SetImage(sample, line) << endl;
+  cout << "Latitude = " << c->UniversalLatitude() << endl;
+  cout << "Longitude = " << c->UniversalLongitude() << endl;
+  cout << "Radius = " << c->LocalRadius() << endl;
+  c->Coordinate(p);
+  cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
+  cout << "SetUniversalGround (c->UniveraslLatitude(), c->UniversalLongitude(), c->LocalRadius()): " 
+       << c->SetUniversalGround(c->UniversalLatitude(), c->UniversalLongitude(), c->LocalRadius()) 
+       << endl;
+  cout << "Sample = " << c->Sample() << endl;
+  cout << "Line = " << c->Line() << endl << endl;
+
   std::cout << "Test Polar Boundary Conditions" << std::endl;
   inputFile = "$clementine1/testData/lub5992r.292.lev1.phot.cub";
   cube.Close();
@@ -155,7 +171,24 @@ int main() {
   camMap.FindGroup("Mapping")["LongitudeDomain"][0] = "180";
   cam2->GroundRange(minlat, maxlat, minlon, maxlon, camMap);
   std::cout << "Latitude Range: " << minlat << " to " << maxlat << std::endl;
-  std::cout << "Longitude Range: " << minlon << " to " << maxlon << std::endl;
+  std::cout << "Longitude Range: " << minlon << " to " << maxlon << std::endl << std::endl;
+
+  cout << "Test Forward/Reverse Camera Calculations At Center Of Image..." << std::endl;
+  sample = cam2->Samples() / 2.0;
+  line = cam2->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam2->SetImage(sample, line) << endl;
+  cout << "Latitude = " << cam2->UniversalLatitude() << endl;
+  cout << "Longitude = " << cam2->UniversalLongitude() << endl;
+  cout << "Radius = " << cam2->LocalRadius() << endl;
+  cam2->Coordinate(p);
+  cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
+  cout << "SetUniversalGround (cam2->UniversalLatitude(), cam2->UniversalLongitude()): " 
+       << cam2->SetUniversalGround(cam2->UniversalLatitude(), cam2->UniversalLongitude()) 
+       << endl;
+  cout << "Sample = " << cam2->Sample() << endl;
+  cout << "Line = " << cam2->Line() << endl << endl;
 
   cube.Close();
   delete cam2;
