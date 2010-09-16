@@ -9,7 +9,7 @@
 #include "PvlGroup.h"
 #include "Preference.h"
 #include "UniversalGroundMap.h"
-#include "CnetValidMeasure.h"
+#include "ControlNetValidMeasure.h"
 
 using namespace Isis;
 

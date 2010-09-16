@@ -40,7 +40,7 @@ namespace Isis {
    *
    * @see automaticRegistration.doc
    */
-  InterestOperator::InterestOperator(Pvl &pPvl): CnetValidMeasure(pPvl) {
+  InterestOperator::InterestOperator(Pvl &pPvl): ControlNetValidMeasure(pPvl) {
     p_interestAmount = 0.0;
     p_worstInterest = 0.0;
     p_lines = 1;

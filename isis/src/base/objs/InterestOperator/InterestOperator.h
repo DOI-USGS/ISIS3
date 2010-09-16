@@ -28,7 +28,7 @@
 #include "PvlGroup.h"
 #include "Camera.h"
 #include "UniversalGroundMap.h"
-#include "CnetValidMeasure.h"
+#include "ControlNetValidMeasure.h"
 #include "ImageOverlapSet.h"
 
 #include "geos/geom/Point.h"
@@ -46,17 +46,17 @@ namespace Isis {
   class ControlMeasure;
 
   typedef struct {
-    std::string msSerialNum; 	//!< Serial Number of the Measure
-    double mdInterest; 		//!< Resulting interest amt from InterestOperator
-    double mdBestSample;		//!< Most interesting sample
-    double mdBestLine; 		//!< Most interesting line
-    double mdOrigSample; 	//!< Control Measure's original sample
-    double mdOrigLine; 		//!< Control Measure's original line
-    double mdEmission; 		//!< Emission angle at most interesting sample,line
-    double mdIncidence; 		//!< Incidence angle at most interesting sample,line
-    double mdDn; 		//!< Cube DN value at most interesting sample,line
-    double mdResolution; 	//!< Camera resolution at most interesting sample,line
-    bool mbValid; 		//!< Value of the interest operator result (success)
+    std::string msSerialNum;     //!< Serial Number of the Measure
+    double mdInterest;           //!< Resulting interest amt from InterestOperator
+    double mdBestSample;         //!< Most interesting sample
+    double mdBestLine;           //!< Most interesting line
+    double mdOrigSample;         //!< Control Measure's original sample
+    double mdOrigLine;           //!< Control Measure's original line
+    double mdEmission;           //!< Emission angle at most interesting sample,line
+    double mdIncidence;          //!< Incidence angle at most interesting sample,line
+    double mdDn;                 //!< Cube DN value at most interesting sample,line
+    double mdResolution;         //!< Camera resolution at most interesting sample,line
+    bool mbValid;                //!< Value of the interest operator result (success)
     int  miDeltaSample;          //!< The number of Samples the point has been moved
     int  miDeltaLine;            //!< The number of Lines the point has been moved
   } InterestResults;
@@ -89,12 +89,12 @@ namespace Isis {
    *   @history 2009-08-11 Travis Addair - Added functionality allowing it and all its
    *                     subclasses to return the pvl group that they were initialized from
    *   @history 2010-04-09 Sharmila Prasad - API's to check valid DN and Emission Angle.
-   *  			Also changed functionality of Operate and made it overloaded.
+   *                       Also changed functionality of Operate and made it overloaded.
    *   @history 2010-04-30 Sharmila Prasad - Added class members mdBestEmissionAngle, mdBestDnValue
    *   and their access functions.Also added member mUnusedParamGrp to check for the default
    *   values used for the operator.
-   *   @history 2010-04-30 Sharmila Prasad - 1. Interest Operator a child of CnetValidMeasure which validates
-   *                      all the standard control network options. Changed functionality to accomadate CnetValidMeasure
+   *   @history 2010-04-30 Sharmila Prasad - 1. Interest Operator a child of ControlNetValidMeasure which validates
+   *                      all the standard control network options. Changed functionality to accomadate ControlNetValidMeasure
    *                      2. Removed class members  mdBestEmissionAngle, mdBestDnValue..., instead stored in
    *                      structure InterestResults structure
    *                      3. Move processing ImageOverlaps from app to here
@@ -103,10 +103,10 @@ namespace Isis {
    *                                         2. Do not process previously Ignored points in the Original Control Net
    *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
    *                                         use CubeManager instead
-   *   @history 2010-06-23 Sharmila Prasad - Use CnetValidMeasure's Validate Standard Options &
+   *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard Options &
    *                                         Std Options Pixels/Meters from Edge
    */
-  class InterestOperator : public CnetValidMeasure {
+  class InterestOperator : public ControlNetValidMeasure {
     public:
       InterestOperator(Pvl &pPvl);
       virtual ~InterestOperator();
