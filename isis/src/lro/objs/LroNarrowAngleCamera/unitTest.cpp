@@ -19,8 +19,6 @@ int main(void) {
    */
 
   try {
-
-
     // Support different camera model versions thusly...
     Isis::Pvl p("$lro/testData/M111607830RE_crop.cub");
     int cmVersion = Isis::CameraFactory::CameraVersion(p);
@@ -30,14 +28,16 @@ int main(void) {
     // and "Longitude off by: " values directly into these variables.
     double knownLat, knownLon;
 
+    // Camera Version 1's test is provided here for easy testing with an old version of the camera,
+    //   this is generally not executed
     if (cmVersion == 1) {
       knownLat = -83.229473272165;
       knownLon = 353.93153626711;
       p.Read("$lro/testData/M111607830RE_crop.cub.cv1");
     }
     else {
-      knownLat = -83.2598101446504;
-      knownLon = 353.91934392144;
+      knownLat = -83.25981500725959;
+      knownLon = 353.9497987082822;
     }
 
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
