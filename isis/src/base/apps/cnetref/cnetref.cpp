@@ -64,7 +64,7 @@ void IsisMain() {
     }
 
     // get the Criteria option
-    CnetValidMeasure *cnetValidMeas = NULL;
+    ControlNetValidMeasure *cnetValidMeas = NULL;
     std::string sCriteria = ui.GetString("CRITERIA");
 
     // Process Reference by Emission Angle

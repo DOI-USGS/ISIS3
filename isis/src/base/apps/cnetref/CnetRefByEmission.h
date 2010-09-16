@@ -1,7 +1,7 @@
 #ifndef _CnetRefByEmission_h_
 #define _CnetRefByEmission_h_
 
-#include "CnetValidMeasure.h"
+#include "ControlNetValidMeasure.h"
 
 /**
  * @file
@@ -38,29 +38,32 @@ namespace Isis {
   *
   * @author 2010-06-10 Sharmila Prasad
   *
-  * @see CnetValidMeasure, CnetRefByIncidence, CnetRefByResolution
+  * @see ControlNetValidMeasure, CnetRefByIncidence, CnetRefByResolution
   *
   * @internal
   *   @history 2010-06-10 Sharmila Prasad - Original version
   *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
   *                                         use CubeManager instead
-  *   @history 2010-06-23 Sharmila Prasad - Use CnetValidMeasure's Validate Standard Options &
+  *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard Options &
   *                                         Std Options Pixels/Meters from Edge
-  *
+  *   @history 2010-09-16 Sharmila Prasad - Renamed CnetValidMeasure to ControlNetValidMeasure
   */
 
   class Pvl;
   class ControlNet;
 
-  class CnetRefByEmission : public CnetValidMeasure {
+  class CnetRefByEmission : public ControlNetValidMeasure {
     public:
+      //! Constructor
       CnetRefByEmission(Pvl *pPvlDef, std::string msSerialNumfile);
       virtual ~CnetRefByEmission() {};
 
+      //! Get the Log updated by this object
       virtual Pvl &GetLogPvl(void) {
         return mPvlLog;
       };
-      //!< Given Control Net, find the reference based on Emission Angle
+
+      //! Given Control Net, find the reference based on Emission Angle
       virtual void FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet);
   };
 };

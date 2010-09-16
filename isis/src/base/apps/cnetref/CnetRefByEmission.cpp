@@ -12,12 +12,10 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/14/2010)
    *
-   * @param pPvlDef
-   * @param pOrigNet
-   * @param pNewNet
-   * @param psSerialNumfile
+   * @param pPvlDef         - Pvl Definition File
+   * @param psSerialNumfile - Serial Number file attached to the ControlNet
    */
-  CnetRefByEmission::CnetRefByEmission(Pvl *pPvlDef, std::string psSerialNumfile): CnetValidMeasure(pPvlDef) {
+  CnetRefByEmission::CnetRefByEmission(Pvl *pPvlDef, std::string psSerialNumfile): ControlNetValidMeasure(pPvlDef) {
     ReadSerialNumbers(psSerialNumfile);
   }
 
@@ -27,8 +25,9 @@ namespace Isis {
    * and  picks the Measure with the best Emission Angle (closer) to zero as the Reference
    *
    * @author Sharmila Prasad (5/14/2010)
-   *
-   * @return none
+   * 
+   * @param pOrigNet  - Input Control Net
+   * @param pNewNet   - Modified output Control Net 
    */
   void CnetRefByEmission::FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet) {
     // Process each existing control point in the network

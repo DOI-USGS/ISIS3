@@ -16,15 +16,15 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/25/2010)
    *
-   * @param pPvlDef
-   * @param pOrigNet
-   * @param pNewNet
-   * @param psSerialNumfile
-   * @param peType
-   * @param pdResValue
+   * @param pPvlDef         - Pvl Definition File
+   * @param psSerialNumfile - Serial Number file attached to the ControlNet
+   * @param peType          - Resolution Type
+   * @param pdResValue      - Resolution value 
+   * @param pdMinRes        - Min Resolution value 
+   * @param pdMaxRes        - Max Resolution value 
    */
   CnetRefByResolution::CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, ResolutionType peType,
-      double pdResValue, double pdMinRes, double pdMaxRes) : CnetValidMeasure(pPvlDef) {
+      double pdResValue, double pdMinRes, double pdMaxRes) : ControlNetValidMeasure(pPvlDef) {
     mdResValue = pdResValue;
     mdMinRes   = pdMinRes;
     mdMaxRes   = pdMaxRes;
@@ -39,8 +39,8 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/25/2010)
    *
-   * @param pOrigNet
-   * @param pNewNet
+   * @param pOrigNet  - Input Control Net
+   * @param pNewNet   - Modified output Control Net 
    *
    */
   void CnetRefByResolution::FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet) {

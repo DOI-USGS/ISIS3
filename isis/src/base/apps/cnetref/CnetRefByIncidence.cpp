@@ -12,12 +12,10 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/24/2010)
    *
-   * @param pPvlDef
-   * @param pOrigNet
-   * @param pNewNet
-   * @param psSerialNumfile
+   * @param pPvlDef         - Pvl Definition File
+   * @param psSerialNumfile - Serial Number file attached to the ControlNet
    */
-  CnetRefByIncidence::CnetRefByIncidence(Pvl *pPvlDef, std::string psSerialNumfile): CnetValidMeasure(pPvlDef) {
+  CnetRefByIncidence::CnetRefByIncidence(Pvl *pPvlDef, std::string psSerialNumfile): ControlNetValidMeasure(pPvlDef) {
     ReadSerialNumbers(psSerialNumfile);
   }
 
@@ -28,7 +26,8 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/24/2010)
    *
-   * @return New ControlNet
+   * @param pOrigNet  - Input Control Net
+   * @param pNewNet   - Modified output Control Net 
    */
   void CnetRefByIncidence::FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet) {
     // Process each existing control point in the network
