@@ -56,33 +56,25 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-08-24 Sharmila Prasad Original version
+   *   @history 2010-09-16 Sharmila Prasad Added individual image maps for
+   *                                       each Point stats to correct segmentation faults
    */
   class ControlNetStatistics{
   public:
     //! Constructor
     ControlNetStatistics(ControlNet * pCNet, const string &psSerialNumFile, Progress *pProgress=0);
-    
+
     //! Destructor
-    ~ControlNetStatistics() {};
+    ~ControlNetStatistics();
     
-    //! Generate stats like Total Points, Ignored, Held by Image
+    //! Generate stats like Total, Ignored, Held, Ground Points in an Image
     void GenerateImageStats(void);
     
     //! Print the Image Stats into specified output file
     void PrintImageStats(const string & psImageFile);
     
-    /**
-     * Returns the Image Stats by Serial Number
-     * 
-     * @author Sharmila Prasad (9/13/2010)
-     * 
-     * @param psSerialNum - Serial Number for which stats are required
-     * 
-     * @return int* 
-     */
-    int* GetImageStatsBySerialNum(string psSerialNum) {
-      return mImagePointMap[psSerialNum];
-    }
+    //! Returns the Image Stats by Serial Number
+    void GetImageStatsBySerialNum(string psSerialNum, int* piPointDetail, int piSize);
     
     //! Generate stats like Ignored, Ground, Held, Total Measures, Ignored by Control Point
     void GeneratePointStats(const string & psPointFile);
@@ -135,7 +127,10 @@ namespace Isis {
     Progress *mProgress;                //!< Progress state
     
   private:
-    map <string, int*> mImagePointMap;  //!< Contains map of serial num and point stats
+    map <string, int> mImageTotalPointMap;   //!< Contains map of serial num and Total points
+    map <string, int> mImageIgnorePointMap;  //!< Contains map of serial num and Ignored points
+    map <string, int> mImageHeldPointMap;    //!< Contains map of serial num and Held points
+    map <string, int> mImageGroundPointMap;  //!< Contains map of serial num and Ground points
   };
 }
 #endif

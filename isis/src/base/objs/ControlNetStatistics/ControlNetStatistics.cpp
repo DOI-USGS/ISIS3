@@ -32,6 +32,16 @@ namespace Isis {
   }
   
   /**
+   * Destructor
+   * 
+   * @author Sharmila Prasad (9/17/2010)
+   */
+  ControlNetStatistics::~ControlNetStatistics()
+  {
+    
+  }
+  
+  /**
    * Generates the summary stats for the entire control network. 
    * Stats include Total images, Total, Valid, Ignored, Held, Ground Points, 
    * Total, Valid, Ignored Measures and also Average, Min, Max Error, 
@@ -86,12 +96,11 @@ namespace Isis {
    */
   void ControlNetStatistics::GenerateImageStats(void)
   {
-    map<string,int*>::iterator it;
+    map<string,int>::iterator it;
     int iNumPoints = mCNet->Size();
-    int *iPointDetail;
     
     // Sort the ControlNet by PointID    
-    mCNet->SortControlNet();
+    //mCNet->SortControlNet();
     
     // Initialise the Progress object
     if(mProgress != NULL && iNumPoints > 0) {
@@ -110,22 +119,18 @@ namespace Isis {
       for (int j=0; j<iNumMeasures; j++) {
         ControlMeasure & cMeasure = cPoint[j];
         string sMeasureSN = cMeasure.CubeSerialNumber();
-        it = mImagePointMap.find(sMeasureSN);
-        if (mImagePointMap.find(sMeasureSN) == mImagePointMap.end()){
-          iPointDetail = new int(IMAGE_POINT_SIZE);
-          iPointDetail[total]  = 0;
-          iPointDetail[ignore] = 0;
-          iPointDetail[held]   = 0;
-          iPointDetail[ground] = 0;
-          mImagePointMap[sMeasureSN] = iPointDetail;
-        }
-        iPointDetail = mImagePointMap[sMeasureSN];
-        iPointDetail[total]++;
-        if (bIgnore)  iPointDetail[ignore]++;
-        if (bHeld)    iPointDetail[held]++;
-        if (bGround)  iPointDetail[ground]++;
-        
-        iPointDetail = NULL;
+        it = mImageTotalPointMap.find(sMeasureSN);
+        // initialize the maps
+        if (mImageTotalPointMap.find(sMeasureSN) == mImageTotalPointMap.end()){
+          mImageTotalPointMap [sMeasureSN]  = 0;
+          mImageIgnorePointMap[sMeasureSN]  = 0;
+          mImageHeldPointMap  [sMeasureSN]  = 0;
+          mImageGroundPointMap[sMeasureSN]  = 0;
+        }        
+        mImageTotalPointMap[sMeasureSN]++;
+        if (bIgnore)  mImageIgnorePointMap[sMeasureSN]++;
+        if (bHeld)    mImageHeldPointMap  [sMeasureSN]++;
+        if (bGround)  mImageGroundPointMap[sMeasureSN]++;
       }
       // Update Progress
       if(mProgress != NULL) 
@@ -147,17 +152,35 @@ namespace Isis {
     string outName(outFile.Expanded());
     ostm.open(outName.c_str(), std::ios::out);
     
-    map<string,int*>::iterator it;
-    int *iPointDetail;
+    map<string,int>::iterator it;
     
     // Log into the output file
     ostm << "Filename" << ", " << "SerialNumber" << ", " << "Total Points" << ", " << "Ignore" << ", " << "Ground" << ", " << "Held" << endl;
-    for ( it=mImagePointMap.begin(); it != mImagePointMap.end(); it++ ){
+    for ( it=mImageTotalPointMap.begin(); it != mImageTotalPointMap.end(); it++ ){
       ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
-      iPointDetail = (*it).second;
-      ostm << iPointDetail[total] << ", " << iPointDetail[ignore] << ", " << iPointDetail[ground] << ", " << iPointDetail[held] <<endl;
+      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " << mImageHeldPointMap[(*it).first] << ", " << mImageGroundPointMap[(*it).first] <<endl;
     }
     ostm.close();
+  }
+  
+  /**
+   * Returns the Image Stats by Serial Number
+   * 
+   * @author Sharmila Prasad (9/17/2010)
+   * 
+   * @param psSerialNum   - Image Serial Number File 
+   * @param piPointDetail - Calculated Points stats (total, ignore, held, ground)
+   * @param piSize        - array size
+   */
+  void ControlNetStatistics::GetImageStatsBySerialNum(string psSerialNum, int* piPointDetail, int piSize)
+  {
+    if (piSize < IMAGE_POINT_SIZE) {
+      return;
+    }
+    piPointDetail[total]  = mImageTotalPointMap[psSerialNum];
+    piPointDetail[ignore] = mImageIgnorePointMap[psSerialNum];
+    piPointDetail[held]   = mImageHeldPointMap[psSerialNum];
+    piPointDetail[ground] = mImageGroundPointMap[psSerialNum];
   }
   
   /**
