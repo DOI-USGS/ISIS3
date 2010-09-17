@@ -81,8 +81,8 @@
    2. <a href="#numpoints">Number of Points</a> <br/>
    3. <a href="#cdistance">Measures</a><br/> <br/>
     
-    <p>The Format for the output files could be either PVL/Comma Separated 
-    Value(CVS). CVS is the default.</p> <br/>
+    <p>The Format for the output files will be in Comma Separated 
+      Value(CVS). </p> <br/>
     
     1. <a name="error"><b>ErrorMagnitude</b></a> - Filter the ControlNet by 
     Control Point ErrorMagnitude. Options can be combined. To omit an option, it 
@@ -287,8 +287,7 @@
     <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0"> 
     <tr><td>FileName</td><td>SerialNum</td><td>Total Points</td>
     <td>Ignore</td><td>Ground</td><td>Held</td>
-    <td>Distance_PointIDs >> </td></tr></table><br/><br/>
-  </p>
+    <td>Distance_PointIDs >> </td></tr></table><br/><br/> </p> 
     </description> 
 
   <category>
@@ -296,9 +295,10 @@
   </category>
 
   <history>
-    <change name="Sharmila Prasad" date="2010-08-04">
-      Original version
-    </change>
+    <change name="Sharmila Prasad" date="2010-08-04"> Original version</change>
+    <change name="Sharmila Prasad" date="2010-09-17"> Removed unused 
+      Format group and modified to verify the input before the actual stats 
+      processing</change>
   </history>
       
   <groups>
@@ -356,7 +356,7 @@
         <internalDefault>None</internalDefault>
         <brief>Output Flat File</brief>
         <description>
-          This file will contain statistics in the specified format for the 
+          This file will contain statistics in the csv format for the 
           selected options
         </description>
       </parameter>
@@ -408,34 +408,6 @@
         point Id, type, ignore flag, number of measures, number of ignored 
         measures, measure held flag.
         </description>
-      </parameter>
-    </group>
-
-    <group name ="Format">
-      <parameter name="FORMAT">
-        <type>string</type>
-        <default><item>CSV</item></default>
-        <brief>Format of the output flat file </brief>
-        <description>
-          This parameter lets the user choose the format the statistics will be 
-          stored onto the output file. The options are PVL or Comma Separated 
-          Value (CSV) formats.
-        </description>
-
-        <list>
-          <option value="CSV">
-            <brief>Comma Separated Value Format </brief>
-            <description>
-              This option will generate the statistics in Comma Separated 
-              Value(CSV) Format
-            </description>
-          </option>
-          <option value="PVL">
-            <brief>PVL Format </brief>
-            <description>This option will generate the statistics in PVL 
-              Format</description>
-          </option>
-        </list>
       </parameter>
     </group>
   </groups>

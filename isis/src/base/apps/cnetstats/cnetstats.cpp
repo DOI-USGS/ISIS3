@@ -12,56 +12,64 @@ using namespace Isis;
 using namespace std;
 
 void ReadDefFile(ControlNetFilter & pcNetFilter, Pvl & pvlDefFile);
-
 void (ControlNetFilter::*GetPtr2Filter(const string sFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter);
 
 void IsisMain() {
 
   try {
+    // Process all the inputs first, for errors and to satisfy requirements
     UserInterface &ui = Application::GetUserInterface();
     string sSerialNumFile = ui.GetFilename("FROMLIST");
-    
-    // Get the original control net internalized
-    Progress progress;
-    ControlNet origNet(ui.GetFilename("CNET"), &progress);
-    
-    // Copy of the Control Network - preserve the original
-    ControlNet newNet(origNet);
-    
-    // Get the output file and the format
-    string sFileType = ui.GetString("FORMAT") ;
-    bool bPvl = true;
-    if (sFileType == "CVS") {
-      bPvl = false;
-    }
-
-    Progress statsProgress;
-    ControlNetFilter cNetFilter(&newNet, sSerialNumFile, &statsProgress);
     
     // Get the DefFile
     string sDefFile = "";
     string sOutFile = "";
+    Pvl pvlDefFile;
     if (ui.WasEntered("DEFFILE")) {
       sDefFile = ui.GetFilename("DEFFILE");
       sOutFile = ui.GetFilename("FLATFILE");
+      pvlDefFile = Pvl(sDefFile);
       
-      cNetFilter.SetOutputFile(sOutFile, bPvl);
-      Pvl pvlDefFile(sDefFile);
-      ReadDefFile(cNetFilter, pvlDefFile);
+      // Verify DefFile
+      //ControlNetFilter::VerifyDefFile(pvlDefFile);
     }
     
     // Get the Image Stats File
     string sImageFile= "";
     if (ui.WasEntered("CREATE_IMAGE_STATS") && ui.GetBoolean("CREATE_IMAGE_STATS")) {
       sImageFile = ui.GetFilename("IMAGE_STATS_FILE");
-      cNetFilter.GenerateImageStats();
-      cNetFilter.PrintImageStats(sImageFile);
     }
     
     // Get the Point Stats File
     string sPointFile="";
     if (ui.WasEntered("CREATE_POINT_STATS") && ui.GetBoolean("CREATE_POINT_STATS")) {
       sPointFile = ui.GetFilename("POINT_STATS_FILE");
+    }
+    
+     // Get the original control net internalized
+    Progress progress;
+    ControlNet origNet(ui.GetFilename("CNET"), &progress);
+    
+    // Copy of the Control Network - preserve the original
+    ControlNet newNet(origNet);
+
+    Progress statsProgress;
+    ControlNetFilter cNetFilter(&newNet, sSerialNumFile, &statsProgress);
+    
+    // Run Filters using Deffile
+    if (ui.WasEntered("DEFFILE")) {
+      cNetFilter.SetOutputFile(sOutFile);
+      ReadDefFile(cNetFilter, pvlDefFile);
+    }
+    
+    // Run Image Stats
+    if (ui.WasEntered("CREATE_IMAGE_STATS") && ui.GetBoolean("CREATE_IMAGE_STATS")) {
+      cNetFilter.GenerateImageStats();
+      cNetFilter.PrintImageStats(sImageFile);
+    }
+    
+    // Run Point Stats
+    if (ui.WasEntered("CREATE_POINT_STATS") && ui.GetBoolean("CREATE_POINT_STATS")) {
       cNetFilter.GeneratePointStats(sPointFile);
     }
     
@@ -111,10 +119,10 @@ void ReadDefFile(ControlNetFilter & pcNetFilter, Pvl & pvlDefFile)
  * 
  * @return void(ControlNetFilter::*GetPtr2Filter)(const PvlGroup&pvlGrp) 
  */
-void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup & pvlGrp, bool pbPvl)
+void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter)
 {  
   // Point Filters
-  if(psFilter == "Point_ErrorMagnitude")
+  if (psFilter == "Point_ErrorMagnitude")
     return &ControlNetFilter::PointErrorFilter;
 
   if (psFilter == "Point_IdExpression") 
