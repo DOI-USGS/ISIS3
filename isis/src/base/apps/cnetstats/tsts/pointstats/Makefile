@@ -9,5 +9,5 @@ commands:
 	  filter=no \
 	  create_image_stats=no \
 	  create_point_stats=yes \
-	  point_stats_file=$(OUTPUT)/pointstats.txt > /dev/null;
+	  point_stats_file=$(OUTPUT)/truth.txt > /dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;
