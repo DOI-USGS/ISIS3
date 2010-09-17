@@ -72,13 +72,11 @@ namespace Isis {
    * @param psPrintFile 
    * @param pbPvl 
    */
-  void ControlNetFilter::SetOutputFile(string psPrintFile, bool pbPvl)
+  void ControlNetFilter::SetOutputFile(string psPrintFile)
   {
     Isis::Filename outFile(psPrintFile);
     string outName(outFile.Expanded());
     mOstm.open(outName.c_str(), std::ios::out);
-
-    mbPvl = pbPvl;
   }
   
   /**
@@ -846,7 +844,7 @@ namespace Isis {
           // Image Details
           string sn = cMeasure.CubeSerialNumber();
           int iPointDetails[IMAGE_POINT_SIZE], *iPntDetailsPtr = iPointDetails ;
-          iPntDetailsPtr = GetImageStatsBySerialNum(sn);
+          GetImageStatsBySerialNum(sn, iPntDetailsPtr, IMAGE_POINT_SIZE);
           mOstm << mSerialNumList.Filename(sn) << ", " << sn << ", ";
           mOstm << iPntDetailsPtr[total] << ", " << iPntDetailsPtr[ignore] << ", " ;
           mOstm << iPntDetailsPtr[ground] << ", " << iPntDetailsPtr[held] << endl;
@@ -909,16 +907,18 @@ namespace Isis {
         }
       }
     }
-    GenerateImageStats();
-    iNumCubes = mSerialNumFilter.Size();
-    for (int i=0; i<iNumCubes; i++) {
-      string sn = mSerialNumFilter.SerialNumber(i);
-      mOstm << mSerialNumFilter.Filename(i) << ", " << sn << ", ";
-      int iPointDetails[IMAGE_POINT_SIZE], *iPntDetailsPtr=iPointDetails;
-      iPntDetailsPtr=GetImageStatsBySerialNum(sn);
+    if (pbLastFilter) {
+      GenerateImageStats();
+      iNumCubes = mSerialNumFilter.Size();
+      for (int i=0; i<iNumCubes; i++) {
+        string sn = mSerialNumFilter.SerialNumber(i);
+        mOstm << mSerialNumFilter.Filename(i) << ", " << sn << ", ";
+        int iPointDetails[IMAGE_POINT_SIZE], *iPntDetailsPtr=iPointDetails;
+        GetImageStatsBySerialNum(sn, iPntDetailsPtr, IMAGE_POINT_SIZE);
       
-      mOstm << iPntDetailsPtr[total] << ", " << iPntDetailsPtr[ignore] << ", ";
-      mOstm << iPntDetailsPtr[ground] << ", " << iPntDetailsPtr[held] << endl;
+        mOstm << iPntDetailsPtr[total]  << ", " << iPntDetailsPtr[ignore] << ", ";
+        mOstm << iPntDetailsPtr[ground] << ", " << iPntDetailsPtr[held]   << endl;
+      }
     }
   }
   
@@ -1190,5 +1190,33 @@ namespace Isis {
     }
   }
   
+  /**
+   * Static function to verify Pvl DefFile containing Filters to be in the 
+   * required format 
+   * 
+   * @author Sharmila Prasad (9/16/2010)
+   * 
+   * @param pvlDefFile 
+   * 
+   * @return bool - Success / Failure
+   */
+  bool ControlNetFilter::VerifyDefFile(Pvl & pvlDefFile)
+  {
+    // Parse the Groups in Point Object
+    PvlObject filtersObj = pvlDefFile.FindObject("Filters", Pvl::Traverse);
+    int iNumGroups = filtersObj.Groups();
+    map <string, int> filterMap;
+    
+    for (int i=0; i<iNumGroups; i++) {
+      PvlGroup pvlGrp = filtersObj.Group(i);
+      string sFilterName = pvlGrp.Name();
+      if (filterMap.count(sFilterName) > 0) {
+        return false;
+      }
+      filterMap[sFilterName]++;
+      sFilterName = iString::DownCase(sFilterName);
+    }
+    return true;
+  }
 }
 

@@ -34,6 +34,8 @@ namespace Isis {
   class ControlPoint;
   class ControlMeasure;
 
+  #define TOTAL_FILTERS 12
+
   /**
    * @brief Filter Control Network
    *
@@ -47,12 +49,14 @@ namespace Isis {
    * @see ControlNetwork ControlPoint ControlMeasure
    *
    * @internal
-   *   @history 2010-08-10 Sharmila Prasad Original version
+   *   @history 2010-08-10 Sharmila Prasad - Original version
+   *   @history 2010-09-16 Sharmila Prasad - Modified prototype for GetImageStatsBySerialNum API
+   *                                         in sync with the ControlNetStatistics class
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
       //! Constructor
-      ControlNetFilter(ControlNet * pCNet, string & psSerialNumFile, Progress *pProgress=0);
+      ControlNetFilter(ControlNet *pCNet, string & psSerialNumFile, Progress *pProgress=0);
       
       //! Destructor
       ~ControlNetFilter();
@@ -104,8 +108,8 @@ namespace Isis {
       //! Print the standard cube stats Header
       void CubeStatsHeader          (void);
       
-      //! Set the output print file and the file format (PVL / CVS)
-      void SetOutputFile   (string psPrintFile, bool pbPvl=false);
+      //! Set the output print file 
+      void SetOutputFile   (string psPrintFile);
       
       //! Parse Expressions into Tokens
       void ParseExpression (string pStr, vector<string> & pStrTokens);
@@ -113,8 +117,10 @@ namespace Isis {
       //! Print Image File and Serial Num given the Control Measure
       void PrintCubeFileSerialNum(ControlMeasure & pCMeasure);
       
+      //! VerifyDefFile
+      static bool VerifyDefFile(Pvl & pvlDefFile);
+      
     private:
-      bool mbPvl;                         //!< Flag to indicate PVL / CVS Format
       ofstream mOstm;                     //!< output stream for printing to output file
       SerialNumberList mSerialNumFilter;  //!< Serial Number List file
   };
