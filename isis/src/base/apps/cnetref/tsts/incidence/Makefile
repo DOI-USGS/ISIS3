@@ -10,7 +10,6 @@ commands:
 	  network=$(INPUT)/autoseed.net \
 	  deffile=$(INPUT)/deffile.def \
 	  criteria=incidence \
-	  log=out.log \
 	  to=$(OUTPUT)/truth.pvl \
 	  networkid=DefaultTruth \
 	  Description=RefByIncidence > /dev/null;
