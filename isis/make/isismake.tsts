@@ -421,7 +421,7 @@ force: ;
 	          to=compare.txt                       \
 		  $$tolerancestr                       \
 		  $$ignorestr 1>>/dev/null 2>cubediffError.txt; \
-	  if [ $? != 0 ]; then                         \
+	  if [ $$? != 0 ]; then                        \
 	    compResult="ERROR";                        \
 	  else                                         \
 	    compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results keyword=Compare`; \
