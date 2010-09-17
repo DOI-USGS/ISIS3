@@ -19,7 +19,6 @@
     in Simple Cylindrical projection. If it is not, then the demprep program will fail. This program will first
     check to see if the DEM has been padded. If padding has already occurred, then no further padding will be
     added. It is not valid to run this program on anything but a DEM.
-    this program on anything but a DEM.
   </description>
 
   <history>
