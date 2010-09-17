@@ -400,36 +400,45 @@ force: ;
 # against a similiarly named file in the output directory.
 #----------------------------------------------------------------------------
 %.cub: force
-	if [ ! -f $(OUTPUT)/$@ ]; \
-	then \
-	  msg='$(FILENOTFOUND)'; \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	  $$msg >> casefailed.txt; \
-	else \
-	  tolerancestr=""; \
-	  ignorestr="";\
-	  if [ "$($@.TOLERANCE)" != "" ]; \
-	  then \
-	    tolerancestr="tolerance=$($@.TOLERANCE)"; \
-	  fi; \
-	  if [ "$($@.IGNORESPECIAL)" != "" ]; \
-	  then \
+	if [ ! -f $(OUTPUT)/$@ ];                      \
+	then                                           \
+	  msg='$(FILENOTFOUND)';                       \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;   \
+	  $$msg >> casefailed.txt;                     \
+	else                                           \
+	  tolerancestr="";                             \
+	  ignorestr="";                                \
+	  if [ "$($@.TOLERANCE)" != "" ];              \
+	  then                                         \
+	    tolerancestr="tolerance=$($@.TOLERANCE)";  \
+	  fi;                                          \
+	  if [ "$($@.IGNORESPECIAL)" != "" ];          \
+	  then                                         \
 	    ignorestr="ignorespecial=$($@.IGNORESPECIAL)"; \
-	  fi; \
-	  $(ISISROOT)/bin/cubediff from=$(TRUTH)/$@ \
-	          from2=$(OUTPUT)/$@ \
-	          to=compare.txt \
-		  $$tolerancestr  \
-		  $$ignorestr > /dev/null; \
-	  compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results keyword=Compare`; \
-	  command="";\
-	  if [ "$$compResult" = "DIFFERENT" ]; \
-	  then \
-	    msg='$(TESTFILEFAILED)'; \
+	  fi;                                          \
+	  $(ISISROOT)/bin/cubediff from=$(TRUTH)/$@    \
+	          from2=$(OUTPUT)/$@                   \
+	          to=compare.txt                       \
+		  $$tolerancestr                       \
+		  $$ignorestr 1>>/dev/null 2>cubediffError.txt; \
+	  if [ $? != 0 ]; then                         \
+	    compResult="ERROR";                        \
+	  else                                         \
+	    compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results keyword=Compare`; \
+	  fi;                                          \
+	  command="";                                  \
+	  if [ "$$compResult" = "DIFFERENT" ] || [ "$$compResult" == "ERROR" ]; then \
+	    msg='$(TESTFILEFAILED)';                   \
 	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	    $$msg >> casefailed.txt; \
-	  fi ; \
-	  $(RM) compare.txt; \
+	    $$msg >> casefailed.txt;                   \
+	    if [ "$$compResult" == "ERROR" ]; then     \
+	      cat cubediffError.txt >> casefailed.txt; \
+	    fi;                                        \
+	  fi ;                                         \
+	  $(RM) compare.txt;                           \
+	  if [ -f cubediffError.txt ]; then            \
+	    $(RM) cubediffError.txt;                   \
+	  fi;                                          \
 	fi;
 
 #----------------------------------------------------------------------------
