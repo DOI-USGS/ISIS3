@@ -123,10 +123,19 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         rsync -azv --delete isisdist.wr.usgs.gov::x86_darwin_OSX/isis .
 </pre>
 
-        <i>Note: We are no longer building Isis 3 for Linux SuSE 
-          9.X, RedHat Enterprise 3, 4 or equivalent systems or Mac OSX
-          with the Power PC processor.
-        </i>
+        <p>
+          <i><b>Note:</b> Isis3 can also be downloaded over port 80. To use port 80 change
+           isisdist.wr.usgs.gov:: in the previous commands to rsync://isisdist.wr.usgs.gov:80::.
+           Example: <pre>rsync -azv --delete rsync://isisdist.wr.usgs.gov:80::x86-64_linux_RHEL/isis .</pre>
+          </i>
+        </p>
+
+        <p>
+          <i>Note: We are no longer building Isis 3 for Linux SuSE 
+            9.X, RedHat Enterprise 3, 4 or equivalent systems or Mac OSX
+            with the Power PC processor.
+          </i>
+        </p>
 
 
         <h2>3) Get the Isis3 data files </h2>
@@ -148,7 +157,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
           <b>Note:</b> The isis3 data area is very large (over 70GB). You may want to 
           consider downloading only the missions you require. To download 
             specific Isis3 mission data files use the following commands. 
-          <u>Please note: Reguardless of the mission the base data is required.</u>
+          <u>Please note: Regardless of the mission the base data is required.</u>
         </p>
         <p>
           <b>
