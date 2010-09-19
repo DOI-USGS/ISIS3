@@ -49,14 +49,20 @@ commands:
 	$(MV) $(OUTPUT)/$(INPUTFILE).uv.odd.crop.cub \
 	  $(OUTPUT)/$(INPUTFILE).uv.odd.cub;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).vis.even.cub \
-	  TO=$(OUTPUT)/$(INPUTFILE).vis.even.lev2.cub \
+	  TO=$(OUTPUT)/$(INPUTFILE).vis.even.lev2.cub DEFAULTRANGE=CAMERA \
+	  MINLAT=-74.026771144939 MAXLAT=-73.382294787899 \
+	  MINLON=242.75004784633 MAXLON=244.11987169894 \
+	  PIXRES=MPP RESOLUTION=52.8 \
 	  > /dev/null;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).vis.odd.cub \
 	  TO=$(OUTPUT)/$(INPUTFILE).vis.odd.lev2.cub \
 	  MAP=$(OUTPUT)/$(INPUTFILE).vis.even.lev2.cub MATCHMAP=TRUE \
 	  > /dev/null;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).uv.even.cub \
-	  TO=$(OUTPUT)/$(INPUTFILE).uv.even.lev2.cub \
+	  TO=$(OUTPUT)/$(INPUTFILE).uv.even.lev2.cub DEFAULTRANGE=CAMERA \
+	  MINLAT=-74.672077453164 MAXLAT=-73.705457723751 \
+	  MINLON=242.08695858855 MAXLON=247.03644145678 \
+	  PIXRES=MPP RESOLUTION=266.757 \
 	  > /dev/null;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).uv.odd.cub \
 	  TO=$(OUTPUT)/$(INPUTFILE).uv.odd.lev2.cub \
