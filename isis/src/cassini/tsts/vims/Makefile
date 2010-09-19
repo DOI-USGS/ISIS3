@@ -33,7 +33,7 @@ commands:
 	  to= $(OUTPUT)/CM_1477461989_1.cub--finalOutput.pvl SAMPLE=32 LINE=33 ALLOWOUTSIDE=no \
 	  > /dev/null
 
-	$(ECHO) -e "\nOutput of getsn..." >> $(OUTPUT)/CM_1477461989_1.cub--getsnOutput.txt
+	$(ECHO) "Output of getsn..." >> $(OUTPUT)/CM_1477461989_1.cub--getsnOutput.txt
 
 	$(GETSN) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-vis.cub \
 	  >> $(OUTPUT)/CM_1477461989_1.cub--getsnOutput.txt
