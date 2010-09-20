@@ -72,6 +72,10 @@
     <change name="Travis Addair" date="2010-09-03">
       First commit, added exception handling, finished conversion.
     </change>
+    <change name="Travis Addair" date="2010-09-20">
+      Fixed minor process inconsistencies with Isis 2, clean up code, added
+      tests.
+    </change>
   </history>
 
   <category>

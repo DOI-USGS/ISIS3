@@ -13,10 +13,11 @@ using namespace std;
 using namespace Isis;
 
 // Working functions and parameters
-void Mar10Cal (std::vector< Isis::Buffer* > &inCubes, std::vector< Isis::Buffer* > &outCubes);
+void Mar10Cal (std::vector< Isis::Buffer* > &inCubes,
+    std::vector< Isis::Buffer* > &outCubes);
 
 Cube coCube;
-Brick *coef;
+Brick * coef;
 
 bool useBlem;
 bool mask;
@@ -31,11 +32,10 @@ void IsisMain() {
   ProcessByLine p;
 
   // Setup the input and make sure it is a mariner10 file
-  UserInterface &ui = Application::GetUserInterface();
+  UserInterface & ui = Application::GetUserInterface();
 
   Isis::Pvl lab(ui.GetFilename("FROM"));
-  Isis::PvlGroup &inst = 
-             lab.FindGroup("Instrument",Pvl::Traverse);
+  Isis::PvlGroup & inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
   std::string mission = inst["SpacecraftName"];
   if (mission != "Mariner_10") {
@@ -43,7 +43,7 @@ void IsisMain() {
     throw iException::Message(iException::User,msg,_FILEINFO_);
   }
 
-  Cube *icube = p.SetInputCube("FROM",OneBand);
+  Cube * icube = p.SetInputCube("FROM", OneBand);
 
   // If it is already calibrated then complain
   if (icube->HasGroup("Radiometry")) {
@@ -62,7 +62,6 @@ void IsisMain() {
   string target = inst["TargetName"];
   
   iTime startTime((string) inst["StartTime"]);
-  //double etStart = startTime.Et();
 
   double exposure = inst["ExposureDuration"];
   double exposureOffset = 0.0;
@@ -70,12 +69,20 @@ void IsisMain() {
     exposureOffset = ui.GetDouble("EXPOFF");
   }
   else {
-    if (camera == "A") exposureOffset = 0.316;
-    if (camera == "B") exposureOffset = 3.060;
+    if (camera == "A") {
+      exposureOffset = 0.316;
+    }
+    else if (camera == "B") {
+      exposureOffset = 3.060;
+    }
+    else {
+      string msg = "Camera [" + camera + "] is not supported.";
+      throw iException::Message(iException::User,msg,_FILEINFO_);
+    }
   }
   correctedExp = exposure + exposureOffset;
  
-  Cube *dcCube;
+  Cube * dcCube;
   if (ui.WasEntered ("DCCUBE") ) {
     dcCube = p.SetInputCube("DCCUBE");
   }
@@ -85,22 +92,22 @@ void IsisMain() {
     string dcFile("$mariner10/calibration/mariner_10_" + camera +
                   "_dc.cub");
     CubeAttributeInput cubeAtt;
-    dcCube = p.SetInputCube(dcFile,cubeAtt);
+    dcCube = p.SetInputCube(dcFile, cubeAtt);
   }
 
 
   //  Open blemish removal file
-  Cube *blemCube = 0;
+  Cube * blemCube = 0;
   useBlem = (ui.GetBoolean("BLEMMASK")) ? true : false;
   if (useBlem) {
     string blemFile("$mariner10/calibration/mariner_10_blem_" + camera + ".cub");
     CubeAttributeInput cubeAtt;
-    blemCube = p.SetInputCube(blemFile,cubeAtt);
+    blemCube = p.SetInputCube(blemFile, cubeAtt);
   }
 
   if (filter == "FAB" || filter == "WAF") {
     string msg = "Filter type [" + filter + "] is not supported at this time.";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   if (ui.WasEntered ("COEFCUBE")) {
@@ -111,7 +118,7 @@ void IsisMain() {
         camera + "_coef.cub");
     coCube.Open(coFile.Expanded());
   }
-  coef = new Brick(icube->Samples(),1,6,coCube.PixelType());
+  coef = new Brick(icube->Samples(), 1, 6, coCube.PixelType());
 
   if (ui.WasEntered("ABSCOEF")) {
     absCoef = ui.GetDouble("ABSCOEF");
@@ -134,47 +141,47 @@ void IsisMain() {
 
   // Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
-  Camera *cam = icube->Camera();
+  Camera * cam = icube->Camera();
   bool camSuccess = cam->SetImage(icube->Samples()/2,icube->Lines()/2);
   if (!camSuccess) {
     throw iException::Message(iException::Camera,
-                              "Unable to calculate the Solar Distance on [" +
-                              icube->Filename() + "]", _FILEINFO_);
+        "Unable to calculate the Solar Distance on [" +
+        icube->Filename() + "]", _FILEINFO_);
   }
   sunDist = cam->SolarDistance();
 
   // Setup the output cube
-  Cube *ocube = p.SetOutputCube ("TO");
+  Cube  *ocube = p.SetOutputCube("TO");
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("DarkCurrentCube",dcCube->Filename());
-  if (useBlem) calgrp += PvlKeyword("BlemishRemovalCube",blemCube->Filename());
-  calgrp += PvlKeyword("CoefficientCube",coCube.Filename());
-  calgrp += PvlKeyword("AbsoluteCoefficient",absCoef);
+  calgrp += PvlKeyword("DarkCurrentCube", dcCube->Filename());
+  if (useBlem) calgrp += PvlKeyword("BlemishRemovalCube", blemCube->Filename());
+  calgrp += PvlKeyword("CoefficientCube", coCube.Filename());
+  calgrp += PvlKeyword("AbsoluteCoefficient", absCoef);
 
   ocube->PutGroup(calgrp);
   
   // Start the line-by-line calibration sequence
   p.StartProcess(Mar10Cal);
   p.EndProcess();
-
 }
 
 // Line processing routine
-void Mar10Cal (std::vector<Isis::Buffer*>&inCubes,std::vector<Isis::Buffer*> &outCubes) {
+void Mar10Cal (std::vector<Isis::Buffer *> & inCubes, 
+    std::vector<Isis::Buffer *> & outCubes) {
 
-  Buffer &in = *inCubes[0];
-  Buffer &dc = *inCubes[1];
-  Buffer &out = *outCubes[0];
-  Buffer *blem = (useBlem) ? inCubes[2] : 0;
+  Buffer & in = *inCubes[0];
+  Buffer & dc = *inCubes[1];
+  Buffer & out = *outCubes[0];
+  Buffer * blem = (useBlem) ? inCubes[2] : 0;
 
-  coef->SetBasePosition(1,in.Line(),1);
+  coef->SetBasePosition(1, in.Line(), 1);
   coCube.Read(*coef);
 
   // Loop and apply calibration
-  for (int samp=0; samp<in.size(); samp++) {
+  for (int samp = 0; samp < in.size(); samp++) {
     // Handle special pixels
     if (IsSpecial(in[samp])) {
       out[samp] = in[samp];
@@ -182,48 +189,49 @@ void Mar10Cal (std::vector<Isis::Buffer*>&inCubes,std::vector<Isis::Buffer*> &ou
     else if (IsSpecial(dc[samp]) || (useBlem && IsSpecial((*blem)[samp]))) {
       out[samp] = Isis::Null;
     }
-    else if (IsSpecial(coef->at(coef->Index(samp+1,in.Line(),1))),
-        IsSpecial(coef->at(coef->Index(samp+1,in.Line(),2))),
-        IsSpecial(coef->at(coef->Index(samp+1,in.Line(),3))),
-        IsSpecial(coef->at(coef->Index(samp+1,in.Line(),4))),
-        IsSpecial(coef->at(coef->Index(samp+1,in.Line(),5))),
-        IsSpecial(dc.at(dc.Index(samp+1,in.Line(),1)))) {
+    else if (
+        IsSpecial(coef->at(coef->Index(samp+1, in.Line(), 1))),
+        IsSpecial(coef->at(coef->Index(samp+1, in.Line(), 2))),
+        IsSpecial(coef->at(coef->Index(samp+1, in.Line(), 3))),
+        IsSpecial(coef->at(coef->Index(samp+1, in.Line(), 4))),
+        IsSpecial(coef->at(coef->Index(samp+1, in.Line(), 5))),
+        IsSpecial(dc.at(dc.Index(samp+1, in.Line(), 1)))) {
       out[samp] = Isis::Null;
     }
-    else if (mask && (in[samp] < coef->at(coef->Index(samp+1,in.Line(),5)) ||
-          in[samp] > coef->at(coef->Index(samp+1,in.Line(),6)))) {
+    else if (mask && (in[samp] < coef->at(coef->Index(samp+1, in.Line(), 5)) ||
+          in[samp] > coef->at(coef->Index(samp+1, in.Line(), 6)))) {
       out[samp] = Isis::Null;
     }
-    else if (blem && blem->at(blem->Index(samp+1,in.Line(),1)) == Isis::Null) {
+    else if (blem && blem->at(blem->Index(samp+1, in.Line(), 1)) == Isis::Null) {
       out[samp] = Isis::Null;
     }
-    else {
-      //  OK, all pixels look good, calibrate
+    else { //  OK, all pixels look good, calibrate
+      // Subtract space derived DC file from M10 image
       double dcCorrected = in[samp] - dc[samp];
-      if (dcCorrected < 0.) {
+      if (dcCorrected <= 0.0) {
         out[samp] = Isis::Null;
       }
       else {
         double x = xparm;
+        for (int iteration = 0; iteration < 9; iteration++) {
 
-        for (int iteration=0; iteration<9; iteration++) {
-          double num = (coef->at(coef->Index(samp+1,in.Line(),4)) * pow(x,3)) +
-            (coef->at(coef->Index(samp+1,in.Line(),3)) * pow(x,2)) +
-            (coef->at(coef->Index(samp+1,in.Line(),2)) * x) +
-            (coef->at(coef->Index(samp+1,in.Line(),1)) - dcCorrected);
-          double den = (3 * coef->at(coef->Index(samp+1,in.Line(),4)) * pow(x,2)) +
-            (2 * coef->at(coef->Index(samp+1,in.Line(),3)) * x) +
-            coef->at(coef->Index(samp+1,in.Line(),2));
-          double temp;
-          if (den == 0) {
-            temp = Isis::Null;
-          }
-          else {
-            temp = num/den;
-          }
-          if (!IsSpecial(temp)) x = x - temp;
+          // Ax^3 + Bx^2 + Cx + D = 0 'normal cubic equation'
+          double numerator = 
+            (coef->at(coef->Index(samp+1, in.Line(), 4)) * pow(x, 3)) +
+            (coef->at(coef->Index(samp+1, in.Line(), 3)) * pow(x, 2)) +
+            (coef->at(coef->Index(samp+1, in.Line(), 2)) * x) +
+            (coef->at(coef->Index(samp+1, in.Line(), 1)) - dcCorrected);
+
+          // Ax^2 + Bx + C = 0
+          double denominator = 
+            (3 * coef->at(coef->Index(samp+1, in.Line(), 4)) * pow(x, 2)) +
+            (2 * coef->at(coef->Index(samp+1, in.Line(), 3)) * x) +
+            coef->at(coef->Index(samp+1, in.Line(), 2));
+
+          if (denominator != 0.0) x -= numerator / denominator;
         }
-        out[samp] = (x * pow(sunDist,2)) * absCoef / correctedExp;
+
+        out[samp] = (x * pow(sunDist, 2)) * absCoef / correctedExp;
       }
     }
   }
