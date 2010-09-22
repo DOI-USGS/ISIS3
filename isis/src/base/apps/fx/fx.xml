@@ -167,7 +167,7 @@
       </tr>   
       <tr>
         <td>13</td>
-        <td>linemmax</td>
+        <td>linemax</td>
         <td>Minimum of DNs on the current line</td>
         <td>f1 + linemax(f2)</td>
       </tr>   
