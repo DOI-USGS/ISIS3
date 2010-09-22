@@ -162,8 +162,8 @@
       <tr>
         <td>12</td>
         <td>max</td>
-        <td>Maximum</td>
-        <td>20 * max(f1)</td>
+        <td>Maximum of Two DNs</td>
+        <td>20 * max(f1,f2)</td>
       </tr>   
       <tr>
         <td>13</td>
