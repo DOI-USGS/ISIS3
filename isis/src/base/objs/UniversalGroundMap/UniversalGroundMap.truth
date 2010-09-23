@@ -2,17 +2,17 @@ UnitTest for Universal Ground Map
   Testing Camera Model...
 Is Projection? = 0
 
-For (1.0, 1.0) ...
-Universal Latitude = -31.2795097
-Universal Longitude = 171.809885
-Sample = 0.999968238
-Line = 1.00010555
+For (1.0, 5.0) ...
+Universal Latitude = -31.2924964
+Universal Longitude = 171.871675
+Sample = 0.99996206
+Line = 5.00012951
 
-For (1204, 1.0) ...
-Universal Latitude = -13.6617649
-Universal Longitude = 173.660653
-Sample = 1204.00005
-Line = 0.999958049
+For (1204, 5.0) ...
+Universal Latitude = -13.6764854
+Universal Longitude = 173.717209
+Sample = 1204.00018
+Line = 4.99986061
 
 For (1.0, 1056) ...
 Universal Latitude = -33.1118093
@@ -29,54 +29,54 @@ Line = 1056.0001
   Testing Projection...
 Is Projection? = 1
 
-For (1.0, 1.0) ...
-Universal Latitude = 89.9921875
-Universal Longitude = 0.0078125
-Sample = 1
-Line = 1
+For (2.0, 5.0) ...
+Universal Latitude = 89.9727
+Universal Longitude = 0.0038963
+Sample = 2
+Line = 5
 
-For (23040, 1.0) ...
-Universal Latitude = 89.9921875
-Universal Longitude = 359.992188
+For (23040, 5.0) ...
+Universal Latitude = 89.9726612
+Universal Longitude = 179.988281
 Sample = 23040
-Line = 1
+Line = 5
 
-For (1.0, 11520) ...
-Universal Latitude = -89.9921875
-Universal Longitude = 0.0078125
-Sample = 1
+For (2.0, 11520) ...
+Universal Latitude = 0.0117187506
+Universal Longitude = 0.00389629985
+Sample = 2
 Line = 11520
 
 For (23040, 11520) ...
-Universal Latitude = -89.9921875
-Universal Longitude = 359.992188
+Universal Latitude = 0.0117187506
+Universal Longitude = 179.988281
 Sample = 23040
 Line = 11520
 
   Testing Camera Model and Projection...
 Is Projection? = 0
 
-For (1.0, 1.0) ...
-Universal Latitude = -86.9414729
-Universal Longitude = 244.294251
+For (1.0, 5.0) ...
+Universal Latitude = -86.9422124
+Universal Longitude = 244.293531
 Sample = 1
-Line = 1
+Line = 5
 
-For (1721, 1.0) ...
-Universal Latitude = -86.9414729
-Universal Longitude = 250.253797
-Sample = 1721
-Line = 1
+For (1640, 20.0) ...
+Universal Latitude = -86.9449854
+Universal Longitude = 249.976243
+Sample = 1640
+Line = 20
 
-For (1.0, 667) ...
-Universal Latitude = -87.0645968
-Universal Longitude = 244.16931
-Sample = 1
-Line = 667
+For (30.0, 415) ...
+Universal Latitude = -87.0180094
+Universal Longitude = 244.320856
+Sample = 30
+Line = 415
 
-For (1721, 667) ...
-Universal Latitude = -87.0645968
-Universal Longitude = 250.378593
-Sample = 1721
-Line = 667
+For (1700, 245) ...
+Universal Latitude = -86.9865813
+Universal Longitude = 250.224484
+Sample = 1700
+Line = 245
 
