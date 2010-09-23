@@ -70,8 +70,8 @@ namespace Isis {
       }
 
       // Get the coefficients
-      vector<double> transx;
-      vector<double> transy;
+      std::vector<double> transx;
+      std::vector<double> transy;
       transx = fptrans->Coefficients(1);
       transy = fptrans->Coefficients(2);
 
@@ -92,8 +92,8 @@ namespace Isis {
       pdpool_c(icodex.c_str(), 3, (double( *)) &transx[0]);
       pdpool_c(icodey.c_str(), 3, (double( *)) &transy[0]);
 
-      vector<double> transs;
-      vector<double> transl;
+      std::vector<double> transs;
+      std::vector<double> transl;
       transs = fptrans->InverseCoefficients(1);
       transl = fptrans->InverseCoefficients(2);
 

@@ -50,6 +50,7 @@ namespace Isis {
      *  @history 2007-07-17 Debbie A. Cook - Original Version
      *  @history 2007-11-01 Debbie A. Cook - Revised to handle medium resolution camera
      *  @history 2008-06-18 Steven Lambright - Fixed documentation
+     *  @history 2010-09-23 Debbie A. Cook - Added std before vector declarations to avoid confusion with boost vector
      */
     class LoCameraFiducialMap  {
       public:
