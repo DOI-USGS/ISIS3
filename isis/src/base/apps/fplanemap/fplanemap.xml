@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="fplanemap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+       Produce focal plane coordinates from control net file
+  </brief>
+
+  <description>
+      <p>
+          <b>fplanemap</b> produces a comma separated value (CSV) file 
+          containing focal plane coordinates from a control network file.  The 
+          file is assumed to originate from a <b>coreg</b> run comparing two 
+          files either in  camera or projected space.  
+      </p>
+      <p>
+          Typical processing strategies would include identifying a trusted 
+          source image (truth or MATCH file used in <b>coreg</b> ) that has no 
+          distortion and comparable resolution.  The registration of the truth 
+          image to the image requiring analysis (FROM) should produce strong 
+          correlations for the best results. Areas of least variation in 
+          topography will also contribute to better results. 
+      </p>
+      <p>
+          This application was developed primarily to analyze image distortion, 
+          which is very sensitive to correlation imperfections.  The content of 
+          the CSV output TO file contains all the information necessary to apply 
+          linear or least square fits to equations.   The following describes 
+          the output CSV file format.
+      </p>
+      <p>
+          The output TO CSV file contains 11 columns.   Note that a camera model 
+          for the FROM file is required since it is used to get the actual 
+          focal plane coordinates.  The sample and line coordinates recorded in 
+          the output file will be the same as in the control net file. The 
+          sample/line coordinate provided there is used to determine the 
+          latitude and longitude of the coordinate.   Below is a small portion 
+          of an output TO CSV file:
+          <pre>
+OldSample,OldLine,NewSample,NewLine,X,Y,XC,YC,GoodnessOfFit,Latitude,Longitude
+51,3,46.5738,6.52725,-0.125346,3.18205,-0.152566,3.58934,0.514252,32.2544,82.1228
+17,37,22.0716,36.9117,-0.0278861,3.11492,-0.030747,3.51921,0.44952,32.2264,82.0898
+51,37,54.8234,41.0111,-0.025531,3.18319,-0.0403855,3.6141,0.543963,32.2264,82.1228
+84,37,86.1196,39.766,-0.0232456,3.24823,-0.0344203,3.70423,0.225104,32.2264,82.1548
+51,43,49.5502,46.0587,-0.0410861,3.18351,-0.055586,3.59933,0.255932,32.2215,82.1228
+51,49,51.7797,45.6973,-0.0566404,3.18382,-0.0543615,3.60573,0.347588,32.2165,82.1228
+84,49,90.1357,49.14,-0.0541637,3.24884,-0.0616203,3.71664,0.446062,32.2165,82.1548
+17,55,15.761,61.5159,-0.0748423,3.11587,-0.103437,3.5031,0.204652,32.2116,82.0898
+51,55,48.6316,58.2457,-0.0721934,3.18412,-0.0914211,3.59775,0.383612,32.2116,82.1228
+84,55,89.9976,55.097,-0.0696208,3.24915,-0.0791061,3.71678,0.338814,32.2116,82.1548
+17,60,11.4821,61.6077,-0.0878837,3.11609,-0.10402,3.49073,0.436698,32.2074,82.0898
+51,60,48.1177,61.9931,-0.0851532,3.18435,-0.102458,3.59659,0.266318,32.2074,82.1228
+84,60,89.7459,59.6435,-0.0825007,3.24938,-0.0924634,3.71647,0.326716,32.2074,82.1548
+17,66,14.9112,70.9194,-0.103532,3.11635,-0.13111,3.50144,0.365906,32.2025,82.0898
+          </pre>
+      </p>
+      <p>
+              Analysis of the data may result in adjustments to the boresight 
+              and/or the distortion model.  The plot below is derived from the data 
+              from the above file. 
+        </p>
+          <p>
+               <img src='assets/output.png' alt='Plot of Y Component in mm' width='675' height='452' />
+          </p> 
+      <p>
+             This data as plotted can be used to derive distortion model parameters 
+              by fitting a line through the data.
+      </p>
+      <p>
+          The following table describes each column: 
+      </p>
+                <br><h1 align="center">CSV Output Columns</h1></br>
+                <TABLE BORDER="1">
+                      <CAPTION>
+                        Data generated from the <b>fplanemap</b> application
+                        </CAPTION>
+                    <TR>
+                      <TH>Column</TH>
+                      <TH>Description</TH>
+                    </TR>
+                    <TR>
+                       <TD>OldSample</TD>
+                       <TD>
+                         The original sample coordinate of the point at the 
+                         center of the registration pixel location.  This 
+                         coordinate comes from the MATCH file in <b>coreg</b>.
+                       </TD>
+                    </TR>
+                    <TR>
+                        <TD>OldLine</TD>
+                        <TD>
+                            The original line coordinate of the point at the 
+                            center of the registration pixel location.   This 
+                         coordinate comes from the MATCH file in <b>coreg</b>.
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>NewSample</TD>
+                        <TD>
+                            The registered sample coordinate from the FROM file 
+                            in  <b>coreg</b> and <b>fplanemap</b> . 
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>NewLine</TD>
+                        <TD>
+                            The registered line coordinate from the FROM file 
+                            in  <b>coreg</b> and <b>fplanemap</b>.
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>X</TD>
+                        <TD>
+                            The  distorted focal plane X coordinate (xd) that 
+                            maps from the old distorted pixel location 
+                            (OldSample, OldLine).  The units are typically in 
+                            millimeters.
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>Y</TD>
+                        <TD>
+                            The distorted focal plane Y coordinate (yd) that 
+                            maps from the old distorted pixel location 
+                            (OldSample, OldLine).  The units are typically in 
+                            millimeters.
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>XC</TD>
+                        <TD>
+                            The undistorted focal plane X coordinate (xc) that 
+                            maps from the new distorted pixel location 
+                            (NewSample, NewLine). The units are typically in 
+                            millimeters.
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>YC</TD>
+                        <TD>
+                            The undistorted focal plane Y coordinate (yc) that 
+                            maps from the new distorted pixel location 
+                            (NewSample,NewLine).  The units are typically in 
+                            millimeters.
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>GoodnessOfFit</TD>
+                        <TD>
+                            The coorelation coefficient as found in the control 
+                            net file that indicates the quality of the 
+                            registration for the point
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>Latitude</TD>
+                        <TD>
+                            The latitude of the OldSamp/OldLine coordinate
+                        </TD>
+                    </TR>
+                    <TR>
+                        <TD>Longitude</TD>
+                        <TD>
+                            The longitude of the OldSample/OldLine coordinate
+                        </TD>
+                    </TR>
+                </TABLE>
+  </description>
+
+  <category>
+    <categoryItem>Registration and Pattern Matching</categoryItem>
+  </category>  
+
+  <history>
+     <change name="Kris Becker" date="2010-09-24">
+         Original Version
+     </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to provide focal plane data
+        </brief>
+        <description>
+          This is the same file provided in the FROM parameter for the 
+          coregistration program, such as <b>coreg</b>.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+       <parameter name="CNETFILE">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+               Pvl file of ControlNet
+          </brief>
+          <description>
+              <p>
+                   This file will contain the ControlNet created from the run of a 
+                   co-registration application such as <b>coreg</b>.  There are 
+                   checks made to ensure that it satisfies expected conditions of a 
+                   output control net from one of these types of applications.
+              </p>
+              <p>
+                  There must be only two measures to a control point.  One must 
+                  be designated the reference.  Points that have the Ignore 
+                  property set to true are not considered in this application.
+              </p>
+          </description>
+          <filter>
+            *.net *.pbnet
+          </filter>
+        </parameter>
+
+        <parameter name="TO">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+              Output file containing focal plane information
+          </brief>
+          <description>
+              This file will contain the 11 parameters in comma separated values 
+              (CSV) format that provides information about the orginal and 
+              registered points, focal plane coordinates and latitude and 
+              longitude data.
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+            *.csv
+          </filter>
+        </parameter>
+      </group>
+    
+      <group name="Options">
+        <parameter name="TOLERANCE">
+            <type>double</type>
+            <brief>
+                Detector pixel tolerance
+            </brief>
+            <description>
+                Places a limit on the maximum distance in the detector plane 
+                the offset is expected to differ.  This value unit is in pixels 
+                which is converted internally to the detector pixel unit, which 
+                is typically millimeters.   Pixel size of the detector is 
+                sometimes referred to as <i>pixel pitch</i>.
+            </description>
+            <default><item>5.0</item></default>
+        </parameter>
+
+        <parameter name="CHECKDN">
+                <type>boolean</type>
+                <default><item>False</item></default>
+                <brief>
+                  Check the DN in the file at the pixel location for validity
+                </brief>
+                <description>
+                  A check will be performed at the pixel location of the original 
+                  line and sample to ensure the pixel is valid.  The pixel must only 
+                  have a pixel value that is not one of the ISIS special pixels
+                </description>
+          </parameter>
+          </group>
+  </groups>
+</application>
