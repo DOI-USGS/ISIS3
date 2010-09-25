@@ -88,7 +88,7 @@ void IsisXMLGroups::startElement(const XMLCh *const uri,
     }
     unsigned int index = groups->size();
     groups->resize(index + 1);
-    (*groups)[index].name = XERCES::XMLString::transcode(attributes.getValue((unsigned int)0));
+    (*groups)[index].name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
     groupHandler = new IsisXMLGroup(encodingName, expandNamespaces, parser,
                                     &(*groups)[index]);
   }

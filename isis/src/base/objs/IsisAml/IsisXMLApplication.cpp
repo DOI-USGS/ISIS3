@@ -96,7 +96,7 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
                                       const XERCES::Attributes &attributes) {
 
   if((string)XERCES::XMLString::transcode(localname) == (string)"application")  {
-    Isis::iString name = XERCES::XMLString::transcode(attributes.getValue((unsigned int)0));
+    Isis::iString name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
     appData->name = name.DownCase();
   }
   else if((string)XERCES::XMLString::transcode(localname) == (string)"brief")  {

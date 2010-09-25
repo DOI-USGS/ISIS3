@@ -88,7 +88,7 @@ void IsisXMLHelpers::startElement(const XMLCh *const uri,
     }
     unsigned int index = helpers->size();
     helpers->resize(index + 1);
-    (*helpers)[index].name = XERCES::XMLString::transcode(attributes.getValue((unsigned int)0));
+    (*helpers)[index].name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
     helperHandler = new IsisXMLHelper(encodingName, expandNamespaces, parser,
                                       &(*helpers)[index]);
   }
