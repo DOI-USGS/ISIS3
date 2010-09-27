@@ -1,12 +1,12 @@
 #include "Isis.h"
 #include "IsisDebug.h"
+#include "iException.h"
+#include "Pvl.h"
 #include "ControlNet.h"
 #include "ControlNetFilter.h"
 #include "ControlNetStatistics.h"
 #include "PvlGroup.h"
-#include "iException.h"
 #include "Progress.h"
-#include "Pvl.h"
 
 using namespace Isis;
 using namespace std;
@@ -29,9 +29,30 @@ void IsisMain() {
       sDefFile = ui.GetFilename("DEFFILE");
       sOutFile = ui.GetFilename("FLATFILE");
       pvlDefFile = Pvl(sDefFile);
+
+      // Log the DefFile - Cannot log Object... only by Group
+      for (int i=0; i<pvlDefFile.Objects(); i++) {
+        PvlObject pvlObj = pvlDefFile.Object(i);
+        for (int j=0; j<pvlObj.Groups(); j++) {
+          Application::Log(pvlObj.Group(j));
+        }
+      }
       
-      // Verify DefFile
-      //ControlNetFilter::VerifyDefFile(pvlDefFile);
+      // Verify DefFile comparing with the Template
+      Pvl pvlTemplate("$ISIS3DATA/base/templates/cnetstats/cnetstats.def");
+      Pvl pvlResults;
+      pvlTemplate.ValidatePvl(pvlDefFile, pvlResults);
+      if(pvlResults.Objects() != 0 || pvlResults.Groups() != 0 || pvlResults.Keywords() != 0){
+        for (int i=0; i<pvlResults.Objects(); i++) {
+          PvlObject pvlObj = pvlResults.Object(i);
+          for (int j=0; j<pvlObj.Groups(); j++) {
+            Application::Log(pvlObj.Group(j));
+          }
+        }
+        string sErrMsg = "Invalid Deffile\n";
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
+        
+      }
     }
     
     // Get the Image Stats File

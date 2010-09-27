@@ -1,7 +1,7 @@
 ifeq ($(ISISROOT), $(BLANK))
 .SILENT:
 error:
-        echo "Please set ISISROOT";
+	echo "Please set ISISROOT";
 else
-        include $(ISISROOT)/make/isismake.apps
+	include $(ISISROOT)/make/isismake.apps
 endif

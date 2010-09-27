@@ -224,12 +224,12 @@
     9. <a name="cubename"><b>Cube Names(Serial Number)</b></a> - Filter the 
     ControlNet by Cube Serial Number. Only Points with the specified Image as 
     one of their Measures will be Filtered in. Any number of Cube names can be 
-    specified with the index (Example Cube1, Cube2, Cube3...)  <br/> 
+    entered with "Cube="  <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
               <tr><td colspan="2"> Group = Point_CubeNames</td></tr>
-              <tr><td width="10"></td><td> Cube1 = Cube Name</td></tr>
-              <tr><td width="10"></td><td> Cube2 = Cube Name</td></tr>
+              <tr><td width="10"></td><td> Cube = Cube Name</td></tr>
+              <tr><td width="10"></td><td> Cube = Cube Name</td></tr>
               <tr><td colspan="2"> EndGroup</td></tr> </table> 
     </td></tr> </table><br/><br/> 
     
@@ -299,6 +299,8 @@
     <change name="Sharmila Prasad" date="2010-09-17"> Removed unused 
       Format group and modified to verify the input before the actual stats 
       processing</change>
+    <change name="Sharmila Prasad" date="2010-09-27">Validate DefFile 
+      comparing with the Template. Record the DefFile in the Log</change>
   </history>
       
   <groups>
