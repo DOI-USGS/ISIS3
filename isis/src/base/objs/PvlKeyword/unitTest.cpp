@@ -299,4 +299,59 @@ int main() {
   catch(Isis::iException &e) {
     e.Report(false);
   }
+  
+  // Test Validation of PvlKeywords
+  // Validate type integer
+  try {
+    // Template Keyword
+    PvlKeyword pvlTmplKwrd("KeyName", "integer");
+    PvlKeyword pvlKwrd("KeyName", 3);
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlKwrd.Clear();
+
+    pvlKwrd=PvlKeyword("KeyName", "null");
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlKwrd.Clear();
+    
+    pvlKwrd=PvlKeyword("KeyName", 3.5);
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+  } 
+  catch(Isis::iException &e) {
+   cerr << "Invalid Keyword Type: Integer Expected" << endl;
+  }
+  
+  // Validate String
+  try {
+    PvlKeyword pvlTmplKwrd("KeyName", "string");
+    pvlTmplKwrd.AddValue("value1");
+    pvlTmplKwrd.AddValue("value2");
+    pvlTmplKwrd.AddValue("value3");
+    PvlKeyword pvlKwrd("KeyName", "VALUe3");
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlKwrd.Clear();
+
+    pvlKwrd=PvlKeyword("KeyName", "value");
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+  } 
+  catch(Isis::iException &e) {
+    cerr << "Invalid Keyword Value: Expected values \"value1\", \"value2\", \"value3\"" << endl;
+  }
+  
+  // Validate Boolean
+  try {
+    PvlKeyword pvlTmplKwrd("KeyName", "boolean");
+    PvlKeyword pvlKwrd("KeyName", "true");
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlKwrd.Clear();
+
+    pvlKwrd=PvlKeyword("KeyName", "null");
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlKwrd.Clear();
+    
+    pvlKwrd=PvlKeyword("KeyName", "value");
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+  } 
+  catch(Isis::iException &e) {
+    cerr << "Invalid Keyword Type: Expected  Boolean values \"true\", \"false\", \"null\"" << endl;
+  }
 }

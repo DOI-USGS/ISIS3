@@ -1782,4 +1782,75 @@ namespace Isis {
     return *this;
   }
 
+  /**
+   * Validate a Keyword, comparing against corresponding Template Keyword.
+   *  
+   * Template Keyword has the format: 
+   * keyName = (valueType, optional/required, Values allowed separated by comma)  
+   * 
+   * @author Sharmila Prasad (9/22/2010)
+   * 
+   * @param pvlKwrd - Keyword to be validated
+   */
+  void PvlKeyword::ValidateKeyword(PvlKeyword & pvlKwrd)
+  {
+    int iTmplKwrdSize = Size();
+    int iSize = pvlKwrd.Size();
+    
+    string sType = iString::DownCase(p_values[0]);
+    
+    // Type integer
+    if(sType == "integer") {
+      for(int i=0; i<iSize; i++) {
+        string sValue = iString::DownCase(pvlKwrd[i]);
+        if(sValue != "null"){
+          iString::ToInteger(sValue);
+        }
+      }
+      return;
+    }
+    
+    // Type double
+    if(sType == "double") {
+      for(int i=0; i<iSize; i++) {
+        string sValue = iString::DownCase(pvlKwrd[i]);
+        if(sValue != "null"){
+          iString::ToDouble(sValue);
+        }
+      }
+      return;
+    }
+    
+    // Type boolean
+    if(sType == "boolean") {
+      for(int i=0; i<iSize; i++) {
+        string sValue = iString::DownCase(pvlKwrd[i]);
+        if(sValue != "null" || sValue != "true" || sValue != "false"){
+          string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
+          throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        }
+      }
+      return;
+    }
+    
+    // Type String
+    if(sType == "string" && iTmplKwrdSize > 1) {
+      for(int i=0; i<iSize; i++) {
+        string sValue = iString::DownCase(pvlKwrd[i]);
+        bool bValFound = false;
+        
+        for(int j=1; j<iTmplKwrdSize; j++) {
+          string sTmplValue = iString::DownCase(p_values[j]);
+          if (sValue == sTmplValue) {
+            bValFound = true;
+            break;
+          }
+        }
+        if(bValFound == false) {
+          string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
+          throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        }
+      }
+    }
+  }
 }

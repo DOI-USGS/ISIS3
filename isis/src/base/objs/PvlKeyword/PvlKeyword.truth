@@ -539,3 +539,6 @@ double     = 131.244
 Test_key_2 = "Might work"
 **USER ERROR** [Bob is a name] is invalid. Keyword name cannot contain whitespace.
 Test_key_3 = "Might'not work"
+Invalid Keyword Type: Integer Expected
+Invalid Keyword Value: Expected values "value1", "value2", "value3"
+Invalid Keyword Type: Expected  Boolean values "true", "false", "null"
