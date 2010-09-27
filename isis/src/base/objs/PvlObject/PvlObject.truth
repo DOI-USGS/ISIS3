@@ -190,3 +190,32 @@ Testing Object with no end tag
 **PVL ERROR** Object [Hello] EndObject not found before end of file
 Testing Object with wrong end tag
 **PVL ERROR** Unexpected [EndGroup] in Object [Hello]
+Template Object:
+Object = Object0
+  Object = Object2
+    Object = Object1
+      Test_Required = false
+      Test_Repeated = true
+      Test          = string
+
+      Group = Point_ErrorMagnitude
+        Point_ErrorMagnitude__Required = true
+        LessThan                       = double
+        LessThan__Required             = false
+        LessThan__Repeated             = false
+        GreaterThan                    = double
+        GreaterThan__Required          = true
+        GreaterThan__Repeated          = true
+      End_Group
+    End_Object
+  End_Object
+End_Object
+
+After Validation Results PVL:
+Object = Object0
+  Object = Object2
+    Object = Object1
+      TestTest = "Not in Template"
+    End_Object
+  End_Object
+End_Object

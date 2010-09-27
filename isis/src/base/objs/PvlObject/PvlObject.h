@@ -58,7 +58,8 @@ namespace Isis {
    *  @history 2009-12-28 Steven Lambright Implemented const FindObject
    *  @history 2010-04-13 Eric Hyer - Added copy constructor
    *                                  Added assignment operator
-   *
+   *  @history 2010-09-27 Sharmila Prasad - Validate an Object comparing with the
+   *                                        corresponding Template Object
    */
   class PvlObject : public Isis::PvlContainer {
     public:
@@ -346,7 +347,10 @@ namespace Isis {
       }
 
       const PvlObject &operator=(const PvlObject &other);
-
+      
+      //! Validate Object
+      void ValidateObject(PvlObject & pPvlObj);
+      
     private:
       std::vector<PvlObject> p_objects;    /**<A vector of PvlObjects contained
                                                 in the current PvlObject. */

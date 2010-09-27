@@ -126,4 +126,100 @@ int main() {
     cout.flush();
     e.Report(false);
   }
+  
+  try {
+    // Validate PvlObject
+    // Template Object
+    PvlObject pvlTmplObjectRoot("Object0");
+    PvlObject pvlTmplObject1("Object1");
+    PvlObject pvlTmplObject2("Object2");
+    PvlGroup pvlTmplGrp("Point_ErrorMagnitude");
+    PvlKeyword pvlTmplKwrd("Point_ErrorMagnitude__Required", "true");
+    pvlTmplGrp += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+  
+    pvlTmplKwrd = PvlKeyword("LessThan", "double");
+    pvlTmplGrp += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+  
+    pvlTmplKwrd = PvlKeyword("LessThan__Required", "false");
+    pvlTmplGrp += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+  
+    pvlTmplKwrd = PvlKeyword("LessThan__Repeated", "false");
+    pvlTmplGrp += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+  
+    pvlTmplKwrd = PvlKeyword("GreaterThan", "double");
+    pvlTmplGrp += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+  
+    pvlTmplKwrd = PvlKeyword("GreaterThan__Required", "true");
+    pvlTmplGrp += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+  
+    pvlTmplKwrd = PvlKeyword("GreaterThan__Repeated", "true");
+    pvlTmplGrp += pvlTmplKwrd;
+   
+    pvlTmplObject1 += pvlTmplGrp;
+    pvlTmplKwrd.Clear();
+    pvlTmplKwrd = PvlKeyword("Test_Required", "false");
+    pvlTmplObject1 += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+     
+    pvlTmplKwrd = PvlKeyword("Test_Repeated", "true");
+    pvlTmplObject1 += pvlTmplKwrd;
+    pvlTmplKwrd.Clear();
+    
+    pvlTmplKwrd = PvlKeyword("Test", "string");
+    pvlTmplObject1 += pvlTmplKwrd;
+
+    pvlTmplObject2 += pvlTmplObject1;
+    
+    pvlTmplObjectRoot += pvlTmplObject2;
+     
+    cout << "Template Object:\n" << pvlTmplObjectRoot << endl << endl;
+    
+    // PvlGroup to be Validated
+    PvlObject pvlObjectRoot("Object0");
+    PvlObject pvlObject1("Object1");
+    PvlObject pvlObject2("Object2");
+    PvlGroup pvlGrp("Point_errormagnitude");
+    PvlKeyword pvlKwrd("LessThan", 2);
+    pvlGrp += pvlKwrd;
+      
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("GreaterThan", 3.5);
+    pvlGrp += pvlKwrd;
+      
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("GreaterThan", 4.4545);
+    pvlGrp += pvlKwrd;
+    
+    pvlObject1 += pvlGrp;
+    
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("Test", "testing1");
+    pvlObject1 += pvlKwrd;
+    
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("Test", "testing2");
+    pvlObject1 += pvlKwrd;
+    
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("TestTest", "Not in Template");
+    pvlObject1 += pvlKwrd;
+  
+    pvlObject2 += pvlObject1;
+    
+    pvlObjectRoot += pvlObject2;
+     
+    pvlTmplObjectRoot.ValidateObject(pvlObjectRoot);
+    
+    cout << "After Validation Results PVL:\n" << pvlObjectRoot << endl;
+    
+  } catch (iException &e) {
+    cout.flush();
+    e.Report(false);
+  }
 }

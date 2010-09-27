@@ -805,5 +805,88 @@ namespace Isis {
 
     return *this;
   }
+  
+  /**
+   * Validate a PvlObject, comparing against corresponding Template PvlObject. 
+   * If the Objects are nested, it will recursively validate the PvlObject. 
+   *  
+   * Template PvlObject has the format: 
+   * Object = (objectName, optional/required)
+   * 
+   * @author Sharmila Prasad (9/22/2010)
+   * 
+   * @param pvlObj- PvlObject to be validated
+   */
+  void PvlObject::ValidateObject(PvlObject & pPvlObj)
+  {
+    // Validate the current object
+    int iObjSize = Objects();
+    
+    for(int i=0; i<iObjSize; i++) {
+      PvlObject & pvlTmplObj = Object(i);
+      
+      string sObjName = pvlTmplObj.Name();
+      bool bObjFound = false;
+
+      // Pvl contains the Object Name
+      if(pPvlObj.HasObject(sObjName)) {
+        PvlObject & pvlObj = pPvlObj.FindObject(sObjName);
+        pvlTmplObj.ValidateObject(pvlObj);
+        if(pvlObj.Objects()==0 && pvlObj.Groups()==0 && pvlObj.Keywords()==0) {
+          pPvlObj.DeleteObject(pvlObj.Name());
+        }
+        bObjFound = true;
+      }
+      else {
+        string sOption = sObjName + "__Required";
+        bObjFound = true; // optional is the default
+        if(pvlTmplObj.HasKeyword(sOption)) {
+          PvlKeyword pvlKeyOption = pvlTmplObj.FindKeyword(sOption);
+          if(pvlKeyOption[0] == "true") { // Required is true
+            bObjFound = false;
+          }
+        }
+      }
+      if (bObjFound == false) {
+        string sErrMsg = "Object \"" + sObjName + "\" Not Found in the Template File\n";
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+      }
+    }
+
+    // Validate the Groups in the current object
+    int iTmplGrpSize = Groups();
+    for(int i=0; i<iTmplGrpSize; i++) {
+      PvlGroup & pvlTmplGrp = Group(i);
+      bool bGrpFound = false;
+      string sGrpName = pvlTmplGrp.Name();
+      
+      // Pvl contains the Object Name
+      if(pPvlObj.HasGroup(sGrpName)) {
+        PvlGroup & pvlGrp = pPvlObj.FindGroup(sGrpName);
+        pvlTmplGrp.ValidateGroup(pvlGrp);
+        if(pvlGrp.Keywords()==0) {
+          pPvlObj.DeleteGroup(pvlGrp.Name());
+        }
+        bGrpFound = true;
+      }
+      else {
+        bGrpFound = true;
+        string sOption = sGrpName + "__Required";
+        if(pvlTmplGrp.HasKeyword(sOption)) {
+          PvlKeyword pvlKeyOption = pvlTmplGrp.FindKeyword(sOption);
+          if(pvlKeyOption[0] == "true") { // Required is true
+            bGrpFound = false;
+          }
+        }
+      }
+      if (bGrpFound == false) {
+        string sErrMsg = "Group \"" + sGrpName + "\" Not Found in the Template File\n";
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+      }
+    }
+    
+    // Validate the Keywords in the current Object
+    ValidateAllKeywords((PvlContainer &)pPvlObj);
+  }
 
 } // end namespace isis
