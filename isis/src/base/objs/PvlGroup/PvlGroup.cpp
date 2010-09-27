@@ -18,10 +18,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "iException.h"
 #include "PvlFormat.h"
-#include "PvlGroup.h"
 
 using namespace std;
 namespace Isis {
@@ -205,4 +205,27 @@ namespace Isis {
 
     return *this;
   }
+  
+  /**
+   * Validate a PvlGroup, comparing against the corresponding 
+   * PvlGroup in the Template file
+   *  
+   * Template PvlGroup has the format: 
+   * Group = (groupName, optional/required)
+   * 
+   * @author Sharmila Prasad (9/22/2010)
+   * 
+   * @param pPvlGrp - PvlGroup to be validated
+   */
+  void PvlGroup::ValidateGroup(PvlGroup & pPvlGrp)
+  {
+    // Group cannot be empty - needs to have a keyword
+    if(pPvlGrp.Keywords() <= 0) {
+      string sErrMsg = "Group \"" + pPvlGrp.Name() + "\" has no Keywords\n";
+      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+    }
+    
+    ValidateAllKeywords((PvlContainer &)pPvlGrp);
+  }
+  
 } // end namespace isis

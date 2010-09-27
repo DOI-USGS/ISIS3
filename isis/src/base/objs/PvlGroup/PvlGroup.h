@@ -24,7 +24,7 @@
 
 #include "PvlContainer.h"
 
-namespace Isis {
+namespace Isis {  
   /**
    * @brief Contains multiple PvlContainers
    *
@@ -48,7 +48,8 @@ namespace Isis {
    *           operator with PvlFormat.FormatEOL()
    *  @history 2010-04-13 Eric Hyer - Added copy constructor
    *                                  Added assignment operator
-   *
+   *  @history 2010-09-27 Sharmila Prasad - Added API to Validate a PVLGroup
+   *  
    *  @todo 2005-04-04 Needs coded example.
    */
   class PvlGroup : public Isis::PvlContainer {
@@ -57,6 +58,9 @@ namespace Isis {
       PvlGroup(const std::string &name);
       PvlGroup(const PvlGroup &other);
 
+      //! Validate a Group comparing with the Template Group
+      void ValidateGroup(PvlGroup & pPvlGrp);
+      
       friend std::istream &operator>>(std::istream &is, PvlGroup &result);
       friend std::ostream &operator<<(std::ostream &os, PvlGroup &group);
       /**

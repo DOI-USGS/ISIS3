@@ -34,3 +34,36 @@ Group = POODLE
   BIG     = ("  NOT  ", "REALLY LARGE")
 End_Group
 **PVL ERROR** Group [POODLE] EndGroup not found before end of file
+Template Group:
+Group = Point_ErrorMagnitude
+  Point_ErrorMagnitude__Required = false
+  LessThan                       = double
+  LessThan__Required             = false
+  LessThan__Repeated             = false
+  GreaterThan                    = double
+  GreaterThan__Required          = true
+  GreaterThan__Repeated          = true
+End_Group
+
+
+**Test1**RequiredKeyword
+Results Group:
+Group = Point_errormagnitude
+End_Group
+**PVL ERROR** Required Keyword "GreaterThan" not found in the PvlGroup
+**********
+
+**Test2**
+Repeated values are allowed if Repeat flag is set
+Results Group:
+Group = Point_errormagnitude
+End_Group
+**********
+
+**Test3**
+Unvalidated Keywords
+Results Group:
+Group = Point_errormagnitude
+  Less123Than = 2.5
+End_Group
+**********

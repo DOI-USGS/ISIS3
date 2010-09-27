@@ -77,4 +77,98 @@ int main() {
     cout.flush();
     e.Report(false);
   }
+  
+  // Validate Group
+
+  // Template Group
+  PvlGroup pvlTmplGrp("Point_ErrorMagnitude");
+  PvlKeyword pvlTmplKwrd("Point_ErrorMagnitude__Required", "false");
+  pvlTmplGrp += pvlTmplKwrd;
+  pvlTmplKwrd.Clear();
+  
+  pvlTmplKwrd = PvlKeyword("LessThan", "double");
+  pvlTmplGrp += pvlTmplKwrd;
+  pvlTmplKwrd.Clear();
+    
+  pvlTmplKwrd = PvlKeyword("LessThan__Required", "false");
+  pvlTmplGrp += pvlTmplKwrd;
+  pvlTmplKwrd.Clear();
+
+  pvlTmplKwrd = PvlKeyword("LessThan__Repeated", "false");
+  pvlTmplGrp += pvlTmplKwrd;
+  pvlTmplKwrd.Clear();
+    
+  pvlTmplKwrd = PvlKeyword("GreaterThan", "double");
+  pvlTmplGrp += pvlTmplKwrd;
+  pvlTmplKwrd.Clear();
+    
+  pvlTmplKwrd = PvlKeyword("GreaterThan__Required", "true");
+  pvlTmplGrp += pvlTmplKwrd;
+  pvlTmplKwrd.Clear();
+
+  pvlTmplKwrd = PvlKeyword("GreaterThan__Repeated", "true");
+  pvlTmplGrp += pvlTmplKwrd;
+  pvlTmplKwrd.Clear();
+  cout << "Template Group:\n" << pvlTmplGrp << endl << endl;
+  
+  // PvlGroup to be Validated
+  PvlGroup pvlGrp("Point_errormagnitude");
+  PvlKeyword pvlKwrd("LessThan", 2.5);
+  
+  try {
+    pvlTmplGrp.ValidateGroup(pvlGrp);
+  } 
+  catch (iException &e) {
+    cerr << "\n**Test1**RequiredKeyword\nResults Group:\n" << pvlGrp << endl;
+    cerr << "**PVL ERROR** Required Keyword \"GreaterThan\" not found in the PvlGroup\n";
+    cerr << "**********\n";
+  }
+  
+  // Test Repeated values
+  try {
+    pvlKwrd.Clear();
+    PvlKeyword pvlKwrd("LessThan", 2.5);
+    pvlGrp += pvlKwrd;
+    
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("GreaterThan", 3.5);
+    pvlGrp += pvlKwrd;
+    
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("GreaterThan", 4.4545);
+    pvlGrp += pvlKwrd;
+    
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("GreaterThan", 100.8988095);
+    pvlGrp += pvlKwrd;
+    pvlTmplGrp.ValidateGroup(pvlGrp);
+    
+    cout << "\n**Test2**\nRepeated values are allowed if Repeat flag is set\n";
+    cout << "Results Group:\n" << pvlGrp << endl;
+    cerr << "**********\n";
+  } 
+  catch (iException &e) {
+    e.Report(false);
+  } 
+  
+  // Test for unvalidated elements
+  try {
+    pvlKwrd.Clear();
+    PvlKeyword pvlKwrd("Less123Than", 2.5);
+    pvlGrp += pvlKwrd;
+    
+    pvlKwrd.Clear();
+    pvlKwrd = PvlKeyword("GreaterThan", 3.5);
+    pvlGrp += pvlKwrd;
+
+    pvlTmplGrp.ValidateGroup(pvlGrp);
+    
+    cout << "\n**Test3**\nUnvalidated Keywords\n";
+    cout << "Results Group:\n" << pvlGrp << endl;
+    cerr << "**********\n";
+  } 
+  catch (iException &e) {
+    e.Report(false);
+  } 
+  
 }
