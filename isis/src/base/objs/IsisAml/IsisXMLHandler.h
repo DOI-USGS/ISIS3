@@ -55,7 +55,7 @@ class IsisXMLHandler : public XERCES::DefaultHandler {
                     const XMLCh *const qname);
 
     void characters(const XMLCh *const chars,
-                    const unsigned int length);
+                    const XMLSize_t length);
 
     void ignorableWhitespace(const XMLCh *const chars,
                              const unsigned int length);

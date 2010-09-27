@@ -65,7 +65,7 @@ IsisXMLGroups::~IsisXMLGroups() {
 
 //  IsisXMLGroups: Overrides of the SAX DocumentHandler interface
 void IsisXMLGroups::characters(const XMLCh *const chars,
-                               const unsigned int length) {}
+                               const XMLSize_t length) {}
 
 
 void IsisXMLGroups::endElement(const XMLCh *const uri,

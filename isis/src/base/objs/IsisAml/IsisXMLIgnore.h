@@ -45,7 +45,7 @@ class IsisXMLIgnore : public IsisXMLHandler {
     ~IsisXMLIgnore();
 
     void characters(const XMLCh *const chars,
-                    const unsigned int length);
+                    const XMLSize_t length);
 
     void endElement(const XMLCh *const uri, const XMLCh *const localname,
                     const XMLCh *const qname);

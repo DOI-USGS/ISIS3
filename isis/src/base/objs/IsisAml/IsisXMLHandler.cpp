@@ -119,7 +119,7 @@ void IsisXMLHandler::warning(const XERCES::SAXParseException &e) {
 
 //  IsisXMLHandler: Overrides of the SAX DocumentHandler interface
 void IsisXMLHandler::characters(const XMLCh *const chars,
-                                const unsigned int length) {
+                                const XMLSize_t length) {
 
   if(value != NULL) {
     Isis::iString str;

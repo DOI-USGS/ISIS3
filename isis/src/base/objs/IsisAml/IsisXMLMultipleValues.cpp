@@ -61,7 +61,7 @@ IsisXMLMultipleValues::~IsisXMLMultipleValues() {
 
 //  IsisXMLMultipleValues: Overrides of the SAX DocumentHandler interface
 void IsisXMLMultipleValues::characters(const XMLCh *const chars,
-                                       const unsigned int length) {}
+                                       const XMLSize_t length) {}
 
 
 void IsisXMLMultipleValues::endElement(const XMLCh *const uri,

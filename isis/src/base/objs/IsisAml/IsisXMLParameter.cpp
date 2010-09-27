@@ -86,7 +86,7 @@ IsisXMLParameter::~IsisXMLParameter() {
 
 //  IsisXMLParameter: Overrides of the SAX DocumentHandler interface
 void IsisXMLParameter::characters(const XMLCh *const chars,
-                                  const unsigned int length) {}
+                                  const XMLSize_t length) {}
 
 
 void IsisXMLParameter::endElement(const XMLCh *const uri,
@@ -102,7 +102,6 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
                                     const XMLCh *const localname,
                                     const XMLCh *const qname,
                                     const XERCES::Attributes &attributes) {
-
   if((string)XERCES::XMLString::transcode(localname) == (string)"type") {
     if(generalHandler != NULL) {
       delete generalHandler;

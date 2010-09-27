@@ -68,7 +68,7 @@ IsisXMLList::~IsisXMLList() {
 
 //  IsisXMLList: Overrides of the SAX DocumentHandler interface
 void IsisXMLList::characters(const XMLCh *const chars,
-                             const unsigned int length) {
+                             const XMLSize_t length) {
 }
 
 

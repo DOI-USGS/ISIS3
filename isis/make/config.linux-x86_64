@@ -95,8 +95,8 @@ QWTLIB    = -lqwt
 #---------------------------------------------------------------------------
 # Set up for Xerces 
 #---------------------------------------------------------------------------
-XERCESINCDIR = -I$(ISIS3SYSINC)
-XERCESLIBDIR = -L$(ISIS3SYSLIB)
+XERCESINCDIR = -I$(ISIS3LOCAL)/include/xercesc/xercesc-3.1.1
+XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
 #---------------------------------------------------------------------------
@@ -212,7 +212,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
 
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas.so.*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgfortran.so*"
-THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libxerces-c.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libicuuc.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libicudata.so*"

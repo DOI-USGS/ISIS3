@@ -70,7 +70,7 @@ IsisXMLApplication::~IsisXMLApplication() {
 
 //  IsisXMLApplication: Overrides of the SAX DocumentHandler interface
 void IsisXMLApplication::characters(const XMLCh *const chars,
-                                    const unsigned int length) {}
+                                    const XMLSize_t length) {}
 
 
 

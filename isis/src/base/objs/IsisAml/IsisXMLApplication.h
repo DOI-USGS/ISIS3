@@ -53,7 +53,7 @@ class IsisXMLApplication : public IsisXMLHandler {
                     const XMLCh *const qname);
 
     void characters(const XMLCh *const chars,
-                    const unsigned int length);
+                    const XMLSize_t length);
 
     void processingInstruction(const XMLCh *const target,
                                const XMLCh *const data);

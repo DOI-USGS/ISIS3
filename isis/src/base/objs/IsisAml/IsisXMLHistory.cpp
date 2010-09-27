@@ -65,7 +65,7 @@ IsisXMLHistory::~IsisXMLHistory() {
 
 //  IsisXMLHistory: Overrides of the SAX DocumentHandler interface
 void IsisXMLHistory::characters(const XMLCh *const chars,
-                                const unsigned int length) {}
+                                const XMLSize_t length) {}
 
 
 void IsisXMLHistory::endElement(const XMLCh *const uri,

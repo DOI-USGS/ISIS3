@@ -65,7 +65,7 @@ IsisXMLHelpers::~IsisXMLHelpers() {
 
 //  IsisXMLHelpers: Overrides of the SAX DocumentHandler interface
 void IsisXMLHelpers::characters(const XMLCh *const chars,
-                                const unsigned int length) {}
+                                const XMLSize_t length) {}
 
 
 void IsisXMLHelpers::endElement(const XMLCh *const uri,

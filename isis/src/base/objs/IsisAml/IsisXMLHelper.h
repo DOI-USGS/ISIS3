@@ -51,7 +51,7 @@ class IsisXMLHelper : public IsisXMLHandler {
                     const XMLCh *const qname);
 
     void characters(const XMLCh *const chars,
-                    const unsigned int length);
+                    const XMLSize_t length);
 
     void startElement(const XMLCh *const uri,
                       const XMLCh *const localname,

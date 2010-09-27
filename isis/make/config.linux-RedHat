@@ -94,8 +94,8 @@ QWTLIB    = -lqwt
 #---------------------------------------------------------------------------
 # Set up for Xerces 
 #---------------------------------------------------------------------------
-XERCESINCDIR = -I$(ISIS3SYSINC)
-XERCESLIBDIR = -L$(ISIS3SYSLIB)
+XERCESINCDIR = -I$(ISIS3LOCAL)/include/xercesc/xercesc-3.1.1
+XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
 #---------------------------------------------------------------------------
@@ -173,7 +173,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libXercesMessages.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgsl*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos-*.so"

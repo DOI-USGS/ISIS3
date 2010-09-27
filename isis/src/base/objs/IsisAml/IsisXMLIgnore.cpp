@@ -59,7 +59,7 @@ IsisXMLIgnore::~IsisXMLIgnore() {}
 
 
 void IsisXMLIgnore::characters(const XMLCh *const chars,
-                               const unsigned int length) {
+                               const XMLSize_t length) {
 }
 
 void IsisXMLIgnore::endElement(const XMLCh *const uri,
