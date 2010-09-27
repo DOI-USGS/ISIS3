@@ -1014,4 +1014,35 @@ namespace Isis {
 
     return(Stdsl);
   }
+  
+    /**
+   * Parse the regular expression entered for PointID into Tokens 
+   * and place into a vector 
+   * 
+   * @author Sharmila Prasad (8/12/2010)
+   * 
+   * @param pStr       - String containing the delimiter chars
+   * @param pStrTokens - Result Vector containing the string tokenized by Delimiter char 
+   * @param pcDelim    - Delimiting character (ex: '*' or '#' or '$'..)
+   */
+  void iString::ParseExpression(std::string pStr, std::vector<std::string> & pStrTokens, char pcDelim)
+  {
+    size_t found = pStr.find(pcDelim);
+
+    while (found != string::npos) {
+      string temp;
+      temp.assign(pStr, 0, found);
+      pStrTokens.push_back(temp);
+
+      int len1 = pStr.length() - (found+1);
+      temp.assign(pStr, found+1, len1);
+
+      pStr.assign(temp);      
+
+      found = pStr.find(pcDelim);
+    }
+    if (pStr.length()) {
+      pStrTokens.push_back(pStr);
+    }
+  }
 }
