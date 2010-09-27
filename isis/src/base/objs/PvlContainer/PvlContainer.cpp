@@ -68,7 +68,6 @@ namespace Isis {
     p_formatTemplate = NULL;
   }
 
-
   /**
    * Find a keyword with a specified name.
    * @param name The name of the keyword to look for.
@@ -395,6 +394,86 @@ namespace Isis {
     p_formatTemplate = other.p_formatTemplate;
 
     return *this;
+  }
+  
+  /**
+   * Validate all the PvlKeywords in this container
+   * 
+   * @author Sharmila Prasad (9/24/2010)
+   * 
+   * @param pPvlCont - Container to be Validated
+   */
+  void PvlContainer::ValidateAllKeywords(PvlContainer & pPvlCont)
+  {
+    // Validate the Keywords in the current Object
+    int iTmplKeySize = Keywords();
+    for(int i=0; i<iTmplKeySize; i++) {
+      PvlKeyword & pvlTmplKwrd = (*this)[i];
+      string sKeyName = pvlTmplKwrd.Name();
+      bool bKwrdFound = false;
+      
+      // These are reserved keywords for properties like "Required" or "Repeated"
+      if(sKeyName.find("__Required") != string::npos || sKeyName.find("__Repeated") != string::npos) {
+        continue;
+      }
+      
+      if(pPvlCont.HasKeyword(sKeyName)) {
+        PvlKeyword & pvlKwrd = pPvlCont.FindKeyword(sKeyName);
+        pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+        pPvlCont.DeleteKeyword(pvlKwrd.Name());
+        bKwrdFound = true;
+      }
+      else {
+        bKwrdFound = true;
+        string sOption = sKeyName + "__Required";
+        if(HasKeyword(sOption)) {
+          PvlKeyword pvlKeyOption = FindKeyword(sOption);
+          if(pvlKeyOption[0] == "true") { // Required is true
+            bKwrdFound = false;
+          }
+        }
+      }
+      if (bKwrdFound == false) {
+        string sErrMsg = "Keyword \"" + sKeyName + "\" Not Found in the Template File\n";
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+      }
+      
+      // Check for "Repeated" Option
+      ValidateRepeatOption(pvlTmplKwrd, pPvlCont);
+    }
+  }
+  
+  /**
+   * Validate Repeat Option in the Template Group. This option indicates 
+   * that a particular keyname can be repeated several times 
+   * 
+   * @author Sharmila Prasad (9/24/2010)
+   * 
+   * @param pPvlTmplKwrd - Template Keyword wit
+   * @param pPvlCont - Container with all the Keywords
+   */
+  void PvlContainer::ValidateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont)
+  {
+    string sTmplKeyName = pPvlTmplKwrd.Name();
+    string sOption = sTmplKeyName + "__Repeated";
+    bool bRepeat =false;
+    if(HasKeyword(sOption)) {
+      PvlKeyword pvlKeyOption = FindKeyword(sOption);
+      if(pvlKeyOption[0] == "true") { // Required is true
+        bRepeat = true;
+      }
+    }
+    if(bRepeat) {
+      int iKeySize = pPvlCont.Keywords();
+      for(int j=(iKeySize-1); j>=0; j--) {
+        PvlKeyword & pvlKwrd = pPvlCont[j];
+        string sKeyName = pvlKwrd.Name();
+        if(sTmplKeyName == sKeyName) {
+          pPvlTmplKwrd.ValidateKeyword(pvlKwrd);
+          pPvlCont.DeleteKeyword(pvlKwrd.Name());
+        }
+      }
+    }
   }
 
 } // end namespace isis

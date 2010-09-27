@@ -53,7 +53,8 @@ namespace Isis {
    *  @history 2010-01-06 Christopher Austin - Added CleanDuplicateKeywords()
    *  @history 2010-04-13 Eric Hyer - Added Copy constructor
    *                                - Added Assignment operator
-   *
+   *  @history 2010-09-27 Sharmila Prasad - Validate all the Keywords in a Container and
+   *                                        verify the 'Repeat' Option also
    *  @todo 2005-04-04 Need coded example.
    */
   class PvlContainer {
@@ -313,6 +314,12 @@ namespace Isis {
       };
 
       PvlContainer *p_formatTemplate;
+      
+      //! Validate All the Keywords in a Container comparing with the Template
+      void ValidateAllKeywords(PvlContainer &pPvlCont);
+      
+      //! Validate the Repeat Option for a Keyword
+      void ValidateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont);
   };
 
   std::ostream &operator<<(std::ostream &os, PvlContainer &container);
