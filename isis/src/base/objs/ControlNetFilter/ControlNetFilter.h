@@ -49,9 +49,11 @@ namespace Isis {
    * @see ControlNetwork ControlPoint ControlMeasure
    *
    * @internal
-   *   @history 2010-08-10 Sharmila Prasad - Original version
-   *   @history 2010-09-16 Sharmila Prasad - Modified prototype for GetImageStatsBySerialNum API
-   *                                         in sync with the ControlNetStatistics class
+   *  @history 2010-08-10 Sharmila Prasad - Original version
+   *  @history 2010-09-16 Sharmila Prasad - Modified prototype for GetImageStatsBySerialNum API
+   *                                        in sync with the ControlNetStatistics class
+   *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression functionality to iString class
+   *                                        Verify the DefFile in the PVL Class
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
@@ -111,14 +113,8 @@ namespace Isis {
       //! Set the output print file 
       void SetOutputFile   (string psPrintFile);
       
-      //! Parse Expressions into Tokens
-      void ParseExpression (string pStr, vector<string> & pStrTokens);
-      
       //! Print Image File and Serial Num given the Control Measure
       void PrintCubeFileSerialNum(ControlMeasure & pCMeasure);
-      
-      //! VerifyDefFile
-      static bool VerifyDefFile(Pvl & pvlDefFile);
       
     private:
       ofstream mOstm;                     //!< output stream for printing to output file

@@ -219,7 +219,7 @@ namespace Isis {
     vector<string> strTokens;
     if (pvlGrp.HasKeyword("Expression")){
       sExpr = pvlGrp["Expression"][0];
-      ParseExpression(sExpr, strTokens);
+      iString::ParseExpression(sExpr, strTokens, '*');
       #ifdef _DEBUG_
       for (int i=0; i<(int)strTokens.size(); i++) {
         odb << "[" << i << "]=" << strTokens[i] << "  Size=" << strTokens[i].length() << endl;
@@ -779,16 +779,9 @@ namespace Isis {
   {
     vector <string> sCubeNames;
     
-    int index=1;
-    iString sIndex = index;
-    string sName, sCubeIndex = "Cube" + sIndex;
-    
-    while (pvlGrp.HasKeyword(sCubeIndex)) {
-      sCubeNames.push_back(pvlGrp[sCubeIndex][0]);
-      sIndex = ++index;
-      sCubeIndex = "Cube" + sIndex;
-      
-      //odb << index << "." << sCubeNames[index-2] << endl;
+    // Store the Cubenames from the PvlGroup
+    for (int i=0; i<pvlGrp.Keywords(); i++) {
+      sCubeNames.push_back(pvlGrp[i][0]);
     }
     
     int size = sCubeNames.size();
@@ -874,7 +867,7 @@ namespace Isis {
     }
     
     vector <string> strTokens;
-    ParseExpression(sCubeExpr, strTokens);
+    iString::ParseExpression(sCubeExpr, strTokens, '*');
     
     int iTokenSize = (int)strTokens.size();
     int iNumCubes = mSerialNumFilter.Size();
@@ -1158,65 +1151,6 @@ namespace Isis {
       }
       delete (cam);
     } // end cube loop
-  }
-
-  /**
-   * Parse the regular expression entered for PointID into Tokens 
-   * and place into a vector 
-   * 
-   * @author Sharmila Prasad (8/12/2010)
-   * 
-   * @param pStr 
-   * @param pStrTokens 
-   */
-  void ControlNetFilter::ParseExpression(string pStr, vector<string> & pStrTokens)
-  {
-    size_t found = pStr.find('*');
-
-    while (found != string::npos) {
-      string temp;
-      temp.assign(pStr, 0, found);      
-      pStrTokens.push_back(temp);
-
-      int len1 = pStr.length() - (found+1);
-      temp.assign(pStr, found+1, len1);      
-
-      pStr.assign(temp);      
-
-      found = pStr.find('*');
-    }
-    if (pStr.length()) {
-      pStrTokens.push_back(pStr);
-    }
-  }
-  
-  /**
-   * Static function to verify Pvl DefFile containing Filters to be in the 
-   * required format 
-   * 
-   * @author Sharmila Prasad (9/16/2010)
-   * 
-   * @param pvlDefFile 
-   * 
-   * @return bool - Success / Failure
-   */
-  bool ControlNetFilter::VerifyDefFile(Pvl & pvlDefFile)
-  {
-    // Parse the Groups in Point Object
-    PvlObject filtersObj = pvlDefFile.FindObject("Filters", Pvl::Traverse);
-    int iNumGroups = filtersObj.Groups();
-    map <string, int> filterMap;
-    
-    for (int i=0; i<iNumGroups; i++) {
-      PvlGroup pvlGrp = filtersObj.Group(i);
-      string sFilterName = pvlGrp.Name();
-      if (filterMap.count(sFilterName) > 0) {
-        return false;
-      }
-      filterMap[sFilterName]++;
-      sFilterName = iString::DownCase(sFilterName);
-    }
-    return true;
   }
 }
 
