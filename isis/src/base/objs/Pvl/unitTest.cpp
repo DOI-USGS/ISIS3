@@ -133,4 +133,15 @@ int main() {
     cout << errors;
     e.Clear();
   }
+  
+  // Validate a PVL
+  Pvl pvlTmpl("cnetstatsTest.def");
+  cout << "\n\n***Template PVL**\n" << pvlTmpl << endl;
+  
+  Pvl pvlUser("pointdef.def");
+  cout << "\n\n***Test PVL**\n" << pvlUser << endl;
+  
+  Pvl pvlResults;
+  pvlTmpl.ValidatePvl(pvlUser, pvlResults);
+  cout << "\n\n**Result PVL**\n" << pvlResults << endl;
 }

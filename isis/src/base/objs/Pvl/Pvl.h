@@ -128,7 +128,7 @@ namespace Isis {
    *  @history 2010-07-12 Steven Lambright - It's a bad idea to copy 
    *            p_internalTemplate in the copy constructor since it describes
    *            whether or not to delete an internal pointer.
-   *
+   *  @history 2010-079-27 Sharmila Prasad - Validate a Pvl with the Template Pvl
    *  @todo 2005-02-14 add coded example to class documentation.
    */
   class Pvl : public Isis::PvlObject {
@@ -172,6 +172,9 @@ namespace Isis {
       void SetFormatTemplate(const std::string &filename);
 
       const Pvl &operator=(const Pvl &other);
+      
+      //! Validate a Pvl with the Template Pvl
+      void ValidatePvl(const Pvl & pPvl, Pvl & pPvlResults);
 
     private:
       void Init();
