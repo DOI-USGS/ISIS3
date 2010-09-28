@@ -38,6 +38,9 @@
       Added an error when no new overlaps are calculated. (i.e. All overlaps
       contain only a single Serial Number)
     </change>
+    <change name="Christopher Austin" date="2010-09-27">
+      Moved the above error handling to ImageOverlapSet.
+    </change>
   </history>
 
   <groups>

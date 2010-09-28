@@ -38,19 +38,9 @@ void IsisMain() {
   // Now we want the ImageOverlapSet to calculate our overlaps
   ImageOverlapSet overlaps(true);
 
-  // The following line was replaced to allow checking of the overlap size
-  //overlaps.FindImageOverlaps(serialNumbers, Filename(ui.GetFilename("TO")).Expanded());
+  // Use multi-threading to create the overlaps
+  overlaps.FindImageOverlaps(serialNumbers, Filename(ui.GetFilename("TO")).Expanded());
 
-  overlaps.FindImageOverlaps(serialNumbers);
-
-  // Error if the overlaps are empty
-  if(overlaps.Size() == serialNumbers.Size()) {
-    std::cerr << "No Overlaps Calculated" << std::endl;
-    string msg = "No overlaps were calculated from the input cubes in the [FROMLIST].";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
-  }
-
-  overlaps.WriteImageOverlaps(Filename(ui.GetFilename("TO")).Expanded());
 
   // This will only occur when "CONTINUE" was true, so we can assume "ERRORS" was
   //   an entered parameter.
