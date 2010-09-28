@@ -92,8 +92,7 @@ namespace Isis {
         p_minRadius = table[0]["MinimumRadius"];
         p_maxRadius = table[0]["MaximumRadius"];
         Isis::PvlGroup &mapgrp = demlab.FindGroup("Mapping",Isis::Pvl::Traverse);
-        p_demScale = (double) mapgrp["PixelResolution"];
-        p_demScale = p_demScale / 1000.0;
+        p_demScale = (double) mapgrp["Scale"];
       }
     }
 
@@ -207,6 +206,8 @@ namespace Isis {
     SpiceDouble plat, plon, pradius;
     if(p_hasElevationModel) {
 
+      double cmin = cos((90.0 - 1.0 / (2.0*p_demScale)) * Isis::PI/180.0);
+
       // Separate iteration algorithms are used for different projections -
       // use this iteration for equatorial cylindrical type projections 
       if (p_demProj->IsEquatorialCylindrical()) {
@@ -271,7 +272,8 @@ namespace Isis {
         double psi1 = vsep_c(negg1,ulookB);
 
         // Set dalpha to be half the grid spacing for nyquist sampling
-        double dalpha = (Isis::PI/180.0)/(2.0*p_demScale);
+        //double dalpha = (Isis::PI/180.0)/(2.0*p_demScale);
+        double dalpha = (Isis::PI/180.0) * MAX(cos(g1lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
         double r1 = DemRadius(g1lat,g1lon);
         if (Isis::IsSpecial(r1)) {
           p_hasIntersection = false;
@@ -382,6 +384,13 @@ namespace Isis {
                 done = true;
               }
             }
+            g1[0] = g2[0];
+            g1[1] = g2[1];
+            g1[2] = g2[2];
+            g1len = g2len; 
+            r1 = r2;
+            psi1 = psi2;
+            dalpha = (Isis::PI/180.0) * MAX(cos(g2lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
           }
         }
 
