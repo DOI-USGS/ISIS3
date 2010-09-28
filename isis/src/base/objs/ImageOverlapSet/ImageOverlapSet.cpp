@@ -160,8 +160,8 @@ namespace Isis {
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, std::string outputFile) {
     // Do a common sense programmer check, this should be empty before we start
     if(!p_lonLatOverlaps.empty()) {
-      string msg = "FindImageOverlaps(SerialNumberList&,std::string) may not be called on an ImageOverlapSet " \
-                   "which already contains overlaps.";
+      string msg = "FindImageOverlaps(SerialNumberList&,std::string) may not be called on " \
+                   "an ImageOverlapSet which already contains overlaps.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -312,7 +312,7 @@ namespace Isis {
     try {
       // Let's get an istream pointed at our file
       std::ifstream inStream;
-      inStream.open(file.c_str(), fstream::in);
+      inStream.open(file.c_str(), fstream::in | fstream::binary);
 
       while(!inStream.eof()) {
         p_lonLatOverlaps.push_back(new ImageOverlap(inStream));
@@ -408,6 +408,11 @@ namespace Isis {
     bool failed = false;
     if(p_threadedCalculate) p_calculatePolygonMutex.lock();
 
+    if(p_lonLatOverlaps.size() == 0) {
+      iString msg = "No overlaps were found.";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
     try {
       // Let's get an ostream pointed at our file
       std::ofstream outStream;
@@ -483,8 +488,8 @@ namespace Isis {
     for(unsigned int outside = 0; outside < p_lonLatOverlaps.size() - 1; ++outside) {
       p_calculatedSoFar = outside - 1;
 
-      // unblock the writing process after every 10 polygons
-      if(p_calculatedSoFar % 10 == 0) {
+      // unblock the writing process after every 10 polygons if we need to write
+      if(p_calculatedSoFar % 10 == 0 && (!snlist || p_lonLatOverlaps.size() > (unsigned)snlist->Size())) {
         if(p_threadedCalculate) p_calculatePolygonMutex.unlock();
       }
 
@@ -709,6 +714,13 @@ namespace Isis {
 
     p_calculatedSoFar = p_lonLatOverlaps.size();
     delete emptyPolygon;
+
+    // Do not write empty overlap files
+    if(snlist) {
+      if(p_lonLatOverlaps.size() == (unsigned)snlist->Size()) {
+        p_lonLatOverlaps.clear();
+      }
+    }
 
     // unblock the writing process
     p_calculatePolygonMutex.unlock();

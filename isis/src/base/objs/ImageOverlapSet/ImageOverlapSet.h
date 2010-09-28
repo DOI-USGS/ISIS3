@@ -83,6 +83,8 @@ namespace Isis {
    *           code into smaller methods, now new elements are inserted next
    *           instead of appended to the end of the overlap list, and added more
    *           error-recovery solutions.
+   *  @history 2010-09-27 Christopher Austin - Added an error when no new overlaps
+   *           are calculated. (i.e. All overlaps contain only a single Serial Number)
    */
   class ImageOverlapSet : private QThread {
     public:
