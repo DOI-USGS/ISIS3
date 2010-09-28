@@ -315,3 +315,67 @@ Group = SUBFRAME5_PARAMETERS
 End_Group
 End
 
+
+
+***Template PVL**
+Object = Filters
+  Filters__Required = true
+  Test_Required     = false
+  Test_Repeated     = true
+  Test              = string
+
+  Group = Point_ErrorMagnitude
+    Point_ErrorMagnitude__Required = false
+    LessThan                       = double
+    LessThan__Required             = false
+    LessThan__Repeated             = false
+    GreaterThan                    = double
+    GreaterThan__Required          = false
+    GreaterThan__Repeated          = false
+  End_Group
+
+  Group = Point_CubeNames
+    Point_CubeNames__Required = false
+    Cube                      = string
+    Cube__Required            = false
+    Cube__Repeated            = true
+  End_Group
+End_Object
+End
+
+
+***Test PVL**
+Object = Filters
+  Test12 = Testing
+  Test   = Testing
+  Test   = Testing
+
+  Group = Pointerrormagnitude
+    LessThan    = 3.5
+    GreaterThan = 0
+  End_Group
+
+  Group = Point_errormagnitude2
+    lessthan    = 3.5
+    GreaterThan = 0
+  End_Group
+
+  Group = Point_CubeNames
+    Cube = SerialNumber1
+    Cube = SerialNumber2
+    Cube = SerialNumber3
+  End_Group
+End_Object
+End
+
+
+**Result PVL**
+Object = Filters
+  Test12 = Testing
+
+  Group = Point_errormagnitude2
+    lessthan    = 3.5
+    GreaterThan = 0
+  End_Group
+End_Object
+End
