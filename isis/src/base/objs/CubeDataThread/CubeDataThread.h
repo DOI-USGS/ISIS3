@@ -8,6 +8,7 @@ namespace Isis {
   class Cube;
   class Filename;
   class Brick;
+  class UniversalGroundMap;
 };
 
 template<typename T> class QList;
@@ -38,8 +39,14 @@ namespace Isis {
    * @author 2010-01-15 Steven Lambright
    *
    * @internal
-   *   @history 2010-04-12 Eric Hyer - Added check for valid cube ID's for slots
-   *                                   ReadCube and ReadWriteCube
+   *   @history 2010-04-12 Eric Hyer - Added check for valid cube ID's for
+   *       slots ReadCube and ReadWriteCube.
+   *   @history 2010-07-29 Eric Hyer - AcquireLock now flushes events for this
+   *       thread instead of the main eventloop's thread.
+   *   @history 2010-08-12 Steven Lambright - Fixed memory leak and simplified
+   *       acquiring write bricks
+   *   @history 2010-08-23 Eric Hyer - Added the FindCubeId method
+   *   @history 2010-08-24 Eric Hyer - Added the RemoveCube method
    *
    *   @todo Add state recording/reverting functionality
    *
@@ -51,16 +58,22 @@ namespace Isis {
       CubeDataThread();
       virtual ~CubeDataThread();
 
-      int AddCube(const Isis::Filename &fileName,
+      int AddCube(const Filename &fileName,
                   bool mustOpenReadWrite = false);
-
-      int AddCube(Isis::Cube *cube);
+      int AddCube(Cube *cube);
+      
+      void RemoveCube(int cubeId);
 
       void AddChangeListener();
       void RemoveChangeListener();
 
       int BricksInMemory();
 
+      UniversalGroundMap *GetUniversalGroundMap(int cubeId) const;
+      
+      const Cube *GetCube(int cubeId) const;
+      int FindCubeId(const Cube *) const; 
+      
     public slots:
       void ReadCube(int cubeId, int startSample, int startLine,
                     int endSample, int endLine, int band, void *caller);
@@ -70,6 +83,7 @@ namespace Isis {
       void DoneWithData(int, const Isis::Brick *);
 
     signals:
+
       /**
        * This signal will be emitted when ReadCube has finished processing.
        *
@@ -111,7 +125,28 @@ namespace Isis {
       void BrickChanged(int cubeId, const Isis::Brick *data);
 
     private:
-      int OverlapIndex(const Isis::Brick *initial, int cubeId,
+      /**
+       * Assigning CubeDataThreads to eachother is bad, so this has been
+       * intentionally not implemented!
+       *
+       * @param cdt The CubeDataThread that would be used to copy construct
+       *            this CubeDataThread if this method were implemented (which
+       *            its not)
+       */
+      CubeDataThread(const CubeDataThread &cdt);
+      
+      /**
+       * Assigning CubeDataThreads to eachother is bad, so this has been
+       * intentionally not implemented!
+       *
+       * @param rhs The right hand side CubeDataThread in the assignment
+       *            operation.
+       *
+       * @returns would return this if it was implemented :)
+       */
+      const CubeDataThread &operator=(CubeDataThread rhs);
+      
+      int OverlapIndex(const Brick *initial, int cubeId,
                        int instanceNum, bool &exact);
 
       void GetCubeData(int cubeId, int ss, int sl, int es, int el, int band,
@@ -125,13 +160,13 @@ namespace Isis {
        * This is a list of the opened cubes. Since opening cubes is allowed in
        * other threads (via AddCube(...)) and is accessed with many threads, all
        * operations on this map must be serialized (non-simultaneous). The
-       * p_managedCubesMutex enables this.
+       * p_managedCubesMutex enables this.  The bool indicates ownership.
        *
        */
-      QMap< int, QPair< bool, Isis::Cube * > > * p_managedCubes;
+      QMap< int, QPair< bool, Cube * > > * p_managedCubes;
 
       //! This locks the member variable p_managedCubes
-      QMutex *p_managedCubesMutex;
+      QMutex *p_threadSafeMutex;
 
       /**
        * This is a list of bricks in memory and their locks. The following
@@ -156,7 +191,7 @@ namespace Isis {
        *        and proceed to the end.
        *   10) No NULL or invalid pointers may exist in this list.
        */
-      QList< QPair<QReadWriteLock *, Isis::Brick *> > * p_managedData;
+      QList< QPair<QReadWriteLock *, Brick *> > * p_managedData;
 
       //! This is the associated cube ID with each brick
       QList< int > * p_managedDataSources;
@@ -166,6 +201,9 @@ namespace Isis {
 
       //! This is the unique id counter for cubes
       unsigned int p_currentId;
+      
+      //! This is set to help the shutdown process when deleted
+      bool p_stopping;
 
       /**
        * Number of locks being attempted that re-entered the event loop. As long

@@ -1,3 +1,5 @@
+Testing FindCubeId method :  5
+
 =============== Testing Basic Read ===============
   CubeDataThreadTester::ReadBrick
     Requester is me? Yes
@@ -116,7 +118,24 @@
       5
 
 
+Creating Deadlock then trying to remove cubes
+=============== Testing Conflicting Cube R/W ===============
+  CubeDataThreadTester::ReadWriteBrick
+    Changing Brick : Index 0 Becoming 5
+
+    Old Data: 
+      5	3	4
+    New Data: 
+      5	3	4
+
+**PROGRAMMER ERROR** CubeDataThread::RemoveCube failed cube ID [3] has requested Bricks
+**PROGRAMMER ERROR** CubeDataThread::RemoveCube failed because cube ID [-1] not found
+Remove cube succeeded
+
+
+Deleting CubeDataThread with allocated bricks...
+
+
 Cleanup Tester
-Cleanup Cubes
 Deleting Temporary R/W Cubes
 Unit Test Complete

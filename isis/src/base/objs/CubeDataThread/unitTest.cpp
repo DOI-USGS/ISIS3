@@ -25,6 +25,9 @@ void IsisMain() {
 
   Cube someCube;
   cubeData->AddCube(&someCube);
+  
+  cout << "Testing FindCubeId method :  " << cubeData->FindCubeId(&someCube)
+       << endl << endl;
 
   CubeDataThreadTester *tester = new CubeDataThreadTester(cubeData);
   tester->Connect();
@@ -121,11 +124,51 @@ void IsisMain() {
   }
   // Test 7 is complete
 
+  // Create a deadlock
+
+  cout << endl << endl << "Creating Deadlock then trying to remove cubes" 
+       << endl;
+  tester->WriteCubeTest3(readWrite1);
+
+  // Wait for test deadlock
+  while(cubeData->BricksInMemory() != 1 ||
+        tester->NumberOfTestsDone() != 14) {
+    QThread::yieldCurrentThread();
+  }
+  
+  try {
+   cubeData->RemoveCube(readWrite1);
+   cout << "Remove cube didn't throw an exception, PROBLEM!" << endl;
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
+  
+  try {
+   cubeData->RemoveCube(-1);
+   cout << "Remove cube didn't throw an exception, PROBLEM!" << endl;
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
+  
+  try {
+   cubeData->RemoveCube(readOnly1);
+   cout << "Remove cube succeeded" << endl;
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
+
+  cout << endl << endl << "Deleting CubeDataThread with allocated bricks..." 
+       << endl;
+  delete cubeData;
+
   cout << endl << endl << "Cleanup Tester" << endl;
   delete tester;
-
-  cout << "Cleanup Cubes" << endl;
-  delete cubeData;
 
   cout << "Deleting Temporary R/W Cubes" << endl;
   remove("unitTest2.cub");
