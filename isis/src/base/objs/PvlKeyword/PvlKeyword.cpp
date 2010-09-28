@@ -860,6 +860,12 @@ namespace Isis {
     bool multiLineComment = false;
     bool error = !is.good();
 
+    // These variable are used to back off of the new support of multi-line
+    // comments in order to support some older, invalid PVLs with comments
+    // starting with /* and no ending */ (Stuart made me do it)
+    bool convertMultilineToSingleLine = false;
+    istream::pos_type beforeKeywordPos = is.tellg();
+
     while(!error && !keywordDone) {
       istream::pos_type beforeLine = is.tellg();
 
@@ -873,7 +879,18 @@ namespace Isis {
             keywordString[keywordString.size()-1] == '\n') {
           line = "End";
 
-          if(multiLineComment) {
+          if(multiLineComment && !convertMultilineToSingleLine) {
+            // We ended while in a multi-line comment... let's pretend these
+            //   comments are really single-line comments and try again from
+            //   the beginning.
+            convertMultilineToSingleLine = true;
+            is.clear();
+            is.seekg(beforeKeywordPos);
+            keywordString = "";
+            multiLineComment = false;
+            continue;
+          }
+          else {
             error = true;
           }
         }
@@ -893,10 +910,14 @@ namespace Isis {
             (line[1] == '*' || line[1] == '/')) {
           comment = true;
 
-          if(line[1] == '*') {
+          if(line[1] == '*' && !convertMultilineToSingleLine) {
             multiLineComment = true;
             keywordString += line.substr(0, 2);
             line = iString(line.substr(2)).Trim(" \r\n\t");
+          }
+          // If convertMultilineToSingleLine then convert /* to //
+          else if(line[1] == '*') {
+            line[1] = '/';
           }
         }
       }
@@ -1004,11 +1025,11 @@ namespace Isis {
 
       string msg;
 
-      if(keywordString.empty() && !multiLineComment) {
-        msg = "Input contains no Pvl Keywords";
-      }
-      else if(multiLineComment) {
+      if(convertMultilineToSingleLine) {
         msg = "Input ends while still in a multi-line comment";
+      }
+      else if(keywordString.empty() && !multiLineComment) {
+        msg = "Input contains no Pvl Keywords";
       }
       else {
         msg = "The keyword [" + keywordString + "] does not appear to be";
@@ -1085,7 +1106,7 @@ namespace Isis {
     };
 
     // Need more data if nothing is here!
-    if(keyword.empty()) return 0;
+    if(keyword.empty()) return false;
 
     /*
       Step 1: Read Comments
@@ -1117,6 +1138,10 @@ namespace Isis {
       if(keywordStart == "/*") {
         noneStripped = false;
         bool inComment = true;
+
+        // No */ to accompany our /*... need more data
+        if (keyword.find("*/") == string::npos)
+          return false;
 
         while(inComment && keyword.find("*/") != string::npos) {
           // Correct the */ to make sure it has a \n after it,
@@ -1796,9 +1821,9 @@ namespace Isis {
   {
     int iTmplKwrdSize = Size();
     int iSize = pvlKwrd.Size();
-    
+
     string sType = iString::DownCase(p_values[0]);
-    
+
     // Type integer
     if(sType == "integer") {
       for(int i=0; i<iSize; i++) {
@@ -1809,7 +1834,7 @@ namespace Isis {
       }
       return;
     }
-    
+
     // Type double
     if(sType == "double") {
       for(int i=0; i<iSize; i++) {
