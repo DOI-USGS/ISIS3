@@ -26,6 +26,8 @@
 #include "UniversalGroundMap.h"
 #include "SpecialPixel.h"
 
+#include "ImagePolygon.h"
+
 enum SeedDomain {
   XY,
   SampleLine
@@ -314,7 +316,6 @@ void IsisMain() {
     }
 
     // No points were seeded in this polygon, so collect some stats and move on
-    //if (seed.size() == 0) {
     if(points.size() == 0) {
       stats_tolerance++;
       continue;
@@ -353,9 +354,9 @@ void IsisMain() {
     //   Create a control point for each seeded point in this overlap
     for(unsigned int point = 0; point < seed.size(); ++point) {
 
-      ControlPoint control;
-      control.SetId(pointId.Next());
-      control.SetType(ControlPoint::Tie);
+      ControlPoint controlpt;
+      controlpt.SetId(pointId.Next());
+      controlpt.SetType(ControlPoint::Tie);
 
       // Create a measurment at this point for each image in the overlap area
       for(int sn = 0; sn < overlaps[ov]->Size(); ++sn) {
@@ -363,9 +364,17 @@ void IsisMain() {
 
         // Get the line/sample of the lat/lon for this cube
         UniversalGroundMap *gmap = gMaps[(*overlaps[ov])[sn]];
-        if(!gmap->SetUniversalGround(seed[point]->getY(), seed[point]->getX())) {
-          std::string msg = "Unable to set Universal Ground for Image:" + serialNumbers.Filename(sn);
+
+        if(!gmap) {
+          std::string msg = "Unable to create a Universal Ground for Serial Number [";
+          msg += (*overlaps[ov])[sn] + "] The associated image is more than ";
+          msg += "likely missing from your FROMLIST.";
           throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        }
+
+        if(!gmap->SetUniversalGround(seed[point]->getY(), seed[point]->getX())) {
+          // This error is more than likely due to floating point roundoff
+          continue;
         }
 
         // Check the line/sample with the gmap for image edge
@@ -417,15 +426,17 @@ void IsisMain() {
         }
         measurment.SetChooserName("Application autoseed");
         if(sn == 0) measurment.SetReference(true);
-        control.Add(measurment);
+        controlpt.Add(measurment);
       }
 
-      if(control.NumValidMeasures() < 2) {
-        control.SetIgnore(true);
+      if(controlpt.NumValidMeasures() < 2) {
+        controlpt.SetIgnore(true);
         cpIgnoredCount ++;
       }
 
-      cnet.Add(control);
+      if(controlpt.Size() > 0) {
+        cnet.Add(controlpt);
+      }
       delete seed[point];
 
     } // End of create control points loop
@@ -437,13 +448,12 @@ void IsisMain() {
     UniversalGroundMap *gmap = gMaps[serialNumbers.SerialNumber(sn)];
     delete gmap;
   }
+  gMaps.clear();
 
   for(unsigned int i = 0 ; i < points.size(); i ++) {
     delete points[i];
     points[i] = NULL;
   }
-
-  gMaps.clear();
 
   //Log the ERRORS file
   if(ui.WasEntered("ERRORS")) {

@@ -91,6 +91,10 @@
     <change name="Sharmila Prasad" date="2010-06-30">
       Throw exception, when SetUniversalGround Fails
     </change>
+    <change name="Christopher Austin" date="2010-09-27">
+      Removed the SetUniversalGround fail exception, and added an exception when
+      serial numbers in the overlaps list are not included in the FROMLIST.
+    </change>
   </history>
 
   <groups>
