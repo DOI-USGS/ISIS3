@@ -965,7 +965,14 @@ namespace Isis {
    * @return double North Azimuth
    */
   double Camera::NorthAzimuth() {
-    return ComputeAzimuth(LocalRadius(), 90.0, 0.0);
+    double lat = UniversalLatitude();
+    if (lat >= 0.0) {
+      return ComputeAzimuth(LocalRadius() / 1000.0, 90.0, 0.0);
+    } else {
+      double azimuth = ComputeAzimuth(LocalRadius() / 1000.0, -90.0, 0.0) + 180.0;
+      if (azimuth > 360.0) azimuth = azimuth - 360.0;
+      return azimuth;
+    }
   }
 
   /**
@@ -1007,6 +1014,8 @@ namespace Isis {
    *
    * @history 2009-09-23  Tracie Sucharski - Convert negative
    *                         longitudes coming out of reclat.
+   * @history 2010-09-28  Janet Barrett - Added Randy's updated method
+   *                         for calculating the azimuth.
    *
    * @todo Write PushState and PopState method to ensure the
    * internals of the class are set based on SetImage or SetGround
@@ -1030,25 +1039,22 @@ namespace Isis {
     Coordinate(oB);
 
     // Get the difference unit vector
-    SpiceDouble poB[3], upoB[3];
+    SpiceDouble poB[3],upoB[3];
     vsub_c(pB, oB, poB);
     vhat_c(poB, upoB);
 
     // Scale to be within a pixel (km)
     double scale = (PixelResolution() / 1000.0) / 2.0;
-    SpiceDouble supoB[3];
-    vscl_c(scale, upoB, supoB);
+    SpiceDouble hpoB[3];
+    SpiceDouble spoB[3];
+    vperp_c(upoB, oB, hpoB);
+    vscl_c(scale, hpoB, spoB);
 
     // Compute the new point in body fixed.  This point will be within
     // a pixel of the origin but in the same direction as the
     // requested lat/lon
     SpiceDouble nB[3];
-    vadd_c(oB, supoB, nB);
-
-    // However, it could be below the surface of the planet so bring it
-    // back
-    vhat_c(nB, nB);
-    vscl_c(LocalRadius() / 1000.0, nB, nB);
+    vadd_c(oB, spoB, nB);
 
     // Get the origin image coordinate
     double osample = Sample();
