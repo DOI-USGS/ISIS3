@@ -111,8 +111,6 @@
     COMMENT: /* SOMECOMMENT1 */
     NAME: KEYWORD
     VALUE: SOME_VAL
-/*SOMECOMMENT1
-'KEYWORD = SOME_VAL' ------------> INCOMPLETE
 KEYWORD = '/*
 '*/'' ---------------------------> VALID
     NAME: KEYWORD
@@ -407,14 +405,6 @@ Output:
 KEYWORD = SOME_VAL
 
 Input:
-/*SOMECOMMENT1
-KEYWORD = SOME_VAL
-
-Output: 
-//SOMECOMMENT1
-KEYWORD = SOME_VAL
-
-Input:
 KEYWORD = '/*
 */'
 
@@ -550,12 +540,5 @@ Test_key_2 = "Might work"
 **USER ERROR** [Bob is a name] is invalid. Keyword name cannot contain whitespace.
 Test_key_3 = "Might'not work"
 Invalid Keyword Type: Integer Expected
-**PARSE ERROR** Cannot convert (3.5) to an integer
 Invalid Keyword Value: Expected values "value1", "value2", "value3"
-**USER ERROR** Wrong Type of value in the Keyword "KeyName" 
-
 Invalid Keyword Type: Expected  Boolean values "true", "false", "null"
-**USER ERROR** Wrong Type of value in the Keyword "KeyName" 
-
-**PVL ERROR** Error in pvl on line [1]
-**PVL ERROR** Input ends while still in a multi-line comment
