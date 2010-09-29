@@ -19,7 +19,7 @@ Group = GroundPoint
   # Spacecraft Information
   SpacecraftPosition         = (216.76438021037, 54.256829538645,
                                 -2462.1179579968) <km>
-  SpacecraftAzimuth          = 211.3041013642
+  SpacecraftAzimuth          = 211.30410136438
   SlantDistance              = 734.86014724525 <km>
   TargetCenterDistance       = 2472.2369302253 <km>
   SubSpacecraftLatitude      = -84.814280390523
@@ -31,7 +31,7 @@ Group = GroundPoint
   # Sun Information
   SunPosition                = (142092302.24738, 46513072.418956,
                                 3175615.049146) <km>
-  SubSolarAzimuth            = 91.898419271085
+  SubSolarAzimuth            = 91.898419270824
   SolarDistance              = 0.99964723782732 <AU>
   SubSolarLatitude           = 1.2167758823866
   SubSolarLongitude          = 18.125552305876
@@ -41,7 +41,7 @@ Group = GroundPoint
   Phase                      = 86.187914936426
   Incidence                  = 85.984352390204
   Emission                   = 0.54329574339681
-  NorthAzimuth               = 87.645652990003
+  NorthAzimuth               = 87.645642357759
 
   # Time
   EphemerisTime              = -182103311.79772 <seconds>
@@ -71,7 +71,7 @@ Group = GroundPoint
   # Spacecraft Information
   SpacecraftPosition         = (216.76438021037, 54.256829538645,
                                 -2462.1179579968) <km>
-  SpacecraftAzimuth          = 281.0452412939
+  SpacecraftAzimuth          = 281.04524129395
   SlantDistance              = 734.93178063402 <km>
   TargetCenterDistance       = 2472.2369302253 <km>
   SubSpacecraftLatitude      = -84.814280390523
@@ -83,7 +83,7 @@ Group = GroundPoint
   # Sun Information
   SunPosition                = (142092302.24738, 46513072.418956,
                                 3175615.049146) <km>
-  SubSolarAzimuth            = 91.888489308716
+  SubSolarAzimuth            = 91.888489445517
   SolarDistance              = 0.99964718552167 <AU>
   SubSolarLatitude           = 1.2167758823866
   SubSolarLongitude          = 18.125552305876
@@ -93,7 +93,7 @@ Group = GroundPoint
   Phase                      = 86.799461484504
   Incidence                  = 85.725629389695
   Emission                   = 1.0980943778398
-  NorthAzimuth               = 89.56396439469
+  NorthAzimuth               = 89.530798360521
 
   # Time
   EphemerisTime              = -182103311.79772 <seconds>
