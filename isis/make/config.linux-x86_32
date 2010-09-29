@@ -162,7 +162,7 @@ SUPERLULIB    = -lsuperlu_3.0 -lblas -lgfortran
 PROTOBUFINCDIR = -I$(ISIS3LOCAL)/include/google-protobuf/protobuf2.3.0
 PROTOBUFLIBDIR = -L$(ISIS3LOCAL)/lib
 PROTOBUFLIB    = -lprotobuf
-
+PROTOC         = $(ISIS3LOCAL)/bin/protoc
 
 #---------------------------------------------------------------------------
 # Set up for kakadu
