@@ -223,11 +223,11 @@ Group = Mapping
   LatitudeType       = Planetocentric
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 360
-  MinimumLatitude    = 87.796623049558
+  MinimumLatitude    = 87.796623049559
   MaximumLatitude    = 90.0
   MinimumLongitude   = 0.0
   MaximumLongitude   = 360.0
-  PixelResolution    = 193.58279339242
+  PixelResolution    = 193.58279339243
   ProjectionName     = Sinusoidal
 End_Group
 End
