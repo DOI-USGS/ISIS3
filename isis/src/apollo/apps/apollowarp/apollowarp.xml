@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="apollowarp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+      Warp an image to another using control points
+  </brief>
+
+  <description>
+      This program warps Apollo images using the reseau information. (note: findapollorx must be run first).
+  </description>
+
+  <history>
+    <change name="Jacob Danton" date="2007-01-30">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Apollo</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to warp
+        </brief>
+        <description>
+          Use this parameter to select the filename. All bands within the file
+          will be warped unless a specific band is specified.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the results of the warping.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Warp parameters">
+      <parameter name="DEGREE">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>Order of polynomial</brief>
+        <description>
+            The order of the polynomial to be used in the linear regression fit.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+      <parameter name="WEIGHTED">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>Weight the control points using distance</brief>
+        <description>
+            The control points will be weighted based on distance if this option is selected.
+            If it is not selected, all control points will have a weight of 1, reguardless of distance.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Interpolation">
+      <parameter name="INTERPOLATION">
+        <type>string</type>
+        <default>
+          <item>NEARESTNEIGHBOR</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolutioin interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>
+

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="remapollorx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Removes Reseaus from an Apollo image
+  </brief>
+
+  <description>
+    This program will remove Reseaus from Apollo images.  
+    The Reseaus are removed using either PATCH interpolation of the 
+    surrounding pixels or by simply putting NULLs in the portion of the 
+    image around the Reseau location of the input image.  The ACTION 
+    parameter is used to tell the program which of these two actions to 
+    take. RESVALID is used to determine whether the
+    program will check the reseau valid flag for nominal reseaux before
+    removing the reseau.  If RESVALID is NO, the program will not check
+    the reseau valid flag for nominal reseaux and all the reseaux will be
+    removed except invalid nominal positions.  If RESVALID is YES, the 
+    program will check the reseau valid flag that is output from the 
+    findrx program.  If the flag is 0, the program will not remove that
+    reseau.  If the flag is 1, the reseau will be removed.  If the flag is
+    -1, indicating an invalid nominal position, the reseau will not be
+    removed in any case.   The output cube file can be written over the
+    input file or a new output cube can be created.  To overwrite the input
+    file, the TO parameter should be set to blank, " ".  The "findrx"
+    program, which writes the Reseau locations, Reseau type, and a valid
+    flag to the cube file label, must be run before "remapollorx".
+  </description>
+
+  <category>
+    <missionItem>Apollo</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>findapollorx</item>
+      <item>findrx</item>
+      <item>remrx</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2007-01-18">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+          The cube the reseaus will be removed from.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the data with reseaus removed. (Leave blank to overwrite original)
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+        <parameter name="WIDTH">
+            <type>integer</type>
+            <brief>
+                Reseau width
+            </brief>
+            <description>
+                The width of the Apollo reseau.
+            </description>
+            <default><item>5</item></default>
+        </parameter>
+        <parameter name="ACTION">
+            <type>string</type>
+            <brief>
+                The way the reseaus will be removed
+            </brief>
+            <description>
+                There are 2 options for removing the Reseaus.  The program 
+                can replace pixels inside the SDIM x LDIM box with Null or 
+                PATCH interpolation. Defaults to PATCH.
+            </description>
+            <default><item>PATCH</item></default>
+            <list>
+                <option value="PATCH">
+                    <brief>
+                       Replace values with PATCH interpolation
+                    </brief>
+                    <description>
+                        This option uses PATCH interpolation to create new DN
+                        values for the pixels inside the SDIM x LDIM box.
+                    </description>
+                </option>
+                <option value="NULL">
+                    <brief>
+                       Replace values with NULLs
+                    </brief>
+                    <description>
+                       This option will replace each value inside the SDIM x LDIM
+                       box with the Isis::NULL value.  This allows the user to run 
+                       another filter program to replace the NULL values.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+
+        <parameter name="RESVALID">
+            <type>boolean</type>
+            <brief>
+                Check Reseau Valid Flag?
+            </brief>
+            <description>
+                If this parameter is TRUE, the reseau valid flag will be
+                checked before the reseau is removed.  If the reseau 
+                valid flag is a 0 or -1, the reseau will not be removed.
+                If the reseau valid flag is a 1, the reseau will be
+                removed.  Reseaus with a valid flag=-1 are never removed.
+                This flag indicates an invalid nominal position.
+                If RESVALID is FALSE, the reseau valid flag will not be 
+                checked for nominals and all the reseaus will be removed,
+                except the invalid nominals. Defaults to FALSE.
+            </description>
+            <default><item>FALSE</item></default>
+        </parameter>
+    </group>
+  </groups>
+</application>
+

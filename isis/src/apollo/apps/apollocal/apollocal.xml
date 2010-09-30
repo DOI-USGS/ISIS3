@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="apollocal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Radiometric correction of Apollo Planetary images
+  </brief>
+
+  <description>
+  </description>
+
+  <category>
+    <missionItem>Apollo</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>apollowarp</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2007-05-09">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube file name
+        </brief>
+        <description>
+          The cube to be calibrated.  
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the calibrated data.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+</application>

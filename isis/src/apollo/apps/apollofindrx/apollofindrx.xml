@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="apollofindrx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Find and refine reseau points in an Apollo cube
+  </brief>
+
+  <description>
+    This program will read in an Apollo cube and refine the positions of the Reseau points. 
+    It will also modify the cube's label so the Reseaus are matched with sub-pixel accuracy.
+    The new reseau coordinate set is then set to "Refined", and the validity of the pixels that
+    have nothing wrong will be set to 1. 
+  </description>
+
+  <category>
+      <missionItem>Apollo</missionItem>
+  </category>
+  
+  <seeAlso>
+    <applications>
+      <item>remapollorx</item>
+      <item>findrx</item>
+      <item>remrx</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jacob Danton" date="2007-01-24">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to be read
+        </brief>
+        <description>
+          The cube to be used to extract Reseau points from.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+    
+    <group name="Parameters">
+      <parameter name="TOLERANCE">
+        <type>double</type>
+        <brief>
+          Tolerance
+        </brief>
+        <description>
+        </description>
+        <default><item>0.125</item></default>
+        <minimum inclusive="yes"> 0.0 </minimum>
+        <maximum inclusive="no"> 0.5 </maximum>
+      </parameter>
+      <parameter name="PATTERNSIZE">
+        <type>integer</type>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <default><item>201</item></default>
+        <minimum inclusive="yes">101</minimum>
+        <maximum inclusive="yes">403</maximum>
+        <odd />
+      </parameter>
+      <parameter name="DELTAX">
+        <type>integer</type>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <default><item>100</item></default>
+        <minimum inclusive="yes">2</minimum>
+      </parameter>
+      <parameter name="DELTAY">
+        <type>integer</type>
+        <brief>
+        </brief>
+        <description>
+        </description>
+        <default><item>100</item></default>
+        <minimum inclusive="yes">2</minimum>
+      </parameter>
+    </group>
+  </groups>
+</application>
