@@ -1,0 +1,17 @@
+Unit test for Isis::Apollo
+IsMetric: 1
+IsPanoramic: 0
+IsHasselblad: 0
+IsApollo15: 1
+IsApollo16: 0
+IsApollo17: 0
+Width: 22900
+Height: 22900
+Bands: 1
+ReseauDimension: 403
+PixelPitch: 200.5
+SpacecraftName: APOLLO 15
+InstrumentId: METRIC
+NaifFrameCode: -915240
+TargetName: MOON
+Time: 1971-07-26T13:33:39.11
