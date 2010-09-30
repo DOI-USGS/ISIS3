@@ -74,8 +74,8 @@ CWDLIB    =
 # Set up for Qwt
 #---------------------------------------------------------------------------
 QWTDIR    = $(ISIS3OPT)
-QWTINCDIR = -I$(QWTDIR)/include
-QWTLIBDIR = -L$(QWTDIR)/lib 
+QWTINCDIR = -I$(QWTDIR)/include/qwt
+QWTLIBDIR = -L$(QWTDIR)/lib
 QWTLIB    = -lqwt 
 
 #---------------------------------------------------------------------------
@@ -247,6 +247,11 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsqlite3.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/postgresql*/libpq.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/mysql5/mysql/libmysqlclient_r*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.dylib"
+
+# libxerces-c depends on these libraries
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicuuc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicudata*.dylib"
 
 #  Plugins
 THIRDPARTYPLUGINS +=  "$(ISIS3OPT)/libexec/qt4-mac/plugins/"
