@@ -1292,13 +1292,14 @@ namespace Isis {
     // if we don't have an equal, then we have a problem - an invalid symbol.
     // Our possible remaining formats both are KEYWORD = ...
     if(keyword[0] != '=') {
-      string msg = "Expected an assignemnt operator [=], but found [";
+      string msg = "Expected an assignment operator [=], but found [";
       msg += keyword[0];
       msg += "]";
+
       throw iException::Message(iException::Pvl, msg, _FILEINFO_);
     }
 
-    keyword = iString(keyword.substr(1)).Trim(" ");
+    keyword = iString(keyword.substr(1)).Trim(" \t");
 
     if(keyword.empty()) {
       return false;
@@ -1325,7 +1326,7 @@ namespace Isis {
 
       // strip '(' - onetime, this makes every element in the array the same
       // (except the last)
-      keyword = iString(keyword.substr(1)).Trim(" ");
+      keyword = iString(keyword.substr(1)).Trim(" \t");
 
       // handle empty arrays: KEYWORD = ()
       if(!keyword.empty() && keyword[0] == closingParen) {
@@ -1371,7 +1372,7 @@ namespace Isis {
         // Now we should* have a comma, strip it
         if(!keyword.empty() && keyword[0] == ',') {
           foundComma = true;
-          keyword = iString(keyword.substr(1)).Trim(" ");
+          keyword = iString(keyword.substr(1)).Trim(" \t");
         }
 
         // No comma and nothing more in string - we found
@@ -1417,7 +1418,7 @@ namespace Isis {
 
       // Trim off the closing paren
       if(!keyword.empty()) {
-        keyword = iString(keyword.substr(1)).Trim(" ");
+        keyword = iString(keyword.substr(1)).Trim(" \t");
       }
 
       // Read units here if they exist and apply them
@@ -1521,7 +1522,7 @@ namespace Isis {
 
     // This method ignores spaces except as delimiters; let's trim the string
     // to start
-    keyword = iString(keyword).Trim(" ");
+    keyword = iString(keyword).Trim(" \t");
 
     if(keyword.empty()) {
       return "";
@@ -1553,6 +1554,7 @@ namespace Isis {
         '}',
         ',',
         ' ',
+        '\t',
         '<',
         '='
       };
@@ -1597,6 +1599,7 @@ namespace Isis {
 
     // Do we have a known quote end?
     size_t quoteEndPos = keyword.find(quoteEnd);
+
     if(quoteEndPos != string::npos) {
       value = keyword.substr(0, quoteEndPos);
 
@@ -1612,7 +1615,7 @@ namespace Isis {
       }
 
       // Make sure we dont have padding
-      keyword = iString(keyword).Trim(" ");
+      keyword = iString(keyword).Trim(" \t");
 
       if(keepQuotes) {
         value = startQuote + value + quoteEnd;

@@ -32,6 +32,7 @@ int main() {
     "KEYWORD = {A, B}",
     "KEYWORD = (A,B) #comment this",
     "KEYWORD = ( A , B )",
+    "KEYWORD\t=\t( A\t,\tB )",
     "KEYWORD = (A, B,C,D,E))",
     "KEYWORD = ((1, 2), {3,  4}, (5), 6)",
     "KEYWORD = { \"VAL1\" ,   \"VAL2\", \"VAL3\"}",

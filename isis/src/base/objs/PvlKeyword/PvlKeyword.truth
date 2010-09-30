@@ -4,7 +4,7 @@
 'KEYWORD' -----------------------> VALID
     NAME: KEYWORD
 'KEYWORD X' ---------------------> INVALID
-    **PVL ERROR** Expected an assignemnt operator [=], but found [X]
+    **PVL ERROR** Expected an assignment operator [=], but found [X]
 'KEYWORD =' ---------------------> INCOMPLETE
 'KEYWORD = SOME_VAL' ------------> VALID
     NAME: KEYWORD
@@ -47,6 +47,10 @@
     VALUE: A
     VALUE: B
 'KEYWORD = ( A , B )' -----------> VALID
+    NAME: KEYWORD
+    VALUE: A
+    VALUE: B
+'KEYWORD	=	( A	,	B )' -----------> VALID
     NAME: KEYWORD
     VALUE: A
     VALUE: B
@@ -192,7 +196,7 @@ KEYWORD X
 
 Output: 
 **PVL ERROR** Unable to read keyword [KEYWORD X]
-**PVL ERROR** Expected an assignemnt operator [=], but found [X]
+**PVL ERROR** Expected an assignment operator [=], but found [X]
 
 Input:
 KEYWORD =
@@ -295,6 +299,12 @@ KEYWORD = (A, B)
 
 Input:
 KEYWORD = ( A , B )
+
+Output: 
+KEYWORD = (A, B)
+
+Input:
+KEYWORD	=	( A	,	B )
 
 Output: 
 KEYWORD = (A, B)
