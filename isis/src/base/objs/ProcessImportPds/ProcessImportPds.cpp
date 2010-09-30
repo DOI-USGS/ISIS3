@@ -1061,7 +1061,7 @@ namespace Isis {
     str = pdsXlater.InputKeyword("PixelResolution").Unit();
     str.UpCase();
     // Assume KM/PIXEL if the unit doesn't exist or is not METERS/PIXEL
-    if((str != "METERS/PIXEL") && (str != "M/PIXEL")) {
+    if((str != "METERS/PIXEL") && (str != "M/PIXEL") && (str != "M/PIX")) {
       p_pixelResolution *= 1000.0;
     }
 
