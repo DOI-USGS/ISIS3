@@ -26,6 +26,7 @@
 
 #include "iTime.h"
 #include "iString.h"
+#include "iException.h"
 
 namespace Isis {
 /**                                                                       
