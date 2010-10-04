@@ -33,6 +33,11 @@ namespace Isis {
      *          coincide with the code changes made here. IMPORTANT:  This
      *          results in Version = 2 of the LroWideAngleCamera as depicted in
      *          the Camera.plugin for both WAC-UV and WAC-VIS.
+     *   @history 2010-10-04 Kris Becker - Modified the frame kernel code to use
+     *            the instrument code instead of the WAC ID.  This change was
+     *            brought about with the release of frames kernel
+     *            lro_frames_2010214_v01.tf (actually used version 2010277 that
+     *            contains updated angles for VIS and UV).
      *  
      */
     class LroWideAngleCamera : public Isis::PushFrameCamera {

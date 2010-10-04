@@ -24,7 +24,7 @@ namespace Isis {
     LroWideAngleCamera::LroWideAngleCamera(Isis::Pvl &lab) :
       Isis::PushFrameCamera(lab) {
       // Set up the camera characteristics
-      InstrumentRotation()->SetFrame(-85620);
+      InstrumentRotation()->SetFrame(NaifIkCode());
       SetFocalLength();
       SetPixelPitch();
 
