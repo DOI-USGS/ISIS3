@@ -54,6 +54,7 @@ namespace Isis {
    *                                        in sync with the ControlNetStatistics class
    *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression functionality to iString class
    *                                        Verify the DefFile in the PVL Class
+   *  @history 2010-10-04 Sharmila Prasad - Use iString's Token method instead of ParseExpression(..) 
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
@@ -113,8 +114,7 @@ namespace Isis {
       //! Set the output print file 
       void SetOutputFile   (string psPrintFile);
       
-      //! Print Image File and Serial Num given the Control Measure
-      void PrintCubeFileSerialNum(ControlMeasure & pCMeasure);
+      void PrintCubeFileSerialNum(ControlMeasure & pcMeasure);
       
     private:
       ofstream mOstm;                     //!< output stream for printing to output file

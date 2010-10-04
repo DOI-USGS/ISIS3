@@ -62,7 +62,7 @@ void IsisMain()
   
   // Filter Points by Lat Lon Range
   filterGrp = Isis::PvlGroup("Point_LatLon");
-  Isis::PvlKeyword keyword1("MinLat", 0);
+  Isis::PvlKeyword keyword1("MinLat", -180);
   filterGrp += keyword1;
   
   Isis::PvlKeyword keyword2("MaxLat", 180);
@@ -71,10 +71,10 @@ void IsisMain()
   Isis::PvlKeyword keyword3("MinLon", 0);
   filterGrp += keyword3;
   
-  Isis::PvlKeyword keyword4("MaxLon", 180);
+  Isis::PvlKeyword keyword4("MaxLon", 240);
   filterGrp += keyword4;
   
-  //cnetFilter.PointLatLonFilter(filterGrp,  false);
+  cnetFilter.PointLatLonFilter(filterGrp,  false);
   filterGrp.Clear();
   
   // Filter Points by distance between points
@@ -83,7 +83,7 @@ void IsisMain()
   filterGrp += keyword1;
   keyword2 = Isis::PvlKeyword("Units=", "meters");  
   filterGrp += keyword2;
-  //cnetFilter.PointDistanceFilter(filterGrp,  false);
+  cnetFilter.PointDistanceFilter(filterGrp,  false);
   filterGrp.Clear();
   
   // Filter Points by Measure properties
@@ -134,7 +134,7 @@ void IsisMain()
   filterGrp += keyword1;
   keyword2 = Isis::PvlKeyword("Units=", "meters");  
   filterGrp += keyword2;
-  //cnetFilter.CubeDistanceFilter(filterGrp,  false);
+  cnetFilter.CubeDistanceFilter(filterGrp,  false);
   filterGrp.Clear();
     
   cnet.SetModifiedDate("current");

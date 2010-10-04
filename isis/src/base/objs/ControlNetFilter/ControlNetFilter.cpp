@@ -1,7 +1,9 @@
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetFilter.h"
+#include "ControlPoint.h"
 #include "Filename.h"
 #include "iString.h"
 #include "PvlGroup.h"
@@ -33,10 +35,7 @@ namespace Isis {
 
   //! String values for Boolean
   extern string sBoolean[];
-  
-  //! String values for Measure Types
-  string sMeasureType[] = {"Unmeasured", "Manual", "Estimated", "Automatic", "ValidatedManual", "ValidatedAutomatic"};
-  
+
   /**
    * ControlNetFilter Constructor
    * 
@@ -49,7 +48,7 @@ namespace Isis {
   ControlNetFilter::ControlNetFilter(ControlNet *pCNet, string & psSerialNumFile, Progress *pProgress) :
                                                             ControlNetStatistics(pCNet, psSerialNumFile, pProgress)
   {
-    mSerialNumFilter  = SerialNumberList(psSerialNumFile);
+    mSerialNumFilter  = SerialNumberList(psSerialNumFile);    
     
     #ifdef _DEBUG_
     StartDebug();
@@ -215,19 +214,18 @@ namespace Isis {
    */
   void ControlNetFilter::PointIDFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
-    string sExpr="";
     vector<string> strTokens;
-    if (pvlGrp.HasKeyword("Expression")){
-      sExpr = pvlGrp["Expression"][0];
-      iString::ParseExpression(sExpr, strTokens, '*');
-      #ifdef _DEBUG_
-      for (int i=0; i<(int)strTokens.size(); i++) {
-        odb << "[" << i << "]=" << strTokens[i] << "  Size=" << strTokens[i].length() << endl;
+    iString sPointIDExpr = pvlGrp["Expression"][0];
+    iString sSeparator("*");
+    
+    string strToken = sPointIDExpr.Token(sSeparator);
+    while (strToken != "") {
+      strTokens.push_back(strToken);
+      if (!sPointIDExpr.size()) {
+        break;
       }
-      #endif
+      strToken = sPointIDExpr.Token(sSeparator);
     }
-    else
-      return;
 
     int iTokenSize = (int)strTokens.size();
     int iNumPoints = mCNet->Size();
@@ -244,7 +242,7 @@ namespace Isis {
       ControlPoint cPoint = (*mCNet)[i];
       string sPointID = cPoint.Id();
       int iPosition = 0;      
-      for (int j=0; j<iTokenSize; j++) {
+      for (int j=(iTokenSize-1); j>=0; j--) {
         int iLen = strTokens[j].length();
         if (iLen > 0) {
           size_t found = sPointID.find(strTokens[j], iPosition);
@@ -487,11 +485,11 @@ namespace Isis {
    */
   void ControlNetFilter::PointDistanceFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
-    double dMinDistance=0;
+    double dMaxDistance=0;
     string sUnits = "pixels";
     
     if (pvlGrp.HasKeyword("MaxDistance")){
-      dMinDistance = pvlGrp["MaxDistance"][0];
+      dMaxDistance = pvlGrp["MaxDistance"][0];
     }
     
     if (pvlGrp.HasKeyword("Units")){
@@ -524,10 +522,11 @@ namespace Isis {
           string filename1 = mSerialNumList.Filename(sn1);
           Pvl pvl1(filename1);
           cam1 = CameraFactory::Create(pvl1);
-        
-          dRadius1  = cp1.RadiusByReference(cam1);
-          dUnivLat1 = cp1.LatitudeByReference(cam1);
-          dUnivLon1 = cp1.LongitudeByReference(cam1);
+          if (cam1->SetImage(cp1[iRefIndex1].Sample(),cp1[iRefIndex1].Line()) ) {
+            dRadius1  = cam1->UniversalLatitude();
+            dUnivLat1 = cam1->UniversalLongitude();
+            dUnivLon1 = cam1->LocalRadius();
+          }
         }
       }
       else { // pixels
@@ -558,8 +557,10 @@ namespace Isis {
             Pvl pvl2(filename2);
             cam2 = CameraFactory::Create(pvl2);
           
-            dUnivLat2 = cp2.LatitudeByReference(cam2);
-            dUnivLon2 = cp2.LongitudeByReference(cam2);
+            if (cam2->SetImage(cp2[iRefIndex2].Sample(),cp2[iRefIndex2].Line())) {
+              dUnivLat2 = cam2->UniversalLatitude();
+              dUnivLon2 = cam2->UniversalLongitude();
+            }
           }
           
           // Get the distance from the camera class
@@ -571,18 +572,18 @@ namespace Isis {
           
           double dDeltaSamp = dSample1 - dSample2;
           double dDeltaLine = dLine1 - dLine2;
-            // use the distance formula for cartesian coordinates
+          // use the distance formula for cartesian coordinates
           dDist = sqrt((dDeltaSamp * dDeltaSamp) + (dDeltaLine * dDeltaLine));
         }
         
-        if (dDist <= dMinDistance) {
+        if (dDist <= dMaxDistance) {
           if (pbLastFilter){
             if (!bMinDistance) {
               PointStats(cp1);
             }
             mOstm << cp2.Id() << "#" << dDist << ", ";
-            bMinDistance = true;
           }
+          bMinDistance = true;
         }
         else 
           continue;
@@ -598,7 +599,7 @@ namespace Isis {
   }
   
   /**
-   * Filter the Points which have measures of specified Measure type
+   * Filter the PoibMinDistancents which have measures of specified Measure type
    * Group by Points 
    *  
    * @author Sharmila Prasad (8/13/2010)
@@ -669,7 +670,7 @@ namespace Isis {
             PointStats(cPoint);
             string sn = cMeasure.CubeSerialNumber();
             mOstm << mSerialNumList.Filename(sn) << ", " << sn << ",";
-            mOstm << sBoolean[(int)cMeasure.Ignore()] << ", " << sMeasureType[(int)cMeasure.Type()] << ", ";
+            mOstm << sBoolean[(int)cMeasure.Ignore()] << ", " << cMeasure.PrintableMeasureType() << ", ";
             mOstm << sBoolean[(int)cMeasure.IsReference()] << endl;
           }
         }
@@ -857,31 +858,37 @@ namespace Isis {
    */
   void ControlNetFilter::CubeNameExpressionFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
-    string sCubeExpr="";
+    iString sCubeExpr("");
     if (pvlGrp.HasKeyword("Expression")){
-      sCubeExpr = pvlGrp["Expression"][0];
-    }
-    
-    if (!sCubeExpr.length()) {
-      return;
+      sCubeExpr = iString(pvlGrp["Expression"][0]);
     }
     
     vector <string> strTokens;
-    iString::ParseExpression(sCubeExpr, strTokens, '*');
+    iString sSeparator("*");
+    string strToken = sCubeExpr.Token(sSeparator);
+    while (strToken != "") {
+      strTokens.push_back(strToken);
+      //odb << "Expr=" << sCubeExpr << "   Token=" << strToken << endl;
+      if (!sCubeExpr.size()) {
+        break;
+      }
+      strToken = sCubeExpr.Token(sSeparator);
+    }
     
     int iTokenSize = (int)strTokens.size();
-    int iNumCubes = mSerialNumFilter.Size();
+    int iNumCubes  = mSerialNumFilter.Size();
     
     if (pbLastFilter) {
       CubeStatsHeader();
       mOstm << endl;
     }
 
+    //odb << "Token Size=" << iTokenSize << endl;
     for (int i=(iNumCubes-1); i >= 0;  i--){
       string sCubeName = mSerialNumFilter.Filename(i);
       string sSerialNum= mSerialNumFilter.SerialNumber(i);
       int iPosition = 0;
-      for (int j=0; j<iTokenSize; j++) {
+      for (int j=(iTokenSize-1); j>=0; j--) {
         int iLen = strTokens[j].length();
         if (iLen > 0) {
           size_t found = sSerialNum.find(strTokens[j], iPosition);
@@ -1152,5 +1159,6 @@ namespace Isis {
       delete (cam);
     } // end cube loop
   }
+  
 }
 
