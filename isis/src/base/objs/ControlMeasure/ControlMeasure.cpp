@@ -242,6 +242,7 @@ namespace Isis {
   bool ControlMeasure::operator != (const Isis::ControlMeasure &pMeasure) const {
     return !(*this == pMeasure);
   }
+  
   /**
    * Check for Control Measures equality
    *
@@ -253,7 +254,7 @@ namespace Isis {
    */
   bool ControlMeasure::operator == (const Isis::ControlMeasure &pMeasure) const {
     if(pMeasure.p_measureType != p_measureType || pMeasure.p_serialNumber != p_serialNumber ||
-        pMeasure.p_line != p_line ||	pMeasure.p_sample != p_sample ||	pMeasure.p_diameter != p_diameter ||
+        pMeasure.p_line != p_line || pMeasure.p_sample != p_sample || pMeasure.p_diameter != p_diameter ||
         pMeasure.p_ignore != p_ignore || pMeasure.p_isReference != p_isReference ||
         pMeasure.p_sampleError !=  p_sampleError || pMeasure.p_lineError != p_lineError || pMeasure.p_zScoreMin != p_zScoreMin ||
         pMeasure.p_zScoreMax != p_zScoreMax || pMeasure.p_goodnessOfFit != p_goodnessOfFit || pMeasure.p_focalPlaneMeasuredX != p_focalPlaneMeasuredX ||
@@ -267,4 +268,42 @@ namespace Isis {
     return true;
   }
 
+  /**
+   * Return the String Control Measure type
+   * 
+   * @author Sharmila Prasad (10/1/2010)
+   * 
+   * @return string - Measure Type
+   */
+  std::string ControlMeasure::PrintableMeasureType(void)
+  {
+    std::string sPrintable;
+    
+    switch (p_measureType) {
+      case ControlMeasure::Unmeasured:
+        sPrintable ="Unmeasured";
+        break;
+    
+      case ControlMeasure::Manual:
+        sPrintable ="Manual";
+        break;
+      
+      case ControlMeasure::Estimated:
+        sPrintable ="Estimated";
+        break;
+      
+      case ControlMeasure::Automatic:
+        sPrintable ="Automatic";
+        break;
+      
+      case ControlMeasure::ValidatedManual:
+        sPrintable ="ValidatedManual";
+        break;
+      
+      case ControlMeasure::ValidatedAutomatic:
+        sPrintable ="ValidatedAutomatic";
+        break;
+    }
+    return sPrintable;
+  }
 }

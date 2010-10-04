@@ -57,6 +57,8 @@ namespace Isis {
    *                                   issues.
    *   @history 2009-09-22 Eric Hyer - Removed forward declaration for QPair
    *   @history 2009-10-30 Eric Hyer - GetMeasurDataNames is now static
+   *   @history 2010-10-04 Sharmila Prasad - Add PrintableMeasureType method to return
+   *                                         String Measure Type
    */
   class ControlMeasure {
     public:
@@ -357,6 +359,8 @@ namespace Isis {
 
       bool operator == (const Isis::ControlMeasure &pMeasure) const;
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
+      
+      std::string PrintableMeasureType(void);
 
     private:
       MeasureType p_measureType;
@@ -378,7 +382,6 @@ namespace Isis {
       double p_focalPlaneMeasuredY;
       double p_focalPlaneComputedX;
       double p_focalPlaneComputedY;
-
       double p_measuredEphemerisTime;
       double p_computedEphemerisTime;
   };
