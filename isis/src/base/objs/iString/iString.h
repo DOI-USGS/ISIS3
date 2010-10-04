@@ -109,6 +109,7 @@ namespace Isis {
    *                                       method and unclosed quotes.
    *  @history 2010-03-18 Sharmila Prasad - Ability to set the exact precision digits for double
    *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression from ControlNetFilter to iString class
+   *  @history 2010-10-04 Sharmila Prasad - Remove redundant ParseExpression
    *
    *  @todo  The Token member should consider single and double
    *         quotes seperatly *as of 10/28/09* Token no longer
@@ -245,9 +246,6 @@ namespace Isis {
 
       static QStringList ToQt(const std::vector<std::string> &sl);
       static std::vector<std::string> ToStd(const QStringList &sl);
-
-      //! Parse Expressions into Tokens
-      static void ParseExpression (std::string pStr, std::vector<std::string> & pStrTokens, char pcDelim);
 
     private:
       void SetDouble(const double &value, const int piPrecision = 14);
