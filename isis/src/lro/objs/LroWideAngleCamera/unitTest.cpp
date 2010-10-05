@@ -36,8 +36,8 @@ int main(void) {
     else {
       // Version 2 difference caused by new CK and comprehensive IK kernel support
       //   and no longer using a DEM
-      knownLat = -70.70796484931643;
-      knownLon = 244.3050652237698;
+      knownLat = -70.70409850373171;
+      knownLon = 244.3339031595905;
     }
 
 
