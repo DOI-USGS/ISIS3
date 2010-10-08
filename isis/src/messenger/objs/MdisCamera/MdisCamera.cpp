@@ -179,21 +179,19 @@ namespace Isis {
       // parameters.
       // NAC has a new implementation of its distortion contributed by
       // Scott Turner and Lillian Nguyen at JHUAPL.
-      if(NaifIkCode() == MdisWac) {
-        CameraDistortionMap *distortionMap = new CameraDistortionMap(this);
+      // (2010/10/06) The WAC now uses the same disortion model implementation.
+      // Valid Taylor Series parameters are in versions msgr_mdis_v120.ti IK
+      // and above.   Note fnCode works for NAC as well as long as 
+      // filterNumber stays at 0 for the NAC only!
+      try {
+        TaylorCameraDistortionMap *distortionMap = new TaylorCameraDistortionMap(this);
         distortionMap->SetDistortion(fnCode);
       }
-      else {  // Camera is the NAC, use new distortion model
-        try {
-          TaylorCameraDistortionMap *distortionMap = new TaylorCameraDistortionMap(this);
-          distortionMap->SetDistortion(NaifIkCode());
-        }
-        catch(iException &ie) {
-          string msg = "New MDIS/NAC distortion model invalidates previous "
-                       "SPICE - you must rerun spiceinit to get new kernels";
-          ie.Message(iException::User, msg, _FILEINFO_);
-          throw;
-        }
+      catch(iException &ie) {
+        string msg = "New MDIS NAC/WAC distortion models will invalidate previous "
+                     "SPICE - you may need to rerun spiceinit to get new kernels";
+        ie.Message(iException::User, msg, _FILEINFO_);
+        throw;
       }
 
       // Setup the ground and sky map

@@ -62,6 +62,11 @@ namespace Isis {
      *   @history 2009-06-11 Steven Lambright - Documentation fixes
      *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
      *            inherit directly from Camera
+     *   @history 2010-10-06 Kris Becker - Updated WAC distortion model to the
+     *            same as the NAC - A Taylor Series implementation.  Update to
+     *            the MDIS IK (msgr_mdis_v120.ti) udpates these parameters as
+     *            well as the WAC focal lengths.  The NAC is unaffected by these
+     *            changes.
      */
     class MdisCamera : public FramingCamera {
       public:
