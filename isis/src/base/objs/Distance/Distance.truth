@@ -1,0 +1,63 @@
+----- Testing Constructors -----
+
+Constructor given a value in meters
+1500.5 meters
+Constructor given a value in kilometers
+1500500 meters
+Copy constructor
+1500.5 meters
+
+----- Testing Accessors -----
+
+Meters (redundant)
+1 meters
+Kilometers
+1 kilometers
+
+----- Testing Operators -----
+
+
+Distance 1: 1 meters
+Distance 2: 1 meters
+Distance 1 > Distance 2 ? 0
+Distance 1 >= Distance 2 ? 1
+Distance 1 == Distance 2 ? 1
+Distance 1 <= Distance 2 ? 1
+Distance 1 < Distance 2 ? 0
+Distance 1 = Distance 2... Distance 1 = 1 meters
+
+Distance 1: 1 meters
+Distance 2: 10 meters
+Distance 1 > Distance 2 ? 0
+Distance 1 >= Distance 2 ? 0
+Distance 1 == Distance 2 ? 0
+Distance 1 <= Distance 2 ? 1
+Distance 1 < Distance 2 ? 1
+Distance 1 = Distance 2... Distance 1 = 10 meters
+
+Distance 1: 10 meters
+Distance 2: 1 meters
+Distance 1 > Distance 2 ? 1
+Distance 1 >= Distance 2 ? 1
+Distance 1 == Distance 2 ? 0
+Distance 1 <= Distance 2 ? 0
+Distance 1 < Distance 2 ? 0
+Distance 1 = Distance 2... Distance 1 = 1 meters
+
+Distance 1: 1000 meters
+Distance 2: 1000 meters
+Distance 1 > Distance 2 ? 0
+Distance 1 >= Distance 2 ? 1
+Distance 1 == Distance 2 ? 1
+Distance 1 <= Distance 2 ? 1
+Distance 1 < Distance 2 ? 0
+Distance 1 = Distance 2... Distance 1 = 1000 meters
+
+----- Testing Error Checking -----
+
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1000.0 meters] cannot be stored in the Distance class
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1000.0 meters] cannot be stored in the Distance class
+**PROGRAMMER ERROR** Distance does not understand the enumerated value [-1] as a unit
