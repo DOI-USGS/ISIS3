@@ -19,8 +19,12 @@
 
 #include "Distance.h"
 
+#include <iostream>
+
 #include "iString.h"
 #include "iException.h"
+
+using namespace std;
 
 namespace Isis {
 
@@ -121,6 +125,57 @@ namespace Isis {
 
     SetDistance(distanceToCopy.GetMeters(), Meters);
 
+    return *this;
+  }
+
+
+  /**
+   * Add another distance to this distance (1km + 1m = 1005m)
+   *
+   * @param distanceToAdd This is the distance we are adding to ourselves
+   * @return Resulting distance, self not modified
+   */
+  Distance Distance::operator +(Distance &distanceToAdd) const {
+    Distance result(GetMeters() + distanceToAdd.GetMeters(), Meters);
+    return result;
+  }
+
+
+  /**
+   * Subtract another distance from this distance (1km - 1m = 995m). This could
+   *   throw an exception if the result is negative.
+   *
+   * @param distanceToSub This is the distance we are subtracting from ourself
+   * @return Resulting distance, self not modified
+   */
+  Distance Distance::operator -(Distance &distanceToSub) const {
+    Distance result(GetMeters() - distanceToSub.GetMeters(), Meters);
+    return result;
+  }
+
+
+  /**
+   * Add and assign the given distance to ourselves.
+   *
+   * @param distanceToAdd This is the distance we are to duplicate exactly
+   * @return Resulting distance, a reference to this distance after assignment
+   */
+  Distance &Distance::operator +=(Distance &distanceToAdd) {
+    SetDistance(GetMeters() + distanceToAdd.GetMeters(), Meters);
+    return *this;
+  }
+
+
+  /**
+   * Subtract and assign the given distance from ourself. This could throw
+   *   an exception if the result is negative, in which case the new value is
+   *   never applied.
+   *
+   * @param distanceToSub This is the distance we are to duplicate exactly
+   * @return Resulting distance, a reference to this distance after assignment
+   */
+  Distance &Distance::operator -=(Distance &distanceToSub) {
+    SetDistance(GetMeters() - distanceToSub.GetMeters(), Meters);
     return *this;
   }
 

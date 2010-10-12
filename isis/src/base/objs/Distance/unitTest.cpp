@@ -93,6 +93,10 @@ int main(int argc, char *argv[]) {
     cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+        " meters" << endl;
+    cout << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+        " meters" << endl;
 
     dist1 = dist2;
     cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
@@ -114,6 +118,16 @@ int main(int argc, char *argv[]) {
     cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+        " meters" << endl;
+
+    // This should throw an exception and never cout
+    try {
+      (dist1 - dist2).GetMeters();
+    }
+    catch(iException &e) {
+      e.Report(false);
+    }
 
     dist1 = dist2;
     cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
@@ -135,6 +149,10 @@ int main(int argc, char *argv[]) {
     cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+        " meters" << endl;
+    cout << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+        " meters" << endl;
 
     dist1 = dist2;
     cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
@@ -156,9 +174,19 @@ int main(int argc, char *argv[]) {
     cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+        " meters" << endl;
+    cout << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+        " meters" << endl;
 
     dist1 = dist2;
     cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
+        " meters" << endl;
+    dist1 += dist2;
+    cout << "Distance 1 += Distance 2... Distance 1 = " << dist1.GetMeters() <<
+        " meters" << endl;
+    dist1 -= dist2;
+    cout << "Distance 1 -= Distance 2... Distance 1 = " << dist1.GetMeters() <<
         " meters" << endl;
   }
   catch(iException &e) {

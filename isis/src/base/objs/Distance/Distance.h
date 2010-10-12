@@ -139,6 +139,10 @@ namespace Isis {
 
 
       Distance &operator =(Distance &distanceToCopy);
+      Distance operator +(Distance &distanceToAdd) const;
+      Distance operator -(Distance &distanceToAdd) const;
+      Distance &operator +=(Distance &distanceToAdd);
+      Distance &operator -=(Distance &distanceToSub);
 
     protected:
       double GetDistance(Units distanceUnit) const;
