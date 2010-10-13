@@ -116,7 +116,7 @@ namespace Isis {
    * 
    * @author Sharmila Prasad (8/31/2010)
    * 
-   * @param pcMeasure 
+   * @param pcMeasure - Measure's Cube and Serial #
    */
   void ControlNetFilter::PrintCubeFileSerialNum(ControlMeasure & pcMeasure)
   {
@@ -157,10 +157,6 @@ namespace Isis {
     if (pvlGrp.HasKeyword("GreaterThan")) {
       dGreater     = pvlGrp["GreaterThan"][0];
       bGreaterThan = true;
-    }
-    
-    if (!bLessThan && !bGreaterThan) {
-      return;
     }
     
     if (pbLastFilter) {
@@ -288,7 +284,9 @@ namespace Isis {
       bGreaterFlag = true;
     }
     
-    if (iLesser <=0  && iGreater <= 0) {
+    if (iLesser < 0  || iGreater < 0) {
+      string sErrMsg = "Invalid Deffile - Check Point_NumMeasures Group\n";
+      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
       return;
     }
     
@@ -363,10 +361,6 @@ namespace Isis {
       }
     }
     
-    if (!bGroundFlag && !bIgnoredFlag && !bHeldFlag) {
-      return;
-    }
-    
     if (pbLastFilter) {
       PointStatsHeader();
       mOstm << endl << endl;
@@ -434,6 +428,8 @@ namespace Isis {
     }
     
     if (dMinLat > dMaxLat || dMinLon > dMaxLon) {
+      string sErrMsg = "Invalid Deffile - Check Point_LatLon Group\n";
+      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
       return;
     }
     
@@ -623,12 +619,6 @@ namespace Isis {
       sType = pvlGrp["MeasureType"][0];
       sType = isType.DownCase(sType);
     }
-
-    if (sType != "unmeasured" && sType != "manual" && sType != "estimated"  &&
-        sType != "autoregistered" && sType != "manualvalidated" && sType != "autoregvalidated" && 
-        iIgnoredFlag == UNDEFINED_STATUS) {
-      return;
-    }
     
     if (pbLastFilter) {
       PointStatsHeader();
@@ -699,19 +689,15 @@ namespace Isis {
     double dLesserValue=0, dGreaterValue=0;
     
     if (pvlGrp.HasKeyword("LessThan")){
-      dLesserValue = (int) pvlGrp["LessThan"][0];
+      dLesserValue = (double) pvlGrp["LessThan"][0];
       bLesserFlag = true;
     }
     
     if (pvlGrp.HasKeyword("GreaterThan")){
-      dGreaterValue = (int) pvlGrp["GreaterThan"][0];
+      dGreaterValue = (double) pvlGrp["GreaterThan"][0];
       bGreaterFlag = true;
     }
     
-    if (!bLesserFlag && !bGreaterFlag) {
-      return;
-    }
-
     if (pbLastFilter) {
       mOstm << "PointID, Type, Ignore, Filename, SerialNum, GoodnessOfFit, MeasureIgnore, Reference" << endl << endl;
     }
@@ -786,10 +772,6 @@ namespace Isis {
     }
     
     int size = sCubeNames.size();
-    
-    if (!size) {
-      return;
-    }
 
     if (pbLastFilter) {
       PointStatsHeader();
@@ -944,7 +926,9 @@ namespace Isis {
       bGreaterFlag = true;
     }
     
-    if ((!bLessFlag && !bGreaterFlag) || (iLessPoints <= 0 && iGreaterPoints <= 0)) {
+    if (iLessPoints < 0 || iGreaterPoints < 0) {
+      string sErrMsg = "Invalid Deffile - Check Cube_NumPoints Group\n";
+      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
       return;
     }
     
@@ -1019,6 +1003,8 @@ namespace Isis {
     }
     
     if (dDistance <= 0) {
+      string sErrMsg = "Invalid Deffile - Check Cube_Distance Group\n";
+      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
       return;
     }
     
