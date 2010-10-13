@@ -1828,7 +1828,7 @@ namespace Isis {
     if(sType == "boolean") {
       for(int i=0; i<iSize; i++) {
         string sValue = iString::DownCase(pvlKwrd[i]);
-        if(sValue != "null" || sValue != "true" || sValue != "false"){
+        if(sValue != "null" && sValue != "true" && sValue != "false"){
           string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
           throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
         }
