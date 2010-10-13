@@ -301,6 +301,8 @@
       processing</change>
     <change name="Sharmila Prasad" date="2010-09-27">Validate DefFile 
       comparing with the Template. Record the DefFile in the Log</change>
+    <change name="Sharmila Prasad" date="2010-10-13">Use only one copy 
+      of Control Net</change>
   </history>
       
   <groups>

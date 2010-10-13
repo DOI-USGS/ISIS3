@@ -51,7 +51,6 @@ void IsisMain() {
         }
         string sErrMsg = "Invalid Deffile\n";
         throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
-        
       }
     }
     
@@ -69,13 +68,10 @@ void IsisMain() {
     
      // Get the original control net internalized
     Progress progress;
-    ControlNet origNet(ui.GetFilename("CNET"), &progress);
-    
-    // Copy of the Control Network - preserve the original
-    ControlNet newNet(origNet);
+    ControlNet cNet(ui.GetFilename("CNET"), &progress);
 
     Progress statsProgress;
-    ControlNetFilter cNetFilter(&newNet, sSerialNumFile, &statsProgress);
+    ControlNetFilter cNetFilter(&cNet, sSerialNumFile, &statsProgress);
     
     // Run Filters using Deffile
     if (ui.WasEntered("DEFFILE")) {
