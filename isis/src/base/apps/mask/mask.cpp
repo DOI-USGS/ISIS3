@@ -25,14 +25,11 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   if(!ui.WasEntered("MASK"))
-    ui.PutFilename("MASK", ui.GetFilename("FROM"));
-
-  printf("MASK=%s", ui.GetFilename("MASK").c_str());
+    ui.PutAsString("MASK", ui.GetAsString("FROM"));
 
   p.SetInputCube("FROM");
   p.SetInputCube("MASK", OneBand);
   p.SetOutputCube("TO");
-
 
   //  Get min/max info
   minimum = VALID_MIN8;

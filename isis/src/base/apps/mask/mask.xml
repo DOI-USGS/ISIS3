@@ -36,6 +36,9 @@
    <change name="Sharmila Prasad" date="2009-08-24">
       Set Internal Default for "MASK" to be "FROM" 
     </change>
+    <change name="Steven Lambright" date="2010-10-13">
+      Removed printf and now respecting cube attributes set on input cube
+    </change>
   </history>
 
   <category>
