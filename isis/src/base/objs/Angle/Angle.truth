@@ -1,0 +1,33 @@
+
+UnitTest for Angle
+
+    Testing constructors
+  Degree input and radian output:  0.523598776 radians
+  Radian input and degree output:  30 degrees
+  Copy constructor:  30 degrees
+
+    Testing operators
+  Assignment operator:  45 degrees
+  + and - operators...
+    angle + angle: 90 degrees
+    angle += angle: 150 degrees
+    angle -= angle: 90 degrees
+    angle - angle: 30 degrees
+  * and / operators...
+    double * angle: 60 degrees
+    angle *= double: 120 degrees
+    angle /= double: 60 degrees
+    angle / double: 30 degrees
+
+    Testing logical operators
+  angle1 == angle2?  0
+  angle1 < angle2?  1
+  angle1 <= angle2?  1
+  angle1 > angle2?  0
+  angle1 >= angle2?  0
+
+    Testing protected methods
+  Degree wrap value = 360
+  Radian wrap value = 6.28318531
+  Degree angle set to 60
+  Radian angle set to 0.5

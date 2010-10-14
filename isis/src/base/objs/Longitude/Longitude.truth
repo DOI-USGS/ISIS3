@@ -1,0 +1,61 @@
+----- Testing Constructors -----
+
+Constructor given a value in degrees
+180 degrees
+Constructor given a positive west value in degrees
+180 degrees
+Constructor given a positive west, -90 value in degrees
+90 degrees
+Constructor given -90 degrees PW & 360 domain
+450 degrees
+Copy constructor
+450 degrees == 450 degrees
+
+----- Testing Set Methods -----
+
+Set to 90 degrees
+90 degrees
+Set to 90 degrees PW
+270 degrees
+After assignment: 270 degrees
+
+----- Testing Get Methods -----
+
+90 degrees is
+90 degrees universal
+90 degrees positive east
+0.5*pi radians positive east
+1.5707963267949 default double
+270 degrees positive west
+1.5*pi radians positive west
+
+450 degrees is
+450 degrees universal
+450 degrees positive east
+2.5*pi radians positive east
+7.8539816339745 default double
+630 degrees positive west
+3.5*pi radians positive west
+
+-450 degrees is
+-450 degrees universal
+-450 degrees positive east
+-2.5*pi radians positive east
+-7.8539816339745 default double
+-630 degrees positive west
+-3.5*pi radians positive west
+
+-450 degrees PW is
+-630 degrees universal
+-630 degrees positive east
+-3.5*pi radians positive east
+-10.995574287564 default double
+-450 degrees positive west
+-2.5*pi radians positive west
+
+----- Testing Domain Methods -----
+
+Test Force180Domain
+-90 degrees
+Test Force360Domain
+270 degrees

@@ -1,0 +1,35 @@
+----- Testing Constructors -----
+
+Constructor given a value in degrees
+45 degrees
+Constructor given a Planetographic value
+45 degrees
+Constructor given a Planetographic value and ellipsoid
+70.201123645475 degrees
+Constructor given a more permissive mode but hard task
+**PROGRAMMER ERROR** Latitudes outside of the -90/90 range cannot be converted between Planetographic and Planetocentric
+Constructor given a more permissive mode
+95 degrees
+Constructor given disallowed value
+**PROGRAMMER ERROR** Latitudes outside of the -90/90 range cannot be converted between Planetographic and Planetocentric
+Copy constructor
+95 degrees == 95 degrees
+
+----- Testing Set Methods -----
+
+Set to 45 degrees
+45 degrees
+0.25*pi radians universal
+45 degrees after assignment
+Set to 25 degrees Planetographic
+**PROGRAMMER ERROR** Latitude [25.0] cannot be converted to Planetocentic without the planetary radii, please use the other Latitude constructor
+Set to 25 degrees Planetographic with radii
+28.160239385449 degrees
+
+----- Testing Get Methods -----
+
+-15 degrees with radii (1, 1.1) is
+-15 degrees universal
+-15 degrees Planetocentric
+-12.486398292871 degrees GetPlanetographic
+
