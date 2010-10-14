@@ -19,12 +19,8 @@
 
 #include "Distance.h"
 
-#include <iostream>
-
-#include "iString.h"
 #include "iException.h"
-
-using namespace std;
+#include "iString.h"
 
 namespace Isis {
 
@@ -120,7 +116,7 @@ namespace Isis {
    * @param distanceToCopy This is the distance we are to duplicate exactly
    * @return Resulting distance, a reference to this distance after assignment
    */
-  Distance &Distance::operator =(Distance &distanceToCopy) {
+  Distance &Distance::operator =(const Distance &distanceToCopy) {
     if(this == &distanceToCopy) return *this;
 
     SetDistance(distanceToCopy.GetMeters(), Meters);
@@ -135,7 +131,7 @@ namespace Isis {
    * @param distanceToAdd This is the distance we are adding to ourselves
    * @return Resulting distance, self not modified
    */
-  Distance Distance::operator +(Distance &distanceToAdd) const {
+  Distance Distance::operator +(const Distance &distanceToAdd) const {
     Distance result(GetMeters() + distanceToAdd.GetMeters(), Meters);
     return result;
   }
@@ -148,7 +144,7 @@ namespace Isis {
    * @param distanceToSub This is the distance we are subtracting from ourself
    * @return Resulting distance, self not modified
    */
-  Distance Distance::operator -(Distance &distanceToSub) const {
+  Distance Distance::operator -(const Distance &distanceToSub) const {
     Distance result(GetMeters() - distanceToSub.GetMeters(), Meters);
     return result;
   }
@@ -160,9 +156,8 @@ namespace Isis {
    * @param distanceToAdd This is the distance we are to duplicate exactly
    * @return Resulting distance, a reference to this distance after assignment
    */
-  Distance &Distance::operator +=(Distance &distanceToAdd) {
+  void Distance::operator +=(const Distance &distanceToAdd) {
     SetDistance(GetMeters() + distanceToAdd.GetMeters(), Meters);
-    return *this;
   }
 
 
@@ -174,9 +169,8 @@ namespace Isis {
    * @param distanceToSub This is the distance we are to duplicate exactly
    * @return Resulting distance, a reference to this distance after assignment
    */
-  Distance &Distance::operator -=(Distance &distanceToSub) {
+  void Distance::operator -=(const Distance &distanceToSub) {
     SetDistance(GetMeters() - distanceToSub.GetMeters(), Meters);
-    return *this;
   }
 
 
@@ -192,6 +186,10 @@ namespace Isis {
     double distanceInMeters = p_distanceInMeters;
     double resultingDistance = 0.0;
 
+    // This could use a negative value in order to denote unit not found,
+    //   which would give a compiler warning. However, for consistency with set
+    //   and the want to not do extra computation in this class we will use an
+    //   exception. 
     switch(distanceUnit) {
       case Meters:
         resultingDistance = distanceInMeters;

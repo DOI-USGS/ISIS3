@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   cout << "----- Testing Constructors -----" << endl << endl;
 
   /*
-  See Distance.cpp for why this is disabled.
+  // See Distance.cpp for why this is disabled.
   try {
     cout << "Empty constructor" << endl;
     Distance dist;

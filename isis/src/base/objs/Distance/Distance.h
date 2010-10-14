@@ -53,8 +53,8 @@ namespace Isis {
         Kilometers
       };
 
-      Distance(const Distance &distanceToCopy);
       Distance(double distance, Units distanceUnit = Meters);
+      Distance(const Distance &distanceToCopy);
       ~Distance();
 
       double GetMeters() const;
@@ -138,11 +138,11 @@ namespace Isis {
       }
 
 
-      Distance &operator =(Distance &distanceToCopy);
-      Distance operator +(Distance &distanceToAdd) const;
-      Distance operator -(Distance &distanceToAdd) const;
-      Distance &operator +=(Distance &distanceToAdd);
-      Distance &operator -=(Distance &distanceToSub);
+      Distance &operator =(const Distance &distanceToCopy);
+      Distance operator +(const Distance &distanceToAdd) const;
+      Distance operator -(const Distance &distanceToAdd) const;
+      void operator +=(const Distance &distanceToAdd);
+      void operator -=(const Distance &distanceToSub);
 
     protected:
       double GetDistance(Units distanceUnit) const;
@@ -154,9 +154,6 @@ namespace Isis {
        *   stored in meters.
        */
       double p_distanceInMeters;
-
-      //! This is a disallowed constructor.
-      Distance();
   };
 }
 
