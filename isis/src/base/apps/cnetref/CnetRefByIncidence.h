@@ -43,11 +43,12 @@ namespace Isis {
   *
   * @internal
   *   @history 2010-06-10 Sharmila Prasad - Original version
-  *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
-  *                                         use CubeManager instead
-  *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard Options &
-  *                                         Std Options Pixels/Meters from Edge
+  *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and 
+  *                                         Cubes use CubeManager instead
+  *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard 
+  *                                         Options & Std Options Pixels/Meters from Edge
   *   @history 2010-09-16 Sharmila Prasad - Renamed CnetValidMeasure to ControlNetValidMeasure
+  *   @history 2010-10-14 Sharmila Prasad - Use single copy of Control Net in FindCnetRef()
   */
   class Pvl;
   class ControlNet;
@@ -64,7 +65,7 @@ namespace Isis {
       };
 
       //! Given Control Net, find the reference based on Incidence Angle
-      virtual void FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet);
+      virtual void FindCnetRef(ControlNet &pNewNet);
 
     private:
   };

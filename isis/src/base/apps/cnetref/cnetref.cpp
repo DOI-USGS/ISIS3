@@ -26,26 +26,16 @@ void IsisMain() {
 
     // Get the original control net internalized
     Progress progress;
-    ControlNet origNet(ui.GetFilename("NETWORK"), &progress);
+    ControlNet cNet(ui.GetFilename("NETWORK"), &progress);
 
-    // Create the new control net to store the points in.
-    ControlNet newNet;
-    newNet.SetType(origNet.Type());
-    newNet.SetTarget(origNet.Target());
     if(ui.WasEntered("NETWORKID")) {
-      newNet.SetNetworkId(ui.GetString("NETWORKID"));
-    }
-    else {
-      newNet.SetNetworkId(origNet.NetworkId());
+      cNet.SetNetworkId(ui.GetString("NETWORKID"));
     }
 
-    newNet.SetUserName(Isis::Application::UserName());
+    cNet.SetUserName(Isis::Application::UserName());
 
     if(ui.WasEntered("DESCRIPTION")) {
-      newNet.SetDescription(ui.GetString("DESCRIPTION"));
-    }
-    else {
-      newNet.SetDescription(origNet.Description());
+      cNet.SetDescription(ui.GetString("DESCRIPTION"));
     }
 
     bool bDefFile = false;
@@ -70,13 +60,13 @@ void IsisMain() {
     // Process Reference by Emission Angle
     if(sCriteria == "EMISSION") {
       cnetValidMeas = new CnetRefByEmission(pvlDefFile, sSerialNumFile);
-      cnetValidMeas->FindCnetRef(origNet, newNet);
+      cnetValidMeas->FindCnetRef(cNet);
     }
 
     // Process Reference by Incidence Angle
     else if(sCriteria == "INCIDENCE") {
       cnetValidMeas = new CnetRefByIncidence(pvlDefFile, sSerialNumFile);
-      cnetValidMeas->FindCnetRef(origNet, newNet);
+      cnetValidMeas->FindCnetRef(cNet);
     }
 
     // Process Reference by Resolution
@@ -100,7 +90,7 @@ void IsisMain() {
         }
       }
       cnetValidMeas = new CnetRefByResolution(pvlDefFile, sSerialNumFile, GetResolutionType(sType), dResValue, dMinRes, dMaxRes);
-      cnetValidMeas->FindCnetRef(origNet, newNet);
+      cnetValidMeas->FindCnetRef(cNet);
     }
 
     // Process Reference by Interest
@@ -118,7 +108,7 @@ void IsisMain() {
 
       // Get the InterestOperator set up
       InterestOperator *interestOp = InterestOperatorFactory::Create(*pvlDefFile);
-      interestOp->Operate(origNet, newNet, sSerialNumFile, sOverlapListFile);
+      interestOp->Operate(cNet, sSerialNumFile, sOverlapListFile);
 
       // Write to print.prt and screen interest details
       // add operator to print.prt
@@ -134,7 +124,7 @@ void IsisMain() {
     }
 
     // Write the new control network out
-    newNet.Write(ui.GetFilename("TO"));
+    cNet.Write(ui.GetFilename("TO"));
 
     if(cnetValidMeas) {
       Pvl pvlLog = cnetValidMeas->GetLogPvl();

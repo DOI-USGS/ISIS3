@@ -23,8 +23,9 @@ namespace Isis {
    * @param pdMinRes        - Min Resolution value 
    * @param pdMaxRes        - Max Resolution value 
    */
-  CnetRefByResolution::CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, ResolutionType peType,
-      double pdResValue, double pdMinRes, double pdMaxRes) : ControlNetValidMeasure(pPvlDef) {
+  CnetRefByResolution::CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, 
+    ResolutionType peType, double pdResValue, double pdMinRes, double pdMaxRes)
+    :ControlNetValidMeasure(pPvlDef) {
     mdResValue = pdResValue;
     mdMinRes   = pdMinRes;
     mdMaxRes   = pdMaxRes;
@@ -33,33 +34,36 @@ namespace Isis {
   }
 
   /**
-   * FindCnetRef traverses all the control points and measures in the network and checks for valid Measure which passes
-   * the Emission Incidence Angle, DN value tests and chooses the measure with the best
-   * Resolution criteria as the reference. Creates a new control network with these adjustments.
+   * FindCnetRef traverses all the control points and measures in the network and checks for 
+   * valid Measure which passes the Emission Incidence Angle, DN value tests and chooses the 
+   * measure with the best Resolution criteria as the reference. Creates a new control network 
+   * with these adjustments.
    *
    * @author Sharmila Prasad (5/25/2010)
    *
-   * @param pOrigNet  - Input Control Net
    * @param pNewNet   - Modified output Control Net 
-   *
+   *  
+   * @history 2010-10-14 Sharmila Prasad - Use single copy of Control Net in FindCnetRef() 
    */
-  void CnetRefByResolution::FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet) {
+  void CnetRefByResolution::FindCnetRef(ControlNet &pNewNet) {
     // Process each existing control point in the network
     int iTotalMeasures = 0;
     int iPointsModified = 0;
     int iMeasuresModified = 0;
-    //int iMeasuresTypeChanged=0;
     int iRefChanged = 0;
 
     //Status Report
     mStatus.SetText("Choosing Reference by Resolution...");
-    mStatus.SetMaximumSteps(pOrigNet.Size());
+    mStatus.SetMaximumSteps(pNewNet.Size());
     mStatus.CheckStatus();
 
     //mPvlLog += GetStdOptions();
-    for(int point = 0; point < pOrigNet.Size(); ++point) {
-      ControlPoint &origPnt = ((ControlNet &)pOrigNet)[point];  // to remove the const
-
+    for(int point = 0; point < pNewNet.Size(); ++point) {
+      ControlPoint & newPnt = ((ControlNet &)pNewNet)[point]; 
+      
+      // Save a copy of the Original
+      ControlPoint origPnt(newPnt);
+      
       mdResVector.clear();
 
       // Stats and Accounting
@@ -67,14 +71,9 @@ namespace Isis {
 
       // Logging
       PvlObject pvlPointObj("PointDetails");
-      pvlPointObj += Isis::PvlKeyword("PointId", origPnt.Id());
+      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.Id());
 
-      // Create a new control point
-      ControlPoint newPnt;
-      newPnt.SetId(origPnt.Id());
-      newPnt.SetType(origPnt.Type());
-
-      int iRefIndex = origPnt.ReferenceIndexNoException();
+      int iRefIndex = newPnt.ReferenceIndexNoException();
       iString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
@@ -82,7 +81,7 @@ namespace Isis {
 
       // Only perform the interest operation on points of type "Tie" and
       // Points having atleast 1 measure and Point is not Ignored
-      if(!origPnt.Ignore() && origPnt.Type() == ControlPoint::Tie && iRefIndex >= 0) {
+      if(!newPnt.Ignore() && newPnt.Type() == ControlPoint::Tie && iRefIndex >= 0) {
         // Create a measurment for each image in this point using the reference
         // lat/lon.
         int iNumIgnore = 0;
@@ -91,13 +90,13 @@ namespace Isis {
 
         for(int measure = 0; measure < origPnt.Size(); ++measure) {
 
-          ControlMeasure newMsr(origPnt[measure]); //copy constructor
+          ControlMeasure & newMsr = newPnt[measure];
           newMsr.SetDateTime();
           newMsr.SetChooserName("Application cnetref(Resolution)");
 
-          double dSample = origPnt[measure].Sample();
-          double dLine   = origPnt[measure].Line();
-          std::string sn = origPnt[measure].CubeSerialNumber();
+          double dSample = newMsr.Sample();
+          double dLine   = newMsr.Line();
+          std::string sn = newMsr.CubeSerialNumber();
 
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
@@ -121,7 +120,7 @@ namespace Isis {
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Originally Ignored");
             iNumIgnore++;
           }
-          newPnt.Add(newMsr);
+          
           if(newMsr != origPnt[measure]) {
             iMeasuresModified++;
           }
@@ -151,10 +150,8 @@ namespace Isis {
         for(int i = 0; i < newPnt.Size(); i++) {
           pvlPointObj += pvlGrpVector[i];
         }
-        pNewNet.Add(newPnt);
       } // end Tie
       else {
-        newPnt = origPnt;
         if(iRefIndex < 0) {
           pvlPointObj += Isis::PvlKeyword("Comments", "No Measures in the Point");
         }
@@ -168,7 +165,6 @@ namespace Isis {
           newPnt[measure].SetDateTime();
           newPnt[measure].SetChooserName("Application cnetref(Resolution)");
         }
-        pNewNet.Add(newPnt);
       }
 
       if(newPnt != origPnt) {
@@ -219,11 +215,11 @@ namespace Isis {
     }// end Point
 
     // Basic Statistics
-    mStatisticsGrp += Isis::PvlKeyword("TotalPoints", pOrigNet.Size());
-    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored", (pNewNet.Size() - pNewNet.NumValidPoints()));
-    mStatisticsGrp += Isis::PvlKeyword("PointsModified", iPointsModified);
+    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.Size());
+    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored",    (pNewNet.Size() - pNewNet.NumValidPoints()));
+    mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
     mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
-    mStatisticsGrp += Isis::PvlKeyword("TotalMeasures", iTotalMeasures);
+    mStatisticsGrp += Isis::PvlKeyword("TotalMeasures",    iTotalMeasures);
     mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", iMeasuresModified);
 
     mPvlLog += mStatisticsGrp;

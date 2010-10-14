@@ -53,6 +53,7 @@ namespace Isis {
   *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard Options &
   *                                         Std Options Pixels/Meters from Edge
   *   @history 2010-09-16 Sharmila Prasad - Renamed CnetValidMeasure to ControlNetValidMeasure
+  *   @history 2010-10-14 Sharmila Prasad - Use single copy of Control Net in FindCnetRef()
   */
   
   /**
@@ -78,7 +79,7 @@ namespace Isis {
       double GetMeanResolution(void);
 
       //! Given Control Net, find the reference based on Resolution
-      virtual void FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet);
+      virtual void FindCnetRef(ControlNet &pNewNet);
 
     private:
       int GetReferenceByResolution(ControlPoint &pNewPoint); //!< Get the Reference based on Resolution type

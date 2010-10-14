@@ -15,7 +15,8 @@ namespace Isis {
    * @param pPvlDef         - Pvl Definition File
    * @param psSerialNumfile - Serial Number file attached to the ControlNet
    */
-  CnetRefByIncidence::CnetRefByIncidence(Pvl *pPvlDef, std::string psSerialNumfile): ControlNetValidMeasure(pPvlDef) {
+  CnetRefByIncidence::CnetRefByIncidence(Pvl *pPvlDef, std::string psSerialNumfile)
+                     :ControlNetValidMeasure(pPvlDef) {
     ReadSerialNumbers(psSerialNumfile);
   }
 
@@ -26,10 +27,11 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/24/2010)
    *
-   * @param pOrigNet  - Input Control Net
    * @param pNewNet   - Modified output Control Net 
+   *  
+   * @history 2010-10-14 Sharmila Prasad - Use single copy of Control Net in FindCnetRef() 
    */
-  void CnetRefByIncidence::FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet) {
+  void CnetRefByIncidence::FindCnetRef(ControlNet &pNewNet) {
     // Process each existing control point in the network
     int iTotalMeasures = 0;
     int iPointsModified = 0;
@@ -38,26 +40,24 @@ namespace Isis {
 
     //Status Report
     mStatus.SetText("Choosing Reference by Incidence...");
-    mStatus.SetMaximumSteps(pOrigNet.Size());
+    mStatus.SetMaximumSteps(pNewNet.Size());
     mStatus.CheckStatus();
 
     //mPvlLog += GetStdOptions();
-    for(int point = 0; point < pOrigNet.Size(); ++point) {
-      ControlPoint &origPnt = ((ControlNet &)pOrigNet)[point];  // to remove the const
+    for(int point = 0; point < pNewNet.Size(); ++point) {
+      ControlPoint & newPnt = ((ControlNet &)pNewNet)[point];
 
+      // Save a copy of the Original
+      ControlPoint origPnt(newPnt);
+      
       // Stats and Accounting
-      iTotalMeasures += origPnt.Size();
+      iTotalMeasures += newPnt.Size();
 
       // Logging
       PvlObject pvlPointObj("PointDetails");
-      pvlPointObj += Isis::PvlKeyword("PointId", origPnt.Id());
+      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.Id());
 
-      // Create a new control point
-      ControlPoint newPnt;
-      newPnt.SetId(origPnt.Id());
-      newPnt.SetType(origPnt.Type());
-
-      int iRefIndex = origPnt.ReferenceIndexNoException();
+      int iRefIndex = newPnt.ReferenceIndexNoException();
       iString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
@@ -66,21 +66,21 @@ namespace Isis {
 
       // Only perform the interest operation on points of type "Tie" and
       // Points having atleast 1 measure and Point must not be Ignored
-      if(!origPnt.Ignore() && origPnt.Type() == ControlPoint::Tie && iRefIndex >= 0) {
+      if(!newPnt.Ignore() && newPnt.Type() == ControlPoint::Tie && iRefIndex >= 0) {
         // Create a measurment for each image in this point using the reference
         // lat/lon.
         int iNumIgnore = 0;
         iString istrTemp;
         double dBestIncidenceAngle = 135;
 
-        for(int measure = 0; measure < origPnt.Size(); ++measure) {
-          ControlMeasure newMsr(origPnt[measure]); //copy constructor
+        for(int measure = 0; measure < newPnt.Size(); ++measure) {
+          ControlMeasure & newMsr = newPnt[measure];
           newMsr.SetDateTime();
           newMsr.SetChooserName("Application cnetref(Incidence)");
 
-          double dSample = origPnt[measure].Sample();
-          double dLine   = origPnt[measure].Line();
-          std::string sn = origPnt[measure].CubeSerialNumber();
+          double dSample = newMsr.Sample();
+          double dLine   = newMsr.Line();
+          std::string sn = newMsr.CubeSerialNumber();
 
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
@@ -110,7 +110,7 @@ namespace Isis {
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Originally Ignored");
             iNumIgnore++;
           }
-          newPnt.Add(newMsr);
+
           if(newMsr != origPnt[measure]) {
             iMeasuresModified++;
           }
@@ -130,10 +130,8 @@ namespace Isis {
         for(int i = 0; i < newPnt.Size(); i++) {
           pvlPointObj += pvlGrpVector[i];
         }
-        pNewNet.Add(newPnt);
       } // end Tie
       else {
-        newPnt = origPnt;
         if(iRefIndex < 0) {
           pvlPointObj += Isis::PvlKeyword("Comments", "No Measures in the Point");
         }
@@ -147,7 +145,6 @@ namespace Isis {
           newPnt[measure].SetDateTime();
           newPnt[measure].SetChooserName("Application cnetref(Incidence)");
         }
-        pNewNet.Add(newPnt);
       }
 
       if(newPnt != origPnt) {
@@ -158,7 +155,7 @@ namespace Isis {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
         pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", origPnt[iRefIndex].CubeSerialNumber());
-        pvlRefChangeGrp += Isis::PvlKeyword("PrevIncAngle",  bestIncidenceAngle[iRefIndex]);
+        pvlRefChangeGrp += Isis::PvlKeyword("PrevIncAngle",     bestIncidenceAngle[iRefIndex]);
 
         istrTemp = iString((int)origPnt[iRefIndex].Sample());
         istrTemp += ",";
@@ -166,7 +163,7 @@ namespace Isis {
         pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
 
         pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",  newPnt[iBestIndex].CubeSerialNumber());
-        pvlRefChangeGrp += Isis::PvlKeyword("NewLeastIncAngle",   bestIncidenceAngle[iBestIndex]);
+        pvlRefChangeGrp += Isis::PvlKeyword("NewLeastIncAngle", bestIncidenceAngle[iBestIndex]);
 
         istrTemp = iString((int)newPnt[iBestIndex].Sample());
         istrTemp += ",";
@@ -184,8 +181,8 @@ namespace Isis {
     }// end Point
 
     // Basic Statistics
-    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pOrigNet.Size());
-    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored", (pNewNet.Size() - pNewNet.NumValidPoints()));
+    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.Size());
+    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored",    (pNewNet.Size() - pNewNet.NumValidPoints()));
     mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
     mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
     mStatisticsGrp += Isis::PvlKeyword("TotalMeasures",    iTotalMeasures);
