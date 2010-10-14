@@ -30,10 +30,6 @@ namespace Isis {
    *   This class accepts values past the longitude domain limits. This adds
    *   the concept of longitude direction to the Angle class.
    *
-   * The empty constructor is purposefully disallowed, I strongly discourage
-   *   constructing these with a 'known' bad longitude and testing for that
-   *   later on.
-   *
    * @ingroup Utility
    *
    * @author 2010-10-12 Steven Lambright

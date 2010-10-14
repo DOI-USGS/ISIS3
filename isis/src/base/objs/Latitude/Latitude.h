@@ -31,10 +31,6 @@ namespace Isis {
    *   This class has error checking for past the poles. This adds
    *   the concept of 90/-90 and planetographic to the Angle class.
    *
-   * The empty constructor is purposefully disallowed, I strongly discourage
-   *   constructing these with a 'known' bad latitude and testing for that
-   *   later on.
-   *
    * @ingroup Utility
    *
    * @author 2010-10-13 Steven Lambright
