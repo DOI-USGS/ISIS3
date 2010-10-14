@@ -611,7 +611,7 @@ namespace Isis {
     
     if (pvlGrp.HasKeyword("Ignore")){
       iIgnoredFlag = 0;
-      if (pvlGrp["Ignored"][0]=="true")
+      if (pvlGrp["Ignore"][0]=="true")
         iIgnoredFlag = 1;
     }
 
