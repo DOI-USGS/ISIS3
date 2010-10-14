@@ -1,12 +1,13 @@
-
 UnitTest for Angle
 
-    Testing constructors
+Testing constructors
+  Default constructor - valid?:  0 values: -1.79769313e+308 and -1.79769313e+308
   Degree input and radian output:  0.523598776 radians
+  Valid? 1
   Radian input and degree output:  30 degrees
   Copy constructor:  30 degrees
 
-    Testing operators
+Testing operators
   Assignment operator:  45 degrees
   + and - operators...
     angle + angle: 90 degrees
@@ -19,14 +20,21 @@ UnitTest for Angle
     angle /= double: 60 degrees
     angle / double: 30 degrees
 
-    Testing logical operators
+Testing logical operators
   angle1 == angle2?  0
-  angle1 < angle2?  1
+  angle1 == angle2?  1
+  angle1 == angle2?  0
+  angle1 <  angle2?  1
   angle1 <= angle2?  1
-  angle1 > angle2?  0
+**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator
+**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator
+**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator
+  angle1 >  angle2?  0
+**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator
   angle1 >= angle2?  0
+**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator
 
-    Testing protected methods
+Testing protected methods
   Degree wrap value = 360
   Radian wrap value = 6.28318531
   Degree angle set to 60

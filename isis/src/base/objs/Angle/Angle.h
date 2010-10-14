@@ -52,6 +52,7 @@ namespace Isis {
       Radians
     };
 
+    Angle();
     Angle(double angle, Units unit=Radians);
     Angle(const Angle& angle);
 
@@ -59,6 +60,7 @@ namespace Isis {
 
 
     // Class member operator functions 
+    bool Valid() const;
 
     /**
      * Assign angle object equal to another
@@ -71,15 +73,12 @@ namespace Isis {
     }
 
 
-    /**
-     * Add angle value to another as double
-     *
-     * @param angle2 The angle to add to this angle
-     * @return sum angle 
-     */
-    Angle operator+(const Angle& angle2) const {
-      return Angle(GetRadians() + angle2.GetRadians(), Radians);
-    };
+    Angle operator+(const Angle& angle2) const;
+    Angle operator-(const Angle& angle2) const;
+    Angle operator*(double value) const;
+    Angle operator/(double value) const;
+    bool operator<(const Angle& angle2) const;
+    bool operator>(const Angle& angle2) const;
 
 
     /**
@@ -88,20 +87,9 @@ namespace Isis {
      * @param angle2 The angle to add to this angle
      * @return sum angle, replaces original 
      */
-    void operator+=(const Angle&  angle2) { 
-      SetAngle(GetRadians() + angle2.GetRadians(), Radians);
+    void operator+=(const Angle&  angle2) {
+      *this = *this + angle2;
     };
-
-
-    /**
-     * Subtract angle value from another and return the resulting angle.
-     *
-     * @param angle2 The angle to subtract from this angle
-     * @return difference angle
-     */
-    Angle operator-(const Angle& angle2) const {
-      return Angle(GetRadians() - angle2.GetRadians(), Radians);
-    }
 
 
     /**
@@ -111,19 +99,8 @@ namespace Isis {
      * @param angle2 The angle to subtract from this angle
      */
     void operator-=(const Angle& angle2) {
-      SetAngle(GetRadians() - angle2.GetRadians(), Radians);
+      *this = *this - angle2;
     };
-
-
-    /**
-     * Multiply this angle by a double and return the resulting angle.
-     *
-     * @param value The double value to multiply with this angle
-     * @return Product of the angles 
-     */
-    Angle operator*(double value) const {
-      return Angle(GetRadians() * value, Radians);
-    }
 
 
     /**
@@ -133,7 +110,7 @@ namespace Isis {
      * @return Product of the angles
      */
     Angle operator*(int value) const {
-      return Angle(GetRadians() * value, Radians);
+      return *this * (double)value;
     }
 
 
@@ -143,29 +120,19 @@ namespace Isis {
      *
      * @param value The double value to multiply with this angle
      */
-    void operator*=(double value) { SetAngle(GetRadians() * value, Radians); }
-
-
-    /**
-     * Divide this angle by a double and set this instance to the resulting
-     *   angle.
-     *
-     * @param value The double value to use as the divisor
-     * @return Quotient of the angles 
-     */
-    Angle operator/(double value) const {
-      return Angle(GetRadians() / value, Radians); 
+    void operator*=(double value) {
+      *this = *this * value;
     }
 
 
     /**
-     * Divide this angle by an integet and return the resulting angle.
+     * Divide this angle by an integer and return the resulting angle.
      *
      * @param value The double value to use as the divisor
      * @return Quotient of the angles
      */
     Angle operator/(int value) const {
-      return Angle(GetRadians() / value, Radians);
+      return *this / (double)value;
     }
 
 
@@ -174,7 +141,9 @@ namespace Isis {
      *
      * @param value The double value to use as the divisor 
      */
-    void operator/=(double value) { SetAngle(GetRadians() / value, Radians); };
+    void operator/=(double value) {
+      *this = *this / value;
+    }
 
     // Relational operator functions
 
@@ -182,6 +151,8 @@ namespace Isis {
      * Test if another angle is equal to this angle. This does not compensate
      *   for going around a circle:
      *     Angle(360, Angle::Degrees) does not equal Angle(0, Angle::Degrees)
+     *
+     * Invalid angles are equal to each other.
      *
      * @param angle2 The comparison angle (on right-hand-side of == operator)
      * @return true if the angle equals the comparision angle 
@@ -192,35 +163,13 @@ namespace Isis {
 
 
     /**
-     * Test if the other angle is less than the current angle
-     *
-     * @param angle2 The comparison angle (on right-hand-side of < operator) 
-     * @return True if the angle is less than the comparision angle 
-     */
-    bool operator<(const Angle& angle2) const {
-      return (GetAngle(Radians) < angle2.GetAngle(Radians));
-    }
-
-
-    /**
      * Test if the other angle is less than or equal to the current angle
      *
      * @param angle2 The comparison angle (on right-hand-side of < operator) 
      * @return true if the angle is less than or equal to the comparision angle 
      */
     bool operator<=(const Angle& angle2) const {
-      return (GetAngle(Radians) <= angle2.GetAngle(Radians));
-    }
-
-
-    /**
-     * Test if the other angle is greater than the current angle
-     *
-     * @param angle2 The comparison angle (on right-hand-side of < operator) 
-     * @return true if the angle is greater than the comparision angle 
-     */
-    bool operator>(const Angle& angle2) const {
-      return (GetAngle(Radians) > angle2.GetAngle(Radians));
+      return *this < angle2 || *this == angle2;
     }
 
 
@@ -232,7 +181,7 @@ namespace Isis {
      *          angle 
      */
     bool operator>=(const Angle& angle2) const {
-      return (GetAngle(Radians) >= angle2.GetAngle(Radians));
+      return *this > angle2 || *this == angle2;
     }
 
 

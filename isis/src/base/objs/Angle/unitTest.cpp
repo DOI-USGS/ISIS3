@@ -29,13 +29,24 @@ int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
   cout << setprecision(9);
 
-  cout << endl << "UnitTest for Angle" << endl << endl;
-  cout << "    Testing constructors" << endl;
+  cout << "UnitTest for Angle" << endl << endl;
+  cout << "Testing constructors" << endl;
+
+  try {
+    Angle angle;
+    cout << "  Default constructor - valid?:  " << angle.Valid() << 
+      " values: " << angle.GetRadians() << " and " << angle.GetDegrees() << 
+      endl;
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+  }
 
   try {
     Angle angle(30., Angle::Degrees );
-    cout <<"  Degree input and radian output:  " << angle.GetRadians() << 
+    cout << "  Degree input and radian output:  " << angle.GetRadians() << 
       " radians" << endl;
+    cout << "  Valid? " << angle.Valid() << endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -43,7 +54,7 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle(0.523598776, Angle::Radians );
-    cout <<"  Radian input and degree output:  " << angle.GetDegrees() <<
+    cout << "  Radian input and degree output:  " << angle.GetDegrees() <<
       " degrees" <<endl;
   }
   catch(Isis::iException &e) {
@@ -53,18 +64,20 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(30., Angle::Degrees );
     Angle angleCopy(angle);
-    cout <<"  Copy constructor:  " << angleCopy.GetDegrees() << " degrees" <<endl;
+    cout <<"  Copy constructor:  " << angleCopy.GetDegrees() << " degrees" << 
+        endl;
   }
   catch(Isis::iException &e) {
     e.Report();
   }
 
-  cout << endl << "    Testing operators" << endl;
+  cout << endl << "Testing operators" << endl;
 
   try {
     Angle angle(30., Angle::Degrees );
     angle = Angle(45., Angle::Degrees);
-    cout <<"  Assignment operator:  " << angle.GetDegrees() << " degrees" <<endl;
+    cout << "  Assignment operator:  " << angle.GetDegrees() << " degrees" <<
+        endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -105,12 +118,14 @@ int main(int argc, char *argv[]) {
     e.Report();
   }
 
-  cout << endl << "    Testing logical operators" << endl;
+  cout << endl << "Testing logical operators" << endl;
 
   try {
     Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
-    cout << "  angle1 == angle2?  " << (angle1 == angle2) <<endl;
+    cout << "  angle1 == angle2?  " << (angle1 == angle2) << endl;
+    cout << "  angle1 == angle2?  " << (Angle() == Angle()) << endl;
+    cout << "  angle1 == angle2?  " << (Angle() == angle2) <<endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -119,7 +134,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
-    cout << "  angle1 < angle2?  " << (angle1 < angle2) << endl;
+    cout << "  angle1 <  angle2?  " << (angle1 < angle2) << endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -136,8 +151,40 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle1(30., Angle::Degrees );
+    cout << "  angle1 <  angle2?  " << (angle1 < Angle());
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
+    cout << "  angle1 <  angle2?  " << (Angle() < angle1);
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
+    cout << "  angle1 <=  angle2?  " << (Angle() <= angle1);
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
-    cout << "  angle1 > angle2?  " << (angle1 > angle2) << endl;
+    cout << "  angle1 >  angle2?  " << (angle1 > angle2) << endl;
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
+    cout << "  angle1 >  angle2?  " << (angle1 > Angle()) << endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -152,7 +199,15 @@ int main(int argc, char *argv[]) {
     e.Report();
   }
 
-  cout << endl << "    Testing protected methods" << endl;
+  try {
+    Angle angle1(30., Angle::Degrees );
+    cout << "  angle1 >= angle2?  " << (angle1 >= Angle()) << endl;
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+  }
+
+  cout << endl << "Testing protected methods" << endl;
 
   try {
     MyAngle angle(30., Angle::Degrees);
@@ -179,9 +234,6 @@ int main(int argc, char *argv[]) {
   catch(Isis::iException &e) {
     e.Report();
   }
-//345678901234567890123456789012345678901234567890123456789012345678901234567890
-
-
 }
 
 
