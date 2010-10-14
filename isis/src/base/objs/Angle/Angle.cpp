@@ -27,7 +27,6 @@
 #include "iString.h"
 #include "iException.h"
 
-using namespace std;
 namespace Isis {
 
   /**
