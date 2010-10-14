@@ -38,7 +38,6 @@ namespace Isis {
    *
    * @param pvl  A pvl object containing a valid InterestOperator specification
    *
-   * @see automaticRegistration.doc
    */
   InterestOperator::InterestOperator(Pvl &pPvl): ControlNetValidMeasure(pPvl) {
     p_interestAmount = 0.0;
@@ -127,7 +126,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (6/8/2010)
    *
-   * @param piIndex
+   * @param piIndex - Index for the Interest Results structure
    */
   void InterestOperator::InitInterestResults(int piIndex) {
     mtInterestResults[piIndex].msSerialNum  = "";
@@ -236,13 +235,15 @@ namespace Isis {
    * for all the points in the network
    *
    * @author Sharmila Prasad (6/9/2010)
-   *
-   * @param psSerialNumFile
-   * @param psOverlapListFile
-   * @param pOrigNet
-   * @param pNewNet
+   *  
+   * @param pNewNet - Input Control Net
+   * @param psSerialNumFile - Serial Number File
+   * @param psOverlapListFile - Overlaplist File containing overlap data
+   * 
+   * @history 10/14/2010 Sharmila Prasad - Use only a single copy of Control Net 
+   *  
    */
-  void InterestOperator::Operate(const ControlNet &pOrigNet, ControlNet &pNewNet, std::string psSerialNumFile, std::string psOverlapListFile) {
+  void InterestOperator::Operate(ControlNet &pNewNet, std::string psSerialNumFile, std::string psOverlapListFile) {
     ReadSerialNumbers(psSerialNumFile);
 
     // Find all the overlaps between the images in the FROMLIST
@@ -254,7 +255,7 @@ namespace Isis {
 
     // Process the entire control net by calculating interest and moving the
     // point to a more interesting area
-    FindCnetRef(pOrigNet, pNewNet);
+    FindCnetRef(pNewNet);
   }
 
   /**
@@ -263,39 +264,40 @@ namespace Isis {
    * and  picks the Measure with the best Interest as the Reference
    *
    * @author Sharmila Prasad (5/14/2010)
-   *
-   * @return none
+   * 
+   * @param pNewNet - Input Control Net 
+   *  
+   * @history 10/14/2010 Sharmila Prasad - Use only a single copy of Control Net 
+   *  
    */
-  void InterestOperator::FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet) {
+  void InterestOperator::FindCnetRef(ControlNet &pNewNet) {
     int iPointsModified = 0;
     int iMeasuresModified = 0;
     int iRefChanged = 0;
 
-    //Status Report
+    // Status Report
     mStatus.SetText("Choosing Reference by Interest...");
-    mStatus.SetMaximumSteps(pOrigNet.Size());
+    mStatus.SetMaximumSteps(pNewNet.Size());
     mStatus.CheckStatus();
 
     // Process each existing control point in the network
-    for(int point = 0; point < pOrigNet.Size(); ++point) {
-      ControlPoint &origPnt = ((ControlNet &) pOrigNet)[point];
+    for(int point = 0; point < pNewNet.Size(); ++point) {
+      ControlPoint & newPnt = ((ControlNet &) pNewNet)[point];
 
+      // Keep a copy
+      ControlPoint origPnt(newPnt);
+      
       // Logging
       PvlObject pvlPointObj("PointDetails");
-      pvlPointObj += Isis::PvlKeyword("PointId", origPnt.Id());
+      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.Id());
 
-      // Create a new control point
-      ControlPoint newPnt;
-      newPnt.SetId(origPnt.Id());
-      newPnt.SetType(origPnt.Type());
-
-      int iOrigRefIndex = origPnt.ReferenceIndexNoException();
+      int iOrigRefIndex = newPnt.ReferenceIndexNoException();
 
       // Only perform the interest operation on points of type "Tie" and
       // Points having atleast 1 measure and Point is not Ignored
-      if(!origPnt.Ignore() && origPnt.Type() == ControlPoint::Tie && iOrigRefIndex >= 0) {
+      if(!newPnt.Ignore() && newPnt.Type() == ControlPoint::Tie && iOrigRefIndex >= 0) {
 
-        int iBestMeasureIndex = InterestByPoint(origPnt);
+        int iBestMeasureIndex = InterestByPoint(newPnt);
 
         // Process for point with good interest and a best index
         double dReferenceLat = 0, dReferenceLon = 0;
@@ -324,8 +326,8 @@ namespace Isis {
         // Create a measurment for each image in this point using
         // the reference lat/lon.
         int iNumIgnore = 0;
-        for(int measure = 0; measure < origPnt.Size(); ++measure) {
-          ControlMeasure newMeasure(origPnt[measure]);
+        for(int measure = 0; measure < newPnt.Size(); ++measure) {
+          ControlMeasure & newMeasure = newPnt[measure];
           newMeasure.SetDateTime();
           newMeasure.SetChooserName("Application cnetref(interest)");
           std::string sn = newMeasure.CubeSerialNumber();
@@ -394,7 +396,6 @@ namespace Isis {
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "True");
             newMeasure.SetIgnore(true);
           }
-          newPnt.Add(newMeasure);
 
           if(newMeasure != origPnt[measure]) {
             iMeasuresModified ++;
@@ -409,12 +410,11 @@ namespace Isis {
         } // Measures Loop
 
         //check the ignored measures number
-        if((origPnt.Size() - iNumIgnore) < 2) {
+        if((newPnt.Size() - iNumIgnore) < 2) {
           newPnt.SetIgnore(true);
           pvlPointObj += Isis::PvlKeyword("Ignored", "Good Measures less than 2");
         }
 
-        pNewNet.Add(newPnt);
         iNumIgnore = 0;
 
         if(newPnt != origPnt) {
@@ -436,13 +436,11 @@ namespace Isis {
         else {
           pvlPointObj += Isis::PvlKeyword("Reference", "No Change");
         }
-        //Clean up the results structure
+        // Clean up the results structure
         delete [] mtInterestResults;
       }
       else {
         // Process Ignored, non Tie points or Measures=0
-        newPnt = origPnt;
-
         if(iOrigRefIndex < 0) {
           pvlPointObj += Isis::PvlKeyword("Comments", "No Measures in the Point");
         }
@@ -457,7 +455,6 @@ namespace Isis {
           newPnt[measure].SetDateTime();
           newPnt[measure].SetChooserName("Application cnetref(Interest)");
         }
-        pNewNet.Add(newPnt);
       } // End of if point is of type tie
 
       mPvlLog += pvlPointObj;
@@ -467,7 +464,7 @@ namespace Isis {
 
     // Basic Statistics
     mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.Size());
-    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored", (pNewNet.Size() - pNewNet.NumValidPoints()));
+    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored",    (pNewNet.Size() - pNewNet.NumValidPoints()));
     mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
     mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
     mStatisticsGrp += Isis::PvlKeyword("TotalMeasures",    pNewNet.NumMeasures());
@@ -482,7 +479,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (6/8/2010)
    *
-   * @param pCnetPoint
+   * @param pCnetPoint - Control Point for which the best interest is calculated
    */
   int InterestOperator::InterestByPoint(ControlPoint &pCnetPoint) {
     // Find the overlap this point is inside of if the overlap list is entered
@@ -541,9 +538,10 @@ namespace Isis {
    *
    * @author Sharmila Prasad (6/10/2010)
    *
-   * @param piMeasure
-   * @param pCnetMeasure
-   *
+   * @param piMeasure    - Index for Interest Results structure
+   * @param pCnetMeasure - Control Measure for which the best interest 
+   *                       is calculated
+   *  
    * @return bool
    */
   bool InterestOperator::InterestByMeasure(int piMeasure, ControlMeasure &pCnetMeasure, Cube &pCube) {
@@ -695,9 +693,9 @@ namespace Isis {
    * Find image overlaps by getting intersection of the individual image footprints
    * when an exact match in the overlaplist fails
    *
-   * @author sprasad (7/1/2010)
+   * @author Sharmila Prasad (7/1/2010)
    *
-   * @param pCnetPoint
+   * @param pCnetPoint - Overlaps for the Control Point
    *
    * @return const geos::geom::MultiPolygon*
    */
