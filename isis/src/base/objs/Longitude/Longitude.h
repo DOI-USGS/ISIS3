@@ -69,6 +69,7 @@ namespace Isis {
         Domain180
       };
 
+      Longitude();
       Longitude(double longitude,
                 Angle::Units longitudeUnits = Angle::Radians,
                 Direction lonDir = PositiveEast,

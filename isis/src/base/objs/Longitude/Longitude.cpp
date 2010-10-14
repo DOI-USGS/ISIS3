@@ -24,8 +24,17 @@
 #include "Constants.h"
 #include "iException.h"
 #include "iString.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
+  /**
+   * Create a blank Longitude object with 0-360 domain.
+   */
+  Longitude::Longitude() : Angle() {
+    p_currentDomain = Domain360;
+  }
+
+
   /**
    * Create and initialize a Longitude value. This value can wrap the planet
    *   any number of times regardless of the domain.
@@ -135,25 +144,27 @@ namespace Isis {
    * @param units The angular units longitude is in
    */
   void Longitude::SetPositiveWest(double longitude, Angle::Units units) {
-    if(p_currentDomain == Domain360) {
-      // Same as GetPositiveWest
-      double wrapPoint = UnitWrapValue(units);
-      double halfWrap = wrapPoint / 2.0;
+    if(!IsSpecial(longitude)) {
+      if(p_currentDomain == Domain360) {
+        // Same as GetPositiveWest
+        double wrapPoint = UnitWrapValue(units);
+        double halfWrap = wrapPoint / 2.0;
 
-      int numPlanetWraps = (int)(longitude / wrapPoint);
+        int numPlanetWraps = (int)(longitude / wrapPoint);
 
-      // being negative needs an extra increment here to get the value into
-      //   the positive 360 world
-      if (numPlanetWraps < 0) numPlanetWraps --;
+        // being negative needs an extra increment here to get the value into
+        //   the positive 360 world
+        if (numPlanetWraps < 0) numPlanetWraps --;
 
-      longitude -= numPlanetWraps * wrapPoint;
-      longitude = -(longitude - halfWrap) + halfWrap;
-      longitude += numPlanetWraps * wrapPoint;
-    }
-    else {
-      // 180 domain is just a negation in this conversion,
-      //   no more work needs done
-      longitude = -1 * longitude;
+        longitude -= numPlanetWraps * wrapPoint;
+        longitude = -(longitude - halfWrap) + halfWrap;
+        longitude += numPlanetWraps * wrapPoint;
+      }
+      else {
+        // 180 domain is just a negation in this conversion,
+        //   no more work needs done
+        longitude = -1 * longitude;
+      }
     }
 
     SetAngle(longitude, units);
@@ -180,6 +191,8 @@ namespace Isis {
    * @return Longitude with an angular value between 0 and 360 inclusive
    */
   Longitude Longitude::Force360Domain() const {
+    if(!Valid()) return Longitude();
+
     double resultantLongitude = GetAngle(Angle::Degrees);
 
     // Bring the number in the 0 to 360 range
@@ -195,6 +208,8 @@ namespace Isis {
    * @return Longitude with an angular value between -180 and 180 inclusive
    */
   Longitude Longitude::Force180Domain() const {
+    if(!Valid()) return Longitude();
+
     Longitude forced = Force360Domain();
 
     if(forced.GetDegrees() > 180.0)

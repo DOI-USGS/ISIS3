@@ -23,6 +23,15 @@ int main(int argc, char *argv[]) {
   cout << "----- Testing Constructors -----" << endl << endl;
 
   try {
+    cout << "Default constructor" << endl;
+    Longitude lon;
+    cout << lon.GetDegrees() << " degrees" << endl;
+  }
+  catch(iException &e) {
+    e.Report(false);
+  }
+
+  try {
     cout << "Constructor given a value in degrees" << endl;
     Longitude lon(180.0, Angle::Degrees);
     cout << lon.GetDegrees() << " degrees" << endl;
