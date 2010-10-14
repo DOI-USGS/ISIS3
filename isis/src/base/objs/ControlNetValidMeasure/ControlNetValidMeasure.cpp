@@ -14,7 +14,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/13/2010)
    *
-   * @param pPvl
+   * @param pPvl - Pvl DefFile
    */
   ControlNetValidMeasure::ControlNetValidMeasure(Pvl *pPvl) {
     InitStdOptions();
@@ -34,7 +34,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (6/8/2010)
    *
-   * @param pPvl
+   * @param pPvl - Pvl DefFile
    */
   ControlNetValidMeasure::ControlNetValidMeasure(Pvl &pPvl) {
     InitStdOptions();
@@ -96,7 +96,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (6/3/2010)
    *
-   * @param psSerialNumfile
+   * @param psSerialNumfile - File with list of Serial Numbers
    */
   void ControlNetValidMeasure::ReadSerialNumbers(std::string psSerialNumfile) {
     mSerialNumbers = SerialNumberList(psSerialNumfile, true, &mStatus);
@@ -110,7 +110,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/13/2010)
    *
-   * @param pvl
+   * @param pvlDef - Pvl DefFile
    */
   void ControlNetValidMeasure::Parse(Pvl &pvlDef) {
     mPvlOpGrp = pvlDef.FindGroup("Operator", Pvl::Traverse);
@@ -129,12 +129,13 @@ namespace Isis {
   /**
    * Validate a measure for all the Standard Options
    *
-   * @author sprasad (6/22/2010)
+   * @author Sharmila Prasad (6/22/2010)
    *
-   * @param piSample
-   * @param piLine
-   * @param pCube
-   *
+   * @param piSample    - Point Sample location
+   * @param piLine      - Point Line location
+   * @param pCube       - Control Measure Cube
+   * @param pMeasureGrp - Log PvlGroup 
+   *  
    * @return bool
    */
   bool ControlNetValidMeasure::ValidStandardOptions(double pdSample, double pdLine, Cube *pCube, PvlGroup *pMeasureGrp) {
@@ -178,7 +179,7 @@ namespace Isis {
    * Validate and Read the Pixels and Meters from Edge Standard
    * Options
    *
-   * @author sprasad (6/22/2010)
+   * @author Sharmila Prasad (6/22/2010)
    */
   void ControlNetValidMeasure::ValidatePvlFromEdge(void) {
     // Parse the Pixels from edge
@@ -197,7 +198,6 @@ namespace Isis {
       }
       mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge", mdMetersFromEdge);
     }
-
   }
 
   /**
@@ -303,7 +303,6 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/10/2010)
    *
-   *
    */
   void ControlNetValidMeasure::ValidatePvlIncidenceAngle(void) {
     if(mPvlOpGrp.HasKeyword("MinIncidence")) {
@@ -330,14 +329,14 @@ namespace Isis {
     }
   }
 
-
   /**
    * Validates an Emission angle by comparing with the min and max values in the def file.
    * If Emission Angle is greater or lesser than the max/min values in the def file or the defaults
    * it returns false else true.
    *
-   * @author Sharmila Prasad (3/30/2010)
-   *
+   * @author Sharmila Prasad (3/30/2010) 
+   *  
+   * @param pdEmissionAngle - Emission Angle to Valdiate
    *
    * @return bool
    */
@@ -355,7 +354,8 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/10/2010)
    *
-   *
+   * @param pdIncidenceAngle - Incidence Angle to Valdiate 
+   *  
    * @return bool
    */
   bool ControlNetValidMeasure::ValidIncidenceAngle(double pdIncidenceAngle) {
@@ -370,7 +370,9 @@ namespace Isis {
    * def file or the defaults.
    *
    * @author Sharmila Prasad (3/30/2010)
-   *
+   *  
+   * @param pdDnValue - DN Value to Valdiate 
+   *  
    * @return bool
    */
   bool ControlNetValidMeasure::ValidDnValue(double pdDnValue) {
@@ -385,7 +387,9 @@ namespace Isis {
    * def file or the defaults.
    *
    * @author Sharmila Prasad (6/4/2010)
-   *
+   *  
+   * @param pdResolution - Resolution to Validate 
+   *  
    * @return bool
    */
   bool ControlNetValidMeasure::ValidResolution(double pdResolution) {
@@ -400,7 +404,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (6/4/2010)
    *
-   * @param pCamera
+   * @param pCamera 
    * @param piSample
    * @param piLine
    *
@@ -411,13 +415,13 @@ namespace Isis {
   }
 
   /**
-   * Validate if a point is user defined number of pixels from the edge
+   * Validate if a point in Measure is user defined number of pixels from the edge
    *
    * @author Sharmila Prasad (6/21/2010)
    *
-   * @param piSample
-   * @param piLine
-   * @param pCube
+   * @param piSample - Point Sample Location
+   * @param piLine   - Point Line Location
+   * @param pCube    - Control Measure Cube
    *
    * @return bool
    */
@@ -453,13 +457,13 @@ namespace Isis {
   }
 
   /**
-   * Validate if a point is user defined number of meters from the edge
+   * Validate if a point in Measure is user defined number of meters from the edge
    *
    * @author Sharmila Prasad (6/21/2010)
    *
-   * @param piSample
-   * @param piLine
-   * @param pCube
+   * @param piSample - Point Sample Location
+   * @param piLine   - Point Line Location
+   * @param pCube    - Control Measure Cube
    *
    * @return bool
    */

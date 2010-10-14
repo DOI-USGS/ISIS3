@@ -47,13 +47,14 @@ namespace Isis {
     * @see cnetref autoseed etc.
     *
     * @internal
-    *   @history 2010-05-11 Sharmila Prasad - Original Version
-    *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
-    *                                         use CubeManager instead
-    *   @history 2010-06-23 Sharmila Prasad - Added Pixels/Meters from the edge options
-    *                                         and Validate Standard Options
-    *   @history 2010-09-16 Sharmila Prasad - Renamed to ControlNetValidMeasure for uniformity with
-    *                                         other ControlNet Classes
+    *  @history 2010-05-11 Sharmila Prasad - Original Version
+    *  @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap & 
+    *                                        Cubes use CubeManager instead
+    *  @history 2010-06-23 Sharmila Prasad - Added Pixels/Meters from the edge options
+    *                                        and Validate Standard Options
+    *  @history 2010-09-16 Sharmila Prasad - Renamed to ControlNetValidMeasure for  
+    *                                        uniformity with other ControlNet Classes
+    *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control Net
     */
 
   class ControlNetValidMeasure {
@@ -61,12 +62,16 @@ namespace Isis {
       ControlNetValidMeasure(Pvl *pvl = 0);
       ControlNetValidMeasure(Pvl &pvl);
 
-      void InitStdOptions(void);         //!< Initialize the Standard Options
-      void InitStdOptionsGroup(void);    //!< Initialize the Standard Options Pvl Group with no DefFile
+      //! Initialize the Standard Options
+      void InitStdOptions(void);         
+      
+      //! Initialize the Standard Options Pvl Group with no DefFile
+      void InitStdOptionsGroup(void);    
 
       virtual ~ControlNetValidMeasure();
 
-      void Parse(Pvl &pvlDef);           //!< Parse the DefFile for Standard Options
+      //! Parse the DefFile for Standard Options
+      void Parse(Pvl &pvlDef);
 
       //! Get the Pvl Log file
       virtual Pvl &GetLogPvl(void) {
@@ -74,13 +79,22 @@ namespace Isis {
       };
 
       //! Virtual Function to get better references for a Control Network based on Criteria
-      virtual void FindCnetRef(const ControlNet &pOrigNet, ControlNet &pNewNet) {};
+      virtual void FindCnetRef(ControlNet &pNewNet) {};
 
-      bool ValidEmissionAngle(double pdEmissionAngle);                   //!< Validate whether the Emission Angle is in the set Range
-      bool ValidIncidenceAngle(double pdIncidenceAngle);                 //!< Validate whether the Incidence Angle is in the set Range
-      bool ValidDnValue(double pdDnValue);                               //!< Validate whether the DN Value is in the set Range
-      bool ValidResolution(double pdResolution);                         //!< Validate whether the Resolution is in the set Range
-      bool ValidLatLon(Isis::Camera *pCamera, int piSample, int piLine); //!< Validate the Lat/Lon
+      //! Validate whether the Emission Angle is in the set Range
+      bool ValidEmissionAngle(double pdEmissionAngle);
+      
+      //! Validate whether the Incidence Angle is in the set Range
+      bool ValidIncidenceAngle(double pdIncidenceAngle);
+      
+      //! Validate whether the DN Value is in the set Range
+      bool ValidDnValue(double pdDnValue);
+      
+      //! Validate whether the Resolution is in the set Range
+      bool ValidResolution(double pdResolution);
+      
+      //! Validate the Lat/Lon
+      bool ValidLatLon(Isis::Camera *pCamera, int piSample, int piLine); 
 
       //! Get the Standard Options Pvl Group
       PvlGroup &GetStdOptions(void) {
@@ -147,36 +161,47 @@ namespace Isis {
       bool ValidStandardOptions(double pdSample, double pdLine, Cube *pCube, PvlGroup *pMeasureGrp = NULL);
 
     protected:
-      void ValidatePvlDN(void);                             //!< Validate PVL Min & Max DN Standard Options
-      void ValidatePvlEmissionAngle(void);                  //!< Validate PVL Min & Max EmissionAngle Standard Options
-      void ValidatePvlIncidenceAngle(void);                 //!< Validate PVL Min & Max IncidenceAngle Standard Options
-      void ValidatePvlResolution(void);                     //!< Validate PVL Min & Max Resolution Standard Options
-      void ValidatePvlFromEdge(void);                       //!< Validate and read Pixels and Meters from Edge Standard Options
-      void ReadSerialNumbers(std::string psSerialNumfile);  //!< Read the Serial Numbers from the file and open assocaited cubes
+      //! Validate PVL Min & Max DN Standard Options
+      void ValidatePvlDN(void);
+      
+      //! Validate PVL Min & Max EmissionAngle Standard Options
+      void ValidatePvlEmissionAngle(void);
+      
+      //! Validate PVL Min & Max IncidenceAngle Standard Options
+      void ValidatePvlIncidenceAngle(void);
+      
+      //! Validate PVL Min & Max Resolution Standard Options
+      void ValidatePvlResolution(void);
+      
+      //! Validate and read Pixels and Meters from Edge Standard Options
+      void ValidatePvlFromEdge(void);
+      
+      //! Read the Serial Numbers from the file and open assocaited cubes
+      void ReadSerialNumbers(std::string psSerialNumfile);
 
-      double mdMinDN;                     //!< Standard Option MinDN
-      double mdMaxDN;                     //!< Standard Option MaxDN
-      double mdMinResolution;             //!< Standard Option MinResolution
-      double mdMaxResolution;             //!< Standard Option MaxResolution
-      double mdMinEmissionAngle;          //!< Standard Option MinEmissionAngle
-      double mdMaxEmissionAngle;          //!< Standard Option MaxEmissionAngle
-      double mdMinIncidenceAngle;         //!< Standard Option MinIncidenceAngle
-      double mdMaxIncidenceAngle;         //!< Standard Option MaxIncidenceAngle
-      double mdMetersFromEdge;            //!< Standard Option MeteresFromEdge
-      int miPixelsFromEdge;               //!< Standard Option PixelsFromEdge
+      double mdMinDN;                  //!< Standard Option MinDN
+      double mdMaxDN;                  //!< Standard Option MaxDN
+      double mdMinResolution;          //!< Standard Option MinResolution
+      double mdMaxResolution;          //!< Standard Option MaxResolution
+      double mdMinEmissionAngle;       //!< Standard Option MinEmissionAngle
+      double mdMaxEmissionAngle;       //!< Standard Option MaxEmissionAngle
+      double mdMinIncidenceAngle;      //!< Standard Option MinIncidenceAngle
+      double mdMaxIncidenceAngle;      //!< Standard Option MaxIncidenceAngle
+      double mdMetersFromEdge;         //!< Standard Option MeteresFromEdge
+      int miPixelsFromEdge;            //!< Standard Option PixelsFromEdge
 
-      double mdEmissionAngle;             //!< Store current Measure's Emission Angle
-      double mdIncidenceAngle;            //!< Store current Measure's Incidence Angle
-      double mdResolution;                //!< Store current Measure's Resolution
-      double mdDnValue;                   //!< Store current Measure's DN Value
+      double mdEmissionAngle;          //!< Store current Measure's Emission Angle
+      double mdIncidenceAngle;         //!< Store current Measure's Incidence Angle
+      double mdResolution;             //!< Store current Measure's Resolution
+      double mdDnValue;                //!< Store current Measure's DN Value
 
-      PvlGroup mPvlOpGrp;                 //!< Pvl Operator Group
-      PvlGroup mStdOptionsGrp;            //!< Pvl Standard Options Group
-      PvlGroup mStatisticsGrp;            //!< Pvl output Statistics Group
-      Pvl mPvlLog;                        //!< Pvl Log - containing all the processing log
-      Progress mStatus;                   //!< Monitor the Progress/status of the application running
-      CubeManager mCubeMgr;               //!< CubeManager to open and read cubes
-      SerialNumberList mSerialNumbers;    //!< Serial numbers lists read from the list file
+      PvlGroup mPvlOpGrp;              //!< Pvl Operator Group
+      PvlGroup mStdOptionsGrp;         //!< Pvl Standard Options Group
+      PvlGroup mStatisticsGrp;         //!< Pvl output Statistics Group
+      Pvl mPvlLog;                     //!< Pvl Log of all the processing
+      Progress mStatus;                //!< Monitor the status of the app
+      CubeManager mCubeMgr;            //!< CubeManager to open and read cubes
+      SerialNumberList mSerialNumbers; //!< Serial numbers list
   };
 };
 #endif
