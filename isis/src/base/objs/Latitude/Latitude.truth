@@ -1,5 +1,7 @@
 ----- Testing Constructors -----
 
+Default constructor
+-1.7976931348623e+308 degrees
 Constructor given a value in degrees
 45 degrees
 Constructor given a Planetographic value

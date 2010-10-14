@@ -96,6 +96,7 @@ namespace Isis {
         Planetographic
       };
 
+      Latitude();
       Latitude(double latitude,
                Angle::Units latitudeUnits = Angle::Radians,
                ErrorChecking errors = ThrowAllErrors);

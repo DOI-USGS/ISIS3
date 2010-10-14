@@ -25,8 +25,20 @@
 #include "Distance.h"
 #include "iException.h"
 #include "iString.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
+  /**
+   * Create a blank Latitude object without Planetographic support.
+   */
+  Latitude::Latitude() : Angle() {
+    p_equatorialRadius = NULL;
+    p_polarRadius = NULL;
+
+    p_errors = ThrowAllErrors;
+  }
+
+
   /**
    * Create and initialize a Latitude value without planetographic support.
    *
@@ -38,7 +50,7 @@ namespace Isis {
    * @param errors Error checking conditions
    */
   Latitude::Latitude(double latitude, Angle::Units latitudeUnits,
-                     ErrorChecking errors) : Angle(0.0) {
+                     ErrorChecking errors) : Angle() {
     p_equatorialRadius = NULL;
     p_polarRadius = NULL;
 
@@ -65,7 +77,7 @@ namespace Isis {
                      Distance equatorialRadius, Distance polarRadius,
                      CoordinateType latType,
                      Angle::Units latitudeUnits,
-                     ErrorChecking errors) : Angle(0.0) {
+                     ErrorChecking errors) : Angle() {
     p_equatorialRadius = NULL;
     p_polarRadius = NULL;
 
@@ -172,6 +184,12 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    if(!Valid()) {
+      iString msg = "Invalid planetographic latitudes are not currently "
+          "supported";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
     double ographicLatitude = atan(tan(*this) * 
         (*p_equatorialRadius / *p_polarRadius) *
         (*p_equatorialRadius / *p_polarRadius));
@@ -202,6 +220,12 @@ namespace Isis {
         inputAngle < Angle(-90.0, Angle::Degrees)) {
       iString msg = "Latitudes outside of the -90/90 range cannot be converted "
           "between Planetographic and Planetocentric";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    if(IsSpecial(latitude)) {
+      iString msg = "Invalid planetographic latitudes are not currently "
+          "supported";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -246,9 +270,9 @@ namespace Isis {
    * @param angle The numeric value of the angle
    * @param units The units angle is in (radians or degrees typically)
    */
-  void Latitude::SetAngle(double angle, const Angle::Units &units) {
+  void Latitude::SetAngle(double angle, const Angle::Units &units) { 
     // Check for passing 90 degrees if that error checking is on
-    if ((p_errors | AllowPastPole) != AllowPastPole) {
+    if (!IsSpecial(angle) && (p_errors | AllowPastPole) != AllowPastPole) {
       Angle tmpAngle(angle, units);
       if(tmpAngle > Angle(90, Angle::Degrees) ||
          tmpAngle < Angle(-90, Angle::Degrees)) {
