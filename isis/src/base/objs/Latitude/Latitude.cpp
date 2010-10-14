@@ -241,7 +241,7 @@ namespace Isis {
     * This assigns another latitude to this one - making this latitude an
     *   exact duplicate of the other.
     *
-    * @param latToCopy The latitude we are assigning from
+    * @param latitudeToCopy The latitude we are assigning from
     * @return The result, a reference to this
     */
   Latitude& Latitude::operator=(const Latitude & latitudeToCopy) {
