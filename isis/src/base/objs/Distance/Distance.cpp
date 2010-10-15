@@ -24,12 +24,6 @@
 
 namespace Isis {
 
-  /*
-   * A constructor for a blank distance object is not provided because it
-   *   doesn't make sense to keep track as to whether we set a distance yet
-   *   or not.
-   */
-
   /**
    * This is the copy constructor for Distance. The distance passed in will be
    *   exactly duplicated.
