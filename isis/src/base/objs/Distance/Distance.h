@@ -53,6 +53,7 @@ namespace Isis {
         Kilometers
       };
 
+      Distance();
       Distance(double distance, Units distanceUnit = Meters);
       Distance(const Distance &distanceToCopy);
       ~Distance();
@@ -63,6 +64,8 @@ namespace Isis {
       double GetKilometers() const;
       void SetKilometers(double distanceInKilometers);
 
+      bool Valid() const;
+
       /**
        * Get the distance in meters. This is equivalent to GetMeters()
        *
@@ -72,20 +75,8 @@ namespace Isis {
         return GetMeters();
       }
 
-      // The following comparison operators could rely in the double operator
-      // to work, but I feel it's clearer what's happening and less work to
-      // maintain if I manually write these and put them here.
-
-      /**
-       * Compare two distances with the greater than operator.
-       *
-       * @param otherDistance This is the distance we're comparing to, i.e. on
-       *     the right hand side of the operator when used
-       * @return True if this distance is greater than the given distance
-       */
-      bool operator >(const Distance &otherDistance) const {
-        return GetMeters() > otherDistance.GetMeters();
-      }
+      bool operator >(const Distance &otherDistance) const;
+      bool operator <(const Distance &otherDistance) const;
 
 
       /**
@@ -97,19 +88,7 @@ namespace Isis {
        *     distance
        */
       bool operator >=(const Distance &otherDistance) const {
-        return GetMeters() >= otherDistance.GetMeters();
-      }
-
-
-      /**
-       * Compare two distances with the less than operator.
-       *
-       * @param otherDistance This is the distance we're comparing to, i.e. on
-       *     the right hand side of the operator when used
-       * @return True if this distance is less than the given distance
-       */
-      bool operator <(const Distance &otherDistance) const {
-        return GetMeters() < otherDistance.GetMeters();
+        return *this > otherDistance || *this == otherDistance;
       }
 
 
@@ -122,12 +101,13 @@ namespace Isis {
        *   distance
        */
       bool operator <=(const Distance &otherDistance) const {
-        return GetMeters() <= otherDistance.GetMeters();
+        return *this < otherDistance || *this == otherDistance;
       }
 
 
       /**
-       * Compare two distances with the == operator.
+       * Compare two distances with the == operator. Two uninitialized distances
+       *   are equal to each other.
        *
        * @param otherDistance This is the distance we're comparing to, i.e. on
        *     the right hand side of the operator when used

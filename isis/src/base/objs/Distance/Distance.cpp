@@ -21,8 +21,17 @@
 
 #include "iException.h"
 #include "iString.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
+
+  /**
+   * This initializes the distance to an invalid state. You must set the
+   *   distance later on with operator= or one of the Set methods.
+   */
+  Distance::Distance() {
+    SetDistance(Null, Meters);
+  }
 
   /**
    * This is the copy constructor for Distance. The distance passed in will be
@@ -57,7 +66,7 @@ namespace Isis {
   Distance::~Distance() {
     // This will help debug memory problems, better to reset to obviously bad
     //   values in case we're used after we're deleted. 
-    p_distanceInMeters = 0.0;
+    p_distanceInMeters = Null;
   }
 
 
@@ -105,6 +114,52 @@ namespace Isis {
 
 
   /**
+   * Test if this distance has been initialized or not
+   *
+   * @return True if this distance has been initialized.
+   */
+  bool Distance::Valid() const {
+    return GetDistance(Meters) != Null;
+  }
+
+
+  /**
+    * Compare two distances with the greater than operator.
+    *
+    * @param otherDistance This is the distance we're comparing to, i.e. on
+    *     the right hand side of the operator when used
+    * @return True if this distance is greater than the given distance
+    */
+  bool Distance::operator >(const Distance &otherDistance) const {
+    if(!Valid() || !otherDistance.Valid()) {
+      iString msg = "Distance has not been initialized, you must initialize "
+          "it first before comparing with another distance using [>]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    return GetMeters() > otherDistance.GetMeters();
+  }
+
+
+  /**
+    * Compare two distances with the less than operator.
+    *
+    * @param otherDistance This is the distance we're comparing to, i.e. on
+    *     the right hand side of the operator when used
+    * @return True if this distance is less than the given distance
+    */
+  bool Distance::operator <(const Distance &otherDistance) const {
+    if(!Valid() || !otherDistance.Valid()) {
+      iString msg = "Distance has not been initialized, you must initialize "
+          "it first before comparing with another distance using [<]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    return GetMeters() < otherDistance.GetMeters();
+  }
+
+
+  /**
    * Assign this distance to the value of another distance.
    *
    * @param distanceToCopy This is the distance we are to duplicate exactly
@@ -126,8 +181,9 @@ namespace Isis {
    * @return Resulting distance, self not modified
    */
   Distance Distance::operator +(const Distance &distanceToAdd) const {
-    Distance result(GetMeters() + distanceToAdd.GetMeters(), Meters);
-    return result;
+    if(!Valid() || !distanceToAdd.Valid()) return Distance();
+
+    return Distance(GetMeters() + distanceToAdd.GetMeters(), Meters);
   }
 
 
@@ -180,6 +236,8 @@ namespace Isis {
     double distanceInMeters = p_distanceInMeters;
     double resultingDistance = 0.0;
 
+    if(p_distanceInMeters == Null) return Null;
+
     // This could use a negative value in order to denote unit not found,
     //   which would give a compiler warning. However, for consistency with set
     //   and the want to not do extra computation in this class we will use an
@@ -215,6 +273,11 @@ namespace Isis {
    */
   void Distance::SetDistance(const double &distance, Units distanceUnit) {
     double distanceInMeters = 0.0;
+
+    if(distance == Null) {
+      p_distanceInMeters = Null;
+      return;
+    }
 
     switch(distanceUnit) {
       case Meters:

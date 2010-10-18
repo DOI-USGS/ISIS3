@@ -19,8 +19,6 @@ int main(int argc, char *argv[]) {
 
   cout << "----- Testing Constructors -----" << endl << endl;
 
-  /*
-  // See Distance.cpp for why this is disabled.
   try {
     cout << "Empty constructor" << endl;
     Distance dist;
@@ -29,7 +27,6 @@ int main(int argc, char *argv[]) {
   catch(iException &e) {
     e.Report(false);
   }
-  */
 
   try {
     cout << "Constructor given a value in meters" << endl;
@@ -236,6 +233,34 @@ int main(int argc, char *argv[]) {
   try {
     Distance dist(1, (Distance::Units)-1);
     dist.SetKilometers(-1);
+  }
+  catch(iException &e) {
+    e.Report(false);
+  }
+
+  try {
+    Distance() > Distance();
+  }
+  catch(iException &e) {
+    e.Report(false);
+  }
+
+  try {
+    Distance() >= Distance();
+  }
+  catch(iException &e) {
+    e.Report(false);
+  }
+
+  try {
+    Distance() < Distance();
+  }
+  catch(iException &e) {
+    e.Report(false);
+  }
+
+  try {
+    Distance() <= Distance();
   }
   catch(iException &e) {
     e.Report(false);
