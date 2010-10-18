@@ -238,10 +238,6 @@ namespace Isis {
 
     if(p_distanceInMeters == Null) return Null;
 
-    // This could use a negative value in order to denote unit not found,
-    //   which would give a compiler warning. However, for consistency with set
-    //   and the want to not do extra computation in this class we will use an
-    //   exception. 
     switch(distanceUnit) {
       case Meters:
         resultingDistance = distanceInMeters;
