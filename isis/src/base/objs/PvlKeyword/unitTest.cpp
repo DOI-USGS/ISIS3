@@ -321,18 +321,38 @@ int main() {
    cerr << "Invalid Keyword Type: Integer Expected" << endl;
   }
   
+  // Test keyword__Type
+  try {
+    PvlKeyword pvlTmplKwrd("KeyName", "integer");
+    PvlKeyword pvlKwrd("KeyName", -3);
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "positive");
+  } catch(Isis::iException &e) {
+    cerr <<"Positive number Expected" << endl;
+  }
+  
+  // Test keyword__Type
+  try {
+    PvlKeyword pvlTmplKwrd("KeyName", "integer");
+    PvlKeyword pvlTmplKwrdRange("KeyName__Range", (0-10));
+    PvlKeyword pvlKwrd("KeyName", 11);
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdRange);
+  } catch(Isis::iException &e) {
+    cerr <<"Integer not in the Range. Expected (0-10)" << endl;
+  }
+  
   // Validate String
   try {
     PvlKeyword pvlTmplKwrd("KeyName", "string");
-    pvlTmplKwrd.AddValue("value1");
-    pvlTmplKwrd.AddValue("value2");
-    pvlTmplKwrd.AddValue("value3");
+    PvlKeyword pvlTmplKwrdValue("KeyName__Value", "value0");
+    pvlTmplKwrdValue.AddValue("value1");
+    pvlTmplKwrdValue.AddValue("value2");
+    pvlTmplKwrdValue.AddValue("value3");
     PvlKeyword pvlKwrd("KeyName", "VALUe3");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdValue);
     pvlKwrd.Clear();
 
     pvlKwrd=PvlKeyword("KeyName", "value");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdValue);
   } 
   catch(Isis::iException &e) {
     cerr << "Invalid Keyword Value: Expected values \"value1\", \"value2\", \"value3\"" << endl;

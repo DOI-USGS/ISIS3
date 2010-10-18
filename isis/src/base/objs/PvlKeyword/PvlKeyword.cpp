@@ -1793,21 +1793,68 @@ namespace Isis {
    * 
    * @author Sharmila Prasad (9/22/2010)
    * 
-   * @param pvlKwrd - Keyword to be validated
+   * @param pvlKwrd      - Keyword to be validated 
+   * @param psValueType  - Value Type (positive / negative) for numbers
+   * @param pvlKwrdValue - Template Keyword __Value or __Range to validate keyword's value
    */
-  void PvlKeyword::ValidateKeyword(PvlKeyword & pvlKwrd)
+  void PvlKeyword::ValidateKeyword(PvlKeyword & pvlKwrd, std::string psValueType, PvlKeyword* pvlKwrdValue)
   {
-    int iTmplKwrdSize = Size();
     int iSize = pvlKwrd.Size();
     
     string sType = iString::DownCase(p_values[0]);
+    
+    // Value type
+    if(psValueType.length()) {
+      psValueType = iString::DownCase(psValueType);
+    }
+
+    double dRangeMin=0, dRangeMax=0;
+    bool bRange = false;
+    bool bValue = false;
+    if(pvlKwrdValue != NULL) {
+      string sValueName = pvlKwrdValue->Name();
+      
+      // Check for Range
+      if(sValueName.find("__Range") != string::npos ) {
+        dRangeMin = (*pvlKwrdValue)[0];
+        dRangeMax = (*pvlKwrdValue)[1];
+        bRange = true;
+      }
+      else if(sValueName.find("__Value") != string::npos) {
+        bValue = true;
+      }
+    }
     
     // Type integer
     if(sType == "integer") {
       for(int i=0; i<iSize; i++) {
         string sValue = iString::DownCase(pvlKwrd[i]);
         if(sValue != "null"){
-          iString::ToInteger(sValue);
+          int iValue = iString::ToInteger(sValue);
+          if(bRange && (iValue < dRangeMin || iValue > dRangeMax)) {
+            string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
+            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
+          }
+          if(bValue) {
+            bool bFound = false;
+            for(int j=0; j<pvlKwrdValue->Size(); j++) {
+              if(iValue == (int)(*pvlKwrdValue)[j]) {
+                bFound = true;
+                break;
+              }
+            }
+            if(!bFound) {
+              string sErrMsg = "\"" +pvlKwrd.Name() +"\" has value not in the accepted list";
+              throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            }
+          }
+          // Type is specified (positive / negative)
+          if(psValueType.length()) {
+            if((psValueType == "positive" && iValue < 0) || (psValueType == "negative" && iValue >= 0) ) {
+              string sErrMsg = "\"" +pvlKwrd.Name() +"\" has invalid value";
+              throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            }
+          }
         }
       }
       return;
@@ -1818,7 +1865,31 @@ namespace Isis {
       for(int i=0; i<iSize; i++) {
         string sValue = iString::DownCase(pvlKwrd[i]);
         if(sValue != "null"){
-          iString::ToDouble(sValue);
+          double dValue = iString::ToDouble(sValue);
+          if(bRange && (dValue < dRangeMin || dValue > dRangeMax)) {
+            string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
+            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
+          }
+          if(bValue) {
+            bool bFound = false;
+            for(int j=0; j<pvlKwrdValue->Size(); j++) {
+              if(dValue == (double)(*pvlKwrdValue)[j]) {
+                bFound = true;
+                break;
+              }
+            }
+            if(!bFound) {
+              string sErrMsg = "\"" +pvlKwrd.Name() +"\" has value not in the accepted list";
+            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            }
+          }
+          // Type is specified (positive / negative)
+          if(psValueType.length()) {
+            if((psValueType == "positive" && dValue < 0) || (psValueType == "negative" && dValue >= 0) ) {
+              string sErrMsg = "\"" +pvlKwrd.Name() +"\" has invalid value";
+              throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            }
+          }
         }
       }
       return;
@@ -1837,21 +1908,21 @@ namespace Isis {
     }
     
     // Type String
-    if(sType == "string" && iTmplKwrdSize > 1) {
+    if(sType == "string") {
       for(int i=0; i<iSize; i++) {
         string sValue = iString::DownCase(pvlKwrd[i]);
-        bool bValFound = false;
-        
-        for(int j=1; j<iTmplKwrdSize; j++) {
-          string sTmplValue = iString::DownCase(p_values[j]);
-          if (sValue == sTmplValue) {
-            bValFound = true;
-            break;
+        if(bValue) {
+          bool bValFound = false;
+          for(int i=0; i<pvlKwrdValue->Size(); i++) {
+            if(sValue == iString::DownCase((*pvlKwrdValue)[i])) {
+              bValFound = true;
+              break;
+            }
           }
-        }
-        if(bValFound == false) {
-          string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
-          throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+          if(!bValFound) {
+            string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
+            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+          }
         }
       }
     }

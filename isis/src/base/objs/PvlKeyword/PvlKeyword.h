@@ -77,6 +77,7 @@ namespace Isis {
    *                                  Added assignment operator
    *  @history 2010-06-25 Steven Lambright - NULLs ('\0') now count as binary
    *  @history 2010-09-27 Sharmila Prasad - API to Validate a Keyword for type and values
+   *  @history 2010-10-18 Sharmila Prasad - Added more options for the keyword validation
    */
   class PvlSequence;
   class PvlFormat;
@@ -237,7 +238,7 @@ namespace Isis {
       const PvlKeyword &operator=(const PvlKeyword &other);
       
       //! Validate Keyword for type and required values
-      void ValidateKeyword(PvlKeyword & pvlKwrd);
+      void ValidateKeyword(PvlKeyword & pvlKwrd, std::string psValueType="", PvlKeyword* pvlKwrdRange=NULL);
 
     protected:
       std::string Reform(const std::string &value) const;
