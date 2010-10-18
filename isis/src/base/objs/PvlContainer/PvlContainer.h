@@ -55,6 +55,7 @@ namespace Isis {
    *                                - Added Assignment operator
    *  @history 2010-09-27 Sharmila Prasad - Validate all the Keywords in a Container and
    *                                        verify the 'Repeat' Option also
+   *  @history 2010-10-18 Sharmila Prasad - Added more options for the keyword validation
    *  @todo 2005-04-04 Need coded example.
    */
   class PvlContainer {

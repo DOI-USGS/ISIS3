@@ -401,7 +401,10 @@ namespace Isis {
    * 
    * @author Sharmila Prasad (9/24/2010)
    * 
-   * @param pPvlCont - Container to be Validated
+   * @param pPvlCont - Container to be Validated 
+   *  
+   * @history 2010-10-18 Sharmila Prasad - Added options "Type", "Range", "Value" 
+   *                                       for the keyword validation 
    */
   void PvlContainer::ValidateAllKeywords(PvlContainer & pPvlCont)
   {
@@ -412,14 +415,39 @@ namespace Isis {
       string sKeyName = pvlTmplKwrd.Name();
       bool bKwrdFound = false;
       
-      // These are reserved keywords for properties like "Required" or "Repeated"
-      if(sKeyName.find("__Required") != string::npos || sKeyName.find("__Repeated") != string::npos) {
+      // These are reserved keywords for properties like "Range", "Value", "Type", 
+      // "Required" or "Repeated"
+      if(sKeyName.find("__Required") != string::npos || sKeyName.find("__Repeated") != string::npos ||
+         sKeyName.find("__Range") != string::npos || sKeyName.find("__Value") != string::npos ||
+         sKeyName.find("__Type") != string::npos) {
         continue;
       }
       
       if(pPvlCont.HasKeyword(sKeyName)) {
         PvlKeyword & pvlKwrd = pPvlCont.FindKeyword(sKeyName);
-        pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+        string sTmplKwrdRange = sKeyName + "__Range";
+        string sTmplKwrdValue = sKeyName + "__Value";
+        string sTmplKwrdType  = sKeyName + "__Type";
+        string sType="";
+        PvlKeyword pvlTmplKwrdRange, pvlTmplKwrdValue;
+
+        // Check if Type is specified (positive or negative for numbers)
+        if(HasKeyword(sTmplKwrdType)) {
+          sType = FindKeyword(sTmplKwrdType)[0];
+        }
+        // Check for Range
+        if(HasKeyword(sTmplKwrdRange)) {
+          pvlTmplKwrdRange = FindKeyword(sTmplKwrdRange);
+          pvlTmplKwrd.ValidateKeyword(pvlKwrd, sType, &pvlTmplKwrdRange);
+        }
+        // Check for Value
+        else if(HasKeyword(sTmplKwrdValue)) {
+          pvlTmplKwrdValue = FindKeyword(sTmplKwrdValue);
+          pvlTmplKwrd.ValidateKeyword(pvlKwrd, sType, &pvlTmplKwrdValue);
+        }
+        else {
+          pvlTmplKwrd.ValidateKeyword(pvlKwrd, sType);
+        }
         pPvlCont.DeleteKeyword(pvlKwrd.Name());
         bKwrdFound = true;
       }
@@ -450,15 +478,24 @@ namespace Isis {
    * @author Sharmila Prasad (9/24/2010)
    * 
    * @param pPvlTmplKwrd - Template Keyword wit
-   * @param pPvlCont - Container with all the Keywords
+   * @param pPvlCont - Container with all the Keywords 
+   *  
+   * @history 2010-10-18 Sharmila Prasad - Added option "Type" for the keyword validation 
    */
   void PvlContainer::ValidateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont)
   {
     string sTmplKeyName = pPvlTmplKwrd.Name();
-    string sOption = sTmplKeyName + "__Repeated";
+    
+    // Check for the Type
+    string sType = sTmplKeyName + "__Type";
+    string sValueType ="";
+    if(HasKeyword(sType)) {
+      sValueType = FindKeyword(sType)[0];
+    }
+    string sRepeatOption = sTmplKeyName + "__Repeated";
     bool bRepeat =false;
-    if(HasKeyword(sOption)) {
-      PvlKeyword pvlKeyOption = FindKeyword(sOption);
+    if(HasKeyword(sRepeatOption)) {
+      PvlKeyword pvlKeyOption = FindKeyword(sRepeatOption);
       if(pvlKeyOption[0] == "true") { // Required is true
         bRepeat = true;
       }
@@ -469,7 +506,7 @@ namespace Isis {
         PvlKeyword & pvlKwrd = pPvlCont[j];
         string sKeyName = pvlKwrd.Name();
         if(sTmplKeyName == sKeyName) {
-          pPvlTmplKwrd.ValidateKeyword(pvlKwrd);
+          pPvlTmplKwrd.ValidateKeyword(pvlKwrd, sValueType);
           pPvlCont.DeleteKeyword(pvlKwrd.Name());
         }
       }
