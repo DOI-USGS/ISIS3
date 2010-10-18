@@ -234,7 +234,7 @@ namespace Isis {
    */
   double Distance::GetDistance(Units distanceUnit) const {
     double distanceInMeters = p_distanceInMeters;
-    double resultingDistance = 0.0;
+    double resultingDistance = Null;
 
     if(p_distanceInMeters == Null) return Null;
 
@@ -250,11 +250,12 @@ namespace Isis {
       case Kilometers:
         resultingDistance = distanceInMeters / 1000.0;
         break;
+    }
 
-      default:
-        iString msg = "Distance does not understand the enumerated value [" +
-          iString(distanceUnit) + "] as a unit";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    if(resultingDistance == Null) {
+      iString msg = "Distance does not understand the enumerated value [" +
+        iString(distanceUnit) + "] as a unit";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     return resultingDistance;
@@ -272,7 +273,7 @@ namespace Isis {
    *     exception will be thrown and the state left unmodified.
    */
   void Distance::SetDistance(const double &distance, Units distanceUnit) {
-    double distanceInMeters = 0.0;
+    double distanceInMeters = Null;
 
     if(distance == Null) {
       p_distanceInMeters = Null;
@@ -287,11 +288,12 @@ namespace Isis {
       case Kilometers:
         distanceInMeters = distance * 1000.0;
         break;
+    }
 
-      default:
-        iString msg = "Distance does not understand the enumerated value [" +
-          iString(distanceUnit) + "] as a unit";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    if(distanceInMeters == Null) {
+      iString msg = "Distance does not understand the enumerated value [" +
+        iString(distanceUnit) + "] as a unit";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     if (distanceInMeters < 0.0) {
