@@ -1,11 +1,12 @@
 #include "Isis.h"
+#include "IsisDebug.h"
+#include "iException.h"
 
 #include "Pvl.h"
 #include "ControlNet.h"
 #include "Progress.h"
 #include "InterestOperatorFactory.h"
 #include "InterestOperator.h"
-#include "iException.h"
 
 #include "CnetRefByEmission.h"
 #include "CnetRefByIncidence.h"
@@ -24,6 +25,40 @@ void IsisMain() {
     UserInterface &ui = Application::GetUserInterface();
     std::string sSerialNumFile = ui.GetFilename("FROMLIST");
 
+    // get the Criteria option
+    std::string sCriteria = ui.GetString("CRITERIA");
+
+    // Check format of Pvl DefFile
+    bool bDefFile = false;
+    Pvl *pvlDefFile = 0;
+    Pvl pvlTemplate, pvlResults;
+    if(ui.WasEntered("DEFFILE")) {
+      bDefFile = true;
+      pvlDefFile = new Pvl(ui.GetFilename("DEFFILE"));
+
+      // Log the DefFile
+      Application::Log(pvlDefFile->Group(0));
+
+      if(pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge") ) {
+        string message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
+        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      }
+      
+      Pvl pvlTemplate, pvlResults;
+      if(sCriteria == "INTEREST") {
+        pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_operator.def");
+      }
+      else {
+        pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_nooperator.def");
+      }
+      pvlTemplate.ValidatePvl(*pvlDefFile, pvlResults);
+      if(pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
+        Application::Log(pvlResults.Group(0));
+        string sErrMsg = "Invalid Deffile\n";
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
+      }
+    }
+    
     // Get the original control net internalized
     Progress progress;
     ControlNet cNet(ui.GetFilename("NETWORK"), &progress);
@@ -38,13 +73,6 @@ void IsisMain() {
       cNet.SetDescription(ui.GetString("DESCRIPTION"));
     }
 
-    bool bDefFile = false;
-    Pvl *pvlDefFile = 0;
-    if(ui.WasEntered("DEFFILE")) {
-      bDefFile = true;
-      pvlDefFile = new Pvl(ui.GetFilename("DEFFILE"));
-    }
-
     // Get the output Log file
     bool bLogFile = false;
     string sLogFile;
@@ -53,9 +81,7 @@ void IsisMain() {
       bLogFile = true;
     }
 
-    // get the Criteria option
     ControlNetValidMeasure *cnetValidMeas = NULL;
-    std::string sCriteria = ui.GetString("CRITERIA");
 
     // Process Reference by Emission Angle
     if(sCriteria == "EMISSION") {
