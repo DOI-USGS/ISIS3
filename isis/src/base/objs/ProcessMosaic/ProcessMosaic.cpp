@@ -68,7 +68,7 @@ namespace Isis {
     mtTrackInfo.iBandNum  = 0;
     mtTrackInfo.sKeyName  = "";
     mtTrackInfo.sKeyValue = "";
-    mtTrackInfo.eCriteria =	Lesser;
+    mtTrackInfo.eCriteria = Lesser;
     mtTrackInfo.iInBand   = 0;
     mtTrackInfo.iOutBand  = 0;
 
@@ -410,7 +410,7 @@ namespace Isis {
       if(inLab->FindObject("IsisCube").HasGroup("BandBin")) {
         // Check to make sure the output cube has a bandbin group & make sure it
         // matches the input cube bandbin group
-        if(outLab->FindObject("IsisCube").HasGroup("BandBin")) {
+        if(!mtTrackInfo.bCreate && outLab->FindObject("IsisCube").HasGroup("BandBin")) {
           inb = 0;
 #ifdef _DEBUG_
           ostm << "\n*** Matching Mosaic label ***\n";
@@ -434,8 +434,8 @@ namespace Isis {
     }
     // Match BandBin set to false and CREATE and TRACKING is true
     else {
-      if(mtTrackInfo.bCreate && mtTrackInfo.bTrack) {
-        AddDefaultBandBinGroup();
+      if(mtTrackInfo.bCreate){
+        AddBandBinGroup(isb, outFile);
       }
     }
 
@@ -679,7 +679,7 @@ namespace Isis {
     int iOutBands = OutputCubes[0]->Bands();
 
     if(mtTrackInfo.bTrack) {
-      iOutBands -= 1;   // leave tracking band
+      iOutBands -= 1;     // leave tracking band
     }
 
     int iIsb = piIsb - 1; // array zero based
@@ -733,7 +733,6 @@ namespace Isis {
    * This method adds a default BandBin group on Mosaic creation
    * if the MatchBandBin Group is set to false and Tracking to set
    * to true
-   *
    *
    * Return void
    */

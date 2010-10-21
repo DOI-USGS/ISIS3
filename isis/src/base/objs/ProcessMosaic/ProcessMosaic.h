@@ -24,11 +24,18 @@
 
 #include "Process.h"
 #include "Buffer.h"
-
+/**
+ * Enumeration for different Mosaic priorities 
+ * (input, mosaic, band) 
+ */
 enum MosaicPriority {
   input, mosaic, band
 };
 
+/**
+ * Enumeration for BandCriteria 
+ * Band to be compared must be greater/lesser than 
+ */
 enum BandCriteria {
   Lesser, Greater
 };
@@ -38,7 +45,7 @@ enum FileType {
 
 namespace Isis {
   /**
-   * @brief Mosaic two cubs together
+   * @brief Mosaic two cubes together
    *
    * This class allows a programmer to develop a program which merges two cubes
    * together. The application sets the position where input (child) cube will be
@@ -119,7 +126,7 @@ namespace Isis {
    *  @history 2006-10-20 Stuart Sides - Fixed bug BandBin group did not get
    *                                     copied to the output mosaic.
    *  @history 2008-10-03 Steven Lambright - Fixed problem where member variables
-   *                                     could be corrupted
+   *                                         could be corrupted
    *  @history 2009-09-30 Sharmila Prasad - Added capability to track the pixel origin.
    *                                        Priorities Top and Beneath can track origin
    *                                        for a single band input image only. Band
@@ -129,31 +136,37 @@ namespace Isis {
    *                                        from the input cube can fit within the output
    *                                        mosaic. Also ability to allow HS, LS or NULL pixels
    *                                        from input to the mosaic(output). Added table for
-   *  									  Origin Default values based on pixel type
+   *                                        Origin Default values based on pixel type
    *  @history 2010-02-25 Sharmila Prasad - Changed stricmp to use iString function "Equal"
+   *  @history 2010-10-21 Sharmila Prasad - The BandBin group must be carried thru to the mosaic
+   *                                        at creation time regardless of matchbandbin flag
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */
 
-  // Constants
+/** 
+ * Constants
+ */
 #define SRC_IMAGE_TBL  "InputImages"
 #define FLOAT_MAX    16777216
 #define FLOAT_MIN   -16777215
 
-  // structure for origin tracking information
+  /** 
+   * structure for origin tracking information
+   * from the GUI-user set parameters 
+   * used for internal processing 
+   */ 
   typedef struct {
-    //from the GUI-user set parameters
     bool bTrack;
     bool bCreate;
     int  iBandNum;
     std::string  sKeyName;
     std::string  sKeyValue;
     BandCriteria eCriteria;
-    //used for internal processing
-    int  iInBand;  //input  band index for the corresponding band in KeyValue
-    int  iOutBand; //output band index for the corresponding band in KeyValue
-  } TrackInfo;
+    int  iInBand;  //!< input  band index for the corresponding band in KeyValue
+    int  iOutBand; //!< output band index for the corresponding band in KeyValue
+  }TrackInfo;
 
   class ProcessMosaic : public Isis::Process {
 
@@ -165,11 +178,11 @@ namespace Isis {
       //!  Destroys the Mosaic object. It will close all opened cubes.
       ~ProcessMosaic();
 
-      // Line Processing method for one input and output cube
+      //! Line Processing method for one input and output cube
       void StartProcess(const int &outputSample, const int &outputLine,
                         const int &outputBand, const MosaicPriority &priority);
 
-      // Line Processing method for one input and output cube
+      //! Line Processing method for one input and output cube
       void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
 
       Isis::Cube *SetInputCube(const std::string &parameter,
@@ -195,44 +208,50 @@ namespace Isis {
         mbBandbinMatch = pbFlag;
       };
 
-      // If Tracking is set, create table and add the input file name
-      // into the table to track the mosaic origin
+      /** 
+       * If Tracking is set, create table and add the input file name
+       *  into the table to track the mosaic origin
+       */
       void SetMosaicOrigin(int &piIndex);
 
-      //get the file index offset to be saved in the band by pixel type
+      //! Get the file index offset to be saved in the band by pixel type
       int GetIndexOffsetByPixelType(void);
 
-      //reset the origin band
+      //! Reset the origin band
       void ResetOriginBand(void);
 
-      //Compare the input and mosaic for the specified band based on the criteria and update the mosaic origin band
-      void BandComparison(int piIndex, int piIns, int piInl, int piIss, int piIsl, int piOss, int piOsl);
+      //! Compare the input and mosaic for the specified band based on the 
+      //! criteria and update the mosaic origin band
+      void BandComparison(int piIndex, int piIns, int piInl, int piIss, 
+                          int piIsl, int piOss, int piOsl);
 
-      //Get the origin of the pixel given sample, line
+      //! Get the origin of the pixel given sample, line
       int GetPixelOrigin(int piLineNum, int piStartSample, int piSampleNum);
 
-      //Get the default origin value based on pixel type for the origin band
+      //! Get the default origin value based on pixel type for the origin band
       int GetOriginDefaultByPixelType(void);
 
-      //Get the Band Index in an image of type (input/output)
+      //! Get the Band Index in an image of type (input/output)
       int GetBandIndex(const FileType &peFileType);
 
-      //Checks for the table with name "InputImage"
+      //! Checks for the table with name "InputImage"
       bool GetTrackStatus(void);
 
-      //New mosaic, add the Band Bin group specific to the mosaic
+      //! New mosaic, add the Band Bin group specific to the mosaic
       void AddBandBinGroup(int piIsb, int piOsb);
 
-      // Default BandBin group if Match BandBin is set to False
+      //! Default BandBin group if Match BandBin is set to False
       void AddDefaultBandBinGroup(void);
 
-      //Mosaic exists, match the band with the input image
+      //! Mosaic exists, match the band with the input image
       void MatchBandBinGroup(const int piIsb, const int piOsb, int &piInb);
 
-      // Get/Set HS,LS, NULL Flags. If set true and if the input image has a
-      // Special Pixel then it is copied to the mosaic irrespective of any condition
-      // Not supported in mosaic priority
-      void SetHighSaturationFlag(bool pbFlag) {
+      /** 
+       * Get/Set HS,LS, NULL Flags. If set true and if the input image has a
+       * Special Pixel then it is copied to the mosaic irrespective of any 
+       * condition. Not supported in mosaic priority
+       */ 
+       void SetHighSaturationFlag(bool pbFlag) {
         mbHighSat = pbFlag;
       } ;
       void SetLowSaturationFlag(bool pbFlag) {
@@ -241,7 +260,6 @@ namespace Isis {
       void SetNullFlag(bool pbFlag) {
         mbNull    = pbFlag;
       } ;
-
       bool GetHighSaturationFlag(void) {
         return mbHighSat;
       } ;
@@ -252,12 +270,12 @@ namespace Isis {
         return mbNull;
       }    ;
 
-      // Set the priority input, mosaic, band
+      //! Set the priority input, mosaic, band
       void SetPriority(MosaicPriority pePriority) {
         mePriority = pePriority;
       };
 
-      // Set/Get the Track Flag
+      //! Set/Get the Track Flag
       void SetTrackFlag(bool pbFlag) {
         mtTrackInfo.bTrack = pbFlag;
       };
@@ -265,68 +283,75 @@ namespace Isis {
         return mtTrackInfo.bTrack;
       };
 
-      // Flag to indicate to the Process that the mosaic is being newly created
-      // Indication that the new label specific to the mosaic needs to be created.
-      void SetCreateFlag(bool pbFlag) {
+      /** 
+       * Flag to indicate to the Process that the mosaic is being newly created
+       * Indication that the new label specific to the mosaic needs to be created.
+       */ 
+       void SetCreateFlag(bool pbFlag) {
         mtTrackInfo.bCreate  = pbFlag;
       };
 
-      // Set the Band Number for priority Band
+      //! Set the Band Number for priority Band
       void SetBandNumber(int piBandNum) {
         mtTrackInfo.iBandNum = piBandNum;
       };
 
-      // Set the keyword for priority Band
+      //! Set the keyword for priority Band
       void SetBandKeyWord(std::string psKeyName, std::string psKeyValue) {
         mtTrackInfo.sKeyName = psKeyName;
         mtTrackInfo.sKeyValue = psKeyValue;
       };
 
-      // Set the Band Criteria Lesser/Greater than for Band priority
+      //! Set the Band Criteria Lesser/Greater than for Band priority
       void SetBandCriteria(BandCriteria peCriteria) {
         mtTrackInfo.eCriteria = peCriteria;
       };
 
       void Test(void);
 
-      int GetInputStartLine(void) {
+      /**
+       * Get the input file location (Sample, Line, Band) in the mosaic
+       */
+      int GetInputStartLineInMosaic(void) {
         return miOsl;
       };
-      int GetInputStartSample(void) {
+      int GetInputStartSampleInMosaic(void) {
         return miOss;
       };
-      int GetInputStartBand(void) {
+      int GetInputStartBandInMosaic(void) {
         return miOsb;
       };
 
     private:
-      int p_iss; //!<The starting sample within the input cube
-      int p_isl; //!<The starting line within the input cube
-      int p_isb; //!<The starting band within the input cube
-      int p_ins; //!<The number of samples from the input cube
-      int p_inl; //!<The number of lines from the input cube
-      int p_inb; //!<The number of bands from the input cube
+      int p_iss; //!< The starting sample within the input cube
+      int p_isl; //!< The starting line within the input cube
+      int p_isb; //!< The starting band within the input cube
+      int p_ins; //!< The number of samples from the input cube
+      int p_inl; //!< The number of lines from the input cube
+      int p_inb; //!< The number of bands from the input cube
 
-      int miOss; //!<The starting sample within the output cube
-      int miOsl; //!<The starting line within the output cube
-      int miOsb; //!<The starting band within the output cube
+      int miOss; //!< The starting sample within the output cube
+      int miOsl; //!< The starting line within the output cube
+      int miOsb; //!< The starting band within the output cube
       /**
        * True/False value to determine whether to enforce the input cube
        * bandbin matches the mosaic bandbin group
        */
       bool mbBandbinMatch;
 
-      //Set the priority to input(ontop), mosaic(beneath) or band
+      //! Set the priority to input(ontop), mosaic(beneath) or band
       MosaicPriority mePriority;
 
-      // Set the Special Pixels Flags to True/False.
-      // True- allow the special pixel to be passed onto the mosaic. Holds good for input and band priority
+      /**
+       * Set the Special Pixels Flags to True/False.
+       * True- allow the special pixel to be passed onto the mosaic. 
+       * Holds good for input and band priority
+       */
       bool mbHighSat;
       bool mbLowSat;
       bool mbNull;
 
-      // Structure holding the tracking info
-      TrackInfo mtTrackInfo;
+      TrackInfo mtTrackInfo; //!< Structure holding the tracking info
   };
 };
 
