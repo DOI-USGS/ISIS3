@@ -89,8 +89,8 @@ void IsisMain() {
   else {
     // Logs the input file location in the mosaic
     PvlGroup imgPosition("ImageLocation");
-    int iStartLine   =  m.GetInputStartLine();
-    int iStartSample =  m.GetInputStartSample();
+    int iStartLine   =  m.GetInputStartLineInMosaic();
+    int iStartSample =  m.GetInputStartSampleInMosaic();
     imgPosition   += PvlKeyword("File", ui.GetFilename("FROM"));
     imgPosition   += PvlKeyword("StartSample", iStartSample);
     imgPosition   += PvlKeyword("StartLine", iStartLine);
