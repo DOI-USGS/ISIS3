@@ -121,8 +121,8 @@ void IsisMain() {
   PvlObject hist = Isis::iApp->History();
   Isis::iApp->Log(hist.FindGroup("UserParameters"));
   PvlGroup imgPosition("ImageLocation");
-  int iStartLine   = p.GetInputStartLine();
-  int iStartSample = p.GetInputStartSample();
+  int iStartLine   = p.GetInputStartLineInMosaic();
+  int iStartSample = p.GetInputStartSampleInMosaic();
   imgPosition += PvlKeyword("File", ui.GetFilename("FROM"));
   imgPosition += PvlKeyword("StartSample", iStartSample);
   imgPosition += PvlKeyword("StartLine", iStartLine);
