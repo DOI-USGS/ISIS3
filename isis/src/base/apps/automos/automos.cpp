@@ -26,7 +26,7 @@ void IsisMain() {
   // Get the list of cubes to mosaic
   list.Read(ui.GetFilename("FROMLIST"));
   if(list.size() < 1) {
-    string msg = "The list file [" + ui.GetFilename("FROMLIST") +	"does not contain any data";
+    string msg = "The list file [" + ui.GetFilename("FROMLIST") +"does not contain any data";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -99,8 +99,8 @@ void IsisMain() {
     }
     else {
       PvlGroup imgPosition("ImageLocation");
-      int iStartLine   = m.GetInputStartLine();
-      int iStartSample = m.GetInputStartSample();
+      int iStartLine   = m.GetInputStartLineInMosaic();
+      int iStartSample = m.GetInputStartSampleInMosaic();
       imgPosition += PvlKeyword("File", list[i]);
       imgPosition += PvlKeyword("StartSample", iStartSample);
       imgPosition += PvlKeyword("StartLine", iStartLine);
