@@ -162,6 +162,15 @@ namespace Isis {
    *
    * history  2009-09-23  Tracie Sucharski - Convert negative longitudes
    *                         returned my reclat.
+   * history  2010-09-15  Janet Barrett - Modified this method to use a new
+   *                         algorithm for finding the intersection of a ray with
+   *                         the DEM. This was required to take care of problems that
+   *                         were encountered at the poles of global DEM files. The
+   *                         algorithm that is being used was taken from "Intersection
+   *                         between spacecraft viewing vectors and digital elevation
+   *                         models" by N.A. Teanby. This algorithm only works on 
+   *                         Equatorial Cylindrical projections. Other projections still
+   *                         use the previous algorithm.
    * @return bool
    */
   bool Sensor::SetLookDirection(const double v[3]) {
@@ -283,8 +292,8 @@ namespace Isis {
         // Set default to limb observation until we determine that it is a nadir observation
         int ptype = 0;
 
-        // Set the tolerance to 1/100th of a meter in altitude
-        double tolerance = 1E-5;
+        // Set the tolerance to a fraction of the equatorial radius, a
+        double tolerance = 3E-8 * a;
 
         // Main iteration loop
         // Loop from g1 to gm stepping by angles of dalpha until intersection is found
