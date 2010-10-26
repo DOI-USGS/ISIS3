@@ -119,6 +119,13 @@ namespace Isis {
    *  @history 2009-07-09 Debbie A. Cook - Corrected documentation on Resolution method
    *  @history 2009-09-23  Tracie Sucharski - Convert negative longitudes
    *                         returned by reclat in SetLookDirection.
+   *  @history 2010-09-15 Janet Barrett - Modified the SetLookDirection method to use a new
+   *                                      algorithm for finding the intersection of a ray with
+   *                                      the DEM. This was required to take care of problems that
+   *                                      were encountered at the poles of global DEM files. The
+   *                                      algorithm that is being used was taken from "Intersection
+   *                                      between spacecraft viewing vectors and digital elevation
+   *                                      models" by N.A. Teanby.
    *
    */
   class Sensor : public Isis::Spice {
