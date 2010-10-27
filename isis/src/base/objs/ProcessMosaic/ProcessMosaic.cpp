@@ -400,8 +400,8 @@ namespace Isis {
     // *******************************************************************************
 
     // Check to make sure the bandbins match if necessary
+    Pvl *inLab  = InputCubes[0]->Label();
     if(mbBandbinMatch) {
-      Pvl *inLab  = InputCubes[0]->Label();
       Pvl *outLab = OutputCubes[0]->Label();
 
 #ifdef _DEBUG_
@@ -434,7 +434,7 @@ namespace Isis {
     }
     // Match BandBin set to false and CREATE and TRACKING is true
     else {
-      if(mtTrackInfo.bCreate){
+      if(mtTrackInfo.bCreate && inLab->FindObject("IsisCube").HasGroup("BandBin")){
         AddBandBinGroup(isb, outFile);
       }
     }
