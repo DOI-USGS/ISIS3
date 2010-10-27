@@ -187,6 +187,8 @@
       cause HS, LS and NULL input pixels to be copied to the mosaic regardless 
       of the priorities and criteria. These options are not supported for  "BENEATH" priority.
     </change>
+    <change name="Sharmila Prasad" date="2010-10-27">Process Input File 
+      Attributes</change>
   </history>
 
   <oldName>

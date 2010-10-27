@@ -18,6 +18,9 @@ void IsisMain() {
   bool bTrack = ui.GetBoolean("TRACK");
   m.SetTrackFlag(bTrack);
 
+  // Gets the input file along with attributes
+  string sInputFile = ui.GetAsString("FROM");
+  
   // Get the output projection set up properly
   if(ui.GetBoolean("CREATE")) {
     Cube inCube;
@@ -37,12 +40,12 @@ void IsisMain() {
 
     CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
 
-    m.SetOutputCube(ui.GetFilename("FROM"), mapGroup, oAtt, ui.GetFilename("MOSAIC"));
+    m.SetOutputCube(sInputFile, mapGroup, oAtt, ui.GetFilename("MOSAIC"));
   }
   else {
     m.SetOutputCube(ui.GetFilename("MOSAIC"));
   }
-
+  
   // Set up the mosaic priority, either the input cube will be
   // placed ontop of the mosaic or beneath it
   MosaicPriority priority;
@@ -80,7 +83,7 @@ void IsisMain() {
   }
 
   // Start Process
-  if(!m.StartProcess(ui.GetFilename("FROM"))) {
+  if(!m.StartProcess(sInputFile)) {
     // Logs the cube if it falls outside of the given mosaic
     PvlGroup outsiders("Outside");
     outsiders += PvlKeyword("File", ui.GetFilename("FROM"));
