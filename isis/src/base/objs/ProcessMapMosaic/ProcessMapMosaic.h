@@ -63,6 +63,8 @@ namespace Isis {
    *  @history 2008-12-08 Steven Lambright - MinimumLatitude,MaximumLatitude,
    *           MinimumLongitude,MaximumLongitude keywords no longer required to
    *           exist if passed into SetOutputCube
+   *  @history 2010-10-27 Sharmila Prasad - Read input file attributes
+   *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */
@@ -82,12 +84,12 @@ namespace Isis {
                                 double slat, double elat, double slon, double elon,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
-      Isis::Cube *SetOutputCube(const std::string &propagationCube,
+      Isis::Cube *SetOutputCube(const std::string &inputFile,
                                 double xmin, double xmax, double ymin, double ymax,
                                 double slat, double elat, double slon, double elon, int nbands,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
-      Isis::Cube *SetOutputCube(const std::string &propagationCube, PvlGroup mapping,
+      Isis::Cube *SetOutputCube(const std::string &inputFile, PvlGroup mapping,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
       //! Mosaic output method for Mosaic Processing Method, this will use an existing mosaic

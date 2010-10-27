@@ -49,8 +49,9 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    CubeAttributeInput inAtt;
+    CubeAttributeInput inAtt(inputFile);
     Cube *inCube = ProcessMosaic::SetInputCube(inputFile, inAtt);
+    
     Cube *mosaicCube = OutputCubes[0];
     Projection *iproj = inCube->Projection();
     Projection *oproj = mosaicCube->Projection();
@@ -266,11 +267,11 @@ namespace Isis {
 
   //*************************************************************************************************
 
-  Isis::Cube *ProcessMapMosaic::SetOutputCube(const std::string &propagationCube,
+  Isis::Cube *ProcessMapMosaic::SetOutputCube(const std::string &inputFile,
       double xmin, double xmax, double ymin, double ymax,
       double slat, double elat, double slon, double elon, int nbands,
       CubeAttributeOutput &oAtt, const std::string &mosaicFile) {
-    Pvl fileLab(propagationCube);
+    Pvl fileLab(inputFile);
     PvlGroup &mapping = fileLab.FindGroup("Mapping", Pvl::Traverse);
 
     mapping["UpperLeftCornerX"] = xmin;
@@ -293,7 +294,7 @@ namespace Isis {
       CubeAttributeInput inAtt;
 
       ProcessByLine p;
-      p.SetInputCube(propagationCube, inAtt);
+      p.SetInputCube(inputFile, inAtt);
       p.PropagateHistory(false);
       p.PropagateLabels(false);
       p.PropagateTables(false);
@@ -324,7 +325,7 @@ namespace Isis {
 
   //*************************************************************************************************
 
-  Isis::Cube *ProcessMapMosaic::SetOutputCube(const std::string &propagationCube, PvlGroup mapping,
+  Isis::Cube *ProcessMapMosaic::SetOutputCube(const std::string &inputFile, PvlGroup mapping,
       CubeAttributeOutput &oAtt, const std::string &mosaicFile) {
     if(OutputCubes.size() != 0) {
       std::string msg = "You can only specify one output cube and projection";
@@ -345,8 +346,8 @@ namespace Isis {
 
       // Initialize the mosaic
       ProcessByLine p;
-      CubeAttributeInput inAtt;
-      Cube *propCube = p.SetInputCube(propagationCube, inAtt);
+      CubeAttributeInput inAtt(inputFile);
+      Cube *propCube = p.SetInputCube(inputFile, inAtt);
       bands = propCube->Bands();
 
       //if track set, create the origin band
