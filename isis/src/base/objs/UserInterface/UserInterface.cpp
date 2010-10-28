@@ -856,14 +856,14 @@ namespace Isis {
          throw Isis::iException::Message( Isis::iException::User, msg, _FILEINFO_ );*/
       }
       catch(...) {
-        string msg = "A corrupt parameter history file [" + file
-                     + "] has been detected. Please fix or remove this file";
+        string msg = "The history file [" + file
+                     + "] is corrupt, please fix or delete this file";
         throw Isis::iException::Message(Isis::iException::User, msg,
                                         _FILEINFO_);
       }
     }
     else {
-      string msg = "Parameter history file [" + file + "] does not exist";
+      string msg = "The history file [" + file + "] does not exist";
       throw Isis::iException::Message(Isis::iException::User, msg,
                                       _FILEINFO_);
     }

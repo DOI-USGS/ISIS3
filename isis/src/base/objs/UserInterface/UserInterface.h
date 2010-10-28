@@ -106,6 +106,7 @@ namespace Isis {
    *           cases on array format parsing that have existed for a while now
    *  @history 2010-07-28 Christopher Austin - Fixed a -LAST issue causing IsisAml
    *                                           to throw an incorrect exception.
+   *  @history 2010-10-28 Mackenzie Boyd - Modified error messages in LoadHistory()
    *  @todo 2005-02-22 Jeff Anderson - add coded and implementation examples to
    *                                   class documentation
    *
