@@ -29,6 +29,9 @@ void IsisMain() {
 
   bool bTrack = ui.GetBoolean("TRACK");
   p.SetTrackFlag(bTrack);
+  
+  string inputFile = ui.GetAsString("FROM");
+  string mosaicFile = ui.GetFilename("MOSAIC");
 
   if(ui.GetString("CREATE") == "YES") {
     ns = ui.GetInteger("NSAMPLES");
@@ -44,9 +47,14 @@ void IsisMain() {
     ProcessByLine bl;
 
     bl.Progress()->SetText("Initializing base mosaic");
-    bl.SetInputCube("FROM");
-    bl.SetOutputCube("MOSAIC", ns, nl, nb);
+    CubeAttributeInput iAtt(inputFile);
+    bl.SetInputCube(inputFile, iAtt);
+    
+    CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
+    bl.SetOutputCube(mosaicFile, oAtt, ns, nl, nb);
     bl.ClearInputCubes();
+    
+    // Initialize the mosaic to defaults
     bl.StartProcess(CreateMosaic);
     bl.EndProcess();
   }
@@ -56,8 +64,7 @@ void IsisMain() {
   p.Progress()->SetText("Mosaicking");
 
   // Set up the mosaic priority, either the input cube will be
-  // placed ontop of the mosaic or beneath it
-  ui = Application::GetUserInterface();
+  // placed ontop of the mosaic or beneath it  
   MosaicPriority priority;
   string sType;
   if(ui.GetString("PRIORITY") == "BENEATH") {
@@ -99,8 +106,9 @@ void IsisMain() {
   int outLine   = ui.GetInteger("OUTLINE")   - ui.GetInteger("INLINE")   + 1;
   int outBand   = ui.GetInteger("OUTBAND")   - ui.GetInteger("INBAND")   + 1;
 
-  // Set the input mosaic
-  p.SetInputCube("FROM");
+  // Set the input image and attributes
+  CubeAttributeInput inAtt(inputFile);
+  p.SetInputCube(inputFile, inAtt);
 
   // Set the output mosaic
   Cube *to = p.SetOutputCube("MOSAIC");

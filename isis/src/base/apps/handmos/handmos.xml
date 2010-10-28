@@ -184,6 +184,8 @@
       Track the origin for  multiband ONTOP priority if all the Special Pixel  flags are set. 
       Store the Serial numbers of the input mosaic in the mosaic along with the  file name.
     </change>
+    <change name="Sharmila Prasad" date="2010-10-27">Process Input Image's 
+     Attributes</change> 
   </history>
 
   <oldName>
