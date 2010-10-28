@@ -171,6 +171,11 @@ namespace Isis {
    *                         models" by N.A. Teanby. This algorithm only works on 
    *                         Equatorial Cylindrical projections. Other projections still
    *                         use the previous algorithm.
+   * history  2010-10-26  Janet Barrett - The tolerance value of 1E-5 was too small and
+   *                         was causing a divide by zero error when the current and last
+   *                         intersections were virtually the same. The tolerance was
+   *                         changed to 3E-8 * a (where a is the equatorial radius of the
+   *                         planet we are dealing with).
    * @return bool
    */
   bool Sensor::SetLookDirection(const double v[3]) {
@@ -345,7 +350,15 @@ namespace Isis {
 
             while (it < maxit && !done) {
               // Calculate the fractional distance "v" to move along the look vector
-              // to the intersection point
+              // to the intersection point. Check to see if there was a convergence
+              // of the solution and the tolerance was too small to detect it.
+              if ((g2len*r1/r2 - g1len) == 0.0) {
+                std::string msg = "The tolerance is too small to detect the convergence of ";
+                msg += "a solution. The tolerance must be re-evaluated to fix this problem. ";
+                msg += "Please provide the program you are running along with the inputs to ";
+                msg += "ISIS support so that this problem can be addressed.";
+                throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              }
               double v = (r1-g1len) / (g2len*r1/r2 - g1len);
               p_pB[0] = g1[0] + v * dd * ulookB[0];
               p_pB[1] = g1[1] + v * dd * ulookB[1];
