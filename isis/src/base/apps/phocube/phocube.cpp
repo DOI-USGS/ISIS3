@@ -12,9 +12,21 @@ using namespace Isis;
 // Global variables
 Camera *cam;
 int nbands;
-bool phase, emission, incidence, latitude, longitude, pixelResolution,
-     lineResolution, sampleResolution, detectorResolution, northAzimuth,
-     sunAzimuth, spacecraftAzimuth, offnadirAngle;
+bool phase, 
+     emission, 
+     incidence, 
+     latitude, 
+     longitude,
+     pixelResolution,
+     lineResolution, 
+     sampleResolution, 
+     detectorResolution, 
+     northAzimuth,
+     sunAzimuth, 
+     spacecraftAzimuth, 
+     offnadirAngle,
+     subSpacecraftGroundAzimuth,
+     subSolarGroundAzimuth;
 
 void phocube(Buffer &out);
 
@@ -44,6 +56,8 @@ void IsisMain() {
   if((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
   if((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
   if((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
+  if((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
+  if((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
 
   if(nbands < 1) {
     string message = "At least one photometry parameter must be entered"
@@ -66,6 +80,8 @@ void IsisMain() {
   if(sunAzimuth) name += "Sun Azimuth";
   if(spacecraftAzimuth) name += "Spacecraft Azimuth";
   if(offnadirAngle) name += "OffNadir Angle";
+  if(subSpacecraftGroundAzimuth) name += "Sub Spacecraft Ground Azimuth";
+  if(subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
   PvlGroup bandBin("BandBin");
   bandBin += name;
 
@@ -160,6 +176,22 @@ void phocube(Buffer &out) {
         }
         if(offnadirAngle) {
           out[index] = cam->OffNadirAngle();
+          index += 64 * 64;
+        }
+        if(subSpacecraftGroundAzimuth) {
+          double ssplat, ssplon;
+          ssplat = ssplon = 0.0;
+          cam->SubSpacecraftPoint(ssplat, ssplon);
+          out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
+              cam->UniversalLongitude(), ssplat, ssplon);
+          index += 64 * 64;
+        }
+        if(subSolarGroundAzimuth) {
+          double sslat, sslon;
+          sslat = sslon = 0.0;
+          cam->SubSolarPoint(sslat,sslon);
+          out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
+              cam->UniversalLongitude(), sslat, sslon);
           index += 64 * 64;
         }
       }

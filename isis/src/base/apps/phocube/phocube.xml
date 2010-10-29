@@ -72,6 +72,10 @@
       SAMPLERESOLUTION, DETECTORRESOLUTION, NORTHAZIMUTH, 
       SUNAZIMUTH, SPACECRAFTAZIMUTH, OFFNADIRANGLE to FALSE
     </change>
+    <change name="Mackenzie Boyd" date="2010-10-29">
+      Added parameters/bands SUBSPACECRAFTGROUNDAZIMUTH and
+      SUBSOLARGROUNDAZIMUTH.
+    </change>
 </history>
 
   <category>
@@ -216,6 +220,26 @@
         <brief>Create a offNadir angle band.</brief>
         <description>
           If this parameter is true then a offNadir angle band will be created
+        </description>
+      </parameter>
+      <parameter name="SUBSPACECRAFTGROUNDAZIMUTH">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Creata a sub spacecraft ground azimuth band.</brief>
+        <description>
+          This is the clockwise angle on the ground between a line drawn from
+          the ground point to the North pole of the body and a line drawn from
+          the ground point to the sub spacecraft point.
+        </description>
+      </parameter>
+      <parameter name="SUBSOLARGROUNDAZIMUTH">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a sub solar ground azimuth band.</brief>
+        <description>
+          This is the clockwise angle on the ground between a line drawn from
+          the ground point to the North pole of the body and a line drawn from
+          the ground point to the sub solar point.
         </description>
       </parameter>
     </group>

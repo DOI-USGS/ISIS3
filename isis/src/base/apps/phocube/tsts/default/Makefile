@@ -20,4 +20,6 @@ commands:
 	  northazimuth=true \
 	  sunazimuth=true \
 	  spacecraftazimuth=true \
-	  offnadirangle=true > /dev/null;
+	  offnadirangle=true \
+	  subspacecraftgroundazimuth=true \
+	  subsolargroundazimuth=true > /dev/null;  
