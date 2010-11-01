@@ -29,7 +29,7 @@ then
 fi
 
 CWD=`pwd`
-if [ $1 = "" ]; then
+if [ "$1" == "" ]; then
   TRUTH=`basename $CWD`_`uname -s`_`uname -p`.truth || exit 99;
 else
   TRUTH=`basename $CWD`_`uname -s`_`uname -p`_${1}.truth || exit 99;
