@@ -35,10 +35,11 @@ void PrintHelp() {
 }
 
 void MakeCompletion(const string &appName) {
-  static char *argv[2];
-  static int argc(2);
+  char *argv[2] = { 0, 0 };
+  int argc = 2;
   argv[0] = (char *)appName.c_str();
-  argv[1] = "-nogui";
+  argv[1] = new char[16];
+  strcpy(argv[1], "-nogui");
 
   // Do not complete image-viewer applications
   if(appName.compare("qview") == 0) {
@@ -78,6 +79,9 @@ void MakeCompletion(const string &appName) {
   completeCommand += "'n/*/(-" + paramList + ")/='";
   completeCommand = "complete " + appName + " " + completeCommand + "; ";
   cout << completeCommand;
+
+  delete [] argv[1];
+  argv[1] = 0;
 }
 
 string BuildStaticCompletes(std::string paramList) {
