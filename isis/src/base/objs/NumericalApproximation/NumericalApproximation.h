@@ -878,7 +878,7 @@ namespace Isis {
       void GslDeallocation();
       InterpFunctor GslFunctor(NumericalApproximation::InterpType itype) const throw(iException &);
       // VERIFICATION METHODS
-      void GslIntegrityCheck(int gsl_status, char *src,
+      void GslIntegrityCheck(int gsl_status, const char *src,
                              int line) throw(iException &);
       void ValidateDataSet() throw(iException &);
       bool InsideDomain(const double a);
@@ -897,7 +897,7 @@ namespace Isis {
       int FindIntervalLowerIndex(const double a);
       // STANDARDIZE ERRORS
       void ReportException(iException::errType type, const string &method,
-                           const string &message, char *filesrc,
+                           const string &message, const char *filesrc,
                            int lineno) const throw(iException &);
   };
 };

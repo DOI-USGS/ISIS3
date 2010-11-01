@@ -2453,7 +2453,7 @@ namespace Isis {
    *   @history 2008-11-05 Jeannie Walldren - Renamed.
    *
    */
-  void NumericalApproximation::GslIntegrityCheck(int gsl_status, char *src, int line)
+  void NumericalApproximation::GslIntegrityCheck(int gsl_status, const char *src, int line)
   throw(iException &) {
     if(gsl_status != GSL_SUCCESS) {
       if(gsl_status != GSL_EDOM) {
@@ -3297,7 +3297,7 @@ namespace Isis {
    *            iException::errType as input parameter.
    */
   void NumericalApproximation::ReportException(iException::errType type, const string &methodName, const string &message,
-      char *filesrc, int lineno)
+      const char *filesrc, int lineno)
   const throw(iException &) {
     string msg = methodName + " - " + message;
     throw iException::Message(type, msg.c_str(), filesrc, lineno);
