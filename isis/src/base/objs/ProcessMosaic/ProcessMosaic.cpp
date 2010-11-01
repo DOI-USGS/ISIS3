@@ -556,9 +556,9 @@ namespace Isis {
           else if(mePriority == input) {
             if(Isis::IsNullPixel(oportal[pixel])  ||
                 Isis::IsValidPixel(iportal[pixel]) ||
-                mbHighSat && Isis::IsHighPixel(iportal[pixel]) ||
-                mbLowSat  && Isis::IsLowPixel(iportal[pixel])  ||
-                mbNull    && Isis::IsNullPixel(iportal[pixel])) {
+                (mbHighSat && Isis::IsHighPixel(iportal[pixel])) ||
+                (mbLowSat  && Isis::IsLowPixel(iportal[pixel]))  ||
+                (mbNull    && Isis::IsNullPixel(iportal[pixel]))) {
               oportal[pixel] = iportal[pixel];
               if(mtTrackInfo.bTrack) {
                 cOrgPortal[pixel] = iIndex;
@@ -571,7 +571,8 @@ namespace Isis {
           else if(mePriority == mosaic) {
             if(Isis::IsNullPixel(oportal[pixel])) {
               oportal[pixel] = iportal[pixel];
-              // Set the origin if number of input bands equal to 1 and if the track flag was set
+              // Set the origin if number of input bands equal to 1
+              // and if the track flag was set
               if(mtTrackInfo.bTrack) {
                 cOrgPortal[pixel] = iIndex;
                 bChanged = true;
@@ -925,9 +926,9 @@ namespace Isis {
 #endif
 
         if(Isis::IsNullPixel(cOrgPortal[iPixel]) ||
-            mbHighSat && Isis::IsHighPixel(cIportal[iPixel]) ||
-            mbLowSat  && Isis::IsLowPixel(cIportal[iPixel]) ||
-            mbNull    && Isis::IsNullPixel(cIportal[iPixel])) {
+            (mbHighSat && Isis::IsHighPixel(cIportal[iPixel])) ||
+            (mbLowSat  && Isis::IsLowPixel(cIportal[iPixel])) ||
+            (mbNull    && Isis::IsNullPixel(cIportal[iPixel]))) {
           cOrgPortal[iPixel] = piIndex;
 #ifdef _DEBUG_
           //ostm << "   SP >>   Origin=" << (int)cOrgPortal[iPixel];
