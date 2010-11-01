@@ -243,7 +243,7 @@ void gbl::Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
   // Add Desmear correction
 
   if(mi->ShutterEffectCorrectionFlag() == "FALSE" &&
-      mi->ExposureDuration() < 1000 || mi->ExposureDuration() > 0 && ibuf.size() != 1024) {
+      (mi->ExposureDuration() < 1000 || mi->ExposureDuration() > 0) && ibuf.size() != 1024) {
 
     double smearScale = mi->TransferTime() / mi->ExposureDuration() / obuf.size();
     static vector<double> smear;
