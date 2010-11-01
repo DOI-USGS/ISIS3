@@ -2964,7 +2964,7 @@ void IsisAml::StartParser(const char *xmlfile) {
 
   //  Create the handler object for an application
   //  Then parse the file
-  char *encodingName = "LATIN1";
+  char *encodingName = const_cast<char *>("LATIN1");
   bool expandNamespaces = false ;
 
   try {
