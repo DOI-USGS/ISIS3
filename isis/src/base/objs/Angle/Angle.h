@@ -29,7 +29,8 @@ namespace Isis {
    *  @author 2010-10-09 Debbie A. Cook
    *
    *  @internal
-   *
+   *    @history 2010-11-01 Steven Lambright - Added methods SetRadians and
+   *                          SetDegrees
    */
   class Angle {
 
@@ -191,17 +192,27 @@ namespace Isis {
      *
      * @return The angle value in radians 
      */
-    operator double() const { return GetAngle(Radians); };
+    operator double() const { return GetAngle(Radians); }
 
     /**
      * Get the angle in units of Radians.
      */
-    double GetRadians() const { return GetAngle(Radians); };
+    double GetRadians() const { return GetAngle(Radians); }
 
     /**
      * Get the angle in units of Degrees.
      */
-    double GetDegrees() const { return GetAngle(Degrees); };
+    double GetDegrees() const { return GetAngle(Degrees); }
+
+    /**
+     * Set the angle in units of Radians.
+     */
+    void SetRadians(double radians) { SetAngle(radians, Radians); }
+
+    /**
+     * Set the angle in units of Degrees.
+     */
+    void SetDegrees(double degrees) { SetAngle(degrees, Degrees); }
 
   protected:
     double UnitWrapValue(const Units& unit) const;

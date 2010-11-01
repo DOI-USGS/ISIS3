@@ -7,6 +7,7 @@
 
 using namespace std;
 using Isis::Angle;
+using Isis::PI;
 
 class MyAngle : public Isis::Angle {
 public:
@@ -71,6 +72,21 @@ int main(int argc, char *argv[]) {
     e.Report();
   }
 
+  cout << endl << "Testing mutators" << endl;
+
+  try {
+    Angle angle(30., Angle::Degrees );
+    angle.SetDegrees(180);
+    cout <<"  SetDegrees:  " << angle.GetDegrees() << " degrees" << 
+        endl;
+    angle.SetRadians(PI);
+    cout <<"  SetRadians:  " << angle.GetRadians() << " radians" << 
+        endl;
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+  }
+
   cout << endl << "Testing operators" << endl;
 
   try {
@@ -121,7 +137,7 @@ int main(int argc, char *argv[]) {
   cout << endl << "Testing logical operators" << endl;
 
   try {
-    Angle angle1(30., Angle::Degrees );
+    Angle angle1(30., Angle::Degrees);
     Angle angle2(45., Angle::Degrees);
     cout << "  angle1 == angle2?  " << (angle1 == angle2) << endl;
     cout << "  angle1 == angle2?  " << (Angle() == Angle()) << endl;
