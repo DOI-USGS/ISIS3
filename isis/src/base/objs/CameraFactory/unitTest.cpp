@@ -10,37 +10,37 @@ int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
   void doit(Isis::Pvl & lab);
 
-  cout << "Unit test for CameraFactory" << endl;
-  cout << "Testing missing Instrument Group ..." << endl;
+  cerr << "Unit test for CameraFactory" << endl;
+  cerr << "Testing missing Instrument Group ..." << endl;
   Isis::Pvl lab;
   doit(lab);
 
   lab.AddGroup(Isis::PvlGroup("Kernels"));
 
-  cout << "Testing missing spacecraft name ..." << endl;
+  cerr << "Testing missing spacecraft name ..." << endl;
   lab.AddGroup(Isis::PvlGroup("Instrument"));
   doit(lab);
 
-  cout << "Testing missing instrument id ..." << endl;
+  cerr << "Testing missing instrument id ..." << endl;
   Isis::PvlGroup &inst = lab.FindGroup("Instrument");
   inst += Isis::PvlKeyword("SpacecraftName", "Bogus Spacecraft");
   doit(lab);
 
-  cout << "Testing unsupported camera mode ..." << endl;
+  cerr << "Testing unsupported camera mode ..." << endl;
   inst += Isis::PvlKeyword("InstrumentId", "Bogus Instrument");
   doit(lab);
 }
 
 void doit(Isis::Pvl &lab) {
   try {
-    std::cout << "Version: ";
-    std::cout << Isis::CameraFactory::CameraVersion(lab) << std::endl;
+    cerr << "Version: ";
+    cerr << Isis::CameraFactory::CameraVersion(lab) << endl;
   }
   catch(Isis::iException &error) {
     error.Report(false);
   }
 
-  cout << endl;
+  cerr << endl;
 
   try {
     Isis::CameraFactory::Create(lab);
@@ -49,7 +49,7 @@ void doit(Isis::Pvl &lab) {
     error.Report(false);
   }
 
-  cout << endl;
+  cerr << endl;
 }
 
 
