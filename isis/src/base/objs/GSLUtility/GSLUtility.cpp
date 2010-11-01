@@ -317,7 +317,7 @@ namespace Isis {
      * @param src Name of the source file where the function was called.
      * @param line Line number in the source where the call/error occurs
      */
-    void GSLUtility::check(int gsl_status, char *src, int line)
+    void GSLUtility::check(int gsl_status, const char *src, int line)
     const throw(iException &) {
       if(gsl_status != GSL_SUCCESS) {
         string msg = "GSL error occured: " + string(gsl_strerror(gsl_status));

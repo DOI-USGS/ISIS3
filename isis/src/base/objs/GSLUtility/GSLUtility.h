@@ -103,7 +103,7 @@ namespace Isis {
           return (std::string(gsl_strerror(gsl_errno)));
         }
 
-        void check(int gsl_status, char *src = __FILE__, int line = __LINE__)
+        void check(int gsl_status, const char *src = __FILE__, int line = __LINE__)
         const throw(iException &);
 
 
