@@ -7,6 +7,10 @@ Testing constructors
   Radian input and degree output:  30 degrees
   Copy constructor:  30 degrees
 
+Testing mutators
+  SetDegrees:  180 degrees
+  SetRadians:  3.14159265 radians
+
 Testing operators
   Assignment operator:  45 degrees
   + and - operators...
