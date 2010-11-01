@@ -43,7 +43,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 #include "image_io.h"
 #include <errno.h>
 
-int prefix(char *s, char *pre)
+int prefix(const char *s, const char *pre)
 {
   return strncmp(s, pre, strlen(pre)) == 0;
 }

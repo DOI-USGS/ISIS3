@@ -358,11 +358,12 @@ byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr)
 
   if(rawencode || pcomp > 0) {
     /* predictively compressed */
-    if(rawencode)
+    if(rawencode) {
       if(verbose) fprintf(stderr, "raw encoded fragment\n");
       else if(verbose) fprintf(stderr, "%s%s predictive fragment, table %d\n",
                                  pcomp & 1 ? "x" : "", (pcomp & 2) >> 1 ? "y" : "",
                                  huffman_table);
+    }
 
     /* set up decode arrays */
     extern void decodeLoad(char *);
