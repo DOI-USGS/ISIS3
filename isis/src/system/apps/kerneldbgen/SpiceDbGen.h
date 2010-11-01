@@ -62,7 +62,7 @@ class SpiceDbGen {
     PvlGroup GetIntervals(SpiceCell &cover);
     //private instance variables
     iString p_type;
-    char *calForm;
+    static const char *calForm;
 };
 
 #endif

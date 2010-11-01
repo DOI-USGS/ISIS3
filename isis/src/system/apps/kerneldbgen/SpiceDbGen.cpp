@@ -28,6 +28,8 @@
 using namespace std;
 using namespace Isis;
 
+
+const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
 /**
  * Constructs a new SpiceDbGen.
  *
@@ -35,7 +37,7 @@ using namespace Isis;
 */
 SpiceDbGen::SpiceDbGen(iString type) {
   p_type = type;
-  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
+//  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
 }
 
 
