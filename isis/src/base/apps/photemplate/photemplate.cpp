@@ -106,7 +106,7 @@ void addAtmosModel(Pvl &pvl) {
 
   //If the normalization model is one with an atmospheric model
   //then create an atmospheric model and add it to the PVL.
-  if((ui.GetString("NORMALIZATION") == "ATMALBEDO" |
+  if((ui.GetString("NORMALIZATION") == "ATMALBEDO" ||
       ui.GetString("NORMALIZATION") == "ATMSHADE" ||
       ui.GetString("NORMALIZATION") == "ATMTOPO")) {
 
