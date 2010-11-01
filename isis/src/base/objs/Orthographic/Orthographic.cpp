@@ -159,7 +159,7 @@ namespace Isis {
     rho = sqrt(GetX() * GetX() + GetY() * GetY());
 
     // Error calculating rho - should be less than equatorial radius
-    if(rho > p_equatorialRadius) {
+    if(fabs(rho - p_equatorialRadius) < 1E-10 || rho > p_equatorialRadius) {
       p_good = false;
       return p_good;
     }
