@@ -226,6 +226,22 @@ EndObject
           being corrected by with Hillier algorithm.
         </description>
       </parameter>
+      
+      <parameter name="BACKPLANE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>input</fileMode>
+        <brief>
+          Backplane Cube
+        </brief>
+        <description>
+          This file will contain the backplane data. It must have "Phase Angle", "Emission Angle",
+          and "Incidence Angle" as the first three bands.
+        </description>
+        <internalDefault>
+            Calculate the photometry on the fly
+        </internalDefault>
+      </parameter>
 
       <parameter name="PHOPAR">
         <type>filename</type>

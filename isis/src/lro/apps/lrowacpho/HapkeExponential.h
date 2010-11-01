@@ -1,5 +1,5 @@
-#if !defined(Exponential_h)
-#define Exponential_h
+#if !defined(HapkeExponential_h)
+#define HapkeExponential_h
 /**
  * @file
  * $Revision$
@@ -40,7 +40,7 @@ namespace Isis {
     class Camera;
 
     /**
-     * @brief An implementation of the Exponential photometric function
+     * @brief An implementation of the HapkeExponential photometric function
      *
      * This class implements the Exponential-Buratti-Hill photometric
      * equation as outline in thier paper "Multispectral Photometry
@@ -50,16 +50,16 @@ namespace Isis {
      * @author  2010-02-15 Kris Becker
      *
      */
-    class Exponential : public PhotometricFunction {
+    class HapkeExponential : public PhotometricFunction {
         public:
             /**
              * @brief Create Hilier photometric object
              *
              */
-            Exponential (PvlObject &pvl, Cube &cube, bool useCamera) : PhotometricFunction(pvl, cube, useCamera) {init(pvl, cube);}
+            HapkeExponential (PvlObject &pvl, Cube &cube, bool useCamera) : PhotometricFunction(pvl, cube, useCamera) {init(pvl, cube);}
 
             //! Destructor
-            virtual ~Exponential () {}
+            virtual ~HapkeExponential () {}
 
             double photometry ( double i, double e, double g, int band = 1 ) const;
             void Report ( PvlContainer &pvl );

@@ -28,7 +28,7 @@
 #include <sstream>
 
 #include "Camera.h"
-#include "Hillier.h"
+#include "HapkeExponential.h"
 #include "DbProfile.h"
 #include "PvlObject.h"
 #include "naif/SpiceUsr.h"
@@ -38,6 +38,7 @@
 using namespace std;
 
 namespace Isis {
+
     /**
      * @brief Method to get photometric property given angles
      *
@@ -56,7 +57,7 @@ namespace Isis {
      * @return double Returns photometric correction using
      *         parameters
      */
-    double Hillier::photometry ( double i, double e, double g, int band ) const {
+    double HapkeExponential::photometry ( double i, double e, double g, int band ) const {
         // Test for valid band
         if ((band <= 0) || (band > (int) _bandpho.size())) {
             std::string mess = "Provided band " + iString(band) + " out of range.";
@@ -70,19 +71,18 @@ namespace Isis {
      * @brief Performs actual photometric correction calculations
      *
      * This routine computes photometric correction using parameters
-     * for the Hillier-Buratti-Hill equation.
+     * for the Exponential-Buratti-Hill equation.
      *
      * @author Kris Becker - 2/21/2010
      *
-     * @param parms Container of band-specific Hillier parameters
+     * @param parms Container of band-specific HapkeExponential parameters
      * @param i     Incidence angle in degrees
      * @param e     Emission angle in degrees
      * @param g     Phase angle in degrees
      *
      * @return double Photometric correction parameter
      */
-    double Hillier::photometry ( const Parameters &parms, double i, double e, double g ) const {
-
+    double HapkeExponential::photometry ( const Parameters &parms, double i, double e, double g ) const {
         //  Ensure problematic values are adjusted
         if (i == 0.0)
             i = 10.E-12;
@@ -99,13 +99,21 @@ namespace Isis {
         double mu0 = cos(i);
 
         double alpha = g;
-        double alpha2 = g * g;
 
-        // Simple Hillier photometric polynomial equation with exponential opposition
+        // Simple HapkeExponential photometric polynomial equation with exponential opposition
         //  surge term.
-        double rcal = (mu0 / (mu + mu0)) * (parms.b0 * exp(-parms.b1 * alpha) + parms.a0 + (parms.a1 * alpha) + (parms.a2 * alpha2) + (parms.a3 * alpha * alpha2) + (parms.a4 * alpha2 * alpha2));
 
-        return (rcal);
+//        I   µ0 + µ
+//        _ * ______  = A1 exp(B1 phase) + A2 ( µ0 + µ )exp(B2 phase) + A3 ( µ0 + µ ) + A4
+//        F    µ0
+
+
+        double rcal = parms.aTerms[0]*exp(parms.bTerms[0] * alpha);
+        rcal += parms.aTerms[1]*(mu0 + mu)*exp(parms.bTerms[1] * alpha);
+        rcal += parms.aTerms[2]*(mu0 + mu);
+        rcal += parms.aTerms[3];
+
+        return rcal*mu0/(mu0+mu);
     }
 
     /**
@@ -118,24 +126,30 @@ namespace Isis {
      *
      * @param pvl Output PVL container write keywords
      */
-    void Hillier::Report ( PvlContainer &pvl ) {
-        pvl.AddComment("I/F = mu0/(mu0+mu) * F(phase)\n where:\n  mu0 = cos(incidence)\n  mu = cos(incidence)\n  F(phase) = B0*exp(-B1*phase) + A0 + A1*phase + A2*phase^2 + A3*phase^3 + A4*phase^4");
-        pvl += PvlKeyword("Algorithm", "Hillier");
+    void HapkeExponential::Report ( PvlContainer &pvl ) {
+        pvl.AddComment("I/F = mu0/(mu0+mu) * F(mu,mu0,phase)");
+        pvl.AddComment("  where:");
+        pvl.AddComment("    mu0 = cos(incidence)");
+        pvl.AddComment("    mu = cos(emission)");
+        pvl.AddComment("    F(mu,mu0,phase) = A1*exp(B1*phase) + A2*( mu0 + mu )exp(B2*phase) + A3*( mu0 + mu ) + A4");
+
+        pvl += PvlKeyword("Algorithm", "HapkeExponential");
         pvl += PvlKeyword("IncRef", _iRef, "degrees");
         pvl += PvlKeyword("EmaRef", _eRef, "degrees");
         pvl += PvlKeyword("PhaRef", _gRef, "degrees");
-        PvlKeyword units("HillierUnits");
+        PvlKeyword units("HapkeExponentialUnits");
         PvlKeyword phostd("PhotometricStandard");
         PvlKeyword bbc("BandBinCenter");
         PvlKeyword bbct("BandBinCenterTolerance");
         PvlKeyword bbn("BandNumber");
-        PvlKeyword b0("B0");
-        PvlKeyword b1("B1");
-        PvlKeyword a0("A0");
-        PvlKeyword a1("A1");
-        PvlKeyword a2("A2");
-        PvlKeyword a3("A3");
-        PvlKeyword a4("A4");
+
+        std::vector<PvlKeyword> aTermKeywords;
+        std::vector<PvlKeyword> bTermKeywords;
+        for (unsigned int i = 0; i < _bandpho[0].aTerms.size(); i++)
+            aTermKeywords.push_back(PvlKeyword("A" + iString((int) i+1)));
+        for (unsigned int i = 0; i < _bandpho[0].bTerms.size(); i++)
+            bTermKeywords.push_back(PvlKeyword("B" + iString((int) i+1)));
+
         for (unsigned int i = 0; i < _bandpho.size(); i++) {
             Parameters &p = _bandpho[i];
             units.AddValue(p.units);
@@ -143,33 +157,29 @@ namespace Isis {
             bbc.AddValue(p.wavelength);
             bbct.AddValue(p.tolerance);
             bbn.AddValue(p.band);
-            b0.AddValue(p.b0);
-            b1.AddValue(p.b1);
-            a0.AddValue(p.a0);
-            a1.AddValue(p.a1);
-            a2.AddValue(p.a2);
-            a3.AddValue(p.a3);
-            a4.AddValue(p.a4);
+            for (unsigned int j = 0; j < aTermKeywords.size(); j++)
+                aTermKeywords[j].AddValue(p.aTerms[j]);
+            for (unsigned int j = 0; j < bTermKeywords.size(); j++)
+                bTermKeywords[j].AddValue(p.bTerms[j]);
         }
         pvl += units;
         pvl += phostd;
         pvl += bbc;
         pvl += bbct;
         pvl += bbn;
-        pvl += b0;
-        pvl += b1;
-        pvl += a0;
-        pvl += a1;
-        pvl += a2;
-        pvl += a3;
-        pvl += a4;
+        for (unsigned int i = 0; i < aTermKeywords.size(); i++)
+            pvl += aTermKeywords[i];
+
+        for (unsigned int i = 0; i < bTermKeywords.size(); i++)
+            pvl += bTermKeywords[i];
+
         return;
     }
 
     /**
-     * @brief Determine Hillier parameters given a wavelength
+     * @brief Determine HapkeExponential parameters given a wavelength
      *
-     * This method determines the set of Hillier parameters to use
+     * This method determines the set of HapkeExponential parameters to use
      * for a given wavelength.  It iterates through all band
      * profiles as read from the PVL file and computes the
      * difference between the "wavelength" parameter and the
@@ -182,10 +192,10 @@ namespace Isis {
      *
      * @param wavelength Wavelength used to find parameter set
      *
-     * @return Hillier::Parameters Container of valid values.  If
+     * @return HapkeExponential::Parameters Container of valid values.  If
      *         not found, a value of iProfile = -1 is returned.
      */
-    Hillier::Parameters Hillier::findParameters ( const double wavelength ) const {
+    HapkeExponential::Parameters HapkeExponential::findParameters ( const double wavelength ) const {
         for (unsigned int i = 0; i < _profiles.size(); i++) {
             const DbProfile &p = _profiles[i];
             if (p.exists("BandBinCenter")) {
@@ -206,7 +216,7 @@ namespace Isis {
     }
 
     /**
-     * @brief Extracts necessary Hillier parameters from profile
+     * @brief Extracts necessary HapkeExponential parameters from profile
      *
      * Given a profile read from the input PVL file, this method
      * extracts needed parameters (from Keywords) in the PVL profile
@@ -216,21 +226,21 @@ namespace Isis {
      *
      * @param p Profile to extract/convert
      *
-     * @return Hillier::Parameters Container of extracted values
+     * @return HapkeExponential::Parameters Container of extracted values
      */
-    Hillier::Parameters Hillier::extract ( const DbProfile &p ) const {
+    HapkeExponential::Parameters HapkeExponential::extract ( const DbProfile &p ) const {
         Parameters pars;
-        pars.b0 = ConfKey(p, "B0", 0.0);
-        pars.b1 = ConfKey(p, "B1", 0.0);
-        pars.a0 = ConfKey(p, "A0", 0.0);
-        pars.a1 = ConfKey(p, "A1", 0.0);
-        pars.a2 = ConfKey(p, "A2", 0.0);
-        pars.a3 = ConfKey(p, "A3", 0.0);
-        pars.a4 = ConfKey(p, "A4", 0.0);
+
+        for (int i=1; i<=4; i++)
+            pars.aTerms.push_back(ConfKey(p, "A" + iString(i), 0.0));
+
+        for (int i=1; i<=2; i++)
+            pars.bTerms.push_back(ConfKey(p, "B" + iString(i), 0.0));
+
         pars.wavelength = ConfKey(p, "BandBinCenter", Null);
         pars.tolerance = ConfKey(p, "BandBinCenterTolerance", Null);
         //  Determine equation units - defaults to Radians
-        pars.units = ConfKey(p, "HillierUnits", iString("Radians"));
+        pars.units = ConfKey(p, "HapkeExponentialUnits", iString("Radians"));
         pars.phaUnit = (iString::Equal(pars.units, "Degrees")) ? 1.0 : rpd_c();
         return (pars);
     }
@@ -249,7 +259,7 @@ namespace Isis {
      * @param pvl  Input PVL parameter files
      * @param cube Input cube file to correct
      */
-    void Hillier::init ( PvlObject &pvl, Cube &cube ) {
+    void HapkeExponential::init ( PvlObject &pvl, Cube &cube ) {
         //  Make it reentrant
         _profiles.clear();
         _bandpho.clear();

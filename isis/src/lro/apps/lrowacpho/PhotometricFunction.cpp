@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision: 1.1 $
- * $Date: 2010/05/18 06:38:05 $
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -39,54 +39,55 @@ using namespace std;
 
 namespace Isis {
 
-  /**
-   * @brief Construct from PVL and Cube file
-   *
-   * @author Kris Becker - 2/21/2010
-   *
-   * @param pvl Photometric parameter files
-   * @param cube Input cube file
-   */
-  PhotometricFunction::PhotometricFunction(PvlObject &pvl, Cube &cube) {
-    _camera = cube.Camera();
-  }
-  /**
-   * @brief Compute photometric DN at given line/sample/band
-   *
-   * This routine applies the photometric angles to the equation
-   * and returns the calibration coefficient at the given  cube
-   * location.
-   *
-   * The return parameter is the photometric standard/photometric
-   * correction coefficient at the given pixel location.
-   *
-   * @author Kris Becker - 2/21/2010
-   *
-   * @param line   Line of cube image to compute photometry
-   * @param sample Sample of cube image to compute photometry
-   * @param band   Band of cube image to compute photometry
-   *
-   * @return double Photometric correction at cube loation
-   */
-  double PhotometricFunction::Compute(const double &line, const double &sample, int band) {
-    // Update band if necessary
-    if(_camera->Band() != band) {
-      _camera->SetBand(band);
+    /**
+     * @brief Construct from PVL and Cube file
+     *
+     * @author Kris Becker - 2/21/2010
+     *
+     * @param pvl Photometric parameter files
+     * @param cube Input cube file
+     */
+    PhotometricFunction::PhotometricFunction ( PvlObject &pvl, Cube &cube , bool useCamera) {
+        if (useCamera)
+            _camera = cube.Camera();
     }
-    if(!_camera->SetImage(sample, line))
-      return (Null);
+    /**
+     * @brief Compute photometric DN at given line/sample/band
+     *
+     * This routine applies the photometric angles to the equation
+     * and returns the calibration coefficient at the given  cube
+     * location.
+     *
+     * The return parameter is the photometric standard/photometric
+     * correction coefficient at the given pixel location.
+     *
+     * @author Kris Becker - 2/21/2010
+     *
+     * @param line   Line of cube image to compute photometry
+     * @param sample Sample of cube image to compute photometry
+     * @param band   Band of cube image to compute photometry
+     *
+     * @return double Photometric correction at cube loation
+     */
+    double PhotometricFunction::Compute ( const double &line, const double &sample, int band ) {
+        // Update band if necessary
+        if (_camera->Band() != band) {
+            _camera->SetBand(band);
+        }
+        if (!_camera->SetImage(sample, line))
+            return (Null);
 
-    double i = _camera->IncidenceAngle();
-    double e = _camera->EmissionAngle();
-    double g = _camera->PhaseAngle();
+        double i = _camera->IncidenceAngle();
+        double e = _camera->EmissionAngle();
+        double g = _camera->PhaseAngle();
 
-    if(i < MinimumIncidenceAngle() || i > MaximumIncidenceAngle() || e < MinimumEmissionAngle() || e
-        > MaximumEmissionAngle() || g < MinimumPhaseAngle() || g > MaximumPhaseAngle())
-      return (Null);
+        if (i < MinimumIncidenceAngle() || i > MaximumIncidenceAngle() || e < MinimumEmissionAngle() || e
+                        > MaximumEmissionAngle() || g < MinimumPhaseAngle() || g > MaximumPhaseAngle())
+            return (Null);
 
 
-    return photometry(i, e, g, band);
-  }
+        return photometry(i, e, g, band);
+    }
 
 } // namespace Isis
 
