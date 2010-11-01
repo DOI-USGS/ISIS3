@@ -452,13 +452,13 @@ int get_files(int host)
     scanf("%s", inname);
   }
 
-  if(host == 1 | host == 2) {
+  if(host == 1 || host == 2) {
     if((infile = open(inname, O_RDONLY | O_BINARY)) <= 0) {
       fprintf(stderr, "\ncan't open input file: %s\n", inname);
       exit(3);
     }
   }
-  else if(host == 3 | host == 5) {
+  else if(host == 3 || host == 5) {
     if((infile = open(inname, O_RDONLY)) <= 0) {
       fprintf(stderr, "\ncan't open input file: %s\n", inname);
       exit(3);
