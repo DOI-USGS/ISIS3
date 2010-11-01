@@ -72,7 +72,6 @@ Distance 1 -= Distance 2... Distance 1 = 1000 meters
 **PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
 **PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
 **PROGRAMMER ERROR** Negative distances are not supported, the value [-1000.0 meters] cannot be stored in the Distance class
-**PROGRAMMER ERROR** Distance does not understand the enumerated value [-1] as a unit
 **PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [>]
 **PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [>]
 **PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [<]

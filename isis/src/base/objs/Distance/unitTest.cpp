@@ -5,7 +5,7 @@
 #include "iException.h"
 #include "Preference.h"
 
-using std::cout;
+using std::cerr;
 using std::endl;
 
 using Isis::Distance;
@@ -15,88 +15,88 @@ using Isis::Preference;
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
-  cout.precision(14);
+  cerr.precision(14);
 
-  cout << "----- Testing Constructors -----" << endl << endl;
+  cerr << "----- Testing Constructors -----" << endl << endl;
 
   try {
-    cout << "Empty constructor" << endl;
+    cerr << "Empty constructor" << endl;
     Distance dist;
-    cout << dist.GetMeters() << " meters" << endl;
+    cerr << dist.GetMeters() << " meters" << endl;
   }
   catch(iException &e) {
     e.Report(false);
   }
 
   try {
-    cout << "Constructor given a value in meters" << endl;
+    cerr << "Constructor given a value in meters" << endl;
     Distance dist(1500.5);
-    cout << dist.GetMeters() << " meters" << endl;
+    cerr << dist.GetMeters() << " meters" << endl;
   }
   catch(iException &e) {
     e.Report(false);
   }
 
   try {
-    cout << "Constructor given a value in kilometers" << endl;
+    cerr << "Constructor given a value in kilometers" << endl;
     Distance dist(1500.5, Distance::Kilometers);
-    cout << dist.GetMeters() << " meters" << endl;
+    cerr << dist.GetMeters() << " meters" << endl;
   }
   catch(iException &e) {
     e.Report(false);
   }
 
   try {
-    cout << "Copy constructor" << endl;
+    cerr << "Copy constructor" << endl;
     Distance dist(1500.5);
     Distance copiedDist(dist);
-    cout << copiedDist.GetMeters() << " meters" << endl;
+    cerr << copiedDist.GetMeters() << " meters" << endl;
   }
   catch(iException &e) {
     e.Report(false);
   }
 
-  cout << endl << "----- Testing Accessors -----" << endl << endl;
+  cerr << endl << "----- Testing Accessors -----" << endl << endl;
 
   try {
-    cout << "Meters (redundant)" << endl;
+    cerr << "Meters (redundant)" << endl;
     Distance dist(1, Distance::Meters);
-    cout << dist.GetMeters() << " meters" << endl;
+    cerr << dist.GetMeters() << " meters" << endl;
   }
   catch(iException &e) {
     e.Report(false);
   }
 
   try {
-    cout << "Kilometers" << endl;
+    cerr << "Kilometers" << endl;
     Distance dist(1, Distance::Kilometers);
-    cout << dist.GetKilometers() << " kilometers" << endl;
+    cerr << dist.GetKilometers() << " kilometers" << endl;
   }
   catch(iException &e) {
     e.Report(false);
   }
 
-  cout << endl << "----- Testing Operators -----" << endl << endl;
+  cerr << endl << "----- Testing Operators -----" << endl << endl;
 
   try {
     Distance dist1(1, Distance::Meters);
     Distance dist2(1, Distance::Meters);
-    cout << endl;
-    cout << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cout << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << endl;
+    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
+    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
 
-    cout << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
-    cout << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
-    cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
-    cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
-    cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+    cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
+    cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
+    cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
+    cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
+    cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
         " meters" << endl;
-    cout << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
         " meters" << endl;
 
     dist1 = dist2;
-    cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
+    cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
         " meters" << endl;
   }
   catch(iException &e) {
@@ -106,19 +106,19 @@ int main(int argc, char *argv[]) {
   try {
     Distance dist1(1, Distance::Meters);
     Distance dist2(10, Distance::Meters);
-    cout << endl;
-    cout << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cout << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << endl;
+    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
+    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
 
-    cout << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
-    cout << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
-    cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
-    cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
-    cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+    cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
+    cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
+    cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
+    cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
+    cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
         " meters" << endl;
 
-    // This should throw an exception and never cout
+    // This should throw an exception and nevercerr 
     try {
       (dist1 - dist2).GetMeters();
     }
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     }
 
     dist1 = dist2;
-    cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
+    cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
         " meters" << endl;
   }
   catch(iException &e) {
@@ -137,22 +137,22 @@ int main(int argc, char *argv[]) {
   try {
     Distance dist1(10, Distance::Meters);
     Distance dist2(1, Distance::Meters);
-    cout << endl;
-    cout << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cout << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << endl;
+    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
+    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
 
-    cout << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
-    cout << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
-    cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
-    cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
-    cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+    cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
+    cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
+    cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
+    cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
+    cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
         " meters" << endl;
-    cout << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
         " meters" << endl;
 
     dist1 = dist2;
-    cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
+    cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
         " meters" << endl;
   }
   catch(iException &e) {
@@ -162,35 +162,35 @@ int main(int argc, char *argv[]) {
   try {
     Distance dist1(1000, Distance::Meters);
     Distance dist2(1, Distance::Kilometers);
-    cout << endl;
-    cout << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cout << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << endl;
+    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
+    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
 
-    cout << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
-    cout << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
-    cout << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
-    cout << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
-    cout << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cout << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+    cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
+    cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
+    cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
+    cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
+    cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
         " meters" << endl;
-    cout << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
         " meters" << endl;
 
     dist1 = dist2;
-    cout << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
+    cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
         " meters" << endl;
     dist1 += dist2;
-    cout << "Distance 1 += Distance 2... Distance 1 = " << dist1.GetMeters() <<
+    cerr << "Distance 1 += Distance 2... Distance 1 = " << dist1.GetMeters() <<
         " meters" << endl;
     dist1 -= dist2;
-    cout << "Distance 1 -= Distance 2... Distance 1 = " << dist1.GetMeters() <<
+    cerr << "Distance 1 -= Distance 2... Distance 1 = " << dist1.GetMeters() <<
         " meters" << endl;
   }
   catch(iException &e) {
     e.Report(false);
   }
 
-  cout << endl << "----- Testing Error Checking -----" << endl << endl;
+  cerr << endl << "----- Testing Error Checking -----" << endl << endl;
 
   try {
     Distance dist(-1);
@@ -230,9 +230,12 @@ int main(int argc, char *argv[]) {
     e.Report(false);
   }
 
+  // This is actually undefined behavior that has changed in
+  //   newer versions of the g++ compiler. Disable the test and
+  //   know the Distance class does its best to handle this case.
   try {
-    Distance dist(1, (Distance::Units)-1);
-    dist.SetKilometers(-1);
+    //Distance dist(1, (Distance::Units)-1);
+    //dist.SetKilometers(-1);
   }
   catch(iException &e) {
     e.Report(false);
