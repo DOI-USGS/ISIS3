@@ -73,9 +73,17 @@ namespace Isis {
 //  ensure database driver plugins are loaded - if they exist.
     QCoreApplication *cApp = QCoreApplication::instance();
     if(cApp == 0) {
-      static char *argv = { "DatabaseFactory" };
+      static char **argv = 0;
+
+      if(!argv) {
+        argv = new char*[2];
+        argv[0] = new char[1024];
+        strcpy(argv[0], "DatabaseFactory");
+        argv[1] = 0;
+      }
+
       static int argc  = 1;
-      new QCoreApplication(argc, &argv);
+      new QCoreApplication(argc, argv);
     }
 
     //  Initializes
