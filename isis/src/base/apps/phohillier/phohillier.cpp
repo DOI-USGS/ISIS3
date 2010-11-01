@@ -2,14 +2,15 @@
 #include "Isis.h"
 
 #include <string>
-#include "ProcessByLine.h"
-#include "SpecialPixel.h"
-#include "Hillier.h"
-#include "Pvl.h"
-#include "Cube.h"
+#include <memory>
 
-#include "PvlGroup.h"
+#include "Cube.h"
+#include "Hillier.h"
 #include "iException.h"
+#include "ProcessByLine.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "SpecialPixel.h"
 
 using namespace std;
 using namespace Isis;
