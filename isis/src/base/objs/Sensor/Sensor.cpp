@@ -352,58 +352,59 @@ namespace Isis {
               // Calculate the fractional distance "v" to move along the look vector
               // to the intersection point. Check to see if there was a convergence
               // of the solution and the tolerance was too small to detect it.
+              double palt;
               if ((g2len*r1/r2 - g1len) == 0.0) {
-                std::string msg = "The tolerance is too small to detect the convergence of ";
-                msg += "a solution. The tolerance must be re-evaluated to fix this problem. ";
-                msg += "Please provide the program you are running along with the inputs to ";
-                msg += "ISIS support so that this problem can be addressed.";
-                throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
-              }
-              double v = (r1-g1len) / (g2len*r1/r2 - g1len);
-              p_pB[0] = g1[0] + v * dd * ulookB[0];
-              p_pB[1] = g1[1] + v * dd * ulookB[1];
-              p_pB[2] = g1[2] + v * dd * ulookB[2];
-              plen = vnorm_c(p_pB);
-              reclat_c(p_pB,&pradius,&plon,&plat);
-              plat *= 180.0 / Isis::PI;
-              plon *= 180.0 / Isis::PI;
-              if (plon < 0.0) plon += 360.0;
-              if (plon > 360.0) plon -= 360.0;
-              pradius = DemRadius(plat,plon);
-              if (Isis::IsSpecial(pradius)) {
-                p_hasIntersection = false;
-                return p_hasIntersection;
-              } 
-              double palt = plen - pradius;
-
-              // The altitude relative to surface is +ve at the observation point,
-              // so reset g1=p and r1=pradius
-              if (palt > tolerance) {
-                it = it + 1;
-                g1[0] = p_pB[0];
-                g1[1] = p_pB[1];
-                g1[2] = p_pB[2];
-                g1len = plen;
-                r1 = pradius;
-                dd = dd * (1.0 - v);
-
-              // The altitude relative to surface -ve at the observation point,
-              // so reset g2=p and r2=pradius
-              } else if (palt < -tolerance) {
-                it = it + 1;
-                g2[0] = p_pB[0];
-                g2[1] = p_pB[1];
-                g2[2] = p_pB[2];
-                g2len = plen;
-                r2 = pradius;
-                dd = dd * v;
-
-              // We are within the tolerance, so the solution has converged
-              } else {
                 p_hasIntersection = true;
                 plen = pradius;
                 palt = 0.0;
                 done = true;
+              } else {
+                double v = (r1-g1len) / (g2len*r1/r2 - g1len);
+                p_pB[0] = g1[0] + v * dd * ulookB[0];
+                p_pB[1] = g1[1] + v * dd * ulookB[1];
+                p_pB[2] = g1[2] + v * dd * ulookB[2];
+                plen = vnorm_c(p_pB);
+                reclat_c(p_pB,&pradius,&plon,&plat);
+                plat *= 180.0 / Isis::PI;
+                plon *= 180.0 / Isis::PI;
+                if (plon < 0.0) plon += 360.0;
+                if (plon > 360.0) plon -= 360.0;
+                pradius = DemRadius(plat,plon);
+                if (Isis::IsSpecial(pradius)) {
+                  p_hasIntersection = false;
+                  return p_hasIntersection;
+                } 
+                palt = plen - pradius;
+
+                // The altitude relative to surface is +ve at the observation point,
+                // so reset g1=p and r1=pradius
+                if (palt > tolerance) {
+                  it = it + 1;
+                  g1[0] = p_pB[0];
+                  g1[1] = p_pB[1];
+                  g1[2] = p_pB[2];
+                  g1len = plen;
+                  r1 = pradius;
+                  dd = dd * (1.0 - v);
+
+                // The altitude relative to surface -ve at the observation point,
+                // so reset g2=p and r2=pradius
+                } else if (palt < -tolerance) {
+                  it = it + 1;
+                  g2[0] = p_pB[0];
+                  g2[1] = p_pB[1];
+                  g2[2] = p_pB[2];
+                  g2len = plen;
+                  r2 = pradius;
+                  dd = dd * v;
+
+                // We are within the tolerance, so the solution has converged
+                } else {
+                  p_hasIntersection = true;
+                  plen = pradius;
+                  palt = 0.0;
+                  done = true;
+                }
               }
             }
             g1[0] = g2[0];
