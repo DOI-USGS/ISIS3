@@ -206,11 +206,15 @@ namespace Isis {
 
     /**
      * Set the angle in units of Radians.
+     *
+     * @param radians The new angle value, Null for invalid angle
      */
     void SetRadians(double radians) { SetAngle(radians, Radians); }
 
     /**
      * Set the angle in units of Degrees.
+     *
+     * @param degrees The new angle value, Null for invalid angle
      */
     void SetDegrees(double degrees) { SetAngle(degrees, Degrees); }
 
