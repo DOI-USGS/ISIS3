@@ -106,69 +106,77 @@ void IsisMain() {
 
   string target("Unknown");
   for(unsigned int i = 0 ; i < flist.size() ; i++) {
-    // Set the input image, get the camera model, and a basic mapping
-    // group
-    Cube cube;
-    cube.Open(flist[i]);
-
-    int lines = cube.Lines();
-    int samples = cube.Samples();
-
-
-    PvlObject fmap("File");
-    fmap += PvlKeyword("Name", flist[i]);
-    fmap += PvlKeyword("Lines", lines);
-    fmap += PvlKeyword("Samples", samples);
-
-    Camera *cam = cube.Camera();
-    Pvl mapping;
-    cam->BasicMapping(mapping);
-    PvlGroup &mapgrp = mapping.FindGroup("Mapping");
-    mapgrp.AddKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
-    mapgrp.AddKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
-    mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
-    mapgrp.AddKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
-
-    // Get the radii
-    double radii[3];
-    cam->Radii(radii);
-
-    eqRad   = radii[0] * 1000.0;
-    eq2Rad  = radii[1] * 1000.0;
-    poleRad = radii[2] * 1000.0;
-
-    target = cam->Target();
-    equiRadStat.AddData(&eqRad, 1);
-    poleRadStat.AddData(&poleRad, 1);
-
-    // Get resolution
-    double lowres = cam->LowestImageResolution();
-    double hires = cam->HighestImageResolution();
-    scaleStat.AddData(&lowres, 1);
-    scaleStat.AddData(&hires, 1);
-
-    double pixres = (lowres + hires) / 2.0;
-    double scale = Scale(pixres, poleRad, eqRad);
-    mapgrp.AddKeyword(PvlKeyword("PixelResolution", pixres), Pvl::Replace);
-    mapgrp.AddKeyword(PvlKeyword("Scale", scale, "pixels/degree"), Pvl::Replace);
-    mapgrp += PvlKeyword("MinPixelResolution", lowres, "meters");
-    mapgrp += PvlKeyword("MaxPixelResolution", hires, "meters");
-
-    // Get the universal ground range
-    double minlat, maxlat, minlon, maxlon;
-    cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
-    mapgrp.AddKeyword(PvlKeyword("MinimumLatitude", minlat), Pvl::Replace);
-    mapgrp.AddKeyword(PvlKeyword("MaximumLatitude", maxlat), Pvl::Replace);
-    mapgrp.AddKeyword(PvlKeyword("MinimumLongitude", minlon), Pvl::Replace);
-    mapgrp.AddKeyword(PvlKeyword("MaximumLongitude", maxlon), Pvl::Replace);
-
-    fmap.AddGroup(mapgrp);
-    fileset.AddObject(fmap);
-
-    longitudeStat.AddData(&minlon, 1);
-    longitudeStat.AddData(&maxlon, 1);
-    latitudeStat.AddData(&minlat, 1);
-    latitudeStat.AddData(&maxlat, 1);
+    try {
+      // Set the input image, get the camera model, and a basic mapping
+      // group
+      Cube cube;
+      cube.Open(flist[i]);
+  
+      int lines = cube.Lines();
+      int samples = cube.Samples();
+  
+  
+      PvlObject fmap("File");
+      fmap += PvlKeyword("Name", flist[i]);
+      fmap += PvlKeyword("Lines", lines);
+      fmap += PvlKeyword("Samples", samples);
+  
+      Camera *cam = cube.Camera();
+      Pvl mapping;
+      cam->BasicMapping(mapping);
+      PvlGroup &mapgrp = mapping.FindGroup("Mapping");
+      mapgrp.AddKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
+  
+      // Get the radii
+      double radii[3];
+      cam->Radii(radii);
+  
+      eqRad   = radii[0] * 1000.0;
+      eq2Rad  = radii[1] * 1000.0;
+      poleRad = radii[2] * 1000.0;
+  
+      target = cam->Target();
+      equiRadStat.AddData(&eqRad, 1);
+      poleRadStat.AddData(&poleRad, 1);
+  
+      // Get resolution
+      double lowres = cam->LowestImageResolution();
+      double hires = cam->HighestImageResolution();
+      scaleStat.AddData(&lowres, 1);
+      scaleStat.AddData(&hires, 1);
+  
+      double pixres = (lowres + hires) / 2.0;
+      double scale = Scale(pixres, poleRad, eqRad);
+      mapgrp.AddKeyword(PvlKeyword("PixelResolution", pixres), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("Scale", scale, "pixels/degree"), Pvl::Replace);
+      mapgrp += PvlKeyword("MinPixelResolution", lowres, "meters");
+      mapgrp += PvlKeyword("MaxPixelResolution", hires, "meters");
+  
+      // Get the universal ground range
+      double minlat, maxlat, minlon, maxlon;
+      cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
+      mapgrp.AddKeyword(PvlKeyword("MinimumLatitude", minlat), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("MaximumLatitude", maxlat), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("MinimumLongitude", minlon), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("MaximumLongitude", maxlon), Pvl::Replace);
+  
+      fmap.AddGroup(mapgrp);
+      fileset.AddObject(fmap);
+  
+      longitudeStat.AddData(&minlon, 1);
+      longitudeStat.AddData(&maxlon, 1);
+      latitudeStat.AddData(&minlat, 1);
+      latitudeStat.AddData(&maxlat, 1);
+    } catch(iException &ie) {
+      string mess = "Problems with file " + flist[i] + "\n" +
+                     ie.what();
+      ie.Clear();
+      ie.Message(iException::User, mess, _FILEINFO_);
+      throw;
+    }
 
     p.ClearInputCubes();
     prog.CheckStatus();

@@ -76,6 +76,10 @@ End
         Modified program to have output go to print.prt file in addition to 
         other outputs.
     </change>
+    <change name="Kris Becker" date="2010-11-02">
+        Added more detail to error reporting so the offending file can be 
+        more readily identified.
+    </change>
 </history>
 
   <groups>
