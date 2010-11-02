@@ -107,4 +107,4 @@ GUI:     0
 **USER ERROR** Invalid command line
 **USER ERROR** Unknown parameter [bogus].
 
-**USER ERROR** Parameter history file [junk.par] does not exist
+**USER ERROR** The history file [junk.par] does not exist
