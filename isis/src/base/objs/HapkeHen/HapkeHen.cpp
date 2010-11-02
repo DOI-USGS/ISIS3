@@ -73,7 +73,7 @@ namespace Isis {
     double hgs;
     double sing;
     double cosg;
-    double tang;
+    double tang2;
     double bg;
     double pg;
     double pg1;
@@ -137,18 +137,13 @@ namespace Isis {
 
     sing = sin(pharad);
     cosg = cos(pharad);
-    tang = sing / max(1.0e-10, cosg);
+    tang2 = tan(pharad/2.0);
 
     if(p_photoHh == 0.0) {
       bg = 0.0;
     }
     else {
-      if(phase <= 90.0) {
-        bg = p_photoB0 / max(-5.0, 1.0 + tang / p_photoHh);
-      }
-      else {
-        bg = 0.0;
-      }
+      bg = p_photoB0 / (1.0 + tang2 / p_photoHh);
     }
 
     pg1 = (1.0 - p_photoHg2) * (1.0 - hgs) / pow((1.0 + hgs + 2.0 *
