@@ -10,6 +10,5 @@ Exists: 1
 () operator: bar
 Value: bar
 Test getting non-existing key BadKey
-**PROGRAMMER ERROR** Error fetching value from key BadKey
+BadKey =**PROGRAMMER ERROR** Error fetching value from key BadKey
 **PROGRAMMER ERROR** Requested value does not exist!
-BadKey =

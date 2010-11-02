@@ -9,25 +9,25 @@ int main(int argc, char *argv[]) {
 
   DbProfile p("test profile");
 
-  cout << "Valid: " << p.isValid() << endl;
-  cout << "Size: " << p.size() << endl;
+  cerr << "Valid: " << p.isValid() << endl;
+  cerr << "Size: " << p.size() << endl;
   p.setName("test profile");
-  cout << "Name: " << p.Name() << endl;
-  cout << "Adding a key..." << endl;
+  cerr << "Name: " << p.Name() << endl;
+  cerr << "Adding a key..." << endl;
   p.add("foo", "bar");
-  cout << "Valid: " << p.isValid() << endl;
-  cout << "Size: " << p.size() << endl;
-  cout << "Count: " << p.count("foo") << endl;
-  cout << "Exists: " << p.exists("boo") << endl;
-  cout << "Exists: " << p.exists("foo") << endl;
-  cout << "() operator: " << p("foo") << endl;
-  cout << "Value: " << p.value("foo", 0) << endl;
+  cerr << "Valid: " << p.isValid() << endl;
+  cerr << "Size: " << p.size() << endl;
+  cerr << "Count: " << p.count("foo") << endl;
+  cerr << "Exists: " << p.exists("boo") << endl;
+  cerr << "Exists: " << p.exists("foo") << endl;
+  cerr << "() operator: " << p("foo") << endl;
+  cerr << "Value: " << p.value("foo", 0) << endl;
 
-  cout << "Test getting non-existing key BadKey\n";
-  cout.flush();
+  cerr << "Test getting non-existing key BadKey\n";
+  cerr.flush();
   try {
-    cout << "BadKey =";
-    cout << p("BadKey") << endl;
+    cerr << "BadKey =";
+    cerr << p("BadKey") << endl;
   }
   catch(iException &ie) {
     ie.Report();
