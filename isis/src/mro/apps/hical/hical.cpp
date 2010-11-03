@@ -87,7 +87,7 @@ void calibrate(Buffer &in, Buffer &out) {
 void IsisMain() {
 
   const std::string hical_program = "hical";
-  const std::string hical_version = "3.5";
+  const std::string hical_version = "3.6";
   const std::string hical_revision = "$Revision: 1.9 $";
   const std::string hical_runtime = Application::DateTime();
 

@@ -143,6 +143,9 @@
         module which corrects temperature dependant gain previously in the Za 
         module; updated documentation.
     </change>
+   <change name="Kris Becker" date="2010-05-26"> 
+       Corrected sign for temperature gain coefficient.
+   </change>
   </history>
 
   <category>

@@ -51,7 +51,9 @@ namespace Isis {
    *
    * @ingroup Utility
    *
-   * @author 2009-09-14 Kris Becker
+   * @author 2009-09-14 Kris Becker 
+   * @internal 
+   *   @history 2010-11-02 Kris Becker Corrected sign for _fpaFactor 
    */
   class TempGainCorrect : public Component {
 
@@ -88,7 +90,7 @@ namespace Isis {
 
 
         double FPA_temp = (fpa_py_temp + fpa_my_temp) / 2.0;
-        double _baseT = 1.0 + (_fpaFactor * (FPA_temp - _refTemp));
+        double _baseT = 1.0 - (_fpaFactor * (FPA_temp - _refTemp));
 
         //  Create data
         int nsamps = ToInteger(prof("Samples"));
