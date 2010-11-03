@@ -48,13 +48,13 @@ namespace Isis {
    *                                       RAD2DEG
    */
 
-  const std::string version("3.2.1beta2 | 2010-03-18");
+  const std::string version("3.2.1 | 2010-11-05");
 
   const double E(2.7182818284590452354);    //!<The mathematical constant E
-  const double PI(3.14159265358979323846);  //!<The mathematical constant PI
-  const double HALFPI(1.57079632679489661923); //!<The mathematical constant PI/2
-  const double DEG2RAD(PI / 180.0);  //!<Multiplier for converting from degrees to radians
-  const double RAD2DEG(180.0 / PI);  //!<Multiplier for converting from radians to degrees
+  const double PI(3.14159265358979323846);   //!<The mathematical constant PI
+  const double HALFPI(1.57079632679489661923);   //!<The mathematical constant PI/2
+  const double DEG2RAD(PI / 180.0);   //!<Multiplier for converting from degrees to radians
+  const double RAD2DEG(180.0 / PI);   //!<Multiplier for converting from radians to degrees
 
 #if (defined(__SunOS__) || defined(__x86_64))
   typedef long int BigInt;
