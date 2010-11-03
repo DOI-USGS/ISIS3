@@ -15,7 +15,9 @@ int main() {
 
   std::cout << std::endl << "Empty String Error" << std::endl;
   try {
-    erract_c("SET", (SpiceInt)0, "");
+    SpiceChar *tmp = new SpiceChar[128];
+    tmp[0] = '\0';
+    erract_c("SET", (SpiceInt)0, tmp);
     NaifStatus::CheckErrors();
   }
   catch(iException &e) {
