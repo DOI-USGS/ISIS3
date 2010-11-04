@@ -29,23 +29,24 @@
             <li>
                 <em>HiRISE Calibration Image</em> - Contains calibration image 
                 data.  These data are acquired immediately before the actual 
-                image observation is executed.   Within this data set is three 
-                distinct calibration sources.  <b>Reverse Clock</b> contains 20 
-                lines of nominal zero data. There is some serial dark current 
-                but this is negligible at the shorter line times.  <b>Mask</b> 
-                contains 20/binning lines of data from behind the aluminum mask.  
-                It should only contain dark current - serial and parallel.  
-                <b>Ramp</b> is 8, 32, 64 or 128 (TDI) lines that has a signal 
-                from the reverse and forward clocking.  With uniform scene, the 
-                peak amplitude of the ramp should be 2X the image area.
+                image observation from three distinct calibration sources.  
+                <b>Reverse Clock</b> contains 20 lines of nominal zero (offset) 
+                data. There is some serial register dark current but this is 
+                negligible at the shorter line times.  <b>Mask</b> contains 
+                20/bin lines of data from behind the aluminum mask.  It should 
+                only contain dark current - serial and parallel.  <b>Ramp</b> is 
+                8, 32, 64 or 128 time delay integration (TDI) lines that 
+                includes signal from the reverse and forward clocking.  For a 
+                uniform scene, the peak amplitude of the ramp should be 2X the 
+                image area DN.
             </li>
             <li>
                 <em>HiRISE Calibration Ancillary</em> -   These data are also 
                 acquired prior to the actual image.  This BLOB contains two 
-                sources of calibration data.  <b>Buffer Pixels</b> is always 12 
-                pixels at the start of each line of the calibration image.                                                    
-                <b>Dark Pixels</b> is always 16 pixels extending the image area 
-                and is under the aluminum mask.
+                types of calibration data.   <b>Buffer Pixels</b> are the 12 
+                pixels at the start of each line of the calibration image. 
+                <b>Dark Pixels</b> are the 16 pixels at the end of each line 
+                under the aluminum mask.
             </li>
             <li>
                 <em>HiRISE Ancillary</em> -  These data are acquired for each 
@@ -56,19 +57,19 @@
             </li>
         </ul>
         Note that these data BLOBs are removed by <b>hicalbeta</b> in the output 
-        file so that subsequent runs of this application are prevented.
+        file so that repeated runs of this application are prevented.
     </p>
     <p>
-          The calibration reduction is carried out in a series of modules.  
-          These modules provide various contributions to the calibration 
-          process.  The parameters that govern the behavior of these modules are 
-          contained in the program configuration file as specified in the CONF 
-          program parameter.   The default provided is automatically selected 
-          from the ISIS MRO ancillary data that accompanies the ISIS release and 
-          would normally not need to be explicitly provided by the user.
+          The calibration is carried out in a series of modules. These modules 
+          provide various contributions to the calibration process.  The   
+          parameters that govern the behavior of these modules are contained in 
+          the program configuration file as specified in the CONF program 
+          parameter.   The default provided is automatically selected from the 
+          ISIS MRO ancillary data that accompany the ISIS release and would 
+          normally not need to be explicitly provided by the user.
     </p>
       <p>
-              Each of the calibration modules have their own unique set of keywords 
+              Each of the calibration modules has their own unique set of keywords 
               that govern is behavior.  This is documented in the CONF parameter.
       </p>
           
@@ -80,25 +81,25 @@
 
           ZeroBufferSmooth          - Fills gaps in Buffer Data (ZBS)
           ZeroBufferFit             - Computes non-linear fit of ZeroBufferSmooth (ZBF)
-          ZeroReverse               - Process Reverse Clock data (ZR)
-          ZeroDark                  - B-matrix, temperature correction (ZD) 
+          ZeroReverse               - Process Reverse Clocked data (ZR)
+          ZeroDark                  - Dark current temperature correction (ZD) 
           GainLineDrift             - Time-base line drift correction (GLD)
-          GainChannelNormalize      - G-matrix, normalize gain for summing/TDI (GCN)
+          GainChannelNormalize      - Normalize gain for summing/TDI (GCN)
           GainNonLinearity          - Line-based non-linearity gain correction (GNL)
-          GainFlatField             - A-matrix flat field correction (GFF)
+          GainFlatField             - Flat field correction (GFF)
           GainTemperature           - Temperature dependant gain correction (GT) 
           GainUnitConversion        - DN unit conversion factors (GUC) 
 
-  The general form of the HiRISE calibration correction equation is:
+  The general form of the HiRISE calibration equation is:
 
     oDN = (iDN - ZBF(ZBS) - ZR - ZD)  / GLD * GCN * GNL * GFF * GT / GUC 
 
           where iDN is the input raw pixel value and oDN is the calibrated 
-          output pixel.
+          output pixel value in 16-bit DN.
       </PRE>
       <p>
-           How these radiometric components are computed are governed by the 
-           CONF configuration file.  This file is highly customizable to 
+           Computation of these radiometric components is governed by the 
+           PVL ()CONF) configuration file.  This file is highly customizable to 
            accommodate as many specialized processing needs as possible. The 
            contents of this file and how it may be used/customized is fully  
            described below in this documentation section.
@@ -107,21 +108,19 @@
                 This important file provides all parameters used
                 in the calibration process.  It contains references to
                 calibration matrices (such as flat fields, instrument gains,
-                etc...), label keywords and parameter constants used in the
-                radiometric calibration process.  
+                etc...), label keywords and parameters used in the radiometric 
+                calibration process.  
             </p>
             <p>
-                The format of this PVL file is highly flexible for managing 
-                HiRISE calibration data.  This configuration file contains 
-                numerous module profiles that govern the behavior of each phase 
-                in the calibration process.  These modules each have parameters 
-                that are specific to its requirements.  There are 10 different 
-                modules that are used in the application.  However, you will 
-                typically see many other profiles in the configuration file.  
-                The technique employed here is that you can take advantage of 
-                the ability to merge other profiles into one or more of the 
-                other main profiles, simply by the content of the labels or 
-                observing conditions of the image.
+                This highly flexible configuration file contains numerous module 
+                profiles that govern the behavior of each phase in the 
+                calibration process.  These modules each have parameters that 
+                are specific to their function.  There are 10 different modules 
+                used in the application.  However, the configuration file will 
+                typically include many other profiles. The user can take 
+                advantage of the ability to merge other profiles into one or 
+                more of the other main profiles, simply by the content of the 
+                labels or observing conditions of the image. 
             </p>
             <p>
                 The file must contain a top level  <b>Hical</b> object.  Within 
@@ -131,16 +130,16 @@
                 loaded after the initial one.  Optional profile names are 
                 constructed by the combination of the <b>OptionKeywords</b> and 
                 <b>ProfileOptions</b>  keywords.   The <b>OptionKeywords</b> 
-                lists keywords in the configuration file and/or label that can 
-                be used to textually replace the patterns surrounded by the {} 
-                in the <b>ProfileOptions</b>  keyword.  The keywords FILTER, 
-                CCD, CHANNEL, TDI and BIN are always generated after the initial 
-                module and label are loaded in.  After the initial profile is 
-                loaded, the FROM file label is loaded using the 
-                <b>LabelGroups</b> to determine which keywords are loaded.  Note 
-                that the groups must exist or an error is issued.  Other than 
-                that you can specify any defined keyword in the                   
-                <b>OptionKeywords</b> to apply to profile names.  
+                lists keyword groups in the configuration file and/or label that 
+                can be used to textually replace the patterns surrounded by the 
+                {} in the  <b>ProfileOptions</b>  keyword.  The keywords 
+                FILTER, CCD, CHANNEL, TDI and BIN are always generated after the 
+                initial module and label are loaded in.  After the initial 
+                profile is loaded, the FROM file label is loaded using the 
+                <b>LabelGroups</b> list to determine which keywords are loaded.  
+                Note that the groups must exist or an error is issued.  
+                Otherwise, the user can specify any defined keyword in the 
+                <b>OptionKeywords</b> list to apply to profile names.  
             </p>
             <p>
                 The real power of the configuration file is its use of named Profiles.
@@ -844,7 +843,7 @@ End_Object
             <br><h1 align="center">ZeroReverse Module Parameters</h1> </br>
             <TABLE BORDER="1">
                   <CAPTION> 
-                      This module uses the Reverse Clock region to compute the 
+                      This module uses the Reverse Clocked region to compute the 
                       offset that is then subtracted from the result of the 
                       ZeroBufferFit module.  Processing is governed by some 
                       statistical properties of this region.  The standard 
@@ -861,7 +860,7 @@ End_Object
                  <TR>
                     <TD>ZeroReverseFirstLine</TD>
                     <TD>
-                       Specifies the first line of the Reverse Clock region in 
+                       Specifies the first line of the Reverse Clocked region in 
                        the input FROM file "HiRISE Ancillary Image" data to 
                        average for dark current correction.
                     </TD>
@@ -869,7 +868,7 @@ End_Object
                 <TR>
                     <TD>ZeroReverseLastLine</TD>
                     <TD>
-                       Specifies the last line in the Reverse Clock region in 
+                       Specifies the last line in the Reverse Clocked region in 
                        the input FROM file "HiRISE Ancillary Image" data to 
                        average for dark current correction.
                     </TD>
@@ -908,19 +907,20 @@ End_Object
                       <TR>
                          <TD>RevMeanTrigger</TD>
                          <TD>
-                           Maximum mean value of the Reverse Clock data region.  
-                           Means that exceed this value will instead use this 
-                           value as the offset correction value for all samples.
+                           Maximum mean value of the Reverse Clocked data 
+                           region.  Means that exceed this value will instead 
+                           use this value as the offset correction value for all 
+                           samples.
                          </TD>
                       </TR>
                       <TR>
                           <TD>RevStdDevTrigger</TD>
                           <TD>
                             Maximum standard deviation value of the Reverse 
-                            Clock data region.  Standard deviations that exceed 
-                            this value will instead cause the RevMeanTrigger 
-                            value to be used as the offset constant for all 
-                            samples.
+                            Clocked data region.  Standard deviations that 
+                            exceed this value will instead cause the 
+                            RevMeanTrigger value to be used as the offset 
+                            constant for all samples.
                           </TD>
                       </TR>
                   </TABLE>
@@ -930,10 +930,10 @@ End_Object
                     <TD>RevLisTolerance</TD>
                     <TD>
                         The maximum number of low instrument saturation (LIS)
-                        special pixels that can exist in the Reverse Clock 
+                        special pixels that can exist in the Reverse Clocked 
                         calibration data region.  If more LIS pixels exist in 
                         this region, then the RevMeanTrigger value is used in 
-                        lieu of the processed Reverse Clock data.  This value 
+                        lieu of the processed Reverse Clocked data.  This value 
                         provides the default (1) for all HiRISE images which can 
                         be changed/overridden in subsequently loaded profiles (such as 
                         the one loaded in the ReverseClockStatistics file).
@@ -943,10 +943,10 @@ End_Object
                     <TD>RevHisTolerance</TD>
                     <TD>
                         The maximum number of high instrument saturation (HIS)
-                        special pixels that can exist in the Reverse Clock 
+                        special pixels that can exist in the Reverse Clocked 
                         calibration data region.  If more HIS pixels exist in 
                         this region, then the RevMeanTrigger value is used in 
-                        lieu of the processed Reverse Clock data.  This value 
+                        lieu of the processed Reverse Clocked data.  This value 
                         provides the default (1) for all HiRISE images which can 
                         be changed/overridden in subsequently loaded profiles 
                         (such as the one loaded in the ReverseClockStatistics 
@@ -957,11 +957,11 @@ End_Object
                     <TD>RevNulTolerance</TD>
                     <TD>
                         The maximum number of null (NUL) special pixels that 
-                        can exist in the Reverse Clock calibration data region. 
-                        If more NUL pixels exist in this region, then the
-                        RevMeanTrigger value is used in lieu of the processed
-                        Reverse Clock data.   This value  provides the default 
-                        (1) for all HiRISE images which can be 
+                        can exist in the Reverse Clocked calibration data 
+                        region. If more NUL pixels exist in this region, then 
+                        the RevMeanTrigger value is used in lieu of the 
+                        processed Reverse Clocked data.   This value  provides 
+                        the default (1) for all HiRISE images which can be 
                         changed/overridden in subsequently loaded profiles (such 
                         as the one loaded in the ReverseClockStatistics file).
                     </TD>
@@ -1372,7 +1372,7 @@ End_Object
           Abstracted Buffer pixel processing to DriftBuffer class (Zf); Added
           robustness to some module dumps (Zf, Zb, Za);  Added statistics
           computations to several modules (Zf, Zz, Zb,Za);  Abstracted dark
-          offset processing of Reverse Clock data to OffsetCorrect class (Zz).
+          offset processing of Reverse Clocked data to OffsetCorrect class (Zz).
       </change>
       <change name="Jeannie Walldren" date="2008-11-05"> 
       Replaced references to DataInterp class with NumericalApproximation.
@@ -1380,7 +1380,7 @@ End_Object
     <change name="Kris Becker" date="2008-11-17"> 
         Added additional code to implement Zz module trigger options.  This 
         option provides the ability to trigger a constant used in the Reverse 
-        Clock calibration data based upon noise.  See the discussion on the Zz 
+        Clocked calibration data based upon noise.  See the discussion on the Zz 
         module in this program documentation.
     </change>
     <change name="Kris Becker" date="2009-09-15"> 
@@ -1403,8 +1403,9 @@ End_Object
    <change name="Kris Becker" date="2010-05-26"> 
        Corrected sign for temperature gain coefficient.
    </change>
-   <change name="Kris Becker" date="2010-10-28"> 
-       Extensively updated the program documentation.
+   <change name="Kris Becker" date="2010-11-04">
+       Renamed many of the modules to better reflect their function.  
+       Extensively updated the program documentation. 
    </change>
   </history>
 
@@ -1429,7 +1430,7 @@ End_Object
         <type>filename</type>
         <fileMode>input</fileMode>
         <defaultPath>$mro/calibration</defaultPath>
-        <default><item>$mro/calibration/matrices/beta/hicalbeta.????.conf</item></default>   
+        <default><item>$mro/calibration/hicalbeta.????.conf</item></default>   
         <brief>
             File containing HiRISE calibration and matrix configuration parameters
         </brief>
@@ -1438,7 +1439,7 @@ End_Object
             This file is critical to the proper functioning of hicalbeta.  It 
              contains parameters that are loaded to provide necessary data used 
              in the calibration of HiRISE CCD channels.  It is extensively 
-             documented in the main documetation section of this application.
+             documented in the main documentation section of this application.
         </description>
       </parameter>
       

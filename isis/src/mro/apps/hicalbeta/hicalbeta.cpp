@@ -109,7 +109,7 @@ void IsisMain(){
 
   const std::string hical_program = "hicalbeta";
   const std::string hical_version = "5.0";
-  const std::string hical_revision = "$Revision: 1.14 $";
+  const std::string hical_revision = "$Revision: 1.15 $";
   const std::string hical_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
