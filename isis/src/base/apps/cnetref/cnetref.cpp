@@ -61,7 +61,7 @@ void IsisMain() {
     
     // Get the original control net internalized
     Progress progress;
-    ControlNet cNet(ui.GetFilename("NETWORK"), &progress);
+    ControlNet cNet(ui.GetFilename("CNET"), &progress);
 
     if(ui.WasEntered("NETWORKID")) {
       cNet.SetNetworkId(ui.GetString("NETWORKID"));
@@ -150,7 +150,7 @@ void IsisMain() {
     }
 
     // Write the new control network out
-    cNet.Write(ui.GetFilename("TO"));
+    cNet.Write(ui.GetFilename("ONET"));
 
     if(cnetValidMeas) {
       Pvl pvlLog = cnetValidMeas->GetLogPvl();

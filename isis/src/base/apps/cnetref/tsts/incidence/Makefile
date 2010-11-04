@@ -7,10 +7,10 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
-	  network=$(INPUT)/autoseed.net \
+	  cnet=$(INPUT)/autoseed.net \
 	  deffile=$(INPUT)/deffile.def \
 	  criteria=incidence \
-	  to=$(OUTPUT)/truth.pvl \
+	  onet=$(OUTPUT)/truth.pvl \
 	  networkid=DefaultTruth \
 	  Description=RefByIncidence > /dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;
