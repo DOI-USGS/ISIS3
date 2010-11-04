@@ -20,9 +20,11 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Camera.h"
+
 #include <cfloat>
 #include <cmath>
-#include "Camera.h"
+
 #include "Projection.h"
 #include "Constants.h"
 #include "CameraDetectorMap.h"
@@ -30,12 +32,16 @@
 #include "CameraDistortionMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "ProjectionFactory.h"
-#include "NaifStatus.h"
 #include "iException.h"
 #include "iString.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "NaifStatus.h"
+#include "ProjectionFactory.h"
+//#include "SurfacePoint.h"
 
 using namespace std;
+
 namespace Isis {
   /**
    * Constructs the Camera object
@@ -224,6 +230,36 @@ namespace Isis {
     p_hasIntersection = false;
     return p_hasIntersection;
   }
+
+
+  /**
+   * Sets the lat/lon values to get the sample/line values
+   *
+   * @param latitude Latitude coordinate of the point
+   * @param longitude Longitude coordinate of the point
+   *
+   * @return bool Returns true if the Universal Ground was set successfully and
+   *              false if it was not
+   */
+  bool Camera::SetGround(Latitude latitude, Longitude longitude) {
+    return SetUniversalGround(latitude.GetDegrees(), longitude.GetDegrees());
+  }
+
+
+  /**
+   * Sets the lat/lon/radius values to get the sample/line values
+   *
+   * @param latitude Latitude coordinate of the point
+   * @param longitude Longitude coordinate of the point
+   *
+   * @return bool Returns true if the Universal Ground was set successfully and
+   *              false if it was not
+   *
+  bool Camera::SetGround(SurfacePoint surfacePt) {
+    return SetUniversalGround(surfacePt.GetLatitude().GetDegrees(),
+                              surfacePt.GetLongitude().GetDegrees(),
+                              surfacePt.GetLocalRadius().GetMeters());
+  }*/
 
 
 

@@ -27,12 +27,15 @@
 #include "AlphaCube.h"
 
 namespace Isis {
-  class Projection;
   class CameraDetectorMap;
   class CameraFocalPlaneMap;
   class CameraDistortionMap;
   class CameraGroundMap;
   class CameraSkyMap;
+  class Latitude;
+  class Longitude;
+  class Projection;
+//  class SurfacePoint;
 
   /**
    * @author ??? Jeff Anderson
@@ -125,6 +128,9 @@ namespace Isis {
    *   @history 2010-03-29 Debbie A. Cook - Modified SetCkFrameid and
    *            SetCkReferenceFrame to set new bool value p_ckwriteReady to true
    *            if the kernels have values and false if they don't instead of bombing.
+   *   @history 2010-11-04 Steven Lambright - Added SetGround() methods with the
+   *            SurfacePoint version being commented out until the SurfacePoint
+   *            class is available.
    */
 
   class Camera : public Isis::Sensor {
@@ -140,6 +146,8 @@ namespace Isis {
       bool SetUniversalGround(const double latitude, const double longitude);
       bool SetUniversalGround(const double latitude, const double longitude,
                               const double radius);
+      bool SetGround(Latitude latitude, Longitude longitude);
+//      bool SetGround(SurfacePoint surfacePt);
       bool SetRightAscensionDeclination(const double ra, const double dec);
 
       /**

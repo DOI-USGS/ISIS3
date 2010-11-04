@@ -1,6 +1,8 @@
 #include "Camera.h"
-#include "Preference.h"
 #include "CameraFactory.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "Preference.h"
 
 using namespace std;
 using namespace Isis;
@@ -34,13 +36,13 @@ int main() {
 
   double line = 453.0;
   double sample = 534.0;
-  double lat = 18.221;
-  double lon = 226.671;
+  Latitude lat(18.221, Angle::Degrees);
+  Longitude lon(226.671, Angle::Degrees);
   double ra = 347.016;
   double dec = -51.2677;
 
   cout << endl << "Line: " << line << ", Sample: " << sample << endl;
-  cout << "Lat: " << lat << ", Lon: " << lon << endl;
+  cout << "Lat: " << lat.GetDegrees() << ", Lon: " << lon.GetDegrees() << endl;
   cout << "RightAscension: " << ra << ", Declination: " << dec << endl;
   cout << "Camera* from: " << inputFile << endl << endl;
 
@@ -52,7 +54,7 @@ int main() {
   cout << "OffNadirAngle: " << c->OffNadirAngle() << endl << endl;
 
   cout << "SetUniversalGround(lat, lon): "
-       << c->SetUniversalGround(lat, lon) << endl;
+       << c->SetGround(lat, lon) << endl;
   cout << "SetRightAscensionDeclination(ra, dec): "
        << c->SetRightAscensionDeclination(ra, dec) << endl;
   cout << "HasProjection: " << c->HasProjection() << endl;
@@ -64,6 +66,7 @@ int main() {
   cout << "Line: " << c->Line() << endl;
 
   try {
+    double lat = 0, lon = 0;
     cout << "GroundRange: "
          << c->GroundRange(lat, lat, lon, lon, pvl) << endl;
     cout << "IntersectsLongitudeDomain: "
@@ -122,10 +125,11 @@ int main() {
   c->IgnoreProjection(false);
 
   cout << endl << "Testing SetUniversalGround(lat,lon,radius)..." << endl;
-  lat = 18.221;
-  lon = 226.671;
+  lat.SetDegrees(18.221);
+  lon.SetDegrees(226.671);
   double radius = 3420.;
-  c->SetUniversalGround(lat, lon, radius);
+  c->SetUniversalGround(lat.GetDegrees(), lon.GetDegrees(), radius);
+  //c->SetGround(SurfacePoint(lat, lon, radius));
   cout << "Has intersection " << c->HasSurfaceIntersection() << endl;
   cout << "Latitude = " << c->UniversalLatitude() << endl;
   cout << "Longitude = " << c->UniversalLongitude() << endl;
