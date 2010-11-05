@@ -48,8 +48,6 @@ void IsisMain() {
     
     int numPointsInOutFile = numPoints / numOutputFiles;
     int numPointsDiff = (numPoints - (numPointsInOutFile * numOutputFiles));
-    //cerr << "total points=" << numPoints << "   numPointsInOutFile=" << numPointsInOutFile << endl;
-    //cerr << "numPointsDiff=" << numPointsDiff << endl;
     int startIndex=0 ,endIndex=0;
     for (int i=0; i<numOutputFiles; i++) {
       
@@ -72,8 +70,6 @@ void IsisMain() {
       if (endIndex > numPoints) {
         endIndex = numPoints;
       }
-      
-      //cerr << i << ". startIndex=" << startIndex << "   endIndex=" << endIndex << "   diff=" << (endIndex-startIndex) <<  endl;
       
       for (int j=startIndex; j<endIndex; j++) {
         oNet.Add(cNet[j]);

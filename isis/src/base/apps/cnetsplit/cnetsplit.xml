@@ -29,8 +29,7 @@
           Input control network
         </brief>
         <description>
-          This file must contain control network with valid points and 
-          measurments
+          The control network file to be split 
         </description>
         <filter>
           *.net
@@ -41,14 +40,13 @@
         <type>string</type>
         <brief>Enter the output file name pattern</brief>
         <description>
-          A string with one and only one set of question marks ("?"). This 
-          string will be used to create unique IDs for each control point 
-          created by this program. The question marks will be replaced with a 
-          number beginning with zero. For example the pattern "ControlNet????" 
-          would create point IDs "ControlNet0001" through "ControlNet9999". 
-          Note: Make sure there are enough "?"s for all the Control Networks 
-          that may be created during this run. If all question marks are 
-          exausted the program will throw an error.
+          A string with set of question marks ("?"). This 
+          string will be used to create unique output file names. The question 
+          marks will be replaced with a number beginning with zero. For example 
+          the pattern "ControlNet????" would create point IDs "ControlNet0001" 
+          through "ControlNet0999". Note: Make sure there are enough "?"s for 
+          all the Control Networks that may be created during this run. If all 
+          question marks are exausted the program will throw an error.
         </description>
       </parameter>
     </group>
