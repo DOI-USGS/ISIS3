@@ -63,6 +63,9 @@ namespace Isis {
   public:
     //! Constructor
     ControlNetStatistics(ControlNet * pCNet, const string &psSerialNumFile, Progress *pProgress=0);
+    
+    //! Constructor
+    ControlNetStatistics(ControlNet * pCNet, Progress *pProgress=0);
 
     //! Destructor
     ~ControlNetStatistics();

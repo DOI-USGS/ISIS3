@@ -32,6 +32,19 @@ namespace Isis {
   }
   
   /**
+   * Constructor with  ControlNet
+   * 
+   * @author Sharmila Prasad (11/5/2010)
+   * 
+   * @param pCNet 
+   * @param pProgress 
+   */
+  ControlNetStatistics::ControlNetStatistics(ControlNet * pCNet, Progress *pProgress)
+  {
+    mCNet = pCNet;
+    mProgress = pProgress;
+  }
+  /**
    * Destructor
    * 
    * @author Sharmila Prasad (9/17/2010)
@@ -54,8 +67,9 @@ namespace Isis {
   void ControlNetStatistics::GenerateControlNetStats(PvlGroup & pStatsGrp)
   {
     pStatsGrp = PvlGroup("ControlNetSummary");
-    
-    pStatsGrp += PvlKeyword("TotalImages",       mSerialNumList.Size());
+    if (mSerialNumList.Size()) {
+      pStatsGrp += PvlKeyword("TotalImages",     mSerialNumList.Size());
+    }
     pStatsGrp += PvlKeyword("TotalPoints",       mCNet->Size());
     pStatsGrp += PvlKeyword("ValidPoints",       NumValidPoints());
     pStatsGrp += PvlKeyword("IgnoredPoints",     mCNet->Size() - NumValidPoints());
@@ -147,6 +161,12 @@ namespace Isis {
    */
   void ControlNetStatistics::PrintImageStats(const string & psImageFile)
   {
+    // Check if the image list has been provided
+    if (!mSerialNumList.Size()) {
+      string msg = "Serial Number of Images has not been provided to get Image Stats";
+      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    }
+    
     Filename outFile(psImageFile);
     ofstream ostm;
     string outName(outFile.Expanded());
