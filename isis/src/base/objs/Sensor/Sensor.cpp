@@ -220,269 +220,275 @@ namespace Isis {
     SpiceDouble plat, plon, pradius;
     if(p_hasElevationModel) {
 
-      double cmin = cos((90.0 - 1.0 / (2.0*p_demScale)) * Isis::PI/180.0);
+      // Set hasIntersection flag to true so Resolution can be calculated
+      p_hasIntersection = true;
+      int maxit = 100;
+      int it = 1;
+      bool done = false;
+      SpiceDouble pB[3];
+      while(!done) {
+        if(it > maxit) {
+          p_hasIntersection = false;
+          done = true;
+          continue;
+        }
+        // Set the tolerance for 1/100 of a pixel in meters
+        double tolerance = Resolution() / 100.0;
+        double lat, lon, radius;
+        reclat_c(p_pB, &radius, &lon, &lat);
+        lat *= 180.0 / Isis::PI;
+        lon *= 180.0 / Isis::PI;
+        if(lon < 0.0) lon += 360.0;
 
-      // Separate iteration algorithms are used for different projections -
-      // use this iteration for equatorial cylindrical type projections 
-      if (p_demProj->IsEquatorialCylindrical()) {
-        // Set hasIntersection flag to true so Resolution can be calculated
-        p_hasIntersection = true;
-        int maxit = 10;
-        int it = 0;
-        bool done = false;
+        if(it == 1) {
+          p_radius = DemRadius(lat, lon);
+        }
+        else {
+          double demRadius = DemRadius(lat, lon);
 
-        // Normalize the look vector
-        SpiceDouble ulookB[3];
-        ulookB[0] = lookB[0];
-        ulookB[1] = lookB[1];
-        ulookB[2] = lookB[2];
-        vhat_c(ulookB,ulookB);
+          if(!Isis::IsSpecial(demRadius)) {
+            p_radius = (p_radius + demRadius) / 2.0;
+          }
+        }
 
-        // Calculate the limb viewing angle to see if the line of sight is
-        // pointing away from the planet
-        SpiceDouble observer[3];
-        observer[0] = sB[0];
-        observer[1] = sB[1];
-        observer[2] = sB[2];
-        SpiceDouble negobserver[3];
-        vminus_c(observer,negobserver);
-        double psi0 = vsep_c(negobserver,ulookB);
-        double cospsi0 = cos(psi0);
-
-        // If psi0 is greater than 90 degrees, then reject data as looking
-        // away from the planet and no proper tangent point exists in the
-        // direction that the spacecraft is looking
-        if (psi0 > Isis::PI/2.0) {
+        if(Isis::IsSpecial(p_radius)) {
           p_hasIntersection = false;
           return p_hasIntersection;
         }
 
-        // Calculate the vector to the tangent point
-        SpiceDouble tvec[3];
-        double observerdist = vnorm_c(observer);
-        tvec[0] = observer[0] + observerdist*cospsi0*ulookB[0];
-        tvec[1] = observer[1] + observerdist*cospsi0*ulookB[1];
-        tvec[2] = observer[2] + observerdist*cospsi0*ulookB[2];
-        double tlen = vnorm_c(tvec);
-
-        // Calculate distance along look vector to first and last test point
-        double d0 = observerdist*cospsi0 - sqrt(p_maxRadius*p_maxRadius - tlen*tlen);
-        double dm = observerdist*cospsi0 + sqrt(p_maxRadius*p_maxRadius - tlen*tlen);
-
-        // Set the properties at the first test observation point
-        double d = d0;
-        SpiceDouble g1[3];
-        g1[0] = observer[0] + d0*ulookB[0];
-        g1[1] = observer[1] + d0*ulookB[1];
-        g1[2] = observer[2] + d0*ulookB[2];
-        double g1len = vnorm_c(g1);
-        SpiceDouble g1lat, g1lon, g1radius;
-        reclat_c(g1,&g1radius,&g1lon,&g1lat);
-        g1lat *= 180.0 / Isis::PI;
-        g1lon *= 180.0 / Isis::PI;
-        if (g1lon < 0.0) g1lon += 360.0;
-        SpiceDouble negg1[3];
-        vminus_c(g1,negg1);
-        double psi1 = vsep_c(negg1,ulookB);
-
-        // Set dalpha to be half the grid spacing for nyquist sampling
-        //double dalpha = (Isis::PI/180.0)/(2.0*p_demScale);
-        double dalpha = (Isis::PI/180.0) * MAX(cos(g1lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
-        double r1 = DemRadius(g1lat,g1lon);
-        if (Isis::IsSpecial(r1)) {
-          p_hasIntersection = false;
-          return p_hasIntersection;
-        }
-
-        // Set default to limb observation until we determine that it is a nadir observation
-        int ptype = 0;
-
-        // Set the tolerance to a fraction of the equatorial radius, a
-        double tolerance = 3E-8 * a;
-
-        // Main iteration loop
-        // Loop from g1 to gm stepping by angles of dalpha until intersection is found
-        while(!done) {
-          if (d > dm) {
-            p_hasIntersection = false;
-            return p_hasIntersection;
-          }
-          it = 0;
-
-          // Calculate the angle between the look vector and the planet radius at the current
-          // test point
-          double psi2 = psi1 + dalpha;
-
-          // Calculate the step size
-          double dd = g1len * sin(dalpha) / sin(Isis::PI-psi2);
-
-          // Calculate the vector to the current test point from the planet center
-          d = d + dd;
-          SpiceDouble g2[3];
-          g2[0] = observer[0] + d * ulookB[0];
-          g2[1] = observer[1] + d * ulookB[1];
-          g2[2] = observer[2] + d * ulookB[2];
-          double g2len = vnorm_c(g2);
-
-          // Determine lat,lon,radius at this point
-          SpiceDouble g2lat, g2lon, g2radius;
-          reclat_c(g2,&g2radius,&g2lon,&g2lat);
-          g2lat *= 180.0 / Isis::PI;
-          g2lon *= 180.0 / Isis::PI;
-          if (g2lon < 0.0) g2lon += 360.0;
-          double r2 = DemRadius(g2lat,g2lon);
-          if (Isis::IsSpecial(r2)) {
-            p_hasIntersection = false;
-            return p_hasIntersection;
-          }
-
-          // Test for intersection
-          if (r2 > g2len) {
-            // An intersection has occurred. Interpolate between g1 and g2 to get the
-            // lat,lon of the intersect point.
-
-            // If g1 and g2 straddle a hill, then we may need to iterate a few times
-            // until we are on the linear segment.
-
-            // First, set flag for the nadir observation
-            ptype = 1;
-            it = it + 1;
-
-            while (it < maxit && !done) {
-              // Calculate the fractional distance "v" to move along the look vector
-              // to the intersection point. Check to see if there was a convergence
-              // of the solution and the tolerance was too small to detect it.
-              double palt;
-              if ((g2len*r1/r2 - g1len) == 0.0) {
-                p_hasIntersection = true;
-                plen = pradius;
-                palt = 0.0;
-                done = true;
-              } else {
-                double v = (r1-g1len) / (g2len*r1/r2 - g1len);
-                p_pB[0] = g1[0] + v * dd * ulookB[0];
-                p_pB[1] = g1[1] + v * dd * ulookB[1];
-                p_pB[2] = g1[2] + v * dd * ulookB[2];
-                plen = vnorm_c(p_pB);
-                reclat_c(p_pB,&pradius,&plon,&plat);
-                plat *= 180.0 / Isis::PI;
-                plon *= 180.0 / Isis::PI;
-                if (plon < 0.0) plon += 360.0;
-                if (plon > 360.0) plon -= 360.0;
-                pradius = DemRadius(plat,plon);
-                if (Isis::IsSpecial(pradius)) {
-                  p_hasIntersection = false;
-                  return p_hasIntersection;
-                } 
-                palt = plen - pradius;
-
-                // The altitude relative to surface is +ve at the observation point,
-                // so reset g1=p and r1=pradius
-                if (palt > tolerance) {
-                  it = it + 1;
-                  g1[0] = p_pB[0];
-                  g1[1] = p_pB[1];
-                  g1[2] = p_pB[2];
-                  g1len = plen;
-                  r1 = pradius;
-                  dd = dd * (1.0 - v);
-
-                // The altitude relative to surface -ve at the observation point,
-                // so reset g2=p and r2=pradius
-                } else if (palt < -tolerance) {
-                  it = it + 1;
-                  g2[0] = p_pB[0];
-                  g2[1] = p_pB[1];
-                  g2[2] = p_pB[2];
-                  g2len = plen;
-                  r2 = pradius;
-                  dd = dd * v;
-
-                // We are within the tolerance, so the solution has converged
-                } else {
-                  p_hasIntersection = true;
-                  plen = pradius;
-                  palt = 0.0;
-                  done = true;
-                }
-              }
-            }
-            g1[0] = g2[0];
-            g1[1] = g2[1];
-            g1[2] = g2[2];
-            g1len = g2len; 
-            r1 = r2;
-            psi1 = psi2;
-            dalpha = (Isis::PI/180.0) * MAX(cos(g2lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
-          }
-        }
-
-        p_latitude = plat;
-        p_longitude = plon;
-        p_radius = plen;
-
+        pB[0] = p_pB[0];
+        pB[1] = p_pB[1];
+        pB[2] = p_pB[2];
         surfpt_c((SpiceDouble *)&sB[0], p_lookB, p_radius, p_radius, p_radius,
-                  p_pB, &found);
+                 p_pB, &found);
         if(!found) {
           p_hasIntersection = false;
           return p_hasIntersection;
         }
-      } else {
-        // Set hasIntersection flag to true so Resolution can be calculated
-        p_hasIntersection = true;
-        int maxit = 100;
-        int it = 1;
-        bool done = false;
-        SpiceDouble pB[3];
-        while(!done) {
-          if(it > maxit) {
+
+        double dist = sqrt((pB[0] - p_pB[0]) * (pB[0] - p_pB[0]) +
+                           (pB[1] - p_pB[1]) * (pB[1] - p_pB[1]) +
+                           (pB[2] - p_pB[2]) * (pB[2] - p_pB[2])) * 1000.;
+        if(dist < tolerance) {
+          // Now recompute tolerance at updated surface point and recheck
+          double tolerance = Resolution() / 100.0;
+          if(dist < tolerance) done = true;
+        }
+
+        it++;
+      }
+
+      if (!p_hasIntersection) {
+        double cmin = cos((90.0 - 1.0 / (2.0*p_demScale)) * Isis::PI/180.0);
+
+        // Separate iteration algorithms are used for different projections -
+        // use this iteration for equatorial cylindrical type projections 
+        if (p_demProj->IsEquatorialCylindrical()) {
+          // Set hasIntersection flag to true so Resolution can be calculated
+          p_hasIntersection = true;
+          int maxit = 10;
+          int it = 0;
+          bool done = false;
+
+          // Normalize the look vector
+          SpiceDouble ulookB[3];
+          ulookB[0] = lookB[0];
+          ulookB[1] = lookB[1];
+          ulookB[2] = lookB[2];
+          vhat_c(ulookB,ulookB);
+
+          // Calculate the limb viewing angle to see if the line of sight is
+          // pointing away from the planet
+          SpiceDouble observer[3];
+          observer[0] = sB[0];
+          observer[1] = sB[1];
+          observer[2] = sB[2];
+          SpiceDouble negobserver[3];
+          vminus_c(observer,negobserver);
+          double psi0 = vsep_c(negobserver,ulookB);
+          double cospsi0 = cos(psi0);
+
+          // If psi0 is greater than 90 degrees, then reject data as looking
+          // away from the planet and no proper tangent point exists in the
+          // direction that the spacecraft is looking
+          if (psi0 > Isis::PI/2.0) {
             p_hasIntersection = false;
             return p_hasIntersection;
           }
-          // Set the tolerance for 1/100 of a pixel in meters
-          double tolerance = Resolution() / 100.0;
-          double lat, lon, radius;
-          reclat_c(p_pB, &radius, &lon, &lat);
-          lat *= 180.0 / Isis::PI;
-          lon *= 180.0 / Isis::PI;
-          if(lon < 0.0) lon += 360.0;
 
-          if(it == 1) {
-            p_radius = DemRadius(lat, lon);
+          // Calculate the vector to the tangent point
+          SpiceDouble tvec[3];
+          double observerdist = vnorm_c(observer);
+          tvec[0] = observer[0] + observerdist*cospsi0*ulookB[0];
+          tvec[1] = observer[1] + observerdist*cospsi0*ulookB[1];
+          tvec[2] = observer[2] + observerdist*cospsi0*ulookB[2];
+          double tlen = vnorm_c(tvec);
+
+          // Calculate distance along look vector to first and last test point
+          double d0 = observerdist*cospsi0 - sqrt(p_maxRadius*p_maxRadius - tlen*tlen);
+          double dm = observerdist*cospsi0 + sqrt(p_maxRadius*p_maxRadius - tlen*tlen);
+
+          // Set the properties at the first test observation point
+          double d = d0;
+          SpiceDouble g1[3];
+          g1[0] = observer[0] + d0*ulookB[0];
+          g1[1] = observer[1] + d0*ulookB[1];
+          g1[2] = observer[2] + d0*ulookB[2];
+          double g1len = vnorm_c(g1);
+          SpiceDouble g1lat, g1lon, g1radius;
+          reclat_c(g1,&g1radius,&g1lon,&g1lat);
+          g1lat *= 180.0 / Isis::PI;
+          g1lon *= 180.0 / Isis::PI;
+          if (g1lon < 0.0) g1lon += 360.0;
+          SpiceDouble negg1[3];
+          vminus_c(g1,negg1);
+          double psi1 = vsep_c(negg1,ulookB);
+ 
+          // Set dalpha to be half the grid spacing for nyquist sampling
+          //double dalpha = (Isis::PI/180.0)/(2.0*p_demScale);
+          double dalpha = (Isis::PI/180.0) * MAX(cos(g1lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
+          double r1 = DemRadius(g1lat,g1lon);
+          if (Isis::IsSpecial(r1)) {
+            p_hasIntersection = false;
+            return p_hasIntersection;
           }
-          else {
-            double demRadius = DemRadius(lat, lon);
 
-            if(!Isis::IsSpecial(demRadius)) {
-              p_radius = (p_radius + demRadius) / 2.0;
+          // Set default to limb observation until we determine that it is a nadir observation
+          int ptype = 0;
+
+          // Set the tolerance to a fraction of the equatorial radius, a
+          double tolerance = 3E-8 * a;
+
+          // Main iteration loop
+          // Loop from g1 to gm stepping by angles of dalpha until intersection is found
+          while(!done) {
+            if (d > dm) {
+              p_hasIntersection = false;
+              return p_hasIntersection;
+            }
+            it = 0;
+ 
+            // Calculate the angle between the look vector and the planet radius at the current
+            // test point
+            double psi2 = psi1 + dalpha;
+ 
+            // Calculate the step size
+            double dd = g1len * sin(dalpha) / sin(Isis::PI-psi2);
+
+            // Calculate the vector to the current test point from the planet center
+            d = d + dd;
+            SpiceDouble g2[3];
+            g2[0] = observer[0] + d * ulookB[0];
+            g2[1] = observer[1] + d * ulookB[1];
+            g2[2] = observer[2] + d * ulookB[2];
+            double g2len = vnorm_c(g2);
+ 
+            // Determine lat,lon,radius at this point
+            SpiceDouble g2lat, g2lon, g2radius;
+            reclat_c(g2,&g2radius,&g2lon,&g2lat);
+            g2lat *= 180.0 / Isis::PI;
+            g2lon *= 180.0 / Isis::PI;
+            if (g2lon < 0.0) g2lon += 360.0;
+            double r2 = DemRadius(g2lat,g2lon);
+            if (Isis::IsSpecial(r2)) {
+              p_hasIntersection = false;
+              return p_hasIntersection;
+            }
+
+            // Test for intersection
+            if (r2 > g2len) {
+              // An intersection has occurred. Interpolate between g1 and g2 to get the
+              // lat,lon of the intersect point.
+ 
+              // If g1 and g2 straddle a hill, then we may need to iterate a few times
+              // until we are on the linear segment.
+
+              // First, set flag for the nadir observation
+              ptype = 1;
+              it = it + 1;
+
+              while (it < maxit && !done) {
+                // Calculate the fractional distance "v" to move along the look vector
+                // to the intersection point. Check to see if there was a convergence
+                // of the solution and the tolerance was too small to detect it.
+                double palt;
+                if ((g2len*r1/r2 - g1len) == 0.0) {
+                  p_hasIntersection = true;
+                  plen = pradius;
+                  palt = 0.0;
+                  done = true;
+                } else {
+                  double v = (r1-g1len) / (g2len*r1/r2 - g1len);
+                  p_pB[0] = g1[0] + v * dd * ulookB[0];
+                  p_pB[1] = g1[1] + v * dd * ulookB[1];
+                  p_pB[2] = g1[2] + v * dd * ulookB[2];
+                  plen = vnorm_c(p_pB);
+                  reclat_c(p_pB,&pradius,&plon,&plat);
+                  plat *= 180.0 / Isis::PI;
+                  plon *= 180.0 / Isis::PI;
+                  if (plon < 0.0) plon += 360.0;
+                  if (plon > 360.0) plon -= 360.0;
+                  pradius = DemRadius(plat,plon);
+                  if (Isis::IsSpecial(pradius)) {
+                    p_hasIntersection = false;
+                    return p_hasIntersection;
+                  } 
+                  palt = plen - pradius;
+ 
+                  // The altitude relative to surface is +ve at the observation point,
+                  // so reset g1=p and r1=pradius
+                  if (palt > tolerance) {
+                    it = it + 1;
+                    g1[0] = p_pB[0];
+                    g1[1] = p_pB[1];
+                    g1[2] = p_pB[2];
+                    g1len = plen;
+                    r1 = pradius;
+                    dd = dd * (1.0 - v);
+
+                  // The altitude relative to surface -ve at the observation point,
+                  // so reset g2=p and r2=pradius
+                  } else if (palt < -tolerance) {
+                    it = it + 1;
+                    g2[0] = p_pB[0];
+                    g2[1] = p_pB[1];
+                    g2[2] = p_pB[2];
+                    g2len = plen;
+                    r2 = pradius;
+                    dd = dd * v;
+
+                  // We are within the tolerance, so the solution has converged
+                  } else {
+                    p_hasIntersection = true;
+                    plen = pradius;
+                    palt = 0.0;
+                    done = true;
+                  }
+                }
+              }
+              g1[0] = g2[0];
+              g1[1] = g2[1];
+              g1[2] = g2[2];
+              g1len = g2len; 
+              r1 = r2;
+              psi1 = psi2;
+              dalpha = (Isis::PI/180.0) * MAX(cos(g2lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
             }
           }
 
-          if(Isis::IsSpecial(p_radius)) {
-            p_hasIntersection = false;
-            return p_hasIntersection;
-          }
+          p_latitude = plat;
+          p_longitude = plon;
+          p_radius = plen;
 
-          pB[0] = p_pB[0];
-          pB[1] = p_pB[1];
-          pB[2] = p_pB[2];
           surfpt_c((SpiceDouble *)&sB[0], p_lookB, p_radius, p_radius, p_radius,
-                   p_pB, &found);
+                    p_pB, &found);
           if(!found) {
             p_hasIntersection = false;
             return p_hasIntersection;
           }
-
-          double dist = sqrt((pB[0] - p_pB[0]) * (pB[0] - p_pB[0]) +
-                             (pB[1] - p_pB[1]) * (pB[1] - p_pB[1]) +
-                             (pB[2] - p_pB[2]) * (pB[2] - p_pB[2])) * 1000.;
-          if(dist < tolerance) {
-            // Now recompute tolerance at updated surface point and recheck
-            double tolerance = Resolution() / 100.0;
-            if(dist < tolerance) done = true;
-          }
-
-          it++;
+        } else {
+          p_hasIntersection = false;
+          return p_hasIntersection;
         }
       }
     }
