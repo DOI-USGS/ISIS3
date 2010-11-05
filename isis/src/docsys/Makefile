@@ -12,7 +12,8 @@ include $(ISISROOT)/make/isismake.macros
 #APPLICATIONS = $(filter-out Makefile CVS $(wildcard *.*) , data/$(wildcard *))
 #DOCUMENTS    = $(filter-out Makefile $(wildcard *.*) , documents/$(wildcard *))
 DOCDIR = $(ISISROOT)/doc
-USER = webman
+#USER = webman
+USER = rraub
 USERDEV = isis3mgr
 
 help:
@@ -147,7 +148,7 @@ wwwdoc: wwwschema
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "BEGIN SYNC: docs to public server"
-	rsync -vlHtr --delete --progress --rsh=ssh --exclude 'Schemas/*' --cvs-exclude $(ISISROOT)/doc/ $(USER)@astroweb:/www/sites/Isis/htdocs/
+	rsync -vlHr --delete --progress --rsh=ssh --exclude 'Schemas/*' --cvs-exclude $(ISISROOT)/doc/ $(USER)@jane:/www/sites/isis/htdocs/
 
 devdoc:  
 	echo " "
@@ -161,8 +162,8 @@ wwwschema: schemas
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "SYNC: schemas to public server"
-	rsync -vlHtr --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/Schemas/ $(USER)@astroweb:/www/sites/Isis/htdocs/Schemas/
-	rsync -vlHptr --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/assets $(USER)@astroweb:/www/sites/Isis/htdocs/
+	rsync -vlHtr --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/Schemas/ $(USER)@jane:/www/sites/isis/htdocs/Schemas/
+	rsync -vlHptr --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/assets $(USER)@jane:/www/sites/isis/htdocs/
 
 
 
