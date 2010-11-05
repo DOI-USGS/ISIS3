@@ -1,0 +1,92 @@
+#include "Isis.h"
+#include "IsisDebug.h"
+#include "iException.h"
+
+#include "ID.h"
+#include "ControlNet.h"
+#include "ControlNetStatistics.h"
+#include "Progress.h"
+
+#include <string.h>
+
+using namespace std;
+using namespace Isis;
+
+void IsisMain() {
+
+  try {
+    UserInterface &ui = Application::GetUserInterface();
+    
+    // To determine the progress of the application
+    Progress progress;
+    
+    // Get the input Control Net
+    ControlNet cNet(ui.GetFilename("CNET"), &progress);
+    
+    // Get the output file pattern string
+    // Set up an automatic id generator for the point ids
+    ID outFileID = ID(ui.GetString("ONET_FORMAT"));
+    
+    int numOutputFiles = ui.GetInteger("NUM_OUTPUT_FILES");
+    
+    int numPoints = cNet.Size();
+    
+    if (numOutputFiles > numPoints) {
+      string msg = "The number of output files is greater than total number of Control Points";
+      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    }
+    
+    // Display input ControlNet Stats
+    ControlNetStatistics cnetStats(&cNet);
+    PvlGroup statsGrp;
+    cnetStats.GenerateControlNetStats(statsGrp);
+    Application::Log(statsGrp);
+    
+    // Set the progress
+    progress.SetText("Splitting the ControlNet...");
+    progress.SetMaximumSteps(numOutputFiles);
+    
+    int numPointsInOutFile = numPoints / numOutputFiles;
+    int numPointsDiff = (numPoints - (numPointsInOutFile * numOutputFiles));
+    //cerr << "total points=" << numPoints << "   numPointsInOutFile=" << numPointsInOutFile << endl;
+    //cerr << "numPointsDiff=" << numPointsDiff << endl;
+    int startIndex=0 ,endIndex=0;
+    for (int i=0; i<numOutputFiles; i++) {
+      
+      // Check the progress
+      progress.CheckStatus();
+      
+      ControlNet oNet;
+      oNet.SetCreatedDate(Application::DateTime());
+      oNet.SetDescription(cNet.Description());
+      oNet.SetNetworkId(cNet.NetworkId());
+      oNet.SetTarget(cNet.Target());
+      oNet.SetType(cNet.Type());
+      oNet.SetUserName(Application::UserName());
+        
+      startIndex = endIndex;
+      endIndex  += numPointsInOutFile;
+      if (numPointsDiff > 0 && i < numPointsDiff)
+        endIndex++;
+        
+      if (endIndex > numPoints) {
+        endIndex = numPoints;
+      }
+      
+      //cerr << i << ". startIndex=" << startIndex << "   endIndex=" << endIndex << "   diff=" << (endIndex-startIndex) <<  endl;
+      
+      for (int j=startIndex; j<endIndex; j++) {
+        oNet.Add(cNet[j]);
+      }
+        
+      oNet.Write(outFileID.Next() + ".net");
+
+      if (endIndex >= numPoints) {
+        break;
+      }
+    }
+  } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
+  catch(Isis::iException &e) {
+    throw;
+  }
+}
