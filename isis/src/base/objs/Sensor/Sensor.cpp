@@ -346,7 +346,7 @@ namespace Isis {
  
           // Set dalpha to be half the grid spacing for nyquist sampling
           //double dalpha = (Isis::PI/180.0)/(2.0*p_demScale);
-          double dalpha = (Isis::PI/180.0) * MAX(cos(g1lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
+          double dalpha = (180.0/Isis::PI) * MAX(cos(g1lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale);
           double r1 = DemRadius(g1lat,g1lon);
           if (Isis::IsSpecial(r1)) {
             p_hasIntersection = false;
