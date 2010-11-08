@@ -94,6 +94,7 @@ namespace Qisis {
   *                         width and height.  Added setScale() minimum value of
   *                         1/min(samps,lines).  Added exceptions to
   *                         ViewportBuffer to help track errors.
+  *  @history 2010-11-08 Eric Hyer -  Added better mouseMove signal
   */
 
   class Tool;
@@ -304,6 +305,7 @@ namespace Qisis {
       void viewportUpdated();//!< Emitted when viewport updated.
       void mouseEnter();//!< Emitted when the mouse enters the viewport
       void mouseMove(QPoint);//!< Emitted when the mouse moves.
+      void mouseMove(QPoint, Qt::MouseButton);//!< Emitted when the mouse moves.
       void mouseLeave();//!< Emitted when the mouse leaves the viewport.
       void mouseButtonPress(QPoint, Qt::MouseButton);//!< Emitted when mouse button pressed
       void mouseButtonRelease(QPoint, Qt::MouseButton);//!< Emitted when mouse button released
@@ -391,7 +393,6 @@ namespace Qisis {
 
     protected: // data
       QPixmap p_pixmap;//!< The qpixmap.
-
 
 
     private: // data
