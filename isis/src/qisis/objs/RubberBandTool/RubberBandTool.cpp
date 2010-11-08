@@ -22,6 +22,8 @@
 #include "SerialNumberList.h"
 
 
+using namespace std;
+
 namespace Qisis {
   RubberBandTool *RubberBandTool::p_instance = NULL;
 
@@ -99,9 +101,9 @@ namespace Qisis {
     greenPen.setStyle(Qt::SolidLine);
     painter->setPen(pen);
 
-    if(vp != cubeViewport()) {
-      return;
-    }
+     if (!(vp == cubeViewport() || (cubeViewport()->isLinked() && vp->isLinked()))) {
+       return;
+     }
 
     switch(p_bandingMode) {
       case Angle:
@@ -400,6 +402,7 @@ namespace Qisis {
    */
   void RubberBandTool::mouseButtonPress(QPoint p, Qt::MouseButton s) {
     *p_mouseLoc = p;
+    p_mouseButton = s;
 
     if((s & Qt::LeftButton) != Qt::LeftButton && !p_allClicks) {
       return;
@@ -487,7 +490,11 @@ namespace Qisis {
    * @param s Which mouse button was released
    */
   void RubberBandTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
-    *p_mouseLoc = p;
+    if ((s & Qt::ControlModifier) == Qt::ControlModifier)
+      *p_mouseLoc = snapMouse(p);
+    else
+      *p_mouseLoc = p;
+      
     p_mouseButton = s;
 
     if((s & Qt::LeftButton) == Qt::LeftButton || p_allClicks) {
@@ -503,7 +510,7 @@ namespace Qisis {
             reset();
           }
 
-          p_vertices->push_back(p);
+          p_vertices->push_back(*p_mouseLoc);
           p_tracking = true;
 
           if(p_vertices->size() == 3) {
@@ -519,14 +526,13 @@ namespace Qisis {
       case Rectangle: {
           *p_vertices = getFoundVertices();
           p_tracking = false;
-          repaint();
           emit bandingComplete();
         }
         break;
 
       case RotatedRectangle: {
           if(p_vertices->size() == 1) {
-            p_vertices->push_back(p);
+            p_vertices->push_back(*p_mouseLoc);
           }
           else if(p_vertices->size() == 2) {
             *p_vertices = getFoundVertices();
@@ -542,7 +548,42 @@ namespace Qisis {
     }
 
     p_doubleClicking = false; // If we were in a double click, it's over now.
+    
+    
+    MdiCubeViewport * activeViewport = cubeViewport();
+    for (int i = 0; i < (int) cubeViewportList()->size(); i++) {
+      MdiCubeViewport * curViewport = cubeViewportList()->at(i);
+      if (curViewport == activeViewport ||
+          (activeViewport->isLinked() && curViewport->isLinked())) {
+        curViewport->viewport()->repaint();
+      }
+    }
   }
+  
+  
+  /**
+   * moves the mouse's location p to the nearest axis
+   *
+   * @param p The mouse's current location
+   *
+   * @returns The snapped point
+   */
+  QPoint RubberBandTool::snapMouse(QPoint p) {
+    if (p_vertices->size()) {      
+      QPoint lastVertex = p_vertices->at(p_vertices->size() - 1);
+      
+      int deltaX = abs(p.x() - lastVertex.x());
+      int deltaY = abs(p.y() - lastVertex.y());
+      
+      if (deltaX > deltaY)
+        p.setY(lastVertex.y());
+      else
+        p.setX(lastVertex.x());
+    }
+      
+    return p;
+  }
+  
 
   /**
    * If tracking is not enabled, this does nothing.
@@ -562,14 +603,20 @@ namespace Qisis {
    *
    * @param p Current mouse Location
    */
-  void RubberBandTool::mouseMove(QPoint p) {
+  void RubberBandTool::mouseMove(QPoint p, Qt::MouseButton mouseButton) {
     if(!p_tracking) {
       return;
     }
 
+    p_mouseButton = mouseButton;
+
     // Store the mouse location for painting the polygons
     QPoint oldMouseLoc = *p_mouseLoc;
-    *p_mouseLoc = p;
+    
+    if ((p_mouseButton & Qt::ControlModifier) == Qt::ControlModifier)
+      *p_mouseLoc = snapMouse(p);
+    else
+      *p_mouseLoc = p;
 
     switch(p_bandingMode) {
       case Angle:
@@ -600,8 +647,14 @@ namespace Qisis {
         break;
     }
 
-    // Repaint because tracking is enabled, meaning we're drawing to the mouse loc
-    repaint();
+    MdiCubeViewport * activeViewport = cubeViewport();
+    for (int i = 0; i < (int) cubeViewportList()->size(); i++) {
+      MdiCubeViewport * curViewport = cubeViewportList()->at(i);
+      if (curViewport == activeViewport ||
+          (activeViewport->isLinked() && curViewport->isLinked())) {
+        curViewport->viewport()->repaint();
+      }
+    }
   }
 
   /**
@@ -882,6 +935,7 @@ namespace Qisis {
       case Line: {
           if(vertices.size() != 2)
             break;
+          
           geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
           points->add(geos::geom::Coordinate(vertices[0].x(), vertices[0].y()));
           points->add(geos::geom::Coordinate(vertices[1].x(), vertices[1].y()));

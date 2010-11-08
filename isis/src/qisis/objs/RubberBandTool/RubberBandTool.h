@@ -26,7 +26,7 @@ namespace Qisis {
   * @author 2007-09-11 Steven Lambright
   *
   * @internal
-  *   @history 2006-01-01 Jeff Anderson Original version
+  *   @history 2007-09-11 Steven Lambright Original version
   *   @history 2008-01-03 Steven Lambright bug fix on the polygons
   *   @history 2008-05-23 Noah Hilt added getRectangle method
   *   @history 2008-08-18 Steven Koechle updated to work with Geos 3.0.0
@@ -34,6 +34,7 @@ namespace Qisis {
   *   @history 2010-05-24 Eric Hyer - Added clear() method
   *   @history 2010-06-03 Eric Hyer - Fixed bug in getInstance method
   *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
+  *   @history 2010-11-08 Eric Hyer - Added mouse snapping
   */
   class RubberBandTool : public Tool {
       Q_OBJECT
@@ -105,12 +106,13 @@ namespace Qisis {
       void scaleChanged();
 
     protected slots:
-      void mouseMove(QPoint p);
+      void mouseMove(QPoint p, Qt::MouseButton);
       void mouseDoubleClick(QPoint p);
       void mouseButtonPress(QPoint p, Qt::MouseButton s);
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
 
     private:
+      QPoint snapMouse(QPoint);
       RubberBandTool(QWidget *parent);
 
       void repaint();
