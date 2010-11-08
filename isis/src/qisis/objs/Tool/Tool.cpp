@@ -183,6 +183,9 @@ namespace Qisis {
     connect(p_cvp, SIGNAL(mouseMove(QPoint)),
             this, SLOT(mouseMove(QPoint)), Qt::DirectConnection);
 
+    connect(p_cvp, SIGNAL(mouseMove(QPoint, Qt::MouseButton)),
+            this, SLOT(mouseMove(QPoint, Qt::MouseButton)), Qt::DirectConnection);
+
     connect(p_cvp, SIGNAL(mouseLeave()),
             this, SLOT(mouseLeave()));
 
@@ -228,6 +231,9 @@ namespace Qisis {
 
     disconnect(p_cvp, SIGNAL(mouseMove(QPoint)),
                this, SLOT(mouseMove(QPoint)));
+
+    disconnect(p_cvp, SIGNAL(mouseMove(QPoint, Qt::MouseButton)),
+               this, SLOT(mouseMove(QPoint, Qt::MouseButton)));
 
     disconnect(p_cvp, SIGNAL(mouseLeave()),
                this, SLOT(mouseLeave()));

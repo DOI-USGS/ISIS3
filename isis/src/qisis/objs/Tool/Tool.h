@@ -70,6 +70,8 @@ namespace Qisis {
   *                                    on mouse double click, press or release
   *  @history 2010-05-24  Eric Hyer - setCubeViewport is now public
   *  @history 2010-06-26  Eric Hyer - Now uses MdiCubeViewport
+  *  @history 2010-11-08  Eric Hyer - Added connects and disconnects for
+  *               cubeViewport's new mouseMove signal
   */
 
   class Tool : public QObject {
@@ -154,6 +156,7 @@ namespace Qisis {
       virtual void mouseEnter() {};
 
       virtual void mouseMove(QPoint p);
+      virtual void mouseMove(QPoint p, Qt::MouseButton) {}
 
       /**
        */
