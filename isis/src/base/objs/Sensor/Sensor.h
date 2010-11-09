@@ -126,7 +126,8 @@ namespace Isis {
    *                                      algorithm that is being used was taken from "Intersection
    *                                      between spacecraft viewing vectors and digital elevation
    *                                      models" by N.A. Teanby.
-   *
+   *  @history 2010-11-09 Eric Hyer - moved some private members to protected
+   *               section for Camera
    */
   class Sensor : public Isis::Spice {
     public:
@@ -180,6 +181,8 @@ namespace Isis {
       double PhaseAngle() const;
       double EmissionAngle() const;
       double IncidenceAngle() const;
+      
+      
       void LookDirection(double v[3]) const;
 
       double RightAscension();
@@ -206,14 +209,15 @@ namespace Isis {
                                   direction is valid. It is made protected so
                                   inheriting classes can change it if
                                   necessary.*/
+      Isis::Cube *p_demCube;         //!< The cube containing the model
+      SpiceDouble p_latitude;  //!< Latitude at p_pB
+      SpiceDouble p_longitude; //!< Longitude at p_pB
+      SpiceDouble p_pB[3];     //!< Surface intersection point in body fixed
 
     private:
       void CommonInitialize(const std::string &demCube);
 
       SpiceDouble p_lookB[3];  //!< Look direction in body fixed
-      SpiceDouble p_pB[3];     //!< Surface intersection point in body fixed
-      SpiceDouble p_latitude;  //!< Latitude at p_pB
-      SpiceDouble p_longitude; //!< Longitude at p_pB
       SpiceDouble p_radius;    //!< Local radius at p_pB
 
       bool p_newLookB;      //!< flag to indicate we need to recompute ra/dec
@@ -222,7 +226,6 @@ namespace Isis {
       void computeRaDec();  //!< Computes the ra/dec from the look direction
 
       bool p_hasElevationModel;     //!< Does sensor use an elevation model
-      Isis::Cube *p_demCube;         //!< The cube containing the model
       Isis::Projection *p_demProj;  //!< The projection of the model
       Isis::Portal *p_portal;       //!< Buffer used to read from the model
       Isis::Interpolator *p_interp; //!< Use bilinear interpolation from dem
