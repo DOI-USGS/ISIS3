@@ -19,7 +19,7 @@
     and Resolution Criteria. Following is the format for the Pvl DEFFILE file 
     with the defaults: <br/>
     Group = Operator<br/> 
-      Name = None (for Emission, Incidence, Resolution) (Required) OR<br/>
+      Name = NoOperator (for Emission, Incidence, Resolution) (Optional) OR<br/>
       Name = StandardDeviation/GradientOperator (for Interest) (Required)<br/>
       MinDN = Isis::ValidMinimum(Optional)<br/> 
       MaxDN = Isis::ValidMaximum(Optional)<br/>
@@ -29,7 +29,7 @@
       MaxIncidence = 135(Optional) <br/> 
       MinResolution = 0(Optional)<br/>
       MaxResolution = DOUBLE_MAX (Optional)<br/> 
-      PixelsFromEdge= 0(Optional)<br/> 
+      PixelsFromEdge= 0(Optional) OR<br/> 
       MetersFromEdge= 0(Optional)<br/> 
     EndGroup<br/><br/> 
     Non-Tie Points and Points with no Measures will not be 
@@ -201,6 +201,9 @@
     </change>
     <change name="Sharmila Prasad" date="2010-10-18">
       Input DefFile Validation before any processing
+    </change>
+    <change name="Sharmila Prasad" date="2010-11-09">
+      Update documentation regarding Template DefFile
     </change>
 </history>
 
