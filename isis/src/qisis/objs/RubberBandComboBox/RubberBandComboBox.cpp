@@ -128,9 +128,11 @@ namespace Qisis {
 
       addItem(lineIcon, p_bandingOptionStrings[p_bandingOptionStrings.size()-1], QVariant((int)Line));
 
-      whatsThis += "<br><br>When <b>Line</b> is selected, you can draw a line. To draw a line, \
-                     click the starting point of the line, drag the mouse until the line is the correct length in the correct direction, \
-                     and release the mouse.";
+      whatsThis += "<br><br>When <b>Line</b> is selected, you can draw a line. "
+          "To draw a line, click the starting point of the line, drag the "
+          "mouse until the line is the correct length in the correct direction,"
+          " and release the mouse.  To draw vertical or horizontal lines, press"
+          " and hold the control key while drawing your line";
 
       if((defaultOption & Line) == Line) {
         setCurrentIndex(findText(p_bandingOptionStrings[ p_bandingOptionStrings.size()-1 ]));

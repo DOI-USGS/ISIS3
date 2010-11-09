@@ -20,6 +20,7 @@ namespace Qisis {
   *   @history 2008-10-01 Steven Lambright Fixed bug with segmented line, if
   *            polygon was enabled then segmented line was
   *   @history 2010-06-26 Eric Hyer - Fixed one include issue
+  *   @history 2010-11-08 Eric Hyer - Updated documentation for drawing lines
   */
 
   class RubberBandComboBox : public QComboBox {
