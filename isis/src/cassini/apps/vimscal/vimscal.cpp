@@ -556,6 +556,7 @@ void calculateIrDarkCurrent(Cube *icube) {
       }
     }
 
+    if(lsq.Rows() == 0) return;
     lsq.Solve();
 
     double coefficients[2] = {
