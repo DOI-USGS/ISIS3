@@ -1,4 +1,8 @@
 #include "Camera.h"
+
+#include <iostream>
+#include <iomanip>
+
 #include "CameraFactory.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -46,7 +50,8 @@ int main() {
   cout << "RightAscension: " << ra << ", Declination: " << dec << endl;
   cout << "Camera* from: " << inputFile << endl << endl;
 
-  cout << "SetImage (sample, line): " << c->SetImage(sample, line) << endl << endl;
+  cout << "SetImage (sample, line): " << c->SetImage(sample, line)
+       << endl << endl;
 
   cout << "NorthAzimuth: " << c->NorthAzimuth() << endl;
   cout << "SunAzimuth: " << c->SunAzimuth() << endl;
@@ -62,8 +67,8 @@ int main() {
   cout << "ReferenceBand: " << c->ReferenceBand() << endl;
   cout << "HasReferenceBand: " << c->HasReferenceBand() << endl;
   cam.SetBand(7);
-  cout << "Sample: " << c->Sample() << endl;
-  cout << "Line: " << c->Line() << endl;
+  cout << "Sample: " << setprecision(3) << c->Sample() << endl;
+  cout << "Line: " << setprecision(3) << c->Line() << endl;
 
   try {
     double lat = 0, lon = 0;
@@ -82,8 +87,10 @@ int main() {
   cout << "LineResolution: " << c->LineResolution() << endl;
   cout << "SampleResolution: " << c->SampleResolution() << endl;
   cout << "DetectorResolution: " << c->DetectorResolution() << endl;
-  cout << "LowestImageResolution: " << c->LowestImageResolution() << endl;
-  cout << "HighestImageResolution: " << c->HighestImageResolution() << endl;
+  cout << "LowestImageResolution: " << setprecision(4)
+       << c->LowestImageResolution() << endl;
+  cout << "HighestImageResolution: " << setprecision(3)
+       << c->HighestImageResolution() << endl;
   cout << "Calling BasicMapping (pvl)..." << endl;
   c->BasicMapping(pvl);
   cout << "BasicMapping PVL: " << endl << pvl << endl << endl;
@@ -136,26 +143,30 @@ int main() {
   cout << "Radius = " << c->LocalRadius() << endl;
   double p[3];
   c->Coordinate(p);
-  cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl << endl;
+  cout << "Point = " << setprecision(4)
+       << p[0] << " " << p[1] << " " << p[2] << endl << endl;
 
-  cout << "Test Forward/Reverse Camera Calculations At Center Of Image..." << std::endl;
+  cout << "Test Forward/Reverse Camera Calculations At Center Of Image..."
+       << endl;
   sample = c->Samples() / 2.0;
   line = c->Lines() / 2.0;
-  cout << "Sample = " << sample << endl;
+  cout << "Sample = " << setprecision(3) << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << c->SetImage(sample, line) << endl;
   cout << "Latitude = " << c->UniversalLatitude() << endl;
   cout << "Longitude = " << c->UniversalLongitude() << endl;
   cout << "Radius = " << c->LocalRadius() << endl;
   c->Coordinate(p);
-  cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
-  cout << "SetUniversalGround (c->UniveraslLatitude(), c->UniversalLongitude(), c->LocalRadius()): " 
-       << c->SetUniversalGround(c->UniversalLatitude(), c->UniversalLongitude(), c->LocalRadius()) 
+  cout << "Point = " << setprecision(4)
+       << p[0] << " " << p[1] << " " << p[2] << endl;
+  cout << "SetUniversalGround (lat, lon, radius): "
+       << c->SetUniversalGround(c->UniversalLatitude(), c->UniversalLongitude(),
+                                c->LocalRadius())
        << endl;
   cout << "Sample = " << c->Sample() << endl;
   cout << "Line = " << c->Line() << endl << endl;
 
-  std::cout << "Test Polar Boundary Conditions" << std::endl;
+  cout << "Test Polar Boundary Conditions" << endl;
   inputFile = "$clementine1/testData/lub5992r.292.lev1.phot.cub";
   cube.Close();
   cube.Open(inputFile);
@@ -163,21 +174,36 @@ int main() {
   Camera *cam2 = CameraFactory::Create(pvl);
   cube.Close();
 
-  std::cout << std::endl;
-  std::cout << "Basic Mapping: " << std::endl;
+  cout << endl;
+  cout << "Basic Mapping: " << endl;
   Pvl camMap;
   cam2->BasicMapping(camMap);
-  std::cout << camMap << std::endl;
 
-  std::cout << std::endl;
-  std::cout << "180 Domain Range: " << std::endl;
+  double minLat = camMap.FindGroup("Mapping")["MinimumLatitude"];
+  minLat *= 100;
+  minLat = round(minLat);
+  minLat /= 100;
+  camMap.FindGroup("Mapping")["MinimumLatitude"] = minLat;
+
+  double pixRes = camMap.FindGroup("Mapping")["PixelResolution"];
+  pixRes *= 100;
+  pixRes = round(pixRes);
+  pixRes /= 100;
+  camMap.FindGroup("Mapping")["PixelResolution"] = pixRes;
+
+  cout << camMap << endl;
+
+  cout << endl;
+  cout << "180 Domain Range: " << endl;
   double minlat, maxlat, minlon, maxlon;
   camMap.FindGroup("Mapping")["LongitudeDomain"][0] = "180";
   cam2->GroundRange(minlat, maxlat, minlon, maxlon, camMap);
-  std::cout << "Latitude Range: " << minlat << " to " << maxlat << std::endl;
-  std::cout << "Longitude Range: " << minlon << " to " << maxlon << std::endl << std::endl;
+  cout << "Latitude Range: " << minlat << " to " << maxlat << endl;
+  cout << "Longitude Range: " << minlon << " to " << maxlon
+            << endl << endl;
 
-  cout << "Test Forward/Reverse Camera Calculations At Center Of Image..." << std::endl;
+  cout << "Test Forward/Reverse Camera Calculations At Center Of Image..."
+       << endl;
   sample = cam2->Samples() / 2.0;
   line = cam2->Lines() / 2.0;
   cout << "Sample = " << sample << endl;
@@ -188,8 +214,10 @@ int main() {
   cout << "Radius = " << cam2->LocalRadius() << endl;
   cam2->Coordinate(p);
   cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
-  cout << "SetUniversalGround (cam2->UniversalLatitude(), cam2->UniversalLongitude()): " 
-       << cam2->SetUniversalGround(cam2->UniversalLatitude(), cam2->UniversalLongitude()) 
+  cout << "SetUniversalGround (cam2->UniversalLatitude(), "
+          "cam2->UniversalLongitude()): "
+       << cam2->SetUniversalGround(cam2->UniversalLatitude(),
+                                   cam2->UniversalLongitude())
        << endl;
   cout << "Sample = " << cam2->Sample() << endl;
   cout << "Line = " << cam2->Line() << endl << endl;
