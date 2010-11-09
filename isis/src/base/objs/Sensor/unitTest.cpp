@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
     double v[3] = { 0.0, 0.0, 1.0 };
     double p[3];
 
+    cout << setprecision(8);
+
     // Testing Set Look Direction
     cout << "Test SetLookDirection using ShapeModel=Null" << endl;
     for(int i = 0; i < 10; i++) {
@@ -68,13 +70,16 @@ int main(int argc, char *argv[]) {
       cout << "Latitude            = " << spi.UniversalLatitude() << endl;
       cout << "Longitude           = " << spi.UniversalLongitude() << endl;
       spi.Coordinate(p);
-      cout << "Point               = " << p[0] << " " << p[1] << " " << p[2] << endl;
-      cout << "Local Radius        = " << spi.LocalRadius() << endl;
+      cout << "Point               = " << p[0] << " " << p[1] << " " << p[2]
+           << endl;
+      cout << "Local Radius        = " //< setprecision(6)
+           << spi.LocalRadius() << endl;
       cout << "Phase               = " << spi.PhaseAngle() << endl;
       cout << "Emission            = " << spi.EmissionAngle() << endl;
       cout << "Incidence           = " << spi.IncidenceAngle() << endl;
       spi.LookDirection(p);
-      cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2] << endl;
+      cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
+           << endl;
       cout << "Slant Distance      = " << spi.SlantDistance() << endl;
       cout << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
       cout << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
@@ -92,19 +97,22 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     // Test SetUniversalGround
-    cout << "Test SetUniversalGround (lat/lon only) using ShapeModel=Null" << endl;
+    cout << "Test SetUniversalGround (lat/lon only) using ShapeModel=Null"
+         << endl;
     spi.SetUniversalGround(11.57143551329, 223.328646604);
     cout << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
     cout << "Latitude            = " << spi.UniversalLatitude() << endl;
     cout << "Longitude           = " << spi.UniversalLongitude() << endl;
     spi.Coordinate(p);
-    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Local Radius        = " << spi.LocalRadius() << endl;
     cout << "Phase               = " << spi.PhaseAngle() << endl;
     cout << "Emission            = " << spi.EmissionAngle() << endl;
     cout << "Incidence           = " << spi.IncidenceAngle() << endl;
     spi.LookDirection(p);
-    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Slant Distance      = " << spi.SlantDistance() << endl;
     cout << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
     cout << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
@@ -112,20 +120,23 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     // Test SetUniversalGround
-    cout << "Test SetUniversalGround (lat/lon/radius) using ShapeModel=Null" << endl;
+    cout << "Test SetUniversalGround (lat/lon/radius) using ShapeModel=Null"
+         << endl;
     spi.SetUniversalGround(11.57143551329, 223.328646604, 3400.);
     cout << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
     cout << "Latitude            = " << spi.UniversalLatitude() << endl;
     cout << "Longitude           = " << spi.UniversalLongitude() << endl;
     cout << "Radius              = " << spi.LocalRadius() << endl;
     spi.Coordinate(p);
-    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Local Radius        = " << spi.LocalRadius() << endl;
     cout << "Phase               = " << spi.PhaseAngle() << endl;
     cout << "Emission            = " << spi.EmissionAngle() << endl;
     cout << "Incidence           = " << spi.IncidenceAngle() << endl;
     spi.LookDirection(p);
-    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Slant Distance      = " << spi.SlantDistance() << endl;
     cout << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
     cout << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
@@ -135,7 +146,8 @@ int main(int argc, char *argv[]) {
     // Test bad ground point
     cout << "Test Bad ground point using ShapeModel=Null" << endl;
     spi.SetUniversalGround(11.57143551329, 43.328646604);
-    cout << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl << endl << endl;
+    cout << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl
+         << endl << endl;
 
     Isis::Pvl lab2;
     lab2.AddGroup(inst);
@@ -144,7 +156,8 @@ int main(int argc, char *argv[]) {
 
     kern2 += Isis::PvlKeyword("NaifFrameCode", -94031);
     kern2 += Isis::PvlKeyword("LeapSecond", dir + "naif0007.tls");
-    kern2 += Isis::PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
+    kern2 += Isis::PvlKeyword("SpacecraftClock",
+                              dir + "MGS_SCLKSCET.00045.tsc");
     kern2 += Isis::PvlKeyword("TargetPosition", dir + "de405.bsp");
     kern2 += Isis::PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
     kern2 += Isis::PvlKeyword("Instrument", dir + "mocSensorUnitTest.ti");
@@ -152,7 +165,8 @@ int main(int argc, char *argv[]) {
     kern2 += Isis::PvlKeyword("InstrumentPosition", dir + "moc.bsp");
     kern2 += Isis::PvlKeyword("InstrumentPointing", dir + "moc.bc");
     kern2 += Isis::PvlKeyword("Frame", "");
-    kern2 += Isis::PvlKeyword("ShapeModel","$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub");
+    kern2 += Isis::PvlKeyword("ShapeModel",
+                        "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub");
     lab2.AddGroup(kern2);
 
     // Setup
@@ -160,7 +174,8 @@ int main(int argc, char *argv[]) {
     spi2.InstrumentRotation()->SetTimeBias(-1.15);
 
     // Testing Set Look Direction
-    cout << "Test SetLookDirection using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
+    cout << "Test SetLookDirection using ShapeModel="
+            "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
       spi2.SetEphemerisTime(t);
@@ -171,13 +186,15 @@ int main(int argc, char *argv[]) {
       cout << "Latitude            = " << spi2.UniversalLatitude() << endl;
       cout << "Longitude           = " << spi2.UniversalLongitude() << endl;
       spi2.Coordinate(p);
-      cout << "Point               = " << p[0] << " " << p[1] << " " << p[2] << endl;
+      cout << "Point               = " << p[0] << " " << p[1] << " " << p[2]
+           << endl;
       cout << "Local Radius        = " << spi2.LocalRadius() << endl;
       cout << "Phase               = " << spi2.PhaseAngle() << endl;
       cout << "Emission            = " << spi2.EmissionAngle() << endl;
       cout << "Incidence           = " << spi2.IncidenceAngle() << endl;
       spi2.LookDirection(p);
-      cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2] << endl;
+      cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
+           << endl;
       cout << "Slant Distance      = " << spi2.SlantDistance() << endl;
       cout << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
       cout << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
@@ -186,7 +203,9 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     // Test bad look direction
-    cout << "Test bad look direction using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
+    cout << "Test bad look direction using "
+            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+         << endl;
     p[0] = 0.0;
     p[1] = 0.0;
     p[2] = -1.0;
@@ -195,19 +214,23 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     // Test SetUniversalGround
-    cout << "Test SetUniversalGround (lat/lon only) using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
+    cout << "Test SetUniversalGround (lat/lon only) using "
+            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+         << endl;
     spi2.SetUniversalGround(11.57143551329, 223.328646604);
     cout << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     cout << "Latitude            = " << spi2.UniversalLatitude() << endl;
     cout << "Longitude           = " << spi2.UniversalLongitude() << endl;
     spi2.Coordinate(p);
-    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Local Radius        = " << spi2.LocalRadius() << endl;
     cout << "Phase               = " << spi2.PhaseAngle() << endl;
     cout << "Emission            = " << spi2.EmissionAngle() << endl;
     cout << "Incidence           = " << spi2.IncidenceAngle() << endl;
     spi2.LookDirection(p);
-    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Slant Distance      = " << spi2.SlantDistance() << endl;
     cout << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
     cout << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
@@ -215,20 +238,24 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     // Test SetUniversalGround
-    cout << "Test SetUniversalGround (lat/lon/radius) using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
+    cout << "Test SetUniversalGround (lat/lon/radius) using "
+            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+         << endl;
     spi2.SetUniversalGround(11.57143551329, 223.328646604, 3400.);
     cout << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     cout << "Latitude            = " << spi2.UniversalLatitude() << endl;
     cout << "Longitude           = " << spi2.UniversalLongitude() << endl;
     cout << "Radius              = " << spi2.LocalRadius() << endl;
     spi2.Coordinate(p);
-    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Point               = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Local Radius        = " << spi2.LocalRadius() << endl;
     cout << "Phase               = " << spi2.PhaseAngle() << endl;
     cout << "Emission            = " << spi2.EmissionAngle() << endl;
     cout << "Incidence           = " << spi2.IncidenceAngle() << endl;
     spi2.LookDirection(p);
-    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
+         << endl;
     cout << "Slant Distance      = " << spi2.SlantDistance() << endl;
     cout << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
     cout << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
@@ -236,7 +263,9 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     // Test bad ground point
-    cout << "Test Bad ground point using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
+    cout << "Test Bad ground point using "
+            "ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub"
+         << endl;
     spi2.SetUniversalGround(11.57143551329, 43.328646604);
     cout << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
   }
