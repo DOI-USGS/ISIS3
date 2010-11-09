@@ -46,7 +46,7 @@ namespace Isis {
    * @param pProgress - Progress of the processing
    */
   ControlNetFilter::ControlNetFilter(ControlNet *pCNet, string & psSerialNumFile, Progress *pProgress) :
-                                                            ControlNetStatistics(pCNet, psSerialNumFile, pProgress)
+                    ControlNetStatistics(pCNet, psSerialNumFile, pProgress)
   {
     mSerialNumFilter  = SerialNumberList(psSerialNumFile);    
     
@@ -107,8 +107,10 @@ namespace Isis {
    */
   void ControlNetFilter::PointStats(ControlPoint & pcPoint)
   {
-    mOstm << pcPoint.Id()   << ", " << sPointType[(int)pcPoint.Type()] << ", " <<  sBoolean[(int)pcPoint.Ignore()] << ", " ;
-    mOstm << sBoolean[(int)pcPoint.Held()] << ", " << pcPoint.Size() << ", " << pcPoint.Size()-pcPoint.NumValidMeasures() << ", ";
+    mOstm << pcPoint.Id()   << ", " << sPointType[(int)pcPoint.Type()] << ", ";
+    mOstm << sBoolean[(int)pcPoint.Ignore()] << ", " ;
+    mOstm << sBoolean[(int)pcPoint.Held()] << ", " << pcPoint.Size() << ", ";
+    mOstm << pcPoint.Size()-pcPoint.NumValidMeasures() << ", ";
   }
   
   /**
@@ -160,7 +162,8 @@ namespace Isis {
     }
     
     if (pbLastFilter) {
-      mOstm << "PointID, Type, Ignore, Filename, SerialNum, ErrorMagnitude, MeasureIgnore, Reference" << endl << endl;
+      mOstm << "PointID, Type, Ignore, Filename, SerialNum, ErrorMagnitude, MeasureIgnore, Reference";
+      mOstm << endl << endl;
     }
     
     int iNumPoints = mCNet->Size();
@@ -189,7 +192,9 @@ namespace Isis {
       if (pbLastFilter){
         int iNumMeasures = cPoint.Size();
         for (int j=0; j<iNumMeasures; j++) {
-          mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", " << sBoolean[cPoint.Ignore()] << ", " ;
+          mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", " ;
+          mOstm << sBoolean[cPoint.Ignore()] << ", " ;
+          
           PrintCubeFileSerialNum(cPoint[j]);
           mOstm << ", " << cPoint[j].ErrorMagnitude() << ", ";
           mOstm << sBoolean[cPoint[j].Ignore()] << ", ";
@@ -595,7 +600,7 @@ namespace Isis {
   }
   
   /**
-   * Filter the PoibMinDistancents which have measures of specified Measure type
+   * Filter the Points which have measures of specified Measure type and Ignored Flag. 
    * Group by Points 
    *  
    * @author Sharmila Prasad (8/13/2010)
@@ -635,8 +640,12 @@ namespace Isis {
         ControlMeasure cMeasure=cPoint[j];
         bool bMeasureIgnored = cMeasure.Ignore();
         bool bMeasureFound = false;
+        
         if (iIgnoredFlag == UNDEFINED_STATUS || bMeasureIgnored == iIgnoredFlag) {
-          if (sType == "unmeasured" && cMeasure.Type() == ControlMeasure::Unmeasured) {
+          if (sType == "all") {
+            bMeasureFound = true;
+          }
+          else if (sType == "unmeasured" && cMeasure.Type() == ControlMeasure::Unmeasured) {
             bMeasureFound = true;
           }
           else if (sType == "manual" && cMeasure.Type() == ControlMeasure::Manual) {
@@ -699,7 +708,8 @@ namespace Isis {
     }
     
     if (pbLastFilter) {
-      mOstm << "PointID, Type, Ignore, Filename, SerialNum, GoodnessOfFit, MeasureIgnore, Reference" << endl << endl;
+      mOstm << "PointID, Type, Ignore, Filename, SerialNum, GoodnessOfFit, MeasureIgnore, Reference";
+      mOstm << endl << endl;
     }
     #ifdef _DEBUG_
     odb << "Lessthan=" << bLesserFlag << "  value=" << dLesserValue << endl;
@@ -742,7 +752,8 @@ namespace Isis {
             ControlMeasure cMeasure=cPoint[j];
             double dGFit = cMeasure.GoodnessOfFit();
             
-            mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", " << sBoolean[cPoint.Ignore()] << ", " ;
+            mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", ";
+            mOstm << sBoolean[cPoint.Ignore()] << ", " ;
             PrintCubeFileSerialNum(cMeasure);
             mOstm << ", " << (dGFit==Isis::Null ? "Null" : iString(dGFit)) << ", ";
             mOstm << sBoolean[cMeasure.Ignore()] << ", ";
@@ -814,8 +825,10 @@ namespace Isis {
           ControlMeasure cMeasure = cPoint[j];
 
           // Point Details
-          mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", " << sBoolean[cPoint.Ignore()] << ", ";
-          mOstm << iNumMeasures << ", " << iNumMeasures - cPoint.NumValidMeasures() << ", " << sBoolean[cPoint.Held()] << ", ";
+          mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", ";
+          mOstm << sBoolean[cPoint.Ignore()] << ", " << iNumMeasures << ", ";
+          mOstm << iNumMeasures - cPoint.NumValidMeasures() << ", ";
+          mOstm << sBoolean[cPoint.Held()] << ", ";
           
           // Image Details
           string sn = cMeasure.CubeSerialNumber();
@@ -1130,7 +1143,8 @@ namespace Isis {
       }
       else if (pbLastFilter) {
         mOstm << mSerialNumList.Filename(sSerialNum) << ", " << sSerialNum << ", ";
-        mOstm << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsGround << ", " << iPointsHeld << ", ";
+        mOstm << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsGround << ", ";
+        mOstm << iPointsHeld << ", ";
         for (int j=0; j<(int)sPointIndex1.size(); j++) {
           iString sPointIDDist(dPointDistance[j]);
           sPointIDDist += "#";

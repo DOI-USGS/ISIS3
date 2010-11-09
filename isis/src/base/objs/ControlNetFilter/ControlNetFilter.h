@@ -56,6 +56,8 @@ namespace Isis {
    *                                        Verify the DefFile in the PVL Class
    *  @history 2010-10-04 Sharmila Prasad - Use iString's Token method instead of ParseExpression(..)
    *  @history 2010-10-13 Sharmila Prasad - Display error on bad filter values
+   *  @history 2010-11-09 Sharmila Prasad - Point_MeasureProperties,process 'All' measuretype
+   *  
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
