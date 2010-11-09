@@ -1689,6 +1689,14 @@ namespace Qisis {
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("state", p_mainWindow->saveState());
   }
+  
+  
+  /**
+   * replot the plot
+   */
+   void PlotWindow::replot() {
+     p_plot->replot();
+   }
 
 }
 

@@ -46,6 +46,14 @@ class QDockWidget;
 class QListWidgetItem;
 
 namespace Qisis {
+  /**
+   * @ingroup Visualization Tools
+   *
+   * @author Stacy Alley
+   *
+   * @internal
+   *   @history 2010-11-08 Eric Hyer - Added replot method
+   */
   class PlotWindow : public Qisis::MainWindow {
       Q_OBJECT
 
@@ -67,6 +75,7 @@ namespace Qisis {
       void setupDefaultMenu();
       void setCustomMenu(QList<QMenu *> &menu, QList<QAction *> &actions);
       void getDefaultMenus(QList<QMenu *> &menu, QList<QAction *> &actions);
+      void replot();
 
       /**
        *
