@@ -3,24 +3,26 @@
 #include "LeastSquares.h"
 #include "Preference.h"
 
+using namespace std;
+
 int main() {
   Isis::Preference::Preferences(true);
   try {
-    std::cout << "Unit Test for LeastSquares:" << std::endl;
-    std::cout << std::endl;
+    cerr << "Unit Test for LeastSquares:" << endl;
+    cerr << endl;
     Isis::BasisFunction b("Linear", 2, 2);
 
     Isis::LeastSquares lsq(b);
 
-    std::vector<double> one;
+    vector<double> one;
     one.push_back(1.0);
     one.push_back(1.0);
 
-    std::vector<double> two;
+    vector<double> two;
     two.push_back(-2.0);
     two.push_back(3.0);
 
-    std::vector<double> tre;
+    vector<double> tre;
     tre.push_back(2.0);
     tre.push_back(-1.0);
 
@@ -51,21 +53,21 @@ int main() {
     xcoefQRD = b.Coefficient(0);
     ycoefQRD = b.Coefficient(1);
 
-    std::cout << "*** TEST 1:  3 POINTS, NO WEIGHTS ***************************" << std::endl;
-    std::cout << "Number of Knowns = " << knowns << std::endl;
-    std::cout << "        SVD\tresidual\tQRD\tresidual" << std::endl;
-    std::cout << "  one = " << evalSVD1 << "\t" << resSVD1 << "\t\t" << evalQRD1 << "\t" << resQRD1 << std::endl;
-    std::cout << "  two = " << evalSVD2 << "\t" << resSVD2 << "\t\t" << evalQRD2 << "\t" << resQRD2 << std::endl;
-    std::cout << "  tre = " << evalSVD3 << "\t" << resSVD3 << "\t\t" << evalQRD3 << "\t" << resQRD3 << std::endl;
+    cerr << "*** TEST 1:  3 POINTS, NO WEIGHTS ***************************" << endl;
+    cerr << "Number of Knowns = " << knowns << endl;
+    cerr << "        SVD\tresidual\tQRD\tresidual" << endl;
+    cerr << "  one = " << evalSVD1 << "\t" << resSVD1 << "\t\t" << evalQRD1 << "\t" << resQRD1 << endl;
+    cerr << "  two = " << evalSVD2 << "\t" << resSVD2 << "\t\t" << evalQRD2 << "\t" << resQRD2 << endl;
+    cerr << "  tre = " << evalSVD3 << "\t" << resSVD3 << "\t\t" << evalQRD3 << "\t" << resQRD3 << endl;
 
-    std::cout << "---" << std::endl;
-    std::cout << "Test from Linear Algebra with Applications, 2nd Edition" << std::endl;
-    std::cout << "Steven J. Leon, page 191, 83/50=1.66 71/50=1.42" << std::endl;
-    std::cout << xcoefSVD << std::endl;
-    std::cout << ycoefSVD << std::endl ;
-    std::cout << "---" << std::endl;
+    cerr << "---" << endl;
+    cerr << "Test from Linear Algebra with Applications, 2nd Edition" << endl;
+    cerr << "Steven J. Leon, page 191, 83/50=1.66 71/50=1.42" << endl;
+    cerr << xcoefSVD << endl;
+    cerr << ycoefSVD << endl ;
+    cerr << "---" << endl;
 
-    std::cout << "*** TEST 2:  SAME 3 POINTS, MIDDLE POINT HAS WEIGHT 5 *******" << std::endl;
+    cerr << "*** TEST 2:  SAME 3 POINTS, MIDDLE POINT HAS WEIGHT 5 *******" << endl;
     lsq.Weight(1, 5);
     knowns = lsq.Knowns();;
     lsq.Solve(Isis::LeastSquares::SVD);
@@ -80,16 +82,16 @@ int main() {
     evalQRD3 = lsq.Evaluate(tre);
     xcoefQRD = b.Coefficient(0);
     ycoefQRD = b.Coefficient(1);
-    std::cout << "Number of Knowns = " << knowns << std::endl;
-    std::cout << "        SVD\t\tQRD" << std::endl;
-    std::cout << "  one = " << evalSVD1 << "\t\t" << evalQRD1 << std::endl;
-    std::cout << "  two = " << evalSVD2 << "\t"   << evalQRD2 << std::endl;
-    std::cout << "  tre = " << evalSVD3 << "\t\t" << evalQRD3 << std::endl;
-    std::cout << "  x =   " << xcoefSVD << "\t\t" << xcoefQRD << std::endl;
-    std::cout << "  y =   " << ycoefSVD << "\t\t" << ycoefQRD << std::endl ;
-    std::cout << "---" << std::endl;
+    cerr << "Number of Knowns = " << knowns << endl;
+    cerr << "        SVD\t\tQRD" << endl;
+    cerr << "  one = " << evalSVD1 << "\t\t" << evalQRD1 << endl;
+    cerr << "  two = " << evalSVD2 << "\t"   << evalQRD2 << endl;
+    cerr << "  tre = " << evalSVD3 << "\t\t" << evalQRD3 << endl;
+    cerr << "  x =   " << xcoefSVD << "\t\t" << xcoefQRD << endl;
+    cerr << "  y =   " << ycoefSVD << "\t\t" << ycoefQRD << endl ;
+    cerr << "---" << endl;
 
-    std::cout << "*** TEST 3:  SAME 3 POINTS, MIDDLE POINT REPEATED 5 TIMES ***" << std::endl;
+    cerr << "*** TEST 3:  SAME 3 POINTS, MIDDLE POINT REPEATED 5 TIMES ***" << endl;
     lsq.Weight(1, 1);
     lsq.AddKnown(two, 1.0);
     lsq.AddKnown(two, 1.0);
@@ -108,16 +110,28 @@ int main() {
     evalQRD3 = lsq.Evaluate(tre);
     xcoefQRD = b.Coefficient(0);
     ycoefQRD = b.Coefficient(1);
-    std::cout << "Number of Knowns = " << knowns << std::endl;
-    std::cout << "        SVD\t\tQRD" << std::endl;
-    std::cout << "  one = " << evalSVD1 << "\t\t" << evalQRD1 << std::endl;
-    std::cout << "  two = " << evalSVD2 << "\t" << evalQRD2 << std::endl;
-    std::cout << "  tre = " << evalSVD3 << "\t\t" << evalQRD3 << std::endl;
-    std::cout << "  x =   " << xcoefSVD << "\t\t" << xcoefQRD << std::endl;
-    std::cout << "  y =   " << ycoefSVD << "\t\t" << ycoefQRD << std::endl ;
+    cerr << "Number of Knowns = " << knowns << endl;
+    cerr << "        SVD\t\tQRD" << endl;
+    cerr << "  one = " << evalSVD1 << "\t\t" << evalQRD1 << endl;
+    cerr << "  two = " << evalSVD2 << "\t" << evalQRD2 << endl;
+    cerr << "  tre = " << evalSVD3 << "\t\t" << evalQRD3 << endl;
+    cerr << "  x =   " << xcoefSVD << "\t\t" << xcoefQRD << endl;
+    cerr << "  y =   " << ycoefSVD << "\t\t" << ycoefQRD << endl ;
   }
   catch(Isis::iException &e) {
     e.Report();
+  }
+
+  cerr << endl;
+
+  try {
+    Isis::BasisFunction b("Linear", 2, 2);
+    Isis::LeastSquares lsq2(b);
+    lsq2.Solve();
+  }
+  catch(Isis::iException &e) {
+    e.Report();
+    e.Clear();
   }
 
   return 0;

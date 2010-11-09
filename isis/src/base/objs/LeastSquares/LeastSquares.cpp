@@ -214,6 +214,12 @@ namespace Isis {
 #if defined(__sun__)
     if(method == SPARSE) method = QRD;
 #endif
+    if(Rows() == 0) {
+      p_solved = false;
+      std::string msg = "No solution available because no input data was "
+                        "provided";
+      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+    }
 
     if(method == SVD) {
       SolveSVD();
@@ -267,7 +273,6 @@ namespace Isis {
     for(int i = 0; i < invS.dim1(); i++) {
       if(invS[i][i] != 0.0) invS[i][i] = 1.0 / invS[i][i];
     }
-
     // Transpose U
     TNT::Array2D<double> U;
     svd.getU(U);
@@ -288,7 +293,6 @@ namespace Isis {
       b[r][0] = p_expected[r] * p_sqrtweight[r];
     }
     TNT::Array2D<double> coefs = TNT::matmult(Aplus, b);
-
     // If the rank of the matrix is not large enough we don't
     // have enough coefficients for the solution
     if(coefs.dim1() < p_basis->Coefficients()) {
