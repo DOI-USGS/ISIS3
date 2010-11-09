@@ -46,6 +46,7 @@ namespace Qisis {
    *          plot
    * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *          CubeViewport.  Fixed some include issues (many still remain!).
+   * @history 2010-11-08 Eric Hyer - Spacial plot now handles linked images.
    */
   class PlotTool : public Tool {
       Q_OBJECT
@@ -96,8 +97,10 @@ namespace Qisis {
       void getSpectralStatistics(std::vector< double > & labels,
                                  std::vector< Isis::Statistics > & data);
       void getSpatialStatistics(std::vector< double >  & labels,
-                                std::vector< double > & data, double &xmax);
+                                std::vector< double > & data, double &xmax,
+                                MdiCubeViewport *);
       void setupPlotCurves();
+      PlotToolCurve * newDNCurve(QString, QColor = Qt::white);
 
       /**
        * Enum for the different plot types
@@ -130,7 +133,7 @@ namespace Qisis {
       PlotToolCurve *p_stdDev2Curve;//!< Plot curve for avg. - std. dev
       PlotToolCurve *p_copyCurve;//!< Plot curve for copying curves
       PlotToolCurve *p_paintCurve;//!< Plot curve for painting
-      PlotToolCurve *p_dnCurve;//!< Plot curve for DN values
+      QList< PlotToolCurve * > p_dnCurves;//!< Plot curve for DN values
 
       QList <QColor> p_colors;//!< List of colors
       QList<PlotWindow *> p_plotWindows;//!< List of all plot windows

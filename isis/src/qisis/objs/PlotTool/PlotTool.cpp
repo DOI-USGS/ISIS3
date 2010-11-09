@@ -1,5 +1,7 @@
 #include "PlotTool.h"
 
+#include <iostream>
+
 #include "geos/geom/Polygon.h"
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/Point.h"
@@ -19,6 +21,7 @@
 #include "ToolPad.h"
 
 using namespace Isis;
+using std::cerr;
 
 namespace Qisis {
 
@@ -117,7 +120,7 @@ namespace Qisis {
    * @param newType
    */
   void PlotTool::changePlotType(int newType) {
-    p_currentPlotType = (PlotType)p_plotTypeCombo->itemData(newType).toInt();
+    p_currentPlotType = (PlotType) p_plotTypeCombo->itemData(newType).toInt();
     enableRubberBandTool();
 
     QList<QMenu *> menu;
@@ -293,6 +296,7 @@ namespace Qisis {
     layout->addWidget(plotButton);
     layout->addStretch(1);
     hbox->setLayout(layout);
+    
     return hbox;
   }
 
@@ -455,6 +459,7 @@ namespace Qisis {
     connect(blankWindow, SIGNAL(destroyed(QObject *)), this,
             SLOT(removeWindow(QObject *)));
     connect(blankWindow, SIGNAL(plotChanged()), this, SLOT(updateViewPort()));
+    
     blankWindow->setAxisLabel(QwtPlot::xBottom, p_plotToolWindow->getAxisLabel
                               (QwtPlot::xBottom).text());
     blankWindow->setAxisLabel(QwtPlot::yLeft, p_plotToolWindow->getAxisLabel
@@ -575,46 +580,76 @@ namespace Qisis {
         plotTitle.append(QString("- Bands %1, %2, %3").arg(cvp->redBand()).arg(cvp->greenBand()).arg(cvp->blueBand()));
       }
     }
-    else if(p_currentPlotType == SpatialPlot) {
-      std::vector<double> dnValues;
-
-      getSpatialStatistics(labels, dnValues, xMax);
-
-      Statistics scalingStats;
-      scalingStats.AddData(&dnValues[0], dnValues.size());
-
-      double border = (scalingStats.Maximum() - scalingStats.Minimum()) * 0.25;
-      if(p_autoScale->isChecked())
-        p_plotToolWindow->setScale(QwtPlot::yLeft, scalingStats.Minimum() -
-                                   border, scalingStats.Maximum() + border);
-
-
-
-      if(labels.size() > 0) {
-        p_dnCurve->setData(&labels[0], &dnValues[0], labels.size());
+    else if (p_currentPlotType == SpatialPlot) {
+    
+      for (int i = 0; i < p_dnCurves.size(); i++)
+      {
+        if (p_dnCurves[i])
+        {
+          delete p_dnCurves[i];
+          p_dnCurves[i] = NULL;
+        }
       }
+      p_dnCurves.clear();
+      
+      MdiCubeViewport * activeViewport = cubeViewport();
+      QColor color(Qt::white);
+      // get curves for active viewport and also for any linked viewports
+      for (int i = 0; i < (int) cubeViewportList()->size(); i++)
+      {
+        MdiCubeViewport * curViewport = cubeViewportList()->at(i);
+        if (curViewport == activeViewport ||
+            (activeViewport->isLinked() && curViewport->isLinked()))
+        {
+          // add new curve to our list of curves (use viewport window title as
+          // our label in the legend
+          p_dnCurves.append(newDNCurve(
+              curViewport->parentWidget()->windowTitle(), color));
+          
+          // provide a new color for next linked viewport.  Can support up to
+          // 11 unique colors (after which colors are re-used)
+          color = QColor((Qt::GlobalColor) ((i + 7) % 11));
 
-      p_plotToolWindow->add(p_dnCurve);
-      p_plotToolWindow->setViewport(p_minCurve->getViewPort());
-      p_plotToolWindow->drawBandMarkers();
-      /*copy the dn curve each time the user re-plots data*/
-      copyCurve(p_dnCurve);
-      p_plotToolWindow->p_curveCopied = true;
-      p_plotToolWindow->fillTable();
-
-      if(p_autoScale->isChecked())
-        p_plotToolWindow->setScale(QwtPlot::xBottom, 1, xMax);
-
-      if(cvp->isGray()) {
-        plotTitle.append(QString("- Band %1").arg(cvp->grayBand()));
-      }
-      else {
-        plotTitle.append(QString("- Band %1").arg(cvp->redBand()));
+          // get statistics for this viewport
+          std::vector<double> dnValues;
+          labels.clear();
+          getSpatialStatistics(labels, dnValues, xMax, curViewport);
+          
+          // do our own autoscaling
+          Statistics scaleStats;
+          scaleStats.AddData(&dnValues[0], dnValues.size());
+          double border = (scaleStats.Maximum() - scaleStats.Minimum()) * 0.25;
+          if (p_autoScale->isChecked()) {
+            p_plotToolWindow->setScale(QwtPlot::yLeft, scaleStats.Minimum() -
+                border, scaleStats.Maximum() + border);
+            p_plotToolWindow->setScale(QwtPlot::xBottom, 1, xMax);
+          }
+          
+          // load data into curve
+            p_dnCurves[p_dnCurves.size() - 1]->setData(&labels[0],
+                &dnValues[0], labels.size());
+                
+          // add curve to plot
+          p_plotToolWindow->add(p_dnCurves[p_dnCurves.size() - 1]);
+          
+          
+          p_plotToolWindow->drawBandMarkers();
+          p_plotToolWindow->fillTable();
+          
+          if(cvp->isGray()) {
+            plotTitle.append(QString("- Band %1").arg(cvp->grayBand()));
+          }
+          else {
+            plotTitle.append(QString("- Band %1").arg(cvp->redBand()));
+          }
+        }
+        
       }
     }
 
     p_plotToolWindow->setPlotTitle(plotTitle);
     p_plotToolWindow->showWindow();
+    p_plotToolWindow->replot();
     updateTool();
   }
 
@@ -639,10 +674,9 @@ namespace Qisis {
    * @param pw
    */
   void PlotTool::pasteCurve(Qisis::PlotWindow *pw) {
-    p_cvp = cubeViewport();
+     p_cvp = cubeViewport();
     pw->add(p_copyCurve);
     updateViewPort(p_copyCurve);
-
   }
 
 
@@ -652,7 +686,7 @@ namespace Qisis {
    * @param pw
    */
   void PlotTool::pasteCurveSpecial(Qisis::PlotWindow *pw) {
-    p_cvp = cubeViewport();
+     p_cvp = cubeViewport();
     if(p_color < p_colors.size()) {
       p_copyCurve->setColor(p_colors[p_color]);
     }
@@ -686,7 +720,6 @@ namespace Qisis {
       }
     }
     updateViewPort();
-
   }
 
 
@@ -724,11 +757,7 @@ namespace Qisis {
     p_stdDev2Curve->setPen(*pen);
 
     /*This is for the spatial plot*/
-    p_dnCurve = new PlotToolCurve();
-    p_dnCurve->setTitle("DN Values");
-    pen->setColor(Qt::white);
-    pen->setWidth(2);
-    p_dnCurve->setPen(*pen);
+    //p_dnCurves.append(newDNCurve("DN Values"));
 
     /*Setup colors for paste special*/
     p_colors.push_back(Qt::cyan);
@@ -744,6 +773,17 @@ namespace Qisis {
 
 
 
+  }
+  
+  
+  PlotToolCurve * PlotTool::newDNCurve(QString name, QColor color) {
+    PlotToolCurve * newCurve = new PlotToolCurve();
+    newCurve->setTitle(name);
+    QPen * pen = new QPen(color);
+    pen->setWidth(2);
+    newCurve->setPen(*pen);
+    
+    return newCurve;
   }
 
 
@@ -921,8 +961,8 @@ namespace Qisis {
    * @param xmax
    */
   void PlotTool::getSpatialStatistics(std::vector<double> &labels,
-                                      std::vector<double> &data, double &xmax) {
-    MdiCubeViewport *cvp = cubeViewport();
+                                      std::vector<double> &data, double &xmax,
+                                      MdiCubeViewport * cvp) {
     QList<QPoint> vertices = RubberBandTool::getVertices();
     double ss, sl, es, el;
 
@@ -932,8 +972,8 @@ namespace Qisis {
     cvp->viewportToCube(vertices[0].x(), vertices[0].y(), ss, sl);
     cvp->viewportToCube(vertices[1].x(), vertices[1].y(), es, el);
 
-    p_dnCurve->setViewPort(cvp);
-    p_dnCurve->setVertices(vertices);
+    p_dnCurves[p_dnCurves.size() - 1]->setViewPort(cvp);
+    p_dnCurves[p_dnCurves.size() - 1]->setVertices(vertices);
 
     ss = ss + 0.5;
     sl = sl + 0.5;
@@ -1143,8 +1183,7 @@ namespace Qisis {
    */
   void PlotTool::updateViewPort() {
     p_cvp->viewport()->repaint();
-
   }
-
+  
 }
 
