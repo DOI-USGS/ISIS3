@@ -144,18 +144,21 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
     darkCorrection = lineBasedDarkCorrections.find(pair<int, int>(inBuffer->Line(), inBuffer->Band()));
 
     if(darkCorrection != lineBasedDarkCorrections.end()) {
-      (*outBuffer)[i] -= darkCorrection->second;
+      if(!IsSpecial(darkCorrection->second))
+        (*outBuffer)[i] -= darkCorrection->second;
+      else
+        (*outBuffer)[i] = Null;
     }
 
-    if(!IsSpecial((*flatFieldBuffer)[i])) {
+    if(!IsSpecial((*flatFieldBuffer)[i]) && !IsSpecial((*outBuffer)[i])) {
       (*outBuffer)[i] /= (*flatFieldBuffer)[i];
     }
 
-    if(inBuffer->Band() <= (int)specificEnergyCorrections.size()) {
+    if(inBuffer->Band() <= (int)specificEnergyCorrections.size() && !IsSpecial((*outBuffer)[i])) {
       (*outBuffer)[i] *= specificEnergyCorrections[inBuffer->Band()-1];
     }
 
-    if(iof && solarRemoveBuffer) {
+    if(iof && solarRemoveBuffer && !IsSpecial((*outBuffer)[i])) {
       (*outBuffer)[i] = (*outBuffer)[i] / ((*solarRemoveBuffer)[i] / solarRemoveCoefficient) * Isis::PI;
     }
   }
@@ -522,7 +525,10 @@ void calculateIrDarkCurrent(Cube *icube) {
       pair<int, int> index = pair<int, int>(line, band);
       int value = (int)sideplane[(line-1)*icube->Bands() + (band-1)][2];
 
-      lineBasedDarkCorrections.insert(pair< pair<int, int>, double>(index, value));
+      if(value != 57344)
+        lineBasedDarkCorrections.insert(pair< pair<int, int>, double>(index, value));
+      else
+        lineBasedDarkCorrections.insert(pair< pair<int, int>, double>(index, Null));
     }
   }
 
@@ -540,11 +546,14 @@ void calculateIrDarkCurrent(Cube *icube) {
       pair<int, int> index = pair<int, int>(line, band);
       map< pair<int, int>, double>::iterator val = lineBasedDarkCorrections.find(index);
 
-      vector<double> input;
-      input.push_back(line);
-      double expected = val->second;
+      if(val != lineBasedDarkCorrections.end()) {
+        vector<double> input;
+        input.push_back(line);
+        double expected = val->second;
 
-      lsq.AddKnown(input, expected);
+        if(!IsSpecial(expected))
+          lsq.AddKnown(input, expected);
+      }
     }
 
     lsq.Solve();
@@ -558,18 +567,22 @@ void calculateIrDarkCurrent(Cube *icube) {
       pair<int, int> index = pair<int, int>(line, band);
 
       map< pair<int, int>, double>::iterator val = lineBasedDarkCorrections.find(index);
-      double currentDark = val->second;
+      if(val != lineBasedDarkCorrections.end()) {
+        double currentDark = val->second;
 
-      double newDark = coefficients[0] + line * coefficients[1];
+        if(!IsSpecial(currentDark)) {
+          double newDark = coefficients[0] + line * coefficients[1];
 
-      // initial dark applied by compressor
-      if(archive["CompressorId"][0] != "N/A") {
-        // input is in (dn-dark) units
-        // (dn-dark) - (fit-dark) = dn-fit
-        newDark -= currentDark;
+          // initial dark applied by compressor
+          if(archive["CompressorId"][0] != "N/A") {
+            // input is in (dn-dark) units
+            // (dn-dark) - (fit-dark) = dn-fit
+            newDark -= currentDark;
+          }
+
+          val->second = newDark;
+        }
       }
-
-      val->second = newDark;
     }
   }
 
