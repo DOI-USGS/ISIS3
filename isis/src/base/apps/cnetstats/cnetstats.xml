@@ -174,7 +174,7 @@
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
               <tr><td colspan="2"> Group = Point_Distance</td></tr>
-              <tr><td width="10"></td><td> MinDistance = double value</td></tr>
+              <tr><td width="10"></td><td> MaxDistance = double value</td></tr>
               <tr><td width="10"></td><td> Units = meters/pixels</td></tr>
               <tr><td colspan="2"> EndGroup</td></tr> </table> 
     </td></tr> </table><br/><br/>
@@ -190,11 +190,8 @@
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
               <tr><td colspan="2"> Group = Point_MeasureProperties</td></tr>
-              <tr><td width="10"></td><td> Manual = true/false</td></tr>
-              <tr><td width="10"></td><td> Estimated = true/false</td></tr>
-              <tr><td width="10"></td><td> Auto-Registered = true/false </td></tr>
-              <tr><td width="10"></td><td> Manual_Validated = true/false</td></tr>
-              <tr><td width="10"></td><td> AutoReg_Validated = true/false</td></tr>
+              <tr><td width="10"></td><td> MeasureType = All / Manual/Estimated 
+                  / Auto-Registered / Manual_Validated / AutoReg_Validated</td></tr>
               <tr><td width="10"></td><td> Ignored = true/false</td></tr>
               <tr><td colspan="2"> EndGroup</td></tr> </table> 
     </td></tr> </table><br/> <br/>
@@ -278,7 +275,7 @@
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
               <tr><td colspan="2"> Group = Cube_Distance</td></tr>
-              <tr><td width="10"></td><td> MinDistance = double value</td></tr>
+              <tr><td width="10"></td><td> MaxDistance = double value</td></tr>
               <tr><td width="10"></td><td> Units = meters/pixels</td></tr>
               <tr><td colspan="2"> EndGroup</td></tr> </table> 
     </td></tr> </table><br/> <br/>
