@@ -58,6 +58,8 @@ namespace Qisis {
    *  @history 2008-12-10 Jeannie Walldren - Fixed documentation
    *  @history 2010-07-01 Jeannie Walldren - Added file extension filters for
    *                         input control network
+   *  @history 2010-11-09 Tracie Sucharski - "emit" was missing from the signal
+   *                         serialNumberListUpdated.
    *
    */
   void QnetFileTool::open() {
@@ -147,7 +149,7 @@ namespace Qisis {
     //  Initialize cameras for control net
     g_controlNetwork->SetImages(*g_serialNumberList);
 
-    serialNumberListUpdated();
+    emit serialNumberListUpdated();
     emit controlNetworkUpdated(cNetFilename);
     QApplication::restoreOverrideCursor();
     return;

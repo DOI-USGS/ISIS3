@@ -96,6 +96,8 @@ namespace Qisis {
    *                          Replaced #includes with forward class declarations
    *                          and moved #include to .cpp file.
    *   @history 2010-07-12 Jeannie Walldren - Fixed documentation.
+   *   @history 2010-11-04 Tracie Sucharski - Added overloaded load slot for
+   *                          double-clicking on the cube list.
    *
    *
    */
@@ -134,6 +136,7 @@ namespace Qisis {
 
     private slots:
       void load();
+      void load(QListWidgetItem *);
       void tie();
       void filter();
       void editPoint(QListWidgetItem *ptItem);

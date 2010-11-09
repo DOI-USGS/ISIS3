@@ -70,6 +70,9 @@ namespace Qisis {
    * @internal
    *   @history  2008-10-29 Tracie Sucharski - Added filter count
    *   @history  2008-12-31 Jeannie Walldren - Added keyboard shortcuts
+   *   @history  2010-11-04 Tracie Sucharski - Move listBox double-click
+   *                            connection to the slot for changing the
+   *                            listBox.
    */
   void QnetNavTool::createNavigationDialog(QWidget *parent) {
     // Create the combo box selector
@@ -78,8 +81,6 @@ namespace Qisis {
     p_listCombo->addItem("Cubes");
     p_listBox = new QListWidget();
     p_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    connect(p_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-            this, SLOT(editPoint(QListWidgetItem *)));
 
     // Create the filter area
     QLabel *filterLabel = new QLabel("Filters");
@@ -363,6 +364,7 @@ namespace Qisis {
    *   @history  2009-01-08 Jeannie Walldren - Reset filtered list with all points
    *                           in control net and all images in serial number
    *                           list.
+   *   @history  2010-11-04 Tracie Sucharski - Added double-click connections.
    */
   void QnetNavTool::resetList() {
     p_filtered = false;
@@ -386,6 +388,11 @@ namespace Qisis {
 
     // We are dealing with points so output the point numbers
     if(p_listCombo->currentIndex() == Points) {
+      // disconnect any old signals
+      disconnect (p_listBox,SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+               this,SLOT(load(QListWidgetItem *)));
+      connect (p_listBox,SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+               this,SLOT(editPoint(QListWidgetItem *)));
       //p_listBox->setSelectionMode(QAbstractItemView::SingleSelection);
       for(int i = 0; i < g_controlNetwork->Size(); i++) {
         string cNetId = (*g_controlNetwork)[i].Id();
@@ -403,6 +410,10 @@ namespace Qisis {
     }
     // We are dealing with images so output the cube names
     else if(p_listCombo->currentIndex() == Cubes) {
+      disconnect (p_listBox,SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+               this,SLOT(editPoint(QListWidgetItem *)));
+      connect (p_listBox,SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+               this,SLOT(load(QListWidgetItem *)));
       //p_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
       for(int i = 0; i < g_serialNumberList->Size(); i++) {
         Isis::Filename filename = Isis::Filename(g_serialNumberList->Filename(i));
@@ -422,7 +433,7 @@ namespace Qisis {
    *
    * @param pointId Value of the PointId keyword for the new point.
    * @internal
-   *   @history  2008-12-30 Jeannie Walldren - Modified to setCurrentItem() rather
+   *   @history 2008-12-30 Jeannie Walldren - Modified to setCurrentItem() rather
    *                           than simply highlight the new point using
    *                           setItemSelected() and scrollToItem().
    *   @history 2010-07-12 Jeannie Walldren - Fixed documentation.
@@ -575,6 +586,19 @@ namespace Qisis {
     return;
   }
 
+
+
+
+  /**
+   * Slot for double-clicking cube list
+   *  
+   * @author 2010-11-04 Tracie Sucharski 
+   *  
+   * @internal
+   */
+  void QnetNavTool::load(QListWidgetItem *) {
+    load();
+  }
 
   /**
    * Emits a modifyPoint signal
