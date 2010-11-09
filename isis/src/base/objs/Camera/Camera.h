@@ -27,6 +27,7 @@
 #include "AlphaCube.h"
 
 namespace Isis {
+  class Angle;
   class CameraDetectorMap;
   class CameraFocalPlaneMap;
   class CameraDistortionMap;
@@ -131,6 +132,8 @@ namespace Isis {
    *   @history 2010-11-04 Steven Lambright - Added SetGround() methods with the
    *            SurfacePoint version being commented out until the SurfacePoint
    *            class is available.
+   *   @history 2010-11-09 Eric Hyer - Added GetLocalNormal and 
+   *       LocalPhotometricAngles methods
    */
 
   class Camera : public Isis::Sensor {
@@ -149,6 +152,9 @@ namespace Isis {
       bool SetGround(Latitude latitude, Longitude longitude);
 //      bool SetGround(SurfacePoint surfacePt);
       bool SetRightAscensionDeclination(const double ra, const double dec);
+      
+      void LocalPhotometricAngles(Angle & phase, Angle & emission,
+                                  Angle & incidence);
 
       /**
        * Checks to see if the camera object has a projection
@@ -484,7 +490,12 @@ namespace Isis {
       // slant range changes.
       friend class RadarGroundMap;
       friend class RadarSlantRangeMap;
-
+      
+      
+    private:
+      void GetLocalNormal(double normal[3]);
+      
+      
     private:
       double p_focalLength;  //!<The focal length, in units of millimeters
       double p_pixelPitch;   //!<The pixel pitch, in millimeters per pixel

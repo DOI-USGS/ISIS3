@@ -25,7 +25,11 @@
 #include <cfloat>
 #include <cmath>
 
-#include "Projection.h"
+#include <QList>
+#include <QPair>
+#include <QVector>
+
+#include "Angle.h"
 #include "Constants.h"
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -37,8 +41,8 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
-//#include "SurfacePoint.h"
 
 using namespace std;
 
@@ -169,6 +173,7 @@ namespace Isis {
           double focalPlaneY = p_focalPlaneMap->FocalPlaneY();
           // Remove optical distortion
           if(p_distortionMap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
+            cerr << "Camera::SetImage... Made it inside if!\n";
             // Map to the ground
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
@@ -789,7 +794,139 @@ namespace Isis {
 
     return false;
   }
+  
+  
+  /**
+   * Sets the passed in vector to be the local normal which is calculated using
+   * the DEM
+   *
+   * @param normal - local normal vector to be set
+   *
+   */
+  void Camera::GetLocalNormal(double normal[3]) {
+    
+    // As documented in the doxygen above, the goal of this method is to
+    // calculate a normal vector to the surface using the DEM instead of the
+    // ellipsoid
+    double samp = Sample();
+    double line = Line();
+    
+    // order of points in vector is top, bottom, left, right
+    QList< QPair< double, double > > surroundingPoints;
+    surroundingPoints.append(qMakePair(samp, line - 0.5));
+    surroundingPoints.append(qMakePair(samp, line + 0.5));
+    surroundingPoints.append(qMakePair(samp - 0.5, line));
+    surroundingPoints.append(qMakePair(samp + 0.5, line));
+    
+    // save state
+    bool computed = p_pointComputed;
+    double originalSample = samp;
+    double originalLine = line;
 
+    // now we have all four points in the image, so find the same points in the
+    // dem
+    QVector< double * > lookVects(4);
+    for (int i = 0; i < lookVects.size(); i++)
+      lookVects[i] = new double[3];
+      
+    for (int i = 0; i < surroundingPoints.size(); i ++) {
+      SetImage(surroundingPoints[i].first, surroundingPoints[i].second);
+    
+      Angle demLat(p_latitude, Angle::Degrees);
+      Angle demLon(p_longitude, Angle::Degrees);
+      double demRadius = DemRadius(demLat, demLon);
+      
+      latrec_c(demRadius, demLon.GetRadians(), demLat.GetRadians(), lookVects[i]);
+    }
+    
+    // subtract bottom from top and left from right and store results
+    double topMinusBottom[3];
+    vsub_c(lookVects[0], lookVects[1], topMinusBottom);
+    double rightMinusLeft[3];
+    vsub_c(lookVects[3], lookVects[2], rightMinusLeft);
+    
+    // take cross product of subtraction results to get normal
+    ucrss_c(topMinusBottom, rightMinusLeft, normal);
+    
+    // unitize normal (and do sanity check for magnitude)
+    double mag;
+    unorm_c(normal, normal, &mag); 
+    if (mag == 0.0) {
+      // throw exception
+    }
+    
+    double centerLookVect[3];
+    LookDirection(centerLookVect);
+    
+    // Check to make sure that the normal is pointing outward from the planet
+    // surface. This is done by taking the dot product of the normal and 
+    // any one of the unitized xyz vectors. If the normal is pointing inward, 
+    // then negate it.
+    unorm_c(centerLookVect, centerLookVect, &mag);
+    double dotprod = vdot_c(normal,centerLookVect);
+    if (dotprod < 0.0)
+      vminus_c(normal, normal);
+      
+    // restore state
+    if(computed) {
+      SetImage(originalSample, originalLine);
+    }
+    else {
+      p_pointComputed = false;
+    }
+    
+    // free memory
+    for (int i = 0; i < lookVects.size(); i++)
+      delete lookVects[i];
+  }
+  
+  
+  /**
+   * Calculates LOCAL photometric angles using the DEM (not ellipsoid).  These
+   * calcualtions are more expensive computationally than Sensor's angle getter
+   * methods.  Furthermore, this cost is mostly in calculating the local normal
+   * vector, which can be done only once for all angles using this method.
+   *
+   * @param phase The local phase angle to be calculated
+   *
+   * @param emission The local emission angle to be calculated
+   *
+   * @param incidence The local incidence angle to be calculated
+   */
+  void Camera::LocalPhotometricAngles(Angle & phase, Angle & emission,
+      Angle & incidence) {
+    
+    // get local normal vector
+    double normal[3];
+    GetLocalNormal(normal);
+    
+    // get a normalized surface spacecraft vector
+    SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
+    std::vector<double> sB = BodyRotation()->ReferenceVector(
+        InstrumentPosition()->Coordinate());
+    vsub_c((SpiceDouble *) &sB[0], p_pB, surfSpaceVect);
+    unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
+
+    // get a normalized surface sun vector
+    SpiceDouble surfaceSunVect[3];
+    vsub_c(p_uB, p_pB, surfaceSunVect);
+    SpiceDouble unitizedSurfSunVect[3];
+    unorm_c(surfaceSunVect, unitizedSurfSunVect, &dist);
+
+    // use normalized surface spacecraft and surface sun vectors to calculate
+    // the phase angle (in radians)
+    phase = Angle(vsep_c(unitizedSurfSpaceVect, unitizedSurfSunVect));
+    
+    // use normalized surface spacecraft and local normal vectors to calculate
+    // the emission angle (in radians)
+    emission = Angle(vsep_c(unitizedSurfSpaceVect, normal));
+    
+    // use normalized surface sun and normal vectors to calculate the incidence
+    // angle (in radians)
+    incidence = Angle(vsep_c(unitizedSurfSunVect, normal));
+  }
+  
+  
   /**
    * Computes the RaDec range
    *
