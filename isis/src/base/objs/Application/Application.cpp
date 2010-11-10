@@ -86,7 +86,8 @@ namespace Isis {
 
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
-    setlocale(LC_NUMERIC, "en_US");
+    setlocale(LC_ALL, "en_US");
+    putenv("LANG=en_US");
 
     // Verify ISISROOT was set
     if (getenv("ISISROOT") == NULL || iString(getenv("ISISROOT")) == "") {
