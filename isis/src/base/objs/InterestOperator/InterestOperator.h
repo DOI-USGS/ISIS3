@@ -107,6 +107,7 @@ namespace Isis {
    *  @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard
    *                      Options & Std Options Pixels/Meters from Edge
    *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control Net
+   *  @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:
