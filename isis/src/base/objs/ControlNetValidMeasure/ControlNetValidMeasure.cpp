@@ -113,7 +113,7 @@ namespace Isis {
    * @param pvlDef - Pvl DefFile
    */
   void ControlNetValidMeasure::Parse(Pvl &pvlDef) {
-    mPvlOpGrp = pvlDef.FindGroup("Operator", Pvl::Traverse);
+    mPvlOpGrp = pvlDef.FindGroup("ValidMeasure", Pvl::Traverse);
 
     mStdOptionsGrp = PvlGroup("StandardOptions");
 

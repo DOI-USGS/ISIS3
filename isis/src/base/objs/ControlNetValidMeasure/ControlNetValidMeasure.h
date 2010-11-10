@@ -55,6 +55,8 @@ namespace Isis {
     *  @history 2010-09-16 Sharmila Prasad - Renamed to ControlNetValidMeasure for  
     *                                        uniformity with other ControlNet Classes
     *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control Net
+    *  @history 2010-11-10 Sharmila Prasad - Change group name of DefFile from "Operator" to
+    *                                        "ValidMeasure"
     */
 
   class ControlNetValidMeasure {

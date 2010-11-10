@@ -10,7 +10,7 @@ int main(void) {
   try {
     try {
       Pvl pvlLog;
-      PvlGroup op("Operator");
+      PvlGroup op("ValidMeasure");
       op += PvlKeyword("Name", "StandardDeviation");
       op += PvlKeyword("DeltaLine", 100);
       op += PvlKeyword("DeltaSamp", 100);
@@ -35,7 +35,7 @@ int main(void) {
 
     try {
       Pvl pvlLog;
-      PvlGroup op("Operator");
+      PvlGroup op("ValidMeasure");
       op += PvlKeyword("Name", "None");
       op += PvlKeyword("MinDN", -1.0);
       op += PvlKeyword("MaxDN", 1.0);
@@ -55,7 +55,7 @@ int main(void) {
 
     try {
       Pvl pvlLog;
-      PvlGroup op("Operator");
+      PvlGroup op("ValidMeasure");
       op += PvlKeyword("Name", "StandardDeviation");
       op += PvlKeyword("DeltaLine", 100);
       op += PvlKeyword("DeltaSamp", 100);
@@ -80,7 +80,7 @@ int main(void) {
 
     try {
       Pvl pvlLog;
-      PvlGroup op("Operator");
+      PvlGroup op("ValidMeasure");
       op += PvlKeyword("Name", "None");
       op += PvlKeyword("MinDN", -1.0);
       op += PvlKeyword("MaxDN", 1.0);
@@ -102,7 +102,7 @@ int main(void) {
 
     try {
       Pvl pvlLog;
-      PvlGroup op("Operator");
+      PvlGroup op("ValidMeasure");
       op += PvlKeyword("Name", "None");
       op += PvlKeyword("MinDN", -1.0);
       op += PvlKeyword("MaxDN", 1.0);
