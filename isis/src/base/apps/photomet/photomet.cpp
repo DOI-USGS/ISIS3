@@ -10,8 +10,7 @@
 #include "PvlGroup.h"
 #include "iException.h"
 
-#define MIN(x,y) (((x) < (y)) ? (x) : (y))
-#define MAX(x,y) (((x) > (y)) ? (x) : (y))
+#include "Angle.h"
 
 using namespace std;
 using namespace Isis;
@@ -22,6 +21,7 @@ Cube *icube;
 Photometry *pho;
 double maxema;
 double maxinc;
+bool useDem;
 
 void photomet(Buffer &in, Buffer &out);
 
@@ -38,12 +38,17 @@ void IsisMain() {
 
   // Set up the user interface
   UserInterface &ui = Application::GetUserInterface();
+  
   // Get the name of the parameter file
   Pvl par(ui.GetFilename("PHOPAR"));
+  
   // Set value for maximum emission/incidence angles chosen by user
   maxema = ui.GetDouble("MAXEMISSION");
   maxinc = ui.GetDouble("MAXINCIDENCE");
-
+  
+  // determine how photometric angles should be calculated
+  useDem = ui.GetBoolean("USEDEM");
+  
   // Get the BandBin Center from the image
   PvlGroup pvlg = icube->GetGroup("BandBin");
   double wl;
@@ -82,20 +87,35 @@ void IsisMain() {
 void photomet(Buffer &in, Buffer &out) {
 
   double pha, inc, ema, mult, base;
-  for(int i = 0; i < in.size(); i++) {
+  
+  for (int i = 0; i < in.size(); i++) {
+  
     // if special pixel, copy to output
     if(!IsValidPixel(in[i])) {
       out[i] = in[i];
     }
+    
     // if off the target, set to null
     else if(!cam->SetImage(in.Sample(i), in.Line(i))) {
       out[i] = NULL8;
     }
+    
     // otherwise, compute angle values
     else {
-      pha = cam->PhaseAngle();
-      inc = cam->IncidenceAngle();
-      ema = cam->EmissionAngle();
+      
+      // calculate photometric angles
+      if (useDem) {
+        Angle phase, incidence, emission;
+        cam->LocalPhotometricAngles(phase, incidence, emission);
+        pha = phase.GetDegrees();
+        inc = incidence.GetDegrees();
+        ema = emission.GetDegrees();
+      }
+      else {
+        pha = cam->PhaseAngle();
+        inc = cam->IncidenceAngle();
+        ema = cam->EmissionAngle();
+      }
 
       // if invalid angles, set to null
       if(inc >= 90.0 || ema >= 90.0) {

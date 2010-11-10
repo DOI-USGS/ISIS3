@@ -433,6 +433,9 @@
       off-target pixels to NULL.  Added appTests for new parameters.  Added user
       documentation examples. 
     </change>
+    <change name="Eric Hyer" date="2011-11-10">
+      Added USEDEM parameter.
+    </change>
   </history>
 
   <category>
@@ -506,6 +509,22 @@
         <default><item> 90.0</item></default>
       </parameter>
     </group>
+    
+    <group name="Other Options">
+      <parameter name="USEDEM">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Use DEM instead of ellipsoid for photometric angle calculations
+        </brief>
+        <description>
+          Phase, Emission, and Incidence angles can be calculated from the
+          elipsoid (default) or from the DEM.  The difference is that using the
+          DEM the surface roughness is taken into account.
+        </description>
+      </parameter>
+    </group>
+    
   </groups>
 
   <examples>
