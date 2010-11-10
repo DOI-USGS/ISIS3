@@ -41,6 +41,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2008-12-12 Jacob Danton - Original Version
+   *   @history 2010-11-10 Sharmila Prasad - Updated unittest for changes in the deffile
    */
   class NoOperator : public InterestOperator {
     public:
