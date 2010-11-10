@@ -9,6 +9,15 @@ Object = InterestOperator
     MaximumDN       = 1.0
     MinimumInterest = 0.01
   End_Group
+
+  Group = ValidMeasure
+    MinDN        = 0.0
+    MaxDN        = 1.0
+    MinEmission  = 15.0
+    MaxEmission  = 25.0
+    MinIncidence = 0.0
+    MaxIncidence = 135.0
+  End_Group
 End_Object
 End
 Sample: 90

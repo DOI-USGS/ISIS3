@@ -47,7 +47,8 @@ namespace Isis {
    *            pixels[n] to see if it was a special pixel.
    *   @history 2007-08-02 Steven Koechle - Removed
     *            CompareInterests virtual method.
-    *   @history 2010-06-10 Sharmila Prasad - Changes to accomodate CnetValidMeasure base class
+   *    @history 2010-06-10 Sharmila Prasad - Changes to accomodate CnetValidMeasure base class
+   *    @history 2010-11-10 Sharmila Prasad - Updated unittest for changes in the deffile
    */
   class StandardDeviationOperator : public InterestOperator {
     public:
