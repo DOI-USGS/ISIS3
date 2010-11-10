@@ -35,6 +35,7 @@ namespace Isis {
    * @internal
    *   @history 2007-08-02 Steven Koechle - Original Version
    *   @history 2008-08-16 Steven Koechle - Fixed Documentation
+   *   @history 2010-11-10 Sharmila Prasad - Updated unittest for changes in the deffile
    */
   class MoravecOperator : public InterestOperator {
     public:
