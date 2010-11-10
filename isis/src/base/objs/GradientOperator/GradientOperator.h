@@ -40,7 +40,8 @@ namespace Isis {
    *
     * @author 2006-02-11 Jacob Danton
     *
-    * @history 2010-06-10 Sharmila Prasad  Updated to accomadate CnetValidMeasure base class
+   *  @history 2010-06-10 Sharmila Prasad  Updated to accomadate CnetValidMeasure base class
+   *  @history 2010-11-10 Sharmila Prasad - Updated unittest to accomodate changes in the DefFile
    */
   class GradientOperator : public InterestOperator {
     public:
