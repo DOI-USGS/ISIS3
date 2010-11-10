@@ -93,6 +93,13 @@ int main() {
        << c->HighestImageResolution() << endl;
   cout << "Calling BasicMapping (pvl)..." << endl;
   c->BasicMapping(pvl);
+
+  double pixRes2 = pvl.FindGroup("Mapping")["PixelResolution"];
+  pixRes2 *= 10000000;
+  pixRes2 = round(pixRes2);
+  pixRes2 /= 10000000;
+  pvl.FindGroup("Mapping")["PixelResolution"] = pixRes2;
+
   cout << "BasicMapping PVL: " << endl << pvl << endl << endl;
   cout << "FocalLength: " << c->FocalLength() << endl;
   cout << "PixelPitch: " << c->PixelPitch() << endl;
