@@ -177,7 +177,7 @@ Group = Mapping
   MaximumLatitude    = 34.449775120271
   MinimumLongitude   = 218.13667853438
   MaximumLongitude   = 237.62560286587
-  PixelResolution    = 429.52632181214
+  PixelResolution    = 429.5263218
   ProjectionName     = Sinusoidal
 End_Group
 End
