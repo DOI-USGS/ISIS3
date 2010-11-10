@@ -173,7 +173,6 @@ namespace Isis {
           double focalPlaneY = p_focalPlaneMap->FocalPlaneY();
           // Remove optical distortion
           if(p_distortionMap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
-            cerr << "Camera::SetImage... Made it inside if!\n";
             // Map to the ground
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
