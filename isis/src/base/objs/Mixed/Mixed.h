@@ -52,6 +52,11 @@ namespace Isis {
    *  @history 2007-07-31 Steven Lambright - Refactored code
    *  @history 2008-03-07 Janet Barrett - Changed name of Incmatch variable
    *                      to Incmat
+   *  @history 2010-11-10 Janet Barrett - Added reference parameters for
+   *                      phase and emission so user can specify normalization
+   *                      conditions in initialization - also added match 
+   *                      parameters for phase and emission for the same reason
+   *
    */
   class Mixed : public NormModel {
     public:
@@ -67,8 +72,12 @@ namespace Isis {
 
     private:
       //! Set parameters needed for albedo normalization
+      void SetNormPharef(const double pharef);
       void SetNormIncref(const double incref);
+      void SetNormEmaref(const double emaref);
+      void SetNormPhamat(const double phamat);
       void SetNormIncmat(const double incmat);
+      void SetNormEmamat(const double emamat);
       void SetNormThresh(const double thresh);
       void SetNormAlbedo(const double albedo);
 
@@ -77,9 +86,13 @@ namespace Isis {
       double p_anum;
       double p_rhobar;
       double p_psurfref;
+      double p_normPharef;
       double p_normIncref;
+      double p_normEmaref;
       double p_normThresh;
+      double p_normPhamat;
       double p_normIncmat;
+      double p_normEmamat;
       double p_normAlbedo;
   };
 };
