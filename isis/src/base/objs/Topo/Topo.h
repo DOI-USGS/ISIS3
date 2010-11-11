@@ -37,6 +37,10 @@ namespace Isis {
    *  @history 2007-08-15 Steven Lambright Refactored and fixed unit test
    *  @history 2008-06-18 Steven Lambright Fixed ifndef, removed endlink doxygen
    *           command
+   *  @history 2010-11-10 Janet Barrett - Added reference parameters for
+   *           phase and emission so user can specify normalization
+   *           conditions in initialization
+   *
    */
   class Topo : public NormModel {
     public:
@@ -52,11 +56,15 @@ namespace Isis {
 
     private:
 
+      void SetNormPharef(const double pharef);
       void SetNormIncref(const double incref);
+      void SetNormEmaref(const double emaref);
       void SetNormThresh(const double thresh);
       void SetNormAlbedo(const double albedo);
 
+      double p_normPharef;
       double p_normIncref;
+      double p_normEmaref;
       double p_normThresh;
       double p_normAlbedo;
 
