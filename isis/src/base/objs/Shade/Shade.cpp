@@ -8,11 +8,23 @@ namespace Isis {
   Shade::Shade(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {
     PvlGroup &algorithm = pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse);
 
+    SetNormPharef(0.0);
     SetNormIncref(0.0);
+    SetNormEmaref(0.0);
     SetNormAlbedo(1.0);
 
     if(algorithm.HasKeyword("Incref")) {
       SetNormIncref(algorithm["Incref"]);
+    }
+
+    if(algorithm.HasKeyword("Pharef")) {
+      SetNormPharef(algorithm["Pharef"]);
+    } else {
+      p_normPharef = p_normIncref;
+    }
+
+    if(algorithm.HasKeyword("Emaref")) {
+      SetNormEmaref(algorithm["Emaref"]);
     }
 
     if(algorithm.HasKeyword("Albedo")) {
@@ -28,7 +40,7 @@ namespace Isis {
 
     // Calculate normalization at standard conditions
     GetPhotoModel()->SetStandardConditions(true);
-    psurfref = GetPhotoModel()->CalcSurfAlbedo(p_normIncref, p_normIncref, 0.0);
+    psurfref = GetPhotoModel()->CalcSurfAlbedo(p_normPharef, p_normIncref, p_normEmaref);
     GetPhotoModel()->SetStandardConditions(false);
 
     if(psurfref == 0.0) {
@@ -39,6 +51,24 @@ namespace Isis {
     rho = p_normAlbedo / psurfref;
 
     albedo = rho * GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
+  }
+
+  /**
+    * Set the normalization function parameter. This is the
+    * reference phase angle to which the image photometry will
+    * be normalized. This parameter is limited to values that are
+    * >=0 and <180.
+    *
+    * @param pharef  Normalization function parameter, default
+    *                is 0.0
+    */
+  void Shade::SetNormPharef(const double pharef) {
+    if(pharef < 0.0 || pharef >= 180.0) {
+      std::string msg = "Invalid value of normalization pharef [" + iString(pharef) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    p_normPharef = pharef;
   }
 
   /**
@@ -57,6 +87,24 @@ namespace Isis {
     }
 
     p_normIncref = incref;
+  }
+
+  /**
+    * Set the normalization function parameter. This is the
+    * reference emission angle to which the image photometry will
+    * be normalized. This parameter is limited to values that are
+    * >=0 and <90.
+    *
+    * @param emaref  Normalization function parameter, default
+    *                is 0.0
+    */
+  void Shade::SetNormEmaref(const double emaref) {
+    if(emaref < 0.0 || emaref >= 90.0) {
+      std::string msg = "Invalid value of normalization emaref [" + iString(emaref) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    p_normEmaref = emaref;
   }
 
   /**
