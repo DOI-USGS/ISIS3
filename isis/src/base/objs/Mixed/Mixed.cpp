@@ -8,17 +8,40 @@ namespace Isis {
     PvlGroup &algorithm = pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse);
 
     // Set default value
+    SetNormPharef(0.0);
     SetNormIncref(0.0);
+    SetNormEmaref(0.0);
+    SetNormPhamat(0.0);
     SetNormIncmat(0.0);
+    SetNormEmamat(0.0);
     SetNormThresh(30.0);
     SetNormAlbedo(1.0);
 
     // Get value from user
+    if(algorithm.HasKeyword("Pharef")) {
+      SetNormPharef(algorithm["Pharef"]);
+    }
+
     if(algorithm.HasKeyword("Incref")) {
       SetNormIncref(algorithm["Incref"]);
     }
+
+    if(algorithm.HasKeyword("Emaref")) {
+      SetNormEmaref(algorithm["Emaref"]);
+    }
+
     if(algorithm.HasKeyword("Incmat")) {
       SetNormIncmat(algorithm["Incmat"]);
+    }
+
+    if(algorithm.HasKeyword("Phamat")) {
+      SetNormPhamat(algorithm["Phamat"]);
+    } else {
+      p_normPhamat = p_normIncmat;
+    }
+
+    if(algorithm.HasKeyword("Emamat")) {
+      SetNormEmamat(algorithm["Emamat"]);
     }
 
     if(algorithm.HasKeyword("Thresh")) {
@@ -33,8 +56,8 @@ namespace Isis {
     // Calculate normalization at standard conditions
     // Turn off Hapke opposition effect
     GetPhotoModel()->SetStandardConditions(true);
-    p_psurfref = GetPhotoModel()->CalcSurfAlbedo(0.0, p_normIncref, 0.0);
-    double pprimeref = GetPhotoModel()->PhtTopder(0.0, p_normIncref, 0.0);
+    p_psurfref = GetPhotoModel()->CalcSurfAlbedo(p_normPharef, p_normIncref, p_normEmaref);
+    double pprimeref = GetPhotoModel()->PhtTopder(p_normPharef, p_normIncref, p_normEmaref);
 
     if(p_psurfref == 0.0) {
       std::string err = "Divide by zero error";
@@ -45,8 +68,8 @@ namespace Isis {
     }
 
     // Calculate brightness and topo derivative at matchpoint incidence
-    p_psurfmatch = GetPhotoModel()->CalcSurfAlbedo(p_normIncmat, p_normIncmat, 0.0);
-    p_pprimematch = GetPhotoModel()->PhtTopder(p_normIncmat, p_normIncmat, 0.0);
+    p_psurfmatch = GetPhotoModel()->CalcSurfAlbedo(p_normPhamat, p_normIncmat, p_normEmamat);
+    p_pprimematch = GetPhotoModel()->PhtTopder(p_normPhamat, p_normIncmat, p_normEmamat);
 
     // Calculate numerator of the stretch coeff. a; if it is very
     // large or small we haven't chosen a good reference state
@@ -87,6 +110,25 @@ namespace Isis {
 
   /**
     * Set the normalization function parameter. This is the
+    * reference phase angle to which the image photometry will
+    * be normalized. This parameter is limited to values that are
+    * >=0 and <180.
+    *
+    * @param pharef  Normalization function parameter, default
+    *                is 0.0
+    */
+  void Mixed::SetNormPharef(const double pharef) {
+    if(pharef < 0.0 || pharef >= 180.0) {
+      std::string msg = "Invalid value of normalization pharef [" +
+                        iString(pharef) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    p_normPharef = pharef;
+  }
+
+  /**
+    * Set the normalization function parameter. This is the
     * reference incidence angle to which the image photometry will
     * be normalized. This parameter is limited to values that are
     * >=0 and <90.
@@ -102,6 +144,45 @@ namespace Isis {
     }
 
     p_normIncref = incref;
+  }
+
+  /**
+    * Set the normalization function parameter. This is the
+    * reference emission angle to which the image photometry will
+    * be normalized. This parameter is limited to values that are
+    * >=0 and <90.
+    *
+    * @param emaref  Normalization function parameter, default
+    *                is 0.0
+    */
+  void Mixed::SetNormEmaref(const double emaref) {
+    if(emaref < 0.0 || emaref >= 90.0) {
+      std::string msg = "Invalid value of normalization emaref [" +
+                        iString(emaref) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    p_normEmaref = emaref;
+  }
+
+  /**
+   * Set the normalization function parameter. The image will be normalized
+   * so that albedo variations are constant for small phase angles and
+   * topographic shading is constant for large phase angles. The transition
+   * from albedo normalization to phase normalization occurs around
+   * the phase angle represented by this parameter. This
+   * parameter is limited to values that are >=0 and <180.
+   *
+   * @param phamat  Normalization function parameter
+   */
+  void Mixed::SetNormPhamat(const double phamat) {
+    if(phamat < 0.0 || phamat >= 180.0) {
+      std::string msg = "Invalid value of normalization phamat [" +
+                        iString(phamat) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    p_normPhamat = phamat;
   }
 
   /**
@@ -122,6 +203,26 @@ namespace Isis {
     }
 
     p_normIncmat = incmat;
+  }
+
+  /**
+   * Set the normalization function parameter. The image will be normalized
+   * so that albedo variations are constant for small emission angles and
+   * topographic shading is constant for large emission angles. The transition
+   * from albedo normalization to emission normalization occurs around
+   * the emission angle represented by this parameter. This
+   * parameter is limited to values that are >=0 and <90.
+   *
+   * @param emamat  Normalization function parameter
+   */
+  void Mixed::SetNormEmamat(const double emamat) {
+    if(emamat < 0.0 || emamat >= 90.0) {
+      std::string msg = "Invalid value of normalization emamat [" +
+                        iString(emamat) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    p_normEmamat = emamat;
   }
 
   /**
