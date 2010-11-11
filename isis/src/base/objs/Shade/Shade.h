@@ -35,6 +35,10 @@ namespace Isis {
    *
    * @internal
    *  @history 2007-07-31 Steven Lambright - Refactored code
+   *  @history 2010-11-10 Janet Barrett - Added reference parameters for
+   *                      phase and emission so user can specify normalization
+   *                      conditions in initialization
+   *
    */
   class Shade : public NormModel {
     public:
@@ -42,7 +46,9 @@ namespace Isis {
       virtual ~Shade() {};
 
       //! Set parameters needed for albedo normalization
+      void SetNormPharef(const double pharef);
       void SetNormIncref(const double incref);
+      void SetNormEmaref(const double emaref);
       void SetNormAlbedo(const double albedo);
 
     protected:
@@ -53,7 +59,9 @@ namespace Isis {
                                       double &mult, double &base) {};
 
     private:
+      double p_normPharef;
       double p_normIncref;
+      double p_normEmaref;
       double p_normAlbedo;
 
   };
