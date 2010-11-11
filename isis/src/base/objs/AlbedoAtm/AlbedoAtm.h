@@ -43,6 +43,9 @@ namespace Isis {
    *  @history 2009-05-11 Janet Barrett - Fixed so that the NormModelAlgorithm
    *          supporting DEM input is the empty function. DEM input is not yet
    *          supported.
+   *  @history 2010-11-10 Janet Barrett - Added reference parameters for
+   *                      phase and emission so user can specify normalization
+   *                      conditions in initialization
    *
    */
   class AlbedoAtm : public NormModel {
@@ -60,10 +63,14 @@ namespace Isis {
 
     private:
       //! Set parameters needed for albedo normalization
+      void SetNormPharef(const double pharef);
       void SetNormIncref(const double incref);
+      void SetNormEmaref(const double emaref);
 
       double p_normPsurfref;
+      double p_normPharef;
       double p_normIncref;
+      double p_normEmaref;
       double p_normPstdref;
       double p_normAhref;
       double p_normMunotref;
