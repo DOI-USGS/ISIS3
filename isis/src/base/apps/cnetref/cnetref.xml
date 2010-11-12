@@ -17,21 +17,31 @@
     properties. These properties can be user defined in a DEFFILE file 
     else defaults will be used. The DEFFILE is optional for Emission, Incidence 
     and Resolution Criteria. Following is the format for the Pvl DEFFILE file 
-    with the defaults: <br/>
-    Group = Operator<br/> 
-      Name = NoOperator (for Emission, Incidence, Resolution) (Optional) OR<br/>
-      Name = StandardDeviation/GradientOperator (for Interest) (Required)<br/>
-      MinDN = Isis::ValidMinimum(Optional)<br/> 
-      MaxDN = Isis::ValidMaximum(Optional)<br/>
-      MinEmission = 0(Optional)<br/>
-      MaxEmission = 135(Optional) <br/> 
-      MinIncidence = 0(Optional)    <br/>
-      MaxIncidence = 135(Optional) <br/> 
-      MinResolution = 0(Optional)<br/>
-      MaxResolution = DOUBLE_MAX (Optional)<br/> 
-      PixelsFromEdge= 0(Optional) OR<br/> 
-      MetersFromEdge= 0(Optional)<br/> 
-    EndGroup<br/><br/> 
+    with the defaults for measure validation: <br/>
+    <table border="0" cellspacing="0" cellpadding="0">
+    <tr><th colspan="3" align="left">Group=ValidMeasure </th></tr>
+    <tr><td width="25"></td><td align="left">MinDN </td>
+        <td>= Isis::ValidMinimum (Optional)</td></tr>
+    <tr><td></td><td align="left">MaxDN </td>
+        <td>= Isis::ValidMaximum (Optional)</td></tr> 
+    <tr><td></td><td align="left">MinEmission </td>
+        <td>= 0 (Optional)</td></tr>
+    <tr><td></td><td align="left">MaxEmission </td>
+        <td>= 135 (Optional)</td></tr> 
+    <tr><td></td><td align="left">MinIncidence </td>
+        <td>= 0 (Optional)</td></tr>
+    <tr><td></td><td align="left">MaxIncidence </td>
+        <td>= 135 (Optional)</td></tr> 
+    <tr><td></td><td align="left">MinResolution </td>
+        <td>= 0 (Optional)</td></tr>
+    <tr><td></td><td align="left">MaxResolution </td>
+        <td>= DOUBLE_MAX (Optional)</td></tr> 
+    <tr><td></td><td align="left">PixelsFromEdge</td>
+        <td>= 0 (Optional) OR</td></tr> 
+    <tr><td></td><td align="left">MetersFromEdge</td>
+        <td>= 0 (Optional)</td></tr> 
+    <tr><th colspan="3" align="left">EndGroup</th><td></td></tr> 
+    </table><br/>
     Non-Tie Points and Points with no Measures will not be 
     processed and will be copied from the Original Control Net to the output. 
     Also Points originally Ignored will not be processed and will remain 
@@ -75,27 +85,49 @@
       for the interest to be considered a best interest. If the point must be 
       static then set the DeltaSamp and DeltaLine to zero.<br/> <br/>
       <b>Example:</b><br/> 
-      Group = Operator <br/> 
-      Name = StandardDeviation (Required)<br/> 
-      Samples = 10 (Required)<br/>
-      Lines = 10 (Required)<br/> 
-      DeltaLine  = 50 (Required)<br/> 
-      DeltaSamp = 50 (Required) <br/> 
-      MinimumInterest = 0.00001 (Required)<br/> 
-      MinDN = Isis::ValidMinimum(Optional)<br/> 
-      MaxDN = Isis::ValidMaximum(Optional)<br/>
-      MinEmission = 0 (Optional)<br/>
-      MaxEmission = 135 (Optional)<br/> 
-      MinIncidence = 0(Optional)<br/> 
-      MaxIncidence = 135(Optional)<br/>
-      MinResolution = 0(Optional)<br/>
-      MaxResolution = DOUBLE_MAX (Optional)<br/>
-      PixelsFromEdge= 0(Optional)<br/> 
-      MetersFromEdge= 0(Optional)<br/>
-      EndGroup<br/> <br/>
-      If the "Required" parameters are not entered or misspelt, then the 
-      application will throw an error. If "Optional" parameters are not entered 
-      or misspelt, then their default values will be used.  <br/> <br/> 
+      <table border="0" cellspacing="0" cellpadding="0">
+      <tr><th colspan="3" align="left">Group = Operator</th></tr>
+      <tr><td width="25"></td><td align="left">Name </td>
+        <td>= StandardDeviation (Required)</td></tr>
+      <tr><td width="25"></td><td align="left">Samples </td>
+        <td>= 10 (Required)</td></tr>
+      <tr><td width="25"></td><td align="left">Lines </td>
+        <td>= 10 (Required)</td></tr> 
+      <tr><td width="25"></td><td align="left">DeltaLine  </td>
+        <td>= 50 (Required)</td></tr> 
+      <tr><td width="25"></td><td align="left">DeltaSamp </td>
+        <td>= 50 (Required)</td></tr> 
+      <tr><td width="25"></td><td align="left">MinimumInterest </td>
+        <td>= 0.00001 (Required)</td></tr>
+      <tr><th colspan="3" align="left">EndGroup</th><td></td></tr> </table>
+              <br/> 
+      <table border="0" cellspacing="0" cellpadding="0">
+      <tr><th colspan="3" align="left">Group=ValidMeasure</th></tr>
+      <tr><td width="25"></td><td align="left">MinDN </td>
+        <td>= Isis::ValidMinimum (Optional)</td></tr>
+      <tr><td></td><td align="left">MaxDN </td>
+        <td>= Isis::ValidMaximum (Optional)</td></tr> 
+      <tr><td></td><td align="left">MinEmission </td>
+        <td>= 0 (Optional)</td></tr>
+      <tr><td></td><td align="left">MaxEmission </td>
+        <td>= 135 (Optional)</td></tr> 
+      <tr><td></td><td align="left">MinIncidence </td>
+        <td>= 0(Optional)</td></tr>
+      <tr><td></td><td align="left">MaxIncidence </td>
+        <td>= 135 (Optional)</td></tr> 
+      <tr><td></td><td align="left">MinResolution </td>
+        <td>= 0 (Optional)</td></tr>
+      <tr><td></td><td align="left">MaxResolution </td>
+        <td>= DOUBLE_MAX (Optional)</td></tr> 
+      <tr><td></td><td align="left">PixelsFromEdge</td>
+        <td>= 0 (Optional) OR</td></tr> 
+      <tr><td></td><td align="left">MetersFromEdge</td>
+        <td>= 0 (Optional)</td></tr> 
+      <tr><th colspan="3" align="left">EndGroup</th><td></td></tr> 
+      </table> <br/>
+    If the "Required" parameters are not entered or misspelt, then the 
+    application will throw an error. If "Optional" parameters are not entered 
+    or misspelt, then their default values will be used.  <br/> <br/> 
        
     The interest operator reads in a chip of size Delta Samples and Lines from 
     each measurement(cube) in a point.  If the Overlap list is included then 
