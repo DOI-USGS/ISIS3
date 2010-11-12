@@ -72,7 +72,6 @@ namespace Isis {
   * An example of the PVL required for this is:
   *
   * @code
-  * Object = InterestOperator
   *   Group = Operator
   *     Name      = StandardDeviation
   *     Samples   = 21
@@ -80,7 +79,6 @@ namespace Isis {
   *     DeltaLine = 50
   *     DeltaSamp = 25
   *   EndGroup
-  * EndObject
   * @endcode
   *
   * There are many other options that can be set via the pvl and are

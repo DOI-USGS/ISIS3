@@ -45,22 +45,6 @@ namespace Isis {
   class ControlPoint;
   class ControlMeasure;
 
-  typedef struct {
-    std::string msSerialNum;     //!< Serial Number of the Measure
-    double mdInterest;           //!< Resulting interest amt from InterestOperator
-    double mdBestSample;         //!< Most interesting sample
-    double mdBestLine;           //!< Most interesting line
-    double mdOrigSample;         //!< Control Measure's original sample
-    double mdOrigLine;           //!< Control Measure's original line
-    double mdEmission;           //!< Emission angle at most interesting sample,line
-    double mdIncidence;          //!< Incidence angle at most interesting sample,line
-    double mdDn;                 //!< Cube DN value at most interesting sample,line
-    double mdResolution;         //!< Camera resolution at most interesting sample,line
-    bool mbValid;                //!< Value of the interest operator result (success)
-    int  miDeltaSample;          //!< The number of Samples the point has been moved
-    int  miDeltaLine;            //!< The number of Lines the point has been moved
-  } InterestResults;
-
   /**
    * @brief Interest Operator class
    *
@@ -108,6 +92,8 @@ namespace Isis {
    *                      Options & Std Options Pixels/Meters from Edge
    *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control Net
    *  @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
+   *  @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private and
+   *                                        modify documentation of Parse function regarding deffile
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:
@@ -125,7 +111,7 @@ namespace Isis {
         return mOperatorGrp["Name"];
       };
 
-      //! Operate used by the app interestcube- to calculate interest by sample,line
+      //! Operate used b      y the app interestcube- to calculate interest by sample,line
       bool Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap, int piSample, int piLine);
 
       //! Operate - to calculate interest for entire control net to get better reference
@@ -200,10 +186,27 @@ namespace Isis {
       double p_minimumInterest;           //!< Specified in the Pvl Operator group
       Isis::ImageOverlapSet mOverlaps;    //!< Holds the overlaps from the Overlaplist
       bool mbOverlaps;                    //!< If Overlaplist exists
-      InterestResults *mtInterestResults; //!< Holds the results of an interest computation
       
       //! Specified in the Pvl Operator group for the box car size
       int p_deltaSamp, p_deltaLine, p_lines, p_samples; 
+      
+      //! Structure to hold Interest Results
+      typedef struct {
+        std::string msSerialNum;     //!< Serial Number of the Measure
+        double mdInterest;           //!< Resulting interest amt from InterestOperator
+        double mdBestSample;         //!< Most interesting sample
+        double mdBestLine;           //!< Most interesting line
+        double mdOrigSample;         //!< Control Measure's original sample
+        double mdOrigLine;           //!< Control Measure's original line
+        double mdEmission;           //!< Emission angle at most interesting sample,line
+        double mdIncidence;          //!< Incidence angle at most interesting sample,line
+        double mdDn;                 //!< Cube DN value at most interesting sample,line
+        double mdResolution;         //!< Camera resolution at most interesting sample,line
+        bool mbValid;                //!< Value of the interest operator result (success)
+        int  miDeltaSample;          //!< The number of Samples the point has been moved
+        int  miDeltaLine;            //!< The number of Lines the point has been moved
+      }InterestResults;
+      InterestResults *mtInterestResults; //!< Holds the results of an interest computation
   };
 };
 
