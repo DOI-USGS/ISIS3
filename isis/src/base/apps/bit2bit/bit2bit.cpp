@@ -31,8 +31,8 @@ void IsisMain(){
   */  
   Histogram* histptr = cubeptr -> Histogram();
   
-  double maxper = histptr -> Percent(ui.GetDouble("MPER"));
-  double minper = histptr -> Percent(ui.GetDouble("LPER"));
+  double maxper = histptr -> Percent(ui.GetDouble("MAXPER"));
+  double minper = histptr -> Percent(ui.GetDouble("MINPER"));
   double validMin = Isis::ValidMinimum;
   double validMax = Isis::ValidMaximum;
   

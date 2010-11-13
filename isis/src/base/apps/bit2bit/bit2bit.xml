@@ -13,13 +13,13 @@
       Since the pixel type will typically be modified with this procedure,
       if a non-32 bit output is selected some binning will be done to accomodate 
       the output data's new bit type. To minimize over or underbinning, the user 
-      can choose values LPER and MPER or MIN and MAX to clip the original 
-      data set. LPER and MPER denote minimum and maximum percentages on the 
+      can choose values MINPER and MAXPER or MIN and MAX to clip the original 
+      data set. MINPER and MAXPER denote minimum and maximum percentages on the 
       cumulative histogram of the incoming cube data that you wish to be 
       represented in the output cube. MIN and MAX represent the minimum and maximum 
       pixel values you wish to have represented in the output cube. All pixels under 
-      MIN or LPER get set to LRS in the output cube while all pixels over MAX or 
-      MPER get mapped to HRS.
+      MIN or MINPER get set to LRS in the output cube while all pixels over MAX or 
+      MAXPER get mapped to HRS.
     </p>
     <p>
       Why would one wish to clip data off a perfectly good cube? The example below
@@ -39,14 +39,14 @@
     <br/>
     <p>
       To minimize over or under binning in the output image, the user can chose to only accept data within 
-      the range bounded by LPER and MPER on the cumulative histogram. In the example above, if the user 
-      set LPER=0 and MPER=97.5, the 8-bit range (including base and multiplier) would include DN's in the range
+      the range bounded by MINPER and MAXPER on the cumulative histogram. In the example above, if the user 
+      set MINPER=0 and MAXPER=97.5, the 8-bit range (including base and multiplier) would include DN's in the range
       10,000 to 12,500. A DN above 12500 would be set as the special pixel HRS.
     </p>
     <p>
       Any data that gets scaled out of range gets converted to the special pixels LRS (if the DN is <i>below</i> the
-      value corresponding to the <i>minimum</i> percentile specified by LPER) or HRS (if the DN is <i>above</i> the
-      value corresponding to the <i>maximum</i> percentile specified by MPER).
+      value corresponding to the <i>minimum</i> percentile specified by MINPER) or HRS (if the DN is <i>above</i> the
+      value corresponding to the <i>maximum</i> percentile specified by MAXPER).
      </p>
   </description>
 
@@ -126,10 +126,8 @@
 	    floats in the output cube.
 	  </description>
 	  <exclusions>
-	    <item>LPER</item>
-	    <item>MPER</item>
-	    <item>MIN</item>
-	    <item>MAX</item>
+      <item>MINPER</item>
+	    <item>MAXPER</item>
 	  </exclusions>
 	</option>  
 	</list>
@@ -164,8 +162,8 @@
 	    Clip by Min/Max pixel values
 	  </description>
 	  <exclusions>
-	    <item>LPER</item>
-	    <item>MPER</item>
+	    <item>MINPER</item>
+	    <item>MAXPER</item>
 	  </exclusions>
 	</option>
 	</list>
@@ -173,7 +171,7 @@
     </group>
       
     <group name="Extrema">
-      <parameter name="LPER">
+      <parameter name="MINPER">
         <type>double</type>
 	<minimum inclusive="yes">0.0</minimum>
         <default><item>0.5</item></default>
@@ -182,11 +180,11 @@
         </brief>
         <description>
           Choose the minimum percentile to represent from the cumulative data histogram of the pixel values from the incoming cube.
-	  For example: The default LPER value of .5 will discard the lowest .5% of the data values from the incoming cube.
+	  For example: The default MINPER value of .5 will discard the lowest .5% of the data values from the incoming cube.
         </description>
       </parameter>
       
-      <parameter name="MPER">
+      <parameter name="MAXPER">
         <type>double</type>
 	<maximum inclusive="yes">100.0</maximum>
         <default><item>99.5</item></default>
@@ -195,7 +193,7 @@
         </brief>
         <description>
           Choose the maximum percentile to represent from the cumulative data histogram of the pixel values from the incoming cube.
-	  For example: The default MPER value of 99.5 will discard the upper .5% of the data values from the incoming cube.
+	  For example: The default MAXPER value of 99.5 will discard the upper .5% of the data values from the incoming cube.
         </description>
       </parameter> 
       
