@@ -323,7 +323,7 @@ namespace Qisis {
       if(ieline > vp->cubeLines()) ieline = vp->cubeLines();
 
       //If the rectangle is completely out of bounds on either side, display an error and return
-      if(issamp == iesamp || isline == ieline) {
+      if(issamp > iesamp || isline > ieline) {
         QMessageBox::information((QWidget *)parent(),
                                  "Error", "Rectangle is out of bounds");
         return;
