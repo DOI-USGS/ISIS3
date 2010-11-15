@@ -72,6 +72,8 @@ namespace Qisis {
    *           discarding changes to the current cube.
    *  @history 2010-06-26 Eric Hyer - uses MdiCubeViewport instead of
    *           CubeViewport.  Fixed many include issues but some still remain!
+   *  @history 2010-11-15 Eric Hyer - valid rectangle dimensions for banding
+   *               must now be >= 1 instead of >= 5
    *
    */
   class EditTool : public Qisis::Tool {

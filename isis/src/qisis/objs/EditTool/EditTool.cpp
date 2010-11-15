@@ -290,16 +290,19 @@ namespace Qisis {
                                "Error", "Cannot edit in color mode");
       return;
     }
-
+    
     int issamp, isline, iesamp, ieline;
     double ssamp, sline, esamp, eline;
     QList<QPoint *> *linePts = NULL;
 
     // Rectangle is selected
     if(p_shapeComboBox->currentIndex() == Rectangle) {
+
       if(!RubberBandTool::isValid()) return;
+      
       QRect r = RubberBandTool::rectangle();
-      if((r.width() < 5) || (r.height() < 5)) return;
+      if((r.width() < 1) || (r.height() < 1)) return;
+
       vp->viewportToCube(r.left(), r.top(), ssamp, sline);
       vp->viewportToCube(r.right(), r.bottom(), esamp, eline);
 
