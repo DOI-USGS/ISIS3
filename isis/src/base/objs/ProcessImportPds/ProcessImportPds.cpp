@@ -327,7 +327,13 @@ namespace Isis {
       Isis::iString dataFile;
       dataFile = pdsXlater.Translate("DataFilePointer", 0);
       Isis::Filename lfile(p_labelFile);
-      Isis::Filename ifile(lfile.Path() + "/" + dataFile);
+      
+      Isis::Filename ifile;
+      if (dataFile.size() && dataFile.at(0) == '/')
+        ifile = dataFile;
+      else
+        ifile = lfile.Path() + "/" + dataFile;
+                
       if(ifile.Exists()) {
         SetInputFile(ifile.Expanded());
       }

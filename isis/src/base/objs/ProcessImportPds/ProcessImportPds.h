@@ -170,6 +170,8 @@ namespace Isis {
    *  @history 2010-08-27 Steven Lambright - Longitude domain correction added 
    *                          for center and pole longitude keywords in PDS
    *                          projections
+   *  @history 2010-11-17 Eric Hyer - Inside ProcessPdsImageLabel method
+   *               Absolute paths are now supported for the ^IMAGE Keyword
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
