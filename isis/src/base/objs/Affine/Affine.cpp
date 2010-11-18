@@ -188,9 +188,8 @@ namespace Isis {
     scale[1][1] = scaleFactor;
     p_matrix = TNT::matmult(scale, p_matrix);
 
-    scale[0][0] = scaleFactor;
-    scale[1][1] = scaleFactor;
-    p_invmat = TNT::matmult(p_invmat, scale);
+    // Invert for inverse translation
+    p_invmat = invert(p_matrix);
   }
 
   /**

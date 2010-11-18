@@ -72,6 +72,8 @@ namespace Isis {
    *          constructor that accepts an AMatrix; added static method to return
    *          an Affine identity matrix; added methods to retrieve forward and
    *          inverse AMatrixs; added new method that inverts the matrix.
+   * @history 2010-11-18 Kris Becker Fixed bug in inverse representation when 
+   *          scaling is applied to the current transform.
    *
    */
 

@@ -75,3 +75,12 @@ Inverse: 3.0,1.0
 1.0
 3.0
 ---
+
+Scale by factor 2
+Forward: 1.0, 3.0
+6.0
+2.0
+Inverse: 6.0,2.0
+1.0
+3.0
+---

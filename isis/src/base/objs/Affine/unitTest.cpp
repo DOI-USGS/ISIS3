@@ -128,5 +128,17 @@ int main() {
   std::cout <<  std::fixed << b.y() << std::endl;
   std::cout << "---" << std::endl;
 
+  // Test scale
+  std::cout << "\nScale by factor 2\n";
+  b.Scale(2.0);
+  std::cout << "Forward: 1.0, 3.0\n";
+  b.Compute(1.0, 3.0);
+  std::cout <<  std::fixed << b.xp() << std::endl;
+  std::cout <<  std::fixed << b.yp() << std::endl;
+  std::cout << "Inverse: " << b.xp() << "," << b.yp() << std::endl;
+  b.ComputeInverse(b.xp(), b.yp());
+  std::cout <<  std::fixed << b.x() << std::endl;
+  std::cout <<  std::fixed << b.y() << std::endl;
+  std::cout << "---" << std::endl;
 
 }
