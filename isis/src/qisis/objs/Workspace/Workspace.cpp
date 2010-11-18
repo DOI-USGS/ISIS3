@@ -187,8 +187,8 @@ namespace Qisis {
 
   void Workspace::addBrowseView(QString cubename) {
     /* Close the last browse window if necessary.  */
-    if(subWindowList().size() > 0) {
-      removeSubWindow(subWindowList()[0]);
+    if (subWindowList().size()) {
+      removeSubWindow(subWindowList()[subWindowList().size() - 1]);
     }
 
     addCubeViewport(cubename);

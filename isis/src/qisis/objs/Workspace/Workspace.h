@@ -59,6 +59,8 @@ namespace Qisis {
   * @history 2010-04-08 Steven Lambright and Eric Hyer - Added progress bar
   * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
   *          CubeViewport.  Also fixed include issues.
+  * @history 2010-11-18 Eric Hyer - addBrowseView now deletes the last viewport
+  *              in the subWindowList instead of the first one
   */
   class Workspace : public QMdiArea {
       Q_OBJECT
