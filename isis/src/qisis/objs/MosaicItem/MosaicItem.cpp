@@ -82,6 +82,9 @@ namespace Qisis {
     }
 
     setAcceptHoverEvents(true);
+    
+    setFootprintVisible(false);
+    setOutlineVisible(true);
   }
 
 
