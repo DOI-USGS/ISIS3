@@ -156,6 +156,8 @@ namespace Isis {
       void LocalPhotometricAngles(Angle & phase, Angle & emission,
                                   Angle & incidence);
 
+      void GetLocalNormal(double normal[3]);
+
       /**
        * Checks to see if the camera object has a projection
        *
@@ -490,10 +492,6 @@ namespace Isis {
       // slant range changes.
       friend class RadarGroundMap;
       friend class RadarSlantRangeMap;
-      
-      
-    private:
-      void GetLocalNormal(double normal[3]);
       
       
     private:
