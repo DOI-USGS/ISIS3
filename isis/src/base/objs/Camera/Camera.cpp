@@ -831,11 +831,13 @@ namespace Isis {
     for (int i = 0; i < surroundingPoints.size(); i ++) {
       SetImage(surroundingPoints[i].first, surroundingPoints[i].second);
     
-      Angle demLat(p_latitude, Angle::Degrees);
-      Angle demLon(p_longitude, Angle::Degrees);
+      double demLat = p_latitude;
+      double demLon = p_longitude;
       double demRadius = DemRadius(demLat, demLon);
       
-      latrec_c(demRadius, demLon.GetRadians(), demLat.GetRadians(), lookVects[i]);
+      demLat = p_latitude * Isis::PI/180.0;
+      demLon = p_longitude * Isis::PI/180.0;
+      latrec_c(demRadius, demLon, demLat, lookVects[i]);
     }
     
     // subtract bottom from top and left from right and store results
@@ -854,14 +856,13 @@ namespace Isis {
       // throw exception
     }
     
-    double centerLookVect[3];
-    LookDirection(centerLookVect);
-    
     // Check to make sure that the normal is pointing outward from the planet
     // surface. This is done by taking the dot product of the normal and 
-    // any one of the unitized xyz vectors. If the normal is pointing inward, 
-    // then negate it.
-    unorm_c(centerLookVect, centerLookVect, &mag);
+    // the look vector. If the normal is pointing inward, then negate
+    // it.
+    double centerLookVect[3];
+    SetImage(originalSample, originalLine);
+    unorm_c(p_pB, centerLookVect, &mag);
     double dotprod = vdot_c(normal,centerLookVect);
     if (dotprod < 0.0)
       vminus_c(normal, normal);
@@ -876,7 +877,7 @@ namespace Isis {
     
     // free memory
     for (int i = 0; i < lookVects.size(); i++)
-      delete lookVects[i];
+      delete [] lookVects[i];
   }
   
   
