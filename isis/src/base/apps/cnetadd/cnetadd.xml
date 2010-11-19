@@ -57,6 +57,10 @@
       Added an error message  when RETREIVAL=POINT is used but lat/lon values
       are absent from the points.
     </change>
+    <change name="Christopher Austin" date="2010-11-19">
+      Added the DEFFILE option and test, similar to cnetref. Logging still needs
+      to be done.
+    </change>
   </history>
 
   <groups>
@@ -227,6 +231,21 @@
           </list>
         </parameter>
 
+        <parameter name="DEFFILE">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <internalDefault>None</internalDefault>
+          <brief>
+            PVL file containing the description of the Validity Keywords
+          </brief>
+          <description>
+            PVL file containing the description of the Validity Keywords
+          </description>
+          <filter>
+            *.def *.pvl
+          </filter>
+        </parameter>
+        
         <parameter name="MODIFIEDPOINTS">
           <type>filename</type>
           <fileMode>input</fileMode>

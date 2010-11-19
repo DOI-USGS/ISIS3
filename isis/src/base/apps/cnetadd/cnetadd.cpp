@@ -1,29 +1,31 @@
 #include "Isis.h"
 
-#include "UserInterface.h"
+#include "CameraFactory.h"
+#include "ControlNet.h"
+#include "ControlNetValidMeasure.h"
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
+#include "CubeManager.h"
 #include "FileList.h"
 #include "Filename.h"
+#include "iException.h"
+#include "iTime.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Pvl.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
-#include "CameraFactory.h"
-#include "ControlNet.h"
-#include "ControlPoint.h"
-#include "ControlMeasure.h"
-#include "iException.h"
-#include "CubeManager.h"
-#include "iTime.h"
+#include "UserInterface.h"
 
 #include <map>
 #include <set>
 
-using namespace std;
 using namespace Isis;
 
 void SetControlPointLatLon(const std::string &incubes, const std::string &cnet);
 
 std::map< std::string, std::pair<double, double> > p_pointLatLon;
-std::map< int, set<std::string> > p_modifiedMeasures;
+std::map< int, std::set<std::string> > p_modifiedMeasures;
 
 void IsisMain() {
 
@@ -44,7 +46,14 @@ void IsisMain() {
   PvlKeyword omitted("FilesOmitted");
   PvlKeyword pointsModified("PointsModified");
 
-  string retrievalOpt = ui.GetString("RETRIEVAL");
+  bool checkMeasureValidity = ui.WasEntered("DEFFILE");
+  ControlNetValidMeasure validator;
+  if(checkMeasureValidity) {
+    Pvl deffile(ui.GetFilename("DEFFILE"));
+    validator = ControlNetValidMeasure(deffile);
+  }
+
+  std::string retrievalOpt = ui.GetString("RETRIEVAL");
   PvlKeyword duplicates("DupSerialNumbers");
   if(retrievalOpt == "REFERENCE") {
     FileList list1(ui.GetFilename("FROMLIST"));
@@ -62,7 +71,7 @@ void IsisMain() {
       // Check for duplicate SNs within the addlist
       for(int j = i + 1; j < addSerials.Size(); j++) {
         if(addSerials.SerialNumber(i) == addSerials.SerialNumber(j)) {
-          string msg = "Add list files [" + addSerials.Filename(i) + "] and [";
+          std::string msg = "Add list files [" + addSerials.Filename(i) + "] and [";
           msg += addSerials.Filename(j) + "] share the same serial number.";
           throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
         }
@@ -82,8 +91,7 @@ void IsisMain() {
 
   ControlNet inNet = ControlNet(ui.GetFilename("INNET"));
   inNet.SetUserName(Isis::Application::UserName());
-  //inNet.SetCreatedDate( Isis::Application::DateTime() );    //This should be done in ControlNet's Write fn
-  inNet.SetModifiedDate(Isis::iTime::CurrentLocalTime());
+  inNet.SetModifiedDate(Isis::iTime::CurrentLocalTime());     //This should be done in ControlNet's Write fn
 
   Progress progress;
   progress.SetText("Adding Images");
@@ -91,16 +99,17 @@ void IsisMain() {
   progress.CheckStatus();
 
   // loop through all the images
-  vector<int> modPoints;
+  std::vector<int> modPoints;
   for(unsigned int img = 0; img < list2.size(); img++) {
-    Pvl cubepvl;
     bool imageAdded = false;
-    cubepvl.Read(list2[img]);
-    Camera *cam = CameraFactory::Create(cubepvl);
+    Cube cube;
+    cube.Open(list2[img]);
+    Pvl *cubepvl = cube.Label();
+    Camera *cam = cube.Camera();
 
     //loop through all the control points
     for(int cp = 0; cp < inNet.Size(); cp++) {
-      ControlPoint point(inNet[cp]);
+      ControlPoint &point(inNet[cp]);
 
       double latitude;
       double longitude;
@@ -126,10 +135,10 @@ void IsisMain() {
 
         // Make sure the samp & line are inside the image
         if(cam->InCube()) {
+          std::string sn = SerialNumber::Compose(* cubepvl);
 
           // If there are duplicate serial numbers in the addlist, prevent double adding
           if(hasDuplicateSerialNumbers) {
-            std::string sn = SerialNumber::Compose(cubepvl);
             bool hasSerialNumber = false;
 
             for(int cm = 0; cm < point.Size() && !hasSerialNumber; cm ++) {
@@ -138,6 +147,8 @@ void IsisMain() {
               }
             }
 
+            // if the current Control Point contains this image,
+            // continue on to the next Control Point
             if(hasSerialNumber) {
               continue;
             }
@@ -145,19 +156,49 @@ void IsisMain() {
 
           ControlMeasure newCm;
           newCm.SetCoordinate(cam->Sample(), cam->Line(), ControlMeasure::Estimated);
-          newCm.SetCubeSerialNumber(SerialNumber::Compose(cubepvl));
+          newCm.SetCubeSerialNumber(sn);
           newCm.SetDateTime();
           newCm.SetChooserName("Application cnetadd");
-          inNet[cp].Add(newCm);
+
+          // Check the measure for DEFFILE validity
+          if(checkMeasureValidity) {
+            if(!validator.ValidEmissionAngle(cam->EmissionAngle())) {
+              //TODO: log that it was Emission Angle that failed the check
+              newCm.SetIgnore(true);
+            }
+            else if(!validator.ValidIncidenceAngle(cam->IncidenceAngle())) {
+              //TODO: log that it was Incidence Angle that failed the check
+              newCm.SetIgnore(true);
+            }
+            else if(!validator.ValidResolution(cam->Resolution())) {
+              //TODO: log that it was Resolution that failed the check
+              newCm.SetIgnore(true);
+            }
+            else if(!validator.PixelsFromEdge((int)cam->Sample(), (int)cam->Line(), &cube)) {
+              //TODO: log that it was Pixels from Edge that failed the check
+              newCm.SetIgnore(true);
+            }
+            else {
+              Isis::Portal portal(1, 1, cube.PixelType());
+              portal.SetPosition(cam->Sample(), cam->Line(), 1);
+              cube.Read(portal);
+              if(!validator.ValidDnValue(portal[0])) {
+                //TODO: log that it was DN that failed the check
+                newCm.SetIgnore(true);
+              }
+            }
+          }
+
+          point.Add(newCm);
+
           // Record the modified Point and Measure
           p_modifiedMeasures[cp].insert(newCm.CubeSerialNumber());
 
           if(retrievalOpt == "POINT" && inNet[cp].Size() == 1) {
-            inNet[cp].SetIgnore(false);
+            point.SetIgnore(false);
           }
 
           if(log) {
-
             // If we can't find this control point in the list of control points
             // that have already been modified, then add it to the list
             bool doesntContainPoint = true;
@@ -174,7 +215,7 @@ void IsisMain() {
       }
     }
 
-    delete cam;
+    cubepvl = NULL;
     cam = NULL;
 
     if(log) {
@@ -184,6 +225,7 @@ void IsisMain() {
 
     progress.CheckStatus();
   }
+
 
   if(log) {
 
@@ -224,9 +266,9 @@ void IsisMain() {
     Filename pointList(ui.GetFilename("MODIFIEDPOINTS"));
 
     // Set up the output file for writing
-    ofstream out_stream;
+    std::ofstream out_stream;
     out_stream.open(pointList.Expanded().c_str(), std::ios::out);
-    out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
+    out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     for(std::map< int, std::set<std::string> >::iterator it = p_modifiedMeasures.begin();
         it != p_modifiedMeasures.end(); it ++) {
@@ -239,7 +281,7 @@ void IsisMain() {
   // Modify the inNet to only have modified points/measures
   if(ui.GetString("EXTRACT") == "MODIFIED") {
     for(int cp = inNet.Size() - 1; cp >= 0; cp --) {
-      std::map< int, set<std::string> >::iterator it = p_modifiedMeasures.find(cp);
+      std::map< int, std::set<std::string> >::iterator it = p_modifiedMeasures.find(cp);
       // If the point was not modified, delete
       if(it == p_modifiedMeasures.end()) {
         inNet.Delete(cp);
@@ -272,7 +314,7 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
   ControlNet net(cnet);
 
   CubeManager manager;
-  manager.SetNumOpenCubes(50); //Should keep memory usage to around 1GB
+  manager.SetNumOpenCubes(50);   //Should keep memory usage to around 1GB
 
   Progress progress;
   progress.SetText("Calculating Lat/Lon");
