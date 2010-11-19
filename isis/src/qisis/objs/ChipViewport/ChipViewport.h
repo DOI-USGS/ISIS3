@@ -32,6 +32,11 @@
 #include "iException.h"
 #include "Histogram.h"
 
+
+namespace Isis {
+  class ControlNet;
+}
+
 class QImage;
 
 namespace Qisis {
@@ -49,7 +54,9 @@ namespace Qisis {
     *                        rotateChip() and reloadChip() to catch possible
     *                        iExceptions from Chip's Load() method and display
     *                        Error in QMessageBox
-    *
+    * @history 2010-11-17 Eric Hyer - Added cubeToViewport method and
+    *              setControlNet slot.  paintEvent can now use the control net
+    *              to paint measures in the viewport.
     */
 
   class ChipViewport : public QWidget {
@@ -59,6 +66,8 @@ namespace Qisis {
     public:
       ChipViewport(int width, int height, QWidget *parent = 0);
       ~ChipViewport();
+      
+      bool cubeToViewport(double samp, double line, int & x, int & y);
 
       //!  Set chip
       void setChip(Isis::Chip *chip, Isis::Cube *chipCube);
@@ -124,6 +133,17 @@ namespace Qisis {
       void zoom1();
 
       void refreshView(double tackSample, double tackLine);
+      
+      /**
+       * sets the ControlNet to be used for drawing measure locations
+       *
+       * @param newControlNet The new ControlNet to be used
+       */ 
+      void setControlNet(Isis::ControlNet * newControlNet) {
+        p_controlNet = newControlNet;
+      }
+      
+
 
     protected:
       void paintEvent(QPaintEvent *e);
@@ -174,7 +194,15 @@ namespace Qisis {
       int p_circleSize;//!<Circle size
 
       ChipViewport *p_tempView;//!< Temporary viewport
-
+      
+      // The ControlNet pointed to by this pointer is not owned by this class!
+      // It is ok for p_controlNet to be NULL any time.  If it is not NULL then
+      // it is used to paint measures in the viewport.
+      //
+      // After construction, it is the responsibility of the user of this class
+      // to maintain this pointer with the setControlNet method (to make sure
+      // that either NULL or a valid ControlNet is being pointed to).
+      Isis::ControlNet * p_controlNet;
   };
 };
 

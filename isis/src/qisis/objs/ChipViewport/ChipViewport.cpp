@@ -3,6 +3,13 @@
 #include <QMessageBox>
 #include <QPainter>
 
+#include "ControlNet.h"
+#include "ControlPoint.h"
+#include "Cube.h"
+#include "SerialNumber.h"
+
+
+
 namespace Qisis {
 
   //!  Construct an empty viewport
@@ -26,6 +33,7 @@ namespace Qisis {
     p_matchChip = NULL;
     p_matchChipCube = NULL;
     p_image = NULL;
+    p_controlNet = NULL;
   }
 
 
@@ -35,6 +43,27 @@ namespace Qisis {
    */
   ChipViewport::~ChipViewport() {
 
+  }
+  
+  
+  /**
+   * get viewport x and y from cube sample and line
+   *
+   * @param samp Sample in cube
+   * @param line Line in cube
+   * @param x calcualated viewport x coordinate
+   * @param y calcualated viewport y coordinate
+   *
+   * @returns True if the point is contained in the viewport, false otherwise
+   */ 
+  bool ChipViewport::cubeToViewport(double samp, double line,
+      int & x, int & y) {
+      
+    p_chip->SetCubePosition(samp, line);
+    x = (int) p_chip->ChipSample();
+    y = (int) p_chip->ChipLine();
+    
+    return p_chip->IsInsideChip(samp, line);
   }
 
 
@@ -143,9 +172,50 @@ namespace Qisis {
 
     if(p_circle == true) {
       painter.setPen(Qt::red);
-      painter.drawEllipse((p_height - 1) / 2 - p_circleSize / 2, (p_width - 1) / 2 - p_circleSize / 2,
+      painter.drawEllipse((p_height - 1) / 2 - p_circleSize / 2,
+                          (p_width - 1) / 2 - p_circleSize / 2,
                           p_circleSize, p_circleSize);
     }
+    
+    // draw measure locations if we have a control network
+    if (p_controlNet)
+    {
+      string serialNumber = Isis::SerialNumber::Compose(*p_chipCube);
+      
+      // loop through all points in the control net
+      for (int i = 0; i < p_controlNet->Size(); i++) {
+        Isis::ControlPoint &p = (*p_controlNet)[i];
+  
+        // if this point is contained in the image
+        if (p.HasSerialNumber(serialNumber))
+        {
+          // Find the measurments on the viewport
+          double samp = p[serialNumber].Sample();
+          double line = p[serialNumber].Line();
+          int x,y;
+          
+          cubeToViewport(samp, line, x, y);
+          
+          // Determine pen color
+          // if the point or measure is ignored set to yellow
+          if (p.Ignore() || (!p.Ignore() && p[serialNumber].Ignore())) {
+            painter.setPen(QColor(255,255,0)); // set point marker yellow
+          }
+          // check for ground measure
+          else if (p.Type() == Isis::ControlPoint::Ground) {
+            painter.setPen(Qt::magenta);// set point marker magenta
+          }
+          else {
+            painter.setPen(Qt::green); // set all other point markers green
+          }
+          
+          // draw points
+          painter.drawLine(x - 5, y, x + 5, y);
+          painter.drawLine(x, y - 5, x, y + 5);
+        }
+      }
+    }
+    
     p_tempView = NULL;
     //painter.end();
 
@@ -468,6 +538,7 @@ namespace Qisis {
     else {
       try {
         p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
+        //cerr << "ChipViewport::reloadChip... p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor) called\n";
       }
       catch(Isis::iException &e) {
         QString msg = "Cannot reload chip.\n";
