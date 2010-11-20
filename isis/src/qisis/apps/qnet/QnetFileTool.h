@@ -23,12 +23,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "ControlPoint.h"
 #include "FileTool.h" // parent
 
 // forward declarations
 class QString;
 class QWidget;
+
+namespace Isis {
+  class ControlNet;
+  class ControlPoint;
+}
+
 
 namespace Qisis {
 
@@ -70,6 +75,7 @@ namespace Qisis {
     signals:
       void serialNumberListUpdated();
       void controlNetworkUpdated(QString cNetName);
+      void newControlNetwork(Isis::ControlNet *);
 
     public:
       QnetFileTool(QWidget *parent);

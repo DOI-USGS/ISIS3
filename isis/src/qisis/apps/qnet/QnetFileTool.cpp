@@ -151,6 +151,7 @@ namespace Qisis {
 
     emit serialNumberListUpdated();
     emit controlNetworkUpdated(cNetFilename);
+    emit newControlNetwork(g_controlNetwork);
     QApplication::restoreOverrideCursor();
     return;
   }

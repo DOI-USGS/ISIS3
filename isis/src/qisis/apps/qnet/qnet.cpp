@@ -165,6 +165,8 @@ int main(int argc, char *argv[]) {
     // 2008-11-26 Jeannie Walldren
     QObject::connect(ftool, SIGNAL(controlNetworkUpdated(QString)),
                      qnetTool, SLOT(updateNet(QString)));
+    QObject::connect(ftool, SIGNAL(newControlNetwork(Isis::ControlNet *)),
+                     qnetTool, SIGNAL(newControlNetwork(Isis::ControlNet *)));
     QObject::connect(qnetTool, SIGNAL(editPointChanged(string)),
                      ntool, SLOT(updateEditPoint(string)));
     QObject::connect(qnetTool, SIGNAL(refreshNavList()),

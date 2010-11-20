@@ -216,8 +216,10 @@ namespace Qisis {
     connect(p_rightCombo, SIGNAL(activated(int)),
             this, SLOT(selectRightMeasure(int)));
 
-    p_pointEditor = new Qisis::ControlPointEdit(parent);
+    p_pointEditor = new Qisis::ControlPointEdit(g_controlNetwork, parent);
     gridLayout->addWidget(p_pointEditor, row++, 0, 1, 3);
+    connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
+            p_pointEditor, SIGNAL(newControlNetwork(Isis::ControlNet *)));
     connect(p_pointEditor, SIGNAL(pointSaved()), this, SLOT(pointSaved()));
     p_pointEditor->show();
 //    connect(this,SIGNAL(modifyPoint(Isis::ControlPoint *)),

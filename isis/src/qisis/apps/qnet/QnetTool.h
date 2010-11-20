@@ -20,6 +20,14 @@ class QStackedWidget;
 class QString;
 class QWidget;
 
+namespace Isis {
+  class ControlMeasure;
+  class ControlNet;
+  class ControlPoint;
+  class Cube;
+  class UniversalGroundMap;
+}
+
 using namespace std;
 
 namespace Qisis {
@@ -132,6 +140,7 @@ namespace Qisis {
       void ignoreLeftChanged();
       void ignoreRightChanged();
       void showNavTool();
+      void newControlNetwork(Isis::ControlNet *);
 
     public slots:
       void updateList();

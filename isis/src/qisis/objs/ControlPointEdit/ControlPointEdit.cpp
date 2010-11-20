@@ -45,7 +45,8 @@ namespace Qisis {
    *                            string to Isis::iException::Message before
    *                            creating QMessageBox
    */
-  ControlPointEdit::ControlPointEdit(QWidget *parent, bool allowLeftMouse) : QWidget(parent) {
+  ControlPointEdit::ControlPointEdit(Isis::ControlNet * cnet, QWidget *parent,
+      bool allowLeftMouse) : QWidget(parent) {
 
     p_rotation = 0;
     p_timerOn = false;
@@ -74,6 +75,7 @@ namespace Qisis {
     }
 
     createPointEditor(parent);
+    emit newControlNetwork(cnet);
   }
 
 
@@ -242,6 +244,9 @@ namespace Qisis {
     if(!p_allowLeftMouse) p_leftView->setDisabled(true);
 
     gridLayout->addWidget(p_leftView, row, 0);
+    
+    connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
+            p_leftView, SLOT(setControlNet(Isis::ControlNet *)));
 
     //  Connect left zoom buttons to ChipViewport's zoom slots
     connect(leftZoomIn, SIGNAL(clicked()), p_leftView, SLOT(zoomIn()));
@@ -272,6 +277,10 @@ namespace Qisis {
 
     p_rightView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
     gridLayout->addWidget(p_rightView, row, 1);
+    
+    connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
+            p_rightView, SLOT(setControlNet(Isis::ControlNet *)));
+            
     //  Connect the ChipViewport tackPointChanged signal to
     //  the update sample/line label
     connect(p_rightView, SIGNAL(tackPointChanged(double)),

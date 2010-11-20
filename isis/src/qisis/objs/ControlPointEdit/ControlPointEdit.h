@@ -22,6 +22,7 @@ namespace Isis {
   class AutoReg;
   class Chip;
   class ControlMeasure;
+  class ControlNet;
   class Cube;
   class UniversalGroundMap;
 }
@@ -75,12 +76,15 @@ namespace Qisis {
     *                          load left or right chip
     *   @history 2010-06-26 Eric Hyer - now uses MdiCubeViewport instead of
     *                          CubeViewport.  Fixed multiple include problems.
+    *   @history 2010-11-17 Eric Hyer - now forwards new ControlNets to the
+    *                          ChipViewports
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT
 
     public:
-      ControlPointEdit(QWidget *parent = 0, bool allowLeftMouse = false);
+      ControlPointEdit(Isis::ControlNet * cnetQ, QWidget *parent = 0,
+                       bool allowLeftMouse = false);
       std::string templateFilename() {
         return p_templateFilename;
       };
@@ -91,6 +95,7 @@ namespace Qisis {
       void updateLeftView(double sample, double line);
       void updateRightView(double sample, double line);
       void pointSaved();
+      void newControlNetwork(Isis::ControlNet *);
 
     public slots:
       void setLeftMeasure(Isis::ControlMeasure *leftMeasure,
