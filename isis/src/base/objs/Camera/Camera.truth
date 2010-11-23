@@ -248,3 +248,92 @@ SetUniversalGround (cam2->UniversalLatitude(), cam2->UniversalLongitude()): 1
 Sample = 192
 Line = 144
 
+Test Local Photometric Angles...
+
+Flat DEM Surface...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = 0.03228, 0.1276, -0.9913
+Phase = 57.32
+Emission = 59.59
+Incidence = 2.835
+
+45 Degree DEM Surface Facing Left...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = 0.7105, -0.08428, -0.6986
+Phase = 57.32
+Emission = 60.94
+Incidence = 46.41
+
+45 Degree DEM Surface Facing Top...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = 0.1945, 0.7705, -0.607
+Phase = 57.32
+Emission = 17.41
+Incidence = 42.49
+
+45 Degree DEM Surface Facing Right...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = -0.6648, 0.264, -0.6988
+Phase = 57.32
+Emission = 76.83
+Incidence = 44.07
+
+45 Degree DEM Surface Facing Bottom...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = -0.1491, -0.5904, -0.7932
+Phase = 57.32
+Emission = 103.8
+Incidence = 47.67
+
+80 Degree DEM Surface Facing Left...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = 0.9617, -0.2209, -0.1622
+Phase = 57.32
+Emission = 74.77
+Incidence = 81.75
+
+80 Degree DEM Surface Facing Top...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = 0.2423, 0.9696, -0.03452
+Phase = 57.32
+Emission = 23.84
+Incidence = 77.87
+
+80 Degree DEM Surface Facing Right...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = -0.9512, 0.2624, -0.1626
+Phase = 57.32
+Emission = 95.57
+Incidence = 79.42
+
+80 Degree DEM Surface Facing Bottom...
+Sample = 625
+Line = 575
+SetImage (sample, line): 1
+Normal = -0.231, -0.9267, -0.2965
+Phase = 57.32
+Emission = 138.2
+Incidence = 82.91
+
+Point Does Not Intersect DEM...
+Sample = 1
+Line = 1
+SetImage (sample, line): 0
+Normal = 0, 0, 0
+Angles could not be calculated.
