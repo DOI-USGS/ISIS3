@@ -13,6 +13,7 @@ class QToolButton;
 
 namespace Isis {
   class Cube;
+  class CubeViewport;
   class Histogram;
   class Statistics;
   class Stretch;
@@ -72,7 +73,10 @@ namespace Qisis {
    *             - Added RGB support for stretchRegional
    *             - stretchRegional and rubberBandComplete
    *                 now use the new private method stretchRect in order to
-   *                 avoid duplicate code. 
+   *                 avoid duplicate code.
+   *    @history 2010-11-22 Eric Hyer - new SIGNAL called stretchChipViewport
+   *                 exists for sending stretches made in CubeViewports to any
+   *                 ChipViewports that want to get stretched.
    */
   class StretchTool : public Qisis::Tool {
       Q_OBJECT
@@ -104,6 +108,23 @@ namespace Qisis {
       static Isis::Histogram histFromBuffer(ViewportBuffer *buffer, QRect rect,
                                             double min, double max);
 
+    signals:
+      /**
+       * when a viewport is stretched, send the stretch and the viewport
+       * associated with it to any ChipViewport's that might be listening
+       */
+      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      
+      /**
+       * Shows a warning. This sends a signal (meant for when an
+       * exception occurs) to display the error using the warning
+       * object
+       *
+       * @param pStr
+       * @param pExStr
+       */
+      void warningSignal(std::string   &pStr, const std::string pExStr);
+      
     public slots:
       void stretchGlobal();
       void stretchGlobal(CubeViewport *);
@@ -145,17 +166,6 @@ namespace Qisis {
       void setStretchAllViewports();
       void stretchBandChanged(int);
 
-    signals:
-      /**
-       * Shows a warning. This sends a signal (meant for when an
-       * exception occurs) to display the error using the warning
-       * object
-       *
-       * @param pStr
-       * @param pExStr
-       */
-      void warningSignal(std::string   &pStr, const std::string pExStr);
-      
     private:
       void stretchRect(CubeViewport *cvp, QRect rect);
 
@@ -181,6 +191,8 @@ namespace Qisis {
 
       //! Stretches before global button pressed
       Isis::Stretch *p_preGlobalStretches;
+      
+      Isis::Stretch *p_chipViewportStretch; //!< ChipViewport's stretch
   };
 };
 

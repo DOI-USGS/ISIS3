@@ -35,8 +35,13 @@ namespace Qisis {
    * @param parent
    */
   StretchTool::StretchTool(QWidget *parent) : Tool::Tool(parent) {
+    
+    p_chipViewportStretch = NULL;
     p_preGlobalStretches = NULL;
     p_advancedStretch = NULL;
+    
+    p_chipViewportStretch = new Stretch;
+    
     p_advancedStretch = new AdvancedStretchDialog(parent);
     connect(p_advancedStretch, SIGNAL(stretchChanged()),
             this, SLOT(advancedStretchChanged()));
@@ -71,6 +76,11 @@ namespace Qisis {
     if(p_preGlobalStretches) {
       delete [] p_preGlobalStretches;
       p_preGlobalStretches = NULL;
+    }
+    
+    if (p_chipViewportStretch) {
+      delete p_chipViewportStretch;
+      p_chipViewportStretch = NULL;
     }
   }
 
@@ -771,6 +781,8 @@ namespace Qisis {
         newStretch.ClearPairs();
         newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
         cvp->stretchGray(newStretch);
+        *p_chipViewportStretch = newStretch;
+        emit stretchChipViewport(p_chipViewportStretch, cvp);
       }
       else {
         switch(p_stretchBand) {
@@ -821,6 +833,10 @@ namespace Qisis {
 
     if(s == Qt::RightButton) {
       stretchGlobal(cvp);
+      
+      // notify any ChipViewports listening that the CubeViewport was stretched
+      // back to global
+      emit stretchChipViewport(NULL, cvp);
 
       // Resets the RubberBandTool on screen.
       enableRubberBandTool();
