@@ -219,7 +219,11 @@ namespace Qisis {
     p_pointEditor = new Qisis::ControlPointEdit(g_controlNetwork, parent);
     gridLayout->addWidget(p_pointEditor, row++, 0, 1, 3);
     connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
-            p_pointEditor, SIGNAL(newControlNetwork(Isis::ControlNet *)));
+        p_pointEditor, SIGNAL(newControlNetwork(Isis::ControlNet *)));
+    connect(this,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        p_pointEditor,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
     connect(p_pointEditor, SIGNAL(pointSaved()), this, SLOT(pointSaved()));
     p_pointEditor->show();
 //    connect(this,SIGNAL(modifyPoint(Isis::ControlPoint *)),
