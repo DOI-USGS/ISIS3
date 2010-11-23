@@ -1,3 +1,5 @@
+#include "IsisDebug.h"
+
 #include "ChipViewport.h"
 
 #include <QMessageBox>
@@ -109,7 +111,12 @@ namespace Qisis {
   
   void ChipViewport::stretchFromCubeViewport(Isis::Stretch * newStretch,
       Qisis::CubeViewport * cvp) {
-      
+    
+    ASSERT(cvp != NULL);
+    
+    if (!cvp || !p_chipCube)
+      return;
+    
     // only stretch if the CubeViewport is opened to the same cube as we are,
     // otherwise the signal was meant for a different ChipViewport!
     if (cvp->cube()->Filename() == p_chipCube->Filename()) {
