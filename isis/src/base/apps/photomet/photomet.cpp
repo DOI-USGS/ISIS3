@@ -104,12 +104,15 @@ void photomet(Buffer &in, Buffer &out) {
     else {
       
       // calculate photometric angles
+      bool success = true;
       if (useDem) {
         Angle phase, incidence, emission;
-        cam->LocalPhotometricAngles(phase, incidence, emission);
-        pha = phase.GetDegrees();
-        inc = incidence.GetDegrees();
-        ema = emission.GetDegrees();
+        cam->LocalPhotometricAngles(phase, incidence, emission, success);
+        if (success) {
+          pha = phase.GetDegrees();
+          inc = incidence.GetDegrees();
+          ema = emission.GetDegrees();
+        }
       }
       else {
         pha = cam->PhaseAngle();
@@ -118,7 +121,10 @@ void photomet(Buffer &in, Buffer &out) {
       }
 
       // if invalid angles, set to null
-      if(inc >= 90.0 || ema >= 90.0) {
+      if(!success) {
+        out[i] = NULL8;
+      }
+      else if(inc >= 90.0 || ema >= 90.0) {
         out[i] = NULL8;
       }
       // if angles greater than max allowed by user, set to null
