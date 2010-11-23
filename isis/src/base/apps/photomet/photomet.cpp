@@ -86,7 +86,7 @@ void IsisMain() {
  */
 void photomet(Buffer &in, Buffer &out) {
 
-  double pha, inc, ema, mult, base;
+  double pha=0., inc=0., ema=0., mult=0., base=0.;
   
   for (int i = 0; i < in.size(); i++) {
   
