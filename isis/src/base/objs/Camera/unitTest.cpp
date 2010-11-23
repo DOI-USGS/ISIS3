@@ -7,6 +7,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Preference.h"
+#include "Angle.h"
 
 using namespace std;
 using namespace Isis;
@@ -231,4 +232,251 @@ int main() {
 
   cube.Close();
   delete cam2;
+
+  cube.Close();
+  cout << "Test Local Photometric Angles..." << endl << endl;
+  cout << "Flat DEM Surface..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_flat.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam3 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam3->Samples() / 2.0;
+  line = cam3->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam3->SetImage(sample, line) << endl;
+  double normal[3];
+  cam3->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  Angle phase;
+  Angle incidence;
+  Angle emission;
+  bool success;
+  cam3->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam3;
+
+  cout << endl << "45 Degree DEM Surface Facing Left..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_45left.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam4 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam4->Samples() / 2.0;
+  line = cam4->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam4->SetImage(sample, line) << endl;
+  cam4->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam4->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam4;
+
+  cout << endl << "45 Degree DEM Surface Facing Top..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_45top.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam5 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam5->Samples() / 2.0;
+  line = cam5->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam5->SetImage(sample, line) << endl;
+  cam5->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam5->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam5;
+
+  cout << endl << "45 Degree DEM Surface Facing Right..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_45right.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam6 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam6->Samples() / 2.0;
+  line = cam6->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam6->SetImage(sample, line) << endl;
+  cam6->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam6->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam6;
+
+  cout << endl << "45 Degree DEM Surface Facing Bottom..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_45bottom.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam7 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam7->Samples() / 2.0;
+  line = cam7->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam7->SetImage(sample, line) << endl;
+  cam7->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam7->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam7;
+
+  cout << endl << "80 Degree DEM Surface Facing Left..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_80left.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam8 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam8->Samples() / 2.0;
+  line = cam8->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam8->SetImage(sample, line) << endl;
+  cam8->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam8->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam8;
+
+  cout << endl << "80 Degree DEM Surface Facing Top..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_80top.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam9 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam9->Samples() / 2.0;
+  line = cam9->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam9->SetImage(sample, line) << endl;
+  cam9->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam9->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam9;
+
+  cout << endl << "80 Degree DEM Surface Facing Right..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_80right.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam10 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam10->Samples() / 2.0;
+  line = cam10->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam10->SetImage(sample, line) << endl;
+  cam10->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam10->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam10;
+
+  cout << endl << "80 Degree DEM Surface Facing Bottom..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_80bottom.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam11 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = cam11->Samples() / 2.0;
+  line = cam11->Lines() / 2.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam11->SetImage(sample, line) << endl;
+  cam11->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam11->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam11;
+
+  cout << endl << "Point Does Not Intersect DEM..." << endl;
+  inputFile = "$base/testData/f319b18_ideal_flat.cub";
+  cube.Open(inputFile);
+  pvl = *cube.Label();
+  Camera *cam12 = CameraFactory::Create(pvl);
+  cube.Close();
+
+  sample = 1.0;
+  line = 1.0;
+  cout << "Sample = " << sample << endl;
+  cout << "Line = " << line << endl;
+  cout << "SetImage (sample, line): " << cam12->SetImage(sample, line) << endl;
+  cam12->GetLocalNormal(normal);
+  cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
+  cam12->LocalPhotometricAngles(phase,emission,incidence,success);
+  if (success) {
+    cout << "Phase = " << phase.GetDegrees() << endl;
+    cout << "Emission = " << emission.GetDegrees() << endl;
+    cout << "Incidence = " << incidence.GetDegrees() << endl;
+  } else {
+    cout << "Angles could not be calculated." << endl;
+  }
+  delete cam12;
 }
