@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     // adds band tool button to toolpad on left
     Qisis::Tool *btool = new Qisis::BandTool(Qisis::Qnet::g_vpMainWindow);
     btool->addTo(Qisis::Qnet::g_vpMainWindow);
-
+        
     // adds zoom tool button to toolpad on left
     // adds to "View" dropdown of Menu toolbar with seperator
     Qisis::Tool *ztool = new Qisis::ZoomTool(Qisis::Qnet::g_vpMainWindow);
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     // adds stretch tool button to toolpad on left
     Qisis::Tool *stool = new Qisis::StretchTool(Qisis::Qnet::g_vpMainWindow);
     stool->addTo(Qisis::Qnet::g_vpMainWindow);
-
+ 
     // adds find tool button to toolpad on left
     // adds to "Options" dropdown of Menu toolbar
     Qisis::Tool *findTool = new Qisis::FindTool(Qisis::Qnet::g_vpMainWindow);
@@ -178,6 +178,12 @@ int main(int argc, char *argv[]) {
     QObject::connect(qnetTool, SIGNAL(netChanged()), ftool, SLOT(setSaveNet()));
     QObject::connect(ntool, SIGNAL(netChanged()), ftool, SLOT(setSaveNet()));
     QObject::connect(qnetTool, SIGNAL(qnetToolSave()), ftool, SLOT(saveAs()));
+
+    // First hop for signal from StretchTool to ChipViewport
+    QObject::connect(stool,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        qnetTool,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
 
 
     /**** EXITING ****/
