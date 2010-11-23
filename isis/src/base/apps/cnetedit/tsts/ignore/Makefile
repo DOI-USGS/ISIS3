@@ -3,8 +3,8 @@ APPNAME = cnetedit
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
+	$(LS) $(INPUT)/*.cub > $(INPUT)/list.lis;
 	$(APPNAME) CNET=$(INPUT)/cnet.net \
-	FROMLIST=$(OUTPUT)/list.lis \
+	FROMLIST=$(INPUT)/list.lis \
 	ONET=$(OUTPUT)/cnet.pvl > /dev/null;
-	$(RM) $(OUTPUT)/list.lis;
+	$(RM) $(INPUT)/list.lis;

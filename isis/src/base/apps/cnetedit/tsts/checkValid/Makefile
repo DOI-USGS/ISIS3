@@ -5,7 +5,9 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) $(INPUT)/*.cub > $(INPUT)/list.lis;
 	$(APPNAME) CNET=$(INPUT)/cnet.net \
-	FROMLIST=$(INPUT)/list.lis \
-	POINTLIST=$(INPUT)/points.lis \
-	ONET=$(OUTPUT)/cnet.pvl > /dev/null;
+	ONET=$(OUTPUT)/cnet.pvl \
+	LOG=$(OUTPUT)/log.txt \
+	CHECKVALID=yes \
+       	ALLFROMLIST=$(INPUT)/list.lis \
+	DEFFILE=$(INPUT)/deffile.def > /dev/null;
 	$(RM) $(INPUT)/list.lis;

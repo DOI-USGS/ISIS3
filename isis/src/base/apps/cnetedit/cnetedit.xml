@@ -25,9 +25,9 @@
     <change name="Christopher Austin" date="2009-01-09">
       Renamed EXCLUDELIST to IGNORELIST and made other similar name changes.
     </change>
-       <change name="Sharmila Prasad" date="2009-07-17">
+    <change name="Sharmila Prasad" date="2009-07-17">
       Renamed IGNORELIST to FROMLIST and made other similar name changes
-       Added options HOLD and UNHOLD
+      Added options HOLD and UNHOLD
       Set the default as FALSE for DELETE Ignored Control Points and Measures
     </change>
     <change name="Sharmila Prasad" date="2009-07-24">
@@ -45,8 +45,13 @@
       reverted DELETE default to be TRUE
     </change>
     <change name="Sharmila Prasad" date="2009-09-14">
-    Added parameter PRESERVE with default FALSE. If set the Control Points with 
-    Measures equal to one are not deleted  
+      Added parameter PRESERVE with default FALSE. If set the Control Points with 
+      Measures equal to one are not deleted  
+    </change>
+    <change name="Travis Addair" date="2010-11-24">
+      Added optional measure validity check, removed a redundant deletion
+      pass, and fixed a bug causing points to be deleted before all measures
+      had been checked.
     </change>
   </history> 
   
@@ -104,26 +109,7 @@
       </parameter>
     </group>
 
-    <group name="List" >
-        <parameter name="FROMLIST">
-        <type>filename</type>
-        <fileMode>input</fileMode>
-        <internalDefault>None</internalDefault>
-        <brief>
-          File contains Cube file names from which Serial #'s are generated and
-          matching Control Measures will be ignored in the Control Network. 
-        </brief>
-        <description>
-          Use this parameter to select the filename which contains a list of
-         cubes. All of the Control Measures matching the serial # of the cube
-         will be ignored.  If DELETE is also set to true, the ignored control
-         measures and points  will be deleted.
-        </description>
-        <filter>
-          *.lis
-        </filter>
-      </parameter>
-
+    <group name="Ignore Lists" >
        <parameter name="POINTLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
@@ -142,9 +128,95 @@
           *.lis
         </filter>
       </parameter>
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          File contains Cube file names from which Serial #'s are generated and
+          matching Control Measures will be ignored in the Control Network. 
+        </brief>
+        <description>
+          Use this parameter to select the filename which contains a list of
+          cubes. All of the Control Measures matching the serial # of the cube
+          will be ignored.  If DELETE is also set to true, the ignored control
+          measures and points  will be deleted.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Validity Check" >
+      <parameter name="CHECKVALID">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Ignore all control measures outside user-specified tolerances
+        </brief>
+        <description>
+          If set to true, the application will check the validity of each
+          control measure against the tolerances set in the relevant
+          definition file (DEFFILE).  Because validity checking requires camera
+          information not contained within the control measure itself, a list of
+          all cubes in the network is necessary (FROMLIST), and could result in
+          a noticeably more time-intensive run of the program.  For the
+          aforementioned reasons, this option is disabled by default.
+        </description>
+        <inclusions>
+          <item>ALLFROMLIST</item>
+          <item>DEFFILE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="ALLFROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of all Input cubes in the control network
+        </brief>
+        <description>
+          This parameter specifies a list of cube names corresponding to the
+          serial numbers for every control measure in the input control
+          network.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="DEFFILE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          PVL file containing the description of the Validity Keywords
+        </brief>
+        <description>
+          This parameter specifies a PVL file containing descriptions for the
+          validity keywords when the user chooses to perform a validity check
+          on each of the measures in the input control network.  Invalid control
+          measures will be ignored and, unless otherwise specified, removed.
+        </description>
+        <filter>
+          *.def
+        </filter>
+        <helpers >
+          <helper name="H1">
+            <function>PrintTemp</function>
+            <brief>View Template</brief>
+            <description>
+              This helper button will print the definition file to the session
+              log of the application
+            </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
+      </parameter>
     </group>
       
-      <group name="Output Options">
+    <group name="Output Options">
       <parameter name="DELETE">
         <type>boolean</type>
         <default><item>TRUE</item></default>
@@ -157,7 +229,7 @@
           Control Point will be deleted as well.
         </description>
       </parameter>
-        <parameter name="PRESERVE">
+      <parameter name="PRESERVE">
         <type>boolean</type>
         <default><item>FALSE</item></default>
         <brief>
