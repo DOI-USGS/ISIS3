@@ -40,6 +40,8 @@ namespace Isis {
 class QImage;
 
 namespace Qisis {
+  class CubeViewport;
+
   /**
     * @brief Viewport for Isis Chips
     *
@@ -57,6 +59,8 @@ namespace Qisis {
     * @history 2010-11-17 Eric Hyer - Added cubeToViewport method and
     *              setControlNet slot.  paintEvent can now use the control net
     *              to paint measures in the viewport.
+    * @history 2010-11-22 Eric Hyer - ChipViewports can now be stretched by
+    *              stretching CubeViewports opened to the same cube
     */
 
   class ChipViewport : public QWidget {
@@ -115,6 +119,7 @@ namespace Qisis {
     public slots:
 
       void autoStretch();
+      void stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *);
       void setCross(bool checked);
       void rotateChip(int rotation);
       void setCircle(bool checked);

@@ -6,6 +6,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Cube.h"
+#include "CubeViewport.h"
 #include "SerialNumber.h"
 
 
@@ -103,6 +104,28 @@ namespace Qisis {
     computeStretch(p_gray.stretch);
     paintImage();
     update();
+  }
+  
+  
+  void ChipViewport::stretchFromCubeViewport(Isis::Stretch * newStretch,
+      Qisis::CubeViewport * cvp) {
+    
+    // if they right clicked in the CubeViewport then we get a SIGNAL with
+    // NULLs in it.  This is used to signify that we need to restretch on our
+    // own (go back to global).  The SIGNAL is emitted when right clicks happen
+    // on the CubeViewport with the StretchTool enabled.
+    if (!newStretch || !cvp) {
+      autoStretch();
+    }
+    else {
+      // only stretch if the CubeViewport is opened to the same cube as we are,
+      // otherwise the signal was meant for a different ChipViewport!
+      if (cvp->cube()->Filename() == p_chipCube->Filename()) {
+        p_gray.stretch = *newStretch;
+        paintImage();
+        update();
+      }
+    }
   }
 
 
