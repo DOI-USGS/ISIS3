@@ -829,7 +829,27 @@ namespace Isis {
       lookVects[i] = new double[3];
       
     for (int i = 0; i < surroundingPoints.size(); i ++) {
-      SetImage(surroundingPoints[i].first, surroundingPoints[i].second);
+      if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
+        surroundingPoints[i].first = samp;
+        surroundingPoints[i].second = line;
+        if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
+          normal[0] = 0.;
+          normal[1] = 0.;
+          normal[2] = 0.;
+          // restore state
+          if(computed) {
+            SetImage(originalSample, originalLine);
+          } else {
+            p_pointComputed = false;
+          }
+
+          // free memory
+          for (int i = 0; i < lookVects.size(); i++)
+            delete [] lookVects[i];
+
+          return;
+        }
+      }
     
       double demLat = p_latitude;
       double demLon = p_longitude;
@@ -839,7 +859,28 @@ namespace Isis {
       demLon = p_longitude * Isis::PI/180.0;
       latrec_c(demRadius, demLon, demLat, lookVects[i]);
     }
-    
+   
+    if ((surroundingPoints[0].first == surroundingPoints[1].first &&
+        surroundingPoints[0].second == surroundingPoints[1].second) ||
+       (surroundingPoints[2].first == surroundingPoints[3].first &&
+        surroundingPoints[2].second == surroundingPoints[3].second)) {
+      normal[0] = 0.;
+      normal[1] = 0.;
+      normal[2] = 0.;
+      // restore state
+      if(computed) {
+        SetImage(originalSample, originalLine);
+      } else {
+        p_pointComputed = false;
+      }
+
+      // free memory
+      for (int i = 0; i < lookVects.size(); i++)
+        delete [] lookVects[i];
+
+      return;
+    }
+
     // subtract bottom from top and left from right and store results
     double topMinusBottom[3];
     vsub_c(lookVects[0], lookVects[1], topMinusBottom);
@@ -853,15 +894,30 @@ namespace Isis {
     double mag;
     unorm_c(normal, normal, &mag); 
     if (mag == 0.0) {
-      // throw exception
+      normal[0] = 0.;
+      normal[1] = 0.;
+      normal[2] = 0.;
+      // restore state
+      if(computed) {
+        SetImage(originalSample, originalLine);
+      } else {
+        p_pointComputed = false;
+      }
+
+      // free memory
+      for (int i = 0; i < lookVects.size(); i++)
+        delete [] lookVects[i];
+ 
+      return;
     }
+    
+    double centerLookVect[3];
+    SetImage(originalSample, originalLine);
     
     // Check to make sure that the normal is pointing outward from the planet
     // surface. This is done by taking the dot product of the normal and 
-    // the look vector. If the normal is pointing inward, then negate
-    // it.
-    double centerLookVect[3];
-    SetImage(originalSample, originalLine);
+    // any one of the unitized xyz vectors. If the normal is pointing inward, 
+    // then negate it.
     unorm_c(p_pB, centerLookVect, &mag);
     double dotprod = vdot_c(normal,centerLookVect);
     if (dotprod < 0.0)
@@ -893,12 +949,21 @@ namespace Isis {
    *
    * @param incidence The local incidence angle to be calculated
    */
-  void Camera::LocalPhotometricAngles(Angle & phase, Angle & emission,
-      Angle & incidence) {
+  void Camera::LocalPhotometricAngles(Angle & phase, Angle & incidence,
+      Angle & emission, bool &success) {
     
     // get local normal vector
     double normal[3];
     GetLocalNormal(normal);
+    success = true;
+
+    // Check to make sure normal is valid
+    SpiceDouble mag;
+    unorm_c(normal,normal,&mag);
+    if (mag == 0.) {
+      success = false;
+      return;
+    }
     
     // get a normalized surface spacecraft vector
     SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
