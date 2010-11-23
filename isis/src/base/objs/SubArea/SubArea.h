@@ -42,6 +42,11 @@ namespace Isis {
    *
    * @author 2009-10-02 Janet Barrett
    *
+   * @internal
+   *  @history 2010-11-21 Mackenzie Boyd - Modified UpdateLabels method so
+   *                                       so that the units for Scale and
+   *                                       PixelResolution keywords are
+   *                                       perserved.
    */
 
   class SubArea {

@@ -172,10 +172,14 @@ namespace Isis {
       // mapping scale and resolution.
       if(p_linc == p_sinc && p_linc != 1.0) {
         PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
+        string pixresUnit = mapgroup["PixelResolution"].Unit();
         double pixres = mapgroup["PixelResolution"];
         mapgroup["PixelResolution"] = pixres * p_linc;
+        mapgroup["PixelResolution"].SetUnits(pixresUnit);
+        string scaleUnit = mapgroup["Scale"].Unit();
         double scale = mapgroup["Scale"];
         mapgroup["Scale"] = scale / p_linc;
+        mapgroup["Scale"].SetUnits(scaleUnit);
       }
 
       // If the outer bounds of the image are changed, then the
