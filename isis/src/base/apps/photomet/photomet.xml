@@ -436,6 +436,10 @@
     <change name="Eric Hyer" date="2011-11-10">
       Added USEDEM parameter.
     </change>
+    <change name="Janet Barrett" date="2011-11-22">
+      Added error check for situations where there is not an intersection with
+      the DEM and the local photometric angles are requested.
+    </change>
   </history>
 
   <category>
