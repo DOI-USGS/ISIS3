@@ -24,11 +24,13 @@ namespace Isis {
   class ControlMeasure;
   class ControlNet;
   class Cube;
+  class Stretch;
   class UniversalGroundMap;
 }
 
 namespace Qisis {
   class ChipViewport;
+  class CubeViewport;
   class Tool;
 
 
@@ -78,6 +80,8 @@ namespace Qisis {
     *                          CubeViewport.  Fixed multiple include problems.
     *   @history 2010-11-17 Eric Hyer - now forwards new ControlNets to the
     *                          ChipViewports
+    *   @history 2010-11-22 Eric Hyer - Forwarded SIGNAL from StretchTool to
+    *                          ChipViewports
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT
@@ -96,6 +100,7 @@ namespace Qisis {
       void updateRightView(double sample, double line);
       void pointSaved();
       void newControlNetwork(Isis::ControlNet *);
+      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
 
     public slots:
       void setLeftMeasure(Isis::ControlMeasure *leftMeasure,

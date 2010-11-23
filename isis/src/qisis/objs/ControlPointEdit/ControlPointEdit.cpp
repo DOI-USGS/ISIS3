@@ -247,6 +247,11 @@ namespace Qisis {
     
     connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
             p_leftView, SLOT(setControlNet(Isis::ControlNet *)));
+    
+    connect(this,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        p_leftView,
+        SLOT(stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *)));
 
     //  Connect left zoom buttons to ChipViewport's zoom slots
     connect(leftZoomIn, SIGNAL(clicked()), p_leftView, SLOT(zoomIn()));
@@ -280,6 +285,12 @@ namespace Qisis {
     
     connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
             p_rightView, SLOT(setControlNet(Isis::ControlNet *)));
+    
+    connect(this,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        p_rightView,
+        SLOT(stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+            
             
     //  Connect the ChipViewport tackPointChanged signal to
     //  the update sample/line label
