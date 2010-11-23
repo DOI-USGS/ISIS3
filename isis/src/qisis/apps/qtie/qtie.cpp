@@ -69,6 +69,11 @@ int main(int argc, char *argv[]) {
     QObject::connect(ftool, SIGNAL(newFiles()), tieTool, SLOT(clearFiles()));
 
     QObject::connect(mw, SIGNAL(closeWindow()), ftool, SLOT(exit()));
+    
+    QObject::connect(stool,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        tieTool,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
 
     mw->show();
 

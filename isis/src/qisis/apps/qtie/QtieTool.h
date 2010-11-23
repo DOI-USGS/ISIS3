@@ -41,7 +41,9 @@ namespace Qisis {
     *                           Dialog to return if "Cancel" is clicked.
     * @history 2010-05-18  Tracie Sucharski - Added pointId to the Tie tool
     *                          Dialog.
-    *
+    * @history 2010-11-23 Eric Hyer - Added stretchChipViewport SIGNAL for
+    *                          forwarding of SIGNAL from StretchTool to
+    *                          ChipViewport
     */
   class QtieTool : public Qisis::Tool {
       Q_OBJECT
@@ -56,6 +58,7 @@ namespace Qisis {
       void tieToolSave();
       void editPointChanged();
       void newSolution(Isis::Table *cmatrix);
+      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
 
     public slots:
       void setFiles(Isis::Cube &baseCube, Isis::Cube &matchCube, Isis::ControlNet &cnet);

@@ -142,10 +142,15 @@ namespace Qisis {
     p_ptIdValue = new QLabel();
     gridLayout->addWidget(p_ptIdValue, row++, 0);
 
-    p_pointEditor = new Qisis::ControlPointEdit(parent, true);
+    p_pointEditor = new Qisis::ControlPointEdit(NULL, parent, true);
     gridLayout->addWidget(p_pointEditor, row++, 0, 1, 3);
     connect(p_pointEditor, SIGNAL(pointSaved()), this, SLOT(pointSaved()));
     p_pointEditor->show();
+    connect(this,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        p_pointEditor,
+        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+
 
     QPushButton *solve = new QPushButton("Solve");
     connect(solve, SIGNAL(clicked()), this, SLOT(solve()));
