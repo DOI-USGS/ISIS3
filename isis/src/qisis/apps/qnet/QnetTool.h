@@ -25,6 +25,7 @@ namespace Isis {
   class ControlNet;
   class ControlPoint;
   class Cube;
+  class Stretch;
   class UniversalGroundMap;
 }
 
@@ -32,6 +33,7 @@ using namespace std;
 
 namespace Qisis {
   class ControlPointEdit;
+  class CubeViewport;
   class MdiCubeViewport;
   class QnetHoldPointDialog;
   class ToolPad;
@@ -120,7 +122,8 @@ namespace Qisis {
    *   @history 2010-07-12 Jeannie Walldren - Fixed bug in newHoldPoint() method
    *                          that was causing the Hold Point Dialog to call the
    *                          reject() command.  Updated documentation.
-   *  
+   *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for
+   *                forwarding of SIGNAL from StretchTool to ChipViewport
    *
    */
   class QnetTool : public Tool {
@@ -141,6 +144,7 @@ namespace Qisis {
       void ignoreRightChanged();
       void showNavTool();
       void newControlNetwork(Isis::ControlNet *);
+      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
 
     public slots:
       void updateList();
