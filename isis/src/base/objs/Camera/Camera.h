@@ -134,6 +134,10 @@ namespace Isis {
    *            class is available.
    *   @history 2010-11-09 Eric Hyer - Added GetLocalNormal and 
    *       LocalPhotometricAngles methods
+   *   @history 2010-11-22 Janet Barrett - Added checks to make sure that the
+   *            normal can be determined for DEM surface. Also modified the
+   *            LocalPhotometricAngles method to report if the angles could
+   *            successfully be calculated.
    */
 
   class Camera : public Isis::Sensor {
@@ -153,8 +157,8 @@ namespace Isis {
 //      bool SetGround(SurfacePoint surfacePt);
       bool SetRightAscensionDeclination(const double ra, const double dec);
       
-      void LocalPhotometricAngles(Angle & phase, Angle & emission,
-                                  Angle & incidence);
+      void LocalPhotometricAngles(Angle & phase, Angle & incidence,
+                                  Angle & emission, bool &success);
 
       void GetLocalNormal(double normal[3]);
 
