@@ -91,7 +91,9 @@ void IsisMain() {
   // done first since it's likely to cause an error if one exists
   calculateSolarRemove(icube, &p);
 
-  calculateDarkCurrent(icube);
+  if(ui.GetBoolean("DARK"))
+    calculateDarkCurrent(icube);
+
   chooseFlatFile(icube, &p);
   calculateSpecificEnergy(icube);
 

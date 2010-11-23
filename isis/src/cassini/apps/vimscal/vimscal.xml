@@ -59,6 +59,9 @@
       If the solar remove coefficient cannot be calculated then a default
       value will be used now instead of giving an error
     </change>
+    <change name="Steven Lambright" date="2010-11-23">
+      Added an option to not do dark current correction
+    </change>
   </history>
 
   <category>
@@ -127,7 +130,7 @@
 
       <parameter name="IRORIGDARK">
         <type>boolean</type>
-        <brief>Do not perform IR Dark Current Corrections</brief>
+        <brief>Do not smooth IR Dark Current</brief>
         <description>
           By default Isis will fit a line to the dark current values, on each band, across the lines since
           there is one dark value per line. The linear fit value will be applied correctly even if a dark
@@ -135,6 +138,15 @@
           This parameter has no effect for VIS cubes.
         </description>
         <default><item>false</item></default>
+      </parameter>
+
+      <parameter name="DARK">
+        <type>boolean</type>
+        <brief>Do Dark Current Corrections</brief>
+        <description>
+          If this is false then no dark current values will be subtracted.
+        </description>
+        <default><item>true</item></default>
       </parameter>
     </group>
   </groups>
