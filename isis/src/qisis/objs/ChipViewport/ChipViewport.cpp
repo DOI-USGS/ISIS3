@@ -63,8 +63,8 @@ namespace Qisis {
       int & x, int & y) {
       
     p_chip->SetCubePosition(samp, line);
-    x = (int) p_chip->ChipSample();
-    y = (int) p_chip->ChipLine();
+    x = ((int) p_chip->ChipSample()) - 1;
+    y = ((int) p_chip->ChipLine()) - 1;
     
     return p_chip->IsInsideChip(samp, line);
   }
@@ -239,9 +239,11 @@ namespace Qisis {
             painter.setPen(Qt::green); // set all other point markers green
           }
           
-          // draw points
-          painter.drawLine(x - 5, y, x + 5, y);
-          painter.drawLine(x, y - 5, x, y + 5);
+          // draw points which are not under cross
+          if (x != (p_width - 1) / 2 || y != (p_height - 1) / 2) {
+            painter.drawLine(x - 5, y, x + 5, y);
+            painter.drawLine(x, y - 5, x, y + 5);
+          }
         }
       }
     }

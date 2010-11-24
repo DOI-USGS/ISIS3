@@ -61,6 +61,9 @@ namespace Qisis {
     *              to paint measures in the viewport.
     * @history 2010-11-22 Eric Hyer - ChipViewports can now be stretched by
     *              stretching CubeViewports opened to the same cube
+    * @history 2010-11-24 Eric Hyer - Fixed bug where crosses were painted one
+    *              screen pixel off on each direction.  Also no longer paint
+    *              cross under the large main red crosses.
     */
 
   class ChipViewport : public QWidget {
