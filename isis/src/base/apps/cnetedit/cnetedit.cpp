@@ -61,9 +61,9 @@ void IsisMain() {
   }
 
   //List has Cube file names
-  if(ui.WasEntered("FROMLIST")) {
+  if(ui.WasEntered("CUBELIST")) {
     useDefaultOptions = false;
-    std::string ignorelistFilename = ui.GetFilename("FROMLIST");
+    std::string ignorelistFilename = ui.GetFilename("CUBELIST");
     ProcessControlMeasures(ignorelistFilename, cnet);
   }
 
@@ -75,7 +75,7 @@ void IsisMain() {
     Pvl defFile(ui.GetFilename("DEFFILE"));
     validator = new ControlNetValidMeasure(&defFile);
 
-    std::string cubeList = ui.GetFilename("ALLFROMLIST");
+    std::string cubeList = ui.GetFilename("FROMLIST");
     CheckAllMeasureValidity(cnet, cubeList);
 
     if(validator != NULL) {
@@ -231,7 +231,7 @@ void CheckAllMeasureValidity(ControlNet & cnet, std::string cubeList) {
       std::string serialNumber = cnet[cp][cm].CubeSerialNumber();
       if(!serialNumbers.HasSerialNumber(serialNumber)) {
         std::string msg = "Serial Number [" + serialNumber + "] contains no ";
-        msg += "matching cube in ALLFROMLIST [" + cubeList + "]";
+        msg += "matching cube in FROMLIST [" + cubeList + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 

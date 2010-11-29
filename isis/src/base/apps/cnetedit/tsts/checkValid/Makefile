@@ -8,6 +8,6 @@ commands:
 	ONET=$(OUTPUT)/cnet.pvl \
 	LOG=$(OUTPUT)/log.txt \
 	CHECKVALID=yes \
-       	ALLFROMLIST=$(INPUT)/list.lis \
+       	FROMLIST=$(INPUT)/list.lis \
 	DEFFILE=$(INPUT)/deffile.def > /dev/null;
 	$(RM) $(INPUT)/list.lis;

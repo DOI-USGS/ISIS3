@@ -53,6 +53,9 @@
       pass, and fixed a bug causing points to be deleted before all measures
       had been checked.
     </change>
+    <change name="Travis Addair" date="2010-11-29">
+      Changed parameter FROMLIST to CUBELIST and ALLFROMLIST to FROMLIST.
+    </change>
   </history> 
   
   <category>
@@ -129,7 +132,7 @@
         </filter>
       </parameter>
 
-      <parameter name="FROMLIST">
+      <parameter name="CUBELIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
@@ -166,12 +169,12 @@
           aforementioned reasons, this option is disabled by default.
         </description>
         <inclusions>
-          <item>ALLFROMLIST</item>
+          <item>FROMLIST</item>
           <item>DEFFILE</item>
         </inclusions>
       </parameter>
 
-      <parameter name="ALLFROMLIST">
+      <parameter name="FROMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
