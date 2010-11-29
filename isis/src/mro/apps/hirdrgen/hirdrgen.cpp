@@ -186,7 +186,9 @@ void IsisMain() {
   // Add labels to the PDS product that could not be handled by the translater
 
   if(ui.WasEntered("RATIONALE_DESC")) {
-    pdsLabel.AddKeyword(PvlKeyword("RATIONALE_DESC", ui.GetString("RATIONALE_DESC")), Pvl::Replace);
+    pdsLabel.AddKeyword(
+        PvlKeyword("RATIONALE_DESC", ui.GetString("RATIONALE_DESC")),
+        Pvl::Replace);
   }
 
   // Add PRODUCT_CREATION_TIME
@@ -205,7 +207,8 @@ void IsisMain() {
   // Add SOFTWARE_NAME to the ROOT
   iString sfname;
   sfname.clear();
-  sfname += "Isis " + Isis::version + " " + Application::GetUserInterface().ProgramName();
+  sfname += "Isis " + Application::Version() + " " +
+            Application::GetUserInterface().ProgramName();
   pdsLabel += PvlKeyword("SOFTWARE_NAME", sfname);
 
   // Add the PRODUCT_VERSION_ID from the user parameter VERSION
@@ -228,7 +231,8 @@ void IsisMain() {
   PvlKeyword &cpmmSpecial = icube2->Label()->FindObject("IsisCube").
                             FindGroup("Mosaic")["SpecialProcessingFlag"];
   for(int ccd = 0; ccd < 14; ++ccd) {
-    const unsigned int cpmmByCcd[] = {0, 1, 2, 3, 5, 8, 10, 11, 12, 13, 6, 7, 4, 9};
+    const unsigned int cpmmByCcd[] = {0, 1, 2, 3, 5, 8, 10,
+                                      11, 12, 13, 6, 7, 4, 9};
     ccdFlag.AddValue(cpmmFlag[cpmmByCcd[ccd]]);
     ccdBin.AddValue(cpmmBin[cpmmByCcd[ccd]] != "Null" ? cpmmBin[cpmmByCcd[ccd]] : "-9998");
     ccdTdi.AddValue(cpmmTdi[cpmmByCcd[ccd]] != "Null" ? cpmmTdi[cpmmByCcd[ccd]] : "-9998");

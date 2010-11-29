@@ -138,7 +138,7 @@ void IsisMain() {
 
   FixLabel(pdsLabel, bLevel2);
 
-  // Add an output format template to	the PDS PVL
+  // Add an output format template to the PDS PVL
   // Distinguish betweeen Level 2 and 3 images by calling the camera()
   // function as only non mosaic images(Level2) have a camera
   if(bLevel2) {
@@ -172,13 +172,13 @@ void GetUserLabel(std::string psUserLbl, Pvl &pcPdsLbl, bool pbLevel2) {
   Pvl cUsrPvl(psUserLbl);
 
   /*if (pbLevel2 &&
-  	(cUsrPvl.HasKeyword("SPACECRAFT_CLOCK_START_COUNT") ||
-  	 cUsrPvl.HasKeyword("SPACECRAFT_CLOCK_STOP_COUNT")  ||
-  	 cUsrPvl.HasKeyword("START_TIME") ||
-  	 cUsrPvl.HasKeyword("STOP_TIME"))) {
+      (cUsrPvl.HasKeyword("SPACECRAFT_CLOCK_START_COUNT") ||
+       cUsrPvl.HasKeyword("SPACECRAFT_CLOCK_STOP_COUNT")  ||
+       cUsrPvl.HasKeyword("START_TIME") ||
+       cUsrPvl.HasKeyword("STOP_TIME"))) {
 
-  	std::string msg = "Unsupported User defined keywords for Level2";
-  	throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+       std::string msg = "Unsupported User defined keywords for Level2";
+       throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
   }*/
 
   // Add all the keywords in the root
@@ -320,7 +320,7 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
   PvlKeyword cKeySoftware("SOFTWARE_NAME", "ISIS3");
   pcPdsLbl += cKeySoftware;
 
-  PvlKeyword cKeySoftwareVersion("SOFTWARE_VERSION_ID", version);
+  PvlKeyword cKeySoftwareVersion("SOFTWARE_VERSION_ID", Application::Version());
   pcPdsLbl += cKeySoftwareVersion;
 
   // Specific to IMAGE Object

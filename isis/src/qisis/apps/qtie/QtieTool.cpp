@@ -1,3 +1,5 @@
+#include "QtieTool.h"
+
 #include <QApplication>
 #include <QDialog>
 #include <QMenuBar>
@@ -20,21 +22,20 @@
 
 #include <vector>
 
-#include "QtieTool.h"
-#include "MainWindow.h"
-#include "MdiCubeViewport.h"
-#include "Filename.h"
-#include "SerialNumber.h"
+#include "Application.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
+#include "BundleAdjust.h"
 #include "ControlMeasure.h"
-#include "BundleAdjust.h"
+#include "Filename.h"
 #include "History.h"
-#include "PvlObject.h"
-#include "PvlEditDialog.h"
 #include "iTime.h"
-#include "Application.h"
-#include "BundleAdjust.h"
+#include "MainWindow.h"
+#include "MdiCubeViewport.h"
+#include "PvlEditDialog.h"
+#include "PvlObject.h"
+#include "QIsisApplication.h"
+#include "SerialNumber.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 
@@ -80,7 +81,6 @@ namespace Qisis {
     createQtieTool(parent);
 
   }
-
 
 
   /**
@@ -174,7 +174,6 @@ namespace Qisis {
    */
   void QtieTool::createMenus() {
 
-
     QAction *saveNet = new QAction(p_tieTool);
     saveNet->setText("Save Control Network &As...");
     QString whatsThis =
@@ -221,7 +220,6 @@ namespace Qisis {
   }
 
 
-
   /**
    * Put the QtieTool icon on the main window Toolpad
    *
@@ -236,8 +234,6 @@ namespace Qisis {
     action->setShortcut(Qt::Key_T);
     return action;
   }
-
-
 
 
   /**
@@ -325,7 +321,6 @@ namespace Qisis {
   }
 
 
-
   /**
    * New files selected, clean up old file info
    *
@@ -351,7 +346,6 @@ namespace Qisis {
   }
 
 
-
   /**
    * Save control point under crosshairs of ChipViewports
    *
@@ -371,7 +365,6 @@ namespace Qisis {
     emit editPointChanged();
 
   }
-
 
 
   /**
@@ -445,7 +438,6 @@ namespace Qisis {
       createPoint(lat, lon);
     }
   }
-
 
 
   /**
@@ -563,7 +555,6 @@ namespace Qisis {
   }
 
 
-
   /**
    * Delete given control point
    *
@@ -590,7 +581,6 @@ namespace Qisis {
 
     emit editPointChanged();
   }
-
 
 
   /**
@@ -632,7 +622,6 @@ namespace Qisis {
   }
 
 
-
   /**
    * Draw all Control Measures on each viewport
    *
@@ -645,7 +634,6 @@ namespace Qisis {
       vp->viewport()->update();
     }
   }
-
 
 
   /**
@@ -689,8 +677,6 @@ namespace Qisis {
     }
 
   }
-
-
 
 
   /**
@@ -769,8 +755,6 @@ namespace Qisis {
   }
 
 
-
-
   /**
    * Write the new cmatrix to the match cube
    *
@@ -791,7 +775,8 @@ namespace Qisis {
       p_matchCube->Read(h);
     }
     catch(Isis::iException &e) {
-      QString message = "Could not read cube history, will not update history.\n";
+      QString message = "Could not read cube history, "
+                        "will not update history.\n";
       string errors = e.Errors();
       message += errors.c_str();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
@@ -799,10 +784,11 @@ namespace Qisis {
       return;
     }
     Isis::PvlObject history("qtie");
-    history += Isis::PvlKeyword("IsisVersion", Isis::version);
+    history += Isis::PvlKeyword("IsisVersion", Isis::Application::Version());
     QString path = QCoreApplication::applicationDirPath();
     history += Isis::PvlKeyword("ProgramPath", path);
-    history += Isis::PvlKeyword("ExecutionDateTime", Isis::Application::DateTime());
+    history += Isis::PvlKeyword("ExecutionDateTime",
+                                Isis::Application::DateTime());
     history += Isis::PvlKeyword("HostName", Isis::Application::HostName());
     history += Isis::PvlKeyword("UserName", Isis::Application::UserName());
     Isis::PvlGroup results("Results");
@@ -817,8 +803,6 @@ namespace Qisis {
   }
 
 
-
-
   /**
    * Allows user to set a new template file.
    * @author 2008-12-10 Jeannie Walldren
@@ -829,8 +813,6 @@ namespace Qisis {
   void QtieTool::setTemplateFile() {
     p_pointEditor->setTemplateFile();
   }
-
-
 
 
   /**
@@ -863,7 +845,6 @@ namespace Qisis {
       QMessageBox::warning((QWidget *)parent(), "Error", message);
     }
   }
-
 
 
   /**
@@ -914,7 +895,5 @@ namespace Qisis {
       QMessageBox::information((QWidget *)parent(),
                                "Error", "Saving Aborted");
     }
-
   }
-
 }

@@ -108,13 +108,14 @@ endif
 #---------------------------------------------------------------------------
 #  Set up ISIS versioning
 #---------------------------------------------------------------------------
-ISISVERSIONFULL := $(shell $(GREP) version $(ISISROOT)/src/base/objs/Constants/Constants.h | $(CUT) -d"(" -f2 | $(CUT) -d")" -f1)
-ISISMAJOR       := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f1)
-ISISMINOR       := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f2)
-ISISMINORMINOR  := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f3 | cut -d" " -f1)
-ISISVERSION     := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR)
-ISISLIBVERSION  := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
-ISISRELEASE     := REL_0_0
+ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version)
+ISISMAJOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f1)
+ISISMINOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f2)
+ISISMINORMINOR       := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f3)
+ISISMINORMINORMINOR  := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f4)
+ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
+ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
+ISISRELEASE          := REL_0_0
 
 #---------------------------------------------------------------------------
 # Set up the Isis include and library directories

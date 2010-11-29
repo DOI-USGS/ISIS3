@@ -51,7 +51,7 @@ void IsisMain() {
   PvlObject common("Parameters");
   common += PvlKeyword("Program", caminfo_program);
   common += PvlKeyword("Version", caminfo_version);
-  common += PvlKeyword("IsisVersion", version);
+  common += PvlKeyword("IsisVersion", Application::Version());
   common += PvlKeyword("RunDate", caminfo_runtime);
   common += PvlKeyword("IsisId", SerialNumber::Compose(*icube));
   common += PvlKeyword("From", icube->Filename());

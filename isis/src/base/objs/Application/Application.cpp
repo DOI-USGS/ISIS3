@@ -5,24 +5,29 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <errno.h>
+
 extern int errno;
-#include <QString>
+
 #include <iostream>
 #include <sstream>
 #include <locale.h>
+
 #include <QCoreApplication>
+#include <QString>
 
 #include "Application.h"
-#include "UserInterface.h"
-#include "Gui.h"
 #include "Constants.h"
-#include "Message.h"
-#include "SessionLog.h"
-#include "System.h"
-#include "Preference.h"
-#include "iException.h"
 #include "CubeManager.h"
 #include "Filename.h"
+#include "iException.h"
+#include "iString.h"
+#include "Gui.h"
+#include "Message.h"
+#include "Preference.h"
+#include "SessionLog.h"
+#include "System.h"
+#include "TextFile.h"
+#include "UserInterface.h"
 
 /**
  * @file
@@ -234,7 +239,7 @@ namespace Isis {
    */
   PvlObject Application::History() {
     PvlObject history(p_ui->ProgramName());
-    history += PvlKeyword("IsisVersion", Isis::version);
+    history += PvlKeyword("IsisVersion", Version());
     history += PvlKeyword("ProgramVersion", p_ui->Version());
     QString path = QCoreApplication::applicationDirPath();
     history += PvlKeyword("ProgramPath", path);
@@ -1171,7 +1176,7 @@ namespace Isis {
    *
    * @return string The date and time
    */
-  std::string Application::DateTime(time_t *curtime) {
+  iString Application::DateTime(time_t *curtime) {
     time_t startTime = time(NULL);
     if(curtime != 0) *curtime = startTime;
     struct tm *tmbuf = localtime(&startTime);
@@ -1185,7 +1190,7 @@ namespace Isis {
    *
    * @return string User Name
    */
-  std::string Application::UserName() {
+  iString Application::UserName() {
     std::string user = "Unknown";
     char *userPtr = getenv("USER");
     if(userPtr != NULL) user = userPtr;
@@ -1197,7 +1202,7 @@ namespace Isis {
    *
    * @return string Host Name
    */
-  std::string Application::HostName() {
+  iString Application::HostName() {
     std::string host = "Unknown";
     char *hostPtr = getenv("HOST");
     if(hostPtr == NULL) hostPtr = getenv("HOSTNAME");
@@ -1205,5 +1210,12 @@ namespace Isis {
     return host;
   }
 
+  iString Application::Version() {
+    TextFile versionFile("$ISISROOT/version");
+    iString versionString = versionFile.GetLine() + " | " +
+                            versionFile.GetLine();
+
+    return versionString;
+  }
 }  //end namespace isis
 

@@ -49,7 +49,9 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
   bool hasFiducial = false;
   // Check to see if file is PDS
   if(inputLabel.HasKeyword("PDS_VERSION_ID", Pvl::None)) {
-    if(inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0] == "PDS3") {
+    iString pdsVersion = inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0];
+    
+    if(pdsVersion == "PDS3") {
       if(inputLabel.HasKeyword("LO:FIDUCIAL_ID", Pvl::Traverse)) {
         hasFiducial = true;
         bandBinTransFile = transDir + "LoPdsFiducialImport.trn";
@@ -58,12 +60,13 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
         bandBinTransFile = transDir + "LoPdsBoresightImport.trn";
       }
       else {
-        string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information.";
+        string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information";
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "[" + labelFile.Name() + "] contains unknown PDS version type [" + version + "].";
+      string msg = "[" + labelFile.Name() + "] contains unknown PDS version [" +
+                   pdsVersion + "]";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
   }
@@ -77,7 +80,7 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
       bandBinTransFile = transDir + "LoIsis2BoresightImport.trn";
     }
     else {
-      string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information.";
+      string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
   }

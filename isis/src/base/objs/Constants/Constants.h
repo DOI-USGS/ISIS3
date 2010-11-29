@@ -46,10 +46,8 @@ namespace Isis {
    *   @history 2010-03-18 Tracie Sucharski - Updated to 3.2.1beta.
    *   @history 2010-05-24 Travis Addair - Added DEG2RAD and
    *                                       RAD2DEG
+   *   @history 2010-11-29 Steven Lambright - Isis version constant removed
    */
-
-  const std::string version("3.2.2beta | 2010-11-05");
-
   const double E(2.7182818284590452354);    //!<The mathematical constant E
   const double PI(3.14159265358979323846);   //!<The mathematical constant PI
   const double HALFPI(1.57079632679489661923);   //!<The mathematical constant PI/2

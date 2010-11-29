@@ -23,7 +23,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "IsisDebug.h"
 
 #include <iostream>
 #include <QApplication>

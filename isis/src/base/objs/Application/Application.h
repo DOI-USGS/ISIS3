@@ -82,6 +82,7 @@ namespace Isis {
    *                                      into the library path
    *   @history 2010-06-29 Steven Lambright - Added a setlocale to english for
    *            numeric values
+   *   @history 2010-11-29 Steven Lambright - Added the Version() method
    */
   class Application {
     public:
@@ -110,9 +111,10 @@ namespace Isis {
 
       void Exec(const std::string &program, const std::string &parameters);
 
-      static std::string UserName();
-      static std::string HostName();
-      static std::string DateTime(time_t *curtime = 0);
+      static iString UserName();
+      static iString HostName();
+      static iString DateTime(time_t *curtime = 0);
+      static iString Version();
 
     private:
       int p_BatchlistPass;
