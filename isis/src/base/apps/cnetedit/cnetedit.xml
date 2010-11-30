@@ -56,6 +56,10 @@
     <change name="Travis Addair" date="2010-11-29">
       Changed parameter FROMLIST to CUBELIST and ALLFROMLIST to FROMLIST.
     </change>
+    <change name="Travis Addair" date="2010-11-30">
+      Added progress bar for validity checking and automatic logging of the
+      DEFFILE to the print file when entered. 
+    </change>
   </history> 
   
   <category>

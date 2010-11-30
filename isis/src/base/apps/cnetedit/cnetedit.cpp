@@ -3,10 +3,11 @@
 #include "Isis.h"
 
 #include "ControlNet.h"
-#include "SerialNumberList.h"
-#include "ControlPointList.h"
 #include "ControlNetValidMeasure.h"
+#include "ControlPointList.h"
 #include "iException.h"
+#include "Progress.h"
+#include "SerialNumberList.h"
 
 using namespace std;
 using namespace Isis;
@@ -82,6 +83,9 @@ void IsisMain() {
       delete validator;
       validator = NULL;
     }
+
+    // Log the DEFFILE to the print file
+    Application::Log(defFile.FindGroup("ValidMeasure", Pvl::Traverse));
   }
 
   //No List files - only Delete option was chosen
@@ -222,6 +226,11 @@ void ProcessControlMeasures(std::string psFileName, ControlNet &pcCnet) {
 void CheckAllMeasureValidity(ControlNet & cnet, std::string cubeList) {
   SerialNumberList serialNumbers(cubeList);
 
+  Progress progress;
+  progress.SetText("Checking Measure Validity");
+  progress.SetMaximumSteps(cnet.Size());
+  progress.CheckStatus();
+
   for(int cp = cnet.Size() - 1; cp >= 0; cp--) {
 
     // Compare each Serial Number listed with the serial number in the
@@ -253,6 +262,8 @@ void CheckAllMeasureValidity(ControlNet & cnet, std::string cubeList) {
       cnet.Delete(cp);
       numPointsDeleted++;
     }
+
+    progress.CheckStatus();
   }
 }
 
