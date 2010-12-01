@@ -38,6 +38,8 @@ namespace Isis {
    *  @history 2010-11-10 Janet Barrett - Added reference parameters for
    *                      phase and emission so user can specify normalization
    *                      conditions in initialization
+   *  @history 2010-11-30 Janet Barrett - Added ability to use the photometric
+   *                      angles from the ellipsoid or the DEM
    *
    */
   class Shade : public NormModel {
@@ -53,10 +55,10 @@ namespace Isis {
 
     protected:
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
-                                      double dn, double &albedo, double &mult, double &base);
+                                      double dn, double &albedo, double &mult, double &base) {};
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
                                       double deminc, double demema, double dn, double &albedo,
-                                      double &mult, double &base) {};
+                                      double &mult, double &base);
 
     private:
       double p_normPharef;
