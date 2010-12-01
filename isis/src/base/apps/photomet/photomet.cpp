@@ -86,7 +86,8 @@ void IsisMain() {
  */
 void photomet(Buffer &in, Buffer &out) {
 
-  double pha=0., inc=0., ema=0., mult=0., base=0.;
+  double dempha=0., deminc=0., demema=0., mult=0., base=0.;
+  double ellipsoidpha=0., ellipsoidinc=0., ellipsoidema=0.;
   
   for (int i = 0; i < in.size(); i++) {
   
@@ -104,36 +105,38 @@ void photomet(Buffer &in, Buffer &out) {
     else {
       
       // calculate photometric angles
+      ellipsoidpha = cam->PhaseAngle();
+      ellipsoidinc = cam->IncidenceAngle();
+      ellipsoidema = cam->EmissionAngle();
       bool success = true;
       if (useDem) {
         Angle phase, incidence, emission;
         cam->LocalPhotometricAngles(phase, incidence, emission, success);
         if (success) {
-          pha = phase.GetDegrees();
-          inc = incidence.GetDegrees();
-          ema = emission.GetDegrees();
+          dempha = phase.GetDegrees();
+          deminc = incidence.GetDegrees();
+          demema = emission.GetDegrees();
         }
-      }
-      else {
-        pha = cam->PhaseAngle();
-        inc = cam->IncidenceAngle();
-        ema = cam->EmissionAngle();
+      } else {
+        dempha = ellipsoidpha;
+        deminc = ellipsoidinc;
+        demema = ellipsoidema;
       }
 
       // if invalid angles, set to null
       if(!success) {
         out[i] = NULL8;
       }
-      else if(inc >= 90.0 || ema >= 90.0) {
+      else if(deminc >= 90.0 || demema >= 90.0) {
         out[i] = NULL8;
       }
       // if angles greater than max allowed by user, set to null
-      else if(inc > maxinc || ema > maxema) {
+      else if(deminc > maxinc || demema > maxema) {
         out[i] = NULL8;
       }
       // otherwise, do photometric correction
       else {
-        pho->Compute(pha, inc, ema, in[i], out[i], mult, base);
+        pho->Compute(ellipsoidpha, ellipsoidinc, ellipsoidema, deminc, demema, in[i], out[i], mult, base);
       }
     }
   }
