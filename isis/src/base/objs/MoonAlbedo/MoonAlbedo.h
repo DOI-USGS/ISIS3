@@ -34,6 +34,9 @@ namespace Isis {
    * @author 1998-12-21 Randy Kirk
    *
    * @internal
+   *  @history 2010-11-30 Janet Barrett - Added ability to use photometric angles
+   *                      from the ellipsoid or the DEM
+   *
    */
   class MoonAlbedo : public NormModel {
     public:
@@ -42,10 +45,10 @@ namespace Isis {
 
     protected:
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
-                                      double dn, double &albedo, double &mult, double &base);
+                                      double dn, double &albedo, double &mult, double &base) {};
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
                                       double deminc, double demema, double dn, double &albedo,
-                                      double &mult, double &base) {};
+                                      double &mult, double &base);
 
     private:
       //! Set parameters needed for albedo dependent phase function
