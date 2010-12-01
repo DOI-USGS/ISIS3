@@ -8,8 +8,8 @@ namespace Isis {
     NormModel(pvl, pmodel) {
   }
 
-  void NoNormalization::NormModelAlgorithm(double phase, double incidence,
-      double emission, double dn, double &albedo, double &mult,
+  void NoNormalization::NormModelAlgorithm(double phase, double incidence, double emission,
+      double demincidence, double dememission, double dn, double &albedo, double &mult,
       double &base) {
     albedo = dn;
   }
