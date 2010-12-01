@@ -55,19 +55,19 @@ int main() {
     AtmosModel *am = AtmosModelFactory::Create(pvl, *pm);
     TopoAtm *nm = (TopoAtm *)NormModelFactory::Create(pvl, *pm, *am);
 
-    nm->CalcNrmAlbedo(86.7226722, 51.7002388, 38.9414439, .0800618902, result, mult, base);
+    nm->CalcNrmAlbedo(86.7226722, 51.7002388, 38.9414439, 51.7002388, 38.9414439, .0800618902, result, mult, base);
 
     std::cout << "Test phase=86.7226722, incidence=51.7002388, emission=38.9414439, " <<
               "dn=.0800618902 ..." << std::endl;
     std::cout << "Normalization value = " << result << std::endl << std::endl;
 
-    nm->CalcNrmAlbedo(86.7207248, 51.7031305, 38.9372914, .0797334611, result, mult, base);
+    nm->CalcNrmAlbedo(86.7207248, 51.7031305, 38.9372914, 51.7031305, 38.9372914, .0797334611, result, mult, base);
 
     std::cout << "Test phase=86.7207248, incidence=51.7031305, emission=38.9372914, " <<
               "dn=.0797334611 ..." << std::endl;
     std::cout << "Normalization value = " << result << std::endl << std::endl;
 
-    nm->CalcNrmAlbedo(86.7187773, 51.7060221, 38.9331391, .0794225037, result, mult, base);
+    nm->CalcNrmAlbedo(86.7187773, 51.7060221, 38.9331391, 51.7060221, 38.9331391, .0794225037, result, mult, base);
 
     std::cout << "Test phase=86.7187773, incidence=51.7060221, emission=38.9331391, " <<
               "dn=.0794225037 ..." << std::endl;
