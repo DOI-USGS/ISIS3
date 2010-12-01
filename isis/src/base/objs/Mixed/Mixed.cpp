@@ -83,16 +83,16 @@ namespace Isis {
     GetPhotoModel()->SetStandardConditions(false);
   }
 
-  void Mixed::NormModelAlgorithm(double phase, double incidence,
-                                 double emission, double dn, double &albedo, double &mult,
-                                 double &base) {
+  void Mixed::NormModelAlgorithm(double phase, double incidence, double emission,
+                                 double demincidence, double dememission, double dn, 
+                                 double &albedo, double &mult, double &base) {
     double psurf;
     double pprime;
     double aden;
 
     // code for scaling each pixel
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
-    pprime = GetPhotoModel()->PhtTopder(phase, incidence, emission);
+    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
+    pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
     double arg = pow(psurf, 2.0) + pow(p_psurfmatch * pprime / std::max(1.0e-30, p_pprimematch), 2.0);
     aden = sqrt(std::max(1.0e-30, arg));
 
