@@ -39,6 +39,8 @@ namespace Isis {
    *   @history 2010-05-18 Janet Barrett - Modified class so that it does nothing to
    *                       the incoming dn value. The outgoing albedo value will be
    *                       the same as the incoming dn value.
+   *   @history 2010-11-30 Janet Barrett - Added ability to use photometric angles
+   *                       from the ellipsoid or the DEM
    *
    */
   class NoNormalization : public NormModel {
@@ -48,10 +50,10 @@ namespace Isis {
 
     protected:
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
-                                      double dn, double &albedo, double &mult, double &base);
+                                      double dn, double &albedo, double &mult, double &base) {};
       virtual void NormModelAlgorithm(double pha, double inc, double ema,
                                       double deminc, double demema, double dn, double &albedo,
-                                      double &mult, double &base) {};
+                                      double &mult, double &base);
   };
 };
 
