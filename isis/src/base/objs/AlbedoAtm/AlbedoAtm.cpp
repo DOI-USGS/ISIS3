@@ -78,8 +78,9 @@ namespace Isis {
    *          to NumericalMethods class and replaced Isis::PI with
    *          PI since this is in Isis namespace.
    */
-  void AlbedoAtm::NormModelAlgorithm(double phase, double incidence,
-                                     double emission, double dn, double &albedo, double &mult, double &base) {
+  void AlbedoAtm::NormModelAlgorithm(double phase, double incidence, double emission,
+                                     double demincidence, double dememission, double dn, 
+                                     double &albedo, double &mult, double &base) {
     double psurf;
     double ahInterp;
     double munot;
@@ -96,8 +97,8 @@ namespace Isis {
     double fourthterm;
     double fifthterm;
 
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, incidence,
-                                            emission);
+    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence,
+                                            dememission);
 
     ahInterp = (GetAtmosModel()->AtmosAhSpline()).Evaluate(incidence, NumericalApproximation::Extrapolate);
 
