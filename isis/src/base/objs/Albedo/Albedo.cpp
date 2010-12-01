@@ -50,13 +50,13 @@ namespace Isis {
   }
 
   void Albedo::NormModelAlgorithm(double phase, double incidence,
-                                  double emission, double dn, double &albedo, double &mult,
-                                  double &base) {
+                                  double emission, double demincidence, double dememission,
+                                  double dn, double &albedo, double &mult, double &base) {
     double psurf;
     double result;
 
     // code for scaling each pixel
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
+    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
 
     // thresh is a parameter limiting how much we amplify the dns
     if(p_normPsurfref > psurf * p_normThresh) {
