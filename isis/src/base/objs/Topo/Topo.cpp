@@ -38,9 +38,9 @@ namespace Isis {
     }
   }
 
-  void Topo::NormModelAlgorithm(double phase, double incidence,
-                                double emission, double dn, double &albedo, double &mult,
-                                double &base) {
+  void Topo::NormModelAlgorithm(double phase, double incidence, double emission,
+                                double demincidence, double dememission, double dn, 
+                                double &albedo, double &mult, double &base) {
     double rhobar;
     double pprimeref;
     double psurfref;
@@ -64,8 +64,8 @@ namespace Isis {
     GetPhotoModel()->SetStandardConditions(false);
 
     // code for scaling each pixel
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
-    pprime = GetPhotoModel()->PhtTopder(phase, incidence, emission);
+    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
+    pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
 
     if(psurf * pprimeref > pprime * p_normThresh) {
       albedo = NULL8;
