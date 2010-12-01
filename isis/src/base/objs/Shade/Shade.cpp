@@ -32,9 +32,9 @@ namespace Isis {
     }
   }
 
-  void Shade::NormModelAlgorithm(double phase, double incidence,
-                                 double emission, double dn, double &albedo, double &mult,
-                                 double &base) {
+  void Shade::NormModelAlgorithm(double phase, double incidence, double emission,
+                                 double demincidence, double dememission, double dn, 
+                                 double &albedo, double &mult, double &base) {
     double rho;
     double psurfref;
 
@@ -50,7 +50,7 @@ namespace Isis {
 
     rho = p_normAlbedo / psurfref;
 
-    albedo = rho * GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
+    albedo = rho * GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
   }
 
   /**
