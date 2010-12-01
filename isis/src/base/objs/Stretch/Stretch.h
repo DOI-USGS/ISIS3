@@ -62,16 +62,11 @@ namespace Isis {
    *                                       methods
    *  @history 2008-11-12 Steven Lambright - Changed search algorithm into a
    *                                 binary search replacing a linear search.
-   *  @history 2009-04-30 Eric Hyer - One line setters now implemented in header file instead of cpp
-   *                                - Modified parse method
-   *                                    - added abstraction by letting NextPair handle low level details
-   *                                - created second Parse method for handling pairs where the input side
-   *                                  is a perentage
-   *                                - created private NextPair method
-   *                                - Fixed Input and Output getters to check both sides of boundry condition
-   *                                  for valid data
-   *  @history 2009-07-16 Eric Hyer - Fixed bug introduced in AddPair by my last commit
-   *                                - Renamed variable pair to avoid potential conflict with std::pair
+   *  @history 2009-04-30 Eric Hyer - Modified parse method.  New private method
+   *               NextPair() now handles low level details of parsing.
+   *               Created second Parse method for handling pairs where the
+   *               input side is a perentage.  Fixed Input and Output getters
+   *               to check both sides of boundry condition for valid data
    *
    */
   class Stretch {
