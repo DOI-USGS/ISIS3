@@ -203,11 +203,13 @@ namespace Qisis {
    */
   void CubeViewport::showEvent(QShowEvent *event) {
     if(p_scale == -1) {
-      double sampScale = (double) sizeHint().width() / (double) cubeSamples();
-      double lineScale = (double) sizeHint().height() / (double) cubeLines();
-      double scale = sampScale < lineScale ? sampScale : lineScale;
+      // This doesn't equal fitScale() ... causes misalignment in qview initial
+      //   view versus zoomFit
+      //double sampScale = (double) sizeHint().width() / (double) cubeSamples();
+      //double lineScale = (double) sizeHint().height() / (double) cubeLines();
+      //double scale = sampScale < lineScale ? sampScale : lineScale;
 
-      setScale(scale, cubeSamples() / 2.0, cubeLines() / 2.0);
+      setScale(fitScale(), cubeSamples() / 2.0, cubeLines() / 2.0);
     }
 
     if(p_grayBuffer && !p_grayBuffer->enabled()) {

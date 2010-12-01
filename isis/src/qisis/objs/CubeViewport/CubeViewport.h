@@ -95,6 +95,8 @@ namespace Qisis {
   *                         1/min(samps,lines).  Added exceptions to
   *                         ViewportBuffer to help track errors.
   *  @history 2010-11-08 Eric Hyer -  Added better mouseMove signal
+  *  @history 2010-12-01 Steven Lambright - The initial scale now uses fitScale
+  *                         so that it is consistent with the zoom tool.
   */
 
   class Tool;
