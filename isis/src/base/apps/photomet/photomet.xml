@@ -440,6 +440,11 @@
       Added error check for situations where there is not an intersection with
       the DEM and the local photometric angles are requested.
     </change>
+    <change name="Janet Barrett" date="2011-11-23">
+      Added capability to use both ellipsoid and DEM photometric angles in 
+      atmospheric corrections. This provides the ability to do shading using a
+      DEM surface.
+    </change>
   </history>
 
   <category>
