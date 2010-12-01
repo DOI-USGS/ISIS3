@@ -88,8 +88,9 @@ namespace Isis {
    *          NumericalMethods class and replaced Isis::PI with PI
    *          since this is in Isis namespace.
    */
-  void TopoAtm::NormModelAlgorithm(double phase, double incidence,
-                                   double emission, double dn, double &albedo, double &mult, double &base) {
+  void TopoAtm::NormModelAlgorithm(double phase, double incidence, double emission,
+                                   double demincidence, double dememission, double dn, 
+                                   double &albedo, double &mult, double &base) {
     double eps = 0.1;
     double psurf;
     double pprime;
@@ -109,8 +110,8 @@ namespace Isis {
     double pflat;
     double rhoflat;
 
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
-    pprime = GetPhotoModel()->PhtTopder(phase, incidence, emission);
+    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
+    pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
     ahInterp = (GetAtmosModel()->AtmosAhSpline()).Evaluate(incidence, NumericalApproximation::Extrapolate);
 
     munot = cos(incidence * (PI / 180.0));
