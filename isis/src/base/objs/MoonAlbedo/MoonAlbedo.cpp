@@ -130,9 +130,9 @@ namespace Isis {
     p_normBshad3 = 1.0 + p_normBsh1 / (1.0 + tan(Isis::PI / 180.0) / p_normH);
   }
 
-  void MoonAlbedo::NormModelAlgorithm(double phase, double incidence,
-                                      double emission, double dn, double &albedo, double &mult,
-                                      double &base) {
+  void MoonAlbedo::NormModelAlgorithm(double phase, double incidence, double emission,
+                                      double demincidence, double dememission, double dn, 
+                                      double &albedo, double &mult, double &base) {
     double a;
     double cosa;
     double pg2;
@@ -146,7 +146,7 @@ namespace Isis {
     double pg31;
     double pg3;
 
-    a = GetPhotoModel()->CalcSurfAlbedo(phase, incidence, emission);
+    a = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
 
     if(a != 0.0) {
       cosa = cos(phase * Isis::PI / 180.0);
