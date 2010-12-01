@@ -126,13 +126,13 @@ int main() {
 //    result = pho->Compute(86.722672229212051,51.7002388445338,38.94144389777756,
 //        0.080061890184879303);
     pho->Compute(86.722672229212051, 51.7002388445338, 38.94144389777756,
-                 0.080061890184879303, albedo, mult, base);
+                 51.7002388445338, 38.94144389777756, 0.080061890184879303, albedo, mult, base);
 //    std::cout << "Photometric brightness value = " << result << std::endl <<
 //        std::endl;
     std::cout << "Photometric brightness value = " << albedo << std::endl <<
               std::endl;
 //    result = pho->Compute(86.7207248,51.7031305,38.9372914,.0797334611);
-    pho->Compute(86.7207248, 51.7031305, 38.9372914, .0797334611, albedo, mult,
+    pho->Compute(86.7207248, 51.7031305, 38.9372914, 51.7031305, 38.9372914, .0797334611, albedo, mult,
                  base);
 //    std::cout << "Photometric brightness value = " << result << std::endl <<
 //        std::endl;
@@ -141,7 +141,7 @@ int main() {
     std::cout << "Testing photometry method with dem ..." << std::endl;
 //    result = phodem->Compute(86.7226722,51.7002388,38.9414439,51.7910076,
 //        39.0176048,.0800618902);
-    phodem->Compute(86.7226722, 51.7002388, 38.9414439,
+    phodem->Compute(86.7226722, 51.7002388, 38.9414439, 51.7002388, 38.9414439,
                     .0800618902, albedo, mult, base);
 //    std::cout << "Photometric brightness value = " << result << std::endl <<
 //        std::endl;
@@ -149,7 +149,7 @@ int main() {
               std::endl;
 //    result = phodem->Compute(86.7207248,51.7031305,38.9372914,51.8776595,
 //        38.9719125,.0797334611);
-    phodem->Compute(86.7207248, 51.7031305, 38.9372914,
+    phodem->Compute(86.7207248, 51.7031305, 38.9372914, 51.7031305, 38.9372914,
                     .0797334611, albedo, mult, base);
 //    std::cout << "Photometric brightness value = " << result << std::endl <<
 //        std::endl;
