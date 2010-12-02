@@ -58,26 +58,27 @@ namespace Qisis {
    *
    * @internal
    *  @history 2008-05-23 Noah Hilt - Added RubberBandTool
-   *    @history 2010-03-18 Sharmila Prasad - Exception handling and emit warning signal
-   *        to the Viewportwindow to display warning status on the status bar(Track Tool)
-   *    @history 2010-04-08 Steven Lambright - Made to work with threaded
-   *        viewportbuffer and also removed map to viewport stretches due to
-   *        synchronization problems.
-   *    @history 2010-04-08 Steven Lambright - Fixed access of
-   *             viewport data for statistics
-   *    @history 2010-05-20 Steven Lambright - Re-enabled the
-   *             advanced stretch... without a viewport map!
-   *    @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
-   *                                  - Fixed all include abuses
-   *    @history 2010-08-30 Eric Hyer
-   *             - Added RGB support for stretchRegional
-   *             - stretchRegional and rubberBandComplete
-   *                 now use the new private method stretchRect in order to
-   *                 avoid duplicate code.
-   *    @history 2010-11-22 Eric Hyer - new SIGNAL called stretchChipViewport
-   *                 exists for sending stretches made in CubeViewports to any
-   *                 ChipViewports that want to get stretched.
-   *    @history 2010-12-01 Steven Lambright - Improved stretch copy abilities
+   *  @history 2010-03-18 Sharmila Prasad - Exception handling and emit warning signal
+   *      to the Viewportwindow to display warning status on the status bar(Track Tool)
+   *  @history 2010-04-08 Steven Lambright - Made to work with threaded
+   *      viewportbuffer and also removed map to viewport stretches due to
+   *      synchronization problems.
+   *  @history 2010-04-08 Steven Lambright - Fixed access of
+   *      viewport data for statistics
+   *  @history 2010-05-20 Steven Lambright - Re-enabled the
+   *      advanced stretch... without a viewport map!
+   *  @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
+   *                                - Fixed all include abuses
+   *  @history 2010-08-30 Eric Hyer
+   *      - Added RGB support for stretchRegional
+   *      - stretchRegional and rubberBandComplete now use the new private
+   *        method stretchRect in order to avoid duplicate code.
+   *  @history 2010-11-22 Eric Hyer - new SIGNAL called stretchChipViewport
+   *      exists for sending stretches made in CubeViewports to any
+   *      ChipViewports that want to get stretched.
+   *  @history 2010-12-01 Steven Lambright - Improved stretch copy abilities
+   *  @history 2010-12-02 Eric Hyer - changed where stretchChipViewport is
+   *      emitted.
    */
   class StretchTool : public Qisis::Tool {
       Q_OBJECT

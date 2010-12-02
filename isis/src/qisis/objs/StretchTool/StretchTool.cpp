@@ -530,10 +530,6 @@ namespace Qisis {
       Isis::Stretch stretch = cvp->grayStretch();
       min = stretch.Input(0);
       max = stretch.Input(stretch.Pairs() - 1);
-      
-      // send the stretch to any ChipViewports that want to listen
-      *p_chipViewportStretch = stretch;
-      emit stretchChipViewport(p_chipViewportStretch, cvp);
     }
 
     //Otherwise it is in color mode
@@ -585,6 +581,10 @@ namespace Qisis {
       grayStretch.ClearPairs();
       grayStretch.CopyPairs(p_advancedStretch->getGrayStretch());
       cvp->stretchGray(grayStretch);
+      
+      // send the stretch to any ChipViewports that want to listen
+      *p_chipViewportStretch = grayStretch;
+      emit stretchChipViewport(p_chipViewportStretch, cvp);
     }
     else {
       Stretch redStretch = cvp->redStretch();
@@ -632,6 +632,10 @@ namespace Qisis {
       stretch.ClearPairs();
       stretch.AddPair(min, 0.0);
       stretch.AddPair(max, 255.0);
+      
+      // send the stretch to any ChipViewports that want to listen
+      *p_chipViewportStretch = stretch;
+      emit stretchChipViewport(p_chipViewportStretch, cvp);
 
       cvp->stretchGray(stretch);
     }
@@ -785,6 +789,10 @@ namespace Qisis {
         newStretch.ClearPairs();
         newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
         cvp->stretchGray(newStretch);
+        
+        // send the stretch to any ChipViewports that want to listen
+        *p_chipViewportStretch = newStretch;
+        emit stretchChipViewport(p_chipViewportStretch, cvp);
       }
       else {
         switch(p_stretchBand) {
