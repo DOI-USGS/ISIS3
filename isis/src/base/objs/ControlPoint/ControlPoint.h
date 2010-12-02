@@ -91,6 +91,7 @@ namespace Isis {
    *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString()
    *   @history 2010-09-09 Sharmila Prasad - Added API's to get Latitude, Logitude, Radius from the
    *                       Reference Measure in the Point. Also to get the min & max Line & Sample Errors
+   *   @history 2010-12-02 Eric Hyer - HasSerialNumber is now const
    */
   class ControlPoint {
     public:
@@ -154,7 +155,7 @@ namespace Isis {
       const ControlMeasure &operator[](const std::string &serialNumber) const;
 
       //! Does Serial Number exist in point
-      bool HasSerialNumber(std::string &serialNumber);
+      bool HasSerialNumber(std::string &serialNumber) const;
 
       //! Return the number of measurements in the control point
       int Size() const {

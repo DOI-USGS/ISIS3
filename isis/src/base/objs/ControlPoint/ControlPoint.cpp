@@ -227,7 +227,7 @@ namespace Isis {
    *  @param serialNumber  The serial number
    *  @return True if point contains serial number, false if not
    */
-  bool ControlPoint::HasSerialNumber(std::string &serialNumber) {
+  bool ControlPoint::HasSerialNumber(std::string &serialNumber) const {
     for(int m = 0; m < this->Size(); m++) {
       if(this->operator[](m).CubeSerialNumber() == serialNumber) {
         return true;
