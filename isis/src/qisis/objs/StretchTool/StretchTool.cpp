@@ -938,19 +938,7 @@ namespace Qisis {
         cvp->stretchBlue(newStretchBlue);
       }
       else if(!thisViewport->isGray() && cvp->isGray()) {
-        Stretch newStretch(cvp->grayStretch());
-
-        if(p_stretchBand == Red) {
-          newStretch.CopyPairs(thisViewport->redStretch());
-        }
-        else if(p_stretchBand == Green) {
-          newStretch.CopyPairs(thisViewport->greenStretch());
-        }
-        else if(p_stretchBand == Blue) {
-          newStretch.CopyPairs(thisViewport->blueStretch());
-        }
-
-        cvp->stretchGray(newStretch);
+        // don't copy rgb to gray
       }
       else if(thisViewport->isGray() && !cvp->isGray()) {
         // don't copy gray stretches to rgb
