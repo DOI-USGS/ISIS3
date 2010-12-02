@@ -77,6 +77,7 @@ namespace Qisis {
    *    @history 2010-11-22 Eric Hyer - new SIGNAL called stretchChipViewport
    *                 exists for sending stretches made in CubeViewports to any
    *                 ChipViewports that want to get stretched.
+   *    @history 2010-12-01 Steven Lambright - Improved stretch copy abilities
    */
   class StretchTool : public Qisis::Tool {
       Q_OBJECT

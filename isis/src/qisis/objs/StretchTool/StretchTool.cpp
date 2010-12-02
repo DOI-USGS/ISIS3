@@ -403,7 +403,7 @@ namespace Qisis {
       p_stretchBandComboBox->setShown(false);
     }
     else if(cvp) {
-      p_copyBands->setEnabled(false);
+      p_copyBands->setEnabled(true);
       p_stretchBandComboBox->setShown(true);
     }
     else {
@@ -866,10 +866,41 @@ namespace Qisis {
     double min = p_stretchMinEdit->text().toDouble();
     double max = p_stretchMaxEdit->text().toDouble();
 
-    Isis::Stretch stretch = cvp->grayStretch();
-    stretch.ClearPairs();
-    stretch.AddPair(min, 0.0);
-    stretch.AddPair(max, 255.0);
+    Isis::Stretch stretch;
+
+    if(cvp->isGray()) {
+      stretch = cvp->grayStretch();
+      stretch.ClearPairs();
+      stretch.AddPair(min, 0.0);
+      stretch.AddPair(max, 255.0);
+    }
+    else if(p_stretchBand == Red) {
+      stretch = cvp->redStretch();
+      stretch.ClearPairs();
+      stretch.AddPair(min, 0.0);
+      stretch.AddPair(max, 255.0);
+      cvp->stretchGreen(stretch);
+      cvp->stretchBlue(stretch);
+    }
+    else if(p_stretchBand == Green) {
+      stretch = cvp->greenStretch();
+      stretch.ClearPairs();
+      stretch.AddPair(min, 0.0);
+      stretch.AddPair(max, 255.0);
+      cvp->stretchRed(stretch);
+      cvp->stretchBlue(stretch);
+    }
+    else if(p_stretchBand == Blue) {
+      stretch = cvp->blueStretch();
+      stretch.ClearPairs();
+      stretch.AddPair(min, 0.0);
+      stretch.AddPair(max, 255.0);
+      cvp->stretchRed(stretch);
+      cvp->stretchGreen(stretch);
+    }
+    else {
+      return;
+    }
 
     cvp->setAllBandStretches(stretch);
   }
@@ -881,52 +912,48 @@ namespace Qisis {
    *
    */
   void StretchTool::setStretchAllViewports() {
+    CubeViewport *thisViewport = cubeViewport();
+
+    if(thisViewport == NULL) return;
+
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       CubeViewport *cvp = cubeViewportList()->at(i);
-      double min = p_stretchMinEdit->text().toDouble();
-      double max = p_stretchMaxEdit->text().toDouble();
 
-      //The viewport is in gray mode
-      if(cvp->isGray()) {
-        Isis::Stretch stretch = cvp->grayStretch();
-        stretch.ClearPairs();
-        stretch.AddPair(min, 0.0);
-        stretch.AddPair(max, 255.0);
-        cvp->stretchGray(stretch);
+      if(thisViewport->isGray() && cvp->isGray()) {
+        Stretch newStretch(cvp->grayStretch());
+        newStretch.CopyPairs(thisViewport->grayStretch());
+        cvp->stretchGray(newStretch);
       }
-      //Otherwise the viewport is in color mode
-      else {
+      else if(!thisViewport->isGray() && !cvp->isGray()) {
+        Stretch newStretchRed(cvp->redStretch());
+        newStretchRed.CopyPairs(thisViewport->redStretch());
+        cvp->stretchRed(newStretchRed);
 
-        Isis::Stretch greenStretch = cvp->greenStretch();
-        Isis::Stretch blueStretch = cvp->blueStretch();
+        Stretch newStretchGreen(cvp->greenStretch());
+        newStretchGreen.CopyPairs(thisViewport->greenStretch());
+        cvp->stretchGreen(newStretchGreen);
+
+        Stretch newStretchBlue(cvp->blueStretch());
+        newStretchBlue.CopyPairs(thisViewport->blueStretch());
+        cvp->stretchBlue(newStretchBlue);
+      }
+      else if(!thisViewport->isGray() && cvp->isGray()) {
+        Stretch newStretch(cvp->grayStretch());
 
         if(p_stretchBand == Red) {
-          Isis::Stretch redStretch = cvp->redStretch();
-
-          redStretch.ClearPairs();
-          redStretch.AddPair(min, 0.0);
-          redStretch.AddPair(max, 255.0);
-
-          cvp->stretchRed(redStretch);
+          newStretch.CopyPairs(thisViewport->redStretch());
         }
         else if(p_stretchBand == Green) {
-          Isis::Stretch greenStretch = cvp->redStretch();
-
-          greenStretch.ClearPairs();
-          greenStretch.AddPair(min, 0.0);
-          greenStretch.AddPair(max, 255.0);
-
-          cvp->stretchGreen(greenStretch);
+          newStretch.CopyPairs(thisViewport->greenStretch());
         }
         else if(p_stretchBand == Blue) {
-          Isis::Stretch blueStretch = cvp->blueStretch();
-
-          blueStretch.ClearPairs();
-          blueStretch.AddPair(min, 0.0);
-          blueStretch.AddPair(max, 255.0);
-
-          cvp->stretchBlue(blueStretch);
+          newStretch.CopyPairs(thisViewport->blueStretch());
         }
+
+        cvp->stretchGray(newStretch);
+      }
+      else if(thisViewport->isGray() && !cvp->isGray()) {
+        // don't copy gray stretches to rgb
       }
     }
 
