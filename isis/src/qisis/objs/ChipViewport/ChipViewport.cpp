@@ -126,19 +126,21 @@ namespace Qisis {
     
     if (!cvp || !p_chipCube)
       return;
-    
+      
     // only stretch if the CubeViewport is opened to the same cube as we are,
     // otherwise the signal was meant for a different ChipViewport!
     if (cvp->cube()->Filename() == p_chipCube->Filename()) {
-      *p_stretch = *newStretch;
     
       // if user right clicked in the CubeViewport then we get a SIGNAL with a
       // NULL Stretch.  This is used to signify that we need to restretch on our
       // own (go back to global).
       if (!newStretch) {
-        autoStretch();
+        computeStretch(p_gray.stretch, true);
+        paintImage();
+        update();
       }
       else {
+        *p_stretch = *newStretch;
         p_gray.stretch = *newStretch;
         paintImage();
         update();
@@ -156,8 +158,8 @@ namespace Qisis {
 
 
   //! Compute automatic stretch for a portion of the cube
-  void ChipViewport::computeStretch(Isis::Stretch &stretch) {
-    if (p_stretchLocked) {
+  void ChipViewport::computeStretch(Isis::Stretch &stretch, bool force) {
+    if (p_stretchLocked && !force) {
       stretch = *p_stretch;
     }
     else {

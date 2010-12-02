@@ -51,22 +51,20 @@ namespace Qisis {
     *
     * @internal
     * @history 2008-09-09 Tracie Sucharski - Added setCircle and setCircleSize
-    *                          methods.
+    *     methods.
     * @history 2010-06-16 Jeannie Walldren - Modified geomChip(), nogeomChip(),
-    *                        rotateChip() and reloadChip() to catch possible
-    *                        iExceptions from Chip's Load() method and display
-    *                        Error in QMessageBox
+    *     rotateChip() and reloadChip() to catch possible iExceptions from
+    *     Chip's Load() method and display Error in QMessageBox
     * @history 2010-11-17 Eric Hyer - Added cubeToViewport method and
-    *              setControlNet slot.  paintEvent can now use the control net
-    *              to paint measures in the viewport.
+    *     setControlNet slot.  paintEvent can now use the control net to paint
+    *     measures in the viewport.
     * @history 2010-11-22 Eric Hyer - ChipViewports can now be stretched by
-    *              stretching CubeViewports opened to the same cube
+    *     stretching CubeViewports opened to the same cube
     * @history 2010-11-24 Eric Hyer - Fixed bug where crosses were painted one
-    *              screen pixel off on each direction.  Also no longer paint
-    *              cross under the large main red crosses.
+    *     screen pixel off on each direction.  Also no longer paint cross under
+    *     the large main red crosses.
     * @history 2010-12-01 Eric Hyer - Added stretch locking
     */
-
   class ChipViewport : public QWidget {
       Q_OBJECT
 
@@ -166,7 +164,7 @@ namespace Qisis {
     private:
       void reloadChip(double tackSample = 0., double tackLine = 0.);
 
-      void computeStretch(Isis::Stretch &stretch);
+      void computeStretch(Isis::Stretch &stretch, bool force = false);
       void paintImage();
 
       class BandInfo {
