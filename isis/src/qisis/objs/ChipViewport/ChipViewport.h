@@ -64,6 +64,7 @@ namespace Qisis {
     * @history 2010-11-24 Eric Hyer - Fixed bug where crosses were painted one
     *              screen pixel off on each direction.  Also no longer paint
     *              cross under the large main red crosses.
+    * @history 2010-12-01 Eric Hyer - Added stretch locking
     */
 
   class ChipViewport : public QWidget {
@@ -72,7 +73,7 @@ namespace Qisis {
 
     public:
       ChipViewport(int width, int height, QWidget *parent = 0);
-      ~ChipViewport();
+      virtual ~ChipViewport();
       
       bool cubeToViewport(double samp, double line, int & x, int & y);
 
@@ -123,6 +124,7 @@ namespace Qisis {
 
       void autoStretch();
       void stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      void changeStretchLock(int);
       void setCross(bool checked);
       void rotateChip(int rotation);
       void setCircle(bool checked);
@@ -211,6 +213,9 @@ namespace Qisis {
       // to maintain this pointer with the setControlNet method (to make sure
       // that either NULL or a valid ControlNet is being pointed to).
       Isis::ControlNet * p_controlNet;
+      
+      bool p_stretchLocked;
+      Isis::Stretch * p_stretch;
   };
 };
 

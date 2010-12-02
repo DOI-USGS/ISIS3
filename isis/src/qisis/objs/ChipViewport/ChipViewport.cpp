@@ -2,6 +2,8 @@
 
 #include "ChipViewport.h"
 
+#include <iostream>
+
 #include <QMessageBox>
 #include <QPainter>
 
@@ -10,8 +12,9 @@
 #include "Cube.h"
 #include "CubeViewport.h"
 #include "SerialNumber.h"
+#include "Stretch.h"
 
-
+using namespace Isis;
 
 namespace Qisis {
 
@@ -37,6 +40,10 @@ namespace Qisis {
     p_matchChipCube = NULL;
     p_image = NULL;
     p_controlNet = NULL;
+    p_stretchLocked = false;
+    p_stretch = NULL;
+    
+    p_stretch = new Stretch;
   }
 
 
@@ -45,7 +52,10 @@ namespace Qisis {
    *
    */
   ChipViewport::~ChipViewport() {
-
+    if (p_stretch) {
+      delete p_stretch;
+      p_stretch = NULL;
+    }
   }
   
   
@@ -120,6 +130,7 @@ namespace Qisis {
     // only stretch if the CubeViewport is opened to the same cube as we are,
     // otherwise the signal was meant for a different ChipViewport!
     if (cvp->cube()->Filename() == p_chipCube->Filename()) {
+      *p_stretch = *newStretch;
     
       // if user right clicked in the CubeViewport then we get a SIGNAL with a
       // NULL Stretch.  This is used to signify that we need to restretch on our
@@ -134,34 +145,49 @@ namespace Qisis {
       }
     }
   }
+  
+  
+  void ChipViewport::changeStretchLock(int newStatus) {
+    if (newStatus == 0)
+      p_stretchLocked = false;
+    else
+      p_stretchLocked = true;
+  }
 
 
   //! Compute automatic stretch for a portion of the cube
   void ChipViewport::computeStretch(Isis::Stretch &stretch) {
-    Isis::Statistics stats;
-    for(int line = 1; line < p_chip->Lines(); line++) {
-      for(int samp = 1; samp < p_chip->Samples(); samp++) {
-        double value = p_chip->GetValue(samp, line);
-        stats.AddData(&value, 1);
-      }
-    }
-
-    Isis::Histogram hist(stats.BestMinimum(), stats.BestMaximum());
-    for(int line = 1; line <= p_chip->Lines(); line++) {
-      for(int samp = 1; samp <= p_chip->Samples(); samp++) {
-        double value = p_chip->GetValue(samp, line);
-        hist.AddData(&value, 1);
-      }
-    }
-
-    stretch.ClearPairs();
-    if(hist.Percent(0.5) != hist.Percent(99.5)) {
-      stretch.AddPair(hist.Percent(0.5), 0.0);
-      stretch.AddPair(hist.Percent(99.5), 255.0);
+    if (p_stretchLocked) {
+      stretch = *p_stretch;
     }
     else {
-      stretch.AddPair(-DBL_MAX, 0.0);
-      stretch.AddPair(DBL_MAX, 255.0);
+      Isis::Statistics stats;
+      for(int line = 1; line < p_chip->Lines(); line++) {
+        for(int samp = 1; samp < p_chip->Samples(); samp++) {
+          double value = p_chip->GetValue(samp, line);
+          stats.AddData(&value, 1);
+        }
+      }
+  
+      Isis::Histogram hist(stats.BestMinimum(), stats.BestMaximum());
+      for(int line = 1; line <= p_chip->Lines(); line++) {
+        for(int samp = 1; samp <= p_chip->Samples(); samp++) {
+          double value = p_chip->GetValue(samp, line);
+          hist.AddData(&value, 1);
+        }
+      }
+  
+      stretch.ClearPairs();
+      if(hist.Percent(0.5) != hist.Percent(99.5)) {
+        stretch.AddPair(hist.Percent(0.5), 0.0);
+        stretch.AddPair(hist.Percent(99.5), 255.0);
+      }
+      else {
+        stretch.AddPair(-DBL_MAX, 0.0);
+        stretch.AddPair(DBL_MAX, 255.0);
+      }
+      
+      *p_stretch = stretch;
     }
   }
 
@@ -570,7 +596,6 @@ namespace Qisis {
     else {
       try {
         p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
-        //cerr << "ChipViewport::reloadChip... p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor) called\n";
       }
       catch(Isis::iException &e) {
         QString msg = "Cannot reload chip.\n";
