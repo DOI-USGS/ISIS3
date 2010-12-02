@@ -25,6 +25,7 @@ namespace Qisis {
    * @param parent
    */
   BandTool::BandTool(QWidget *parent) : Qisis::Tool(parent) {
+    p_bandBinViewport = NULL;
   }
 
   /**
@@ -461,7 +462,9 @@ namespace Qisis {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp != NULL) {
 
-      setBandBin(*cvp->cube()->Label());
+      if(p_bandBinViewport != cvp) {
+        setBandBin(*cvp->cube()->Label());
+      }
 
       if(cvp->isGray()) {
 
@@ -502,6 +505,8 @@ namespace Qisis {
 
       connect(p_rgbButton, SIGNAL(toggled(bool)), this, SLOT(changeView()));
     }
+
+    p_bandBinViewport = cvp;
   }
 
 

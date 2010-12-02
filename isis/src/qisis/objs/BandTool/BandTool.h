@@ -25,6 +25,8 @@ namespace Qisis {
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport
+   *   @history 2010-12-01 Steven Lambright - No longer calls setBandBin() if
+   *            the viewport doesn't change.
    */
   class BandTool : public Qisis::Tool {
       Q_OBJECT
@@ -68,6 +70,7 @@ namespace Qisis {
       QComboBox *p_comboBox;//!< display selection combo box
       QStackedWidget *p_stack; //!< Stacked widget for spin boxes
       QStackedWidget *p_stack2;//!< Stacked widget for displays and combo box
+      CubeViewport *p_bandBinViewport;
 
       int p_bands;//!< Number of possible bands
       Isis::Pvl p_pvl;//!< pvl
