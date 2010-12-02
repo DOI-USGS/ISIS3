@@ -126,11 +126,21 @@ namespace Qisis {
     leftZoom1->setIcon(QPixmap(toolIconDir + "/viewmag1.png"));
     leftZoom1->setIconSize(isize);
     leftZoom1->setToolTip("Zoom 1:1");
+    
+    QCheckBox *leftLockStretch = new QCheckBox("lock stretch");
+    // there are two "lock stretch" checkboxes (left and right)
+    // use same whats this text for both
+    QString whatsThisTextForStretchLocking = "If checked then a new stretch "
+        "will NOT be calculated for each pan or zoom change.  Note that stretch"
+        " changes made using the stretch tool will ALWAYS take effect, "
+        "regardless of the state of this checkbox.";
+    leftLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
 
     QHBoxLayout *leftZoomPan = new QHBoxLayout;
     leftZoomPan->addWidget(leftZoomIn);
     leftZoomPan->addWidget(leftZoomOut);
     leftZoomPan->addWidget(leftZoom1);
+    leftZoomPan->addWidget(leftLockStretch);
 
     // These buttons only used if allow mouse events in leftViewport
     QToolButton *leftPanUp = 0;
@@ -223,11 +233,15 @@ namespace Qisis {
                                  Expanded().c_str()));
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");
+    
+    QCheckBox *rightLockStretch = new QCheckBox("lock stretch");
+    rightLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
 
     rightZoomPan->addWidget(rightPanUp);
     rightZoomPan->addWidget(rightPanDown);
     rightZoomPan->addWidget(rightPanLeft);
     rightZoomPan->addWidget(rightPanRight);
+    rightZoomPan->addWidget(rightLockStretch);
     rightZoomPan->addStretch();
 
     gridLayout->addLayout(rightZoomPan, row++, 1);
@@ -252,6 +266,12 @@ namespace Qisis {
         SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
         p_leftView,
         SLOT(stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+        
+    connect(leftLockStretch, SIGNAL(stateChanged(int)),
+        p_leftView,
+        SLOT(changeStretchLock(int)));
+    leftLockStretch->setChecked(false);
+
 
     //  Connect left zoom buttons to ChipViewport's zoom slots
     connect(leftZoomIn, SIGNAL(clicked()), p_leftView, SLOT(zoomIn()));
@@ -290,7 +310,11 @@ namespace Qisis {
         SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
         p_rightView,
         SLOT(stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *)));
-            
+        
+    connect(rightLockStretch, SIGNAL(stateChanged(int)),
+        p_rightView,
+        SLOT(changeStretchLock(int)));
+    rightLockStretch->setChecked(false);
             
     //  Connect the ChipViewport tackPointChanged signal to
     //  the update sample/line label
