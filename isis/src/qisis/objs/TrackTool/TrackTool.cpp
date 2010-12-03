@@ -113,8 +113,8 @@ namespace Qisis {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
 
-    if(p.x() > 0 && p.x() < cvp->width() &&
-        p.y() > 0 && p.y() < cvp->height()) {
+    if(p.x() >= 0 && p.x() < cvp->width() &&
+        p.y() >= 0 && p.y() < cvp->height()) {
       updateLabels(p);
     }
   }
