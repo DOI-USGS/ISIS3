@@ -50,10 +50,10 @@ int main(int argc, char *argv[]) {
   }
   std::cout << std::endl;
 
-  a.Exec(myFunct);
+  a.Run(myFunct);
   std::cout << std::endl;
 
-  a.Exec(myError);
+  a.Run(myError);
   std::cout << std::endl;
 
   Isis::Pvl p("print.prt");

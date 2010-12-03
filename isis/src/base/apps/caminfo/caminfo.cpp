@@ -13,6 +13,7 @@
 #include "LineManager.h"
 #include "OriginalLabel.h"
 #include "Process.h"
+#include "ProgramLauncher.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "SerialNumber.h"
@@ -41,7 +42,7 @@ void IsisMain() {
   //spiceinit will use system kernels
   if(ui.GetBoolean("SPICE")) {
     string parameters = "FROM=" + in.Expanded();
-    Isis::iApp->Exec("spiceinit", parameters);
+    ProgramLauncher::RunIsisProgram("spiceinit", parameters);
   }
 
   Cube *icube = p.SetInputCube("FROM");
@@ -78,7 +79,7 @@ void IsisMain() {
                         " LINC=" + iString(linc) +
                         " SINC=" + iString(sinc);
 
-    Isis::iApp->Exec("camstats", parameters);
+    ProgramLauncher::RunIsisProgram("camstats", parameters);
     //out put to common object of the PVL
     camPvl.Read(pvlOut);
     remove(pvlOut.c_str());

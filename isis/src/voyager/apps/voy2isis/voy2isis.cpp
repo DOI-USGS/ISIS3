@@ -9,10 +9,10 @@
 #include "iString.h"
 #include "NaifStatus.h"
 #include "ProcessImportPds.h"
+#include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlTranslationManager.h"
-#include "System.h"
 #include "UserInterface.h"
 
 #include "naif/SpiceUsr.h"
@@ -42,7 +42,8 @@ void IsisMain() {
   if(ext == "IMQ") {
     try {
       string command = "$ISISROOT/bin/vdcomp " + in.Expanded() + " " + temp.Expanded();
-      System(command);
+      // don't pretend vdcomp is a standard Isis program, just run it
+      ProgramLauncher::RunSystemCommand(command);
       in = temp.Expanded();
       ConvertComments(in);
       tempFile = true;

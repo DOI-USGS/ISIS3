@@ -8,13 +8,14 @@
 #include <cstdio>
 #include <cmath>
 
-#include "ProcessByLine.h"
-#include "Statistics.h"
-#include "MultivariateStatistics.h"
-#include "TextFile.h"
-#include "Spice.h"
-#include "MdisCalUtils.h"
 #include "DarkModelPixel.h"
+#include "MdisCalUtils.h"
+#include "MultivariateStatistics.h"
+#include "ProcessByLine.h"
+#include "ProgramLauncher.h"
+#include "Spice.h"
+#include "Statistics.h"
+#include "TextFile.h"
 
 using namespace Isis;
 using namespace std;
@@ -299,7 +300,7 @@ void IsisMain() {
                         " LSCALE=" + scale +
                         " SSCALE=" + scale;
     cout << "Running: reduce " << parameters << endl;
-    iApp->Exec("reduce", parameters);
+    ProgramLauncher::RunIsisProgram("reduce", parameters);
     reducedFlat = newflat.Expanded();
     CubeAttributeInput att;
     p.SetInputCube(reducedFlat, att);
@@ -495,7 +496,7 @@ void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
       continue;
     }
 //462
-//	if(i == 25 && imageIn.Line() == 25) std::cout <<  "In: " << imageIn[i] << std::endl;
+//if(i == 25 && imageIn.Line() == 25) std::cout <<  "In: " << imageIn[i] << std::endl;
 
     // Step 1: Perform dark current corrections
     if(darkCurrentMode == DarkCurrentNone) {

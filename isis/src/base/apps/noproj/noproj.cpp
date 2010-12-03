@@ -1,19 +1,21 @@
 #define GUIHELPERS
 #include "Isis.h"
-#include "Pvl.h"
 
-#include "Process.h"
-
-#include "Blob.h"
-#include "History.h"
-#include "CameraDetectorMap.h"
-#include "Application.h"
-#include "CameraFocalPlaneMap.h"
-#include "PvlObject.h"
-#include "AlphaCube.h"
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include "AlphaCube.h"
+#include "Application.h"
+#include "Blob.h"
+#include "CameraDetectorMap.h"
+#include "CameraFocalPlaneMap.h"
+#include "History.h"
+#include "Process.h"
+#include "ProgramLauncher.h"
+#include "Pvl.h"
+#include "PvlObject.h"
+
 
 using namespace Isis;
 using namespace std;
@@ -297,7 +299,7 @@ void IsisMain() {
   parameters += " MATCH= " + string("match.cub");
   parameters += " TO= " + ui.GetFilename("TO");
   parameters += " INTERP=" + ui.GetString("INTERP");
-  Isis::iApp ->Exec("cam2cam", parameters);
+  ProgramLauncher::RunIsisProgram("cam2cam", parameters);
 
 //  Cleanup by deleting the match files
   remove("match.History.IsisCube");

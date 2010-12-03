@@ -2,6 +2,7 @@
 
 #include "Pipeline.h"
 #include "PipelineApplication.h"
+#include "ProgramLauncher.h"
 #include "iException.h"
 #include "Application.h"
 #include "Preference.h"
@@ -190,7 +191,7 @@ namespace Isis {
           }
           else {
             // Nothing special is happening, just execute the program
-            Isis::iApp->Exec(Application(i).Name(), params[j]);
+            ProgramLauncher::RunIsisProgram(Application(i).Name(), params[j]);
           }
         }
       }

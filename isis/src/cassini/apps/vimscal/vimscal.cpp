@@ -3,17 +3,18 @@
 #include <vector>
 #include <stdio.h>
 
-#include "EndianSwapper.h"
-#include "UserInterface.h"
-#include "iException.h"
-#include "ProcessByLine.h"
-#include "iString.h"
-#include "LineManager.h"
-#include "Table.h"
-#include "Statistics.h"
 #include "Camera.h"
-#include "PolynomialUnivariate.h"
+#include "EndianSwapper.h"
+#include "iException.h"
+#include "iString.h"
 #include "LeastSquares.h"
+#include "LineManager.h"
+#include "PolynomialUnivariate.h"
+#include "ProcessByLine.h"
+#include "ProgramLauncher.h"
+#include "Statistics.h"
+#include "Table.h"
+#include "UserInterface.h"
 
 using namespace Isis;
 using namespace std;
@@ -662,7 +663,7 @@ iString createCroppedFile(Cube *icube, iString cubeFilename, bool flatFile) {
 
   appArgs += "to=" + tempFile.Expanded();
 
-  iApp->Exec("crop", appArgs);
+  ProgramLauncher::RunIsisProgram("crop", appArgs);
   tempFiles.push_back(tempFile.Expanded());
   return tempFile.Expanded();
 }

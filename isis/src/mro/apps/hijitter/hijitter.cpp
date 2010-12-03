@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "CameraDetectorMap.h"
 #include "CameraFactory.h"
+#include "ProgramLauncher.h"
 
 using namespace std;
 using namespace Isis;
@@ -265,7 +266,7 @@ void ProcessNoprojFiles(Pipeline &p) {
     params += " FLAT=" + flatFileLoc;
 
     try {
-      Isis::iApp->Exec("hijitreg", params);
+      ProgramLauncher::RunIsisProgram("hijitreg", params);
     }
     catch(iException &e) {
       e.Clear();

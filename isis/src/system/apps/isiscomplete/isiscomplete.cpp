@@ -1,6 +1,5 @@
 #include "Application.h"
 #include "UserInterface.h"
-#include "System.h"
 #include "FileList.h"
 #include "iString.h"
 

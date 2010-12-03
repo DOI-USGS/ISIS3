@@ -1,0 +1,80 @@
+#include "Isis.h"
+
+#include <iostream>
+
+#include "iException.h"
+#include "iString.h"
+#include "Preference.h"
+#include "ProgramLauncher.h"
+
+using namespace Isis;
+using namespace std;
+
+void IsisMain() {
+  Preference::Preferences(true);
+
+  cerr << "Testing ProgramLauncher Class ... " << endl;
+  cerr << endl;
+
+  cerr << "Testing ls, grep, sed and pipes ... " << endl;
+  cerr << endl;
+  ProgramLauncher::RunSystemCommand("ls -l * | grep Program | "
+      "sed 's/\\(.*\\)\\(ProgramLauncher.*\\)/\\2/'");
+
+  cerr << "Testing stats ... " << endl;
+  cerr << endl;
+  ProgramLauncher::RunIsisProgram("stats",
+                                  "from=$base/testData/ab102401_ideal.cub");
+
+  cerr << endl;
+  cerr << "Testing malformed command... " << endl;
+  cerr << endl;
+  try {
+    ProgramLauncher::RunSystemCommand("ls -l * | grep Program | "
+        "sed 's/\\(.*\\)\\(ProgramLauncher.*\\)/\\2/");
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
+
+
+  cerr << endl;
+  cerr << "Testing non-existant Isis 3 program... " << endl;
+  cerr << endl;
+  try {
+    ProgramLauncher::RunIsisProgram("chocolatelab",
+                                    "from=$base/testData/ab102401_ideal.cub");
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
+
+
+  cerr << endl;
+  cerr << "Testing using Isis 3 program as a system program... " << endl;
+  cerr << endl;
+  try {
+    ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
+        "from=\\$base/testData/ab102401_ideal.cub -pid=999");
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
+
+
+  cerr << endl;
+  cerr << "Testing using Isis 3 program as a system program without pid... "
+       << endl;
+  cerr << endl;
+  try {
+    ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
+        "from=\\$base/testData/ab102401_ideal.cub");
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
+}

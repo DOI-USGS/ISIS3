@@ -19,18 +19,19 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "UserInterface.h"
 
 #include <sstream>
 #include <vector>
 
-#include "UserInterface.h"
+#include "Application.h"
 #include "iException.h"
 #include "Filename.h"
 #include "iString.h"
-#include "System.h"
 #include "Message.h"
 #include "Gui.h"
 #include "Preference.h"
+#include "ProgramLauncher.h"
 #include "TextFile.h"
 
 using namespace std;
@@ -503,7 +504,7 @@ namespace Isis {
       command += " $ISISROOT/doc/Application/presentation/Tabbed/";
       command += Filename(p_progName).Name() + "/" + Filename(
                    p_progName).Name() + ".html";
-      Isis::System(command);
+      ProgramLauncher::RunSystemCommand(command);
       exit(0);
     }
     else if(name == "-INFO") {

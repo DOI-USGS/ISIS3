@@ -1,6 +1,8 @@
 #include "Isis.h"
-#include "ProcessByLine.h"
+
 #include "Application.h"
+#include "ProcessByLine.h"
+#include "ProgramLauncher.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -67,7 +69,7 @@ void IsisMain() {
   lowParams += " samples= " + iString(lowSamples);
   lowParams += " lines= " + iString(lowLines);
 
-  Isis::iApp->Exec("lowpass", lowParams);
+  ProgramLauncher::RunIsisProgram("lowpass", lowParams);
 
   // Make a copy of the lowpass filter results if the user wants it
   if(!ui.GetBoolean("DELETENOISE")) {
@@ -76,7 +78,7 @@ void IsisMain() {
     lowParams += " to= " + ui.GetFilename("LPFNOISE");
     lowParams += " samples= " + iString(lowSamples);
     lowParams += " lines= " + iString(lowLines);
-    Isis::iApp->Exec("lowpass", lowParams);
+    ProgramLauncher::RunIsisProgram("lowpass", lowParams);
   }
 
   // Run highpass filter after lowpass is done, i.e. highpass(lowpass(input))
@@ -86,7 +88,7 @@ void IsisMain() {
   highParams += " samples= " + iString(highSamples);
   highParams += " lines= " + iString(highLines);
 
-  Isis::iApp->Exec("highpass", highParams);
+  ProgramLauncher::RunIsisProgram("highpass", highParams);
   remove("dstripe.temporary.cub");
 
   // Take the difference (FROM-NOISE) and write it to output

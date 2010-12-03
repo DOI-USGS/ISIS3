@@ -3,6 +3,7 @@
 #include "Pvl.h"
 #include "Cube.h"
 #include "OriginalLabel.h"
+#include "ProgramLauncher.h"
 #include <string>
 
 using namespace std;
@@ -26,7 +27,7 @@ void IsisMain() {
   string parameters = string(" LIST = ")    + tempFile.Expanded() +
                       string(" TO = ")      + ui.GetFilename("TO") +
                       string(" PROPLAB = ") + redFile;
-  iApp->Application::Exec("cubeit", parameters);
+  ProgramLauncher::RunIsisProgram("cubeit", parameters);
   remove(tempFile.Expanded().c_str());
 
   // Get the instrument group from each file

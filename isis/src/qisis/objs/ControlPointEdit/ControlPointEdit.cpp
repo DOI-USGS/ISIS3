@@ -25,8 +25,8 @@
 #include "ControlMeasure.h"
 #include "Filename.h"
 #include "iString.h"
+#include "ProgramLauncher.h"
 #include "Pvl.h"
-#include "System.h"
 #include "UniversalGroundMap.h"
 
 namespace Qisis {
@@ -1164,7 +1164,7 @@ namespace Qisis {
     fname = baseFile + "Fit.cub";
     command += " " + fname + "&";
     p_autoRegFact->FitChip()->Write(fname);
-    Isis::System(command);
+    Isis::ProgramLauncher::RunSystemCommand(command);
   }
 
 #if 0

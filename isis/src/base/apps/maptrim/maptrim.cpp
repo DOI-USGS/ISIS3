@@ -1,11 +1,12 @@
 #include "Isis.h"
 
-#include "ProcessByLine.h"
+#include "Application.h"
 #include "LineManager.h"
+#include "ProcessByLine.h"
+#include "ProgramLauncher.h"
 #include "ProjectionFactory.h"
 #include "Projection.h"
 #include "iException.h"
-#include "Application.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -72,7 +73,7 @@ void IsisMain() {
     cropParams += " nlines= "   + iString(lines);
 
     try {
-      Isis::iApp->Exec("crop", cropParams);
+      ProgramLauncher::RunIsisProgram("crop", cropParams);
     }
     catch(iException &e) {
       string msg = "Could not execute crop with params: [" + cropParams + "]";

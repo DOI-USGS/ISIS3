@@ -15,6 +15,7 @@
 #include "LineManager.h"
 #include "OriginalLabel.h"
 #include "PvlTranslationManager.h"
+#include "ProgramLauncher.h"
 #include "BufferManager.h"
 #include "LineManager.h"
 #include "CollectorMap.h"
@@ -127,7 +128,7 @@ void IsisMain() {
   string pfile = phoFile.Expanded();
   string parameters = "FROM=" + input.Expanded() + " TO=" + pfile +
                       " LATITUDE=TRUE LONGITUDE=TRUE PHASE=TRUE EMISSION=TRUE INCIDENCE=TRUE";
-  Isis::iApp->Exec("phocube", parameters);
+  ProgramLauncher::RunIsisProgram("phocube", parameters);
 
   //  Wrap a try clause so that if anything goes wrong below, we can remove
   //  the phocube file.

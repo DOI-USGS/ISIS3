@@ -41,8 +41,8 @@
 #include "GuiInputAttribute.h"
 #include "GuiOutputAttribute.h"
 #include "iException.h"
+#include "ProgramLauncher.h"
 #include "Pvl.h"
-#include "System.h"
 #include "UserInterface.h"
 
 
@@ -153,8 +153,8 @@ namespace Isis {
         temp.Close();
 
         // Open the cube in Qview
-        std::string command = "qview " + cubeName + " &";
-        Isis::System(command);
+        iString command = "$ISISROOT/bin/qview " + cubeName + " &";
+        ProgramLauncher::RunSystemCommand(command);
       }
       // Throw an error if no cube name was entered
       else {

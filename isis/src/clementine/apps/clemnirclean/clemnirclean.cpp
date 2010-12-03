@@ -1,6 +1,8 @@
 #include "Isis.h"
+
 #include "Application.h"
 #include "Filename.h"
+#include "ProgramLauncher.h"
 
 using namespace std;
 using namespace Isis;
@@ -23,7 +25,7 @@ void IsisMain() {
   string outFile = outpath + temp1.Name();
   string parameters = "FROM=" + inFile + " TO=" + outFile +
                       " toldef=stddev tolmax=1.25 tolmin=1.25 samples=3 lines=3 replace=null";
-  Isis::iApp ->Exec("noisefilter", parameters);
+  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
 
   // Run lowpass on the cube using outside filter, 3x3 boxcar
   inFile = outFile;
@@ -32,7 +34,7 @@ void IsisMain() {
   outFile = outpath + temp2.Name();
   parameters = "FROM=" + inFile + " TO=" + outFile +
                " samples=3 lines=3 filter=outside";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
   if(rmv) remove(inFile.c_str());
 
   // Run lowpass on the cube using outside filter, 3x3 boxcar
@@ -43,7 +45,7 @@ void IsisMain() {
 
   parameters = "FROM=" + inFile + " TO=" + outFile +
                " samples=3 lines=3 filter=outside";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
   if(rmv) remove(inFile.c_str());
 
   // Run noisefilter on the cube and replace with avg, 3x3 boxcar
@@ -53,13 +55,13 @@ void IsisMain() {
   outFile = outpath + temp4.Name();
   parameters = "FROM=" + inFile + " TO=" + outFile +
                " toldef=stddev tolmax=1.5 tolmin=1.5 samples=3 lines=3 nullisnoise=yes";
-  Isis::iApp -> Exec("noisefilter", parameters);
+  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
   if(rmv) remove(inFile.c_str());
 
   // Run lowpass on the cube using outside filter, 5x5 boxcar
   inFile = outFile;
   parameters = "FROM=" + inFile + " TO=" + outfname.Expanded() +
                " samples=5 lines=5 filter=outside";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
   if(rmv) remove(inFile.c_str());
 }

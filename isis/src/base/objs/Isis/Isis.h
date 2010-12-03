@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 
   Isis::Application *app = new Isis::Application(argc, argv);
   app->RegisterGuiHelpers(GuiHelpers());
-  int status = app->Exec(APPLICATION);
+  int status = app->Run(APPLICATION);
   delete app;
   delete QCoreApplication::instance();
   return status;

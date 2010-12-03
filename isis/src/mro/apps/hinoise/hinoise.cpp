@@ -5,6 +5,7 @@
 #include "iException.h"
 #include "Histogram.h"
 #include "ProcessByLine.h"
+#include "ProgramLauncher.h"
 #include "Pixel.h"
 
 
@@ -140,15 +141,15 @@ void IsisMain() {
   p.EndProcess();
 
   // Now run lowpass, highpass, and algebra for further destriping
-  Isis::iApp->Exec("lowpass", "FROM=" + g_zapFilename + " TO=" +
+  ProgramLauncher::RunIsisProgram("lowpass", "FROM=" + g_zapFilename + " TO=" +
                    g_lpfFilename + "+32bit NULL=FALSE HRS=FALSE HIS=FALSE LRS=FALSE LIS=FALSE LINE=" +
                    ui.GetString("LPFLINE") + " SAMP=" + ui.GetString("LPFSAMP") +
                    " MINOPT=PERCENT MINIMUM=" + ui.GetString("LPFMINPER") +
                    " REPLACE=NULL");
-  Isis::iApp->Exec("highpass", "FROM=" + g_zapFilename + " TO=" + g_hpfFilename +
+  ProgramLauncher::RunIsisProgram("highpass", "FROM=" + g_zapFilename + " TO=" + g_hpfFilename +
                    " LINE=" + ui.GetString("HPFLINE") + " SAMP=" + ui.GetString("HPFSAMP") +
                    " MINOPT=PERCENT" + " MINIMUM=" + ui.GetString("HPFMINPER"));
-  Isis::iApp->Exec("algebra", "FROM1=" + g_lpfFilename + " FROM2=" +
+  ProgramLauncher::RunIsisProgram("algebra", "FROM1=" + g_lpfFilename + " FROM2=" +
                    g_hpfFilename + " TO=" + g_addFilename + g_isisnormFilenameSuffix + " OPERATOR=ADD");
 
   // ******** vertical destriping done *********
@@ -191,14 +192,14 @@ void IsisMain() {
   }
 
   // run first noise filter
-  Isis::iApp->Exec("noisefilter", "FROM=" + g_addFilename + " TO=" + g_noisefilter1Filename +
+  ProgramLauncher::RunIsisProgram("noisefilter", "FROM=" + g_addFilename + " TO=" + g_noisefilter1Filename +
                    g_isisnormFilenameSuffix + " FLATTOL=" + iString(flattol) + " TOLDEF=STDDEV LOW=" +
                    ui.GetAsString("LOW") + " HIGH=" + iString(high) + " TOLMIN=" + iString(tolmin) + " TOLMAX=" +
                    iString(tolmax) + " REPLACE=NULL SAMPLE=" + ui.GetString("NOISESAMPLE") + " LINE=" +
                    ui.GetString("NOISELINE") + " LISISNOISE=true LRSISNOISE=true");
 
   // run second noise filter
-  Isis::iApp->Exec("noisefilter", "FROM=" + g_noisefilter1Filename + " TO=" +
+  ProgramLauncher::RunIsisProgram("noisefilter", "FROM=" + g_noisefilter1Filename + " TO=" +
                    g_noisefilter2Filename + g_isisnormFilenameSuffix + " FLATTOL=" + iString(flattol) +
                    " TOLDEF=STDDEV LOW=" + ui.GetAsString("LOW") + " HIGH=" + iString(high) + " TOLMIN=" +
                    iString(tolmin) + " TOLMAX=" + iString(tolmax) + " REPLACE=NULL SAMPLE=" +
@@ -206,7 +207,7 @@ void IsisMain() {
                    " LISISNOISE=true LRSISNOISE=true");
 
   // run third noise filter
-  Isis::iApp->Exec("noisefilter", "FROM=" + g_noisefilter2Filename + " TO=" +
+  ProgramLauncher::RunIsisProgram("noisefilter", "FROM=" + g_noisefilter2Filename + " TO=" +
                    g_noisefilter3Filename + g_isisnormFilenameSuffix + " FLATTOL=" + iString(flattol) +
                    " TOLDEF=STDDEV LOW=" + ui.GetAsString("LOW") + " HIGH=" + iString(high) + " TOLMIN=" +
                    iString(tolmin) + " TOLMAX=" + iString(tolmax) + " REPLACE=NULL SAMPLE=" +
@@ -218,7 +219,7 @@ void IsisMain() {
 
   // ************** fill in holes **************
 
-  Isis::iApp->Exec("lowpass", "FROM=" + g_noisefilter3Filename + " TO=" + g_lpfz1Filename +
+  ProgramLauncher::RunIsisProgram("lowpass", "FROM=" + g_noisefilter3Filename + " TO=" + g_lpfz1Filename +
                    g_isisnormFilenameSuffix + " sample=3 line=3 minopt=COUNT minimum=3 filter=OUTSIDE" +
                    " null=TRUE hrs=FALSE his=TRUE lrs=TRUE lis=TRUE");
 
@@ -232,7 +233,7 @@ void IsisMain() {
   int lpfzsamples =  ui.GetInteger("LPFZSAMPLES");
   int lpfzlines = ui.GetInteger("LPFZLINES");
   int minimum = (int)((lpfzlines * lpfzsamples) / 3);
-  Isis::iApp->Exec("lowpass", "FROM=" + g_lpfz1Filename + " TO=" + outFile +
+  ProgramLauncher::RunIsisProgram("lowpass", "FROM=" + g_lpfz1Filename + " TO=" + outFile +
                    g_isisnormFilenameSuffix + " sample=" + iString(lpfzsamples) + " line=" + iString(lpfzlines) + " minopt=COUNT" +
                    " minimum=" + iString(minimum) + " filter=OUTSIDE null=TRUE hrs=FALSE his=TRUE " +
                    "lrs=TRUE lis=TRUE");

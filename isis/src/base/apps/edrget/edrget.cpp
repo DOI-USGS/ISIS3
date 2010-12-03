@@ -6,6 +6,7 @@
 #include "httpget.h"
 #include "ftpget.h"
 #include "UserInterface.h"
+#include "ProgramLauncher.h"
 #include "iString.h"
 #include "iException.h"
 
@@ -31,7 +32,7 @@ void IsisMain() {
       if(ui.WasEntered("TOPATH")) {
         parameters += " TOPATH=" + guiPath;
       }
-      iApp->Exec("edrget", parameters);
+      ProgramLauncher::RunIsisProgram("edrget", parameters);
     }
     else {
 
@@ -63,7 +64,7 @@ void IsisMain() {
       if(ui.WasEntered("TOPATH")) {
         parameters += " TOPATH=" + guiPath;
       }
-      iApp->Exec("edrget", parameters);
+      ProgramLauncher::RunIsisProgram("edrget", parameters);
     }
     else {
       HttpGet getter;

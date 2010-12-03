@@ -1,5 +1,6 @@
 #include "Isis.h"
-#include "Application.h"
+
+#include "ProgramLauncher.h"
 
 using namespace std;
 using namespace Isis;
@@ -36,14 +37,14 @@ void IsisMain() {
   string parameters = "FROM=" + inFile + " TO=" + outFile +
                       " toldef=stddev flattol=10  samp=3 line=3 minimum=5 tolmin=2.5 tolmax=2.5"
                       + " replace=null";
-  Isis::iApp ->Exec("noisefilter", parameters);
+  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
 
   // Run a lowpass filter on the cube
   inFile = outFile;
   outFile = name + ".step2.cub";
   parameters = "FROM=" + inFile + " TO=" + outFile +
                " filter=outside line=3 samp=3 minimum=5";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
   if(rmv) remove(inFile.c_str());
 
   // Run mask on the cube with the correct masking cube
@@ -53,7 +54,7 @@ void IsisMain() {
                " MASK=$ISIS3DATA/viking" + iString(spn) + "/calibration/vik" + iString(spn);
   if(even) parameters += "evenMask.cub";
   else parameters += "oddMask.cub";
-  Isis::iApp ->Exec("mask", parameters);
+  ProgramLauncher::RunIsisProgram("mask", parameters);
   if(rmv) remove(inFile.c_str());
 
   // Run a low pass filter on the invalid data in the cube
@@ -61,7 +62,7 @@ void IsisMain() {
   outFile = name + ".step4.cub";
   parameters = "FROM=" + inFile + " TO=" + outFile +
                " samp=3 line=3 filter=outside replace=null";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
   if(rmv) remove(inFile.c_str());
 
   // Run a lowpass filter on the cube
@@ -69,7 +70,7 @@ void IsisMain() {
   outFile = name + ".step5.cub";
   parameters = "FROM=" + inFile + " TO=" + outFile +
                " filter=outside samp=7 line=7 replace=null";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
   if(rmv) remove(inFile.c_str());
 
   // Run a lowpass filter on the cube
@@ -77,14 +78,14 @@ void IsisMain() {
   outFile = name + ".step6.cub";
   parameters = "FROM=" + inFile + " TO=" + outFile +
                " filter=outside line=11 samp=11 replace=null";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
   if(rmv) remove(inFile.c_str());
 
   inFile = outFile;
   outFile = ui.GetFilename("TO");
   parameters = "FROM=" + inFile + " TO=" + outFile
                + " bottom=20 top=25 left=30 right=30";
-  Isis::iApp ->Exec("trim", parameters);
+  ProgramLauncher::RunIsisProgram("trim", parameters);
   if(rmv) remove(inFile.c_str());
 }
 

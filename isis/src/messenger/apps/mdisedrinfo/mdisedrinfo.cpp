@@ -12,6 +12,7 @@
 #include "UserInterface.h"
 #include "Cube.h"
 #include "OriginalLabel.h"
+#include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "iString.h"
@@ -51,7 +52,7 @@ void IsisMain() {
     string params = "from=" + from.Expanded()  + " to=" + temp.Expanded();
 
     try {
-      iApp->Exec("mdis2isis", params);
+      ProgramLauncher::RunIsisProgram("mdis2isis", params);
 
 // Ensure a proper target before initialization
       Cube cube;
@@ -61,7 +62,7 @@ void IsisMain() {
       cube.Close();
 
       //  Run spiceinit on it
-      iApp->Exec("spiceinit", "from=" + temp.Expanded());
+      ProgramLauncher::RunIsisProgram("spiceinit", "from=" + temp.Expanded());
     }
     catch(iException &ie) {
       string tempName(temp.Expanded());

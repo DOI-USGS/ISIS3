@@ -3,6 +3,7 @@
 #include "FileList.h"
 #include "Cube.h"
 #include "Preference.h"
+#include "ProgramLauncher.h"
 
 #include <iostream>
 #include <fstream>
@@ -37,7 +38,7 @@ void IsisMain() {
   string parameters = "FROMLIST=" + ui.GetFilename("FROMLIST") +
                       " MOSAIC=" + pathName + "OriginalMosaic.cub" +
                       " MATCHBANDBIN=" + match;
-  Isis::iApp ->Exec("automos", parameters);
+  ProgramLauncher::RunIsisProgram("automos", parameters);
 
   //Creates the highpass cubes from the cubes FileList
   std::ofstream highPassList;
@@ -48,7 +49,7 @@ void IsisMain() {
     parameters = "FROM=" + inFile.Expanded() +
                  " TO=" + outParam
                  + " SAMPLES=" + iString(hns) + " LINES=" + iString(hnl);
-    Isis::iApp ->Exec("highpass", parameters);
+    ProgramLauncher::RunIsisProgram("highpass", parameters);
     //Reads the just created highpass cube into a list file for automos
     highPassList << outParam << endl;
   }
@@ -57,20 +58,20 @@ void IsisMain() {
   //Makes a mosaic out of the highpass cube filelist
   parameters = "FROMLIST=HighPassList.lis MOSAIC=" + pathName + "HighpassMosaic.cub"
                + " MATCHBANDBIN=" + match;
-  Isis::iApp ->Exec("automos", parameters);
+  ProgramLauncher::RunIsisProgram("automos", parameters);
 
   //Does a lowpass on the original mosaic
   parameters = "FROM=" + pathName + "OriginalMosaic.cub"
                + " TO=" + pathName + "LowpassMosaic.cub"
                + " SAMPLES=" + iString(lns) + " LINES=" + iString(lnl);
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
   //Finally combines the highpass and lowpass mosaics
   parameters = "FROM1=" + pathName + "HighpassMosaic.cub" +
                " FROM2=" + pathName + "LowpassMosaic.cub" +
                " TO=" + ui.GetFilename("TO") +
                " OPERATOR= add";
-  Isis::iApp ->Exec("algebra", parameters);
+  ProgramLauncher::RunIsisProgram("algebra", parameters);
 
   //Will remove all of the temp files by default
   if(ui.GetBoolean("REMOVETEMP")) {

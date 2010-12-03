@@ -1,10 +1,12 @@
 #include "Isis.h"
-#include "Application.h"
-#include "FileList.h"
-#include "Cube.h"
 
 #include <iostream>
 #include <fstream>
+
+#include "Application.h"
+#include "Cube.h"
+#include "FileList.h"
+#include "ProgramLauncher.h"
 
 using namespace std;
 using namespace Isis;
@@ -47,7 +49,7 @@ void IsisMain() {
                         + " TO=" + outParam
                         + " SAMPLES= " + HNS1
                         + " LINES= " + HNL1;
-    Isis::iApp ->Exec("highpass", parameters);
+    ProgramLauncher::RunIsisProgram("highpass", parameters);
     //Reads the just created highpass cube into a list file for automos
     firstHighPassList << outParam << endl;
   }
@@ -64,7 +66,7 @@ void IsisMain() {
                         + " TO=" + outParam
                         + " SAMPLES= " + HNS2
                         + " LINES= " + HNL2;
-    Isis::iApp ->Exec("highpass", parameters);
+    ProgramLauncher::RunIsisProgram("highpass", parameters);
     //Reads the just created highpass cube into a list file for automos
     secondHighPassList << outParam << endl;
   }
@@ -84,7 +86,7 @@ void IsisMain() {
                   + " MAXLAT= " + MAXLAT
                   + " MAXLON= " + MAXLON;
   }
-  Isis::iApp ->Exec("automos", parameters);
+  ProgramLauncher::RunIsisProgram("automos", parameters);
 
   //Makes a mosaic out of the second highpass cube filelist
   parameters = "FROM= " + cubeListBaseName + "_SecondHighPassList.lis MOSAIC="
@@ -100,7 +102,7 @@ void IsisMain() {
                   + " MAXLAT= " + MAXLAT
                   + " MAXLON= " + MAXLON;
   }
-  Isis::iApp ->Exec("automos", parameters);
+  ProgramLauncher::RunIsisProgram("automos", parameters);
 
   //Does a lowpass on the Second highpass
   parameters = "FROM=" + cubeListBaseName + "_newmosSecond.cub"
@@ -108,14 +110,14 @@ void IsisMain() {
                + " SAMPLES=" + LNS
                + " LINES=" + LNL
                + " FILTER=inside";
-  Isis::iApp ->Exec("lowpass", parameters);
+  ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
   //Finally combines the first highpass and lowpass mosaics
   parameters = "FROM1=" + cubeListBaseName + "_newmosFirst.cub" +
                " FROM2=" + cubeListBaseName + "_lpfmos.cub" +
                " TO= " + cubeListBaseName + "_untrimmedmoc.cub" +
                " OPERATOR= add";
-  Isis::iApp ->Exec("algebra", parameters);
+  ProgramLauncher::RunIsisProgram("algebra", parameters);
 
   //Concludes with a maptrim of the final product
   parameters = "FROM=" + cubeListBaseName + "_untrimmedmoc.cub" +
@@ -126,7 +128,7 @@ void IsisMain() {
                   + " MAXLAT= " + MAXLAT
                   + " MAXLON= " + MAXLON;
   }
-  Isis::iApp ->Exec("maptrim", parameters);
+  ProgramLauncher::RunIsisProgram("maptrim", parameters);
 
 
   //Will remove all of the temp files by default

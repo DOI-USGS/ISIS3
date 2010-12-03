@@ -26,9 +26,10 @@
 #include <vector>
 #include <cmath>
 
-#include "iString.h"
-#include "Filename.h"
 #include "CSVReader.h"
+#include "Filename.h"
+#include "iString.h"
+#include "Spice.h"
 
 namespace Isis {
   /**

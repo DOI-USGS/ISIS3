@@ -25,25 +25,26 @@
 
 #include <QMutex>
 
+#include "Application.h"
+#include "Camera.h"
+#include "CameraFactory.h"
 #include "Cube.h"
-#include "Preference.h"
-#include "Filename.h"
-#include "iException.h"
 #include "CubeBsqHandler.h"
 #include "CubeTileHandler.h"
 #include "Endian.h"
-#include "SpecialPixel.h"
-#include "Message.h"
-#include "Application.h"
-#include "System.h"
-#include "Camera.h"
-#include "CameraFactory.h"
-#include "Projection.h"
-#include "Statistics.h"
+#include "Filename.h"
 #include "Histogram.h"
+#include "iException.h"
 #include "LineManager.h"
+#include "Message.h"
+#include "Preference.h"
+#include "ProgramLauncher.h"
+#include "Projection.h"
+#include "SpecialPixel.h"
+#include "Statistics.h"
 
 using namespace std;
+
 namespace Isis {
   //! Constructs a Cube object.
   Cube::Cube() {
@@ -580,11 +581,11 @@ namespace Isis {
 
     if(Isis::iApp == NULL) {
       string command = "$ISISROOT/bin/pds2isis " + parameters;
-      System(command);
+      ProgramLauncher::RunSystemCommand(command);
     }
     else {
       std::string prog = "pds2isis";
-      Isis::iApp->Exec(prog, parameters);
+      ProgramLauncher::RunIsisProgram(prog, parameters);
     }
 
     p_tempCube = tempCube.Expanded();

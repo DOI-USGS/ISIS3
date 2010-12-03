@@ -14,6 +14,7 @@
 #include "SerialNumber.h"
 #include "ControlMeasure.h"
 #include "iTime.h"
+#include "ProgramLauncher.h"
 
 using namespace std;
 using namespace Isis;
@@ -251,15 +252,14 @@ void IsisMain() {
       string params = "from=" + ui.GetFilename("FROM") + " to=" +
                       ui.GetFilename("TO") + " strans=" + iString(sTrans) + " ltrans="
                       + iString(lTrans) + " interp=" + ui.GetString("INTERP");
-      iApp->Exec("translate", params);
+      ProgramLauncher::RunIsisProgram("translate", params);
     }
     else {
       string params = "from=" + ui.GetFilename("FROM") + " to=" +
                       ui.GetFilename("TO") + " cube=" + ui.GetFilename("MATCH") + " control=" +
                       ui.GetFilename("CNETFILE") + " interp=" + ui.GetString("INTERP") +
                       " degree=" + iString(ui.GetInteger("DEGREE"));
-      iApp->Exec("warp", params);
-
+      ProgramLauncher::RunIsisProgram("warp", params);
     }
   }
 }

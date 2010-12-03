@@ -1,34 +1,3 @@
-#include "IsisDebug.h"
-
-#include <cstdio>
-#include <sstream>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <errno.h>
-
-extern int errno;
-
-#include <iostream>
-#include <sstream>
-#include <locale.h>
-
-#include <QCoreApplication>
-#include <QString>
-
-#include "Application.h"
-#include "Constants.h"
-#include "CubeManager.h"
-#include "Filename.h"
-#include "iException.h"
-#include "iString.h"
-#include "Gui.h"
-#include "Message.h"
-#include "Preference.h"
-#include "SessionLog.h"
-#include "System.h"
-#include "TextFile.h"
-#include "UserInterface.h"
-
 /**
  * @file
  * $Revision: 1.22 $
@@ -51,6 +20,43 @@ extern int errno;
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "IsisDebug.h"
+
+#include <cstdio>
+#include <sstream>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <errno.h>
+
+extern int errno;
+
+#include <fstream>
+//#include <stdlib.h>
+//#include <string>
+
+#include <iostream>
+#include <sstream>
+#include <locale.h>
+
+#include <QCoreApplication>
+#include <QLocalSocket>
+#include <QString>
+
+#include "Application.h"
+#include "Constants.h"
+#include "CubeManager.h"
+#include "Filename.h"
+#include "iException.h"
+#include "iString.h"
+#include "Gui.h"
+#include "Message.h"
+#include "Preference.h"
+#include "ProgramLauncher.h"
+#include "SessionLog.h"
+#include "TextFile.h"
+#include "UserInterface.h"
+
+using namespace std;
 
 namespace Isis {
   Application *iApp = NULL;
@@ -66,15 +72,8 @@ namespace Isis {
    * @throws Isis::iException::Io - FileOpen error
    */
   Application::Application(int &argc, char *argv[]) {
-    // Init socket communications
-    p_socket = -1;
-    p_childSocket = -1;
-    p_socketFile = "";
     p_ui = NULL;
-
-    // Child pid and caught status
-    p_childPid = -1;
-    p_childCaught = false;
+    p_connectionToParent = NULL;
 
     // Save the application name
     p_appName = argv[0];
@@ -96,8 +95,9 @@ namespace Isis {
 
     // Verify ISISROOT was set
     if (getenv("ISISROOT") == NULL || iString(getenv("ISISROOT")) == "") {
-      std::string message = "Please set ISISROOT before running any Isis applications";
-      std::cerr << message << std::endl;
+      string message = "Please set ISISROOT before running any Isis "
+                            "applications";
+      cerr << message << endl;
       abort();
     }
 
@@ -109,7 +109,7 @@ namespace Isis {
 
     // Create user interface and log
     try {
-      Filename f = std::string(argv[0]) + ".xml";
+      Filename f = string(argv[0]) + ".xml";
 
       // Create preferences
       Preference::Preferences(f.Name() == "unitTest.xml");
@@ -117,11 +117,11 @@ namespace Isis {
       if(!f.Exists()) {
         f = "$ISISROOT/bin/xml/" + f.Name();
         if(!f.Exists()) {
-          std::string message = Message::FileOpen(f.Expanded());
+          string message = Message::FileOpen(f.Expanded());
           throw iException::Message(iException::Io, message, _FILEINFO_);
         }
       }
-      std::string xmlfile = f.Expanded();
+      string xmlfile = f.Expanded();
 
       p_ui = new UserInterface(xmlfile, argc, argv);
       if(!p_ui->IsInteractive()) {
@@ -131,40 +131,43 @@ namespace Isis {
         Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
         QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
       }
-
     }
     catch(iException &e) {
       exit(e.Report());
     }
 
     iApp = this;
+
+    // If we were run by another Isis app, connect to it
+    if(GetUserInterface().ParentId()) {
+      p_connectionToParent = new QLocalSocket;
+
+      iString serverName = "isis_" + UserName() +
+          "_" + iString(iApp->GetUserInterface().ParentId());
+
+      p_connectionToParent->connectToServer(serverName);
+      if(!p_connectionToParent->waitForConnected()) {
+        delete p_connectionToParent;
+        p_connectionToParent = NULL;
+      }
+    }
   }
 
   //! Destroys the Application object
   Application::~Application() {
-    if(HasParent()) {
-      SendParentData("DONE", "");
-      close(p_childSocket);
-    }
-
-    if(p_socket >= 0) {
-      close(p_socket);
-      remove(p_socketFile.c_str());
-    }
-
     if(p_ui) {
       delete p_ui;
     }
   }
 
   /**
-   * Executes a function
+   * Runs the program defined in the function funct.
    *
    * @param *funct
    *
    * @return int Status of the function execution
    */
-  int Application::Exec(void (*funct)()) {
+  int Application::Run(void (*funct)()) {
     int status = 0;
     try {
       if(p_ui->IsInteractive()) {
@@ -217,13 +220,13 @@ namespace Isis {
     }
 
 #if 0
-    catch(std::exception &e) {
-      std::string message = e.what();
+    catch(exception &e) {
+      string message = e.what();
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
     }
     catch(...) {
-      std::string message = "Unknown error expection";
+      string message = "Unknown error expection";
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
     }
@@ -271,7 +274,7 @@ namespace Isis {
     minutes = minutes - hours * 60;
     char temp[80];
     sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
-    std::string conTime = temp;
+    string conTime = temp;
 
     // Grab the ending cpu time to compute total cpu time
     clock_t endClock = clock();
@@ -281,7 +284,7 @@ namespace Isis {
     hours = minutes / 60;
     minutes = minutes - hours * 60;
     sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
-    std::string cpuTime = temp;
+    string cpuTime = temp;
 
     // Add this information to the log
     PvlGroup acct("Accounting");
@@ -336,6 +339,7 @@ namespace Isis {
   void Application::Log(PvlGroup &results) {
     // Add it to the log file
     static bool blankLine = false;
+
     SessionLog::TheLog().AddResults(results);
 
     // See if the log file will be written to the terminal/gui
@@ -343,26 +347,26 @@ namespace Isis {
 
     // See if we should write the info to our parents gui
     if(HasParent()) {
-      std::ostringstream ostr;
-      if(blankLine) ostr << std::endl;
-      ostr << results << std::endl;
-      std::string data = ostr.str();
-      SendParentData(std::string("LOG"), data);
+      ostringstream ostr;
+      if(blankLine) ostr << endl;
+      ostr << results << endl;
+      string data = ostr.str();
+      iApp->SendParentData(string("LOG"), data);
     }
 
     // Otherwise see if we need to write to our gui
     else if(iApp->GetUserInterface().IsInteractive()) {
-      std::ostringstream ostr;
-      if(blankLine) ostr << std::endl;
-      ostr << results << std::endl;
+      ostringstream ostr;
+      if(blankLine) ostr << endl;
+      ostr << results << endl;
       iApp->GetUserInterface().TheGui()->Log(ostr.str());
       iApp->GetUserInterface().TheGui()->ShowLog();
     }
 
     // Otherwise its command line mode
     else {
-      if(blankLine) std::cout << std::endl;
-      std::cout << results << std::endl;
+      if(blankLine) cout << endl;
+      cout << results << endl;
     }
     blankLine = true;
   }
@@ -375,16 +379,16 @@ namespace Isis {
   void Application::GuiLog(Pvl &results) {
     // See if we should write the info to our parents gui
     if(HasParent()) {
-      std::ostringstream ostr;
-      ostr << results << std::endl;
-      std::string data = ostr.str();
-      SendParentData(std::string("LOG"), data);
+      ostringstream ostr;
+      ostr << results << endl;
+      string data = ostr.str();
+      iApp->SendParentData(string("GUILOG"), data);
     }
 
     // Otherwise see if we need to write to our gui
     else if(iApp->GetUserInterface().IsInteractive()) {
-      std::ostringstream ostr;
-      ostr << results << std::endl;
+      ostringstream ostr;
+      ostr << results << endl;
       iApp->GetUserInterface().TheGui()->Log(ostr.str());
       iApp->GetUserInterface().TheGui()->ShowLog();
     }
@@ -398,16 +402,16 @@ namespace Isis {
   void Application::GuiLog(PvlGroup &results) {
     // See if we should write the info to our parents gui
     if(HasParent()) {
-      std::ostringstream ostr;
-      ostr << results << std::endl;
-      std::string data = ostr.str();
-      SendParentData(std::string("LOG"), data);
+      ostringstream ostr;
+      ostr << results << endl;
+      string data = ostr.str();
+      iApp->SendParentData(string("GUILOG"), data);
     }
 
     // Otherwise see if we need to write to our gui
     else if(iApp->GetUserInterface().IsInteractive()) {
-      std::ostringstream ostr;
-      ostr << results << std::endl;
+      ostringstream ostr;
+      ostr << results << endl;
       iApp->GetUserInterface().TheGui()->Log(ostr.str());
       iApp->GetUserInterface().TheGui()->ShowLog();
     }
@@ -418,10 +422,10 @@ namespace Isis {
    *
    * @param results string containing the results to add to the session log
    */
-  void Application::GuiLog(std::string &results) {
+  void Application::GuiLog(string &results) {
     // See if we should write the info to our parents gui
     if(HasParent()) {
-      SendParentData(std::string("LOG"), results);
+      iApp->SendParentData(string("GUILOG"), results);
     }
 
     // Otherwise see if we need to write to our gui
@@ -458,69 +462,42 @@ namespace Isis {
    * @param &errors A PvlObject of the errors
    */
   void Application::SendParentErrors(Isis::PvlObject &errors) {
+    if(!HasParent()) return;
+
     for(int i = 0; i < errors.Groups(); i++) {
-      std::ostringstream ostr;
-      ostr << errors.Group(i) << std::endl;
-      std::string data = ostr.str();
-      SendParentData(std::string("ERROR"), data);
+      ostringstream ostr;
+      ostr << errors.Group(i) << endl;
+      string data = ostr.str();
+      iApp->SendParentData(string("ERROR"), data);
     }
   }
 
-  /**
-   * Sends data from the child to the parent
-   *
-   * @param code
-   *
-   * @param &message The message the child is sending to the parent
-   *
-   * @throws Isis::iException::System - Unable to connect to the parent
-   * @throws Isis::iException::System - Unable to send to the parent
-   */
-  int Application::p_childSocket = -1;
-  void Application::SendParentData(const std::string code, const std::string &message) {
-    // See if we need to connect to the parent
-    if(p_childSocket < 0) {
-      std::string socketFile = "/tmp/isis_" + iString(iApp->GetUserInterface().ParentId());
-      sockaddr_un socketName;
-      socketName.sun_family = AF_UNIX;
-      strcpy(socketName.sun_path, socketFile.c_str());
-      p_childSocket = socket(PF_UNIX, SOCK_STREAM, 0);
-      if(p_childSocket == -1) {
-        std::string msg = "Unable to create child-to-parent socket [" +
-                          socketFile + "]";
-        std::cout << msg << std::endl;
-        throw iException::Message(Isis::iException::System,
-                                        msg, _FILEINFO_);
-      }
 
-      errno = 0;
-      int len = strlen(socketName.sun_path) + sizeof(socketName.sun_family);
-      int status = connect(p_childSocket, (struct sockaddr *)&socketName, len);
-      if(status == -1) {
-        std::string msg = "Unable to connect to parent [" +
-                          iString(iApp->GetUserInterface().ParentId()) + "] errno = " +
-                          iString(errno);
-        std::cout << msg << std::endl;
-        throw iException::Message(Isis::iException::System,
-                                        msg, _FILEINFO_);
-      }
+  void Application::SendParentData(const string code,
+                                   const string &message) {
+    // See if we need to connect to the parent
+    if(p_connectionToParent == NULL) {
+      iString msg = "Unable to communicate with parent process with pid [" +
+          iString(iApp->GetUserInterface().ParentId()) + "]";
+      throw iException::Message(iException::System, msg, _FILEINFO_);
     }
 
     // Have connection so build data string and send it
-    std::string data = code;
+    string data = code;
     data += char(27);
-    if(message != "") {
-      data += message;
-      data += char(27);
-    }
+    data += message;
+    data += char(27);
+    data += '\n';
 
-    if(send(p_childSocket, data.c_str(), data.size(), 0) < 0) {
-      std::string msg = "Unable to send to parent [" +
+    if(p_connectionToParent->write(data.c_str(), data.size()) == -1) {
+      string msg = "Unable to send data to parent [" +
                         iString(iApp->GetUserInterface().ParentId()) + "]";
-      std::cout << msg << std::endl;
       throw iException::Message(iException::System, msg, _FILEINFO_);
     }
+
+    p_connectionToParent->waitForBytesWritten(-1);
   }
+
 
   /**
    * Cleans up after the function by writing the log, saving the history, and
@@ -534,29 +511,29 @@ namespace Isis {
 
     if(SessionLog::TheLog().TerminalOutput()) {
       if(HasParent()) {
-        std::ostringstream ostr;
-        ostr << SessionLog::TheLog() << std::endl;
-        std::string data = ostr.str();
-        SendParentData(std::string("LOG"), data);
+        ostringstream ostr;
+        ostr << SessionLog::TheLog() << endl;
+        string data = ostr.str();
+        iApp->SendParentData(string("LOG"), data);
       }
       else if(p_ui->IsInteractive()) {
-        std::ostringstream ostr;
-        ostr << SessionLog::TheLog() << std::endl;
+        ostringstream ostr;
+        ostr << SessionLog::TheLog() << endl;
         p_ui->TheGui()->Log(ostr.str());
         p_ui->TheGui()->ShowLog();
       }
       else {
-        std::cout << SessionLog::TheLog() << std::endl;
+        cout << SessionLog::TheLog() << endl;
       }
     }
 
     // If debugging flag on write debugging log
     if(p_ui->GetInfoFlag()) {
-      std::string filename = p_ui->GetInfoFileName();
+      string filename = p_ui->GetInfoFileName();
       Pvl log;
-      iString app = (iString)QCoreApplication::applicationDirPath() + "/" + (iString)p_appName;
+      iString app = (iString)QCoreApplication::applicationDirPath() + "/" + p_appName;
       if(p_BatchlistPass == 0) {
-        std::stringstream ss ;
+        stringstream ss ;
         ss << SessionLog::TheLog();
         ss.clear();
         ss >> log;
@@ -570,38 +547,38 @@ namespace Isis {
       if(filename.compare("") != 0) {
 
         if(p_BatchlistPass == 0) {
-          std::ofstream debugingLog(filename.c_str());
+          ofstream debugingLog(filename.c_str());
           if(!debugingLog.good()) {
-            std::string msg = "Error opening debugging log file [" + filename + "]";
+            string msg = "Error opening debugging log file [" + filename + "]";
             throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
           }
-          debugingLog << log << std::endl;
-          debugingLog << "\n############### User Preferences ################\n" << std::endl;
+          debugingLog << log << endl;
+          debugingLog << "\n############### User Preferences ################\n" << endl;
           debugingLog << Preference::Preferences();
-          debugingLog << "\n############## System Disk Space ################\n" << std::endl;
-          debugingLog << SystemDiskSpace() << std::endl;
-          debugingLog << "\n############ Executable Information #############\n" << std::endl;
-          debugingLog << GetLibraryDependencies(app) << std::endl;
+          debugingLog << "\n############## System Disk Space ################\n" << endl;
+          debugingLog << GetSystemDiskSpace() << endl;
+          debugingLog << "\n############ Executable Information #############\n" << endl;
+          debugingLog << GetLibraryDependencies(app) << endl;
           debugingLog.close();
         }
         else {
-          std::ofstream debugingLog(filename.c_str(), std::ios_base::app);
-          debugingLog << SessionLog::TheLog() << std::endl;
+          ofstream debugingLog(filename.c_str(), ios_base::app);
+          debugingLog << SessionLog::TheLog() << endl;
           debugingLog.close();
         }
       }
       else {   // Write to std out
         if(p_BatchlistPass == 0) {
-          std::cout << log << std::endl;
-          std::cout << "\n############### User Preferences ################\n" << std::endl;
-          std::cout << Preference::Preferences();
-          std::cout << "\n############## System Disk Space ################\n" << std::endl;
-          std::cout << SystemDiskSpace() << std::endl;
-          std::cout << "\n############ Executable Information #############\n" << std::endl;
-          std::cout << GetLibraryDependencies(app) << std::endl;
+          cout << log << endl;
+          cout << "\n############### User Preferences ################\n" << endl;
+          cout << Preference::Preferences();
+          cout << "\n############## System Disk Space ################\n" << endl;
+          cout << GetSystemDiskSpace() << endl;
+          cout << "\n############ Executable Information #############\n" << endl;
+          cout << GetLibraryDependencies(app) << endl;
         }
         else {
-          std::cout << SessionLog::TheLog() << std::endl;
+          cout << SessionLog::TheLog() << endl;
         }
       }
     }
@@ -628,8 +605,8 @@ namespace Isis {
     }
     else if(p_ui->IsInteractive()) {
       if(e.IsPvlFormat()) {
-        std::ostringstream ostr;
-        ostr << errors << std::endl;
+        ostringstream ostr;
+        ostr << errors << endl;
         p_ui->TheGui()->LoadMessage(ostr.str());
       }
       else {
@@ -637,22 +614,22 @@ namespace Isis {
       }
     }
     else if(SessionLog::TheLog().TerminalOutput()) {
-      std::cerr << SessionLog::TheLog() << std::endl;
+      cerr << SessionLog::TheLog() << endl;
     }
     else if(e.IsPvlFormat()) {
-      std::cerr << errors << std::endl;
+      cerr << errors << endl;
     }
     else {
-      std::cerr << e.Errors() << std::endl;
+      cerr << e.Errors() << endl;
     }
 
     // If debugging flag on write debugging log
     if(p_ui->GetInfoFlag()) {
-      std::string filename = p_ui->GetInfoFileName();
+      string filename = p_ui->GetInfoFileName();
       Pvl log;
-      iString app = (iString)QCoreApplication::applicationDirPath() + "/" + (iString)p_appName;
+      iString app = (iString)QCoreApplication::applicationDirPath() + "/" + p_appName;
       if(p_BatchlistPass == 0) {
-        std::stringstream ss ;
+        stringstream ss ;
         ss << SessionLog::TheLog();
         ss.clear();
         ss >> log;
@@ -665,38 +642,38 @@ namespace Isis {
       // Write to file
       if(filename.compare("") != 0) {
         if(p_BatchlistPass == 0) {
-          std::ofstream debugingLog(filename.c_str());
+          ofstream debugingLog(filename.c_str());
           if(!debugingLog.good()) {
-            std::string msg = "Error opening debugging log file [" + filename + "]";
+            string msg = "Error opening debugging log file [" + filename + "]";
             throw iException::Message(iException::System, msg, _FILEINFO_);
           }
-          debugingLog << log << std::endl;
-          debugingLog << "\n############### User Preferences ################\n" << std::endl;
+          debugingLog << log << endl;
+          debugingLog << "\n############### User Preferences ################\n" << endl;
           debugingLog << Preference::Preferences();
-          debugingLog << "\n############ System Disk Space #############\n" << std::endl;
-          debugingLog << SystemDiskSpace() << std::endl;
-          debugingLog << "\n############ Executable Information #############\n" << std::endl;
-          debugingLog << GetLibraryDependencies(app) << std::endl;
+          debugingLog << "\n############ System Disk Space #############\n" << endl;
+          debugingLog << GetSystemDiskSpace() << endl;
+          debugingLog << "\n############ Executable Information #############\n" << endl;
+          debugingLog << GetLibraryDependencies(app) << endl;
           debugingLog.close();
         }
         else {
-          std::ofstream debugingLog(filename.c_str(), std::ios_base::app);
-          debugingLog << SessionLog::TheLog() << std::endl;
+          ofstream debugingLog(filename.c_str(), ios_base::app);
+          debugingLog << SessionLog::TheLog() << endl;
           debugingLog.close();
         }
       }
       else {   // Write to std out
         if(p_BatchlistPass == 0) {
-          std::cout << log << std::endl;
-          std::cout << "\n############### User Preferences ################\n" << std::endl;
-          std::cout << Preference::Preferences();
-          std::cout << "\n############ System Disk Space #############\n" << std::endl;
-          std::cout << SystemDiskSpace() << std::endl;
-          std::cout << "\n############ Executable Information #############\n" << std::endl;
-          std::cout << GetLibraryDependencies(app) << std::endl;
+          cout << log << endl;
+          cout << "\n############### User Preferences ################\n" << endl;
+          cout << Preference::Preferences();
+          cout << "\n############ System Disk Space #############\n" << endl;
+          cout << GetSystemDiskSpace() << endl;
+          cout << "\n############ Executable Information #############\n" << endl;
+          cout << GetLibraryDependencies(app) << endl;
         }
         else {
-          std::cout << SessionLog::TheLog() << std::endl;
+          cout << SessionLog::TheLog() << endl;
         }
       }
     }
@@ -719,8 +696,8 @@ namespace Isis {
       p_ui->TheGui()->ProgressText("Stopped");
     }
     if(e.IsPvlFormat()) {
-      std::ostringstream ostr;
-      ostr << errors << std::endl;
+      ostringstream ostr;
+      ostr << errors << endl;
       p_ui->TheGui()->LoadMessage(ostr.str());
     }
     else {
@@ -738,9 +715,9 @@ namespace Isis {
    *
    * @return string The application name
    */
-  QString Application::p_appName("Unknown");
-  std::string Application::Name() {
-    return p_appName.toStdString();
+  iString Application::p_appName("Unknown");
+  iString Application::Name() {
+    return p_appName;
   }
 
   /**
@@ -750,18 +727,19 @@ namespace Isis {
    *
    * @param print
    */
-  void Application::UpdateProgress(const std::string &text, bool print) {
-    if(HasParent()) {
-      std::string msg = p_ui->ProgramName() + ": " + text;
-      SendParentData(std::string("PROGRESSTEXT"), msg);
+  void Application::UpdateProgress(const string &text, bool print) {
+    if(HasParent() && print) {
+      iApp->SendParentData(string("PROGRESSTEXT"), text);
     }
     else if(p_ui->IsInteractive()) {
       p_ui->TheGui()->ProgressText(text);
     }
     else if(print) {
-      std::string msg = p_ui->ProgramName() + ": " + text;
-      std::cout << msg << std::endl;
+      string msg = p_ui->ProgramName() + ": " + text;
+      cout << msg << endl;
     }
+
+    ProcessGuiEvents();
   }
 
   /**
@@ -772,19 +750,19 @@ namespace Isis {
    * @param print
    */
   void Application::UpdateProgress(int percent, bool print) {
-    if(HasParent()) {
-      std::string data = iString(percent);
-      SendParentData(std::string("PROGRESS"), data);
+    if(HasParent() && print) {
+      string data = iString(percent);
+      iApp->SendParentData(string("PROGRESS"), data);
     }
     else if(p_ui->IsInteractive()) {
       p_ui->TheGui()->Progress(percent);
     }
     else if(print) {
       if(percent < 100) {
-        std::cout << percent << "% Processed\r" << std::flush;
+        cout << percent << "% Processed\r" << flush;
       }
       else {
-        std::cout << percent << "% Processed" << std::endl;
+        cout << percent << "% Processed" << endl;
       }
     }
   }
@@ -797,377 +775,12 @@ namespace Isis {
    */
   void Application::ProcessGuiEvents() {
     if(p_ui->IsInteractive()) {
-      bool cancel = p_ui->TheGui()->ProcessEvents();
-      if(cancel) {
-
-        // We need to catch our child if we are canceling, throw our own error if
-        // the return status isn't zero, blocking wait.
-        if(!p_childCaught) {
-          int status = 0;
-          waitpid(p_childPid, &status, 0);
-          p_childCaught = true;
-          if(status) {
-            std::string msg = "Program execution canceled, child returned nonzero status ["
-                              + (iString)status + "]";
-            throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
-          }
-        }
-        throw iException::Message(Isis::iException::Cancel, "", _FILEINFO_);
+      if(p_ui->TheGui()->ProcessEvents()) {
+        throw iException::Message(iException::Cancel, "", _FILEINFO_);
       }
     }
   }
 
-  /**
-   * Executes the program passed in with the given string of parameters.
-   *
-   * @param &program The program name to be run
-   *
-   * @param &parameters A string of the parameters and their values to be run
-   *                    with the application name passed in
-   *
-   * @throws Isis::iException::System - Unable to execute the command
-   */
-  void Application::Exec(const std::string &program, const std::string &parameters) {
-    // Setup the command line
-    Filename bin(program);
-    if(!bin.Exists()) {
-      bin = "$ISISROOT/bin/" + program;
-    }
-    //Isis::Filename bin("$ISISROOT/bin/"+program);
-    std::string command = bin.Expanded() + " " + parameters;
-
-    // If we are interactive we must do an asychronous execute
-    // so we can watch our socket
-    if(p_ui->IsInteractive()) {
-      p_pid = getpid();
-      p_childCaught = false;
-      // fork and save off our child
-      if((p_childPid = fork()) == -1) {
-        std::string msg = "Unable to execute command [" + command + "]";
-        throw iException::Message(iException::System, msg, _FILEINFO_);
-      }
-
-      // Parent code
-      if(p_childPid != 0) {
-        EstablishConnections();
-        ParentFork(command, program);
-        ProcessGuiEvents();
-
-        // ParentFork only returns after the child has returned success
-        // we should be safe to pick up a finished child at this point
-        // `man 2 wait` for more info, this is a blocking wait for specific pid.
-        // Odds are if we make it to here, we were successful, but, we'll
-        // still be verifying that.
-        if(!p_childCaught) {
-          int status = 0;
-          waitpid(p_childPid, &status, 0);
-          p_childCaught = true;
-          if(status) {
-            std::string msg = "Child process return status was nonzero, something went wrong";
-            throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
-          }
-        }
-
-        // Child code
-      }
-      else {
-        ChildFork(command);
-      }
-    }
-    // Handle command line programs invoked by GUI programs
-    else if(HasParent()) {
-      SendParentData("DISCONNECT", "");
-      close(p_childSocket);
-      p_childSocket = -1;
-      command += " -pid=" + iString((int)p_ui->ParentId());
-      System(command);
-      SendParentData("RECONNECT", "");
-    }
-    // Otherwise just execute the command and wait for it to finish
-    else {
-      System(command);
-    }
-  }
-
-  /**
-   * Establishes a connection by creating a new socket, getting the process id
-   * number and creating a unique filename that it binds to the socket.
-   * It then sets up the socket to listen.
-   *
-   * @throws Isis::iException::System - Unable to create the socket
-   * @throws Isis::iException::System - Unable to bind the socket to the filename
-   * @throws Isis::iException::System - Unable to listen to the socket
-   */
-  void Application::EstablishConnections() {
-    if(p_socket != -1) return;
-
-    // Create a socket
-    if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) == -1) {
-      std::string msg = "Unable to create socket";
-      throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
-    }
-
-    // Get the process id and create a unique filename
-    p_socketFile = "/tmp/isis_" + iString((int)p_pid);
-
-    // Bind the file to the socket
-    p_socketName.sun_family = AF_UNIX;
-    strcpy(p_socketName.sun_path, p_socketFile.c_str());
-    int len = strlen(p_socketName.sun_path) + sizeof(p_socketName.sun_family);
-    if(bind(p_socket, (struct sockaddr *)&p_socketName, len) == -1) {
-      std::string msg = "Unable to bind to socket [" + p_socketFile + "]";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
-    }
-
-    // Set up to listen to the socket
-    if(listen(p_socket, 5) == -1) {
-      std::string msg = "Unable to listen to socket [" + p_socketFile + "]";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
-    }
-  }
-
-  /**
-   * Runs the entered command line and returns the status to the parent
-   *
-   * @param commandLine The command line to be run
-   */
-  void Application::ChildFork(const std::string &commandLine) {
-    // The child fork doesn't have the socket
-    p_socket = -1;
-
-    // Append the pid as an argument
-    std::string command = commandLine + " -pid=" + iString((int)p_pid);
-
-    // Run the command
-    int status = system(command.c_str());
-
-    int childSocket = socket(PF_UNIX, SOCK_STREAM, 0);
-    if(childSocket == -1) {
-      std::cout << "couldn't create socket to parent fork" << std::endl << std::flush;
-      exit(255);
-    }
-
-    sockaddr_un socketName;
-    socketName.sun_family = AF_UNIX;
-    iString socketFile = "/tmp/isis_" + iString((int)p_pid);
-    strcpy(socketName.sun_path, socketFile.c_str());
-
-    int len = strlen(socketName.sun_path) + sizeof(socketName.sun_family);
-    if(connect(childSocket, (struct sockaddr *)&socketName, len) == -1) {
-      std::cout << "couldn't connect to parent fork" << std::endl << std::flush;
-      exit(255);
-    }
-
-    if(status != 0) {
-      char terminate[10] = "TERMINATE";
-      terminate[9] = 27; // escape character
-      if(send(childSocket, terminate, sizeof(terminate), 0) < 0) {
-        std::cout << "couldn't send terminate to parent fork" << std::endl << std::flush;
-        exit(255);
-      }
-    }
-    else {
-      char success[8] = "SUCCESS";
-      success[7] = 27; // escape character
-      if(send(childSocket, success, sizeof(success), 0) < 0) {
-        std::cout << "couldn't send success to parent fork" << std::endl << std::flush;
-        exit(255);
-      }
-    }
-
-    close(childSocket);
-    exit(0);
-  }
-
-  /**
-   *
-   *
-   * @param &command The command to run
-   *
-   * @param &program The program name currently running
-   *
-   * @throws Isis::iException::System - Unable to execute the command
-   * @throws Isis::iException::System - Unknown command on the socket
-   */
-  void Application::ParentFork(const std::string &command, const std::string &program) {
-    // Try to accept a connection from the program our child fork executed.  If
-    // the program we ran failed to start then we are waiting for the connection
-    // in the child fork
-    p_buffer = "";
-    p_queue.clear();
-    int status = -21; // Magic number hopefully not going to appear in a return status
-    int childForkDone = false;
-    while(!childForkDone) {
-      int childSocket = -1;
-      while(childSocket == -1) {
-
-        // verify the child hasn't had any problems,
-        // should only be exiting here if there were problems
-        // nonblocking wait
-        if(!p_childCaught) {
-          waitpid(p_childPid, &status, WNOHANG);
-          if(status != -21) {
-            p_childCaught = true;
-            if(status == 255) {
-              std::string msg = "Error in connection between processes";
-              throw iException::Message(iException::System, msg, _FILEINFO_);
-            }
-          }
-        }
-        errno = 0;
-        socklen_t len = sizeof(p_socketName);
-        childSocket = accept(p_socket, (struct sockaddr *)&p_socketName, &len);
-        if(childSocket == -1) {
-          if(errno != EINTR) {
-            std::cout << "accept errno = " << errno << std::endl << std::flush;
-            std::string msg = "Unable to accept socket connection [" +
-                              p_socketFile + "] from child process";
-            throw iException::Message(iException::System, msg, _FILEINFO_);
-          }
-        }
-      }
-
-      // Looks like we are the parent so we must wait for input to come from
-      // the child.
-      bool done = false;
-      while(!done) {
-        WaitForCommand(childSocket);
-
-        // Again, check for problems, such as with socket communication
-        // there is a possibility we could catch a successful run here
-        // nonblocking wait
-        if(!p_childCaught) {
-          waitpid(p_childPid, &status, WNOHANG);
-          if(status != -21) {
-            p_childCaught = true;
-            if(status == 255) {
-              std::string msg = "Error in connection between processes";
-              throw iException::Message(iException::System, msg, _FILEINFO_);
-            }
-          }
-        }
-
-        while(p_queue.size() > 0) {
-          if(p_queue[0] == "DONE") {
-            p_queue.erase(p_queue.begin());
-            done = true;
-          }
-          else if(p_queue[0] == "DISCONNECT") {
-            p_queue.erase(p_queue.begin());
-            done = true;
-          }
-          else if(p_queue[0] == "RECONNECT") {
-            p_queue.erase(p_queue.begin());
-          }
-          else if(p_queue[0] == "SUCCESS") {
-            p_queue.erase(p_queue.begin());
-            done = true;
-            childForkDone = true;
-          }
-          else if(p_queue[0] == "TERMINATE") {
-            // Should only happen if child fork could not fire off the process
-            p_queue.erase(p_queue.begin());
-            std::string msg = "Unable to execute command [" + command + "]";
-            throw iException::Message(iException::System, msg, _FILEINFO_);
-          }
-          else if(p_queue[0] == "ERROR") {
-            p_queue.erase(p_queue.begin());
-            while(p_queue.size() == 0) WaitForCommand(childSocket);
-            std::stringstream str;
-            str << p_queue[0];
-            p_queue.erase(p_queue.begin());
-
-            Pvl error;
-            str >> error;
-
-            for(int i = 0; i < error.Groups(); i++) {
-              PvlGroup &g = error.Group(i);
-              std::string eclass = g["Class"];
-              std::string emsg = g["Message"];
-              int ecode = g["Code"];
-              std::string efile = g["File"];
-              int eline = g["Line"];
-
-              iException::Message((iException::errType)ecode,
-                                        emsg, (char *)efile.c_str(), eline);
-            }
-          }
-          else if(p_queue[0] == "PROGRESSTEXT") {
-            p_queue.erase(p_queue.begin());
-            while(p_queue.size() == 0) WaitForCommand(childSocket);
-            p_ui->TheGui()->ProgressText(p_queue[0]);
-            p_ui->TheGui()->Progress(0);
-            p_queue.erase(p_queue.begin());
-          }
-          else if(p_queue[0] == "PROGRESS") {
-            p_queue.erase(p_queue.begin());
-            while(p_queue.size() == 0) WaitForCommand(childSocket);
-            p_ui->TheGui()->Progress(iString(p_queue[0]).ToInteger());
-            p_queue.erase(p_queue.begin());
-          }
-          else if(p_queue[0] == "LOG") {
-            p_queue.erase(p_queue.begin());
-            while(p_queue.size() == 0) WaitForCommand(childSocket);
-
-            std::stringstream str;
-            str << p_queue[0];
-            p_queue.erase(p_queue.begin());
-
-            p_ui->TheGui()->Log(str.str());
-          }
-          else {
-            std::string msg = "Unknown command [" + p_queue[0];
-            msg += "] on socket [" + p_socketFile + "]";
-            throw iException::Message(iException::System, msg, _FILEINFO_);
-          }
-          ProcessGuiEvents();
-          // Last check for any bad return status from child
-          if(!p_childCaught) {
-            waitpid(p_childPid, &status, WNOHANG);
-            if(status != -21) {
-              p_childCaught = true;
-              if(status == 255) {
-                std::string msg = "Error in connection between processes";
-                throw iException::Message(iException::System, msg, _FILEINFO_);
-              }
-            }
-          }
-        }
-      }
-      close(childSocket);
-    }
-  }
-
-  /**
-   * Trys to accept a connection from the child socket.  When it does accept the
-   * connection it receives the command from the child and pushes it into a
-   * buffer which is then pushed onto the queue.
-   *
-   * @param childSocket The child socket to establish connection to
-   *
-   * @throws Isis::iException::System - Unable to read from the socket
-   */
-  void Application::WaitForCommand(int childSocket) {
-
-    // Now we are ready to receive commands from our child (like in real
-    // life) so receive the command
-    int bytes;
-    char buf[1024*1024];
-    if((bytes = recv(childSocket, &buf, 1024 * 1024, 0)) < 0) {
-      std::string msg = "Unable to read from socket [" + p_socketFile + "]";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
-    }
-
-    // Push everything onto our string buffer
-    for(int i = 0; i < bytes; i++) p_buffer += buf[i];
-
-    // Move esc delimited strings to our command queue
-    std::string::size_type pos;
-    while((pos = p_buffer.find(27)) != std::string::npos) {
-      p_queue.push_back(p_buffer.substr(0, pos));
-      p_buffer.erase(0, pos + 1);
-    }
-  }
 
   /**
    * Returns the date and time as a string.
@@ -1182,7 +795,7 @@ namespace Isis {
     struct tm *tmbuf = localtime(&startTime);
     char timestr[80];
     strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
-    return(std::string) timestr;
+    return(string) timestr;
   }
 
   /**
@@ -1191,7 +804,7 @@ namespace Isis {
    * @return string User Name
    */
   iString Application::UserName() {
-    std::string user = "Unknown";
+    string user = "Unknown";
     char *userPtr = getenv("USER");
     if(userPtr != NULL) user = userPtr;
     return user;
@@ -1203,7 +816,7 @@ namespace Isis {
    * @return string Host Name
    */
   iString Application::HostName() {
-    std::string host = "Unknown";
+    string host = "Unknown";
     char *hostPtr = getenv("HOST");
     if(hostPtr == NULL) hostPtr = getenv("HOSTNAME");
     if(hostPtr != NULL) host = hostPtr;
@@ -1216,6 +829,194 @@ namespace Isis {
                             versionFile.GetLine();
 
     return versionString;
+  }
+
+
+  /**
+   * Runs various system specific uname commands and returns the results
+   *
+   * @return PvlGroup containing uname information
+   */
+  PvlGroup Application::GetUnameInfo() {
+    // Create a temporary file to store console output to
+    Filename temp;
+    temp.Temporary("/tmp/UnameConsoleInfo", "txt");
+    iString tempFile = temp.Expanded();
+
+    // Uname commands output to temp file with each of the following
+    // values on its own line in this order:
+    // machine hardware name, processor, hardware platform name,
+    // operating system, kernel name, kernel version, kernel release, all
+    PvlGroup unameGroup("UNAME");
+    ifstream readTemp;
+
+#if defined(__linux__)
+    // Write uname outputs to temp file
+    ProgramLauncher::RunSystemCommand("uname -m > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -p > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -i > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -o > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -s > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -v > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -r > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -a > " + tempFile);
+    // Read data from temp file
+    char value[256];
+    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("MachineHardware", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("Processor", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("HardwarePlatform", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("OperatingSystem", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("KernelName", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("KernelVersion", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("KernelRelease", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("FullUnameString", value));
+
+#elif defined(__APPLE__)
+    // Write uname outputs to temp file
+    ProgramLauncher::RunSystemCommand("uname -m > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -p > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -s > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -v > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -r > " + tempFile);
+    ProgramLauncher::RunSystemCommand("uname -a > " + tempFile);
+
+    // Read data from temp file
+    char value[256];
+    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("MachineHardware", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("Processor", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("OperatingSystem", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("OperatingSystemVersion", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("OperatingSystemRelease", value));
+    readTemp.getline(value, 256);
+    unameGroup.AddKeyword(PvlKeyword("FullUnameString", value));
+#endif
+
+    // remove temp file and return
+    remove(tempFile.c_str());
+    return unameGroup;
+  }
+
+  /**
+   * Runs some printenv commands that return Isis related Enviroment Variables.
+   *
+   * @return PvlGroup containing Enviroment information
+   * @todo Replace printenv commands with c library getenv
+   * @todo
+   */
+  PvlGroup Application::GetEnviromentInfo() {
+    // Create a temporary file to store console output to
+    Filename temp;
+    temp.Temporary("/tmp/EnviromentInfo", "txt");
+    iString tempFile = temp.Expanded();
+    PvlGroup envGroup("EnviromentVariables");
+    ifstream readTemp;
+
+    string env1 = "printenv SHELL > " + tempFile;
+    string env2 = "printenv HOME >> " + tempFile;
+    string env3 = "printenv PWD >> " + tempFile;
+    string env5 = "printenv ISISROOT >> " + tempFile;
+    string env6 = "printenv ISIS3DATA >> " + tempFile;
+    ProgramLauncher::RunSystemCommand(env1);
+    ProgramLauncher::RunSystemCommand(env2);
+    ProgramLauncher::RunSystemCommand(env3);
+    ProgramLauncher::RunSystemCommand(env5);
+    ProgramLauncher::RunSystemCommand(env6);
+    // Read data from temp file
+    char value[511];
+    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.getline(value, 255);
+    envGroup.AddKeyword(PvlKeyword("Shell", value));
+    readTemp.getline(value, 255);
+    envGroup.AddKeyword(PvlKeyword("Home", value));
+    readTemp.getline(value, 255);
+    envGroup.AddKeyword(PvlKeyword("Pwd", value));
+    readTemp.getline(value, 255);
+    envGroup.AddKeyword(PvlKeyword("ISISROOT", value));
+    readTemp.getline(value, 255);
+    envGroup.AddKeyword(PvlKeyword("ISIS3DATA", value));
+
+    // remove temp file and return
+    iString cleanup = "rm -f " + tempFile;
+    ProgramLauncher::RunSystemCommand(cleanup);
+    return envGroup;
+  }
+
+  /**
+   * Runs df to see the disk space availability
+   *
+   * @return iString containing df results
+   */
+  iString Application::GetSystemDiskSpace() {
+    Filename temp;
+    temp.Temporary("/tmp/SystemDiskSpace", "txt");
+    iString tempFile = temp.Expanded();
+    ifstream readTemp;
+    string diskspace = "df > " + tempFile;
+    ProgramLauncher::RunSystemCommand(diskspace);
+    readTemp.open(tempFile.c_str(), ifstream::in);
+
+    iString results = "";
+    char tmp[512];
+    while(!readTemp.eof()) {
+      readTemp.getline(tmp, 512);
+      results += tmp;
+      results += "\n";
+    }
+
+    // remove temp file and return
+    iString cleanup = "rm -f " + tempFile;
+    ProgramLauncher::RunSystemCommand(cleanup);
+    return results;
+  }
+
+  /**
+   * Runs ldd on linux and sun and otool on macs to get information about the applicaiton run
+   *
+   * @return iString containing application information
+   */
+  iString Application::GetLibraryDependencies(iString file) {
+    Filename temp;
+    temp.Temporary("/tmp/LibraryDependencies", "txt");
+    iString tempFile = temp.Expanded();
+    ifstream readTemp;
+    string dependencies = "";
+#if defined(__linux__)
+    dependencies = "ldd -v " + file + " > " + tempFile;
+#elif defined(__APPLE__)
+    dependencies = "otool -L " + file + " > " + tempFile;
+#elif defined (__sun__)
+    dependencies = "ldd -v " + file + " > " + tempFile;
+#endif
+    ProgramLauncher::RunSystemCommand(dependencies);
+    readTemp.open(tempFile.c_str(), ifstream::in);
+
+    iString results = "";
+    char tmp[512];
+    while(!readTemp.eof()) {
+      readTemp.getline(tmp, 512);
+      results += tmp;
+      results += "\n";
+    }
+
+    // remove temp file and return
+    iString cleanup = "rm -f " + tempFile;
+    ProgramLauncher::RunSystemCommand(cleanup);
+    return results;
   }
 }  //end namespace isis
 

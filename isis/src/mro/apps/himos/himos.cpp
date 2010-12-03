@@ -1,14 +1,16 @@
 #include "Isis.h"
-#include "Process.h"
+
+#include "Application.h"
+#include "Camera.h"
+#include "Cube.h"
 #include "FileList.h"
 #include "iException.h"
-#include "Cube.h"
-#include "Camera.h"
-#include "UserInterface.h"
 #include "Pvl.h"
-#include "Application.h"
 #include "iString.h"
 #include "OriginalLabel.h"
+#include "Process.h"
+#include "ProgramLauncher.h"
+#include "UserInterface.h"
 
 
 using namespace std;
@@ -249,7 +251,7 @@ void IsisMain() {
     string MosaicPriority = ui.GetString("PRIORITY");
 
     string parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + MosaicPriority;
-    Isis::iApp ->Exec("automos", parameters);
+    ProgramLauncher::RunIsisProgram("automos", parameters);
 
     // write out new information to new group mosaic
 

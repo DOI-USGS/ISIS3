@@ -1,6 +1,8 @@
 #include "Isis.h"
+
 #include "Application.h"
 #include "Cube.h"
+#include "ProgramLauncher.h"
 
 using namespace std;
 using namespace Isis;
@@ -39,7 +41,7 @@ void IsisMain() {
     else {
       parameters += iString(numberOfLines);
     }
-    Isis::iApp ->Exec("crop", parameters);
+    ProgramLauncher::RunIsisProgram("crop", parameters);
     //The starting line for next crop
     startLine = 1 + cropNum * (numberOfLines - lineOverlap);
     cropNum++;

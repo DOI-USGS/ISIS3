@@ -1,19 +1,21 @@
 #include "Isis.h"
-#include "Process.h"
-#include "FileList.h"
-#include "iException.h"
-#include "Cube.h"
-#include "CameraFactory.h"
-#include "Camera.h"
-#include "Projection.h"
-#include "UserInterface.h"
-#include "Pvl.h"
-#include "PvlGroup.h"
+
 #include "Application.h"
+#include "Camera.h"
+#include "CameraFactory.h"
+#include "Cube.h"
+#include "FileList.h"
+#include "Filename.h"
+#include "iException.h"
 #include "iString.h"
 #include "OriginalLabel.h"
+#include "Process.h"
+#include "ProgramLauncher.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
 #include "TextFile.h"
-#include "Filename.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
@@ -70,13 +72,13 @@ void IsisMain() {
   }
 
   // Work with latitude and longitude use projection factory (from1)
-  Projection *proj = Isis::ProjectionFactory::CreateFromCube(from1lab);
+  Projection *proj = ProjectionFactory::CreateFromCube(from1lab);
   double minLat = proj->MinimumLatitude();
   double maxLat = proj->MaximumLatitude();
   double minLon = proj->MinimumLongitude();
   double maxLon = proj->MaximumLongitude();
   if(ui.WasEntered("FROM2")) {
-    Projection *proj = Isis::ProjectionFactory::CreateFromCube(from2lab);
+    Projection *proj = ProjectionFactory::CreateFromCube(from2lab);
     if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
     if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
     if(proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
@@ -105,7 +107,7 @@ void IsisMain() {
   // has been left in to be backward compatiable.  See code below that sets
   // image,  this was in 10/07 because pole images would not find an
   // intersect in projection lat. lon. space.
-  Camera *cam = Isis::CameraFactory::Create(from1lab);
+  Camera *cam = CameraFactory::Create(from1lab);
   if(cam->SetUniversalGround(avgLat, avgLon)) {
     Cemiss = cam->EmissionAngle();
     Cphase = cam->PhaseAngle();
@@ -117,7 +119,7 @@ void IsisMain() {
     runXY = false;
   }
   else if(ui.WasEntered("FROM2")) {
-    Camera *cam = Isis::CameraFactory::Create(from2lab);
+    Camera *cam = CameraFactory::Create(from2lab);
     if(cam->SetUniversalGround(avgLat, avgLon)) {
       Cemiss = cam->EmissionAngle();
       Cphase = cam->PhaseAngle();
@@ -135,7 +137,7 @@ void IsisMain() {
   // This is run if no intersect is found when using lat and lon in
   // projection space.
   if(runXY) {
-    Projection *proj = Isis::ProjectionFactory::CreateFromCube(from1lab);
+    Projection *proj = ProjectionFactory::CreateFromCube(from1lab);
     proj->SetWorld(0.5, 0.5);
     double startX = proj->XCoord();
     double endY = proj->YCoord();
@@ -146,7 +148,7 @@ void IsisMain() {
     double startY = proj->YCoord();
 
     if(ui.WasEntered("FROM2")) {
-      Projection *proj = Isis::ProjectionFactory::CreateFromCube(from2lab);
+      Projection *proj = ProjectionFactory::CreateFromCube(from2lab);
       proj->SetWorld(0.5, 0.5);
       if(proj->XCoord() < startX) startX = proj->XCoord();
       if(proj->YCoord() > endY) endY = proj->YCoord();
@@ -161,7 +163,7 @@ void IsisMain() {
     double avgY = (startY + endY) / 2;
     double sample = proj->ToWorldX(avgX);
     double line = proj->ToWorldY(avgY);
-    Camera *cam = Isis::CameraFactory::Create(from1lab);
+    Camera *cam = CameraFactory::Create(from1lab);
     if(cam->SetImage(sample, line)) {
       Cemiss = cam->EmissionAngle();
       Cphase = cam->PhaseAngle();
@@ -173,7 +175,7 @@ void IsisMain() {
       runXY = false;
     }
     else if(ui.WasEntered("FROM2")) {
-      Camera *cam = Isis::CameraFactory::Create(from2lab);
+      Camera *cam = CameraFactory::Create(from2lab);
       if(cam->SetImage(sample, line)) {
         Cemiss = cam->EmissionAngle();
         Cphase = cam->PhaseAngle();
@@ -232,7 +234,7 @@ void IsisMain() {
   string parameters = "FROMLIST=" + tempFile.Expanded() +
                       " MOSAIC=" + ui.GetFilename("TO") +
                       " PRIORITY=" + MosaicPriority;
-  Isis::iApp ->Exec("automos", parameters);
+  ProgramLauncher::RunIsisProgram("automos", parameters);
 
   PvlGroup mos("Mosaic");
   mos += PvlKeyword("ProductId ", ProdId);
