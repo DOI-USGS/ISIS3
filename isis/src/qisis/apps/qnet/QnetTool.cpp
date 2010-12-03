@@ -22,6 +22,7 @@
 #include "ControlPoint.h"
 #include "ControlPointEdit.h"
 #include "Filename.h"
+#include "iString.h"
 #include "MdiCubeViewport.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
@@ -36,7 +37,7 @@
 
 #include "qnet.h"
 using namespace Qisis::Qnet;
-using namespace std;
+using namespace Isis;
 
 
 namespace Qisis {
@@ -793,7 +794,7 @@ namespace Qisis {
 
     //  Create list of list box of all files highlighting those that
     //  contain the point.
-    vector<string> pointFiles;
+    QStringList pointFiles;
 
     //  Initialize camera for all images in control network,
     //  TODO::   Needs to be moved to QnetFileTool.cpp
@@ -806,7 +807,7 @@ namespace Qisis {
         double line = cam->Line();
         if(samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles.push_back(g_serialNumberList->Filename(i));
+          pointFiles << (iString) g_serialNumberList->Filename(i);
         }
       }
     }
@@ -1221,7 +1222,7 @@ namespace Qisis {
 
     //  Create list of list box of all files highlighting those that
     //  contain the point, but that do not already have a measure.
-    vector<string> pointFiles;
+    QStringList pointFiles;
 
     //  Initialize camera for all images in control network,
     //  TODO::   Needs to be moved to QnetFileTool.cpp
@@ -1248,7 +1249,7 @@ namespace Qisis {
         double line = cam->Line();
         if(samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles.push_back(g_serialNumberList->Filename(i));
+          pointFiles << QString::fromStdString(g_serialNumberList->Filename(i));
         }
       }
     }

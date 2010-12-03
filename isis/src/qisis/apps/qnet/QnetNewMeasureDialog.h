@@ -3,15 +3,14 @@
 
 #include <QDialog>
 
-class QLabel;
 class QListWidget;
 class QPushButton;
+class QStringList;
 
-#include "ControlPoint.h"
+namespace Isis {
+  class ControlPoint;
+}
 
-#include <vector>
-
-using namespace std;
 namespace Qisis {
   /**
    *
@@ -20,28 +19,28 @@ namespace Qisis {
    *                          to null in constructor.  Removed "std::"
    *                          since "using namespace std" in
    *                          header and .cpp files.
-   *
+   *   @history 2010-12-02 Eric Hyer - Removed "using namespace std" from
+   *       header file!!!  Also removed non-parent includes.  Eliminated
+   *       the p_pointFiles variable.  SetFiles now puts Selected items on top.
    */
-
   class QnetNewMeasureDialog : public QDialog {
+  
       Q_OBJECT
 
     public:
       QnetNewMeasureDialog(QWidget *parent = 0);
-      void SetFiles(const Isis::ControlPoint &point,
-                    vector<string> &pointFiles);
+      void SetFiles(Isis::ControlPoint point, QStringList pointFiles);
 
+      // FIXME: Make this private
       QListWidget *fileList;
 
-    private:
-
-      QPushButton *p_okButton;
-
-      vector<string> *p_pointFiles;
 
     private slots:
       void enableOkButton(const QString &text);
-
+    
+    
+    private:
+      QPushButton *p_okButton;
   };
 };
 

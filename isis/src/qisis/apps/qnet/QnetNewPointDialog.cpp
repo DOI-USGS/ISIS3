@@ -1,15 +1,17 @@
-#include <QtGui>
-#include <QString>
+#include "QnetNewPointDialog.h"
 
 #include <algorithm>
 
-#include "QnetNewPointDialog.h"
+#include <QLabel>
+#include <QPushButton>
+#include <QStringList>
+
+#include "iString.h"
+#include "qnet.h"
 #include "SerialNumberList.h"
 
-#include "qnet.h"
-
 using namespace Qisis::Qnet;
-using namespace std;
+using namespace Isis;
 
 namespace Qisis {
   // initialize static variable
@@ -32,7 +34,6 @@ namespace Qisis {
     fileList = NULL;
     p_ptIdLabel = NULL;
     p_okButton = NULL;
-    p_pointFiles = NULL;
 
     p_ptIdLabel = new QLabel("Point ID:");
     ptIdValue = new QLineEdit;
@@ -73,29 +74,28 @@ namespace Qisis {
 
   }
 
-  /**
-   * @internal
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::"
-   *            since "using namespace std"
-   */
-  void QnetNewPointDialog::SetFiles(vector<string> &pointFiles) {
-    //  TODO::  make pointFiles const???
-    p_pointFiles = &pointFiles;
-
-    //  Add all files to list , selecting those in pointFiles which are
-    //  those files which contain the point.
+  void QnetNewPointDialog::SetFiles(QStringList pointFiles) {
+  
+    int bottomMostSelectedItemIndex = 0;
+    
     for(int i = 0; i < g_serialNumberList->Size(); i++) {
-      QListWidgetItem *item = new QListWidgetItem(fileList);
-      string tempFilename = g_serialNumberList->Filename(i);
-      item->setText(QString(tempFilename.c_str()));
-      vector<string>::iterator pos;
-      pos = std::find(p_pointFiles->begin(), p_pointFiles->end(),
-                      g_serialNumberList->Filename(i));
-      if(pos != p_pointFiles->end()) {
-        fileList->setItemSelected(item, true);
+      
+      // build new item...
+      iString label = g_serialNumberList->Filename(i);
+      QListWidgetItem * item = new QListWidgetItem(label);
+      
+      // if this entry of the SerialNumberList is also in the pointFiles then
+      // mark it as selected and insert after the last selected item (toward
+      // the top of the list).  Otherwise just add the item to the end of the
+      // list
+      if (pointFiles.contains(label)) {
+        fileList->insertItem(bottomMostSelectedItemIndex++, item);
+        item->setSelected(true);
+      }
+      else {
+        fileList->addItem(item);
       }
     }
-
   }
 
 

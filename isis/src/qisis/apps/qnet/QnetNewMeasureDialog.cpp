@@ -1,14 +1,20 @@
-#include <QtGui>
+#include "QnetNewMeasureDialog.h"
 
 #include <algorithm>
+#include <string>
 
-#include "QnetNewMeasureDialog.h"
+#include <QLabel>
+#include <QPushButton>
+#include <QStringList>
+
+#include "ControlPoint.h"
+#include "iString.h"
+#include "qnet.h"
 #include "SerialNumberList.h"
 
-#include "qnet.h"
 
 using namespace Qisis::Qnet;
-using namespace std;
+using namespace Isis;
 
 namespace Qisis {
   /**
@@ -24,7 +30,6 @@ namespace Qisis {
   QnetNewMeasureDialog::QnetNewMeasureDialog(QWidget *parent) : QDialog(parent) {
     fileList = NULL;
     p_okButton = NULL;
-    p_pointFiles = NULL;
 
 
     QLabel *listLabel = new QLabel("Select Files:");
@@ -54,36 +59,34 @@ namespace Qisis {
   }
 
 
-  /**
-   * @internal
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::"
-   *            since "using namespace std"
-   */
-  void QnetNewMeasureDialog::SetFiles(const Isis::ControlPoint &point,
-                                      vector<string> &pointFiles) {
-    //  TODO::  make pointFiles const???
-    p_pointFiles = &pointFiles;
-    Isis::ControlPoint pt = point;
-
-    //  Add all files to list , selecting those in pointFiles which are
-    //  those files which contain the point.
+  void QnetNewMeasureDialog::SetFiles(Isis::ControlPoint point,
+                                      QStringList pointFiles) {
+    int bottomMostSelectedItemIndex = 0;
+                                      
+    //  Add all entries in the SerialNumberList
     for(int i = 0; i < g_serialNumberList->Size(); i++) {
+    
+      iString curSerialNum = g_serialNumberList->SerialNumber(i);
+      
       //  Don't add if already in this point
-      string sn = g_serialNumberList->SerialNumber(i);
-      if(pt.HasSerialNumber(sn)) continue;
-      //if (point.HasSN(sn)) continue;
+      if (point.HasSerialNumber(curSerialNum))
+        continue;
 
-      QListWidgetItem *item = new QListWidgetItem(fileList);
-      string tempFilename = g_serialNumberList->Filename(i);
-      item->setText(QString(tempFilename.c_str()));
-      vector<string>::iterator pos;
-      pos = std::find(p_pointFiles->begin(), p_pointFiles->end(),
-                      g_serialNumberList->Filename(i));
-      if(pos != p_pointFiles->end()) {
-        fileList->setItemSelected(item, true);
+      // build new item...
+      iString label(g_serialNumberList->Filename(i));
+      QListWidgetItem * item = new QListWidgetItem(label);
+      
+      // if this entry of the SerialNumberList is also in the pointFiles then
+      // mark it as selected and insert after the last selected item (toward
+      // the top, otherwise add it to the
+      if (pointFiles.contains(label)) {
+        fileList->insertItem(bottomMostSelectedItemIndex++, item);
+        item->setSelected(true);
+      }
+      else {
+        fileList->addItem(item);
       }
     }
-
   }
 
 

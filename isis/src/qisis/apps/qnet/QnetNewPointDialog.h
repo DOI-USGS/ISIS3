@@ -2,15 +2,13 @@
 #define QnetNewPointDialog_h
 
 #include <QDialog>
-#include <QString>
 
 class QLabel;
 class QLineEdit;
 class QListWidget;
 class QPushButton;
-
-#include <vector>
-using namespace std;
+class QString;
+class QStringList;
 
 namespace Qisis {
   /**
@@ -21,10 +19,11 @@ namespace Qisis {
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          in constructor.  Removed "std::" in
    *                          header and .cpp files.
+   *   @history 2010-12-03 Eric Hyer - Selected points now go to the top!
    */
   class QnetNewPointDialog : public QDialog {
+  
       Q_OBJECT
-
 
     public:
       static QString lastPtIdValue;
@@ -32,7 +31,7 @@ namespace Qisis {
       QnetNewPointDialog(QWidget *parent = 0);
 
       QLineEdit *ptIdValue;
-      void SetFiles(vector<string> &pointFiles);
+      void SetFiles(QStringList pointFiles);
 
       QListWidget *fileList;
 
@@ -40,8 +39,6 @@ namespace Qisis {
 
       QLabel *p_ptIdLabel;
       QPushButton *p_okButton;
-
-      vector<string> *p_pointFiles;
 
     private slots:
       void enableOkButton(const QString &text);
