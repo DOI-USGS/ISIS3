@@ -24,7 +24,8 @@ void IsisMain() {
   cerr << "Testing stats ... " << endl;
   cerr << endl;
   ProgramLauncher::RunIsisProgram("stats",
-                                  "from=$base/testData/ab102401_ideal.cub");
+        "from=$base/testData/ab102401_ideal.cub "
+        "-preference=$ISISROOT/src/base/objs/Preference/TestPreferences");
 
   cerr << endl;
   cerr << "Testing malformed command... " << endl;
@@ -57,7 +58,8 @@ void IsisMain() {
   cerr << endl;
   try {
     ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
-        "from=\\$base/testData/ab102401_ideal.cub -pid=999");
+        "from=\\$base/testData/ab102401_ideal.cub -pid=999 "
+        "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
   }
   catch(iException &e) {
     e.Report(false);
@@ -71,7 +73,8 @@ void IsisMain() {
   cerr << endl;
   try {
     ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
-        "from=\\$base/testData/ab102401_ideal.cub");
+        "from=\\$base/testData/ab102401_ideal.cub "
+        "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
   }
   catch(iException &e) {
     e.Report(false);

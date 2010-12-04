@@ -106,7 +106,7 @@ namespace Isis {
       QByteArray lineData;
 
       if(childSocket->waitForReadyRead(1000)) {
-        lineData = childSocket->read(1024 * 1024 * 1024);
+        lineData = childSocket->read(childSocket->bytesAvailable());
 
         for(int i = 0; i < lineData.size(); i++) {
           if(insideCode) {
@@ -130,6 +130,8 @@ namespace Isis {
 
           if(messageDone) {
             ProcessIsisMessageFromChild(code, message);
+            code = "";
+            message = "";
             messageDone = false;
           }
         }
