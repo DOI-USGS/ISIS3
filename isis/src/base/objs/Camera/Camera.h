@@ -138,9 +138,6 @@ namespace Isis {
    *            normal can be determined for DEM surface. Also modified the
    *            LocalPhotometricAngles method to report if the angles could
    *            successfully be calculated.
-   *   @history 2010-12-07 Steven Lambright - PixelResolution() now caches its
-   *            results. This causes an improvement in performance when
-   *            projecting.
    */
 
   class Camera : public Isis::Sensor {
@@ -516,8 +513,6 @@ namespace Isis {
       double p_maxlon180;                 //!<The maximum longitude in the 180 domain
       bool p_groundRangeComputed;         /**<Flag showing if the ground range
                                               was computed successfully.*/
-      double p_cachedPixelRes;    /**< The pixel resolution, set after its first
-                                       calculated */
 
       bool p_pointComputed;               //!<Flag showing if Sample/Line has been computed
 
