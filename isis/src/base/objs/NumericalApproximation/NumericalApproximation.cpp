@@ -1,16 +1,20 @@
+#include "NumericalApproximation.h"
+
 #include <cmath>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "NumericalApproximation.h"
+
 #include "SpecialPixel.h"
 #include "iException.h"
 #include "iString.h"
 
 using namespace std;
 namespace Isis {
+  NumericalApproximation::FunctorList NumericalApproximation::p_interpFunctors;
+
   /**
    * Default constructor creates NumericalApproximation object.
    * Sets the NumericalApproximation::InterpType to the
@@ -494,18 +498,31 @@ namespace Isis {
    *   @history 2008-12-18 Jeannie Walldren - Added address
    *            operator (&) to input variables of type vector.
    */
-  void NumericalApproximation::AddData(const vector <double> &x, const vector <double> &y) throw(iException &) {
+  void NumericalApproximation::AddData(const vector <double> &x,
+                                       const vector <double> &y)
+                                       throw(iException &) {
     int n = x.size();
     int m = y.size();
     if(n != m) {
       ReportException(iException::Programmer, "AddData()",
-                      "Invalid arguments. The sizes of the input vectors do not match",
+                      "Invalid arguments. The sizes of the input vectors do "
+                      "not match",
                       _FILEINFO_);
     }
-    for(int i = 0; i < n; i++) {
-      p_x.push_back(x[i]);
-      p_y.push_back(y[i]);
+
+    // Avoid push_back if at all possible. These calls were consuming 10% of
+    //   cam2map's run time on a line scan camera.
+    if(!p_x.empty() || !p_y.empty()) {
+      for(int i = 0; i < n; i++) {
+        p_x.push_back(x[i]);
+        p_y.push_back(y[i]);
+      }
     }
+    else {
+      p_x = x;
+      p_y = y;
+    }
+
     p_clampedComputed = false;
     p_clampedEndptsSet = false;
     p_dataValidated = false;
@@ -586,16 +603,25 @@ namespace Isis {
    * @internal
    *   @history 2009-06-10 Jeannie Walldren - Original version
    */
-  void NumericalApproximation::AddCubicHermiteDeriv(const vector <double> &fprimeOfx) throw(iException &) {
+  void NumericalApproximation::AddCubicHermiteDeriv(
+      const vector <double> &fprimeOfx) throw(iException &) {
     if(p_itype != NumericalApproximation::CubicHermite) {
       ReportException(iException::Programmer, "SetCubicHermiteDeriv()",
                       "This method is only valid for cspline-Hermite interpolation, may not be used for "
                       + Name() + " interpolation",
                       _FILEINFO_);
     }
-    for(unsigned int i = 0; i < fprimeOfx.size(); i++) {
-      p_fprimeOfx.push_back(fprimeOfx[i]);
+
+    // Avoid push_back if at all possible.
+    if(!p_fprimeOfx.empty()) {
+      for(unsigned int i = 0; i < fprimeOfx.size(); i++) {
+        p_fprimeOfx.push_back(fprimeOfx[i]);
+      }
     }
+    else {
+      p_fprimeOfx = fprimeOfx;
+    }
+
     return;
   }
   /**
@@ -611,7 +637,8 @@ namespace Isis {
    * @internal
    *   @history 2009-06-10 Jeannie Walldren - Original version
    */
-  void NumericalApproximation::AddCubicHermiteDeriv(double fprimeOfx) throw(iException &) {
+  void NumericalApproximation::AddCubicHermiteDeriv(
+      double fprimeOfx) throw(iException &) {
     if(p_itype != NumericalApproximation::CubicHermite) {
       ReportException(iException::Programmer, "SetCubicHermiteDeriv()",
                       "This method is only valid for cspline-Hermite interpolation, may not be used for "
@@ -2310,12 +2337,15 @@ namespace Isis {
    *            interpolation types not supported by GSL.
    */
   void NumericalApproximation::Init(NumericalApproximation::InterpType itype) {
-    p_interpFunctors.insert(make_pair(Linear, gsl_interp_linear));
-    p_interpFunctors.insert(make_pair(Polynomial, gsl_interp_polynomial));
-    p_interpFunctors.insert(make_pair(CubicNatural, gsl_interp_cspline));
-    p_interpFunctors.insert(make_pair(CubicNatPeriodic, gsl_interp_cspline_periodic));
-    p_interpFunctors.insert(make_pair(Akima, gsl_interp_akima));
-    p_interpFunctors.insert(make_pair(AkimaPeriodic, gsl_interp_akima_periodic));
+    if(p_interpFunctors.empty()) {
+      p_interpFunctors.insert(make_pair(Linear, gsl_interp_linear));
+      p_interpFunctors.insert(make_pair(Polynomial, gsl_interp_polynomial));
+      p_interpFunctors.insert(make_pair(CubicNatural, gsl_interp_cspline));
+      p_interpFunctors.insert(make_pair(CubicNatPeriodic, gsl_interp_cspline_periodic));
+      p_interpFunctors.insert(make_pair(Akima, gsl_interp_akima));
+      p_interpFunctors.insert(make_pair(AkimaPeriodic, gsl_interp_akima_periodic));
+    }
+
     p_acc = 0;
     p_interp = 0;
     try {

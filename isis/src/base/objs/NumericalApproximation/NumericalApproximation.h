@@ -709,7 +709,12 @@ namespace Isis {
    *   @history 2009-08-03 Jeannie Walldren - Clean up code,
    *            documentation and check in changes from
    *            2009-06-10, 2009-07-02, 2009-07-09
-   *   @history 2010-07-21 Sharmila Prasad - Remove doxygen documentation warnings
+   *   @history 2010-07-21 Sharmila Prasad - Remove doxygen documentation
+   *            warnings
+   *   @history 2010-12-06 Steven Lambright - Optimized AddData(vector, vector),
+   *            AddCubicHermiteDeriv(vector), and Init() which causes a
+   *            very significant increase in performance when constructing a lot
+   *            or adding a lot of data.
    */
 
   class NumericalApproximation {
@@ -857,7 +862,7 @@ namespace Isis {
       typedef FunctorList::const_iterator FunctorConstIter; //!< GSL Iterator
       gsl_interp_accel *p_acc;                              //!< Lookup accelorator
       gsl_spline       *p_interp;                           //!< Currently active interpolator
-      FunctorList       p_interpFunctors;                   //!< Maintains list of interpolator options
+      static FunctorList p_interpFunctors;                   //!< Maintains list of interpolator options
       // CUBIC CLAMPED VARIABLES
       bool              p_clampedEndptsSet;                 //!< Flag variable to determine whether SetCubicClampedEndptDeriv() has been called after all data was added for @a CubicClamped interpolation.
       bool              p_clampedComputed;                  //!< Flag variable to determine whether ComputeCubicClamped() has been called.
