@@ -103,6 +103,8 @@ namespace Isis {
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
     p_pointComputed = false;
+
+    p_cachedPixelRes = Null;
   }
 
   //! Destroys the Camera Object
@@ -390,11 +392,16 @@ namespace Isis {
    * @return double The pixel resolution
    */
   double Camera::PixelResolution() {
+    if(!IsSpecial(p_cachedPixelRes)) return p_cachedPixelRes;
+
     double lineRes = LineResolution();
     double sampRes = SampleResolution();
     if(lineRes < 0.0) return -1.0;
     if(sampRes < 0.0) return -1.0;
-    return (lineRes + sampRes) / 2.0;
+
+    p_cachedPixelRes = (lineRes + sampRes) / 2.0;
+
+    return p_cachedPixelRes;
   }
 
   /**
