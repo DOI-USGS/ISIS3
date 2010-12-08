@@ -37,14 +37,7 @@ namespace Isis {
    * @return conversion was successful
    */
   bool LineScanCameraGroundMap::SetGround(const double lat, const double lon) {
-    // Set a time in order to get Spice so SetUniversalGround will not fail
-    // We are only interested in getting the radius for this lat/lon and
-    // calling the overload SetGround to do the work.
-    p_camera->Sensor::SetEphemerisTime(p_camera->Spice::CacheStartTime());
-    if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) return false;
-    // Get radius in meters
-    double radius = p_camera->Sensor::LocalRadius();
-    return SetGround(lat, lon, radius);
+    return SetGround(lat, lon, p_camera->LocalRadius(lat, lon));
   }
 
   /** Compute undistorted focal plane coordinate from ground position

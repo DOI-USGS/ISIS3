@@ -55,6 +55,9 @@ namespace Isis {
    *   @history 2010-06-17 Steven Lambright - More tolerant of failures in the
    *            distortion models for finding the bounds of the search in
    *            FindSpacecraftDistance
+   *   @history 2010-12-07 Steven Lambright - SetGround(double,double) now goes
+   *            straight to the radius instead of using SetUniversalGround to
+   *            get the radius.
    *
    */
   class LineScanCameraGroundMap : public CameraGroundMap {
