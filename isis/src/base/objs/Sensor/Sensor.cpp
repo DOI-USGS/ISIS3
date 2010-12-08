@@ -21,6 +21,7 @@
  */
 
 #include "Sensor.h"
+#include "Angle.h"
 #include "CubeManager.h"
 #include "iString.h"
 #include "iException.h"
@@ -266,13 +267,13 @@ namespace Isis {
           return p_hasIntersection;
         }
 
-        double dist = sqrt((pB[0] - p_pB[0]) * (pB[0] - p_pB[0]) +
+        double dist = ((pB[0] - p_pB[0]) * (pB[0] - p_pB[0]) +
                            (pB[1] - p_pB[1]) * (pB[1] - p_pB[1]) +
-                           (pB[2] - p_pB[2]) * (pB[2] - p_pB[2])) * 1000.;
-        if(dist < tolerance) {
+                           (pB[2] - p_pB[2]) * (pB[2] - p_pB[2])) * 1000 * 1000;
+        if(dist < tolerance*tolerance) {
           // Now recompute tolerance at updated surface point and recheck
           double tolerance = Resolution() / 100.0;
-          if(dist < tolerance) done = true;
+          if(dist < tolerance*tolerance) done = true;
         }
 
         it++;
@@ -514,6 +515,39 @@ namespace Isis {
     p[2] = p_pB[2];
   }
 
+
+  /**
+   * Returns the local radius (in meters) at a given lat, lon.
+   *
+   * @param lat The latitude of the point to get the local radius for
+   *              in degrees.
+   * @param lon The longitude of the point to get the local radius for
+   *              in degrees.
+   *
+   * @returns The distance from the center of the planet to this lat,lon in
+   *          meters
+   */
+  double Sensor::LocalRadius(double lat, double lon) {
+    double radius;
+
+    if(p_hasElevationModel) {
+      radius = DemRadius(lat, lon);
+    }
+    else {
+      double a = p_radii[0];
+      double b = p_radii[1];
+      double c = p_radii[2];
+      double rlat = Angle(lat, Angle::Degrees).GetRadians();
+      double rlon = Angle(lon, Angle::Degrees).GetRadians();
+      double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) +
+                        pow(a * sin(rlon), 2));
+      radius = xyradius * c / sqrt(pow(c * cos(rlat), 2) +
+                        pow(xyradius * sin(rlat), 2));
+    }
+
+    return radius;
+  }
+
   /**
    * Returns the phase angle in degrees. This does not use the surface model.
    *
@@ -599,23 +633,11 @@ namespace Isis {
     p_latitude = latitude;
     p_longitude = longitude;
 
-    double lon = p_longitude * Isis::PI / 180.0;
-    double lat = p_latitude * Isis::PI / 180.0;
+    p_radius = LocalRadius(p_latitude, p_longitude);
 
-    if(p_hasElevationModel) {
-      p_radius = DemRadius(p_latitude, p_longitude);
-      if(Isis::IsSpecial(p_radius)) {
-        p_hasIntersection = false;
-        return p_hasIntersection;
-      }
-    }
-    else {
-      // Otherwise compute the local radius on the ellipsoid
-      double a = p_radii[0];
-      double b = p_radii[1];
-      double c = p_radii[2];
-      double xyradius = a * b / sqrt(pow(b * cos(lon), 2) + pow(a * sin(lon), 2));
-      p_radius = xyradius * c / sqrt(pow(c * cos(lat), 2) + pow(xyradius * sin(lat), 2));
+    if(Isis::IsSpecial(p_radius)) {
+      p_hasIntersection = false;
+      return p_hasIntersection;
     }
 
     return SetGroundLocal(backCheck);
@@ -823,17 +845,7 @@ namespace Isis {
     double rlon = lon * Isis::PI / 180.0;
 
     // Compute radius
-    double rad;
-    if(p_hasElevationModel) {
-      rad = DemRadius(lat, lon);
-    }
-    else {
-      double a = p_radii[0];
-      double b = p_radii[1];
-      double c = p_radii[2];
-      double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) + pow(a * sin(rlon), 2));
-      rad = xyradius * c / sqrt(pow(c * cos(rlat), 2) + pow(xyradius * sin(rlat), 2));
-    }
+    double rad = LocalRadius(lat, lon);
 
     // Now with the 3 spherical value compute the x/y/z coordinate
     double ssB[3];
@@ -862,7 +874,8 @@ namespace Isis {
     p_portal->SetPosition(p_demProj->WorldX(), p_demProj->WorldY(), 1);
     p_demCube->Read(*p_portal);
 
-    double radius = p_interp->Interpolate(p_demProj->WorldX(), p_demProj->WorldY(),
+    double radius = p_interp->Interpolate(p_demProj->WorldX(),
+                                          p_demProj->WorldY(),
                                           p_portal->DoubleBuffer());
     if(Isis::IsSpecial(radius)) {
       return Isis::Null;

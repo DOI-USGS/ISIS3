@@ -54,8 +54,8 @@ namespace Isis {
    * @author 2003-04-11 Jeff Anderson
    *
    * @internal
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
+   *  @history 2003-05-16 Stuart Sides -  Modified schema from astrogeology...
+   *                                      isis.astrogeology...
    *  @history 2003-05-30 Jeff Anderson - Updated unitTest and truth to account
    *                                      for precision due to optimization
    *  @history 2003-10-16 Jeff Anderson - Added LoadEulerMounting and
@@ -76,7 +76,7 @@ namespace Isis {
    *                                      and the radius needed to be converted
    *                                      to km when read from the DEM file.
    *  @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
+   *                                      documentation
    *  @history 2005-02-24 Jeff Anderson - Added SlantDistance method and made
    *                                      the constructor ignore the
    *                                      ElevationModel keyword if it is null
@@ -88,7 +88,7 @@ namespace Isis {
    *  @history 2005-09-20 Jeff Anderson - Added tests for trying to intersect the
    *                                      sky
    *  @history 2006-03-31 Elizabeth Miller - Added SpacecraftAltitude &
-   *                                        SolarDistance methods
+   *                                      SolarDistance methods
    *  @history 2006-09-07 Debbie A. Cook - Changed back-of-planet test to use
    *                                      emission angle instead of length
    *                                      of vector to surface point
@@ -101,7 +101,7 @@ namespace Isis {
    *                                      available) when
    *                                      computing a ground point
    *  @history 2007-05-18 Jeff Anderson - Modify SpacecraftAltitude method
-   *          to use DEM
+   *                                      to use DEM
    *  @history 2007-06-11 Debbie A. Cook - Added alternative  method that includes radius
    *  @history 2007-08-24 Debbie A. Cook - Replaced references to p_sB since it was removed from Spice
    *  @history 2007-11-27 Debbie A. Cook - Added overloaded method SetUniversalGround(lat, lon, radius)
@@ -109,16 +109,17 @@ namespace Isis {
    *  @history 2008-06-18 Debbie A. Cook - Made DemRadius radius public instead of private and added
    *                                       method HasElevationModel
    *  @history 2008-08-06 Stuart Sides   - Modified SetLookDirection to better
-   *           handle oblique views. In the past it would oscillate and run out
-   *           out iterations.
+   *                                       handle oblique views. In the past it
+   *                                       would oscillate and run out of
+   *                                       iterations.
    *  @history 2009-02-06 Debbie A. Cook - Changed the tolerance from 1e-6 to 1e-12 for dist**2 (mm)
    *  @history 2009-02-06 Debbie A. Cook - Changed the tolerance back to 1e-6 (mm)
    *  @history 2009-02-15 Debbie A. Cook - Added virtual Resolution method
    *  @history 2009-06-30 Steven Lambright - Added IgnoreElevationModel and fixed
-   *           DemRadius
+   *                                       DemRadius
    *  @history 2009-07-09 Debbie A. Cook - Corrected documentation on Resolution method
    *  @history 2009-09-23  Tracie Sucharski - Convert negative longitudes
-   *                         returned by reclat in SetLookDirection.
+   *                                      returned by reclat in SetLookDirection.
    *  @history 2010-09-15 Janet Barrett - Modified the SetLookDirection method to use a new
    *                                      algorithm for finding the intersection of a ray with
    *                                      the DEM. This was required to take care of problems that
@@ -127,7 +128,9 @@ namespace Isis {
    *                                      between spacecraft viewing vectors and digital elevation
    *                                      models" by N.A. Teanby.
    *  @history 2010-11-09 Eric Hyer - moved some private members to protected
-   *               section for Camera
+   *                                      section for Camera
+   *  @history 2010-12-07 Steven Lambright - Added LocalRadius(lat,lon) and
+   *                                     removed a sqrt from SetLookDirection
    */
   class Sensor : public Isis::Spice {
     public:
@@ -158,14 +161,14 @@ namespace Isis {
       /**
        * Returns the planetocentric latitude.
        */
-      inline double UniversalLatitude() const {
+      double UniversalLatitude() const {
         return p_latitude;
       };
 
       /**
        * Returns a positive east, 0-360 domain longitude.
        */
-      inline double UniversalLongitude() const {
+      double UniversalLongitude() const {
         return p_longitude;
       };
 
@@ -174,9 +177,12 @@ namespace Isis {
        * radius on the ellipsoid, the radius from the surface model passed into
        * the constructor, or the radius set with SetUniversalGround.
        */
-      inline double LocalRadius() const {
+      double LocalRadius() const {
         return p_radius * 1000.0;
       };
+
+
+      double LocalRadius(double lat, double lon);
 
       double PhaseAngle() const;
       double EmissionAngle() const;
