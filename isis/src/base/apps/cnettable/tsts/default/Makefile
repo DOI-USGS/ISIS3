@@ -9,6 +9,7 @@ commands:
 	to=$(OUTPUT)/cnetstats.txt \
         > /dev/null;
 	rm -f $(OUTPUT)/cubeList.lst > /dev/null;
-	cat $(OUTPUT)/cnetstats.txt | sed s/,\[^,]\*\.cub,/,.cub,/ \
-	> $(OUTPUT)/output.txt
+	cat $(OUTPUT)/cnetstats.txt | sed s/,\[^,]\*\.cub,/,file.cub,/ \
+	  | sed 's/\([0-9][0-9]*\.[0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  > $(OUTPUT)/output.txt
 	rm -f $(OUTPUT)/cnetstats.txt > /dev/null;
