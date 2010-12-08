@@ -58,6 +58,9 @@
     <change name="Christopher Austin" date="2010-01-08">
       Fixed the reading of Pvl labels twice.
     </change>
+    <change name="Sharmila Prasad" date="2010-12-08">
+      Removed traling 'Z' for Start, Stop and Image Time Pds labels
+    </change>
   </history>
   <liens>
     <item> 

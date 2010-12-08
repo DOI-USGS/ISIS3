@@ -246,10 +246,19 @@ void FixDns(Buffer &buf) {
 }
 
 
-//This method uses the translation table to read labels and adds any
-// other needed keywords to Instrument, BandBin, and Kernels groups
-// Called in IsisMain()
-// modified by Jeannie Walldren 2008-08-21
+/**
+ * This method uses the translation table to read labels and adds any
+ * other needed keywords to Instrument, BandBin, and Kernels groups 
+ * Called in IsisMain()
+ * 
+ * @param labelFile 
+ * @param ocube 
+ *  
+ * @history 2008-08-21 Jeannie Walldren 
+ * @history 2010-12-08 Sharmila Prasad - Removed traling 'Z' for Start, 
+ *                                       Stop and Image Time labels
+ *  
+ */
 void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
   // Get the directory where the CISS translation tables are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
@@ -295,6 +304,20 @@ void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
   else {
     flightSoftware = fsw.ToDouble();
   }
+  
+  // Remove the trailing 'Z' in some pds labels
+  iString sUpdateTime = inst.FindKeyword("StartTime")[0];
+  sUpdateTime.Trim("Zz");
+  inst.FindKeyword("StartTime").SetValue(sUpdateTime);
+  
+  sUpdateTime = inst.FindKeyword("StopTime")[0];
+  sUpdateTime.Trim("Zz");
+  inst.FindKeyword("StopTime").SetValue(sUpdateTime);
+  
+  sUpdateTime = inst.FindKeyword("ImageTime")[0];
+  sUpdateTime.Trim("Zz");
+  inst.FindKeyword("ImageTime").SetValue(sUpdateTime);
+  
 
   // create BandBin group
   iString filter = inputLabel.FindKeyword("FilterName")[0] + "/" +
