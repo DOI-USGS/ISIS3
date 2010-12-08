@@ -241,16 +241,7 @@ namespace Isis {
         lon *= 180.0 / Isis::PI;
         if(lon < 0.0) lon += 360.0;
 
-        if(it == 1) {
-          p_radius = DemRadius(lat, lon);
-        }
-        else {
-          double demRadius = DemRadius(lat, lon);
-
-          if(!Isis::IsSpecial(demRadius)) {
-            p_radius = (p_radius + demRadius) / 2.0;
-          }
-        }
+        p_radius = DemRadius(lat, lon);
 
         if(Isis::IsSpecial(p_radius)) {
           p_hasIntersection = false;

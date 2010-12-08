@@ -283,7 +283,7 @@ Line = 575
 SetImage (sample, line): 1
 Normal = -0.6648, 0.264, -0.6988
 Phase = 57.32
-Emission = 76.83
+Emission = 76.84
 Incidence = 44.07
 
 45 Degree DEM Surface Facing Bottom...

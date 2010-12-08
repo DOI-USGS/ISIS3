@@ -1,11 +1,11 @@
 #include "ImagePolygon.h"
 #include "PolygonTools.h"
 #include "Preference.h"
+#include "ProgramLauncher.h"
 #include "geos/geom/MultiPolygon.h"
 
 using namespace std;
 using namespace Isis;
-
 
 int main() {
   Isis::Preference::Preferences(true);
@@ -44,7 +44,10 @@ int main() {
 
 
   //  write poly as WKT
-  std::cout << poly.Polys()->toString() << std::endl;
+  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString() 
+    + "\" | sed "
+      "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
+    );
 
   //  Test sub-poly option
   try {
@@ -54,8 +57,12 @@ int main() {
     std::string msg = "Cannot create sub-polygon for [" + cube.Filename() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
+
   //  write poly as WKT
-  std::cout << poly.Polys()->toString() << std::endl;
+  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString() 
+    + "\" | sed "
+      "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
+    );
 
 
   //  Test lower quality option
@@ -63,13 +70,15 @@ int main() {
     poly.Create(cube, 10, 12, 1, 384, 640, 385);
   }
   catch(iException &e) {
-    std::string msg = "Cannot create lower quality polygon for [" + cube.Filename() + "]";
+    std::string msg = "Cannot create lower quality polygon for [" +
+        cube.Filename() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
   //  write poly as WKT
-  std::cout << poly.Polys()->toString() << std::endl;
-
-
+  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString() 
+    + "\" | sed "
+      "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
+    );
 
   cube.Close();
 }
