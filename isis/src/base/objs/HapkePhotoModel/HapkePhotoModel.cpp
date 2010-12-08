@@ -14,6 +14,12 @@ namespace Isis {
 
     PvlGroup &algorithm = pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse);
 
+    if(algorithm.HasKeyword("0B0Standard")) {
+      SetPhoto0B0Standard((string)algorithm["0B0Standard"]);
+    } else {
+      p_photo0B0Standard = "TRUE";
+    }
+
     if(algorithm.HasKeyword("Wh")) {
       SetPhotoWh(algorithm["Wh"]);
     }
@@ -86,6 +92,27 @@ namespace Isis {
 
 
   /**
+    * Determine if the Hapke opposition surge component is initialized
+    * to zero during the SetStandardContions phase. 
+    * This parameter is limited to values that are true or false.
+    *
+    * @param b0standard  Hapke opposition surge initialization, default is true
+    */
+  void HapkePhotoModel::SetPhoto0B0Standard(const string &b0standard) {
+    iString temp(b0standard);
+    temp = temp.UpCase();
+
+    if(temp != "NO" && temp != "YES" && temp != "FALSE" && temp != "TRUE") {
+      string msg = "Invalid value of Hapke b0standard [" +
+                   temp + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    if (temp == "NO" || temp == "FALSE") p_photo0B0Standard = "FALSE";
+    if (temp == "YES" || temp == "TRUE") p_photo0B0Standard = "TRUE";
+  }
+
+
+  /**
     * Set the Hapke macroscopic roughness component. This parameter
     * is limited to values that are >=0 and <=90.
     *
@@ -106,7 +133,7 @@ namespace Isis {
 
     if(standard) {
       p_photoB0save = p_photoB0;
-      p_photoB0 = 0.0;
+      if (p_photo0B0Standard == "TRUE") p_photoB0 = 0.0;
     }
     else {
       p_photoB0 = p_photoB0save;
