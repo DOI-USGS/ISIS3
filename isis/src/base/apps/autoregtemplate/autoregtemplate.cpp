@@ -28,10 +28,10 @@ void IsisMain() {
       if(i != 0 &&
          algos.Group(i).Name() == algos.Group(0).Name()) break;
 
+      if(i != 0) msg += ", ";
       msg += algos.Group(i).Name();
-      if(i < algos.Groups() - 1) msg += ", ";
-      else msg += "]";
     }
+    msg += "]";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
