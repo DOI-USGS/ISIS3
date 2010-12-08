@@ -23,10 +23,14 @@ void IsisMain() {
     // Give the user a list of possible algorithms
     string msg = "Invalid value for [ALGORITHM] entered [" + algoName + "].  " 
       + "Must be one of [";
+
     for(int i = 0; i < algos.Groups(); i++) {
+      if(i != 0 &&
+         algos.Group(i).Name() == algos.Group(0).Name()) break;
+
       msg += algos.Group(i).Name();
       if(i < algos.Groups() - 1) msg += ", ";
-      else msg += "].";
+      else msg += "]";
     }
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
