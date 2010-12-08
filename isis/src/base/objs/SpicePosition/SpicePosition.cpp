@@ -30,7 +30,19 @@ namespace Isis {
     p_et = -DBL_MAX;
     p_noOverride = true;
     p_hasVelocity = false;
+    p_xhermite = NULL;
+    p_yhermite = NULL;
+    p_zhermite = NULL;
   }
+
+
+  /**
+   * Free the memory allocated by this SpicePosition instance
+   */
+  SpicePosition::~SpicePosition() {
+    ClearCache();
+  }
+
 
   /** Apply a time bias when invoking SetEphemerisTime method.
    *
@@ -46,6 +58,7 @@ namespace Isis {
   void SpicePosition::SetTimeBias(double timeBias) {
     p_timeBias = timeBias;
   }
+
 
   /** Set the aberration correction (light time).
    * See NAIF required reading for more information on this correction at
@@ -65,6 +78,7 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
   }
+
 
   /** Return J2000 coordinate at given time.
    *
@@ -102,6 +116,7 @@ namespace Isis {
     return p_coordinate;
     NaifStatus::CheckErrors();
   }
+
 
   /** Cache J2000 position over a time range.
    *
@@ -149,6 +164,7 @@ namespace Isis {
     p_source = Memcache;
   }
 
+
   /** Cache J2000 position for a time.
    *
    * This method will load an internal cache with coordinates for a single
@@ -165,6 +181,7 @@ namespace Isis {
   void SpicePosition::LoadCache(double time) {
     LoadCache(time, time, 1);
   }
+
 
   /** Cache J2000 positions using a table file.
    *
@@ -243,6 +260,7 @@ namespace Isis {
       p_cacheTime.push_back((double)rec[inext]);
     }
   }
+
 
   /** Return a table with J2000 positions.
    *
@@ -346,10 +364,13 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
 
-    // Clear existing coordinates from cache
-    p_cache.clear();
-    p_cacheVelocity.clear();
+    // find the first and last time values
+    double firstTime = p_cacheTime[0];
+    double lastTime = p_cacheTime[p_cacheTime.size()-1];
+    int cacheTimeSize = p_cacheTime.size();
 
+    // Clear existing coordinates from cache
+    ClearCache();
 
     // Set velocity vector to true since it is calculated
     p_hasVelocity = true;
@@ -366,11 +387,8 @@ namespace Isis {
 //      std::cout << p_coordinate[i] << std::endl;
 //    }
 
-    // find the first and last time values
-    double firstTime = p_cacheTime[0];
-    double lastTime = p_cacheTime[p_cacheTime.size()-1];
 
-    if(p_cacheTime.size() != 1) {
+    if(cacheTimeSize != 1) {
 
       // find time for the extremum of each polynomial
       // since this is only a 2nd degree polynomial,
@@ -446,6 +464,9 @@ namespace Isis {
       }
     }
     else {
+      // Restore the framing camera time
+      p_cacheTime.push_back(firstTime);
+
       std::vector <double> time;
       time.push_back(p_cacheTime[0] - p_baseTime);
       p_coordinate[0] = function1.Evaluate(time);
@@ -756,8 +777,6 @@ namespace Isis {
     double derivative = 1.;
     double time = p_et - p_baseTime;
 
-//    std::cout << "coeff index = " << coeffIndex << std::endl;
-
     switch(coeffIndex) {
       case C:
         derivative = time;
@@ -866,39 +885,72 @@ namespace Isis {
 
     // what if framing camera???
 
-    ComputeBaseTime();
+    // On the first SetEphemerisTime, create our splines. Later calls should
+    // reuse these splines.
+    if(p_xhermite == NULL) {
+      ComputeBaseTime();
 
-    NumericalApproximation xhermite(NumericalApproximation::CubicHermite);
-    NumericalApproximation yhermite(NumericalApproximation::CubicHermite);
-    NumericalApproximation zhermite(NumericalApproximation::CubicHermite);
+      p_xhermite = new NumericalApproximation(
+          NumericalApproximation::CubicHermite);
+      p_yhermite = new NumericalApproximation(
+          NumericalApproximation::CubicHermite);
+      p_zhermite = new NumericalApproximation(
+          NumericalApproximation::CubicHermite);
 
-    for(unsigned int i = 0; i < p_cache.size(); i++) {
-      xhermite.AddData(p_cacheTime[i] - p_baseTime, p_cache[i][0]);  // add time, x-position to x spline
-      yhermite.AddData(p_cacheTime[i] - p_baseTime, p_cache[i][1]);  // add time, y-position to y spline
-      zhermite.AddData(p_cacheTime[i] - p_baseTime, p_cache[i][2]);  // add time, z-position to z spline
-
-      if(p_hasVelocity) {  // Line scan camera
-        xhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][0]); // add x-velocity to x spline
-        yhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][1]); // add y-velocity to y spline
-        zhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][2]); // add z-velocity to z spline
+      vector<double> xvalues(p_cache.size());
+      vector<double> xhermiteYValues(p_cache.size());
+      vector<double> yhermiteYValues(p_cache.size());
+      vector<double> zhermiteYValues(p_cache.size());
+  
+      vector<double> xhermiteVelocities(p_cache.size());
+      vector<double> yhermiteVelocities(p_cache.size());
+      vector<double> zhermiteVelocities(p_cache.size());
+  
+      for(unsigned int i = 0; i < p_cache.size(); i++) {
+        vector<double> &cache = p_cache[i];
+        double &cacheTime = p_cacheTime[i];
+        xvalues[i] = cacheTime - p_baseTime;
+  
+        xhermiteYValues[i] = cache[0];
+        yhermiteYValues[i] = cache[1];
+        zhermiteYValues[i] = cache[2];
+  
+        if(p_hasVelocity) {  // Line scan camera
+          vector<double> &cacheVelocity = p_cacheVelocity[i];
+          xhermiteVelocities[i] = cacheVelocity[0];
+          yhermiteVelocities[i] = cacheVelocity[1];
+          zhermiteVelocities[i] = cacheVelocity[2];
+        }
+        else { // Not line scan camera
+          throw iException::Message(iException::Io, "No velcities available.",
+          _FILEINFO_);
+        }
       }
-      else { // Not line scan camera
-        throw iException::Message(iException::Io, "No velcities available.", _FILEINFO_);
-        // xhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
-        // yhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
-        // zhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
-      }
+
+      p_xhermite->AddData(xvalues, xhermiteYValues);
+      p_xhermite->AddCubicHermiteDeriv(xhermiteVelocities);
+
+      p_yhermite->AddData(xvalues, yhermiteYValues);
+      p_yhermite->AddCubicHermiteDeriv(yhermiteVelocities);
+
+      p_zhermite->AddData(xvalues, zhermiteYValues);
+      p_zhermite->AddCubicHermiteDeriv(zhermiteVelocities);
     }
-    // Next line added 07/13/2009 to prevent Camera unit test from bombing because time is outside domain. DAC
-    // Also added etype to Evaluate calls
-    NumericalApproximation::ExtrapType etype = NumericalApproximation::Extrapolate;
-    p_coordinate[0] = xhermite.Evaluate(p_et - p_baseTime, etype);
-    p_coordinate[1] = yhermite.Evaluate(p_et - p_baseTime, etype);
-    p_coordinate[2] = zhermite.Evaluate(p_et - p_baseTime, etype);
 
-    p_velocity[0] = xhermite.EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
-    p_velocity[1] = yhermite.EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
-    p_velocity[2] = zhermite.EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
+    // Next line added 07/13/2009 to prevent Camera unit test from bombing
+    // because time is outside domain. DAC Also added etype to Evaluate calls
+    NumericalApproximation::ExtrapType etype =
+        NumericalApproximation::Extrapolate;
+
+    vector<double> &coordinate = p_coordinate;
+    coordinate[0] = p_xhermite->Evaluate(p_et - p_baseTime, etype);
+    coordinate[1] = p_yhermite->Evaluate(p_et - p_baseTime, etype);
+    coordinate[2] = p_zhermite->Evaluate(p_et - p_baseTime, etype);
+
+    vector<double> &velocity = p_velocity;
+    velocity[0] = p_xhermite->EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
+    velocity[1] = p_yhermite->EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
+    velocity[2] = p_zhermite->EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
   }
 
   /**
@@ -1086,6 +1138,31 @@ namespace Isis {
   }
 
 
+  /**
+   * Removes the entire cache from memory.
+   */
+  void SpicePosition::ClearCache() {
+    p_cache.clear();
+    p_cacheVelocity.clear();
+    p_cacheTime.clear();
+
+    if(p_xhermite) {
+      delete p_xhermite;
+      p_xhermite = NULL;
+    }
+
+    if(p_yhermite) {
+      delete p_xhermite;
+      p_xhermite = NULL;
+    }
+
+    if(p_zhermite) {
+      delete p_xhermite;
+      p_xhermite = NULL;
+    }
+  }
+
+
   /** Cache J2000 position over existing cached time range using
    *  table
    *
@@ -1099,9 +1176,7 @@ namespace Isis {
    */
   void SpicePosition::ReloadCache(Table &table) {
     p_source = Spice;
-    p_cacheTime.clear();
-    p_cache.clear();
-    p_cacheVelocity.clear();
+    ClearCache();
     LoadCache(table);
   }
 }

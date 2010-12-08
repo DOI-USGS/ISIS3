@@ -31,6 +31,8 @@
 #include "naif/SpiceZmc.h"
 
 namespace Isis {
+  class NumericalApproximation;
+
   /**
    * @brief Obtain SPICE position information for a body
    *
@@ -61,7 +63,7 @@ namespace Isis {
    *  class
    *  @history 2006-03-23 Jeff Anderson Added check to SetEphemeris to return
    *                      if the time did not change.  Should speed up line
-   *			  scan cameras
+   *                      scan cameras
    *  @history 2007-07-10 Debbie A. Cook Added else to method SetAberrationCorrection
    *                      to separate error section from the rest of the code
    *  @history 2007-08-24 Debbie A. Cook Added members p_coefficients, enums PartialType and Coefficient,
@@ -95,14 +97,18 @@ namespace Isis {
    *  @history 2009-11-06 Debbie A. Cook - Added velocity partial derivative method
    *  @history 2009-12-15 Debbie A. Cook - Changed enumerated partial types and argument list for
    *                       CoordinatePartial and VelocityPartial
-  *  @history 2010-03-19 Debbie A. Cook - Added argument coeffIndex to method Velocity Partial
-  */
+   *  @history 2010-03-19 Debbie A. Cook - Added argument coeffIndex to method Velocity Partial
+   *  @history 2010-12-07 Steven Lambright - Moved the cubic hermite splines to
+   *                      member scope for efficiency. It was a significant
+   *                      overhead to keep reconstructing these. Created
+   *                      ClearCache() to help increase code reusability.
+   */
   class SpicePosition {
     public:
       SpicePosition(int targetCode, int observerCode);
 
       //! Destructor
-      virtual ~SpicePosition() {}
+      virtual ~SpicePosition();
 
       void SetTimeBias(double timeBias);
       void SetAberrationCorrection(const std::string &correction);
@@ -191,6 +197,7 @@ namespace Isis {
       std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
 
     private:
+      void ClearCache();
       int p_targetCode;                   //!< target body code
       int p_observerCode;                 //!< observer body code
 
@@ -200,6 +207,13 @@ namespace Isis {
       double p_et;                        //!< Current ephemeris time
       std::vector<double> p_coordinate;   //!< J2000 position at time et
       std::vector<double> p_velocity;     //!< J2000 velocity at time et
+
+      //! Hermite spline for x coordinate if Source == HermiteCache
+      NumericalApproximation *p_xhermite;
+      //! Hermite spline for y coordinate if Source == HermiteCache
+      NumericalApproximation *p_yhermite;
+      //! Hermite spline for z coordinate if Source == HermiteCache
+      NumericalApproximation *p_zhermite;
 
       Source p_source;                    //!< Enumerated value for the location of the SPK information used
       std::vector<double> p_cacheTime;    //!< iTime for corresponding position
