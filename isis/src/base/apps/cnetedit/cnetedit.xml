@@ -60,6 +60,11 @@
       Added progress bar for validity checking and automatic logging of the
       DEFFILE to the print file when entered. 
     </change>
+    <change name="Travis Addair" date="2010-12-08">
+      Added check to ensure that ignored reference measures are not deleted,
+      but that the entire point is deleted instead, by setting the containing
+      point to ignored whenever the reference is.
+    </change>
   </history> 
   
   <category>
