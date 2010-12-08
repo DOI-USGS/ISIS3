@@ -26,6 +26,7 @@
 #include <string>
 #include "PhotoModel.h"
 
+using namespace std;
 namespace Isis {
   class Pvl;
 
@@ -44,6 +45,11 @@ namespace Isis {
    *   Theta
    *
    * @author 2008-10-17 Steven Lambright
+   *
+   *  @history 2010-12-7 Janet Barrett - Added capability to turn off the setting of
+   *                     B0 to 0 when setting standard conditions. The new 0B0Standard
+   *                     parameter was added so it can be specified as true or false in
+   *                     the PVL.
    *
    */
   class HapkePhotoModel : public PhotoModel {
@@ -79,6 +85,12 @@ namespace Isis {
         p_photoThetaold = theta;
       }
 
+      void SetPhoto0B0Standard(const string &b0standard);
+      //! Return photometric B0 standardization value
+      inline string Photo0B0Standard() const {
+        return p_photo0B0Standard;
+      }
+
       //! Hapke's approximation to Chandra's H function
       inline double Hfunc(double u, double gamma) {
         return (1.0 + 2.0 * u) / (1.0 + 2.0 * u * gamma);
@@ -87,6 +99,7 @@ namespace Isis {
       void SetStandardConditions(bool standard);
 
     protected:
+      string p_photo0B0Standard;
       double p_photoWh;
       double p_photoHh;
       double p_photoB0;
