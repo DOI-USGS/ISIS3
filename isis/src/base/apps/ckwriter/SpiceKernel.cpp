@@ -70,6 +70,25 @@ bool CheckSegment(const SpiceSegment *s1, const SpiceSegment *s2) {
   return (s1->startTime() < s2->startTime());
 }
 
+std::string SpiceKernel::getSummary(const std::string &commfile) const {
+  vector<const SpiceSegment *> seglist;
+  int comChars(0);
+  for ( int i = 0 ; i < size() ; i++) {
+    seglist.push_back(&_segments[i]);
+  }
+  
+  // Sorts the Segment pointers
+  stable_sort(seglist.begin(), seglist.end(), CheckSegment);
+
+  string comment = getCkComment(commfile);
+
+  // Collect comments from each segment
+  for ( unsigned int i = 0 ; i < seglist.size() ; i++ ) {
+    comment += seglist[i]->getComment();
+  }
+  return (comment);
+}
+
  void SpiceKernel::write(const std::string &kname, const std::string &comfile,
                          const int cktype) const {
    vector<const SpiceSegment *> seglist;

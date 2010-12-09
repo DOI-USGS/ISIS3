@@ -49,6 +49,8 @@ class SpiceKernel {
     void add(const std::string &fname);
     void add(Cube &cube);
 
+    std::string getSummary(const std::string &commfile = "") const;
+
     void write(const std::string &kname, const std::string &commfile = "",
                const int ckType = 3) const;
 

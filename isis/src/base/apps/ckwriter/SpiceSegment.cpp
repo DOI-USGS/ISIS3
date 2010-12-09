@@ -299,7 +299,7 @@ SpiceSegment::SMatrix SpiceSegment::getIdentityRotation(const int &nelements) co
  *  
  * This method is invoked when a dynamic frame is encountered.  This condition 
  * requires the reloading of kernels to resolve time dependent rotations 
- * MESSENGER is one such instrument). 
+ * (MESSENGER is one such instrument). 
  *  
  * There are two ways the state rotation matrix can be determined.  One is with 
  * the sxform_c NAIF routine that returns a 6x6 state matrix sufficient to 

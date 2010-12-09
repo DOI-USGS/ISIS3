@@ -30,21 +30,28 @@ void IsisMain() {
   prog.CheckStatus();
 
   for (unsigned int i = 0 ; i < flist.size() ; i++) {
-    // Set the input image, get the camera model, and a basic mapping
-    // group
+    // Add and process each image
     kernel.add(flist[i]);
-
-  //  p.ClearInputCubes();
     prog.CheckStatus();
   }
 
+  //  Get comment file
+  string comfile("");
+  if (ui.WasEntered("COMFILE")) comfile = ui.GetFilename("COMFILE");
+
   // Write the output file if requested
   if (ui.WasEntered("TO")) {
-    string comfile("");
-    if (ui.WasEntered("COMFILE")) comfile = ui.GetFilename("COMFILE");
     int cktype = ui.GetInteger("CKTYPE");
-
     kernel.write(ui.GetFilename("TO"), comfile, cktype);
+  }
+
+  // Write a summary of the documentation
+  if (ui.WasEntered("SUMMARY")) {
+    string fFile = Filename(ui.GetFilename("SUMMARY")).Expanded();
+    ofstream os;
+    os.open(fFile.c_str(),ios::out);
+    os << kernel.getSummary(comfile);
+    os.close();
   }
 
   p.EndProcess();
