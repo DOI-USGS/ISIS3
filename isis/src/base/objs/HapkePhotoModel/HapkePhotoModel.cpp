@@ -14,8 +14,8 @@ namespace Isis {
 
     PvlGroup &algorithm = pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse);
 
-    if(algorithm.HasKeyword("0B0Standard")) {
-      SetPhoto0B0Standard((string)algorithm["0B0Standard"]);
+    if(algorithm.HasKeyword("ZeroB0Standard")) {
+      SetPhoto0B0Standard((string)algorithm["ZeroB0Standard"]);
     } else {
       p_photo0B0Standard = "TRUE";
     }
