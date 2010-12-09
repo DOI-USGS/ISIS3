@@ -1,6 +1,5 @@
 <RCC>
   <qresource>
-    <file alias="save">icons/save.png</file>
     <file alias="saveAs">icons/saveAs.png</file>
     <file alias="close">icons/close.png</file>
     <file alias="view_edit">icons/view_edit.png</file>
