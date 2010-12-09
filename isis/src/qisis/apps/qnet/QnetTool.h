@@ -9,6 +9,7 @@
 
 // forward declarations
 class QAction;
+class QBoxLayout;
 class QCheckBox;
 class QComboBox;
 class QLabel;
@@ -124,7 +125,11 @@ namespace Qisis {
    *                          reject() command.  Updated documentation.
    *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for
    *                forwarding of SIGNAL from StretchTool to ChipViewport
-   *
+   *   @history 2010-12-08 Eric Hyer - Template filename now shown.  Widgets
+   *                in main window now organized into groupBoxes.  Removed
+   *                Options menu and moved registration menu to main menu bar.
+   *                Added toolbar for actions also in menu.  All actions now
+   *                have icons.
    */
   class QnetTool : public Tool {
       Q_OBJECT
@@ -188,10 +193,18 @@ namespace Qisis {
       void saveChips();
       //void setInterestOp();
 
+
     private:
       void createQnetTool(QWidget *parent);
+      QBoxLayout * createTopLayout();
+      QBoxLayout * createCenterLayout();
+      
+      
+    private:
       QMainWindow *p_qnetTool;
+      void createActions();
       void createMenus();
+      void createToolBars();
 
       void loadPoint();
       void drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter);
@@ -202,12 +215,19 @@ namespace Qisis {
       QAction *p_createPoint;
       QAction *p_modifyPoint;
       QAction *p_deletePoint;
-
+      QAction *p_saveNet;
+      QAction *p_closeQnetTool;
+      QAction *p_viewTemplate;
+      QAction *p_saveChips;
+      QAction *p_templateFile;
+      
       QMainWindow *p_mw;
       ControlPointEdit *p_pointEditor;
 
+      QLabel *p_templateFilenameLabel;
       QLabel *p_ptIdValue;
       QLabel *p_numMeasures;
+      
       QCheckBox *p_ignorePoint;
       QCheckBox *p_holdPoint;
       QCheckBox *p_groundPoint;

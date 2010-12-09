@@ -1,8 +1,13 @@
+#include "QnetTool.h"
+
+#include <vector>
+
 #include <QAction>
 #include <QBrush>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QLabel>
 #include <QMainWindow>
 #include <QMenu>
@@ -14,7 +19,6 @@
 #include <QStackedWidget>
 #include <QString>
 #include <QWidget>
-#include <vector>
 
 //#include "AutoReg.h"
 //#include "AutoRegFactory.h"
@@ -23,6 +27,7 @@
 #include "ControlPointEdit.h"
 #include "Filename.h"
 #include "iString.h"
+#include "iException.h"
 #include "MdiCubeViewport.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
@@ -30,9 +35,7 @@
 #include "QnetHoldPointDialog.h"
 #include "QnetNewMeasureDialog.h"
 #include "QnetNewPointDialog.h"
-#include "QnetTool.h"
 #include "SerialNumber.h"
-#include "iException.h"
 #include "ToolPad.h"
 
 #include "qnet.h"
@@ -41,8 +44,9 @@ using namespace Isis;
 
 
 namespace Qisis {
+  
+  const int CHIPVIEWPORT_WIDTH = 310;
 
-  const int VIEWSIZE = 301;
 
   /**
    * Consructs the Qnet Tool window
@@ -123,102 +127,23 @@ namespace Qisis {
    */
   void QnetTool::createQnetTool(QWidget *parent) {
 
-    // Create dialog with a main window
     p_qnetTool = new QMainWindow(parent);
-    p_qnetTool->layout()->setSizeConstraint(QLayout::SetFixedSize);
+//    Qt::WindowFlags flags = p_qnetTool->windowFlags();
+//    p_qnetTool->setWindowFlags(flags | Qt::CustomizeWindowHint |
+//        Qt::WindowStaysOnTopHint);
 
+    createActions();
     createMenus();
-
-    // Place everything in a grid
-    QGridLayout *gridLayout = new QGridLayout();
-    //gridLayout->setSizeConstraint(QLayout::SetFixedSize);
-    //  ???  Very tacky-hardcoded to ChipViewport size of ControlPointEdit + xtra.
-    //       Is there a better way to do this?
-    gridLayout->setColumnMinimumWidth(0, 310);
-    gridLayout->setColumnMinimumWidth(1, 310);
-    //  grid row
-    int row = 0;
-
-    //  Point Id, Number of Measures
-    p_ptIdValue = new QLabel();
-    p_numMeasures = new QLabel();
-    gridLayout->addWidget(p_ptIdValue, row++, 0);
-    gridLayout->addWidget(p_numMeasures, row++, 0);
-
-    // Hold / Ignore / Ground flags
-    p_ignorePoint = new QCheckBox("Ignore Point");
-    gridLayout->addWidget(p_ignorePoint, row++, 0);
-    connect(p_ignorePoint, SIGNAL(toggled(bool)), this, SLOT(setIgnorePoint(bool)));
-    // this will toggle the point's ignore box if ignorePointChanged() is emitted
-    connect(this, SIGNAL(ignorePointChanged()), p_ignorePoint, SLOT(toggle()));
-    p_holdPoint = new QCheckBox("Hold Point");
-    gridLayout->addWidget(p_holdPoint, row++, 0);
-    connect(p_holdPoint, SIGNAL(toggled(bool)), this, SLOT(setHoldPoint(bool)));
-    p_groundPoint = new QCheckBox("Ground Point");
-    // disable user's ability to set ground points
-    p_groundPoint->setEnabled(false);
-    gridLayout->addWidget(p_groundPoint, row++, 0);
-    // the following connection is commented out since we are currently
-    // not allowing the user to set ground points
-    //????  connect(p_groundPoint,SIGNAL(toggled(bool)),this,SLOT(setGroundPoint(bool)));
-
-    // Measure type
-    p_leftMeasureType = new QLabel();
-    gridLayout->addWidget(p_leftMeasureType, row, 0);
-    p_rightMeasureType = new QLabel();
-    gridLayout->addWidget(p_rightMeasureType, row++, 1);
-
-    //  Show if measure ignore flag is set
-    p_ignoreLeftMeasure = new QCheckBox("Ignore Measure");
-    gridLayout->addWidget(p_ignoreLeftMeasure, row, 0);
-    connect(p_ignoreLeftMeasure, SIGNAL(toggled(bool)),
-            this, SLOT(setIgnoreLeftMeasure(bool)));
-    connect(this, SIGNAL(ignoreLeftChanged()),
-            p_ignoreLeftMeasure, SLOT(toggle()));
-
-    p_ignoreRightMeasure = new QCheckBox("Ignore Measure");
-    gridLayout->addWidget(p_ignoreRightMeasure, row++, 1);
-    connect(p_ignoreRightMeasure, SIGNAL(toggled(bool)),
-            this, SLOT(setIgnoreRightMeasure(bool)));
-    connect(this, SIGNAL(ignoreRightChanged()),
-            p_ignoreRightMeasure, SLOT(toggle()));
-
-    p_leftSampError = new QLabel();
-    gridLayout->addWidget(p_leftSampError, row, 0);
-    p_rightSampError = new QLabel();
-    gridLayout->addWidget(p_rightSampError, row++, 1);
-
-    p_leftLineError = new QLabel();
-    gridLayout->addWidget(p_leftLineError, row, 0);
-    p_rightLineError = new QLabel();
-    gridLayout->addWidget(p_rightLineError, row++, 1);
-
-    p_leftGoodness = new QLabel();
-    gridLayout->addWidget(p_leftGoodness, row, 0);
-    p_rightGoodness = new QLabel();
-    gridLayout->addWidget(p_rightGoodness, row++, 1);
-
-    // Set up chipViewport and comboBox to select chips
-    p_leftCombo = new QComboBox();
-    p_leftCombo->setFixedWidth(256);
-    gridLayout->addWidget(p_leftCombo, row, 0);
-
-    //  Install event filter so that when user moves away
-    //  from combo box the correct measurement info is written back
-    //  out.
-    p_leftCombo->view()->installEventFilter(this);
-    connect(p_leftCombo, SIGNAL(activated(int)),
-            this, SLOT(selectLeftMeasure(int)));
-
-    p_rightCombo = new QComboBox();
-    p_rightCombo->setFixedWidth(256);
-    gridLayout->addWidget(p_rightCombo, row++, 1);
-    p_rightCombo->view()->installEventFilter(this);
-    connect(p_rightCombo, SIGNAL(activated(int)),
-            this, SLOT(selectRightMeasure(int)));
-
+    createToolBars();
+    
+    // The main window's central widget's layout will be vertical and consist
+    // of a "topLayou", a "centerLayout", the p_pointEditor and the addMeasure
+    // button.  The first step in building our window is then to build these
+    // four components.
+    
+    // create p_pointEditor first since we need to get its templateFilename
+    // later when we create the topLayout
     p_pointEditor = new Qisis::ControlPointEdit(g_controlNetwork, parent);
-    gridLayout->addWidget(p_pointEditor, row++, 0, 1, 3);
     connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
         p_pointEditor, SIGNAL(newControlNetwork(Isis::ControlNet *)));
     connect(this,
@@ -226,26 +151,153 @@ namespace Qisis {
         p_pointEditor,
         SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
     connect(p_pointEditor, SIGNAL(pointSaved()), this, SLOT(pointSaved()));
-    p_pointEditor->show();
-//    connect(this,SIGNAL(modifyPoint(Isis::ControlPoint *)),
-//            p_pointEditor,SLOT(modifyPoint(Isis::ControlPoint *)));
+    
+    QBoxLayout * topLayout = createTopLayout();
+    QBoxLayout * centerLayout = createCenterLayout();
 
-
-    QPushButton *addMeasure = new QPushButton("Add Measure(s) to Point");
+    QPushButton * addMeasure = new QPushButton("Add Measure(s) to Point");
     connect(addMeasure, SIGNAL(clicked()), this, SLOT(addMeasure()));
-
-    QHBoxLayout *hlayout = new QHBoxLayout();
-    hlayout->addWidget(addMeasure);
-    hlayout->addStretch();
-    gridLayout->addLayout(hlayout, row++, 0);
-
-    QWidget *cw = new QWidget();
-    cw->setLayout(gridLayout);
-    p_qnetTool->setCentralWidget(cw);
-
+    QHBoxLayout * addMeasureLayout = new QHBoxLayout;
+    addMeasureLayout->addWidget(addMeasure);
+    addMeasureLayout->addStretch();
+    
+    // We now have all four components needed for the central layout, so build
+    // the layout, a central widget to contain it, and then finally do
+    // setCentralWidget for our main window
+    QVBoxLayout * centralLayout = new QVBoxLayout;
+    centralLayout->addLayout(topLayout);
+    centralLayout->addStretch();
+    centralLayout->addLayout(centerLayout);
+    centralLayout->addStretch();
+    centralLayout->addWidget(p_pointEditor);
+    centralLayout->addLayout(addMeasureLayout);
+    
+    QWidget * centralWidget = new QWidget;
+    centralWidget->setLayout(centralLayout);
+    p_qnetTool->setCentralWidget(centralWidget);
+    
+        
     connect(this, SIGNAL(editPointChanged(string)),
             this, SLOT(paintAllViewports(string)));
+  }
+  
+  
+  QBoxLayout * QnetTool::createTopLayout() {
+    
+    // The top layout is horizontal and consists of a groupbox and a stretch.
+    // The groupbox's layout is horizontal and has two vertical layouts which
+    // contain the widgets
+    
+    // create widgets for the left layout
+    p_templateFilenameLabel = new QLabel(QString::fromStdString(
+        p_pointEditor->templateFilename()));
+    p_ptIdValue = new QLabel;
+    p_numMeasures = new QLabel;
+    
+    // create the left layout
+    QVBoxLayout * leftLayout = new QVBoxLayout;
+    leftLayout->addWidget(p_templateFilenameLabel);
+    leftLayout->addWidget(p_ptIdValue);
+    leftLayout->addWidget(p_numMeasures);
+    
+    // create widgets for the right layout
+    p_ignorePoint = new QCheckBox("Ignore Point");
+    connect(p_ignorePoint, SIGNAL(toggled(bool)),
+            this, SLOT(setIgnorePoint(bool)));
+    connect(this, SIGNAL(ignorePointChanged()),
+            p_ignorePoint, SLOT(toggle()));
+    p_holdPoint = new QCheckBox("Hold Point");
+    connect(p_holdPoint, SIGNAL(toggled(bool)), this, SLOT(setHoldPoint(bool)));
+    p_groundPoint = new QCheckBox("Ground Point");
+    p_groundPoint->setEnabled(false);
+    //????  connect(p_groundPoint,SIGNAL(toggled(bool)),this,SLOT(setGroundPoint(bool)));
 
+    // create the right layout
+    QVBoxLayout * rightLayout = new QVBoxLayout;
+    rightLayout->addWidget(p_ignorePoint);
+    rightLayout->addWidget(p_holdPoint);
+    rightLayout->addWidget(p_groundPoint);
+    
+    // create the groupbox
+    QHBoxLayout * groupBoxLayout = new QHBoxLayout;
+    groupBoxLayout->addLayout(leftLayout);
+    groupBoxLayout->addLayout(rightLayout);
+    QGroupBox * groupBox = new QGroupBox("Control Point");
+    groupBox->setMinimumWidth(CHIPVIEWPORT_WIDTH * 2 + 6);
+    groupBox->setLayout(groupBoxLayout);
+    
+    QHBoxLayout * topLayout = new QHBoxLayout;
+    topLayout->addWidget(groupBox);
+    topLayout->addStretch();
+    
+    return topLayout;
+  }
+  
+  
+  QBoxLayout * QnetTool::createCenterLayout() {
+  
+    // the center layout is horizontal and consists of two groupboxes
+  
+    // create widgets for the left groupbox
+    p_leftCombo = new QComboBox;
+    p_leftCombo->view()->installEventFilter(this);
+    connect(p_leftCombo, SIGNAL(activated(int)),
+            this, SLOT(selectLeftMeasure(int)));
+    p_ignoreLeftMeasure = new QCheckBox("Ignore Measure");
+    connect(p_ignoreLeftMeasure, SIGNAL(toggled(bool)),
+            this, SLOT(setIgnoreLeftMeasure(bool)));
+    connect(this, SIGNAL(ignoreLeftChanged()),
+            p_ignoreLeftMeasure, SLOT(toggle()));
+    p_leftMeasureType = new QLabel;
+    p_leftSampError = new QLabel();
+    p_leftLineError = new QLabel();
+    p_leftGoodness = new QLabel();
+    
+    // create left groupbox
+    QVBoxLayout * leftLayout = new QVBoxLayout;
+    leftLayout->addWidget(p_leftCombo);
+    leftLayout->addWidget(p_ignoreLeftMeasure);
+    leftLayout->addWidget(p_leftMeasureType);
+    leftLayout->addWidget(p_leftSampError);
+    leftLayout->addWidget(p_leftLineError);
+    leftLayout->addWidget(p_leftGoodness);
+    QGroupBox * leftGroupBox = new QGroupBox("Left Measure");
+    leftGroupBox->setMinimumWidth(CHIPVIEWPORT_WIDTH);
+    leftGroupBox->setLayout(leftLayout);
+    
+    // create widgets for the right groupbox
+    p_rightCombo = new QComboBox;
+    p_rightCombo->view()->installEventFilter(this);
+    connect(p_rightCombo, SIGNAL(activated(int)),
+            this, SLOT(selectRightMeasure(int)));
+    p_ignoreRightMeasure = new QCheckBox("Ignore Measure");
+    connect(p_ignoreRightMeasure, SIGNAL(toggled(bool)),
+            this, SLOT(setIgnoreRightMeasure(bool)));
+    connect(this, SIGNAL(ignoreRightChanged()),
+            p_ignoreRightMeasure, SLOT(toggle()));
+    p_rightMeasureType = new QLabel;
+    p_rightSampError = new QLabel();
+    p_rightLineError = new QLabel();
+    p_rightGoodness = new QLabel();
+    
+    // create right groupbox
+    QVBoxLayout * rightLayout = new QVBoxLayout;
+    rightLayout->addWidget(p_rightCombo);
+    rightLayout->addWidget(p_ignoreRightMeasure);
+    rightLayout->addWidget(p_rightMeasureType);
+    rightLayout->addWidget(p_rightSampError);
+    rightLayout->addWidget(p_rightLineError);
+    rightLayout->addWidget(p_rightGoodness);
+    QGroupBox * rightGroupBox = new QGroupBox("Right Measure");
+    rightGroupBox->setMinimumWidth(CHIPVIEWPORT_WIDTH);
+    rightGroupBox->setLayout(rightLayout);
+    
+    QHBoxLayout * centerLayout = new QHBoxLayout;
+    centerLayout->addWidget(leftGroupBox);
+    centerLayout->addWidget(rightGroupBox);
+    centerLayout->addStretch();
+    
+    return centerLayout;
   }
 
 
@@ -340,6 +392,49 @@ namespace Qisis {
   }
 
 
+  void QnetTool::createActions() {
+    p_saveNet = new QAction(QIcon(":saveAs"), "Save Control Network &As...",
+        p_qnetTool);
+    p_saveNet->setStatusTip("Save current control network to chosen file");
+    QString whatsThis = "<b>Function:</b> Saves the current <i>"
+        "control network</i> under chosen filename";
+    p_saveNet->setWhatsThis(whatsThis);
+    connect(p_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+
+    p_closeQnetTool = new QAction(QIcon(":close"), "&Close", p_qnetTool);
+    p_closeQnetTool->setStatusTip("Close this window");
+    p_closeQnetTool->setShortcut(Qt::ALT + Qt::Key_F4);
+    whatsThis ="<b>Function:</b> Closes the Qnet Tool window for this point "
+        "<p><b>Shortcut:</b> Alt+F4 </p>";
+    p_closeQnetTool->setWhatsThis(whatsThis);
+    connect(p_closeQnetTool, SIGNAL(activated()), p_qnetTool, SLOT(close()));
+    
+    p_viewTemplate = new QAction(QIcon(":view_edit"),
+        "&View/edit registration template", p_qnetTool);
+    p_viewTemplate->setStatusTip("View and/or edit the registration template");
+    whatsThis = "<b>Function:</b> Displays the curent registration template.  "
+       "The user may edit and save changes under a chosen filename.";
+    p_viewTemplate->setWhatsThis(whatsThis);
+    connect(p_viewTemplate, SIGNAL(activated()), this,
+        SLOT(viewTemplateFile()));
+
+    p_saveChips = new QAction(QIcon(":window_new"), "Save registration chips",
+        p_qnetTool);
+    p_saveChips->setStatusTip("Save registration chips");
+    whatsThis = "<b>Function:</b> Save registration chips to file.  "
+       "Each chip: pattern, search, fit will be saved to a separate file.";
+    p_saveChips->setWhatsThis(whatsThis);
+    connect(p_saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
+
+    p_templateFile = new QAction(QIcon(":open"), "&Set registration template",
+        p_qnetTool);
+    p_templateFile->setStatusTip("Set registration template");
+    whatsThis = "<b>Function:</b> Allows user to select a new file to set as "
+        "the registration template";
+    p_templateFile->setWhatsThis(whatsThis);
+    connect(p_templateFile, SIGNAL(activated()), this, SLOT(setTemplateFile()));
+  }
+
 
   /**
    * Customize dropdown menus below title bar.
@@ -352,62 +447,28 @@ namespace Qisis {
    */
   void QnetTool::createMenus() {
 
-    QAction *saveNet = new QAction(p_qnetTool);
-    saveNet->setText("Save Control Network &As...");
-    QString whatsThis =
-      "<b>Function:</b> Saves the current <i>control network</i> under chosen filename";
-    saveNet->setWhatsThis(whatsThis);
-    connect(saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
-
-    QAction *closeQnetTool = new QAction(p_qnetTool);
-    closeQnetTool->setText("&Close");
-    closeQnetTool->setShortcut(Qt::ALT + Qt::Key_F4);
-    whatsThis =
-      "<b>Function:</b> Closes the Qnet Tool window for this point \
-       <p><b>Shortcut:</b> Alt+F4 </p>";
-    closeQnetTool->setWhatsThis(whatsThis);
-    connect(closeQnetTool, SIGNAL(activated()), p_qnetTool, SLOT(close()));
-
     QMenu *fileMenu = p_qnetTool->menuBar()->addMenu("&File");
-    fileMenu->addAction(saveNet);
-    fileMenu->addAction(closeQnetTool);
+    fileMenu->addAction(p_saveNet);
+    fileMenu->addAction(p_closeQnetTool);
 
-    QAction *templateFile = new QAction(p_qnetTool);
-    templateFile->setText("&Set registration template");
-    whatsThis =
-      "<b>Function:</b> Allows user to select a new file to set as the registration template";
-    templateFile->setWhatsThis(whatsThis);
-    connect(templateFile, SIGNAL(activated()), this, SLOT(setTemplateFile()));
-
-    QAction *viewTemplate = new QAction(p_qnetTool);
-    viewTemplate->setText("&View/edit registration template");
-    whatsThis =
-      "<b>Function:</b> Displays the curent registration template.  \
-       The user may edit and save changes under a chosen filename.";
-    viewTemplate->setWhatsThis(whatsThis);
-    connect(viewTemplate, SIGNAL(activated()), this, SLOT(viewTemplateFile()));
-
-    QAction *saveChips = new QAction(p_qnetTool);
-//    saveChips->setCheckable(true);
-    saveChips->setText("Save registration chips");
-    whatsThis =
-      "<b>Function:</b> Save registration chips to file.  \
-       Each chip: pattern, search, fit will be saved to a separate file.";
-    saveChips->setWhatsThis(whatsThis);
-    connect(saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
-
-//     QAction *interestOp = new QAction(p_pointEditor);
-//     interestOp->setText("Choose interest operator");
-//     connect (interestOp,SIGNAL(activated()),this,SLOT(setInterestOp()));
-
-    QMenu *optionMenu = p_qnetTool->menuBar()->addMenu("&Options");
-    QMenu *regMenu = optionMenu->addMenu("&Registration");
-
-    regMenu->addAction(templateFile);
-    regMenu->addAction(viewTemplate);
-    regMenu->addAction(saveChips);
-    //    registrationMenu->addAction(interestOp);
-
+    QMenu *regMenu = p_qnetTool->menuBar()->addMenu("&Registration");
+    regMenu->addAction(p_templateFile);
+    regMenu->addAction(p_viewTemplate);
+    regMenu->addAction(p_saveChips);
+  }
+  
+  
+  void QnetTool::createToolBars() {
+    
+    QToolBar *toolBar = new QToolBar;
+    toolBar->setFloatable(false);
+    toolBar->addAction(p_saveNet);
+    toolBar->addSeparator();
+    toolBar->addAction(p_templateFile);
+    toolBar->addAction(p_viewTemplate);
+    toolBar->addAction(p_saveChips);
+  
+    p_qnetTool->addToolBar(Qt::TopToolBarArea, toolBar);
   }
 
 
@@ -1436,6 +1497,8 @@ namespace Qisis {
 
   void QnetTool::setTemplateFile() {
     p_pointEditor->setTemplateFile();
+    p_templateFilenameLabel->setText(QString::fromStdString(
+        p_pointEditor->templateFilename()));
   }
 
 
