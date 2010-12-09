@@ -50,6 +50,10 @@ void IsisMain() {
     string fFile = Filename(ui.GetFilename("SUMMARY")).Expanded();
     ofstream os;
     os.open(fFile.c_str(),ios::out);
+    if (!os) {
+      string mess = "Cannot create SUMMARY output file " + fFile;
+      throw iException::Message(iException::User, mess, _FILEINFO_);
+    }
     os << kernel.getSummary(comfile);
     os.close();
   }

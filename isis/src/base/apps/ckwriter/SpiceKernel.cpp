@@ -72,7 +72,6 @@ bool CheckSegment(const SpiceSegment *s1, const SpiceSegment *s2) {
 
 std::string SpiceKernel::getSummary(const std::string &commfile) const {
   vector<const SpiceSegment *> seglist;
-  int comChars(0);
   for ( int i = 0 ; i < size() ; i++) {
     seglist.push_back(&_segments[i]);
   }
