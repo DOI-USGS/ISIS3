@@ -49,7 +49,10 @@ namespace Isis {
    * further NAIF operations can occur, such as velocity vectors.
    * 
    * @ingroup Utility
-   * @author 2007-08-19 Kris Becker
+   * @author 2007-08-19 Kris Becker 
+   *  
+   * @internal 
+   * @history 2010-12-09 Kris Becker Ensure we exclude a NULL keyword value 
    */
 class Kernels {
     public:
@@ -77,6 +80,7 @@ class Kernels {
       std::vector<std::string> getList(const std::string &ktype, 
                                        bool removePath = false) const;
       
+      /** Returns the ISIS camera model version number */
       int CameraVersion() const { return (_camVersion); }
 
   private:

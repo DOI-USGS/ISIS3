@@ -166,11 +166,11 @@ Segment (by file) Summary
           ftp://naif.jpl.nasa.gov/pub/naif/utilities.
       </p>
       <p>
-          The SUMMARY parameter is provided as a file name that will contain
-          the comments section of the output CK kernel file.   This can be
-          used in addition to or in lieu of the TO parameter.  Getting the
-          contents of the comment section of the NAIF CK SPICE kernek in the
-          TO file requires a NAIF utility.
+          The SUMMARY parameter is provided as a file name that will contain the 
+          comments section of the output CK kernel file.   This can be used in 
+          addition to or in lieu of the TO parameter.  Getting the contents of 
+          the comment section of the NAIF CK SPICE kernel in the TO file 
+          requires the NAIF utility program, <b>commnt</b> . 
       </p>
       <p>
           To use the newly created CK SPICE kernel in the ISIS environment, you 

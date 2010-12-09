@@ -99,7 +99,7 @@ namespace Isis {
 
  
   int Kernels::Load(const std::string &ktypes) {
-    //  If not types specified, return them all
+    //  If no types specified, return them all
     int nLoaded(0);
     if (ktypes.empty()) { 
       for (unsigned int k = 0 ; k < _kernels.size() ; k++) {
@@ -280,10 +280,10 @@ namespace Isis {
 
   /**
    * @brief Add a list of kernel files to internal storage 
-   * 
-   * @author Kris Becker - 12/6/2010
-   * 
-   * @param klist 
+   *  
+   * Specialized inserter of images into exist container. 
+   *  
+   * @param klist List to add to existing collection
    */
   void Kernels::addKernels(const KernelList &klist) {
     copy(klist.begin(), klist.end(), back_inserter(_kernels));
@@ -291,6 +291,19 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Retrieve contents of keyword 
+   *  
+   * This metyhod retrieves the contents of a keyword.   It is specifically 
+   * designed to handle Kernel group keywords.  As such, any value of "Table" 
+   * found in the keyword is not added to the kernel list. 
+   * 
+   * 
+   * @param pvl    ISIS label containing the Kernels group.
+   * @param kname  Name of keyword to extract
+   * 
+   * @return Kernels::KernelList List of scrutinized kernel file names 
+   */
   Kernels::KernelList Kernels::findKernels(Pvl &pvl, 
                                            const std::string &kname) {
     KernelList klist;
@@ -300,8 +313,10 @@ namespace Isis {
     if (kernels.HasKeyword(kname)) {
       PvlKeyword &kkey = kernels[kname];
       for (int i = 0 ; i < kkey.Size() ; i++) {
-        if (!iString::Equal(kkey[i], "Table")) {
-          klist.push_back(examine(kkey[i]));
+        if (!kkey.IsNull(i)) {
+          if (!iString::Equal(kkey[i], "Table")) {
+            klist.push_back(examine(kkey[i]));
+          }
         }
       }
     }
@@ -399,6 +414,26 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Determines type of NAIF/ISIS kernel we're dealing with 
+   *  
+   * This method will open the file and look at the first 8 characters.  Valid 
+   * NAIF binary and text kernels typically have its type defined in the first 8 
+   * characters.  The expected format of these characters is "DAF/CK".  This 
+   * method retrieves this string, trims off formatting characters and spaces 
+   * and returns the string after the "/" character.  This value is returned as 
+   * the kernel type. 
+   *  
+   * It also checks for ISIS DEMs and a special case of ISIS IAKs, which does 
+   * not follow the NAIF convention.  ISIS IAKs don't typically contain the NAIF 
+   * format identifier but do contain the ".ti" file extention.
+   * 
+   * 
+   * @param kfile Name of potential NAIF kernel to determine type for
+   * 
+   * @return std::string Value of the indentifier found.  If undetermined, 
+   *         "UNKNOWN" is returned.
+   */
   std::string Kernels::resolveType(const std::string &kfile) const {
     Filename kernFile(kfile);
     string kpath = kernFile.Expanded();
@@ -435,6 +470,19 @@ namespace Isis {
     return (ktype);
   }
 
+  /**
+   * @brief Determine the ISIS camera model version number 
+   *  
+   * This method looks for the "CameraVersion" keyword in the Kernels group of 
+   * an ISIS label.  If found, it returns this number, otherwise it returns 0 
+   * (this is indicative of an older file). 
+   * 
+   * 
+   * @param pvl ISIS label 
+   * 
+   * @return int The version number found in the label.  If it cannot be 
+   *         determined, 0 is returned.
+   */
   int Kernels::getCameraVersion(Pvl &pvl) const {
     PvlGroup &kernels = pvl.FindGroup("Kernels",Pvl::Traverse);
     int cv(0);
