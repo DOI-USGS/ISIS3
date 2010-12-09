@@ -46,7 +46,7 @@ int main() {
   //  write poly as WKT
   ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString() 
     + "\" | sed "
-      "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
+      "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );
 
   //  Test sub-poly option
