@@ -83,6 +83,7 @@ namespace Qisis {
     *   @history 2010-11-22 Eric Hyer - Forwarded SIGNAL from StretchTool to
     *                          ChipViewports
     *   @history 2010-12-01 Eric Hyer - Added checkboxes for stretch locking
+    *   @history 2010-12-08 Eric Hyer - Relocated stretch locking checkboxes
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT

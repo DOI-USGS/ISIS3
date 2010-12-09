@@ -127,20 +127,10 @@ namespace Qisis {
     leftZoom1->setIconSize(isize);
     leftZoom1->setToolTip("Zoom 1:1");
     
-    QCheckBox *leftLockStretch = new QCheckBox("lock stretch");
-    // there are two "lock stretch" checkboxes (left and right)
-    // use same whats this text for both
-    QString whatsThisTextForStretchLocking = "If checked then a new stretch "
-        "will NOT be calculated for each pan or zoom change.  Note that stretch"
-        " changes made using the stretch tool will ALWAYS take effect, "
-        "regardless of the state of this checkbox.";
-    leftLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
-
     QHBoxLayout *leftZoomPan = new QHBoxLayout;
     leftZoomPan->addWidget(leftZoomIn);
     leftZoomPan->addWidget(leftZoomOut);
     leftZoomPan->addWidget(leftZoom1);
-    leftZoomPan->addWidget(leftLockStretch);
 
     // These buttons only used if allow mouse events in leftViewport
     QToolButton *leftPanUp = 0;
@@ -234,23 +224,36 @@ namespace Qisis {
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");
     
-    QCheckBox *rightLockStretch = new QCheckBox("lock stretch");
-    rightLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
-
     rightZoomPan->addWidget(rightPanUp);
     rightZoomPan->addWidget(rightPanDown);
     rightZoomPan->addWidget(rightPanLeft);
     rightZoomPan->addWidget(rightPanRight);
-    rightZoomPan->addWidget(rightLockStretch);
     rightZoomPan->addStretch();
 
     gridLayout->addLayout(rightZoomPan, row++, 1);
 
-    //  Add zoom factor label
+    //  Add zoom factor label and stretch locking checkbox
     p_leftZoomFactor = new QLabel();
-    gridLayout->addWidget(p_leftZoomFactor, row, 0);
+    QCheckBox *leftLockStretch = new QCheckBox("lock stretch");
+    // there are two "lock stretch" checkboxes (left and right)
+    // use same whats this text for both
+    QString whatsThisTextForStretchLocking = "If checked then a new stretch "
+        "will NOT be calculated for each pan or zoom change.  Note that stretch"
+        " changes made using the stretch tool will ALWAYS take effect, "
+        "regardless of the state of this checkbox.";
+    leftLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
+    QHBoxLayout *leftzflsLayout = new QHBoxLayout;
+    leftzflsLayout->addWidget(p_leftZoomFactor);
+    leftzflsLayout->addWidget(leftLockStretch);
+    gridLayout->addLayout(leftzflsLayout, row, 0);
+    
     p_rightZoomFactor = new QLabel();
-    gridLayout->addWidget(p_rightZoomFactor, row++, 1);
+    QCheckBox *rightLockStretch = new QCheckBox("lock stretch");
+    rightLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
+    QHBoxLayout *rightzflsLayout = new QHBoxLayout;
+    rightzflsLayout->addWidget(p_rightZoomFactor);
+    rightzflsLayout->addWidget(rightLockStretch);
+    gridLayout->addLayout(rightzflsLayout, row++, 1);
 
 
     p_leftView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
