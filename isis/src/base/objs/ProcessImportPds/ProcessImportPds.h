@@ -172,6 +172,8 @@ namespace Isis {
    *                          projections
    *  @history 2010-11-17 Eric Hyer - Inside ProcessPdsImageLabel method
    *               Absolute paths are now supported for the ^IMAGE Keyword
+   *  @history 2010-12-09 Sharmila Prasad - Set default offset to be 1 for detatched label 
+   *                                       and  offset not set
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
