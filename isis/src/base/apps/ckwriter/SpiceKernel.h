@@ -37,6 +37,34 @@
 
 namespace Isis {
 
+/**
+ * @brief Container for SPICE kernel creation
+ * 
+ * This class serves as a container for ISIS cube files to prep for writing the
+ * contents to a NAIF SPICE kernel.  Each file added is a CK segment.  When the
+ * ISIS cube is added, the contents of the Table BLOB (InstrumentRotation for
+ * CKs, InstrumentPosition for SPKs) are read and transformed to the appropriate
+ * state intended to be compatible with kernels issued by each mission source.
+ * 
+ * It is designed for ease of use.  Here is an example to create the most basic
+ * of CK kernel from a single ISIS file:
+ * @code
+ *   SpiceKernel kernel;
+ *   kernel.add("mycube.cub");
+ *   kernel.write("mycube.ck");  // Writes a type 3 CK kernel by default
+ * @endcode
+ * 
+ * Note that processing ISIS cubes is expensive in terms of NAIF kernel
+ * management.  Lots of NAIF kernel activity is incurred in resolving all the
+ * necessary requirements to get the SPICE data in a form that satisfies NAIF
+ * kernel specifications.
+ * 
+ * @ingroup Utility
+ * 
+ * @author 2010-11-22 Kris Becker
+ * @internal
+ * @history 2010-12-09 Kris Becker Add documentation and example
+ */
 class SpiceKernel {
   public:
     SpiceKernel();

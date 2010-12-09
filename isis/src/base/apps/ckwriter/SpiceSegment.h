@@ -54,9 +54,11 @@ class PvlObject;
  * 
  * This class is designed to read SPICE data from ISIS cube blobs and convert
  * them to proper formats for export to NAIF formatted SPICE kernel files.  This
- * particular implementation is for type 3 CKs.
- * 
- * @history 2010-11-10 Kris Becker Original Implementation
+ * particular implementation supports NAIF CK kernel types 1, 2 and 3.
+ *  
+ * @author 2010-11-10 Kris Becker 
+ * @internal 
+ * @history 2010-12-09 Kris Becker Added more documentation
  * 
  */
 class SpiceSegment {
