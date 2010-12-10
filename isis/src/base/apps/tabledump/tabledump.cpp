@@ -120,6 +120,8 @@ void IsisMain() {
       }
     } // End Field loop
   } // End Record loop
+  ss.put('\n');
+
 
   if(ui.WasEntered("TO")) {
     string outfile(Filename(ui.GetFilename("TO")).Expanded());
@@ -132,7 +134,7 @@ void IsisMain() {
     Application::GuiLog(log);
   }
   else {
-    cout << ss.str() << endl;
+    cout << ss.str();
   }
 }
 

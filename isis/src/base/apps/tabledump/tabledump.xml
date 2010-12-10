@@ -45,6 +45,9 @@
           Changed helper button to only place one table name into the 
           NAME parameter each time it is pressed
       </change>
+      <change name="Kris Becker" date="2010-12-10">
+          Added a newline to the last line of the output TO file.
+      </change>
   </history>
 
   <groups>
