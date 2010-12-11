@@ -544,6 +544,8 @@ namespace Isis {
    *
    * @history 2008-07-17  Tracie Sucharski,  Added ptid and measure serial
    *                            number to the unable to map to surface error.
+   *          2010-12-10  Debbie A. Cook,  Revised error calculation for radar
+   *                            because it was always reporting line errors=0.
    */
 
   void ControlPoint::ComputeErrors() {
@@ -562,19 +564,21 @@ namespace Isis {
       // TODO:  Should we use crater diameter?
       Camera *cam = m.Camera();
       cam->SetImage(m.Sample(), m.Line());
+
+      double cuSamp;
+      double cuLine;
+      CameraFocalPlaneMap *fpmap = m.Camera()->FocalPlaneMap();
+
+      if(cam->GetCameraType()  !=  Isis::Camera::Radar) {
+
       // Map the lat/lon/radius of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.  This must be
       // done manually because the camera will compute a new time for line scanners,
       // instead of using the measured time.
-      // First compute the look vector in body-fixed coordinates
-      std::vector<double> look(3);
-      double cudx, cudy;
-      cam->GroundMap()->GetXY(lat, lon, rad, &cudx, &cudy);
-      m.SetFocalPlaneComputed(cudx, cudy);
+        double cudx, cudy;
+        cam->GroundMap()->GetXY(lat, lon, rad, &cudx, &cudy);
+        m.SetFocalPlaneComputed(cudx, cudy);
 
-      CameraFocalPlaneMap *fpmap = m.Camera()->FocalPlaneMap();
-
-      if(cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Now things get tricky.  We want to produce errors in pixels not mm
         // but some of the camera maps could fail.  One that won't is the
         // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
@@ -585,26 +589,31 @@ namespace Isis {
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
+
+        cuSamp = fpmap->DetectorSample();
+        cuLine = fpmap->DetectorLine();
       }
 
       else {
-        // For radar, we can't skip the "distortion map" because it really converts
-        //  slant range to ground range.
-        // Convert slant range/ doppler shift x/y to ground range x/y
-        m.Camera()->DistortionMap()->SetUndistortedFocalPlane(cudx, cudy);
+        // For radar we can't map through the current Spice, because y in the 
+        // focal plane is doppler shift.  Line is calculated from time.  If
+        // we hold time and the Spice, we'll get the same sample/line as
+        // measured
 
-        // Convert ground range x/y to detector position
-        double focalPlaneX = m.Camera()->DistortionMap()->FocalPlaneX();
-        double focalPlaneY = m.Camera()->DistortionMap()->FocalPlaneY();
-
-        if(!fpmap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
-          std::string msg = "Sanity check #1 for ControlPoint [" +
-                            Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        if (!cam->SetUniversalGround(lat, lon, rad)) {
+          std::string msg = "ControlPoint [" +
+                            Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]"
+                            + " does not map into image";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
         }
+
+        cuSamp = cam->Sample();
+        cuLine = cam->Line();
+        
       }
-      double cuSamp = fpmap->DetectorSample();
-      double cuLine = fpmap->DetectorLine();
+
+      double muSamp;
+      double muLine;
 
       if(cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
@@ -614,33 +623,20 @@ namespace Isis {
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
+        muSamp = fpmap->DetectorSample();
+        muLine = fpmap->DetectorLine();
       }
-      else {
-        // In the radar case we can't skip this step since it is really converting slant range to ground range
-        m.Camera()->DistortionMap()->SetUndistortedFocalPlane(m.FocalPlaneMeasuredX(), m.FocalPlaneMeasuredY());
-        double focalPlaneX = m.Camera()->DistortionMap()->FocalPlaneX();
-        double focalPlaneY = m.Camera()->DistortionMap()->FocalPlaneY();
 
-        if(!fpmap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
-          std::string msg = "Sanity check #2 for ControlPoint [" +
-                            Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-        }
+      else {
+        muSamp = m.Sample();
+        muLine = m.Line();
       }
-      double muSamp = fpmap->DetectorSample();
-      double muLine = fpmap->DetectorLine();
 
       // The units are in detector sample/lines.  We will apply the instrument
       // summing mode to get close to real pixels.  Note however we are in
       // undistorted pixels
-      CameraDetectorMap *cdmap = m.Camera()->DetectorMap();
       double sampError = muSamp - cuSamp;
       double lineError = muLine - cuLine;
-
-      if(cam->GetCameraType()  != Isis::Camera::Radar) {
-        sampError /= cdmap->SampleScaleFactor();
-        lineError /=   cdmap->LineScaleFactor();
-      }
       m.SetError(sampError, lineError);
     }
     return;
