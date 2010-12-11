@@ -129,7 +129,7 @@ namespace Isis {
 
       rlat = lat * 180.0 / Isis::PI;
       rlon = lon * 180.0 / Isis::PI;
-      R = GetRadius(rlat, rlon);
+      R = GetRadius(rlat, rlon);  // km
       iter++;
     }
     while(fabs(R - lastR) > p_tolerance && iter < 30);
@@ -164,9 +164,13 @@ namespace Isis {
    * @param lon planetocentric longitude in degrees
    *
    * @return conversion was successful
+   *
+   * @internal
+   *   @history 2010-12-10 Debbie A. Cook,  Corrected radius units
+   *                        in SetGround call to be meters
    */
   bool RadarGroundMap::SetGround(const double lat, const double lon) {
-    return SetGround(lat, lon, GetRadius(lat, lon));
+    return SetGround(lat, lon, GetRadius(lat, lon)*1000.);
   }
 
   /** Compute undistorted focal plane coordinate from ground position that includes a local radius
@@ -176,13 +180,19 @@ namespace Isis {
    * @param radius local radius in meters
    *
    * @return conversion was successful
+   *
+   * @internal
+   *   @history 2010-12-10 Debbie A. Cook,  Corrected radius units
+   *                        in latrec call to be km and set
+   *                        set p_focalPlaneY to the scaled
+   *                        doppler frequency
    */
   bool RadarGroundMap::SetGround(const double lat, const double lon, const double radius) {
     // Get the ground point in rectangular coordinates (X)
     SpiceDouble X[3];
     SpiceDouble rlat = lat * Isis::PI / 180.0;
     SpiceDouble rlon = lon * Isis::PI / 180.0;
-    latrec_c(radius, rlon, rlat, X);
+    latrec_c(radius/1000., rlon, rlat, X);
 
     // Compute lower bound for Doppler shift
     double et1 = p_camera->Spice::CacheStartTime();
@@ -291,7 +301,8 @@ namespace Isis {
 
         p_camera->SetFocalLength(p_slantRange * 1000.0); // p_slantRange is km so focal length is in m
         p_focalPlaneX = p_slantRange * 1000.0 / p_rangeSigma; // km to meters and scaled to focal plane
-        p_focalPlaneY = 0.0;
+        //        p_focalPlaneY = 0.0;
+        p_focalPlaneY = p_dopplerFreq / p_dopplerSigma;   // htx to focal plane coord  OR should this be etGuess?
         return true;
       }
     }
@@ -357,6 +368,17 @@ namespace Isis {
 
 
 
+  /** Compute the slant range and the doppler frequency for current body position
+   *
+   * @param X body-fixed coordinate of surface point
+   *
+   * @return doppler frequency
+   *
+   * @internal
+   *   @history 2010-12-10 Debbie A. Cook,  Corrected radius units
+   *                        in SetGround call to be meters and set
+   *                        p_dopplerFreq
+   */
   double RadarGroundMap::ComputeXv(SpiceDouble X[3]) {
     // Get the spacecraft position (Xsc) and velocity (Vsc) in body fixed
     // coordinates
@@ -387,10 +409,22 @@ namespace Isis {
     // In body-fixed coordinates, the point velocity = 0. so the equation becomes
     //    double xv = 2.0 * vdot_c(lookB,&Vsc[0]) / (vnorm_c(lookB) * WaveLength() );
     double xv = -2.0 * vdot_c(lookB, &Vsc[0]) / (vnorm_c(lookB) * WaveLength()); // - is applied to lookB above
+    p_dopplerFreq = xv;
     return xv;
   }
 
 
+  /** Compute the radius based on the shape model for the cube
+   *
+   * This method will compute the local radius at the specified lat/lon
+   * using the shape model specified in the kernels group of the cube.
+   *
+   * @param lat planetocentric latitude in degrees
+   * @param lon planetocentric longitude in degrees
+   * @param radius local radius in km
+   *
+   * @return radius local radius in km
+   */
   double RadarGroundMap::GetRadius(double lat, double lon) {
     if(p_camera->HasElevationModel()) {
       return p_camera->DemRadius(lat, lon);
