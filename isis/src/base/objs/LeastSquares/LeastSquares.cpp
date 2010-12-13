@@ -203,18 +203,21 @@ namespace Isis {
    * and Residual methods freely.
    *
    * @internal
-   * @history  2008-04-16 Debbie Dook / Tracie Sucharski, Added SolveSparse.
+   * @history  2008-04-16 Debbie Cook / Tracie Sucharski, Added SolveSparse.
    * @history  2009-04-08 Tracie Sucharski - Added return value which will
    *                          pass on what is returned from SolveSparse which
    *                          is a column number of a column that contained
    *                          all zeros.
+   * @history  2010-12-12 Debbie A. Cook  Fixed "no data" test for SPARSE
+   *                          case
    */
   int LeastSquares::Solve(Isis::LeastSquares::SolveMethod method) {
 
 #if defined(__sun__)
     if(method == SPARSE) method = QRD;
 #endif
-    if(Rows() == 0) {
+    if((method == SPARSE  &&  p_sparseRows == 0)  ||
+       (method != SPARSE  &&  Rows() == 0 )) {
       p_solved = false;
       std::string msg = "No solution available because no input data was "
                         "provided";
