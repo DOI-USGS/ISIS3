@@ -262,6 +262,9 @@ namespace Isis {
         needQuotes = true;
       }
 
+      if(pos == val.size() - 1 && val[pos] == '-')
+        needQuotes = true;
+
       // remember if we are a quote, what quote type we are
       if(existingQuoteType == '\0') {
         if(val[pos] == '"') {

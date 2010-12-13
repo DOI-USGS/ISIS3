@@ -114,6 +114,8 @@ namespace Isis {
    *  @history 2010-02-04 Travis Addair - Added SetCharLimit
    *           method allowing users to set the point at which a
    *           keyword value is output to the next line down.
+   *  @history 2010-12-09 Steven Lambright - Values ending in '-' no longer fail
+   *           to be quoted properly
    */
   class PvlFormat {
 
