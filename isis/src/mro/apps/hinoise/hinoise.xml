@@ -12,12 +12,15 @@
   </description>
 
   <category>
-    <categoryItem>Utility</categoryItem>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
   </category>
 
   <history>
     <change name="Eric Hyer" date="2009-04-15">
       Original version converted from Eric Eliason's Perl
+    </change>
+    <change name="Sharmila Prasad" date="2010-12-13">
+      Changed the category from Utility to mission Mars Reconnaissance Orbiter
     </change>
   </history>
 
