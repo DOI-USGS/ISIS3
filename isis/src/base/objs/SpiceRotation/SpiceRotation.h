@@ -104,6 +104,12 @@ namespace Isis {
    *                        initialization of members p_fullCacheStartTime, p_fullCacheEndTime, and p_fullCacheSize.  Added these
    *                        same values to the table label in method Cache and the reading of these values to the method
    *                        LoadCache(table).  Improved error message in FrameTrace.  Also corrected a comment in StateTJ
+   *  @history 2010-09-23  Debbie A. Cook Revised to write out line cache for updated pointing when cache size is 1. If the
+   *                        original pointing had an angular velocity in this case, the original angular velocity is written
+   *                        out along with the updated quaternion.  Also added method Extrapolate, to extrapolate pointing
+   *                        assuming a constant angular velocity.  This method was designed to compute the pointing at the
+   *                        start and end of the exposure for framing cameras to create a ck that would cover a single framing
+   *                        observation.
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {
@@ -255,12 +261,14 @@ namespace Isis {
       };
 
       void ComputeAv();
+      std::vector<double> Extrapolate(double timeEt);
+
 
     protected:
       std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
       std::vector<std::vector<double> > p_cache;      //!< Cached rotations
       //!< Stored as rotation matrix from
-      //    J2000 to reference frame or
+      //    J2000 to 1st constant frame (CJ) or
       //    coefficients of polynomial
       //    fit to rotation angles
       int p_degree;                     //!< Degree of fit polynomial for angles

@@ -233,7 +233,10 @@ namespace Isis {
               (SpiceDouble( *)[3]) &p_CJ[0]);
 
       if(p_hasAngularVelocity) {
-        ComputeAv();
+        if( p_degree == 0) 
+          p_av = p_cacheAv[0];
+        else
+          ComputeAv();
       }
     }
     // Read from the kernel
@@ -552,7 +555,8 @@ namespace Isis {
       SetOverrideBaseTime(baseTime, timeScale);
       SetPolynomial(coeffAng1, coeffAng2, coeffAng3);
       p_source = Function;
-      p_hasAngularVelocity = true;
+      if (degree > 0)  p_hasAngularVelocity = true;
+      if(degree == 0  && p_cacheAv.size() > 0) p_hasAngularVelocity = true;
     }
     else  {
       std::string msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
@@ -584,18 +588,29 @@ namespace Isis {
     // Clear existing matrices from cache
     p_cacheTime.clear();
     p_cache.clear();
-    p_cacheAv.clear();
+
+    // Clear the angular velocity cache if we can calculate it instead.  It can't be calculated for 
+    // functions of degree 0 (framing cameras), so keep the original av.  It is better than nothing.
+    if (p_degree > 0  && p_cacheAv.size() > 1)  p_cacheAv.clear();
 
     // Load the time cache first
     p_minimizeCache = No;
     LoadTimeCache();
 
+    if (p_fullCacheSize > 1) {
     // Load the matrix and av caches
-    for(std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
-      p_et = p_cacheTime.at(pos);
+      for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
+        p_et = p_cacheTime.at(pos);
+        SetEphemerisTime(p_et);
+        p_cache.push_back(p_CJ);
+        p_cacheAv.push_back(p_av);
+      }
+    }
+    else {
+    // Load the matrix for the single updated time instance
+      p_et = p_cacheTime[0];
       SetEphemerisTime(p_et);
       p_cache.push_back(p_CJ);
-      p_cacheAv.push_back(p_av);
     }
 
     // Set source to cache and reset current et
@@ -698,6 +713,7 @@ namespace Isis {
       return table;
     }
     // Load the coefficients for the curves fit to the 3 camera angles
+    else if(p_source == Function  &&  p_degree == 0  &&  p_fullCacheSize == 1) return LineCache(tableName);
     else if(p_source == Function) {
       TableField angle1("J2000Ang1", TableField::Double);
       TableField angle2("J2000Ang2", TableField::Double);
@@ -895,6 +911,15 @@ namespace Isis {
 //      std::string msg = "Rotation already fit to a polynomial -- spiceint first to refit";
 //      throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
     }
+
+    // Adjust degree of polynomial on available data
+    if(p_cache.size() == 1) {
+      p_degree = 0;
+    }
+    else if(p_cache.size() == 2) {
+      p_degree = 1;
+    }
+
     Isis::PolynomialUnivariate function1(p_degree);       //!< Basis function fit to 1st rotation angle
     Isis::PolynomialUnivariate function2(p_degree);       //!< Basis function fit to 2nd rotation angle
     Isis::PolynomialUnivariate function3(p_degree);       //!< Basis function fit to 3rd rotation angle
@@ -909,7 +934,6 @@ namespace Isis {
     std::vector<double> coeffAng1, coeffAng2, coeffAng3;
 
     if(p_cache.size() == 1) {
-      p_degree = 0;
       double t = p_cacheTime.at(0);
       SetEphemerisTime(t);
       std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
@@ -1240,7 +1264,13 @@ namespace Isis {
    *
    */
   void SpiceRotation::SetPolynomialDegree(int degree) {
-
+    // Adjust the degree for the data
+    if(p_fullCacheSize == 1) {
+      degree = 0;
+    }
+    else if(p_fullCacheSize == 2) {
+      degree = 1;
+    }
     // If polynomials have not been applied yet then simply set the degree and return
     if(!p_degreeApplied) {
       p_degree = degree;
@@ -1814,5 +1844,29 @@ namespace Isis {
   }
 
 
+  /** Extrapolate pointing for a given time assuming a constant angular velocity.
+   *  The pointing and angular velocity at the current time will be used to
+   *  extrapolate pointing at the input time.  If angular velocity does not
+   *  exist, the value at the current time will be output.
+   *
+   * @param [in]   timeEt    The time of the pointing to be extrapolated
+   * @param [out]            A quaternion defining the rotation at the input time
+   *
+   */
+   std::vector<double> SpiceRotation::Extrapolate(double timeEt) {
+    NaifStatus::CheckErrors();
 
+    if(!p_hasAngularVelocity) return p_CJ;
+      
+    double diffTime = p_et - timeEt;
+    std::vector<double> CJ(9,0.);
+    double dmat[3][3];
+
+    // Create a rotation matrix for the axis and magnitude of the angular velocity * the time difference
+    axisar_c((SpiceDouble *) &p_av[0], diffTime*vnorm_c((SpiceDouble *) &p_av[0]), dmat);
+
+    // Rotate from the current time to the desired time assuming constant angular velocity
+    mxm_c(dmat, (SpiceDouble *) &p_CJ[0], (SpiceDouble( *)[3]) &CJ[0]);
+    return CJ;
+   }
 }
