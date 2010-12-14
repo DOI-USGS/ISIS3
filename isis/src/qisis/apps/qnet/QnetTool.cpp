@@ -1562,9 +1562,10 @@ namespace Qisis {
     if (filename.isEmpty())
       return;
       
-    p_pointEditor->setTemplateFile(filename);
-    p_templateFilenameLabel->setText("Template File: " + filename);
-    loadTemplateFile(filename);
+    if (p_pointEditor->setTemplateFile(filename)) {
+      p_templateFilenameLabel->setText("Template File: " + filename);
+      loadTemplateFile(filename);
+    }
   }
   
   
@@ -1572,8 +1573,9 @@ namespace Qisis {
   
     QFile file(QString::fromStdString(Filename((iString) fn).Expanded()));
     if (!file.open(QIODevice::ReadOnly)) {
-      QString msg = "Failed to open template file [" + fn + "]";
-      iException::Message(iException::Io, msg.toStdString(), _FILEINFO_);
+      QString msg = "Failed to open template file \"" + fn + "\"";
+      QMessageBox::warning(p_qnetTool, "IO Error", msg);
+      return;
     }
     
     QTextStream stream(&file);
@@ -1603,7 +1605,6 @@ namespace Qisis {
         p_pointEditor->templateFilename());
         
     writeTemplateFile(filename);
-    p_pointEditor->setTemplateFile(filename);
   }
   
   
@@ -1626,9 +1627,10 @@ namespace Qisis {
     QFile file(QString::fromStdString(Filename((iString) fn).Expanded()));
     
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-      QString msg = "Failed to save template file to [" + fn + "]\nDo you "
+      QString msg = "Failed to save template file to \"" + fn + "\"\nDo you "
           "have permission?";
-      iException::Message(iException::Io, msg.toStdString(), _FILEINFO_);
+      QMessageBox::warning(p_qnetTool, "IO Error", msg);
+      return;
     }
     
     QString contents = p_templateEditor->toPlainText();
@@ -1650,10 +1652,12 @@ namespace Qisis {
     // now save contents
     QTextStream stream(&file);
     stream << contents;
-  
+    
     file.close();
-    p_templateModified = false;
-    p_saveTemplateFile->setEnabled(false);
+    if (p_pointEditor->setTemplateFile(fn)) {
+      p_templateModified = false;
+      p_saveTemplateFile->setEnabled(false);
+    }
   }
 
 
