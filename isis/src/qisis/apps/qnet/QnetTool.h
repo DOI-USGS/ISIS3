@@ -12,13 +12,16 @@ class QAction;
 class QBoxLayout;
 class QCheckBox;
 class QComboBox;
+class QGroupBox;
 class QLabel;
 class QMainWindow;
 class QObject;
 class QPainter;
 class QPoint;
+class QSplitter;
 class QStackedWidget;
 class QString;
+class QTextEdit;
 class QWidget;
 
 namespace Isis {
@@ -130,6 +133,9 @@ namespace Qisis {
    *                Options menu and moved registration menu to main menu bar.
    *                Added toolbar for actions also in menu.  All actions now
    *                have icons.
+   *   @history 2010-12-14 Eric Hyer - Template editor is now a widget within
+   *                the main window.  Newly saved template files take effect
+   *                after saving.
    */
   class QnetTool : public Tool {
       Q_OBJECT
@@ -188,26 +194,34 @@ namespace Qisis {
 
       void pointSaved();
 
-      void setTemplateFile();
+      void openTemplateFile();
       void viewTemplateFile();
       void saveChips();
-      //void setInterestOp();
+      void showHideTemplateEditor();
+      void saveTemplateFile();
+      void saveTemplateFileAs();
+      void setTemplateModified();
+      void writeTemplateFile(QString);
 
 
     private:
+      void createActions();
+      void createMenus();
+      void createToolBars();
+      void loadPoint();
+      void drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter);
       void createQnetTool(QWidget *parent);
-      QBoxLayout * createTopLayout();
-      QBoxLayout * createCenterLayout();
+      QSplitter * createTopSplitter();
+      QGroupBox * createControlPointGroupBox();
+      QGroupBox * createLeftMeasureGroupBox();
+      QGroupBox * createRightMeasureGroupBox();
+      void createTemplateEditorWidget();
+      void loadTemplateFile(QString);
+      bool okToContinue();
       
       
     private:
       QMainWindow *p_qnetTool;
-      void createActions();
-      void createMenus();
-      void createToolBars();
-
-      void loadPoint();
-      void drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter);
 
 
       vector<string> findPointFiles(double lat, double lon);
@@ -217,12 +231,16 @@ namespace Qisis {
       QAction *p_deletePoint;
       QAction *p_saveNet;
       QAction *p_closeQnetTool;
-      QAction *p_viewTemplate;
       QAction *p_saveChips;
-      QAction *p_templateFile;
+      QAction *p_showHideTemplateEditor;
+      QAction *p_openTemplateFile;
+      QAction *p_saveTemplateFile;
+      QAction *p_saveTemplateFileAs;
       
       QMainWindow *p_mw;
       ControlPointEdit *p_pointEditor;
+      QTextEdit *p_templateEditor;
+      QWidget *p_templateEditorWidget;
 
       QLabel *p_templateFilenameLabel;
       QLabel *p_ptIdValue;
@@ -256,6 +274,8 @@ namespace Qisis {
       Isis::Cube *p_rightCube;
 
       QnetHoldPointDialog *p_holdPointDialog;
+      
+      bool p_templateModified;
   };
 };
 
