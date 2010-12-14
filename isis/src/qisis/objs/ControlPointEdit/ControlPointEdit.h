@@ -14,6 +14,7 @@ class QLCDNumber;
 class QPushButton;
 class QRadioButton;
 class QScrollBar;
+class QString;
 class QTimer;
 class QToolButton;
 class QVBoxLayout;
@@ -84,6 +85,8 @@ namespace Qisis {
     *                          ChipViewports
     *   @history 2010-12-01 Eric Hyer - Added checkboxes for stretch locking
     *   @history 2010-12-08 Eric Hyer - Relocated stretch locking checkboxes
+    *   @history 2010-12-14 Eric Hyer - setTemplateFile now takes the filename
+    *                          as a parameter (no more open dialog!)
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT
@@ -94,7 +97,7 @@ namespace Qisis {
       std::string templateFilename() {
         return p_templateFilename;
       };
-      void setTemplateFile();
+      void setTemplateFile(QString);
       void allowLeftMouse(bool allowMouse);
 
     signals:

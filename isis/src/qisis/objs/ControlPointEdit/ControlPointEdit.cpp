@@ -1087,34 +1087,33 @@ namespace Qisis {
    *                          registration is successfull, otherwise the
    *                          original template file is kept.
    */
-  void ControlPointEdit::setTemplateFile() {
+  void ControlPointEdit::setTemplateFile(QString fn) {
 
-    QString filter = "Select registration template (*.def *.pvl);;";
-    filter += "All (*)";
-    QString regDef = QFileDialog::getOpenFileName((QWidget *)parent(),
-                     "Select a registration template",
-                     ".",
-                     filter);
-    if(regDef.isEmpty()) return;
     Isis::AutoReg *reg = NULL;
     // save original template filename
     std::string temp = p_templateFilename;
     try {
       // set template filename to user chosen pvl file
-      p_templateFilename = regDef.toStdString();
+      p_templateFilename = fn.toStdString();
+      
       // Create PVL object with this file
-      Isis::Pvl pvl(regDef.toStdString());
+      Isis::Pvl pvl(fn.toStdString());
+      
       // try to register file
       reg = Isis::AutoRegFactory::Create(pvl);
-      if(p_autoRegFact != NULL) delete p_autoRegFact;
+      if (p_autoRegFact != NULL)
+        delete p_autoRegFact;
       p_autoRegFact = reg;
+      
+      p_templateFilename = fn.toStdString();
     }
     catch(Isis::iException &e) {
       // set templateFilename back to its original value
       p_templateFilename = temp;
-      e.Message(Isis::iException::Io, "Cannot create AutoRegFactory for "
-                + regDef.toStdString() + ".  As a result, current template file will remain set to "
-                + p_templateFilename, _FILEINFO_);
+      e.Message(Isis::iException::Io, "Cannot create AutoRegFactory for " +
+          fn.toStdString() +
+          ".  As a result, current template file will remain set to " +
+          p_templateFilename, _FILEINFO_);
       QString message = e.Errors().c_str();
       e.Clear();
       QMessageBox::information((QWidget *)parent(), "Error", message);
