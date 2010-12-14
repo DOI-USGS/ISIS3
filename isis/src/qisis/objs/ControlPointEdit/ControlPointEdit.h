@@ -97,7 +97,7 @@ namespace Qisis {
       std::string templateFilename() {
         return p_templateFilename;
       };
-      void setTemplateFile(QString);
+      bool setTemplateFile(QString);
       void allowLeftMouse(bool allowMouse);
 
     signals:

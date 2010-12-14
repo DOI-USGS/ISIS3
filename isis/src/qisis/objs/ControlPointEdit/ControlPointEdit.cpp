@@ -1087,7 +1087,7 @@ namespace Qisis {
    *                          registration is successfull, otherwise the
    *                          original template file is kept.
    */
-  void ControlPointEdit::setTemplateFile(QString fn) {
+  bool ControlPointEdit::setTemplateFile(QString fn) {
 
     Isis::AutoReg *reg = NULL;
     // save original template filename
@@ -1106,6 +1106,7 @@ namespace Qisis {
       p_autoRegFact = reg;
       
       p_templateFilename = fn.toStdString();
+      return true;
     }
     catch(Isis::iException &e) {
       // set templateFilename back to its original value
@@ -1117,6 +1118,7 @@ namespace Qisis {
       QString message = e.Errors().c_str();
       e.Clear();
       QMessageBox::information((QWidget *)parent(), "Error", message);
+      return false;
     }
   }
 
