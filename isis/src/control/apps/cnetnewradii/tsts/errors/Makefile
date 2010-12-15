@@ -12,6 +12,6 @@ commands:
 	  errors=errors.pvl \
 	  -preference=$$ISISROOT/src/base/objs/Preference/TestPreferences \
 	  2>> $(OUTPUT)/error1.txt > /dev/null;
-	cat $(OUTPUT)/error1.txt | sed s+/usgs/cpkgs/isis3/testData/isis/src/base/apps/cnetnewradii/tsts/errors/++g > $(OUTPUT)/error.txt;
+	cat $(OUTPUT)/error1.txt | sed s+/usgs.*errors/++g > $(OUTPUT)/error.txt;
 	rm -f $(OUTPUT)/error1.txt;
 	rm -f $(OUTPUT)/outputcnet.pvl;
