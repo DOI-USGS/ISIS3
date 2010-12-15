@@ -108,6 +108,7 @@ Group = DataDirectory
   Cassini     = $ISIS3DATA/cassini
   Chan1       = $ISIS3DATA/chan1
   Clementine1 = $ISIS3DATA/clementine1
+  Control     = $ISIS3DATA/control
   Dawn        = $ISIS3DATA/dawn
   Galileo     = $ISIS3DATA/galileo
   Lo          = $ISIS3DATA/lo
