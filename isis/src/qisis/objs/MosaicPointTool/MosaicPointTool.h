@@ -2,11 +2,27 @@
 #define Qisis_MosaicPointTool_h
 
 #include "MosaicTool.h"
-#include "ControlNet.h"
 
 class QLabel;
+namespace Isis {
+  class ControlNet;
+}
 
 namespace Qisis {
+
+  /**
+   * @brief
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author Stacy Alley
+   *
+   * @internal
+   *
+   *  @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
+   *                                removing includes from ControlNet.h.
+   */
+
   class MosaicPointTool : public Qisis::MosaicTool {
       Q_OBJECT
 

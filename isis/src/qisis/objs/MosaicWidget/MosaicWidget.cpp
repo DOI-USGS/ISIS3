@@ -1,9 +1,10 @@
+#include "MosaicWidget.h"
+
 #include <cfloat>
 #include <QContextMenuEvent>
 #include <QColorDialog>
 #include <QSizePolicy>
 
-#include "MosaicWidget.h"
 #include "MosaicItem.h"
 #include "MosaicMainWindow.h"
 #include "FileDialog.h"
@@ -17,6 +18,7 @@
 
 #include "Pvl.h"
 #include "PvlGroup.h"
+#include "ProjectionFactory.h"  
 #include "ControlGraph.h"
 #include "iString.h"
 

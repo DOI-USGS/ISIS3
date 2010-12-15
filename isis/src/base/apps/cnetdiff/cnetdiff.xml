@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnetdiff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Compare two control networks</brief>
+
+  <description>
+    This program will compare two control network files.
+    The purpose of this program is for application tests that output a control
+    network formatted file, to be able to compare binary control networks with
+    tolerances in numerical values of keywords.
+  </description>
+
+  <history>
+    <change name="Steven Lambright" date="2010-10-19">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Control Network File 1
+        </brief>
+        <description>
+        </description>
+        <filter>
+          *.net *.bin
+        </filter>
+      </parameter>
+
+       <parameter name="FROM2">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Control Network File 2
+        </brief>
+        <description>
+        </description>
+        <filter>
+          *.net *.bin
+        </filter>
+      </parameter>
+
+       <parameter name="DIFF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Input tolerance file
+        </brief>
+        <description>
+          This is used to specify tolerances between the two input files. If 
+          this file is not specified, the two control network files must match
+          exactly except for date/times.
+        </description>
+        <filter>
+          *.net.DIFF
+        </filter>
+      </parameter>
+
+       <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Differences
+        </brief>
+        <description>
+          This will output the differences to a text file.
+        </description>
+        <filter>
+          *.txt
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+  <!--examples>
+    <example>
+      <brief>Basic Comparison</brief>
+      <description>
+        This example will cover doing a basic difference between two pvl files and how to interpret the results.
+      </description>
+      <terminalInterface>
+        <commandLine>from=pvl1.pvl from2=pvl2.pvl</commandLine>
+        <description>Differencing pvl1.pvl and pvl2.pvl</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/ex1interface.jpg">
+            <brief>Running this program with pvl1.pvl and pvl2.pvl</brief>
+            <description>
+              This shows how to run this program to compare the two pvl files pvl1.pvl and pvl2.pvl.
+            </description>
+            <thumbnail width="164" height="200" caption="Differencing two files" src="assets/thumbs/ex1interface.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/pvl1.pvl">
+          <brief>pvl1.pvl</brief>
+          <description>
+            This is the file used in the input parameter FROM. It will be compared with pvl2.pvl.
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+        <dataFile path="assets/pvl2.pvl">
+          <brief>pvl2.pvl</brief>
+          <description>
+            This is the file used in the input parameter FROM2. It will be compared with pvl1.pvl.
+          </description>
+          <parameterName>FROM2</parameterName>
+        </dataFile>
+      </dataFiles>
+      <outputImages>
+        <image width="511" height="93" src="assets/images/ex1output.jpg">
+          <brief>The results from comparing pvl1.pvl and pvl2.pvl</brief>
+          <description>
+            This is the output after running this program on pvl1.pvl and pvl2.pvl. Since the input pvl files differed, it shows the first difference encountered. 
+            Notice it also says exactly where the difference was found and, if numerical, the tolerance. 
+          </description>
+          <thumbnail width="200" height="36" caption="Results" src="assets/thumbs/ex1output.jpg" />
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Basic Comparison With Tolerance</brief>
+      <description>
+        This example will cover doing a basic difference between two pvl files with a tolerance file.
+      </description>
+      <terminalInterface>
+        <commandLine>from=pvl1.pvl from2=pvl2.pvl diff=tolerance.pvl</commandLine>
+        <description>Differencing pvl1.pvl and pvl2.pvl</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="450" height="550" src="assets/images/ex1interface.jpg">
+            <brief>Running this program with pvl1.pvl and pvl2.pvl with tolerance</brief>
+            <description>
+              This shows how to run this program to compare the two pvl files pvl1.pvl and pvl2.pvl using a tolerance file.
+            </description>
+            <thumbnail width="164" height="200" caption="Differencing two files" src="assets/thumbs/ex2interface.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/pvl1.pvl">
+          <brief>pvl1.pvl</brief>
+          <description>
+            This is the file used in the input parameter FROM. It will be compared with pvl2.pvl.
+          </description>
+          <parameterName>FROM</parameterName>
+        </dataFile>
+        <dataFile path="assets/pvl2.pvl">
+          <brief>pvl2.pvl</brief>
+          <description>
+            This is the file used in the input parameter FROM2. It will be compared with pvl1.pvl.
+          </description>
+          <parameterName>FROM2</parameterName>
+        </dataFile>
+        <dataFile path="assets/tolerance.pvl">
+          <brief>tolerance.pvl</brief>
+          <description>
+            This is the file used in the input parameter DIFF. It specifies the tolerance for the two files.
+          </description>
+          <parameterName>DIFF</parameterName>
+        </dataFile>
+      </dataFiles>
+      <outputImages>
+        <image width="511" height="93" src="assets/images/ex2output.jpg">
+          <brief>The results from comparing pvl1.pvl and pvl2.pvl</brief>
+          <description>
+            This is the output after running this program on pvl1.pvl and pvl2.pvl. The input pvl files differed, 
+            but not more than specified by the tolerance so the results came back identicle.
+          </description>
+          <thumbnail width="200" height="36" caption="Results" src="assets/thumbs/ex2output.jpg" />
+        </image>
+      </outputImages>
+    </example>
+  </examples-->
+</application>

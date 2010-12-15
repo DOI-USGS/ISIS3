@@ -8,7 +8,7 @@ commands:
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
 	match=$(INPUT)/pts.mat \
 	list3=$(OUTPUT)/cub3.lis \
-	cnet=$(OUTPUT)/mat2cnetTruth1.pvl \
+	cnet=$(OUTPUT)/mat2cnetTruth1.net \
 	description="Default Test Network" \
 	networkid=TestNet01 \
 	target=Titan > /dev/null;

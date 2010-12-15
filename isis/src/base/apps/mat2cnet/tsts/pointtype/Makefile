@@ -10,7 +10,7 @@ commands:
     inputppp=true \
 	ppp=$(INPUT)/rand.ppp \
 	list3=$(OUTPUT)/cub3.lis \
-	cnet=$(OUTPUT)/mat2cnetTruth3.pvl \
+	cnet=$(OUTPUT)/mat2cnetTruth3.net \
 	pointtype=Tie \
 	description="PointTypeTie Test Network" \
 	networkid=TestNet03 \

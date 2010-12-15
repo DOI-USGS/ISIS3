@@ -10,7 +10,7 @@ commands:
 	inputppp=true \
 	ppp=$(INPUT)/rand.ppp \
 	list3=$(OUTPUT)/cub3.lis \
-	cnet=$(OUTPUT)/mat2cnetTruth2.pvl \
+	cnet=$(OUTPUT)/mat2cnetTruth2.net \
 	description="Rand Test Network - Default Ground Point Type" \
 	networkid=TestNet02 \
 	target=Titan \

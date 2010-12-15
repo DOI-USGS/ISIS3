@@ -81,6 +81,9 @@ namespace Isis {
    *            shift
    *   @history 2010-06-14 Jeannie Walldren - Capitalized getTransform and
    *            setTransform to match changes in Chip class
+   *   @history 2010-10-07 Travis Addair - Now returns "SuccessSubPixel" on
+   *            success given that Gruen inherently computes to sub-pixel
+   *            accuracy.
    */
   class Gruen : public AutoReg {
     public:

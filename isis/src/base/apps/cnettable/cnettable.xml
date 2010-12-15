@@ -22,6 +22,8 @@
             <LI>UniversalLatitude</LI>
             <LI>UniversalLongitude</LI>
             <LI>Radius</LI>
+
+
             <LI>Filename</LI>
             <LI>Sample</LI>
             <LI>Line</LI>
@@ -158,7 +160,7 @@
         </filter>
       </parameter>
 
-      <parameter name="TO">
+      <parameter name="FLATFILE">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
@@ -177,7 +179,7 @@
         <type>boolean</type> 
         <default><item>false</item></default>
         <brief>
-          Append output to "TO" file
+          Append output to "FLATFILE" file
         </brief>
         <description>
           If checked this option allows file output to be appended to a file or
@@ -236,7 +238,7 @@
 
       <terminalInterface>
         <commandLine>
-          fromlist=cubeList.lst cnet=testNet.net to=output.csv
+          fromlist=cubeList.lst cnet=testNet.net flatfile=output.csv
         </commandLine>
         <description>
           These arguments will produce a flatfile containing infomation on all 

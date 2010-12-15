@@ -1,7 +1,5 @@
 include $(ISISROOT)/make/isismake.macros
 
-.NOTPARALLEL:
-
 # ISIS DOCS MAKEFILE
 #   Create tables of contents for the Application
 #   documentation and kicks off lower makefiles
@@ -37,7 +35,7 @@ docs: documentation toccat tocoldvnew tocalph categories
 documentation:
 	echo "      Creating Documentation"
 	mkdir -p $(ISISROOT)/doc/Application
-	cd data ; $(MAKE) docs ; cd .. ;
+	cd data ; make docs ; cd .. ;
 
 
 #---------------

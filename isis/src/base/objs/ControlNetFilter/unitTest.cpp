@@ -94,11 +94,11 @@ void IsisMain()
   filterGrp.Clear();
   
   // Filter Points by Goodness of Fit
-  filterGrp = Isis::PvlGroup("Point_GoodnessOfFit");
+  /*filterGrp = Isis::PvlGroup("Point_GoodnessOfFit");
   keyword = Isis::PvlKeyword("LessThan", 5);
   filterGrp += keyword;  
   cnetFilter.PointGoodnessOfFitFilter(filterGrp,  false);
-  filterGrp.Clear();
+  filterGrp.Clear();*/
   
   // Filter Points by Cube names 
   filterGrp = Isis::PvlGroup("Point_CubeNames");
@@ -115,7 +115,7 @@ void IsisMain()
   
   // Cube Filters
   // Filter Cubes by Cube name expression 
-  filterGrp = Isis::PvlGroup("Point_GoodnessOfFit");
+  filterGrp = Isis::PvlGroup("Cube_NameExpression");
   keyword = Isis::PvlKeyword("Expression", "Clementine1/UVVIS/1994-04*");
   filterGrp += keyword;  
   cnetFilter.CubeNameExpressionFilter(filterGrp,  false);

@@ -8,6 +8,7 @@
 #include "PolynomialBivariate.h"
 #include "UserInterface.h"
 #include "ControlNet.h"
+#include "ControlPoint.h"
 
 using namespace std;
 using namespace Isis;
@@ -18,10 +19,10 @@ void IsisMain() {
 
   // Get the control point file
   UserInterface &ui = Application::GetUserInterface();
-  string cfile = ui.GetFilename("CONTROL");
+  string cfile = ui.GetFilename("CNET");
   ControlNet cn(cfile);
 
-  vector<double> inputLine, inputSample, outputLine, outputSample;
+  std::vector<double> inputLine, inputSample, outputLine, outputSample;
   for(int i = 0; i < cn.Size(); i++) {
     ControlPoint cp = cn[i];
     if(cp.Size() != 2) {

@@ -4,12 +4,19 @@
 #include <iomanip>
 #include <sstream>
 
-#include "Pvl.h"
-#include "TextFile.h"
-#include "FileList.h"
-#include "SerialNumberList.h"
+#include "Application.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "ControlPoint.h"
+#include "FileList.h"
 #include "iException.h"
+#include "iString.h"
+#include "Pvl.h"
+#include "PvlObject.h"
+#include "SerialNumberList.h"
+#include "SpecialPixel.h"
+#include "TextFile.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
@@ -155,23 +162,22 @@ void IsisMain() {
       //Set Class
       string ptClass;
       ControlMeasure::MeasureType mType = currMeas.Type();
-      if(mType == ControlMeasure::Unmeasured) {
-        ptClass = "U   ";
-      }
-      else if(mType == ControlMeasure::ValidatedManual) {
-        ptClass = "M   ";
-      }
-      else if(mType == ControlMeasure::ValidatedAutomatic) {
-        ptClass = "S   ";
-      }
-      else {
-        ptClass = "M   "; //! U was causing qmatch "havoc"
-      }
-      if(currMeas.IsReference()) {
-        ptClass = "T   ";
-      }
+
       if(currMeas.Ignore() || cnet[i].Ignore()) {
-        ptClass = "U   ";
+        ptClass = "U   "; //Unmeasured
+      }
+      else if(mType == ControlMeasure::Reference) {
+        ptClass = "T   "; //Truth
+      }
+      else if(mType == ControlMeasure::RegisteredSubPixel) {
+        ptClass = "S   "; //SubPixel
+      }
+      else if(mType == ControlMeasure::RegisteredPixel 
+              || mType == ControlMeasure::Manual) {
+        ptClass = "M   "; //Measured
+      }
+      else{ // if(mType == ControlMeasure::Candidate) {
+        ptClass = "A   "; //Approximate
       }
       textLine += ptClass;
 

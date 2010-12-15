@@ -171,8 +171,8 @@ namespace Isis {
   void BundleAdjust::CheckHeldList() {
     for(int ih = 0; ih < p_heldsnlist->Size(); ih++) {
       if(!(p_snlist->HasSerialNumber(p_heldsnlist->SerialNumber(ih)))) {
-        std::string msg = "Held image [" + p_heldsnlist->SerialNumber(ih)
-                          + "not in FROMLIST";
+        std::string msg = "Held image [" + p_heldsnlist->SerialNumber(ih) +
+            " not in FROMLIST";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
@@ -205,9 +205,10 @@ namespace Isis {
             rad = cam->LocalRadius(); //meters
           }
           else {
-            std::string msg = "Cannot compute lat/lon for control point [" +
-                              pt.Id() + "], measure [" + m.CubeSerialNumber() + "]";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
+            QString msg = "Cannot compute lat/lon for control point [" +
+                pt.Id() + "], measure [" + m.CubeSerialNumber() + "]";
+            throw iException::Message(iException::User, msg.toStdString(),
+                _FILEINFO_);
           }
           pt.SetUniversalGround(lat, lon, rad);
           pt.SetHeld(true);
@@ -600,9 +601,10 @@ namespace Isis {
       // Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
       if(!(cam->GroundMap()->GetXY(point.UniversalLatitude(), point.UniversalLongitude(),
                                    point.Radius(), &cudx, &cudy))) {
-        std::string msg = "Unable to map apriori surface point for measure ";
-        msg += iString(i) + " on point " + point.Id() + " into focal plane";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        QString msg = "Unable to map apriori surface point for measure " +
+            QString::number(i) + " on point " + point.Id() + " into focal plane";
+        throw iException::Message(iException::User, msg.toStdString(),
+            _FILEINFO_);
       }
 
       // Create the known array to put in the least squares
@@ -620,7 +622,7 @@ namespace Isis {
           useImage = true;
       }
       if(useImage) {
-        int index = p_snlist->SerialNumberIndex(point[i].CubeSerialNumber());
+        int index = p_snlist->SerialNumberIndex(point[i].CubeSerialNumber().toStdString());
         index = ImageIndex(index);
 
         if(p_spacecraftPositionSolveType != Nothing) {

@@ -2,23 +2,31 @@
 #define QnetNewMeasureDialog_h
 
 #include <QDialog>
+#include <QVector>
 
 class QListWidget;
 class QPushButton;
+class QString;
 class QStringList;
 
 namespace Isis {
   class ControlPoint;
 }
 
+
 namespace Qisis {
   /**
-   *
-   * @internal
+   * 
+   * @internal 
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
-   *                          to null in constructor.  Removed "std::"
+   *                          to null in constructor.  Removed "std::" 
    *                          since "using namespace std" in
    *                          header and .cpp files.
+   *   @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
+   *                          by changes made to the ControlNet,ControlPoint,
+   *                          ControlMeasure header files.  Changed vector of
+   *                          std::strings to a QStringList.
+   *                          
    *   @history 2010-12-02 Eric Hyer - Removed "using namespace std" from
    *       header file!!!  Also removed non-parent includes.  Eliminated
    *       the p_pointFiles variable.  SetFiles now puts Selected items on top.

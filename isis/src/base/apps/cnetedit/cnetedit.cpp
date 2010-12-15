@@ -2,9 +2,12 @@
 
 #include "Isis.h"
 
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetValidMeasure.h"
+#include "ControlPoint.h"
 #include "ControlPointList.h"
+#include "Cube.h"
 #include "iException.h"
 #include "Progress.h"
 #include "SerialNumberList.h"

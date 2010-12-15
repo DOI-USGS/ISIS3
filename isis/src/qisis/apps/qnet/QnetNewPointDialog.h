@@ -22,15 +22,17 @@ namespace Qisis {
    *   @history 2010-12-03 Eric Hyer - Selected points now go to the top!
    */
   class QnetNewPointDialog : public QDialog {
-  
+
       Q_OBJECT
 
     public:
       static QString lastPtIdValue;
 
-      QnetNewPointDialog(QWidget *parent = 0);
+      QnetNewPointDialog (QWidget *parent=0);
 
       QLineEdit *ptIdValue;
+
+
       void SetFiles(QStringList pointFiles);
 
       QListWidget *fileList;
@@ -39,6 +41,8 @@ namespace Qisis {
 
       QLabel *p_ptIdLabel;
       QPushButton *p_okButton;
+
+      QStringList *p_pointFiles;
 
     private slots:
       void enableOkButton(const QString &text);

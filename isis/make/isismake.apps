@@ -4,25 +4,23 @@ error:
 	echo "This can be found at $$ISISROOT/make/Makefile.apps";
 endif
 
-
 INCS  := $(wildcard *.h)
 
 # Figure out Qt Q_OBJECTS
 
 # QT - get all header files with 'Q_OBJECT' Output: '%.h: QOBJECT'
 ifneq ($(INCS), $(BLANK))
-  QOBJ  := $(shell grep -HI -m1 'Q_OBJECT' $(INCS))
+	QOBJ  := $(shell grep -HI -m1 'Q_OBJECT' $(INCS))
 
-  # filter out 'Q_OBJECT' from '%.h: QOBJECT'
-  QCOLN := $(filter-out Q_OBJECT, $(QOBJ))
+	# filter out 'Q_OBJECT' from '%.h: QOBJECT'
+	QCOLN := $(filter-out Q_OBJECT, $(QOBJ))
 
-  # filter out ':' from '%.h:'
-  QINC  := $(subst  :, , $(QCOLN))
+	# filter out ':' from '%.h:'
+	QINC  := $(subst  :, , $(QCOLN))
 endif
 
 # Get CPPs that dont include intermediate files or the unit test (if object)
-CPPS  := $(wildcard *.cpp *.cc) # List of all compilable extensions!
-CPPS  := $(filter-out moc_%.cpp,    $(CPPS))
+CPPS  := $(filter-out moc_%.cpp, $(wildcard *.cpp *.cc))
 CPPS  := $(filter-out unitTest.cpp, $(CPPS))
 
 # Handle Qt resource files (qrc)
@@ -60,8 +58,6 @@ PROTOS       = $(wildcard *.proto)
 PROTOSGEN    = $(wildcard *.pb.*)
 PROTOSOBJ    = $(wildcard *.pb.o)
 
-#TODO: This is obsolete. We need to not require these any more.
-#  These cause targets such as .cpp.o to work properly.
 .SUFFIXES:
 .SUFFIXES: .cpp .o
 .SUFFIXES: .c .o

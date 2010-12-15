@@ -4,12 +4,12 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	cp $(INPUT)/appendTo.txt $(OUTPUT); \
-	find $(INPUT)/*.cub > $(OUTPUT)/cubeList.lst; \
-	$(APPNAME) fromlist=$(OUTPUT)/cubeList.lst \
+	find $(INPUT)/*.cub > $(INPUT)/cubeList.lst; \
+	$(APPNAME) fromlist=$(INPUT)/cubeList.lst \
 	cnet=$(INPUT)/testNet.net \
-	to=$(OUTPUT)/appendTo.txt \
+	flatfile=$(OUTPUT)/appendTo.txt \
 	  append=true > /dev/null; 
-	rm -f $(OUTPUT)/cubeList.lst > /dev/null;
+	rm -f $(INPUT)/cubeList.lst > /dev/null;
 	cat $(OUTPUT)/appendTo.txt | sed s/,\[^,]\*\.cub,/,file.cub,/ \
 	  | sed 's/\([0-9][0-9]*\.[0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/output.txt

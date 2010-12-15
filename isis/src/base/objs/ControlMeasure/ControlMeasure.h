@@ -2,8 +2,8 @@
 #define ControlMeasure_h
 /**
  * @file
- * $Revision: 1.11 $
- * $Date: 2010/06/10 23:56:44 $
+ * $Revision: 1.6 $
+ * $Date: 2009/09/01 17:53:05 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -23,15 +23,16 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 
 template< class A> class QVector;
-class QString;
+template< class A> class QList;
+class QStringList;
 
 namespace Isis {
-
-  class PvlGroup;
+  class Application;
   class Camera;
+  class iString;
+  class PvlGroup;
 
   /**
    * @brief a control measurement
@@ -46,30 +47,88 @@ namespace Isis {
    * @see ControlPoint ControlNet
    *
    * @internal
-   *   @history 2005-07-29 Jeff Anderson - Original version
-   *   @history 2006-01-11 Jacob Danton Added a Reference flag and updated unitTest
-   *   @history 2006-10-05 Brendan George Modified call to retrieve current time to
-   *                                    use iTime class, instead of Application class
-   *   @history 2008-06-23 Steven Lambright - The ZScore keyword is now supported
-   *   @history 2008-06-25 Steven Koechle - Added get methods for ZScore values.
-   *   @history 2009-09-01 Eric Hyer - Added the methods GetMeasureData and
-   *                                   GetMeasureDataNames.  Also fixed include
-   *                                   issues.
-   *   @history 2009-09-22 Eric Hyer - Removed forward declaration for QPair
-   *   @history 2009-10-30 Eric Hyer - GetMeasurDataNames is now static
-   *   @history 2010-10-04 Sharmila Prasad - Add PrintableMeasureType method to return
-   *                                         String Measure Type
+   *   @history 2005-07-29 Jeff Anderson Original version
+   *   @history 2006-01-11 Jacob Danton Added a Reference flag and updated
+   *                              unitTest
+   *   @history 2006-10-05 Brendan George Modified call to retrieve current time
+   *                              to use iTime class, instead of Application
+   *                              class
+   *   @history 2008-06-23 Steven Lambright The ZScore keyword is now supported
+   *   @history 2008-06-25 Steven Koechle Added get methods for ZScore values.
+   *   @history 2009-09-01 Eric Hyer Added the methods GetMeasureData and
+   *                              GetMeasureDataNames.  Also fixed include
+   *                              issues.
+   *   @history 2009-09-22 Eric Hyer Removed forward declaration for QPair
+   *   @history 2009-10-30 Eric Hyer GetMeasurDataNames is now static
+   *   @history 2009-12-31 Tracie Sucharski Added new parameters for jigsaw.
+   *   @history 2010-04-29 Tracie Sucharski Renamed AutomaticPixel to
+   *                              Registered Pixel and AutomaticSubPixel to
+   *                              RegisteredSubPixel.
+   *   @history 2010-05-06 Tracie Sucharski Use defaults of 0. instead of
+   *                              Isis::Null, because 0. is the default in the
+   *                              protocol buffers.
+   *   @history 2010-06-03 Tracie Sucharski Move SetReference to ControlPoint,
+   *                              so error checking to make sure only a single
+   *                              measure be set to Reference.
+   *   @history 2010-06-17 Tracie Sucharski Added Lock value to MeasureStatus.
+   *   @history 2010-07-21 Tracie Sucharski Remove SetReference IsReference
+   *                              methods.  Reference is no longer a separate
+   *                              keyword, but a possible MeasureType.  Use
+   *                              either the ControlMeasure::Type() method or
+   *                              ControlPoint::HasReference, ReferenceIndex
+   *                              to determine the reference measure.
+   *   @history 2010-07-27 Tracie Sucharski Updated for changes made after
+   *                              additional working sessions for Control
+   *                              network design.
+   *   @history 2010-08-26 Tracie Sucharski No longer writing
+   *                              ResidualMagnitude, will be calculated as
+   *                              needed.
+   *   @history 2010-10-04 Sharmila Prasad Add PrintableMeasureType method to
+   *                              return String Measure Type
+   *   @history 2010-10-05 Eric Hyer No more includes in header file!
+   *                              serial number is now a QString.
+   *   @history 2010-10-18 Tracie Sucharski Change "Setters", ComputeApriori
+   *                              and ComputeResiduals to return either Success
+   *                              or PointLocked.  If the point is locked do not
+   *                              set values.
+   *   @history 2010-10-19 Tracie Sucharski Set the DateTime to Null if
+   *                              anything in measure chanes, the date will be
+   *                              updated at write time.
+   *   @history 2010-10-22 Steven Lambright Moved all implementations to the
+   *                              cpp file to shorten the header. Reordered
+   *                              methods. Improved consistency as far as the
+   *                              types of parameters passed in - some took
+   *                              'double' and some 'const double &' depending
+   *                              on the original programmer. Now all take
+   *                              'double' for the cleaner syntax and hopefully
+   *                              the overhead is negligable.
+   *   @history 2010-10-26 Steven Lambright Change default chooser name from
+   *                              user name to application name.
+   *   @history 2010-11-03 Mackenzie Boyd Modified MeasureType to string
+   *                              method, added static version. Added
+   *                              method PrintableClassData.
+   *   @history 2010-11-16 Debbie Cook, Added jigsawRejected keyword. 
+   *   @history 2010-11-29 Tracie Sucharski, Constructor still had initializations
+   *                              in addition to the same intiializers in the
+   *                              method InitializeToNull.  Also, values were
+   *                              being intialized to 0. instead of Isis::Null.
+   *                              Not sure how this happened other than a mistake
+   *                              in svn mergina?  This was causing keywords
+   *                              with a value of 0. to be written to the output
+   *                              network.  Remove all methods relating to
+   *                              Ephemeris Time-they are not used anywhere in
+   *                              Isis.
+   *   @history 2010-12-08 Tracie Sucharski, Added a new measure type of Ground.
+   *                              This was done to help qnet functionality, but
+   *                              may be used for other functionality in the
+   *                              future.  Added IsGround for convenience.
    */
   class ControlMeasure {
     public:
       /**
        * @brief Control network measurement types
        *
-       * Unmeasured implies the coordinate (sample, line) has not been
-       * identified and therefore should not be used.  An error will be
-       * thrown if the programmer attempts to acquire a coordinate for
-       * an unmeasured measurement
-       *
+       * OLD VERSION:
        * Manual implies the coordinate was selected by a human
        * but still may be in error.  It is subject to refinement by other
        * computer programs.
@@ -78,9 +137,9 @@ namespace Isis {
        * but has not been sub-pixel registered and is more than likely in
        * error.  It is subject to refinement by other computer programs
        *
-       * Automatic implies the coordinate was selected by a computer program
-       * and met registration criteria (but still may be in error).  It is
-       * subject to refinement by other computer programs
+       * AutomaticPixel implies the coordinate was selected by a computer
+       * program and met registration criteria (but still may be in error). It
+       * is subject to refinement by other computer programs.
        *
        * ValidatedManual implies the coordinate was manually selected by a
        * human, was validated by a human, and should not be changed by
@@ -91,300 +150,165 @@ namespace Isis {
        * be changed by any automated means.
        *
        */
-      enum MeasureType { Unmeasured, Manual, Estimated, Automatic,
-                         ValidatedManual, ValidatedAutomatic
-                       };
+      enum MeasureType {
+        //! // Reference Measure 
+        Reference,
+        //! (e.g., autoseed, interest) AKA predicted, unmeasured, unverified
+        Candidate,
+        //! Hand Measured (e.g., qnet)
+        Manual,
+        //! Registered to whole pixel (e.g.,pointreg)
+        RegisteredPixel, 
+        //! Registered to sub-pixel (e.g., pointreg)
+        RegisteredSubPixel,
+        //! Coordinate in ground source
+        Ground
+      };
 
-      // Constructor
+      enum Status {
+        Success,
+        MeasureLocked
+      };
+
+      /*enum MeasureData {
+        AprioriLine,
+        AprioriSample,
+        ChooserName,
+        ComputerEphemerisTime,
+        CubeSerialNumber,
+        DateTime,
+        Diameter,
+        EditLock,
+        FocalPlaneComputedX,
+        FocalPlaneComputedY,
+        FocalPlaneMeasuredX,
+        FocalPlaneMeasuredY,
+        Ignore,
+        IsMeasured,
+        IsRegistered,
+        Line,
+        LineResidual,
+        LineSigma,
+        MeasuredEphemerisTime,
+        ResidualMagnitude,
+        Sample,
+        SampleResidual,
+        SampleSigma,
+        Type,
+        NumMeasureDataFields
+      };*/
+
       ControlMeasure();
-
-      //! Destroy a control point measurement
-      ~ControlMeasure() {};
+      ControlMeasure(const ControlMeasure & other);
+      ~ControlMeasure();
 
       void Load(PvlGroup &p);
+
+      Status SetAprioriLine  (double aprioriLine);
+      Status SetAprioriSample(double aprioriSample);
+      Status SetCamera (Isis::Camera *camera);
+      Status SetCubeSerialNumber(iString newSerialNumber);
+      Status SetChooserName();
+      Status SetChooserName(iString name);
+      Status SetComputedEphemerisTime(double et);
+      Status SetCoordinate(double sample, double line);
+      Status SetCoordinate(double sample, double line, MeasureType type);
+      Status SetDateTime();
+      Status SetDateTime(iString datetime);
+      Status SetDiameter(double diameter);
+      Status SetEditLock(bool editLock);
+      Status SetRejected(bool rejected);
+      Status SetFocalPlaneMeasured(double x, double y);
+      Status SetFocalPlaneComputed(double x, double y);
+      Status SetIgnore(bool ignore);
+      Status SetLineSigma(double lineSigma);
+      Status SetMeasuredEphemerisTime(double et);
+      Status SetResidual(double sampResidual, double lineResidual);
+      Status SetSampleSigma(double sampleSigma);
+      Status SetType(MeasureType type);
+
+      double AprioriLine() const;
+      double AprioriSample() const;
+      Isis::Camera *Camera() const;
+      iString ChooserName() const;
+      double ComputedEphemerisTime() const;
+      iString CubeSerialNumber() const;
+      iString DateTime() const;
+      double Diameter() const;
+      bool EditLock() const;
+      bool IsRejected() const;
+      double FocalPlaneComputedX() const;
+      double FocalPlaneComputedY() const;
+      double FocalPlaneMeasuredX() const;
+      double FocalPlaneMeasuredY() const;
+      bool Ignore() const;
+      bool IsMeasured () const;
+      bool IsRegistered () const;
+      bool IsGround () const;
+      //static bool IsStatisticallyRelevant(MeasureData) const;
+      double Line() const;
+      double LineResidual() const;
+      double LineSigma() const;
+      double MeasuredEphemerisTime() const;
+      double ResidualMagnitude() const;
+      double Sample() const;
+      double SampleResidual() const;
+      double SampleSigma() const;
+      MeasureType Type () const;
+
+      double GetMeasureData(iString data) const;
+      static QVector<iString> GetMeasureDataNames();
+
+      QList<QStringList> PrintableClassData() const;       
+
       PvlGroup CreatePvlGroup();
+      static iString MeasureTypeToString(MeasureType type);
+      iString MeasureTypeString() const;
 
-      /**
-       * @brief Set the coordinate of the measurement
-       *
-       * @param sample  Sample coordinate of the measurement
-       * @param line    Line coordinate of the measurement
-       */
-      void SetCoordinate(const double &sample, const double &line) {
-        p_sample = sample;
-        p_line = line;
-      };
-
-      /**
-       * @brief Set the coordinate of the measurement
-       *
-       * @param sample  Sample coordinate of the measurement
-       * @param line    Line coordinate of the measurement
-       * @param type    The type of the coordinate
-       */
-      void SetCoordinate(const double &sample, const double &line,
-                         const MeasureType &type) {
-        p_sample = sample;
-        p_line = line;
-        SetType(type);
-      };
-
-      //! Return the sample coordinate of the measurement
-      double Sample() const {
-        return p_sample;
-      };
-
-      //! Return the line coordinate of the measurement
-      double Line() const {
-        return p_line;
-      };
-
-      /**
-       * @brief Set the error of the coordinate
-       *
-       * @param serror  Sample error
-       * @param lerror  Line error
-       */
-      void SetError(const double &serror, const double &lerror) {
-        p_sampleError = serror;
-        p_lineError = lerror;
-      };
-
-      /**
-       * @brief Sets the Z Scores of the coordinate
-       *
-       * @param zScoreMin Z Score of Minimum DN
-       * @param zScoreMin Z Score of Maximum DN
-       */
-      void SetZScores(const double &zScoreMin, const double &zScoreMax) {
-        p_zScoreMin = zScoreMin;
-        p_zScoreMax = zScoreMax;
-      }
-
-      /**
-       * @brief Returns the minimum zScore
-       * @return the minimum zScore
-       */
-      double GetZScoreMin() const {
-        return p_zScoreMin;
-      };
-
-      /**
-       * @brief Returns the maximum zScore
-       * @return the maximum zScore
-       */
-      double GetZScoreMax() const {
-        return p_zScoreMax;
-      };
-
-      //! Return error the sample coordinate of the measurement
-      double SampleError() const {
-        return p_sampleError;
-      };
-
-      //! Return error the line coordinate of the measurement
-      double LineError() const {
-        return p_lineError;
-      };
-
-      double ErrorMagnitude() const;
-
-      //! Set how the coordinate was obtained
-      void SetType(const MeasureType &type) {
-        p_measureType = type;
-      };
-
-      //! Return the type of the measurment
-      MeasureType Type() const {
-        return p_measureType;
-      };
-
-      //! Has the measurement be measured??
-      bool IsMeasured() const {
-        return p_measureType != Unmeasured;
-      };
-
-      //! Has the measurement be validated by a human?
-      bool IsValidated() const {
-        return (p_measureType == ValidatedManual) ||
-               (p_measureType == ValidatedAutomatic);
-      };
-
-      //! Set if a reference measurement
-      void SetReference(bool value) {
-        p_isReference = value;
-      };
-
-      //! Is the measurement a reference?
-      bool IsReference() const {
-        return (p_isReference && IsMeasured());
-      };
-
-      /**
-       * @brief Set cube serial number
-       *
-       * This method is used to set the serial number of the cube.  That is,
-       * the coordinate was selected from a cube with this unique serial
-       * number
-       *
-       * @param sn  Serial number of the cube where the coordinate was
-       *            selected
-       */
-      void SetCubeSerialNumber(const std::string &sn) {
-        p_serialNumber = sn;
-      };
-
-      //! Return the serial number of the cube containing the coordinate
-      std::string CubeSerialNumber() const {
-        return p_serialNumber;
-      };
-
-      /**
-       * @brief Set the crater diameter at the coordinate
-       *
-       * This method sets the crater diameter at the coordinate.  If
-       * left unset a diameter of 0 is assumed which implies no crater
-       *
-       * @param diameter  The diameter of the crater in pixels
-       */
-      void SetDiameter(double diameter) {
-        p_diameter = diameter;
-      };
-
-      //! Return the diameter of the crater in pixels (0 implies no crater)
-      double Diameter() const {
-        return p_diameter;
-      };
-
-      void SetDateTime();
-
-      //! Set date/time the coordinate was last changed to specified date/time
-      void SetDateTime(const std::string &datetime) {
-        p_dateTime = datetime;
-      };
-
-      //! Return the date/time the coordinate was last changed
-      std::string DateTime() const {
-        return p_dateTime;
-      };
-
-      void SetChooserName();
-
-      //! Set the chooser name to an application that last changed the coordinate
-      void SetChooserName(const std::string &name) {
-        p_chooserName = name;
-      };
-
-      //! Return the chooser name
-      std::string ChooserName() const {
-        return p_chooserName;
-      };
-
-      //! Set up to ignore this measurement
-      void SetIgnore(bool ignore) {
-        p_ignore = ignore;
-      };
-
-      //! Return if this measurement should be ignored
-      bool Ignore() const {
-        return p_ignore;
-      };
-
-      //! Set the Goodness of Fit variable
-      void SetGoodnessOfFit(const double fit) {
-        p_goodnessOfFit = fit;
-      };
-
-      //! Return the Goodnes of Fit
-      double GoodnessOfFit() const {
-        return p_goodnessOfFit;
-      };
-
-      //! Set the camera for this measure
-      void SetCamera(Isis::Camera *camera) {
-        p_camera = camera;
-      };
-
-      //! Return the camera associated with this measure
-      Isis::Camera *Camera() const {
-        return p_camera;
-      };
-
-      void SetFocalPlaneMeasured(double x, double y);
-
-      //! Return the measured focal plane x
-      double FocalPlaneMeasuredX() const {
-        return p_focalPlaneMeasuredX;
-      };
-
-      //! Return the measured focal plane y
-      double FocalPlaneMeasuredY() const {
-        return p_focalPlaneMeasuredY;
-      };
-
-      void SetFocalPlaneComputed(double x, double y);
-
-      //! Return the computed focal plane x
-      double FocalPlaneComputedX() const {
-        return p_focalPlaneComputedX;
-      };
-
-      //! Return the computed focal plane y
-      double FocalPlaneComputedY() const {
-        return p_focalPlaneComputedY;
-      };
-
-      //! Set the measured ephemeris time of the measure
-      void SetMeasuredEphemerisTime(double et) {
-        p_measuredEphemerisTime = et;
-      };
-
-      //! Get the measured ephemeris time of the measure
-      double MeasuredEphemerisTime() const {
-        return p_measuredEphemerisTime;
-      };
-
-      //! Set the computed ephemeris time of the measure
-      void SetComputedEphemerisTime(double et) {
-        p_computedEphemerisTime = et;
-      };
-
-      //! Get the computed ephemeris time of the measure
-      double ComputedEphemerisTime() const {
-        return p_computedEphemerisTime;
-      };
-
-      const double GetMeasureData(QString type) const;
-      static const QVector< QString > GetMeasureDataNames();
-
-      bool operator == (const Isis::ControlMeasure &pMeasure) const;
+      const ControlMeasure & operator=(const ControlMeasure & other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
-      
-      std::string PrintableMeasureType(void);
+      bool operator == (const Isis::ControlMeasure &pMeasure) const;
 
-    private:
+    private: // methods
+      void InitializeToNull();
+      void MeasureModified();
+
+    private: // data
+      iString *p_serialNumber;
       MeasureType p_measureType;
-      std::string p_serialNumber;
-      double p_line;
-      double p_sample;
-      double p_diameter;
-      std::string p_dateTime;
-      std::string p_chooserName;
+
+      /**
+       * list the program used and the definition file or include the user
+       * name for qnet
+       */
+      iString *p_chooserName;
+      iString *p_dateTime;
+      bool p_editLock;        //!< If true do not edit anything in measure. 
       bool p_ignore;
-      bool p_isReference;
-      double p_sampleError;
-      double p_lineError;
-      double p_zScoreMin;
-      double p_zScoreMax;
-      double p_goodnessOfFit;
+      bool p_jigsawRejected;  //!< Status of measure for last bundle adjust iteration
+      double p_sample;        //!< Current sample/line measurement
+      double p_line;          //!< Jigsaw uses this measure
+      double p_diameter;
+
+      double p_aprioriSample;   //!< The first identified location of the 
+      double p_aprioriLine;     //!< measure by autoseed.  Pointreg/Interest
+                                //!< always use this location to start it's search.
+                                //!< Could be moved by interest program or user.
+
+
+      double p_computedEphemerisTime;
+
+      double p_sampleSigma;    //!< Uncertainty/sigma in pixels of the measurement (current sample/line)
+      double p_lineSigma;      //!< Not sure how we determine this for automated or manual picking
+      double p_sampleResidual; //!< Jigsaw information - Solution error - replaces p_sampleError
+      double p_lineResidual;   //!< Jigsaw information - Solution error - replaces p_lineError
       Isis::Camera *p_camera;
-      double p_focalPlaneMeasuredX;
+      double p_focalPlaneMeasuredX; 
       double p_focalPlaneMeasuredY;
       double p_focalPlaneComputedX;
       double p_focalPlaneComputedY;
       double p_measuredEphemerisTime;
-      double p_computedEphemerisTime;
   };
-};
+}
 
 #endif

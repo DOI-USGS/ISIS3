@@ -13,9 +13,11 @@ int main(int argc, char *argv[]) {
     snl.Add("$mgs/testData/ab102401.cub");
     snl.Add("$mgs/testData/m0402852.cub");
     snl.Add("$lo/testData/3133_h1.cub");
+    // Test adding level 2 using filename
+    snl.Add("$mgs/testData/ab102402.lev2.cub",true);
 
     cout << "size   = " << snl.Size() << endl;
-    cout << "hasXYZ = " << snl.HasSerialNumber("XYZ") << endl;
+    cout << "hasXYZ = " << snl.HasSerialNumber(QString("XYZ")) << endl;
 
     for(int i = 0; i < snl.Size(); i++) {
       cout << snl.Filename(i) << " = " << snl.SerialNumber(i) << endl;

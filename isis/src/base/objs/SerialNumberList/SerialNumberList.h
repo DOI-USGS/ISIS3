@@ -28,6 +28,10 @@
 #include <vector>
 #include "Progress.h"
 
+
+class QString;
+
+
 namespace Isis {
   /**
    * @brief Serial Number list generator
@@ -73,17 +77,23 @@ namespace Isis {
    *   @history 2009-11-05 Jeannie Walldren - Modified number
    *                          of maximum steps for Progress flag
    *                          in Constructor
-   *  @history 2010-09-09 Sharmila Prasad - Added API to delete serial# off of the list given Serial #
+   *  @history 2010-09-09 Sharmila Prasad - Added API to delete serial# off of
+   *                          the list given Serial #
+   *  @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter
+   *                          to the Add method. This will allow level 2 images
+   *                          to be added to a serial number list.
    */
 
   class SerialNumberList {
     public:
       SerialNumberList(bool checkTarget = true);
-      SerialNumberList(const std::string &list, bool checkTarget = true, Progress *progress = NULL);
+      SerialNumberList(const std::string &list, bool checkTarget = true,
+                       Progress *progress = NULL);
       virtual ~SerialNumberList();
 
-      void Add(const std::string &filename);
+      void Add(const std::string &filename, bool def2filename = false);
       bool HasSerialNumber(const std::string &sn);
+      bool HasSerialNumber(QString sn);
       
       //!< Delete a serial number off of the list
       void Delete(const std::string &sn);

@@ -60,6 +60,10 @@
  *   @history 2009-12-14 Debbie A. Cook Updated SpicePosition enumerated partial type constants
  *   @history 2010-03-19 Debbie A. Cook Moved partials to GroundMap classes to support Radar sensors and modified
  *                          argument list for GroundMap method ComputeXY since it now returns cudx and cudy
+ *   @history 2010-10-05 Eric Hyer - ControlMeasure's CubeSerialNumber now
+ *                          returns QString.  ControlPoint Ids are also now
+ *                          returned as QStrings. Fixed breakages caused by
+ *                          these changes.
  */
 
 #include "ControlNet.h"

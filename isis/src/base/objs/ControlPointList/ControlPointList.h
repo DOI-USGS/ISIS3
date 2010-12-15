@@ -25,11 +25,13 @@
 
 #include <string>
 #include <vector>
-#include <QList>
 #include <QStringList>
+
 #include "Pvl.h"
 
 namespace Isis {
+  class Filename;
+
   /**
    * @brief Control Point List  generator
    *
@@ -42,12 +44,13 @@ namespace Isis {
    *
    * @internal
    *
-   * @history 2009-08-11 Sharmila Prasad Original Version
+   *   @history 2009-08-11 Sharmila Prasad Original Version
+   *   @history 2009-10-04 Steven Lambright Constructor now takes a Filename
+   *     instead of a string.
    */
-
   class ControlPointList {
     public:
-      ControlPointList(const std::string &psFileName);
+      ControlPointList(const Filename &psFileName);
       virtual ~ControlPointList();
 
       std::string ControlPointId(int piIndex);
@@ -61,8 +64,10 @@ namespace Isis {
 
     private:
       QStringList mqCpList;
-      std::vector<bool> mbFound;	 // holds one to one correspondence with "mqCpList" on
-      // whether the point was valid
+
+      //! holds one to one correspondence with "mqCpList" on
+      //! whether the point was valid
+      std::vector<bool> mbFound; 
   };
 };
 

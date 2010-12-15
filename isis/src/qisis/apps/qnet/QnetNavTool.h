@@ -96,16 +96,18 @@ namespace Qisis {
    *                          Replaced #includes with forward class declarations
    *                          and moved #include to .cpp file.
    *   @history 2010-07-12 Jeannie Walldren - Fixed documentation.
+   *   @history 2010-11-01 Tracie Sucharski - Changed updateEditPoint parameter
+   *                          from std::string to QString.
    *   @history 2010-11-04 Tracie Sucharski - Added overloaded load slot for
    *                          double-clicking on the cube list.
-   *
-   *
+   *  
+   *  
    */
   class QnetNavTool : public Tool {
-      Q_OBJECT
+    Q_OBJECT
 
     public:
-      QnetNavTool(QWidget *parent);
+      QnetNavTool (QWidget *parent);
 
       enum FilterIndex {
         Points,
@@ -132,7 +134,7 @@ namespace Qisis {
     public slots:
       void resetList();
       void refreshList();
-      void updateEditPoint(string pointId);
+      void updateEditPoint(QString pointId);
 
     private slots:
       void load();
@@ -149,8 +151,8 @@ namespace Qisis {
       void showNavTool();
 
     signals:
-      void loadPoint(Isis::ControlPoint *);
-      void loadImage(const QString &);
+      void loadPoint (Isis::ControlPoint *);
+      void loadImage (const QString &);
       void modifyPoint(Isis::ControlPoint *);
       void ignoredPoints();
       void deletedPoints();
@@ -174,7 +176,7 @@ namespace Qisis {
       QLabel *p_filterCountLabel;
       int p_filterCount;
 
-      string p_editPointId;
+      QString p_editPointId;
   };
 };
 

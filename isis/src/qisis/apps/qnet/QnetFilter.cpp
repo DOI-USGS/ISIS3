@@ -7,6 +7,6 @@ using namespace Qisis::Qnet;
 
 namespace Qisis {
   // Constructor
-  QnetFilter::QnetFilter(QWidget *parent) : QWidget(parent) {
+  QnetFilter::QnetFilter (QWidget *parent) : QWidget(parent) {
   }
 }

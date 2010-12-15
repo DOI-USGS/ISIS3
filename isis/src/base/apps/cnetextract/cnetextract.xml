@@ -102,6 +102,9 @@
     <change name="Christopher Austin" date="2010-06-30">
       Rewrote documentation and reorganized keywords into groups.
     </change>
+    <change name="Christopher Austin" date="2010-11-08">
+      Fixed for binary cnet conversion.
+    </change>
   </history>
 
   <category>
@@ -224,20 +227,6 @@
         </description>
       </parameter>
 
-      <parameter name="NOHELD">
-        <type>boolean</type>
-        <default><item>False</item></default>
-        <brief>Do not extract held points</brief>
-        <description>
-          <p>When true, all held Control Points in the Control Net will not be
-          included in the output Control Network.</p>
-
-          <p>When PREFIX is used, the file [PREFIX]HeldPoints.txt will be
-          created when using this parameter. It lists the Control Points that
-          were not extracted due to this filter.</p>
-        </description>
-      </parameter>
-
       <parameter name="NOMEASURELESS">
         <type>boolean</type>
         <default><item>False</item></default>
@@ -312,13 +301,13 @@
       <parameter name="TOLERANCE">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract Control Points with line or sample errors greater than PIXELTOLERANCE</brief>
+        <brief>Only extract Control Points with line or sample residual greater than PIXELTOLERANCE</brief>
         <description>
           <p>When true, extract all Control Points which have a line or a
-          sample error greater than or equal to the PIXELTOLERANCE value.</p>
+          sample residual greater than or equal to the PIXELTOLERANCE value.</p>
 
-          <p>The PIXELTOLERANCE is compared to the keywords ErrorLine and
-          ErrorSample.</p>
+          <p>The PIXELTOLERANCE is compared to the keywords LineResidual and
+          SampleResidual.</p>
 
           <p>When PREFIX is used, the file [PREFIX]TolerancePoints.txt will be
           created when using this parameter. Each Control Point it lists was not
@@ -471,7 +460,7 @@
       <parameter name="MINLON">
         <type>double</type>
         <default><item>0.0</item></default>
-        <minimum inclusive="yes">-180.0</minimum>
+        <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">360.0</maximum>
         <brief>Minimum Control Point Longitude</brief>
         <description>
@@ -487,7 +476,7 @@
       <parameter name="MAXLON">
         <type>double</type>
         <default><item>360.0</item></default>
-        <minimum inclusive="yes">-180.0</minimum>
+        <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">360.0</maximum>
         <brief>Maximum Control Point Longitude</brief>
         <description>

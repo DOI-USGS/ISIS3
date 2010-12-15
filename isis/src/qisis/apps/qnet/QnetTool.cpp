@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <QAction>
+
 #include <QBrush>
 #include <QCheckBox>
 #include <QComboBox>
@@ -24,8 +25,8 @@
 #include <QString>
 #include <QWidget>
 
-//#include "AutoReg.h"
-//#include "AutoRegFactory.h"
+#include "Application.h"
+#include "Camera.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "ControlPointEdit.h"
@@ -35,47 +36,35 @@
 #include "MdiCubeViewport.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
+#include "qnet.h"
 #include "QnetDeletePointDialog.h"
-#include "QnetHoldPointDialog.h"
 #include "QnetNewMeasureDialog.h"
 #include "QnetNewPointDialog.h"
 #include "SerialNumber.h"
 #include "ToolPad.h"
+#include "UniversalGroundMap.h"
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
 using namespace Isis;
 using namespace std;
 
-
 namespace Qisis {
+  using namespace Qnet;
   
   const int CHIPVIEWPORT_WIDTH = 310;
 
 
   /**
    * Consructs the Qnet Tool window
-   *
+   * 
    * @param parent Pointer to the parent widget for the Qnet tool
-   * @internal
-   *   @history 2010-06-03 Jeannie Walldren - Initialized pointers to null.
-   *
+   * 
+   * @internal 
+   * @history 2010-06-03 Jeannie Walldren - Initialized pointers to null.
+   * 
    */
-  QnetTool::QnetTool(QWidget *parent) : Qisis::Tool(parent) {
+  QnetTool::QnetTool (QWidget *parent) : Qisis::Tool(parent) {
 
-#if 0
-    p_createPoint = new QAction(parent);
-    p_createPoint->setShortcut(Qt::Key_C);
-    connect(p_createPoint, SIGNAL(triggered()), this, SLOT(createPoint()));
-
-    p_modifyPoint = new QAction(parent);
-    p_modifyPoint->setShortcut(Qt::Key_M);
-//    connect(p_modifyPoint,SIGNAL(triggered()),this,SLOT(modifyPoint()));
-
-    p_deletePoint = new QAction(parent);
-    p_deletePoint->setShortcut(Qt::Key_D);
-    connect(p_deletePoint, SIGNAL(triggered()), this, SLOT(deletePoint()));
-#endif
     p_leftCube = NULL;
     p_rightCube = NULL;
     p_controlPoint = NULL;
@@ -103,12 +92,33 @@ namespace Qisis {
     p_rightCombo = NULL;
     p_leftMeasure = NULL;
     p_rightMeasure = NULL;
-    p_holdPointDialog = NULL;
+    p_pointFiles = NULL;
+    p_leftFile = NULL;
+    
+    p_pointFiles = new QStringList;
+    p_leftFile = new iString;
+    
     
     p_templateModified = false;
     
     createQnetTool(parent);
   }
+  
+  
+  QnetTool::~QnetTool() {
+  
+    if (p_pointFiles) {
+      delete p_pointFiles;
+      p_pointFiles = NULL;
+    }
+    
+    if (p_leftFile) {
+      delete p_leftFile;
+      p_leftFile = NULL;
+    }
+  }
+  
+  
 
   
   void QnetTool::createQnetTool(QWidget *parent) {
@@ -391,16 +401,17 @@ namespace Qisis {
                                      "This point already contains a reference measure.  Would you like to replace it with the measure on the left?",
                                      "&Yes", "&No", 0, 0)) {
           case 0: // Yes was clicked or Enter was pressed, replace reference
-            refMeasure->SetReference(false);
-            p_leftMeasure->SetReference(true);
+            refMeasure->SetType(Isis::ControlMeasure::Candidate);
+            p_leftMeasure->SetType(Isis::ControlMeasure::Reference);
+            // ??? Need to set rest of measures to Candiate and add more warning. ???//
           case 1: // No was clicked, keep original reference
             break;
-
+        
         }
       }
     }
     else {
-      p_leftMeasure->SetReference(true);
+      p_leftMeasure->SetType(Isis::ControlMeasure::Reference);
     }
 
     // emit signal so the nav tool can update edit point
@@ -520,89 +531,10 @@ namespace Qisis {
 
 
   /**
-   * Sets the "Held" keyword of the control point to the boolean
-   * value of the input parameter.
-   *
-   * @param hold Boolean value to which "Held" keyword will be
-   *             set.
-   * @internal
-   *   @history 2008-12-29 Jeannie Walldren - Added dialog box to allow user to
-   *                          determine the lat/lon/radius for this point if set
-   *                          to Held=True.
-   */
-  void QnetTool::setHoldPoint(bool hold) {
-    // if control point is already set to value of hold, return
-    //    (currently this is unnecessary since this method is
-    //     only called if the checkbox is toggled)
-    if(hold == p_controlPoint->Held()) {
-      return;
-    }
-    if(!hold) {
-      p_controlPoint->SetHeld(false);
-    }
-    else {
-      p_holdPointDialog = new QnetHoldPointDialog;
-      p_holdPointDialog->setModal(true);
-      p_holdPointDialog->setPoint(*p_controlPoint);
-      connect(p_holdPointDialog, SIGNAL(holdPoint(Isis::ControlPoint &)),
-              this, SLOT(newHoldPoint(Isis::ControlPoint &)));
-      connect(p_holdPointDialog, SIGNAL(holdCancelled()),
-              this, SLOT(cancelHoldPoint()));
-      p_holdPointDialog->exec();
-    }
-    // emit a signal to alert user to save when exiting 
-    emit netChanged();
-  }
-
-
-  /**
-   *
-   * Makes a new control point identical to input with Held=True.
-   *
-   * @param point Control point to be copied
-   * @author 2008-12-29 Jeannie Walldren
-   * @internal
-   *   @history 2008-12-29 Jeannie Walldren - Original Version
-   *   @history 2008-12-30 Jeannie Walldren - Replaced reference to
-   *                          ignoreChanged() with ignorePointChanged().
-   *   @history 2008-12-30 Jeannie Walldren - Removed call to close the Hold
-   *                          Point Dialog that caused the reject() command to
-   *                          be called.
-   */
-  void QnetTool::newHoldPoint(Isis::ControlPoint &point) {
-    //  If setting as hold or ground point ,make sure point isn't ignored, ground
-    if(p_controlPoint->Ignore()) {
-      p_controlPoint->SetIgnore(false);
-      emit ignorePointChanged();
-    }
-    p_controlPoint = &point;
-
-    // this line causes hold point dialog to call "reject()"
-    // not sure why it was orginally included
-    //p_holdPointDialog->close();
-
-  }
-
-
-  /**
-   *  This method sets Held=False and unchecks hold CheckBox if
-   *  the "Cancel" button is clicked in the Hold Point Dialog.
-   *
-   *
-   * @internal
-   *   @history 2010-06-02 Jeannie Walldren - Original version
-   */
-  void QnetTool::cancelHoldPoint() {
-    p_controlPoint->SetHeld(false);
-    p_holdPoint->setChecked(false);
-    return;
-  }
-
-
-  /**
    * Sets the "PointType" keyword of the control point.  If ground
    * is true the point type will be set to "Ground".  If ground is
    * false, it will be set to "Tie".
+   * 
    * @param ground Boolean value that determines whether the PointType will be set
    *               to ground.  If false, PointType will be set to Tie.
    * @author
@@ -617,7 +549,7 @@ namespace Qisis {
     if(ground && p_controlPoint->Type() == Isis::ControlPoint::Ground) return;
 
     //  if false, turn back Tie
-    if(!ground) {
+    if (!ground) {
       p_controlPoint->SetType(Isis::ControlPoint::Tie);
     }
     else {
@@ -642,6 +574,7 @@ namespace Qisis {
   /**
    * Set the "Ignore" keyword of the measure shown in the left
    * viewport to the value of the input parameter.
+   * 
    * @param ignore Boolean value that determines the Ignore value for the left 
    *               measure.
    * @internal
@@ -657,8 +590,8 @@ namespace Qisis {
 
     //  If the right chip is the same as the left chip , update the right
     //  ignore box.
-    if(p_rightMeasure != NULL) {
-      if(p_rightMeasure->CubeSerialNumber() == p_leftMeasure->CubeSerialNumber()) {
+    if (p_rightMeasure != NULL) {
+      if (p_rightMeasure->CubeSerialNumber() == p_leftMeasure->CubeSerialNumber()) {
         p_rightMeasure->SetIgnore(ignore);
         p_ignoreRightMeasure->setChecked(ignore);
       }
@@ -669,6 +602,7 @@ namespace Qisis {
   /**
    * Set the "Ignore" keyword of the measure shown in the right
    * viewport to the value of the input parameter. 
+   * 
    * @param ignore Boolean value that determines the Ignore value for the right 
    *               measure.
    * @internal
@@ -678,14 +612,14 @@ namespace Qisis {
    *                          p_leftMeasure.
    */
   void QnetTool::setIgnoreRightMeasure(bool ignore) {
-    if(p_rightMeasure != NULL) p_rightMeasure->SetIgnore(ignore);
+    if (p_rightMeasure != NULL) p_rightMeasure->SetIgnore(ignore);
     // emit a signal to alert user to save when exiting 
     emit netChanged();
 
     //  If the right chip is the same as the left chip , update the right
     //  ignore blox.
-    if(p_leftMeasure != NULL) {
-      if(p_rightMeasure->CubeSerialNumber() == p_leftMeasure->CubeSerialNumber()) {
+    if (p_leftMeasure != NULL) {
+      if (p_rightMeasure->CubeSerialNumber() == p_leftMeasure->CubeSerialNumber()) {
         p_leftMeasure->SetIgnore(ignore);
         p_ignoreLeftMeasure->setChecked(ignore);
       }
@@ -738,8 +672,10 @@ namespace Qisis {
   /**
    * Adds the Tie tool action to the tool pad.  When the Tie tool is selected, the
    * Navigation Tool will automatically open. 
+   *  
    * @param pad Tool pad
    * @return @b QAction* Pointer to Tie tool action 
+   *  
    * @internal
    *   @history 2010-07-01 Jeannie Walldren - Added connection between qnet's
    *                          TieTool button and the showNavWindow() method
@@ -749,7 +685,7 @@ namespace Qisis {
     action->setIcon(QPixmap(toolIconDir() + "/stock_draw-connector-with-arrows.png"));
     action->setToolTip("Tie (T)");
     action->setShortcut(Qt::Key_T);
-    QObject::connect(action, SIGNAL(activated()), this, SLOT(showNavWindow()));
+    QObject::connect(action,SIGNAL(triggered(bool)),this,SLOT(showNavWindow(bool)));
     return action;
   }
 
@@ -762,28 +698,28 @@ namespace Qisis {
    * @param s[in]   (Qt::MouseButton)   Which mouse button was pressed
    *
    * @internal
-   * @history  2007-06-12 Tracie Sucharski - Swapped left and right mouse
+   *   @history  2007-06-12 Tracie Sucharski - Swapped left and right mouse
    *                           button actions.
-   * @history  2009-06-08 Tracie Sucharski - Add error checking for editing
+   *   @history  2009-06-08 Tracie Sucharski - Add error checking for editing
    *                           or deleting points when no point exists.
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
+   *                           namespace std"
    *
    */
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
-    if(cvp  == NULL) return;
-    if(cvp->cursorInside()) QPoint p = cvp->cursorPosition();
+    if (cvp  == NULL) return;
+    if (cvp->cursorInside()) QPoint p = cvp->cursorPosition();
 
-    string file = cvp->cube()->Filename();
-    string sn = g_serialNumberList->SerialNumber(file);
+    iString file = cvp->cube()->Filename();
+    iString sn = g_serialNumberList->SerialNumber(file);
 
     double samp, line;
     cvp->viewportToCube(p.x(), p.y(), samp, line);
 
 
-    if(s == Qt::LeftButton) {
-      p_leftFile = file;
+    if (s == Qt::LeftButton) {
+      *p_leftFile = file;
       //  Find closest control point in network
       Isis::ControlPoint *point =
         g_controlNetwork->FindClosest(sn, samp, line);
@@ -796,12 +732,12 @@ namespace Qisis {
       }
       modifyPoint(point);
     }
-    else if(s == Qt::MidButton) {
+    else if (s == Qt::MidButton) {
       //  Find closest control point in network
       Isis::ControlPoint *point =
-        g_controlNetwork->FindClosest(sn, samp, line);
+          g_controlNetwork->FindClosest(sn, samp, line);
       //  TODO:  test for errors and reality
-      if(point == NULL) {
+      if (point == NULL) {
         QString message = "No points exist for deleting.  Create points ";
         message += "using the right mouse button.";
         QMessageBox::warning((QWidget *)parent(), "Warning", message);
@@ -809,8 +745,8 @@ namespace Qisis {
       }
       deletePoint(point);
     }
-    else if(s == Qt::RightButton) {
-      p_leftFile = file;
+    else if (s == Qt::RightButton) {
+      *p_leftFile = file;
       Isis::Camera *cam = cvp->camera();
       cam->SetImage(samp, line);
       double lat = cam->UniversalLatitude();
@@ -820,49 +756,13 @@ namespace Qisis {
   }
 
 
-  /** 
-   * Finds point files 
-   * @param lat Latitude used to find sample/line values
-   * @param lon Longitude used to find sample/line values
-   * @return @b vector @b <string> Point files found.
-   *  
-   * @internal
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
-   *
-   */
-  vector<string> QnetTool::findPointFiles(double lat, double lon) {
-
-
-    //  Create list of list box of all files highlighting those that
-    //  contain the point.
-    vector<string> pointFiles;
-
-    //  Initialize camera for all images in control network,
-    //  TODO::   Needs to be moved to QnetFileTool.cpp
-    Isis::Camera *cam;
-    for(int i = 0; i < g_serialNumberList->Size(); i++) {
-      cam = g_controlNetwork->Camera(i);
-      if(cam->SetUniversalGround(lat, lon)) {
-        //  Make sure point is within image boundary
-        double samp = cam->Sample();
-        double line = cam->Line();
-        if(samp >= 1 && samp <= cam->Samples() &&
-            line >= 1 && line <= cam->Lines()) {
-          pointFiles.push_back(g_serialNumberList->Filename(i));
-        }
-      }
-    }
-    return pointFiles;
-  }
-
-
-
   /**
    *   Create new control point
+   *  
    * @param lat Latitude value of control point to be created. 
    * @param lon Longitude value of control point to be created. 
-   *   @internal
+   *  
+   * @internal
    *   @history 2008-11-20 Jeannie Walldren - Added message box if pointID value
    *                          entered already exists for another ControlPoint.
    *                          Previously this resulted in a PROGRAMMER ERROR from
@@ -879,7 +779,10 @@ namespace Qisis {
    *   @history 2009-04-20  Tracie Sucharski - Set camera for each measure.
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
-   *
+   *   @history 2010-07-21  Tracie Sucharski - Modified for new keywords
+   *                           associated with implementation of binary
+   *                           control networks.
+   *  
    */
   void QnetTool::createPoint(double lat, double lon) {
 
@@ -892,15 +795,15 @@ namespace Qisis {
     //  Initialize camera for all images in control network,
     //  TODO::   Needs to be moved to QnetFileTool.cpp
     Isis::Camera *cam;
-    for(int i = 0; i < g_serialNumberList->Size(); i++) {
+    for (int i = 0; i < g_serialNumberList->Size(); i++) {
       cam = g_controlNetwork->Camera(i);
-      if(cam->SetUniversalGround(lat, lon)) {
+      if (cam->SetUniversalGround(lat, lon)) {
         //  Make sure point is within image boundary
         double samp = cam->Sample();
         double line = cam->Line();
-        if(samp >= 1 && samp <= cam->Samples() &&
+        if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles << (iString) g_serialNumberList->Filename(i);
+          pointFiles<<g_serialNumberList->Filename(i).c_str();
         }
       }
     }
@@ -925,37 +828,40 @@ namespace Qisis {
 
     QnetNewPointDialog *newPointDialog = new QnetNewPointDialog();
     newPointDialog->SetFiles(pointFiles);
-    if(newPointDialog->exec()) {
-      Isis::ControlPoint *newPoint =
-        new Isis::ControlPoint(newPointDialog->ptIdValue->text().toStdString());
+    if (newPointDialog->exec()) {
+      Isis::ControlPoint *newPoint = 
+         new Isis::ControlPoint(newPointDialog->ptIdValue->text().toStdString()); 
 
 
-      // If this ControlPointId already exists, message box pops up and user is asked to enter a new value.
-      if(g_controlNetwork->Exists(*newPoint)) {
-        string message = "A ControlPoint with Point Id = [" + newPoint->Id();
+      // If this ControlPointId already exists, message box pops up and user is 
+      // asked to enter a new value.
+      if (g_controlNetwork->Exists(*newPoint)) {
+        iString message = "A ControlPoint with Point Id = [" + newPoint->Id();
         message += "] already exists.  Re-enter Point Id for this ControlPoint.";
         QMessageBox::warning((QWidget *)parent(), "New Point Id", message.c_str());
         pointFiles.clear();
         createPoint(lat, lon);
         return;
       }
+      newPoint->SetChooserName(Isis::Application::UserName());
+
       for(int i = 0; i < newPointDialog->fileList->count(); i++) {
         QListWidgetItem *item = newPointDialog->fileList->item(i);
-        if(!newPointDialog->fileList->isItemSelected(item)) continue;
+        if (!newPointDialog->fileList->isItemSelected(item)) continue;
         //  Create measure for any file selected
         Isis::ControlMeasure *m = new Isis::ControlMeasure;
         //  Find serial number for this file
-        string sn =
-          g_serialNumberList->SerialNumber(item->text().toStdString());
+        iString sn =
+                  g_serialNumberList->SerialNumber(item->text().toStdString());
         m->SetCubeSerialNumber(sn);
         int camIndex =
-          g_serialNumberList->FilenameIndex(item->text().toStdString());
+              g_serialNumberList->FilenameIndex(item->text().toStdString());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat, lon);
         m->SetCoordinate(cam->Sample(), cam->Line());
-        m->SetType(Isis::ControlMeasure::Estimated);
+        m->SetType(Isis::ControlMeasure::Manual);
         m->SetDateTime();
-        m->SetChooserName();
+        m->SetChooserName(Isis::Application::UserName());
         m->SetCamera(cam);
         newPoint->Add(*m);
       }
@@ -1006,12 +912,12 @@ namespace Qisis {
     loadPoint();
 
     QnetDeletePointDialog *deletePointDialog = new QnetDeletePointDialog;
-    string CPId = p_controlPoint->Id();
+    iString CPId = p_controlPoint->Id();
     deletePointDialog->pointIdValue->setText(CPId.c_str());
     //  Need all files for this point
     for(int i = 0; i < p_controlPoint->Size(); i++) {
       Isis::ControlMeasure &m = (*p_controlPoint)[i];
-      string file = g_serialNumberList->Filename(m.CubeSerialNumber());
+      iString file = g_serialNumberList->Filename(m.CubeSerialNumber());
       deletePointDialog->fileList->addItem(file.c_str());
     }
 
@@ -1039,7 +945,7 @@ namespace Qisis {
           p_controlPoint->Delete(i);
         }
 
-        p_leftFile = "";
+        *p_leftFile = "";
         loadPoint();
         p_qnetTool->setShown(true);
         p_qnetTool->raise();
@@ -1094,7 +1000,7 @@ namespace Qisis {
 
     //  If navTool modfify button pressed, p_leftFile needs to be reset
     //  better way - have 2 slots
-    if(sender() != this) p_leftFile = "";
+    if (sender() != this) *p_leftFile = "";
     loadPoint();
     p_qnetTool->setShown(true);
     p_qnetTool->raise();
@@ -1112,6 +1018,7 @@ namespace Qisis {
    *                           QnetTool point information.
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
+   *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList 
    *
    */
   void QnetTool::loadPoint() {
@@ -1122,9 +1029,9 @@ namespace Qisis {
 //    }
 
     //  Write pointId
-    string CPId = p_controlPoint->Id();
-    QString ptId = "Point ID:  " +
-                   QString::fromStdString(CPId.c_str());
+    iString CPId = p_controlPoint->Id();
+    QString ptId("Point ID:  ");
+    ptId += (QString) CPId;
     p_ptIdValue->setText(ptId);
 
     //  Write number of measures
@@ -1135,9 +1042,6 @@ namespace Qisis {
     //  Set ignore box correctly
     p_ignorePoint->setChecked(p_controlPoint->Ignore());
 
-    //  Set hold box correctly
-    p_holdPoint->setChecked(p_controlPoint->Held());
-
     //  Set ground box correctly
     p_groundPoint->setChecked(
       p_controlPoint->Type() == Isis::ControlPoint::Ground);
@@ -1145,15 +1049,15 @@ namespace Qisis {
     // Clear combo boxes
     p_leftCombo->clear();
     p_rightCombo->clear();
-    p_pointFiles.clear();
+    p_pointFiles->clear();
     //  Need all files for this point
     for(int i = 0; i < p_controlPoint->Size(); i++) {
       Isis::ControlMeasure &m = (*p_controlPoint)[i];
-      string file = g_serialNumberList->Filename(m.CubeSerialNumber());
-      p_pointFiles.push_back(file);
-      string tempFilename = Isis::Filename(file).Name();
-      p_leftCombo->addItem(tempFilename.c_str());
-      p_rightCombo->addItem(tempFilename.c_str());
+      iString file = g_serialNumberList->Filename(m.CubeSerialNumber());
+      (*p_pointFiles) << file;
+      QString tempFilename = Isis::Filename(file).Name().c_str();
+      p_leftCombo->addItem(tempFilename);
+      p_rightCombo->addItem(tempFilename);
     }
 
 
@@ -1168,9 +1072,9 @@ namespace Qisis {
       leftIndex = p_controlPoint->ReferenceIndex();
     }
     else {
-      if(p_leftFile.length() != 0) {
-        string tempFilename = Isis::Filename(p_leftFile).Name();
-        leftIndex = p_leftCombo->findText(QString(tempFilename.c_str()));
+      if(p_leftFile->length() != 0) {
+        iString tempFilename = Isis::Filename(*p_leftFile).Name();
+        leftIndex = p_leftCombo->findText(tempFilename);
       }
     }
     int rightIndex = 0;
@@ -1201,20 +1105,20 @@ namespace Qisis {
    *                          namespace std"
    */
   void QnetTool::selectLeftMeasure(int index) {
-    string file = p_pointFiles[index];
+    iString file = (*p_pointFiles)[index];
 
-    string serial = g_serialNumberList->SerialNumber(file);
+    iString serial = g_serialNumberList->SerialNumber(file);
     //  Find measure for each file
     p_leftMeasure = &(*p_controlPoint)[serial];
 
     //  If p_leftCube is not null, delete before creating new one
-    if(p_leftCube != NULL) delete p_leftCube;
+    if (p_leftCube != NULL) delete p_leftCube;
     p_leftCube = new Isis::Cube();
     p_leftCube->Open(file);
 
     //  Update left measure of pointEditor
-    p_pointEditor->setLeftMeasure(p_leftMeasure, p_leftCube, p_controlPoint->Id());
-    updateLeftMeasureInfo();
+    p_pointEditor->setLeftMeasure (p_leftMeasure,p_leftCube,p_controlPoint->Id());
+    updateLeftMeasureInfo ();
 
   }
 
@@ -1228,20 +1132,20 @@ namespace Qisis {
    */
   void QnetTool::selectRightMeasure(int index) {
 
-    string file = p_pointFiles[index];
+    iString file = (*p_pointFiles)[index];
 
-    string serial = g_serialNumberList->SerialNumber(file);
+    iString serial = g_serialNumberList->SerialNumber(file);
     //  Find measure for each file
     p_rightMeasure = &(*p_controlPoint)[serial];
 
     //  If p_leftCube is not null, delete before creating new one
-    if(p_rightCube != NULL) delete p_rightCube;
+    if (p_rightCube != NULL) delete p_rightCube;
     p_rightCube = new Isis::Cube();
     p_rightCube->Open(file);
 
     //  Update left measure of pointEditor
-    p_pointEditor->setRightMeasure(p_rightMeasure, p_rightCube, p_controlPoint->Id());
-    updateRightMeasureInfo();
+    p_pointEditor->setRightMeasure (p_rightMeasure,p_rightCube,p_controlPoint->Id());
+    updateRightMeasureInfo ();
 
   }
 
@@ -1250,32 +1154,29 @@ namespace Qisis {
 
   /**
    * @internal
-   * @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to left
+   * @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to left 
    *                         measure info.
-   *
+   * @history 2010-07-22  Tracie Sucharski - Updated new measure types  
+   *                           associated with implementation of binary
+   *                           control networks.
+   * 
    */
-  void QnetTool::updateLeftMeasureInfo() {
+  void QnetTool::updateLeftMeasureInfo () {
 
     //  Set ignore measure box correctly
     p_ignoreLeftMeasure->setChecked(p_leftMeasure->Ignore());
 
     QString s = "Measure Type: ";
-    if(p_leftMeasure->Type() == Isis::ControlMeasure::Unmeasured) s += "Unmeasured";
-    if(p_leftMeasure->Type() == Isis::ControlMeasure::Manual) s += "Manual";
-    if(p_leftMeasure->Type() == Isis::ControlMeasure::Estimated) s += "Estimated";
-    if(p_leftMeasure->Type() == Isis::ControlMeasure::Automatic) s += "Automatic";
-    if(p_leftMeasure->Type() == Isis::ControlMeasure::ValidatedManual) s += "ValidatedManual";
-    if(p_leftMeasure->Type() == Isis::ControlMeasure::ValidatedAutomatic) s += "ValidatedAutomatic";
+    if (p_leftMeasure->Type() == Isis::ControlMeasure::Reference) s+= "Reference";
+    if (p_leftMeasure->Type() == Isis::ControlMeasure::Candidate) s+= "Candidate";
+    if (p_leftMeasure->Type() == Isis::ControlMeasure::Manual) s+= "Manual";
+    if (p_leftMeasure->Type() == Isis::ControlMeasure::RegisteredPixel) s+= "RegisteredPixel";
+    if (p_leftMeasure->Type() == Isis::ControlMeasure::RegisteredSubPixel) s+= "RegisteredSubPixel";
     p_leftMeasureType->setText(s);
-    s = "Sample Error: " + QString::number(p_leftMeasure->SampleError());
+    s = "Sample Residual: " + QString::number(p_leftMeasure->SampleResidual());
     p_leftSampError->setText(s);
-    s = "Line Error: " + QString::number(p_leftMeasure->LineError());
+    s = "Line Residual: " + QString::number(p_leftMeasure->LineResidual());
     p_leftLineError->setText(s);
-    if(p_leftMeasure->GoodnessOfFit() == Isis::Null) {
-      s = "Goodness of Fit: Null";
-    }
-    else s = "Goodness of Fit: " + QString::number(p_leftMeasure->GoodnessOfFit());
-    p_leftGoodness->setText(s);
 
   }
 
@@ -1283,40 +1184,43 @@ namespace Qisis {
 
   /**
    * @internal
-   *   @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to right
+   * @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to right
    *                           measure info.
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
-   *
+   * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   *                           namespace std"
+   * @history 2010-07-22  Tracie Sucharski - Updated new measure types  
+   *                           associated with implementation of binary
+   *                           control networks.
+   * 
    */
 
-  void QnetTool::updateRightMeasureInfo() {
+  void QnetTool::updateRightMeasureInfo () {
 
     //  Set ignore measure box correctly
     p_ignoreRightMeasure->setChecked(p_rightMeasure->Ignore());
 
     QString s = "Measure Type: ";
-    if(p_rightMeasure->Type() == Isis::ControlMeasure::Unmeasured) s += "Unmeasured";
-    if(p_rightMeasure->Type() == Isis::ControlMeasure::Manual) s += "Manual";
-    if(p_rightMeasure->Type() == Isis::ControlMeasure::Estimated) s += "Estimated";
-    if(p_rightMeasure->Type() == Isis::ControlMeasure::Automatic) s += "Automatic";
-    if(p_rightMeasure->Type() == Isis::ControlMeasure::ValidatedManual) s += "ValidatedManual";
-    if(p_rightMeasure->Type() == Isis::ControlMeasure::ValidatedAutomatic) s += "ValidatedAutomatic";
+    if (p_rightMeasure->Type() == Isis::ControlMeasure::Reference) s+= "Reference";
+    if (p_rightMeasure->Type() == Isis::ControlMeasure::Candidate) s+= "Candidate";
+    if (p_rightMeasure->Type() == Isis::ControlMeasure::Manual) s+= "Manual";
+    if (p_rightMeasure->Type() == Isis::ControlMeasure::RegisteredPixel) s+= "RegisteredPixel";
+    if (p_rightMeasure->Type() == Isis::ControlMeasure::RegisteredSubPixel) s+= "RegisteredSubPixel";
     p_rightMeasureType->setText(s);
-    s = "Sample Error: " + QString::number(p_rightMeasure->SampleError());
+    s = "Sample Residual: " + QString::number(p_rightMeasure->SampleResidual());
     p_rightSampError->setText(s);
-    s = "Line Error: " + QString::number(p_rightMeasure->LineError());
+    s = "Line Residual: " + QString::number(p_rightMeasure->LineResidual());
     p_rightLineError->setText(s);
-    if(p_rightMeasure->GoodnessOfFit() == Isis::Null) {
-      s = "Goodness of Fit: Null";
-    }
-    else s = "Goodness of Fit: " + QString::number(p_rightMeasure->GoodnessOfFit());
-    p_rightGoodness->setText(s);
   }
 
 
   /**
-   * Add measure to point
+   * Add measure to point 
+   *  
+   * @internal
+   * @history 2010-07-22  Tracie Sucharski - MeasureType of Estimated is now 
+   *                           Reference.  This change associated with
+   *                           implementation of binary control networks.
+   * 
    */
   void QnetTool::addMeasure() {
 
@@ -1324,54 +1228,53 @@ namespace Qisis {
     //  contain the point, but that do not already have a measure.
     QStringList pointFiles;
 
-    //  Initialize camera for all images in control network,
+    //  Initialize camera for all images in control network,  
     //  TODO::   Needs to be moved to QnetFileTool.cpp
     Isis::Camera *cam;
 
     // If no apriori lat/lon for this point, use lat/lon of first measure
     double lat = p_controlPoint->UniversalLatitude();
     double lon = p_controlPoint->UniversalLongitude();
-    if(lat == Isis::Null || lon == Isis::Null) {
+    if (lat == Isis::Null || lon == Isis::Null) {
       Isis::ControlMeasure m = (*p_controlPoint)[0];
       int camIndex = g_serialNumberList->SerialNumberIndex(m.CubeSerialNumber());
       cam = g_controlNetwork->Camera(camIndex);
       //cam = m.Camera();
-      cam->SetImage(m.Sample(), m.Line());
+      cam->SetImage(m.Sample(),m.Line());
       lat = cam->UniversalLatitude();
       lon = cam->UniversalLongitude();
     }
 
-    for(int i = 0; i < g_serialNumberList->Size(); i++) {
+    for (int i=0; i<g_serialNumberList->Size(); i++) {
       cam = g_controlNetwork->Camera(i);
-      if(cam->SetUniversalGround(lat, lon)) {
+      if (cam->SetUniversalGround(lat,lon)) {
         //  Make sure point is within image boundary
         double samp = cam->Sample();
         double line = cam->Line();
-        if(samp >= 1 && samp <= cam->Samples() &&
+        if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles << QString::fromStdString(g_serialNumberList->Filename(i));
+          pointFiles<<g_serialNumberList->Filename(i).c_str();
         }
       }
     }
 
     QnetNewMeasureDialog *newMeasureDialog = new QnetNewMeasureDialog();
-    newMeasureDialog->SetFiles(*p_controlPoint, pointFiles);
-    if(newMeasureDialog->exec()) {
-      for(int i = 0; i < newMeasureDialog->fileList->count(); i++) {
+    newMeasureDialog->SetFiles(*p_controlPoint,pointFiles);
+    if (newMeasureDialog->exec()) {
+      for (int i=0; i<newMeasureDialog->fileList->count(); i++) {
         QListWidgetItem *item = newMeasureDialog->fileList->item(i);
-        if(!newMeasureDialog->fileList->isItemSelected(item)) continue;
+        if (!newMeasureDialog->fileList->isItemSelected(item)) continue;
         //  Create measure for any file selected
         Isis::ControlMeasure *m = new Isis::ControlMeasure;
         //  Find serial number for this file
-        string sn =
-          g_serialNumberList->SerialNumber(item->text().toStdString());
+        iString sn = g_serialNumberList->SerialNumber((iString) item->text());
         m->SetCubeSerialNumber(sn);
         int camIndex =
-          g_serialNumberList->FilenameIndex(item->text().toStdString());
+              g_serialNumberList->FilenameIndex(item->text().toStdString());
         cam = g_controlNetwork->Camera(camIndex);
-        cam->SetUniversalGround(lat, lon);
-        m->SetCoordinate(cam->Sample(), cam->Line());
-        m->SetType(Isis::ControlMeasure::Estimated);
+        cam->SetUniversalGround(lat,lon);
+        m->SetCoordinate(cam->Sample(),cam->Line());
+        m->SetType(Isis::ControlMeasure::Candidate);
         m->SetDateTime();
         m->SetChooserName();
         p_controlPoint->Add(*m);
@@ -1407,8 +1310,8 @@ namespace Qisis {
       updateLeftMeasureInfo();
       p_leftCombo->hidePopup();
     }
-    if(o == p_rightCombo->view()) {
-      updateRightMeasureInfo();
+    if (o == p_rightCombo->view()) {
+      updateRightMeasureInfo ();
       p_rightCombo->hidePopup();
     }
     return true;
@@ -1417,7 +1320,8 @@ namespace Qisis {
 
   /**
    * Take care of drawing things on a viewPort.
-   * This is overiding the parents paintViewport member.
+   * This is overiding the parents paintViewport member. 
+   *  
    * @param vp Pointer to Viewport to be painted
    * @param painter 
    */
@@ -1428,26 +1332,18 @@ namespace Qisis {
   }
 
 
-  /** 
-   * This method will repaint the given Point ID in each viewport. 
-   * @param pointId
-   * @internal
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
-   */
-  void QnetTool::paintAllViewports(string pointId) {
+  void QnetTool::paintAllViewports() {
     // Take care of drawing things on all viewPorts.
     // Calling update will cause the Tool class to call all registered tools
     // if point has been deleted, this will remove it from the main window
     MdiCubeViewport *vp;
-    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+    for(int i = 0; i < (int) cubeViewportList()->size(); i++) {
       vp = (*(cubeViewportList()))[i];
       vp->viewport()->update();
     }
-
   }
-
-
+  
+  
   /**
    * Draw all measurments which are on this viewPort
    * @param vp Viewport whose measurements will be drawn
@@ -1461,73 +1357,85 @@ namespace Qisis {
    *   @history 2010-07-01 Jeannie Walldren - Modified to draw points selected in
    *                          QnetTool last so they lay on top of all other points
    *                          in the image.
+   *   @history 2010-10-28 Tracie Sucharski - Cleaned up code.
    */
-  void QnetTool::drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter) {
+  void QnetTool::drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter) {
     // Without a controlnetwork there are no points
-    if(g_controlNetwork == 0) return;
+    if (g_controlNetwork == 0) return;
 
     // Don't show the measurments on cubes not in the serial number list
     // TODO: Should we show them anyway
     // TODO: Should we add the SN to the viewPort
-    string serialNumber = Isis::SerialNumber::Compose(*vp->cube());
-    if(!g_serialNumberList->HasSerialNumber(serialNumber)) return;
-
+    iString serialNumber = Isis::SerialNumber::Compose(*vp->cube());
+    if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
     // loop through all points in the control net
-    for(int i = 0; i < g_controlNetwork->Size(); i++) {
+    for (int i=0; i<g_controlNetwork->Size(); i++) {
       Isis::ControlPoint &p = (*g_controlNetwork)[i];
-      // loop through the measurements
-      for(int j = 0; j < p.Size(); j++) {
-        // check whether this point is contained in the image
-        if(p[j].CubeSerialNumber() == serialNumber) {
-          // Find the measurments on the viewport
-          double samp = p[j].Sample();
-          double line = p[j].Line();
-          int x, y;
-          vp->cubeToViewport(samp, line, x, y);
-          // if the point is ignored,
-          if(p.Ignore()) {
-            painter->setPen(QColor(255, 255, 0)); // set point marker yellow
-          }
-          // point is not ignored
-          // if the measure matching this image is ignored,
-          else if(p[j].Ignore()) {
-            painter->setPen(QColor(255, 255, 0)); // set point marker yellow
-          }
-          // Neither point nor measure is not ignored and the measure is ground,
-          else if(p.Type() == Isis::ControlPoint::Ground) {
-            painter->setPen(Qt::magenta);// set point marker magenta
-          }
-          else {
-            painter->setPen(Qt::green); // set all other point markers green
-          }
-          // draw points
-          painter->drawLine(x - 5, y, x + 5, y);
-          painter->drawLine(x, y - 5, x, y + 5);
-        }
-        // if point is not in the image, go to next point
-        else continue;
+
+      // check whether this point is contained in the image
+      if (!p.HasSerialNumber(serialNumber)) continue;
+      // Find the measurments on the viewport
+      double samp = p[serialNumber].Sample();
+      double line = p[serialNumber].Line();
+      int x,y;
+      vp->cubeToViewport(samp,line,x,y);
+      // Determine pen color
+      // if the point is ignored, 
+      if (p.Ignore()) {
+        painter->setPen(QColor(255,255,0)); // set point marker yellow
       }
+      // point is not ignored 
+      // if the measure matching this image is ignored, 
+      else if (p.Ignore()){
+        painter->setPen(QColor(255,255,0)); // set point marker yellow
+      }
+      // Neither point nor measure is not ignored and the measure is ground,
+      else if (p.Type() == Isis::ControlPoint::Ground) {
+        painter->setPen(Qt::magenta);// set point marker magenta
+      }
+      else {
+        painter->setPen(Qt::green); // set all other point markers green
+      }
+
+      // draw points
+      painter->drawLine(x-5,y,x+5,y);
+      painter->drawLine(x,y-5,x,y+5);
     }
-    // if QnetTool is open,
-    if(p_controlPoint != NULL) {
-      // and the selected point is in the image,
-      if(p_controlPoint->HasSerialNumber(serialNumber)) {
+
+    // if QnetTool is open, redraw selected point so it is on top.  This is
+    // done because the selected point was hidden under a mass of crosshairs
+    // for dense networks.
+    if (p_controlPoint != NULL) {
+      // and the selected point is in the image, 
+      if (p_controlPoint->HasSerialNumber(serialNumber)) {
         // find the measurement
         double samp = (*p_controlPoint)[serialNumber].Sample();
         double line = (*p_controlPoint)[serialNumber].Line();
-        int x, y;
-        vp->cubeToViewport(samp, line, x, y);
+        int x,y;
+        vp->cubeToViewport(samp,line,x,y);
         // set point marker red
         QBrush brush(Qt::red);
         // set point marker bold - line width 2
         QPen pen(brush, 2);
         // draw the selected point in each image last so it's on top of the rest of the points
         painter->setPen(pen);
-        painter->drawLine(x - 5, y, x + 5, y);
-        painter->drawLine(x, y - 5, x, y + 5);
+        painter->drawLine(x-5,y,x+5,y);
+        painter->drawLine(x,y-5,x,y+5);
       }
     }
   }
+
+
+  /**
+   * Allows user to set a new template file.
+   * @author 2008-12-10 Jeannie Walldren 
+   * @internal 
+   *   @history 2008-12-10 Jeannie Walldren - Original Version
+   *
+
+  void QnetTool::setTemplateFile() {
+    p_pointEditor->setTemplateFile();
+  }*/
 
 
   bool QnetTool::okToContinue() {
@@ -1680,15 +1588,15 @@ namespace Qisis {
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       Isis::PvlEditDialog registrationDialog(templatePvl);
-      registrationDialog.setWindowTitle("View or Edit Template File: "
-                                        + QString::fromStdString(templatePvl.Filename()));
-      registrationDialog.resize(550, 360);
+      registrationDialog.setWindowTitle("View or Edit Template File: " 
+                                         + QString::fromStdString(templatePvl.Filename()));
+      registrationDialog.resize(550,360);
       registrationDialog.exec();
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e){
       QString message = e.Errors().c_str();
-      e.Clear();
-      QMessageBox::information((QWidget *)parent(), "Error", message);
+      e.Clear ();
+      QMessageBox::information((QWidget *)parent(),"Error",message);
     }
   }
 
@@ -1723,7 +1631,7 @@ namespace Qisis {
 
     //  Check point being edited, make sure it still exists, if not ???
     //  Update ignored checkbox??
-    if(p_controlPoint != NULL) {
+    if (p_controlPoint != NULL) {
       try {
         QString id = p_ptIdValue->text().remove("Point ID:  ");
         Isis::ControlPoint *pt =
@@ -1736,11 +1644,11 @@ namespace Qisis {
       }
     }
 
-    if(p_controlPoint == NULL) {
-      paintAllViewports("");
+    if (p_controlPoint == NULL) {
+      paintAllViewports();
     }
     else {
-      paintAllViewports(p_controlPoint->Id());
+      paintAllViewports();
     }
   }
 
@@ -1751,7 +1659,7 @@ namespace Qisis {
    * @internal
    *   @history 2010-07-01 Jeannie Walldren - Original version
    */
-  void QnetTool::showNavWindow() {
+  void QnetTool::showNavWindow(bool checked){
     emit showNavTool();
   }
 
@@ -1778,7 +1686,7 @@ namespace Qisis {
       "<b>Function:</b> This button will bring up the Navigation Tool window that allows \
      the user to view, modify, ignore, delete, or filter points and cubes.";
     showNavToolButton->setWhatsThis(text);
-    connect(showNavToolButton, SIGNAL(clicked()), this, SLOT(showNavWindow()));
+    connect(showNavToolButton,SIGNAL(clicked(bool)),this,SLOT(showNavWindow(bool)));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);

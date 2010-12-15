@@ -1,0 +1,55 @@
+UnitTest for SurfacePoint
+
+1-Test rectangular set of point and variance only ...
+ with x=-424.024048 m, y=734.4311949 m, z=529.919264 m,sigmaX=10. m, sigmaY=50. m, sigmaZ=20. m
+
+  Output spherical...
+    lat = 32 degrees, lon = 120 degrees, radius = 1000 meters
+    lat = 0.55850536 radians, lon = 2.0943951 radians, radius = 1000 meters
+    latitude sigma=1.64192315 degrees, longitude sigma=1.78752107 degrees, radius sigma=38.4548873 m
+    latitude sigma=0.0286569649 radians, longitude sigma=0.0311981281 radians, radius sigma=38.4548873 m
+    latitude sigma=28.6569649 m, longitude sigma=36.7881588 m, radius sigma=38.4548873 m
+    spherical covariance matrix = 0.00082122164  0.000649383279  -0.674095535
+                                  0.000649383279  0.000973323195  -1.03923048
+                                  -0.674095535  -1.03923048  1478.77836
+  Input rectangular sigmas = 10/50/20
+
+2-Testing spherical set of point and variance/covariance matrix ...
+ with lat=32 degrees, lon=120 degrees, radius=1000 m
+ latitude sigma=1.64192315 m, longitude sigma=1.78752107 m, radiusSig=38.4548873 m
+  Output rectangular...
+    x=-424.024048 m, y=734.431195 m, z=529.919264 m
+    X sigma=10 m, Y sigma=50 m, Z sigma=20 m
+    rectangular covariance matrix = 100  -3.33955086e-13  -1.0658141e-14
+                                    -3.33955086e-13  2500  2.27373675e-13
+                                    -1.0658141e-14  2.27373675e-13  400
+3-Testing rectangular set with point and sigmas only...
+  Output spherical...
+    lat=32 degrees, lon=120 degrees, radius=1000m
+    latitude sigma=1.64192315 degrees, longitude sigma=1.78752107 degrees, radius sigma=38.4548873m
+    ocentric covariance matrix = 0.00082122164  0.000649383279  -0.674095535
+                                 0.000649383279  0.000973323195  -1.03923048
+                                 -0.674095535  -1.03923048  1478.77836
+
+4-Testing planetocentric set with point and sigmas only in degrees ...
+  4a-Output rectangular from degrees...
+    x=-424.024048 m, y=734.431195 m, z=529.919264 m
+    X sigma =29.1295681 m, Y sigma = 33.8466425 m, Z sigma = 31.7155018m
+    rectangular covariance matrix = 848.531739  -257.264514  -147.752015
+                                    -257.264514  1145.59521  255.913997
+                                    -147.752015  255.913997  1005.87306
+  4b-Output rectangular from radians...
+    x=-424.024046 m, y=734.431196 m, z=529.919264 m
+    X sigma = 29.1295681 m, Y sigma = 33.8466425 m, Z sigma = 31.7155018m
+    rectangular covariance matrix = 848.531737  -257.264513  -147.752014
+                                    -257.264513  1145.59521  255.913997
+                                    -147.752014  255.913997  1005.87305
+
+5-Testing copy constructor
+  Output spherical...
+    lat=32 degrees, lon=120 degrees, radius=1000 m
+    latitude sigma = 1.64192315 degrees, longitude sigma = 1.78752107 degrees, radius sigma = 38.4548873 m
+    ocentric covariance matrix = 0.00082122164  0.000649383279  -0.674095535
+                                 0.000649383279  0.000973323195  -1.03923048
+                                 -0.674095535  -1.03923048  1478.77836
+

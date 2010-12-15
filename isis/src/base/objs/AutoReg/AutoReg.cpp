@@ -105,7 +105,8 @@ namespace Isis {
     // Clear statistics
     //TODO: Delete these after control net refactor.
     p_Total = 0;
-    p_Success = 0;
+    p_SuccessPixel = 0;
+    p_SuccessSubPixel = 0;
     p_PatternChipNotEnoughValidData = 0;
     p_PatternZScoreNotMet = 0;
     p_FitChipNoData = 0;
@@ -776,12 +777,12 @@ namespace Isis {
       p_status = AdaptiveRegistration(p_searchChip, p_patternChip, p_fitChip,
                                       startSamp, startLine, endSamp, endLine, bestSearchSamp,
                                       bestSearchLine);
-      if(p_status == AutoReg::Success) {
+      if(p_status == AutoReg::SuccessSubPixel) {
         p_searchChip.SetChipPosition(p_chipSample, p_chipLine);
         p_cubeSample = p_searchChip.CubeSample();
         p_cubeLine   = p_searchChip.CubeLine();
         p_goodnessOfFit = p_bestFit;
-        p_Success++;
+        p_SuccessSubPixel++;
       }
       return p_status;
     }
@@ -815,6 +816,7 @@ namespace Isis {
     }
 
     // Try to fit a model for sub-pixel accuracy if necessary
+    bool computedSubPixel = false;
     if(p_subpixelAccuracy && !IsIdeal(p_bestFit)) {
       vector<double> samps, lines, fits;
       for(int line = p_bestLine - p_windowSize / 2; line <= p_bestLine + p_windowSize / 2; line++) {
@@ -844,7 +846,8 @@ namespace Isis {
       // Now that we know we have enough data to model the surface we call
       // ModelSurface to get the sub-pixel accuracy we are looking for.
       // -------------------------------------------------------------------
-      if(!ModelSurface(samps, lines, fits)) {
+      computedSubPixel = ModelSurface(samps, lines, fits);
+      if (!computedSubPixel) {
         return p_status;
       }
 
@@ -867,9 +870,16 @@ namespace Isis {
       p_cubeLine   = p_searchChip.CubeLine();
     }
 
-    p_Success++;
-    p_status = Success;
-    return Success;
+    // Registration succeeded, but did it compute to sub-pixel accuracy?
+    if (computedSubPixel) {
+      p_SuccessSubPixel++;
+      p_status = SuccessSubPixel;
+    }
+    else {
+      p_SuccessPixel++;
+      p_status = SuccessPixel;
+    }
+    return p_status;
   }
 
 
@@ -1222,9 +1232,14 @@ namespace Isis {
     Pvl pvl;
     PvlGroup stats("AutoRegStatistics");
     stats += Isis::PvlKeyword("Total", p_Total);
-    stats += Isis::PvlKeyword("Successful", p_Success);
-    stats += Isis::PvlKeyword("Failure", p_Total - p_Success);
+    stats += Isis::PvlKeyword("Successful", p_SuccessPixel + p_SuccessSubPixel);
+    stats += Isis::PvlKeyword("Failure", p_Total - (p_SuccessPixel + p_SuccessSubPixel));
     pvl.AddGroup(stats);
+
+    PvlGroup successes("Successes");
+    successes += PvlKeyword("SuccessPixel", p_SuccessPixel);
+    successes += PvlKeyword("SuccessSubPixel", p_SuccessSubPixel);
+    pvl.AddGroup(successes);
 
     PvlGroup grp("PatternChipFailures");
     grp += PvlKeyword("PatternNotEnoughValidData", p_PatternChipNotEnoughValidData);
@@ -1296,7 +1311,7 @@ namespace Isis {
       int bestLine) {
     string msg = "Programmer needs to write their own virtual AdaptiveRegistration method";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    return Success;
+    return SuccessSubPixel;
   }
 
   /**

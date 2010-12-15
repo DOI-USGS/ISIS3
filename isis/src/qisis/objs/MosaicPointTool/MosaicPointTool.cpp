@@ -1,5 +1,11 @@
 #include "MosaicPointTool.h"
 
+#include <QtGui>
+
+#include "ControlNet.h"
+#include "ControlPoint.h"
+#include "ControlMeasure.h"
+
 namespace Qisis {
   /**
    * MosaicPointTool constructor
@@ -65,8 +71,13 @@ namespace Qisis {
    * Finds the given point in the control net, then dipslays an
    * information message box about the choosen control point.
    *
-   *
-   * @param p
+   * @param p 
+   *  
+   * @history 2010-07-12 Tracie Sucharski, Changed point types to reflect to 
+   *                        values from implementation of binary control networks.
+   * @history 2010-11-04 Tracie Sucharski, Change std::string to Qstring, due 
+   *                        to change in return value of
+   *                        ControlPoint::PointTypeToString.
    */
   void MosaicPointTool::findPoint(QPointF p, Isis::ControlNet *cn) {
     double minDistance = DBL_MAX;
@@ -103,10 +114,18 @@ namespace Qisis {
 
     Isis::ControlPoint *controlPoint = cn->Find(pointId.toStdString());
     QString type = "no type";
-    if(controlPoint->Type() == Isis::ControlPoint::Ground) {
-      type = "Ground";
+
+    QString ptType = controlPoint->PointTypeString();
+    if (ptType == "GroundXYZ") {
+      type = "GroundXYZ";
     }
-    else if(controlPoint->Type() == Isis::ControlPoint::Tie) {
+    if (ptType == "GroundXY") {
+      type = "GroundXY";
+    }
+    if (ptType == "GroundZ") {
+      type = "GroundZ";
+    }
+    else if (ptType == "Tie") {
       type = "Tie";
     }
 

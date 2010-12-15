@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnetpvl2bin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Converts an Isis3 control network file from pvl format into binary.
+  </brief>
+
+  <description>
+    <p>
+      This program converts an Isis3 control network file from an ascii pvl 
+    format into a binary formatted file. 
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <history>
+    <change name="Tracie Sucharski" date="2010-05-28">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2010-10-13">
+      Change parameter name to FROM and TO.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+    <parameter name="FROM">
+      <type>filename</type>
+      <fileMode>input</fileMode>
+      <brief>
+              Pvl formated control net file
+      </brief>
+      <description>
+              A control net file in the Pvl format.
+      </description>
+      <filter>
+              *.cnet *.pvl
+      </filter>
+    </parameter>
+  
+    <parameter name="TO">
+      <type>filename</type>
+      <fileMode>output</fileMode>
+      <brief>
+                Binary formatted control net file
+      </brief>
+      <description>
+              A control net file in binary format.
+      </description>
+      <filter>
+              *.bin
+      </filter>
+    </parameter>
+    </group>    
+  </groups>
+</application>

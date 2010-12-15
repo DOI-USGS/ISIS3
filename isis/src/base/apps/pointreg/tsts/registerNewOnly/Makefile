@@ -1,16 +1,15 @@
 APPNAME = pointreg
 
-outnet.pvl.IGNORELINES = DateTime
+log.txt.IGNORELINES = Processed
 
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/cub.lis;
-	$(APPNAME) files=$(OUTPUT)/cub.lis \
+	$(APPNAME) fromlist=$(OUTPUT)/cub.lis \
 	cnet=$(INPUT)/inputcontrol.net \
-	template=$(INPUT)/autoRegTemplate.def \
-	to=$(OUTPUT)/outnet.pvl \
+	deffile=$(INPUT)/autoRegTemplate.def \
+	onet=$(OUTPUT)/outnet.net \
 	flatfile=$(OUTPUT)/flatfile.txt \
-	measures=estimated \
-	> /dev/null;
+	measures=candidates > $(OUTPUT)/log.txt;
 	$(RM) $(OUTPUT)/cub.lis;

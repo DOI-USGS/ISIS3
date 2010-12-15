@@ -1,0 +1,129 @@
+// Protocol buffer descriptor for ISIS3 ControlNet class hierarchy
+
+package Isis;
+
+message PBControlNet {
+// Version tracking so we know which version of the code we are dealing with
+  message Pedigree {
+    required float  version = 1 [default = 1.0];
+    required string date    = 2 [default = "2010/11/18"];
+  }
+
+// Declaration of Pedigree for tracking purposes
+  required Pedigree pedigree = 1;
+
+//  Some fields of ControlNet
+  optional  string networkId = 2;
+  optional  string targetName = 3;
+  optional  string created = 4;
+  optional  string lastModified = 5;
+  optional  string description = 6;
+  optional  string userName = 7;
+
+//  Start of ControlPoint definition
+  message PBControlPoint {
+    enum PointType {
+       Tie         = 0;         //  Image to Image
+       Ground      = 1;         //  Image to Ground
+    }
+
+    enum AprioriSource{
+      None              = 0;
+      User              = 1;
+      AverageOfMeasures = 2;
+      Reference         = 3;
+      Ellipsoid         = 4;  
+      DEM               = 5;  
+      Basemap           = 6;
+      BundleSolution    = 7;
+    }
+
+//  Some fields of ControlPoint
+    required string         id   = 1;
+    required PointType      type = 2 [default = Tie];
+    optional string         chooserName = 3;
+    optional string         datetime = 4;
+    optional bool           editLock = 5 [default = false];
+    optional bool           ignore = 6 [default = false];
+    optional bool           jigsawRejected = 7 [default = false];
+
+    optional AprioriSource        aprioriXYZSource = 8; 
+    optional string               aprioriXYZSourceFile = 9;
+    optional AprioriSource        aprioriRadiusSource = 10;
+    optional string               aprioriRadiusSourceFile = 11;
+    optional double               aprioriX = 12;   // <meters>
+    optional double               aprioriY = 13;   // <meters>
+    optional double               aprioriZ = 14;   // <meters>
+
+    //  Accuracy of apriori coordinates from basemap, user or mission SPICE,
+    //   jigsaw weights based on these values. The sigmas are stored as a
+    //  3 x 3 variance-covariance matrix.
+    repeated double aprioriCovar = 15 [packed = true];
+        
+    optional double         X = 16;
+    optional double         Y = 17;
+    optional double         Z = 18;
+
+    //  Set in jigsaw.  Accuracy of apostiori lat/lon from basemap,user or mission SPICE
+    //  Stored as a 3 x 3 variance-covariance matrix.
+    repeated double apostCovar = 19 [packed = true];
+
+     
+// Start of ControlMeasure definition
+    message PBControlMeasure {
+      enum MeasureType {
+        Reference           = 0;   // Reference (or truth) measure
+        Candidate           = 1;   // (e.g., autoseed, interest) AKA predicted, unmeasured, unverified
+        Manual              = 2;   // Hand Measured (e.g., qnet)                                      
+        RegisteredPixel     = 3;   // Automatically registered to whole pixel (e.g.,pointreg/qnet)           
+        RegisteredSubPixel  = 4;   // Automatically registered to sub-pixel (e.g., pointreg/qnet)
+        Ground              = 5;   // Measure holding coordinate information in ground source
+      }
+
+// Define an UnMeasured message for efficiency
+      message PBMeasure {
+        optional double      sample            = 1;
+        optional double      line              = 2;
+        optional double      sampleResidual    = 3;  // Jigsaw info-solution error <pixels>
+        optional double      lineResidual      = 4;
+      }
+
+//  Some fields of ControlMeasure
+      required string         serialnumber   = 1;
+      required MeasureType    type           = 2 [default = Candidate];
+      optional string         choosername    = 3;
+      optional string         datetime       = 4;
+      optional bool           editLock       = 5 [default = false];
+      optional bool           ignore         = 6 [default = false];
+      optional bool           jigsawRejected = 7 [default = false];
+      optional PBMeasure      measurement    = 8;
+      optional double         diameter       = 9;
+      optional double         apriorisample  = 10;  // The first identified location of measure by autoseed.
+      optional double         aprioriline    = 11;  // pointreg/interest always use this location as starting point.
+                                                    // Could be moved by: interest,qnet,user, etc.
+      optional double         samplesigma    = 12;  // Uncertainty/Sigma of current samp/line <pixels>
+      optional double         linesigma      = 13;
+    }
+
+//  Actual declaration of varaible number of ControlMeasures
+    repeated PBControlMeasure measures = 20;
+  }
+
+// Actual declartion of variable number of ControlPoints
+  repeated PBControlPoint points = 8;
+
+//  Define the CubeFile message buffer
+  message PBNetCubes {
+    optional string cubelistfile = 1;
+    message PBCubeList {
+      optional string filename = 1;
+      optional string serialnumber = 2;
+      optional int32  lines = 3;
+      optional int32  samples = 4;
+    }
+    repeated PBCubeList filelist = 2;
+  }
+
+  optional PBNetCubes netcubes = 9;
+}
+

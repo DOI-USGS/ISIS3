@@ -38,10 +38,10 @@ namespace Isis {
   class PvlGroup;
 
   //! Size of the PointDetails Array 
-  #define IMAGE_POINT_SIZE 4
+  #define IMAGE_POINT_SIZE 3
 
   //! Enumeration for Point Statistics
-  enum ePointDetails { total, ignore, held, ground };
+  enum ePointDetails { total, ignore, ground };
   
   /**
    * @brief Control Network Stats
@@ -56,8 +56,11 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-08-24 Sharmila Prasad Original version
-   *   @history 2010-09-16 Sharmila Prasad Added individual image maps for
-   *                                       each Point stats to correct segmentation faults
+   *   @history 2010-09-16 Sharmila Prasad Added individual image maps for each
+   *                                       Point stats to correct segmentation
+   *                                       faults.
+   *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
+   *                                       removing includes from ControlNet.h.
    */
   class ControlNetStatistics{
   public:
@@ -70,7 +73,7 @@ namespace Isis {
     //! Destructor
     ~ControlNetStatistics();
     
-    //! Generate stats like Total, Ignored, Held, Ground Points in an Image
+    //! Generate stats like Total, Ignored, Ground Points in an Image
     void GenerateImageStats(void);
     
     //! Print the Image Stats into specified output file
@@ -79,7 +82,7 @@ namespace Isis {
     //! Returns the Image Stats by Serial Number
     void GetImageStatsBySerialNum(string psSerialNum, int* piPointDetail, int piSize);
     
-    //! Generate stats like Ignored, Ground, Held, Total Measures, Ignored by Control Point
+    //! Generate stats like Ignored, Ground, Total Measures, Ignored by Control Point
     void GeneratePointStats(const string & psPointFile);
     
     //! Generate the Control Net Stats into the PvlGroup
@@ -90,10 +93,7 @@ namespace Isis {
     
     //! Returns the Number of Ground Points in the Control Net
     int NumGroundPoints();
-    
-    //! Returns the Number of Held Points in the Control Net
-    int NumHeldPoints();
-    
+
     //! Returns the total Number of Measures in the Control Net
     int NumMeasures();
     
@@ -104,25 +104,25 @@ namespace Isis {
     int NumIgnoredMeasures();
     
     //! Determine the average error of all points in the network
-    double AverageError();
+    double AverageResidual();
     
     //! Determine the minimum error of all points in the network
-    double MinimumError();
+    double MinimumResidual();
     
     //! Determine the maximum error of all points in the network
-    double MaximumError();
+    double MaximumResidual();
     
     //! Determine the minimum line error of all points in the network
-    double MinimumErrorLine();
+    double MinimumLineResidual();
     
     //! Determine the minimum sample error of all points in the network
-    double MinimumErrorSample();
+    double MinimumSampleResidual();
     
     //! Determine the maximum line error of all points in the network
-    double MaximumErrorLine();
+    double MaximumLineResidual();
     
     //! Determine the maximum sample error of all points in the network
-    double MaximumErrorSample();
+    double MaximumSampleResidual();
     
   protected:
     SerialNumberList mSerialNumList;    //!< Serial Number List
@@ -132,7 +132,6 @@ namespace Isis {
   private:
     map <string, int> mImageTotalPointMap;   //!< Contains map of serial num and Total points
     map <string, int> mImageIgnorePointMap;  //!< Contains map of serial num and Ignored points
-    map <string, int> mImageHeldPointMap;    //!< Contains map of serial num and Held points
     map <string, int> mImageGroundPointMap;  //!< Contains map of serial num and Ground points
   };
 }

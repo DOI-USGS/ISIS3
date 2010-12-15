@@ -10,14 +10,12 @@
 
 namespace Qisis {
   class QnetFilter : public QWidget {
-      Q_OBJECT
+    Q_OBJECT
 
     public:
-      QnetFilter(QWidget *parent);
-      virtual ~QnetFilter() {};
-      virtual void filter() {
-        return;
-      };
+      QnetFilter (QWidget *parent);
+      virtual ~QnetFilter () {};
+      virtual void filter() { return; };
 
     signals:
       void filteredListModified();

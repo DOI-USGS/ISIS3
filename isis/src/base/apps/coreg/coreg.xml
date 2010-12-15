@@ -22,7 +22,7 @@
        you read "Automatic Registration in Isis 3.0".  It is essential for under understanding how to create a "registration 
        definition" file and how to size your search and pattern chips.  We will continue with the discussion of functionality 
        of this program assuming the reader has a fundamental knowledge of Automatic Registration.  For the brave we 
-       give an example of a defintion file (REGDEF):
+       give an example of a defintion file (DEFFILE):
      </p>
      <pre>
          Object = AutoRegistration
@@ -153,6 +153,10 @@
         Auto registration parameters now placed into the print file before
         potential throwing of exceptions.
     </change>
+    <change name="Janet Barrett" date="2010-07-30">
+        Changed REGDEF parameter name to DEFFILE. Changed CNETFILE parameter name
+        to ONET.
+    </change>
   </history>
 
   <groups>
@@ -185,7 +189,7 @@
         </filter>
       </parameter>
 
-      <parameter name="REGDEF">
+      <parameter name="DEFFILE">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -235,7 +239,7 @@
             </brief>
             <description>
                 The tranformation type to use on the output file.  The options are TRANSLATE or WARP.
-                If WARP is selected, the CNETFILE and DEGREE parameters are required.  
+                If WARP is selected, the ONET and DEGREE parameters are required.  
                 Defaults to TRANSLATE.
             </description>
             <default><item>TRANSLATE</item></default>
@@ -255,7 +259,7 @@
                     </brief>
                     <description>
                         Runs the warp application on the input file to get the output file.  If this
-                        option is selected, the CNETFILE and DEGREE parameters must also
+                        option is selected, the ONET and DEGREE parameters must also
                         be entered.
                     </description>
                 </option>
@@ -317,7 +321,7 @@
        </group>
 
     <group name= "ControlNetOptions">
-            <parameter name="CNETFILE">
+            <parameter name="ONET">
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>

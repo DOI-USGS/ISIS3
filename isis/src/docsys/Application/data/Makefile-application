@@ -1,7 +1,5 @@
 include $(ISISROOT)/make/isismake.macros
 
-.NOTPARALLEL:
-
 # ISIS APPLICATION DOC MAKEFILE
 #   Process the XML files deposited by application
 #   makefiles

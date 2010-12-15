@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision: 1.20 $
- * $Date: 2010/06/04 23:51:27 $
+ * $Revision: 1.14 $
+ * $Date: 2009/09/08 17:38:17 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
@@ -24,12 +24,15 @@
 #ifndef ControlPoint_h
 #define ControlPoint_h
 
-#include <vector>
-#include <string>
+#include <QVector>
+
+#include "iString.h"
 #include "ControlMeasure.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
-
+  class Latitude;
+  class Longitude;
   class PvlObject;
 
   /**
@@ -46,24 +49,29 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-07-29 Jeff Anderson Original version
-   *   @history 2006-01-11 Jacob Danton Added ReferenceIndex method and updated unitTest
+   *   @history 2006-01-11 Jacob Danton Added ReferenceIndex method and updated
+   *            unitTest
    *   @history 2006-06-28 Tracie Sucharski, Added method to return measure
    *            for given serial number.
    *   @history 2006-10-31 Tracie Sucharski, Added HasReference method,
    *            changed ReferenceIndex method to throw error if there is no
    *            Reference ControlMeasure.
-   *   @history 2007-01-25 Debbie A. Cook, Removed return statement in SetApriori method
-   *            for GroundPoint case so that FocalPlaneMeasures will get set.  The method
-   *            already has a later return statement to avoid changing the lat/lon values.
-   *   @history 2007-10-19 Debbie A. Cook, Wrapped longitudes when calculating apriori longitude
-   *            for points with a difference of more than 180 degrees of longitude between measures.
-   *   @history 2008-01-14 Debbie A. Cook, Changed call to Camera->SetUniversalGround in ComputeErrors
-   *            to include the radius as an argument since the method has been overloaded to include
-   *            radius.
+   *   @history 2007-01-25 Debbie A. Cook, Removed return statement in 
+   *            SetApriori method for \Point case so that
+   *            FocalPlaneMeasures will get set.  The method already has a later
+   *            return statement to avoid changing the lat/lon values.
+   *   @history 2007-10-19 Debbie A. Cook, Wrapped longitudes when calculating
+   *            apriori longitude for points with a difference of more than 180
+   *            degrees of longitude between measures.
+   *   @history 2008-01-14 Debbie A. Cook, Changed call to
+   *            Camera->SetUniversalGround in ComputeErrors to include the
+   *            radius as an argument since the method has been overloaded to
+   *            include radius.
    *   @history 2008-09-12 Tracie Sucharski, Add method to return true/false
-   *                   for existence of Serial Number.
-   *   @history 2009-03-07 Debbie A. Cook Fixed ComputeErrors method to set focal plane coordinates
-   *                   without changing time and improved error messages.
+   *            for existence of Serial Number.
+   *   @history 2009-03-07 Debbie A. Cook Fixed ComputeErrors method to set
+   *            focal plane coordinates
+   *            without changing time and improved error messages.
    *   @history 2009-06-03 Christopher Austin, Added the p_invalid functionality
    *            along with forceBuild, fixed documentation errors.
    *   @history 2009-06-22 Jeff Anderson, Modified ComputeAprior
@@ -83,234 +91,378 @@ namespace Isis {
    *   @history 2009-09-08 Eric Hyer, Added PointTypeToString method.
    *   @history 2009-10-13 Jeannie Walldren - Added detail to
    *            error messages.
-   *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors with call to
-   *                              CameraGroundMap->GetXY
-   *   @history 2010-05-11 Sharmila Prasad Added API's Copy Constructor to copy one point to another and
-   *                       ReferenceIndexNoException not to throw Exception if there are no reference point or
-   *                       no measures in a Control Point.
+   *   @history 2009-12-06  Tracie Sucharski, Renamed ComputeErrors to
+   *            ComputeResiudals.
+   *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors 
+   *            with call to CameraGroundMap->GetXY
+   *   @history 2010-01-12 Tracie Sucharski, Added support for binary networds,
+   *            added new parameters, renamed ComputeErrors to ComputeResiduals,
+   *            renamed MaximumError to MaximumResidual, renamed AverageError to
+   *            AverageResidual.
+   *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors 
+   *            with call to CameraGroundMap->GetXY
+   *   @history 2010-05-06 Tracie Sucharski, Use defaults of 0. instead of
+   *            Isis::Null, because 0. is the default in the protocol buffers.
+   *   @history 2010-05-11 Sharmila Prasad Added API's Copy Constructor to copy
+   *            one point to another and ReferenceIndexNoException not to throw
+   *            Exception if there are no reference point or no measures in a
+   *            Control Point.  Also added the boolean logical operator method
+   *            = and !=.
+   *   @history 2010-05-26 Tracie Sucharski, Changed point type of Ground to
+   *            GroundXYZ, GroundXY, or GroundZ.
+   *   @history 2010-06-01 Tracie Sucharski, Added Ellipsoid and DEM to
+   *            AprioriSource enum.  Change AprioriSourceBasemap to
+   *            AprioriLatLonSourcFile and AprioriRadiusSourceFile.
+   *   @history 2010-06-03 Tracie Sucharski, Moved SetReference method from
+   *            ControlMeasure so check for multiple reference meausres can be
+   *            done.
+   *   @history 2010-06-17 Tracie Sucharski, Added Lock keyword, new methods
+   *            SetLocked, Locked and NumLockedMeasures.
+   *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString() 
+   *            additional working sessions for Control network design.
+   *   @history 2010-07-27 Tracie Sucharski, Updated for changes made after
+   *            additional working sessions for Control network
+   *            design.  Major change to keywords, including storing coordinates
+   *            as x/y/z instead of lat/lon/radius.  Needed methods to allow
+   *            inputting either, and conversion methods.
+   *   @history 2010-08-18 Tracie Sucharski, Updated for changes made to
+   *            SurfacePoint covariance matrix.
+   *   @history 2010-08-25 Tracie Sucharski, Fixed some bugs relating to
+   *            conversions between sigmas and covariance matrices.
+   *   @history 2010-09-13 Tracie Sucharski, Added methods for setting
+   *            planetocentric sigmas as both degrees and meters,
+   *            as a result of changes made to the SurfacePoint class.
+   *   @history 2010-09-15 Tracie Sucharski, It was decided after mtg with
+   *            Debbie, Stuart, Ken and Tracie that ControlPoint
+   *            will only function with x/y/z, not lat/lon/radius. It will be
+   *            the responsibility of the application or class using 
+   *            ControlPoint to set up a SurfacePoint object to do conversions
+   *            between x/y/z and lat/lon/radius. So... remove all conversion
+   *            methods from this class. It was also decided that when importing
+   *            old networks that contain Sigmas, the sigmas will not be
+   *            imported, due to conflicts with the units of the sigmas.
+   *   @history 2010-05-11 Sharmila Prasad Added API's Copy Constructor to copy
+   *            one point to another and ReferenceIndexNoException not to throw
+   *            Exception if there are no reference point or no measures in a
+   *            Control Point.
    *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString()
-   *   @history 2010-09-09 Sharmila Prasad - Added API's to get Latitude, Logitude, Radius from the
-   *                       Reference Measure in the Point. Also to get the min & max Line & Sample Errors
-   *   @history 2010-12-02 Eric Hyer - HasSerialNumber is now const
+   *   @history 2010-09-09 Sharmila Prasad - Added API's to get Latitude, 
+   *            Longitude, Radius from the Reference Measure in the Point. Also
+   *            to get the min & max Line & Sample Errors
+   *   @history 2010-09-27 Tracie Sucharski, Removed these new methods and move
+   *            functionality to the ControlNetFilter class. Add the old
+   *            methods, SetUniversalGround, UniversalLatitude,
+   *            UniversalLongitude and Radius back in for convenience.
+   *   @history 2010-10-05 Eric Hyer - interface to ID is now with QString
+   *   @history 2010-10-06 Sharmila Prasad - Added method ReferenceLocked()
+   *   @history 2010-10-18 Tracie Sucharski, Change "Setters", ComputeApriori
+   *            and ComputeResiduals to return either Success or PointLocked.
+   *            If the point is locked do not set values.
+   *   @history 2010-10-18 Tracie Sucharski, Change SurfacePoint::Rectangular
+   *            and SurfacePoint::Ocentric to SurfacePoint as
+   *            both return values and parameters.
+   *   @history 2010-10-06 Sharmila Prasad - API to reset Apriori
+   *   @history 2010-10-21 Steven Lambright Minimized the header file and moved
+   *            most implementations to the cpp. Reorganized the order of
+   *            methods. Made more methods callable on a const instance. Added
+   *            GetMeasure(...) methods and a suggested implementation for the
+   *            bracket operators, not yet implemented due to returning
+   *            reference conflicts. Finished implementing the new use of
+   *            SurfacePoint mentioned in the last history comment. Marked
+   *            SetUniversalGround(), UniversalLatitude(), UniversalLongitude(),
+   *            and Radius() as deprecated. These methods need to be phased out
+   *            and GetSurfacePoint() used instead. There are naming
+   *            conflicts with accessors (some use Get, some don't) still. The
+   *            comparison operator now relies on QVector's comparison operator
+   *            instead of looping itself. Added private helper methods:
+   *              int FindMeasureIndex(iString serialNumber) const
+   *              void PointModified();
+   *            Updated documentation extensively. Removed everything apost
+   *            except for inside of Load() and CreatePvlObject(). Added
+   *            automatic updating of DateTime and ChooserName.
+   *   @history 2010-10-26 Steven Lambright Change default chooser name from
+   *            user name to application name.
+   *   @history 2010-11-03 Mackenzie Boyd Added ToString methods for enums,
+   *            String and statis ToString now exist for PointType,
+   *            RadiusSource, and SurfacePointSource.
+   *   @history 2010-11-16 Debbie Cook, Added jigsawRejected keyword.
+   *   @history 2010-12-08 Tracie Sucharski, Added IsGround convenience method.
    */
   class ControlPoint {
     public:
-      ControlPoint();
-      ControlPoint(const std::string &id);
-
-      //! Destroy a control point
-      ~ControlPoint() {};
-
-      void Load(PvlObject &p, bool forceBuild = false);
-
-      PvlObject CreatePvlObject();
-
       /**
-       * Sets the Id of the control point
-       *
-       * @param id Control Point Id
-       */
-      void SetId(const std::string &id) {
-        p_id = id;
-      };
-
-      /**
-       * Return the Id of the control point
-       *
-       * @return Control Point Id
-       */
-      std::string Id() const {
-        return p_id;
-      };
-
-      void Add(const ControlMeasure &measure, bool forceBuild = false);
-      void Delete(int index);
-
-      /**
-       * Return the ith measurement of the control point
-       *
-       * @param index Control Measure index
-       *
-       * @return The Control Measure at the provided index
-       */
-      ControlMeasure &operator[](int index) {
-        return p_measures[index];
-      };
-
-      /**
-       * Return the ith measurement of the control point
-       *
-       * @param index Control Measure index
-       *
-       * @return The Control Measure at the provided index
-       */
-      const ControlMeasure &operator[](int index) const {
-        return p_measures[index];
-      };
-
-      //! Return the measurement for the given serial number
-      ControlMeasure &operator[](const std::string &serialNumber);
-
-      //! Return the measurement for the given serial number
-      const ControlMeasure &operator[](const std::string &serialNumber) const;
-
-      //! Does Serial Number exist in point
-      bool HasSerialNumber(std::string &serialNumber) const;
-
-      //! Return the number of measurements in the control point
-      int Size() const {
-        return p_measures.size();
-      };
-      int NumValidMeasures();
-
-      /**
-       * Set whether to ignore or use control point
-       *
-       * @param ignore True to ignore this Control Point, False to un-ignore
-       */
-      void SetIgnore(bool ignore) {
-        p_ignore = ignore;
-      };
-
-      //! Return if the control point should be ignored
-      bool Ignore() const {
-        return p_ignore;
-      };
-
-      //! Return if the control point is invalid
-      bool Invalid() const {
-        return p_invalid;
-      }
-
-      /**
-       * Set the control point as held to its lat/lon
-       *
-       * @param held True to hold this Control Point, False to release
-       */
-      void SetHeld(bool held) {
-        p_held = held;
-      };
-
-      //! Is the control point lat/lon held?
-      bool Held() const {
-        return p_held;
-      };
-
-      /**
-       * A control point can have one of two types, either Ground or Tie.
+       * These are the valid 'types' of point. A point type defines what a point
+       *   is tying together.
        */
       enum PointType {
         /**
-         * A Ground point is a Control Point whose lat/lon is well established
-         * and should not be changed. Some people will refer to this as a
-         * truth (i.e., ground truth).  Holding a point is equivalent to making
-         * it a ground point.  A ground point can be identifed in one or more
-         * cubes.
-         */
+          * A Ground point is a Control Point whose lat/lon is well established
+          * and should not be changed. Some people will refer to this as a
+          * truth (i.e., ground truth).  Holding a point is equivalent to making
+          * it a ground point.  A ground point can be identifed in one or more
+          * cubes.
+          */
         Ground,
         /**
-         * A Tie point is a Control Point that identifies common measurements
-         * between two or more cubes. While it could have a lat/lon, it is not
-         * necessarily correct and is subject to change.  This is the most
-         * common type of control point.
-         */
+          * A Tie point is a Control Point that identifies common measurements
+          * between two or more cubes. While it could have a lat/lon, it is not
+          * necessarily correct and is subject to change.  This is the most
+          * common type of control point.
+          */
         Tie
       };
 
       /**
-       * Change the type of the control point
-       *
-       * @param type The type for this Control Point
+       * This is a return status for many of the mutating (setter) method calls.
+       *   We chose to use return status' because often times ignoring them
+       *   is the behavior the caller wants.
        */
-      void SetType(PointType type) {
-        p_type = type;
+      enum Status {
+        /**
+         * This is returned when an operation cannot be performed due to a
+         *   problem such as the point is ignored and the operation doesn't make
+         *   sense.
+         */
+        Failure,
+        /**
+         * This is returned when the operation successfully took effect.
+         */
+        Success,
+        /**
+         * This is returned when the operation requires Edit Lock to be false
+         *   but it is currently true. The operation did not take effect.
+         */
+        PointLocked
       };
 
-      //! Return the type of the point
-      PointType Type() const {
-        return p_type;
+      // This stuff input to jigsaw
+      // How did apriori source get computed??
+      struct SurfacePointSource {
+        enum Source {
+          None,
+          User,
+          AverageOfMeasures,
+          Reference,
+          Basemap,
+          BundleSolution
+        };
       };
 
-      const std::string PointTypeToString() const;
+      struct RadiusSource {
+        enum Source {
+          None,
+          User,
+          AverageOfMeasures,
+          Ellipsoid,
+          DEM,
+          BundleSolution
+        };
+      };
 
-      void SetUniversalGround(double lat, double lon, double radius);
+      ControlPoint();
+      ControlPoint (const iString &id);
+      ~ControlPoint ();
 
-      //! Return the planetocentric latitude of the point
-      double UniversalLatitude() const {
-        return p_latitude;
-      }
+      void Load(PvlObject &p, bool forceBuild = false);
 
-      //! Return the planetocentric longitude of the point
-      double UniversalLongitude() const {
-        return p_longitude;
-      }
-      
-      //! Return the radius of the point in meters
-      double Radius() const {
-        return p_radius;
-      }
-      
-      //! Returns the Universal Latitude of the Reference Measure
-      double LatitudeByReference(Camera *pCamera);
-      
-      //! Returns the Universal Longitude of the Reference Measure
-      double LongitudeByReference(Camera *pCamera);
-      
-      //! Returns the Radius of the Reference Measure
-      double RadiusByReference(Camera *pCamera);
-      
-      double AverageError() const;
+      void Add(const ControlMeasure &measure, bool forceBuild = false,
+               bool isNewMeasure = true);
+      void Delete(int index);
+      Status ResetApriori();
+      Status UpdateMeasure(const ControlMeasure &);
 
-      // std::string Thumbnail() const;
-      // std::string FeatureName() const;
+      ControlMeasure GetMeasure(int index) const;
+      ControlMeasure GetMeasure(iString serialNumber) const;
+      ControlMeasure GetReferenceMeasure() const;
 
-      bool HasReference();
+      Status SetChooserName(iString name);
+      Status SetDateTime(iString dateTime);
+      Status SetEditLock(bool editLock);
+      Status SetId(iString id);
+      Status SetRejected(bool rejected);
+      Status SetIgnore(bool ignore);
+      Status SetSurfacePoint (SurfacePoint surfacePoint);
+      Status SetType(PointType type);
 
-      int ReferenceIndex();
+      Status SetAprioriRadiusSource(RadiusSource::Source source);
+      Status SetAprioriRadiusSourceFile(iString sourceFile);
+      Status SetAprioriSurfacePoint(SurfacePoint aprioriSurfacePoint);
+      Status SetAprioriSurfacePointSource(SurfacePointSource::Source source);
+      Status SetAprioriSurfacePointSourceFile(iString sourceFile);
 
-      int ReferenceIndexNoException();
+      Status ComputeApriori();
+      Status ComputeResiduals();
 
-      void ComputeApriori();
+      iString ChooserName() const;
+      iString DateTime() const;
+      bool EditLock() const;
+      bool IsRejected() const;
+      iString Id() const;
+      bool Ignore() const;
+      bool Valid() const;
+      bool Invalid() const;
+      SurfacePoint GetSurfacePoint() const;
+      PointType Type () const;
+      bool IsGround() const;
 
-      void ComputeErrors();
+      static iString PointTypeToString(PointType type);
+      iString PointTypeString() const;
+      static iString RadiusSourceToString(RadiusSource::Source source);
+      iString RadiusSourceString() const;
+      static iString SurfacePointSourceToString(SurfacePointSource::Source source);
+      iString SurfacePointSourceString() const;
 
-      double MaximumError() const;
-      
-      //! Get the Minimum Error Magnitude for the Control Point
-      double MinimumError() const;
-      
-      //! Get the Minimum ErrorLine for the Control Point
-      double MinimumErrorLine();
-      
-      //! Get the Minimum ErrorSample for the Control Point
-      double MinimumErrorSample();
-      
-      //! Get the Maximum ErrorLine for the Control Point
-      double MaximumErrorLine();
-      
-      //! Get the Maximum ErrorSample for the Control Point
-      double MaximumErrorSample();
+      SurfacePoint GetAprioriSurfacePoint() const;
+      RadiusSource::Source AprioriRadiusSource() const;
+      iString AprioriRadiusSourceFile() const;
+      SurfacePointSource::Source AprioriSurfacePointSource() const;
+      iString AprioriSurfacePointSourceFile() const;
 
-      double WrapLongitude(double lon, double baselon);
+      int Size () const { return p_measures.size(); };
+      int NumMeasures () const { return p_measures.size(); };
+      int NumValidMeasures ();
+      int NumLockedMeasures ();
+      bool HasSerialNumber (iString serialNumber) const;
+      bool HasReference() const;
+      int  ReferenceIndex() const;
+      int  ReferenceIndexNoException() const;
+      bool ReferenceLocked() const;
 
-      bool operator == (const Isis::ControlPoint &pPoint) const;
-      bool operator != (const Isis::ControlPoint &pPoint) const;
-      ControlPoint &operator = (const Isis::ControlPoint &pPoint);
+      double AverageResidual() const;
+      double MinimumResidual() const;
+      double MinimumSampleResidual() const;
+      double MinimumLineResidual() const;
+      double MaximumResidual() const;
+      double MaximumSampleResidual() const;
+      double MaximumLineResidual() const;
 
+      PvlObject CreatePvlObject();
+
+      ControlMeasure &operator[](int index);
+      ControlMeasure &operator[](iString serialNumber);
+      const ControlMeasure &operator[](int index) const;
+      const ControlMeasure &operator[](iString serialNumber) const;
+
+      bool operator != (const ControlPoint &pPoint) const;
+      bool operator == (const ControlPoint &pPoint) const;
+      ControlPoint & operator = (const ControlPoint &pPoint);
+
+      // The next 3 methods are specifically to support BundleAdjust
+      void ZeroNumberOfRejectedMeasures();
+      void SetNumberOfRejectedMeasures(int numRejected);
+      int GetNumberOfRejectedMeasures();
+
+      // ########## DEPRECATED METHODS ##########
+      // The following are convenience functions for setting/getting the points
+      //   current lat,lon, radius from the x,y,z. These are all DEPRECATED.
+      //   Please use SetSurfacePoint.
+      Status SetUniversalGround(double lat, double lon, double radius);
+
+      double UniversalLatitude() const;
+      double UniversalLongitude() const;
+      Distance Radius() const;
+      // ########## END DEPRECATED METHODS ##########
 
     private:
-      std::string p_id; //!< Point Id
-      std::vector<Isis::ControlMeasure> p_measures; //!< List of Control Measures
-      PointType p_type; //!< This Control Point's Type
-      bool p_ignore;    //!< If this Control Point is ignored
-      bool p_held;      //!< If this Control Point is held
-      double p_latitude;  //!< The Latitude of this Control Point
-      double p_longitude; //!< The Longtude of this Control Point
-      double p_radius;    //!< The raduis of this Control Point
+      int FindMeasureIndex(iString serialNumber) const;
+      void PointModified();
 
-      bool p_invalid;  //!< If this Control Point is invalid
+      QVector<ControlMeasure> p_measures; //!< List of Control Measures
+
+      /**
+       * This is the control point ID. This is supposed to be a unique
+       *   identifier for control points. This often has a number in it, and
+       *   looks like "T0052" where the next one is "T0053" and so on.
+       */
+      iString p_id;
+
+      /**
+       * This is the user name of the person who last modified this control
+       *   point. Modifications are things like updating the surface point, but
+       *   not things like updating the last modified time. The calculations
+       *   relating to this control point have to actually change for this to
+       *   be updated. This is an empty string if we need to dynamically
+       *   get the username of the caller when asked for (or written to file).
+       */ 
+      iString p_chooserName;
+
+      /**
+       * This is the last modified date and time. This is updated automatically
+       *   and works virtually in the same way as p_chooserName.
+       */ 
+      iString p_dateTime;
+
+      /**
+       * What this control point is tying together.
+       * @see PointType
+       */ 
+      PointType p_type;
+
+      /**
+       * If we forced a build that we would normally have thrown an exception
+       *   for then this is set to true. Otherwise, and most of the time, this
+       *   is false.
+       */
+      bool p_invalid;
+
+      /**
+       * This stores the edit lock state.
+       * @see SetEditLock
+       */
+      bool p_editLock;
+
+      /**
+       * This stores the jigsaw rejected state.
+       * @see SetJigsawReject
+       */
+      bool p_jigsawRejected;
+
+      /**
+       * True if we should preserve but ignore the entire control point and its
+       *   measures.
+       */
+      bool p_ignore;
+
+      //! Where the apriori surface point originated from
+      SurfacePointSource::Source p_aprioriSurfacePointSource;
+
+      //! Filename where the apriori surface point originated from
+      iString p_aprioriSurfacePointSourceFile;
+
+      /**
+       * Where the apriori surface point's radius originated from, most commonly
+       *   used by jigsaw.
+       */
+      RadiusSource::Source p_aprioriRadiusSource;
+
+      /**
+       * The name of the file that derives the apriori surface point's radius
+       */
+      iString p_aprioriRadiusSourceFile;
+
+      /**
+       * The apriori surface point. This is the "known truth" or trustworthy
+       *   point that should not be modified unless done very explicitely. This
+       *   comes from places like hand picking where you really don't want the
+       *   surface point to vary far from this point, but some variation is
+       *   okay (1/10th of a pixel is fair for human accuracy for example). Very
+       *   often this point does not exist.
+       */
+      SurfacePoint p_aprioriSurfacePoint;
+
+      /**
+       * This is the calculated, or aposterori, surface point. This is what most
+       *   programs should be working with and updating.
+       */
+      SurfacePoint p_surfacePoint;
+
+      /**
+       * This parameter is used and maintained by BundleAdjust for the jigsaw
+       * application.  It is stored here because ControlPoint contains the index
+       * of the measures.
+       */
+      int p_numberOfRejectedMeasures;
   };
-};
+}
 
 #endif
-

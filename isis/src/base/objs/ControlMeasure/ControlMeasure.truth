@@ -1,112 +1,116 @@
-Test 1
+Test 1 Default values
 Group = ControlMeasure
   SerialNumber = Null
-  MeasureType  = Unmeasured
-  Sample       = Null
-  Line         = Null
-  Reference    = False
+  MeasureType  = Candidate
+  ChooserName  = ManuallySet
+  DateTime     = 2001-01-01T00:00:00
+  Sample       = 0.0
+  Line         = 0.0
 End_Group
 End
 Test 2
 Group = ControlMeasure
   SerialNumber   = Test
-  MeasureType    = Manual
+  MeasureType    = Reference
+  ChooserName    = Bob
+  DateTime       = 2005-05-03T00:00:00
+  Ignore         = True
   Sample         = 1.0
   Line           = 2.0
-  ErrorLine      = 4.0
-  ErrorSample    = -3.0
-  ErrorMagnitude = 5.0
   Diameter       = 15.0
-  DateTime       = 2005-05-03T00:00:00
-  ChooserName    = Bob
-  Ignore         = True
-  GoodnessOfFit  = 0.5
-  Reference      = True
+  AprioriSample  = 2.0
+  AprioriLine    = 5.0
+  SampleSigma    = 0.01 <pixels>
+  LineSigma      = 0.21 <pixels>
+  SampleResidual = -3.0 <pixels>
+  LineResidual   = 4.0 <pixels>
 End_Group
 End
 Test 3
 Group = ControlMeasure
   SerialNumber   = Test
-  MeasureType    = Estimated
+  MeasureType    = Candidate
+  ChooserName    = Bob
+  DateTime       = 2005-05-03T00:00:00
+  Ignore         = True
   Sample         = 1.0
   Line           = 2.0
-  ErrorLine      = 4.0
-  ErrorSample    = -3.0
-  ErrorMagnitude = 5.0
   Diameter       = 15.0
-  DateTime       = 2005-05-03T00:00:00
-  ChooserName    = Bob
-  Ignore         = True
-  GoodnessOfFit  = 0.5
-  Reference      = False
+  AprioriSample  = 2.0
+  AprioriLine    = 5.0
+  SampleSigma    = 0.01 <pixels>
+  LineSigma      = 0.21 <pixels>
+  SampleResidual = -3.0 <pixels>
+  LineResidual   = 4.0 <pixels>
 End_Group
 End
 Test 4
 Group = ControlMeasure
   SerialNumber   = Test
-  MeasureType    = Automatic
+  MeasureType    = Manual
+  ChooserName    = Bob
+  DateTime       = 2005-05-03T00:00:00
+  EditLock       = True
+  Ignore         = True
   Sample         = 1.0
   Line           = 2.0
-  ErrorLine      = 4.0
-  ErrorSample    = -3.0
-  ErrorMagnitude = 5.0
   Diameter       = 15.0
-  DateTime       = 2005-05-03T00:00:00
-  ChooserName    = Bob
-  Ignore         = True
-  GoodnessOfFit  = 0.5
-  Reference      = False
+  AprioriSample  = 2.0
+  AprioriLine    = 5.0
+  SampleSigma    = 0.01 <pixels>
+  LineSigma      = 0.21 <pixels>
+  SampleResidual = -3.0 <pixels>
+  LineResidual   = 4.0 <pixels>
 End_Group
 End
 Test 5
 Group = ControlMeasure
   SerialNumber   = Test
-  MeasureType    = ValidatedManual
+  MeasureType    = Manual
+  ChooserName    = Bob
+  DateTime       = 2005-05-03T00:00:00
+  Ignore         = True
   Sample         = 1.0
   Line           = 2.0
-  ErrorLine      = 4.0
-  ErrorSample    = -3.0
-  ErrorMagnitude = 5.0
   Diameter       = 15.0
-  DateTime       = 2005-05-03T00:00:00
-  ChooserName    = Bob
-  Ignore         = True
-  GoodnessOfFit  = 0.5
-  Reference      = False
+  AprioriSample  = 2.0
+  AprioriLine    = 5.0
+  SampleSigma    = 0.01 <pixels>
+  LineSigma      = 0.21 <pixels>
+  SampleResidual = -3.0 <pixels>
+  LineResidual   = 4.0 <pixels>
 End_Group
 End
 Test 6
 Group = ControlMeasure
   SerialNumber   = Test
-  MeasureType    = ValidatedAutomatic
+  MeasureType    = RegisteredSubPixel
+  ChooserName    = Bob
+  DateTime       = 2005-05-03T00:00:00
+  Ignore         = True
   Sample         = 1.0
   Line           = 2.0
-  ErrorLine      = 4.0
-  ErrorSample    = -3.0
-  ErrorMagnitude = 5.0
   Diameter       = 15.0
-  DateTime       = 2005-05-03T00:00:00
-  ChooserName    = Bob
-  Ignore         = True
-  GoodnessOfFit  = 0.5
-  Reference      = False
+  AprioriSample  = 2.0
+  AprioriLine    = 5.0
+  SampleSigma    = 0.01 <pixels>
+  LineSigma      = 0.21 <pixels>
+  SampleResidual = -3.0 <pixels>
+  LineResidual   = 4.0 <pixels>
 End_Group
 End
 Test 7
-Group = ControlMeasure
-  SerialNumber   = Test
-  MeasureType    = ValidatedAutomatic
-  Sample         = 1.0
-  Line           = 2.0
-  ErrorLine      = 4.0
-  ErrorSample    = -3.0
-  ErrorMagnitude = 5.0
-  ZScore         = (-1.1, 1.0)
-  Diameter       = 15.0
-  DateTime       = 2005-05-03T00:00:00
-  ChooserName    = Bob
-  Ignore         = True
-  GoodnessOfFit  = 0.5
-  Reference      = False
-End_Group
-End
+AprioriLine=5
+AprioriSample=2
+ChooserName=Bob
+CubeSerialNumber=Test
+DateTime=2005-05-03T00:00:00
+Line=2
+LineResidual=4
+LineSigma=0.21
+Sample=1
+SampleResidual=-3
+SampleSigma=0.01
+ResidualMagnitude=5
+MeasureType=RegisteredSubPixel
+2.22507e-308

@@ -53,7 +53,9 @@ namespace Isis {
   *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard Options &
   *                                         Std Options Pixels/Meters from Edge
   *   @history 2010-09-16 Sharmila Prasad - Renamed CnetValidMeasure to ControlNetValidMeasure
-  *   @history 2010-10-14 Sharmila Prasad - Use single copy of Control Net in FindCnetRef()
+  *   @history 2010-10-06 Sharmila Prasad - Modified to incorporate Binary Control Network
+  *   @history 2010-10-15 Sharmila Prasad - Use single copy of Control Net in FindCnetRef()
+  *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
   */
   
   /**
@@ -67,7 +69,8 @@ namespace Isis {
   class CnetRefByResolution : public ControlNetValidMeasure {
     public:
       //! Constructor
-      CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, ResolutionType peType = Low, double pdResValue = 0, double pdMinRes = 0, double pdMaxRes = 0);
+      CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, ResolutionType peType = Low, 
+                          double pdResValue = 0, double pdMinRes = 0, double pdMaxRes = 0);
       virtual ~CnetRefByResolution() {};
 
       //! Get the Log updated by this object
@@ -82,12 +85,14 @@ namespace Isis {
       virtual void FindCnetRef(ControlNet &pNewNet);
 
     private:
-      int GetReferenceByResolution(ControlPoint &pNewPoint); //!< Get the Reference based on Resolution type
-      std::vector<double> mdResVector;                       //!< Store the Resolutions of all Measures in a Point
-      ResolutionType meType;                                 //!< Resolution Type - Low, Mean, High, Value, Range
-      double mdResValue;                                     //!< Resolution value for Type=Value
-      double mdMinRes;                                       //!< Min Resolution for Type=Range
-      double mdMaxRes;                                       //!< Max Resolution for Type=Range
+      //! Get the Reference based on Resolution type
+      int GetReferenceByResolution(ControlPoint &pNewPoint); 
+      
+      std::vector<double> mdResVector; //!< Store the Resolutions of all Measures in a Point
+      ResolutionType meType;           //!< Resolution Type - Low, Mean, High, Value, Range
+      double mdResValue;               //!< Resolution value for Type=Value
+      double mdMinRes;                 //!< Min Resolution for Type=Range
+      double mdMaxRes;                 //!< Max Resolution for Type=Range
   };
 };
 #endif

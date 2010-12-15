@@ -3,9 +3,6 @@ UnitTest for ControlNet ....
 Test adding control points with identical id numbers ...
 **PROGRAMMER ERROR** ControlPoint must have unique Id
 
-Test adding invalid control point ...
-**PROGRAMMER ERROR** Invalid Point Enumeration, [999] for ControlPoint [T0002].
-
 Test deleting nonexistant control point id ...
 **USER ERROR** A ControlPoint matching the id [T0002] was not found in the ControlNet
 
@@ -14,101 +11,190 @@ Test deleting nonexistant control point index ...
 
 Object = ControlNetwork
   NetworkId    = Test
-  NetworkType  = ImageToGround
   TargetName   = Mars
-  UserName     = jdoe
-  Created      = 2009-02-05T14:20:15
-  LastModified = 2009-02-05T14:20:55
+  UserName     = TSucharski
+  Created      = 2010-07-10T12:50:15
+  LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
 
   Object = ControlPoint
-    PointType = Tie
-    PointId   = T0001
-    Ignore    = True
+    PointType               = Ground
+    PointId                 = T0000
+    ChooserName             = autoseed
+    DateTime                = 2010-08-27T17:10:06
+    EditLock                = True
+    AprioriXYZSource        = Basemap
+    AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
+    AprioriRadiusSource     = DEM
+    AprioriRadiusSourceFile = $base/dems/molaMarsPlanetaryRadius0003.cub
+    AprioriX                = -424.024048 <meters>
+    AprioriY                = 734.4311949 <meters>
+    AprioriZ                = 529.919264 <meters>
+    AprioriCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+    X                       = -424.024048 <meters>
+    Y                       = 734.4311949 <meters>
+    Z                       = 529.919264 <meters>
+    ApostCovarianceMatrix   = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
 
     Group = ControlMeasure
-      SerialNumber = Id1
-      MeasureType  = Unmeasured
-      Sample       = Null
-      Line         = Null
-      Reference    = False
-    End_Group
-  End_Object
-
-  Object = ControlPoint
-    PointType = Ground
-    PointId   = G0001
-    Latitude  = 30.5
-    Longitude = 175.0
-    Radius    = 3950.2
-    Held      = True
-
-    Group = ControlMeasure
-      SerialNumber   = Id1
-      MeasureType    = Manual
-      Sample         = 15.5
-      Line           = 23.2
-      ErrorLine      = 1.0
-      ErrorSample    = 1.0
-      ErrorMagnitude = 1.4142135623731
-      Diameter       = 7900.4
-      DateTime       = 2004-12-20T10:12:05
-      ChooserName    = janeDoe
-      Reference      = False
-    End_Group
-
-    Group = ControlMeasure
-      SerialNumber   = Id2
-      MeasureType    = Automatic
-      Sample         = 13.5
-      Line           = 168.3
-      ErrorLine      = 0.5
-      ErrorSample    = 0.5
-      ErrorMagnitude = 0.70710678118655
-      Reference      = False
-    End_Group
-  End_Object
-
-  Object = ControlPoint
-    PointType = Ground
-    PointId   = G0002
-    Latitude  = 63.5
-    Longitude = 168.2
-    Radius    = 3950.2
-
-    Group = ControlMeasure
-      SerialNumber   = Id1
-      MeasureType    = ValidatedManual
-      Sample         = 45.2
-      Line           = 135.4
-      ErrorLine      = 0.25
-      ErrorSample    = 0.25
-      ErrorMagnitude = 0.35355339059327
-      Reference      = False
+      SerialNumber   = id0
+      MeasureType    = Reference
+      ChooserName    = cnetref
+      DateTime       = 2010-08-27T17:10:06
+      EditLock       = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
     End_Group
 
     Group = ControlMeasure
-      SerialNumber   = Id2
-      MeasureType    = ValidatedAutomatic
-      Sample         = 53.8
-      Line           = 110.5
-      ErrorLine      = 0.1
-      ErrorSample    = 0.1
-      ErrorMagnitude = 0.14142135623731
-      Reference      = False
-    End_Group
-
-    Group = ControlMeasure
-      SerialNumber   = Id3
-      MeasureType    = Estimated
-      Sample         = 70.1
-      Line           = 118.7
-      ErrorLine      = 0.75
-      ErrorSample    = 0.75
-      ErrorMagnitude = 1.0606601717798
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
       Ignore         = True
-      Reference      = False
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0001
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+    Ignore      = True
+
+    Group = ControlMeasure
+      SerialNumber   = id0
+      MeasureType    = Reference
+      ChooserName    = cnetref
+      DateTime       = 2010-08-27T17:10:06
+      EditLock       = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0003
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+
+    Group = ControlMeasure
+      SerialNumber   = id0
+      MeasureType    = Reference
+      ChooserName    = cnetref
+      DateTime       = 2010-08-27T17:10:06
+      EditLock       = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0004
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+
+    Group = ControlMeasure
+      SerialNumber   = id0
+      MeasureType    = Reference
+      ChooserName    = cnetref
+      DateTime       = 2010-08-27T17:10:06
+      EditLock       = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
     End_Group
   End_Object
 End_Object
 End
+Test read/write of binary control networks ...
+Read/Write of binary files OK.

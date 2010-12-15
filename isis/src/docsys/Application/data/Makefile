@@ -1,7 +1,5 @@
 include $(ISISROOT)/make/isismake.macros
 
-.NOTPARALLEL:
-
 # ISIS APPLICATION DOCS MAKEFILE
 #   Process the XML files deposited by application
 #   makefiles
@@ -38,7 +36,7 @@ printer:
 	echo "        Printer Friendly Version"
 
 	for dirname in $(APPLICATIONS); do \
-	  cd $$dirname ; $(MAKE) -f ../Makefile-application printer ; cd .. ; \
+	  cd $$dirname ; make -f ../Makefile-application printer ; cd .. ; \
 	done
 	mkdir -p $(PFDIR)/styles ; \
 	rsync -lHptr --delete --rsh=ssh $(PFSTYLEDIR)/*.css $(PFDIR)/styles/ ; \
@@ -51,7 +49,7 @@ tabbed:
 	echo "        Tabbed Interface Version"
 
 	for dirname in $(APPLICATIONS); do \
- 	    cd $$dirname ; $(MAKE) -f ../Makefile-application tabbed ; cd .. ; \
+ 	    cd $$dirname ; make -f ../Makefile-application tabbed ; cd .. ; \
 	done
 	mkdir -p $(TABDIR)/styles ; \
 	rsync -lHptr --delete --rsh=ssh $(TABSTYLEDIR)/*.css $(TABDIR)/styles/ ; \

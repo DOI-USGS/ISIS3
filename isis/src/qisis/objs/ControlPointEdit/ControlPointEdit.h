@@ -81,6 +81,10 @@ namespace Qisis {
     *                          CubeViewport.  Fixed multiple include problems.
     *   @history 2010-11-17 Eric Hyer - now forwards new ControlNets to the
     *                          ChipViewports
+    *   @history 2010-11-19 Tracie Sucharski - Renamed the "Save Point" button
+    *                           to "Save Measure" along with signals and slots.
+    *                           Add a new "Save Point" button which actually
+    *                           saves the edit point to the network.
     *   @history 2010-11-22 Eric Hyer - Forwarded SIGNAL from StretchTool to
     *                          ChipViewports
     *   @history 2010-12-01 Eric Hyer - Added checkboxes for stretch locking
@@ -103,7 +107,7 @@ namespace Qisis {
     signals:
       void updateLeftView(double sample, double line);
       void updateRightView(double sample, double line);
-      void pointSaved();
+      void measureSaved();
       void newControlNetwork(Isis::ControlNet *);
       void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
 
@@ -125,7 +129,7 @@ namespace Qisis {
 
       void findPoint();
       void registerPoint();
-      void savePoint();
+      void saveMeasure();
       void updateLeftPositionLabel(double zoomFactor);
       void updateRightGeom();
       void updateRightPositionLabel(double zoomFactor);

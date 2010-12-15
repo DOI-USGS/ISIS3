@@ -3,8 +3,11 @@
 #include "Isis.h"
 
 #include "ControlNet.h"
+#include "ControlPoint.h"
 #include "ID.h"
 #include "Progress.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
 
 using namespace std;
 using namespace Isis;

@@ -1,5 +1,7 @@
 APPNAME = cnetref
 
+truth.pvl.IGNORELINES = UserName Created LastModified DateTime
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:

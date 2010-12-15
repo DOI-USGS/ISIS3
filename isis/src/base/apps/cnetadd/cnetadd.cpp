@@ -77,17 +77,14 @@ void IsisMain() {
         }
       }
     }
-
     // If duplicates throw error
     if(duplicates.Size() > 0) {
       hasDuplicateSerialNumbers = true;
     }
-
     SetControlPointLatLon(ui.GetFilename("FROMLIST"), ui.GetFilename("INNET"));
-
   }
 
-  Filename outNet(ui.GetFilename("OUTNET"));
+  Filename outNetFile(ui.GetFilename("OUTNET"));
 
   ControlNet inNet = ControlNet(ui.GetFilename("INNET"));
   inNet.SetUserName(Isis::Application::UserName());
@@ -111,6 +108,28 @@ void IsisMain() {
     for(int cp = 0; cp < inNet.Size(); cp++) {
       ControlPoint &point(inNet[cp]);
 
+      // If the point is locked and Apriori source is "AverageOfMeasures" 
+      // then do not add the measures.
+      if(point.EditLock() && 
+         point.AprioriSurfacePointSource() == ControlPoint::SurfacePointSource::AverageOfMeasures){
+        continue;
+      }
+      // If there are duplicate serial numbers in the addlist, prevent double adding
+      if(hasDuplicateSerialNumbers) {
+        std::string sn = SerialNumber::Compose(*cubepvl);
+        bool hasSerialNumber = false;
+
+        for(int cm = 0; cm < point.Size() && !hasSerialNumber; cm ++) {
+          if(sn == point[cm].CubeSerialNumber()) {
+            hasSerialNumber = true;
+          }
+        }
+
+        if(hasSerialNumber) {
+          continue;
+        }
+      }
+          
       double latitude;
       double longitude;
       if(retrievalOpt == "REFERENCE") {
@@ -129,7 +148,6 @@ void IsisMain() {
           throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
         }
       }
-
 
       if(cam->SetUniversalGround(latitude, longitude)) {
 
@@ -155,7 +173,9 @@ void IsisMain() {
           }
 
           ControlMeasure newCm;
-          newCm.SetCoordinate(cam->Sample(), cam->Line(), ControlMeasure::Estimated);
+          newCm.SetCoordinate(cam->Sample(), cam->Line(), ControlMeasure::Candidate);
+          newCm.SetAprioriSample(cam->Sample());
+          newCm.SetAprioriLine  (cam->Line());
           newCm.SetCubeSerialNumber(sn);
           newCm.SetDateTime();
           newCm.SetChooserName("Application cnetadd");
@@ -289,7 +309,7 @@ void IsisMain() {
       // Else, remove the unwanted measures from the modified point
       else {
         for(int cm = inNet[cp].Size() - 1; cm >= 0; cm --) {
-          if(!inNet[cp][cm].IsReference()  &&
+          if(!inNet[cp][cm].Type() ==  ControlMeasure::Reference &&
               it->second.find(inNet[cp][cm].CubeSerialNumber()) == it->second.end()) {
             inNet[cp].Delete(cm);
           }
@@ -298,7 +318,7 @@ void IsisMain() {
     }
   }
 
-  inNet.Write(outNet.Expanded());
+  inNet.Write(outNetFile.Expanded());
 
 }
 

@@ -26,6 +26,7 @@
 
 #include "Camera.h"
 #include "CameraGroundMap.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
 
@@ -70,6 +71,7 @@ namespace Isis {
    *            p_sB, p_slantRange, and p_dopplerFreq; and methods SlantRangeSigma,
    *            WaveLength, DopplerSigma, SetSlantRangeSigma, GetXY,
    *            GetXYdPosition, and GetXYdPoint.  Removed method SetWeightFactors.
+   *  @history 2010-08-05 Debbie A. Cook - changed to use Surface point class
    *
    */
   class RadarGroundMap : public CameraGroundMap {
@@ -84,8 +86,7 @@ namespace Isis {
 
       virtual bool SetGround(const double lat, const double lon);
       virtual bool SetGround(const double lat, const double lon, const double radius);
-      virtual bool GetXY(const double lat, const double lon, const double radius,
-                         double *cudx, double *cudy);
+      virtual bool GetXY(SurfacePoint point, double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
                                    double *cudx, double *cudy);
       virtual bool GetdXYdPoint(double lat, double lon, double radius, PartialType wrt,

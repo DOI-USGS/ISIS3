@@ -1,12 +1,11 @@
 #include "Isis.h"
-#include "IsisDebug.h"
-#include "iException.h"
 
 #include "Pvl.h"
 #include "ControlNet.h"
 #include "Progress.h"
 #include "InterestOperatorFactory.h"
 #include "InterestOperator.h"
+#include "iException.h"
 
 #include "CnetRefByEmission.h"
 #include "CnetRefByIncidence.h"
@@ -81,6 +80,7 @@ void IsisMain() {
       bLogFile = true;
     }
 
+    // get the Criteria option
     ControlNetValidMeasure *cnetValidMeas = NULL;
 
     // Process Reference by Emission Angle

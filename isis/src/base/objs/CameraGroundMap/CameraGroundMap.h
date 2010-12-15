@@ -27,6 +27,7 @@
 #include "Camera.h"
 #include "CameraDistortionMap.h"
 #include "SpicePosition.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
   /** Convert between undistorted focal plane and ground coordinates
@@ -56,6 +57,8 @@ namespace Isis {
    *  @history 2010-03-19 Debbie A. Cook Modified virtual method to return cudx and cudy; added
    *                       methods GetdXYdPosition, GetdXYdOrientation, GetdXYdPoint, PointPartial,
    *                       and DQuotient; and added members PartialType (from BundleAdjust) and p_lookJ.
+   *  @history 2010-08-05 Debbie A. Cook Added another version of GetXY to support changes from binary
+   *                       control net upgrade
    *
    */
   class CameraGroundMap {
@@ -76,8 +79,7 @@ namespace Isis {
 
       virtual bool SetGround(const double lat, const double lon);
       virtual bool SetGround(const double lat, const double lon, const double radius);
-      virtual bool GetXY(const double lat, const double lon, const double radius,
-                         double *cudx, double *cudy);
+      virtual bool GetXY(SurfacePoint point, double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
                                    double *cudx, double *cudy);
       virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType, int coefIndex,

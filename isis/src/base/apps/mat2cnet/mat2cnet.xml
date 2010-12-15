@@ -25,6 +25,16 @@
       included in the output control net.  The corresponding lines from the 
       RAND PPP file for these points will be copied to the RAND PPP log.
     </p>
+    <p>
+      The following indicates how the Isis2 Class is translated to an Isis3 MeasureType
+      <ul>
+        <li> "T" (Truth) is translated to Reference</li>
+        <li> "S" (SubPixel) is tranlated to RegisteredSubPixel</li>
+        <li> "M" (Measured) is translated to RegisteredPixel</li>
+        <li> "A" (Approximate) is tranlated to Candidate</li>
+        <li> "U" (Unmeasured) is translated to Candidate and the measure is set to Ignore</li>
+      </ul>
+    </p>
   </description>
 
   <category>
@@ -75,6 +85,9 @@
       programs.  Added INPUTPPP parameter. Changed parameter name from RAND to 
       PPP for more precise description and modified POINTTYPE parameter usage.  
       Added results to GUI log and added output PPPLOG parameter.  
+    </change>
+    <change name="Jeannie Walldren" date="2010-12-01">
+      Modified to be compatible with binary control network.  Modified errors app test Makefile.
     </change>
   </history>
 

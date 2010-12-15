@@ -146,6 +146,12 @@ namespace Isis {
    *             percentage for the search chip's subchip. Updated documentation
    *             and unitTest.
    *    @history 2010-08-04 Jeannie Walldren - Updated documentation.
+   *    @history 2010-10-07 Travis Addair - Changed enumeration value
+   *             "Success" into two separate values "SuccessPixel" and
+   *             "SuccessSubPixel" to differentiate between registrations
+   *             computed and not computed to sub-pixel accuracy.  Also added
+   *             method "Success()" to fill the role of looking at the
+   *             original "Success" value to know if AutoReg succeeded.
    *
    */
   class Pvl;
@@ -164,7 +170,8 @@ namespace Isis {
        * registration did not succeed.
        */
       enum RegisterStatus {
-        Success, //!< Success
+        SuccessPixel,                        //!< Success registering to whole pixel
+        SuccessSubPixel,                     //!< Success registering to sub-pixel accuracy
         PatternChipNotEnoughValidData,       //!< Not enough valid data in pattern chip
         FitChipNoData,                       //!< Fit chip did not have any valid data
         FitChipToleranceNotMet,              //!< Goodness of fit tolerance not satisfied
@@ -244,6 +251,16 @@ namespace Isis {
         p_testResidual = test;
       };
 
+      /**
+       * Return whether this object will attempt to register to whole or
+       * sub-pixel accuracy.
+       *
+       * @return on Is sub-pixel accuracy enabled?
+       */
+      bool SubPixelAccuracy() {
+        return p_subpixelAccuracy;
+      }
+
       //! Return pattern chip valid percent.  The default value is 
       double PatternValidPercent() const {
         return p_patternValidPercent;
@@ -286,6 +303,11 @@ namespace Isis {
       }
 
       AutoReg::RegisterStatus Register();
+
+      //! Return whether the match algorithm succeeded or not
+      inline bool Success() const {
+        return (p_status == SuccessPixel || p_status == SuccessSubPixel);
+      }
 
       //! Return the goodness of fit of the match algorithm
       inline double GoodnessOfFit() const {
@@ -484,7 +506,8 @@ namespace Isis {
 
       //TODO: remove these after control points are refactored.
       int p_Total;                                      //!< Registration Statistics Total keyword.
-      int p_Success;                                    //!< Registration statistics Success keyword.
+      int p_SuccessPixel;                               //!< Registration statistics Success keyword.
+      int p_SuccessSubPixel;                            //!< Registration statistics Success keyword.
       int p_PatternChipNotEnoughValidData;              //!< Registration statistics PatternNotEnoughValidData keyword.
       int p_PatternZScoreNotMet;                        //!< Registration statistics PatternZScoreNotMet keyword.
       int p_FitChipNoData;                              //!< Registration statistics FitChipNoData keyword.

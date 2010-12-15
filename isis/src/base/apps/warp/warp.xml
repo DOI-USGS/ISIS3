@@ -35,6 +35,9 @@
      <change name="Stacy Alley" date="2008-12-19"> 
       Updating documentation and adding examples
     </change>
+     <change name="Janet Barrett" date="2010-07-30"> 
+      Changed CONTROL parameter name to CNET.
+    </change>
   </history>
 
   <oldName>
@@ -74,7 +77,7 @@
         </description>
       </parameter>
 
-      <parameter name="CONTROL">
+      <parameter name="CNET">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -272,7 +275,7 @@
             Control net input file.
           </brief>
           <description>
-            This is the require input for the CONTROL parameter.  User can edit 
+            This is the require input for the CNET parameter.  User can edit 
             this file to fit individual needs.  In each control point there are 
             two measures.  Measure 1 is the point on the from file you would 
             like to map to measure 2.
@@ -327,7 +330,7 @@
             Control net input file.
           </brief>
           <description>
-            This is the require input for the CONTROL parameter.  User can edit 
+            This is the require input for the CNET parameter.  User can edit 
             this file to fit individual needs.  In each control point there are 
             two measures.  Measure 1 is the point on the from file you would 
             like to map to measure 2.

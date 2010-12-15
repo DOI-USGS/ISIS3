@@ -325,14 +325,13 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::GetXY(const double lat, const double lon, const double radius,
-                             double *cudx, double *cudy) {
+  bool RadarGroundMap::GetXY(SurfacePoint point, double *cudx, double *cudy) {
 
     // Get the ground point in rectangular body-fixed coordinates (X)
-    SpiceDouble X[3];
-    SpiceDouble rlat = lat * Isis::PI / 180.0;
-    SpiceDouble rlon = lon * Isis::PI / 180.0;
-    latrec_c(radius / 1000., rlon, rlat, X);
+    double X[3];
+    X[0] = point.GetX();
+    X[1] = point.GetY();
+    X[2] = point.GetX();
 
     // Compute body-fixed look vector
     SpiceRotation *bodyFrame = p_camera->BodyRotation();

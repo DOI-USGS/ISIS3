@@ -8,6 +8,10 @@
 #include "Cube.h"
 #include "Filename.h"
 #include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "SpecialPixel.h"
+#include "SurfacePoint.h"
 #include "UniversalGroundMap.h"
 
 using namespace std;
@@ -16,33 +20,38 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  ControlNet cnet_in(ui.GetFilename("CNET"));
-  ControlNet cnet_out;
+  ControlNet cnet(ui.GetFilename("CNET"));
 
   // Get input cube and get camera model for it
   string from = ui.GetFilename("DEM");
   Cube cube;
   cube.Open(from);
-// TODO: need empty constructor to declare ugm outside try/catch
-//  try {
-  UniversalGroundMap ugm(cube);
-//  } catch (iException e){
-//    std::string msg = "Cannot initalize UniversalGroundMap for cube [" + from + "]";
-//    throw iException::Message(iException::User,msg,_FILEINFO_);
-//  }
+
+  UniversalGroundMap *ugm = NULL;
+  try {
+    ugm = new UniversalGroundMap(cube);
+  } catch (iException e){
+    iString msg = "Cannot initalize UniversalGroundMap for cube [" + from + "]";
+    throw iException::Message(iException::User,msg,_FILEINFO_);
+  }
 
 
   int numSuccesses = 0;
   int numFailures = 0;
   string failedIDs = "";
 
-  for(int i = 0; i < cnet_in.Size() ; i++) {
-    ControlPoint temp_cp = cnet_in[i];
-    if(temp_cp.Type() == ControlPoint::Ground) {
+  for(int i = 0; i < cnet.Size() ; i++) {
+    ControlPoint &cp = cnet[i];
+    cerr << cp.Type() << "\n";
+    if(cp.Type() == ControlPoint::Ground) {
       // Create Brick on samp, line to get the dn value of the pixel
+      SurfacePoint surfacePt = cp.GetSurfacePoint();
+      cerr << surfacePt.GetLatitude().GetDegrees() << "," << surfacePt.GetLongitude().GetDegrees() << "\n";
       Brick b(1, 1, 1, cube.PixelType());
-      bool ugSuccess = ugm.SetUniversalGround(temp_cp.UniversalLatitude(), temp_cp.UniversalLongitude());
-      b.SetBasePosition((int)ugm.Sample(), (int)ugm.Line(), 1);
+      bool ugSuccess = ugm->SetUniversalGround(
+          surfacePt.GetLatitude().GetDegrees(),
+          surfacePt.GetLongitude().GetDegrees());
+      b.SetBasePosition((int)ugm->Sample(), (int)ugm->Line(), 1);
       cube.Read(b);
       double newRadius = b[0];
 
@@ -53,32 +62,27 @@ void IsisMain() {
         if(numFailures > 1) {
           failedIDs = failedIDs + ", ";
         }
-        failedIDs = failedIDs + temp_cp.Id();
-        temp_cp.SetIgnore(true);
+        failedIDs = failedIDs + cp.Id();
+        cp.SetIgnore(true);
       }
       // otherwise, we will replace the computed radius value to the output control net
       else {
         numSuccesses++;
-        temp_cp.SetUniversalGround(temp_cp.UniversalLatitude(), temp_cp.UniversalLongitude(), newRadius);
+        surfacePt.ResetLocalRadius(newRadius);
+        cp.SetSurfacePoint(surfacePt);
       }
     }
-    cnet_out.Add(temp_cp);
   }
+
+  delete ugm;
+  ugm = NULL;
 
   if(numSuccesses == 0) {
     string msg = "No valid radii can be calculated. Verify that the DEM [" + ui.GetAsString("DEM") + "] is valid.";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
-  // Propogate and Create Labels
-  cnet_out.SetType(cnet_in.Type());
-  cnet_out.SetTarget(cnet_in.Target());
-  cnet_out.SetNetworkId(ui.GetString("NETWORKID"));
-  cnet_out.SetUserName(Isis::Application::UserName());
-  cnet_out.SetDescription(cnet_in.Description());
-  cnet_out.SetCreatedDate(Isis::Application::DateTime());
-
-  cnet_out.Write(ui.GetFilename("TO"));
+  cnet.Write(ui.GetFilename("TO"));
 
   // Write results to Logs
   // Summary group is created with the counts of successes and failures

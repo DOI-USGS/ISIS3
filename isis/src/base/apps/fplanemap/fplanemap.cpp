@@ -8,6 +8,8 @@
 #include "ControlNet.h"
 #include "SerialNumber.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 #include "Brick.h"
 
 using namespace std;

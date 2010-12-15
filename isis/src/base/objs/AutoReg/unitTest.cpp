@@ -297,9 +297,18 @@ int main() {
   p_ar->SetSurfaceModelDistanceTolerance(1.5);
   Doit(obj);
 
-  cout << "\n----------------" << endl;
-  cout << "Testing Success" << endl;
-  cout << "----------------" << endl;
+  cout << "\n---------------------" << endl;
+  cout << "Testing SuccessPixel" << endl;
+  cout << "---------------------" << endl;
+  p_ar->SetSubPixelAccuracy(false);
+  DoRegister();
+  //Reset to sub-pixel accuracy
+  p_ar->SetSubPixelAccuracy(true);
+  Doit(obj);
+
+  cout << "\n------------------------" << endl;
+  cout << "Testing SuccessSubPixel" << endl;
+  cout << "------------------------" << endl;
   DoRegister();
 
   delete p_ar;
@@ -357,8 +366,8 @@ void Doit(Isis::PvlObject &obj) {
 }
 
 void DoRegister() {
-  AutoReg::RegisterStatus status = p_ar->Register();
-  if(status == AutoReg::Success) {
+  p_ar->Register();
+  if(p_ar->Success()) {
     std::cout << "Position = " << p_ar->CubeSample() << " " <<  p_ar->CubeLine() << std::endl;
   }
   Pvl regstats = p_ar->RegistrationStatistics();

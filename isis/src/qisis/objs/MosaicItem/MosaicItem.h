@@ -1,25 +1,49 @@
 #ifndef MosaicItem_H
 #define MosaicItem_H
 
-#include <QGraphicsPolygonItem>
 #include <QBitmap>
+#include <QColor>
+#include <QFont>
+#include <QGraphicsPolygonItem>
+#include <QGraphicsSimpleTextItem>
+#include <QImage>
+#include <QList>
+#include <QMap>
+#include <QPointF>
+#include <QPolygonF>
+#include <QRectF>
+#include <QTreeWidgetItem>
 
-#include "ControlNet.h"
-#include "ControlMeasure.h"
-#include "geos/geom/MultiPolygon.h"
-#include "geos/geom/CoordinateSequence.h"
-#include "Filename.h"
-#include "Projection.h"
+#include <geos/geom/MultiPolygon.h>
+#include <geos/geom/CoordinateSequence.h>
+
 #include "MosaicWidget.h"
+
+#include "Filename.h"
 #include "Cube.h"
 #include "Stretch.h"
-#include "Brick.h"
-#include "PvlGroup.h"
-#include "UniversalGroundMap.h"
+
+namespace Isis {
+  class ControlNet;
+  class Projection;
+  class PvlGroup;
+  class UniversalGroundMap;
+}
 
 namespace Qisis {
-  class MosaicWidget;
 
+  /**
+   * @brief
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author Stacy Alley
+   *
+   * @internal
+   *
+   *  @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
+   *                                removing includes from ControlNet.h.
+   */
   class MosaicItem : public QGraphicsPolygonItem {
 
     public:

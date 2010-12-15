@@ -148,6 +148,8 @@ namespace Isis {
       operator std::string() const {
         return (std::string) operator[](0);
       };
+      
+      operator QString() const;
 
       const Isis::iString &operator[](const int index) const;
       Isis::iString &operator[](const int index);

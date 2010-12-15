@@ -4,19 +4,25 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "Displacement.h"
 #include "Filename.h"
 #include "iException.h"
 #include "iString.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Progress.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
+#include "SurfacePoint.h"
 #include "TextFile.h"
 #include "UserInterface.h"
 
 #include <QString>
-#include <QVector>
+
+#include <QStringList>
+#include <QList>
 
 #include <string>
 
@@ -46,7 +52,7 @@ void IsisMain() {
   Progress prog;
 
   // Get user entered information
-  UserInterface &ui = Application::GetUserInterface();
+  UserInterface & ui = Application::GetUserInterface();
   ControlNet cnet(ui.GetFilename("CNET"));
   SerialNumberList serials(ui.GetFilename("FROMLIST"));
   append = ui.GetBoolean("APPEND");
@@ -59,52 +65,188 @@ void IsisMain() {
   prog.SetMaximumSteps(cnet.Size());
 
   // If append is true, output will be appended or a new file created
-  if(append) {
+  if (append) {
     // Check to see if its a new file or we open an existing file
-    Filename file(ui.GetFilename("TO"));
-    if(!file.Exists()) {
+    Filename file(ui.GetFilename("FLATFILE"));
+    if (!file.Exists()) {
       // It is new, so we aren't appending
+      // Set this because it is used elsewhere
       append = false;
     }
-    txt = new TextFile(ui.GetFilename("TO"), "append");
+    txt = new TextFile(ui.GetFilename("FLATFILE"), "append");
   }
   // Without append, if the files exists it will be overwritten
   else {
-    txt = new TextFile(ui.GetFilename("TO"), "overwrite");
+    txt = new TextFile(ui.GetFilename("FLATFILE"), "overwrite");
   }
 
-  PvlGroup *grp = NULL;
+  PvlGroup * grp = NULL;
   CameraPointInfo camPoint;
 
   outside = ui.GetBoolean("ALLOWOUTSIDE");
   errors = ui.GetBoolean("ALLOWERRORS");
 
   // Loop through all points in controlnet
-  for(int i = 0; i < cnet.Size(); i++) {
+  for (int i = 0; i < cnet.Size(); i++) {
     ControlPoint &cpoint = cnet[i];
 
-    if(isFirst && !append) {
+    if (isFirst && !append) {
       measureLabels += "ControlPointId,";
       measureLabels += "PointType,";
+      measureLabels += "ChooserName,";
+      measureLabels += "DateTime,";
+      measureLabels += "EditLock,";
       measureLabels += "Ignored,";
-      measureLabels += "Held,";
-      measureLabels += "Invalid,";
-      measureLabels += "UniversalLatitude,";
-      measureLabels += "UniversalLongitude,";
-      measureLabels += "Radius,";
+
+      measureLabels += "AprioriSurfacePointSource,";
+      measureLabels += "AprioriSurfacePointSourceFile,";
+
+      measureLabels += "AprioriRadiusSource,";
+      measureLabels += "AprioriRadiusSourceFile,";
+
+      measureLabels += "AprioriX,";
+      measureLabels += "AprioriY,";
+      measureLabels += "AprioriZ,";
+      measureLabels += "AprioriXSigma,";
+      measureLabels += "AprioriYSigma,";
+      measureLabels += "AprioriZSigma,";
+      measureLabels += "AprioriLatitude,";
+      measureLabels += "AprioriLongitude,";
+      measureLabels += "AprioriLocalRadius,";
+      measureLabels += "AprioriLatitudeSigma,";
+      measureLabels += "AprioriLongitudeSigma,";
+      measureLabels += "AprioriLocalRadiusSigma,";
+      measureLabels += "AprioriLatitudeSigmaDistance,";
+      measureLabels += "AprioriLongitudeSigmaDistance,";
+
+      measureLabels += "X,";
+      measureLabels += "Y,";
+      measureLabels += "Z,";
+      measureLabels += "XSigma,";
+      measureLabels += "YSigma,";
+      measureLabels += "ZSigma,";
+      measureLabels += "Latitude,";
+      measureLabels += "Longitude,";
+      measureLabels += "LocalRadius,";
+      measureLabels += "LatitudeSigma,";
+      measureLabels += "LongitudeSigma,";
+      measureLabels += "LocalRadiusSigma,";
+      measureLabels += "LatitudeSigmaDistance,";
+      measureLabels += "LongitudeSigmaDistance,";
+
+      measureLabels += "MinimumResidual,";
+      measureLabels += "MaximumResidual,";
+      measureLabels += "AverageResidual,";
+      measureLabels += "MinimumSampleResidual,";
+      measureLabels += "MaximumSamlpeResidual,";
+      measureLabels += "MinimumLineResidual,";
+      measureLabels += "MaximumLineResidual,";
     }
+/*
+ * ChooserName
+ * DateTime
+   EditLock
+   Ignore
+   AprioriXYZSource
+   AprioriXYZSourceFile
+   AprioriRadiusSrouce
+   AprioriRadiusSourceFile
+   AprioriX
+   AprioriY
+   AprioriZ
+   AprioriSigmaX
+   AprioriSigmaY
+   AprioriSigmaZ
+   X
+   Y
+   Z
+   ApostSigmaX
+   ApostSigmaY
+   ApostSigmaZ
+   double MinimumSampleResidual() const;
+   double MinimumLineResidual() const;
+   double MinimumResidual() const;
+   double MaximumLineResidual() const;
+   double MaximumSampleResidual() const;
+   UniversalLatitude
+   UniversalLongitude
+   Radius
+   XYZSource
+   RadiusSource
+   AverageResidual
+   MaximumResidual
+ */
 
     // Always add data
     measureInfo.clear();
-    measureInfo += QString(cpoint.Id().c_str()) + ",";
-    measureInfo += QString(cpoint.PointTypeToString().c_str()) + ",";
+    measureInfo += cpoint.Id().ToQt() + ",";
+    measureInfo += cpoint.PointTypeString().ToQt() + ",";
+    measureInfo += iString(cpoint.ChooserName()).ToQt() + ",";
+    measureInfo += iString(cpoint.DateTime()).ToQt() + ",";
+    measureInfo += iString(cpoint.EditLock()).ToQt() + ",";
     measureInfo += iString(cpoint.Ignore()).ToQt() + ",";
-    measureInfo += iString(cpoint.Held()).ToQt() + ",";
-    measureInfo += iString(cpoint.Invalid()).ToQt() + ",";
-    measureInfo += iString(cpoint.UniversalLatitude()).ToQt() + ",";
-    measureInfo += iString(cpoint.UniversalLongitude()).ToQt() + ",";
-    measureInfo += iString(cpoint.Radius()).ToQt() + ",";
 
+    measureInfo += iString(cpoint.SurfacePointSourceString()).ToQt() + ",";
+    measureInfo += iString(cpoint.AprioriSurfacePointSourceFile()).ToQt() + ",";
+    measureInfo += iString(cpoint.RadiusSourceString()).ToQt() + ",";
+    measureInfo += iString(cpoint.AprioriRadiusSourceFile()).ToQt() + ",";
+
+    SurfacePoint Asp = cpoint.GetAprioriSurfacePoint();
+    measureInfo += iString(Asp.GetX().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(Asp.GetY().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(Asp.GetZ().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(Asp.GetXSigma().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(Asp.GetYSigma().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(Asp.GetZSigma().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(Asp.GetLatitude().GetPlanetocentric(Angle::Degrees)).ToQt() + ",";
+    measureInfo += iString(Asp.GetLongitude().GetPositiveEast(Angle::Degrees)).ToQt() + ",";
+    measureInfo += iString(Asp.GetLocalRadius().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(Asp.GetLatSigma().GetDegrees()).ToQt() + ",";
+    measureInfo += iString(Asp.GetLonSigma().GetDegrees()).ToQt() + ",";
+    measureInfo += iString(Asp.GetLocalRadiusSigma().GetKilometers()).ToQt() + ",";
+    try { measureInfo += iString(Asp.GetLatSigmaDistance().GetKilometers()).ToQt() + ","; }
+    catch (iException e) {
+      e.Clear();
+      measureInfo += ",";
+    }
+    try { measureInfo += iString(Asp.GetLonSigmaDistance().GetKilometers()).ToQt() + ","; }
+    catch (iException e) {
+      e.Clear();
+      measureInfo += ",";
+    }
+
+    SurfacePoint sp = cpoint.GetSurfacePoint();
+    measureInfo += iString(sp.GetX().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(sp.GetY().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(sp.GetZ().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(sp.GetXSigma().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(sp.GetYSigma().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(sp.GetZSigma().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(sp.GetLatitude().GetPlanetocentric(Angle::Degrees)).ToQt() + ",";
+    measureInfo += iString(sp.GetLongitude().GetPositiveEast(Angle::Degrees)).ToQt() + ",";
+    measureInfo += iString(sp.GetLocalRadius().GetKilometers()).ToQt() + ",";
+    measureInfo += iString(sp.GetLatSigma().GetDegrees()).ToQt() + ",";
+    measureInfo += iString(sp.GetLonSigma().GetDegrees()).ToQt() + ",";
+    measureInfo += iString(sp.GetLocalRadiusSigma().GetKilometers()).ToQt() + ",";
+    try { measureInfo += iString(sp.GetLatSigmaDistance().GetKilometers()).ToQt() + ","; }
+    catch (iException e) {
+      e.Clear();
+      measureInfo += ",";
+    }
+    try { measureInfo += iString(sp.GetLonSigmaDistance().GetKilometers()).ToQt() + ","; }
+    catch (iException e) {
+      e.Clear();
+      measureInfo += ",";
+    }
+
+    measureInfo += iString(cpoint.MinimumResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.MaximumResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.AverageResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.MinimumSampleResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.MaximumSampleResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.MinimumLineResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.MinimumLineResidual()).ToQt() + ",";
+    
     // Loop through all measures in controlpoint
     for(int j = 0; j < cpoint.Size(); j++) {
 
@@ -144,7 +286,7 @@ void Write(PvlGroup *point, ControlMeasure &cm) {
   // this is necessary as iString will accept doubles but QString won't.
 
   QString output = "";
-  QVector < QString > dataNames;
+  QVector < iString > dataNames;
 
   // Do we have errors?
   int maxCount = 0;
@@ -158,6 +300,13 @@ void Write(PvlGroup *point, ControlMeasure &cm) {
 
   // If its first and not appending, write the column labels
   if(isFirst && !append) {
+
+    QList< QStringList > printableMeasureData = cm.PrintableClassData();
+    QStringList nameValuePair;
+    foreach (nameValuePair, printableMeasureData) {
+      output += nameValuePair.at(0) + ",";
+    }
+    
     // point information
     for(int i = 0; i < maxCount; i++) {
       if((*point)[i].Size() == 3) {
@@ -171,10 +320,12 @@ void Write(PvlGroup *point, ControlMeasure &cm) {
     }
 
     // control measure information
-    dataNames = cm.GetMeasureDataNames();
-    for(int i = 0; i < dataNames.size(); i++) {
-      output += dataNames[i] + ",";
-    }
+    //dataNames = cm.GetMeasureDataNames();
+    //for(int i = 0; i < dataNames.size(); i++) {
+    //  output += iString(dataNames[i] + ",").ToQt();
+    //}
+
+
     if(errors) output += QString((*point)[maxCount].Name().c_str());
     isFirst = false;
     measureLabels += output;
@@ -182,6 +333,12 @@ void Write(PvlGroup *point, ControlMeasure &cm) {
   }
   output.clear();
   measureLabels.clear();
+
+  QList< QStringList > printableMeasureData = cm.PrintableClassData();
+  QStringList nameValuePair;
+  foreach (nameValuePair, printableMeasureData) {
+    output += nameValuePair.at(1) + ",";
+  }
 
   // Write out date values
   // point information
@@ -196,14 +353,16 @@ void Write(PvlGroup *point, ControlMeasure &cm) {
     }
   }
 
-  dataNames = cm.GetMeasureDataNames();
-  for(int i = 0; i < dataNames.size(); i++) {
-    output += iString(cm.GetMeasureData(dataNames[i])).ToQt() + ",";
-  }
+  //dataNames = cm.GetMeasureDataNames();
+  //for(int i = 0; i < dataNames.size(); i++) {
+  //  output += iString(cm.GetMeasureData(dataNames[i])).ToQt() + ",";
+  //}
+
+  
 
   if(errors) output += QString((*point)[maxCount][0]);
 
-  // Meseaure info comes first
+  // Meaure info comes first
   QString pri = "";
   pri += measureInfo;
   pri += output;

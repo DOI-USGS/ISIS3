@@ -14,6 +14,8 @@
 #include "SerialNumber.h"
 #include "ControlMeasure.h"
 #include "iTime.h"
+#include "iString.h"
+#include "ControlPoint.h"
 #include "ProgramLauncher.h"
 
 using namespace std;
@@ -35,7 +37,7 @@ void IsisMain() {
   // Make sure the correct parameters are entered
   if(ui.WasEntered("TO")) {
     if(ui.GetString("TRANSFORM") == "WARP") {
-      if(!ui.WasEntered("CNETFILE")) {
+      if(!ui.WasEntered("ONET")) {
         string msg = "A Control Net file must be entered if the TO parameter is ";
         msg += "entered";
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
@@ -46,7 +48,7 @@ void IsisMain() {
   // Open the first cube.  It will be matched to the second input cube.
   Cube trans;
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
-  vector<string> bandTrans = attTrans.Bands();
+  std::vector<string> bandTrans = attTrans.Bands();
   trans.SetVirtualBands(bandTrans);
   trans.Open(ui.GetFilename("FROM"), "r");
 
@@ -55,7 +57,7 @@ void IsisMain() {
   // first to this one by attempting to compute a sample/line translation
   Cube match;
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
-  vector<string> bandMatch = attMatch.Bands();
+  std::vector<string> bandMatch = attMatch.Bands();
   match.SetVirtualBands(bandMatch);
   match.Open(ui.GetFilename("MATCH"), "r");
 
@@ -93,7 +95,7 @@ void IsisMain() {
   // We need to get a user definition of how to auto correlate around each
   // of the control points.
   Pvl regdef;
-  regdef.Read(ui.GetFilename("REGDEF"));
+  regdef.Read(ui.GetFilename("DEFFILE"));
   AutoReg *ar = AutoRegFactory::Create(regdef);
 
   // We want to create a grid of control points that is N rows by M columns.
@@ -122,11 +124,13 @@ void IsisMain() {
   double lSpacing = (double)trans.Lines() / rows;
   double sSpacing = (double)trans.Samples() / cols;
 
-  // Initialize control point network
+  // Initialize control point network and set target name (only required
+  // field)
   ControlNet cn;
-  cn.SetType(ControlNet::ImageToImage);
-  cn.SetUserName(Application::UserName());
-  cn.SetCreatedDate(iTime::CurrentLocalTime());
+  PvlGroup inst = match.GetGroup("Instrument");
+  PvlKeyword &targname = inst.FindKeyword("TargetName");
+  string targetname = targname;
+  cn.SetTarget(targetname);
 
   // Loop through grid of points and get statistics to compute
   // translation values
@@ -143,27 +147,27 @@ void IsisMain() {
       // Set up ControlMeasure for cube to translate
       ControlMeasure cmTrans;
       cmTrans.SetCubeSerialNumber(serialTrans);
-      cmTrans.SetCoordinate(samp, line, ControlMeasure::Unmeasured);
+      cmTrans.SetCoordinate(samp, line, ControlMeasure::Candidate);
       cmTrans.SetChooserName("coreg");
-      cmTrans.SetReference(false);
 
       // Set up ControlMeasure for the pattern/Match cube
       ControlMeasure cmMatch;
       cmMatch.SetCubeSerialNumber(serialMatch);
-      cmMatch.SetCoordinate(samp, line, ControlMeasure::Automatic);
+      cmMatch.SetCoordinate(samp, line, ControlMeasure::RegisteredPixel);
       cmMatch.SetChooserName("coreg");
-      cmMatch.SetReference(true);
+      cmMatch.SetType(ControlMeasure::Reference);
+
+      ar->Register();
 
       // Match found
-      if(ar->Register() == AutoReg::Success) {
+      if(ar->Success()) {
         double sDiff = samp - ar->CubeSample();
         double lDiff = line - ar->CubeLine();
         sStats.AddData(&sDiff, (unsigned int)1);
         lStats.AddData(&lDiff, (unsigned int)1);
         cmTrans.SetCoordinate(ar->CubeSample(), ar->CubeLine(),
-                              ControlMeasure::Automatic);
-        cmTrans.SetError(sDiff, lDiff);
-        cmTrans.SetGoodnessOfFit(ar->GoodnessOfFit());
+                              ControlMeasure::RegisteredPixel);
+        cmTrans.SetResidual(sDiff, lDiff);
       }
 
       // Add the measures to a control point
@@ -220,8 +224,8 @@ void IsisMain() {
   match.Close();
 
   // If a cnet file was entered, write the ControlNet pvl to the file
-  if(ui.WasEntered("CNETFILE")) {
-    cn.Write(ui.GetFilename("CNETFILE"));
+  if(ui.WasEntered("ONET")) {
+    cn.Write(ui.GetFilename("ONET"));
   }
 
   // If flatfile was entered, create the flatfile
@@ -232,7 +236,7 @@ void IsisMain() {
     ofstream os;
     os.open(fFile.c_str(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
-       "SampleDifference,LineDifference,GoodnessOfFit" << endl;
+       "SampleDifference,LineDifference" << endl;
     for(int i = 0; i < cn.Size(); i++) {
       ControlPoint cp = cn[i];
       if(cp.Ignore()) continue;
@@ -240,8 +244,7 @@ void IsisMain() {
       ControlMeasure cmMatch = cp[1];
       os << cmTrans.Sample() << "," << cmTrans.Line() << ","
          << cmMatch.Sample() << "," << cmMatch.Line() << ","
-         << cmTrans.SampleError() << "," << cmTrans.LineError() << ","
-         << cmTrans.GoodnessOfFit() << endl;
+         << cmTrans.SampleResidual() << "," << cmTrans.LineResidual() << endl;
     }
   }
 
@@ -257,7 +260,7 @@ void IsisMain() {
     else {
       string params = "from=" + ui.GetFilename("FROM") + " to=" +
                       ui.GetFilename("TO") + " cube=" + ui.GetFilename("MATCH") + " control=" +
-                      ui.GetFilename("CNETFILE") + " interp=" + ui.GetString("INTERP") +
+                      ui.GetFilename("ONET") + " interp=" + ui.GetString("INTERP") +
                       " degree=" + iString(ui.GetInteger("DEGREE"));
       ProgramLauncher::RunIsisProgram("warp", params);
     }
@@ -267,7 +270,7 @@ void IsisMain() {
 //Helper function to output the regdeft file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFilename("REGDEF"));
+  string file(ui.GetFilename("DEFFILE"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

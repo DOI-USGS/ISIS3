@@ -226,13 +226,22 @@
       Added documentation, display error for Interest option with no DefFile.
     </change>
     <change name="Sharmila Prasad" date="2010-06-18">
-      Use Standard Options Pixels/Meters from Edge 
+      Use Standard Options Pixels/Meters from Edge
     </change>
-    <change name="Sharmila Prasad" date="2010-10-14">
+    <change name="Sharmila Prasad" date="2010-10-06">
+      Made changes for binary control net
+    </change>
+    <change name="Sharmila Prasad" date="2010-10-15">
       Use single copy of Control Net
     </change>
     <change name="Sharmila Prasad" date="2010-10-18">
       Input DefFile Validation before any processing
+    </change>
+    <change name="Sharmila Prasad" date="2010-10-22">
+      Reset apriori for source==Reference
+    </change>
+    <change name="Sharmila Prasad" date="2010-10-27">
+      Log, if Reference changed and apriorisource==Reference
     </change>
     <change name="Sharmila Prasad" date="2010-11-09">
       Update documentation regarding Template DefFile

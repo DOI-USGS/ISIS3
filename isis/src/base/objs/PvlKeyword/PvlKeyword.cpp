@@ -22,6 +22,8 @@
 
 #include "IsisDebug.h"
 
+#include <QString>
+
 #include "PvlKeyword.h"
 #include "iException.h"
 #include "Message.h"
@@ -255,6 +257,12 @@ namespace Isis {
     p_values.clear();
     p_units.clear();
   }
+  
+  
+  PvlKeyword::operator QString() const {
+    return QString::fromStdString((std::string) operator[](0));
+  }
+  
 
   /**
    * Gets value for this object at specified index.

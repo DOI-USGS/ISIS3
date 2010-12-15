@@ -48,7 +48,9 @@ namespace Isis {
   *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard 
   *                                         Options & Std Options Pixels/Meters from Edge
   *   @history 2010-09-16 Sharmila Prasad - Renamed CnetValidMeasure to ControlNetValidMeasure
-  *   @history 2010-10-14 Sharmila Prasad - Use single copy of Control Net in FindCnetRef()
+  *   @history 2010-10-06 Sharmila Prasad - Modified to incorporate Binary Control Network
+  *   @history 2010-10-15 Sharmila Prasad - Use single copy of Control Net in FindCnetRef()
+  *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
   */
   class Pvl;
   class ControlNet;

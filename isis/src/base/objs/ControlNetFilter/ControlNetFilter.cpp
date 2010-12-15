@@ -64,7 +64,7 @@ namespace Isis {
   }
   
   /**
-   * Get the output file and the file format (pvl / cvs)
+   * Get the output file and open the output file stream
    *  
    * @author Sharmila Prasad (9/7/2010)
    * 
@@ -95,7 +95,7 @@ namespace Isis {
    */
   void ControlNetFilter::PointStatsHeader(void)
   {
-    mOstm << "PointID, Type, Ignore, Held, NumMeasures, NumIgnoredMeasures, ";
+    mOstm << "PointID, Type, Ignore, NumMeasures, NumIgnoredMeasures, ";
   }
 
   /**
@@ -109,7 +109,7 @@ namespace Isis {
   {
     mOstm << pcPoint.Id()   << ", " << sPointType[(int)pcPoint.Type()] << ", ";
     mOstm << sBoolean[(int)pcPoint.Ignore()] << ", " ;
-    mOstm << sBoolean[(int)pcPoint.Held()] << ", " << pcPoint.Size() << ", ";
+    mOstm << sBoolean[(int)pcPoint.EditLock()] << ", " << pcPoint.Size() << ", ";
     mOstm << pcPoint.Size()-pcPoint.NumValidMeasures() << ", ";
   }
   
@@ -133,7 +133,7 @@ namespace Isis {
    */
   void ControlNetFilter::CubeStatsHeader(void)
   {
-    mOstm << "FileName, SerialNum, Total Points, Ignore, Ground, Held, ";
+    mOstm << "FileName, SerialNum, Total Points, Ignore, Ground, ";
   }
 
   /**
@@ -161,6 +161,10 @@ namespace Isis {
       bGreaterThan = true;
     }
     
+    if (!bLessThan && !bGreaterThan) {
+      return;
+    }
+    
     if (pbLastFilter) {
       mOstm << "PointID, Type, Ignore, Filename, SerialNum, ErrorMagnitude, MeasureIgnore, Reference";
       mOstm << endl << endl;
@@ -169,7 +173,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     for (int i=(iNumPoints-1); i >= 0; i--) {
       ControlPoint cPoint = (*mCNet)[i];
-      double dMaxErr = cPoint.MaximumError();
+      double dMaxErr = cPoint.MaximumResidual();
       if (bLessThan && bGreaterThan) {
         if (!(dMaxErr < dLesser && dMaxErr > dGreater)){
           mCNet->Delete(i);
@@ -196,9 +200,9 @@ namespace Isis {
           mOstm << sBoolean[cPoint.Ignore()] << ", " ;
           
           PrintCubeFileSerialNum(cPoint[j]);
-          mOstm << ", " << cPoint[j].ErrorMagnitude() << ", ";
+          mOstm << ", " << cPoint[j].ResidualMagnitude() << ", ";
           mOstm << sBoolean[cPoint[j].Ignore()] << ", ";
-          mOstm << sBoolean[cPoint[j].IsReference()] << endl;
+          mOstm << sBoolean[cPoint[j].Type() == ControlMeasure::Reference] << endl;
         }
       }
     }
@@ -215,7 +219,7 @@ namespace Isis {
    */
   void ControlNetFilter::PointIDFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
-    vector<string> strTokens;
+    std::vector<string> strTokens;
     iString sPointIDExpr = pvlGrp["Expression"][0];
     iString sSeparator("*");
     
@@ -325,14 +329,14 @@ namespace Isis {
           PointStats(cPoint);
           PrintCubeFileSerialNum(cPoint[j]);
           mOstm << ", "  << sBoolean[(int)cPoint[j].Ignore()];
-          mOstm << ", "  << sBoolean[(int)cPoint[j].IsReference()] << endl;
+          mOstm << ", "  << sBoolean[(int)cPoint[j].Type() == ControlMeasure::Reference] << endl;
         }
       }
     }
   }
   
   /**
-   * Filter the Control Network based on Ignored, Held, Ground Point Properties
+   * Filter the Control Network based on Ignored, Ground Point Properties
    * Group by Points 
    *  
    * @author Sharmila Prasad (8/12/2010)
@@ -342,7 +346,7 @@ namespace Isis {
    */
   void ControlNetFilter::PointPropertiesFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
-    bool bIgnoredFlag=false, bHeldFlag=false, bGroundFlag=false;
+    bool bIgnoredFlag=false, bGroundFlag=false;
     string sTemp="";
     
     if (pvlGrp.HasKeyword("Ground")){
@@ -359,11 +363,8 @@ namespace Isis {
       }
     }
     
-    if (pvlGrp.HasKeyword("Held")){
-      sTemp = pvlGrp["Held"][0];
-      if (sTemp == "true") {
-        bHeldFlag = true;
-      }
+    if (!bGroundFlag && !bIgnoredFlag) {
+      return;
     }
     
     if (pbLastFilter) {
@@ -376,7 +377,6 @@ namespace Isis {
     for (int i=(iNumPoints-1); i>=0; i--) {
       ControlPoint cPoint = (*mCNet)[i];
       bool bIgnored = cPoint.Ignore();
-      bool bHeld    = cPoint.Held();
       bool bGround  = (cPoint.Type()==ControlPoint::Ground ? true : false);
       
       if (bIgnoredFlag && !bIgnored) {
@@ -385,11 +385,6 @@ namespace Isis {
       }
       
       if (bGroundFlag && !bGround) {
-        mCNet->Delete(i);
-        continue;
-      }
-      
-      if (bHeldFlag && !bHeld) {
         mCNet->Delete(i);
         continue;
       }
@@ -457,9 +452,12 @@ namespace Isis {
         Pvl pvl(filename);
         
         Camera *camera = CameraFactory::Create(pvl);
-        dUnivLat = cPoint.LatitudeByReference(camera);
-        dUnivLon = cPoint.LongitudeByReference(camera);
-        dRadius  = cPoint.RadiusByReference(camera);
+        ControlMeasure & cm = cPoint[cPoint.ReferenceIndex()];
+        if (camera->SetImage(cm.Sample(),cm.Line())) {
+          dUnivLat = camera->UniversalLatitude();
+          dUnivLon = camera->UniversalLongitude();
+          dRadius  = camera->LocalRadius();
+        }
       }
       
       if (!(dUnivLat >= dMinLat && dUnivLat <= dMaxLat) ||
@@ -557,7 +555,7 @@ namespace Isis {
             string filename2 = mSerialNumList.Filename(sn2);
             Pvl pvl2(filename2);
             cam2 = CameraFactory::Create(pvl2);
-          
+
             if (cam2->SetImage(cp2[iRefIndex2].Sample(),cp2[iRefIndex2].Line())) {
               dUnivLat2 = cam2->UniversalLatitude();
               dUnivLon2 = cam2->UniversalLongitude();
@@ -624,10 +622,10 @@ namespace Isis {
       sType = pvlGrp["MeasureType"][0];
       sType = isType.DownCase(sType);
     }
-    
+
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "FileName, SerialNum, MeasureIgnore, MeasureType, Reference" << endl;
+      mOstm << "FileName, SerialNum, MeasureIgnore, MeasureType" << endl;
     }
     
     int iNumPoints = mCNet->Size();
@@ -645,22 +643,16 @@ namespace Isis {
           if (sType == "all") {
             bMeasureFound = true;
           }
-          else if (sType == "unmeasured" && cMeasure.Type() == ControlMeasure::Unmeasured) {
+          else if (sType == "candidate" && cMeasure.Type() == ControlMeasure::Candidate) {
             bMeasureFound = true;
           }
           else if (sType == "manual" && cMeasure.Type() == ControlMeasure::Manual) {
             bMeasureFound = true;
           }
-          else if (sType == "estimated" && cMeasure.Type() == ControlMeasure::Estimated) {
+          else if (sType == "registeredpixel" && cMeasure.Type() == ControlMeasure::RegisteredPixel) {
             bMeasureFound = true;
           }
-          else if (sType == "autoregistered" && cMeasure.Type() == ControlMeasure::Unmeasured) {
-            bMeasureFound = true;
-          }
-          else if (sType == "manualvalidated" && cMeasure.Type() == ControlMeasure::ValidatedManual) {
-            bMeasureFound = true;
-          }
-          else if (sType == "autoregvalidated" && cMeasure.Type() == ControlMeasure::ValidatedAutomatic) {
+          else if (sType == "registeredsubpixel" && cMeasure.Type() == ControlMeasure::RegisteredSubPixel) {
             bMeasureFound = true;
           }
         }
@@ -669,8 +661,8 @@ namespace Isis {
             PointStats(cPoint);
             string sn = cMeasure.CubeSerialNumber();
             mOstm << mSerialNumList.Filename(sn) << ", " << sn << ",";
-            mOstm << sBoolean[(int)cMeasure.Ignore()] << ", " << cMeasure.PrintableMeasureType() << ", ";
-            mOstm << sBoolean[(int)cMeasure.IsReference()] << endl;
+            mOstm << sBoolean[(int)cMeasure.Ignore()] << ", " << cMeasure.MeasureTypeString() << ", ";
+            mOstm << sBoolean[cMeasure.Type() == ControlMeasure::Reference] << endl;
           }
         }
         else
@@ -692,21 +684,25 @@ namespace Isis {
    * @param pvlGrp - Pvl Group containing the filter info
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
-  void ControlNetFilter::PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
+  /*void ControlNetFilter::PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
     bool bLesserFlag=false, bGreaterFlag=false;
     double dLesserValue=0, dGreaterValue=0;
     
     if (pvlGrp.HasKeyword("LessThan")){
-      dLesserValue = (double) pvlGrp["LessThan"][0];
+      dLesserValue = (int) pvlGrp["LessThan"][0];
       bLesserFlag = true;
     }
     
     if (pvlGrp.HasKeyword("GreaterThan")){
-      dGreaterValue = (double) pvlGrp["GreaterThan"][0];
+      dGreaterValue = (int) pvlGrp["GreaterThan"][0];
       bGreaterFlag = true;
     }
     
+    if (!bLesserFlag && !bGreaterFlag) {
+      return;
+    }
+
     if (pbLastFilter) {
       mOstm << "PointID, Type, Ignore, Filename, SerialNum, GoodnessOfFit, MeasureIgnore, Reference";
       mOstm << endl << endl;
@@ -757,12 +753,12 @@ namespace Isis {
             PrintCubeFileSerialNum(cMeasure);
             mOstm << ", " << (dGFit==Isis::Null ? "Null" : iString(dGFit)) << ", ";
             mOstm << sBoolean[cMeasure.Ignore()] << ", ";
-            mOstm << sBoolean[cMeasure.IsReference()] << endl;
+            mOstm << sBoolean[(int)cMeasure.Type() == ControlMeasure::Reference] << endl;
           }
         }
       }
     }
-  }
+  }*/
 
 
   /**
@@ -775,7 +771,7 @@ namespace Isis {
    */
   void ControlNetFilter::PointCubeNamesFilter(const PvlGroup & pvlGrp, bool pbLastFilter)
   {
-    vector <string> sCubeNames;
+    std::vector <string> sCubeNames;
     
     // Store the Cubenames from the PvlGroup
     for (int i=0; i<pvlGrp.Keywords(); i++) {
@@ -828,7 +824,7 @@ namespace Isis {
           mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", ";
           mOstm << sBoolean[cPoint.Ignore()] << ", " << iNumMeasures << ", ";
           mOstm << iNumMeasures - cPoint.NumValidMeasures() << ", ";
-          mOstm << sBoolean[cPoint.Held()] << ", ";
+          mOstm << sBoolean[cPoint.EditLock()] << ", ";
           
           // Image Details
           string sn = cMeasure.CubeSerialNumber();
@@ -836,7 +832,7 @@ namespace Isis {
           GetImageStatsBySerialNum(sn, iPntDetailsPtr, IMAGE_POINT_SIZE);
           mOstm << mSerialNumList.Filename(sn) << ", " << sn << ", ";
           mOstm << iPntDetailsPtr[total] << ", " << iPntDetailsPtr[ignore] << ", " ;
-          mOstm << iPntDetailsPtr[ground] << ", " << iPntDetailsPtr[held] << endl;
+          mOstm << iPntDetailsPtr[ground] << endl;
         }
       }
     }
@@ -912,7 +908,7 @@ namespace Isis {
         GetImageStatsBySerialNum(sn, iPntDetailsPtr, IMAGE_POINT_SIZE);
       
         mOstm << iPntDetailsPtr[total]  << ", " << iPntDetailsPtr[ignore] << ", ";
-        mOstm << iPntDetailsPtr[ground] << ", " << iPntDetailsPtr[held]   << endl;
+        mOstm << iPntDetailsPtr[ground] << endl;
       }
     }
   }
@@ -956,7 +952,7 @@ namespace Isis {
       int iPointsTotal=0;
       int iPointsIgnored=0;
       int iPointsGround=0;
-      int iPointsHeld=0;
+      int iPointsLocked=0;
       string sSerialNum = mSerialNumFilter.SerialNumber(sn);
 
       for (int i=0; i<iNumPoints; i++) {
@@ -972,8 +968,8 @@ namespace Isis {
             if (cPoint.Type() == ControlPoint::Ground) {
               iPointsGround++;
             }
-            if (cPoint.Held()) {
-              iPointsHeld++;
+            if (cPoint.EditLock()) {
+              iPointsLocked++;
             }
             break;
           }
@@ -987,8 +983,7 @@ namespace Isis {
       }
       else if (pbLastFilter) {
         mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", ";
-        mOstm << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsGround << ", ";
-        mOstm << iPointsHeld << endl;
+        mOstm << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsGround << endl;
       }
     }
   }
@@ -1034,15 +1029,15 @@ namespace Isis {
       double dDist = 0;
       bool bMatchDistance = false;
       
-      vector <int> sPointIndex1;
-      vector <int> sPointIndex2;
-      vector <double> dPointDistance;
+      std::vector <int> sPointIndex1;
+      std::vector <int> sPointIndex2;
+      std::vector <double> dPointDistance;
       
       // Point stats
       int iPointsTotal   = 0;
       int iPointsIgnored = 0;
       int iPointsGround  = 0;
-      int iPointsHeld    = 0;
+      int iPointsLocked  = 0;
       
       // Reset the vectors
       sPointIndex1.clear();
@@ -1065,8 +1060,8 @@ namespace Isis {
             if (cPoint1.Type() == ControlPoint::Ground) {
               iPointsGround++;
             }
-            if (cPoint1.Held()) {
-              iPointsHeld++;
+            if (cPoint1.EditLock()) {
+              iPointsLocked++;
             }
             bImageFound = true;
             break;
@@ -1144,7 +1139,7 @@ namespace Isis {
       else if (pbLastFilter) {
         mOstm << mSerialNumList.Filename(sSerialNum) << ", " << sSerialNum << ", ";
         mOstm << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsGround << ", ";
-        mOstm << iPointsHeld << ", ";
+        mOstm << iPointsLocked << ", ";
         for (int j=0; j<(int)sPointIndex1.size(); j++) {
           iString sPointIDDist(dPointDistance[j]);
           sPointIDDist += "#";

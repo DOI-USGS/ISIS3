@@ -127,6 +127,11 @@ Group = AutoRegStatistics
   Failure    = 1
 End_Group
 
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
+End_Group
+
 Group = PatternChipFailures
   PatternNotEnoughValidData = 1
   PatternZScoreNotMet       = 0
@@ -153,6 +158,11 @@ Group = AutoRegStatistics
   Total      = 1
   Successful = 0
   Failure    = 1
+End_Group
+
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
 End_Group
 
 Group = PatternChipFailures
@@ -183,6 +193,11 @@ Group = AutoRegStatistics
   Failure    = 1
 End_Group
 
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
+End_Group
+
 Group = PatternChipFailures
   PatternNotEnoughValidData = 0
   PatternZScoreNotMet       = 0
@@ -209,6 +224,11 @@ Group = AutoRegStatistics
   Total      = 1
   Successful = 0
   Failure    = 1
+End_Group
+
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
 End_Group
 
 Group = PatternChipFailures
@@ -239,6 +259,11 @@ Group = AutoRegStatistics
   Failure    = 1
 End_Group
 
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
+End_Group
+
 Group = PatternChipFailures
   PatternNotEnoughValidData = 0
   PatternZScoreNotMet       = 0
@@ -265,6 +290,11 @@ Group = AutoRegStatistics
   Total      = 1
   Successful = 0
   Failure    = 1
+End_Group
+
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
 End_Group
 
 Group = PatternChipFailures
@@ -295,6 +325,11 @@ Group = AutoRegStatistics
   Failure    = 1
 End_Group
 
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
+End_Group
+
 Group = PatternChipFailures
   PatternNotEnoughValidData = 0
   PatternZScoreNotMet       = 0
@@ -323,6 +358,11 @@ Group = AutoRegStatistics
   Failure    = 1
 End_Group
 
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 0
+End_Group
+
 Group = PatternChipFailures
   PatternNotEnoughValidData = 0
   PatternZScoreNotMet       = 0
@@ -342,14 +382,53 @@ Group = SurfaceModelFailures
 End_Group
 End
 
-----------------
-Testing Success
-----------------
+---------------------
+Testing SuccessPixel
+---------------------
+Position = 71 51
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 1
+  Failure    = 0
+End_Group
+
+Group = Successes
+  SuccessPixel    = 1
+  SuccessSubPixel = 0
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+
+------------------------
+Testing SuccessSubPixel
+------------------------
 Position = 71.0284 51.0874
 Group = AutoRegStatistics
   Total      = 1
   Successful = 1
   Failure    = 0
+End_Group
+
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 1
 End_Group
 
 Group = PatternChipFailures

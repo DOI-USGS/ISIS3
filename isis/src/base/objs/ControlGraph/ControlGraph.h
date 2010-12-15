@@ -46,12 +46,14 @@ namespace Isis {
    * @ingroup ControlGraph
    *
    * @author Eric Hyer
-   *   @history 2009-09-23 Eric Hyer Original version
-   *   @history 2009-10-15 Eric Hyer Added GetCubeList Method
    *
    * @see ControlNet ControlPoint ControlMeasure GroupedStatistics
    *
    * @internal
+   *   @history 2009-09-23 Eric Hyer Original version
+   *   @history 2009-10-15 Eric Hyer Added GetCubeList Method
+   *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
+   *                                       removing includes from ControlNet.h.
    *
    */
   class ControlGraph {

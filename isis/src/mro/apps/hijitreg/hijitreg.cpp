@@ -21,6 +21,7 @@
 #include "ControlNet.h"
 #include "SerialNumber.h"
 #include "ControlMeasure.h"
+#include "ControlPoint.h"
 #include "iTime.h"
 
 using namespace std;
@@ -233,9 +234,10 @@ void IsisMain() {
       cmMatch.SetChooserName("hijitreg");
       cmMatch.SetReference(true);
 
+      ar->Register();
 
       // Match found
-      if(ar->Register() == AutoReg::Success) {
+      if(ar->Success()) {
         RegData reg;
         reg.fLine = fline0 + line;
         reg.fSamp = fsamp0 + samp;

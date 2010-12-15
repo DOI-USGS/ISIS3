@@ -1,11 +1,7 @@
 #ifndef QnetTool_h
 #define QnetTool_h
 
-// name space Isis classes don't work with forward declarations?
-#include "ControlMeasure.h"
-#include "ControlPoint.h"
-#include "Cube.h"
-#include "Tool.h" // parent class
+#include "Tool.h"
 
 // forward declarations
 class QAction;
@@ -29,11 +25,10 @@ namespace Isis {
   class ControlNet;
   class ControlPoint;
   class Cube;
+  class iString;
   class Stretch;
   class UniversalGroundMap;
 }
-
-using namespace std;
 
 namespace Qisis {
   class ControlPointEdit;
@@ -126,6 +121,11 @@ namespace Qisis {
    *   @history 2010-07-12 Jeannie Walldren - Fixed bug in newHoldPoint() method
    *                          that was causing the Hold Point Dialog to call the
    *                          reject() command.  Updated documentation.
+   *   @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
+   *                          by changes made to the ControlNet,ControlPoint,
+   *                          ControlMeasure header files.  Remove findPointFiles
+   *                          method, the code is now in the createPoint method.
+   *   @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
    *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for
    *                forwarding of SIGNAL from StretchTool to ChipViewport
    *   @history 2010-12-08 Eric Hyer - Template filename now shown.  Widgets
@@ -142,13 +142,13 @@ namespace Qisis {
 
     public:
       QnetTool(QWidget *parent);
-//      void addTo (QMenu *menu);
+      virtual ~QnetTool();
       void paintViewport(MdiCubeViewport *cvp, QPainter *painter);
 
     signals:
       void qnetToolSave();
       void refreshNavList();
-      void editPointChanged(string pointId);
+      void editPointChanged(QString pointId);
       void netChanged();
       void ignorePointChanged();
       void ignoreLeftChanged();
@@ -174,18 +174,15 @@ namespace Qisis {
       QWidget *createToolBarWidget(QStackedWidget *parent);
 
     private slots:
-      void paintAllViewports(string pointId);
+      void paintAllViewports ();
       void saveNet();
       void addMeasure();
-      void setIgnorePoint(bool ignore);
-      void newHoldPoint(Isis::ControlPoint &point);
-      void setHoldPoint(bool hold);
-      void cancelHoldPoint();
-      void newGroundPoint(Isis::ControlPoint &point);
-      void setGroundPoint(bool ground);
-      void setIgnoreLeftMeasure(bool ignore);
-      void setIgnoreRightMeasure(bool ignore);
-      void showNavWindow();
+      void setIgnorePoint (bool ignore);
+      void newGroundPoint (Isis::ControlPoint &point);
+      void setGroundPoint (bool ground);
+      void setIgnoreLeftMeasure (bool ignore);
+      void setIgnoreRightMeasure (bool ignore);
+      void showNavWindow (bool checked);
 
       void selectLeftMeasure(int index);
       void selectRightMeasure(int index);
@@ -224,7 +221,7 @@ namespace Qisis {
       QMainWindow *p_qnetTool;
 
 
-      vector<string> findPointFiles(double lat, double lon);
+      QStringList findPointFiles(double lat, double lon);
 
       QAction *p_createPoint;
       QAction *p_modifyPoint;
@@ -265,15 +262,13 @@ namespace Qisis {
 
       Isis::ControlPoint *p_controlPoint;
 
-      vector<string> p_pointFiles;
+      QStringList * p_pointFiles;
 
-      string p_leftFile;
+      Isis::iString * p_leftFile;
       Isis::ControlMeasure *p_leftMeasure;
       Isis::ControlMeasure *p_rightMeasure;
       Isis::Cube *p_leftCube;
       Isis::Cube *p_rightCube;
-
-      QnetHoldPointDialog *p_holdPointDialog;
       
       bool p_templateModified;
   };

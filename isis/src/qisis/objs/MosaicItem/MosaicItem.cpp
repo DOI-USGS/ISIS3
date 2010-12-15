@@ -1,3 +1,5 @@
+#include "MosaicItem.h"
+
 #include <iostream>
 #include <cfloat>
 
@@ -9,7 +11,8 @@
 #include <QTreeWidgetItem>
 #include <QApplication>
 
-#include "MosaicItem.h"
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
 #include "ImagePolygon.h"
 #include "SerialNumber.h"
 #include "Table.h"

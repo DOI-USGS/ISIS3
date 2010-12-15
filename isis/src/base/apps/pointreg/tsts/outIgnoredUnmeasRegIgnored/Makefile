@@ -1,15 +1,16 @@
 APPNAME = pointreg
 
+redPointregLog.txt.IGNORELINES = Processed
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/cub.lis;
-	$(APPNAME) files=$(OUTPUT)/cub.lis \
+	$(APPNAME) fromlist=$(OUTPUT)/cub.lis \
 	cnet=$(INPUT)/red.net \
-	template=$(INPUT)/autoRegTemplate.def \
-	to=$(OUTPUT)/redOutputCnet.pvl \
+	deffile=$(INPUT)/autoRegTemplate.def \
+	onet=$(OUTPUT)/redOutputCnet.net \
 	flatfile=$(OUTPUT)/redFlatFile.txt \
 	points=ignored \
-	measures=estimated >& $(OUTPUT)/redPointregLog.txt \
-	> /dev/null;
+	measures=candidates > $(OUTPUT)/redPointregLog.txt;
 	$(RM) $(OUTPUT)/cub.lis;

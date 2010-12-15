@@ -50,6 +50,9 @@
     <change name="Christopher Austin" date="2010-03-15">
       Changed an outdated error message.
     </change>
+    <change name="Steven Lambright" date="2010-10-19">
+      Updated to work with recent control network changes
+    </change>
   </history> 
   
   <category>

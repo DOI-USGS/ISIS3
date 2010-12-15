@@ -163,10 +163,6 @@ void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup &
   if (psFilter == "Point_MeasureProperties") {
     return &ControlNetFilter::PointMeasurePropertiesFilter;
   }
-  
-  if (psFilter == "Point_GoodnessOfFit") {
-    return &ControlNetFilter::PointGoodnessOfFitFilter;
-  }
 
   if (psFilter == "Point_CubeNames") {
     return &ControlNetFilter::PointCubeNamesFilter;

@@ -18,5 +18,5 @@ Object = AutoRegistration
   End_Group
 End_Object
 End
-Register = 0
+Register = 1
 Position = 512.195 512.085

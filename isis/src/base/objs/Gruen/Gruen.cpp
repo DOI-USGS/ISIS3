@@ -974,7 +974,7 @@ namespace Isis {
    */
   AutoReg::RegisterStatus Gruen::Status(const GruenResult &result) const {
     if(result.IsGood()) {
-      return (AutoReg::Success);
+      return (AutoReg::SuccessSubPixel);
     }
     return (AutoReg::AdaptiveAlgorithmFailed);
   }

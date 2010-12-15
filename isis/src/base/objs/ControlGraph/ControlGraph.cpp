@@ -1,7 +1,6 @@
 #include "IsisDebug.h"
 #include "ControlGraph.h"
 
-#include <string>
 #include <iostream>
 #include <utility>
 
@@ -13,6 +12,7 @@
 #include <QPair>
 
 #include "ControlMeasure.h"
+#include "ControlPoint.h"
 #include "GroupedStatistics.h"
 #include "ControlNet.h"
 #include "iException.h"
@@ -127,22 +127,21 @@ namespace Isis {
   const QVector< QString > ControlGraph::GetCubesOnIsland(const int &island)
   const {
     if(connected) {
-      std::string message = "\n\nGetCubesOnIsland called on connected graph ";
-      message += "with no islands!!!\n\n";
-      throw Isis::iException::Message(Isis::iException::Programmer, message,
-                                      _FILEINFO_);
+      QString msg = "\n\nGetCubesOnIsland called on connected graph with no "
+          "islands!!!\n\n";
+      throw iException::Message(iException::Programmer, msg.toStdString(),
+          _FILEINFO_);
     }
 
     ASSERT(islands->size() != 0);
 
     if(island < 0 || island >= islands->size()) {
-      iString message = "\n\nA list of cubes was requested from island ";
-      message += iString(island);
-      message += "\nbut that island does not exist!!!";
-      message += "\n\nThere are " + iString(islands->size()) + " islands ";
-      message += "numbered from 0 to " + iString(islands->size() - 1) + "\n\n";
-      throw Isis::iException::Message(Isis::iException::Programmer, message,
-                                      _FILEINFO_);
+      QString msg = "\n\nA list of cubes was requested from island " +
+          QString::number(island) + "\nbut that island does not exist!!!"
+          "\n\nThere are " + QString::number(islands->size()) + " islands "
+          "numbered from 0 to " + QString::number(islands->size() - 1) + "\n\n";
+      throw Isis::iException::Message(Isis::iException::Programmer,
+          msg.toStdString(), _FILEINFO_);
     }
 
     QVector< QString > cubeList;
@@ -187,17 +186,28 @@ namespace Isis {
    *  @param other The ControlGraph on the right side of the =
    */
   ControlGraph &ControlGraph::operator=(const ControlGraph &other) {
+    if (this == &other)
+      return *this;
+      
+    if (cubeIdToIndexHash) {
+      delete cubeIdToIndexHash;
+      cubeIdToIndexHash = NULL;
+    }
+    if (cubeIndexToIdHash) {
+      delete cubeIndexToIdHash;
+      cubeIndexToIdHash = NULL;
+    }
+    if (graph) {
+      delete graph;
+      graph = NULL;
+    }
+    if (islands) {
+      delete islands;
+      islands = NULL;
+    }
+    
     cnet = other.cnet;
     connected = other.connected;
-
-    delete cubeIdToIndexHash;
-    cubeIdToIndexHash = NULL;
-    delete cubeIndexToIdHash;
-    cubeIndexToIdHash = NULL;
-    delete graph;
-    graph = NULL;
-    delete islands;
-    islands = NULL;
 
     cubeIdToIndexHash = new QHash< QString, int >(*other.cubeIdToIndexHash);
     cubeIndexToIdHash = new QHash< int, QString >(*other.cubeIndexToIdHash);
@@ -232,8 +242,7 @@ namespace Isis {
         ControlPoint &curCtrlPoint = (*cnet)[cpIndex];
         for(int cmIndex = 0; cmIndex < curCtrlPoint.Size(); cmIndex++) {
           // get current cube's serial number and hash if new
-          std::string temp = curCtrlPoint[cmIndex].CubeSerialNumber();
-          QString curCube(temp.c_str());
+          QString curCube = curCtrlPoint[cmIndex].CubeSerialNumber();
           if(!cubeIdToIndexHash->contains(curCube)) {
             cubeIdToIndexHash->insert(curCube, ++cubeIndex);
             cubeIndexToIdHash->insert(cubeIndex, curCube);
@@ -247,8 +256,7 @@ namespace Isis {
           for(int cmIndex2 = 0; cmIndex2 < curCtrlPoint.Size(); cmIndex2++) {
             if(cmIndex2 != cmIndex) {
               // get adjacent cube's serial number and hash if new
-              std::string temp = curCtrlPoint[cmIndex2].CubeSerialNumber();
-              QString adjacentCube(temp.c_str());
+              QString adjacentCube = curCtrlPoint[cmIndex2].CubeSerialNumber();
               if(!cubeIdToIndexHash->contains(adjacentCube)) {
                 cubeIdToIndexHash->insert(adjacentCube, ++cubeIndex);
                 cubeIndexToIdHash->insert(cubeIndex, adjacentCube);
@@ -270,7 +278,7 @@ namespace Isis {
 
           // save off statistics
           if(graphIterator != graph->end()) {
-            QVector< QString > dataNames((*cnet)[cpIndex][cmIndex]
+            QVector< iString > dataNames((*cnet)[cpIndex][cmIndex]
                                          .GetMeasureDataNames());
 
             for(int i = 0; i < dataNames.size(); i++)
@@ -461,8 +469,10 @@ namespace Isis {
    */
   ControlGraph::AdjacentCubeList &ControlGraph::AdjacentCubeList::operator=(
     const AdjacentCubeList &other) {
-    delete connections;
-    connections = NULL;
+    if (connections) {
+      delete connections;
+      connections = NULL;
+    }
 
     connections = new QMap< int, QVector< QPair< int, int > > >(
       *other.connections);

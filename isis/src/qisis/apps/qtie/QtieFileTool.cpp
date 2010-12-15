@@ -1,3 +1,5 @@
+#include "QtieFileTool.h"
+
 #include <QApplication>
 #include <QAction>
 #include <QFileDialog>
@@ -12,13 +14,14 @@
 #include <QCheckBox>
 #include <QPainter>
 
-#include "QtieFileTool.h"
 #include "Application.h"
+#include "Cube.h"
 #include "Filename.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
-#include "Workspace.h"
 #include "SerialNumberList.h"
+#include "Workspace.h"
+
 
 using namespace Qisis;
 

@@ -1,9 +1,13 @@
-#include "ControlNet.h"
 #include "ControlNetStatistics.h"
+
+#include "ControlNet.h"
+#include "ControlPoint.h"
+#include "ControlMeasure.h"
 #include "Filename.h"
 #include "iString.h"
 #include "Progress.h"
 #include "Pvl.h"
+#include "SpecialPixel.h"
 
 using namespace std;
 
@@ -56,7 +60,7 @@ namespace Isis {
   
   /**
    * Generates the summary stats for the entire control network. 
-   * Stats include Total images, Total, Valid, Ignored, Held, Ground Points, 
+   * Stats include Total images, Total, Valid, Ignored, Ground Points, 
    * Total, Valid, Ignored Measures and also Average, Min, Max Error, 
    * Min, Max Line and Sample Errors
    * 
@@ -74,36 +78,35 @@ namespace Isis {
     pStatsGrp += PvlKeyword("ValidPoints",       NumValidPoints());
     pStatsGrp += PvlKeyword("IgnoredPoints",     mCNet->Size() - NumValidPoints());
     pStatsGrp += PvlKeyword("GroundPoints",      NumGroundPoints());
-    pStatsGrp += PvlKeyword("HeldPoints",        NumHeldPoints());
-    pStatsGrp += PvlKeyword("AverageError",      AverageError());
+    pStatsGrp += PvlKeyword("AverageResidual",   AverageResidual());
 
-    double dError = MinimumError();
-    pStatsGrp += PvlKeyword("MinErrorMagnitude", (dError == VALID_MAX4 ? "N/A" : iString(dError)));
+    double dError = MinimumResidual();
+    pStatsGrp += PvlKeyword("MinimumResidual",   (dError == VALID_MAX4 ? "N/A" : iString(dError)));
 
-    dError = MaximumError();
-    pStatsGrp += PvlKeyword("MaxErrorMagnitude", (dError == 0 ? "N/A" : iString(dError)));
+    dError = MaximumResidual();
+    pStatsGrp += PvlKeyword("MaximumResidual",   (dError == 0 ? "N/A" : iString(dError)));
     
     pStatsGrp += PvlKeyword("TotalMeasures",     NumMeasures());
     pStatsGrp += PvlKeyword("ValidMeasures",     NumValidMeasures());
     pStatsGrp += PvlKeyword("IgnoredMeasures",   NumIgnoredMeasures());
     
-    dError = MinimumErrorLine();
-    pStatsGrp += PvlKeyword("MinLineError",      (dError == 0 ? "N/A" : iString(dError)));
+    dError = MinimumLineResidual();
+    pStatsGrp += PvlKeyword("MinLineResidual",   (dError == 0 ? "N/A" : iString(dError)));
     
-    dError = MinimumErrorSample();
-    pStatsGrp += PvlKeyword("MinSampleError",    (dError == 0 ? "N/A" : iString(dError)));
+    dError = MinimumSampleResidual();
+    pStatsGrp += PvlKeyword("MinSampleResidual", (dError == 0 ? "N/A" : iString(dError)));
     
-    dError = MaximumErrorLine();
-    pStatsGrp += PvlKeyword("MaxLineError",      (dError == 0 ? "N/A" : iString(dError)));
+    dError = MaximumLineResidual();
+    pStatsGrp += PvlKeyword("MaxLineResidual",   (dError == 0 ? "N/A" : iString(dError)));
     
-    dError = MaximumErrorSample();
-    pStatsGrp += PvlKeyword("MaxSampleError",    (dError == 0 ? "N/A" : iString(dError)));
+    dError = MaximumSampleResidual();
+    pStatsGrp += PvlKeyword("MaxSampleResidual", (dError == 0 ? "N/A" : iString(dError)));
   }
   
   /**
    * Generate the statistics of a Control Network by Image 
    * Stats include Filename, Serial Num, and 
-   * Total, Valid, Ignored, Held, Ground Points in each Image 
+   * Total, Valid, Ignored, Ground Points in each Image 
    * 
    * @author Sharmila Prasad (8/24/2010)
    * 
@@ -127,7 +130,6 @@ namespace Isis {
       ControlPoint & cPoint = (*mCNet)[i];
       int iNumMeasures = cPoint.Size();
       bool bIgnore = cPoint.Ignore();
-      bool bHeld   = cPoint.Held();
       bool bGround = (cPoint.Type()==ControlPoint::Ground ? true : false);
       
       for (int j=0; j<iNumMeasures; j++) {
@@ -138,12 +140,10 @@ namespace Isis {
         if (mImageTotalPointMap.find(sMeasureSN) == mImageTotalPointMap.end()){
           mImageTotalPointMap [sMeasureSN]  = 0;
           mImageIgnorePointMap[sMeasureSN]  = 0;
-          mImageHeldPointMap  [sMeasureSN]  = 0;
           mImageGroundPointMap[sMeasureSN]  = 0;
         }        
         mImageTotalPointMap[sMeasureSN]++;
         if (bIgnore)  mImageIgnorePointMap[sMeasureSN]++;
-        if (bHeld)    mImageHeldPointMap  [sMeasureSN]++;
         if (bGround)  mImageGroundPointMap[sMeasureSN]++;
       }
       // Update Progress
@@ -175,10 +175,10 @@ namespace Isis {
     map<string,int>::iterator it;
     
     // Log into the output file
-    ostm << "Filename" << ", " << "SerialNumber" << ", " << "Total Points" << ", " << "Ignore" << ", " << "Ground" << ", " << "Held" << endl;
+    ostm << "Filename" << ", " << "SerialNumber" << ", " << "Total Points" << ", " << "Ignore" << ", " << "Ground" << ", " <<  endl;
     for ( it=mImageTotalPointMap.begin(); it != mImageTotalPointMap.end(); it++ ){
       ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
-      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " << mImageHeldPointMap[(*it).first] << ", " << mImageGroundPointMap[(*it).first] <<endl;
+      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " << mImageGroundPointMap[(*it).first] <<endl;
     }
     ostm.close();
   }
@@ -189,7 +189,7 @@ namespace Isis {
    * @author Sharmila Prasad (9/17/2010)
    * 
    * @param psSerialNum   - Image Serial Number File 
-   * @param piPointDetail - Calculated Points stats (total, ignore, held, ground)
+   * @param piPointDetail - Calculated Points stats (total, ignore, ground)
    * @param piSize        - array size
    */
   void ControlNetStatistics::GetImageStatsBySerialNum(string psSerialNum, int* piPointDetail, int piSize)
@@ -199,13 +199,12 @@ namespace Isis {
     }
     piPointDetail[total]  = mImageTotalPointMap[psSerialNum];
     piPointDetail[ignore] = mImageIgnorePointMap[psSerialNum];
-    piPointDetail[held]   = mImageHeldPointMap[psSerialNum];
     piPointDetail[ground] = mImageGroundPointMap[psSerialNum];
   }
   
   /**
    * Generate the statistics of a Control Network by Point 
-   * Stats include ID, Type, Held of each Control Point and 
+   * Stats include ID, Type of each Control Point and 
    * Total, Ignored measures in each Control Point
    * 
    * @author Sharmila Prasad (8/24/2010)
@@ -219,7 +218,7 @@ namespace Isis {
     ofstream ostm;
     string outName(outFile.Expanded());
     ostm.open(outName.c_str(), std::ios::out);
-    ostm << "Point Id, " << "Type, " << " Ignore, " << "Held, " << "Num Measures, " << "Ignored Measures" << endl;
+    ostm << "Point Id, " << "Type, " << " Ignore, " << "Num Measures, " << "Ignored Measures" << endl;
     
     int iNumPoints = mCNet->Size();
     
@@ -242,7 +241,7 @@ namespace Isis {
       }
       // Log into the output file
       ostm << cPoint.Id()   << ", " << sPointType[(int)cPoint.Type()] << ", " <<  sBoolean[(int)cPoint.Ignore()] << ", " ;
-      ostm << sBoolean[(int)cPoint.Held()] << ", " << iNumMeasures << ", " << iIgnored << endl;
+      ostm << iNumMeasures << ", " << iIgnored << endl;
       
       // Update Progress
       if(mProgress != NULL) 
@@ -289,27 +288,6 @@ namespace Isis {
       if((*mCNet)[i].Type() == ControlPoint::Ground)
         iCount ++;
     }
-    return iCount;
-  }
-  
-  /**
-   * Returns the total number of Held Points in the Control Network
-   * Moved from ControlNet class 
-   *  
-   * @author Sharmila Prasad (9/8/2010)
-   * 
-   * @return int - Total Held Points
-   */
-  int ControlNetStatistics::NumHeldPoints()
-  {
-    int iCount = 0;
-    int iNumPoints = mCNet->Size();
-    
-    for(int i = 0; i < iNumPoints; i++) {
-      if((*mCNet)[i].Held())
-        iCount ++;
-    }
-    
     return iCount;
   }
   
@@ -387,7 +365,7 @@ namespace Isis {
    * 
    * @return double - Average Error
    */
-  double ControlNetStatistics::AverageError()
+  double ControlNetStatistics::AverageResidual()
   {
     double dAvgError = 0.0;
     int iPointsCount = 0;
@@ -395,7 +373,7 @@ namespace Isis {
     
     for(int i = 0; i < iNumPoints; i++) {
       if((*mCNet)[i].Ignore()) continue;
-      dAvgError += (*mCNet)[i].AverageError();
+      dAvgError += (*mCNet)[i].AverageResidual();
       iPointsCount++;
     }
     
@@ -413,13 +391,13 @@ namespace Isis {
    * 
    * @return double - Minimum Error
    */
-  double ControlNetStatistics::MinimumError()
+  double ControlNetStatistics::MinimumResidual()
   {
     double dMinError = VALID_MAX4;
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      double dError = (*mCNet)[i].MinimumError();
+      double dError = (*mCNet)[i].MinimumResidual();
       if(dError < dMinError) 
         dMinError = dError;
     }
@@ -435,13 +413,13 @@ namespace Isis {
    * 
    * @return double - Max Error
    */
-  double ControlNetStatistics::MaximumError()
+  double ControlNetStatistics::MaximumResidual()
   {
     double dMaxError = 0.0;
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      double dError = (*mCNet)[i].MaximumError();
+      double dError = (*mCNet)[i].MaximumResidual();
       if(dError > dMaxError)
         dMaxError = dError;
     }
@@ -455,13 +433,13 @@ namespace Isis {
    * 
    * @return double - Min Line Error
    */
-  double ControlNetStatistics::MinimumErrorLine()
+  double ControlNetStatistics::MinimumLineResidual()
   {
     double dMinError = VALID_MAX4;
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-       double dError = (*mCNet)[i].MinimumErrorLine();
+       double dError = (*mCNet)[i].MinimumLineResidual();
        if(dError < dMinError)
          dMinError = dError;
      }
@@ -476,13 +454,13 @@ namespace Isis {
    * 
    * @return double - Min Sample Error
    */
-  double ControlNetStatistics::MinimumErrorSample()
+  double ControlNetStatistics::MinimumSampleResidual()
   {
     double dMinError = VALID_MAX4;
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-       double dError = (*mCNet)[i].MinimumErrorSample();
+       double dError = (*mCNet)[i].MinimumSampleResidual();
        if(dError < dMinError)
          dMinError = dError;
      }
@@ -497,13 +475,13 @@ namespace Isis {
    * 
    * @return double - Max Line Error
    */
-  double ControlNetStatistics::MaximumErrorLine()
+  double ControlNetStatistics::MaximumLineResidual()
   {
     double dMaxError = 0.0;
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-       double dError = (*mCNet)[i].MaximumErrorLine();
+       double dError = (*mCNet)[i].MaximumLineResidual();
        if(dError > dMaxError) 
          dMaxError = dError;
      }
@@ -518,13 +496,13 @@ namespace Isis {
    * 
    * @return double - Max Sample Error
    */
-  double ControlNetStatistics::MaximumErrorSample()
+  double ControlNetStatistics::MaximumSampleResidual()
   {
     double dMaxError = 0.0;
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      double dError = (*mCNet)[i].MaximumErrorSample();
+      double dError = (*mCNet)[i].MaximumSampleResidual();
       if(dError > dMaxError)
         dMaxError = dError;
     }

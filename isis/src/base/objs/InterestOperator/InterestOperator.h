@@ -55,43 +55,52 @@ namespace Isis {
    * @see StandardDeviationOperator GradientOperator
    *
    * @internal
-   *  @history 2006-02-11 Jacob Danton - Original Version
-   *  @history 2007-08-02 Steven Koechle - Added better
+   *   @history 2006-02-11 Jacob Danton - Original Version
+   *   @history 2007-08-02 Steven Koechle - Added better
    *            documentation to CompareInterests().
-   *  @history 2007-08-02 Steven Koechle - Fixed looping error
+   *   @history 2007-08-02 Steven Koechle - Fixed looping error
    *            that caused subchip to go outside the chip to the
    *            left and top, and not check the bottom and right.
-   *  @history 2007-08-14 Steven Koechle - Added virtual method
+   *   @history 2007-08-14 Steven Koechle - Added virtual method
    *            Padding() which default returns 0.
-   *  @history 2007-08-16 Steven Koechle - Fixed Looping error
+   *   @history 2007-08-16 Steven Koechle - Fixed Looping error
    *            in Operate. Made the loops <= instead of just <.
    *            Changed from accepting one delta to accepting a
    *            deltaSamp and a deltaLine.
-   *  @history 2008-06-18 Stuart Sides - Fixed doc error
-   *  @history 2008-08-19 Steven Koechle - Updated to work with
+   *   @history 2008-06-18 Stuart Sides - Fixed doc error
+   *   @history 2008-08-19 Steven Koechle - Updated to work with
    *            Geos3.0.0
-   *  @history 2009-08-11 Travis Addair - Added functionality allowing it and all its
+   *   @history 2009-08-11 Travis Addair - Added functionality allowing it and all its
    *                     subclasses to return the pvl group that they were initialized from
-   *  @history 2010-04-09 Sharmila Prasad - API's to check valid DN and Emission Angle.
-   *                      Also changed functionality of Operate and made it overloaded.
-   *  @history 2010-04-30 Sharmila Prasad - Added class members mdBestEmissionAngle,
-   *                      mdBestDnValue and their access functions. Added member mUnusedParamGrp
-   *                      to check for the default values used for the operator
-   *  @history 2010-04-30 Sharmila Prasad - 1.InterestOperator, child of ControlNetValidMeasure
-   *                      which validates all the standard control network options.
-   *                      Changed functionality to accomadate ControlNetValidMeasure
-   *                      2.Removed class members  mdBestEmissionAngle, mdBestDnValue,
-   *                      instead stored in structure InterestResults structure
-   *                      3. Move processing ImageOverlaps from app to here
-   *                      4. Added API's to compute Interest by point and by measure
-   *  @history 2010-06-18 Sharmila Prasad - 1. Fixed Bug to ignore Points with no good interest
-   *                      2. Do not process previously Ignored points in the Control Net
-   *  @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
-   *                      use CubeManager instead
-   *  @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard
-   *                      Options & Std Options Pixels/Meters from Edge
-   *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control Net
-   *  @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
+   *   @history 2010-04-09 Sharmila Prasad - API's to check valid DN and Emission Angle.
+   *            Also changed functionality of Operate and made it overloaded.
+   *   @history 2010-04-30 Sharmila Prasad - Added class members mdBestEmissionAngle, 
+   *            mdBestDnValue and their access functions.Also added member mUnusedParamGrp
+   *            to check for the default values used for the operator.
+   *   @history 2010-04-30 Sharmila Prasad - 1. Interest Operator child of ControlNetValidMeasure
+   *            which validates all the standard control network options. Changed functionality
+   *            to accomadate ControlNetValidMeasure
+   *            2. Removed class members  mdBestEmissionAngle, mdBestDnValue..., instead 
+   *            stored in structure InterestResults structure
+   *            3. Move processing ImageOverlaps from app to here
+   *            4. Added API's to compute Interest by point and by measure
+   *   @history 2010-06-18 Sharmila Prasad - 1. Fixed Bug to ignore Points with bad interest
+   *            2. Do not process previously Ignored points in the Original Control Net
+   *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
+   *            use CubeManager instead
+   *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard 
+   *            Options & Std Options Pixels/Meters from Edge
+   *   @history 2010-07-13 Tracie Sucharski - Make changes to implement the new or modified
+   *            keywords for the implementation of binary control networks.
+   *   @history 2010-10-05 Sharmila Prasad - Process EditLock feature
+   *   @history 2010-10-15 Sharmila Prasad - Use only a single copy of Control Net
+   *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
+   *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
+   *                                       removing includes from ControlNet.h.
+   *   @history 2010-10-28 Sharmila Prasad - Log, if Reference changed and apriorisource==Reference
+   *   @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
+   *   @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private and
+   *                                        modify documentation of Parse function regarding deffile
    *  @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private and
    *                                        modify documentation of Parse function regarding deffile
    */
@@ -117,11 +126,12 @@ namespace Isis {
       //! Operate - to calculate interest for entire control net to get better reference
       void Operate(ControlNet &pNewNet, std::string psSerialNumFile, std::string psOverlapListFile = "");
 
-      //! Return the goodness of fit of the match operator
+      //! Return the Interest Amount 
       inline double InterestAmount() const {
         return p_interestAmount;
       };
 
+      //! Return the Worst(least value) Interest 
       inline double WorstInterest() const {
         return p_worstInterest;
       }
@@ -163,6 +173,9 @@ namespace Isis {
       //! moving point to a better interest area.
       void FindCnetRef(ControlNet &pNewNet);
 
+      //! Process (Validate and Log) Point with Lock or with Referemce Measure Locked
+      void ProcessLocked_Point_Reference(ControlPoint & pCPoint, PvlObject & pPvlObj, int & piMeasuresModified);
+      
       //! Calculate interest for a Control Point
       int InterestByPoint(ControlPoint &pCnetPoint);
 
@@ -176,10 +189,10 @@ namespace Isis {
 
       double p_worstInterest, p_interestAmount;
 
-      //! clipping polygon set by SetClipPolygon (line,samp)
+      //!< clipping polygon set by SetClipPolygon (line,samp)
       geos::geom::MultiPolygon *p_clipPolygon; 
 
-      Isis::PvlGroup mOperatorGrp;        //!< Operator group to log Interest Options
+      Isis::PvlGroup mOperatorGrp;        //!< Operator group that created this projection
 
     private:
       double p_cubeSample, p_cubeLine;    //!< Point in a cube from a chip perspective
@@ -188,7 +201,7 @@ namespace Isis {
       bool mbOverlaps;                    //!< If Overlaplist exists
       
       //! Specified in the Pvl Operator group for the box car size
-      int p_deltaSamp, p_deltaLine, p_lines, p_samples; 
+      int p_deltaSamp, p_deltaLine, p_lines, p_samples;
       
       //! Structure to hold Interest Results
       typedef struct {

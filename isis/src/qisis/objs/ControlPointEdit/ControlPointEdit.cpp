@@ -79,7 +79,6 @@ namespace Qisis {
   }
 
 
-
   /**
    * Design the PointEdit widget
    *
@@ -308,12 +307,10 @@ namespace Qisis {
     
     connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
             p_rightView, SLOT(setControlNet(Isis::ControlNet *)));
-    
     connect(this,
         SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
         p_rightView,
         SLOT(stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *)));
-        
     connect(rightLockStretch, SIGNAL(stateChanged(int)),
         p_rightView,
         SLOT(changeStretchLock(int)));
@@ -479,7 +476,7 @@ namespace Qisis {
 
     QHBoxLayout *rightLayout = new QHBoxLayout();
     p_autoReg = new QPushButton("Register");
-    QPushButton *save = new QPushButton("Save Point");
+    QPushButton *save = new QPushButton("Save Measure");
 
     rightLayout->addWidget(p_autoReg);
     rightLayout->addWidget(save);
@@ -488,7 +485,7 @@ namespace Qisis {
 
     connect(find, SIGNAL(clicked()), this, SLOT(findPoint()));
     connect(p_autoReg, SIGNAL(clicked()), this, SLOT(registerPoint()));
-    connect(save, SIGNAL(clicked()), this, SLOT(savePoint()));
+    connect(save, SIGNAL(clicked()), this, SLOT(saveMeasure()));
 
     setLayout(gridLayout);
 
@@ -701,12 +698,13 @@ namespace Qisis {
    *                             warn user if unable to load
    *                             pattern (left) or search (right)
    *                             chip
+   *   @history 2010-10-12  Tracie Sucharski - Clean up try/catch blocks. 
    *
    */
 
   void ControlPointEdit::registerPoint() {
 
-    if(p_autoRegShown) {
+    if (p_autoRegShown) {
       //  Undo Registration
       p_autoRegShown = false;
       p_autoRegExtension->hide();
@@ -724,74 +722,75 @@ namespace Qisis {
         p_leftMeasure->Sample(), p_leftMeasure->Line());
       p_autoRegFact->PatternChip()->Load(*p_leftCube);
       p_autoRegFact->SearchChip()->TackCube(
-        p_rightMeasure->Sample(), p_rightMeasure->Line());
-      p_autoRegFact->SearchChip()->Load(*p_rightCube, *(p_autoRegFact->PatternChip()), *p_leftCube);
-      Isis::AutoReg::RegisterStatus status = p_autoRegFact->Register();
-      if(status != Isis::AutoReg::Success) {
-        throw Isis::iException::Message(Isis::iException::User, "Autoregistration failed", _FILEINFO_);
-      }
+                             p_rightMeasure->Sample(), p_rightMeasure->Line());
+      p_autoRegFact->SearchChip()->Load(
+                   *p_rightCube, *(p_autoRegFact->PatternChip()), *p_leftCube);
     }
-    catch(Isis::iException &e) {
-      Isis::AutoReg::RegisterStatus status = p_autoRegFact->Register();
-      QString msg = "Cannot sub-pixel register this point.\n";
+    catch (Isis::iException &e) {
+      QString msg = "Cannot register this point, unable to Load chips.";
       msg += e.Errors().c_str();
-      if(status != Isis::AutoReg::Success) {
-        if(status == Isis::AutoReg::PatternChipNotEnoughValidData) {
-          msg += "\n\nNot enough valid data in Pattern Chip.\n";
-          msg += "  PatternValidPercent = ";
-          msg += QString::number(p_autoRegFact->PatternValidPercent()) + "%";
-        }
-        else if(status == Isis::AutoReg::FitChipNoData) {
-          msg += "\n\nNo valid data in Fit Chip.";
-        }
-        else if(status == Isis::AutoReg::FitChipToleranceNotMet) {
-          msg += "\n\nGoodness of Fit Tolerance not met.\n";
-          msg += "\nGoodnessOfFit = " + QString::number(p_autoRegFact->GoodnessOfFit());
-          msg += "\nGoodnessOfFitTolerance = ";
-          msg += QString::number(p_autoRegFact->Tolerance());
-        }
-        else if(status == Isis::AutoReg::SurfaceModelNotEnoughValidData) {
-          msg += "\n\nNot enough points to fit a surface model for sub-pixel ";
-          msg += "accuracy.  Probably too close to edge.\n";
-        }
-        else if(status == Isis::AutoReg::SurfaceModelSolutionInvalid) {
-          msg += "\n\nCould not model surface for sub-pixel accuracy.\n";
-        }
-        else if(status == Isis::AutoReg::SurfaceModelDistanceInvalid) {
-          double sampDist, lineDist;
-          p_autoRegFact->Distance(sampDist, lineDist);
-          msg += "\n\nSurface model moves registartion more than tolerance.\n";
-          msg += "\nSampleMovement = " + QString::number(sampDist) +
-                 "    LineMovement = " + QString::number(lineDist);
-          msg += "\nDistanceTolerance = " +
-                 QString::number(p_autoRegFact->DistanceTolerance());
-        }
-        else if(status == Isis::AutoReg::PatternZScoreNotMet) {
-          double score1, score2;
-          p_autoRegFact->ZScores(score1, score2);
-          msg += "\n\nPattern data max or min does not pass z-score test.\n";
-          msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
-          msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
-        }
-        else if(status == Isis::AutoReg::SurfaceModelEccentricityRatioNotMet) {
-          msg += "\n\nEccentricity of surface model exceeds tolerance.";
-          QString calcEccentricity = QString::number(p_autoRegFact->EccentricityRatio(), 'f', 5);
-          msg += "\nCalculated Eccentricity Ratio = " +
-                 calcEccentricity + " (" + calcEccentricity + ":1)";
-          QString tolEccentricity = QString::number(p_autoRegFact->EccentricityRatioTolerance(), 'f', 5);
-          msg += "\nEccentricity Ratio Tolerance (i.e., EccentricityRatio) = " +
-                 tolEccentricity + " (" + tolEccentricity + ":1)";
-        }
-        else if(status == Isis::AutoReg::AdaptiveAlgorithmFailed) {
-          msg += "\n\nError occured in Adaptive algorithm.";
-        }
-        else {
-          msg += "\n\nUnknown registration error.";
-        }
+      QMessageBox::information((QWidget *)parent(), "Error", msg);
+      e.Clear();
+      return;
+    }
+
+    Isis::AutoReg::RegisterStatus status = p_autoRegFact->Register();
+    if (!p_autoRegFact->Success()) {
+      QString msg = "Cannot sub-pixel register this point.\n";
+      if(status == Isis::AutoReg::PatternChipNotEnoughValidData) {
+        msg += "\n\nNot enough valid data in Pattern Chip.\n";
+        msg += "  PatternValidPercent = ";
+        msg += QString::number(p_autoRegFact->PatternValidPercent()) + "%";
+      }
+      else if(status == Isis::AutoReg::FitChipNoData) {
+        msg += "\n\nNo valid data in Fit Chip.";
+      }
+      else if(status == Isis::AutoReg::FitChipToleranceNotMet) {
+        msg += "\n\nGoodness of Fit Tolerance not met.\n";
+        msg += "\nGoodnessOfFit = " + QString::number(p_autoRegFact->GoodnessOfFit());
+        msg += "\nGoodnessOfFitTolerance = ";
+        msg += QString::number(p_autoRegFact->Tolerance());
+      }
+      else if(status == Isis::AutoReg::SurfaceModelNotEnoughValidData) {
+        msg += "\n\nNot enough points to fit a surface model for sub-pixel ";
+        msg += "accuracy.  Probably too close to edge.\n";
+      }
+      else if(status == Isis::AutoReg::SurfaceModelSolutionInvalid) {
+        msg += "\n\nCould not model surface for sub-pixel accuracy.\n";
+      }
+      else if(status == Isis::AutoReg::SurfaceModelDistanceInvalid) {
+        double sampDist, lineDist;
+        p_autoRegFact->Distance(sampDist, lineDist);
+        msg += "\n\nSurface model moves registartion more than tolerance.\n";
+        msg += "\nSampleMovement = " + QString::number(sampDist) +
+               "    LineMovement = " + QString::number(lineDist);
+        msg += "\nDistanceTolerance = " +
+               QString::number(p_autoRegFact->DistanceTolerance());
+      }
+      else if(status == Isis::AutoReg::PatternZScoreNotMet) {
+        double score1, score2;
+        p_autoRegFact->ZScores(score1, score2);
+        msg += "\n\nPattern data max or min does not pass z-score test.\n";
+        msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
+        msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
+      }
+      else if(status == Isis::AutoReg::SurfaceModelEccentricityRatioNotMet) {
+        msg += "\n\nEccentricity of surface model exceeds tolerance.";
+        QString calcEccentricity = QString::number(p_autoRegFact->EccentricityRatio(), 'f', 5);
+        msg += "\nCalculated Eccentricity Ratio = " +
+               calcEccentricity + " (" + calcEccentricity + ":1)";
+        QString tolEccentricity = QString::number(p_autoRegFact->EccentricityRatioTolerance(), 'f', 5);
+        msg += "\nEccentricity Ratio Tolerance (i.e., EccentricityRatio) = " +
+               tolEccentricity + " (" + tolEccentricity + ":1)";
+      }
+      else if(status == Isis::AutoReg::AdaptiveAlgorithmFailed) {
+        msg += "\n\nError occured in Adaptive algorithm.";
+      }
+      else {
+        msg += "\n\nUnknown registration error.";
       }
 
       QMessageBox::information((QWidget *)parent(), "Error", msg);
-      e.Clear();
       return;
     }
 
@@ -816,13 +815,14 @@ namespace Qisis {
   }
 
   /**
-   * Save point under the crosshair in right ChipViewport
+   * Save control measure under the crosshair in right ChipViewport
    * @internal
    *   @history 2008-12-30 Jeannie Walldren - Modified to update
    *                          user (chooser) name and date when
    *                          point is saved
+   *   @history 2010-11-19 Tracie Sucharski - Renamed from savePoint. 
    */
-  void ControlPointEdit::savePoint() {
+  void ControlPointEdit::saveMeasure() {
     //  Get cube position at right chipViewport crosshair
     if(p_rightMeasure != NULL) {
       p_rightMeasure->SetCoordinate(p_rightView->tackSample(),
@@ -857,7 +857,7 @@ namespace Qisis {
 
 
     //  Redraw measures and overlaps on viewports
-    emit pointSaved();
+    emit measureSaved();
   }
 
 

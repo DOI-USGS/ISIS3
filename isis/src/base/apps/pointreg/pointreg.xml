@@ -117,18 +117,21 @@
     <change name="Travis Addair" date="2010-05-25">
         Added a validity test for ensuring newly registered measure has a computable lat-lon position.
     </change>
+    <change name="Travis Addair" date="2010-11-02">
+        Binary Control Network conversion
+    </change>
   </history>
 
   <groups>
     <group name="Input">
-      <parameter name="FILES">
+      <parameter name="FROMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
           Input File List
         </brief>
         <description>
-          This file contains all the files used in the control network.
+          This file contains the names of all files used in the control network.
         </description>
         <filter>
           *.txt *.lis *.lst *.list
@@ -149,17 +152,18 @@
         </filter>
       </parameter>
 
-      <parameter name="TEMPLATE">
+      <parameter name="DEFFILE">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Auto Regestration Template
+          Auto Registration Definition File
         </brief>
         <description>
-          This is the auto regestration template file which contains all the information
-          on the registration algorithm to be used.  The default template 
-          contains every keyword AutoReg will accept set to their default 
-          values, or common example values where defaults do not exist.
+          This is the auto regestration definition file which contains all the
+          information on the registration algorithm to be used.  The default
+          "template" definition file contains all the keywords AutoReg will
+          accept set to their default values, or common example values where
+          defaults do not exist.
         </description>
           <helpers >
               <helper name="H1">
@@ -179,18 +183,18 @@
     </group>
 
     <group name="Output">
-        <parameter name="TO">
+        <parameter name="ONET">
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-            Resulting ControlNet
+            Output ControlNet
           </brief>
           <description>
             This is the output ControlNet file containing the registered information.
           </description>
           <filter>
-          *.net
-        </filter>
+            *.net
+          </filter>
         </parameter>
 
        <parameter name="FLATFILE">
@@ -225,13 +229,13 @@
         <default><item>True</item></default>
       </parameter>
 
-      <parameter name="OUTPUTUNMEASURED">
+      <parameter name="OUTPUTFAILED">
         <type>boolean</type>
         <brief>
-          Keep Unmeasured ControlMeasures
+          Keep Failed ControlMeasures
         </brief>
         <description>
-          Specifies if Unmeasured ControlMeasures will remain in the ControlNet.
+          Specifies if ControlMeasures that failed to register will remain in the ControlNet.
         </description>
         <default><item>True</item></default>
       </parameter> 
@@ -292,14 +296,14 @@
             Which types of measures should be processed
         </brief>
         <description>
-          If this parameter is set to ESTIMATED, only measures that have not 
-          been successfully registered by a prior run of the pointreg 
+          If this parameter is set to CANDIDATES, only measures that have not 
+          been successfully registered by a prior run of the "pointreg" 
           application will be processed.  However, if this parameter is set to 
           its default of ALL, every measure, including those that have been run 
-          through pointreg successfully, will be reprocessed.  A measure is 
-          presumed to have been "successfully registered" if the value of its 
-          MeasureType keyword is not "Estimated", as this value will be set to 
-          "Automatic" if registration succeeds. 
+          through pointreg successfully and manually chosen measures, will be
+          processed.  A measure is considered a "Candidate" if it has never
+          been run through "pointreg" before, or if it was unsuccessfully
+          registed in a previous run.
         </description>     
         <default><item>ALL</item></default>
         <list>
@@ -312,13 +316,13 @@
                     processed regardless of MeasureType.  This is the default.
                 </description>
             </option>
-            <option value="ESTIMATED">
+            <option value="CANDIDATES">
                 <brief>
-                    Process only Estimated Measures
+                    Process only Candidate Measures
                 </brief>
                 <description>
                     This option will result in only Control Measures whose 
-                    MeasureType equals "Estimated" being processed.
+                    MeasureType equals "Candidate" being processed.
                 </description>
             </option>
         </list>  

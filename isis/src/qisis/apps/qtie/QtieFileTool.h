@@ -36,6 +36,10 @@
 #include "ControlNet.h"
 #include "Projection.h"
 
+namespace Isis {
+  class Cube;
+}
+
 namespace Qisis {
 
   /**

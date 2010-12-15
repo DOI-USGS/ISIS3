@@ -2,6 +2,7 @@
 
 #include <map>
 
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "FileList.h"
@@ -69,12 +70,11 @@ void IsisMain() {
 
   // Create a new control network
   ControlNet cnet;
-  cnet.SetType(ControlNet::ImageToGround);
-  cnet.SetTarget(ui.GetString("TARGET"));
   cnet.SetNetworkId(ui.GetString("NETWORKID"));
+  cnet.SetTarget(ui.GetString("TARGET"));
   cnet.SetUserName(Isis::Application::UserName());
-  cnet.SetDescription(ui.GetString("DESCRIPTION"));
   cnet.SetCreatedDate(Isis::Application::DateTime());
+  cnet.SetDescription(ui.GetString("DESCRIPTION"));
 
   // Open the match point file
   TextFile mpFile(ui.GetFilename("MATCH"));
@@ -148,7 +148,7 @@ void IsisMain() {
     // Declare the Point and Measure
     ControlPoint *cpoint;
     ControlMeasure cmeasure;
-
+    
     // Section the match point line into the important pieces
     currLine.ConvertWhiteSpace();
     currLine.Compress();
@@ -173,7 +173,6 @@ void IsisMain() {
 
     // Set the coordinate and serial number for this measure
     cmeasure.SetCoordinate(sampNum, lineNum);
-
     cmeasure.SetCubeSerialNumber(snMap[(int)fsc]);
 
     if(snMap[(int)fsc].empty()) {
@@ -186,22 +185,21 @@ void IsisMain() {
     }
 
     //Set the Measure Type
-    if(iString::Equal(matClass, "T")) {
-      cmeasure.SetReference(true);
-      cmeasure.SetType(ControlMeasure::ValidatedManual);
+    if(iString::Equal(matClass, "U")) { //Unmeasured - these are ignored in isis2
+      cmeasure.SetType(ControlMeasure::Candidate);
+      cmeasure.SetIgnore(true);
     }
-    else if(iString::Equal(matClass, "M")) {
-      cmeasure.SetType(ControlMeasure::ValidatedManual);
+    else if(iString::Equal(matClass, "T")) { //Truth
+      cmeasure.SetType(ControlMeasure::Reference);
     }
-    else if(iString::Equal(matClass, "S")) {
-      cmeasure.SetType(ControlMeasure::ValidatedAutomatic);
+    else if(iString::Equal(matClass, "S")) { //SubPixel
+      cmeasure.SetType(ControlMeasure::RegisteredSubPixel);
     }
-    else if(iString::Equal(matClass, "U") &&
-            (cmeasure.Sample() != 0.0) && (cmeasure.Line() != 0.0)) {
-      cmeasure.SetType(ControlMeasure::Estimated);
+    else if(iString::Equal(matClass, "M")) { //Measured
+      cmeasure.SetType(ControlMeasure::RegisteredPixel);
     }
-    else if(iString::Equal(matClass, "U")) {
-      cmeasure.SetType(ControlMeasure::Unmeasured);
+    else if (iString::Equal(matClass,"A")) { //Approximate
+      cmeasure.SetType(ControlMeasure::Candidate);
     }
     else {
       iString msg = "Unknown measurment type [" + matClass + "] ";
@@ -229,7 +227,6 @@ void IsisMain() {
       // point not found in control net, but this is not an error, so clear exception
       e.Clear();
       // add point to control net, default point type is "Tie"
-      e.Clear();
       cnet.Add(ControlPoint(pid));
       cpoint = cnet.Find(pid);
     }
@@ -364,13 +361,22 @@ void IsisMain() {
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
 
-      //Find the point that matches the PointID, create it if it does not exist
+      //Find the point that matches the PointID, if it does not exist alert the user
       try {
         cpoint = cnet.Find(pid);
-        // if the point exists in the matchpoint file and rand file, set it to ground
+        // if the point is already added to the control net, it was found in 
+        // the match point file also.  
         if(ui.GetString("POINTTYPE") == "GROUND") {
+          // If the POINTTYPE parameter is set to ground, change point type
+          // of points in rand file
           cpoint->SetType(ControlPoint::Ground);
         }
+        cpoint->SetAprioriSurfacePointSource(
+            ControlPoint::SurfacePointSource::BundleSolution);
+        cpoint->SetAprioriSurfacePointSourceFile(ui.GetAsString("PPP"));
+        cpoint->SetAprioriRadiusSource(
+            ControlPoint::RadiusSource::BundleSolution);
+        cpoint->SetAprioriRadiusSourceFile(ui.GetAsString("PPP"));
       }
       catch(iException &e) {
         // point not found in control net means it was not in the matchpoint file,

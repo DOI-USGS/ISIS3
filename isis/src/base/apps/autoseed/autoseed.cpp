@@ -3,6 +3,8 @@
 #include <map>
 #include <sstream>
 
+#include <QString>
+
 #include "Brick.h"
 #include "CameraFactory.h"
 #include "ControlNet.h"
@@ -171,10 +173,8 @@ void IsisMain() {
 
   // Create the control net to store the points in.
   ControlNet cnet;
-  cnet.SetType(ControlNet::ImageToGround);
   cnet.SetTarget(target);
-  string networkId = ui.GetString("NETWORKID");
-  cnet.SetNetworkId(networkId);
+  cnet.SetNetworkId(ui.GetString("NETWORKID"));
   cnet.SetUserName(Isis::Application::UserName());
   cnet.SetDescription(ui.GetString("DESCRIPTION"));
 
@@ -224,7 +224,7 @@ void IsisMain() {
         cm = cp[cp.ReferenceIndex()];
       }
 
-      string c = serialNumbers.Filename(cm.CubeSerialNumber());
+      iString c = serialNumbers.Filename(cm.CubeSerialNumber());
       Pvl cubepvl(c);
       Camera *cam = CameraFactory::Create(cubepvl);
       cam->SetImage(cm.Sample(), cm.Line());
@@ -355,7 +355,7 @@ void IsisMain() {
     for(unsigned int point = 0; point < seed.size(); ++point) {
 
       ControlPoint controlpt;
-      controlpt.SetId(pointId.Next());
+      controlpt.SetId(QString::fromStdString(pointId.Next()));
       controlpt.SetType(ControlPoint::Tie);
 
       // Create a measurment at this point for each image in the overlap area
@@ -416,16 +416,19 @@ void IsisMain() {
         // Put the line/samp into a measurment
         ControlMeasure measurment;
         measurment.SetCoordinate(gmap->Sample(), gmap->Line(),
-                                 ControlMeasure::Estimated);
-        measurment.SetType(ControlMeasure::Estimated);
+                                 ControlMeasure::Candidate);
+
+        if(sn == 0)
+          measurment.SetType(ControlMeasure::Reference);
+        else
+          measurment.SetType(ControlMeasure::Candidate);
         measurment.SetCubeSerialNumber((*(overlaps[ov]))[sn]);
-        measurment.SetDateTime();
         measurment.SetIgnore(ignore);
+
         if(ignore) {
           cmIgnoredCount ++;
         }
-        measurment.SetChooserName("Application autoseed");
-        if(sn == 0) measurment.SetReference(true);
+
         controlpt.Add(measurment);
       }
 

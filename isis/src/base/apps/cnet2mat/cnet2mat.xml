@@ -10,6 +10,18 @@
       This program converts an Isis3 control network file to an ISIS2 match 
       point file.
     </p>
+    <p>
+      The following indicates how the Isis3 MeasureType is translated to an Isis2 Class 
+      <ul>
+        <li> Ignored measure is translated to "U" (Unmeasured)</li>
+        <li> Ignored point is translated to "U" (Unmeasured) for all measures</li>
+        <li> Reference is translated to "T" (Truth)</li>
+        <li> RegisteredSubPixel is tranlated to "S" (SubPixel)</li>
+        <li> RegisteredPixel is translated to "M" (Measured)</li>
+        <li> Manual is translated to "M" (Measured)</li>
+        <li> Candidate is tranlated to "A" (Approximate)</li>
+      </ul>
+    </p>
   </description>
 
   <category>
@@ -31,6 +43,9 @@
     <change name="Christopher Austin" date="2009-10-07">
       All Ignored Control Measures as well as all Control Measures inside
       ignored Control Points will now have the Type Unmeasured.
+    </change>
+    <change name="Jeannie Walldren" date="2010-12-01">
+      Modified to be compatible with binary control network.  Added errors apptest.
     </change>
   </history>
 

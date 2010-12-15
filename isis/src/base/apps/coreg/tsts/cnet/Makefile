@@ -10,8 +10,8 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) from=$(INPUT)/CRU_000004_1200_IR10_0.equi.cub \
 	  match=$(INPUT)/CRU_000004_1200_RED4_0.equi.cub \
-	  regdef=$(INPUT)/coregtemp.def \
+	  deffile=$(INPUT)/coregtemp.def \
 	  to=$(OUTPUT)/coregTruth.cub \
-	  cnet=$(OUTPUT)/coregTruthCnet.pvl \
+	  onet=$(OUTPUT)/coregTruthCnet.pvl \
 	  flatfile=$(OUTPUT)/coregTruthFlatFile.txt \
 	  interp=n > /dev/null;

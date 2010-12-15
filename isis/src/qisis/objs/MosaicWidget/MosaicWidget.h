@@ -26,19 +26,22 @@ namespace Qisis {
   class MosaicControlNetTool;
   class MosaicFindTool;
 
+  /**
+   * @brief
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author Stacy Alley
+   *
+   * @internal
+   *
+   *  @history 2010-05-10 Christopher Austin - added cnet connectivity
+   *                                functionality and fixed a few design issues
+   *  @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
+   *                                removing includes from ControlNet.h.
+   */
+
   class MosaicWidget : public QSplitter {
-      /**
-      * @brief
-      *
-      * @ingroup Visualization Tools
-      *
-      * @author Stacy Alley
-      *
-      * @internal
-      *
-      *  @history 2010-05-10 Christopher Austin - added cnet connectivity
-      *  	      functionality and fixed a few design issues
-      */
       Q_OBJECT
 
     public:

@@ -57,6 +57,14 @@
       Added an error message  when RETREIVAL=POINT is used but lat/lon values
       are absent from the points.
     </change>
+     <change name="Sharmila Prasad" date="2010-10-13">
+      Modified for binary cnet</change>
+    <change name="Sharmila Prasad" date="2010-10-22">
+      Reset Apriori values if Apriori source is AvgOfMeasures</change>
+    <change name="Sharmila Prasad" date="2010-10-28">
+      Do not add measures if the Control Point is locked and Apriori source is 
+      "AverageOfMeasures".
+    </change>
     <change name="Christopher Austin" date="2010-11-19">
       Added the DEFFILE option and test, similar to cnetref. Logging still needs
       to be done.

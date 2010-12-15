@@ -1,12 +1,15 @@
 #include "ControlPointList.h"
-#include "iException.h"
 
 #include <string>
 #include <iostream>
+
+#include "iException.h"
+#include "Filename.h" 
+
 using namespace std;
 
 int main() {
-  Isis::ControlPointList cpl("points.lis"); //list of Control Point Ids in the file
+  Isis::ControlPointList cpl(Isis::Filename("points.lis")); //list of Control Point Ids in the file
 
   int size = cpl.Size();
 

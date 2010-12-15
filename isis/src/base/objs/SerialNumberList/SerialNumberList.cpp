@@ -1,4 +1,7 @@
 #include "SerialNumberList.h"
+
+#include <QString>
+
 #include "iException.h"
 #include "FileList.h"
 #include "Filename.h"
@@ -82,34 +85,64 @@ namespace Isis {
    * SerialNumberList
    *
    * @param filename the filename to be added
+   * @param def2filename If a serial number could not be found, try to return the 
+   *                     filename
    *
    * @internal
    * @history 2007-06-04 Tracie Sucharski - Expand filename to include full
    *                        path before adding to list.
+   * @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter.
+   *                        This will allow level 2 images to be added to a
+   *                        serial number list.
+   * @history 2010-11-29 Tracie Sucharski - Only read the Instrument group 
+   *                        if p_checkTarget is True.  If def2filename is True,
+   *                        check for Mapping group if Target does not exist.
    */
-  void SerialNumberList::Add(const std::string &filename) {
+  void SerialNumberList::Add(const std::string &filename, bool def2filename) {
 
     Pvl p(Isis::Filename(filename).Expanded());
+    PvlObject cubeObj = p.FindObject("IsisCube");
     try {
-      PvlGroup instrument = p.FindGroup("Instrument", Isis::Pvl::Traverse);
-      iString target = instrument["TargetName"][0];
-      target.UpCase();
-
       // Test the target name if desired
-      if(p_checkTarget && !p_target.empty()) {
-        if(p_target != target) {
+      if (p_checkTarget) {
+        iString target;
+        PvlGroup targetGroup;
+        if (cubeObj.HasGroup("Instrument")) {
+          targetGroup = cubeObj.FindGroup("Instrument");
+        }
+        else if (def2filename) {
+          // No instrument, try Mapping
+          if (cubeObj.HasGroup("Mapping")) {
+            targetGroup = cubeObj.FindGroup("Mapping");
+          }
+          else {
+            std::string msg = "Unable to find Instrument or Mapping group in ";
+            msg += filename + " for comparing target";
+            throw iException::Message(iException::User, msg, _FILEINFO_);
+          }
+        }
+        else {
+          // No Instrument group
+          std::string msg = "Unable to find Instrument group in " + filename;
+          msg += " for comparing target";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
+        }
+
+        target = targetGroup["TargetName"][0];
+        target.UpCase();
+        if (p_target.empty()) {
+          p_target = target;
+        }
+        else if (p_target != target) {
           std::string msg = "Target name of [" + target + "] from file [";
           msg += filename + "] does not match [" + p_target + "]";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
       }
-      else {
-        p_target = target;
-      }
 
       // Create the SN
-      std::string sn = SerialNumber::Compose(p);
-      std::string on = ObservationNumber::Compose(p);
+      std::string sn = SerialNumber::Compose(p, def2filename);
+      std::string on = ObservationNumber::Compose(p, def2filename);
       if(sn == "Unknown") {
         std::string msg = "Invalid serial number [Unknown] from file [";
         msg += filename + "]";
@@ -149,6 +182,19 @@ namespace Isis {
   bool SerialNumberList::HasSerialNumber(const std::string &sn) {
     if(p_serialMap.find(sn) == p_serialMap.end()) return false;
     return true;
+  }
+
+
+  /**
+   * Determines whether or not the requested serial number exists
+   * in the list
+   *
+   * @param sn The serial number to be checked for
+   *
+   * @return bool
+   */
+  bool SerialNumberList::HasSerialNumber(QString sn) {
+    return HasSerialNumber(sn.toStdString());
   }
 
 

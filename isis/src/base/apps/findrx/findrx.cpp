@@ -92,7 +92,10 @@ void IsisMain() {
       ar->SetPatternValidPercent(patternValidPercent / 4.0);
       ar->SetSubsearchValidPercent(subsearchValidPercent / 4.0);
     }
-    if(ar->Register() == AutoReg::Success) {
+
+    ar->Register();
+
+    if(ar->Success()) {
       reseaus["Sample"][res] = ar->CubeSample();
       reseaus["Line"][res] = ar->CubeLine();
       reseaus["Valid"][res] = 1;

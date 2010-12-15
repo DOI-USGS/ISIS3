@@ -1,4 +1,7 @@
 #include "ControlPointList.h"
+
+#include <QList>
+
 #include "iException.h"
 #include "FileList.h"
 #include "Filename.h"
@@ -10,10 +13,10 @@ namespace Isis {
    *
    * @param psListFile The file withe list of control point ids'
    */
-  ControlPointList::ControlPointList(const std::string &psListFile) {
+  ControlPointList::ControlPointList(const Filename &psListFile) {
     try {
       QList<QString> qList;
-      FileList list(psListFile);
+      FileList list(psListFile.Expanded());
       int size = (int)list.size();
       for(int i = 0; i < size; i++) {
         qList.insert(i, QString(list[i].c_str()));
@@ -25,7 +28,8 @@ namespace Isis {
       mqCpList.sort();
     }
     catch(iException &e) {
-      std::string msg = "Can't open or invalid file list [" + psListFile + "]";
+      std::string msg = "Can't open or invalid file list [" + 
+          psListFile.Expanded() + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
@@ -126,8 +130,8 @@ namespace Isis {
 
     pcPvlLog += Isis::PvlKeyword("TotalPoints", size);
     pcPvlLog += Isis::PvlKeyword("ValidPoints", size - iNotFound);
-    pcPvlLog += Isis::PvlKeyword("InValidPoints", iNotFound);
-    pcPvlLog += Isis::PvlKeyword("InValidPointIds", sPointsNotFound);
+    pcPvlLog += Isis::PvlKeyword("InvalidPoints", iNotFound);
+    pcPvlLog += Isis::PvlKeyword("InvalidPointIds", sPointsNotFound);
   }
 }
 

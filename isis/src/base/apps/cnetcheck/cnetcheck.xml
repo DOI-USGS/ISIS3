@@ -66,6 +66,9 @@
     <change name="Christopher Austin" date="2009-06-08">
       Added the DELIMIT parameter
     </change>
+    <change name="Christopher Austin" date="2010-10-06">
+      Fixed for binary cnet conversion.
+    </change>
   </history>
 
   <category>
