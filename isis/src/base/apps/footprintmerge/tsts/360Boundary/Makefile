@@ -3,10 +3,11 @@ APPNAME = footprintmerge
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(LS) $(INPUT)/*.cub > $(OUTPUT)/fromList.lis;
+	$(CP) $(INPUT)/*.cub $(OUTPUT)/;
+	$(LS) $(OUTPUT)/*.cub > $(OUTPUT)/fromList.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/fromList.lis \
 	to=$(OUTPUT)/islands.txt mode=FULL > /dev/null;> /dev/null;
-	$(RM) $(OUTPUT)/fromList.lis;
+	$(RM) $(OUTPUT)/fromList.lis $(OUTPUT)/*.cub;
 	$(SED) -e 's+\([^b]*\)\(m[0-9]*.lev1.crop.cub\)+\2X+g' \
 	  output/islands.txt | $(SED) -e 's+)++' | tr "X" "\n" \
 	  > $(OUTPUT)/islands2.txt;
