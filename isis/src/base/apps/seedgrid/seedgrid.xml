@@ -42,6 +42,9 @@
     <change name="Travis Addair" date="2010-06-07">
       Added progress bar.
     </change>
+    <change name="Tracie Sucharski" date="2010-10-26">
+      Changed for new Control Network format.
+    </change>
   </history>
 
   <groups>
@@ -263,6 +266,9 @@
             The ID or name of this particular control network. This string
             should be unique.
         </description>
+        <internalDefault>
+          No Id
+        </internalDefault>
       </parameter>
 
       <parameter name="POINTID">
@@ -290,6 +296,9 @@
         <description>
             A string describing purpose of this control network.
         </description>
+        <internalDefault>
+          No Description
+        </internalDefault>
       </parameter>
 
     </group>
