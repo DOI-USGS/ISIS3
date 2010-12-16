@@ -7,5 +7,5 @@ commands:
 	$(APPNAME) CNET=$(INPUT)/cnet.net \
 	CUBELIST=$(OUTPUT)/list.lis \
 	POINTLIST=$(INPUT)/points.lis \
-	ONET=$(OUTPUT)/cnet.pvl > /dev/null;
+	ONET=$(OUTPUT)/cnet.net > /dev/null;
 	$(RM) $(OUTPUT)/list.lis;
