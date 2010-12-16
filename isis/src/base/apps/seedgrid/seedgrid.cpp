@@ -4,6 +4,10 @@
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "SurfacePoint.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "Distance.h"
 #include "ID.h"
 #include "Progress.h"
 #include "Projection.h"
@@ -84,12 +88,16 @@ void IsisMain() {
     }
 
     // Create the control net to store the points in.
-    cnet.SetType(ControlNet::ImageToGround);
     cnet.SetTarget(target);
-    string networkId = ui.GetString("NETWORKID");
-    cnet.SetNetworkId(networkId);
+    string networkId;
+    if (ui.WasEntered("NETWORKID")) {
+      networkId = ui.GetString("NETWORKID");
+      cnet.SetNetworkId(networkId);
+    }
     cnet.SetUserName(Isis::Application::UserName());
-    cnet.SetDescription(ui.GetString("DESCRIPTION"));
+    if (ui.WasEntered("DESCRIPTION")) {
+      cnet.SetDescription(ui.GetString("DESCRIPTION"));
+    }
 
     // Set up an automatic id generator for the point ids
     ID pointId = ID(ui.GetString("POINTID"));
@@ -127,10 +135,13 @@ void IsisMain() {
             proj->Longitude() < ui.GetDouble("MAXLON") &&
             proj->Latitude() > ui.GetDouble("MINLAT") &&
             proj->Longitude() > ui.GetDouble("MINLON")) {
+          SurfacePoint pt(Latitude(proj->Latitude(), Angle::Degrees),
+                          Longitude(proj->Longitude(), Angle::Degrees),
+                          Distance(equatorialRadius));
           ControlPoint control;
           control.SetId(pointId.Next());
           control.SetIgnore(true);
-          control.SetUniversalGround(proj->Latitude(), proj->Longitude(), equatorialRadius);
+          control.SetSurfacePoint(pt);
           cnet.Add(control);
         }
         y += yStepSize;
@@ -152,12 +163,16 @@ void IsisMain() {
     equatorialRadius = radii["EquatorialRadius"];
 
     // Create the control net to store the points in.
-    cnet.SetType(ControlNet::ImageToGround);
     cnet.SetTarget(target);
-    string networkId = ui.GetString("NETWORKID");
-    cnet.SetNetworkId(networkId);
+    string networkId;
+    if (ui.WasEntered("NETWORKID")) {
+      networkId = ui.GetString("NETWORKID");
+      cnet.SetNetworkId(networkId);
+    }
     cnet.SetUserName(Isis::Application::UserName());
-    cnet.SetDescription(ui.GetString("DESCRIPTION"));
+    if (ui.WasEntered("DESCRIPTION")) {
+      cnet.SetDescription(ui.GetString("DESCRIPTION"));
+    }
 
     // Set up an automatic id generator for the point ids
     ID pointId = ID(ui.GetString("POINTID"));
@@ -197,7 +212,10 @@ void IsisMain() {
         ControlPoint control;
         control.SetId(pointId.Next());
         control.SetIgnore(true);
-        control.SetUniversalGround(lat, lon, equatorialRadius);
+        SurfacePoint pt(Latitude(lat, Angle::Degrees),
+                        Longitude(lon, Angle::Degrees),
+                        Distance(equatorialRadius));
+        control.SetSurfacePoint(pt);
         cnet.Add(control);
 
         lat += latStep;
