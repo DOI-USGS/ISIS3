@@ -6,7 +6,7 @@ commands:
 	$(LS) $(INPUT)/*.ctl > $(OUTPUT)/list.lis;
 	$(APPNAME) INPUTTYPE=list \
 	FROMLIST=$(OUTPUT)/list.lis \
-	TO=$(OUTPUT)/testReplace.pvl \
+	TO=$(OUTPUT)/testReplace.net \
 	DUPLICATEPOINTS=merge \
 	REPORT=$(OUTPUT)/report.txt \
 	ID=testReplaceMerge DESCRIPTION=NewTextCtl \
