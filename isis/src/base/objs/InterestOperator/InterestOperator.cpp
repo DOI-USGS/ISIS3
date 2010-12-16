@@ -12,6 +12,7 @@
 #include "ControlMeasure.h"
 #include "ImageOverlapSet.h"
 #include "ImagePolygon.h"
+#include "MeasureValidationResults.h"
 #include "PolygonTools.h"
 
 //#define _DEBUG_
@@ -192,7 +193,9 @@ namespace Isis {
         chip.SetChipPosition((double)samp, (double)lin);
 
         bCalculateInterest = false;
-        if(ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube)) {
+        MeasureValidationResults results = 
+          ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube);
+        if(results.isValid()) {
           bCalculateInterest = true;
         }
 
@@ -297,7 +300,9 @@ namespace Isis {
       if (!newMeasure.Ignore()) {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
         
-        if (!ValidStandardOptions(dSample, dLine, measureCube)) {
+        MeasureValidationResults results = 
+          ValidStandardOptions(dSample, dLine, measureCube);
+        if (!results.isValid()) {
           if(bPntEditLock) {
             pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not "
                                                            "Ignored as Point EditLock is True");
@@ -478,7 +483,10 @@ namespace Isis {
               else {
                 double dSample = measureCamera->Sample();
                 double dLine   = measureCamera->Line();
-                if(!ValidStandardOptions(dSample, dLine, measureCube)) {
+
+                MeasureValidationResults results = 
+                  ValidStandardOptions(dSample, dLine, measureCube);
+                if(!results.isValid()) {
                   iNumIgnore++;
                   pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test");
                   newMeasure.SetIgnore(true);
@@ -705,7 +713,10 @@ namespace Isis {
         chip.SetChipPosition((double)samp, (double)lin);
 
         bCalculateInterest = false;
-        if(ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube)) {
+
+        MeasureValidationResults results = 
+          ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube);
+        if(results.isValid()) {
           bCalculateInterest = true;
         }
 
