@@ -37,6 +37,7 @@ namespace Isis {
   class Camera;
   class Cube;
   class ControlNet;
+  class MeasureValidationResults;
   
    /**
     * @brief ControlNetValidMeasure class
@@ -160,7 +161,8 @@ namespace Isis {
       bool MetersFromEdge(int piSample, int piLine, Cube *pCube);
 
       //! Validate Standard options to pick a reference based on a particular criteria
-      bool ValidStandardOptions(double pdSample, double pdLine, Cube *pCube, PvlGroup *pMeasureGrp = NULL);
+      MeasureValidationResults ValidStandardOptions(double pdSample, double pdLine,
+          Cube *pCube, PvlGroup *pMeasureGrp = NULL);
 
     protected:
       //! Validate PVL Min & Max DN Standard Options

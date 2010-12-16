@@ -2,6 +2,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "CubeManager.h"
+#include "MeasureValidationResults.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "UniversalGroundMap.h"
@@ -138,7 +139,8 @@ namespace Isis {
    *  
    * @return bool
    */
-  bool ControlNetValidMeasure::ValidStandardOptions(double pdSample, double pdLine, Cube *pCube, PvlGroup *pMeasureGrp) {
+  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
+      double pdSample, double pdLine, Cube *pCube, PvlGroup *pMeasureGrp) {
     // Get the Camera
     Camera *measureCamera;
     try {
@@ -167,12 +169,39 @@ namespace Isis {
       *pMeasureGrp += Isis::PvlKeyword("Resolution",     mdResolution);
     }
 
-    if(ValidEmissionAngle(mdEmissionAngle) && ValidIncidenceAngle(mdIncidenceAngle) &&
-        ValidDnValue(mdDnValue) && ValidResolution(mdResolution) &&
-        PixelsFromEdge((int)pdSample, (int)pdLine, pCube) && MetersFromEdge((int)pdSample, (int)pdLine, pCube)) {
-      return true;
+    MeasureValidationResults results;
+
+    if(!ValidEmissionAngle(mdEmissionAngle)) {
+      results.addFailure(MeasureValidationResults::EmissionAngle,
+          mdEmissionAngle, mdMinEmissionAngle, mdMaxEmissionAngle);
     }
-    return false;
+
+    if(!ValidIncidenceAngle(mdIncidenceAngle)) {
+      results.addFailure(MeasureValidationResults::IncidenceAngle,
+          mdIncidenceAngle, mdMinIncidenceAngle, mdMaxEmissionAngle);
+    }
+
+    if(!ValidDnValue(mdDnValue)) {
+      results.addFailure(MeasureValidationResults::DNValue,
+          mdDnValue, mdMinDN, mdMaxDN);
+    }
+
+    if(!ValidResolution(mdResolution)) {
+      results.addFailure(MeasureValidationResults::Resolution,
+          mdResolution, mdMinResolution, mdMaxResolution);
+    }
+
+    if(!PixelsFromEdge((int)pdSample, (int)pdLine, pCube)) {
+      results.addFailure(MeasureValidationResults::PixelsFromEdge,
+          miPixelsFromEdge);
+    }
+
+    if(!MetersFromEdge((int)pdSample, (int)pdLine, pCube)) {
+      results.addFailure(MeasureValidationResults::MetersFromEdge,
+          mdMetersFromEdge);
+    }
+
+    return results;
   }
 
   /**
