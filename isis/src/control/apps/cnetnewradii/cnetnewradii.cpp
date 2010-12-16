@@ -42,11 +42,10 @@ void IsisMain() {
 
   for(int i = 0; i < cnet.Size() ; i++) {
     ControlPoint &cp = cnet[i];
-    cerr << cp.Type() << "\n";
+
     if(cp.Type() == ControlPoint::Ground) {
       // Create Brick on samp, line to get the dn value of the pixel
       SurfacePoint surfacePt = cp.GetSurfacePoint();
-      cerr << surfacePt.GetLatitude().GetDegrees() << "," << surfacePt.GetLongitude().GetDegrees() << "\n";
       Brick b(1, 1, 1, cube.PixelType());
       bool ugSuccess = ugm->SetUniversalGround(
           surfacePt.GetLatitude().GetDegrees(),
