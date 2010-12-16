@@ -74,7 +74,7 @@ commands:
 	description="Invalid RAND file - lat/lon/rad not a double" \
 	networkid=TestNet10 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
-	$(SED) 's+.*/input/++' $(OUTPUT)/error1.txt > $(OUTPUT)/error.txt;
+	$(SED) 's+/usgs.*/input/++' $(OUTPUT)/error1.txt > $(OUTPUT)/error.txt;
 	rm -f $(OUTPUT)/error1.txt;
 	rm -f $(OUTPUT)/out.net;
 	rm -f $(OUTPUT)/cub2.lis;
