@@ -5,6 +5,7 @@
 #include "ControlMeasure.h"
 #include "PvlGroup.h"
 #include "Camera.h"
+#include "MeasureValidationResults.h"
 #include "Portal.h"
 #include "SpecialPixel.h"
 #include "Pvl.h"
@@ -105,7 +106,9 @@ namespace Isis {
           if(!newMsr.Ignore()) {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
-            if(ValidStandardOptions(dSample, dLine, measureCube, &pvlMeasureGrp)) {
+            MeasureValidationResults results =
+              ValidStandardOptions(dSample, dLine, measureCube, &pvlMeasureGrp);
+            if(results.isValid()) {
               if(!bPntEditLock && !bRefLocked) {
                  newMsr.SetType(ControlMeasure::Candidate);
                  if (mdIncidenceAngle < dBestIncidenceAngle) {
