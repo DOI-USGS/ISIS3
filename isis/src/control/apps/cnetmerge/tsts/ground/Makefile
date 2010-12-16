@@ -6,7 +6,7 @@ commands:
 	$(APPNAME) INPUTTYPE=cnets \
 	FROM1=$(INPUT)/testNetGround.ctl \
 	FROM2=$(INPUT)/testNetReferences.ctl \
-	TO=$(OUTPUT)/testGround.pvl \
+	TO=$(OUTPUT)/testGround.net \
 	REPORT=$(OUTPUT)/groundReport.txt \
 	DUPLICATEPOINTS=merge \
 	ID=testReplaceMerge DESCRIPTION=NewTextCtl \
@@ -14,7 +14,7 @@ commands:
 	$(APPNAME) INPUTTYPE=cnets \
 	FROM1=$(INPUT)/testNetReferences.ctl \
 	FROM2=$(INPUT)/testNetGround.ctl \
-	TO=$(OUTPUT)/testReferences.pvl \
+	TO=$(OUTPUT)/testReferences.net \
 	REPORT=$(OUTPUT)/referenceReport.txt \
 	DUPLICATEPOINTS=merge \
 	OVERWRITEMEASURES=true \
