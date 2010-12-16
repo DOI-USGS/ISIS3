@@ -75,7 +75,7 @@ void IsisMain() {
         for(int cm = cnet[cp].Size() - 1; cm >= 0; cm--) {
           if(cnet[cp][cm].Ignore()) {
             // Can't delete the reference without deleting the whole point
-            if(cnet[cp][cm].IsReference()) {
+            if(cnet[cp][cm].Type() == ControlMeasure::Reference) {
               cnet[cp].SetIgnore(true);
             }
             else {
@@ -218,12 +218,13 @@ void ProcessControlMeasures(std::string psFileName, ControlNet &pcCnet) {
       if(snl.HasSerialNumber(serialNumber)) {
         pcCnet[cp][cm].SetIgnore(true);
 
-        if(pcCnet[cp][cm].IsReference())
+        if(pcCnet[cp][cm].Type() == ControlMeasure::Reference)
           pcCnet[cp].SetIgnore(true);
       }
 
       //also look for previously ignored control measures
-      if(deleteIgnored && pcCnet[cp][cm].Ignore() && !pcCnet[cp][cm].IsReference()) {
+      if(deleteIgnored && pcCnet[cp][cm].Ignore() && 
+        !(pcCnet[cp][cm].Type() == ControlMeasure::Reference)) {
         pcCnet[cp].Delete(cm);
         numMeasuresDeleted++;
       }
@@ -263,12 +264,13 @@ void CheckAllMeasureValidity(ControlNet & cnet, std::string cubeList) {
       if(InvalidMeasure(cnet[cp][cm], serialNumbers.Filename(serialNumber))) {
         cnet[cp][cm].SetIgnore(true);
 
-        if(cnet[cp][cm].IsReference())
+        if(cnet[cp][cm].Type() == ControlMeasure::Reference)
           cnet[cp].SetIgnore(true);
       }
 
       //also look for previously ignored control measures
-      if(deleteIgnored && cnet[cp][cm].Ignore() && !cnet[cp][cm].IsReference()) {
+      if(deleteIgnored && cnet[cp][cm].Ignore() && 
+         !(cnet[cp][cm].Type() == ControlMeasure::Reference)) {
         cnet[cp].Delete(cm);
         numMeasuresDeleted++;
       }
