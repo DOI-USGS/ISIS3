@@ -136,6 +136,9 @@ namespace Qisis {
    *   @history 2010-12-14 Eric Hyer - Template editor is now a widget within
    *                the main window.  Newly saved template files take effect
    *                after saving.
+   *   @history 2010-12-17 Eric Hyer - Fixed bug where current template file
+   *                was not being updated with saveAs.  Moved template file
+   *                display to outside of control point groupbox.
    */
   class QnetTool : public Tool {
       Q_OBJECT
