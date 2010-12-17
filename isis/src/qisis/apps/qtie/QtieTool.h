@@ -44,6 +44,9 @@ namespace Qisis {
     * @history 2010-11-23 Eric Hyer - Added stretchChipViewport SIGNAL for
     *                          forwarding of SIGNAL from StretchTool to
     *                          ChipViewport
+    * @history 2010-12-17 Eric Hyer - Code for open dialog for setting the
+    *                          registration template now in this class, not in
+    *                          ControlPointEdit
     */
   class QtieTool : public Qisis::Tool {
       Q_OBJECT

@@ -811,7 +811,14 @@ namespace Qisis {
    */
 
   void QtieTool::setTemplateFile() {
-    p_pointEditor->setTemplateFile();
+    QString filename = QFileDialog::getOpenFileName(p_mw,
+        "Select a registration template", ".",
+        "Registration template files (*.def *.pvl);;All files (*)");
+
+    if (filename.isEmpty())
+      return;
+
+    p_pointEditor->setTemplateFile(filename);
   }
 
 
