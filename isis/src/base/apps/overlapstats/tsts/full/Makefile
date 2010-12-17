@@ -13,7 +13,8 @@ commands:
 	$(APPNAME) from=$(OUTPUT)/list.lis \
 	to=$(OUTPUT)/tab.txt OVERLAPLIST=$(INPUT)/overlaps.lis \
 	DETAIL=full TABLETYPE=tab > /dev/null;
-	sed -e 's:/[^\t]*.lev1.cub:PATH:g' $(OUTPUT)/tab.txt \
+	$(CAT)  $(OUTPUT)/tab.txt | tr '\t' ',' | \
+	sed -e 's:/[^,]*.lev1.cub:PATH:g' | tr ',' '\t' \
 	> $(OUTPUT)/tabNoPaths.txt;
 	$(RM) $(OUTPUT)/tab.txt;
 	$(APPNAME) from=$(OUTPUT)/list.lis \
