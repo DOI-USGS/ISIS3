@@ -3,27 +3,8 @@
 #include <sstream>
 #include <vector>
 
-#include <QAction>
+#include <QtGui>  
 
-#include <QBrush>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QFile>
-#include <QHBoxLayout>
-#include <QIcon>
-#include <QLabel>
-#include <QMainWindow>
-#include <QMenu>
-#include <QMessageBox>
-#include <QObject>
-#include <QPainter>
-#include <QPoint>
-#include <QPushButton>
-#include <QSplitter>
-#include <QStackedWidget>
-#include <QTextStream>
-#include <QString>
-#include <QWidget>
 
 #include "Application.h"
 #include "Camera.h"
@@ -36,7 +17,6 @@
 #include "MdiCubeViewport.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
-#include "qnet.h"
 #include "QnetDeletePointDialog.h"
 #include "QnetNewMeasureDialog.h"
 #include "QnetNewPointDialog.h"
@@ -76,28 +56,19 @@ namespace Qisis {
     p_ptIdValue = NULL;
     p_numMeasures = NULL;
     p_ignorePoint = NULL;
-    p_holdPoint = NULL;
     p_groundPoint = NULL;
     p_leftMeasureType = NULL;
     p_leftSampError = NULL;
     p_leftLineError = NULL;
-    p_leftGoodness = NULL;
     p_rightMeasureType = NULL;
     p_rightSampError = NULL;
     p_rightLineError = NULL;
-    p_rightGoodness = NULL;
     p_ignoreLeftMeasure = NULL;
     p_ignoreRightMeasure = NULL;
     p_leftCombo = NULL;
     p_rightCombo = NULL;
     p_leftMeasure = NULL;
     p_rightMeasure = NULL;
-    p_pointFiles = NULL;
-    p_leftFile = NULL;
-    
-    p_pointFiles = new QStringList;
-    p_leftFile = new iString;
-    
     
     p_templateModified = false;
     
@@ -107,20 +78,35 @@ namespace Qisis {
   
   QnetTool::~QnetTool() {
   
-    if (p_pointFiles) {
-      delete p_pointFiles;
-      p_pointFiles = NULL;
-    }
-    
-    if (p_leftFile) {
-      delete p_leftFile;
-      p_leftFile = NULL;
-    }
   }
   
   
 
   
+  /** 
+   * Called by constructor to create Qnet Tool. 
+   * @param parent Pointer to parent QWidget 
+   * Called by constructor to create Qnet Tool. 
+   * @param parent Pointer to parent QWidget 
+   * @internal
+   *   @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to right
+   *                           and left measure info.
+   *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
+   *                           QnetTool point information. Moved setWindowTitle()
+   *                           command to updateNet() method. Added connection
+   *                           between Ignore checkbox toggle() slot and
+   *                           ignoreChanged() signal
+   *   @history 2008-12-29 Jeannie Walldren - Disabled ground point check box and
+   *                          commented out connection between check box and
+   *                          setGroundPoint() method.
+   *   @history 2008-12-30 Jeannie Walldren - Added connections to toggle
+   *                          measures' Ignore check boxes if ignoreLeftChanged()
+   *                          and ignoreRightChanged() are emitted. Replaced
+   *                          reference to ignoreChanged() with
+   *                          ignorePointChanged().
+   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   *                          namespace std"
+   */
   void QnetTool::createQnetTool(QWidget *parent) {
 
     p_qnetTool = new QMainWindow(parent);
@@ -209,11 +195,8 @@ namespace Qisis {
             this, SLOT(setIgnorePoint(bool)));
     connect(this, SIGNAL(ignorePointChanged()),
             p_ignorePoint, SLOT(toggle()));
-    p_holdPoint = new QCheckBox("Hold Point");
-    connect(p_holdPoint, SIGNAL(toggled(bool)), this, SLOT(setHoldPoint(bool)));
     QHBoxLayout * rightTopInnerLayout = new QHBoxLayout;
     rightTopInnerLayout->addWidget(p_ignorePoint);
-    rightTopInnerLayout->addWidget(p_holdPoint);
     
     // create right vertical layout's bottom layout
     p_groundPoint = new QCheckBox("Ground Point");
@@ -255,7 +238,6 @@ namespace Qisis {
     p_leftMeasureType = new QLabel;
     p_leftSampError = new QLabel();
     p_leftLineError = new QLabel();
-    p_leftGoodness = new QLabel();
     
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(p_leftCombo);
@@ -263,7 +245,6 @@ namespace Qisis {
     leftLayout->addWidget(p_leftMeasureType);
     leftLayout->addWidget(p_leftSampError);
     leftLayout->addWidget(p_leftLineError);
-    leftLayout->addWidget(p_leftGoodness);
     
     QGroupBox * leftGroupBox = new QGroupBox("Left Measure");
     leftGroupBox->setLayout(leftLayout);
@@ -287,7 +268,6 @@ namespace Qisis {
     p_rightMeasureType = new QLabel;
     p_rightSampError = new QLabel();
     p_rightLineError = new QLabel();
-    p_rightGoodness = new QLabel();
     
     // create right groupbox
     QVBoxLayout * rightLayout = new QVBoxLayout;
@@ -296,7 +276,6 @@ namespace Qisis {
     rightLayout->addWidget(p_rightMeasureType);
     rightLayout->addWidget(p_rightSampError);
     rightLayout->addWidget(p_rightLineError);
-    rightLayout->addWidget(p_rightGoodness);
     
     QGroupBox * rightGroupBox = new QGroupBox("Right Measure");
     rightGroupBox->setLayout(rightLayout);
@@ -717,7 +696,7 @@ namespace Qisis {
 
 
     if (s == Qt::LeftButton) {
-      *p_leftFile = file;
+      p_leftFile = file;
       //  Find closest control point in network
       Isis::ControlPoint *point =
         g_controlNetwork->FindClosest(sn, samp, line);
@@ -744,7 +723,7 @@ namespace Qisis {
       deletePoint(point);
     }
     else if (s == Qt::RightButton) {
-      *p_leftFile = file;
+      p_leftFile = file;
       Isis::Camera *cam = cvp->camera();
       cam->SetImage(samp, line);
       double lat = cam->UniversalLatitude();
@@ -890,7 +869,9 @@ namespace Qisis {
 
   /**
    * Delete control point
+   * 
    * @param point Pointer to control point to be deleted. 
+   * 
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                           namespace std"
@@ -943,7 +924,7 @@ namespace Qisis {
           p_controlPoint->Delete(i);
         }
 
-        *p_leftFile = "";
+        p_leftFile = "";
         loadPoint();
         p_qnetTool->setShown(true);
         p_qnetTool->raise();
@@ -971,6 +952,7 @@ namespace Qisis {
 
   /**
    * Modify control point 
+   * 
    * @param point Pointer to control point to be modified. 
    *
    * @history 2009-09-15 Tracie Sucharski - Add error check for points
@@ -998,7 +980,7 @@ namespace Qisis {
 
     //  If navTool modfify button pressed, p_leftFile needs to be reset
     //  better way - have 2 slots
-    if (sender() != this) *p_leftFile = "";
+    if (sender() != this) p_leftFile = "";
     loadPoint();
     p_qnetTool->setShown(true);
     p_qnetTool->raise();
@@ -1047,12 +1029,12 @@ namespace Qisis {
     // Clear combo boxes
     p_leftCombo->clear();
     p_rightCombo->clear();
-    p_pointFiles->clear();
+    p_pointFiles.clear();
     //  Need all files for this point
     for(int i = 0; i < p_controlPoint->Size(); i++) {
       Isis::ControlMeasure &m = (*p_controlPoint)[i];
       iString file = g_serialNumberList->Filename(m.CubeSerialNumber());
-      (*p_pointFiles) << file;
+      p_pointFiles<<file;
       QString tempFilename = Isis::Filename(file).Name().c_str();
       p_leftCombo->addItem(tempFilename);
       p_rightCombo->addItem(tempFilename);
@@ -1070,8 +1052,8 @@ namespace Qisis {
       leftIndex = p_controlPoint->ReferenceIndex();
     }
     else {
-      if(p_leftFile->length() != 0) {
-        iString tempFilename = Isis::Filename(*p_leftFile).Name();
+      if (p_leftFile.length() != 0) {
+        iString tempFilename = Isis::Filename(p_leftFile).Name();
         leftIndex = p_leftCombo->findText(tempFilename);
       }
     }
@@ -1097,13 +1079,15 @@ namespace Qisis {
 
   /** 
    * Select left measure 
+   *  
    * @param index Index of file from the point files vector 
+   *  
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    */
   void QnetTool::selectLeftMeasure(int index) {
-    iString file = (*p_pointFiles)[index];
+    iString file = p_pointFiles[index];
 
     iString serial = g_serialNumberList->SerialNumber(file);
     //  Find measure for each file
@@ -1123,14 +1107,16 @@ namespace Qisis {
 
   /** 
    * Select right measure 
+   *  
    * @param index  Index of file from the point files vector
+   *  
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    */
   void QnetTool::selectRightMeasure(int index) {
 
-    iString file = (*p_pointFiles)[index];
+    iString file = p_pointFiles[index];
 
     iString serial = g_serialNumberList->SerialNumber(file);
     //  Find measure for each file
@@ -1330,6 +1316,15 @@ namespace Qisis {
   }
 
 
+  /** 
+   * This method will repaint the given Point ID in each viewport. 
+   *  
+   * @param pointId 
+   *  
+   * @internal
+   * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   *                          namespace std"
+   */    
   void QnetTool::paintAllViewports() {
     // Take care of drawing things on all viewPorts.
     // Calling update will cause the Tool class to call all registered tools
@@ -1492,7 +1487,7 @@ namespace Qisis {
     
     p_templateModified = false;
     p_saveTemplateFile->setEnabled(false);
-    p_templateFilenameLabel->setText("Template File: " + filename);
+    p_templateFilenameLabel->setText("Template File: " + fn);
   }
   
   
@@ -1573,6 +1568,7 @@ namespace Qisis {
   /**
    * Allows the user to view the template file that is currently
    * set.
+   *  
    * @author 2008-12-10 Jeannie Walldren
    * @internal
    *   @history 2008-12-10 Jeannie Walldren - Original Version
@@ -1602,8 +1598,10 @@ namespace Qisis {
   }
 
 
+
   /**
    * Slot which calls ControlPointEditor slot to save chips
+   *  
    * @author 2009-03-17 Tracie Sucharski
    */
 
@@ -1657,6 +1655,7 @@ namespace Qisis {
   /**
    * Emits a signal to displays the Navigation window.  This signal is connected
    * to QnetNavTool.
+   *  
    * @internal
    *   @history 2010-07-01 Jeannie Walldren - Original version
    */

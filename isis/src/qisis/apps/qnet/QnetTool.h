@@ -3,6 +3,8 @@
 
 #include "Tool.h"
 
+#include <QStringList>
+
 // forward declarations
 class QAction;
 class QBoxLayout;
@@ -247,16 +249,13 @@ namespace Qisis {
       QLabel *p_numMeasures;
       
       QCheckBox *p_ignorePoint;
-      QCheckBox *p_holdPoint;
       QCheckBox *p_groundPoint;
       QLabel *p_leftMeasureType;
       QLabel *p_leftSampError;
       QLabel *p_leftLineError;
-      QLabel *p_leftGoodness;
       QLabel *p_rightMeasureType;
       QLabel *p_rightSampError;
       QLabel *p_rightLineError;
-      QLabel *p_rightGoodness;
       QCheckBox *p_ignoreLeftMeasure;
       QCheckBox *p_ignoreRightMeasure;
 
@@ -265,9 +264,9 @@ namespace Qisis {
 
       Isis::ControlPoint *p_controlPoint;
 
-      QStringList * p_pointFiles;
+      QStringList p_pointFiles;
 
-      Isis::iString * p_leftFile;
+      std::string p_leftFile;
       Isis::ControlMeasure *p_leftMeasure;
       Isis::ControlMeasure *p_rightMeasure;
       Isis::Cube *p_leftCube;

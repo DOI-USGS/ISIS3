@@ -1,14 +1,12 @@
 #include "QnetNewPointDialog.h"
 
+#include <QtGui>
 #include <algorithm>
 
-#include <QLabel>
-#include <QPushButton>
-#include <QStringList>
-
 #include "iString.h"
-#include "qnet.h"
 #include "SerialNumberList.h"
+
+#include "qnet.h"
 
 using namespace Qisis::Qnet;
 using namespace Isis;
@@ -75,6 +73,13 @@ namespace Qisis {
   }
 
   
+  /**
+   * @internal
+   *   @history 2010-06-03 Jeannie Walldren - Removed "std::"
+   *            since "using namespace std"
+   *   @history 2010-10-29 Tracie Sucharski - Changed std::vector<std::string>
+   *            to QSringList
+   */
   void QnetNewPointDialog::SetFiles(QStringList pointFiles) {
   
     int bottomMostSelectedItemIndex = 0;

@@ -3,15 +3,13 @@
 #include <algorithm>
 #include <string>
 
-#include <QLabel>
-#include <QPushButton>
-#include <QStringList>
+#include <QtGui>
 
 #include "ControlPoint.h"
 #include "iString.h"
-#include "qnet.h"
 #include "SerialNumberList.h"
 
+#include "qnet.h"
 
 using namespace Qisis::Qnet;
 using namespace Isis;
@@ -59,6 +57,13 @@ namespace Qisis {
   }
 
 
+  /**
+   * @internal
+   *   @history 2010-06-03 Jeannie Walldren - Removed "std::"
+   *            since "using namespace std"
+   *   @history 2010-10-29 Tracie Sucharski - Changed std::vector<std::string>
+   *            to QSringList
+   */
   void QnetNewMeasureDialog::SetFiles(Isis::ControlPoint point,
                                       QStringList pointFiles) {
     int bottomMostSelectedItemIndex = 0;
