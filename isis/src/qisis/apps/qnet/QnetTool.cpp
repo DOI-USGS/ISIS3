@@ -146,7 +146,12 @@ namespace Qisis {
     addMeasureLayout->addWidget(addMeasure);
     addMeasureLayout->addStretch();
     
+    p_templateFilenameLabel = new QLabel("Template File: " +
+        QString::fromStdString(p_pointEditor->templateFilename()));
+    
     QVBoxLayout * centralLayout = new QVBoxLayout;
+    
+    centralLayout->addWidget(p_templateFilenameLabel);
     centralLayout->addWidget(createTopSplitter());
     centralLayout->addStretch();
     centralLayout->addWidget(p_pointEditor);
@@ -223,17 +228,10 @@ namespace Qisis {
     rightLayout->addLayout(rightTopInnerLayout);
     rightLayout->addLayout(rightBottomInnerLayout);
     
-    QHBoxLayout * topLayout = new QHBoxLayout;
-    topLayout->addLayout(leftLayout);
-    topLayout->addStretch();
-    topLayout->addLayout(rightLayout);
-    
-    p_templateFilenameLabel = new QLabel("Template File: " +
-        QString::fromStdString(p_pointEditor->templateFilename()));
-    
-    QVBoxLayout * mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(topLayout);
-    mainLayout->addWidget(p_templateFilenameLabel);
+    QHBoxLayout * mainLayout = new QHBoxLayout;
+    mainLayout->addLayout(leftLayout);
+    mainLayout->addStretch();
+    mainLayout->addLayout(rightLayout);
     
     // create the groupbox
     QGroupBox * groupBox = new QGroupBox("Control Point");
@@ -1471,7 +1469,6 @@ namespace Qisis {
       return;
       
     if (p_pointEditor->setTemplateFile(filename)) {
-      p_templateFilenameLabel->setText("Template File: " + filename);
       loadTemplateFile(filename);
     }
   }
@@ -1495,6 +1492,7 @@ namespace Qisis {
     
     p_templateModified = false;
     p_saveTemplateFile->setEnabled(false);
+    p_templateFilenameLabel->setText("Template File: " + filename);
   }
   
   
@@ -1526,21 +1524,11 @@ namespace Qisis {
       return;
   
     writeTemplateFile(filename);
-    p_pointEditor->setTemplateFile(filename);
   }
   
   
   void QnetTool::writeTemplateFile(QString fn) {
   
-    QFile file(QString::fromStdString(Filename((iString) fn).Expanded()));
-    
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-      QString msg = "Failed to save template file to \"" + fn + "\"\nDo you "
-          "have permission?";
-      QMessageBox::warning(p_qnetTool, "IO Error", msg);
-      return;
-    }
-    
     QString contents = p_templateEditor->toPlainText();
     
     // catch errors in Pvl format when populating pvl object
@@ -1557,14 +1545,27 @@ namespace Qisis {
       return;
     }
     
+    QString expandedFilename(QString::fromStdString(
+        Filename((iString) fn).Expanded()));
+    
+    QFile file(expandedFilename);
+    
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+      QString msg = "Failed to save template file to \"" + fn + "\"\nDo you "
+          "have permission?";
+      QMessageBox::warning(p_qnetTool, "IO Error", msg);
+      return;
+    }
+    
     // now save contents
     QTextStream stream(&file);
     stream << contents;
-    
     file.close();
+    
     if (p_pointEditor->setTemplateFile(fn)) {
       p_templateModified = false;
       p_saveTemplateFile->setEnabled(false);
+      p_templateFilenameLabel->setText("Template File: " + fn);
     }
   }
 
