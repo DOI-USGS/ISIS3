@@ -21,6 +21,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "RadarGroundMap.h"
+#include "Latitude.h"
+#include "Longitude.h"
 
 namespace Isis {
   RadarGroundMap::RadarGroundMap(Camera *parent, Radar::LookDirection ldir,
@@ -129,7 +131,7 @@ namespace Isis {
 
       rlat = lat * 180.0 / Isis::PI;
       rlon = lon * 180.0 / Isis::PI;
-      R = GetRadius(rlat, rlon);  // km
+      R = GetRadius(rlat, rlon);
       iter++;
     }
     while(fabs(R - lastR) > p_tolerance && iter < 30);
@@ -164,13 +166,9 @@ namespace Isis {
    * @param lon planetocentric longitude in degrees
    *
    * @return conversion was successful
-   *
-   * @internal
-   *   @history 2010-12-10 Debbie A. Cook,  Corrected radius units
-   *                        in SetGround call to be meters
    */
   bool RadarGroundMap::SetGround(const double lat, const double lon) {
-    return SetGround(lat, lon, GetRadius(lat, lon)*1000.);
+    return SetGround(lat, lon, GetRadius(lat, lon));
   }
 
   /** Compute undistorted focal plane coordinate from ground position that includes a local radius
@@ -180,19 +178,13 @@ namespace Isis {
    * @param radius local radius in meters
    *
    * @return conversion was successful
-   *
-   * @internal
-   *   @history 2010-12-10 Debbie A. Cook,  Corrected radius units
-   *                        in latrec call to be km and set
-   *                        set p_focalPlaneY to the scaled
-   *                        doppler frequency
    */
   bool RadarGroundMap::SetGround(const double lat, const double lon, const double radius) {
     // Get the ground point in rectangular coordinates (X)
     SpiceDouble X[3];
     SpiceDouble rlat = lat * Isis::PI / 180.0;
     SpiceDouble rlon = lon * Isis::PI / 180.0;
-    latrec_c(radius/1000., rlon, rlat, X);
+    latrec_c(radius, rlon, rlat, X);
 
     // Compute lower bound for Doppler shift
     double et1 = p_camera->Spice::CacheStartTime();
@@ -301,15 +293,13 @@ namespace Isis {
 
         p_camera->SetFocalLength(p_slantRange * 1000.0); // p_slantRange is km so focal length is in m
         p_focalPlaneX = p_slantRange * 1000.0 / p_rangeSigma; // km to meters and scaled to focal plane
-        //        p_focalPlaneY = 0.0;
-        p_focalPlaneY = p_dopplerFreq / p_dopplerSigma;   // htx to focal plane coord  OR should this be etGuess?
+        p_focalPlaneY = 0.0;
         return true;
       }
     }
 
     return false;
   }
-
 
 
   /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
@@ -319,19 +309,18 @@ namespace Isis {
    * without resetting the current point values for lat/lon/radius/x/y and
    * related radar parameter p_slantRange.
    *
-   * @param lat planetocentric latitude in degrees
-   * @param lon planetocentric longitude in degrees
-   * @param radius local radius in m
+   * @param spoint
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::GetXY(SurfacePoint point, double *cudx, double *cudy) {
+  bool RadarGroundMap::GetXY(const SurfacePoint spoint, double *cudx,
+                             double *cudy) {
 
     // Get the ground point in rectangular body-fixed coordinates (X)
     double X[3];
-    X[0] = point.GetX();
-    X[1] = point.GetY();
-    X[2] = point.GetX();
+    X[0] = spoint.GetX().GetKilometers();
+    X[1] = spoint.GetY().GetKilometers();
+    X[2] = spoint.GetZ().GetKilometers();
 
     // Compute body-fixed look vector
     SpiceRotation *bodyFrame = p_camera->BodyRotation();
@@ -365,19 +354,28 @@ namespace Isis {
   }
 
 
-
-
-  /** Compute the slant range and the doppler frequency for current body position
+  /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
    *
-   * @param X body-fixed coordinate of surface point
+   * This method will compute the undistorted focal plane coordinate for
+   * a ground position, using the current Spice settings (time and kernels)
+   * without resetting the current point values for lat/lon/radius/x/y and
+   * related radar parameter p_slantRange.
    *
-   * @return doppler frequency
+   * @param lat planetocentric latitude in degrees
+   * @param lon planetocentric longitude in degrees
+   * @param radius local radius in m
    *
-   * @internal
-   *   @history 2010-12-10 Debbie A. Cook,  Corrected radius units
-   *                        in SetGround call to be meters and set
-   *                        p_dopplerFreq
+   * @return conversion was successful
    */
+  bool RadarGroundMap::GetXY(const double lat, const double lon,
+                             const double radius, double *cudx, double *cudy) {
+    SurfacePoint spoint(Latitude(lat, Angle::Degrees),
+                        Longitude(lon, Angle::Degrees),
+                        Distance(radius, Distance::Meters));
+    return GetXY(spoint, cudx, cudy);
+  }
+
+
   double RadarGroundMap::ComputeXv(SpiceDouble X[3]) {
     // Get the spacecraft position (Xsc) and velocity (Vsc) in body fixed
     // coordinates
@@ -408,22 +406,10 @@ namespace Isis {
     // In body-fixed coordinates, the point velocity = 0. so the equation becomes
     //    double xv = 2.0 * vdot_c(lookB,&Vsc[0]) / (vnorm_c(lookB) * WaveLength() );
     double xv = -2.0 * vdot_c(lookB, &Vsc[0]) / (vnorm_c(lookB) * WaveLength()); // - is applied to lookB above
-    p_dopplerFreq = xv;
     return xv;
   }
 
 
-  /** Compute the radius based on the shape model for the cube
-   *
-   * This method will compute the local radius at the specified lat/lon
-   * using the shape model specified in the kernels group of the cube.
-   *
-   * @param lat planetocentric latitude in degrees
-   * @param lon planetocentric longitude in degrees
-   * @param radius local radius in km
-   *
-   * @return radius local radius in km
-   */
   double RadarGroundMap::GetRadius(double lat, double lon) {
     if(p_camera->HasElevationModel()) {
       return p_camera->DemRadius(lat, lon);
@@ -497,13 +483,10 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::GetdXYdPoint(double lat, double lon, double radius, PartialType wrt,
+  bool RadarGroundMap::GetdXYdPoint(std::vector<double> d_lookB,
                                     double *dx, double *dy) {
 
     //  TODO  add a check to make sure p_lookB has been set
-
-    // Get the partial derivative of the surface point
-    std::vector<double> d_lookB = PointPartial(lat, lon, radius, wrt);
 
     double d_slantRange = vdot_c(&p_lookB[0], &d_lookB[0]) / p_groundSlantRange;  // km
     // After switching to J2000, the last term will not be 0. as it is in body-fixed

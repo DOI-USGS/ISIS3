@@ -72,6 +72,12 @@ namespace Isis {
    *            WaveLength, DopplerSigma, SetSlantRangeSigma, GetXY,
    *            GetXYdPosition, and GetXYdPoint.  Removed method SetWeightFactors.
    *  @history 2010-08-05 Debbie A. Cook - changed to use Surface point class
+   *  @history 2010-11-22 Debbie A. Cook - moved PointPartial call out of
+   *                       GetdXYdPoint to allow BundleAdjust to avoid multiple
+   *                       calls for every measure.  The application must call
+   *                       PointPartial to get the body-fixed look vector
+   *                       derivative prior to calling this method.
+   *  @history 2010-12-17 Debbie A. Cook - Corrected units to kilometers in GetXY
    *
    */
   class RadarGroundMap : public CameraGroundMap {
@@ -83,14 +89,14 @@ namespace Isis {
 
       virtual bool SetFocalPlane(const double ux, const double uy,
                                  const double uz);
-
       virtual bool SetGround(const double lat, const double lon);
       virtual bool SetGround(const double lat, const double lon, const double radius);
-      virtual bool GetXY(SurfacePoint point, double *cudx, double *cudy);
+      virtual bool GetXY(const double lat, const double lon, const double radius,
+                         double *cudx, double *cudy);
+      virtual bool GetXY(const SurfacePoint spoint, double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
                                    double *cudx, double *cudy);
-      virtual bool GetdXYdPoint(double lat, double lon, double radius, PartialType wrt,
-                                double *dx, double *dy);
+      virtual bool GetdXYdPoint(std::vector<double> d_lookB, double *dx, double *dy);
 
       //!Set the range sigma
       void SetRangeSigma(double rangeSigma) {
