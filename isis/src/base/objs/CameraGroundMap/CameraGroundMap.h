@@ -59,6 +59,11 @@ namespace Isis {
    *                       and DQuotient; and added members PartialType (from BundleAdjust) and p_lookJ.
    *  @history 2010-08-05 Debbie A. Cook Added another version of GetXY to support changes from binary
    *                       control net upgrade
+   *  @history 2010-11-22 Debbie A. Cook Moved PointPartial call out of GetdXYdPoint
+   *                       to allow BundleAdjust to avoid multiple calls for
+   *                       every measure.  The application must call PointPartial
+   *                       to get the body-fixed look vector derivative prior to
+   *                       calling this method.
    *
    */
   class CameraGroundMap {
@@ -79,14 +84,14 @@ namespace Isis {
 
       virtual bool SetGround(const double lat, const double lon);
       virtual bool SetGround(const double lat, const double lon, const double radius);
-      virtual bool GetXY(SurfacePoint point, double *cudx, double *cudy);
+      virtual bool GetXY(const SurfacePoint spoint, double *cudx, double *cudy);
+      virtual bool GetXY(const double lat, const double lon, const double radius, double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
                                    double *cudx, double *cudy);
       virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType, int coefIndex,
                                       double *cudx, double *cudy);
-      virtual bool GetdXYdPoint(double lat, double lon, double radius, PartialType wrt,
-                                double *cudx, double *cudy);
-      std::vector<double> PointPartial(double lat, double lon, double radius, PartialType wrt);
+      virtual bool GetdXYdPoint(std::vector<double> d_lookB, double *cudx, double *cudy);
+      std::vector<double> PointPartial(SurfacePoint spoint, PartialType wrt);
       double DQuotient(std::vector<double> &look, std::vector<double> &dlook, int index);
 
       //! Return undistorted focal plane x

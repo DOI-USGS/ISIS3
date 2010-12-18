@@ -23,6 +23,8 @@
 #include "CameraGroundMap.h"
 #include "NaifStatus.h"
 #include "SurfacePoint.h"
+#include "Latitude.h"
+#include "Longitude.h"
 
 namespace Isis {
   CameraGroundMap::CameraGroundMap(Camera *parent) {
@@ -99,6 +101,7 @@ namespace Isis {
     return false;
   }
 
+
   /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
    *
    * This method will compute the undistorted focal plane coordinate for
@@ -113,9 +116,9 @@ namespace Isis {
   bool CameraGroundMap::GetXY(SurfacePoint point, double *cudx, double *cudy) {
 
     double pB[3];
-    pB[0] = point.GetX();
-    pB[1] = point.GetY();
-    pB[2] = point.GetZ();
+    pB[0] = point.GetX().GetKilometers();
+    pB[1] = point.GetY().GetKilometers();
+    pB[2] = point.GetZ().GetKilometers();
 
     // Check for Sky images
     if(p_camera->IsSky()) {
@@ -165,9 +168,33 @@ namespace Isis {
 
     *cudx = lookC[0] * fl / lookC[2];
     *cudy = lookC[1] * fl / lookC[2];
-
     return true;
   }
+
+
+
+
+  /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
+   *
+   * This method will compute the undistorted focal plane coordinate for
+   * a ground position, using the current Spice settings (time and kernels)
+   * without resetting the current point values for lat/lon/radius/p_pB/x/y.  The
+   * class value for p_look is set by this method.
+   *
+   * @param lat Latitude in degrees 
+   * @param lon Longitude in degrees
+   * @param radius 
+   *
+   * @return conversion was successful
+   */
+  bool CameraGroundMap::GetXY(const double lat, const double lon,
+                              const double radius, double *cudx, double *cudy) {
+    SurfacePoint spoint(Latitude(lat, Angle::Degrees),
+                    Longitude(lon, Angle::Degrees),
+                    Distance(radius, Distance::Meters));
+    return GetXY(spoint, cudx, cudy);
+  }
+
 
   /** Compute derivative w/r to position of focal plane coordinate from ground position using current Spice from SetImage call
    *
@@ -250,10 +277,9 @@ namespace Isis {
    * @param *dx pointer to partial derivative of undistorted focal plane x
    * @param *dy pointer to partial derivative of undistorted focal plane y
    *
-   * @return conversion was successful
+   * @return conversion was successful 
    */
-  bool CameraGroundMap::GetdXYdPoint(double lat, double lon, double radius, PartialType wrt,
-                                     double *dx, double *dy) {
+  bool CameraGroundMap::GetdXYdPoint(std::vector<double> d_lookB, double *dx, double *dy) {
 
     //  TODO  add a check to make sure p_lookJ has been set
 
@@ -264,9 +290,6 @@ namespace Isis {
     SpiceRotation *instRot = p_camera->InstrumentRotation();
     std::vector <double> lookC(3);
     lookC = instRot->ReferenceVector(p_lookJ);
-
-    // Get the partial derivative of the surface point
-    std::vector<double> d_lookB = PointPartial(lat, lon, radius, wrt);
 
     SpiceRotation *bodyRot = p_camera->BodyRotation();
     std::vector<double> d_lookJ = bodyRot->J2000Vector(d_lookB);
@@ -287,14 +310,14 @@ namespace Isis {
    *
    * @return partialDerivative
    */
-  std::vector<double> CameraGroundMap::PointPartial(double lat, double lon, double radius, PartialType wrt) {
-    double rlat = lat * Isis::PI / 180.0;
-    double rlon = lon * Isis::PI / 180.0;
+  std::vector<double> CameraGroundMap::PointPartial(SurfacePoint spoint, PartialType wrt) {
+    double rlat = spoint.GetLatitude();
+    double rlon = spoint.GetLongitude();
     double sinLon = sin(rlon);
     double cosLon = cos(rlon);
     double sinLat = sin(rlat);
     double cosLat = cos(rlat);
-    double radkm = radius / 1000.0;
+    double radkm = spoint.GetLocalRadius().GetKilometers();
 
     std::vector<double> v(3);
     if(wrt == WRT_Latitude) {
