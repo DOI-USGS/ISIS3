@@ -93,7 +93,7 @@ namespace Isis {
    *                            correct solution method. This was done for
    *                            documentation purposes-clarifies the default
    *                            solves by SVD.
-   *   @history  2008-04-16 Debbie Dook / Tracie Sucharski, Added SolveSparse.
+   *   @history  2008-04-16 Debbie Cook / Tracie Sucharski, Added SolveSparse.
    *   @history  2008-06-09 Tracie Sucharski, Added conditional compilations
    *                            for Solaris.  We could not get SuperLu to build
    *                            under Solaris due to a confilict with Complex
@@ -106,13 +106,16 @@ namespace Isis {
    *                            and AddKnown() to take the square
    *                            root of the given weight and add
    *                            it to the p_sqrtweight vector.
+   *   @history  2010-04-20 Debbie A. Cook, Replaced SparseReset with Reset
+   *                            to reset all solution methods
+   *   @history  2010-11-22 Debbie A. Cook, Merged with Ken Edmundson version
    *
    */
   class LeastSquares {
     public:
 
       LeastSquares(Isis::BasisFunction &basis, bool sparse = false,
-                   int sparseRows = 0, int sparseCols = 0);
+                   int sparseRows = 0, int sparseCols = 0, bool jigsaw = false);
       ~LeastSquares();
       void AddKnown(const std::vector<double> &input, double expected,
                     double weight = 1.0);
@@ -142,36 +145,66 @@ namespace Isis {
         return p_expected.size();
       };
 
+      double GetSigma0() { return p_sigma0; }
+      int GetDegreesOfFreedom() { return p_degreesOfFreedom; }
+      void Reset ();
+
+#if !defined(__sun__)
+      void ResetSparse() { Reset(); }
+      bool SparseErrorPropagation();
+      std::vector<double> GetEpsilons () const { return p_epsilonsSparse; }
+      void SetParameterWeights(const std::vector<double> weights) { p_parameterWeights = weights; }
+      void SetNumberOfConstrainedParameters(int n) { p_constrainedParameters = n; }
+      const gmm::row_matrix<gmm::rsvector<double> >& GetCovarianceMatrix () const { return p_normals; }
+#endif
+
     private:
       void SolveSVD();
       void SolveQRD();
+      void SolveCholesky () {}
 
 #if !defined(__sun__)
       int SolveSparse();
       void FillSparseA(const std::vector<double> &data);
-      gmm::row_matrix<gmm::rsvector<double> > p_sparseA;
+      bool ApplyParameterWeights();
+
+      std::vector<double> p_xSparse;          /**<sparse solution vector*/
+      std::vector<double> p_epsilonsSparse;   /**<sparse vector of total parameter corrections*/
+      std::vector<double> p_parameterWeights; /**<vector of parameter weights*/
+
+      gmm::row_matrix<gmm::rsvector<double> > p_sparseA; /**<design matrix 'A' */
+  private:
+      gmm::row_matrix<gmm::rsvector<double> > p_normals; /**<normal equations matrix 'N'*/
+  private:
+      gmm::dense_matrix<double> p_ATb;                   /**<right-hand side vector*/                        
+      gmm::SuperLU_factor<double> p_SLU_Factor;          /**<decomposed normal equations matrix*/
 #endif
+      bool p_jigsaw;
       bool p_sparse;
+      bool p_solved;  /**<Boolean value indicating solution is complete*/
+
+      int p_currentFillRow;
       int p_sparseRows;
       int p_sparseCols;
-      int p_currentFillRow;
+      int p_constrainedParameters; /**<constrained parameters*/
+      int p_degreesOfFreedom;      /**<degrees of freedom (redundancy)*/
 
-      bool p_solved;                /**<Boolean value representing whether or
-                                          not the function has been solved.*/
-      Isis::BasisFunction *p_basis; //!<Pointer to the BasisFunction object
-
+      double p_sigma0;               /**<sigma nought - reference variance*/
 
       std::vector<std::vector<double> > p_input; /**<A vector of the input
                                                        variables to evaluate.*/
       std::vector<double> p_expected;            /**<A vector of the expected
                                                        values when solved.*/
-      std::vector<double> p_sqrtweight;          /**<A vector of the square
+      std::vector<double> p_sqrtWeight;          /**<A vector of the square
                                                        roots of the weights
                                                        for each known value.*/
       std::vector<double> p_residuals;           /**<A vector of the residuals
                                                        (or difference between
                                                        expected and solved
                                                        values).*/
+      Isis::BasisFunction *p_basis; //!<Pointer to the BasisFunction object
+
+
 
   };
 };
