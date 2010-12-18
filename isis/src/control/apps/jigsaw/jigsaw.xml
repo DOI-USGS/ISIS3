@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <application name="jigsaw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Improves camera pointing
+    Improves camera pointing and a whole lot more!
   </brief>
 
   <description>
@@ -42,6 +42,14 @@
     <change name="Mackenzie Boyd" date="2009-07-23">
       Modified program to write history to input cubes.
     </change>
+    <change name="Debbie A. Cook" data="2010-08-12">
+      Commented out Heldlist until mechanism in place to enter individual
+      image parameter constraints.
+      </change>
+    </change>
+    <change name="Debbie A. Cook" data="2010-08-12">
+      Merged Ken Edmundson version with system and binary control net.
+      </change>
   </history>
 
   <groups>
@@ -61,7 +69,7 @@
         </filter>
       </parameter>
 
-      <parameter name="HELDLIST">
+<!--    <parameter name="HELDLIST">
         <type>filename</type>
         <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
@@ -74,7 +82,7 @@
         <filter>
           *.txt *.lis
         </filter>
-      </parameter>
+      </parameter>  -->
 
       <parameter name="CNET">
         <type>filename</type>
@@ -87,6 +95,26 @@
         </description>
         <filter>
           *.net
+        </filter>
+      </parameter>
+
+      <parameter name="SC_SIGMAS">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Input spacecraft parameter uncertainties
+        </brief>
+        <description>
+          This file contains a list of parameter uncertainties for position and 
+        angle parameters (including those of velocity and acceleration). Format 
+        is one instrument per line; entries separated by commas; as follows... 
+          SPACECRAFTNAME/INSTRUMENTID, sPos, sPos(v), sPos(a), sAngles, 
+          sAngles(v), sAngles(a). Any entries without values should be filled 
+          with a -1.0 as a placeholder
+        </description>
+        <filter>
+          *.csv *.txt
         </filter>
       </parameter>
 
@@ -103,7 +131,7 @@
           *.net
         </filter>
       </parameter>
-    </group>
+      </group>
 
     <group name="Solve Options">
       <parameter name="OBSERVATIONS">
@@ -133,7 +161,7 @@
           <item>No</item>
         </default>
       </parameter>
-
+      
       <parameter name="UPDATE">
         <brief> Update cube label</brief>
         <description>
@@ -152,7 +180,7 @@
         <type>string</type>
         <brief> Matrix solution method to use</brief>
         <default>
-          <item>QRD</item>
+          <item>SPECIALK</item>
         </default>
         <description>
           <p>
@@ -194,6 +222,13 @@
         </pre>
         </description>
         <list>
+          <option value="SPECIALK">
+            <brief> Do the SpecialK!</brief>
+            <description>
+                      Solve the matrix using the Cholesky decomposition
+                      technique.
+            </description>
+          </option>
           <option value="SVD">
             <brief> Single Value Decomposition</brief>
             <description>
@@ -219,16 +254,49 @@
           </option>
         </list>
       </parameter>
+
+      <parameter name="ERRORPROPAGATION">
+        <brief> Compute variance-covariance matrix</brief>
+        <description>
+            Select this option to compute the variance-covariance matrix of the 
+            parameters.
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>No</item>
+        </default>
+      </parameter>
+
+      <parameter name="OUTLIER_REJECTION">
+      <brief> Auto-rejection of outliers</brief>
+      <description>
+          Select this option to perform automatic outlier detection and rejection. 
+      </description>
+      <type>boolean</type>
+      <default>
+        <item>Yes</item>
+      </default>
+    </parameter>
     </group>
 
-    <group name="Iteration Options">
+    <group name="Convergence Criteria">
+      <parameter name="SIGMA0">
+        <brief> standard deviation of unit weight
+        </brief>
+        <description> Converges on stabilization of Sigma0</description>
+        <type>double</type>
+        <default>
+          <item>1.0e-10</item>
+        </default>
+      </parameter>
+
       <parameter name="MAXITS">
         <brief> iterations
         </brief>
         <description> Number of iterations</description>
         <type>integer</type>
         <default>
-          <item>5</item>
+          <item>50</item>
         </default>
       </parameter>
 
@@ -361,7 +429,7 @@
           </option>
 
           <option value="VELOCITIES">
-            <brief>Solve for the spacecraft positions and velocites</brief>
+            <brief>Solve for the spacecraft positions and velocities</brief>
             <description>
                          If this option is selected, the spacecraft positions will be adjusted in the solution, as well as the velocities of the spacecraft at each instance.
             </description>
@@ -375,7 +443,108 @@
           </option>
         </list>
       </parameter>
+      </group>
 
-    </group>
-  </groups>
+      <group name="Parameter Uncertainties">
+        <parameter name="POINT_LATITUDE_SIGMA">
+          <brief> global latitude uncertainty for all points (meters)
+          </brief>
+          <description> global latitude uncertainty for all points 
+            (meters)</description>
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="POINT_LONGITUDE_SIGMA">
+          <brief> global longitude uncertainty for all points (meters)
+          </brief>
+          <description> global longitude uncertainty for all points 
+            (meters)</description>
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="POINT_RADIUS_SIGMA">
+          <brief> global radius uncertainty for all points (meters)
+          </brief>
+          <description> Global radius uncertainty for all points 
+            (meters)</description>
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="SPACECRAFT_POSITION_SIGMA">
+          <brief> global uncertainty for spacecraft coordinates (meters)
+          </brief>
+          <description> global uncertainty for spacecraft coordinates
+            (meters)</description> 
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="SPACECRAFT_VELOCITY_SIGMA">
+          <brief> global uncertainty for spacecraft velocity (meters/second)
+          </brief>
+          <description> global uncertainty for spacecraft coordinates
+            (meters)</description> 
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="SPACECRAFT_ACCELERATION_SIGMA">
+          <brief> global uncertainty for spacecraft acceleration 
+            (meters/second/second)</brief>
+          <description> global uncertainty for spacecraft acceleration
+            (meters/second/second)</description> 
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="CAMERA_ANGLES_SIGMA">
+          <brief> global uncertainty for camera angles 
+            (decimal degrees)</brief>
+          <description> global uncertainty for camera angles
+            (decimal degrees)</description> 
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="CAMERA_ANGULAR_VELOCITY_SIGMA">
+          <brief> global uncertainty for camera angular velocity 
+            (decimal degrees/second)</brief>
+          <description> global uncertainty for camera angular velocity
+            (decimal degrees/second)</description> 
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+
+        <parameter name="CAMERA_ANGULAR_ACCELERATION_SIGMA">
+          <brief> global uncertainty for camera angular acceleration 
+            (decimal degrees/second/second)</brief>
+          <description> global uncertainty for camera angular acceleration
+            (decimal degrees/second/second)</description> 
+          <type>double</type>
+          <default>
+            <item>-1.0</item>
+          </default>
+        </parameter>
+        </group>
+
+    </groups>
 </application>
