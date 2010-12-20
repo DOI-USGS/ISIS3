@@ -77,35 +77,13 @@ namespace Qisis {
   
   
   QnetTool::~QnetTool() {
-  
   }
   
   
-
-  
-  /** 
-   * Called by constructor to create Qnet Tool. 
-   * @param parent Pointer to parent QWidget 
-   * Called by constructor to create Qnet Tool. 
-   * @param parent Pointer to parent QWidget 
-   * @internal
-   *   @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to right
-   *                           and left measure info.
-   *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
-   *                           QnetTool point information. Moved setWindowTitle()
-   *                           command to updateNet() method. Added connection
-   *                           between Ignore checkbox toggle() slot and
-   *                           ignoreChanged() signal
-   *   @history 2008-12-29 Jeannie Walldren - Disabled ground point check box and
-   *                          commented out connection between check box and
-   *                          setGroundPoint() method.
-   *   @history 2008-12-30 Jeannie Walldren - Added connections to toggle
-   *                          measures' Ignore check boxes if ignoreLeftChanged()
-   *                          and ignoreRightChanged() are emitted. Replaced
-   *                          reference to ignoreChanged() with
-   *                          ignorePointChanged().
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
+  /**
+   * create the main window for editing control points
+   *
+   * @param parent Pointer to parent QWidget
    */
   void QnetTool::createQnetTool(QWidget *parent) {
 
@@ -152,6 +130,7 @@ namespace Qisis {
   }
   
   
+  //! creates everything above the ControlPointEdit
   QSplitter * QnetTool::createTopSplitter() {
   
     QHBoxLayout * measureLayout = new QHBoxLayout;
@@ -180,6 +159,7 @@ namespace Qisis {
   }
   
   
+  //! @returns The groupbox labeled "Control Point"
   QGroupBox * QnetTool::createControlPointGroupBox() {
   
     // create left vertical layout
@@ -224,6 +204,7 @@ namespace Qisis {
   }
   
   
+  //! @returns The groupbox labeled "Left Measure"
   QGroupBox * QnetTool::createLeftMeasureGroupBox() {
   
     p_leftCombo = new QComboBox;
@@ -253,6 +234,7 @@ namespace Qisis {
   }
   
   
+  //! @returns The groupbox labeled "Right Measure"
   QGroupBox * QnetTool::createRightMeasureGroupBox() {
   
     // create widgets for the right groupbox
@@ -284,6 +266,7 @@ namespace Qisis {
   }
   
   
+  //! Creates the Widget which contains the template editor and its toolbar
   void QnetTool::createTemplateEditorWidget() {
     
     QToolBar * toolBar = new QToolBar("Template Editor ToolBar");
@@ -1420,17 +1403,9 @@ namespace Qisis {
 
 
   /**
-   * Allows user to set a new template file.
-   * @author 2008-12-10 Jeannie Walldren 
-   * @internal 
-   *   @history 2008-12-10 Jeannie Walldren - Original Version
-   *
-
-  void QnetTool::setTemplateFile() {
-    p_pointEditor->setTemplateFile();
-  }*/
-
-
+   * @returns true if it is ok to continue, which is decided by the user via
+   *          popup dialog.
+   */ 
   bool QnetTool::okToContinue() {
   
     if (p_templateModified) {
@@ -1451,6 +1426,11 @@ namespace Qisis {
   }
   
   
+  /**
+   * prompt user for a registration template file to open.  Once the file is
+   * selected, loadTemplateFile is called to update the current template file
+   * being used.
+   */
   void QnetTool::openTemplateFile() {
   
     if (!okToContinue())
@@ -1469,6 +1449,11 @@ namespace Qisis {
   }
   
   
+  /**
+   * Updates the current template file being used.
+   *
+   * @param fn The file path of the new template file
+   */
   void QnetTool::loadTemplateFile(QString fn) {
   
     QFile file(QString::fromStdString(Filename((iString) fn).Expanded()));
@@ -1491,12 +1476,14 @@ namespace Qisis {
   }
   
   
+  //! called when the template file is modified by the template editor
   void QnetTool::setTemplateModified() {
     p_templateModified = true;
     p_saveTemplateFile->setEnabled(true);
   }
   
   
+  //! save the file opened in the template editor
   void QnetTool::saveTemplateFile() {
   
     if (!p_templateModified)
@@ -1509,6 +1496,7 @@ namespace Qisis {
   }
   
   
+  //! save the contents of template editor to a file chosen by the user
   void QnetTool::saveTemplateFileAs() {
   
     QString filename = QFileDialog::getSaveFileName(p_qnetTool,
@@ -1522,6 +1510,11 @@ namespace Qisis {
   }
   
   
+  /**
+   * write the contents of the template editor to the file provided.
+   *
+   * @param fn The filename to write to
+   */
   void QnetTool::writeTemplateFile(QString fn) {
   
     QString contents = p_templateEditor->toPlainText();
