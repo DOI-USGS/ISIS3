@@ -18,16 +18,16 @@ commands:
 	  > /dev/null;
 	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
 	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-          from=$(OUTPUT)/$(INPUTFILE).vis.even.cub > /dev/null;
+	  shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).vis.even.cub > /dev/null;
 	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
 	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-          from=$(OUTPUT)/$(INPUTFILE).vis.odd.cub > /dev/null;
+          shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).vis.odd.cub > /dev/null;
 	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
 	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-          from=$(OUTPUT)/$(INPUTFILE).uv.even.cub > /dev/null;
+          shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).uv.even.cub > /dev/null;
 	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
 	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-          from=$(OUTPUT)/$(INPUTFILE).uv.odd.cub > /dev/null;
+          shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).uv.odd.cub > /dev/null;
 	catlab from=$(OUTPUT)/$(INPUTFILE).vis.even.cub > $(OUTPUT)/vislabel.pvl;
 	catlab from=$(OUTPUT)/$(INPUTFILE).uv.odd.cub > $(OUTPUT)/uvlabel.pvl;
 	$(CROP) from=$(OUTPUT)/$(INPUTFILE).vis.even.cub line=3000 nlines=200 \
@@ -49,14 +49,20 @@ commands:
 	$(MV) $(OUTPUT)/$(INPUTFILE).uv.odd.crop.cub \
 	  $(OUTPUT)/$(INPUTFILE).uv.odd.cub;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).vis.even.cub \
-	  TO=$(OUTPUT)/$(INPUTFILE).vis.even.lev2.cub \
+	  TO=$(OUTPUT)/$(INPUTFILE).vis.even.lev2.cub DEFAULTRANGE=CAMERA \
+	  MINLAT=-74.026771144939 MAXLAT=-73.382294787899 \
+	  MINLON=242.75004784633 MAXLON=244.11987169894 \
+	  PIXRES=MPP RESOLUTION=52.8 \
 	  > /dev/null;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).vis.odd.cub \
 	  TO=$(OUTPUT)/$(INPUTFILE).vis.odd.lev2.cub \
 	  MAP=$(OUTPUT)/$(INPUTFILE).vis.even.lev2.cub MATCHMAP=TRUE \
 	  > /dev/null;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).uv.even.cub \
-	  TO=$(OUTPUT)/$(INPUTFILE).uv.even.lev2.cub \
+	  TO=$(OUTPUT)/$(INPUTFILE).uv.even.lev2.cub DEFAULTRANGE=CAMERA \
+	  MINLAT=-74.672077453164 MAXLAT=-73.705457723751 \
+	  MINLON=242.08695858855 MAXLON=247.03644145678 \
+	  PIXRES=MPP RESOLUTION=266.757 \
 	  > /dev/null;
 	$(PROJECT) FROM=$(OUTPUT)/$(INPUTFILE).uv.odd.cub \
 	  TO=$(OUTPUT)/$(INPUTFILE).uv.odd.lev2.cub \
