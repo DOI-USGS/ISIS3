@@ -65,6 +65,10 @@
       but that the entire point is deleted instead, by setting the containing
       point to ignored whenever the reference is.
     </change>
+    <change name="Travis Addair" date="2010-12-20">
+      Added information to the log file pertaining to each point and measure
+      ignored/deleted with an associated reason why.
+    </change>
   </history> 
   
   <category>
