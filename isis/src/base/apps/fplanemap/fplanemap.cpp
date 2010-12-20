@@ -29,7 +29,7 @@ struct Coordinate {
   double longitude;    //!< Longitude of the point
 };
 
-inline double Distance(const double &x1, const double &y1, 
+inline double distance(const double &x1, const double &y1, 
                        const double &x2, const double &y2) {
   return (sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)));
 }
@@ -70,19 +70,19 @@ void IsisMain() {
     ControlPoint pnt = cn[p];
     if((!pnt.Ignore()) && (pnt.Size() == 2)) {
       Coordinate c;
-      if (pnt[0].IsReference()) {
+      if (pnt[0].Type() == ControlMeasure::Reference) {
         c.samp = pnt[0].Sample();
         c.line = pnt[0].Line();
         c.errSamp = pnt[1].Sample();
         c.errLine = pnt[1].Line();
-        c.gof = pnt[1].GoodnessOfFit();
+        c.gof = 0;//pnt[1].GoodnessOfFit();
       }
       else {
         c.samp = pnt[1].Sample();
         c.line = pnt[1].Line();
         c.errSamp = pnt[0].Sample();
         c.errLine = pnt[0].Line();
-        c.gof = pnt[0].GoodnessOfFit();
+        c.gof = 0;//pnt[0].GoodnessOfFit();
 
       }
 
@@ -108,8 +108,8 @@ void IsisMain() {
             double c_dx = dmap->FocalPlaneX();
             double c_dy = dmap->FocalPlaneY();
 
-            double ddist = Distance(o_dx, o_dy, c_dx, c_dy);
-            double udist = Distance(o_ux, o_uy, c_ux, c_uy);
+            double ddist = distance(o_dx, o_dy, c_dx, c_dy);
+            double udist = distance(o_ux, o_uy, c_ux, c_uy);
 
             if ((ddist <= mmTol) && (udist <= mmTol)) {
               c.olddetX = o_dx;
