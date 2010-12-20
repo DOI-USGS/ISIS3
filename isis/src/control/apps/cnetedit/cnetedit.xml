@@ -8,10 +8,14 @@
 
   <description>
     <p>
-      This application enables the editiong of Control Networks.  It may remove
-      all ignored Control Points and Control Measures.  Also, it may take a
-      list of cubes and ignore all Control Measures contained by those cubes or 
-      take list of control point ids.
+      This application edits Control Networks by setting the "ignored" status
+      of Control Points and Measures based on user-specified criteria, then
+      optionally deleting them.  The user-specified criteria includes ignoring
+      points in a given list, ignoring measures in a given list, and ignoring
+      measures with attributes failing to meet the requirements defined by a
+      definition file.  Additional options include the ability to preserve
+      points with less than a single valid measure, and the ability to print
+      detailed logging results to a text file.
     </p>
   </description>
 
