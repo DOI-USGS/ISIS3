@@ -3,9 +3,6 @@
 
 #include "Tool.h"
 
-#include <QStringList>
-
-// forward declarations
 class QAction;
 class QBoxLayout;
 class QCheckBox;
@@ -19,6 +16,7 @@ class QPoint;
 class QSplitter;
 class QStackedWidget;
 class QString;
+class QStringList;
 class QTextEdit;
 class QWidget;
 
@@ -264,7 +262,7 @@ namespace Qisis {
 
       Isis::ControlPoint *p_controlPoint;
 
-      QStringList p_pointFiles;
+      QStringList *p_pointFiles;
 
       std::string p_leftFile;
       Isis::ControlMeasure *p_leftMeasure;

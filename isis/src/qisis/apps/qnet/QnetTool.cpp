@@ -3,8 +3,17 @@
 #include <sstream>
 #include <vector>
 
-#include <QtGui>  
-
+#include <QBoxLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMenu>
+#include <QPushButton>
+#include <QString>
+#include <QStringList>
+#include <QToolBar>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 #include "Application.h"
 #include "Camera.h"
@@ -69,14 +78,22 @@ namespace Qisis {
     p_rightCombo = NULL;
     p_leftMeasure = NULL;
     p_rightMeasure = NULL;
+    p_pointFiles = NULL;
     
     p_templateModified = false;
+
+    p_pointFiles = new QStringList;
     
     createQnetTool(parent);
   }
   
   
+  //! pointless doxygen comment
   QnetTool::~QnetTool() {
+    if (p_pointFiles) {
+      delete p_pointFiles;
+      p_pointFiles;
+    }
   }
   
   
@@ -1012,12 +1029,12 @@ namespace Qisis {
     // Clear combo boxes
     p_leftCombo->clear();
     p_rightCombo->clear();
-    p_pointFiles.clear();
+    p_pointFiles->clear();
     //  Need all files for this point
     for(int i = 0; i < p_controlPoint->Size(); i++) {
       Isis::ControlMeasure &m = (*p_controlPoint)[i];
       iString file = g_serialNumberList->Filename(m.CubeSerialNumber());
-      p_pointFiles<<file;
+      (*p_pointFiles) << file;
       QString tempFilename = Isis::Filename(file).Name().c_str();
       p_leftCombo->addItem(tempFilename);
       p_rightCombo->addItem(tempFilename);
@@ -1070,7 +1087,7 @@ namespace Qisis {
    *                          namespace std"
    */
   void QnetTool::selectLeftMeasure(int index) {
-    iString file = p_pointFiles[index];
+    iString file = p_pointFiles->at(index);
 
     iString serial = g_serialNumberList->SerialNumber(file);
     //  Find measure for each file
@@ -1099,7 +1116,7 @@ namespace Qisis {
    */
   void QnetTool::selectRightMeasure(int index) {
 
-    iString file = p_pointFiles[index];
+    iString file = p_pointFiles->at(index);
 
     iString serial = g_serialNumberList->SerialNumber(file);
     //  Find measure for each file
