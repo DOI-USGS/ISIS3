@@ -13,7 +13,8 @@ namespace Isis {
    * Constructs the first pipeline application.
    *
    * @param appName The name of this application
-   * @param pipe The pipeline
+   * @param pipe The pipeline 
+   * @history 2010-12-20 Sharmila Prasad Initialise & enable the branches
    */
   PipelineApplication::PipelineApplication(iString appName, Pipeline *pipe) {
     p_name = appName;
@@ -25,10 +26,14 @@ namespace Isis {
     if(p_pipeline->OriginalBranches().size() == 1) {
       p_inBranches.push_back("");
       p_outBranches.push_back("");
+      p_enableBranch.push_back(true);
     }
     else {
       p_inBranches = p_pipeline->OriginalBranches();
       p_outBranches = p_pipeline->OriginalBranches();
+      for(int i=0; i<(int)p_outBranches.size(); i++) {
+        p_enableBranch.push_back(true);
+      }
     }
   };
 
@@ -37,7 +42,8 @@ namespace Isis {
    * Constructs subsequent pipeline applications
    *
    * @param appName The name of this application
-   * @param previous The previously last pipeline application
+   * @param previous The previously last pipeline application 
+   * @history 2010-12-20 Sharmila Prasad Initialise & enable the branches 
    */
   PipelineApplication::PipelineApplication(iString appName, PipelineApplication *previous) {
     p_name = appName;
@@ -46,8 +52,11 @@ namespace Isis {
     p_next = NULL;
     p_pipeline = p_previous->GetPipeline();
 
-    p_inBranches = p_previous->OutputBranches();
-    p_outBranches = p_previous->OutputBranches();
+    p_inBranches   = p_previous->OutputBranches();
+    p_outBranches  = p_previous->OutputBranches();
+    for(int i=0; i<(int)p_outBranches.size(); i++) {
+      p_enableBranch.push_back(true);
+    }
     p_previous->SetNext(this);
   }
 
@@ -141,7 +150,8 @@ namespace Isis {
    * parameter.
    *
    * @param modString Branch name
-   * @param type Modifier type; currently only supports constant strings
+   * @param type Modifier type; currently only supports constant strings 
+   * @history 2010-12-20 Sharmila Prasad Enable the branch at the time of creation
    */
   void PipelineApplication::AddBranch(const iString &modString, NameModifierType type) {
     if(modString == "") {
@@ -154,10 +164,14 @@ namespace Isis {
     //  throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     //}
 
-    if(p_outBranches[0] == "") p_outBranches.clear();
-
+    if(p_outBranches[0] == "") {
+      p_outBranches.clear();
+      p_enableBranch.clear();
+    }
+    
     if(p_inBranches.size() == 1) {
       p_outBranches.push_back(modString);
+      p_enableBranch.push_back(true);
     }
     else if(p_inBranches.size() == p_outBranches.size()) {
       for(int outBranch = p_outBranches.size() - 1; outBranch >= 0; outBranch --) {
@@ -166,12 +180,14 @@ namespace Isis {
         }
         else {
           p_outBranches.push_back(p_inBranches[outBranch] + "." + modString);
+          p_enableBranch.push_back(true);
         }
       }
     }
     else {
       for(unsigned int inBranch = 0; inBranch < p_inBranches.size(); inBranch ++) {
         p_outBranches.push_back(p_inBranches[inBranch] + "." + modString);
+        p_enableBranch.push_back(true);
       }
     }
   }
@@ -277,7 +293,10 @@ namespace Isis {
   /**
    * This method calculates the inputs, outputs and necessary calls to this
    * program for the pipeline. This should only be used by Pipeline.
-   *
+   *  
+   * @history 2010-12-20 Sharmila Prasad Set appropriate inputs to the branch taking 
+   *          into consideration whether the previous branch was enabled/disabled. Also
+   *          set the input list accordingly if needlist is true
    */
   void PipelineApplication::BuildParamString() {
     p_paramString.clear();
@@ -293,6 +312,16 @@ namespace Isis {
 
     bool runOnce = Merges() && !Branches();
 
+    /*cerr << "***BuildParamString App " << p_name << " RunOnce="<< runOnce << "***\nInput Branches Size=" << p_inBranches.size() << endl;
+    for(int i=0; i<(int)p_inBranches.size(); i++) {
+      cerr << "Branch" << i << " = " << p_inBranches[i] << endl;
+    }
+    
+    cerr << "Output Branches Size=" << p_outBranches.size() << endl;
+    for(int i=0; i<(int)p_outBranches.size(); i++) {
+      cerr << "Branch" << i << " = " << p_outBranches[i] << " Enabled=" << p_enableBranch[i] << endl;
+    }*/
+    
     // Make sure we have different inputs for different runs...
     if(!runOnce && p_input.size() == 1) {
       PipelineParameter &inputParam = p_input[0];
@@ -312,6 +341,13 @@ namespace Isis {
         return;
       }
 
+      if(!BranchEnabled(branch)) {
+        iString tmpBranch(branch);
+        p_outputs.push_back(p_name + "." +tmpBranch);
+        continue;
+      }
+      
+      
       // Figure out the input file; could throw an exception if the user didnt set it
       iString inputFile = CalculateInputFile(branch);
       // Figure out the output file; This adds the output to the output list*
@@ -345,8 +381,16 @@ namespace Isis {
           iString input = p_pipeline->TemporaryFolder() + "/" + Filename(listName).Basename() + ".lis";
           params = ">>LIST " + input + " ";
 
-          for(int i = 0; i < (int)Previous()->GetOutputs().size(); i++) {
-            params += " " + Previous()->GetOutputs()[i];
+          PipelineApplication * prev = Previous();
+          int infile = 0;
+          while(prev != NULL && infile < (int)p_inBranches.size()) {
+            for(int i = 0; i < (int)prev->OutputBranches().size(); i++) {
+              if(prev->BranchEnabled(i)) {
+                params += " " + prev->GetOutputs()[i];
+                infile++;
+              }
+            }
+            prev = prev->Previous();
           }
 
           p_tempFiles.push_back(input);
@@ -461,32 +505,70 @@ namespace Isis {
    *
    * @param branch Branch this input file affects
    *
-   * @return iString Input filename
+   * @return iString Input filename 
+   * @history 2010-12-20 Sharmila Prasad Get the right input for this branch if previous 
+   *          branch is disabled. 
    */
   iString PipelineApplication::CalculateInputFile(int branch) {
     iString file = "";
 
-    if(Previous() != NULL) {
+    PipelineApplication *prev = Previous();
+    
+    if(prev != NULL) {
       // The last app exists, look for output on this branch
-      if(branch < (int)Previous()->GetOutputs().size()) {
-        file = Previous()->GetOutputs()[branch];
+      if(branch < (int)prev->GetOutputs().size() && prev->BranchEnabled(branch)) {
+        file = prev->GetOutputs()[branch];
+      }
+      else {
+        while (prev != NULL && file=="") {
+          if(prev->Branches()){
+             if (!prev->BranchEnabled(branch)) {
+               string msg = "Application branches but branch is disabled";
+               throw iException::Message(iException::Programmer, msg, _FILEINFO_); 
+             } 
+          }
+          /*   else {
+               vector<iString> inputs = prev->GetInputs();
+               if((int)inputs.size() > branch) {
+                 file = inputs[branch];
+               }
+               else {
+                 file = inputs[0];
+               }
+               break;
+             }
+          } */
+          //else {
+            if(prev->BranchEnabled(branch)) {
+              if(branch < (int)prev->GetOutputs().size()) {
+                file = prev->GetOutputs()[branch];
+                break;
+              }
+            }
+         // }
+          prev = prev->Previous();
+        }
       }
     }
-
+        
     // We're either the first program, or nothing has generated output yet.
-    if(file.empty()) {
+    if(file.empty()){
       file = p_pipeline->OriginalInput(branch);
+      if (file.empty()) {
+        int index = branch / (p_pipeline->OriginalBranchesSize() / p_pipeline->OriginalInputSize());
+        file = p_pipeline->OriginalInput(index);
+      }
     }
 
     // deal with special cases
     for(int i = 0; i < (int)p_input.size(); i++) {
       if(p_input[i].AppliesToBranch(branch) && p_input[i].IsSpecial()) {
         if(p_input[i].Special() == LastOutput) {
-          return GetRealLastOutput();
+          file = GetRealLastOutput();
+          break;
         }
       }
     }
-
     return file;
   }
 

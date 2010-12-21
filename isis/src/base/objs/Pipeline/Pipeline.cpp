@@ -218,11 +218,13 @@ namespace Isis {
    *
    * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
+   *                                       to p_inputBranches
    */
   void Pipeline::SetInputFile(const iString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
     p_originalInput.push_back(ui.GetFilename(inputParam));
-    p_originalBranches.push_back(inputParam);
+    p_inputBranches.push_back(inputParam);
     p_virtualBands.push_back(ui.GetInputAttribute(inputParam).BandsStr());
   }
 
@@ -232,11 +234,13 @@ namespace Isis {
    * be read, and the inputFile parameter will be read as a path to a file instead
    * of as a parameter.
    *
-   * @param inputParam A filename object containing the location of the input file
+   * @param inputParam A filename object containing the location of the input file 
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
+   *                                       to p_inputBranches 
    */
   void Pipeline::SetInputFile(const Filename &inputFile) {
     p_originalInput.push_back(inputFile.Expanded());
-    p_originalBranches.push_back(inputFile.Expanded());
+    p_inputBranches.push_back(inputFile.Expanded());
     p_virtualBands.push_back("");
   }
 
@@ -248,17 +252,19 @@ namespace Isis {
    *
    * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
+   *                                       to p_inputBranches 
    */
   void Pipeline::SetInputListFile(const iString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
-
+    
     TextFile filelist(Filename(ui.GetFilename(inputParam)).Expanded());
     string filename;
     int branch = 1;
 
     while(filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
-      p_originalBranches.push_back(inputParam + iString(branch));
+      p_inputBranches.push_back(inputParam + iString(branch));
       p_virtualBands.push_back("");
       p_finalOutput.push_back(Filename(filename).Name());
 
@@ -273,16 +279,18 @@ namespace Isis {
    * This method is used to set the original input files. These files are the
    * first program's input, a branch will be added for every line in the file.
    *
-   * @param inputParam The filename of the list file contains the input files
+   * @param inputParam The filename of the list file contains the input files 
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
+   *                                       to p_inputBranches 
    */
   void Pipeline::SetInputListFile(const Filename &inputFilename) {
     TextFile filelist(inputFilename.Expanded());
     string filename;
     int branch = 1;
-
+    
     while(filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
-      p_originalBranches.push_back(Filename(inputFilename).Expanded() + " " + iString(branch));
+      p_inputBranches.push_back(Filename(inputFilename).Expanded() + " " + iString(branch));
       p_finalOutput.push_back(Filename(filename).Name());
       p_virtualBands.push_back("");
 
@@ -303,11 +311,13 @@ namespace Isis {
    *                          contains the virtual bands list; internal default is
    *                          supported. Empty string if no virtual bands
    *                          parameter exists.
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
+   *                                       to p_inputBranches 
    */
   void Pipeline::SetInputFile(const iString &inputParam, const iString &virtualBandsParam) {
     UserInterface &ui = Application::GetUserInterface();
     p_originalInput.push_back(ui.GetAsString(inputParam));
-    p_originalBranches.push_back(inputParam);
+    p_inputBranches.push_back(inputParam);
 
     if(!virtualBandsParam.empty() && ui.WasEntered(virtualBandsParam)) {
       p_virtualBands.push_back(ui.GetAsString(virtualBandsParam));

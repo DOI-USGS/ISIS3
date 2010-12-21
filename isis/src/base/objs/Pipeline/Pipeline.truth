@@ -437,3 +437,17 @@ rm ./fileC.jitter.copy.FROM3.cub
 rm ./appjit.lis
 PIPELINE -------> unitTest4 <------- PIPELINE
 
+*** Branching Pipe with a branch disabled ***
+PIPELINE -------> unitTest5 <------- PIPELINE
+lowpass FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.cub" TO="./out.lowpass.lpf.cub" SAMPLES="3" LINES="3"
+highpass FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.cub" TO="./out.highpass.hpf.cub" SAMPLES="3" LINES="3"
+echo  ./out.highpass.hpf.cub ./out.lowpass.lpf.cub > ./out.add.lis
+fx FROMLIST="./out.add.lis" TO="./out.add.cub" MODE="LIST" EQUATION="f1+f2"
+cubeatt FROM="./out.add.cub+2,4-5" TO="./out.cub"
+rm ./out.lowpass.lpf.cub
+rm lowpass.1
+rm highpass.0
+rm ./out.highpass.hpf.cub
+rm ./out.add.cub
+rm ./out.add.lis
+PIPELINE -------> unitTest5 <------- PIPELINE

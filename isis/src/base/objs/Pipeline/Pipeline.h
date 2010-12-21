@@ -97,6 +97,8 @@ namespace Isis {
    *            virtual bands parameter. SetInputListFile(...) method added.
    *   @history 2008-12-19 List files are now fully supported, along with output
    *            list files.
+   *   @history 2010-12-20 Sharmila Prasad - Added ability to add branches right off
+   *                                         of the Pipeline
    */
   class Pipeline {
     public:
@@ -151,22 +153,67 @@ namespace Isis {
       iString OriginalInput(unsigned int branch) {
         return ((branch < p_originalInput.size()) ? p_originalInput[branch] : "");
       }
-
-      //! Returns the names of the original branches of the pipeline (multiple input files)
-      vector<iString> OriginalBranches() {
-        return p_originalBranches;
+      
+      //! Returns the number of input files
+      int OriginalInputSize() {
+         return p_originalInput.size();
       }
+      
+      /**
+       * Returns the total number of input branches 
+       * Original branches = Number of input files * Number of branches
+       * 
+       * @author Sharmila Prasad (12/20/2010)
+       * 
+       * @return int - Total number of branches
+       */
+      int OriginalBranchesSize() {
+        if (p_originalBranches.size() > 0){
+          return p_originalBranches.size();
+        }
+        return p_inputBranches.size();
+      }
+      
+      //! Returns the names of the original branches of the pipeline 
+      //! (input files * branches if any)
+      vector<iString> OriginalBranches() {
+        if (p_originalBranches.size() > 0){
+          return p_originalBranches;
+        }
+        return p_inputBranches;
+      }
+      
       iString FinalOutput(int branch = 0, bool addModifiers = true);
       iString TemporaryFolder();
 
       void EnableAllApplications();
+      
+      /**
+       * Start off the branches directly from the pipeline
+       * 
+       * @author Sharmila Prasad (12/20/2010)
+       * 
+       * @param branch - Branch name to be added
+       */
+      void AddOriginalBranch(iString branch){
+        int size = (int)p_inputBranches.size();
+        if (size == 1) {
+          p_originalBranches.push_back(branch);
+        }
+        else {
+          for (int i=0; i<size; i++) {
+            p_originalBranches.push_back(p_inputBranches[i] + "." + branch);
+          }
+        }
+      }
 
     private:
       iString p_procAppName; //!< The name of the pipeline
       vector<iString> p_originalInput; //!< The original input file
-      vector<iString> p_originalBranches; //!< The original branch names
+      vector<iString> p_inputBranches; //!< Branches for input list
+      vector<iString> p_originalBranches; //!< The input file(s) + original branches from pipeline
       vector<iString> p_finalOutput; //!< The final output file (empty if needs calculated)
-      vector<iString> p_virtualBands; //!< The virtual bands string
+      vector<iString> p_virtualBands;//!< The virtual bands string
       bool p_keepTemporary; //!< True if keeping temporary files
       bool p_addedCubeatt; //!< True if the "cubeatt" program was added
       vector< PipelineApplication * > p_apps; //!< The pipeline applications

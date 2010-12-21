@@ -24,6 +24,7 @@
  */
 
 #include <vector>
+#include "iException.h"
 #include "iString.h"
 
 using namespace std;
@@ -53,6 +54,8 @@ namespace Isis {
    *   @history 2008-09-26 Steven Lambright Changed CalculateOutputFile(...)
    *            to work in more cases. Pipeline::FinalOutput is relied upon more
    *            heavily now to do the right thing.
+   *   @history 2010-12-20 Sharmila Prasad - Added the ability to enable/disable a
+   *            branch.
    */
   class PipelineApplication {
     public:
@@ -151,7 +154,6 @@ namespace Isis {
       iString OutputExtension() {
         return (!p_outputExtension.empty() || !Previous()) ? p_outputExtension : Previous()->OutputExtension();
       }
-
       //! This returns this application's output files. Only valid after BuildParamString is called.
       vector<iString> &GetOutputs();
 
@@ -202,7 +204,37 @@ namespace Isis {
 
       bool SupportsVirtualBands();
       void SetVirtualBands(vector<iString> bands);
-
+      
+      /**
+       * Enable/Disable Branch given the branch name
+       * 
+       * @author Sharmila Prasad (12/20/2010)
+       * 
+       * @param branch - branch name
+       * @param flag   - true/false
+       */
+      void EnableBranch(iString branch, bool flag) {
+        for(int i=0; i<(int)p_inBranches.size(); i++) {
+          if (p_inBranches[i].rfind(branch) != string::npos)
+            p_enableBranch[i] = flag;
+        }
+      }
+      
+      /**
+       * Check whether a branch is enabled given branch index
+       * 
+       * @author Sharmila Prasad (12/20/2010)
+       * 
+       * @param branch - index into the branch
+       * 
+       * @return bool - true/false
+       */
+      bool BranchEnabled(int branch){
+        if (branch >= 0 && branch >= (int)p_enableBranch.size())
+          return false;
+        return p_enableBranch[branch] ;
+      }
+      
     private:
       bool FutureOutputFileCreated();
       bool LastApplicationWithOutput();
@@ -249,12 +281,13 @@ namespace Isis {
       bool p_enabled; //!< This application enabled?
       bool p_supportsVirtualBands; //!< This application supports virtual bands?
       iString p_name; //!< Name of this application
-      vector<iString> p_outputs; //!< Actual output files
-      vector<iString> p_tempFiles; //!< Actial temporary files
+      vector<iString> p_outputs;     //!< Actual output files
+      vector<iString> p_tempFiles;   //!< Actial temporary files
       vector<iString> p_paramString; //!< Built parameter strings
-      vector<iString> p_inBranches; //!< Input branches
+      vector<iString> p_inBranches;  //!< Input branches
       vector<iString> p_outBranches; //!< Output branches
-
+      vector<bool>    p_enableBranch; //!< Branch enabled/disabled
+      
       vector<PipelineParameter> p_output; //!< Output parameters
       iString p_outputMod; //!< Output file name modifier
       iString p_outputExtension; //!< Output file name extension

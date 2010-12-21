@@ -6,6 +6,7 @@ using namespace Isis;
 
 void PipeBranched();
 void PipeMultiBranched();
+void PipeBranchDisabled();
 void PipeSimple();
 void PipeListed();
 
@@ -43,6 +44,13 @@ void IsisMain() {
   ui.PutFilename("FROM", "unitTest.lis");
   std::cout << "Testing listing methods" << std::endl;
   PipeListed();
+  
+  ui.Clear("FROM");
+  ui.Clear("TO");
+  ui.PutFilename("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
+  ui.PutFilename("TO", "./out.cub");
+  std::cout << "*** Branching Pipe with a branch disabled ***" << std::endl;
+  PipeBranchDisabled();
 }
 
 void PipeBranched() {
@@ -268,4 +276,48 @@ void PipeListed() {
   p.Application("noproj").SetOutputParameter("TO", "jitter");
 
   std::cout << p << std::endl;
+}
+
+/**
+ * Unittest pipeline with branch disabled
+ * 
+ * @author sprasad (12/20/2010)
+ */
+void PipeBranchDisabled(void)
+{
+  Pipeline p("unitTest5");
+
+  p.SetInputFile("FROM", "BANDS");
+  p.SetOutputFile("TO");
+  p.AddOriginalBranch("lpf");
+  p.AddOriginalBranch("hpf");
+  p.KeepTemporaryFiles(false);
+  
+  p.AddToPipeline("lowpass");
+  p.Application("lowpass").SetInputParameter("FROM", false);
+  p.Application("lowpass").SetOutputParameter("TO", "lowpass");
+  p.Application("lowpass").AddConstParameter("lpf", "SAMPLES", "3");
+  p.Application("lowpass").AddConstParameter("lpf", "LINES", "3");
+  p.Application("lowpass").EnableBranch("lpf", true);
+  p.Application("lowpass").EnableBranch("hpf", false);
+  
+  //std::cout << p;
+    
+  p.AddToPipeline("highpass");
+  p.Application("highpass").SetInputParameter("FROM", false);
+  p.Application("highpass").SetOutputParameter("TO", "highpass");
+  p.Application("highpass").AddConstParameter ("hpf", "SAMPLES", "3");
+  p.Application("highpass").AddConstParameter("hpf", "LINES", "3");
+  p.Application("highpass").EnableBranch("lpf", false);
+  p.Application("highpass").EnableBranch("hpf", true);
+  
+  //std::cout << p;
+  
+  p.AddToPipeline("fx");
+  p.Application("fx").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputList, false);
+  p.Application("fx").SetOutputParameter("TO", "add");
+  p.Application("fx").AddConstParameter("MODE", "LIST");
+  p.Application("fx").AddConstParameter("EQUATION", "f1+f2");
+  
+  std::cout << p;
 }
