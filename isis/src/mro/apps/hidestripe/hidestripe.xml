@@ -71,6 +71,9 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
+    <change name="Sharmila Prasad" date="2010-12-21">
+      Destripe for images with summing greater than 2
+    </change>
   </history>
 
   <groups>

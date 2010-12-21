@@ -12,6 +12,7 @@
 #include "ProcessByLine.h"
 #include "Statistics.h"
 #include "iException.h"
+#include "Pipeline.h"
 #include "Pvl.h"
 #include "Table.h"
 
@@ -28,8 +29,6 @@ static Statistics lineStats[4];
 static vector<Statistics> lines[4];
 
 // Size of the cube
-static int totalLines;
-static int totalSamples;
 static unsigned int myIndex = 0;
 static int offset;
 static int mode = 1;
@@ -37,6 +36,7 @@ static int mode = 1;
 // function prototypes
 void getStats(Buffer &in);
 void fix(Buffer &in, Buffer &out);
+void DestripeForOtherBinningModes(int piSamples);
 
 int channel0Phases[] = {252, 515, 778, 1024};
 int channel1Phases[] = {247, 510, 773, 1024};
@@ -60,8 +60,7 @@ void IsisMain() {
 
   ProcessByLine processByLine;
   Cube *icube = processByLine.SetInputCube("FROM");
-  totalLines = icube->Lines();
-  totalSamples = icube->Samples();
+  int totalSamples = icube->Samples();
 
   //We'll be going through the cube by line, manually differentiating
   // between phases
@@ -80,79 +79,80 @@ void IsisMain() {
   }
   int binning_mode = icube->GetGroup("Instrument")["Summing"];
   if(binning_mode != 1 && binning_mode != 2) {
-    iString msg = "You may only use input with binning mode 1 or 2, not";
+    /*iString msg = "You may only use input with binning mode 1 or 2, not";
     msg += binning_mode;
-    throw iException::Message(iException::User, msg, _FILEINFO_);
-  }
-
-  //Adjust phase breaks based on the binning mode
-  for(int i = 0 ; i < num_phases ; i++) {
-    phases[i] /= binning_mode;
-  }
-
-  //Phases must be able to stretch across the entire cube
-  if(totalSamples != phases[3]) {
-    iString required_samples(phases[3]);
-    iString bin_string(binning_mode);
-    string msg = "image must have exactly ";
-    msg += required_samples;
-    msg += " samples per line for binning mode ";
-    msg += bin_string;
-    throw iException::Message(iException::User, msg, _FILEINFO_);
-  }
-
-  //Index starts at 1 and will go up to totalLines. This must be done since
-  // lines go into different statistics vectors based on their index
-  myIndex = 1;
-  processByLine.StartProcess(getStats);
-
-  //This program is trying to find horizontal striping in the image that occurs
-  // in every other line, but at runtime we do not know whether that striping
-  // occurs on the odd numbered lines (1, 3, 5, etc.) or the even numbered
-  // ones (2, 4, 6, etc.). The below algorithm determines which of these is the
-  // case.
-
-  string parity = ui.GetString("PARITY");
-  if(parity == "EVEN") {
-    offset = 1;
-  }
-  else if(parity == "ODD") {
-    offset = 0;
+    throw iException::Message(iException::User, msg, _FILEINFO_);*/
+    DestripeForOtherBinningModes(totalSamples);
   }
   else {
-    //PRECONDITION: getStats must have been run
-    long double maxDiff = 0;
-    int maxDiffIndex = 0;
+    //Adjust phase breaks based on the binning mode
     for(int i = 0 ; i < num_phases ; i++) {
-      long double thisDiff;
-      thisDiff = lineStats[i].Average() - stats.Average();
-      if(thisDiff < 0) {
-        thisDiff *= -1;
-      }
-      if(thisDiff > maxDiff) {
-        maxDiff = thisDiff;
-        maxDiffIndex = i;
-      }
+      phases[i] /= binning_mode;
     }
-    if(maxDiffIndex == 1 || maxDiffIndex == 3) {
+  
+    //Phases must be able to stretch across the entire cube
+    if(totalSamples != phases[3]) {
+      iString required_samples(phases[3]);
+      iString bin_string(binning_mode);
+      string msg = "image must have exactly ";
+      msg += required_samples;
+      msg += " samples per line for binning mode ";
+      msg += bin_string;
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+  
+    //Index starts at 1 and will go up to totalLines. This must be done since
+    // lines go into different statistics vectors based on their index
+    myIndex = 1;
+    processByLine.StartProcess(getStats);
+  
+    //This program is trying to find horizontal striping in the image that occurs
+    // in every other line, but at runtime we do not know whether that striping
+    // occurs on the odd numbered lines (1, 3, 5, etc.) or the even numbered
+    // ones (2, 4, 6, etc.). The below algorithm determines which of these is the
+    // case.
+  
+    string parity = ui.GetString("PARITY");
+    if(parity == "EVEN") {
       offset = 1;
     }
-    else {
+    else if(parity == "ODD") {
       offset = 0;
     }
+    else {
+      //PRECONDITION: getStats must have been run
+      long double maxDiff = 0;
+      int maxDiffIndex = 0;
+      for(int i = 0 ; i < num_phases ; i++) {
+        long double thisDiff;
+        thisDiff = lineStats[i].Average() - stats.Average();
+        if(thisDiff < 0) {
+          thisDiff *= -1;
+        }
+        if(thisDiff > maxDiff) {
+          maxDiff = thisDiff;
+          maxDiffIndex = i;
+        }
+      }
+      if(maxDiffIndex == 1 || maxDiffIndex == 3) {
+        offset = 1;
+      }
+      else {
+        offset = 0;
+      }
+    }
+  
+    //Again we must reset the index, because we apply corrections only on every
+    // other line and the fix processing function has no concept of where it is
+    // in the cube.
+    myIndex = 1;
+  
+    mode = (ui.GetString("CORRECTION") == "MULTIPLY");
+  
+    processByLine.SetOutputCube("TO");
+    processByLine.StartProcess(fix);
+    processByLine.EndProcess();
   }
-
-  //Again we must reset the index, because we apply corrections only on every
-  // other line and the fix processing function has no concept of where it is
-  // in the cube.
-  myIndex = 1;
-
-  mode = (ui.GetString("CORRECTION") == "MULTIPLY");
-
-  processByLine.SetOutputCube("TO");
-  processByLine.StartProcess(fix);
-  processByLine.EndProcess();
-
 }
 
 //**********************************************************
@@ -278,4 +278,60 @@ void fix(Buffer &in, Buffer &out) {
     }
   }
   myIndex++;
+}
+
+/**
+ * Destripe for images which have summing greater than 2
+ * 
+ * @author Sharmila Prasad (12/21/2010)
+ * 
+ * @param piSamples - Image Sample size
+ */
+void DestripeForOtherBinningModes(int piSamples)
+{
+  int iBoxSample = (2 * piSamples) - 1;
+  iString sSamples(iBoxSample);
+  
+  Pipeline p("hidestripe");
+  p.SetInputFile("FROM");
+  p.SetOutputFile("TO");
+  p.KeepTemporaryFiles(false);
+  p.AddOriginalBranch("lpf");
+  p.AddOriginalBranch("hpf");
+  
+  p.AddToPipeline("lowpass");
+  p.Application("lowpass").SetInputParameter("FROM", false);
+  p.Application("lowpass").SetOutputParameter("TO", "lowpass");
+  p.Application("lowpass").EnableBranch("lpf", true);
+  p.Application("lowpass").EnableBranch("hpf", false);
+  
+  // Set parameters for "lpf" branch
+  p.Application("lowpass").AddConstParameter("lpf", "SAMPLES", sSamples);
+  p.Application("lowpass").AddConstParameter("lpf", "LINES", "3");
+  p.Application("lowpass").AddConstParameter("lpf", "NULL", "FALSE");
+  p.Application("lowpass").AddConstParameter("lpf", "HRS",  "FALSE");
+  p.Application("lowpass").AddConstParameter("lpf", "HIS",  "FALSE");
+  p.Application("lowpass").AddConstParameter("lpf", "LRS",  "FALSE");
+  p.Application("lowpass").AddConstParameter("lpf", "LIS",  "FALSE");
+  
+  p.AddToPipeline("highpass");
+  p.Application("highpass").SetInputParameter("FROM", false);
+  p.Application("highpass").SetOutputParameter("TO", "highpass");
+  p.Application("highpass").EnableBranch("lpf", false);
+  p.Application("highpass").EnableBranch("hpf", true);
+  
+  // Set parameters for "hpf" branch
+  p.Application("highpass").AddConstParameter("hpf", "SAMPLES", sSamples);
+  p.Application("highpass").AddConstParameter("hpf", "LINES", "1");
+  p.Application("highpass").AddConstParameter("hpf", "PROPAGATE", "TRUE");
+  
+  p.AddToPipeline("fx");
+  p.Application("fx").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputList, false);
+  p.Application("fx").SetOutputParameter("TO", "add");
+  p.Application("fx").AddConstParameter("MODE", "LIST");
+  p.Application("fx").AddConstParameter("EQUATION", "f1+f2");
+  
+  //cout << p;
+  
+  p.Run();
 }
