@@ -59,7 +59,6 @@ void IsisMain() {
       oNet.SetDescription(cNet.Description());
       oNet.SetNetworkId(cNet.NetworkId());
       oNet.SetTarget(cNet.Target());
-      oNet.SetType(cNet.Type());
       oNet.SetUserName(Application::UserName());
         
       startIndex = endIndex;

@@ -13,5 +13,7 @@ commands:
 	  from2=$(OUTPUT)/outsplit02.net \
 	  id=autoseed \
 	  description=cnetsplit \
+	  to=$(OUTPUT)/truth.bin > /dev/null;
+	  cnetbin2pvl from=$(OUTPUT)/truth.bin \
 	  to=$(OUTPUT)/truth.pvl > /dev/null;
-	  $(RM) $(OUTPUT)/outsplit*;
+	  $(RM) $(OUTPUT)/outsplit* $(OUTPUT)/truth.bin;
