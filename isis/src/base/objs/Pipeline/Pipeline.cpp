@@ -111,7 +111,10 @@ namespace Isis {
         // keep track of tmp files
         vector<iString> theseTempFiles = p_apps[i]->TemporaryFiles();
         for(int tmpFile = 0; tmpFile < (int)theseTempFiles.size(); tmpFile++) {
-          tmpFiles.push_back(theseTempFiles[tmpFile]);
+          // no need to delete blank files
+          if(theseTempFiles[tmpFile].find("blank") == string::npos) {
+            tmpFiles.push_back(theseTempFiles[tmpFile]);
+          }
         }
 
         if(!foundFirst && p_apps[i]->Enabled()) {
@@ -752,7 +755,9 @@ namespace Isis {
         if(pipeline.Application(i).Enabled()) {
           vector<iString> tmpFiles = pipeline.Application(i).TemporaryFiles();
           for(int file = 0; file < (int)tmpFiles.size(); file++) {
-            os << "rm " << tmpFiles[file] << endl;
+            if(tmpFiles[file].find("blank") == string::npos) {
+              os << "rm " << tmpFiles[file] << endl;
+            }
           }
         }
       }

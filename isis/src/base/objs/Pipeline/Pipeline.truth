@@ -445,8 +445,6 @@ echo  ./out.highpass.hpf.cub ./out.lowpass.lpf.cub > ./out.add.lis
 fx FROMLIST="./out.add.lis" TO="./out.add.cub" MODE="LIST" EQUATION="f1+f2"
 cubeatt FROM="./out.add.cub+2,4-5" TO="./out.cub"
 rm ./out.lowpass.lpf.cub
-rm lowpass.1
-rm highpass.0
 rm ./out.highpass.hpf.cub
 rm ./out.add.cub
 rm ./out.add.lis

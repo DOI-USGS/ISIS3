@@ -34,11 +34,36 @@ namespace Isis {
   class Filename;
 
   /**
-   * This class is designed to do most of the work in the "proc" programs, such as
-   * thmproc and mocproc. This object works by setting the initial input, final
-   * output, and every program in between. It is suggested that you "cout" this
-   * object in order to debug you're usage of the class.
-   *
+   * This class helps to call other Isis Applications in a Pipeline. This object 
+   * works by creating a Pipeline and setting the initial input, final
+   * output of the Pipeline which are got from the user interface. Applications 
+   * are added to the Pipeline and parameters relevant to the application are set 
+   * using relevant APIs'. 
+   *  
+   * The Pipeline will control the flow of calls to the different applications in 
+   * the Pipeline in First In First Out fashion. Also the first and last application 
+   * in the Pipeline can be explicitly set. Pipeline automatically calculates the 
+   * input to an application from the output of the previous application. 
+   *  
+   * The Pipeline branches automatically for a list file with multiple input files 
+   * or user can explicitly create branches from the Pipeline directly or from any 
+   * application in the Pipeline. The branches are required when an application 
+   * generates multiple outputs. Branches may be disabled / enabled and the Pipeline 
+   * will figure out the input for an application whose previous app in the same 
+   * branch was disabled. 
+   *  
+   * Parameters for an application in a branch can be set commonly for all branches 
+   * or explicitly for a branch by specifiying the branch name. 
+   *  
+   * Temporary files are created and will be deleted when explicitly set by the user. 
+   *  
+   * The Pipeline calls cubeatt app inherently if virtual bands are true. 
+   *  
+   * It is suggested that you "cout" this object in order to debug you're usage of 
+   * the class.
+   *  
+   * Refer to Applications thmproc, mocproc, hidestripe for Pipeline usage. 
+   *  
    * Here's an example usage of this class:
    * @code
    * UserInterface &ui = Application::GetUserInterface();
@@ -48,10 +73,14 @@ namespace Isis {
    * p.SetOutputFile("TO");
    *
    * p.KeepTemporaryFiles(!ui.GetBoolean("REMOVE"));
-   *
-   * p.AddToPipeline("mission2isis");
-   * p.Application("mission2isis").SetInputParameter("FROM", false);
-   * p.Application("mission2isis").SetOutputParameter("TO", "raw");
+   *  
+   * // The app "thm2isis" generates multiple outputs for a single input. 
+   * // Hence the branches have to be created to process the outputs odd, even.
+   * p.AddToPipeline("thm2isis");
+   * p.Application("thm2isis").SetInputParameter("FROM", false);
+   * p.Application("thm2isis").SetOutputParameter("TO", "raw");
+   * p.Application("thm2isis").AddBranch("even", PipelineApplication::ConstantStrings);
+   * p.Application("thm2isis").AddBranch("odd", PipelineApplication::ConstantStrings);
 
    * p.AddToPipeline("spiceinit");
    * p.Application("spiceinit").SetInputParameter("FROM", false);
@@ -61,15 +90,23 @@ namespace Isis {
    * p.AddToPipeline("cam2map");
    * p.Application("cam2map").SetInputParameter("FROM", true);
    * p.Application("cam2map").SetOutputParameter("TO", "lev2");
-   * p.Application("cam2map").AddParameter("MAP", "MAP");
-   * p.Application("cam2map").AddParameter("PIXRES", "RESOLUTION");
+   * p.Application("cam2map").AddParameter("even", "MAP", "MAP");
+   * p.Application("cam2map").AddParameter("even", "PIXRES", "RESOLUTION");
+
+   * if(ui.WasEntered("PIXRES")) {
+   *   p.Application("cam2map").AddConstParameter("even", "PIXRES", "MPP");
+   * }
+
+   * p.Application("cam2map").AddParameter("odd", "MAP", PipelineApplication::LastOutput);
+   * p.Application("cam2map").AddConstParameter("odd", "PIXRES", "MAP");
+   * p.Application("cam2map").AddConstParameter("odd", "DEFAULTRANGE", "MAP");
 
    * if(ui.WasEntered("PIXRES")) {
    *   p.Application("cam2map").AddConstParameter("PIXRES", "MPP");
    * }
 
    * if(ui.GetBoolean("INGESTION")) {
-   *   p.SetFirstApplication("mission2isis");
+   *   p.SetFirstApplication("thm2isis");
    * }
    * else{
    *   p.SetFirstApplication("spiceinit");
@@ -98,7 +135,9 @@ namespace Isis {
    *   @history 2008-12-19 List files are now fully supported, along with output
    *            list files.
    *   @history 2010-12-20 Sharmila Prasad - Added ability to add branches right off
-   *                                         of the Pipeline
+   *            of the Pipeline
+   *   @history 2010-12-21 Sharmila Prasad - Added documentation and ignore temp files
+   *            from disabled branches
    */
   class Pipeline {
     public:

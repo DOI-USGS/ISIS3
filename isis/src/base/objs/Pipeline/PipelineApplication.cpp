@@ -343,7 +343,7 @@ namespace Isis {
 
       if(!BranchEnabled(branch)) {
         iString tmpBranch(branch);
-        p_outputs.push_back(p_name + "." +tmpBranch);
+        p_outputs.push_back(p_name + "." +tmpBranch + ".blank");
         continue;
       }
       
