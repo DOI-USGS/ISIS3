@@ -76,7 +76,7 @@ void IsisMain() {
   while (i < outNet.Size()) {
     progress.CheckStatus();
 
-    ControlPoint & outPoint = outNet[i];
+    ControlPoint outPoint = outNet[i];
 
     // Establish whether or not we want to attempt to register this point.
     bool wantToRegister = true;
@@ -105,14 +105,14 @@ void IsisMain() {
         outPoint.SetIgnore(false);
       }
 
-      ControlMeasure &patternCM = outPoint[outPoint.ReferenceIndex()];
+      ControlMeasure patternCM = outPoint[outPoint.ReferenceIndex()];
       Cube &patternCube = *cubeMgr.OpenCube(
-          files.Filename(patternCM.CubeSerialNumber()));
+          files.Filename(patternCM.GetCubeSerialNumber()));
 
-      ar->PatternChip()->TackCube(patternCM.Sample(), patternCM.Line());
+      ar->PatternChip()->TackCube(patternCM.GetSample(), patternCM.GetLine());
       ar->PatternChip()->Load(patternCube);
 
-      if (patternCM.EditLock()) {
+      if (patternCM.IsEditLocked()) {
         locked++;
       }
       else {
@@ -124,7 +124,7 @@ void IsisMain() {
         }
       }
 
-      if (patternCM.Type() != ControlMeasure::Reference) {
+      if (patternCM.GetType() != ControlMeasure::Reference) {
         patternCM.SetType(ControlMeasure::Reference);
         patternCM.SetChooserName("Application pointreg");
         patternCM.SetDateTime();
@@ -138,29 +138,29 @@ void IsisMain() {
       while (j < outPoint.Size()) {
         if (j == outPoint.ReferenceIndex()) {
           // don't register the reference, go to next measure
-          if (!outPoint[j].Ignore()) goodMeasureCount++;
+          if (!outPoint[j].IsIgnored()) goodMeasureCount++;
         }
-        else if (outPoint[j].EditLock()) {
+        else if (outPoint[j].IsEditLocked()) {
           // if the measurement is locked, keep it as is and go to next measure
           locked++;
-          if (!outPoint[j].Ignore()) goodMeasureCount++;
+          if (!outPoint[j].IsIgnored()) goodMeasureCount++;
         }
         else if (registerMeasures == "CANDIDATES" && outPoint[j].IsMeasured()) {
           // if user chose not to reprocess successful measures, keep registered
           // measure as is and go to next measure
-          if (!outPoint[j].Ignore()) goodMeasureCount++;
+          if (!outPoint[j].IsIgnored()) goodMeasureCount++;
         }
         else {
           // Register the measure
-          ControlMeasure & searchCM = outPoint[j];
+          ControlMeasure searchCM = outPoint[j];
 
           // refresh pattern cube pointer to ensure it stays valid
           Cube &patternCube = *cubeMgr.OpenCube(files.Filename(
-                patternCM.CubeSerialNumber()));
+                patternCM.GetCubeSerialNumber()));
           Cube &searchCube = *cubeMgr.OpenCube(files.Filename(
-                searchCM.CubeSerialNumber()));
+                searchCM.GetCubeSerialNumber()));
 
-          ar->SearchChip()->TackCube(searchCM.Sample(), searchCM.Line());
+          ar->SearchChip()->TackCube(searchCM.GetSample(), searchCM.GetLine());
 
           try {
             ar->SearchChip()->Load(searchCube, *(ar->PatternChip()), patternCube);
@@ -189,8 +189,8 @@ void IsisMain() {
                   searchCM.SetType(ControlMeasure::RegisteredPixel);
 
                 searchCM.SetResidual(
-                    searchCM.Sample() - ar->CubeSample(),
-                    searchCM.Line() - ar->CubeLine());
+                    searchCM.GetSample() - ar->CubeSample(),
+                    searchCM.GetLine() - ar->CubeLine());
                 searchCM.SetCoordinate(ar->CubeSample(), ar->CubeLine());
                 // TODO no longer set goodness of fit, but how to output to log?
                 searchCM.SetChooserName("Application pointreg");
@@ -222,8 +222,8 @@ void IsisMain() {
 
                 if (res == AutoReg::FitChipToleranceNotMet) {
                   searchCM.SetResidual(
-                      outPoint[j].Sample() - ar->CubeSample(),
-                      outPoint[j].Line() - ar->CubeLine());
+                      outPoint[j].GetSample() - ar->CubeSample(),
+                      outPoint[j].GetLine() - ar->CubeLine());
                   // TODO no longer set goodness of fit, but how to output to log?
                 }
                 searchCM.SetChooserName("Application pointreg");
@@ -251,6 +251,8 @@ void IsisMain() {
               continue;
             }
           }
+
+          outPoint.UpdateMeasure(searchCM);
         }
 
         // If we made it here (without continuing on to the next measure),
@@ -282,8 +284,11 @@ void IsisMain() {
           continue;
         }
       }
+      
+      outPoint.UpdateMeasure(patternCM);
     }
 
+    outNet.UpdatePoint(outPoint);
     // The point wasn't deleted, so the network size is the same and we should
     // increment our index.
     i++;
@@ -318,16 +323,16 @@ void IsisMain() {
 
           // get measure and find its corresponding measure from input net
           ControlMeasure cmTrans = outPoint[i];
-          ControlMeasure cmOrig = (*inPoint)[cmTrans.CubeSerialNumber()];
+          ControlMeasure cmOrig = (*inPoint)[cmTrans.GetCubeSerialNumber()];
 
-          double inSamp = cmOrig.Sample();
-          double inLine = cmOrig.Line();
+          double inSamp = cmOrig.GetSample();
+          double inLine = cmOrig.GetLine();
 
-          double outSamp = cmTrans.Sample();
-          double outLine = cmTrans.Line();
+          double outSamp = cmTrans.GetSample();
+          double outLine = cmTrans.GetLine();
 
-          double sampErr = cmTrans.SampleResidual();
-          double lineErr = cmTrans.LineResidual();
+          double sampErr = cmTrans.GetSampleResidual();
+          double lineErr = cmTrans.GetLineResidual();
 
           /* TODO long string of calculations derived from values that no longer
            * exist in binary control networks

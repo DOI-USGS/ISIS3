@@ -1,0 +1,42 @@
+Testing default constructor...
+Valid? 0
+Type?  0
+Value? -1.79769e+308
+Keyword: ' = Null'
+
+Testing type-only constructor...
+Valid? 0
+Type?  2
+Value? -1.79769e+308
+Keyword: ' = Null'
+
+Testing PvlKeyword constructor...
+Valid? 1
+Type?  2
+Value? 3.14159
+Keyword: 'GoodnessOfFit = 3.14159
+
+Testing type/value constructor...
+Valid? 1
+Type?  2
+Value? 3.14159
+Keyword: 'GoodnessOfFit = 3.14159'
+
+Testing copy constructor 1...
+Valid? 1
+Type?  2
+Value? 3.14159
+Keyword: 'GoodnessOfFit = 3.14159'
+
+Testing copy constructor 2...
+Valid? 0
+Type?  0
+Value? -1.79769e+308
+Keyword: ' = Null'
+
+Testing SetDataType/SetNumericalValue...
+Valid? 1
+Type?  1
+Value? 3.14159
+Keyword: 'Eccentricity = 3.14159'
+

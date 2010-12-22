@@ -274,8 +274,9 @@ namespace Isis {
    * @param pCPoint - Control Point wtih the Locks(s)
    * @param pPvlObj - Output log Pvl
    */
-  void InterestOperator::ProcessLocked_Point_Reference(ControlPoint & pCPoint, 
-                                PvlObject & pPvlObj, int & piMeasuresModified)
+  void InterestOperator::ProcessLocked_Point_Reference(
+      ControlPoint & pCPoint, PvlObject & pPvlObj,
+      int & piMeasuresModified)
   {
     int iNumMeasures  = pCPoint.Size();
     bool bPntEditLock = pCPoint.EditLock();
@@ -285,19 +286,19 @@ namespace Isis {
       ControlMeasure newMeasure(pCPoint[measure]);
       newMeasure.SetDateTime();
       newMeasure.SetChooserName("Application cnetref(interest)");
-      bool bMeasureLocked = newMeasure.EditLock();
-      
-      std::string sn = newMeasure.CubeSerialNumber();
-      double dSample = newMeasure.Sample();
-      double dLine   = newMeasure.Line();  
-        
+      bool bMeasureLocked = newMeasure.IsEditLocked();
+
+      std::string sn = newMeasure.GetCubeSerialNumber();
+      double dSample = newMeasure.GetSample();
+      double dLine   = newMeasure.GetLine();
+
       // Log
       PvlGroup pvlMeasureGrp("MeasureDetails");
       pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
-      pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(newMeasure.Sample(), 
-                                                                           newMeasure.Line()));
+      pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation",
+          LocationString(newMeasure.GetSample(), newMeasure.GetLine()));
   
-      if (!newMeasure.Ignore()) {
+      if (!newMeasure.IsIgnored()) {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
         
         MeasureValidationResults results = 
@@ -324,8 +325,9 @@ namespace Isis {
         pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Originally Ignored");
         iMsrIgnored++;
       }
-      
+
       pPvlObj += pvlMeasureGrp;
+      pCPoint.UpdateMeasure(newMeasure);
     }
 
     if ((iNumMeasures - iMsrIgnored) < 2) {
@@ -371,7 +373,7 @@ namespace Isis {
 
     // Process each existing control point in the network
     for(int point = 0; point < pNewNet.Size(); ++point) {
-      ControlPoint & newPnt = ((ControlNet &) pNewNet)[point];
+      ControlPoint newPnt = ((ControlNet &) pNewNet)[point];
 
       // Create a copy of original control point
       const ControlPoint origPnt(newPnt);
@@ -396,6 +398,7 @@ namespace Isis {
         // Reference Measure is locked. 
         if(newPnt.EditLock() || iNumMeasuresLocked > 0) {
           ProcessLocked_Point_Reference(newPnt, pvlPointObj, iMeasuresModified);
+          ((ControlNet &) pNewNet).UpdatePoint(newPnt);
 
           mPvlLog += pvlPointObj;
           mStatus.CheckStatus();
@@ -436,19 +439,19 @@ namespace Isis {
         // the reference lat/lon.
         int iNumIgnore = 0;
         for(int measure = 0; measure < newPnt.Size(); ++measure) {
-          ControlMeasure & newMeasure = newPnt[measure];
+          ControlMeasure newMeasure = newPnt[measure];
           newMeasure.SetDateTime();
           newMeasure.SetChooserName("Application cnetref(interest)");
-          std::string sn = newMeasure.CubeSerialNumber();
+          std::string sn = newMeasure.GetCubeSerialNumber();
 
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
           pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
-          pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(newMeasure.Sample(), 
-                                                                               newMeasure.Line()));
+          pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(newMeasure.GetSample(), 
+                                                                               newMeasure.GetLine()));
 
           // Initialize the UGM of this cube with the reference lat/lon
-          if(!newMeasure.Ignore() && iBestMeasureIndex >= 0 && 
+          if(!newMeasure.IsIgnored() && iBestMeasureIndex >= 0 && 
              mtInterestResults[iBestMeasureIndex].mdInterest != WorstInterest()) {
             Cube *measureCube =  mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
@@ -492,8 +495,8 @@ namespace Isis {
                   newMeasure.SetIgnore(true);
                 }
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation", LocationString(dSample, dLine));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)newMeasure.Sample()));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine",   (int)abs((int)dLine - (int)newMeasure.Line()));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)newMeasure.GetSample()));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine",   (int)abs((int)dLine - (int)newMeasure.GetLine()));
                 pvlMeasureGrp += Isis::PvlKeyword("Reference",   "false");
                 newMeasure.SetCoordinate(dSample, dLine);
               }
@@ -638,11 +641,11 @@ namespace Isis {
     double dBestInterestValue = Isis::Null;
 
     for(int measure = 0; measure < pCnetPoint.Size(); ++measure) {
-      ControlMeasure &origMsr = pCnetPoint[measure];
-      std::string sn = origMsr.CubeSerialNumber();
+      ControlMeasure origMsr = pCnetPoint[measure];
+      std::string sn = origMsr.GetCubeSerialNumber();
 
       // Do not process Ignored Measures
-      if(!origMsr.Ignore()) {
+      if(!origMsr.IsIgnored()) {
         InitInterestResults(measure);
         Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
@@ -683,14 +686,14 @@ namespace Isis {
    */
   bool InterestOperator::InterestByMeasure(int piMeasure, ControlMeasure &pCnetMeasure, 
                                            Cube &pCube) {
-    std::string serialNum = pCnetMeasure.CubeSerialNumber();
+    std::string serialNum = pCnetMeasure.GetCubeSerialNumber();
 
-    int iOrigSample = (int)(pCnetMeasure.Sample() + 0.5);
-    int iOrigLine   = (int)(pCnetMeasure.Line() + 0.5);
+    int iOrigSample = (int)(pCnetMeasure.GetSample() + 0.5);
+    int iOrigLine   = (int)(pCnetMeasure.GetLine() + 0.5);
 
     mtInterestResults[piMeasure].msSerialNum    = serialNum;
-    mtInterestResults[piMeasure].mdOrigSample   = pCnetMeasure.Sample();
-    mtInterestResults[piMeasure].mdOrigLine     = pCnetMeasure.Line();
+    mtInterestResults[piMeasure].mdOrigSample   = pCnetMeasure.GetSample();
+    mtInterestResults[piMeasure].mdOrigLine     = pCnetMeasure.GetLine();
 
     int pad = Padding();
     Chip chip(2 * p_deltaSamp + p_samples + pad, 2 * p_deltaLine + p_lines + pad);
@@ -814,8 +817,8 @@ namespace Isis {
 
       for(int measureIndex = 0; measureIndex < pCnetPoint.Size(); measureIndex ++) {
         if(measureIndex == numMatches) {
-          ControlMeasure &controlMeasure = pCnetPoint[measureIndex];
-          iString serialNum = controlMeasure.CubeSerialNumber();
+          const ControlMeasure &controlMeasure = pCnetPoint[measureIndex];
+          iString serialNum = controlMeasure.GetCubeSerialNumber();
           if(overlap->HasSerialNumber(serialNum)) {
             numMatches++;
           }
@@ -850,12 +853,12 @@ namespace Isis {
     geos::geom::Geometry *geomIntersect1, *geomIntersect2;
 
     // Create Multipolygon for the first Control Measure
-    std::string sn1 = pCnetPoint[0].CubeSerialNumber();
+    std::string sn1 = pCnetPoint[0].GetCubeSerialNumber();
     Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn1));
     inCube1->Read((Blob &)measPolygon1);
 
     // Create Multipolygon for the Second Control Measure
-    std::string sn2 = pCnetPoint[1].CubeSerialNumber();
+    std::string sn2 = pCnetPoint[1].GetCubeSerialNumber();
     Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn2));
     inCube2->Read((Blob &)measPolygon2);
 
@@ -864,7 +867,7 @@ namespace Isis {
                                              (const geos::geom::Geometry *)measPolygon2.Polys());
 
     for(int measureIndex = 2; measureIndex < pCnetPoint.Size(); measureIndex ++) {
-      std::string sn3 = pCnetPoint[measureIndex].CubeSerialNumber();
+      std::string sn3 = pCnetPoint[measureIndex].GetCubeSerialNumber();
       Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn3));
       inCube3->Read((Blob &)measPolygon3);
 

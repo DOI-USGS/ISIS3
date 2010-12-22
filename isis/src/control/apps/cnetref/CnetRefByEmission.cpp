@@ -42,14 +42,14 @@ namespace Isis {
     int iPointsModified = 0;
     int iMeasuresModified = 0;
     int iRefChanged = 0;
-    
+
     //Status Report
     mStatus.SetText("Choosing Reference by Emission...");
     mStatus.SetMaximumSteps(pNewNet.Size());
     mStatus.CheckStatus();
 
     for(int point = 0; point < pNewNet.Size(); ++point) {
-      ControlPoint & newPnt = pNewNet[point];
+      ControlPoint newPnt = pNewNet[point];
       const ControlPoint origPnt(newPnt);
 
       // Stats and Accounting
@@ -87,23 +87,23 @@ namespace Isis {
 
         for(int measure = 0; measure < newPnt.Size(); ++measure) {
 
-          ControlMeasure & newMsr = newPnt[measure];
-          bool bMeasureLocked = newMsr.EditLock();
+          ControlMeasure newMsr = newPnt[measure];
+          bool bMeasureLocked = newMsr.IsEditLocked();
           if(!bPntEditLock && !bMeasureLocked) {
             newMsr.SetDateTime(Application::DateTime());
             newMsr.SetChooserName("Application cnetref(Emission)");
           }
 
-          std::string sn = newMsr.CubeSerialNumber();
-          double dSample = newMsr.Sample();
-          double dLine   = newMsr.Line();
+          std::string sn = newMsr.GetCubeSerialNumber();
+          double dSample = newMsr.GetSample();
+          double dLine   = newMsr.GetLine();
 
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
           pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
           pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(dSample, dLine));
 
-          if(!newMsr.Ignore()) {
+          if(!newMsr.IsIgnored()) {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
             MeasureValidationResults results =
@@ -140,6 +140,7 @@ namespace Isis {
             iMeasuresModified++;
           }
           pvlGrpVector.push_back(pvlMeasureGrp);
+          newPnt.UpdateMeasure(newMsr);
         }// end Measure
 
         if((newPnt.Size() - iNumIgnore) < 2) {
@@ -153,7 +154,7 @@ namespace Isis {
         }
 
         // Set the Reference if the Point is unlocked and Reference measure is unlocked
-        if(!newPnt.Ignore() && iBestIndex >= 0 && !newPnt[iBestIndex].Ignore() && !bPntEditLock && !bRefLocked) {
+        if(!newPnt.Ignore() && iBestIndex >= 0 && !newPnt[iBestIndex].IsIgnored() && !bPntEditLock && !bRefLocked) {
           newPnt[iBestIndex].SetType(ControlMeasure::Reference);
           pvlGrpVector[iBestIndex] += Isis::PvlKeyword("Reference", "true");
 
@@ -202,20 +203,20 @@ namespace Isis {
       if(!newPnt.Ignore() && iBestIndex != iRefIndex && !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
-        pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", origPnt[iRefIndex].CubeSerialNumber());
+        pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", origPnt[iRefIndex].GetCubeSerialNumber());
         pvlRefChangeGrp += Isis::PvlKeyword("PrevEmAngle",      bestEmissionAngle[iRefIndex]);
 
-        istrTemp = iString((int)origPnt[iRefIndex].Sample());
+        istrTemp = iString((int)origPnt[iRefIndex].GetSample());
         istrTemp += ",";
-        istrTemp += iString((int)origPnt[iRefIndex].Line());
+        istrTemp += iString((int)origPnt[iRefIndex].GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
 
-        pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",  newPnt[iBestIndex].CubeSerialNumber());
+        pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",  newPnt[iBestIndex].GetCubeSerialNumber());
         pvlRefChangeGrp += Isis::PvlKeyword("NewLeastEmAngle",  bestEmissionAngle[iBestIndex]);
 
-        istrTemp = iString((int)newPnt[iBestIndex].Sample());
+        istrTemp = iString((int)newPnt[iBestIndex].GetSample());
         istrTemp += ",";
-        istrTemp += iString((int)newPnt[iBestIndex].Line());
+        istrTemp += iString((int)newPnt[iBestIndex].GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      istrTemp);
 
         pvlPointObj += pvlRefChangeGrp;
@@ -226,6 +227,7 @@ namespace Isis {
 
       mPvlLog += pvlPointObj;
       mStatus.CheckStatus();
+      pNewNet.UpdatePoint(newPnt);
     }// end Point
 
     // Basic Statistics

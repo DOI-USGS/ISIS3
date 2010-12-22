@@ -12,6 +12,8 @@
 #include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "PBControlNetIO.pb.h"
+#include "PBControlNetLogData.pb.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
@@ -28,13 +30,39 @@ namespace Isis {
    */
   ControlPoint::ControlPoint () : p_invalid(false) {
     p_type = Tie;
-    p_dateTime = 
+    p_dateTime = "";
     p_editLock = false;
     p_ignore = false;
     p_jigsawRejected = false;
     p_aprioriSurfacePointSource = SurfacePointSource::None;
     p_aprioriRadiusSource = RadiusSource::None;
   }
+
+
+  ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt) {
+    Init(protoBufPt);
+
+    for ( int m = 0 ; m < protoBufPt.measures_size() ; m++ ) {
+      // Create a PControlMeasure and fill in it's info.
+      // with the values from the input file.
+      ControlMeasure measure(protoBufPt.measures(m));
+      Add(measure, false, false);
+    }
+  }
+
+
+  ControlPoint::ControlPoint(const PBControlNet_PBControlPoint & protoBufPt,
+               const PBControlNetLogData_Point & logProtoBuf) {
+    Init(protoBufPt);
+
+    for ( int m = 0 ; m < protoBufPt.measures_size() ; m++ ) {
+      // Create a PControlMeasure and fill in it's info.
+      // with the values from the input file.
+      ControlMeasure measure(protoBufPt.measures(m), logProtoBuf.measures(m));
+      Add(measure, false, false);
+    }
+  }
+
 
   /**
    * Construct a control point with given Id
@@ -318,14 +346,14 @@ namespace Isis {
   void ControlPoint::Add(const ControlMeasure &measure, bool forceBuild,
                          bool isNewMeasure) {
     for (int i = 0; i < Size(); i++) {
-      if ((*this)[i].CubeSerialNumber() == measure.CubeSerialNumber()) {
+      if ((*this)[i].GetCubeSerialNumber() == measure.GetCubeSerialNumber()) {
         if( forceBuild ) {
           p_invalid = true;
           break;
         }
         else {
           iString msg = "The SerialNumber is not unique. A measure with "
-              "serial number [" + measure.CubeSerialNumber() + "] already "
+              "serial number [" + measure.GetCubeSerialNumber() + "] already "
               "exists for ControlPoint [" + Id() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
@@ -360,7 +388,7 @@ namespace Isis {
       p_invalid = false;
       for (int i=0; i<Size() && !p_invalid; i++) {
         for (int j=i+1; j<Size() && !p_invalid; j++) {
-          if ((*this)[i].CubeSerialNumber() == (*this)[j].CubeSerialNumber()) {
+          if ((*this)[i].GetCubeSerialNumber() == (*this)[j].GetCubeSerialNumber()) {
             p_invalid = true;
           }
         }
@@ -406,7 +434,7 @@ namespace Isis {
    *           reflect
    */
   ControlPoint::Status ControlPoint::UpdateMeasure(const ControlMeasure &cm) {
-    int existingIndex = FindMeasureIndex(cm.CubeSerialNumber());
+    int existingIndex = FindMeasureIndex(cm.GetCubeSerialNumber());
 
     // FindMeasureIndex guarantees the index exists so no transparent creation
     //   will occur
@@ -716,7 +744,7 @@ namespace Isis {
       if (!m.IsMeasured()) {
         // TODO: How do we deal with unmeasured measures
       }
-      else if (m.Ignore()) {
+      else if (m.IsIgnored()) {
         // TODO: How do we deal with ignored measures
       }
       else {
@@ -725,7 +753,7 @@ namespace Isis {
           iString msg = "The Camera must be set prior to calculating apriori";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
-        if (cam->SetImage(m.Sample(),m.Line())) {
+        if (cam->SetImage(m.GetSample(), m.GetLine())) {
           goodMeasures++;
           double pB[3];
           cam->Coordinate(pB);
@@ -744,7 +772,7 @@ namespace Isis {
 
           // TODO: What do we do
           iString msg = "Cannot compute lat/lon/radius (x/y/z) for "
-              "ControlPoint [" + Id() + "], measure [" + m.CubeSerialNumber()
+              "ControlPoint [" + Id() + "], measure [" + m.GetCubeSerialNumber()
               + "]";
           throw iException::Message(iException::User, msg, _FILEINFO_);
 
@@ -795,12 +823,12 @@ namespace Isis {
     // Loop for each measure to compute the error
     for (int j=0; j<(int)p_measures.size(); j++) {
       ControlMeasure &m = p_measures[j];
-      if (m.Ignore()) continue;
+      if (m.IsIgnored()) continue;
       if (!m.IsMeasured()) continue;
 
       // TODO:  Should we use crater diameter?
       Camera *cam = m.Camera();
-      cam->SetImage(m.Sample(),m.Line());
+      cam->SetImage(m.GetSample(), m.GetLine());
 
       double cuSamp;
       double cuLine;
@@ -820,9 +848,9 @@ namespace Isis {
         // but some of the camera maps could fail.  One that won't is the
         // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
         // distortion map and have residuals in undistorted pixels.
-        if (!fpmap->SetFocalPlane(m.FocalPlaneComputedX(), m.FocalPlaneComputedY())) {
+        if (!fpmap->SetFocalPlane(m.GetFocalPlaneComputedX(), m.GetFocalPlaneComputedY())) {
           iString msg = "Sanity check #1 for ControlPoint [" + Id() +
-              "], ControlMeasure [" + m.CubeSerialNumber() + "]";
+              "], ControlMeasure [" + m.GetCubeSerialNumber() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
@@ -841,7 +869,7 @@ namespace Isis {
         double rad = GetSurfacePoint().GetLocalRadius().GetMeters();
         if (!cam->SetUniversalGround(lat, lon, rad)) {
           std::string msg = "ControlPoint [" +
-                            Id() + "], ControlMeasure [" + m.CubeSerialNumber() + "]"
+                            Id() + "], ControlMeasure [" + m.GetCubeSerialNumber() + "]"
                             + " does not map into image";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
@@ -855,9 +883,9 @@ namespace Isis {
 
       if(cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
-        if (!fpmap->SetFocalPlane(m.FocalPlaneMeasuredX(), m.FocalPlaneMeasuredY())) {
+        if (!fpmap->SetFocalPlane(m.GetFocalPlaneMeasuredX(), m.GetFocalPlaneMeasuredY())) {
           iString msg = "Sanity check #2 for ControlPoint [" + Id() +
-              "], ControlMeasure [" + m.CubeSerialNumber() + "]";
+              "], ControlMeasure [" + m.GetCubeSerialNumber() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
@@ -865,8 +893,8 @@ namespace Isis {
         muLine = fpmap->DetectorLine();
       }
       else {
-        muSamp = m.Sample();
-        muLine = m.Line();
+        muSamp = m.GetSample();
+        muLine = m.GetLine();
       }
 
       // The units are in detector sample/lines.  We will apply the instrument
@@ -1128,10 +1156,10 @@ namespace Isis {
    *
    * @return Number of valid control measures
    */
-  int ControlPoint::NumValidMeasures() {
+  int ControlPoint::NumValidMeasures() const {
     int size = 0;
     for(int cm = 0; cm < Size(); cm ++) {
-      if(!p_measures[cm].Ignore()) size ++;
+      if(!p_measures[cm].IsIgnored()) size ++;
     }
     return size;
   }
@@ -1142,10 +1170,10 @@ namespace Isis {
    *
    * @return Number of locked control measures
    */
-  int ControlPoint::NumLockedMeasures() {
+  int ControlPoint::NumLockedMeasures() const {
     int size = 0;
     for(int cm = 0; cm < Size(); cm ++) {
-      if (p_measures[cm].EditLock()) size ++;
+      if (p_measures[cm].IsEditLocked()) size ++;
     }
     return size;
   }
@@ -1159,7 +1187,7 @@ namespace Isis {
    */
   bool ControlPoint::HasSerialNumber(iString serialNumber) const {
     for (int m=0; m<this->Size(); m++) {
-      if ((*this)[m].CubeSerialNumber() == serialNumber) {
+      if ((*this)[m].GetCubeSerialNumber() == serialNumber) {
         return true;
       }
     }
@@ -1185,7 +1213,7 @@ namespace Isis {
 
     // Return true if reference measure is found
     for (int i = 0; i < p_measures.size(); i++) {
-      if (p_measures[i].Type() == ControlMeasure::Reference) {
+      if (p_measures[i].GetType() == ControlMeasure::Reference) {
         return true;
       }
     }
@@ -1211,7 +1239,7 @@ namespace Isis {
 
     // Return the first ControlMeasure that is a reference
     for(int i = 0; i < p_measures.size(); i++) {
-      if(p_measures[i].Type() == ControlMeasure::Reference) return i;
+      if(p_measures[i].GetType() == ControlMeasure::Reference) return i;
     }
 
     return 0;
@@ -1233,7 +1261,7 @@ namespace Isis {
 
     // Return the first ControlMeasure that is a reference
     for (int i=0; i < p_measures.size(); i++) {
-      if (p_measures[i].Type() == ControlMeasure::Reference) return i;
+      if (p_measures[i].GetType() == ControlMeasure::Reference) return i;
     }
 
     // Or return the first measured ControlMeasure
@@ -1261,7 +1289,7 @@ namespace Isis {
       return false;
     }
 
-    return (p_measures[iRefIndex].EditLock());
+    return (p_measures[iRefIndex].IsEditLocked());
   }
 
 
@@ -1275,10 +1303,10 @@ namespace Isis {
     int errorCount = 0;
     for (int i = 0; i < p_measures.size(); i ++) {
       const ControlMeasure &measure = p_measures[i]; 
-      if (measure.Ignore()) continue;
+      if (measure.IsIgnored()) continue;
       if (!measure.IsMeasured()) continue;
 
-      errorSum += measure.ResidualMagnitude();
+      errorSum += measure.GetResidualMagnitude();
       errorCount ++;
     }
 
@@ -1300,10 +1328,10 @@ namespace Isis {
     if(Ignore()) return dMinError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
-      if(p_measures[j].Ignore()) continue;
-      if(p_measures[j].Type() == ControlMeasure::Candidate) continue;
+      if(p_measures[j].IsIgnored()) continue;
+      if(p_measures[j].GetType() == ControlMeasure::Candidate) continue;
 
-      double dErr = p_measures[j].ResidualMagnitude();
+      double dErr = p_measures[j].GetResidualMagnitude();
       if(dErr < dMinError) {
         dMinError = dErr;
       }
@@ -1324,10 +1352,10 @@ namespace Isis {
     if(Ignore()) return dMinError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
-      if(p_measures[j].Ignore()) continue;
-      if(p_measures[j].Type() == ControlMeasure::Candidate) continue;
+      if(p_measures[j].IsIgnored()) continue;
+      if(p_measures[j].GetType() == ControlMeasure::Candidate) continue;
 
-      double dErr = p_measures[j].SampleResidual();
+      double dErr = p_measures[j].GetSampleResidual();
       if(dErr < dMinError) {
         dMinError = dErr;
       }
@@ -1348,10 +1376,10 @@ namespace Isis {
     if(Ignore()) return dMinError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
-      if(p_measures[j].Ignore()) continue;
-      if(p_measures[j].Type() == ControlMeasure::Candidate) continue;
+      if(p_measures[j].IsIgnored()) continue;
+      if(p_measures[j].GetType() == ControlMeasure::Candidate) continue;
 
-      double dErr = p_measures[j].LineResidual();
+      double dErr = p_measures[j].GetLineResidual();
       if(dErr < dMinError) {
         dMinError = dErr;
       }
@@ -1371,10 +1399,10 @@ namespace Isis {
     if (Ignore()) return maxResidual;
 
     for (int j=0; j<(int) p_measures.size(); j++) {
-      if (p_measures[j].Ignore()) continue;
+      if (p_measures[j].IsIgnored()) continue;
       if (!p_measures[j].IsMeasured()) continue;
-      if (p_measures[j].ResidualMagnitude() > maxResidual) {
-        maxResidual = p_measures[j].ResidualMagnitude();
+      if (p_measures[j].GetResidualMagnitude() > maxResidual) {
+        maxResidual = p_measures[j].GetResidualMagnitude();
       }
     }
     return maxResidual;
@@ -1393,10 +1421,10 @@ namespace Isis {
     if(Ignore()) return dMaxError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
-      if(p_measures[j].Ignore()) continue;
-      if(p_measures[j].Type() == ControlMeasure::Candidate) continue;
+      if(p_measures[j].IsIgnored()) continue;
+      if(p_measures[j].GetType() == ControlMeasure::Candidate) continue;
 
-      double dErr = p_measures[j].SampleResidual(); 
+      double dErr = p_measures[j].GetSampleResidual(); 
       if(dErr > dMaxError) {
         dMaxError = dErr;
       }
@@ -1418,10 +1446,10 @@ namespace Isis {
     if(Ignore()) return dMaxError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
-      if(p_measures[j].Ignore()) continue;
-      if(p_measures[j].Type() == ControlMeasure::Candidate) continue;
+      if(p_measures[j].IsIgnored()) continue;
+      if(p_measures[j].GetType() == ControlMeasure::Candidate) continue;
 
-      double dErr = p_measures[j].LineResidual(); 
+      double dErr = p_measures[j].GetLineResidual(); 
       if(dErr > dMaxError) {
         dMaxError = dErr;
       }
@@ -1436,7 +1464,7 @@ namespace Isis {
    * @return The PvlObject created
    *
    */
-  PvlObject ControlPoint::CreatePvlObject() {
+  PvlObject ControlPoint::CreatePvlObject() const {
     PvlObject p("ControlPoint");
     switch (p_type) {
       case Tie:
@@ -1512,7 +1540,7 @@ namespace Isis {
     }
 
     if (p_aprioriSurfacePoint.Valid()) {
-      SurfacePoint &apriori = p_aprioriSurfacePoint;
+      const SurfacePoint &apriori = p_aprioriSurfacePoint;
 
       p += PvlKeyword("AprioriX", apriori.GetX().GetMeters(), "meters");
       p += PvlKeyword("AprioriY", apriori.GetY().GetMeters(), "meters");
@@ -1532,7 +1560,7 @@ namespace Isis {
     }
 
     if (p_surfacePoint.Valid()) {
-      SurfacePoint &point = p_surfacePoint;
+      const SurfacePoint &point = p_surfacePoint;
 
       p += PvlKeyword("X", point.GetX().GetMeters(), "meters");
       p += PvlKeyword("Y", point.GetY().GetMeters(), "meters");
@@ -1567,45 +1595,7 @@ namespace Isis {
    *
    * @return The Control Measure at the provided index
    */
-  ControlMeasure &ControlPoint::operator[](int index) {
-    return p_measures[index];
-    // return GetMeasure(index);
-  }
-
-
-  /**
-   *  Return the measurement for the given serial number
-   *
-   *  @param serialNumber The serial number
-   *
-   *  @return The ControlMeasure corresponding to the give serial number
-  * @internal 
-  *   @history 2009-10-13 Jeannie Walldren - Added detail to
-  *            error message.
-  */
-  ControlMeasure &ControlPoint::operator[](iString serialNumber) {
-    for (int m=0; m<this->Size(); m++) {
-      if ((*this)[m].CubeSerialNumber() == serialNumber) {
-        return (*this)[m];
-      }
-    }
-
-    iString msg = "Requested measurement serial number [" + serialNumber +
-        "] does not exist in ControlPoint [" + Id() + "].";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
-
-    // return GetMeasure(serialNumber);
-  }
-
-
-  /**
-   * Return the ith measurement of the control point
-   *
-   * @param index Control Measure index
-   *
-   * @return The Control Measure at the provided index
-   */
-  const ControlMeasure &ControlPoint::operator[](int index) const {
+  ControlMeasure ControlPoint::operator[](int index) const {
     return p_measures[index];
   }
 
@@ -1621,9 +1611,9 @@ namespace Isis {
    *   @history 2009-10-13 Jeannie Walldren - Added detail to
    *            error message.
    */
-  const ControlMeasure & ControlPoint::operator[](iString serialNumber) const {
+  ControlMeasure ControlPoint::operator[](iString serialNumber) const {
     for (int m = 0; m < this->Size(); m++) {
-      if (this->operator[](m).CubeSerialNumber() == serialNumber) {
+      if (this->operator[](m).GetCubeSerialNumber() == serialNumber) {
         return this->operator [](m);
       }
     }
@@ -1746,11 +1736,146 @@ namespace Isis {
   }
 
 
+  void ControlPoint::Init(const PBControlNet_PBControlPoint & protoBufPt) {
+    p_id = protoBufPt.id();
+    p_dateTime = "";
+    p_aprioriSurfacePointSource = SurfacePointSource::None;
+    p_aprioriRadiusSource = RadiusSource::None;
+
+    p_chooserName = protoBufPt.choosername();
+    p_dateTime = protoBufPt.datetime();
+    p_editLock = protoBufPt.editlock();
+
+    switch(protoBufPt.type()) {
+      case PBControlNet_PBControlPoint_PointType_Tie:
+          p_type = Tie;
+          break;
+      case PBControlNet_PBControlPoint_PointType_Ground:
+          p_type = Ground;
+          break;
+    }
+
+    p_ignore = protoBufPt.ignore();
+    p_jigsawRejected = protoBufPt.jigsawrejected();
+
+    // Read apriori keywords
+    if (protoBufPt.has_apriorixyzsource()) {
+      switch (protoBufPt.apriorixyzsource()) {
+        case PBControlNet_PBControlPoint_AprioriSource_None:
+          p_aprioriSurfacePointSource = SurfacePointSource::None;
+          break;
+
+        case PBControlNet_PBControlPoint_AprioriSource_User:
+          p_aprioriSurfacePointSource = SurfacePointSource::User;
+          break;
+
+        case PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures:
+          p_aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
+          break;
+
+        case PBControlNet_PBControlPoint_AprioriSource_Reference:
+          p_aprioriSurfacePointSource = SurfacePointSource::Reference;
+          break;
+
+        case PBControlNet_PBControlPoint_AprioriSource_Basemap:
+          p_aprioriSurfacePointSource = SurfacePointSource::Basemap;
+          break;
+
+        case PBControlNet_PBControlPoint_AprioriSource_BundleSolution:
+          p_aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
+          break;
+
+        case PBControlNet_PBControlPoint_AprioriSource_Ellipsoid:
+        case PBControlNet_PBControlPoint_AprioriSource_DEM:
+          break;
+      }
+    }
+
+    if (protoBufPt.has_apriorixyzsourcefile()){
+      p_aprioriSurfacePointSourceFile = protoBufPt.apriorixyzsourcefile();
+    }
+
+    if (protoBufPt.has_aprioriradiussource()) {
+      switch (protoBufPt.aprioriradiussource()) {
+        case PBControlNet_PBControlPoint_AprioriSource_None:
+          p_aprioriRadiusSource = RadiusSource::None;
+          break;
+        case PBControlNet_PBControlPoint_AprioriSource_User:
+          p_aprioriRadiusSource = RadiusSource::User;
+          break;
+        case PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures:
+          p_aprioriRadiusSource = RadiusSource::AverageOfMeasures;
+          break;
+        case PBControlNet_PBControlPoint_AprioriSource_Ellipsoid:
+          p_aprioriRadiusSource = RadiusSource::Ellipsoid;
+          break;
+        case PBControlNet_PBControlPoint_AprioriSource_DEM:
+          p_aprioriRadiusSource = RadiusSource::DEM;
+          break;
+        case PBControlNet_PBControlPoint_AprioriSource_BundleSolution:
+          p_aprioriRadiusSource = RadiusSource::BundleSolution;
+          break;
+
+        case PBControlNet_PBControlPoint_AprioriSource_Reference:
+        case PBControlNet_PBControlPoint_AprioriSource_Basemap:
+          break;
+      }
+    }
+
+    if (protoBufPt.has_aprioriradiussourcefile()) {
+      p_aprioriRadiusSourceFile = protoBufPt.aprioriradiussourcefile();
+    }
+
+    if (protoBufPt.has_apriorix() && protoBufPt.has_aprioriy() &&
+        protoBufPt.has_aprioriz()) {
+      SurfacePoint apriori(Displacement(protoBufPt.apriorix()),
+                           Displacement(protoBufPt.aprioriy()),
+                           Displacement(protoBufPt.aprioriz()));
+
+      if (protoBufPt.aprioricovar_size() > 0) {
+        symmetric_matrix<double,upper> covar;
+        covar.resize(3);
+        covar.clear();
+        covar(0,0) = protoBufPt.aprioricovar(0);
+        covar(0,1) = protoBufPt.aprioricovar(1);
+        covar(0,2) = protoBufPt.aprioricovar(2);
+        covar(1,1) = protoBufPt.aprioricovar(3);
+        covar(1,2) = protoBufPt.aprioricovar(4);
+        covar(2,2) = protoBufPt.aprioricovar(5);
+        apriori.SetRectangularMatrix(covar);
+      }
+
+      p_aprioriSurfacePoint = apriori;
+    }
+
+    if (protoBufPt.has_x() && protoBufPt.has_y() && protoBufPt.has_z()) {
+      SurfacePoint apost(Displacement(protoBufPt.x()),
+                         Displacement(protoBufPt.y()),
+                         Displacement(protoBufPt.z()));
+
+      if (protoBufPt.apostcovar_size() > 0) {
+        symmetric_matrix<double,upper> covar;
+        covar.resize(3);
+        covar.clear();
+        covar(0,0) = protoBufPt.aprioricovar(0);
+        covar(0,1) = protoBufPt.aprioricovar(1);
+        covar(0,2) = protoBufPt.aprioricovar(2);
+        covar(1,1) = protoBufPt.aprioricovar(3);
+        covar(1,2) = protoBufPt.aprioricovar(4);
+        covar(2,2) = protoBufPt.aprioricovar(5);
+        apost.SetRectangularMatrix(covar);
+      }
+
+      p_surfacePoint = apost;
+    }
+  }
+
+
   int ControlPoint::FindMeasureIndex(iString serialNumber) const {
     for (int measureIndex = 0; measureIndex < NumMeasures(); measureIndex ++) {
       const ControlMeasure &currentMeasure = GetMeasure(measureIndex);
 
-      if (currentMeasure.CubeSerialNumber() == serialNumber) {
+      if (currentMeasure.GetCubeSerialNumber() == serialNumber) {
         return measureIndex;
       }
     }
@@ -1789,8 +1914,140 @@ namespace Isis {
    * @return The number of rejected measures on this control point
    *
    */
-  int ControlPoint::GetNumberOfRejectedMeasures() {
+  int ControlPoint::GetNumberOfRejectedMeasures() const {
     return p_numberOfRejectedMeasures;
+  }
+
+
+  PBControlNet_PBControlPoint ControlPoint::ToProtocolBuffer() const {
+    PBControlNet_PBControlPoint pbPoint;
+
+    pbPoint.set_id(Id());
+    switch (Type()) {
+      case ControlPoint::Tie:
+        pbPoint.set_type(PBControlNet_PBControlPoint::Tie);
+        break;
+      case ControlPoint::Ground:
+        pbPoint.set_type(PBControlNet_PBControlPoint::Ground);
+        break;
+    }
+
+    if (!ChooserName().empty()) {
+      pbPoint.set_choosername(ChooserName());
+    }
+    if (!DateTime().empty()) {
+      pbPoint.set_datetime(DateTime());
+    }
+    if (EditLock()) pbPoint.set_editlock(true);
+    if (Ignore()) pbPoint.set_ignore(true);
+    if (IsRejected()) pbPoint.set_jigsawrejected(true);
+
+    switch (AprioriSurfacePointSource()) {
+      case ControlPoint::SurfacePointSource::None:
+        break;
+      case ControlPoint::SurfacePointSource::User:
+        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_User);
+        break;
+      case ControlPoint::SurfacePointSource::AverageOfMeasures:
+        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures);
+        break;
+      case ControlPoint::SurfacePointSource::Reference:
+        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_Reference);
+        break;
+      case ControlPoint::SurfacePointSource::Basemap:
+        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_Basemap);
+        break;
+      case ControlPoint::SurfacePointSource::BundleSolution:
+        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_BundleSolution);
+        break;
+      default:
+        break;
+    }
+    if (!AprioriSurfacePointSourceFile().empty()) {
+      pbPoint.set_apriorixyzsourcefile(AprioriSurfacePointSourceFile());
+    }
+    switch (AprioriRadiusSource()) {
+      case ControlPoint::RadiusSource::None:
+        break;
+      case ControlPoint::RadiusSource::User:
+        pbPoint.set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_User);
+        break;
+      case ControlPoint::RadiusSource::AverageOfMeasures:
+        pbPoint.set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures);
+        break;
+      case ControlPoint::RadiusSource::Ellipsoid:
+        pbPoint.set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_Ellipsoid);
+        break;
+      case ControlPoint::RadiusSource::DEM:
+        pbPoint.set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_DEM);
+        break;
+      case ControlPoint::RadiusSource::BundleSolution:
+        pbPoint.set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_BundleSolution);
+        break;
+      default:
+        break;
+    }
+    if (!AprioriRadiusSourceFile().empty()) {
+      pbPoint.set_aprioriradiussourcefile(AprioriRadiusSourceFile());
+    }
+
+    if (GetAprioriSurfacePoint().Valid()) {
+      SurfacePoint apriori = GetAprioriSurfacePoint();
+      pbPoint.set_apriorix(apriori.GetX());
+      pbPoint.set_aprioriy(apriori.GetY());
+      pbPoint.set_aprioriz(apriori.GetZ());
+
+      symmetric_matrix<double,upper> covar = apriori.GetRectangularMatrix();
+      if (covar(0,0) != 0. || covar(0,1) != 0. ||
+          covar(0,2) != 0. || covar(1,1) != 0. ||
+          covar(1,2) != 0. || covar(2,2) != 0.) {
+        pbPoint.add_aprioricovar(covar(0,0));
+        pbPoint.add_aprioricovar(covar(0,1));
+        pbPoint.add_aprioricovar(covar(0,2));
+        pbPoint.add_aprioricovar(covar(1,1));
+        pbPoint.add_aprioricovar(covar(1,2));
+        pbPoint.add_aprioricovar(covar(2,2));
+      }
+    }
+
+
+    if (GetSurfacePoint().Valid()) {
+      SurfacePoint apost = GetSurfacePoint();
+      pbPoint.set_x(apost.GetX());
+      pbPoint.set_y(apost.GetY());
+      pbPoint.set_z(apost.GetZ());
+
+      symmetric_matrix<double,upper> covar = apost.GetRectangularMatrix();
+      if (covar(0,0) != 0. || covar(0,1) != 0. ||
+          covar(0,2) != 0. || covar(1,1) != 0. ||
+          covar(1,2) != 0. || covar(2,2) != 0.) {
+        pbPoint.add_apostcovar(covar(0,0));
+        pbPoint.add_apostcovar(covar(0,1));
+        pbPoint.add_apostcovar(covar(0,2));
+        pbPoint.add_apostcovar(covar(1,1));
+        pbPoint.add_apostcovar(covar(1,2));
+        pbPoint.add_apostcovar(covar(2,2));
+      }
+    }
+
+    //  Process all measures in the point
+    for ( int meas = 0 ; meas < Size() ; meas++ ) {
+      *pbPoint.add_measures() = p_measures[meas].ToProtocolBuffer();
+    }
+
+    return pbPoint;
+  }
+
+
+  PBControlNetLogData_Point ControlPoint::GetLogProtocolBuffer() const {
+    PBControlNetLogData_Point protoBufLog;
+
+    ControlMeasure measure;
+    foreach (measure, p_measures) {
+      *protoBufLog.add_measures() = measure.GetLogProtocolBuffer();
+    }
+
+    return protoBufLog;
   }
 }
 

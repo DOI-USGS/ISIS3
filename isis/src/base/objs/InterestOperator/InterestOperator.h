@@ -100,9 +100,6 @@ namespace Isis {
    *   @history 2010-10-28 Sharmila Prasad - Log, if Reference changed and apriorisource==Reference
    *   @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
    *   @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private and
-   *                                        modify documentation of Parse function regarding deffile
-   *  @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private and
-   *                                        modify documentation of Parse function regarding deffile
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:

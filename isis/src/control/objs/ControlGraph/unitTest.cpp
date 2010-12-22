@@ -105,7 +105,7 @@ int main() {
   for(int i = 0; i < cnet.Size(); i++) {
     cerr << "\n\t" << cnet[i].Id() << "\t|";
     for(int j = 0; j < cnet[i].Size(); j++) {
-      cerr << "\t" << cnet[i][j].CubeSerialNumber();
+      cerr << "\t" << cnet[i][j].GetCubeSerialNumber();
     }
   }
   cerr << "\n\nControlNet built!\n\n"

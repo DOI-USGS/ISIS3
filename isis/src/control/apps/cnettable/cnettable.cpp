@@ -29,7 +29,7 @@
 using namespace std;
 using namespace Isis;
 
-void Write(PvlGroup *point, ControlMeasure &cm);
+void Write(PvlGroup *point, const ControlMeasure &cm);
 
 // Allows for column names to be written on the first pass
 bool isFirst;
@@ -88,7 +88,7 @@ void IsisMain() {
 
   // Loop through all points in controlnet
   for (int i = 0; i < cnet.Size(); i++) {
-    ControlPoint &cpoint = cnet[i];
+    const ControlPoint &cpoint = cnet[i];
 
     if (isFirst && !append) {
       measureLabels += "ControlPointId,";
@@ -250,12 +250,12 @@ void IsisMain() {
     // Loop through all measures in controlpoint
     for(int j = 0; j < cpoint.Size(); j++) {
 
-      ControlMeasure &cmeasure = cpoint[j];
+      const ControlMeasure &cmeasure = cpoint[j];
 
       // Set and then get CameraPointInfo information
-      camPoint.SetCube(serials.Filename(cmeasure.CubeSerialNumber()));
+      camPoint.SetCube(serials.Filename(cmeasure.GetCubeSerialNumber()));
 
-      grp = camPoint.SetImage(cmeasure.Sample(), cmeasure.Line(), outside, errors);
+      grp = camPoint.SetImage(cmeasure.GetSample(), cmeasure.GetLine(), outside, errors);
       // Shouldn't ever happen, but, being safe...
       if(grp == NULL) {
         string msg = "You shouldn't have gotten here. Errors in CameraPointInfo class";
@@ -279,7 +279,7 @@ void IsisMain() {
 }
 
 // Write each PvlGroup out to file
-void Write(PvlGroup *point, ControlMeasure &cm) {
+void Write(PvlGroup *point, const ControlMeasure &cm) {
 
   // QStrings are used QString here because of ControlMeasure returning
   // QStrings. There is some monkey motion involving ingesting doubles,

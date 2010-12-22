@@ -22,7 +22,7 @@ PvlGroup ignorekeys;
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
 void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2);
-void Compare(ControlPoint &point1, ControlPoint &point2);
+void Compare(const ControlPoint &point1, const ControlPoint &point2);
 void Compare(ControlNet net1, ControlNet net2);
 
 void IsisMain() {
@@ -105,8 +105,8 @@ void Compare(ControlNet net1, ControlNet net2) {
   net2.SortControlNet();
 
   for(int cpIndex = 0; cpIndex < net1.Size(); cpIndex ++) {
-    ControlPoint &net1Point = net1[cpIndex];
-    ControlPoint &net2Point = net2[cpIndex];
+    const ControlPoint &net1Point = net1[cpIndex];
+    const ControlPoint &net2Point = net2[cpIndex];
 
     Compare(net1Point, net2Point);
 
@@ -116,7 +116,7 @@ void Compare(ControlNet net1, ControlNet net2) {
   }
 }
 
-void Compare(ControlPoint &point1, ControlPoint &point2) {
+void Compare(const ControlPoint &point1, const ControlPoint &point2) {
   PvlObject point1Pvl = point1.CreatePvlObject();
   PvlObject point2Pvl = point2.CreatePvlObject();
 

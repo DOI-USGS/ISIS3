@@ -12,6 +12,6 @@ commands:
 	  match=$(INPUT)/CRU_000004_1200_RED4_0.equi.cub \
 	  deffile=$(INPUT)/coregtemp.def \
 	  to=$(OUTPUT)/coregTruth.cub \
-	  onet=$(OUTPUT)/coregTruthCnet.pvl \
+	  onet=$(OUTPUT)/coregTruthCnet.net \
 	  flatfile=$(OUTPUT)/coregTruthFlatFile.txt \
 	  interp=n > /dev/null;

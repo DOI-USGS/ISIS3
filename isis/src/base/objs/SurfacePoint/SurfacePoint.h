@@ -132,7 +132,7 @@ namespace Isis {
       Distance GetYSigma() const { return sqrt(p_rectCovar(1,1)); }
       Distance GetZSigma() const { return sqrt(p_rectCovar(2,2)); }
       boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> 
-        const GetRectangularMatrix() { return p_rectCovar; }
+        const GetRectangularMatrix() const { return p_rectCovar; }
       Latitude GetLatitude() const; 
       Longitude GetLongitude() const;
       Distance GetLocalRadius() const;
@@ -142,7 +142,7 @@ namespace Isis {
       Distance GetLonSigmaDistance() const;
       Distance GetLocalRadiusSigma() const { return sqrt(p_sphereCovar(2,2)); }
       boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> 
-         const GetSphericalMatrix() { return p_sphereCovar; }
+         GetSphericalMatrix() const { return p_sphereCovar; }
 
       bool operator==(const SurfacePoint &other) const;
 

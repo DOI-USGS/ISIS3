@@ -9,6 +9,7 @@ Test deleting nonexistant control point id ...
 Test deleting nonexistant control point index ...
 **USER ERROR** There is no ControlPoint at the given index number
 
+Test read/write of binary control networks ...
 Object = ControlNetwork
   NetworkId    = Test
   TargetName   = Mars
@@ -51,6 +52,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 0.53523
     End_Group
 
     Group = ControlMeasure
@@ -68,6 +70,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 1.07046
     End_Group
   End_Object
 
@@ -93,6 +96,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 0.53523
     End_Group
 
     Group = ControlMeasure
@@ -110,6 +114,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 1.07046
     End_Group
   End_Object
 
@@ -134,6 +139,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 0.53523
     End_Group
 
     Group = ControlMeasure
@@ -151,6 +157,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 1.07046
     End_Group
   End_Object
 
@@ -175,6 +182,7 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 0.53523
     End_Group
 
     Group = ControlMeasure
@@ -192,9 +200,9 @@ Object = ControlNetwork
       LineSigma      = 0.21 <pixels>
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 1.07046
     End_Group
   End_Object
 End_Object
 End
-Test read/write of binary control networks ...
 Read/Write of binary files OK.

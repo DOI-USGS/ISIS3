@@ -134,7 +134,7 @@ void IsisMain() {
       formatter.str("");
       formatter.width(12);
       formatter.setf(ios::right);
-      string sn = currMeas.CubeSerialNumber();
+      string sn = currMeas.GetCubeSerialNumber();
       string fsc = fscMap[snMap[sn]];
       formatter << fsc << " ";
       textLine += formatter.str();
@@ -146,7 +146,7 @@ void IsisMain() {
       formatter.setf(ios::right);
       formatter.setf(ios::fixed);
       formatter.precision(2);
-      formatter << currMeas.Line() << " ";
+      formatter << currMeas.GetLine() << " ";
       textLine += formatter.str();
 
       //Set Sample
@@ -156,14 +156,14 @@ void IsisMain() {
       formatter.setf(ios::right);
       formatter.setf(ios::fixed);
       formatter.precision(2);
-      formatter << currMeas.Sample() << "   ";
+      formatter << currMeas.GetSample() << "   ";
       textLine += formatter.str();
 
       //Set Class
       string ptClass;
-      ControlMeasure::MeasureType mType = currMeas.Type();
+      ControlMeasure::MeasureType mType = currMeas.GetType();
 
-      if(currMeas.Ignore() || cnet[i].Ignore()) {
+      if(currMeas.IsIgnored() || cnet[i].Ignore()) {
         ptClass = "U   "; //Unmeasured
       }
       else if(mType == ControlMeasure::Reference) {
@@ -187,11 +187,11 @@ void IsisMain() {
       formatter.width(16);
       formatter.setf(ios::right);
       iString diam;
-      if(currMeas.Diameter() == Isis::Null) {
+      if(currMeas.GetDiameter() == Isis::Null) {
         diam = 0.0;
       }
       else {
-        diam = currMeas.Diameter();
+        diam = currMeas.GetDiameter();
       }
       formatter << diam;
       textLine += formatter.str();

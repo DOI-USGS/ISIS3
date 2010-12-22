@@ -17,6 +17,7 @@
 #include "iException.h"
 #include "iTime.h"
 #include "PBControlNetIO.pb.h"
+#include "PBControlNetLogData.pb.h"
 #include "Progress.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
@@ -113,7 +114,7 @@ namespace Isis {
             }
             else {
               for (int m=0; m<cp.Size(); m++) {
-                if (cp[m].Ignore()) p_numIgnoredMeasures++;
+                if (cp[m].IsIgnored()) p_numIgnoredMeasures++;
               }
             }
             Add(cp,forceBuild);
@@ -147,7 +148,7 @@ namespace Isis {
    * @history 2010-10-06 Tracie Sucharski, Changed long to BigInt. 
    * @history 2010-12-09 Tracie Sucharski, Added new measure type of Ground 
    */
-  void ControlNet::ReadPBControl(const iString &ptfile){
+  void ControlNet::ReadPBControl(const iString &ptfile) {
     // Create an input file stream with the input file.
     Pvl protoFile(ptfile);
 
@@ -169,12 +170,11 @@ namespace Isis {
     // max 512MB, warn at 400MB
     codedInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400); 
 
-    //  Clear message before reading new
-    p_pbnet.Clear();
+    PBControlNet pbnet;
 
     // Now stream the rest of the input into the google protocol buffer.
     try {
-      if (!p_pbnet.ParsePartialFromCodedStream(&codedInStream)) {
+      if (!pbnet.ParsePartialFromCodedStream(&codedInStream)) {
         string msg = "Failed to read input PB file " + ptfile;
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
@@ -184,225 +184,58 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
     }
 
-    int actNumControlPoints = 0;
+    PBControlNetLogData logData;
+    bool readLogData = protoBufferInfo.HasObject("LogData");
+    if(readLogData) {
+      PvlObject &logDataInfo = protoBufferInfo.FindObject("LogData");
+      BigInt logStartPos = logDataInfo["StartByte"];
+      BigInt logLength = logDataInfo["Bytes"];
+
+      input.clear();
+      input.seekg(0, ios::beg);
+      IstreamInputStream logInStream(&input);
+      CodedInputStream codedLogInStream(&inStream);
+      codedLogInStream.Skip(logStartPos);
+      codedLogInStream.PushLimit(logLength);
+      // max 512MB, warn at 400MB
+      codedLogInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400); 
+
+      // Now stream the rest of the input into the google protocol buffer.
+      try {
+        if (!logData.ParsePartialFromCodedStream(&codedLogInStream)) {
+          string msg = "Failed to read log data in PB file " + ptfile;
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        }
+      }
+      catch (...) {
+        string msg = "Cannot parse binary PB file's log data";
+        throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+      }
+      
+      if(logData.points_size() != pbnet.points_size() || logData.points_size() == 0) {
+        readLogData = false;
+      }
+    }
 
     // Set the private variable to the read in values from the input file.
-    p_networkId = p_pbnet.networkid();
-    p_targetName = p_pbnet.targetname();
-    p_created = p_pbnet.created();
-    p_modified = p_pbnet.lastmodified();
-    p_description = p_pbnet.description();
-    p_userName = p_pbnet.username();
-
-    // Produce numbers available in ControlNet
-    int NumValidPoints(0), NumMeasures(0), NumValidMeasures(0),
-        NumIgnoredMeasures(0);
-
+    p_networkId = pbnet.networkid();
+    p_targetName = pbnet.targetname();
+    p_created = pbnet.created();
+    p_modified = pbnet.lastmodified();
+    p_description = pbnet.description();
+    p_userName = pbnet.username();
 
     // Create a PvlObject for each point and create an Isis::ControlPoint
     // and call the Load(PvlObject &p, bool forceBuild = false) command with the pvlobject.
-    for ( int pnts = 0 ; pnts < p_pbnet.points_size() ; pnts++ ) {
-      ControlPoint *point = new ControlPoint(p_pbnet.points(pnts).id());
-      switch(p_pbnet.points(pnts).type()) {
-        case PBControlNet_PBControlPoint_PointType_Tie:
-            point->SetType(ControlPoint::Tie);
-            break;
-        case PBControlNet_PBControlPoint_PointType_Ground:
-            point->SetType(ControlPoint::Ground);
-            break;
-      }
-      point->SetIgnore(p_pbnet.points(pnts).ignore());
-      point->SetRejected(p_pbnet.points(pnts).jigsawrejected());
-
-      const PBControlNet_PBControlPoint &pbPoint = p_pbnet.points(pnts);
-      NumMeasures += pbPoint.measures_size();
-      if (pbPoint.ignore()) {
-        NumIgnoredMeasures += pbPoint.measures_size();
+    for ( int pnts = 0 ; pnts < pbnet.points_size(); pnts++ ) {
+      if(!readLogData) {
+        ControlPoint point(pbnet.points(pnts));
+        Add(point, true);
       }
       else {
-        NumValidPoints++;
+        ControlPoint point(pbnet.points(pnts), logData.points(pnts));
+        Add(point, true);
       }
-
-      // Read apriori keywords
-      if (pbPoint.has_apriorixyzsource()) {
-        switch (pbPoint.apriorixyzsource()) {
-          case PBControlNet_PBControlPoint_AprioriSource_None:
-            point->SetAprioriSurfacePointSource(
-                ControlPoint::SurfacePointSource::None);
-            break;
-
-          case PBControlNet_PBControlPoint_AprioriSource_User:
-            point->SetAprioriSurfacePointSource(
-                ControlPoint::SurfacePointSource::User);
-            break;
-
-          case PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures:
-            point->SetAprioriSurfacePointSource(
-                ControlPoint::SurfacePointSource::AverageOfMeasures);
-            break;
-
-          case PBControlNet_PBControlPoint_AprioriSource_Reference:
-            point->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Reference);
-            break;
-
-          case PBControlNet_PBControlPoint_AprioriSource_Basemap:
-            point->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
-            break;
-
-          case PBControlNet_PBControlPoint_AprioriSource_BundleSolution:
-            point->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::BundleSolution);
-            break;
-
-          default:
-            break;
-        }
-      }
-
-      if (pbPoint.has_apriorixyzsourcefile()){
-        point->SetAprioriSurfacePointSourceFile(pbPoint.apriorixyzsourcefile());
-      }
-
-      if (pbPoint.has_aprioriradiussource()) {
-        switch (pbPoint.aprioriradiussource()) {
-          case PBControlNet_PBControlPoint_AprioriSource_None:
-            point->SetAprioriRadiusSource(ControlPoint::RadiusSource::None);
-            break;
-          case PBControlNet_PBControlPoint_AprioriSource_User:
-            point->SetAprioriRadiusSource(ControlPoint::RadiusSource::User);
-            break;
-          case PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures:
-            point->SetAprioriRadiusSource(ControlPoint::RadiusSource::AverageOfMeasures);
-            break;
-          case PBControlNet_PBControlPoint_AprioriSource_Ellipsoid:
-            point->SetAprioriRadiusSource(ControlPoint::RadiusSource::Ellipsoid);
-            break;
-          case PBControlNet_PBControlPoint_AprioriSource_DEM:
-            point->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
-            break;
-          case PBControlNet_PBControlPoint_AprioriSource_BundleSolution:
-            point->SetAprioriRadiusSource(ControlPoint::RadiusSource::BundleSolution);
-            break;
-          default:
-            break;
-        }
-      }
-
-      if (pbPoint.has_aprioriradiussourcefile()) {
-        point->SetAprioriRadiusSourceFile(pbPoint.aprioriradiussourcefile());
-      }
-
-      if (pbPoint.has_apriorix() && pbPoint.has_aprioriy() &&
-          pbPoint.has_aprioriz()) {
-        SurfacePoint apriori(pbPoint.apriorix(),
-                             pbPoint.aprioriy(),
-                             pbPoint.aprioriz());
-
-        if (pbPoint.aprioricovar_size() > 0) {
-          symmetric_matrix<double,upper> covar;
-          covar.resize(3);
-          covar.clear();
-          covar(0,0) = pbPoint.aprioricovar(0);
-          covar(0,1) = pbPoint.aprioricovar(1);
-          covar(0,2) = pbPoint.aprioricovar(2);
-          covar(1,1) = pbPoint.aprioricovar(3);
-          covar(1,2) = pbPoint.aprioricovar(4);
-          covar(2,2) = pbPoint.aprioricovar(5);
-          apriori.SetRectangularMatrix(covar);
-        }
-
-        point->SetAprioriSurfacePoint(apriori);
-      }
-
-      if (pbPoint.has_x() && pbPoint.has_y() && pbPoint.has_z()) {
-        SurfacePoint apost(pbPoint.x(),
-                           pbPoint.y(),
-                           pbPoint.z());
-
-        if (pbPoint.apostcovar_size() > 0) {
-          symmetric_matrix<double,upper> covar;
-          covar.resize(3);
-          covar.clear();
-          covar(0,0) = pbPoint.aprioricovar(0);
-          covar(0,1) = pbPoint.aprioricovar(1);
-          covar(0,2) = pbPoint.aprioricovar(2);
-          covar(1,1) = pbPoint.aprioricovar(3);
-          covar(1,2) = pbPoint.aprioricovar(4);
-          covar(2,2) = pbPoint.aprioricovar(5);
-          apost.SetRectangularMatrix(covar);
-        }
-
-        point->SetSurfacePoint(apost);
-      }
-
-      for ( int m = 0 ; m < pbPoint.measures_size() ; m++ ) {
-        // Create a PControlMeasure and fill in it's info.
-        // with the values from the input file.
-        ControlMeasure *measure = new ControlMeasure();
-        measure->SetCubeSerialNumber(QString::fromStdString(pbPoint.measures(m).serialnumber()));
-        switch(pbPoint.measures(m).type()) {
-          case PBControlNet_PBControlPoint_PBControlMeasure::Reference:
-            measure->SetType(ControlMeasure::Reference);
-            break;
-          case PBControlNet_PBControlPoint_PBControlMeasure::Candidate:
-            measure->SetType(ControlMeasure::Candidate);
-            break;
-          case PBControlNet_PBControlPoint_PBControlMeasure::Manual:
-            measure->SetType(ControlMeasure::Manual);
-            break;
-          case PBControlNet_PBControlPoint_PBControlMeasure::RegisteredPixel:
-            measure->SetType(ControlMeasure::RegisteredPixel);
-            break;
-          case PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel:
-            measure->SetType(ControlMeasure::RegisteredSubPixel);
-            break;
-          case PBControlNet_PBControlPoint_PBControlMeasure::Ground:
-            measure->SetType(ControlMeasure::RegisteredSubPixel);
-            break;
-        }
-
-        measure->SetIgnore(pbPoint.measures(m).ignore());
-        measure->SetRejected(pbPoint.measures(m).jigsawrejected());
-        measure->SetCoordinate(pbPoint.measures(m).measurement().sample(),
-                               pbPoint.measures(m).measurement().line());
-        if (pbPoint.measures(m).measurement().has_sampleresidual() ||
-            pbPoint.measures(m).measurement().has_lineresidual()) {
-          measure->SetResidual(pbPoint.measures(m).measurement().sampleresidual(),
-                               pbPoint.measures(m).measurement().lineresidual());
-        }
-
-        if (pbPoint.measures(m).has_diameter()) {
-          measure->SetDiameter(pbPoint.measures(m).diameter());
-        }
-        if (pbPoint.measures(m).has_apriorisample()) {
-          measure->SetAprioriSample(pbPoint.measures(m).apriorisample());
-        }
-        if (pbPoint.measures(m).has_aprioriline()) {
-          measure->SetAprioriLine(pbPoint.measures(m).aprioriline());
-        }
-        if (pbPoint.measures(m).has_samplesigma()) {
-          measure->SetSampleSigma(pbPoint.measures(m).samplesigma());
-        }
-        if (pbPoint.measures(m).has_linesigma()) {
-          measure->SetLineSigma(pbPoint.measures(m).linesigma());
-        }
-
-        measure->SetChooserName(QString::fromStdString(pbPoint.measures(m).choosername()));
-        measure->SetDateTime(QString::fromStdString(pbPoint.measures(m).datetime()));
-        measure->SetEditLock(pbPoint.measures(m).editlock());
-        point->Add(*measure, false, false);
-        delete measure;
-
-        if ( measure->Ignore() ) NumIgnoredMeasures++;
-        else NumValidMeasures++;
-      }
-
-      point->SetChooserName(p_pbnet.points(pnts).choosername());
-      point->SetDateTime(p_pbnet.points(pnts).datetime());
-      point->SetEditLock(p_pbnet.points(pnts).editlock());
-      p_numMeasures += point->Size();
-      Add(*point, true);
-      actNumControlPoints++;
-      delete point;
     }
 
     input.close();
@@ -441,207 +274,33 @@ namespace Isis {
    *
    * @param ptfile 
    */
-  void ControlNet::WritePB(const iString &ptfile){
+  void ControlNet::WritePB(const iString &ptfile) {
 
     //  Clear message before writing new
-    p_pbnet.Clear();
+    PBControlNet pbnet;
+    PBControlNetLogData logData;
+
     //  Gotta assign the Pedigree explicitly even though they default, otherwise
     //  they do not make it to the output file and error out!  Yes, this is by
     //  design.
-    p_pbnet.mutable_pedigree()->set_version(p_pbnet.pedigree().version());
-    p_pbnet.mutable_pedigree()->set_date(p_pbnet.pedigree().date());
+    pbnet.mutable_pedigree()->set_version(pbnet.pedigree().version());
+    pbnet.mutable_pedigree()->set_date(pbnet.pedigree().date());
 
-    p_pbnet.set_networkid(p_networkId);
-    p_pbnet.set_targetname(p_targetName);
-    p_pbnet.set_created(p_created);
-    p_pbnet.set_lastmodified(p_modified);
-    p_pbnet.set_description(p_description);
-    p_pbnet.set_username(p_userName);
+    pbnet.set_networkid(p_networkId);
+    pbnet.set_targetname(p_targetName);
+    pbnet.set_created(p_created);
+    pbnet.set_lastmodified(p_modified);
+    pbnet.set_description(p_description);
+    pbnet.set_username(p_userName);
 
     //  Now create ControlPoints
-    int numPtsWritten = 0;
     for (int pnts = 0 ; pnts < p_pointsHash.size() ; pnts++ ) {
       ControlPoint &point = p_pointsHash[p_pointIds[pnts]];
-      PBControlNet_PBControlPoint *pbPoint = p_pbnet.add_points();
-
-      pbPoint->set_id(point.Id());
-      switch (point.Type()) {
-        case ControlPoint::Tie:
-          pbPoint->set_type(PBControlNet_PBControlPoint::Tie);
-          break;
-        case ControlPoint::Ground:
-          pbPoint->set_type(PBControlNet_PBControlPoint::Ground);
-          break;
-      }
-
-      if (!point.ChooserName().empty()) {
-        pbPoint->set_choosername(point.ChooserName());
-      }
-      if (!point.DateTime().empty()) {
-        pbPoint->set_datetime(point.DateTime());
-      }
-      if (point.EditLock()) pbPoint->set_editlock(true);
-      if (point.Ignore()) pbPoint->set_ignore(true);
-      if (point.IsRejected()) pbPoint->set_jigsawrejected(true);
-
-      switch (point.AprioriSurfacePointSource()) {
-        case ControlPoint::SurfacePointSource::None:
-          break;
-        case ControlPoint::SurfacePointSource::User:
-          pbPoint->set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_User);
-          break;
-        case ControlPoint::SurfacePointSource::AverageOfMeasures:
-          pbPoint->set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures);
-          break;
-        case ControlPoint::SurfacePointSource::Reference:
-          pbPoint->set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_Reference);
-          break;
-        case ControlPoint::SurfacePointSource::Basemap:
-          pbPoint->set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_Basemap);
-          break;
-        case ControlPoint::SurfacePointSource::BundleSolution:
-          pbPoint->set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_BundleSolution);
-          break;
-        default:
-          break;
-      }
-      if (!point.AprioriSurfacePointSourceFile().empty()) {
-        pbPoint->set_apriorixyzsourcefile(point.AprioriSurfacePointSourceFile());
-      }
-      switch (point.AprioriRadiusSource()) {
-        case ControlPoint::RadiusSource::None:
-          break;
-        case ControlPoint::RadiusSource::User:
-          pbPoint->set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_User);
-          break;
-        case ControlPoint::RadiusSource::AverageOfMeasures:
-          pbPoint->set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures);
-          break;
-        case ControlPoint::RadiusSource::Ellipsoid:
-          pbPoint->set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_Ellipsoid);
-          break;
-        case ControlPoint::RadiusSource::DEM:
-          pbPoint->set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_DEM);
-          break;
-        case ControlPoint::RadiusSource::BundleSolution:
-          pbPoint->set_aprioriradiussource(PBControlNet_PBControlPoint_AprioriSource_BundleSolution);
-          break;
-        default:
-          break;
-      }
-      if (!point.AprioriRadiusSourceFile().empty()) {
-        pbPoint->set_aprioriradiussourcefile(point.AprioriRadiusSourceFile());
-      }
-
-      if (point.GetAprioriSurfacePoint().Valid()) {
-        SurfacePoint apriori = point.GetAprioriSurfacePoint();
-        pbPoint->set_apriorix(apriori.GetX());
-        pbPoint->set_aprioriy(apriori.GetY());
-        pbPoint->set_aprioriz(apriori.GetZ());
-
-        symmetric_matrix<double,upper> covar = apriori.GetRectangularMatrix();
-        if (covar(0,0) != 0. || covar(0,1) != 0. ||
-            covar(0,2) != 0. || covar(1,1) != 0. ||
-            covar(1,2) != 0. || covar(2,2) != 0.) {
-          pbPoint->add_aprioricovar(covar(0,0));
-          pbPoint->add_aprioricovar(covar(0,1));
-          pbPoint->add_aprioricovar(covar(0,2));
-          pbPoint->add_aprioricovar(covar(1,1));
-          pbPoint->add_aprioricovar(covar(1,2));
-          pbPoint->add_aprioricovar(covar(2,2));
-        }
-      }
-
-
-      if (point.GetSurfacePoint().Valid()) {
-        SurfacePoint apost = point.GetSurfacePoint();
-        pbPoint->set_x(apost.GetX());
-        pbPoint->set_y(apost.GetY());
-        pbPoint->set_z(apost.GetZ());
-
-        symmetric_matrix<double,upper> covar = apost.GetRectangularMatrix();
-        if (covar(0,0) != 0. || covar(0,1) != 0. ||
-            covar(0,2) != 0. || covar(1,1) != 0. ||
-            covar(1,2) != 0. || covar(2,2) != 0.) {
-          pbPoint->add_apostcovar(covar(0,0));
-          pbPoint->add_apostcovar(covar(0,1));
-          pbPoint->add_apostcovar(covar(0,2));
-          pbPoint->add_apostcovar(covar(1,1));
-          pbPoint->add_apostcovar(covar(1,2));
-          pbPoint->add_apostcovar(covar(2,2));
-        }
-      }
-
-      //  Process all measures in the point
-      for ( int meas = 0 ; meas < point.Size() ; meas++ ) {
-        const ControlMeasure &measure = point[meas];
-        PBControlNet_PBControlPoint_PBControlMeasure *pbmeasure = pbPoint->add_measures();
-        pbmeasure->set_serialnumber(measure.CubeSerialNumber());
-        switch (measure.Type()) {
-          case ControlMeasure::Reference:
-            pbmeasure->set_type(PBControlNet_PBControlPoint_PBControlMeasure::Reference);
-            break;
-          case ControlMeasure::Candidate:
-            pbmeasure->set_type(PBControlNet_PBControlPoint_PBControlMeasure::Candidate);
-            break;
-          case ControlMeasure::Manual:
-            pbmeasure->set_type(PBControlNet_PBControlPoint_PBControlMeasure::Manual);
-            break;
-          case ControlMeasure::RegisteredPixel:
-            pbmeasure->set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredPixel);
-            break;
-          case ControlMeasure::RegisteredSubPixel:
-            pbmeasure->set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
-            break;
-          case ControlMeasure::Ground:
-            pbmeasure->set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
-            break;
-        }
-
-        if (measure.ChooserName() != "") {
-          pbmeasure->set_choosername(measure.ChooserName());
-        }
-        if (measure.DateTime() != "") {
-          pbmeasure->set_datetime(measure.DateTime());
-        }
-        if (measure.EditLock()) pbmeasure->set_editlock(true);
-
-        if (measure.Ignore()) pbmeasure->set_ignore(true);
-
-        if (measure.IsRejected()) pbmeasure->set_jigsawrejected(true);
-
-        if (measure.Sample() != 0. && measure.Line() != 0. ) {
-          PBControlNet_PBControlPoint_PBControlMeasure::PBMeasure *m = pbmeasure->mutable_measurement();
-          m->set_sample(measure.Sample());
-          m->set_line(measure.Line());
-          if (measure.SampleResidual() != Isis::Null) {
-            m->set_sampleresidual(measure.SampleResidual());
-          }
-          if (measure.LineResidual() != Isis::Null) {
-            m->set_lineresidual(measure.LineResidual());
-          }
-        }
-
-        if (measure.Diameter() != Isis::Null) pbmeasure->set_diameter(measure.Diameter());
-        if (measure.AprioriSample() != Isis::Null) {
-          pbmeasure->set_apriorisample(measure.AprioriSample());
-        }
-        if (measure.AprioriLine() != Isis::Null) {
-          pbmeasure->set_aprioriline(measure.AprioriLine());
-        }
-        if (measure.SampleSigma() != Isis::Null) {
-          pbmeasure->set_samplesigma(measure.SampleSigma());
-        }
-        if (measure.LineSigma() != Isis::Null) {
-          pbmeasure->set_linesigma(measure.LineSigma());
-        }
-
-      }
-
-      numPtsWritten++;
+      *pbnet.add_points() = point.ToProtocolBuffer();
+      *logData.add_points() = point.GetLogProtocolBuffer();
     }
 
-    const int labelBytes =  65536;
+    const int labelBytes = 65536;
     fstream output(ptfile.c_str(), ios::out | ios::trunc | ios::binary);
 
     char *blankLabel = new char[labelBytes];
@@ -650,21 +309,27 @@ namespace Isis {
 
     streampos startCorePos = output.tellp();
 
-//    p_pbnet.PrintDebugString();
-    if (!p_pbnet.SerializeToOstream(&output)) {
-//      if (!p_pbnet.SerializePartialToOstream(&output)) {
-      string msg = "Failed to write output PB file " + ptfile;
+    if (!pbnet.SerializeToOstream(&output)) {
+      string msg = "Failed to write output PB file [" + ptfile + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    streampos size = output.tellp() - startCorePos;
+    streampos coreSize = output.tellp() - startCorePos;
+
+    streampos startLogPos = output.tellp();
+    if (!logData.SerializeToOstream(&output)) {
+      string msg = "Failed to write output PB file [" + ptfile + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    streampos logSize = output.tellp() - startLogPos;
 
     Pvl p;
     PvlObject protoObj("ProtoBuffer");
 
     PvlObject protoCore("Core");
     protoCore.AddKeyword(PvlKeyword("StartByte", iString(startCorePos)));
-    protoCore.AddKeyword(PvlKeyword("Bytes", iString(size)));
+    protoCore.AddKeyword(PvlKeyword("Bytes", iString(coreSize)));
     protoObj.AddObject(protoCore);
 
     PvlGroup netInfo("ControlNetworkInfo");
@@ -676,8 +341,14 @@ namespace Isis {
     netInfo += Isis::PvlKeyword("LastModified", p_modified);
     netInfo += Isis::PvlKeyword("Description", p_description);
     netInfo += Isis::PvlKeyword("NumberOfPoints", p_pointsHash.count());
-    netInfo += Isis::PvlKeyword("Proto_Version", p_pbnet.pedigree().version());
+    netInfo += Isis::PvlKeyword("Proto_Version", pbnet.pedigree().version());
     protoObj.AddGroup(netInfo);
+
+    // Now write the log data section
+    PvlObject logInfo("LogData");
+    logInfo.AddKeyword(PvlKeyword("StartByte", iString(startLogPos)));
+    logInfo.AddKeyword(PvlKeyword("Bytes", iString(logSize)));
+    protoObj.AddObject(logInfo);
 
     p.AddObject(protoObj);
 
@@ -685,8 +356,6 @@ namespace Isis {
     output << p;
     output << '\n';
     output.close();
-//    google::protobuf::ShutdownProtobufLibrary();
-
   }
 
 
@@ -990,10 +659,10 @@ namespace Isis {
     double minDist=99999.;
     for (int i=0; i < (int)p_pointsHash.count(); i++) {
       for (int j=0; j < p_pointsHash[p_pointIds[i]].Size(); j++) {
-        if (p_pointsHash[p_pointIds[i]][j].CubeSerialNumber() != serialNumber) continue;
+        if (p_pointsHash[p_pointIds[i]][j].GetCubeSerialNumber() != serialNumber) continue;
         //Find closest line sample & return that controlpoint
-        dist = fabs(sample - p_pointsHash[p_pointIds[i]][j].Sample()) +
-               fabs(line - p_pointsHash[p_pointIds[i]][j].Line());
+        dist = fabs(sample - p_pointsHash[p_pointIds[i]][j].GetSample()) +
+               fabs(line - p_pointsHash[p_pointIds[i]][j].GetLine());
         if (dist < minDist) {
           minDist = dist;
           savePoint = &p_pointsHash[p_pointIds[i]];
@@ -1220,15 +889,15 @@ namespace Isis {
     // Loop through all measures and set the camera
     for (int p=0; p<Size(); p++) {
       for (int m=0; m<p_pointsHash[p_pointIds[p]].Size(); m++) {
-        if (p_pointsHash[p_pointIds[p]][m].Ignore()) continue;
-        iString serialNumber = p_pointsHash[p_pointIds[p]][m].CubeSerialNumber();
+        if (p_pointsHash[p_pointIds[p]][m].IsIgnored()) continue;
+        iString serialNumber = p_pointsHash[p_pointIds[p]][m].GetCubeSerialNumber();
         if (list.HasSerialNumber(serialNumber)) {
           p_pointsHash[p_pointIds[p]][m].SetCamera(p_cameraMap[serialNumber]);
         }
         else {
           iString msg = "Control point [" +
               p_pointsHash[p_pointIds[p]].Id() + "], measure [" +
-              p_pointsHash[p_pointIds[p]][m].CubeSerialNumber() +
+              p_pointsHash[p_pointIds[p]][m].GetCubeSerialNumber() +
               "] does not have a cube with a matching serial number";
           throw Isis::iException::Message(iException::User, msg,
               _FILEINFO_);
@@ -1279,14 +948,38 @@ namespace Isis {
   }
 
 
+  ControlPoint ControlNet::operator[](int index) const {
+    if(index >= p_pointIds.size()) {
+      iString msg = "Index [" + iString(index) + "] out of range";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    return (*this)[p_pointIds.at(index)];
+  }
+
+
+  ControlPoint ControlNet::operator[](iString id) const {
+    QHash <QString, ControlPoint>::const_iterator
+        result = p_pointsHash.find(id);
+
+    if(result == p_pointsHash.end()) {
+      iString msg = "The control network has no control points with an ID "
+          "equal to [" + id + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    return p_pointsHash[id];
+  }
+
+
   /**
    * Return the ith control point 
    *
    * @param index Control Point index 
    *
    * @return The Control Point at the provided index
-   */
+   *
   ControlPoint &ControlNet::operator[](int index) {
     return p_pointsHash[p_pointIds[index]];
-  }
+  }*/
 }

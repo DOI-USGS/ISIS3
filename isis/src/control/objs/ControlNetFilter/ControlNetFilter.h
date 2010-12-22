@@ -97,7 +97,7 @@ namespace Isis {
       void PointStatsHeader            (void);
       
       //! Standard Point Stats
-      void PointStats                  (ControlPoint & pcPoint);
+      void PointStats                  (const ControlPoint & pcPoint);
       
       // Cube Filters
       //! Filter Cubes by Cube name expression
@@ -115,7 +115,7 @@ namespace Isis {
       //! Set the output print file 
       void SetOutputFile   (string psPrintFile);
       
-      void PrintCubeFileSerialNum(ControlMeasure & pcMeasure);
+      void PrintCubeFileSerialNum(const ControlMeasure & pcMeasure);
       
     private:
       ofstream mOstm;                     //!< output stream for printing to output file

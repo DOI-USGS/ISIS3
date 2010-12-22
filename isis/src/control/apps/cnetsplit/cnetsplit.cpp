@@ -5,6 +5,7 @@
 #include "ID.h"
 #include "ControlNet.h"
 #include "ControlNetStatistics.h"
+#include "ControlPoint.h"
 #include "Progress.h"
 
 #include <string.h>

@@ -137,6 +137,8 @@ namespace Isis {
       void ComputeApriori();
       void SortControlNet();
 
+      ControlPoint GetPoint(int index) const;
+
       double AverageResidual();
       Isis::Camera *Camera(int index);
       iString CreatedDate() const;
@@ -170,7 +172,8 @@ namespace Isis {
       void SetTarget(const iString &target);
       void SetUserName(const iString &name);
 
-      ControlPoint &operator[](int index);
+      ControlPoint operator[](int index) const;
+      ControlPoint operator[](iString id) const;
 
     private:
       QStringList p_pointIds;  //!< String List of ControlPoint Ids
@@ -187,7 +190,6 @@ namespace Isis {
       std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
 
       bool p_invalid;  //!< If the Control Network is currently invalid
-      PBControlNet p_pbnet;
   };
 };
 

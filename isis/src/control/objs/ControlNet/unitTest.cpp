@@ -5,6 +5,7 @@
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "ControlMeasureLogData.h"
 #include "SurfacePoint.h"
 #include "SpecialPixel.h"
 #include "TextFile.h"
@@ -63,6 +64,9 @@ int main () {
       oss2 << id << k;
       cm.SetCubeSerialNumber(oss2.str());
       cm.SetType(ControlMeasure::RegisteredSubPixel);
+      cm.SetLogData(
+        ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit,
+        0.53523 * (k + 1)));
       cm.SetCoordinate(1.0,2.0);
       cm.SetResidual(-3.0,4.0);
       cm.SetDiameter(15.0);
@@ -88,7 +92,7 @@ int main () {
       cm.SetDateTime("2010-08-27T17:10:06");
       cp.Add(cm);
     }
-    
+
     cp.SetChooserName("autoseed");
     cp.SetDateTime("2010-08-27T17:10:06");
 
@@ -111,7 +115,8 @@ int main () {
   string id2 = cn1[2].Id();
   cn1.Delete(2);
 
-  cn1.Write("temp.txt",true);
+  cn1.Write("temp.txt", true);
+
   cout << "Test deleting nonexistant control point id ..." << endl;
   try {
     cn1.Delete(id2);
@@ -129,7 +134,6 @@ int main () {
     e.Report(false);
   }
   cout << endl;
-
   ControlNet cn2("temp.txt");
 
   cn2.Write("temp2.txt",true);
@@ -137,14 +141,19 @@ int main () {
     cout << "ERROR:  Text Files are not the same!" << endl;
   }
 
+  cout << "Test read/write of binary control networks ..." << endl;
+
+  //  Test read/write of binary
+  cn2.Write("temp.bin");
+  ControlNet cn3;
+
+  cn3.ReadControl("temp.bin");
+
+  cn3.Write("temp.txt", true);
+
   Pvl p1("temp.txt");
   cout << p1 << endl;
 
-  //  Test read/write of binary
-  cout << "Test read/write of binary control networks ..." << endl;
-  cn2.Write("temp.bin");
-  ControlNet cn3;
-  cn3.ReadControl("temp.bin");
   cn3.Write("temp2.bin");
   ControlNet cn4("temp2.bin");
 

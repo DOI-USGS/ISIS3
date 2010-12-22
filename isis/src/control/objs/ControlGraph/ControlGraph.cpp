@@ -239,10 +239,10 @@ namespace Isis {
     for(int cpIndex = 0; cpIndex < cnet->Size(); cpIndex++) {
       if(!(*cnet)[cpIndex].Ignore()) {
         // use a reference for the current ControlPoint for clearity
-        ControlPoint &curCtrlPoint = (*cnet)[cpIndex];
+        const ControlPoint &curCtrlPoint = (*cnet)[cpIndex];
         for(int cmIndex = 0; cmIndex < curCtrlPoint.Size(); cmIndex++) {
           // get current cube's serial number and hash if new
-          QString curCube = curCtrlPoint[cmIndex].CubeSerialNumber();
+          QString curCube = curCtrlPoint[cmIndex].GetCubeSerialNumber();
           if(!cubeIdToIndexHash->contains(curCube)) {
             cubeIdToIndexHash->insert(curCube, ++cubeIndex);
             cubeIndexToIdHash->insert(cubeIndex, curCube);
@@ -256,7 +256,7 @@ namespace Isis {
           for(int cmIndex2 = 0; cmIndex2 < curCtrlPoint.Size(); cmIndex2++) {
             if(cmIndex2 != cmIndex) {
               // get adjacent cube's serial number and hash if new
-              QString adjacentCube = curCtrlPoint[cmIndex2].CubeSerialNumber();
+              QString adjacentCube = curCtrlPoint[cmIndex2].GetCubeSerialNumber();
               if(!cubeIdToIndexHash->contains(adjacentCube)) {
                 cubeIdToIndexHash->insert(adjacentCube, ++cubeIndex);
                 cubeIndexToIdHash->insert(cubeIndex, adjacentCube);

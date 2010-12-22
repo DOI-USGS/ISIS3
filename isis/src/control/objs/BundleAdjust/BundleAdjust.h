@@ -204,8 +204,8 @@ namespace Isis {
 
       // triangulation functions
       int Triangulation(bool bDoApproximation = false);
-      bool ApproximatePoint_ClosestApproach(ControlPoint& rpoint, int nIndex);
-      bool TriangulatePoint(ControlPoint& rpoint);
+      bool ApproximatePoint_ClosestApproach(const ControlPoint& rpoint, int nIndex);
+      bool TriangulatePoint(const ControlPoint& rpoint);
       bool TriangulationPartials();
 
       bool SetParameterWeights();
@@ -363,8 +363,8 @@ namespace Isis {
       bool FormNormalEquations();
 
       bool ComputePartials (matrix<double>& coeff_image, matrix<double>& coeff_point3D,
-                            vector<double>& coeff_RHS, ControlMeasure& measure,
-                            ControlPoint& point);
+                            vector<double>& coeff_RHS, const ControlMeasure& measure,
+                            const ControlPoint& point);
 
       bool FormNormalEquations1(symmetric_matrix<double,upper>&N22, matrix<double>& N12,
                                 compressed_vector<double>& n1, vector<double>& n2,

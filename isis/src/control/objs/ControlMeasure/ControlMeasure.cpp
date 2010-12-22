@@ -27,9 +27,13 @@
 
 #include "Application.h"
 #include "Camera.h"
+#include "ControlMeasureLogData.h"
 #include "iString.h"
 #include "iTime.h"
+#include "PBControlNetIO.pb.h"
+#include "PBControlNetLogData.pb.h"
 #include "SpecialPixel.h"
+
 
 namespace Isis {
   /**
@@ -41,6 +45,7 @@ namespace Isis {
     p_serialNumber = new iString;
     p_chooserName = new iString;
     p_dateTime = new iString;
+    p_loggedData = new QVector<ControlMeasureLogData>();
 
     p_measureType = Candidate;
     p_editLock = false;
@@ -49,7 +54,38 @@ namespace Isis {
 
     p_sample = 0.0;
     p_line = 0.0;
+  }
 
+
+  /**
+   * Converts the protocol buffer version of the measure into a real
+   *   ControlMeasure 
+   *
+   * @param other The control measure to copy all of the values from
+   */
+  ControlMeasure::ControlMeasure(
+      const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf) {
+    Init(protoBuf);
+  }
+
+
+  /**
+   * Converts the protocol buffer version of the measure into a real
+   *   ControlMeasure 
+   *
+   * @param other The control measure to copy all of the values from
+   */
+  ControlMeasure::ControlMeasure(
+      const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf,
+      const PBControlNetLogData_Point_Measure &logData) {
+    Init(protoBuf);
+
+    for(int dataEntry = 0;
+        dataEntry < logData.loggedmeasuredata_size();
+        dataEntry ++) {
+      ControlMeasureLogData logEntry(logData.loggedmeasuredata(dataEntry));
+      p_loggedData->push_back(logEntry);
+    }
   }
 
 
@@ -64,6 +100,8 @@ namespace Isis {
     p_serialNumber = new iString(*other.p_serialNumber);
     p_chooserName = new iString(*other.p_chooserName);
     p_dateTime = new iString(*other.p_dateTime);
+
+    p_loggedData = new QVector<ControlMeasureLogData>(*other.p_loggedData);
 
     p_measureType = other.p_measureType;
     p_editLock = other.p_editLock;
@@ -82,11 +120,71 @@ namespace Isis {
   }
 
 
+  void ControlMeasure::Init(
+      const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf) {
+    InitializeToNull();
+
+    p_serialNumber = new iString(protoBuf.serialnumber());
+    p_chooserName = new iString(protoBuf.choosername());
+    p_dateTime = new iString(protoBuf.datetime());
+    p_loggedData = new QVector<ControlMeasureLogData>();
+
+    switch(protoBuf.type()) {
+      case PBControlNet_PBControlPoint_PBControlMeasure::Reference:
+        p_measureType = ControlMeasure::Reference;
+        break;
+      case PBControlNet_PBControlPoint_PBControlMeasure::Candidate:
+        p_measureType = ControlMeasure::Candidate;
+        break;
+      case PBControlNet_PBControlPoint_PBControlMeasure::Manual:
+        p_measureType = ControlMeasure::Manual;
+        break;
+      case PBControlNet_PBControlPoint_PBControlMeasure::RegisteredPixel:
+        p_measureType = ControlMeasure::RegisteredPixel;
+        break;
+      case PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel:
+        p_measureType = ControlMeasure::RegisteredSubPixel;
+        break;
+      case PBControlNet_PBControlPoint_PBControlMeasure::Ground:
+        p_measureType = ControlMeasure::RegisteredSubPixel;
+        break;
+    }
+
+    p_editLock = protoBuf.editlock();
+    p_jigsawRejected = protoBuf.jigsawrejected();
+    p_ignore = protoBuf.ignore();
+    p_sample = protoBuf.measurement().sample();
+    p_line = protoBuf.measurement().line();
+
+    if(protoBuf.has_diameter())
+      p_diameter = protoBuf.diameter();
+
+    if(protoBuf.has_apriorisample())
+      p_aprioriSample = protoBuf.apriorisample();
+
+    if(protoBuf.has_aprioriline())
+      p_aprioriLine = protoBuf.aprioriline();
+
+    if(protoBuf.has_samplesigma())
+      p_sampleSigma = protoBuf.samplesigma();
+
+    if(protoBuf.has_linesigma())
+      p_lineSigma = protoBuf.linesigma();
+
+    if(protoBuf.measurement().has_sampleresidual())
+      p_sampleResidual = protoBuf.measurement().sampleresidual();
+
+    if(protoBuf.measurement().has_lineresidual())
+      p_lineResidual = protoBuf.measurement().lineresidual();
+  }
+
+
   //! initialize pointers and other data to NULL
   void ControlMeasure::InitializeToNull() {
     p_serialNumber = NULL;
     p_chooserName = NULL;
     p_dateTime = NULL;
+    p_loggedData = NULL;
 
     p_diameter = Null;
     p_aprioriSample = Null;
@@ -105,7 +203,7 @@ namespace Isis {
 
 
   /**
-   * Free the memory allocated by a control measure.
+   * Free the memory allocated by a control 
    */
   ControlMeasure::~ControlMeasure() {
     if (p_serialNumber) {
@@ -121,6 +219,11 @@ namespace Isis {
     if (p_dateTime) {
       delete p_dateTime;
       p_dateTime = NULL;
+    }
+
+    if (p_loggedData) {
+      delete p_loggedData;
+      p_loggedData = NULL;
     }
   }
 
@@ -149,7 +252,9 @@ namespace Isis {
     *
     */
   void ControlMeasure::Load(PvlGroup &p) {
+    PvlGroup unknownKeywords(p);
     *p_serialNumber = p["SerialNumber"][0];
+    unknownKeywords.DeleteKeyword("SerialNumber");
 
     if (p["MeasureType"][0] == "Reference") {
       p_measureType = Reference;
@@ -194,54 +299,107 @@ namespace Isis {
       iString msg = "Invalid Measure Type, [" + p["MeasureType"][0] + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
+    unknownKeywords.DeleteKeyword("MeasureType");
 
     //  Check for old Reference keyword
     if (p.HasKeyword("Reference")) {
       iString reference = p["Reference"][0];
       if (reference.DownCase() == "true") p_measureType = Reference;
+      unknownKeywords.DeleteKeyword("Reference");
     }
 
-    if (p.HasKeyword("ChooserName"))
+    if (p.HasKeyword("ChooserName")) {
       *p_chooserName = p["ChooserName"][0];
+      unknownKeywords.DeleteKeyword("ChooserName");
+    }
 
-    if (p.HasKeyword("DateTime"))
+    if (p.HasKeyword("DateTime")) {
       *p_dateTime = p["DateTime"][0];
+      unknownKeywords.DeleteKeyword("DateTime");
+    }
 
     if (p.HasKeyword("EditLock")) {
       iString lock = p["EditLock"][0];
       if (lock.DownCase() == "true") p_editLock = true;
+      unknownKeywords.DeleteKeyword("EditLock");
     }
 
     if (p.HasKeyword("JigsawRejected")) {
       iString reject = p["JigsawRejected"][0];
       if (reject.DownCase() == "true") p_jigsawRejected = true;
+      unknownKeywords.DeleteKeyword("JigsawRejected");
     }
 
     if (p.HasKeyword("Ignore")) {
       iString ignore = p["Ignore"][0];
       if (ignore.DownCase() == "true") p_ignore = true;
+      unknownKeywords.DeleteKeyword("Ignore");
     }
 
     p_sample = p["Sample"];
+    unknownKeywords.DeleteKeyword("Sample");
     p_line = p["Line"];
-    if (p.HasKeyword("Diameter")) p_diameter = p["Diameter"];
+    unknownKeywords.DeleteKeyword("Line");
 
-    if (p.HasKeyword("AprioriSample")) p_aprioriSample = p["AprioriSample"];
-    if (p.HasKeyword("AprioriLine")) p_aprioriLine = p["AprioriLine"];
+    if (p.HasKeyword("Diameter")) {
+      p_diameter = p["Diameter"];
+      unknownKeywords.DeleteKeyword("Diameter");
+    }
 
-    if (p.HasKeyword("SampleSigma")) p_sampleSigma = p["SampleSigma"];
-    if (p.HasKeyword("LineSigma")) p_lineSigma = p["LineSigma"];
+    if (p.HasKeyword("AprioriSample")) {
+      p_aprioriSample = p["AprioriSample"];
+      unknownKeywords.DeleteKeyword("AprioriSample");
+    }
 
-    if (p.HasKeyword("SampleResidual")) p_sampleResidual = p["SampleResidual"];
-    if (p.HasKeyword("LineResidual")) p_lineResidual = p["LineResidual"];
+    if (p.HasKeyword("AprioriLine")) {
+      p_aprioriLine = p["AprioriLine"];
+      unknownKeywords.DeleteKeyword("AprioriLine");
+    }
+
+    if (p.HasKeyword("SampleSigma")) {
+      p_sampleSigma = p["SampleSigma"];
+      unknownKeywords.DeleteKeyword("SampleSigma");
+    }
+
+    if (p.HasKeyword("LineSigma")) {
+      p_lineSigma = p["LineSigma"];
+      unknownKeywords.DeleteKeyword("LineSigma");
+    }
+
+    if (p.HasKeyword("SampleResidual")) {
+      p_sampleResidual = p["SampleResidual"];
+      unknownKeywords.DeleteKeyword("SampleResidual");
+    }
+
+    if (p.HasKeyword("LineResidual")) {
+      p_lineResidual = p["LineResidual"];
+      unknownKeywords.DeleteKeyword("LineResidual");
+    }
+
     //  Old keywords ErrorSample, ErrorLine, Error Magnitude
-    if (p.HasKeyword("ErrorSample")) p_sampleResidual = p["ErrorSample"];
-    if (p.HasKeyword("ErrorLine")) p_lineResidual = p["ErrorLine"];
+    if (p.HasKeyword("ErrorSample")) {
+      p_sampleResidual = p["ErrorSample"];
+      unknownKeywords.DeleteKeyword("ErrorSample");
+    }
+
+    if (p.HasKeyword("ErrorLine")) {
+      p_lineResidual = p["ErrorLine"];
+      unknownKeywords.DeleteKeyword("ErrorLine");
+    }
+
+    // Try to interpret remaining keywords as log data
+    for(int unknownKeyIndex = 0; unknownKeyIndex < unknownKeywords.Keywords();
+            unknownKeyIndex ++) {
+      ControlMeasureLogData logEntry(unknownKeywords[unknownKeyIndex]);
+
+      if(logEntry.IsValid()) {
+        p_loggedData->append(logEntry);
+      }
+    }
   }
 
 
-  ControlMeasure::Status ControlMeasure::SetAprioriLine(
-      double aprioriLine) {
+  ControlMeasure::Status ControlMeasure::SetAprioriLine(double aprioriLine) {
     if (p_editLock) return MeasureLocked;
     MeasureModified();
     p_aprioriLine = aprioriLine;
@@ -307,8 +465,8 @@ namespace Isis {
    * @param line    Line coordinate of the measurement,
    */
   ControlMeasure::Status ControlMeasure::SetCoordinate(double sample,
-                                                       double line) {
-    return SetCoordinate(sample, line, Type());
+      double line) {
+    return SetCoordinate(sample, line, GetType());
   }
 
 
@@ -320,8 +478,7 @@ namespace Isis {
     * @param type    The type of the coordinate
     */
   ControlMeasure::Status ControlMeasure::SetCoordinate(double sample,
-                                                       double line,
-                                                       MeasureType type) {
+      double line, MeasureType type) {
     if (p_editLock) return MeasureLocked;
     MeasureModified();
     p_sample = sample;
@@ -370,7 +527,8 @@ namespace Isis {
 
 
   //! Set the focal plane x/y for the measured line/sample
-  ControlMeasure::Status ControlMeasure::SetFocalPlaneMeasured(double x, double y) {
+  ControlMeasure::Status ControlMeasure::SetFocalPlaneMeasured(double x,
+      double y) {
     if (p_editLock) return MeasureLocked;
     p_focalPlaneMeasuredX = x;
     p_focalPlaneMeasuredY = y;
@@ -379,7 +537,8 @@ namespace Isis {
 
 
   //! Set the focal plane x/y for the computed (apriori) lat/lon
-  ControlMeasure::Status ControlMeasure::SetFocalPlaneComputed(double x, double y) {
+  ControlMeasure::Status ControlMeasure::SetFocalPlaneComputed(double x,
+      double y) {
     if (p_editLock) return MeasureLocked;
     p_focalPlaneComputedX = x;
     p_focalPlaneComputedY = y;
@@ -418,7 +577,7 @@ namespace Isis {
     * @param lineResidual  Line Residual
     */
   ControlMeasure::Status ControlMeasure::SetResidual(double sampResidual,
-                                                     double lineResidual) {
+      double lineResidual) {
     if (p_editLock) return MeasureLocked;
     MeasureModified();
     p_sampleResidual = sampResidual;
@@ -444,12 +603,70 @@ namespace Isis {
   }
 
 
-  double ControlMeasure::AprioriLine() const {
+  void ControlMeasure::SetLogData(ControlMeasureLogData data) {
+    if(!data.IsValid()) {
+      iString msg = "Cannot set log data with invalid information stored in "
+          "the ControlMeasureLogData";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    if(HasLogData(data.GetDataType()))
+      UpdateLogData(data);
+    else
+      p_loggedData->append(data);
+  }
+
+
+  void ControlMeasure::DeleteLogData(long dataType) {
+    for(int i = p_loggedData->size(); i >= 0; i--) {
+      ControlMeasureLogData logDataEntry = p_loggedData->at(i);
+
+      if(logDataEntry.GetDataType() == dataType)
+        p_loggedData->remove(i);
+    }
+  }
+
+
+  bool ControlMeasure::HasLogData(long dataType) const {
+    for(int i = 0; i < p_loggedData->size(); i++) {
+      const ControlMeasureLogData &logDataEntry = p_loggedData->at(i);
+
+      if(logDataEntry.GetDataType() == dataType)
+        return true;
+    }
+
+    return false;
+  }
+
+
+  void ControlMeasure::UpdateLogData(ControlMeasureLogData newLogData) {
+    bool updated = false;
+
+    for(int i = 0; i < p_loggedData->size(); i++) {
+      ControlMeasureLogData logDataEntry = p_loggedData->at(i);
+
+      if(logDataEntry.GetDataType() == newLogData.GetDataType()) {
+        (*p_loggedData)[i] = newLogData;
+        updated = true;
+      }
+    }
+
+    if(!updated) {
+      iString msg = "Unable to update the log data for [" +
+          newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
+          " control measure does not have log data for this value. Please use "
+          "SetLogData instead";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  double ControlMeasure::GetAprioriLine() const {
     return p_aprioriLine;
   }
 
 
-  double ControlMeasure::AprioriSample() const {
+  double ControlMeasure::GetAprioriSample() const {
     return p_aprioriSample;
   }
 
@@ -460,7 +677,7 @@ namespace Isis {
 
 
   //! Return the chooser name
-  iString ControlMeasure::ChooserName() const {
+  iString ControlMeasure::GetChooserName() const {
     if(*p_chooserName != "") {
       return *p_chooserName;
     }
@@ -471,13 +688,13 @@ namespace Isis {
 
 
   //! Return the serial number of the cube containing the coordinate
-  iString ControlMeasure::CubeSerialNumber() const {
+  iString ControlMeasure::GetCubeSerialNumber() const {
     return *p_serialNumber;
   }
 
 
   //! Return the date/time the coordinate was last changed
-  iString ControlMeasure::DateTime() const {
+  iString ControlMeasure::GetDateTime() const {
     if(*p_dateTime != "") {
       return *p_dateTime;
     }
@@ -488,37 +705,37 @@ namespace Isis {
 
 
   //! Return the diameter of the crater in pixels (0 implies no crater)
-  double ControlMeasure::Diameter() const {
+  double ControlMeasure::GetDiameter() const {
     return p_diameter;
   }
 
 
-  bool ControlMeasure::EditLock() const {
+  bool ControlMeasure::IsEditLocked() const {
     return p_editLock;
   }
 
 
-  double ControlMeasure::FocalPlaneComputedX() const {
+  double ControlMeasure::GetFocalPlaneComputedX() const {
     return p_focalPlaneComputedX;
   }
 
 
-  double ControlMeasure::FocalPlaneComputedY() const {
+  double ControlMeasure::GetFocalPlaneComputedY() const {
     return p_focalPlaneComputedY;
   }
 
 
-  double ControlMeasure::FocalPlaneMeasuredX() const {
+  double ControlMeasure::GetFocalPlaneMeasuredX() const {
     return p_focalPlaneMeasuredX;
   }
 
 
-  double ControlMeasure::FocalPlaneMeasuredY() const {
+  double ControlMeasure::GetFocalPlaneMeasuredY() const {
     return p_focalPlaneMeasuredY;
   }
 
 
-  bool ControlMeasure::Ignore() const {
+  bool ControlMeasure::IsIgnored() const {
     return p_ignore;
   }
 
@@ -542,26 +759,34 @@ namespace Isis {
     return p_measureType == Ground;
   }
 
-/*
-  bool ControlMeasure::IsStatisticallyRelevant(MeasureData field) const {
+  bool ControlMeasure::IsStatisticallyRelevant(DataField field) const {
     bool relevant = false;
     bool validField = false;
-    
+
     switch(field) {
-      case ComputerEphemerisTime:
-      case EditLock:
-      case Ignore:
-      case IsMeasured:
-      case IsRegistered:
-      case LineResidual:
-      case LineSigma:
-      case ResidualMagnitude:
+      case AprioriLine:
+      case AprioriSample:
+      case ChooserName:
+      case CubeSerialNumber:
+      case Coordinate:
+      case Diameter:
+      case FocalPlaneMeasured:
+      case FocalPlaneComputed:
       case SampleResidual:
+      case LineResidual:
       case SampleSigma:
+      case LineSigma:
         relevant = true;
         validField = true;
+        break;
 
-      case NumMeasureDataFields:
+      case DateTime:
+      case EditLock:
+      case Ignore:
+      case Rejected:
+      case Type:
+        validField = true;
+        break;
     }
 
     if(!validField) {
@@ -569,48 +794,68 @@ namespace Isis {
           + iString(field) + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-  }
-*/
 
-  double ControlMeasure::Line() const {
+    return relevant;
+  }
+
+
+  double ControlMeasure::GetLine() const {
     return p_line;
   }
 
 
-  double ControlMeasure::LineResidual() const {
+  double ControlMeasure::GetLineResidual() const {
     return p_lineResidual;
   }
 
 
-  double ControlMeasure::LineSigma() const {
+  double ControlMeasure::GetLineSigma() const {
     return p_lineSigma;
   }
 
 
   //! Return Residual magnitude
-  double ControlMeasure::ResidualMagnitude() const {
+  double ControlMeasure::GetResidualMagnitude() const {
     double dist = (p_lineResidual * p_lineResidual) + (p_sampleResidual * p_sampleResidual);
     return sqrt(dist);
   }
 
 
-  double ControlMeasure::Sample() const {
+  double ControlMeasure::GetSample() const {
     return p_sample;
   }
 
 
-  double ControlMeasure::SampleResidual() const {
+  double ControlMeasure::GetSampleResidual() const {
     return p_sampleResidual;
   }
 
 
-  double ControlMeasure::SampleSigma() const {
+  double ControlMeasure::GetSampleSigma() const {
     return p_sampleSigma;
   }
 
 
-  ControlMeasure::MeasureType ControlMeasure::Type () const {
+  ControlMeasure::MeasureType ControlMeasure::GetType () const {
     return p_measureType;
+  }
+
+
+  ControlMeasureLogData ControlMeasure::GetLogData(long dataType) const {
+    int foundIndex = 0;
+    ControlMeasureLogData::NumericLogDataType typedDataType =
+        (ControlMeasureLogData::NumericLogDataType)dataType;
+
+    while(foundIndex < p_loggedData->size()) {
+      const ControlMeasureLogData &logData = p_loggedData->at(foundIndex);
+      if(logData.GetDataType() == typedDataType) {
+        return logData;
+      }
+
+      foundIndex ++;
+    }
+
+    return ControlMeasureLogData(typedDataType);
   }
 
 
@@ -706,7 +951,7 @@ namespace Isis {
     data.append(qsl);
     qsl.clear();
 
-    qsl << "ResidualMagnitude" << QString::number(ResidualMagnitude());
+    qsl << "ResidualMagnitude" << QString::number(GetResidualMagnitude());
     data.append(qsl);
     qsl.clear();
 
@@ -759,11 +1004,11 @@ namespace Isis {
         break;
     }
 
-    p += PvlKeyword("ChooserName", ChooserName());
-    p += PvlKeyword("DateTime", DateTime());
+    p += PvlKeyword("ChooserName", GetChooserName());
+    p += PvlKeyword("DateTime", GetDateTime());
 
-    if (p_editLock == true) p += PvlKeyword("EditLock", "True");
-    if (p_ignore == true) p += PvlKeyword("Ignore", "True");
+    if (IsEditLocked()) p += PvlKeyword("EditLock", "True");
+    if (IsIgnored()) p += PvlKeyword("Ignore", "True");
 
     p += PvlKeyword("Sample", p_sample);
     p += PvlKeyword("Line",   p_line);
@@ -786,6 +1031,10 @@ namespace Isis {
     }
     if (p_lineResidual != Isis::Null) {
       p += PvlKeyword("LineResidual", p_lineResidual,"pixels");
+    }
+
+    for(int logEntry = 0; logEntry < p_loggedData->size(); logEntry ++) {
+      p += p_loggedData->at(logEntry).ToKeyword();
     }
 
     return p;
@@ -868,14 +1117,20 @@ namespace Isis {
       delete p_chooserName;
       p_chooserName = NULL;
     }
+    if(p_loggedData) {
+      delete p_loggedData;
+      p_loggedData = NULL;
+    }
 
     p_serialNumber = new iString;
     p_chooserName = new iString;
     p_dateTime = new iString;
+    p_loggedData = new QVector<ControlMeasureLogData>();
 
     *p_serialNumber = *other.p_serialNumber;
     *p_chooserName = *other.p_chooserName;
     *p_dateTime = *other.p_dateTime;
+    *p_loggedData = *other.p_loggedData;
 
     p_measureType = other.p_measureType;
     p_editLock = other.p_editLock;
@@ -917,9 +1172,9 @@ namespace Isis {
    * Check for Control Measures equality
    *
    * @author sprasad (4/20/2010)
-   *  
+   *
    * history 2010-06-24 Tracie Sucharski, Added new keywords
-   *  
+   *
    * @param pMeasure - Control Measure to be compared against
    *
    * @return bool
@@ -944,6 +1199,87 @@ namespace Isis {
         pMeasure.p_focalPlaneMeasuredY == p_focalPlaneMeasuredY &&
         pMeasure.p_focalPlaneComputedX == p_focalPlaneComputedX &&
         pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY;
+  }
+
+
+  PBControlNet_PBControlPoint_PBControlMeasure 
+      ControlMeasure::ToProtocolBuffer() const {
+    PBControlNet_PBControlPoint_PBControlMeasure protoBufMeasure;
+
+    protoBufMeasure.set_serialnumber(GetCubeSerialNumber());
+    switch (GetType()) {
+      case ControlMeasure::Reference:
+        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::Reference);
+        break;
+      case ControlMeasure::Candidate:
+        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::Candidate);
+        break;
+      case ControlMeasure::Manual:
+        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::Manual);
+        break;
+      case ControlMeasure::RegisteredPixel:
+        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredPixel);
+        break;
+      case ControlMeasure::RegisteredSubPixel:
+        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
+        break;
+      case ControlMeasure::Ground:
+        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
+        break;
+    }
+
+    if (GetChooserName() != "") {
+      protoBufMeasure.set_choosername(GetChooserName());
+    }
+    if (GetDateTime() != "") {
+      protoBufMeasure.set_datetime(GetDateTime());
+    }
+    if (IsEditLocked()) protoBufMeasure.set_editlock(true);
+
+    if (IsIgnored()) protoBufMeasure.set_ignore(true);
+
+    if (IsRejected()) protoBufMeasure.set_jigsawrejected(true);
+
+    if (GetSample() != 0. && GetLine() != 0. ) {
+      PBControlNet_PBControlPoint_PBControlMeasure::PBMeasure *m = protoBufMeasure.mutable_measurement();
+      m->set_sample(GetSample());
+      m->set_line(GetLine());
+      if (GetSampleResidual() != Isis::Null) {
+        m->set_sampleresidual(GetSampleResidual());
+      }
+      if (GetLineResidual() != Isis::Null) {
+        m->set_lineresidual(GetLineResidual());
+      }
+    }
+
+    if (GetDiameter() != Isis::Null) protoBufMeasure.set_diameter(GetDiameter());
+    if (GetAprioriSample() != Isis::Null) {
+      protoBufMeasure.set_apriorisample(GetAprioriSample());
+    }
+    if (GetAprioriLine() != Isis::Null) {
+      protoBufMeasure.set_aprioriline(GetAprioriLine());
+    }
+    if (GetSampleSigma() != Isis::Null) {
+      protoBufMeasure.set_samplesigma(GetSampleSigma());
+    }
+    if (GetLineSigma() != Isis::Null) {
+      protoBufMeasure.set_linesigma(GetLineSigma());
+    }
+
+    return protoBufMeasure;
+  }
+
+
+  PBControlNetLogData_Point_Measure ControlMeasure::GetLogProtocolBuffer()
+      const {
+    PBControlNetLogData_Point_Measure protoBufLog;
+    ControlMeasureLogData logDataEntry;
+
+    foreach (logDataEntry, *p_loggedData) {
+      *protoBufLog.add_loggedmeasuredata() = logDataEntry.ToProtocolBuffer();
+    }
+
+    return protoBufLog;
   }
 
 

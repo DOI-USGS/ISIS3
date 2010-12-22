@@ -135,14 +135,14 @@ namespace Qisis {
       serialNumbers.append("\nControl Measure ");
       serialNumbers.append(QString::number(m + 1));
       serialNumbers.append(" Serial #:  ");
-      serialNumbers.append(QString::fromStdString((*controlPoint)[m].CubeSerialNumber()));
+      serialNumbers.append(QString::fromStdString((*controlPoint)[m].GetCubeSerialNumber()));
 
       //------------------------------------------------------------------------
       // If the Mosaic Item is one of the control point's measures, then we want
       // to set that item's transparency to 255 and the others to 120.
       //------------------------------------------------------------------------
       for(int n = 0; n < items.size(); n++) {
-        if((*controlPoint)[m].CubeSerialNumber().compare(items[n]->serialNumber()) == 0) {
+        if((*controlPoint)[m].GetCubeSerialNumber().compare(items[n]->serialNumber()) == 0) {
           measureItems.push_back(items[n]);
         }
       }

@@ -242,9 +242,9 @@ void IsisMain() {
       if(cp.Ignore()) continue;
       ControlMeasure cmTrans = cp[0];
       ControlMeasure cmMatch = cp[1];
-      os << cmTrans.Sample() << "," << cmTrans.Line() << ","
-         << cmMatch.Sample() << "," << cmMatch.Line() << ","
-         << cmTrans.SampleResidual() << "," << cmTrans.LineResidual() << endl;
+      os << cmTrans.GetSample() << "," << cmTrans.GetLine() << ","
+         << cmMatch.GetSample() << "," << cmMatch.GetLine() << ","
+         << cmTrans.GetSampleResidual() << "," << cmTrans.GetLineResidual() << endl;
     }
   }
 

@@ -106,7 +106,7 @@ void IsisMain() {
 
     //loop through all the control points
     for(int cp = 0; cp < inNet.Size(); cp++) {
-      ControlPoint &point(inNet[cp]);
+      ControlPoint point(inNet[cp]);
 
       // If the point is locked and Apriori source is "AverageOfMeasures" 
       // then do not add the measures.
@@ -120,7 +120,7 @@ void IsisMain() {
         bool hasSerialNumber = false;
 
         for(int cm = 0; cm < point.Size() && !hasSerialNumber; cm ++) {
-          if(sn == point[cm].CubeSerialNumber()) {
+          if(sn == point[cm].GetCubeSerialNumber()) {
             hasSerialNumber = true;
           }
         }
@@ -160,7 +160,7 @@ void IsisMain() {
             bool hasSerialNumber = false;
 
             for(int cm = 0; cm < point.Size() && !hasSerialNumber; cm ++) {
-              if(sn == point[cm].CubeSerialNumber()) {
+              if(sn == point[cm].GetCubeSerialNumber()) {
                 hasSerialNumber = true;
               }
             }
@@ -212,7 +212,7 @@ void IsisMain() {
           point.Add(newCm);
 
           // Record the modified Point and Measure
-          p_modifiedMeasures[cp].insert(newCm.CubeSerialNumber());
+          p_modifiedMeasures[cp].insert(newCm.GetCubeSerialNumber());
 
           if(retrievalOpt == "POINT" && inNet[cp].Size() == 1) {
             point.SetIgnore(false);
@@ -233,6 +233,8 @@ void IsisMain() {
           }
         }
       }
+      
+      inNet.UpdatePoint(point);
     }
 
     cubepvl = NULL;
@@ -309,8 +311,8 @@ void IsisMain() {
       // Else, remove the unwanted measures from the modified point
       else {
         for(int cm = inNet[cp].Size() - 1; cm >= 0; cm --) {
-          if(!inNet[cp][cm].Type() ==  ControlMeasure::Reference &&
-              it->second.find(inNet[cp][cm].CubeSerialNumber()) == it->second.end()) {
+          if(!inNet[cp][cm].GetType() ==  ControlMeasure::Reference &&
+              it->second.find(inNet[cp][cm].GetCubeSerialNumber()) == it->second.end()) {
             inNet[cp].Delete(cm);
           }
         }
@@ -345,15 +347,15 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
     ControlPoint point(net[cp]);
     ControlMeasure cm(point[ net[cp].ReferenceIndex() ]);
 
-    Cube *cube = manager.OpenCube(snl.Filename(cm.CubeSerialNumber()));
+    Cube *cube = manager.OpenCube(snl.Filename(cm.GetCubeSerialNumber()));
     try {
-      cube->Camera()->SetImage(cm.Sample(), cm.Line());
+      cube->Camera()->SetImage(cm.GetSample(), cm.GetLine());
       p_pointLatLon[point.Id()].first = cube->Camera()->UniversalLatitude();
       p_pointLatLon[point.Id()].second = cube->Camera()->UniversalLongitude();
     }
     catch(Isis::iException &e) {
       std::string msg = "Unable to create camera for cube file [";
-      msg += snl.Filename(cm.CubeSerialNumber()) + "]";
+      msg += snl.Filename(cm.GetCubeSerialNumber()) + "]";
       throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
     }
     cube = NULL; //Do not delete, manager still has ownership

@@ -30,10 +30,10 @@ void IsisMain() {
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
     if(!cp.Ignore()) {
-      inputLine.push_back(cp[0].Line());
-      inputSample.push_back(cp[0].Sample());
-      outputLine.push_back(cp[1].Line());
-      outputSample.push_back(cp[1].Sample());
+      inputLine.push_back(cp[0].GetLine());
+      inputSample.push_back(cp[0].GetSample());
+      outputLine.push_back(cp[1].GetLine());
+      outputSample.push_back(cp[1].GetSample());
     }
   }
 

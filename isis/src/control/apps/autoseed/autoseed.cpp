@@ -224,10 +224,10 @@ void IsisMain() {
         cm = cp[cp.ReferenceIndex()];
       }
 
-      iString c = serialNumbers.Filename(cm.CubeSerialNumber());
+      iString c = serialNumbers.Filename(cm.GetCubeSerialNumber());
       Pvl cubepvl(c);
       Camera *cam = CameraFactory::Create(cubepvl);
-      cam->SetImage(cm.Sample(), cm.Line());
+      cam->SetImage(cm.GetSample(), cm.GetLine());
 
 
       points.push_back(Isis::globalFactory.createPoint(geos::geom::Coordinate(

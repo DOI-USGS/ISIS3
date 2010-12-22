@@ -153,35 +153,35 @@ void IsisMain() {
     }
 
     // Change the current point into a new point by manipulation of its control measures
-    ControlPoint &newPoint = outNet[cp];
+    ControlPoint newPoint = outNet[cp];
 
     bool shouldDeleteReferenceMeasure = false;
     for(int cm = newPoint.Size() - 1; cm >= 0; cm --) {
-      ControlMeasure &newMeasure = newPoint[cm];
+      const ControlMeasure &newMeasure = newPoint[cm];
 
-      if(noIgnore && newMeasure.Ignore()) {
-        ignoredMeasures.append(newPoint.Id() + "," + newMeasure.CubeSerialNumber());
+      if(noIgnore && newMeasure.IsIgnored()) {
+        ignoredMeasures.append(newPoint.Id() + "," + newMeasure.GetCubeSerialNumber());
         //New error with deleting Reference Measures
-        if(!newMeasure.Type() == ControlMeasure::Reference)
+        if(!newMeasure.GetType() == ControlMeasure::Reference)
           newPoint.Delete(cm);
         else
           shouldDeleteReferenceMeasure = true;
       }
-      else if(reference && !newMeasure.Type() == ControlMeasure::Reference) {
-        nonReferenceMeasures.append(newPoint.Id() + "," + newMeasure.CubeSerialNumber());
+      else if(reference && !newMeasure.GetType() == ControlMeasure::Reference) {
+        nonReferenceMeasures.append(newPoint.Id() + "," + newMeasure.GetCubeSerialNumber());
         newPoint.Delete(cm);
       }
       else if(cubeMeasures) {
         bool hasSerialNumber = false;
 
         for(int sn = 0; sn < serialNumbers.size() && !hasSerialNumber; sn ++) {
-          if(serialNumbers[sn] == newMeasure.CubeSerialNumber()) hasSerialNumber = true;
+          if(serialNumbers[sn] == newMeasure.GetCubeSerialNumber()) hasSerialNumber = true;
         }
 
         if(!hasSerialNumber) {
-          noCubeMeasures.append(newPoint.Id() + "," + newMeasure.CubeSerialNumber());
+          noCubeMeasures.append(newPoint.Id() + "," + newMeasure.GetCubeSerialNumber());
           //New error with deleting Reference Measures
-          if(!newMeasure.Type() == ControlMeasure::Reference)
+          if(!newMeasure.GetType() == ControlMeasure::Reference)
             newPoint.Delete(cm);
           else
             shouldDeleteReferenceMeasure = true;
@@ -189,14 +189,16 @@ void IsisMain() {
       }
     }
 
+    outNet.UpdatePoint(newPoint);
+
     // Check for line/sample errors above provided tolerance
     if(noTolerancePoints) {
       bool hasLowTolerance = true;
 
       for(int cm = 0; cm < newPoint.Size() && hasLowTolerance; cm ++) {
-        ControlMeasure &newMeasure = newPoint[cm];
-        if(newMeasure.SampleResidual() >= tolerance ||
-            newMeasure.LineResidual() >= tolerance) {
+        const ControlMeasure &newMeasure = newPoint[cm];
+        if(newMeasure.GetSampleResidual() >= tolerance ||
+            newMeasure.GetLineResidual() >= tolerance) {
           hasLowTolerance = false;
         }
       }
@@ -227,7 +229,7 @@ void IsisMain() {
 
       for(int cm = 0; cm < newPoint.Size() && !hasSerialNumber; cm ++) {
         for(int sn = 0; sn < serialNumbers.size() && !hasSerialNumber; sn ++) {
-          if(serialNumbers[sn] == newPoint[cm].CubeSerialNumber()) hasSerialNumber = true;
+          if(serialNumbers[sn] == newPoint[cm].GetCubeSerialNumber()) hasSerialNumber = true;
         }
       }
 
@@ -511,8 +513,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
       // First check the reference Measure
       if(controlPt.HasReference()) {
         cm = controlPt.ReferenceIndex();
-        if(!sn2filename[controlPt[cm].CubeSerialNumber()].length() == 0) {
-          sn = controlPt[cm].CubeSerialNumber();
+        if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
+          sn = controlPt[cm].GetCubeSerialNumber();
         }
       }
 
@@ -520,8 +522,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
       if(sn.empty()) {
         // Find the Serial Number if it exists
         for(int cm = 0; (cm < controlPt.Size()) && sn.empty(); cm ++) {
-          if(!sn2filename[controlPt[cm].CubeSerialNumber()].length() == 0) {
-            sn = controlPt[cm].CubeSerialNumber();
+          if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
+            sn = controlPt[cm].GetCubeSerialNumber();
           }
         }
       }
@@ -543,7 +545,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
           try {
             Projection *projection = ProjectionFactory::Create((*(cube->Label())));
 
-            if(!projection->SetCoordinate(controlPt[cm].Sample(), controlPt[cm].Line())) {
+            if(!projection->SetCoordinate(controlPt[cm].GetSample(), controlPt[cm].GetLine())) {
               nonLatLonPoints.push_back(controlPt.Id());
               remove = true;
             }
@@ -561,7 +563,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
           }
         }
         else {
-          if(!camera->SetImage(controlPt[cm].Sample(), controlPt[cm].Line())) {
+          if(!camera->SetImage(controlPt[cm].GetSample(), controlPt[cm].GetLine())) {
             nonLatLonPoints.push_back(controlPt.Id());
             remove = true;
           }
@@ -668,7 +670,7 @@ void WriteCubeOutList(ControlNet cnet, QMap<iString, iString> sn2file) {
     std::set<iString> outputsn;
     for(int cp = 0; cp < cnet.Size(); cp ++) {
       for(int cm = 0; cm < cnet[cp].Size(); cm ++) {
-        outputsn.insert(cnet[cp][cm].CubeSerialNumber());
+        outputsn.insert(cnet[cp][cm].GetCubeSerialNumber());
       }
       p.CheckStatus();
     }

@@ -1613,14 +1613,14 @@ namespace Qisis {
       //------------------------------------------------------------
       //for (int j = 0; j < p.Size(); j++) {
       // This is how we decide if this point is in this item.
-      if(p[0].CubeSerialNumber().compare(p_serialNumber))  continue;
+      if(p[0].GetCubeSerialNumber().compare(p_serialNumber))  continue;
       //if (p[j].CubeSerialNumber().compare(p_serialNumber))  continue;
 
       //----------------------------------------------
       // only use the first measure for all items.
       // because that is usually the reference point.
       //----------------------------------------------
-      p_groundMap->SetImage(p[0].Sample(), p[0].Line());
+      p_groundMap->SetImage(p[0].GetSample(), p[0].GetLine());
       //-------------------------------------------------------
       // the following commented out line causes us to display
       // all the measures in each control point.

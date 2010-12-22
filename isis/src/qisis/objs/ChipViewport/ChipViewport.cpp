@@ -242,21 +242,21 @@ namespace Qisis {
       
       // loop through all points in the control net
       for (int i = 0; i < p_controlNet->Size(); i++) {
-        Isis::ControlPoint &p = (*p_controlNet)[i];
+        const Isis::ControlPoint &p = (*p_controlNet)[i];
   
         // if this point is contained in the image
         if (p.HasSerialNumber(serialNumber))
         {
           // Find the measurments on the viewport
-          double samp = p[serialNumber].Sample();
-          double line = p[serialNumber].Line();
+          double samp = p[serialNumber].GetSample();
+          double line = p[serialNumber].GetLine();
           int x,y;
           
           cubeToViewport(samp, line, x, y);
           
           // Determine pen color
           // if the point or measure is ignored set to yellow
-          if (p.Ignore() || (!p.Ignore() && p[serialNumber].Ignore())) {
+          if (p.Ignore() || (!p.Ignore() && p[serialNumber].IsIgnored())) {
             painter.setPen(QColor(255,255,0)); // set point marker yellow
           }
           // check for ground measure

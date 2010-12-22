@@ -85,7 +85,8 @@ namespace Isis {
 
     while(!connected && childProcess.state() != QProcess::NotRunning) {
       // Give time for the process to connect to us or for it to finish
-      connected = server.waitForNewConnection(900);
+      // wait 30s for the new connection....
+      connected = server.waitForNewConnection(30000);
       childProcess.waitForFinished(100);
     }
 

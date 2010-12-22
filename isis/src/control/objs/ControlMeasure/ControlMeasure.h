@@ -27,12 +27,17 @@
 template< class A> class QVector;
 template< class A> class QList;
 class QStringList;
+class QVariant;
 
 namespace Isis {
   class Application;
   class Camera;
+  class ControlMeasureLogData;
   class iString;
+  class PBControlNet_PBControlPoint_PBControlMeasure;
+  class PBControlNetLogData_Point_Measure;
   class PvlGroup;
+  class PvlKeyword;
 
   /**
    * @brief a control measurement
@@ -122,6 +127,12 @@ namespace Isis {
    *                              This was done to help qnet functionality, but
    *                              may be used for other functionality in the
    *                              future.  Added IsGround for convenience.
+   *   @history 2010-12-22 Steven Lambright Added LogData capabilities and
+   *                              prepped for detailed change logs. The
+   *                              accessors needed to change names because of a
+   *                              conflict with a new enumerated value,
+   *                              DataField. The accessors to this class no
+   *                              longer give up internal pointers.
    */
   class ControlMeasure {
     public:
@@ -170,35 +181,30 @@ namespace Isis {
         MeasureLocked
       };
 
-      /*enum MeasureData {
-        AprioriLine,
-        AprioriSample,
-        ChooserName,
-        ComputerEphemerisTime,
-        CubeSerialNumber,
-        DateTime,
-        Diameter,
-        EditLock,
-        FocalPlaneComputedX,
-        FocalPlaneComputedY,
-        FocalPlaneMeasuredX,
-        FocalPlaneMeasuredY,
-        Ignore,
-        IsMeasured,
-        IsRegistered,
-        Line,
-        LineResidual,
-        LineSigma,
-        MeasuredEphemerisTime,
-        ResidualMagnitude,
-        Sample,
-        SampleResidual,
-        SampleSigma,
-        Type,
-        NumMeasureDataFields
-      };*/
+      enum DataField {
+        AprioriLine        = 1,
+        AprioriSample      = 2,
+        ChooserName        = 4,
+        CubeSerialNumber   = 8,
+        Coordinate         = 16,
+        DateTime           = 32,
+        Diameter           = 64,
+        EditLock           = 128,
+        Rejected           = 256,
+        FocalPlaneMeasured = 512,
+        FocalPlaneComputed = 1024,
+        Ignore             = 2048,
+        SampleResidual     = 4096,
+        LineResidual       = 8192,
+        SampleSigma        = 16384,
+        LineSigma          = 32768,
+        Type               = 65536
+      };
 
       ControlMeasure();
+      ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &);
+      ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &,
+                     const PBControlNetLogData_Point_Measure &);
       ControlMeasure(const ControlMeasure & other);
       ~ControlMeasure();
 
@@ -210,7 +216,6 @@ namespace Isis {
       Status SetCubeSerialNumber(iString newSerialNumber);
       Status SetChooserName();
       Status SetChooserName(iString name);
-      Status SetComputedEphemerisTime(double et);
       Status SetCoordinate(double sample, double line);
       Status SetCoordinate(double sample, double line, MeasureType type);
       Status SetDateTime();
@@ -222,60 +227,74 @@ namespace Isis {
       Status SetFocalPlaneComputed(double x, double y);
       Status SetIgnore(bool ignore);
       Status SetLineSigma(double lineSigma);
-      Status SetMeasuredEphemerisTime(double et);
       Status SetResidual(double sampResidual, double lineResidual);
       Status SetSampleSigma(double sampleSigma);
       Status SetType(MeasureType type);
 
-      double AprioriLine() const;
-      double AprioriSample() const;
+      void DeleteLogData(long dataType);
+      bool HasLogData(long dataType) const;
+      void SetLogData(ControlMeasureLogData);
+      void UpdateLogData(ControlMeasureLogData);
+
+      double GetAprioriLine() const;
+      double GetAprioriSample() const;
       Isis::Camera *Camera() const;
-      iString ChooserName() const;
-      double ComputedEphemerisTime() const;
-      iString CubeSerialNumber() const;
-      iString DateTime() const;
-      double Diameter() const;
-      bool EditLock() const;
+      iString GetChooserName() const;
+      double GetComputedEphemerisTime() const;
+      iString GetCubeSerialNumber() const;
+      iString GetDateTime() const;
+      double GetDiameter() const;
+      ControlMeasureLogData GetLogData(long dataType) const;
+      bool IsEditLocked() const;
       bool IsRejected() const;
-      double FocalPlaneComputedX() const;
-      double FocalPlaneComputedY() const;
-      double FocalPlaneMeasuredX() const;
-      double FocalPlaneMeasuredY() const;
-      bool Ignore() const;
+      double GetFocalPlaneComputedX() const;
+      double GetFocalPlaneComputedY() const;
+      double GetFocalPlaneMeasuredX() const;
+      double GetFocalPlaneMeasuredY() const;
+      double GetMeasureData(iString) const;
+      bool IsIgnored() const;
       bool IsMeasured () const;
       bool IsRegistered () const;
+      bool IsStatisticallyRelevant(DataField field) const;
       bool IsGround () const;
-      //static bool IsStatisticallyRelevant(MeasureData) const;
-      double Line() const;
-      double LineResidual() const;
-      double LineSigma() const;
-      double MeasuredEphemerisTime() const;
-      double ResidualMagnitude() const;
-      double Sample() const;
-      double SampleResidual() const;
-      double SampleSigma() const;
-      MeasureType Type () const;
+      double GetLine() const;
+      double GetLineResidual() const;
+      double GetLineSigma() const;
+      QVector<ControlMeasureLogData> GetLogDataEntries() const;
+      QVector<ControlMeasureLogData> GetLastRunLogDataEntries() const;
+      double GetResidualMagnitude() const;
+      double GetSample() const;
+      double GetSampleResidual() const;
+      double GetSampleSigma() const;
+      MeasureType GetType() const;
 
-      double GetMeasureData(iString data) const;
       static QVector<iString> GetMeasureDataNames();
 
-      QList<QStringList> PrintableClassData() const;       
+      QList<QStringList> PrintableClassData() const;
 
       PvlGroup CreatePvlGroup();
       static iString MeasureTypeToString(MeasureType type);
       iString MeasureTypeString() const;
 
+
       const ControlMeasure & operator=(const ControlMeasure & other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
       bool operator == (const Isis::ControlMeasure &pMeasure) const;
 
+      PBControlNet_PBControlPoint_PBControlMeasure ToProtocolBuffer() const;
+      PBControlNetLogData_Point_Measure GetLogProtocolBuffer() const;
+
     private: // methods
+      void Init(const PBControlNet_PBControlPoint_PBControlMeasure &);
       void InitializeToNull();
       void MeasureModified();
 
     private: // data
       iString *p_serialNumber;
       MeasureType p_measureType;
+
+      QVector<ControlMeasureLogData> * p_loggedData;
+      PvlGroup *p_comments;
 
       /**
        * list the program used and the definition file or include the user

@@ -41,7 +41,7 @@ void IsisMain() {
   string failedIDs = "";
 
   for(int i = 0; i < cnet.Size() ; i++) {
-    ControlPoint &cp = cnet[i];
+    ControlPoint cp = cnet[i];
 
     if(cp.Type() == ControlPoint::Ground) {
       // Create Brick on samp, line to get the dn value of the pixel
@@ -71,6 +71,8 @@ void IsisMain() {
         cp.SetSurfacePoint(surfacePt);
       }
     }
+
+    cnet.UpdatePoint(cp);
   }
 
   delete ugm;

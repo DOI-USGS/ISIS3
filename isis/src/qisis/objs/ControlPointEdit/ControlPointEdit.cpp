@@ -529,7 +529,7 @@ namespace Qisis {
     p_leftGroundMap = new Isis::UniversalGroundMap(*leftCube);
     p_leftCube = leftCube;
 
-    p_leftChip->TackCube(p_leftMeasure->Sample(), p_leftMeasure->Line());
+    p_leftChip->TackCube(p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
     p_leftChip->Load(*p_leftCube);
 
     // Dump into left chipViewport
@@ -579,7 +579,8 @@ namespace Qisis {
     p_rightGroundMap = new Isis::UniversalGroundMap(*rightCube);
     p_rightCube = rightCube;
 
-    p_rightChip->TackCube(p_rightMeasure->Sample(), p_rightMeasure->Line());
+    p_rightChip->TackCube(p_rightMeasure->GetSample(),
+                          p_rightMeasure->GetLine());
     if(p_geomIt == false) {
       p_rightChip->Load(*p_rightCube);
     }
@@ -711,7 +712,8 @@ namespace Qisis {
       p_autoReg->setText("Register");
 
       //  Reload chip with original measure
-      emit updateRightView(p_rightMeasure->Sample(), p_rightMeasure->Line());
+      emit updateRightView(p_rightMeasure->GetSample(),
+                           p_rightMeasure->GetLine());
       return;
 
     }
@@ -719,10 +721,11 @@ namespace Qisis {
 
     try {
       p_autoRegFact->PatternChip()->TackCube(
-        p_leftMeasure->Sample(), p_leftMeasure->Line());
+        p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
       p_autoRegFact->PatternChip()->Load(*p_leftCube);
       p_autoRegFact->SearchChip()->TackCube(
-                             p_rightMeasure->Sample(), p_rightMeasure->Line());
+                             p_rightMeasure->GetSample(),
+                             p_rightMeasure->GetLine());
       p_autoRegFact->SearchChip()->Load(
                    *p_rightCube, *(p_autoRegFact->PatternChip()), *p_leftCube);
     }
@@ -801,8 +804,8 @@ namespace Qisis {
 
 
     QString oldPos = "Original Sample: " +
-                     QString::number(p_rightMeasure->Sample()) + "   Original Line:  " +
-                     QString::number(p_rightMeasure->Line());
+                     QString::number(p_rightMeasure->GetSample()) + "   Original Line:  " +
+                     QString::number(p_rightMeasure->GetLine());
     p_oldPosition->setText(oldPos);
 
     QString goodFit = "Goodness of Fit:  " +
@@ -839,7 +842,8 @@ namespace Qisis {
 
     //  If the right chip is the same as the left chip , update the left
     //  chipViewport.
-    if(p_rightMeasure->CubeSerialNumber() == p_leftMeasure->CubeSerialNumber()) {
+    if(p_rightMeasure->GetCubeSerialNumber() ==
+       p_leftMeasure->GetCubeSerialNumber()) {
       p_leftMeasure->SetCoordinate(p_rightView->tackSample(),
                                    p_rightView->tackLine());
       p_leftMeasure->SetDateTime();
@@ -1155,10 +1159,10 @@ namespace Qisis {
 
     //  Save chips - pattern, search and fit
     std::string baseFile = p_pointId + "_" +
-                           Isis::iString((int)(p_leftMeasure->Sample())) + "_" +
-                           Isis::iString((int)(p_leftMeasure->Line())) + "_" +
-                           Isis::iString((int)(p_rightMeasure->Sample())) + "_" +
-                           Isis::iString((int)(p_rightMeasure->Line())) + "_";
+                       Isis::iString((int)(p_leftMeasure ->GetSample())) + "_" +
+                       Isis::iString((int)(p_leftMeasure ->GetLine()))   + "_" +
+                       Isis::iString((int)(p_rightMeasure->GetSample())) + "_" +
+                       Isis::iString((int)(p_rightMeasure->GetLine()))   + "_";
     std::string fname = baseFile + "Search.cub";
     std::string command = "$ISISROOT/bin/qview " + fname;
     p_autoRegFact->SearchChip()->Write(fname);

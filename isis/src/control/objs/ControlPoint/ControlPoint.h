@@ -33,6 +33,8 @@
 namespace Isis {
   class Latitude;
   class Longitude;
+  class PBControlNet_PBControlPoint;
+  class PBControlNetLogData_Point;
   class PvlObject;
 
   /**
@@ -261,6 +263,9 @@ namespace Isis {
 
       ControlPoint();
       ControlPoint (const iString &id);
+      ControlPoint(const PBControlNet_PBControlPoint &);
+      ControlPoint(const PBControlNet_PBControlPoint &,
+                   const PBControlNetLogData_Point &);
       ~ControlPoint ();
 
       void Load(PvlObject &p, bool forceBuild = false);
@@ -320,8 +325,8 @@ namespace Isis {
 
       int Size () const { return p_measures.size(); };
       int NumMeasures () const { return p_measures.size(); };
-      int NumValidMeasures ();
-      int NumLockedMeasures ();
+      int NumValidMeasures () const;
+      int NumLockedMeasures () const;
       bool HasSerialNumber (iString serialNumber) const;
       bool HasReference() const;
       int  ReferenceIndex() const;
@@ -336,12 +341,10 @@ namespace Isis {
       double MaximumSampleResidual() const;
       double MaximumLineResidual() const;
 
-      PvlObject CreatePvlObject();
+      PvlObject CreatePvlObject() const;
 
-      ControlMeasure &operator[](int index);
-      ControlMeasure &operator[](iString serialNumber);
-      const ControlMeasure &operator[](int index) const;
-      const ControlMeasure &operator[](iString serialNumber) const;
+      ControlMeasure operator[](int index) const;
+      ControlMeasure operator[](iString serialNumber) const;
 
       bool operator != (const ControlPoint &pPoint) const;
       bool operator == (const ControlPoint &pPoint) const;
@@ -350,7 +353,10 @@ namespace Isis {
       // The next 3 methods are specifically to support BundleAdjust
       void ZeroNumberOfRejectedMeasures();
       void SetNumberOfRejectedMeasures(int numRejected);
-      int GetNumberOfRejectedMeasures();
+      int GetNumberOfRejectedMeasures() const;
+
+      PBControlNet_PBControlPoint ToProtocolBuffer() const;
+      PBControlNetLogData_Point GetLogProtocolBuffer() const;
 
       // ########## DEPRECATED METHODS ##########
       // The following are convenience functions for setting/getting the points
@@ -364,6 +370,8 @@ namespace Isis {
       // ########## END DEPRECATED METHODS ##########
 
     private:
+      void Init(const PBControlNet_PBControlPoint &);
+
       int FindMeasureIndex(iString serialNumber) const;
       void PointModified();
 

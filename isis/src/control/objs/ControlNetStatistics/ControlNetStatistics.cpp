@@ -127,14 +127,14 @@ namespace Isis {
     }
     
     for (int i=0; i<iNumPoints; i++) {
-      ControlPoint & cPoint = (*mCNet)[i];
+      const ControlPoint & cPoint = (*mCNet)[i];
       int iNumMeasures = cPoint.Size();
       bool bIgnore = cPoint.Ignore();
       bool bGround = (cPoint.Type()==ControlPoint::Ground ? true : false);
       
       for (int j=0; j<iNumMeasures; j++) {
-        ControlMeasure & cMeasure = cPoint[j];
-        string sMeasureSN = cMeasure.CubeSerialNumber();
+        const ControlMeasure & cMeasure = cPoint[j];
+        string sMeasureSN = cMeasure.GetCubeSerialNumber();
         it = mImageTotalPointMap.find(sMeasureSN);
         // initialize the maps
         if (mImageTotalPointMap.find(sMeasureSN) == mImageTotalPointMap.end()){
@@ -230,12 +230,12 @@ namespace Isis {
     }
     
     for (int i=0; i<iNumPoints; i++) {
-      ControlPoint & cPoint = (*mCNet)[i];
+      const ControlPoint & cPoint = (*mCNet)[i];
       int iNumMeasures = cPoint.Size();
       int iIgnored = 0;
       for (int j=0; j<iNumMeasures; j++) {
-        ControlMeasure & cMeasure = cPoint[j];
-        if (cMeasure.Ignore()) {
+        const ControlMeasure & cMeasure = cPoint[j];
+        if (cMeasure.IsIgnored()) {
           iIgnored++;
         }
       }
@@ -349,7 +349,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      ControlPoint &cPoint = (*mCNet)[i];
+      const ControlPoint &cPoint = (*mCNet)[i];
       iNumIgnoredMeasures += cPoint.Size() - cPoint.NumValidMeasures();
     }
     

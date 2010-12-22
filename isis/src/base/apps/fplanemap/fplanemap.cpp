@@ -70,18 +70,18 @@ void IsisMain() {
     ControlPoint pnt = cn[p];
     if((!pnt.Ignore()) && (pnt.Size() == 2)) {
       Coordinate c;
-      if (pnt[0].Type() == ControlMeasure::Reference) {
-        c.samp = pnt[0].Sample();
-        c.line = pnt[0].Line();
-        c.errSamp = pnt[1].Sample();
-        c.errLine = pnt[1].Line();
+      if (pnt[0].GetType() == ControlMeasure::Reference) {
+        c.samp = pnt[0].GetSample();
+        c.line = pnt[0].GetLine();
+        c.errSamp = pnt[1].GetSample();
+        c.errLine = pnt[1].GetLine();
         c.gof = 0;//pnt[1].GoodnessOfFit();
       }
       else {
-        c.samp = pnt[1].Sample();
-        c.line = pnt[1].Line();
-        c.errSamp = pnt[0].Sample();
-        c.errLine = pnt[0].Line();
+        c.samp = pnt[1].GetSample();
+        c.line = pnt[1].GetLine();
+        c.errSamp = pnt[0].GetSample();
+        c.errLine = pnt[0].GetLine();
         c.gof = 0;//pnt[0].GoodnessOfFit();
 
       }
