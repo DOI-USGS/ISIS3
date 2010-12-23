@@ -33,6 +33,7 @@
 #include <QMouseEvent>
 #include <QRgb>
 #include <QScrollBar>
+#include <QString>
 #include <QTimer>
 
 #include "Camera.h"
