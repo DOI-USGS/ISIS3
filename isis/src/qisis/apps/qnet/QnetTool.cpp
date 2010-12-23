@@ -229,7 +229,7 @@ namespace Qisis {
     connect(p_leftCombo, SIGNAL(activated(int)),
             this, SLOT(selectLeftMeasure(int)));
     p_ignoreLeftMeasure = new QCheckBox("Ignore Measure");
-    connect(p_ignoreLeftMeasure, SIGNAL(toggled(bool)),
+    connect(p_ignoreLeftMeasure, SIGNAL(clicked(bool)),
             this, SLOT(setIgnoreLeftMeasure(bool)));
     connect(this, SIGNAL(ignoreLeftChanged()),
             p_ignoreLeftMeasure, SLOT(toggle()));
@@ -260,7 +260,7 @@ namespace Qisis {
     connect(p_rightCombo, SIGNAL(activated(int)),
             this, SLOT(selectRightMeasure(int)));
     p_ignoreRightMeasure = new QCheckBox("Ignore Measure");
-    connect(p_ignoreRightMeasure, SIGNAL(toggled(bool)),
+    connect(p_ignoreRightMeasure, SIGNAL(clicked(bool)),
             this, SLOT(setIgnoreRightMeasure(bool)));
     connect(this, SIGNAL(ignoreRightChanged()),
             p_ignoreRightMeasure, SLOT(toggle()));
