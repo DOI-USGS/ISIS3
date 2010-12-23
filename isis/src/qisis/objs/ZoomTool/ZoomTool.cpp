@@ -599,27 +599,6 @@ namespace Qisis {
 
 
   /**
-   * Sets the appropriate cursor when the mouse buttons are pressed.  If the 
-   * user right clicks on the image, the cursor is set to the magnifying glass 
-   * with a "-" next to it to indicate zoom out.  If the user left clicks on the
-   * image, the cursor is set to the magnifying glass with a "+" to indicate 
-   * zoom in. 
-   *
-   *
-   * @param p QPoint
-   * @param s Mouse button
-   */
-  void ZoomTool::mouseButtonPress(QPoint p, Qt::MouseButton s) {
-    if(s == Qt::RightButton) {
-      cubeViewport()->viewport()->setCursor(QCursor(QPixmap(toolIconDir() + "/viewmag-.png")));
-    }
-    else if(s == Qt::LeftButton) {
-      cubeViewport()->viewport()->setCursor(QCursor(QPixmap(toolIconDir() + "/viewmag+.png")));
-    }
-  }
-
-
-  /**
    * Sets the cursor to the original arrow cursor shape when the mouse button is
    * released. 
    *

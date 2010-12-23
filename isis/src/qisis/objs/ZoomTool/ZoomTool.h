@@ -56,7 +56,7 @@ namespace Qisis {
    *   @history 2010-07-14 Jeannie Walldren - Fixed bug that caused 1:1 to fail.
    *                          Added iExceptions if value is manually entered in
    *                          text box is invalid. Updated documentation.
-   *            
+   *   @history 2010-12-22 Eric Hyer - Removed mouseButtonPress method.
    */
   class ZoomTool : public Tool {
       Q_OBJECT
@@ -93,7 +93,6 @@ namespace Qisis {
       void zoomFitHeight();
       void zoomManual();
 
-      void mouseButtonPress(QPoint p, Qt::MouseButton s);
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
 
 
