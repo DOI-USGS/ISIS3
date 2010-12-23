@@ -110,6 +110,8 @@ namespace Isis {
    *                        assuming a constant angular velocity.  This method was designed to compute the pointing at the
    *                        start and end of the exposure for framing cameras to create a ck that would cover a single framing
    *                        observation.
+   *  @history 2010-12-22  Debbie A. Cook  Added new method SetFullCacheParameters to upgrade appjit to current instrument
+   *                        Rotation group labels.
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {
@@ -265,6 +267,7 @@ namespace Isis {
 
 
     protected:
+      void SetFullCacheParameters(double startTime, double endTime, int cacheSize);
       std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
       std::vector<std::vector<double> > p_cache;      //!< Cached rotations
       //!< Stored as rotation matrix from

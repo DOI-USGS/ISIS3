@@ -1869,4 +1869,20 @@ namespace Isis {
     mxm_c(dmat, (SpiceDouble *) &p_CJ[0], (SpiceDouble( *)[3]) &CJ[0]);
     return CJ;
    }
+
+
+   /** Set the full cache time parameters.
+    *
+    * @param [in]   startTime The earliest time of the full cache coverage
+    * @param [in]   endTime   The latest time of the full cache coverage 
+    * @param [in]   cacheSize The number of epochs in the full (line) cache
+    *
+    */
+   void SpiceRotation::SetFullCacheParameters(double startTime, double endTime, int cacheSize) {
+    // Save full cache parameters
+    p_fullCacheStartTime = startTime;
+    p_fullCacheEndTime = endTime;
+    p_fullCacheSize = cacheSize;
+   }
+
 }
