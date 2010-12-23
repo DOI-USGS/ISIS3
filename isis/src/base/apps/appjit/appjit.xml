@@ -38,6 +38,9 @@
     <change name="Debbie Cook" date="2009-08-05">
       Added alternate tolerance calculation
     </change>
+    <change name="Debbie Cook" date="2010-12-23">
+      Upgraded output labels for ckwriter application
+    </change>
    </history>
 
   <groups>

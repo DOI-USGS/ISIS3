@@ -101,7 +101,15 @@ void IsisMain() {
 
     // Pull out the pointing cache as a table and write it
     Table cmatrix = crot.Cache("InstrumentPointing");
-    cmatrix.Label().AddComment("Corrected using appjit and" + ui.GetFilename("JITTERFILE"));
+    //    cmatrix.Label().AddComment("Corrected using appjit and" + ui.GetFilename("JITTERFILE"));
+    cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFilename("JITTERFILE"));
+    cmatrix.Label() += PvlKeyword("Kernels");
+    PvlKeyword ckKeyword = crot.InstrumentPointingValue();
+    
+    for (int i = 0; i < ckKeyword.Size(); i++) {
+      cmatrix.Label()["Kernels"].AddValue(ckKeyword[i]);
+    }
+
     cube.Write(cmatrix);
 
     // Write out the instrument position table
@@ -109,7 +117,6 @@ void IsisMain() {
 
     // Write out the "Table" label to the tabled kernels in the kernels group
     kernels["InstrumentPointing"] = "Table";
-//    kernels["InstrumentPosition"] = "Table";
     cube.PutGroup(kernels);
     cube.Close();
     gp += PvlKeyword("StatusMaster", ui.GetFilename("MASTER") + ":  camera pointing updated");

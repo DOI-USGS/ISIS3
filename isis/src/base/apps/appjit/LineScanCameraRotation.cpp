@@ -45,6 +45,10 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
+    // Get the kernel group and save the instrument pointing keyword
+    Isis::PvlGroup kernels = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
+    p_ckKeyword = kernels["InstrumentPointing"];
+
     p_cacheTime = timeCache;
 //    std::cout<<std::setprecision(24);
 //    std::cout<<timeCache.at(0)<<"-"<<timeCache.at(50000)<<std::endl;
@@ -81,6 +85,9 @@ namespace Isis {
    * cache has been loaded then the kernels can be unloaded from the NAIF
    * system.
    *
+   * @internal
+   * @history 2010-12-23  Debbie A. Cook Added set of full cache time
+   *                       parameters
    */
   void LineScanCameraRotation::LoadCache() {
     NaifStatus::CheckErrors();
@@ -88,6 +95,8 @@ namespace Isis {
     double startTime = p_cacheTime[0];
     int size = p_cacheTime.size();
     double endTime = p_cacheTime[size-1];
+    SetFullCacheParameters(startTime, endTime, size);
+
     // TODO  Add a label value to indicate pointing is already decomposed to line scan angles
     // and set p_pointingDecomposition=none,framing angles, or line scan angles.
     // Also add a label value to indicate jitterOffsets=jitterFileName

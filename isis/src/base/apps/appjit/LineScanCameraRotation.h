@@ -95,6 +95,9 @@ namespace Isis {
    *  @history 2009-10-01  Debbie A. Cook Modified methods to be compatible with changes made
    *                        to parent class, SpiceRotation, to separate rotation into a constant
    *                        rotation and a time-dependent rotation
+   *  @history 2010=12-23  Debbie A. Cook Added new method to return InstrumentPointing keyword
+   *                        value from kernels group in label and added this value as a class
+   *                        member.
    */
   class LineScanCameraRotation : public Isis::SpiceRotation {
     public:
@@ -107,16 +110,22 @@ namespace Isis {
       virtual ~LineScanCameraRotation();
 
       void LoadCache();
+
       void SetJitter(PixelOffset *jitter) {
         p_jitter = jitter;
       };
+
       void ReloadCache();
+
       void ResetPitchRate(double pitchRate) {
         p_pitchRate = pitchRate;
       };
+
       void ResetYaw(double yaw) {
         p_yaw = yaw;
       };
+
+      Isis::PvlKeyword InstrumentPointingValue() { return p_ckKeyword; };
 
     private:
       Isis::Spice *p_spi;
@@ -128,6 +137,7 @@ namespace Isis {
       bool p_cachesLoaded;                                //!< Flag indicated p_cache and p_cacheIB are loaded
       double p_pitchRate;                                 //!< Optional update to pitch rate
       double p_yaw;                                       //!< Optional update to yaw
+      Isis::PvlKeyword p_ckKeyword;                       //!< List of the ck and related fk
   };
 };
 
