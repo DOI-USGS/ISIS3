@@ -1,67 +1,66 @@
 #include "Isis.h"
 
 #include "Application.h"
-#include "Filename.h"
-#include "ProgramLauncher.h"
+#include "Pipeline.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
 
 void IsisMain() {
-
   // Open the input cube and get filename of output cube
   UserInterface &ui = Application::GetUserInterface();
-  Filename infname = ui.GetFilename("FROM");
-  string name = infname.Basename();
-  Filename outfname = ui.GetFilename("TO");
-  string outpath = outfname.Path() + "/";
-  string outname = infname.Basename();
-  bool rmv = ui.GetBoolean("REMOVE");
+
+  Pipeline p("clemnirclean");
+  p.SetInputFile("FROM");
+  p.KeepTemporaryFiles(!ui.GetBoolean("REMOVE"));
+  p.SetOutputFile("TO");
 
   // Run noisefilter on the cube and replace with nulls, 3x3 boxcar
-  string inFile = ui.GetFilename("FROM");
-  Filename temp1;
-  temp1.Temporary(outname + ".box1_", "cub");
-  string outFile = outpath + temp1.Name();
-  string parameters = "FROM=" + inFile + " TO=" + outFile +
-                      " toldef=stddev tolmax=1.25 tolmin=1.25 samples=3 lines=3 replace=null";
-  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
+  p.AddToPipeline("noisefilter", "noisefilter1");
+  p.Application("noisefilter1").SetInputParameter("FROM", true);
+  p.Application("noisefilter1").SetOutputParameter("TO", "box1");
+  p.Application("noisefilter1").AddConstParameter("toldef", "stddev"); 
+  p.Application("noisefilter1").AddConstParameter("tolmin", "1.25"); 
+  p.Application("noisefilter1").AddConstParameter("tolmax", "1.25"); 
+  p.Application("noisefilter1").AddConstParameter("samples", "3"); 
+  p.Application("noisefilter1").AddConstParameter("lines", "3"); 
+  p.Application("noisefilter1").AddConstParameter("replace", "null"); 
 
   // Run lowpass on the cube using outside filter, 3x3 boxcar
-  inFile = outFile;
-  Filename temp2;
-  temp2.Temporary(outname + ".box2_", "cub");
-  outFile = outpath + temp2.Name();
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " samples=3 lines=3 filter=outside";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  p.AddToPipeline("lowpass", "lowpass1");
+  p.Application("lowpass1").SetInputParameter("FROM", true);
+  p.Application("lowpass1").SetOutputParameter("TO", "box2");
+  p.Application("lowpass1").AddConstParameter("samples", "3"); 
+  p.Application("lowpass1").AddConstParameter("lines", "3"); 
+  p.Application("lowpass1").AddConstParameter("filter", "outside"); 
 
   // Run lowpass on the cube using outside filter, 3x3 boxcar
-  inFile = outFile;
-  Filename temp3;
-  temp3.Temporary(outname + ".box3_", "cub");
-  outFile = outpath + temp3.Name();
+  p.AddToPipeline("lowpass", "lowpass2");
+  p.Application("lowpass2").SetInputParameter("FROM", true);
+  p.Application("lowpass2").SetOutputParameter("TO", "box3");
+  p.Application("lowpass2").AddConstParameter("samples", "3"); 
+  p.Application("lowpass2").AddConstParameter("lines", "3"); 
+  p.Application("lowpass2").AddConstParameter("filter", "outside"); 
 
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " samples=3 lines=3 filter=outside";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  // Run lowpass on the cube using outside filter, 3x3 boxcar
+  p.AddToPipeline("noisefilter", "noisefilter2");
+  p.Application("noisefilter2").SetInputParameter("FROM", true);
+  p.Application("noisefilter2").SetOutputParameter("TO", "box4");
+  p.Application("noisefilter2").AddConstParameter("toldef", "stddev"); 
+  p.Application("noisefilter2").AddConstParameter("tolmin", "1.5"); 
+  p.Application("noisefilter2").AddConstParameter("tolmax", "1.5"); 
+  p.Application("noisefilter2").AddConstParameter("samples", "3"); 
+  p.Application("noisefilter2").AddConstParameter("lines", "3"); 
+  p.Application("noisefilter2").AddConstParameter("nullisnoise", "yes");
 
-  // Run noisefilter on the cube and replace with avg, 3x3 boxcar
-  inFile = outFile;
-  Filename temp4;
-  temp4.Temporary(outname + ".box4_", "cub");
-  outFile = outpath + temp4.Name();
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " toldef=stddev tolmax=1.5 tolmin=1.5 samples=3 lines=3 nullisnoise=yes";
-  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
-  if(rmv) remove(inFile.c_str());
+  // Run lowpass on the cube using outside filter, 3x3 boxcar
+  p.AddToPipeline("lowpass", "lowpass3");
+  p.Application("lowpass3").SetInputParameter("FROM", true);
+  p.Application("lowpass3").SetOutputParameter("TO", "box5");
+  p.Application("lowpass3").AddConstParameter("samples", "5"); 
+  p.Application("lowpass3").AddConstParameter("lines", "5"); 
+  p.Application("lowpass3").AddConstParameter("filter", "outside"); 
 
-  // Run lowpass on the cube using outside filter, 5x5 boxcar
-  inFile = outFile;
-  parameters = "FROM=" + inFile + " TO=" + outfname.Expanded() +
-               " samples=5 lines=5 filter=outside";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  p.Run();
 }
