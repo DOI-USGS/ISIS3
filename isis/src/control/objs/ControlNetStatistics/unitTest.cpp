@@ -2,6 +2,8 @@
 #include "IsisDebug.h"
 #include "Application.h"
 #include "ControlNet.h"
+#include "ControlPoint.h"
+#include "ControlMeasure.h"
 #include "ControlNetStatistics.h"
 #include "iException.h"
 #include "Preference.h"
