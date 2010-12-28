@@ -2,8 +2,8 @@
 #define Kernels_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.1 $
- * $Date: 2009/06/26 23:39:21 $
+ * $Revision$
+ * $Date$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

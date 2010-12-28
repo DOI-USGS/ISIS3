@@ -1,8 +1,8 @@
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.1 $
- * $Date: 2009/06/26 23:39:21 $
- * $Id: Kernels.cpp,v 1.1 2009/06/26 23:39:21 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 
