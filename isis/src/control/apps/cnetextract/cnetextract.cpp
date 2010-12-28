@@ -129,24 +129,24 @@ void IsisMain() {
     progress.CheckStatus();
 
     // Do preliminary exclusion checks
-    if(noIgnore && outNet[cp].Ignore()) {
-      ignoredPoints.append(outNet[cp].Id());
+    if(noIgnore && outNet[cp].IsIgnored()) {
+      ignoredPoints.append(outNet[cp].GetId());
       outNet.Delete(cp);
       continue;
     }
-    if(ground && !(outNet[cp].Type() == ControlPoint::Ground)) {
-      nonGroundPoints.append(outNet[cp].Id());
+    if(ground && !(outNet[cp].GetType() == ControlPoint::Ground)) {
+      nonGroundPoints.append(outNet[cp].GetId());
       outNet.Delete(cp);
       continue;
     }
 
     if(noSingleMeasure) {
       bool invalidPoint = false;
-      invalidPoint |= noIgnore && (outNet[cp].NumValidMeasures() < 2);
-      invalidPoint |= outNet[cp].Size() < 2 && (outNet[cp].Type() != ControlPoint::Ground);
+      invalidPoint |= noIgnore && (outNet[cp].GetNumValidMeasures() < 2);
+      invalidPoint |= outNet[cp].Size() < 2 && (outNet[cp].GetType() != ControlPoint::Ground);
 
       if(invalidPoint) {
-        singleMeasurePoints.append(outNet[cp].Id());
+        singleMeasurePoints.append(outNet[cp].GetId());
         outNet.Delete(cp);
         continue;
       }
@@ -160,7 +160,7 @@ void IsisMain() {
       const ControlMeasure &newMeasure = newPoint[cm];
 
       if(noIgnore && newMeasure.IsIgnored()) {
-        ignoredMeasures.append(newPoint.Id() + "," + newMeasure.GetCubeSerialNumber());
+        ignoredMeasures.append(newPoint.GetId() + "," + newMeasure.GetCubeSerialNumber());
         //New error with deleting Reference Measures
         if(!newMeasure.GetType() == ControlMeasure::Reference)
           newPoint.Delete(cm);
@@ -168,7 +168,7 @@ void IsisMain() {
           shouldDeleteReferenceMeasure = true;
       }
       else if(reference && !newMeasure.GetType() == ControlMeasure::Reference) {
-        nonReferenceMeasures.append(newPoint.Id() + "," + newMeasure.GetCubeSerialNumber());
+        nonReferenceMeasures.append(newPoint.GetId() + "," + newMeasure.GetCubeSerialNumber());
         newPoint.Delete(cm);
       }
       else if(cubeMeasures) {
@@ -179,7 +179,7 @@ void IsisMain() {
         }
 
         if(!hasSerialNumber) {
-          noCubeMeasures.append(newPoint.Id() + "," + newMeasure.GetCubeSerialNumber());
+          noCubeMeasures.append(newPoint.GetId() + "," + newMeasure.GetCubeSerialNumber());
           //New error with deleting Reference Measures
           if(!newMeasure.GetType() == ControlMeasure::Reference)
             newPoint.Delete(cm);
@@ -204,7 +204,7 @@ void IsisMain() {
       }
 
       if(hasLowTolerance) {
-        tolerancePoints.append(newPoint.Id());
+        tolerancePoints.append(newPoint.GetId());
         outNet.Delete(cp);
         continue;
       }
@@ -213,11 +213,11 @@ void IsisMain() {
     // Do not add outPoint if it has too few measures
     if(noSingleMeasure) {
       bool invalidPoint = false;
-      invalidPoint |= noIgnore && (newPoint.NumValidMeasures() < 2);
-      invalidPoint |= newPoint.Size() < 2 && newPoint.Type() != ControlPoint::Ground;
+      invalidPoint |= noIgnore && (newPoint.GetNumValidMeasures() < 2);
+      invalidPoint |= newPoint.Size() < 2 && newPoint.GetType() != ControlPoint::Ground;
 
       if(invalidPoint) {
-        singleMeasurePoints.append(outNet[cp].Id());
+        singleMeasurePoints.append(outNet[cp].GetId());
         outNet.Delete(cp);
         continue;
       }
@@ -234,14 +234,14 @@ void IsisMain() {
       }
 
       if(!hasSerialNumber) {
-        nonCubePoints.append(newPoint.Id());
+        nonCubePoints.append(newPoint.GetId());
         outNet.Delete(cp);
         continue;
       }
     }
 
     if(noMeasureless && newPoint.Size() == 0) {
-      noMeasurePoints.append(newPoint.Id());
+      noMeasurePoints.append(newPoint.GetId());
       outNet.Delete(cp);
       continue;
     }
@@ -437,11 +437,11 @@ void ExtractPointList(ControlNet &outNet, QVector<iString> nonListedPoints) {
   for(int cp = outNet.Size() - 1; cp >= 0; cp --) {
     bool isInList = false;
     for(int pointId = 0; pointId < (int)listedPoints.size()  &&  !isInList; pointId ++) {
-      isInList = outNet[cp].Id().compare(listedPoints[pointId]) == 0;
+      isInList = outNet[cp].GetId().compare(listedPoints[pointId]) == 0;
     }
 
     if(!isInList) {
-      nonListedPoints.append(outNet[cp].Id());
+      nonListedPoints.append(outNet[cp].GetId());
       outNet.Delete(cp);
     }
   }
@@ -490,9 +490,9 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
     //Latitude pointLat(controlPt.UniversalLatitude(),Angle::Degrees);
     //Longitude pointLon(controlPt.UniversalLongitude(),Angle::Degrees);
     //bool hasLatLon = pointLat != Isis::Null && pointLon != Isis::Null;
-    if(controlPt.Type() == Isis::ControlPoint::Ground || surfacePt.Valid()) {
+    if(controlPt.GetType() == Isis::ControlPoint::Ground || surfacePt.Valid()) {
       if(NotInLatLonRange(surfacePt, minlat, maxlat, minlon, maxlon)) {
-        nonLatLonPoints.push_back(controlPt.Id());
+        nonLatLonPoints.push_back(controlPt.GetId());
         outNet.Delete(cp);
       }
     }
@@ -512,7 +512,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
 
       // First check the reference Measure
       if(controlPt.HasReference()) {
-        cm = controlPt.ReferenceIndex();
+        cm = controlPt.GetReferenceIndex();
         if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
           sn = controlPt[cm].GetCubeSerialNumber();
         }
@@ -530,7 +530,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
 
       // Connot fine a cube to get the lat/lon from
       if(sn.empty()) {
-        cannotGenerateLatLonPoints.push_back(controlPt.Id());
+        cannotGenerateLatLonPoints.push_back(controlPt.GetId());
         outNet.Delete(cp);
       }
 
@@ -546,12 +546,12 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
             Projection *projection = ProjectionFactory::Create((*(cube->Label())));
 
             if(!projection->SetCoordinate(controlPt[cm].GetSample(), controlPt[cm].GetLine())) {
-              nonLatLonPoints.push_back(controlPt.Id());
+              nonLatLonPoints.push_back(controlPt.GetId());
               remove = true;
             }
 
-            lat = projection->Latitude();
-            lon = projection->Longitude();
+            lat = Latitude(projection->Latitude(), Angle::Degrees);
+            lon = Longitude(projection->Longitude(), Angle::Degrees);
             radius = projection->LocalRadius();
 
             delete projection;
@@ -564,7 +564,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
         }
         else {
           if(!camera->SetImage(controlPt[cm].GetSample(), controlPt[cm].GetLine())) {
-            nonLatLonPoints.push_back(controlPt.Id());
+            nonLatLonPoints.push_back(controlPt.GetId());
             remove = true;
           }
 
@@ -585,16 +585,16 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
         }
 
         if(remove || notInRange) {
-          nonLatLonPoints.push_back(controlPt.Id());
+          nonLatLonPoints.push_back(controlPt.GetId());
           outNet.Delete(cp);
         }
         else if(validLatLonRadius) { // Add the reference lat/lon/radius to the Control Point
-          outNet[cp].SetUniversalGround(lat.GetDegrees(), lon.GetDegrees(), radius);
+          outNet[cp].SetSurfacePoint(SurfacePoint(lat, lon, radius));
         }
       }
     }
     else {
-      cannotGenerateLatLonPoints.push_back(controlPt.Id());
+      cannotGenerateLatLonPoints.push_back(controlPt.GetId());
       outNet.Delete(cp);
     }
 

@@ -325,8 +325,8 @@ namespace Isis {
         }
       }
       catch (iException &e) {
-        iString msg = "Unable to add Control Measure to ControlPoint [" + Id()
-            + "]";
+        iString msg = "Unable to add Control Measure to ControlPoint [" +
+            GetId() + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
@@ -354,7 +354,7 @@ namespace Isis {
         else {
           iString msg = "The SerialNumber is not unique. A measure with "
               "serial number [" + measure.GetCubeSerialNumber() + "] already "
-              "exists for ControlPoint [" + Id() + "]";
+              "exists for ControlPoint [" + GetId() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -374,9 +374,9 @@ namespace Isis {
    * @history 2010-10-18 Tracie Sucharski, If Reference, do not delete. 
    */
   void ControlPoint::Delete(int index) {
-    if (ReferenceIndex() == index) {
+    if (GetReferenceIndex() == index) {
       iString msg = "Cannot delete reference measure, for ControlPoint [" +
-          Id() + "]";
+          GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -403,7 +403,7 @@ namespace Isis {
    * @author Sharmila Prasad (10/22/2010)
    */
   ControlPoint::Status ControlPoint::ResetApriori() {
-    if(EditLock()) return PointLocked;
+    if(IsEditLocked()) return PointLocked;
 
     p_aprioriSurfacePointSource = SurfacePointSource::None;
     p_aprioriSurfacePointSourceFile    = "";
@@ -478,7 +478,7 @@ namespace Isis {
    * @return The control measure that is considered to be the reference.
    */
   ControlMeasure ControlPoint::GetReferenceMeasure() const {
-    return GetMeasure(ReferenceIndex());
+    return GetMeasure(GetReferenceIndex());
   }
 
 
@@ -595,7 +595,7 @@ namespace Isis {
   ControlPoint::Status ControlPoint::SetType(PointType type) {
     if(type != Ground && type != Tie) {
       iString msg = "Invalid Point Enumeration, [" + iString(type) + "], for "
-          "Control Point [" + Id() + "]";
+          "Control Point [" + GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -717,15 +717,15 @@ namespace Isis {
 
     if (p_editLock) return PointLocked;
     // Should we ignore the point altogether?
-    if (Ignore()) return Failure;
+    if (IsIgnored()) return Failure;
 
     PointModified();
 
     // Don't goof with ground points.  The lat/lon is what it is ... if
     // it exists!
-    if (Type() == Ground) {
+    if (GetType() == Ground) {
       if (!p_surfacePoint.Valid()) {
-        iString msg = "ControlPoint [" + Id() + "] is a ground point ";
+        iString msg = "ControlPoint [" + GetId() + "] is a ground point ";
         msg += "and requires x/y/z";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -768,12 +768,12 @@ namespace Isis {
         else {
           // JAA: Don't stop if we know the lat/lon.  The SetImage may fail
           // but the FocalPlane measures have been set
-          if (Type() == Ground) continue;
+          if (GetType() == Ground) continue;
 
           // TODO: What do we do
           iString msg = "Cannot compute lat/lon/radius (x/y/z) for "
-              "ControlPoint [" + Id() + "], measure [" + m.GetCubeSerialNumber()
-              + "]";
+              "ControlPoint [" + GetId() + "], measure [" +
+              m.GetCubeSerialNumber() + "]";
           throw iException::Message(iException::User, msg, _FILEINFO_);
 
           // m.SetFocalPlaneMeasured(?,?);
@@ -782,11 +782,11 @@ namespace Isis {
     }
 
     // Don't update the x/y/z for ground points
-    if (Type() == Ground) return Success;
+    if (GetType() == Ground) return Success;
 
     // Did we have any measures?
     if (goodMeasures == 0) {
-      iString msg = "ControlPoint [" + Id() + "] has no measures which "
+      iString msg = "ControlPoint [" + GetId() + "] has no measures which "
           "project to lat/lon/radius (x/y/z)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -816,7 +816,7 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
     if (p_editLock) return PointLocked;
-    if (Ignore()) return Failure;
+    if (IsIgnored()) return Failure;
 
     PointModified();
 
@@ -849,7 +849,7 @@ namespace Isis {
         // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
         // distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m.GetFocalPlaneComputedX(), m.GetFocalPlaneComputedY())) {
-          iString msg = "Sanity check #1 for ControlPoint [" + Id() +
+          iString msg = "Sanity check #1 for ControlPoint [" + GetId() +
               "], ControlMeasure [" + m.GetCubeSerialNumber() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
@@ -869,8 +869,9 @@ namespace Isis {
         double rad = GetSurfacePoint().GetLocalRadius().GetMeters();
         if (!cam->SetUniversalGround(lat, lon, rad)) {
           std::string msg = "ControlPoint [" +
-                            Id() + "], ControlMeasure [" + m.GetCubeSerialNumber() + "]"
-                            + " does not map into image";
+                            GetId() + "], ControlMeasure [" +
+                            m.GetCubeSerialNumber() + "]" +
+                            " does not map into image";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
 
@@ -884,7 +885,7 @@ namespace Isis {
       if(cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m.GetFocalPlaneMeasuredX(), m.GetFocalPlaneMeasuredY())) {
-          iString msg = "Sanity check #2 for ControlPoint [" + Id() +
+          iString msg = "Sanity check #2 for ControlPoint [" + GetId() +
               "], ControlMeasure [" + m.GetCubeSerialNumber() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
@@ -909,7 +910,7 @@ namespace Isis {
   }
 
 
-  iString ControlPoint::ChooserName() const {
+  iString ControlPoint::GetChooserName() const {
     if(p_chooserName != "") {
       return p_chooserName;
     }
@@ -919,7 +920,7 @@ namespace Isis {
   }
 
 
-  iString ControlPoint::DateTime() const {
+  iString ControlPoint::GetDateTime() const {
     if(p_dateTime != "") {
       return p_dateTime;
     }
@@ -929,7 +930,7 @@ namespace Isis {
   }
 
 
-  bool ControlPoint::EditLock() const {
+  bool ControlPoint::IsEditLocked() const {
     return p_editLock;
   }
 
@@ -944,22 +945,22 @@ namespace Isis {
    *
    * @return Control Point Id
    */
-  iString ControlPoint::Id() const {
+  iString ControlPoint::GetId() const {
     return p_id;
   }
 
 
-  bool ControlPoint::Ignore() const {
+  bool ControlPoint::IsIgnored() const {
     return p_ignore;
   }
 
 
-  bool ControlPoint::Valid() const {
+  bool ControlPoint::IsValid() const {
     return !p_invalid;
   }
 
 
-  bool ControlPoint::Invalid() const {
+  bool ControlPoint::IsInvalid() const {
     return p_invalid;
   }
 
@@ -1004,7 +1005,7 @@ namespace Isis {
    *
    * @return A string representation of the PointType
    */
-  iString ControlPoint::PointTypeString() const {
+  iString ControlPoint::GetPointTypeString() const {
     return PointTypeToString(p_type);
   }
 
@@ -1055,7 +1056,7 @@ namespace Isis {
    *
    * @return A string representation of the RadiusSource
    */
-  iString ControlPoint::RadiusSourceString() const {
+  iString ControlPoint::GetRadiusSourceString() const {
     return RadiusSourceToString(p_aprioriRadiusSource);
   }
 
@@ -1106,7 +1107,7 @@ namespace Isis {
    *
    * @return A string representation of the SurfacePointSource
    */
-  iString ControlPoint::SurfacePointSourceString() const {
+  iString ControlPoint::GetSurfacePointSourceString() const {
     return SurfacePointSourceToString(p_aprioriSurfacePointSource);
   }
 
@@ -1115,7 +1116,7 @@ namespace Isis {
   }
 
 
-  ControlPoint::PointType ControlPoint::Type() const {
+  ControlPoint::PointType ControlPoint::GetType() const {
     return p_type;
   }
 
@@ -1131,23 +1132,23 @@ namespace Isis {
   }
 
 
-  ControlPoint::RadiusSource::Source ControlPoint::AprioriRadiusSource()
+  ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
       const {
     return p_aprioriRadiusSource;
   }
 
 
-  iString ControlPoint::AprioriRadiusSourceFile() const {
+  iString ControlPoint::GetAprioriRadiusSourceFile() const {
     return p_aprioriRadiusSourceFile;
   }
 
   ControlPoint::SurfacePointSource::Source
-      ControlPoint::AprioriSurfacePointSource() const {
+      ControlPoint::GetAprioriSurfacePointSource() const {
     return p_aprioriSurfacePointSource;
   }
 
 
-  iString ControlPoint::AprioriSurfacePointSourceFile() const {
+  iString ControlPoint::GetAprioriSurfacePointSourceFile() const {
     return p_aprioriSurfacePointSourceFile;
   }
 
@@ -1156,7 +1157,7 @@ namespace Isis {
    *
    * @return Number of valid control measures
    */
-  int ControlPoint::NumValidMeasures() const {
+  int ControlPoint::GetNumValidMeasures() const {
     int size = 0;
     for(int cm = 0; cm < Size(); cm ++) {
       if(!p_measures[cm].IsIgnored()) size ++;
@@ -1170,7 +1171,7 @@ namespace Isis {
    *
    * @return Number of locked control measures
    */
-  int ControlPoint::NumLockedMeasures() const {
+  int ControlPoint::GetNumLockedMeasures() const {
     int size = 0;
     for(int cm = 0; cm < Size(); cm ++) {
       if (p_measures[cm].IsEditLocked()) size ++;
@@ -1207,7 +1208,7 @@ namespace Isis {
 
     if (p_measures.size() == 0) {
       iString msg = "There are no ControlMeasures in the ControlPoint [" +
-          Id() + "]";
+          GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1232,7 +1233,7 @@ namespace Isis {
    *                        comparison of MeasureType. 
    * @return int
    */
-  int ControlPoint::ReferenceIndexNoException() const {
+  int ControlPoint::GetReferenceIndexNoException() const {
     if(p_measures.size() == 0) {
       return -1;
     }
@@ -1252,10 +1253,10 @@ namespace Isis {
    *
    * @return The PvlObject created
    */
-  int ControlPoint::ReferenceIndex() const {
+  int ControlPoint::GetReferenceIndex() const {
     if (p_measures.size() == 0) {
       iString msg = "There are no ControlMeasures in the ControlPoint [" +
-          Id() + "]";
+          GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1270,7 +1271,7 @@ namespace Isis {
     }
 
     iString msg = "There are no Measured ControlMeasures in the ControlPoint ["
-        + Id() + "]";
+        + GetId() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1282,8 +1283,8 @@ namespace Isis {
    * 
    * @return bool - True/False for EditLock 
    */
-  bool ControlPoint::ReferenceLocked() const {
-    int iRefIndex = ReferenceIndexNoException();
+  bool ControlPoint::IsReferenceLocked() const {
+    int iRefIndex = GetReferenceIndexNoException();
 
     if (iRefIndex == -1) {
       return false;
@@ -1298,7 +1299,7 @@ namespace Isis {
    * 
    *  @history 2010-12-06  Tracie Sucharski, Renamed from AverageError 
    */
-  double ControlPoint::AverageResidual() const {
+  double ControlPoint::GetAverageResidual() const {
     double errorSum = 0.0;
     int errorCount = 0;
     for (int i = 0; i < p_measures.size(); i ++) {
@@ -1323,9 +1324,9 @@ namespace Isis {
    * 
    * @return double 
    */
-  double ControlPoint::MinimumResidual() const {
+  double ControlPoint::GetMinimumResidual() const {
     double dMinError = VALID_MAX4;
-    if(Ignore()) return dMinError;
+    if(IsIgnored()) return dMinError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
       if(p_measures[j].IsIgnored()) continue;
@@ -1347,9 +1348,9 @@ namespace Isis {
    * 
    * @return double 
    */
-  double ControlPoint::MinimumSampleResidual() const {
+  double ControlPoint::GetMinimumSampleResidual() const {
     double dMinError = VALID_MAX4;
-    if(Ignore()) return dMinError;
+    if(IsIgnored()) return dMinError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
       if(p_measures[j].IsIgnored()) continue;
@@ -1371,9 +1372,9 @@ namespace Isis {
    *
    * @return double 
    */
-  double ControlPoint::MinimumLineResidual() const {
+  double ControlPoint::GetMinimumLineResidual() const {
     double dMinError = VALID_MAX4;
-    if(Ignore()) return dMinError;
+    if(IsIgnored()) return dMinError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
       if(p_measures[j].IsIgnored()) continue;
@@ -1394,9 +1395,9 @@ namespace Isis {
    *
    * @history 2010-12-06  Tracie Sucharski, Renamed from MaximumError
    */
-  double ControlPoint::MaximumResidual() const {
+  double ControlPoint::GetMaximumResidual() const {
     double maxResidual = 0.0;
-    if (Ignore()) return maxResidual;
+    if (IsIgnored()) return maxResidual;
 
     for (int j=0; j<(int) p_measures.size(); j++) {
       if (p_measures[j].IsIgnored()) continue;
@@ -1416,9 +1417,9 @@ namespace Isis {
    * 
    * @return double 
    */
-  double ControlPoint::MaximumSampleResidual() const {
+  double ControlPoint::GetMaximumSampleResidual() const {
     double dMaxError = 0.0;
-    if(Ignore()) return dMaxError;
+    if(IsIgnored()) return dMaxError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
       if(p_measures[j].IsIgnored()) continue;
@@ -1441,9 +1442,9 @@ namespace Isis {
    * 
    * @return double 
    */
-  double ControlPoint::MaximumLineResidual() const {
+  double ControlPoint::GetMaximumLineResidual() const {
     double dMaxError = 0.0;
-    if(Ignore()) return dMaxError;
+    if(IsIgnored()) return dMaxError;
 
     for(int j = 0; j < (int) p_measures.size(); j++) {
       if(p_measures[j].IsIgnored()) continue;
@@ -1464,7 +1465,7 @@ namespace Isis {
    * @return The PvlObject created
    *
    */
-  PvlObject ControlPoint::CreatePvlObject() const {
+  PvlObject ControlPoint::ToPvlObject() const {
     PvlObject p("ControlPoint");
     switch (p_type) {
       case Tie:
@@ -1476,8 +1477,8 @@ namespace Isis {
     }
 
     p += PvlKeyword("PointId", p_id);
-    p += PvlKeyword("ChooserName", ChooserName());
-    p += PvlKeyword("DateTime", DateTime());
+    p += PvlKeyword("ChooserName", GetChooserName());
+    p += PvlKeyword("DateTime", GetDateTime());
 
     if (p_editLock == true) {
       p += PvlKeyword("EditLock", "True");
@@ -1618,7 +1619,7 @@ namespace Isis {
       }
     }
     iString msg = "Requested measurement serial number [" + serialNumber + "] ";
-    msg += "does not exist in ControlPoint [" + Id() + "].";
+    msg += "does not exist in ControlPoint [" + GetId() + "].";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -1695,44 +1696,6 @@ namespace Isis {
     p_measures     = pPoint.p_measures;
 
     return *this;
-  }
-
-
-  /**
-   * Set the ground coordinate of a control point
-   *
-   * @param lat     planetocentric latitude in degrees
-   * @param lon     planetocentric longitude in degrees
-   * @param radius  radius at coordinate in meters 
-   *  
-   * @return Status Success or PointLocked 
-   */
-  ControlPoint::Status ControlPoint::SetUniversalGround(double lat,
-                                                        double lon,
-                                                        double radius) {
-    if (p_editLock) return PointLocked;
-    PointModified();
-    p_surfacePoint.SetSpherical(Latitude(lat, Angle::Degrees),
-        Longitude(lon, Angle::Degrees), Distance(radius));
-    return Success;
-  }
-
-
-  //! Return the planetocentric latitude of the point in degrees (DEPRECATED)
-  double ControlPoint::UniversalLatitude() const {
-    return p_surfacePoint.GetLatitude().GetDegrees();
-  }
-
-
-  //! Return the planetocentric longitude of the point in degrees (DEPRECATED)
-  double ControlPoint::UniversalLongitude() const {
-    return p_surfacePoint.GetLongitude().GetDegrees();
-  }
-
-
-  //! Return the radius of the point in meters
-  Distance ControlPoint::Radius() const {
-    return p_surfacePoint.GetLocalRadius();
   }
 
 
@@ -1872,7 +1835,8 @@ namespace Isis {
 
 
   int ControlPoint::FindMeasureIndex(iString serialNumber) const {
-    for (int measureIndex = 0; measureIndex < NumMeasures(); measureIndex ++) {
+    for (int measureIndex = 0; measureIndex < GetNumMeasures();
+         measureIndex ++) {
       const ControlMeasure &currentMeasure = GetMeasure(measureIndex);
 
       if (currentMeasure.GetCubeSerialNumber() == serialNumber) {
@@ -1881,7 +1845,7 @@ namespace Isis {
     }
 
     iString msg = "No control measures with a serial number [" + serialNumber +
-        "] exist in control point [" + Id() + "]";
+        "] exist in control point [" + GetId() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1922,8 +1886,8 @@ namespace Isis {
   PBControlNet_PBControlPoint ControlPoint::ToProtocolBuffer() const {
     PBControlNet_PBControlPoint pbPoint;
 
-    pbPoint.set_id(Id());
-    switch (Type()) {
+    pbPoint.set_id(GetId());
+    switch (GetType()) {
       case ControlPoint::Tie:
         pbPoint.set_type(PBControlNet_PBControlPoint::Tie);
         break;
@@ -1932,17 +1896,17 @@ namespace Isis {
         break;
     }
 
-    if (!ChooserName().empty()) {
-      pbPoint.set_choosername(ChooserName());
+    if (!GetChooserName().empty()) {
+      pbPoint.set_choosername(GetChooserName());
     }
-    if (!DateTime().empty()) {
-      pbPoint.set_datetime(DateTime());
+    if (!GetDateTime().empty()) {
+      pbPoint.set_datetime(GetDateTime());
     }
-    if (EditLock()) pbPoint.set_editlock(true);
-    if (Ignore()) pbPoint.set_ignore(true);
+    if (IsEditLocked()) pbPoint.set_editlock(true);
+    if (IsIgnored()) pbPoint.set_ignore(true);
     if (IsRejected()) pbPoint.set_jigsawrejected(true);
 
-    switch (AprioriSurfacePointSource()) {
+    switch (GetAprioriSurfacePointSource()) {
       case ControlPoint::SurfacePointSource::None:
         break;
       case ControlPoint::SurfacePointSource::User:
@@ -1963,10 +1927,10 @@ namespace Isis {
       default:
         break;
     }
-    if (!AprioriSurfacePointSourceFile().empty()) {
-      pbPoint.set_apriorixyzsourcefile(AprioriSurfacePointSourceFile());
+    if (!GetAprioriSurfacePointSourceFile().empty()) {
+      pbPoint.set_apriorixyzsourcefile(GetAprioriSurfacePointSourceFile());
     }
-    switch (AprioriRadiusSource()) {
+    switch (GetAprioriRadiusSource()) {
       case ControlPoint::RadiusSource::None:
         break;
       case ControlPoint::RadiusSource::User:
@@ -1987,8 +1951,8 @@ namespace Isis {
       default:
         break;
     }
-    if (!AprioriRadiusSourceFile().empty()) {
-      pbPoint.set_aprioriradiussourcefile(AprioriRadiusSourceFile());
+    if (!GetAprioriRadiusSourceFile().empty()) {
+      pbPoint.set_aprioriradiussourcefile(GetAprioriRadiusSourceFile());
     }
 
     if (GetAprioriSurfacePoint().Valid()) {

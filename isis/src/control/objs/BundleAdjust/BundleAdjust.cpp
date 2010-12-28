@@ -214,13 +214,13 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )     {
       const ControlPoint & point = (*m_pCnet)[i];
 
-      if ( point.Ignore() ) {
+      if ( point.IsIgnored() ) {
           m_nPointIndexMap.push_back(-1);
           m_nIgnoredPoints++;
           continue;
       }
 
-      if ( point.Type() == ControlPoint::Ground )
+      if ( point.GetType() == ControlPoint::Ground )
         m_nGroundPoints++;
 
       m_nPointIndexMap.push_back(count);
@@ -947,7 +947,7 @@ namespace Isis {
 //      std::cout << "   processing point " << i << " with id = " << point.Id() << std::endl;
 
 
-      if( point.Ignore() )
+      if( point.IsIgnored() )
         continue;
 
 //    printf("Processing %s - 3D Point %d of %d\n", point.Id().c_str(),nPointIndex,n3DPoints);
@@ -986,7 +986,8 @@ namespace Isis {
         // flagged as "JigsawFail" implies this measure has been rejected 
         // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
         if( measure.IsRejected() ) {
-          printf("skipping rejected observation for %s\n",point.Id().c_str());  
+          printf("skipping rejected observation for %s\n",
+              point.GetId().c_str());
           continue;
         }
 
@@ -1227,7 +1228,7 @@ namespace Isis {
     int nPointIndex = 0;
     for( int i = 0; i < n3DPoints; i++ ) {
       ControlPoint point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
 //      {
 //        nPointIndex++;  
         continue;
@@ -1245,7 +1246,7 @@ namespace Isis {
 //      std::cout << weights << std::endl;
 
 //      if( point.Held() || point.Type() == ControlPoint::Ground )
-      if (point.Type() == ControlPoint::Ground ) {
+      if (point.GetType() == ControlPoint::Ground ) {
         weights[0] = 1.0e+25;
         weights[1] = 1.0e+25;
         weights[2] = 1.0e+25;
@@ -1367,7 +1368,7 @@ namespace Isis {
     for( int i = 0; i < n3DPoints; i++ ) {
       ControlPoint point = (*m_pCnet)[i];
 
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
       SurfacePoint aprioriSurfacePoint = point.GetAprioriSurfacePoint();
@@ -1827,7 +1828,7 @@ namespace Isis {
     //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
     if (!(pCamera->GroundMap()->GetXY( point.GetSurfacePoint(), &dComputedx, &dComputedy ))) {
       std::string msg = "Unable to map apriori surface point for measure ";
-      msg += measure.GetCubeSerialNumber() + " on point " + point.Id() + " into focal plane";
+      msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
       throw iException::Message(iException::User,msg,_FILEINFO_);
     }
 
@@ -2382,7 +2383,7 @@ namespace Isis {
   {
     const ControlPoint& point = (*m_pCnet)[nPointIndex];
 
-    if( point.Ignore() )
+    if( point.IsIgnored() )
       return;
 
     // pointers to partial derivative vectors
@@ -2477,7 +2478,7 @@ namespace Isis {
       double dComputedx, dComputedy;
       if (!(pCamera->GroundMap()->GetXY( point.GetSurfacePoint(), &dComputedx, &dComputedy ))) {
         std::string msg = "Unable to map apriori surface point for measure ";
-        msg += measure.GetCubeSerialNumber() + " on point " + point.Id() + " into focal plane";
+        msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
         throw iException::Message(iException::User,msg,_FILEINFO_);
       }
 
@@ -2733,7 +2734,7 @@ namespace Isis {
     {
       const ControlPoint& point = (*m_pCnet)[i];
 
-      if( point.Ignore() )
+      if( point.IsIgnored() )
         return nSuccessfullyTriangulated;
 
       if( bDoApproximation )
@@ -3157,7 +3158,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       ControlPoint point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
 //      if( point.Status() == ControlPoint::JigsawHighSigma )
@@ -3263,7 +3264,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
 // Next line appears to do nothing so skip it.
@@ -3303,7 +3304,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.Ignore() || point.Invalid() )
+      if ( point.IsIgnored() || point.IsInvalid() )
         continue;
 
       // get weight and correction vector for this point
@@ -3358,7 +3359,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       ControlPoint point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
       point.ComputeResiduals();
@@ -3409,7 +3410,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
 //      if ( point.Status() == ControlPoint::JigsawHighSigma )
@@ -3506,7 +3507,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       ControlPoint point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
 // Do we need this method below...TODO
@@ -3583,8 +3584,8 @@ namespace Isis {
 
       int ndummy = point.GetNumberOfRejectedMeasures();
       m_pCnet->UpdatePoint(point);
-      printf("Rejected for point %s = %d\n",point.Id().c_str(),ndummy);
-      printf("%s: %20.10lf  %20.10lf*\n",point.Id().c_str(),rejected.GetSampleResidual(),rejected.GetLineResidual());
+      printf("Rejected for point %s = %d\n",point.GetId().c_str(),ndummy);
+      printf("%s: %20.10lf  %20.10lf*\n",point.GetId().c_str(),rejected.GetSampleResidual(),rejected.GetLineResidual());
     }
 
     printf("Total Rejections: %d\n", ntotalrejected);
@@ -3610,7 +3611,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
       T.clear();
@@ -3743,7 +3744,7 @@ namespace Isis {
     for ( int i = 0; i < nObjectPoints; i++ )
     {
       ControlPoint point = (*m_pCnet)[i];
-      if ( point.Ignore() )
+      if ( point.IsIgnored() )
         continue;
 
       double dLat = point.GetSurfacePoint().GetLatitude().GetDegrees();
@@ -3940,7 +3941,7 @@ namespace Isis {
      for ( int i = 0; i < nObjectPoints; i++ )
      {
        const ControlPoint& point = (*m_pCnet)[i];
-       if( point.Ignore() )
+       if( point.IsIgnored() )
          continue;
 /*
        if(  m_dGlobalLatitudeAprioriSigma > 0.0 )
@@ -3988,7 +3989,7 @@ namespace Isis {
        dVarianceRad = dAprioriSigmaRad * 0.001;
        dVarianceRad *= dVarianceRad;
 
-       if( point.Type() == ControlPoint::Ground ) {
+       if( point.GetType() == ControlPoint::Ground ) {
          m_dParameterWeights[nWtIndex] = 1.0e+25;
          m_dParameterWeights[nWtIndex+1] = 1.0e+25;
          m_dParameterWeights[nWtIndex+2] = 1.0e+25;
@@ -4042,7 +4043,7 @@ namespace Isis {
      for (int i = 0; i < nPoints; i++)
      {
        ControlPoint point = (*m_pCnet)[i];
-       if( point.Ignore() )
+       if( point.IsIgnored() )
          continue;
 
        dSigmaLat = sqrt((double)(lsqCovMatrix(nIndex,nIndex)));
@@ -4492,7 +4493,7 @@ namespace Isis {
      for (int i = 0; i < nPoints; i++)
      {
        const ControlPoint& point = (*m_pCnet)[i];
-       if( point.Ignore() )
+       if( point.IsIgnored() )
          continue;
 
        nRays = point.Size();
@@ -4508,15 +4509,15 @@ namespace Isis {
 //     if( point.Held() )
 //       strStatus = "HELD";
 //     else if( point.Type() == ControlPoint::Ground)
-       if( point.Type() == ControlPoint::Ground)
+       if( point.GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.Type() == ControlPoint::Tie)
+       else if( point.GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
 
        sprintf(buf,"%16s%9s%5d of %d%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-               point.Id().c_str(),strStatus.c_str(),nGoodRays,nRays,dLat,dLon,dRadius*0.001,dSigmaLat,dSigmaLong,dSigmaRadius);
+               point.GetId().c_str(),strStatus.c_str(),nGoodRays,nRays,dLat,dLon,dRadius*0.001,dSigmaLat,dSigmaLong,dSigmaRadius);
 
        fp_out << buf;
        nPointIndex++;
@@ -4530,7 +4531,7 @@ namespace Isis {
      for (int i = 0; i < nPoints; i++)
      {
        const ControlPoint& point = (*m_pCnet)[i];
-       if( point.Ignore() )
+       if( point.IsIgnored() )
          continue;
 
        nRays = point.Size();
@@ -4561,14 +4562,14 @@ namespace Isis {
 //     if( point.Held() )
 //       strStatus = "HELD";
 //     else if( point.Type() == ControlPoint::Ground)
-       if( point.Type() == ControlPoint::Ground)
+       if( point.GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.Type() == ControlPoint::Tie)
+       else if( point.GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
 
-       sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",point.Id().c_str(),strStatus.c_str(),nGoodRays,nRays);
+       sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",point.GetId().c_str(),strStatus.c_str(),nGoodRays,nRays);
        fp_out << buf;
 
 //       sprintf(buf,"%16s%9s%9d\n",
@@ -4965,7 +4966,7 @@ namespace Isis {
      {
        const ControlPoint& point = (*m_pCnet)[i];
 
-       if( point.Ignore() )
+       if( point.IsIgnored() )
          continue;
 
        nRays = point.Size();
@@ -4976,15 +4977,15 @@ namespace Isis {
 //     if( point.Held() )
 //       strStatus = "HELD";
 //     else if( point.Type() == ControlPoint::Ground)
-       if( point.Type() == ControlPoint::Ground)
+       if( point.GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.Type() == ControlPoint::Tie)
+       else if( point.GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
 
        sprintf(buf,"%16s%9s%9d%16.8lf%16.8lf%16.8lf%16s%16s%16s\n",
-               point.Id().c_str(),strStatus.c_str(),nRays,dLat,dLon,dRadius*0.001,"N/A","N/A","N/A");
+               point.GetId().c_str(),strStatus.c_str(),nRays,dLat,dLon,dRadius*0.001,"N/A","N/A","N/A");
 
        fp_out << buf;
      }
@@ -5013,7 +5014,7 @@ namespace Isis {
      for (int i = 0; i < nPoints; i++) {
        const ControlPoint& point = (*m_pCnet)[i];
 
-       if( point.Ignore() )
+       if( point.IsIgnored() )
          continue;
 
        dLat = point.GetSurfacePoint().GetLatitude();
@@ -5023,9 +5024,9 @@ namespace Isis {
 //     if( point.Held() )
 //       strStatus = "HELD";
 //     else if( point.Type() == ControlPoint::Ground)
-       if( point.Type() == ControlPoint::Ground)
+       if( point.GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.Type() == ControlPoint::Tie)
+       else if( point.GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
@@ -5037,11 +5038,11 @@ namespace Isis {
          dSigmaRadius = point.GetSurfacePoint().GetLocalRadiusSigma();
 
          sprintf(buf,"%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                 point.Id().c_str(),strStatus.c_str(),dLat,dLon,dRadius*0.001,
+                 point.GetId().c_str(),strStatus.c_str(),dLat,dLon,dRadius*0.001,
                  dSigmaLat,dSigmaLong,dSigmaRadius);
        }
        else
-         sprintf(buf,"%s,%16.8lf,%16.8lf,%16.8lf\n", point.Id().c_str(),dLat,dLon,dRadius*0.001);
+         sprintf(buf,"%s,%16.8lf,%16.8lf,%16.8lf\n", point.GetId().c_str(),dLat,dLon,dRadius*0.001);
 
        fp_out << buf;
      }
@@ -5077,7 +5078,7 @@ namespace Isis {
      for ( int i = 0; i < nObjectPoints; i++ )
      {
        const ControlPoint& point = (*m_pCnet)[i];
-       if ( point.Ignore() )
+       if ( point.IsIgnored() )
          continue;
 
        int nObservations = point.Size();
@@ -5096,11 +5097,11 @@ namespace Isis {
 
          if( measure.IsRejected() )
              sprintf(buf,"%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-                     point.Id().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
+                     point.GetId().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
                      measure.GetFocalPlaneMeasuredX(),measure.GetFocalPlaneMeasuredY(),measure.GetSampleResidual(),measure.GetLineResidual(),measure.GetResidualMagnitude());
          else
              sprintf(buf,"%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                     point.Id().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
+                     point.GetId().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
                      measure.GetFocalPlaneMeasuredX(),measure.GetFocalPlaneMeasuredY(),measure.GetSampleResidual(),measure.GetLineResidual(),measure.GetResidualMagnitude());
          fp_out << buf;
        }

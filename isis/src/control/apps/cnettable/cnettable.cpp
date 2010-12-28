@@ -179,17 +179,17 @@ void IsisMain() {
 
     // Always add data
     measureInfo.clear();
-    measureInfo += cpoint.Id().ToQt() + ",";
-    measureInfo += cpoint.PointTypeString().ToQt() + ",";
-    measureInfo += iString(cpoint.ChooserName()).ToQt() + ",";
-    measureInfo += iString(cpoint.DateTime()).ToQt() + ",";
-    measureInfo += iString(cpoint.EditLock()).ToQt() + ",";
-    measureInfo += iString(cpoint.Ignore()).ToQt() + ",";
+    measureInfo += cpoint.GetId().ToQt() + ",";
+    measureInfo += cpoint.GetPointTypeString().ToQt() + ",";
+    measureInfo += iString(cpoint.GetChooserName()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetDateTime()).ToQt() + ",";
+    measureInfo += iString(cpoint.IsEditLocked()).ToQt() + ",";
+    measureInfo += iString(cpoint.IsIgnored()).ToQt() + ",";
 
-    measureInfo += iString(cpoint.SurfacePointSourceString()).ToQt() + ",";
-    measureInfo += iString(cpoint.AprioriSurfacePointSourceFile()).ToQt() + ",";
-    measureInfo += iString(cpoint.RadiusSourceString()).ToQt() + ",";
-    measureInfo += iString(cpoint.AprioriRadiusSourceFile()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetSurfacePointSourceString()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetAprioriSurfacePointSourceFile()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetRadiusSourceString()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetAprioriRadiusSourceFile()).ToQt() + ",";
 
     SurfacePoint Asp = cpoint.GetAprioriSurfacePoint();
     measureInfo += iString(Asp.GetX().GetKilometers()).ToQt() + ",";
@@ -239,13 +239,13 @@ void IsisMain() {
       measureInfo += ",";
     }
 
-    measureInfo += iString(cpoint.MinimumResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.MaximumResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.AverageResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.MinimumSampleResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.MaximumSampleResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.MinimumLineResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.MinimumLineResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetMinimumResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetMaximumResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetAverageResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetMinimumSampleResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetMaximumSampleResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetMinimumLineResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint.GetMinimumLineResidual()).ToQt() + ",";
     
     // Loop through all measures in controlpoint
     for(int j = 0; j < cpoint.Size(); j++) {

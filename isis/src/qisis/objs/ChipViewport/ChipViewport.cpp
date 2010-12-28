@@ -256,11 +256,11 @@ namespace Qisis {
           
           // Determine pen color
           // if the point or measure is ignored set to yellow
-          if (p.Ignore() || (!p.Ignore() && p[serialNumber].IsIgnored())) {
+          if (p.IsIgnored() || (!p.IsIgnored() && p[serialNumber].IsIgnored())) {
             painter.setPen(QColor(255,255,0)); // set point marker yellow
           }
           // check for ground measure
-          else if (p.Type() == Isis::ControlPoint::Ground) {
+          else if (p.GetType() == Isis::ControlPoint::Ground) {
             painter.setPen(Qt::magenta);// set point marker magenta
           }
           else {

@@ -80,7 +80,7 @@ void IsisMain() {
 
     // Establish whether or not we want to attempt to register this point.
     bool wantToRegister = true;
-    if (outPoint.Ignore()) {
+    if (outPoint.IsIgnored()) {
       if (registerPoints == "NONIGNORED") wantToRegister = false;
     }
     else {
@@ -90,7 +90,7 @@ void IsisMain() {
     // Check if this is a point we wish to disregard.
     if (!wantToRegister) {
       // Keep track of how many ignored points we didn't register.
-      if (outPoint.Ignore()) {
+      if (outPoint.IsIgnored()) {
         ignored++;
 
         // If the point is ignored and the user doesn't want them, delete it
@@ -101,11 +101,11 @@ void IsisMain() {
       }
     }
     else {  // "Ignore" or "valid" point to be registered
-      if (outPoint.Ignore()) {
+      if (outPoint.IsIgnored()) {
         outPoint.SetIgnore(false);
       }
 
-      ControlMeasure patternCM = outPoint[outPoint.ReferenceIndex()];
+      ControlMeasure patternCM = outPoint[outPoint.GetReferenceIndex()];
       Cube &patternCube = *cubeMgr.OpenCube(
           files.Filename(patternCM.GetCubeSerialNumber()));
 
@@ -117,7 +117,7 @@ void IsisMain() {
       }
       else {
         // Reference isn't locked, but the point is!
-        if (outPoint.EditLock()) {
+        if (outPoint.IsEditLocked()) {
           // TODO
           // Report as error
           // Then skip this point
@@ -136,7 +136,7 @@ void IsisMain() {
       // Register all the unlocked measurements
       int j = 0;
       while (j < outPoint.Size()) {
-        if (j == outPoint.ReferenceIndex()) {
+        if (j == outPoint.GetReferenceIndex()) {
           // don't register the reference, go to next measure
           if (!outPoint[j].IsIgnored()) goodMeasureCount++;
         }
@@ -266,7 +266,7 @@ void IsisMain() {
       // registered. When a measure can't be registered to the reference then
       // that measure is set to be ignored where in the past the whole point
       // was ignored
-      if (goodMeasureCount < 2 && outPoint.Type() != ControlPoint::Ground) {
+      if (goodMeasureCount < 2 && outPoint.GetType() != ControlPoint::Ground) {
         outPoint.SetIgnore(true);
       }
 
@@ -277,7 +277,7 @@ void IsisMain() {
       // to "ignore".  If not, add it to the network. If so, only
       // add it to the output if the OUTPUTIGNORED parameter is selected
       // 2008-11-14 Jeannie Walldren
-      if (outPoint.Ignore()) {
+      if (outPoint.IsIgnored()) {
         ignored++;
         if (!ui.GetBoolean("OUTPUTIGNORED")) {
           outNet.Delete(i);
@@ -316,9 +316,9 @@ void IsisMain() {
       // get point from output control net and its
       // corresponding point from input control net
       ControlPoint outPoint = outNet[i];
-      ControlPoint *inPoint = inNet.Find(outPoint.Id());
+      ControlPoint *inPoint = inNet.Find(outPoint.GetId());
 
-      if (!outPoint.Ignore()) {
+      if (!outPoint.IsIgnored()) {
         for (int i = 0; i < outPoint.Size(); i++) {
 
           // get measure and find its corresponding measure from input net
@@ -344,7 +344,7 @@ void IsisMain() {
            if(fabs(goodnessOfFit) <= DBL_EPSILON || goodnessOfFit == NULL8) goodnessOfFit = 0;
            */
 
-          string pointId = outPoint.Id();
+          string pointId = outPoint.GetId();
 
           os << pointId << "," << inSamp << ","
             << inLine << "," << outSamp << ","

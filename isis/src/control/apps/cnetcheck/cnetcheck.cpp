@@ -91,7 +91,7 @@ void IsisMain() {
 
   // Loop through all control points in control net
   for(int cp = 0; cp < innet.Size(); cp ++) {
-    if(ignore && innet[cp].Ignore()) continue;
+    if(ignore && innet[cp].IsIgnored()) continue;
     ControlPoint controlpt(innet[cp]);
 
     // Checks for lat/Lon production
@@ -126,16 +126,16 @@ void IsisMain() {
           // Record it if it failed at anything
           if(createFail || !setPassed) {
             noLatLonSerialNumbers.insert(controlms.GetCubeSerialNumber());
-            noLatLonControlPoints[controlms.GetCubeSerialNumber()].insert(controlpt.Id());
+            noLatLonControlPoints[controlms.GetCubeSerialNumber()].insert(controlpt.GetId());
           }
         }
       }
     }
     // Checks of the ControlPoint has only 1 Measure
-    if(controlpt.NumValidMeasures() == 1) {
+    if(controlpt.GetNumValidMeasures() == 1) {
       iString sn = controlpt[0].GetCubeSerialNumber();
       singleMeasureSerialNumbers.insert(sn);
-      singleMeasureControlPoints[sn].insert(controlpt.Id());
+      singleMeasureControlPoints[sn].insert(controlpt.GetId());
 
       // Records how many times a cube is in the ControlNet
       cubeMeasureCount[sn] ++;
@@ -156,7 +156,7 @@ void IsisMain() {
         for(int pre_cm = controlMeasures.size() - 1 - 1; pre_cm >= 0; pre_cm --) {
           if(controlMeasures[pre_cm].GetCubeSerialNumber() == currentsn) {
             duplicateSerialNumbers.insert(currentsn);   //serial number duplication
-            duplicateControlPoints[currentsn].insert(controlpt.Id());
+            duplicateControlPoints[currentsn].insert(controlpt.GetId());
           }
         }
 
@@ -417,14 +417,14 @@ QMap< iString, std::set<iString> > constructPointSets(std::set<iString> & index,
   bool ignore = Application::GetUserInterface().GetBoolean("IGNORE");
   for(int cp = 0; cp < innet.Size(); cp++) {
 
-    if(ignore && innet[cp].Ignore()) continue;
+    if(ignore && innet[cp].IsIgnored()) continue;
 
-    if(innet[cp].NumValidMeasures() < 2) continue;
+    if(innet[cp].GetNumValidMeasures() < 2) continue;
 
     ControlPoint controlpt = innet[cp];
     // Map SerialNumbers together based on ControlMeasures
     for(int cm1 = 0; cm1 < controlpt.Size(); cm1++) {
-      if(ignore && controlpt.Ignore()) continue;
+      if(ignore && controlpt.IsIgnored()) continue;
 
       iString sn = controlpt[cm1].GetCubeSerialNumber();
       index.insert(sn);

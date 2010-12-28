@@ -103,7 +103,7 @@ int main() {
   cerr << "  ControlPoint  |  Images\n"
        "----------------|--------------------------";
   for(int i = 0; i < cnet.Size(); i++) {
-    cerr << "\n\t" << cnet[i].Id() << "\t|";
+    cerr << "\n\t" << cnet[i].GetId() << "\t|";
     for(int j = 0; j < cnet[i].Size(); j++) {
       cerr << "\t" << cnet[i][j].GetCubeSerialNumber();
     }

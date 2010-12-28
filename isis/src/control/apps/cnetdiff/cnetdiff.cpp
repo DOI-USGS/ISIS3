@@ -117,8 +117,8 @@ void Compare(ControlNet net1, ControlNet net2) {
 }
 
 void Compare(const ControlPoint &point1, const ControlPoint &point2) {
-  PvlObject point1Pvl = point1.CreatePvlObject();
-  PvlObject point2Pvl = point2.CreatePvlObject();
+  PvlObject point1Pvl = point1.ToPvlObject();
+  PvlObject point2Pvl = point2.ToPvlObject();
 
   // both names must be at least equal, should be named ControlPoint
   if(point1Pvl.Name() != point2Pvl.Name()) {
@@ -151,7 +151,7 @@ void Compare(const ControlPoint &point1, const ControlPoint &point2) {
   }
 
   if(!filesMatch) {
-    differenceReason = "Control Point [" + point1.Id() +
+    differenceReason = "Control Point [" + point1.GetId() +
         "] " + differenceReason;
   }
 }

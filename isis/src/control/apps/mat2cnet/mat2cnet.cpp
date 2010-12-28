@@ -8,6 +8,8 @@
 #include "FileList.h"
 #include "ID.h"
 #include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Process.h"
 #include "Pvl.h"
 #include "SerialNumberList.h"
@@ -390,7 +392,9 @@ void IsisMain() {
       if(cpoint != NULL) {
         //Add the lat,lon,rad to point
         try {
-          cpoint->SetUniversalGround(lat, lon, rad);
+          SurfacePoint surfacePt(Latitude(lat, Angle::Degrees),
+              Longitude(lon, Angle::Degrees), Distance(rad));
+          cpoint->SetSurfacePoint(surfacePt);
         }
         catch(iException &e) {
           iString msg = "Unable to set universal ground point to control network from line [";

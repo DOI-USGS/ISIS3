@@ -29,7 +29,7 @@ void IsisMain() {
       string msg = "Control points must have exactly 2 control measures";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
-    if(!cp.Ignore()) {
+    if(!cp.IsIgnored()) {
       inputLine.push_back(cp[0].GetLine());
       inputSample.push_back(cp[0].GetSample());
       outputLine.push_back(cp[1].GetLine());

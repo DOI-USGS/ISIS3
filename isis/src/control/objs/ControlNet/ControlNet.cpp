@@ -109,7 +109,7 @@ namespace Isis {
             ControlPoint cp;
             cp.Load(cn.Object(i),forceBuild);
             p_numMeasures += cp.Size();
-            if (cp.Ignore()) {
+            if (cp.IsIgnored()) {
               p_numIgnoredMeasures += cp.Size();
             }
             else {
@@ -385,7 +385,7 @@ namespace Isis {
     net += PvlKeyword("Description", p_description);
 
     for (int i=0; i<(int)p_pointsHash.count(); i++) {
-      PvlObject cp = p_pointsHash[p_pointIds[i]].CreatePvlObject();
+      PvlObject cp = p_pointsHash[p_pointIds[i]].ToPvlObject();
       net.AddObject(cp);
     }
     p.AddObject(net);
@@ -412,13 +412,13 @@ namespace Isis {
    *             have unique Id"
    */
   void ControlNet::Add (const ControlPoint &point, bool forceBuild) {
-    if(p_pointsHash.contains(point.Id())) {
+    if(p_pointsHash.contains(point.GetId())) {
       iString msg = "ControlPoint must have unique Id";
       throw iException::Message(iException::Programmer,msg,_FILEINFO_);
     }
     else {
-      p_pointsHash.insert(point.Id(), point);
-      p_pointIds.push_back(point.Id());
+      p_pointsHash.insert(point.GetId(), point);
+      p_pointIds.push_back(point.GetId());
     }
   }
 
@@ -439,7 +439,7 @@ namespace Isis {
     else {
       // See if removing this point qualifies for a re-check of validity
       bool check = false;
-      if( p_invalid && p_pointsHash[p_pointIds[index]].Invalid()) check = true;
+      if( p_invalid && p_pointsHash[p_pointIds[index]].IsInvalid()) check = true;
 
       p_pointsHash.remove(p_pointIds[index]);
       p_pointIds.removeAt(index);
@@ -448,7 +448,7 @@ namespace Isis {
       if( check ) {
         p_invalid = false;
         for (int i=0; i<Size() && !p_invalid; i++) {
-          if(p_pointsHash.contains(p_pointsHash[p_pointIds[i]].Id())) {
+          if(p_pointsHash.contains(p_pointsHash[p_pointIds[i]].GetId())) {
               p_invalid = true;
           }
         }
@@ -543,8 +543,8 @@ namespace Isis {
     double avgResidual = 0.0;
     int count = 0;
     for (int i=0; i<(int)p_pointsHash.count(); i++) {
-      if (p_pointsHash[p_pointIds[i]].Ignore()) continue;
-      avgResidual += p_pointsHash[p_pointIds[i]].AverageResidual();
+      if (p_pointsHash[p_pointIds[i]].IsIgnored()) continue;
+      avgResidual += p_pointsHash[p_pointIds[i]].GetAverageResidual();
       count++;
     }
 
@@ -596,7 +596,7 @@ namespace Isis {
    * @return <B>bool</B> If the ControlPoint id was found 
    */
   bool ControlNet::Exists( ControlPoint &point ) {
-    if(p_pointsHash.contains(point.Id())) {
+    if(p_pointsHash.contains(point.GetId())) {
       return true;
     }
     return false;
@@ -612,7 +612,7 @@ namespace Isis {
   *         the same ID
   */
   ControlPoint *ControlNet::Find(const ControlPoint &point) {
-    return Find(point.Id());
+    return Find(point.GetId());
   }
 
 
@@ -690,7 +690,7 @@ namespace Isis {
     // TODO:  Make sure the cameras have been initialized
     double maxResidual = 0.0;
     for (int i=0; i<(int)p_pointsHash.count(); i++) {
-      double residual = p_pointsHash[p_pointIds[i]].MaximumResidual();
+      double residual = p_pointsHash[p_pointIds[i]].GetMaximumResidual();
       if (residual > maxResidual) maxResidual = residual;
     }
     return maxResidual;
@@ -712,7 +712,7 @@ namespace Isis {
     int numLockedMeasures = 0;
     for (int cp = 0; cp < Size(); cp++) {
       ControlPoint &pt = p_pointsHash[p_pointIds[cp]];
-      numLockedMeasures += pt.Size() - pt.NumLockedMeasures();
+      numLockedMeasures += pt.Size() - pt.GetNumLockedMeasures();
     }
     return numLockedMeasures;
   }
@@ -726,7 +726,7 @@ namespace Isis {
   int ControlNet::NumEditLockPoints() {
     int size = 0;
     for(int cp = 0; cp < Size(); cp ++) {
-      if (p_pointsHash[p_pointIds[cp]].EditLock()) size ++;
+      if (p_pointsHash[p_pointIds[cp]].IsEditLocked()) size ++;
     }
     return size;
   }
@@ -742,7 +742,7 @@ namespace Isis {
     int numIgnoredMeasures = 0;
     for (int cp = 0; cp < Size(); cp++) {
       ControlPoint &pt = p_pointsHash[p_pointIds[cp]];
-      numIgnoredMeasures += pt.Size() - pt.NumValidMeasures();
+      numIgnoredMeasures += pt.Size() - pt.GetNumValidMeasures();
     }
     return numIgnoredMeasures;
   }
@@ -777,7 +777,7 @@ namespace Isis {
   int ControlNet::NumValidMeasures() {
     int numValidMeasures = 0;
     for (int cp = 0; cp < Size(); cp++) {
-      numValidMeasures += p_pointsHash[p_pointIds[cp]].NumValidMeasures();
+      numValidMeasures += p_pointsHash[p_pointIds[cp]].GetNumValidMeasures();
     }
     return numValidMeasures;
   }
@@ -791,7 +791,7 @@ namespace Isis {
   int ControlNet::NumValidPoints() {
     int size = 0;
     for(int cp = 0; cp < Size(); cp ++) {
-      if(!p_pointsHash[p_pointIds[cp]].Ignore()) size ++;
+      if(!p_pointsHash[p_pointIds[cp]].IsIgnored()) size ++;
     }
     return size;
   }
@@ -896,7 +896,7 @@ namespace Isis {
         }
         else {
           iString msg = "Control point [" +
-              p_pointsHash[p_pointIds[p]].Id() + "], measure [" +
+              p_pointsHash[p_pointIds[p]].GetId() + "], measure [" +
               p_pointsHash[p_pointIds[p]][m].GetCubeSerialNumber() +
               "] does not have a cube with a matching serial number";
           throw Isis::iException::Message(iException::User, msg,

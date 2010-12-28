@@ -1652,7 +1652,7 @@ namespace Qisis {
         //---------------------------------------------------------------
         if(this->polygon().boundingRect().contains(QPointF(x, y))) {
           p_controlPoints.push_back(mapToScene(x, y));
-          p_sceneToPointMap.insert(QString::fromStdString(p.Id()), mapToScene(x, y));
+          p_sceneToPointMap.insert(QString::fromStdString(p.GetId()), mapToScene(x, y));
         }
 
       }

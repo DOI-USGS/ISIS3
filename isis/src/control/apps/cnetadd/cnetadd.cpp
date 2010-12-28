@@ -110,8 +110,8 @@ void IsisMain() {
 
       // If the point is locked and Apriori source is "AverageOfMeasures" 
       // then do not add the measures.
-      if(point.EditLock() && 
-         point.AprioriSurfacePointSource() == ControlPoint::SurfacePointSource::AverageOfMeasures){
+      if(point.IsEditLocked() && 
+         point.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::AverageOfMeasures){
         continue;
       }
       // If there are duplicate serial numbers in the addlist, prevent double adding
@@ -134,16 +134,16 @@ void IsisMain() {
       double longitude;
       if(retrievalOpt == "REFERENCE") {
         // Get the lat/long coords from the existing reference measure
-        latitude = p_pointLatLon[point.Id()].first;
-        longitude = p_pointLatLon[point.Id()].second;
+        latitude = p_pointLatLon[point.GetId()].first;
+        longitude = p_pointLatLon[point.GetId()].second;
       }
       else {
         // Get the lat/long coords from the current control point
-        latitude = point.UniversalLatitude();
-        longitude = point.UniversalLongitude();
+        latitude = point.GetSurfacePoint().GetLatitude().GetDegrees();
+        longitude = point.GetSurfacePoint().GetLongitude().GetDegrees();
         if(latitude == Isis::Null  ||  longitude == Isis::Null) {
           std::string msg = "Unable to retreive lat/lon from Control Point [";
-          msg += point.Id() + "]. RETREIVAL=POINT cannot be used unless all Control ";
+          msg += point.GetId() + "]. RETREIVAL=POINT cannot be used unless all Control ";
           msg += "Points have Latitude/Longitude keywords.";
           throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
         }
@@ -270,7 +270,7 @@ void IsisMain() {
 
     // Add the list of modified points to the output log file
     for(unsigned int i = 0; i < modPoints.size(); i++) {
-      pointsModified += inNet[modPoints[i]].Id();
+      pointsModified += inNet[modPoints[i]].GetId();
     }
 
     results.AddKeyword(added);
@@ -294,7 +294,7 @@ void IsisMain() {
 
     for(std::map< int, std::set<std::string> >::iterator it = p_modifiedMeasures.begin();
         it != p_modifiedMeasures.end(); it ++) {
-      out_stream << inNet[it->first].Id() << std::endl;
+      out_stream << inNet[it->first].GetId() << std::endl;
     }
 
     out_stream.close();
@@ -345,13 +345,13 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
 
   for(int cp = 0; cp < net.Size(); cp++) {
     ControlPoint point(net[cp]);
-    ControlMeasure cm(point[ net[cp].ReferenceIndex() ]);
+    ControlMeasure cm(point[ net[cp].GetReferenceIndex() ]);
 
     Cube *cube = manager.OpenCube(snl.Filename(cm.GetCubeSerialNumber()));
     try {
       cube->Camera()->SetImage(cm.GetSample(), cm.GetLine());
-      p_pointLatLon[point.Id()].first = cube->Camera()->UniversalLatitude();
-      p_pointLatLon[point.Id()].second = cube->Camera()->UniversalLongitude();
+      p_pointLatLon[point.GetId()].first = cube->Camera()->UniversalLatitude();
+      p_pointLatLon[point.GetId()].second = cube->Camera()->UniversalLongitude();
     }
     catch(Isis::iException &e) {
       std::string msg = "Unable to create camera for cube file [";

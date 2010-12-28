@@ -279,7 +279,7 @@ namespace Isis {
       int & piMeasuresModified)
   {
     int iNumMeasures  = pCPoint.Size();
-    bool bPntEditLock = pCPoint.EditLock();
+    bool bPntEditLock = pCPoint.IsEditLocked();
     int iMsrIgnored   = 0;
     
     for (int measure=0; measure<iNumMeasures; measure++) {
@@ -380,23 +380,24 @@ namespace Isis {
         
       // Logging
       PvlObject pvlPointObj("PointDetails");
-      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.Id());
+      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.GetId());
       
       // Get number of measures locked and check if Reference
       // Measure is locked
-      int iNumMeasuresLocked = newPnt.NumLockedMeasures();
-      bool bRefLocked = newPnt.ReferenceLocked();
+      int iNumMeasuresLocked = newPnt.GetNumLockedMeasures();
+      bool bRefLocked = newPnt.IsReferenceLocked();
 
-      int iOrigRefIndex = newPnt.ReferenceIndexNoException();
+      int iOrigRefIndex = newPnt.GetReferenceIndexNoException();
 
       // Only perform the interest operation on points of type "Tie" and
       // Points having atleast 1 measure and Point is not Ignored
-      if(!newPnt.Ignore() && newPnt.Type() == ControlPoint::Tie && iOrigRefIndex >= 0 &&
+      if(!newPnt.IsIgnored() && newPnt.GetType() == ControlPoint::Tie &&
+         iOrigRefIndex >= 0 &&
          (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
 
         // Check only the validity of the Point / Measures only if Point and/or 
         // Reference Measure is locked. 
-        if(newPnt.EditLock() || iNumMeasuresLocked > 0) {
+        if(newPnt.IsEditLocked() || iNumMeasuresLocked > 0) {
           ProcessLocked_Point_Reference(newPnt, pvlPointObj, iMeasuresModified);
           ((ControlNet &) pNewNet).UpdatePoint(newPnt);
 
@@ -541,7 +542,7 @@ namespace Isis {
           iPointsModified ++;
         }
           
-        if(!newPnt.Ignore() && iBestMeasureIndex != iOrigRefIndex) {
+        if(!newPnt.IsIgnored() && iBestMeasureIndex != iOrigRefIndex) {
           iRefChanged ++;
           PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
           pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", mtInterestResults[iOrigRefIndex].msSerialNum);
@@ -554,7 +555,7 @@ namespace Isis {
                                                                                  mtInterestResults[iBestMeasureIndex].mdBestLine));
 
           // Log info, if Point not locked, apriori source == Reference and a new reference
-          if(newPnt.AprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
+          if(newPnt.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
             pvlRefChangeGrp += Isis::PvlKeyword("AprioriSource", "Reference is the source and has changed");
           }
         
@@ -575,12 +576,12 @@ namespace Isis {
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
-        if(newPnt.Ignore()) {
+        if(newPnt.IsIgnored()) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
         
-        if (newPnt.Type() == ControlPoint::Tie) {
+        if (newPnt.GetType() == ControlPoint::Tie) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
         }
@@ -627,7 +628,8 @@ namespace Isis {
     if(mbOverlaps) {
       overlapPoly = FindOverlap(pCnetPoint);
       if(overlapPoly == NULL) {
-        string msg = "Unable to find overlap polygon for point [" + pCnetPoint.Id() + "]";
+        string msg = "Unable to find overlap polygon for point [" +
+            pCnetPoint.GetId() + "]";
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
     }

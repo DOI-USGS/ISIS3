@@ -1,11 +1,15 @@
+#include "ControlNetFilter.h"
+
+#include "Angle.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
-#include "ControlNetFilter.h"
 #include "ControlPoint.h"
 #include "Filename.h"
 #include "iString.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "PvlGroup.h"
 #include "SerialNumberList.h"
 
@@ -107,10 +111,10 @@ namespace Isis {
    */
   void ControlNetFilter::PointStats(const ControlPoint & pcPoint)
   {
-    mOstm << pcPoint.Id()   << ", " << sPointType[(int)pcPoint.Type()] << ", ";
-    mOstm << sBoolean[(int)pcPoint.Ignore()] << ", " ;
-    mOstm << sBoolean[(int)pcPoint.EditLock()] << ", " << pcPoint.Size() << ", ";
-    mOstm << pcPoint.Size() - pcPoint.NumValidMeasures() << ", ";
+    mOstm << pcPoint.GetId()   << ", " << sPointType[(int)pcPoint.GetType()] << ", ";
+    mOstm << sBoolean[(int)pcPoint.IsIgnored()] << ", " ;
+    mOstm << sBoolean[(int)pcPoint.IsEditLocked()] << ", " << pcPoint.Size() << ", ";
+    mOstm << pcPoint.Size() - pcPoint.GetNumValidMeasures() << ", ";
   }
   
   /**
@@ -173,7 +177,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     for (int i=(iNumPoints-1); i >= 0; i--) {
       ControlPoint cPoint = (*mCNet)[i];
-      double dMaxErr = cPoint.MaximumResidual();
+      double dMaxErr = cPoint.GetMaximumResidual();
       if (bLessThan && bGreaterThan) {
         if (!(dMaxErr < dLesser && dMaxErr > dGreater)){
           mCNet->Delete(i);
@@ -196,8 +200,8 @@ namespace Isis {
       if (pbLastFilter){
         int iNumMeasures = cPoint.Size();
         for (int j=0; j<iNumMeasures; j++) {
-          mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", " ;
-          mOstm << sBoolean[cPoint.Ignore()] << ", " ;
+          mOstm << cPoint.GetId() << ", " << sPointType[cPoint.GetType()] << ", " ;
+          mOstm << sBoolean[cPoint.IsIgnored()] << ", " ;
           
           PrintCubeFileSerialNum(cPoint[j]);
           mOstm << ", " << cPoint[j].GetResidualMagnitude() << ", ";
@@ -245,7 +249,7 @@ namespace Isis {
     
     for (int i=(iNumPoints-1); i >= 0; i--){
       ControlPoint cPoint = (*mCNet)[i];
-      string sPointID = cPoint.Id();
+      string sPointID = cPoint.GetId();
       int iPosition = 0;      
       for (int j=(iTokenSize-1); j>=0; j--) {
         int iLen = strTokens[j].length();
@@ -376,8 +380,8 @@ namespace Isis {
     
     for (int i=(iNumPoints-1); i>=0; i--) {
       ControlPoint cPoint = (*mCNet)[i];
-      bool bIgnored = cPoint.Ignore();
-      bool bGround  = (cPoint.Type()==ControlPoint::Ground ? true : false);
+      bool bIgnored = cPoint.IsIgnored();
+      bool bGround  = (cPoint.GetType()==ControlPoint::Ground ? true : false);
       
       if (bIgnoredFlag && !bIgnored) {
         mCNet->Delete(i);
@@ -442,33 +446,36 @@ namespace Isis {
     
     for (int i=(iNumPoints-1); i>=0; i--) {
       const ControlPoint & cPoint = (*mCNet)[i];
-      double dUnivLat = cPoint.UniversalLatitude();
-      double dUnivLon = cPoint.UniversalLongitude();
-      double dRadius  = cPoint.Radius();
+      SurfacePoint cPointSurfPt = cPoint.GetSurfacePoint();
       
-      if (dUnivLat==Isis::Null || dUnivLon == Isis::Null) {
-        string sn = cPoint[cPoint.ReferenceIndex()].GetCubeSerialNumber();
+      if (!cPointSurfPt.Valid()) {
+        string sn = cPoint[cPoint.GetReferenceIndex()].GetCubeSerialNumber();
         string filename = mSerialNumList.Filename(sn);
         Pvl pvl(filename);
         
         Camera *camera = CameraFactory::Create(pvl);
-        const ControlMeasure & cm = cPoint[cPoint.ReferenceIndex()];
+        const ControlMeasure & cm = cPoint[cPoint.GetReferenceIndex()];
         if (camera->SetImage(cm.GetSample(), cm.GetLine())) {
-          dUnivLat = camera->UniversalLatitude();
-          dUnivLon = camera->UniversalLongitude();
-          dRadius  = camera->LocalRadius();
+          cPointSurfPt.SetSpherical(
+              Latitude(camera->UniversalLatitude(), Angle::Degrees),
+              Longitude(camera->UniversalLongitude(), Angle::Degrees),
+              Distance(camera->LocalRadius()));
         }
       }
       
-      if (!(dUnivLat >= dMinLat && dUnivLat <= dMaxLat) ||
-          !(dUnivLon >= dMinLon && dUnivLon <= dMaxLon)) {
+      if (!(cPointSurfPt.GetLatitude().GetDegrees() >= dMinLat && 
+            cPointSurfPt.GetLatitude().GetDegrees() <= dMaxLat) ||
+          !(cPointSurfPt.GetLongitude().GetDegrees() >= dMinLon &&
+            cPointSurfPt.GetLongitude().GetDegrees() <= dMaxLon)) {
         mCNet->Delete(i);
         continue;
       }
       
       if (pbLastFilter) {
         PointStats(cPoint);
-        mOstm << dUnivLat << ", " << dUnivLon << ", " << dRadius << endl;
+        mOstm << cPointSurfPt.GetLatitude().GetDegrees() << ", " <<
+                 cPointSurfPt.GetLongitude().GetDegrees() << ", " <<
+                 cPointSurfPt.GetLocalRadius().GetMeters() << endl;
       }
     }
   }
@@ -504,27 +511,27 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     for (int i=(iNumPoints-1); i>=0; i--) {
       ControlPoint cp1 = (*mCNet)[i];
-      double dUnivLat1=0, dUnivLon1=0, dRadius1=0;
+      SurfacePoint surfacePt1;
       Camera *cam1;
       
       double dSample1=Isis::Null, dLine1=Isis::Null;
       
-      int iRefIndex1 = cp1.ReferenceIndex();
+      int iRefIndex1 = cp1.GetReferenceIndex();
       
       if (sUnits == "meters") {
-        dUnivLat1 = cp1.UniversalLatitude();
-        dUnivLon1 = cp1.UniversalLongitude(); 
-        dRadius1  = cp1.Radius();
+        surfacePt1 = cp1.GetSurfacePoint();
       
-        if ((dUnivLat1 == Isis::Null) || (dUnivLon1 == Isis::Null)) {
+        if (!surfacePt1.Valid()) {
           string sn1 = cp1[iRefIndex1].GetCubeSerialNumber();
           string filename1 = mSerialNumList.Filename(sn1);
           Pvl pvl1(filename1);
           cam1 = CameraFactory::Create(pvl1);
           if (cam1->SetImage(cp1[iRefIndex1].GetSample(), cp1[iRefIndex1].GetLine()) ) {
-            dRadius1  = cam1->UniversalLatitude();
-            dUnivLat1 = cam1->UniversalLongitude();
-            dUnivLon1 = cam1->LocalRadius();
+            surfacePt1.SetSpherical(
+                Latitude(cam1->UniversalLatitude(), Angle::Degrees),
+                Longitude(cam1->UniversalLongitude(), Angle::Degrees),
+                Distance(cam1->LocalRadius())
+                );
           }
         }
       }
@@ -538,32 +545,40 @@ namespace Isis {
           continue;
         }
         ControlPoint cp2 = (*mCNet)[j];
-        double dUnivLat2=0, dUnivLon2=0;
+        SurfacePoint surfacePt2;
         Camera *cam2;
         double dDist=0;
         
         double dSample2=Isis::Null, dLine2=Isis::Null;
       
-        int iRefIndex2 = cp2.ReferenceIndex();
+        int iRefIndex2 = cp2.GetReferenceIndex();
         
         if (sUnits == "meters") {
-          dUnivLat2 = cp2.UniversalLatitude();
-          dUnivLon2 = cp2.UniversalLongitude();
+          surfacePt2 = cp2.GetSurfacePoint();
         
-          if ((dUnivLat2 == Isis::Null) || (dUnivLon2 == Isis::Null)) {
-            string sn2 = cp2[cp2.ReferenceIndex()].GetCubeSerialNumber();
+          if (!surfacePt2.Valid()) {
+            string sn2 = cp2[cp2.GetReferenceIndex()].GetCubeSerialNumber();
             string filename2 = mSerialNumList.Filename(sn2);
             Pvl pvl2(filename2);
             cam2 = CameraFactory::Create(pvl2);
 
             if (cam2->SetImage(cp2[iRefIndex2].GetSample(), cp2[iRefIndex2].GetLine())) {
-              dUnivLat2 = cam2->UniversalLatitude();
-              dUnivLon2 = cam2->UniversalLongitude();
+              surfacePt2.SetSpherical(
+                Latitude(cam2->UniversalLatitude(), Angle::Degrees),
+                Longitude(cam2->UniversalLongitude(), Angle::Degrees),
+                Distance(cam2->LocalRadius())
+                );
             }
           }
           
           // Get the distance from the camera class
-          dDist = Camera::Distance(dUnivLat1, dUnivLon1, dUnivLat2, dUnivLon2, dRadius1);
+          dDist = Camera::Distance(
+              surfacePt1.GetLatitude().GetDegrees(),
+              surfacePt1.GetLongitude().GetDegrees(),
+              surfacePt2.GetLatitude().GetDegrees(),
+              surfacePt2.GetLongitude().GetDegrees(),
+              surfacePt1.GetLocalRadius()
+              );
         }
         else { // pixels
           dSample2 = cp2[iRefIndex2].GetSample();
@@ -580,7 +595,7 @@ namespace Isis {
             if (!bMinDistance) {
               PointStats(cp1);
             }
-            mOstm << cp2.Id() << "#" << dDist << ", ";
+            mOstm << cp2.GetId() << "#" << dDist << ", ";
           }
           bMinDistance = true;
         }
@@ -821,10 +836,10 @@ namespace Isis {
           ControlMeasure cMeasure = cPoint[j];
 
           // Point Details
-          mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", ";
-          mOstm << sBoolean[cPoint.Ignore()] << ", " << iNumMeasures << ", ";
-          mOstm << iNumMeasures - cPoint.NumValidMeasures() << ", ";
-          mOstm << sBoolean[cPoint.EditLock()] << ", ";
+          mOstm << cPoint.GetId() << ", " << sPointType[cPoint.GetType()] << ", ";
+          mOstm << sBoolean[cPoint.IsIgnored()] << ", " << iNumMeasures << ", ";
+          mOstm << iNumMeasures - cPoint.GetNumValidMeasures() << ", ";
+          mOstm << sBoolean[cPoint.IsEditLocked()] << ", ";
           
           // Image Details
           string sn = cMeasure.GetCubeSerialNumber();
@@ -962,13 +977,13 @@ namespace Isis {
           ControlMeasure cMeasure = cPoint[j];
           if (cMeasure.GetCubeSerialNumber() == sSerialNum) {
             iPointsTotal++;
-            if (cPoint.Ignore()) {
+            if (cPoint.IsIgnored()) {
               iPointsIgnored++;
             }
-            if (cPoint.Type() == ControlPoint::Ground) {
+            if (cPoint.GetType() == ControlPoint::Ground) {
               iPointsGround++;
             }
-            if (cPoint.EditLock()) {
+            if (cPoint.IsEditLocked()) {
               iPointsLocked++;
             }
             break;
@@ -1054,13 +1069,13 @@ namespace Isis {
           cMeasure1   = cPoint1[j];
           if (cMeasure1.GetCubeSerialNumber() == sSerialNum) {
             iPointsTotal++;
-            if (cPoint1.Ignore()) {
+            if (cPoint1.IsIgnored()) {
               iPointsIgnored++;
             }
-            if (cPoint1.Type() == ControlPoint::Ground) {
+            if (cPoint1.GetType() == ControlPoint::Ground) {
               iPointsGround++;
             }
-            if (cPoint1.EditLock()) {
+            if (cPoint1.IsEditLocked()) {
               iPointsLocked++;
             }
             bImageFound = true;
@@ -1143,9 +1158,9 @@ namespace Isis {
         for (int j=0; j<(int)sPointIndex1.size(); j++) {
           iString sPointIDDist(dPointDistance[j]);
           sPointIDDist += "#";
-          sPointIDDist += (*mCNet)[sPointIndex1[j]].Id();
+          sPointIDDist += (*mCNet)[sPointIndex1[j]].GetId();
           sPointIDDist += "#";
-          sPointIDDist += (*mCNet)[sPointIndex2[j]].Id();
+          sPointIDDist += (*mCNet)[sPointIndex2[j]].GetId();
           
           mOstm << (string)sPointIDDist << ",";
         }

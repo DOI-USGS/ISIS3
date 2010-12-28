@@ -68,7 +68,7 @@ void IsisMain() {
   BigInt badPoint(0), nulls(0), oldNotInImage(0), newNotInImage(0), badTol(0);
   for(int p = 0; p < cn.Size(); p++) {
     ControlPoint pnt = cn[p];
-    if((!pnt.Ignore()) && (pnt.Size() == 2)) {
+    if((!pnt.IsIgnored()) && (pnt.Size() == 2)) {
       Coordinate c;
       if (pnt[0].GetType() == ControlMeasure::Reference) {
         c.samp = pnt[0].GetSample();

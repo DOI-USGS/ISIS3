@@ -126,7 +126,7 @@ void IsisMain() {
       formatter.str("");
       formatter.width(30);
       formatter.setf(ios::left);
-      formatter << cnet[i].Id() << " ";
+      formatter << cnet[i].GetId() << " ";
       textLine = formatter.str();
 
       //Set FSC
@@ -163,7 +163,7 @@ void IsisMain() {
       string ptClass;
       ControlMeasure::MeasureType mType = currMeas.GetType();
 
-      if(currMeas.IsIgnored() || cnet[i].Ignore()) {
+      if(currMeas.IsIgnored() || cnet[i].IsIgnored()) {
         ptClass = "U   "; //Unmeasured
       }
       else if(mType == ControlMeasure::Reference) {

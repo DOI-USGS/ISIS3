@@ -112,7 +112,7 @@ int main () {
   cout << endl;
 
   //  Delete point with invalid point type, first save id for next test
-  string id2 = cn1[2].Id();
+  string id2 = cn1[2].GetId();
   cn1.Delete(2);
 
   cn1.Write("temp.txt", true);

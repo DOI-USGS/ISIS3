@@ -221,7 +221,7 @@ void IsisMain() {
       ControlPoint cp = precnet[i];
       ControlMeasure cm = cp[0];
       if(cp.HasReference()) {
-        cm = cp[cp.ReferenceIndex()];
+        cm = cp[cp.GetReferenceIndex()];
       }
 
       iString c = serialNumbers.Filename(cm.GetCubeSerialNumber());
@@ -432,7 +432,7 @@ void IsisMain() {
         controlpt.Add(measurment);
       }
 
-      if(controlpt.NumValidMeasures() < 2) {
+      if(controlpt.GetNumValidMeasures() < 2) {
         controlpt.SetIgnore(true);
         cpIgnoredCount ++;
       }

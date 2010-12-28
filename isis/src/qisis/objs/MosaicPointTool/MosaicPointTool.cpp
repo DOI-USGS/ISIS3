@@ -115,7 +115,7 @@ namespace Qisis {
     Isis::ControlPoint *controlPoint = cn->Find(pointId.toStdString());
     QString type = "no type";
 
-    QString ptType = controlPoint->PointTypeString();
+    QString ptType = controlPoint->GetPointTypeString();
     if (ptType == "GroundXYZ") {
       type = "GroundXYZ";
     }

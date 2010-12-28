@@ -137,7 +137,7 @@ ReferenceIndex = 0
 Test adding control measures with identical serial numbers ...
 **PROGRAMMER ERROR** The SerialNumber is not unique. A measure with serial number [Test2] already exists for ControlPoint [C151]
 
-Test SetUniversalGround ... 
+Test SetSurfacePoint ... 
 X = -424.024
 Y = 734.431
 Z = 529.919
@@ -147,6 +147,9 @@ Radius = 1000
 X = -424.024
 Y = 734.431
 Z = 529.919
+Latitude = 32
+Longitude = 120
+Radius = 1000
 
 Test conversions for apriori/aposteriori covariance matrices ... 
 Apriori Sigma X = 10

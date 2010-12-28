@@ -43,7 +43,7 @@ void IsisMain() {
   for(int i = 0; i < cnet.Size() ; i++) {
     ControlPoint cp = cnet[i];
 
-    if(cp.Type() == ControlPoint::Ground) {
+    if(cp.GetType() == ControlPoint::Ground) {
       // Create Brick on samp, line to get the dn value of the pixel
       SurfacePoint surfacePt = cp.GetSurfacePoint();
       Brick b(1, 1, 1, cube.PixelType());
@@ -61,7 +61,7 @@ void IsisMain() {
         if(numFailures > 1) {
           failedIDs = failedIDs + ", ";
         }
-        failedIDs = failedIDs + cp.Id();
+        failedIDs = failedIDs + cp.GetId();
         cp.SetIgnore(true);
       }
       // otherwise, we will replace the computed radius value to the output control net

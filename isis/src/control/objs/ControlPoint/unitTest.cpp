@@ -6,6 +6,8 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Preference.h"
 #include "SurfacePoint.h"
 
@@ -62,7 +64,7 @@ int main () {
 
   c.Add(d);
 
-  cout << "test PointTypeString(): " << c.PointTypeString() << "\n";
+  cout << "test PointTypeString(): " << c.GetPointTypeString() << "\n";
   printPoint(c);
 
   d.SetCubeSerialNumber("Test2");
@@ -73,11 +75,11 @@ int main () {
   d.SetDateTime("2005-05-03T00:00:00");
   c.Add(d);
   printPoint(c);
-  cout <<"ReferenceIndex = " << c.ReferenceIndex() << endl;
+  cout <<"ReferenceIndex = " << c.GetReferenceIndex() << endl;
 
   c.Delete(0);
   printPoint(c);
-  cout <<"ReferenceIndex = " << c.ReferenceIndex() << endl;
+  cout <<"ReferenceIndex = " << c.GetReferenceIndex() << endl;
 
   cout << endl << "Test adding control measures with identical serial numbers ..." << endl;
   try {
@@ -87,18 +89,24 @@ int main () {
     e.Report(false);
   }
 
-  cout << endl << "Test SetUniversalGround ... " << endl;
-  cout << "X = " << c.GetSurfacePoint().GetX() << endl;
-  cout << "Y = " << c.GetSurfacePoint().GetY() << endl;
-  cout << "Z = " << c.GetSurfacePoint().GetZ() << endl;
-  cout << "Latitude = " << c.UniversalLatitude() << endl;
-  cout << "Longitude = " << c.UniversalLongitude() << endl;
-  cout << "Radius = " << c.Radius() << endl;
-  c.SetUniversalGround(32.,120.,1000.);
-  cout << "X = " << c.GetSurfacePoint().GetX() << endl;
-  cout << "Y = " << c.GetSurfacePoint().GetY() << endl;
-  cout << "Z = " << c.GetSurfacePoint().GetZ() << endl;
-
+  cout << endl << "Test SetSurfacePoint ... " << endl;
+  SurfacePoint surfPt(c.GetSurfacePoint());
+  cout << "X = " << surfPt.GetX() << endl;
+  cout << "Y = " << surfPt.GetY() << endl;
+  cout << "Z = " << surfPt.GetZ() << endl;
+  cout << "Latitude = " << surfPt.GetLatitude().GetDegrees() << endl;
+  cout << "Longitude = " << surfPt.GetLongitude().GetDegrees() << endl;
+  cout << "Radius = " << surfPt.GetLocalRadius() << endl;
+  surfPt.SetSpherical(Latitude(32, Angle::Degrees),
+      Longitude(120, Angle::Degrees), Distance(1000));
+  c.SetSurfacePoint(surfPt);
+  surfPt = c.GetSurfacePoint();
+  cout << "X = " << surfPt.GetX() << endl;
+  cout << "Y = " << surfPt.GetY() << endl;
+  cout << "Z = " << surfPt.GetZ() << endl;
+  cout << "Latitude = " << surfPt.GetLatitude().GetDegrees() << endl;
+  cout << "Longitude = " << surfPt.GetLongitude().GetDegrees() << endl;
+  cout << "Radius = " << surfPt.GetLocalRadius() << endl;
 
   cout << endl << "Test conversions for apriori/aposteriori covariance matrices ... " << endl;
 
@@ -133,13 +141,13 @@ int main () {
 }
 
 void printPoint(Isis::ControlPoint &p) {
-  bool wasLocked = p.EditLock();
+  bool wasLocked = p.IsEditLocked();
   p.SetEditLock(false);
   p.SetChooserName("cnetref");
   p.SetDateTime("2005-05-03T00:00:00");
   p.SetEditLock(wasLocked);
 
   Pvl tmp;
-  tmp.AddObject(p.CreatePvlObject());
+  tmp.AddObject(p.ToPvlObject());
   cout << tmp << endl;
 }

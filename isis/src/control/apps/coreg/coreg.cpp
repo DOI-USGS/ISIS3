@@ -239,7 +239,7 @@ void IsisMain() {
        "SampleDifference,LineDifference" << endl;
     for(int i = 0; i < cn.Size(); i++) {
       ControlPoint cp = cn[i];
-      if(cp.Ignore()) continue;
+      if(cp.IsIgnored()) continue;
       ControlMeasure cmTrans = cp[0];
       ControlMeasure cmMatch = cp[1];
       os << cmTrans.GetSample() << "," << cmTrans.GetLine() << ","

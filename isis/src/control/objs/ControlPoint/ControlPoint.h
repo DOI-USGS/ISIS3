@@ -189,6 +189,9 @@ namespace Isis {
    *            RadiusSource, and SurfacePointSource.
    *   @history 2010-11-16 Debbie Cook, Added jigsawRejected keyword.
    *   @history 2010-12-08 Tracie Sucharski, Added IsGround convenience method.
+   *   @history 2010-12-28 Steven Lambright Changed accessors to match
+   *            ControlMeasure's method of accessing data. Removed obsolete
+   *            methods to prevent further use of them.
    */
   class ControlPoint {
     public:
@@ -286,7 +289,7 @@ namespace Isis {
       Status SetId(iString id);
       Status SetRejected(bool rejected);
       Status SetIgnore(bool ignore);
-      Status SetSurfacePoint (SurfacePoint surfacePoint);
+      Status SetSurfacePoint(SurfacePoint surfacePoint);
       Status SetType(PointType type);
 
       Status SetAprioriRadiusSource(RadiusSource::Source source);
@@ -298,50 +301,50 @@ namespace Isis {
       Status ComputeApriori();
       Status ComputeResiduals();
 
-      iString ChooserName() const;
-      iString DateTime() const;
-      bool EditLock() const;
+      iString GetChooserName() const;
+      iString GetDateTime() const;
+      bool IsEditLocked() const;
       bool IsRejected() const;
-      iString Id() const;
-      bool Ignore() const;
-      bool Valid() const;
-      bool Invalid() const;
+      iString GetId() const;
+      bool IsIgnored() const;
+      bool IsValid() const;
+      bool IsInvalid() const;
       SurfacePoint GetSurfacePoint() const;
-      PointType Type () const;
+      PointType GetType () const;
       bool IsGround() const;
 
       static iString PointTypeToString(PointType type);
-      iString PointTypeString() const;
+      iString GetPointTypeString() const;
       static iString RadiusSourceToString(RadiusSource::Source source);
-      iString RadiusSourceString() const;
+      iString GetRadiusSourceString() const;
       static iString SurfacePointSourceToString(SurfacePointSource::Source source);
-      iString SurfacePointSourceString() const;
+      iString GetSurfacePointSourceString() const;
 
       SurfacePoint GetAprioriSurfacePoint() const;
-      RadiusSource::Source AprioriRadiusSource() const;
-      iString AprioriRadiusSourceFile() const;
-      SurfacePointSource::Source AprioriSurfacePointSource() const;
-      iString AprioriSurfacePointSourceFile() const;
+      RadiusSource::Source GetAprioriRadiusSource() const;
+      iString GetAprioriRadiusSourceFile() const;
+      SurfacePointSource::Source GetAprioriSurfacePointSource() const;
+      iString GetAprioriSurfacePointSourceFile() const;
 
       int Size () const { return p_measures.size(); };
-      int NumMeasures () const { return p_measures.size(); };
-      int NumValidMeasures () const;
-      int NumLockedMeasures () const;
+      int GetNumMeasures () const { return p_measures.size(); };
+      int GetNumValidMeasures () const;
+      int GetNumLockedMeasures () const;
       bool HasSerialNumber (iString serialNumber) const;
       bool HasReference() const;
-      int  ReferenceIndex() const;
-      int  ReferenceIndexNoException() const;
-      bool ReferenceLocked() const;
+      int  GetReferenceIndex() const;
+      int  GetReferenceIndexNoException() const;
+      bool IsReferenceLocked() const;
 
-      double AverageResidual() const;
-      double MinimumResidual() const;
-      double MinimumSampleResidual() const;
-      double MinimumLineResidual() const;
-      double MaximumResidual() const;
-      double MaximumSampleResidual() const;
-      double MaximumLineResidual() const;
+      double GetAverageResidual() const;
+      double GetMinimumResidual() const;
+      double GetMinimumSampleResidual() const;
+      double GetMinimumLineResidual() const;
+      double GetMaximumResidual() const;
+      double GetMaximumSampleResidual() const;
+      double GetMaximumLineResidual() const;
 
-      PvlObject CreatePvlObject() const;
+      PvlObject ToPvlObject() const;
 
       ControlMeasure operator[](int index) const;
       ControlMeasure operator[](iString serialNumber) const;
@@ -357,17 +360,6 @@ namespace Isis {
 
       PBControlNet_PBControlPoint ToProtocolBuffer() const;
       PBControlNetLogData_Point GetLogProtocolBuffer() const;
-
-      // ########## DEPRECATED METHODS ##########
-      // The following are convenience functions for setting/getting the points
-      //   current lat,lon, radius from the x,y,z. These are all DEPRECATED.
-      //   Please use SetSurfacePoint.
-      Status SetUniversalGround(double lat, double lon, double radius);
-
-      double UniversalLatitude() const;
-      double UniversalLongitude() const;
-      Distance Radius() const;
-      // ########## END DEPRECATED METHODS ##########
 
     private:
       void Init(const PBControlNet_PBControlPoint &);

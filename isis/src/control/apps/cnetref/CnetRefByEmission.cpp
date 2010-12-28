@@ -57,18 +57,18 @@ namespace Isis {
 
       // Logging
       PvlObject pvlPointObj("PointDetails");
-      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.Id());
+      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.GetId());
 
       // Edit Lock Option
-      bool bPntEditLock = newPnt.EditLock();
+      bool bPntEditLock = newPnt.IsEditLocked();
       if(!bPntEditLock) {
         newPnt.SetDateTime(Application::DateTime());
       }
 
-      int iNumMeasuresLocked = newPnt.NumLockedMeasures();
-      bool bRefLocked = newPnt.ReferenceLocked();
+      int iNumMeasuresLocked = newPnt.GetNumLockedMeasures();
+      bool bRefLocked = newPnt.IsReferenceLocked();
       
-      int iRefIndex = newPnt.ReferenceIndexNoException();
+      int iRefIndex = newPnt.GetReferenceIndexNoException();
       iString istrTemp;
       
       std::vector <PvlGroup> pvlGrpVector;
@@ -79,7 +79,7 @@ namespace Isis {
       // Points having atleast 1 measure and Points not Ignored
       // Check for EditLock in the Measures and also verfify that
       // only a Reference Measure can be Locked else error
-      if(!newPnt.Ignore() && newPnt.Type() == ControlPoint::Tie && iRefIndex >= 0 && 
+      if(!newPnt.IsIgnored() && newPnt.GetType() == ControlPoint::Tie && iRefIndex >= 0 && 
          (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked)) ) {
         int iNumIgnore = 0;
         iString istrTemp;
@@ -154,13 +154,13 @@ namespace Isis {
         }
 
         // Set the Reference if the Point is unlocked and Reference measure is unlocked
-        if(!newPnt.Ignore() && iBestIndex >= 0 && !newPnt[iBestIndex].IsIgnored() && !bPntEditLock && !bRefLocked) {
+        if(!newPnt.IsIgnored() && iBestIndex >= 0 && !newPnt[iBestIndex].IsIgnored() && !bPntEditLock && !bRefLocked) {
           newPnt[iBestIndex].SetType(ControlMeasure::Reference);
           pvlGrpVector[iBestIndex] += Isis::PvlKeyword("Reference", "true");
 
           // Log info, if Point not locked, apriori source == Reference and a new reference
           if(iRefIndex != iBestIndex && 
-             newPnt.AprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
+             newPnt.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
             pvlGrpVector[iBestIndex] += Isis::PvlKeyword("AprioriSource", "Reference is the source and has changed");
           }
         }
@@ -176,12 +176,12 @@ namespace Isis {
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
         
-        if(newPnt.Ignore()) {
+        if(newPnt.IsIgnored()) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
         
-        if (newPnt.Type() == ControlPoint::Tie) {
+        if (newPnt.GetType() == ControlPoint::Tie) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
         }
@@ -200,7 +200,7 @@ namespace Isis {
         iPointsModified++;
       }
 
-      if(!newPnt.Ignore() && iBestIndex != iRefIndex && !bPntEditLock && !bRefLocked) {
+      if(!newPnt.IsIgnored() && iBestIndex != iRefIndex && !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
         pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", origPnt[iRefIndex].GetCubeSerialNumber());

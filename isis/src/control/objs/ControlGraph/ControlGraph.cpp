@@ -237,7 +237,7 @@ namespace Isis {
     // the measures encountered be the middle for loop statistics are saved.
 
     for(int cpIndex = 0; cpIndex < cnet->Size(); cpIndex++) {
-      if(!(*cnet)[cpIndex].Ignore()) {
+      if(!(*cnet)[cpIndex].IsIgnored()) {
         // use a reference for the current ControlPoint for clearity
         const ControlPoint &curCtrlPoint = (*cnet)[cpIndex];
         for(int cmIndex = 0; cmIndex < curCtrlPoint.Size(); cmIndex++) {

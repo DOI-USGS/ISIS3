@@ -94,13 +94,13 @@ void IsisMain() {
    */
   if(deleteIgnored) {
     for(int cp = cnet.Size() - 1; cp >= 0; cp--) {
-      if(cnet[cp].Ignore()) {
+      if(cnet[cp].IsIgnored()) {
         DeletePoint(cnet, cp);
       }
       else {
         for(int cm = cnet[cp].Size() - 1; cm >= 0; cm--) {
           if(cnet[cp][cm].IsIgnored()) {
-            if(cm == cnet[cp].ReferenceIndex()) {
+            if(cm == cnet[cp].GetReferenceIndex()) {
               // If the reference is ignored, the point must ignored too
               IgnorePoint(cnet, cp, "Reference measure ignored");
             }
@@ -113,8 +113,8 @@ void IsisMain() {
 
         // Check if the number of measures in the point is zero or there are too
         // few measures in the point and we don't want to preserve them.
-        if(((cnet[cp].Size() < 2 && !preservePoints) && cnet[cp].Type() != ControlPoint::Ground)
-            || cnet[cp].Size() == 0 || cnet[cp].Ignore()) {
+        if(((cnet[cp].Size() < 2 && !preservePoints) && cnet[cp].GetType() != ControlPoint::Ground)
+            || cnet[cp].Size() == 0 || cnet[cp].IsIgnored()) {
           DeletePoint(cnet, cp);
         }
       }
@@ -208,7 +208,7 @@ void IgnorePoint(ControlNet & cnet, int cp, string cause) {
   if(keepLog) {
     // Label the keyword as the Point ID, and make the cause into the value
     ignoredPoints->AddKeyword(
-        PvlKeyword(cnet[cp].Id(), cause));
+        PvlKeyword(cnet[cp].GetId(), cause));
   }
 }
 
@@ -225,18 +225,18 @@ void IgnoreMeasure(ControlNet & cnet, int cp, int cm, string cause) {
         PvlKeyword(cnet[cp][cm].GetCubeSerialNumber(), cause));
 
     // Using a map to make accessing by Point ID a O(1) to O(lg n) operation
-    if(ignoredMeasures->contains(cnet[cp].Id())) {
+    if(ignoredMeasures->contains(cnet[cp].GetId())) {
       // If the map already has a group for the given Point ID, simply add the
       // new measure to it
-      PvlGroup & pointGroup = (*ignoredMeasures)[cnet[cp].Id()];
+      PvlGroup & pointGroup = (*ignoredMeasures)[cnet[cp].GetId()];
       pointGroup.AddKeyword(ignoredMeasure);
     }
     else {
       // Else there is no group for the Point ID of the measure being ignored,
       // so make a new group, add the measure, and insert it into the map
-      PvlGroup pointGroup(cnet[cp].Id());
+      PvlGroup pointGroup(cnet[cp].GetId());
       pointGroup.AddKeyword(ignoredMeasure);
-      (*ignoredMeasures)[cnet[cp].Id()] = pointGroup;
+      (*ignoredMeasures)[cnet[cp].GetId()] = pointGroup;
     }
   }
 }
@@ -250,7 +250,7 @@ void DeletePoint(ControlNet & cnet, int cp) {
   if(keepLog) {
     // If the point's being deleted but it wasn't set to ignore, it can only be
     // because the point has two few measures remaining
-    if(!cnet[cp].Ignore())
+    if(!cnet[cp].IsIgnored())
       IgnorePoint(cnet, cp, "Too few measures");
 
     // For any measures not ignored, mark their cause for deletion as being
@@ -281,15 +281,15 @@ void PopulateLog(ControlNet & cnet) {
   ignoredMeasures = new QMap<string, PvlGroup>;
 
   for(int cp = 0; cp < cnet.Size(); cp++) {
-    if(cnet[cp].Ignore()) {
+    if(cnet[cp].IsIgnored()) {
       IgnorePoint(cnet, cp, "Ignored from input");
     }
 
     for(int cm = 0; cm < cnet[cp].Size(); cm++) {
       if(cnet[cp][cm].IsIgnored()) {
-        if(cm == cnet[cp].ReferenceIndex()) {
+        if(cm == cnet[cp].GetReferenceIndex()) {
           // If the reference is ignored, the point must ignored too
-          if(!cnet[cp].Ignore()) {
+          if(!cnet[cp].IsIgnored()) {
             IgnorePoint(cnet, cp, "Reference measure ignored");
           }
         }
@@ -320,14 +320,14 @@ void ProcessControlPoints(std::string psFileName, ControlNet &pcCnet) {
 
     // Compare each Point Id listed with the Point in the
     // Control Network for according exclusion
-    if(!pcCnet[cp].Ignore() && cpList.HasControlPoint(pcCnet[cp].Id())) {
+    if(!pcCnet[cp].IsIgnored() && cpList.HasControlPoint(pcCnet[cp].GetId())) {
       IgnorePoint(pcCnet, cp, "Point ID in POINTLIST");
     }
 
     if(deleteIgnored) {
       //look for previously ignored control points
-      if(pcCnet[cp].Ignore() ||
-          pcCnet[cp][pcCnet[cp].ReferenceIndex()].IsIgnored()) {
+      if(pcCnet[cp].IsIgnored() ||
+          pcCnet[cp][pcCnet[cp].GetReferenceIndex()].IsIgnored()) {
         DeletePoint(pcCnet, cp);
       }
       else {
@@ -338,8 +338,8 @@ void ProcessControlPoints(std::string psFileName, ControlNet &pcCnet) {
           }
         }
         // Check if there are too few measures in the point or the point was previously ignored
-        if(((pcCnet[cp].Size() < 2 && !preservePoints) && pcCnet[cp].Type() != ControlPoint::Ground)
-            || pcCnet[cp].Size() == 0 || (pcCnet[cp].Ignore() && deleteIgnored)) {
+        if(((pcCnet[cp].Size() < 2 && !preservePoints) && pcCnet[cp].GetType() != ControlPoint::Ground)
+            || pcCnet[cp].Size() == 0 || (pcCnet[cp].IsIgnored() && deleteIgnored)) {
           DeletePoint(pcCnet, cp);
         }
       }
@@ -370,19 +370,19 @@ void ProcessControlMeasures(std::string psFileName, ControlNet &pcCnet) {
       if(!pcCnet[cp][cm].IsIgnored() && snl.HasSerialNumber(serialNumber)) {
         IgnoreMeasure(pcCnet, cp, cm, "Serial Number in CUBELIST");
 
-        if(cm == pcCnet[cp].ReferenceIndex() && !pcCnet[cp].Ignore()) {
+        if(cm == pcCnet[cp].GetReferenceIndex() && !pcCnet[cp].IsIgnored()) {
           IgnorePoint(pcCnet, cp, "Reference measure ignored");
         }
       }
 
       //also look for previously ignored control measures
-      if(deleteIgnored && pcCnet[cp][cm].IsIgnored() && cm != pcCnet[cp].ReferenceIndex()) {
+      if(deleteIgnored && pcCnet[cp][cm].IsIgnored() && cm != pcCnet[cp].GetReferenceIndex()) {
         DeleteMeasure(pcCnet, cp, cm);
       }
     }
     // Check if there are too few measures in the point or the point was previously ignored
-    if(((pcCnet[cp].Size() < 2 && !preservePoints) && pcCnet[cp].Type() != ControlPoint::Ground)
-        || pcCnet[cp].Size() == 0 || (pcCnet[cp].Ignore() && deleteIgnored)) {
+    if(((pcCnet[cp].Size() < 2 && !preservePoints) && pcCnet[cp].GetType() != ControlPoint::Ground)
+        || pcCnet[cp].Size() == 0 || (pcCnet[cp].IsIgnored() && deleteIgnored)) {
       DeletePoint(pcCnet, cp);
     }
   }
@@ -417,21 +417,21 @@ void CheckAllMeasureValidity(ControlNet & cnet, std::string cubeList) {
           string failure = results.toString().toStdString();
           IgnoreMeasure(cnet, cp, cm, "Validity Check " + failure);
 
-          if(cm == cnet[cp].ReferenceIndex()) {
+          if(cm == cnet[cp].GetReferenceIndex()) {
             IgnorePoint(cnet, cp, "Reference measure ignored");
           }
         }
       }
 
       //also look for previously ignored control measures
-      if(deleteIgnored && cnet[cp][cm].IsIgnored() && cm != cnet[cp].ReferenceIndex()) {
+      if(deleteIgnored && cnet[cp][cm].IsIgnored() && cm != cnet[cp].GetReferenceIndex()) {
         DeleteMeasure(cnet, cp, cm);
       }
     }
 
     // Check if there are too few measures in the point or the point was previously ignored
-    if(((cnet[cp].Size() < 2 && !preservePoints) && cnet[cp].Type() != ControlPoint::Ground)
-        || cnet[cp].Size() == 0 || (cnet[cp].Ignore() && deleteIgnored)) {
+    if(((cnet[cp].Size() < 2 && !preservePoints) && cnet[cp].GetType() != ControlPoint::Ground)
+        || cnet[cp].Size() == 0 || (cnet[cp].IsIgnored() && deleteIgnored)) {
       DeletePoint(cnet, cp);
     }
 

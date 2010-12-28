@@ -129,8 +129,8 @@ namespace Isis {
     for (int i=0; i<iNumPoints; i++) {
       const ControlPoint & cPoint = (*mCNet)[i];
       int iNumMeasures = cPoint.Size();
-      bool bIgnore = cPoint.Ignore();
-      bool bGround = (cPoint.Type()==ControlPoint::Ground ? true : false);
+      bool bIgnore = cPoint.IsIgnored();
+      bool bGround = (cPoint.GetType()==ControlPoint::Ground ? true : false);
       
       for (int j=0; j<iNumMeasures; j++) {
         const ControlMeasure & cMeasure = cPoint[j];
@@ -240,7 +240,7 @@ namespace Isis {
         }
       }
       // Log into the output file
-      ostm << cPoint.Id()   << ", " << sPointType[(int)cPoint.Type()] << ", " <<  sBoolean[(int)cPoint.Ignore()] << ", " ;
+      ostm << cPoint.GetId()   << ", " << sPointType[(int)cPoint.GetType()] << ", " <<  sBoolean[(int)cPoint.IsIgnored()] << ", " ;
       ostm << iNumMeasures << ", " << iIgnored << endl;
       
       // Update Progress
@@ -264,7 +264,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      if(!(*mCNet)[i].Ignore())
+      if(!(*mCNet)[i].IsIgnored())
         iCount ++;
     }
     
@@ -285,7 +285,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i= 0; i < iNumPoints; i++) {
-      if((*mCNet)[i].Type() == ControlPoint::Ground)
+      if((*mCNet)[i].GetType() == ControlPoint::Ground)
         iCount ++;
     }
     return iCount;
@@ -327,7 +327,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      iNumValidMeasures += (*mCNet)[i].NumValidMeasures();
+      iNumValidMeasures += (*mCNet)[i].GetNumValidMeasures();
     }
     
     return iNumValidMeasures;
@@ -350,7 +350,7 @@ namespace Isis {
     
     for(int i = 0; i < iNumPoints; i++) {
       const ControlPoint &cPoint = (*mCNet)[i];
-      iNumIgnoredMeasures += cPoint.Size() - cPoint.NumValidMeasures();
+      iNumIgnoredMeasures += cPoint.Size() - cPoint.GetNumValidMeasures();
     }
     
     return iNumIgnoredMeasures;
@@ -372,8 +372,8 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      if((*mCNet)[i].Ignore()) continue;
-      dAvgError += (*mCNet)[i].AverageResidual();
+      if((*mCNet)[i].IsIgnored()) continue;
+      dAvgError += (*mCNet)[i].GetAverageResidual();
       iPointsCount++;
     }
     
@@ -397,7 +397,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      double dError = (*mCNet)[i].MinimumResidual();
+      double dError = (*mCNet)[i].GetMinimumResidual();
       if(dError < dMinError) 
         dMinError = dError;
     }
@@ -419,7 +419,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      double dError = (*mCNet)[i].MaximumResidual();
+      double dError = (*mCNet)[i].GetMaximumResidual();
       if(dError > dMaxError)
         dMaxError = dError;
     }
@@ -439,7 +439,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-       double dError = (*mCNet)[i].MinimumLineResidual();
+       double dError = (*mCNet)[i].GetMinimumLineResidual();
        if(dError < dMinError)
          dMinError = dError;
      }
@@ -460,7 +460,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-       double dError = (*mCNet)[i].MinimumSampleResidual();
+       double dError = (*mCNet)[i].GetMinimumSampleResidual();
        if(dError < dMinError)
          dMinError = dError;
      }
@@ -481,7 +481,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-       double dError = (*mCNet)[i].MaximumLineResidual();
+       double dError = (*mCNet)[i].GetMaximumLineResidual();
        if(dError > dMaxError) 
          dMaxError = dError;
      }
@@ -502,7 +502,7 @@ namespace Isis {
     int iNumPoints = mCNet->Size();
     
     for(int i = 0; i < iNumPoints; i++) {
-      double dError = (*mCNet)[i].MaximumSampleResidual();
+      double dError = (*mCNet)[i].GetMaximumSampleResidual();
       if(dError > dMaxError)
         dMaxError = dError;
     }
