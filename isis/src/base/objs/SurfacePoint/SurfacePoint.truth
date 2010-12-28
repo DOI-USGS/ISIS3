@@ -53,3 +53,6 @@ UnitTest for SurfacePoint
                                  0.000649383279  0.000973323195  -1.03923048
                                  -0.674095535  -1.03923048  1478.77836
 
+Testing Longitude Accessor...
+Longitude (from -45): 315
+

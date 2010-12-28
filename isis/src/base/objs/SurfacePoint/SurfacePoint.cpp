@@ -627,9 +627,13 @@ namespace Isis {
       double z = (double) p_z;
 
       if (x != 0.  ||  y != 0.) {
-        if (z != 0.) 
-          return atan2(y, x);
-        else
+        if (z != 0.){
+          double lon = atan2(y, x);
+          if (lon < 0) {
+            lon += 2 * PI;
+          }
+          return lon;
+        } else
           return 0.;
       }
       else

@@ -209,6 +209,11 @@ int main(int argc, char *argv[]) {
          << covarSphere(1,1) << "  " << covarSphere(1,2) << endl;
     cout << "                                 " << covarSphere(2,0) << "  "
          << covarSphere(2,1) << "  " << covarSphere(2,2) << endl << endl;
+    
+    cout << "Testing Longitude Accessor..." << endl;
+    Isis::SurfacePoint spSphere3(Latitude(15, Angle::Degrees), Longitude(-45, Angle::Degrees),
+                                 Distance(10, Distance::Kilometers));
+    cout << "Longitude (from -45): " << spSphere3.GetLongitude().GetDegrees() << endl << endl;
 
   }
   catch(Isis::iException &e) {

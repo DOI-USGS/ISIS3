@@ -56,7 +56,8 @@ namespace Isis {
    * @history  2010-10-20 Debbie A. Cook and Steven Lambright  Simplified the 
    *           class by using new Displacement, Distance, Latitude, Longitude,
    *           and Angle objects. 
-   *
+   * @history  2010-12-28 Steven Lambright and Sharmila Prasad  Fixed a problem with 
+   *           retreiving longitudes outside of 0-360.
    * @internal
    * Do we need a bool to make sure a surface point has been set before
    *  computing covariance matrix???? TODO
