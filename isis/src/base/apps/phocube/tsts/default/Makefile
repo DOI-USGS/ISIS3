@@ -6,7 +6,7 @@ phocubeTruth.cub.TOLERANCE = .0000153
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	 $(APPNAME) from=$(INPUT)/ab102401.cub \
+	 $(APPNAME) from=$(INPUT)/ab102401.cropped.cub \
 	  to=$(OUTPUT)/phocubeTruth.cub \
 	  phase=true \
 	  emission=true \
