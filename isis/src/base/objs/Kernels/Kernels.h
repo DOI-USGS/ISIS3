@@ -3,7 +3,8 @@
 /**                                                                       
  * @file                                                                  
  * $Revision$
- * $Date$
+ * $Date$ 
+ * $Id:$ 
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 
