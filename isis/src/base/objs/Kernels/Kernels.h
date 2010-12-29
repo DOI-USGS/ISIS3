@@ -4,7 +4,7 @@
  * @file                                                                  
  * $Revision$
  * $Date$ 
- * $Id:$ 
+ * $Id$ 
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 
@@ -94,11 +94,13 @@ namespace Isis {
    * @author 2010-12-28 Kris Becker 
    *  
    * @internal 
+   *   @history 2010-12-29 Kris Becker - added resolveTypeByExt() method to find
+   *                        non-compliant NAIF file type identifiers kernels
    */
 class Kernels {
     public:
       /** Default Constructor */
-      Kernels() { }
+      Kernels();
       Kernels(const std::string &filename);
       Kernels(Cube &cube);
       Kernels(Pvl &pvl);
@@ -165,6 +167,9 @@ class Kernels {
 
     std::vector<std::string> getTypes(const std::string &ktypes) const;
     std::string resolveType(const std::string &kfile) const;
+    std::string resolveTypeByExt(const std::string &kfile, 
+                                 const std::string &iktype = "UNKNOWN") const;
+
     bool IsNaifType(const std::string &ktype) const;
     KernelFile examine(const std::string &fname, const bool &manage = true) 
                        const;

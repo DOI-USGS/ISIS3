@@ -41,6 +41,13 @@ using namespace std;
 
 namespace Isis {
 
+  /** Default constructor simple initialization */
+  Kernels::Kernels() {
+    _kernels.clear();
+    _camVersion = -1;
+  }
+
+
   /**
    * @brief Construct using an ISIS file name
    * 
@@ -999,11 +1006,15 @@ namespace Isis {
    * It also checks for ISIS DEMs and a special case of ISIS IAKs, which does 
    * not follow the NAIF convention.  ISIS IAKs don't typically contain the NAIF 
    * format identifier but do contain the ".ti" file extention.
-   * 
+   *  
+   * UNKNOWN and DAF types are further checked by the filename.  This is a last 
+   * resort to properly tag kernel types that are ambiguous.  DAFs are common 
+   * for some SPKs.  UNKNOWNs are common for many kernels that do not follow the 
+   * NAIF standard first 8 character identifier model. 
    * 
    * @param kfile Name of potential NAIF kernel to determine type for
    * 
-   * @return std::string Value of the indentifier found.  If undetermined, 
+   * @return std::string Value of the identifier found.  If undetermined, 
    *         "UNKNOWN" is returned.
    */
   std::string Kernels::resolveType(const std::string &kfile) const {
@@ -1015,6 +1026,8 @@ namespace Isis {
       char ibuf[10];
       ifile.read(ibuf, 8);
       ibuf[8] = '\0';
+      for (int i = 0 ; i < 8 ; i++) 
+        if (ibuf[i] == '\n') ibuf[i] = '\0';
 
       // See if the file is a known NAIF type.  Assume it has been
       // extracted from a NAIF compliant kernel
@@ -1027,20 +1040,106 @@ namespace Isis {
         }
       }
 
-      // Check for ISIS specific types
-      if (ktype == "UNKNOWN") {
-        string ext = Filename(kfile).Extension();
-        if (ext == "cub") {
-          ktype = "DEM";
-        }
-        else if (ext == "ti") {
-          //  Assume its an ISIS IAK with a .ti extension
-          ktype = "IAK";
-        }
+      // If type is not resolved, check file extensions and special ISIS types
+      if ((ktype == "UNKNOWN") || (ktype == "DAF")) {
+        ktype = resolveTypeByExt(kfile, ktype);
       }
+
     }
     return (ktype);
   }
+
+  /**
+   * @brief Check kernel type by file extension and special ISIS kernels 
+   *  
+   * This method is a fallback attempt to determine the type of an expected NAIF 
+   * kernel.  This method assumes the proper way (inspecting first 8 characters 
+   * of the kernel file) did not succeed in making this determination. 
+   *  
+   * There are some times that are expected to fail this test.  ISIS DEMs are 
+   * cube files and will not be determined using the NAIF 8 character approach. 
+   * As such, all files that end in .cub are assumed to be DEMs and are tagged 
+   * as such. 
+   *  
+   * There are also some special ISIS IK addendum files that exist in the ISIS 
+   * system.  These files are used to augment an instruments' IK kernel and 
+   * potentially override some of the original IK contents.  This file type is 
+   * determined by checking for a ".ti" extension and then further checking the 
+   * base filename for the substring "Addendum".  This is the only way to ensure 
+   * it is an ISIS IAK file.  It must pass both tests or it is simply tagged as 
+   * an IK (due to the .ti extension). 
+   *  
+   * The remainder of the tests are strictly testing the file extension. Here is 
+   * how the associations are made to the files based upon their file 
+   * extensions: 
+   *  
+   * .cub         = DEM - ISIS cubes are DEMs 
+   * .ti          = IK - unless "Addendum" is in basename, then it is an IAK 
+   * .tf          = FK - frames kernel
+   * .tsc         = SCLK - spacecraft clock kernel 
+   * .tsl         = LSK - leap seconds kernel 
+   * .tpc         = PCK - planetary ephemeris kernel 
+   * .bc          = CK - C-kernel 
+   * .bsp         = SPK - spacecraft position kernel 
+   * .bes         = EK - event kernels 
+   *  
+   * If none of these file extensions or condition are found, then the value of 
+   * the parameter iktype is returned as the default type. 
+   *  
+   * @param kfile  File to determine type for
+   * @param iktype Default type to be used in none are determined from this 
+   *               methiod
+   * 
+   * @return std::string Type of kernel found from file extensions
+   */
+  std::string Kernels::resolveTypeByExt(const std::string &kfile, 
+                                        const std::string &iktype) const {
+
+    string ktype(iktype);  // Set default condition
+
+    //  Deciminate file parts
+    Filename kf(kfile);
+    string ext = iString(kf.Extension()).DownCase();
+
+    //  Check extensions for types
+    if (ext == "cub") {
+      ktype = "DEM";
+    }
+    else if (ext == "ti") {
+      //  Assume its an instrument kernel but check for ISIS IAK file
+      ktype = "IK";
+      string base = iString(kf.Basename()).DownCase();
+      string::size_type idx = base.find("addendum");
+      if (idx != string::npos) {   // This is an ISIS IK addendum (IAK)
+        ktype = "IAK";
+      }
+    }
+    else if (ext == "tsc") {
+      ktype = "SCLK";
+    }
+    else if (ext == "tf") {
+      ktype = "FK";
+    }
+    else if (ext == "tls") {
+      ktype = "LSK";
+    }
+    else if (ext == "tpc") {
+      ktype = "PCK";
+    }
+    else if (ext == "bc") {
+      ktype = "CK";
+    }
+    else if (ext == "bsp") {
+      ktype = "SPK";
+    }
+    else if (ext == "bes") {
+      ktype = "EK";
+    }
+
+    return (ktype);
+  }
+
+
 
   /**
    * @brief Determine the ISIS camera model version number 

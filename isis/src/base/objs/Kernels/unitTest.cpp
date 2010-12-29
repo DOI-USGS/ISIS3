@@ -47,18 +47,18 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nUnLoading All, count after = " << query.size() << "\n";
 
-  //  Now load the DAF kernels after unloading
-  myKernels.Load("DAF");
+  //  Now load the SPK kernels after unloading
+  myKernels.Load("SPK");
   query.Discover();
-  cout << "\nLoaded DAF kernels = " << query.size() << "\n";
+  cout << "\nLoaded SPK kernels = " << query.size() << "\n";
   kloaded = query.getKernelList();
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Load kernels needed for Time manipulation
   myKernels.Load("LSK,SCLK");
-  myKernels.UnLoad("DAF");
+  myKernels.UnLoad("SPK");
   query.Discover();
-  cout << "\nLoad LSK, SCLK for Time manip, unload DAF kernels = " << query.size() << "\n";
+  cout << "\nLoad LSK, SCLK for Time manip, unload SPK kernels = " << query.size() << "\n";
   kloaded = query.getKernelList();
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
