@@ -13,7 +13,10 @@ commands:
 	  type=range \
 	  minres=200 \
 	  maxres=300 \
-	  onet=$(OUTPUT)/truth.pvl \
+	  onet=$(OUTPUT)/truth.bin \
 	  networkid=DefaultTruth \
 	  Description=RefByIncidence > /dev/null;
+	  cnetbin2pvl from=$(OUTPUT)/truth.bin \
+	  to=$(OUTPUT)/truth.pvl >/dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;
+	  $(RM) $(OUTPUT)/truth.bin;

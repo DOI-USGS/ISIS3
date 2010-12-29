@@ -50,6 +50,8 @@ namespace Isis {
   *   @history 2010-10-06 Sharmila Prasad - Modified to incorporate Binary Control Network
   *   @history 2010-10-15 Sharmila Prasad - Use single copy of Control Net in FindCnetRef()
   *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
+  *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
+  *                                         (UpdatePoint, UpdateMeasure)
   */
 
   class Pvl;

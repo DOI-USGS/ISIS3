@@ -246,6 +246,9 @@
     <change name="Sharmila Prasad" date="2010-11-09">
       Update documentation regarding Template DefFile
     </change>
+    <change name="Sharmila Prasad" date="2010-12-29">
+      Updated for binary control net and fixed the app tests accordingly
+    </change>
 </history>
 
 <groups>

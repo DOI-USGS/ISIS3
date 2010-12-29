@@ -11,7 +11,10 @@ commands:
 	  deffile=$(INPUT)/deffile.def \
 	  criteria=interest \
 	  limit=false \
-	  onet=$(OUTPUT)/truth.pvl \
+	  onet=$(OUTPUT)/truth.bin \
 	  networkid=DefaultTruth \
 	  Description=Testing > /dev/null;
+	  cnetbin2pvl from=$(OUTPUT)/truth.bin \
+	  to=$(OUTPUT)/truth.pvl >/dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;
+	  $(RM) $(OUTPUT)/truth.bin;

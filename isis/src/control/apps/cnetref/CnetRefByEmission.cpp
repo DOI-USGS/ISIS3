@@ -119,10 +119,12 @@ namespace Isis {
             } 
             else {
               if(bPntEditLock) {
-                pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not Ignored as Point EditLock is True");
+                pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but "
+                                                  "not Ignored as Point EditLock is True");
               }
               else if(bMeasureLocked) {
-                pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not Ignored as Measure EditLock is True");
+                pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but "
+                                                  "not Ignored as Measure EditLock is True");
               }
               else {
                 pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test");
@@ -145,7 +147,8 @@ namespace Isis {
 
         if((newPnt.Size() - iNumIgnore) < 2) {
           if(bPntEditLock) {
-            pvlPointObj += Isis::PvlKeyword("UnIgnored", "Good Measures less than 2 but not Ignored as Point EditLock is True");
+            pvlPointObj += Isis::PvlKeyword("UnIgnored", "Good Measures less than 2 but "
+                                            "not Ignored as Point EditLock is True");
           }
           else {
             newPnt.SetIgnore(true);
@@ -155,9 +158,11 @@ namespace Isis {
 
         // Set the Reference if the Point is unlocked and Reference measure is unlocked
         if(!newPnt.IsIgnored() && iBestIndex >= 0 && !newPnt[iBestIndex].IsIgnored() && !bPntEditLock && !bRefLocked) {
-          newPnt[iBestIndex].SetType(ControlMeasure::Reference);
+          ControlMeasure cm = newPnt[iBestIndex];
+          cm.SetType(ControlMeasure::Reference);
           pvlGrpVector[iBestIndex] += Isis::PvlKeyword("Reference", "true");
-
+          newPnt.UpdateMeasure(cm);
+          
           // Log info, if Point not locked, apriori source == Reference and a new reference
           if(iRefIndex != iBestIndex && 
              newPnt.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
@@ -191,8 +196,10 @@ namespace Isis {
         }
         
         for(int measure = 0; measure < newPnt.Size(); measure++) {
-          newPnt[measure].SetDateTime(Application::DateTime());
-          newPnt[measure].SetChooserName("Application cnetref(Emission)");
+          ControlMeasure cm = newPnt[measure];
+          cm.SetDateTime(Application::DateTime());
+          cm.SetChooserName("Application cnetref(Emission)");
+          newPnt.UpdateMeasure(cm);
         }
       }
 

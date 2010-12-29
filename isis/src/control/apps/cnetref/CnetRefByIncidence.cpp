@@ -157,9 +157,11 @@ namespace Isis {
 
         // Set the Reference if the Point is unlocked and Reference measure is unlocked
         if(!newPnt.IsIgnored() && iBestIndex >= 0 && !newPnt[iBestIndex].IsIgnored() && !bPntEditLock && !bRefLocked) {
-          newPnt[iBestIndex].SetType(ControlMeasure::Reference);
+          ControlMeasure cm = newPnt[iBestIndex];
+          cm.SetType(ControlMeasure::Reference);
           pvlGrpVector[iBestIndex] += Isis::PvlKeyword("Reference", "true");
-
+          newPnt.UpdateMeasure(cm);
+          
           // Log info, if Point not locked, apriori source == Reference and a new reference
           if(iRefIndex != iBestIndex && 
              newPnt.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
@@ -193,8 +195,10 @@ namespace Isis {
         }
         
         for(int measure = 0; measure < newPnt.Size(); measure++) {
-          newPnt[measure].SetDateTime(Application::DateTime());
-          newPnt[measure].SetChooserName("Application cnetref(Incidence)");
+          ControlMeasure cm = newPnt[measure];
+          cm.SetDateTime(Application::DateTime());
+          cm.SetChooserName("Application cnetref(Incidence)");
+          newPnt.UpdateMeasure(cm);
         }
       }
 

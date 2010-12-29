@@ -169,7 +169,9 @@ namespace Isis {
         if(!newPnt.IsIgnored() && !bPntEditLock && !bRefLocked) {
           iBestIndex = GetReferenceByResolution(newPnt);
           if(iBestIndex >= 0 && !newPnt[iBestIndex].IsIgnored()) {
-            newPnt[iBestIndex].SetType(ControlMeasure::Reference);
+            ControlMeasure cm = newPnt[iBestIndex];
+            cm.SetType(ControlMeasure::Reference);
+            newPnt.UpdateMeasure(cm);
             pvlGrpVector[iBestIndex] += Isis::PvlKeyword("Reference", "true");
           }
           else {
@@ -177,7 +179,9 @@ namespace Isis {
               pvlPointObj += Isis::PvlKeyword("NOTE", "No Valid Measures within the Resolution Range. Reference defaulted to the first Measure");
             }
             iBestIndex = 0;
-            newPnt[iBestIndex].SetType(ControlMeasure::Reference);
+            ControlMeasure cm = newPnt[iBestIndex];
+            cm.SetType(ControlMeasure::Reference);
+            newPnt.UpdateMeasure(cm);
             
             // Log info, if Point not locked, apriori source == Reference and a new reference
             if(iRefIndex != iBestIndex && 
@@ -213,8 +217,10 @@ namespace Isis {
         }
         
         for(int measure = 0; measure < newPnt.Size(); measure++) {
-          newPnt[measure].SetDateTime(Application::DateTime());
-          newPnt[measure].SetChooserName("Application cnetref(Resolution)");
+          ControlMeasure cm = newPnt[iBestIndex];
+          cm.SetDateTime(Application::DateTime());
+          cm.SetChooserName("Application cnetref(Resolution)");
+          newPnt.UpdateMeasure(cm);
         }
       }
 
