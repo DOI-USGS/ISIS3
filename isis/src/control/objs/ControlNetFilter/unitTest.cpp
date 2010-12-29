@@ -3,6 +3,8 @@
 #include "IsisDebug.h"
 #include "Application.h"
 #include "ControlNet.h"
+#include "ControlPoint.h"
+#include "ControlMeasure.h"
 #include "ControlNetFilter.h"
 #include "iException.h"
 #include "Preference.h"
@@ -17,6 +19,8 @@
 #include <stdlib.h>
 
 using namespace std;
+
+void PrintControlNetInfo(Isis::ControlNet & pCNet);
 
 void IsisMain()
 {
@@ -38,6 +42,9 @@ void IsisMain()
   filterGrp += keyword;
   cnetFilter.PointErrorFilter (filterGrp, false);
   filterGrp.Clear();
+  cout << "****************** PointError Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
   // PointID Filter
   filterGrp = Isis::PvlGroup("Point_IdExpression");
@@ -45,6 +52,9 @@ void IsisMain()
   filterGrp += keyword;
   cnetFilter.PointIDFilter (filterGrp, false);
   filterGrp.Clear();
+  cout << "******************  PointID Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
   // PointNumMeasures Filter
   filterGrp = Isis::PvlGroup("Point_NumMeasures");
@@ -52,15 +62,21 @@ void IsisMain()
   filterGrp += keyword;
   cnetFilter.PointMeasuresFilter(filterGrp,  false);
   filterGrp.Clear();
+  cout << "****************** PointNumMeasures Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
 
-  // Filter Points by properties 
+  // PointsProperties Filter 
   filterGrp = Isis::PvlGroup("Point_Properties");
   keyword = Isis::PvlKeyword("Ignore", false);
   filterGrp += keyword;
   cnetFilter.PointPropertiesFilter(filterGrp,  false);
   filterGrp.Clear();
+  cout << "****************** PointsProperties Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
-  // Filter Points by Lat Lon Range
+  // Point_LatLon  Filter
   filterGrp = Isis::PvlGroup("Point_LatLon");
   Isis::PvlKeyword keyword1("MinLat", -180);
   filterGrp += keyword1;
@@ -76,22 +92,31 @@ void IsisMain()
   
   cnetFilter.PointLatLonFilter(filterGrp,  false);
   filterGrp.Clear();
+  cout << "****************** Point_LatLon Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
-  // Filter Points by distance between points
+  // Point_Distance Filter
   filterGrp = Isis::PvlGroup("Point_Distance");
   keyword1 = Isis::PvlKeyword("MaxDistance", 100000);
   filterGrp += keyword1;
-  keyword2 = Isis::PvlKeyword("Units=", "meters");  
+  keyword2 = Isis::PvlKeyword("Units", "meters");  
   filterGrp += keyword2;
   cnetFilter.PointDistanceFilter(filterGrp,  false);
   filterGrp.Clear();
+  cout << "****************** Point_Distance Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
-  // Filter Points by Measure properties
+  // Points_MeasureProperties Filter
   filterGrp = Isis::PvlGroup("Point_MeasureProperties");
-  keyword = Isis::PvlKeyword("MeasureType", "Estimated");
+  keyword = Isis::PvlKeyword("MeasureType", "Candidate");
   filterGrp += keyword;  
   cnetFilter.PointMeasurePropertiesFilter(filterGrp,  false);
   filterGrp.Clear();
+  cout << "****************** Points_MeasureProperties Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
   // Filter Points by Goodness of Fit
   /*filterGrp = Isis::PvlGroup("Point_GoodnessOfFit");
@@ -100,7 +125,7 @@ void IsisMain()
   cnetFilter.PointGoodnessOfFitFilter(filterGrp,  false);
   filterGrp.Clear();*/
   
-  // Filter Points by Cube names 
+  // Point_CubeNames Filter
   filterGrp = Isis::PvlGroup("Point_CubeNames");
   keyword1 = Isis::PvlKeyword("Cube1", "Clementine1/UVVIS/1994-04-05T12:17:21.337");
   filterGrp += keyword1;  
@@ -112,35 +137,60 @@ void IsisMain()
   filterGrp += keyword4;
   cnetFilter.PointCubeNamesFilter(filterGrp,  false);
   filterGrp.Clear();
+  cout << "****************** Point_CubeNames Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
   // Cube Filters
-  // Filter Cubes by Cube name expression 
+  // Cube_NameExpression Filter
   filterGrp = Isis::PvlGroup("Cube_NameExpression");
   keyword = Isis::PvlKeyword("Expression", "Clementine1/UVVIS/1994-04*");
   filterGrp += keyword;  
   cnetFilter.CubeNameExpressionFilter(filterGrp,  false);
   filterGrp.Clear();
+  cout << "****************** Cube_NameExpression Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
   
-  // Filter Cubes by number of points in the cube 
+  // Cube_NumPoints Filter 
   filterGrp = Isis::PvlGroup("Cube_NumPoints");
   keyword = Isis::PvlKeyword("GreaterThan", 2);
   filterGrp += keyword;
   cnetFilter.CubeNumPointsFilter(filterGrp,  false);
-  filterGrp.Clear(); 
+  filterGrp.Clear();
+  cout << "****************** Cube_NumPoints Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n"; 
         
-  // Filter Cubes by Distance between points in a Cube
+  // Cube_Distance Filter
   filterGrp = Isis::PvlGroup("Cube_Distance");
   keyword1 = Isis::PvlKeyword("MaxDistance", 100000);
   filterGrp += keyword1;
-  keyword2 = Isis::PvlKeyword("Units=", "meters");  
+  keyword2 = Isis::PvlKeyword("Units=", "meters");
   filterGrp += keyword2;
   cnetFilter.CubeDistanceFilter(filterGrp,  false);
   filterGrp.Clear();
-    
-  cnet.SetModifiedDate("current");
-  cnet.SetCreatedDate("current");
-  cnet.Write("cnetNew.net");  
+  cout << "****************** Cube_Distance Filter ******************" << endl;
+  PrintControlNetInfo(cnet);
+  cout << "************************************************************************\n";
 
-  system ("cat cnetNew.net");
-  system ("rm cnetNew.net"); 
+}
+
+/**
+ * Print Control Net info like Point ID and Measure SerialNum
+ * 
+ * @author Sharmila Prasad (12/28/2010)
+ * 
+ * @param pCNet - Control Net
+ */
+void PrintControlNetInfo(Isis::ControlNet & pCNet)
+{
+  for (int i=0; i<pCNet.Size(); i++) {
+    cout << "Control Point ID  " << pCNet[i].GetId() << endl;
+    for (int j=0; j<pCNet[i].Size(); j++) {
+      cout << "   Measure SerialNum " << pCNet[i][j].GetCubeSerialNumber() << endl;
+    }
+    cout << endl;
+  }
+  
 }
