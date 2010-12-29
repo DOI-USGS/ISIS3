@@ -99,7 +99,9 @@ namespace Isis {
    *                                       removing includes from ControlNet.h.
    *   @history 2010-10-28 Sharmila Prasad - Log, if Reference changed and apriorisource==Reference
    *   @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
-   *   @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private and
+   *   @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private
+   *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
+  *                                         (UpdatePoint, UpdateMeasure)
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:

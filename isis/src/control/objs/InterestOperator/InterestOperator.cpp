@@ -522,6 +522,8 @@ namespace Isis {
             iMeasuresModified ++;
           }
 
+          newPnt.UpdateMeasure(newMeasure);
+          
           pvlMeasureGrp += Isis::PvlKeyword("BestInterest",   mtInterestResults[measure].mdInterest);
           pvlMeasureGrp += Isis::PvlKeyword("EmissionAngle",  mtInterestResults[measure].mdEmission);
           pvlMeasureGrp += Isis::PvlKeyword("IncidenceAngle", mtInterestResults[measure].mdIncidence);
@@ -592,13 +594,17 @@ namespace Isis {
         }
 
         for(int measure = 0; measure < newPnt.Size(); measure++) {
-          newPnt[measure].SetDateTime();
-          newPnt[measure].SetChooserName("Application cnetref(Interest)");
+          ControlMeasure cm = newPnt[measure];
+          cm.SetDateTime();
+          cm.SetChooserName("Application cnetref(Interest)");
+          newPnt.UpdateMeasure(cm);
         }
       } // End of if point is of type tie
 
       mPvlLog += pvlPointObj;
 
+      pNewNet.UpdatePoint(newPnt);
+      
       mStatus.CheckStatus();
     } // Point loop
 
