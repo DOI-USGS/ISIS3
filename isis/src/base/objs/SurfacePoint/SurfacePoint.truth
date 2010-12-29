@@ -20,9 +20,9 @@ UnitTest for SurfacePoint
   Output rectangular...
     x=-424.024048 m, y=734.431195 m, z=529.919264 m
     X sigma=10 m, Y sigma=50 m, Z sigma=20 m
-    rectangular covariance matrix = 100  -3.33955086e-13  -1.0658141e-14
-                                    -3.33955086e-13  2500  2.27373675e-13
-                                    -1.0658141e-14  2.27373675e-13  400
+    rectangular covariance matrix =        100         0         0
+                                             0      2500         0
+                                             0         0       400
 3-Testing rectangular set with point and sigmas only...
   Output spherical...
     lat=32 degrees, lon=120 degrees, radius=1000m

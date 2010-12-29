@@ -87,6 +87,14 @@ int main(int argc, char *argv[]) {
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
     covarRec = spSphere.GetRectangularMatrix();
+
+    if(fabs(covarRec(0,1)) < 1E-12) covarRec(0,1) = 0.0;
+    if(fabs(covarRec(0,2)) < 1E-12) covarRec(0,2) = 0.0;
+    if(fabs(covarRec(1,0)) < 1E-12) covarRec(1,0) = 0.0;
+    if(fabs(covarRec(1,2)) < 1E-12) covarRec(1,2) = 0.0;
+    if(fabs(covarRec(2,0)) < 1E-12) covarRec(2,0) = 0.0;
+    if(fabs(covarRec(2,2)) < 1E-12) covarRec(2,2) = 0.0;
+
     cout << "  Output rectangular..." << endl;
     cout << "    x=" << spSphere.GetX() << " m, y=" << spSphere.GetY()
          << " m, z=" << spSphere.GetZ() << " m" << endl;
@@ -94,11 +102,14 @@ int main(int argc, char *argv[]) {
          << spSphere.GetYSigma() << " m, Z sigma=" << spSphere.GetZSigma() << " m"
          << endl;
     cout << "    rectangular covariance matrix = " 
-         << covarRec(0,0) << "  " << covarRec(0,1) << "  " << covarRec(0,2) << endl;
+         << setw(10) << covarRec(0,0) << setw(10) << covarRec(0,1)
+         << setw(10) << covarRec(0,2) << endl;
     cout << "                                    "
-         << covarRec(1,0) << "  " << covarRec(1,1) << "  " << covarRec(1,2) << endl;
+         << setw(10) << covarRec(1,0) << setw(10) << covarRec(1,1)
+         << setw(10) << covarRec(1,2) << endl;
     cout << "                                    "
-         << covarRec(2,0) << "  " << covarRec(2,1) << "  " << covarRec(2,2) << endl;
+         << setw(10) << covarRec(2,0) << setw(10) << covarRec(2,1)
+         << setw(10) << covarRec(2,2) << endl;
   }
   catch(Isis::iException &e) {
     e.Report();
