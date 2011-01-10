@@ -427,7 +427,7 @@ force: ;
 	    compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results keyword=Compare`; \
 	  fi;                                          \
 	  command="";                                  \
-	  if [ "$$compResult" = "DIFFERENT" ] || [ "$$compResult" == "ERROR" ]; then \
+	  if [ "$$compResult" != "Identical" ]; then   \
 	    msg='$(TESTFILEFAILED)';                   \
 	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
 	    $$msg >> casefailed.txt;                   \
