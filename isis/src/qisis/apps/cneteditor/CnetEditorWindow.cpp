@@ -22,7 +22,7 @@ namespace Qisis
   
     ControlPoint cp0("0");
     cp0.Add(cp0cm1);
-    cp0.Add(cp0cm2);
+//    cp0.Add(cp0cm2);
   
   
     // control point 1
@@ -35,8 +35,8 @@ namespace Qisis
   
     ControlPoint cp1("1");
     cp1.Add(cp1cm1);
-    cp1.Add(cp1cm2);
-    cp1.Add(cp1cm3);
+//    cp1.Add(cp1cm2);
+//    cp1.Add(cp1cm3);
   
   
     // control point 2
@@ -91,10 +91,10 @@ namespace Qisis
     ControlNet * cnet = new ControlNet;
     cnet->Add(cp0);
     cnet->Add(cp1);
-    cnet->Add(cp2);
-    cnet->Add(cp3);
-    cnet->Add(cp4);
-    cnet->Add(cp5);
+//    cnet->Add(cp2);
+//    cnet->Add(cp3);
+//    cnet->Add(cp4);
+//    cnet->Add(cp5);
 
     editorWidget = new CnetEditorWidget(cnet);
     setCentralWidget(editorWidget);

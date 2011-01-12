@@ -30,13 +30,13 @@ namespace Qisis
     
     cubeView = new QTreeView();
     cubeView->setModel(cubeModel);
-    pointView = new QTableView();
-    measureView = new QTableView();  
+//    pointView = new QTableView();
+//    measureView = new QTableView();  
 
     QBoxLayout* mainLayout = new QHBoxLayout();
     mainLayout->addWidget(cubeView);
-    mainLayout->addWidget(pointView);
-    mainLayout->addWidget(measureView);
+//    mainLayout->addWidget(pointView);
+//    mainLayout->addWidget(measureView);
 
     return mainLayout;
   }
