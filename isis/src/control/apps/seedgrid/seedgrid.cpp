@@ -40,7 +40,7 @@ void IsisMain() {
     PvlGroup &mapGroup = userMap.FindGroup("Mapping", Pvl::Traverse);
 
     // Construct a Projection for converting between Lon/Lat and X/Y
-    // Note: Should this be an option to include this in the program?
+    // TODO: Should this be an option to include this in the program?
     string target;
     if(ui.WasEntered("TARGET")) {
       target = ui.GetString("TARGET");
