@@ -3,7 +3,7 @@
 <application name="maplab" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Add "Mapping" group to the labels of a cube
+    Add Mapping group to the labels of a cube
   </brief>
 
   <description>
