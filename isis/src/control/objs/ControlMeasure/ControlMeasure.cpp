@@ -28,6 +28,8 @@
 #include "Application.h"
 #include "Camera.h"
 #include "ControlMeasureLogData.h"
+#include "ControlPoint.h"
+#include "ControlSerialNumber.h"
 #include "iString.h"
 #include "iTime.h"
 #include "PBControlNetIO.pb.h"
@@ -118,6 +120,7 @@ namespace Isis {
     p_lineResidual = other.p_lineResidual;
     p_camera = other.p_camera;
     parentPoint = other.parentPoint;
+    associatedSN = other.associatedSN;
   }
 
 
@@ -202,6 +205,7 @@ namespace Isis {
     p_focalPlaneComputedY = Null;
 
     parentPoint = NULL;
+    associatedSN = NULL;
   }
 
 
@@ -227,6 +231,10 @@ namespace Isis {
     if (p_loggedData) {
       delete p_loggedData;
       p_loggedData = NULL;
+    }
+
+    if (associatedSN) {
+      associatedSN->RemoveMeasure(GetPointId());
     }
   }
 
@@ -844,6 +852,26 @@ namespace Isis {
   }
 
 
+  QString ControlMeasure::GetPointId() const {
+    if (parentPoint == NULL) {
+      iString msg = "Measure has no containing point";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    return parentPoint->GetId();
+  }
+
+
+  void ControlMeasure::ConnectControlSN(ControlSerialNumber * sn) {
+    associatedSN = sn;
+  }
+
+
+  void ControlMeasure::DisconnectControlSN() {
+    associatedSN = NULL;
+  }
+
+
   ControlMeasureLogData ControlMeasure::GetLogData(long dataType) const {
     int foundIndex = 0;
     ControlMeasureLogData::NumericLogDataType typedDataType =
@@ -1152,6 +1180,7 @@ namespace Isis {
     p_focalPlaneComputedX = other.p_focalPlaneComputedX;
     p_focalPlaneComputedY = other.p_focalPlaneComputedY;
     parentPoint = other.parentPoint;
+    associatedSN = other.associatedSN;
 
     return *this;
   }

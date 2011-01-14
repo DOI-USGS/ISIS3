@@ -26,6 +26,7 @@
 
 template< class A> class QVector;
 template< class A> class QList;
+class QString;
 class QStringList;
 class QVariant;
 
@@ -34,6 +35,7 @@ namespace Isis {
   class Camera;
   class ControlMeasureLogData;
   class ControlPoint;
+  class ControlSerialNumber;
   class iString;
   class PBControlNet_PBControlPoint_PBControlMeasure;
   class PBControlNetLogData_Point_Measure;
@@ -272,6 +274,10 @@ namespace Isis {
       double GetSampleResidual() const;
       double GetSampleSigma() const;
       MeasureType GetType() const;
+      QString GetPointId() const;
+
+      void ConnectControlSN(ControlSerialNumber * sn);
+      void DisconnectControlSN();
 
       static QVector<iString> GetMeasureDataNames();
 
@@ -295,6 +301,9 @@ namespace Isis {
 
     private: // data
       ControlPoint * parentPoint; //!< Pointer to parent ControlPoint, may be null
+      ControlSerialNumber * associatedSN; //!< Pointer to the Serial Number
+                                          // structure connecting measures in an image
+
       iString *p_serialNumber;
       MeasureType p_measureType;
 
