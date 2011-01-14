@@ -2,14 +2,14 @@
 #include "ControlMeasure.h"
 
 #include <QHash>
-#include <QString>
 
 namespace Isis {
 
   /**
   * Create an empty SerialNumber object.
   */
-  ControlSerialNumber::ControlSerialNumber() {
+  ControlSerialNumber::ControlSerialNumber(QString sn) {
+    serialNumber = sn;
     measures = new QHash<QString, ControlMeasure *>;
   }
 
@@ -34,5 +34,10 @@ namespace Isis {
   void ControlSerialNumber::RemoveMeasure(QString parentPoint) {
     (*measures)[parentPoint]->DisconnectControlSN();
     measures->remove(parentPoint);
+  }
+
+
+  QString ControlSerialNumber::GetSerialNumber() {
+    return serialNumber;
   }
 }

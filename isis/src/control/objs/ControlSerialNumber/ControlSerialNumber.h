@@ -23,11 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "SerialNumber.h"
-
 template < typename A, typename B > class QHash;
 
-class QString;
+#include <QString>
 
 namespace Isis {
 
@@ -51,15 +49,18 @@ namespace Isis {
    *
    */
 
-  class ControlSerialNumber : SerialNumber {
+  class ControlSerialNumber {
     public:
-      ControlSerialNumber();
+      ControlSerialNumber(QString sn);
       virtual ~ControlSerialNumber();
 
       void AddMeasure(QString parentPoint, ControlMeasure * measure);
       void RemoveMeasure(QString parentPoint);
 
+      QString GetSerialNumber();
+
     private:
+      QString serialNumber;
       QHash<QString, ControlMeasure *> * measures;
 
   }; // End of Class
