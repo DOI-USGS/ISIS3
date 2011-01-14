@@ -56,6 +56,16 @@ namespace Isis {
         MiniRF(Isis::Pvl &lab);
 
         ~MiniRF() {};
+
+        virtual int CkFrameId() const;
+
+        virtual int CkReferenceId() const;
+
+        /** SPK Target Body ID - Lunar Reconnaissance Orbiter spacecraft */
+        virtual int SpkTargetId() const { return (-85); }
+
+        /** SPK Reference ID - J2000 */
+        virtual int SpkReferenceId() const { return (1); }
     };
   };
 };

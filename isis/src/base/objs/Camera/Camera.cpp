@@ -80,9 +80,11 @@ namespace Isis {
     p_pixelPitch = 1.0;
     p_referenceBand = 0;
     p_childBand = 1;
-    p_ckFrameId = 0;
-    p_ckReferenceId = 0;
-    p_ckwriteReady = false;
+
+    // TODO (taddair): make sure these variables are, in fact, deprecated
+//     p_ckFrameId = 0;
+//     p_ckReferenceId = 0;
+//     p_ckwriteReady = false;
 
     p_distortionMap = NULL;
     p_focalPlaneMap = NULL;
@@ -96,9 +98,12 @@ namespace Isis {
       p_referenceBand = inst["ReferenceBand"];
     }
 
+#if 0
+//  Obsoleted with the pure virtuals in each Camera model
     // Set the FrameId and the ReferenceFrameId
     SetCkFrameId();
     SetCkReferenceId();
+#endif
 
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
@@ -1683,6 +1688,7 @@ namespace Isis {
     return true;
   }
 
+#if 0
   //! Reads the ck frame id from the instrument kernel
   void Camera::SetCkFrameId() {
     int code = NaifIkCode();
@@ -1734,5 +1740,6 @@ namespace Isis {
       throw Isis::iException::Message(iException::Camera, msg, _FILEINFO_);
     }
   }
+#endif
 // end namespace isis
 }

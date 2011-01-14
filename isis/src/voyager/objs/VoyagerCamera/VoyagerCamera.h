@@ -44,6 +44,30 @@ namespace Isis {
     public:
       VoyagerCamera (Isis::Pvl &lab);
       ~VoyagerCamera () {};      
+
+      /** 
+       * CK frame ID -
+       * Voyager 1 instrument code (VG1_SCAN_PLATFORM) = -31100
+       * Voyager 2 instrument code (VG1_SCAN_PLATFORM) [sic] = -32100
+       */
+      virtual int CkFrameId() const { return p_ckFrameId; }
+
+      /** CK Reference ID - B1950 */
+      virtual int CkReferenceId() const { return (2); }
+
+      /** 
+       * SPK Target Body ID -
+       * VOYAGER 1 = -31
+       * VOYAGER 2 = -32
+       */
+      virtual int SpkTargetId() const { return p_spkTargetId; }
+
+      /** SPK Reference ID - J2000 */
+      virtual int SpkReferenceId() const { return (1); }
+
+    private:
+      int p_ckFrameId;
+      int p_spkTargetId;
   };
 };
 #endif

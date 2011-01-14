@@ -56,6 +56,15 @@ namespace Isis {
 
         // Destroys the HiriseCamera object
         ~HiriseCamera();
+
+        /** CK Frame ID - Instrument Code from spacit run on CK */
+        virtual int CkFrameId() const { return (-74000); }
+
+        /** CK Reference ID - MRO_MME_OF_DATE */
+        virtual int CkReferenceId() const { return (-74900); }
+
+        /** SPK Reference ID - J2000 */
+        virtual int SpkReferenceId() const { return (1); }
     };
   };
 };

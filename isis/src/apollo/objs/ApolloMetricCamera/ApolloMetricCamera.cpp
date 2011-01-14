@@ -29,8 +29,6 @@ namespace Isis {
       CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
       focalMap->SetDetectorOrigin(ParentSamples() / 2.0, ParentLines() / 2.0);
 
-      const PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-
       iString ppKey("INS" + iString((int)NaifIkCode()) + "_PP");
       iString odkKey("INS" + iString((int)NaifIkCode()) + "_OD_K");
       iString decenterKey("INS" + iString((int)NaifIkCode()) + "_DECENTER");
@@ -43,6 +41,32 @@ namespace Isis {
       // Setup the ground and sky map
       new CameraGroundMap(this);
       new CameraSkyMap(this);
+
+      const PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+
+      // The Spacecraft Name should be either Apollo 15, 16, or 17.  The name
+      // itself could be formatted any number of ways, but the number contained
+      // in the name should be unique between the missions
+      string spacecraft = inst.FindKeyword("SpacecraftName")[0];
+      if (spacecraft.find("15") != string::npos) {
+        p_ckFrameId = -915240;
+        p_ckReferenceId = 1400015;
+        p_spkTargetId = -915;
+      }
+      else if (spacecraft.find("16") != string::npos) {
+        p_ckFrameId = -916240;
+        p_ckReferenceId = 1400016;
+        p_spkTargetId = -916;
+      }
+      else if (spacecraft.find("17") != string::npos) {
+        p_ckFrameId = -917240;
+        p_ckReferenceId = 1400017;
+        p_spkTargetId = -917;
+      }
+      else {
+        string msg = "File does not appear to be an Apollo image";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
 
       // Create a cache and grab spice info since it does not change for
       // a framing camera (fixed spacecraft position and pointing)

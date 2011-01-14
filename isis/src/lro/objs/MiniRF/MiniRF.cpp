@@ -165,6 +165,18 @@ namespace Isis {
       groundMap->SetDopplerSigma(dopplerSigma);
       slantRangeMap->SetWeightFactors(range_sigma, dopplerSigma);
     }
+
+
+    int MiniRF::CkFrameId() const {
+      std::string msg = "Cannot generate CK for MiniRF";
+      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    }
+
+
+    int MiniRF::CkReferenceId() const {
+      std::string msg = "Cannot generate CK for MiniRF";
+      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    }
   }
 }
 

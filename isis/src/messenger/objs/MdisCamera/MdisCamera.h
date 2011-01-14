@@ -67,6 +67,8 @@ namespace Isis {
      *            the MDIS IK (msgr_mdis_v120.ti) udpates these parameters as
      *            well as the WAC focal lengths.  The NAC is unaffected by these
      *            changes.
+     *   @history 2010-12-20 Kris Becker - Added implementation of CK and SPK
+     *            NAIF codes for the Camera class.
      */
     class MdisCamera : public FramingCamera {
       public:
@@ -76,6 +78,15 @@ namespace Isis {
          * This destroys the MdisCamera object
          */
         ~MdisCamera() {};
+
+        /** CK frame ID - MESSENGER instrument code (MSGR_SPACECRAFT) */
+        virtual int CkFrameId() const { return (-236000); }
+        /** CK Reference ID - J2000 */
+        virtual int CkReferenceId() const { return (1); }
+        /** SPK Target Body ID - MESSENGER spacecraft */
+        virtual int SpkTargetId() const { return (-236); }
+        /** SPK Reference ID - J2000 */
+        virtual int SpkReferenceId() const { return (1); }
     };
   };
 };

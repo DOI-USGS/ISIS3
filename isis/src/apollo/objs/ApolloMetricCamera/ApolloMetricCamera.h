@@ -24,6 +24,38 @@ namespace Isis {
         ApolloMetricCamera(Isis::Pvl &lab);
 
         ~ApolloMetricCamera() {};
+
+        /**
+         * CK frame ID -
+         * Apollo 15 instrument code (A15_METRIC) = -915240
+         * Apollo 16 instrument code (A16_METRIC) = -916240
+         * Apollo 17 instrument code (A17_METRIC) = -917240
+         */
+        virtual int CkFrameId() const { return p_ckFrameId; }
+
+        /**
+         * CK Reference ID -
+         * APOLLO_15_NADIR = 1400015
+         * APOLLO_16_NADIR = 1400016
+         * APOLLO_17_NADIR = 1400017
+         */
+        virtual int CkReferenceId() const { return p_ckReferenceId; }
+
+        /**
+         * SPK Target Body ID -
+         * Apollo 15 = -915
+         * Apollo 16 = -916
+         * Apollo 17 = -917
+         */
+        virtual int SpkTargetId() const { return p_spkTargetId; }
+
+        /** SPK Reference ID - B1950 */
+        virtual int SpkReferenceId() const { return (2); }
+
+      private:
+        int p_ckFrameId;
+        int p_ckReferenceId;
+        int p_spkTargetId;
     };
   };
 };

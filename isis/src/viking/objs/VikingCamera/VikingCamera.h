@@ -55,6 +55,35 @@ namespace Isis {
 
       //! Destroys the VikingCamera Object
       ~VikingCamera() {};
+
+      /** 
+       * CK frame ID -
+       * Viking1 instrument code (VO1_PLATFORM) = -27000
+       * Viking2 instrument code (VO2_PLATFORM) = -30000
+       */
+      virtual int CkFrameId() const { return p_ckFrameId; }
+
+      /** 
+       * CK Reference ID -
+       * B1950 or J2000 depending on the ck used.  The mdim2.0_rand ck is in
+       * J2000.  Here we use B1950 (code = 2) because it was the reference
+       * frame for the original spice
+       */
+      virtual int CkReferenceId() const { return (2); }
+
+      /** 
+       * SPK Target Body ID -
+       * VIKING 1 ORBITER = -27
+       * VIKING 2 ORBITER = -30
+       */
+      virtual int SpkTargetId() const { return p_spkTargetId; }
+
+      /** SPK Reference ID - B1950 */
+      virtual int SpkReferenceId() const { return (2); }
+
+    private:
+      int p_ckFrameId;
+      int p_spkTargetId;
   };
 };
 #endif

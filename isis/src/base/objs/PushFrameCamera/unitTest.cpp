@@ -7,6 +7,21 @@ using namespace Isis;
 class MyCamera : public PushFrameCamera {
   public:
     MyCamera(Isis::Pvl &lab) : Isis::PushFrameCamera(lab) { }
+
+    virtual int CkFrameId() const {
+      string msg = "CK Frame ID is unqiue to mission-specific cameras";
+      throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    }
+
+    virtual int CkReferenceId() const {
+      string msg = "CK Reference ID is unique to mission-specific cameras";
+      throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    }
+
+    virtual int SpkReferenceId() const {
+      string msg = "SPK Reference ID is unique to mission-specific cameras";
+      throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    }
 };
 
 int main() {

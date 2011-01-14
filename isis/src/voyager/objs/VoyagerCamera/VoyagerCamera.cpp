@@ -52,6 +52,9 @@ namespace Isis {
 
     // These set up which kernel and other files to access, 
     if (spacecraft == "VOYAGER_1") {
+      p_ckFrameId = -31100;
+      p_spkTargetId = -31;
+
       reseauFilename += "1/reseaus/vg1";
       spacecraftCode = -31;
 
@@ -69,6 +72,9 @@ namespace Isis {
       }
     }
     else if (spacecraft == "VOYAGER_2") {
+      p_ckFrameId = -32100;
+      p_spkTargetId = -32;
+
       reseauFilename += "2/reseaus/vg2";
       spacecraftCode = -32;
 

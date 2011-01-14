@@ -56,6 +56,9 @@ namespace Isis {
     double raster, cone, crosscone;
     int altinstcode = 0;
     if(spacecraft == "VIKING_ORBITER_1") {
+      p_ckFrameId = -27000;
+      p_spkTargetId = -27;
+
       spn = 1;
       altinstcode = -27999;
       if(instId == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
@@ -78,6 +81,9 @@ namespace Isis {
       }
     }
     else if(spacecraft == "VIKING_ORBITER_2") {
+      p_ckFrameId = -30000;
+      p_spkTargetId = -30;
+
       spn = 2;
       altinstcode = -30999;
       if(instId == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
@@ -110,7 +116,7 @@ namespace Isis {
     scs2e_c(altinstcode, spacecraftClock.c_str(), &et);
 
     // Calculate and load the euler angles
-    SpiceDouble	CP[3][3];
+    SpiceDouble CP[3][3];
     eul2m_c((SpiceDouble)raster * rpd_c(), (SpiceDouble)cone * rpd_c(),
             (SpiceDouble) - crosscone * rpd_c(), 3, 2, 1, CP);
 

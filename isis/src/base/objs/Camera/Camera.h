@@ -448,22 +448,187 @@ namespace Isis {
        */
       virtual CameraType GetCameraType() const = 0;
 
-      void SetCkFrameId();
-      void SetCkReferenceId();
+      // These are obsolete with the pure virtuals below
+     //  void SetCkFrameId();
+     //  void SetCkReferenceId();
 
       /**
-       * Returns the ck frame id
-       *
-       * @return ck frame id
+       * @brief Provides the NAIF frame code for an instruments CK kernel
+       *  
+       * This pure virtual method must be implemented in each camera model 
+       * providing the reference frame NAIF ID code found in the mission CK 
+       * kernel. 
+       *  
+       * This value can be easily determined by using the NAIF @b spacit 
+       * application that sumarizes binary CK kernels a particular instrument on 
+       * a spacecraft. @b spacit will additionally require a spacecraft clock 
+       * kernel (SCLK) and a leap seconds kernel (LSK). For example, the output 
+       * of the MESSENGER camera CK supporting the MDIS camera below indicates 
+       * it is the MESSENGER spacecraft. 
+       * 
+       *  
+       * @code 
+       *   Segment ID     : MSGR_SPACECRAFT
+       *   Instrument Code: -236000
+       *   Spacecraft     : Body -236, MESSENGER
+       *   Reference Frame: Frame 1, J2000
+       *   CK Data Type   : Type 3
+       *   Description : Continuous Pointing: Linear Interpolation
+       *   Available Data : Pointing and Angular Velocity
+       *   UTC Start Time : 2004 AUG 12 17:17:42.558
+       *   UTC Stop Time  : 2010 JUL 23 12:35:22.814
+       *   SCLK Start Time: 1/000818300:000000
+       *   SCLK Stop Time : 1/188375996:000000
+       * @endcode 
+       *  
+       * The CkFrameId value is found in the "Instrument Code" entry (-236000). 
+       * 
+       * @return int 
        */
-      int CkFrameId();
+      virtual int CkFrameId() const = 0;
 
       /**
-       * Returns the ck reference id
-       *
-       * @return ck reference id
+       * @brief Provides the NAIF reference code for an instruments CK kernel
+       * 
+       * This virtual method must be implemented in each camera model providing
+       * the reference frame NAIF ID code found in the mission CK kernel. 
+       *  
+       * This value can be easily determined by using the NAIF @b spacit 
+       * application that sumarizes binary CK kernels a particular instrument on 
+       * a spacecraft.  @b spacit will additionally require a spacecraft clock 
+       * kernel (SCLK) and a leap seconds kernel (LSK).For example, the output 
+       * of the MESSENGER camera CK supporting the MDIS camera below indicates 
+       * it is the MESSENGER spacecraft. 
+       * 
+       *  
+       * @code 
+       *   Segment ID     : MSGR_SPACECRAFT
+       *   Instrument Code: -236000
+       *   Spacecraft     : Body -236, MESSENGER
+       *   Reference Frame: Frame 1, J2000
+       *   CK Data Type   : Type 3
+       *   Description : Continuous Pointing: Linear Interpolation
+       *   Available Data : Pointing and Angular Velocity
+       *   UTC Start Time : 2004 AUG 12 17:17:42.558
+       *   UTC Stop Time  : 2010 JUL 23 12:35:22.814
+       *   SCLK Start Time: 1/000818300:000000
+       *   SCLK Stop Time : 1/188375996:000000
+       * @endcode 
+       *  
+       * The CkReferenced value is found in the "Reference Frame" entry (1). 
+       * 
+       * @return int 
        */
-      int CkReferenceId();
+      virtual int CkReferenceId() const = 0;
+
+      /**
+       * @brief Provides target code for instruments SPK NAIF kernel 
+       *  
+       * This virtual method may need to be implemented in each camera model 
+       * providing the target NAIF ID code found in the mission SPK kernel. This 
+       * is typically the spacecraft ID code. 
+       *  
+       * This value can be easily determined by using the NAIF @b spacit 
+       * application that sumarizes binary kernels on the SPK kernel used for a 
+       * particular instrument on a spacecraft.  @b spacit will additionally 
+       * require a leap seconds kernel (LSK).  For example, the output of the 
+       * MESSENGER SPK camera supporting the MDIS camera below indicates it is 
+       * indeed the MESSENGER spacecraft: 
+       *  
+       * @code 
+       *     Segment ID     : msgr_20050903_20061125_recon002.nio
+       *     Target Body    : Body -236, MESSENGER
+       *     Center Body    : Body 2, VENUS BARYCENTER
+       *     Reference frame: Frame 1, J2000
+       *     SPK Data Type  : Type 1
+       *     Description : Modified Difference Array
+       *     UTC Start Time : 2006 OCT 16 19:25:41.111
+       *     UTC Stop Time  : 2006 OCT 31 22:14:24.040
+       *     ET Start Time  : 2006 OCT 16 19:26:46.293
+       *     ET Stop time   : 2006 OCT 31 22:15:29.222
+       * @endcode 
+       *  
+       * The SpkTargetId value is found in the "Target Body" entry (-236). 
+       *  
+       * For most cases, this is the NAIF SPK code returned by the NaifSpkCode() 
+       * method (in the Spice class).  Some instrument camera models may need to
+       * override this method if this is not case. 
+       * 
+       * @return int NAIF code for SPK target for an instrument
+       */
+      virtual int SpkTargetId() const { return  (NaifSpkCode()); }
+
+      /**
+       * @brief Provides the center of motion body for SPK NAIF kernel 
+       *  
+       * This virtual method may need to be implemented in each camera model 
+       * providing the NAIF integer code for the center of motion of the object 
+       * identified by the SpkTargetId() code.  This is typically the targeted 
+       * body for a particular image observation, but may be unique depending 
+       * upon the design of the SPK mission kernels. 
+       *  
+       * This value can be easily determined by using the NAIF @b spacit 
+       * application that sumarizes binary kernels on the SPK kernel used for a 
+       * particular instrument on a spacecraft.  @b spacit will additionally 
+       * require a leap seconds kernel (LSK).  For example, the output of the 
+       * MESSENGER SPK camera supporting the MDIS camera below indicates it is 
+       * Venus.
+       *  
+       * @code 
+       *     Segment ID     : msgr_20050903_20061125_recon002.nio
+       *     Target Body    : Body -236, MESSENGER
+       *     Center Body    : Body 2, VENUS BARYCENTER
+       *     Reference frame: Frame 1, J2000
+       *     SPK Data Type  : Type 1
+       *     Description : Modified Difference Array
+       *     UTC Start Time : 2006 OCT 16 19:25:41.111
+       *     UTC Stop Time  : 2006 OCT 31 22:14:24.040
+       *     ET Start Time  : 2006 OCT 16 19:26:46.293
+       *     ET Stop time   : 2006 OCT 31 22:15:29.222
+       * @endcode 
+       *  
+       * The SpkCenterId value is found in the "Center Body" entry (2). The 
+       * center of motion is most likely the targeted body for the image and 
+       * this is provided by the NaifBodyCode() method (in the Spice class).  If 
+       * this is not consistently the case for a particular mission, then camera 
+       * models will need to reimplement this method. 
+       * 
+       * @return int NAIF code for SPK center of motion body for an instrument
+       */
+      virtual int SpkCenterId() const { return (NaifBodyCode()); }
+
+      /**
+       * @brief Provides reference frame for instruments SPK NAIF kernel 
+       *  
+       * This pure virtual method must be implemented in each camera model 
+       * providing the reference frame NAIF ID code found in the mission SPK 
+       * kernel.  This is typically J2000, but may be relative to other frames. 
+       *  
+       * This value can be easily determined by using the NAIF @b spacit 
+       * application that sumarizes binary kernels on the SPK kernel used for a 
+       * particular instrument on a spacecraft.  @b spacit will additionally 
+       * require a leap seconds kernel (LSK).  For example, the output of the 
+       * MESSENGER SPK camera supporting the MDIS camera below indicates it is 
+       * indeed the J2000 reference frame: 
+       *  
+       * @code 
+       *     Segment ID     : msgr_20050903_20061125_recon002.nio
+       *     Target Body    : Body -236, MESSENGER
+       *     Center Body    : Body 2, VENUS BARYCENTER
+       *     Reference frame: Frame 1, J2000
+       *     SPK Data Type  : Type 1
+       *     Description : Modified Difference Array
+       *     UTC Start Time : 2006 OCT 16 19:25:41.111
+       *     UTC Stop Time  : 2006 OCT 31 22:14:24.040
+       *     ET Start Time  : 2006 OCT 16 19:26:46.293
+       *     ET Stop time   : 2006 OCT 31 22:15:29.222
+       * @endcode 
+       *  
+       * The SpkReferenceId value is found in the "Reference frame" entry (1).
+       * 
+       * @return int NAIF code for SPK reference frame for an instrument
+       */
+      virtual int SpkReferenceId() const = 0;
 
     protected:
 
@@ -552,9 +717,9 @@ namespace Isis {
       int p_geometricTilingStartSize; //!< The ideal geometric tile size to start with when projecting
       int p_geometricTilingEndSize; //!< The ideal geometric tile size to end with when projecting
 
-      int p_ckFrameId;      //!< The native frame of the c-kernels for this instrument
-      int p_ckReferenceId; //!< The reference frame of the c-kernels for this instrument
-      bool p_ckwriteReady;   //! Flag indicating ckFrameid and ckReferenceid are available
+//       int p_ckFrameId;      //!< The native frame of the c-kernels for this instrument
+//       int p_ckReferenceId; //!< The reference frame of the c-kernels for this instrument
+//       bool p_ckwriteReady;   //! Flag indicating ckFrameid and ckReferenceid are available
   };
 };
 

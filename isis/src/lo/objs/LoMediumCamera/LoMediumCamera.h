@@ -52,6 +52,15 @@ namespace Isis {
         LoMediumCamera(Isis::Pvl &lab);
         ~LoMediumCamera() {};
         enum FocalPlaneMapType {Fiducial, Boresight, None};
+
+        /** CK Frame ID - Instrument Code from spacit run on CK */
+        virtual int CkFrameId() const { return (-533000); }
+
+        /** CK Reference ID - J2000 */
+        virtual int CkReferenceId() const { return (1); }
+
+        /** SPK Reference ID - J2000 */
+        virtual int SpkReferenceId() const { return (1); }
     };
   };
 };

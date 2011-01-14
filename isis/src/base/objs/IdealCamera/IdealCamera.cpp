@@ -160,6 +160,36 @@ namespace Isis {
 
   //! Destroys the IdealCamera object
   IdealCamera::~IdealCamera() {}
+
+
+  int IdealCamera::CkFrameId() const {
+    std::string msg = "No CK Frame ID for Ideal Camera class";
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+  }
+
+
+  int IdealCamera::CkReferenceId() const {
+    std::string msg = "No CK Reference ID for Ideal Camera class";
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+  }
+
+
+  int IdealCamera::SpkTargetId() const {
+    std::string msg = "No SPK Target ID for Ideal Camera class";
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+  }
+
+
+  int IdealCamera::SpkCenterId() const {
+    std::string msg = "No SPK Center ID for Ideal Camera class";
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+  }
+
+
+  int IdealCamera::SpkReferenceId() const {
+    std::string msg = "No SPK Reference ID for Ideal Camera class";
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+  }
 }
 
 /**

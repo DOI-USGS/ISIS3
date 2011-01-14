@@ -29,6 +29,15 @@ namespace Galileo {
     public:
       SsiCamera(Isis::Pvl &lab);
       ~SsiCamera() {};
+
+      /** CK Frame ID - Instrument Code from spacit run on CK */
+      virtual int CkFrameId() const { return (-77001); }
+
+      /** CK Reference ID - B1950 */
+      virtual int CkReferenceId() const { return (2); }
+
+      /** SPK Reference ID - DE-143 */
+      virtual int SpkReferenceId() const { return (21); }
   };
 };
 #endif

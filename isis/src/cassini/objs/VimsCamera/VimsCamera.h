@@ -47,6 +47,18 @@ namespace Isis {
 //        void SetBand (const int physicalBand);
 //        bool IsBandIndependent () { return false; };
 
+        /** CK Frame ID - Instrument Code from spacit run on CK */
+        virtual int CkFrameId() const { return (-82000); }
+
+        /** CK Reference ID - J2000 */
+        virtual int CkReferenceId() const { return (1); }
+
+        /** SPK Center ID - 6 (Saturn) */
+        virtual int SpkCenterId() const { return 6; }
+
+        /** SPK Reference ID - J2000 */
+        virtual int SpkReferenceId() const { return (1); }
+
     };
   };
 };

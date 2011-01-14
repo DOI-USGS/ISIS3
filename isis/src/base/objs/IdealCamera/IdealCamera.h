@@ -68,6 +68,12 @@ namespace Isis {
         return LineScan;
       }
 
+      virtual int CkFrameId() const;
+      virtual int CkReferenceId() const;
+      virtual int SpkTargetId() const;
+      virtual int SpkCenterId() const;
+      virtual int SpkReferenceId() const;
+
     private:
       bool p_framing; //!< true if framing camera
   };
