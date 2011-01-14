@@ -25,7 +25,9 @@
 
 #include "SerialNumber.h"
 
-template < typename T > class QList;
+template < typename A, typename B > class QHash;
+
+class QString;
 
 namespace Isis {
 
@@ -54,12 +56,11 @@ namespace Isis {
       ControlSerialNumber();
       virtual ~ControlSerialNumber();
 
-      void AddMeasure(ControlMeasure * measure);
-      void RemoveMeasure(ControlMeasure * measure);
-      void RemoveMeasure(int index);
+      void AddMeasure(QString parentPoint, ControlMeasure * measure);
+      void RemoveMeasure(QString parentPoint);
 
     private:
-      QList<ControlMeasure *> * measures;
+      QHash<QString, ControlMeasure *> * measures;
 
   }; // End of Class
 }; // End of namespace
