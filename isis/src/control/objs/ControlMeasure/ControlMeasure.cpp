@@ -117,6 +117,7 @@ namespace Isis {
     p_sampleResidual = other.p_sampleResidual;
     p_lineResidual = other.p_lineResidual;
     p_camera = other.p_camera;
+    parentPoint = other.parentPoint;
   }
 
 
@@ -199,6 +200,8 @@ namespace Isis {
     p_focalPlaneMeasuredY = Null;
     p_focalPlaneComputedX = Null;
     p_focalPlaneComputedY = Null;
+
+    parentPoint = NULL;
   }
 
 
@@ -1099,7 +1102,6 @@ namespace Isis {
     return MeasureTypeToString(p_measureType);
   }
 
-
   //! Assignment operator
   const ControlMeasure &ControlMeasure::operator=(const ControlMeasure &other) {
     if (this == &other)
@@ -1149,6 +1151,7 @@ namespace Isis {
     p_focalPlaneMeasuredY = other.p_focalPlaneMeasuredY;
     p_focalPlaneComputedX = other.p_focalPlaneComputedX;
     p_focalPlaneComputedY = other.p_focalPlaneComputedY;
+    parentPoint = other.parentPoint;
 
     return *this;
   }

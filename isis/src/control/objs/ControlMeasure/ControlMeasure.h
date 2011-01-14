@@ -33,6 +33,7 @@ namespace Isis {
   class Application;
   class Camera;
   class ControlMeasureLogData;
+  class ControlPoint;
   class iString;
   class PBControlNet_PBControlPoint_PBControlMeasure;
   class PBControlNetLogData_Point_Measure;
@@ -133,8 +134,10 @@ namespace Isis {
    *                              conflict with a new enumerated value,
    *                              DataField. The accessors to this class no
    *                              longer give up internal pointers.
+   *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlPoint. 
    */
   class ControlMeasure {
+    friend class ControlPoint;
     public:
       /**
        * @brief Control network measurement types
@@ -276,7 +279,6 @@ namespace Isis {
       static iString MeasureTypeToString(MeasureType type);
       iString MeasureTypeString() const;
 
-
       const ControlMeasure & operator=(const ControlMeasure & other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
       bool operator == (const Isis::ControlMeasure &pMeasure) const;
@@ -290,6 +292,7 @@ namespace Isis {
       void MeasureModified();
 
     private: // data
+      ControlPoint * parentPoint; //!< Pointer to parent ControlPoint, may be null
       iString *p_serialNumber;
       MeasureType p_measureType;
 
