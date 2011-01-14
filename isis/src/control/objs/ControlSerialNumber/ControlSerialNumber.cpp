@@ -1,5 +1,8 @@
 #include "ControlSerialNumber.h"
+
 #include "ControlMeasure.h"
+#include "iException.h"
+#include "iString.h"
 
 #include <QHash>
 
@@ -26,6 +29,13 @@ namespace Isis {
 
   void ControlSerialNumber::AddMeasure(QString parentPoint,
       ControlMeasure * measure) {
+    if (measure->GetCubeSerialNumber() != iString(serialNumber)) {
+      iString msg = "Attempted to add Control Measure with Cube Serial Number [";
+      msg += measure->GetCubeSerialNumber() + "] does not match Serial Number [";
+      msg += iString(serialNumber) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
     measure->ConnectControlSN(this);
     (*measures)[parentPoint] = measure;
   }
