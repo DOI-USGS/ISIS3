@@ -369,7 +369,7 @@ namespace Isis {
   *   @history 2009-10-13 Jeannie Walldren - Added detail to
   *            error message.
   */
-  void ControlPoint::Add(ControlMeasure &measure, bool forceBuild,
+  void ControlPoint::Add(ControlMeasure measure, bool forceBuild,
                          bool isNewMeasure) {
     for (int i = 0; i < Size(); i++) {
       if ((*this)[i].GetCubeSerialNumber() == measure.GetCubeSerialNumber()) {
@@ -390,7 +390,7 @@ namespace Isis {
       PointModified();
     
     measure.parentPoint = this;
-    p_measures.push_back(measure);
+    p_measures.append(measure);
   }
 
   /**

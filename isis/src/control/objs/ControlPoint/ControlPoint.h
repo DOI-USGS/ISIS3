@@ -277,7 +277,7 @@ namespace Isis {
 
       void Load(PvlObject &p, bool forceBuild = false);
 
-      void Add(ControlMeasure &measure, bool forceBuild = false,
+      void Add(ControlMeasure measure, bool forceBuild = false,
                bool isNewMeasure = true);
       void Delete(int index);
       Status ResetApriori();
