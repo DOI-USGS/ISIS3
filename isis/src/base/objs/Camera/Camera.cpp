@@ -81,11 +81,6 @@ namespace Isis {
     p_referenceBand = 0;
     p_childBand = 1;
 
-    // TODO (taddair): make sure these variables are, in fact, deprecated
-//     p_ckFrameId = 0;
-//     p_ckReferenceId = 0;
-//     p_ckwriteReady = false;
-
     p_distortionMap = NULL;
     p_focalPlaneMap = NULL;
     p_detectorMap = NULL;
@@ -97,13 +92,6 @@ namespace Isis {
     if(inst.HasKeyword("ReferenceBand")) {
       p_referenceBand = inst["ReferenceBand"];
     }
-
-#if 0
-//  Obsoleted with the pure virtuals in each Camera model
-    // Set the FrameId and the ReferenceFrameId
-    SetCkFrameId();
-    SetCkReferenceId();
-#endif
 
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
@@ -1210,9 +1198,9 @@ namespace Isis {
   double Camera::NorthAzimuth() {
     double lat = UniversalLatitude();
     if (lat >= 0.0) {
-      return ComputeAzimuth(LocalRadius() / 1000.0, 90.0, 0.0);
+      return ComputeAzimuth(LocalRadius(90.0, 0.0), 90.0, 0.0);
     } else {
-      double azimuth = ComputeAzimuth(LocalRadius() / 1000.0, -90.0, 0.0) + 180.0;
+      double azimuth = ComputeAzimuth(LocalRadius(-90.0, 0.0), -90.0, 0.0) + 180.0;
       if (azimuth > 360.0) azimuth = azimuth - 360.0;
       return azimuth;
     }
@@ -1228,7 +1216,7 @@ namespace Isis {
   double Camera::SunAzimuth() {
     double lat, lon;
     SubSolarPoint(lat, lon);
-    return ComputeAzimuth(LocalRadius() / 1000.0, lat, lon);
+    return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
 
   /**
@@ -1241,7 +1229,7 @@ namespace Isis {
   double Camera::SpacecraftAzimuth() {
     double lat, lon;
     SubSpacecraftPoint(lat, lon);
-    return ComputeAzimuth(LocalRadius() / 1000.0, lat, lon);
+    return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
 
   /**
@@ -1688,58 +1676,5 @@ namespace Isis {
     return true;
   }
 
-#if 0
-  //! Reads the ck frame id from the instrument kernel
-  void Camera::SetCkFrameId() {
-    int code = NaifIkCode();
-    string key = "INS" + Isis::iString(code) + "_CK_FRAME_ID";
-    try {
-      p_ckFrameId = Isis::Spice::GetInteger(key, 0);
-      p_ckwriteReady = true;
-    }
-    catch(iException &e) {
-      p_ckwriteReady = false;
-      e.Clear();
-    }
-  }
-
-  //! Returns the ck frame id if defined
-  int Camera::CkFrameId() {
-    if(p_ckwriteReady) {
-      return p_ckFrameId;
-    }
-    else {
-      std::string msg = "Unable to find CK_FRAME_ID keyword for instrument";
-      throw Isis::iException::Message(iException::Camera, msg, _FILEINFO_);
-    }
-  }
-
-
-  //! Reads the ck reference frame id if known
-  void Camera::SetCkReferenceId() {
-    int code = NaifIkCode();
-    string key = "INS" + Isis::iString(code) + "_CK_REFERENCE_ID";
-    try {
-      p_ckReferenceId = Isis::Spice::GetInteger(key);
-      p_ckwriteReady = true;
-    }
-    catch(iException &e) {
-      p_ckwriteReady = false;
-      e.Clear();
-    }
-  }
-
-
-  //! Returns the ck reference frame id if known
-  int Camera::CkReferenceId() {
-    if(p_ckwriteReady) {
-      return p_ckReferenceId;
-    }
-    else {
-      std::string msg = "Unable to find CK_REFERENCE_ID keyword for instrument";
-      throw Isis::iException::Message(iException::Camera, msg, _FILEINFO_);
-    }
-  }
-#endif
 // end namespace isis
 }

@@ -138,6 +138,22 @@ namespace Isis {
    *            normal can be determined for DEM surface. Also modified the
    *            LocalPhotometricAngles method to report if the angles could
    *            successfully be calculated.
+   *   @history 2011-01-14 Kris Becker - Added the (pure) virtual methods
+   *            CkFrameId(), CkReferenceId(), SpkTargetId(), SpkCenterId() and
+   *            SpkReferenceId().  Camera model developers must provide, at a
+   *            minimum, implementations for CkFrameId(), CkReferenceId() and
+   *            SpkReferenceId().  A determination must be made if default
+   *            implementations of SpkTargetId() and SpkCenterId() are
+   *            sufficient.  These methods are required in order to write proper
+   *            CKs and SPKs NAIF kernels for instruments from updated pointing
+   *            and position data; Removed SetCkFrameId() and SetCkReferenceId()
+   *            and their implementations as the aforementioned routines replace
+   *            them; also corrected a bug in the computation of North, Sun and
+   *            Spacecraft azimuths when a shape model is present/active.  The
+   *            call to LocalRadius() should be LocalRadius(lat,lon) in these
+   *            cases.  (Note at this time, those two routines return meters and
+   *            kilometers, respectively - we need to address this
+   *            inconsistancy!)
    */
 
   class Camera : public Isis::Sensor {
@@ -448,7 +464,6 @@ namespace Isis {
        */
       virtual CameraType GetCameraType() const = 0;
 
-      // These are obsolete with the pure virtuals below
      //  void SetCkFrameId();
      //  void SetCkReferenceId();
 
@@ -717,9 +732,6 @@ namespace Isis {
       int p_geometricTilingStartSize; //!< The ideal geometric tile size to start with when projecting
       int p_geometricTilingEndSize; //!< The ideal geometric tile size to end with when projecting
 
-//       int p_ckFrameId;      //!< The native frame of the c-kernels for this instrument
-//       int p_ckReferenceId; //!< The reference frame of the c-kernels for this instrument
-//       bool p_ckwriteReady;   //! Flag indicating ckFrameid and ckReferenceid are available
   };
 };
 
