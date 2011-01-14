@@ -210,6 +210,8 @@ namespace Isis {
                      const PBControlNetLogData_Point_Measure &);
       ControlMeasure(const ControlMeasure & other);
       ~ControlMeasure();
+      
+      ControlPoint * Parent() { return parentPoint; }
 
       void Load(PvlGroup &p);
 
