@@ -31,6 +31,7 @@
 #include "SurfacePoint.h"
 
 namespace Isis {
+  class ControlNet;
   class Latitude;
   class Longitude;
   class PBControlNet_PBControlPoint;
@@ -192,8 +193,10 @@ namespace Isis {
    *   @history 2010-12-28 Steven Lambright Changed accessors to match
    *            ControlMeasure's method of accessing data. Removed obsolete
    *            methods to prevent further use of them.
+   *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlNet.
    */
   class ControlPoint {
+    friend class ControlNet; 
     public:
       /**
        * These are the valid 'types' of point. A point type defines what a point
@@ -265,6 +268,7 @@ namespace Isis {
       };
 
       ControlPoint();
+      ControlPoint(const ControlPoint&);
       ControlPoint (const iString &id);
       ControlPoint(const PBControlNet_PBControlPoint &);
       ControlPoint(const PBControlNet_PBControlPoint &,
@@ -273,7 +277,7 @@ namespace Isis {
 
       void Load(PvlObject &p, bool forceBuild = false);
 
-      void Add(const ControlMeasure &measure, bool forceBuild = false,
+      void Add(ControlMeasure &measure, bool forceBuild = false,
                bool isNewMeasure = true);
       void Delete(int index);
       Status ResetApriori();
@@ -346,6 +350,8 @@ namespace Isis {
 
       PvlObject ToPvlObject() const;
 
+      void SetParent(ControlNet * parent);
+
       ControlMeasure operator[](int index) const;
       ControlMeasure operator[](iString serialNumber) const;
 
@@ -367,6 +373,7 @@ namespace Isis {
       int FindMeasureIndex(iString serialNumber) const;
       void PointModified();
 
+      ControlNet * parentNetwork;
       QVector<ControlMeasure> p_measures; //!< List of Control Measures
 
       /**

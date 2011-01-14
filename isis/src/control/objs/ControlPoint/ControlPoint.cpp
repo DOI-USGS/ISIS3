@@ -8,6 +8,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
+#include "ControlNet.h"
 #include "Cube.h"
 #include "iString.h"
 #include "Latitude.h"
@@ -36,8 +37,32 @@ namespace Isis {
     p_jigsawRejected = false;
     p_aprioriSurfacePointSource = SurfacePointSource::None;
     p_aprioriRadiusSource = RadiusSource::None;
+    parentNetwork = NULL;
   }
 
+  ControlPoint::ControlPoint(const ControlPoint & other) {
+    parentNetwork = other.parentNetwork;
+    p_id = other.p_id;
+    p_chooserName = other.p_chooserName;
+    p_dateTime = other.p_dateTime;
+    p_type = other.p_type;
+    p_invalid = other.p_invalid;
+    p_editLock = other.p_editLock;
+    p_jigsawRejected = other.p_jigsawRejected;
+    p_ignore = other.p_ignore;
+    p_aprioriSurfacePointSource = other.p_aprioriSurfacePointSource;
+    p_aprioriSurfacePointSourceFile = other.p_aprioriSurfacePointSourceFile;
+    p_aprioriRadiusSource = other.p_aprioriRadiusSource;
+    p_aprioriRadiusSourceFile = other.p_aprioriRadiusSourceFile;
+    p_aprioriSurfacePoint = other.p_aprioriSurfacePoint;
+    p_surfacePoint = other.p_surfacePoint;
+    p_numberOfRejectedMeasures = other.p_numberOfRejectedMeasures; 
+    
+    p_measures = other.p_measures;
+    for (int i = 0; i < p_measures.size(); i++) {
+      p_measures[i].parentPoint = this;
+    }
+  }
 
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt) {
     Init(protoBufPt);
@@ -77,6 +102,7 @@ namespace Isis {
     p_ignore = false;
     p_aprioriSurfacePointSource = SurfacePointSource::None;
     p_aprioriRadiusSource = RadiusSource::None;
+    parentNetwork = NULL;
   }
 
 
@@ -343,7 +369,7 @@ namespace Isis {
   *   @history 2009-10-13 Jeannie Walldren - Added detail to
   *            error message.
   */
-  void ControlPoint::Add(const ControlMeasure &measure, bool forceBuild,
+  void ControlPoint::Add(ControlMeasure &measure, bool forceBuild,
                          bool isNewMeasure) {
     for (int i = 0; i < Size(); i++) {
       if ((*this)[i].GetCubeSerialNumber() == measure.GetCubeSerialNumber()) {
@@ -362,7 +388,8 @@ namespace Isis {
 
     if(isNewMeasure)
       PointModified();
-
+    
+    measure.parentPoint = this;
     p_measures.push_back(measure);
   }
 
@@ -1588,6 +1615,9 @@ namespace Isis {
     return p;
   }
 
+  void ControlPoint::SetParent(ControlNet * parent) {
+    parentNetwork = parent;
+  }
 
   /**
    * Return the ith measurement of the control point
@@ -1674,26 +1704,33 @@ namespace Isis {
 
   /**
    *
-   * @author Sharmila Prasad (5/11/2010)
-   *
    * @param pPoint
    *
    * @return ControlPoint&
    */
-  ControlPoint & ControlPoint::operator=  (const ControlPoint &pPoint) {
-    p_id          = pPoint.p_id;
-    p_type        = pPoint.p_type; 
-    p_chooserName = pPoint.p_chooserName;
-    p_editLock    = pPoint.p_editLock;
-    p_ignore      = pPoint.p_ignore;
-    p_aprioriSurfacePointSource      = pPoint.p_aprioriSurfacePointSource;
-    p_aprioriSurfacePointSourceFile  = pPoint.p_aprioriSurfacePointSourceFile;
-    p_aprioriRadiusSource            = pPoint.p_aprioriRadiusSource;
-    p_aprioriRadiusSourceFile        = pPoint.p_aprioriRadiusSourceFile;
-    p_aprioriSurfacePoint            = pPoint.p_aprioriSurfacePoint;
-    p_surfacePoint = pPoint.p_surfacePoint;
-    p_invalid      = pPoint.p_invalid;
-    p_measures     = pPoint.p_measures;
+  ControlPoint & ControlPoint::operator=(const ControlPoint &other) {
+    if (this == &other) 
+      return *this;
+
+    p_measures     = other.p_measures;
+    for (int i = 0; i < p_measures.size(); i++) {
+      p_measures[i].parentPoint = this;
+    }
+    p_id             = other.p_id;
+    p_chooserName    = other.p_chooserName;
+    p_dateTime       = other.p_dateTime;
+    p_type           = other.p_type; 
+    p_invalid        = other.p_invalid;
+    p_editLock       = other.p_editLock;
+    p_jigsawRejected = other.p_jigsawRejected;
+    p_ignore         = other.p_ignore;
+    p_aprioriSurfacePointSource      = other.p_aprioriSurfacePointSource;
+    p_aprioriSurfacePointSourceFile  = other.p_aprioriSurfacePointSourceFile;
+    p_aprioriRadiusSource            = other.p_aprioriRadiusSource;
+    p_aprioriRadiusSourceFile        = other.p_aprioriRadiusSourceFile;
+    p_aprioriSurfacePoint            = other.p_aprioriSurfacePoint;
+    p_surfacePoint = other.p_surfacePoint;
+    p_numberOfRejectedMeasures = other.p_numberOfRejectedMeasures;
 
     return *this;
   }
@@ -1708,6 +1745,8 @@ namespace Isis {
     p_chooserName = protoBufPt.choosername();
     p_dateTime = protoBufPt.datetime();
     p_editLock = protoBufPt.editlock();
+
+    parentNetwork = NULL;
 
     switch(protoBufPt.type()) {
       case PBControlNet_PBControlPoint_PointType_Tie:
