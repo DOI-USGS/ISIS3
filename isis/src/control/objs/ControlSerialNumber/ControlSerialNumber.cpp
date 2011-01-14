@@ -27,7 +27,7 @@ namespace Isis {
   }
 
 
-  void ControlSerialNumber::AddMeasure(QString parentPoint,
+  void ControlSerialNumber::AddMeasure(QString parentPointId,
       ControlMeasure * measure) {
     if (measure->GetCubeSerialNumber() != iString(serialNumber)) {
       iString msg = "Attempted to add Control Measure with Cube Serial Number [";

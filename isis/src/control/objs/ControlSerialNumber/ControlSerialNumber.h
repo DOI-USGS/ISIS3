@@ -54,14 +54,14 @@ namespace Isis {
       ControlSerialNumber(QString sn);
       virtual ~ControlSerialNumber();
 
-      void AddMeasure(QString parentPoint, ControlMeasure * measure);
+      void AddMeasure(QString parentPointId, ControlMeasure * measure);
       void RemoveMeasure(QString parentPoint);
 
       QString GetSerialNumber();
 
     private:
       QString serialNumber;
-      QHash<QString, ControlMeasure *> * measures;
+      QHash< QString, ControlMeasure * > * measures;
 
   }; // End of Class
 }; // End of namespace
