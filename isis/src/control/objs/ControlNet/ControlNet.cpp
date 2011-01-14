@@ -39,6 +39,27 @@ namespace Isis {
     p_modified = Application::DateTime();
   }
 
+  ControlNet::ControlNet(const ControlNet & other) {
+    p_pointIds = other.p_pointIds;
+    p_targetName = other.p_targetName;
+    p_networkId = other.p_networkId;
+    p_created = other.p_created;
+    p_modified = other.p_modified;
+    p_description = other.p_description;
+    p_userName = other.p_userName;
+    p_numMeasures = other.p_numMeasures;
+    p_numIgnoredMeasures = other.p_numIgnoredMeasures;
+    p_invalid = other.p_invalid;
+    p_cameraMap = other.p_cameraMap;
+    p_cameraList = other.p_cameraList;   
+
+    p_pointsHash = other.p_pointsHash;
+    QHashIterator <QString, ControlPoint> i(p_pointsHash);
+    while (i.hasNext()) {
+      i.next();
+      p_pointsHash[i.key()].parentNetwork = this;
+    }
+  }
 
  /**
   * Creates a ControlNet object with the given list of control points and cubes
@@ -55,6 +76,7 @@ namespace Isis {
     p_numIgnoredMeasures = 0;
     ReadControl(ptfile, progress, forceBuild);
   }
+
 
 
   ControlNet::~ControlNet () {
@@ -411,12 +433,13 @@ namespace Isis {
    * @throws Isis::iException::Programmer - "ControlPoint must 
    *             have unique Id"
    */
-  void ControlNet::Add (const ControlPoint &point, bool forceBuild) {
+  void ControlNet::Add (ControlPoint &point, bool forceBuild) {
     if(p_pointsHash.contains(point.GetId())) {
       iString msg = "ControlPoint must have unique Id";
       throw iException::Message(iException::Programmer,msg,_FILEINFO_);
     }
     else {
+      point.parentNetwork = this;
       p_pointsHash.insert(point.GetId(), point);
       p_pointIds.push_back(point.GetId());
     }
@@ -947,6 +970,32 @@ namespace Isis {
     p_userName = name;
   }
 
+  const ControlNet& ControlNet::operator=(ControlNet other) {
+    if (this == &other) 
+      return *this;
+  
+    p_pointIds = other.p_pointIds;
+    p_targetName = other.p_targetName;
+    p_networkId = other.p_networkId;
+    p_created = other.p_created;
+    p_modified = other.p_modified;
+    p_description = other.p_description;
+    p_userName = other.p_userName;
+    p_numMeasures = other.p_numMeasures;
+    p_numIgnoredMeasures = other.p_numIgnoredMeasures;
+    p_invalid = other.p_invalid;
+    p_cameraMap = other.p_cameraMap;
+    p_cameraList = other.p_cameraList;
+
+    p_pointsHash = other.p_pointsHash;
+    QHashIterator <QString, ControlPoint> i(p_pointsHash);
+    while (i.hasNext()) {
+      i.next();
+      p_pointsHash[i.key()].parentNetwork = this;
+    }
+
+    return *this;
+  }
 
   ControlPoint ControlNet::operator[](int index) const {
     if(index >= p_pointIds.size()) {

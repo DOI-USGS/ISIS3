@@ -106,14 +106,17 @@ namespace Isis {
    *   @history 2010-10-05 Eric Hyer ControlMeasure and ControlPoint now
    *            return QStrings for some methods.  Fixed breakages caused by
    *            this.
-   *  @history 2010-10-06 Sharmila Prasad Added method to get CreatedDate
-   *  @history 2010-11-21 Tracie Sucharski - Added new keyword, jigsawRejected
+   *   @history 2010-10-06 Sharmila Prasad Added method to get CreatedDate
+   *   @history 2010-11-21 Tracie Sucharski - Added new keyword, jigsawRejected
    *            to the read and write methods.
+   *   @history 2011-01-13 Mackenzie Boyd Added copy constructor and assignment
+   *            operator.
    *
    */
   class ControlNet {
     public:
       ControlNet();
+      ControlNet(const ControlNet& other);
       ControlNet(const iString &ptfile,
                  Progress *progress = 0,
                  bool forceBuild = false);
@@ -128,7 +131,7 @@ namespace Isis {
       void WritePB(const iString &ptfile);
       void WritePvl(const iString &ptfile);
 
-      void Add(const ControlPoint &point, bool forceBuild = false);
+      void Add(ControlPoint &point, bool forceBuild = false);
       void Delete (int index);
       void Delete (const iString &id);
       void UpdatePoint(const ControlPoint &point);
@@ -172,9 +175,11 @@ namespace Isis {
       void SetTarget(const iString &target);
       void SetUserName(const iString &name);
 
+      const ControlNet& operator=(ControlNet other);
       ControlPoint operator[](int index) const;
       ControlPoint operator[](iString id) const;
 
+    // Data
     private:
       QStringList p_pointIds;  //!< String List of ControlPoint Ids
       QHash <QString, ControlPoint> p_pointsHash; //!< Hash table of Control Points
