@@ -229,8 +229,7 @@ void IsisMain() {
       // point not found in control net, but this is not an error, so clear exception
       e.Clear();
       // add point to control net, default point type is "Tie"
-      ControlPoint pt(pid);
-      cnet.Add(pt);
+      cnet.Add(ControlPoint(pid));
       cpoint = cnet.Find(pid);
     }
 
