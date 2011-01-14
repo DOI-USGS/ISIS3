@@ -131,7 +131,7 @@ namespace Isis {
       void WritePB(const iString &ptfile);
       void WritePvl(const iString &ptfile);
 
-      void Add(ControlPoint &point, bool forceBuild = false);
+      void Add(ControlPoint point, bool forceBuild = false);
       void Delete (int index);
       void Delete (const iString &id);
       void UpdatePoint(const ControlPoint &point);

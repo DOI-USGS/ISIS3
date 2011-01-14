@@ -433,7 +433,7 @@ namespace Isis {
    * @throws Isis::iException::Programmer - "ControlPoint must 
    *             have unique Id"
    */
-  void ControlNet::Add (ControlPoint &point, bool forceBuild) {
+  void ControlNet::Add(ControlPoint point, bool forceBuild) {
     if(p_pointsHash.contains(point.GetId())) {
       iString msg = "ControlPoint must have unique Id";
       throw iException::Message(iException::Programmer,msg,_FILEINFO_);
