@@ -72,7 +72,8 @@ void IsisMain() {
       }
       
       for (int j=startIndex; j<endIndex; j++) {
-        oNet.Add(cNet[j]);
+        ControlPoint cp = cNet[j];
+        oNet.Add(cp);
       }
         
       oNet.Write(outFileID.Next() + ".net");
