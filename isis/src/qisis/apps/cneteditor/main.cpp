@@ -35,10 +35,11 @@ int main(int argc, char * argv[])
   startMonitoringMemory();
 #endif
 
-  CnetEditorApp app(argc, argv);
-  CnetEditorWindow window;
-  window.show();
-  return app.exec();
+//  CnetEditorApp app(argc, argv);
+//  CnetEditorWindow window;
+//  window.show();
+//  return app.exec();
+  return 0;
 }
 
 
