@@ -274,6 +274,8 @@ namespace Isis {
       ControlPoint(const PBControlNet_PBControlPoint &,
                    const PBControlNetLogData_Point &);
       ~ControlPoint ();
+      
+      ControlNet * Parent() { return parentNetwork; }
 
       void Load(PvlObject &p, bool forceBuild = false);
 
