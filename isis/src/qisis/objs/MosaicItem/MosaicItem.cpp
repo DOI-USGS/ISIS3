@@ -34,7 +34,7 @@ namespace Qisis {
   MosaicItem::MosaicItem(const QString &cubeFilename, MosaicWidget *parent, Isis::PvlGroup *group)
     : QGraphicsPolygonItem() {
 
-    if(parent->projection() == 0) {
+    if (parent->projection() == 0) {
       std::string msg = "Parent does not have projection in MosaicWidget";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
@@ -80,12 +80,12 @@ namespace Qisis {
     //If this item was constructed with a PvlGroup
     //call setUpItem so set all the item's attributes
     //to the last state they were in.
-    if(group != 0) {
+    if (group != 0) {
       setUpItem(group);
     }
 
     setAcceptHoverEvents(true);
-    
+
     setFootprintVisible(false);
     setOutlineVisible(true);
   }
@@ -107,7 +107,7 @@ namespace Qisis {
     //parent->setHandlesChildEvents(true);
 
     p_proj = parent->getProj();
-    if(p_groundMap != NULL) p_groundMap = parent->getGroundMap();
+    if (p_groundMap != NULL) p_groundMap = parent->getGroundMap();
 
     p_filename = parent->p_filename;
     //p_levelOfDetail = 0.025;
@@ -142,19 +142,19 @@ namespace Qisis {
    *
    */
   MosaicItem::~MosaicItem() {
-    if(p_mp == NULL) {
+    if (p_mp == NULL) {
       delete p_mp;
     }
-    if(p_treeItem == NULL) {
+    if (p_treeItem == NULL) {
       delete p_treeItem;
     }
-    if(p_secondItem == NULL) {
+    if (p_secondItem == NULL) {
       delete p_secondItem;
     }
-    if(p_camera == NULL) {
+    if (p_camera == NULL) {
       delete p_camera;
     }
-    if(p_proj == NULL) {
+    if (p_proj == NULL) {
       delete p_proj;
     }
   }
@@ -204,11 +204,11 @@ namespace Qisis {
     this->setLabelVisible(checked ? true : false);
 
     //Look for the control points
-    if(grp->HasKeyword("ControlPoints")) {
+    if (grp->HasKeyword("ControlPoints")) {
       p_controlPoints.clear();
       Isis::PvlKeyword points = grp->FindKeyword("ControlPoints");
-      if(points[0].compare("Null") != 0) {
-        for(int i = 0; i < points.Size(); i++) {
+      if (points[0].compare("Null") != 0) {
+        for (int i = 0; i < points.Size(); i++) {
           Isis::iString point = points[i];
           double x = point.Token(":").ToDouble();
           double y = point.ToDouble();
@@ -218,7 +218,7 @@ namespace Qisis {
       }
 
       //Set control points visible state
-      if(grp->HasKeyword("ControlPointsVisible")) {
+      if (grp->HasKeyword("ControlPointsVisible")) {
         state = grp->FindKeyword("ControlPointsVisible")[0];
         checked = state.Equal("Yes");
         this->setControlPointsVisible(checked);
@@ -243,7 +243,7 @@ namespace Qisis {
     // colors to have any transparency because it causes the application
     // to slow down significantly
     // -------------------------------------------------------------------
-    if(itemLevelOfDetail < p_levelOfDetail) {
+    if (itemLevelOfDetail < p_levelOfDetail) {
       tempColor.setAlpha(255);
     }
 
@@ -251,12 +251,12 @@ namespace Qisis {
     // If this item is a child item, then we need to check it's parent's
     // check state to see if we need to draw the OUTLINE.
     // ------------------------------------------------------------------
-    if(p_treeItem == NULL) {
-      if(((MosaicItem *)parentItem())->p_treeItem->checkState(3) == Qt::Checked) {
+    if (p_treeItem == NULL) {
+      if (((MosaicItem *)parentItem())->p_treeItem->checkState(3) == Qt::Checked) {
         paintOutline(painter);
       }
     }
-    else if(p_treeItem->checkState(3) == Qt::Checked) {
+    else if (p_treeItem->checkState(3) == Qt::Checked) {
       paintOutline(painter);
     }
 
@@ -264,12 +264,12 @@ namespace Qisis {
     // If this item is a child item, then we need th check it's parent's
     // check state for the FOOTPRINT.
     // ------------------------------------------------------------------
-    if(p_treeItem == NULL) {
-      if(((MosaicItem *)parentItem())->p_treeItem->checkState(2) == Qt::Checked) {
+    if (p_treeItem == NULL) {
+      if (((MosaicItem *)parentItem())->p_treeItem->checkState(2) == Qt::Checked) {
         paintFootprint(painter);
       }
     }
-    else if(p_treeItem->checkState(2) == Qt::Checked) {
+    else if (p_treeItem->checkState(2) == Qt::Checked) {
       paintFootprint(painter);
     }
 
@@ -277,12 +277,12 @@ namespace Qisis {
     // If this item is a child item, then we need th check it's parent's
     // check state for the IMAGE.
     // ------------------------------------------------------------------
-    if(scene() != 0 && p_treeItem == NULL) {
-      if(((MosaicItem *)parentItem())->p_treeItem->checkState(4) == Qt::Checked) {
+    if (scene() != 0 && p_treeItem == NULL) {
+      if (((MosaicItem *)parentItem())->p_treeItem->checkState(4) == Qt::Checked) {
         drawImage(painter, option);
       }
     }
-    else if(scene() != 0 && p_treeItem->checkState(4) == Qt::Checked) {
+    else if (scene() != 0 && p_treeItem->checkState(4) == Qt::Checked) {
       drawImage(painter, option);
     }
 
@@ -290,18 +290,18 @@ namespace Qisis {
     // If this item is a PARENT item, then we need th check it's check state
     // for column 5 to know if we need to add the LABEL item.
     // ----------------------------------------------------------------------
-    if(p_treeItem != NULL) {
-      if(p_treeItem->checkState(5) == Qt::Checked) {
+    if (p_treeItem != NULL) {
+      if (p_treeItem->checkState(5) == Qt::Checked) {
         // ----------------------------------------------
         // If this item has not child, then you know to
         // call paintLabel immediately.
         // ---------------------------------------------
-        if(p_secondItem == NULL) {
+        if (p_secondItem == NULL) {
           // ----------------------------------------------------------
           // The following if statement prevent you from getting into
           // an endless paint cycle.
           // -----------------------------------------------------------
-          if(!scene()->items().contains(p_label) || !p_label->isVisible() ||
+          if (!scene()->items().contains(p_label) || !p_label->isVisible() ||
               (p_lastLevelOfDetail != option->levelOfDetail)) {
             paintLabel(option);
           }
@@ -310,12 +310,12 @@ namespace Qisis {
         // if this item does have a child and it's polygon
         // is smaller than this one, then call this paintLabel
         // ---------------------------------------------------
-        if(p_secondItem != NULL && p_secondItem->boundingRect().width() < this->boundingRect().width()) {
+        if (p_secondItem != NULL && p_secondItem->boundingRect().width() < this->boundingRect().width()) {
           // ----------------------------------------------------------
           // The following if statement prevent you from getting into
           // an endless paint cycle.
           // -----------------------------------------------------------
-          if(!scene()->items().contains(p_label) || !p_label->isVisible() ||
+          if (!scene()->items().contains(p_label) || !p_label->isVisible() ||
               (p_lastLevelOfDetail != option->levelOfDetail)) {
             paintLabel(option);
           }
@@ -324,7 +324,7 @@ namespace Qisis {
       }
       else {
         // User does not want the label item on the scene.
-        if(scene()->items().contains(p_label)) {
+        if (scene()->items().contains(p_label)) {
           p_label->setVisible(false);
         }
       }
@@ -334,18 +334,18 @@ namespace Qisis {
     // If this item is a CHILD item, then we need th check it's parent's check
     // state for column 5 to know if we need to add the LABEL item.
     // ----------------------------------------------------------------------
-    if(p_treeItem == NULL) {
-      if(((MosaicItem *)parentItem())->p_treeItem->checkState(5) == Qt::Checked) {
+    if (p_treeItem == NULL) {
+      if (((MosaicItem *)parentItem())->p_treeItem->checkState(5) == Qt::Checked) {
         // --------------------------------------------------
         // If the parent item is smaller than this item then
         // we know we can the child item to paint the label.
         // ---------------------------------------------------
-        if(parentItem()->boundingRect().width() < this->boundingRect().width()) {
+        if (parentItem()->boundingRect().width() < this->boundingRect().width()) {
           // ----------------------------------------------------------
           // The following if statement prevent you from getting into
           // an endless paint cycle.
           // -----------------------------------------------------------
-          if(!scene()->items().contains(p_label) || !p_label->isVisible() ||
+          if (!scene()->items().contains(p_label) || !p_label->isVisible() ||
               (p_lastLevelOfDetail != option->levelOfDetail)) {
             paintLabel(option);
           }
@@ -353,7 +353,7 @@ namespace Qisis {
       }
       else {
         // User does not want the label item on the scene.
-        if(scene()->items().contains(p_label)) {
+        if (scene()->items().contains(p_label)) {
           p_label->setVisible(false);
         }
       }
@@ -362,7 +362,7 @@ namespace Qisis {
     // ----------------------------------------------------
     // Display the CONTROL POINTS if they've been read in.
     // ----------------------------------------------------
-    if(p_controlPoints.size() > 0 && p_controlPointsVisible) {
+    if (p_controlPoints.size() > 0 && p_controlPointsVisible) {
       paintControlPoints(painter, option);
     }
 
@@ -370,7 +370,7 @@ namespace Qisis {
     // if the item is selected then we draw the dotted line around it
     // to signify that it's selected. see qt_graphicsItem_highlightSelected()
     // ----------------------------------------------------------------------
-    if(option->state & QStyle::State_Selected)
+    if (option->state & QStyle::State_Selected)
       qt_graphicsItem_highlightSelected(this, painter, option);
 
     p_lastLevelOfDetail = option->levelOfDetail;
@@ -419,8 +419,8 @@ namespace Qisis {
     QColor tempColor = p_color;
     tempColor.setAlpha(255);
 
-    for(int i = 0; i < p_controlPoints.size(); i++) {
-      if(p_controlPoints[i] == p_selectedPoint) {
+    for (int i = 0; i < p_controlPoints.size(); i++) {
+      if (p_controlPoints[i] == p_selectedPoint) {
         //We only need this threshold if we are going to display all control point measures.
         //if(p_controlPoints[i].x() <= p_selectedPoint.x()+.1 && p_controlPoints[i].x() >= p_selectedPoint.x()-.1
         // && p_controlPoints[i].y() <= p_selectedPoint.y()+.1 && p_controlPoints[i].y() >= p_selectedPoint.y()-.1) {
@@ -454,7 +454,7 @@ namespace Qisis {
     // the center of the total size.
     // ------------------------------------------------------
     QPolygonF poly2 = mapToScene(this->polygon());
-    if(p_secondItem != NULL) {
+    if (p_secondItem != NULL) {
       poly2 = mapToScene(p_secondItem->polygon().united(this->polygon()));
     }
     QPolygonF poly3 = mapToScene(option->exposedRect.toRect());
@@ -475,7 +475,7 @@ namespace Qisis {
     // height vs. the sum of double the width.
     // ----------------------------------------------------------------
     QRectF totalRect;
-    if(p_crossesBoundry && p_secondItem != NULL) {
+    if (p_crossesBoundry && p_secondItem != NULL) {
       totalRect = p_secondItem->boundingRect().united(polygon().boundingRect());
     }
     else {
@@ -486,7 +486,7 @@ namespace Qisis {
     // now we have the totalRectangle bounding the item even if it crosses
     // the lat/lon boundry.
     // --------------------------------------------------------------------
-    if(totalRect.height() > 1.5 * (totalRect.width())) {
+    if (totalRect.height() > 1.5 *(totalRect.width())) {
       p_label->rotate(90);
     }
 
@@ -500,7 +500,7 @@ namespace Qisis {
     // if this is the first time the label has been requested,
     // we need to add it to the scene
     // -------------------------------------------------------
-    if(!scene()->items().contains(p_label)) {
+    if (!scene()->items().contains(p_label)) {
       scene()->addItem(p_label);
       p_label->installSceneEventFilter(this);
     }
@@ -542,8 +542,8 @@ namespace Qisis {
    */
   void MosaicItem::setLevelOfDetail(double detail) {
     p_levelOfDetail = detail;
-    if(children().size() > 0)((MosaicItem *)children()[0])->p_levelOfDetail = detail;
-    if(parentItem() != 0)((MosaicItem *)parentItem())->p_levelOfDetail = detail;
+    if (children().size() > 0)((MosaicItem *)children()[0])->p_levelOfDetail = detail;
+    if (parentItem() != 0)((MosaicItem *)parentItem())->p_levelOfDetail = detail;
   }
 
 
@@ -559,7 +559,7 @@ namespace Qisis {
       cube.Open(p_filename.Expanded());
       //cube.Open(p_filename.Name());
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       std::string msg = e.Errors();
       QMessageBox::information(p_parent, "Error", QString::fromStdString(msg), QMessageBox::Ok);
       return;
@@ -578,48 +578,48 @@ namespace Qisis {
     try {
       Isis::Table table("CameraStatistics", p_filename.Expanded());
       //Isis::Table table("CameraStatistics", p_filename.Name());
-      for(int i = 0; i < table.Records(); i++) {
-        for(int j = 0; j < table[i].Fields(); j++) {
-          if(table[i][j].IsText()) {
+      for (int i = 0; i < table.Records(); i++) {
+        for (int j = 0; j < table[i].Fields(); j++) {
+          if (table[i][j].IsText()) {
             qstring = QString::fromStdString((std::string)table[i][j]);
             qstring.truncate(10);
           }
 
           // Get the average resolution for this mosaic item.
-          if(table[i][j].IsText() && qstring.compare("Resolution") == 0) {
-            if(j + 3 < table[i].Fields()) {
-              if(table[i][j+3].IsInteger()) {
+          if (table[i][j].IsText() && qstring.compare("Resolution") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
               }
-              else if(table[i][j+3].IsDouble()) {
+              else if (table[i][j+3].IsDouble()) {
                 p_pixRes = (double)table[i][j+3];
               }
-              else if(table[i][j+3].IsText()) {
+              else if (table[i][j+3].IsText()) {
               }
             }
           }
 
           // Get the average emission angle for this mosaic item.
-          if(table[i][j].IsText() && qstring.compare("EmissionAn") == 0) {
-            if(j + 3 < table[i].Fields()) {
-              if(table[i][j+3].IsInteger()) {
+          if (table[i][j].IsText() && qstring.compare("EmissionAn") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
               }
-              else if(table[i][j+3].IsDouble()) {
+              else if (table[i][j+3].IsDouble()) {
                 p_emissionAngle = (double)table[i][j+3];
               }
-              else if(table[i][j+3].IsText()) {
+              else if (table[i][j+3].IsText()) {
               }
             }
           }
 
           // Get the average incidence angle for this mosaic item.
-          if(table[i][j].IsText() && qstring.compare("IncidenceA") == 0) {
-            if(j + 3 < table[i].Fields()) {
-              if(table[i][j+3].IsInteger()) {
+          if (table[i][j].IsText() && qstring.compare("IncidenceA") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
               }
-              else if(table[i][j+3].IsDouble()) {
+              else if (table[i][j+3].IsDouble()) {
                 p_incidenceAngle = (double)table[i][j+3];
               }
-              else if(table[i][j+3].IsText()) {
+              else if (table[i][j+3].IsText()) {
               }
             }
           }
@@ -628,7 +628,7 @@ namespace Qisis {
       } // end for table.Records
 
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       std::string msg = "Could not find the CameraStatistics Table.  Please run camerastats with the 'attach' option";
       QMessageBox::information(p_parent, "Error", QString::fromStdString(msg), QMessageBox::Ok);
       return;
@@ -642,7 +642,7 @@ namespace Qisis {
       cube.Read(*poly);
 
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       cube.Close();
       std::string msg = "footprintinit must be run before reading the polygon.";
       QMessageBox::information(p_parent, "Error", QString::fromStdString(msg), QMessageBox::Ok);
@@ -675,7 +675,7 @@ namespace Qisis {
     geos::geom::MultiPolygon *mp;
     p_proj = p_parent->projection();
 
-    if(p_proj->Has180Domain()) {
+    if (p_proj->Has180Domain()) {
       p_180mp = Isis::PolygonTools::To180(p_mp);
       mp = p_180mp;
     }
@@ -688,7 +688,7 @@ namespace Qisis {
     // cubes will have more than one geom. if it crosses lat/lon
     // boundries.
     //----------------------------------------------------------
-    for(unsigned int i = 0; i < mp->getNumGeometries(); i++) {
+    for (unsigned int i = 0; i < mp->getNumGeometries(); i++) {
       const geos::geom::Geometry *geom = mp->getGeometryN(i);
       geos::geom::CoordinateSequence *pts;
 
@@ -700,10 +700,10 @@ namespace Qisis {
       // We need to convert the footprint polygons from lat/lon to x/y
       // in order to display them in the QGraphicsScene
       //--------------------------------------------------------------
-      for(unsigned int j = 0; j < pts->getSize(); j++) {
+      for (unsigned int j = 0; j < pts->getSize(); j++) {
         lat = pts->getY(j);
         lon = pts->getX(j);
-        if(p_proj->SetUniversalGround(lat, lon)) {
+        if (p_proj->SetUniversalGround(lat, lon)) {
           double x = p_proj->XCoord();
           double y = -1 * (p_proj->YCoord());
 
@@ -711,10 +711,10 @@ namespace Qisis {
           // determine x/y min/max for the polygons(s)
           // so we know how big to make the QGraphicsScene
           //-----------------------------------------------
-          if(x < xmin) xmin = x;
-          if(y < ymin) ymin = y;
-          if(x > xmax) xmax = x;
-          if(y > ymax) ymax = y;
+          if (x < xmin) xmin = x;
+          if (y < ymin) ymin = y;
+          if (x > xmax) xmax = x;
+          if (y > ymax) ymax = y;
 
           polyPoints.push_back(QPointF(x, y));
         }
@@ -725,7 +725,7 @@ namespace Qisis {
       p_ymin = ymin;
       p_ymax = ymax;
 
-      if(i == 0) {
+      if (i == 0) {
         p_footprintPoly = QPolygonF(polyPoints);
         setPolygon(p_footprintPoly);
         setFlag(QGraphicsItem::ItemIsSelectable);
@@ -738,7 +738,7 @@ namespace Qisis {
         // create a new MosaicItem for it. (i.e. this cube
         // crosses a lat/lon boundry.)
         //---------------------------------------------------
-        if(p_secondItem == NULL) {
+        if (p_secondItem == NULL) {
           p_secondItem = new MosaicItem(this);
         }
         p_footprintPoly = QPolygonF(polyPoints);
@@ -750,7 +750,7 @@ namespace Qisis {
       }
       delete pts;
     }
-    if(p_controlPoints.size() > 0 && p_controlPointsVisible) {
+    if (p_controlPoints.size() > 0 && p_controlPointsVisible) {
       displayControlPoints(p_controlNet);
     }
   }
@@ -769,7 +769,7 @@ namespace Qisis {
     QPointF camPoints;
     QPointF scenePoint = scene()->views().last()->mapToScene(QPoint(x, y));
 
-    if(!p_proj->SetWorld(scenePoint.x(), -scenePoint.y())) {
+    if (!p_proj->SetWorld(scenePoint.x(), -scenePoint.y())) {
       camPoints.setX(-1);
       camPoints.setY(-1);
       return camPoints;
@@ -777,7 +777,7 @@ namespace Qisis {
 
     double lat = p_proj->UniversalLatitude();
     double lon = p_proj->UniversalLongitude();
-    if(!p_groundMap->SetUniversalGround(lat, lon)) {
+    if (!p_groundMap->SetUniversalGround(lat, lon)) {
       camPoints.setX(-1);
       camPoints.setY(-1);
       return camPoints;
@@ -802,7 +802,7 @@ namespace Qisis {
   QPointF MosaicItem::screenToCam(QPointF p) {
     QPointF camPoints;
 
-    if(!p_proj->SetWorld(p.x(), -p.y())) {
+    if (!p_proj->SetWorld(p.x(), -p.y())) {
       camPoints.setX(-1);
       camPoints.setY(-1);
       return camPoints;
@@ -810,7 +810,7 @@ namespace Qisis {
 
     double lat = p_proj->UniversalLatitude();
     double lon = p_proj->UniversalLongitude();
-    if(!p_groundMap->SetUniversalGround(lat, lon)) {
+    if (!p_groundMap->SetUniversalGround(lat, lon)) {
       camPoints.setX(-1);
       camPoints.setY(-1);
       return camPoints;
@@ -834,7 +834,7 @@ namespace Qisis {
    */
   QPointF MosaicItem::screenToGround(QPointF point) {
     QPointF groundPoints;
-    if(!p_proj->SetWorld(point.x(), -point.y())) {
+    if (!p_proj->SetWorld(point.x(), -point.y())) {
       groundPoints.setX(-1);
       groundPoints.setY(-1);
       return groundPoints;
@@ -867,7 +867,7 @@ namespace Qisis {
     //double dist = sqrt(pow(testMidX - trueMidX,2) + pow(testMidY - trueMidY,2));
     double dist = (testMidX - trueMidX) * (testMidX - trueMidX) +
                   (testMidY - trueMidY) * (testMidY - trueMidY);
-    if(dist < .5 * .5) {
+    if (dist < .5 * .5) {
       return true;
     }
     else {
@@ -891,11 +891,11 @@ namespace Qisis {
     p_cube.Read(gryBrick);
 
     double pixelValue = gryBrick[0];
-    if(pixelValue == Isis::Null) {
+    if (pixelValue == Isis::Null) {
       return Isis::Null;
     }
-    if(pixelValue < 0) pixelValue = 0;
-    if(pixelValue > 255) pixelValue = 255;
+    if (pixelValue < 0) pixelValue = 0;
+    if (pixelValue > 255) pixelValue = 255;
     return pixelValue;
   }
 
@@ -909,7 +909,7 @@ namespace Qisis {
     //std::cout << "\nTop drawImage for " << filename().Name() << std::endl;
     //if paint is not enabled, then just draw the last image and return
     //the paint is only disable when in zoom mode and the mouse button is down.
-    if(!p_enablePaint) {
+    if (!p_enablePaint) {
       painter->drawImage(this->polygon().boundingRect(), p_lastImage);
       return;
     }
@@ -927,19 +927,19 @@ namespace Qisis {
       p_cube.Open(p_filename.Expanded());
       //p_cube.Open(p_filename.Name());
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       std::string msg = "Can not open this cube!";
       QMessageBox::information(p_parent, "Error", QString::fromStdString(msg), QMessageBox::Ok);
       return;
     }
 
-    if(p_groundMap == NULL) {
+    if (p_groundMap == NULL) {
       try {
         Isis::Pvl pvl(p_filename.Expanded());
         //Isis::Pvl pvl(p_filename.Name());
         p_groundMap = new Isis::UniversalGroundMap(pvl);
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         std::string msg = "Could not get a ground map for this cube.";
         QMessageBox::information(p_parent, "Error", QString::fromStdString(msg), QMessageBox::Ok);
         return;
@@ -970,15 +970,15 @@ namespace Qisis {
       QImage image(bbWidth, bbHeight, QImage::Format_ARGB32);
 
       // Looping through the height of the bounding box.
-      for(int h = bby; h <= (const int)(bby + bbHeight - 1); h++) {
+      for (int h = bby; h <= (const int)(bby + bbHeight - 1); h++) {
         //check to make sure we are not outside the viewport's height.
-        if(h < 0)continue;
-        if(h > scene()->views().last()->viewport()->height())continue;
+        if (h < 0)continue;
+        if (h > scene()->views().last()->viewport()->height())continue;
 
         QRgb *rgb = (QRgb *)image.scanLine(h - bby);
 
         //Fill the bounding Box with a white, transparent color.
-        for(int w = bbx; w <= (const int)(bbx + bbWidth - 1); w++) {
+        for (int w = bbx; w <= (const int)(bbx + bbWidth - 1); w++) {
           rgb[w - bbx] = qRgba(255, 255, 255, 0);
         }
 
@@ -996,7 +996,7 @@ namespace Qisis {
         // pixels between the two points.
         //---------------------------------------------
 
-        while(inter.size() > 1) {
+        while (inter.size() > 1) {
 
           //------------------------------------------
           // set starting x to the second to last value
@@ -1019,14 +1019,14 @@ namespace Qisis {
           // rid or the problem with the verticle lines
           // ------------------------------------------------
           //if (eX - sX < 10) {
-          for(int i = sX; i < eX; i++) {
+          for (int i = sX; i < eX; i++) {
             QPointF cameraCoords = screenToCam(i, h);
             double samp = cameraCoords.x();
             double line = cameraCoords.y();
-            if(samp < 0.5) continue;
-            if(line < 0.5) continue;
-            if(line > p_cube.Lines() + 0.5) continue;
-            if(samp > p_cube.Samples() + 0.5) continue;
+            if (samp < 0.5) continue;
+            if (line < 0.5) continue;
+            if (line > p_cube.Lines() + 0.5) continue;
+            if (samp > p_cube.Samples() + 0.5) continue;
 
             double pixelValue = getPixelValue((int)(samp + 0.5), (int)(line + 0.5));
             int strValue = (int)p_stretch.Map(pixelValue);
@@ -1109,7 +1109,7 @@ namespace Qisis {
       QApplication::restoreOverrideCursor();
 
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       std::cout << e.Errors() << std::endl;
     }
 
@@ -1131,17 +1131,17 @@ namespace Qisis {
    */
   QList<int> MosaicItem::scanLineIntersections(QPolygon poly, int y, int boxWidth) {
     QList <int> inter;
-    for(int i = 0; i < poly.size() - 1; i++) {
+    for (int i = 0; i < poly.size() - 1; i++) {
       int n = i + 1;
 
       int yMax = qMax(poly.point(i).y(), poly.point(n).y());
       int yMin = qMin(poly.point(i).y(), poly.point(n).y());
 
-      if(y < yMin) continue;
-      if(y > yMax) continue;
-      if(yMin == yMax) continue;
+      if (y < yMin) continue;
+      if (y > yMax) continue;
+      if (yMin == yMax) continue;
 
-      if((poly.point(n).x() - poly.point(i).x()) == 0) {
+      if ((poly.point(n).x() - poly.point(i).x()) == 0) {
         inter.push_back(poly.point(n).x());
       }
       else {
@@ -1154,15 +1154,15 @@ namespace Qisis {
     qSort(inter.begin(), inter.end());
 
     QList<int> uniqueList;
-    for(int i = 0; i < inter.size(); i++) {
-      if(uniqueList.size() == 0) {
+    for (int i = 0; i < inter.size(); i++) {
+      if (uniqueList.size() == 0) {
         uniqueList.push_back(inter[i]);
       }
-      else if(inter[i] != uniqueList.last()) {
+      else if (inter[i] != uniqueList.last()) {
         uniqueList.push_back(inter[i]);
       }
     }
-    if(uniqueList.size() == 3) {
+    if (uniqueList.size() == 3) {
       uniqueList.removeAt(1);
     }
 
@@ -1177,7 +1177,7 @@ namespace Qisis {
   QColor MosaicItem::randomColor() {
     static bool firstTime = true;
     // This seeds the random number.
-    if(firstTime) srand(5390);
+    if (firstTime) srand(5390);
 
     // Gives a random number between 0 and 255
     int red = rand() % 256;
@@ -1196,7 +1196,7 @@ namespace Qisis {
   void MosaicItem::setColor(QColor color) {
     this->setBrush(color);
     this->setPen(color);
-    if(children().size() > 0) {
+    if (children().size() > 0) {
       //if(children()[0]->isSelected()) {
       ((MosaicItem *)children()[0])->setPen(color);
       ((MosaicItem *)children()[0])->setBrush(color);
@@ -1204,7 +1204,7 @@ namespace Qisis {
       ((MosaicItem *)children()[0])->setTransparency(color.alpha());
       //}
     }
-    if(parentItem() != 0) {
+    if (parentItem() != 0) {
       ((MosaicItem *)parentItem())->setPen(color);
       ((MosaicItem *)parentItem())->setBrush(color);
     }
@@ -1212,7 +1212,7 @@ namespace Qisis {
 
     //ensure good contrast against bgcolor.
     const QColor bgcolor = color;
-    if(bgcolor.red() > 127 || bgcolor.green() > 127 || bgcolor.blue() > 127
+    if (bgcolor.red() > 127 || bgcolor.green() > 127 || bgcolor.blue() > 127
         || bgcolor.alpha() < 127) {
       // black text
       const QColor fgcolor(0, 0, 0);
@@ -1241,7 +1241,7 @@ namespace Qisis {
     p_imageTransparency = alpha;
     p_color.setAlpha(alpha);
 
-    if(p_treeItem != NULL) {
+    if (p_treeItem != NULL) {
       p_treeItem->setBackground(0, p_color);
     }
 
@@ -1264,9 +1264,9 @@ namespace Qisis {
    */
   void MosaicItem::setItemVisible(bool visible) {
     setVisible(visible);
-    if(p_treeItem != NULL) p_treeItem->setCheckState(1, visible ? Qt::Checked : Qt::Unchecked);
-    if(p_label != NULL) p_label->setVisible(visible);
-    if(p_secondItem != NULL) p_secondItem->setItemVisible(visible);
+    if (p_treeItem != NULL) p_treeItem->setCheckState(1, visible ? Qt::Checked : Qt::Unchecked);
+    if (p_label != NULL) p_label->setVisible(visible);
+    if (p_secondItem != NULL) p_secondItem->setItemVisible(visible);
   }
 
 
@@ -1285,7 +1285,7 @@ namespace Qisis {
    * @param selected
    */
   void MosaicItem::setTreeItemSelected(bool selected) {
-    if(p_treeItem->isSelected() != selected) {
+    if (p_treeItem->isSelected() != selected) {
       p_treeItem->setSelected(selected);
     }
   }
@@ -1304,15 +1304,15 @@ namespace Qisis {
     QGraphicsItem *item, QPainter *painter, const QStyleOptionGraphicsItem *option) {
 
     const QRectF murect = painter->transform().mapRect(QRectF(0, 0, 1, 1));
-    if(qFuzzyCompare(qMax(murect.width(), murect.height()), qreal(0.0)))
+    if (qFuzzyCompare(qMax(murect.width(), murect.height()), qreal(0.0)))
       return;
 
     const QRectF mbrect = painter->transform().mapRect(item->boundingRect());
-    if(qMin(mbrect.width(), mbrect.height()) < qreal(1.0))
+    if (qMin(mbrect.width(), mbrect.height()) < qreal(1.0))
       return;
 
     qreal itemPenWidth;
-    switch(item->type()) {
+    switch (item->type()) {
 
       case QGraphicsPolygonItem::Type:
         itemPenWidth = static_cast<QGraphicsPolygonItem *>(item)->pen().widthF();
@@ -1340,11 +1340,11 @@ namespace Qisis {
 
     // Ensure that the children of this item are selected whenever the parent is.
     QList<QGraphicsItem *>children = item->children();
-    for(int j = 0; j < children.size(); j++) {
+    for (int j = 0; j < children.size(); j++) {
       children[j]->setSelected(true);
     }
     // If the child was the item selected, make sure that the parent is also selected
-    if(item->parentItem() != 0) item->parentItem()->setSelected(true);
+    if (item->parentItem() != 0) item->parentItem()->setSelected(true);
   }
 
 
@@ -1357,8 +1357,8 @@ namespace Qisis {
    */
   void MosaicItem::setZValue(qreal z) {
     QGraphicsItem::setZValue(z);
-    if(children().size() > 0) children()[0]->QGraphicsItem::setZValue(z);
-    if(parentItem() != 0) parentItem()->QGraphicsItem::setZValue(z);
+    if (children().size() > 0) children()[0]->QGraphicsItem::setZValue(z);
+    if (parentItem() != 0) parentItem()->QGraphicsItem::setZValue(z);
 
   }
 
@@ -1371,8 +1371,8 @@ namespace Qisis {
    */
   void MosaicItem::setSelected(bool selected) {
     QGraphicsItem::setSelected(selected);
-    if(children().size() > 0) children()[0]->QGraphicsItem::setSelected(selected);
-    if(parentItem() != 0) parentItem()->QGraphicsItem::setSelected(selected);
+    if (children().size() > 0) children()[0]->QGraphicsItem::setSelected(selected);
+    if (parentItem() != 0) parentItem()->QGraphicsItem::setSelected(selected);
 
   }
 
@@ -1382,7 +1382,7 @@ namespace Qisis {
    * with this mosaic item.
    */
   void MosaicItem::getStretch() {
-    if(p_stretch.Pairs() != 0) return;
+    if (p_stretch.Pairs() != 0) return;
     //Isis::Histogram hist(p_cube,1);
     Isis::Histogram hist = *p_cube.Histogram(1);
     double bestMin = hist.BestMinimum();
@@ -1408,7 +1408,7 @@ namespace Qisis {
    * @param visible
    */
   void MosaicItem::setLabelVisible(bool visible) {
-    if(visible) {
+    if (visible) {
       p_treeItem->setCheckState(5, Qt::Checked);
     }
     else {
@@ -1423,7 +1423,7 @@ namespace Qisis {
    * @param visible
    */
   void MosaicItem::setOutlineVisible(bool visible) {
-    if(visible) {
+    if (visible) {
       p_treeItem->setCheckState(3, Qt::Checked);
     }
     else {
@@ -1438,7 +1438,7 @@ namespace Qisis {
    * @param visible
    */
   void MosaicItem::setFootprintVisible(bool visible) {
-    if(visible) {
+    if (visible) {
       p_treeItem->setCheckState(2, Qt::Checked);
     }
     else {
@@ -1456,10 +1456,10 @@ namespace Qisis {
     bool ok;
     const QString caption = "Qmos rules! Select your font size";
     QFont font = QFontDialog::getFont(&ok, QFont("Helvetica", 10), p_parent, caption);
-    if(ok) {
+    if (ok) {
       // font is set to the font the user selected
       p_label->setFont(font);
-      if(p_secondItem != NULL) setFontSize(font);
+      if (p_secondItem != NULL) setFontSize(font);
       p_updateFont = true;
       update();
     }
@@ -1505,18 +1505,18 @@ namespace Qisis {
   bool MosaicItem::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
 
     // if the item is not in the movable mode, then just need to return.
-    if(watched->flags() != QGraphicsItem::ItemIsMovable)return false;
+    if (watched->flags() != QGraphicsItem::ItemIsMovable)return false;
 
-    switch(event->type()) {
+    switch (event->type()) {
         //-----------------------------------------------------------------------
         // We need to make sure the user does not drag the label beyond the area
         // of the bounding rectangle of the parent item's polygon.
         //-----------------------------------------------------------------------
       case QEvent::UngrabMouse: {
           QRectF totalRect;
-          if(((QMouseEvent *) event)->button() == Qt::RightButton) return false;
+          if (((QMouseEvent *) event)->button() == Qt::RightButton) return false;
 
-          if(watched->parentItem() != 0) {
+          if (watched->parentItem() != 0) {
             // This give us the coordinates at which the label was dropped.
             QPointF dropPoint = p_label->mapToParent(((QGraphicsSceneMouseEvent *)event)->scenePos());
 
@@ -1527,7 +1527,7 @@ namespace Qisis {
             // the user droped the label within the correct area
             // for this item.
             //-------------------------------------------------------
-            if(p_crossesBoundry) {
+            if (p_crossesBoundry) {
               totalRect = p_secondItem->boundingRect().united(watched->parentItem()->boundingRect());
             }
             else {
@@ -1540,7 +1540,7 @@ namespace Qisis {
             // outside of the bounding rect, then we put the label right
             // back in the center
             //-----------------------------------------------------------------
-            if(!totalRect.contains(dropPoint)) {
+            if (!totalRect.contains(dropPoint)) {
               p_label->setPos(watched->parentItem()->boundingRect().center());
             }
 
@@ -1579,32 +1579,33 @@ namespace Qisis {
       cube.Open(p_filename.Expanded());
       //cube.Open(p_filename.Name());
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       std::string msg = e.Errors();
       QMessageBox::information(p_parent, "Error", QString::fromStdString(msg), QMessageBox::Ok);
       return;
     }
 
-    if(p_groundMap == NULL) {
+    if (p_groundMap == NULL) {
       try {
         Isis::Pvl pvl(p_filename.Expanded());
         //Isis::Pvl pvl(p_filename.Name());
         p_groundMap = new Isis::UniversalGroundMap(pvl);
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         std::string msg = e.Errors();
         QMessageBox::information(p_parent, "Error", QString::fromStdString(msg), QMessageBox::Ok);
         return;
       }
     }
 
-    if(p_serialNumber.empty()) p_serialNumber = Isis::SerialNumber::Compose(cube);
+    if (p_serialNumber.empty()) p_serialNumber = Isis::SerialNumber::Compose(cube);
 
     // Remove the old control points
     p_controlPoints.clear();
 
-    for(int i = 0; i < cn->Size(); i++) {
-      Isis::ControlPoint p = (*cn)[i];
+    for (int i = 0; i < cn->GetNumPoints(); i++) {
+      Isis::ControlPoint &p = *cn->GetPoint(i);
+
       //------------------------------------------------------------
       // we are now looping thru all the measures, so therefore all
       // measures are being drawn to the scene.
@@ -1613,14 +1614,14 @@ namespace Qisis {
       //------------------------------------------------------------
       //for (int j = 0; j < p.Size(); j++) {
       // This is how we decide if this point is in this item.
-      if(p[0].GetCubeSerialNumber().compare(p_serialNumber))  continue;
+      if (p[0]->GetCubeSerialNumber().compare(p_serialNumber))  continue;
       //if (p[j].CubeSerialNumber().compare(p_serialNumber))  continue;
 
       //----------------------------------------------
       // only use the first measure for all items.
       // because that is usually the reference point.
       //----------------------------------------------
-      p_groundMap->SetImage(p[0].GetSample(), p[0].GetLine());
+      p_groundMap->SetImage(p[0]->GetSample(), p[0]->GetLine());
       //-------------------------------------------------------
       // the following commented out line causes us to display
       // all the measures in each control point.
@@ -1629,19 +1630,19 @@ namespace Qisis {
       double lat = p_groundMap->UniversalLatitude();
       double lon = p_groundMap->UniversalLongitude();
       // convert long. if necessary
-      if(p_proj->Has180Domain()) {
+      if (p_proj->Has180Domain()) {
         lon = p_proj->To180Domain(lon);
-        if(p_proj->IsPositiveWest()) lon = p_proj->ToPositiveWest(lon, 180);
+        if (p_proj->IsPositiveWest()) lon = p_proj->ToPositiveWest(lon, 180);
       }
-      else if(p_proj->IsPositiveWest()) {
+      else if (p_proj->IsPositiveWest()) {
         lon = p_proj->ToPositiveWest(lon, 360);
       }
       // convert lat. if necessary
-      if(p_proj->IsPlanetographic()) {
+      if (p_proj->IsPlanetographic()) {
         lat = p_proj->ToPlanetographic(lat, p_proj->EquatorialRadius(), p_proj->PolarRadius());
       }
 
-      if(p_proj->SetGround(lat, lon)) {
+      if (p_proj->SetGround(lat, lon)) {
         double x = p_proj->XCoord();
         double y = -1 * (p_proj->YCoord());
 
@@ -1650,7 +1651,7 @@ namespace Qisis {
         // box of this polygon.  This way we know if the point
         // is in the parent or the child polygon if there are two polys.
         //---------------------------------------------------------------
-        if(this->polygon().boundingRect().contains(QPointF(x, y))) {
+        if (this->polygon().boundingRect().contains(QPointF(x, y))) {
           p_controlPoints.push_back(mapToScene(x, y));
           p_sceneToPointMap.insert(QString::fromStdString(p.GetId()), mapToScene(x, y));
         }
@@ -1665,7 +1666,7 @@ namespace Qisis {
 
     // Now take care of the children
     QList<QGraphicsItem *>children = this->children();
-    for(int j = 0; j < children.size(); j++) {
+    for (int j = 0; j < children.size(); j++) {
       ((MosaicItem *)children[j])->displayControlPoints(cn);
     }
   }
@@ -1682,7 +1683,7 @@ namespace Qisis {
     p_controlPointsVisible = visible;
 
     // If we do not have the points for this item yet, we need to get them!
-    if(p_controlPoints.size() == 0 && p_controlPointsVisible) {
+    if (p_controlPoints.size() == 0 && p_controlPointsVisible) {
       displayControlPoints(p_parent->controlNet());
     }
 
@@ -1690,7 +1691,7 @@ namespace Qisis {
 
     // Now take care of the children
     QList<QGraphicsItem *>children = this->children();
-    for(int j = 0; j < children.size(); j++) {
+    for (int j = 0; j < children.size(); j++) {
       ((MosaicItem *)children[j])->setControlPointsVisible(visible);
     }
   }
@@ -1712,7 +1713,7 @@ namespace Qisis {
     grp += Isis::PvlKeyword("Group_Name", this->treeItem()->parent()->text(0).toStdString());
 
     // Check item state
-    if(this->treeItem()->checkState(1) == Qt::Checked) {
+    if (this->treeItem()->checkState(1) == Qt::Checked) {
       grp += Isis::PvlKeyword("Item", "Yes");
     }
     else {
@@ -1720,7 +1721,7 @@ namespace Qisis {
     }
 
     // Check footprint state
-    if(this->treeItem()->checkState(2) == Qt::Checked) {
+    if (this->treeItem()->checkState(2) == Qt::Checked) {
       grp += Isis::PvlKeyword("Footprint", "Yes");
     }
     else {
@@ -1728,7 +1729,7 @@ namespace Qisis {
     }
 
     // Check outline state
-    if(this->treeItem()->checkState(3) == Qt::Checked) {
+    if (this->treeItem()->checkState(3) == Qt::Checked) {
       grp += Isis::PvlKeyword("Outline", "Yes");
     }
     else {
@@ -1736,7 +1737,7 @@ namespace Qisis {
     }
 
     // Check image state
-    if(this->treeItem()->checkState(4) == Qt::Checked) {
+    if (this->treeItem()->checkState(4) == Qt::Checked) {
       grp += Isis::PvlKeyword("Image", "Yes");
     }
     else {
@@ -1744,7 +1745,7 @@ namespace Qisis {
     }
 
     // Check label state
-    if(this->treeItem()->checkState(5) == Qt::Checked) {
+    if (this->treeItem()->checkState(5) == Qt::Checked) {
       grp += Isis::PvlKeyword("Label", "Yes");
     }
     else {
@@ -1753,8 +1754,8 @@ namespace Qisis {
 
     // Save control points
     Isis::PvlKeyword keyword("ControlPoints");
-    if(p_controlPointsVisible) {
-      for(int i = 0; i < p_controlPoints.size(); i++) {
+    if (p_controlPointsVisible) {
+      for (int i = 0; i < p_controlPoints.size(); i++) {
         Isis::iString controlPoint =  p_controlPoints[i].x();
         controlPoint.append(":");
         Isis::iString temp =  p_controlPoints[i].y();
@@ -1765,7 +1766,7 @@ namespace Qisis {
     }
 
     // Check control points visible state
-    if(p_controlPointsVisible) {
+    if (p_controlPointsVisible) {
       grp += Isis::PvlKeyword("ControlPointsVisible", "Yes");
     }
     else {
