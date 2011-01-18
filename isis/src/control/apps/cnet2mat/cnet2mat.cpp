@@ -56,8 +56,8 @@ void IsisMain() {
 
   int mpTotal = 0;
 
-  for(int i = 0; i < cnet.Size(); i++) {
-    mpTotal += cnet[i].Size();
+  for(int i = 0; i < cnet.GetNumPoints(); i++) {
+    mpTotal += cnet.GetPoint(i)->GetNumMeasures();
   }
 
   TextFile mpFile(ui.GetFilename("MATCH"), "Overwrite", "");
@@ -114,19 +114,20 @@ void IsisMain() {
   mpFile.PutLine(textLine);
 
   // Loop for each point in the control network
-  for(int i = 0; i < cnet.Size(); i++) {
+  for(int i = 0; i < cnet.GetNumPoints(); i++) {
+    ControlPoint *currPoint = cnet.GetPoint(i);
 
     // Loop for each measure in the control point
-    for(int m = 0; m < cnet[i].Size(); m++) {
+    for(int m = 0; m < currPoint->GetNumMeasures(); m++) {
       ostringstream formatter;
-      ControlMeasure currMeas = cnet[i][m];
+      ControlMeasure *currMeas = currPoint->GetMeasure(m);
 
       //Set Point ID
       formatter.clear();
       formatter.str("");
       formatter.width(30);
       formatter.setf(ios::left);
-      formatter << cnet[i].GetId() << " ";
+      formatter << currPoint->GetId() << " ";
       textLine = formatter.str();
 
       //Set FSC
@@ -134,7 +135,7 @@ void IsisMain() {
       formatter.str("");
       formatter.width(12);
       formatter.setf(ios::right);
-      string sn = currMeas.GetCubeSerialNumber();
+      string sn = currMeas->GetCubeSerialNumber();
       string fsc = fscMap[snMap[sn]];
       formatter << fsc << " ";
       textLine += formatter.str();
@@ -146,7 +147,7 @@ void IsisMain() {
       formatter.setf(ios::right);
       formatter.setf(ios::fixed);
       formatter.precision(2);
-      formatter << currMeas.GetLine() << " ";
+      formatter << currMeas->GetLine() << " ";
       textLine += formatter.str();
 
       //Set Sample
@@ -156,14 +157,14 @@ void IsisMain() {
       formatter.setf(ios::right);
       formatter.setf(ios::fixed);
       formatter.precision(2);
-      formatter << currMeas.GetSample() << "   ";
+      formatter << currMeas->GetSample() << "   ";
       textLine += formatter.str();
 
       //Set Class
       string ptClass;
-      ControlMeasure::MeasureType mType = currMeas.GetType();
+      ControlMeasure::MeasureType mType = currMeas->GetType();
 
-      if(currMeas.IsIgnored() || cnet[i].IsIgnored()) {
+      if(currMeas->IsIgnored() || currPoint->IsIgnored()) {
         ptClass = "U   "; //Unmeasured
       }
       else if(mType == ControlMeasure::Reference) {
@@ -172,11 +173,11 @@ void IsisMain() {
       else if(mType == ControlMeasure::RegisteredSubPixel) {
         ptClass = "S   "; //SubPixel
       }
-      else if(mType == ControlMeasure::RegisteredPixel 
+      else if(mType == ControlMeasure::RegisteredPixel
               || mType == ControlMeasure::Manual) {
         ptClass = "M   "; //Measured
       }
-      else{ // if(mType == ControlMeasure::Candidate) {
+      else { // if(mType == ControlMeasure::Candidate) {
         ptClass = "A   "; //Approximate
       }
       textLine += ptClass;
@@ -187,11 +188,11 @@ void IsisMain() {
       formatter.width(16);
       formatter.setf(ios::right);
       iString diam;
-      if(currMeas.GetDiameter() == Isis::Null) {
+      if(currMeas->GetDiameter() == Isis::Null) {
         diam = 0.0;
       }
       else {
-        diam = currMeas.GetDiameter();
+        diam = currMeas->GetDiameter();
       }
       formatter << diam;
       textLine += formatter.str();
