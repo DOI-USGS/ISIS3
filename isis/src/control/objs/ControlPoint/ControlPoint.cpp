@@ -1363,6 +1363,65 @@ namespace Isis {
 
 
   /**
+     * Returns a Reference Index of the Control Point. If none then returns the
+     * first measure as Reference. If there are no measures then returns -1;
+     *
+     * @author Sharmila Prasad (5/11/2010)
+     *
+     * @history 2010-07-21 Tracie Sucharski - Replaced IsReferece call with
+     *                        comparison of MeasureType.
+     * @return int
+     */
+  int ControlPoint::GetReferenceIndexNoException() const {
+    if (p_measures->size() == 0) {
+      return -1;
+    }
+
+    // Return the first ControlMeasure that is a reference
+    for (int i = 0; i < cubeSerials->size(); i++) {
+      if (p_measures->value(cubeSerials->at(i))->GetType() ==
+          ControlMeasure::Reference)
+        return i;
+    }
+
+    return 0;
+  }
+
+
+  /**
+   * Return the index of the reference measurement
+   * if none is specified, return the first measured CM
+   *
+   * @return The PvlObject created
+   */
+  int ControlPoint::GetReferenceIndex() const {
+    if (p_measures->size() == 0) {
+      iString msg = "There are no ControlMeasures in the ControlPoint [" +
+                    GetId() + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Return the first ControlMeasure that is a reference
+    for (int i = 0; i < cubeSerials->size(); i++) {
+      if (p_measures->value(cubeSerials->at(i))->GetType() ==
+          ControlMeasure::Reference)
+        return i;
+    }
+
+    // Or return the first measured ControlMeasure
+    for (int i = 0; i < cubeSerials->size(); i++) {
+      if (p_measures->value(cubeSerials->at(i))->IsMeasured())
+        return i;
+    }
+
+    iString msg = "There are no Measured ControlMeasures in the ControlPoint ["
+                  + GetId() + "]";
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+  }
+
+
+
+  /**
    * Return the status of Reference Measure's Edit Lock
    *
    * @author Sharmila Prasad (10/6/2010)

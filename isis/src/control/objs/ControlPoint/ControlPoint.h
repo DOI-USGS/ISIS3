@@ -344,6 +344,8 @@ namespace Isis {
       int GetNumLockedMeasures() const;
       bool HasSerialNumber(iString serialNumber) const;
       bool HasReference() const;
+      int  GetReferenceIndex() const;
+      int  GetReferenceIndexNoException() const;
       QString GetReferenceKey() const;
       QString GetReferenceKeyNoException() const;
       bool IsReferenceLocked() const;
