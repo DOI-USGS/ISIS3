@@ -39,7 +39,9 @@ void IsisMain() {
 
   Progress progress;
   UserInterface &ui = Application::GetUserInterface();
-  ControlNet innet(ui.GetFilename("CNET"), NULL, true);
+  // This constructor was removed in the Control redesign
+  //ControlNet innet(ui.GetFilename("CNET"), NULL, true);
+  ControlNet innet(ui.GetFilename("CNET"));
   iString prefix(ui.GetString("PREFIX"));
   bool ignore = ui.GetBoolean("IGNORE");
 
@@ -79,9 +81,9 @@ void IsisMain() {
   QMap< iString, int > cubeMeasureCount;
 
   // Set calculating progress
-  if(innet.Size() > 0) {
+  if(innet.GetNumPoints() > 0) {
     progress.SetText("Calculating");
-    progress.SetMaximumSteps(innet.Size());
+    progress.SetMaximumSteps(innet.GetNumPoints());
     progress.CheckStatus();
   }
 
@@ -90,21 +92,21 @@ void IsisMain() {
   cbman.SetNumOpenCubes(50);
 
   // Loop through all control points in control net
-  for(int cp = 0; cp < innet.Size(); cp ++) {
-    if(ignore && innet[cp].IsIgnored()) continue;
-    ControlPoint controlpt(innet[cp]);
+  for(int cp = 0; cp < innet.GetNumPoints(); cp ++) {
+    if(ignore && innet.GetPoint(cp)->IsIgnored()) continue;
+    ControlPoint * controlpt = innet.GetPoint(cp);
 
     // Checks for lat/Lon production
     if(ui.GetBoolean("NOLATLON")) {
 
       // Loop through all control measures in control points
-      for(int cm = 0; cm < controlpt.Size(); cm ++) {
-        ControlMeasure controlms = controlpt[cm];
+      for(int cm = 0; cm < controlpt->GetNumMeasures(); cm ++) {
+        ControlMeasure * controlms = controlpt->GetMeasure(cm);
 
         // If we have the cube, check it out
-        if(num2cube.HasSerialNumber(controlms.GetCubeSerialNumber())) {
+        if(num2cube.HasSerialNumber(controlms->GetCubeSerialNumber())) {
           Cube *cube = cbman.OpenCube(num2cube.Filename(
-                                        controlms.GetCubeSerialNumber()));
+                                        controlms->GetCubeSerialNumber()));
           Camera *cam = NULL;
           bool createFail = false;
           bool setPassed = true;
@@ -120,43 +122,45 @@ void IsisMain() {
 
           // Check the exact measure location
           if(!createFail) {
-            setPassed = cam->SetImage(controlms.GetSample(), controlms.GetLine());
+            setPassed = cam->SetImage(controlms->GetSample(), controlms->GetLine());
           }
 
           // Record it if it failed at anything
           if(createFail || !setPassed) {
-            noLatLonSerialNumbers.insert(controlms.GetCubeSerialNumber());
-            noLatLonControlPoints[controlms.GetCubeSerialNumber()].insert(controlpt.GetId());
+            noLatLonSerialNumbers.insert(controlms->GetCubeSerialNumber());
+            noLatLonControlPoints[controlms->GetCubeSerialNumber()].insert(controlpt->GetId());
           }
         }
       }
     }
     // Checks of the ControlPoint has only 1 Measure
-    if(controlpt.GetNumValidMeasures() == 1) {
-      iString sn = controlpt[0].GetCubeSerialNumber();
+    if(controlpt->GetNumValidMeasures() == 1) {
+      iString sn = controlpt->GetMeasure(0)->GetCubeSerialNumber();
       singleMeasureSerialNumbers.insert(sn);
-      singleMeasureControlPoints[sn].insert(controlpt.GetId());
+      singleMeasureControlPoints[sn].insert(controlpt->GetId());
 
       // Records how many times a cube is in the ControlNet
       cubeMeasureCount[sn] ++;
     }
     else {
       // Checks for duplicate Measures for the same SerialNumber
-      QVector<ControlMeasure> controlMeasures;
-      for(int cm = 0; cm < controlpt.Size(); cm ++) {
-        if(ignore  &&  controlpt[cm].IsIgnored()) continue;
+      QVector<ControlMeasure *> controlMeasures;
+      for(int cm = 0; cm < controlpt->GetNumMeasures(); cm ++) {
+        ControlMeasure * controlms = controlpt->GetMeasure(cm);
 
-        controlMeasures.append(controlpt[cm]);
-        iString currentsn = controlpt[cm].GetCubeSerialNumber();
+        if(ignore  &&  controlms->IsIgnored()) continue;
+
+        controlMeasures.append(controlms);
+        iString currentsn = controlms->GetCubeSerialNumber();
 
         // Records how many times a cube is in the ControlNet
         cubeMeasureCount[currentsn] ++;
 
         // Compares previous ControlMeasure SerialNumbers with the current
         for(int pre_cm = controlMeasures.size() - 1 - 1; pre_cm >= 0; pre_cm --) {
-          if(controlMeasures[pre_cm].GetCubeSerialNumber() == currentsn) {
+          if(controlMeasures[pre_cm]->GetCubeSerialNumber() == currentsn) {
             duplicateSerialNumbers.insert(currentsn);   //serial number duplication
-            duplicateControlPoints[currentsn].insert(controlpt.GetId());
+            duplicateControlPoints[currentsn].insert(controlpt->GetId());
           }
         }
 
@@ -415,24 +419,24 @@ QMap< iString, std::set<iString> > constructPointSets(std::set<iString> & index,
   QMap< iString, std::set<iString > > adjPoints;
 
   bool ignore = Application::GetUserInterface().GetBoolean("IGNORE");
-  for(int cp = 0; cp < innet.Size(); cp++) {
+  for(int cp = 0; cp < innet.GetNumPoints(); cp++) {
+    ControlPoint * controlpt = innet.GetPoint(cp);
 
-    if(ignore && innet[cp].IsIgnored()) continue;
+    if(ignore && controlpt->IsIgnored()) continue;
 
-    if(innet[cp].GetNumValidMeasures() < 2) continue;
+    if(controlpt->GetNumValidMeasures() < 2) continue;
 
-    ControlPoint controlpt = innet[cp];
     // Map SerialNumbers together based on ControlMeasures
-    for(int cm1 = 0; cm1 < controlpt.Size(); cm1++) {
-      if(ignore && controlpt.IsIgnored()) continue;
+    for(int cm1 = 0; cm1 < controlpt->GetNumMeasures(); cm1++) {
+      if(ignore && controlpt->IsIgnored()) continue;
 
-      iString sn = controlpt[cm1].GetCubeSerialNumber();
+      iString sn = controlpt->GetMeasure(cm1)->GetCubeSerialNumber();
       index.insert(sn);
-      for(int cm2 = 0; cm2 < controlpt.Size(); cm2++) {
-        if(ignore && controlpt[cm2].IsIgnored()) continue;
+      for(int cm2 = 0; cm2 < controlpt->GetNumMeasures(); cm2++) {
+        if(ignore && controlpt->GetMeasure(cm2)->IsIgnored()) continue;
 
         if(cm1 != cm2) {
-          adjPoints[ sn ].insert(controlpt[cm2].GetCubeSerialNumber());
+          adjPoints[ sn ].insert(controlpt->GetMeasure(cm2)->GetCubeSerialNumber());
         }
       }
     }
