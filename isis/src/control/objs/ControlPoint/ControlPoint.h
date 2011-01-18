@@ -24,11 +24,13 @@
 #ifndef ControlPoint_h
 #define ControlPoint_h
 
-#include <QVector>
-
 #include "iString.h"
 #include "ControlMeasure.h"
 #include "SurfacePoint.h"
+
+template< typename A, typename B > class QHash;
+
+class QStringList;
 
 namespace Isis {
   class ControlNet;
@@ -59,7 +61,7 @@ namespace Isis {
    *   @history 2006-10-31 Tracie Sucharski, Added HasReference method,
    *            changed ReferenceIndex method to throw error if there is no
    *            Reference ControlMeasure.
-   *   @history 2007-01-25 Debbie A. Cook, Removed return statement in 
+   *   @history 2007-01-25 Debbie A. Cook, Removed return statement in
    *            SetApriori method for \Point case so that
    *            FocalPlaneMeasures will get set.  The method already has a later
    *            return statement to avoid changing the lat/lon values.
@@ -96,13 +98,13 @@ namespace Isis {
    *            error messages.
    *   @history 2009-12-06  Tracie Sucharski, Renamed ComputeErrors to
    *            ComputeResiudals.
-   *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors 
+   *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors
    *            with call to CameraGroundMap->GetXY
    *   @history 2010-01-12 Tracie Sucharski, Added support for binary networds,
    *            added new parameters, renamed ComputeErrors to ComputeResiduals,
    *            renamed MaximumError to MaximumResidual, renamed AverageError to
    *            AverageResidual.
-   *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors 
+   *   @history 2010-03-19 Debbie A. Cook Replaced code in method ComputeErrors
    *            with call to CameraGroundMap->GetXY
    *   @history 2010-05-06 Tracie Sucharski, Use defaults of 0. instead of
    *            Isis::Null, because 0. is the default in the protocol buffers.
@@ -121,7 +123,7 @@ namespace Isis {
    *            done.
    *   @history 2010-06-17 Tracie Sucharski, Added Lock keyword, new methods
    *            SetLocked, Locked and NumLockedMeasures.
-   *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString() 
+   *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString()
    *            additional working sessions for Control network design.
    *   @history 2010-07-27 Tracie Sucharski, Updated for changes made after
    *            additional working sessions for Control network
@@ -138,7 +140,7 @@ namespace Isis {
    *   @history 2010-09-15 Tracie Sucharski, It was decided after mtg with
    *            Debbie, Stuart, Ken and Tracie that ControlPoint
    *            will only function with x/y/z, not lat/lon/radius. It will be
-   *            the responsibility of the application or class using 
+   *            the responsibility of the application or class using
    *            ControlPoint to set up a SurfacePoint object to do conversions
    *            between x/y/z and lat/lon/radius. So... remove all conversion
    *            methods from this class. It was also decided that when importing
@@ -149,7 +151,7 @@ namespace Isis {
    *            Exception if there are no reference point or no measures in a
    *            Control Point.
    *   @history 2010-06-04 Eric Hyer - removed parametor for PointTypeToString()
-   *   @history 2010-09-09 Sharmila Prasad - Added API's to get Latitude, 
+   *   @history 2010-09-09 Sharmila Prasad - Added API's to get Latitude,
    *            Longitude, Radius from the Reference Measure in the Point. Also
    *            to get the min & max Line & Sample Errors
    *   @history 2010-09-27 Tracie Sucharski, Removed these new methods and move
@@ -194,9 +196,13 @@ namespace Isis {
    *            ControlMeasure's method of accessing data. Removed obsolete
    *            methods to prevent further use of them.
    *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlNet.
+   *   @history 2011-01-17 Eric Hyer - Points now own and delete their measures.
+   *                           ControlNet now notified of changes (like adding
+   *                           and removing measures).  Returning pointers to
+   *                           measures is now safe and encouraged.
    */
   class ControlPoint {
-    friend class ControlNet; 
+      friend class ControlNet;
     public:
       /**
        * These are the valid 'types' of point. A point type defines what a point
@@ -268,26 +274,27 @@ namespace Isis {
       };
 
       ControlPoint();
-      ControlPoint(const ControlPoint&);
-      ControlPoint (const iString &id);
+      ControlPoint(const ControlPoint &);
+      ControlPoint(const iString &id);
       ControlPoint(const PBControlNet_PBControlPoint &);
       ControlPoint(const PBControlNet_PBControlPoint &,
                    const PBControlNetLogData_Point &);
-      ~ControlPoint ();
-      
-      ControlNet * Parent() { return parentNetwork; }
+      ~ControlPoint();
 
-      void Load(PvlObject &p, bool forceBuild = false);
+      ControlNet *Parent() { return parentNetwork; }
 
-      void Add(ControlMeasure measure, bool forceBuild = false,
-               bool isNewMeasure = true);
+      void Load(PvlObject &p);
+
+      void Add(ControlMeasure *measure);
+      void Delete(iString serialNumber);
       void Delete(int index);
       Status ResetApriori();
-      Status UpdateMeasure(const ControlMeasure &);
 
-      ControlMeasure GetMeasure(int index) const;
-      ControlMeasure GetMeasure(iString serialNumber) const;
-      ControlMeasure GetReferenceMeasure() const;
+      const ControlMeasure *GetMeasure(iString serialNumber) const;
+      ControlMeasure *GetMeasure(iString serialNumber);
+
+      const ControlMeasure *GetReferenceMeasure() const;
+      ControlMeasure *GetReferenceMeasure();
 
       Status SetChooserName(iString name);
       Status SetDateTime(iString dateTime);
@@ -316,7 +323,7 @@ namespace Isis {
       bool IsValid() const;
       bool IsInvalid() const;
       SurfacePoint GetSurfacePoint() const;
-      PointType GetType () const;
+      PointType GetType() const;
       bool IsGround() const;
 
       static iString PointTypeToString(PointType type);
@@ -332,14 +339,13 @@ namespace Isis {
       SurfacePointSource::Source GetAprioriSurfacePointSource() const;
       iString GetAprioriSurfacePointSourceFile() const;
 
-      int Size () const { return p_measures.size(); };
-      int GetNumMeasures () const { return p_measures.size(); };
-      int GetNumValidMeasures () const;
-      int GetNumLockedMeasures () const;
-      bool HasSerialNumber (iString serialNumber) const;
+      int GetNumMeasures() const;
+      int GetNumValidMeasures() const;
+      int GetNumLockedMeasures() const;
+      bool HasSerialNumber(iString serialNumber) const;
       bool HasReference() const;
-      int  GetReferenceIndex() const;
-      int  GetReferenceIndexNoException() const;
+      QString GetReferenceKey() const;
+      QString GetReferenceKeyNoException() const;
       bool IsReferenceLocked() const;
 
       double GetAverageResidual() const;
@@ -350,16 +356,21 @@ namespace Isis {
       double GetMaximumSampleResidual() const;
       double GetMaximumLineResidual() const;
 
+      QList< QString > GetCubeSerialNumbers() const;
+
       PvlObject ToPvlObject() const;
 
-      void SetParent(ControlNet * parent);
+      void SetParent(ControlNet *parent);
 
-      ControlMeasure operator[](int index) const;
-      ControlMeasure operator[](iString serialNumber) const;
+      const ControlMeasure *operator[](iString serialNumber) const;
+      ControlMeasure *operator[](iString serialNumber);
 
-      bool operator != (const ControlPoint &pPoint) const;
-      bool operator == (const ControlPoint &pPoint) const;
-      ControlPoint & operator = (const ControlPoint &pPoint);
+      const ControlMeasure *operator[](int index) const;
+      ControlMeasure *operator[](int index);
+
+      bool operator!=(const ControlPoint &pPoint) const;
+      bool operator==(const ControlPoint &pPoint) const;
+      const ControlPoint &operator=(ControlPoint pPoint);
 
       // The next 3 methods are specifically to support BundleAdjust
       void ZeroNumberOfRejectedMeasures();
@@ -369,14 +380,24 @@ namespace Isis {
       PBControlNet_PBControlPoint ToProtocolBuffer() const;
       PBControlNetLogData_Point GetLogProtocolBuffer() const;
 
+
+    private:
+      void validateMeasure(iString serialNumber, bool checkRef = false) const;
+
+
     private:
       void Init(const PBControlNet_PBControlPoint &);
 
-      int FindMeasureIndex(iString serialNumber) const;
       void PointModified();
 
-      ControlNet * parentNetwork;
-      QVector<ControlMeasure> p_measures; //!< List of Control Measures
+      ControlNet *parentNetwork;
+
+      //!< List of Control Measures
+      QHash< QString, ControlMeasure * > * p_measures;
+
+      QStringList *cubeSerials;
+
+      ControlMeasure *referenceMeasure;
 
       /**
        * This is the control point ID. This is supposed to be a unique
@@ -392,19 +413,19 @@ namespace Isis {
        *   relating to this control point have to actually change for this to
        *   be updated. This is an empty string if we need to dynamically
        *   get the username of the caller when asked for (or written to file).
-       */ 
+       */
       iString p_chooserName;
 
       /**
        * This is the last modified date and time. This is updated automatically
        *   and works virtually in the same way as p_chooserName.
-       */ 
+       */
       iString p_dateTime;
 
       /**
        * What this control point is tying together.
        * @see PointType
-       */ 
+       */
       PointType p_type;
 
       /**
