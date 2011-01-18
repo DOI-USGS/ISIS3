@@ -105,22 +105,24 @@ void IsisMain() {
     Camera *cam = cube.Camera();
 
     //loop through all the control points
-    for(int cp = 0; cp < inNet.Size(); cp++) {
-      ControlPoint point(inNet[cp]);
+    for(int cp = 0; cp < inNet.GetNumPoints(); cp++) {
+      ControlPoint *point = inNet.GetPoint(cp);
 
-      // If the point is locked and Apriori source is "AverageOfMeasures" 
+      // If the point is locked and Apriori source is "AverageOfMeasures"
       // then do not add the measures.
-      if(point.IsEditLocked() && 
-         point.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::AverageOfMeasures){
+      if(point->IsEditLocked() &&
+          point->GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::AverageOfMeasures) {
         continue;
       }
       // If there are duplicate serial numbers in the addlist, prevent double adding
+      //TODO: This whole check should be pointless with the new design. Once this
+      // conversion is complete, this 'if' should be removed
       if(hasDuplicateSerialNumbers) {
         std::string sn = SerialNumber::Compose(*cubepvl);
         bool hasSerialNumber = false;
 
-        for(int cm = 0; cm < point.Size() && !hasSerialNumber; cm ++) {
-          if(sn == point[cm].GetCubeSerialNumber()) {
+        for(int cm = 0; cm < point->GetNumMeasures() && !hasSerialNumber; cm ++) {
+          if(sn == point->GetMeasure(cm)->GetCubeSerialNumber()) {
             hasSerialNumber = true;
           }
         }
@@ -129,21 +131,21 @@ void IsisMain() {
           continue;
         }
       }
-          
+
       double latitude;
       double longitude;
       if(retrievalOpt == "REFERENCE") {
         // Get the lat/long coords from the existing reference measure
-        latitude = p_pointLatLon[point.GetId()].first;
-        longitude = p_pointLatLon[point.GetId()].second;
+        latitude = p_pointLatLon[point->GetId()].first;
+        longitude = p_pointLatLon[point->GetId()].second;
       }
       else {
         // Get the lat/long coords from the current control point
-        latitude = point.GetSurfacePoint().GetLatitude().GetDegrees();
-        longitude = point.GetSurfacePoint().GetLongitude().GetDegrees();
+        latitude = point->GetSurfacePoint().GetLatitude().GetDegrees();
+        longitude = point->GetSurfacePoint().GetLongitude().GetDegrees();
         if(latitude == Isis::Null  ||  longitude == Isis::Null) {
           std::string msg = "Unable to retreive lat/lon from Control Point [";
-          msg += point.GetId() + "]. RETREIVAL=POINT cannot be used unless all Control ";
+          msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless all Control ";
           msg += "Points have Latitude/Longitude keywords.";
           throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
         }
@@ -159,8 +161,8 @@ void IsisMain() {
           if(hasDuplicateSerialNumbers) {
             bool hasSerialNumber = false;
 
-            for(int cm = 0; cm < point.Size() && !hasSerialNumber; cm ++) {
-              if(sn == point[cm].GetCubeSerialNumber()) {
+            for(int cm = 0; cm < point->GetNumMeasures() && !hasSerialNumber; cm ++) {
+              if(sn == point->GetMeasure(cm)->GetCubeSerialNumber()) {
                 hasSerialNumber = true;
               }
             }
@@ -172,31 +174,31 @@ void IsisMain() {
             }
           }
 
-          ControlMeasure newCm;
-          newCm.SetCoordinate(cam->Sample(), cam->Line(), ControlMeasure::Candidate);
-          newCm.SetAprioriSample(cam->Sample());
-          newCm.SetAprioriLine  (cam->Line());
-          newCm.SetCubeSerialNumber(sn);
-          newCm.SetDateTime();
-          newCm.SetChooserName("Application cnetadd");
+          ControlMeasure *newCm = new ControlMeasure();
+          newCm->SetCoordinate(cam->Sample(), cam->Line(), ControlMeasure::Candidate);
+          newCm->SetAprioriSample(cam->Sample());
+          newCm->SetAprioriLine(cam->Line());
+          newCm->SetCubeSerialNumber(sn);
+          newCm->SetDateTime();
+          newCm->SetChooserName("Application cnetadd");
 
           // Check the measure for DEFFILE validity
           if(checkMeasureValidity) {
             if(!validator.ValidEmissionAngle(cam->EmissionAngle())) {
               //TODO: log that it was Emission Angle that failed the check
-              newCm.SetIgnore(true);
+              newCm->SetIgnore(true);
             }
             else if(!validator.ValidIncidenceAngle(cam->IncidenceAngle())) {
               //TODO: log that it was Incidence Angle that failed the check
-              newCm.SetIgnore(true);
+              newCm->SetIgnore(true);
             }
             else if(!validator.ValidResolution(cam->Resolution())) {
               //TODO: log that it was Resolution that failed the check
-              newCm.SetIgnore(true);
+              newCm->SetIgnore(true);
             }
             else if(!validator.PixelsFromEdge((int)cam->Sample(), (int)cam->Line(), &cube)) {
               //TODO: log that it was Pixels from Edge that failed the check
-              newCm.SetIgnore(true);
+              newCm->SetIgnore(true);
             }
             else {
               Isis::Portal portal(1, 1, cube.PixelType());
@@ -204,18 +206,19 @@ void IsisMain() {
               cube.Read(portal);
               if(!validator.ValidDnValue(portal[0])) {
                 //TODO: log that it was DN that failed the check
-                newCm.SetIgnore(true);
+                newCm->SetIgnore(true);
               }
             }
           }
 
-          point.Add(newCm);
+          point->Add(newCm); //point takes ownership
+          newCm = NULL;
 
           // Record the modified Point and Measure
-          p_modifiedMeasures[cp].insert(newCm.GetCubeSerialNumber());
+          p_modifiedMeasures[cp].insert(newCm->GetCubeSerialNumber());
 
-          if(retrievalOpt == "POINT" && inNet[cp].Size() == 1) {
-            point.SetIgnore(false);
+          if(retrievalOpt == "POINT" && inNet.GetPoint(cp)->GetNumMeasures() == 1) {
+            point->SetIgnore(false);
           }
 
           if(log) {
@@ -233,8 +236,8 @@ void IsisMain() {
           }
         }
       }
-      
-      inNet.UpdatePoint(point);
+
+      //inNet.UpdatePoint(point); //This is fixed via pointers
     }
 
     cubepvl = NULL;
@@ -270,7 +273,7 @@ void IsisMain() {
 
     // Add the list of modified points to the output log file
     for(unsigned int i = 0; i < modPoints.size(); i++) {
-      pointsModified += inNet[modPoints[i]].GetId();
+      pointsModified += inNet.GetPoint(modPoints[i])->GetId();
     }
 
     results.AddKeyword(added);
@@ -294,7 +297,7 @@ void IsisMain() {
 
     for(std::map< int, std::set<std::string> >::iterator it = p_modifiedMeasures.begin();
         it != p_modifiedMeasures.end(); it ++) {
-      out_stream << inNet[it->first].GetId() << std::endl;
+      out_stream << inNet.GetPoint(it->first)->GetId() << std::endl;
     }
 
     out_stream.close();
@@ -302,18 +305,22 @@ void IsisMain() {
 
   // Modify the inNet to only have modified points/measures
   if(ui.GetString("EXTRACT") == "MODIFIED") {
-    for(int cp = inNet.Size() - 1; cp >= 0; cp --) {
+    for(int cp = inNet.GetNumPoints() - 1; cp >= 0; cp --) {
       std::map< int, std::set<std::string> >::iterator it = p_modifiedMeasures.find(cp);
       // If the point was not modified, delete
       if(it == p_modifiedMeasures.end()) {
-        inNet.Delete(cp);
+        inNet.DeletePoint(cp);
       }
       // Else, remove the unwanted measures from the modified point
       else {
-        for(int cm = inNet[cp].Size() - 1; cm >= 0; cm --) {
-          if(!inNet[cp][cm].GetType() ==  ControlMeasure::Reference &&
-              it->second.find(inNet[cp][cm].GetCubeSerialNumber()) == it->second.end()) {
-            inNet[cp].Delete(cm);
+        ControlPoint *controlpt = inNet.GetPoint(cp);
+
+        for(int cm = controlpt->GetNumMeasures() - 1; cm >= 0; cm --) {
+          ControlMeasure *controlms = controlpt->GetMeasure(cm);
+
+          if(!controlms->GetType() ==  ControlMeasure::Reference &&
+              it->second.find(controlms->GetCubeSerialNumber()) == it->second.end()) {
+            controlpt->Delete(cm);
           }
         }
       }
@@ -340,22 +347,22 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
 
   Progress progress;
   progress.SetText("Calculating Lat/Lon");
-  progress.SetMaximumSteps(net.Size());
+  progress.SetMaximumSteps(net.GetNumPoints());
   progress.CheckStatus();
 
-  for(int cp = 0; cp < net.Size(); cp++) {
-    ControlPoint point(net[cp]);
-    ControlMeasure cm(point[ net[cp].GetReferenceIndex() ]);
+  for(int cp = 0; cp < net.GetNumPoints(); cp++) {
+    ControlPoint *point = net.GetPoint(cp);
+    ControlMeasure *cm = point->GetReferenceMeasure();
 
-    Cube *cube = manager.OpenCube(snl.Filename(cm.GetCubeSerialNumber()));
+    Cube *cube = manager.OpenCube(snl.Filename(cm->GetCubeSerialNumber()));
     try {
-      cube->Camera()->SetImage(cm.GetSample(), cm.GetLine());
-      p_pointLatLon[point.GetId()].first = cube->Camera()->UniversalLatitude();
-      p_pointLatLon[point.GetId()].second = cube->Camera()->UniversalLongitude();
+      cube->Camera()->SetImage(cm->GetSample(), cm->GetLine());
+      p_pointLatLon[point->GetId()].first = cube->Camera()->UniversalLatitude();
+      p_pointLatLon[point->GetId()].second = cube->Camera()->UniversalLongitude();
     }
     catch(Isis::iException &e) {
       std::string msg = "Unable to create camera for cube file [";
-      msg += snl.Filename(cm.GetCubeSerialNumber()) + "]";
+      msg += snl.Filename(cm->GetCubeSerialNumber()) + "]";
       throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
     }
     cube = NULL; //Do not delete, manager still has ownership
