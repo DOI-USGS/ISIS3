@@ -209,18 +209,18 @@ namespace Isis {
     // Create a lookup table of ignored, held, and ground points
     m_nHeldPoints = m_nGroundPoints = m_nIgnoredPoints = 0;
     count = 0;
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
 
     for ( int i = 0; i < nObjectPoints; i++ )     {
-      const ControlPoint & point = (*m_pCnet)[i];
+      const ControlPoint * point = m_pCnet->GetPoint(i);
 
-      if ( point.IsIgnored() ) {
+      if ( point->IsIgnored() ) {
           m_nPointIndexMap.push_back(-1);
           m_nIgnoredPoints++;
           continue;
       }
 
-      if ( point.GetType() == ControlPoint::Ground )
+      if ( point->GetType() == ControlPoint::Ground )
         m_nGroundPoints++;
 
       m_nPointIndexMap.push_back(count);
@@ -539,7 +539,7 @@ namespace Isis {
   {
     m_nImageParameters = Observations() * m_nNumImagePartials;
 
-    int nPointParameterColumns = m_pCnet->NumValidPoints() * 3;
+    int nPointParameterColumns = m_pCnet->GetNumValidPoints() * 3;
 
     return m_nImageParameters + nPointParameterColumns;
   }
@@ -571,7 +571,7 @@ namespace Isis {
     m_Normals.resize(m_nRank);                        // set size of reduced normal equations matrix
     m_Normals.clear();                                // zero all elements
 
-    int n3DPoints = m_pCnet->NumValidPoints();
+    int n3DPoints = m_pCnet->GetNumValidPoints();
 
     m_nUnknownParameters = m_nRank + 3 * n3DPoints;
 
@@ -939,22 +939,22 @@ namespace Isis {
     // loop over 3D points
     int nPointIndex = 0;
     int nImageIndex;
-    int n3DPoints = m_pCnet->Size();
+    int n3DPoints = m_pCnet->GetNumPoints();
 
     for( int i = 0; i < n3DPoints; i++ ) {
-      const ControlPoint & point = (*m_pCnet)[i];
+      const ControlPoint * point = m_pCnet->GetPoint(i);
 
-//      std::cout << "   processing point " << i << " with id = " << point.Id() << std::endl;
+//      std::cout << "   processing point " << i << " with id = " << point->Id() << std::endl;
 
 
-      if( point.IsIgnored() )
+      if( point->IsIgnored() )
         continue;
 
-//    printf("Processing %s - 3D Point %d of %d\n", point.Id().c_str(),nPointIndex,n3DPoints);
+//    printf("Processing %s - 3D Point %d of %d\n", point->Id().c_str(),nPointIndex,n3DPoints);
 
       // flagged as "JigsawHighSigma" implies this point has
       // insufficient number of observations (kluge on this flag - need specific flag) 
-//      if( point.Status() == ControlPoint::JigsawHighSigma )
+//      if( point->Status() == ControlPoint::JigsawHighSigma )
 //        continue;
 
       // send notification to UI indicating index of point currently being processed
@@ -967,7 +967,7 @@ namespace Isis {
         n2.clear();
       }
 
-      int nMeasures = point.Size();
+      int nMeasures = point->GetNumMeasures();
 
       // set up non-zero indices for Q matrix - Q will be sparse matrix - do we have to do this?
 //    if( m_nIterations == 0 )
@@ -978,20 +978,20 @@ namespace Isis {
 
       // loop over measures for this point
       for( int j = 0; j < nMeasures; j++ ) {
-        const ControlMeasure & measure = point[j];
+        const ControlMeasure * measure = point->GetMeasure(j);
 
-        if( measure.IsIgnored() )
+        if( measure->IsIgnored() )
           continue;
 
         // flagged as "JigsawFail" implies this measure has been rejected 
         // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
-        if( measure.IsRejected() ) {
+        if( measure->IsRejected() ) {
           printf("skipping rejected observation for %s\n",
-              point.GetId().c_str());
+              point->GetId().c_str());
           continue;
         }
 
-        if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(measure.GetCubeSerialNumber()) )
+        if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(measure->GetCubeSerialNumber()) )
           continue;
 
 //        printf("   Processing Measure %d of %d\n", j,nMeasures);
@@ -1000,13 +1000,13 @@ namespace Isis {
         // see BundleDistanceConstraints.java for code snippet (line 926)
 
         // Determine the image index
-        nImageIndex = m_pSnList->SerialNumberIndex(measure.GetCubeSerialNumber());
+        nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
 
 //        std::cout << "  About to call ComputePartials..." << std::endl;
 
 
         bStatus = ComputePartials(coeff_image, coeff_point3D, coeff_RHS,
-                                  measure, point);
+                                  *measure, *point);
 
 //        std::cout << coeff_image << std::endl;
 //        std::cout << coeff_point3D << std::endl;
@@ -1137,7 +1137,7 @@ namespace Isis {
     Q.clear();
 
     // weighting of 3D point parameters
-    const ControlPoint& point = (*m_pCnet)[i];
+    const ControlPoint * point = m_pCnet->GetPoint(i);
 
     bounded_vector<double,3>& weights = m_Point_Weights[nPointIndex];
     bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
@@ -1170,12 +1170,12 @@ namespace Isis {
     // save upper triangular covariance matrix for error propagation
     // TODO:  The following method does not exist yet (08-13-2010)
     // Can N22 be cast to vector type? Or should SurfacePoint be changed to use matrix type?
-    point.GetSurfacePoint().SetSphericalMatrix( N22 );
+    point->GetSurfacePoint().SetSphericalMatrix( N22 );
 
     // Next 3 lines obsolete because only the matrix is stored and sigmas are calculated from it.
-//    point.SetSigmaLatitude(N22(0,0));
-//    point.SetSigmaLongitude(N22(1,1));
-//    point.SetSigmaRadius(N22(2,2));
+//    point->SetSigmaLatitude(N22(0,0));
+//    point->SetSigmaLongitude(N22(1,1));
+//    point->SetSigmaRadius(N22(2,2));
 
     // form Q (this is N22{-1} * N12{T})
 //    clock_t FormQ1 = clock();
@@ -1224,29 +1224,29 @@ namespace Isis {
 //  double dWtRadius = 0.0;
     double d;
 
-    int n3DPoints = m_pCnet->Size();
+    int n3DPoints = m_pCnet->GetNumPoints();
     int nPointIndex = 0;
     for( int i = 0; i < n3DPoints; i++ ) {
-      ControlPoint point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
 //      {
 //        nPointIndex++;  
         continue;
 //      }
 
-      SurfacePoint aprioriSurfacePoint = point.GetAprioriSurfacePoint(); 
+      SurfacePoint aprioriSurfacePoint = point->GetAprioriSurfacePoint(); 
       aprioriSurfacePoint.SetRadii(Distance(m_BodyRadii[0]),
                                    Distance(m_BodyRadii[1]),
                                    Distance(m_BodyRadii[2]));
-      point.SetAprioriSurfacePoint(aprioriSurfacePoint);
+      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
 
       bounded_vector<double,3>& weights = m_Point_Weights[nPointIndex];
       bounded_vector<double,3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
 
 //      std::cout << weights << std::endl;
 
-//      if( point.Held() || point.Type() == ControlPoint::Ground )
-      if (point.GetType() == ControlPoint::Ground ) {
+//      if( point->Held() || point->Type() == ControlPoint::Ground )
+      if (point->GetType() == ControlPoint::Ground ) {
         weights[0] = 1.0e+25;
         weights[1] = 1.0e+25;
         weights[2] = 1.0e+25;
@@ -1255,9 +1255,9 @@ namespace Isis {
 //      if(  m_dGlobalLatitudeAprioriSigma > 0.0 )
 //        dAprioriSigmaLat = m_dGlobalLatitudeAprioriSigma;
 //      else
-//        dAprioriSigmaLat = (double) point.GetAprioriSurfacePoint().GetLatSigma();
+//        dAprioriSigmaLat = (double) point->GetAprioriSurfacePoint().GetLatSigma();
 
-        dAprioriSigmaLat = point.GetAprioriSurfacePoint().GetLatSigmaDistance();
+        dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance();
 
         if ( dAprioriSigmaLat <= 0.0 || dAprioriSigmaLat >= 1000.0 ) {
           if ( m_dGlobalLatitudeAprioriSigma > 0.0 )
@@ -1270,7 +1270,7 @@ namespace Isis {
           weights[0] = 1.0/(d*d);
         }
 
-//      dAprioriSigmaX = point.GetAprioriSurfacePoint().GetXSigma();
+//      dAprioriSigmaX = point->GetAprioriSurfacePoint().GetXSigma();
 //      if(  dAprioriSigmaX <= 0.0 || dAprioriSigmaX >= 1000.0 ) {
 //        if( m_dGlobalSurfaceXAprioriSigma > 0.0 )
 //          dAprioriSigmaX = m_dGlobalSurfaceXAprioriSigma;
@@ -1286,9 +1286,9 @@ namespace Isis {
 //     if(  m_dGlobalLongitudeAprioriSigma > 0.0 )
 //       dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
 //     else
-//       dAprioriSigmaLon = point.AprioriSigmaLongitude();
+//       dAprioriSigmaLon = point->AprioriSigmaLongitude();
 
-        dAprioriSigmaLon = point.GetAprioriSurfacePoint().GetLonSigmaDistance();
+        dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance();
         if ( dAprioriSigmaLon <= 0.0 || dAprioriSigmaLon >= 1000.0 ) {
           if ( m_dGlobalLongitudeAprioriSigma > 0.0 )
             dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
@@ -1296,11 +1296,11 @@ namespace Isis {
         apriorisigmas[1] = dAprioriSigmaLon;
 
         if ( dAprioriSigmaLon > 0.0  &&  dAprioriSigmaLon < 1000.0 ) {
-          d = dAprioriSigmaLon * m_dMTR * cos(point.GetSurfacePoint().GetLatitude());
+          d = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude());
           weights[1] = 1.0/(d*d);
         }
 
-//      dAprioriSigmaY = point.GetAprioriSurfacePoint().GetYSigma();
+//      dAprioriSigmaY = point->GetAprioriSurfacePoint().GetYSigma();
 //        if(  dAprioriSigmaY <= 0.0 || dAprioriSigmaY >= 1000.0 ) {
 //          if( m_dGlobalSurfaceYAprioriSigma > 0.0 )
 //            dAprioriSigmaY = m_dGlobalSurfaceYAprioriSigma;
@@ -1316,9 +1316,9 @@ namespace Isis {
 //      if(  m_dGlobalRadiusAprioriSigma > 0.0 )
 //        dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
 //      else
-//        dAprioriSigmaRad = point.AprioriSigmaRadius();
+//        dAprioriSigmaRad = point->AprioriSigmaRadius();
 
-        dAprioriSigmaRad = point.GetAprioriSurfacePoint().GetLocalRadiusSigma();
+        dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma();
         if ( dAprioriSigmaRad <= 0.0 || dAprioriSigmaRad >= 1000.0 ) {
           if ( m_dGlobalRadiusAprioriSigma > 0.0 )
             dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
@@ -1333,7 +1333,7 @@ namespace Isis {
           weights[2] = 1.0/(d*d);
         }
 
-//      dAprioriSigmaZ = point.GetAprioriSurfacePoint().GetZSigma();
+//      dAprioriSigmaZ = point->GetAprioriSurfacePoint().GetZSigma();
 //        if(  dAprioriSigmaZ <= 0.0 || dAprioriSigmaZ >= 1000.0 ) {
 //          if( m_dGlobalSurfaceZAprioriSigma > 0.0 )
 //            dAprioriSigmaZ = m_dGlobalSurfaceZAprioriSigma;
@@ -1353,8 +1353,7 @@ namespace Isis {
       aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(apriorisigmas[0]),
                                                      Distance(apriorisigmas[1]),
                                                      Distance(apriorisigmas[2]));
-      point.SetAprioriSurfacePoint(aprioriSurfacePoint);
-      m_pCnet->UpdatePoint(point);
+      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
       nPointIndex++;
     }
 
@@ -1363,17 +1362,16 @@ namespace Isis {
 
 // This method will definitely need to be revisited
   void BundleAdjust::InitializePoints() {
-    int n3DPoints = m_pCnet->Size();
+    int n3DPoints = m_pCnet->GetNumPoints();
 
     for( int i = 0; i < n3DPoints; i++ ) {
-      ControlPoint point = (*m_pCnet)[i];
+      ControlPoint * point = m_pCnet->GetPoint(i);
 
-      if ( point.IsIgnored() )
+      if ( point->IsIgnored() )
         continue;
 
-      SurfacePoint aprioriSurfacePoint = point.GetAprioriSurfacePoint();
-      point.SetSurfacePoint(aprioriSurfacePoint);
-      m_pCnet->UpdatePoint(point);
+      SurfacePoint aprioriSurfacePoint = point->GetAprioriSurfacePoint();
+      point->SetSurfacePoint(aprioriSurfacePoint);
     }
 
   }
@@ -2199,7 +2197,7 @@ namespace Isis {
     if ( m_strSolutionMethod == "SPARSE" )
     {
       m_pLsq = new Isis::LeastSquares(basis, true,
-                                m_pCnet->NumValidMeasures()*2, m_nBasisColumns);
+                                m_pCnet->GetNumValidMeasures()*2, m_nBasisColumns);
     }
     else
       m_pLsq = new Isis::LeastSquares(basis);
@@ -2217,7 +2215,7 @@ namespace Isis {
       m_nIteration++;
 
       m_pCnet->ComputeResiduals();
-      m_dError = m_pCnet->MaximumResidual();
+      m_dError = m_pCnet->GetMaximumResidual();
       averageError = m_pCnet->AverageResidual();
 
       // kle testing - print residual(?) statistics
@@ -2275,7 +2273,7 @@ namespace Isis {
       // Loop through the control net and add the partials for each point
       // need generic 'AddPartials' function which calls necessary partials
       // function dependent on sensor, i.e., frame, pushframe, linescan, radar?
-      int nObjectPoints = m_pCnet->Size();
+      int nObjectPoints = m_pCnet->GetNumPoints();
       for ( int i = 0; i < nObjectPoints; i++ )
         AddPartials(i);
 
@@ -2381,9 +2379,9 @@ namespace Isis {
    */
   void BundleAdjust::AddPartials (int nPointIndex)
   {
-    const ControlPoint& point = (*m_pCnet)[nPointIndex];
+    const ControlPoint * point = m_pCnet->GetPoint(nPointIndex);
 
-    if( point.IsIgnored() )
+    if( point->IsIgnored() )
       return;
 
     // pointers to partial derivative vectors
@@ -2427,32 +2425,32 @@ namespace Isis {
     double dTime = -1.0;
 
     // partials for ground point w/r lat, long, radius in Body-Fixed
-    d_lookB_WRT_LAT = point[0].Camera()->GroundMap()->PointPartial(
-                                                point.GetSurfacePoint(),
+    d_lookB_WRT_LAT = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
+                                                point->GetSurfacePoint(),
                                                 CameraGroundMap::WRT_Latitude);
-    d_lookB_WRT_LON = point[0].Camera()->GroundMap()->PointPartial(
-                                                point.GetSurfacePoint(),
+    d_lookB_WRT_LON = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
+                                                point->GetSurfacePoint(),
                                                 CameraGroundMap::WRT_Longitude);
-    d_lookB_WRT_RAD = point[0].Camera()->GroundMap()->PointPartial(
-                                                point.GetSurfacePoint(),
+    d_lookB_WRT_RAD = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
+                                                point->GetSurfacePoint(),
                                                 CameraGroundMap::WRT_Radius);
     
     // Compute ground point in body-fixed coordinates
-    latrec_c( (double) point.GetSurfacePoint().GetLocalRadius() * 0.001,
-              (double) point.GetSurfacePoint().GetLongitude(),
-              (double) point.GetSurfacePoint().GetLatitude(),
+    latrec_c( (double) point->GetSurfacePoint().GetLocalRadius() * 0.001,
+              (double) point->GetSurfacePoint().GetLongitude(),
+              (double) point->GetSurfacePoint().GetLatitude(),
               pB);
 
-    int nObservations = point.Size();
+    int nObservations = point->GetNumMeasures();
     for( int i = 0; i < nObservations; i++ )
     {
-      const ControlMeasure& measure = point[i];
-      if( measure.IsIgnored() )
+      const ControlMeasure * measure = point->GetMeasure(i);
+      if( measure->IsIgnored() )
         continue;
 
       if ( m_nHeldImages > 0 )
       {
-        if (m_pHeldSnList->HasSerialNumber(measure.GetCubeSerialNumber()))
+        if (m_pHeldSnList->HasSerialNumber(measure->GetCubeSerialNumber()))
            continue;
       }
 
@@ -2460,7 +2458,7 @@ namespace Isis {
       memset(px, 0, m_nBasisColumns*sizeof(double));
       memset(py, 0, m_nBasisColumns*sizeof(double));
 
-      pCamera = measure.Camera();
+      pCamera = measure->Camera();
 
       // Get focal length with direction
       fl = pCamera->DistortionMap()->UndistortedFocalPlaneZ();
@@ -2470,15 +2468,15 @@ namespace Isis {
       {  
         // Set the Spice to the measured point
         // but, can this be simplified???
-        if( !pCamera->SetImage(measure.GetSample(), measure.GetLine()) )
+        if( !pCamera->SetImage(measure->GetSample(), measure->GetLine()) )
             printf("\n***Call to Camera::SetImage failed - need to handle this***\n");
       }
       
       //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
       double dComputedx, dComputedy;
-      if (!(pCamera->GroundMap()->GetXY( point.GetSurfacePoint(), &dComputedx, &dComputedy ))) {
+      if (!(pCamera->GroundMap()->GetXY( point->GetSurfacePoint(), &dComputedx, &dComputedy ))) {
         std::string msg = "Unable to map apriori surface point for measure ";
-        msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
+        msg += measure->GetCubeSerialNumber() + " on point " + point->GetId() + " into focal plane";
         throw iException::Message(iException::User,msg,_FILEINFO_);
       }
 
@@ -2510,7 +2508,7 @@ namespace Isis {
         a3 = NY_C/D_C;
 
       // Determine the image index
-      nIndex = m_pSnList->SerialNumberIndex(measure.GetCubeSerialNumber());
+      nIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
       nIndex = ImageIndex(nIndex);
 
       if ( m_spacecraftPositionSolveType != Nothing )
@@ -2692,10 +2690,10 @@ namespace Isis {
 //    py[nIndex] = fl * LowDHigh(lookC,d_lookC,1);
 //
       // right-hand side (measured - computed)
-      dMeasuredx = measure.GetFocalPlaneMeasuredX();
+      dMeasuredx = measure->GetFocalPlaneMeasuredX();
       dComputedx = lookC[0] * fl / lookC[2];
 
-      dMeasuredy = measure.GetFocalPlaneMeasuredY();
+      dMeasuredy = measure->GetFocalPlaneMeasuredY();
       dComputedy = lookC[1] * fl / lookC[2];
 
       deltax = dMeasuredx - dComputedx;
@@ -2729,23 +2727,23 @@ namespace Isis {
     // Loop over all points in control net
     // We will triangulate all points, ultimately using this as a rudimentary means of outlier detection.
     // if the point is control, we triangulate but don't update the coordinates
-    int nControlNetPoints = m_pCnet->Size();
+    int nControlNetPoints = m_pCnet->GetNumPoints();
     for ( int i = 0;  i < nControlNetPoints; i++ )
     {
-      const ControlPoint& point = (*m_pCnet)[i];
+      const ControlPoint * point = m_pCnet->GetPoint(i);
 
-      if( point.IsIgnored() )
+      if( point->IsIgnored() )
         return nSuccessfullyTriangulated;
 
       if( bDoApproximation )
       {
-        ApproximatePoint_ClosestApproach(point, i);
+        ApproximatePoint_ClosestApproach(*point, i);
 //        if( !ApproximatePoint_ClosestApproach() )
           // mark point somehow to ignore it
       }
 
       // triangulate point
-      TriangulatePoint(point);
+      TriangulatePoint(*point);
 //    if( !TriangulatePoint(point) )
 //    {
 //      flag point to ignore
@@ -2805,10 +2803,10 @@ namespace Isis {
 //  const char* buf = rPoint.Id().c_str();
 
     // loop over observations (in Astro Terms "measures")
-    int nObservations = rPoint.Size();
+    int nObservations = rPoint.GetNumMeasures();
     for( int i = 0; i < nObservations-1; i++ )
     {
-      measure1 = rPoint[i];
+      measure1 = *rPoint.GetMeasure(i);
       if( measure1.IsIgnored() )
         continue;
 
@@ -2870,7 +2868,7 @@ namespace Isis {
 
       for(int j = i+1; j < nObservations; j++ )
       {
-        measure2 = rPoint[j];
+        measure2 = *rPoint.GetMeasure(j);
         if( measure2.IsIgnored() )
           continue;
 
@@ -2999,7 +2997,7 @@ namespace Isis {
 //  double avgrad = rPoint.Radius();
 
     // set the apriori control net value to the closest approach version
-    (*m_pCnet)[nIndex].SetSurfacePoint(SurfacePoint(Latitude(lat),Longitude(lon),Distance(rad*1000.0)));
+    m_pCnet->GetPoint(nIndex)->SetSurfacePoint(SurfacePoint(Latitude(lat),Longitude(lon),Distance(rad*1000.0)));
 
     // Compute ground point in body-fixed coordinates
     double pB[3];
@@ -3154,19 +3152,19 @@ namespace Isis {
     // Update lat/lon for each control point
     double dLatCorr, dLongCorr, dRadCorr;
     int nPointIndex = 0;
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      ControlPoint point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
         continue;
 
-//      if( point.Status() == ControlPoint::JigsawHighSigma )
+//      if( point->Status() == ControlPoint::JigsawHighSigma )
 //        continue;
 
       // no update to points that are being held absolutely
       // ***NOTE: think about this
-//      if( point.Held() || point.Type() == ControlPoint::Ground )
+//      if( point->Held() || point->Type() == ControlPoint::Ground )
 //        continue;
 
       // get NIC, Q, and correction vector for this point
@@ -3190,11 +3188,11 @@ namespace Isis {
       dLongCorr = NIC(1);
       dRadCorr = NIC(2);
 
-//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point.Id().c_str(),dLatCorr, dLongCorr, dRadCorr);
+//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->Id().c_str(),dLatCorr, dLongCorr, dRadCorr);
 
-      double dLat = point.GetSurfacePoint().GetLatitude().GetDegrees();
-      double dLon = point.GetSurfacePoint().GetLongitude().GetDegrees();
-      double dRad = point.GetSurfacePoint().GetLocalRadius().GetMeters();
+      double dLat = point->GetSurfacePoint().GetLatitude().GetDegrees();
+      double dLon = point->GetSurfacePoint().GetLongitude().GetDegrees();
+      double dRad = point->GetSurfacePoint().GetLocalRadius().GetMeters();
 
       dLat += RAD2DEG * dLatCorr;
       dLon += RAD2DEG * dLongCorr;
@@ -3225,10 +3223,9 @@ namespace Isis {
 
 //      std::cout << corrections << std::endl;
 
-      point.SetSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
+      point->SetSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
                                          Longitude(dLon, Angle::Degrees),
                                          Distance(dRad)));
-      m_pCnet->UpdatePoint(point);
       nPointIndex++;
 
       // testing
@@ -3238,7 +3235,7 @@ namespace Isis {
 //               (dLon * DEG2RAD),
 //               (dLat * DEG2RAD),
 //               pB);
-//      printf("%s %lf %lf %lf\n",point.Id().c_str(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().c_str(),pB[0],pB[1],pB[2]);
     } // end loop over point corrections
   }
 
@@ -3260,32 +3257,32 @@ namespace Isis {
 //    m_drms_rxy = sqrt(m_Statsrxy.SumSquare()/m_nObservations);
 
     // vtpv for image coordinates
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      const ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
         continue;
 
 // Next line appears to do nothing so skip it.
-//      point.ComputeResiduals_Millimeters();
+//      point->ComputeResiduals_Millimeters();
 
-      int nMeasures = point.Size();
+      int nMeasures = point->GetNumMeasures();
       for( int j = 0; j < nMeasures; j++ )
       {
-        const ControlMeasure& measure = point[j];
-        if ( measure.IsIgnored() )
+        const ControlMeasure * measure = point->GetMeasure(j);
+        if ( measure->IsIgnored() )
           continue;
 
-        dWeight = 1.4*(measure.Camera())->PixelPitch();
+        dWeight = 1.4*(measure->Camera())->PixelPitch();
         dWeight = 1.0/dWeight;
         dWeight *= dWeight;
 
-        vx = measure.GetSampleResidual();
-        vy = measure.GetLineResidual();
+        vx = measure->GetSampleResidual();
+        vy = measure->GetLineResidual();
 
         // if rejected, don't include in statistics
-        if( measure.IsRejected() )
+        if( measure->IsRejected() )
             continue;
 
         m_Statsrx.AddData(vx);
@@ -3293,7 +3290,7 @@ namespace Isis {
         m_Statsrxy.AddData(vx);
         m_Statsrxy.AddData(vy);
 
-//      printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point.Id().c_str(),rx,ry);
+//      printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point->Id().c_str(),rx,ry);
 
         vtpv += vx * vx *dWeight + vy * vy * dWeight;
       }
@@ -3303,8 +3300,8 @@ namespace Isis {
     int nPointIndex = 0;
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.IsIgnored() || point.IsInvalid() )
+      const ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() || point->IsInvalid() )
         continue;
 
       // get weight and correction vector for this point
@@ -3355,17 +3352,16 @@ namespace Isis {
     // compute residuals in pixels
 
     // vtpv for image coordinates
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      ControlPoint point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
         continue;
 
-      point.ComputeResiduals();
-      m_pCnet->UpdatePoint(point);
+      point->ComputeResiduals();
 /*
-      int nMeasures = point.Size();
+      int nMeasures = point->Size();
       for( int j = 0; j < nMeasures; j++ )
       {
         ControlMeasure& measure = point[j];
@@ -3406,28 +3402,28 @@ namespace Isis {
 
     // load absolute value of residuals into vectors
     int nObservation = 0;
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      const ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
         continue;
 
-//      if ( point.Status() == ControlPoint::JigsawHighSigma )
+//      if ( point->Status() == ControlPoint::JigsawHighSigma )
 //        continue;
 
-      int nMeasures = point.Size();
+      int nMeasures = point->GetNumMeasures();
       for( int j = 0; j < nMeasures; j++ )
       {
-        const ControlMeasure& measure = point[j];
-        if ( measure.IsIgnored() )
+        const ControlMeasure * measure = point->GetMeasure(j);
+        if ( measure->IsIgnored() )
           continue;
 
-        if ( measure.IsRejected() )
+        if ( measure->IsRejected() )
           continue;
 
-        vx = measure.GetSampleResidual();
-        vy = measure.GetLineResidual();
+        vx = measure->GetSampleResidual();
+        vy = measure->GetLineResidual();
 
         x_residuals[nObservation] = fabs(vx);
         y_residuals[nObservation] = fabs(vy);
@@ -3503,38 +3499,37 @@ namespace Isis {
 
     int ntotalrejected = 0;
 
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      ControlPoint point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
         continue;
 
 // Do we need this method below...TODO
-      //      point.ZeroNumberOfRejectedMeasures();
+      //      point->ZeroNumberOfRejectedMeasures();
 
       nRejected = 0;
       dMaxResidual = -1.0;
 
-      int nMeasures = point.Size();
+      int nMeasures = point->GetNumMeasures();
       for( int j = 0; j < nMeasures; j++ )
       {
-        ControlMeasure measure = point[j];
-        if ( measure.IsIgnored() )
+        ControlMeasure * measure = point->GetMeasure(j);
+        if ( measure->IsIgnored() )
           continue;
 
-        vx = measure.GetSampleResidual();
-        vy = measure.GetLineResidual();
+        vx = measure->GetSampleResidual();
+        vy = measure->GetLineResidual();
 
         if( fabs(vx) < m_dRejectionLimit && fabs(vy) < m_dRejectionLimit )
         {
-            measure.SetRejected(false);
-            point.UpdateMeasure(measure);
+            measure->SetRejected(false);
             continue;
         }
 
         // if it's still rejected, skip it
-        if( measure.IsRejected() )
+        if( measure->IsRejected() )
         {
             nRejected++;
             continue;
@@ -3553,7 +3548,7 @@ namespace Isis {
       // rejection limit for this 3D point
       if( dMaxResidual == -1.0 )
       {
-          point.SetNumberOfRejectedMeasures(nRejected);
+          point->SetNumberOfRejectedMeasures(nRejected);
           continue;
       }
 
@@ -3561,7 +3556,7 @@ namespace Isis {
       // we won't reject (for now)
       if( (nMeasures-(nRejected+1)) < 2 )
       {
-          point.SetNumberOfRejectedMeasures(nRejected);
+          point->SetNumberOfRejectedMeasures(nRejected);
           continue;
       }
 
@@ -3569,23 +3564,22 @@ namespace Isis {
       // for this point whose residual is above the
       // current rejection limit - we'll flag the
       // worst of these as rejected
-      ControlMeasure rejected = point[nIndexMaxResidual];
-      rejected.SetRejected(true);
+      ControlMeasure * rejected = point->GetMeasure(nIndexMaxResidual);
+      rejected->SetRejected(true);
       nRejected++;
-      point.UpdateMeasure(rejected);
-      point.SetNumberOfRejectedMeasures(nRejected);
+      point->SetNumberOfRejectedMeasures(nRejected);
       ntotalrejected++;
 
       // do we still have sufficient remaining observations for this 3D point?
 //      if( (nMeasures-nRejected) < 2 ) 
-//        point.SetStatus(ControlPoint::JigsawHighSigma); // ATTENTION: this is a kluge, need to check number of valid
+//        point->SetStatus(ControlPoint::JigsawHighSigma); // ATTENTION: this is a kluge, need to check number of valid
 //      else                                              // measures that the 3D point has
-//        point.SetStatus(ControlPoint::Valid);
+//        point->SetStatus(ControlPoint::Valid);
 
-      int ndummy = point.GetNumberOfRejectedMeasures();
-      m_pCnet->UpdatePoint(point);
-      printf("Rejected for point %s = %d\n",point.GetId().c_str(),ndummy);
-      printf("%s: %20.10lf  %20.10lf*\n",point.GetId().c_str(),rejected.GetSampleResidual(),rejected.GetLineResidual());
+      int ndummy = point->GetNumberOfRejectedMeasures();
+      printf("Rejected for point %s = %d\n",point->GetId().c_str(),ndummy);
+      printf("%s: %20.10lf  %20.10lf*\n",
+          point->GetId().c_str(), rejected->GetSampleResidual(), rejected->GetLineResidual());
     }
 
     printf("Total Rejections: %d\n", ntotalrejected);
@@ -3607,11 +3601,11 @@ namespace Isis {
     double dSigma02 = m_dSigma0*m_dSigma0;
 
     int nPointIndex = 0;
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      const ControlPoint& point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      const ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
         continue;
 
       T.clear();
@@ -3628,24 +3622,24 @@ namespace Isis {
 
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO
-      point.GetSurfacePoint().SetRadii(Distance(m_BodyRadii[0]),
+      point->GetSurfacePoint().SetRadii(Distance(m_BodyRadii[0]),
                                        Distance(m_BodyRadii[1]),
                                        Distance(m_BodyRadii[0]));
-      dSigmaLat = point.GetSurfacePoint().GetLatSigmaDistance();
-      dSigmaLong = point.GetSurfacePoint().GetLonSigmaDistance();
-      dSigmaRadius = point.GetSurfacePoint().GetLocalRadiusSigma();
+      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
+      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
+      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
 
       t = dSigmaLat + T(0,0);
       Distance tLatSig = sqrt(dSigma02 * t)*m_dRTM;
 
       t = dSigmaLong + T(1,1);
       t = sqrt(dSigma02 * t)*m_dRTM;
-      Distance tLonSig = t/cos(point.GetSurfacePoint().GetLatitude());
-//      point.SetSigmaLongitude(t);
+      Distance tLonSig = t/cos(point->GetSurfacePoint().GetLatitude());
+//      point->SetSigmaLongitude(t);
 
       t = dSigmaRadius + T(2,2);
       t = sqrt(dSigma02 * t)*1000.0;
-      point.GetSurfacePoint().SetSphericalSigmasDistance(tLatSig, tLonSig, Distance(t));
+      point->GetSurfacePoint().SetSphericalSigmasDistance(tLatSig, tLonSig, Distance(t));
 
       nPointIndex++;
     }
@@ -3740,16 +3734,16 @@ namespace Isis {
     }
 
     // Update lat/lon for each control point
-    int nObjectPoints = m_pCnet->Size();
+    int nObjectPoints = m_pCnet->GetNumPoints();
     for ( int i = 0; i < nObjectPoints; i++ )
     {
-      ControlPoint point = (*m_pCnet)[i];
-      if ( point.IsIgnored() )
+      ControlPoint * point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
         continue;
 
-      double dLat = point.GetSurfacePoint().GetLatitude().GetDegrees();
-      double dLon = point.GetSurfacePoint().GetLongitude().GetDegrees();
-      double dRad = point.GetSurfacePoint().GetLocalRadius().GetMeters();
+      double dLat = point->GetSurfacePoint().GetLatitude().GetDegrees();
+      double dLon = point->GetSurfacePoint().GetLongitude().GetDegrees();
+      double dRad = point->GetSurfacePoint().GetLocalRadius().GetMeters();
 
       int index = PointIndex(i);
       dLat += RAD2DEG * (basis.Coefficient(index)); index++;
@@ -3780,7 +3774,7 @@ namespace Isis {
                (dLon * DEG2RAD),
                (dLat * DEG2RAD),
                pB);
-//      printf("%s %lf %lf %lf\n",point.Id().c_str(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().c_str(),pB[0],pB[1],pB[2]);
 
 /*      else {  // Recompute radius to match updated lat/lon... Should this be removed?
         ControlMeasure &m = ((*m_pCnet)[i])[0];
@@ -3788,10 +3782,9 @@ namespace Isis {
         cam->SetUniversalGround(lat, lon);
         rad = cam->LocalRadius(); //meters
      }*/
-      point.SetSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
+      point->SetSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
                                          Longitude(dLon, Angle::Degrees),
                                          Distance(dRad,Distance::Meters)));
-      m_pCnet->UpdatePoint(point);
     }
 
   }
@@ -3936,33 +3929,33 @@ namespace Isis {
 
      // loop over 3D object points
      int nWtIndex = m_nImageParameters;
-     int nObjectPoints = m_pCnet->Size();
+     int nObjectPoints = m_pCnet->GetNumPoints();
      m_nConstrainedPointParameters = 0;
      for ( int i = 0; i < nObjectPoints; i++ )
      {
-       const ControlPoint& point = (*m_pCnet)[i];
-       if( point.IsIgnored() )
+       const ControlPoint * point = m_pCnet->GetPoint(i);
+       if( point->IsIgnored() )
          continue;
 /*
        if(  m_dGlobalLatitudeAprioriSigma > 0.0 )
          dAprioriSigmaLat = m_dGlobalLatitudeAprioriSigma;
        else
-         dAprioriSigmaLat = point.AprioriSigmaLatitude();
+         dAprioriSigmaLat = point->AprioriSigmaLatitude();
 
        if(  m_dGlobalLatitudeAprioriSigma > 0.0 )
          dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
        else
-         dAprioriSigmaLon = point.AprioriSigmaLongitude();
+         dAprioriSigmaLon = point->AprioriSigmaLongitude();
 
        if(  m_dGlobalRadiusAprioriSigma > 0.0 )
          dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
        else
-         dAprioriSigmaRad = point.AprioriSigmaRadius();
+         dAprioriSigmaRad = point->AprioriSigmaRadius();
 */
 
-       dAprioriSigmaLat = point.GetAprioriSurfacePoint().GetLatSigmaDistance();
-       dAprioriSigmaLon = point.GetAprioriSurfacePoint().GetLonSigmaDistance();
-       dAprioriSigmaRad = point.GetAprioriSurfacePoint().GetLocalRadiusSigma();
+       dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance();
+       dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance();
+       dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma();
 
        if( dAprioriSigmaLat > 1000.0 || dAprioriSigmaLat <= 0.0  )
        {
@@ -3984,12 +3977,12 @@ namespace Isis {
 
        dVarianceLat = dAprioriSigmaLat * m_dMTR;
        dVarianceLat *= dVarianceLat;
-       dVarianceLon = dAprioriSigmaLon * m_dMTR * cos(point.GetSurfacePoint().GetLatitude()); // Lat in radians
+       dVarianceLon = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude()); // Lat in radians
        dVarianceLon *= dVarianceLon;
        dVarianceRad = dAprioriSigmaRad * 0.001;
        dVarianceRad *= dVarianceRad;
 
-       if( point.GetType() == ControlPoint::Ground ) {
+       if( point->GetType() == ControlPoint::Ground ) {
          m_dParameterWeights[nWtIndex] = 1.0e+25;
          m_dParameterWeights[nWtIndex+1] = 1.0e+25;
          m_dParameterWeights[nWtIndex+2] = 1.0e+25;
@@ -4039,11 +4032,11 @@ namespace Isis {
 
      int nIndex = m_nImageParameters;
 
-     int nPoints = m_pCnet->Size();
+     int nPoints = m_pCnet->GetNumPoints();
      for (int i = 0; i < nPoints; i++)
      {
-       ControlPoint point = (*m_pCnet)[i];
-       if( point.IsIgnored() )
+       ControlPoint * point = m_pCnet->GetPoint(i);
+       if( point->IsIgnored() )
          continue;
 
        dSigmaLat = sqrt((double)(lsqCovMatrix(nIndex,nIndex)));
@@ -4051,16 +4044,15 @@ namespace Isis {
        nIndex++;
 
        dSigmaLong = sqrt((double)(lsqCovMatrix(nIndex,nIndex)));
-       dSigmaLong *= m_dRTM/cos(point.GetSurfacePoint().GetLatitude()); // Lat in radians
+       dSigmaLong *= m_dRTM/cos(point->GetSurfacePoint().GetLatitude()); // Lat in radians
        nIndex++;
 
        dSigmaRadius = sqrt((double)(lsqCovMatrix(nIndex,nIndex)));
        nIndex++;
 
-       point.GetSurfacePoint().SetSphericalSigmasDistance(Distance(dSigmaLat),
+       point->GetSurfacePoint().SetSphericalSigmasDistance(Distance(dSigmaLat),
                                                           Distance(dSigmaLong),
                                                           Distance(dSigmaRadius*1000.0));
-       m_pCnet->UpdatePoint(point);
      }
    }
 
@@ -4106,7 +4098,7 @@ namespace Isis {
        return false;
 
      int nImages = Images();
-     int nValidPoints = m_pCnet->NumValidPoints();
+     int nValidPoints = m_pCnet->GetNumValidPoints();
      int nInnerConstraints = 0;
      int nDistanceConstraints = 0;
      int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
@@ -4116,11 +4108,11 @@ namespace Isis {
      fp_out << buf;
      sprintf(buf, "\n               Network Filename: %s", p_cnetFile.c_str());
      fp_out << buf;
-     sprintf(buf, "\n                     Network Id: %s", m_pCnet->NetworkId().c_str());
+     sprintf(buf, "\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
      fp_out << buf;
      sprintf(buf, "\n            Network Description: %s", m_pCnet->Description().c_str());
      fp_out << buf;
-     sprintf(buf, "\n                         Target: %s", m_pCnet->Target().c_str());
+     sprintf(buf, "\n                         Target: %s", m_pCnet->GetTarget().c_str());
      fp_out << buf;
      sprintf(buf, "\n                   Linear Units: kilometers");
      fp_out << buf;
@@ -4489,35 +4481,35 @@ namespace Isis {
      std::string strStatus;
      int nPointIndex = 0;
 
-     int nPoints = m_pCnet->Size();
+     int nPoints = m_pCnet->GetNumPoints();
      for (int i = 0; i < nPoints; i++)
      {
-       const ControlPoint& point = (*m_pCnet)[i];
-       if( point.IsIgnored() )
+       const ControlPoint * point = m_pCnet->GetPoint(i);
+       if( point->IsIgnored() )
          continue;
 
-       nRays = point.Size();
-       dLat = point.GetSurfacePoint().GetLatitude();
-       dLon = point.GetSurfacePoint().GetLongitude();
-       dRadius = point.GetSurfacePoint().GetLocalRadius();
-       dSigmaLat = point.GetSurfacePoint().GetLatSigmaDistance();
-       dSigmaLong = point.GetSurfacePoint().GetLonSigmaDistance();
-       dSigmaRadius = point.GetSurfacePoint().GetLocalRadiusSigma();
-       nGoodRays = nRays - point.GetNumberOfRejectedMeasures();
+       nRays = point->GetNumMeasures();
+       dLat = point->GetSurfacePoint().GetLatitude();
+       dLon = point->GetSurfacePoint().GetLongitude();
+       dRadius = point->GetSurfacePoint().GetLocalRadius();
+       dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
+       dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
+       dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
+       nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
 //     Held point type is obsolete
-//     if( point.Held() )
+//     if( point->Held() )
 //       strStatus = "HELD";
-//     else if( point.Type() == ControlPoint::Ground)
-       if( point.GetType() == ControlPoint::Ground)
+//     else if( point->Type() == ControlPoint::Ground)
+       if( point->GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.GetType() == ControlPoint::Tie)
+       else if( point->GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
 
        sprintf(buf,"%16s%9s%5d of %d%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-               point.GetId().c_str(),strStatus.c_str(),nGoodRays,nRays,dLat,dLon,dRadius*0.001,dSigmaLat,dSigmaLong,dSigmaRadius);
+               point->GetId().c_str(),strStatus.c_str(),nGoodRays,nRays,dLat,dLon,dRadius*0.001,dSigmaLat,dSigmaLong,dSigmaRadius);
 
        fp_out << buf;
        nPointIndex++;
@@ -4530,18 +4522,18 @@ namespace Isis {
      nPointIndex = 0;
      for (int i = 0; i < nPoints; i++)
      {
-       const ControlPoint& point = (*m_pCnet)[i];
-       if( point.IsIgnored() )
+       const ControlPoint * point = m_pCnet->GetPoint(i);
+       if( point->IsIgnored() )
          continue;
 
-       nRays = point.Size();
-       dLat = point.GetSurfacePoint().GetLatitude();
-       dLon = point.GetSurfacePoint().GetLongitude();
-       dRadius = point.GetSurfacePoint().GetLocalRadius();
-       dSigmaLat = point.GetSurfacePoint().GetLatSigmaDistance();
-       dSigmaLong = point.GetSurfacePoint().GetLonSigmaDistance();
-       dSigmaRadius = point.GetSurfacePoint().GetLocalRadiusSigma();
-       nGoodRays = nRays - point.GetNumberOfRejectedMeasures();
+       nRays = point->GetNumMeasures();
+       dLat = point->GetSurfacePoint().GetLatitude();
+       dLon = point->GetSurfacePoint().GetLongitude();
+       dRadius = point->GetSurfacePoint().GetLocalRadius();
+       dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
+       dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
+       dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
+       nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
        // point corrections and initial sigmas
        bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
@@ -4559,21 +4551,21 @@ namespace Isis {
        dRadiusInit = dRadius-(corrections[2]*1000.0);
 
 // Held method is obsolete
-//     if( point.Held() )
+//     if( point->Held() )
 //       strStatus = "HELD";
-//     else if( point.Type() == ControlPoint::Ground)
-       if( point.GetType() == ControlPoint::Ground)
+//     else if( point->Type() == ControlPoint::Ground)
+       if( point->GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.GetType() == ControlPoint::Tie)
+       else if( point->GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
 
-       sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",point.GetId().c_str(),strStatus.c_str(),nGoodRays,nRays);
+       sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",point->GetId().c_str(),strStatus.c_str(),nGoodRays,nRays);
        fp_out << buf;
 
 //       sprintf(buf,"%16s%9s%9d\n",
-//               point.Id().c_str(),strStatus.c_str(),nRays);
+//               point->Id().c_str(),strStatus.c_str(),nRays);
 //       fp_out << buf;
 
        sprintf(buf,"\n     Point         Initial               Total               Total              Final             Initial             Final\n"
@@ -4625,7 +4617,7 @@ namespace Isis {
        return false;
 
      int nImages = Images();
-     int nValidPoints = m_pCnet->NumValidPoints();
+     int nValidPoints = m_pCnet->GetNumValidPoints();
      int nInnerConstraints = 0;
      int nDistanceConstraints = 0;
      int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
@@ -4635,11 +4627,11 @@ namespace Isis {
      fp_out << buf;
      sprintf(buf, "\n               Network Filename: %s", p_cnetFile.c_str());
      fp_out << buf;
-     sprintf(buf, "\n                     Network Id: %s", m_pCnet->NetworkId().c_str());
+     sprintf(buf, "\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
      fp_out << buf;
      sprintf(buf, "\n            Network Description: %s", m_pCnet->Description().c_str());
      fp_out << buf;
-     sprintf(buf, "\n                         Target: %s", m_pCnet->Target().c_str());
+     sprintf(buf, "\n                         Target: %s", m_pCnet->GetTarget().c_str());
      fp_out << buf;
      sprintf(buf, "\n                   Linear Units: kilometers");
      fp_out << buf;
@@ -4961,31 +4953,31 @@ namespace Isis {
      double dLat,dLon,dRadius;
      std::string strStatus;
 
-     int nPoints = m_pCnet->Size();
+     int nPoints = m_pCnet->GetNumPoints();
      for (int i = 0; i < nPoints; i++)
      {
-       const ControlPoint& point = (*m_pCnet)[i];
+       const ControlPoint * point = m_pCnet->GetPoint(i);
 
-       if( point.IsIgnored() )
+       if( point->IsIgnored() )
          continue;
 
-       nRays = point.Size();
-       dLat = point.GetSurfacePoint().GetLatitude();
-       dLon = point.GetSurfacePoint().GetLongitude();
-       dRadius = point.GetSurfacePoint().GetLocalRadius();
+       nRays = point->GetNumMeasures();
+       dLat = point->GetSurfacePoint().GetLatitude();
+       dLon = point->GetSurfacePoint().GetLongitude();
+       dRadius = point->GetSurfacePoint().GetLocalRadius();
 
-//     if( point.Held() )
+//     if( point->Held() )
 //       strStatus = "HELD";
-//     else if( point.Type() == ControlPoint::Ground)
-       if( point.GetType() == ControlPoint::Ground)
+//     else if( point->Type() == ControlPoint::Ground)
+       if( point->GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.GetType() == ControlPoint::Tie)
+       else if( point->GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
 
        sprintf(buf,"%16s%9s%9d%16.8lf%16.8lf%16.8lf%16s%16s%16s\n",
-               point.GetId().c_str(),strStatus.c_str(),nRays,dLat,dLon,dRadius*0.001,"N/A","N/A","N/A");
+               point->GetId().c_str(),strStatus.c_str(),nRays,dLat,dLon,dRadius*0.001,"N/A","N/A","N/A");
 
        fp_out << buf;
      }
@@ -5005,44 +4997,44 @@ namespace Isis {
      if ( !fp_out )
        return false;
 
-     int nPoints = m_pCnet->Size();
+     int nPoints = m_pCnet->GetNumPoints();
 
      double dLat,dLon,dRadius;
      double dSigmaLat,dSigmaLong, dSigmaRadius;
      std::string strStatus;
 
      for (int i = 0; i < nPoints; i++) {
-       const ControlPoint& point = (*m_pCnet)[i];
+       const ControlPoint * point = m_pCnet->GetPoint(i);
 
-       if( point.IsIgnored() )
+       if( point->IsIgnored() )
          continue;
 
-       dLat = point.GetSurfacePoint().GetLatitude();
-       dLon = point.GetSurfacePoint().GetLongitude();
-       dRadius = point.GetSurfacePoint().GetLocalRadius();
+       dLat = point->GetSurfacePoint().GetLatitude();
+       dLon = point->GetSurfacePoint().GetLongitude();
+       dRadius = point->GetSurfacePoint().GetLocalRadius();
 
-//     if( point.Held() )
+//     if( point->Held() )
 //       strStatus = "HELD";
-//     else if( point.Type() == ControlPoint::Ground)
-       if( point.GetType() == ControlPoint::Ground)
+//     else if( point->Type() == ControlPoint::Ground)
+       if( point->GetType() == ControlPoint::Ground)
          strStatus = "GROUND";
-       else if( point.GetType() == ControlPoint::Tie)
+       else if( point->GetType() == ControlPoint::Tie)
          strStatus = "TIE";
        else
          strStatus = "UNKNOWN";
 
        if( m_bErrorPropagation )
        {
-         dSigmaLat = point.GetSurfacePoint().GetLatSigmaDistance();
-         dSigmaLong = point.GetSurfacePoint().GetLonSigmaDistance();
-         dSigmaRadius = point.GetSurfacePoint().GetLocalRadiusSigma();
+         dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
+         dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
+         dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
 
          sprintf(buf,"%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                 point.GetId().c_str(),strStatus.c_str(),dLat,dLon,dRadius*0.001,
+                 point->GetId().c_str(),strStatus.c_str(),dLat,dLon,dRadius*0.001,
                  dSigmaLat,dSigmaLong,dSigmaRadius);
        }
        else
-         sprintf(buf,"%s,%16.8lf,%16.8lf,%16.8lf\n", point.GetId().c_str(),dLat,dLon,dRadius*0.001);
+         sprintf(buf,"%s,%16.8lf,%16.8lf,%16.8lf\n", point->GetId().c_str(),dLat,dLon,dRadius*0.001);
 
        fp_out << buf;
      }
@@ -5074,35 +5066,35 @@ namespace Isis {
 
      printf("output residuals!!!\n");
 
-     int nObjectPoints = m_pCnet->Size();
+     int nObjectPoints = m_pCnet->GetNumPoints();
      for ( int i = 0; i < nObjectPoints; i++ )
      {
-       const ControlPoint& point = (*m_pCnet)[i];
-       if ( point.IsIgnored() )
+       const ControlPoint * point = m_pCnet->GetPoint(i);
+       if ( point->IsIgnored() )
          continue;
 
-       int nObservations = point.Size();
+       int nObservations = point->GetNumMeasures();
        for( int j = 0; j < nObservations; j++ )
        {
-         const ControlMeasure& measure = point[j];
-         if( measure.IsIgnored() )
+         const ControlMeasure * measure = point->GetMeasure(j);
+         if( measure->IsIgnored() )
            continue;
 
-         Camera* pCamera = measure.Camera();
+         Camera* pCamera = measure->Camera();
          if( !pCamera )
            continue;
 
          // Determine the image index
-         nImageIndex = m_pSnList->SerialNumberIndex(measure.GetCubeSerialNumber());
+         nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
 
-         if( measure.IsRejected() )
+         if( measure->IsRejected() )
              sprintf(buf,"%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-                     point.GetId().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
-                     measure.GetFocalPlaneMeasuredX(),measure.GetFocalPlaneMeasuredY(),measure.GetSampleResidual(),measure.GetLineResidual(),measure.GetResidualMagnitude());
+                     point->GetId().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
+                     measure->GetFocalPlaneMeasuredX(),measure->GetFocalPlaneMeasuredY(),measure->GetSampleResidual(),measure->GetLineResidual(),measure->GetResidualMagnitude());
          else
              sprintf(buf,"%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                     point.GetId().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
-                     measure.GetFocalPlaneMeasuredX(),measure.GetFocalPlaneMeasuredY(),measure.GetSampleResidual(),measure.GetLineResidual(),measure.GetResidualMagnitude());
+                     point->GetId().c_str(),m_pSnList->Filename(nImageIndex).c_str(),m_pSnList->SerialNumber(nImageIndex).c_str(),
+                     measure->GetFocalPlaneMeasuredX(),measure->GetFocalPlaneMeasuredY(),measure->GetSampleResidual(),measure->GetLineResidual(),measure->GetResidualMagnitude());
          fp_out << buf;
        }
      }
