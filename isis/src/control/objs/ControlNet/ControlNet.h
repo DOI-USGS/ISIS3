@@ -25,15 +25,18 @@
 
 #include "PBControlNetIO.pb.h"
 
-#include <QHash>
-#include <QString>
-
 #include "iString.h"
+
+class QString;
+template< typename A, typename B > class QHash;
+template< typename A, typename B > class QPair;
 
 
 namespace Isis {
   class Camera;
+  class ControlMeasure;
   class ControlPoint;
+  class ControlSerialNumber;
   class iString;
   class Progress;
   class SerialNumberList;
@@ -84,7 +87,7 @@ namespace Isis {
    *   @history 2010-05-06 Tracie Sucharski Use defaults of 0. instead of
    *            Isis::Null, because 0. is the default in the protocol buffers.
    *   @history 2010-08-05 Steven Lambright New label format much closer to a
-   *            cube so that we can expand upon it easily later. Also added 
+   *            cube so that we can expand upon it easily later. Also added
    *            support for more than just the protocol buffer in the file, at
    *            the current cost of reading the protocol buffer's binary data
    *            into memory. This might need to be changed later.
@@ -111,78 +114,96 @@ namespace Isis {
    *            to the read and write methods.
    *   @history 2011-01-13 Mackenzie Boyd Added copy constructor and assignment
    *            operator.
-   *
+   *   @history 2011-01-17 Eric Hyer - Points are now owned and deleted by the
+   *                           network.  Network now stored in such a way that
+   *                           access to all points in a cube is just as cheap
+   *                           as accessing measures in a point.  Removed
+   *                           redundant methods and made other api changes.
    */
   class ControlNet {
     public:
       ControlNet();
-      ControlNet(const ControlNet& other);
-      ControlNet(const iString &ptfile,
-                 Progress *progress = 0,
-                 bool forceBuild = false);
+      ControlNet(const ControlNet &other);
+      ControlNet(const iString &ptfile, Progress *progress = 0);
 
       ~ControlNet();
 
-      void ReadControl(const iString &ptfile,
-                       Progress *progress = 0,
-                       bool forceBuild = false);
+      void ReadControl(const iString &ptfile, Progress *progress = 0);
       void ReadPBControl(const iString &ptfile);
       void Write(const iString &ptfile, bool pvl = false);
       void WritePB(const iString &ptfile);
       void WritePvl(const iString &ptfile);
 
-      void Add(ControlPoint point, bool forceBuild = false);
-      void Delete (int index);
-      void Delete (const iString &id);
-      void UpdatePoint(const ControlPoint &point);
+      void AddPoint(ControlPoint *point);
+      void AddControlSerialNumber(const ControlPoint *point,
+                                  ControlMeasure *measure);
+      void DeletePoint(iString pointId);
+      void DeletePoint(int index);
+      void RemoveControlSerialNumber(ControlPoint *point,
+                                     ControlMeasure *measure);
+      bool ContainsPoint(iString pointId) const;
+
+      QList< QPair< ControlPoint *, ControlMeasure * > >
+          GetPointMeasuresInCube(iString serialNumber);
+      QList< QPair< const ControlPoint *, const ControlMeasure * > >
+          GetPointMeasuresInCube(iString serialNumber) const;
+      void DeleteMeasuresWithId(iString serialNumber);
 
       void ComputeResiduals();
       void ComputeApriori();
       void SortControlNet();
 
-      ControlPoint GetPoint(int index) const;
+      const ControlPoint *GetPoint(QString) const;
+      ControlPoint *GetPoint(QString);
+      const ControlPoint *GetPoint(int) const;
+      ControlPoint *GetPoint(int);
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
       iString CreatedDate() const;
       iString Description() const;
-      bool Exists( ControlPoint &point );
-      ControlPoint *Find(const ControlPoint &point);
-      ControlPoint *Find(const std::string &id) { return Find(iString(id)); }
-      ControlPoint *Find(const iString &id);
-      ControlPoint *FindClosest(const iString &serialNumber,
+      ControlPoint *FindClosest(iString serialNumber,
                                 double sample, double line);
-      bool Invalid() const;
-      double MaximumResidual();
-      iString NetworkId() const;
-      int NumEditLockMeasures();
-      int NumEditLockPoints ();
-      int NumIgnoredMeasures();
-      int NumMeasures();
-      int NumPoints() const;
-      int NumValidMeasures();
-      int NumValidPoints ();
-      int Size() const;
-      iString Target() const;
-      iString UserName() const;
+      bool IsValid() const;
+      double GetMaximumResidual();
+      iString GetNetworkId() const;
+      int GetNumEditLockMeasures();
+      int GetNumEditLockPoints();
+      int GetNumIgnoredMeasures();
+      int GetNumMeasures() const;
+      int GetNumPoints() const;
+      int GetNumValidMeasures();
+      int GetNumValidPoints();
+      iString GetTarget() const;
+      iString GetUserName() const;
 
       void SetCreatedDate(const iString &date);
       void SetDescription(const iString &newDescription);
-      void SetImages (const iString &imageListFile);
-      void SetImages (SerialNumberList &list, Progress *progress=0);
+      void SetImages(const iString &imageListFile);
+      void SetImages(SerialNumberList &list, Progress *progress = 0);
       void SetModifiedDate(const iString &date);
       void SetNetworkId(const iString &id);
       void SetTarget(const iString &target);
       void SetUserName(const iString &name);
 
-      const ControlNet& operator=(ControlNet other);
-      ControlPoint operator[](int index) const;
-      ControlPoint operator[](iString id) const;
+      const ControlNet &operator=(ControlNet other);
 
-    // Data
+      const ControlPoint *operator[](QString id) const;
+      ControlPoint *operator[](QString id);
+      const ControlPoint *operator[](int id) const;
+      ControlPoint *operator[](int id);
+
+
     private:
-      QStringList p_pointIds;  //!< String List of ControlPoint Ids
-      QHash <QString, ControlPoint> p_pointsHash; //!< Hash table of Control Points
+      void Nullify();
+      void ValidateSerialNumber(iString serialNumber) const;
+
+
+    private:
+      QHash< QString, ControlPoint * > * points;
+      QHash< QString, ControlSerialNumber * > * serials;
+      QStringList *pointIds;
+
       iString p_targetName;            //!< Name of the target
       iString p_networkId;             //!< The Network Id
       iString p_created;               //!< Creation Date

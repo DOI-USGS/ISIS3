@@ -15,7 +15,7 @@
 using namespace std;
 using namespace Isis;
 
-int main () {
+int main() {
   Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;
   ControlNet cn1;
@@ -23,88 +23,88 @@ int main () {
   cn1.SetTarget("Mars");
   cn1.SetNetworkId("Test");
   cn1.SetUserName("TSucharski");
-  cn1.SetCreatedDate( "2010-07-10T12:50:15" );
-  cn1.SetModifiedDate( "2010-07-10T12:50:55" );
+  cn1.SetCreatedDate("2010-07-10T12:50:15");
+  cn1.SetModifiedDate("2010-07-10T12:50:55");
   cn1.SetDescription("UnitTest of ControlNetwork");
 
   std::string pointId = "T000";
   std::string id = "id";
-  
+
   for (int i = 0; i < 5; i++) {
     std::stringstream oss1;
     oss1.flush();
     oss1 << pointId << i;
-    ControlPoint cp(oss1.str());
+    ControlPoint *cp = new ControlPoint(oss1.str());
 
     if (i == 0) {
-      cp.SetType(ControlPoint::Ground);
-      cp.SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
-      cp.SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
-      cp.SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
-      cp.SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
+      cp->SetType(ControlPoint::Ground);
+      cp->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
+      cp->SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
+      cp->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
+      cp->SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
       SurfacePoint surfacePt(Displacement(-424.024048),
-          Displacement(734.4311949), Displacement(529.919264), Distance(10),
-          Distance(50), Distance(20));
+                             Displacement(734.4311949), Displacement(529.919264), Distance(10),
+                             Distance(50), Distance(20));
 
-      cp.SetSurfacePoint(surfacePt);
-      cp.SetAprioriSurfacePoint(surfacePt);
+      cp->SetSurfacePoint(surfacePt);
+      cp->SetAprioriSurfacePoint(surfacePt);
     }
     else if (i == 1) {
-      cp.SetIgnore(true);
+      cp->SetIgnore(true);
     }
     else {
-      cp.SetType(ControlPoint::Tie);
+      cp->SetType(ControlPoint::Tie);
     }
 
     for (int k = 0; k < 2; k++) {
-      ControlMeasure cm;
+      ControlMeasure *cm = new ControlMeasure;
       std::stringstream oss2;
       oss2.flush();
       oss2 << id << k;
-      cm.SetCubeSerialNumber(oss2.str());
-      cm.SetType(ControlMeasure::RegisteredSubPixel);
-      cm.SetLogData(
+      cm->SetCubeSerialNumber(oss2.str());
+      cm->SetType(ControlMeasure::RegisteredSubPixel);
+      cm->SetLogData(
         ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit,
-        0.53523 * (k + 1)));
-      cm.SetCoordinate(1.0,2.0);
-      cm.SetResidual(-3.0,4.0);
-      cm.SetDiameter(15.0);
-      cm.SetAprioriSample(2.0);
-      cm.SetAprioriLine(5.0);
-      cm.SetSampleSigma(.01);
-      cm.SetLineSigma(.21);
-      cm.SetChooserName("pointreg");
-      cm.SetDateTime("2010-08-27T17:10:06");
+                              0.53523 *(k + 1)));
+      cm->SetCoordinate(1.0, 2.0);
+      cm->SetResidual(-3.0, 4.0);
+      cm->SetDiameter(15.0);
+      cm->SetAprioriSample(2.0);
+      cm->SetAprioriLine(5.0);
+      cm->SetSampleSigma(.01);
+      cm->SetLineSigma(.21);
+      cm->SetChooserName("pointreg");
+      cm->SetDateTime("2010-08-27T17:10:06");
 
       if (k == 0) {
-        cm.SetType(ControlMeasure::Reference);
-        cm.SetChooserName("cnetref");
-        cm.SetDateTime("2010-08-27T17:10:06");
-        cm.SetEditLock(true);
+        cm->SetType(ControlMeasure::Reference);
+        cm->SetChooserName("cnetref");
+        cm->SetDateTime("2010-08-27T17:10:06");
+        cm->SetEditLock(true);
       }
       if (k == 1) {
-        cm.SetType(ControlMeasure::Candidate);
-        cm.SetIgnore(true);
-        cm.SetChooserName("autoseed");
+        cm->SetType(ControlMeasure::Candidate);
+        cm->SetIgnore(true);
+        cm->SetChooserName("autoseed");
       }
 
-      cm.SetDateTime("2010-08-27T17:10:06");
-      cp.Add(cm);
+      cm->SetDateTime("2010-08-27T17:10:06");
+      cp->Add(cm);
     }
 
-    cp.SetChooserName("autoseed");
-    cp.SetDateTime("2010-08-27T17:10:06");
+    cp->SetChooserName("autoseed");
+    cp->SetDateTime("2010-08-27T17:10:06");
 
-    if(i == 0) 
-      cp.SetEditLock(true);
+    if (i == 0)
+      cp->SetEditLock(true);
 
-    cn1.Add(cp);
+    cn1.AddPoint(cp);
   }
 
   cout << "Test adding control points with identical id numbers ..." << endl;
   try {
-    cn1.Add(cn1[3]);
+    cn1.AddPoint(cn1.GetPoint(3));
   }
   catch (iException &e) {
     e.Report(false);
@@ -112,14 +112,14 @@ int main () {
   cout << endl;
 
   //  Delete point with invalid point type, first save id for next test
-  string id2 = cn1[2].GetId();
-  cn1.Delete(2);
+  string id2 = cn1[2]->GetId();
+  cn1.DeletePoint(2);
 
   cn1.Write("temp.txt", true);
 
   cout << "Test deleting nonexistant control point id ..." << endl;
   try {
-    cn1.Delete(id2);
+    cn1.DeletePoint(id2);
   }
   catch (iException &e) {
     e.Report(false);
@@ -128,7 +128,7 @@ int main () {
 
   cout << "Test deleting nonexistant control point index ..." << endl;
   try {
-    cn1.Delete(7);
+    cn1.DeletePoint(7);
   }
   catch (iException &e) {
     e.Report(false);
@@ -136,7 +136,7 @@ int main () {
   cout << endl;
   ControlNet cn2("temp.txt");
 
-  cn2.Write("temp2.txt",true);
+  cn2.Write("temp2.txt", true);
   if (system("cmp temp.txt temp2.txt")) {
     cout << "ERROR:  Text Files are not the same!" << endl;
   }
@@ -176,30 +176,30 @@ int main () {
   // SLA 6/30/09
   // -------------------------------------------------------------------------
 
-  cout<<"Enter input cnet: ";
+  cout << "Enter input cnet: ";
   string inNet;
-  cin>>inNet;
+  cin >> inNet;
   string outFile;
-  cout<<"Enter output file (directory & prefix, no extension): ";
-  cin>>outFile;
+  cout << "Enter output file (directory & prefix, no extension): ";
+  cin >> outFile;
 
   ControlNet *cn1 = new ControlNet;
   cout << "Speed Test for ControlNet ...." << endl << endl;
-  cout << "\nReading from the ascii file....    " << inNet<<endl;
+  cout << "\nReading from the ascii file....    " << inNet << endl;
   std::clock_t start = std::clock();
 //  cn1.ReadControl("/work1/tsucharski/protobuf/isis/nets/cnet.net");
 //  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg2.net");
 //  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg_combinedparts.net");
   cn1->ReadControl(inNet);
-  std::cout<< ( ( std::clock() - start ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
+  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
 
   cout << "\nWriting to the binary file...." << endl;
   start = std::clock();
 //  cn1.WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
 //  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
 //  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
-  cn1->WritePB(outFile+".bin");
-  std::cout<< ( ( std::clock() - start ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
+  cn1->WritePB(outFile + ".bin");
+  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
   delete cn1;
 
 //  ControlNet cn2;
@@ -210,8 +210,8 @@ int main () {
 //  cn2.ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
 //  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
 //  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
-  cn2->ReadPBControl(outFile+".bin");
-  std::cout<< ( ( std::clock() - start2 ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
+  cn2->ReadPBControl(outFile + ".bin");
+  std::cout << ((std::clock() - start2) / (double)CLOCKS_PER_SEC) << " seconds \n";
 
 //  apLat = (*cn2)[2].AprioriLatitude();
 //  cout<<"binaryNet AprioriLatitude = "<<apLat<<endl;
@@ -228,8 +228,8 @@ int main () {
 //  cn2.Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.pvl");
 //  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.pvl");
 //  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.pvl");
-  cn2->Write(outFile+".pvl");
-  std::cout<< ( ( std::clock() - start3 ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
+  cn2->Write(outFile + ".pvl");
+  std::cout << ((std::clock() - start3) / (double)CLOCKS_PER_SEC) << " seconds \n";
 
 #endif
 }
