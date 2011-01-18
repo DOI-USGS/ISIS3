@@ -42,7 +42,7 @@ namespace Qisis {
     p_controlNet = NULL;
     p_stretchLocked = false;
     p_stretch = NULL;
-    
+
     p_stretch = new Stretch;
   }
 
@@ -57,8 +57,8 @@ namespace Qisis {
       p_stretch = NULL;
     }
   }
-  
-  
+
+
   /**
    * get viewport x and y from cube sample and line
    *
@@ -68,14 +68,14 @@ namespace Qisis {
    * @param y calcualated viewport y coordinate
    *
    * @returns True if the point is contained in the viewport, false otherwise
-   */ 
+   */
   bool ChipViewport::cubeToViewport(double samp, double line,
-      int & x, int & y) {
-      
+                                    int &x, int &y) {
+
     p_chip->SetCubePosition(samp, line);
     x = ((int) p_chip->ChipSample()) - 1;
     y = ((int) p_chip->ChipLine()) - 1;
-    
+
     return p_chip->IsInsideChip(samp, line);
   }
 
@@ -91,7 +91,7 @@ namespace Qisis {
 
   void ChipViewport::setChip(Isis::Chip *chip, Isis::Cube *chipCube) {
     // Is the chip usable?
-    if(chip == NULL || chipCube == NULL) {
+    if (chip == NULL || chipCube == NULL) {
       throw Isis::iException::Message(Isis::iException::Programmer,
                                       "Can not view NULL chip pointer",
                                       _FILEINFO_);
@@ -102,7 +102,8 @@ namespace Qisis {
 
     p_chip = chip;
     p_chipCube = chipCube;
-    if(p_image != NULL) delete p_image;
+    if (p_image != NULL)
+      delete p_image;
     p_image = new QImage(chip->Samples(), chip->Lines(), QImage::Format_RGB32);
 
     autoStretch();
@@ -117,20 +118,20 @@ namespace Qisis {
     paintImage();
     update();
   }
-  
-  
-  void ChipViewport::stretchFromCubeViewport(Isis::Stretch * newStretch,
-      Qisis::CubeViewport * cvp) {
-    
+
+
+  void ChipViewport::stretchFromCubeViewport(Isis::Stretch *newStretch,
+      Qisis::CubeViewport *cvp) {
+
     ASSERT(cvp != NULL);
-    
+
     if (!cvp || !p_chipCube)
       return;
-      
+
     // only stretch if the CubeViewport is opened to the same cube as we are,
     // otherwise the signal was meant for a different ChipViewport!
     if (cvp->cube()->Filename() == p_chipCube->Filename()) {
-    
+
       // if user right clicked in the CubeViewport then we get a SIGNAL with a
       // NULL Stretch.  This is used to signify that we need to restretch on our
       // own (go back to global).
@@ -147,8 +148,8 @@ namespace Qisis {
       }
     }
   }
-  
-  
+
+
   void ChipViewport::changeStretchLock(int newStatus) {
     if (newStatus == 0)
       p_stretchLocked = false;
@@ -164,23 +165,23 @@ namespace Qisis {
     }
     else {
       Isis::Statistics stats;
-      for(int line = 1; line < p_chip->Lines(); line++) {
-        for(int samp = 1; samp < p_chip->Samples(); samp++) {
+      for (int line = 1; line < p_chip->Lines(); line++) {
+        for (int samp = 1; samp < p_chip->Samples(); samp++) {
           double value = p_chip->GetValue(samp, line);
           stats.AddData(&value, 1);
         }
       }
-  
+
       Isis::Histogram hist(stats.BestMinimum(), stats.BestMaximum());
-      for(int line = 1; line <= p_chip->Lines(); line++) {
-        for(int samp = 1; samp <= p_chip->Samples(); samp++) {
+      for (int line = 1; line <= p_chip->Lines(); line++) {
+        for (int samp = 1; samp <= p_chip->Samples(); samp++) {
           double value = p_chip->GetValue(samp, line);
           hist.AddData(&value, 1);
         }
       }
-  
+
       stretch.ClearPairs();
-      if(hist.Percent(0.5) != hist.Percent(99.5)) {
+      if (hist.Percent(0.5) != hist.Percent(99.5)) {
         stretch.AddPair(hist.Percent(0.5), 0.0);
         stretch.AddPair(hist.Percent(99.5), 255.0);
       }
@@ -188,7 +189,7 @@ namespace Qisis {
         stretch.AddPair(-DBL_MAX, 0.0);
         stretch.AddPair(DBL_MAX, 255.0);
       }
-      
+
       *p_stretch = stretch;
     }
   }
@@ -198,10 +199,10 @@ namespace Qisis {
   void ChipViewport::paintImage() {
     //  TODO: ??? Need something similar to CubeViewport clipping, so that
     //         at edge of image, fill viewport w/ black
-    for(int y = 0; y < p_chip->Lines(); y++) {
+    for (int y = 0; y < p_chip->Lines(); y++) {
       QRgb *rgb = (QRgb *) p_image->scanLine(y);
       int r, g, b;
-      for(int x = 0; x < p_chip->Samples(); x++) {
+      for (int x = 0; x < p_chip->Samples(); x++) {
         r = g = b = (int) p_gray.stretch.Map(p_chip->GetValue(x + 1, y + 1));
         rgb[x] =  qRgb(r, g, b);
       }
@@ -215,58 +216,58 @@ namespace Qisis {
   void ChipViewport::paintEvent(QPaintEvent *e) {
     QPainter painter(this);
 
-    if(p_tempView != NULL) {
+    if (p_tempView != NULL) {
       painter.drawImage(0, 0, *(p_tempView->p_image));
     }
     else {
       painter.drawImage(0, 0, *p_image);
     }
 
-    if(p_cross == true) {
+    if (p_cross == true) {
       painter.setPen(Qt::red);
       painter.drawLine(0, (p_height - 1) / 2, p_width - 1, (p_height - 1) / 2);
       painter.drawLine((p_width - 1) / 2, 0, (p_width - 1) / 2, p_height - 1);
     }
 
-    if(p_circle == true) {
+    if (p_circle == true) {
       painter.setPen(Qt::red);
       painter.drawEllipse((p_height - 1) / 2 - p_circleSize / 2,
                           (p_width - 1) / 2 - p_circleSize / 2,
                           p_circleSize, p_circleSize);
     }
-    
+
     // draw measure locations if we have a control network
-    if (p_controlNet)
-    {
+    if (p_controlNet) {
       string serialNumber = Isis::SerialNumber::Compose(*p_chipCube);
-      
+
       // loop through all points in the control net
-      for (int i = 0; i < p_controlNet->Size(); i++) {
-        const Isis::ControlPoint &p = (*p_controlNet)[i];
-  
+      for (int i = 0; i < p_controlNet->GetNumPoints(); i++) {
+        const ControlPoint *p = p_controlNet->GetPoint(i);
+
         // if this point is contained in the image
-        if (p.HasSerialNumber(serialNumber))
-        {
+        if (p->HasSerialNumber(serialNumber)) {
+          const ControlMeasure *measure = p->GetMeasure(serialNumber);
+
           // Find the measurments on the viewport
-          double samp = p[serialNumber].GetSample();
-          double line = p[serialNumber].GetLine();
-          int x,y;
-          
+          double samp = measure->GetSample();
+          double line = measure->GetLine();
+          int x, y;
+
           cubeToViewport(samp, line, x, y);
-          
+
           // Determine pen color
           // if the point or measure is ignored set to yellow
-          if (p.IsIgnored() || (!p.IsIgnored() && p[serialNumber].IsIgnored())) {
-            painter.setPen(QColor(255,255,0)); // set point marker yellow
+          if (p->IsIgnored() || (!p->IsIgnored() && measure->IsIgnored())) {
+            painter.setPen(QColor(255, 255, 0)); // set point marker yellow
           }
           // check for ground measure
-          else if (p.GetType() == Isis::ControlPoint::Ground) {
+          else if (p->GetType() == Isis::ControlPoint::Ground) {
             painter.setPen(Qt::magenta);// set point marker magenta
           }
           else {
             painter.setPen(Qt::green); // set all other point markers green
           }
-          
+
           // draw points which are not under cross
           if (x != (p_width - 1) / 2 || y != (p_height - 1) / 2) {
             painter.drawLine(x - 5, y, x + 5, y);
@@ -275,7 +276,7 @@ namespace Qisis {
         }
       }
     }
-    
+
     p_tempView = NULL;
     //painter.end();
 
@@ -410,16 +411,16 @@ namespace Qisis {
     int x, y;
     x = p_chip->TackSample();
     y = p_chip->TackLine();
-    if(e->key() == Qt::Key_Up) {
+    if (e->key() == Qt::Key_Up) {
       y--;
     }
-    else if(e->key() == Qt::Key_Down) {
+    else if (e->key() == Qt::Key_Down) {
       y++;
     }
-    else if(e->key() == Qt::Key_Left) {
+    else if (e->key() == Qt::Key_Left) {
       x--;
     }
-    else if(e->key() == Qt::Key_Right) {
+    else if (e->key() == Qt::Key_Right) {
       x++;
     }
     else {
@@ -439,7 +440,7 @@ namespace Qisis {
   void ChipViewport::mousePressEvent(QMouseEvent *event) {
 
     QPoint p = event->pos();
-    if(event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton) {
       //  Reload with new cube position
       p_chip->SetChipPosition((double)p.x(), (double)p.y());
       reloadChip(p_chip->CubeSample(), p_chip->CubeLine());
@@ -450,7 +451,8 @@ namespace Qisis {
   //!<  Slot to change state of crosshair
   void ChipViewport::setCross(bool checked) {
 
-    if(checked == p_cross) return;
+    if (checked == p_cross)
+      return;
 
     p_cross = checked;
     repaint();
@@ -460,7 +462,8 @@ namespace Qisis {
 
   void ChipViewport::setCircle(bool checked) {
 
-    if(checked == p_circle) return;
+    if (checked == p_circle)
+      return;
 
     p_circle = checked;
     repaint();
@@ -491,7 +494,7 @@ namespace Qisis {
       p_chip->Load(*p_chipCube, *matchChip, *matchChipCube);
 //    p_chip->ReLoad(*matchChip,p_zoomFactor);
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString msg = "Cannot geom chip.\n";
       msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -515,7 +518,7 @@ namespace Qisis {
     try {
       p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString msg = "Cannot load no geom chip.\n";
       msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -545,7 +548,7 @@ namespace Qisis {
     try {
       p_chip->Load(*p_chipCube, -rotation, p_zoomFactor);
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString msg = "Cannot load rotated chip.\n";
       msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -570,23 +573,23 @@ namespace Qisis {
   void ChipViewport::reloadChip(double tackSample, double tackLine) {
 
     // Is the chip usable?
-    if(p_chip == NULL) {
+    if (p_chip == NULL) {
       throw Isis::iException::Message(Isis::iException::Programmer,
                                       "Can not view NULL chip pointer",
                                       _FILEINFO_);
     }
 
-    if(tackSample != 0. && tackLine != 0.)
+    if (tackSample != 0. && tackLine != 0.)
       p_chip->TackCube(tackSample, tackLine);
-    if(p_geomIt) {
-      if(p_matchChip == NULL) {
+    if (p_geomIt) {
+      if (p_matchChip == NULL) {
         throw Isis::iException::Message(Isis::iException::User,
                                         "Invalid match chip", _FILEINFO_);
       }
       try {
         p_chip->Load(*p_chipCube, *p_matchChip, *p_matchChipCube);
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         QString msg = "Cannot reload chip.\n";
         msg += e.Errors().c_str();
         QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -599,7 +602,7 @@ namespace Qisis {
       try {
         p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         QString msg = "Cannot reload chip.\n";
         msg += e.Errors().c_str();
         QMessageBox::information((QWidget *)parent(), "Error", msg);

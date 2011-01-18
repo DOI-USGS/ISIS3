@@ -72,8 +72,8 @@ namespace Qisis {
     public:
       ChipViewport(int width, int height, QWidget *parent = 0);
       virtual ~ChipViewport();
-      
-      bool cubeToViewport(double samp, double line, int & x, int & y);
+
+      bool cubeToViewport(double samp, double line, int &x, int &y);
 
       //!  Set chip
       void setChip(Isis::Chip *chip, Isis::Cube *chipCube);
@@ -141,16 +141,16 @@ namespace Qisis {
       void zoom1();
 
       void refreshView(double tackSample, double tackLine);
-      
+
       /**
        * sets the ControlNet to be used for drawing measure locations
        *
        * @param newControlNet The new ControlNet to be used
-       */ 
-      void setControlNet(Isis::ControlNet * newControlNet) {
+       */
+      void setControlNet(Isis::ControlNet *newControlNet) {
         p_controlNet = newControlNet;
       }
-      
+
 
 
     protected:
@@ -182,27 +182,27 @@ namespace Qisis {
       };
 
       BandInfo p_gray;//!< info for the gray bands.
-      Isis::Chip *p_chip;//!< The chip
-      Isis::Cube *p_chipCube;//!< The chip's cube
+      Isis::Chip *p_chip;  //!< The chip
+      Isis::Cube *p_chipCube;  //!< The chip's cube
 
       int p_width;//!< Chip width
       int p_height;//!< Chip height
 
       bool p_geomIt;//!< geomIt?
-      Isis::Chip *p_matchChip;//!< The matching chip.
-      Isis::Cube *p_matchChipCube;//!< The matching chip's cube
+      Isis::Chip *p_matchChip;  //!< The matching chip.
+      Isis::Cube *p_matchChipCube;  //!< The matching chip's cube
 
       double p_zoomFactor;//!< Zoom Factor
       int p_rotation;//!< Rotation
 
-      QImage *p_image;//!< The image
+      QImage *p_image;  //!< The image
       bool p_paintImage;//!< Paint Image?
       bool p_cross;//!< Draw crosshair
       bool p_circle;//!< Draw circle
       int p_circleSize;//!<Circle size
 
-      ChipViewport *p_tempView;//!< Temporary viewport
-      
+      ChipViewport *p_tempView;  //!< Temporary viewport
+
       // The ControlNet pointed to by this pointer is not owned by this class!
       // It is ok for p_controlNet to be NULL any time.  If it is not NULL then
       // it is used to paint measures in the viewport.
@@ -210,10 +210,10 @@ namespace Qisis {
       // After construction, it is the responsibility of the user of this class
       // to maintain this pointer with the setControlNet method (to make sure
       // that either NULL or a valid ControlNet is being pointed to).
-      Isis::ControlNet * p_controlNet;
-      
+      Isis::ControlNet *p_controlNet;
+
       bool p_stretchLocked;
-      Isis::Stretch * p_stretch;
+      Isis::Stretch *p_stretch;
   };
 };
 
