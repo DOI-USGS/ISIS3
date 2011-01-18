@@ -214,20 +214,20 @@ void IsisMain() {
 
     Progress progress;
     progress.SetText("Calculating Provided Control Net");
-    progress.SetMaximumSteps(precnet.Size());
+    progress.SetMaximumSteps(precnet.GetNumPoints());
     progress.CheckStatus();
 
-    for(int i = 0 ; i < precnet.Size(); i ++) {
-      ControlPoint cp = precnet[i];
-      ControlMeasure cm = cp[0];
-      if(cp.HasReference()) {
-        cm = cp[cp.GetReferenceIndex()];
+    for(int i = 0 ; i < precnet.GetNumPoints(); i ++) {
+      ControlPoint *cp = precnet.GetPoint(i);
+      ControlMeasure *cm = cp->GetMeasure(0);
+      if(cp->HasReference()) {
+        cm = cp->GetReferenceMeasure();
       }
 
-      iString c = serialNumbers.Filename(cm.GetCubeSerialNumber());
+      iString c = serialNumbers.Filename(cm->GetCubeSerialNumber());
       Pvl cubepvl(c);
       Camera *cam = CameraFactory::Create(cubepvl);
-      cam->SetImage(cm.GetSample(), cm.GetLine());
+      cam->SetImage(cm->GetSample(), cm->GetLine());
 
 
       points.push_back(Isis::globalFactory.createPoint(geos::geom::Coordinate(
@@ -354,9 +354,9 @@ void IsisMain() {
     //   Create a control point for each seeded point in this overlap
     for(unsigned int point = 0; point < seed.size(); ++point) {
 
-      ControlPoint controlpt;
-      controlpt.SetId(QString::fromStdString(pointId.Next()));
-      controlpt.SetType(ControlPoint::Tie);
+      ControlPoint *controlpt = new ControlPoint();
+      controlpt->SetId(QString::fromStdString(pointId.Next()));
+      controlpt->SetType(ControlPoint::Tie);
 
       // Create a measurment at this point for each image in the overlap area
       for(int sn = 0; sn < overlaps[ov]->Size(); ++sn) {
@@ -414,31 +414,32 @@ void IsisMain() {
         }
 
         // Put the line/samp into a measurment
-        ControlMeasure measurment;
-        measurment.SetCoordinate(gmap->Sample(), gmap->Line(),
-                                 ControlMeasure::Candidate);
+        ControlMeasure *measurment = new ControlMeasure();
+        measurment->SetCoordinate(gmap->Sample(), gmap->Line(),
+                                  ControlMeasure::Candidate);
 
         if(sn == 0)
-          measurment.SetType(ControlMeasure::Reference);
+          measurment->SetType(ControlMeasure::Reference);
         else
-          measurment.SetType(ControlMeasure::Candidate);
-        measurment.SetCubeSerialNumber((*(overlaps[ov]))[sn]);
-        measurment.SetIgnore(ignore);
+          measurment->SetType(ControlMeasure::Candidate);
+        measurment->SetCubeSerialNumber((*(overlaps[ov]))[sn]);
+        measurment->SetIgnore(ignore);
 
         if(ignore) {
           cmIgnoredCount ++;
         }
 
-        controlpt.Add(measurment);
+        controlpt->Add(measurment); //controlpt takes ownership
+        measurment = NULL;
       }
 
-      if(controlpt.GetNumValidMeasures() < 2) {
-        controlpt.SetIgnore(true);
+      if(controlpt->GetNumValidMeasures() < 2) {
+        controlpt->SetIgnore(true);
         cpIgnoredCount ++;
       }
 
-      if(controlpt.Size() > 0) {
-        cnet.Add(controlpt);
+      if(controlpt->GetNumMeasures() > 0) {
+        cnet.AddPoint(controlpt); //cnet takes ownership
       }
       delete seed[point];
 
@@ -468,7 +469,7 @@ void IsisMain() {
   }
 
   // Make sure the control network is not empty
-  if(cnet.Size() == 0) {
+  if(cnet.GetNumPoints() == 0) {
     string msg = "The ouput Control Network [TO] is empty. This is likely due";
     msg += " to the input cubes failing to overlap.";
     throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -491,12 +492,10 @@ void IsisMain() {
   }
 
   // calc # of points and measures for results group in print.prt
-  int cpCount = 0;
+  int cpCount = cnet.GetNumPoints();
   int msCount = 0;
-  for(int i = 0; i < cnet.Size(); i++) {
-    cpCount++;
-    for(int j = 0; j < cnet[i].Size(); j++)
-      msCount++;
+  for(int i = 0; i < cpCount; i++) {
+    msCount += cnet.GetPoint(i)->GetNumMeasures();
   }
 
   // create Results group and add to print.prt
