@@ -1908,6 +1908,7 @@ namespace Isis {
     while (i.hasNext()) {
       i.next();
       ControlMeasure *newMeasure = new ControlMeasure(*i.value());
+      newMeasure->parentPoint = this;
       p_measures->insert(i.key(), newMeasure);
       cubeSerials->append(i.key());
     }
