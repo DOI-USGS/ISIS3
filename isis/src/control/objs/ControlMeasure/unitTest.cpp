@@ -12,19 +12,19 @@
 
 using namespace std;
 using namespace Isis;
-void outit (ControlMeasure &d);
+void outit(ControlMeasure &d);
 
-int main () {
+int main() {
   /**
    * @brief Test ControlMeasure object for accuracy and correct behavior.
    *
-   * @history 2010-06-30  Tracie Sucharski, Updated for binary control net and 
+   * @history 2010-06-30  Tracie Sucharski, Updated for binary control net and
    *                         new keywords.
-   * @history 2010-08-12  Tracie Sucharski,  Keywords changed AGAIN.. 
-   * @history 2010-10-18  Tracie Sucharski,  Set EditLock to false before 
-   *                         Test 5 so type can be updated. 
-   * @history 2010-11-03  Mackenzie Boyd,  Added test for PrintableClassData() 
-   *  
+   * @history 2010-08-12  Tracie Sucharski,  Keywords changed AGAIN..
+   * @history 2010-10-18  Tracie Sucharski,  Set EditLock to false before
+   *                         Test 5 so type can be updated.
+   * @history 2010-11-03  Mackenzie Boyd,  Added test for PrintableClassData()
+   *
   */
   Preference::Preferences(true);
   ControlMeasure d;
@@ -75,8 +75,8 @@ int main () {
   outit(d);
 
   d.SetLogData(
-      ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit, 5.0)
-      );
+    ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit, 5.0)
+  );
   d.SetChooserName("Bob");
   d.SetDateTime("2005-05-03T00:00:00");
 
@@ -84,25 +84,25 @@ int main () {
   cout << "Test 7" << endl;
   QList< QStringList > printableMeasureData = d.PrintableClassData();
   QStringList nameValuePair;
-  foreach (nameValuePair, printableMeasureData) {
+  foreach(nameValuePair, printableMeasureData) {
     cout << nameValuePair.at(0).toStdString() << "=" <<
-            nameValuePair.at(1).toStdString() << endl;
+         nameValuePair.at(1).toStdString() << endl;
   }
 
   cout << "Test 8" << endl;
   cout << d.GetLogData(ControlMeasureLogData::GoodnessOfFit).
-                                                    GetNumericalValue() << endl;
+       GetNumericalValue() << endl;
 
   try {
     d.SetLogData(ControlMeasureLogData());
   }
-  catch(iException &e) {
+  catch (iException &e) {
     e.Report(false);
     e.Clear();
   }
 }
 
-void outit (ControlMeasure &d) {
+void outit(ControlMeasure &d) {
   Pvl pvl;
   pvl.AddGroup(d.CreatePvlGroup());
   cout << pvl << endl;

@@ -61,30 +61,30 @@ namespace Isis {
 
   /**
    * Converts the protocol buffer version of the measure into a real
-   *   ControlMeasure 
+   *   ControlMeasure
    *
    * @param other The control measure to copy all of the values from
    */
   ControlMeasure::ControlMeasure(
-      const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf) {
+    const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf) {
     Init(protoBuf);
   }
 
 
   /**
    * Converts the protocol buffer version of the measure into a real
-   *   ControlMeasure 
+   *   ControlMeasure
    *
    * @param other The control measure to copy all of the values from
    */
   ControlMeasure::ControlMeasure(
-      const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf,
-      const PBControlNetLogData_Point_Measure &logData) {
+    const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf,
+    const PBControlNetLogData_Point_Measure &logData) {
     Init(protoBuf);
 
-    for(int dataEntry = 0;
-        dataEntry < logData.loggedmeasuredata_size();
-        dataEntry ++) {
+    for (int dataEntry = 0;
+         dataEntry < logData.loggedmeasuredata_size();
+         dataEntry ++) {
       ControlMeasureLogData logEntry(logData.loggedmeasuredata(dataEntry));
       p_loggedData->push_back(logEntry);
     }
@@ -96,7 +96,7 @@ namespace Isis {
    *
    * @param other The control measure to copy all of the values from
    */
-  ControlMeasure::ControlMeasure(const ControlMeasure & other) {
+  ControlMeasure::ControlMeasure(const ControlMeasure &other) {
     InitializeToNull();
 
     p_serialNumber = new iString(*other.p_serialNumber);
@@ -125,7 +125,7 @@ namespace Isis {
 
 
   void ControlMeasure::Init(
-      const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf) {
+    const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf) {
     InitializeToNull();
 
     p_serialNumber = new iString(protoBuf.serialnumber());
@@ -133,7 +133,7 @@ namespace Isis {
     p_dateTime = new iString(protoBuf.datetime());
     p_loggedData = new QVector<ControlMeasureLogData>();
 
-    switch(protoBuf.type()) {
+    switch (protoBuf.type()) {
       case PBControlNet_PBControlPoint_PBControlMeasure::Reference:
         p_measureType = ControlMeasure::Reference;
         break;
@@ -160,25 +160,25 @@ namespace Isis {
     p_sample = protoBuf.measurement().sample();
     p_line = protoBuf.measurement().line();
 
-    if(protoBuf.has_diameter())
+    if (protoBuf.has_diameter())
       p_diameter = protoBuf.diameter();
 
-    if(protoBuf.has_apriorisample())
+    if (protoBuf.has_apriorisample())
       p_aprioriSample = protoBuf.apriorisample();
 
-    if(protoBuf.has_aprioriline())
+    if (protoBuf.has_aprioriline())
       p_aprioriLine = protoBuf.aprioriline();
 
-    if(protoBuf.has_samplesigma())
+    if (protoBuf.has_samplesigma())
       p_sampleSigma = protoBuf.samplesigma();
 
-    if(protoBuf.has_linesigma())
+    if (protoBuf.has_linesigma())
       p_lineSigma = protoBuf.linesigma();
 
-    if(protoBuf.measurement().has_sampleresidual())
+    if (protoBuf.measurement().has_sampleresidual())
       p_sampleResidual = protoBuf.measurement().sampleresidual();
 
-    if(protoBuf.measurement().has_lineresidual())
+    if (protoBuf.measurement().has_lineresidual())
       p_lineResidual = protoBuf.measurement().lineresidual();
   }
 
@@ -210,7 +210,7 @@ namespace Isis {
 
 
   /**
-   * Free the memory allocated by a control 
+   * Free the memory allocated by a control
    */
   ControlMeasure::~ControlMeasure() {
     if (p_serialNumber) {
@@ -256,10 +256,10 @@ namespace Isis {
     *
     * @param p PvlGroup containing ControlMeasure information
     *
-    * @throws Isis::iException::User - Invalid Measure Type 
-    *  
-    * @internal 
-    *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground. 
+    * @throws Isis::iException::User - Invalid Measure Type
+    *
+    * @internal
+    *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground.
     *
     */
   void ControlMeasure::Load(PvlGroup &p) {
@@ -315,7 +315,8 @@ namespace Isis {
     //  Check for old Reference keyword
     if (p.HasKeyword("Reference")) {
       iString reference = p["Reference"][0];
-      if (reference.DownCase() == "true") p_measureType = Reference;
+      if (reference.DownCase() == "true")
+        p_measureType = Reference;
       unknownKeywords.DeleteKeyword("Reference");
     }
 
@@ -331,19 +332,22 @@ namespace Isis {
 
     if (p.HasKeyword("EditLock")) {
       iString lock = p["EditLock"][0];
-      if (lock.DownCase() == "true") p_editLock = true;
+      if (lock.DownCase() == "true")
+        p_editLock = true;
       unknownKeywords.DeleteKeyword("EditLock");
     }
 
     if (p.HasKeyword("JigsawRejected")) {
       iString reject = p["JigsawRejected"][0];
-      if (reject.DownCase() == "true") p_jigsawRejected = true;
+      if (reject.DownCase() == "true")
+        p_jigsawRejected = true;
       unknownKeywords.DeleteKeyword("JigsawRejected");
     }
 
     if (p.HasKeyword("Ignore")) {
       iString ignore = p["Ignore"][0];
-      if (ignore.DownCase() == "true") p_ignore = true;
+      if (ignore.DownCase() == "true")
+        p_ignore = true;
       unknownKeywords.DeleteKeyword("Ignore");
     }
 
@@ -399,11 +403,11 @@ namespace Isis {
     }
 
     // Try to interpret remaining keywords as log data
-    for(int unknownKeyIndex = 0; unknownKeyIndex < unknownKeywords.Keywords();
-            unknownKeyIndex ++) {
+    for (int unknownKeyIndex = 0; unknownKeyIndex < unknownKeywords.Keywords();
+         unknownKeyIndex ++) {
       ControlMeasureLogData logEntry(unknownKeywords[unknownKeyIndex]);
 
-      if(logEntry.IsValid()) {
+      if (logEntry.IsValid()) {
         p_loggedData->append(logEntry);
       }
     }
@@ -411,7 +415,8 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetAprioriLine(double aprioriLine) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_aprioriLine = aprioriLine;
     return Success;
@@ -419,16 +424,18 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetAprioriSample(
-      double aprioriSample) {
-    if (p_editLock) return MeasureLocked;
+    double aprioriSample) {
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_aprioriSample = aprioriSample;
     return Success;
   }
 
 
-  ControlMeasure::Status ControlMeasure::SetCamera (Isis::Camera *camera) {
-    if (p_editLock) return MeasureLocked;
+  ControlMeasure::Status ControlMeasure::SetCamera(Isis::Camera *camera) {
+    if (p_editLock)
+      return MeasureLocked;
     p_camera = camera;
     return Success;
   }
@@ -443,11 +450,12 @@ namespace Isis {
    *
    * @param sn  Serial number of the cube where the coordinate was
    *            selected
-   * @return Status Success or MeasureLocked 
-   *  
+   * @return Status Success or MeasureLocked
+   *
    */
   ControlMeasure::Status ControlMeasure::SetCubeSerialNumber(iString newSerialNumber) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     *p_serialNumber = newSerialNumber;
     return Success;
   }
@@ -455,7 +463,8 @@ namespace Isis {
 
   //! Set chooser name to a user who last changed the coordinate
   ControlMeasure::Status ControlMeasure::SetChooserName() {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     *p_chooserName = "";
     return Success;
   }
@@ -463,7 +472,8 @@ namespace Isis {
 
   //! Set the chooser name to an application that last changed the coordinate
   ControlMeasure::Status ControlMeasure::SetChooserName(iString name) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     *p_chooserName = name;
     return Success;
   }
@@ -490,7 +500,8 @@ namespace Isis {
     */
   ControlMeasure::Status ControlMeasure::SetCoordinate(double sample,
       double line, MeasureType type) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_sample = sample;
     p_line = line;
@@ -501,7 +512,8 @@ namespace Isis {
 
   //! Date Time - Creation Time
   ControlMeasure::Status ControlMeasure::SetDateTime() {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     *p_dateTime = Application::DateTime();
     return Success;
   }
@@ -509,7 +521,8 @@ namespace Isis {
 
   //! Set date/time the coordinate was last changed to specified date/time
   ControlMeasure::Status ControlMeasure::SetDateTime(iString datetime) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     *p_dateTime = datetime;
     return Success;
   }
@@ -524,7 +537,8 @@ namespace Isis {
    * @param diameter  The diameter of the crater in pixels
    */
   ControlMeasure::Status ControlMeasure::SetDiameter(double diameter) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_diameter = diameter;
     return Success;
@@ -540,7 +554,8 @@ namespace Isis {
   //! Set the focal plane x/y for the measured line/sample
   ControlMeasure::Status ControlMeasure::SetFocalPlaneMeasured(double x,
       double y) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     p_focalPlaneMeasuredX = x;
     p_focalPlaneMeasuredY = y;
     return Success;
@@ -550,7 +565,8 @@ namespace Isis {
   //! Set the focal plane x/y for the computed (apriori) lat/lon
   ControlMeasure::Status ControlMeasure::SetFocalPlaneComputed(double x,
       double y) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     p_focalPlaneComputedX = x;
     p_focalPlaneComputedY = y;
     return Success;
@@ -558,7 +574,8 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetRejected(bool reject) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_jigsawRejected = reject;
     return Success;
@@ -566,7 +583,8 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetIgnore(bool ignore) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_ignore = ignore;
     return Success;
@@ -574,7 +592,8 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetLineSigma(double lineSigma) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_lineSigma = lineSigma;
     return Success;
@@ -589,7 +608,8 @@ namespace Isis {
     */
   ControlMeasure::Status ControlMeasure::SetResidual(double sampResidual,
       double lineResidual) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_sampleResidual = sampResidual;
     p_lineResidual   = lineResidual;
@@ -598,7 +618,8 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetSampleSigma(double sampleSigma) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_sampleSigma = sampleSigma;
     return Success;
@@ -607,7 +628,8 @@ namespace Isis {
 
   //! Set how the coordinate was obtained
   ControlMeasure::Status ControlMeasure::SetType(MeasureType type) {
-    if (p_editLock) return MeasureLocked;
+    if (p_editLock)
+      return MeasureLocked;
     MeasureModified();
     p_measureType = type;
     return Success;
@@ -615,13 +637,13 @@ namespace Isis {
 
 
   void ControlMeasure::SetLogData(ControlMeasureLogData data) {
-    if(!data.IsValid()) {
+    if (!data.IsValid()) {
       iString msg = "Cannot set log data with invalid information stored in "
-          "the ControlMeasureLogData";
+                    "the ControlMeasureLogData";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if(HasLogData(data.GetDataType()))
+    if (HasLogData(data.GetDataType()))
       UpdateLogData(data);
     else
       p_loggedData->append(data);
@@ -629,20 +651,20 @@ namespace Isis {
 
 
   void ControlMeasure::DeleteLogData(long dataType) {
-    for(int i = p_loggedData->size(); i >= 0; i--) {
+    for (int i = p_loggedData->size(); i >= 0; i--) {
       ControlMeasureLogData logDataEntry = p_loggedData->at(i);
 
-      if(logDataEntry.GetDataType() == dataType)
+      if (logDataEntry.GetDataType() == dataType)
         p_loggedData->remove(i);
     }
   }
 
 
   bool ControlMeasure::HasLogData(long dataType) const {
-    for(int i = 0; i < p_loggedData->size(); i++) {
+    for (int i = 0; i < p_loggedData->size(); i++) {
       const ControlMeasureLogData &logDataEntry = p_loggedData->at(i);
 
-      if(logDataEntry.GetDataType() == dataType)
+      if (logDataEntry.GetDataType() == dataType)
         return true;
     }
 
@@ -653,20 +675,20 @@ namespace Isis {
   void ControlMeasure::UpdateLogData(ControlMeasureLogData newLogData) {
     bool updated = false;
 
-    for(int i = 0; i < p_loggedData->size(); i++) {
+    for (int i = 0; i < p_loggedData->size(); i++) {
       ControlMeasureLogData logDataEntry = p_loggedData->at(i);
 
-      if(logDataEntry.GetDataType() == newLogData.GetDataType()) {
+      if (logDataEntry.GetDataType() == newLogData.GetDataType()) {
         (*p_loggedData)[i] = newLogData;
         updated = true;
       }
     }
 
-    if(!updated) {
+    if (!updated) {
       iString msg = "Unable to update the log data for [" +
-          newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
-          " control measure does not have log data for this value. Please use "
-          "SetLogData instead";
+                    newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
+                    " control measure does not have log data for this value. Please use "
+                    "SetLogData instead";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -689,7 +711,7 @@ namespace Isis {
 
   //! Return the chooser name
   iString ControlMeasure::GetChooserName() const {
-    if(*p_chooserName != "") {
+    if (*p_chooserName != "") {
       return *p_chooserName;
     }
     else {
@@ -706,7 +728,7 @@ namespace Isis {
 
   //! Return the date/time the coordinate was last changed
   iString ControlMeasure::GetDateTime() const {
-    if(*p_dateTime != "") {
+    if (*p_dateTime != "") {
       return *p_dateTime;
     }
     else {
@@ -756,17 +778,17 @@ namespace Isis {
   }
 
 
-  bool ControlMeasure::IsMeasured () const {
+  bool ControlMeasure::IsMeasured() const {
     return p_measureType != Candidate;
   }
 
 
-  bool ControlMeasure::IsRegistered () const {
+  bool ControlMeasure::IsRegistered() const {
     return (p_measureType == RegisteredPixel ||
             p_measureType == RegisteredSubPixel);
   }
 
-  bool ControlMeasure::IsGround () const {
+  bool ControlMeasure::IsGround() const {
     return p_measureType == Ground;
   }
 
@@ -774,7 +796,7 @@ namespace Isis {
     bool relevant = false;
     bool validField = false;
 
-    switch(field) {
+    switch (field) {
       case AprioriLine:
       case AprioriSample:
       case ChooserName:
@@ -800,9 +822,9 @@ namespace Isis {
         break;
     }
 
-    if(!validField) {
+    if (!validField) {
       iString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
-          + iString(field) + "]";
+                    + iString(field) + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -847,7 +869,7 @@ namespace Isis {
   }
 
 
-  ControlMeasure::MeasureType ControlMeasure::GetType () const {
+  ControlMeasure::MeasureType ControlMeasure::GetType() const {
     return p_measureType;
   }
 
@@ -862,7 +884,7 @@ namespace Isis {
   }
 
 
-  void ControlMeasure::ConnectControlSN(ControlSerialNumber * sn) {
+  void ControlMeasure::ConnectControlSN(ControlSerialNumber *sn) {
     associatedSN = sn;
   }
 
@@ -875,11 +897,11 @@ namespace Isis {
   ControlMeasureLogData ControlMeasure::GetLogData(long dataType) const {
     int foundIndex = 0;
     ControlMeasureLogData::NumericLogDataType typedDataType =
-        (ControlMeasureLogData::NumericLogDataType)dataType;
+      (ControlMeasureLogData::NumericLogDataType)dataType;
 
-    while(foundIndex < p_loggedData->size()) {
+    while (foundIndex < p_loggedData->size()) {
       const ControlMeasureLogData &logData = p_loggedData->at(foundIndex);
-      if(logData.GetDataType() == typedDataType) {
+      if (logData.GetDataType() == typedDataType) {
         return logData;
       }
 
@@ -907,7 +929,7 @@ namespace Isis {
     else {
       iString msg = data + " passed to GetMeasureData but is invalid";
       throw Isis::iException::Message(Isis::iException::Programmer, msg,
-          _FILEINFO_);
+                                      _FILEINFO_);
     }
   }
 
@@ -989,61 +1011,64 @@ namespace Isis {
     qsl << "MeasureType" << MeasureTypeString();
     data.append(qsl);
     qsl.clear();
-    
+
     return data;
   }
 
 
- /**
-  * Sets up and returns a PvlGroup for the ControlMeasure
-  *
-  * @return The PvlGroup for the ControlMeasure
-  *
-  * @throws Isis::iException::Programmer - Invalid Measure Enumeration 
-  *  
-  * @internal 
-  *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground. 
-  *  
-  */
+  /**
+   * Sets up and returns a PvlGroup for the ControlMeasure
+   *
+   * @return The PvlGroup for the ControlMeasure
+   *
+   * @throws Isis::iException::Programmer - Invalid Measure Enumeration
+   *
+   * @internal
+   *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground.
+   *
+   */
   PvlGroup ControlMeasure::CreatePvlGroup() {
     PvlGroup p("ControlMeasure");
     p += PvlKeyword("SerialNumber", *p_serialNumber);
 
     switch (p_measureType) {
       case Reference:
-          p += PvlKeyword("MeasureType", "Reference");
-          break;
+        p += PvlKeyword("MeasureType", "Reference");
+        break;
       case Candidate:
-          p += PvlKeyword("MeasureType", "Candidate");
-          break;
-      case Manual: 
-          p += PvlKeyword("MeasureType", "Manual");
-          break;
+        p += PvlKeyword("MeasureType", "Candidate");
+        break;
+      case Manual:
+        p += PvlKeyword("MeasureType", "Manual");
+        break;
       case RegisteredPixel:
-          p += PvlKeyword("MeasureType", "RegisteredPixel"); 
-          break;
+        p += PvlKeyword("MeasureType", "RegisteredPixel");
+        break;
       case RegisteredSubPixel:
-          p += PvlKeyword("MeasureType", "RegisteredSubPixel"); 
-          break;
+        p += PvlKeyword("MeasureType", "RegisteredSubPixel");
+        break;
       case Ground:
-          p += PvlKeyword("MeasureType", "Ground"); 
-          break;
+        p += PvlKeyword("MeasureType", "Ground");
+        break;
       default:
         iString msg = "Invalid Measure Enumeration, [" + iString(p_measureType)
-            + "]";
-        throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+                      + "]";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     p += PvlKeyword("ChooserName", GetChooserName());
     p += PvlKeyword("DateTime", GetDateTime());
 
-    if (IsEditLocked()) p += PvlKeyword("EditLock", "True");
-    if (IsIgnored()) p += PvlKeyword("Ignore", "True");
+    if (IsEditLocked())
+      p += PvlKeyword("EditLock", "True");
+    if (IsIgnored())
+      p += PvlKeyword("Ignore", "True");
 
     p += PvlKeyword("Sample", p_sample);
     p += PvlKeyword("Line",   p_line);
-    if (p_diameter != Isis::Null) p += PvlKeyword("Diameter", p_diameter);
+    if (p_diameter != Isis::Null)
+      p += PvlKeyword("Diameter", p_diameter);
     if (p_aprioriSample != Isis::Null) {
       p += PvlKeyword("AprioriSample", p_aprioriSample);
     }
@@ -1052,19 +1077,19 @@ namespace Isis {
     }
 
     if (p_sampleSigma != Isis::Null) {
-      p += PvlKeyword("SampleSigma", p_sampleSigma,"pixels");
+      p += PvlKeyword("SampleSigma", p_sampleSigma, "pixels");
     }
     if (p_lineSigma != Isis::Null) {
-      p += PvlKeyword("LineSigma", p_lineSigma,"pixels");
+      p += PvlKeyword("LineSigma", p_lineSigma, "pixels");
     }
     if (p_sampleResidual != Isis::Null) {
-      p += PvlKeyword("SampleResidual", p_sampleResidual,"pixels");
+      p += PvlKeyword("SampleResidual", p_sampleResidual, "pixels");
     }
     if (p_lineResidual != Isis::Null) {
-      p += PvlKeyword("LineResidual", p_lineResidual,"pixels");
+      p += PvlKeyword("LineResidual", p_lineResidual, "pixels");
     }
 
-    for(int logEntry = 0; logEntry < p_loggedData->size(); logEntry ++) {
+    for (int logEntry = 0; logEntry < p_loggedData->size(); logEntry ++) {
       p += p_loggedData->at(logEntry).ToKeyword();
     }
 
@@ -1074,45 +1099,45 @@ namespace Isis {
 
   /**
    * Return the String Control Measure type
-   * 
+   *
    * @return string - Measure Type
    *
    * @author Sharmila Prasad (10/1/2010)
    * @internal
    *   @history 2010-10-28 Mackenzie Boyd - Changed name and made static,
    *                                        added exception.
-   *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground. 
+   *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground.
    */
   iString ControlMeasure::MeasureTypeToString(MeasureType type) {
     iString sPrintable;
 
     switch (type) {
       case ControlMeasure::Reference:
-        sPrintable ="Reference";
+        sPrintable = "Reference";
         break;
 
       case ControlMeasure::Candidate:
-        sPrintable ="Candidate";
+        sPrintable = "Candidate";
         break;
 
       case ControlMeasure::Manual:
-        sPrintable ="Manual";
+        sPrintable = "Manual";
         break;
 
       case ControlMeasure::RegisteredPixel:
-        sPrintable ="RegisteredPixel";
+        sPrintable = "RegisteredPixel";
         break;
 
       case ControlMeasure::RegisteredSubPixel:
-        sPrintable ="RegisteredSubPixel";
+        sPrintable = "RegisteredSubPixel";
         break;
 
       case ControlMeasure::Ground:
-        sPrintable ="Ground";
+        sPrintable = "Ground";
         break;
     }
 
-    if(sPrintable == "") {
+    if (sPrintable == "") {
       iString msg = "Measure type [" + iString(type) + "] cannot be converted "
                     "to a string";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -1147,7 +1172,7 @@ namespace Isis {
       delete p_chooserName;
       p_chooserName = NULL;
     }
-    if(p_loggedData) {
+    if (p_loggedData) {
       delete p_loggedData;
       p_loggedData = NULL;
     }
@@ -1175,7 +1200,7 @@ namespace Isis {
     p_sampleResidual = other.p_sampleResidual;
     p_lineResidual = other.p_lineResidual;
     p_camera = other.p_camera;
-    p_focalPlaneMeasuredX = other.p_focalPlaneMeasuredX; 
+    p_focalPlaneMeasuredX = other.p_focalPlaneMeasuredX;
     p_focalPlaneMeasuredY = other.p_focalPlaneMeasuredY;
     p_focalPlaneComputedX = other.p_focalPlaneComputedX;
     p_focalPlaneComputedY = other.p_focalPlaneComputedY;
@@ -1211,31 +1236,31 @@ namespace Isis {
    *
    * @return bool
    */
-  bool ControlMeasure::operator==(const Isis::ControlMeasure & pMeasure) const {
+  bool ControlMeasure::operator==(const Isis::ControlMeasure &pMeasure) const {
     return pMeasure.p_measureType == p_measureType &&
-        *pMeasure.p_serialNumber == *p_serialNumber &&
-        pMeasure.p_chooserName == p_chooserName &&
-        pMeasure.p_dateTime == p_dateTime &&
-        pMeasure.p_editLock == p_editLock &&
-        pMeasure.p_ignore == p_ignore &&
-        pMeasure.p_sample == p_sample &&
-        pMeasure.p_line == p_line &&
-        pMeasure.p_diameter == p_diameter &&
-        pMeasure.p_aprioriSample == p_aprioriSample &&
-        pMeasure.p_aprioriLine == p_aprioriLine &&
-        pMeasure.p_sampleSigma ==  p_sampleSigma &&
-        pMeasure.p_lineSigma ==  p_lineSigma &&
-        pMeasure.p_sampleResidual == p_sampleResidual &&
-        pMeasure.p_lineResidual == p_lineResidual &&
-        pMeasure.p_focalPlaneMeasuredX == p_focalPlaneMeasuredX &&
-        pMeasure.p_focalPlaneMeasuredY == p_focalPlaneMeasuredY &&
-        pMeasure.p_focalPlaneComputedX == p_focalPlaneComputedX &&
-        pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY;
+           *pMeasure.p_serialNumber == *p_serialNumber &&
+           pMeasure.p_chooserName == p_chooserName &&
+           pMeasure.p_dateTime == p_dateTime &&
+           pMeasure.p_editLock == p_editLock &&
+           pMeasure.p_ignore == p_ignore &&
+           pMeasure.p_sample == p_sample &&
+           pMeasure.p_line == p_line &&
+           pMeasure.p_diameter == p_diameter &&
+           pMeasure.p_aprioriSample == p_aprioriSample &&
+           pMeasure.p_aprioriLine == p_aprioriLine &&
+           pMeasure.p_sampleSigma ==  p_sampleSigma &&
+           pMeasure.p_lineSigma ==  p_lineSigma &&
+           pMeasure.p_sampleResidual == p_sampleResidual &&
+           pMeasure.p_lineResidual == p_lineResidual &&
+           pMeasure.p_focalPlaneMeasuredX == p_focalPlaneMeasuredX &&
+           pMeasure.p_focalPlaneMeasuredY == p_focalPlaneMeasuredY &&
+           pMeasure.p_focalPlaneComputedX == p_focalPlaneComputedX &&
+           pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY;
   }
 
 
-  PBControlNet_PBControlPoint_PBControlMeasure 
-      ControlMeasure::ToProtocolBuffer() const {
+  PBControlNet_PBControlPoint_PBControlMeasure
+  ControlMeasure::ToProtocolBuffer() const {
     PBControlNet_PBControlPoint_PBControlMeasure protoBufMeasure;
 
     protoBufMeasure.set_serialnumber(GetCubeSerialNumber());
@@ -1266,13 +1291,16 @@ namespace Isis {
     if (GetDateTime() != "") {
       protoBufMeasure.set_datetime(GetDateTime());
     }
-    if (IsEditLocked()) protoBufMeasure.set_editlock(true);
+    if (IsEditLocked())
+      protoBufMeasure.set_editlock(true);
 
-    if (IsIgnored()) protoBufMeasure.set_ignore(true);
+    if (IsIgnored())
+      protoBufMeasure.set_ignore(true);
 
-    if (IsRejected()) protoBufMeasure.set_jigsawrejected(true);
+    if (IsRejected())
+      protoBufMeasure.set_jigsawrejected(true);
 
-    if (GetSample() != 0. && GetLine() != 0. ) {
+    if (GetSample() != 0. && GetLine() != 0.) {
       PBControlNet_PBControlPoint_PBControlMeasure::PBMeasure *m = protoBufMeasure.mutable_measurement();
       m->set_sample(GetSample());
       m->set_line(GetLine());
@@ -1284,7 +1312,8 @@ namespace Isis {
       }
     }
 
-    if (GetDiameter() != Isis::Null) protoBufMeasure.set_diameter(GetDiameter());
+    if (GetDiameter() != Isis::Null)
+      protoBufMeasure.set_diameter(GetDiameter());
     if (GetAprioriSample() != Isis::Null) {
       protoBufMeasure.set_apriorisample(GetAprioriSample());
     }
@@ -1303,11 +1332,11 @@ namespace Isis {
 
 
   PBControlNetLogData_Point_Measure ControlMeasure::GetLogProtocolBuffer()
-      const {
+  const {
     PBControlNetLogData_Point_Measure protoBufLog;
     ControlMeasureLogData logDataEntry;
 
-    foreach (logDataEntry, *p_loggedData) {
+    foreach(logDataEntry, *p_loggedData) {
       *protoBufLog.add_loggedmeasuredata() = logDataEntry.ToProtocolBuffer();
     }
 

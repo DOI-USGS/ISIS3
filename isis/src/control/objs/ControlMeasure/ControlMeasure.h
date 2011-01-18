@@ -115,7 +115,7 @@ namespace Isis {
    *   @history 2010-11-03 Mackenzie Boyd Modified MeasureType to string
    *                              method, added static version. Added
    *                              method PrintableClassData.
-   *   @history 2010-11-16 Debbie Cook, Added jigsawRejected keyword. 
+   *   @history 2010-11-16 Debbie Cook, Added jigsawRejected keyword.
    *   @history 2010-11-29 Tracie Sucharski, Constructor still had initializations
    *                              in addition to the same intiializers in the
    *                              method InitializeToNull.  Also, values were
@@ -136,10 +136,10 @@ namespace Isis {
    *                              conflict with a new enumerated value,
    *                              DataField. The accessors to this class no
    *                              longer give up internal pointers.
-   *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlPoint. 
+   *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlPoint.
    */
   class ControlMeasure {
-    friend class ControlPoint;
+      friend class ControlPoint;
     public:
       /**
        * @brief Control network measurement types
@@ -167,14 +167,14 @@ namespace Isis {
        *
        */
       enum MeasureType {
-        //! // Reference Measure 
+        //! // Reference Measure
         Reference,
         //! (e.g., autoseed, interest) AKA predicted, unmeasured, unverified
         Candidate,
         //! Hand Measured (e.g., qnet)
         Manual,
         //! Registered to whole pixel (e.g.,pointreg)
-        RegisteredPixel, 
+        RegisteredPixel,
         //! Registered to sub-pixel (e.g., pointreg)
         RegisteredSubPixel,
         //! Coordinate in ground source
@@ -210,16 +210,16 @@ namespace Isis {
       ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &);
       ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &,
                      const PBControlNetLogData_Point_Measure &);
-      ControlMeasure(const ControlMeasure & other);
+      ControlMeasure(const ControlMeasure &other);
       ~ControlMeasure();
-      
-      ControlPoint * Parent() { return parentPoint; }
+
+      ControlPoint *Parent() { return parentPoint; }
 
       void Load(PvlGroup &p);
 
-      Status SetAprioriLine  (double aprioriLine);
+      Status SetAprioriLine(double aprioriLine);
       Status SetAprioriSample(double aprioriSample);
-      Status SetCamera (Isis::Camera *camera);
+      Status SetCamera(Isis::Camera *camera);
       Status SetCubeSerialNumber(iString newSerialNumber);
       Status SetChooserName();
       Status SetChooserName(iString name);
@@ -260,10 +260,10 @@ namespace Isis {
       double GetFocalPlaneMeasuredY() const;
       double GetMeasureData(iString) const;
       bool IsIgnored() const;
-      bool IsMeasured () const;
-      bool IsRegistered () const;
+      bool IsMeasured() const;
+      bool IsRegistered() const;
       bool IsStatisticallyRelevant(DataField field) const;
-      bool IsGround () const;
+      bool IsGround() const;
       double GetLine() const;
       double GetLineResidual() const;
       double GetLineSigma() const;
@@ -276,7 +276,7 @@ namespace Isis {
       MeasureType GetType() const;
       QString GetPointId() const;
 
-      void ConnectControlSN(ControlSerialNumber * sn);
+      void ConnectControlSN(ControlSerialNumber *sn);
       void DisconnectControlSN();
 
       static QVector<iString> GetMeasureDataNames();
@@ -287,7 +287,7 @@ namespace Isis {
       static iString MeasureTypeToString(MeasureType type);
       iString MeasureTypeString() const;
 
-      const ControlMeasure & operator=(const ControlMeasure & other);
+      const ControlMeasure &operator=(const ControlMeasure &other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
       bool operator == (const Isis::ControlMeasure &pMeasure) const;
 
@@ -300,9 +300,9 @@ namespace Isis {
       void MeasureModified();
 
     private: // data
-      ControlPoint * parentPoint; //!< Pointer to parent ControlPoint, may be null
-      ControlSerialNumber * associatedSN; //!< Pointer to the Serial Number
-                                          // structure connecting measures in an image
+      ControlPoint *parentPoint;  //!< Pointer to parent ControlPoint, may be null
+      ControlSerialNumber *associatedSN;  //!< Pointer to the Serial Number
+      // structure connecting measures in an image
 
       iString *p_serialNumber;
       MeasureType p_measureType;
@@ -316,17 +316,17 @@ namespace Isis {
        */
       iString *p_chooserName;
       iString *p_dateTime;
-      bool p_editLock;        //!< If true do not edit anything in measure. 
+      bool p_editLock;        //!< If true do not edit anything in measure.
       bool p_ignore;
       bool p_jigsawRejected;  //!< Status of measure for last bundle adjust iteration
       double p_sample;        //!< Current sample/line measurement
       double p_line;          //!< Jigsaw uses this measure
       double p_diameter;
 
-      double p_aprioriSample;   //!< The first identified location of the 
+      double p_aprioriSample;   //!< The first identified location of the
       double p_aprioriLine;     //!< measure by autoseed.  Pointreg/Interest
-                                //!< always use this location to start it's search.
-                                //!< Could be moved by interest program or user.
+      //!< always use this location to start it's search.
+      //!< Could be moved by interest program or user.
 
 
       double p_computedEphemerisTime;
@@ -336,7 +336,7 @@ namespace Isis {
       double p_sampleResidual; //!< Jigsaw information - Solution error - replaces p_sampleError
       double p_lineResidual;   //!< Jigsaw information - Solution error - replaces p_lineError
       Isis::Camera *p_camera;
-      double p_focalPlaneMeasuredX; 
+      double p_focalPlaneMeasuredX;
       double p_focalPlaneMeasuredY;
       double p_focalPlaneComputedX;
       double p_focalPlaneComputedY;
