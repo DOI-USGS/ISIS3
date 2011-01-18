@@ -11,7 +11,7 @@ using namespace std;
 int giDefault = 0;
 
 void TestIn(int iss, int isl, int isb, int ins = 0, int inl = 0, int inb = 0);
-void TestOut(int piSamples, int piLines, int piBands, int piOffset);
+void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriority);
 
 /**
  * Display the contents of Input image with starting and number of
@@ -37,7 +37,7 @@ void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   if(inl == 0) inl = cInCube.Lines()   - isl + 1;
   if(inb == 0) inb = cInCube.Bands()   - isb + 1 ;
 
-  printf("Stats %d, %d, %d, %d, %d, %d\n", iss, isl, isb, ins, inl, inb);
+  printf("Stats %d, %d, %d, %d, %d, %d\n", isl, iss, isb, inl, ins, inb);
 
   int iS;
   Isis::Portal ciPortal(ins, 1, cInCube.PixelType());
@@ -50,7 +50,7 @@ void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
         if(iPixel == 5) {
           cout << endl;
         }
-        printf("(%d,%d,%d)=%-11d  ", iS++, line, band, (int)ciPortal[iPixel]);
+        printf("(%d,%d,%d)=%-11d  ", line, iS++, band, (int)ciPortal[iPixel]);
       }
       cout << "\n";
     }
@@ -69,38 +69,47 @@ void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
  * @param isl  - input starting line
  * @param isb  - input starting band
  */
-void TestOut(int piSamples, int piLines, int piBands, int piOffset) {
+void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriority) {
   int iFileIndex;
 
   Isis::Cube cOutCube;
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
-  string sTo = ui.GetFilename("TO");
+  string sTo;
+  if (piPriority == Isis::ProcessMosaic::average)
+    sTo = ui.GetFilename("TO_AVG");
+  else
+    sTo = ui.GetFilename("TO");
   cOutCube.Open(sTo);
 
+  int iBands=cOutCube.Bands();
+  
   cout << "\n***  Mosaic Image  ***  ";
-  printf("Start Stats %d, %d, %d\n", piSamples, piLines, piBands);
+  printf("Start Stats %d, %d, %d\nTotal Bands=%d\n", piLines, piSamples, piBands, iBands);
   Isis::Portal coPortal(5, 1, cOutCube.PixelType());
-  for(int band = piBands; band <= 3; band = 3) {
+  int band = piBands;
+  while(band <= iBands) {
     for(int line = 1; line <= 5; line++) {
       coPortal.SetPosition(1, line, band);  //sample, line, band position
       cOutCube.Read(coPortal);
       for(int iPixel = 0; iPixel < coPortal.size(); iPixel++) {
         iFileIndex = 0;
-        if(band == 3 && coPortal[iPixel] != giDefault) {
+        if(piPriority != Isis::ProcessMosaic::average && band == 3 && coPortal[iPixel] != giDefault) {
           iFileIndex = (int)coPortal[iPixel] - piOffset + 1;
         }
-        if(band == 3) { //origin band
-          printf("(%d,%d,%d)=%-9d,%-1d  ", (iPixel + 1), line, band, (int)coPortal[iPixel], iFileIndex);
+        if(band == 3 && piPriority != Isis::ProcessMosaic::average) { //origin band
+          printf("(%d,%d,%d)=%-9d,%-1d  ", line, (iPixel + 1), band, (int)coPortal[iPixel], iFileIndex);
         }
         else
-          printf("(%d,%d,%d)=%-11d  ", (iPixel + 1), line, band, (int)coPortal[iPixel]);
+          printf("(%d,%d,%d)=%-11d  ", line, (iPixel + 1), band, (int)coPortal[iPixel]);
       }
       cout << "\n";
     }
     cout << "\n";
-    if(band == 3) {
-      return;
+    band++;
+    if(band > iBands) {
+      break;
     }
+    band = (piPriority == Isis::ProcessMosaic::average ? 2 : 3);
   }
   cOutCube.Close();
 }
@@ -123,7 +132,7 @@ void IsisMain() {
 
   cout << "Testing Isis::ProcessMosaic Class ... " << endl;
 
-  // Create the temp parent cube
+  // Create the default output cube
   Isis::Process p;
   p.SetOutputCube("TO", 5, 5, 3);
   p.EndProcess();
@@ -135,7 +144,7 @@ void IsisMain() {
   Isis::ProcessMosaic m1;
   m1.SetTrackFlag(true);
   m1.SetCreateFlag(true);
-  m1.SetPriority(input);
+  m1.SetPriority(Isis::ProcessMosaic::input);
 
   m1.SetInputCube("FROM", 1, 1, 1, 10, 5, 1);
 
@@ -166,7 +175,7 @@ void IsisMain() {
   m1.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(2, 2, 1, iDefault);
+  TestOut(2, 2, 1, iDefault, Isis::ProcessMosaic::input);
 
   remove("isisMosaic_01.cub");
 
@@ -179,7 +188,7 @@ void IsisMain() {
   Isis::ProcessMosaic m2;
   m2.SetTrackFlag(false);
   m2.SetCreateFlag(true);
-  m2.SetPriority(input);
+  m2.SetPriority(Isis::ProcessMosaic::input);
 
   m2.SetInputCube("FROM", 2, 2, 1);
 
@@ -191,7 +200,7 @@ void IsisMain() {
   m2.EndProcess();
 
   TestIn(2, 2, 1, 5, 5, 1);
-  TestOut(4, 4, 2, iDefault);
+  TestOut(4, 4, 2, iDefault, Isis::ProcessMosaic::input);
   remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
 
@@ -201,7 +210,7 @@ void IsisMain() {
   Isis::ProcessMosaic m3;
   m3.SetTrackFlag(true);
   m3.SetCreateFlag(true);
-  m3.SetPriority(mosaic);
+  m3.SetPriority(Isis::ProcessMosaic::mosaic);
 
   m3.SetInputCube("FROM", 3, 3, 1, 10, 1, 1);
 
@@ -213,7 +222,7 @@ void IsisMain() {
   m3.EndProcess();
 
   TestIn(3, 3, 1, 5, 5, 1);
-  TestOut(5, 1, 1, iDefault);
+  TestOut(5, 1, 1, iDefault, Isis::ProcessMosaic::mosaic);
 
   remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
@@ -224,7 +233,7 @@ void IsisMain() {
   Isis::ProcessMosaic m4;
   m4.SetTrackFlag(true);
   m4.SetCreateFlag(true);
-  m4.SetPriority(mosaic);
+  m4.SetPriority(Isis::ProcessMosaic::mosaic);
 
   m4.SetInputCube("FROM", 1, 1, 1, 3, 3, 1);
 
@@ -236,7 +245,7 @@ void IsisMain() {
   m4.EndProcess();
 
   TestIn(1, 1, 1, 3, 3, 1);
-  TestOut(1, 1, 1, iDefault);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::mosaic);
 
   //remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
@@ -246,7 +255,7 @@ void IsisMain() {
   Isis::ProcessMosaic m5;
   //m5.SetTrackFlag (true);
   //m5.SetCreateFlag(false);
-  m5.SetPriority(mosaic);
+  m5.SetPriority(Isis::ProcessMosaic::mosaic);
 
   m5.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
 
@@ -256,7 +265,7 @@ void IsisMain() {
   m5.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(1, 2, 1, iDefault);
+  TestOut(1, 2, 1, iDefault, Isis::ProcessMosaic::mosaic);
 
   cout << "************************************************************************************************\n";
 
@@ -267,7 +276,7 @@ void IsisMain() {
   Isis::ProcessMosaic m6;
   m6.SetTrackFlag(true);
   m6.SetCreateFlag(true);
-  m6.SetPriority(band);
+  m6.SetPriority(Isis::ProcessMosaic::band);
   m6.SetBandKeyWord("FilterName", "red");
   m6.SetBandCriteria(Greater);
 
@@ -281,7 +290,7 @@ void IsisMain() {
   m6.EndProcess();
 
   TestIn(3, 3, 1, 10, 1, 1);
-  TestOut(1, 1, 1, iDefault);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::band);
 
   cout << "************************************************************************************************\n";
 
@@ -289,7 +298,7 @@ void IsisMain() {
   Isis::ProcessMosaic m7;
   m7.SetTrackFlag(true);
   m7.SetCreateFlag(false);
-  m7.SetPriority(band);
+  m7.SetPriority(Isis::ProcessMosaic::band);
   m7.SetBandKeyWord("OriginalBand", "1");
   m7.SetBandCriteria(Lesser);
   m7.SetHighSaturationFlag(false) ;
@@ -306,7 +315,7 @@ void IsisMain() {
   m7.EndProcess();
 
   TestIn(1, 1, 1, 10, 1, 1);
-  TestOut(1, 1, 1, iDefault);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::band);
 
   //remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
@@ -317,7 +326,7 @@ void IsisMain() {
   Isis::ProcessMosaic m8;
   m8.SetTrackFlag(true);
   m8.SetCreateFlag(true);
-  m8.SetPriority(band);
+  m8.SetPriority(Isis::ProcessMosaic::band);
   m8.SetBandNumber(1);
   m8.SetBandCriteria(Lesser);
   m8.SetHighSaturationFlag(true) ;
@@ -334,16 +343,15 @@ void IsisMain() {
   m8.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(1, 3, 1, iDefault);
+  TestOut(1, 3, 1, iDefault, Isis::ProcessMosaic::band);
 
   cout << "************************************************************************************************\n";
-
+  
   // ***********************************************************
   // Test for HS value set with existing mosaic
   cout << "9. Test for Null flag set with existing mosaic\n";
   Isis::ProcessMosaic m9;
-  //m9.SetTrackFlag (true);
-  m9.SetPriority(band);
+  m9.SetPriority(Isis::ProcessMosaic::band);
   m9.SetBandNumber(1);
   m9.SetBandCriteria(Greater);
   m9.SetHighSaturationFlag(false) ;
@@ -351,15 +359,48 @@ void IsisMain() {
   m9.SetNullFlag(true) ;
 
   m9.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
-
   m9.SetOutputCube("TO");
 
   m9.StartProcess(1, 2, 1);
   m9.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(1, 2, 1, iDefault);
+  TestOut(1, 2, 1, iDefault, Isis::ProcessMosaic::band);
+  
+  //remove("isisMosaic_01.cub");
+  
+  // ***********************************************************
+  // Test Average Priority
+  cout << "\n10. Test Average Priority" << endl;
+  // Create the default output cube
+  p.SetOutputCube("TO_AVG", 5, 5, 2);
+  p.EndProcess();
 
+  Isis::ProcessMosaic m10;
+  m10.SetTrackFlag(false);
+  m10.SetPriority(Isis::ProcessMosaic::average);
+  m10.SetCreateFlag(true);
+
+  m10.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
+  m10.SetOutputCube("TO_AVG");
+  m10.StartProcess(1, 1, 1);
+  m10.EndProcess();
+  TestIn(1, 1, 1, 5, 5, 1);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::average);
+
+  m10.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
+  m10.SetOutputCube("TO_AVG");
+  m10.SetTrackFlag(false);
+  m10.SetPriority(Isis::ProcessMosaic::average);
+  m10.SetCreateFlag(false);
+
+  m10.StartProcess(-1, -1, 1);
+  m10.EndProcess();
+
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::average);
+  remove("isisMosaic_02.cub");
+
+  cout << "****** End Average **********************\n";
   // ***********************************************************
   // Testing Errors
 
@@ -461,7 +502,7 @@ void IsisMain() {
   try {
     Isis::ProcessMosaic m;
     m.SetTrackFlag(false);
-    m.SetPriority(band);
+    m.SetPriority(Isis::ProcessMosaic::band);
     m.SetBandNumber(1);
 
     m.SetOutputCube("TO");
@@ -481,7 +522,7 @@ void IsisMain() {
   try {
     Isis::ProcessMosaic m;
     m.SetTrackFlag(true);
-    m.SetPriority(band);
+    m.SetPriority(Isis::ProcessMosaic::band);
     m.SetBandNumber(10);
 
     m.SetOutputCube("TO");
@@ -495,7 +536,6 @@ void IsisMain() {
     p.EndProcess();
     cout << endl;
   }
-
   remove("isisMosaic_01.cub");
 }
 

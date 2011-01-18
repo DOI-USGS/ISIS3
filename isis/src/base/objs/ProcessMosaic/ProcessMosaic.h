@@ -24,14 +24,7 @@
 
 #include "Process.h"
 #include "Buffer.h"
-/**
- * Enumeration for different Mosaic priorities 
- * (input, mosaic, band) 
- */
-enum MosaicPriority {
-  input, mosaic, band
-};
-
+#include "Portal.h"
 /**
  * Enumeration for BandCriteria 
  * Band to be compared must be greater/lesser than 
@@ -51,7 +44,19 @@ namespace Isis {
    * together. The application sets the position where input (child) cube will be
    * placed in the mosaic (parent) cube and priority. The Mosaic object will merge
    * the overlapping area.
-   *
+   *  
+   * The process has four priorities (input, mosaic, band, average) for how the input 
+   * image has to be placed on the mosaic. Priority "input" will place the input image 
+   * on top of the mosaic. Priority "mosaic" will place the input image beneath the 
+   * mosaic. Priority "band" will place the input image on the mosaic based on the 
+   * "Lessser" or "Greater" criteria between user defined band in the input and the 
+   * mosaic images. Priority Average will average of valid pixels in the input and 
+   * mosaic images. Choosing this priority will cause the mosaic to have twice the 
+   * number of bands of the input image,with a count band for each band. The count 
+   * band keeps track of number of images involved in the dn value of the mosaic. 
+   * In case of special pixels and the special pixel flags being enabled, the details 
+   * for each priority is described below.
+   *  
    * This class also has the ability to track the origin of the pixel by storing
    * the input image names in a table and assigning an index to each unique image
    * in the order they were placed on the mosaic. If the priority is input or mosaic
@@ -95,7 +100,7 @@ namespace Isis {
    *  T OR  T OR  T     S      S,V     I(H,L,N)
    *
    *
-   * For priority=band,  following is the criteria for pixel assignment:
+   * For priority=band, following is the criteria for pixel assignment:
    * -----------------------------------------------------
    * ---Options---   ---Images----
    * HS    LS  NULL  Input  Mosaic  Output
@@ -107,7 +112,20 @@ namespace Isis {
    *  T OR T OR  T     V      V      Criteria based
    *  T OR T OR  T     V      S      I
    *
-   *
+   * For priority=average, following is the criteria for pixel assignment:
+   * -----------------------------------------------------
+   * ---Options---   ---Images----
+   * HS    LS  NULL  Input  Mosaic  Output       Count
+   * -----------------------------------------------------
+   *  F    F     F     V      V      Average     count++
+   *  F    F     F     V      S      I            1
+   *  F    F     F     S      S      M            0
+   *  F    F     F     S      V      M           count
+   *  T OR T OR  T     S      S,V    I(H,L,N)     0
+   *  T OR T OR  T     V      V      Average     count++
+   *  T OR T OR  T     V      S      I            1
+   *  
+   *  
    *
    * @ingroup HighLevelCubeIO
    *
@@ -140,7 +158,9 @@ namespace Isis {
    *  @history 2010-02-25 Sharmila Prasad - Changed stricmp to use iString function "Equal"
    *  @history 2010-10-21 Sharmila Prasad - The BandBin group must be carried thru to the mosaic
    *                                        at creation time regardless of matchbandbin flag
-   *
+   *  @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature, to double
+   *           the number of mosaic bands to get Count info
+   *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */
@@ -172,15 +192,19 @@ namespace Isis {
 
     public:
 
+      /**
+       * Enumeration for different Mosaic priorities 
+       * (input, mosaic, band) 
+       */
+      enum MosaicPriority {
+        input, mosaic, band, average
+      };
+
       //! Constructs a Mosaic object
       ProcessMosaic();
 
       //!  Destroys the Mosaic object. It will close all opened cubes.
       ~ProcessMosaic();
-
-      //! Line Processing method for one input and output cube
-      void StartProcess(const int &outputSample, const int &outputLine,
-                        const int &outputBand, const MosaicPriority &priority);
 
       //! Line Processing method for one input and output cube
       void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
@@ -237,6 +261,11 @@ namespace Isis {
       //! Checks for the table with name "InputImage"
       bool GetTrackStatus(void);
 
+      //! Get the set Priority
+      MosaicPriority GetPriority(void){
+        return mePriority;
+      };
+      
       //! New mosaic, add the Band Bin group specific to the mosaic
       void AddBandBinGroup(int piIsb, int piOsb);
 
@@ -245,30 +274,35 @@ namespace Isis {
 
       //! Mosaic exists, match the band with the input image
       void MatchBandBinGroup(const int piIsb, const int piOsb, int &piInb);
+      
+      //! Process average priority
+      bool ProcessAveragePriority(int piPixel, Portal& pInPortal, Portal& pOutPortal, Portal& pOrigPortal);
 
+      //! Reset all the count bands to default at the time of creation
+      void ResetCountBands(void);
       /** 
        * Get/Set HS,LS, NULL Flags. If set true and if the input image has a
        * Special Pixel then it is copied to the mosaic irrespective of any 
        * condition. Not supported in mosaic priority
        */ 
        void SetHighSaturationFlag(bool pbFlag) {
-        mbHighSat = pbFlag;
-      } ;
-      void SetLowSaturationFlag(bool pbFlag) {
-        mbLowSat  = pbFlag;
-      } ;
-      void SetNullFlag(bool pbFlag) {
-        mbNull    = pbFlag;
-      } ;
-      bool GetHighSaturationFlag(void) {
-        return mbHighSat;
-      } ;
-      bool GetLowSaturationFlag(void) {
-        return mbLowSat;
-      }  ;
-      bool GetNullFlag(void) {
-        return mbNull;
-      }    ;
+         mbHighSat = pbFlag;
+       } ;
+       void SetLowSaturationFlag(bool pbFlag) {
+         mbLowSat  = pbFlag;
+       } ;
+       void SetNullFlag(bool pbFlag) {
+         mbNull    = pbFlag;
+       } ;
+       bool GetHighSaturationFlag(void) {
+         return mbHighSat;
+       } ;
+       bool GetLowSaturationFlag(void) {
+         return mbLowSat;
+       };
+       bool GetNullFlag(void) {
+         return mbNull;
+       };
 
       //! Set the priority input, mosaic, band
       void SetPriority(MosaicPriority pePriority) {
@@ -287,7 +321,7 @@ namespace Isis {
        * Flag to indicate to the Process that the mosaic is being newly created
        * Indication that the new label specific to the mosaic needs to be created.
        */ 
-       void SetCreateFlag(bool pbFlag) {
+      void SetCreateFlag(bool pbFlag) {
         mtTrackInfo.bCreate  = pbFlag;
       };
 

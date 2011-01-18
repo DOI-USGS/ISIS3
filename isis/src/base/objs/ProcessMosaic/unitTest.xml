@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://astrogeology.usgs.gov/Projects/IsisXML/Schemas/Application/application.xsd">
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:noNamespaceSchemaLocation="http://astrogeology.usgs.gov/Projects/IsisXML/Schemas/Application/application.xsd">
   <brief>
     Unit test for IsisMosaic class
   </brief>
@@ -48,6 +49,21 @@
           *.cub
         </filter>
         <default><item>isisMosaic_01.cub</item></default>
+      </parameter>
+      <parameter name="TO_AVG">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>Real</pixelType>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>isisMosaic_02.cub</item></default>
       </parameter>
     </group>
   </groups>
