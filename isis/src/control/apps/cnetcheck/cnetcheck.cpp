@@ -94,14 +94,14 @@ void IsisMain() {
   // Loop through all control points in control net
   for(int cp = 0; cp < innet.GetNumPoints(); cp ++) {
     if(ignore && innet.GetPoint(cp)->IsIgnored()) continue;
-    ControlPoint * controlpt = innet.GetPoint(cp);
+    ControlPoint *controlpt = innet.GetPoint(cp);
 
     // Checks for lat/Lon production
     if(ui.GetBoolean("NOLATLON")) {
 
       // Loop through all control measures in control points
       for(int cm = 0; cm < controlpt->GetNumMeasures(); cm ++) {
-        ControlMeasure * controlms = controlpt->GetMeasure(cm);
+        ControlMeasure *controlms = controlpt->GetMeasure(cm);
 
         // If we have the cube, check it out
         if(num2cube.HasSerialNumber(controlms->GetCubeSerialNumber())) {
@@ -146,7 +146,7 @@ void IsisMain() {
       // Checks for duplicate Measures for the same SerialNumber
       QVector<ControlMeasure *> controlMeasures;
       for(int cm = 0; cm < controlpt->GetNumMeasures(); cm ++) {
-        ControlMeasure * controlms = controlpt->GetMeasure(cm);
+        ControlMeasure *controlms = controlpt->GetMeasure(cm);
 
         if(ignore  &&  controlms->IsIgnored()) continue;
 
@@ -420,7 +420,7 @@ QMap< iString, std::set<iString> > constructPointSets(std::set<iString> & index,
 
   bool ignore = Application::GetUserInterface().GetBoolean("IGNORE");
   for(int cp = 0; cp < innet.GetNumPoints(); cp++) {
-    ControlPoint * controlpt = innet.GetPoint(cp);
+    ControlPoint *controlpt = innet.GetPoint(cp);
 
     if(ignore && controlpt->IsIgnored()) continue;
 
@@ -449,7 +449,7 @@ QMap< iString, std::set<iString> > constructPointSets(std::set<iString> & index,
 
 // Uses a depth-first search to construct the islands
 QVector< std::set<iString> > findIslands(std::set<iString> & index,
-                                     QMap< iString, std::set<iString> > adjCubes) {
+    QMap< iString, std::set<iString> > adjCubes) {
   QVector< std::set<iString> > islands;
 
   while(index.size() != 0) {
