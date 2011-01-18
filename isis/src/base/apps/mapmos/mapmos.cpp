@@ -21,6 +21,39 @@ void IsisMain() {
   // Gets the input file along with attributes
   string sInputFile = ui.GetAsString("FROM");
   
+  // Set up the mosaic priority, either the input cube will be
+  // placed ontop of the mosaic or beneath it
+  ProcessMapMosaic::MosaicPriority priority;
+  string sType;
+  if(ui.GetString("PRIORITY") == "BENEATH") {
+    priority = ProcessMapMosaic::mosaic;
+  }
+  else if(ui.GetString("PRIORITY") == "ONTOP") {
+    priority = ProcessMapMosaic::input;
+  }
+  else if(ui.GetString("PRIORITY") == "AVERAGE") {
+    priority = ProcessMapMosaic::average;
+  }
+  else {
+    priority = ProcessMapMosaic::band;
+    sType = ui.GetString("TYPE");
+    if(sType == "BANDNUMBER") {
+      m.SetBandNumber(ui.GetInteger("NUMBER"));
+    }
+    else {
+      // Key Name & Value
+      m.SetBandKeyWord(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
+    }
+    // Band Criteria
+    BandCriteria eCriteria = Lesser;
+    if(ui.GetString("CRITERIA") == "GREATER")
+      eCriteria = Greater;
+    m.SetBandCriteria(eCriteria);
+  }
+
+  // Set priority
+  m.SetPriority(priority);
+  
   // Get the output projection set up properly
   if(ui.GetBoolean("CREATE")) {
     Cube inCube;
@@ -45,42 +78,11 @@ void IsisMain() {
   else {
     m.SetOutputCube(ui.GetFilename("MOSAIC"));
   }
+
   
-  // Set up the mosaic priority, either the input cube will be
-  // placed ontop of the mosaic or beneath it
-  MosaicPriority priority;
-  string sType;
-  if(ui.GetString("PRIORITY") == "BENEATH") {
-    priority = mosaic;
-  }
-  else if(ui.GetString("PRIORITY") == "ONTOP") {
-    priority = input;
-  }
-  else {
-    priority = band;
-    sType = ui.GetString("TYPE");
-    if(sType == "BANDNUMBER") {
-      m.SetBandNumber(ui.GetInteger("NUMBER"));
-    }
-    else {
-      // Key Name & Value
-      m.SetBandKeyWord(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
-    }
-    // Band Criteria
-    BandCriteria eCriteria = Lesser;
-    if(ui.GetString("CRITERIA") == "GREATER")
-      eCriteria = Greater;
-    m.SetBandCriteria(eCriteria);
-  }
-
-  // Set priority
-  m.SetPriority(priority);
-
-  if(priority == input || priority == band) {
-    m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
-    m.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
-    m.SetNullFlag(ui.GetBoolean("NULL"));
-  }
+  m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
+  m.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
+  m.SetNullFlag(ui.GetBoolean("NULL"));
 
   // Start Process
   if(!m.StartProcess(sInputFile)) {

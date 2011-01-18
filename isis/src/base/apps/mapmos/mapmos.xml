@@ -10,6 +10,9 @@
     .td {
       padding-left: 20px; width:70px; align:center;
     }
+    .td1 {
+      padding-left: 5px; width:70px; align:left;
+    }
     </style></head><body> <font size="2" face="Verdana">
     <p>
       This program allows the user to create a mosaic using map projected cubes.  An individual cube can be placed in a pre-existing mosaic.  
@@ -18,6 +21,19 @@
         and LongitudeDirection as well as projection specific keywords (e.g., CenterLatitude, CenterLongitude). This application regardless of any 
         priority and flags set, will always place an input pixel on a NULL mosaic  pixel. This application  also has the ability to track the pixel origin. 
     </p>
+    <p>There are four different ways/priorities (input, mosaic, band, average) 
+    for how the input image has to be placed on the mosaic. Priority "input" 
+   will place the input image on top of the mosaic. Priority "mosaic" will 
+   place the input image beneath the mosaic. Priority "band" will place the 
+   input image on the mosaic based on the "Lessser" or "Greater" criteria 
+   between user defined band in the input and the mosaic images. Priority 
+   Average will average of valid pixels in the input and mosaic images. 
+   Choosing this priority will cause the mosaic to have twice the number of 
+   bands of the input image, with a count band for each band. The count band 
+   keeps track of number of images involved in the dn value of the mosaic. In 
+   case of special pixels and the special pixel flags being enabled, the details 
+   for each priority is described below.
+   </p>
     <p> Tracking can be set at the time of Mosaic creation
       only and cannot be turned on after the mosaic is created. But the tracking
       will be turned off for multiband ONTOP and BENEATH priority even though it 
@@ -132,6 +148,23 @@
           <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td">T </td><td class="td">V</td><td class="td">V</td><td class="td">Criteria based</td></tr>
           <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td"> T </td><td class="td">V</td><td class="td"> S</td><td class="td">I</td></tr>
        </table></td></tr> </table>
+       <table cellspacing="0" cellpadding="1" border="0"> 
+        <tr><th colspan="3" align="center"><u> Priority Average</u></th></tr>
+        <tr height="15"><th colspan="3"></th></tr>
+        <tr><td class="td"><img src="assets/Average.jpg" alt="Priority Average" />  
+        </td><td class="td"></td>
+        <td class="td"><table cellspacing="0" cellpadding="0" border="1" width="400">
+          <tr><th colspan="7" align="center"> AVERAGE</th></tr>
+          <tr><th colspan="3" align="center">Options</th><th colspan="4" align="center">Images</th></tr>
+          <tr><th>HS</th><th>LS</th><th>NULL</th><th>Input</th><th>Mosaic</th><th>Output</th><th>Count</th></tr>
+        <tr><td class="td">F</td><td class="td"> F</td><td class="td"> F</td><td class="td">V</td><td class="td"> V</td><td class="td1">Average</td><td class="td1">count++</td></tr> 
+        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">V</td><td class="td">S</td><td class="td">I</td><td class="td">1</td></tr>
+        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">S</td><td class="td">S</td><td class="td">M</td><td class="td">0</td></tr> 
+        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">S</td><td class="td">V</td><td class="td">M</td><td class="td1">count</td></tr>
+        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">S</td><td class="td">S,V</td><td class="td">I</td><td class="td">0</td></tr>
+        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">V</td><td class="td">V</td><td class="td1">Average</td><td class="td1">count++</td></tr>
+        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">V</td><td class="td">S</td><td class="td">I</td><td class="td">1</td></tr>
+        </table></td></tr> </table><li />
    </font>
    </body></html>
   </description>
@@ -189,6 +222,10 @@
     </change>
     <change name="Sharmila Prasad" date="2010-10-27">Process Input File 
       Attributes</change>
+    <change name="Sharmila Prasad" date="2011-01-19">
+      Added "AVERAGE" priority where the mosaic will be average of valid input 
+      and mosaic pixels.
+    </change>
   </history>
 
   <oldName>
@@ -282,6 +319,24 @@
               <item>TYPE</item>
               <item>CRITERIA</item>
            </inclusions>
+          </option>
+          <option value="AVERAGE">
+            <brief>Average of valid input and the mosaic pixels</brief>
+            <description>
+              If the Input and Mosaic pixels are valid then the output will be 
+              the average of the 2 values. A count band is created for each 
+              corresponding band in the mosaic and holds the count of the 
+              images corresponding to the Average DN value of each pixel in the 
+              mosaic .
+            </description>
+            <exclusions>
+              <item>TYPE</item>
+              <item>CRITERIA</item>
+              <item>NUMBER</item>
+              <item>KEYNAME</item>
+              <item>KEYVALUE</item>
+              <item>TRACK </item>
+           </exclusions>
           </option>
         </list>
       </parameter>
@@ -419,7 +474,7 @@
             If selected the application will track the mosaic origin. Once 
             origin is tracked, the tracker cannot be turned off.
           </description>
-        </parameter>
+      </parameter>
 
       <parameter name="MINLAT">
         <type>double</type>
