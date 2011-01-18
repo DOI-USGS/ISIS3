@@ -28,23 +28,23 @@ using namespace std;
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
- 
+
 namespace Isis {
   class ControlNet;
   class ControlPoint;
   class ControlMeasure;
 
-  #define TOTAL_FILTERS 12
+#define TOTAL_FILTERS 12
 
   /**
    * @brief Filter Control Network
    *
-   * This class is used to filter Control Network based on 
-   * different options 
+   * This class is used to filter Control Network based on
+   * different options
    *
    * @ingroup ControlNetwork
    *
-   * @author 2010-08-10 Sharmila Prasad 
+   * @author 2010-08-10 Sharmila Prasad
    *
    * @see ControlNetwork ControlPoint ControlMeasure
    *
@@ -58,65 +58,67 @@ namespace Isis {
    *  @history 2010-10-04 Sharmila Prasad - Use iString's Token method instead of ParseExpression
    *  @history 2010-10-15 Sharmila Prasad - Display error on bad filter values
    *  @history 2010-11-09 Sharmila Prasad - Point_MeasureProperties,process 'All' measuretype
-   *  
+   *  @history 2011-01-17 Eric Hyer - Fixed breakages caused by ControlNet api
+   *                          changes
+   *
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
       //! Constructor
-      ControlNetFilter(ControlNet *pCNet, string & psSerialNumFile, Progress *pProgress=0);
-      
+      ControlNetFilter(ControlNet *pCNet, string &psSerialNumFile, Progress *pProgress = 0);
+
       //! Destructor
       ~ControlNetFilter();
 
       // Point Filters
       //! Filter Points by Error Magnitude
-      void PointErrorFilter            (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void PointErrorFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Points by Point ID Expression
-      void PointIDFilter               (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void PointIDFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Points by Number of measures
-      void PointMeasuresFilter         (const PvlGroup & pvlGrp, bool pbLastFilter); 
-      
+      void PointMeasuresFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Points by properties
-      void PointPropertiesFilter       (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void PointPropertiesFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Points by Lat Lon Range
-      void PointLatLonFilter           (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void PointLatLonFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Points by distance between points
-      void PointDistanceFilter         (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void PointDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Points by Measure properties
-      void PointMeasurePropertiesFilter(const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void PointMeasurePropertiesFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Points by Cube names
-      void PointCubeNamesFilter        (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void PointCubeNamesFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Standard Point stats Header
-      void PointStatsHeader            (void);
-      
+      void PointStatsHeader(void);
+
       //! Standard Point Stats
-      void PointStats                  (const ControlPoint & pcPoint);
-      
+      void PointStats(const ControlPoint &pcPoint);
+
       // Cube Filters
       //! Filter Cubes by Cube name expression
-      void CubeNameExpressionFilter (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void CubeNameExpressionFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Cubes by number of points in the cube
-      void CubeNumPointsFilter      (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void CubeNumPointsFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Filter Cubes by Distance between points in a Cube
-      void CubeDistanceFilter       (const PvlGroup & pvlGrp, bool pbLastFilter);
-      
+      void CubeDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
       //! Print the standard cube stats Header
-      void CubeStatsHeader          (void);
-      
-      //! Set the output print file 
-      void SetOutputFile   (string psPrintFile);
-      
-      void PrintCubeFileSerialNum(const ControlMeasure & pcMeasure);
-      
+      void CubeStatsHeader(void);
+
+      //! Set the output print file
+      void SetOutputFile(string psPrintFile);
+
+      void PrintCubeFileSerialNum(const ControlMeasure &pcMeasure);
+
     private:
       ofstream mOstm;                     //!< output stream for printing to output file
       SerialNumberList mSerialNumFilter;  //!< Serial Number List file
