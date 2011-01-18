@@ -112,7 +112,7 @@ namespace Qisis {
       //items[k]->update();
     }
 
-    Isis::ControlPoint *controlPoint = cn->Find(pointId.toStdString());
+    Isis::ControlPoint *controlPoint = cn->GetPoint(pointId);
     QString type = "no type";
 
     QString ptType = controlPoint->GetPointTypeString();
@@ -131,18 +131,18 @@ namespace Qisis {
 
     QString serialNumbers;
     QList<MosaicItem *> measureItems;
-    for(int m = 0; m < controlPoint->Size(); m++) {
+    for(int m = 0; m < controlPoint->GetNumMeasures(); m++) {
       serialNumbers.append("\nControl Measure ");
       serialNumbers.append(QString::number(m + 1));
       serialNumbers.append(" Serial #:  ");
-      serialNumbers.append(QString::fromStdString((*controlPoint)[m].GetCubeSerialNumber()));
+      serialNumbers.append((*controlPoint)[m]->GetCubeSerialNumber());
 
       //------------------------------------------------------------------------
       // If the Mosaic Item is one of the control point's measures, then we want
       // to set that item's transparency to 255 and the others to 120.
       //------------------------------------------------------------------------
       for(int n = 0; n < items.size(); n++) {
-        if((*controlPoint)[m].GetCubeSerialNumber().compare(items[n]->serialNumber()) == 0) {
+        if((*controlPoint)[m]->GetCubeSerialNumber().compare(items[n]->serialNumber()) == 0) {
           measureItems.push_back(items[n]);
         }
       }
@@ -161,7 +161,7 @@ namespace Qisis {
     }
 
     p_pointInfoDialog->setText("Point ID: " + pointId
-                               + "\nNumber of Measures: " + QString::number(controlPoint->Size())
+                               + "\nNumber of Measures: " + QString::number(controlPoint->GetNumMeasures())
                                + serialNumbers +
                                + "\nPoint Type: " + type);
 
