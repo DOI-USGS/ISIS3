@@ -38,33 +38,25 @@ void IsisMain() {
   // Get the Track Flag
   bool bTrack = ui.GetBoolean("TRACK");
   m.SetTrackFlag(bTrack);
-
-  CubeAttributeOutput &oAtt = ui.GetOutputAttribute("MOSAIC");
-  if(ui.GetString("GRANGE") == "USER") {
-    m.SetOutputCube(list,
-                    ui.GetDouble("MINLAT"), ui.GetDouble("MAXLAT"),
-                    ui.GetDouble("MINLON"), ui.GetDouble("MAXLON"),
-                    oAtt, ui.GetFilename("MOSAIC"));
-  }
-  else {
-    m.SetOutputCube(list, oAtt, ui.GetFilename("MOSAIC"));
-  }
-
+  
   // Set up the mosaic priority, either the input cubes will be
   // placed ontop of each other in the mosaic or beneath each other or
   // placed based on band with "Lesser" or "Greater" criteria
   // Set up the mosaic priority, either the input cube will be
   // placed ontop of the mosaic or beneath it
-  MosaicPriority priority;
+  ProcessMapMosaic::MosaicPriority priority;
   string sType;
   if(ui.GetString("PRIORITY") == "BENEATH") {
-    priority = mosaic;
+    priority = ProcessMapMosaic::mosaic;
   }
   else if(ui.GetString("PRIORITY") == "ONTOP") {
-    priority = input;
+    priority = ProcessMapMosaic::input;
   }
+  else if(ui.GetString("PRIORITY") == "AVERAGE") {
+    priority = ProcessMapMosaic::average;
+  } 
   else {
-    priority = band;
+    priority = ProcessMapMosaic::band;
     sType = ui.GetString("TYPE");
     if(sType == "BANDNUMBER") {
       m.SetBandNumber(ui.GetInteger("NUMBER"));
@@ -82,6 +74,17 @@ void IsisMain() {
 
   // Priority
   m.SetPriority(priority);
+  
+  CubeAttributeOutput &oAtt = ui.GetOutputAttribute("MOSAIC");
+  if(ui.GetString("GRANGE") == "USER") {
+    m.SetOutputCube(list,
+                    ui.GetDouble("MINLAT"), ui.GetDouble("MAXLAT"),
+                    ui.GetDouble("MINLON"), ui.GetDouble("MAXLON"),
+                    oAtt, ui.GetFilename("MOSAIC"));
+  }
+  else {
+    m.SetOutputCube(list, oAtt, ui.GetFilename("MOSAIC"));
+  }
 
   m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
   m.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
