@@ -22,7 +22,6 @@
  */
 
 
-// Global forward declarations
 template< class A, class B > class QHash;
 template< class A, class B > class QMap;
 template< class A, class B > class QPair;
@@ -30,8 +29,6 @@ template< class A> class QVector;
 class QString;
 
 namespace Isis {
-
-  // Isis forward declarations
   class ControlNet;
   class GroupedStatistics;
 
@@ -54,7 +51,6 @@ namespace Isis {
    *   @history 2009-10-15 Eric Hyer Added GetCubeList Method
    *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
    *                                       removing includes from ControlNet.h.
-   *
    */
   class ControlGraph {
     public:
@@ -75,7 +71,7 @@ namespace Isis {
       // nested class forward declaration
       class AdjacentCubeList;
 
-      void HashCubesAndPopulateGraph(ControlNet *someControlNet);
+      void HashCubesAndPopulateGraph();
       void CalculateIslands();
 
       //! ControlNet to make a graph from

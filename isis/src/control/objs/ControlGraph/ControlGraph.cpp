@@ -39,14 +39,14 @@ namespace Isis {
     // cubeIndexToIdHash prvides a way to get the Cube Serial numbers back.
     cubeIdToIndexHash = new QHash< QString, int >();
     cubeIndexToIdHash = new QHash< int, QString >();
-    cubeIdToIndexHash->reserve(cnet->Size() / 5);
-    cubeIndexToIdHash->reserve(cnet->Size() / 5);
+    cubeIdToIndexHash->reserve(cnet->GetNumPoints() / 5);
+    cubeIndexToIdHash->reserve(cnet->GetNumPoints() / 5);
 
-    HashCubesAndPopulateGraph(someControlNet);
+    HashCubesAndPopulateGraph();
 
     CalculateIslands();
 
-    if(islands->size())
+    if (islands->size())
       connected = false;
     else
       connected = true;
@@ -82,22 +82,22 @@ namespace Isis {
   ControlGraph::~ControlGraph() {
     cnet = NULL;
 
-    if(cubeIdToIndexHash) {
+    if (cubeIdToIndexHash) {
       delete cubeIdToIndexHash;
       cubeIdToIndexHash = NULL;
     }
 
-    if(cubeIndexToIdHash) {
+    if (cubeIndexToIdHash) {
       delete cubeIndexToIdHash;
       cubeIndexToIdHash = NULL;
     }
 
-    if(graph) {
+    if (graph) {
       delete graph;
       graph = NULL;
     }
 
-    if(islands) {
+    if (islands) {
       delete islands;
       islands = NULL;
     }
@@ -126,26 +126,26 @@ namespace Isis {
    */
   const QVector< QString > ControlGraph::GetCubesOnIsland(const int &island)
   const {
-    if(connected) {
+    if (connected) {
       QString msg = "\n\nGetCubesOnIsland called on connected graph with no "
-          "islands!!!\n\n";
+                    "islands!!!\n\n";
       throw iException::Message(iException::Programmer, msg.toStdString(),
-          _FILEINFO_);
+                                _FILEINFO_);
     }
 
     ASSERT(islands->size() != 0);
 
-    if(island < 0 || island >= islands->size()) {
+    if (island < 0 || island >= islands->size()) {
       QString msg = "\n\nA list of cubes was requested from island " +
-          QString::number(island) + "\nbut that island does not exist!!!"
-          "\n\nThere are " + QString::number(islands->size()) + " islands "
-          "numbered from 0 to " + QString::number(islands->size() - 1) + "\n\n";
+                    QString::number(island) + "\nbut that island does not exist!!!"
+                    "\n\nThere are " + QString::number(islands->size()) + " islands "
+                    "numbered from 0 to " + QString::number(islands->size() - 1) + "\n\n";
       throw Isis::iException::Message(Isis::iException::Programmer,
-          msg.toStdString(), _FILEINFO_);
+                                      msg.toStdString(), _FILEINFO_);
     }
 
     QVector< QString > cubeList;
-    for(int i = 0; i < (*islands)[island].size(); i++) {
+    for (int i = 0; i < (*islands)[island].size(); i++) {
       cubeList.push_back(cubeIndexToIdHash->value((*islands)[island][i]));
     }
 
@@ -161,7 +161,7 @@ namespace Isis {
 
     // for each key in the cubeIdToIndexHash add the key to a vector
     QHash< QString, int >::const_iterator i = cubeIdToIndexHash->constBegin();
-    while(i != cubeIdToIndexHash->constEnd()) {
+    while (i != cubeIdToIndexHash->constEnd()) {
       cubeList.push_back(i.key());
       i++;
     }
@@ -188,7 +188,7 @@ namespace Isis {
   ControlGraph &ControlGraph::operator=(const ControlGraph &other) {
     if (this == &other)
       return *this;
-      
+
     if (cubeIdToIndexHash) {
       delete cubeIdToIndexHash;
       cubeIdToIndexHash = NULL;
@@ -205,7 +205,7 @@ namespace Isis {
       delete islands;
       islands = NULL;
     }
-    
+
     cnet = other.cnet;
     connected = other.connected;
 
@@ -222,7 +222,7 @@ namespace Isis {
   /**
    * @param someControlNet The ControlNet to create a ControlGraph from
    */
-  void ControlGraph::HashCubesAndPopulateGraph(ControlNet *someControlNet) {
+  void ControlGraph::HashCubesAndPopulateGraph() {
     // index assigned to last hashed cube (-1 means empty hash table)
     int cubeIndex = -1;
 
@@ -236,14 +236,14 @@ namespace Isis {
     // along the way as we encounter new cubes they are hashed.  Also, for all
     // the measures encountered be the middle for loop statistics are saved.
 
-    for(int cpIndex = 0; cpIndex < cnet->Size(); cpIndex++) {
-      if(!(*cnet)[cpIndex].IsIgnored()) {
+    for (int cpIndex = 0; cpIndex < cnet->GetNumPoints(); cpIndex++) {
+      if (!(*cnet)[cpIndex]->IsIgnored()) {
         // use a reference for the current ControlPoint for clearity
-        const ControlPoint &curCtrlPoint = (*cnet)[cpIndex];
-        for(int cmIndex = 0; cmIndex < curCtrlPoint.Size(); cmIndex++) {
+        const ControlPoint &curCtrlPoint = *(*cnet)[cpIndex];
+        for (int cmIndex = 0; cmIndex < curCtrlPoint.GetNumMeasures(); cmIndex++) {
           // get current cube's serial number and hash if new
-          QString curCube = curCtrlPoint[cmIndex].GetCubeSerialNumber();
-          if(!cubeIdToIndexHash->contains(curCube)) {
+          QString curCube = curCtrlPoint[cmIndex]->GetCubeSerialNumber();
+          if (!cubeIdToIndexHash->contains(curCube)) {
             cubeIdToIndexHash->insert(curCube, ++cubeIndex);
             cubeIndexToIdHash->insert(cubeIndex, curCube);
           }
@@ -253,18 +253,18 @@ namespace Isis {
           >::iterator graphIterator = graph->find(curCubeIndex);
 
           // look for adjacent cubes
-          for(int cmIndex2 = 0; cmIndex2 < curCtrlPoint.Size(); cmIndex2++) {
-            if(cmIndex2 != cmIndex) {
+          for (int cmIndex2 = 0; cmIndex2 < curCtrlPoint.GetNumMeasures(); cmIndex2++) {
+            if (cmIndex2 != cmIndex) {
               // get adjacent cube's serial number and hash if new
-              QString adjacentCube = curCtrlPoint[cmIndex2].GetCubeSerialNumber();
-              if(!cubeIdToIndexHash->contains(adjacentCube)) {
+              QString adjacentCube = curCtrlPoint[cmIndex2]->GetCubeSerialNumber();
+              if (!cubeIdToIndexHash->contains(adjacentCube)) {
                 cubeIdToIndexHash->insert(adjacentCube, ++cubeIndex);
                 cubeIndexToIdHash->insert(cubeIndex, adjacentCube);
               }
               int adjCubeIndex = cubeIdToIndexHash->value(adjacentCube);
 
               // add a connection from the current cube to the adjacent cube
-              if(graphIterator != graph->end()) {
+              if (graphIterator != graph->end()) {
                 graphIterator.value().first.AddConnection(adjCubeIndex, cpIndex,
                     cmIndex2);
               }
@@ -277,13 +277,14 @@ namespace Isis {
           } // of for all measures in cp
 
           // save off statistics
-          if(graphIterator != graph->end()) {
-            QVector< iString > dataNames((*cnet)[cpIndex][cmIndex]
-                                         .GetMeasureDataNames());
+          if (graphIterator != graph->end()) {
+            QVector< iString > dataNames(cnet->GetPoint(cpIndex)->
+                                         GetMeasure(cmIndex)->GetMeasureDataNames());
 
-            for(int i = 0; i < dataNames.size(); i++)
+            for (int i = 0; i < dataNames.size(); i++)
               graphIterator.value().second.AddStatistic(dataNames[i],
-                  (*cnet)[cpIndex][cmIndex].GetMeasureData(dataNames[i]));
+                  cnet->GetPoint(cpIndex)->GetMeasure(cmIndex)->
+                  GetMeasureData(dataNames[i]));
           } // of saving statistics
         } // of for all measures in cp
       } // of if not an igrored point
@@ -308,7 +309,7 @@ namespace Isis {
     // continues until all entries in the search list are true (until all cubes
     // have been visited)
     QMap< int, bool > searchList;
-    for(int i = 0; i < graph->size(); i++)
+    for (int i = 0; i < graph->size(); i++)
       searchList.insert(i, false);
 
     // For each subgraph keep a list of the cubes in the subgraph.  This is
@@ -320,7 +321,7 @@ namespace Isis {
     // thus also which subgraph we are currently populating
     int subgraphIndex = -1;
 
-    while(searchList.size()) {
+    while (searchList.size()) {
       // create a new subgraph
       subgraphIndex++;
       islands->push_back(QVector< int >());
@@ -333,17 +334,17 @@ namespace Isis {
       q.enqueue(searchList.begin().key());
 
       // visit all cubes possible using the breadth-first approach
-      while(q.size()) {
+      while (q.size()) {
         int curVertex(q.dequeue());
         QVector< int > adjacentVertices = graph->find(curVertex).value().first
                                           .GetAdjacentCubes();
 
-        for(int i = 0; i < adjacentVertices.size(); i++) {
+        for (int i = 0; i < adjacentVertices.size(); i++) {
           const int &curNeighbor = adjacentVertices[i];
 
           ASSERT(searchList.find(curNeighbor) != searchList.end());
 
-          if(!searchList.find(curNeighbor).value()) {
+          if (!searchList.find(curNeighbor).value()) {
             searchList.find(curNeighbor).value() = true;
             q.enqueue(curNeighbor);
           }
@@ -352,22 +353,22 @@ namespace Isis {
 
       // add all true entries to the current subgraph
       QMap< int, bool >::iterator i = searchList.begin();
-      while(i != searchList.end()) {
-        if(i.value()) {
+      while (i != searchList.end()) {
+        if (i.value()) {
           (*islands)[subgraphIndex].push_back(i.key());
         }
         i++;
       }
 
       // remove all the true entries from the search list
-      for(int i = 0; i < (*islands)[subgraphIndex].size(); i++) {
+      for (int i = 0; i < (*islands)[subgraphIndex].size(); i++) {
         searchList.remove((*islands)[subgraphIndex][i]);
       }
     }
 
     // if there was only ever one subgraph created then the initial assumption
     // was wrong!  There are no islands at all - this is a connected graph!
-    if(subgraphIndex == 0) {
+    if (subgraphIndex == 0) {
       islands->clear();
     }
   }
@@ -409,7 +410,7 @@ namespace Isis {
 
   //! destruct an AdjacentCubeList
   ControlGraph::AdjacentCubeList::~AdjacentCubeList() {
-    if(connections) {
+    if (connections) {
       delete connections;
       connections = NULL;
     }
@@ -423,12 +424,12 @@ namespace Isis {
     // vector of adjacent cubes to be returned
     QVector< int > adjacentCubes;
 
-    if(!connections)
+    if (!connections)
       return adjacentCubes;
 
     QMap< int, QVector< QPair< int, int > > >::const_iterator i =
       connections->constBegin();
-    while(i != connections->constEnd()) {
+    while (i != connections->constEnd()) {
       adjacentCubes.push_back(i.key());
       i++;
     }
@@ -453,7 +454,7 @@ namespace Isis {
 
     // if the cube already exists in our list then just add another edge to it.
     // otherwise we need to add the cube as well.
-    if(i != connections->end()) {
+    if (i != connections->end()) {
       i.value().push_back(qMakePair(cpIndex, cmIndex));
     }
     else {
