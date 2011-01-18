@@ -33,6 +33,40 @@ void IsisMain() {
   string inputFile = ui.GetAsString("FROM");
   string mosaicFile = ui.GetFilename("MOSAIC");
 
+  // Set up the mosaic priority, either the input cube will be
+  // placed ontop of the mosaic or beneath it  
+  ProcessMosaic::MosaicPriority priority;
+  string sPriority = ui.GetString("PRIORITY");
+  string sType;
+  if(sPriority == "BENEATH") {
+    priority = ProcessMosaic::mosaic;
+  }
+  else if(sPriority == "ONTOP") {
+    priority = ProcessMosaic::input;
+  }
+  else if(sPriority == "AVERAGE") {
+    priority = ProcessMosaic::average;
+  }
+  else {
+    priority = ProcessMosaic::band;
+    sType = ui.GetString("TYPE");
+    if(sType == "BANDNUMBER") {
+      p.SetBandNumber(ui.GetInteger("NUMBER"));
+    }
+    else {
+      //keyname & key value
+      p.SetBandKeyWord(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
+    }
+    // Band Criteria
+    BandCriteria eCriteria = Lesser;
+    if(ui.GetString("CRITERIA") == "GREATER")
+      eCriteria = Greater;
+    p.SetBandCriteria(eCriteria);
+  }
+
+  //set priority
+  p.SetPriority(priority);
+  
   if(ui.GetString("CREATE") == "YES") {
     ns = ui.GetInteger("NSAMPLES");
     nl = ui.GetInteger("NLINES");
@@ -41,6 +75,9 @@ void IsisMain() {
     // Create the origin band if the Track Flag is set
     if(bTrack) {
       nb += 1;
+    }
+    else if(priority == ProcessMosaic::average) {
+      nb *= 2;
     }
     p.SetCreateFlag(true);
 
@@ -63,39 +100,9 @@ void IsisMain() {
   p.SetBandBinMatch(ui.GetBoolean("MATCHBANDBIN"));
   p.Progress()->SetText("Mosaicking");
 
-  // Set up the mosaic priority, either the input cube will be
-  // placed ontop of the mosaic or beneath it  
-  MosaicPriority priority;
-  string sType;
-  if(ui.GetString("PRIORITY") == "BENEATH") {
-    priority = mosaic;
-  }
-  else if(ui.GetString("PRIORITY") == "ONTOP") {
-    priority = input;
-  }
-  else {
-    priority = band;
-    sType = ui.GetString("TYPE");
-    if(sType == "BANDNUMBER") {
-      p.SetBandNumber(ui.GetInteger("NUMBER"));
-    }
-    else {
-      //keyname & key value
-      p.SetBandKeyWord(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
-    }
-    // Band Criteria
-    BandCriteria eCriteria = Lesser;
-    if(ui.GetString("CRITERIA") == "GREATER")
-      eCriteria = Greater;
-    p.SetBandCriteria(eCriteria);
-  }
-
-  //set priority
-  p.SetPriority(priority);
-
   // Get the value for HS, LS, NULL flags whether to transfer the special pixels
   // onto the mosaic. Holds good for "ontop" and "band" priorities only
-  if(priority == input || priority == band) {
+  if(priority == ProcessMosaic::input || priority == ProcessMosaic::band || priority == ProcessMosaic::average) {
     p.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
     p.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
     p.SetNullFlag(ui.GetBoolean("NULL"));
