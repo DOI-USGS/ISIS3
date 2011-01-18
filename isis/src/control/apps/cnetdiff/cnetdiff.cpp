@@ -22,7 +22,7 @@ PvlGroup ignorekeys;
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
 void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2);
-void Compare(const ControlPoint &point1, const ControlPoint &point2);
+void Compare(const ControlPoint *point1, const ControlPoint *point2);
 void Compare(ControlNet net1, ControlNet net2);
 
 void IsisMain() {
@@ -51,7 +51,7 @@ void IsisMain() {
 
   // Don't want to consider the DateTime of a Point or Measure was set by
   // default.
-  if (!ignorekeys.HasKeyword("DateTime")) {
+  if(!ignorekeys.HasKeyword("DateTime")) {
     ignorekeys += PvlKeyword("DateTime", "true");
   }
 
@@ -78,25 +78,26 @@ void IsisMain() {
 }
 
 void Compare(ControlNet net1, ControlNet net2) {
-  if(net1.Size() != net2.Size()) {
+  if(net1.GetNumPoints() != net2.GetNumPoints()) {
     differenceReason = "The number of control points in the networks, [" +
-        iString(net1.Size()) + "] and [" + iString(net2.Size()) + ", differ";
+                       iString(net1.GetNumPoints()) + "] and [" +
+                       iString(net2.GetNumPoints()) + ", differ";
     filesMatch = false;
     return;
   }
 
-  if(net1.NetworkId() != net2.NetworkId()) {
+  if(net1.GetNetworkId() != net2.GetNetworkId()) {
     differenceReason = "The network IDs, [" +
-        iString(net1.NetworkId()) + "] and [" + iString(net2.NetworkId()) + 
-        " differ";
+                       iString(net1.GetNetworkId()) + "] and [" +
+                       iString(net2.GetNetworkId()) + " differ";
     filesMatch = false;
     return;
   }
 
-  if(net1.NetworkId() != net2.NetworkId()) {
+  if(net1.GetTarget() != net2.GetTarget()) {
     differenceReason = "The targets, [" +
-        iString(net1.Target()) + "] and [" + iString(net2.Target()) + 
-        " differ";
+                       iString(net1.GetTarget()) + "] and [" +
+                       iString(net2.GetTarget()) + " differ";
     filesMatch = false;
     return;
   }
@@ -104,9 +105,9 @@ void Compare(ControlNet net1, ControlNet net2) {
   net1.SortControlNet();
   net2.SortControlNet();
 
-  for(int cpIndex = 0; cpIndex < net1.Size(); cpIndex ++) {
-    const ControlPoint &net1Point = net1[cpIndex];
-    const ControlPoint &net2Point = net2[cpIndex];
+  for(int cpIndex = 0; cpIndex < net1.GetNumPoints(); cpIndex ++) {
+    const ControlPoint *net1Point = net1.GetPoint(cpIndex);
+    const ControlPoint *net2Point = net2.GetPoint(cpIndex);
 
     Compare(net1Point, net2Point);
 
@@ -116,22 +117,22 @@ void Compare(ControlNet net1, ControlNet net2) {
   }
 }
 
-void Compare(const ControlPoint &point1, const ControlPoint &point2) {
-  PvlObject point1Pvl = point1.ToPvlObject();
-  PvlObject point2Pvl = point2.ToPvlObject();
+void Compare(const ControlPoint *point1, const ControlPoint *point2) {
+  PvlObject point1Pvl = point1->ToPvlObject();
+  PvlObject point2Pvl = point2->ToPvlObject();
 
   // both names must be at least equal, should be named ControlPoint
   if(point1Pvl.Name() != point2Pvl.Name()) {
     iString msg = "The control points' CreatePvlOject method returned an "
-        "unexpected result";
+                  "unexpected result";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
-  
+
   if(point1Pvl.Groups() != point2Pvl.Groups()) {
     filesMatch = false;
-    differenceReason = "The number of control measures, [" + 
-        iString(point1Pvl.Groups()) + "] and [" + iString(point2Pvl.Groups()) +
-        "] does not match";
+    differenceReason = "The number of control measures, [" +
+                       iString(point1Pvl.Groups()) + "] and [" +
+                       iString(point2Pvl.Groups()) + "] does not match";
   }
 
   // Start by comparing top level control point keywords.
@@ -146,13 +147,13 @@ void Compare(const ControlPoint &point1, const ControlPoint &point2) {
 
     if(!filesMatch) {
       differenceReason = "Control Measure for Cube [" +
-          measure1["SerialNumber"][0] + "] " + differenceReason;
+                         measure1["SerialNumber"][0] + "] " + differenceReason;
     }
   }
 
   if(!filesMatch) {
-    differenceReason = "Control Point [" + point1.GetId() +
-        "] " + differenceReason;
+    differenceReason = "Control Point [" + point1->GetId() +
+                       "] " + differenceReason;
   }
 }
 
@@ -163,7 +164,7 @@ void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2) {
   PvlGroup point2FullKeys;
 
   for(int keywordIndex = 0; keywordIndex < pvl1.Keywords(); keywordIndex++) {
-    PvlKeyword thisKey = pvl1[keywordIndex]; 
+    PvlKeyword thisKey = pvl1[keywordIndex];
     point1FullKeys += thisKey;
 
     if(!pvl2.HasKeyword(thisKey.Name())) {
@@ -172,7 +173,7 @@ void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2) {
   }
 
   for(int keywordIndex = 0; keywordIndex < pvl2.Keywords(); keywordIndex++) {
-    PvlKeyword thisKey = pvl2[keywordIndex]; 
+    PvlKeyword thisKey = pvl2[keywordIndex];
     point2FullKeys += thisKey;
 
     if(!pvl1.HasKeyword(thisKey.Name())) {
@@ -195,7 +196,7 @@ void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2) {
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(pvl1.Name().compare(pvl2.Name()) != 0) {
     iString msg = "CompareKeywords should always be called with keywords that "
-        "have the same name";
+                  "have the same name";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
@@ -260,8 +261,8 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
             differenceReason = "Value [" + pvl1.Name() + "] at index " +
                                iString(i) + ": difference is " + iString(difference);
           }
-          differenceReason += " (values are [" + iString(val1) + "] and [" + 
-              iString(val2) + "], tolerance is [" + iString(tolerance) + "])";
+          differenceReason += " (values are [" + iString(val1) + "] and [" +
+                              iString(val2) + "], tolerance is [" + iString(tolerance) + "])";
         }
       }
     }
