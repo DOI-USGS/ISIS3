@@ -64,6 +64,8 @@ namespace Isis {
    *           MinimumLongitude,MaximumLongitude keywords no longer required to
    *           exist if passed into SetOutputCube
    *  @history 2010-10-27 Sharmila Prasad - Read input file attributes
+   *  @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature, to double
+   *           the number of mosaic bands to get Count info
    *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation

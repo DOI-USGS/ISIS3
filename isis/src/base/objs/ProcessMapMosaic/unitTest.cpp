@@ -26,7 +26,7 @@ void IsisMain() {
   cout << "Testing Mosaic 1" << endl;
   ProcessMapMosaic m1;
   CubeAttributeOutput oAtt;
-  MosaicPriority priority = input;
+  ProcessMapMosaic::MosaicPriority priority = ProcessMapMosaic::input;
   m1.SetBandBinMatch(false);
   m1.SetOutputCube(cubes, oAtt, "./unitTest.cub");
 

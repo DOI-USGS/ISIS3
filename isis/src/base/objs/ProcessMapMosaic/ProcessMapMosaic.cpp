@@ -301,9 +301,13 @@ namespace Isis {
       p.PropagatePolygons(false);
       p.PropagateOriginalLabel(false);
 
-      //if track set, create the origin band
+      // If track set, create the origin band
       if(GetTrackFlag()) {
         nbands += 1;
+      }
+      // For average priority, get the new band count
+      else if(GetPriority() == average) {
+        nbands *= 2;
       }
 
       Cube *ocube = p.SetOutputCube(mosaicFile, oAtt, samps, lines, nbands);
@@ -350,11 +354,15 @@ namespace Isis {
       Cube *propCube = p.SetInputCube(inputFile, inAtt);
       bands = propCube->Bands();
 
-      //if track set, create the origin band
+      // If track set, create the origin band
       if(GetTrackFlag()) {
         bands += 1;
       }
-
+      // For average priority, get the new band count
+      else if(GetPriority() == average) {
+        bands *= 2;
+      }
+      
       p.PropagateHistory(false);
       p.PropagateLabels(false);
       Cube *ocube = p.SetOutputCube(mosaicFile, oAtt, samps, lines, bands);
