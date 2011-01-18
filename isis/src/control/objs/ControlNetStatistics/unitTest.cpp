@@ -20,25 +20,24 @@
 using namespace std;
 using namespace Isis;
 
-void IsisMain() 
-{
+void IsisMain() {
   Preference::Preferences(true);
   cout << "UnitTest for ControlNetStatistics ...." << endl << endl;
 
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
-  
+
   cout << "CNET=" << ui.GetFilename("CNET") << endl;
   cout << "Serial File=" << ui.GetFilename("FROMLIST") << endl;
 
   Isis::ControlNet cnetOrig(ui.GetFilename("CNET"));
   Isis::ControlNet cnet = cnetOrig;
-  
+
   std::string sSerialFile = ui.GetFilename("FROMLIST");
   ControlNetStatistics cnetStats(&cnet, sSerialFile);
-  
+
   PvlGroup statsGrp;
   cnetStats.GenerateControlNetStats(statsGrp);
-  
+
   cout << statsGrp;
- 
+
 }

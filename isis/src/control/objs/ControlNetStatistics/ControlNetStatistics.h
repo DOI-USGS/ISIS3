@@ -31,18 +31,18 @@ using namespace std;
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
- 
+
 namespace Isis {
   class ControlNet;
   class Progress;
   class PvlGroup;
 
-  //! Size of the PointDetails Array 
-  #define IMAGE_POINT_SIZE 3
+  //! Size of the PointDetails Array
+#define IMAGE_POINT_SIZE 3
 
   //! Enumeration for Point Statistics
   enum ePointDetails { total, ignore, ground };
-  
+
   /**
    * @brief Control Network Stats
    *
@@ -50,7 +50,7 @@ namespace Isis {
    *
    * @ingroup ControlNetwork
    *
-   * @author 2010-08-24 Sharmila Prasad 
+   * @author 2010-08-24 Sharmila Prasad
    *
    * @see ControlNetwork ControlPoint ControlMeasure
    *
@@ -62,77 +62,77 @@ namespace Isis {
    *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
    *                                       removing includes from ControlNet.h.
    */
-  class ControlNetStatistics{
-  public:
-    //! Constructor
-    ControlNetStatistics(ControlNet * pCNet, const string &psSerialNumFile, Progress *pProgress=0);
-    
-    //! Constructor
-    ControlNetStatistics(ControlNet * pCNet, Progress *pProgress=0);
+  class ControlNetStatistics {
+    public:
+      //! Constructor
+      ControlNetStatistics(ControlNet *pCNet, const string &psSerialNumFile, Progress *pProgress = 0);
 
-    //! Destructor
-    ~ControlNetStatistics();
-    
-    //! Generate stats like Total, Ignored, Ground Points in an Image
-    void GenerateImageStats(void);
-    
-    //! Print the Image Stats into specified output file
-    void PrintImageStats(const string & psImageFile);
-    
-    //! Returns the Image Stats by Serial Number
-    void GetImageStatsBySerialNum(string psSerialNum, int* piPointDetail, int piSize);
-    
-    //! Generate stats like Ignored, Ground, Total Measures, Ignored by Control Point
-    void GeneratePointStats(const string & psPointFile);
-    
-    //! Generate the Control Net Stats into the PvlGroup
-    void GenerateControlNetStats(PvlGroup & pStatsGrp);
-    
-    //! Returns the Number of Valid (Not Ignored) Points in the Control Net 
-    int NumValidPoints();
-    
-    //! Returns the Number of Ground Points in the Control Net
-    int NumGroundPoints();
+      //! Constructor
+      ControlNetStatistics(ControlNet *pCNet, Progress *pProgress = 0);
 
-    //! Returns the total Number of Measures in the Control Net
-    int NumMeasures();
-    
-    //!< Returns the total Number of valid Measures in the Control Net
-    int NumValidMeasures();
-    
-    //! Returns the total Number of Ignored Measures in the Control Net
-    int NumIgnoredMeasures();
-    
-    //! Determine the average error of all points in the network
-    double AverageResidual();
-    
-    //! Determine the minimum error of all points in the network
-    double MinimumResidual();
-    
-    //! Determine the maximum error of all points in the network
-    double MaximumResidual();
-    
-    //! Determine the minimum line error of all points in the network
-    double MinimumLineResidual();
-    
-    //! Determine the minimum sample error of all points in the network
-    double MinimumSampleResidual();
-    
-    //! Determine the maximum line error of all points in the network
-    double MaximumLineResidual();
-    
-    //! Determine the maximum sample error of all points in the network
-    double MaximumSampleResidual();
-    
-  protected:
-    SerialNumberList mSerialNumList;    //!< Serial Number List
-    ControlNet * mCNet;                 //!< Control Network
-    Progress *mProgress;                //!< Progress state
-    
-  private:
-    map <string, int> mImageTotalPointMap;   //!< Contains map of serial num and Total points
-    map <string, int> mImageIgnorePointMap;  //!< Contains map of serial num and Ignored points
-    map <string, int> mImageGroundPointMap;  //!< Contains map of serial num and Ground points
+      //! Destructor
+      ~ControlNetStatistics();
+
+      //! Generate stats like Total, Ignored, Ground Points in an Image
+      void GenerateImageStats(void);
+
+      //! Print the Image Stats into specified output file
+      void PrintImageStats(const string &psImageFile);
+
+      //! Returns the Image Stats by Serial Number
+      void GetImageStatsBySerialNum(string psSerialNum, int *piPointDetail, int piSize);
+
+      //! Generate stats like Ignored, Ground, Total Measures, Ignored by Control Point
+      void GeneratePointStats(const string &psPointFile);
+
+      //! Generate the Control Net Stats into the PvlGroup
+      void GenerateControlNetStats(PvlGroup &pStatsGrp);
+
+      //! Returns the Number of Valid (Not Ignored) Points in the Control Net
+      int NumValidPoints();
+
+      //! Returns the Number of Ground Points in the Control Net
+      int NumGroundPoints();
+
+      //! Returns the total Number of Measures in the Control Net
+      int NumMeasures();
+
+      //!< Returns the total Number of valid Measures in the Control Net
+      int NumValidMeasures();
+
+      //! Returns the total Number of Ignored Measures in the Control Net
+      int NumIgnoredMeasures();
+
+      //! Determine the average error of all points in the network
+      double AverageResidual();
+
+      //! Determine the minimum error of all points in the network
+      double MinimumResidual();
+
+      //! Determine the maximum error of all points in the network
+      double MaximumResidual();
+
+      //! Determine the minimum line error of all points in the network
+      double MinimumLineResidual();
+
+      //! Determine the minimum sample error of all points in the network
+      double MinimumSampleResidual();
+
+      //! Determine the maximum line error of all points in the network
+      double MaximumLineResidual();
+
+      //! Determine the maximum sample error of all points in the network
+      double MaximumSampleResidual();
+
+    protected:
+      SerialNumberList mSerialNumList;    //!< Serial Number List
+      ControlNet *mCNet;                  //!< Control Network
+      Progress *mProgress;                //!< Progress state
+
+    private:
+      map <string, int> mImageTotalPointMap;   //!< Contains map of serial num and Total points
+      map <string, int> mImageIgnorePointMap;  //!< Contains map of serial num and Ignored points
+      map <string, int> mImageGroundPointMap;  //!< Contains map of serial num and Ground points
   };
 }
 #endif
