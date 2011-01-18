@@ -78,6 +78,10 @@ int main() {
 
   c.Delete(0);
   printPoint(c);
+  cout << "ReferenceIndex = " << c.GetReferenceIndex() << endl;
+
+  c.Delete(0);
+  cout << "ReferenceIndex = " << c.GetReferenceIndex() << endl;
 
   cout << endl << "Test adding control measures with identical serial numbers ..." << endl;
   try {
