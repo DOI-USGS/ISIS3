@@ -63,36 +63,37 @@ namespace Isis {
 
   //! Destroy InterestOperator object
   InterestOperator::~InterestOperator() {
-    if(p_clipPolygon != NULL) delete p_clipPolygon;
+    if (p_clipPolygon != NULL)
+      delete p_clipPolygon;
 #ifdef _DEBUG_
     CloseDebug();
 #endif
   }
 
 
- /**
-  * Create an InterestOperator object using a PVL specification.
-  * An example of the PVL required for this is:
-  *
-  * @code
-  *   Group = Operator
-  *     Name      = StandardDeviation
-  *     Samples   = 21
-  *     Lines     = 21
-  *     DeltaLine = 50
-  *     DeltaSamp = 25
-  *   EndGroup
-  * @endcode
-  *
-  * There are many other options that can be set via the pvl and are
-  * described in other documentation (see below).
-  *
-  * @param pvl The pvl object containing the specification
-  *
-  * @history 2010-04-09 Sharmila Prasad Check for validity of new keyword "MaxEmissionAngle"
-  * @history 2010-06-10 Sharmila Prasad Parse only Interest specific keywords and store 
-  *                                     in Operator group
-  */
+  /**
+   * Create an InterestOperator object using a PVL specification.
+   * An example of the PVL required for this is:
+   *
+   * @code
+   *   Group = Operator
+   *     Name      = StandardDeviation
+   *     Samples   = 21
+   *     Lines     = 21
+   *     DeltaLine = 50
+   *     DeltaSamp = 25
+   *   EndGroup
+   * @endcode
+   *
+   * There are many other options that can be set via the pvl and are
+   * described in other documentation (see below).
+   *
+   * @param pvl The pvl object containing the specification
+   *
+   * @history 2010-04-09 Sharmila Prasad Check for validity of new keyword "MaxEmissionAngle"
+   * @history 2010-06-10 Sharmila Prasad Parse only Interest specific keywords and store
+   *                                     in Operator group
+   */
   void InterestOperator::Parse(Pvl &pPvl) {
     try {
       // Get info from the operator group
@@ -117,7 +118,7 @@ namespace Isis {
       mOperatorGrp += Isis::PvlKeyword("MinimumInterest", p_minimumInterest);
 
     }
-    catch(iException &e) {
+    catch (iException &e) {
       std::string msg = "Improper format for InterestOperator PVL [" + pPvl.Filename() + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -141,7 +142,7 @@ namespace Isis {
     mtInterestResults[piIndex].mdIncidence  = 135;
     mtInterestResults[piIndex].mdDn         = Isis::ValidMinimum;
     mtInterestResults[piIndex].mdResolution = DBL_MAX ;
-    mtInterestResults[piIndex].miDeltaSample= 0;
+    mtInterestResults[piIndex].miDeltaSample = 0;
     mtInterestResults[piIndex].miDeltaLine  = 0;
     mtInterestResults[piIndex].mbValid      = false;
   }
@@ -159,22 +160,25 @@ namespace Isis {
    * @history 2010-03-30 Sharmila Prasad - Check for valid DN Value and Emission Angle in
    *          the user defined ValidMin-ValidMax range when selecting point of interest
    *          in a Control Measure
-   * @history 2010-06-23 Sharmila Prasad - Validate for Resolution Range and Pixels/Meters 
+   * @history 2010-06-23 Sharmila Prasad - Validate for Resolution Range and Pixels/Meters
    *                                       from edge options
    */
-  bool InterestOperator::Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap, 
+  bool InterestOperator::Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap,
                                  int piSample, int piLine) {
 
-    if(!pUnivGrndMap.HasCamera()) {  // Level 3 images/mosaic or bad image
+    if (!pUnivGrndMap.HasCamera())
+      // Level 3 images/mosaic or bad image
+    {
       std::string msg = "Cannot run interest on images with no camera. Image " +
-         pCube.Filename() + " has no Camera";
+                        pCube.Filename() + " has no Camera";
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
 
     int pad = Padding();
     Chip chip(2 * p_deltaSamp + p_samples + pad, 2 * p_deltaLine + p_lines + pad);
     chip.TackCube(piSample, piLine);
-    if(p_clipPolygon != NULL) chip.SetClipPolygon(*p_clipPolygon);
+    if (p_clipPolygon != NULL)
+      chip.SetClipPolygon(*p_clipPolygon);
     chip.Load(pCube);
 
     // Walk the search chip and find the best interest
@@ -186,26 +190,26 @@ namespace Isis {
     int iSamples =  2 * p_deltaSamp + p_samples / 2 + 1;
     bool bCalculateInterest = false;
 
-    for(int lin = p_lines / 2 + 1; lin <= iLines; lin++) {
-      for(int samp = p_samples / 2 + 1; samp <= iSamples; samp++) {
+    for (int lin = p_lines / 2 + 1; lin <= iLines; lin++) {
+      for (int samp = p_samples / 2 + 1; samp <= iSamples; samp++) {
         // Cannot take dnValues from the chip as it contains the interpolated dnValue
         // hence get the dn values directly from the cube
         chip.SetChipPosition((double)samp, (double)lin);
 
         bCalculateInterest = false;
-        MeasureValidationResults results = 
+        MeasureValidationResults results =
           ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube);
-        if(results.isValid()) {
+        if (results.isValid()) {
           bCalculateInterest = true;
         }
 
-        if(bCalculateInterest) {
+        if (bCalculateInterest) {
           Chip subChip = chip.Extract(p_samples + pad, p_lines + pad, samp, lin);
           double interest = Interest(subChip);
-          if(interest != Isis::Null) {
-            if((dBestInterest == Isis::Null) || CompareInterests(interest, dBestInterest)) {
+          if (interest != Isis::Null) {
+            if ((dBestInterest == Isis::Null) || CompareInterests(interest, dBestInterest)) {
               double dist = std::sqrt(std::pow(piSample - samp, 2.0) + std::pow(piLine - lin, 2.0));
-              if(interest == dBestInterest && dist > dSmallestDist) {
+              if (interest == dBestInterest && dist > dSmallestDist) {
                 continue;
               }
               else {
@@ -222,8 +226,8 @@ namespace Isis {
 
     // Check to see if we went through the interest chip and never got a interest at
     // any location.
-    if(dBestInterest == Isis::Null || dBestInterest < p_minimumInterest) {
-      if(pUnivGrndMap.SetImage(piSample, piLine)) {
+    if (dBestInterest == Isis::Null || dBestInterest < p_minimumInterest) {
+      if (pUnivGrndMap.SetImage(piSample, piLine)) {
         p_interestAmount = dBestInterest;
       }
       return false;
@@ -246,17 +250,17 @@ namespace Isis {
    * @param pNewNet - Input Control Net
    * @param psSerialNumFile - Serial Number File
    * @param psOverlapListFile - Overlaplist File containing overlap data
-   * 
-   * @history 10/15/2010 Sharmila Prasad - Use a single copy of Control Net 
+   *
+   * @history 10/15/2010 Sharmila Prasad - Use a single copy of Control Net
    *
    */
-  void InterestOperator::Operate(ControlNet &pNewNet, std::string psSerialNumFile, 
+  void InterestOperator::Operate(ControlNet &pNewNet, std::string psSerialNumFile,
                                  std::string psOverlapListFile) {
     ReadSerialNumbers(psSerialNumFile);
 
     // Find all the overlaps between the images in the FROMLIST
     // The overlap polygon coordinates are in Lon/Lat order
-    if(psOverlapListFile != "") {
+    if (psOverlapListFile != "") {
       mOverlaps.ReadImageOverlaps(psOverlapListFile);
       mbOverlaps = true;
     }
@@ -268,54 +272,53 @@ namespace Isis {
 
   /**
    * Process a Control Point which is Locked or has the Reference Measure locked
-   * 
+   *
    * @author Sharmila Prasad (10/5/2010)
-   * 
+   *
    * @param pCPoint - Control Point wtih the Locks(s)
    * @param pPvlObj - Output log Pvl
    */
   void InterestOperator::ProcessLocked_Point_Reference(
-      ControlPoint & pCPoint, PvlObject & pPvlObj,
-      int & piMeasuresModified)
-  {
-    int iNumMeasures  = pCPoint.Size();
+    ControlPoint &pCPoint, PvlObject &pPvlObj,
+    int &piMeasuresModified) {
+    int iNumMeasures  = pCPoint.GetNumMeasures();
     bool bPntEditLock = pCPoint.IsEditLocked();
     int iMsrIgnored   = 0;
-    
-    for (int measure=0; measure<iNumMeasures; measure++) {
-      ControlMeasure newMeasure(pCPoint[measure]);
-      newMeasure.SetDateTime();
-      newMeasure.SetChooserName("Application cnetref(interest)");
-      bool bMeasureLocked = newMeasure.IsEditLocked();
 
-      std::string sn = newMeasure.GetCubeSerialNumber();
-      double dSample = newMeasure.GetSample();
-      double dLine   = newMeasure.GetLine();
+    for (int measure = 0; measure < iNumMeasures; measure++) {
+      ControlMeasure *newMeasure = new ControlMeasure(*pCPoint[measure]);
+      newMeasure->SetDateTime();
+      newMeasure->SetChooserName("Application cnetref(interest)");
+      bool bMeasureLocked = newMeasure->IsEditLocked();
+
+      std::string sn = newMeasure->GetCubeSerialNumber();
+      double dSample = newMeasure->GetSample();
+      double dLine   = newMeasure->GetLine();
 
       // Log
       PvlGroup pvlMeasureGrp("MeasureDetails");
       pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
       pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation",
-          LocationString(newMeasure.GetSample(), newMeasure.GetLine()));
-  
-      if (!newMeasure.IsIgnored()) {
+                                        LocationString(newMeasure->GetSample(), newMeasure->GetLine()));
+
+      if (!newMeasure->IsIgnored()) {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
-        
-        MeasureValidationResults results = 
+
+        MeasureValidationResults results =
           ValidStandardOptions(dSample, dLine, measureCube);
         if (!results.isValid()) {
-          if(bPntEditLock) {
+          if (bPntEditLock) {
             pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not "
-                                                           "Ignored as Point EditLock is True");
+                                              "Ignored as Point EditLock is True");
           }
-          else if (bMeasureLocked == measure){ 
-            pvlMeasureGrp += Isis::PvlKeyword("Error","Reference failed the Validation Test "
-                                                      "but is Locked");
+          else if (bMeasureLocked == measure) {
+            pvlMeasureGrp += Isis::PvlKeyword("Error", "Reference failed the Validation Test "
+                                              "but is Locked");
           }
           else {
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Failed Emission, Incidence, Resolution "
-                                                         "and/or Dn Value Test");
-            newMeasure.SetIgnore(true);
+                                              "and/or Dn Value Test");
+            newMeasure->SetIgnore(true);
             iMsrIgnored++;
             piMeasuresModified++;
           }
@@ -327,13 +330,12 @@ namespace Isis {
       }
 
       pPvlObj += pvlMeasureGrp;
-      pCPoint.UpdateMeasure(newMeasure);
     }
 
     if ((iNumMeasures - iMsrIgnored) < 2) {
       if (bPntEditLock) {
         pPvlObj += Isis::PvlKeyword("UnIgnored", "Good Measures less than 2 "
-                                                 "but Point EditLock is True");
+                                    "but Point EditLock is True");
       }
       else {
         pCPoint.SetIgnore(true);
@@ -341,23 +343,23 @@ namespace Isis {
       }
     }
   }
-  
+
   /**
    * This traverses all the control points and measures in the network and
-   * checks for valid Measure which passes the Emission Incidence Angle, DN value 
+   * checks for valid Measure which passes the Emission Incidence Angle, DN value
    * tests and  picks the Measure with the best Interest as the Reference
    *
    * @author Sharmila Prasad (5/14/2010)
    *
-   * @param pNewNet - Input Control Net  
+   * @param pNewNet - Input Control Net
    *
-   * @history 2010-07-13 Tracie Sucharski, Changes  for binary control networks, 
+   * @history 2010-07-13 Tracie Sucharski, Changes  for binary control networks,
    *                        Measure type of Estimated is now Candidate and
    *                        instead of a separate keyword indicating whether
    *                        a meausre is the reference, the MeasureType is set
    *                        to Reference.
-   * @history 2010-10-04 Sharmila Prasad - Modified for binary Control Net ex Edit Lock 
-   * @history 2010-10-15 Sharmila Prasad - Use only a single copy of Control Net  
+   * @history 2010-10-04 Sharmila Prasad - Modified for binary Control Net ex Edit Lock
+   * @history 2010-10-15 Sharmila Prasad - Use only a single copy of Control Net
    *
    * @return none
    */
@@ -368,53 +370,52 @@ namespace Isis {
 
     // Status Report
     mStatus.SetText("Choosing Reference by Interest...");
-    mStatus.SetMaximumSteps(pNewNet.Size());
+    mStatus.SetMaximumSteps(pNewNet.GetNumMeasures());
     mStatus.CheckStatus();
 
     // Process each existing control point in the network
-    for(int point = 0; point < pNewNet.Size(); ++point) {
-      ControlPoint newPnt = ((ControlNet &) pNewNet)[point];
+    for (int point = 0; point < pNewNet.GetNumMeasures(); ++point) {
+      ControlPoint *newPnt = pNewNet.GetPoint(point);
 
       // Create a copy of original control point
-      const ControlPoint origPnt(newPnt);
-        
+      const ControlPoint origPnt(*newPnt);
+
       // Logging
       PvlObject pvlPointObj("PointDetails");
-      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.GetId());
-      
+      pvlPointObj += Isis::PvlKeyword("PointId", newPnt->GetId());
+
       // Get number of measures locked and check if Reference
       // Measure is locked
-      int iNumMeasuresLocked = newPnt.GetNumLockedMeasures();
-      bool bRefLocked = newPnt.IsReferenceLocked();
+      int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
+      bool bRefLocked = newPnt->IsReferenceLocked();
 
-      int iOrigRefIndex = newPnt.GetReferenceIndexNoException();
+      int iOrigRefIndex = newPnt->GetReferenceIndexNoException();
 
       // Only perform the interest operation on points of type "Tie" and
       // Points having atleast 1 measure and Point is not Ignored
-      if(!newPnt.IsIgnored() && newPnt.GetType() == ControlPoint::Tie &&
-         iOrigRefIndex >= 0 &&
-         (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
+      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Tie &&
+          iOrigRefIndex >= 0 &&
+          (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
 
-        // Check only the validity of the Point / Measures only if Point and/or 
-        // Reference Measure is locked. 
-        if(newPnt.IsEditLocked() || iNumMeasuresLocked > 0) {
-          ProcessLocked_Point_Reference(newPnt, pvlPointObj, iMeasuresModified);
-          ((ControlNet &) pNewNet).UpdatePoint(newPnt);
+        // Check only the validity of the Point / Measures only if Point and/or
+        // Reference Measure is locked.
+        if (newPnt->IsEditLocked() || iNumMeasuresLocked > 0) {
+          ProcessLocked_Point_Reference(*newPnt, pvlPointObj, iMeasuresModified);
 
           mPvlLog += pvlPointObj;
           mStatus.CheckStatus();
-          
-          if(newPnt != origPnt) {
+
+          if (*newPnt != origPnt) {
             iPointsModified ++;
           }
           continue;
         }
-        
-        int iBestMeasureIndex = InterestByPoint(newPnt);
+
+        int iBestMeasureIndex = InterestByPoint(*newPnt);
 
         // Process for point with good interest and a best index
         double dReferenceLat = 0, dReferenceLon = 0;
-        if(iBestMeasureIndex >= 0) {
+        if (iBestMeasureIndex >= 0) {
           std::string sn = mtInterestResults[iBestMeasureIndex].msSerialNum;
           Cube *bestCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
@@ -423,7 +424,7 @@ namespace Isis {
           try {
             bestCamera = bestCube->Camera();
           }
-          catch(Isis::iException &e) {
+          catch (Isis::iException &e) {
             std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
             throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
           }
@@ -439,47 +440,47 @@ namespace Isis {
         // Create a measurment for each image in this point using
         // the reference lat/lon.
         int iNumIgnore = 0;
-        for(int measure = 0; measure < newPnt.Size(); ++measure) {
-          ControlMeasure newMeasure = newPnt[measure];
-          newMeasure.SetDateTime();
-          newMeasure.SetChooserName("Application cnetref(interest)");
-          std::string sn = newMeasure.GetCubeSerialNumber();
+        for (int measure = 0; measure < newPnt->GetNumMeasures(); ++measure) {
+          ControlMeasure *newMeasure = newPnt->GetMeasure(measure);
+          newMeasure->SetDateTime();
+          newMeasure->SetChooserName("Application cnetref(interest)");
+          std::string sn = newMeasure->GetCubeSerialNumber();
 
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
           pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
-          pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(newMeasure.GetSample(), 
-                                                                               newMeasure.GetLine()));
+          pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(newMeasure->GetSample(),
+                                            newMeasure->GetLine()));
 
           // Initialize the UGM of this cube with the reference lat/lon
-          if(!newMeasure.IsIgnored() && iBestMeasureIndex >= 0 && 
-             mtInterestResults[iBestMeasureIndex].mdInterest != WorstInterest()) {
+          if (!newMeasure->IsIgnored() && iBestMeasureIndex >= 0 &&
+              mtInterestResults[iBestMeasureIndex].mdInterest != WorstInterest()) {
             Cube *measureCube =  mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
             // default setting
-            newMeasure.SetIgnore(false);
-            newMeasure.SetType(ControlMeasure::Candidate);
+            newMeasure->SetIgnore(false);
+            newMeasure->SetType(ControlMeasure::Candidate);
 
             // Get the Camera
             Camera *measureCamera;
             try {
               measureCamera = measureCube->Camera();
             }
-            catch(Isis::iException &e) {
+            catch (Isis::iException &e) {
               std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
               throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
             }
 
-            if(measureCamera->SetUniversalGround(dReferenceLat, dReferenceLon) && 
-               measureCamera->InCube()) {
+            if (measureCamera->SetUniversalGround(dReferenceLat, dReferenceLon) &&
+                measureCamera->InCube()) {
               // Check for reference, Put the corresponding line/samp into a newMeasure
-              if(measure == iBestMeasureIndex) {
-                newMeasure.SetCoordinate(mtInterestResults[measure].mdBestSample, 
-                                         mtInterestResults[measure].mdBestLine, ControlMeasure::Candidate);
-                newMeasure.SetType(ControlMeasure::Reference);
+              if (measure == iBestMeasureIndex) {
+                newMeasure->SetCoordinate(mtInterestResults[measure].mdBestSample,
+                                          mtInterestResults[measure].mdBestLine, ControlMeasure::Candidate);
+                newMeasure->SetType(ControlMeasure::Reference);
 
-                pvlMeasureGrp += Isis::PvlKeyword("NewLocation",  LocationString(mtInterestResults[measure].mdBestSample, 
-                                                                                 mtInterestResults[measure].mdBestLine));
+                pvlMeasureGrp += Isis::PvlKeyword("NewLocation",  LocationString(mtInterestResults[measure].mdBestSample,
+                                                  mtInterestResults[measure].mdBestLine));
                 pvlMeasureGrp += Isis::PvlKeyword("DeltaSample",  mtInterestResults[measure].miDeltaSample);
                 pvlMeasureGrp += Isis::PvlKeyword("DeltaLine",    mtInterestResults[measure].miDeltaLine);
                 pvlMeasureGrp += Isis::PvlKeyword("Reference",    "true");
@@ -488,25 +489,25 @@ namespace Isis {
                 double dSample = measureCamera->Sample();
                 double dLine   = measureCamera->Line();
 
-                MeasureValidationResults results = 
+                MeasureValidationResults results =
                   ValidStandardOptions(dSample, dLine, measureCube);
-                if(!results.isValid()) {
+                if (!results.isValid()) {
                   iNumIgnore++;
                   pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test");
-                  newMeasure.SetIgnore(true);
+                  newMeasure->SetIgnore(true);
                 }
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation", LocationString(dSample, dLine));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)newMeasure.GetSample()));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine",   (int)abs((int)dLine - (int)newMeasure.GetLine()));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)newMeasure->GetSample()));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine", (int)abs((int)dLine - (int)newMeasure->GetLine()));
                 pvlMeasureGrp += Isis::PvlKeyword("Reference",   "false");
-                newMeasure.SetCoordinate(dSample, dLine);
+                newMeasure->SetCoordinate(dSample, dLine);
               }
             }
             else {
               iNumIgnore++;
               pvlMeasureGrp += Isis::PvlKeyword("Ignored", "True");
-              newMeasure.SetIgnore(true);
-              if(!measureCamera->InCube()) {
+              newMeasure->SetIgnore(true);
+              if (!measureCamera->InCube()) {
                 pvlMeasureGrp += Isis::PvlKeyword("Comments", "New location is not in the Image");
               }
             }
@@ -515,15 +516,13 @@ namespace Isis {
           else {
             iNumIgnore++;
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "True");
-            newMeasure.SetIgnore(true);
+            newMeasure->SetIgnore(true);
           }
 
-          if(newMeasure != origPnt[measure]) {
+          if (newMeasure != origPnt[measure]) {
             iMeasuresModified ++;
           }
 
-          newPnt.UpdateMeasure(newMeasure);
-          
           pvlMeasureGrp += Isis::PvlKeyword("BestInterest",   mtInterestResults[measure].mdInterest);
           pvlMeasureGrp += Isis::PvlKeyword("EmissionAngle",  mtInterestResults[measure].mdEmission);
           pvlMeasureGrp += Isis::PvlKeyword("IncidenceAngle", mtInterestResults[measure].mdIncidence);
@@ -533,34 +532,34 @@ namespace Isis {
         } // Measures Loop
 
         // Check the ignored measures number
-        if((newPnt.Size() - iNumIgnore) < 2) {
-          newPnt.SetIgnore(true);
+        if ((newPnt->GetNumMeasures() - iNumIgnore) < 2) {
+          newPnt->SetIgnore(true);
           pvlPointObj += Isis::PvlKeyword("Ignored", "Good Measures less than 2");
         }
 
         iNumIgnore = 0;
 
-        if(newPnt != origPnt) {
+        if (*newPnt != origPnt) {
           iPointsModified ++;
         }
-          
-        if(!newPnt.IsIgnored() && iBestMeasureIndex != iOrigRefIndex) {
+
+        if (!newPnt->IsIgnored() && iBestMeasureIndex != iOrigRefIndex) {
           iRefChanged ++;
           PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
           pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", mtInterestResults[iOrigRefIndex].msSerialNum);
           pvlRefChangeGrp += Isis::PvlKeyword("PrevBestInterest", mtInterestResults[iOrigRefIndex].mdInterest);
           pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     LocationString(mtInterestResults[iOrigRefIndex].mdOrigSample,
-                                                                                 mtInterestResults[iOrigRefIndex].mdOrigLine));
+                                              mtInterestResults[iOrigRefIndex].mdOrigLine));
           pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",  mtInterestResults[iBestMeasureIndex].msSerialNum);
           pvlRefChangeGrp += Isis::PvlKeyword("NewBestInterest",  mtInterestResults[iBestMeasureIndex].mdInterest);
           pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      LocationString(mtInterestResults[iBestMeasureIndex].mdBestSample,
-                                                                                 mtInterestResults[iBestMeasureIndex].mdBestLine));
+                                              mtInterestResults[iBestMeasureIndex].mdBestLine));
 
           // Log info, if Point not locked, apriori source == Reference and a new reference
-          if(newPnt.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
+          if (newPnt->GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
             pvlRefChangeGrp += Isis::PvlKeyword("AprioriSource", "Reference is the source and has changed");
           }
-        
+
           pvlPointObj += pvlRefChangeGrp;
         }
         else {
@@ -572,48 +571,45 @@ namespace Isis {
       else {
         // Process Ignored, non Tie points or Measures=0
         int iComment = 1;
-        
-        if(iOrigRefIndex < 0) {
+
+        if (iOrigRefIndex < 0) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
-        if(newPnt.IsIgnored()) {
+        if (newPnt->IsIgnored()) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
-        
-        if (newPnt.GetType() == ControlPoint::Tie) {
+
+        if (newPnt->GetType() == ControlPoint::Tie) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
         }
-        
-        if (iNumMeasuresLocked > 0 && !bRefLocked){
+
+        if (iNumMeasuresLocked > 0 && !bRefLocked) {
           pvlPointObj += Isis::PvlKeyword("Error", "Point has a Measure with EditLock set to true "
-                                                   "but not a Reference");
+                                          "but not a Reference");
         }
 
-        for(int measure = 0; measure < newPnt.Size(); measure++) {
-          ControlMeasure cm = newPnt[measure];
-          cm.SetDateTime();
-          cm.SetChooserName("Application cnetref(Interest)");
-          newPnt.UpdateMeasure(cm);
+        for (int measure = 0; measure < newPnt->GetNumMeasures(); measure++) {
+          ControlMeasure *cm = newPnt->GetMeasure(measure);
+          cm->SetDateTime();
+          cm->SetChooserName("Application cnetref(Interest)");
         }
       } // End of if point is of type tie
 
       mPvlLog += pvlPointObj;
 
-      pNewNet.UpdatePoint(newPnt);
-      
       mStatus.CheckStatus();
     } // Point loop
 
     // Basic Statistics
-    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.Size());
-    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored",    (pNewNet.Size() - pNewNet.NumValidPoints()));
+    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.GetNumMeasures());
+    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored", (pNewNet.GetNumMeasures() - pNewNet.GetNumValidPoints()));
     mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
     mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
-    mStatisticsGrp += Isis::PvlKeyword("TotalMeasures",    pNewNet.NumMeasures());
+    mStatisticsGrp += Isis::PvlKeyword("TotalMeasures",    pNewNet.GetNumMeasures());
     mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", iMeasuresModified);
 
     mPvlLog += mStatisticsGrp;
@@ -624,18 +620,18 @@ namespace Isis {
    * and store all the results in Interest Results structure.
    *
    * @author Sharmila Prasad (6/8/2010)
-   *  
+   *
    * @param pCnetPoint - Control Point for which the best interest is calculated
    */
   int InterestOperator::InterestByPoint(ControlPoint &pCnetPoint) {
     // Find the overlap this point is inside of if the overlap list is entered
     const geos::geom::MultiPolygon *overlapPoly = NULL;
-    
-    if(mbOverlaps) {
+
+    if (mbOverlaps) {
       overlapPoly = FindOverlap(pCnetPoint);
-      if(overlapPoly == NULL) {
+      if (overlapPoly == NULL) {
         string msg = "Unable to find overlap polygon for point [" +
-            pCnetPoint.GetId() + "]";
+                     pCnetPoint.GetId() + "]";
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
     }
@@ -643,24 +639,24 @@ namespace Isis {
     std::vector <PvlGroup> pvlGrpVector;
 
     // Create an array of Interest Results structure of measures size
-    mtInterestResults = new InterestResults[pCnetPoint.Size()];
+    mtInterestResults = new InterestResults[pCnetPoint.GetNumMeasures()];
 
     int iBestMeasureIndex     = -1;
     double dBestInterestValue = Isis::Null;
 
-    for(int measure = 0; measure < pCnetPoint.Size(); ++measure) {
-      ControlMeasure origMsr = pCnetPoint[measure];
-      std::string sn = origMsr.GetCubeSerialNumber();
+    for (int measure = 0; measure < pCnetPoint.GetNumMeasures(); ++measure) {
+      ControlMeasure *origMsr = pCnetPoint[measure];
+      std::string sn = origMsr->GetCubeSerialNumber();
 
       // Do not process Ignored Measures
-      if(!origMsr.IsIgnored()) {
+      if (!origMsr->IsIgnored()) {
         InitInterestResults(measure);
         Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
         // Set the clipping polygon for this point
         // Convert the lon/lat overlap polygon to samp/line using the UGM for
         // this image
-        if(mbOverlaps) {
+        if (mbOverlaps) {
           UniversalGroundMap unvGround = UniversalGroundMap(*inCube);
           geos::geom::MultiPolygon *poly = PolygonTools::LatLonToSampleLine(*overlapPoly, &unvGround);
           SetClipPolygon(*poly);
@@ -668,9 +664,9 @@ namespace Isis {
         }
 
         // Run the interest operator on this measurment
-        if(InterestByMeasure(measure, origMsr, *inCube)) {
-          if(dBestInterestValue == Isis::Null || CompareInterests(mtInterestResults[measure].mdInterest, 
-                                                                  dBestInterestValue)) {
+        if (InterestByMeasure(measure, *origMsr, *inCube)) {
+          if (dBestInterestValue == Isis::Null || CompareInterests(mtInterestResults[measure].mdInterest,
+              dBestInterestValue)) {
             dBestInterestValue = mtInterestResults[measure].mdInterest;
             iBestMeasureIndex = measure;
           }
@@ -685,15 +681,15 @@ namespace Isis {
    * InterestResults structure
    *
    * @author Sharmila Prasad (6/10/2010)
-   *  
+   *
    * @param piMeasure    - Index for Interest Results structure
-   * @param pCnetMeasure - Control Measure for which the best interest 
+   * @param pCnetMeasure - Control Measure for which the best interest
    *                       is calculated
    *
    * @return bool
    */
-  bool InterestOperator::InterestByMeasure(int piMeasure, ControlMeasure &pCnetMeasure, 
-                                           Cube &pCube) {
+  bool InterestOperator::InterestByMeasure(int piMeasure, ControlMeasure &pCnetMeasure,
+      Cube &pCube) {
     std::string serialNum = pCnetMeasure.GetCubeSerialNumber();
 
     int iOrigSample = (int)(pCnetMeasure.GetSample() + 0.5);
@@ -706,7 +702,8 @@ namespace Isis {
     int pad = Padding();
     Chip chip(2 * p_deltaSamp + p_samples + pad, 2 * p_deltaLine + p_lines + pad);
     chip.TackCube(iOrigSample, iOrigLine);
-    if(p_clipPolygon != NULL) chip.SetClipPolygon(*p_clipPolygon);
+    if (p_clipPolygon != NULL)
+      chip.SetClipPolygon(*p_clipPolygon);
     chip.Load(pCube);
 
     // Walk the search chip and find the best interest
@@ -717,29 +714,29 @@ namespace Isis {
     int iLines   =  2 * p_deltaLine + p_lines / 2 + 1;
     int iSamples =  2 * p_deltaSamp + p_samples / 2 + 1;
     bool bCalculateInterest = false;
-    for(int lin = p_lines / 2 + 1; lin <= iLines; lin++) {
-      for(int samp = p_samples / 2 + 1; samp <= iSamples; samp++) {
+    for (int lin = p_lines / 2 + 1; lin <= iLines; lin++) {
+      for (int samp = p_samples / 2 + 1; samp <= iSamples; samp++) {
         // Cannot take dnValues from the chip as it contains the interpolated dnValue
         // hence get the dn values directly from the cube
         chip.SetChipPosition((double)samp, (double)lin);
 
         bCalculateInterest = false;
 
-        MeasureValidationResults results = 
+        MeasureValidationResults results =
           ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube);
-        if(results.isValid()) {
+        if (results.isValid()) {
           bCalculateInterest = true;
         }
 
-        if(bCalculateInterest) {
+        if (bCalculateInterest) {
           Chip subChip = chip.Extract(p_samples + pad, p_lines + pad, samp, lin);
           double interest = Interest(subChip);
 
-          if(interest != Isis::Null) {
-            if((dBestInterest == Isis::Null) || CompareInterests(interest, dBestInterest)) {
-              double dist = std::sqrt(std::pow(iOrigSample - samp, 2.0) + 
+          if (interest != Isis::Null) {
+            if ((dBestInterest == Isis::Null) || CompareInterests(interest, dBestInterest)) {
+              double dist = std::sqrt(std::pow(iOrigSample - samp, 2.0) +
                                       std::pow(iOrigLine - lin, 2.0));
-              if(interest == dBestInterest && dist > dSmallestDist) {
+              if (interest == dBestInterest && dist > dSmallestDist) {
                 continue;
               }
               else {
@@ -761,20 +758,20 @@ namespace Isis {
     }
 
     // Check to see if we went through the interest chip and never got a interest at
-    // any location.But record the Emission, Incidence Angles and DN Value for the failed 
+    // any location.But record the Emission, Incidence Angles and DN Value for the failed
     // Measure at the original location
-    if(dBestInterest == Isis::Null || dBestInterest < p_minimumInterest) {
+    if (dBestInterest == Isis::Null || dBestInterest < p_minimumInterest) {
       // Get the Camera
       Camera *camera;
       try {
         camera = pCube.Camera();
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(serialNum);
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
 
-      if(camera->SetImage(iOrigSample, iOrigLine)) {
+      if (camera->SetImage(iOrigSample, iOrigLine)) {
         Portal inPortal(1, 1, pCube.PixelType());
         inPortal.SetPosition(iOrigSample, iOrigLine, 1);
         pCube.Read(inPortal);
@@ -797,10 +794,10 @@ namespace Isis {
     mtInterestResults[piMeasure].mdInterest    = dBestInterest;
     mtInterestResults[piMeasure].mdBestSample  = chip.CubeSample();
     mtInterestResults[piMeasure].mdBestLine    = chip.CubeLine();
-    mtInterestResults[piMeasure].miDeltaSample = (int)abs(mtInterestResults[piMeasure].mdBestSample - 
-                                                          iOrigSample);
-    mtInterestResults[piMeasure].miDeltaLine   = (int)abs(mtInterestResults[piMeasure].mdBestLine - 
-                                                          iOrigLine);
+    mtInterestResults[piMeasure].miDeltaSample = (int)abs(mtInterestResults[piMeasure].mdBestSample -
+        iOrigSample);
+    mtInterestResults[piMeasure].miDeltaLine   = (int)abs(mtInterestResults[piMeasure].mdBestLine -
+        iOrigLine);
     return true;
   }
 
@@ -812,33 +809,36 @@ namespace Isis {
   const geos::geom::MultiPolygon *InterestOperator::FindOverlap(ControlPoint &pCnetPoint) {
     int exactMatchIndex = -1;
 
-    for(int overlapIndex = 0; ((exactMatchIndex == -1) && (overlapIndex < mOverlaps.Size())); 
+    for (int overlapIndex = 0; ((exactMatchIndex == -1) && (overlapIndex < mOverlaps.Size()));
          overlapIndex ++) {
       const Isis::ImageOverlap *overlap = mOverlaps[overlapIndex];
 
       // Exact matches only; skip if # SNs don't match
-      if(overlap->Size() != pCnetPoint.Size()) continue;
+      if (overlap->Size() != pCnetPoint.GetNumMeasures())
+        continue;
 
       // If # SNs match and each SN is contained in both then we're good, there
       // should never be two measures with the same SN
       int numMatches = 0;
 
-      for(int measureIndex = 0; measureIndex < pCnetPoint.Size(); measureIndex ++) {
-        if(measureIndex == numMatches) {
-          const ControlMeasure &controlMeasure = pCnetPoint[measureIndex];
+      for (int measureIndex = 0;
+           measureIndex < pCnetPoint.GetNumMeasures();
+           measureIndex ++) {
+        if (measureIndex == numMatches) {
+          const ControlMeasure &controlMeasure = *pCnetPoint[measureIndex];
           iString serialNum = controlMeasure.GetCubeSerialNumber();
-          if(overlap->HasSerialNumber(serialNum)) {
+          if (overlap->HasSerialNumber(serialNum)) {
             numMatches++;
           }
         }
       }
 
-      if(numMatches == pCnetPoint.Size()) {
+      if (numMatches == pCnetPoint.GetNumMeasures()) {
         exactMatchIndex = overlapIndex;
       }
     }
 
-    if(exactMatchIndex < 0) {
+    if (exactMatchIndex < 0) {
       return (FindOverlapByImageFootPrint(pCnetPoint));
     }
 
@@ -856,32 +856,32 @@ namespace Isis {
    * @return const geos::geom::MultiPolygon*
    */
   const geos::geom::MultiPolygon *InterestOperator::FindOverlapByImageFootPrint
-                                                    (Isis::ControlPoint &pCnetPoint) {
+  (Isis::ControlPoint &pCnetPoint) {
     ImagePolygon measPolygon1, measPolygon2, measPolygon3;
     geos::geom::Geometry *geomIntersect1, *geomIntersect2;
 
     // Create Multipolygon for the first Control Measure
-    std::string sn1 = pCnetPoint[0].GetCubeSerialNumber();
+    std::string sn1 = pCnetPoint[0]->GetCubeSerialNumber();
     Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn1));
     inCube1->Read((Blob &)measPolygon1);
 
     // Create Multipolygon for the Second Control Measure
-    std::string sn2 = pCnetPoint[1].GetCubeSerialNumber();
+    std::string sn2 = pCnetPoint[1]->GetCubeSerialNumber();
     Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn2));
     inCube2->Read((Blob &)measPolygon2);
 
     // Get the interesection for the first 2 polgons
-    geomIntersect1 = PolygonTools::Intersect((const geos::geom::Geometry *)measPolygon1.Polys(), 
-                                             (const geos::geom::Geometry *)measPolygon2.Polys());
+    geomIntersect1 = PolygonTools::Intersect((const geos::geom::Geometry *)measPolygon1.Polys(),
+                     (const geos::geom::Geometry *)measPolygon2.Polys());
 
-    for(int measureIndex = 2; measureIndex < pCnetPoint.Size(); measureIndex ++) {
-      std::string sn3 = pCnetPoint[measureIndex].GetCubeSerialNumber();
+    for (int measureIndex = 2; measureIndex < pCnetPoint.GetNumMeasures(); measureIndex ++) {
+      std::string sn3 = pCnetPoint[measureIndex]->GetCubeSerialNumber();
       Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn3));
       inCube3->Read((Blob &)measPolygon3);
 
       // Get the intersection of the intersection and the measure Image Polygon
-      geomIntersect2 = PolygonTools::Intersect(geomIntersect1, 
-                                     (const geos::geom::Geometry *)measPolygon3.Polys());
+      geomIntersect2 = PolygonTools::Intersect(geomIntersect1,
+                       (const geos::geom::Geometry *)measPolygon3.Polys());
       geomIntersect1 = geomIntersect2;
     }
     return (geos::geom::MultiPolygon *)geomIntersect1;
@@ -913,7 +913,8 @@ namespace Isis {
    * @param clipPolygon  The polygons used to clip the chip
    */
   void InterestOperator::SetClipPolygon(const geos::geom::MultiPolygon &clipPolygon) {
-    if(p_clipPolygon != NULL) delete p_clipPolygon;
+    if (p_clipPolygon != NULL)
+      delete p_clipPolygon;
     p_clipPolygon = PolygonTools::CopyMultiPolygon(clipPolygon);
   }
 

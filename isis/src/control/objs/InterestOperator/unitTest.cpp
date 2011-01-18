@@ -23,8 +23,8 @@ int main() {
     op += PvlKeyword("Samples", 15);
     op += PvlKeyword("Lines", 15);
     op += PvlKeyword("MinimumInterest", 0.01);
-        
-    PvlGroup opv("ValidMeasure"); 
+
+    PvlGroup opv("ValidMeasure");
     opv += PvlKeyword("MinDN", 0.0);
     opv += PvlKeyword("MaxDN", 1.0);
     opv += PvlKeyword("MinEmission", 15.0);
@@ -54,7 +54,7 @@ int main() {
               << "Line : " << iop->CubeLine() << std::endl
               << "Interest: " << iop->InterestAmount() << std::endl;
   }
-  catch(iException &e) {
+  catch (iException &e) {
     e.Report();
   }
 

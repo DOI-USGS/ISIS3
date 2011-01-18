@@ -74,13 +74,13 @@ namespace Isis {
    *                     subclasses to return the pvl group that they were initialized from
    *   @history 2010-04-09 Sharmila Prasad - API's to check valid DN and Emission Angle.
    *            Also changed functionality of Operate and made it overloaded.
-   *   @history 2010-04-30 Sharmila Prasad - Added class members mdBestEmissionAngle, 
+   *   @history 2010-04-30 Sharmila Prasad - Added class members mdBestEmissionAngle,
    *            mdBestDnValue and their access functions.Also added member mUnusedParamGrp
    *            to check for the default values used for the operator.
    *   @history 2010-04-30 Sharmila Prasad - 1. Interest Operator child of ControlNetValidMeasure
    *            which validates all the standard control network options. Changed functionality
    *            to accomadate ControlNetValidMeasure
-   *            2. Removed class members  mdBestEmissionAngle, mdBestDnValue..., instead 
+   *            2. Removed class members  mdBestEmissionAngle, mdBestDnValue..., instead
    *            stored in structure InterestResults structure
    *            3. Move processing ImageOverlaps from app to here
    *            4. Added API's to compute Interest by point and by measure
@@ -88,7 +88,7 @@ namespace Isis {
    *            2. Do not process previously Ignored points in the Original Control Net
    *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
    *            use CubeManager instead
-   *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard 
+   *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard
    *            Options & Std Options Pixels/Meters from Edge
    *   @history 2010-07-13 Tracie Sucharski - Make changes to implement the new or modified
    *            keywords for the implementation of binary control networks.
@@ -125,12 +125,12 @@ namespace Isis {
       //! Operate - to calculate interest for entire control net to get better reference
       void Operate(ControlNet &pNewNet, std::string psSerialNumFile, std::string psOverlapListFile = "");
 
-      //! Return the Interest Amount 
+      //! Return the Interest Amount
       inline double InterestAmount() const {
         return p_interestAmount;
       };
 
-      //! Return the Worst(least value) Interest 
+      //! Return the Worst(least value) Interest
       inline double WorstInterest() const {
         return p_worstInterest;
       }
@@ -147,7 +147,7 @@ namespace Isis {
 
       //! Compare for int1 greater than / equal to int2
       virtual bool CompareInterests(double int1, double int2);
-      void AddGroup(Isis::PvlObject &obj); //???? check if used
+      void AddGroup(Isis::PvlObject &obj);  //???? check if used
 
       //! Set the Clip Polygon for points to be contained in the overlaps
       void SetClipPolygon(const geos::geom::MultiPolygon &clipPolygon);
@@ -173,8 +173,8 @@ namespace Isis {
       void FindCnetRef(ControlNet &pNewNet);
 
       //! Process (Validate and Log) Point with Lock or with Referemce Measure Locked
-      void ProcessLocked_Point_Reference(ControlPoint & pCPoint, PvlObject & pPvlObj, int & piMeasuresModified);
-      
+      void ProcessLocked_Point_Reference(ControlPoint &pCPoint, PvlObject &pPvlObj, int &piMeasuresModified);
+
       //! Calculate interest for a Control Point
       int InterestByPoint(ControlPoint &pCnetPoint);
 
@@ -189,7 +189,7 @@ namespace Isis {
       double p_worstInterest, p_interestAmount;
 
       //!< clipping polygon set by SetClipPolygon (line,samp)
-      geos::geom::MultiPolygon *p_clipPolygon; 
+      geos::geom::MultiPolygon *p_clipPolygon;
 
       Isis::PvlGroup mOperatorGrp;        //!< Operator group that created this projection
 
@@ -198,10 +198,10 @@ namespace Isis {
       double p_minimumInterest;           //!< Specified in the Pvl Operator group
       Isis::ImageOverlapSet mOverlaps;    //!< Holds the overlaps from the Overlaplist
       bool mbOverlaps;                    //!< If Overlaplist exists
-      
+
       //! Specified in the Pvl Operator group for the box car size
       int p_deltaSamp, p_deltaLine, p_lines, p_samples;
-      
+
       //! Structure to hold Interest Results
       typedef struct {
         std::string msSerialNum;     //!< Serial Number of the Measure
@@ -217,8 +217,8 @@ namespace Isis {
         bool mbValid;                //!< Value of the interest operator result (success)
         int  miDeltaSample;          //!< The number of Samples the point has been moved
         int  miDeltaLine;            //!< The number of Lines the point has been moved
-      }InterestResults;
-      InterestResults *mtInterestResults; //!< Holds the results of an interest computation
+      } InterestResults;
+      InterestResults *mtInterestResults;  //!< Holds the results of an interest computation
   };
 };
 
