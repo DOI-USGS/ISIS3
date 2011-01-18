@@ -23,13 +23,14 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-template < typename A, typename B > class QHash;
+template< typename A, typename B > class QHash;
+template< typename T > class QList;
 
-#include <QString>
+class QString;
 
 namespace Isis {
-
   class ControlMeasure;
+  class iString;
 
   /**
    * @brief Serial Number with added functionality for Control Networks
@@ -48,22 +49,38 @@ namespace Isis {
    *                                                              version
    *
    */
-
   class ControlSerialNumber {
     public:
-      ControlSerialNumber(QString sn);
+      explicit ControlSerialNumber(iString sn);
+      ControlSerialNumber(const ControlSerialNumber &other);
       virtual ~ControlSerialNumber();
 
-      void AddMeasure(QString parentPointId, ControlMeasure * measure);
-      void RemoveMeasure(QString parentPoint);
+      void AddMeasure(iString parentPointId, ControlMeasure *measure);
+      void RemoveMeasure(iString parentPointId);
 
-      QString GetSerialNumber();
+      bool Contains(iString parentPointId);
+      iString GetSerialNumber();
+      int GetNumMeasures();
+      QList< QString > GetPointIds() const;
+
+      ControlMeasure *GetMeasure(iString pointId);
+      const ControlMeasure *GetMeasure(iString pointId) const;
+
+      ControlMeasure *operator[](iString pointId);
+      const ControlMeasure *operator[](iString pointId) const;
+
+      const ControlSerialNumber &operator=(ControlSerialNumber);
+
 
     private:
-      QString serialNumber;
+      void Nullify();
+
+
+    private:
+      iString *serialNumber;
       QHash< QString, ControlMeasure * > * measures;
 
   }; // End of Class
-}; // End of namespace
+} // End of namespace
 
 #endif
