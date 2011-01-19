@@ -46,21 +46,21 @@ void IsisMain() {
   }
 
   bool noIgnore          = ui.GetBoolean("NOIGNORE");
-  bool noSingleMeasure   = ui.GetBoolean("NOSINGLEMEASURES");
   bool noMeasureless     = ui.GetBoolean("NOMEASURELESS");
-  bool noTolerancePoints = ui.GetBoolean("TOLERANCE");
+  bool noSingleMeasure   = ui.GetBoolean("NOSINGLEMEASURES");
   bool reference         = ui.GetBoolean("REFERENCE");
   bool ground            = ui.GetBoolean("GROUND");
+  bool noTolerancePoints = ui.GetBoolean("TOLERANCE");
+  bool pointsEntered     = ui.WasEntered("POINTLIST");
   bool cubePoints        = ui.GetBoolean("CUBES");
   bool cubeMeasures      = ui.GetBoolean("CUBEMEASURES");
-  bool pointsEntered     = ui.WasEntered("POINTLIST");
   bool latLon            = ui.GetBoolean("LATLON");
 
-  if(!(noIgnore || noSingleMeasure || noMeasureless || noTolerancePoints ||
-       reference || ground || cubePoints || pointsEntered || latLon)) {
+  if(!(noIgnore || noMeasureless || noSingleMeasure || reference || ground ||
+       noTolerancePoints || pointsEntered || cubePoints || latLon)) {
     std::string msg = "At least one filter must be selected [";
-    msg += "NOIGNORE,NOSINGLEMEASURE,TOLERANCE,REFERENCE,GROUND,";
-    msg += "POINTLIST,LATLON]";
+    msg += "NOIGNORE,NOMEASURELESS,NOSINGLEMEASURE,REFERENCE,GROUND,TOLERANCE,";
+    msg += "POINTLIST,CUBES,LATLON]";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 

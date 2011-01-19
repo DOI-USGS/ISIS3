@@ -388,7 +388,7 @@
       <parameter name="CUBEMEASURES">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract Control Measures containing a cube in CUBEPOINTS</brief>
+        <brief>Only extract Control Measures containing a cube in CUBELIST</brief>
         <description>
           <p>When true, remove all Control Measures from extracted Control
           Points which do not contain a cube from the CUBEPOINTS list.
