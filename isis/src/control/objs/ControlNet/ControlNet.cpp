@@ -121,6 +121,10 @@ namespace Isis
   {
     Nullify();
 
+    points = new QHash< QString, ControlPoint * >;
+    serials = new QHash< QString, ControlSerialNumber * >;
+    pointIds = new QStringList;
+
     p_invalid = false;
     p_numMeasures = 0;
     p_numIgnoredMeasures = 0;
@@ -573,17 +577,18 @@ namespace Isis
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    QString pointId = point->GetId();
+    points->insert(pointId, point);
+    pointIds->append(pointId);
+
     point->parentNetwork = this;
     QList< QString > serials = point->GetCubeSerialNumbers();
     if (serials.size())
     {
-      for (int i = 0; i < serials.size(); i++)
+      for (int i = 0; i < serials.size(); i++) {
         AddControlSerialNumber(point, point->GetMeasure(serials[i]));
+      }
     }
-
-    QString pointId = point->GetId();
-    points->insert(pointId, point);
-    pointIds->append(pointId);
   }
 
 
