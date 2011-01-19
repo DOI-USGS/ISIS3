@@ -138,11 +138,11 @@ void IsisMain() {
           SurfacePoint pt(Latitude(proj->Latitude(), Angle::Degrees),
                           Longitude(proj->Longitude(), Angle::Degrees),
                           Distance(equatorialRadius));
-          ControlPoint control;
-          control.SetId(pointId.Next());
-          control.SetIgnore(true);
-          control.SetSurfacePoint(pt);
-          cnet.Add(control);
+          ControlPoint * control = new ControlPoint;
+          control->SetId(pointId.Next());
+          control->SetIgnore(true);
+          control->SetSurfacePoint(pt);
+          cnet.AddPoint(control);
         }
         y += yStepSize;
         gridStatus.CheckStatus();
@@ -209,14 +209,14 @@ void IsisMain() {
     while(lon <= maxLon) {
       double lat = minLat;
       while(lat <= maxLat) {
-        ControlPoint control;
-        control.SetId(pointId.Next());
-        control.SetIgnore(true);
+        ControlPoint * control = new ControlPoint;
+        control->SetId(pointId.Next());
+        control->SetIgnore(true);
         SurfacePoint pt(Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(equatorialRadius));
-        control.SetSurfacePoint(pt);
-        cnet.Add(control);
+        control->SetSurfacePoint(pt);
+        cnet.AddPoint(control);
 
         lat += latStep;
         gridStatus.CheckStatus();
@@ -227,7 +227,7 @@ void IsisMain() {
 
   PvlGroup results("Results");
   results += PvlKeyword("EquatorialRadius", equatorialRadius);
-  results += PvlKeyword("NumberControlPoints", cnet.Size());
+  results += PvlKeyword("NumberControlPoints", cnet.GetNumPoints());
   Application::Log(results);
 
   cnet.Write(ui.GetFilename("TO"));
