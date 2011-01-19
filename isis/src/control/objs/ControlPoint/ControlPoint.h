@@ -293,6 +293,9 @@ namespace Isis {
       const ControlMeasure *GetMeasure(iString serialNumber) const;
       ControlMeasure *GetMeasure(iString serialNumber);
 
+      const ControlMeasure * GetMeasure(int index) const;
+      ControlMeasure * GetMeasure(int index);
+
       const ControlMeasure *GetReferenceMeasure() const;
       ControlMeasure *GetReferenceMeasure();
 

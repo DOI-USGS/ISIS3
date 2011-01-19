@@ -528,6 +528,30 @@ namespace Isis {
   }
 
 
+  const ControlMeasure * ControlPoint::GetMeasure(int index) const
+  {
+    if (index < 0 || index >= cubeSerials->size())
+    {
+      iString msg = "Index [" + iString(index) + "] out of range";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    return GetMeasure(cubeSerials->at(index));
+  }
+
+
+  ControlMeasure * ControlPoint::GetMeasure(int index)
+  {
+    if (index < 0 || index >= cubeSerials->size())
+    {
+      iString msg = "Index [" + iString(index) + "] out of range";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    return GetMeasure(cubeSerials->at(index));
+  }
+
+
   /**
    * Get the reference control measure.
    *
