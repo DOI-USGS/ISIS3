@@ -44,7 +44,7 @@ namespace Isis {
   *   @history 2010-06-10 Sharmila Prasad - Original version
   *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
   *                                         use CubeManager instead
-  *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard 
+  *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard
   *                                         Options & Std Options Pixels/Meters from Edge
   *   @history 2010-09-16 Sharmila Prasad - Renamed CnetValidMeasure to ControlNetValidMeasure
   *   @history 2010-10-06 Sharmila Prasad - Modified to incorporate Binary Control Network
@@ -52,6 +52,8 @@ namespace Isis {
   *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
   *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
   *                                         (UpdatePoint, UpdateMeasure)
+  *   @history 2011-01-19 Christopher Austin - Altered to compile with the new
+  *                                            Control redesign.
   */
 
   class Pvl;

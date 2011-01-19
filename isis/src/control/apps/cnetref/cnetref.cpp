@@ -38,11 +38,11 @@ void IsisMain() {
       // Log the DefFile
       Application::Log(pvlDefFile->Group(0));
 
-      if(pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge") ) {
+      if(pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge")) {
         string message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
         throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
       }
-      
+
       Pvl pvlTemplate, pvlResults;
       if(sCriteria == "INTEREST") {
         pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_operator.def");
@@ -54,10 +54,10 @@ void IsisMain() {
       if(pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
         Application::Log(pvlResults.Group(0));
         string sErrMsg = "Invalid Deffile\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
       }
     }
-    
+
     // Get the original control net internalized
     Progress progress;
     ControlNet cNet(ui.GetFilename("CNET"), &progress);

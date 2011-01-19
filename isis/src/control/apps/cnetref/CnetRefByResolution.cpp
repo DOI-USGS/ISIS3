@@ -23,13 +23,13 @@ namespace Isis {
    * @param pPvlDef         - Pvl Definition File
    * @param psSerialNumfile - Serial Number file attached to the ControlNet
    * @param peType          - Resolution Type
-   * @param pdResValue      - Resolution value 
-   * @param pdMinRes        - Min Resolution value 
-   * @param pdMaxRes        - Max Resolution value 
+   * @param pdResValue      - Resolution value
+   * @param pdMinRes        - Min Resolution value
+   * @param pdMaxRes        - Max Resolution value
    */
-  CnetRefByResolution::CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, 
-    ResolutionType peType,double pdResValue, double pdMinRes, double pdMaxRes) 
-    :ControlNetValidMeasure(pPvlDef) {
+  CnetRefByResolution::CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile,
+      ResolutionType peType, double pdResValue, double pdMinRes, double pdMaxRes)
+    : ControlNetValidMeasure(pPvlDef) {
     mdResValue = pdResValue;
     mdMinRes   = pdMinRes;
     mdMaxRes   = pdMaxRes;
@@ -38,15 +38,15 @@ namespace Isis {
   }
 
   /**
-   * FindCnetRef traverses all the control points and measures in the network and checks for 
-   * valid Measure which passes the Emission Incidence Angle, DN value tests and chooses the 
-   * measure with the best Resolution criteria as the reference. Creates a new control network 
+   * FindCnetRef traverses all the control points and measures in the network and checks for
+   * valid Measure which passes the Emission Incidence Angle, DN value tests and chooses the
+   * measure with the best Resolution criteria as the reference. Creates a new control network
    * with these adjustments.
    *
    * @author Sharmila Prasad (5/25/2010)
-   * @history 2010-10-04 Sharmila Prasad - Modified for Binary CNet (Edit Lock) 
-   *  
-   * @param pNewNet   - Modified output Control Net 
+   * @history 2010-10-04 Sharmila Prasad - Modified for Binary CNet (Edit Lock)
+   *
+   * @param pNewNet   - Modified output Control Net
    *
    */
   void CnetRefByResolution::FindCnetRef(ControlNet &pNewNet) {
@@ -58,33 +58,33 @@ namespace Isis {
 
     //Status Report
     mStatus.SetText("Choosing Reference by Resolution...");
-    mStatus.SetMaximumSteps(pNewNet.Size());
+    mStatus.SetMaximumSteps(pNewNet.GetNumPoints());
     mStatus.CheckStatus();
 
     //mPvlLog += GetStdOptions();
-    for(int point = 0; point < pNewNet.Size(); ++point) {
-      ControlPoint newPnt = pNewNet[point];      
-      const ControlPoint origPnt(newPnt);
-      
+    for(int point = 0; point < pNewNet.GetNumPoints(); ++point) {
+      ControlPoint *newPnt = pNewNet.GetPoint(point);
+      const ControlPoint *origPnt = newPnt;
+
       mdResVector.clear();
 
       // Stats and Accounting
-      iTotalMeasures += newPnt.Size();
+      iTotalMeasures += newPnt->GetNumMeasures();
 
       // Logging
       PvlObject pvlPointObj("PointDetails");
-      pvlPointObj += Isis::PvlKeyword("PointId", newPnt.GetId());
+      pvlPointObj += Isis::PvlKeyword("PointId", newPnt->GetId());
 
       // Edit Lock Option
-      bool bPntEditLock = newPnt.IsEditLocked();
+      bool bPntEditLock = newPnt->IsEditLocked();
       if(!bPntEditLock) {
-        newPnt.SetDateTime(Application::DateTime());
+        newPnt->SetDateTime(Application::DateTime());
       }
 
-      int iNumMeasuresLocked = newPnt.GetNumLockedMeasures();
-      bool bRefLocked = newPnt.IsReferenceLocked();
-      
-      int iRefIndex = newPnt.GetReferenceIndexNoException();
+      int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
+      bool bRefLocked = newPnt->IsReferenceLocked();
+
+      int iRefIndex = newPnt->GetReferenceIndexNoException();
       iString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
@@ -94,23 +94,23 @@ namespace Isis {
       // Points having atleast 1 measure and Point is not Ignored
       // Check for EditLock in the Measures and also verfify that
       // only a Reference Measure can be Locked else error
-      if(!newPnt.IsIgnored() && newPnt.GetType() == ControlPoint::Tie && iRefIndex >= 0 &&
-         (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
+      if(!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Tie && iRefIndex >= 0 &&
+          (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
         iString istrTemp;
 
-        for(int measure = 0; measure < newPnt.Size(); ++measure) {
+        for(int measure = 0; measure < newPnt->GetNumMeasures(); ++measure) {
 
-          ControlMeasure newMsr = newPnt[measure]; 
-          
-          bool bMeasureLocked = newMsr.IsEditLocked();
-          double dSample      = newMsr.GetSample();
-          double dLine        = newMsr.GetLine();
-          std::string sn      = newMsr.GetCubeSerialNumber();
+          ControlMeasure *newMsr = newPnt->GetMeasure(measure);
+
+          bool bMeasureLocked = newMsr->IsEditLocked();
+          double dSample      = newMsr->GetSample();
+          double dLine        = newMsr->GetLine();
+          std::string sn      = newMsr->GetCubeSerialNumber();
 
           if(!bPntEditLock && !bMeasureLocked) {
-            newMsr.SetDateTime(Application::DateTime());
-            newMsr.SetChooserName("Application cnetref(Resolution)");
+            newMsr->SetDateTime(Application::DateTime());
+            newMsr->SetChooserName("Application cnetref(Resolution)");
           }
 
           // Log
@@ -118,7 +118,7 @@ namespace Isis {
           pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
           pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(dSample, dLine));
 
-          if(!newMsr.IsIgnored()) {
+          if(!newMsr->IsIgnored()) {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
             MeasureValidationResults results =
@@ -132,14 +132,14 @@ namespace Isis {
               }
               else {
                 pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Failed Validation Test");
-                newMsr.SetIgnore(true);
+                newMsr->SetIgnore(true);
                 iNumIgnore++;
               }
             } // valid measure
             else {
               if(!bPntEditLock && !bRefLocked) {
-                newMsr.SetType(ControlMeasure::Candidate);
-                newMsr.SetIgnore(false);  
+                newMsr->SetType(ControlMeasure::Candidate);
+                newMsr->SetIgnore(false);
                 mdResVector.push_back(mdResolution);
               }
             }
@@ -148,30 +148,30 @@ namespace Isis {
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Originally Ignored");
             iNumIgnore++;
           }
-          if(newMsr != origPnt[measure]) {
+          if(newMsr != origPnt->GetMeasure(measure)) {
             iMeasuresModified++;
           }
-          
-          newPnt.UpdateMeasure(newMsr);
+
+          //newPnt.UpdateMeasure(newMsr); // Redesign fixed this
           pvlGrpVector.push_back(pvlMeasureGrp);
         }// end Measure
 
-        if((newPnt.Size() - iNumIgnore) < 2) {
+        if((newPnt->GetNumMeasures() - iNumIgnore) < 2) {
           if(bPntEditLock) {
             pvlPointObj += Isis::PvlKeyword("UnIgnored", "Good Measures less than 2 but not Ignored as Point EditLock is True");
           }
           else {
-            newPnt.SetIgnore(true);
+            newPnt->SetIgnore(true);
             pvlPointObj += Isis::PvlKeyword("Ignored", "Good Measures less than 2");
           }
         }
         // Set the Reference if the Point is unlocked and Reference measure is unlocked
-        if(!newPnt.IsIgnored() && !bPntEditLock && !bRefLocked) {
+        if(!newPnt->IsIgnored() && !bPntEditLock && !bRefLocked) {
           iBestIndex = GetReferenceByResolution(newPnt);
-          if(iBestIndex >= 0 && !newPnt[iBestIndex].IsIgnored()) {
-            ControlMeasure cm = newPnt[iBestIndex];
-            cm.SetType(ControlMeasure::Reference);
-            newPnt.UpdateMeasure(cm);
+          if(iBestIndex >= 0 && !newPnt->GetMeasure(iBestIndex)->IsIgnored()) {
+            ControlMeasure *cm = newPnt->GetMeasure(iBestIndex);
+            cm->SetType(ControlMeasure::Reference);
+            //newPnt.UpdateMeasure(cm); // Redesign fixed this
             pvlGrpVector[iBestIndex] += Isis::PvlKeyword("Reference", "true");
           }
           else {
@@ -179,48 +179,48 @@ namespace Isis {
               pvlPointObj += Isis::PvlKeyword("NOTE", "No Valid Measures within the Resolution Range. Reference defaulted to the first Measure");
             }
             iBestIndex = 0;
-            ControlMeasure cm = newPnt[iBestIndex];
-            cm.SetType(ControlMeasure::Reference);
-            newPnt.UpdateMeasure(cm);
-            
+            ControlMeasure *cm = newPnt->GetMeasure(iBestIndex);
+            cm->SetType(ControlMeasure::Reference);
+            //newPnt.UpdateMeasure(cm); // Redesign fixed this
+
             // Log info, if Point not locked, apriori source == Reference and a new reference
-            if(iRefIndex != iBestIndex && 
-               newPnt.GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
+            if(iRefIndex != iBestIndex &&
+                newPnt->GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::Reference) {
               pvlGrpVector[iBestIndex] += Isis::PvlKeyword("AprioriSource", "Reference is the source and has changed");
             }
           }
         }
 
-        for(int i = 0; i < newPnt.Size(); i++) {
+        for(int i = 0; i < newPnt->GetNumMeasures(); i++) {
           pvlPointObj += pvlGrpVector[i];
         }
       } // end Tie
       else {
-        int iComment=1;
+        int iComment = 1;
         if(iRefIndex < 0) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
-        
-        if(newPnt.IsIgnored()) {
+
+        if(newPnt->IsIgnored()) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
-        
-        if (newPnt.GetType() == ControlPoint::Tie) {
+
+        if(newPnt->GetType() == ControlPoint::Tie) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
         }
-        
-        if (iNumMeasuresLocked > 0 && !bRefLocked){
+
+        if(iNumMeasuresLocked > 0 && !bRefLocked) {
           pvlPointObj += Isis::PvlKeyword("Error", "Point has Measure(s) with EditLock set to true but not the Reference");
         }
-        
-        for(int measure = 0; measure < newPnt.Size(); measure++) {
-          ControlMeasure cm = newPnt[iBestIndex];
-          cm.SetDateTime(Application::DateTime());
-          cm.SetChooserName("Application cnetref(Resolution)");
-          newPnt.UpdateMeasure(cm);
+
+        for(int measure = 0; measure < newPnt->GetNumMeasures(); measure++) {
+          ControlMeasure *cm = newPnt->GetMeasure(iBestIndex);
+          cm->SetDateTime(Application::DateTime());
+          cm->SetChooserName("Application cnetref(Resolution)");
+          //newPnt.UpdateMeasure(cm); // Redesign fixed this
         }
       }
 
@@ -228,18 +228,20 @@ namespace Isis {
         iPointsModified++;
       }
 
-      if(!newPnt.IsIgnored() && iBestIndex != iRefIndex && !bPntEditLock && !bRefLocked) {
+      if(!newPnt->IsIgnored() && iBestIndex != iRefIndex && !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
-        pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", origPnt[iRefIndex].GetCubeSerialNumber());
+        pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",
+                                            origPnt->GetMeasure(iRefIndex)->GetCubeSerialNumber());
         pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   mdResVector[iRefIndex]);
 
-        istrTemp = iString((int)origPnt[iRefIndex].GetSample());
+        istrTemp = iString((int)origPnt->GetMeasure(iRefIndex)->GetSample());
         istrTemp += ",";
-        istrTemp += iString((int)origPnt[iRefIndex].GetLine());
+        istrTemp += iString((int)origPnt->GetMeasure(iRefIndex)->GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
 
-        pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",  newPnt[iBestIndex].GetCubeSerialNumber());
+        pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",
+                                            newPnt->GetMeasure(iBestIndex)->GetCubeSerialNumber());
         std::string sKeyName = "NewHighestResolution";
         if(meType == Low) {
           sKeyName = "NewLeastResolution";
@@ -256,9 +258,9 @@ namespace Isis {
         }
         pvlRefChangeGrp += Isis::PvlKeyword(sKeyName,  mdResVector[iBestIndex]);
 
-        istrTemp = iString((int)newPnt[iBestIndex].GetSample());
+        istrTemp = iString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
         istrTemp += ",";
-        istrTemp += iString((int)newPnt[iBestIndex].GetLine());
+        istrTemp += iString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      istrTemp);
 
         pvlPointObj += pvlRefChangeGrp;
@@ -267,14 +269,14 @@ namespace Isis {
         pvlPointObj += Isis::PvlKeyword("Reference", "No Change");
       }
 
-      pNewNet.UpdatePoint(newPnt);
+      //pNewNet.UpdatePoint(newPnt); // Redesign fixed this
       mPvlLog += pvlPointObj;
       mStatus.CheckStatus();
     }// end Point
 
     // Basic Statistics
-    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.Size());
-    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored",    (pNewNet.Size() - pNewNet.NumValidPoints()));
+    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.GetNumPoints());
+    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored", (pNewNet.GetNumPoints() - pNewNet.GetNumValidPoints()));
     mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
     mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
     mStatisticsGrp += Isis::PvlKeyword("TotalMeasures",    iTotalMeasures);
@@ -308,7 +310,7 @@ namespace Isis {
    *
    * @return int
    */
-  int CnetRefByResolution::GetReferenceByResolution(ControlPoint &pNewPoint) {
+  int CnetRefByResolution::GetReferenceByResolution(ControlPoint *pNewPoint) {
     int iBestIndex = -1;
     double dBestResolution = -1;
     double dMean = 0;
@@ -317,7 +319,7 @@ namespace Isis {
     }
 
     for(int i = 0; i < (int)mdResVector.size(); i++) {
-      if(pNewPoint[i].IsIgnored()) {
+      if(pNewPoint->GetMeasure(i)->IsIgnored()) {
         continue;
       }
       else {

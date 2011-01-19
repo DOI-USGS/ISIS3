@@ -58,8 +58,10 @@ namespace Isis {
   *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
   *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
   *                                         (UpdatePoint, UpdateMeasure)
+   *   @history 2011-01-19 Christopher Austin - Altered to compile with the new
+   *                                            Control redesign.
   */
-  
+
   /**
    * Enumeration containing different Resolution Types
    */
@@ -71,7 +73,7 @@ namespace Isis {
   class CnetRefByResolution : public ControlNetValidMeasure {
     public:
       //! Constructor
-      CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, ResolutionType peType = Low, 
+      CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, ResolutionType peType = Low,
                           double pdResValue = 0, double pdMinRes = 0, double pdMaxRes = 0);
       virtual ~CnetRefByResolution() {};
 
@@ -88,8 +90,8 @@ namespace Isis {
 
     private:
       //! Get the Reference based on Resolution type
-      int GetReferenceByResolution(ControlPoint &pNewPoint); 
-      
+      int GetReferenceByResolution(ControlPoint *pNewPoint);
+
       std::vector<double> mdResVector; //!< Store the Resolutions of all Measures in a Point
       ResolutionType meType;           //!< Resolution Type - Low, Mean, High, Value, Range
       double mdResValue;               //!< Resolution value for Type=Value
