@@ -30,9 +30,10 @@ void IsisMain() {
   UniversalGroundMap *ugm = NULL;
   try {
     ugm = new UniversalGroundMap(cube);
-  } catch (iException e){
+  }
+  catch(iException e) {
     iString msg = "Cannot initalize UniversalGroundMap for cube [" + from + "]";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
 
@@ -40,16 +41,16 @@ void IsisMain() {
   int numFailures = 0;
   string failedIDs = "";
 
-  for(int i = 0; i < cnet.Size() ; i++) {
-    ControlPoint cp = cnet[i];
+  for(int i = 0; i < cnet.GetNumPoints() ; i++) {
+    ControlPoint *cp = cnet.GetPoint(i);
 
-    if(cp.GetType() == ControlPoint::Ground) {
+    if(cp->GetType() == ControlPoint::Ground) {
       // Create Brick on samp, line to get the dn value of the pixel
-      SurfacePoint surfacePt = cp.GetSurfacePoint();
+      SurfacePoint surfacePt = cp->GetSurfacePoint();
       Brick b(1, 1, 1, cube.PixelType());
       bool ugSuccess = ugm->SetUniversalGround(
-          surfacePt.GetLatitude().GetDegrees(),
-          surfacePt.GetLongitude().GetDegrees());
+                         surfacePt.GetLatitude().GetDegrees(),
+                         surfacePt.GetLongitude().GetDegrees());
       b.SetBasePosition((int)ugm->Sample(), (int)ugm->Line(), 1);
       cube.Read(b);
       double newRadius = b[0];
@@ -61,18 +62,18 @@ void IsisMain() {
         if(numFailures > 1) {
           failedIDs = failedIDs + ", ";
         }
-        failedIDs = failedIDs + cp.GetId();
-        cp.SetIgnore(true);
+        failedIDs = failedIDs + cp->GetId();
+        cp->SetIgnore(true);
       }
       // otherwise, we will replace the computed radius value to the output control net
       else {
         numSuccesses++;
         surfacePt.ResetLocalRadius(newRadius);
-        cp.SetSurfacePoint(surfacePt);
+        cp->SetSurfacePoint(surfacePt);
       }
     }
 
-    cnet.UpdatePoint(cp);
+    //cnet.UpdatePoint(cp); // Redesign fixed this
   }
 
   delete ugm;
