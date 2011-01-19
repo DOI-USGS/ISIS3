@@ -53,6 +53,9 @@
     <change name="Steven Lambright" date="2010-10-19">
       Updated to work with recent control network changes
     </change>
+    <change name="Christopher Austin" date="2011-01-19">
+      Altered to compile with the new Control redesign.
+    </change>
   </history> 
   
   <category>
