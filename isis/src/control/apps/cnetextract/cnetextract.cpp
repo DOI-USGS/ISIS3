@@ -84,7 +84,7 @@ void IsisMain() {
 
 
   Progress progress;
-  progress.SetMaximumSteps(outNet.Size());
+  progress.SetMaximumSteps(outNet.GetNumPoints());
   progress.CheckStatus();
 
   // Set up verctor records of how points/measures are removed
@@ -125,87 +125,89 @@ void IsisMain() {
   outNet.SetDescription(ui.GetString("DESCRIPTION"));
 
 
-  for(int cp = outNet.Size() - 1; cp >= 0; cp --) {
+  for(int cp = outNet.GetNumPoints() - 1; cp >= 0; cp --) {
     progress.CheckStatus();
 
+    ControlPoint *controlpt = outNet.GetPoint(cp);
+
     // Do preliminary exclusion checks
-    if(noIgnore && outNet[cp].IsIgnored()) {
-      ignoredPoints.append(outNet[cp].GetId());
-      outNet.Delete(cp);
+    if(noIgnore && controlpt->IsIgnored()) {
+      ignoredPoints.append(controlpt->GetId());
+      outNet.DeletePoint(cp);
       continue;
     }
-    if(ground && !(outNet[cp].GetType() == ControlPoint::Ground)) {
-      nonGroundPoints.append(outNet[cp].GetId());
-      outNet.Delete(cp);
+    if(ground && !(controlpt->GetType() == ControlPoint::Ground)) {
+      nonGroundPoints.append(controlpt->GetId());
+      outNet.DeletePoint(cp);
       continue;
     }
 
     if(noSingleMeasure) {
       bool invalidPoint = false;
-      invalidPoint |= noIgnore && (outNet[cp].GetNumValidMeasures() < 2);
-      invalidPoint |= outNet[cp].Size() < 2 && (outNet[cp].GetType() != ControlPoint::Ground);
+      invalidPoint |= noIgnore && (controlpt->GetNumValidMeasures() < 2);
+      invalidPoint |= controlpt->GetNumMeasures() < 2 && (controlpt->GetType() != ControlPoint::Ground);
 
       if(invalidPoint) {
-        singleMeasurePoints.append(outNet[cp].GetId());
-        outNet.Delete(cp);
+        singleMeasurePoints.append(controlpt->GetId());
+        outNet.DeletePoint(cp);
         continue;
       }
     }
 
     // Change the current point into a new point by manipulation of its control measures
-    ControlPoint newPoint = outNet[cp];
+    ControlPoint *newPoint = outNet.GetPoint(cp);
 
     bool shouldDeleteReferenceMeasure = false;
-    for(int cm = newPoint.Size() - 1; cm >= 0; cm --) {
-      const ControlMeasure &newMeasure = newPoint[cm];
+    for(int cm = newPoint->GetNumMeasures() - 1; cm >= 0; cm --) {
+      const ControlMeasure *newMeasure = newPoint->GetMeasure(cm);
 
-      if(noIgnore && newMeasure.IsIgnored()) {
-        ignoredMeasures.append(newPoint.GetId() + "," + newMeasure.GetCubeSerialNumber());
+      if(noIgnore && newMeasure->IsIgnored()) {
+        ignoredMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
         //New error with deleting Reference Measures
-        if(!newMeasure.GetType() == ControlMeasure::Reference)
-          newPoint.Delete(cm);
+        if(!newMeasure->GetType() == ControlMeasure::Reference)
+          newPoint->Delete(cm);
         else
           shouldDeleteReferenceMeasure = true;
       }
-      else if(reference && !newMeasure.GetType() == ControlMeasure::Reference) {
-        nonReferenceMeasures.append(newPoint.GetId() + "," + newMeasure.GetCubeSerialNumber());
-        newPoint.Delete(cm);
+      else if(reference && !newMeasure->GetType() == ControlMeasure::Reference) {
+        nonReferenceMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
+        newPoint->Delete(cm);
       }
       else if(cubeMeasures) {
         bool hasSerialNumber = false;
 
         for(int sn = 0; sn < serialNumbers.size() && !hasSerialNumber; sn ++) {
-          if(serialNumbers[sn] == newMeasure.GetCubeSerialNumber()) hasSerialNumber = true;
+          if(serialNumbers[sn] == newMeasure->GetCubeSerialNumber()) hasSerialNumber = true;
         }
 
         if(!hasSerialNumber) {
-          noCubeMeasures.append(newPoint.GetId() + "," + newMeasure.GetCubeSerialNumber());
+          noCubeMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
           //New error with deleting Reference Measures
-          if(!newMeasure.GetType() == ControlMeasure::Reference)
-            newPoint.Delete(cm);
+          if(!newMeasure->GetType() == ControlMeasure::Reference)
+            newPoint->Delete(cm);
           else
             shouldDeleteReferenceMeasure = true;
         }
       }
     }
 
-    outNet.UpdatePoint(newPoint);
+    //outNet.UpdatePoint(newPoint); // Fixed by redesign
 
     // Check for line/sample errors above provided tolerance
     if(noTolerancePoints) {
       bool hasLowTolerance = true;
 
-      for(int cm = 0; cm < newPoint.Size() && hasLowTolerance; cm ++) {
-        const ControlMeasure &newMeasure = newPoint[cm];
-        if(newMeasure.GetSampleResidual() >= tolerance ||
-            newMeasure.GetLineResidual() >= tolerance) {
+      for(int cm = 0; cm < newPoint->GetNumMeasures() && hasLowTolerance; cm ++) {
+        const ControlMeasure *newMeasure = newPoint->GetMeasure(cm);
+        if(newMeasure->GetSampleResidual() >= tolerance ||
+            newMeasure->GetLineResidual() >= tolerance) {
           hasLowTolerance = false;
         }
       }
 
       if(hasLowTolerance) {
-        tolerancePoints.append(newPoint.GetId());
-        outNet.Delete(cp);
+        tolerancePoints.append(newPoint->GetId());
+        outNet.DeletePoint(cp);
         continue;
       }
     }
@@ -213,12 +215,12 @@ void IsisMain() {
     // Do not add outPoint if it has too few measures
     if(noSingleMeasure) {
       bool invalidPoint = false;
-      invalidPoint |= noIgnore && (newPoint.GetNumValidMeasures() < 2);
-      invalidPoint |= newPoint.Size() < 2 && newPoint.GetType() != ControlPoint::Ground;
+      invalidPoint |= noIgnore && (newPoint->GetNumValidMeasures() < 2);
+      invalidPoint |= newPoint->GetNumMeasures() < 2 && newPoint->GetType() != ControlPoint::Ground;
 
       if(invalidPoint) {
-        singleMeasurePoints.append(outNet[cp].GetId());
-        outNet.Delete(cp);
+        singleMeasurePoints.append(controlpt->GetId());
+        outNet.DeletePoint(cp);
         continue;
       }
     }
@@ -227,22 +229,23 @@ void IsisMain() {
     if(cubePoints && !cubeMeasures) {
       bool hasSerialNumber = false;
 
-      for(int cm = 0; cm < newPoint.Size() && !hasSerialNumber; cm ++) {
+      for(int cm = 0; cm < newPoint->GetNumMeasures() && !hasSerialNumber; cm ++) {
         for(int sn = 0; sn < serialNumbers.size() && !hasSerialNumber; sn ++) {
-          if(serialNumbers[sn] == newPoint[cm].GetCubeSerialNumber()) hasSerialNumber = true;
+          if(serialNumbers[sn] == newPoint->GetMeasure(cm)->GetCubeSerialNumber())
+            hasSerialNumber = true;
         }
       }
 
       if(!hasSerialNumber) {
-        nonCubePoints.append(newPoint.GetId());
-        outNet.Delete(cp);
+        nonCubePoints.append(newPoint->GetId());
+        outNet.DeletePoint(cp);
         continue;
       }
     }
 
-    if(noMeasureless && newPoint.Size() == 0) {
-      noMeasurePoints.append(newPoint.GetId());
-      outNet.Delete(cp);
+    if(noMeasureless && newPoint->GetNumMeasures() == 0) {
+      noMeasurePoints.append(newPoint->GetId());
+      outNet.DeletePoint(cp);
       continue;
     }
   } //! Finished with simple comparisons
@@ -434,15 +437,16 @@ void ExtractPointList(ControlNet &outNet, QVector<iString> nonListedPoints) {
 
   FileList listedPoints(ui.GetFilename("POINTLIST"));
 
-  for(int cp = outNet.Size() - 1; cp >= 0; cp --) {
+  for(int cp = outNet.GetNumPoints() - 1; cp >= 0; cp --) {
+    ControlPoint *controlpt = outNet.GetPoint(cp);
     bool isInList = false;
     for(int pointId = 0; pointId < (int)listedPoints.size()  &&  !isInList; pointId ++) {
-      isInList = outNet[cp].GetId().compare(listedPoints[pointId]) == 0;
+      isInList = controlpt->GetId().compare(listedPoints[pointId]) == 0;
     }
 
     if(!isInList) {
-      nonListedPoints.append(outNet[cp].GetId());
-      outNet.Delete(cp);
+      nonListedPoints.append(controlpt->GetId());
+      outNet.DeletePoint(cp);
     }
   }
 }
@@ -461,7 +465,7 @@ void ExtractPointList(ControlNet &outNet, QVector<iString> nonListedPoints) {
  */
 void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
                         QVector<iString> cannotGenerateLatLonPoints,  QMap<iString, iString> sn2filename) {
-  if(outNet.Size() == 0) {
+  if(outNet.GetNumPoints() == 0) {
     return;
   }
 
@@ -475,25 +479,25 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
 
   Progress progress;
   progress.SetText("Calculating lat/lon");
-  progress.SetMaximumSteps(outNet.Size());
+  progress.SetMaximumSteps(outNet.GetNumPoints());
   progress.CheckStatus();
 
   CubeManager manager;
   manager.SetNumOpenCubes(50);   //Should keep memory usage to around 1GB
 
-  for(int cp = outNet.Size() - 1; cp >= 0; cp --) {
+  for(int cp = outNet.GetNumPoints() - 1; cp >= 0; cp --) {
     progress.CheckStatus();
-    const ControlPoint &controlPt = outNet[cp];
-    SurfacePoint surfacePt = controlPt.GetSurfacePoint();
+    const ControlPoint *controlPt = outNet.GetPoint(cp);
+    SurfacePoint surfacePt = controlPt->GetSurfacePoint();
 
     // If the Contorl Network takes priority, use it
     //Latitude pointLat(controlPt.UniversalLatitude(),Angle::Degrees);
     //Longitude pointLon(controlPt.UniversalLongitude(),Angle::Degrees);
     //bool hasLatLon = pointLat != Isis::Null && pointLon != Isis::Null;
-    if(controlPt.GetType() == Isis::ControlPoint::Ground || surfacePt.Valid()) {
+    if(controlPt->GetType() == Isis::ControlPoint::Ground || surfacePt.Valid()) {
       if(NotInLatLonRange(surfacePt, minlat, maxlat, minlon, maxlon)) {
-        nonLatLonPoints.push_back(controlPt.GetId());
-        outNet.Delete(cp);
+        nonLatLonPoints.push_back(controlPt->GetId());
+        outNet.DeletePoint(cp);
       }
     }
 
@@ -511,27 +515,29 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
       Distance radius;
 
       // First check the reference Measure
-      if(controlPt.HasReference()) {
-        cm = controlPt.GetReferenceIndex();
-        if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
-          sn = controlPt[cm].GetCubeSerialNumber();
+      if(controlPt->HasReference()) {
+        //cm = controlPt->GetReferenceIndex();
+        //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
+        if(!sn2filename[controlPt->GetReferenceMeasure()->GetCubeSerialNumber()].length() == 0) {
+          sn = controlPt->GetReferenceMeasure()->GetCubeSerialNumber();
         }
       }
 
       // Search for other Control Measures if needed
       if(sn.empty()) {
         // Find the Serial Number if it exists
-        for(int cm = 0; (cm < controlPt.Size()) && sn.empty(); cm ++) {
-          if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
-            sn = controlPt[cm].GetCubeSerialNumber();
+        for(int cm = 0; (cm < controlPt->GetNumMeasures()) && sn.empty(); cm ++) {
+          //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
+          if(!sn2filename[controlPt->GetReferenceMeasure()->GetCubeSerialNumber()].length() == 0) {
+            sn = controlPt->GetReferenceMeasure()->GetCubeSerialNumber();
           }
         }
       }
 
       // Connot fine a cube to get the lat/lon from
       if(sn.empty()) {
-        cannotGenerateLatLonPoints.push_back(controlPt.GetId());
-        outNet.Delete(cp);
+        cannotGenerateLatLonPoints.push_back(controlPt->GetId());
+        outNet.DeletePoint(cp);
       }
 
       // Calculate the lat/lon and check for validity
@@ -545,8 +551,9 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
           try {
             Projection *projection = ProjectionFactory::Create((*(cube->Label())));
 
-            if(!projection->SetCoordinate(controlPt[cm].GetSample(), controlPt[cm].GetLine())) {
-              nonLatLonPoints.push_back(controlPt.GetId());
+            if(!projection->SetCoordinate(controlPt->GetMeasure(cm)->GetSample(),
+                                          controlPt->GetMeasure(cm)->GetLine())) {
+              nonLatLonPoints.push_back(controlPt->GetId());
               remove = true;
             }
 
@@ -563,8 +570,9 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
           }
         }
         else {
-          if(!camera->SetImage(controlPt[cm].GetSample(), controlPt[cm].GetLine())) {
-            nonLatLonPoints.push_back(controlPt.GetId());
+          if(!camera->SetImage(controlPt->GetMeasure(cm)->GetSample(),
+                               controlPt->GetMeasure(cm)->GetLine())) {
+            nonLatLonPoints.push_back(controlPt->GetId());
             remove = true;
           }
 
@@ -585,17 +593,17 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
         }
 
         if(remove || notInRange) {
-          nonLatLonPoints.push_back(controlPt.GetId());
-          outNet.Delete(cp);
+          nonLatLonPoints.push_back(controlPt->GetId());
+          outNet.DeletePoint(cp);
         }
         else if(validLatLonRadius) { // Add the reference lat/lon/radius to the Control Point
-          outNet[cp].SetSurfacePoint(SurfacePoint(lat, lon, radius));
+          outNet.GetPoint(cp)->SetSurfacePoint(SurfacePoint(lat, lon, radius));
         }
       }
     }
     else {
-      cannotGenerateLatLonPoints.push_back(controlPt.GetId());
-      outNet.Delete(cp);
+      cannotGenerateLatLonPoints.push_back(controlPt->GetId());
+      outNet.DeletePoint(cp);
     }
 
   }
@@ -658,7 +666,7 @@ void WriteCubeOutList(ControlNet cnet, QMap<iString, iString> sn2file) {
     Progress p;
     p.SetText("Writing Cube List");
     try {
-      p.SetMaximumSteps(cnet.Size());
+      p.SetMaximumSteps(cnet.GetNumPoints());
       p.CheckStatus();
     }
     catch(iException &e) {
@@ -668,9 +676,9 @@ void WriteCubeOutList(ControlNet cnet, QMap<iString, iString> sn2file) {
     }
 
     std::set<iString> outputsn;
-    for(int cp = 0; cp < cnet.Size(); cp ++) {
-      for(int cm = 0; cm < cnet[cp].Size(); cm ++) {
-        outputsn.insert(cnet[cp][cm].GetCubeSerialNumber());
+    for(int cp = 0; cp < cnet.GetNumPoints(); cp ++) {
+      for(int cm = 0; cm < cnet.GetPoint(cp)->GetNumMeasures(); cm ++) {
+        outputsn.insert(cnet.GetPoint(cp)->GetMeasure(cm)->GetCubeSerialNumber());
       }
       p.CheckStatus();
     }
