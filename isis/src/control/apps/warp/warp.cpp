@@ -23,23 +23,23 @@ void IsisMain() {
   ControlNet cn(cfile);
 
   std::vector<double> inputLine, inputSample, outputLine, outputSample;
-  for(int i = 0; i < cn.Size(); i++) {
-    ControlPoint cp = cn[i];
-    if(cp.Size() != 2) {
+  for (int i = 0; i < cn.GetNumPoints(); i++) {
+    const ControlPoint *cp = cn.GetPoint(i);
+    if (cp->GetNumMeasures() != 2) {
       string msg = "Control points must have exactly 2 control measures";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
-    if(!cp.IsIgnored()) {
-      inputLine.push_back(cp[0].GetLine());
-      inputSample.push_back(cp[0].GetSample());
-      outputLine.push_back(cp[1].GetLine());
-      outputSample.push_back(cp[1].GetSample());
+    if (!cp->IsIgnored()) {
+      inputLine.push_back(cp->GetMeasure(0)->GetLine());
+      inputSample.push_back(cp->GetMeasure(0)->GetSample());
+      outputLine.push_back(cp->GetMeasure(1)->GetLine());
+      outputSample.push_back(cp->GetMeasure(1)->GetSample());
     }
   }
 
   // If there are no valid control points,
   //  throw an error
-  if(inputLine.size() < 1) {
+  if (inputLine.size() < 1) {
     string msg = "The specified Control Network is empty.";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
@@ -49,14 +49,14 @@ void IsisMain() {
 
   // Determine the size of the output cube
   int onl, ons;
-  if(ui.GetString("OSIZE") == "MATCH") {
+  if (ui.GetString("OSIZE") == "MATCH") {
     Cube c;
     c.Open(iString(ui.GetFilename("CUBE")), "r");
     onl = c.Lines();
     ons = c.Samples();
     c.Close();
   }
-  else if(ui.GetString("OSIZE") == "COMPUTE") {
+  else if (ui.GetString("OSIZE") == "COMPUTE") {
     onl = 0;
     ons = 0;
   }
@@ -85,13 +85,13 @@ void IsisMain() {
 
   // Set up the interpolator
   Interpolator *interp;
-  if(ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
+  if (ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
     interp = new Interpolator(Interpolator::NearestNeighborType);
   }
-  else if(ui.GetString("INTERP") == "BILINEAR") {
+  else if (ui.GetString("INTERP") == "BILINEAR") {
     interp = new Interpolator(Interpolator::BiLinearType);
   }
-  else if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
+  else if (ui.GetString("INTERP") == "CUBICCONVOLUTION") {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
