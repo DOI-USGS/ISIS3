@@ -28,6 +28,9 @@
       Now uses the SubArea class to produce output cube labels
       with corrected Mapping, Instrument, and AlphaCube groups.
     </change>
+    <change name="Sharmila Prasad" date="2011-01-20">
+      Updated for changes in ProcessMosaic
+    </change>
   </history>
 
   <groups>
