@@ -77,26 +77,37 @@ namespace Isis {
 
       //! Constructs a Mosaic object
       ProcessMapMosaic();
+      
+      //! Destructor
       ~ProcessMapMosaic() { };
 
+      //! Set the output cube to specified file name and specified input images
+      //! and output attributes
       Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
                                 const std::string &mosaicFile);
 
+      //! Set the output cube to specified file name and specified input images
+      //! and output attributes and lat,lons
       Isis::Cube *SetOutputCube(FileList &propagationCubes,
                                 double slat, double elat, double slon, double elon,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
+      //! Set the output cube to specified file name and specified input images
+      //! and output attributes and lat,lons
       Isis::Cube *SetOutputCube(const std::string &inputFile,
                                 double xmin, double xmax, double ymin, double ymax,
                                 double slat, double elat, double slon, double elon, int nbands,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
+      //! Set the output cube to specified file name and specified input images
+      //! and output attributes and lat,lons
       Isis::Cube *SetOutputCube(const std::string &inputFile, PvlGroup mapping,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
       //! Mosaic output method for Mosaic Processing Method, this will use an existing mosaic
       Isis::Cube *SetOutputCube(const std::string &mosaicFile);
 
+      //! Input cube cannot be set here
       Isis::Cube *SetInputCube() {
         throw iException::Message(iException::Programmer,
                                   "ProcessMapMosaic does not support the SetInputCube method",
@@ -107,6 +118,7 @@ namespace Isis {
       bool StartProcess(std::string inputFile);
 
     private:
+      //! Reset the buffer with NULL pixels
       static void FillNull(Buffer &data);
 
       //! Internal use; SetOutputMosaic (const std::string &) sets to false to
