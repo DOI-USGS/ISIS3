@@ -32,6 +32,9 @@
 enum BandCriteria {
   Lesser, Greater
 };
+/**
+ * File Type - Input/Output
+ */
 enum FileType {
   inFile, outFile
 };
@@ -169,35 +172,38 @@ namespace Isis {
  * Constants
  */
 #define SRC_IMAGE_TBL  "InputImages"
-#define FLOAT_MAX    16777216
-#define FLOAT_MIN   -16777215
-
-  /** 
-   * structure for origin tracking information
-   * from the GUI-user set parameters 
-   * used for internal processing 
-   */ 
-  typedef struct {
-    bool bTrack;
-    bool bCreate;
-    int  iBandNum;
-    std::string  sKeyName;
-    std::string  sKeyValue;
-    BandCriteria eCriteria;
-    int  iInBand;  //!< input  band index for the corresponding band in KeyValue
-    int  iOutBand; //!< output band index for the corresponding band in KeyValue
-  }TrackInfo;
+#define FLOAT_MAX      16777216       //!< Max number a Floating point will hold
+#define FLOAT_MIN      -16777215      //!< Min number a Floating point will hold
 
   class ProcessMosaic : public Isis::Process {
 
     public:
+
+      /** 
+       * structure for origin tracking information
+       * from the GUI-user set parameters 
+       * used for internal processing 
+       */ 
+      typedef struct {
+        bool bTrack;   //!< Tracking Status Flag
+        bool bCreate;  //!< Create Mosaic Flag
+        int  iBandNum; //!< Band Number for Band Priority
+        std::string  sKeyName;  //!< Band Property - Original band, FilterName etc
+        std::string  sKeyValue; //!< Band Value
+        BandCriteria eCriteria; //!< Lesser or Greater Criteria
+        int  iInBand;  //!< input  band index for the corresponding band in KeyValue
+        int  iOutBand; //!< output band index for the corresponding band in KeyValue
+      }TrackInfo;
 
       /**
        * Enumeration for different Mosaic priorities 
        * (input, mosaic, band) 
        */
       enum MosaicPriority {
-        input, mosaic, band, average
+        input,  //!< ontop priority
+        mosaic, //!< beneath priority
+        band,   //!< band priority
+        average //!< average priority
       };
 
       //! Constructs a Mosaic object
@@ -209,12 +215,16 @@ namespace Isis {
       //! Line Processing method for one input and output cube
       void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
 
+      //! Set input cube to specified image name at the starting and count of 
+      //! samples, lines, bands
       Isis::Cube *SetInputCube(const std::string &parameter,
                                const int ss = 1, const int sl = 1,
                                const int sb = 1,
                                const int ns = 0, const int nl = 0,
                                const int nb = 0);
 
+      //! Set input cube to specified image name with specified attributes at the 
+      //! starting and count of samples, lines, bands
       Isis::Cube *SetInputCube(const std::string &fname,
                                Isis::CubeAttributeInput &att,
                                const int ss = 1, const int sl = 1,
@@ -222,11 +232,15 @@ namespace Isis {
                                const int ns = 0, const int nl = 0,
                                const int nb = 0);
 
+      //! Set output cube to specified image name
       Isis::Cube *SetOutputCube(const std::string &psParameter);
 
       /**
        * Sets the bandbin match parameter to the input boolean value
-       * @param b The boolean value to set the bandbin match parameter to
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @param pbFlag - The boolean value to set the bandbin match parameter
        */
       void SetBandBinMatch(bool pbFlag) {
         mbBandbinMatch = pbFlag;
@@ -261,7 +275,13 @@ namespace Isis {
       //! Checks for the table with name "InputImage"
       bool GetTrackStatus(void);
 
-      //! Get the set Priority
+      /**
+       * Get the configured Priority
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @return MosaicPriority 
+       */
       MosaicPriority GetPriority(void){
         return mePriority;
       };
@@ -285,73 +305,161 @@ namespace Isis {
        * Special Pixel then it is copied to the mosaic irrespective of any 
        * condition. Not supported in mosaic priority
        */ 
+      
+       /**
+        * Set HS Flag
+        * 
+        * @author Sharmila Prasad (1/19/2011)
+        * 
+        * @param pbFlag 
+        */
        void SetHighSaturationFlag(bool pbFlag) {
          mbHighSat = pbFlag;
        } ;
+       
+       /**
+        * Set LS Flag
+        * 
+        * @author Sharmila Prasad (1/19/2011)
+        * 
+        * @param pbFlag 
+        */
        void SetLowSaturationFlag(bool pbFlag) {
          mbLowSat  = pbFlag;
        } ;
+       
+       /**
+        * Set NULL Flag
+        * 
+        * @author Sharmila Prasad (1/19/2011)
+        * 
+        * @param pbFlag 
+        */
        void SetNullFlag(bool pbFlag) {
          mbNull    = pbFlag;
        } ;
+       
+       /**
+        * Get HS Flag
+        * 
+        * @author Sharmila Prasad (1/19/2011)
+        * 
+        * @return bool 
+        */
        bool GetHighSaturationFlag(void) {
          return mbHighSat;
        } ;
+
+       /**
+        * Get LS Flag
+        * 
+        * @author Sharmila Prasad (1/19/2011)
+        * 
+        * @return bool 
+        */
        bool GetLowSaturationFlag(void) {
          return mbLowSat;
        };
+       
+       /**
+        * Get NULL Flag
+        * 
+        * @author Sharmila Prasad (1/19/2011)
+        * 
+        * @return bool
+        */
        bool GetNullFlag(void) {
          return mbNull;
        };
 
-      //! Set the priority input, mosaic, band
+      /**
+       * Set the priority input, mosaic, band, average
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @param pePriority - one of the four priorities
+       */
       void SetPriority(MosaicPriority pePriority) {
         mePriority = pePriority;
       };
 
-      //! Set/Get the Track Flag
+      /**
+       * Set/Get the Track Flag
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @param pbFlag - set the tracking flag 
+       */
       void SetTrackFlag(bool pbFlag) {
         mtTrackInfo.bTrack = pbFlag;
       };
+      
+      //! Get Track Flag status
       bool GetTrackFlag(void) {
         return mtTrackInfo.bTrack;
       };
 
-      /** 
+      /**
        * Flag to indicate to the Process that the mosaic is being newly created
        * Indication that the new label specific to the mosaic needs to be created.
-       */ 
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @param pbFlag - Set Create Flag True/False
+       */
       void SetCreateFlag(bool pbFlag) {
         mtTrackInfo.bCreate  = pbFlag;
       };
 
-      //! Set the Band Number for priority Band
+      /**
+       * Set the Band Number for priority Band
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @param piBandNum - Band Number 
+       */
       void SetBandNumber(int piBandNum) {
         mtTrackInfo.iBandNum = piBandNum;
       };
 
-      //! Set the keyword for priority Band
+      /**
+       * Set the keyword for priority Band
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @param psKeyName - Band Property
+       * @param psKeyValue - Band Value
+       */
       void SetBandKeyWord(std::string psKeyName, std::string psKeyValue) {
         mtTrackInfo.sKeyName = psKeyName;
         mtTrackInfo.sKeyValue = psKeyValue;
       };
 
-      //! Set the Band Criteria Lesser/Greater than for Band priority
+      /**
+       * Set the Band Criteria Lesser/Greater than for Band priority
+       * 
+       * @author Sharmila Prasad (1/19/2011)
+       * 
+       * @param peCriteria - Band Criteria
+       */
       void SetBandCriteria(BandCriteria peCriteria) {
         mtTrackInfo.eCriteria = peCriteria;
       };
 
+      //! Debugging
       void Test(void);
 
-      /**
-       * Get the input file location (Sample, Line, Band) in the mosaic
-       */
+      //! Get the input file Line location in the mosaic
       int GetInputStartLineInMosaic(void) {
         return miOsl;
       };
+      
+      //! Get the input file Sample location in the mosaic
       int GetInputStartSampleInMosaic(void) {
         return miOss;
       };
+      
+      //! Get the input file Band location in the mosaic
       int GetInputStartBandInMosaic(void) {
         return miOsb;
       };
@@ -381,9 +489,9 @@ namespace Isis {
        * True- allow the special pixel to be passed onto the mosaic. 
        * Holds good for input and band priority
        */
-      bool mbHighSat;
-      bool mbLowSat;
-      bool mbNull;
+      bool mbHighSat; //!< HS Flag
+      bool mbLowSat;  //!< LS Flag
+      bool mbNull;    //!< NULL Flag
 
       TrackInfo mtTrackInfo; //!< Structure holding the tracking info
   };
