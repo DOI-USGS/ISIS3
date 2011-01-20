@@ -129,7 +129,8 @@ void IsisMain() {
     m.SetOutputCube("TO");
     CubeAttributeInput attrib(cubeList[i]);
     Cube *icube = m.SetInputCube(cubeList[i], attrib);
-    m.StartProcess(1, 1, sband, input);
+    m.SetPriority(ProcessMosaic::input);
+    m.StartProcess(1, 1, sband);
     sband += icube->Bands();
     m.EndProcess();
   }
