@@ -54,6 +54,7 @@ namespace Isis {
   ControlPoint::ControlPoint(const ControlPoint &other) {
     p_measures = NULL;
     cubeSerials = NULL;
+    referenceMeasure = NULL;
 
     p_measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
@@ -62,11 +63,16 @@ namespace Isis {
     while (i.hasNext()) {
       i.next();
       ControlMeasure *newMeasure = new ControlMeasure(*i.value());
+      if (other.referenceMeasure == i.value())
+        referenceMeasure = newMeasure; 
       QString newSerial = newMeasure->GetCubeSerialNumber();
       newMeasure->parentPoint = this;
       p_measures->insert(newSerial, newMeasure);
       cubeSerials->append(newSerial);
     }
+
+    if (referenceMeasure == NULL && cubeSerials->size() != 0)
+      referenceMeasure = p_measures->value(cubeSerials->at(0));
 
     parentNetwork = other.parentNetwork;
     p_id = other.p_id;
@@ -84,10 +90,15 @@ namespace Isis {
     p_aprioriSurfacePoint = other.p_aprioriSurfacePoint;
     p_surfacePoint = other.p_surfacePoint;
     p_numberOfRejectedMeasures = other.p_numberOfRejectedMeasures;
-    referenceMeasure = other.referenceMeasure;
   }
 
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt) {
+    p_measures = NULL;
+    cubeSerials = NULL;
+    referenceMeasure = NULL;
+
+    p_measures = new QHash< QString, ControlMeasure * >;
+    cubeSerials = new QStringList;
     Init(protoBufPt);
 
     for (int m = 0 ; m < protoBufPt.measures_size() ; m++) {
@@ -101,6 +112,11 @@ namespace Isis {
 
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt,
                              const PBControlNetLogData_Point &logProtoBuf) {
+    p_measures = NULL;
+    cubeSerials = NULL;
+
+    p_measures = new QHash< QString, ControlMeasure * >;
+    cubeSerials = new QStringList;
     Init(protoBufPt);
 
     for (int m = 0 ; m < protoBufPt.measures_size() ; m++) {
@@ -430,7 +446,7 @@ namespace Isis {
     p_measures->insert(newSerial, measure);
     cubeSerials->append(newSerial);
 
-    if (p_measures->size() == 1)
+    if (referenceMeasure == NULL) 
       referenceMeasure = measure;
   }
 
@@ -451,7 +467,8 @@ namespace Isis {
 
 
   /**
-   * Remove a measurement from the control point
+   * Remove a measurement from the control point, deleting reference measure
+   * is allowed.
    *
    * @param serialNumber The serial number of the measure to delete
    */
@@ -465,7 +482,8 @@ namespace Isis {
 
 
   /**
-   * Remove a measurement from the control point
+   * Remove a measurement from the control point, deleting reference measure
+   * is allowed.
    *
    * @param index The index of the control measure to delete
    */
@@ -474,6 +492,7 @@ namespace Isis {
       iString msg = "index [" + iString(index) + "] out of bounds";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
+  
 
     iString serialNumber = cubeSerials->at(index);
     validateMeasure(serialNumber, true);
