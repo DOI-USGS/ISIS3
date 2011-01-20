@@ -194,67 +194,69 @@ namespace Isis
     if (p.HasObject("ProtoBuffer"))
     {
       ReadPBControl(ptfile);
-      return;
     }
-    try
+    else
     {
-      PvlObject & cn = p.FindObject("ControlNetwork");
-
-      if (cn.HasKeyword("NetworkId"))
-        p_networkId = cn["NetworkId"][0];
-      p_targetName = (std::string)cn["TargetName"];
-      p_userName = (std::string)cn["UserName"];
-      p_created = (std::string)cn["Created"];
-      p_modified = (std::string)cn["LastModified"];
-      if (cn.HasKeyword("Description"))
-        p_description = cn["Description"][0];
-
-      // Prep for reporting progress
-      if (progress != NULL)
+      try
       {
-        progress->SetText("Loading Control Points...");
-        progress->SetMaximumSteps(cn.Objects());
-        progress->CheckStatus();
-      }
-      for (int i = 0; i < cn.Objects(); i++)
-      {
-        try
-        {
-          if (cn.Object(i).IsNamed("ControlPoint"))
-          {
-            ControlPoint * newPoint = new ControlPoint;
-            newPoint->Load(cn.Object(i));
-            p_numMeasures += newPoint->GetNumMeasures();
-            if (newPoint->IsIgnored())
-            {
-              p_numIgnoredMeasures += newPoint->GetNumMeasures();
-            }
-            else
-            {
-              QList< QString > measureIds = newPoint->GetCubeSerialNumbers();
-              for (int i = 0; i < measureIds.size(); i++)
-              {
-                if ((*newPoint)[measureIds[i]]->IsIgnored())
-                  p_numIgnoredMeasures++;
-              }
-            }
-            AddPoint(newPoint);
-          }
-        }
-        catch (iException & e)
-        {
-          iString msg = "Invalid Control Point at position [" + iString(i)
-                        + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
-        }
+        PvlObject & cn = p.FindObject("ControlNetwork");
+
+        if (cn.HasKeyword("NetworkId"))
+          p_networkId = cn["NetworkId"][0];
+        p_targetName = (std::string)cn["TargetName"];
+        p_userName = (std::string)cn["UserName"];
+        p_created = (std::string)cn["Created"];
+        p_modified = (std::string)cn["LastModified"];
+        if (cn.HasKeyword("Description"))
+          p_description = cn["Description"][0];
+
+        // Prep for reporting progress
         if (progress != NULL)
+        {
+          progress->SetText("Loading Control Points...");
+          progress->SetMaximumSteps(cn.Objects());
           progress->CheckStatus();
+        }
+        for (int i = 0; i < cn.Objects(); i++)
+        {
+          try
+          {
+            if (cn.Object(i).IsNamed("ControlPoint"))
+            {
+              ControlPoint * newPoint = new ControlPoint;
+              newPoint->Load(cn.Object(i));
+              p_numMeasures += newPoint->GetNumMeasures();
+              if (newPoint->IsIgnored())
+              {
+                p_numIgnoredMeasures += newPoint->GetNumMeasures();
+              }
+              else
+              {
+                QList< QString > measureIds = newPoint->GetCubeSerialNumbers();
+                for (int i = 0; i < measureIds.size(); i++)
+                {
+                  if ((*newPoint)[measureIds[i]]->IsIgnored())
+                    p_numIgnoredMeasures++;
+                }
+              }
+              AddPoint(newPoint);
+            }
+          }
+          catch (iException & e)
+          {
+            iString msg = "Invalid Control Point at position [" + iString(i)
+                          + "]";
+            throw iException::Message(iException::User, msg, _FILEINFO_);
+          }
+          if (progress != NULL)
+            progress->CheckStatus();
+        }
       }
-    }
-    catch (iException & e)
-    {
-      iString msg = "Invalid Format in [" + ptfile + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      catch (iException & e)
+      {
+        iString msg = "Invalid Format in [" + ptfile + "]";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
     }
   }
 
@@ -312,7 +314,6 @@ namespace Isis
       string msg = "Cannot parse binary PB file";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
-
     PBControlNetLogData logData;
     bool readLogData = protoBufferInfo.HasObject("LogData");
     if (readLogData)
@@ -540,6 +541,7 @@ namespace Isis
       PvlObject cp = i.value()->ToPvlObject();
       net.AddObject(cp);
     }
+    
     p.AddObject(net);
 
     try
