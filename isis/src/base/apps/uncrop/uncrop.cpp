@@ -15,12 +15,12 @@ void IsisMain() {
   // Set up the mosaic priority
   UserInterface &ui = Application::GetUserInterface();
   string combineMethod = ui.GetString("COMBINE");
-  MosaicPriority priority;
+  ProcessMosaic::MosaicPriority priority;
   if(combineMethod == "PARENT") {
-    priority = mosaic;
+    priority = ProcessMosaic::mosaic;
   }
   else {
-    priority = input;
+    priority = ProcessMosaic::input;
   }
 
   // Get the extraction label from the input file
@@ -32,8 +32,8 @@ void IsisMain() {
   int outBand = 1;
 
   p.SetOutputCube("PARENT");
-
-  p.StartProcess(outSample, outLine, outBand, priority);
+  p.SetPriority(priority);
+  p.StartProcess(outSample, outLine, outBand);
   p.EndProcess();
 }
 
