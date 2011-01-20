@@ -147,7 +147,8 @@
           <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td"> T</td><td class="td">  S</td><td class="td"> S,V</td><td class="td"> I(H,L,N)</td></tr>
           <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td">T </td><td class="td">V</td><td class="td">V</td><td class="td">Criteria based</td></tr>
           <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td"> T </td><td class="td">V</td><td class="td"> S</td><td class="td">I</td></tr>
-       </table></td></tr> </table>
+       </table></td></tr> </table><br></br><br></br><br></br>
+       <li />
        <table cellspacing="0" cellpadding="1" border="0"> 
         <tr><th colspan="3" align="center"><u> Priority Average</u></th></tr>
         <tr height="15"><th colspan="3"></th></tr>
