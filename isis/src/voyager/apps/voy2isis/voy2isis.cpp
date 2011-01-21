@@ -54,6 +54,9 @@ void IsisMain() {
                                 + in.Name() + "].", _FILEINFO_);
     }
   }
+  else if (ext == "IMG") {
+    // Do nothing
+  }
   else {
     string msg = "Input file [" + in.Name() +
                  "] does not appear to be a Voyager EDR";

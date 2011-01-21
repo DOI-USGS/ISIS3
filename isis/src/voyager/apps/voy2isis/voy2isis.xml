@@ -37,6 +37,9 @@
     <change name="Mackenzie Boyd" date="2010-07-29">
       Added keywords Camera_State_1 and Camera_State_2.
     </change>
+    <change name="Mackenzie Boyd" date="2011-01-21">
+      Added support for .img files. 
+    </change>
   </history>
 
   <category>
