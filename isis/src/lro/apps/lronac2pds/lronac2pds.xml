@@ -10,13 +10,16 @@
   </description>
 
   <category>
-    <categoryItem>Import and Export</categoryItem>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
   </category>
 
 
   <history>
     <change name="Jacob Danton" date="2010-01-10">
       Original version
+    </change>
+    <change name="Sharmila Prasad" date="2011-01-21">
+      Changed the category
     </change>
   </history>
 
