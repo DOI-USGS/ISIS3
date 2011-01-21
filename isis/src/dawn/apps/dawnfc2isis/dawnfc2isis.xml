@@ -21,10 +21,13 @@
     <change name="Janet Barrett" date="2010-04-15">
       The program now automatically flips the image in the line direction.
     </change>
+    <change name="Sharmila Prasad" date="2011-01-21">
+      Changed the category
+    </change>
   </history>
 
   <category>
-    <categoryItem>Import and Export</categoryItem>
+    <missionItem>Dawn</missionItem>
   </category>
 
   <groups>
