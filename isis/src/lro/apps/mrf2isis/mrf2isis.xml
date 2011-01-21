@@ -33,10 +33,13 @@
       Made changes so that program would run on files that
       were created by the mrf2pds program.
     </change>
+    <change name="Sharmila Prasad" date="2011-01-21">
+      Changed the category
+    </change>
   </history>
 
   <category>
-    <categoryItem>Import and Export</categoryItem>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
   </category>
 
   <groups>
