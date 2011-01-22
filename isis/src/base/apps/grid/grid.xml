@@ -50,6 +50,9 @@
     <change name="Steven Lambright" date="2010-07-22">
       Added LINEWIDTH option
     </change>
+    <change name="Mackenzie Boyd" date="2011-01-21">
+      Added more line options, to change output to be HRS, LRS, NULL, or a DN.
+    </change>
   </history>
 
   <groups>
@@ -246,6 +249,59 @@
         <odd />
       </parameter>
       <odd />
+
+      <parameter name="LINEVALUE">
+        <type>string</type>
+        <default><item>HRS</item></default>
+        <brief>Select line DN value</brief>
+        <description>
+          This options allows for any DN value, or any of three special pixel
+          values to be choosen as the line value.
+        </description>
+        <list>
+          <option value="HRS">
+            <brief>Use HRS DN value</brief>
+            <description>
+              Use the special pixel value HRS (High Representation Saturation)
+              as the line value. This may vary with bittype used.
+            </description>
+            <exclusions><item>DNVALUE</item></exclusions>
+          </option>
+          <option value="LRS">
+            <brief>Use LRS DN value</brief>
+            <description>
+              Use the special pixel value LRS (Low Representation Saturation)
+              as the line value. This may vary with bittype used.
+            </description>
+            <exclusions><item>DNVALUE</item></exclusions>
+          </option>
+          <option value="NULL">
+            <brief>Use NULL DN value</brief>
+            <description>
+              Use the special pixel value NULL as the line value. This may vary
+              with bittype used.
+            </description>
+            <exclusions><item>DNVALUE</item></exclusions>
+          </option>
+
+          <option value="DN">
+            <brief>Use given DN value</brief>
+            <description>
+              Use the DN value specified in the DNVALUE parameter. It is a good
+              idea to run the application stats on a cube before selecting a DN
+              value. 
+            </description>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="DNVALUE">
+        <type>double</type>
+        <brief>DN value to be used</brief>
+        <description>
+          This is the DN value to be used as the value of the line. To pick an
+          appropriate value, run the application stats first and use max or min.
+        </description>
+      </parameter>
     </group>
 
     <group name="Tick Parameters">

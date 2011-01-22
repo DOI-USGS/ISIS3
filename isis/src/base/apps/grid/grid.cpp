@@ -2,12 +2,13 @@
 
 #include <cmath>
 
-#include "ProcessByLine.h"
-#include "Projection.h"
-#include "ProjectionFactory.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "GroundGrid.h"
+#include "iException.h"
+#include "ProcessByLine.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
 #include "UniversalGroundMap.h"
 
 using namespace std;
@@ -21,6 +22,7 @@ void createGroundImage(Camera *cam, Projection *proj);
 bool outline, ticks, diagonalTicks;
 int baseLine, baseSample, lineInc, sampleInc, tickSize, lineWidth;
 double baseLat, baseLon, latInc, lonInc;
+double lineValue;
 
 int inputSamples, inputLines;
 GroundGrid *latLonGrid;
@@ -44,6 +46,30 @@ void IsisMain() {
   }
 
   lineWidth = ui.GetInteger("LINEWIDTH") / 2;
+
+  iString lval = iString::UpCase(ui.GetString("LINEVALUE"));
+  if (lval == "HRS") {
+    lineValue = Isis::Hrs; 
+  }
+  else if (lval == "LRS") {
+    lineValue = Isis::Lrs; 
+  }
+  else if (lval == "NULL") {
+    lineValue = Isis::Null; 
+  }
+  else if (lval == "DN") {
+    if (ui.WasEntered("DNVALUE")) {
+      lineValue = ui.GetDouble("DNVALUE"); 
+    }
+    else {
+      throw iException::Message(iException::User, "Must enter value in DNVALUE", _FILEINFO_);
+    }
+  }
+  else {
+    iString msg = "Invalid LINEVALUE string [" + ui.GetString("LINEVALUE");
+    msg += "], must be one of HRS, LRS, NULL, or DN.";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
 
   inputSamples = icube->Samples();
   inputLines   = icube->Lines();
@@ -115,7 +141,7 @@ void imageGrid(Buffer &in, Buffer &out) {
 
     if(!ticks) {
       if(imageDrawSample(samp) || imageDrawLine(in.Line())) {
-        out[samp - 1] = Isis::Hrs;
+        out[samp - 1] = lineValue;
       }
     }
     // ticks!
@@ -128,19 +154,19 @@ void imageGrid(Buffer &in, Buffer &out) {
       if(!diagonalTicks) {
         // horizontal test
         for(int sampleTest = samp - tickSize;
-            (sampleTest <= samp + tickSize) && (out[samp-1] != Isis::Hrs);
+            (sampleTest <= samp + tickSize) && (out[samp-1] != lineValue);
             sampleTest ++) {
           if(imageDrawLine(in.Line()) && imageDrawSample(sampleTest)) {
-            out[samp - 1] = Isis::Hrs;
+            out[samp - 1] = lineValue;
           }
         }
 
         // vertical test
         for(int lineTest = in.Line() - tickSize;
-            (lineTest <= in.Line() + tickSize) && (out[samp-1] != Isis::Hrs);
+            (lineTest <= in.Line() + tickSize) && (out[samp-1] != lineValue);
             lineTest ++) {
           if(imageDrawLine(lineTest) && imageDrawSample(samp)) {
-            out[samp-1] = Isis::Hrs;
+            out[samp-1] = lineValue;
           }
         }
       }
@@ -150,11 +176,11 @@ void imageGrid(Buffer &in, Buffer &out) {
         int sampleTest = samp - tickSize;
         int lineTest = in.Line() - tickSize;
 
-        while((out[samp-1] != Isis::Hrs) &&
+        while((out[samp-1] != lineValue) &&
               (lineTest <= in.Line() + tickSize) &&
               (sampleTest <= samp + tickSize)) {
           if(imageDrawLine(lineTest) && imageDrawSample(sampleTest)) {
-            out[samp-1] = Isis::Hrs;
+            out[samp-1] = lineValue;
           }
 
           sampleTest ++;
@@ -165,11 +191,11 @@ void imageGrid(Buffer &in, Buffer &out) {
         sampleTest = samp + tickSize;
         lineTest = in.Line() - tickSize;
 
-        while((out[samp-1] != Isis::Hrs) &&
+        while((out[samp-1] != lineValue) &&
               (lineTest <= in.Line() + tickSize) &&
               (sampleTest >= samp - tickSize)) {
           if(imageDrawLine(lineTest) && imageDrawSample(sampleTest)) {
-            out[samp-1] = Isis::Hrs;
+            out[samp-1] = lineValue;
           }
 
           sampleTest --;
