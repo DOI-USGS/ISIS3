@@ -57,12 +57,12 @@ void IsisMain() {
   SerialNumberList serials(ui.GetFilename("FROMLIST"));
   append = ui.GetBoolean("APPEND");
 
-  if(cnet.Size() == 0) {
+  if(cnet.GetNumMeasures() == 0) {
     string msg = "Your control network must contain at least one point";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  prog.SetMaximumSteps(cnet.Size());
+  prog.SetMaximumSteps(cnet.GetNumMeasures());
 
   // If append is true, output will be appended or a new file created
   if (append) {
@@ -87,8 +87,10 @@ void IsisMain() {
   errors = ui.GetBoolean("ALLOWERRORS");
 
   // Loop through all points in controlnet
-  for (int i = 0; i < cnet.Size(); i++) {
-    const ControlPoint &cpoint = cnet[i];
+  for (int i = 0; i < cnet.GetNumPoints(); i++) {
+    cout << cnet.GetNumPoints() << " " << i << endl;
+    const ControlPoint * cpoint = cnet[i];
+    cout << "done" << endl;
 
     if (isFirst && !append) {
       measureLabels += "ControlPointId,";
@@ -179,19 +181,19 @@ void IsisMain() {
 
     // Always add data
     measureInfo.clear();
-    measureInfo += cpoint.GetId().ToQt() + ",";
-    measureInfo += cpoint.GetPointTypeString().ToQt() + ",";
-    measureInfo += iString(cpoint.GetChooserName()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetDateTime()).ToQt() + ",";
-    measureInfo += iString(cpoint.IsEditLocked()).ToQt() + ",";
-    measureInfo += iString(cpoint.IsIgnored()).ToQt() + ",";
+    measureInfo += cpoint->GetId().ToQt() + ",";
+    measureInfo += cpoint->GetPointTypeString().ToQt() + ",";
+    measureInfo += iString(cpoint->GetChooserName()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetDateTime()).ToQt() + ",";
+    measureInfo += iString(cpoint->IsEditLocked()).ToQt() + ",";
+    measureInfo += iString(cpoint->IsIgnored()).ToQt() + ",";
 
-    measureInfo += iString(cpoint.GetSurfacePointSourceString()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetAprioriSurfacePointSourceFile()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetRadiusSourceString()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetAprioriRadiusSourceFile()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetSurfacePointSourceString()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetAprioriSurfacePointSourceFile()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetRadiusSourceString()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetAprioriRadiusSourceFile()).ToQt() + ",";
 
-    SurfacePoint Asp = cpoint.GetAprioriSurfacePoint();
+    SurfacePoint Asp = cpoint->GetAprioriSurfacePoint();
     measureInfo += iString(Asp.GetX().GetKilometers()).ToQt() + ",";
     measureInfo += iString(Asp.GetY().GetKilometers()).ToQt() + ",";
     measureInfo += iString(Asp.GetZ().GetKilometers()).ToQt() + ",";
@@ -215,7 +217,7 @@ void IsisMain() {
       measureInfo += ",";
     }
 
-    SurfacePoint sp = cpoint.GetSurfacePoint();
+    SurfacePoint sp = cpoint->GetSurfacePoint();
     measureInfo += iString(sp.GetX().GetKilometers()).ToQt() + ",";
     measureInfo += iString(sp.GetY().GetKilometers()).ToQt() + ",";
     measureInfo += iString(sp.GetZ().GetKilometers()).ToQt() + ",";
@@ -239,29 +241,29 @@ void IsisMain() {
       measureInfo += ",";
     }
 
-    measureInfo += iString(cpoint.GetMinimumResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetMaximumResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetAverageResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetMinimumSampleResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetMaximumSampleResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetMinimumLineResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint.GetMinimumLineResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetMinimumResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetMaximumResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetAverageResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetMinimumSampleResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetMaximumSampleResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetMinimumLineResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetMinimumLineResidual()).ToQt() + ",";
     
     // Loop through all measures in controlpoint
-    for(int j = 0; j < cpoint.Size(); j++) {
+    for(int j = 0; j < cpoint->GetNumMeasures(); j++) {
 
-      const ControlMeasure &cmeasure = cpoint[j];
+      const ControlMeasure * cmeasure = (*cpoint)[j];
 
       // Set and then get CameraPointInfo information
-      camPoint.SetCube(serials.Filename(cmeasure.GetCubeSerialNumber()));
+      camPoint.SetCube(serials.Filename(cmeasure->GetCubeSerialNumber()));
 
-      grp = camPoint.SetImage(cmeasure.GetSample(), cmeasure.GetLine(), outside, errors);
+      grp = camPoint.SetImage(cmeasure->GetSample(), cmeasure->GetLine(), outside, errors);
       // Shouldn't ever happen, but, being safe...
       if(grp == NULL) {
         string msg = "You shouldn't have gotten here. Errors in CameraPointInfo class";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
-      Write(grp, cmeasure);
+      Write(grp, *cmeasure);
       delete grp;
       grp = NULL;
     }
