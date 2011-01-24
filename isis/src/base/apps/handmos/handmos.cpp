@@ -100,6 +100,9 @@ void IsisMain() {
   p.SetBandBinMatch(ui.GetBoolean("MATCHBANDBIN"));
   p.Progress()->SetText("Mosaicking");
 
+  // Get the MatchDEM Flag
+  p.SetMatchDEM(ui.GetBoolean("MATCHDEM"));
+  
   // Get the value for HS, LS, NULL flags whether to transfer the special pixels
   // onto the mosaic. Holds good for "ontop" and "band" priorities only
   if(priority == ProcessMosaic::input || priority == ProcessMosaic::band || priority == ProcessMosaic::average) {
@@ -143,6 +146,7 @@ void IsisMain() {
   imgPosition += PvlKeyword("StartLine", iStartLine);
   Application::Log(imgPosition);
 }
+
 /**
  * Initialize the mosaic to defaults
  *
