@@ -145,13 +145,17 @@ namespace Isis {
     // If the linc and sinc are not equal, then the Instrument and
     // Mapping groups are no longer valid.
     if(p_linc != p_sinc) {
-      if(inlabel.FindObject("IsisCube").HasGroup("Instrument")) {
-        inlabel.FindObject("IsisCube").DeleteGroup("Instrument");
-        results += PvlKeyword("InstrumentGroupDeleted", "True");
-      }
       if(inlabel.FindObject("IsisCube").HasGroup("Mapping")) {
         inlabel.FindObject("IsisCube").DeleteGroup("Mapping");
         results += PvlKeyword("MappingGroupDeleted", "True");
+
+        // We don't want to think our projected cube is unprojected, so if we
+        //   delete a mapping group and we have a camera there is a problem.
+        //   Remove the camera.
+        if(inlabel.FindObject("IsisCube").HasGroup("Instrument")) {
+          inlabel.FindObject("IsisCube").DeleteGroup("Instrument");
+          results += PvlKeyword("InstrumentGroupDeleted", "True");
+        }
       }
     }
 

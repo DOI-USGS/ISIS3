@@ -131,17 +131,16 @@ End_Group
 Testing full image area with linc=2, sinc=3 for unprojected cube...
 
 Group = Results
-  InputLines             = 768
-  InputSamples           = 640
-  StartingLine           = 1
-  StartingSample         = 1
-  EndingLine             = 768
-  EndingSample           = 640
-  LineIncrement          = 2.0
-  SampleIncrement        = 3.0
-  OutputLines            = 384
-  OutputSamples          = 214
-  InstrumentGroupDeleted = True
+  InputLines      = 768
+  InputSamples    = 640
+  StartingLine    = 1
+  StartingSample  = 1
+  EndingLine      = 768
+  EndingSample    = 640
+  LineIncrement   = 2.0
+  SampleIncrement = 3.0
+  OutputLines     = 384
+  OutputSamples   = 214
 End_Group
 
 Output cube label: 
@@ -150,6 +149,24 @@ Group = Dimensions
   Samples = 214
   Lines   = 384
   Bands   = 1
+End_Group
+
+Group = Instrument
+  SpacecraftName        = "MARS GLOBAL SURVEYOR"
+  InstrumentId          = MOC-WA
+  TargetName            = Mars
+  StartTime             = 1997-10-20T10:58:37.46
+  StopTime              = 1997-10-20T11:03:44.66
+  CrosstrackSumming     = 4
+  DowntrackSumming      = 4
+  FocalPlaneTemperature = 213.1
+  GainModeId            = 1A
+  LineExposureDuration  = 100.000000 <milliseconds>
+  MissionPhaseName      = AB-1
+  OffsetModeId          = 5
+  SpacecraftClockCount  = 561812335:32
+  RationaleDesc         = "OLYMPUS MONS SPECIAL RED WIDE ANGLE"
+  FirstLineSample       = 673
 End_Group
 
 Group = AlphaCube
@@ -218,17 +235,16 @@ End_Group
 Testing sub image area with linc=1.0, sinc=2.5 for unprojected cube...
 
 Group = Results
-  InputLines             = 768
-  InputSamples           = 640
-  StartingLine           = 25
-  StartingSample         = 10
-  EndingLine             = 735
-  EndingSample           = 622
-  LineIncrement          = 1.0
-  SampleIncrement        = 2.5
-  OutputLines            = 711
-  OutputSamples          = 246
-  InstrumentGroupDeleted = True
+  InputLines      = 768
+  InputSamples    = 640
+  StartingLine    = 25
+  StartingSample  = 10
+  EndingLine      = 735
+  EndingSample    = 622
+  LineIncrement   = 1.0
+  SampleIncrement = 2.5
+  OutputLines     = 711
+  OutputSamples   = 246
 End_Group
 
 Output cube label: 
@@ -237,6 +253,24 @@ Group = Dimensions
   Samples = 246
   Lines   = 711
   Bands   = 1
+End_Group
+
+Group = Instrument
+  SpacecraftName        = "MARS GLOBAL SURVEYOR"
+  InstrumentId          = MOC-WA
+  TargetName            = Mars
+  StartTime             = 1997-10-20T10:58:37.46
+  StopTime              = 1997-10-20T11:03:44.66
+  CrosstrackSumming     = 4
+  DowntrackSumming      = 4
+  FocalPlaneTemperature = 213.1
+  GainModeId            = 1A
+  LineExposureDuration  = 100.000000 <milliseconds>
+  MissionPhaseName      = AB-1
+  OffsetModeId          = 5
+  SpacecraftClockCount  = 561812335:32
+  RationaleDesc         = "OLYMPUS MONS SPECIAL RED WIDE ANGLE"
+  FirstLineSample       = 673
 End_Group
 
 Group = AlphaCube
@@ -470,8 +504,8 @@ Group = Results
   SampleIncrement        = 3.0
   OutputLines            = 702
   OutputSamples          = 320
-  InstrumentGroupDeleted = True
   MappingGroupDeleted    = True
+  InstrumentGroupDeleted = True
 End_Group
 
 Output cube label: 
@@ -576,8 +610,8 @@ Group = Results
   SampleIncrement        = 2.5
   OutputLines            = 1347
   OutputSamples          = 373
-  InstrumentGroupDeleted = True
   MappingGroupDeleted    = True
+  InstrumentGroupDeleted = True
 End_Group
 
 Output cube label: 

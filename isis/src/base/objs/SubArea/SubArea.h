@@ -47,6 +47,10 @@ namespace Isis {
    *                                       so that the units for Scale and
    *                                       PixelResolution keywords are
    *                                       perserved.
+   *  @history 2011-01-24 Steven Lambright - Cameras are still valid when linc
+   *                                         and sinc are not equal, so now
+   *                                         this class is more likely to not
+   *                                         delete the instrument group.
    */
 
   class SubArea {
