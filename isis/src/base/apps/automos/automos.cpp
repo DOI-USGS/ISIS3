@@ -93,6 +93,9 @@ void IsisMain() {
   // Loop for each input file and place it in the output mosaic
 
   m.SetBandBinMatch(ui.GetBoolean("MATCHBANDBIN"));
+  
+  // Get the MatchDEM Flag
+  m.SetMatchDEM(ui.GetBoolean("MATCHDEM"));
 
   for(unsigned int i = 0; i < list.size(); i++) {
     if(!m.StartProcess(list[i])) {
