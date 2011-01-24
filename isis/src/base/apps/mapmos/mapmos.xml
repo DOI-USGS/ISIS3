@@ -227,6 +227,10 @@
       Added "AVERAGE" priority where the mosaic will be average of valid input 
       and mosaic pixels.
     </change>
+    <change name="Sharmila Prasad" date="2011-01-24">
+      Option to match DEM and also added new group "mosaic" to hold ShapeModel 
+      attributes for the mosaic
+    </change>
   </history>
 
   <oldName>
@@ -539,6 +543,15 @@
           match the mosaic bandbin group.
         </description>
         <default><item>TRUE</item></default>
+      </parameter>
+        <parameter name="MATCHDEM">
+        <type>boolean</type>
+        <brief>Enforce DEM Match</brief>
+        <description>
+          This option causes the application to fail if the input DEM 
+        shapemodel does not match the mosaic's' shapemodel. 
+        </description>
+        <default><item>FALSE</item></default>
       </parameter>
       <parameter name="HIGHSATURATION">
         <type>boolean</type>

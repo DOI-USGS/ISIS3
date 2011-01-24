@@ -7,7 +7,7 @@ commands:
 	  mosaic=$(OUTPUT)/mapmosTruth2.cub \
 	  create=true \
 	  track=true \
-	  match=false \
+	  matchbandbin=false \
 	  minlat=10.765 \
 	  maxlat=34.445 \
 	  minlon=219.720 \
@@ -23,6 +23,6 @@ commands:
 	  inter=near > /dev/null;
 
 	  $(APPNAME) from=$(OUTPUT)/map.cub \
-	  mosaic=$(OUTPUT)/mapmosTruth2.cub match=false  > /dev/null;
+	  mosaic=$(OUTPUT)/mapmosTruth2.cub matchbandbin=false  > /dev/null;
 
 	  

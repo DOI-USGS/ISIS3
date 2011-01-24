@@ -14,6 +14,9 @@ void IsisMain() {
   // Get the MatchBandBin Flag
   m.SetBandBinMatch(ui.GetBoolean("MATCHBANDBIN"));
 
+  // Get the MatchDEM Flag
+  m.SetMatchDEM(ui.GetBoolean("MATCHDEM"));
+
   // Get the track flag
   bool bTrack = ui.GetBoolean("TRACK");
   m.SetTrackFlag(bTrack);
