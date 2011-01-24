@@ -79,6 +79,8 @@ namespace Isis {
     // Default Priority OnTop
     mePriority = input;
 
+    mbMatchDEM = false;
+    
     // Initialize the data members
     miOss = -1;
     miOsl = -1;
@@ -198,7 +200,7 @@ namespace Isis {
     if((outLine + inl - 1) > OutputCubes[0]->Lines()) {
       inl = OutputCubes[0]->Lines() - outLine + 1;
     }
-
+    
     // Tests for completly off the mosaic
     if((ins < 1) || (inl < 1)) {
 #ifdef _DEBUG_
@@ -215,7 +217,7 @@ namespace Isis {
       inb = inb + outFile - 1;
       outFile = 1;
     }
-
+    
     p_progress->SetMaximumSteps((int)InputCubes[0]->Lines() * (int)InputCubes[0]->Bands());
     p_progress->CheckStatus();
 
@@ -230,9 +232,14 @@ namespace Isis {
 
 #endif
     // *******************************************************************************
-
-    // Check to make sure the bandbins match if necessary
+    
     Pvl *inLab  = InputCubes[0]->Label();
+    // Create / Match DEM Shape Model if bMatchDEM Flag is enabled 
+    if (mbMatchDEM){
+      MatchDEMShapeModel();
+    }
+    
+    // Check to make sure the bandbins match if necessary
     if(mbBandbinMatch) {
       Pvl *outLab = OutputCubes[0]->Label();
 
@@ -464,6 +471,59 @@ namespace Isis {
     }
   } // End StartProcess
 
+  /**
+   * Match the Shape Model for input and mosaic. If creating the mosaic, 
+   * copy the input ShapeModel from the input label. 
+   * Store only the file name of the Shape Model 
+   * 
+   * @author Sharmila Prasad (1/24/2011)
+   */
+  void ProcessMosaic::MatchDEMShapeModel(void)
+  {
+    Pvl* inLabel  = InputCubes[0]->Label(); 
+    Pvl* outLabel = OutputCubes[0]->Label();
+    
+    if(outLabel->FindObject("IsisCube").HasGroup("Mosaic")) {
+      PvlGroup outMosaicGrp = outLabel->FindObject("IsisCube").FindGroup("Mosaic");
+      if(outMosaicGrp.HasKeyword("ShapeModel")) {
+        if(inLabel->FindObject("IsisCube").HasGroup("Kernels")) {
+          PvlGroup inMosaicGrp = inLabel->FindObject("IsisCube").FindGroup("Kernels");
+          if(outMosaicGrp.HasKeyword("ShapeModel") && inMosaicGrp.HasKeyword("ShapeModel")) {
+            PvlKeyword outShapeModelKey = outMosaicGrp.FindKeyword("ShapeModel");
+            string sShapeModel = inMosaicGrp.FindKeyword("ShapeModel")[0];
+            //cout <<"Orig in=" << sShapeModel << endl;
+            size_t found = sShapeModel.rfind ("/");
+            if(found != string::npos) {
+              sShapeModel.replace (0, found+1, "\0");
+            }
+            if(sShapeModel == outShapeModelKey[0]) {
+              return;
+            }
+          }
+        }
+        std::string sErrMsg = "Input and Mosaic DEM Shape Model do not match";
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+      }
+    }
+    else {
+      if(mtTrackInfo.bCreate) {
+        if(inLabel->FindObject("IsisCube").HasGroup("Kernels")) {
+          string sShapeModel = inLabel->FindObject("IsisCube").FindGroup("Kernels").FindKeyword("ShapeModel")[0];
+          size_t found = sShapeModel.rfind ("/");
+          if(found != string::npos){
+            sShapeModel.replace (0, found+1, "\0");
+          }
+          PvlObject & outIsisCubeObj = outLabel->FindObject("IsisCube");
+          PvlGroup mosaicGrp("Mosaic");
+          PvlKeyword shapeModelKey("ShapeModel");
+          shapeModelKey += sShapeModel;
+          mosaicGrp += shapeModelKey;
+          outIsisCubeObj += mosaicGrp;
+        }
+      }
+    }
+  }
+  
   /**
    * Reset all the count bands to default at the time of mosaic creation
    * 

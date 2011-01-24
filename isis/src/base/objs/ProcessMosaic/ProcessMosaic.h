@@ -163,6 +163,8 @@ namespace Isis {
    *                                        at creation time regardless of matchbandbin flag
    *  @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature, to double
    *           the number of mosaic bands to get Count info
+   *  @history 2011-01-24 Sharmila Prasad - API to match DEM and also to add new group "mosaic"
+   *           to hold ShapeModel attributes for the mosaic if Flag is Enabled
    *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
@@ -384,6 +386,20 @@ namespace Isis {
       };
 
       /**
+       * Enable/Disable Match DEM's
+       * 
+       * @author Sharmila Prasad (1/24/2011)
+       * 
+       * @param pbMatchDEM 
+       */
+      void SetMatchDEM(bool pbMatchDEM) {
+        mbMatchDEM = pbMatchDEM;
+      }
+      
+      //! Match DEM between Input & Mosaic if MatchDEM Flag is enabled
+      void MatchDEMShapeModel(void);
+      
+      /**
        * Set/Get the Track Flag
        * 
        * @author Sharmila Prasad (1/19/2011)
@@ -481,6 +497,9 @@ namespace Isis {
        */
       bool mbBandbinMatch;
 
+      //! Flag to indicate whether DEM of the input and mosaic should match
+      bool mbMatchDEM;
+      
       //! Set the priority to input(ontop), mosaic(beneath) or band
       MosaicPriority mePriority;
 
