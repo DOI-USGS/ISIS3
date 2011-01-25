@@ -25,6 +25,7 @@
 #include "Distance.h"
 #include "iException.h"
 #include "iString.h"
+#include "PvlGroup.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -57,6 +58,44 @@ namespace Isis {
     p_errors = errors;
 
     SetPlanetocentric(latitude, latitudeUnits);
+  }
+
+
+  /**
+   * Create and initialize a Latitude value using the mapping group's latitude
+   * units and radii.
+   *
+   * @see ErrorChecking
+   * @see CoordinateType
+   * @param latitude The latitude value this instance will represent,
+   *     in the mapping group's units
+   * @param mapping A mapping group
+   * @param latitudeUnits The angular units of the latitude value (degs, rads)
+   * @param errors Error checking conditions
+   */
+  Latitude::Latitude(double latitude,
+            PvlGroup mapping,
+            Angle::Units latitudeUnits,
+            ErrorChecking errors) {
+    p_equatorialRadius = NULL;
+    p_polarRadius = NULL;
+
+    p_equatorialRadius = new Distance(mapping["EquatorialRadius"][0]);
+    p_polarRadius = new Distance(mapping["PolarRadius"][0]);
+
+    p_errors = errors;
+
+    if(mapping["LatitudeType"][0] == "Planetographic") {
+      SetPlanetographic(latitude, latitudeUnits);
+    }
+    else if(mapping["LatitudeType"][0] == "Planetocentric") {
+      SetPlanetocentric(latitude, latitudeUnits);
+    }
+    else {
+      iString msg = "Latitude type [" + iString(mapping["LatitudeType"][0]) +
+        "] is not recognized";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -259,6 +298,8 @@ namespace Isis {
     if(latitudeToCopy.p_polarRadius) {
       p_polarRadius = new Distance(*latitudeToCopy.p_polarRadius);
     }
+
+    SetPlanetocentric(latitudeToCopy.GetPlanetocentric());
 
     return *this;
   }

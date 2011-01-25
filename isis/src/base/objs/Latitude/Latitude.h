@@ -24,6 +24,7 @@
 
 namespace Isis {
   class Distance;
+  class PvlGroup;
 
   /**
    * This class is designed to encapsulate the concept of a Latitude. This is
@@ -36,6 +37,8 @@ namespace Isis {
    * @author 2010-10-13 Steven Lambright
    *
    * @internal
+   *   @history 2011-01-25 Steven Lambright - Added a constructor which takes a
+   *                         mapping group.
    */
   class Latitude : public Angle {
     public:
@@ -94,6 +97,11 @@ namespace Isis {
 
       Latitude();
       Latitude(double latitude,
+               Angle::Units latitudeUnits = Angle::Radians,
+               ErrorChecking errors = ThrowAllErrors);
+
+      Latitude(double latitude,
+               PvlGroup mapping,
                Angle::Units latitudeUnits = Angle::Radians,
                ErrorChecking errors = ThrowAllErrors);
 
