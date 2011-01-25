@@ -114,8 +114,6 @@ namespace Isis
    *
    * @param ptfile Name of file containing a Pvl list of control points
    * @param progress A pointer to the progress of reading in the control points
-   * @param forceBuild Forces invalid Control Points to be added to this Control
-   *                   Network
    */
   ControlNet::ControlNet(const iString & ptfile, Progress * progress)
   {
@@ -173,8 +171,6 @@ namespace Isis
    *
    * @param ptfile Name of file containing a Pvl list of control points
    * @param progress A pointer to the progress of reading in the control points
-   * @param forceBuild Forces invalid Control Points to be added to this Control
-   *                   Network
    *
    * @throws Isis::iException::User - "Invalid Network Type"
    * @throws Isis::iException::User - "Invalid Control Point"
@@ -834,17 +830,6 @@ namespace Isis
 
 
   /**
-   * Sort the entire Control Net by Point ID using Quick sort
-   *
-   * @author sprasad (8/26/2010)
-   */
-  /*  void ControlNet::SortControlNet()
-    {
-      p_pointIds.sort();
-    }
-  */
-
-  /**
    * Compute the average error of all points in the network
    * @return <B>double</B> Average error of points
    *
@@ -1125,6 +1110,12 @@ namespace Isis
   iString ControlNet::GetUserName() const
   {
     return p_userName;
+  }
+
+  //! Return QList of ControlPoint Ids used in hash, in order of addition 
+  QList< QString > ControlNet::GetPointIds() const
+  {
+    return *pointIds;
   }
 
 

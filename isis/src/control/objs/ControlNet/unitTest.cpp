@@ -126,6 +126,12 @@ int main() {
   }
   cout << endl;
 
+  
+  for (int i = 0; i < cn1.GetNumPoints(); i++) {
+    cout << cn1.GetPoint(i)->GetDateTime() << endl;
+  }
+ 
+ 
   cout << "Test deleting nonexistant control point index ..." << endl;
   try {
     cn1.DeletePoint(7);
@@ -134,7 +140,17 @@ int main() {
     e.Report(false);
   }
   cout << endl;
+
+  for (int i = 0; i < cn1.GetNumPoints(); i++) {
+    cout << cn1.GetPoint(i)->GetDateTime() << endl;
+  }
+
+
   ControlNet cn2("temp.txt");
+
+  for (int i = 0; i < cn2.GetNumPoints(); i++) {
+    cout << cn2.GetPoint(i)->GetDateTime() << endl;
+  }
 
   cn2.Write("temp2.txt", true);
   if (system("cmp temp.txt temp2.txt")) {
@@ -167,6 +183,9 @@ int main() {
   remove("temp2.txt");
   remove("temp.bin");
   remove("temp2.bin");
+
+  //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
+  //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");
 
   return 0;
 #if 0

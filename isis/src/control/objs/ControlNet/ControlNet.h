@@ -151,7 +151,6 @@ namespace Isis {
 
       void ComputeResiduals();
       void ComputeApriori();
-      void SortControlNet();
 
       const ControlPoint *GetPoint(QString) const;
       ControlPoint *GetPoint(QString);
@@ -176,6 +175,7 @@ namespace Isis {
       int GetNumValidPoints();
       iString GetTarget() const;
       iString GetUserName() const;
+      QList< QString > GetPointIds() const;
 
       void SetCreatedDate(const iString &date);
       void SetDescription(const iString &newDescription);
