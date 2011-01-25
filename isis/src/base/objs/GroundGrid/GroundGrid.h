@@ -23,6 +23,10 @@
  */
 
 namespace Isis {
+  class Angle;
+  class Latitude;
+  class Longitude;
+  class PvlGroup;
   class Progress;
   class UniversalGroundMap;
 
@@ -39,6 +43,9 @@ namespace Isis {
    *   @history 2010-05-06 Steven Lambright Added Split Lat/Lon
    *            Functionality
    *   @history 2010-06-22 Steven Lambright Improved handling of resolutions
+   *   @history 2011-01-25 Steven Lambright Now uses native unitsto the
+   *            projection, Lat/Lon classes, and several bug fixes when it comes
+   *            to out of range values or non-standard projection types.
    */
   class GroundGrid {
     public:
@@ -47,16 +54,28 @@ namespace Isis {
 
       virtual ~GroundGrid();
 
-      void CreateGrid(double baseLat, double baseLon,
-                      double latInc,  double lonInc,
-                      Progress *progress = 0,
-                      double latRes = 0.0, double lonRes = 0.0);
+      void CreateGrid(Latitude baseLat, Longitude baseLon,
+                      Angle latInc,  Angle lonInc,
+                      Progress *progress = 0);
+
+      void CreateGrid(Latitude baseLat, Longitude baseLon,
+                      Angle latInc,  Angle lonInc,
+                      Progress *progress,
+                      Angle latRes, Angle lonRes);
 
       bool PixelOnGrid(int x, int y);
       bool PixelOnGrid(int x, int y, bool latGrid);
 
+      /**
+       * Returns a mapping group representation of the projection or camera.
+       * This is useful for matching units with lat/lons.
+       *
+       * @returns Returns a mapping group representation of the projection or camera
+       */
+      PvlGroup *GetMappingGroup() { return p_mapping; }
+
     protected:
-      virtual bool GetXY(double lat, double lon,
+      virtual bool GetXY(Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y);
 
       //! Returns the ground map for children
@@ -80,10 +99,13 @@ namespace Isis {
       unsigned long p_gridSize; //!< This is width*height
       UniversalGroundMap *p_groundMap; //!< This calculates single grid pts
 
-      double p_minLat; //!< Lowest latitude in image
-      double p_minLon; //!< Lowest longitude in image
-      double p_maxLat; //!< Highest latitude in image
-      double p_maxLon; //!< Highest longitude in image
+      Latitude  *p_minLat; //!< Lowest latitude in image
+      Longitude *p_minLon; //!< Lowest longitude in image
+      Latitude  *p_maxLat; //!< Highest latitude in image
+      Longitude *p_maxLon; //!< Highest longitude in image
+
+      //! The mapping group representation of the projection or camera
+      PvlGroup *p_mapping;
 
       double p_defaultResolution; //!< Default step size in degrees/pixel
 

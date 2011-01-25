@@ -53,6 +53,13 @@
     <change name="Mackenzie Boyd" date="2011-01-21">
       Added more line options, to change output to be HRS, LRS, NULL, or a DN.
     </change>
+    <change name="Steven Lambright" date="2011-01-25">
+      Bug fixes for projections that use PositiveWest or Planetographic
+      coordinate systems. The BASELAT and BASELON parameters are now expected
+      to be in the units of the projection (if your cube has a planetographic
+      latitude system, and baselat=50, then there will be a line at the
+      planetographic latitude of 50).
+    </change>
   </history>
 
   <groups>
@@ -199,7 +206,10 @@
         <description>
           This is a latitude line the grid will lie on. If it is not in the
           image, then it is a latitude line the grid would lie on if the image
-          were larger. This is not a minimum latitude for the grid.
+          were larger. This is not a minimum latitude for the grid. If the image
+          is projected, then this should be in the same units of the projection
+          (for example, if your cube has a planetographic projection then this
+          parameter will be interpretted as planetographic).
         </description>
         <minimum inclusive="yes">-90.0</minimum>
       </parameter>
@@ -211,7 +221,11 @@
         <description>
           This is a longitude line the grid will lie on. If it is not in the 
           image,  then it is a longitude line the grid would lie on if the image 
-          were larger. This is not a minimum longitude for the grid.
+          were larger. This is not a minimum longitude for the grid. If this
+          image is projected, then this should be in the same units of the
+          projection (for example, if your cube is projected in postive west
+          then this longitude will be interpretted as a positive west
+          longitude).
         </description>
         <minimum inclusive="yes">-360.0</minimum>
       </parameter>

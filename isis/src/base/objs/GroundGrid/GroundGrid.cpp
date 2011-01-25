@@ -1,12 +1,17 @@
 #include "GroundGrid.h"
 
 #include <cmath>
+#include <iomanip>
 
-#include "ProjectionFactory.h"
+#include "Angle.h"
 #include "UniversalGroundMap.h"
 #include "Camera.h"
-#include "Projection.h"
+#include "Distance.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Progress.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
 
 using namespace std;
 
@@ -57,29 +62,40 @@ namespace Isis {
 
     // We need a lat/lon range for gridding, use the mapping group
     //  (in case of camera, use BasicMapping)
-    p_minLat = 0.0;
-    p_minLon = 0.0;
-    p_maxLat = 0.0;
-    p_maxLon = 0.0;
+    p_minLat = NULL;
+    p_minLon = NULL;
+    p_maxLat = NULL;
+    p_maxLon = NULL;
 
-    PvlGroup mapping;
+    p_mapping = new PvlGroup;
 
     if(p_groundMap->Camera()) {
       Pvl tmp;
       p_groundMap->Camera()->BasicMapping(tmp);
-      mapping = tmp.FindGroup("Mapping");
+      *p_mapping = tmp.FindGroup("Mapping");
     }
     else {
-      mapping = p_groundMap->Projection()->Mapping();
+      *p_mapping = p_groundMap->Projection()->Mapping();
     }
 
-    p_minLat = mapping["MinimumLatitude"];
-    p_maxLat = mapping["MaximumLatitude"];
-    p_minLon = mapping["MinimumLongitude"];
-    p_maxLon = mapping["MaximumLongitude"];
+    Distance radius1 = (double)(*p_mapping)["EquatorialRadius"];
+    Distance radius2 = (double)(*p_mapping)["PolarRadius"];
 
-    double radius1 = mapping["EquatorialRadius"];
-    double radius2 = mapping["PolarRadius"];
+    p_minLat = new Latitude((*p_mapping)["MinimumLatitude"][0], *p_mapping,
+        Angle::Degrees);
+    p_maxLat = new Latitude((*p_mapping)["MaximumLatitude"][0], *p_mapping,
+        Angle::Degrees);
+
+    p_minLon = new Longitude((*p_mapping)["MinimumLongitude"][0], *p_mapping,
+        Angle::Degrees);
+    p_maxLon = new Longitude((*p_mapping)["MaximumLongitude"][0], *p_mapping,
+        Angle::Degrees);
+
+    if(*p_minLon > *p_maxLon) {
+      Longitude tmp(*p_minLon);
+      *p_minLon = *p_maxLon;
+      *p_maxLon = tmp;
+    }
 
     double largerRadius = max(radius1, radius2);
 
@@ -102,6 +118,31 @@ namespace Isis {
    * Delete the object
    */
   GroundGrid::~GroundGrid() {
+    if(p_minLat) {
+      delete p_minLat;
+      p_minLat = NULL;
+    }
+
+    if(p_minLon) {
+      delete p_minLon;
+      p_minLon = NULL;
+    }
+
+    if(p_maxLat) {
+      delete p_maxLat;
+      p_maxLat = NULL;
+    }
+
+    if(p_maxLon) {
+      delete p_maxLon;
+      p_maxLon = NULL;
+    }
+
+    if(p_mapping) {
+      delete p_mapping;
+      p_mapping = NULL;
+    }
+
     if(p_grid) {
       delete [] p_grid;
       p_grid = NULL;
@@ -118,6 +159,21 @@ namespace Isis {
     }
   }
 
+  /**
+   * This method draws the grid internally, using default resolutions.
+   *
+   * @param baseLat Latitude to hit in the grid
+   * @param baseLon Longitude to hit in the grid
+   * @param latInc  Distance between latitude lines
+   * @param lonInc  Distance between longitude lines
+   * @param progress If passed in, this progress will be used
+   */
+  void GroundGrid::CreateGrid(Latitude baseLat, Longitude baseLon,
+                              Angle latInc,  Angle lonInc,
+                              Progress *progress) {
+    CreateGrid(baseLat, baseLon, latInc, lonInc, progress, Angle(), Angle());
+  }
+
 
   /**
    * This method draws the grid internally. It is not valid to call PixelOnGrid
@@ -131,10 +187,10 @@ namespace Isis {
    * @param latRes  Resolution of latitude lines (in degrees/pixel)
    * @param lonRes  Resolution of longitude lines (in degrees/pixel)
    */
-  void GroundGrid::CreateGrid(double baseLat, double baseLon,
-                              double latInc,  double lonInc,
+  void GroundGrid::CreateGrid(Latitude baseLat, Longitude baseLon,
+                              Angle latInc,  Angle lonInc,
                               Progress *progress,
-                              double latRes, double lonRes) {
+                              Angle latRes, Angle lonRes) {
     if(p_groundMap == NULL ||
         (p_grid == NULL && p_latLinesGrid == NULL && p_lonLinesGrid == NULL)) {
       iString msg = "GroundGrid::CreateGrid missing ground map or grid array";
@@ -153,23 +209,30 @@ namespace Isis {
     p_reinitialize = true;
 
     // Find starting points for lat/lon
-    double startLat = baseLat - floor((baseLat - p_minLat) / latInc) * latInc;
-    double startLon = baseLon - floor((baseLat - p_minLon) / lonInc) * lonInc;
+    Latitude startLat = Latitude(
+        baseLat - Angle(floor((baseLat - *p_minLat) / latInc) * latInc),
+        *GetMappingGroup());
 
-    if(latRes == 0.0) {
-      latRes = p_defaultResolution;
+    Longitude startLon = Longitude(
+        baseLon - Angle(floor((baseLat - *p_minLon) / lonInc) * lonInc));
+
+    if(!latRes.Valid() || latRes <= Angle(0)) {
+      latRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 
-    if(lonRes == 0.0) {
-      lonRes = p_defaultResolution;
+    if(!lonRes.Valid() || latRes <= Angle(0)) {
+      lonRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 
-    double endLat = (long)((p_maxLat - startLat) / latInc) * latInc + startLat;
-    double endLon = (long)((p_maxLon - startLon) / lonInc) * lonInc + startLon;
+    Latitude endLat = Latitude(
+        (long)((*p_maxLat - startLat) / latInc) * latInc + startLat,
+        *GetMappingGroup());
+    Longitude endLon =
+        (long)((*p_maxLon - startLon) / lonInc) * lonInc + startLon;
 
     if(progress) {
-      double numSteps = (endLat - startLat) / latInc + 1;
-      numSteps += (endLon - startLon) / lonInc + 1;
+      double numSteps = (double)((endLat - startLat) / latInc) + 1;
+      numSteps += (double)((endLon - startLon) / lonInc) + 1;
 
       if(numSteps <= 0) {
         iString msg = "No gridlines would intersect the image";
@@ -180,22 +243,20 @@ namespace Isis {
       progress->CheckStatus();
     }
 
-    for(double lat = startLat; lat <= endLat; lat += latInc) {
+    for(Latitude lat = startLat; lat <= endLat + latInc / 2; lat += latInc) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(double lon = startLon; lon <= p_maxLon; lon += latRes) {
+      for(Longitude lon = startLon; lon <= *p_maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
         bool valid = GetXY(lat, lon, x, y);
 
         if(valid && havePrevious) {
-          if(previousX == x && previousY == y) {
-            continue;
+          if(previousX != x || previousY != y) {
+            DrawLineOnGrid(previousX, previousY, x, y, true);
           }
-
-          DrawLineOnGrid(previousX, previousY, x, y, true);
         }
 
         havePrevious = valid;
@@ -208,12 +269,12 @@ namespace Isis {
       }
     }
 
-    for(double lon = startLon; lon <= endLon; lon += lonInc) {
+    for(double lon = startLon; lon <= endLon + lonInc / 2; lon += lonInc) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(double lat = startLat; lat <= p_maxLat; lat += lonRes) {
+      for(double lat = startLat; lat <= *p_maxLat; lat += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
 
@@ -291,13 +352,17 @@ namespace Isis {
    *
    * @return bool Successful
    */
-  bool GroundGrid::GetXY(double lat, double lon,
+  bool GroundGrid::GetXY(Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y) {
     if(!GroundMap()) return false;
+    if(!GroundMap()->SetGround(lat, lon)) return false;
+    if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
+    if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
 
-    if(!GroundMap()->SetUniversalGround(lat, lon)) return false;
     x = (int)(p_groundMap->Sample() - 0.5);
     y = (int)(p_groundMap->Line() - 0.5);
+
+    if(x >= p_width || y >= p_height) return false;
 
     return true;
   }
@@ -341,6 +406,8 @@ namespace Isis {
    *
    * @param x X-Coordinate (0-based)
    * @param y Y-Coordinate (0-based)
+   * @param latGrid True if you want to access the latitude grid where there are
+   *   separate lat/lon grids. False for lon. Irrelevant if using a single grid.
    *
    * @return bool Value at grid coordinate
    */

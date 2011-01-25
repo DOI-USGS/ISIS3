@@ -2,10 +2,13 @@
 
 #include <iostream>
 
+#include "Angle.h"
 #include "Cube.h"
-#include "UniversalGroundMap.h"
 #include "GroundGrid.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Progress.h"
+#include "UniversalGroundMap.h"
 
 using namespace std;
 using namespace Isis;
@@ -28,7 +31,9 @@ void IsisMain() {
   Progress progress;
   GroundGrid grid(&gmap, false, someCube.Samples(), someCube.Lines());
 
-  grid.CreateGrid(0, 0, 0.2, 0.2, &progress, 0.1, 0.01);
+  grid.CreateGrid(Latitude(0), Longitude(0), Angle(0.2, Angle::Degrees),
+      Angle(0.2, Angle::Degrees), &progress, Angle(0.1, Angle::Degrees),
+      Angle(0.01, Angle::Degrees));
 
   cout << "\n\nGrid cutout: \n" << endl;
 

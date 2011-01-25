@@ -2,10 +2,13 @@
 
 #include <cmath>
 
+#include "Angle.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "GroundGrid.h"
 #include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "ProcessByLine.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -21,7 +24,9 @@ void createGroundImage(Camera *cam, Projection *proj);
 
 bool outline, ticks, diagonalTicks;
 int baseLine, baseSample, lineInc, sampleInc, tickSize, lineWidth;
-double baseLat, baseLon, latInc, lonInc;
+Latitude baseLat;
+Longitude baseLon;
+Angle latInc, lonInc;
 double lineValue;
 
 int inputSamples, inputLines;
@@ -90,13 +95,16 @@ void IsisMain() {
     p.SetOutputCube(ui.GetFilename("TO"), oatt, icube->Samples(),
                     icube->Lines(), icube->Bands());
 
-    baseLat = ui.GetDouble("BASELAT");
-    baseLon = ui.GetDouble("BASELON");
-    latInc = ui.GetDouble("LATINC");
-    lonInc = ui.GetDouble("LONINC");
-
-    UniversalGroundMap *gmap = new UniversalGroundMap(*icube);
+    UniversalGroundMap *gmap = new UniversalGroundMap(*icube,
+        UniversalGroundMap::ProjectionFirst);
     latLonGrid = new GroundGrid(gmap, ticks, icube->Samples(), icube->Lines());
+
+    baseLat = Latitude(ui.GetDouble("BASELAT"),
+        *latLonGrid->GetMappingGroup(), Angle::Degrees);
+    baseLon = Longitude(ui.GetDouble("BASELON"),
+        *latLonGrid->GetMappingGroup(), Angle::Degrees);
+    latInc = Angle(ui.GetDouble("LATINC"), Angle::Degrees);
+    lonInc = Angle(ui.GetDouble("LONINC"), Angle::Degrees);
 
     Progress progress;
     progress.SetText("Calculating Grid");
