@@ -24,6 +24,7 @@
 #include "Constants.h"
 #include "iException.h"
 #include "iString.h"
+#include "PvlGroup.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -32,6 +33,45 @@ namespace Isis {
    */
   Longitude::Longitude() : Angle() {
     p_currentDomain = Domain360;
+  }
+
+
+  /**
+   * Create and initialize a Longitude value. This value can wrap the planet
+   *   any number of times regardless of the domain. The longitude domain and
+   *   direction are read from the mapping group.
+   *
+   * @param longitude The longitude value this instance will represent
+   * @param mapping The mapping group containing the longitude direction and
+   *   domain
+   * @param longitudeUnits The angular units of the longitude value (degs, rads)
+   */
+  Longitude::Longitude(double longitude, PvlGroup mapping,
+                       Angle::Units longitudeUnits) :
+      Angle(longitude, longitudeUnits) {
+    if(mapping["LongitudeDomain"][0] == "360") {
+      p_currentDomain = Domain360;
+    }
+    else if(mapping["LongitudeDomain"][0] == "180") {
+      p_currentDomain = Domain180;
+    }
+    else {
+      iString msg = "Longitude domain [" +
+          iString(mapping["LongitudeDomain"][0]) + "] not recognized";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    if(mapping["LongitudeDirection"][0] == "PositiveEast") {
+      SetPositiveEast(longitude, longitudeUnits);
+    }
+    else if(mapping["LongitudeDirection"][0] == "PositiveWest") {
+      SetPositiveWest(longitude, longitudeUnits);
+    }
+    else {
+      iString msg = "Longitude direction [" +
+          iString(mapping["LongitudeDirection"][0]) + "] not recognized";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -179,7 +219,10 @@ namespace Isis {
    *     instance
    */
   Longitude& Longitude::operator=(const Longitude & longitudeToCopy) {
+    if(this == &longitudeToCopy) return *this;
+
     p_currentDomain = longitudeToCopy.p_currentDomain;
+    SetPositiveEast(longitudeToCopy.GetPositiveEast());
 
     return *this;
   }

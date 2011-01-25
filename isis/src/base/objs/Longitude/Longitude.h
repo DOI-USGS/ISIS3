@@ -23,6 +23,7 @@
 #include "Angle.h"
 
 namespace Isis {
+  class PvlGroup;
 
   /**
    * This class is designed to encapsulate the concept of a Longitude. This is
@@ -35,6 +36,8 @@ namespace Isis {
    * @author 2010-10-12 Steven Lambright
    *
    * @internal
+   *   @history 2011-01-25 Steven Lambright - Added a constructor which takes a
+   *                         mapping group.
    */
   class Longitude : public Angle {
     public:
@@ -70,6 +73,9 @@ namespace Isis {
                 Angle::Units longitudeUnits = Angle::Radians,
                 Direction lonDir = PositiveEast,
                 Domain lonDomain = Domain360);
+      Longitude(double longitude,
+                PvlGroup mapping,
+                Angle::Units longitudeUnits = Angle::Radians);
       Longitude(const Longitude &longitudeToCopy);
       ~Longitude();
 
