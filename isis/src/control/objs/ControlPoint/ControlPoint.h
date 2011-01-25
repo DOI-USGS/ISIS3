@@ -365,8 +365,6 @@ namespace Isis {
 
       PvlObject ToPvlObject() const;
 
-      void SetParent(ControlNet *parent);
-
       const ControlMeasure *operator[](iString serialNumber) const;
       ControlMeasure *operator[](iString serialNumber);
 
@@ -389,8 +387,8 @@ namespace Isis {
     private:
       void validateMeasure(iString serialNumber, bool checkRef = false) const;
 
+      void AddMeasure(ControlMeasure *measure);
 
-    private:
       void Init(const PBControlNet_PBControlPoint &);
 
       void PointModified();

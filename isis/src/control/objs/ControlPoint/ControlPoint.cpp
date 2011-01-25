@@ -295,7 +295,6 @@ namespace Isis {
       p_aprioriSurfacePointSourceFile = p["AprioriLatLonSourceFile"][0];
     }
 
-
     if (p.HasKeyword("AprioriRadiusSource")) {
       if ((std::string)p["AprioriRadiusSource"] == "None") {
         p_aprioriRadiusSource = RadiusSource::None;
@@ -412,7 +411,7 @@ namespace Isis {
         if (p.Group(g).IsNamed("ControlMeasure")) {
           ControlMeasure *cm = new ControlMeasure;
           cm->Load(p.Group(g));
-          Add(cm);
+          AddMeasure(cm);
         }
       }
       catch (iException &e) {
@@ -430,24 +429,44 @@ namespace Isis {
    * @param measure The ControlMeasure to add
    */
   void ControlPoint::Add(ControlMeasure *measure) {
+    PointModified();
+    AddMeasure(measure);
+  }
+
+  void ControlPoint::AddMeasure(ControlMeasure * cmeasure) {
+    // Make sure measure is unique
     foreach(ControlMeasure * m, p_measures->values()) {
-      if (m->GetCubeSerialNumber() == measure->GetCubeSerialNumber()) {
+      if (m->GetCubeSerialNumber() == cmeasure->GetCubeSerialNumber()) {
         iString msg = "The SerialNumber is not unique. A measure with "
-                      "serial number [" + measure->GetCubeSerialNumber() + "] already "
+                      "serial number [" + cmeasure->GetCubeSerialNumber() + "] already "
                       "exists for ControlPoint [" + GetId() + "]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }
 
-    PointModified();
+    // If its type is Reference, make sure we don't already have a reference
+    // measure, if we do, throw an error, if not, make it the reference.
+    if (cmeasure->GetType() == ControlMeasure::Reference) {
+      if (referenceMeasure != NULL) {
+        if (referenceMeasure->GetType() != ControlMeasure::Reference) 
+          referenceMeasure = cmeasure;
+      } 
+      else {
+        iString msg = "Cannot add second ControlMeasure with type Reference";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_); 
+      }
+    }
 
-    measure->parentPoint = this;
-    QString newSerial = measure->GetCubeSerialNumber();
-    p_measures->insert(newSerial, measure);
+    // If we still don't have a reference measure, if it's measured, make it
+    // the reference measure.
+    if (referenceMeasure == NULL && cmeasure->IsMeasured()) {
+      referenceMeasure = cmeasure;
+    }
+
+    cmeasure->parentPoint = this;
+    QString newSerial = cmeasure->GetCubeSerialNumber();
+    p_measures->insert(newSerial, cmeasure);
     cubeSerials->append(newSerial);
-
-    if (referenceMeasure == NULL) 
-      referenceMeasure = measure;
   }
 
 
@@ -577,7 +596,7 @@ namespace Isis {
    * @returns const reference measure for this point
    */
   const ControlMeasure *ControlPoint::GetReferenceMeasure() const {
-    if (!referenceMeasure) {
+    if (referenceMeasure == NULL) {
       iString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -588,7 +607,7 @@ namespace Isis {
 
 
   ControlMeasure *ControlPoint::GetReferenceMeasure() {
-    if (!referenceMeasure) {
+    if (referenceMeasure == NULL) {
       iString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -1350,22 +1369,8 @@ namespace Isis {
    *          ReferenceIndex.
    */
   bool ControlPoint::HasReference() const {
-
-    if (p_measures->size() == 0) {
-      iString msg = "There are no ControlMeasures in the ControlPoint [" +
-                    GetId() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    // Return true if reference measure is found
-    QList<QString> keys = p_measures->keys();
-    for (int i = 0; i < keys.size(); i++) {
-      if ((*p_measures)[keys[i]]->GetType() == ControlMeasure::Reference) {
-        return true;
-      }
-    }
-
-    return false;
+    // If it is set, then there is a reference measure
+    return referenceMeasure != NULL;
   }
 
 
@@ -1400,6 +1405,11 @@ namespace Isis {
                     GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
+    if (referenceMeasure == NULL) {
+      iString msg = "There is no reference measure set in the ControlPoint [" +
+                    GetId() + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
 
     return referenceMeasure->GetCubeSerialNumber();
   }
@@ -1420,11 +1430,11 @@ namespace Isis {
       return -1;
     }
 
-    // Return the first ControlMeasure that is a reference
-    for (int i = 0; i < cubeSerials->size(); i++) {
-      if (p_measures->value(cubeSerials->at(i))->GetType() ==
-          ControlMeasure::Reference)
-        return i;
+    if (referenceMeasure != NULL) {
+      int index = cubeSerials->indexOf(referenceMeasure->GetCubeSerialNumber());
+      // If the serial number isn't contained, there is something very odd going on
+      if (index == -1) return 0;
+      else return index; 
     }
 
     return 0;
@@ -1444,17 +1454,18 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    // Return the first ControlMeasure that is a reference
-    for (int i = 0; i < cubeSerials->size(); i++) {
-      if (p_measures->value(cubeSerials->at(i))->GetType() ==
-          ControlMeasure::Reference)
-        return i;
-    }
-
-    // Or return the first measured ControlMeasure
-    for (int i = 0; i < cubeSerials->size(); i++) {
-      if (p_measures->value(cubeSerials->at(i))->IsMeasured())
-        return i;
+    if (referenceMeasure != NULL) {
+      int index = cubeSerials->indexOf(referenceMeasure->GetCubeSerialNumber());
+      // If the serial number isn't contained, there is something very odd going on
+      if (index != -1) {
+        return index; 
+      }
+      else { 
+        iString msg = "Reference measure serial number [" + 
+                      referenceMeasure->GetCubeSerialNumber()
+                      + "] is not contained in the point";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
     }
 
     iString msg = "There are no Measured ControlMeasures in the ControlPoint ["
@@ -1474,6 +1485,11 @@ namespace Isis {
   bool ControlPoint::IsReferenceLocked() const {
     if (p_measures->size() == 0)
       return false;
+    if (referenceMeasure == NULL) {
+      iString msg = "There is no reference measure set in the ControlPoint ["
+                    + GetId() + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
 
     return referenceMeasure->IsEditLocked();
   }
@@ -1815,11 +1831,6 @@ namespace Isis {
 
     return p;
   }
-
-  void ControlPoint::SetParent(ControlNet *parent) {
-    parentNetwork = parent;
-  }
-
 
   /**
    *  Same as GetMeasure (provided for convenience)

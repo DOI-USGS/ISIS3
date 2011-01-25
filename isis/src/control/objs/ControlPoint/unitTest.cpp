@@ -62,25 +62,37 @@ int main() {
   d->SetChooserName("seedgrid");
   d->SetDateTime("2005-05-03T00:00:00");
 
+  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl;
   c.Add(d);
+
 
   cout << "test PointTypeString(): " << c.GetPointTypeString() << "\n";
   printPoint(c);
 
+  d = new ControlMeasure;
   d->SetCubeSerialNumber("Test2");
   d->SetCoordinate(100.0, 200.0);
   d->SetType(Isis::ControlMeasure::Reference);
   d->SetResidual(-2.0, 2.0);
   d->SetChooserName("seedgrid");
   d->SetDateTime("2005-05-03T00:00:00");
+  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl;
   c.Add(d);
   printPoint(c);
 
+  cout << "Deleting ControlMeasure with cube serial number [" << c.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
   c.Delete(0);
   printPoint(c);
   cout << "ReferenceIndex = " << c.GetReferenceIndex() << endl;
 
-  c.Delete(0);
+  // BTW, not allowed to delete last/reference measure
+  cout << "Deleting ControlMeasure with cube serial number [" << c.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
+  try {
+    c.Delete(0);
+  }
+  catch (Isis::iException &e) {
+    e.Report(false);
+  }
   cout << "ReferenceIndex = " << c.GetReferenceIndex() << endl;
 
   cout << endl << "Test adding control measures with identical serial numbers ..." << endl;
@@ -151,5 +163,5 @@ void printPoint(Isis::ControlPoint &p) {
 
   Pvl tmp;
   tmp.AddObject(p.ToPvlObject());
-  cout << tmp << endl;
+  cout << endl << tmp << endl << endl;
 }
