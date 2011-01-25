@@ -3,6 +3,9 @@
 #include <cmath>
 #include <float.h>
 
+#include <QList>
+#include <QString>
+
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
@@ -102,12 +105,14 @@ void Compare(ControlNet net1, ControlNet net2) {
     return;
   }
 
-  net1.SortControlNet();
-  net2.SortControlNet();
+  QList <QString> net1Points = net1.GetPointIds();
+  QList <QString> net2Points = net2.GetPointIds();
+  qSort(net1Points);
+  qSort(net2Points);
 
-  for(int cpIndex = 0; cpIndex < net1.GetNumPoints(); cpIndex ++) {
-    const ControlPoint *net1Point = net1.GetPoint(cpIndex);
-    const ControlPoint *net2Point = net2.GetPoint(cpIndex);
+  for(int cpIndex = 0; cpIndex < net1Points.size(); cpIndex ++) {
+    const ControlPoint *net1Point = net1.GetPoint(net1Points[cpIndex]);
+    const ControlPoint *net2Point = net2.GetPoint(net2Points[cpIndex]);
 
     Compare(net1Point, net2Point);
 
