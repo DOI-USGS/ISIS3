@@ -181,6 +181,8 @@ namespace Isis {
    *                         intersections were virtually the same. The tolerance was
    *                         changed to 3E-8 * a (where a is the equatorial radius of the
    *                         planet we are dealing with).
+   * history 2011-01-24   Janet Barrett - Got rid of extra loop that wasn't needed for the
+   *                         new ray tracing algorithm.
    * @return bool
    */
   bool Sensor::SetLookDirection(const double v[3]) {
@@ -349,9 +351,6 @@ namespace Isis {
             return p_hasIntersection;
           }
 
-          // Set default to limb observation until we determine that it is a nadir observation
-          int ptype = 0;
-
           // Set the tolerance to a fraction of the equatorial radius, a
           double tolerance = 3E-8 * a;
 
@@ -398,12 +397,8 @@ namespace Isis {
  
               // If g1 and g2 straddle a hill, then we may need to iterate a few times
               // until we are on the linear segment.
-
-              // First, set flag for the nadir observation
-              ptype = 1;
-              it = it + 1;
-
               while (it < maxit && !done) {
+
                 // Calculate the fractional distance "v" to move along the look vector
                 // to the intersection point. Check to see if there was a convergence
                 // of the solution and the tolerance was too small to detect it.
@@ -461,15 +456,19 @@ namespace Isis {
                     done = true;
                   }
                 }
+                if (!done && it >= maxit) {
+                  p_hasIntersection = false;
+                  return p_hasIntersection;
+                }
               }
-              g1[0] = g2[0];
-              g1[1] = g2[1];
-              g1[2] = g2[2];
-              g1len = g2len; 
-              r1 = r2;
-              psi1 = psi2;
-              dalpha = MAX(cos(g2lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale*(Isis::PI/180.0));
             }
+            g1[0] = g2[0];
+            g1[1] = g2[1];
+            g1[2] = g2[2];
+            g1len = g2len; 
+            r1 = r2;
+            psi1 = psi2;
+            dalpha = MAX(cos(g2lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale*(Isis::PI/180.0));
           }
 
           p_latitude = plat;
