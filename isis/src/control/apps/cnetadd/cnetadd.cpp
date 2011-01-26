@@ -186,19 +186,19 @@ void IsisMain() {
           if(checkMeasureValidity) {
             if(!validator.ValidEmissionAngle(cam->EmissionAngle())) {
               //TODO: log that it was Emission Angle that failed the check
-              newCm->SetIgnore(true);
+              newCm->SetIgnored(true);
             }
             else if(!validator.ValidIncidenceAngle(cam->IncidenceAngle())) {
               //TODO: log that it was Incidence Angle that failed the check
-              newCm->SetIgnore(true);
+              newCm->SetIgnored(true);
             }
             else if(!validator.ValidResolution(cam->Resolution())) {
               //TODO: log that it was Resolution that failed the check
-              newCm->SetIgnore(true);
+              newCm->SetIgnored(true);
             }
             else if(!validator.PixelsFromEdge((int)cam->Sample(), (int)cam->Line(), &cube)) {
               //TODO: log that it was Pixels from Edge that failed the check
-              newCm->SetIgnore(true);
+              newCm->SetIgnored(true);
             }
             else {
               Isis::Portal portal(1, 1, cube.PixelType());
@@ -206,7 +206,7 @@ void IsisMain() {
               cube.Read(portal);
               if(!validator.ValidDnValue(portal[0])) {
                 //TODO: log that it was DN that failed the check
-                newCm->SetIgnore(true);
+                newCm->SetIgnored(true);
               }
             }
           }
@@ -218,7 +218,7 @@ void IsisMain() {
           p_modifiedMeasures[cp].insert(newCm->GetCubeSerialNumber());
 
           if(retrievalOpt == "POINT" && inNet.GetPoint(cp)->GetNumMeasures() == 1) {
-            point->SetIgnore(false);
+            point->SetIgnored(false);
           }
 
           if(log) {
