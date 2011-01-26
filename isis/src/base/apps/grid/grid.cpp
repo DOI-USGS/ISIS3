@@ -95,8 +95,7 @@ void IsisMain() {
     p.SetOutputCube(ui.GetFilename("TO"), oatt, icube->Samples(),
                     icube->Lines(), icube->Bands());
 
-    UniversalGroundMap *gmap = new UniversalGroundMap(*icube,
-        UniversalGroundMap::ProjectionFirst);
+    UniversalGroundMap *gmap = new UniversalGroundMap(*icube);
     latLonGrid = new GroundGrid(gmap, ticks, icube->Samples(), icube->Lines());
 
     baseLat = Latitude(ui.GetDouble("BASELAT"),
