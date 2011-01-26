@@ -423,7 +423,7 @@ void IsisMain() {
         else
           measurment->SetType(ControlMeasure::Candidate);
         measurment->SetCubeSerialNumber((*(overlaps[ov]))[sn]);
-        measurment->SetIgnore(ignore);
+        measurment->SetIgnored(ignore);
 
         if(ignore) {
           cmIgnoredCount ++;
@@ -434,7 +434,7 @@ void IsisMain() {
       }
 
       if(controlpt->GetNumValidMeasures() < 2) {
-        controlpt->SetIgnore(true);
+        controlpt->SetIgnored(true);
         cpIgnoredCount ++;
       }
 
