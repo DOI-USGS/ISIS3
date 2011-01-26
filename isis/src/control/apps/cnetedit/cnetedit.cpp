@@ -262,7 +262,7 @@ bool ShouldDelete(ControlPoint *point) {
  * @param cause A prose description of why the point was ignored (for logging)
  */
 void IgnorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
-  point->SetIgnore(true);
+  point->SetIgnored(true);
   //cnet.UpdatePoint(point); //Redesign fixed this
 
   if(keepLog) {
@@ -285,7 +285,7 @@ void IgnorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
  */
 void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
                    ControlMeasure *measure, string cause) {
-  measure->SetIgnore(true);
+  measure->SetIgnored(true);
   //point.UpdateMeasure(measure); // Redesign fixed this
   //cnet.UpdatePoint(point); // Redesign fixed this
 
