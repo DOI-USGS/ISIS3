@@ -63,7 +63,7 @@ void IsisMain() {
           failedIDs = failedIDs + ", ";
         }
         failedIDs = failedIDs + cp->GetId();
-        cp->SetIgnore(true);
+        cp->SetIgnored(true);
       }
       // otherwise, we will replace the computed radius value to the output control net
       else {
