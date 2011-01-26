@@ -696,7 +696,7 @@ namespace Isis {
    *
    * @param ignore True to ignore this Control Point, False to un-ignore
    */
-  ControlPoint::Status ControlPoint::SetIgnore(bool ignore) {
+  ControlPoint::Status ControlPoint::SetIgnored(bool ignore) {
     if (p_editLock)
       return PointLocked;
     PointModified();

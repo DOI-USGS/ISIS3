@@ -304,7 +304,7 @@ namespace Isis {
       Status SetEditLock(bool editLock);
       Status SetId(iString id);
       Status SetRejected(bool rejected);
-      Status SetIgnore(bool ignore);
+      Status SetIgnored(bool ignore);
       Status SetSurfacePoint(SurfacePoint surfacePoint);
       Status SetType(PointType type);
 
