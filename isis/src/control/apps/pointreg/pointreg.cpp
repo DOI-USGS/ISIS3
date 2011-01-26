@@ -102,7 +102,7 @@ void IsisMain() {
     }
     else {  // "Ignore" or "valid" point to be registered
       if (outPoint->IsIgnored()) {
-        outPoint->SetIgnore(false);
+        outPoint->SetIgnored(false);
       }
 
       ControlMeasure * patternCM = outPoint->GetReferenceMeasure();
@@ -195,7 +195,7 @@ void IsisMain() {
                 // TODO no longer set goodness of fit, but how to output to log?
                 measure->SetChooserName("Application pointreg");
                 measure->SetDateTime();
-                measure->SetIgnore(false);
+                measure->SetIgnored(false);
                 goodMeasureCount++;
               }
               else {
@@ -205,7 +205,7 @@ void IsisMain() {
                   measure->SetType(ControlMeasure::Candidate);
                   measure->SetChooserName("Application pointreg");
                   measure->SetDateTime();
-                  measure->SetIgnore(true);
+                  measure->SetIgnored(true);
                 }
                 else {
                   outPoint->Delete(j);
@@ -228,7 +228,7 @@ void IsisMain() {
                 }
                 measure->SetChooserName("Application pointreg");
                 measure->SetDateTime();
-                measure->SetIgnore(true);
+                measure->SetIgnored(true);
               }
               else {
                 outPoint->Delete(j);
@@ -244,7 +244,7 @@ void IsisMain() {
               measure->SetType(ControlMeasure::Candidate);
               measure->SetChooserName("Application pointreg");
               measure->SetDateTime();
-              measure->SetIgnore(true);
+              measure->SetIgnored(true);
             }
             else {
               outPoint->Delete(j);
@@ -265,7 +265,7 @@ void IsisMain() {
       // that measure is set to be ignored where in the past the whole point
       // was ignored
       if (goodMeasureCount < 2 && outPoint->GetType() != ControlPoint::Ground) {
-        outPoint->SetIgnore(true);
+        outPoint->SetIgnored(true);
       }
 
       // Otherwise, ignore=false. This is already set at the beginning of the
