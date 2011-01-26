@@ -318,7 +318,7 @@ namespace Isis {
           else {
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "Failed Emission, Incidence, Resolution "
                                               "and/or Dn Value Test");
-            newMeasure->SetIgnore(true);
+            newMeasure->SetIgnored(true);
             iMsrIgnored++;
             piMeasuresModified++;
           }
@@ -338,7 +338,7 @@ namespace Isis {
                                     "but Point EditLock is True");
       }
       else {
-        pCPoint.SetIgnore(true);
+        pCPoint.SetIgnored(true);
         pPvlObj += Isis::PvlKeyword("Ignored", "Good Measures less than 2");
       }
     }
@@ -458,7 +458,7 @@ namespace Isis {
             Cube *measureCube =  mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
             // default setting
-            newMeasure->SetIgnore(false);
+            newMeasure->SetIgnored(false);
             newMeasure->SetType(ControlMeasure::Candidate);
 
             // Get the Camera
@@ -494,7 +494,7 @@ namespace Isis {
                 if (!results.isValid()) {
                   iNumIgnore++;
                   pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test");
-                  newMeasure->SetIgnore(true);
+                  newMeasure->SetIgnored(true);
                 }
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation", LocationString(dSample, dLine));
                 pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)newMeasure->GetSample()));
@@ -506,7 +506,7 @@ namespace Isis {
             else {
               iNumIgnore++;
               pvlMeasureGrp += Isis::PvlKeyword("Ignored", "True");
-              newMeasure->SetIgnore(true);
+              newMeasure->SetIgnored(true);
               if (!measureCamera->InCube()) {
                 pvlMeasureGrp += Isis::PvlKeyword("Comments", "New location is not in the Image");
               }
@@ -516,7 +516,7 @@ namespace Isis {
           else {
             iNumIgnore++;
             pvlMeasureGrp += Isis::PvlKeyword("Ignored", "True");
-            newMeasure->SetIgnore(true);
+            newMeasure->SetIgnored(true);
           }
 
           if (newMeasure != origPnt[measure]) {
@@ -533,7 +533,7 @@ namespace Isis {
 
         // Check the ignored measures number
         if ((newPnt->GetNumMeasures() - iNumIgnore) < 2) {
-          newPnt->SetIgnore(true);
+          newPnt->SetIgnored(true);
           pvlPointObj += Isis::PvlKeyword("Ignored", "Good Measures less than 2");
         }
 
