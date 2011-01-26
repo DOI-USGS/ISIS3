@@ -30,7 +30,7 @@ void IsisMain() {
     
     int numOutputFiles = ui.GetInteger("NUM_OUTPUT_FILES");
     
-    int numPoints = cNet.Size();
+    int numPoints = cNet.GetNumPoints();
     
     if (numOutputFiles > numPoints) {
       string msg = "The number of output files is greater than total number of Control Points";
@@ -58,8 +58,8 @@ void IsisMain() {
       ControlNet oNet;
       oNet.SetCreatedDate(Application::DateTime());
       oNet.SetDescription(cNet.Description());
-      oNet.SetNetworkId(cNet.NetworkId());
-      oNet.SetTarget(cNet.Target());
+      oNet.SetNetworkId(cNet.GetNetworkId());
+      oNet.SetTarget(cNet.GetTarget());
       oNet.SetUserName(Application::UserName());
         
       startIndex = endIndex;
@@ -72,7 +72,7 @@ void IsisMain() {
       }
       
       for (int j=startIndex; j<endIndex; j++) {
-        oNet.Add(cNet[j]);
+        oNet.AddPoint(new ControlPoint(*cNet[j]));
       }
         
       oNet.Write(outFileID.Next() + ".net");
