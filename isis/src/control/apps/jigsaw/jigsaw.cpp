@@ -1,3 +1,7 @@
+INTENIONAL_COMPILE_ERROR
+To be removed when BundleAdjust is working properly again
+
+
 #include "Isis.h"
 #include "Process.h"
 #include "BundleAdjust.h"
