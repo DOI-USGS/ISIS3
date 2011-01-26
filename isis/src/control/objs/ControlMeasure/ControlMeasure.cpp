@@ -582,7 +582,7 @@ namespace Isis {
   }
 
 
-  ControlMeasure::Status ControlMeasure::SetIgnore(bool ignore) {
+  ControlMeasure::Status ControlMeasure::SetIgnored(bool ignore) {
     if (p_editLock)
       return MeasureLocked;
     MeasureModified();

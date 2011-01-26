@@ -232,7 +232,7 @@ namespace Isis {
       Status SetRejected(bool rejected);
       Status SetFocalPlaneMeasured(double x, double y);
       Status SetFocalPlaneComputed(double x, double y);
-      Status SetIgnore(bool ignore);
+      Status SetIgnored(bool ignore);
       Status SetLineSigma(double lineSigma);
       Status SetResidual(double sampResidual, double lineResidual);
       Status SetSampleSigma(double sampleSigma);
