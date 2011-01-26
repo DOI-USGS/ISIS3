@@ -145,17 +145,17 @@ void IsisMain() {
       ar->SearchChip()->Load(trans);
 
       // Set up ControlMeasure for cube to translate
-      ControlMeasure cmTrans;
-      cmTrans.SetCubeSerialNumber(serialTrans);
-      cmTrans.SetCoordinate(samp, line, ControlMeasure::Candidate);
-      cmTrans.SetChooserName("coreg");
+      ControlMeasure * cmTrans = new ControlMeasure;
+      cmTrans->SetCubeSerialNumber(serialTrans);
+      cmTrans->SetCoordinate(samp, line, ControlMeasure::Candidate);
+      cmTrans->SetChooserName("coreg");
 
       // Set up ControlMeasure for the pattern/Match cube
-      ControlMeasure cmMatch;
-      cmMatch.SetCubeSerialNumber(serialMatch);
-      cmMatch.SetCoordinate(samp, line, ControlMeasure::RegisteredPixel);
-      cmMatch.SetChooserName("coreg");
-      cmMatch.SetType(ControlMeasure::Reference);
+      ControlMeasure * cmMatch = new ControlMeasure;
+      cmMatch->SetCubeSerialNumber(serialMatch);
+      cmMatch->SetCoordinate(samp, line, ControlMeasure::RegisteredPixel);
+      cmMatch->SetChooserName("coreg");
+      cmMatch->SetType(ControlMeasure::Reference);
 
       ar->Register();
 
@@ -165,19 +165,19 @@ void IsisMain() {
         double lDiff = line - ar->CubeLine();
         sStats.AddData(&sDiff, (unsigned int)1);
         lStats.AddData(&lDiff, (unsigned int)1);
-        cmTrans.SetCoordinate(ar->CubeSample(), ar->CubeLine(),
+        cmTrans->SetCoordinate(ar->CubeSample(), ar->CubeLine(),
                               ControlMeasure::RegisteredPixel);
-        cmTrans.SetResidual(sDiff, lDiff);
+        cmTrans->SetResidual(sDiff, lDiff);
       }
 
       // Add the measures to a control point
       string str = "Row " + iString(r) + " Column " + iString(c);
-      ControlPoint cp(str);
-      cp.SetType(ControlPoint::Tie);
-      cp.Add(cmTrans);
-      cp.Add(cmMatch);
-      if(!cmTrans.IsMeasured()) cp.SetIgnore(true);
-      cn.Add(cp);
+      ControlPoint * cp = new ControlPoint(str);
+      cp->SetType(ControlPoint::Tie);
+      cp->Add(cmTrans);
+      cp->Add(cmMatch);
+      if(!cmTrans->IsMeasured()) cp->SetIgnored(true);
+      cn.AddPoint(cp);
       prog.CheckStatus();
     }
   }
@@ -237,14 +237,15 @@ void IsisMain() {
     os.open(fFile.c_str(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
        "SampleDifference,LineDifference" << endl;
-    for(int i = 0; i < cn.Size(); i++) {
-      ControlPoint cp = cn[i];
-      if(cp.IsIgnored()) continue;
-      ControlMeasure cmTrans = cp[0];
-      ControlMeasure cmMatch = cp[1];
-      os << cmTrans.GetSample() << "," << cmTrans.GetLine() << ","
-         << cmMatch.GetSample() << "," << cmMatch.GetLine() << ","
-         << cmTrans.GetSampleResidual() << "," << cmTrans.GetLineResidual() << endl;
+    for(int i = 0; i < cn.GetNumPoints(); i++) {
+      const ControlPoint * cp = cn[i];
+      if(cp->IsIgnored()) continue;
+      const ControlMeasure * cmTrans = cp->GetMeasure(0);
+      const ControlMeasure * cmMatch = cp->GetMeasure(1);
+      os << cmTrans->GetSample() << "," << cmTrans->GetLine() << ","
+         << cmMatch->GetSample() << "," << cmMatch->GetLine() << ","
+         << cmTrans->GetSampleResidual() << "," << cmTrans->GetLineResidual()
+         << endl;
     }
   }
 
