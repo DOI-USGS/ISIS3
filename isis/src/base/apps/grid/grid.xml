@@ -60,6 +60,9 @@
       latitude system, and baselat=50, then there will be a line at the
       planetographic latitude of 50).
     </change>
+    <change name="Steven Lambright" date="2011-01-26">
+      Added BOUNDARY, MINLAT, MAXLAT, MINLON and MAXLON options.
+    </change>
   </history>
 
   <groups>
@@ -112,7 +115,11 @@
               <item>BASELON</item>
               <item>LATINC</item>
               <item>LONINC</item>
-            </exclusions>  
+              <item>MINLAT</item>
+              <item>MAXLAT</item>
+              <item>MINLON</item>
+              <item>MAXLON</item>
+            </exclusions>
           </option>
 
           <option value = "GROUND">
@@ -126,7 +133,7 @@
               <item>SINC</item>
               <item>BASELINE</item>
               <item>BASESAMPLE</item>
-            </exclusions>  
+            </exclusions>
           </option>
         </list>
       </parameter>
@@ -152,7 +159,19 @@
           This will draw grid lines at the very edges of the image
         </description>
       </parameter>
-    </group>  
+
+      <parameter name="BOUNDARY">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Outline the lat/lon range</brief>
+        <description>
+          This will draw grid lines at the extents of the latitude and longitude
+          range provided by minlat, maxlat, minlon and maxlon. The boundary will
+          add ticks to intersections with it in the case of TICKS being
+          true.
+        </description>
+      </parameter>
+    </group>
 
     <group name="Image Grid Parameters">
       <parameter name="BASELINE">
@@ -248,6 +267,62 @@
           This defines the longitudinal spacing between gridlines 
         </description>
         <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+    </group>
+
+    <group name="Ground Grid Limits">
+      <parameter name="MINLAT">
+        <type>double</type>
+        <internalDefault>Automatic</internalDefault>
+        <brief>Lowest latitude inside the grid</brief>
+        <description>
+          This defines the lowest latitude to draw grid lines for. If BOUNDARY
+          then this latitude will have a line at it too, regardless of the
+          BASELAT and LATINC values.
+        </description>
+        <minimum inclusive="yes">-90</minimum>
+        <maximum inclusive="yes">90</maximum>
+      </parameter>
+
+      <parameter name="MAXLAT">
+        <type>double</type>
+        <internalDefault>Automatic</internalDefault>
+        <brief>Highest latitude inside the grid</brief>
+        <description>
+          This defines the highest latitude to draw grid lines for. If BOUNDARY
+          then this latitude will have a line at it too, regardless of the
+          BASELAT and LATINC values.
+        </description>
+        <minimum inclusive="yes">-90</minimum>
+        <maximum inclusive="yes">90</maximum>
+        <greaterThan><item>MINLAT</item></greaterThan>
+      </parameter>
+
+      <parameter name="MINLON">
+        <type>double</type>
+        <internalDefault>Automatic</internalDefault>
+        <brief>Lowest longitude value inside grid</brief>
+        <description>
+          This defines the lowest longitude to draw grid lines for. If BOUNDARY
+          then this latitude will have a line at it too, regardless of the
+          BASELAT and LATINC values.
+        </description>
+        <minimum inclusive="yes">-360</minimum>
+        <maximum inclusive="yes">360</maximum>
+      </parameter>
+
+      <parameter name="MAXLON">
+        <type>double</type>
+        <internalDefault>Automatic</internalDefault>
+        <brief>Highest longitude value in the image</brief>
+        <description>
+          This defines the highest longitude to draw grid lines for. If BOUNDARY
+          then this latitude will have a line at it too, regardless of the
+          BASELAT and LATINC values.
+        </description>
+        <minimum inclusive="yes">-360</minimum>
+        <maximum inclusive="yes">360</maximum>
+        <greaterThan><item>MINLON</item></greaterThan>
       </parameter>
     </group>
 

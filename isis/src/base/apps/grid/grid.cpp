@@ -95,7 +95,8 @@ void IsisMain() {
     p.SetOutputCube(ui.GetFilename("TO"), oatt, icube->Samples(),
                     icube->Lines(), icube->Bands());
 
-    UniversalGroundMap *gmap = new UniversalGroundMap(*icube);
+    UniversalGroundMap *gmap = new UniversalGroundMap(*icube,
+        UniversalGroundMap::ProjectionFirst);
     latLonGrid = new GroundGrid(gmap, ticks, icube->Samples(), icube->Lines());
 
     baseLat = Latitude(ui.GetDouble("BASELAT"),
@@ -108,7 +109,32 @@ void IsisMain() {
     Progress progress;
     progress.SetText("Calculating Grid");
 
+    Latitude minLat, maxLat;
+
+    if(ui.WasEntered("MINLAT"))
+      minLat = Latitude(ui.GetDouble("MINLAT"),
+        *latLonGrid->GetMappingGroup(), Angle::Degrees);
+
+    if(ui.WasEntered("MAXLAT"))
+      maxLat = Latitude(ui.GetDouble("MAXLAT"),
+        *latLonGrid->GetMappingGroup(), Angle::Degrees);
+
+    Longitude minLon, maxLon;
+
+    if(ui.WasEntered("MINLON"))
+      minLon = Longitude(ui.GetDouble("MINLON"),
+        *latLonGrid->GetMappingGroup(), Angle::Degrees);
+
+    if(ui.WasEntered("MAXLON"))
+      maxLon = Longitude(ui.GetDouble("MAXLON"),
+        *latLonGrid->GetMappingGroup(), Angle::Degrees);
+
+    latLonGrid->SetGroundLimits(minLat, minLon, maxLat, maxLon);
+
     latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
+
+    if(ui.GetBoolean("BOUNDARY"))
+      latLonGrid->WalkBoundary();
 
     p.StartProcess(groundGrid);
     p.EndProcess();
@@ -214,14 +240,18 @@ void imageGrid(Buffer &in, Buffer &out) {
 
   // draw outline
   if(outline) {
-    if(in.Line() == 1 || in.Line() == inputLines) {
+    if(in.Line() - 1 <= lineWidth * 2 ||
+       in.Line() >= inputLines - lineWidth * 2) {
       for(int i = 0; i < in.size(); i++) {
         out[i] = Isis::Hrs;
       }
     }
     else {
-      out[0] = Isis::Hrs;
-      out[out.size()-1] = Isis::Hrs;
+      for(int i = 0; i <= lineWidth * 2; i++)
+        out[i] = Isis::Hrs;
+
+      for(int i = inputLines - lineWidth * 2 - 1; i < in.size(); i++)
+        out[i] = Isis::Hrs;
     }
   }
 }
@@ -321,14 +351,18 @@ void groundGrid(Buffer &in, Buffer &out) {
 
   // draw outline
   if(outline) {
-    if(in.Line() == 1 || in.Line() == inputLines) {
+    if(in.Line() - 1 <= lineWidth * 2 ||
+       in.Line() >= inputLines - lineWidth * 2) {
       for(int i = 0; i < in.size(); i++) {
         out[i] = Isis::Hrs;
       }
     }
     else {
-      out[0] = Isis::Hrs;
-      out[out.size()-1] = Isis::Hrs;
+      for(int i = 0; i <= lineWidth * 2; i++)
+        out[i] = Isis::Hrs;
+
+      for(int i = inputLines - lineWidth * 2 - 1; i < in.size(); i++)
+        out[i] = Isis::Hrs;
     }
   }
 }
