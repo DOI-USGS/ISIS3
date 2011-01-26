@@ -191,7 +191,7 @@ void IsisMain() {
       //Unmeasured - these are ignored in isis2
     {
       cmeasure->SetType(ControlMeasure::Candidate);
-      cmeasure->SetIgnore(true);
+      cmeasure->SetIgnored(true);
     }
     else if (iString::Equal(matClass, "T"))
       //Truth
