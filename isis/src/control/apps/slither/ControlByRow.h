@@ -25,6 +25,7 @@
 
 #include <vector>
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "Statistics.h"
 #include "CollectorMap.h"
 #include "iString.h"
@@ -52,7 +53,7 @@ namespace Isis {
    * @return bool If first point reference line is less than the second
    */
   inline bool PointLess(const PointData &p1, const PointData &p2) {
-    return (p1.refPoint.Line() < p2.refPoint.Line());
+    return (p1.refPoint.GetLine() < p2.refPoint.GetLine());
   }
 
   /**
@@ -68,7 +69,7 @@ namespace Isis {
    * @return bool If the reference point lines are (approximately) equivalent
    */
   inline bool PointEqual(const PointData &p1, const PointData &p2) {
-    return (gsl_fcmp(p1.refPoint.Line(), p2.refPoint.Line(), 1.0E-6) == 0);
+    return (gsl_fcmp(p1.refPoint.GetLine(), p2.refPoint.GetLine(), 1.0E-6) == 0);
   }
 
   /**
@@ -204,14 +205,14 @@ namespace Isis {
        * @param p  Point to add to the list
        */
       void addPoint(const PointData &p) {
-        if(_rowList.exists(p.refPoint.Line())) {
-          PointList &r = _rowList.get(p.refPoint.Line());
+        if(_rowList.exists(p.refPoint.GetLine())) {
+          PointList &r = _rowList.get(p.refPoint.GetLine());
           r.push_back(p);
         }
         else {
           PointList pl;
           pl.push_back(p);
-          _rowList.add(p.refPoint.Line(), pl);
+          _rowList.add(p.refPoint.GetLine(), pl);
         }
         return;
       }
@@ -276,18 +277,20 @@ namespace Isis {
        */
       RowPoint computeStats(const std::vector<PointData> &cols) const {
         RowPoint rp;
-        rp.refLine = cols[0].refPoint.Line();
+        rp.refLine = cols[0].refPoint.GetLine();
         for(unsigned int i = 0; i < cols.size() ; i++) {
-          double regGOF(cols[i].chpPoint.GoodnessOfFit());
+          double regGOF =
+            cols[i].chpPoint.GetLogData(ControlMeasureLogData::GoodnessOfFit)
+              .GetNumericalValue();
           if(fabs(regGOF) > _maxGOF) continue;
           if(fabs(regGOF) < _minGOF) continue;
           (rp.count)++;
-          addToStats(cols[i].refPoint.Sample(), rp.rSStats);
-          addToStats(cols[i].chpPoint.Line(), rp.cLStats);
-          addToStats(cols[i].chpPoint.Sample(), rp.cSStats);
-          addToStats(cols[i].chpPoint.LineError(), rp.cLOffset);
-          addToStats(cols[i].chpPoint.SampleError(), rp.cSOffset);
-          addToStats(cols[i].chpPoint.GoodnessOfFit(), rp.GOFStats);
+          addToStats(cols[i].refPoint.GetSample(), rp.rSStats);
+          addToStats(cols[i].chpPoint.GetLine(), rp.cLStats);
+          addToStats(cols[i].chpPoint.GetSample(), rp.cSStats);
+          addToStats(cols[i].chpPoint.GetLineResidual(), rp.cLOffset);
+          addToStats(cols[i].chpPoint.GetSampleResidual(), rp.cSOffset);
+          addToStats(regGOF, rp.GOFStats);
         }
 
         rp.total = cols.size();

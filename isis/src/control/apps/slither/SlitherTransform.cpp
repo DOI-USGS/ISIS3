@@ -5,7 +5,9 @@
 #include <algorithm>
 
 #include "Cube.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "ControlPoint.h"
 #include "NumericalApproximation.h"
 #include "Statistics.h"
 #include <gsl/gsl_math.h>
@@ -45,11 +47,11 @@ namespace Isis {
     _lineSpline.SetInterpType(lInterp);
     _sampSpline.SetInterpType(sInterp);
     vector<PointData> points;
-    for(int i = 0; i < cnet.Size(); i++) {
-      ControlPoint &cp = cnet[i];
+    for(int i = 0; i < cnet.GetNumPoints(); i++) {
+      ControlPoint &cp = *cnet[i];
       _pntsTotal++;
-      if(!cp.Ignore()) {
-        if(cp.Size() != 2) {
+      if(!cp.IsIgnored()) {
+        if(cp.GetNumMeasures() != 2) {
 //          cout << "Point " << i << " doesn't have two measures but "
 //               << cp.Size() << endl;
           _pntsTossed++;
@@ -58,14 +60,14 @@ namespace Isis {
           // Determine reference image assuming first one is the reference
           // if it is not expressly identified
           int snIndex(0), mnIndex(1);
-          if(!cp[snIndex].IsReference()) {
+          if(!cp[snIndex]->GetType() == ControlMeasure::Reference) {
             snIndex = 1;
             mnIndex = 0;
           }
           //  Add the point set to the list
           PointData p;
-          p.refPoint = cp[snIndex];
-          p.chpPoint = cp[mnIndex];
+          p.refPoint = *cp[snIndex];
+          p.chpPoint = *cp[mnIndex];
           points.push_back(p);
           _pntsUsed++;
         }
