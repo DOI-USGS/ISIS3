@@ -4,8 +4,11 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "Distance.h"
 #include "History.h"
 #include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Process.h"
 #include "Sensor.h"
 #include "SerialNumberList.h"
@@ -28,9 +31,9 @@ void IsisMain() {
   // line sample
   double samp1 = ui.GetDouble("SAMP1");
   double line1 = ui.GetDouble("LINE1");
-  double lat1 = ui.GetDouble("LAT1");
-  double lon1 = ui.GetDouble("LON1");
-  double rad1;
+  Latitude lat1 = ui.GetDouble("LAT1");
+  Longitude lon1 = ui.GetDouble("LON1");
+  Distance rad1;
   if(ui.WasEntered("RAD1")) {
     rad1 = ui.GetDouble("RAD1");
   }
@@ -40,28 +43,28 @@ void IsisMain() {
 
   // In order to use the bundle adjustment class we will need a control
   // network
-  ControlMeasure m;
-  m.SetCubeSerialNumber(serialNumberList.SerialNumber(0));
-  m.SetCoordinate(samp1, line1);
-  m.SetType(ControlMeasure::Manual);
+  ControlMeasure * m = new ControlMeasure;
+  m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
+  m->SetCoordinate(samp1, line1);
+  m->SetType(ControlMeasure::Manual);
 
-  ControlPoint p;
-  p.SetUniversalGround(lat1, lon1, rad1);
-  p.SetId("Point1");
-  p.SetType(ControlPoint::Ground);
-  p.Add(m);
+  ControlPoint * p = new ControlPoint;
+  p->SetSurfacePoint(SurfacePoint(lat1, lon1, rad1));
+  p->SetId("Point1");
+  p->SetType(ControlPoint::Ground);
+  p->Add(m);
 
   ControlNet cnet;
-  cnet.SetType(ControlNet::ImageToGround);
-  cnet.Add(p);
+//  cnet.SetType(ControlNet::ImageToGround);
+  cnet.AddPoint(p);
 
   // See if they wanted to solve for twist
   if(ui.GetBoolean("TWIST")) {
     double samp2 = ui.GetDouble("SAMP2");
     double line2 = ui.GetDouble("LINE2");
-    double lat2 = ui.GetDouble("LAT2");
-    double lon2 = ui.GetDouble("LON2");
-    double rad2;
+    Latitude lat2 = ui.GetDouble("LAT2");
+    Longitude lon2 = ui.GetDouble("LON2");
+    Distance rad2;
     if(ui.WasEntered("RAD2")) {
       rad2 = ui.GetDouble("RAD2");
     }
@@ -69,18 +72,18 @@ void IsisMain() {
       rad2 = GetRadius(ui.GetFilename("FROM"), lat2, lon2);
     }
 
-    ControlMeasure m;
-    m.SetCubeSerialNumber(serialNumberList.SerialNumber(0));
-    m.SetCoordinate(samp2, line2);
-    m.SetType(ControlMeasure::Manual);
+    ControlMeasure * m = new ControlMeasure;
+    m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
+    m->SetCoordinate(samp2, line2);
+    m->SetType(ControlMeasure::Manual);
 
-    ControlPoint p;
-    p.SetUniversalGround(lat2, lon2, rad2);
-    p.SetId("Point2");
-    p.SetType(ControlPoint::Ground);
-    p.Add(m);
+    ControlPoint * p = new ControlPoint;
+    p->SetSurfacePoint(SurfacePoint(lat2, lon2, rad2));
+    p->SetId("Point2");
+    p->SetType(ControlPoint::Ground);
+    p->Add(m);
 
-    cnet.Add(p);
+    cnet.AddPoint(p);
   }
 
   // Bundle adjust to solve for new pointing
@@ -89,7 +92,8 @@ void IsisMain() {
     b.SetSolveTwist(ui.GetBoolean("TWIST"));
     double tol = ui.GetDouble("TOL");
     int maxIterations = ui.GetInteger("MAXITS");
-    b.Solve(tol, maxIterations);
+    //b.Solve(tol, maxIterations);
+    b.Solve(tol);
 
     Cube c;
     c.Open(filename, "rw");
