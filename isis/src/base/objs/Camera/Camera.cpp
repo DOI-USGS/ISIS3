@@ -243,6 +243,7 @@ namespace Isis {
   }
 
 
+
   /**
    * Sets the lat/lon/radius values to get the sample/line values
    *
@@ -251,13 +252,13 @@ namespace Isis {
    *
    * @return bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
-   *
-  bool Camera::SetGround(SurfacePoint surfacePt) {
+   */
+  bool Camera::SetGround(const SurfacePoint & surfacePt) {
     return SetUniversalGround(surfacePt.GetLatitude().GetDegrees(),
                               surfacePt.GetLongitude().GetDegrees(),
                               surfacePt.GetLocalRadius().GetMeters());
-  }*/
-
+  }
+  
 
 
   /**

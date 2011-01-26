@@ -154,6 +154,8 @@ namespace Isis {
    *            cases.  (Note at this time, those two routines return meters and
    *            kilometers, respectively - we need to address this
    *            inconsistancy!)
+   *   @history 2011-01-25 Eric Hyer - SurfacePoint class now exists so
+   *            uncommented Steven's new method (see history for 2011-11-04)
    */
 
   class Camera : public Isis::Sensor {
@@ -170,7 +172,7 @@ namespace Isis {
       bool SetUniversalGround(const double latitude, const double longitude,
                               const double radius);
       bool SetGround(Latitude latitude, Longitude longitude);
-//      bool SetGround(SurfacePoint surfacePt);
+      bool SetGround(const SurfacePoint & surfacePt);
       bool SetRightAscensionDeclination(const double ra, const double dec);
       
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
