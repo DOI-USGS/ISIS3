@@ -1,5 +1,7 @@
 ControlPoint unitTest
-test PointTypeString(): Ground
+Adding ControlMeasure with cube serial number [Test1]
+
+Printing point:
 Object = ControlPoint
   PointType               = Ground
   PointId                 = C151
@@ -38,6 +40,11 @@ Object = ControlPoint
   End_Group
 End_Object
 End
+Done printing point.
+
+Adding ControlMeasure with cube serial number [Test2]
+
+Printing point:
 Object = ControlPoint
   PointType               = Ground
   PointId                 = C151
@@ -93,7 +100,12 @@ Object = ControlPoint
   End_Group
 End_Object
 End
-ReferenceIndex = 1
+Done printing point.
+
+Deleting ControlMeasure with cube serial number [Test1]
+Measure type: Candidate
+
+Printing point:
 Object = ControlPoint
   PointType               = Ground
   PointId                 = C151
@@ -132,6 +144,12 @@ Object = ControlPoint
   End_Group
 End_Object
 End
+Done printing point.
+
+ReferenceIndex = 0
+Deleting ControlMeasure with cube serial number [Test2]
+Measure type: Reference
+**PROGRAMMER ERROR** Point Id [C151] can not do requested operation on reference measure [Test2]
 ReferenceIndex = 0
 
 Test adding control measures with identical serial numbers ...

@@ -62,31 +62,38 @@ int main() {
   d->SetChooserName("seedgrid");
   d->SetDateTime("2005-05-03T00:00:00");
 
-  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl;
+  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test1"
   c.Add(d);
 
-
-  cout << "test PointTypeString(): " << c.GetPointTypeString() << "\n";
   printPoint(c);
 
   d = new ControlMeasure;
   d->SetCubeSerialNumber("Test2");
+  d->SetIgnore(true);
   d->SetCoordinate(100.0, 200.0);
+  d->SetDiameter(15.0);
+  d->SetAprioriSample(2.0);
+  d->SetAprioriLine(5.0);
+  d->SetSampleSigma(.01);
+  d->SetLineSigma(.21);
   d->SetType(Isis::ControlMeasure::Reference);
   d->SetResidual(-2.0, 2.0);
   d->SetChooserName("seedgrid");
   d->SetDateTime("2005-05-03T00:00:00");
-  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl;
+  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test2"
   c.Add(d);
   printPoint(c);
 
+  // Should be successful
   cout << "Deleting ControlMeasure with cube serial number [" << c.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
+  cout << "Measure type: " << ControlMeasure::MeasureTypeToString(c.GetMeasure(0)->GetType()) << endl;
   c.Delete(0);
   printPoint(c);
   cout << "ReferenceIndex = " << c.GetReferenceIndex() << endl;
 
-  // BTW, not allowed to delete last/reference measure
+  // Should fail
   cout << "Deleting ControlMeasure with cube serial number [" << c.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
+  cout << "Measure type: " << ControlMeasure::MeasureTypeToString(c.GetMeasure(0)->GetType()) << endl;
   try {
     c.Delete(0);
   }
@@ -163,5 +170,5 @@ void printPoint(Isis::ControlPoint &p) {
 
   Pvl tmp;
   tmp.AddObject(p.ToPvlObject());
-  cout << endl << tmp << endl << endl;
+  cout << endl << "Printing point:\n" << tmp << "\nDone printing point." << endl << endl;
 }

@@ -448,13 +448,14 @@ namespace Isis {
     // measure, if we do, throw an error, if not, make it the reference.
     if (cmeasure->GetType() == ControlMeasure::Reference) {
       if (referenceMeasure != NULL) {
-        if (referenceMeasure->GetType() != ControlMeasure::Reference) 
+        if (referenceMeasure->GetType() != ControlMeasure::Reference) { 
           referenceMeasure = cmeasure;
+        }
+        else {
+          iString msg = "Cannot add second ControlMeasure with type Reference";
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_); 
+        }
       } 
-      else {
-        iString msg = "Cannot add second ControlMeasure with type Reference";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_); 
-      }
     }
 
     // If we still don't have a reference measure, if it's measured, make it
@@ -1711,14 +1712,8 @@ namespace Isis {
    */
   PvlObject ControlPoint::ToPvlObject() const {
     PvlObject p("ControlPoint");
-    switch (p_type) {
-      case Tie:
-        p += PvlKeyword("PointType", "Tie");
-        break;
-      case Ground:
-        p += PvlKeyword("PointType", "Ground");
-        break;
-    }
+
+    p += PvlKeyword("PointType", GetPointTypeString());
 
     p += PvlKeyword("PointId", p_id);
     p += PvlKeyword("ChooserName", GetChooserName());
@@ -1758,27 +1753,7 @@ namespace Isis {
       p += PvlKeyword("AprioriXYZSourceFile", p_aprioriSurfacePointSourceFile);
     }
 
-    switch (p_aprioriRadiusSource) {
-      case RadiusSource::None:
-        break;
-      case RadiusSource::User:
-        p += PvlKeyword("AprioriRadiusSource", "User");
-        break;
-      case RadiusSource::AverageOfMeasures:
-        p += PvlKeyword("AprioriRadiusSource", "AverageOfMeasures");
-        break;
-      case RadiusSource::Ellipsoid:
-        p += PvlKeyword("AprioriRadiusSource", "Ellipsoid");
-        break;
-      case RadiusSource::DEM:
-        p += PvlKeyword("AprioriRadiusSource", "DEM");
-        break;
-      case RadiusSource::BundleSolution:
-        p += PvlKeyword("AprioriRadiusSource", "BundleSolution");
-        break;
-      default:
-        break;
-    }
+    p += PvlKeyword("AprioriRadiusSource", GetRadiusSourceString());
 
     if (!p_aprioriRadiusSourceFile.empty()) {
       p += PvlKeyword("AprioriRadiusSourceFile", p_aprioriRadiusSourceFile);
