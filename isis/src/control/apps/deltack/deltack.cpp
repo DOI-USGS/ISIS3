@@ -91,7 +91,7 @@ void IsisMain() {
     BundleAdjust b(cnet, serialNumberList);
     b.SetSolveTwist(ui.GetBoolean("TWIST"));
     double tol = ui.GetDouble("TOL");
-    int maxIterations = ui.GetInteger("MAXITS");
+    //int maxIterations = ui.GetInteger("MAXITS");
     //b.Solve(tol, maxIterations);
     b.Solve(tol);
 
