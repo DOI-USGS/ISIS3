@@ -140,7 +140,7 @@ void IsisMain() {
                           Distance(equatorialRadius));
           ControlPoint * control = new ControlPoint;
           control->SetId(pointId.Next());
-          control->SetIgnore(true);
+          control->SetIgnored(true);
           control->SetSurfacePoint(pt);
           cnet.AddPoint(control);
         }
@@ -211,7 +211,7 @@ void IsisMain() {
       while(lat <= maxLat) {
         ControlPoint * control = new ControlPoint;
         control->SetId(pointId.Next());
-        control->SetIgnore(true);
+        control->SetIgnored(true);
         SurfacePoint pt(Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(equatorialRadius));
