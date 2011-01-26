@@ -128,7 +128,7 @@ namespace Isis {
               }
               else {
                 pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test");
-                newMsr->SetIgnore(true);
+                newMsr->SetIgnored(true);
                 iNumIgnore++;
               }
             }
@@ -151,7 +151,7 @@ namespace Isis {
                                             "not Ignored as Point EditLock is True");
           }
           else {
-            newPnt->SetIgnore(true);
+            newPnt->SetIgnored(true);
             pvlPointObj += Isis::PvlKeyword("Ignored", "Good Measures less than 2");
           }
         }
