@@ -4,6 +4,8 @@
 #include "CameraFactory.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "SurfacePoint.h"
@@ -13,39 +15,50 @@ namespace Isis {
    * Constructs a UniversalGroundMap object from a pvl
    *
    * @param pvl The Pvl file to create the UniversalGroundMap from
+   * @param priority Try to make a camera or projection first
    */
-  UniversalGroundMap::UniversalGroundMap(Pvl &pvl) {
-    Init(pvl);
+  UniversalGroundMap::UniversalGroundMap(Pvl &pvl, CameraPriority priority) {
+    Init(pvl, priority);
   }
 
   /**
    * Constructs a UniversalGroundMap object from a cube
    *
    * @param cube The Cube to create the UniversalGroundMap from
+   * @param priority Try to make a camera or projection first
    */
-  UniversalGroundMap::UniversalGroundMap(Cube &cube) {
-    Init(*(cube.Label()));
+  UniversalGroundMap::UniversalGroundMap(Cube &cube, CameraPriority priority) {
+    Init(*(cube.Label()), priority);
   }
 
   /**
    * Creates the UniversalGroundMap
    *
    * @param pvl The Pvl file to create the UniversalGroundMap from
+   * @param priority Try to make a camera or projection first
    *
    * @throws Isis::iException::Camera - Could not create camera or projection
    */
-  void UniversalGroundMap::Init(Pvl &pvl) {
+  void UniversalGroundMap::Init(Pvl &pvl, CameraPriority priority) {
     p_camera = NULL;
     p_projection = NULL;
 
     try {
-      p_camera = CameraFactory::Create(pvl);
+      if(priority == CameraFirst)
+        p_camera = CameraFactory::Create(pvl);
+      else
+        p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
     }
     catch (iException &e) {
       e.Clear();
       p_camera = NULL;
+      p_projection = NULL;
+
       try {
-        p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
+        if(priority == CameraFirst)
+          p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
+        else
+          p_camera = CameraFactory::Create(pvl);
       }
       catch (iException &e) {
         p_projection = NULL;
@@ -84,8 +97,8 @@ namespace Isis {
    * @param lat The universal latitude
    * @param lon The universal longitude
    *
-   * @return Returns true if the lat/lon position was set successfully, and false
-   *         if it was not
+   * @return Returns true if the lat/lon position was set successfully, and
+   *         false if it was not
    */
   bool UniversalGroundMap::SetUniversalGround(double lat, double lon) {
     if (p_camera != NULL) {
@@ -100,6 +113,34 @@ namespace Isis {
       return p_projection->SetUniversalGround(lat, lon);
     }
   }
+
+
+  /**
+   * Returns whether the lat/lon position was set successfully in the camera
+   * model or projection.
+   *
+   * @param lat The latitude
+   * @param lon The longitude
+   *
+   * @return Returns true if the lat/lon position was set successfully, and
+   *         false if it was not
+   */
+  bool UniversalGroundMap::SetGround(Latitude lat, Longitude lon) {
+    if(p_camera != NULL) {
+      if(p_camera->SetGround(lat, lon)) {
+        return p_camera->InCube();
+      }
+      else {
+        return false;
+      }
+    }
+    else {
+      double universalLat = lat.GetDegrees();
+      double universalLon = lon.GetDegrees();
+      return p_projection->SetUniversalGround(universalLat, universalLon);
+    }
+  }
+
 
   /**
    * Returns whether the SurfacePoint was set successfully in the camera model
@@ -120,8 +161,8 @@ namespace Isis {
       }
     }
     else {
-      return p_projection->SetUniversalGround(sp.GetLatitude(),
-                                              sp.GetLongitude());
+      return p_projection->SetUniversalGround(sp.GetLatitude().GetDegrees(),
+                                              sp.GetLongitude().GetDegrees());
     }
   }
 

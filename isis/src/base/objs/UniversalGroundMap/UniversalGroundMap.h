@@ -47,6 +47,16 @@ namespace Isis {
    *  @history 2010-04-09 Sharmila Prasad Added an API to check for camera in an image
    *  @history 2010-04-28 Mackenzie Boyd Fixed dereferencing issue in constructor
    *                                     that takes a cube.
+   *  @history 2011-01-25 Steven Lambright Added CameraPriority and SetGround.
+   *                                       The CameraPriority was for grid to
+   *                                       use projections by default so they
+   *                                       would work across the image
+   *                                       regardless of the camera. The
+   *                                       SetGround is so that conversions
+   *                                       between lat/lon types are simply
+   *                                       handled and allows a clean interface
+   *                                       to use the new Latitude and Longitude
+   *                                       classes.
    *  @history 2011-01-25 Eric Hyer - Added SetGround method for Surface Points
    */
   class Camera;
@@ -54,15 +64,35 @@ namespace Isis {
   class Projection;
   class Pvl;
   class SurfacePoint;
+  class Latitude;
+  class Longitude;
 
   class UniversalGroundMap {
     public:
-      UniversalGroundMap(Pvl &pvl);
-      UniversalGroundMap(Cube &cube);
+      /**
+       * This enum is used to define whether to use a camera or projection
+       * primarily, and which to fall back on.
+       */
+      enum CameraPriority {
+        /**
+         * This is the default because cameras are projection-aware. Use the
+         * camera for additional power if available, and fall back to projection
+         */
+        CameraFirst,
+        /**
+         * Use the projection for functionality well outside the original image
+         * if available, and fall back to camera.
+         */
+        ProjectionFirst
+      };
+
+      UniversalGroundMap(Pvl &pvl, CameraPriority priority = CameraFirst);
+      UniversalGroundMap(Cube &cube, CameraPriority priority = CameraFirst);
       ~UniversalGroundMap();
 
       void SetBand(const int band);
       bool SetUniversalGround(double lat, double lon);
+      bool SetGround(Latitude lat, Longitude lon);
       bool SetGround(const SurfacePoint &);
       double Sample() const;
       double Line() const;
@@ -82,6 +112,13 @@ namespace Isis {
         return p_projection != 0;
       };
 
+
+      /**
+       * Returns whether the ground map has a camera or not
+       *
+       * @return bool Returns true if the ground map has a camera, and false
+       *              if it does not
+       */
       bool HasCamera() {
         return p_camera != 0;
       };
@@ -98,7 +135,7 @@ namespace Isis {
 
 
     private:
-      void Init(Pvl &pvl);
+      void Init(Pvl &pvl, CameraPriority priority);
 
       Isis::Camera *p_camera;  //!<The camera (if the image has a camera)
       Isis::Projection *p_projection;  //!<The projection (if the image is projected)
