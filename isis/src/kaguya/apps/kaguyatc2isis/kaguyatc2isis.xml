@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="kaguyatc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import PDS formatted Kaguya Terrain Camera level 2 image cube into Isis format cube</brief>
+
+  <description>
+    This program will import a PDS formatted Kaguya Terrain Camera (TC) level 2  
+    image into an Isis cube. 
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2011-01-24">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Kaguya</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted Kaguya Terrain Camera level 2 file
+        </brief>
+        <description>
+          Use this parameter to select the Kaguya Terrain
+	  Camera filename. This file must contain the PDS 
+          labels.
+        </description>
+        <filter>
+          *.img *.IMG
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+
+    </group>
+  </groups>
+</application>
