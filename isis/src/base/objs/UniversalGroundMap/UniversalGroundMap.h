@@ -43,15 +43,17 @@ namespace Isis {
    *  @history 2007-02-06 Tracie Sucharski Added SetBand method.
    *  @history 2007-02-06 Steven Lambright Fixed documentation
    *  @history 2009-04-24 Steven Koechle Added a check to SetUniversalGround that
-   *  		 makes sure the result is on the cube before returning true.
+   *       makes sure the result is on the cube before returning true.
    *  @history 2010-04-09 Sharmila Prasad Added an API to check for camera in an image
    *  @history 2010-04-28 Mackenzie Boyd Fixed dereferencing issue in constructor
    *                                     that takes a cube.
+   *  @history 2011-01-25 Eric Hyer - Added SetGround method for Surface Points
    */
   class Camera;
+  class Cube;
   class Projection;
   class Pvl;
-  class Cube;
+  class SurfacePoint;
 
   class UniversalGroundMap {
     public:
@@ -61,6 +63,7 @@ namespace Isis {
 
       void SetBand(const int band);
       bool SetUniversalGround(double lat, double lon);
+      bool SetGround(const SurfacePoint &);
       double Sample() const;
       double Line() const;
 
@@ -97,10 +100,9 @@ namespace Isis {
     private:
       void Init(Pvl &pvl);
 
-      Isis::Camera *p_camera; //!<The camera (if the image has a camera)
-      Isis::Projection *p_projection; //!<The projection (if the image is projected)
+      Isis::Camera *p_camera;  //!<The camera (if the image has a camera)
+      Isis::Projection *p_projection;  //!<The projection (if the image is projected)
   };
 };
 
 #endif
-

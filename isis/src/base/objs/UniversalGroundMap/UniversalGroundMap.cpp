@@ -1,8 +1,12 @@
 #include "UniversalGroundMap.h"
-#include "Projection.h"
+
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
   /**
@@ -37,13 +41,13 @@ namespace Isis {
     try {
       p_camera = CameraFactory::Create(pvl);
     }
-    catch(iException &e) {
+    catch (iException &e) {
       e.Clear();
       p_camera = NULL;
       try {
         p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
       }
-      catch(iException &e) {
+      catch (iException &e) {
         p_projection = NULL;
         std::string msg = "Could not create camera or projection for [" +
                           pvl.Filename() + "]";
@@ -59,15 +63,18 @@ namespace Isis {
    *
    */
   void UniversalGroundMap::SetBand(const int band) {
-    if(p_camera != NULL) p_camera->SetBand(band);
+    if (p_camera != NULL)
+      p_camera->SetBand(band);
   }
 
 
 
   //! Destroys the UniversalGroundMap object
   UniversalGroundMap::~UniversalGroundMap() {
-    if(p_camera != NULL) delete p_camera;
-    if(p_projection != NULL) delete p_projection;
+    if (p_camera != NULL)
+      delete p_camera;
+    if (p_projection != NULL)
+      delete p_projection;
   }
 
   /**
@@ -81,8 +88,8 @@ namespace Isis {
    *         if it was not
    */
   bool UniversalGroundMap::SetUniversalGround(double lat, double lon) {
-    if(p_camera != NULL) {
-      if(p_camera->SetUniversalGround(lat, lon)) {
+    if (p_camera != NULL) {
+      if (p_camera->SetUniversalGround(lat, lon)) {
         return p_camera->InCube();
       }
       else {
@@ -95,12 +102,36 @@ namespace Isis {
   }
 
   /**
+   * Returns whether the SurfacePoint was set successfully in the camera model
+   * or projection
+   *
+   * @param sp The Surface Point to set ground with
+   *
+   * @return Returns true if the Surface Point was set successfully, and false
+   *         otherwise
+   */
+  bool UniversalGroundMap::SetGround(const SurfacePoint &sp) {
+    if (p_camera != NULL) {
+      if (p_camera->SetGround(sp)) {
+        return p_camera->InCube();
+      }
+      else {
+        return false;
+      }
+    }
+    else {
+      return p_projection->SetUniversalGround(sp.GetLatitude(),
+                                              sp.GetLongitude());
+    }
+  }
+
+  /**
    * Returns the current line value of the camera model or projection
    *
    * @return Sample value
    */
   double UniversalGroundMap::Sample() const {
-    if(p_camera != NULL) {
+    if (p_camera != NULL) {
       return p_camera->Sample();
     }
     else {
@@ -114,7 +145,7 @@ namespace Isis {
    * @return Line value
    */
   double UniversalGroundMap::Line() const {
-    if(p_camera != NULL) {
+    if (p_camera != NULL) {
       return p_camera->Line();
     }
     else {
@@ -133,7 +164,7 @@ namespace Isis {
    *         false if it was not
    */
   bool UniversalGroundMap::SetImage(double sample, double line) {
-    if(p_camera != NULL) {
+    if (p_camera != NULL) {
       return p_camera->SetImage(sample, line);
     }
     else {
@@ -147,7 +178,7 @@ namespace Isis {
    * @return Universal Latitude
    */
   double UniversalGroundMap::UniversalLatitude() const {
-    if(p_camera != NULL) {
+    if (p_camera != NULL) {
       return p_camera->UniversalLatitude();
     }
     else {
@@ -161,7 +192,7 @@ namespace Isis {
    * @return Universal Longitude
    */
   double UniversalGroundMap::UniversalLongitude() const {
-    if(p_camera != NULL) {
+    if (p_camera != NULL) {
       return p_camera->UniversalLongitude();
     }
     else {
@@ -175,7 +206,7 @@ namespace Isis {
    * @return Resolution
    */
   double UniversalGroundMap::Resolution() const {
-    if(p_camera != NULL) {
+    if (p_camera != NULL) {
       return p_camera->PixelResolution();
     }
     else {
