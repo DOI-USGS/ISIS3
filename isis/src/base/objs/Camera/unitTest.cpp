@@ -1,13 +1,14 @@
-#include "Camera.h"
-
 #include <iostream>
 #include <iomanip>
 
+#include "Angle.h"
+#include "Camera.h"
 #include "CameraFactory.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Preference.h"
-#include "Angle.h"
+#include "SurfacePoint.h"
+
 
 using namespace std;
 using namespace Isis;
@@ -148,7 +149,7 @@ int main() {
   lon.SetDegrees(226.671);
   double radius = 3420.;
   c->SetUniversalGround(lat.GetDegrees(), lon.GetDegrees(), radius);
-  //c->SetGround(SurfacePoint(lat, lon, radius));
+  c->SetGround(SurfacePoint(lat, lon, radius));
   cout << "Has intersection " << c->HasSurfaceIntersection() << endl;
   cout << "Latitude = " << c->UniversalLatitude() << endl;
   cout << "Longitude = " << c->UniversalLongitude() << endl;

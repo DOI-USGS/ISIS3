@@ -43,6 +43,7 @@
 #include "NaifStatus.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "SurfacePoint.h"
 
 using namespace std;
 

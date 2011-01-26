@@ -36,7 +36,7 @@ namespace Isis {
   class Latitude;
   class Longitude;
   class Projection;
-//  class SurfacePoint;
+  class SurfacePoint;
 
   /**
    * @author ??? Jeff Anderson
