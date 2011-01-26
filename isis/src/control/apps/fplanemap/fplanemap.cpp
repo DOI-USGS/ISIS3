@@ -58,7 +58,7 @@ void IsisMain() {
   double mmTol = fabs(pp * dtol);
 
   Progress prog;
-  prog.SetMaximumSteps(cn.Size());
+  prog.SetMaximumSteps(cn.GetNumPoints());
   prog.CheckStatus();
 
   // Loop through grid of points and get statistics to compute
@@ -66,22 +66,22 @@ void IsisMain() {
   std::vector<Coordinate> coords;
   Brick pixel(from, 1, 1, 1);
   BigInt badPoint(0), nulls(0), oldNotInImage(0), newNotInImage(0), badTol(0);
-  for(int p = 0; p < cn.Size(); p++) {
-    ControlPoint pnt = cn[p];
-    if((!pnt.IsIgnored()) && (pnt.Size() == 2)) {
+  for(int p = 0; p < cn.GetNumPoints(); p++) {
+    const ControlPoint & pnt = *cn[p];
+    if((!pnt.IsIgnored()) && (pnt.GetNumMeasures() == 2)) {
       Coordinate c;
-      if (pnt[0].GetType() == ControlMeasure::Reference) {
-        c.samp = pnt[0].GetSample();
-        c.line = pnt[0].GetLine();
-        c.errSamp = pnt[1].GetSample();
-        c.errLine = pnt[1].GetLine();
+      if (pnt[0]->GetType() == ControlMeasure::Reference) {
+        c.samp = pnt[0]->GetSample();
+        c.line = pnt[0]->GetLine();
+        c.errSamp = pnt[1]->GetSample();
+        c.errLine = pnt[1]->GetLine();
         c.gof = 0;//pnt[1].GoodnessOfFit();
       }
       else {
-        c.samp = pnt[1].GetSample();
-        c.line = pnt[1].GetLine();
-        c.errSamp = pnt[0].GetSample();
-        c.errLine = pnt[0].GetLine();
+        c.samp = pnt[1]->GetSample();
+        c.line = pnt[1]->GetLine();
+        c.errSamp = pnt[0]->GetSample();
+        c.errLine = pnt[0]->GetLine();
         c.gof = 0;//pnt[0].GoodnessOfFit();
 
       }
@@ -134,7 +134,7 @@ void IsisMain() {
 
   PvlGroup results("Results");
   results += PvlKeyword("PixelPitch", pp, "millimeters");  
-  results += PvlKeyword("TotalPoints", cn.Size());  
+  results += PvlKeyword("TotalPoints", cn.GetNumPoints());  
   results += PvlKeyword("ValidPoints", (BigInt) coords.size());
   results += PvlKeyword("InvalidPoints", badPoint);
   if (checkForNulls) results += PvlKeyword("NullDNs", nulls);
