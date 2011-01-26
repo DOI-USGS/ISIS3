@@ -248,7 +248,7 @@ namespace Isis {
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(Longitude lon = startLon; lon <= *p_maxLon; lon += latRes) {
+      for(Longitude lon = *p_minLon; lon <= *p_maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
         bool valid = GetXY(lat, lon, x, y);
@@ -274,7 +274,7 @@ namespace Isis {
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(double lat = startLat; lat <= *p_maxLat; lat += lonRes) {
+      for(double lat = *p_minLat; lat <= *p_maxLat; lat += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
 
@@ -295,6 +295,94 @@ namespace Isis {
 
       if(progress) {
         progress->CheckStatus();
+      }
+    }
+  }
+
+
+  /**
+   * This restricts (or grows) the ground range in which to draw grid lines.
+   *
+   * @param minLat The lowest latitude extreme to draw grid lines to
+   * @param maxLat The highest latitude extreme to draw grid lines to
+   * @param minLon The lowest longitude extreme to draw grid lines to
+   * @param maxLon The highest longitude extreme to draw grid lines to
+   */
+  void GroundGrid::SetGroundLimits(Latitude minLat, Longitude minLon,
+                                   Latitude maxLat, Longitude maxLon) {
+    if(minLat.Valid()) *p_minLat = minLat;
+    if(maxLat.Valid()) *p_maxLat = maxLat;
+    if(minLon.Valid()) *p_minLon = minLon;
+    if(maxLon.Valid()) *p_maxLon = maxLon;
+
+    if(*p_minLat > *p_maxLat) {
+      Latitude tmp(*p_minLat);
+      *p_minLat = *p_maxLat;
+      *p_maxLat = tmp;
+    }
+
+    if(*p_minLon > *p_maxLon) {
+      Longitude tmp(*p_minLon);
+      *p_minLon = *p_maxLon;
+      *p_maxLon = tmp;
+    }
+  }
+
+  /**
+   * This draws grid lines along the extremes of the lat/lon box of the grid.
+   */
+  void GroundGrid::WalkBoundary() {
+    Angle latRes = Angle(p_defaultResolution, Angle::Degrees);
+    Angle lonRes = Angle(p_defaultResolution, Angle::Degrees);
+
+    const Latitude  &minLat = *p_minLat;
+    const Latitude  &maxLat = *p_maxLat;
+    const Longitude &minLon = *p_minLon;
+    const Longitude &maxLon = *p_maxLon;
+
+    // Walk the minLat/maxLat lines
+    for(Latitude lat = minLat; lat <= maxLat; lat += (maxLat - minLat)) {
+      unsigned int previousX = 0;
+      unsigned int previousY = 0;
+      bool havePrevious = false;
+
+      for(Longitude lon = minLon; lon <= maxLon; lon += latRes) {
+        unsigned int x = 0;
+        unsigned int y = 0;
+        bool valid = GetXY(lat, lon, x, y);
+
+        if(valid && havePrevious) {
+          if(previousX != x || previousY != y) {
+            DrawLineOnGrid(previousX, previousY, x, y, true);
+          }
+        }
+
+        havePrevious = valid;
+        previousX = x;
+        previousY = y;
+      }
+    }
+
+    // Walk the minLon/maxLon lines
+    for(Longitude lon = minLon; lon <= maxLon; lon += (maxLon - minLon)) {
+      unsigned int previousX = 0;
+      unsigned int previousY = 0;
+      bool havePrevious = false;
+
+      for(Latitude lat = minLat; lat <= maxLat; lat += lonRes) {
+        unsigned int x = 0;
+        unsigned int y = 0;
+        bool valid = GetXY(lat, lon, x, y);
+
+        if(valid && havePrevious) {
+          if(previousX != x || previousY != y) {
+            DrawLineOnGrid(previousX, previousY, x, y, false);
+          }
+        }
+
+        havePrevious = valid;
+        previousX = x;
+        previousY = y;
       }
     }
   }

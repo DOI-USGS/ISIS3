@@ -43,9 +43,12 @@ namespace Isis {
    *   @history 2010-05-06 Steven Lambright Added Split Lat/Lon
    *            Functionality
    *   @history 2010-06-22 Steven Lambright Improved handling of resolutions
-   *   @history 2011-01-25 Steven Lambright Now uses native unitsto the
+   *   @history 2011-01-25 Steven Lambright Now uses native units to the
    *            projection, Lat/Lon classes, and several bug fixes when it comes
    *            to out of range values or non-standard projection types.
+   *   @history 2011-01-26 Steven Lambright Fixed a bug where the grid was not
+   *            consistent on the edges and added SetGroundLimits and
+   *            WalkBoundary for the new grid options Bound lat/lon range.
    */
   class GroundGrid {
     public:
@@ -62,6 +65,11 @@ namespace Isis {
                       Angle latInc,  Angle lonInc,
                       Progress *progress,
                       Angle latRes, Angle lonRes);
+
+      void WalkBoundary();
+
+      void SetGroundLimits(Latitude minLat, Longitude minLon, Latitude maxLat,
+                           Longitude maxLon);
 
       bool PixelOnGrid(int x, int y);
       bool PixelOnGrid(int x, int y, bool latGrid);

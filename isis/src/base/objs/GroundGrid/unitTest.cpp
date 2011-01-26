@@ -30,6 +30,10 @@ void IsisMain() {
   cout << "Create grid..." << endl;
   Progress progress;
   GroundGrid grid(&gmap, false, someCube.Samples(), someCube.Lines());
+  grid.SetGroundLimits(Latitude(28.572438078395002, Angle::Degrees),
+                       Longitude(-133.284402721991682, Angle::Degrees),
+                       Latitude(34.340453944831125, Angle::Degrees),
+                       Longitude(-134.060950006448195, Angle::Degrees));
 
   grid.CreateGrid(Latitude(0), Longitude(0), Angle(0.2, Angle::Degrees),
       Angle(0.2, Angle::Degrees), &progress, Angle(0.1, Angle::Degrees),
@@ -43,7 +47,23 @@ void IsisMain() {
             i < (someCube.Samples() * 3.5 / 7.0); i++) {
       cout << grid.PixelOnGrid(i, line);
     }
-    
+
+    cout << endl;
+  }
+
+  cout << endl;
+
+  grid.WalkBoundary();
+
+  cout << "\n\nGrid cutout with boundary walk: \n" << endl;
+
+  for(int line = 0; line < someCube.Lines() / 4; line++) {
+
+    for(int i = (int)(someCube.Samples() * 3.0 / 7.0);
+            i < (someCube.Samples() * 3.5 / 7.0); i++) {
+      cout << grid.PixelOnGrid(i, line);
+    }
+
     cout << endl;
   }
 
