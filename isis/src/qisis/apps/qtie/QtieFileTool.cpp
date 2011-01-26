@@ -35,7 +35,6 @@ namespace Qisis {
     openAction()->setWhatsThis(whatsThis);
 
     saveAction()->setEnabled(false);
-
   }
 
   /**
@@ -57,7 +56,7 @@ namespace Qisis {
 
 
     //  If we've already opened files, clear before starting over
-    if(cubeViewportList()->size() > 0) {
+    if (cubeViewportList()->size() > 0) {
       closeAll();
       emit newFiles();
     }
@@ -70,11 +69,11 @@ namespace Qisis {
     filter += "All (*)";
 
     Isis::Cube *baseCube = new Isis::Cube;
-    while(!baseCube->IsOpen()) {
+    while (!baseCube->IsOpen()) {
       baseFile = QFileDialog::getOpenFileName((QWidget *)parent(),
                                               "Select basemap cube (projected)",
                                               ".", filter);
-      if(baseFile.isEmpty()) {
+      if (baseFile.isEmpty()) {
         delete baseCube;
         return;
       }
@@ -89,14 +88,14 @@ namespace Qisis {
         try {
           baseCube->Projection();
         }
-        catch(Isis::iException &e) {
+        catch (Isis::iException &e) {
           baseCube->Close();
           QString message = "Base must be projected";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           baseCube->Close();
         }
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         QString message = "Unable to open base cube";
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
@@ -106,12 +105,12 @@ namespace Qisis {
 
     Isis::Cube *matchCube = new Isis::Cube;
 
-    while(!matchCube->IsOpen()) {
+    while (!matchCube->IsOpen()) {
       // Get match cube
       matchFile = QFileDialog::getOpenFileName((QWidget *)parent(),
                   "Select cube to tie to base",
                   dir, filter);
-      if(matchFile.isEmpty()) {
+      if (matchFile.isEmpty()) {
         delete baseCube;
         delete matchCube;
         (*(cubeViewportList()))[0]->close();
@@ -123,20 +122,20 @@ namespace Qisis {
         matchCube->Open(matchFile.toStdString());
         try {
 
-          if(matchCube->HasGroup("Mapping")) {
+          if (matchCube->HasGroup("Mapping")) {
             QString message = "The match cube cannot be a projected cube.";
             QMessageBox::critical((QWidget *)parent(), "Error", message);
             matchCube->Close();
             continue;
           }
         }
-        catch(Isis::iException &e) {
+        catch (Isis::iException &e) {
           QString message = "Error reading match cube labels.";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           matchCube->Close();
         }
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         QString message = "Unable to open match cube";
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
@@ -156,9 +155,9 @@ namespace Qisis {
                        dir, filter);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     Isis::ControlNet *cnet;
-    if(cnetFile.isEmpty()) {
+    if (cnetFile.isEmpty()) {
       cnet = new Isis::ControlNet();
-      cnet->SetType(Isis::ControlNet::ImageToGround);
+      //cnet->SetType(Isis::ControlNet::ImageToGround);
       cnet->SetNetworkId("Qtie");
       cnet->SetUserName(Isis::Application::UserName());
     }
@@ -166,7 +165,7 @@ namespace Qisis {
       try {
         cnet = new Isis::ControlNet(cnetFile.toStdString());
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         QString message = "Invalid control network.  \n";
         std::string errors = e.Errors();
         message += errors.c_str();

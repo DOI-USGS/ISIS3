@@ -29,7 +29,10 @@
 #include "ControlMeasure.h"
 #include "Filename.h"
 #include "History.h"
+#include "iString.h"
 #include "iTime.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "PvlEditDialog.h"
@@ -39,7 +42,7 @@
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 
-using namespace Qisis;
+using namespace Isis;
 using namespace std;
 
 
@@ -147,9 +150,9 @@ namespace Qisis {
     connect(p_pointEditor, SIGNAL(pointSaved()), this, SLOT(pointSaved()));
     p_pointEditor->show();
     connect(this,
-        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
-        p_pointEditor,
-        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+            SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+            p_pointEditor,
+            SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
 
 
     QPushButton *solve = new QPushButton("Solve");
@@ -257,7 +260,7 @@ namespace Qisis {
     try {
       p_baseGM = new Isis::UniversalGroundMap(*p_baseCube);
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString message = "Cannot initialize universal ground map for basemap.\n";
       string errors = e.Errors();
       message += errors.c_str();
@@ -268,7 +271,7 @@ namespace Qisis {
     try {
       p_matchGM = new Isis::UniversalGroundMap(matchCube);
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString message = "Cannot initialize universal ground map for match cube.\n";
       string errors = e.Errors();
       message += errors.c_str();
@@ -279,20 +282,21 @@ namespace Qisis {
 
     //  If Control Net has points, set the basemap measures, since they are not
     //  saved in the net file.
-    if(cnet.Size() != 0) {
-      for(int i = 0; i < cnet.Size(); i++) {
-        Isis::ControlPoint &p = cnet[i];
+    if (cnet.GetNumPoints() != 0) {
+      for (int i = 0; i < cnet.GetNumPoints(); i++) {
+        Isis::ControlPoint &p = *cnet[i];
         double baseSamp, baseLine;
 
-        if(p_baseGM->SetUniversalGround(p.UniversalLatitude(), p.UniversalLongitude())) {
+
+        if (p_baseGM->SetGround(p.GetSurfacePoint())) {
           //  Make sure point on base cube
           baseSamp = p_baseGM->Sample();
           baseLine = p_baseGM->Line();
-          if(baseSamp < 1 || baseSamp > p_baseCube->Samples() ||
+          if (baseSamp < 1 || baseSamp > p_baseCube->Samples() ||
               baseLine < 1 || baseLine > p_baseCube->Lines()) {
             // throw error? point not on base
             QString message = "Error parsing input control net.  Lat/Lon for Point Id: " +
-                              QString::fromStdString(p.Id()) + " computes to a sample/line off " +
+                              QString::fromStdString(p.GetId()) + " computes to a sample/line off " +
                               "the edge of the basemap cube.";
             QMessageBox::critical((QWidget *)parent(), "Control Net Error", message);
             return;
@@ -301,7 +305,7 @@ namespace Qisis {
         else {
           //  throw error?  point not on base cube
           QString message = "Error parsing input control net.  Point Id: " +
-                            QString::fromStdString(p.Id()) + " does not exist on basemap.";
+                            QString::fromStdString(p.GetId()) + " does not exist on basemap.";
           QMessageBox::critical((QWidget *)parent(), "Control Net Error", message);
           return;
         }
@@ -309,12 +313,12 @@ namespace Qisis {
         Isis::ControlMeasure *mB = new Isis::ControlMeasure;
         mB->SetCubeSerialNumber(p_baseSN);
         mB->SetCoordinate(baseSamp, baseLine);
-        mB->SetType(Isis::ControlMeasure::Estimated);
+//        mB->SetType(Isis::ControlMeasure::Estimated);
         mB->SetDateTime();
         mB->SetChooserName();
-        mB->SetIgnore(true);
+        mB->SetIgnored(true);
 
-        p.Add(*mB);
+        p.Add(mB);
       }
     }
 
@@ -352,18 +356,17 @@ namespace Qisis {
    */
   void QtieTool::pointSaved() {
     //  Get sample/line from base map and find lat/lon
-    double samp = (*p_controlPoint)[Base].Sample();
-    double line = (*p_controlPoint)[Base].Line();
+    double samp = p_controlPoint->GetMeasure(Base)->GetSample();
+    double line = p_controlPoint->GetMeasure(Base)->GetLine();
 
     p_baseGM->SetImage(samp, line);
-    double lat = p_baseGM->UniversalLatitude();
-    double lon = p_baseGM->UniversalLongitude();
-    double radius = p_baseGM->Projection()->LocalRadius();
+    Latitude lat = p_baseGM->UniversalLatitude();
+    Longitude lon = p_baseGM->UniversalLongitude();
+    Distance radius = p_baseGM->Projection()->LocalRadius();
 
-    p_controlPoint->SetUniversalGround(lat, lon, radius);
+    p_controlPoint->SetSurfacePoint(SurfacePoint(lat, lon, radius));
 
     emit editPointChanged();
-
   }
 
 
@@ -382,18 +385,20 @@ namespace Qisis {
    */
   void QtieTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
-    if(cvp  == NULL) return;
-    if(cubeViewportList()->size() != 2) {
+    if (cvp  == NULL)
+      return;
+    if (cubeViewportList()->size() != 2) {
       QString message = "You must have a basemap and a match cube open.";
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
     }
-    if(cvp->cube() == p_baseCube) {
+    if (cvp->cube() == p_baseCube) {
       QString message = "Select points on match Cube only.";
       QMessageBox::information((QWidget *)parent(), "Warning", message);
       return;
     }
-    if(cvp->cursorInside()) QPoint p = cvp->cursorPosition();
+    if (cvp->cursorInside())
+      QPoint p = cvp->cursorPosition();
 
     // ???  do we only allow mouse clicks on level1???
     //    If we allow on both, need to find samp,line on level1 if
@@ -404,12 +409,12 @@ namespace Qisis {
     double samp, line;
     cvp->viewportToCube(p.x(), p.y(), samp, line);
 
-    if(s == Qt::LeftButton) {
+    if (s == Qt::LeftButton) {
       //  Find closest control point in network
       Isis::ControlPoint *point =
         p_controlNet->FindClosest(sn, samp, line);
       //  TODO:  test for errors and reality
-      if(point == NULL) {
+      if (point == NULL) {
         QString message = "No points exist for editing.  Create points ";
         message += "using the right mouse button.";
         QMessageBox::information((QWidget *)parent(), "Warning", message);
@@ -417,12 +422,12 @@ namespace Qisis {
       }
       modifyPoint(point);
     }
-    else if(s == Qt::MidButton) {
+    else if (s == Qt::MidButton) {
       //  Find closest control point in network
       Isis::ControlPoint *point =
         p_controlNet->FindClosest(sn, samp, line);
       //  TODO:  test for errors and reality
-      if(point == NULL) {
+      if (point == NULL) {
         QString message = "No points exist for deleting.  Create points ";
         message += "using the right mouse button.";
         QMessageBox::information((QWidget *)parent(), "Warning", message);
@@ -430,7 +435,7 @@ namespace Qisis {
       }
       deletePoint(point);
     }
-    else if(s == Qt::RightButton) {
+    else if (s == Qt::RightButton) {
       p_matchGM->SetImage(samp, line);
       double lat = p_matchGM->UniversalLatitude();
       double lon = p_matchGM->UniversalLongitude();
@@ -465,11 +470,11 @@ namespace Qisis {
     matchLine = p_matchGM->Line();
 
     //  Make sure point is on base
-    if(p_baseGM->SetUniversalGround(lat, lon)) {
+    if (p_baseGM->SetUniversalGround(lat, lon)) {
       //  Make sure point on base cube
       baseSamp = p_baseGM->Sample();
       baseLine = p_baseGM->Line();
-      if(baseSamp < 1 || baseSamp > p_baseCube->Samples() ||
+      if (baseSamp < 1 || baseSamp > p_baseCube->Samples() ||
           baseLine < 1 || baseLine > p_baseCube->Lines()) {
         // throw error? point not on base
         QString message = "Point does not exist on base map.";
@@ -484,31 +489,35 @@ namespace Qisis {
     }
 
     //  Get radius
-    double radius = p_baseGM->Projection()->LocalRadius();
+//    double radius = p_baseGM->Projection()->LocalRadius();
 
     //  Point is on both base and match, create new control point
     Isis::ControlPoint *newPoint = NULL;
     // First prompt for pointId
     bool goodId = false;
-    while(!goodId) {
+    while (!goodId) {
       bool ok = false;
       QString id = QInputDialog::getText((QWidget *)parent(),
                                          "Point ID", "Enter Point ID:",
                                          QLineEdit::Normal, lastPtIdValue,
                                          &ok);
-      if(!ok) {  // user clicked "Cancel"
+      if (!ok)
+        // user clicked "Cancel"
+      {
         return;
       }
-      if(ok && id.isEmpty()) {  // user clicked "Ok" but did not enter a point ID
+      if (ok && id.isEmpty())
+        // user clicked "Ok" but did not enter a point ID
+      {
         QString message = "You must enter a point Id.";
         QMessageBox::warning((QWidget *)parent(), "Warning", message);
       }
       else {
         // Make sure Id doesn't already exist
         newPoint = new Isis::ControlPoint(id.toStdString());
-        if(p_controlNet->Exists(*newPoint)) {
-          QString message = "A ControlPoint with Point Id = [" +
-                            QString::fromStdString(newPoint->Id()) +
+        if (p_controlNet->ContainsPoint(newPoint->GetId())) {
+          iString message = "A ControlPoint with Point Id = [" +
+                            newPoint->GetId() +
                             "] already exists.  Re-enter unique Point Id.";
           QMessageBox::warning((QWidget *)parent(), "Unique Point Id", message);
         }
@@ -520,38 +529,37 @@ namespace Qisis {
     }
 
 
-    newPoint->SetUniversalGround(lat, lon, radius);
-    newPoint->SetType(Isis::ControlPoint::Ground);
+//    newPoint->SetUniversalGround(lat, lon, radius);
+//    newPoint->SetType(Isis::ControlPoint::Ground);
 
     // Set first measure to match
-    Isis::ControlMeasure *mM = new Isis::ControlMeasure;
+    ControlMeasure *mM = new ControlMeasure;
     mM->SetCubeSerialNumber(p_matchSN);
     mM->SetCoordinate(matchSamp, matchLine);
-    mM->SetType(Isis::ControlMeasure::Estimated);
+//    mM->SetType(Isis::ControlMeasure::Estimated);
     mM->SetDateTime();
     mM->SetChooserName();
-    newPoint->Add(*mM);
+    newPoint->Add(mM);
     //  Second measure is base measure, set to Ignore=yes
-    Isis::ControlMeasure *mB = new Isis::ControlMeasure;
+    ControlMeasure *mB = new ControlMeasure;
     mB->SetCubeSerialNumber(p_baseSN);
     mB->SetCoordinate(baseSamp, baseLine);
-    mB->SetType(Isis::ControlMeasure::Estimated);
+//    mB->SetType(ControlMeasure::Estimated);
     mB->SetDateTime();
     mB->SetChooserName();
-    mB->SetIgnore(true);
-    newPoint->Add(*mB);
+    mB->SetIgnored(true);
+    newPoint->Add(mB);
 
     //  Add new control point to control network
-    p_controlNet->Add(*newPoint);
+    p_controlNet->AddPoint(newPoint);
     //  Read newly added point
-    p_controlPoint = p_controlNet->Find(newPoint->Id());
+    p_controlPoint = p_controlNet->GetPoint((QString) newPoint->GetId());
     //  Load new point in QtieTool
     loadPoint();
     p_tieTool->setShown(true);
     p_tieTool->raise();
 
     emit editPointChanged();
-
   }
 
 
@@ -575,7 +583,7 @@ namespace Qisis {
 
     //loadPoint();
 
-    p_controlNet->Delete(p_controlPoint->Id());
+    p_controlNet->DeletePoint(p_controlPoint->GetId());
     p_tieTool->setShown(false);
     p_controlPoint = NULL;
 
@@ -607,18 +615,14 @@ namespace Qisis {
   void QtieTool::loadPoint() {
 
     //  Initialize pointEditor with measures
-    p_pointEditor->setLeftMeasure(&(*p_controlPoint)[Base], p_baseCube,
-                                  p_controlPoint->Id());
-    p_pointEditor->setRightMeasure(&(*p_controlPoint)[Match], p_matchCube,
-                                   p_controlPoint->Id());
+    p_pointEditor->setLeftMeasure(p_controlPoint->GetMeasure(Base), p_baseCube,
+                                  p_controlPoint->GetId());
+    p_pointEditor->setRightMeasure(p_controlPoint->GetMeasure(Match),
+                                   p_matchCube, p_controlPoint->GetId());
 
     //  Write pointId
-    string CPId = p_controlPoint->Id();
-    QString ptId = "Point ID:  " +
-                   QString::fromStdString(CPId.c_str());
+    iString ptId = "Point ID:  " + p_controlPoint->GetId();
     p_ptIdValue->setText(ptId);
-
-
   }
 
 
@@ -629,7 +633,7 @@ namespace Qisis {
   void QtieTool::drawMeasuresOnViewports() {
 
     MdiCubeViewport *vp;
-    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+    for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
       vp = (*(cubeViewportList()))[i];
       vp->viewport()->update();
     }
@@ -646,13 +650,14 @@ namespace Qisis {
   void QtieTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
 
     //  Make sure we have points to draw
-    if(p_controlNet == NULL || p_controlNet->Size() == 0) return;
+    if (p_controlNet == NULL || p_controlNet->GetNumPoints() == 0)
+      return;
 
     //  Draw all measures
     std::string serialNumber = Isis::SerialNumber::Compose(*vp->cube(), true);
-    for(int i = 0; i < p_controlNet->Size(); i++) {
-      Isis::ControlPoint &p = (*p_controlNet)[i];
-      if(p_controlPoint != NULL && p.Id() == p_controlPoint->Id()) {
+    for (int i = 0; i < p_controlNet->GetNumPoints(); i++) {
+      Isis::ControlPoint &p = *p_controlNet->GetPoint(i);
+      if (p_controlPoint != NULL && p.GetId() == p_controlPoint->GetId()) {
         painter->setPen(QColor(200, 0, 0));
       }
       else {
@@ -660,15 +665,15 @@ namespace Qisis {
       }
 
       double samp, line;
-      if(vp->cube()->Filename() == p_baseCube->Filename()) {
+      if (vp->cube()->Filename() == p_baseCube->Filename()) {
         // Draw on left viewport (base)
-        samp = p[Base].Sample();
-        line = p[Base].Line();
+        samp = p[Base]->GetSample();
+        line = p[Base]->GetLine();
       }
       else {
         // Draw on right viewport (match)
-        samp = p[Match].Sample();
-        line = p[Match].Line();
+        samp = p[Match]->GetSample();
+        line = p[Match]->GetLine();
       }
       int x, y;
       vp->cubeToViewport(samp, line, x, y);
@@ -690,8 +695,8 @@ namespace Qisis {
     p_tolerance = p_tolValue->text().toDouble();
 
     //  Need at least 2 points to solve for twist
-    if(p_twist) {
-      if(p_controlNet->Size() < 2) {
+    if (p_twist) {
+      if (p_controlNet->GetNumPoints() < 2) {
         QString message = "Need at least 2 points to solve for twist. \n";
         QMessageBox::critical((QWidget *)parent(), "Error", message);
         return;
@@ -701,25 +706,26 @@ namespace Qisis {
 
     // Bundle adjust to solve for new pointing
     try {
-
       //  Create new control net for bundle adjust , deleting ignored measures
-      for(int p = 0; p < p_controlNet->Size(); p++) {
-        Isis::ControlPoint pt = (*p_controlNet)[p];
-        for(int m = 0; m < pt.Size(); m++) {
-          if(pt[m].Ignore()) pt.Delete(m);
+      for (int p = 0; p < p_controlNet->GetNumPoints(); p++) {
+        ControlPoint *pt = new ControlPoint(*p_controlNet->GetPoint(p));
+        for (int m = 0; m < pt->GetNumMeasures(); m++) {
+          if (pt->GetMeasure(m)->SetIgnored(true))
+            pt->Delete(m);
         }
-        net.Add(pt);
+        net.AddPoint(pt);
       }
 
-      Isis::BundleAdjust b(net, *p_serialNumberList, false);
+      BundleAdjust b(net, *p_serialNumberList, false);
       b.SetSolveTwist(p_twist);
-      b.Solve(p_tolerance, p_maxIterations);
+      //b.Solve(p_tolerance, p_maxIterations);
+      b.Solve(p_tolerance);
 
       // Print results and give user option of updating cube pointin
 //      double maxError = net.MaximumResidual();
 //      double avgError = net.AverageResidual();
-      double maxError = net.MaximumError();
-      double avgError = net.AverageError();
+      double maxError = net.GetMaximumResidual();
+      double avgError = net.AverageResidual();
 
       QString message = "Maximum Error = " + QString::number(maxError);
       message += "\nAverage Error = " + QString::number(avgError);
@@ -729,7 +735,7 @@ namespace Qisis {
       QPushButton *close = msgBox.addButton("Close", QMessageBox::RejectRole);
       msgBox.setDefaultButton(close);
       msgBox.exec();
-      if(msgBox.clickedButton() == update) {
+      if (msgBox.clickedButton() == update) {
         p_matchCube->ReOpen("rw");
         Isis::Table cmatrix = b.Cmatrix(0);
         //cmatrix = b.Cmatrix(0);
@@ -740,15 +746,15 @@ namespace Qisis {
       }
 
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString message = "Bundle Solution failed.\n";
       string errors = e.Errors();
       message += errors.c_str();
       e.Clear();
 //      message += "\n\nMaximum Error = " + QString::number(net.MaximumResiudal());
 //      message += "\nAverage Error = " + QString::number(net.AverageResidual());
-      message += "\n\nMaximum Error = " + QString::number(net.MaximumError());
-      message += "\nAverage Error = " + QString::number(net.AverageError());
+      message += "\n\nMaximum Error = " + QString::number(net.GetMaximumResidual());
+      message += "\nAverage Error = " + QString::number(net.AverageResidual());
       QMessageBox::warning((QWidget *)parent(), "Error", message);
       return;
     }
@@ -764,7 +770,7 @@ namespace Qisis {
   void QtieTool::writeNewCmatrix(Isis::Table *cmatrix) {
 
     //check for existing polygon, if exists delete it
-    if(p_matchCube->Label()->HasObject("Polygon")) {
+    if (p_matchCube->Label()->HasObject("Polygon")) {
       p_matchCube->Label()->DeleteObject("Polygon");
     }
 
@@ -774,7 +780,7 @@ namespace Qisis {
     try {
       p_matchCube->Read(h);
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString message = "Could not read cube history, "
                         "will not update history.\n";
       string errors = e.Errors();
@@ -812,8 +818,8 @@ namespace Qisis {
 
   void QtieTool::setTemplateFile() {
     QString filename = QFileDialog::getOpenFileName(p_mw,
-        "Select a registration template", ".",
-        "Registration template files (*.def *.pvl);;All files (*)");
+                       "Select a registration template", ".",
+                       "Registration template files (*.def *.pvl);;All files (*)");
 
     if (filename.isEmpty())
       return;
@@ -846,7 +852,7 @@ namespace Qisis {
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }
-    catch(Isis::iException &e) {
+    catch (Isis::iException &e) {
       QString message = e.Errors().c_str();
       e.Clear();
       QMessageBox::warning((QWidget *)parent(), "Error", message);
@@ -867,29 +873,30 @@ namespace Qisis {
     QString fn = QFileDialog::getSaveFileName((QWidget *)parent(),
                  "Choose filename to save under",
                  ".", filter);
-    if(!fn.isEmpty()) {
+    if (!fn.isEmpty()) {
       try {
         //  Create new control net for bundle adjust , deleting ignored measures
         // which are the basemap measures.
         Isis::ControlNet net;
-        for(int p = 0; p < p_controlNet->Size(); p++) {
-          Isis::ControlPoint pt = (*p_controlNet)[p];
-          for(int m = 0; m < pt.Size(); m++) {
-            if(pt[m].Ignore()) pt.Delete(m);
+        for (int p = 0; p < p_controlNet->GetNumPoints(); p++) {
+          ControlPoint *pt = new ControlPoint(*p_controlNet->GetPoint(p));
+          for (int m = 0; m < pt->GetNumMeasures(); m++) {
+            if (pt->GetMeasure(m)->IsIgnored())
+              pt->Delete(m);
           }
-          net.SetType(Isis::ControlNet::ImageToGround);
+//          net.SetType(Isis::ControlNet::ImageToGround);
           net.SetTarget(p_matchCube->Camera()->Target());
           net.SetNetworkId("Qtie");
           net.SetUserName(Isis::Application::UserName());
           net.SetCreatedDate(Isis::Application::DateTime());
           net.SetModifiedDate(Isis::iTime::CurrentLocalTime());
           net.SetDescription("Qtie Ground Points");
-          net.Add(pt);
+          net.AddPoint(pt);
         }
 
         net.Write(fn.toStdString());
       }
-      catch(Isis::iException &e) {
+      catch (Isis::iException &e) {
         QString message = "Error saving control network.  \n";
         string errors = e.Errors();
         message += errors.c_str();
