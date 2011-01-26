@@ -29,6 +29,10 @@
 #include "Interpolator.h"
 
 namespace Isis {
+  class Distance;
+  class Latitude;
+  class Longitude;
+
   /**
    * @brief Class for computing sensor ground coordinates
    *
@@ -131,6 +135,10 @@ namespace Isis {
    *                                      section for Camera
    *  @history 2010-12-07 Steven Lambright - Added LocalRadius(lat,lon) and
    *                                     removed a sqrt from SetLookDirection
+   *  @history 2011-01-26 Steven Lambright - The LocalRadius methods now return
+   *                                     Distance objects and added a
+   *                                     LocalRadius method that uses the
+   *                                     Latitude and Longitude classes.
    */
   class Sensor : public Isis::Spice {
     public:
@@ -177,12 +185,9 @@ namespace Isis {
        * radius on the ellipsoid, the radius from the surface model passed into
        * the constructor, or the radius set with SetUniversalGround.
        */
-      double LocalRadius() const {
-        return p_radius * 1000.0;
-      };
-
-
-      double LocalRadius(double lat, double lon);
+      Distance LocalRadius() const;
+      Distance LocalRadius(Latitude lat, Longitude lon);
+      Distance LocalRadius(double lat, double lon);
 
       double PhaseAngle() const;
       double EmissionAngle() const;

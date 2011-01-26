@@ -4,6 +4,7 @@
 #include <QMenu>
 
 #include "Camera.h"
+#include "Distance.h"
 #include "iTime.h"
 #include "MdiCubeViewport.h"
 #include "Projection.h"

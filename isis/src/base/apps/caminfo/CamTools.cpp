@@ -20,6 +20,8 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privdacy.html.
  */
+#include "CamTools.h"
+
 #include <cmath>
 #include <string>
 #include <vector>
@@ -32,8 +34,12 @@
 #include <iomanip>
 #include <sstream>
 
-#include "CamTools.h"
+#include "geos/geom/GeometryFactory.h"
+#include "geos/geom/Geometry.h"
+#include "geos/geom/Point.h"
+
 #include "CameraFactory.h"
+#include "Distance.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "iTime.h"
@@ -43,10 +49,6 @@
 #include "naif/SpiceUsr.h"
 #include "ProjectionFactory.h"
 #include "PolygonTools.h"
-
-#include "geos/geom/GeometryFactory.h"
-#include "geos/geom/Geometry.h"
-#include "geos/geom/Point.h"
 
 using namespace std;
 

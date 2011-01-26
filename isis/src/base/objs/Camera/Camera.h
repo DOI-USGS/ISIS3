@@ -33,6 +33,7 @@ namespace Isis {
   class CameraDistortionMap;
   class CameraGroundMap;
   class CameraSkyMap;
+  class Distance;
   class Latitude;
   class Longitude;
   class Projection;
@@ -156,6 +157,9 @@ namespace Isis {
    *            inconsistancy!)
    *   @history 2011-01-25 Eric Hyer - SurfacePoint class now exists so
    *            uncommented Steven's new method (see history for 2011-11-04)
+   *   @history 2011-01-26  Steven Lambright - ComputeAzimuth now takes a
+   *            Distance for the radius. The LocalRadius() methods now return
+   *            instances of the Distance class.
    */
 
   class Camera : public Isis::Sensor {
@@ -726,7 +730,7 @@ namespace Isis {
       CameraGroundMap *p_groundMap;          //!<A pointer to the GroundMap
       CameraSkyMap *p_skyMap;                //!<A pointer to the SkyMap
 
-      double ComputeAzimuth(const double radius,
+      double ComputeAzimuth(Isis::Distance radius,
                             const double lat, const double lon);
 
       bool RawFocalPlanetoImage();

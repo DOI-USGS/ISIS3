@@ -1,8 +1,10 @@
 #include <iostream>
 #include <iomanip>
-#include "Sensor.h"
+
 #include "iException.h"
+#include "Distance.h"
 #include "Filename.h"
+#include "Sensor.h"
 
 #include "Preference.h"
 

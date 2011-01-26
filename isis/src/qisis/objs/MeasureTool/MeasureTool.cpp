@@ -13,6 +13,7 @@
 #include "geos/geom/Point.h"
 
 #include "Camera.h"
+#include "Distance.h"
 #include "Filename.h"
 #include "MdiCubeViewport.h"
 #include "ToolPad.h"

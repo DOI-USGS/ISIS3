@@ -1,12 +1,14 @@
 #include "Isis.h"
-#include "Statistics.h"
-#include "Camera.h"
-#include "UserInterface.h"
-#include "Cube.h"
-#include "Progress.h"
-#include "Process.h"
 
+#include "Camera.h"
+#include "Cube.h"
+#include "Distance.h"
 #include "iString.h"
+#include "UserInterface.h"
+#include "Process.h"
+#include "Progress.h"
+#include "Statistics.h"
+
 
 using namespace std;
 using namespace Isis;

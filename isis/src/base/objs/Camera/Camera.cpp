@@ -1202,7 +1202,8 @@ namespace Isis {
     if (lat >= 0.0) {
       return ComputeAzimuth(LocalRadius(90.0, 0.0), 90.0, 0.0);
     } else {
-      double azimuth = ComputeAzimuth(LocalRadius(-90.0, 0.0), -90.0, 0.0) + 180.0;
+      double azimuth = ComputeAzimuth(LocalRadius(-90.0, 0.0),
+                                      -90.0, 0.0) + 180.0;
       if (azimuth > 360.0) azimuth = azimuth - 360.0;
       return azimuth;
     }
@@ -1253,7 +1254,7 @@ namespace Isis {
    * @todo Write PushState and PopState method to ensure the
    * internals of the class are set based on SetImage or SetGround
    */
-  double Camera::ComputeAzimuth(const double radius,
+  double Camera::ComputeAzimuth(Isis::Distance radius,
                                 const double lat, const double lon) {
     if(!HasSurfaceIntersection()) return -1.0;
 
@@ -1265,7 +1266,8 @@ namespace Isis {
 
     // Convert the point to x/y/z in body-fixed
     SpiceDouble pB[3];
-    latrec_c(radius, lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
+    latrec_c(radius.GetKilometers(), lon * Isis::PI / 180.0,
+             lat * Isis::PI / 180.0, pB);
 
     // Get the origin point
     SpiceDouble oB[3];

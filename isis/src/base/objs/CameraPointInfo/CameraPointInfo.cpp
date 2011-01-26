@@ -24,6 +24,7 @@
 #include "Camera.h"
 #include "CameraPointInfo.h"
 #include "CubeManager.h"
+#include "Distance.h"
 #include "iException.h"
 #include "iTime.h"
 #include "PvlGroup.h"
@@ -327,7 +328,7 @@ namespace Isis {
         gp->FindKeyword("BodyFixedCoordinate").AddValue(pB[1], "km");
         gp->FindKeyword("BodyFixedCoordinate").AddValue(pB[2], "km");
 
-        gp->FindKeyword("LocalRadius").SetValue(camera->LocalRadius(), "meters");
+        gp->FindKeyword("LocalRadius").SetValue(camera->LocalRadius().GetMeters(), "meters");
         gp->FindKeyword("SampleResolution").SetValue(camera->SampleResolution(), "meters/pixel");
         gp->FindKeyword("LineResolution").SetValue(camera->LineResolution(), "meters/pixel");
 

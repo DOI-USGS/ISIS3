@@ -21,15 +21,19 @@
  */
 
 #include "Sensor.h"
+
+#include <iomanip>
+
 #include "Angle.h"
+#include "Constants.h"
 #include "CubeManager.h"
+#include "Distance.h"
 #include "iString.h"
 #include "iException.h"
-#include "iException.h"
-#include "Constants.h"
-#include "SpecialPixel.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "NaifStatus.h"
-#include <iomanip>
+#include "SpecialPixel.h"
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
@@ -507,6 +511,16 @@ namespace Isis {
   }
 
 
+  Distance Sensor::LocalRadius() const {
+    return Distance(p_radius, Distance::Kilometers);
+  }
+
+
+  Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
+    return LocalRadius(lat.GetDegrees(), lon.GetDegrees());
+  }
+
+
   /**
    * Returns the local radius (in meters) at a given lat, lon.
    *
@@ -518,7 +532,7 @@ namespace Isis {
    * @returns The distance from the center of the planet to this lat,lon in
    *          meters
    */
-  double Sensor::LocalRadius(double lat, double lon) {
+  Distance Sensor::LocalRadius(double lat, double lon) {
     double radius;
 
     if(p_hasElevationModel) {
@@ -536,7 +550,7 @@ namespace Isis {
                         pow(xyradius * sin(rlat), 2));
     }
 
-    return radius;
+    return Distance(radius, Distance::Kilometers);
   }
 
   /**
