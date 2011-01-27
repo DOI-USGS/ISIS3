@@ -672,7 +672,7 @@ namespace Isis {
             string sn = cMeasure->GetCubeSerialNumber();
             mOstm << mSerialNumList.Filename(sn) << ", " << sn << ","
                   << sBoolean[(int) cMeasure->IsIgnored()] << ", "
-                  << cMeasure->MeasureTypeString() << ", "
+                  << cMeasure->GetMeasureTypeString() << ", "
                   << sBoolean[cMeasure->GetType() == ControlMeasure::Reference]
                   << endl;
           }
