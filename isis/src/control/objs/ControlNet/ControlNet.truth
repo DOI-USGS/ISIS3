@@ -4,12 +4,21 @@ Test adding control points with identical id numbers ...
 **PROGRAMMER ERROR** ControlPoint must have unique Id
 
 Test deleting nonexistant control point id ...
-**USER ERROR** A ControlPoint matching the id [T0002] was not found in the ControlNet
+**USER ERROR** point Id [T0002] does not exist in the network
 
 Test deleting nonexistant control point index ...
-**USER ERROR** There is no ControlPoint at the given index number
+**PROGRAMMER ERROR** Index [7] out of range
 
+Writing ControlNet to temp.txt in Pvl format
+Reading ControlNet from temp.txt
+Writing ControlNet to temp2.txt in Pvl format
+Diffing temp.txt and temp2.txt
 Test read/write of binary control networks ...
+Writing ControlNet to temp.bin in binary format
+Reading ControlNet from temp.bin
+Writing ControlNet to temp.txt in Pvl format
+Reading Pvl from temp.txt and then printing
+
 Object = ControlNetwork
   NetworkId    = Test
   TargetName   = Mars
@@ -17,62 +26,6 @@ Object = ControlNetwork
   Created      = 2010-07-10T12:50:15
   LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
-
-  Object = ControlPoint
-    PointType               = Ground
-    PointId                 = T0000
-    ChooserName             = autoseed
-    DateTime                = 2010-08-27T17:10:06
-    EditLock                = True
-    AprioriXYZSource        = Basemap
-    AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
-    AprioriRadiusSource     = DEM
-    AprioriRadiusSourceFile = $base/dems/molaMarsPlanetaryRadius0003.cub
-    AprioriX                = -424.024048 <meters>
-    AprioriY                = 734.4311949 <meters>
-    AprioriZ                = 529.919264 <meters>
-    AprioriCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
-    X                       = -424.024048 <meters>
-    Y                       = 734.4311949 <meters>
-    Z                       = 529.919264 <meters>
-    ApostCovarianceMatrix   = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
-
-    Group = ControlMeasure
-      SerialNumber   = id0
-      MeasureType    = Reference
-      ChooserName    = cnetref
-      DateTime       = 2010-08-27T17:10:06
-      EditLock       = True
-      Sample         = 1.0
-      Line           = 2.0
-      Diameter       = 15.0
-      AprioriSample  = 2.0
-      AprioriLine    = 5.0
-      SampleSigma    = 0.01 <pixels>
-      LineSigma      = 0.21 <pixels>
-      SampleResidual = -3.0 <pixels>
-      LineResidual   = 4.0 <pixels>
-      GoodnessOfFit  = 0.53523
-    End_Group
-
-    Group = ControlMeasure
-      SerialNumber   = id1
-      MeasureType    = Candidate
-      ChooserName    = autoseed
-      DateTime       = 2010-08-27T17:10:06
-      Ignore         = True
-      Sample         = 1.0
-      Line           = 2.0
-      Diameter       = 15.0
-      AprioriSample  = 2.0
-      AprioriLine    = 5.0
-      SampleSigma    = 0.01 <pixels>
-      LineSigma      = 0.21 <pixels>
-      SampleResidual = -3.0 <pixels>
-      LineResidual   = 4.0 <pixels>
-      GoodnessOfFit  = 1.07046
-    End_Group
-  End_Object
 
   Object = ControlPoint
     PointType   = Tie
@@ -203,6 +156,66 @@ Object = ControlNetwork
       GoodnessOfFit  = 1.07046
     End_Group
   End_Object
+
+  Object = ControlPoint
+    PointType               = Ground
+    PointId                 = T0000
+    ChooserName             = autoseed
+    DateTime                = 2010-08-27T17:10:06
+    EditLock                = True
+    AprioriXYZSource        = Basemap
+    AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
+    AprioriRadiusSource     = DEM
+    AprioriRadiusSourceFile = $base/dems/molaMarsPlanetaryRadius0003.cub
+    AprioriX                = -424.024048 <meters>
+    AprioriY                = 734.4311949 <meters>
+    AprioriZ                = 529.919264 <meters>
+    AprioriCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+    X                       = -424.024048 <meters>
+    Y                       = 734.4311949 <meters>
+    Z                       = 529.919264 <meters>
+    ApostCovarianceMatrix   = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+
+    Group = ControlMeasure
+      SerialNumber   = id0
+      MeasureType    = Reference
+      ChooserName    = cnetref
+      DateTime       = 2010-08-27T17:10:06
+      EditLock       = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 0.53523
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+      GoodnessOfFit  = 1.07046
+    End_Group
+  End_Object
 End_Object
 End
+
+Writing ControlNet to temp2.bin in binary format
+Reading ControlNet from temp2.bin
+Diffing temp.bin and temp2.bin
 Read/Write of binary files OK.

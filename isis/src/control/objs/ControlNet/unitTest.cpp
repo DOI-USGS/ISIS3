@@ -51,7 +51,7 @@ int main() {
       cp->SetAprioriSurfacePoint(surfacePt);
     }
     else if (i == 1) {
-      cp->SetIgnore(true);
+      cp->SetIgnored(true);
     }
     else {
       cp->SetType(ControlPoint::Tie);
@@ -85,7 +85,7 @@ int main() {
       }
       if (k == 1) {
         cm->SetType(ControlMeasure::Candidate);
-        cm->SetIgnore(true);
+        cm->SetIgnored(true);
         cm->SetChooserName("autoseed");
       }
 
@@ -115,8 +115,6 @@ int main() {
   string id2 = cn1[2]->GetId();
   cn1.DeletePoint(2);
 
-  cn1.Write("temp.txt", true);
-
   cout << "Test deleting nonexistant control point id ..." << endl;
   try {
     cn1.DeletePoint(id2);
@@ -126,11 +124,6 @@ int main() {
   }
   cout << endl;
 
-  
-  for (int i = 0; i < cn1.GetNumPoints(); i++) {
-    cout << cn1.GetPoint(i)->GetDateTime() << endl;
-  }
- 
  
   cout << "Test deleting nonexistant control point index ..." << endl;
   try {
@@ -141,18 +134,15 @@ int main() {
   }
   cout << endl;
 
-  for (int i = 0; i < cn1.GetNumPoints(); i++) {
-    cout << cn1.GetPoint(i)->GetDateTime() << endl;
-  }
+  cout << "Writing ControlNet to temp.txt in Pvl format" << endl;
+  cn1.Write("temp.txt", true);
 
-
+  cout << "Reading ControlNet from temp.txt" << endl;
   ControlNet cn2("temp.txt");
 
-  for (int i = 0; i < cn2.GetNumPoints(); i++) {
-    cout << cn2.GetPoint(i)->GetDateTime() << endl;
-  }
-
+  cout << "Writing ControlNet to temp2.txt in Pvl format" << endl;
   cn2.Write("temp2.txt", true);
+  cout << "Diffing temp.txt and temp2.txt" << endl;
   if (system("cmp temp.txt temp2.txt")) {
     cout << "ERROR:  Text Files are not the same!" << endl;
   }
@@ -160,19 +150,26 @@ int main() {
   cout << "Test read/write of binary control networks ..." << endl;
 
   //  Test read/write of binary
+  cout << "Writing ControlNet to temp.bin in binary format" << endl;
   cn2.Write("temp.bin");
   ControlNet cn3;
 
+  cout << "Reading ControlNet from temp.bin" << endl;
   cn3.ReadControl("temp.bin");
 
+  cout << "Writing ControlNet to temp.txt in Pvl format" << endl;
   cn3.Write("temp.txt", true);
 
+  cout << "Reading Pvl from temp.txt and then printing" << endl;
   Pvl p1("temp.txt");
-  cout << p1 << endl;
+  cout << endl << p1 << endl << endl;
 
+  cout << "Writing ControlNet to temp2.bin in binary format" << endl;
   cn3.Write("temp2.bin");
+  cout << "Reading ControlNet from temp2.bin" << endl;
   ControlNet cn4("temp2.bin");
 
+  cout << "Diffing temp.bin and temp2.bin" << endl;
   if (system("cmp temp.bin temp2.bin")) {
     cout << "ERROR:  Binary files are not the same." << endl;
   }

@@ -296,6 +296,7 @@ namespace Isis
 
     PBControlNet pbnet;
 
+
     // Now stream the rest of the input into the google protocol buffer.
     try
     {
