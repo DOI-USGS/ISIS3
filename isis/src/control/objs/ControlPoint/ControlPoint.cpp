@@ -105,7 +105,7 @@ namespace Isis {
       // Create a PControlMeasure and fill in it's info.
       // with the values from the input file.
       ControlMeasure *measure = new ControlMeasure(protoBufPt.measures(m));
-      Add(measure);
+      AddMeasure(measure);
     }
   }
 
@@ -114,6 +114,7 @@ namespace Isis {
                              const PBControlNetLogData_Point &logProtoBuf) {
     p_measures = NULL;
     cubeSerials = NULL;
+    referenceMeasure = NULL;
 
     p_measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
@@ -123,7 +124,7 @@ namespace Isis {
       // Create a PControlMeasure and fill in it's info.
       // with the values from the input file.
       ControlMeasure *measure = new ControlMeasure(protoBufPt.measures(m), logProtoBuf.measures(m));
-      Add(measure);
+      AddMeasure(measure);
     }
   }
 
@@ -1753,7 +1754,9 @@ namespace Isis {
       p += PvlKeyword("AprioriXYZSourceFile", p_aprioriSurfacePointSourceFile);
     }
 
-    p += PvlKeyword("AprioriRadiusSource", GetRadiusSourceString());
+    if (p_aprioriRadiusSource != RadiusSource::None) {
+      p += PvlKeyword("AprioriRadiusSource", GetRadiusSourceString());
+    }
 
     if (!p_aprioriRadiusSourceFile.empty()) {
       p += PvlKeyword("AprioriRadiusSourceFile", p_aprioriRadiusSourceFile);
