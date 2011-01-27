@@ -285,7 +285,7 @@ namespace Isis {
 
       PvlGroup CreatePvlGroup();
       static iString MeasureTypeToString(MeasureType type);
-      iString MeasureTypeString() const;
+      iString GetMeasureTypeString() const;
 
       const ControlMeasure &operator=(const ControlMeasure &other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;

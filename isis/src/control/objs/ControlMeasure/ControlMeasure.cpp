@@ -1008,7 +1008,7 @@ namespace Isis {
     data.append(qsl);
     qsl.clear();
 
-    qsl << "MeasureType" << MeasureTypeString();
+    qsl << "MeasureType" << GetMeasureTypeString();
     data.append(qsl);
     qsl.clear();
 
@@ -1031,31 +1031,7 @@ namespace Isis {
     PvlGroup p("ControlMeasure");
     p += PvlKeyword("SerialNumber", *p_serialNumber);
 
-    switch (p_measureType) {
-      case Reference:
-        p += PvlKeyword("MeasureType", "Reference");
-        break;
-      case Candidate:
-        p += PvlKeyword("MeasureType", "Candidate");
-        break;
-      case Manual:
-        p += PvlKeyword("MeasureType", "Manual");
-        break;
-      case RegisteredPixel:
-        p += PvlKeyword("MeasureType", "RegisteredPixel");
-        break;
-      case RegisteredSubPixel:
-        p += PvlKeyword("MeasureType", "RegisteredSubPixel");
-        break;
-      case Ground:
-        p += PvlKeyword("MeasureType", "Ground");
-        break;
-      default:
-        iString msg = "Invalid Measure Enumeration, [" + iString(p_measureType)
-                      + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-        break;
-    }
+    p += PvlKeyword("MeasureType", GetMeasureTypeString());
 
     p += PvlKeyword("ChooserName", GetChooserName());
     p += PvlKeyword("DateTime", GetDateTime());
@@ -1151,7 +1127,7 @@ namespace Isis {
    *
    * @return A string representation of the MeasureType
    */
-  iString ControlMeasure::MeasureTypeString() const {
+  iString ControlMeasure::GetMeasureTypeString() const {
     return MeasureTypeToString(p_measureType);
   }
 
