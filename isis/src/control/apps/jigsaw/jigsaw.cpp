@@ -1,4 +1,4 @@
-INTENIONAL_COMPILE_ERROR
+INTENTIONAL_COMPILE_ERROR
 To be removed when BundleAdjust is working properly again
 
 
