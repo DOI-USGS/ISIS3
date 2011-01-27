@@ -28,7 +28,7 @@ namespace Qisis {
     public:
       static QString lastPtIdValue;
 
-      QnetNewPointDialog (QWidget *parent=0);
+      QnetNewPointDialog(QWidget *parent = 0);
 
       QLineEdit *ptIdValue;
 

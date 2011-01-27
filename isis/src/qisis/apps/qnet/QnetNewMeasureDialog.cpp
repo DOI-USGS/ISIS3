@@ -16,16 +16,16 @@ using namespace Isis;
 
 namespace Qisis {
   /**
-   * Contructor. 
-   *  
+   * Contructor.
+   *
    * @param parent The parent widget for the
    *               cube points filter
-   * @internal 
+   * @internal
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null.
-   *  
+   *
    */
-  QnetNewMeasureDialog::QnetNewMeasureDialog (QWidget *parent) : QDialog (parent) {
+  QnetNewMeasureDialog::QnetNewMeasureDialog(QWidget *parent) : QDialog(parent) {
     fileList = NULL;
     p_okButton = NULL;
 
@@ -65,22 +65,22 @@ namespace Qisis {
    *            to QSringList
    */
   void QnetNewMeasureDialog::SetFiles(Isis::ControlPoint point,
-                                      QStringList pointFiles) {
+      QStringList pointFiles) {
     int bottomMostSelectedItemIndex = 0;
-                                      
+
     //  Add all entries in the SerialNumberList
-    for (int i=0; i<g_serialNumberList->Size(); i++) {
-    
+    for (int i = 0; i < g_serialNumberList->Size(); i++) {
+
       iString curSerialNum = g_serialNumberList->SerialNumber(i);
-      
+
       //  Don't add if already in this point
       if (point.HasSerialNumber(curSerialNum))
         continue;
 
       // build new item...
       iString label(g_serialNumberList->Filename(i));
-      QListWidgetItem * item = new QListWidgetItem(label);
-      
+      QListWidgetItem *item = new QListWidgetItem(label);
+
       // if this entry of the SerialNumberList is also in the pointFiles then
       // mark it as selected and insert after the last selected item (toward
       // the top, otherwise add it to the end
@@ -95,7 +95,7 @@ namespace Qisis {
   }
 
 
-  void QnetNewMeasureDialog::enableOkButton (const QString &text) {
+  void QnetNewMeasureDialog::enableOkButton(const QString &text) {
     p_okButton->setEnabled(!text.isEmpty());
   }
 

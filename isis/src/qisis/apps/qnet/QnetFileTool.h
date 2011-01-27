@@ -36,42 +36,42 @@ namespace Isis {
 
 namespace Qisis {
 
-/**
- * @brief Qnet File operations
- *
- * @ingroup Visualization Tools
- *
- * @author 2006-02-01 Jeff Anderson
- *
- * @internal
- *  @history 2006-08-02 Tracie Sucharski - Initialize cameras for every image
- *                         in cube list.
- *  @history 2008-11-24 Jeannie Walldren - Replace references to PointEdit class
- *                         with ControlPointEdit
- *  @history 2008-11-26 Jeannie Walldren - Added cNetName parameter to
- *                         controlNetworkUpdated() so that QnetTool can read the
- *                         name of the control net file.
- * @history  2008-11-26 Tracie Sucharski - Remove all polygon/overlap 
- *                         polygon/overlap references, this functionality will
- *                         be in qmos.
- *  @history 2008-12-10 Jeannie Walldren - Reworded "What's this?" description
- *                         for saveAs action. Changed "Save As" action text to
- *                         match QnetTool's "Save As" action 2010-06-03 Jeannie
- *                         Walldren - Removed "std::" in .cpp file since "using
- *                         namespace std"
- *  @history 2010-07-01 Jeannie Walldren - Added file extension filters for
- *                         input control network. Replaced #includes with
- *                            forward class declarations and moved #include to
- *                            .cpp file.
- *  @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
- *                          by changes made to the ControlNet,ControlPoint,
- *                          ControlMeasure header files.
- *  @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
- *
- */
+  /**
+   * @brief Qnet File operations
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2006-02-01 Jeff Anderson
+   *
+   * @internal
+   *  @history 2006-08-02 Tracie Sucharski - Initialize cameras for every image
+   *                         in cube list.
+   *  @history 2008-11-24 Jeannie Walldren - Replace references to PointEdit class
+   *                         with ControlPointEdit
+   *  @history 2008-11-26 Jeannie Walldren - Added cNetName parameter to
+   *                         controlNetworkUpdated() so that QnetTool can read the
+   *                         name of the control net file.
+   * @history  2008-11-26 Tracie Sucharski - Remove all polygon/overlap
+   *                         polygon/overlap references, this functionality will
+   *                         be in qmos.
+   *  @history 2008-12-10 Jeannie Walldren - Reworded "What's this?" description
+   *                         for saveAs action. Changed "Save As" action text to
+   *                         match QnetTool's "Save As" action 2010-06-03 Jeannie
+   *                         Walldren - Removed "std::" in .cpp file since "using
+   *                         namespace std"
+   *  @history 2010-07-01 Jeannie Walldren - Added file extension filters for
+   *                         input control network. Replaced #includes with
+   *                            forward class declarations and moved #include to
+   *                            .cpp file.
+   *  @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
+   *                          by changes made to the ControlNet,ControlPoint,
+   *                          ControlMeasure header files.
+   *  @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
+   *
+   */
 
   class QnetFileTool : public FileTool {
-    Q_OBJECT
+      Q_OBJECT
 
     signals:
       void serialNumberListUpdated();
@@ -79,7 +79,7 @@ namespace Qisis {
       void newControlNetwork(Isis::ControlNet *);
 
     public:
-      QnetFileTool (QWidget *parent);
+      QnetFileTool(QWidget *parent);
       QString cNetFilename;
 
     public slots:
@@ -92,7 +92,7 @@ namespace Qisis {
 
     private:
       bool p_saveNet;
- };
+  };
 };
 
 #endif

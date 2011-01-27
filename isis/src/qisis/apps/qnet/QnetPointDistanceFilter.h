@@ -12,13 +12,13 @@
 
 namespace Qisis {
   /**
-   * Defines the Distance filter for the QnetNavTool's Points 
-   * section.  The user must enter a Minimum Distance value. This 
-   * class is designed to remove points from the current filtered 
-   * list whose distance from all other points in the control net 
-   * is greater than or equal to the given value. 
-   * 
-   * @internal 
+   * Defines the Distance filter for the QnetNavTool's Points
+   * section.  The user must enter a Minimum Distance value. This
+   * class is designed to remove points from the current filtered
+   * list whose distance from all other points in the control net
+   * is greater than or equal to the given value.
+   *
+   * @internal
    *   @history 2008-11-26 Jeannie Walldren - Changed variable
    *                          names and labels for clarity.
    *                          Modified filter() to handle case in
@@ -30,13 +30,13 @@ namespace Qisis {
    *                          list.
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null in constructor.
-   *  
+   *
    */
   class QnetPointDistanceFilter : public QnetFilter {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetPointDistanceFilter (QWidget *parent=0);
+      QnetPointDistanceFilter(QWidget *parent = 0);
       virtual void filter();
 
     private:

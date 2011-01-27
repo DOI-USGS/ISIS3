@@ -100,14 +100,14 @@ namespace Qisis {
    *                          from std::string to QString.
    *   @history 2010-11-04 Tracie Sucharski - Added overloaded load slot for
    *                          double-clicking on the cube list.
-   *  
-   *  
+   *
+   *
    */
   class QnetNavTool : public Tool {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
-      QnetNavTool (QWidget *parent);
+      QnetNavTool(QWidget *parent);
 
       enum FilterIndex {
         Points,
@@ -151,8 +151,8 @@ namespace Qisis {
       void showNavTool();
 
     signals:
-      void loadPoint (Isis::ControlPoint *);
-      void loadImage (const QString &);
+      void loadPoint(Isis::ControlPoint *);
+      void loadImage(const QString &);
       void modifyPoint(Isis::ControlPoint *);
       void ignoredPoints();
       void deletedPoints();

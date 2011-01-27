@@ -177,15 +177,15 @@ namespace Qisis {
       QWidget *createToolBarWidget(QStackedWidget *parent);
 
     private slots:
-      void paintAllViewports ();
+      void paintAllViewports();
       void saveNet();
       void addMeasure();
-      void setIgnorePoint (bool ignore);
-      void newGroundPoint (Isis::ControlPoint &point);
-      void setGroundPoint (bool ground);
-      void setIgnoreLeftMeasure (bool ignore);
-      void setIgnoreRightMeasure (bool ignore);
-      void showNavWindow (bool checked);
+      void setIgnorePoint(bool ignore);
+      void newGroundPoint(Isis::ControlPoint &point);
+      void setGroundPoint(bool ground);
+      void setIgnoreLeftMeasure(bool ignore);
+      void setIgnoreRightMeasure(bool ignore);
+      void showNavWindow(bool checked);
 
       void selectLeftMeasure(int index);
       void selectRightMeasure(int index);
@@ -211,15 +211,15 @@ namespace Qisis {
       void loadPoint();
       void drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter);
       void createQnetTool(QWidget *parent);
-      QSplitter * createTopSplitter();
-      QGroupBox * createControlPointGroupBox();
-      QGroupBox * createLeftMeasureGroupBox();
-      QGroupBox * createRightMeasureGroupBox();
+      QSplitter *createTopSplitter();
+      QGroupBox *createControlPointGroupBox();
+      QGroupBox *createLeftMeasureGroupBox();
+      QGroupBox *createRightMeasureGroupBox();
       void createTemplateEditorWidget();
       void loadTemplateFile(QString);
       bool okToContinue();
-      
-      
+
+
     private:
       QMainWindow *p_qnetTool;
 
@@ -236,7 +236,7 @@ namespace Qisis {
       QAction *p_openTemplateFile;
       QAction *p_saveTemplateFile;
       QAction *p_saveTemplateFileAs;
-      
+
       QMainWindow *p_mw;
       ControlPointEdit *p_pointEditor;
       QTextEdit *p_templateEditor;
@@ -245,7 +245,7 @@ namespace Qisis {
       QLabel *p_templateFilenameLabel;
       QLabel *p_ptIdValue;
       QLabel *p_numMeasures;
-      
+
       QCheckBox *p_ignorePoint;
       QCheckBox *p_groundPoint;
       QLabel *p_leftMeasureType;
@@ -269,7 +269,7 @@ namespace Qisis {
       Isis::ControlMeasure *p_rightMeasure;
       Isis::Cube *p_leftCube;
       Isis::Cube *p_rightCube;
-      
+
       bool p_templateModified;
   };
 };
