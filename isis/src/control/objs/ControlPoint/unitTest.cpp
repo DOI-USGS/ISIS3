@@ -35,7 +35,7 @@ int main() {
   ControlPoint c("C151");
 
   c.SetType(ControlPoint::Ground);
-  c.SetIgnore(true);
+  c.SetIgnored(true);
   c.SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
   c.SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
   c.SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
@@ -51,7 +51,7 @@ int main() {
 
   ControlMeasure *d = new ControlMeasure;
   d->SetCubeSerialNumber("Test1");
-  d->SetIgnore(true);
+  d->SetIgnored(true);
   d->SetCoordinate(1.0, 2.0);
   d->SetResidual(-3.0, 4.0);
   d->SetDiameter(15.0);
@@ -69,7 +69,7 @@ int main() {
 
   d = new ControlMeasure;
   d->SetCubeSerialNumber("Test2");
-  d->SetIgnore(true);
+  d->SetIgnored(true);
   d->SetCoordinate(100.0, 200.0);
   d->SetDiameter(15.0);
   d->SetAprioriSample(2.0);
