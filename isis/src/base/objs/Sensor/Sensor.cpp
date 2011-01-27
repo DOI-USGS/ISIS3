@@ -637,7 +637,7 @@ namespace Isis {
     p_latitude = latitude;
     p_longitude = longitude;
 
-    p_radius = LocalRadius(p_latitude, p_longitude);
+    p_radius = LocalRadius(p_latitude, p_longitude).GetKilometers();
 
     if(Isis::IsSpecial(p_radius)) {
       p_hasIntersection = false;
@@ -849,7 +849,7 @@ namespace Isis {
     double rlon = lon * Isis::PI / 180.0;
 
     // Compute radius
-    double rad = LocalRadius(lat, lon);
+    double rad = LocalRadius(lat, lon).GetKilometers();
 
     // Now with the 3 spherical value compute the x/y/z coordinate
     double ssB[3];

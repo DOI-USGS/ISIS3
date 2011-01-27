@@ -192,8 +192,7 @@ namespace Isis {
       double PhaseAngle() const;
       double EmissionAngle() const;
       double IncidenceAngle() const;
-      
-      
+
       void LookDirection(double v[3]) const;
 
       double RightAscension();
