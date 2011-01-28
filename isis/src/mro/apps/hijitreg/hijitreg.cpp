@@ -1,28 +1,29 @@
 #include "Isis.h"
 
 #include <cmath>
-#include <string>
-#include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <string>
 #include <vector>
 
-#include "PvlGroup.h"
-#include "UserInterface.h"
-#include "Cube.h"
-#include "Chip.h"
-#include "Progress.h"
-#include "iException.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
-#include "Statistics.h"
-#include "MultivariateStatistics.h"
-#include "HiJitCube.h"
-#include "ControlNet.h"
-#include "SerialNumber.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
+#include "Chip.h"
+#include "Cube.h"
+#include "HiJitCube.h"
+#include "iException.h"
 #include "iTime.h"
+#include "MultivariateStatistics.h"
+#include "Progress.h"
+#include "PvlGroup.h"
+#include "SerialNumber.h"
+#include "Statistics.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
@@ -178,7 +179,6 @@ void IsisMain() {
 
   // Initialize control point network
   ControlNet cn;
-  cn.SetType(ControlNet::ImageToImage);
   cn.SetUserName(Application::UserName());
   cn.SetCreatedDate(iTime::CurrentLocalTime());
 
@@ -219,20 +219,18 @@ void IsisMain() {
       ar->SearchChip()->Load(trans);
 
       // Set up ControlMeasure for cube to translate
-      ControlMeasure cmTrans;
-      cmTrans.SetCubeSerialNumber(transSN);
-      cmTrans.SetCoordinate(msamp0 + samp, mline0 + line,
-                            ControlMeasure::Unmeasured);
-      cmTrans.SetChooserName("hijitreg");
-      cmTrans.SetReference(false);
+      ControlMeasure * cmTrans = new ControlMeasure;
+      cmTrans->SetCubeSerialNumber(transSN);
+      cmTrans->SetCoordinate(msamp0 + samp, mline0 + line,
+                            ControlMeasure::Candidate);
+      cmTrans->SetChooserName("hijitreg");
 
       // Set up ControlMeasure for the pattern/Match cube
-      ControlMeasure cmMatch;
-      cmMatch.SetCubeSerialNumber(matchSN);
-      cmMatch.SetCoordinate(fsamp0 + samp, fline0 + line,
-                            ControlMeasure::Automatic);
-      cmMatch.SetChooserName("hijitreg");
-      cmMatch.SetReference(true);
+      ControlMeasure * cmMatch = new ControlMeasure;
+      cmMatch->SetCubeSerialNumber(matchSN);
+      cmMatch->SetCoordinate(fsamp0 + samp, fline0 + line,
+                            ControlMeasure::Reference);
+      cmMatch->SetChooserName("hijitreg");
 
       ar->Register();
 
@@ -258,10 +256,12 @@ void IsisMain() {
         jparms.lStats.AddData(&lDiff, (unsigned int)1);
 
 //  Record the translation in the control point
-        cmTrans.SetCoordinate(ar->CubeSample(), ar->CubeLine(),
-                              ControlMeasure::Automatic);
-        cmTrans.SetError(sDiff, lDiff);
-        cmTrans.SetGoodnessOfFit(ar->GoodnessOfFit());
+        cmTrans->SetCoordinate(ar->CubeSample(), ar->CubeLine(),
+                              ControlMeasure::RegisteredPixel);
+        cmTrans->SetResidual(sDiff, lDiff);
+        ControlMeasureLogData gof(ControlMeasureLogData::GoodnessOfFit,
+            ar->GoodnessOfFit());
+        cmTrans->SetLogData(gof);
 
 //  Reread the chip location centering the offset and compute
 //  linear regression statistics
@@ -310,12 +310,12 @@ void IsisMain() {
 
       // Add the measures to a control point
       string str = "Row " + iString(r) + " Column " + iString(c);
-      ControlPoint cp(str);
-      cp.SetType(ControlPoint::Tie);
-      cp.Add(cmTrans);
-      cp.Add(cmMatch);
-      if(!cmTrans.IsMeasured()) cp.SetIgnore(true);
-      cn.Add(cp);
+      ControlPoint * cp = new ControlPoint(str);
+      cp->SetType(ControlPoint::Tie);
+      cp->Add(cmTrans);
+      cp->Add(cmMatch);
+      if(!cmTrans->IsMeasured()) cp->SetIgnored(true);
+      cn.AddPoint(cp);
       prog.CheckStatus();
     }
   }
