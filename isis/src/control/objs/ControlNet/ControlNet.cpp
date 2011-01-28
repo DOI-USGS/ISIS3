@@ -723,58 +723,16 @@ namespace Isis
   
   
   /**
-   * Get all the point-measures pertaining to a given cube serial number
+   * Get all the measures pertaining to a given cube serial number
    *
-   * @returns A list of all point-measure pairs which are in a given cube
+   * @returns A list of all measures which are in a given cube
    */
-  QList< QPair< ControlPoint *, ControlMeasure * > >
-      ControlNet::GetPointMeasuresInCube(iString serialNumber)
+  QList< ControlMeasure * > ControlNet::GetMeasuresInCube(iString serialNumber)
   {
     ValidateSerialNumber(serialNumber);
-
-    // point-measure list to be built and returned
-    QList< QPair< ControlPoint *, ControlMeasure * > > pointMeasuresInCube;
-    
-    ControlSerialNumber * csn = (*serials)[serialNumber];
-    QList< QString > pointIds = csn->GetPointIds();
-    foreach (QString id, pointIds)
-    {
-      ControlPoint * point = GetPoint(id);
-      ControlMeasure * measure = csn->GetMeasure(id);
-      pointMeasuresInCube.append(qMakePair(point, measure));
-    }
-    
-    return pointMeasuresInCube;
+    return (*serials)[serialNumber]->GetMeasures();
   }
 
-
-  /**
-   * Get all the point-measures pertaining to a given cube serial number
-   *
-   * @returns A list of all point-measure pairs which are in a given cube
-   *          (const version)
-   */
-  QList< QPair< const ControlPoint *, const ControlMeasure * > >
-      ControlNet::GetPointMeasuresInCube(iString serialNumber) const
-  {
-    ValidateSerialNumber(serialNumber);
-
-    // point-measure list to be built and returned
-    QList< QPair< const ControlPoint *, const ControlMeasure * > >
-        pointMeasuresInCube;
-    
-    ControlSerialNumber * csn = (*serials)[serialNumber];
-    QList< QString > pointIds = csn->GetPointIds();
-    foreach (QString id, pointIds)
-    {
-      const ControlPoint * point = GetPoint(id);
-      const ControlMeasure * measure = csn->GetMeasure(id);
-      pointMeasuresInCube.append(qMakePair(point, measure));
-    }
-    
-    return pointMeasuresInCube;
-  }
-  
   
   /**
    * Essentially removes a cube from the networkid

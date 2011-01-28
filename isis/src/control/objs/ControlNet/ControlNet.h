@@ -29,7 +29,7 @@
 
 class QString;
 template< typename A, typename B > class QHash;
-template< typename A, typename B > class QPair;
+template< typename T > class QList;
 
 
 namespace Isis {
@@ -143,10 +143,7 @@ namespace Isis {
                                      ControlMeasure *measure);
       bool ContainsPoint(iString pointId) const;
 
-      QList< QPair< ControlPoint *, ControlMeasure * > >
-          GetPointMeasuresInCube(iString serialNumber);
-      QList< QPair< const ControlPoint *, const ControlMeasure * > >
-          GetPointMeasuresInCube(iString serialNumber) const;
+      QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
       void DeleteMeasuresWithId(iString serialNumber);
 
       void ComputeResiduals();
