@@ -41,6 +41,8 @@ namespace Isis {
    *                       the same as the incoming dn value.
    *   @history 2010-11-30 Janet Barrett - Added ability to use photometric angles
    *                       from the ellipsoid or the DEM
+   *   @history 2011-01-28 Janet Barrett - Fixed NormModelAlgorithm so that it applies 
+   *                       the photometric correction to the incoming dn value
    *
    */
   class NoNormalization : public NormModel {

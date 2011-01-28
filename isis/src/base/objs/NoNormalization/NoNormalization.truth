@@ -14,11 +14,11 @@ End_Object
 End
 
 Test phase=86.7207248, incidence=51.7031305, emission=38.9372914, dn=.0800618902 ...
-Normalization value = 0.0800619
+Normalization value = 1.33208
 
 Test phase=75.7207248, incidence=41.7031305, emission=28.9372914, dn=.6973346110 ...
-Normalization value = 0.697335
+Normalization value = 1.12777
 
 Test phase=53.7187773, incidence=31.7060221, emission=18.9331391, dn=.1942250370 ...
-Normalization value = 0.194225
+Normalization value = 1.01078
 

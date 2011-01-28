@@ -11,7 +11,8 @@ namespace Isis {
   void NoNormalization::NormModelAlgorithm(double phase, double incidence, double emission,
       double demincidence, double dememission, double dn, double &albedo, double &mult,
       double &base) {
-    albedo = dn;
+    // apply the photometric correction
+    albedo = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
   }
 }
 
