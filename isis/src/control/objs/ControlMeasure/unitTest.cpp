@@ -35,7 +35,7 @@ int main() {
 
   d.SetCubeSerialNumber("Test");
   d.SetType(ControlMeasure::Reference);
-  d.SetIgnore(true);
+  d.SetIgnored(true);
   d.SetCoordinate(1.0, 2.0);
   d.SetResidual(-3.0, 4.0);
   d.SetDiameter(15.0);
