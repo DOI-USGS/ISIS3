@@ -443,7 +443,7 @@ namespace Isis {
   bool GroundGrid::GetXY(Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y) {
     if(!GroundMap()) return false;
-    if(!GroundMap()->SetUniversalGround(lat, lon)) return false;
+    if(!GroundMap()->SetUniversalGround(lat.GetDegrees(), lon.GetDegrees())) return false;
     if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
     if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
 
