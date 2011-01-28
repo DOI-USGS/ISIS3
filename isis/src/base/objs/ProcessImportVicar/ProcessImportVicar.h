@@ -54,25 +54,18 @@ namespace Isis {
    *                                          documentation
    *  @history 2008-06-26 Christopher Austin - Added the termination char to
    *           SetVicarFile's buf
+   *  @history 2011-01-27 Jai Rideout - Fixed to handle VICAR files that
+   *           have end labels
    *
-   *  @todo 2005-02-11 Jeff Anderson - add implementation example to class
-   *                                   documentation
-   *  @todo 2005-05-23 Jeff Anderson - Currently VICAR files can not exceed 2GB
-   *                   however, they may in the future so we should remember to
-   *                   look at this
-   *  @todo 2009-12-14 Steven Lambright - No longer using PvlTokenizer and now
-   *                   creating a valid Pvl from the label before creating a Pvl
-   *                   from it
    */
 
   class ProcessImportVicar : public ProcessImport {
 
     public:
-      void SetVicarFile(const std::string &vicarFile, Isis::Pvl &vicarLab);
+      void SetVicarFile(const std::string &vicarFile, Pvl &vicarLab);
 
     private:
-      Isis::Pvl p_vicLab; //!<A PVL object which will contain the vicar labels.
-
+      iString ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const;
   };
 };
 

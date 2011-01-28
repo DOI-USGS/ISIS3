@@ -20,15 +20,13 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "ProcessImportVicar.h"
+
 #include <iostream>
 #include <string>
 #include <sstream>
 
 #include "Preference.h"
-
-#include "ProcessImportVicar.h"
-#include "iException.h"
-#include "iException.h"
 #include "iException.h"
 #include "LineManager.h"
 #include "Pvl.h"
@@ -38,19 +36,16 @@
 #include "UserInterface.h"
 
 using namespace std;
+
 namespace Isis {
   /**
    * Opens a vicar file which can then be immediately imported by invoking the
    * inherited StartProcess method.
    *
    * @param vicarFile Name of the vicar file to open
-   *
    * @param vicarLab A PVL object which will contain the vicar labels.
-   *
-   * @throws Isis::iException::Message
    */
-  void ProcessImportVicar::SetVicarFile(const std::string &vicarFile, Isis::Pvl &vicarLab) {
-
+  void ProcessImportVicar::SetVicarFile(const std::string &vicarFile, Pvl &vicarLab) {
     //  Open vicar file
     ifstream vicFile(vicarFile.c_str(), ios::in);
 
@@ -59,62 +54,14 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
-    // Read the LBLSIZE from Vicar file
     try {
-      //  Convert the LBLSIZE to an integer
-      // theoretically this value is always size 4....
-      char *lblSizeValue = new char [1024];
-      vicFile.seekg(string("LBLSIZE=").size());
+      // get the starting VICAR label and convert to PVL
+      iString vicLabels = ExtractPvlLabel(0, vicFile);
 
-      for(int pos = 0; pos < 1024 - 1; pos++) {
-        if(!vicFile.good())
-          break;
-
-        if(vicFile.peek() == ' ')
-          break;
-
-        lblSizeValue[pos] = vicFile.get();
-        lblSizeValue[pos+1] = '\0';
-
-        // we're totally lost at this point
-        if(pos == 1023) {
-          string msg = "Cannot read vicar file [" + vicarFile + "]";
-          throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
-        }
-      }
-
-      int lblSize = iString(lblSizeValue).ToInteger();
-
-      delete [] lblSizeValue;
-      lblSizeValue = NULL;
-
-      char *buf = new char[lblSize+1];
-
-      //  Read all of VICAR labels
-      vicFile.seekg(0);
-      vicFile.read(buf, lblSize);
-      buf[lblSize] = '\0';
-      vicFile.close();
-
-      // Transform the vicar labels into valid pvl labels
-      iString vicLabels = buf;
-
-      bool inQuote = false;
-      for(unsigned int pos = 0; pos < vicLabels.size(); pos++) {
-        if(vicLabels[pos] == '\'' ||
-            vicLabels[pos] == '"') {
-          inQuote = !inQuote;
-        }
-
-        if(!inQuote && vicLabels[pos] == ' ') {
-          vicLabels[pos] = '\n';
-        }
-      }
-
-      // Fill temp Pvl label for Isis::ProcessImport startprocess
+      // Fill temp Pvl label for ProcessImport startprocess
       stringstream lbl;
       lbl << vicLabels << " End" << endl;
-      Isis::Pvl vLab;
+      Pvl vLab;
       lbl >> vLab;
       vicarLab = vLab;
 
@@ -131,22 +78,22 @@ namespace Isis {
       SetDimensions(vLab["NS"], vLab["NL"], vLab["NB"]);
 
       string pixType = vLab["FORMAT"];
-      Isis::PixelType pixelType = Isis::None;
-      if(pixType == "BYTE") pixelType = Isis::UnsignedByte;
-      if(pixType == "HALF") pixelType = Isis::SignedWord;
-      if(pixType == "REAL") pixelType = Isis::Real;
-      if(pixelType == Isis::None) {
+      Isis::PixelType pixelType = None;
+      if(pixType == "BYTE") pixelType = UnsignedByte;
+      if(pixType == "HALF") pixelType = SignedWord;
+      if(pixType == "REAL") pixelType = Real;
+      if(pixelType == None) {
         string msg = "Unsupported pixel type [FORMAT=" + pixType + "]";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
       SetPixelType(pixelType);
 
       string order = vLab["INTFMT"];
       if(order == "LOW") {
-        SetByteOrder(Isis::Lsb);
+        SetByteOrder(Lsb);
       }
       else {
-        SetByteOrder(Isis::Msb);
+        SetByteOrder(Msb);
       }
 
       string organization = vLab["ORG"];
@@ -160,8 +107,8 @@ namespace Isis {
         SetOrganization(ProcessImport::BIP);
       }
       else {
-        string msg = "Unsupported file organization [ORG=" + organization + "]";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        string msg = "Unsupported file organization [" + organization + "]";
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
       // See if there is end-of-dataset labels
@@ -173,9 +120,13 @@ namespace Isis {
                           (int) vLab["NL"] * (int) vLab["NB"] *
                           (int) vLab["RECSIZE"];
           ifstream vicFile(vicarFile.c_str(), ios::in);
-          vicFile.seekg(startByte, ios::beg);
-          Isis::Pvl endLab;
-          vicFile >> endLab;
+
+          iString endPvlLabel = ExtractPvlLabel(startByte, vicFile);
+          stringstream lbl;
+          lbl << endPvlLabel;
+
+          Pvl endLab;
+          lbl >> endLab;
           vicFile.close();
 
           for(int k = 0; k < endLab.Keywords(); k++) {
@@ -184,11 +135,72 @@ namespace Isis {
         }
       }
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       string msg = "Input file [" + vicarFile + "] does not appear to be a vicar file";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     SetInputFile(vicarFile);
   }
-} // end namespace isis
+
+  /**
+   * Returns a valid PVL label based on the start position in the VICAR file.
+   *
+   * @param startPos the position to start reading the label
+   * @param vicarFile the file stream to read from
+   *
+   * @return a valid PVL label
+   */
+  iString ProcessImportVicar::ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const {
+    vicarFile.seekg(startPos, ios::beg);
+
+    // convert the LBLSIZE to an integer
+    char *lblSizeValue = new char [1024];
+    vicarFile.seekg(string("LBLSIZE=").size(), ios_base::cur);
+
+    for(int pos = 0; pos < 1024 - 1; pos++) {
+      if(!vicarFile.good())
+        break;
+
+      if(vicarFile.peek() == ' ')
+        break;
+
+      lblSizeValue[pos] = vicarFile.get();
+      lblSizeValue[pos + 1] = '\0';
+
+      // we're totally lost at this point
+      if(pos == 1023) {
+        string msg = "Cannot find label size in VICAR file";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+    }
+
+    int lblSize = iString(lblSizeValue).ToInteger();
+    delete [] lblSizeValue;
+    lblSizeValue = NULL;
+
+    char *buf = new char[lblSize+1];
+
+    //  Read end vicar label
+    vicarFile.seekg(startPos, ios::beg);
+    vicarFile.read(buf, lblSize);
+    buf[lblSize] = '\0';
+    vicarFile.close();
+
+    // Transform the vicar labels into valid pvl labels
+    iString vicLabels = buf;
+
+    bool inQuote = false;
+    for(unsigned int pos = 0; pos < vicLabels.size(); pos++) {
+      if(vicLabels[pos] == '\'' || vicLabels[pos] == '"') {
+        inQuote = !inQuote;
+      }
+
+      if(!inQuote && vicLabels[pos] == ' ') {
+        vicLabels[pos] = '\n';
+      }
+    }
+
+    return vicLabels;
+  }
+} // end namespace Isis
