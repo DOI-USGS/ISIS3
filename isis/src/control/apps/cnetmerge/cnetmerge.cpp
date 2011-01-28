@@ -89,7 +89,8 @@ void IsisMain() {
         e.Clear();
 
         // There was no duplicate point so transfer the point directly
-        destinationNet.AddPoint(sourcePoint);
+        ControlPoint * cp = new ControlPoint(*sourcePoint);
+        destinationNet.AddPoint(cp);
         // dupPoint should be null if this happened
       }
 
