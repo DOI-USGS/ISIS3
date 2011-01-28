@@ -90,8 +90,13 @@ namespace Isis {
   QList< QString > ControlSerialNumber::GetPointIds() const {
     return measures->keys();
   }
-
-
+  
+  
+  QList< ControlMeasure * > ControlSerialNumber::GetMeasures() const {
+    return measures->values();
+  }
+  
+  
   ControlMeasure *ControlSerialNumber::GetMeasure(iString pointId) {
     if (!measures->contains(pointId)) {
       iString msg = "point Id [";

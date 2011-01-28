@@ -62,6 +62,7 @@ namespace Isis {
       iString GetSerialNumber();
       int GetNumMeasures();
       QList< QString > GetPointIds() const;
+      QList< ControlMeasure * > GetMeasures() const;
 
       ControlMeasure *GetMeasure(iString pointId);
       const ControlMeasure *GetMeasure(iString pointId) const;
