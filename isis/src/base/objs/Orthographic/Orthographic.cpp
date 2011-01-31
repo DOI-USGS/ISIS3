@@ -67,8 +67,8 @@ namespace Isis {
       // Get the center longitude  & latitude
       p_centerLongitude = mapGroup["CenterLongitude"];
       p_centerLatitude = mapGroup["CenterLatitude"];
-      if(this->IsPlanetocentric()) {
-        p_centerLatitude = this->ToPlanetographic(p_centerLatitude);
+      if(IsPlanetocentric()) {
+        p_centerLatitude = ToPlanetographic(p_centerLatitude);
       }
 
       // convert to radians, adjust for longitude direction
@@ -80,6 +80,68 @@ namespace Isis {
       sinph0 = sin(p_centerLatitude);
       cosph0 = cos(p_centerLatitude);
 
+      // This projection has a limited lat/lon range (can't do the world)
+      //   So let's make sure that our lat/lon range is properly restricted!
+      // The equation: sinph0 * sinphi + cosph0 * cosphi * coslon tells us
+      // if we are inside of the projection.
+      //
+      // sinph0 = sin(center lat)
+      // sinphi = sin(lat)
+      // cosph0 = cos(center lat)
+      // cosphi = cos(lat)
+      // coslon = cos(lon - centerLon)
+      //
+      // Let's apply this equation at the extremes to minimize our lat/lon range
+      double sinphi, cosphi, coslon;
+
+      // Can we project at the minlat, center lon? If not, then we should move
+      // up the min lat to be inside the image.
+      sinphi = sin(p_minimumLatitude * Isis::PI / 180.0);
+      cosphi = cos(p_minimumLatitude * Isis::PI / 180.0);
+      coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
+      if(sinph0 * sinphi + cosph0 * cosphi * coslon < 1E-10) {
+        // solve for x: a * sin(x) + b * cos(x) * 1 = 0
+        // a * sin(x) + b * cos(x) = 0
+        // a * sin(x) = - b * cos(x)
+        // -(a * sin(x)) / b = cos(x)
+        // -(a / b) = cos(x) / sin(x)
+        // -(b / a) = sin(x) / cos(x)
+        // -(b / a) = tan(x)
+        // arctan(-(b / a)) = x
+        // arctan(-(cosph0 / sinph0)) = x
+        double newMin = atan2(- cosph0, sinph0) * 180.0 / PI;
+        if(newMin > p_minimumLatitude) {
+          p_minimumLatitude = newMin;
+        } // else something else is off (i.e. longitude range)
+      }
+
+      sinphi = sin(p_minimumLatitude * Isis::PI / 180.0);
+      cosphi = cos(p_minimumLatitude * Isis::PI / 180.0);
+
+      // Can we project at the maxlat, center lon? If not, then we should move
+      // down the max lat to be inside the image.
+      sinphi = sin(p_maximumLatitude * Isis::PI / 180.0);
+      cosphi = cos(p_maximumLatitude * Isis::PI / 180.0);
+      coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
+      if(sinph0 * sinphi + cosph0 * cosphi * coslon < 1E-10) {
+        // see above equations for latitude
+        double newMax = atan2(- cosph0, sinph0) * 180.8 / PI;
+        if(newMax < p_maximumLatitude && newMax > p_minimumLatitude) {
+          p_maximumLatitude = newMax;
+        } // else something else is off (i.e. longitude range)
+      }
+
+      // If we are looking at the side of the planet (clat = 0), then make sure
+      // the longitude range is limited to 90 degrees to either direction
+      if(p_centerLatitude == 0.0) {
+        if(p_maximumLongitude - p_centerLongitude * 180.0 / PI > 90) {
+          p_maximumLongitude = (p_centerLongitude * 180.0 / PI) + 90;
+        }
+
+        if(p_centerLongitude * 180.0 / PI - p_minimumLongitude > 90) {
+          p_minimumLongitude = (p_centerLongitude * 180.0 / PI) - 90;
+        }
+      }
     }
     catch(Isis::iException &e) {
       string message = "Invalid label group [Mapping]";
@@ -131,6 +193,7 @@ namespace Isis {
     // Compute the coordinates
     double x = p_equatorialRadius * cosphi * sin(deltaLon);
     double y = p_equatorialRadius * (cosph0 * sinphi - sinph0 * cosphi * coslon);
+
     SetComputedXY(x, y);
     p_good = true;
     return p_good;
@@ -246,8 +309,11 @@ namespace Isis {
     XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
     XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
 
+//cout << " ************ WALK LATITUDE ******************\n";
+//cout << "MIN LAT: " << p_minimumLatitude << " MAX LAT: " << p_maximumLatitude << "\n";
     // Walk top and bottom edges
     for(lat = p_minimumLatitude; lat <= p_maximumLatitude; lat += 0.01) {
+//cout << "WALKED A STEP - lat: " << lat << "\n";
       lat = lat;
       lon = p_minimumLongitude;
       XYRangeCheck(lat, lon);
@@ -255,8 +321,10 @@ namespace Isis {
       lat = lat;
       lon = p_maximumLongitude;
       XYRangeCheck(lat, lon);
+//cout << "MIN LAT: " << p_minimumLatitude << " MAX LAT: " << p_maximumLatitude << "\n";
     }
 
+//cout << " ************ WALK LONGITUDE ******************\n";
     // Walk left and right edges
     for(lon = p_minimumLongitude; lon <= p_maximumLongitude; lon += 0.01) {
       lat = p_minimumLatitude;
@@ -273,10 +341,23 @@ namespace Isis {
       double x = p_equatorialRadius * cos(angle * Isis::PI / 180.0);
       double y = p_equatorialRadius * sin(angle * Isis::PI / 180.0);
       if(SetCoordinate(x, y) == 0) {
-        if(p_latitude > p_maximumLatitude) continue;
-        if(p_longitude > p_maximumLongitude) continue;
-        if(p_latitude < p_minimumLatitude) continue;
-        if(p_longitude < p_minimumLongitude) continue;
+        if(p_latitude > p_maximumLatitude) {
+          continue;
+        }
+        if(p_longitude > p_maximumLongitude) {
+          continue;
+        }
+        if(p_latitude < p_minimumLatitude) {
+          continue;
+        }
+        if(p_longitude < p_minimumLongitude) {
+          continue;
+        }
+
+        if(p_minimumX > x) p_minimumX = x;
+        if(p_maximumX < x) p_maximumX = x;
+        if(p_minimumY > y) p_minimumY = y;
+        if(p_maximumY < y) p_maximumY = y;
         XYRangeCheck(p_latitude, p_longitude);
       }
     }

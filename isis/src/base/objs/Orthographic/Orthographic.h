@@ -49,6 +49,12 @@ namespace Isis {
    *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes and
    *                                          MappingLongitudes methods.
    *   @history 2008-05-09 Steven Lambright - Added Name, Version methods
+   *   @history 2011-01-31 Steven Lambright - Improved ability to work with
+   *                                    lat/lon ranges outside of what is
+   *                                    possible to project. Now a lat,lon range
+   *                                    of -90 to 90, 0 to 360 works. Improved
+   *                                    XYRange method to have a better chance
+   *                                    at success.
    */
   class Orthographic : public Isis::Projection {
     public:
