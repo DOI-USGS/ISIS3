@@ -26,10 +26,10 @@ XCoord:                 -0.150383733
 YCoord:                 -0.165191103
 
 Test XYRange method ... 
-Minimum X:  -0.984807753
-Maximum X:  0.342020143
-Minimum Y:  -0.264516875
-Maximum Y:  0.939692621
+Minimum X:  -1
+Maximum X:  1
+Minimum Y:  -1
+Maximum Y:  1
 
 Test Name and comparision method ... 
 Name:       Orthographic
