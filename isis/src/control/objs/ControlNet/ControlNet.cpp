@@ -434,11 +434,9 @@ namespace Isis
     pbnet.set_username(p_userName);
 
     //  Now create ControlPoints
-    QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext())
+    for (int i = 0; i < pointIds->size(); i++)
     {
-      i.next();
-      ControlPoint * point = i.value();
+      ControlPoint * point = points->value(pointIds->at(i));
       *pbnet.add_points() = point->ToProtocolBuffer();
       *logData.add_points() = point->GetLogProtocolBuffer();
     }
@@ -531,11 +529,10 @@ namespace Isis
     net += PvlKeyword("LastModified", p_modified);
     net += PvlKeyword("Description", p_description);
 
-    QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext())
+    for (int i = 0; i < pointIds->size(); i++)
     {
-      i.next();
-      PvlObject cp = i.value()->ToPvlObject();
+      ControlPoint * point = points->value(pointIds->at(i));
+      PvlObject cp = point->ToPvlObject();
       net.AddObject(cp);
     }
     
