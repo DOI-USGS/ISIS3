@@ -44,12 +44,14 @@
 
       <tr>
         <td>LongitudeDomain</td>
-        <td>Normally, 360.  However, if the cube crosses the longitude boundary the value will change to 180</td>
+        <td>Normally, 360.  However, if the 180 domain causes less area to need to be projected then 180.</td>
       </tr>
 
       <tr>
         <td>MinimumLatitude<br />MaximumLatitude<br />MinimumLongitude<br />MaximumLongitude</td>
-        <td>Computed from the input cube or read from the map file.   However, any combination of the four values can then be overridden by the user</td>
+        <td>Computed from the input cube or read from the map file.   However, any combination of the four values can then be overridden by the user.
+          The values the user specifies are expected to be in the coodinate
+          system of the projection.</td>
       </tr>
 
       <tr>
@@ -213,6 +215,9 @@
      </change>
      <change name="Travis Addair" date="2009-08-10">
        Mapping group parameters are now placed into the print file.
+     </change>
+     <change name="Steven Lambright" date="2011-01-31">
+       Improved documentation
      </change>
   </history>
 
