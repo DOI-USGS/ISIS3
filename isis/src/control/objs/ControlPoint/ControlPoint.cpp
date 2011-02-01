@@ -1803,9 +1803,8 @@ namespace Isis {
       }
     }
 
-    QList<QString> keys = p_measures->keys();
-    for (int i = 0; i < keys.size(); i++)
-      p.AddGroup((*p_measures)[keys[i]]->CreatePvlGroup());
+    for (int i = 0; i < cubeSerials->size(); i++)
+      p.AddGroup((*p_measures)[cubeSerials->at(i)]->CreatePvlGroup());
 
     return p;
   }
@@ -2250,10 +2249,8 @@ namespace Isis {
     }
 
     //  Process all measures in the point
-    QList< QString > keys = p_measures->keys();
-    for (int meas = 0 ; meas < keys.size() ; meas++) {
-      *pbPoint.add_measures() = (*p_measures)[keys[meas]]->ToProtocolBuffer();
-    }
+    for (int i = 0; i < cubeSerials->size(); i++)
+      *pbPoint.add_measures() = (*p_measures)[cubeSerials->at(i)]->ToProtocolBuffer();
 
     return pbPoint;
   }
