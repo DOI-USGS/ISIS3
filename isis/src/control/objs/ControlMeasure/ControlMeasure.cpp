@@ -715,7 +715,7 @@ namespace Isis {
       return *p_chooserName;
     }
     else {
-      return Application::Name();
+      return Filename(Application::Name()).Name();
     }
   }
 
@@ -1145,8 +1145,8 @@ namespace Isis {
       p_chooserName = NULL;
     }
     if (p_dateTime) {
-      delete p_chooserName;
-      p_chooserName = NULL;
+      delete p_dateTime;
+      p_dateTime = NULL;
     }
     if (p_loggedData) {
       delete p_loggedData;
