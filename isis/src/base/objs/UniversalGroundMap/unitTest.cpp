@@ -39,7 +39,9 @@ int main(int argc, char *argv[]) {
         cout << "Line = " << ugm.Line() << endl << endl;
       }
       if (ugm.SetGround(SurfacePoint(Latitude(ugm.UniversalLatitude()),
-                                     Longitude(ugm.UniversalLongitude()), Isis::Distance()))) {
+                                     Longitude(ugm.UniversalLongitude()),
+                                     Distance(ugm.Camera()->LocalRadius(),
+                                     Distance::Meters)))) {
         cout << "Sample = " << ugm.Sample() << endl;
         cout << "Line = " << ugm.Line() << endl << endl;
       }
