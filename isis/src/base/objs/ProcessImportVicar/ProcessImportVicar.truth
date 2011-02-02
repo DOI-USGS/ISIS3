@@ -1,94 +1,262 @@
 hist: Importing
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-LBLSIZE                        = 4096
-FORMAT                         = REAL
-TYPE                           = IMAGE
-BUFSIZ                         = 24576
-DIM                            = 3
-EOL                            = 0
-RECSIZE                        = 4096
-ORG                            = BSQ
-NL                             = 1024
-NS                             = 1024
-NB                             = 1
-N1                             = 1024
-N2                             = 1024
-N3                             = 1
-N4                             = 0
-NBB                            = 0
-NLB                            = 0
-HOST                           = DECSTATN
-INTFMT                         = LOW
-REALFMT                        = RIEEE
-BHOST                          = DECSTATN
-BINTFMT                        = LOW
-BREALFMT                       = RIEEE
-BLTYPE                         = CAS-ISS2
-PROPERTY                       = COMPRESSION
-ANTIBLOOMING_STATE_FLAG        = ON
-CALIBRATION_LAMP_STATE_FLAG    = N/A
-DELAYED_READOUT_FLAG           = NO
-DETECTOR_TEMPERATURE           = -89.2435
-EXPOSURE_DURATION              = 820.0
-FILTER_NAME                    = (P0, UV3)
-FILTER_TEMPERATURE             = -0.468354
-FLIGHT_SOFTWARE_VERSION_ID     = 1.2
-GAIN_MODE_ID                   = "29 ELECTRONS PER DN"
-INSTRUMENT_DATA_RATE           = 182.784
-INSTRUMENT_MODE_ID             = FULL
-LIGHT_FLOOD_STATE_FLAG         = ON
-OPTICS_TEMPERATURE             = 0.712693
-PREPARE_CYCLE_INDEX            = 0
-READOUT_CYCLE_INDEX            = 11
-SENSOR_HEAD_ELEC_TEMPERATURE   = 1.63302
-SHUTTER_MODE_ID                = NACONLY
-SHUTTER_STATE_ID               = ENABLED
-BIAS_STRIP_MEAN                = 6.59002
-DARK_STRIP_MEAN                = 0.0
-DATA_CONVERSION_TYPE           = TABLE
-MISSING_LINES                  = 0
-CALIBRATION_LAMP_DURATION      = 0.0
-COMMAND_FILE_NAME              = ISS_C23EU_EUR1X1004_VIMS_B.icf
-COMMAND_SEQUENCE_NUMBER        = 625
-ELECTRONICS_BIAS               = 112
-PARALLEL_CLOCK_VOLTAGE_INDEX   = 9
-DATA_SET_ID                    = CO-J/JSA-ISS-2/3-EDR-V1.0
-IMAGE_NUMBER                   = 1356768698
-IMAGE_OBSERVATION_TYPE         = SCIENCE
-IMAGE_TIME                     = 2000-364T08:00:01.352Z
-INSTRUMENT_HOST_NAME           = "CASSINI ORBITER"
-INSTRUMENT_ID                  = ISSNA
-INSTRUMENT_NAME                = "IMAGING SCIENCE SUBSYSTEM NARROW ANGLE"
-MISSION_NAME                   = CASSINI
-MISSION_PHASE_NAME             = "EARTH-JUPITER CRUISE"
-NOTE                           = N/A
-OBSERVATION_ID                 = VIMS_C23EU_EUR1X1004_PRIME
-PRODUCT_CREATION_TIME          = 2001-002T10:58:08.000Z
-PRODUCT_ID                     = 1_N1356768698.123
-PRODUCT_VERSION_TYPE           = FINAL
-SEQUENCE_ID                    = C23
-SEQUENCE_TITLE                 = Europa_Lon
-SPACECRAFT_CLOCK_CNT_PARTITION = 1
-SPACECRAFT_CLOCK_START_COUNT   = 1356768697.168
-SPACECRAFT_CLOCK_STOP_COUNT    = 1356768698.123
-START_TIME                     = 2000-364T08:00:00.532Z
-STOP_TIME                      = 2000-364T08:00:01.352Z
-TARGET_NAME                    = EUROPA
-EARTH_RECEIVED_START_TIME      = 2000-365T04:28:13.001Z
-EARTH_RECEIVED_STOP_TIME       = 2000-365T04:28:32.159Z
-MISSING_PACKET_FLAG            = NO
-SOFTWARE_VERSION_ID            = "ISS V7.0 11-22-2000"
-INST_CMPRS_PARAM               = (N/A, N/A, N/A, N/A)
-INST_CMPRS_RATIO               = 5.32396
-INST_CMPRS_TYPE                = LOSSLESS
-TASK                           = CISSCAL
-USER                           = doug
-DAT_TIM                        = "Thu Jul 10 13:53:21 2003"
-CISSCAL_CORRECTION_FACTOR      = 1
-CISSCAL_CORRECTION_FACTOR_FILE = correctionfactors.1
-CISSCAL_WTIM                   = "Thu Jul 10 13:54:00 2003"
+LBLSIZE                       = 7140
+FORMAT                        = BYTE
+TYPE                          = IMAGE
+BUFSIZ                        = 20480
+DIM                           = 3
+EOL                           = 1
+RECSIZE                       = 1428
+ORG                           = BSQ
+NL                            = 15792
+NS                            = 1428
+NB                            = 1
+N1                            = 1428
+N2                            = 15792
+N3                            = 1
+N4                            = 0
+NBB                           = 0
+NLB                           = 0
+HOST                          = X86-LINUX
+INTFMT                        = LOW
+REALFMT                       = RIEEE
+BHOST                         = X86-LINUX
+BINTFMT                       = LOW
+BREALFMT                      = RIEEE
+BLTYPE                        = M94_HRSC
+PROPERTY                      = M94_ORBIT
+ORBIT_NUMBER                  = 8
+ASCENDING_NODE_LONGITUDE      = 228.77
+ORBITAL_ECCENTRICITY          = 0.717
+ORBITAL_INCLINATION           = 86.61
+PERIAPSIS_ARGUMENT_ANGLE      = 358.12
+PERIAPSIS_TIME                = "2004 JAN 09 13:25:23Z"
+PERIAPSIS_ALTITUDE            = 273.77
+SPACECRAFT_SOLAR_DISTANCE     = 2.222e+08
+SPACECRAFT_CLOCK_START_COUNT  = 1/0021734746.32204
+SPACECRAFT_CLOCK_STOP_COUNT   = 1/0021734995.56285
+START_TIME                    = 2004-01-09T13:26:14.567Z
+STOP_TIME                     = 2004-01-09T13:29:28.852Z
+PROPERTY                      = M94_CAMERAS
+CLOCK_ID                      = 0
+PARAMETER_SEQUENCE_NUMBER     = 2
+PMEM_FILE_NAME                = scivis3.prm
+SIGNAL_CHAIN_ID               = 2
+INST_CMPRS_RATIO              = 50.4256
+INST_CMPRS_QUANTZ_TBL_ID      = 0
+INST_CMPRS_QUALITY            = 3
+INST_CMPRS_NAME               = DCT
+MACROPIXEL_SIZE               = 4
+PIXEL_SUBSAMPLING_FLAG        = N
+SAMPLE_FIRST_PIXEL            = 80
+PROPERTY                      = FILE
+DATA_SET_ID                   = MEX-M-HRSC-3-RDR-V1.0
+EVENT_TYPE                    = MARS-REGIONAL-MAPPING-Vo-Im-Tc
+FILE_NAME                     = h0008_0009.gr3.01
+PRODUCT_ID                    = h0008_0009.gr3.01
+PROCESSING_LEVEL_ID           = 3
+PROPERTY                      = M94_INSTRUMENT
+MISSION_NAME                  = MARS_EXPRESS
+INSTRUMENT_HOST_NAME          = MARS_EXPRESS
+INSTRUMENT_HOST_ID            = MEX
+INSTRUMENT_NAME               = HIGH_RESOLUTION_STEREO_CAMERA
+INSTRUMENT_ID                 = HRSC
+DETECTOR_ID                   = MEX_HRSC_GREEN
+MISSION_PHASE_NAME            = Null
+PROPERTY                      = FOOTPRINT
+FOOTPRINT_POINT_LATITUDE      = (1.471961944940766, 1.470126481578147,
+                                 1.469577293849379, 1.467741354296974,
+                                 1.467426278880859, 1.466691462556849,
+                                 1.466309526949087, 1.465940605696979,
+                                 1.465509206851734, 1.462208608451784,
+                                 1.461808800593676, 1.454795432127752,
+                                 1.454453601822663, 1.450766051613123,
+                                 1.450409140510686, 1.447080731081586,
+                                 1.446647210723375, 1.44330507760405,
+                                 1.442815385262566, 1.439104810052095,
+                                 1.438606544871205, 1.435227949768081,
+                                 1.434704234106521, 1.43245419036097,
+                                 1.431945855311053, 1.431569228310195,
+                                 1.432188010104817, 1.561132537485806,
+                                 1.818615169159907, 1.947213752877929,
+                                 2.075911757848758, 2.204697266322185,
+                                 2.46237175711541, 2.590697579211914,
+                                 2.976136124940257, 3.233114366043235,
+                                 3.361453864568179, 3.48984029242111,
+                                 3.617999688002517, 3.746344779712286,
+                                 3.874513018976663, 6.051847929986353,
+                                 6.307171034266483, 6.690151082259232,
+                                 8.124286358422539, 9.708166133390174,
+                                 11.33259330149328, 11.87624738872867,
+                                 12.011867289603, 12.14792981529052,
+                                 13.83190593456705, 14.71820775915534,
+                                 14.74620465794776, 14.74652058295361,
+                                 14.74684954505143, 14.75339901780487,
+                                 14.75429482619192, 14.75361295737969,
+                                 14.46478412068353, 14.175682593102,
+                                 13.88780402480292, 13.74803561494464,
+                                 13.1880449585154, 12.90748975889175,
+                                 12.06802607610441, 11.52488377807487,
+                                 11.25284238757691, 10.43503570813822,
+                                 10.02743908310782, 9.369453123838296,
+                                 8.577727377886637, 7.916469135793901,
+                                 7.129065400322038, 6.363989798824739,
+                                 5.725278181036616, 5.597246258078181,
+                                 5.469542624702366, 4.957619361105702,
+                                 4.573196454309144, 4.44509778104443,
+                                 4.317007803441805, 4.188743894607426,
+                                 4.060507080537312, 3.932293400958486,
+                                 3.803836265153079, 3.67553048119727,
+                                 3.547133408506012, 3.419046480588155,
+                                 3.291041129352185, 3.16295201837529,
+                                 2.905483567496213, 2.777384980503605,
+                                 2.648872675341565, 2.391342769761655,
+                                 2.262746661499333, 2.005326726783649,
+                                 1.747692840559667, 1.619031767905202,
+                                 1.490476341771878, 1.471961944940766)
+FOOTPRINT_POINT_LONGITUDE     = (91.20260899087864, 91.15754877294442,
+                                 91.14894264209016, 91.10389078965078,
+                                 91.09478125809626, 91.07678836525628,
+                                 91.06782348755424, 91.05882998502801,
+                                 91.04995272643139, 90.96899475633359,
+                                 90.96004132829978, 90.78904959887937,
+                                 90.78004603195259, 90.6902824462916,
+                                 90.68130625816565, 90.60055937744328,
+                                 90.5915765828243, 90.51084876782153,
+                                 90.50181559278532, 90.41210890317576,
+                                 90.40301258553588, 90.3221327267707,
+                                 90.31296536010626, 90.25907220336842,
+                                 90.24989255094683, 90.24090590138759,
+                                 90.23866065005254, 90.23884854647247,
+                                 90.23867344873454, 90.23840476266797,
+                                 90.23831211673038, 90.23837792856396,
+                                 90.2387461441588, 90.2381973448493,
+                                 90.23742849937108, 90.23710194931795,
+                                 90.23676241532191, 90.23652787114504,
+                                 90.23598624427264, 90.23576030762213,
+                                 90.23530480393943, 90.23165941197513,
+                                 90.23087719040903, 90.23009323686063,
+                                 90.2256209393223, 90.21935363540079,
+                                 90.21116755945268, 90.20803631104192,
+                                 90.20707111337785, 90.20640064989902,
+                                 90.19563277759815, 90.18931135451167,
+                                 91.12745293580157, 91.13909057310855,
+                                 91.15071197837887, 91.39541341184075,
+                                 91.43051577956639, 91.43434911741595,
+                                 91.4262770216606, 91.41802809626047,
+                                 91.4105619362017, 91.40684995541206,
+                                 91.39242585599298, 91.38551398377768,
+                                 91.3655519487603, 91.35326479692101,
+                                 91.34737272615041, 91.33032359709289,
+                                 91.32216762999626, 91.30954124568893,
+                                 91.29576336050033, 91.28485509683475,
+                                 91.27260902595883, 91.26158810031356,
+                                 91.25295098245009, 91.25171276748664,
+                                 91.24956839018003, 91.24303818513305,
+                                 91.2385988222527, 91.23687679840199,
+                                 91.23506742321977, 91.23363027491349,
+                                 91.23206203655371, 91.23037415271843,
+                                 91.2292358031451, 91.22765913898095,
+                                 91.22625322475893, 91.22401530438093,
+                                 91.22151924229591, 91.21917975462905,
+                                 91.21756727241322, 91.21509950531646,
+                                 91.21361570567956, 91.21176680488321,
+                                 91.21035415616302, 91.20796737958395,
+                                 91.20594993752218, 91.20449653168765,
+                                 91.20274472513059, 91.20260899087864)
+PROPERTY                      = MAP
+TARGET_NAME                   = MARS
+MAP_PROJECTION_TYPE           = SINUSOIDAL
+COORDINATE_SYSTEM_NAME        = PLANETOGRAPHIC
+POSITIVE_LONGITUDE_DIRECTION  = EAST
+A_AXIS_RADIUS                 = 3396.19
+B_AXIS_RADIUS                 = 3396.19
+C_AXIS_RADIUS                 = 3376.2
+BODY_LONG_AXIS                = 0.0
+MAP_SCALE                     = 0.05
+CENTER_LATITUDE               = 0.0
+CENTER_LONGITUDE              = 91.0
+SPHERICAL_AZIMUTH             = 0.0
+CARTESIAN_AZIMUTH             = 0.0
+LINE_PROJECTION_OFFSET        = 17488.0
+SAMPLE_PROJECTION_OFFSET      = 929.0
+PROPERTY                      = PHOT
+PHO_FUNC                      = NONE
+TASK                          = HRCONVER
+USER                          = mexsyst
+DAT_TIM                       = "Sun Jan 11 11:44:40 2004"
+SPICE_FILE_NAME               = (naif0007.tls, mex_031209_step.tsc,
+                                 ORMM_PSTPIX_DA_031222180906_00038.orb)
+SPICE_FILE_ID                 = (LSK,SCLK,ON)
+DETECTOR_TEMPERATURE          = 19.7978
+DETECTOR_TEMPERATURE__UNIT    = degC
+FOCAL_PLANE_TEMPERATURE       = 9.195
+FOCAL_PLANE_TEMPERATURE__UNIT = degC
+INSTRUMENT_TEMPERATURE        = 13.6808
+INSTRUMENT_TEMPERATURE__UNIT  = degC
+LENS_TEMPERATURE              = 9.3989
+LENS_TEMPERATURE__UNIT        = degC
+SOURCE_FILE_NAME              = o0008_img_2004-009T142629Z_hrsc_2
+MISSING_FRAMES                = 0
+OVERFLOW_FRAMES               = 0
+ERROR_FRAMES                  = 0
+TASK                          = HRCATLAB
+USER                          = mexsyst
+DAT_TIM                       = "Sun Jan 11 11:49:37 2004"
+OBJ_ID                        = -1073763568
+TASK                          = HRCAL
+USER                          = mexsyst
+DAT_TIM                       = "Sun Jan 11 11:52:42 2004"
+PROCESSING_HISTORY_TEXT       = "hrcal v3.19  19.12.2003"
+BLEMISH_FILE_NAME             = h2egr_04.cal
+DARK_CURRENT_FILE_NAME        = h2dgr_04.cal
+RESPONSE_FILE_NAME            = h2pgr_04.cal
+GAIN_FILE_NAME                = h2vgr_04.cal
+MINIMUM                       = 0
+MAXIMUM                       = 101
+MEAN                          = 90.3996
+STANDARD_DEVIATION            = 2.43236
+RADIANCE_SCALING_FACTOR       = 6.72615e-07
+RADIANCE_OFFSET               = 0.0
+REFLECTANCE_SCALING_FACTOR    = 0.000299593
+CENTER_FILTER_WAVELENGTH      = 538.0
+BANDWIDTH                     = 88.0
+ABSOLUTE_FLUX_CALIB_FLAG      = Y
+DARK_CURRENT_CORRECTION_FLAG  = Y
+FLAT_FIELD_CORRECTION_FLAG    = Y
+OVERFLOW_VALUE                = -8
+TASK                          = HRFOOT
+USER                          = mexsyst
+DAT_TIM                       = "Sun Jan 11 12:24:11 2004"
+EXTORI_FILE_NAME              = h0008_0009.gr2.01_ext
+SPICE_FILE_NAME               = mars_iau2000_v0.tpc
+SPICE_FILE_ID                 = PCK
+GEOMETRIC_CALIB_FILE_NAME     = h2ggr_01.cal
+BEST_GROUND_SAMPLING_DISTANCE = 0.0444
+CENTRIC_LATITUDE_AT_CENTER    = 7.88798
+LBLSIZE                       = 1428
+EASTERN_LONGITUDE_AT_CENTER   = 90.7541
+SPACECRAFT_ORIENTATION        = (0.0, 1.0, 0.0)
+SPACECRAFT_REFERENCE_FRAME    = "S/C REFERENCE FRAME"
+TASK                          = DLRTO8
+USER                          = mexsyst
+DAT_TIM                       = "Sun Jan 11 14:36:31 2004"
+RADIANCE_SCALING_FACTOR       = 2.66408e-07
+RADIANCE_OFFSET               = 0.0
+TASK                          = HRORTHO
+USER                          = mexsyst
+DAT_TIM                       = "Sun Jan 11 14:36:32 2004"
+DTM_NAME                      = /vicsys/data/mars_5km.dtm
+START_INPUT_LINE              = 1
+NUMBER_OF_INPUT_LINES         = 18128
+INTERPOLATION_TYPE            = BILINEAR_INTERPOLATION
+ANCHORPOINT_DISTANCE          = 5
+EXTORI_FILE_NAME              = h0008_0009.gr2.01_ext
+SPICE_FILE_NAME               = mars_iau2000_v0.tpc
+SPICE_FILE_ID                 = PCK
+GEOMETRIC_CALIB_FILE_NAME     = h2ggr_01.cal
 End
 hist: Gathering statistics
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
--0.00156779
-9.824e-05
+226.411
+33.6794
