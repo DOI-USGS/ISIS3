@@ -416,7 +416,6 @@ namespace Isis {
         }
       }
       catch (iException &e) {
-        e.Report();
         iString msg = "Unable to add Control Measure to ControlPoint [" +
                       GetId() + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -514,9 +513,14 @@ namespace Isis {
       iString msg = "index [" + iString(index) + "] out of bounds";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
+  
 
     iString serialNumber = cubeSerials->at(index);
-    Delete(serialNumber);
+    validateMeasure(serialNumber, true);
+
+    PointModified();
+    p_measures->remove(cubeSerials->at(index));
+    cubeSerials->removeAt(index);
   }
 
 
