@@ -11,3 +11,4 @@ commands:
 	           flatfile=$(OUTPUT)/PSP_001446_1790_RED.flat.txt \
 	           cnetfile=$(OUTPUT)/PSP_001446_1790_RED.net > /dev/null; \
 	cnetbin2pvl from=$(OUTPUT)/PSP_001446_1790_RED.net to=$(OUTPUT)/PSP_001446_1790_RED.pvl
+	$(RM) $(OUTPUT)/PSP_001446_1790_RED.net
