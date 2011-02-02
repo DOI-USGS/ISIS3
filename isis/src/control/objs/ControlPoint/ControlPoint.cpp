@@ -514,13 +514,7 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   
-
-    iString serialNumber = cubeSerials->at(index);
-    validateMeasure(serialNumber, true);
-
-    PointModified();
-    p_measures->remove(cubeSerials->at(index));
-    cubeSerials->removeAt(index);
+    Delete(cubeSerials->at(index));
   }
 
 
