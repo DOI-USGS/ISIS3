@@ -425,7 +425,8 @@ namespace Isis {
 
 
   /**
-   * Add a measurement to the control point
+   * Add a measurement to the control point, taking ownership of the measure in
+   * the process.
    *
    * @param measure The ControlMeasure to add
    */
