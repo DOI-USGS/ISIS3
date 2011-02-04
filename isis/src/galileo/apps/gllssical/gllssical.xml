@@ -82,6 +82,14 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
+    <change name="Janet Barrett" date="2011-02-02">
+      Fixed the calculateScaleFactor subroutine so that it uses the CalTargetCode
+      instead of the TargetName to determine which radiometric scale factors to 
+      obtain from the $galileo/calibration/conversionFactors_v???.sav file. Also,
+      had to subtract 1 from the getGainModeID value because the GainRatio
+      values are zero based and the gain mode id is 1 based.
+      based.
+    </change>
   </history>
 
   <groups>     

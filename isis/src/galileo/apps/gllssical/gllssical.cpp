@@ -358,7 +358,7 @@ void calculateScaleFactor(Cube *icube, Cube *gaincube) {
 
     // Match target name
     if(currGrp.HasKeyword("TargetName")) {
-      if(icube->GetGroup("Instrument")["TargetName"][0].find(currGrp["TargetName"][0]) != 0) {
+      if(icube->GetGroup("Archive")["CalTargetCode"][0].find(currGrp["TargetName"][0]) != 0) {
         continue;
       }
     }
@@ -367,7 +367,7 @@ void calculateScaleFactor(Cube *icube, Cube *gaincube) {
     if(currGrp.HasKeyword("MinimumTargetName")) {
       try {
         if((int)currGrp["MinimumTargetName"] >
-            (int)(iString)icube->GetGroup("Instrument")["TargetName"][0].substr(0, 2)) {
+            (int)(iString)icube->GetGroup("Archive")["CalTargetCode"][0].substr(0, 2)) {
           continue;
         }
       }
@@ -408,8 +408,8 @@ void calculateScaleFactor(Cube *icube, Cube *gaincube) {
   a2 = (s2 / s1) / pow(rsun, 2);
 
   scaleFactor0 = s1 * (
-                   (double)conversionFactors["GainRatios"][getGainModeID(icube)] /
-                   (double)conversionFactors["GainRatios"][getGainModeID(gaincube)]) * pow(rsun, 2);
+                   (double)conversionFactors["GainRatios"][getGainModeID(icube)-1] /
+                   (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1]) * pow(rsun, 2);
 }
 
 Filename GetScaleFactorFile() {
