@@ -296,7 +296,7 @@ void IsisMain() {
     newflat.Temporary(flatfield.Basename() + "_reduced", "cub");
     string parameters = "FROM=" + flatfield.Expanded() +
                         " TO="   + newflat.Expanded() +
-                        " REDUCTION_TYPE=SCALE" +
+                        " MODE=SCALE" +
                         " LSCALE=" + scale +
                         " SSCALE=" + scale;
     cout << "Running: reduce " << parameters << endl;

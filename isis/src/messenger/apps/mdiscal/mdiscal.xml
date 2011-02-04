@@ -442,7 +442,10 @@ in the SOLAR directory.
         applicable; bumped the version number to 3.
     </change>
     <change name="Mackenzie Boyd" date="2009-09-03">
-        Added parameter to the usage of reduce to accomidate changes to reduce.
+        Added parameter to the usage of reduce to accommodate changes to reduce.
+    </change> 
+    <change name="Mackenzie Boyd" date="2011-02-04">
+        Fixed reduce parameters to use MODE instead of REDUCTION_TYPE. Fixed typo in docs.
     </change> 
   </history>
 
