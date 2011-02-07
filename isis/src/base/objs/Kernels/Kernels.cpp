@@ -116,7 +116,7 @@ namespace Isis {
     addKernels(findKernels(pvl, "LeapSecond"));
     addKernels(findKernels(pvl, "SpacecraftClock"));
     addKernels(findKernels(pvl, "ShapeModel"));
-    addKernels(findKernels(pvl, "Extras"));
+    addKernels(findKernels(pvl, "Extra"));
     _camVersion = getCameraVersion(pvl);
     return;
   }

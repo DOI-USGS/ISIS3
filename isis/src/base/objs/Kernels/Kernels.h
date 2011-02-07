@@ -96,6 +96,8 @@ namespace Isis {
    * @internal 
    *   @history 2010-12-29 Kris Becker - added resolveTypeByExt() method to find
    *                        non-compliant NAIF file type identifiers kernels
+   *   @history 2011-02-07 Kris Becker Corrected typo in Kernels/Extra (was
+   *                                   Extras)
    */
 class Kernels {
     public:
