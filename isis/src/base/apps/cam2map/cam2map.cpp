@@ -295,8 +295,7 @@ void IsisMain() {
   p.EndProcess();
 
   // add mapping to print.prt
-  PvlGroup mapping = outmap->Mapping();
-  Application::Log(mapping);
+  Application::Log(userGrp);
 
   // Cleanup
   delete outmap;

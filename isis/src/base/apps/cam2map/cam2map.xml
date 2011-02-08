@@ -219,6 +219,9 @@
      <change name="Steven Lambright" date="2011-01-31">
        Improved documentation
      </change>
+     <change name="Jai Rideout" date="2011-02-08">
+       Print file now includes PixelResolution, Scale, UpperLeftCornerX, and UpperLeftCornerY in Mapping group.
+     </change>
   </history>
 
   <oldName>
