@@ -21,11 +21,13 @@
  */
 
 #include <cfloat>
+
 #include "Spice.h"
-#include "iString.h"
-#include "iException.h"
-#include "Filename.h"
+
 #include "Constants.h"
+#include "Filename.h"
+#include "iException.h"
+#include "iString.h"
 #include "NaifStatus.h"
 
 using namespace std;
@@ -36,6 +38,7 @@ namespace Isis {
    * in the labels.
    *
    * @param lab Label containing Instrument and Kernels groups.
+   *  
    * @internal
    * @history 2005-10-07 Jim Torson  -   Modified the constructor so it can
    *                                      handle multiple SpacecraftPosition and
@@ -58,10 +61,29 @@ namespace Isis {
     Init(lab, !hasTables);
   }
 
+  /** 
+   * Constructs a Spice object. 
+   *  
+   * @param lab  Pvl labels.
+   * @param notab
+   */
   Spice::Spice(Isis::Pvl &lab, bool notab) {
     Init(lab, notab);
   }
 
+  /**
+   * Initialization of Spice object.
+   * 
+   * @param lab  Pvl labels
+   * @param notab 
+   * 
+   * @throw Isis::Exception::Io - "Can not find NAIF code for NAIF target" 
+   * @throw Isis::Exception::Camera - "No camera pointing available"
+   * @throw Isis::Exception::Camera - "No instrument position available"
+   *  
+   * @internal 
+   *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null. 
+   */
   void Spice::Init(Isis::Pvl &lab, bool notab) {
     NaifStatus::CheckErrors();
 
@@ -71,6 +93,12 @@ namespace Isis {
     p_cacheSize = 0;
     p_et = -DBL_MAX;
     p_allowDownsizing = false;
+    p_instrumentPosition = NULL;
+    p_instrumentRotation = NULL;
+    p_sunPosition = NULL;
+    p_bodyRotation = NULL;
+
+
 
     // Get the kernel group and load main kernels
     Isis::PvlGroup kernels = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
@@ -249,7 +277,14 @@ namespace Isis {
   }
 
 
-  //! Load/furnish NAIF kernel(s)
+  /**
+   * Loads/furnishes NAIF kernel(s)
+   * 
+   * @param key PvlKeyword
+   * @param notab
+   * 
+   * @throw Isis::iException::Io - "Spice file does not exist."
+   */
   void Spice::Load(Isis::PvlKeyword &key, bool notab) {
     NaifStatus::CheckErrors();
 
@@ -300,15 +335,25 @@ namespace Isis {
    * toolkit can clash if multiple sets of SPICE kernels are loaded. Note that
    * the cache size is specified as an argument. Therefore, times requested via
    * SetEphemerisTime which are not directly loaded in the cache will be
-   * interpolated.
+   * interpolated.  If the instrument position is not cached and cacheSize is 
+   * greater than 3, the tolerance is passed to the SpicePosition 
+   * Memcache2HermiteCache() method. 
+   *  
+   * @b Note:  Before this method is called, the private variables p_cacheSize, 
+   * p_startTime and p_endTime must be set.  This is done in the Camera classes 
+   * using the methods SetCacheSize() and SetStartEndEphemerisTime(). 
    *
    * @param startTime Starting ephemeris time to cache
-   *
    * @param endTime Ending ephemeris time to cache
-   *
    * @param size Size of the cache.
-   *
-   * @throws Isis::iException::Programmer
+   * @param tol Tolerance.
+   *  
+   * @throw Isis::iException::Programmer - "Argument cacheSize must be greater 
+   *        than zero"
+   * @throw Isis::iException::Programmer - "Argument startTime must be less than 
+   *        or equal to endTime"
+   * @throw Isis::iException::User - "This instrument does not support time 
+   *             padding"
    */
   void Spice::CreateCache(double startTime, double endTime, int cacheSize, double tol) {
     NaifStatus::CheckErrors();
@@ -377,24 +422,28 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
-  /**
-   * See previous CreateCache method. This method simply invokes that one with
-   * the same start and end time and a cache size of one.
-   *
-   * @param time Ephemeris time to cache
-   */
-  void Spice::CreateCache(double time, double tol) {
-    CreateCache(time, time, 1, tol);
-  }
+  //NO CALL TO THIS METHOD IS FOUND IN ISIS.  COMMENT OUT AND SAVE FOR AT LEAST 3 MONTHS
+  //IF NO NEED IS FOUND FOR IT, DELETE METHOD.
+  // 2011-02-08 JEANNIE WALLDREN
+//???
+//???  /**
+//???   * See previous CreateCache method. This method simply invokes that one with
+//???   * the same start and end time and a cache size of one.
+//???   *
+//???   * @param time Ephemeris time to cache
+//???   */
+//???  void Spice::CreateCache(double time, double tol) {
+//???    CreateCache(time, time, 1, tol);
+//???  }
 
   /**
    * Sets the ephemeris time and reads the spacecraft and sun position from the
    * kernels at that instant in time.
    *
-   * @param et Ephemeris time(read NAIF documentation for a detailed description)
-   *
-   * @throws Isis::iException::Message
-   *
+   * @param et Ephemeris time (read NAIF documentation for a detailed 
+   *           description)
+   *  
+   * @see http://naif.jpl.nasa.gov/naif/ 
    * @internal
    * @history 2005-11-29 Debbie A. Cook - Added alternate code for processing
    *                                      instruments without a platform
@@ -419,6 +468,11 @@ namespace Isis {
    * Returns the spacecraft position in body-fixed frame km units.
    *
    * @param p[] Spacecraft position
+   *  
+   * @see SetEphemerisTime() 
+   *  
+   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
+   *        first"
    */
   void Spice::InstrumentPosition(double p[3]) const {
     if(p_et == -DBL_MAX) {
@@ -436,7 +490,11 @@ namespace Isis {
   /**
    * Returns the spacecraft velocity in body-fixed frame km/sec units.
    *
-   * @param p[] Spacecraft velocity
+   * @param v[] Spacecraft velocity
+   *  
+   * @see SetEphemerisTime() 
+   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
+   *        first"
    */
   void Spice::InstrumentVelocity(double v[3]) const {
     if(p_et == -DBL_MAX) {
@@ -451,11 +509,15 @@ namespace Isis {
   }
 
   /**
-  * Returns the sun position in either body-fixed or J2000 reference frame and
-  * km units.
-  *
-  * @param p[] Sun position
-  */
+   * Returns the sun position in either body-fixed or J2000 reference frame and
+   * km units.
+   *
+   * @param p[] Sun position
+   *  
+   * @see SetEphemerisTime() 
+   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
+   *        first"
+   */
   void Spice::SunPosition(double p[3]) const {
     if(p_et == -DBL_MAX) {
       std::string msg = "You must call SetEphemerisTime first";
@@ -470,7 +532,7 @@ namespace Isis {
   /**
    * Calculates and returns the distance from the spacecraft to the target center
    *
-   * @return double Distance to the center of the target from the spacecraft
+   * @return @b double Distance to the center of the target from the spacecraft
    */
   double Spice::TargetCenterDistance() const {
     std::vector<double> sB = p_bodyRotation->ReferenceVector(p_instrumentPosition->Coordinate());
@@ -493,9 +555,9 @@ namespace Isis {
   /**
    * This returns the NAIF body code of the target indicated in the labels.
    *
-   * @return SpiceInt
+   * @return @b SpiceInt NAIF body code
    *
-   * @throws Isis::iException::Io
+   * @throw Isis::iException::Io - "Could not convert Target to NAIF code."
    */
   SpiceInt Spice::NaifBodyCode() const {
     SpiceInt code;
@@ -513,7 +575,7 @@ namespace Isis {
   /**
    * This returns the NAIF SPK code to use when reading from SPK kernels.
    *
-   * @return SpiceInt
+   * @return @b SpiceInt NAIF SPK code
    */
   SpiceInt Spice::NaifSpkCode() const {
     return p_spkCode;
@@ -522,7 +584,7 @@ namespace Isis {
   /**
    * This returns the NAIF CK code to use when reading from CK kernels.
    *
-   * @return SpiceInt
+   * @return @b SpiceInt NAIF CK code
    */
   SpiceInt Spice::NaifCkCode() const {
     return p_ckCode;
@@ -531,13 +593,18 @@ namespace Isis {
   /**
    * This returns the NAIF IK code to use when reading from instrument kernels.
    *
-   * @return SpiceInt
+   * @return @b SpiceInt NAIF IK code
    */
   SpiceInt Spice::NaifIkCode() const {
     return p_ikCode;
   }
 
-  // Return naif sclk code
+  /**
+   * This returns the NAIF SCLK code to use when reading from instrument 
+   * kernels. 
+   *
+   * @return @b SpiceInt NAIF SCLK code
+   */
   SpiceInt Spice::NaifSclkCode() const {
     return p_sclkCode;
   }
@@ -545,13 +612,12 @@ namespace Isis {
    * This returns a value from the NAIF text pool. It is a static convience
    *
    * @param key Name of NAIF keyword to obtain from the pool
-   *
    * @param index If the keyword is an array, the element to obtain.
    *              Defaults to 0
    *
-   * @return SpiceInt
+   * @return @b SpiceInt Spice integer from NAIF text pool
    *
-   * @throws Isis::iException::Io
+   * @throw Isis::iException::Io - "Can not find key in instrument kernels
    */
   SpiceInt Spice::GetInteger(const std::string &key, int index) {
     NaifStatus::CheckErrors();
@@ -574,12 +640,11 @@ namespace Isis {
    * This returns a value from the NAIF text pool. It is a static convience method
    *
    * @param key Name of NAIF keyword to obtain from the pool
-   *
    * @param index If the keyword is an array, the element to obtain. Defaults to 0
    *
-   * @return SpiceDouble
+   * @return @b SpiceDouble Spice double from NAIF text pool
    *
-   * @throws Isis::iException::Io
+   * @throw Isis::iException::Io - "Can not find key in instrument kernels."
    */
   SpiceDouble Spice::GetDouble(const std::string &key, int index) {
     NaifStatus::CheckErrors();
@@ -603,12 +668,11 @@ namespace Isis {
    * method
    *
    * @param key Name of NAIF keyword to obtain from the pool
-   *
    * @param index If the keyword is an array, the element to obtain. Defaults to 0
    *
-   * @return string
+   * @return @b string Value from the NAIF text pool
    *
-   * @throws Isis::iException::Io
+   * @throw Isis::iException::Io - "Can not find key in instrument kernels."
    */
   string Spice::GetString(const std::string &key, int index) {
     NaifStatus::CheckErrors();
@@ -632,8 +696,11 @@ namespace Isis {
    * (0-360 positive east, ocentric)
    *
    * @param lat Sub-spacecraft latitude
-   *
    * @param lon Sub-spacecraft longitude
+   *  
+   * @see SetEphemerisTime() 
+   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
+   *             first."
    */
   void Spice::SubSpacecraftPoint(double &lat, double &lon) {
     NaifStatus::CheckErrors();
@@ -676,8 +743,11 @@ namespace Isis {
    * positive east, ocentric)
    *
    * @param lat Sub-solar latitude
-   *
    * @param lon Sub-solar longitude
+   *  
+   * @see SetEphemerisTime() 
+   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
+   *             first."
    */
   void Spice::SubSolarPoint(double &lat, double &lon) {
     NaifStatus::CheckErrors();
@@ -710,6 +780,12 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  /** 
+   * Computes the solar longitude for the given ephemeris time.  If the target 
+   * is sky, the longitude is set to -999.0. 
+   *  
+   * @param et Ephemeris time
+   */
   void Spice::ComputeSolarLongitude(double et) {
     NaifStatus::CheckErrors();
 
@@ -775,7 +851,7 @@ namespace Isis {
   /**
    * Returns the solar longitude
    *
-   * @return double - The Solar Longitude
+   * @return @b double The Solar Longitude
    */
   double Spice::SolarLongitude() {
     ComputeSolarLongitude(p_et);
@@ -787,7 +863,8 @@ namespace Isis {
    * Returns true if the kernel group has kernel files
    *
    * @param lab Label containing Instrument and Kernels groups.
-   * @return bool - status of kernel files in the kernel group
+   *  
+   * @return @b bool status of kernel files in the kernel group
    */
   bool Spice::HasKernels(Isis::Pvl &lab) {
 

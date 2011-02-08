@@ -52,7 +52,7 @@ class MySpice : public Isis::Spice {
       for(int i = 0; i < (int)BI.size(); i++) {
         cout << BI[i] << endl;
       }
-    };
+    }
 };
 
 
