@@ -6,15 +6,15 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APP1NAME) from= $(INPUT)/lua0825f.cub \
-	  to= $(OUTPUT)/cropTruth.cub \
+	  to= $(OUTPUT)/cropTruth.cub+real \
 	  sample=15 nsamples=200 \
 	  line=50 nlines=200 > /dev/null;
 	$(APP2NAME) from= $(OUTPUT)/cropTruth.cub \
-	  to= $(OUTPUT)/CropReduceTruth.cub \
+	  to= $(OUTPUT)/CropReduceTruth.cub+real \
 	  mode=total \
 	  ons=150 onl=150 > /dev/null;
 	$(APP3NAME) from= $(OUTPUT)/CropReduceTruth.cub \
-	  to= $(OUTPUT)/CropReduceCam2mapTruth.cub \
+	  to= $(OUTPUT)/CropReduceCam2mapTruth.cub+real \
 	  > /dev/null;
 	catlab from=$(OUTPUT)/CropReduceCam2mapTruth.cub \
 	  > $(OUTPUT)/labels.pvl;
