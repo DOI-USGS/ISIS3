@@ -1,25 +1,3 @@
-/**
- * @file
- * $Revision$
- * $Date$
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
 #include "Camera.h"
 
 #include <cfloat>
@@ -30,12 +8,12 @@
 #include <QVector>
 
 #include "Angle.h"
-#include "Constants.h"
 #include "CameraDetectorMap.h"
-#include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
+#include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
+#include "Constants.h"
 #include "iException.h"
 #include "iString.h"
 #include "Latitude.h"
@@ -43,19 +21,38 @@
 #include "NaifStatus.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 #include "SurfacePoint.h"
 
 using namespace std;
-
 namespace Isis {
   /**
    * Constructs the Camera object
    *
    * @param lab Pvl label used to create the Camera object
+   * @internal 
+   *   @history 2011-02-08 Jeannie Walldren - Modified to initialize all
+   *            pointers to NULL.
    */
-  Camera::Camera(Isis::Pvl &lab) : Isis::Sensor(lab) {
+  Camera::Camera(Pvl &lab) : Sensor(lab) {
+    // initialize private variables
+    p_focalLength = 0.0;
+    p_pixelPitch = 1.0;
+    p_referenceBand = 0;
+    p_childBand = 1;
+    p_ignoreProjection = false;
+    p_projection = NULL;
+    p_alphaCube = NULL;
+    p_distortionMap = NULL;
+    p_focalPlaneMap = NULL;
+    p_detectorMap = NULL;
+    p_groundMap = NULL;
+    p_skyMap = NULL;
+
     // Get the image size which can be different than the alpha cube size
-    Isis::PvlGroup &dims = lab.FindObject("IsisCube")
+    PvlGroup &dims = lab.FindObject("IsisCube")
                            .FindObject("Core")
                            .FindGroup("Dimensions");
     p_lines = dims["Lines"];
@@ -65,31 +62,15 @@ namespace Isis {
     SetGeometricTilingHint();
 
     // Get the AlphaCube information
-    p_alphaCube = new Isis::AlphaCube(lab);
+    p_alphaCube = new AlphaCube(lab);
 
     // Get the projection group if it exists
     if(lab.FindObject("IsisCube").HasGroup("Mapping")) {
       p_projection = ProjectionFactory::CreateFromCube(lab);
     }
-    else {
-      p_projection = NULL;
-    }
-    p_ignoreProjection = false;
-
-    // Initialize stuff
-    p_focalLength = 0.0;
-    p_pixelPitch = 1.0;
-    p_referenceBand = 0;
-    p_childBand = 1;
-
-    p_distortionMap = NULL;
-    p_focalPlaneMap = NULL;
-    p_detectorMap = NULL;
-    p_groundMap = NULL;
-    p_skyMap = NULL;
-
+    
     // See if we have a reference band
-    Isis::PvlGroup &inst = lab.FindObject("IsisCube").FindGroup("Instrument");
+    PvlGroup &inst = lab.FindObject("IsisCube").FindGroup("Instrument");
     if(inst.HasKeyword("ReferenceBand")) {
       p_referenceBand = inst["ReferenceBand"];
     }
@@ -138,13 +119,12 @@ namespace Isis {
   }
 
   /**
-   * Sets the sample/line values of the to get the lat/lon values
+   * Sets the sample/line values of the image to get the lat/lon values
    *
    * @param sample Sample coordinate of the cube
-   *
    * @param line Line coordinate of the cube
    *
-   * @return bool Returns true if the image was set successfully and false if it
+   * @return @b bool Returns true if the image was set successfully and false if it
    *              was not
    */
   bool Camera::SetImage(const double sample, const double line) {
@@ -216,7 +196,7 @@ namespace Isis {
    * @param latitude Latitude coordinate of the point
    * @param longitude Longitude coordinate of the point
    *
-   * @return bool Returns true if the Universal Ground was set successfully and
+   * @return @b bool Returns true if the Universal Ground was set successfully and
    *              false if it was not
    */
   bool Camera::SetUniversalGround(const double latitude, const double longitude) {
@@ -259,14 +239,14 @@ namespace Isis {
                               surfacePt.GetLongitude().GetDegrees(),
                               surfacePt.GetLocalRadius().GetMeters());
   }
-  
+
 
 
   /**
    * Computes the image coordinate for the current universal ground point
    *
    *
-   * @return bool Returns true if image coordinate was computed successfully and
+   * @return @b bool Returns true if image coordinate was computed successfully and
    *              false if it was not
    */
   bool Camera::RawFocalPlanetoImage() {
@@ -322,13 +302,11 @@ namespace Isis {
   * Sets the lat/lon/radius values to get the sample/line values
   *
   * @param latitude Latitude coordinate of the cube
-  *
   * @param longitude Longitude coordinate of the cube
-  *
   * @param radius Radius coordinate of the cube
   *
-  * @return bool Returns true if the Universal Ground was set successfully and
-  *              false if it was not
+  * @return @b bool Returns true if the Universal Ground was set successfully 
+  *              and false if it was not
   */
   bool Camera::SetUniversalGround(const double latitude, const double longitude,
                                   const double radius) {
@@ -344,7 +322,7 @@ namespace Isis {
   /**
    * Returns the detector resolution at the current position
    *
-   * @return double The detector resolution
+   * @return @b double The detector resolution
    */
   double Camera::DetectorResolution() {
     if(HasSurfaceIntersection()) {
@@ -364,7 +342,7 @@ namespace Isis {
   /**
    * Returns the sample resolution at the current position
    *
-   * @return double The sample resolution
+   * @return @b double The sample resolution
    */
   double Camera::SampleResolution() {
     return DetectorResolution() * p_detectorMap->SampleScaleFactor();
@@ -373,7 +351,7 @@ namespace Isis {
   /**
    * Returns the line resolution at the current position
    *
-   * @return double The line resolution
+   * @return @b double The line resolution
    */
   double Camera::LineResolution() {
     return DetectorResolution() * p_detectorMap->LineScaleFactor();
@@ -382,7 +360,7 @@ namespace Isis {
   /**
    * Returns the pixel resolution at the current position in m/pix
    *
-   * @return double The pixel resolution
+   * @return @b double The pixel resolution
    */
   double Camera::PixelResolution() {
     double lineRes = LineResolution();
@@ -395,7 +373,7 @@ namespace Isis {
   /**
    * Returns the lowest/worst resolution in the entire image
    *
-   * @return double The lowest/worst resolution in the image
+   * @return @b double The lowest/worst resolution in the image
    */
   double Camera::LowestImageResolution() {
     GroundRangeResolution();
@@ -405,7 +383,7 @@ namespace Isis {
   /**
    * Returns the highest/best resolution in the entire image
    *
-   * @return double The highest/best resolution in the entire image
+   * @return @b double The highest/best resolution in the entire image
    */
   double Camera::HighestImageResolution() {
     GroundRangeResolution();
@@ -413,7 +391,9 @@ namespace Isis {
   }
 
   /**
-   * Computes the ground range and min/max resolution
+   * Computes the ground range and min/max resolution 
+   *  
+   * @throw iException::Camera - "Camera missed planet or SPICE data off."
    */
   void Camera::GroundRangeResolution() {
     // Have we already done this
@@ -587,10 +567,10 @@ namespace Isis {
    *
    * @param pvl The pvl file used to set the ground range
    *
-   * @return bool Returns true if the range intersects the longitude domain, and
+   * @return @b bool Returns true if the range intersects the longitude domain, and
    *              false if it does not
    */
-  bool Camera::IntersectsLongitudeDomain(Isis::Pvl &pvl) {
+  bool Camera::IntersectsLongitudeDomain(Pvl &pvl) {
     double minlat, minlon, maxlat, maxlon;
     return GroundRange(minlat, maxlat, minlon, maxlon, pvl);
   }
@@ -599,21 +579,17 @@ namespace Isis {
    * Computes the Ground Range
    *
    * @param minlat The minimum latitude
-   *
    * @param maxlat The maximum latitude
-   *
    * @param minlon The minimum longitude
-   *
    * @param maxlon The maximum longitude
-   *
    * @param pvl The pvl file used for ground range calculations
    *
-   * @return bool Returns true if it crosses the longitude domain boundary and
+   * @return @b bool Returns true if it crosses the longitude domain boundary and
    *              false if it does not
    */
   bool Camera::GroundRange(double &minlat, double &maxlat,
                            double &minlon, double &maxlon,
-                           Isis::Pvl &pvl) {
+                           Pvl &pvl) {
     // Compute the ground range and resolution
     GroundRangeResolution();
 
@@ -624,7 +600,7 @@ namespace Isis {
     double b = radii[2] * 1000.0;
 
     // See if the PVL overrides the radii
-    Isis::PvlGroup map = pvl.FindGroup("Mapping", Isis::Pvl::Traverse);
+    PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
     if(map.HasKeyword("EquatorialRadius")) a = map["EquatorialRadius"];
     if(map.HasKeyword("PolarRadius")) b = map["PolarRadius"];
 
@@ -632,7 +608,7 @@ namespace Isis {
     minlat = p_minlat;
     maxlat = p_maxlat;
     if(map.HasKeyword("LatitudeType")) {
-      Isis::iString latType = (string) map["LatitudeType"];
+      iString latType = (string) map["LatitudeType"];
       if(latType.UpCase() == "PLANETOGRAPHIC") {
         if(abs(minlat) < 90.0) {  // So tan doesn't fail
           minlat *= Isis::PI / 180.0;
@@ -653,7 +629,7 @@ namespace Isis {
     maxlon = p_maxlon;
     bool domain360 = true;
     if(map.HasKeyword("LongitudeDomain")) {
-      Isis::iString lonDomain = (string) map["LongitudeDomain"];
+      iString lonDomain = (string) map["LongitudeDomain"];
       if(lonDomain.UpCase() == "180") {
         minlon = p_minlon180;
         maxlon = p_maxlon180;
@@ -663,7 +639,7 @@ namespace Isis {
 
     // Convert to the proper longitude direction
     if(map.HasKeyword("LongitudeDirection")) {
-      Isis::iString lonDirection = (string) map["LongitudeDirection"];
+      iString lonDirection = (string) map["LongitudeDirection"];
       if(lonDirection.UpCase() == "POSITIVEWEST") {
         double swap = minlon;
         minlon = -maxlon;
@@ -702,48 +678,47 @@ namespace Isis {
    *
    * @param pvl Pvl to write mapping group to
    */
-  void Camera::BasicMapping(Isis::Pvl &pvl) {
-    Isis::PvlGroup map("Mapping");
-    map += Isis::PvlKeyword("TargetName", Target());
-    map += Isis::PvlKeyword("EquatorialRadius", p_radii[0] * 1000.0, "meters");
-    map += Isis::PvlKeyword("PolarRadius", p_radii[2] * 1000.0, "meters");
-    map += Isis::PvlKeyword("LatitudeType", "Planetocentric");
-    map += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-    map += Isis::PvlKeyword("LongitudeDomain", "360");
+  void Camera::BasicMapping(Pvl &pvl) {
+    PvlGroup map("Mapping");
+    map += PvlKeyword("TargetName", Target());
+    map += PvlKeyword("EquatorialRadius", p_radii[0] * 1000.0, "meters");
+    map += PvlKeyword("PolarRadius", p_radii[2] * 1000.0, "meters");
+    map += PvlKeyword("LatitudeType", "Planetocentric");
+    map += PvlKeyword("LongitudeDirection", "PositiveEast");
+    map += PvlKeyword("LongitudeDomain", "360");
 
     GroundRangeResolution();
-    map += Isis::PvlKeyword("MinimumLatitude", p_minlat);
-    map += Isis::PvlKeyword("MaximumLatitude", p_maxlat);
-    map += Isis::PvlKeyword("MinimumLongitude", p_minlon);
-    map += Isis::PvlKeyword("MaximumLongitude", p_maxlon);
-    map += Isis::PvlKeyword("PixelResolution", p_minres);
+    map += PvlKeyword("MinimumLatitude", p_minlat);
+    map += PvlKeyword("MaximumLatitude", p_maxlat);
+    map += PvlKeyword("MinimumLongitude", p_minlon);
+    map += PvlKeyword("MaximumLongitude", p_maxlon);
+    map += PvlKeyword("PixelResolution", p_minres);
 
-    map += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
+    map += PvlKeyword("ProjectionName", "Sinusoidal");
     pvl.AddGroup(map);
   }
 
   //! Reads the focal length from the instrument kernel
   void Camera::SetFocalLength() {
     int code = NaifIkCode();
-    string key = "INS" + Isis::iString(code) + "_FOCAL_LENGTH";
+    string key = "INS" + iString(code) + "_FOCAL_LENGTH";
     SetFocalLength(Isis::Spice::GetDouble(key));
   }
 
   //! Reads the Pixel Pitch from the instrument kernel
   void Camera::SetPixelPitch() {
     int code = NaifIkCode();
-    string key = "INS" + Isis::iString(code) + "_PIXEL_PITCH";
+    string key = "INS" + iString(code) + "_PIXEL_PITCH";
     SetPixelPitch(Isis::Spice::GetDouble(key));
   }
 
   /**
    * Sets the right ascension declination
    *
-   * @param ra
+   * @param ra Right ascension value
+   * @param dec Declination value
    *
-   * @param dec
-   *
-   * @return bool Returns true if the declination was set successfully and false
+   * @return @b bool Returns true if the declination was set successfully and false
    *              if it was not
    */
   bool Camera::SetRightAscensionDeclination(const double ra, const double dec) {
@@ -990,15 +965,15 @@ namespace Isis {
   /**
    * Computes the RaDec range
    *
-   * @param minra
-   *
-   * @param maxra
-   *
-   * @param mindec
-   *
-   * @param maxdec
-   *
-   * @return bool Returns true if the range computation was successful and false
+   * @param minra Minimum right ascension value
+   * @param maxra Maximum right ascension value
+   * @param mindec Minimum declination value
+   * @param maxdec Maximum declination value
+   *  
+   * @throw iException::Programmer - "Camera::RaDecRange can not calculate a 
+   *  right ascension, declination range for projected images which are not
+   *  projected to sky"
+   * @return @b bool Returns true if the range computation was successful and false
    *              if it was not
    */
   bool Camera::RaDecRange(double &minra, double &maxra,
@@ -1144,9 +1119,12 @@ namespace Isis {
 
   /**
    * Returns the RaDec resolution
+   *  
+   * @throw iException::Programmer - "Camera::RaDecResolution can not calculate 
+   *  a right ascension, declination resolution for projected images which are
+   *  not projected to sky"
    *
-   *
-   * @return double The resutant RaDec resolution
+   * @return @b double The resutant RaDec resolution
    */
   double Camera::RaDecResolution() {
     if(p_projection != NULL && !p_projection->IsSky()) {
@@ -1195,13 +1173,14 @@ namespace Isis {
   /**
    * Returns the North Azimuth
    *
-   * @return double North Azimuth
+   * @return @b double North Azimuth
    */
   double Camera::NorthAzimuth() {
     double lat = UniversalLatitude();
     if (lat >= 0.0) {
       return ComputeAzimuth(LocalRadius(90.0, 0.0), 90.0, 0.0);
-    } else {
+    } 
+    else {
       double azimuth = ComputeAzimuth(LocalRadius(-90.0, 0.0),
                                       -90.0, 0.0) + 180.0;
       if (azimuth > 360.0) azimuth = azimuth - 360.0;
@@ -1212,7 +1191,7 @@ namespace Isis {
   /**
    * Returns the Sun Azimuth
    *
-   * @return double Sun Azimuth
+   * @return @b double Sun Azimuth
    *
    * @todo Get appropriate radius at the subsolar point
    */
@@ -1225,7 +1204,7 @@ namespace Isis {
   /**
    * Return the Spacecraft Azimuth
    *
-   * @return double Spacecraft Azimuth
+   * @return @b double Spacecraft Azimuth
    *
    * @todo Get appropriate radius at the subscraft point
    */
@@ -1239,12 +1218,10 @@ namespace Isis {
    * Computes the Azimuth value at specified lat/lon with the entered radius
    *
    * @param radius The Radius
-   *
    * @param lat The Latitude
-   *
    * @param lon The Longitude
    *
-   * @return double Azimuth value
+   * @return @b double Azimuth value
    *
    * @history 2009-09-23  Tracie Sucharski - Convert negative
    *                         longitudes coming out of reclat.
@@ -1336,7 +1313,7 @@ namespace Isis {
   /**
    * Return the off nadir angle in degrees.
    *
-   * @return double Off Nadir Angle
+   * @return @b double Off Nadir Angle
    */
   double Camera::OffNadirAngle() {
     NaifStatus::CheckErrors();
@@ -1371,7 +1348,7 @@ namespace Isis {
    * @param slat The latitude of the subspacecraft or subsolar point
    * @param slon The longitude of the subspacecraft or subsolar point
    *
-   * @return double The azimuth in degrees
+   * @return @b double The azimuth in degrees
    */
   double Camera::GroundAzimuth(double glat, double glon,
                                double slat, double slon) {
@@ -1428,7 +1405,7 @@ namespace Isis {
    * @param lon2 The second longitude value
    * @param radius The radius of the sphere (in meters)
    *
-   * @return double The distance between the two points
+   * @return @b double The distance between the two points
    */
   double Camera::Distance(double lat1, double lon1,
                           double lat2, double lon2, double radius) {
@@ -1521,52 +1498,25 @@ namespace Isis {
    * This loads the spice cache big enough for this image. The default cache size
    *   is the number of lines in the cube if the ephemeris time changes in the
    *   image, one otherwise.
-   *
-   * @param cacheSize The size of the spice cache. Should be >1 or not entered.
-   *
+   * @internal 
+   *   @history 2011-02-08 Jeannie Walldren - Removed unused input parameter.
+   *                          Moved calculations of cache size and start/end
+   *                          ephemeris times to their own methods.
    */
-  void Camera::LoadCache(int cacheSize) {
+  void Camera::LoadCache() {
     // We want to stay in unprojected space for this process
     bool projIgnored = p_ignoreProjection;
     p_ignoreProjection = true;
 
-    double etStart = 0.0, etEnd = 0.0;
-
-    for(int band = 1; band <= Bands(); band++) {
-      SetBand(band);
-      SetImage(0.5, 0.5);
-      double etStartTmp = EphemerisTime();
-      SetImage(p_alphaCube->BetaSamples() + 0.5, p_alphaCube->BetaLines() + 0.5);
-      double etEndTmp = EphemerisTime();
-
-      if(band == 1) {
-        etStart = min(etStartTmp, etEndTmp);
-        etEnd   = max(etStartTmp, etEndTmp);
-      }
-
-      etStart = min(etStart, min(etStartTmp, etEndTmp));
-      etEnd   = max(etEnd,   max(etStartTmp, etEndTmp));
-    }
-
-    if(cacheSize <= 0) {
-      // BetaLines() + 1 so we get at least 2 points for interpolation
-      cacheSize = p_alphaCube->BetaLines() + 1;
-
-      if(etStart == etEnd) {
-        cacheSize = 1;
-      }
-    }
-
-    if(etStart == -DBL_MAX || etEnd == -DBL_MAX) {
-      string msg = "Unable to find time range for the spice kernels";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
+    // get the cache variables
+    pair<double,double> ephemerisTimes = StartEndEphemerisTimes();
+    int cacheSize = CacheSize(ephemerisTimes.first, ephemerisTimes.second);
 
     // Set a position in the image so that the PixelResolution can be calculated
     SetImage(p_alphaCube->BetaSamples() / 2, p_alphaCube->BetaLines() / 2);
     double tol = PixelResolution() / 100.; //meters/pix/100.
 
-    if(tol < 0.) {
+    if(tol < 0.0) {
       // Alternative calculation of ground resolution of a pixel/100
       double altitudeMeters;
       if(IsSky()) {   // Use the unit sphere as the target
@@ -1580,13 +1530,85 @@ namespace Isis {
 
     p_ignoreProjection = projIgnored;
 
-    Spice::CreateCache(etStart, etEnd, cacheSize, tol);
+    Spice::CreateCache(ephemerisTimes.first, ephemerisTimes.second, 
+                       cacheSize, tol); 
 
-    SetEphemerisTime(etStart);
+    SetEphemerisTime(ephemerisTimes.first);
 
     // Reset to band 1
     SetBand(1);
+
+    return;
   }
+
+
+  /**
+   * Calculates the start and end ephemeris times. These times are found by 
+   * looping through the bands and finding the ephemeris times for the upper 
+   * left and bottom right pixels in the image. The start time (shutter open 
+   * time) is the minimum value of those ephemeris times. The end time (shutter 
+   * close time) is the maximum value of those ephemeris times. This method must
+   * be called before a call to the Spice::CreateCache() method.  It is called 
+   * in the LoadCache() method.
+   *  
+   * @throw Isis::iException::Programmer - "Unable to find time range for the 
+   *             spice kernels."
+   * @see CreateCache()
+   * @see LoadCache()
+   * 
+   * @author 2011-02-02 Jeannie Walldren
+   * @internal
+   *   @history 2011-02-02 Jeannie Walldren - Original version.
+   */
+  pair<double, double> Camera::StartEndEphemerisTimes() {
+    pair<double,double> ephemerisTimes;
+    double startTime, endTime;
+    for(int band = 1; band <= Bands(); band++) {
+      SetBand(band);
+      SetImage(0.5, 0.5);
+      double etStart = EphemerisTime();
+      SetImage(p_alphaCube->BetaSamples() + 0.5, p_alphaCube->BetaLines() + 0.5);
+      double etEnd = EphemerisTime();
+      if(band == 1) {
+        startTime = min(etStart, etEnd);
+        endTime = max(etStart, etEnd);
+      }
+      startTime = min(startTime, min(etStart, etEnd));
+      endTime = max(endTime, max(etStart, etEnd));
+    }
+    if(startTime == -DBL_MAX || endTime == -DBL_MAX) {
+      string msg = "Unable to find time range for the spice kernels";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+    ephemerisTimes.first = startTime;
+    ephemerisTimes.second = endTime;
+    return ephemerisTimes;
+  }
+
+  /**
+   * This method calculates the spice cache size. This method finds the number 
+   * of lines in the beta cube and adds 1, since we need at least 2 points for 
+   * interpolation. This method must be called before a call to the 
+   * Spice::CreateCache() method.  It is called in the LoadCache() method. 
+   *  
+   * @throw iException::Programmer - "A cache has already been created." 
+   * @see CreateCache()
+   * @see LoadCache()
+   * 
+   * @author 2011-02-02 Jeannie Walldren 
+   * @internal
+   *   @history 2011-02-02 Jeannie Walldren - Original version.
+   */
+  int Camera::CacheSize(double startTime, double endTime) {
+    int cacheSize;
+    // BetaLines() + 1 so we get at least 2 points for interpolation
+    cacheSize = p_alphaCube->BetaLines() + 1;
+    if(startTime == endTime) {
+      cacheSize = 1;
+    }
+    return cacheSize;
+  }
+
 
   /**
    * This method sets the best geometric tiling size for projecting from this
@@ -1603,6 +1625,15 @@ namespace Isis {
    *
    * @param startSize The tile size to start with; default 128
    * @param endSize The tile size to give up at; default 8
+   *  
+   * @throw iException::Programmer - "Camera::SetGeometricTilingHint End size
+   *        must be smaller than the start size"
+   * @throw iException::Programmer - "Camera::SetGeometricTilingHint Start size
+   *        must be at least 4"
+   * @throw iException::Programmer - "Camera::SetGeometricTilingHint Start size 
+   *        must be a power of 2"
+   * @throw iException::Programmer - "Camera::SetGeometricTilingHint End size 
+   *        must be a power of 2 less than the start size, but greater than 2"
    */
   void Camera::SetGeometricTilingHint(int startSize, int endSize) {
     // verify the start size is a multiple of 2 greater than 2
@@ -1666,7 +1697,7 @@ namespace Isis {
    * extrapolated).
    *
    *
-   * @return bool Point was extrapolated
+   * @return @b bool Point was extrapolated
    */
   bool Camera::InCube() {
     if(Sample() < 0.5 || Line() < 0.5) {

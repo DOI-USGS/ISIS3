@@ -1,6 +1,5 @@
 #include <iostream>
 #include <iomanip>
-
 #include "Angle.h"
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -8,7 +7,6 @@
 #include "Longitude.h"
 #include "Preference.h"
 #include "SurfacePoint.h"
-
 
 using namespace std;
 using namespace Isis;
@@ -37,10 +35,11 @@ class MyCamera : public Isis::Camera {
 
 int main() {
   Isis::Preference::Preferences(true);
-  string inputFile = "$ISIS3DATA/mgs/testData/ab102401.lev2.cub";
+  string inputFile = "$mgs/testData/ab102401.lev2.cub";
   Cube cube;
   cube.Open(inputFile);
-  Camera *c = cube.Camera();
+  Camera *c = NULL;
+  c = cube.Camera();
   Pvl &pvl = *cube.Label();
   MyCamera cam(pvl);
 
@@ -51,10 +50,10 @@ int main() {
   double ra = 347.016;
   double dec = -51.2677;
 
-  cout << endl << "Line: " << line << ", Sample: " << sample << endl;
+  cout << endl << "Camera* from: " << inputFile << endl;
+  cout << "Line: " << line << ", Sample: " << sample << endl;
   cout << "Lat: " << lat.GetDegrees() << ", Lon: " << lon.GetDegrees() << endl;
-  cout << "RightAscension: " << ra << ", Declination: " << dec << endl;
-  cout << "Camera* from: " << inputFile << endl << endl;
+  cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
 
   cout << "SetImage (sample, line): " << c->SetImage(sample, line)
        << endl << endl;
@@ -179,7 +178,7 @@ int main() {
   cout << "Sample = " << c->Sample() << endl;
   cout << "Line = " << c->Line() << endl << endl;
 
-  cout << "Test Polar Boundary Conditions" << endl;
+  cout << endl << "/---------- Test Polar Boundary Conditions" << endl;
   inputFile = "$clementine1/testData/lub5992r.292.lev1.phot.cub";
   cube.Close();
   cube.Open(inputFile);
@@ -188,6 +187,7 @@ int main() {
   cube.Close();
 
   cout << endl;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Basic Mapping: " << endl;
   Pvl camMap;
   cam2->BasicMapping(camMap);
@@ -239,7 +239,7 @@ int main() {
   delete cam2;
 
   cube.Close();
-  cout << "Test Local Photometric Angles..." << endl << endl;
+  cout << endl << "/---------- Test Local Photometric Angles..." << endl << endl;
   cout << "Flat DEM Surface..." << endl;
   inputFile = "$base/testData/f319b18_ideal_flat.cub";
   cube.Open(inputFile);
@@ -249,6 +249,7 @@ int main() {
 
   sample = cam3->Samples() / 2.0;
   line = cam3->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam3->SetImage(sample, line) << endl;
@@ -278,6 +279,7 @@ int main() {
 
   sample = cam4->Samples() / 2.0;
   line = cam4->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam4->SetImage(sample, line) << endl;
@@ -302,6 +304,7 @@ int main() {
 
   sample = cam5->Samples() / 2.0;
   line = cam5->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam5->SetImage(sample, line) << endl;
@@ -326,6 +329,7 @@ int main() {
 
   sample = cam6->Samples() / 2.0;
   line = cam6->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam6->SetImage(sample, line) << endl;
@@ -350,6 +354,7 @@ int main() {
 
   sample = cam7->Samples() / 2.0;
   line = cam7->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam7->SetImage(sample, line) << endl;
@@ -374,6 +379,7 @@ int main() {
 
   sample = cam8->Samples() / 2.0;
   line = cam8->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam8->SetImage(sample, line) << endl;
@@ -398,6 +404,7 @@ int main() {
 
   sample = cam9->Samples() / 2.0;
   line = cam9->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam9->SetImage(sample, line) << endl;
@@ -422,6 +429,7 @@ int main() {
 
   sample = cam10->Samples() / 2.0;
   line = cam10->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam10->SetImage(sample, line) << endl;
@@ -446,6 +454,7 @@ int main() {
 
   sample = cam11->Samples() / 2.0;
   line = cam11->Lines() / 2.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam11->SetImage(sample, line) << endl;
@@ -470,6 +479,7 @@ int main() {
 
   sample = 1.0;
   line = 1.0;
+  cout << "Camera* from: " << inputFile << endl;
   cout << "Sample = " << sample << endl;
   cout << "Line = " << line << endl;
   cout << "SetImage (sample, line): " << cam12->SetImage(sample, line) << endl;

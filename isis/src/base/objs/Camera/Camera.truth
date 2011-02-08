@@ -1,8 +1,8 @@
 
+Camera* from: $mgs/testData/ab102401.lev2.cub
 Line: 453, Sample: 534
 Lat: 18.221, Lon: 226.671
 RightAscension: 347.016, Declination: -51.2677
-Camera* from: $ISIS3DATA/mgs/testData/ab102401.lev2.cub
 
 SetImage (sample, line): 1
 
@@ -213,8 +213,10 @@ SetUniversalGround (lat, lon, radius): 1
 Sample = 479.5
 Line = 702
 
-Test Polar Boundary Conditions
 
+/---------- Test Polar Boundary Conditions
+
+Camera* from: $clementine1/testData/lub5992r.292.lev1.phot.cub
 Basic Mapping: 
 Group = Mapping
   TargetName         = Moon
@@ -248,9 +250,11 @@ SetUniversalGround (cam2->UniversalLatitude(), cam2->UniversalLongitude()): 1
 Sample = 192
 Line = 144
 
-Test Local Photometric Angles...
+
+/---------- Test Local Photometric Angles...
 
 Flat DEM Surface...
+Camera* from: $base/testData/f319b18_ideal_flat.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -260,6 +264,7 @@ Emission = 59.59
 Incidence = 2.835
 
 45 Degree DEM Surface Facing Left...
+Camera* from: $base/testData/f319b18_ideal_45left.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -269,6 +274,7 @@ Emission = 60.94
 Incidence = 46.41
 
 45 Degree DEM Surface Facing Top...
+Camera* from: $base/testData/f319b18_ideal_45top.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -278,6 +284,7 @@ Emission = 17.41
 Incidence = 42.49
 
 45 Degree DEM Surface Facing Right...
+Camera* from: $base/testData/f319b18_ideal_45right.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -287,6 +294,7 @@ Emission = 76.84
 Incidence = 44.07
 
 45 Degree DEM Surface Facing Bottom...
+Camera* from: $base/testData/f319b18_ideal_45bottom.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -296,6 +304,7 @@ Emission = 103.8
 Incidence = 47.67
 
 80 Degree DEM Surface Facing Left...
+Camera* from: $base/testData/f319b18_ideal_80left.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -305,6 +314,7 @@ Emission = 74.77
 Incidence = 81.75
 
 80 Degree DEM Surface Facing Top...
+Camera* from: $base/testData/f319b18_ideal_80top.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -314,6 +324,7 @@ Emission = 23.84
 Incidence = 77.87
 
 80 Degree DEM Surface Facing Right...
+Camera* from: $base/testData/f319b18_ideal_80right.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -323,6 +334,7 @@ Emission = 95.57
 Incidence = 79.42
 
 80 Degree DEM Surface Facing Bottom...
+Camera* from: $base/testData/f319b18_ideal_80bottom.cub
 Sample = 625
 Line = 575
 SetImage (sample, line): 1
@@ -332,6 +344,7 @@ Emission = 138.2
 Incidence = 82.91
 
 Point Does Not Intersect DEM...
+Camera* from: $base/testData/f319b18_ideal_flat.cub
 Sample = 1
 Line = 1
 SetImage (sample, line): 0
