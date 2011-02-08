@@ -14,21 +14,6 @@
 #include "SerialNumberList.h"
 
 using namespace std;
-//#define _DEBUG_
-#ifdef _DEBUG_
-//debugging
-fstream odb;
-
-void StartDebug() {
-  odb.open("Debug.log", std::ios::out | std::ios::app);
-  odb << "\n*************************\n";
-}
-
-void CloseDebug() {
-  odb << "\n*************************\n";
-  odb.close();
-}
-#endif
 
 #define UNDEFINED_STATUS 2
 
@@ -52,18 +37,6 @@ namespace Isis {
   ControlNetFilter::ControlNetFilter(ControlNet *pCNet, string &psSerialNumFile, Progress *pProgress) :
     ControlNetStatistics(pCNet, psSerialNumFile, pProgress) {
     mSerialNumFilter  = SerialNumberList(psSerialNumFile);
-
-#ifdef _DEBUG_
-    StartDebug();
-    /*for (int i=0; i<mCNet->GetNumPoints(); i++) {
-      ControlPoint cp = mCNet->GetPoint(i);
-      for (int j=0; j<cp.Size(); j++) {
-        ControlMeasure cm = cp[j];
-        string sn = cm.CubeSerialNumber();
-        odb << "serial num=" << sn << "  File=" << mSerialNumList.Filename(sn) << endl;
-      }
-    }*/
-#endif
   }
 
   /**
@@ -618,7 +591,7 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointMeasurePropertiesFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    int iIgnoredFlag = UNDEFINED_STATUS;
+    int iIgnoredFlag = -1;
     string sType = "";
     iString isType;
 
@@ -649,7 +622,7 @@ namespace Isis {
         bool bMeasureIgnored = cMeasure->IsIgnored();
         bool bMeasureFound = false;
 
-        if (iIgnoredFlag == UNDEFINED_STATUS || bMeasureIgnored == iIgnoredFlag) {
+        if (iIgnoredFlag == -1 || bMeasureIgnored == iIgnoredFlag) {
           if (sType == "all") {
             bMeasureFound = true;
           }
