@@ -252,7 +252,7 @@ namespace Isis {
                                   direction is valid. It is made protected so
                                   inheriting classes can change it if
                                   necessary.*/
-      Isis::Cube *p_demCube;         //!< The cube containing the model
+      Isis::Cube *p_demCube;   //!< The cube containing the model
       SpiceDouble p_latitude;  //!< Latitude at p_pB
       SpiceDouble p_longitude; //!< Longitude at p_pB
       SpiceDouble p_pB[3];     //!< Surface intersection point in body fixed
@@ -272,7 +272,7 @@ namespace Isis {
       Isis::Projection *p_demProj;  //!< The projection of the model
       Isis::Portal *p_portal;       //!< Buffer used to read from the model
       Isis::Interpolator *p_interp; //!< Use bilinear interpolation from dem
-      bool SetGroundLocal(bool backCheck);   //!<Computes look vector
+      bool SetGroundLocal(bool backCheck);   //!< Computes look vector
 
       double p_minRadius;  //!< Minimum radius value in DEM file
       double p_maxRadius;  //!< Maximum radius value in DEM file
