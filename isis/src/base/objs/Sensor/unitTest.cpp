@@ -1,11 +1,11 @@
+#include "Sensor.h"
+
 #include <iostream>
 #include <iomanip>
 
-#include "iException.h"
 #include "Distance.h"
 #include "Filename.h"
-#include "Sensor.h"
-
+#include "iException.h"
 #include "Preference.h"
 
 using namespace std;

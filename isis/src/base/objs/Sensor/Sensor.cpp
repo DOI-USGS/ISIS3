@@ -1,25 +1,3 @@
-/**
- * @file
- * $Revision: 1.17 $
- * $Date: 2010/05/22 00:08:59 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
-
 #include "Sensor.h"
 
 #include <iomanip>
@@ -129,7 +107,7 @@ namespace Isis {
   /**
    * This allows you to ignore the elevation model
    *
-   * @param ignore True for no elevation model
+   * @param ignore True if the elevation model is ignored
    */
   void Sensor::IgnoreElevationModel(bool ignore) {
     // if we have an elevation model and are not ignoring it,
@@ -165,25 +143,27 @@ namespace Isis {
    * @param v[] A look vector in camera coordinates. For example, (0,0,1) is
    *            usually the look direction out of the boresight of a camera.
    *
-   * history  2009-09-23  Tracie Sucharski - Convert negative longitudes
-   *                         returned my reclat.
-   * history  2010-09-15  Janet Barrett - Modified this method to use a new
-   *                         algorithm for finding the intersection of a ray with
-   *                         the DEM. This was required to take care of problems that
-   *                         were encountered at the poles of global DEM files. The
-   *                         algorithm that is being used was taken from "Intersection
-   *                         between spacecraft viewing vectors and digital elevation
-   *                         models" by N.A. Teanby. This algorithm only works on 
-   *                         Equatorial Cylindrical projections. Other projections still
-   *                         use the previous algorithm.
-   * history  2010-10-26  Janet Barrett - The tolerance value of 1E-5 was too small and
-   *                         was causing a divide by zero error when the current and last
-   *                         intersections were virtually the same. The tolerance was
-   *                         changed to 3E-8 * a (where a is the equatorial radius of the
-   *                         planet we are dealing with).
-   * history 2011-01-24   Janet Barrett - Got rid of extra loop that wasn't needed for the
-   *                         new ray tracing algorithm.
-   * @return bool
+   * @return @b bool True if the look direction intersected the target. 
+   * @internal 
+   *   @history  2009-09-23  Tracie Sucharski - Convert negative longitudes
+   *                           returned my reclat.
+   *   @history  2010-09-15  Janet Barrett - Modified this method to use a new
+   *                           algorithm for finding the intersection of a ray with
+   *                           the DEM. This was required to take care of problems that
+   *                           were encountered at the poles of global DEM files. The
+   *                           algorithm that is being used was taken from "Intersection
+   *                           between spacecraft viewing vectors and digital elevation
+   *                           models" by N.A. Teanby. This algorithm only works on 
+   *                           Equatorial Cylindrical projections. Other projections still
+   *                           use the previous algorithm.
+   *   @history  2010-10-26  Janet Barrett - The tolerance value of 1E-5 was too
+   *                           small and was causing a divide by zero error when
+   *                           the current and last intersections were virtually
+   *                           the same. The tolerance was changed to 3E-8 * a
+   *                           (where a is the equatorial radius of the planet
+   *                           we are dealing with).
+   *   @history 2011-01-24   Janet Barrett - Got rid of extra loop that wasn't
+   *                         needed for the new ray tracing algorithm.
    */
   bool Sensor::SetLookDirection(const double v[3]) {
     // The look vector must be in the camera coordinate system
@@ -509,12 +489,29 @@ namespace Isis {
     p[2] = p_pB[2];
   }
 
-
+  /** 
+   * Returns the local radius at the intersection point. This is either the
+   * radius on the ellipsoid, the radius from the surface model passed into
+   * the constructor, or the radius set with SetUniversalGround.
+   *  
+   * @return @b Distance The distance from the center of the planet to this 
+   *          lat,lon in meters
+   */
   Distance Sensor::LocalRadius() const {
     return Distance(p_radius, Distance::Kilometers);
   }
 
-
+  /** 
+   * Returns the local radius at the intersection point. This is either the
+   * radius on the ellipsoid, the radius from the surface model passed into
+   * the constructor, or the radius set with SetUniversalGround.
+   *  
+   * @param lat The latitude of the point to get the local radius.
+   * @param lon The longitude of the point to get the local radius.
+   *  
+   * @return @b Distance The distance from the center of the planet to this 
+   *          lat,lon in meters
+   */
   Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
     return LocalRadius(lat.GetDegrees(), lon.GetDegrees());
   }
@@ -528,8 +525,8 @@ namespace Isis {
    * @param lon The longitude of the point to get the local radius for
    *              in degrees.
    *
-   * @returns The distance from the center of the planet to this lat,lon in
-   *          meters
+   * @return @b Distance The distance from the center of the planet to this 
+   *          lat,lon in meters
    */
   Distance Sensor::LocalRadius(double lat, double lon) {
     double radius;
@@ -555,7 +552,7 @@ namespace Isis {
   /**
    * Returns the phase angle in degrees. This does not use the surface model.
    *
-   * @return double
+   * @return @b double Phase angle, in degrees.
    */
   double Sensor::PhaseAngle() const {
     SpiceDouble psB[3], upsB[3], dist;
@@ -576,7 +573,7 @@ namespace Isis {
   /**
    * Returns the emission angle in degrees. This does not use the surface model.
    *
-   * @return double
+   * @return @b double Emission angle, in degrees.
    */
   double Sensor::EmissionAngle() const {
     SpiceDouble psB[3], upsB[3], upB[3], dist;
@@ -594,7 +591,7 @@ namespace Isis {
   /**
    * Returns the incidence angle in degrees. This does not use the surface model.
    *
-   * @return double
+   * @return @b double Incidence angle, in degrees.
    */
   double Sensor::IncidenceAngle() const {
     SpiceDouble puB[3], upuB[3], upB[3], dist;
@@ -615,15 +612,13 @@ namespace Isis {
    * method returns a true.
    *
    * @param latitude Planetocentric latitude
-   *
    * @param longitude Positive east longitude
-   *
    * @param backCheck If true this method will check the lat/lon point to see if
    *                  it falls on the backside of the target (or beyond the
    *                  horizon). If false this test will not occur.
    *                  Defaults to true
    *
-   * @return bool
+   * @return bool True if the look direction intersects the target.
    */
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude, bool backCheck) {
@@ -654,17 +649,14 @@ namespace Isis {
    * this method returns a true.
    *
    * @param latitude Planetocentric latitude in degrees
-   *
    * @param longitude Positive east longitude in degrees
-   *
    * @param radius Radius in meters
-   *
    * @param backCheck If true this method will check the lat/lon point to see if
    *                  it falls on the backside of the target (or beyond the
    *                  horizon). If false this test will not occur.
    *                  Defaults to true
    *
-   * @return bool
+   * @return bool True if the look direction intersects the target.
    */
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude,
@@ -693,8 +685,7 @@ namespace Isis {
   *                  horizon). If false this test will not occur.
   *                  Defaults to true
   *
-  * @return bool
-  *
+  * @return bool True if the look direction intersects the target.
   */
   bool Sensor::SetGroundLocal(bool backCheck) {
     // With the 3 spherical value compute the x/y/z coordinate
@@ -727,7 +718,7 @@ namespace Isis {
 
 
   /**
-  * Returns the look direction in the camera coordinate system
+  * Sets the look direction in the camera coordinate system
   *
   * @param v[] The look vector
   */
@@ -741,10 +732,13 @@ namespace Isis {
     v[0] = lookC[0];
     v[1] = lookC[1];
     v[2] = lookC[2];
+    return;
   }
 
   /**
-   * Returns the right ascension angle (sky longitude)
+   * Returns the right ascension angle (sky longitude) 
+   *  
+   * @return @b double Right ascension angle. 
    */
   double Sensor::RightAscension() {
     if(p_newLookB) computeRaDec();
@@ -752,7 +746,8 @@ namespace Isis {
   }
 
   /**
-   * Returns the declination angle (sky latitude)
+   * Returns the declination angle (sky latitude) 
+   * @return @b double Declination angle. 
    */
   double Sensor::Declination() {
     if(p_newLookB) computeRaDec();
@@ -779,10 +774,10 @@ namespace Isis {
   /**
    * Given the ra/dec compute the look direction
    *
-   * @param ra    right ascension in degrees (sky longitude)
-   * @param dec   declination in degrees (sky latitude)
+   * @param ra    Right ascension in degrees (sky longitude)
+   * @param dec   Declination in degrees (sky latitude)
    *
-   * @returns success or failure
+   * @return @b bool True if successful
    */
   bool Sensor::SetRightAscensionDeclination(const double ra, const double dec) {
     vector<double> lookJ(3);
@@ -793,7 +788,10 @@ namespace Isis {
   }
 
 
-  //! Return the distance between the spacecraft and surface point in km
+  /**
+   * Return the distance between the spacecraft and surface point in kmv
+   * @return @b double Slant distance
+   */
   double Sensor::SlantDistance() const {
     SpiceDouble psB[3], upsB[3];
     SpiceDouble dist;
@@ -804,7 +802,10 @@ namespace Isis {
     return dist;
   }
 
-  //! Return the local solar time in hours
+  /**
+   * Return the local solar time in hours
+   * @return @b double Local solar time, in hours 
+   */
   double Sensor::LocalSolarTime() {
     double slat, slon;
     SubSolarPoint(slat, slon);
@@ -816,7 +817,10 @@ namespace Isis {
     return lst;
   }
 
-  //! Returns the distance between the sun and surface point in AU
+  /**
+   * Returns the distance between the sun and surface point in AU
+   * @return @b double Solar distance
+   */
   double Sensor::SolarDistance() const {
     // Get the sun coord
     double sB[3];
@@ -835,7 +839,8 @@ namespace Isis {
 
   /**
    * Returns the distance from the spacecraft to the subspacecraft point in km.
-   * It uses the ellipsoid, not the shape model
+   * It uses the ellipsoid, not the shape model 
+   * @return @b double Spacecraft altitude.
    */
   double Sensor::SpacecraftAltitude() {
     // Get the spacecraft coord
@@ -865,7 +870,11 @@ namespace Isis {
     return dist;
   }
 
-  /** Grab the radius from the dem if we have one
+  /** 
+   * Gets the radius from the DEM, if we have one.
+   * @param lat Latitude
+   * @param lon Longitude
+   * @return @b double Local radius from the DEM
    */
   double Sensor::DemRadius(double lat, double lon) {
     if(!p_hasElevationModel) return Isis::Null;
