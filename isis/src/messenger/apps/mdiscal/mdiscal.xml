@@ -447,6 +447,9 @@ in the SOLAR directory.
     <change name="Mackenzie Boyd" date="2011-02-04">
         Fixed reduce parameters to use MODE instead of REDUCTION_TYPE. Fixed typo in docs.
     </change> 
+    <change name="Mackenzie Boyd" date="2011-02-09">
+        Removed a cout, fixed calibration for images with nonzero pixel binning. 
+    </change> 
   </history>
 
   <groups>

@@ -291,7 +291,7 @@ void IsisMain() {
   string reducedFlat("");
   Filename flatfield = DetermineFlatFieldFile();
   if(pxlBin > 0) {
-    iString scale(pow(2.0, pxlBin));
+    iString scale(pxlBin);
     Filename newflat;
     newflat.Temporary(flatfield.Basename() + "_reduced", "cub");
     string parameters = "FROM=" + flatfield.Expanded() +
@@ -299,7 +299,6 @@ void IsisMain() {
                         " MODE=SCALE" +
                         " LSCALE=" + scale +
                         " SSCALE=" + scale;
-    cout << "Running: reduce " << parameters << endl;
     ProgramLauncher::RunIsisProgram("reduce", parameters);
     reducedFlat = newflat.Expanded();
     CubeAttributeInput att;
