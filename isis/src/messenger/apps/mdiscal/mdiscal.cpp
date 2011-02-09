@@ -12,7 +12,7 @@
 #include "MdisCalUtils.h"
 #include "MultivariateStatistics.h"
 #include "ProcessByLine.h"
-//#include "ProgramLauncher.h"
+#include "ProgramLauncher.h"
 #include "Spice.h"
 #include "Statistics.h"
 #include "TextFile.h"
@@ -299,8 +299,7 @@ void IsisMain() {
                         " MODE=SCALE" +
                         " LSCALE=" + scale +
                         " SSCALE=" + scale;
-    //ProgramLauncher::RunIsisProgram("reduce", parameters);
-    iApp->Exec("reduce", parameters);
+    ProgramLauncher::RunIsisProgram("reduce", parameters);
     reducedFlat = newflat.Expanded();
     CubeAttributeInput att;
     p.SetInputCube(reducedFlat, att);
