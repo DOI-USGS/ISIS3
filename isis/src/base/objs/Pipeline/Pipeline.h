@@ -55,6 +55,10 @@ namespace Isis {
    * Parameters for an application in a branch can be set commonly for all branches 
    * or explicitly for a branch by specifiying the branch name. 
    *  
+   * Option continue allows the pipeline to proceed with the execution inspite of any 
+   * exceptions encountered while running an application in the pipeline. If continue 
+   * is not enabled, then on encountering  an exception the pipeline exits.
+   *  
    * Temporary files are created and will be deleted when explicitly set by the user. 
    *  
    * The Pipeline calls cubeatt app inherently if virtual bands are true. 
@@ -62,7 +66,7 @@ namespace Isis {
    * It is suggested that you "cout" this object in order to debug you're usage of 
    * the class.
    *  
-   * Refer to Applications thmproc, mocproc, hidestripe for Pipeline usage. 
+   * Refer to Applications thmproc, mocproc, hidestripe, hiproc, hinoise2 for Pipeline usage. 
    *  
    * Here's an example usage of this class:
    * @code
@@ -138,6 +142,8 @@ namespace Isis {
    *            of the Pipeline
    *   @history 2010-12-21 Sharmila Prasad - Added documentation and ignore temp files
    *            from disabled branches
+   *   @history 2011-02-09 Sharmila Prasad - Added option continue to proceed with execution
+   *            even if an application in the pipeline encounters an exception.
    */
   class Pipeline {
     public:
@@ -245,6 +251,17 @@ namespace Isis {
           }
         }
       }
+      
+      /**
+       * Set the continue flag
+       * 
+       * @author Sharmila Prasad (2/9/2011)
+       * 
+       * @param pbFlag - true/false
+       */
+      void SetContinue(bool pbFlag) {
+        p_continue = pbFlag;
+      };
 
     private:
       iString p_procAppName; //!< The name of the pipeline
@@ -258,6 +275,7 @@ namespace Isis {
       vector< PipelineApplication * > p_apps; //!< The pipeline applications
       vector< iString > p_appIdentifiers; //!< The strings to identify the pipeline applications
       bool p_outputListNeedsModifiers;
+      bool p_continue; //!< continue the execution even if exception is encountered.
   };
 };
 

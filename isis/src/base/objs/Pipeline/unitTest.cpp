@@ -1,21 +1,24 @@
 #include "Isis.h"
 #include "Pipeline.h"
+#include "SpecialPixel.h"
 #include "UserInterface.h"
 
 using namespace Isis;
+using namespace std;
 
 void PipeBranched();
 void PipeMultiBranched();
 void PipeBranchDisabled();
 void PipeSimple();
 void PipeListed();
+void PipeContinue();
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  ui.PutFilename("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub");
+  ui.PutFilename("FROM",  "$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub");
   ui.PutFilename("FROM2", "$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub");
-  ui.PutFilename("TO", "/work1/out.cub");
-  ui.PutString("SHAPE", "ELLIPSOID");
+  ui.PutFilename("TO",    "/work1/out.cub");
+  ui.PutString  ("SHAPE", "ELLIPSOID");
 
   ui.Clear("MAPPING");
   ui.PutBoolean("MAPPING", true);
@@ -51,6 +54,12 @@ void IsisMain() {
   ui.PutFilename("TO", "./out.cub");
   std::cout << "*** Branching Pipe with a branch disabled ***" << std::endl;
   PipeBranchDisabled();
+  
+  ui.Clear("TO");
+  ui.PutFilename("TO",   "./out.cub");
+  std::cout << "\n*** Continue option ***" << endl;
+  cout << "input=" << ui.GetFilename("FROM") << endl;
+  PipeContinue();
 }
 
 void PipeBranched() {
@@ -320,4 +329,61 @@ void PipeBranchDisabled(void)
   p.Application("fx").AddConstParameter("EQUATION", "f1+f2");
   
   std::cout << p;
+}
+
+void PipeContinue(void)
+{
+  // Pipeline level "continue"
+  Pipeline pc1("unitTest6");
+  
+  pc1.SetInputFile(Filename("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
+  pc1.SetOutputFile("TO");
+  pc1.SetContinue(true);
+  pc1.KeepTemporaryFiles(false);
+  
+  pc1.AddToPipeline("mask");
+  //p.Application("mask").SetContinue(true);
+  pc1.Application("mask").SetInputParameter("FROM",     false);
+  pc1.Application("mask").SetOutputParameter("TO",      "mask");
+  pc1.Application("mask").AddConstParameter("MINIMUM",  iString(VALID_MIN4));
+  pc1.Application("mask").AddConstParameter("MAXIMUM",  iString(VALID_MAX4));
+  pc1.Application("mask").AddConstParameter("PRESERVE", "INSIDE");
+  pc1.Application("mask").AddConstParameter("SPIXELS",  "NONE");
+  
+  pc1.AddToPipeline("lowpass");
+  pc1.Application("lowpass").SetInputParameter ("FROM", false);
+  pc1.Application("lowpass").SetOutputParameter("TO", "lowpass");
+  pc1.Application("lowpass").AddConstParameter ("SAMPLES", "3");
+  pc1.Application("lowpass").AddConstParameter ("LINES", "3");
+  
+  cout << pc1;
+  
+  pc1.Run();
+  
+
+  cout << "\n*** Application level continue option ***\n";
+  Pipeline pc2("unitTest7");
+  
+  pc2.SetInputFile(Filename("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
+  pc2.SetOutputFile("TO");
+  pc2.KeepTemporaryFiles(false);
+  
+  pc2.AddToPipeline("mask", "mask1");
+  pc2.Application("mask1").SetContinue(true);
+  pc2.Application("mask1").SetInputParameter("FROM",     false);
+  pc2.Application("mask1").SetOutputParameter("TO",      "mask1");
+  pc2.Application("mask1").AddConstParameter("MINIMUM",  iString(VALID_MIN4));
+  pc2.Application("mask1").AddConstParameter("MAXIMUM",  iString(VALID_MAX4));
+  pc2.Application("mask1").AddConstParameter("PRESERVE", "INSIDE");
+  pc2.Application("mask1").AddConstParameter("SPIXELS",  "NONE");
+  
+  pc2.AddToPipeline("lowpass", "lpf1");
+  pc2.Application("lpf1").SetInputParameter ("FROM", false);
+  pc2.Application("lpf1").SetOutputParameter("TO", "lpf1");
+  pc2.Application("lpf1").AddConstParameter ("SAMPLES", "3");
+  pc2.Application("lpf1").AddConstParameter ("LINES", "3");
+  
+  cout << pc2;
+  
+  pc2.Run();
 }

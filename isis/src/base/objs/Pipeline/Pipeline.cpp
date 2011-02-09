@@ -25,6 +25,7 @@ namespace Isis {
     p_procAppName = procAppName;
     p_addedCubeatt = false;
     p_outputListNeedsModifiers = false;
+    p_continue = false;
   }
 
 
@@ -194,7 +195,19 @@ namespace Isis {
           }
           else {
             // Nothing special is happening, just execute the program
-            ProgramLauncher::RunIsisProgram(Application(i).Name(), params[j]);
+            try {
+              ProgramLauncher::RunIsisProgram(Application(i).Name(), params[j]);
+            } 
+            catch(Isis::iException & Ex) {
+              if(!p_continue && !Application(i).Continue()) {
+                throw iException::Message(iException::Programmer, Ex.Errors(), _FILEINFO_);
+              }
+              else {
+                cerr << Ex.Errors() << endl;
+                Ex.Clear();
+                cerr << "Continuing ......" << endl;
+              }
+            }
           }
         }
       }

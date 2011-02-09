@@ -56,6 +56,8 @@ namespace Isis {
    *            heavily now to do the right thing.
    *   @history 2010-12-20 Sharmila Prasad - Added the ability to enable/disable a
    *            branch.
+   *   @history 2011-02-09 Sharmila Prasad - Added option continue to proceed with execution
+   *            of the next application in the pipeline if the current encounters an exception.
    */
   class PipelineApplication {
     public:
@@ -235,6 +237,28 @@ namespace Isis {
         return p_enableBranch[branch] ;
       }
       
+      /**
+       * Set the continue flag status
+       * 
+       * @author Sharmila Prasad (2/9/2011)
+       * 
+       * @param pbFlag - true/false
+       */
+      void SetContinue(bool pbFlag){
+        p_continue = pbFlag;
+      };
+      
+      /**
+       * Get the continue flag status
+       * 
+       * @author Sharmila Prasad (2/9/2011)
+       * 
+       * @return bool - return continue status
+       */
+      bool Continue(void) {
+        return p_continue;
+      };
+      
     private:
       bool FutureOutputFileCreated();
       bool LastApplicationWithOutput();
@@ -278,6 +302,7 @@ namespace Isis {
 
       int FindBranch(iString name, bool input = true);
 
+      bool p_continue;//!< Continue the pipeline execution even if an error is encountered by this app
       bool p_enabled; //!< This application enabled?
       bool p_supportsVirtualBands; //!< This application supports virtual bands?
       iString p_name; //!< Name of this application

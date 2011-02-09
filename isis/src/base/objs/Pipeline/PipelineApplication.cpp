@@ -22,6 +22,7 @@ namespace Isis {
     p_previous = NULL;
     p_next = NULL;
     p_pipeline = pipe;
+    p_continue = false;
 
     if(p_pipeline->OriginalBranches().size() == 1) {
       p_inBranches.push_back("");
