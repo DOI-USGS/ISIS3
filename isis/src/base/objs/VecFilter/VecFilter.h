@@ -21,6 +21,7 @@
  */
 
 #include <vector>
+#include "iString.h"
 
 namespace Isis {
   /**
@@ -36,7 +37,8 @@ namespace Isis {
   * @ingroup Statistics
   *
   * @author Janet Barrett - 2009-03-13
-  *
+  *  
+  * @history 2011-02-08 Sharmila Prasad - Extended Highpass API for hicubenorm 
   */
   class VecFilter {
     public:
@@ -45,6 +47,8 @@ namespace Isis {
 
       std::vector<double> LowPass(std::vector<double> invec, int boxsize);
       std::vector<double> HighPass(std::vector<double> invec1, std::vector<double> invec2);
+      std::vector<double> HighPass(std::vector<double> pdInVector1, std::vector<double> pdInVector2, 
+             std::vector<int> piValidPntsVector, int piMaxPoints, const iString & psMode="SUBTRACT");
 
     private:
   };

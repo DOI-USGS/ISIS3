@@ -1,9 +1,13 @@
+#include <string>
 #include <iostream>
+#include <iomanip>
+
 #include "VecFilter.h"
 #include "iException.h"
 #include "Preference.h"
 
 using namespace std;
+
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
@@ -32,21 +36,27 @@ int main(int argc, char *argv[]) {
   cout << "Filter size: " << boxsize << endl;
 
   cout << "Original vector values: " << endl;
-
   for(int i = 0; i < 25; i++) {
-    cout << filtorig[i] << endl;
+    cout << std::setw(10) << filtorig[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
   }
 
-  cout << "Lowpass filtered vector values: " << endl;
-
+  cout << endl<<  "Lowpass filtered vector values: " << endl;
   for(int i = 0; i < 25; i++) {
-    cout << filtlow[i] << endl;
+    cout << setw(10) << filtlow[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
   }
 
-  cout << "Highpass filtered vector values: " << endl;
-
+  cout << endl << "Highpass filtered vector values: " << endl;
   for(int i = 0; i < 25; i++) {
-    cout << filthigh[i] << endl;
+    cout << setw(10) << filthigh[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
   }
 
   filtlow.clear();
@@ -56,26 +66,81 @@ int main(int argc, char *argv[]) {
   filtlow = v.LowPass(filtorig, boxsize);
   filthigh = v.HighPass(filtorig, filtlow);
 
-  cout << "Size of original vector: " << filtorig.size() << endl;
+  cout << "\nSize of original vector: " << filtorig.size() << endl;
   cout << "Size of lowpass vector: " << filtlow.size() << endl;
   cout << "Size of highpass vector: " << filthigh.size() << endl;
   cout << "Filter size: " << boxsize << endl;
 
   cout << "Original vector values: " << endl;
-
   for(int i = 0; i < 25; i++) {
-    cout << filtorig[i] << endl;
+    cout << setw(10) << filtorig[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
   }
 
-  cout << "Lowpass filtered vector values: " << endl;
-
+  cout << "\nLowpass filtered vector values: " << endl;
   for(int i = 0; i < 25; i++) {
-    cout << filtlow[i] << endl;
+    cout << setw(10) << filtlow[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
   }
 
-  cout << "Highpass filtered vector values: " << endl;
-
+  cout << "\nHighpass filtered vector values: " << endl;
   for(int i = 0; i < 25; i++) {
-    cout << filthigh[i] << endl;
+    cout << setw(10) << filthigh[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
   }
+  int iMaxPoints = 2, iTemp=0;
+  vector<int>validPoints;
+  for(int i = 0; i < 25; i++) {
+    iTemp = i%3;
+    if(!iTemp) {
+      iTemp = 2;
+    }
+    validPoints.push_back(iTemp);
+    
+  }
+  filthigh = v.HighPass(filtorig, filtlow, validPoints, iMaxPoints, "DIVIDE");
+  
+  cout << "\nSize of original vector: " << filtorig.size() << endl;
+  cout << "Size of lowpass vector: " << filtlow.size() << endl;
+  cout << "Size of highpass vector: " << filthigh.size() << endl;
+  cout << "Filter size: " << boxsize << endl;
+  
+  cout << "Original vector values: " << endl;
+  for(int i = 0; i < 25; i++) {
+    cout << setw(10) << filtorig[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
+  }
+  
+  cout << "Valid Points vector values: " << endl;
+  for(int i = 0; i < 25; i++) {
+    cout << setw(5) << validPoints[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
+  }
+
+  cout << "\nLowpass filtered vector values: " << endl;
+  for(int i = 0; i < 25; i++) {
+    cout << setw(10) << filtlow[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
+  }
+
+  cout << "\nHighpass filtered vector values: " << endl;
+  for(int i = 0; i < 25; i++) {
+    cout << setw(10) << filthigh[i];
+    if(i%5 == 4) {
+      cout << endl;
+    }
+  }
+  cout << endl;
 }

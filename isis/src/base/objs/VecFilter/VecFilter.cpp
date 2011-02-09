@@ -26,6 +26,7 @@
 #include "iString.h"
 
 using namespace std;
+const int MARKER = -999999;
 namespace Isis {
   //! Constructs a VecFilter object.
   VecFilter::VecFilter() {}
@@ -111,6 +112,51 @@ namespace Isis {
       }
     }
     return outvec;
+  }
+  
+  /**
+   * Highpass specifically used in hicubenorm where the cubenorm stats are 
+   * manipulated. Highpass filtering with Subtract/Divide mode is done if the 
+   * original and resultant lowpass vectors are non-zero and valid points vector 
+   * has max valid points else that index is Marked as having isufficient valid 
+   * points for later processing 
+   * 
+   * @author Sharmila Prasad (1/28/2011)
+   * 
+   * @param pdInVector1       - Original data vector
+   * @param pdInVector2       - Vector after the lowpass filter
+   * @param piValidPntsVector - Valid pixels vector
+   * @param piMaxPoints       - Max Valid pixels
+   * @param psMode            - Mode Subtract/Divide
+   * 
+   * @return vector<double>   - Resulting vector after highpass
+   */
+  vector<double> VecFilter::HighPass(vector<double> pdInVector1, vector<double> pdInVector2, 
+                 vector<int> piValidPntsVector, int piMaxPoints, const iString & psMode)
+  {
+    vector<double> dOutVector;
+
+    // Both vectors must be the same size
+    if(pdInVector1.size() != pdInVector2.size()) {
+      string m = "Both vectors must be the same size in [VecFilter::HighPass]";
+      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+    }
+
+    int iSize = (int)pdInVector1.size();
+    for(int i = 0; i < iSize; i++) {
+      if(pdInVector1[i] != 0.0 && pdInVector2[i] != 0.0 && piValidPntsVector[i]==piMaxPoints) {
+        if(psMode == "SUBTRACT") {
+          dOutVector.push_back(pdInVector1[i] - pdInVector2[i]);
+        }
+        else {
+          dOutVector.push_back(pdInVector1[i] / pdInVector2[i]);
+        }
+      }
+      else {
+        dOutVector.push_back(MARKER);
+      }
+    }
+    return dOutVector;
   }
 
 } // end namespace isis
