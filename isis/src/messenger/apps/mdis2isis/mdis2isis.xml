@@ -75,6 +75,7 @@
   <groups>
     <group name="Files">
       <parameter name="FROM">
+        <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
           Input cube file name
