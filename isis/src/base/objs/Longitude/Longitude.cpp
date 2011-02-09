@@ -80,6 +80,32 @@ namespace Isis {
    *   any number of times regardless of the domain.
    *
    * @param longitude The longitude value this instance will represent
+   * @param lonDir True if moving east means an increase in longitude
+   * @param lonDomain Domain of the given longitude value
+   */
+  Longitude::Longitude(Angle longitude,
+                       Direction lonDir, Domain lonDomain) :
+      Angle(longitude) {
+    p_currentDomain = lonDomain;
+
+    if(lonDir == PositiveEast) {
+      SetPositiveEast(longitude.GetRadians(), Radians);
+    }
+    else if(lonDir == PositiveWest) {
+      SetPositiveWest(longitude.GetRadians(), Radians);
+    }
+    else {
+      iString msg = "Longitude direction [" + iString(lonDir) + "] not valid";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Create and initialize a Longitude value. This value can wrap the planet
+   *   any number of times regardless of the domain.
+   *
+   * @param longitude The longitude value this instance will represent
    * @param longitudeUnits The angular units of the longitude value (degs, rads)
    * @param lonDir True if moving east means an increase in longitude
    * @param lonDomain Domain of the given longitude value

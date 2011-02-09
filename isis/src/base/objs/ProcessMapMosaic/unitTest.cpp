@@ -7,7 +7,6 @@
 #include "CubeAttribute.h"
 #include "FileList.h"
 #include "ProcessMosaic.h"
-#include "ProgramLauncher.h"
 #include "LineManager.h"
 
 using namespace Isis;
@@ -44,7 +43,9 @@ void IsisMain() {
 
   m1.EndProcess();
   cout << "Mosaic label: " << endl;
-  ProgramLauncher::RunIsisProgram("catlab", "FROM=./unitTest.cub");
+
+  Pvl labels("./unitTest.cub");
+  cout << labels << endl;
 
   remove("./unitTest.cub");
 
@@ -68,8 +69,9 @@ void IsisMain() {
   m2.EndProcess();
   cout << "Mosaic label: " << endl;
 
-  ProgramLauncher::RunIsisProgram("catlab", "FROM=./unitTest.cub");
-
+  labels.Clear();
+  labels.Read("./unitTest.cub");
+  cout << labels << endl;
 
   Cube tmp;
   tmp.Open("./unitTest.cub");

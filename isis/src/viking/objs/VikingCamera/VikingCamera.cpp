@@ -27,6 +27,7 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "iString.h"
+#include "iTime.h"
 #include "naif/SpiceUsr.h"
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
@@ -151,7 +152,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetEphemerisTime(et);
+    SetTime(et);
     LoadCache();
   }
 } // end namespace isis

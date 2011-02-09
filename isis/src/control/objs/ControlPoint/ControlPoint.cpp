@@ -328,8 +328,9 @@ namespace Isis {
     if (p.HasKeyword("AprioriX") &&
         p.HasKeyword("AprioriY") &&
         p.HasKeyword("AprioriZ")) {
-      p_aprioriSurfacePoint.SetRectangular(Displacement(p["AprioriX"]),
-                                           Displacement(p["AprioriY"]), Displacement(p["AprioriZ"]));
+      p_aprioriSurfacePoint.SetRectangular(Displacement(p["AprioriX"], Displacement::Meters),
+                                           Displacement(p["AprioriY"], Displacement::Meters),
+                                           Displacement(p["AprioriZ"], Displacement::Meters));
     }
 
     //  Look for AprioriLatitude/Longitude/Radius.  These keywords may
@@ -340,12 +341,13 @@ namespace Isis {
       p_aprioriSurfacePoint.SetSpherical(
         Latitude(p["AprioriLatitude"], Angle::Degrees),
         Longitude(p["AprioriLongitude"], Angle::Degrees),
-        Distance(p["AprioriRadius"]));
+        Distance(p["AprioriRadius"], Distance::Meters));
     }
 
     if (p.HasKeyword("X") && p.HasKeyword("Y") && p.HasKeyword("Z")) {
-      p_surfacePoint.SetRectangular(Displacement(p["X"]), Displacement(p["Y"]),
-                                    Displacement(p["Z"]));
+      p_surfacePoint.SetRectangular(Displacement(p["X"], Displacement::Meters),
+                                    Displacement(p["Y"], Displacement::Meters),
+                                    Displacement(p["Z"], Displacement::Meters));
     }
 
     // Look for Latitude/Longitude/Radius.  These keywords may exist in old
@@ -355,7 +357,7 @@ namespace Isis {
       p_surfacePoint.SetSpherical(
         Latitude(p["Latitude"], Angle::Degrees),
         Longitude(p["Longitude"], Angle::Degrees),
-        Distance(p["Radius"]));
+        Distance(p["Radius"], Distance::Meters));
     }
 
     if (p.HasKeyword("AprioriCovarianceMatrix")) {
@@ -2053,9 +2055,10 @@ namespace Isis {
 
     if (protoBufPt.has_apriorix() && protoBufPt.has_aprioriy() &&
         protoBufPt.has_aprioriz()) {
-      SurfacePoint apriori(Displacement(protoBufPt.apriorix()),
-                           Displacement(protoBufPt.aprioriy()),
-                           Displacement(protoBufPt.aprioriz()));
+      SurfacePoint apriori(
+          Displacement(protoBufPt.apriorix(), Displacement::Meters),
+          Displacement(protoBufPt.aprioriy(), Displacement::Meters),
+          Displacement(protoBufPt.aprioriz(), Displacement::Meters));
 
       if (protoBufPt.aprioricovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
@@ -2074,9 +2077,9 @@ namespace Isis {
     }
 
     if (protoBufPt.has_x() && protoBufPt.has_y() && protoBufPt.has_z()) {
-      SurfacePoint apost(Displacement(protoBufPt.x()),
-                         Displacement(protoBufPt.y()),
-                         Displacement(protoBufPt.z()));
+      SurfacePoint apost(Displacement(protoBufPt.x(), Displacement::Meters),
+                         Displacement(protoBufPt.y(), Displacement::Meters),
+                         Displacement(protoBufPt.z(), Displacement::Meters));
 
       if (protoBufPt.apostcovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
@@ -2206,9 +2209,9 @@ namespace Isis {
 
     if (GetAprioriSurfacePoint().Valid()) {
       SurfacePoint apriori = GetAprioriSurfacePoint();
-      pbPoint.set_apriorix(apriori.GetX());
-      pbPoint.set_aprioriy(apriori.GetY());
-      pbPoint.set_aprioriz(apriori.GetZ());
+      pbPoint.set_apriorix(apriori.GetX().GetMeters());
+      pbPoint.set_aprioriy(apriori.GetY().GetMeters());
+      pbPoint.set_aprioriz(apriori.GetZ().GetMeters());
 
       symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
@@ -2226,9 +2229,9 @@ namespace Isis {
 
     if (GetSurfacePoint().Valid()) {
       SurfacePoint apost = GetSurfacePoint();
-      pbPoint.set_x(apost.GetX());
-      pbPoint.set_y(apost.GetY());
-      pbPoint.set_z(apost.GetZ());
+      pbPoint.set_x(apost.GetX().GetMeters());
+      pbPoint.set_y(apost.GetY().GetMeters());
+      pbPoint.set_z(apost.GetZ().GetMeters());
 
       symmetric_matrix< double, upper > covar = apost.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||

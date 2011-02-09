@@ -133,7 +133,7 @@ namespace Isis {
    *   angle.
    *
    * @param value The value to multiply to this angle
-   * @return difference angle
+   * @return Multiplied angle
    */
   Angle Angle::operator*(double value) const {
     if(!Valid()) return Angle();
@@ -143,8 +143,21 @@ namespace Isis {
 
 
   /**
-    * Divide this angle by a double and set this instance to the resulting
-    *   angle.
+   * Multiply this angle by a double and return the resulting angle. If
+   *   this is an invalid angle, then the result will be an invalid
+   *   angle.
+   *
+   * @param mult The value to multiply to this angle
+   * @param angle The angle being multiplied by mult
+   * @return Multiplied angle
+   */
+  Angle operator *(double mult, Angle angle) {
+    return angle * mult;
+  }
+
+
+  /**
+    * Divide this angle by a double
     *
     * @param value The double value to use as the divisor
     * @return Quotient of the angles 
@@ -153,6 +166,19 @@ namespace Isis {
     if(!Valid()) return Angle();
 
     return Angle(GetRadians() / value, Radians);
+  }
+
+
+  /**
+    * Divide this angle by another angle and return the ratio.
+    *
+    * @param value The ratio, Null if invalid
+    * @return Quotient of the angles
+    */
+  double Angle::operator/(Angle value) const {
+    if(!Valid() || !value.Valid()) return Null;
+
+    return GetRadians() / value.GetRadians();
   }
 
 

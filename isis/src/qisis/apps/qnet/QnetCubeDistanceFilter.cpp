@@ -133,7 +133,7 @@ namespace Qisis {
           cam1  = g_controlNetwork->Camera(g_filteredImages[i]);
           // try to set image using sample/line values
           if (cam1->SetImage(controlMeas1.GetSample(), controlMeas1.GetLine())) {
-            rad = cam1->LocalRadius();
+            rad = cam1->LocalRadius().GetMeters();
             lat1 = cam1->UniversalLatitude();
             lon1 = cam1->UniversalLongitude();
           }

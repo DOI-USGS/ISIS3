@@ -19,14 +19,12 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-
   ControlNet cnet(ui.GetFilename("CNET"));
 
   // Get input cube and get camera model for it
   string from = ui.GetFilename("DEM");
   Cube cube;
   cube.Open(from);
-
   UniversalGroundMap *ugm = NULL;
   try {
     ugm = new UniversalGroundMap(cube);
@@ -35,7 +33,6 @@ void IsisMain() {
     iString msg = "Cannot initalize UniversalGroundMap for cube [" + from + "]";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
-
 
   int numSuccesses = 0;
   int numFailures = 0;
@@ -47,17 +44,23 @@ void IsisMain() {
     if(cp->GetType() == ControlPoint::Ground) {
       // Create Brick on samp, line to get the dn value of the pixel
       SurfacePoint surfacePt = cp->GetSurfacePoint();
+      bool success = surfacePt.Valid();
+
+      if(success) {
+        success = ugm->SetUniversalGround(surfacePt.GetLatitude().GetDegrees(),
+            surfacePt.GetLongitude().GetDegrees());
+      }
+
       Brick b(1, 1, 1, cube.PixelType());
-      bool ugSuccess = ugm->SetUniversalGround(
-                         surfacePt.GetLatitude().GetDegrees(),
-                         surfacePt.GetLongitude().GetDegrees());
-      b.SetBasePosition((int)ugm->Sample(), (int)ugm->Line(), 1);
-      cube.Read(b);
-      double newRadius = b[0];
+      if(success) {
+        b.SetBasePosition((int)ugm->Sample(), (int)ugm->Line(), 1);
+        cube.Read(b);
+        success = !IsSpecial(b[0]);
+      }
 
       // if we are unable to calculate a valid Radius value for a point,
       // we will ignore this point and keep track of it
-      if(IsSpecial(newRadius) || ugSuccess == false) {
+      if(!success) {
         numFailures++;
         if(numFailures > 1) {
           failedIDs = failedIDs + ", ";
@@ -68,7 +71,7 @@ void IsisMain() {
       // otherwise, we will replace the computed radius value to the output control net
       else {
         numSuccesses++;
-        surfacePt.ResetLocalRadius(newRadius);
+        surfacePt.ResetLocalRadius(Distance(b[0], Distance::Meters));
         cp->SetSurfacePoint(surfacePt);
       }
     }

@@ -21,10 +21,15 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "CameraGroundMap.h"
+
+#include <iostream>
+
 #include "NaifStatus.h"
 #include "SurfacePoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
+
+using namespace std;
 
 namespace Isis {
   CameraGroundMap::CameraGroundMap(Camera *parent) {
@@ -58,7 +63,8 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
 
-    return p_camera->SetLookDirection(unitLookC);
+    bool result = p_camera->SetLookDirection(unitLookC);
+    return result;
   }
 
   /** Compute undistorted focal plane coordinate from ground position
@@ -68,11 +74,13 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool CameraGroundMap::SetGround(const double lat, const double lon) {
-    if(p_camera->Sensor::SetUniversalGround(lat, lon)) {
+  bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+    Distance radius(p_camera->LocalRadius(lat, lon));
+    if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
       LookCtoFocalPlaneXY();
       return true;
     }
+
     return false;
   }
 
@@ -93,11 +101,12 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool CameraGroundMap::SetGround(const double lat, const double lon, const double radius) {
-    if(p_camera->Sensor::SetUniversalGround(lat, lon, radius)) {
+  bool CameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
+    if(p_camera->Sensor::SetGround(surfacePoint)) {
       LookCtoFocalPlaneXY();
       return true;
     }
+
     return false;
   }
 
@@ -311,8 +320,8 @@ namespace Isis {
    * @return partialDerivative
    */
   std::vector<double> CameraGroundMap::PointPartial(SurfacePoint spoint, PartialType wrt) {
-    double rlat = spoint.GetLatitude();
-    double rlon = spoint.GetLongitude();
+    double rlat = spoint.GetLatitude().GetRadians();
+    double rlon = spoint.GetLongitude().GetRadians();
     double sinLon = sin(rlon);
     double cosLon = cos(rlon);
     double sinLat = sin(rlat);

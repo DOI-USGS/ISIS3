@@ -68,46 +68,25 @@ namespace Isis {
    *                                  class documentation
    */
   class iTime {
-    private:
-      Isis::Filename p_leapSecond; /**<The filename used to load the leapsecond
-                                       kernel.*/
-      std::string p_original;      /**<The original string passed into the
-                                       constructor or the operator= member. Or,
-                                       the string representation of the
-                                       ephemeris time if the double constructor
-                                       or operator= was used.*/
-
-      int p_year;      /**<The year portion of the original string passed into
-                           the constructor or the operator= member.*/
-      int p_month;     /**<The month portion of the original string passed into
-                           the constructor or the operator= member.*/
-      int p_day;       /**<The day portion of the original string passed into
-                           the constructor or the operator= member.*/
-      int p_dayOfYear; /**<The day of year portion of the original string passed
-                           into the constructor or the operator= member.*/
-      int p_hour;      /**<The hour portion of the original string passed into
-                           the constructor or the operator= member.*/
-      int p_minute;    /**<The minute portion of the original string passed into
-                           the constructor or the operator= member.*/
-      double p_second; /**<The seconds portion of the original string passed into
-                           the constructor or the operator= member.*/
-      double p_et;     /**<The ephemeris representaion of the original string
-                           passed into the constructor or the operator= member*/
-
-      void Extract();
-      void LoadLeapSecondKernel();
-      void UnloadLeapSecondKernel();
-
-      static bool p_lpInitialized;
-
     public:
       // constructor
       iTime();
       iTime(const std::string &time);
-      iTime(const double time);
+
+      /**
+      * Constructs a iTime object and initializes it to the time from the argument.
+      *
+      * @param time An ephemeris time (ET).
+      */
+      iTime(const double time) {
+        if(!p_lpInitialized)
+          LoadLeapSecondKernel();
+
+        p_et = time;
+      }
 
       // destructor
-      ~iTime();
+      ~iTime() {};
 
       void operator=(const std::string &time);
       void operator=(const char *time);
@@ -136,10 +115,26 @@ namespace Isis {
       std::string DayOfYearString() const;
       int DayOfYear() const;
       std::string EtString() const;
-      double Et() const;
+
+      /**
+       * Returns the ephemeris time (TDB) representation of the time as a double
+       */
+      double Et() const {
+        return p_et;
+      }
+
       std::string UTC() const;
       static std::string CurrentGMT();
       static std::string CurrentLocalTime();
+
+    private:
+      double p_et;     /**<The ephemeris representaion of the original string
+                           passed into the constructor or the operator= member*/
+
+      void LoadLeapSecondKernel();
+      void UnloadLeapSecondKernel();
+
+      static bool p_lpInitialized;
   };
 };
 

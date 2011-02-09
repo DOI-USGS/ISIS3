@@ -6,6 +6,7 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "iString.h"
+#include "iTime.h"
 #include "Affine.h"
 
 using namespace std;
@@ -49,7 +50,7 @@ namespace Isis {
       new CameraGroundMap(this);
       new CameraSkyMap(this);
 
-      SetEphemerisTime(time);
+      SetTime(time);
       LoadCache();
     }
   }

@@ -1,24 +1,24 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision: 1.0 $ 
  * $Date: 2009/05/27 12:08:01 $ 
- *                                                                        
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for 
  *   intellectual property information,user agreements, and related information.
- *                                                                        
+ *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
  *   is made by the USGS as to the accuracy and functioning of such software 
  *   and related material nor shall the fact of distribution constitute any such 
  *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.                                                           
- *                                                                        
- *   For additional information, launch                                   
+ *   therewith.
+ *
+ *   For additional information, launch
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,              
+ *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include "VoyagerCamera.h"
 
@@ -28,6 +28,7 @@
 #include "CameraSkyMap.h"
 #include "Filename.h"
 #include "iString.h"
+#include "iTime.h"
 #include "naif/SpiceUsr.h"
 #include "ReseauDistortionMap.h"
 #include "Spice.h"
@@ -116,12 +117,12 @@ namespace Isis {
     new CameraSkyMap(this);
    
     // StartTime is the most accurate time available because in voy2isis the
-    // StartTime is modified to be highly accurate.  
+    // StartTime is modified to be highly accurate.
     string startTime = inst["StartTime"];
     double eTime = 0.0;
     utc2et_c(startTime.c_str(), &eTime);
-                                         
-    double expoDur = inst["ExposureDuration"];        
+
+    double expoDur = inst["ExposureDuration"];
 
     // So, StartTime was actually a time two seconds after the end of the
     // exposure. For that reason, we will take of two seconds, and then
@@ -129,7 +130,7 @@ namespace Isis {
     eTime -= 2.0;
     eTime -= 0.5 * expoDur;
 
-    SetEphemerisTime(eTime);
+    SetTime(eTime);
 
     LoadCache();
   }

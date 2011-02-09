@@ -1,4 +1,9 @@
 #include "VimsCamera.h"
+
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
@@ -9,10 +14,7 @@
 #include "Filename.h"
 #include "SpecialPixel.h"
 #include "Constants.h"
-
-#include <fstream>
-#include <iostream>
-#include <iomanip>
+#include "iTime.h"
 
 using namespace std;
 

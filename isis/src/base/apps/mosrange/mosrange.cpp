@@ -1,9 +1,12 @@
-#include <cmath>
 #include "Isis.h"
-#include "FileList.h"
-#include "Cube.h"
-#include "Process.h"
+
+#include <cmath>
+
 #include "Camera.h"
+#include "Cube.h"
+#include "Distance.h"
+#include "FileList.h"
+#include "Process.h"
 #include "Pvl.h"
 #include "Statistics.h"
 
@@ -131,12 +134,12 @@ void IsisMain() {
       mapgrp.AddKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
   
       // Get the radii
-      double radii[3];
+      Distance radii[3];
       cam->Radii(radii);
   
-      eqRad   = radii[0] * 1000.0;
-      eq2Rad  = radii[1] * 1000.0;
-      poleRad = radii[2] * 1000.0;
+      eqRad   = radii[0].GetMeters();
+      eq2Rad  = radii[1].GetMeters();
+      poleRad = radii[2].GetMeters();
   
       target = cam->Target();
       equiRadStat.AddData(&eqRad, 1);

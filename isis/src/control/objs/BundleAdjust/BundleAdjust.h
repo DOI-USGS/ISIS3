@@ -300,7 +300,7 @@ namespace Isis {
 
       double m_dRTM;                                         //!< radians to meters conversion factor (body specific)
       double m_dMTR;                                         //!< meters to radians conversion factor (body specific)
-      double m_BodyRadii[3];                                 //!< body radii
+      Distance m_BodyRadii[3];                               //!< body radii
 
       std::vector<double> m_dEpsilons;                       //!< vector maintaining total corrections to parameters
       std::vector<double> m_dParameterWeights;               //!< vector of parameter weights

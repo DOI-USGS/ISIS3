@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Isis;
 
-double GetRadius(std::string filename, double lat, double lon);
+Distance GetRadius(std::string filename, Latitude lat, Longitude lon);
 
 void IsisMain() {
   // Create a serial number list
@@ -31,11 +31,11 @@ void IsisMain() {
   // line sample
   double samp1 = ui.GetDouble("SAMP1");
   double line1 = ui.GetDouble("LINE1");
-  Latitude lat1 = ui.GetDouble("LAT1");
-  Longitude lon1 = ui.GetDouble("LON1");
+  Latitude lat1(ui.GetDouble("LAT1"), Angle::Degrees);
+  Longitude lon1(ui.GetDouble("LON1"), Angle::Degrees);
   Distance rad1;
   if(ui.WasEntered("RAD1")) {
-    rad1 = ui.GetDouble("RAD1");
+    rad1 = Distance(ui.GetDouble("RAD1"), Distance::Meters);
   }
   else {
     rad1 = GetRadius(ui.GetFilename("FROM"), lat1, lon1);
@@ -62,11 +62,11 @@ void IsisMain() {
   if(ui.GetBoolean("TWIST")) {
     double samp2 = ui.GetDouble("SAMP2");
     double line2 = ui.GetDouble("LINE2");
-    Latitude lat2 = ui.GetDouble("LAT2");
-    Longitude lon2 = ui.GetDouble("LON2");
+    Latitude lat2(ui.GetDouble("LAT2"), Angle::Degrees);
+    Longitude lon2(ui.GetDouble("LON2"), Angle::Degrees);
     Distance rad2;
     if(ui.WasEntered("RAD2")) {
-      rad2 = ui.GetDouble("RAD2");
+      rad2 = Distance(ui.GetDouble("RAD2"), Distance::Meters);
     }
     else {
       rad2 = GetRadius(ui.GetFilename("FROM"), lat2, lon2);
@@ -129,14 +129,14 @@ void IsisMain() {
 }
 
 // Compute the radius at the lat/lon
-double GetRadius(std::string filename, double lat, double lon) {
+Distance GetRadius(std::string filename, Latitude lat, Longitude lon) {
   Pvl lab(filename);
   Sensor sensor(lab);
-  sensor.SetUniversalGround(lat, lon);
-  double radius = sensor.LocalRadius();
-  if(IsSpecial(radius)) {
+  sensor.SetGround(SurfacePoint(lat, lon, sensor.LocalRadius(lat, lon)));
+  Distance radius = sensor.LocalRadius();
+  if(!radius.Valid()) {
     string msg = "Could not determine radius from DEM at lat/lon [";
-    msg += iString(lat) + "," + iString(lon) + "]";
+    msg += iString(lat.GetDegrees()) + "," + iString(lon.GetDegrees()) + "]";
     throw iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
   }
   return radius;

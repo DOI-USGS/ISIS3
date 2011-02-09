@@ -21,6 +21,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "RadarGroundMap.h"
+#include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
 
@@ -34,15 +35,15 @@ namespace Isis {
 
     // Angular tolerance based on radii and
     // slant range (Focal length)
-    double radii[3];
-    p_camera->Radii(radii);
+//    Distance radii[3];
+//    p_camera->Radii(radii);
 //    p_tolerance = p_camera->FocalLength() / radii[2];
 //    p_tolerance *= 180.0 / Isis::PI;
     p_tolerance = .00000001;
 
     // Compute a default time tolerance to a 1/20 of a pixel
-    double et1 = p_camera->Spice::CacheStartTime();
-    double et2 = p_camera->Spice::CacheEndTime();
+    double et1 = p_camera->Spice::CacheStartTime().Et();
+    double et2 = p_camera->Spice::CacheEndTime().Et();
     p_timeTolerance = (et2 - et1) / p_camera->Lines() / 20.0;
   }
 
@@ -92,9 +93,9 @@ namespace Isis {
     vcrss_c(i, c, r);
 
     // What is the initial guess for R
-    double radii[3];
-    p_camera->Radii(radii); // km
-    SpiceDouble R = radii[0];
+    Distance radii[3];
+    p_camera->Radii(radii);
+    SpiceDouble R = radii[0].GetKilometers();
     SpiceDouble lastR = DBL_MAX;
     SpiceDouble rlat;
     SpiceDouble rlon;
@@ -131,7 +132,7 @@ namespace Isis {
 
       rlat = lat * 180.0 / Isis::PI;
       rlon = lon * 180.0 / Isis::PI;
-      R = GetRadius(rlat, rlon);
+      R = p_camera->LocalRadius(rlat, rlon).GetKilometers();
       iter++;
     }
     while(fabs(R - lastR) > p_tolerance && iter < 30);
@@ -167,8 +168,8 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::SetGround(const double lat, const double lon) {
-    return SetGround(lat, lon, GetRadius(lat, lon));
+  bool RadarGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+    return SetGround(SurfacePoint(lat, lon, p_camera->LocalRadius(lat, lon)));
   }
 
   /** Compute undistorted focal plane coordinate from ground position that includes a local radius
@@ -179,21 +180,21 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::SetGround(const double lat, const double lon, const double radius) {
+  bool RadarGroundMap::SetGround(const SurfacePoint &surfacePoint) {
     // Get the ground point in rectangular coordinates (X)
+    if(!surfacePoint.Valid()) return false;
+
     SpiceDouble X[3];
-    SpiceDouble rlat = lat * Isis::PI / 180.0;
-    SpiceDouble rlon = lon * Isis::PI / 180.0;
-    latrec_c(radius, rlon, rlat, X);
+    surfacePoint.ToNaifArray(X);
 
     // Compute lower bound for Doppler shift
-    double et1 = p_camera->Spice::CacheStartTime();
-    p_camera->Sensor::SetEphemerisTime(et1);
+    double et1 = p_camera->Spice::CacheStartTime().Et();
+    p_camera->Sensor::SetTime(et1);
     double xv1 = ComputeXv(X);
 
     // Compute upper bound for Doppler shift
-    double et2 = p_camera->Spice::CacheEndTime();
-    p_camera->Sensor::SetEphemerisTime(et2);
+    double et2 = p_camera->Spice::CacheEndTime().Et();
+    p_camera->Sensor::SetTime(et2);
     double xv2 = ComputeXv(X);
 
     // Make sure we bound root (xv = 0.0)
@@ -222,7 +223,7 @@ namespace Isis {
 
       // Compute the guessed Doppler shift.  Hopefully
       // this guess converges to zero at some point
-      p_camera->Sensor::SetEphemerisTime(etGuess);
+      p_camera->Sensor::SetTime(etGuess);
       double fGuess = ComputeXv(X);
 
       // Update the bounds
@@ -313,7 +314,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool RadarGroundMap::GetXY(const SurfacePoint spoint, double *cudx,
+  bool RadarGroundMap::GetXY(const SurfacePoint &spoint, double *cudx,
                              double *cudy) {
 
     // Get the ground point in rectangular body-fixed coordinates (X)
@@ -350,29 +351,6 @@ namespace Isis {
     *cudy = p_groundDopplerFreq / p_dopplerSigma;   // htx to focal plane coord
 
     return true;
-
-  }
-
-
-  /** Compute undistorted focal plane coordinate from ground position using current Spice from SetImage call
-   *
-   * This method will compute the undistorted focal plane coordinate for
-   * a ground position, using the current Spice settings (time and kernels)
-   * without resetting the current point values for lat/lon/radius/x/y and
-   * related radar parameter p_slantRange.
-   *
-   * @param lat planetocentric latitude in degrees
-   * @param lon planetocentric longitude in degrees
-   * @param radius local radius in m
-   *
-   * @return conversion was successful
-   */
-  bool RadarGroundMap::GetXY(const double lat, const double lon,
-                             const double radius, double *cudx, double *cudy) {
-    SurfacePoint spoint(Latitude(lat, Angle::Degrees),
-                        Longitude(lon, Angle::Degrees),
-                        Distance(radius, Distance::Meters));
-    return GetXY(spoint, cudx, cudy);
   }
 
 
@@ -408,23 +386,6 @@ namespace Isis {
     double xv = -2.0 * vdot_c(lookB, &Vsc[0]) / (vnorm_c(lookB) * WaveLength()); // - is applied to lookB above
     return xv;
   }
-
-
-  double RadarGroundMap::GetRadius(double lat, double lon) {
-    if(p_camera->HasElevationModel()) {
-      return p_camera->DemRadius(lat, lon);
-    }
-
-    double radii[3];
-    p_camera->Radii(radii);
-    double a = radii[0];
-    double b = radii[1];
-    double c = radii[2];
-    double xyradius = a * b / sqrt(pow(b * cos(lon), 2) + pow(a * sin(lon), 2));
-    return xyradius * c / sqrt(pow(c * cos(lat), 2) + pow(xyradius * sin(lat), 2));
-  }
-
-
 
 
   /** Compute derivative w/r to position of focal plane coordinate from ground position using current Spice from SetImage call

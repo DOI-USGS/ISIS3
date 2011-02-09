@@ -21,10 +21,11 @@
  */
 
 #include <string>
-#include "IdealCamera.h"
-#include "LineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
+#include "IdealCamera.h"
+#include "iTime.h"
+#include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
 #include <iomanip>
@@ -136,7 +137,7 @@ namespace Isis {
       new CameraGroundMap(this);
       new CameraSkyMap(this);
 
-      SetEphemerisTime(et);
+      SetTime(et);
       LoadCache();
     }
     else if(type.UpCase() == "LINESCAN") {

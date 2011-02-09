@@ -1,4 +1,5 @@
 #include "ApolloMetricCamera.h"
+
 #include "ApolloMetricDistortionMap.h"
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -7,6 +8,7 @@
 #include "Filename.h"
 #include "iException.h"
 #include "iString.h"
+#include "iTime.h"
 #include "NaifStatus.h"
 #include "ReseauDistortionMap.h"
 
@@ -74,7 +76,7 @@ namespace Isis {
       string stime = inst["StartTime"];
       double time;
       str2et_c(stime.c_str(), &time);
-      SetEphemerisTime(time);
+      SetTime(time);
       LoadCache();
 
       NaifStatus::CheckErrors();

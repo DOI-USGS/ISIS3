@@ -45,6 +45,7 @@
 #include "iTime.h"
 #include "iString.h"
 #include "iException.h"
+#include "Longitude.h"
 #include "Statistics.h"
 #include "naif/SpiceUsr.h"
 #include "ProjectionFactory.h"
@@ -164,9 +165,9 @@ namespace Isis {
 
     //  Compute average planetary radius in meters.  This is used as a fallback
     //  to compute surface area if no geoemetry has a center intersect point.
-    double radii[3];
+    Distance radii[3];
     camera.Radii(radii);
-    _radius = (radii[0] + radii[1] + radii[2]) / 3.0 * 1000.0;
+    _radius = ((radii[0] + radii[1] + radii[2]) / 3.0).GetMeters();
 
     double cLine = _nLines;
     double cSamp = _nSamps;
@@ -203,7 +204,7 @@ namespace Isis {
         _hasCenterGeom = true;
         g.centerLatitude  = camera.UniversalLatitude();
         g.centerLongitude = camera.UniversalLongitude();
-        g.radius = camera.LocalRadius();
+        g.radius = camera.LocalRadius().GetMeters();
 
         g.rightAscension = camera.RightAscension();
         g.declination    = camera.Declination();
@@ -211,7 +212,7 @@ namespace Isis {
         g.sampRes = camera.SampleResolution();
         g.lineRes = camera.LineResolution();
 
-        g.solarLongitude = camera.SolarLongitude();
+        g.solarLongitude = camera.SolarLongitude().GetDegrees();
         g.northAzimuth = camera.NorthAzimuth();
         g.offNader = camera.OffNadirAngle();
         g.subSolarAzimuth = camera.SunAzimuth();
@@ -607,7 +608,7 @@ namespace Isis {
     if(camera.SetUniversalGround(g.centroidLatitude, g.centroidLongitude)) {
       g.centroidLine = camera.Line();
       g.centroidSample = camera.Sample();
-      g.centroidRadius = camera.LocalRadius();
+      g.centroidRadius = camera.LocalRadius().GetMeters();
     }
 
     return (sinuMap);

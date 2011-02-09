@@ -116,7 +116,6 @@ int main(int argc, char *argv[]) {
         << endl;
     cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << (double)lon << " default double" << endl;
     cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
     cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "
@@ -136,7 +135,6 @@ int main(int argc, char *argv[]) {
         << endl;
     cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << (double)lon << " default double" << endl;
     cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
     cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "
@@ -156,7 +154,6 @@ int main(int argc, char *argv[]) {
         << endl;
     cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << (double)lon << " default double" << endl;
     cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
     cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "
@@ -176,7 +173,6 @@ int main(int argc, char *argv[]) {
         << endl;
     cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << (double)lon << " default double" << endl;
     cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
     cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "

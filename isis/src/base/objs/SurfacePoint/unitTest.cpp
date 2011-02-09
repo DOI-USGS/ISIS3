@@ -26,21 +26,28 @@ int main(int argc, char *argv[]) {
     cout << " with x=-424.024048 m, y=734.4311949 m, z=529.919264 m,"
           "sigmaX=10. m, sigmaY=50. m, sigmaZ=20. m" << endl << endl;
     Isis::SurfacePoint spRec;
-    spRec.SetRadii(Distance(1000.), Distance(1000.), Distance(1000.));
+
+    spRec.SetRadii(Distance(1000., Distance::Meters),
+                   Distance(1000., Distance::Meters),
+                   Distance(1000., Distance::Meters));
+
     symmetric_matrix<double,upper> covar;
     covar.resize(3);
     covar.clear();
     covar(0,0) = 100.;
     covar(1,1) = 2500.;
     covar(2,2) = 400.;
-    spRec.SetRectangular(Displacement(-424.024048), Displacement(734.4311949),
-                         Displacement(529.919264), covar);
+
+    spRec.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+                         Displacement(734.4311949, Displacement::Meters),
+                         Displacement(529.919264, Displacement::Meters), covar);
+
     double lat = spRec.GetLatitude().GetDegrees();
     double lon = spRec.GetLongitude().GetDegrees();
-    double radius = spRec.GetLocalRadius();
+    double radius = spRec.GetLocalRadius().GetMeters();
     double latSig = spRec.GetLatSigma().GetDegrees();
     double lonSig = spRec.GetLonSigma().GetDegrees();
-    double radSig = spRec.GetLocalRadiusSigma();
+    double radSig = spRec.GetLocalRadiusSigma().GetMeters();
     symmetric_matrix<double,upper> covarSphere(3);
     covarSphere.clear();
     covarSphere = spRec.GetSphericalMatrix();
@@ -49,26 +56,29 @@ int main(int argc, char *argv[]) {
     cout << "  Output spherical..." << endl;
     cout << "    lat = " << lat << " degrees, lon = " << lon <<
             " degrees, radius = " << radius << " meters" << endl;
-    cout << "    lat = " << spRec.GetLatitude() << " radians, lon = " <<
-            spRec.GetLongitude() 
-         << " radians, radius = " << spRec.GetLocalRadius() << " meters" << endl;
+    cout << "    lat = " << spRec.GetLatitude().GetRadians() <<
+            " radians, lon = " << spRec.GetLongitude().GetRadians() 
+         << " radians, radius = " << spRec.GetLocalRadius().GetMeters() <<
+            " meters" << endl;
     cout << "    latitude sigma=" << latSig << " degrees, longitude sigma=" <<
             lonSig << " degrees, radius sigma=" << radSig << " m" << endl;
-    cout << "    latitude sigma=" << spRec.GetLatSigma() <<
-            " radians, longitude sigma=" << spRec.GetLonSigma() 
-         << " radians, radius sigma=" << spRec.GetLocalRadiusSigma() << " m" <<
-         endl;
-    cout << "    latitude sigma=" << spRec.GetLatSigmaDistance() <<
-         " m, longitude sigma=" << spRec.GetLonSigmaDistance() << 
-         " m, radius sigma=" << spRec.GetLocalRadiusSigma() <<  " m" << endl;
+    cout << "    latitude sigma=" << spRec.GetLatSigma().GetRadians() <<
+            " radians, longitude sigma=" << spRec.GetLonSigma().GetRadians()
+         << " radians, radius sigma=" << spRec.GetLocalRadiusSigma().GetMeters()
+         << " m" << endl;
+    cout << "    latitude sigma=" << spRec.GetLatSigmaDistance().GetMeters() <<
+         " m, longitude sigma=" << spRec.GetLonSigmaDistance().GetMeters() <<
+         " m, radius sigma=" << spRec.GetLocalRadiusSigma().GetMeters()
+         <<  " m" << endl;
     cout << "    spherical covariance matrix = " << covarSphere(0,0) << "  " <<
          covarSphere(0,1) << "  " << covarSphere(0,2) << endl;
     cout << "                                  " << covarSphere(1,0) << "  " <<
          covarSphere(1,1) << "  " << covarSphere(1,2) << endl;
     cout << "                                  " << covarSphere(2,0) << "  " <<
          covarSphere(2,1) << "  " << covarSphere(2,2) << endl;
-    cout << "  Input rectangular sigmas = " << spRec.GetXSigma() << "/" <<
-         spRec.GetYSigma() << "/" << spRec.GetZSigma() << std::endl;
+    cout << "  Input rectangular sigmas = " << spRec.GetXSigma().GetMeters()
+         << "/" << spRec.GetYSigma().GetMeters() << "/"
+         << spRec.GetZSigma().GetMeters() << std::endl;
 
 
 
@@ -82,7 +92,7 @@ int main(int argc, char *argv[]) {
     Isis::SurfacePoint spSphere;
     spSphere.SetSpherical(Latitude(lat, Angle::Degrees),
                           Longitude(lon, Angle::Degrees),
-                          Distance(radius),
+                          Distance(radius, Distance::Meters),
                           covarSphere );
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
@@ -96,11 +106,12 @@ int main(int argc, char *argv[]) {
     if(fabs(covarRec(2,2)) < 1E-12) covarRec(2,2) = 0.0;
 
     cout << "  Output rectangular..." << endl;
-    cout << "    x=" << spSphere.GetX() << " m, y=" << spSphere.GetY()
-         << " m, z=" << spSphere.GetZ() << " m" << endl;
-    cout << "    X sigma=" << spSphere.GetXSigma() << " m, Y sigma="
-         << spSphere.GetYSigma() << " m, Z sigma=" << spSphere.GetZSigma() << " m"
-         << endl;
+    cout << "    x=" << spSphere.GetX().GetMeters()
+         << " m, y=" << spSphere.GetY().GetMeters()
+         << " m, z=" << spSphere.GetZ().GetMeters() << " m" << endl;
+    cout << "    X sigma=" << spSphere.GetXSigma().GetMeters() << " m, Y sigma="
+         << spSphere.GetYSigma().GetMeters() << " m, Z sigma=" <<
+            spSphere.GetZSigma().GetMeters() << " m" << endl;
     cout << "    rectangular covariance matrix = " 
          << setw(10) << covarRec(0,0) << setw(10) << covarRec(0,1)
          << setw(10) << covarRec(0,2) << endl;
@@ -118,16 +129,18 @@ int main(int argc, char *argv[]) {
     try {
     cout << "3-Testing rectangular set with point and sigmas only..." << endl;
     Isis::SurfacePoint spRec;
-    spRec.SetRectangular(Displacement(-424.024048),
-                         Displacement(734.4311949),
-                         Displacement(529.919264),
-                         Distance(10.), Distance(50.), Distance(20.));
+    spRec.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+                         Displacement(734.4311949, Displacement::Meters),
+                         Displacement(529.919264, Displacement::Meters),
+                         Distance(10., Distance::Meters),
+                         Distance(50., Distance::Meters),
+                         Distance(20., Distance::Meters));
     double lat = (spRec.GetLatitude()).GetDegrees();
     double lon = (spRec.GetLongitude()).GetDegrees();
-    double radius = spRec.GetLocalRadius();
+    double radius = spRec.GetLocalRadius().GetMeters();
     double latSig = (spRec.GetLatSigma()).GetDegrees();
     double lonSig = (spRec.GetLonSigma()).GetDegrees();
-    double radSig = spRec.GetLocalRadiusSigma();
+    double radSig = spRec.GetLocalRadiusSigma().GetMeters();
     symmetric_matrix<double,upper> covarSphere(3);
     covarSphere.clear();
     covarSphere = spRec.GetSphericalMatrix();
@@ -154,27 +167,30 @@ int main(int argc, char *argv[]) {
     Isis::SurfacePoint spSphere1,spSphere2;
     spSphere1.SetSpherical(Latitude(32., Angle::Degrees),
                          Longitude(120., Angle::Degrees),
-                         Distance(1000.),
+                         Distance(1000., Distance::Meters),
                          Angle(1.64192315,Angle::Degrees),
                          Angle(1.78752107, Angle::Degrees),
-                         Distance(38.454887335682053718134171237789));
+                         Distance(38.454887335682053718134171237789,
+                                  Distance::Meters));
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
     covarRec = spSphere1.GetRectangularMatrix();
-    spSphere2.SetSpherical(Latitude(0.55850536),
-                              Longitude(2.0943951),
-                              Distance(1000.),
-                              Angle(0.028656965),
-                              Angle(0.0311981281),
-                              Distance(38.4548873));
+    spSphere2.SetSpherical(Latitude(0.55850536, Angle::Radians),
+                              Longitude(2.0943951, Angle::Radians),
+                              Distance(1000., Distance::Meters),
+                              Angle(0.028656965, Angle::Radians),
+                              Angle(0.0311981281, Angle::Radians),
+                              Distance(38.4548873, Distance::Meters));
 
     // TODO try to convert ocentric sigmas to meters and get error to test error
 
     cout << "  4a-Output rectangular from degrees..." << endl;
-    cout << "    x=" << spSphere1.GetX() << " m, y=" << spSphere1.GetY()
-         << " m, z=" << spSphere1.GetZ() << " m" << endl;
-    cout << "    X sigma =" << spSphere1.GetXSigma() << " m, Y sigma = " <<
-      spSphere1.GetYSigma() << " m, Z sigma = " << spSphere1.GetZSigma() << "m"
+    cout << "    x=" << spSphere1.GetX().GetMeters() << " m, y=" <<
+            spSphere1.GetY().GetMeters()
+         << " m, z=" << spSphere1.GetZ().GetMeters() << " m" << endl;
+    cout << "    X sigma =" << spSphere1.GetXSigma().GetMeters()
+         << " m, Y sigma = " << spSphere1.GetYSigma().GetMeters()
+         << " m, Z sigma = " << spSphere1.GetZSigma().GetMeters() << "m"
          << endl;
     cout << "    rectangular covariance matrix = " << covarRec(0,0) << "  "
          << covarRec(0,1) << "  " << covarRec(0,2) << endl;
@@ -186,11 +202,13 @@ int main(int argc, char *argv[]) {
     covarRec.clear();
     covarRec = spSphere2.GetRectangularMatrix();
     cout << "  4b-Output rectangular from radians..." << endl;
-    cout << "    x=" << spSphere2.GetX() << " m, y=" << spSphere2.GetY() <<
-      " m, z=" << spSphere2.GetZ() << " m" << endl;
-    cout << "    X sigma = " << spSphere2.GetXSigma() << " m, Y sigma = " <<
-      spSphere2.GetYSigma() << " m, Z sigma = " << spSphere2.GetZSigma() <<
-      "m" << endl;
+    cout << "    x=" << spSphere2.GetX().GetMeters()
+         << " m, y=" << spSphere2.GetY().GetMeters()
+         << " m, z=" << spSphere2.GetZ().GetMeters() << " m" << endl;
+    cout << "    X sigma = " << spSphere2.GetXSigma().GetMeters()
+         << " m, Y sigma = " << spSphere2.GetYSigma().GetMeters()
+         << " m, Z sigma = " << spSphere2.GetZSigma().GetMeters()
+         << "m" << endl;
     cout << "    rectangular covariance matrix = " << covarRec(0,0) << "  "
          << covarRec(0,1) << "  " << covarRec(0,2) << endl;
     cout << "                                    " << covarRec(1,0) << "  "
@@ -203,28 +221,29 @@ int main(int argc, char *argv[]) {
     Isis::SurfacePoint spRec2(spSphere1);
     lat = (spRec2.GetLatitude()).GetDegrees();
     lon = (spRec2.GetLongitude()).GetDegrees();
-    radius = spRec2.GetLocalRadius();
+    radius = spRec2.GetLocalRadius().GetMeters();
     latSig = (spRec2.GetLatSigma()).GetDegrees();
     lonSig = (spRec2.GetLonSigma()).GetDegrees();
-    radSig = spRec2.GetLocalRadiusSigma();
+    radSig = spRec2.GetLocalRadiusSigma().GetMeters();
     
     cout << setprecision(9);
     cout << "  Output spherical..." << endl;
     cout << "    lat=" << lat << " degrees, lon=" << lon << " degrees, radius="
          << radius << " m" << endl;
-    cout << "    latitude sigma = " << latSig << " degrees, longitude sigma = " << lonSig
-         << " degrees, radius sigma = " << radSig << " m" << endl;
+    cout << "    latitude sigma = " << latSig << " degrees, longitude sigma = "
+         << lonSig << " degrees, radius sigma = " << radSig << " m" << endl;
     cout << "    ocentric covariance matrix = " << covarSphere(0,0) << "  "
          << covarSphere(0,1) << "  " << covarSphere(0,2) << endl;
     cout << "                                 " << covarSphere(1,0) << "  "
          << covarSphere(1,1) << "  " << covarSphere(1,2) << endl;
     cout << "                                 " << covarSphere(2,0) << "  "
          << covarSphere(2,1) << "  " << covarSphere(2,2) << endl << endl;
-    
+
     cout << "Testing Longitude Accessor..." << endl;
-    Isis::SurfacePoint spSphere3(Latitude(15, Angle::Degrees), Longitude(-45, Angle::Degrees),
-                                 Distance(10, Distance::Kilometers));
-    cout << "Longitude (from -45): " << spSphere3.GetLongitude().GetDegrees() << endl << endl;
+    Isis::SurfacePoint spSphere3(Latitude(15, Angle::Degrees),
+        Longitude(-45, Angle::Degrees), Distance(10, Distance::Kilometers));
+    cout << "Longitude (from -45): " << spSphere3.GetLongitude().GetDegrees()
+         << endl << endl;
 
   }
   catch(Isis::iException &e) {

@@ -1,5 +1,6 @@
 #include "LroNarrowAngleCamera.h"
 #include "iString.h"
+#include "iTime.h"
 #include "iException.h"
 #include "LineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -56,7 +57,7 @@ namespace Isis {
       etStart += additionalPreroll * lineRate;
       etStart += constantTimeOffset;
 
-      SetEphemerisTime(etStart);
+      SetTime(etStart);
 
       // Setup detector map
       LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart, lineRate);

@@ -14,7 +14,7 @@ int main(void) {
   Isis::Preference::Preferences(true);
 
   cout << "Unit Test for MiniRFCamera..." << endl;
-  try {
+ // try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
@@ -60,10 +60,10 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
-  }
-  catch(Isis::iException &e) {
-    e.Report();
-  }
+ // }
+//  catch(Isis::iException &e) {
+//    e.Report();
+//  }
 }
 
 void TestLineSamp(Isis::Camera *cam, double samp, double line) {

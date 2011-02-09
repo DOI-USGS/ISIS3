@@ -157,7 +157,9 @@ namespace Qisis {
 
         // Create a new point
         const geos::geom::Coordinate *coord =
-          new geos::geom::Coordinate(cp.GetSurfacePoint().GetLatitude(), cp.GetSurfacePoint().GetLongitude());
+          new geos::geom::Coordinate(
+            cp.GetSurfacePoint().GetLatitude().GetRadians(),
+            cp.GetSurfacePoint().GetLongitude().GetRadians());
         geos::geom::Point *pt = factory->createPoint(*coord);
 
         // See if the point is in the polygon & add it if it is

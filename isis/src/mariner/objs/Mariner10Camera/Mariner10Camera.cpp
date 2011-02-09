@@ -21,15 +21,18 @@
  */
 
 #include "Mariner10Camera.h"
+
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "ReseauDistortionMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "iString.h"
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
+#include "iTime.h"
 #include "Filename.h"
 
 #include <iostream>
@@ -118,7 +121,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetEphemerisTime(et);
+    SetTime(et);
     LoadCache();
   }
 } // end namespace isis

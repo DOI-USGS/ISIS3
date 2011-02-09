@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Distance.h"
 #include "iTime.h"
+#include "Longitude.h"
 #include "MdiCubeViewport.h"
 #include "Projection.h"
 #include "SerialNumber.h"
@@ -288,7 +289,7 @@ namespace Qisis {
         double lat = cvp->camera()->UniversalLatitude();
         double lon = cvp->camera()->UniversalLongitude();
 
-        double radius = cvp->camera()->LocalRadius();
+        double radius = cvp->camera()->LocalRadius().GetMeters();
         p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->setText(QString::number(lat, 'f', 15));
         p_tableWin->table()->item(row, EAST_LON_360)->setText(QString::number(lon, 'f', 15));
         p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
@@ -299,9 +300,9 @@ namespace Qisis {
         // Write out the planetographic and positive west values
         lon = -lon;
         while(lon < 0.0) lon += 360.0;
-        double radii[3];
+        Distance radii[3];
         cvp->camera()->Radii(radii);
-        lat = Isis::Projection::ToPlanetographic(lat, radii[0], radii[2]);
+        lat = Isis::Projection::ToPlanetographic(lat, radii[0].GetMeters(), radii[2].GetMeters());
         p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText(QString::number(lat, 'f', 15));
         p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(lon, 'f', 15));
 
@@ -330,7 +331,7 @@ namespace Qisis {
         // Write out columns 19-21 (north azimuth, sun azimuth, solar longitude)
         double northAzi = cvp->camera()->NorthAzimuth();
         double sunAzi   = cvp->camera()->SunAzimuth();
-        double solarLon = cvp->camera()->SolarLongitude();
+        double solarLon = cvp->camera()->SolarLongitude().GetDegrees();
         p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
         p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));
@@ -352,9 +353,8 @@ namespace Qisis {
       p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(dec));
 
       // Always write out columns 27/29 et and utc
-      double et = cvp->camera()->EphemerisTime();
-      Isis::iTime time(et);
-      p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(et, 'f', 15));
+      Isis::iTime time(cvp->camera()->Time());
+      p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(time.Et(), 'f', 15));
       std::string time_utc = time.UTC();
       p_tableWin->table()->item(row, UTC)->setText(time_utc.c_str());
 

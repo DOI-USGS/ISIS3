@@ -78,8 +78,10 @@ namespace Isis {
       *p_mapping = p_groundMap->Projection()->Mapping();
     }
 
-    Distance radius1 = (double)(*p_mapping)["EquatorialRadius"];
-    Distance radius2 = (double)(*p_mapping)["PolarRadius"];
+    Distance radius1 = Distance((double)(*p_mapping)["EquatorialRadius"],
+        Distance::Meters);
+    Distance radius2 = Distance((double)(*p_mapping)["PolarRadius"],
+        Distance::Meters);
 
     p_minLat = new Latitude((*p_mapping)["MinimumLatitude"][0], *p_mapping,
         Angle::Degrees);
@@ -97,20 +99,22 @@ namespace Isis {
       *p_maxLon = tmp;
     }
 
-    double largerRadius = max(radius1, radius2);
+    Distance largerRadius = max(radius1, radius2);
 
     // p_defaultResolution is in degrees/pixel
 
     if(p_groundMap->HasCamera()) {
       p_defaultResolution =
-        (p_groundMap->Camera()->HighestImageResolution() / largerRadius) * 10;
+        (p_groundMap->Camera()->HighestImageResolution() /
+         largerRadius.GetMeters()) * 10;
     }
     else {
-      p_defaultResolution = (p_groundMap->Resolution() / largerRadius) * 10;
+      p_defaultResolution = (p_groundMap->Resolution() /
+        largerRadius.GetMeters()) * 10;
     }
 
     if(p_defaultResolution < 0) {
-      p_defaultResolution = 10.0 / largerRadius;
+      p_defaultResolution = 10.0 / largerRadius.GetMeters();
     }
   }
 
@@ -216,11 +220,11 @@ namespace Isis {
     Longitude startLon = Longitude(
         baseLon - Angle(floor((baseLat - *p_minLon) / lonInc) * lonInc));
 
-    if(!latRes.Valid() || latRes <= Angle(0)) {
+    if(!latRes.Valid() || latRes <= Angle(0, Angle::Degrees)) {
       latRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 
-    if(!lonRes.Valid() || latRes <= Angle(0)) {
+    if(!lonRes.Valid() || latRes <= Angle(0, Angle::Degrees)) {
       lonRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 
@@ -269,12 +273,12 @@ namespace Isis {
       }
     }
 
-    for(double lon = startLon; lon <= endLon + lonInc / 2; lon += lonInc) {
+    for(Longitude lon = startLon; lon <= endLon + lonInc / 2; lon += lonInc) {
       unsigned int previousX = 0;
       unsigned int previousY = 0;
       bool havePrevious = false;
 
-      for(double lat = *p_minLat; lat <= *p_maxLat; lat += lonRes) {
+      for(Latitude lat = *p_minLat; lat <= *p_maxLat; lat += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
 
@@ -443,7 +447,7 @@ namespace Isis {
   bool GroundGrid::GetXY(Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y) {
     if(!GroundMap()) return false;
-    if(!GroundMap()->SetUniversalGround(lat.GetDegrees(), lon.GetDegrees())) return false;
+    if(!GroundMap()->SetGround(lat, lon)) return false;
     if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
     if(p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
 

@@ -397,7 +397,8 @@ void IsisMain() {
         //Add the lat,lon,rad to point
         try {
           SurfacePoint surfacePt(Latitude(lat, Angle::Degrees),
-                                 Longitude(lon, Angle::Degrees), Distance(rad));
+                                 Longitude(lon, Angle::Degrees),
+                                 Distance(rad, Distance::Meters));
           cpoint->SetSurfacePoint(surfacePt);
         }
         catch (iException &e) {

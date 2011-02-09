@@ -61,7 +61,7 @@ namespace Galileo {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetEphemerisTime(et);
+    SetTime(et);
     LoadCache();
   }
 }

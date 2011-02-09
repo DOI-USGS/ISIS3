@@ -22,7 +22,9 @@
  */
 
 #include "LineScanCameraDetectorMap.h"
+
 #include "CameraFocalPlaneMap.h"
+#include "iTime.h"
 
 namespace Isis {
   /** Compute parent position from a detector coordinate
@@ -39,7 +41,7 @@ namespace Isis {
   bool LineScanCameraDetectorMap::SetDetector(const double sample,
       const double line) {
     if(!CameraDetectorMap::SetDetector(sample, line)) return false;
-    double etDiff = p_camera->EphemerisTime() - p_etStart;
+    double etDiff = p_camera->Time().Et() - p_etStart;
     p_parentLine = etDiff / p_lineRate + 0.5;
     return true;
   }
@@ -60,7 +62,7 @@ namespace Isis {
     if(!CameraDetectorMap::SetParent(sample, line)) return false;
     p_detectorLine = p_camera->FocalPlaneMap()->DetectorLineOffset();
     double etLine = p_etStart + p_lineRate * (line - 0.5);
-    p_camera->SetEphemerisTime(etLine);
+    p_camera->SetTime(etLine);
     return true;
   }
 }

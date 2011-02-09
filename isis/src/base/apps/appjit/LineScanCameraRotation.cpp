@@ -13,6 +13,7 @@
 #include "BasisFunction.h"
 #include "PolynomialUnivariate.h"
 #include "iString.h"
+#include "iTime.h"
 #include "iException.h"
 #include "Table.h"
 #include "NaifStatus.h"

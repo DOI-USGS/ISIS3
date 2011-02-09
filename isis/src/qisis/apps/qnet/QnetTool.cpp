@@ -1229,8 +1229,8 @@ namespace Qisis {
     Isis::Camera *cam;
 
     // If no apriori lat/lon for this point, use lat/lon of first measure
-    double lat = p_controlPoint->GetSurfacePoint().GetLatitude();
-    double lon = p_controlPoint->GetSurfacePoint().GetLongitude();
+    double lat = p_controlPoint->GetSurfacePoint().GetLatitude().GetRadians();
+    double lon = p_controlPoint->GetSurfacePoint().GetLongitude().GetRadians();
     if (lat == Isis::Null || lon == Isis::Null) {
       ControlMeasure *m = p_controlPoint->GetMeasure(0);
       int camIndex = g_serialNumberList->SerialNumberIndex(m->GetCubeSerialNumber());

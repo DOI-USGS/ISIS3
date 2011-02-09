@@ -20,19 +20,25 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "VimsGroundMap.h"
+
+#include <iostream>
+#include <iomanip>
+
+#include <QVector>
+
 #include "Constants.h"
 #include "Camera.h"
-#include "VimsGroundMap.h"
 #include "Filename.h"
 #include "iString.h"
 #include "SpecialPixel.h"
 #include "LeastSquares.h"
 #include "PolynomialBivariate.h"
 #include "iException.h"
+#include "iTime.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Preference.h"
-
-#include <iostream>
-#include <iomanip>
 
 using namespace std;
 
@@ -41,6 +47,53 @@ namespace Isis {
     VimsGroundMap::VimsGroundMap(Camera *parent, Pvl &lab) :
       CameraGroundMap(parent) {
       // Init(lab);
+        p_minLat = NULL;
+        p_maxLat = NULL;
+        p_minLon = NULL;
+        p_maxLon = NULL;
+        p_latMap = NULL;
+        p_lonMap = NULL;
+
+        p_minLat = new Latitude();
+        p_maxLat = new Latitude();
+        p_minLon = new Longitude();
+        p_maxLon = new Longitude();
+
+        p_latMap = new QVector< QVector<Latitude> >(64, QVector<Latitude>(64));
+        p_lonMap = new QVector< QVector<Longitude> >(64,
+                                                     QVector<Longitude>(64));
+    }
+
+    VimsGroundMap::~VimsGroundMap() {
+      if(p_minLat) {
+        delete p_minLat;
+        p_minLat = NULL;
+      }
+
+      if(p_maxLat) {
+        delete p_maxLat;
+        p_minLat = NULL;
+      }
+
+      if(p_minLon) {
+        delete p_minLon;
+        p_minLon = NULL;
+      }
+
+      if(p_maxLon) {
+        delete p_maxLon;
+        p_maxLon = NULL;
+      }
+
+      if(p_latMap) {
+        delete p_latMap;
+        p_latMap = NULL;
+      }
+
+      if(p_lonMap) {
+        delete p_lonMap;
+        p_lonMap = NULL;
+      }
     }
 
     /**
@@ -136,25 +189,10 @@ namespace Isis {
         }
       }
 
-
-      //  Calculate lat/lon maps
-      for(int line = 0; line < p_camera->ParentLines(); line++) {
-        for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
-          p_latMap[line][samp] = Isis::NULL8;
-          p_lonMap[line][samp] = Isis::NULL8;
-        }
-      }
-
       //---------------------------------------------------------------------
       //  Loop for each pixel in cube, get pointing information and calculate
       //  control point (line,sample,lat,lon) for later use in latlon_to_linesamp.
       //---------------------------------------------------------------------
-      p_minLat = 99999.;
-      p_minLon = 99999.;
-      p_maxLat = -99999.;
-      p_maxLon = -99999.;
-
-
       p_camera->IgnoreProjection(true);
       for(int line = 0; line < p_camera->ParentLines(); line++) {
 
@@ -167,7 +205,7 @@ namespace Isis {
         if(p_channel == "VIS") {
           double et = ((double)p_etStart + (((p_irExp * p_swathWidth) - p_visExp) / 2.)) +
                       ((line + 0.5) * p_visExp);
-          p_camera->SetEphemerisTime(et);
+          p_camera->SetTime(et);
         }
 
         for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
@@ -175,24 +213,24 @@ namespace Isis {
             double et = (double)p_etStart +
                         (line * p_camera->ParentSamples() * p_irExp) +
                         (line * p_interlineDelay) + ((samp + 0.5) * p_irExp);
-            p_camera->SetEphemerisTime(et);
+            p_camera->SetTime(et);
           }
 
           if(p_camera->SetImage((double) samp + 1, (double)line + 1)) {
-            double latitude = p_camera->UniversalLatitude();
-            double longitude = p_camera->UniversalLongitude();
+            const Latitude &latitude = p_camera->GetLatitude();
+            const Longitude &longitude = p_camera->GetLongitude();
             // could do
             // double lat = this->UniversalLatitude ()
-            if(latitude < p_minLat) p_minLat = latitude;
-            if(latitude > p_maxLat) p_maxLat = latitude;
-            if(longitude < p_minLon) p_minLon = longitude;
-            if(longitude > p_maxLon) p_maxLon = longitude;
-            p_latMap[line][samp] = latitude;
-            p_lonMap[line][samp] = longitude;
-          }
-          else {
-            p_latMap[line][samp] = Isis::NULL8;
-            p_lonMap[line][samp] = Isis::NULL8;
+            if(!p_minLat->Valid() || latitude < *p_minLat)
+              *p_minLat = latitude;
+            if(!p_maxLat->Valid() || latitude > *p_maxLat)
+              *p_maxLat = latitude;
+            if(!p_minLon->Valid() || longitude < *p_minLon)
+              *p_minLon = longitude;
+            if(!p_maxLon->Valid() || longitude > *p_maxLon)
+              *p_maxLon = longitude;
+            (*p_latMap)[line][samp] = latitude;
+            (*p_lonMap)[line][samp] = longitude;
           }
         }
       }
@@ -250,7 +288,7 @@ namespace Isis {
              (imgLine * p_camera->ParentSamples() * p_irExp) +
              (imgLine * p_interlineDelay) + ((imgSamp + 0.5) * p_irExp);
       }
-      p_camera->SetEphemerisTime(et);
+      p_camera->SetTime(et);
 
       //  get Look Direction
       SpiceDouble lookC[3];
@@ -286,10 +324,10 @@ namespace Isis {
      *                            center of pixels.
      *
      */
-    bool VimsGroundMap::SetGround(const double lat, const double lon) {
+    bool VimsGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
 
-      if(lat < p_minLat || lat > p_maxLat) return false;
-      if(lon < p_minLon || lon > p_maxLon) return false;
+      if(lat < *p_minLat || lat > *p_maxLat) return false;
+      if(lon < *p_minLon || lon > *p_maxLon) return false;
 
       //  Find closest points  ??? what tolerance ???
       double minDist = 9999.;
@@ -299,23 +337,20 @@ namespace Isis {
       for(int line = 0; line < p_camera->ParentLines(); line++) {
 
         for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
-          double mapLat = p_latMap[line][samp];
-          if(mapLat == Isis::NULL8) continue;
-          double mapLon = p_lonMap[line][samp];
-          if(mapLon == Isis::NULL8) continue;
+          const Latitude &mapLat = (*p_latMap)[line][samp];
+          if(!mapLat.Valid()) continue;
+          Longitude mapLon = (*p_lonMap)[line][samp];
+          if(!mapLon.Valid()) continue;
+
           //  If on boundary convert lons.  If trying to find 360, convert
           //  lons on other side of meridian to values greater than 360.  If
           //  trying to find 1.0, convert lons on other side to negative numbers.
-          if(abs(mapLon - lon) > 180) {
-            if((lon - mapLon) > 0) {
-              mapLon = 360. + mapLon;
-            }
-            else if((lon - mapLon) < 0) {
-              mapLon = mapLon - 360.;
-            }
-          }
-          double dist = ((lat - mapLat) * (lat - mapLat)) +
-                        ((lon - mapLon) * (lon - mapLon));
+          WrapWorldToBeClose(lon, mapLon);
+
+          Angle deltaLat = lat - mapLat;
+          Angle deltaLon = lon - mapLon;
+          double dist = (deltaLat.GetRadians() * deltaLat.GetRadians()) +
+                        (deltaLon.GetRadians() * deltaLon.GetRadians());
           if(dist < minDist) {
             minDist = dist;
             minSamp = samp;
@@ -377,24 +412,17 @@ namespace Isis {
           //  Check for edges
           if(samp < 0 || samp > p_camera->ParentSamples() - 1) continue;
 
-          double mapLat = p_latMap[line][samp];
-          double mapLon = p_lonMap[line][samp];
-          if((mapLat == Isis::NULL8) || (mapLon == Isis::NULL8)) continue;
+          Latitude mapLat = (*p_latMap)[line][samp];
+          Longitude mapLon = (*p_lonMap)[line][samp];
+          if((!mapLat.Valid()) || (!mapLon.Valid())) continue;
 
           //  If on boundary convert lons.  If trying to find 360, convert
           //  lons on other side of meridian to values greater than 360.  If
           //  trying to find 1.0, convert lons on other side to negative numbers.
-          if(abs(mapLon - lon) > 180) {
-            if((lon - mapLon) > 0) {
-              mapLon = 360. + mapLon;
-            }
-            else if((lon - mapLon) < 0) {
-              mapLon = mapLon - 360.;
-            }
-          }
+          WrapWorldToBeClose(lon, mapLon);
 
-          known[0] = mapLat;
-          known[1] = mapLon;
+          known[0] = mapLat.GetDegrees();
+          known[1] = mapLon.GetDegrees();
           sampLsq.AddKnown(known, samp + 1);
           lineLsq.AddKnown(known, line + 1);
         }
@@ -405,8 +433,8 @@ namespace Isis {
       lineLsq.Solve();
 
       //  Solve for new sample position
-      known[0] = lat;
-      known[1] = lon;
+      known[0] = lat.GetDegrees();
+      known[1] = lon.GetDegrees();
       double inSamp = sampLsq.Evaluate(known);
       double inLine = lineLsq.Evaluate(known);
 
@@ -427,6 +455,31 @@ namespace Isis {
       p_focalPlaneY = inLine;
 
       return true;
+    }
+
+
+    /**
+     * If on boundary convert lons.  If trying to find 360, convert
+     * lons on other side of meridian to values greater than 360.  If
+     * trying to find 1.0, convert lons on other side to negative numbers.
+     *
+     * This modifies lon2 and leaves lon1 alone.
+     */
+    void VimsGroundMap::WrapWorldToBeClose(const Longitude &lon1,
+                                           Longitude &lon2) {
+      if(abs((lon1 - lon2).GetDegrees()) > 180) {
+        if(lon1 > lon2) {
+          lon2 += Angle(360, Angle::Degrees);
+        }
+        else {
+          lon2 -= Angle(360, Angle::Degrees);
+        }
+      }
+    }
+
+
+    bool VimsGroundMap::SetGround(const SurfacePoint &surfacePoint) {
+      return SetGround(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
     }
 
 

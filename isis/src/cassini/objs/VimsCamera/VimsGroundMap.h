@@ -28,6 +28,9 @@
 
 
 namespace Isis {
+  class Latitude;
+  class Longitude;
+
   namespace Cassini {
     /** Convert between undistorted focal plane and ground coordinates
      *
@@ -46,10 +49,13 @@ namespace Isis {
      *                          Rick McCloskey's code to calculate look direction.
      * @history 2008-06-18 Steven Lambright Fixed documentation
      * @history 2009-04-06 Steven Lambright Fixed problem that caused double
-     *          deletion of sky map / ground map.
+     *                         deletion of sky map / ground map.
      * @history 2009-08-06 Tracie Sucharski, Bug in unit vector change made
      *                         on 2008-02-05, had the incorrect boresight for
      *                         VIS Hires.
+     * @history 2011-02-08 Steven Lambright & Debbie Cook, Added
+     *                         WrapWorldToBeClose and refactored to use the
+     *                         Latitude and Longitude classes.
      *
      */
     class VimsGroundMap : public CameraGroundMap {
@@ -57,18 +63,20 @@ namespace Isis {
         VimsGroundMap(Camera *parent, Pvl &lab);
 
         //! Destructor
-        virtual ~VimsGroundMap() { };
+        virtual ~VimsGroundMap();
 
         virtual bool SetFocalPlane(const double ux, const double uy,
                                    const double uz);
 
-        virtual bool SetGround(const double lat, const double lon);
+        virtual bool SetGround(const Latitude &lat, const Longitude &lon);
+        virtual bool SetGround(const SurfacePoint &surfacePoint);
 
         void Init(Pvl &lab);
 
       protected:
 
       private:
+        void WrapWorldToBeClose(const Longitude &lon1, Longitude &lon2);
         void LookDirection(double v[3]);
 
         SpiceDouble p_etStart;
@@ -95,12 +103,12 @@ namespace Isis {
         int    p_camSampOffset;
         int    p_camLineOffset;
 
-        double p_minLat;
-        double p_maxLat;
-        double p_minLon;
-        double p_maxLon;
-        double p_latMap[64][64];
-        double p_lonMap[64][64];
+        Latitude *p_minLat;
+        Latitude *p_maxLat;
+        Longitude *p_minLon;
+        Longitude *p_maxLon;
+        QVector< QVector<Latitude> >  *p_latMap;
+        QVector< QVector<Longitude> > *p_lonMap;
 
     };
   };

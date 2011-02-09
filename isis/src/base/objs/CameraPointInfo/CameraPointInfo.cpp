@@ -27,6 +27,7 @@
 #include "Distance.h"
 #include "iException.h"
 #include "iTime.h"
+#include "Longitude.h"
 #include "PvlGroup.h"
 
 using namespace std;
@@ -266,11 +267,9 @@ namespace Isis {
       gp->FindKeyword("Filename").SetValue(currentCube->Filename());
       gp->FindKeyword("Sample").SetValue(camera->Sample());
       gp->FindKeyword("Line").SetValue(camera->Line());
-      gp->FindKeyword("EphemerisTime").SetValue(camera->EphemerisTime(), "seconds");
+      gp->FindKeyword("EphemerisTime").SetValue(camera->Time().Et(), "seconds");
       gp->FindKeyword("EphemerisTime").AddComment("Time");
-      iTime t(camera->EphemerisTime());
-      string utc;
-      utc = t.UTC();
+      string utc = camera->Time().UTC();
       gp->FindKeyword("UTC").SetValue(utc);
       gp->FindKeyword("SpacecraftPosition").AddComment("Spacecraft Information");
       gp->FindKeyword("SunPosition").AddComment("Sun Information");
@@ -300,10 +299,10 @@ namespace Isis {
         gp->FindKeyword("PlanetocentricLatitude").SetValue(camera->UniversalLatitude());
 
         // Convert lat to planetographic
-        double radii[3];
+        Distance radii[3];
         camera->Radii(radii);
         oglat = Isis::Projection::ToPlanetographic(camera->UniversalLatitude(),
-                radii[0], radii[2]);
+                radii[0].GetKilometers(), radii[2].GetKilometers());
         gp->FindKeyword("PlanetographicLatitude").SetValue(oglat);
 
         gp->FindKeyword("PositiveEast360Longitude").SetValue(
@@ -373,13 +372,12 @@ namespace Isis {
         gp->FindKeyword("Emission").SetValue(camera->EmissionAngle());
         gp->FindKeyword("NorthAzimuth").SetValue(camera->NorthAzimuth());
 
-        gp->FindKeyword("EphemerisTime").SetValue(camera->EphemerisTime(), "seconds");
+        gp->FindKeyword("EphemerisTime").SetValue(camera->Time().Et(), "seconds");
         gp->FindKeyword("EphemerisTime").AddComment("Time");
-        iTime t(camera->EphemerisTime());
-        utc = t.UTC();
+        utc = camera->Time().UTC();
         gp->FindKeyword("UTC").SetValue(utc);
         gp->FindKeyword("LocalSolarTime").SetValue(camera->LocalSolarTime(), "hour");
-        gp->FindKeyword("SolarLongitude").SetValue(camera->SolarLongitude());
+        gp->FindKeyword("SolarLongitude").SetValue(camera->SolarLongitude().GetDegrees());
         if(allowErrors) gp->FindKeyword("Error").SetValue("N/A");
       }
     }

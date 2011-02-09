@@ -186,6 +186,13 @@ namespace Isis {
    *                          parameter from LoadCache(). Set pointers to null
    *                          in constructor. Added documentation to methods,
    *                          enum, and private variables.
+   *  @history 2011-02-09 Steven Lambright - Interfaces using Latitude,
+   *                          Longitude, and SurfacePoint are now more
+   *                          efficient. Updated to work with changes to the
+   *                          parent. Now uses more abstraction internally
+   *                          also. These changes were for readability (you have
+   *                          more explicit units and less of a change to misuse
+   *                          them).
    */
 
   class Camera : public Isis::Sensor {

@@ -11,6 +11,7 @@
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "History.h"
+#include "iTime.h"
 #include "Process.h"
 #include "ProgramLauncher.h"
 #include "Pvl.h"
@@ -150,7 +151,7 @@ void IsisMain() {
   double sample = alpha.BetaSample(.5);
   double line = alpha.BetaLine(.5);
   incam->SetImage(sample, line);
-  double et = incam->EphemerisTime();
+  double et = incam->Time().Et();
 
   // Get the output file name and set its attributes
   CubeAttributeOutput cao;

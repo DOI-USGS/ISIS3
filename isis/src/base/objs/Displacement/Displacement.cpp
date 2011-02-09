@@ -19,6 +19,7 @@
 
 #include "Displacement.h"
 
+#include "Distance.h"
 #include "iException.h"
 #include "iString.h"
 #include "SpecialPixel.h"
@@ -33,16 +34,15 @@ namespace Isis {
     SetDisplacement(Null, Meters);
   }
 
+
   /**
-   * This is the copy constructor for Displacement. The displacement passed in 
-   *   will be exactly duplicated.
+   * This creates a displacement equal to a distance.
    *
-   * @param displacementToCopy This is the displacement we are duplicating
-   *    of
+   * @param distanceToCopy This is the distance we are duplicating
    */
-  Displacement::Displacement(const Displacement &displacementToCopy) {
+  Displacement::Displacement(const Distance &distanceToCopy) {
     // Use meters because it is the stored format, no precision loss
-    SetDisplacement(displacementToCopy.GetMeters(), Meters);
+    SetDisplacement(distanceToCopy.GetMeters(), Meters);
   }
 
 
@@ -57,16 +57,6 @@ namespace Isis {
    */
   Displacement::Displacement(double displacement, Units displacementUnit) {
     SetDisplacement(displacement, displacementUnit);
-  }
-
-
-  /**
-   * Free the memory allocated by this instance of the displacement class.
-   */
-  Displacement::~Displacement() {
-    // This will help debug memory problems, better to reset to obviously bad
-    //   values in case we're used after we're deleted. 
-    p_displacementInMeters = Null;
   }
 
 
@@ -162,24 +152,7 @@ namespace Isis {
 
 
   /**
-   * Assign this displacement to the value of another displacement.
-   *
-   * @param displacementToCopy This is the displacement we are to duplicate 
-   *      exactly
-   * @return Resulting displacement, a reference to this displacement after 
-   *      assignment
-   */
-  Displacement &Displacement::operator =(const Displacement &displacementToCopy) {
-    if(this == &displacementToCopy) return *this;
-
-    SetDisplacement(displacementToCopy.GetMeters(), Meters);
-
-    return *this;
-  }
-
-
-  /**
-   * Add another displacement to this displacement (1km + 1m = 1005m)
+   * Add another displacement to this displacement (1km + 5m = 1005m)
    *
    * @param displacementToAdd This is the displacement we are adding to ourselves
    * @return Resulting displacement, self not modified
@@ -193,7 +166,7 @@ namespace Isis {
 
 
   /**
-   * Subtract another displacement from this displacement (1km - 1m = 995m).
+   * Subtract another displacement from this displacement (1km - 5m = 995m).
    *
    * @param displacementToSub This is the displacement we are subtracting from 
    *      ourself
@@ -207,12 +180,72 @@ namespace Isis {
 
 
   /**
+   * Subtract a distance from this displacement (1km - 5m = 995m).
+   *
+   * @param displacementToSub This is the displacement we are subtracting from 
+   *      ourself
+   * @return Resulting displacement, self not modified
+   */
+  Displacement Displacement::operator
+                               -(const Distance &distanceToSub) const {
+    Displacement result(GetMeters() - distanceToSub.GetMeters(), Meters);
+    return result;
+  }
+
+
+  /**
+   * Divide another displacement into this displacement (5m / 1m = 5).
+   *
+   * @param displacementToDiv This is the divisor displacement (denominator)
+   * @return Resulting value
+   */
+  double Displacement::operator /(const Displacement &displacementToDiv) const {
+    double result = GetMeters() / displacementToDiv.GetMeters();
+    return result;
+  }
+
+
+  /**
+   * Divide a value from this displacement (5m / 2 = 2.5m).
+   *
+   * @param valueToDiv This is the divisor displacement (denominator)
+   * @return Resulting value
+   */
+  Displacement Displacement::operator /(const double &valueToDiv) const {
+    Displacement result = Displacement(GetMeters() / valueToDiv, Meters);
+    return result;
+  }
+
+
+  /**
+   * Multiply this displacement by a value (5m * 2 = 10m).
+   *
+   * @param valueToMult This is the value to multiply by
+   * @return Resulting value
+   */
+  Displacement Displacement::operator *(const double &valueToMult) const {
+    Displacement result = Displacement(GetMeters() * valueToMult, Meters);
+    return result;
+  }
+
+
+  /**
+   * Multiply displacement by a value (5m * 2 = 10m).
+   *
+   * @param mult This is the value to multiply by
+   * @param dist This is the distance to multiply into
+   * @return Resulting value
+   */
+  Displacement operator *(double mult, Displacement displacement) {
+    Displacement result = displacement * mult;
+    return result;
+  }
+
+
+  /**
    * Add and assign the given displacement to ourselves.
    *
-   * @param displacementToAdd This is the displacement we are to duplicate 
-   *      exactly
-   * @return Resulting displacement, a reference to this displacement after 
-   *      assignment
+   * @param displacementToAdd This is the displacement we are to add
    */
   void Displacement::operator +=(const Displacement &displacementToAdd) {
     SetDisplacement(GetMeters() + displacementToAdd.GetMeters(), Meters);
@@ -220,15 +253,42 @@ namespace Isis {
 
 
   /**
-   * Subtract and assign the given displacement from ourself. This could throw
-   *   an exception if the result is negative, in which case the new value is
-   *   never applied.
+   * Subtract the given displacement from ourself and assign.
    *
-   * @param DisplacementToSub This is the displacement we are to duplicate exactly
-   * @return Resulting displacement, a reference to this displacement after assignment
+   * @param displacementToSub This is the displacement we are to subtract
    */
   void Displacement::operator -=(const Displacement &displacementToSub) {
     SetDisplacement(GetMeters() - displacementToSub.GetMeters(), Meters);
+  }
+
+
+  /**
+   * Subtract the given distance from ourself and assign.
+   *
+   * @param distanceToSub This is the distance we are to subtract
+   */
+  void Displacement::operator -=(const Distance &distanceToSub) {
+    SetDisplacement(GetMeters() - distanceToSub.GetMeters(), Meters);
+  }
+
+
+  /**
+   * Divide this displacement by a value and assign the result to ourself.
+   *
+   * @param valueToDiv This is the value we are going to divide by
+   */
+  void Displacement::operator /=(const double &valueToDiv) {
+    SetDisplacement(GetMeters() / valueToDiv, Meters);
+  }
+
+
+  /**
+   * Multiply this displacement by a value and assign the result to ourself.
+   *
+   * @param valueToMult This is the value we are going to multiply by
+   */
+  void Displacement::operator *=(const double &valueToMult) {
+    SetDisplacement(GetMeters() * valueToMult, Meters);
   }
 
 
@@ -279,7 +339,7 @@ namespace Isis {
   void Displacement::SetDisplacement(const double &displacement, Units displacementUnit) {
     double displacementInMeters = Null;
 
-    if(displacement == Null) {
+    if(IsSpecial(displacement)) {
       p_displacementInMeters = Null;
       return;
     }

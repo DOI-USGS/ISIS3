@@ -1,6 +1,8 @@
 #include "Isis.h"
-#include "Process.h"
+
 #include "Camera.h"
+#include "Distance.h"
+#include "Process.h"
 #include "Pvl.h"
 
 using namespace std;
@@ -21,14 +23,14 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get the radii
-  double radii[3];
+  Distance radii[3];
   cam->Radii(radii);
   PvlGroup target("Target");
   target += PvlKeyword("From", ui.GetFilename("FROM"));
   target += PvlKeyword("TargetName", cam->Target());
-  target += PvlKeyword("RadiusA", radii[0] * 1000.0, "meters");
-  target += PvlKeyword("RadiusB", radii[1] * 1000.0, "meters");
-  target += PvlKeyword("RadiusC", radii[2] * 1000.0, "meters");
+  target += PvlKeyword("RadiusA", radii[0].GetMeters(), "meters");
+  target += PvlKeyword("RadiusB", radii[1].GetMeters(), "meters");
+  target += PvlKeyword("RadiusC", radii[2].GetMeters(), "meters");
 
   // Get resolution
   PvlGroup res("PixelResolution");

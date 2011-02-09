@@ -5,9 +5,11 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "iString.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
+
 namespace Clementine {
   NirCamera::NirCamera(Pvl &lab) : FramingCamera(lab) {
 
@@ -63,7 +65,7 @@ namespace Clementine {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetEphemerisTime(time);
+    SetTime(time);
     LoadCache();
   }
 }

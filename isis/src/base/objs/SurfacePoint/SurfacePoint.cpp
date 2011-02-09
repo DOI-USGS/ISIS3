@@ -8,6 +8,7 @@
 #include "Longitude.h"
 
 using namespace boost::numeric::ublas;
+using namespace std;
 
 namespace Isis {
 
@@ -21,18 +22,82 @@ namespace Isis {
     InitRadii();
   }
 
+  /**
+   * Constructs an empty SurfacePoint object
+   *
+   */
+  SurfacePoint::SurfacePoint(const SurfacePoint &other) {
+    if(other.p_majorAxis) {
+      p_majorAxis = new Distance(*other.p_majorAxis);
+    }
+    else {
+      p_majorAxis = NULL;
+    }
+
+    if(other.p_minorAxis) {
+      p_minorAxis = new Distance(*other.p_minorAxis);
+    }
+    else {
+      p_minorAxis = NULL;
+    }
+
+    if(other.p_polarAxis) {
+      p_polarAxis = new Distance(*other.p_polarAxis);
+    }
+    else {
+      p_polarAxis = NULL;
+    }
+
+    if(other.p_x) {
+      p_x = new Displacement(*other.p_x);
+    }
+    else {
+      p_x = NULL;
+    }
+
+    if(other.p_y) {
+      p_y = new Displacement(*other.p_y);
+    }
+    else {
+      p_y = NULL;
+    }
+
+    if(other.p_z) {
+      p_z = new Displacement(*other.p_z);
+    }
+    else {
+      p_z = NULL;
+    }
+
+    if(other.p_rectCovar) {
+      p_rectCovar = new symmetric_matrix<double, upper>(*other.p_rectCovar);
+    }
+    else {
+      p_rectCovar = NULL;
+    }
+
+    if(other.p_sphereCovar) {
+      p_sphereCovar = new symmetric_matrix<double, upper>(*other.p_sphereCovar);
+    }
+    else {
+      p_sphereCovar = NULL;
+    }
+  }
+
 
   /**
    * Constructs a SurfacePoint object with a spherical point only
-   *  
+   *
    * @param lat  The latitude of the surface point 
    * @param lon  The longitude of the surface point 
    * @param radius The radius of the surface point 
    */
-  SurfacePoint::SurfacePoint(Latitude lat, Longitude lon, Distance radius) {
-    InitRadii();
+  SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
+      const Distance &radius) {
     InitCovariance();
-    SetSpherical(lat, lon, radius);
+    InitPoint();
+    InitRadii();
+    SetSphericalPoint(lat, lon, radius);
   }
 
 
@@ -43,7 +108,7 @@ namespace Isis {
    * @param lat  The latitude of the surface point 
    * @param lon  The longitude of the surface point 
    * @param radius The radius of the surface point 
-   *  
+   *
    *               The sigmas indicate the accuracy of the point.  For instance,
    *               a latitude sigma of 5 degrees would indicate that the
    *               latitiude value could have an error or + or - 5 degrees. 
@@ -51,10 +116,12 @@ namespace Isis {
    * @param sigmaLon  The sigma of the longitude 
    * @param sigmaRadius  The sigma of the local radius 
    */
-  SurfacePoint::SurfacePoint(Latitude lat, Longitude lon, Distance radius,
-                        Angle latSigma, Angle lonSigma, Distance radiusSigma) {
-    InitRadii();
+  SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
+      const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
+      const Distance &radiusSigma) {
     InitCovariance();
+    InitPoint();
+    InitRadii();
     SetSpherical(lat, lon, radius, latSigma, lonSigma, radiusSigma);
   }
 
@@ -64,35 +131,38 @@ namespace Isis {
    *   its variance/covariance matrix.
    *
    */
-  SurfacePoint::SurfacePoint(Latitude lat, Longitude lon, Distance radius,
-                             const symmetric_matrix<double,upper>& covar) {
-    InitRadii();
+  SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
+      const Distance &radius, const symmetric_matrix<double, upper> &covar) {
     InitCovariance();
+    InitPoint();
+    InitRadii();
     SetSpherical(lat, lon, radius, covar);
   }
 
 
   /**
    * Constructs a SurfacePoint object with a rectangular point only
-   *  
+   *
    * @param x  The x coordinate of the surface point 
    * @param y  The y coordinate of the surface point 
    * @param z  The z coordinate of the surface point 
    */
-  SurfacePoint::SurfacePoint(Displacement x, Displacement y, Displacement z) {
-    InitRadii();
+  SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
+      const Displacement &z) {
     InitCovariance();
+    InitPoint();
+    InitRadii();
     SetRectangular(x, y, z);
   }
 
 
   /**
    * Constructs a SurfacePoint object with a rectangular point and sigmas
-   *  
+   *
    * @param x  The x coordinate of the surface point 
    * @param y  The y coordinate of the surface point 
    * @param z  The z coordinate of the surface point 
-   *  
+   *
    *           The sigmas indicate the accuracy of the point.  For instance,
    *           a sigmaX=100 m, would indicate that the x coordinate was accurate
    *           to within 100 meters.
@@ -100,10 +170,12 @@ namespace Isis {
    * @param ySigma  The y coordinate of the surface point 
    * @param zSigma  The z coordinate of the surface point 
    */
-  SurfacePoint::SurfacePoint(Displacement x, Displacement y, Displacement z,
-                            Distance xSigma, Distance ySigma, Distance zSigma) {
-    InitRadii();
+  SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
+      const Displacement &z, const Distance &xSigma, const Distance &ySigma,
+      const Distance &zSigma) {
     InitCovariance();
+    InitPoint();
+    InitRadii();
     SetRectangular(x, y, z, xSigma, ySigma, zSigma);
   }
 
@@ -111,15 +183,16 @@ namespace Isis {
   /**
    * Constructs a SurfacePoint object with a rectangular point and its 
    *   variance/covariance matrix 
-   *  
+   *
    * @param x  The x coordinate of the surface point 
    * @param y  The y coordinate of the surface point 
    * @param z  The z coordinate of the surface point 
    * @param covar  The variance/covariance matrix of the point 
    */
-  SurfacePoint::SurfacePoint(Displacement x, Displacement y, Displacement z,
-                             const symmetric_matrix<double,upper>& covar) {
+  SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
+      const Displacement &z, const symmetric_matrix<double, upper> &covar) {
     InitCovariance();
+    InitPoint();
     InitRadii();
     SetRectangular(x, y, z, covar);
   }
@@ -130,13 +203,7 @@ namespace Isis {
    *  
    */
   SurfacePoint::~SurfacePoint() {
-    // Reset class members to obviously bad values to help debug memory problems
-    p_x = Displacement();
-    p_y = Displacement();
-    p_z = Displacement();
-    p_majorAxis = Distance();
-    p_minorAxis = Distance();
-    p_polarAxis = Distance();
+    FreeAllocatedMemory();
   }
 
 
@@ -145,23 +212,19 @@ namespace Isis {
    *
    */
   void SurfacePoint::InitCovariance() {
-    p_rectCovar.resize(3);
-    p_rectCovar.clear();
-    p_sphereCovar.resize(3);
-    p_sphereCovar.clear();
-    p_hasMatrix = false;
+    p_rectCovar = NULL;
+    p_sphereCovar = NULL;
   }
 
 
   /**
    * Initialize a surface point 
-   *  
+   *
    */
   void SurfacePoint::InitPoint() {
-    p_x = Displacement();
-    p_y = Displacement();
-    p_z = Displacement();
-    p_hasPoint = false;
+    p_x = NULL;
+    p_y = NULL;
+    p_z = NULL;
   }
 
   /**
@@ -169,10 +232,9 @@ namespace Isis {
    *  
    */
   void SurfacePoint::InitRadii() {
-    p_majorAxis = Distance();
-    p_minorAxis = Distance();
-    p_polarAxis = Distance();
-    p_hasRadii = false;
+    p_majorAxis = NULL;
+    p_minorAxis = NULL;
+    p_polarAxis = NULL;
   }
 
 
@@ -180,16 +242,16 @@ namespace Isis {
    * This is a private method to set a surface point in rectangular, body-fixed 
    *   coordinates.  This method isolates the procedure for setting a
    *   rectangular point in one place.
-   *  
-   *  
+   *
+   *
    * @param x  x value of body-fixed coordinate of surface point  
    * @param y  y value of body-fixed coordinate of surface point
    * @param z  z value of body-fixed coordinate of surface point
-   *  
+   *
    * @return void
    */
-  void SurfacePoint::SetRectangularPoint(Displacement x, Displacement y,
-                                         Displacement z) {
+  void SurfacePoint::SetRectangularPoint(const Displacement &x,
+      const Displacement &y, const Displacement &z) {
 
     if (!x.Valid() || !y.Valid() || !z.Valid()) {
       iString msg = "x, y, and z must be set to valid displacements.  One or "
@@ -197,32 +259,49 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    p_x = x;
-    p_y = y;
-    p_z = z;
-    p_hasPoint = true;
+    if(p_x) {
+      *p_x = x;
+    }
+    else {
+      p_x = new Displacement(x);
+    }
+
+    if(p_y) {
+      *p_y = y;
+    }
+    else {
+      p_y = new Displacement(y);
+    }
+
+    if(p_z) {
+      *p_z = z;
+    }
+    else {
+      p_z = new Displacement(z);
+    }
   }
 
 
   /**
    * Set surface point in rectangular body-fixed coordinates wtih optional 
-   *   sigmas. 
-   *  
-   *  
+   *   sigmas.
+   *
+   *
    * @param x  x value of body-fixed coordinate of surface point  
    * @param y  y value of body-fixed coordinate of surface point
    * @param z  z value of body-fixed coordinate of surface point
    * @param xSigma  x sigma of body-fixed coordinate of surface point  
    * @param ySigma  y sigma of body-fixed coordinate of surface point
    * @param zSigma  z sigma of body-fixed coordinate of surface point
-   *  
+   *
    * @return void
    */
-  void SurfacePoint::SetRectangular(Displacement x, Displacement y, Displacement z,
-                          Distance xSigma, Distance ySigma, Distance zSigma) {
+  void SurfacePoint::SetRectangular(const Displacement &x,
+      const Displacement &y, const Displacement &z, const Distance &xSigma,
+      const Distance &ySigma, const Distance &zSigma) {
     SetRectangularPoint(x, y, z);
 
-    if (xSigma != Distance()  &&  ySigma != Distance()  &&  zSigma != Distance()) 
+    if (xSigma.Valid() && ySigma.Valid() && zSigma.Valid()) 
       SetRectangularSigmas(xSigma, ySigma, zSigma); 
   }
 
@@ -253,9 +332,9 @@ namespace Isis {
    * @param ySigma y sigma of body-fixed coordinate of surface point 
    * @param zSigma z sigma of body-fixed coordinate of surface point 
    */
-  void SurfacePoint::SetRectangularSigmas(Distance xSigma,
-                                          Distance ySigma,
-                                          Distance zSigma) {
+  void SurfacePoint::SetRectangularSigmas(const Distance &xSigma,
+                                          const Distance &ySigma,
+                                          const Distance &zSigma) {
     // Is this error checking necessary or should we just use Distance?????
     if (!xSigma.Valid() || !ySigma.Valid() || !zSigma.Valid()) {
       iString msg = "x sigma, y sigma , and z sigma must be set to valid "
@@ -265,9 +344,9 @@ namespace Isis {
 
     symmetric_matrix<double,upper> covar(3);
     covar.clear();
-    covar(0,0) = xSigma * xSigma;
-    covar(1,1) = ySigma * ySigma;
-    covar(2,2) = zSigma * zSigma;
+    covar(0,0) = xSigma.GetMeters() * xSigma.GetMeters();
+    covar(1,1) = ySigma.GetMeters() * ySigma.GetMeters();
+    covar(2,2) = zSigma.GetMeters() * zSigma.GetMeters();
     SetRectangularMatrix(covar);
   }
 
@@ -280,22 +359,28 @@ namespace Isis {
    * @return void
    */
   void SurfacePoint::SetRectangularMatrix(
-       const symmetric_matrix<double,upper>& covar) {
-
+       const symmetric_matrix<double, upper> &covar) {
     // Make sure the point is set first
-    if (!p_hasPoint) {
+    if (!p_x || !p_y || !p_z || !p_x->Valid() || !p_y->Valid() ||
+        !p_z->Valid()) {
       iString msg = "A point must be set before a variance/covariance matrix "
         "can be set.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    p_rectCovar = covar;
+    if(p_rectCovar) {
+      *p_rectCovar = covar;
+    }
+    else {
+      p_rectCovar = new symmetric_matrix<double, upper>(covar);
+    }
+
     SpiceDouble rectMat[3][3];
 
     // Compute the local radius of the surface point
-    double x2  =  p_x*p_x;
-    double y2  =  p_y*p_y;
-    double z = (double) p_z;
+    double x2  = p_x->GetMeters() * p_x->GetMeters();
+    double y2  = p_y->GetMeters() * p_y->GetMeters();
+    double z   = p_z->GetMeters();
     double radius = sqrt(x2 + y2 + z*z);
 
     // Should we use a matrix utility?
@@ -308,30 +393,31 @@ namespace Isis {
 
     // Compute the Jacobian
     SpiceDouble J[3][3];
-    double zOverR = p_z/radius;
+    double zOverR = p_z->GetMeters() / radius;
     double r2 = radius*radius;
     double denom = r2*radius*sqrt(1.0 - (zOverR*zOverR));
-    J[0][0] = -p_x*p_z / denom;
-    J[0][1] = -p_y*p_z / denom;
-    J[0][2] = (r2 - p_z*p_z)/denom;
-    J[1][0] = -p_y/(x2 + y2);
-    J[1][1] = p_x / (x2 + y2);
+    J[0][0] = -p_x->GetMeters() * p_z->GetMeters() / denom;
+    J[0][1] = -p_y->GetMeters() * p_z->GetMeters() / denom;
+    J[0][2] = (r2 - p_z->GetMeters() * p_z->GetMeters()) / denom;
+    J[1][0] = -p_y->GetMeters() / (x2 + y2);
+    J[1][1] = p_x->GetMeters() / (x2 + y2);
     J[1][2] = 0.0;
-    J[2][0] = p_x / radius;
-    J[2][1] = p_y/radius;
-    J[2][2] = p_z/radius;
+    J[2][0] = p_x->GetMeters() / radius;
+    J[2][1] = p_y->GetMeters() / radius;
+    J[2][2] = p_z->GetMeters() / radius;
+
+    if(!p_sphereCovar)
+      p_sphereCovar = new symmetric_matrix<double, upper>(3);
 
     SpiceDouble mat[3][3];
     mxm_c (J, rectMat, mat);
     mxmt_c (mat, J, mat);
-    p_sphereCovar(0,0) = mat[0][0];
-    p_sphereCovar(0,1) = mat[0][1];
-    p_sphereCovar(0,2) = mat[0][2];
-    p_sphereCovar(1,1) = mat[1][1];
-    p_sphereCovar(1,2) = mat[1][2];
-    p_sphereCovar(2,2) = mat[2][2];
-
-    p_hasMatrix = true;
+    (*p_sphereCovar)(0,0) = mat[0][0];
+    (*p_sphereCovar)(0,1) = mat[0][1];
+    (*p_sphereCovar)(0,2) = mat[0][2];
+    (*p_sphereCovar)(1,1) = mat[1][1];
+    (*p_sphereCovar)(1,2) = mat[1][2];
+    (*p_sphereCovar)(2,2) = mat[2][2];
   }
 
 
@@ -346,9 +432,9 @@ namespace Isis {
    *  
    * @return void
    */
-  void SurfacePoint::SetSphericalPoint(Latitude lat,
-                                       Longitude lon,
-                                       Distance radius) {
+  void SurfacePoint::SetSphericalPoint(const Latitude  &lat,
+                                       const Longitude &lon,
+                                       const Distance  &radius) {
 // Is error checking necessary or does Latitude, Longitude, and Distance handle it?????
     if (!lat.Valid()  ||  !lon.Valid()  ||  !radius.Valid()) {
       iString msg = "Latitude, longitude, or radius is an invalid value.";
@@ -381,14 +467,12 @@ namespace Isis {
    * @param radiusSigma  Local radius sigma of of spherical coordinate of 
    *                   surface point 
    */
-  void SurfacePoint::SetSpherical(Latitude lat, Longitude lon, Distance radius,
-                                  Angle latSigma,
-                                  Angle lonSigma,
-                                  Distance radiusSigma) {
+  void SurfacePoint::SetSpherical(const Latitude &lat, const Longitude &lon,
+      const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
+      const Distance &radiusSigma) {
     SetSphericalPoint(lat, lon, radius);
 
-    if (latSigma != Angle()  &&  lonSigma != Angle()  &&
-        radiusSigma != Distance()) 
+    if (latSigma.Valid() && lonSigma.Valid() && radiusSigma.Valid())
       SetSphericalSigmas(latSigma, lonSigma, radiusSigma); 
   }
 
@@ -402,8 +486,8 @@ namespace Isis {
    * @param radius  Local radius of surface point 
    * @param covar Spherical variance/covariance matrix in m*m
    */
-  void SurfacePoint::SetSpherical(Latitude lat, Longitude lon, Distance radius,
-                                  const symmetric_matrix<double,upper>& covar) {
+  void SurfacePoint::SetSpherical(const Latitude &lat, const Longitude &lon,
+      const Distance &radius, const symmetric_matrix<double, upper> &covar) {
     SetSphericalPoint(lat, lon, radius);
     SetSphericalMatrix(covar);
   }
@@ -416,9 +500,9 @@ namespace Isis {
    * @param lonSigma Longitude sigma of body-fixed coordinate of surface point 
    * @param radiusSigma Radius sigma of body-fixed coordinate of surface point 
    */
-  void SurfacePoint::SetSphericalSigmas(Angle latSigma,
-                                        Angle lonSigma,
-                                        Distance radiusSigma) {
+  void SurfacePoint::SetSphericalSigmas(const Angle    &latSigma,
+                                        const Angle    &lonSigma,
+                                        const Distance &radiusSigma) {
     // Is any error checking necessary beyond Angle and Distance????
 
     symmetric_matrix<double,upper> covar(3);
@@ -446,21 +530,21 @@ namespace Isis {
    * @param radiusSigma Radius sigma of body-fixed coordinate of surface point 
    *                  in meters 
    */
-  void SurfacePoint::SetSphericalSigmasDistance(Distance latSigma,
-                                        Distance lonSigma,
-                                        Distance radiusSigma) {
-    // Is any error checking necessary beyond Angle and Distance????
-
-    if (!p_hasRadii) {
+  void SurfacePoint::SetSphericalSigmasDistance(const Distance &latSigma,
+    const Distance &lonSigma, const Distance &radiusSigma) {
+    if (!p_majorAxis || !p_minorAxis || !p_polarAxis || !p_majorAxis->Valid() ||
+        !p_minorAxis->Valid() || !p_polarAxis->Valid()) {
       iString msg = "In order to use sigmas in meter units, the equitorial "
         "radius must be set with a call to SetRadii or an appropriate "
         "constructor";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    double scaledLatSig = latSigma/p_majorAxis;
-    double scaledLonSig = lonSigma*cos((double) GetLatitude().GetRadians())/p_majorAxis;
-    SetSphericalSigmas( Angle(scaledLatSig), Angle(scaledLonSig), radiusSigma);
+    double scaledLatSig = latSigma / *p_majorAxis;
+    double scaledLonSig = lonSigma * cos((double)GetLatitude().GetRadians())
+                                   / *p_majorAxis;
+    SetSphericalSigmas( Angle(scaledLatSig, Angle::Radians),
+                        Angle(scaledLonSig, Angle::Radians), radiusSigma);
   }
 
 
@@ -472,16 +556,23 @@ namespace Isis {
    * @return void
    */
   void SurfacePoint::SetSphericalMatrix(
-     const symmetric_matrix<double,upper>& covar) {
+     const symmetric_matrix<double, upper> & covar) {
 
     // Make sure the point is set first
-    if (!p_hasPoint) {
+    if (!p_x || !p_y || !p_z || !p_x->Valid() || !p_y->Valid() ||
+        !p_z->Valid()) {
       iString msg = "A point must be set before a variance/covariance matrix "
         "can be set.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    p_sphereCovar = covar;
+    if(p_sphereCovar) {
+      *p_sphereCovar = covar;
+    }
+    else {
+      p_sphereCovar = new symmetric_matrix<double, upper>(covar);
+    }
+
     SpiceDouble sphereMat[3][3];
 
     sphereMat[0][0] = covar(0,0);
@@ -518,16 +609,19 @@ namespace Isis {
     J[2][1] = 0.0;
     J[2][2] = sinPhi;
 
+    if(!p_rectCovar)
+      p_rectCovar = new symmetric_matrix<double, upper>(3);
+
     SpiceDouble mat[3][3];
     mxm_c (J, sphereMat, mat);
     mxmt_c (mat, J, mat);
     //  TODO  Test to see if only the upper triangular portion of the matrix needs to be set
-    p_rectCovar(0,0) = mat[0][0];
-    p_rectCovar(0,1) = mat[0][1];
-    p_rectCovar(0,2) = mat[0][2];
-    p_rectCovar(1,1) = mat[1][1];
-    p_rectCovar(1,2) = mat[1][2];
-    p_rectCovar(2,2) = mat[2][2];
+    (*p_rectCovar)(0,0) = mat[0][0];
+    (*p_rectCovar)(0,1) = mat[0][1];
+    (*p_rectCovar)(0,2) = mat[0][2];
+    (*p_rectCovar)(1,1) = mat[1][1];
+    (*p_rectCovar)(1,2) = mat[1][2];
+    (*p_rectCovar)(2,2) = mat[2][2];
 
 //     std::cout<<"Rcovar = "<<p_rectCovar(0,0)<<" "<<p_rectCovar(0,1)<<" "<<p_rectCovar(0,2)<<std::endl
 //              <<"         "<<p_rectCovar(1,0)<<" "<<p_rectCovar(1,1)<<" "<<p_rectCovar(1,2)<<std::endl
@@ -536,28 +630,88 @@ namespace Isis {
 
 
   /**
+   * A naif array is a c-style array of size 3. The element types are double...
+   * keep in mind a SpiceDouble is a double. The values' units are
+   * kilometers because that is the unit naif works in. The first element is X,
+   * the second Y, and the third Z.
+   *
+   * @param naifOutput The naif array to populate with the surface point's
+   *                   XYZ position.
+   */
+  void SurfacePoint::ToNaifArray(double naifOutput[3]) const {
+    if(Valid()) {
+      naifOutput[0] = p_x->GetKilometers();
+      naifOutput[1] = p_y->GetKilometers();
+      naifOutput[2] = p_z->GetKilometers();
+    }
+    else {
+      iString msg = "Cannot convert an invalid surface point to a naif array";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  /**
+   * A naif array is a c-style array of size 3. The element types are double...
+   * keep in mind a SpiceDouble is a double. The values' units are
+   * kilometers because that is the unit naif works in. The first element is X,
+   * the second Y, and the third Z. This loads the naif array into the surface
+   * point.
+   *
+   * @param naifValues The naif array to use as rectangular coordinates
+   */
+  void SurfacePoint::FromNaifArray(const double naifValues[3]) {
+    if(p_x && p_y && p_z) {
+      p_x->SetKilometers(naifValues[0]);
+      p_y->SetKilometers(naifValues[1]);
+      p_z->SetKilometers(naifValues[2]);
+    }
+    else {
+      p_x = new Displacement(naifValues[0], Displacement::Kilometers);
+      p_y = new Displacement(naifValues[1], Displacement::Kilometers);
+      p_z = new Displacement(naifValues[2], Displacement::Kilometers);
+    }
+  }
+
+
+  /**
    * Reset the radii of the surface body of the surface point 
-   *  
+   *
    * @param majorAxis  The semi-major axis of the surface model 
    * @param minorAxis  The semi-minor axis of the surface model 
    * @param polarAxis  The polar axis of the surface model 
    */
-  void SurfacePoint::SetRadii(Distance majorRadius,
-                         Distance minorRadius,
-                         Distance polarRadius) {
+  void SurfacePoint::SetRadii(const Distance &majorRadius,
+                              const Distance &minorRadius,
+                              const Distance &polarRadius) {
 
-    if (!majorRadius.Valid()  ||  
-        !minorRadius.Valid()  ||  
+    if (!majorRadius.Valid()  ||
+        !minorRadius.Valid()  ||
         !polarRadius.Valid()) {
       iString msg = "Radii must be set to valid distances.  One or more radii "
         "have been set to an invalid distance.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    p_majorAxis = majorRadius;
-    p_minorAxis = minorRadius;
-    p_polarAxis = polarRadius;
-    p_hasRadii = true;
+    if(p_majorAxis) {
+      *p_majorAxis = majorRadius;
+    }
+    else {
+      p_majorAxis = new Distance(majorRadius);
+    }
+
+    if(p_minorAxis) {
+      *p_minorAxis = minorRadius;
+    }
+    else {
+      p_minorAxis = new Distance(minorRadius);
+    }
+
+    if(p_polarAxis) {
+      *p_polarAxis = polarRadius;
+    }
+    else {
+      p_polarAxis = new Distance(polarRadius);
+    }
   }
 
 
@@ -567,14 +721,15 @@ namespace Isis {
    * @param radius The new local radius value to set 
    *  
    */
-  void SurfacePoint::ResetLocalRadius(Distance radius) {
+  void SurfacePoint::ResetLocalRadius(const Distance &radius) {
 
     if (!radius.Valid()) {
       iString msg = "Radius value must be a valid Distance.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if (!p_hasPoint) {
+    if (!p_x || !p_y || !p_z || !p_x->Valid() || !p_y->Valid() ||
+        !p_z->Valid()) {
         iString msg = "In order to reset the local radius, a Surface Point must "
           "already be set.";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -584,13 +739,90 @@ namespace Isis {
     SpiceDouble lon = (double) GetLongitude().GetRadians();
     SpiceDouble rect[3];
     latrec_c ((SpiceDouble) radius.GetKilometers(), lon, lat, rect);
-    p_x.SetKilometers(rect[0]);
-    p_y.SetKilometers(rect[1]);
-    p_z.SetKilometers(rect[2]);
+    p_x->SetKilometers(rect[0]);
+    p_y->SetKilometers(rect[1]);
+    p_z->SetKilometers(rect[2]);
 
     // TODO What should be done to the variance/covariance matrix when the
     // radius is reset??? With Bundle updates will this functionality be
     // obsolete??? Ask Ken
+  }
+
+
+  bool SurfacePoint::Valid() const {
+    static const Displacement zero(0, Displacement::Meters);
+    return p_x && p_y && p_z && p_x->Valid() && p_y->Valid() && p_z->Valid() &&
+           *p_x != zero && *p_y != zero && *p_z != zero;
+  }
+
+
+  Displacement SurfacePoint::GetX() const {
+    if(!p_x) return Displacement();
+
+    return *p_x;
+  }
+
+
+  Displacement SurfacePoint::GetY() const {
+    if(!p_y) return Displacement();
+
+    return *p_y;
+  }
+
+
+  Displacement SurfacePoint::GetZ() const {
+    if(!p_z) return Displacement();
+
+    return *p_z;
+  }
+
+
+  Distance SurfacePoint::GetXSigma() const {
+    if(!p_rectCovar) return Distance();
+
+    return Distance(sqrt((*p_rectCovar)(0, 0)), Distance::Meters);
+  }
+
+
+  Distance SurfacePoint::GetYSigma() const {
+    if(!p_rectCovar) return Distance();
+
+    return Distance(sqrt((*p_rectCovar)(1, 1)), Distance::Meters);
+  }
+
+
+  Distance SurfacePoint::GetZSigma() const {
+    if(!p_rectCovar) return Distance();
+
+    return Distance(sqrt((*p_rectCovar)(2, 2)), Distance::Meters);
+  }
+
+
+  symmetric_matrix<double, upper> SurfacePoint::GetRectangularMatrix()
+      const {
+    if(!p_rectCovar) {
+      symmetric_matrix<double, upper> tmp(3);
+      tmp.clear();
+      return tmp;
+    }
+
+    return *p_rectCovar;
+  }
+
+
+  Angle SurfacePoint::GetLatSigma() const {
+    if(!p_sphereCovar)
+      return Angle();
+
+    return Angle(sqrt((*p_sphereCovar)(0, 0)), Angle::Radians);
+  }
+
+
+  Angle SurfacePoint::GetLonSigma() const {
+    if(!p_sphereCovar)
+      return Angle();
+
+    return Angle(sqrt((*p_sphereCovar)(1, 1)), Angle::Radians);
   }
 
 
@@ -603,14 +835,14 @@ namespace Isis {
         return Latitude();
 
       // TODO Scale for accuracy with coordinate of largest magnitude
-      double x = (double) p_x;
-      double y = (double) p_y;
-      double z = (double) p_z;
+      double x = p_x->GetMeters();
+      double y = p_y->GetMeters();
+      double z = p_z->GetMeters();
 
       if (x != 0.  ||  y != 0.  || z != 0.) 
-        return atan2(z, sqrt(x*x + y*y) );
+        return Latitude(atan2(z, sqrt(x*x + y*y) ), Angle::Radians);
       else
-        return 0.;
+        return Latitude();
     }
 
 
@@ -622,9 +854,9 @@ namespace Isis {
       if (!Valid()) 
         return Longitude();
 
-      double x = (double) p_x;
-      double y = (double) p_y;
-      double z = (double) p_z;
+      double x = p_x->GetMeters();
+      double y = p_y->GetMeters();
+      double z = p_z->GetMeters();
 
       if (x != 0.  ||  y != 0.) {
         if (z != 0.){
@@ -632,12 +864,13 @@ namespace Isis {
           if (lon < 0) {
             lon += 2 * PI;
           }
-          return lon;
-        } else
-          return 0.;
+          return Longitude(lon, Angle::Radians);
+        }
+        else
+          return Longitude();
       }
       else
-        return 0.;
+        return Longitude();
     }
 
 
@@ -646,14 +879,14 @@ namespace Isis {
    *  
    */
     Distance SurfacePoint::GetLocalRadius() const {
-      if (!Valid()) 
+      if (!Valid())
         return Distance();
 
-      double x = (double) p_x;
-      double y = (double) p_y;
-      double z = (double) p_z;
+      double x = p_x->GetMeters();
+      double y = p_y->GetMeters();
+      double z = p_z->GetMeters();
 
-      return sqrt(x*x + y*y + z*z);
+      return Distance(sqrt(x*x + y*y + z*z), Distance::Meters);
     }
 
 
@@ -662,7 +895,7 @@ namespace Isis {
    *  
    */
     Distance SurfacePoint::GetLatSigmaDistance() const {
-      if (!p_hasRadii) {
+      if (!p_majorAxis || !p_majorAxis->Valid()) {
         iString msg = "In order to calculate sigmas in meter units, the "
           "equitorial radius must be set with a call to SetRadii.";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -670,7 +903,7 @@ namespace Isis {
 
       Angle latSigma = GetLatSigma();
       // Convert from radians to meters
-      return Distance(latSigma*p_majorAxis);
+      return latSigma.GetRadians() * *p_majorAxis;
     }
 
 
@@ -679,7 +912,9 @@ namespace Isis {
    *  
    */
   Distance SurfacePoint::GetLonSigmaDistance() const {
-    if (!p_hasRadii) {
+      if (!p_majorAxis || !p_minorAxis || !p_polarAxis ||
+          !p_majorAxis->Valid() || !p_minorAxis->Valid() ||
+          !p_polarAxis->Valid()) {
       iString msg = "In order to calculate sigmas in meter units, the "
           "equitorial radius must be set with a call to SetRadii.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -687,37 +922,178 @@ namespace Isis {
 
     Angle lonSigma = GetLonSigma();
     Latitude lat = GetLatitude();
-    double scaler = cos(lat);
+    double scaler = cos(lat.GetRadians());
 
     // Convert from radians to meters and return
     if (scaler != 0.) 
-      return Distance(lonSigma*p_majorAxis/scaler);
+      return lonSigma.GetRadians() * *p_majorAxis / scaler;
     else
-      return Distance(0.);
+      return Distance();
   }
 
 
+  Distance SurfacePoint::GetLocalRadiusSigma() const {
+    if(!p_sphereCovar)
+      return Distance();
+
+    return Distance(sqrt((*p_sphereCovar)(2, 2)), Distance::Meters);
+  }
+
+
+  symmetric_matrix<double, upper> SurfacePoint::GetSphericalMatrix() const {
+    if(!p_sphereCovar) {
+      symmetric_matrix<double, upper> tmp(3);
+      tmp.clear();
+      return tmp;
+    }
+
+    return *p_sphereCovar;
+  }
+
   bool SurfacePoint::operator==(const SurfacePoint &other) const {
-    return p_hasPoint  == other.p_hasPoint  &&
-           p_hasRadii  == other.p_hasRadii  &&
-           p_hasMatrix == other.p_hasMatrix &&
-           p_majorAxis == other.p_majorAxis &&
-           p_minorAxis == other.p_minorAxis &&
-           p_polarAxis == other.p_polarAxis &&
-           p_x         == other.p_x         &&
-           p_y         == other.p_y         &&
-           p_z         == other.p_z         &&
-           p_rectCovar(0, 0) == other.p_rectCovar(0, 0) &&
-           p_rectCovar(0, 1) == other.p_rectCovar(0, 1) &&
-           p_rectCovar(0, 2) == other.p_rectCovar(0, 2) &&
-           p_rectCovar(1, 1) == other.p_rectCovar(1, 1) &&
-           p_rectCovar(1, 2) == other.p_rectCovar(1, 2) &&
-           p_rectCovar(2, 2) == other.p_rectCovar(2, 2) &&
-           p_sphereCovar(0, 0) == other.p_sphereCovar(0, 0) &&
-           p_sphereCovar(0, 1) == other.p_sphereCovar(0, 1) &&
-           p_sphereCovar(0, 2) == other.p_sphereCovar(0, 2) &&
-           p_sphereCovar(1, 1) == other.p_sphereCovar(1, 1) &&
-           p_sphereCovar(1, 2) == other.p_sphereCovar(1, 2) &&
-           p_sphereCovar(2, 2) == other.p_sphereCovar(2, 2);
+    bool equal = true;
+
+    if(equal && p_x && p_y && p_z && other.p_x && other.p_y && other.p_z) {
+      equal = equal && *p_x == *other.p_x;
+      equal = equal && *p_y == *other.p_y;
+      equal = equal && *p_z == *other.p_z;
+    }
+    else if(equal) {
+      equal = equal && p_x == NULL && other.p_x == NULL;
+      equal = equal && p_y == NULL && other.p_y == NULL;
+      equal = equal && p_z == NULL && other.p_z == NULL;
+    }
+
+    if(equal && p_majorAxis && p_minorAxis && p_polarAxis) {
+      equal = equal && *p_majorAxis == *other.p_majorAxis;
+      equal = equal && *p_minorAxis == *other.p_minorAxis;
+      equal = equal && *p_polarAxis == *other.p_polarAxis;
+    }
+    else if(equal) {
+      equal = equal && p_majorAxis == NULL && other.p_majorAxis == NULL;
+      equal = equal && p_minorAxis == NULL && other.p_minorAxis == NULL;
+      equal = equal && p_polarAxis == NULL && other.p_polarAxis == NULL;
+    }
+
+    if(equal && p_rectCovar) {
+      equal = equal && (*p_rectCovar)(0, 0) == (*other.p_rectCovar)(0, 0);
+      equal = equal && (*p_rectCovar)(0, 1) == (*other.p_rectCovar)(0, 1);
+      equal = equal && (*p_rectCovar)(0, 2) == (*other.p_rectCovar)(0, 2);
+      equal = equal && (*p_rectCovar)(1, 1) == (*other.p_rectCovar)(1, 1);
+      equal = equal && (*p_rectCovar)(1, 2) == (*other.p_rectCovar)(1, 2);
+      equal = equal && (*p_rectCovar)(2, 2) == (*other.p_rectCovar)(2, 2);
+    }
+    else if(equal) {
+      equal = equal && p_rectCovar == NULL && other.p_rectCovar == NULL;
+    }
+
+    if(equal && p_sphereCovar) {
+      equal = equal && (*p_sphereCovar)(0, 0) == (*other.p_sphereCovar)(0, 0);
+      equal = equal && (*p_sphereCovar)(0, 1) == (*other.p_sphereCovar)(0, 1);
+      equal = equal && (*p_sphereCovar)(0, 2) == (*other.p_sphereCovar)(0, 2);
+      equal = equal && (*p_sphereCovar)(1, 1) == (*other.p_sphereCovar)(1, 1);
+      equal = equal && (*p_sphereCovar)(1, 2) == (*other.p_sphereCovar)(1, 2);
+      equal = equal && (*p_sphereCovar)(2, 2) == (*other.p_sphereCovar)(2, 2);
+    }
+    else if(equal) {
+      equal = equal && p_sphereCovar == NULL && other.p_sphereCovar == NULL;
+    }
+
+    return equal;
+  }
+
+  SurfacePoint &SurfacePoint::operator=(const SurfacePoint &other) {
+    // The lazy way of doing this (free all memory and copy) is too expensive
+    // in the default case!
+    if(p_x && other.p_x &&
+       p_y && other.p_y &&
+       p_z && other.p_z &&
+       !p_majorAxis && !other.p_majorAxis &&
+       !p_minorAxis && !other.p_minorAxis &&
+       !p_polarAxis && !other.p_polarAxis &&
+       !p_rectCovar && !other.p_rectCovar &&
+       !p_sphereCovar && !other.p_sphereCovar) {
+      *p_x = *other.p_x;
+      *p_y = *other.p_y;
+      *p_z = *other.p_z;
+    }
+    else {
+      FreeAllocatedMemory();
+      if(other.p_majorAxis) {
+        p_majorAxis = new Distance(*other.p_majorAxis);
+      }
+
+      if(other.p_minorAxis) {
+        p_minorAxis = new Distance(*other.p_minorAxis);
+      }
+
+      if(other.p_polarAxis) {
+        p_polarAxis = new Distance(*other.p_polarAxis);
+      }
+
+      if(other.p_x) {
+        p_x = new Displacement(*other.p_x);
+      }
+
+      if(other.p_y) {
+        p_y = new Displacement(*other.p_y);
+      }
+
+      if(other.p_z) {
+        p_z = new Displacement(*other.p_z);
+      }
+
+      if(other.p_rectCovar) {
+        p_rectCovar = new symmetric_matrix<double, upper>(*other.p_rectCovar);
+      }
+
+      if(other.p_sphereCovar) {
+        p_sphereCovar = new symmetric_matrix<double, upper>(*other.p_sphereCovar);
+      }
+    }
+
+    return *this;
+  }
+
+  void SurfacePoint::FreeAllocatedMemory() {
+    if(p_x) {
+      delete p_x;
+      p_x = NULL;
+    }
+
+    if(p_y) {
+      delete p_y;
+      p_y = NULL;
+    }
+
+    if(p_z) {
+      delete p_z;
+      p_z = NULL;
+    }
+
+    if(p_majorAxis) {
+      delete p_majorAxis;
+      p_majorAxis = NULL;
+    }
+
+    if(p_minorAxis) {
+      delete p_minorAxis;
+      p_minorAxis = NULL;
+    }
+
+    if(p_polarAxis) {
+      delete p_polarAxis;
+      p_polarAxis = NULL;
+    }
+
+    if(p_rectCovar) {
+      delete p_rectCovar;
+      p_rectCovar = NULL;
+    }
+
+    if(p_sphereCovar) {
+      delete p_sphereCovar;
+      p_sphereCovar = NULL;
+    }
   }
 }

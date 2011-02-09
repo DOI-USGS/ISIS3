@@ -23,10 +23,22 @@
 
 #include "LineScanCameraGroundMap.h"
 
+#include <iostream>
+#include <iomanip>
+
+#include <QTime>
+
 #include "CameraDistortionMap.h"
-#include "LineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
+#include "Distance.h"
+#include "LineScanCameraDetectorMap.h"
+#include "iTime.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Statistics.h"
+#include "SurfacePoint.h"
+
+using namespace std;
 
 namespace Isis {
   /** Compute undistorted focal plane coordinate from ground position
@@ -36,8 +48,10 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const double lat, const double lon) {
-    return SetGround(lat, lon, p_camera->LocalRadius(lat, lon));
+  bool LineScanCameraGroundMap::SetGround(const Latitude &lat,
+      const Longitude &lon) {
+    Distance radius(p_camera->LocalRadius(lat, lon));
+    return SetGround(SurfacePoint(lat, lon, radius));
   }
 
   /** Compute undistorted focal plane coordinate from ground position
@@ -48,8 +62,8 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const double lat, const double lon, const double radius) {
-    FindFocalPlaneStatus status = FindFocalPlane(-1, lat, lon, radius);
+  bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
+    FindFocalPlaneStatus status = FindFocalPlane(-1, surfacePoint);
 
     if(status == Success) return true;
     if(status == Failure) return false;
@@ -57,11 +71,10 @@ namespace Isis {
     if(status == BoundingProblem) {
       // Get ending bounding framelets and distances for iterative loop to minimize the spacecraft distance
       int startLine = 1;
-      double startDist = FindSpacecraftDistance(startLine, lat, lon);
+      double startDist = FindSpacecraftDistance(startLine, surfacePoint);
 
       int endLine = p_camera->Lines();
-      double endDist = FindSpacecraftDistance(endLine, lat, lon);
-
+      double endDist = FindSpacecraftDistance(endLine, surfacePoint);
       int deltaX = abs(startLine - endLine) / 2;
 
       // start + deltaX = middle framelet.
@@ -81,8 +94,7 @@ namespace Isis {
       }
 
       int middleLine = startLine + (int)(deltaX + biasFactor * deltaX);
-
-      if(FindFocalPlane(middleLine, lat, lon, radius) == Success) {
+      if(FindFocalPlane(middleLine, surfacePoint) == Success) {
         return true;
       }
       else {
@@ -93,17 +105,18 @@ namespace Isis {
     return false;
   }
 
-  double LineScanCameraGroundMap::FindSpacecraftDistance(int line, const double lat, const double lon) {
+  double LineScanCameraGroundMap::FindSpacecraftDistance(int line,
+      const SurfacePoint &surfacePoint) {
     CameraDetectorMap *detectorMap = p_camera->DetectorMap();
     detectorMap->SetParent(p_camera->ParentSamples() / 2, line);
-    if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) return DBL_MAX;
+    if(!p_camera->Sensor::SetGround(surfacePoint, false)) return DBL_MAX;
 
     return p_camera->SlantDistance();
   }
 
   LineScanCameraGroundMap::FindFocalPlaneStatus
-  LineScanCameraGroundMap::FindFocalPlane(const int &approxLine, const double &lat,
-                                          const double &lon, const double &radius) {
+  LineScanCameraGroundMap::FindFocalPlane(const int &approxLine,
+      const SurfacePoint &surfacePoint) {
     // find middle time; cache time starting points vary
     double approxTime = 0.0;
     double lineRate = 0.0;
@@ -116,16 +129,19 @@ namespace Isis {
     double lookC[3] = {0.0, 0.0, 0.0};
     double ux = 0.0, uy = 0.0;
     double dx = 0.0, dy = 0.0;
-    const double cacheStart = p_camera->Spice::CacheStartTime();
-    const double cacheEnd = p_camera->Spice::CacheEndTime();
+    const double cacheStart = p_camera->Spice::CacheStartTime().Et();
+    const double cacheEnd = p_camera->Spice::CacheEndTime().Et();
     unsigned long lineTolerance = 100;
     bool startTimeMaxed = false, endTimeMaxed = false;
 
     if(approxLine >= 0) {
       p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2, approxLine);
-      approxTime = p_camera->EphemerisTime();
+      approxTime = p_camera->Time().Et();
       lineRate = ((LineScanCameraDetectorMap *)p_camera->DetectorMap())->LineRate();
     }
+
+    const double &givenLat = surfacePoint.GetLatitude().GetDegrees();
+    const double &givenLon = surfacePoint.GetLongitude().GetDegrees();
 
     bool bounded = false;
     while(!bounded) {
@@ -151,8 +167,9 @@ namespace Isis {
       bounded = true;
 
       // Get beginning bounding time and offset for iterative loop
-      p_camera->Sensor::SetEphemerisTime(startTime);
-      if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) {
+      p_camera->Sensor::SetTime(startTime);
+
+      if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
         return Failure;
       }
 
@@ -168,9 +185,13 @@ namespace Isis {
                               (s[2] - p[2]) * (s[2] - p[2]));
 
       int backCheck = 0;
+
       p_camera->SetLookDirection(lookC);
-      if((fabs(p_camera->UniversalLatitude() - lat) > 45.0) ||
-          (fabs(p_camera->UniversalLongitude() - lon) > 180.0)) backCheck++;
+
+      if((fabs(p_camera->UniversalLatitude() - givenLat) > 45.0) ||
+          (fabs(p_camera->UniversalLongitude() - givenLon) > 180.0)) {
+        backCheck++;
+      }
 
       double dx, dy;
       CameraDistortionMap *distortionMap = p_camera->DistortionMap();
@@ -191,8 +212,8 @@ namespace Isis {
                     focalMap->DetectorLine();
 
       // Get ending bounding time and offset for iterative loop
-      p_camera->Sensor::SetEphemerisTime(endTime);
-      if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) {
+      p_camera->Sensor::SetTime(endTime);
+      if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
         return Failure;
       }
 
@@ -207,8 +228,10 @@ namespace Isis {
                             (s[2] - p[2]) * (s[2] - p[2]));
 
       p_camera->SetLookDirection(lookC);
-      if((fabs(p_camera->UniversalLatitude() - lat) > 45.0) ||
-          (fabs(p_camera->UniversalLongitude() - lon) > 180.0)) backCheck++;
+      if((fabs(p_camera->UniversalLatitude() - givenLat) > 45.0) ||
+          (fabs(p_camera->UniversalLongitude() - givenLon) > 180.0)) {
+        backCheck++;
+      }
 
       if(!distortionMap->SetUndistortedFocalPlane(ux, uy)) {
         dx = ux;
@@ -227,8 +250,9 @@ namespace Isis {
       if(backCheck == 1) {
         if(distStart < distEnd) {
           endTime = startTime + (endTime - startTime) / 2.0;
-          p_camera->Sensor::SetEphemerisTime(endTime);
-          if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) return Failure;
+          p_camera->Sensor::SetTime(endTime);
+          if(!p_camera->Sensor::SetGround(surfacePoint, false))
+            return Failure;
 
           p_camera->Sensor::LookDirection(lookC);
           ux = p_camera->FocalLength() * lookC[0] / lookC[2];
@@ -245,8 +269,9 @@ namespace Isis {
         }
         else {
           startTime = endTime - (endTime - startTime) / 2.0;
-          p_camera->Sensor::SetEphemerisTime(startTime);
-          if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) return Failure;
+          p_camera->Sensor::SetTime(startTime);
+          if(!p_camera->Sensor::SetGround(surfacePoint, false))
+            return Failure;
 
           p_camera->Sensor::LookDirection(lookC);
           ux = p_camera->FocalLength() * lookC[0] / lookC[2];
@@ -299,8 +324,9 @@ namespace Isis {
     bool checkHidden = false;
     for(int j = 0; j < 30; j++) {
       double etGuess = xl + (xh - xl) * fl / (fl - fh);
-      p_camera->Sensor::SetEphemerisTime(etGuess);
-      if(!p_camera->Sensor::SetUniversalGround(lat, lon, checkHidden)) return Failure;
+      p_camera->Sensor::SetTime(etGuess);
+      if(!p_camera->Sensor::SetGround(surfacePoint, checkHidden))
+        return Failure;
       p_camera->Sensor::LookDirection(lookC);
       ux = p_camera->FocalLength() * lookC[0] / lookC[2];
       uy = p_camera->FocalLength() * lookC[1] / lookC[2];

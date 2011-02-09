@@ -21,6 +21,7 @@
  */
 
 namespace Isis {
+  class Distance;
 
   /**
    * @brief Displacement is a signed length, usually in meters
@@ -52,9 +53,13 @@ namespace Isis {
       };
 
       Displacement();
-      Displacement(double displacement, Units distanceUnit = Meters);
-      Displacement(const Displacement &DisplacementToCopy);
-      ~Displacement();
+      Displacement(double displacement, Units distanceUnit);
+      Displacement(const Distance &distanceToCopy);
+
+      /**
+       * Free the memory allocated by this instance of the displacement class.
+       */
+      ~Displacement() {};
 
       double GetMeters() const;
       void SetMeters(double displacementInMeters);
@@ -68,10 +73,10 @@ namespace Isis {
        * Get the displacement in meters. This is equivalent to GetMeters()
        *
        * @return The displacement, as a number, in units of Meters
-       */
+
       operator double() const {
         return GetMeters();
-      }
+      }*/
 
       bool operator >(const Displacement &otherDisplacement) const;
       bool operator <(const Displacement &otherDisplacement) const;
@@ -102,6 +107,19 @@ namespace Isis {
         return *this < otherDisplacement  ||  *this == otherDisplacement;
       }
 
+      /**
+       * Compare the lengths of 2 displacements with the != operator.
+       *   Two uninitialized displacements are equal to each other.
+       *
+       * @param otherDisplacement This is the displacement we are comparing to,
+       *     i.e. it is on the right-hand-side of the operator when used
+       * @return True if the length of this displacement is not equal to the
+       *     given displacement
+       *
+       */
+      bool operator !=(const Displacement &otherDisplacement) const {
+        return !(*this == otherDisplacement);
+      }
 
       /**
        * Compare the lengths of 2 displacements with the == operator. 
@@ -109,19 +127,26 @@ namespace Isis {
        *
        * @param otherDisplacement This is the displacement we are comparing to, 
        *     i.e. it is on the right-hand-side of the operator when used
-       * @return True if the length of this displacement is equal to the length 
-       *     of the given displacement 
+       * @return True if the length of this displacement is equal to the  
+       *     given displacement 
        * 
        */
       bool operator ==(const Displacement &otherDisplacement) const {
         return GetLength() == otherDisplacement.GetLength();
       }
 
-      Displacement &operator =(const Displacement &displacement);
       Displacement operator +(const Displacement &displacementToAdd) const;
-      Displacement operator -(const Displacement &displacementToAdd) const;
+      Displacement operator -(const Displacement &displacementToSub) const;
+      Displacement operator -(const Distance &distanceToSub) const;
+      double operator /(const Displacement &displacementToDiv) const;
+      Displacement operator /(const double &valueToDiv) const;
+      Displacement operator *(const double &valueToMult) const;
+      friend Displacement operator *(double mult, Displacement dist);
       void operator +=(const Displacement &displacementToAdd);
       void operator -=(const Displacement &displacementToSub);
+      void operator -=(const Distance &distanceToSub);
+      void operator /=(const double &valueToDiv);
+      void operator *=(const double &valueToMult);
 
     protected:
       double GetDisplacement(Units displacementUnit) const;

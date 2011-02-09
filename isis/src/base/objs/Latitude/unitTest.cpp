@@ -44,8 +44,11 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Constructor given a Planetographic value" << endl;
-    Latitude lat(45.0, Distance(1500), Distance(1500),
-        Latitude::Planetographic, Angle::Degrees);
+    Latitude lat(45.0,
+                 Distance(1500, Distance::Meters),
+                 Distance(1500, Distance::Meters),
+                 Latitude::Planetographic,
+                 Angle::Degrees);
     cout << lat.GetDegrees() << " degrees" << endl;
   }
   catch(iException &e) {
@@ -54,8 +57,9 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Constructor given a Planetographic value and ellipsoid" << endl;
-    Latitude lat(45.0, Distance(1500), Distance(2500),
-        Latitude::Planetographic, Angle::Degrees);
+    Latitude lat(45.0, Distance(1500, Distance::Meters),
+                 Distance(2500, Distance::Meters), Latitude::Planetographic,
+                 Angle::Degrees);
     cout << lat.GetDegrees() << " degrees" << endl;
   }
   catch(iException &e) {
@@ -64,8 +68,9 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Constructor given a more permissive mode but hard task" << endl;
-    Latitude lat(95.0, Distance(1500), Distance(2500),
-        Latitude::Planetographic, Angle::Degrees, Latitude::AllowPastPole);
+    Latitude lat(95.0, Distance(1500, Distance::Meters),
+                 Distance(2500, Distance::Meters), Latitude::Planetographic,
+                 Angle::Degrees, Latitude::AllowPastPole);
     cout << lat.GetDegrees() << " degrees" << endl;
   }
   catch(iException &e) {
@@ -74,8 +79,9 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Constructor given a more permissive mode" << endl;
-    Latitude lat(95.0, Distance(1500), Distance(2500),
-        Latitude::Planetocentric, Angle::Degrees, Latitude::AllowPastPole);
+    Latitude lat(95.0, Distance(1500, Distance::Meters),
+                 Distance(2500, Distance::Meters), Latitude::Planetocentric,
+                 Angle::Degrees, Latitude::AllowPastPole);
     cout << lat.GetDegrees() << " degrees" << endl;
   }
   catch(iException &e) {
@@ -84,8 +90,9 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Constructor given disallowed value" << endl;
-    Latitude lat(95.0, Distance(1500), Distance(2500),
-        Latitude::Planetographic, Angle::Degrees);
+    Latitude lat(95.0, Distance(1500, Distance::Meters),
+                 Distance(2500, Distance::Meters), Latitude::Planetographic,
+                 Angle::Degrees);
     cout << lat.GetDegrees() << " degrees" << endl;
   }
   catch(iException &e) {
@@ -94,8 +101,9 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Copy constructor" << endl;
-    Latitude lat(95.0, Distance(1500), Distance(2500),
-        Latitude::Planetocentric, Angle::Degrees, Latitude::AllowPastPole);
+    Latitude lat(95.0, Distance(1500, Distance::Meters),
+        Distance(2500, Distance::Meters), Latitude::Planetocentric,
+        Angle::Degrees, Latitude::AllowPastPole);
     cout << lat.GetDegrees() << " degrees == ";
     cout << Latitude(lat).GetDegrees() << " degrees" << endl;
   }
@@ -133,7 +141,8 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Set to 25 degrees Planetographic with radii" << endl;
-    Latitude lat(0.0, Distance(1400), Distance(1500));
+    Latitude lat(0.0, Distance(1400, Distance::Meters),
+                 Distance(1500, Distance::Meters));
     lat.SetPlanetographic(25, Angle::Degrees);
     cout << lat.GetDegrees() << " degrees" << endl;
   }
@@ -145,8 +154,9 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "-15 degrees with radii (1, 1.1) is" << endl;
-    Latitude lat(-15, Distance(1), Distance(1.1), Latitude::Planetocentric,
-        Angle::Degrees);
+    Latitude lat(-15, Distance(1, Distance::Meters),
+                 Distance(1.1, Distance::Meters), Latitude::Planetocentric,
+                 Angle::Degrees);
     cout << lat.GetDegrees() << " degrees universal" << endl;
     cout << lat.GetPlanetocentric(Angle::Degrees) << " degrees Planetocentric"
          << endl;

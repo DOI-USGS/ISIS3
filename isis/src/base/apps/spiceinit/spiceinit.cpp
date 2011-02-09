@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "iException.h"
+#include "Longitude.h"
 #include "KernelDb.h"
 #include "Table.h"
 
@@ -347,7 +348,8 @@ bool TryKernels(Cube *icube, Process &p,
       for(int i = 0; i < pckKeyword.Size(); i++) {
         bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
       }
-      bodyTable.Label() += PvlKeyword("SolarLongitude", cam->SolarLongitude());
+      bodyTable.Label() += PvlKeyword("SolarLongitude",
+          cam->SolarLongitude().GetDegrees());
       icube->Write(bodyTable);
 
       Table sunTable = cam->SunPosition()->Cache("SunPosition");

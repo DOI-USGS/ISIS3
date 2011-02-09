@@ -96,9 +96,9 @@ namespace Qisis {
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
       Isis::ControlPoint &cp1 = *(*g_controlNetwork)[g_filteredPoints[i]];
       // Get necessary info from the control point for later use
-      double rad = cp1.GetSurfacePoint().GetLocalRadius();
-      double lat1 = cp1.GetSurfacePoint().GetLatitude();
-      double lon1 = cp1.GetSurfacePoint().GetLongitude();
+      double rad = cp1.GetSurfacePoint().GetLocalRadius().GetMeters();
+      double lat1 = cp1.GetSurfacePoint().GetLatitude().GetRadians();
+      double lon1 = cp1.GetSurfacePoint().GetLongitude().GetRadians();
 
       // If no lat/lon for this point, use lat/lon of first measure
       if ((lat1 == Isis::Null) || (lon1 == Isis::Null)) {
@@ -114,9 +114,9 @@ namespace Qisis {
         int camIndex1 = g_serialNumberList->SerialNumberIndex(cm1.GetCubeSerialNumber());
         cam1 = g_controlNetwork->Camera(camIndex1);
         cam1->SetImage(cm1.GetSample(), cm1.GetLine());
-        rad = cam1->LocalRadius();
-        lat1 = cam1->UniversalLatitude();
-        lon1 = cam1->UniversalLongitude();
+        rad = cam1->LocalRadius().GetMeters();
+        lat1 = cam1->GetLatitude().GetDegrees();
+        lon1 = cam1->GetLongitude().GetDegrees();
       }
       // Loop through each control point, comparing it to the initial point
       // from the filtered list
@@ -126,8 +126,8 @@ namespace Qisis {
           continue;
         }
         Isis::ControlPoint cp2 = *(*g_controlNetwork)[j];
-        double lat2 = cp2.GetSurfacePoint().GetLatitude();
-        double lon2 = cp2.GetSurfacePoint().GetLongitude();
+        double lat2 = cp2.GetSurfacePoint().GetLatitude().GetRadians();
+        double lon2 = cp2.GetSurfacePoint().GetLongitude().GetRadians();
 
         // If no lat/lon for this point, use lat/lon of first measure
         if ((lat2 == Isis::Null) || (lon2 == Isis::Null)) {

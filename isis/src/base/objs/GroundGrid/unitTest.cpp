@@ -35,9 +35,9 @@ void IsisMain() {
                        Latitude(34.340453944831125, Angle::Degrees),
                        Longitude(-134.060950006448195, Angle::Degrees));
 
-  grid.CreateGrid(Latitude(0), Longitude(0), Angle(0.2, Angle::Degrees),
-      Angle(0.2, Angle::Degrees), &progress, Angle(0.1, Angle::Degrees),
-      Angle(0.01, Angle::Degrees));
+  grid.CreateGrid(Latitude(0, Angle::Degrees), Longitude(0, Angle::Degrees),
+      Angle(0.2, Angle::Degrees), Angle(0.2, Angle::Degrees),
+      &progress, Angle(0.1, Angle::Degrees), Angle(0.01, Angle::Degrees));
 
   cout << "\n\nGrid cutout: \n" << endl;
 

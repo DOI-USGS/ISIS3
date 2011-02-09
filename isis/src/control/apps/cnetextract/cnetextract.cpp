@@ -559,7 +559,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
 
             lat = Latitude(projection->Latitude(), Angle::Degrees);
             lon = Longitude(projection->Longitude(), Angle::Degrees);
-            radius = projection->LocalRadius();
+            radius = Distance(projection->LocalRadius(), Distance::Meters);
 
             delete projection;
             projection = NULL;

@@ -42,7 +42,6 @@ int main() {
   c = cube.Camera();
   Pvl &pvl = *cube.Label();
   MyCamera cam(pvl);
-
   double line = 453.0;
   double sample = 534.0;
   Latitude lat(18.221, Angle::Degrees);
@@ -65,6 +64,7 @@ int main() {
 
   cout << "SetUniversalGround(lat, lon): "
        << c->SetGround(lat, lon) << endl;
+
   cout << "SetRightAscensionDeclination(ra, dec): "
        << c->SetRightAscensionDeclination(ra, dec) << endl;
   cout << "HasProjection: " << c->HasProjection() << endl;
@@ -146,13 +146,13 @@ int main() {
   cout << endl << "Testing SetUniversalGround(lat,lon,radius)..." << endl;
   lat.SetDegrees(18.221);
   lon.SetDegrees(226.671);
-  double radius = 3420.;
+  double radius = 3414033.72108798;
   c->SetUniversalGround(lat.GetDegrees(), lon.GetDegrees(), radius);
-  c->SetGround(SurfacePoint(lat, lon, radius));
+  c->SetGround(SurfacePoint(lat, lon, Distance(radius, Distance::Meters)));
   cout << "Has intersection " << c->HasSurfaceIntersection() << endl;
   cout << "Latitude = " << c->UniversalLatitude() << endl;
   cout << "Longitude = " << c->UniversalLongitude() << endl;
-  cout << "Radius = " << c->LocalRadius() << endl;
+  cout << "Radius = " << c->LocalRadius().GetMeters() << endl;
   double p[3];
   c->Coordinate(p);
   cout << "Point = " << setprecision(4)
@@ -167,13 +167,13 @@ int main() {
   cout << "SetImage (sample, line): " << c->SetImage(sample, line) << endl;
   cout << "Latitude = " << c->UniversalLatitude() << endl;
   cout << "Longitude = " << c->UniversalLongitude() << endl;
-  cout << "Radius = " << c->LocalRadius() << endl;
+  cout << "Radius = " << c->LocalRadius().GetMeters() << endl;
   c->Coordinate(p);
   cout << "Point = " << setprecision(4)
        << p[0] << " " << p[1] << " " << p[2] << endl;
   cout << "SetUniversalGround (lat, lon, radius): "
        << c->SetUniversalGround(c->UniversalLatitude(), c->UniversalLongitude(),
-                                c->LocalRadius())
+                                c->LocalRadius().GetMeters())
        << endl;
   cout << "Sample = " << c->Sample() << endl;
   cout << "Line = " << c->Line() << endl << endl;
@@ -224,7 +224,7 @@ int main() {
   cout << "SetImage (sample, line): " << cam2->SetImage(sample, line) << endl;
   cout << "Latitude = " << cam2->UniversalLatitude() << endl;
   cout << "Longitude = " << cam2->UniversalLongitude() << endl;
-  cout << "Radius = " << cam2->LocalRadius() << endl;
+  cout << "Radius = " << cam2->LocalRadius().GetMeters() << endl;
   cam2->Coordinate(p);
   cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
   cout << "SetUniversalGround (cam2->UniversalLatitude(), "

@@ -97,12 +97,16 @@ namespace Isis {
 
       Latitude();
       Latitude(double latitude,
-               Angle::Units latitudeUnits = Angle::Radians,
+               Angle::Units latitudeUnits,
+               ErrorChecking errors = ThrowAllErrors);
+
+      Latitude(Angle latitude,
+               PvlGroup mapping,
                ErrorChecking errors = ThrowAllErrors);
 
       Latitude(double latitude,
                PvlGroup mapping,
-               Angle::Units latitudeUnits = Angle::Radians,
+               Angle::Units latitudeUnits,
                ErrorChecking errors = ThrowAllErrors);
 
       Latitude(double latitude, Distance equatorialRadius, Distance polarRadius,
@@ -128,10 +132,10 @@ namespace Isis {
        * Same as GetPlanetocentric.
        *
        * @see GetPlanetocentric
-       */
+       
       operator double() const {
         return GetPlanetocentric();
-      }
+      }*/
 
     protected:
       virtual void SetAngle(double angle, const Angle::Units &units);

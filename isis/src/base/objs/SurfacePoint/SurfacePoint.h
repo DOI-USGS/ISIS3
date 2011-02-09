@@ -68,31 +68,38 @@ namespace Isis {
       // Constructors
 //      SurfacePoint(const std::vector <double> radii);
       SurfacePoint();
-      SurfacePoint(Latitude lat, Longitude lon, Distance radius);
-      SurfacePoint(Latitude lat, Longitude lon, Distance radius,
-                   Angle latSigma, Angle lonSigma, Distance radiusSigma);
-      SurfacePoint(Latitude lat, Longitude lon, Distance radius,
+      SurfacePoint(const SurfacePoint &other);
+      SurfacePoint(const Latitude &lat, const Longitude &lon,
+                   const Distance &radius);
+      SurfacePoint(const Latitude &lat, const Longitude &lon,
+          const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
+          const Distance &radiusSigma);
+      SurfacePoint(const Latitude &lat, const Longitude &lon,
+                   const Distance &radius,
                    const boost::numeric::ublas::symmetric_matrix
-                   <double,boost::numeric::ublas::upper>& covar);
-      SurfacePoint(Displacement x, Displacement y, Displacement z);
-      SurfacePoint(Displacement x, Displacement y, Displacement z,
-                   Distance xSigma, Distance ySigma, Distance zSigma);
-      SurfacePoint(Displacement x, Displacement y, Displacement z,
+                     <double,boost::numeric::ublas::upper>& covar);
+      SurfacePoint(const Displacement &x, const Displacement &y,
+                   const Displacement &z);
+      SurfacePoint(const Displacement &x, const Displacement &y,
+          const Displacement &z, const Distance &xSigma, const Distance &ySigma,
+          const Distance &zSigma);
+      SurfacePoint(const Displacement &x, const Displacement &y,
+                   const Displacement &z,
                    const boost::numeric::ublas::symmetric_matrix
-                   <double,boost::numeric::ublas::upper>& covar);
+                     <double,boost::numeric::ublas::upper>& covar);
       ~SurfacePoint();
 
 // Rectangular loading utilities
-      void SetRectangular(Displacement x, Displacement y, Displacement z,
-                          Distance xSigma=Distance(),
-                          Distance ySigma=Distance(),
-                          Distance zSigma=Distance());
+      void SetRectangular(const Displacement &x, const Displacement &y,
+          const Displacement &z, const Distance &xSigma=Distance(),
+          const Distance &ySigma=Distance(), const Distance &zSigma=Distance());
 
-      void SetRectangular(Displacement x, Displacement y, Displacement z,
+      void SetRectangular(const Displacement x, const Displacement y, const Displacement z,
         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
 
       //! Set surface point and sigmas in rectangular coordinates and convert to planetocentric
-      void SetRectangularSigmas(Distance xSigma, Distance ySigma, Distance zSigma);
+      void SetRectangularSigmas(const Distance &xSigma, const Distance &ySigma,
+                                const Distance &zSigma);
 
 
       void SetRectangularMatrix(
@@ -102,70 +109,78 @@ namespace Isis {
 
       //! Set surface point and covariance matrix in planetocentric coordinates and convert to rectangular
       //! (Latitude, Longitude in degrees, Radius in meters; matrix in radians and radians**2)
-      void SetSpherical (Latitude lat, Longitude lon, Distance radius,
-                         Angle latSigma=Angle(),
-                         Angle lonSigma=Angle(),
-                         Distance radiusSigma=Distance());
+      void SetSpherical (const Latitude &lat, const Longitude &lon,
+          const Distance &radius, const Angle &latSigma=Angle(),
+          const Angle &lonSigma=Angle(),
+          const Distance &radiusSigma=Distance());
 
-      void SetSpherical (Latitude lat, Longitude lon, Distance radius,
-        const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
+      void SetSpherical (const Latitude &lat, const Longitude &lon,
+          const Distance &radius,
+          const boost::numeric::ublas::symmetric_matrix
+            <double,boost::numeric::ublas::upper>& covar);
 
       void SetSphericalMatrix(
         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
 
-      void SetSphericalSigmas(Angle latSigma, Angle lonSigma, Distance radiusSigma);
+      void SetSphericalSigmas(const Angle &latSigma, const Angle &lonSigma,
+                              const Distance &radiusSigma);
 
-      void SetSphericalSigmasDistance(Distance latSigma,
-                                      Distance lonSigma,
-                                      Distance radiusSigma);
+      void SetSphericalSigmasDistance(const Distance &latSigma,
+                                      const Distance &lonSigma,
+                                      const Distance &radiusSigma);
 
-      void SetRadii(Distance majorRadius, Distance minorRadius, Distance
-                    polarRadius);
+      void SetRadii(const Distance &majorRadius, const Distance &minorRadius,
+                    const Distance &polarRadius);
 
-      void ResetLocalRadius(Distance radius);
-      bool Valid() const { return p_hasPoint; }
+      void ResetLocalRadius(const Distance &radius);
+      bool Valid() const;
 
 // Output methods
-      Displacement GetX() const { return p_x; }
-      Displacement GetY() const { return p_y; }
-      Displacement GetZ() const { return p_z; }
-      Distance GetXSigma() const { return sqrt(p_rectCovar(0,0)); }
-      Distance GetYSigma() const { return sqrt(p_rectCovar(1,1)); }
-      Distance GetZSigma() const { return sqrt(p_rectCovar(2,2)); }
+      Displacement GetX() const;
+      Displacement GetY() const;
+      Displacement GetZ() const;
+      Distance GetXSigma() const;
+      Distance GetYSigma() const;
+      Distance GetZSigma() const;
       boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> 
-        const GetRectangularMatrix() const { return p_rectCovar; }
+        GetRectangularMatrix() const;
       Latitude GetLatitude() const; 
       Longitude GetLongitude() const;
       Distance GetLocalRadius() const;
-      Angle GetLatSigma()  const{ return sqrt(p_sphereCovar(0,0)); }
+      Angle GetLatSigma() const;
       Distance GetLatSigmaDistance() const;
-      Angle GetLonSigma() const { return sqrt(p_sphereCovar(1,1)); }
+      Angle GetLonSigma() const;
       Distance GetLonSigmaDistance() const;
-      Distance GetLocalRadiusSigma() const { return sqrt(p_sphereCovar(2,2)); }
-      boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> 
-         GetSphericalMatrix() const { return p_sphereCovar; }
+      Distance GetLocalRadiusSigma() const;
+      boost::numeric::ublas::symmetric_matrix
+          <double,boost::numeric::ublas::upper> GetSphericalMatrix() const;
+
+      void ToNaifArray(double naifOutput[3]) const;
+      void FromNaifArray(const double naifValues[3]);
 
       bool operator==(const SurfacePoint &other) const;
+      SurfacePoint &operator=(const SurfacePoint &other);
 
     private:
       void InitCovariance();
       void InitPoint();
       void InitRadii();
-      void SetRectangularPoint(Displacement x, Displacement y, Displacement z);
-      void SetSphericalPoint(Latitude lat, Longitude lon, Distance radius);
+      void SetRectangularPoint(const Displacement &x, const Displacement &y, const Displacement &z);
+      void SetSphericalPoint(const Latitude &lat, const Longitude &lon, const Distance &radius);
+      void FreeAllocatedMemory();
 
-      bool p_hasPoint;
-      bool p_hasRadii;
-      bool p_hasMatrix;
-
-      Distance p_majorAxis;
-      Distance p_minorAxis;
-      Distance p_polarAxis;
-      Displacement p_x;
-      Displacement p_y;
-      Displacement p_z;
-      boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> p_rectCovar;  //! 3x3 upper triangular covariance matrix rectangular coordinates
-      boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> p_sphereCovar;  //! 3x3 upper triangular covariance matrix ocentric coordinates
+      Distance *p_majorAxis;
+      Distance *p_minorAxis;
+      Distance *p_polarAxis;
+      Displacement *p_x;
+      Displacement *p_y;
+      Displacement *p_z;
+      //! 3x3 upper triangular covariance matrix rectangular coordinates
+      boost::numeric::ublas::symmetric_matrix
+          <double,boost::numeric::ublas::upper> *p_rectCovar;
+      //! 3x3 upper triangular covariance matrix ocentric coordinates
+      boost::numeric::ublas::symmetric_matrix
+          <double,boost::numeric::ublas::upper> *p_sphereCovar;
   };
 };
 

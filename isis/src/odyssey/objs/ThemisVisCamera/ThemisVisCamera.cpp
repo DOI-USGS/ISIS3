@@ -15,11 +15,13 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <iomanip>
 #include "ThemisVisCamera.h"
+
+#include <iomanip>
 
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
+#include "iTime.h"
 #include "NaifStatus.h"
 #include "PushFrameCameraDetectorMap.h"
 #include "PushFrameCameraGroundMap.h"
@@ -109,7 +111,7 @@ namespace Odyssey {
     Camera::SetBand(vband);
 
     // Set the et
-    SetEphemerisTime(p_etStart + BandEphemerisTimeOffset(vband));
+    SetTime(p_etStart + BandEphemerisTimeOffset(vband));
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *)this->DetectorMap();
     dmap->SetStartTime(p_etStart + BandEphemerisTimeOffset(vband));
   }

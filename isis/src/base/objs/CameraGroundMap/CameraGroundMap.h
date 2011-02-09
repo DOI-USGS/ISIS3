@@ -64,6 +64,8 @@ namespace Isis {
    *                       every measure.  The application must call PointPartial
    *                       to get the body-fixed look vector derivative prior to
    *                       calling this method.
+   *  @history 2011-02-09 Steven Lambright SetGround now uses the Latitude,
+   *                       Longitude and SurfacePoint classes.
    *
    */
   class CameraGroundMap {
@@ -82,17 +84,22 @@ namespace Isis {
         WRT_Radius
       };
 
-      virtual bool SetGround(const double lat, const double lon);
-      virtual bool SetGround(const double lat, const double lon, const double radius);
+      virtual bool SetGround(const Latitude &lat, const Longitude &lon);
+      virtual bool SetGround(const SurfacePoint &surfacePoint);
       virtual bool GetXY(const SurfacePoint spoint, double *cudx, double *cudy);
-      virtual bool GetXY(const double lat, const double lon, const double radius, double *cudx, double *cudy);
-      virtual bool GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
+      virtual bool GetXY(const double lat, const double lon,
+                         const double radius, double *cudx, double *cudy);
+      virtual bool GetdXYdPosition(const SpicePosition::PartialType varType,
+                                   int coefIndex,
                                    double *cudx, double *cudy);
-      virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType, int coefIndex,
+      virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType,
+                                      int coefIndex,
                                       double *cudx, double *cudy);
-      virtual bool GetdXYdPoint(std::vector<double> d_lookB, double *cudx, double *cudy);
+      virtual bool GetdXYdPoint(std::vector<double> d_lookB,
+                                double *cudx, double *cudy);
       std::vector<double> PointPartial(SurfacePoint spoint, PartialType wrt);
-      double DQuotient(std::vector<double> &look, std::vector<double> &dlook, int index);
+      double DQuotient(std::vector<double> &look, std::vector<double> &dlook,
+                       int index);
 
       //! Return undistorted focal plane x
       inline double FocalPlaneX() const {

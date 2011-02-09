@@ -20,10 +20,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "PushFrameCameraDetectorMap.h"
 
 #include <iomanip>
-#include "PushFrameCameraDetectorMap.h"
+
 #include "CameraFocalPlaneMap.h"
+#include "iTime.h"
 
 namespace Isis {
   /** Compute parent position from a detector coordinate
@@ -153,6 +155,6 @@ namespace Isis {
     }
 
     etTime += p_exposureDuration / 2.0;
-    p_camera->SetEphemerisTime(etTime);
+    p_camera->SetTime(etTime);
   }
 }

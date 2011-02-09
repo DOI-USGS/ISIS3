@@ -265,15 +265,15 @@ namespace Isis {
     // radians and meters
     // need validity checks and different
     // conversion factors for lat and long
-    m_BodyRadii[0] = m_BodyRadii[1] = m_BodyRadii[2] = 0.0;
+    m_BodyRadii[0] = m_BodyRadii[1] = m_BodyRadii[2] = Distance();
     Camera *pCamera = m_pCnet->Camera(0);
     if (pCamera) {
       pCamera->Radii(m_BodyRadii);
 
 //      printf("radii: %lf %lf %lf\n",m_BodyRadii[0],m_BodyRadii[1],m_BodyRadii[2]);
 
-      if (m_BodyRadii[0] >= 0.0) {
-        m_dMTR = 0.001 / m_BodyRadii[0]; // at equator
+      if (m_BodyRadii[0] >= Distance(0, Distance::Meters)) {
+        m_dMTR = 0.001 / m_BodyRadii[0].GetKilometers(); // at equator
         m_dRTM = 1.0 / m_dMTR;
       }
 //      printf("MTR: %lf\nRTM: %lf\n",m_dMTR,m_dRTM);
@@ -1214,7 +1214,7 @@ namespace Isis {
 //      else
 //        dAprioriSigmaLat = (double) point->GetAprioriSurfacePoint().GetLatSigma();
 
-        dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance();
+        dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
 
         if (dAprioriSigmaLat <= 0.0 || dAprioriSigmaLat >= 1000.0) {
           if (m_dGlobalLatitudeAprioriSigma > 0.0)
@@ -1245,7 +1245,7 @@ namespace Isis {
 //     else
 //       dAprioriSigmaLon = point->AprioriSigmaLongitude();
 
-        dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance();
+        dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
         if (dAprioriSigmaLon <= 0.0 || dAprioriSigmaLon >= 1000.0) {
           if (m_dGlobalLongitudeAprioriSigma > 0.0)
             dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
@@ -1253,7 +1253,7 @@ namespace Isis {
         apriorisigmas[1] = dAprioriSigmaLon;
 
         if (dAprioriSigmaLon > 0.0  &&  dAprioriSigmaLon < 1000.0) {
-          d = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude());
+          d = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude().GetRadians());
           weights[1] = 1.0 / (d * d);
         }
 
@@ -1275,7 +1275,7 @@ namespace Isis {
 //      else
 //        dAprioriSigmaRad = point->AprioriSigmaRadius();
 
-        dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma();
+        dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
         if (dAprioriSigmaRad <= 0.0 || dAprioriSigmaRad >= 1000.0) {
           if (m_dGlobalRadiusAprioriSigma > 0.0)
             dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
@@ -1307,9 +1307,10 @@ namespace Isis {
 
 //      printf("LatWt: %20.10lf LonWt: %20.10lf RadWt: %20.10lf\n",weights[0],weights[1],weights[2]);
 
-      aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(apriorisigmas[0]),
-          Distance(apriorisigmas[1]),
-          Distance(apriorisigmas[2]));
+      aprioriSurfacePoint.SetSphericalSigmasDistance(
+          Distance(apriorisigmas[0], Distance::Meters),
+          Distance(apriorisigmas[1], Distance::Meters),
+          Distance(apriorisigmas[2], Distance::Meters));
       point->SetAprioriSurfacePoint(aprioriSurfacePoint);
       nPointIndex++;
     }
@@ -2345,9 +2346,9 @@ namespace Isis {
                         CameraGroundMap::WRT_Radius);
 
     // Compute ground point in body-fixed coordinates
-    latrec_c((double) point->GetSurfacePoint().GetLocalRadius() * 0.001,
-             (double) point->GetSurfacePoint().GetLongitude(),
-             (double) point->GetSurfacePoint().GetLatitude(),
+    latrec_c((double) point->GetSurfacePoint().GetLocalRadius().GetKilometers(),
+             (double) point->GetSurfacePoint().GetLongitude().GetRadians(),
+             (double) point->GetSurfacePoint().GetLatitude().GetRadians(),
              pB);
 
     int nObservations = point->GetNumMeasures();
@@ -2881,13 +2882,17 @@ namespace Isis {
 //  double avgrad = rPoint.Radius();
 
     // set the apriori control net value to the closest approach version
-    m_pCnet->GetPoint(nIndex)->SetSurfacePoint(SurfacePoint(Latitude(lat), Longitude(lon), Distance(rad * 1000.0)));
+    m_pCnet->GetPoint(nIndex)->SetSurfacePoint(
+        SurfacePoint(
+          Latitude(lat, Angle::Radians),
+          Longitude(lon, Angle::Radians),
+          Distance(rad, Distance::Kilometers)));
 
     // Compute ground point in body-fixed coordinates
     double pB[3];
-    latrec_c((double) rPoint.GetSurfacePoint().GetLocalRadius() * 0.001,
-             (double) rPoint.GetSurfacePoint().GetLongitude(),
-             (double) rPoint.GetSurfacePoint().GetLatitude(),
+    latrec_c((double) rPoint.GetSurfacePoint().GetLocalRadius().GetKilometers(),
+             (double) rPoint.GetSurfacePoint().GetLongitude().GetRadians(),
+             (double) rPoint.GetSurfacePoint().GetLatitude().GetRadians(),
              pB);
 
 //    printf("%s: %lf   %lf   %lf\n",rPoint.Id().c_str(), AveragePoint[0],AveragePoint[1],AveragePoint[2]);
@@ -3092,7 +3097,7 @@ namespace Isis {
 
       point->SetSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
                                           Longitude(dLon, Angle::Degrees),
-                                          Distance(dRad)));
+                                          Distance(dRad, Distance::Meters)));
       nPointIndex++;
 
       // testing
@@ -3466,21 +3471,24 @@ namespace Isis {
       point->GetSurfacePoint().SetRadii(Distance(m_BodyRadii[0]),
                                         Distance(m_BodyRadii[1]),
                                         Distance(m_BodyRadii[0]));
-      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
-      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
-      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
+      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
+      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
+      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
 
       t = dSigmaLat + T(0, 0);
-      Distance tLatSig = sqrt(dSigma02 * t) * m_dRTM;
+      Distance tLatSig(sqrt(dSigma02 * t) * m_dRTM, Distance::Meters);
 
       t = dSigmaLong + T(1, 1);
       t = sqrt(dSigma02 * t) * m_dRTM;
-      Distance tLonSig = t / cos(point->GetSurfacePoint().GetLatitude());
+      Distance tLonSig(
+          t / cos(point->GetSurfacePoint().GetLatitude().GetRadians()),
+          Distance::Meters);
 //      point->SetSigmaLongitude(t);
 
       t = dSigmaRadius + T(2, 2);
       t = sqrt(dSigma02 * t) * 1000.0;
-      point->GetSurfacePoint().SetSphericalSigmasDistance(tLatSig, tLonSig, Distance(t));
+      point->GetSurfacePoint().SetSphericalSigmasDistance(tLatSig, tLonSig,
+          Distance(t, Distance::Meters));
 
       nPointIndex++;
     }
@@ -3791,9 +3799,9 @@ namespace Isis {
                dAprioriSigmaRad = point->AprioriSigmaRadius();
       */
 
-      dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance();
-      dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance();
-      dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma();
+      dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
+      dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
+      dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
 
       if (dAprioriSigmaLat > 1000.0 || dAprioriSigmaLat <= 0.0) {
         if (m_dGlobalLatitudeAprioriSigma > 0.0)
@@ -3812,7 +3820,7 @@ namespace Isis {
 
       dVarianceLat = dAprioriSigmaLat * m_dMTR;
       dVarianceLat *= dVarianceLat;
-      dVarianceLon = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude()); // Lat in radians
+      dVarianceLon = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude().GetRadians()); // Lat in radians
       dVarianceLon *= dVarianceLon;
       dVarianceRad = dAprioriSigmaRad * 0.001;
       dVarianceRad *= dVarianceRad;
@@ -3872,15 +3880,16 @@ namespace Isis {
       nIndex++;
 
       dSigmaLong = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-      dSigmaLong *= m_dRTM / cos(point->GetSurfacePoint().GetLatitude()); // Lat in radians
+      dSigmaLong *= m_dRTM / cos(point->GetSurfacePoint().GetLatitude().GetRadians()); // Lat in radians
       nIndex++;
 
       dSigmaRadius = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
       nIndex++;
 
-      point->GetSurfacePoint().SetSphericalSigmasDistance(Distance(dSigmaLat),
-          Distance(dSigmaLong),
-          Distance(dSigmaRadius * 1000.0));
+      point->GetSurfacePoint().SetSphericalSigmasDistance(
+          Distance(dSigmaLat, Distance::Meters),
+          Distance(dSigmaLong, Distance::Meters),
+          Distance(dSigmaRadius, Distance::Kilometers));
     }
   }
 
@@ -4290,12 +4299,12 @@ namespace Isis {
         continue;
 
       nRays = point->GetNumMeasures();
-      dLat = point->GetSurfacePoint().GetLatitude();
-      dLon = point->GetSurfacePoint().GetLongitude();
-      dRadius = point->GetSurfacePoint().GetLocalRadius();
-      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
-      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
-      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
+      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
+      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
+      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
+      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
+      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
+      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
       nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
 //     Held point type is obsolete
@@ -4327,12 +4336,12 @@ namespace Isis {
         continue;
 
       nRays = point->GetNumMeasures();
-      dLat = point->GetSurfacePoint().GetLatitude();
-      dLon = point->GetSurfacePoint().GetLongitude();
-      dRadius = point->GetSurfacePoint().GetLocalRadius();
-      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
-      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
-      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
+      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
+      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
+      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
+      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
+      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
+      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
       nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
       // point corrections and initial sigmas
@@ -4739,9 +4748,9 @@ namespace Isis {
         continue;
 
       nRays = point->GetNumMeasures();
-      dLat = point->GetSurfacePoint().GetLatitude();
-      dLon = point->GetSurfacePoint().GetLongitude();
-      dRadius = point->GetSurfacePoint().GetLocalRadius();
+      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
+      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
+      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
 
 //     if( point->Held() )
 //       strStatus = "HELD";
@@ -4786,9 +4795,9 @@ namespace Isis {
       if (point->IsIgnored())
         continue;
 
-      dLat = point->GetSurfacePoint().GetLatitude();
-      dLon = point->GetSurfacePoint().GetLongitude();
-      dRadius = point->GetSurfacePoint().GetLocalRadius();
+      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
+      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
+      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
 
 //     if( point->Held() )
 //       strStatus = "HELD";
@@ -4801,9 +4810,9 @@ namespace Isis {
         strStatus = "UNKNOWN";
 
       if (m_bErrorPropagation) {
-        dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance();
-        dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance();
-        dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma();
+        dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
+        dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
+        dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
 
         sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
                 point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius * 0.001,

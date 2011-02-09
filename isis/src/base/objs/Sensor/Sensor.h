@@ -30,8 +30,10 @@
 
 namespace Isis {
   class Distance;
+  class iTime;
   class Latitude;
   class Longitude;
+  class SurfacePoint;
 
   /**
    * @brief Class for computing sensor ground coordinates
@@ -64,35 +66,33 @@ namespace Isis {
    *                                      for precision due to optimization
    *  @history 2003-10-16 Jeff Anderson - Added LoadEulerMounting and
    *                                      LoadFrameMounting methods
-   *  @history 2003-11-26 Jeff Anderson - Modified FrameMounting methods to
-   *                                      allow for fixed frames or time
-   *                                      dependent frames
+   *  @history 2003-11-26 Jeff Anderson - Modified FrameMounting methods to allow
+   *                                      for fixed frames or time dependent
+   *                                      frames
    *  @history 2004-01-14 Jeff Anderson - Remove an unused constructor
    *  @history 2004-01-20 Jeff Anderson - Added an option to the
-   *                                      SetUniversalGround method to
-   *                                      eliminate checks for points on the
-   *                                      backside of the target
-   *  @history 2004-02-18 Jeff Anderson - Fixed a problem with the
-   *                                      FrameMounting methods as the frame
-   *                                      kernel is unloaded if a cache is
-   *                                      created.
-   *  @history 2004-02-23 Jeff Anderson - Fixed two bugs in the handling of
-   *                                      DEMs. Used universal lat/lon when
-   *                                      appropriate and the radius needed to
-   *                                      be converted to km when read from the
-   *                                      DEM file.
+   *                                      SetUniversalGround method to eliminate
+   *                                      checks for points on the backside of the
+   *                                      target
+   *  @history 2004-02-18 Jeff Anderson - Fixed a problem with the FrameMounting
+   *                                      methods as the frame kernel is
+   *                                      unloaded if a cache is created.
+   *  @history 2004-02-23 Jeff Anderson - Fixed two bugs in the handling of DEMs.
+   *                                      Used universal lat/lon when appropriate
+   *                                      and the radius needed to be converted
+   *                                      to km when read from the DEM file.
    *  @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
    *                                      documentation
    *  @history 2005-02-24 Jeff Anderson - Added SlantDistance method and made
    *                                      the constructor ignore the
    *                                      ElevationModel keyword if it is null
    *  @history 2005-02-25 Jeff Anderson - Added LocalSolarTime method
-   *  @history 2005-06-09 Elizabeth Ribelin - Added LoadEulerMounting method
-   *                                      that accepts a matrix as a parameter
-   *  @history 2005-08-24 Jeff Anderson - Make sure LocalSolarTime always
-   *                                      return positive hours
-   *  @history 2005-09-20 Jeff Anderson - Added tests for trying to intersect
-   *                                      the sky
+   *  @history 2005-06-09 Elizabeth Ribelin - Added LoadEulerMounting method that
+   *                                      accepts a matrix as a parameter
+   *  @history 2005-08-24 Jeff Anderson - Make sure LocalSolarTime always return
+   *                                      positive hours
+   *  @history 2005-09-20 Jeff Anderson - Added tests for trying to intersect the
+   *                                      sky
    *  @history 2006-03-31 Elizabeth Miller - Added SpacecraftAltitude &
    *                                      SolarDistance methods
    *  @history 2006-09-07 Debbie A. Cook - Changed back-of-planet test to use
@@ -108,38 +108,24 @@ namespace Isis {
    *                                      computing a ground point
    *  @history 2007-05-18 Jeff Anderson - Modify SpacecraftAltitude method
    *                                      to use DEM
-   *  @history 2007-06-11 Debbie A. Cook - Added alternative  method that
-   *                                      includes radius
-   *  @history 2007-08-24 Debbie A. Cook - Replaced references to p_sB since it
-   *                                      was removed from Spice
-   *  @history 2007-11-27 Debbie A. Cook - Added overloaded method
-   *                                      SetUniversalGround(lat, lon, radius)
-   *  @history 2008-05-21 Steven Lambright - CubeManager is now used to speed up
-   *                                      DEM Cube I/O
-   *  @history 2008-06-18 Debbie A. Cook - Made DemRadius radius public instead
-   *                                      of private and added method
-   *                                      HasElevationModel
-   *  @history 2008-08-06 Stuart Sides   - Modified SetLookDirection to better 
-   *                                      handle oblique views. In the past it
-   *                                      would oscillate and run out out
-   *                                      iterations.
-   *  @history 2009-02-06 Debbie A. Cook - Changed the tolerance from 1e-6 to
-   *                                      1e-12 for dist**2 (mm)
-   *  @history 2009-02-06 Debbie A. Cook - Changed the tolerance back to 1e-6
-   *                                      (mm)
+   *  @history 2007-06-11 Debbie A. Cook - Added alternative  method that includes radius
+   *  @history 2007-08-24 Debbie A. Cook - Replaced references to p_sB since it was removed from Spice
+   *  @history 2007-11-27 Debbie A. Cook - Added overloaded method SetUniversalGround(lat, lon, radius)
+   *  @history 2008-05-21 Steven Lambright - CubeManager is now used to speed up DEM Cube I/O
+   *  @history 2008-06-18 Debbie A. Cook - Made DemRadius radius public instead of private and added
+   *                                       method HasElevationModel
+   *  @history 2008-08-06 Stuart Sides   - Modified SetLookDirection to better
+   *                                       handle oblique views. In the past it
+   *                                       would oscillate and run out of
+   *                                       iterations.
+   *  @history 2009-02-06 Debbie A. Cook - Changed the tolerance from 1e-6 to 1e-12 for dist**2 (mm)
+   *  @history 2009-02-06 Debbie A. Cook - Changed the tolerance back to 1e-6 (mm)
    *  @history 2009-02-15 Debbie A. Cook - Added virtual Resolution method
-   *  @history 2009-06-30 Steven Lambright - Added IgnoreElevationModel and
-   *                                      fixed DemRadius
-   *  @history 2009-07-09 Debbie A. Cook - Corrected documentation on Resolution
-   *                                      method
+   *  @history 2009-06-30 Steven Lambright - Added IgnoreElevationModel and fixed
+   *                                       DemRadius
+   *  @history 2009-07-09 Debbie A. Cook - Corrected documentation on Resolution method
    *  @history 2009-09-23  Tracie Sucharski - Convert negative longitudes
-   *                                      returned by reclat in
-   *                                      SetLookDirection.
-   *  @history 2010-09-10 Janet Barrett - Added new ray tracing algorithm.
-   *  @history 2010-09-14 Janet Barrett - Fixed p_pB in new code.
-   *  @history 2010-09-15 Steven Lambright - Lowered tolerance, corrected output
-   *                                      to update p_pB in the new DEM
-   *                                      algorithm.
+   *                                      returned by reclat in SetLookDirection.
    *  @history 2010-09-15 Janet Barrett - Modified the SetLookDirection method to use a new
    *                                      algorithm for finding the intersection of a ray with
    *                                      the DEM. This was required to take care of problems that
@@ -156,20 +142,27 @@ namespace Isis {
    *                                     LocalRadius method that uses the
    *                                     Latitude and Longitude classes.
    *  @history 2011-02-08 Jeannie Walldren - Added method parameter documentation.
+   *  @history 2011-02-09 Steven Lambright & Debbie Cook - Refactored heavily to
+   *                                     use Latitude, Longitude, SurfacePoint,
+   *                                     and iTime where applicable. Optimized
+   *                                     SetLookDirection. These changes were
+   *                                     meant primarily for readability and
+   *                                     reducing error-proneness of the code.
    */
-  class Sensor : public Isis::Spice {
+  class Sensor : public Spice {
     public:
-      Sensor(Isis::Pvl &lab);
+      Sensor(Pvl &lab);
 
       virtual ~Sensor();
 
-      void SetEphemerisTime(const double time);
+      void SetTime(const iTime &time);
       bool SetLookDirection(const double v[3]);
       bool SetRightAscensionDeclination(const double ra, const double dec);
       bool SetUniversalGround(const double latitude, const double longitude,
                               bool backCheck = true);
       bool SetUniversalGround(const double latitude, const double longitude,
                               const double radius, bool backCheck = true);
+      bool SetGround(const SurfacePoint &surfacePt, bool backCheck = true);
 
       /**
        * Returns if the last call to either SetLookDirection or
@@ -192,9 +185,12 @@ namespace Isis {
        *  
        * @return @b double Universal latitude value
        */
-      double UniversalLatitude() const {
-        return p_latitude;
-      };
+      double UniversalLatitude() const;
+
+      /**
+       * Returns the latitude.
+       */
+      Latitude GetLatitude() const;
 
       /**
        * Returns a positive east, 0-360 domain longitude at the surface 
@@ -202,10 +198,23 @@ namespace Isis {
        *  
        * @return @b double Universal longitude value
        */
-      double UniversalLongitude() const {
-        return p_longitude;
-      };
+      double UniversalLongitude() const;
 
+      /**
+       * Returns the longitude.
+       */
+      Longitude GetLongitude() const;
+
+      /**
+       * Returns the surface point (most efficient accessor).
+       */
+      SurfacePoint GetSurfacePoint() const;
+
+      /**
+       * Returns the local radius at the intersection point. This is either the
+       * radius on the ellipsoid, the radius from the surface model passed into
+       * the constructor, or the radius set with SetUniversalGround.
+       */
       Distance LocalRadius() const;
       Distance LocalRadius(Latitude lat, Longitude lon);
       Distance LocalRadius(double lat, double lon);
@@ -223,7 +232,10 @@ namespace Isis {
       double LocalSolarTime();
       double SolarDistance() const;
       double SpacecraftAltitude();
-      double DemRadius(double lat, double lon);
+
+      //! Return local radius from dem
+      Distance DemRadius(const SurfacePoint &pt);
+      Distance DemRadius(const Latitude &lat, const Longitude &lon);
 
       /**
        * Indicates whether the Kernels PvlGroup has an ElevationModel or 
@@ -252,16 +264,16 @@ namespace Isis {
                                   direction is valid. It is made protected so
                                   inheriting classes can change it if
                                   necessary.*/
-      Isis::Cube *p_demCube;   //!< The cube containing the model
-      SpiceDouble p_latitude;  //!< Latitude at p_pB
-      SpiceDouble p_longitude; //!< Longitude at p_pB
-      SpiceDouble p_pB[3];     //!< Surface intersection point in body fixed
+      Cube *p_demCube;         //!< The cube containing the model
+      SurfacePoint *p_surfacePoint; //!< Surface intersection point
 
     private:
+      //! This version of DemRadius is for SetLookDirection ONLY. Do not call.
+      double DemRadius(double lat, double lon);
+      double EmissionAngle(const std::vector<double> & sB) const;
       void CommonInitialize(const std::string &demCube);
 
       SpiceDouble p_lookB[3];  //!< Look direction in body fixed
-      SpiceDouble p_radius;    //!< Local radius at p_pB
 
       bool p_newLookB;      //!< flag to indicate we need to recompute ra/dec
       SpiceDouble p_ra;     //!< Right ascension (sky longitude)
@@ -269,13 +281,13 @@ namespace Isis {
       void computeRaDec();  //!< Computes the ra/dec from the look direction
 
       bool p_hasElevationModel;     //!< Does sensor use an elevation model
-      Isis::Projection *p_demProj;  //!< The projection of the model
-      Isis::Portal *p_portal;       //!< Buffer used to read from the model
-      Isis::Interpolator *p_interp; //!< Use bilinear interpolation from dem
-      bool SetGroundLocal(bool backCheck);   //!< Computes look vector
+      Projection *p_demProj;  //!< The projection of the model
+      Portal *p_portal;       //!< Buffer used to read from the model
+      Interpolator *p_interp; //!< Use bilinear interpolation from dem
+      bool SetGroundLocal(bool backCheck);   //!<Computes look vector
 
-      double p_minRadius;  //!< Minimum radius value in DEM file
-      double p_maxRadius;  //!< Maximum radius value in DEM file
+      Distance *p_minRadius;  //!< Minimum radius value in DEM file
+      Distance *p_maxRadius;  //!< Maximum radius value in DEM file
       double p_demScale;   //!< Scale of DEM file in pixels per degree
   };
 };

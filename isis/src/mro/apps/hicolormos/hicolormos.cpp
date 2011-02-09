@@ -8,6 +8,7 @@
 #include "Filename.h"
 #include "iException.h"
 #include "iString.h"
+#include "Longitude.h"
 #include "OriginalLabel.h"
 #include "Process.h"
 #include "ProgramLauncher.h"
@@ -113,7 +114,7 @@ void IsisMain() {
     Cphase = cam->PhaseAngle();
     Cincid = cam->IncidenceAngle();
     ClocalSolTime = cam->LocalSolarTime();
-    CsolarLong = cam->SolarLongitude();
+    CsolarLong = cam->SolarLongitude().GetDegrees();
     CnorthAzimuth = cam->NorthAzimuth();
     CsunAzimuth = cam->SunAzimuth();
     runXY = false;
@@ -125,7 +126,7 @@ void IsisMain() {
       Cphase = cam->PhaseAngle();
       Cincid = cam->IncidenceAngle();
       ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->SolarLongitude();
+      CsolarLong = cam->SolarLongitude().GetDegrees();
       CnorthAzimuth = cam->NorthAzimuth();
       CsunAzimuth = cam->SunAzimuth();
       runXY = false;
@@ -169,7 +170,7 @@ void IsisMain() {
       Cphase = cam->PhaseAngle();
       Cincid = cam->IncidenceAngle();
       ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->SolarLongitude();
+      CsolarLong = cam->SolarLongitude().GetDegrees();
       CnorthAzimuth = cam->NorthAzimuth();
       CsunAzimuth = cam->SunAzimuth();
       runXY = false;
@@ -181,7 +182,7 @@ void IsisMain() {
         Cphase = cam->PhaseAngle();
         Cincid = cam->IncidenceAngle();
         ClocalSolTime = cam->LocalSolarTime();
-        CsolarLong = cam->SolarLongitude();
+        CsolarLong = cam->SolarLongitude().GetDegrees();
         CnorthAzimuth = cam->NorthAzimuth();
         CsunAzimuth = cam->SunAzimuth();
         runXY = false;

@@ -20,31 +20,36 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include <iomanip>
 #include "PushFrameCameraGroundMap.h"
 
 #include "CameraDistortionMap.h"
-#include "PushFrameCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "PushFrameCameraDetectorMap.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
-  /** Compute undistorted focal plane coordinate from ground position
+  /**
+   * Compute undistorted focal plane coordinate from ground position
    *
-   * @param lat planetocentric latitude in degrees
-   * @param lon planetocentric longitude in degrees
+   * @param lat
+   * @param lon
    *
    * @return conversion was successful
    */
-  bool PushFrameCameraGroundMap::SetGround(const double lat, const double lon) {
+  bool PushFrameCameraGroundMap::SetGround(const Latitude &lat,
+                                           const Longitude &lon) {
     PushFrameCameraDetectorMap *detectorMap = (PushFrameCameraDetectorMap *) p_camera->DetectorMap();
+
+    SurfacePoint surfacePoint(lat, lon, p_camera->LocalRadius(lat, lon));
 
     // Get ending bounding framelets and distances for iterative loop to minimize the spacecraft distance
     int startFramelet = 1;
-    double startDist = FindSpacecraftDistance(1, lat, lon);
+    double startDist = FindSpacecraftDistance(1, surfacePoint);
 
     int endFramelet = detectorMap->TotalFramelets();
-    double endDist = FindSpacecraftDistance(endFramelet, lat, lon);
+    double endDist = FindSpacecraftDistance(endFramelet, surfacePoint);
 
     bool minimizedSpacecraftDist = false;
 
@@ -75,7 +80,7 @@ namespace Isis {
       }
 
       int middleFramelet = startFramelet + (int)(deltaX + biasFactor * deltaX);
-      double middleDist = FindSpacecraftDistance(middleFramelet, lat, lon);
+      double middleDist = FindSpacecraftDistance(middleFramelet, surfacePoint);
 
       if(startDist > endDist) {
         // This makes sure we don't get stuck halfway between framelets
@@ -109,14 +114,14 @@ namespace Isis {
 
     int direction = 2;
 
-    double realDist = FindDistance(realFramelet, lat, lon);
+    double realDist = FindDistance(realFramelet, surfacePoint);
     int guessFramelet = realFramelet + direction;
-    double guessDist = FindDistance(guessFramelet, lat, lon);
+    double guessDist = FindDistance(guessFramelet, surfacePoint);
 
     if(guessDist > realDist) {
       direction = -1 * direction; // reverse the search direction
       guessFramelet = realFramelet + direction;
-      guessDist = FindDistance(guessFramelet, lat, lon);
+      guessDist = FindDistance(guessFramelet, surfacePoint);
     }
 
     for(int j = 0; (realDist >= guessDist) && (j < 30); j++) {
@@ -124,7 +129,7 @@ namespace Isis {
       realDist = guessDist;
 
       guessFramelet = realFramelet + direction;
-      guessDist = FindDistance(guessFramelet, lat, lon);
+      guessDist = FindDistance(guessFramelet, surfacePoint);
 
       if(realFramelet <= 0 || realFramelet > detectorMap->TotalFramelets()) {
         return false;
@@ -133,8 +138,14 @@ namespace Isis {
 
     detectorMap->SetFramelet(realFramelet);
 
-    return CameraGroundMap::SetGround(lat, lon);
+    return CameraGroundMap::SetGround(surfacePoint);
   }
+
+
+  bool PushFrameCameraGroundMap::SetGround(const SurfacePoint &surfacePt) {
+    return SetGround(surfacePt.GetLatitude(), surfacePt.GetLongitude());
+  }
+
 
   /**
    * This method finds the distance from the center of the framelet to the lat,lon.
@@ -146,12 +157,13 @@ namespace Isis {
    *
    * @return double Y-Distance squared from center of framelet to lat,lon
    */
-  double PushFrameCameraGroundMap::FindDistance(int framelet, const double lat, const double lon) {
+  double PushFrameCameraGroundMap::FindDistance(int framelet,
+      const SurfacePoint &surfacePoint) {
     PushFrameCameraDetectorMap *detectorMap = (PushFrameCameraDetectorMap *) p_camera->DetectorMap();
     CameraDistortionMap *distortionMap = (CameraDistortionMap *) p_camera->DistortionMap();
 
     detectorMap->SetFramelet(framelet);
-    if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) return DBL_MAX;
+    if(!p_camera->Sensor::SetGround(surfacePoint, false)) return DBL_MAX;
 
     double lookC[3];
     p_camera->Sensor::LookDirection(lookC);
@@ -175,8 +187,8 @@ namespace Isis {
   }
 
   /**
-   * This method finds the distance from the point on the ground to the spacecraft
-   * at the time the specified framelet was taken.
+   * This method finds the distance from the point on the ground to the
+   * spacecraft at the time the specified framelet was taken.
    *
    * @param framelet Which framelet was being captured (determines time)
    * @param lat Latitude of the point on the ground
@@ -184,11 +196,12 @@ namespace Isis {
    *
    * @return double Distance from spacecraft to the lat,lon
    */
-  double PushFrameCameraGroundMap::FindSpacecraftDistance(int framelet, const double lat, const double lon) {
+  double PushFrameCameraGroundMap::FindSpacecraftDistance(int framelet,
+      const SurfacePoint &surfacePoint) {
     PushFrameCameraDetectorMap *detectorMap = (PushFrameCameraDetectorMap *) p_camera->DetectorMap();
 
     detectorMap->SetFramelet(framelet);
-    if(!p_camera->Sensor::SetUniversalGround(lat, lon, false)) return DBL_MAX;
+    if(!p_camera->Sensor::SetGround(surfacePoint, false)) return DBL_MAX;
 
     return p_camera->SlantDistance();
   }

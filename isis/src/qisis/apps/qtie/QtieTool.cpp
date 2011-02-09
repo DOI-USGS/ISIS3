@@ -360,9 +360,9 @@ namespace Qisis {
     double line = p_controlPoint->GetMeasure(Base)->GetLine();
 
     p_baseGM->SetImage(samp, line);
-    Latitude lat = p_baseGM->UniversalLatitude();
-    Longitude lon = p_baseGM->UniversalLongitude();
-    Distance radius = p_baseGM->Projection()->LocalRadius();
+    Latitude lat(p_baseGM->UniversalLatitude(), Angle::Degrees);
+    Longitude lon(p_baseGM->UniversalLongitude(), Angle::Degrees);
+    Distance radius(p_baseGM->Projection()->LocalRadius(), Distance::Meters);
 
     p_controlPoint->SetSurfacePoint(SurfacePoint(lat, lon, radius));
 

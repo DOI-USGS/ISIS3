@@ -19,6 +19,7 @@
 
 #include "Distance.h"
 
+#include "Displacement.h"
 #include "iException.h"
 #include "iString.h"
 #include "SpecialPixel.h"
@@ -194,8 +195,58 @@ namespace Isis {
    * @param distanceToSub This is the distance we are subtracting from ourself
    * @return Resulting distance, self not modified
    */
-  Distance Distance::operator -(const Distance &distanceToSub) const {
-    Distance result(GetMeters() - distanceToSub.GetMeters(), Meters);
+  Displacement Distance::operator -(const Distance &distanceToSub) const {
+    Displacement result(GetMeters() - distanceToSub.GetMeters(),
+        Displacement::Meters);
+    return result;
+  }
+
+
+  /**
+   * Divide another distance into this distance (5m / 1m = 5).
+   *
+   * @param displacementToDiv This is the divisor displacement (denominator)
+   * @return Resulting value
+   */
+  double Distance::operator /(const Distance &distanceToDiv) const {
+    double result = GetMeters() / distanceToDiv.GetMeters();
+    return result;
+  }
+
+
+  /**
+   * Divide a value from this distance (5m / 2 = 2.5m).
+   *
+   * @param valueToDiv This is the divisor displacement (denominator)
+   * @return Resulting value
+   */
+  Distance Distance::operator /(const double &valueToDiv) const {
+    Distance result = Distance(GetMeters() / valueToDiv, Meters);
+    return result;
+  }
+
+
+  /**
+   * Multiply this distance by a value (5m * 2 = 10m).
+   *
+   * @param valueToMult This is the value to multiply by
+   * @return Resulting value
+   */
+  Distance Distance::operator *(const double &valueToMult) const {
+    Distance result = Distance(GetMeters() * valueToMult, Meters);
+    return result;
+  }
+
+
+  /**
+   * Multiply this distance by a value (5m * 2 = 10m).
+   *
+   * @param mult This is the value to multiply by
+   * @param dist This is the distance to multiply into
+   * @return Resulting value
+   */
+  Distance operator *(double mult, Distance dist) {
+    Distance result = dist * mult;
     return result;
   }
 
@@ -204,7 +255,6 @@ namespace Isis {
    * Add and assign the given distance to ourselves.
    *
    * @param distanceToAdd This is the distance we are to duplicate exactly
-   * @return Resulting distance, a reference to this distance after assignment
    */
   void Distance::operator +=(const Distance &distanceToAdd) {
     SetDistance(GetMeters() + distanceToAdd.GetMeters(), Meters);
@@ -216,11 +266,30 @@ namespace Isis {
    *   an exception if the result is negative, in which case the new value is
    *   never applied.
    *
-   * @param distanceToSub This is the distance we are to duplicate exactly
-   * @return Resulting distance, a reference to this distance after assignment
+   * @param distanceToSub This is the distance we are to subtract
    */
   void Distance::operator -=(const Distance &distanceToSub) {
     SetDistance(GetMeters() - distanceToSub.GetMeters(), Meters);
+  }
+
+
+  /**
+   * Divide this distance by a value and assign the result to ourself.
+   *
+   * @param valueToDiv This is the displacement we are to divide by
+   */
+  void Distance::operator /=(const double &valueToDiv) {
+    SetDistance(GetMeters() / valueToDiv, Meters);
+  }
+
+
+  /**
+   * Multiply this distance by a value and assign the result to ourself.
+   *
+   * @param valueToMult This is the value we are going to multiply by
+   */
+  void Distance::operator *=(const double &valueToMult) {
+    SetDistance(GetMeters() * valueToMult, Meters);
   }
 
 
@@ -271,7 +340,7 @@ namespace Isis {
   void Distance::SetDistance(const double &distance, Units distanceUnit) {
     double distanceInMeters = Null;
 
-    if(distance == Null) {
+    if(IsSpecial(distance)) {
       p_distanceInMeters = Null;
       return;
     }

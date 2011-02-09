@@ -611,7 +611,7 @@ namespace Qisis {
               p_endLat = cvp->camera()->UniversalLatitude();
               p_endLon = cvp->camera()->UniversalLongitude();
 
-              radius = cvp->camera()->LocalRadius();
+              radius = cvp->camera()->LocalRadius().GetMeters();
 
               // distance is calculated
               bDistance = true;

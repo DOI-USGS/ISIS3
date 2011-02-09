@@ -544,7 +544,7 @@ namespace Isis {
                     surfacePt1.GetLongitude().GetDegrees(),
                     surfacePt2.GetLatitude().GetDegrees(),
                     surfacePt2.GetLongitude().GetDegrees(),
-                    surfacePt1.GetLocalRadius()
+                    surfacePt1.GetLocalRadius().GetMeters()
                   );
         }
         else
@@ -1059,7 +1059,7 @@ namespace Isis {
         if (sUnits == "meters") {
           // try to set image using sample/line values
           if (cam->SetImage(cMeasure1->GetSample(), cMeasure1->GetLine())) {
-            dRadius = cam->LocalRadius();
+            dRadius = cam->LocalRadius().GetMeters();
             dLat1 = cam->UniversalLatitude();
             dLon1 = cam->UniversalLongitude();
           }

@@ -38,6 +38,8 @@ Distance 1 == Distance 2 ? 0
 Distance 1 <= Distance 2 ? 1
 Distance 1 < Distance 2 ? 1
 Distance 1 + Distance 2 ? 11 meters
+Distance 1 - Distance 2 ? -9 meters
+Distance 1 -= Distance 2 ? 
 **PROGRAMMER ERROR** Negative distances are not supported, the value [-9.0 meters] cannot be stored in the Distance class
 Distance 1 = Distance 2... Distance 1 = 10 meters
 

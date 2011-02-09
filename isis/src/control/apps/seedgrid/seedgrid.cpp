@@ -137,7 +137,7 @@ void IsisMain() {
             proj->Longitude() > ui.GetDouble("MINLON")) {
           SurfacePoint pt(Latitude(proj->Latitude(), Angle::Degrees),
                           Longitude(proj->Longitude(), Angle::Degrees),
-                          Distance(equatorialRadius));
+                          Distance(equatorialRadius, Distance::Meters));
           ControlPoint * control = new ControlPoint;
           control->SetId(pointId.Next());
           control->SetIgnored(true);
@@ -214,7 +214,7 @@ void IsisMain() {
         control->SetIgnored(true);
         SurfacePoint pt(Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
-                        Distance(equatorialRadius));
+                        Distance(equatorialRadius, Distance::Meters));
         control->SetSurfacePoint(pt);
         cnet.AddPoint(control);
 

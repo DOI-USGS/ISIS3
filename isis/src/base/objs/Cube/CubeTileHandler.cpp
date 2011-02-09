@@ -122,14 +122,15 @@ namespace Isis {
     GrowCache(rbuf);
 
     // Starting corner in the Isis::Buffer
-    int ssamp = rbuf.Sample();
-    int sline = rbuf.Line();
-    int sband = rbuf.Band();
+    const int &ssamp = rbuf.Sample();
+    const int &sline = rbuf.Line();
+    const int &sband = rbuf.Band();
 
     // Ending corner in the Isis::Buffer
-    int esamp = rbuf.Sample(rbuf.size() - 1);
-    int eline = rbuf.Line(rbuf.size() - 1);
-    int eband = rbuf.Band(rbuf.size() - 1);
+    const int &lastElementIndex = rbuf.size() - 1;
+    const int &esamp = rbuf.Sample(lastElementIndex);
+    const int &eline = rbuf.Line(lastElementIndex);
+    const int &eband = rbuf.Band(lastElementIndex);
 
     // Current corner of a cache we will work on
     p_sample = ssamp;
@@ -299,20 +300,36 @@ namespace Isis {
     // but check the last cache first
     if(p_lastCache >= 0) {
       InternalCache *cache;
-      int next = p_lastCache;
-      int count = p_cacheList.size();
-      for(int i = 0; i < count; i++) {
-        cache = p_cacheList[next];
+      std::vector<InternalCache *>::iterator cacheIterator(p_cacheList.begin()
+          + p_lastCache);
+
+      if(p_lastCache > 0) {
+        cacheIterator --;
+      }
+
+      std::vector<InternalCache *>::iterator cacheEnd(p_cacheList.end());
+
+      // end when we return to start
+      std::vector<InternalCache *>::iterator loopEnd(cacheIterator);
+
+      bool loopStarted = false;
+
+      while(!loopStarted || cacheIterator != loopEnd) {
+        loopStarted = true;
+        cache = *cacheIterator;
         if(cache->buf != NULL) {
           if((p_sample >= cache->startSamp) && (p_sample <= cache->endSamp) &&
               (p_line >= cache->startLine)   && (p_line <= cache->endLine)   &&
               (p_band == cache->band)) {
-            p_lastCache = next;
+            p_lastCache = cacheIterator - p_cacheList.begin();
             return cache;
           }
         }
-        next++;
-        if(next >= count) next = 0;
+
+        cacheIterator ++;
+
+        if(cacheIterator == cacheEnd)
+          cacheIterator = p_cacheList.begin();
       }
     }
 

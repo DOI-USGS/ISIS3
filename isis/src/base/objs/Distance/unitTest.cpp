@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "Displacement.h"
 #include "iException.h"
 #include "Preference.h"
 
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 
   try {
     cerr << "Constructor given a value in meters" << endl;
-    Distance dist(1500.5);
+    Distance dist(1500.5, Distance::Meters);
     cerr << dist.GetMeters() << " meters" << endl;
   }
   catch(iException &e) {
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
 
   try {
     cerr << "Copy constructor" << endl;
-    Distance dist(1500.5);
+    Distance dist(1500.5, Distance::Meters);
     Distance copiedDist(dist);
     cerr << copiedDist.GetMeters() << " meters" << endl;
   }
@@ -82,8 +83,8 @@ int main(int argc, char *argv[]) {
     Distance dist1(1, Distance::Meters);
     Distance dist2(1, Distance::Meters);
     cerr << endl;
-    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << "Distance 1: " << dist1.GetMeters() << " meters" << endl;
+    cerr << "Distance 2: " << dist2.GetMeters() << " meters" << endl;
 
     cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
     cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
@@ -107,8 +108,8 @@ int main(int argc, char *argv[]) {
     Distance dist1(1, Distance::Meters);
     Distance dist2(10, Distance::Meters);
     cerr << endl;
-    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << "Distance 1: " << dist1.GetMeters() << " meters" << endl;
+    cerr << "Distance 2: " << dist2.GetMeters() << " meters" << endl;
 
     cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
     cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
@@ -118,9 +119,12 @@ int main(int argc, char *argv[]) {
     cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
         " meters" << endl;
 
-    // This should throw an exception and nevercerr 
+    // This should work since it returns a displacement 
     try {
-      (dist1 - dist2).GetMeters();
+      cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+          " meters" << endl;
+      cerr << "Distance 1 -= Distance 2 ? " << endl;
+      dist1 -= dist2;
     }
     catch(iException &e) {
       e.Report(false);
@@ -138,8 +142,8 @@ int main(int argc, char *argv[]) {
     Distance dist1(10, Distance::Meters);
     Distance dist2(1, Distance::Meters);
     cerr << endl;
-    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << "Distance 1: " << dist1.GetMeters() << " meters" << endl;
+    cerr << "Distance 2: " << dist2.GetMeters() << " meters" << endl;
 
     cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
     cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
@@ -163,8 +167,8 @@ int main(int argc, char *argv[]) {
     Distance dist1(1000, Distance::Meters);
     Distance dist2(1, Distance::Kilometers);
     cerr << endl;
-    cerr << "Distance 1: " << (double)dist1 << " meters" << endl;
-    cerr << "Distance 2: " << (double)dist2 << " meters" << endl;
+    cerr << "Distance 1: " << dist1.GetMeters() << " meters" << endl;
+    cerr << "Distance 2: " << dist2.GetMeters() << " meters" << endl;
 
     cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
     cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
@@ -193,7 +197,7 @@ int main(int argc, char *argv[]) {
   cerr << endl << "----- Testing Error Checking -----" << endl << endl;
 
   try {
-    Distance dist(-1);
+    Distance dist(-1, Distance::Meters);
   }
   catch(iException &e) {
     e.Report(false);

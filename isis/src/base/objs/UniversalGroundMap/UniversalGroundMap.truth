@@ -8,6 +8,9 @@ Universal Longitude = 171.871675
 Sample = 0.99996206
 Line = 5.00012951
 
+Sample = 0.99996206
+Line = 5.00012951
+
 For (1204, 5.0) ...
 Universal Latitude = -13.6764854
 Universal Longitude = 173.717209

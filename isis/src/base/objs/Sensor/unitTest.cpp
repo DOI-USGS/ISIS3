@@ -1,13 +1,19 @@
-#include "Sensor.h"
-
 #include <iostream>
 #include <iomanip>
 
+#include "Angle.h"
 #include "Distance.h"
 #include "Filename.h"
 #include "iException.h"
+#include "iTime.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "Sensor.h"
+#include "SurfacePoint.h"
+
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 /**
  * UnitTest for Spice class.
@@ -64,10 +70,11 @@ int main(int argc, char *argv[]) {
     cerr << "Test SetLookDirection using ShapeModel=Null" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi.SetEphemerisTime(t);
+      spi.SetTime(iTime(t));
       cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
 
       spi.SetLookDirection(v);
+
       cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
       cerr << "Latitude            = " << spi.UniversalLatitude() << endl;
       cerr << "Longitude           = " << spi.UniversalLongitude() << endl;
@@ -75,7 +82,7 @@ int main(int argc, char *argv[]) {
       cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
       cerr << "Local Radius        = " //< setprecision(6)
-           << spi.LocalRadius() << endl;
+           << spi.LocalRadius().GetMeters() << endl;
       cerr << "Phase               = " << spi.PhaseAngle() << endl;
       cerr << "Emission            = " << spi.EmissionAngle() << endl;
       cerr << "Incidence           = " << spi.IncidenceAngle() << endl;
@@ -108,7 +115,7 @@ int main(int argc, char *argv[]) {
     spi.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi.LocalRadius() << endl;
+    cerr << "Local Radius        = " << spi.LocalRadius().GetMeters() << endl;
     cerr << "Phase               = " << spi.PhaseAngle() << endl;
     cerr << "Emission            = " << spi.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi.IncidenceAngle() << endl;
@@ -124,15 +131,20 @@ int main(int argc, char *argv[]) {
     // Test SetUniversalGround
     cerr << "Test SetUniversalGround (lat/lon/radius) using ShapeModel=Null"
          << endl;
-    spi.SetUniversalGround(11.57143551329, 223.328646604, 3400.);
+    Latitude lat(11.57143551329, Angle::Degrees);
+    Longitude lon(223.328646604, Angle::Degrees);
+    Distance radius(3400., Distance::Meters);
+    SurfacePoint tmp(lat, lon, radius);
+    spi.SetGround(tmp);
+
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi.UniversalLatitude() << endl;
     cerr << "Longitude           = " << spi.UniversalLongitude() << endl;
-    cerr << "Radius              = " << spi.LocalRadius() << endl;
+    cerr << "Radius              = " << spi.LocalRadius().GetMeters() << endl;
     spi.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi.LocalRadius() << endl;
+    cerr << "Local Radius        = " << spi.LocalRadius().GetMeters() << endl;
     cerr << "Phase               = " << spi.PhaseAngle() << endl;
     cerr << "Emission            = " << spi.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi.IncidenceAngle() << endl;
@@ -180,17 +192,18 @@ int main(int argc, char *argv[]) {
             "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi2.SetEphemerisTime(t);
+      spi2.SetTime(iTime(t));
       cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
 
       spi2.SetLookDirection(v);
+
       cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
       cerr << "Latitude            = " << spi2.UniversalLatitude() << endl;
       cerr << "Longitude           = " << spi2.UniversalLongitude() << endl;
       spi2.Coordinate(p);
       cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
-      cerr << "Local Radius        = " << spi2.LocalRadius() << endl;
+      cerr << "Local Radius        = " << spi2.LocalRadius().GetMeters() << endl;
       cerr << "Phase               = " << spi2.PhaseAngle() << endl;
       cerr << "Emission            = " << spi2.EmissionAngle() << endl;
       cerr << "Incidence           = " << spi2.IncidenceAngle() << endl;
@@ -226,7 +239,7 @@ int main(int argc, char *argv[]) {
     spi2.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi2.LocalRadius() << endl;
+    cerr << "Local Radius        = " << spi2.LocalRadius().GetMeters() << endl;
     cerr << "Phase               = " << spi2.PhaseAngle() << endl;
     cerr << "Emission            = " << spi2.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi2.IncidenceAngle() << endl;
@@ -247,11 +260,11 @@ int main(int argc, char *argv[]) {
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi2.UniversalLatitude() << endl;
     cerr << "Longitude           = " << spi2.UniversalLongitude() << endl;
-    cerr << "Radius              = " << spi2.LocalRadius() << endl;
+    cerr << "Radius              = " << spi2.LocalRadius().GetMeters() << endl;
     spi2.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi2.LocalRadius() << endl;
+    cerr << "Local Radius        = " << spi2.LocalRadius().GetMeters() << endl;
     cerr << "Phase               = " << spi2.PhaseAngle() << endl;
     cerr << "Emission            = " << spi2.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi2.IncidenceAngle() << endl;

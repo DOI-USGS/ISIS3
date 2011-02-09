@@ -1,7 +1,9 @@
 #include "Isis.h"
+
+#include "Brick.h"
 #include "Camera.h"
 #include "iException.h"
-#include "Brick.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -54,7 +56,7 @@ void IsisMain() {
     sp += PvlKeyword("Line", cam->Line());
     sp += PvlKeyword("RightAscension", cam->RightAscension());
     sp += PvlKeyword("Declination", cam->Declination());
-    sp += PvlKeyword("EphemerisTime", cam->EphemerisTime());
+    sp += PvlKeyword("EphemerisTime", cam->Time().Et());
     sp += PvlKeyword("PixelValue", PixelToString(b[0]));
   }
   //Write the group to the screen

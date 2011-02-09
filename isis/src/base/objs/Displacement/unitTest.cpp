@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Constructor given a value in meters" << endl;
-    Displacement disp(1500.5);
+    Displacement disp(1500.5, Displacement::Meters);
     cout << disp.GetMeters() << " meters" << endl;
   }
   catch(iException &e) {
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Copy constructor" << endl;
-    Displacement disp(1500.5);
+    Displacement disp(1500.5, Displacement::Meters);
     Displacement copiedDisp(disp);
     cout << copiedDisp.GetMeters() << " meters" << endl;
   }
@@ -82,8 +82,8 @@ int main(int argc, char *argv[]) {
     Displacement disp1(1, Displacement::Meters);
     Displacement disp2(1, Displacement::Meters);
     cout << endl;
-    cout << "Displacement 1: " << (double)disp1 << " meters" << endl;
-    cout << "Displacement 2: " << (double)disp2 << " meters" << endl;
+    cout << "Displacement 1: " << disp1.GetMeters() << " meters" << endl;
+    cout << "Displacement 2: " << disp2.GetMeters() << " meters" << endl;
 
     cout << "Displacement 1 > Displacement 2 ? " << (disp1 > disp2) << endl;
     cout << "Displacement 1 >= Displacement 2 ? " << (disp1 >= disp2) << endl;
@@ -108,8 +108,8 @@ int main(int argc, char *argv[]) {
     Displacement disp1(1, Displacement::Meters);
     Displacement disp2(10, Displacement::Meters);
     cout << endl;
-    cout << "Displacement 1: " << (double)disp1 << " meters" << endl;
-    cout << "Displacement 2: " << (double)disp2 << " meters" << endl;
+    cout << "Displacement 1: " << disp1.GetMeters() << " meters" << endl;
+    cout << "Displacement 2: " << disp2.GetMeters() << " meters" << endl;
 
     cout << "Displacement 1 > Displacement 2 ? " << (disp1 > disp2) << endl;
     cout << "Displacement 1 >= Displacement 2 ? " << (disp1 >= disp2) << endl;
@@ -139,8 +139,8 @@ int main(int argc, char *argv[]) {
     Displacement disp1(10, Displacement::Meters);
     Displacement disp2(1, Displacement::Meters);
     cout << endl;
-    cout << "Displacement 1: " << (double)disp1 << " meters" << endl;
-    cout << "Displacement 2: " << (double)disp2 << " meters" << endl;
+    cout << "Displacement 1: " << disp1.GetMeters() << " meters" << endl;
+    cout << "Displacement 2: " << disp2.GetMeters() << " meters" << endl;
 
     cout << "Displacement 1 > Displacement 2 ? " << (disp1 > disp2) << endl;
     cout << "Displacement 1 >= Displacement 2 ? " << (disp1 >= disp2) << endl;
@@ -164,8 +164,8 @@ int main(int argc, char *argv[]) {
     Displacement disp1(1000, Displacement::Meters);
     Displacement disp2(1, Displacement::Kilometers);
     cout << endl;
-    cout << "Displacement 1: " << (double)disp1 << " meters" << endl;
-    cout << "Displacement 2: " << (double)disp2 << " meters" << endl;
+    cout << "Displacement 1: " << disp1.GetMeters() << " meters" << endl;
+    cout << "Displacement 2: " << disp2.GetMeters() << " meters" << endl;
 
     cout << "Displacement 1 > Displacement 2 ? " << (disp1 > disp2) << endl;
     cout << "Displacement 1 >= Displacement 2 ? " << (disp1 >= disp2) << endl;
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
   cout << endl << "----- Testing Error Checking -----" << endl << endl;
 
   try {
-    Displacement disp(-1);
+    Displacement disp(-1, Displacement::Meters);
   }
   catch(iException &e) {
     e.Report(false);

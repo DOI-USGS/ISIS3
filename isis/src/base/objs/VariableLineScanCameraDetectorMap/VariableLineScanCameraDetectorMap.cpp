@@ -23,6 +23,7 @@
 
 #include "VariableLineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
+#include "iTime.h"
 
 namespace Isis {
   VariableLineScanCameraDetectorMap::VariableLineScanCameraDetectorMap(
@@ -49,7 +50,7 @@ namespace Isis {
     }
 
     // currEt is our known et time
-    double currEt = p_camera->EphemerisTime();
+    double currEt = p_camera->Time().Et();
     int rateIndex = p_lineRates.size() - 1;
 
     while(rateIndex >= 0 && currEt < p_lineRates[rateIndex].GetStartEt() - 0.5) {
@@ -112,7 +113,7 @@ namespace Isis {
 
     SetLineRate(rate);
 
-    p_camera->SetEphemerisTime(et);
+    p_camera->SetTime(et);
 
     return true;
   }

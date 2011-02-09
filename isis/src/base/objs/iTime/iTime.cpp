@@ -41,7 +41,7 @@ namespace Isis {
 
   //! Constructs an empty iTime object.
   iTime::iTime() {
-    p_original = "";
+    p_et = 0.0;
   }
 
   /**
@@ -58,27 +58,9 @@ namespace Isis {
     str2et_c(time.c_str(), &et);
 
     p_et = et;
-    p_original = time;
 
-    Extract();
     UnloadLeapSecondKernel();
   }
-
-  /**
-   * Constructs a iTime object and initializes it to the time from the argument.
-   *
-   * @param time An ephemeris time (ET).
-   */
-  iTime::iTime(const double time) {
-    LoadLeapSecondKernel();
-    p_et = time;
-    Extract();
-    p_original = EtString();
-    UnloadLeapSecondKernel();
-  }
-
-  //! Destroys the iTime object
-  iTime::~iTime() {}
 
 
   //---------------------------------------------------------------------------
@@ -92,7 +74,6 @@ namespace Isis {
    *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789"
    */
   void iTime::operator=(const std::string &time) {
-
     LoadLeapSecondKernel();
 
     // Convert the time string to a double ephemeris time
@@ -100,9 +81,7 @@ namespace Isis {
     str2et_c(time.c_str(), &et);
 
     p_et = et;
-    p_original = time;
 
-    Extract();
     UnloadLeapSecondKernel();
   }
 
@@ -116,9 +95,7 @@ namespace Isis {
     str2et_c(time, &et);
 
     p_et = et;
-    p_original = time;
 
-    Extract();
     UnloadLeapSecondKernel();
   }
 
@@ -127,8 +104,6 @@ namespace Isis {
   void iTime::operator=(const double time) {
     LoadLeapSecondKernel();
     p_et = time;
-    Extract();
-    p_original = EtString();
     UnloadLeapSecondKernel();
   }
 
@@ -205,7 +180,7 @@ namespace Isis {
    * @return string
    */
   string iTime::YearString() const {
-    Isis::iString sYear(p_year);
+    Isis::iString sYear(Year());
     return sYear;
   }
 
@@ -215,7 +190,11 @@ namespace Isis {
    * @return int
    */
   int iTime::Year() const {
-    return p_year;
+    SpiceChar out[5];
+
+    // Populate the private year member
+    timout_c(p_et, "YYYY", 5, out);
+    return iString(out).ToInteger();
   }
 
   /**
@@ -224,7 +203,7 @@ namespace Isis {
    * @return string
    */
   string iTime::MonthString() const {
-    Isis::iString sMonth(p_month);
+    Isis::iString sMonth(Month());
     return sMonth;
   }
 
@@ -234,7 +213,11 @@ namespace Isis {
    * @return int
    */
   int iTime::Month() const {
-    return p_month;
+    SpiceChar out[3];
+
+    // Populate the private year member
+    timout_c(p_et, "MM", 3, out);
+    return iString(out).ToInteger();
   }
 
   /**
@@ -243,7 +226,7 @@ namespace Isis {
    * @return string
    */
   string iTime::DayString() const {
-    Isis::iString sDay(p_day);
+    Isis::iString sDay(Day());
     return sDay;
   }
 
@@ -253,7 +236,11 @@ namespace Isis {
    * @return int
    */
   int iTime::Day() const {
-    return p_day;
+    SpiceChar out[3];
+
+    // Populate the private year member
+    timout_c(p_et, "DD", 3, out);
+    return iString(out).ToInteger();
   }
 
   /**
@@ -262,7 +249,7 @@ namespace Isis {
    * @return string
    */
   string iTime::HourString() const {
-    Isis::iString sHour(p_hour);
+    Isis::iString sHour(Hour());
     return sHour;
   }
 
@@ -272,7 +259,11 @@ namespace Isis {
    * @return int
    */
   int iTime::Hour() const {
-    return p_hour;
+    SpiceChar out[3];
+
+    // Populate the private year member
+    timout_c(p_et, "HR", 3, out);
+    return iString(out).ToInteger();
   }
 
   /**
@@ -281,7 +272,7 @@ namespace Isis {
    * @return string
    */
   string iTime::MinuteString() const {
-    Isis::iString sMinute(p_minute);
+    Isis::iString sMinute(Minute());
     return sMinute;
   }
 
@@ -291,7 +282,11 @@ namespace Isis {
    * @return int
    */
   int iTime::Minute() const {
-    return p_minute;
+    SpiceChar out[3];
+
+    // Populate the private year member
+    timout_c(p_et, "MN", 3, out);
+    return iString(out).ToInteger();
   }
 
   /**
@@ -302,7 +297,7 @@ namespace Isis {
   string iTime::SecondString() const {
     ostringstream osec;
     osec.setf(ios::fixed);
-    osec << setprecision(8) << p_second;
+    osec << setprecision(8) << Second();
     iString sSeconds(osec.str());
     sSeconds.TrimTail("0");
     sSeconds.TrimTail(".");
@@ -316,7 +311,11 @@ namespace Isis {
    * @return double
    */
   double iTime::Second() const {
-    return p_second;
+    SpiceChar out[256];
+
+    // Populate the private year member
+    timout_c(p_et, "SC.#######::RND", 256, out);
+    return iString(out).ToDouble();
   }
 
   /**
@@ -325,7 +324,7 @@ namespace Isis {
    * @return string
    */
   string iTime::DayOfYearString() const {
-    Isis::iString sDayOfYear(p_dayOfYear);
+    Isis::iString sDayOfYear(DayOfYear());
     return sDayOfYear;
   }
 
@@ -335,7 +334,11 @@ namespace Isis {
    * @return int
    */
   int iTime::DayOfYear() const {
-    return p_dayOfYear;
+    SpiceChar out[4];
+
+    // Populate the private year member
+    timout_c(p_et, "DOY", 4, out);
+    return iString(out).ToInteger();
   }
 
   /**
@@ -347,16 +350,6 @@ namespace Isis {
   string iTime::EtString() const {
     Isis::iString sEt(p_et);
     return sEt;
-  }
-
-  /**
-   * Returns the ephemeris time (TDB) representation of the time as a double.
-   * See the Naif documentation "time.req" for more information.
-   *
-   * @return double
-   */
-  double iTime::Et() const {
-    return p_et;
   }
 
   /**
@@ -388,52 +381,6 @@ namespace Isis {
   // Private members
   //---------------------------------------------------
 
-  /**
-   * Uses the Naif routines to convert a double ephemeris reresentation of a
-   * date/time to its individual components.
-   */
-  void iTime::Extract() {
-
-    SpiceChar out[256];
-    Isis::iString tmp;
-
-    // Populate the private year member
-    timout_c(p_et, "YYYY", 256, out);
-    tmp = out;
-    p_year = tmp.ToInteger();
-
-    // Populate the private month member
-    timout_c(p_et, "MM", 256, out);
-    tmp = out;
-    p_month = tmp.ToInteger();
-
-    // Populate the private day member
-    timout_c(p_et, "DD", 256, out);
-    tmp = out;
-    p_day = tmp.ToInteger();
-
-    // Populate the private hour member
-    timout_c(p_et, "HR", 256, out);
-    tmp = out;
-    p_hour = tmp.ToInteger();
-
-    // Populate the private minute member
-    timout_c(p_et, "MN", 256, out);
-    tmp = out;
-    p_minute = tmp.ToInteger();
-
-    // Populate the private second member
-    timout_c(p_et, "SC.#######::RND", 256, out);
-    tmp = out;
-    p_second = tmp.ToDouble();
-
-    // Populate the private doy member
-    timout_c(p_et, "DOY", 256, out);
-    tmp = out;
-    p_dayOfYear = tmp.ToInteger();
-
-  }
-
 
   //! Uses the Naif routines to load the most current leap second kernel.
   void iTime::LoadLeapSecondKernel() {
@@ -445,10 +392,10 @@ namespace Isis {
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
     string baseDir = dataDir["Base"];
     baseDir += "/kernels/lsk/";
-    p_leapSecond = baseDir + "naif????.tls";
-    p_leapSecond.HighestVersion();
+    Filename leapSecond = baseDir + "naif????.tls";
+    leapSecond.HighestVersion();
 
-    string leapSecondName(p_leapSecond.Expanded());
+    string leapSecondName(leapSecond.Expanded());
     furnsh_c(leapSecondName.c_str());
 
     p_lpInitialized = true;

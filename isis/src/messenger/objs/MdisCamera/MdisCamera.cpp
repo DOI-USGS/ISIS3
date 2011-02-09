@@ -21,6 +21,7 @@
  */
 #include "MdisCamera.h"
 #include "iString.h"
+#include "iTime.h"
 #include "iException.h"
 #include "CameraDistortionMap.h"
 #include "TaylorCameraDistortionMap.h"
@@ -206,7 +207,7 @@ namespace Isis {
       // creating the cache since all kernels are unloaded, essentially
       // clearing the pool and whacking the frames definitions, required to
       double obsTime(etStart + ((expTime / 2.0) / 1000.0));
-      SetEphemerisTime(obsTime);
+      SetTime(obsTime);
       LoadCache();
     }
   }

@@ -41,10 +41,12 @@ int main() {
   c.SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
   c.SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
-  SurfacePoint point(Displacement(-424.024048),
-                     Displacement(734.4311949),
-                     Displacement(529.919264),
-                     Distance(10), Distance(50), Distance(20));
+  SurfacePoint point(Displacement(-424.024048, Displacement::Meters),
+                     Displacement(734.4311949, Displacement::Meters),
+                     Displacement(529.919264, Displacement::Meters),
+                     Distance(10, Distance::Meters),
+                     Distance(50, Distance::Meters),
+                     Distance(20, Distance::Meters));
   c.SetSurfacePoint(point);
   c.SetAprioriSurfacePoint(point);
   c.SetEditLock(true);
@@ -112,22 +114,23 @@ int main() {
 
   cout << endl << "Test SetSurfacePoint ... " << endl;
   SurfacePoint surfPt(c.GetSurfacePoint());
-  cout << "X = " << surfPt.GetX() << endl;
-  cout << "Y = " << surfPt.GetY() << endl;
-  cout << "Z = " << surfPt.GetZ() << endl;
+  cout << "X = " << surfPt.GetX().GetMeters() << endl;
+  cout << "Y = " << surfPt.GetY().GetMeters() << endl;
+  cout << "Z = " << surfPt.GetZ().GetMeters() << endl;
   cout << "Latitude = " << surfPt.GetLatitude().GetDegrees() << endl;
   cout << "Longitude = " << surfPt.GetLongitude().GetDegrees() << endl;
-  cout << "Radius = " << surfPt.GetLocalRadius() << endl;
+  cout << "Radius = " << surfPt.GetLocalRadius().GetMeters() << endl;
   surfPt.SetSpherical(Latitude(32, Angle::Degrees),
-                      Longitude(120, Angle::Degrees), Distance(1000));
+                      Longitude(120, Angle::Degrees),
+                      Distance(1000, Distance::Meters));
   c.SetSurfacePoint(surfPt);
   surfPt = c.GetSurfacePoint();
-  cout << "X = " << surfPt.GetX() << endl;
-  cout << "Y = " << surfPt.GetY() << endl;
-  cout << "Z = " << surfPt.GetZ() << endl;
+  cout << "X = " << surfPt.GetX().GetMeters() << endl;
+  cout << "Y = " << surfPt.GetY().GetMeters() << endl;
+  cout << "Z = " << surfPt.GetZ().GetMeters() << endl;
   cout << "Latitude = " << surfPt.GetLatitude().GetDegrees() << endl;
   cout << "Longitude = " << surfPt.GetLongitude().GetDegrees() << endl;
-  cout << "Radius = " << surfPt.GetLocalRadius() << endl;
+  cout << "Radius = " << surfPt.GetLocalRadius().GetMeters() << endl;
 
   cout << endl << "Test conversions for apriori/aposteriori covariance matrices ... " << endl;
 
@@ -149,14 +152,14 @@ int main() {
 
   //c.SetAprioriCovariance();
   point = c.GetAprioriSurfacePoint();
-  cout << "Apriori Sigma X = " << point.GetXSigma() << endl;
-  cout << "Apriori Sigma Y = " << point.GetYSigma() << endl;
-  cout << "Apriori Sigma Z = " << point.GetZSigma() << endl;
+  cout << "Apriori Sigma X = " << point.GetXSigma().GetMeters() << endl;
+  cout << "Apriori Sigma Y = " << point.GetYSigma().GetMeters() << endl;
+  cout << "Apriori Sigma Z = " << point.GetZSigma().GetMeters() << endl;
 
   point = c.GetSurfacePoint();
-  cout << "Aposteriori Sigma X = " << point.GetXSigma() << endl;
-  cout << "Aposteriori Sigma Y = " << point.GetYSigma() << endl;
-  cout << "Aposteriori Sigma Z = " << point.GetZSigma() << endl;
+  cout << "Aposteriori Sigma X = " << point.GetXSigma().GetMeters() << endl;
+  cout << "Aposteriori Sigma Y = " << point.GetYSigma().GetMeters() << endl;
+  cout << "Aposteriori Sigma Z = " << point.GetZSigma().GetMeters() << endl;
 
   cout << endl;
 }

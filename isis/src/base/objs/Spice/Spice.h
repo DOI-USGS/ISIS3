@@ -31,6 +31,10 @@
 #include "SpiceRotation.h"
 
 namespace Isis {
+  class iTime;
+  class Distance;
+  class Longitude;
+
   /**
    * @brief Obtain SPICE information for a spacecraft
    *
@@ -97,7 +101,7 @@ namespace Isis {
    *                                      SubSpacecraftPoint to return positive
    *                                      longitudes only
    *  @history 2005-09-12 Jeff Anderson - Check for case-insensitive values for
-   *                                    TargetName of SKY
+   *                                      TargetName of SKY
    *  @history 2005-09-20 Jeff Anderson - Added IsSky method
    *  @history 2006-01-05 Debbie A. Cook - Added units to comments
    *  @history 2006-03-28 Jeff Anderson - Refactored using SpiceRotation and
@@ -154,118 +158,69 @@ namespace Isis {
    *  @history 2011-02-08 Jeannie Walldren - Added documentation to methods and private variables. Commented out
    *                                         CreateCache(double,double) since it appears that this method is not
    *                                         needed. Initialize pointers to NULL in Init() method.
-   *
-   *
+   *  @history 2011-02-09 Steven Lambright - Refactored to use iTime where
+   *                                         possible. Changed p_radii to a
+   *                                         Distance so the units are no longer
+   *                                         ambiguous. These changes were meant
+   *                                         for readability and reducing the
+   *                                         likelyhood of future code having
+   *                                         bugs due to unit mismatches.
    */
   class Spice {
     public:
       // constructors
-      Spice(Isis::Pvl &lab);
-      Spice(Isis::Pvl &lab, bool notab);
+      Spice(Pvl &label);
+      Spice(Pvl &label, bool noTables);
 
       // destructor
       ~Spice();
 
       // Methods
-      void Init(Isis::Pvl &lab, bool notab);
-      void SetEphemerisTime(const double time);
+      void SetTime(const iTime &time);
       void InstrumentPosition(double p[3]) const;
       void SunPosition(double p[3]) const;
       double TargetCenterDistance() const;
-      double SolarLongitude();
+      Longitude SolarLongitude();
       void InstrumentVelocity(double v[3]) const;
-//      //! Sets flag to allow downsizing of kernels
-//      void AllowDownsizing( bool allow) const { p_allowDownsizing = allow; };
 
-      /**
-       * Returns the ephemeris time in seconds which was used to obtain the
-       * spacecraft and sun positions.
-       *
-       * @return @b double Ephemeris time, in seconds
-       */
-      inline double EphemerisTime() const {
-        return p_et;
-      };
+      iTime Time() const;
 
-      void Radii(double r[3]) const;
+      void Radii(Distance r[3]) const;
 
-      void CreateCache(const double startTime, const double endTime,
+      void CreateCache(iTime startTime, iTime endTime,
                        const int size, double tol);
-//???      void CreateCache(const double time, double tol);
-
-      /**
-       * Gets the cache start (shutter open) time for the observation.
-       * @return @b double Cache start time.
-       */
-      inline double CacheStartTime() const {
-        return p_startTime;
-      };
-
-      /** 
-       * Gets the cache end (shutter close) time for the observation.
-       * @return @b double Cache end time
-       */
-      inline double CacheEndTime() const {
-        return p_endTime;
-      };
+      void CreateCache(const double time, double tol);
+      iTime CacheStartTime() const;
+      iTime CacheEndTime() const;
 
       void SubSpacecraftPoint(double &lat, double &lon);
       void SubSolarPoint(double &lat, double &lon);
 
-      /**
-       * Returns the string name of the target
-       *
-       * @return @b string Target of observation.
-       */
-      std::string Target() const {
-        return p_target;
-      };
+      iString Target() const;
 
-      /**
-       * Indicates whether the target of the observation is the sky.
-       * @return @b bool True if the target is sky
-       */
+      //! Return if our target is the sky
       bool IsSky() const {
         return p_sky;
       };
 
-      static SpiceDouble GetDouble(const std::string &key, int index = 0);
-      static SpiceInt GetInteger(const std::string &key, int index = 0);
-      static std::string GetString(const std::string &key, int index = 0);
+      static SpiceDouble GetDouble(const iString &key, int index = 0);
+      static SpiceInt GetInteger(const iString &key,   int index = 0);
+      static iString GetString(const iString &key,     int index = 0);
 
-      /** 
-       * Gets the sun spice position. 
-       * @return @b SpicePosition* Pointer to sun position
-       */
       SpicePosition *SunPosition() const {
         return p_sunPosition;
       };
-
-      /** 
-       * Gets the instrument spice position. 
-       * @return @b SpicePosition* Pointer to instrument position
-       */
       SpicePosition *InstrumentPosition() const {
         return p_instrumentPosition;
       };
-
-      /** 
-       * Gets the body spice rotation.
-       * @return @b SpicePosition* Pointer to body rotation
-       */
       SpiceRotation *BodyRotation() const {
         return p_bodyRotation;
       };
-
-      /** 
-       * Gets the instrument spice rotation. 
-       * @return @b SpicePosition* Pointer to instrument rotation
-       */
       SpiceRotation *InstrumentRotation() const {
         return p_instrumentRotation;
       };
 
-      bool HasKernels(Isis::Pvl &lab);
+      bool HasKernels(Pvl &lab);
 
       SpiceInt NaifBodyCode() const;
       SpiceInt NaifSpkCode() const;
@@ -290,46 +245,48 @@ namespace Isis {
                                   space so that conversions between double and
                                   SpiceDouble do not have to occur in inheriting
                                   classes.*/
-      SpiceDouble p_radii[3]; //!< The radii of the target in kilometers
+      Distance *p_radii; //!<The radii of the target
 
 
     private:
-      void Load(Isis::PvlKeyword &key, bool notab);
-      void ComputeSolarLongitude(double et);
+      void Init(Pvl &lab, bool noTables);
 
-      SpiceDouble p_solarLongitude;       //!< Body rotation solar longitude value
-      SpiceDouble p_et;                   //!< Ephemeris time (read NAIF documentation for a detailed description)
-      std::vector<std::string> p_kernels; //!< Vector containing kernels filenames
-      std::string p_target;               //!< Target of the observation
+      void Load(PvlKeyword &key, bool notab);
+      void ComputeSolarLongitude(iTime et);
+
+      Longitude *p_solarLongitude; //!< Body rotation solar longitude value
+      iTime *p_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
+      QVector<iString> * p_kernels; //!< Vector containing kernels filenames
+      iString *p_target; //!< Target of the observation
 
       // cache stuff
-      SpiceDouble p_startTime;            //!< Corrected start (shutter open) time of the observation.
-      SpiceDouble p_endTime;              //!< Corrected end (shutter close) time of the observation.
-      SpiceDouble p_cacheSize;            //!< Cache size.  Note:  This value is 3 for Framing cameras: shutter open, center and close.//??? value is 1???
+      iTime *p_startTime; //!< Corrected start (shutter open) time of the observation.
+      iTime *p_endTime; //!< Corrected end (shutter close) time of the observation.
+      SpiceDouble *p_cacheSize; //!< Cache size.  Note:  This value is 3 for Framing cameras: shutter open, center and close.//??? value is 1???
 
+      SpiceDouble *p_startTimePadding; //!< Kernels pvl group StartPadding keyword value
+      SpiceDouble *p_endTimePadding; //!< Kernels pvl group EndPadding keyword value
 
-      SpiceDouble p_startTimePadding;     //!< Kernels pvl group StartPadding keyword value
-      SpiceDouble p_endTimePadding;       //!< Kernels pvl group EndPadding keyword value
+      SpicePosition *p_instrumentPosition; //!< Instrument spice position
+      SpiceRotation *p_instrumentRotation; //!< Instrument spice rotation
+      SpicePosition *p_sunPosition; //!< Sun spice position
+      SpiceRotation *p_bodyRotation; //!< Body spice rotation
 
-      SpicePosition *p_instrumentPosition;//!< Instrument spice position
-      SpiceRotation *p_instrumentRotation;//!< Instrument spice rotation
-      SpicePosition *p_sunPosition;       //!< Sun spice position
-      SpiceRotation *p_bodyRotation;      //!< Body spice rotation
-
-      bool p_keepKernelsLoaded;           //!< Indicates whether to keep kernels loaded
-      bool p_allowDownsizing;             //!< Indicates whether to allow downsizing
+      bool p_allowDownsizing; //!< Indicates whether to allow downsizing
 
       // Constants
-      SpiceInt p_bodyCode;                //!< The NaifBodyCode value, if it exists in the labels.
-                                          //!< Otherwise, if the target is sky, it's the SPK code 
-                                          //!< and if not it's calculated by the NaifBodyCode() method.
-      SpiceInt p_spkCode;                 //!< Spacecraft and planet ephemeris kernel (SPK) code
-      SpiceInt p_ckCode;                  //!< Camera kernel (CK) code
-      SpiceInt p_ikCode;                  //!< Instrument kernel (IK) code
-      SpiceInt p_sclkCode;                //!< Spacecraft clock correlation kernel (SCLK) code
-      SpiceInt p_spkBodyCode;             //!< Spacecraft and planet ephemeris kernel (SPK) body code
+      /**
+       * The NaifBodyCode value, if it exists in the labels. Otherwise, if the target is sky, it's the SPK code
+       * and if not sky then it's calculated by the NaifBodyCode() method.
+       */
+      SpiceInt *p_bodyCode;
+      SpiceInt *p_spkCode;     //!< Spacecraft and planet ephemeris kernel (SPK) code
+      SpiceInt *p_ckCode;      //!< Camera kernel (CK) code
+      SpiceInt *p_ikCode;      //!< Instrument kernel (IK) code
+      SpiceInt *p_sclkCode;    //!< Spacecraft clock correlation kernel (SCLK) code
+      SpiceInt *p_spkBodyCode; //!< Spacecraft and planet ephemeris kernel (SPK) body code
 
-      bool p_sky;                         //!< Indicates whether the target of the observation is the sky.
+      bool p_sky; //!< Indicates whether the target of the observation is the sky.
   };
 };
 

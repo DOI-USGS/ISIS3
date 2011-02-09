@@ -27,7 +27,6 @@ After assignment: 270 degrees
 90 degrees universal
 90 degrees positive east
 0.5*pi radians positive east
-1.5707963267949 default double
 270 degrees positive west
 1.5*pi radians positive west
 
@@ -35,7 +34,6 @@ After assignment: 270 degrees
 450 degrees universal
 450 degrees positive east
 2.5*pi radians positive east
-7.8539816339745 default double
 630 degrees positive west
 3.5*pi radians positive west
 
@@ -43,7 +41,6 @@ After assignment: 270 degrees
 -450 degrees universal
 -450 degrees positive east
 -2.5*pi radians positive east
--7.8539816339745 default double
 -630 degrees positive west
 -3.5*pi radians positive west
 
@@ -51,7 +48,6 @@ After assignment: 270 degrees
 -630 degrees universal
 -630 degrees positive east
 -3.5*pi radians positive east
--10.995574287564 default double
 -450 degrees positive west
 -2.5*pi radians positive west
 

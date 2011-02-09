@@ -21,6 +21,7 @@
  */
 #include "MiniRF.h"
 #include "iString.h"
+#include "iTime.h"
 #include "iException.h"
 #include "RadarPulseMap.h"
 #include "RadarGroundRangeMap.h"
@@ -132,11 +133,11 @@ namespace Isis {
 
       if(tol < 0.) {
         // Alternative calculation of .01*ground resolution of a pixel
-        SetEphemerisTime(etMid);
+        SetTime(etMid);
         tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 100.;
       }
       Spice::CreateCache(etStart, etEnd, this->ParentLines() + 1, tol);
-      SetEphemerisTime(etMid);
+      SetTime(etMid);
       SpiceRotation *bodyFrame = this->BodyRotation();
       SpicePosition *spaceCraft = this->InstrumentPosition();
 
@@ -155,9 +156,9 @@ namespace Isis {
       vequ_c(Ssc, Xsc);
       vequ_c(Ssc + 3, Vsc);
 
-      double radii[3];
+      Isis::Distance radii[3];
       this->Radii(radii);
-      double R = radii[0];
+      double R = radii[0].GetKilometers();
       double height = sqrt(Xsc[0] * Xsc[0] + Xsc[1] * Xsc[1] + Xsc[2] * Xsc[2]) - R;
       double speed = vnorm_c(Vsc);
       double dopplerSigma = 2.0 * speed * azimuthResolution / (waveLength *

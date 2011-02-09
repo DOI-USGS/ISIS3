@@ -43,9 +43,12 @@ int main() {
       cp->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
       cp->SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
-      SurfacePoint surfacePt(Displacement(-424.024048),
-                             Displacement(734.4311949), Displacement(529.919264), Distance(10),
-                             Distance(50), Distance(20));
+      SurfacePoint surfacePt(Displacement(-424.024048, Displacement::Meters),
+                             Displacement(734.4311949, Displacement::Meters),
+                             Displacement(529.919264, Displacement::Meters),
+                             Distance(10, Distance::Meters),
+                             Distance(50, Distance::Meters),
+                             Distance(20, Distance::Meters));
 
       cp->SetSurfacePoint(surfacePt);
       cp->SetAprioriSurfacePoint(surfacePt);

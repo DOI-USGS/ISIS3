@@ -6,6 +6,7 @@
 #include "CameraSkyMap.h"
 #include "RadialDistortionMap.h"
 #include "iString.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -49,7 +50,7 @@ namespace Cassini {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetEphemerisTime(et);
+    SetTime(et);
     LoadCache();
   }
 }

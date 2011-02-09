@@ -21,6 +21,7 @@
  */
 
 namespace Isis {
+  class Displacement;
 
   /**
    * @brief Distance measurement, usually in meters
@@ -54,7 +55,7 @@ namespace Isis {
       };
 
       Distance();
-      Distance(double distance, Units distanceUnit = Meters);
+      Distance(double distance, Units distanceUnit);
       Distance(const Distance &distanceToCopy);
       ~Distance();
 
@@ -66,18 +67,8 @@ namespace Isis {
 
       bool Valid() const;
 
-      /**
-       * Get the distance in meters. This is equivalent to GetMeters()
-       *
-       * @return The distance, as a number, in units of Meters
-       */
-      operator double() const {
-        return GetMeters();
-      }
-
       bool operator >(const Distance &otherDistance) const;
       bool operator <(const Distance &otherDistance) const;
-
 
       /**
        * Compare two distances with the greater than or equal to operator.
@@ -118,11 +109,30 @@ namespace Isis {
       }
 
 
+      /**
+       * Compare two distances with the != operator. Two uninitialized distances
+       *   are equal to each other.
+       *
+       * @param otherDistance This is the distance we're comparing to, i.e. on
+       *     the right hand side of the operator when used
+       * @return True if this distance is not equal to the given distance
+       */
+      bool operator !=(const Distance &otherDistance) const {
+        return GetMeters() != otherDistance.GetMeters();
+      }
+
+
       Distance &operator =(const Distance &distanceToCopy);
       Distance operator +(const Distance &distanceToAdd) const;
-      Distance operator -(const Distance &distanceToAdd) const;
+      Displacement operator -(const Distance &distanceToSub) const;
+      double operator /(const Distance &distanceToDiv) const;
+      Distance operator /(const double &valueToDiv) const;
+      Distance operator *(const double &valueToMult) const;
+      friend Distance operator *(double mult, Distance dist);
       void operator +=(const Distance &distanceToAdd);
       void operator -=(const Distance &distanceToSub);
+      void operator /=(const double &valueToDiv);
+      void operator *=(const double &valueToMult);
 
     protected:
       double GetDistance(Units distanceUnit) const;

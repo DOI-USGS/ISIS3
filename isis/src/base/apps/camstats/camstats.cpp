@@ -408,7 +408,7 @@ void buildStats(Camera *cam, int &sample, int &line) {
     emissionStat.AddData(cam->EmissionAngle());
     incidenceStat.AddData(cam->IncidenceAngle());
     localSolarTimeStat.AddData(cam->LocalSolarTime());
-    localRaduisStat.AddData(cam->LocalRadius());
+    localRaduisStat.AddData(cam->LocalRadius().GetMeters());
     northAzimuthStat.AddData(cam->NorthAzimuth());
 
     double Aratio = cam->LineResolution() / cam->SampleResolution();

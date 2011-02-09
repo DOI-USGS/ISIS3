@@ -46,14 +46,14 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam->UniversalLatitude() - knownLat) == 0) {
+    if(abs(cam->UniversalLatitude() - knownLat) < 1E-14) {
       cout << "Latitude OK" << endl;
     }
     else {
       cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
-    if(abs(cam->UniversalLongitude() - knownLon) == 0) {
+    if(abs(cam->UniversalLongitude() - knownLon) < 1E-14) {
       cout << "Longitude OK" << endl;
     }
     else {

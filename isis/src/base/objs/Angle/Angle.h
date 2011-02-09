@@ -54,7 +54,7 @@ namespace Isis {
     };
 
     Angle();
-    Angle(double angle, Units unit=Radians);
+    Angle(double angle, Units unit);
     Angle(const Angle& angle);
 
     virtual ~Angle();
@@ -77,7 +77,9 @@ namespace Isis {
     Angle operator+(const Angle& angle2) const;
     Angle operator-(const Angle& angle2) const;
     Angle operator*(double value) const;
+    friend Angle operator *(double mult, Angle angle);
     Angle operator/(double value) const;
+    double operator/(Angle value) const;
     bool operator<(const Angle& angle2) const;
     bool operator>(const Angle& angle2) const;
 
@@ -191,8 +193,8 @@ namespace Isis {
      *   the angle.
      *
      * @return The angle value in radians 
-     */
-    operator double() const { return GetAngle(Radians); }
+
+    operator double() const { return GetAngle(Radians); }*/
 
     /**
      * Get the angle in units of Radians.

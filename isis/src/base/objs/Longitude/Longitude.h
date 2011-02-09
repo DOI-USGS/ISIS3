@@ -70,12 +70,15 @@ namespace Isis {
 
       Longitude();
       Longitude(double longitude,
-                Angle::Units longitudeUnits = Angle::Radians,
+                Angle::Units longitudeUnits,
+                Direction lonDir = PositiveEast,
+                Domain lonDomain = Domain360);
+      Longitude(Angle longitude,
                 Direction lonDir = PositiveEast,
                 Domain lonDomain = Domain360);
       Longitude(double longitude,
                 PvlGroup mapping,
-                Angle::Units longitudeUnits = Angle::Radians);
+                Angle::Units longitudeUnits);
       Longitude(const Longitude &longitudeToCopy);
       ~Longitude();
 
@@ -93,10 +96,10 @@ namespace Isis {
        * Same as GetPositiveEast.
        *
        * @see GetPositiveEast
-       */
+       
       operator double() const {
         return GetPositiveEast();
-      }
+      }*/
 
       Longitude& operator=(const Longitude & longitudeToCopy);
 

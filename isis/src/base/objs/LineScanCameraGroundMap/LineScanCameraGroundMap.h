@@ -71,8 +71,8 @@ namespace Isis {
       //! Destructor
       virtual ~LineScanCameraGroundMap() {};
 
-      virtual bool SetGround(const double lat, const double lon);
-      virtual bool SetGround(const double lat, const double lon, const double radius);
+      virtual bool SetGround(const Latitude &lat, const Longitude &lon);
+      virtual bool SetGround(const SurfacePoint &surfacePoint);
 
     protected:
       enum FindFocalPlaneStatus {
@@ -82,8 +82,8 @@ namespace Isis {
       };
 
       FindFocalPlaneStatus FindFocalPlane(const int &approxLine,
-                                          const double &lat, const double &lon, const double &radius);
-      double FindSpacecraftDistance(int line, const double lat, const double lon);
+                                          const SurfacePoint &surfacePoint);
+      double FindSpacecraftDistance(int line, const SurfacePoint &surfacePoint);
   };
 };
 #endif

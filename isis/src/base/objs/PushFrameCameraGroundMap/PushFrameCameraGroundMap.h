@@ -62,15 +62,15 @@ namespace Isis {
       //! Destructor
       virtual ~PushFrameCameraGroundMap() {};
 
-      virtual bool SetGround(const double lat, const double lon);
+      virtual bool SetGround(const Latitude &lat, const Longitude &lon);
+      virtual bool SetGround(const SurfacePoint &surfacePt);
 
     private:
-      double FindDistance(int framelet, const double lat, const double lon);
+      double FindDistance(int framelet, const SurfacePoint &surfacePoint);
       double FindSpacecraftDistance(int framelet,
-                                    const double lat,
-                                    const double lon);
+                                    const SurfacePoint &surfacePoint);
 
-      bool   p_evenFramelets; //!<True if the file contains even framelets
+      bool   p_evenFramelets; //!< True if the file contains even framelets
   };
 };
 #endif
