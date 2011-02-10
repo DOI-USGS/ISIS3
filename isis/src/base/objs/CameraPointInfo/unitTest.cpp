@@ -50,6 +50,7 @@ void PrintResults(PvlGroup &grp) {
   LowerPrecision(grp["SpacecraftAzimuth"]);
   LowerPrecision(grp["SubSolarAzimuth"]);
   LowerPrecision(grp["SubSolarGroundAzimuth"]);
+  LowerPrecision(grp["SubSpacecraftGroundAzimuth"]);
   LowerPrecision(grp["OffNadirAngle"]);
   LowerPrecision(grp["Emission"]);
 
