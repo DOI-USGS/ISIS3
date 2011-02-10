@@ -386,4 +386,5 @@ void PipeContinue(void)
   cout << pc2;
   
   pc2.Run();
+  remove("./out.cub");
 }
