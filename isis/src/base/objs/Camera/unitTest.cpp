@@ -204,6 +204,12 @@ int main() {
   pixRes /= 100;
   camMap.FindGroup("Mapping")["PixelResolution"] = pixRes;
 
+  double minLon = camMap.FindGroup("Mapping")["MinimumLongitude"];
+  minLon *= 1000000000000.0;
+  minLon = round(minLon);
+  minLon /= 1000000000000.0;
+  camMap.FindGroup("Mapping")["MinimumLongitude"] = minLon;
+
   cout << camMap << endl;
 
   cout << endl;
