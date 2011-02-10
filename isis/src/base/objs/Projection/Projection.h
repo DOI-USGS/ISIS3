@@ -27,6 +27,8 @@
 #include "WorldMapper.h"
 
 namespace Isis {
+  class Displacement;
+
   /**
    *
    *
@@ -102,9 +104,18 @@ namespace Isis {
    *  @history 2008-06-12 Christopher Austin - Elaborated error messages.
    *  @history 2008-06-19 Steven Lambright - Fixed memory leak
    *  @history 2009-01-29 Stacy Alley - added a overloaded STATIC
-   *           method for convenience.  TargetRadii, which takes
-   *           a Pvl, the cube label, and a PvlGroup, a mapping
-   *           group.
+   *                                    method for convenience.  TargetRadii,
+   *                                    which takes a Pvl, the cube label, and
+   *                                    a PvlGroup, a mapping group.
+   *  @history 2011-02-10 Jai Rideout - added SetUpperLeftCorner() because
+   *                                    ProjectionFactory needed a way to set
+   *                                    UpperLeftCornerX and UpperLeftCornerY
+   *                                    keywords after creating the projection.
+   *                                    Mapping() now adds optional keywords
+   *                                    UpperLeftCornerX, UpperLeftCornerY,
+   *                                    PixelResolution, and Scale to original
+   *                                    mapping group so that cam2map can
+   *                                    properly display a clean mapping group.
    *
    */
   class Projection {
@@ -141,6 +152,9 @@ namespace Isis {
 
       // Set x/y coordinate
       virtual bool SetCoordinate(const double x, const double y);
+
+      // set UpperLeftCornerX and UpperLeftCornerY in mapping group
+      void SetUpperLeftCorner(const Displacement &x, const Displacement &y);
 
       /**
        * This indicates if the last invocation of SetGround, SetCoordinate, or
@@ -557,7 +571,7 @@ namespace Isis {
       double GetY() const;
 
     private:
-      double p_rotation;   //! Rotation of map (usually zero)
+      double p_rotation;   //!< Rotation of map (usually zero)
 
       double p_x;          /**<This contains the rotated X coordinate for a
                                specific projection at theposition indicated by

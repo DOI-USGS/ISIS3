@@ -231,7 +231,8 @@ void IsisMain() {
   p.SetTiling(tileStart, tileEnd);
 
   // Output the mapping group used to the Gui session log
-  Application::GuiLog(userMap);
+  PvlGroup cleanMapping = outmap->Mapping();
+  Application::GuiLog(cleanMapping);
 
   // Set up the transform object which will simply map
   // output line/samps -> output lat/lons -> input line/samps
@@ -247,7 +248,8 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO", transform->OutputSamples(),
                                 transform->OutputLines(),
                                 icube->Bands());
-  ocube->PutGroup(userGrp);
+
+  ocube->PutGroup(cleanMapping);
 
   // Set up the interpolator
   Interpolator *interp = NULL;
@@ -295,7 +297,7 @@ void IsisMain() {
   p.EndProcess();
 
   // add mapping to print.prt
-  Application::Log(userGrp);
+  Application::Log(cleanMapping);
 
   // Cleanup
   delete outmap;

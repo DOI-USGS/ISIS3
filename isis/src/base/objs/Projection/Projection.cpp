@@ -19,17 +19,19 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Projection.h"
 
 #include <cfloat>
 #include <cmath>
-#include <sstream>
 #include <iomanip>
-#include "naif/SpiceUsr.h"
+#include <sstream>
 
-#include "Projection.h"
-#include "iException.h"
+#include <naif/SpiceUsr.h>
+
 #include "Constants.h"
+#include "Displacement.h"
 #include "Filename.h"
+#include "iException.h"
 
 using namespace std;
 namespace Isis {
@@ -344,6 +346,21 @@ namespace Isis {
 
     // Now the lat/lon are in user defined coordinates so set them
     return SetGround(p_latitude, p_longitude);
+  }
+
+  /**
+   * This method sets the UpperLeftCornerX and UpperLeftCornerY keywords in the projection
+   * mapping group.
+   *
+   * @param x the upper left corner x value
+   * @param y the upper left corner y value
+   * @param units the units the coordinates are in
+   */
+  void Projection::SetUpperLeftCorner(const Displacement &x, const Displacement &y) {
+    PvlKeyword xKeyword("UpperLeftCornerX", x.GetMeters(), "meters");
+    PvlKeyword yKeyword("UpperLeftCornerY", y.GetMeters(), "meters");
+    p_mappingGrp.AddKeyword(xKeyword);
+    p_mappingGrp.AddKeyword(yKeyword);
   }
 
   /**
@@ -777,6 +794,19 @@ namespace Isis {
     mapping += p_mappingGrp["LatitudeType"];
     mapping += p_mappingGrp["LongitudeDirection"];
     mapping += p_mappingGrp["LongitudeDomain"];
+
+    if(p_mappingGrp.HasKeyword("PixelResolution")) {
+      mapping += p_mappingGrp["PixelResolution"];
+    }
+    if(p_mappingGrp.HasKeyword("Scale")) {
+      mapping += p_mappingGrp["Scale"];
+    }
+    if(p_mappingGrp.HasKeyword("UpperLeftCornerX")) {
+      mapping += p_mappingGrp["UpperLeftCornerX"];
+    }
+    if(p_mappingGrp.HasKeyword("UpperLeftCornerY")) {
+      mapping += p_mappingGrp["UpperLeftCornerY"];
+    }
 
     if(HasGroundRange()) {
       mapping += p_mappingGrp["MinimumLatitude"];

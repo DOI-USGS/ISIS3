@@ -20,15 +20,18 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "ProjectionFactory.h"
+
 #include <cmath>
 #include <cfloat>
-#include "ProjectionFactory.h"
+
 #include "Camera.h"
-#include "Projection.h"
 #include "Cube.h"
-#include "iException.h"
+#include "Displacement.h"
 #include "Filename.h"
+#include "iException.h"
 #include "Plugin.h"
+#include "Projection.h"
 
 using namespace std;
 namespace Isis {
@@ -255,6 +258,9 @@ namespace Isis {
       // Add the mapper from pixel coordinates to projection coordinates
       PFPixelMapper *pixelMapper = new PFPixelMapper(pixelResolution, upperLeftX, upperLeftY);
       proj->SetWorldMapper(pixelMapper);
+
+      proj->SetUpperLeftCorner(Displacement(upperLeftX, Displacement::Meters),
+                               Displacement(upperLeftY, Displacement::Meters));
     }
     catch(Isis::iException &e) {
       string msg = "Unable to create projection";
@@ -495,6 +501,9 @@ namespace Isis {
       // Add the mapper from pixel coordinates to projection coordinates
       PFPixelMapper *pixelMapper = new PFPixelMapper(pixelResolution, upperLeftX, upperLeftY);
       proj->SetWorldMapper(pixelMapper);
+
+      proj->SetUpperLeftCorner(Displacement(upperLeftX, Displacement::Meters),
+                               Displacement(upperLeftY, Displacement::Meters));
     }
     catch(Isis::iException &e) {
       string msg = "Unable to create projection";
@@ -542,6 +551,9 @@ namespace Isis {
       // Create a mapper to transform pixels into projection x/y and vice versa
       PFPixelMapper *pixelMapper = new PFPixelMapper(pixelResolution, upperLeftX, upperLeftY);
       proj->SetWorldMapper(pixelMapper);
+
+      proj->SetUpperLeftCorner(Displacement(upperLeftX, Displacement::Meters),
+                               Displacement(upperLeftY, Displacement::Meters));
     }
     catch(Isis::iException &e) {
       string msg = "Unable to initialize cube projection";

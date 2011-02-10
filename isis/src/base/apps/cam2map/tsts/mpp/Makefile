@@ -7,9 +7,12 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) from= $(INPUT)/ab102401.cub \
 	  to=$(OUTPUT)/cam2mapTruth.cub \
+	  map=$(INPUT)/sinusoidal.map \
 	  pixres=mpp \
 	  defaultrange=camera \
 	  resolution=1000 > /dev/null;
+	catlab from=$(OUTPUT)/cam2mapTruth.cub \
+	  to=$(OUTPUT)/cubeLabel.pvl > /dev/null;
 	$(APPNAME) from= $(INPUT)/ab102401.cub \
 	  to=$(OUTPUT)/cam2mapCheckRange.cub \
 	  defaultrange=camera \

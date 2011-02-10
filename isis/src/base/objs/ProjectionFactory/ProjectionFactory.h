@@ -62,8 +62,13 @@ namespace Isis {
    *                                          keywords
    *   @history 2008-06-18 Steven Koechle - Fixed Documentation Error
    *   @history 2009-06-18 Jeff Anderson - Modified the CreateForCube method to
-   *   make sure extra pixels were not included in the image size due to
-   *   machine precision roundoff problems.
+   *                                       make sure extra pixels were not
+   *                                       included in the image size due to
+   *                                       machine precision roundoff problems.
+   *   @history 2011-02-10 Jai Rideout - UpperLeftCornerX and UpperLeftCornerY
+   *                                     are now set in projection mapping
+   *                                     group via the new SetUpperLeftCorner
+   *                                     method in Projection.
    *
    */
   class ProjectionFactory {
