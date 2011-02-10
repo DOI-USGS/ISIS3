@@ -6,19 +6,34 @@
   </brief>
 
   <description>
-    This program works by finding the correlation between the columns
-    in an input image.  With a Channel 0 image, the first five columns
-    are examined; in a Channel 1 image, the last five columns are 
-    examined (Channel 2 images are not supported).  If the statistical 
-    results suggest a furrow is detected (i.e. the correlation between 
-    two columns is below a certain threshold), then the affected column is 
-    replaced with Null pixels.<br></br><br></br>
-    If a an input image does not have a furrow, none of its pixels will be
-    altered.  The label of all output files will include a new group called
-    "Correlations."  This group lists the correlations between the relevant
-    columns.  For example, "Column3to2  0.987..." means there is a strong 
-    positive correlation between columns 2 and 3 (and very unlikely to have
-    a furrow in the area).  
+    The original version of the program works by finding the correlation 
+    between the columns in an input image.  With a Channel 0 image, the first 
+    five columns are examined; in a Channel 1 image, the last five columns are 
+    examined (Channel 2 images are not supported). <br/><br/>
+    If the statistical results suggest a furrow is detected (i.e. the 
+    correlation between two columns is below a certain threshold), then the 
+    affected column is replaced with Null pixels. If an input image does not 
+    have a furrow, none of its pixels will be altered.  The label of all output 
+    files will include a new group called "Correlations."  This group lists the 
+    correlations between the relevant columns.  For example, "Column3to2 
+    0.987..." means there is a strong positive correlation between columns 2 and 
+    3 (and very unlikely to have a furrow in the area).  
+
+    <br/><br/>
+    For the newer version, the processing has been taken from the Version 1.42 
+    of the original HiCal pipeline perl script and processes images with summing 
+    modes 2 and 4 only. 
+    <br/> <br/>
+    Furrows are checked only in the columns which are based on Channel and the 
+    Summing mode.  Each specified column will have a Threshold DN based on the 
+    Summing mode and CcdId. Then the starting sample and number of samples in 
+    the specified columns are determined based on the Summing mode and Channel. 
+    The DN value of pixels in these samples are checked to be in the  0 and 
+    respective Threshold range.  If not, they are determined to be 
+    a furrow and set to NULL. If a furrow was found, then trimfilter and 
+    lowpass(if option is set) are run on the image in a pipeline to smooth the 
+    edges which were Nulled due to the furrows. 
+    <br/> 
   </description>
 
   <category>
@@ -38,6 +53,10 @@
     </change>
     <change name="Steven Lambright" date="2008-05-12">
           Removed references to CubeInfo 
+    </change>
+    <change name="Sharmila Prasad" date="2011-09-02">
+          Added newer version of implementing hifurrows taken from the Version 
+          1.42 of the original HiCal pipeline perl script.
     </change>
   </history>
 
@@ -70,6 +89,23 @@
           *.cub
         </filter>
       </parameter>
+
+      <parameter name="NEW_VERSION">
+        <type>boolean</type>
+          <default><item>FALSE</item></default>
+          <brief>Updated furrows functionality from the hical pipeline</brief>
+          <description>
+             This option uses the updated furrows functionality from the hical 
+             pipeline  script version1.42
+          </description>
+        <inclusions>
+          <item>LOWPASS</item>
+        </inclusions>
+        <exclusions>
+          <item>CORRELATION</item>
+        </exclusions>
+      </parameter>
+
     </group>
 
     <group name = "Furrow parameters">
@@ -83,8 +119,22 @@
           has been detected.
         </description>  
         <minimum inclusive="yes">0.0</minimum>
+        <exclusions>
+          <item>LOWPASS</item>
+        </exclusions>
       </parameter>  
-    </group>  
+    </group>
+    
+    <group name="Options">
+      <parameter name = "LOWPASS">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>Run Lowpass filter if Furrows are found</brief>
+        <description>
+          Run Lowpass filter if Furrows are found
+        </description>  
+      </parameter>  
+    </group>
   </groups>
 
 </application>
