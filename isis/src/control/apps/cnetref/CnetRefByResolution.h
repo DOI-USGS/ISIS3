@@ -74,7 +74,7 @@ namespace Isis {
     public:
       //! Constructor
       CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile, ResolutionType peType = Low,
-                          double pdResValue = 0, double pdMinRes = 0, double pdMaxRes = 0);
+          double pdResValue = 0, double pdMinRes = 0, double pdMaxRes = 0);
       virtual ~CnetRefByResolution() {};
 
       //! Get the Log updated by this object

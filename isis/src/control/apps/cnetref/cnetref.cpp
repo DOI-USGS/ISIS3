@@ -31,27 +31,27 @@ void IsisMain() {
     bool bDefFile = false;
     Pvl *pvlDefFile = 0;
     Pvl pvlTemplate, pvlResults;
-    if(ui.WasEntered("DEFFILE")) {
+    if (ui.WasEntered("DEFFILE")) {
       bDefFile = true;
       pvlDefFile = new Pvl(ui.GetFilename("DEFFILE"));
 
       // Log the DefFile
       Application::Log(pvlDefFile->Group(0));
 
-      if(pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge")) {
+      if (pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge")) {
         string message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
         throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
       }
 
       Pvl pvlTemplate, pvlResults;
-      if(sCriteria == "INTEREST") {
+      if (sCriteria == "INTEREST") {
         pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_operator.def");
       }
       else {
         pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_nooperator.def");
       }
       pvlTemplate.ValidatePvl(*pvlDefFile, pvlResults);
-      if(pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
+      if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
         Application::Log(pvlResults.Group(0));
         string sErrMsg = "Invalid Deffile\n";
         throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
@@ -62,20 +62,20 @@ void IsisMain() {
     Progress progress;
     ControlNet cNet(ui.GetFilename("CNET"), &progress);
 
-    if(ui.WasEntered("NETWORKID")) {
+    if (ui.WasEntered("NETWORKID")) {
       cNet.SetNetworkId(ui.GetString("NETWORKID"));
     }
 
     cNet.SetUserName(Isis::Application::UserName());
 
-    if(ui.WasEntered("DESCRIPTION")) {
+    if (ui.WasEntered("DESCRIPTION")) {
       cNet.SetDescription(ui.GetString("DESCRIPTION"));
     }
 
     // Get the output Log file
     bool bLogFile = false;
     string sLogFile;
-    if(ui.WasEntered("LOG")) {
+    if (ui.WasEntered("LOG")) {
       sLogFile = ui.GetFilename("LOG");
       bLogFile = true;
     }
@@ -84,33 +84,33 @@ void IsisMain() {
     ControlNetValidMeasure *cnetValidMeas = NULL;
 
     // Process Reference by Emission Angle
-    if(sCriteria == "EMISSION") {
+    if (sCriteria == "EMISSION") {
       cnetValidMeas = new CnetRefByEmission(pvlDefFile, sSerialNumFile);
       cnetValidMeas->FindCnetRef(cNet);
     }
 
     // Process Reference by Incidence Angle
-    else if(sCriteria == "INCIDENCE") {
+    else if (sCriteria == "INCIDENCE") {
       cnetValidMeas = new CnetRefByIncidence(pvlDefFile, sSerialNumFile);
       cnetValidMeas->FindCnetRef(cNet);
     }
 
     // Process Reference by Resolution
-    else if(sCriteria == "RESOLUTION") {
+    else if (sCriteria == "RESOLUTION") {
       std::string sType = ui.GetString("TYPE");
       double dResValue = 0;
       double dMinRes = 0, dMaxRes = 0;
-      if(sType == "NEAREST") {
+      if (sType == "NEAREST") {
         dResValue = ui.GetDouble("RESVALUE");
-        if(dResValue < 0) {
+        if (dResValue < 0) {
           std::string message = "Invalid Nearest Resolution Value";
           throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
         }
       }
-      else if(sType == "RANGE") {
+      else if (sType == "RANGE") {
         dMinRes = ui.GetDouble("MINRES");
         dMaxRes = ui.GetDouble("MAXRES");
-        if(dMinRes < 0 || dMaxRes < 0 || dMinRes > dMaxRes) {
+        if (dMinRes < 0 || dMaxRes < 0 || dMinRes > dMaxRes) {
           std::string message = "Invalid Resolution Range";
           throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
         }
@@ -120,14 +120,14 @@ void IsisMain() {
     }
 
     // Process Reference by Interest
-    else if(sCriteria == "INTEREST") {
-      if(!bDefFile) {
+    else if (sCriteria == "INTEREST") {
+      if (!bDefFile) {
         std::string msg = "Interest Option must have a DefFile";
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
       std::string sOverlapListFile = "";
-      if(ui.WasEntered("LIMIT")) {
-        if(ui.GetBoolean("LIMIT")) {
+      if (ui.WasEntered("LIMIT")) {
+        if (ui.GetBoolean("LIMIT")) {
           sOverlapListFile = Filename(ui.GetFilename("OVERLAPLIST")).Expanded();
         }
       }
@@ -140,7 +140,7 @@ void IsisMain() {
       // add operator to print.prt
       PvlGroup opGroup = interestOp->Operator();
       Application::Log(opGroup);
-      if(bLogFile) {
+      if (bLogFile) {
         Pvl pvlLog = interestOp->GetLogPvl();
         pvlLog += opGroup;
         pvlLog.Write(sLogFile);
@@ -152,9 +152,9 @@ void IsisMain() {
     // Write the new control network out
     cNet.Write(ui.GetFilename("ONET"));
 
-    if(cnetValidMeas) {
+    if (cnetValidMeas) {
       Pvl pvlLog = cnetValidMeas->GetLogPvl();
-      if(bLogFile) {
+      if (bLogFile) {
         pvlLog.Write(sLogFile);
       }
       Application::Log(cnetValidMeas->GetStdOptions());
@@ -165,19 +165,19 @@ void IsisMain() {
     }
 
   } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
-  catch(Isis::iException &e) {
+  catch (Isis::iException &e) {
     throw;
   }
-  catch(geos::util::GEOSException *exc) {
+  catch (geos::util::GEOSException *exc) {
     string message = "GEOS Exception: " + (iString)exc->what();
     delete exc;
     throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
   }
-  catch(std::exception const &se) {
+  catch (std::exception const &se) {
     string message = "std::exception: " + (iString)se.what();
     throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
   }
-  catch(...) {
+  catch (...) {
     string message = "Other Error";
     throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
   }
@@ -193,15 +193,15 @@ void IsisMain() {
  * @return ResolutionType
  */
 ResolutionType GetResolutionType(std::string psType) {
-  if(psType == "LOW")
+  if (psType == "LOW")
     return Low;
-  else if(psType == "HIGH")
+  else if (psType == "HIGH")
     return High;
-  else if(psType == "MEAN")
+  else if (psType == "MEAN")
     return Mean;
-  else if(psType == "NEAREST")
+  else if (psType == "NEAREST")
     return Nearest;
-  else if(psType == "RANGE")
+  else if (psType == "RANGE")
     return Range;
 
   return High;
