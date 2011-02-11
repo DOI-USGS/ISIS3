@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hinoise" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Perform NoiseFilter processing in the Pipeline Enviornment.
+  </brief>
+
+  <description>
+    <p>This application removes noise from HiRISE cubes.  It also checks the
+      pause points and removes any artifacts there. The application runs in a 
+      pipeline and starts off by getting the histogram of the image and gets the 
+      standard deviation, percentage of LIS pixels and MaxDN from the histogram 
+      stats. It then runs Cubenorm and processes the cubenorm stats given the 
+      Channel and Summing mode.  If percentage of valid pixels in a column is less 
+      than CLEAR_FRACTION and if NULL_COLUMNS option is set then the stats for 
+      the columns Average, Median, StdDev, Minimum, Maximum will be set to 0 
+      else it is set to 1. These changes are ouputted to new Stats files. </p> 
+      <p>For images with summing equal to 1, depending on Channel 0/1, pause, 
+      width and direction is calculated. If the percentage of valid pixels in 
+      these columns are less than the user specified NONVALID_FRACTION then 
+      these columns are said to contain a high percentage of non-valid pixels 
+      and the stats for the columns stated above are set to 0. </p> 
+      <p>These updated stats will form the input stats for cubenorm app which is 
+      run twice and output of which forms the input image one each for lowpass 
+      and highpass filters. The cubenorm basically clears the columns with stats 
+      equal to 0 which was previously manipulated.  Perform highpass and 
+      lowpass filters for vertical destripping. The lowpass app is run with  the 
+      options  LPF_LINES, LPF_SAMPLES, LPF_MINPER. The highpass app is run with 
+      the options HPF_LINES, HPF_SAMPLES, HPF_MINPER. The output of these 2 
+      filters are added.</p>
+      <p>Noisefilter app is run 3times with the options FLATTOL, TOLDEF, TOLMIN, 
+      TOLMAX, LOW, HIGH, REPLACE, SAMPLE, LINE, LISISNOISE and LRSISNOISE.
+      </p>
+      <p>Now that the data is much cleaner another set of lowpass, highpass 
+      filters are performed on the image  and added togather. This is the final 
+      product for non RED image. </p> 
+      <p>Perform LPFZ  filters if we have a RED filter image. For IR and BG 
+      filter data, assume that the HiColorNorm pipeline step will interpolate 
+      using the BG/RED and IR/RED ratio data. So another set of lowpass and 
+      highpass filters is performed on RED filter image and added to get the 
+      final product.</p>
+  </description> 
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Sharmila Prasad" date="2011-02-04">
+      Original version converted from Eric Eliason's hical pipeline version 1.42
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file
+        </brief>
+        <description>
+          Input cube to remove noise from
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file
+        </brief>
+        <description>
+	         Output cube with noise removed
+        </description>
+      </parameter>
+
+      <parameter name="REMOVE">
+        <type>boolean</type>
+        <brief>Remove Intermediate Files</brief>
+        <description>Remove Intermediate Files</description>
+        <default><item>false </item></default> 
+        </parameter>
+    </group>
+    
+    <group name="Low Pass Filter Options">
+      
+      <parameter name="LPF_LINES">
+        <type>integer</type>
+        <default><item>251</item></default>
+        <brief>lowpass LINES parameter for the boxcar</brief>
+        <description>
+          This is the total number of lines in the boxcar.  It must be odd and
+          can not exceed twice the number of lines in the cube.
+        </description>
+      </parameter>
+      
+      <parameter name="LPF_SAMPLES">
+        <type>integer</type>
+        <default><item>3</item></default>
+        <brief>lowpass SAMPLES parameter for the boxcar</brief>
+        <description>
+           This is the total number of samples in the boxcar.  It must be odd and
+          can not exceed twice the number of samples in the cube.
+        </description>
+      </parameter>
+      
+      <parameter name="LPF_MINPER">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>lowpass MINIMUM parameter (as a percentage)</brief>
+        <description>
+         Minimum boxcar pixels required for filter. This option is the minimum number of valid pixels
+          required in a boxcar for filtering to begin.
+        </description>
+      </parameter>
+
+    </group>
+    
+    <group name="High Pass Filter Options">
+
+      <parameter name="HPF_LINES">
+        <type>integer</type>
+        <default><item>251</item></default>
+        <brief>highpass LINES parameter for the boxcar</brief>
+        <description>
+          This is the total number of lines in the boxcar.  It must be odd and
+          can not exceed twice the number of lines in the cube.
+        </description>
+      </parameter>
+      
+      <parameter name="HPF_SAMPLES">
+        <type>integer</type>
+        <default><item>1</item></default>
+        <brief>highpass SAMPLES parameter for the boxcar</brief>
+        <description>
+          This is the total number of samples in the boxcar.  It must be odd and
+          can not exceed twice the number of samples in the cube.
+        </description>
+      </parameter>
+
+      <parameter name="HPF_MINPER">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>highpass MINIMUM parameter (as a percentage)</brief>
+        <description>Minimum boxcar pixels required for filter. This option is the minimum number of valid pixels
+          required in a boxcar for filtering to begin.
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Noise Filter Options">
+
+     <parameter name="NULL_COLUMNS">
+        <type>boolean</type>
+          <default><item>FALSE</item></default>
+          <brief>Flag to NULL columns</brief>
+          <description>
+             This option indicates whether columns with valid pixels with ratio 
+             with Max Valid pixels less than CLEAR_FRACTION must be NULLed.
+          </description>
+      </parameter>
+
+      <parameter name="TOLMIN">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>Dark noise tolerance</brief>
+        <description>
+          If the difference between the input pixel and the boxcar average
+          is greater then the tolerances given in TOLMIN or TOLMAX (values
+          of DN), the pixel is considered to be noise and will be replaced.  When a pixel is
+          being checked for noise, a difference between the pixel and boxcar 
+          average is computed. If this difference is negative then TOLMIN will 
+          be used to determine if we have noise, hence dark noise will be 
+          removed by modifying TOLMIN.
+        </description>
+      </parameter>
+
+      <parameter name="TOLMAX">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>Bright noise tolerance</brief>
+        <description>
+          If you are attempting to remove white speckle or other bright noise then you should be modifying this
+          parameter.   When a pixel is being checked for noise, a difference between the pixel and boxcar
+          average is computed.  If this difference is positive then TOLMAX will be used to determine if we
+          have noise, hence white noise will be removed by modifying TOLMAX.
+        </description>
+      </parameter>
+
+      <parameter name="FLATTOL">
+        <type>double</type>
+        <default><item>1</item></default>
+        <brief>Scaled tolerance value</brief>
+        <description>
+          Minimum tolerance value used in the STDDEV filter.  If the difference
+          between the original pixel, and the average value of the noise filter is
+          less than the FLATTOL then the output pixel will remain unchanged
+          from the input pixel.  Without this safeguard, very uniform inage areas
+          (low standard deviation) will be excessively smoothed, creating areas
+          of constant DN.
+        </description>
+      </parameter>
+      
+      <parameter name="MIN_VALUE">
+        <type>double</type>
+        <default><item>0</item></default>
+        <brief>Valid minimum pixel</brief>
+        <description>
+          Valid minimum pixel value that will be used in boxcar computation.  If
+          a pixel value is less than LOW then it will not be used when
+          computing boxcar statistics.
+        </description>
+      </parameter>
+
+      <parameter name="HARD_TOLMIN">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>noisefilter TOLMIN parameter for hard noise filtering</brief>
+        <description>
+          Use this value for noisefilter's TOLMIN parameter when doing
+          hard noise filtering
+        </description>
+      </parameter>
+
+      <parameter name="HARD_TOLMAX">
+        <type>double</type>
+        <default><item>3.5</item></default>
+        <brief>noisefilter TOLMAX parameter for hard noise filtering</brief>
+        <description>
+          Use this value for noisefilter's TOLMAX parameter when doing
+          hard noise filtering
+        </description>
+      </parameter>
+
+      <parameter name="LPFZ_LINES">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>lowpass LINES parameter for LPFZ</brief>
+        <description>
+        </description>
+      </parameter>
+
+      <parameter name="LPFZ_SAMPLES">
+        <type>integer</type>
+        <default><item>5</item></default>
+        <brief>lowpass SAMPLES parameter for LPFZ</brief>
+        <description>
+        </description>
+      </parameter>
+
+      <parameter name="NOISE_SAMPLES">
+        <type>integer</type>
+        <default><item>7</item></default>
+        <brief>Number of samples in boxcar</brief>
+        <description>
+          This is the total number of samples in the boxcar.
+          It must be odd and can not exceed twice the number of samples
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly slower.
+
+           The shape of the filter can be used to control types of noise to 
+            remove.  For example, a 3x3 or 5x5 boxcar can be used to remove 
+            speckle or salt and pepper noise.   A 1 sample x 5 line boxcar with 
+            REPLACE=NULL could be used to remove dropped or noisy lines of data.  
+            Then use the lowpass program with a 3x3 boxcar to fill in the NULLed 
+            data.
+        </description>
+      </parameter>
+      
+      <parameter name="NOISE_LINES">
+        <type>integer</type>
+        <default><item>7</item></default>
+        <brief>Number of lines in boxcar </brief>
+        <description>
+          This is the total number of lines in the boxcar.
+          It must be odd and can not exceed twice the number of lines
+          in the cube.  In general, the size of the boxcar does not
+          cause the program to operate significantly
+          slower.
+          The shape of the filter can be used to control types of noise to 
+          remove.  For example, a 3x3 or 5x5 boxcar can be used to remove 
+          speckle or salt and pepper noise.   A 1 sample x 5 line boxcar with 
+          REPLACE=NULL could be used to remove dropped or noisy lines of data.  
+          Then use the lowpass program with a 3x3 boxcar to fill in the NULLed 
+          data.
+        </description>
+      </parameter>
+      
+      <parameter name="CLEAR_FRACTION">
+        <type>double</type>
+        <default><item>0</item></default>
+        <brief>NULL any columns with valid pixel less than this value</brief>
+        <description>
+          Fraction of valid pixels for which a column will not be NULL i.e any 
+          columns with valid points percentage less than this value will be set 
+          to NULL
+        </description>
+      </parameter>
+
+      <parameter name="NONVALID_FRACTION">
+        <type>double</type>
+        <default><item>0.90</item></default>
+        <brief>Pause point tolerance fraction</brief>
+        <description>
+          For each column of the cube a count is calculated of the number of
+          valid pixels in the column.  If any columns count divided by the
+          maximum count is less than NONVALIDFRACTION then the pause points
+          are nulled out.  If the binning is anything other than one then all
+          columns are checked with only the failing columns getting nulled out.
+        </description>
+      </parameter>
+
+      <parameter name="HARD_FILTERING">
+        <type>double</type>
+        <default><item>0.1</item></default>
+        <brief>Percent of LIS pixels to switch to hard noise filtering</brief>
+        <description>
+          Percent of LIS pixels to switch to hard noise filtering
+        </description>
+      </parameter>
+
+      <parameter name="HIGHEND_PERCENT">
+        <type>double</type>
+        <default><item>99.999</item></default>
+        <brief>Fraction of high-end pixels to zap</brief>
+        <description>
+          Fraction of high-end pixels to zap
+        </description>
+      </parameter>
+
+      <parameter name="HARD_HIGHEND_PERCENT">
+        <type>double</type>
+        <default><item>99.99</item></default>
+        <brief>Fraction of high-end pixels to zap for hard noise filtering</brief>
+        <description>
+          Fraction of high-end pixels to zap for hard noise filtering
+        </description>
+      </parameter>
+      
+    </group>
+
+  </groups>
+
+</application>
