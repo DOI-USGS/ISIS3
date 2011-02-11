@@ -1,4 +1,6 @@
 #include "Isis.h"
+
+#include "Angle.h"
 #include "Camera.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
@@ -12,21 +14,24 @@ using namespace Isis;
 // Global variables
 Camera *cam;
 int nbands;
-bool phase, 
-     emission, 
-     incidence, 
-     latitude, 
-     longitude,
-     pixelResolution,
-     lineResolution, 
-     sampleResolution, 
-     detectorResolution, 
-     northAzimuth,
-     sunAzimuth, 
-     spacecraftAzimuth, 
-     offnadirAngle,
-     subSpacecraftGroundAzimuth,
-     subSolarGroundAzimuth;
+
+bool phase; 
+bool emission;
+bool incidence;
+bool localEmission;
+bool localIncidence;
+bool latitude;
+bool longitude;
+bool pixelResolution;
+bool lineResolution;
+bool sampleResolution;
+bool detectorResolution;
+bool northAzimuth;
+bool sunAzimuth;
+bool spacecraftAzimuth;
+bool offnadirAngle;
+bool subSpacecraftGroundAzimuth;
+bool subSolarGroundAzimuth;
 
 void phocube(Buffer &out);
 
@@ -46,6 +51,8 @@ void IsisMain() {
   if((phase = ui.GetBoolean("PHASE"))) nbands++;
   if((emission = ui.GetBoolean("EMISSION"))) nbands++;
   if((incidence = ui.GetBoolean("INCIDENCE"))) nbands++;
+  if((localEmission = ui.GetBoolean("LOCALEMISSION"))) nbands++;
+  if((localIncidence = ui.GetBoolean("LOCALINCIDENCE"))) nbands++;
   if((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
   if((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
   if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
@@ -70,6 +77,8 @@ void IsisMain() {
   if(phase) name += "Phase Angle";
   if(emission) name += "Emission Angle";
   if(incidence) name += "Incidence Angle";
+  if(localEmission) name += "Local Emission Angle";
+  if(localIncidence) name += "Local Incidence Angle";
   if(latitude) name += "Latitude";
   if(longitude) name += "Longitude";
   if(pixelResolution) name += "Pixel Resolution";
@@ -116,6 +125,7 @@ void IsisMain() {
   p.EndProcess();
 }
 
+
 void phocube(Buffer &out) {
 
   for(int i = 0; i < 64; i++) {
@@ -137,6 +147,23 @@ void phocube(Buffer &out) {
         if(incidence) {
           out[index] = cam->IncidenceAngle();
           index += 64 * 64;
+        }
+        if(localEmission || localIncidence) {
+          Angle phase;
+          Angle emission;
+          Angle incidence;
+          bool success;
+          cam->LocalPhotometricAngles(phase, emission, incidence, success);
+
+          if (localEmission) {
+            out[index] = emission.GetDegrees();
+            index += 64 * 64;
+          }
+
+          if (localIncidence) {
+            out[index] = incidence.GetDegrees();
+            index += 64 * 64;
+          }
         }
         if(latitude) {
           out[index] = cam->UniversalLatitude();

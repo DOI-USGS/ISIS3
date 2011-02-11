@@ -76,6 +76,9 @@
       Added parameters/bands SUBSPACECRAFTGROUNDAZIMUTH and
       SUBSOLARGROUNDAZIMUTH.
     </change>
+    <change name="Travis Addair" date="2011-02-10">
+      Added parameters LOCALINCIDENCE and LOCALEMISSION.
+    </change>
 </history>
 
   <category>
@@ -136,6 +139,22 @@
         <brief>Create an incidience angle band.</brief>
         <description>
           If this parameter is true then an incidence angle band will be created
+        </description>
+      </parameter>
+      <parameter name="LOCALEMISSION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a local emission angle band.</brief>
+        <description>
+          If this parameter is true then a local emission angle band will be created
+        </description>
+      </parameter>
+      <parameter name="LOCALINCIDENCE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a local incidience angle band.</brief>
+        <description>
+          If this parameter is true then a local incidence angle band will be created
         </description>
       </parameter>
       <parameter name="LATITUDE">
