@@ -24,6 +24,24 @@
     filtered. The columnar averages or medians can be chosen as the normalizer. 
     Each pixel is normalized by subtracting the normalization factor or
     by multiplying by the normalization factor.
+    <p/>
+    There is an option NEW_VERSION which uses the updated logic for correcting 
+    Average and Median columns of the cubenorm stats. Similar processing is done 
+    individually for the Average and Median columns with combination of high 
+    and low pass filters. The left and right edges are problamatic and  are cut 
+    out at the pause points. There are changes in the number of samples to be 
+    NULLed on left/right edge of the image depending on the Channel in the 
+    newer version. These samples are Nulled to avoid filter ringing. 
+    <p/> 
+    For binning mode equal to 1, the number of iterations running lowpass 
+    filter is increased to 50 from the original 10. The highpass filter performs 
+    by checking for MaxValid pixels and filters by either divide or subtract 
+    option depending on the user specified MODE while earlier it was only 
+    subtraction. The highpass filter also Marks the samples with missing pixels 
+    (less than MaxValid Pixels) due to a problem with furrows or noise. The 
+    output of the highpass filter is checked for Markers and set to 
+    1/0(Divide/Subtract) depending on the previous sample value. The direction 
+    left/right is based on the Channel. 
   </description>
 
   <history>
@@ -64,6 +82,10 @@
       Changed name to hicubenorm and added Eric Eliason's highpass filter
       code from the Cubenorm_Filter Perl script used in the pipeline at
       UofA.
+    </change>
+    <change name="Sharmila Prasad" date="2011-01-27">
+      Modified for the updated Cubenorm_Filter Perl script used in the HiCal 
+      pipeline at UofA. Added option NEW_VERSION
     </change>
   </history>
 
@@ -125,6 +147,17 @@
         </description>
       </parameter>
 
+      <parameter name="NEW_VERSION">
+        <type>boolean</type>
+          <default><item>FALSE</item></default>
+          <brief>New version of cubenorm filter</brief>
+          <description>
+              This option is used to correct average and median Stats from 
+              cubenorm application for the hiproc pipeline using latest version 
+              1.9 2009/12/22 18:48:39 of Eric Eliason's hical pipeline
+          </description>
+      </parameter>
+
       <parameter name="FORMAT">
          <type>string</type>
          <default><item>TABLE</item></default>
@@ -152,10 +185,10 @@
       </parameter>
    </group>
 
-   <group name="Optional Statistics Source">
+   <group name="Statistics Options">
        <parameter name="STATSOURCE">
            <type>string</type>
-           <default><item>CUBE</item></default>
+           <default><item>TABLE</item></default>
            <brief>Input source of statistics to apply to FROM cube</brief>
            <description>
                <p>
@@ -176,6 +209,14 @@
                </p>
            </description>
            <list>
+              <option value="TABLE">
+                   <brief>Statistics are provided in FROMSTATS in TABLE format</brief>
+                   <description>
+                       This option requires a filename in FROMSTATS with TABLE formatted
+                       data.  This format is the same format as is generated in the STATS
+                       output file.
+                   </description>
+               </option>
                <option value="CUBE">
                    <brief>Statistics are computed from FROM input cube</brief>
                    <description>
@@ -184,14 +225,6 @@
                         are also applied to the TO file if specifed in the same run.
                    </description>
                    <exclusions><item>FROMSTATS</item></exclusions>
-               </option>
-               <option value="TABLE">
-                   <brief>Statistics are provided in FROMSTATS in TABLE format</brief>
-                   <description>
-                       This option requires a filename in FROMSTATS with TABLE formatted
-                       data.  This format is the same format as is generated in the STATS
-                       output file.
-                   </description>
                </option>
                <option value="PVL">
                    <brief>Statistics are provided in FROMSTATS in PVL format</brief>
@@ -219,11 +252,37 @@
           </description>
           <filter>*.txt</filter>
        </parameter>
+     <parameter name="HIGHPASS_MODE">
+         <type>string</type>
+         <default><item>HIGHPASS_DIVIDE</item></default>
+         <brief>
+             Apply subtraction or division for highpass filter
+         </brief>
+         <description>
+           This option is used to choose subtract/divide for the highpass 
+         filter 
+         </description>
+         <list>
+            <option value="HIGHPASS_DIVIDE">
+               <brief>Use Division for highpass filter</brief>
+               <description>
+                  This option will use division for highpass filter 
+               </description>
+            </option>
+            <option value="HIGHPASS_SUBTRACT">
+                <brief>Use Subtraction for highpass filter</brief>
+                <description>
+                    This option will use subtraction for highpass filter 
+                </description>
+            </option>
+         </list>
+      </parameter>
    </group>
 
     <group name="Filter options">
       <parameter name="FILTER">
           <type>integer</type>
+        <default><item>5</item></default>
           <brief>Size of boxcar filter</brief>
           <description>
               This is the total number of samples in the boxcar. It must be a
