@@ -167,7 +167,7 @@ void IsisMain() {
       if(currMeas->IsIgnored() || currPoint->IsIgnored()) {
         ptClass = "U   "; //Unmeasured
       }
-      else if(mType == ControlMeasure::Reference) {
+      else if(currPoint->GetRefMeasure() == currMeas) {
         ptClass = "T   "; //Truth
       }
       else if(mType == ControlMeasure::RegisteredSubPixel) {
