@@ -70,7 +70,7 @@ void IsisMain() {
     const ControlPoint & pnt = *cn[p];
     if((!pnt.IsIgnored()) && (pnt.GetNumMeasures() == 2)) {
       Coordinate c;
-      if (pnt[0]->GetType() == ControlMeasure::Reference) {
+      if (pnt.IndexOfRefMeasure() == 0) {
         c.samp = pnt[0]->GetSample();
         c.line = pnt[0]->GetLine();
         c.errSamp = pnt[1]->GetSample();
