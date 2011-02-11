@@ -165,6 +165,11 @@ namespace Isis {
    *                                         for readability and reducing the
    *                                         likelyhood of future code having
    *                                         bugs due to unit mismatches.
+   *  @history 2011-02-11 Jeannie Walldren - Changed documentation references to
+   *                                         SetEphemerisTime() method (these
+   *                                         were replaced with references to
+   *                                         SetTime()). Added missing
+   *                                         documentation to new methods.
    */
   class Spice {
     public:
@@ -189,7 +194,10 @@ namespace Isis {
 
       void CreateCache(iTime startTime, iTime endTime,
                        const int size, double tol);
-      void CreateCache(const double time, double tol);
+        //NO CALL TO THIS METHOD IS FOUND IN ISIS.  COMMENT OUT AND SAVE FOR AT LEAST 3 MONTHS
+        //IF NO NEED IS FOUND FOR IT, DELETE METHOD.
+        // 2011-02-08 JEANNIE WALLDREN
+//      void CreateCache(const double time, double tol);
       iTime CacheStartTime() const;
       iTime CacheEndTime() const;
 
@@ -207,15 +215,46 @@ namespace Isis {
       static SpiceInt GetInteger(const iString &key,   int index = 0);
       static iString GetString(const iString &key,     int index = 0);
 
+      /**
+       * Accessor method for the sun position.
+       * @return @b iTime Sun position for the image.
+       * @author Steven Lambright
+       * @internal
+       *   @history 2011-02-09 Steven Lambright - Original version.
+       */
       SpicePosition *SunPosition() const {
         return p_sunPosition;
       };
+
+      /**
+       * Accessor method for the instrument position.
+       * @return @b iTime Instrument position for the image.
+       * @author Steven Lambright
+       * @internal
+       *   @history 2011-02-09 Steven Lambright - Original version.
+       */
       SpicePosition *InstrumentPosition() const {
         return p_instrumentPosition;
       };
+
+      /**
+       * Accessor method for the body rotation.
+       * @return @b iTime Body rotation for the image.
+       * @author Steven Lambright
+       * @internal
+       *   @history 2011-02-09 Steven Lambright - Original version.
+       */
       SpiceRotation *BodyRotation() const {
         return p_bodyRotation;
       };
+
+      /**
+       * Accessor method for the instrument rotation.
+       * @return @b iTime Instrument rotation for the image.
+       * @author Steven Lambright
+       * @internal
+       *   @history 2011-02-09 Steven Lambright - Original version.
+       */
       SpiceRotation *InstrumentRotation() const {
         return p_instrumentRotation;
       };
@@ -245,7 +284,7 @@ namespace Isis {
                                   space so that conversions between double and
                                   SpiceDouble do not have to occur in inheriting
                                   classes.*/
-      Distance *p_radii; //!<The radii of the target
+      Distance *p_radii; //!< The radii of the target
 
 
     private:
@@ -262,7 +301,7 @@ namespace Isis {
       // cache stuff
       iTime *p_startTime; //!< Corrected start (shutter open) time of the observation.
       iTime *p_endTime; //!< Corrected end (shutter close) time of the observation.
-      SpiceDouble *p_cacheSize; //!< Cache size.  Note:  This value is 3 for Framing cameras: shutter open, center and close.//??? value is 1???
+      SpiceDouble *p_cacheSize; //!< Cache size.  Note:  This value is 1 for Framing cameras.
 
       SpiceDouble *p_startTimePadding; //!< Kernels pvl group StartPadding keyword value
       SpiceDouble *p_endTimePadding; //!< Kernels pvl group EndPadding keyword value
@@ -275,11 +314,10 @@ namespace Isis {
       bool p_allowDownsizing; //!< Indicates whether to allow downsizing
 
       // Constants
-      /**
-       * The NaifBodyCode value, if it exists in the labels. Otherwise, if the target is sky, it's the SPK code
-       * and if not sky then it's calculated by the NaifBodyCode() method.
-       */
-      SpiceInt *p_bodyCode;
+      SpiceInt *p_bodyCode;    /**< The NaifBodyCode value, if it exists in the 
+                                    labels. Otherwise, if the target is sky, 
+                                    it's the SPK code and if not sky then it's 
+                                    calculated by the NaifBodyCode() method.*/
       SpiceInt *p_spkCode;     //!< Spacecraft and planet ephemeris kernel (SPK) code
       SpiceInt *p_ckCode;      //!< Camera kernel (CK) code
       SpiceInt *p_ikCode;      //!< Instrument kernel (IK) code

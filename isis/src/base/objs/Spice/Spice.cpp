@@ -71,7 +71,7 @@ namespace Isis {
    * Constructs a Spice object. 
    *  
    * @param lab  Pvl labels.
-   * @param notab
+   * @param noTables Indicates the use of tables.
    */
   Spice::Spice(Pvl &lab, bool noTables) {
     Init(lab, noTables);
@@ -81,7 +81,7 @@ namespace Isis {
    * Initialization of Spice object.
    * 
    * @param lab  Pvl labels
-   * @param notab 
+   * @param noTables Indicates the use of tables. 
    * 
    * @throw Isis::Exception::Io - "Can not find NAIF code for NAIF target" 
    * @throw Isis::Exception::Camera - "No camera pointing available"
@@ -326,7 +326,7 @@ namespace Isis {
    * Loads/furnishes NAIF kernel(s)
    * 
    * @param key PvlKeyword
-   * @param notab
+   * @param noTables Indicates the use of tables.
    * 
    * @throw Isis::iException::Io - "Spice file does not exist."
    */
@@ -474,10 +474,10 @@ namespace Isis {
    * allows multiple instances of the Spice object to be created as the NAIF
    * toolkit can clash if multiple sets of SPICE kernels are loaded. Note that
    * the cache size is specified as an argument. Therefore, times requested via
-   * SetEphemerisTime which are not directly loaded in the cache will be
-   * interpolated.  If the instrument position is not cached and cacheSize is 
-   * greater than 3, the tolerance is passed to the SpicePosition 
-   * Memcache2HermiteCache() method. 
+   * SetTime() which are not directly loaded in the cache will be interpolated. 
+   * If the instrument position is not cached and cacheSize is greater than 3, 
+   * the tolerance is passed to the SpicePosition Memcache2HermiteCache() 
+   * method. 
    *  
    * @b Note:  Before this method is called, the private variables p_cacheSize, 
    * p_startTime and p_endTime must be set.  This is done in the Camera classes 
@@ -576,6 +576,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Accessor method for the cache start time.
+   * @return @b iTime Start time for the image.
+   * @author Steven Lambright
+   * @internal
+   *   @history 2011-02-09 Steven Lambright - Original version.
+   */
   iTime Spice::CacheStartTime() const {
     if(p_startTime)
       return *p_startTime;
@@ -583,7 +590,13 @@ namespace Isis {
     return iTime();
   }
 
-
+  /**
+   * Accessor method for the cache end time.
+   * @return @b iTime End time for the image.
+   * @author Steven Lambright
+   * @internal
+   *   @history 2011-02-09 Steven Lambright - Original version.
+   */
   iTime Spice::CacheEndTime() const {
     if(p_endTime)
       return *p_endTime;
@@ -615,8 +628,10 @@ namespace Isis {
    *  
    * @see http://naif.jpl.nasa.gov/naif/ 
    * @internal
-   * @history 2005-11-29 Debbie A. Cook - Added alternate code for processing
-   *                                      instruments without a platform
+   *   @history 2005-11-29 Debbie A. Cook - Added alternate code for processing
+   *                                        instruments without a platform
+   *   @history 2011-02-09 Steven Lambright - Changed name from
+   *                                        SetEphemerisTime()
    */
   void Spice::SetTime(const iTime &et) {
     if(p_et == NULL)
@@ -642,10 +657,9 @@ namespace Isis {
    *
    * @param p[] Spacecraft position
    *  
-   * @see SetEphemerisTime() 
+   * @see SetTime() 
    *  
-   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
-   *        first"
+   * @throw Isis::iException::Programmer - "You must call SetTime first"
    */
   void Spice::InstrumentPosition(double p[3]) const {
     if(p_et == NULL) {
@@ -663,7 +677,7 @@ namespace Isis {
   /**
    * Returns the spacecraft velocity in body-fixed frame km/sec units.
    *
-   * @param p[] Spacecraft velocity
+   * @param v[] Spacecraft velocity
    */
   void Spice::InstrumentVelocity(double v[3]) const {
     if(p_et == NULL) {
@@ -689,19 +703,18 @@ namespace Isis {
   }
 
   /**
-   * Returns the sun position in either body-fixed or J2000 reference frame and
-   * km units.
+   * Fills the input vector with sun position information, in either body-fixed 
+   * or J2000 reference frame and km units. 
    *
    * @param p[] Sun position
    *  
-   * @see SetEphemerisTime()
+   * @see SetTime()
    */
   void Spice::SunPosition(double p[3]) const {
     if(p_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-
     p[0] = p_uB[0];
     p[1] = p_uB[1];
     p[2] = p_uB[2];
@@ -876,8 +889,8 @@ namespace Isis {
    *
    * @param lon Sub-spacecraft longitude
    *  
-   * @see SetEphemerisTime() 
-   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
+   * @see SetTime() 
+   * @throw Isis::iException::Programmer - "You must call SetTime 
    *             first."
    */
   void Spice::SubSpacecraftPoint(double &lat, double &lon) {
@@ -923,8 +936,8 @@ namespace Isis {
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
    *  
-   * @see SetEphemerisTime() 
-   * @throw Isis::iException::Programmer - "You must call SetEphemerisTime 
+   * @see SetTime() 
+   * @throw Isis::iException::Programmer - "You must call SetTime 
    *             first."
    */
   void Spice::SubSolarPoint(double &lat, double &lon) {
