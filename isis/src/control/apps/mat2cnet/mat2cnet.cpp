@@ -61,8 +61,8 @@ void IsisMain() {
     }
     else {
       throw iException::Message(iException::Pvl,
-                                "Can not find required keyword IMAGE_NUMBER or IMAGE_ID in [" + currFile + "]",
-                                _FILEINFO_);
+          "Can not find required keyword IMAGE_NUMBER or IMAGE_ID in [" + currFile + "]",
+          _FILEINFO_);
     }
 
     iString sn(snl.SerialNumber(f));
@@ -92,9 +92,9 @@ void IsisMain() {
   }
   catch (Isis::iException &e) {
     throw iException::Message(iException::User, "Invalid match point file header for ["
-                              + ui.GetAsString("MATCH")
-                              + "]. First line does not contain number of measurements."
-                              , _FILEINFO_);
+        + ui.GetAsString("MATCH")
+        + "]. First line does not contain number of measurements."
+        , _FILEINFO_);
   }
 
   // Read line 2, the column header line
@@ -109,9 +109,9 @@ void IsisMain() {
       error = label;
       // if we are able to convert label to a double, we have an error
       throw iException::Message(iException::User, "Invalid match point file header for ["
-                                + ui.GetAsString("MATCH")
-                                + "]. Second line does not contain proper non-numerical column labels."
-                                , _FILEINFO_);
+          + ui.GetAsString("MATCH")
+          + "]. Second line does not contain proper non-numerical column labels."
+          , _FILEINFO_);
     }
     catch (Isis::iException e) {
       // if this line does not contain a double, continue
@@ -193,11 +193,6 @@ void IsisMain() {
       cmeasure->SetType(ControlMeasure::Candidate);
       cmeasure->SetIgnored(true);
     }
-    else if (iString::Equal(matClass, "T"))
-      //Truth
-    {
-      cmeasure->SetType(ControlMeasure::Reference);
-    }
     else if (iString::Equal(matClass, "S"))
       //SubPixel
     {
@@ -244,6 +239,9 @@ void IsisMain() {
     //Add the measure
     try {
       cpoint->Add(cmeasure);
+      if (iString::Equal(matClass, "T")) {
+        cpoint->SetRefMeasure(cmeasure);
+      }
     }
     catch (iException &e) {
       iString msg = "Invalid match point file [" + ui.GetAsString("MATCH") + "]";
@@ -397,8 +395,8 @@ void IsisMain() {
         //Add the lat,lon,rad to point
         try {
           SurfacePoint surfacePt(Latitude(lat, Angle::Degrees),
-                                 Longitude(lon, Angle::Degrees),
-                                 Distance(rad, Distance::Meters));
+              Longitude(lon, Angle::Degrees),
+              Distance(rad, Distance::Meters));
           cpoint->SetSurfacePoint(surfacePt);
         }
         catch (iException &e) {
