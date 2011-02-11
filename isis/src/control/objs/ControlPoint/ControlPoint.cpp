@@ -431,7 +431,9 @@ namespace Isis {
             if (measureGroup.FindKeyword("Reference")[0].UpCase() == "TRUE")
               SetRefMeasure(cm);
           }
-          catch (iException &e) {}
+          catch (iException &e) {
+            e.Clear();
+          }
         }
       }
       catch (iException &e) {
@@ -2052,10 +2054,9 @@ namespace Isis {
   PBControlNetLogData_Point ControlPoint::GetLogProtocolBuffer() const {
     PBControlNetLogData_Point protoBufLog;
 
-    ControlMeasure *measure;
-    foreach(measure, *measures) {
-      *protoBufLog.add_measures() = measure->GetLogProtocolBuffer();
-    }
+    for (int i = 0; i < cubeSerials->size(); i++)
+      *protoBufLog.add_measures() =
+          (*measures)[cubeSerials->at(i)]->GetLogProtocolBuffer();
 
     return protoBufLog;
   }

@@ -198,15 +198,17 @@ namespace Isis {
    *            methods to prevent further use of them.
    *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlNet.
    *   @history 2011-01-17 Eric Hyer - Points now own and delete their measures.
-   *                ControlNet now notified of changes (like adding and removing
-   *                measures).  Returning pointers to measures is now safe and
-   *                encouraged.
+   *            ControlNet now notified of changes (like adding and removing
+   *            measures).  Returning pointers to measures is now safe and
+   *            encouraged.
    *   @history 2011-02-10 Eric Hyer - measures no longer know or care if they
-   *                are the reference measure.  This information is now
-   *                completely maintained by this class.  Made numerous API and
-   *                internal changes, eliminating substantial duplicate code
-   *                and increasing interface clearity.  Hungarian notation now
-   *                eliminated from this class.
+   *            are the reference measure.  This information is now completely
+   *            maintained by this class.  Made numerous API and internal
+   *            changes, eliminating substantial duplicate code and increasing
+   *            interface clearity.  Hungarian notation now eliminated from this
+   *            class.
+   *   @history 2011-02-11 Steven Lambright - Measure log data is now written to
+   *            the binary file properly since Eric's change on January 17th.
    */
   class ControlPoint {
       friend class ControlNet;
