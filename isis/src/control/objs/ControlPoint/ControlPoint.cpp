@@ -427,11 +427,11 @@ namespace Isis {
           ControlMeasure *cm = new ControlMeasure;
           cm->Load(measureGroup);
           AddMeasure(cm);
-          if (measureGroup.HasKeyword("Reference")) {
-            iString reference = p["Reference"][0].UpCase();
-            if (reference == "TRUE")
+          try {
+            if (measureGroup.FindKeyword("Reference")[0].UpCase() == "TRUE")
               SetRefMeasure(cm);
           }
+          catch (iException &e) {}
         }
       }
       catch (iException &e) {
