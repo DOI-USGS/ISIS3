@@ -46,6 +46,7 @@ message PBControlNet {
     optional bool           editLock = 5 [default = false];
     optional bool           ignore = 6 [default = false];
     optional bool           jigsawRejected = 7 [default = false];
+    optional int32          referenceIndex = 21;
 
     optional AprioriSource        aprioriXYZSource = 8; 
     optional string               aprioriXYZSourceFile = 9;
@@ -72,12 +73,12 @@ message PBControlNet {
 // Start of ControlMeasure definition
     message PBControlMeasure {
       enum MeasureType {
-        Reference           = 0;   // Reference (or truth) measure
+//        Reference           = 0;   // Reference (or truth) measure
         Candidate           = 1;   // (e.g., autoseed, interest) AKA predicted, unmeasured, unverified
         Manual              = 2;   // Hand Measured (e.g., qnet)                                      
         RegisteredPixel     = 3;   // Automatically registered to whole pixel (e.g.,pointreg/qnet)           
         RegisteredSubPixel  = 4;   // Automatically registered to sub-pixel (e.g., pointreg/qnet)
-        Ground              = 5;   // Measure holding coordinate information in ground source
+//        Ground              = 5;   // Measure holding coordinate information in ground source
       }
 
 // Define an UnMeasured message for efficiency
