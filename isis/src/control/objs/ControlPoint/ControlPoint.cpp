@@ -242,8 +242,8 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     if (p.HasKeyword("Ignore")) {
-      iString ignore = (std::string)p["Ignore"];
-      if (ignore.DownCase() == "true")
+      iString ignoreStr = (std::string)p["Ignore"];
+      if (ignoreStr.DownCase() == "true")
         ignore = true;
     }
     if (p.HasKeyword("AprioriXYZSource")) {
