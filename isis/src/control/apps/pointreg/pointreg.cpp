@@ -105,7 +105,7 @@ void IsisMain() {
         outPoint->SetIgnored(false);
       }
 
-      ControlMeasure * patternCM = outPoint->GetReferenceMeasure();
+      ControlMeasure * patternCM = outPoint->GetRefMeasure();
       Cube &patternCube = *cubeMgr.OpenCube(
           files.Filename(patternCM->GetCubeSerialNumber()));
 
@@ -124,8 +124,8 @@ void IsisMain() {
         }
       }
 
-      if (patternCM->GetType() != ControlMeasure::Reference) {
-        patternCM->SetType(ControlMeasure::Reference);
+      if (outPoint->GetRefMeasure() != patternCM) {
+        outPoint->SetRefMeasure(patternCM);
         patternCM->SetChooserName("Application pointreg");
         patternCM->SetDateTime();
       }
@@ -138,7 +138,7 @@ void IsisMain() {
       while (j < outPoint->GetNumMeasures()) {
         ControlMeasure * measure = outPoint->GetMeasure(j);
         
-        if (j == outPoint->GetReferenceIndex()) {
+        if (j == outPoint->IndexOfRefMeasure()) {
           // don't register the reference, go to next measure
           if (!measure->IsIgnored()) goodMeasureCount++;
         }
