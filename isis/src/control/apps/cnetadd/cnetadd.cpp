@@ -318,7 +318,7 @@ void IsisMain() {
         for(int cm = controlpt->GetNumMeasures() - 1; cm >= 0; cm --) {
           ControlMeasure *controlms = controlpt->GetMeasure(cm);
 
-          if(!controlms->GetType() ==  ControlMeasure::Reference &&
+          if(controlpt->GetRefMeasure() != controlms &&
               it->second.find(controlms->GetCubeSerialNumber()) == it->second.end()) {
             controlpt->Delete(cm);
           }
@@ -352,7 +352,7 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
 
   for(int cp = 0; cp < net.GetNumPoints(); cp++) {
     ControlPoint *point = net.GetPoint(cp);
-    ControlMeasure *cm = point->GetReferenceMeasure();
+    ControlMeasure *cm = point->GetRefMeasure();
 
     Cube *cube = manager.OpenCube(snl.Filename(cm->GetCubeSerialNumber()));
     try {
