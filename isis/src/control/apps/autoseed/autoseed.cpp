@@ -221,7 +221,7 @@ void IsisMain() {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetMeasure(0);
       if(cp->HasReference()) {
-        cm = cp->GetReferenceMeasure();
+        cm = cp->GetRefMeasure();
       }
 
       iString c = serialNumbers.Filename(cm->GetCubeSerialNumber());
@@ -418,10 +418,7 @@ void IsisMain() {
         measurment->SetCoordinate(gmap->Sample(), gmap->Line(),
                                   ControlMeasure::Candidate);
 
-        if(sn == 0)
-          measurment->SetType(ControlMeasure::Reference);
-        else
-          measurment->SetType(ControlMeasure::Candidate);
+        measurment->SetType(ControlMeasure::Candidate);
         measurment->SetCubeSerialNumber((*(overlaps[ov]))[sn]);
         measurment->SetIgnored(ignore);
 
