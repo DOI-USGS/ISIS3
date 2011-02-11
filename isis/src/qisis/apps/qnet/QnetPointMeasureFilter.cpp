@@ -215,9 +215,6 @@ namespace Qisis {
    *                         control networks.
    */
   bool QnetPointMeasureFilter::MeasureTypeMatched(int cmType) {
-    if (p_reference->isChecked() && cmType == Isis::ControlMeasure::Reference) {
-      return true;;
-    }
     if (p_candidate->isChecked() && cmType == Isis::ControlMeasure::Candidate) {
       return true;;
     }

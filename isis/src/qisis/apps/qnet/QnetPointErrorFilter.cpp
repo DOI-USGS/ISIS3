@@ -3,11 +3,14 @@
 #include "QnetPointErrorFilter.h"
 #include "QnetNavTool.h"
 #include "ControlNet.h"
+#include "ControlMeasure.h"
 #include "SerialNumberList.h"
+#include "Statistics.h"
 
 #include "qnet.h"
 
 using namespace Qisis::Qnet;
+using namespace Isis;
 
 namespace Qisis {
   /**
@@ -114,23 +117,23 @@ namespace Qisis {
     // Loop in reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
       Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+      double maxResidual = cp.GetStatistic(&ControlMeasure::GetResidualMagnitude).Maximum();
       if (p_lessThanCB->isChecked() && p_greaterThanCB->isChecked()) {
-        if ((cp.GetMaximumResidual() < lessNum) &&
-            (cp.GetMaximumResidual() > greaterNum)) {
+        if (maxResidual < lessNum && maxResidual > greaterNum) {
           continue;
         }
         else
           g_filteredPoints.removeAt(i);
       }
       else if (p_lessThanCB->isChecked()) {
-        if (cp.GetMaximumResidual() < lessNum) {
+        if (maxResidual < lessNum) {
           continue;
         }
         else
           g_filteredPoints.removeAt(i);
       }
       else if (p_greaterThanCB->isChecked()) {
-        if (cp.GetMaximumResidual() > greaterNum) {
+        if (maxResidual > greaterNum) {
           continue;
         }
         else

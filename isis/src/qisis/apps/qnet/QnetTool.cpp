@@ -362,15 +362,14 @@ namespace Qisis {
     // not the same measure that is on the left chip viewport, set left
     // measure as reference.
     if (p_controlPoint->HasReference()) {
-      Isis::ControlMeasure *refMeasure = p_controlPoint->GetReferenceMeasure();
+      Isis::ControlMeasure *refMeasure = p_controlPoint->GetRefMeasure();
       if (refMeasure != p_leftMeasure) {
         switch (QMessageBox::question((QWidget *)parent(),
             "Qnet Tool Save Point",
             "This point already contains a reference measure.  Would you like to replace it with the measure on the left?",
             "&Yes", "&No", 0, 0)) {
           case 0: // Yes was clicked or Enter was pressed, replace reference
-            refMeasure->SetType(Isis::ControlMeasure::Candidate);
-            p_leftMeasure->SetType(Isis::ControlMeasure::Reference);
+            p_controlPoint->SetRefMeasure(p_leftMeasure);
             // ??? Need to set rest of measures to Candiate and add more warning. ???//
           case 1: // No was clicked, keep original reference
             break;
@@ -379,7 +378,7 @@ namespace Qisis {
       }
     }
     else {
-      p_leftMeasure->SetType(Isis::ControlMeasure::Reference);
+      p_controlPoint->SetRefMeasure(p_leftMeasure);
     }
 
     // emit signal so the nav tool can update edit point
@@ -1048,7 +1047,7 @@ namespace Qisis {
     int leftIndex = 0;
     //  Check for reference
     if (p_controlPoint->HasReference()) {
-      leftIndex = p_controlPoint->GetReferenceIndex();
+      leftIndex = p_controlPoint->IndexOfRefMeasure();
     }
     else {
       if (p_leftFile.length() != 0) {
@@ -1153,8 +1152,6 @@ namespace Qisis {
     p_ignoreLeftMeasure->setChecked(p_leftMeasure->IsIgnored());
 
     QString s = "Measure Type: ";
-    if (p_leftMeasure->GetType() == Isis::ControlMeasure::Reference)
-      s += "Reference";
     if (p_leftMeasure->GetType() == Isis::ControlMeasure::Candidate)
       s += "Candidate";
     if (p_leftMeasure->GetType() == Isis::ControlMeasure::Manual)
@@ -1191,8 +1188,6 @@ namespace Qisis {
     p_ignoreRightMeasure->setChecked(p_rightMeasure->IsIgnored());
 
     QString s = "Measure Type: ";
-    if (p_rightMeasure->GetType() == Isis::ControlMeasure::Reference)
-      s += "Reference";
     if (p_rightMeasure->GetType() == Isis::ControlMeasure::Candidate)
       s += "Candidate";
     if (p_rightMeasure->GetType() == Isis::ControlMeasure::Manual)

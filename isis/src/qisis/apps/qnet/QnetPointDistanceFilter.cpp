@@ -106,7 +106,7 @@ namespace Qisis {
         Isis::ControlMeasure cm1;
         // first try to get info from reference measure, if one exists
         if (cp1.HasReference()) {
-          cm1 = *cp1.GetReferenceMeasure();
+          cm1 = *cp1.GetRefMeasure();
         }
         // if no reference measure exists, use the first control measure of the point
         else
@@ -135,7 +135,7 @@ namespace Qisis {
           Isis::ControlMeasure cm2;
           // first try to get info from reference measure, if one exists
           if (cp2.HasReference()) {
-            cm2 = *cp2.GetReferenceMeasure();
+            cm2 = *cp2.GetRefMeasure();
           }
           // if no reference measure exists, use the first control measure of the point
           else
