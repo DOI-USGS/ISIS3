@@ -15,6 +15,7 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
+#include "Statistics.h"
 #include "SurfacePoint.h"
 #include "TextFile.h"
 #include "UserInterface.h"
@@ -38,7 +39,7 @@ bool append;
 TextFile *txt = NULL;
 
 // For control measure related data and labels
-QString measureInfo;
+iString measureInfo;
 QString measureLabels;
 
 void IsisMain() {
@@ -181,73 +182,80 @@ void IsisMain() {
 
     // Always add data
     measureInfo.clear();
-    measureInfo += cpoint->GetId().ToQt() + ",";
-    measureInfo += cpoint->GetPointTypeString().ToQt() + ",";
-    measureInfo += iString(cpoint->GetChooserName()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetDateTime()).ToQt() + ",";
-    measureInfo += iString(cpoint->IsEditLocked()).ToQt() + ",";
-    measureInfo += iString(cpoint->IsIgnored()).ToQt() + ",";
+    measureInfo += cpoint->GetId() + ",";
+    measureInfo += cpoint->GetPointTypeString() + ",";
+    measureInfo += iString(cpoint->GetChooserName()) + ",";
+    measureInfo += iString(cpoint->GetDateTime()) + ",";
+    measureInfo += iString(cpoint->IsEditLocked()) + ",";
+    measureInfo += iString(cpoint->IsIgnored()) + ",";
 
-    measureInfo += iString(cpoint->GetSurfacePointSourceString()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetAprioriSurfacePointSourceFile()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetRadiusSourceString()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetAprioriRadiusSourceFile()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetSurfacePointSourceString()) + ",";
+    measureInfo += iString(cpoint->GetAprioriSurfacePointSourceFile()) + ",";
+    measureInfo += iString(cpoint->GetRadiusSourceString()) + ",";
+    measureInfo += iString(cpoint->GetAprioriRadiusSourceFile()) + ",";
 
     SurfacePoint Asp = cpoint->GetAprioriSurfacePoint();
-    measureInfo += iString(Asp.GetX().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(Asp.GetY().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(Asp.GetZ().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(Asp.GetXSigma().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(Asp.GetYSigma().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(Asp.GetZSigma().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(Asp.GetLatitude().GetPlanetocentric(Angle::Degrees)).ToQt() + ",";
-    measureInfo += iString(Asp.GetLongitude().GetPositiveEast(Angle::Degrees)).ToQt() + ",";
-    measureInfo += iString(Asp.GetLocalRadius().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(Asp.GetLatSigma().GetDegrees()).ToQt() + ",";
-    measureInfo += iString(Asp.GetLonSigma().GetDegrees()).ToQt() + ",";
-    measureInfo += iString(Asp.GetLocalRadiusSigma().GetKilometers()).ToQt() + ",";
-    try { measureInfo += iString(Asp.GetLatSigmaDistance().GetKilometers()).ToQt() + ","; }
+    measureInfo += iString(Asp.GetX().GetKilometers()) + ",";
+    measureInfo += iString(Asp.GetY().GetKilometers()) + ",";
+    measureInfo += iString(Asp.GetZ().GetKilometers()) + ",";
+    measureInfo += iString(Asp.GetXSigma().GetKilometers()) + ",";
+    measureInfo += iString(Asp.GetYSigma().GetKilometers()) + ",";
+    measureInfo += iString(Asp.GetZSigma().GetKilometers()) + ",";
+    measureInfo += iString(Asp.GetLatitude().GetPlanetocentric(Angle::Degrees)) + ",";
+    measureInfo += iString(Asp.GetLongitude().GetPositiveEast(Angle::Degrees)) + ",";
+    measureInfo += iString(Asp.GetLocalRadius().GetKilometers()) + ",";
+    measureInfo += iString(Asp.GetLatSigma().GetDegrees()) + ",";
+    measureInfo += iString(Asp.GetLonSigma().GetDegrees()) + ",";
+    measureInfo += iString(Asp.GetLocalRadiusSigma().GetKilometers()) + ",";
+    try { measureInfo += iString(Asp.GetLatSigmaDistance().GetKilometers()) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";
     }
-    try { measureInfo += iString(Asp.GetLonSigmaDistance().GetKilometers()).ToQt() + ","; }
+    try { measureInfo += iString(Asp.GetLonSigmaDistance().GetKilometers()) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";
     }
 
     SurfacePoint sp = cpoint->GetSurfacePoint();
-    measureInfo += iString(sp.GetX().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(sp.GetY().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(sp.GetZ().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(sp.GetXSigma().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(sp.GetYSigma().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(sp.GetZSigma().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(sp.GetLatitude().GetPlanetocentric(Angle::Degrees)).ToQt() + ",";
-    measureInfo += iString(sp.GetLongitude().GetPositiveEast(Angle::Degrees)).ToQt() + ",";
-    measureInfo += iString(sp.GetLocalRadius().GetKilometers()).ToQt() + ",";
-    measureInfo += iString(sp.GetLatSigma().GetDegrees()).ToQt() + ",";
-    measureInfo += iString(sp.GetLonSigma().GetDegrees()).ToQt() + ",";
-    measureInfo += iString(sp.GetLocalRadiusSigma().GetKilometers()).ToQt() + ",";
-    try { measureInfo += iString(sp.GetLatSigmaDistance().GetKilometers()).ToQt() + ","; }
+    measureInfo += iString(sp.GetX().GetKilometers()) + ",";
+    measureInfo += iString(sp.GetY().GetKilometers()) + ",";
+    measureInfo += iString(sp.GetZ().GetKilometers()) + ",";
+    measureInfo += iString(sp.GetXSigma().GetKilometers()) + ",";
+    measureInfo += iString(sp.GetYSigma().GetKilometers()) + ",";
+    measureInfo += iString(sp.GetZSigma().GetKilometers()) + ",";
+    measureInfo += iString(sp.GetLatitude().GetPlanetocentric(Angle::Degrees)) + ",";
+    measureInfo += iString(sp.GetLongitude().GetPositiveEast(Angle::Degrees)) + ",";
+    measureInfo += iString(sp.GetLocalRadius().GetKilometers()) + ",";
+    measureInfo += iString(sp.GetLatSigma().GetDegrees()) + ",";
+    measureInfo += iString(sp.GetLonSigma().GetDegrees()) + ",";
+    measureInfo += iString(sp.GetLocalRadiusSigma().GetKilometers()) + ",";
+    try { measureInfo += iString(sp.GetLatSigmaDistance().GetKilometers()) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";
     }
-    try { measureInfo += iString(sp.GetLonSigmaDistance().GetKilometers()).ToQt() + ","; }
+    try { measureInfo += iString(sp.GetLonSigmaDistance().GetKilometers()) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";
     }
 
-    measureInfo += iString(cpoint->GetMinimumResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetMaximumResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetAverageResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetMinimumSampleResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetMaximumSampleResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetMinimumLineResidual()).ToQt() + ",";
-    measureInfo += iString(cpoint->GetMinimumLineResidual()).ToQt() + ",";
+    measureInfo += iString(cpoint->GetStatistic(
+        &ControlMeasure::GetResidualMagnitude).Minimum()) + ",";
+    measureInfo += iString(cpoint->GetStatistic(
+        &ControlMeasure::GetResidualMagnitude).Maximum()) + ",";
+    measureInfo += iString(cpoint->GetStatistic(
+        &ControlMeasure::GetResidualMagnitude).Average()) + ",";
+    measureInfo += iString(cpoint->GetStatistic(
+        &ControlMeasure::GetSampleResidual).Minimum()) + ",";
+    measureInfo += iString(cpoint->GetStatistic(
+        &ControlMeasure::GetSampleResidual).Maximum()) + ",";
+    measureInfo += iString(cpoint->GetStatistic(
+        &ControlMeasure::GetLineResidual).Minimum()) + ",";
+    measureInfo += iString(cpoint->GetStatistic(
+        &ControlMeasure::GetLineResidual).Maximum()) + ",";
     
     // Loop through all measures in controlpoint
     for(int j = 0; j < cpoint->GetNumMeasures(); j++) {
@@ -324,7 +332,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
     // control measure information
     //dataNames = cm.GetMeasureDataNames();
     //for(int i = 0; i < dataNames.size(); i++) {
-    //  output += iString(dataNames[i] + ",").ToQt();
+    //  output += iString(dataNames[i] + ",");
     //}
 
 
@@ -357,7 +365,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
 
   //dataNames = cm.GetMeasureDataNames();
   //for(int i = 0; i < dataNames.size(); i++) {
-  //  output += iString(cm.GetMeasureData(dataNames[i])).ToQt() + ",";
+  //  output += iString(cm.GetMeasureData(dataNames[i])) + ",";
   //}
 
   
@@ -366,7 +374,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
 
   // Meaure info comes first
   QString pri = "";
-  pri += measureInfo;
+  pri += measureInfo.ToQt();
   pri += output;
 
   txt->PutLine(pri.toStdString());
