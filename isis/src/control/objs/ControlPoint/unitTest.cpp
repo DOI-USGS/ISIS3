@@ -42,11 +42,11 @@ int main() {
   cp.SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
   SurfacePoint point(Displacement(-424.024048, Displacement::Meters),
-                     Displacement(734.4311949, Displacement::Meters),
-                     Displacement(529.919264, Displacement::Meters),
-                     Distance(10, Distance::Meters),
-                     Distance(50, Distance::Meters),
-                     Distance(20, Distance::Meters));
+      Displacement(734.4311949, Displacement::Meters),
+      Displacement(529.919264, Displacement::Meters),
+      Distance(10, Distance::Meters),
+      Distance(50, Distance::Meters),
+      Distance(20, Distance::Meters));
   cp.SetSurfacePoint(point);
   cp.SetAprioriSurfacePoint(point);
   cp.SetEditLock(true);
@@ -69,7 +69,7 @@ int main() {
 
   printPoint(cp);
 
-  ControlMeasure * cm2 = new ControlMeasure;
+  ControlMeasure *cm2 = new ControlMeasure;
   cm2->SetCubeSerialNumber("Test2");
   cm2->SetIgnored(true);
   cm2->SetCoordinate(100.0, 200.0);
@@ -86,8 +86,7 @@ int main() {
   cp.Add(cm2);
   cout << "Testing Edit Locking... ";
   cp.SetRefMeasure(cm2);
-  if (cp.GetRefMeasure() != cm2)
-  {
+  if (cp.GetRefMeasure() != cm2) {
     cp.SetEditLock(false);
     cp.SetRefMeasure(cm2);
     if (cp.GetRefMeasure() == cm2)
@@ -95,8 +94,7 @@ int main() {
     else
       cout << "Failed!\n";
   }
-  else
-  {
+  else {
     cout << "Failed!\n";
   }
   cp.SetEditLock(false);
@@ -130,8 +128,8 @@ int main() {
   cout << "Longitude = " << surfPt.GetLongitude().GetDegrees() << endl;
   cout << "Radius = " << surfPt.GetLocalRadius().GetMeters() << endl;
   surfPt.SetSpherical(Latitude(32, Angle::Degrees),
-                      Longitude(120, Angle::Degrees),
-                      Distance(1000, Distance::Meters));
+      Longitude(120, Angle::Degrees),
+      Distance(1000, Distance::Meters));
   cp.SetSurfacePoint(surfPt);
   surfPt = cp.GetSurfacePoint();
   cout << "X = " << surfPt.GetX().GetMeters() << endl;

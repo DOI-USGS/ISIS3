@@ -611,7 +611,7 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    const ControlMeasure * cm = referenceMeasure;
+    const ControlMeasure *cm = referenceMeasure;
     return cm;
   }
 
@@ -780,7 +780,7 @@ namespace Isis {
    *                        tied to
    */
   ControlPoint::Status ControlPoint::SetSurfacePoint(
-      SurfacePoint newSurfacePoint) {
+    SurfacePoint newSurfacePoint) {
     if (editLock)
       return PointLocked;
     PointModified();
@@ -859,7 +859,7 @@ namespace Isis {
    * @param aprioriSP The apriori surface point to remember
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePoint(
-      SurfacePoint aprioriSP) {
+    SurfacePoint aprioriSP) {
     if (editLock)
       return PointLocked;
     PointModified();
