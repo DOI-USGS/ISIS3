@@ -11,7 +11,7 @@ End
 Test 2
 Group = ControlMeasure
   SerialNumber   = Test
-  MeasureType    = Reference
+  MeasureType    = Candidate
   ChooserName    = Bob
   DateTime       = 2005-05-03T00:00:00
   Ignore         = True
