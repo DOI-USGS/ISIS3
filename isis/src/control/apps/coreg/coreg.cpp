@@ -155,7 +155,6 @@ void IsisMain() {
       cmMatch->SetCubeSerialNumber(serialMatch);
       cmMatch->SetCoordinate(samp, line, ControlMeasure::RegisteredPixel);
       cmMatch->SetChooserName("coreg");
-      cmMatch->SetType(ControlMeasure::Reference);
 
       ar->Register();
 
@@ -176,6 +175,7 @@ void IsisMain() {
       cp->SetType(ControlPoint::Tie);
       cp->Add(cmTrans);
       cp->Add(cmMatch);
+      cp->SetRefMeasure(cmMatch);
       if(!cmTrans->IsMeasured()) cp->SetIgnored(true);
       cn.AddPoint(cp);
       prog.CheckStatus();
