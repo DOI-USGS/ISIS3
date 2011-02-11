@@ -1,56 +1,80 @@
 #include "Isis.h"
 
-#include "ProgramLauncher.h"
+#include "Pipeline.h"
 
 using namespace std;
 using namespace Isis;
 
 void IsisMain() {
-
-  // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  Filename fname = ui.GetFilename("FROM");
-  string name = fname.Basename();
+  Pipeline pipeline("viknopepper");
+
   bool rmv = ui.GetBoolean("REMOVE");
 
   // Run a standard deviation filter on the cube
-  string inFile = ui.GetFilename("FROM");
-  string outFile = name + ".step1.cub";
-  string parameters = "FROM=" + inFile + " TO=" + outFile
-                      + " toldef=stddev flattol=10 line=9 samp=9 minimum=9 tolmin=4.0 tolmax=4.0"
-                      + " replace=null";
-  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
+  pipeline.SetInputFile("FROM");
+  pipeline.SetOutputFile("TO");
+  pipeline.KeepTemporaryFiles(!rmv);
+
+  pipeline.AddToPipeline("noisefilter", "noisefilter1");
+  pipeline.Application("noisefilter1").SetInputParameter("FROM", false);
+  pipeline.Application("noisefilter1").SetOutputParameter("TO", "step1");
+  pipeline.Application("noisefilter1").AddConstParameter("toldef", "stddev");
+  pipeline.Application("noisefilter1").AddConstParameter("flattol", "10");
+  pipeline.Application("noisefilter1").AddConstParameter("line", "9");
+  pipeline.Application("noisefilter1").AddConstParameter("samp", "9");
+  pipeline.Application("noisefilter1").AddConstParameter("minimum", "9");
+  pipeline.Application("noisefilter1").AddConstParameter("tolmin", "4.0");
+  pipeline.Application("noisefilter1").AddConstParameter("tolmax", "4.0");
+  pipeline.Application("noisefilter1").AddConstParameter("replace", "null");
 
   // Run a standard deviation filter on the cube
-  inFile = outFile;
-  outFile = name + ".step2.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " toldef=stddev flattol=10 line=3 samp=3 minimum=3 tolmin=3.5 tolmax=3.5";
-  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("noisefilter", "noisefilter2");
+  pipeline.Application("noisefilter2").SetInputParameter("FROM", false);
+  pipeline.Application("noisefilter2").SetOutputParameter("TO", "step2");
+  pipeline.Application("noisefilter2").AddConstParameter("toldef", "stddev");
+  pipeline.Application("noisefilter2").AddConstParameter("flattol", "10");
+  pipeline.Application("noisefilter2").AddConstParameter("line", "3");
+  pipeline.Application("noisefilter2").AddConstParameter("samp", "3");
+  pipeline.Application("noisefilter2").AddConstParameter("minimum", "3");
+  pipeline.Application("noisefilter2").AddConstParameter("tolmin", "3.5");
+  pipeline.Application("noisefilter2").AddConstParameter("tolmax", "3.5");
 
   // Run a standard deviation filter on the cube
-  inFile = outFile;
-  outFile = name + ".step3.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile
-               + " toldef=stddev flattol=10 samp=9 line=9 minimum=9 tolmin=4.0 tolmax=4.0"
-               + " replace=null";
-  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("noisefilter", "noisefilter3");
+  pipeline.Application("noisefilter3").SetInputParameter("FROM", false);
+  pipeline.Application("noisefilter3").SetOutputParameter("TO", "step3");
+  pipeline.Application("noisefilter3").AddConstParameter("toldef", "stddev");
+  pipeline.Application("noisefilter3").AddConstParameter("flattol", "10");
+  pipeline.Application("noisefilter3").AddConstParameter("line", "9");
+  pipeline.Application("noisefilter3").AddConstParameter("samp", "9");
+  pipeline.Application("noisefilter3").AddConstParameter("minimum", "9");
+  pipeline.Application("noisefilter3").AddConstParameter("tolmin", "4.0");
+  pipeline.Application("noisefilter3").AddConstParameter("tolmax", "4.0");
+  pipeline.Application("noisefilter3").AddConstParameter("replace", "null");
 
   // Run a standard deviation filter on the cube
-  inFile = outFile;
-  outFile = name + ".step4.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " toldef=stddev samp=3 line=3 minimum=3 tolmin=3.5 tolmax=3.5";
-  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("noisefilter", "noisefilter4");
+  pipeline.Application("noisefilter4").SetInputParameter("FROM", false);
+  pipeline.Application("noisefilter4").SetOutputParameter("TO", "step4");
+  pipeline.Application("noisefilter4").AddConstParameter("toldef", "stddev");
+  pipeline.Application("noisefilter4").AddConstParameter("line", "3");
+  pipeline.Application("noisefilter4").AddConstParameter("samp", "3");
+  pipeline.Application("noisefilter4").AddConstParameter("minimum", "3");
+  pipeline.Application("noisefilter4").AddConstParameter("tolmin", "3.5");
+  pipeline.Application("noisefilter4").AddConstParameter("tolmax", "3.5");
+
 
   // Run a lowpass filter on the cube
-  inFile = outFile;
-  outFile = ui.GetFilename("TO");
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " filter=outside samp=3 line=3 minimum=5 replacement=null";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("lowpass");
+  pipeline.Application("lowpass").SetInputParameter("FROM", false);
+  pipeline.Application("lowpass").SetOutputParameter("TO", "", "cub");
+  pipeline.Application("lowpass").AddConstParameter("filter", "outside");
+  pipeline.Application("lowpass").AddConstParameter("samp", "3");
+  pipeline.Application("lowpass").AddConstParameter("line", "3");
+  pipeline.Application("lowpass").AddConstParameter("minimum", "5");
+  pipeline.Application("lowpass").AddConstParameter("replacement", "null");
+
+  pipeline.Run();
 }
+
