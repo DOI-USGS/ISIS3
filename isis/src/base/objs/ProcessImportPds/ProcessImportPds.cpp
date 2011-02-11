@@ -168,28 +168,112 @@ namespace Isis {
   }
 
   /**
-   * Process the PDS label of type IMAGE.
-   *
-   * @param pdsDataFile The name of the PDS data file where the actual image/cube
-   *                    data is stored. This parameter can be an empty string, in
-   *                    which case the label information will be searched to find
-   *                    the data file name or the data will be assumed to be
-   *                    after the label information.
-   *
-   * @throws Isis::iException::Message
+   * Handles the DataFilePointer keyword, aka ^QUBE or ^IMAGE.
+   * There are two side effects of this method, those are
+   * SetInputFile and SetFileHeaderBytes, both are called during this method.
+   * Will not do SetInputFile if calcOffsetOnly is true
    */
-  void ProcessImportPds::ProcessPdsImageLabel(const std::string &pdsDataFile) {
-    Isis::Filename transFile(p_transDir + "/translations/pdsImage.trn");
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.Expanded());
-
+  void ProcessImportPds::ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater, const bool & calcOffsetOnly) {
+    const PvlKeyword & dataFilePointer = pdsXlater.InputKeyword("DataFilePointer");
+    
+    Isis::iString dataFileName;
+    Isis::iString units;
     Isis::iString str;
+    int offset = -1;
 
-    str = pdsXlater.Translate("CoreLinePrefixBytes");
-    SetDataPrefixBytes(str.ToInteger());
+    // If only size 1, we either have a file name or an offset
+    // Either way, when we're done with these two ifs, offst and fname
+    // will be set.
+    if (dataFilePointer.Size() == 1) {
+      try {
+        str = pdsXlater.Translate("DataFilePointer");
+        offset = str.ToInteger();
+        units = dataFilePointer.Unit();
+        // Successful? we have an offset, means current, p_labelFile
+        // is the location of the data as well
+        dataFileName = p_labelFile;
+      } 
+      catch(Isis::iException &e) {
+        e.Clear();
+        // Failed to parse to an int, means we have a file name
+        // No offset given, so we use 1, offsets are 1 based 
+        offset = 1;
+        units = "BYTES";
+        dataFileName = str;
+      }
+    }
+    // We must have a filename and an offset, in that order
+    // Expection ("filname", <offset>)
+    else if (dataFilePointer.Size() == 2) {
+      dataFileName = pdsXlater.Translate("DataFilePointer", 0);
+      offset = iString(pdsXlater.Translate("DataFilePointer", 1)).ToInteger();
+      units = dataFilePointer.Unit(1);
+    }
+    // Error, no value
+    else if (dataFilePointer.Size() == 0) {
+      string msg = "Data file pointer ^IMAGE or ^QUBE has no value, must"
+                   "have either file name or offset or both, in [" +
+                   p_labelFile + "]";
+      throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
+    }
+    // Error, more than two values
+    else {
+      string msg = "Improperly formatted data file pointer keyword ^IMAGE or "
+                   "^QUBE, in [" + p_labelFile + "], must contain filename "
+                   " or offset or both";
+      throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
+    }
+    
+    // Now, to handle the values we found
+    // the filename first, only do so if calcOffsetOnly is false
+    if (!calcOffsetOnly) {
+      Isis::Filename labelFile(p_labelFile);
+      
+      // If dataFileName isn't empty, and does start at the root, use it
+      Isis::Filename dataFile;
+      if (dataFileName.size() != 0 && dataFileName.at(0) == '/')
+        dataFile = Filename(dataFileName);
+      // Otherwise, use the path to it and its name
+      else
+        dataFile = Filename(labelFile.Path() + "/" + dataFileName);
 
-    str = pdsXlater.Translate("CoreLineSuffixBytes");
-    SetDataSuffixBytes(str.ToInteger());
+      // If it exists, use it
+      if (dataFile.Exists()) {
+        SetInputFile(dataFile.Expanded());
+      }
+      // Retry with downcased name, if still no luck, fail
+      else {
+        string tmp = dataFile.Expanded();
+        dataFileName.DownCase();
+        dataFile = Filename(labelFile.Path() + "/" + dataFileName);
+        if (dataFile.Exists()) {
+          SetInputFile(dataFile.Expanded());
+        }
+        else {
+          string msg = "Unable to find input file [" + tmp + "] or [" +
+                       dataFile.Expanded() + "]";
+          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        }
+      }
+    }
 
+    // Now, to handle the offset
+    units.Trim(" \t\r\v\n");
+    if (units == "BYTES" || units == "B") {
+      SetFileHeaderBytes(offset);  
+    }
+    else {
+      Isis::iString recSize = pdsXlater.Translate("DataFileRecordBytes");
+      SetFileHeaderBytes((offset - 1) * recSize.ToInteger());
+    }
+  }
+
+  /**
+   * Handles PixelType and BitsPerPixel
+   * Calls SetPixelType with the correct values
+   */
+  void ProcessImportPds::ProcessPixelBitandType(Isis::PvlTranslationManager & pdsXlater) {
+    iString str;
     str = pdsXlater.Translate("CoreBitsPerPixel");
     int bitsPerPixel = str.ToInteger();
     str = pdsXlater.Translate("CorePixelType");
@@ -222,18 +306,13 @@ namespace Isis {
                    ", " + Isis::iString(bitsPerPixel) + "]";
       throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
     }
+  } 
 
-    str = pdsXlater.Translate("CoreByteOrder");
-    SetByteOrder(Isis::ByteOrderEnumeration(str));
-
-    str = pdsXlater.Translate("CoreSamples");
-    int ns = str.ToInteger();
-    str = pdsXlater.Translate("CoreLines");
-    int nl = str.ToInteger();
-    str = pdsXlater.Translate("CoreBands");
-    int nb = str.ToInteger();
-    SetDimensions(ns, nl, nb);
-
+  /**
+   * Handles all special pixel setting, ultimately, calls SetSpecialValues. 
+   */
+  void ProcessImportPds::ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube) {
+    iString str;
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
     if(pdsXlater.InputHasKeyword("CoreNull")) {
@@ -242,7 +321,7 @@ namespace Isis {
         pdsNull = str.ToDouble();
       }
     }
-    else if(pdsXlater.InputHasKeyword("CoreNull2")) {
+    else if(!isQube && pdsXlater.InputHasKeyword("CoreNull2")) {
       str = pdsXlater.Translate("CoreNull2");
       if(str != "NULL") {
         pdsNull = str.ToDouble();
@@ -256,7 +335,7 @@ namespace Isis {
         pdsLrs = str.ToDouble();
       }
     }
-    else if(pdsXlater.InputHasKeyword("CoreLrs2")) {
+    else if(!isQube && pdsXlater.InputHasKeyword("CoreLrs2")) {
       str = pdsXlater.Translate("CoreLrs2");
       if(str != "NULL") {
         pdsLrs = str.ToDouble();
@@ -270,7 +349,7 @@ namespace Isis {
         pdsLis = str.ToDouble();
       }
     }
-    else if(pdsXlater.InputHasKeyword("CoreLis2")) {
+    else if(!isQube && pdsXlater.InputHasKeyword("CoreLis2")) {
       str = pdsXlater.Translate("CoreLis2");
       if(str != "NULL") {
         pdsLis = str.ToDouble();
@@ -284,7 +363,7 @@ namespace Isis {
         pdsHrs = str.ToDouble();
       }
     }
-    else if(pdsXlater.InputHasKeyword("CoreHrs2")) {
+    else if(!isQube && pdsXlater.InputHasKeyword("CoreHrs2")) {
       str = pdsXlater.Translate("CoreHrs2");
       if(str != "NULL") {
         pdsHrs = str.ToDouble();
@@ -298,7 +377,7 @@ namespace Isis {
         pdsHis = str.ToDouble();
       }
     }
-    else if(pdsXlater.InputHasKeyword("CoreHis2")) {
+    else if(!isQube && pdsXlater.InputHasKeyword("CoreHis2")) {
       str = pdsXlater.Translate("CoreHis2");
       if(str != "NULL") {
         pdsHis = str.ToDouble();
@@ -306,6 +385,46 @@ namespace Isis {
     }
 
     SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
+  }
+
+  /**
+   * Process the PDS label of type IMAGE.
+   *
+   * @param pdsDataFile The name of the PDS data file where the actual image/cube
+   *                    data is stored. This parameter can be an empty string, in
+   *                    which case the label information will be searched to find
+   *                    the data file name or the data will be assumed to be
+   *                    after the label information.
+   *
+   * @throws Isis::iException::Message
+   */
+  void ProcessImportPds::ProcessPdsImageLabel(const std::string &pdsDataFile) {
+    Isis::Filename transFile(p_transDir + "/translations/pdsImage.trn");
+    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.Expanded());
+
+    Isis::iString str;
+
+    str = pdsXlater.Translate("CoreLinePrefixBytes");
+    SetDataPrefixBytes(str.ToInteger());
+
+    str = pdsXlater.Translate("CoreLineSuffixBytes");
+    SetDataSuffixBytes(str.ToInteger());
+
+    ProcessPixelBitandType(pdsXlater); 
+
+    str = pdsXlater.Translate("CoreByteOrder");
+    SetByteOrder(Isis::ByteOrderEnumeration(str));
+
+    str = pdsXlater.Translate("CoreSamples");
+    int ns = str.ToInteger();
+    str = pdsXlater.Translate("CoreLines");
+    int nl = str.ToInteger();
+    str = pdsXlater.Translate("CoreBands");
+    int nb = str.ToInteger();
+    SetDimensions(ns, nl, nb);
+
+    // Set any special pixel values, not qube, so use false
+    ProcessSpecialPixels(pdsXlater, false);
 
     //-----------------------------------------------------------------
     // Find the data filename it may be the same as the label file
@@ -315,122 +434,19 @@ namespace Isis {
     // Use the name supplied by the application if it is there
     if(pdsDataFile.length() > 0) {
       SetInputFile(pdsDataFile);
+      ProcessDataFilePointer(pdsXlater, true); 
     }
     // If the data is in JPEG 2000 format, then use the name of the file
     // from the label
     else if(p_jp2File.length() > 0) {
       SetInputFile(p_jp2File);
+      ProcessDataFilePointer(pdsXlater, true); 
     }
     // Use the "^IMAGE or ^QUBE" label to get the filename for the image data
     // Get the path portion from user entered label file spec
-    else if(pdsXlater.InputKeyword("DataFilePointer").Size() == 2) {
-      Isis::iString dataFile;
-      dataFile = pdsXlater.Translate("DataFilePointer", 0);
-      Isis::Filename lfile(p_labelFile);
-      
-      Isis::Filename ifile;
-      if (dataFile.size() && dataFile.at(0) == '/')
-        ifile = dataFile;
-      else
-        ifile = lfile.Path() + "/" + dataFile;
-                
-      if(ifile.Exists()) {
-        SetInputFile(ifile.Expanded());
-      }
-      else {
-        string tmp = ifile.Expanded();
-        dataFile.DownCase();
-        ifile = lfile.Path() + "/" + dataFile;
-        if(ifile.Exists()) {
-          SetInputFile(ifile.Expanded());
-        }
-        else {
-          string msg = "Unable to find input file [" + tmp + "] or [" +
-                       ifile.Expanded() + "]";
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-        }
-      }
-    }
-    // The ^IMAGE keyword contains either the filename or the offset
-    // within this file
-    else if(pdsXlater.InputKeyword("DataFilePointer").Size() == 1) {
-      // Try converting the single value to an integer. If that works
-      // then the iamge data must be in the same file as the labels
-      try {
-        str = pdsXlater.Translate("DataFilePointer");
-        str.ToInteger();
-        SetInputFile(p_labelFile);
-      }
-      // If it can't be converted to an integer then it must be
-      // the name of the file that contains the image data
-      catch(Isis::iException &e) {
-        Isis::iString dataFile;
-        dataFile = pdsXlater.Translate("DataFilePointer", 0);
-        Isis::Filename lfile(p_labelFile);
-        Isis::Filename ifile(lfile.Path() + "/" + dataFile);
-        if(ifile.Exists()) {
-          SetInputFile(ifile.Expanded());
-        }
-        else {
-          string tmp = ifile.Expanded();
-          dataFile.DownCase();
-          ifile = lfile.Path() + "/" + dataFile;
-          if(ifile.Exists()) {
-            SetInputFile(ifile.Expanded());
-          }
-          else {
-            string msg = "Unable to find input file [" + tmp + "] or [" +
-                         ifile.Expanded() + "]";
-            throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-          }
-        }
-      }
-    }
-
-    // Could not find a filename for the image data
     else {
-      string msg = "No data filename available on command line or in [" +
-                   p_labelFile + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
-
-    //----------------------------------------------------------------
-    // Calculate the file header size
-    //----------------------------------------------------------------
-
-    Isis::iString units;
-    if(pdsXlater.InputKeyword("DataStart").Size() == 1) {
-      str = pdsXlater.Translate("DataStart", 0);
-      units = pdsXlater.InputKeyword("DataStart").Unit();
-      try {
-        str.ToInteger();
-      }
-      catch(Isis::iException &e) {
-        str = "1";
-        units = "BYTES";
-      }
-    }
-    else if(pdsXlater.InputKeyword("DataStart").Size() == 2) {
-      str = pdsXlater.Translate("DataStart", 1);
-      units = pdsXlater.InputKeyword("DataStart").Unit(1);
-    }
-    else {
-      string msg = "Invalid PDS labels in file [" + p_labelFile +
-                   "]. Label value [" +
-                   pdsXlater.InputKeywordName("DataStart") + "]" ;
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
-
-    units.Trim(" \t\r\v\n");
-    // Set the number of file header bytes using a byte count
-    // byte counts are 1 based
-    if((units == "BYTES") || (units == "B")) {
-      SetFileHeaderBytes(str.ToInteger() - 1);
-    }
-    // Set the number of file header bytes using a record number
-    else {
-      Isis::iString recSize = pdsXlater.Translate("DataFileRecordBytes");
-      SetFileHeaderBytes((str.ToInteger() - 1) * recSize.ToInteger());
+      // Handle filename and offset
+      ProcessDataFilePointer(pdsXlater, false); 
     }
 
     //------------------------------------------------------------
@@ -478,9 +494,7 @@ namespace Isis {
   void ProcessImportPds::ProcessPdsQubeLabel(const std::string &pdsDataFile,
       const std::string &transFile) {
 
-    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    Isis::iString transDir = (string) dataDir["Base"];
-    Isis::Filename tFile(transDir + "/translations/" + transFile);
+    Isis::Filename tFile(p_transDir + "/translations/" + transFile);
 
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.Expanded());
 
@@ -544,38 +558,7 @@ namespace Isis {
     trailer += suffix;
     SetDataTrailerBytes(trailer);
 
-    str = pdsXlater.Translate("CoreBitsPerPixel");
-    int bitsPerPixel = str.ToInteger();
-    str = pdsXlater.Translate("CorePixelType");
-    if((str == "Real") && (bitsPerPixel == 32)) {
-      SetPixelType(Isis::Real);
-    }
-    else if((str == "Integer") && (bitsPerPixel == 8)) {
-      SetPixelType(Isis::UnsignedByte);
-    }
-    else if((str == "Integer") && (bitsPerPixel == 16)) {
-      SetPixelType(Isis::SignedWord);
-    }
-    else if((str == "Integer") && (bitsPerPixel == 32)) {
-      SetPixelType(Isis::SignedInteger);
-    }
-    else if((str == "Natural") && (bitsPerPixel == 8)) {
-      SetPixelType(Isis::UnsignedByte);
-    }
-    else if((str == "Natural") && (bitsPerPixel == 16)) {
-      SetPixelType(Isis::UnsignedWord);
-    }
-    else if((str == "Natural") && (bitsPerPixel == 16)) {
-      SetPixelType(Isis::SignedWord);
-    }
-    else if((str == "Natural") && (bitsPerPixel == 32)) {
-      SetPixelType(Isis::UnsignedInteger);
-    }
-    else {
-      string msg = "Invalid PixelType and BitsPerPixel combination [" + str +
-                   ", " + Isis::iString(bitsPerPixel) + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
+    ProcessPixelBitandType(pdsXlater); 
 
     // Set the byte order
     str = pdsXlater.Translate("CoreByteOrder");
@@ -590,43 +573,8 @@ namespace Isis {
     int nb = str.ToInteger();
     SetDimensions(ns, nl, nb);
 
-    // Set any special pixel values
-    double pdsNull = Isis::NULL8;
-    if(pdsXlater.InputHasKeyword("CoreNull")) {
-      str = pdsXlater.Translate("CoreNull");
-      if(str != "NULL") {
-        pdsNull = str.ToDouble();
-      }
-    }
-    double pdsLrs = Isis::Lrs;
-    if(pdsXlater.InputHasKeyword("CoreLrs")) {
-      str = pdsXlater.Translate("CoreLrs");
-      if(str != "NULL") {
-        pdsLrs = str.ToDouble();
-      }
-    }
-    double pdsLis = Isis::Lis;
-    if(pdsXlater.InputHasKeyword("CoreLis")) {
-      str = pdsXlater.Translate("CoreLis");
-      if(str != "NULL") {
-        pdsLis = str.ToDouble();
-      }
-    }
-    double pdsHrs = Isis::Hrs;
-    if(pdsXlater.InputHasKeyword("CoreHrs")) {
-      str = pdsXlater.Translate("CoreHrs");
-      if(str != "NULL") {
-        pdsHrs = str.ToDouble();
-      }
-    }
-    double pdsHis = Isis::Hrs;
-    if(pdsXlater.InputHasKeyword("CoreHis")) {
-      str = pdsXlater.Translate("CoreHis");
-      if(str != "NULL") {
-        pdsHis = str.ToDouble();
-      }
-    }
-    SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
+    // Set any special pixels values, qube, so use true
+    ProcessSpecialPixels(pdsXlater, true);
 
     //---------------------------------------------------------------
     // Find the data filename, it may be the same as the label file
@@ -634,92 +582,21 @@ namespace Isis {
     //---------------------------------------------------------------
 
     // Use the name supplied by the application if it is there
-    bool bFileOnly   = false;
-    bool bOffsetOnly = false;
-    Isis::iString units;
     if(pdsDataFile.length() > 0) {
       SetInputFile(pdsDataFile);
+      ProcessDataFilePointer(pdsXlater, true);
     }
     // If the data is in JPEG 2000 format, then use the name of the file
     // from the label
     else if(p_jp2File.length() > 0) {
       SetInputFile(p_jp2File);
+      ProcessDataFilePointer(pdsXlater, true);
     }
-    else if(pdsXlater.InputKeyword("DataFilePointer").Size() == 1 || 
-            pdsXlater.InputKeyword("DataFilePointer").Size() == 2) {
-      if(pdsXlater.InputKeyword("DataFilePointer").Size() == 1) {
-        str = pdsXlater.Translate("DataFilePointer", 0);
-        try {
-          str.ToInteger();
-          SetInputFile(p_labelFile);
-          bOffsetOnly = true;
-        } 
-        catch(Isis::iException &e) {
-          str = "1";
-          units = "BYTES";
-          bFileOnly = true;
-        }
-      }
-      
-      if(!bOffsetOnly) {
-        Isis::iString dataFile;
-        dataFile = pdsXlater.Translate("DataFilePointer", 0);
-        Isis::Filename lfile(p_labelFile);
-        Isis::Filename ifile(lfile.Path() + "/" + dataFile);
-        if(ifile.Exists()) {
-          SetInputFile(ifile.Expanded());
-        }
-        else {
-          string tmp = ifile.Expanded();
-          dataFile.DownCase();
-          ifile = lfile.Path() + "/" + dataFile;
-          if(ifile.Exists()) {
-            SetInputFile(ifile.Expanded());
-          }
-          else {
-            string msg = "Unable to find input file [" + tmp + "] or [" +
-              ifile.Expanded() + "]";
-            throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-          }
-        }
-      }
+    else { 
+      // Handle filename and offset
+      ProcessDataFilePointer(pdsXlater, false);
     }
-    // Could not find a filename for the image data
-    else {
-      string msg = "No data filename available on command line or in [" +
-                   p_labelFile + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
-
-    //----------------------------------------------------------------
-    // Calculate the file header size
-    //----------------------------------------------------------------
-    if(!bFileOnly && pdsXlater.InputKeyword("DataFilePointer").Size() == 1) {
-      str = pdsXlater.Translate("DataFilePointer", 0);
-      units = pdsXlater.InputKeyword("DataFilePointer").Unit();
-    }
-    else if(pdsXlater.InputKeyword("DataFilePointer").Size() == 2) {
-      str = pdsXlater.Translate("DataFilePointer", 1);
-      units = pdsXlater.InputKeyword("DataFilePointer").Unit(1);
-    }
-    else {
-      string msg = "Invalid PDS labels in file [" + p_labelFile +
-                   "]. Label value [" +
-                   pdsXlater.InputKeywordName("DataFilePointer") + "]" ;
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
-
-    units.Trim(" \t\r\v\n");
-    // Set the number of file header bytes using a byte count
-    // Byte positions are 1 based
-    if(units == "BYTES") {
-      SetFileHeaderBytes(str.ToInteger() - 1);
-    }
-    // Set the number of file header bytes using a record number
-    else {
-      Isis::iString recSize = pdsXlater.Translate("DataFileRecordBytes");
-      SetFileHeaderBytes((str.ToInteger() - 1) * recSize.ToInteger());
-    }
+       
 
     //------------------------------------------------------------
     // Find the image data base and multiplier

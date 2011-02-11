@@ -174,6 +174,10 @@ namespace Isis {
    *               Absolute paths are now supported for the ^IMAGE Keyword
    *  @history 2010-12-09 Sharmila Prasad - Set default offset to be 1 for detatched label 
    *                                       and  offset not set
+   *  @history 2011-02-11 Mackenzie Boyd - Added methods ProcessDataFilePointer,
+   *                          ProcessPixelBitandType, and ProcessSpecialPixels, removed
+   *                          duplicate code in ProcessImage and ProcessQube labels.
+   *                          Fixed functionality regarding ^QUBE pointer having no offest.
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
@@ -250,6 +254,10 @@ namespace Isis {
 
       Source p_source;
 
+      void ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater, const bool & calcOffsetOnly);
+      void ProcessPixelBitandType(Isis::PvlTranslationManager & pdsXlater);
+      void ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube);
+        
       void ProcessPdsImageLabel(const std::string &pdsDataFile);
       void ProcessPdsQubeLabel(const std::string &pdsDataFile, const std::string &transFile);
 
