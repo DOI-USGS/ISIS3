@@ -164,12 +164,12 @@ void IsisMain() {
       if(noIgnore && newMeasure->IsIgnored()) {
         ignoredMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
         //New error with deleting Reference Measures
-        if(!newMeasure->GetType() == ControlMeasure::Reference)
+        if(newPoint->GetRefMeasure() != newMeasure)
           newPoint->Delete(cm);
         else
           shouldDeleteReferenceMeasure = true;
       }
-      else if(reference && !newMeasure->GetType() == ControlMeasure::Reference) {
+      else if(reference && newPoint->GetRefMeasure() != newMeasure) {
         nonReferenceMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
         newPoint->Delete(cm);
       }
@@ -183,7 +183,7 @@ void IsisMain() {
         if(!hasSerialNumber) {
           noCubeMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
           //New error with deleting Reference Measures
-          if(!newMeasure->GetType() == ControlMeasure::Reference)
+          if(newPoint->GetRefMeasure() != newMeasure)
             newPoint->Delete(cm);
           else
             shouldDeleteReferenceMeasure = true;
@@ -518,8 +518,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
       if(controlPt->HasReference()) {
         //cm = controlPt->GetReferenceIndex();
         //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
-        if(!sn2filename[controlPt->GetReferenceMeasure()->GetCubeSerialNumber()].length() == 0) {
-          sn = controlPt->GetReferenceMeasure()->GetCubeSerialNumber();
+        if(!sn2filename[controlPt->GetReferenceSN()].length() == 0) {
+          sn = controlPt->GetReferenceSN();
         }
       }
 
@@ -528,8 +528,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
         // Find the Serial Number if it exists
         for(int cm = 0; (cm < controlPt->GetNumMeasures()) && sn.empty(); cm ++) {
           //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
-          if(!sn2filename[controlPt->GetReferenceMeasure()->GetCubeSerialNumber()].length() == 0) {
-            sn = controlPt->GetReferenceMeasure()->GetCubeSerialNumber();
+          if(!sn2filename[controlPt->GetReferenceSN()].length() == 0) {
+            sn = controlPt->GetReferenceSN();
           }
         }
       }
