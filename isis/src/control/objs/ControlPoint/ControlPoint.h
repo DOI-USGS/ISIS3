@@ -39,6 +39,7 @@ namespace Isis {
   class PBControlNet_PBControlPoint;
   class PBControlNetLogData_Point;
   class PvlObject;
+  class Statistics;
 
   /**
    * @brief A single control point
@@ -77,7 +78,7 @@ namespace Isis {
    *   @history 2009-03-07 Debbie A. Cook Fixed ComputeErrors method to set
    *            focal plane coordinates
    *            without changing time and improved error messages.
-   *   @history 2009-06-03 Christopher Austin, Added the p_invalid functionality
+   *   @history 2009-06-03 Christopher Austin, Added the invalid functionality
    *            along with forceBuild, fixed documentation errors.
    *   @history 2009-06-22 Jeff Anderson, Modified ComputeAprior
    *            method to correctly handle ground and held points.
@@ -197,9 +198,15 @@ namespace Isis {
    *            methods to prevent further use of them.
    *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlNet.
    *   @history 2011-01-17 Eric Hyer - Points now own and delete their measures.
-   *                           ControlNet now notified of changes (like adding
-   *                           and removing measures).  Returning pointers to
-   *                           measures is now safe and encouraged.
+   *                ControlNet now notified of changes (like adding and removing
+   *                measures).  Returning pointers to measures is now safe and
+   *                encouraged.
+   *   @history 2011-02-10 Eric Hyer - measures no longer know or care if they
+   *                are the reference measure.  This information is now
+   *                completely maintained by this class.  Made numerous API and
+   *                internal changes, eliminating substantial duplicate code
+   *                and increasing interface clearity.  Hungarian notation now
+   *                eliminated from this class.
    */
   class ControlPoint {
       friend class ControlNet;
@@ -278,7 +285,7 @@ namespace Isis {
       ControlPoint(const iString &id);
       ControlPoint(const PBControlNet_PBControlPoint &);
       ControlPoint(const PBControlNet_PBControlPoint &,
-                   const PBControlNetLogData_Point &);
+          const PBControlNetLogData_Point &);
       ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }
@@ -293,24 +300,27 @@ namespace Isis {
       const ControlMeasure *GetMeasure(iString serialNumber) const;
       ControlMeasure *GetMeasure(iString serialNumber);
 
-      const ControlMeasure * GetMeasure(int index) const;
-      ControlMeasure * GetMeasure(int index);
+      const ControlMeasure *GetMeasure(int index) const;
+      ControlMeasure *GetMeasure(int index);
 
-      const ControlMeasure *GetReferenceMeasure() const;
-      ControlMeasure *GetReferenceMeasure();
+      const ControlMeasure *GetRefMeasure() const;
+      ControlMeasure *GetRefMeasure();
 
       Status SetChooserName(iString name);
-      Status SetDateTime(iString dateTime);
+      Status SetDateTime(iString newDateTime);
       Status SetEditLock(bool editLock);
       Status SetId(iString id);
+      Status SetRefMeasure(ControlMeasure *cm);
+      Status SetRefMeasure(int index);
+      Status SetRefMeasure(iString sn);
       Status SetRejected(bool rejected);
-      Status SetIgnored(bool ignore);
-      Status SetSurfacePoint(SurfacePoint surfacePoint);
-      Status SetType(PointType type);
+      Status SetIgnored(bool newIgnoreStatus);
+      Status SetSurfacePoint(SurfacePoint newSurfacePoint);
+      Status SetType(PointType newType);
 
       Status SetAprioriRadiusSource(RadiusSource::Source source);
       Status SetAprioriRadiusSourceFile(iString sourceFile);
-      Status SetAprioriSurfacePoint(SurfacePoint aprioriSurfacePoint);
+      Status SetAprioriSurfacePoint(SurfacePoint aprioriSP);
       Status SetAprioriSurfacePointSource(SurfacePointSource::Source source);
       Status SetAprioriSurfacePointSourceFile(iString sourceFile);
 
@@ -346,20 +356,14 @@ namespace Isis {
       int GetNumValidMeasures() const;
       int GetNumLockedMeasures() const;
       bool HasSerialNumber(iString serialNumber) const;
+      int  IndexOf(ControlMeasure *, bool throws = true) const;
+      int  IndexOf(iString sn, bool throws = true) const;
+      int  IndexOfRefMeasure() const;
       bool HasReference() const;
-      int  GetReferenceIndex() const;
-      int  GetReferenceIndexNoException() const;
-      QString GetReferenceKey() const;
-      QString GetReferenceKeyNoException() const;
-      bool IsReferenceLocked() const;
+      QString GetReferenceSN() const;
 
-      double GetAverageResidual() const;
-      double GetMinimumResidual() const;
-      double GetMinimumSampleResidual() const;
-      double GetMinimumLineResidual() const;
-      double GetMaximumResidual() const;
-      double GetMaximumSampleResidual() const;
-      double GetMaximumLineResidual() const;
+      Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
+
 
       QList< QString > GetCubeSerialNumbers() const;
 
@@ -385,18 +389,18 @@ namespace Isis {
 
 
     private:
-      void validateMeasure(iString serialNumber, bool checkRef = false) const;
-
+      void validateMeasure(iString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
-
       void Init(const PBControlNet_PBControlPoint &);
-
       void PointModified();
+
+
+    private:
 
       ControlNet *parentNetwork;
 
       //!< List of Control Measures
-      QHash< QString, ControlMeasure * > * p_measures;
+      QHash< QString, ControlMeasure * > * measures;
 
       QStringList *cubeSerials;
 
@@ -407,7 +411,7 @@ namespace Isis {
        *   identifier for control points. This often has a number in it, and
        *   looks like "T0052" where the next one is "T0053" and so on.
        */
-      iString p_id;
+      iString id;
 
       /**
        * This is the user name of the person who last modified this control
@@ -417,61 +421,61 @@ namespace Isis {
        *   be updated. This is an empty string if we need to dynamically
        *   get the username of the caller when asked for (or written to file).
        */
-      iString p_chooserName;
+      iString chooserName;
 
       /**
        * This is the last modified date and time. This is updated automatically
-       *   and works virtually in the same way as p_chooserName.
+       *   and works virtually in the same way as chooserName.
        */
-      iString p_dateTime;
+      iString dateTime;
 
       /**
        * What this control point is tying together.
        * @see PointType
        */
-      PointType p_type;
+      PointType type;
 
       /**
        * If we forced a build that we would normally have thrown an exception
        *   for then this is set to true. Otherwise, and most of the time, this
        *   is false.
        */
-      bool p_invalid;
+      bool invalid;
 
       /**
        * This stores the edit lock state.
        * @see SetEditLock
        */
-      bool p_editLock;
+      bool editLock;
 
       /**
        * This stores the jigsaw rejected state.
        * @see SetJigsawReject
        */
-      bool p_jigsawRejected;
+      bool jigsawRejected;
 
       /**
        * True if we should preserve but ignore the entire control point and its
        *   measures.
        */
-      bool p_ignore;
+      bool ignore;
 
       //! Where the apriori surface point originated from
-      SurfacePointSource::Source p_aprioriSurfacePointSource;
+      SurfacePointSource::Source aprioriSurfacePointSource;
 
       //! Filename where the apriori surface point originated from
-      iString p_aprioriSurfacePointSourceFile;
+      iString aprioriSurfacePointSourceFile;
 
       /**
        * Where the apriori surface point's radius originated from, most commonly
        *   used by jigsaw.
        */
-      RadiusSource::Source p_aprioriRadiusSource;
+      RadiusSource::Source aprioriRadiusSource;
 
       /**
        * The name of the file that derives the apriori surface point's radius
        */
-      iString p_aprioriRadiusSourceFile;
+      iString aprioriRadiusSourceFile;
 
       /**
        * The apriori surface point. This is the "known truth" or trustworthy
@@ -481,20 +485,20 @@ namespace Isis {
        *   okay (1/10th of a pixel is fair for human accuracy for example). Very
        *   often this point does not exist.
        */
-      SurfacePoint p_aprioriSurfacePoint;
+      SurfacePoint aprioriSurfacePoint;
 
       /**
        * This is the calculated, or aposterori, surface point. This is what most
        *   programs should be working with and updating.
        */
-      SurfacePoint p_surfacePoint;
+      SurfacePoint surfacePoint;
 
       /**
        * This parameter is used and maintained by BundleAdjust for the jigsaw
        * application.  It is stored here because ControlPoint contains the index
        * of the measures.
        */
-      int p_numberOfRejectedMeasures;
+      int numberOfRejectedMeasures;
   };
 }
 

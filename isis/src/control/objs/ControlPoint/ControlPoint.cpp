@@ -1,3 +1,4 @@
+#include "IsisDebug.h"
 #include "ControlPoint.h"
 
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -22,9 +23,11 @@
 #include "PvlObject.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
+#include "Statistics.h"
 
 using boost::numeric::ublas::symmetric_matrix;
 using boost::numeric::ublas::upper;
+using namespace std;
 
 namespace Isis {
   /**
@@ -33,71 +36,71 @@ namespace Isis {
    * @author tsucharski (5/5/2010)
    *
    */
-  ControlPoint::ControlPoint() : p_invalid(false) {
-    p_measures = NULL;
+  ControlPoint::ControlPoint() : invalid(false) {
+    measures = NULL;
     cubeSerials = NULL;
 
-    p_measures = new QHash< QString, ControlMeasure * >;
+    measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
 
-    p_type = Tie;
-    p_dateTime = "";
-    p_editLock = false;
-    p_ignore = false;
-    p_jigsawRejected = false;
-    p_aprioriSurfacePointSource = SurfacePointSource::None;
-    p_aprioriRadiusSource = RadiusSource::None;
+    type = Tie;
+    dateTime = "";
+    editLock = false;
+    ignore = false;
+    jigsawRejected = false;
+    aprioriSurfacePointSource = SurfacePointSource::None;
+    aprioriRadiusSource = RadiusSource::None;
     parentNetwork = NULL;
     referenceMeasure = NULL;
   }
 
   ControlPoint::ControlPoint(const ControlPoint &other) {
-    p_measures = NULL;
+    measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;
 
-    p_measures = new QHash< QString, ControlMeasure * >;
+    measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
 
-    QHashIterator< QString, ControlMeasure * > i(*other.p_measures);
+    QHashIterator< QString, ControlMeasure * > i(*other.measures);
     while (i.hasNext()) {
       i.next();
       ControlMeasure *newMeasure = new ControlMeasure(*i.value());
       if (other.referenceMeasure == i.value())
-        referenceMeasure = newMeasure; 
+        referenceMeasure = newMeasure;
       QString newSerial = newMeasure->GetCubeSerialNumber();
       newMeasure->parentPoint = this;
-      p_measures->insert(newSerial, newMeasure);
+      measures->insert(newSerial, newMeasure);
       cubeSerials->append(newSerial);
     }
 
     if (referenceMeasure == NULL && cubeSerials->size() != 0)
-      referenceMeasure = p_measures->value(cubeSerials->at(0));
+      referenceMeasure = measures->value(cubeSerials->at(0));
 
     parentNetwork = other.parentNetwork;
-    p_id = other.p_id;
-    p_chooserName = other.p_chooserName;
-    p_dateTime = other.p_dateTime;
-    p_type = other.p_type;
-    p_invalid = other.p_invalid;
-    p_editLock = other.p_editLock;
-    p_jigsawRejected = other.p_jigsawRejected;
-    p_ignore = other.p_ignore;
-    p_aprioriSurfacePointSource = other.p_aprioriSurfacePointSource;
-    p_aprioriSurfacePointSourceFile = other.p_aprioriSurfacePointSourceFile;
-    p_aprioriRadiusSource = other.p_aprioriRadiusSource;
-    p_aprioriRadiusSourceFile = other.p_aprioriRadiusSourceFile;
-    p_aprioriSurfacePoint = other.p_aprioriSurfacePoint;
-    p_surfacePoint = other.p_surfacePoint;
-    p_numberOfRejectedMeasures = other.p_numberOfRejectedMeasures;
+    id = other.id;
+    chooserName = other.chooserName;
+    dateTime = other.dateTime;
+    type = other.type;
+    invalid = other.invalid;
+    editLock = other.editLock;
+    jigsawRejected = other.jigsawRejected;
+    ignore = other.ignore;
+    aprioriSurfacePointSource = other.aprioriSurfacePointSource;
+    aprioriSurfacePointSourceFile = other.aprioriSurfacePointSourceFile;
+    aprioriRadiusSource = other.aprioriRadiusSource;
+    aprioriRadiusSourceFile = other.aprioriRadiusSourceFile;
+    aprioriSurfacePoint = other.aprioriSurfacePoint;
+    surfacePoint = other.surfacePoint;
+    numberOfRejectedMeasures = other.numberOfRejectedMeasures;
   }
 
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt) {
-    p_measures = NULL;
+    measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;
 
-    p_measures = new QHash< QString, ControlMeasure * >;
+    measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
     Init(protoBufPt);
 
@@ -107,16 +110,22 @@ namespace Isis {
       ControlMeasure *measure = new ControlMeasure(protoBufPt.measures(m));
       AddMeasure(measure);
     }
+
+    if (protoBufPt.has_referenceindex()) {
+      referenceMeasure = (*measures)[cubeSerials->at(protoBufPt.referenceindex())];
+    }
+
+
   }
 
 
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt,
-                             const PBControlNetLogData_Point &logProtoBuf) {
-    p_measures = NULL;
+      const PBControlNetLogData_Point &logProtoBuf) {
+    measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;
 
-    p_measures = new QHash< QString, ControlMeasure * >;
+    measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
     Init(protoBufPt);
 
@@ -134,20 +143,20 @@ namespace Isis {
    *
    * @param id Control Point Id
    */
-  ControlPoint::ControlPoint(const iString &id) : p_invalid(false) {
+  ControlPoint::ControlPoint(const iString &newId) : invalid(false) {
     parentNetwork = NULL;
-    p_measures = NULL;
+    measures = NULL;
     referenceMeasure = NULL;
-    p_measures = new QHash< QString, ControlMeasure * >;
+    measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
 
-    p_id = id;
-    p_type = Tie;
-    p_editLock = false;
-    p_jigsawRejected = false;
-    p_ignore = false;
-    p_aprioriSurfacePointSource = SurfacePointSource::None;
-    p_aprioriRadiusSource = RadiusSource::None;
+    id = newId;
+    type = Tie;
+    editLock = false;
+    jigsawRejected = false;
+    ignore = false;
+    aprioriSurfacePointSource = SurfacePointSource::None;
+    aprioriRadiusSource = RadiusSource::None;
   }
 
 
@@ -156,15 +165,15 @@ namespace Isis {
    *    memory.
    */
   ControlPoint::~ControlPoint() {
-    if (p_measures != NULL) {
-      QList< QString > keys = p_measures->keys();
+    if (measures != NULL) {
+      QList< QString > keys = measures->keys();
       for (int i = 0; i < keys.size(); i++) {
-        delete(*p_measures)[keys[i]];
-        (*p_measures)[keys[i]] = NULL;
+        delete(*measures)[keys[i]];
+        (*measures)[keys[i]] = NULL;
       }
 
-      delete p_measures;
-      p_measures = NULL;
+      delete measures;
+      measures = NULL;
     }
 
     if (cubeSerials) {
@@ -220,141 +229,143 @@ namespace Isis {
   *                         SurfacePoint.SetSpherical calls.
   */
   void ControlPoint::Load(PvlObject &p) {
-    p_id = (std::string) p["PointId"];
+    id = (std::string) p["PointId"];
     if ((std::string)p["PointType"] == "Ground") {
-      p_type = Ground;
+      type = Ground;
     }
     else if ((std::string)p["PointType"] == "Tie") {
-      p_type = Tie;
+      type = Tie;
     }
     else {
       std::string msg = "Invalid Point Type, [" + (std::string)p["PointType"] +
-                        "]";
+          "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     if (p.HasKeyword("Ignore")) {
       iString ignore = (std::string)p["Ignore"];
       if (ignore.DownCase() == "true")
-        p_ignore = true;
+        ignore = true;
     }
     if (p.HasKeyword("AprioriXYZSource")) {
       if ((std::string)p["AprioriXYZSource"] == "None") {
-        p_aprioriSurfacePointSource = SurfacePointSource::None;
+        aprioriSurfacePointSource = SurfacePointSource::None;
       }
       else if ((std::string)p["AprioriXYZSource"] == "User") {
-        p_aprioriSurfacePointSource = SurfacePointSource::User;
+        aprioriSurfacePointSource = SurfacePointSource::User;
       }
       else if ((std::string)p["AprioriXYZSource"] == "AverageOfMeasures") {
-        p_aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
+        aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
       }
       else if ((std::string)p["AprioriXYZSource"] == "Reference") {
-        p_aprioriSurfacePointSource = SurfacePointSource::Reference;
+        aprioriSurfacePointSource = SurfacePointSource::Reference;
       }
       else if ((std::string)p["AprioriXYZSource"] == "Basemap") {
-        p_aprioriSurfacePointSource = SurfacePointSource::Basemap;
+        aprioriSurfacePointSource = SurfacePointSource::Basemap;
       }
       else if ((std::string)p["AprioriXYZSource"] == "BundleSolution") {
-        p_aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
+        aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
       }
       else {
         std::string msg = "Invalid AprioriXYZSource, [" +
-                          (std::string)p["AprioriXYZSource"] + "]";
+            (std::string)p["AprioriXYZSource"] + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
     if (p.HasKeyword("AprioriXYZSourceFile")) {
-      p_aprioriSurfacePointSourceFile = (std::string)p["AprioriXYZSourceFile"];
+      aprioriSurfacePointSourceFile = (std::string)p["AprioriXYZSourceFile"];
     }
 
     //  Look for AprioriLatLonSource.  These keywords may exist in old nets.
     if (p.HasKeyword("AprioriLatLonSource")) {
       if ((std::string)p["AprioriLatLonSource"] == "None") {
-        p_aprioriSurfacePointSource = SurfacePointSource::None;
+        aprioriSurfacePointSource = SurfacePointSource::None;
       }
       else if ((std::string)p["AprioriLatLonSource"] == "User") {
-        p_aprioriSurfacePointSource = SurfacePointSource::User;
+        aprioriSurfacePointSource = SurfacePointSource::User;
       }
       else if ((std::string)p["AprioriLatLonSource"] == "AverageOfMeasures") {
-        p_aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
+        aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
       }
       else if ((std::string)p["AprioriLatLonSource"] == "Reference") {
-        p_aprioriSurfacePointSource = SurfacePointSource::Reference;
+        aprioriSurfacePointSource = SurfacePointSource::Reference;
       }
       else if ((std::string)p["AprioriLatLonSource"] == "Basemap") {
-        p_aprioriSurfacePointSource = SurfacePointSource::Basemap;
+        aprioriSurfacePointSource = SurfacePointSource::Basemap;
       }
       else if ((std::string)p["AprioriLatLonSource"] == "BundleSolution") {
-        p_aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
+        aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
       }
       else {
         std::string msg = "Invalid AprioriXYZSource, [" +
-                          (std::string)p["AprioriXYZSource"] + "]";
+            (std::string)p["AprioriXYZSource"] + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
     if (p.HasKeyword("AprioriLatLonSourceFile")) {
-      p_aprioriSurfacePointSourceFile = p["AprioriLatLonSourceFile"][0];
+      aprioriSurfacePointSourceFile = p["AprioriLatLonSourceFile"][0];
     }
 
     if (p.HasKeyword("AprioriRadiusSource")) {
       if ((std::string)p["AprioriRadiusSource"] == "None") {
-        p_aprioriRadiusSource = RadiusSource::None;
+        aprioriRadiusSource = RadiusSource::None;
       }
       else if ((std::string)p["AprioriRadiusSource"] == "User") {
-        p_aprioriRadiusSource = RadiusSource::User;
+        aprioriRadiusSource = RadiusSource::User;
       }
       else if ((std::string)p["AprioriRadiusSource"] == "AverageOfMeasures") {
-        p_aprioriRadiusSource = RadiusSource::AverageOfMeasures;
+        aprioriRadiusSource = RadiusSource::AverageOfMeasures;
       }
       else if ((std::string)p["AprioriRadiusSource"] == "Ellipsoid") {
-        p_aprioriRadiusSource = RadiusSource::Ellipsoid;
+        aprioriRadiusSource = RadiusSource::Ellipsoid;
       }
       else if ((std::string)p["AprioriRadiusSource"] == "DEM") {
-        p_aprioriRadiusSource = RadiusSource::DEM;
+        aprioriRadiusSource = RadiusSource::DEM;
       }
       else if ((std::string)p["AprioriRadiusSource"] == "BundleSolution") {
-        p_aprioriRadiusSource = RadiusSource::BundleSolution;
+        aprioriRadiusSource = RadiusSource::BundleSolution;
       }
       else {
         std::string msg = "Invalid AprioriRadiusSource, [" +
-                          (std::string)p["AprioriRadiusSource"] + "]";
+            (std::string)p["AprioriRadiusSource"] + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
     if (p.HasKeyword("AprioriRadiusSourceFile")) {
-      p_aprioriRadiusSourceFile = (std::string)p["AprioriRadiusSourceFile"];
+      aprioriRadiusSourceFile = (std::string)p["AprioriRadiusSourceFile"];
     }
 
     if (p.HasKeyword("AprioriX") &&
         p.HasKeyword("AprioriY") &&
         p.HasKeyword("AprioriZ")) {
-      p_aprioriSurfacePoint.SetRectangular(Displacement(p["AprioriX"], Displacement::Meters),
-                                           Displacement(p["AprioriY"], Displacement::Meters),
-                                           Displacement(p["AprioriZ"], Displacement::Meters));
+      aprioriSurfacePoint.SetRectangular(
+        Displacement(p["AprioriX"], Displacement::Meters),
+        Displacement(p["AprioriY"], Displacement::Meters),
+        Displacement(p["AprioriZ"], Displacement::Meters));
     }
 
     //  Look for AprioriLatitude/Longitude/Radius.  These keywords may
     //  exist in old nets.  Convert to x/y/z.
     else if (p.HasKeyword("AprioriLatitude") &&
-             p.HasKeyword("AprioriLongitude") &&
-             p.HasKeyword("AprioriRadius")) {
-      p_aprioriSurfacePoint.SetSpherical(
+        p.HasKeyword("AprioriLongitude") &&
+        p.HasKeyword("AprioriRadius")) {
+      aprioriSurfacePoint.SetSpherical(
         Latitude(p["AprioriLatitude"], Angle::Degrees),
         Longitude(p["AprioriLongitude"], Angle::Degrees),
         Distance(p["AprioriRadius"], Distance::Meters));
     }
 
     if (p.HasKeyword("X") && p.HasKeyword("Y") && p.HasKeyword("Z")) {
-      p_surfacePoint.SetRectangular(Displacement(p["X"], Displacement::Meters),
-                                    Displacement(p["Y"], Displacement::Meters),
-                                    Displacement(p["Z"], Displacement::Meters));
+      surfacePoint.SetRectangular(
+        Displacement(p["X"], Displacement::Meters),
+        Displacement(p["Y"], Displacement::Meters),
+        Displacement(p["Z"], Displacement::Meters));
     }
 
     // Look for Latitude/Longitude/Radius.  These keywords may exist in old
     // nets.  Convert to x/y/z.
     else if (p.HasKeyword("Latitude") && p.HasKeyword("Longitude") &&
-             p.HasKeyword("Radius")) {
-      p_surfacePoint.SetSpherical(
+        p.HasKeyword("Radius")) {
+      surfacePoint.SetSpherical(
         Latitude(p["Latitude"], Angle::Degrees),
         Longitude(p["Longitude"], Angle::Degrees),
         Distance(p["Radius"], Distance::Meters));
@@ -373,7 +384,7 @@ namespace Isis {
       aprioriCovariance(1, 2) = matrix[4];
       aprioriCovariance(2, 2) = matrix[5];
 
-      p_aprioriSurfacePoint.SetRectangularMatrix(aprioriCovariance);
+      aprioriSurfacePoint.SetRectangularMatrix(aprioriCovariance);
     }
 
     if (p.HasKeyword("ApostCovarianceMatrix")) {
@@ -390,36 +401,42 @@ namespace Isis {
       apostCovariance(1, 2) = matrix[4];
       apostCovariance(2, 2) = matrix[5];
 
-      p_surfacePoint.SetRectangularMatrix(apostCovariance);
+      surfacePoint.SetRectangularMatrix(apostCovariance);
     }
 
     if (p.HasKeyword("ChooserName"))
-      p_chooserName = p["ChooserName"][0];
+      chooserName = p["ChooserName"][0];
     if (p.HasKeyword("DateTime"))
-      p_dateTime = p["DateTime"][0];
+      dateTime = p["DateTime"][0];
     if (p.HasKeyword("EditLock")) {
       iString locked = (std::string)p["EditLock"];
       if (locked.DownCase() == "true")
-        p_editLock = true;
+        editLock = true;
     }
     if (p.HasKeyword("JigsawRejected")) {
       iString reject = p["JigsawRejected"][0];
       if (reject.DownCase() == "true")
-        p_jigsawRejected = true;
+        jigsawRejected = true;
     }
 
     //  Process Measures
     for (int g = 0; g < p.Groups(); g++) {
       try {
-        if (p.Group(g).IsNamed("ControlMeasure")) {
+        PvlGroup &measureGroup = p.Group(g);
+        if (measureGroup.IsNamed("ControlMeasure")) {
           ControlMeasure *cm = new ControlMeasure;
-          cm->Load(p.Group(g));
+          cm->Load(measureGroup);
           AddMeasure(cm);
+          if (measureGroup.HasKeyword("Reference")) {
+            iString reference = p["Reference"][0].UpCase();
+            if (reference == "TRUE")
+              SetRefMeasure(cm);
+          }
         }
       }
       catch (iException &e) {
         iString msg = "Unable to add Control Measure to ControlPoint [" +
-                      GetId() + "]";
+            GetId() + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
@@ -437,54 +454,40 @@ namespace Isis {
     AddMeasure(measure);
   }
 
-  void ControlPoint::AddMeasure(ControlMeasure * cmeasure) {
+  void ControlPoint::AddMeasure(ControlMeasure *cmeasure) {
     // Make sure measure is unique
-    foreach(ControlMeasure * m, p_measures->values()) {
+    foreach(ControlMeasure * m, measures->values()) {
       if (m->GetCubeSerialNumber() == cmeasure->GetCubeSerialNumber()) {
         iString msg = "The SerialNumber is not unique. A measure with "
-                      "serial number [" + cmeasure->GetCubeSerialNumber() + "] already "
-                      "exists for ControlPoint [" + GetId() + "]";
+            "serial number [" + cmeasure->GetCubeSerialNumber() + "] already "
+            "exists for ControlPoint [" + GetId() + "]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }
 
-    // If its type is Reference, make sure we don't already have a reference
-    // measure, if we do, throw an error, if not, make it the reference.
-    if (cmeasure->GetType() == ControlMeasure::Reference) {
-      if (referenceMeasure != NULL) {
-        if (referenceMeasure->GetType() != ControlMeasure::Reference) { 
-          referenceMeasure = cmeasure;
-        }
-        else {
-          iString msg = "Cannot add second ControlMeasure with type Reference";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_); 
-        }
-      } 
-    }
-
-    // If we still don't have a reference measure, if it's measured, make it
-    // the reference measure.
-    if (referenceMeasure == NULL && cmeasure->IsMeasured()) {
+    if (!measures->size()) {
+      ASSERT(referenceMeasure == NULL);
       referenceMeasure = cmeasure;
     }
 
     cmeasure->parentPoint = this;
     QString newSerial = cmeasure->GetCubeSerialNumber();
-    p_measures->insert(newSerial, cmeasure);
+    measures->insert(newSerial, cmeasure);
     cubeSerials->append(newSerial);
   }
 
 
-  void ControlPoint::validateMeasure(iString serialNumber, bool checkRef) const {
-    if (!p_measures->contains(serialNumber)) {
+  /**
+   * Throws an exception if none of the point's measures have the given serial
+   * number.  It is common to ensure that a measure exists before taking some
+   * action.
+   *
+   * @param sn The serial number of the measure to validate
+   */
+  void ControlPoint::validateMeasure(iString serialNumber) const {
+    if (!measures->contains(serialNumber)) {
       iString msg = "No measure with serial number [" + serialNumber +
-                    "] is owned by this point";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    if (checkRef && referenceMeasure->GetCubeSerialNumber() == serialNumber) {
-      iString msg = "Point Id [" + GetId() + "] can not do requested operation"
-                    " on reference measure [" + serialNumber + "]";
+          "] is owned by this point";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -497,11 +500,23 @@ namespace Isis {
    * @param serialNumber The serial number of the measure to delete
    */
   void ControlPoint::Delete(iString serialNumber) {
-    validateMeasure(serialNumber, true);
+    validateMeasure(serialNumber);
+
+    ControlMeasure *cm = (*measures)[serialNumber];
+    measures->remove(serialNumber);
+    cubeSerials->removeAt(cubeSerials->indexOf(serialNumber));
+
+    if (cubeSerials->size()) {
+      if (referenceMeasure == cm)
+        referenceMeasure = (*measures)[cubeSerials->at(0)];
+    }
+    else {
+      referenceMeasure = NULL;
+    }
+    delete cm;
+    cm = NULL;
 
     PointModified();
-    p_measures->remove(serialNumber);
-    cubeSerials->removeAt(cubeSerials->indexOf(serialNumber));
   }
 
 
@@ -516,7 +531,7 @@ namespace Isis {
       iString msg = "index [" + iString(index) + "] out of bounds";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-  
+
     Delete(cubeSerials->at(index));
   }
 
@@ -530,12 +545,12 @@ namespace Isis {
     if (IsEditLocked())
       return PointLocked;
 
-    p_aprioriSurfacePointSource = SurfacePointSource::None;
-    p_aprioriSurfacePointSourceFile    = "";
-    p_aprioriRadiusSource     = RadiusSource::None;
-    p_aprioriRadiusSourceFile = "";
+    aprioriSurfacePointSource = SurfacePointSource::None;
+    aprioriSurfacePointSourceFile    = "";
+    aprioriRadiusSource     = RadiusSource::None;
+    aprioriRadiusSourceFile = "";
 
-    p_aprioriSurfacePoint = SurfacePoint();
+    aprioriSurfacePoint = SurfacePoint();
 
     return Success;
   }
@@ -549,7 +564,7 @@ namespace Isis {
    */
   ControlMeasure *ControlPoint::GetMeasure(iString serialNumber) {
     validateMeasure(serialNumber);
-    return (*p_measures)[serialNumber];
+    return (*measures)[serialNumber];
   }
 
 
@@ -561,14 +576,12 @@ namespace Isis {
    */
   const ControlMeasure *ControlPoint::GetMeasure(iString serialNumber) const {
     validateMeasure(serialNumber);
-    return p_measures->value(serialNumber);
+    return measures->value(serialNumber);
   }
 
 
-  const ControlMeasure * ControlPoint::GetMeasure(int index) const
-  {
-    if (index < 0 || index >= cubeSerials->size())
-    {
+  const ControlMeasure *ControlPoint::GetMeasure(int index) const {
+    if (index < 0 || index >= cubeSerials->size()) {
       iString msg = "Index [" + iString(index) + "] out of range";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -577,10 +590,8 @@ namespace Isis {
   }
 
 
-  ControlMeasure * ControlPoint::GetMeasure(int index)
-  {
-    if (index < 0 || index >= cubeSerials->size())
-    {
+  ControlMeasure *ControlPoint::GetMeasure(int index) {
+    if (index < 0 || index >= cubeSerials->size()) {
       iString msg = "Index [" + iString(index) + "] out of range";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -594,18 +605,18 @@ namespace Isis {
    *
    * @returns const reference measure for this point
    */
-  const ControlMeasure *ControlPoint::GetReferenceMeasure() const {
+  const ControlMeasure *ControlPoint::GetRefMeasure() const {
     if (referenceMeasure == NULL) {
       iString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    const ControlMeasure *ref = referenceMeasure;
-    return ref;
+    const ControlMeasure * cm = referenceMeasure;
+    return cm;
   }
 
 
-  ControlMeasure *ControlPoint::GetReferenceMeasure() {
+  ControlMeasure *ControlPoint::GetRefMeasure() {
     if (referenceMeasure == NULL) {
       iString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -623,9 +634,9 @@ namespace Isis {
    * @param name The username of the person who last modified this control point
    */
   ControlPoint::Status ControlPoint::SetChooserName(iString name) {
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
-    p_chooserName = name;
+    chooserName = name;
     return Success;
   }
 
@@ -636,12 +647,12 @@ namespace Isis {
    *   set. This is one of the 'last modified attributes' referred to in other
    *   comments.
    *
-   * @param dateTime The date and time this control point was last modified
+   * @param newDateTime The date and time this control point was last modified
    */
-  ControlPoint::Status ControlPoint::SetDateTime(iString dateTime) {
-    if (p_editLock)
+  ControlPoint::Status ControlPoint::SetDateTime(iString newDateTime) {
+    if (editLock)
       return PointLocked;
-    p_dateTime = dateTime;
+    dateTime = newDateTime;
     return Success;
   }
 
@@ -656,7 +667,7 @@ namespace Isis {
    *   point to be modified.
    */
   ControlPoint::Status ControlPoint::SetEditLock(bool lock) {
-    p_editLock = lock;
+    editLock = lock;
     return Success;
   }
 
@@ -670,7 +681,7 @@ namespace Isis {
    * @param reject True to reject a measure, false to include it in the adjustment
    */
   ControlPoint::Status ControlPoint::SetRejected(bool reject) {
-    p_jigsawRejected = reject;
+    jigsawRejected = reject;
     return Success;
   }
 
@@ -682,10 +693,65 @@ namespace Isis {
    *
    * @return  (int) status Success or PointLocked
    */
-  ControlPoint::Status ControlPoint::SetId(iString id) {
-    if (p_editLock)
+  ControlPoint::Status ControlPoint::SetId(iString newId) {
+    if (editLock)
       return PointLocked;
-    p_id = id;
+    id = newId;
+    return Success;
+  }
+
+
+  /**
+   * Set the point's reference measure
+   *
+   * @param cm The new reference measure
+   */
+  ControlPoint::Status ControlPoint::SetRefMeasure(ControlMeasure *cm) {
+    if (editLock)
+      return PointLocked;
+
+    ASSERT(cm);
+    referenceMeasure = cm;
+    return Success;
+  }
+
+
+  /**
+   * Set the point's reference measure
+   *
+   * @param index The index of the new reference measure
+   */
+  ControlPoint::Status ControlPoint::SetRefMeasure(int index) {
+    if (editLock)
+      return PointLocked;
+
+    if (index < 0 || index >= cubeSerials->size()) {
+      iString msg = "Index [";
+      msg += index + "] out of range";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    referenceMeasure = (*measures)[cubeSerials->at(index)];
+    return Success;
+  }
+
+
+  /**
+   * Set the points reference measure
+   *
+   * @param sn The serial number of the new reference measure
+   */
+  ControlPoint::Status ControlPoint::SetRefMeasure(iString sn) {
+    if (editLock)
+      return PointLocked;
+
+    if (!cubeSerials->contains(sn)) {
+      iString msg = "Point [" + id + "] has no measure with serial number [" +
+          sn + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    referenceMeasure = (*measures)[sn];
     return Success;
   }
 
@@ -693,13 +759,14 @@ namespace Isis {
   /**
    * Set whether to ignore or use control point
    *
-   * @param ignore True to ignore this Control Point, False to un-ignore
+   * @param newIgnoreStatus True to ignore this Control Point, False to
+   *                        un-ignore
    */
-  ControlPoint::Status ControlPoint::SetIgnored(bool ignore) {
-    if (p_editLock)
+  ControlPoint::Status ControlPoint::SetIgnored(bool newIgnoreStatus) {
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_ignore = ignore;
+    ignore = newIgnoreStatus;
     return Success;
   }
 
@@ -709,15 +776,15 @@ namespace Isis {
    *   point on the surface of the planet that the measures are tied to. This
    *   updates the last modified attributes of this point.
    *
-   * @param surfacePoint The point on the target's surface the measures are
-   *   tied to
+   * @param newSurfacePoint The point on the target's surface the measures are
+   *                        tied to
    */
   ControlPoint::Status ControlPoint::SetSurfacePoint(
-    SurfacePoint surfacePoint) {
-    if (p_editLock)
+      SurfacePoint newSurfacePoint) {
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_surfacePoint = surfacePoint;
+    surfacePoint = newSurfacePoint;
     return Success;
   }
 
@@ -728,19 +795,19 @@ namespace Isis {
    *
    * @see PointType
    *
-   * @param type The new type this control point should be
+   * @param newType The new type this control point should be
    */
-  ControlPoint::Status ControlPoint::SetType(PointType type) {
+  ControlPoint::Status ControlPoint::SetType(PointType newType) {
     if (type != Ground && type != Tie) {
       iString msg = "Invalid Point Enumeration, [" + iString(type) + "], for "
-                    "Control Point [" + GetId() + "]";
+          "Control Point [" + GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_type = type;
+    type = newType;
     return Success;
   }
 
@@ -754,10 +821,10 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriRadiusSource(
     RadiusSource::Source source) {
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_aprioriRadiusSource = source;
+    aprioriRadiusSource = source;
     return Success;
   }
 
@@ -772,10 +839,10 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriRadiusSourceFile(
     iString sourceFile) {
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_aprioriRadiusSourceFile = sourceFile;
+    aprioriRadiusSourceFile = sourceFile;
     return Success;
   }
 
@@ -787,16 +854,16 @@ namespace Isis {
    * @see SetAprioriRadiusSourceFile
    * @see SetAprioriPointSource
    * @see SetAprioriPointSourceFile
-   * @see p_aprioriSurfacePoint
+   * @see aprioriSurfacePoint
    *
-   * @param aprioriSurfacePoint The apriori surface point to remember
+   * @param aprioriSP The apriori surface point to remember
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePoint(
-    SurfacePoint aprioriSurfacePoint) {
-    if (p_editLock)
+      SurfacePoint aprioriSP) {
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_aprioriSurfacePoint = aprioriSurfacePoint;
+    aprioriSurfacePoint = aprioriSP;
     return Success;
   }
 
@@ -810,10 +877,10 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSource(
     SurfacePointSource::Source source) {
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_aprioriSurfacePointSource = source;
+    aprioriSurfacePointSource = source;
     return Success;
   }
 
@@ -827,10 +894,10 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSourceFile(
     iString sourceFile) {
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
     PointModified();
-    p_aprioriSurfacePointSourceFile = sourceFile;
+    aprioriSurfacePointSourceFile = sourceFile;
     return Success;
   }
 
@@ -859,7 +926,7 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::ComputeApriori() {
 
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
     // Should we ignore the point altogether?
     if (IsIgnored())
@@ -870,7 +937,7 @@ namespace Isis {
     // Don't goof with ground points.  The lat/lon is what it is ... if
     // it exists!
     if (GetType() == Ground) {
-      if (!p_surfacePoint.Valid()) {
+      if (!surfacePoint.Valid()) {
         iString msg = "ControlPoint [" + GetId() + "] is a ground point ";
         msg += "and requires x/y/z";
         throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -919,8 +986,8 @@ namespace Isis {
 
           // TODO: What do we do
           iString msg = "Cannot compute lat/lon/radius (x/y/z) for "
-                        "ControlPoint [" + GetId() + "], measure [" +
-                        m->GetCubeSerialNumber() + "]";
+              "ControlPoint [" + GetId() + "], measure [" +
+              m->GetCubeSerialNumber() + "]";
           throw iException::Message(iException::User, msg, _FILEINFO_);
 
           // m->SetFocalPlaneMeasured(?,?);
@@ -935,12 +1002,12 @@ namespace Isis {
     // Did we have any measures?
     if (goodMeasures == 0) {
       iString msg = "ControlPoint [" + GetId() + "] has no measures which "
-                    "project to lat/lon/radius (x/y/z)";
+          "project to lat/lon/radius (x/y/z)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // Compute the averages
-    p_aprioriSurfacePoint.SetRectangular(
+    aprioriSurfacePoint.SetRectangular(
       Displacement((xB / goodMeasures), Displacement::Kilometers),
       Displacement((yB / goodMeasures), Displacement::Kilometers),
       Displacement((zB / goodMeasures), Displacement::Kilometers));
@@ -963,7 +1030,7 @@ namespace Isis {
    *                            because it was always reporting line errors=0.
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
-    if (p_editLock)
+    if (editLock)
       return PointLocked;
     if (IsIgnored())
       return Failure;
@@ -971,9 +1038,9 @@ namespace Isis {
     PointModified();
 
     // Loop for each measure to compute the error
-    QList<QString> keys = p_measures->keys();
+    QList<QString> keys = measures->keys();
     for (int j = 0; j < keys.size(); j++) {
-      ControlMeasure *m = (*p_measures)[keys[j]];
+      ControlMeasure *m = (*measures)[keys[j]];
       if (m->IsIgnored())
         continue;
       if (!m->IsMeasured())
@@ -1003,7 +1070,7 @@ namespace Isis {
         // distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneComputedX(), m->GetFocalPlaneComputedY())) {
           iString msg = "Sanity check #1 for ControlPoint [" + GetId() +
-                        "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
+              "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
@@ -1022,9 +1089,9 @@ namespace Isis {
         double rad = GetSurfacePoint().GetLocalRadius().GetMeters();
         if (!cam->SetUniversalGround(lat, lon, rad)) {
           std::string msg = "ControlPoint [" +
-                            GetId() + "], ControlMeasure [" +
-                            m->GetCubeSerialNumber() + "]" +
-                            " does not map into image";
+              GetId() + "], ControlMeasure [" +
+              m->GetCubeSerialNumber() + "]" +
+              " does not map into image";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
 
@@ -1039,7 +1106,7 @@ namespace Isis {
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneMeasuredX(), m->GetFocalPlaneMeasuredY())) {
           iString msg = "Sanity check #2 for ControlPoint [" + GetId() +
-                        "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
+              "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
@@ -1064,8 +1131,8 @@ namespace Isis {
 
 
   iString ControlPoint::GetChooserName() const {
-    if (p_chooserName != "") {
-      return p_chooserName;
+    if (chooserName != "") {
+      return chooserName;
     }
     else {
       return Filename(Application::Name()).Name();
@@ -1074,8 +1141,8 @@ namespace Isis {
 
 
   iString ControlPoint::GetDateTime() const {
-    if (p_dateTime != "") {
-      return p_dateTime;
+    if (dateTime != "") {
+      return dateTime;
     }
     else {
       return Application::DateTime();
@@ -1084,12 +1151,12 @@ namespace Isis {
 
 
   bool ControlPoint::IsEditLocked() const {
-    return p_editLock;
+    return editLock;
   }
 
 
   bool ControlPoint::IsRejected() const {
-    return p_jigsawRejected;
+    return jigsawRejected;
   }
 
 
@@ -1099,22 +1166,22 @@ namespace Isis {
    * @return Control Point Id
    */
   iString ControlPoint::GetId() const {
-    return p_id;
+    return id;
   }
 
 
   bool ControlPoint::IsIgnored() const {
-    return p_ignore;
+    return ignore;
   }
 
 
   bool ControlPoint::IsValid() const {
-    return !p_invalid;
+    return !invalid;
   }
 
 
   bool ControlPoint::IsInvalid() const {
-    return p_invalid;
+    return invalid;
   }
 
 
@@ -1124,30 +1191,17 @@ namespace Isis {
    *  @param type PointType to convert to a string
    *
    *  @returns A string representation of type
-   *
-   *  @throws iException::Programmer When unable to translate type
-   * @internal
-   *   @history 2009-10-13 Jeannie Walldren - Added detail to
-   *            error message.
-   *   @history 2010-06-04 Eric Hyer - removed parameter
-   *   @history 2010-10-27 Mackenzie Boyd - changed to static
    */
-  iString ControlPoint::PointTypeToString(PointType type) {
+  iString ControlPoint::PointTypeToString(PointType pointType) {
     iString str;
 
-    switch (type) {
+    switch (pointType) {
       case Ground:
         str = "Ground";
         break;
       case Tie:
         str = "Tie";
         break;
-    }
-
-    if (str == "") {
-      iString msg = "Point type [" + iString(type) + "] cannot be converted "
-                    "to a string";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     return str;
@@ -1159,7 +1213,7 @@ namespace Isis {
    * @return A string representation of the PointType
    */
   iString ControlPoint::GetPointTypeString() const {
-    return PointTypeToString(p_type);
+    return PointTypeToString(type);
   }
 
   /**
@@ -1168,8 +1222,6 @@ namespace Isis {
    *  @param source RadiusSource to convert to string
    *
    *  @returns A string representation of RadiusSource
-   *
-   *  @throws iException::Programmer When unable to translate source
    */
   iString ControlPoint::RadiusSourceToString(RadiusSource::Source source) {
     iString str;
@@ -1195,12 +1247,6 @@ namespace Isis {
         break;
     }
 
-    if (str == "") {
-      iString msg = "Radius source [" + iString(source) + "] cannot be converted "
-                    "to a string";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
     return str;
   }
 
@@ -1210,7 +1256,7 @@ namespace Isis {
    * @return A string representation of the RadiusSource
    */
   iString ControlPoint::GetRadiusSourceString() const {
-    return RadiusSourceToString(p_aprioriRadiusSource);
+    return RadiusSourceToString(aprioriRadiusSource);
   }
 
   /**
@@ -1219,8 +1265,6 @@ namespace Isis {
    *  @param souce SurfacePointSource to get a string representation of
    *
    *  @returns A string representation of SurfacePointSource
-   *
-   *  @throws iException::Programmer When unable to translate source
    */
   iString ControlPoint::SurfacePointSourceToString(SurfacePointSource::Source source) {
     iString str;
@@ -1246,12 +1290,6 @@ namespace Isis {
         break;
     }
 
-    if (str == "") {
-      iString msg = "Surface point source [" + iString(source) + "] cannot be converted "
-                    "to a string";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
     return str;
   }
 
@@ -1261,53 +1299,53 @@ namespace Isis {
    * @return A string representation of the SurfacePointSource
    */
   iString ControlPoint::GetSurfacePointSourceString() const {
-    return SurfacePointSourceToString(p_aprioriSurfacePointSource);
+    return SurfacePointSourceToString(aprioriSurfacePointSource);
   }
 
   SurfacePoint ControlPoint::GetSurfacePoint() const {
-    return p_surfacePoint;
+    return surfacePoint;
   }
 
 
   ControlPoint::PointType ControlPoint::GetType() const {
-    return p_type;
+    return type;
   }
 
 
 
   bool ControlPoint::IsGround() const {
-    return (p_type == Ground);
+    return (type == Ground);
   }
 
 
   SurfacePoint ControlPoint::GetAprioriSurfacePoint() const {
-    return p_aprioriSurfacePoint;
+    return aprioriSurfacePoint;
   }
 
 
   ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
   const {
-    return p_aprioriRadiusSource;
+    return aprioriRadiusSource;
   }
 
 
   iString ControlPoint::GetAprioriRadiusSourceFile() const {
-    return p_aprioriRadiusSourceFile;
+    return aprioriRadiusSourceFile;
   }
 
   ControlPoint::SurfacePointSource::Source
   ControlPoint::GetAprioriSurfacePointSource() const {
-    return p_aprioriSurfacePointSource;
+    return aprioriSurfacePointSource;
   }
 
 
   iString ControlPoint::GetAprioriSurfacePointSourceFile() const {
-    return p_aprioriSurfacePointSourceFile;
+    return aprioriSurfacePointSourceFile;
   }
 
 
   int ControlPoint::GetNumMeasures() const {
-    return p_measures->size();
+    return measures->size();
   }
 
 
@@ -1317,9 +1355,9 @@ namespace Isis {
    */
   int ControlPoint::GetNumValidMeasures() const {
     int size = 0;
-    QList<QString> keys = p_measures->keys();
+    QList<QString> keys = measures->keys();
     for (int cm = 0; cm < keys.size(); cm++) {
-      if (!(*p_measures)[keys[cm]]->IsIgnored())
+      if (!(*measures)[keys[cm]]->IsIgnored())
         size++;
     }
     return size;
@@ -1333,9 +1371,9 @@ namespace Isis {
    */
   int ControlPoint::GetNumLockedMeasures() const {
     int size = 0;
-    QList<QString> keys = p_measures->keys();
+    QList<QString> keys = measures->keys();
     for (int cm = 0; cm < keys.size(); cm++) {
-      if ((*p_measures)[keys[cm]]->IsEditLocked())
+      if ((*measures)[keys[cm]]->IsEditLocked())
         size++;
     }
     return size;
@@ -1349,64 +1387,25 @@ namespace Isis {
    *  @return True if point contains serial number, false if not
    */
   bool ControlPoint::HasSerialNumber(iString serialNumber) const {
-    QList<QString> keys = p_measures->keys();
-    for (int m = 0; m < keys.size(); m++) {
-      if ((*p_measures)[keys[m]]->GetCubeSerialNumber() == serialNumber) {
-        return true;
-      }
-    }
-
-    return false;
+    return cubeSerials->contains(serialNumber);
   }
 
 
   /**
-   * Return true if there is a Reference measure, otherwise return false
-   *
-   * @todo  ??? Check for more than one reference measure ???
-   *          Should print error, this check should also go in
-   *          ReferenceIndex.
+   * @returns true if there is a Reference measure, and false otherwise
    */
   bool ControlPoint::HasReference() const {
-    // If it is set, then there is a reference measure
     return referenceMeasure != NULL;
   }
 
 
   /**
-   * Returns a Reference Index of the Control Point. If none then returns the
-   * first measure as Reference. If there are no measures then returns -1;
-   *
-   * @author Sharmila Prasad (5/11/2010)
-   *
-   * @history 2010-07-21 Tracie Sucharski - Replaced IsReferece call with
-   *                        comparison of MeasureType.
-   * @return int
+   * @returns The cube serial number of the reference measure
    */
-  QString ControlPoint::GetReferenceKeyNoException() const {
-    if (p_measures->size() == 0) {
-      return NULL;
-    }
-
-    return referenceMeasure->GetCubeSerialNumber();
-  }
-
-
-  /**
-   * Return the index of the reference measurement
-   * if none is specified, return the first measured CM
-   *
-   * @return The PvlObject created
-   */
-  QString ControlPoint::GetReferenceKey() const {
-    if (p_measures->size() == 0) {
-      iString msg = "There are no ControlMeasures in the ControlPoint [" +
-                    GetId() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
+  QString ControlPoint::GetReferenceSN() const {
     if (referenceMeasure == NULL) {
       iString msg = "There is no reference measure set in the ControlPoint [" +
-                    GetId() + "]";
+          GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1415,285 +1414,79 @@ namespace Isis {
 
 
   /**
-     * Returns a Reference Index of the Control Point. If none then returns the
-     * first measure as Reference. If there are no measures then returns -1;
-     *
-     * @author Sharmila Prasad (5/11/2010)
-     *
-     * @history 2010-07-21 Tracie Sucharski - Replaced IsReferece call with
-     *                        comparison of MeasureType.
-     * @return int
-     */
-  int ControlPoint::GetReferenceIndexNoException() const {
-    if (p_measures->size() == 0) {
-      return -1;
-    }
-
-    if (referenceMeasure != NULL) {
-      int index = cubeSerials->indexOf(referenceMeasure->GetCubeSerialNumber());
-      // If the serial number isn't contained, there is something very odd going on
-      if (index == -1) return 0;
-      else return index; 
-    }
-
-    return 0;
+   * @param cm The control measure to find the index of
+   * @param throws Throws an exception on failure instead of returning -1.
+   *               Be aware that by default this is true!
+   *
+   * @returns The index of the passed in measure, or -1 on failure if throws
+   *          is false.
+   */
+  int ControlPoint::IndexOf(ControlMeasure *cm, bool throws) const {
+    ASSERT(cm);
+    return IndexOf(cm->GetCubeSerialNumber(), throws);
   }
 
 
   /**
-   * Return the index of the reference measurement
-   * if none is specified, return the first measured CM
+   * @param sn The serial number of the control measure to find the index of
+   * @param throws Throws an exception on failure instead of returning -1.
+   *               Be aware that by default this is true!
    *
-   * @return The PvlObject created
+   * @returns The index of the measure with serial number matching sn,
+   *          or -1 on failure if throws is false.
    */
-  int ControlPoint::GetReferenceIndex() const {
-    if (p_measures->size() == 0) {
-      iString msg = "There are no ControlMeasures in the ControlPoint [" +
-                    GetId() + "]";
+  int ControlPoint::IndexOf(iString sn, bool throws) const {
+    int index = cubeSerials->indexOf(sn);
+
+    if (throws && index == -1) {
+      iString msg = "ControlMeasure [" + sn + "] does not exist in point [" +
+          id + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if (referenceMeasure != NULL) {
-      int index = cubeSerials->indexOf(referenceMeasure->GetCubeSerialNumber());
-      // If the serial number isn't contained, there is something very odd going on
-      if (index != -1) {
-        return index; 
-      }
-      else { 
-        iString msg = "Reference measure serial number [" + 
-                      referenceMeasure->GetCubeSerialNumber()
-                      + "] is not contained in the point";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-      }
-    }
-
-    iString msg = "There are no Measured ControlMeasures in the ControlPoint ["
-                  + GetId() + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    return index;
   }
 
 
-
   /**
-   * Return the status of Reference Measure's Edit Lock
+   * @param throws Throws an exception on failure instead of returning -1.
+   *               Be aware that by default this is true!
    *
-   * @author Sharmila Prasad (10/6/2010)
-   *
-   * @return bool - True/False for EditLock
+   * @returns The index of the reference measure, or -1 if no measures exist
+   * in the point (A point with at least one measure ALWAYS has a reference
+   * measure.
    */
-  bool ControlPoint::IsReferenceLocked() const {
-    if (p_measures->size() == 0)
-      return false;
-    if (referenceMeasure == NULL) {
-      iString msg = "There is no reference measure set in the ControlPoint ["
-                    + GetId() + "]";
+  int ControlPoint::IndexOfRefMeasure() const {
+    if (!referenceMeasure) {
+      iString msg = "There is no reference measure for point [" + id + "]."
+          "  This also means of course that the point is empty!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return referenceMeasure->IsEditLocked();
+    int index = cubeSerials->indexOf(referenceMeasure->GetCubeSerialNumber());
+    ASSERT(index != -1)
+
+    return index;
   }
 
 
   /**
-   *  Return the average residual of all measurements
+   * This function will call a given method on every control measure that
+   * this point has.
    *
-   *  @history 2010-12-06  Tracie Sucharski, Renamed from AverageError
+   * @param statFunc The function to use for data collection
+   *
+   * @returns The gathered statistic
    */
-  double ControlPoint::GetAverageResidual() const {
-    double errorSum = 0.0;
-    int errorCount = 0;
-    QList<QString> keys = p_measures->keys();
-    for (int i = 0; i < keys.size(); i++) {
-      const ControlMeasure *measure = (*p_measures)[keys[i]];
-      if (measure->IsIgnored())
-        continue;
-      if (!measure->IsMeasured())
-        continue;
-
-      errorSum += measure->GetResidualMagnitude();
-      errorCount ++;
+  Statistics ControlPoint::GetStatistic(
+    double(ControlMeasure::*statFunc)() const) const {
+    Statistics stats;
+    foreach(ControlMeasure * cm, *measures) {
+      if (!cm->IsIgnored() && cm->GetType() == ControlMeasure::Candidate)
+        stats.AddData((cm->*statFunc)());
     }
 
-    if (errorCount == 0)
-      return 0.0;
-    return errorSum / (double) errorCount;
-  }
-
-
-  /**
-   * Return the minimum residual magnitude of the measures in the point.
-   * Ignored and Unmeasured measures will not be included
-   *
-   * @author Sharmila Prasad (8/26/2010)
-   *
-   * @return double
-   */
-  double ControlPoint::GetMinimumResidual() const {
-    double dMinError = VALID_MAX4;
-    if (IsIgnored())
-      return dMinError;
-
-    QList<QString> keys = p_measures->keys();
-    for (int j = 0; j < keys.size(); j++) {
-      const ControlMeasure *measure = (*p_measures)[keys[j]];
-      if (measure->IsIgnored())
-        continue;
-      if (measure->GetType() == ControlMeasure::Candidate)
-        continue;
-
-      double dErr = measure->GetResidualMagnitude();
-      if (dErr < dMinError) {
-        dMinError = dErr;
-      }
-    }
-
-    return dMinError;
-  }
-
-
-  /**
-   * Get the minimum sample residual for the control point
-   *
-   * @author Sharmila Prasad (8/26/2010)
-   *
-   * @return double
-   */
-  double ControlPoint::GetMinimumSampleResidual() const {
-    double dMinError = VALID_MAX4;
-    if (IsIgnored())
-      return dMinError;
-
-    QList<QString> keys = p_measures->keys();
-    for (int j = 0; j < keys.size(); j++) {
-      const ControlMeasure *measure = (*p_measures)[keys[j]];
-      if (measure->IsIgnored())
-        continue;
-      if (measure->GetType() == ControlMeasure::Candidate)
-        continue;
-
-      double dErr = measure->GetSampleResidual();
-      if (dErr < dMinError) {
-        dMinError = dErr;
-      }
-    }
-
-    return dMinError;
-  }
-
-
-  /**
-   * Get the minimum line residual for the control point
-   *
-   * @author Sharmila Prasad (8/26/2010)
-   *
-   * @return double
-   */
-  double ControlPoint::GetMinimumLineResidual() const {
-    double dMinError = VALID_MAX4;
-    if (IsIgnored())
-      return dMinError;
-
-    QList<QString> keys = p_measures->keys();
-    for (int j = 0; j < keys.size(); j++) {
-      const ControlMeasure *measure = (*p_measures)[keys[j]];
-      if (measure->IsIgnored())
-        continue;
-      if (measure->GetType() == ControlMeasure::Candidate)
-        continue;
-
-      double dErr = measure->GetLineResidual();
-      if (dErr < dMinError) {
-        dMinError = dErr;
-      }
-    }
-
-    return dMinError;
-  }
-
-
-  /**
-   * Return the maximum residual magnitude of the measures in the point.
-   * Ignored and estimateded measures will not be included.
-   *
-   * @history 2010-12-06  Tracie Sucharski, Renamed from MaximumError
-   */
-  double ControlPoint::GetMaximumResidual() const {
-    double maxResidual = 0.0;
-    if (IsIgnored())
-      return maxResidual;
-
-    QList<QString> keys = p_measures->keys();
-    for (int j = 0; j < keys.size(); j++) {
-      const ControlMeasure *measure = (*p_measures)[keys[j]];
-      if (measure->IsIgnored())
-        continue;
-      if (!measure->IsMeasured())
-        continue;
-      if (measure->GetResidualMagnitude() > maxResidual) {
-        maxResidual = measure->GetResidualMagnitude();
-      }
-    }
-    return maxResidual;
-  }
-
-
-  /**
-   * Get the maximum sample residual for the control point
-   *
-   * @author Sharmila Prasad (8/26/2010)
-   *
-   * @return double
-   */
-  double ControlPoint::GetMaximumSampleResidual() const {
-    double dMaxError = 0.0;
-    if (IsIgnored())
-      return dMaxError;
-
-    QList<QString> keys = p_measures->keys();
-    for (int j = 0; j < keys.size(); j++) {
-      const ControlMeasure *measure = (*p_measures)[keys[j]];
-      if (measure->IsIgnored())
-        continue;
-      if (measure->GetType() == ControlMeasure::Candidate)
-        continue;
-
-      double dErr = measure->GetSampleResidual();
-      if (dErr > dMaxError) {
-        dMaxError = dErr;
-      }
-    }
-
-    return dMaxError;
-  }
-
-
-  /**
-   * Get the maximum line residual for the control point
-   *
-   * @author Sharmila Prasad (8/26/2010)
-   *
-   * @return double
-   */
-  double ControlPoint::GetMaximumLineResidual() const {
-    double dMaxError = 0.0;
-    if (IsIgnored())
-      return dMaxError;
-
-    QList<QString> keys = p_measures->keys();
-    for (int j = 0; j < keys.size(); j++) {
-      const ControlMeasure *measure = (*p_measures)[keys[j]];
-      if (measure->IsIgnored())
-        continue;
-      if (measure->GetType() == ControlMeasure::Candidate)
-        continue;
-
-      double dErr = measure->GetLineResidual();
-      if (dErr > dMaxError) {
-        dMaxError = dErr;
-      }
-    }
-
-    return dMaxError;
+    return stats;
   }
 
 
@@ -1713,19 +1506,24 @@ namespace Isis {
 
     p += PvlKeyword("PointType", GetPointTypeString());
 
-    p += PvlKeyword("PointId", p_id);
+    p += PvlKeyword("PointId", id);
     p += PvlKeyword("ChooserName", GetChooserName());
     p += PvlKeyword("DateTime", GetDateTime());
 
-    if (p_editLock == true) {
+    if (editLock == true) {
       p += PvlKeyword("EditLock", "True");
     }
 
-    if (p_ignore == true) {
+    if (ignore == true) {
       p += PvlKeyword("Ignore", "True");
     }
 
-    switch (p_aprioriSurfacePointSource) {
+    if (referenceMeasure) {
+      int refIndex = IndexOfRefMeasure();
+      p += PvlKeyword("ReferenceIndex", refIndex);
+    }
+
+    switch (aprioriSurfacePointSource) {
       case SurfacePointSource::None:
         break;
       case SurfacePointSource::User:
@@ -1747,20 +1545,20 @@ namespace Isis {
         break;
     }
 
-    if (!p_aprioriSurfacePointSourceFile.empty()) {
-      p += PvlKeyword("AprioriXYZSourceFile", p_aprioriSurfacePointSourceFile);
+    if (!aprioriSurfacePointSourceFile.empty()) {
+      p += PvlKeyword("AprioriXYZSourceFile", aprioriSurfacePointSourceFile);
     }
 
-    if (p_aprioriRadiusSource != RadiusSource::None) {
+    if (aprioriRadiusSource != RadiusSource::None) {
       p += PvlKeyword("AprioriRadiusSource", GetRadiusSourceString());
     }
 
-    if (!p_aprioriRadiusSourceFile.empty()) {
-      p += PvlKeyword("AprioriRadiusSourceFile", p_aprioriRadiusSourceFile);
+    if (!aprioriRadiusSourceFile.empty()) {
+      p += PvlKeyword("AprioriRadiusSourceFile", aprioriRadiusSourceFile);
     }
 
-    if (p_aprioriSurfacePoint.Valid()) {
-      const SurfacePoint &apriori = p_aprioriSurfacePoint;
+    if (aprioriSurfacePoint.Valid()) {
+      const SurfacePoint &apriori = aprioriSurfacePoint;
 
       p += PvlKeyword("AprioriX", apriori.GetX().GetMeters(), "meters");
       p += PvlKeyword("AprioriY", apriori.GetY().GetMeters(), "meters");
@@ -1779,8 +1577,8 @@ namespace Isis {
       }
     }
 
-    if (p_surfacePoint.Valid()) {
-      const SurfacePoint &point = p_surfacePoint;
+    if (surfacePoint.Valid()) {
+      const SurfacePoint &point = surfacePoint;
 
       p += PvlKeyword("X", point.GetX().GetMeters(), "meters");
       p += PvlKeyword("Y", point.GetY().GetMeters(), "meters");
@@ -1801,7 +1599,7 @@ namespace Isis {
     }
 
     for (int i = 0; i < cubeSerials->size(); i++)
-      p.AddGroup((*p_measures)[cubeSerials->at(i)]->CreatePvlGroup());
+      p.AddGroup((*measures)[cubeSerials->at(i)]->CreatePvlGroup());
 
     return p;
   }
@@ -1859,47 +1657,38 @@ namespace Isis {
   /**
    * Compare two Control Points for inequality
    *
-   * @author Sharmila Prasad (4/20/2010)
+   * @param other The other point to compare this one to
    *
-   * @history 2010-06-23 Tracie Sucharski, Added new keywords
-   *
-   * @param pPoint
-   *
-   * @return bool
+   * @returns true if the two points are not equal, and false otherwise
    */
-  bool ControlPoint::operator!=(const ControlPoint &pPoint) const {
-    return !(*this == pPoint);
+  bool ControlPoint::operator!=(const ControlPoint &other) const {
+    return !(*this == other);
   }
 
 
   /**
    * Compare two Control Points for equality
    *
-   * @author Sharmila Prasad (4/20/2010)
+   * @param other The other point to compare to
    *
-   * @history 2010-06-23 Tracie Sucharski, Added new keywords
-   * @history 2010-08-06 Tracie Sucharski, Re-wrote again for new-new keywords.
-   *
-   * @param pPoint to be compared against
-   *
-   * @return bool
+   * @returns true if the two points are equal, and false otherwise
    */
-  bool ControlPoint::operator==(const ControlPoint &pPoint) const {
-    return pPoint.GetNumMeasures() == GetNumMeasures() &&
-           pPoint.p_id == p_id &&
-           pPoint.p_type == p_type &&
-           pPoint.p_chooserName == p_chooserName &&
-           pPoint.p_editLock == p_editLock &&
-           pPoint.p_ignore == p_ignore &&
-           pPoint.p_aprioriSurfacePointSource  == p_aprioriSurfacePointSource &&
-           pPoint.p_aprioriSurfacePointSourceFile
-           == p_aprioriSurfacePointSourceFile &&
-           pPoint.p_aprioriRadiusSource  == p_aprioriRadiusSource &&
-           pPoint.p_aprioriRadiusSourceFile  == p_aprioriRadiusSourceFile &&
-           pPoint.p_aprioriSurfacePoint == p_aprioriSurfacePoint &&
-           pPoint.p_surfacePoint == p_surfacePoint &&
-           pPoint.p_invalid == p_invalid &&
-           pPoint.p_measures == p_measures;
+  bool ControlPoint::operator==(const ControlPoint &other) const {
+    return other.GetNumMeasures() == GetNumMeasures() &&
+        other.id == id &&
+        other.type == type &&
+        other.chooserName == chooserName &&
+        other.editLock == editLock &&
+        other.ignore == ignore &&
+        other.aprioriSurfacePointSource  == aprioriSurfacePointSource &&
+        other.aprioriSurfacePointSourceFile
+        == aprioriSurfacePointSourceFile &&
+        other.aprioriRadiusSource  == aprioriRadiusSource &&
+        other.aprioriRadiusSourceFile  == aprioriRadiusSourceFile &&
+        other.aprioriSurfacePoint == aprioriSurfacePoint &&
+        other.surfacePoint == surfacePoint &&
+        other.invalid == invalid &&
+        other.measures == measures;
   }
 
 
@@ -1913,15 +1702,15 @@ namespace Isis {
     if (this == &other)
       return *this;
 
-    if (p_measures) {
-      QList< QString > keys = p_measures->keys();
+    if (measures) {
+      QList< QString > keys = measures->keys();
       for (int i = 0; i < keys.size(); i++) {
-        delete(*p_measures)[keys[i]];
-        (*p_measures)[keys[i]] = NULL;
+        delete(*measures)[keys[i]];
+        (*measures)[keys[i]] = NULL;
       }
 
-      delete p_measures;
-      p_measures = NULL;
+      delete measures;
+      measures = NULL;
     }
 
     if (cubeSerials) {
@@ -1929,87 +1718,87 @@ namespace Isis {
       cubeSerials = NULL;
     }
 
-    p_measures = new QHash< QString, ControlMeasure * >;
+    measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
 
-    QHashIterator< QString, ControlMeasure * > i(*other.p_measures);
+    QHashIterator< QString, ControlMeasure * > i(*other.measures);
     while (i.hasNext()) {
       i.next();
       ControlMeasure *newMeasure = new ControlMeasure(*i.value());
       newMeasure->parentPoint = this;
-      p_measures->insert(i.key(), newMeasure);
+      measures->insert(i.key(), newMeasure);
       cubeSerials->append(i.key());
     }
 
-    p_id             = other.p_id;
-    p_chooserName    = other.p_chooserName;
-    p_dateTime       = other.p_dateTime;
-    p_type           = other.p_type;
-    p_invalid        = other.p_invalid;
-    p_editLock       = other.p_editLock;
-    p_jigsawRejected = other.p_jigsawRejected;
-    p_ignore         = other.p_ignore;
-    p_aprioriSurfacePointSource      = other.p_aprioriSurfacePointSource;
-    p_aprioriSurfacePointSourceFile  = other.p_aprioriSurfacePointSourceFile;
-    p_aprioriRadiusSource            = other.p_aprioriRadiusSource;
-    p_aprioriRadiusSourceFile        = other.p_aprioriRadiusSourceFile;
-    p_aprioriSurfacePoint            = other.p_aprioriSurfacePoint;
-    p_surfacePoint = other.p_surfacePoint;
-    p_numberOfRejectedMeasures = other.p_numberOfRejectedMeasures;
+    id             = other.id;
+    chooserName    = other.chooserName;
+    dateTime       = other.dateTime;
+    type           = other.type;
+    invalid        = other.invalid;
+    editLock       = other.editLock;
+    jigsawRejected = other.jigsawRejected;
+    ignore         = other.ignore;
+    aprioriSurfacePointSource      = other.aprioriSurfacePointSource;
+    aprioriSurfacePointSourceFile  = other.aprioriSurfacePointSourceFile;
+    aprioriRadiusSource            = other.aprioriRadiusSource;
+    aprioriRadiusSourceFile        = other.aprioriRadiusSourceFile;
+    aprioriSurfacePoint            = other.aprioriSurfacePoint;
+    surfacePoint = other.surfacePoint;
+    numberOfRejectedMeasures = other.numberOfRejectedMeasures;
 
     return *this;
   }
 
 
   void ControlPoint::Init(const PBControlNet_PBControlPoint &protoBufPt) {
-    p_id = protoBufPt.id();
-    p_dateTime = "";
-    p_aprioriSurfacePointSource = SurfacePointSource::None;
-    p_aprioriRadiusSource = RadiusSource::None;
+    id = protoBufPt.id();
+    dateTime = "";
+    aprioriSurfacePointSource = SurfacePointSource::None;
+    aprioriRadiusSource = RadiusSource::None;
 
-    p_chooserName = protoBufPt.choosername();
-    p_dateTime = protoBufPt.datetime();
-    p_editLock = protoBufPt.editlock();
+    chooserName = protoBufPt.choosername();
+    dateTime = protoBufPt.datetime();
+    editLock = protoBufPt.editlock();
 
     parentNetwork = NULL;
 
     switch (protoBufPt.type()) {
       case PBControlNet_PBControlPoint_PointType_Tie:
-        p_type = Tie;
+        type = Tie;
         break;
       case PBControlNet_PBControlPoint_PointType_Ground:
-        p_type = Ground;
+        type = Ground;
         break;
     }
 
-    p_ignore = protoBufPt.ignore();
-    p_jigsawRejected = protoBufPt.jigsawrejected();
+    ignore = protoBufPt.ignore();
+    jigsawRejected = protoBufPt.jigsawrejected();
 
     // Read apriori keywords
     if (protoBufPt.has_apriorixyzsource()) {
       switch (protoBufPt.apriorixyzsource()) {
         case PBControlNet_PBControlPoint_AprioriSource_None:
-          p_aprioriSurfacePointSource = SurfacePointSource::None;
+          aprioriSurfacePointSource = SurfacePointSource::None;
           break;
 
         case PBControlNet_PBControlPoint_AprioriSource_User:
-          p_aprioriSurfacePointSource = SurfacePointSource::User;
+          aprioriSurfacePointSource = SurfacePointSource::User;
           break;
 
         case PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures:
-          p_aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
+          aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
           break;
 
         case PBControlNet_PBControlPoint_AprioriSource_Reference:
-          p_aprioriSurfacePointSource = SurfacePointSource::Reference;
+          aprioriSurfacePointSource = SurfacePointSource::Reference;
           break;
 
         case PBControlNet_PBControlPoint_AprioriSource_Basemap:
-          p_aprioriSurfacePointSource = SurfacePointSource::Basemap;
+          aprioriSurfacePointSource = SurfacePointSource::Basemap;
           break;
 
         case PBControlNet_PBControlPoint_AprioriSource_BundleSolution:
-          p_aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
+          aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
           break;
 
         case PBControlNet_PBControlPoint_AprioriSource_Ellipsoid:
@@ -2019,28 +1808,28 @@ namespace Isis {
     }
 
     if (protoBufPt.has_apriorixyzsourcefile()) {
-      p_aprioriSurfacePointSourceFile = protoBufPt.apriorixyzsourcefile();
+      aprioriSurfacePointSourceFile = protoBufPt.apriorixyzsourcefile();
     }
 
     if (protoBufPt.has_aprioriradiussource()) {
       switch (protoBufPt.aprioriradiussource()) {
         case PBControlNet_PBControlPoint_AprioriSource_None:
-          p_aprioriRadiusSource = RadiusSource::None;
+          aprioriRadiusSource = RadiusSource::None;
           break;
         case PBControlNet_PBControlPoint_AprioriSource_User:
-          p_aprioriRadiusSource = RadiusSource::User;
+          aprioriRadiusSource = RadiusSource::User;
           break;
         case PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures:
-          p_aprioriRadiusSource = RadiusSource::AverageOfMeasures;
+          aprioriRadiusSource = RadiusSource::AverageOfMeasures;
           break;
         case PBControlNet_PBControlPoint_AprioriSource_Ellipsoid:
-          p_aprioriRadiusSource = RadiusSource::Ellipsoid;
+          aprioriRadiusSource = RadiusSource::Ellipsoid;
           break;
         case PBControlNet_PBControlPoint_AprioriSource_DEM:
-          p_aprioriRadiusSource = RadiusSource::DEM;
+          aprioriRadiusSource = RadiusSource::DEM;
           break;
         case PBControlNet_PBControlPoint_AprioriSource_BundleSolution:
-          p_aprioriRadiusSource = RadiusSource::BundleSolution;
+          aprioriRadiusSource = RadiusSource::BundleSolution;
           break;
 
         case PBControlNet_PBControlPoint_AprioriSource_Reference:
@@ -2050,15 +1839,15 @@ namespace Isis {
     }
 
     if (protoBufPt.has_aprioriradiussourcefile()) {
-      p_aprioriRadiusSourceFile = protoBufPt.aprioriradiussourcefile();
+      aprioriRadiusSourceFile = protoBufPt.aprioriradiussourcefile();
     }
 
     if (protoBufPt.has_apriorix() && protoBufPt.has_aprioriy() &&
         protoBufPt.has_aprioriz()) {
       SurfacePoint apriori(
-          Displacement(protoBufPt.apriorix(), Displacement::Meters),
-          Displacement(protoBufPt.aprioriy(), Displacement::Meters),
-          Displacement(protoBufPt.aprioriz(), Displacement::Meters));
+        Displacement(protoBufPt.apriorix(), Displacement::Meters),
+        Displacement(protoBufPt.aprioriy(), Displacement::Meters),
+        Displacement(protoBufPt.aprioriz(), Displacement::Meters));
 
       if (protoBufPt.aprioricovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
@@ -2073,13 +1862,13 @@ namespace Isis {
         apriori.SetRectangularMatrix(covar);
       }
 
-      p_aprioriSurfacePoint = apriori;
+      aprioriSurfacePoint = apriori;
     }
 
     if (protoBufPt.has_x() && protoBufPt.has_y() && protoBufPt.has_z()) {
       SurfacePoint apost(Displacement(protoBufPt.x(), Displacement::Meters),
-                         Displacement(protoBufPt.y(), Displacement::Meters),
-                         Displacement(protoBufPt.z(), Displacement::Meters));
+          Displacement(protoBufPt.y(), Displacement::Meters),
+          Displacement(protoBufPt.z(), Displacement::Meters));
 
       if (protoBufPt.apostcovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
@@ -2094,19 +1883,21 @@ namespace Isis {
         apost.SetRectangularMatrix(covar);
       }
 
-      p_surfacePoint = apost;
+      surfacePoint = apost;
     }
   }
 
 
   void ControlPoint::PointModified() {
-    p_dateTime = "";
+    dateTime = "";
   }
 
 
   //! Initialize the number of rejected measures to 0
-  void ControlPoint::ZeroNumberOfRejectedMeasures() {
-    p_numberOfRejectedMeasures = 0;
+  void ControlPoint::ZeroNumberOfRejectedMeasures()
+
+  {
+    numberOfRejectedMeasures = 0;
   }
 
 
@@ -2117,7 +1908,7 @@ namespace Isis {
    *
    */
   void ControlPoint::SetNumberOfRejectedMeasures(int numRejected) {
-    p_numberOfRejectedMeasures = numRejected;
+    numberOfRejectedMeasures = numRejected;
   }
 
 
@@ -2128,7 +1919,7 @@ namespace Isis {
    *
    */
   int ControlPoint::GetNumberOfRejectedMeasures() const {
-    return p_numberOfRejectedMeasures;
+    return numberOfRejectedMeasures;
   }
 
 
@@ -2157,6 +1948,10 @@ namespace Isis {
       pbPoint.set_ignore(true);
     if (IsRejected())
       pbPoint.set_jigsawrejected(true);
+
+    if (referenceMeasure) {
+      pbPoint.set_referenceindex(IndexOfRefMeasure());
+    }
 
     switch (GetAprioriSurfacePointSource()) {
       case ControlPoint::SurfacePointSource::None:
@@ -2248,7 +2043,7 @@ namespace Isis {
 
     //  Process all measures in the point
     for (int i = 0; i < cubeSerials->size(); i++)
-      *pbPoint.add_measures() = (*p_measures)[cubeSerials->at(i)]->ToProtocolBuffer();
+      *pbPoint.add_measures() = (*measures)[cubeSerials->at(i)]->ToProtocolBuffer();
 
     return pbPoint;
   }
@@ -2258,7 +2053,7 @@ namespace Isis {
     PBControlNetLogData_Point protoBufLog;
 
     ControlMeasure *measure;
-    foreach(measure, *p_measures) {
+    foreach(measure, *measures) {
       *protoBufLog.add_measures() = measure->GetLogProtocolBuffer();
     }
 

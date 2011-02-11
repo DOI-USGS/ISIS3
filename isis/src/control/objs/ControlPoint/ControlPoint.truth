@@ -9,6 +9,7 @@ Object = ControlPoint
   DateTime                = 2005-05-03T00:00:00
   EditLock                = True
   Ignore                  = True
+  ReferenceIndex          = 0
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -43,6 +44,7 @@ End
 Done printing point.
 
 Adding ControlMeasure with cube serial number [Test2]
+Testing Edit Locking... ok!
 
 Printing point:
 Object = ControlPoint
@@ -52,6 +54,7 @@ Object = ControlPoint
   DateTime                = 2005-05-03T00:00:00
   EditLock                = True
   Ignore                  = True
+  ReferenceIndex          = 1
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -84,7 +87,7 @@ Object = ControlPoint
 
   Group = ControlMeasure
     SerialNumber   = Test2
-    MeasureType    = Reference
+    MeasureType    = Candidate
     ChooserName    = seedgrid
     DateTime       = 2005-05-03T00:00:00
     Ignore         = True
@@ -113,6 +116,7 @@ Object = ControlPoint
   DateTime                = 2005-05-03T00:00:00
   EditLock                = True
   Ignore                  = True
+  ReferenceIndex          = 0
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -128,7 +132,7 @@ Object = ControlPoint
 
   Group = ControlMeasure
     SerialNumber   = Test2
-    MeasureType    = Reference
+    MeasureType    = Candidate
     ChooserName    = seedgrid
     DateTime       = 2005-05-03T00:00:00
     Ignore         = True
@@ -146,11 +150,6 @@ End_Object
 End
 Done printing point.
 
-ReferenceIndex = 0
-Deleting ControlMeasure with cube serial number [Test2]
-Measure type: Reference
-**PROGRAMMER ERROR** Point Id [C151] can not do requested operation on reference measure [Test2]
-ReferenceIndex = 0
 
 Test adding control measures with identical serial numbers ...
 **PROGRAMMER ERROR** The SerialNumber is not unique. A measure with serial number [Test2] already exists for ControlPoint [C151]

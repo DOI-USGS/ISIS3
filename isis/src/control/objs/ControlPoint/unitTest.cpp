@@ -32,14 +32,14 @@ int main() {
 
   cout << "ControlPoint unitTest" << endl;
 
-  ControlPoint c("C151");
+  ControlPoint cp("C151");
 
-  c.SetType(ControlPoint::Ground);
-  c.SetIgnored(true);
-  c.SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
-  c.SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
-  c.SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
-  c.SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
+  cp.SetType(ControlPoint::Ground);
+  cp.SetIgnored(true);
+  cp.SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
+  cp.SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
+  cp.SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
+  cp.SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
   SurfacePoint point(Displacement(-424.024048, Displacement::Meters),
                      Displacement(734.4311949, Displacement::Meters),
@@ -47,73 +47,82 @@ int main() {
                      Distance(10, Distance::Meters),
                      Distance(50, Distance::Meters),
                      Distance(20, Distance::Meters));
-  c.SetSurfacePoint(point);
-  c.SetAprioriSurfacePoint(point);
-  c.SetEditLock(true);
+  cp.SetSurfacePoint(point);
+  cp.SetAprioriSurfacePoint(point);
+  cp.SetEditLock(true);
 
-  ControlMeasure *d = new ControlMeasure;
-  d->SetCubeSerialNumber("Test1");
-  d->SetIgnored(true);
-  d->SetCoordinate(1.0, 2.0);
-  d->SetResidual(-3.0, 4.0);
-  d->SetDiameter(15.0);
-  d->SetAprioriSample(2.0);
-  d->SetAprioriLine(5.0);
-  d->SetSampleSigma(.01);
-  d->SetLineSigma(.21);
-  d->SetChooserName("seedgrid");
-  d->SetDateTime("2005-05-03T00:00:00");
+  ControlMeasure *cm1 = new ControlMeasure;
+  cm1->SetCubeSerialNumber("Test1");
+  cm1->SetIgnored(true);
+  cm1->SetCoordinate(1.0, 2.0);
+  cm1->SetResidual(-3.0, 4.0);
+  cm1->SetDiameter(15.0);
+  cm1->SetAprioriSample(2.0);
+  cm1->SetAprioriLine(5.0);
+  cm1->SetSampleSigma(.01);
+  cm1->SetLineSigma(.21);
+  cm1->SetChooserName("seedgrid");
+  cm1->SetDateTime("2005-05-03T00:00:00");
 
-  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test1"
-  c.Add(d);
+  cout << "Adding ControlMeasure with cube serial number [" << cm1->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test1"
+  cp.Add(cm1);
 
-  printPoint(c);
+  printPoint(cp);
 
-  d = new ControlMeasure;
-  d->SetCubeSerialNumber("Test2");
-  d->SetIgnored(true);
-  d->SetCoordinate(100.0, 200.0);
-  d->SetDiameter(15.0);
-  d->SetAprioriSample(2.0);
-  d->SetAprioriLine(5.0);
-  d->SetSampleSigma(.01);
-  d->SetLineSigma(.21);
-  d->SetType(Isis::ControlMeasure::Reference);
-  d->SetResidual(-2.0, 2.0);
-  d->SetChooserName("seedgrid");
-  d->SetDateTime("2005-05-03T00:00:00");
-  cout << "Adding ControlMeasure with cube serial number [" << d->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test2"
-  c.Add(d);
-  printPoint(c);
+  ControlMeasure * cm2 = new ControlMeasure;
+  cm2->SetCubeSerialNumber("Test2");
+  cm2->SetIgnored(true);
+  cm2->SetCoordinate(100.0, 200.0);
+  cm2->SetDiameter(15.0);
+  cm2->SetAprioriSample(2.0);
+  cm2->SetAprioriLine(5.0);
+  cm2->SetSampleSigma(.01);
+  cm2->SetLineSigma(.21);
+//  cm2->SetType(Isis::ControlMeasure::Reference);
+  cm2->SetResidual(-2.0, 2.0);
+  cm2->SetChooserName("seedgrid");
+  cm2->SetDateTime("2005-05-03T00:00:00");
+  cout << "Adding ControlMeasure with cube serial number [" << cm2->GetCubeSerialNumber() << "]" << endl; // Cube Serial Number "Test2"
+  cp.Add(cm2);
+  cout << "Testing Edit Locking... ";
+  cp.SetRefMeasure(cm2);
+  if (cp.GetRefMeasure() != cm2)
+  {
+    cp.SetEditLock(false);
+    cp.SetRefMeasure(cm2);
+    if (cp.GetRefMeasure() == cm2)
+      cout << "ok!\n";
+    else
+      cout << "Failed!\n";
+  }
+  else
+  {
+    cout << "Failed!\n";
+  }
+  cp.SetEditLock(false);
+  cp.SetRefMeasure(cm2);
+  cp.SetEditLock(true);
+  printPoint(cp);
 
   // Should be successful
-  cout << "Deleting ControlMeasure with cube serial number [" << c.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
-  cout << "Measure type: " << ControlMeasure::MeasureTypeToString(c.GetMeasure(0)->GetType()) << endl;
-  c.Delete(0);
-  printPoint(c);
-  cout << "ReferenceIndex = " << c.GetReferenceIndex() << endl;
+  cout << "Deleting ControlMeasure with cube serial number [" << cp.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
+  cout << "Measure type: " << ControlMeasure::MeasureTypeToString(cp.GetMeasure(0)->GetType()) << endl;
+  cp.Delete(0);
+  printPoint(cp);
+//  cout << "ReferenceIndex = " << cp.GetReferenceIndex() << endl;
 
-  // Should fail
-  cout << "Deleting ControlMeasure with cube serial number [" << c.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
-  cout << "Measure type: " << ControlMeasure::MeasureTypeToString(c.GetMeasure(0)->GetType()) << endl;
-  try {
-    c.Delete(0);
-  }
-  catch (Isis::iException &e) {
-    e.Report(false);
-  }
-  cout << "ReferenceIndex = " << c.GetReferenceIndex() << endl;
+//  cout << "ReferenceIndex = " << cp.GetReferenceIndex() << endl;
 
   cout << endl << "Test adding control measures with identical serial numbers ..." << endl;
   try {
-    c.Add(d);
+    cp.Add(cm2);
   }
   catch (Isis::iException &e) {
     e.Report(false);
   }
 
   cout << endl << "Test SetSurfacePoint ... " << endl;
-  SurfacePoint surfPt(c.GetSurfacePoint());
+  SurfacePoint surfPt(cp.GetSurfacePoint());
   cout << "X = " << surfPt.GetX().GetMeters() << endl;
   cout << "Y = " << surfPt.GetY().GetMeters() << endl;
   cout << "Z = " << surfPt.GetZ().GetMeters() << endl;
@@ -123,8 +132,8 @@ int main() {
   surfPt.SetSpherical(Latitude(32, Angle::Degrees),
                       Longitude(120, Angle::Degrees),
                       Distance(1000, Distance::Meters));
-  c.SetSurfacePoint(surfPt);
-  surfPt = c.GetSurfacePoint();
+  cp.SetSurfacePoint(surfPt);
+  surfPt = cp.GetSurfacePoint();
   cout << "X = " << surfPt.GetX().GetMeters() << endl;
   cout << "Y = " << surfPt.GetY().GetMeters() << endl;
   cout << "Z = " << surfPt.GetZ().GetMeters() << endl;
@@ -148,15 +157,15 @@ int main() {
   covar(2, 2) = 400.;
 
   point.SetRectangularMatrix(covar);
-  c.SetAprioriSurfacePoint(point);
+  cp.SetAprioriSurfacePoint(point);
 
   //c.SetAprioriCovariance();
-  point = c.GetAprioriSurfacePoint();
+  point = cp.GetAprioriSurfacePoint();
   cout << "Apriori Sigma X = " << point.GetXSigma().GetMeters() << endl;
   cout << "Apriori Sigma Y = " << point.GetYSigma().GetMeters() << endl;
   cout << "Apriori Sigma Z = " << point.GetZSigma().GetMeters() << endl;
 
-  point = c.GetSurfacePoint();
+  point = cp.GetSurfacePoint();
   cout << "Aposteriori Sigma X = " << point.GetXSigma().GetMeters() << endl;
   cout << "Aposteriori Sigma Y = " << point.GetYSigma().GetMeters() << endl;
   cout << "Aposteriori Sigma Z = " << point.GetZSigma().GetMeters() << endl;
