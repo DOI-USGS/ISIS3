@@ -34,7 +34,7 @@ int main() {
   outit(d);
 
   d.SetCubeSerialNumber("Test");
-  d.SetType(ControlMeasure::Reference);
+  d.SetType(ControlMeasure::Candidate);
   d.SetIgnored(true);
   d.SetCoordinate(1.0, 2.0);
   d.SetResidual(-3.0, 4.0);
@@ -86,12 +86,12 @@ int main() {
   QStringList nameValuePair;
   foreach(nameValuePair, printableMeasureData) {
     cout << nameValuePair.at(0).toStdString() << "=" <<
-         nameValuePair.at(1).toStdString() << endl;
+        nameValuePair.at(1).toStdString() << endl;
   }
 
   cout << "Test 8" << endl;
   cout << d.GetLogData(ControlMeasureLogData::GoodnessOfFit).
-       GetNumericalValue() << endl;
+      GetNumericalValue() << endl;
 
   try {
     d.SetLogData(ControlMeasureLogData());

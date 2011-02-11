@@ -83,8 +83,8 @@ namespace Isis {
     Init(protoBuf);
 
     for (int dataEntry = 0;
-         dataEntry < logData.loggedmeasuredata_size();
-         dataEntry ++) {
+        dataEntry < logData.loggedmeasuredata_size();
+        dataEntry ++) {
       ControlMeasureLogData logEntry(logData.loggedmeasuredata(dataEntry));
       p_loggedData->push_back(logEntry);
     }
@@ -120,7 +120,7 @@ namespace Isis {
     p_lineResidual = other.p_lineResidual;
     p_camera = other.p_camera;
     parentPoint = other.parentPoint;
-    associatedSN = other.associatedSN;
+    associatedCSN = other.associatedCSN;
   }
 
 
@@ -134,9 +134,6 @@ namespace Isis {
     p_loggedData = new QVector<ControlMeasureLogData>();
 
     switch (protoBuf.type()) {
-      case PBControlNet_PBControlPoint_PBControlMeasure::Reference:
-        p_measureType = ControlMeasure::Reference;
-        break;
       case PBControlNet_PBControlPoint_PBControlMeasure::Candidate:
         p_measureType = ControlMeasure::Candidate;
         break;
@@ -149,9 +146,6 @@ namespace Isis {
       case PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel:
         p_measureType = ControlMeasure::RegisteredSubPixel;
         break;
-      case PBControlNet_PBControlPoint_PBControlMeasure::Ground:
-        p_measureType = ControlMeasure::RegisteredSubPixel;
-        break;
     }
 
     p_editLock = protoBuf.editlock();
@@ -159,6 +153,7 @@ namespace Isis {
     p_ignore = protoBuf.ignore();
     p_sample = protoBuf.measurement().sample();
     p_line = protoBuf.measurement().line();
+//    ground = protoBuf.???
 
     if (protoBuf.has_diameter())
       p_diameter = protoBuf.diameter();
@@ -205,7 +200,7 @@ namespace Isis {
     p_focalPlaneComputedY = Null;
 
     parentPoint = NULL;
-    associatedSN = NULL;
+    associatedCSN = NULL;
   }
 
 
@@ -233,8 +228,8 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
-    if (associatedSN) {
-      associatedSN->RemoveMeasure(GetPointId());
+    if (associatedCSN) {
+      associatedCSN->RemoveMeasure(GetPointId());
     }
   }
 
@@ -267,10 +262,7 @@ namespace Isis {
     *p_serialNumber = p["SerialNumber"][0];
     unknownKeywords.DeleteKeyword("SerialNumber");
 
-    if (p["MeasureType"][0] == "Reference") {
-      p_measureType = Reference;
-    }
-    else if (p["MeasureType"][0] == "Candidate") {
+    if (p["MeasureType"][0] == "Candidate") {
       p_measureType = Candidate;
     }
     else if (p["MeasureType"][0] == "Manual") {
@@ -282,41 +274,36 @@ namespace Isis {
     else if (p["MeasureType"][0] == "RegisteredSubPixel") {
       p_measureType = RegisteredSubPixel;
     }
-    else if (p["MeasureType"][0] == "Ground") {
-      p_measureType = Ground;
-    }
-    //  Backwards compatiability for old keyword values
-    else if (p["MeasureType"][0] == "Estimated") {
-      p_measureType = Candidate;
-    }
-    else if (p["MeasureType"][0] == "Unmeasured") {
-      p_measureType = Candidate;
-    }
-    else if (p["MeasureType"][0] == "Automatic" ||
-             p["MeasureType"][0] == "ValidatedManual") {
-      p_measureType = RegisteredPixel;
-    }
-    else if (p["MeasureType"][0] == "ValidatedAutomatic") {
-      p_measureType = RegisteredSubPixel;
-    }
-    //  Intermediate versions that might still be out there
-    else if (p["MeasureType"][0] == "AutomaticPixel") {
-      p_measureType = RegisteredPixel;
-    }
-    else if (p["MeasureType"][0] == "AutomaticSubPixel") {
-      p_measureType = RegisteredSubPixel;
-    }
-    else {
-      iString msg = "Invalid Measure Type, [" + p["MeasureType"][0] + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
+    else
+      //  Backwards compatiability for old keyword values
+      if (p["MeasureType"][0] == "Estimated") {
+        p_measureType = Candidate;
+      }
+      else if (p["MeasureType"][0] == "Unmeasured") {
+        p_measureType = Candidate;
+      }
+      else if (p["MeasureType"][0] == "Automatic" ||
+          p["MeasureType"][0] == "ValidatedManual") {
+        p_measureType = RegisteredPixel;
+      }
+      else if (p["MeasureType"][0] == "ValidatedAutomatic") {
+        p_measureType = RegisteredSubPixel;
+      }
+//  Intermediate versions that might still be out there
+      else if (p["MeasureType"][0] == "AutomaticPixel") {
+        p_measureType = RegisteredPixel;
+      }
+      else if (p["MeasureType"][0] == "AutomaticSubPixel") {
+        p_measureType = RegisteredSubPixel;
+      }
+      else {
+        iString msg = "Invalid Measure Type, [" + p["MeasureType"][0] + "]";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
     unknownKeywords.DeleteKeyword("MeasureType");
 
     //  Check for old Reference keyword
     if (p.HasKeyword("Reference")) {
-      iString reference = p["Reference"][0];
-      if (reference.DownCase() == "true")
-        p_measureType = Reference;
       unknownKeywords.DeleteKeyword("Reference");
     }
 
@@ -404,7 +391,7 @@ namespace Isis {
 
     // Try to interpret remaining keywords as log data
     for (int unknownKeyIndex = 0; unknownKeyIndex < unknownKeywords.Keywords();
-         unknownKeyIndex ++) {
+        unknownKeyIndex ++) {
       ControlMeasureLogData logEntry(unknownKeywords[unknownKeyIndex]);
 
       if (logEntry.IsValid()) {
@@ -639,7 +626,7 @@ namespace Isis {
   void ControlMeasure::SetLogData(ControlMeasureLogData data) {
     if (!data.IsValid()) {
       iString msg = "Cannot set log data with invalid information stored in "
-                    "the ControlMeasureLogData";
+          "the ControlMeasureLogData";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -686,9 +673,9 @@ namespace Isis {
 
     if (!updated) {
       iString msg = "Unable to update the log data for [" +
-                    newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
-                    " control measure does not have log data for this value. Please use "
-                    "SetLogData instead";
+          newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
+          " control measure does not have log data for this value. Please use "
+          "SetLogData instead";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -785,11 +772,7 @@ namespace Isis {
 
   bool ControlMeasure::IsRegistered() const {
     return (p_measureType == RegisteredPixel ||
-            p_measureType == RegisteredSubPixel);
-  }
-
-  bool ControlMeasure::IsGround() const {
-    return p_measureType == Ground;
+        p_measureType == RegisteredSubPixel);
   }
 
   bool ControlMeasure::IsStatisticallyRelevant(DataField field) const {
@@ -824,7 +807,7 @@ namespace Isis {
 
     if (!validField) {
       iString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
-                    + iString(field) + "]";
+          + iString(field) + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -885,12 +868,12 @@ namespace Isis {
 
 
   void ControlMeasure::ConnectControlSN(ControlSerialNumber *sn) {
-    associatedSN = sn;
+    associatedCSN = sn;
   }
 
 
   void ControlMeasure::DisconnectControlSN() {
-    associatedSN = NULL;
+    associatedCSN = NULL;
   }
 
 
@@ -929,7 +912,7 @@ namespace Isis {
     else {
       iString msg = data + " passed to GetMeasureData but is invalid";
       throw Isis::iException::Message(Isis::iException::Programmer, msg,
-                                      _FILEINFO_);
+          _FILEINFO_);
     }
   }
 
@@ -1088,10 +1071,6 @@ namespace Isis {
     iString sPrintable;
 
     switch (type) {
-      case ControlMeasure::Reference:
-        sPrintable = "Reference";
-        break;
-
       case ControlMeasure::Candidate:
         sPrintable = "Candidate";
         break;
@@ -1107,15 +1086,11 @@ namespace Isis {
       case ControlMeasure::RegisteredSubPixel:
         sPrintable = "RegisteredSubPixel";
         break;
-
-      case ControlMeasure::Ground:
-        sPrintable = "Ground";
-        break;
     }
 
     if (sPrintable == "") {
       iString msg = "Measure type [" + iString(type) + "] cannot be converted "
-                    "to a string";
+          "to a string";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1181,7 +1156,7 @@ namespace Isis {
     p_focalPlaneComputedX = other.p_focalPlaneComputedX;
     p_focalPlaneComputedY = other.p_focalPlaneComputedY;
     parentPoint = other.parentPoint;
-    associatedSN = other.associatedSN;
+    associatedCSN = other.associatedCSN;
 
     return *this;
   }
@@ -1214,24 +1189,24 @@ namespace Isis {
    */
   bool ControlMeasure::operator==(const Isis::ControlMeasure &pMeasure) const {
     return pMeasure.p_measureType == p_measureType &&
-           *pMeasure.p_serialNumber == *p_serialNumber &&
-           pMeasure.p_chooserName == p_chooserName &&
-           pMeasure.p_dateTime == p_dateTime &&
-           pMeasure.p_editLock == p_editLock &&
-           pMeasure.p_ignore == p_ignore &&
-           pMeasure.p_sample == p_sample &&
-           pMeasure.p_line == p_line &&
-           pMeasure.p_diameter == p_diameter &&
-           pMeasure.p_aprioriSample == p_aprioriSample &&
-           pMeasure.p_aprioriLine == p_aprioriLine &&
-           pMeasure.p_sampleSigma ==  p_sampleSigma &&
-           pMeasure.p_lineSigma ==  p_lineSigma &&
-           pMeasure.p_sampleResidual == p_sampleResidual &&
-           pMeasure.p_lineResidual == p_lineResidual &&
-           pMeasure.p_focalPlaneMeasuredX == p_focalPlaneMeasuredX &&
-           pMeasure.p_focalPlaneMeasuredY == p_focalPlaneMeasuredY &&
-           pMeasure.p_focalPlaneComputedX == p_focalPlaneComputedX &&
-           pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY;
+        *pMeasure.p_serialNumber == *p_serialNumber &&
+        pMeasure.p_chooserName == p_chooserName &&
+        pMeasure.p_dateTime == p_dateTime &&
+        pMeasure.p_editLock == p_editLock &&
+        pMeasure.p_ignore == p_ignore &&
+        pMeasure.p_sample == p_sample &&
+        pMeasure.p_line == p_line &&
+        pMeasure.p_diameter == p_diameter &&
+        pMeasure.p_aprioriSample == p_aprioriSample &&
+        pMeasure.p_aprioriLine == p_aprioriLine &&
+        pMeasure.p_sampleSigma ==  p_sampleSigma &&
+        pMeasure.p_lineSigma ==  p_lineSigma &&
+        pMeasure.p_sampleResidual == p_sampleResidual &&
+        pMeasure.p_lineResidual == p_lineResidual &&
+        pMeasure.p_focalPlaneMeasuredX == p_focalPlaneMeasuredX &&
+        pMeasure.p_focalPlaneMeasuredY == p_focalPlaneMeasuredY &&
+        pMeasure.p_focalPlaneComputedX == p_focalPlaneComputedX &&
+        pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY;
   }
 
 
@@ -1241,9 +1216,6 @@ namespace Isis {
 
     protoBufMeasure.set_serialnumber(GetCubeSerialNumber());
     switch (GetType()) {
-      case ControlMeasure::Reference:
-        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::Reference);
-        break;
       case ControlMeasure::Candidate:
         protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::Candidate);
         break;
@@ -1254,9 +1226,6 @@ namespace Isis {
         protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredPixel);
         break;
       case ControlMeasure::RegisteredSubPixel:
-        protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
-        break;
-      case ControlMeasure::Ground:
         protoBufMeasure.set_type(PBControlNet_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
         break;
     }

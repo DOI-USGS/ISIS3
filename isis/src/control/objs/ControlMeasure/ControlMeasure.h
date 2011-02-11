@@ -137,6 +137,9 @@ namespace Isis {
    *                              DataField. The accessors to this class no
    *                              longer give up internal pointers.
    *   @history 2011-01-13 Mackenzie Boyd Added pointer to owning ControlPoint.
+   *   @history 2011-02-10 Eric Hyer - Measures no longer know about or care
+   *                about whether they are the reference measure or not.  This
+   *                is now completely maintained by the ControlPoint class.
    */
   class ControlMeasure {
       friend class ControlPoint;
@@ -167,8 +170,6 @@ namespace Isis {
        *
        */
       enum MeasureType {
-        //! // Reference Measure
-        Reference,
         //! (e.g., autoseed, interest) AKA predicted, unmeasured, unverified
         Candidate,
         //! Hand Measured (e.g., qnet)
@@ -177,8 +178,6 @@ namespace Isis {
         RegisteredPixel,
         //! Registered to sub-pixel (e.g., pointreg)
         RegisteredSubPixel,
-        //! Coordinate in ground source
-        Ground
       };
 
       enum Status {
@@ -209,7 +208,7 @@ namespace Isis {
       ControlMeasure();
       ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &);
       ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &,
-                     const PBControlNetLogData_Point_Measure &);
+          const PBControlNetLogData_Point_Measure &);
       ControlMeasure(const ControlMeasure &other);
       ~ControlMeasure();
 
@@ -220,20 +219,20 @@ namespace Isis {
       Status SetAprioriLine(double aprioriLine);
       Status SetAprioriSample(double aprioriSample);
       Status SetCamera(Isis::Camera *camera);
-      Status SetCubeSerialNumber(iString newSerialNumber);
       Status SetChooserName();
       Status SetChooserName(iString name);
       Status SetCoordinate(double sample, double line);
       Status SetCoordinate(double sample, double line, MeasureType type);
+      Status SetCubeSerialNumber(iString newSerialNumber);
       Status SetDateTime();
       Status SetDateTime(iString datetime);
       Status SetDiameter(double diameter);
       Status SetEditLock(bool editLock);
-      Status SetRejected(bool rejected);
       Status SetFocalPlaneMeasured(double x, double y);
       Status SetFocalPlaneComputed(double x, double y);
       Status SetIgnored(bool ignore);
       Status SetLineSigma(double lineSigma);
+      Status SetRejected(bool rejected);
       Status SetResidual(double sampResidual, double lineResidual);
       Status SetSampleSigma(double sampleSigma);
       Status SetType(MeasureType type);
@@ -263,7 +262,6 @@ namespace Isis {
       bool IsMeasured() const;
       bool IsRegistered() const;
       bool IsStatisticallyRelevant(DataField field) const;
-      bool IsGround() const;
       double GetLine() const;
       double GetLineResidual() const;
       double GetLineSigma() const;
@@ -301,7 +299,7 @@ namespace Isis {
 
     private: // data
       ControlPoint *parentPoint;  //!< Pointer to parent ControlPoint, may be null
-      ControlSerialNumber *associatedSN;  //!< Pointer to the Serial Number
+      ControlSerialNumber *associatedCSN;  //!< Pointer to the Serial Number
       // structure connecting measures in an image
 
       iString *p_serialNumber;
