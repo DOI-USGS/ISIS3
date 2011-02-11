@@ -387,9 +387,11 @@ namespace Isis {
       // Get number of measures locked and check if Reference
       // Measure is locked
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
-      bool bRefLocked = newPnt->IsReferenceLocked();
+      bool bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
 
-      int iOrigRefIndex = newPnt->GetReferenceIndexNoException();
+      int iOrigRefIndex = -1;
+      if (newPnt->HasReference())
+        iOrigRefIndex = newPnt->IndexOfRefMeasure();
 
       // Only perform the interest operation on points of type "Tie" and
       // Points having atleast 1 measure and Point is not Ignored
@@ -477,7 +479,10 @@ namespace Isis {
               if (measure == iBestMeasureIndex) {
                 newMeasure->SetCoordinate(mtInterestResults[measure].mdBestSample,
                                           mtInterestResults[measure].mdBestLine, ControlMeasure::Candidate);
-                newMeasure->SetType(ControlMeasure::Reference);
+            //    newMeasure->SetType(ControlMeasure::Reference);
+                
+                if (newPnt == newMeasure->Parent())
+                  exit(68);
 
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation",  LocationString(mtInterestResults[measure].mdBestSample,
                                                   mtInterestResults[measure].mdBestLine));
