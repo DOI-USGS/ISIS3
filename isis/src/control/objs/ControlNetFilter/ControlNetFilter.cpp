@@ -12,6 +12,7 @@
 #include "Longitude.h"
 #include "PvlGroup.h"
 #include "SerialNumberList.h"
+#include "Statistics.h"
 
 using namespace std;
 
@@ -80,10 +81,10 @@ namespace Isis {
    */
   void ControlNetFilter::PointStats(const ControlPoint &pcPoint) {
     mOstm << pcPoint.GetId()   << ", " << sPointType[(int)pcPoint.GetType()]
-          << ", " << sBoolean[(int)pcPoint.IsIgnored()] << ", "
-          << sBoolean[(int)pcPoint.IsEditLocked()] << ", "
-          << pcPoint.GetNumMeasures() << ", "
-          << pcPoint.GetNumMeasures() - pcPoint.GetNumValidMeasures() << ", ";
+        << ", " << sBoolean[(int)pcPoint.IsIgnored()] << ", "
+        << sBoolean[(int)pcPoint.IsEditLocked()] << ", "
+        << pcPoint.GetNumMeasures() << ", "
+        << pcPoint.GetNumMeasures() - pcPoint.GetNumValidMeasures() << ", ";
   }
 
   /**
@@ -143,7 +144,8 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       ControlPoint *cPoint = mCNet->GetPoint(i);
-      double dMaxErr = cPoint->GetMaximumResidual();
+      double dMaxErr = cPoint->GetStatistic(
+          &ControlMeasure::GetResidualMagnitude).Maximum();
       if (bLessThan && bGreaterThan) {
         if (!(dMaxErr < dLesser && dMaxErr > dGreater)) {
           mCNet->DeletePoint(i);
@@ -167,14 +169,14 @@ namespace Isis {
         int iNumMeasures = cPoint->GetNumMeasures();
         for (int j = 0; j < iNumMeasures; j++) {
           mOstm << cPoint->GetId() << ", " << sPointType[cPoint->GetType()]
-                << ", " << sBoolean[cPoint->IsIgnored()] << ", ";
+              << ", " << sBoolean[cPoint->IsIgnored()] << ", ";
 
           const ControlMeasure *measure = cPoint->GetMeasure(j);
           PrintCubeFileSerialNum(*measure);
           mOstm << ", " << measure->GetResidualMagnitude() << ", "
-                << sBoolean[measure->IsIgnored()] << ", "
-                << sBoolean[measure->GetType() == ControlMeasure::Reference]
-                << endl;
+              << sBoolean[measure->IsIgnored()] << ", "
+              << sBoolean[cPoint->GetRefMeasure() == measure]
+              << endl;
         }
       }
     }
@@ -296,10 +298,12 @@ namespace Isis {
 
       if (pbLastFilter) {
         for (int j = 0; j < iNumMeasures; j++) {
+          const ControlMeasure *cm = cPoint->GetMeasure(j);
           PointStats(*cPoint);
-          PrintCubeFileSerialNum(*cPoint->GetMeasure(j));
-          mOstm << ", "  << sBoolean[(int)cPoint[j].IsIgnored()];
-          mOstm << ", "  << sBoolean[(int)cPoint[j].GetType() == ControlMeasure::Reference] << endl;
+          PrintCubeFileSerialNum(*cm);
+          mOstm << ", "  << sBoolean[cm->IsIgnored()]
+              << ", "  << sBoolean[cm == cPoint->GetRefMeasure()]
+              << endl;
         }
       }
     }
@@ -413,7 +417,7 @@ namespace Isis {
       SurfacePoint cPointSurfPt = cPoint->GetSurfacePoint();
 
       if (!cPointSurfPt.Valid()) {
-        const ControlMeasure *cm = cPoint->GetReferenceMeasure();
+        const ControlMeasure *cm = cPoint->GetRefMeasure();
 
         string sn = cm->GetCubeSerialNumber();
         string filename = mSerialNumList.Filename(sn);
@@ -429,9 +433,9 @@ namespace Isis {
       }
 
       if (!(cPointSurfPt.GetLatitude().GetDegrees() >= dMinLat &&
-            cPointSurfPt.GetLatitude().GetDegrees() <= dMaxLat) ||
+          cPointSurfPt.GetLatitude().GetDegrees() <= dMaxLat) ||
           !(cPointSurfPt.GetLongitude().GetDegrees() >= dMinLon &&
-            cPointSurfPt.GetLongitude().GetDegrees() <= dMaxLon)) {
+              cPointSurfPt.GetLongitude().GetDegrees() <= dMaxLon)) {
         mCNet->DeletePoint(i);
         continue;
       }
@@ -439,8 +443,8 @@ namespace Isis {
       if (pbLastFilter) {
         PointStats(*cPoint);
         mOstm << cPointSurfPt.GetLatitude().GetDegrees() << ", " <<
-              cPointSurfPt.GetLongitude().GetDegrees() << ", " <<
-              cPointSurfPt.GetLocalRadius().GetMeters() << endl;
+            cPointSurfPt.GetLongitude().GetDegrees() << ", " <<
+            cPointSurfPt.GetLocalRadius().GetMeters() << endl;
       }
     }
   }
@@ -475,7 +479,7 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       const ControlPoint *cp1 = mCNet->GetPoint(i);
-      const ControlMeasure *cp1RefMeasure = cp1->GetReferenceMeasure();
+      const ControlMeasure *cp1RefMeasure = cp1->GetRefMeasure();
       SurfacePoint surfacePt1;
       Camera *cam1;
 
@@ -490,7 +494,7 @@ namespace Isis {
           Pvl pvl1(filename1);
           cam1 = CameraFactory::Create(pvl1);
           if (cam1->SetImage(cp1RefMeasure->GetSample(),
-                             cp1RefMeasure->GetLine())) {
+              cp1RefMeasure->GetLine())) {
             surfacePt1.SetSpherical(
               Latitude(cam1->UniversalLatitude(), Angle::Degrees),
               Longitude(cam1->UniversalLongitude(), Angle::Degrees),
@@ -511,7 +515,7 @@ namespace Isis {
           continue;
         }
         const ControlPoint *cp2 = mCNet->GetPoint(j);
-        const ControlMeasure *cp2RefMeasure = cp2->GetReferenceMeasure();
+        const ControlMeasure *cp2RefMeasure = cp2->GetRefMeasure();
 
         SurfacePoint surfacePt2;
         Camera *cam2;
@@ -529,7 +533,7 @@ namespace Isis {
             cam2 = CameraFactory::Create(pvl2);
 
             if (cam2->SetImage(cp2RefMeasure->GetSample(),
-                               cp2RefMeasure->GetLine())) {
+                cp2RefMeasure->GetLine())) {
               surfacePt2.SetSpherical(
                 Latitude(cam2->UniversalLatitude(), Angle::Degrees),
                 Longitude(cam2->UniversalLongitude(), Angle::Degrees),
@@ -540,12 +544,12 @@ namespace Isis {
 
           // Get the distance from the camera class
           dDist = Camera::Distance(
-                    surfacePt1.GetLatitude().GetDegrees(),
-                    surfacePt1.GetLongitude().GetDegrees(),
-                    surfacePt2.GetLatitude().GetDegrees(),
-                    surfacePt2.GetLongitude().GetDegrees(),
-                    surfacePt1.GetLocalRadius().GetMeters()
-                  );
+              surfacePt1.GetLatitude().GetDegrees(),
+              surfacePt1.GetLongitude().GetDegrees(),
+              surfacePt2.GetLatitude().GetDegrees(),
+              surfacePt2.GetLongitude().GetDegrees(),
+              surfacePt1.GetLocalRadius().GetMeters()
+              );
         }
         else
           // pixels
@@ -644,10 +648,10 @@ namespace Isis {
             PointStats(*cPoint);
             string sn = cMeasure->GetCubeSerialNumber();
             mOstm << mSerialNumList.Filename(sn) << ", " << sn << ","
-                  << sBoolean[(int) cMeasure->IsIgnored()] << ", "
-                  << cMeasure->GetMeasureTypeString() << ", "
-                  << sBoolean[cMeasure->GetType() == ControlMeasure::Reference]
-                  << endl;
+                << sBoolean[(int) cMeasure->IsIgnored()] << ", "
+                << cMeasure->GetMeasureTypeString() << ", "
+                << sBoolean[cPoint->GetRefMeasure() == cMeasure]
+                << endl;
           }
         }
         else
@@ -806,18 +810,18 @@ namespace Isis {
 
           // Point Details
           mOstm << cPoint->GetId() << ", " << sPointType[cPoint->GetType()]
-                << ", " << sBoolean[cPoint->IsIgnored()] << ", "
-                << iNumMeasures << ", "
-                << iNumMeasures - cPoint->GetNumValidMeasures() << ", "
-                << sBoolean[cPoint->IsEditLocked()] << ", ";
+              << ", " << sBoolean[cPoint->IsIgnored()] << ", "
+              << iNumMeasures << ", "
+              << iNumMeasures - cPoint->GetNumValidMeasures() << ", "
+              << sBoolean[cPoint->IsEditLocked()] << ", ";
 
           // Image Details
           string sn = cMeasure->GetCubeSerialNumber();
           int iPointDetails[IMAGE_POINT_SIZE], *iPntDetailsPtr = iPointDetails;
           GetImageStatsBySerialNum(sn, iPntDetailsPtr, IMAGE_POINT_SIZE);
           mOstm << mSerialNumList.Filename(sn) << ", " << sn << ", "
-                << iPntDetailsPtr[total] << ", " << iPntDetailsPtr[ignore]
-                << ", " << iPntDetailsPtr[ground] << endl;
+              << iPntDetailsPtr[total] << ", " << iPntDetailsPtr[ignore]
+              << ", " << iPntDetailsPtr[ground] << endl;
         }
       }
     }

@@ -197,7 +197,7 @@ void PrintControlNetInfo(ControlNet &pCNet) {
     for (int j = 0; j < serialNums.size(); j++) {
       const QString &serialNum = serialNums.at(j);
       cerr << "   Measure SerialNum "
-           << serialNum.toStdString() << endl;
+          << serialNum.toStdString() << endl;
     }
     cerr << endl;
   }
