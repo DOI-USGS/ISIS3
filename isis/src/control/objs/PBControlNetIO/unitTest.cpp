@@ -68,7 +68,7 @@ int main () {
 
   PBControlNet_PBControlPoint_PBControlMeasure *pbMeas = pbPoint->add_measures();
   pbMeas->set_serialnumber("APOLLO15/METRIC/1971-07-30T02:17:20.758");
-  pbMeas->set_type(PBControlNet_PBControlPoint_PBControlMeasure::Reference);
+  pbMeas->set_type(PBControlNet_PBControlPoint_PBControlMeasure::Candidate);
   pbMeas->set_choosername("cnetref");
   pbMeas->set_datetime("2010-06-30T13:51:45");
 
@@ -113,7 +113,7 @@ int main () {
 
   pbMeas = pbPoint->add_measures();
   pbMeas->set_serialnumber("APOLLO15/METRIC/1971-07-30T02:17:41.097");
-  pbMeas->set_type(PBControlNet_PBControlPoint_PBControlMeasure::Reference);
+  pbMeas->set_type(PBControlNet_PBControlPoint_PBControlMeasure::Candidate);
   pbMeas->set_choosername("cnetref");
   pbMeas->set_datetime("2010-07-15T09:42:55");
 
