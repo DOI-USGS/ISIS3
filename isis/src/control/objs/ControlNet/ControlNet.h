@@ -136,11 +136,11 @@ namespace Isis {
 
       void AddPoint(ControlPoint *point);
       void AddControlSerialNumber(const ControlPoint *point,
-                                  ControlMeasure *measure);
+          ControlMeasure *measure);
       void DeletePoint(iString pointId);
       void DeletePoint(int index);
       void RemoveControlSerialNumber(ControlPoint *point,
-                                     ControlMeasure *measure);
+          ControlMeasure *measure);
       bool ContainsPoint(iString pointId) const;
 
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
@@ -159,7 +159,7 @@ namespace Isis {
       iString CreatedDate() const;
       iString Description() const;
       ControlPoint *FindClosest(iString serialNumber,
-                                double sample, double line);
+          double sample, double line);
       bool IsValid() const;
       double GetMaximumResidual();
       iString GetNetworkId() const;

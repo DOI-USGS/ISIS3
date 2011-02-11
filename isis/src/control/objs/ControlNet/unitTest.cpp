@@ -44,11 +44,11 @@ int main() {
       cp->SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
       SurfacePoint surfacePt(Displacement(-424.024048, Displacement::Meters),
-                             Displacement(734.4311949, Displacement::Meters),
-                             Displacement(529.919264, Displacement::Meters),
-                             Distance(10, Distance::Meters),
-                             Distance(50, Distance::Meters),
-                             Distance(20, Distance::Meters));
+          Displacement(734.4311949, Displacement::Meters),
+          Displacement(529.919264, Displacement::Meters),
+          Distance(10, Distance::Meters),
+          Distance(50, Distance::Meters),
+          Distance(20, Distance::Meters));
 
       cp->SetSurfacePoint(surfacePt);
       cp->SetAprioriSurfacePoint(surfacePt);
@@ -69,7 +69,7 @@ int main() {
       cm->SetType(ControlMeasure::RegisteredSubPixel);
       cm->SetLogData(
         ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit,
-                              0.53523 *(k + 1)));
+            0.53523 * (k + 1)));
       cm->SetCoordinate(1.0, 2.0);
       cm->SetResidual(-3.0, 4.0);
       cm->SetDiameter(15.0);
@@ -80,8 +80,10 @@ int main() {
       cm->SetChooserName("pointreg");
       cm->SetDateTime("2010-08-27T17:10:06");
 
+      cp->Add(cm);
+
       if (k == 0) {
-        cm->SetType(ControlMeasure::Reference);
+        cp->SetRefMeasure(cm);
         cm->SetChooserName("cnetref");
         cm->SetDateTime("2010-08-27T17:10:06");
         cm->SetEditLock(true);
@@ -93,7 +95,6 @@ int main() {
       }
 
       cm->SetDateTime("2010-08-27T17:10:06");
-      cp->Add(cm);
     }
 
     cp->SetChooserName("autoseed");
@@ -127,7 +128,7 @@ int main() {
   }
   cout << endl;
 
- 
+
   cout << "Test deleting nonexistant control point index ..." << endl;
   try {
     cn1.DeletePoint(7);
