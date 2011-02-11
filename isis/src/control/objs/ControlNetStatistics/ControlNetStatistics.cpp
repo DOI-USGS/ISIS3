@@ -8,6 +8,7 @@
 #include "Progress.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
+#include "Statistics.h"
 
 using namespace std;
 
@@ -363,7 +364,8 @@ namespace Isis {
     for (int i = 0; i < iNumPoints; i++) {
       if (mCNet->GetPoint(i)->IsIgnored())
         continue;
-      dAvgError += mCNet->GetPoint(i)->GetAverageResidual();
+      dAvgError += mCNet->GetPoint(i)->GetStatistic(
+          &ControlMeasure::GetResidualMagnitude).Average();
       iPointsCount++;
     }
 
@@ -386,7 +388,8 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
 
     for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetMinimumResidual();
+      double dError = mCNet->GetPoint(i)->GetStatistic(
+          &ControlMeasure::GetResidualMagnitude).Minimum();
       if (dError < dMinError)
         dMinError = dError;
     }
@@ -407,7 +410,8 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
 
     for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetMaximumResidual();
+      double dError = mCNet->GetPoint(i)->GetStatistic(
+          &ControlMeasure::GetResidualMagnitude).Maximum();
       if (dError > dMaxError)
         dMaxError = dError;
     }
@@ -426,7 +430,8 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
 
     for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetMinimumLineResidual();
+      double dError = mCNet->GetPoint(i)->GetStatistic(
+          &ControlMeasure::GetLineResidual).Minimum();
       if (dError < dMinError)
         dMinError = dError;
     }
@@ -446,7 +451,8 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
 
     for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetMinimumSampleResidual();
+      double dError = mCNet->GetPoint(i)->GetStatistic(
+          &ControlMeasure::GetSampleResidual).Minimum();
       if (dError < dMinError)
         dMinError = dError;
     }
@@ -466,7 +472,8 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
 
     for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetMaximumLineResidual();
+      double dError = mCNet->GetPoint(i)->GetStatistic(
+          &ControlMeasure::GetLineResidual).Maximum();
       if (dError > dMaxError)
         dMaxError = dError;
     }
@@ -486,7 +493,8 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
 
     for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetMaximumSampleResidual();
+      double dError = mCNet->GetPoint(i)->GetStatistic(
+          &ControlMeasure::GetSampleResidual).Maximum();
       if (dError > dMaxError)
         dMaxError = dError;
     }

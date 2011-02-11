@@ -38,7 +38,7 @@ namespace Isis {
   class PvlGroup;
 
   //! Size of the PointDetails Array
-#define IMAGE_POINT_SIZE 3
+  const int IMAGE_POINT_SIZE = 3;
 
   //! Enumeration for Point Statistics
   enum ePointDetails { total, ignore, ground };
