@@ -119,7 +119,7 @@ void IsisMain() {
       else {
         for(int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
           if(point->GetMeasure(cm)->IsIgnored()) {
-            if(cm == point->GetReferenceIndex()) {
+            if(cm == point->IndexOfRefMeasure()) {
               // If the reference is ignored, the point must ignored too
               IgnorePoint(cnet, point, "Reference measure ignored");
             }
@@ -384,7 +384,7 @@ void PopulateLog(ControlNet &cnet) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
       if(measure->IsIgnored()) {
-        if(cm == point->GetReferenceIndex()) {
+        if(cm == point->IndexOfRefMeasure()) {
           // If the reference is ignored, the point must ignored too
           if(!point->IsIgnored()) {
             IgnorePoint(cnet, point, "Reference measure ignored");
@@ -429,8 +429,8 @@ void ProcessControlPoints(string fileName, ControlNet &cnet) {
     if(deleteIgnored) {
       //look for previously ignored control points
       if(point->IsIgnored() ||
-          //point[point.GetReferenceIndex()].IsIgnored()) {
-          point->GetReferenceMeasure()->IsIgnored()) {
+          //point[point.IndexOfRefMeasure()].IsIgnored()) {
+          point->GetRefMeasure()->IsIgnored()) {
         DeletePoint(cnet, cp);
       }
       else {
@@ -484,14 +484,14 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
       if(!measure->IsIgnored() && snl.HasSerialNumber(serialNumber)) {
         IgnoreMeasure(cnet, point, measure, "Serial Number in CUBELIST");
 
-        if(cm == point->GetReferenceIndex() && !point->IsIgnored()) {
+        if(cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
           IgnorePoint(cnet, point, "Reference measure ignored");
         }
       }
 
       //also look for previously ignored control measures
       if(deleteIgnored && measure->IsIgnored() &&
-          cm != point->GetReferenceIndex()) {
+          cm != point->IndexOfRefMeasure()) {
         //DeleteMeasure(cnet, point, cm);
         DeleteMeasure(point, cm);
       }
@@ -546,7 +546,7 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
           string failure = results.toString().toStdString();
           IgnoreMeasure(cnet, point, measure, "Validity Check " + failure);
 
-          if(cm == point->GetReferenceIndex()) {
+          if(cm == point->IndexOfRefMeasure()) {
             IgnorePoint(cnet, point, "Reference measure ignored");
           }
         }
@@ -554,7 +554,7 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
 
       //also look for previously ignored control measures
       if(deleteIgnored && measure->IsIgnored() &&
-          cm != point->GetReferenceIndex()) {
+          cm != point->IndexOfRefMeasure()) {
         //DeleteMeasure(cnet, point, cm);
         DeleteMeasure(point, cm);
       }
