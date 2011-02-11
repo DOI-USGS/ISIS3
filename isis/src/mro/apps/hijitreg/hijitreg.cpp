@@ -229,7 +229,7 @@ void IsisMain() {
       ControlMeasure * cmMatch = new ControlMeasure;
       cmMatch->SetCubeSerialNumber(matchSN);
       cmMatch->SetCoordinate(fsamp0 + samp, fline0 + line,
-                            ControlMeasure::Reference);
+                            ControlMeasure::Candidate);
       cmMatch->SetChooserName("hijitreg");
 
       ar->Register();
@@ -314,6 +314,7 @@ void IsisMain() {
       cp->SetType(ControlPoint::Tie);
       cp->Add(cmTrans);
       cp->Add(cmMatch);
+      cp->SetRefMeasure(cmMatch);
       if(!cmTrans->IsMeasured()) cp->SetIgnored(true);
       cn.AddPoint(cp);
       prog.CheckStatus();
