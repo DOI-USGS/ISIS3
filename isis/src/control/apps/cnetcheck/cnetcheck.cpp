@@ -311,8 +311,8 @@ void IsisMain() {
     for(std::set<iString>::iterator sn = inListNums.begin();
         sn != inListNums.end();
         sn ++) {
-      out_stream << *sn;
-      out_stream << "\t" << (num2cube.HasSerialNumber(*sn) ? Filename(num2cube.Filename(*sn)).Name() : "");
+      out_stream << Filename(num2cube.Filename(*sn)).Name();
+      out_stream << "\t" << *sn;
       out_stream << "\n";
     }
     out_stream.close();

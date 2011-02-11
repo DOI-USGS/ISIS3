@@ -72,6 +72,10 @@
     <change name="Christopher Austin" date="2011-01-18">
       Altered to compile with the new Control redesign.
     </change>
+    <change name="Christopher Austin" date="2011-02-10">
+      Swapped the order of to serial number and filename in the NOCONTROL
+      output file.
+    </change>
   </history>
 
   <category>
