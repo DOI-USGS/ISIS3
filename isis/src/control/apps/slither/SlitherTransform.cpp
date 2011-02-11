@@ -60,7 +60,7 @@ namespace Isis {
           // Determine reference image assuming first one is the reference
           // if it is not expressly identified
           int snIndex(0), mnIndex(1);
-          if(!cp[snIndex]->GetType() == ControlMeasure::Reference) {
+          if(cp.GetRefMeasure() != cp[snIndex]) {
             snIndex = 1;
             mnIndex = 0;
           }
