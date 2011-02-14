@@ -87,6 +87,9 @@
       Modified for the updated Cubenorm_Filter Perl script used in the HiCal 
       pipeline at UofA. Added option NEW_VERSION
     </change>
+    <change name="Sharmila Prasad" date="2011-02-14">
+      Fixed GUI defaults
+    </change>
   </history>
 
   <category>
@@ -188,7 +191,7 @@
    <group name="Statistics Options">
        <parameter name="STATSOURCE">
            <type>string</type>
-           <default><item>TABLE</item></default>
+           <default><item>CUBE</item></default>
            <brief>Input source of statistics to apply to FROM cube</brief>
            <description>
                <p>
@@ -209,15 +212,7 @@
                </p>
            </description>
            <list>
-              <option value="TABLE">
-                   <brief>Statistics are provided in FROMSTATS in TABLE format</brief>
-                   <description>
-                       This option requires a filename in FROMSTATS with TABLE formatted
-                       data.  This format is the same format as is generated in the STATS
-                       output file.
-                   </description>
-               </option>
-               <option value="CUBE">
+             <option value="CUBE">
                    <brief>Statistics are computed from FROM input cube</brief>
                    <description>
                        This is the old behavior.  The statistics are computed from
@@ -226,10 +221,18 @@
                    </description>
                    <exclusions><item>FROMSTATS</item></exclusions>
                </option>
-               <option value="PVL">
+             <option value="PVL">
                    <brief>Statistics are provided in FROMSTATS in PVL format</brief>
                    <description>
                        This option requires a filename in FROMSTATS with PVL formatted
+                       data.  This format is the same format as is generated in the STATS
+                       output file.
+                   </description>
+               </option>
+              <option value="TABLE">
+                   <brief>Statistics are provided in FROMSTATS in TABLE format</brief>
+                   <description>
+                       This option requires a filename in FROMSTATS with TABLE formatted
                        data.  This format is the same format as is generated in the STATS
                        output file.
                    </description>
@@ -240,6 +243,8 @@
           <type>filename</type>
           <fileMode>input</fileMode>
           <brief>Optional statistics input file source</brief>
+         <internalDefault>
+           Optional Input Statistics file</internalDefault> 
           <description>
               <p>
                   This optional file provides the statistics that are applied to the input
