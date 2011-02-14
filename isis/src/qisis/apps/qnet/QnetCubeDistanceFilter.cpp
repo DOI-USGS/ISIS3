@@ -11,7 +11,11 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
+#include "Distance.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "SerialNumberList.h"
+#include "SurfacePoint.h"
 
 #include "qnet.h"
 
@@ -191,7 +195,16 @@ namespace Qisis {
             }
             // Calculate the distance between the two points
             // Get the distance from the camera class
-            dist = Isis::Camera::Distance(lat1, lon1, lat2, lon2, rad);
+            Isis::SurfacePoint point1(
+                Isis::Latitude(lat1, Isis::Angle::Degrees),
+                Isis::Longitude(lon1, Isis::Angle::Degrees),
+                Isis::Distance(rad, Isis::Distance::Meters));
+            Isis::SurfacePoint point2(
+                Isis::Latitude(lat2, Isis::Angle::Degrees),
+                Isis::Longitude(lon2, Isis::Angle::Degrees),
+                Isis::Distance(rad, Isis::Distance::Meters));
+            dist = point1.GetDistanceToPoint(point2,
+                Isis::Distance(rad, Isis::Distance::Meters)).GetMeters();
           }
 
           if (dist == 0) {

@@ -82,7 +82,7 @@ Group = GroundPoint
   # Sun Information
   SunPosition                = (142092302.24738, 46513072.418956,
                                 3175615.049146) <km>
-  SubSolarAzimuth            = 91.888
+  SubSolarAzimuth            = 91.887
   SolarDistance              = 0.99964718552167 <AU>
   SubSolarLatitude           = 1.2167758823866
   SubSolarLongitude          = 18.125552305876

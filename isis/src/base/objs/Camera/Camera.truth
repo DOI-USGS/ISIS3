@@ -226,16 +226,16 @@ Group = Mapping
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 360
   MinimumLatitude    = 87.8
-  MaximumLatitude    = 89.891493555786
-  MinimumLongitude   = 0.01558238547
-  MaximumLongitude   = 359.83560766145
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = 0.0
+  MaximumLongitude   = 360.0
   PixelResolution    = 193.58
   ProjectionName     = Sinusoidal
 End_Group
 End
 
 180 Domain Range: 
-Latitude Range: 87.8 to 89.89
+Latitude Range: 87.8 to 90
 Longitude Range: -180 to 180
 
 Test Forward/Reverse Camera Calculations At Center Of Image...

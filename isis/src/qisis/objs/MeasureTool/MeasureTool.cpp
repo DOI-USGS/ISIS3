@@ -15,9 +15,13 @@
 #include "Camera.h"
 #include "Distance.h"
 #include "Filename.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "MdiCubeViewport.h"
+#include "SurfacePoint.h"
 #include "ToolPad.h"
 
+using namespace Isis;
 
 namespace Qisis {
   /**
@@ -626,7 +630,18 @@ namespace Qisis {
         p_pixDist =  pixDist;
 
         if(bDistance) {
-          mDist  = Isis::Camera::Distance(p_startLat, p_startLon, p_endLat, p_endLon, radius);
+          Latitude startLat(p_startLat, Angle::Degrees);
+          Longitude startLon(p_startLon, Angle::Degrees);
+          Latitude endLat(p_endLat, Angle::Degrees);
+          Longitude endLon(p_endLon, Angle::Degrees);
+          Distance radiusDist(radius, Distance::Meters);
+
+          SurfacePoint startPoint(startLat, startLon, radiusDist);
+          SurfacePoint endPoint(endLat, endLon, radiusDist);
+
+          Distance distance =
+              startPoint.GetDistanceToPoint(endPoint, radiusDist);
+          mDist = distance.GetMeters();
           p_mDist  += mDist;
           p_kmDist  = p_mDist / 1000.0;
 

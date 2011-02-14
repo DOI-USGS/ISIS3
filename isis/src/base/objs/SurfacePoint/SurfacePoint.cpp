@@ -446,8 +446,8 @@ namespace Isis {
     SpiceDouble dradius = radius.GetKilometers();
 
     SpiceDouble rect[3];
-
     latrec_c ( dradius, dlon, dlat, rect);
+
     SetRectangularPoint(Displacement(rect[0], Displacement::Kilometers),
                         Displacement(rect[1], Displacement::Kilometers),
                         Displacement(rect[2], Displacement::Kilometers));
@@ -752,7 +752,7 @@ namespace Isis {
   bool SurfacePoint::Valid() const {
     static const Displacement zero(0, Displacement::Meters);
     return p_x && p_y && p_z && p_x->Valid() && p_y->Valid() && p_z->Valid() &&
-           *p_x != zero && *p_y != zero && *p_z != zero;
+           (*p_x != zero || *p_y != zero || *p_z != zero);
   }
 
 
@@ -848,7 +848,7 @@ namespace Isis {
 
     /**
      * Return the body-fixed longitude for the surface point 
-     *  
+     *
      */
     Longitude SurfacePoint::GetLongitude() const {
       if (!Valid()) 
@@ -856,21 +856,17 @@ namespace Isis {
 
       double x = p_x->GetMeters();
       double y = p_y->GetMeters();
-      double z = p_z->GetMeters();
 
-      if (x != 0.  ||  y != 0.) {
-        if (z != 0.){
-          double lon = atan2(y, x);
-          if (lon < 0) {
-            lon += 2 * PI;
-          }
-          return Longitude(lon, Angle::Radians);
-        }
-        else
-          return Longitude();
+      if(x == 0.0 && y == 0.0) {
+        return Longitude(0, Angle::Radians);
       }
-      else
-        return Longitude();
+
+      double lon = atan2(y, x);
+      if (lon < 0) {
+        lon += 2 * PI;
+      }
+
+      return Longitude(lon, Angle::Radians);
     }
 
 
@@ -949,6 +945,68 @@ namespace Isis {
 
     return *p_sphereCovar;
   }
+
+
+  /**
+   * Computes and returns the distance between two surface points. This does
+   *   not currently support ellipsoids and so any attempt with points with
+   *   planetary radii will fail. The average of the local radii will be
+   *   used.
+   */
+  Distance SurfacePoint::GetDistanceToPoint(const SurfacePoint &other) const {
+    if(p_majorAxis || p_minorAxis || p_polarAxis ||
+       other.p_majorAxis || other.p_minorAxis || other.p_polarAxis) {
+      iString msg = "SurfacePoint::GetDistanceToPoint not yet implemented for "
+          "ellipsoids";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    if(!Valid() || !other.Valid())
+      return Distance();
+
+    return GetDistanceToPoint(other,
+        ((GetLocalRadius() + other.GetLocalRadius()) / 2.0));
+  }
+
+
+  /**
+   * Computes and returns the distance between two surface points,
+   * assuming both points are on a sphere with the given radius.
+   *
+   * This uses the haversine formula to compute the distance.
+   * Using a spherical model gives errors typically <1%
+   */
+  Distance SurfacePoint::GetDistanceToPoint(const SurfacePoint &other,
+      const Distance &sphereRadius) const {
+    if(!Valid() || !other.Valid())
+      return Distance();
+
+    // Convert lat/lon values to radians
+    const Angle &latitude = GetLatitude();
+    const Angle &longitude = GetLongitude();
+    const Angle &otherLatitude = other.GetLatitude();
+    const Angle &otherLongitude = other.GetLongitude();
+
+    // The harvestine method:
+    //   http://en.wikipedia.org/wiki/Haversine_formula
+    Angle deltaLat = latitude - otherLatitude;
+    Angle deltaLon = longitude - otherLongitude;
+
+    double haversinLat = sin(deltaLat.GetRadians() / 2.0);
+    haversinLat *= haversinLat;
+
+    double haversinLon = sin(deltaLon.GetRadians() / 2.0);
+    haversinLon *= haversinLon;
+
+    double a = haversinLat + cos(latitude.GetRadians()) *
+               cos(otherLatitude.GetRadians()) *
+               haversinLon;
+
+    double c = 2 * atan(sqrt(a) / sqrt(1 - a));
+
+    return sphereRadius * c;
+  }
+
 
   bool SurfacePoint::operator==(const SurfacePoint &other) const {
     bool equal = true;

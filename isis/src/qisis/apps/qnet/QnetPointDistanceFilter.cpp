@@ -147,7 +147,17 @@ namespace Qisis {
           lon2 = cam2->UniversalLongitude();
         }
         // Get the distance from the camera class
-        double dist = Isis::Camera::Distance(lat1, lon1, lat2, lon2, rad);
+        Isis::SurfacePoint point1(
+            Isis::Latitude(lat1, Isis::Angle::Degrees),
+            Isis::Longitude(lon1, Isis::Angle::Degrees),
+            Isis::Distance(rad, Isis::Distance::Meters));
+        Isis::SurfacePoint point2(
+            Isis::Latitude(lat2, Isis::Angle::Degrees),
+            Isis::Longitude(lon2, Isis::Angle::Degrees),
+            Isis::Distance(rad, Isis::Distance::Meters));
+        double dist = point1.GetDistanceToPoint(point2,
+            Isis::Distance(rad, Isis::Distance::Meters)).GetMeters();
+
         // If the distance found is less than the input number, add the
         // control points' indices to the new filtered points list
         if (dist < userEntered) {

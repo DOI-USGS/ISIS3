@@ -1,14 +1,16 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include "iException.h"
-#include "SurfacePoint.h"
-#include "Preference.h"
+
 #include "Constants.h"
-#include "Latitude.h"
-#include "Longitude.h"
+#include "Camera.h"
 #include "Displacement.h"
 #include "Distance.h"
+#include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "Preference.h"
+#include "SurfacePoint.h"
 
 #include "boost/numeric/ublas/symmetric.hpp"
 
@@ -250,7 +252,16 @@ int main(int argc, char *argv[]) {
     e.Report();
   }
 
-//345678901234567890123456789012345678901234567890123456789012345678901234567890
+  cout << "Test computational methods..." << endl;
+  cout << "  SphericalDistanceToPoint (i.e. haversine): ";
+
+  SurfacePoint point1(Latitude(0, Angle::Degrees),
+      Longitude(90, Angle::Degrees), Distance(1.5, Distance::Kilometers));
+  SurfacePoint point2(Latitude(0, Angle::Degrees),
+      Longitude(180, Angle::Degrees), Distance(0.5, Distance::Kilometers));
+
+  Distance result = point1.GetDistanceToPoint(point2);
+  cout << result.GetMeters() << " meters" << endl;
 }
 
 

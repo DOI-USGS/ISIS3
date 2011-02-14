@@ -542,14 +542,8 @@ namespace Isis {
             }
           }
 
-          // Get the distance from the camera class
-          dDist = Camera::Distance(
-              surfacePt1.GetLatitude().GetDegrees(),
-              surfacePt1.GetLongitude().GetDegrees(),
-              surfacePt2.GetLatitude().GetDegrees(),
-              surfacePt2.GetLongitude().GetDegrees(),
-              surfacePt1.GetLocalRadius().GetMeters()
-              );
+          dDist = surfacePt1.GetDistanceToPoint(surfacePt2,
+              surfacePt1.GetLocalRadius()).GetMeters();
         }
         else
           // pixels
@@ -1104,8 +1098,18 @@ namespace Isis {
             }
             else
               continue;
+
             // Calculate the distance between the two points
-            dDist = Camera::Distance(dLat1, dLon1, dLat2, dLon2, dRadius);
+            Latitude lat1(dLat1, Angle::Degrees);
+            Longitude lon1(dLon1, Angle::Degrees);
+            Latitude lat2(dLat2, Angle::Degrees);
+            Longitude lon2(dLon2, Angle::Degrees);
+            Distance radius(dRadius, Distance::Meters);
+
+            SurfacePoint point1(lat1, lon1, radius);
+            SurfacePoint point2(lat2, lon2, radius);
+
+            dDist = point1.GetDistanceToPoint(point1, radius).GetMeters();
           }
           if (!dDist || dDist >= dDistance) {
             continue;

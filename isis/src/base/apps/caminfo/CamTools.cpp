@@ -27,16 +27,16 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
-#if defined(DEBUG)
-#include <fstream>
-#endif
+
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 
-#include "geos/geom/GeometryFactory.h"
-#include "geos/geom/Geometry.h"
-#include "geos/geom/Point.h"
+#include <naif/SpiceUsr.h>
+
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Geometry.h>
+#include <geos/geom/Point.h>
 
 #include "CameraFactory.h"
 #include "Distance.h"
@@ -45,11 +45,12 @@
 #include "iTime.h"
 #include "iString.h"
 #include "iException.h"
+#include "Latitude.h"
 #include "Longitude.h"
-#include "Statistics.h"
-#include "naif/SpiceUsr.h"
-#include "ProjectionFactory.h"
 #include "PolygonTools.h"
+#include "ProjectionFactory.h"
+#include "Statistics.h"
+#include "SurfacePoint.h"
 
 using namespace std;
 
@@ -535,12 +536,6 @@ namespace Isis {
   Pvl BandGeometry::getProjGeometry(Camera &camera,
                                     geos::geom::MultiPolygon *footprint,
                                     GProperties &g) {
-
-#if defined(DEBUG)
-    std::ofstream fp("footprint.gml");
-    fp << PolygonTools::ToGML(footprint, "Footprint");
-    fp.close();
-#endif
     // Get basic projection information.  Assumes a Sinusoidal projection with
     // East 360 longitude domain and planetocentric laitudes.
     Pvl sinuMap;
@@ -576,12 +571,6 @@ namespace Isis {
 
         // Convert the polygon to 180 domain
         poly = poly180 = PolygonTools::To180(footprint);
-#if defined(DEBUG)
-        std::ofstream p180("poly180.gml");
-        p180 << PolygonTools::ToGML(poly180, "180Domain");
-        p180.close();
-#endif
-
       }
     }
 
@@ -589,11 +578,6 @@ namespace Isis {
 
     Projection *sinu = ProjectionFactory::Create(sinuMap, true);
     geos::geom::MultiPolygon *sPoly = PolygonTools::LatLonToXY(*poly, sinu);
-#if defined(DEBUG)
-    std::ofstream ll("sinuprojxy.gml");
-    ll << PolygonTools::ToGML(sPoly, "SinuProjectedXY");
-    ll.close();
-#endif
     geos::geom::Point *center = sPoly->getCentroid();
 
     sinu->SetCoordinate(center->getX(), center->getY());
@@ -701,7 +685,16 @@ namespace Isis {
     if(IsSpecial(lon2)) return (false);
     if(IsSpecial(radius)) return (false);
 
-    thisDist = Camera::Distance(lat1, lon1, lat2, lon2, radius);
+    SurfacePoint point1(
+        Latitude(lat1, Angle::Degrees),
+        Longitude(lon1, Angle::Degrees),
+        Distance(radius, Distance::Meters));
+    SurfacePoint point2(
+        Latitude(lat2, Angle::Degrees),
+        Longitude(lon2, Angle::Degrees),
+        Distance(radius, Distance::Meters));
+    thisDist = point1.GetDistanceToPoint(point2,
+        Distance(radius, Distance::Meters)).GetMeters();
     return (thisDist < bestDist);
   }
 

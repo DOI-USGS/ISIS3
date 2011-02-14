@@ -202,7 +202,7 @@ namespace Isis {
       if(p_projection->SetWorld(sample, line)) {
         Latitude lat(p_projection->UniversalLatitude(), Angle::Degrees);
         Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
-        Isis::Distance rad(LocalRadius(lat, lon));
+        Distance rad(LocalRadius(lat, lon));
         SurfacePoint surfPt(lat, lon, rad);
         if(SetGround(surfPt)) {
           p_childSample = sample;
@@ -250,7 +250,7 @@ namespace Isis {
    *              false if it was not
    */
   bool Camera::SetGround(Latitude latitude, Longitude longitude) {
-    Isis::Distance localRadius(LocalRadius(latitude, longitude));
+    Distance localRadius(LocalRadius(latitude, longitude));
 
     if(!localRadius.Valid()) {
       p_hasIntersection = false;
@@ -359,7 +359,7 @@ namespace Isis {
     if(p_groundMap->SetGround(
         SurfacePoint(Latitude(latitude, Angle::Degrees),
                      Longitude(longitude, Angle::Degrees),
-                     Isis::Distance(radius, Distance::Meters)))) {
+                     Distance(radius, Distance::Meters)))) {
       return RawFocalPlanetoImage();  // sets p_hasIntersection
     }
 
@@ -532,7 +532,7 @@ namespace Isis {
       SubSpacecraftPoint(lat, lon);
       Latitude latitude(lat, Angle::Degrees);
       Longitude longitude(lon, Angle::Degrees);
-      Isis::Distance radius(LocalRadius(latitude, longitude));
+      Distance radius(LocalRadius(latitude, longitude));
 
       SurfacePoint testPoint(latitude, longitude, radius);
 
@@ -657,19 +657,19 @@ namespace Isis {
     GroundRangeResolution();
 
     // Get the default radii
-    Isis::Distance radii[3];
+    Distance radii[3];
     Radii(radii);
-    Isis::Distance &a = radii[0];
-    Isis::Distance &b = radii[2];
+    Distance &a = radii[0];
+    Distance &b = radii[2];
 
     // See if the PVL overrides the radii
     PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
 
     if(map.HasKeyword("EquatorialRadius"))
-      a = Isis::Distance(map["EquatorialRadius"][0], Distance::Meters);
+      a = Distance(map["EquatorialRadius"][0], Distance::Meters);
 
     if(map.HasKeyword("PolarRadius")) 
-      b = Isis::Distance(map["EquatorialRadius"][0], Distance::Meters);
+      b = Distance(map["EquatorialRadius"][0], Distance::Meters);
 
     // Convert to planetographic if necessary
     minlat = p_minlat;
@@ -678,15 +678,15 @@ namespace Isis {
       iString latType = (string) map["LatitudeType"];
       if(latType.UpCase() == "PLANETOGRAPHIC") {
         if(abs(minlat) < 90.0) {  // So tan doesn't fail
-          minlat *= Isis::PI / 180.0;
+          minlat *= PI / 180.0;
           minlat = atan(tan(minlat) * (a / b) * (a / b));
-          minlat *= 180.0 / Isis::PI;
+          minlat *= 180.0 / PI;
         }
 
         if(abs(maxlat) < 90.0) {  // So tan doesn't fail
-          maxlat *= Isis::PI / 180.0;
+          maxlat *= PI / 180.0;
           maxlat = atan(tan(maxlat) * (a / b) * (a / b));
-          maxlat *= 180.0 / Isis::PI;
+          maxlat *= 180.0 / PI;
         }
       }
     }
@@ -770,14 +770,14 @@ namespace Isis {
   void Camera::SetFocalLength() {
     int code = NaifIkCode();
     string key = "INS" + iString(code) + "_FOCAL_LENGTH";
-    SetFocalLength(Isis::Spice::GetDouble(key));
+    SetFocalLength(Spice::GetDouble(key));
   }
 
   //! Reads the Pixel Pitch from the instrument kernel
   void Camera::SetPixelPitch() {
     int code = NaifIkCode();
     string key = "INS" + iString(code) + "_PIXEL_PITCH";
-    SetPixelPitch(Isis::Spice::GetDouble(key));
+    SetPixelPitch(Spice::GetDouble(key));
   }
 
   /**
@@ -891,7 +891,7 @@ namespace Isis {
 
       Latitude demLat = p_surfacePoint->GetLatitude();
       Longitude demLon = p_surfacePoint->GetLongitude();
-      Isis::Distance demRadius = DemRadius(demLat, demLon);
+      Distance demRadius = DemRadius(demLat, demLon);
 
       latrec_c(demRadius.GetKilometers(), demLon.GetRadians(),
                demLat.GetRadians(), lookVects[i]);
@@ -1368,7 +1368,7 @@ namespace Isis {
    * @todo Write PushState and PopState method to ensure the
    * internals of the class are set based on SetImage or SetGround
    */
-  double Camera::ComputeAzimuth(Isis::Distance radius,
+  double Camera::ComputeAzimuth(Distance radius,
                                 const double lat, const double lon) {
     // Make sure we are on the planet
     if(!HasSurfaceIntersection()) return -1.0;
@@ -1384,13 +1384,13 @@ namespace Isis {
     // Get the origin point and its radius
     SpiceDouble oB[3];
     Coordinate(oB);
-    Isis::Distance originRadius = LocalRadius();
+    Distance originRadius = LocalRadius();
 
     // Convert the point of interest to x/y/z in body-fixed and use the origin radius
     // to avoid the situation where the DEM does not cover the entire planet
     SpiceDouble pB[3];
-    latrec_c(originRadius.GetKilometers(), lon * Isis::PI / 180.0,
-             lat * Isis::PI / 180.0, pB);
+    latrec_c(originRadius.GetKilometers(), lon * PI / 180.0,
+             lat * PI / 180.0, pB);
 
     // Get the difference vector poB=pB-oB with its tail at oB and its head at pB
     SpiceDouble poB[3],upoB[3];
@@ -1422,8 +1422,8 @@ namespace Isis {
     // Convert the point to a lat/lon and find out its image coordinate
     double nrad, nlon, nlat;
     reclat_c(nB, &nrad, &nlon, &nlat);
-    nlat = nlat * 180.0 / Isis::PI;
-    nlon = nlon * 180.0 / Isis::PI;
+    nlat = nlat * 180.0 / PI;
+    nlon = nlon * 180.0 / PI;
     if(nlon < 0) nlon += 360.0;
 
     // Use the radius of the origin point to avoid the effects of topography on the
@@ -1452,7 +1452,7 @@ namespace Isis {
     double azimuth = 0.0;
     if(deltaSample != 0.0 || deltaLine != 0.0) {
       azimuth = atan2(deltaLine, deltaSample);
-      azimuth *= 180.0 / Isis::PI;
+      azimuth *= 180.0 / PI;
     }
     // Azimuth is limited to the range of 0 to 360
     if(azimuth < 0.0) azimuth += 360.0;
@@ -1485,7 +1485,7 @@ namespace Isis {
     InstrumentPosition(spCoord);
 
     // Get the angle between the 2 points and convert to degrees
-    double a = vsep_c(coord, spCoord) * 180.0 / Isis::PI;
+    double a = vsep_c(coord, spCoord) * 180.0 / PI;
     double b = 180.0 - EmissionAngle();
 
     // The three angles in a triangle must add up to 180 degrees
@@ -1513,9 +1513,9 @@ namespace Isis {
    */
   double Camera::GroundAzimuth(double glat, double glon,
                                double slat, double slon) {
-    double a = (90.0 - slat) * Isis::PI / 180.0;
-    double b = (90.0 - glat) * Isis::PI / 180.0;
-    double c = (glon - slon) * Isis::PI / 180.0;
+    double a = (90.0 - slat) * PI / 180.0;
+    double b = (90.0 - glat) * PI / 180.0;
+    double c = (glon - slon) * PI / 180.0;
     double absum = 0.5 * (a + b);
     double cosabsum = cos(absum);
     double sinabsum = sin(absum);
@@ -1531,8 +1531,8 @@ namespace Isis {
     double B = ABsum - ABdif;
     double sinc = sin(c) * sin(a) / sin(A);
     c = asin(sinc);
-    double azimuthA = A * 180.0 / Isis::PI + 90.0;
-    double azimuthB = 90.0 - B * 180.0 / Isis::PI;
+    double azimuthA = A * 180.0 / PI + 90.0;
+    double azimuthB = 90.0 - B * 180.0 / PI;
     double azimuth = 0.0;
     if((glat > slat && glon > slon) ||
         (glat < slat && glon > slon)) {
@@ -1553,36 +1553,6 @@ namespace Isis {
       }
     }
     return azimuth;
-  }
-
-  /**
-   * Computes and returns the distance between two latitude/longitude points in
-   * meters, given the radius of the sphere.  The method uses the haversine
-   * formula to compute the distance.
-   *
-   * @param lat1 The first latitude value
-   * @param lon1 The first longitude value
-   * @param lat2 The second latitude value
-   * @param lon2 The second longitude value
-   * @param radius The radius of the sphere (in meters)
-   *
-   * @return @b double The distance between the two points
-   */
-  double Camera::Distance(double lat1, double lon1,
-                          double lat2, double lon2, double radius) {
-    // Convert lat/lon values to radians
-    double latRad1 = lat1 * Isis::PI / 180.0;
-    double latRad2 = lat2 * Isis::PI / 180.0;
-    double lonRad1 = lon1 * Isis::PI / 180.0;
-    double lonRad2 = lon2 * Isis::PI / 180.0;
-
-    double deltaLat = latRad2 - latRad1;
-    double deltaLon = lonRad2 - lonRad1;
-    double a = (sin(deltaLat / 2) * sin(deltaLat / 2)) + cos(latRad1) *
-               cos(latRad2) * (sin(deltaLon / 2) * sin(deltaLon / 2));
-    double c = 2 * atan(sqrt(a) / sqrt(1 - a));
-    double dist = radius * c;
-    return dist;
   }
 
 
@@ -1713,7 +1683,7 @@ namespace Isis {
    * be called before a call to the Spice::CreateCache() method.  It is called
    * in the LoadCache() method.
    *  
-   * @throw Isis::iException::Programmer - "Unable to find time range for the 
+   * @throw iException::Programmer - "Unable to find time range for the 
    *             spice kernels."
    * @see CreateCache()
    * @see LoadCache()

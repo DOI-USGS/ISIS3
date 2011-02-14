@@ -56,11 +56,13 @@ namespace Isis {
    * @history  2010-10-20 Debbie A. Cook and Steven Lambright  Simplified the 
    *           class by using new Displacement, Distance, Latitude, Longitude,
    *           and Angle objects. 
-   * @history  2010-12-28 Steven Lambright and Sharmila Prasad  Fixed a problem with 
-   *           retreiving longitudes outside of 0-360.
-   * @internal
-   * Do we need a bool to make sure a surface point has been set before
-   *  computing covariance matrix???? TODO
+   * @history  2010-12-28 Steven Lambright and Sharmila Prasad 
+   *           Fixed a problem with retreiving longitudes outside of 0-360.
+   * @history 2011-02-11 Steven Lambright Added SphericalDistanceToPoint and
+   *           optimized for speed inside the cameras and typical use cases
+   *           where we only have an x,y,z but no other data. Fixed a problem
+   *           where points were not properly considered valid at some
+   *           boundary conditions
    */
 
   class SurfacePoint {
@@ -155,9 +157,16 @@ namespace Isis {
       boost::numeric::ublas::symmetric_matrix
           <double,boost::numeric::ublas::upper> GetSphericalMatrix() const;
 
+// Computational methods
+      Distance GetDistanceToPoint(const SurfacePoint &other) const;
+      Distance GetDistanceToPoint(const SurfacePoint &other,
+          const Distance &sphereRadius) const;
+
+// Misc methods
       void ToNaifArray(double naifOutput[3]) const;
       void FromNaifArray(const double naifValues[3]);
 
+// Operators
       bool operator==(const SurfacePoint &other) const;
       SurfacePoint &operator=(const SurfacePoint &other);
 

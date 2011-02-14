@@ -193,12 +193,14 @@ namespace Isis {
    *                          also. These changes were for readability (you have
    *                          more explicit units and less of a change to misuse
    *                          them).
+   *  @history 2011-02-11 Steven Lambright - Moved Distance() method to
+   *                          SurfacePoint
    */
 
-  class Camera : public Isis::Sensor {
+  class Camera : public Sensor {
     public:
       // constructors
-      Camera(Isis::Pvl &lab);
+      Camera(Pvl &lab);
 
       // destructor
       //! Destroys the Camera Object
@@ -212,7 +214,7 @@ namespace Isis {
       bool SetGround(Latitude latitude, Longitude longitude);
       bool SetGround(const SurfacePoint & surfacePt);
       bool SetRightAscensionDeclination(const double ra, const double dec);
-      
+
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
                                   Angle & emission, bool &success);
 
@@ -294,8 +296,8 @@ namespace Isis {
       };
 
       bool GroundRange(double &minlat, double &maxlat,
-                       double &minlon, double &maxlon, Isis::Pvl &pvl);
-      bool IntersectsLongitudeDomain(Isis::Pvl &pvl);
+                       double &minlon, double &maxlon, Pvl &pvl);
+      bool IntersectsLongitudeDomain(Pvl &pvl);
 
       double PixelResolution();
       double LineResolution();
@@ -314,7 +316,7 @@ namespace Isis {
       double LowestImageResolution();
       double HighestImageResolution();
 
-      void BasicMapping(Isis::Pvl &map);
+      void BasicMapping(Pvl &map);
 
       /**
        * Returns the focal length
@@ -438,9 +440,6 @@ namespace Isis {
       double SunAzimuth();
       double SpacecraftAzimuth();
       double OffNadirAngle();
-
-      static double Distance(double lat1, double lon1,
-                             double lat2, double lon2, double radius);
 
       static double GroundAzimuth(double glat, double glon, double slat,
                                   double slon);
@@ -731,7 +730,7 @@ namespace Isis {
       bool p_raDecRangeComputed;             /**!< Flag showing if the raDec range
                                                   has been computed successfully.*/
 
-      Isis::AlphaCube *p_alphaCube;          //!< A pointer to the AlphaCube
+      AlphaCube *p_alphaCube;          //!< A pointer to the AlphaCube
       double p_childSample;                  //!< Sample value for child
       double p_childLine;                    //!< Line value for child
       int p_childBand;                       //!< Band value for child
@@ -741,7 +740,7 @@ namespace Isis {
       CameraGroundMap *p_groundMap;          //!< A pointer to the GroundMap
       CameraSkyMap *p_skyMap;                //!< A pointer to the SkyMap
 
-      double ComputeAzimuth(Isis::Distance radius,
+      double ComputeAzimuth(Distance radius,
                             const double lat, const double lon);
 
       bool RawFocalPlanetoImage();
