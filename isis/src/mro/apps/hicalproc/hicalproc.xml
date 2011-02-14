@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hicalproc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+     Generate radiometrically (cosmetic) corrected HiRISE Channel products.
+  </brief>
+  <description>
+    Hicalproc is one of the pipelines in the list of HiROC pipelines. This 
+    pipeline is used to process images after the EDRs are produced. This 
+    pipeline generates radiometrically (cosmetic) corrected HiRISE Channel 
+    products. The input is a raw HiRISE channel image.The output will be a 
+    radiometrically corrected channel image. This procedure continues to go 
+    through considerable evolution as the instrument calibration procedures are 
+    improved. The application  is version 1.42 of the hical pipeline from UofA 
+    perl script. 
+    <p/> Hicalproc is a pipeline application which processes the image through a 
+    series of Isis apps depending on the options. 
+    <br/>Following are the applications that are run by default irrespective of 
+    the image type: 
+    <br/><b>hical</b> - Run caliberation steps 
+    <br/><b>gaindrift</b> - Apply gaindrift corrections. Uses HiGainFx procedure 
+    <br/><b>hicubenorm</b> - Apply highpass Cubenorm correction <p/> 
+    Following options are provided which can be chosen depending on the input 
+    image: <br/><b>Ingestion</b> - Import and initialize a raw HiRISE image into 
+    Isis format running the apps hi2isis and spiceinit 
+    <br/><b>Furrows</b> - Run hifurrows to remove furrows in the image 
+    <br/><b>NoiseFilter</b> - Run hinoise to remove noise <br/>
+    <b>Destripe</b> - Run hidestripe to remove stripes <br/>
+    <b>Mapping</b> - Finally process the input file through the map projection 
+    phase <p/>
+    This application requires a configuration file, if none provided a system 
+    default will be used. <p/>If ingestion and/or mapping are chosen, then 
+    respective parameters need to be configured. <p/>
+  </description>
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category> 
+  <history>
+   <change name="Sharmila Prasad" date="2011-02-10">
+     Original Version
+   </change>
+  </history>
+
+   <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Input image to be corrected</brief>
+        <description>
+          Input HiRISE image in isis or raw format that needs to be 
+          radiometrically corrected.
+        </description>
+        <filter>*.cub | *.img</filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>Radiometrically caliberated and corrected image</brief>
+        <description>
+          Radiometrically caliberated and corrected isis image
+        </description>
+         <filter>*.cub</filter>
+      </parameter>
+
+      <parameter name="CONF">
+         <type>filename</type>
+         <fileMode>input</fileMode>
+         <brief>User specific configuration for caliberation</brief>
+         <description>
+           User specific configuration for caliberation else Isis default will 
+           be used
+         </description>
+         <internalDefault>$mro/calibration/hical.????.conf</internalDefault>
+       </parameter>
+
+      <parameter name="REMOVE">
+        <type>boolean</type>
+        <brief>Remove Intermediate Files</brief>
+        <description>Remove Intermediate Files created by the 
+          pipeline</description>
+        <default><item>false </item></default> 
+        </parameter>
+    </group>
+
+     <group name="Level Processing">
+        <parameter name="INGESTION">
+          <type>boolean</type>
+          <brief>Import and initialize a HiRISE image</brief>
+          <description>Import and initialize a raw HiRISE image into 
+            Isis format running the apps hi2isis and spiceinit</description>
+          <default><item>false</item></default>
+        </parameter>
+  
+       <parameter name="FURROWS">
+          <type>boolean</type>
+          <brief>Remove furrows</brief>
+          <description>Run hifurrows to remove the furrows which 
+            runs trimfilter and lowpass filter there after</description>
+          <default><item>false</item></default>
+        </parameter>
+
+       <parameter name="NOISE_FILTER">
+          <type>boolean</type>
+          <brief>Filter out noise</brief>
+          <description>Run hinoise2 to filter out noise</description>
+          <default><item>false</item></default>
+        </parameter>
+
+       <parameter name="DESTRIPE">
+          <type>boolean</type>
+          <brief>Remove stripes</brief>
+          <description>Run hidestripe which uses combination of 
+            low and high pass filters to destripe the image</description>
+          <default><item>false</item></default>
+        </parameter>
+
+        <parameter name="MAPPING">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>
+          Process the input file through the map projection phase.
+        </brief>
+        <description>
+          Process the input file through level2. This includes cam2map.
+        </description>
+        <inclusions>
+          <item>MAP</item>
+          <item>PIXRES</item>
+        </inclusions>
+      </parameter>
+    </group>
+
+     <group name="SpiceInit Parameters">
+        <parameter name="PCK">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+          <brief>
+            User defined target attitude and shape kernel file.
+          </brief>
+          <description>
+            Naif kernel file to be used for the target attitude and shape.
+          </description>
+          <defaultPath>
+            $BASE/kernels/pck/
+          </defaultPath>
+        </parameter>
+
+        <parameter name="CK">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+          <brief>
+            User defined spacecraft pointing kernel file.
+          </brief>
+          <description>
+            Naif kernel file to be used for the spacecraft pointing.
+          </description>
+          <defaultPath>
+            $mro/kernels/ck/
+          </defaultPath>
+        </parameter>
+
+        <parameter name="SPK">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+          <brief>
+            User defined spacecraaft position kernel file.
+          </brief>
+          <description>
+            Naif kernel file to be used for the spacecraft position.
+          </description>
+          <defaultPath>
+            $mro/kernels/spk/
+          </defaultPath>
+        </parameter>
+
+        <parameter name="CKNADIR">
+          <type>boolean</type>
+          <default><item>false</item></default>
+          <brief>
+            Compute nadir pointing if no other kernels exist
+          </brief>
+          <description>
+            Compute nadir pointing if no other kernels exist
+          </description>
+        </parameter>
+
+        <parameter name="SHAPE">
+          <type>string</type>
+          <default><item>SYSTEM</item></default>
+          <brief>
+          Select the definition of the shape model
+          </brief>
+          <description>
+           ISIS camera models can use a shape model (a  projected ISIS cube that defines the radii for a global or regional area).  You can choose
+           to select a shape model or to use the definition of the ellipsoid found in the planetary constants (PCK) file.
+          </description>
+          <list>
+            <option value="ELLIPSOID">
+              <brief>Use triiaxial ellipsoid from PCK</brief>
+              <description>
+                The camera will use the radii defined in the planetary constants file (PCK) when 
+                determining intersections of the body surface
+                </description>
+              <exclusions>
+                <item>MODEL</item>
+              </exclusions>
+            </option>
+            <option value="SYSTEM">
+              <brief>Search system for a default shape model</brief>
+              <description>
+                This option will search the default system data area ($ISIS3DATA/base/dems) for a shape model that 
+                matches the target of the input cube.  If none are found then no shape model will be used and the default 
+                ellipsoid parameters found in the planetary constants (PCK) file define the shape.
+              </description>
+              <exclusions>
+                <item>MODEL</item>
+              </exclusions>
+            </option>
+            <option value="USER">
+              <brief>User specified shape model file</brief>
+              <description>
+                The camera will use shape model defined by the parameter MODEL
+                </description>
+            </option>
+          </list>
+        </parameter>
+        <parameter name="MODEL">
+          <type>cube</type>
+          <fileMode>input</fileMode>
+          <brief>
+            User defined ISIS cube shape model.
+          </brief>
+          <description>
+            A map projected ISIS cube which contains the radii of the target.  The file can 
+            cover more than the input cube (FROM) but must minimally cover the data in the input cube.
+          </description>
+          <defaultPath>$base//dems/</defaultPath>
+          <filter>*.cub</filter>
+        </parameter>
+      </group>
+
+     <group name="Mapping parameters">
+        <parameter name="MAP">
+          <type>filename</type>
+          <internalDefault>Sinusoidal</internalDefault>
+          <brief>
+            File containing mapping parameters
+          </brief>
+          <description>
+            A file containing the desired output mapping parameters in PVL form.  This
+            file can be a simple hand produced label file.  It can also be an existing cube
+            label which contains a Mapping group.
+          </description>
+          <filter>*.map</filter>
+          <inclusions>
+              <item>MAPPING</item>
+          </inclusions>
+        </parameter>
+
+        <parameter name="PIXRES">
+          <type>double</type>
+          <brief>Pixel resolution in meters</brief>
+          <internalDefault>Automatic</internalDefault>
+          <description>
+            Specifies the resolution in meters per pixel.  
+            If not in the MAP file the resolution will be computed from
+            the themis level 1 cube.
+          </description>
+          <minimum inclusive="no">0.0</minimum>
+          <inclusions>
+              <item>MAPPING</item>
+          </inclusions>
+        </parameter>
+      </group>
+
+   </groups>
+</application>
