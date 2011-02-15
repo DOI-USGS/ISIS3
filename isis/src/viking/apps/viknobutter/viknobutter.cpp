@@ -1,17 +1,18 @@
 #include "Isis.h"
 
-#include "ProgramLauncher.h"
+#include "Pipeline.h"
 
 using namespace std;
 using namespace Isis;
 
 void IsisMain() {
-
-  // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  Filename fname = ui.GetFilename("FROM");
-  string name = fname.Basename();
   bool rmv = ui.GetBoolean("REMOVE");
+
+  Pipeline pipeline("viknobutter");
+  pipeline.SetInputFile("FROM");
+  pipeline.SetOutputFile("TO");
+  pipeline.KeepTemporaryFiles(!rmv);
 
   // Figure out which masking cube to use
   Pvl p(ui.GetFilename("FROM"));
@@ -32,60 +33,74 @@ void IsisMain() {
   if(num == 1 || num == 3 || num == 5 || num == 7 || num == 9) even = false;
 
   // Run a standard deviation filter on the cube
-  string inFile = ui.GetFilename("FROM");
-  string outFile = name + ".step1.cub";
-  string parameters = "FROM=" + inFile + " TO=" + outFile +
-                      " toldef=stddev flattol=10  samp=3 line=3 minimum=5 tolmin=2.5 tolmax=2.5"
-                      + " replace=null";
-  ProgramLauncher::RunIsisProgram("noisefilter", parameters);
+  pipeline.AddToPipeline("noisefilter");
+  pipeline.Application("noisefilter").SetInputParameter("FROM", false);
+  pipeline.Application("noisefilter").SetOutputParameter("TO", "step1");
+  pipeline.Application("noisefilter").AddConstParameter("toldef", "stddev");
+  pipeline.Application("noisefilter").AddConstParameter("flattol", "10");
+  pipeline.Application("noisefilter").AddConstParameter("samp", "3");
+  pipeline.Application("noisefilter").AddConstParameter("line", "3");
+  pipeline.Application("noisefilter").AddConstParameter("minimum", "5");
+  pipeline.Application("noisefilter").AddConstParameter("tolmin", "2.5");
+  pipeline.Application("noisefilter").AddConstParameter("tolmax", "2.5");
+  pipeline.Application("noisefilter").AddConstParameter("replace", "null");
 
   // Run a lowpass filter on the cube
-  inFile = outFile;
-  outFile = name + ".step2.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " filter=outside line=3 samp=3 minimum=5";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("lowpass", "lowpass1");
+  pipeline.Application("lowpass1").SetInputParameter("FROM", false);
+  pipeline.Application("lowpass1").SetOutputParameter("TO", "step2");
+  pipeline.Application("lowpass1").AddConstParameter("samp", "3");
+  pipeline.Application("lowpass1").AddConstParameter("line", "3");
+  pipeline.Application("lowpass1").AddConstParameter("minimum", "5");
+  pipeline.Application("lowpass1").AddConstParameter("filter", "outside");
 
   // Run mask on the cube with the correct masking cube
-  inFile = outFile;
-  outFile = name + ".step3.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " MASK=$ISIS3DATA/viking" + iString(spn) + "/calibration/vik" + iString(spn);
-  if(even) parameters += "evenMask.cub";
-  else parameters += "oddMask.cub";
-  ProgramLauncher::RunIsisProgram("mask", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("mask");
+  pipeline.Application("mask").SetInputParameter("FROM", false);
+  pipeline.Application("mask").SetOutputParameter("TO", "step3");
+
+  iString maskParameter = "$ISIS3DATA/viking" + iString(spn) +
+    "/calibration/vik" + iString(spn);
+  if(even) maskParameter += "evenMask.cub";
+  else maskParameter += "oddMask.cub";
+  pipeline.Application("mask").AddConstParameter("mask", maskParameter);
 
   // Run a low pass filter on the invalid data in the cube
-  inFile = outFile;
-  outFile = name + ".step4.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " samp=3 line=3 filter=outside replace=null";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("lowpass", "lowpass2");
+  pipeline.Application("lowpass2").SetInputParameter("FROM", false);
+  pipeline.Application("lowpass2").SetOutputParameter("TO", "step4");
+  pipeline.Application("lowpass2").AddConstParameter("samp", "3");
+  pipeline.Application("lowpass2").AddConstParameter("line", "3");
+  pipeline.Application("lowpass2").AddConstParameter("filter", "outside");
+  pipeline.Application("lowpass2").AddConstParameter("replace", "null");
 
   // Run a lowpass filter on the cube
-  inFile = outFile;
-  outFile = name + ".step5.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " filter=outside samp=7 line=7 replace=null";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("lowpass", "lowpass3");
+  pipeline.Application("lowpass3").SetInputParameter("FROM", false);
+  pipeline.Application("lowpass3").SetOutputParameter("TO", "step5");
+  pipeline.Application("lowpass3").AddConstParameter("samp", "7");
+  pipeline.Application("lowpass3").AddConstParameter("line", "7");
+  pipeline.Application("lowpass3").AddConstParameter("filter", "outside");
+  pipeline.Application("lowpass3").AddConstParameter("replace", "null");
 
   // Run a lowpass filter on the cube
-  inFile = outFile;
-  outFile = name + ".step6.cub";
-  parameters = "FROM=" + inFile + " TO=" + outFile +
-               " filter=outside line=11 samp=11 replace=null";
-  ProgramLauncher::RunIsisProgram("lowpass", parameters);
-  if(rmv) remove(inFile.c_str());
+  pipeline.AddToPipeline("lowpass", "lowpass4");
+  pipeline.Application("lowpass4").SetInputParameter("FROM", false);
+  pipeline.Application("lowpass4").SetOutputParameter("TO", "step6");
+  pipeline.Application("lowpass4").AddConstParameter("samp", "11");
+  pipeline.Application("lowpass4").AddConstParameter("line", "11");
+  pipeline.Application("lowpass4").AddConstParameter("filter", "outside");
+  pipeline.Application("lowpass4").AddConstParameter("replace", "null");
 
-  inFile = outFile;
-  outFile = ui.GetFilename("TO");
-  parameters = "FROM=" + inFile + " TO=" + outFile
-               + " bottom=20 top=25 left=30 right=30";
-  ProgramLauncher::RunIsisProgram("trim", parameters);
-  if(rmv) remove(inFile.c_str());
+  // Trim the cube
+  pipeline.AddToPipeline("trim");
+  pipeline.Application("trim").SetInputParameter("FROM", false);
+  pipeline.Application("trim").SetOutputParameter("TO", "");
+  pipeline.Application("trim").AddConstParameter("bottom", "20");
+  pipeline.Application("trim").AddConstParameter("top", "25");
+  pipeline.Application("trim").AddConstParameter("left", "30");
+  pipeline.Application("trim").AddConstParameter("right", "30");
+
+  pipeline.Run();
 }
 
