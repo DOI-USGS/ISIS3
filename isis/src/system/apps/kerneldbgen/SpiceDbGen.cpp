@@ -233,6 +233,10 @@ PvlGroup SpiceDbGen::AddSelection(Filename fileIn) {
   result += PvlKeyword("File", outFile + "/" + fileIn.Name());
 
   NaifStatus::CheckErrors();
+
+  // Unfurnishes tmp file to prevent file table overflow
+  unload_c(tmp.c_str());
+
   return result;
 }
 
