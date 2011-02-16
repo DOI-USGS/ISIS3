@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QMenu>
 
+#include "Angle.h"
 #include "Camera.h"
 #include "Distance.h"
 #include "iTime.h"
@@ -64,6 +65,8 @@ namespace Qisis {
     p_tableWin->addToTable(false, "Phase", "Phase");
     p_tableWin->addToTable(false, "Incidence", "Incidence");
     p_tableWin->addToTable(false, "Emission", "Emission");
+    p_tableWin->addToTable(false, "LocalIncidence", "LocalIncidence");
+    p_tableWin->addToTable(false, "LocalEmission", "LocalEmission");
     p_tableWin->addToTable(false, "North Azimuth", "North Azimuth");
     p_tableWin->addToTable(false, "Sun Azimuth", "Sun Azimuth");
     p_tableWin->addToTable(false, "Solar Longitude", "Solar Longitude");
@@ -285,7 +288,7 @@ namespace Qisis {
     // Do we have a camera model?
     if(cvp->camera() != NULL) {
       if(cvp->camera()->SetImage(sample, line)) {
-        // Write columns 5,7,9 (ocentric lat/lon, and radius)
+        // Write columns ocentric lat/lon, and radius
         double lat = cvp->camera()->UniversalLatitude();
         double lon = cvp->camera()->UniversalLongitude();
 
@@ -309,26 +312,41 @@ namespace Qisis {
         /*180 Positive West Lon.  */
         p_tableWin->table()->item(row, WEST_LON_180)->setText(QString::number(Isis::Projection::To180Domain(lon), 'f', 15));
 
-        // Next write out columns 10-12 (the x/y/z position of the lat/lon)
+        // Next write out columns, the x/y/z position of the lat/lon
         double pos[3];
         cvp->camera()->Coordinate(pos);
         p_tableWin->table()->item(row, POINT_X)->setText(QString::number(pos[0]));
         p_tableWin->table()->item(row, POINT_Y)->setText(QString::number(pos[1]));
         p_tableWin->table()->item(row, POINT_Z)->setText(QString::number(pos[2]));
 
-        // Write out columns 15 (resolution)
+        // Write out columns resolution
         double res = cvp->camera()->PixelResolution();
         p_tableWin->table()->item(row, RESOLUTION)->setText(QString::number(res));
 
-        // Write out columns 16-18 (phase, incidence, emission)
+        // Write out columns phase, incidence, emission
         double phase = cvp->camera()->PhaseAngle();
         double incidence = cvp->camera()->IncidenceAngle();
         double emission = cvp->camera()->EmissionAngle();
         p_tableWin->table()->item(row, PHASE)->setText(QString::number(phase));
         p_tableWin->table()->item(row, INCIDENCE)->setText(QString::number(incidence));
         p_tableWin->table()->item(row, EMISSION)->setText(QString::number(emission));
+        
+        // Write out columns local incidence and emission
+        // Calculates the angles local to the slope for the DEMs, compare against 
+        // the incidence and emission angles calculated for the sphere
+        Angle phaseAngle, incidenceAngle, emissionAngle;
+        bool bSuccess=false;
+        cvp->camera()->LocalPhotometricAngles(phaseAngle, incidenceAngle, emissionAngle, bSuccess);
+        if(bSuccess) {
+          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText(QString::number(incidenceAngle.GetDegrees()));
+          p_tableWin->table()->item(row, LOCAL_EMISSION)->setText(QString::number(emissionAngle.GetDegrees()));
+        }
+        else {
+          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText("NA");
+          p_tableWin->table()->item(row, LOCAL_EMISSION)->setText("NA");
+        }
 
-        // Write out columns 19-21 (north azimuth, sun azimuth, solar longitude)
+        // Write out columns north azimuth, sun azimuth, solar longitude
         double northAzi = cvp->camera()->NorthAzimuth();
         double sunAzi   = cvp->camera()->SunAzimuth();
         double solarLon = cvp->camera()->SolarLongitude().GetDegrees();
@@ -336,8 +354,8 @@ namespace Qisis {
         p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));
 
-        // Write out columns 25-29 (spacecraft azimuth, slant distance,
-        // et, local solar time, and UTC)
+        // Write out columns spacecraft azimuth, slant distance,
+        // et, local solar time, and UTC
         double spacecraftAzi = cvp->camera()->SpacecraftAzimuth();
         double slantDistance = cvp->camera()->SlantDistance();
         double lst = cvp->camera()->LocalSolarTime();
@@ -346,19 +364,19 @@ namespace Qisis {
         p_tableWin->table()->item(row, SOLAR_TIME)->setText(QString::number(lst));
       }
 
-      // Always write out columns 13-14 (ra/dec);
+      // Always write out columns ra/dec;
       double ra = cvp->camera()->RightAscension();
       double dec = cvp->camera()->Declination();
       p_tableWin->table()->item(row, RIGHT_ASCENSION)->setText(QString::number(ra));
       p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(dec));
 
-      // Always write out columns 27/29 et and utc
+      // Always write out columns et and utc
       Isis::iTime time(cvp->camera()->Time());
       p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(time.Et(), 'f', 15));
       std::string time_utc = time.UTC();
       p_tableWin->table()->item(row, UTC)->setText(time_utc.c_str());
 
-      // Always out columns 22-24 (spacecraft position)
+      // Always out columns spacecraft position
       double pos[3];
       cvp->camera()->InstrumentPosition(pos);
       p_tableWin->table()->item(row, SPACECRAFT_X)->setText(QString::number(pos[0]));

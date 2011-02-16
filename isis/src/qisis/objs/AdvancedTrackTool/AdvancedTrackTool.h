@@ -57,6 +57,8 @@ namespace Qisis {
    *  @history 2010-05-07 Eric Hyer - record() SLOT now shows the table as well
    *  @history 2010-06-26 Eric Hyer - Class now uses MdiCubeViewport, also fixed
    *           include issues
+   *  @history 2011-02-16 Sharmila Prasad - Added columns for Local Emission and
+   *           Incidence Angles
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -120,6 +122,8 @@ namespace Qisis {
         PHASE,                  //!< The phase for this point
         INCIDENCE,              //!< The incidence for this point
         EMISSION,               //!< The emission for this point
+        LOCAL_INCIDENCE,        //!< The local incidence for this point
+        LOCAL_EMISSION,         //!< The local emission for this point
         NORTH_AZIMUTH,          //!< The north azimuth for this cube
         SUN_AZIMUTH,            //!< The sun azimuth for this cube
         SOLAR_LON,              //!< The solar longitude for this point
