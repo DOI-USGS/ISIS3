@@ -2,9 +2,6 @@ APPNAME = cnetadd
 
 include $(ISISROOT)/make/isismake.tsts
 
-outnet.pvl.IGNORELINES = DateTime
-modifiednet.pvl.IGNORELINES = DateTime
-
 commands:
 	$(LS) $(INPUT)/*M.cub > $(OUTPUT)/add.lis;
 	$(LS) $(INPUT)/*cal.cub > $(OUTPUT)/files.lis;

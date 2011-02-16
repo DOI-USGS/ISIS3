@@ -107,13 +107,14 @@ void IsisMain() {
     //loop through all the control points
     for(int cp = 0; cp < inNet.GetNumPoints(); cp++) {
       ControlPoint *point = inNet.GetPoint(cp);
-
+       
       // If the point is locked and Apriori source is "AverageOfMeasures"
       // then do not add the measures.
       if(point->IsEditLocked() &&
           point->GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::AverageOfMeasures) {
         continue;
       }
+      
       // If there are duplicate serial numbers in the addlist, prevent double adding
       //TODO: This whole check should be pointless with the new design. Once this
       // conversion is complete, this 'if' should be removed
@@ -212,10 +213,10 @@ void IsisMain() {
           }
 
           point->Add(newCm); //point takes ownership
-          newCm = NULL;
 
           // Record the modified Point and Measure
           p_modifiedMeasures[cp].insert(newCm->GetCubeSerialNumber());
+          newCm = NULL;
 
           if(retrievalOpt == "POINT" && inNet.GetPoint(cp)->GetNumMeasures() == 1) {
             point->SetIgnored(false);
