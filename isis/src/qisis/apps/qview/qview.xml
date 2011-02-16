@@ -54,5 +54,8 @@
     <change name="Sharmila Prasad" date="2010-03-24">
       Enable FindTool for images without camera and/or projection
     </change>
+    <change name="Sharmila Prasad" date="2011-02-16">Added columns Local 
+     Emission and  Incidence Angles for Advanced Tracking Tool
+    </change>
   </history>
 </application>
