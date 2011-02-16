@@ -3,7 +3,16 @@
 <application name="camtest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>Perform basic camera accuracy tests</brief>
 
-  <description>This program will do basic tests for new camera models</description>
+  <description>
+      This program will do basic tests for new camera models.  There are calls 
+      to SetImage(sample, line) and SetUniversalGround(lat, lon) that are used 
+      to test translations from image coordinates to geometric coordinates and 
+      back.  Either one of these calls can fail and are indicated by unique 
+      special pixel values.  If a call to SetImage(sample, line) fails, the 
+      output image is set to the Low Representation Saturation (Lrs) special 
+      value.  Failures in calls to SetUniversalGround(lat, lon) are set to High 
+      Representation Saturation (Hrs) value.
+    </description>
 
   <category>
     <categoryItem>System</categoryItem>
@@ -18,6 +27,12 @@
         of edges - this upset pushframe tests a lot and
         produced inaccurate results.
     </change>
+      <change name="Kris Becker" date="2011-02-16">
+          Corrected a bug where the sample was off by one (used as a 0-based 
+          index instead of 1-based);  Set failures in calls to SetImage (Lrs) 
+          and SetUniversalGround (Hrs) to special pixel values so they are 
+          distinguishable.  Documented this behaviour.
+      </change>
   </history>
 
   <groups>

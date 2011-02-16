@@ -57,9 +57,11 @@ void doIt(Buffer &in, Buffer &out) {
     cam->SetBand(in.Band());
   }
 
+  double line = in.Line();
   for(int samp = 0; samp < in.SampleDimension(); samp++) {
-    if(!cam->SetImage((double)(samp), (double)(in.Line()))) {
-      out[samp] = Null;
+    double sample = in.Sample(samp);
+    if(!cam->SetImage(sample, line)) {
+      out[samp] = Lrs;
       continue;
     }
 
@@ -71,7 +73,7 @@ void doIt(Buffer &in, Buffer &out) {
     }
     else {
       if(!cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude())) {
-        out[samp] = Null;
+        out[samp] = Hrs;
         continue;
       }
 
@@ -83,9 +85,9 @@ void doIt(Buffer &in, Buffer &out) {
         out[samp] = cam->Line();
       }
       else {
-        double deltaS = cam->Sample() - samp;
-        double deltaL = cam->Line() - in.Line();
-        out[samp] = pow(deltaS * deltaS + deltaL * deltaL, 0.5);
+        double deltaS = cam->Sample() - sample;
+        double deltaL = cam->Line()   - line;
+        out[samp] = sqrt(deltaS * deltaS + deltaL * deltaL);
       }
 
     }
