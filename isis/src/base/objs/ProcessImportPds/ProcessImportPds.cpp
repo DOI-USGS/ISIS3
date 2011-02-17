@@ -260,7 +260,7 @@ namespace Isis {
     // Now, to handle the offset
     units.Trim(" \t\r\v\n");
     if (units == "BYTES" || units == "B") {
-      SetFileHeaderBytes(offset);  
+      SetFileHeaderBytes(offset - 1);  
     }
     else {
       Isis::iString recSize = pdsXlater.Translate("DataFileRecordBytes");
