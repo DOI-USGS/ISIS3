@@ -1,4 +1,4 @@
-#if !defined(CamTools_h)
+#ifndef CamTools_h
 #define CamTools_h
 /**
  * @file
@@ -130,23 +130,30 @@ namespace Isis {
    *          poles are not converted to 180 domain when projected
    * @history 2009-08-24 Kris Becker - Added ability to disable use of shape
    *          model when creating polygons that contains a limb
+   * @history 2011-02-17 Jai Rideout - Replaced pixinc with sinc and linc.
    */
   class BandGeometry {
 
     public:
-      BandGeometry() : _nLines(0), _nSamps(0), _nBands(0), _pixinc(1),
-        _radius(1.0), _isBandIndependent(true),
+      BandGeometry() : _nLines(0), _nSamps(0), _nBands(0), _sampleInc(1),
+        _lineInc(1), _radius(1.0), _isBandIndependent(true),
         _hasCenterGeom(false), _gBandList(), _polys(),
         _combined(0), _mapping() {  }
       ~BandGeometry() {
         destruct();
       }
 
-      void setPixInc(const int pixinc) {
-        _pixinc = pixinc;
+      void setSampleInc(const int sampleInc) {
+        _sampleInc = sampleInc;
       }
-      int getPixInc() const {
-        return (_pixinc);
+      void setLineInc(const int lineInc) {
+        _lineInc = lineInc;
+      }
+      int getSampleInc() const {
+        return (_sampleInc);
+      }
+      int getLineInc() const {
+        return (_lineInc);
       }
       void setMaxIncidence(const double maxinc) {
         _maxIncidence = maxinc;
@@ -235,7 +242,8 @@ namespace Isis {
       int _nLines;
       int _nSamps;
       int _nBands;
-      int _pixinc;
+      int _sampleInc;
+      int _lineInc;
       double _maxEmission;
       double _maxIncidence;
       double _radius;

@@ -67,8 +67,8 @@ void IsisMain() {
   Pvl camPvl;    //  This becomes useful if there is only one band, which is
   //  frequent!  Used below if single band image.
   if(doCamstat) {
-    int linc = ui.GetInteger("LINC");
-    int sinc = ui.GetInteger("SINC");
+    int statsLinc = ui.GetInteger("STATSLINC");
+    int statsSinc = ui.GetInteger("STATSSINC");
     Filename tempCamPvl;
     tempCamPvl.Temporary(in.Basename() + "_", "pvl");
     string pvlOut = tempCamPvl.Expanded();
@@ -76,8 +76,8 @@ void IsisMain() {
     //set up camstats run and execute
     string parameters = "FROM=" + from +
                         " TO=" + pvlOut +
-                        " LINC=" + iString(linc) +
-                        " SINC=" + iString(sinc);
+                        " LINC=" + iString(statsLinc) +
+                        " SINC=" + iString(statsSinc);
 
     ProgramLauncher::RunIsisProgram("camstats", parameters);
     //out put to common object of the PVL
@@ -172,13 +172,29 @@ void IsisMain() {
   bool doGeometry = ui.GetBoolean("GEOMETRY");
   bool doPolygon = ui.GetBoolean("POLYGON");
   if(doGeometry || doPolygon) {
-    int pixinc = ui.GetInteger("PIXINC");
-    if(pixinc <= 0) pixinc = 100;
-    bandGeom.setPixInc(pixinc);
+    int polySinc, polyLinc;
+    if(ui.WasEntered("POLYSINC")) {
+      polySinc = ui.GetInteger("POLYSINC");
+    }
+    else {
+      polySinc = (int)round(0.10 * icube->Samples());
+      if (polySinc == 0)
+        polySinc = 1;
+    }
+    if(ui.WasEntered("POLYLINC")) {
+      polyLinc = ui.GetInteger("POLYLINC");
+    }
+    else {
+      polyLinc = (int)round(0.10 * icube->Lines());
+      if (polyLinc == 0)
+        polyLinc = 1;
+    }
+
+    bandGeom.setSampleInc(polySinc);
+    bandGeom.setLineInc(polyLinc);
     bandGeom.setMaxIncidence(ui.GetDouble("MAXINCIDENCE"));
     bandGeom.setMaxEmission(ui.GetDouble("MAXEMISSION"));
     bandGeom.collect(*cam, *icube, doGeometry, doPolygon);
-
 
     // Check if the user requires valid image center geometry
     if(ui.GetBoolean("VCAMERA") && (!bandGeom.hasCenterGeometry())) {

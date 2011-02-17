@@ -15,7 +15,7 @@
     of all bands, this will be put in the "Common" object of the PVL.  Other 
     infomation will be for a given band and placed in the "BandSet" object. the 
     user can use the "output options" check boxes to control the infomation that 
-    will be output to the PVL.  if the polygon option is chosen, the image 
+    will be output to the PVL.  If the polygon option is chosen, the image 
     polygon is output in well known text format.  The following is an example of  
     the output given when caminfo is ran:
 
@@ -249,40 +249,40 @@ End
       Fixed WKT calls
     </change>
     <change name="Tracie Sucharski" date="2007-11-09">
-        Remove ToWKT calls and PolygonTools.h inclusion.  The geos package now 
-        has a method to return a WKT string, so the ToWKT method has been 
-        removed from the PolygonTools class.
+      Remove ToWKT calls and PolygonTools.h inclusion.  The geos package now 
+      has a method to return a WKT string, so the ToWKT method has been 
+      removed from the PolygonTools class.
     </change>
-      <change name="Kris Becker" date="2007-12-07"> 
-          Made the following modifications:  fixed typo in PercentNull and 
-          MaximumLongitude keywords; use the base file name for generation of 
-          temporary files to further ensure uniqueness; run camstats once if 
-          there is only one band - doubles execution speed for single band 
-          images when CAMSTATS option is used; substitute the NULL string for 
-          all special pixel values; added corner pixel keywords for PDS 
-          compatibility; added phase, emission, incidence angles 
-          and line and sample pixel resolution at the center pixel; added test 
-          for intersection of longitude domain, north and south poles and 
-          keywords that report them; added option to output ISIS cube labels; 
-          corrected computations for parallax and shadow keywords.
-       </change>
-       <change name="Kris Becker" date="2007-12-19"> 
-           Renamed the HasLongitudeDomain keyword to HasLongitudeBoundary.  
-           Makes more sense.
-       </change>
-       <change name="Kris Becker" date="2008-02-27"> 
-           Corrected method call to compute polygon with proper parameters as 
-           well as correct band number.  Added code to better honor specific 
-           cube attributes (such as band numbers) in computations.  Also will 
-           produce NULL valued keywords where NULLs are a produced instead of 
-           the real value for the ISIS NULL pixel value.
-       </change>
+    <change name="Kris Becker" date="2007-12-07"> 
+      Made the following modifications:  fixed typo in PercentNull and 
+      MaximumLongitude keywords; use the base file name for generation of 
+      temporary files to further ensure uniqueness; run camstats once if 
+      there is only one band - doubles execution speed for single band 
+      images when CAMSTATS option is used; substitute the NULL string for 
+      all special pixel values; added corner pixel keywords for PDS 
+      compatibility; added phase, emission, incidence angles 
+      and line and sample pixel resolution at the center pixel; added test 
+      for intersection of longitude domain, north and south poles and 
+      keywords that report them; added option to output ISIS cube labels; 
+      corrected computations for parallax and shadow keywords.
+     </change>
+     <change name="Kris Becker" date="2007-12-19"> 
+       Renamed the HasLongitudeDomain keyword to HasLongitudeBoundary.  
+       Makes more sense.
+     </change>
+     <change name="Kris Becker" date="2008-02-27"> 
+       Corrected method call to compute polygon with proper parameters as 
+       well as correct band number.  Added code to better honor specific 
+       cube attributes (such as band numbers) in computations.  Also will 
+       produce NULL valued keywords where NULLs are a produced instead of 
+       the real value for the ISIS NULL pixel value.
+     </change>
      <change name="Steven Lambright" date="2008-05-12">
-          Removed references to CubeInfo 
+        Removed references to CubeInfo 
      </change>
      <change name="Bob Sucharski" date="2008-07-31">
-         Added Camera Test option  to test for a valid camera at center of image 
-         and return an error and end if a valid camera cannot be created.
+       Added Camera Test option  to test for a valid camera at center of image 
+       and return an error and end if a valid camera cannot be created.
      </change>
      <change name="Kris Becker" date="2008-09-22"> 
        Reworked the output PVL format;  added more keywords to the Common object 
@@ -290,60 +290,64 @@ End
        Polygon object.
      </change>
      <change name="Kris Becker" date="2008-10-22"> 
-         Corrected generation of polygon for multi-band data.  It created a 
-         POLYGON union instead of the required MULTIPOLYGON.
+       Corrected generation of polygon for multi-band data.  It created a 
+       POLYGON union instead of the required MULTIPOLYGON.
      </change>
      <change name="Kris Becker" date="2008-10-30"> 
-         The target center distance and subspacecraft latitude were not properly 
-         propagated to the output PVL file and consequently were invalid.  This 
-         has been corrected.
+       The target center distance and subspacecraft latitude were not properly 
+       propagated to the output PVL file and consequently were invalid.  This 
+       has been corrected.
      </change>
      <change name="Kris Becker" date="2008-12-29"> 
-         Added RightAscension, Declination, SubSolarGroundAzimuth, and
-         SubSpacecraftGroundAzimuth computations; added center line/sample image 
-         coordinate used to compute center geometry; added check of valid image 
-         line/sample coordinates when testing for north/south poles (some camera 
-         models return valid states when coordinates are outside of image 
-         boundaries).
+       Added RightAscension, Declination, SubSolarGroundAzimuth, and
+       SubSpacecraftGroundAzimuth computations; added center line/sample image 
+       coordinate used to compute center geometry; added check of valid image 
+       line/sample coordinates when testing for north/south poles (some camera 
+       models return valid states when coordinates are outside of image 
+       boundaries).
      </change>
      <change name="Kris Becker" date="2009-02-26"> 
-         Modified to actually exclude the unconditional computation of the image 
-         polygon to assist in some geometry values.  It is no longer computed if 
-         the user does not select the POLYGON option.  The implications of this 
-         are that some of the keywords in the output Geometry group are no 
-         longer ever relevant.  These keywords were all moved to the Polygon 
-         group.  These keywords are:   CentroidLine, CentroidSample, 
-         CentroidLatitude, CentroidLongitude, CentroidRadius and SurfaceArea.  
-         User will no longer see these values if the POLYGON option is not 
-         selected.  Also the Radius keyword in the Polygon group has been 
-         removed as it is redundant with CentroidRadius.
+       Modified to actually exclude the unconditional computation of the image 
+       polygon to assist in some geometry values.  It is no longer computed if 
+       the user does not select the POLYGON option.  The implications of this 
+       are that some of the keywords in the output Geometry group are no 
+       longer ever relevant.  These keywords were all moved to the Polygon 
+       group.  These keywords are:   CentroidLine, CentroidSample, 
+       CentroidLatitude, CentroidLongitude, CentroidRadius and SurfaceArea.  
+       User will no longer see these values if the POLYGON option is not 
+       selected.  Also the Radius keyword in the Polygon group has been 
+       removed as it is redundant with CentroidRadius.
      </change>
      <change name="Kris Becker" date="2009-05-29"> 
-         Added PIXINC parameter to allow user to specify number of pixels to 
-         skip around the perimiter of the image to compute the polygon.
+       Added PIXINC parameter to allow user to specify number of pixels to 
+       skip around the perimiter of the image to compute the polygon.
      </change>
      <change name="Kris Becker" date="2009-05-29"> 
-         Fixed bug where image was a 0 longitude boundary crosser.  It would 
-         typically fail when determining centroid information unless converted 
-         to 180 domain.  This will also be used at the poles as it seems to work 
-         better in the 180 domain as well.  (This process projects the footprint 
-         to a Sinusoidal projection to determine area which requires an equal 
-         area projection, such as Sinusoidal.)
+       Fixed bug where image was a 0 longitude boundary crosser.  It would 
+       typically fail when determining centroid information unless converted 
+       to 180 domain.  This will also be used at the poles as it seems to work 
+       better in the 180 domain as well.  (This process projects the footprint 
+       to a Sinusoidal projection to determine area which requires an equal 
+       area projection, such as Sinusoidal.)
      </change>
-      <change name="Kris Becker" date="2009-07-08">
-          Added the MAXEMISSION and MAXINCIDENCE limit parameters to better
-          control limb and terminator polygon generation.
-      </change>
-      <change name="Kris Becker" date="2009-08-24">
-          Allow disabling of shape model use when constructing polygons that 
-          contain limbs.
-      </change>
-      <change name="Mackenzie Boyd" date="2010-06-14">
-          Removed polygon options group and placed the options within output 
-          options. Added inclusion for parameters related to polygons to only be 
-          available when polygons are selected. Made TO option not have a 
-          default of None, updated documentation and modified formatting. 
-      </change>
+     <change name="Kris Becker" date="2009-07-08">
+       Added the MAXEMISSION and MAXINCIDENCE limit parameters to better
+       control limb and terminator polygon generation.
+     </change>
+     <change name="Kris Becker" date="2009-08-24">
+       Allow disabling of shape model use when constructing polygons that 
+       contain limbs.
+     </change>
+     <change name="Mackenzie Boyd" date="2010-06-14">
+       Removed polygon options group and placed the options within output 
+       options. Added inclusion for parameters related to polygons to only be 
+       available when polygons are selected. Made TO option not have a 
+       default of None, updated documentation and modified formatting. 
+     </change>
+     <change name="Jai Rideout" date="2011-02-17">
+       Replaced PIXINC with POLYSINC and POLYLINC. Renamed SINC and LINC to
+       STATSSINC and STATSLINC.
+     </change>
   </history>
 
   <category>
@@ -527,13 +531,13 @@ End
           </UL>
         </description>
         <inclusions>
-          <item>SINC</item>
-          <item>LINC</item>
+          <item>STATSSINC</item>
+          <item>STATSLINC</item>
         </inclusions>
         <default><item>FALSE</item></default>
       </parameter>
 
-      <parameter name="LINC">
+      <parameter name="STATSLINC">
         <type>integer</type>
         <brief>
           LINC for camstats
@@ -542,9 +546,10 @@ End
           This is the line increment used by camstats.
         </description>
         <default><item>1</item></default>
+        <minimum inclusive="true">1</minimum>
       </parameter>
 
-      <parameter name="SINC">
+      <parameter name="STATSSINC">
         <type>integer</type>
         <brief>
           SINC for camstats
@@ -553,6 +558,7 @@ End
           This is the sample increment used by camstats.
         </description>
         <default><item>1</item></default>
+        <minimum inclusive="true">1</minimum>
       </parameter>
 
       <parameter name="POLYGON">
@@ -578,24 +584,41 @@ End
             </UL>
         </description>
         <inclusions>
-          <item>PIXINC</item>
+          <item>POLYLINC</item>
+          <item>POLYSINC</item>
           <item>MAXEMISSION</item>
           <item>MAXINCIDENCE</item>
         </inclusions>
       </parameter>
       
-      <parameter name="PIXINC">
+      <parameter name="POLYLINC">
         <type>integer</type>
         <brief>
-          Polygon pixel increment
+          Polygon line increment
         </brief>
         <description>
-          Specifies the number of pixels skip around the perimeter of the image 
-          to compute the polygon footprint.  Note that currently, an increment 
-          of 1 will not work for pushframe instruments such as THEMIS-VIS.  A 
-          default of 0 will cause caminfo to arbitrarily set it to 100.
+          Specifies the number of lines to skip around the perimeter of the
+          image to compute the polygon footprint.  Note that currently, an
+          increment of 1 will not work for pushframe instruments such as
+          THEMIS-VIS.
         </description>
-        <default><item>0</item></default>
+        <internalDefault>10% of the cube's total lines</internalDefault>
+        <minimum inclusive="true">1</minimum>
+      </parameter>
+
+      <parameter name="POLYSINC">
+        <type>integer</type>
+        <brief>
+          Polygon sample increment
+        </brief>
+        <description>
+          Specifies the number of samples to skip around the perimeter of the
+          image to compute the polygon footprint.  Note that currently, an
+          increment of 1 will not work for pushframe instruments such as
+          THEMIS-VIS.
+        </description>
+        <internalDefault>10% of the cube's total samples</internalDefault>
+        <minimum inclusive="true">1</minimum>
       </parameter>
 
       <parameter name="MAXEMISSION">

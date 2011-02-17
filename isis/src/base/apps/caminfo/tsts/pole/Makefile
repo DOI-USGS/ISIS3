@@ -5,8 +5,8 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) FROM=$(INPUT)/f167s71.cub \
 	TO=$(OUTPUT)/caminfo.pvl ISISLABEL=true ORIGINAL=true \
-	STATISTICS=true CAMSTATS=true linc=25 sinc=25 \
-	POLYGON=true pixinc=100 > /dev/null;
+	STATISTICS=true CAMSTATS=true statslinc=25 statssinc=25 \
+	POLYGON=true polysinc=100 polylinc=100 > /dev/null;
 	cat $(OUTPUT)/caminfo.pvl | \
 	  sed 's/\(MULTIPOLYGON.*[0-9]\.[0-9]\{5\}\)\([0-9]*\)/\1/g' | \
 	  sed 's/\([0-9]*\.[0-9]\{5\}\)\([0-9]*)))\)/\1)))/g' | \

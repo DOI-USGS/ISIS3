@@ -304,7 +304,7 @@ namespace Isis {
         poly.Incidence(_maxIncidence);
         poly.Emission(_maxEmission);
         poly.EllipsoidLimb(true);  // Allow disabling of shape model for limbs
-        poly.Create(cube, _pixinc, _pixinc, 1, 1, 0, 0, band + 1);
+        poly.Create(cube, _sampleInc, _lineInc, 1, 1, 0, 0, band + 1);
         geos::geom::MultiPolygon *multiP = poly.Polys();
         _polys.push_back(multiP->clone());
         if(_combined == 0) {
@@ -621,7 +621,8 @@ namespace Isis {
     pband += ValidateKey("SurfaceArea", _summary.surfaceArea, "km^2");
     pband += ValidateKey("GlobalCoverage", globalCoverage, "percent");
     if(_combined != 0) {
-      pband += PvlKeyword("PixelIncrement", _pixinc);
+      pband += PvlKeyword("SampleIncrement", _sampleInc);
+      pband += PvlKeyword("LineIncrement", _lineInc);
       if(_combined->getGeometryTypeId() != geos::geom::GEOS_MULTIPOLYGON) {
         geos::geom::MultiPolygon *geom = makeMultiPolygon(_combined);
         pband += PvlKeyword("GisFootprint", geom->toString());
