@@ -154,6 +154,10 @@ namespace Isis {
     ASSERT(csn);
 
     if (!connections->contains(csn)) {
+      /********************/
+      // this is still being figured out. For now return early.
+      return;
+      /********************/
       iString msg = "Can not remove non-existent connection!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
