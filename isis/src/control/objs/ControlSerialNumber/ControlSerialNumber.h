@@ -30,6 +30,7 @@ class QString;
 
 namespace Isis {
   class ControlMeasure;
+  class ControlPoint;
   class iString;
 
   /**
@@ -46,7 +47,12 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-01-14 Travis Addair and Christopher Austin - original
-   *                                                              version
+   *                version
+   *   @history 2011-02-18 Eric Hyer - This class now also acts as a vertex
+   *                class for a graph where edges are the connections between
+   *                images.  This means that connections are stored to other
+   *                ControlSerialNumber objects who have measures which have
+   *                the same parent (point) as measures here.
    *
    */
   class ControlSerialNumber {
@@ -55,33 +61,44 @@ namespace Isis {
       ControlSerialNumber(const ControlSerialNumber &other);
       virtual ~ControlSerialNumber();
 
-      void AddMeasure(iString parentPointId, ControlMeasure *measure);
-      void RemoveMeasure(iString parentPointId);
+      void addMeasure(ControlMeasure *measure);
+      void removeMeasure(ControlMeasure *measure);
+      void addConnection(ControlMeasure *measure);
+      void removeConnection(ControlMeasure *measure);
 
-      bool Contains(iString parentPointId);
-      iString GetSerialNumber();
-      int GetNumMeasures();
-      QList< QString > GetPointIds() const;
-      QList< ControlMeasure * > GetMeasures() const;
+      bool contains(ControlPoint *point);
+      iString getSerialNumber();
+      int size();
+      QList< ControlMeasure * > getMeasures() const;
 
-      ControlMeasure *GetMeasure(iString pointId);
-      const ControlMeasure *GetMeasure(iString pointId) const;
-
-      ControlMeasure *operator[](iString pointId);
-      const ControlMeasure *operator[](iString pointId) const;
+      ControlMeasure *getMeasure(ControlPoint *point);
+      const ControlMeasure *getMeasure(ControlPoint *point) const;
+      ControlMeasure *operator[](ControlPoint *point);
+      const ControlMeasure *operator[](ControlPoint *point) const;
 
       const ControlSerialNumber &operator=(ControlSerialNumber);
 
 
     private:
-      void Nullify();
+      void nullify();
+      void updateConnections(
+        void (ControlSerialNumber::*updateFunc)(ControlMeasure *),
+        ControlMeasure *measure);
 
 
     private:
       iString *serialNumber;
-      QHash< QString, ControlMeasure * > * measures;
 
-  }; // End of Class
-} // End of namespace
+      //! ControlMeasures hashed by ControlPoint ID
+      QHash< ControlPoint *, ControlMeasure * > * measures;
+
+      /**
+       * Stores a list of ControlMeasures which establish a conection to the
+       * ControlSerialNumber that the list is hashed by
+       */
+      QHash< ControlSerialNumber *, QList< ControlMeasure * > > * connections;
+
+  };
+}
 
 #endif

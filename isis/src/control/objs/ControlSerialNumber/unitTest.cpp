@@ -35,7 +35,7 @@ int main() {
   cout << "Test adding first measure ..." << endl;
   cout << "Key = " << measure1->GetPointId().toStdString() << endl;
   cout << "Value = measure with cube serial number " <<
-    measure1->GetCubeSerialNumber() << endl;
+      measure1->GetCubeSerialNumber() << endl;
   try {
     controlSN.AddMeasure(measure1->GetPointId(), measure1);
     cout << "Successfully added measure" << endl;
@@ -49,7 +49,7 @@ int main() {
   cout << "Test adding second measure ..." << endl;
   cout << "Key = " << measure2->GetPointId().toStdString() << endl;
   cout << "Value = measure with cube serial number " <<
-    measure2->GetCubeSerialNumber() << endl;
+      measure2->GetCubeSerialNumber() << endl;
   try {
     controlSN.AddMeasure(measure2->GetPointId(), measure2);
     cout << "Successfully added measure" << endl;
@@ -73,7 +73,7 @@ int main() {
   cout << "Test adding third measure ..." << endl;
   cout << "Key = " << measure3->GetPointId().toStdString() << endl;
   cout << "Value = measure with cube serial number " <<
-    measure3->GetCubeSerialNumber() << endl;
+      measure3->GetCubeSerialNumber() << endl;
   try {
     controlSN.AddMeasure(measure3->GetPointId(), measure3);
     cout << "Successfully added measure" << endl;
@@ -87,7 +87,7 @@ int main() {
   cout << "Test adding fourth measure ..." << endl;
   cout << "Key = " << measure4->GetPointId().toStdString() << endl;
   cout << "Value = measure with cube serial number " <<
-    measure4->GetCubeSerialNumber() << endl;
+      measure4->GetCubeSerialNumber() << endl;
   try {
     controlSN.AddMeasure(measure4->GetPointId(), measure4);
     cout << "Successfully added measure" << endl;
