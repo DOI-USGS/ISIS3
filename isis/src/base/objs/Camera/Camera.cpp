@@ -669,7 +669,7 @@ namespace Isis {
       a = Distance(map["EquatorialRadius"][0], Distance::Meters);
 
     if(map.HasKeyword("PolarRadius")) 
-      b = Distance(map["EquatorialRadius"][0], Distance::Meters);
+      b = Distance(map["PolarRadius"][0], Distance::Meters);
 
     // Convert to planetographic if necessary
     minlat = p_minlat;

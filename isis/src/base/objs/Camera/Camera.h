@@ -195,6 +195,9 @@ namespace Isis {
    *                          them).
    *  @history 2011-02-11 Steven Lambright - Moved Distance() method to
    *                          SurfacePoint
+   *  @history 2011-02-18 Steven Lambright - Fixed a problem where using a
+   *                          planetographic mapping group in GroundRange would
+   *                          still output planetocentric latitudes. 
    */
 
   class Camera : public Sensor {
