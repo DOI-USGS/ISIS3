@@ -689,7 +689,8 @@ namespace Isis {
             std::vector<double> posPoly1, posPoly2, posPoly3;
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
-            pSpicePos->SetOverrideBaseTime(baseTime);
+            double timeScale = pOpos->GetTimeScale();
+            pSpicePos->SetOverrideBaseTime(baseTime, timeScale);
             pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3);
           }
           else {
@@ -2093,7 +2094,8 @@ namespace Isis {
             std::vector<double> posPoly1, posPoly2, posPoly3;
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
-            pSpicePos->SetOverrideBaseTime(baseTime);
+            double timeScale = pOpos->GetTimeScale();
+            pSpicePos->SetOverrideBaseTime(baseTime, timeScale);
             pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3);
           }
           else {
@@ -2423,12 +2425,14 @@ namespace Isis {
 
         // Add the partial for the x coordinate of the position (differentiating
         // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
+        // ***TODO*** check derivative with scale added to dTime
         px[nIndex] = a1 * (CJ[6] * a2 - CJ[0]);
         py[nIndex] = a1 * (CJ[6] * a3 - CJ[3]);
         nIndex++;
 
         if (m_spacecraftPositionSolveType > PositionOnly) {
           dTime = pInstPos->EphemerisTime() - pInstPos->GetBaseTime();
+          dTime = dTime / pInstPos->GetTimeScale();
 
           px[nIndex] = px[nIndex-1] * dTime;
           py[nIndex] = py[nIndex-1] * dTime;

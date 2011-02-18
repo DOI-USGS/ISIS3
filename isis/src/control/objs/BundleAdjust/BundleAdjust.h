@@ -64,6 +64,7 @@
  *   @history 2010-07-09 Ken Edmundson Added Folding in solution method (SPECIALK), error propogation, statistical report, etc.
  *   @history 2010-08-13 Debbie A. Cook Changed surface point from lat/lon/radius to body-fixed XYZ.
  *   @history 2010-12-17 Debbie A. Cook Merged Ken Edmundson version with system and updated to new binary control net
+ *   @history 2010-02-17 Debbie A. Cook Updated to use new parameter added to SpicePosition, p_timeScale
 */
 
 #include <vector>
