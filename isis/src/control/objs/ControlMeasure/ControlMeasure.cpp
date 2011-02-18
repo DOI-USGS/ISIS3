@@ -228,9 +228,7 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
-    if (associatedCSN) {
-      associatedCSN->RemoveMeasure(GetPointId());
-    }
+    associatedCSN = NULL;
   }
 
 
@@ -864,16 +862,6 @@ namespace Isis {
     }
 
     return parentPoint->GetId();
-  }
-
-
-  void ControlMeasure::ConnectControlSN(ControlSerialNumber *sn) {
-    associatedCSN = sn;
-  }
-
-
-  void ControlMeasure::DisconnectControlSN() {
-    associatedCSN = NULL;
   }
 
 

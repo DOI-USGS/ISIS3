@@ -140,9 +140,13 @@ namespace Isis {
    *   @history 2011-02-10 Eric Hyer - Measures no longer know about or care
    *                about whether they are the reference measure or not.  This
    *                is now completely maintained by the ControlPoint class.
+   *   @history 2011-02-18 Eric Hyer - ControlSerialNumber is now a friend.
+   *                Eliminated ConnectControlSN and DisconnectControlSN methods.
+   *                Fixed bug in destructor.
    */
   class ControlMeasure {
       friend class ControlPoint;
+      friend class ControlSerialNumber;
     public:
       /**
        * @brief Control network measurement types
@@ -213,6 +217,7 @@ namespace Isis {
       ~ControlMeasure();
 
       ControlPoint *Parent() { return parentPoint; }
+      ControlSerialNumber *ControlSN() { return associatedCSN; }
 
       void Load(PvlGroup &p);
 
@@ -273,9 +278,6 @@ namespace Isis {
       double GetSampleSigma() const;
       MeasureType GetType() const;
       QString GetPointId() const;
-
-      void ConnectControlSN(ControlSerialNumber *sn);
-      void DisconnectControlSN();
 
       static QVector<iString> GetMeasureDataNames();
 
