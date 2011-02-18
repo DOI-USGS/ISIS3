@@ -37,7 +37,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure1->GetCubeSerialNumber() << endl;
   try {
-    controlSN.AddMeasure(measure1->GetPointId(), measure1);
+    controlSN.addMeasure(measure1);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
@@ -51,7 +51,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure2->GetCubeSerialNumber() << endl;
   try {
-    controlSN.AddMeasure(measure2->GetPointId(), measure2);
+    controlSN.addMeasure(measure2);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
@@ -75,7 +75,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure3->GetCubeSerialNumber() << endl;
   try {
-    controlSN.AddMeasure(measure3->GetPointId(), measure3);
+    controlSN.addMeasure(measure3);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
@@ -89,7 +89,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure4->GetCubeSerialNumber() << endl;
   try {
-    controlSN.AddMeasure(measure4->GetPointId(), measure4);
+    controlSN.addMeasure(measure4);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
