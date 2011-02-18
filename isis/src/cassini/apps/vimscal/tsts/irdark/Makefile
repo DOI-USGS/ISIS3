@@ -1,6 +1,6 @@
 APPNAME = vimscal
 
-V1483214528_1.ir.avgdark.cal.cub.TOLERANCE = 0.00000000004
+V1483214528_1.ir.avgdark.cal.cub.TOLERANCE = 0.000000001
 V1483214528_1.ir.origdark.cal.cub.TOLERANCE = 0.00000000004
 
 include $(ISISROOT)/make/isismake.tsts
