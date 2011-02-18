@@ -1,5 +1,8 @@
 APPNAME = hisharpen
 
+ir.cub.TOLERANCE = 9.8e-4
+bg.cub.TOLERANCE = 4.9e-4
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
