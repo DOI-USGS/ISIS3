@@ -576,8 +576,9 @@ namespace Isis {
   void SpiceRotation::ReloadCache() {
     NaifStatus::CheckErrors();
 
-    // Save current et
-    double et = p_et;
+     // Save current et
+     double et = p_et;
+     p_et = -DBL_MAX;
 
     // Make sure source is Function
     if(p_source != Function) {
@@ -600,16 +601,14 @@ namespace Isis {
     if (p_fullCacheSize > 1) {
     // Load the matrix and av caches
       for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
-        p_et = p_cacheTime.at(pos);
-        SetEphemerisTime(p_et);
+        SetEphemerisTime(p_cacheTime.at(pos));
         p_cache.push_back(p_CJ);
         p_cacheAv.push_back(p_av);
       }
     }
     else {
     // Load the matrix for the single updated time instance
-      p_et = p_cacheTime[0];
-      SetEphemerisTime(p_et);
+      SetEphemerisTime(p_cacheTime[0]);
       p_cache.push_back(p_CJ);
     }
 
@@ -712,8 +711,10 @@ namespace Isis {
       CacheLabel(table);
       return table;
     }
+    // Just load the position for the single epoch
+    else if(p_source == Function  &&  p_degree == 0  &&  p_fullCacheSize == 1)
+      return LineCache(tableName);
     // Load the coefficients for the curves fit to the 3 camera angles
-    else if(p_source == Function  &&  p_degree == 0  &&  p_fullCacheSize == 1) return LineCache(tableName);
     else if(p_source == Function) {
       TableField angle1("J2000Ang1", TableField::Double);
       TableField angle2("J2000Ang2", TableField::Double);
@@ -1774,7 +1775,8 @@ namespace Isis {
       function.SetCoefficients(p_coefficients[angleIndex]);
 
       // Evaluate the derivative of function at p_et
-      dangle = function.DerivativeVar((p_et - p_baseTime) / p_timeScale);
+      //      dangle = function.DerivativeVar((p_et - p_baseTime) / p_timeScale);
+      dangle = function.DerivativeVar((p_et - p_baseTime) / p_timeScale) / p_timeScale;
 
       // Multiply dangle to complete dmatrix
       for(int row = 0;  row < 3;  row++) {

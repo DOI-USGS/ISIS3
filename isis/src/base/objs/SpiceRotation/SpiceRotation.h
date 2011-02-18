@@ -112,6 +112,8 @@ namespace Isis {
    *                        observation.
    *  @history 2010-12-22  Debbie A. Cook  Added new method SetFullCacheParameters to upgrade appjit to current instrument
    *                        Rotation group labels.
+   *  @history 2011-02-17  Debbie A. Cook  Fixed bug in method LineCache and fixed computation of angular velocity in
+   *                        method DCJdt (derivative was with respect to scaled et instead of et)
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {

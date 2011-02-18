@@ -90,6 +90,8 @@ int main(int argc, char *argv[]) {
   // Testing with Functions
   cout << "Testing with functions ... " << endl;
   std::vector<double> abcAng1, abcAng2, abcAng3;
+//   rot.SetOverrideBaseTime(0., 1.);
+//   rot.ComputeBaseTime();
   rot.SetPolynomial();
   rot.GetPolynomial(abcAng1, abcAng2, abcAng3);
   cout << "Source = " << rot.GetSource() << endl;
@@ -154,11 +156,13 @@ int main(int argc, char *argv[]) {
        << dAtwLookC[1] << " " << dAtwLookC[2] << endl << endl;
 
   cout << "Testing with setting functions ... " << endl;
+  Isis::Table tab = rot.Cache("Test");
   Isis::SpiceRotation rot3(-94031);
   Isis::SpiceRotation::Source source = Isis::SpiceRotation::Spice;
-  rot3.SetSource(source);
-  rot3.LoadCache(startTime, endTime, 10);
-  rot3.SetPolynomial(abcAng1, abcAng2, abcAng3);
+//   rot3.SetSource(source);
+//   rot3.LoadCache(startTime, endTime, 10);
+  rot3.LoadCache(tab);
+//   rot3.SetPolynomial(abcAng1, abcAng2, abcAng3);
   source = rot3.GetSource();
   cout << "Source = " << source << endl;
   for(int i = 0; i < 10; i++) {
@@ -178,11 +182,34 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
 
+  // Test LineCache method
+  cout << "Testing line cache..." << endl;
+  Isis::Table tab2 = rot3.LineCache("Test5");
+  Isis::SpiceRotation rot5(-94031);
+  rot5.LoadCache(tab2);
+
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    rot5.SetEphemerisTime(t);
+    vector<double> CJ = rot5.Matrix();
+    cout << "Time           = " << rot5.EphemerisTime() << endl;
+    cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
+    cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
+    cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
+
+    if(rot5.HasAngularVelocity()) {
+      std::vector<double> av = rot5.AngularVelocity();
+      cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
+    }
+  }
+  cout << endl;
+
+
   // Test table options
   cout << "Testing tables ... " << endl;
-  Isis::Table tab = rot.Cache("Test");
+  Isis::Table tab3 = rot.Cache("Test");
   Isis::SpiceRotation rot2(-94031);
-  rot2.LoadCache(tab);
+  rot2.LoadCache(tab2);
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     rot2.SetEphemerisTime(t);
