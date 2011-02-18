@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cfloat>
+#include <iomanip>
 
 #include "SpicePosition.h"
 #include "BasisFunction.h"
@@ -27,12 +28,19 @@ namespace Isis {
     p_source = Spice;
     p_coordinate.resize(3);
     p_velocity.resize(3);
+    p_degree = 2;
     p_et = -DBL_MAX;
-    p_noOverride = true;
+    p_override = NoOverrides;
+    p_fullCacheStartTime = 0;
+    p_fullCacheEndTime = 0;
+    p_fullCacheSize = 0;
+    p_degreeApplied = false;
     p_hasVelocity = false;
     p_xhermite = NULL;
     p_yhermite = NULL;
     p_zhermite = NULL;
+    p_baseTime = 0.;
+    p_timeScale = 1.;
   }
 
 
@@ -109,6 +117,9 @@ namespace Isis {
     else if(p_source == HermiteCache) {
       SetEphemerisTimeHermiteCache();
     }
+    else if(p_source == PolyFunction) {
+      SetEphemerisTimePolyFunction();
+    }
     else {  // Read from the kernel
       SetEphemerisTimeSpice();
     }
@@ -133,7 +144,7 @@ namespace Isis {
    *
    */
   void SpicePosition::LoadCache(double startTime, double endTime, int size) {
-    // Make sure cache isn't alread loaded
+    // Make sure cache isn't already loaded
     if(p_source == Memcache || p_source == HermiteCache) {
       std::string msg = "A SpicePosition cache has already been created";
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
@@ -149,17 +160,21 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
 
+    // Save full cache parameters
+    p_fullCacheStartTime = startTime;
+    p_fullCacheEndTime = endTime;
+    p_fullCacheSize = size;
+    LoadTimeCache();
 
     // Loop and load the cache
     double cacheSlope = 0.0;
     if(size > 1) cacheSlope = (endTime - startTime) / (double)(size - 1);
 
     for(int i = 0; i < size; i++) {
-      double et = startTime + (double) i * cacheSlope;
+      double et = p_cacheTime[i];
       SetEphemerisTime(et);
       p_cache.push_back(p_coordinate);
       if(p_hasVelocity) p_cacheVelocity.push_back(p_velocity);
-      p_cacheTime.push_back(p_et);
     }
     p_source = Memcache;
   }
@@ -200,6 +215,7 @@ namespace Isis {
    *            keyword from table and sets p_source.  If no
    *            CacheType keyword, we know this is an older image,
    *            so set p_source to Memcache.
+   *   @history 2011-01-05 Debbie A. Cook - Added PolyFunction type
    *
    */
   void SpicePosition::LoadCache(Table &table) {
@@ -210,6 +226,18 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
 
+    // Load the full cache time information from the label if available
+    if(table.Label().HasKeyword("SpkTableStartTime")) {
+      p_fullCacheStartTime = table.Label().FindKeyword("SpkTableStartTime")[0];
+    }
+    if(table.Label().HasKeyword("SpkTableEndTime")) {
+      p_fullCacheEndTime = table.Label().FindKeyword("SpkTableEndTime")[0];
+    }
+    if(table.Label().HasKeyword("SpkTableOriginalSize")) {
+      p_fullCacheSize = table.Label().FindKeyword("SpkTableOriginalSize")[0];
+    }
+
+
     // set source type by table's label keyword
     if(!table.Label().HasKeyword("CacheType")) {
       p_source = Memcache;
@@ -219,6 +247,11 @@ namespace Isis {
     }
     else if(table.Label().FindKeyword("CacheType")[0] == "HermiteSpline") {
       p_source = HermiteCache;
+      p_overrideTimeScale = 1.;
+      p_override = ScaleOnly;
+    }
+    else if(table.Label().FindKeyword("CacheType")[0] == "PolyFunction") {
+      p_source = PolyFunction;
     }
     else {
       throw iException::Message(iException::Io,
@@ -228,36 +261,63 @@ namespace Isis {
     }
 
     // Loop through and move the table to the cache
-    for(int r = 0; r < table.Records(); r++) {
-      TableRecord &rec = table[r];
-      if(rec.Fields() == 7) {
-        p_hasVelocity = true;
-      }
-      else if(rec.Fields() == 4) {
-        p_hasVelocity = false;
-      }
-      else  {
-        std::string msg = "Expecting four or seven fields in the SpicePosition table";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
-      }
+    if (p_source != PolyFunction) {
+      for (int r = 0; r < table.Records(); r++) {
+        TableRecord &rec = table[r];
+        if (rec.Fields() == 7) {
+          p_hasVelocity = true;
+        }
+        else if (rec.Fields() == 4) {
+          p_hasVelocity = false;
+        }
+        else  {
+          std::string msg = "Expecting four or seven fields in the SpicePosition table";
+          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        }
 
-      std::vector<double> j2000Coord;
-      j2000Coord.push_back((double)rec[0]);
-      j2000Coord.push_back((double)rec[1]);
-      j2000Coord.push_back((double)rec[2]);
-      int inext = 3;
+        std::vector<double> j2000Coord;
+        j2000Coord.push_back((double)rec[0]);
+        j2000Coord.push_back((double)rec[1]);
+        j2000Coord.push_back((double)rec[2]);
+        int inext = 3;
 
-      p_cache.push_back(j2000Coord);
-      if(p_hasVelocity) {
-        std::vector<double> j2000Velocity;
-        j2000Velocity.push_back((double)rec[3]);
-        j2000Velocity.push_back((double)rec[4]);
-        j2000Velocity.push_back((double)rec[5]);
-        inext = 6;
+        p_cache.push_back(j2000Coord);
+        if (p_hasVelocity) {
+          std::vector<double> j2000Velocity;
+          j2000Velocity.push_back((double)rec[3]);
+          j2000Velocity.push_back((double)rec[4]);
+          j2000Velocity.push_back((double)rec[5]);
+          inext = 6;
 
-        p_cacheVelocity.push_back(j2000Velocity);
+          p_cacheVelocity.push_back(j2000Velocity);
+        }
+        p_cacheTime.push_back((double)rec[inext]);
       }
-      p_cacheTime.push_back((double)rec[inext]);
+    }
+    else {
+      // Coefficient table for postion coordinates x, y, and z
+      std::vector<double> coeffX, coeffY, coeffZ;
+
+      for (int r = 0; r < table.Records(); r++) {
+        TableRecord &rec = table[r];
+
+        if(rec.Fields() != 3) {
+          // throw an error
+        }
+        coeffX.push_back((double)rec[0]);
+        coeffY.push_back((double)rec[1]);
+        coeffZ.push_back((double)rec[1]);
+      }
+      // Take care of function time parameters
+      TableRecord &rec = table[table.Records()-1];
+      double baseTime = (double)rec[0];
+      double timeScale = (double)rec[1];
+      double degree = (double)rec[2];
+      SetPolynomialDegree((int) degree);
+      SetOverrideBaseTime(baseTime, timeScale);
+      SetPolynomial(coeffX, coeffY, coeffZ);
+      if (degree > 0)  p_hasVelocity = true;
+      if(degree == 0  && p_cacheVelocity.size() > 0) p_hasVelocity = true;
     }
   }
 
@@ -273,11 +333,113 @@ namespace Isis {
    *   @history 2009-08-03 Jeannie Walldren - Added CacheType
    *            keyword to output table.  This is based on
    *            p_source and will be read by LoadCache(Table).
+   *   @history 2011-01-05 Debbie A. Cook - Added PolyFunction
    */
   Table SpicePosition::Cache(const std::string &tableName) {
+    // record to be added to table
+    TableRecord record;
 
+    if (p_source != PolyFunction) {
+    // add x,y,z position labels to record
+      TableField x("J2000X", TableField::Double);
+      TableField y("J2000Y", TableField::Double);
+      TableField z("J2000Z", TableField::Double);
+      record += x;
+      record += y;
+      record += z;
+
+      if (p_hasVelocity) {
+      // add x,y,z velocity labels to record
+        TableField vx("J2000XV", TableField::Double);
+        TableField vy("J2000YV", TableField::Double);
+        TableField vz("J2000ZV", TableField::Double);
+        record += vx;
+        record += vy;
+        record += vz;
+      }
+    // add time label to record
+      TableField t("ET", TableField::Double);
+      record += t;
+
+    // create output table
+      Table table(tableName, record);
+
+      int inext = 0;
+
+      for (int i = 0; i < (int)p_cache.size(); i++) {
+        record[inext++] = p_cache[i][0];                     // record[0]
+        record[inext++] = p_cache[i][1];                     // record[1]
+        record[inext++] = p_cache[i][2];                     // record[2]
+        if (p_hasVelocity) {
+          record[inext++] = p_cacheVelocity[i][0];           // record[3]
+          record[inext++] = p_cacheVelocity[i][1];           // record[4]
+          record[inext++] = p_cacheVelocity[i][2];           // record[5]
+        }
+        record[inext] = p_cacheTime[i];                      // record[6]
+        table += record;
+
+        inext = 0;
+      }
+      CacheLabel(table);
+      return table;
+    }
+
+    else if(p_source == PolyFunction  &&  p_degree == 0  &&  p_fullCacheSize == 1)
+      // Just load the position for the single epoch
+      return LineCache(tableName);
+
+    // Load the coefficients for the curves fit to the 3 camera angles
+    else if (p_source == PolyFunction) {
+      // PolyFunction case
+      TableField spacecraftX("J2000SVX", TableField::Double);
+      TableField spacecraftY("J2000SVY", TableField::Double);
+      TableField spacecraftZ("J2000SVZ", TableField::Double);
+
+      TableRecord record;
+      record += spacecraftX;
+      record += spacecraftY;
+      record += spacecraftZ;
+
+      Table table(tableName, record);
+
+      for(int cindex = 0; cindex < p_degree + 1; cindex++) {
+        record[0] = p_coefficients[0][cindex];
+        record[1] = p_coefficients[1][cindex];
+        record[2] = p_coefficients[2][cindex];
+        table += record;
+      }
+
+      // Load one more table entry with the time adjustments for the fit equation
+      // t = (et - baseTime)/ timeScale
+      record[0] = p_baseTime;
+      record[1] = p_timeScale;
+      record[2] = (double) p_degree;
+
+      CacheLabel(table);
+      table += record;
+      return table;
+    }
+
+    else {
+      throw iException::Message(iException::Io,
+                                "Cannot create Table, no Cache is loaded.",
+                                _FILEINFO_);
+    }
+
+  }
+
+
+
+  /** Add labels to a SpicePosition table.
+   *
+   * Return a table containing the labels defining the position table.
+   *
+   * @param Table    Table to receive labels
+   */
+  void SpicePosition::CacheLabel(Table &table) {
     // determine type of table to return
     std::string tabletype = "";
+
     if(p_source == Memcache) {
       tabletype = "Linear";
     }
@@ -285,62 +447,110 @@ namespace Isis {
       tabletype = "HermiteSpline";
     }
     else {
-      throw iException::Message(iException::Io,
-                                "Cannot create Table, no Cache is loaded.",
-                                _FILEINFO_);
+      tabletype = "PolyFunction";
     }
 
-    // reacord to be added to table
-    TableRecord record;
-
-    // add x,y,z position labels to record
-    TableField x("J2000X", TableField::Double);
-    TableField y("J2000Y", TableField::Double);
-    TableField z("J2000Z", TableField::Double);
-    record += x;
-    record += y;
-    record += z;
-
-    if(p_hasVelocity) {
-      // add x,y,z velocity labels to record
-      TableField vx("J2000XV", TableField::Double);
-      TableField vy("J2000YV", TableField::Double);
-      TableField vz("J2000ZV", TableField::Double);
-      record += vx;
-      record += vy;
-      record += vz;
-    }
-    // add time label to record
-    TableField t("ET", TableField::Double);
-    record += t;
-
-    // create output table
-    Table table(tableName, record);
-
-    int inext = 0;
-    for(int i = 0; i < (int)p_cache.size(); i++) {
-      record[inext++] = p_cache[i][0];  // record[0]
-      record[inext++] = p_cache[i][1];  // record[1]
-      record[inext++] = p_cache[i][2];  // record[2]
-      if(p_hasVelocity) {
-        record[inext++] = p_cacheVelocity[i][0];  // record[3]
-        record[inext++] = p_cacheVelocity[i][1];  // record[4]
-        record[inext++] = p_cacheVelocity[i][2];  // record[5]
-      }
-      record[inext] = p_cacheTime[i];  // record[6]
-      table += record;
-
-      inext = 0;
-    }
-
-    // set CacheType keyword in table's label
     table.Label() += PvlKeyword("CacheType", tabletype);
 
-    return table;
+    // Write original time coverage
+    if(p_fullCacheStartTime != 0) {
+      table.Label() += PvlKeyword("SpkTableStartTime");
+      table.Label()["SpkTableStartTime"].AddValue(p_fullCacheStartTime);
+    }
+    if(p_fullCacheEndTime != 0) {
+      table.Label() += PvlKeyword("SpkTableEndTime");
+      table.Label()["SpkTableEndTime"].AddValue(p_fullCacheEndTime);
+    }
+    if(p_fullCacheSize != 0) {
+      table.Label() += PvlKeyword("SpkTableOriginalSize");
+      table.Label()["SpkTableOriginalSize"].AddValue(p_fullCacheSize);
+    }
   }
 
 
 
+  /** Return a table with J2000 to reference positions.
+   *
+   * Return a table containing the cached positions with the given
+   * name. The table will have seven columns, positionX, positionY, 
+   * positionZ, angular velocity X, angular velocity Y, angular  
+   * velocity Z, and time of J2000 position.
+   *
+   * @param tableName    Name of the table to create and return
+   */
+  Table SpicePosition::LineCache(const std::string &tableName) {
+
+    // Apply the function and fill the caches
+    if(p_source == PolyFunction)  ReloadCache();
+
+    if(p_source != Memcache) {
+      std::string msg = "Only cached positions can be returned as a line cache of positions and time";
+      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    }
+    // Load the table and return it to caller
+    return Cache(tableName);
+  }
+
+
+
+  /** Cache J2000 positions over existing cached time range using polynomials
+   *
+   * This method will reload an internal cache with positions
+   * calculated from functions fit to the coordinates of the position 
+   * over a time range.
+   *
+   */
+  void SpicePosition::ReloadCache() {
+    NaifStatus::CheckErrors();
+
+    // Save current et
+    double et = p_et;
+
+    // Make sure source is PolyFunction
+    if(p_source != PolyFunction) {
+      std::string msg = "The SpicePosition has not yet been fit to a polynomial function";
+      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Clear existing positions from thecache
+    p_cacheTime.clear();
+    p_cache.clear();
+
+    // Clear the velocity cache if we can calculate it instead.  It can't be calculated for 
+    // functions of degree 0 (framing cameras), so keep the original velocity.  It is better than nothing.
+    if (p_degree > 0  && p_cacheVelocity.size() > 1)  p_cacheVelocity.clear();
+
+    // Load the time cache first
+    LoadTimeCache();
+
+    if (p_fullCacheSize > 1) {
+    // Load the positions and velocity caches
+    p_et = -DBL_MAX;   // Forces recalculation in SetEphemerisTime
+
+      for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
+        //        p_et = p_cacheTime.at(pos);
+        SetEphemerisTime(p_cacheTime.at(pos));
+        p_cache.push_back(p_coordinate);
+        p_cacheVelocity.push_back(p_velocity);
+      }
+    }
+    else {
+    // Load the position for the single updated time instance
+      p_et = p_cacheTime[0];
+      SetEphemerisTime(p_et);
+      p_cache.push_back(p_coordinate);
+    }
+
+    // Set source to cache and reset current et
+    p_source = Memcache;
+    p_et = -DBL_MAX;
+    SetEphemerisTime(et);
+
+    NaifStatus::CheckErrors();
+  }
+
+
+//  Obsolete
   /** Cache J2000 position over existing cached time range using
    *  polynomials
    *
@@ -355,7 +565,7 @@ namespace Isis {
    * @param function3   The third polynomial function used to
    *                    find the position coordinates
    */
-  void SpicePosition::ReloadCache(Isis::PolynomialUnivariate &function1,
+  /*  void SpicePosition::ReloadCache(Isis::PolynomialUnivariate &function1,
                                   Isis::PolynomialUnivariate &function2,
                                   Isis::PolynomialUnivariate &function3) {
     // Make sure cache is already loaded
@@ -483,27 +693,33 @@ namespace Isis {
     p_et = -DBL_MAX;
     SetEphemerisTime(et);
 
-    /*    std::cout << "After" << std::endl;
-        std::cout << "     at time " << et << std::endl;
-        for (int i=0; i<3; i++) {
-          std::cout << p_coordinate[i] << std::endl;
-        }*/
-
     return;
   }
+*/
 
 
-
-  /** Set the coefficients of a polynomial (parabola) fit to each
-   * of the components (X, Y, Z) of the position vector for the time period covered
-   * by the cache, component = a + bt + ct**2, where t = time - p_baseTime.
+  /** Set the coefficients of a polynomial fit to each of the components (X, Y, Z)
+   *  of the position vector for the time period covered by the cache,
+   *  component = c0 + c1*t + c2*t**2 + ... + cn*t**n, 
+   *  where t = (time - p_baseTime) / p_timeScale.
    *
    */
   void SpicePosition::SetPolynomial() {
-    int degree = 2;
-    Isis::PolynomialUnivariate function1(degree);       //!< Basis function fit to X
-    Isis::PolynomialUnivariate function2(degree);       //!< Basis function fit to Y
-    Isis::PolynomialUnivariate function3(degree);       //!< Basis function fit to Z
+    // Check to see if the position is already a Polynomial Function
+    if (p_source == PolyFunction)
+      return;
+
+    // Adjust the degree of the polynomial to the available data
+    if (p_cache.size() == 1) {
+      p_degree = 0;
+    }
+    else if (p_cache.size() == 2) {
+      p_degree = 1;
+    }
+      
+    Isis::PolynomialUnivariate function1(p_degree);       //!< Basis function fit to X
+    Isis::PolynomialUnivariate function2(p_degree);       //!< Basis function fit to Y
+    Isis::PolynomialUnivariate function3(p_degree);       //!< Basis function fit to Z
     //
     LeastSquares *fitX = new LeastSquares(function1);
     LeastSquares *fitY = new LeastSquares(function2);
@@ -518,25 +734,19 @@ namespace Isis {
       double t = p_cacheTime.at(0);
       SetEphemerisTime(t);
       XC.push_back(p_coordinate[0]);
-      XC.push_back(0.0);
-      XC.push_back(0.0);
       YC.push_back(p_coordinate[1]);
-      YC.push_back(0.0);
-      YC.push_back(0.0);
       ZC.push_back(p_coordinate[2]);
-      ZC.push_back(0.0);
-      ZC.push_back(0.0);
     }
     else if(p_cache.size() == 2) {
 // Load the times and get the corresponding coordinates
       double t1 = p_cacheTime.at(0);
       SetEphemerisTime(t1);
       std::vector<double> coord1 = p_coordinate;
-      t1 -= p_baseTime;
+      t1 = (t1 - p_baseTime) / p_timeScale;
       double t2 = p_cacheTime.at(1);
       SetEphemerisTime(t2);
       std::vector<double> coord2 = p_coordinate;
-      t2 -= p_baseTime;
+      t2 = (t2 - p_baseTime) / p_timeScale;
       double slope[3];
       double intercept[3];
 
@@ -548,20 +758,17 @@ namespace Isis {
       }
       XC.push_back(intercept[0]);
       XC.push_back(slope[0]);
-      XC.push_back(0.0);
       YC.push_back(intercept[1]);
       YC.push_back(slope[1]);
-      YC.push_back(0.0);
       ZC.push_back(intercept[2]);
       ZC.push_back(slope[2]);
-      ZC.push_back(0.0);
     }
     else {
       // Load the known values to compute the fit equation
 
       for(std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
         double t = p_cacheTime.at(pos);
-        time.push_back(t - p_baseTime);
+        time.push_back( (t - p_baseTime) / p_timeScale);
         SetEphemerisTime(t);
         std::vector<double> coord = p_coordinate;
 
@@ -580,8 +787,8 @@ namespace Isis {
       delete fitY;
       delete fitZ;
 
-      // For now assume all three coordinates are fit to a parabola.  Later they may
-      // each be fit to a unique basis function.
+      // For now assume all three coordinates are fit to a polynomial function.
+      // Later they may each be fit to a unique basis function.
       // Fill the coefficient vectors
 
       for(int i = 0;  i < function1.Coefficients(); i++) {
@@ -601,8 +808,8 @@ namespace Isis {
 
   /** Set the coefficients of a polynomial (parabola) fit to
    * each of the three coordinates of the position vector for the
-   * time period covered by the cache, coord = a + bt + ct**2,
-   * where t = time - p_baseTime.
+   * time period covered by the cache, coord = c0 + c1*t + c2*t**2 + ... + cn*t**n,
+   * where t = (time - p_baseTime) / p_timeScale.
    *
    * @param [in] XC Coefficients of fit to X coordinate
    * @param [in] YC Coefficients of fit to Y coordinate
@@ -612,9 +819,9 @@ namespace Isis {
   void SpicePosition::SetPolynomial(const std::vector<double>& XC,
                                     const std::vector<double>& YC,
                                     const std::vector<double>& ZC) {
-    Isis::PolynomialUnivariate function1(2);
-    Isis::PolynomialUnivariate function2(2);
-    Isis::PolynomialUnivariate function3(2);
+    Isis::PolynomialUnivariate function1(p_degree);
+    Isis::PolynomialUnivariate function2(p_degree);
+    Isis::PolynomialUnivariate function3(p_degree);
 
     // Load the functions with the coefficients
     function1.SetCoefficients(XC);
@@ -624,33 +831,30 @@ namespace Isis {
     // Compute the base time
     ComputeBaseTime();
 
-
-//    std::cout << "Basetime=" << p_baseTime << std::endl;
-
-    // Reload the cache from the functions and the currently cached time
-    ReloadCache(function1, function2, function3);
-
     // Save the current coefficients
     p_coefficients[0] = XC;
-
-//    std::cout << "Saved coef0="<<p_coefficients[0][0]<<" "<<p_coefficients[0][1]
-//              <<p_coefficients[0][2]<<std::endl;
-
     p_coefficients[1] = YC;
-
-//    std::cout << "Saved coef1="<<p_coefficients[1][0]<<" "<<p_coefficients[1][1]
-//              <<p_coefficients[1][2]<<std::endl;
-
     p_coefficients[2] = ZC;
+
+    // Set the flag indicating p_degree has been applied to the spacecraft
+    // positions and the coefficients of the polynomials have been saved.
+    p_degreeApplied = true;
+    p_source = PolyFunction;
+
+    // Update the current position
+    double et = p_et;
+    p_et = -DBL_MAX;
+    SetEphemerisTime(et);
+
     return;
   }
 
 
 
   /**
-   *  Return the coefficients of a polynomial (parabola) fit to each of the
+   *  Return the coefficients of a polynomial fit to each of the
    *  three coordinates of the position for the time period covered by the cache,
-   *  angle = a + bt + ct**2, where t = time - p_basetime.
+   *  angle = c0 + c1*t + c2*t**2 + ... + cn*t**n, where t = (time - p_basetime) / p_timeScale.
    *
    * @param [out] XC Coefficients of fit to first coordinate of position
    * @param [out] YC Coefficients of fit to second coordinate of position
@@ -671,73 +875,95 @@ namespace Isis {
 
   //! Compute the base time using cached times
   void SpicePosition::ComputeBaseTime() {
-    if(p_noOverride) {
+    if(p_override == NoOverrides) {
       p_baseTime = (p_cacheTime.at(0) + p_cacheTime.at(p_cacheTime.size() - 1)) / 2.;
+      p_timeScale = p_baseTime - p_cacheTime.at(0);
+    }
+    else if (p_override == ScaleOnly) {
+      p_baseTime = (p_cacheTime.at(0) + p_cacheTime.at(p_cacheTime.size() - 1)) / 2.;
+      p_timeScale = p_overrideTimeScale;
     }
     else {
       p_baseTime = p_overrideBaseTime;
+      p_timeScale = p_overrideTimeScale;
     }
+
+    // Take care of case where 1st and last times are the same
+    if(p_timeScale == 0)  p_timeScale = 1.0;
     return;
   }
 
 
   /**
-   * Set an override base time to be used with observations on scanners to allow all
-   * images in an observation to use the save base time and polynomials for the positions.
+   * Set an override base time to be used with observations on scanners to allow
+   * all images in an observation to use the same base time and polynomials for 
+   * the positions.
    *
    * @param [in] baseTime The baseTime to use and override the computed base time
    */
-  void SpicePosition::SetOverrideBaseTime(double baseTime) {
+  void SpicePosition::SetOverrideBaseTime(double baseTime, double timeScale) {
     p_overrideBaseTime = baseTime;
-    p_noOverride = false;
+    p_overrideTimeScale = timeScale;
+    p_override = NoOverrides;
     return;
   }
 
 
 
-  /** Set the coefficients of a polynomial (parabola) fit to each of the
-   *  three coordinates of the position vector for the time period covered by the cache,
-   *  coordinate = A + B*t + C*t**2, where t = time - p_basetime.
+  /** Set the coefficients of a polynomial fit to each of the
+   *  three coordinates of the position vector for the time period covered by
+   *  the cache,
+   *  
+   *  coordinate = c0 + c1*t + c2*t**2 + ... cn*t**n, where t = (time - p_basetime) / p_timeScale.
    *
-   * @param partialVar     Variable output derivative vector is to be with respect to
+   * @param partialVar     Designated variable of the partial derivative
    * @return               Derivative of j2000 vector calculated with polynomial
    *                              with respect to partialVar
    *
    */
-  std::vector<double> SpicePosition::CoordinatePartial(SpicePosition::PartialType partialVar, int coeffIndex) {
-    // Start with a zero vector since the derivative of the other coordinates with
-    // respect to the partial var will be 0.
+  std::vector<double> SpicePosition::CoordinatePartial(
+         SpicePosition::PartialType partialVar, int coeffIndex) {
+    // Start with a zero vector since the derivative of the other coordinates
+    // with respect to the partial var will be 0.
     std::vector<double> coordinate(3, 0);
 
     // Get the index of the coordinate to update with the partial derivative
     int coordIndex = partialVar;
 
-    if(coeffIndex > 2) {
-      std::string msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
-    }
-
+//  if(coeffIndex > 2) {
+//    std::string msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
+//    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+//  }
+//
     // Reset the coordinate to its derivative
-    coordinate[coordIndex] = DPolynomial((Coefficient)  coeffIndex);
+    coordinate[coordIndex] = DPolynomial(coeffIndex);
     return coordinate;
   }
 
 
 
-  /** Compute the derivative of the velocity with respect to the specified variable.  The
-   *  velocity is the derivative of the coordinate with respect to time
-   *  coordinate = A + B*t + C*t**2, where t = time - p_basetime.
-   *  velocity = B + 2*C*t
-   *  partial(velocity) with respect to A = 0.
-   *  partial(velocity) with respect to B = 1.
-   *  partial(velocity) with respect to C = 2*t.
+  /** Compute the derivative of the velocity with respect to the specified
+   *  variable.  The velocity is the derivative of the coordinate with respect
+   *  to time.
+   *  
+   *  coordinate = C0 + C1*t + C2*t**2 + ... +Cn*t**n ,
+   *    where t = (time - p_basetime) / p_timeScale.
+   *  velocity = C1 + 2*C2*t + ... + n*Cn*t**(n-1)
+   *  partial(velocity) with respect to C0 = 0.
+   *  partial(velocity) with respect to C1 = 1/p_timeScale.
+   *  partial(velocity) with respect to C2 = 2*t/p_timeScale
+   *  .
+   *  .
+   *  .
+   *  partial(velocity) with respect to CN = n*t**(n-1)/p_timeScale
    *
-   * @param partialVar     Variable output derivative vector is to be with respect to
-   * @return               Derivative of j2000 velocity vector calculated with respect
-   *                        to partialVar
+   * @param partialVar     Designated variable of the partial derivative
+   * @return               Derivative of j2000 velocity vector calculated with
+   *                        respect to partialVar
    *
    */
-  std::vector<double> SpicePosition::VelocityPartial(SpicePosition::PartialType partialVar, int coeffIndex) {
+  std::vector<double> SpicePosition::VelocityPartial(
+                    SpicePosition::PartialType partialVar, int coeffIndex) {
     // Start with a zero vector since the derivative of the other coordinates with
     // respect to the partial var will be 0.
     std::vector<double> dvelocity(3, 0);
@@ -745,19 +971,11 @@ namespace Isis {
     // Get the index of the coordinate to update with the partial derivative
     int coordIndex = partialVar;
 
-    double time = p_et - p_baseTime;
+    double time = (p_et - p_baseTime) / p_timeScale;
     double derivative = 0.;
 
     // Reset the velocity coordinate to its derivative
-    switch(coeffIndex) {
-      case A:
-        break;
-      case B:
-        derivative = 1.;
-      case C:
-        derivative *= 2.*time;
-        break;
-    }
+    derivative = coeffIndex * pow(time, coeffIndex-1) / p_timeScale;
     dvelocity[coordIndex] = derivative;
     return dvelocity;
   }
@@ -773,19 +991,23 @@ namespace Isis {
    * @return The derivative evaluated at the current time
    *
    */
-  double SpicePosition::DPolynomial(const Coefficient coeffIndex) {
+  double SpicePosition::DPolynomial(const int coeffIndex) {
     double derivative = 1.;
-    double time = p_et - p_baseTime;
+    double time = (p_et - p_baseTime) / p_timeScale;
 
-    switch(coeffIndex) {
-      case C:
-        derivative = time;
-      case B:
-        derivative *= time;
-      case A:
-        derivative *= 1.;
-        break;
+    if(coeffIndex > 0  && coeffIndex <= p_degree) {
+      derivative = pow(time, coeffIndex);
     }
+    else if(coeffIndex == 0) {
+      derivative = 1;
+    }
+    else {
+      Isis::iString msg = "Coeff index, " + Isis::iString(coeffIndex) + 
+        " exceeds degree of polynomial";
+      throw Isis::iException::Message(Isis::iException::Programmer, msg, 
+                                      _FILEINFO_);
+    }
+
     return derivative;
   }
 
@@ -888,6 +1110,8 @@ namespace Isis {
     // On the first SetEphemerisTime, create our splines. Later calls should
     // reuse these splines.
     if(p_xhermite == NULL) {
+      p_overrideTimeScale = 1.;
+      p_override = ScaleOnly;
       ComputeBaseTime();
 
       p_xhermite = new NumericalApproximation(
@@ -909,7 +1133,7 @@ namespace Isis {
       for(unsigned int i = 0; i < p_cache.size(); i++) {
         vector<double> &cache = p_cache[i];
         double &cacheTime = p_cacheTime[i];
-        xvalues[i] = cacheTime - p_baseTime;
+        xvalues[i] = (cacheTime - p_baseTime) / p_timeScale;
   
         xhermiteYValues[i] = cache[0];
         yhermiteYValues[i] = cache[1];
@@ -943,14 +1167,63 @@ namespace Isis {
         NumericalApproximation::Extrapolate;
 
     vector<double> &coordinate = p_coordinate;
-    coordinate[0] = p_xhermite->Evaluate(p_et - p_baseTime, etype);
-    coordinate[1] = p_yhermite->Evaluate(p_et - p_baseTime, etype);
-    coordinate[2] = p_zhermite->Evaluate(p_et - p_baseTime, etype);
+    double sTime = (p_et - p_baseTime) / p_timeScale;
+    coordinate[0] = p_xhermite->Evaluate(sTime, etype);
+    coordinate[1] = p_yhermite->Evaluate(sTime, etype);
+    coordinate[2] = p_zhermite->Evaluate(sTime, etype);
 
     vector<double> &velocity = p_velocity;
-    velocity[0] = p_xhermite->EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
-    velocity[1] = p_yhermite->EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
-    velocity[2] = p_zhermite->EvaluateCubicHermiteFirstDeriv(p_et - p_baseTime);
+    velocity[0] = p_xhermite->EvaluateCubicHermiteFirstDeriv(sTime);
+    velocity[1] = p_yhermite->EvaluateCubicHermiteFirstDeriv(sTime);
+    velocity[2] = p_zhermite->EvaluateCubicHermiteFirstDeriv(sTime);
+  }
+
+
+
+  /**
+   * This is a protected method that is called by
+   * SetEphemerisTime() when Source type is PolyFunction.  It
+   * calculates J2000 coordinates (x,y,z) of the body that
+   * correspond to a given et in seconds. These coordinates are
+   * obtained by using an nth degree polynomial function fit to 
+   * each coordinate of the position vector.
+   * @see SetEphemerisTime()
+   * @internal
+   *   @history 2011-01-05 Debbie A. Cook - Original version
+   */
+  void SpicePosition::SetEphemerisTimePolyFunction() {
+    // Create the empty functions
+    Isis::PolynomialUnivariate functionX(p_degree);
+    Isis::PolynomialUnivariate functionY(p_degree);
+    Isis::PolynomialUnivariate functionZ(p_degree);
+
+    // Load the coefficients to define the functions
+    functionX.SetCoefficients(p_coefficients[0]);
+    functionY.SetCoefficients(p_coefficients[1]);
+    functionZ.SetCoefficients(p_coefficients[2]);
+
+    // Normalize the time
+    std::vector<double> rtime;
+    rtime.push_back((p_et - p_baseTime) / p_timeScale);
+
+    // Evaluate the polynomials at current et to get position;
+    p_coordinate[0] = functionX.Evaluate(rtime);
+    p_coordinate[1] = functionY.Evaluate(rtime) ;
+    p_coordinate[2] = functionZ.Evaluate(rtime);
+
+    if(p_hasVelocity) {
+
+      if( p_degree == 0) 
+        p_velocity = p_cacheVelocity[0];
+      else
+        p_velocity[0] = ComputeVelocityInTime(WRT_X);
+        p_velocity[1] = ComputeVelocityInTime(WRT_Y);
+        p_velocity[2] = ComputeVelocityInTime(WRT_Z);
+
+//         p_velocity[0] = functionX.DerivativeVar(rtime[0]);
+//         p_velocity[1] = functionY.DerivativeVar(rtime[0]);
+//         p_velocity[2] = functionZ.DerivativeVar(rtime[0]);
+    }
   }
 
   /**
@@ -1028,6 +1301,8 @@ namespace Isis {
     }
 
     // make sure base time is set before it is needed
+    p_overrideTimeScale = 1.;
+    p_override = ScaleOnly;
     ComputeBaseTime();
 
     // find current size of cache
@@ -1078,14 +1353,16 @@ namespace Isis {
   std::vector<int> SpicePosition::HermiteIndices(double tolerance, std::vector <int> indexList) {
 
     unsigned int n = indexList.size();
+    double sTime;
 
     NumericalApproximation xhermite(NumericalApproximation::CubicHermite);
     NumericalApproximation yhermite(NumericalApproximation::CubicHermite);
     NumericalApproximation zhermite(NumericalApproximation::CubicHermite);
     for(unsigned int i = 0; i < indexList.size(); i++) {
-      xhermite.AddData(p_cacheTime[indexList[i]] - p_baseTime, p_cache[indexList[i]][0]);  // add time, x-position to x spline
-      yhermite.AddData(p_cacheTime[indexList[i]] - p_baseTime, p_cache[indexList[i]][1]);  // add time, y-position to y spline
-      zhermite.AddData(p_cacheTime[indexList[i]] - p_baseTime, p_cache[indexList[i]][2]);  // add time, z-position to z spline
+      sTime = (p_cacheTime[indexList[i]] - p_baseTime) / p_timeScale;
+      xhermite.AddData(sTime, p_cache[indexList[i]][0]);  // add time, x-position to x spline
+      yhermite.AddData(sTime, p_cache[indexList[i]][1]);  // add time, y-position to y spline
+      zhermite.AddData(sTime, p_cache[indexList[i]][2]);  // add time, z-position to z spline
 
       if(p_hasVelocity) {  // Line scan camera
         xhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][0]); // add x-velocity to x spline
@@ -1108,11 +1385,12 @@ namespace Isis {
 
       // check every value of the original kernel values within interval
       for(int line = indexList[i-1] + 1; line < indexList[i]; line++) {
+        sTime = (p_cacheTime[line] - p_baseTime) / p_timeScale;
 
         // find the errors at each value
-        xerror = fabs(xhermite.Evaluate(p_cacheTime[line] - p_baseTime) - p_cache[line][0]);
-        yerror = fabs(yhermite.Evaluate(p_cacheTime[line] - p_baseTime) - p_cache[line][1]);
-        zerror = fabs(zhermite.Evaluate(p_cacheTime[line] - p_baseTime) - p_cache[line][2]);
+        xerror = fabs(xhermite.Evaluate(sTime) - p_cache[line][0]);
+        yerror = fabs(yhermite.Evaluate(sTime) - p_cache[line][1]);
+        zerror = fabs(zhermite.Evaluate(sTime) - p_cache[line][2]);
 
         if(xerror > tolerance || yerror > tolerance || zerror > tolerance) {
           // if any error is greater than tolerance, no need to continue looking, break
@@ -1163,6 +1441,60 @@ namespace Isis {
   }
 
 
+
+  /** Set the degree of the polynomials to be fit to the
+   * three position coordinates for the time period covered by the
+   * cache, coordinate = c0 + c1*t + c2*t**2 + ... + cn*t**n,
+   * where t = (time - p_baseTime) / p_timeScale, and n = p_degree.
+   *
+   * @param [in] degree Degree of the polynomial to be fit
+   *
+   */
+  void SpicePosition::SetPolynomialDegree(int degree) {
+    // Adjust the degree for the data
+    if(p_fullCacheSize == 1) {
+      degree = 0;
+    }
+    else if(p_fullCacheSize == 2) {
+      degree = 1;
+    }
+    // If polynomials have not been applied yet simply set the degree and return
+    if(!p_degreeApplied) {
+      p_degree = degree;
+    }
+
+    // Otherwise the existing polynomials need to be either expanded ...
+    else if(p_degree < degree) {   // (increase the number of terms)
+      std::vector<double> coefX(p_coefficients[0]),
+          coefY(p_coefficients[1]),
+          coefZ(p_coefficients[2]);
+
+      for(int icoef = p_degree + 1;  icoef <= degree; icoef++) {
+        coefX.push_back(0.);
+        coefY.push_back(0.);
+        coefZ.push_back(0.);
+      }
+      p_degree = degree;
+      SetPolynomial(coefX, coefY, coefZ);
+    }
+    // ... or reduced (decrease the number of terms)
+    else if(p_degree > degree) {
+      std::vector<double> coefX(degree + 1),
+          coefY(degree + 1),
+          coefZ(degree + 1);
+
+      for(int icoef = 0;  icoef <= degree;  icoef++) {
+        coefX.push_back(p_coefficients[0][icoef]);
+        coefY.push_back(p_coefficients[1][icoef]);
+        coefZ.push_back(p_coefficients[2][icoef]);
+      }
+      SetPolynomial(coefX, coefY, coefZ);
+      p_degree = degree;
+    }
+  }
+
+
+
   /** Cache J2000 position over existing cached time range using
    *  table
    *
@@ -1179,6 +1511,68 @@ namespace Isis {
     ClearCache();
     LoadCache(table);
   }
+
+  /** Load the time cache.  This method should works with the LoadCache(startTime, endTime, size) method
+   *  to load the time cache.
+   *
+   */
+  void SpicePosition::LoadTimeCache() {
+    // Loop and load the time cache
+    double cacheSlope = 0.0;
+
+    if(p_fullCacheSize > 1)
+      cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / 
+         (double)(p_fullCacheSize - 1);
+
+    for(int i = 0; i < p_fullCacheSize; i++) {
+      double et = p_fullCacheStartTime + (double) i * cacheSlope;
+      p_cacheTime.push_back(et);
+    }
+  }
+
+
+  /** Compute the velocity with respect to time instead of
+   *  scaled time.
+   *
+   * @param coef  A SpicePosition polynomial function partial type
+   *               
+   * @internal
+   *   @history 2011-02-12 Debbie A. Cook - Original version.
+   */
+  double SpicePosition::ComputeVelocityInTime(PartialType var) {
+    double velocity = 0.;
+
+    for (int icoef=1; icoef <= p_degree; icoef++) {
+      velocity += icoef*p_coefficients[var][icoef]*pow((p_et - p_baseTime), (icoef - 1))
+                  / pow(p_timeScale, icoef);
+    }
+
+    return velocity;
+  }
+
+
+  /** Extrapolate position for a given time assuming a constant velocity.
+   *  The position and velocity at the current time will be used to
+   *  extrapolate position at the input time.  If velocity does not
+   *  exist, the value at the current time will be output.  The caller
+   *  must make sure to call SetEphemerisTime to set the time to the
+   *  time to be used for the extrapolation.
+   *
+   * @param [in]   timeEt    The time of the position to be extrapolated
+   * @param [out]            An extrapolated position at the input time
+   *
+   */
+   std::vector<double> SpicePosition::Extrapolate(double timeEt) {
+     if (!p_hasVelocity) return p_coordinate;
+     
+     double diffTime = p_et - timeEt;
+     std::vector<double> extrapPos(3, 0.);
+     extrapPos[0] = p_coordinate[0] + diffTime*p_velocity[0];
+     extrapPos[1] = p_coordinate[1] + diffTime*p_velocity[1];
+     extrapPos[2] = p_coordinate[2] + diffTime*p_velocity[2];
+
+     return extrapPos;
+   }
 }
 
 

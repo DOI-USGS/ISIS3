@@ -69,4 +69,55 @@ int main(int argc, char *argv[]) {
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   cout << endl;
+
+  // Test polynomial functions
+  cout << "Testing with polynomial functions..." << endl;
+  std::vector<double> abcPos1, abcPos2, abcPos3;
+  //  pos.SetOverrideBaseTime(0.,1.);
+  pos.ComputeBaseTime();
+  pos.SetPolynomialDegree(7);
+  pos.SetPolynomial();
+  pos.GetPolynomial(abcPos1, abcPos2, abcPos3);
+  //  cout << "Source = " << pos.GetSource() << endl;
+
+  for (int i=0; i<10; i++) {
+    double t = startTime + (double) i * slope;
+    pos.SetEphemerisTime(t);
+    vector<double> p = pos.Coordinate();
+    vector<double> v = pos.Velocity();
+    cout << setprecision(15) << "Time           = " << pos.EphemerisTime() << endl;
+    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+  }
+  cout << endl;
+
+  // Now use LineCache method 
+  cout << "Testing line cache..." << endl;
+  tab = pos.LineCache("Test2");
+  Isis::SpicePosition pos3(-94, 499);
+  pos3.LoadCache(tab);
+
+  for (int i=0; i<10; i++) {
+    double t = startTime + (double) i * slope;
+    pos3.SetEphemerisTime(t);
+    vector<double> p = pos3.Coordinate();
+    vector<double> v = pos3.Velocity();
+    cout << setprecision(15) << "Time           = " << pos.EphemerisTime() << endl;
+    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+  }
+  cout << endl;
+ 
+
+  // Also test Extrapolate method
+  cout << "Testing extrapolation..." << std::endl;
+  pos3.SetEphemerisTime(endTime);
+  cout << setprecision(15) << "Time           = " << pos3.EphemerisTime() << endl;
+  vector<double> p = pos3.Coordinate();
+  cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+  cout << setprecision(15) << "Time           = " << pos3.EphemerisTime()+.000001 << endl;
+  p = pos3.Extrapolate(endTime+.000001);
+  cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+  cout << endl;
+  
 }

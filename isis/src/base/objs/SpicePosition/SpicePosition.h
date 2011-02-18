@@ -102,6 +102,25 @@ namespace Isis {
    *                      member scope for efficiency. It was a significant
    *                      overhead to keep reconstructing these. Created
    *                      ClearCache() to help increase code reusability.
+   *  @history 2011-02-12 Debbie A. Cook - Added PolyFunction to source types and
+   *                       new method SetEphemerisTimePolyFunction to support the
+   *                       new type.  Also added method SetPolynomialDegree to
+   *                       allow the degree of the polynomials fit to the
+   *                       position coordinates to be changed.  The fit
+   *                       polynomial was changed from a fixed 2nd order polynomial to
+   *                       an nth degree polynomial with one independent
+   *                       variable.  Added private class members
+   *                       p_fullCacheStartTime, p_fullCacheEndTime, and
+   *                       p_fullCacheSize.  Added p_timeScale, GetBaseTime(), SetOverrideBaseTime,
+   *                       GetTimeScale(), Extrapolate( double timeEt), and
+   *                       ComputeVelocityInTime(PartialType var).  The function was changed
+   *                       from a Parabola to Polynomial1Variable, now called
+   *                       PolynomialUnivariate.
+   *  @history 2011-02-14 Debbie A. Cook - Corrected previous update for Hermite case.  Created
+   *                       a special member, p_overrideScale, for Hermite case.  Also removed
+   *                       obsolete enum Coefficient.
+   *  @history 2011-02-17 Debbie A. Cook - Corrected missed problem with degree forced to be 2 and
+   *                       corrected calculation of velocity partial
    */
   class SpicePosition {
     public:
@@ -113,15 +132,7 @@ namespace Isis {
       void SetTimeBias(double timeBias);
       void SetAberrationCorrection(const std::string &correction);
       const std::vector<double> &SetEphemerisTime(double et);
-
-
-//      enum PartialType {WRT_X0,WRT_X1,WRT_X2,
-//                        WRT_Y0,WRT_Y1,WRT_Y2,
-//                        WRT_Z0,WRT_Z1,WRT_Z2};
       enum PartialType {WRT_X, WRT_Y, WRT_Z};
-
-
-      enum Coefficient { A, B, C };
 
       //! Return the current ephemeris time
       double EphemerisTime() const {
@@ -144,6 +155,10 @@ namespace Isis {
       void LoadCache(double startTime, double endTime, int size);
       void LoadCache(double time);
       void LoadCache(Table &table);
+
+      Table LineCache(const std::string &tableName);
+
+      void ReloadCache();
       void ReloadCache(Isis::PolynomialUnivariate &function1, Isis::PolynomialUnivariate &function2,
                        Isis::PolynomialUnivariate &function3);
       void ReloadCache(Table &table);
@@ -165,6 +180,9 @@ namespace Isis {
                          std::vector<double>& YC,
                          std::vector<double>& ZC);
 
+      //! Set the polynomial degree
+      void SetPolynomialDegree(int degree);
+
       void ComputeBaseTime();
 
       //! Return the base time for the position
@@ -172,9 +190,14 @@ namespace Isis {
         return p_baseTime;
       };
 
-      void SetOverrideBaseTime(double baseTime);
+      void SetOverrideBaseTime(double baseTime, double timeScale);
 
-      double DPolynomial(const Coefficient coeffIndex);
+      //! Return the time scale for the position
+      double GetTimeScale() {
+        return p_timeScale;
+      };
+
+      double DPolynomial(const int coeffIndex);
 
       std::vector<double> CoordinatePartial(SpicePosition::PartialType partialVar, int coeffIndex);
 
@@ -185,19 +208,28 @@ namespace Isis {
       /**
        * This enum defines indicates the status of the object
        */
-      enum Source { Spice,      //!< Object is reading directly from the kernels
-                    Memcache,   //!< Object is reading from cached table
-                    HermiteCache //!< Object is reading from splined table
+      enum Source { Spice,       //!< Object is reading directly from the kernels
+                    Memcache,    //!< Object is reading from cached table
+                    HermiteCache,//!< Object is reading from splined table
+                    PolyFunction //!< Object is calculated from nth degree polynomial
                   };
+      enum OverrideType {NoOverrides, ScaleOnly, BaseAndScale};
       void Memcache2HermiteCache(double tolerance);
+      std::vector<double> Extrapolate(double timeEt);
     protected:
       void SetEphemerisTimeMemcache();
       void SetEphemerisTimeHermiteCache();
       void SetEphemerisTimeSpice();
+      void SetEphemerisTimePolyFunction();
+
       std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
 
     private:
       void ClearCache();
+      void LoadTimeCache();
+      void CacheLabel(Table &table);
+      double ComputeVelocityInTime(PartialType var);
+
       int p_targetCode;                   //!< target body code
       int p_observerCode;                 //!< observer body code
 
@@ -219,11 +251,21 @@ namespace Isis {
       std::vector<double> p_cacheTime;    //!< iTime for corresponding position
       std::vector<std::vector<double> > p_cache;         //!< Cached positions
       std::vector<std::vector<double> > p_cacheVelocity; //!< Cached velocities
-      std::vector<double> p_coefficients[3];             //!< Coefficients of polynomials
+      std::vector<double> p_coefficients[3];             //!< Coefficients of polynomials fit to 3 coordinates
+
       double p_baseTime;                  //!< Base time used in fit equations
-      bool p_noOverride;                  //!< Flag to compute base time;
-      double p_overrideBaseTime;          //!< Value set by caller to override computed base time
+      double p_timeScale;                 //!< Time scale used in fit equations
+      bool p_degreeApplied;               //!< Flag indicating whether or not a polynomial
+      //    of degree p_degree has been created and
+      //    used to fill the cache
+      int p_degree;                       //!< Degree of polynomial function fit to the coordinates of the position
+      double p_fullCacheStartTime;        //!< Original start time of the complete cache after spiceinit
+      double p_fullCacheEndTime;          //!< Original end time of the complete cache after spiceinit
+      double p_fullCacheSize;             //!< Orignial size of the complete cache after spiceinit
       bool p_hasVelocity;                 //!< Flag to indicate velocity is available
+      OverrideType p_override;            //!< Time base and scale override options;
+      double p_overrideBaseTime;          //!< Value set by caller to override computed base time
+      double p_overrideTimeScale;         //!< Value set by caller to override computed time scale
   };
 };
 
