@@ -15,7 +15,8 @@
 using namespace std;
 using namespace Isis;
 
-int main() {
+int main()
+{
   Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;
   ControlNet cn1;
@@ -30,13 +31,15 @@ int main() {
   std::string pointId = "T000";
   std::string id = "id";
 
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++)
+  {
     std::stringstream oss1;
     oss1.flush();
     oss1 << pointId << i;
-    ControlPoint *cp = new ControlPoint(oss1.str());
+    ControlPoint * cp = new ControlPoint(oss1.str());
 
-    if (i == 0) {
+    if (i == 0)
+    {
       cp->SetType(ControlPoint::Ground);
       cp->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
       cp->SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
@@ -53,15 +56,19 @@ int main() {
       cp->SetSurfacePoint(surfacePt);
       cp->SetAprioriSurfacePoint(surfacePt);
     }
-    else if (i == 1) {
-      cp->SetIgnored(true);
-    }
-    else {
-      cp->SetType(ControlPoint::Tie);
-    }
+    else
+      if (i == 1)
+      {
+        cp->SetIgnored(true);
+      }
+      else
+      {
+        cp->SetType(ControlPoint::Tie);
+      }
 
-    for (int k = 0; k < 2; k++) {
-      ControlMeasure *cm = new ControlMeasure;
+    for (int k = 0; k < 2; k++)
+    {
+      ControlMeasure * cm = new ControlMeasure;
       std::stringstream oss2;
       oss2.flush();
       oss2 << id << k;
@@ -82,13 +89,15 @@ int main() {
 
       cp->Add(cm);
 
-      if (k == 0) {
+      if (k == 0)
+      {
         cp->SetRefMeasure(cm);
         cm->SetChooserName("cnetref");
         cm->SetDateTime("2010-08-27T17:10:06");
         cm->SetEditLock(true);
       }
-      if (k == 1) {
+      if (k == 1)
+      {
         cm->SetType(ControlMeasure::Candidate);
         cm->SetIgnored(true);
         cm->SetChooserName("autoseed");
@@ -107,10 +116,12 @@ int main() {
   }
 
   cout << "Test adding control points with identical id numbers ..." << endl;
-  try {
+  try
+  {
     cn1.AddPoint(cn1.GetPoint(3));
   }
-  catch (iException &e) {
+  catch (iException & e)
+  {
     e.Report(false);
   }
   cout << endl;
@@ -120,20 +131,24 @@ int main() {
   cn1.DeletePoint(2);
 
   cout << "Test deleting nonexistant control point id ..." << endl;
-  try {
+  try
+  {
     cn1.DeletePoint(id2);
   }
-  catch (iException &e) {
+  catch (iException & e)
+  {
     e.Report(false);
   }
   cout << endl;
 
 
   cout << "Test deleting nonexistant control point index ..." << endl;
-  try {
+  try
+  {
     cn1.DeletePoint(7);
   }
-  catch (iException &e) {
+  catch (iException & e)
+  {
     e.Report(false);
   }
   cout << endl;
@@ -147,7 +162,8 @@ int main() {
   cout << "Writing ControlNet to temp2.txt in Pvl format" << endl;
   cn2.Write("temp2.txt", true);
   cout << "Diffing temp.txt and temp2.txt" << endl;
-  if (system("cmp temp.txt temp2.txt")) {
+  if (system("cmp temp.txt temp2.txt"))
+  {
     cout << "ERROR:  Text Files are not the same!" << endl;
   }
 
@@ -174,10 +190,12 @@ int main() {
   ControlNet cn4("temp2.bin");
 
   cout << "Diffing temp.bin and temp2.bin" << endl;
-  if (system("cmp temp.bin temp2.bin")) {
+  if (system("cmp temp.bin temp2.bin"))
+  {
     cout << "ERROR:  Binary files are not the same." << endl;
   }
-  else {
+  else
+  {
     cout << "Read/Write of binary files OK." << endl;
   }
   remove("temp.txt");
@@ -203,7 +221,7 @@ int main() {
   cout << "Enter output file (directory & prefix, no extension): ";
   cin >> outFile;
 
-  ControlNet *cn1 = new ControlNet;
+  ControlNet * cn1 = new ControlNet;
   cout << "Speed Test for ControlNet ...." << endl << endl;
   cout << "\nReading from the ascii file....    " << inNet << endl;
   std::clock_t start = std::clock();
@@ -223,7 +241,7 @@ int main() {
   delete cn1;
 
 //  ControlNet cn2;
-  ControlNet *cn2 = new ControlNet;
+  ControlNet * cn2 = new ControlNet;
 
   cout << "\nReading from the binary file...." << endl;
   std::clock_t start2 = std::clock();

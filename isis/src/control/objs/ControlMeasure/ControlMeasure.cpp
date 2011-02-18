@@ -29,7 +29,7 @@
 #include "Camera.h"
 #include "ControlMeasureLogData.h"
 #include "ControlPoint.h"
-#include "ControlSerialNumber.h"
+#include "ControlCubeGraphNode.h"
 #include "iString.h"
 #include "iTime.h"
 #include "PBControlNetIO.pb.h"

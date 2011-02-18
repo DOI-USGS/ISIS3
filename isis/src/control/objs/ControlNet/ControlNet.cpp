@@ -16,7 +16,7 @@
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
-#include "ControlSerialNumber.h"
+#include "ControlCubeGraphNode.h"
 #include "iException.h"
 #include "iTime.h"
 #include "PBControlNetIO.pb.h"
@@ -33,19 +33,22 @@ using namespace boost::numeric::ublas;
 using namespace google::protobuf::io;
 
 
-namespace Isis {
-  void ControlNet::Nullify() {
+namespace Isis
+{
+  void ControlNet::Nullify()
+  {
     points = NULL;
     controlSerials = NULL;
     pointIds = NULL;
   }
 
   //!Creates an empty ControlNet object
-  ControlNet::ControlNet() {
+  ControlNet::ControlNet()
+  {
     Nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    controlSerials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     p_invalid = false;
@@ -55,36 +58,41 @@ namespace Isis {
     p_modified = Application::DateTime();
   }
 
-  ControlNet::ControlNet(const ControlNet &other) {
+  ControlNet::ControlNet(const ControlNet & other)
+  {
     Nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    controlSerials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     QHashIterator< QString, ControlPoint * > pointsIterator(*other.points);
-    while (pointsIterator.hasNext()) {
+    while (pointsIterator.hasNext())
+    {
       pointsIterator.next();
 
-      ControlPoint *newPoint = new ControlPoint(*pointsIterator.value());
+      ControlPoint * newPoint = new ControlPoint(*pointsIterator.value());
       QString newPointId = newPoint->GetId();
       points->insert(newPointId, newPoint);
       pointIds->append(newPointId);
 
       QList< QString > newPointsSerials = newPoint->GetCubeSerialNumbers();
-      for (int i = 0; i < newPointsSerials.size(); i++) {
+      for (int i = 0; i < newPointsSerials.size(); i++)
+      {
         QString key = newPointsSerials[i];
-        ControlMeasure *newMeasure = newPoint->GetMeasure(key);
+        ControlMeasure * newMeasure = newPoint->GetMeasure(key);
 
-        if (controlSerials->contains(key)) {
+        if (controlSerials->contains(key))
+        {
           (*controlSerials)[key]->addMeasure(newMeasure);
         }
-        else {
-          ControlSerialNumber *newControlSerialNumber =
-            new ControlSerialNumber(key);
+        else
+        {
+          ControlCubeGraphNode * newControlCubeGraphNode =
+            new ControlCubeGraphNode(key);
 
-          newControlSerialNumber->addMeasure(newMeasure);
-          controlSerials->insert(key, newControlSerialNumber);
+          newControlCubeGraphNode->addMeasure(newMeasure);
+          controlSerials->insert(key, newControlCubeGraphNode);
         }
       }
     }
@@ -108,11 +116,12 @@ namespace Isis {
    * @param ptfile Name of file containing a Pvl list of control points
    * @param progress A pointer to the progress of reading in the control points
    */
-  ControlNet::ControlNet(const iString &ptfile, Progress *progress) {
+  ControlNet::ControlNet(const iString & ptfile, Progress * progress)
+  {
     Nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    controlSerials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     p_invalid = false;
@@ -122,10 +131,13 @@ namespace Isis {
   }
 
 
-  ControlNet::~ControlNet() {
-    if (points) {
+  ControlNet::~ControlNet()
+  {
+    if (points)
+    {
       QHashIterator< QString, ControlPoint * > i(*points);
-      while (i.hasNext()) {
+      while (i.hasNext())
+      {
         i.next();
         delete(*points)[i.key()];
         (*points)[i.key()] = NULL;
@@ -134,9 +146,11 @@ namespace Isis {
       points = NULL;
     }
 
-    if (controlSerials) {
-      QHashIterator< QString, ControlSerialNumber * > i(*controlSerials);
-      while (i.hasNext()) {
+    if (controlSerials)
+    {
+      QHashIterator< QString, ControlCubeGraphNode * > i(*controlSerials);
+      while (i.hasNext())
+      {
         i.next();
         delete(*controlSerials)[i.key()];
         (*controlSerials)[i.key()] = NULL;
@@ -145,7 +159,8 @@ namespace Isis {
       controlSerials = NULL;
     }
 
-    if (pointIds) {
+    if (pointIds)
+    {
       delete pointIds;
       pointIds = NULL;
     }
@@ -169,15 +184,19 @@ namespace Isis {
    *                           design.
    *
    */
-  void ControlNet::ReadControl(const iString &ptfile, Progress *progress) {
+  void ControlNet::ReadControl(const iString & ptfile, Progress * progress)
+  {
     Pvl p(ptfile);
     //Test to see if this is a binary control net file.
-    if (p.HasObject("ProtoBuffer")) {
+    if (p.HasObject("ProtoBuffer"))
+    {
       ReadPBControl(ptfile);
     }
-    else {
-      try {
-        PvlObject &cn = p.FindObject("ControlNetwork");
+    else
+    {
+      try
+      {
+        PvlObject & cn = p.FindObject("ControlNetwork");
 
         if (cn.HasKeyword("NetworkId"))
           p_networkId = cn["NetworkId"][0];
@@ -189,23 +208,30 @@ namespace Isis {
           p_description = cn["Description"][0];
 
         // Prep for reporting progress
-        if (progress != NULL) {
+        if (progress != NULL)
+        {
           progress->SetText("Loading Control Points...");
           progress->SetMaximumSteps(cn.Objects());
           progress->CheckStatus();
         }
-        for (int i = 0; i < cn.Objects(); i++) {
-          try {
-            if (cn.Object(i).IsNamed("ControlPoint")) {
-              ControlPoint *newPoint = new ControlPoint;
+        for (int i = 0; i < cn.Objects(); i++)
+        {
+          try
+          {
+            if (cn.Object(i).IsNamed("ControlPoint"))
+            {
+              ControlPoint * newPoint = new ControlPoint;
               newPoint->Load(cn.Object(i));
               p_numMeasures += newPoint->GetNumMeasures();
-              if (newPoint->IsIgnored()) {
+              if (newPoint->IsIgnored())
+              {
                 p_numIgnoredMeasures += newPoint->GetNumMeasures();
               }
-              else {
+              else
+              {
                 QList< QString > measureIds = newPoint->GetCubeSerialNumbers();
-                for (int i = 0; i < measureIds.size(); i++) {
+                for (int i = 0; i < measureIds.size(); i++)
+                {
                   if ((*newPoint)[measureIds[i]]->IsIgnored())
                     p_numIgnoredMeasures++;
                 }
@@ -213,7 +239,8 @@ namespace Isis {
               AddPoint(newPoint);
             }
           }
-          catch (iException &e) {
+          catch (iException & e)
+          {
             iString msg = "Invalid Control Point at position [" + iString(i)
                 + "]";
             throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -222,7 +249,8 @@ namespace Isis {
             progress->CheckStatus();
         }
       }
-      catch (iException &e) {
+      catch (iException & e)
+      {
         iString msg = "Invalid Format in [" + ptfile + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -243,17 +271,19 @@ namespace Isis {
    * @history 2010-10-06 Tracie Sucharski, Changed long to BigInt.
    * @history 2010-12-09 Tracie Sucharski, Added new measure type of Ground
    */
-  void ControlNet::ReadPBControl(const iString &ptfile) {
+  void ControlNet::ReadPBControl(const iString & ptfile)
+  {
     // Create an input file stream with the input file.
     Pvl protoFile(ptfile);
 
-    PvlObject &protoBufferInfo = protoFile.FindObject("ProtoBuffer");
-    PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
+    PvlObject & protoBufferInfo = protoFile.FindObject("ProtoBuffer");
+    PvlObject & protoBufferCore = protoBufferInfo.FindObject("Core");
     BigInt coreStartPos = protoBufferCore["StartByte"];
     BigInt coreLength =  protoBufferCore["Bytes"];
 
     fstream input(ptfile.c_str(), ios::in | ios::binary);
-    if (!input.is_open()) {
+    if (!input.is_open())
+    {
       string msg = "Failed to open PB file" + ptfile;
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -269,20 +299,24 @@ namespace Isis {
 
 
     // Now stream the rest of the input into the google protocol buffer.
-    try {
-      if (!pbnet.ParsePartialFromCodedStream(&codedInStream)) {
+    try
+    {
+      if (!pbnet.ParsePartialFromCodedStream(&codedInStream))
+      {
         string msg = "Failed to read input PB file " + ptfile;
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }
-    catch (...) {
+    catch (...)
+    {
       string msg = "Cannot parse binary PB file";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
     PBControlNetLogData logData;
     bool readLogData = protoBufferInfo.HasObject("LogData");
-    if (readLogData) {
-      PvlObject &logDataInfo = protoBufferInfo.FindObject("LogData");
+    if (readLogData)
+    {
+      PvlObject & logDataInfo = protoBufferInfo.FindObject("LogData");
       BigInt logStartPos = logDataInfo["StartByte"];
       BigInt logLength = logDataInfo["Bytes"];
 
@@ -296,18 +330,22 @@ namespace Isis {
       codedLogInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
 
       // Now stream the rest of the input into the google protocol buffer.
-      try {
-        if (!logData.ParsePartialFromCodedStream(&codedLogInStream)) {
+      try
+      {
+        if (!logData.ParsePartialFromCodedStream(&codedLogInStream))
+        {
           string msg = "Failed to read log data in PB file " + ptfile;
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
       }
-      catch (...) {
+      catch (...)
+      {
         string msg = "Cannot parse binary PB file's log data";
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
 
-      if (logData.points_size() != pbnet.points_size() || logData.points_size() == 0) {
+      if (logData.points_size() != pbnet.points_size() || logData.points_size() == 0)
+      {
         readLogData = false;
       }
     }
@@ -322,13 +360,16 @@ namespace Isis {
 
     // Create a PvlObject for each point and create an Isis::ControlPoint
     // and call the Load(PvlObject &p, bool forceBuild = false) command with the pvlobject.
-    for (int pnts = 0 ; pnts < pbnet.points_size(); pnts++) {
-      if (!readLogData) {
-        ControlPoint *point = new ControlPoint(pbnet.points(pnts));
+    for (int pnts = 0 ; pnts < pbnet.points_size(); pnts++)
+    {
+      if (!readLogData)
+      {
+        ControlPoint * point = new ControlPoint(pbnet.points(pnts));
         AddPoint(point);
       }
-      else {
-        ControlPoint *point = new ControlPoint(pbnet.points(pnts),
+      else
+      {
+        ControlPoint * point = new ControlPoint(pbnet.points(pnts),
             logData.points(pnts));
         AddPoint(point);
       }
@@ -354,11 +395,14 @@ namespace Isis {
    *                     and created this new method to determine format to
    *                     be written.
    */
-  void ControlNet::Write(const iString &ptfile, bool pvl) {
-    if (pvl) {
+  void ControlNet::Write(const iString & ptfile, bool pvl)
+  {
+    if (pvl)
+    {
       WritePvl(ptfile);
     }
-    else {
+    else
+    {
       WritePB(ptfile);
     }
   }
@@ -370,7 +414,8 @@ namespace Isis {
    *
    * @param ptfile
    */
-  void ControlNet::WritePB(const iString &ptfile) {
+  void ControlNet::WritePB(const iString & ptfile)
+  {
 
     //  Clear message before writing new
     PBControlNet pbnet;
@@ -390,8 +435,9 @@ namespace Isis {
     pbnet.set_username(p_userName);
 
     //  Now create ControlPoints
-    for (int i = 0; i < pointIds->size(); i++) {
-      ControlPoint *point = points->value(pointIds->at(i));
+    for (int i = 0; i < pointIds->size(); i++)
+    {
+      ControlPoint * point = points->value(pointIds->at(i));
       *pbnet.add_points() = point->ToProtocolBuffer();
       *logData.add_points() = point->GetLogProtocolBuffer();
     }
@@ -399,13 +445,14 @@ namespace Isis {
     const int labelBytes = 65536;
     fstream output(ptfile.c_str(), ios::out | ios::trunc | ios::binary);
 
-    char *blankLabel = new char[labelBytes];
+    char * blankLabel = new char[labelBytes];
     memset(blankLabel, 0, labelBytes);
     output.write(blankLabel, labelBytes);
 
     streampos startCorePos = output.tellp();
 
-    if (!pbnet.SerializeToOstream(&output)) {
+    if (!pbnet.SerializeToOstream(&output))
+    {
       string msg = "Failed to write output PB file [" + ptfile + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -413,7 +460,8 @@ namespace Isis {
     streampos coreSize = output.tellp() - startCorePos;
 
     streampos startLogPos = output.tellp();
-    if (!logData.SerializeToOstream(&output)) {
+    if (!logData.SerializeToOstream(&output))
+    {
       string msg = "Failed to write output PB file [" + ptfile + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -464,7 +512,8 @@ namespace Isis {
    * @throws Isis::iException::Io - "Unable to write PVL
    *             infomation to file"
    */
-  void ControlNet::WritePvl(const iString &ptfile) {
+  void ControlNet::WritePvl(const iString & ptfile)
+  {
 
     Pvl p;
     PvlObject net("ControlNetwork");
@@ -473,25 +522,29 @@ namespace Isis {
     net += PvlKeyword("TargetName", p_targetName);
     net += PvlKeyword("UserName", p_userName);
     iString mod = iString(p_modified).UpCase();
-    if (mod == "NULL"  ||  mod == "") {
+    if (mod == "NULL"  ||  mod == "")
+    {
       SetModifiedDate(Isis::iTime::CurrentLocalTime());
     }
     net += PvlKeyword("Created", p_created);
     net += PvlKeyword("LastModified", p_modified);
     net += PvlKeyword("Description", p_description);
 
-    for (int i = 0; i < pointIds->size(); i++) {
-      ControlPoint *point = points->value(pointIds->at(i));
+    for (int i = 0; i < pointIds->size(); i++)
+    {
+      ControlPoint * point = points->value(pointIds->at(i));
       PvlObject cp = point->ToPvlObject();
       net.AddObject(cp);
     }
 
     p.AddObject(net);
 
-    try {
+    try
+    {
       p.Write(ptfile);
     }
-    catch (iException e) {
+    catch (iException e)
+    {
       iString message = "Unable to write PVL infomation to file [" +
           ptfile + "]";
       throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
@@ -507,13 +560,16 @@ namespace Isis {
    * @throws Isis::iException::Programmer - "ControlPoint must
    *             have unique Id"
    */
-  void ControlNet::AddPoint(ControlPoint *point) {
-    if (!point) {
+  void ControlNet::AddPoint(ControlPoint * point)
+  {
+    if (!point)
+    {
       iString msg = "Null pointer passed to ControlNet::AddPoint!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if (ContainsPoint(point->GetId())) {
+    if (ContainsPoint(point->GetId()))
+    {
       iString msg = "ControlPoint must have unique Id";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -529,38 +585,44 @@ namespace Isis {
   }
 
 
-  void ControlNet::MeasureAdded(ControlMeasure *measure) {
-    if (!measure) {
+  void ControlNet::MeasureAdded(ControlMeasure * measure)
+  {
+    if (!measure)
+    {
       iString msg = "NULL measure passed to "
-          "ControlNet::AddControlSerialNumber!";
+          "ControlNet::AddControlCubeGraphNode!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    ControlPoint *point = measure->Parent();
-    if (!point) {
+    ControlPoint * point = measure->Parent();
+    if (!point)
+    {
       iString msg = "Control measure passed to "
-          "ControlNet::AddControlSerialNumber has a NULL parent!";
+          "ControlNet::AddControlCubeGraphNode has a NULL parent!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if (!ContainsPoint(point->GetId())) {
+    if (!ContainsPoint(point->GetId()))
+    {
       iString msg = "ControlNet does not contain the point [";
       msg += point->GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    ControlSerialNumber *csn = NULL;
+    ControlCubeGraphNode * csn = NULL;
 
-    // if a ControlSerialNumber already exists with the measure's
+    // if a ControlCubeGraphNode already exists with the measure's
     // cube serial number, then just add this measure to it.  Otherwise,
-    // Create a new ControlSerialNumber first.
+    // Create a new ControlCubeGraphNode first.
     QString key = measure->GetCubeSerialNumber();
-    if (controlSerials->contains(key)) {
+    if (controlSerials->contains(key))
+    {
       csn = (*controlSerials)[key];
       csn->addMeasure(measure);
     }
-    else {
-      csn = new ControlSerialNumber(measure->GetCubeSerialNumber());
+    else
+    {
+      csn = new ControlCubeGraphNode(measure->GetCubeSerialNumber());
       csn->addMeasure(measure);
       controlSerials->insert(measure->GetCubeSerialNumber(), csn);
     }
@@ -568,18 +630,20 @@ namespace Isis {
 
 
   /**
-   * Updates the ControlSerialNumber containing this measure to reflect
+   * Updates the ControlCubeGraphNode containing this measure to reflect
    * the deletion.  If this is the only measure left in the containing
-   * ControlSerialNumber, then the ControlSerialNumber is deleted as well.
+   * ControlCubeGraphNode, then the ControlCubeGraphNode is deleted as well.
    *
    * @param measure The measure removed from the network.
    */
-  void ControlNet::MeasureDeleted(ControlMeasure *measure) {
+  void ControlNet::MeasureDeleted(ControlMeasure * measure)
+  {
     QString key = measure->GetCubeSerialNumber();
-    ControlSerialNumber *csn = (*controlSerials)[key];
+    ControlCubeGraphNode * csn = (*controlSerials)[key];
 
     csn->removeMeasure(measure);
-    if (!csn->size()) {
+    if (!csn->size())
+    {
       controlSerials->remove(key);
 
       delete csn;
@@ -593,13 +657,15 @@ namespace Isis {
    *
    * @param pointId The Point Id of the ControlPoint to be deleted.
    */
-  void ControlNet::DeletePoint(iString pointId) {
-    if (!points->contains(pointId)) {
+  void ControlNet::DeletePoint(iString pointId)
+  {
+    if (!points->contains(pointId))
+    {
       iString msg = "point Id [" + pointId + "] does not exist in the network";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    ControlPoint *point = (*points)[pointId];
+    ControlPoint * point = (*points)[pointId];
 
     // notify CubeSerialNumbers of the loss of this point
     QList< QString > pointsSerials = point->GetCubeSerialNumbers();
@@ -619,12 +685,14 @@ namespace Isis {
 
     // Check validity if needed (There were two or more points with the same
     // Id - see if this is still the case)
-    if (check) {
+    if (check)
+    {
       p_invalid = false;
 
       // check for 2 or more points with same Id
       QList< QString > keys = points->keys();
-      for (int i = 0; i < keys.size() && !p_invalid; i++) {
+      for (int i = 0; i < keys.size() && !p_invalid; i++)
+      {
         if (points->count(keys[i]) > 1)
           p_invalid = true;
       }
@@ -637,8 +705,10 @@ namespace Isis {
    *
    * @param index The index of the Control Point to be deleted.
    */
-  void ControlNet::DeletePoint(int index) {
-    if (index < 0 || index >= pointIds->size()) {
+  void ControlNet::DeletePoint(int index)
+  {
+    if (index < 0 || index >= pointIds->size())
+    {
       iString msg = "Index [" + iString(index) + "] out of range";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -652,13 +722,16 @@ namespace Isis {
    *
    * @returns True if the point is in the network, false otherwise.
    */
-  bool ControlNet::ContainsPoint(iString pointId) const {
+  bool ControlNet::ContainsPoint(iString pointId) const
+  {
     bool contains = false;
 
     QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
       i.next();
-      if (i.value()->GetId() == (iString) pointId) {
+      if (i.value()->GetId() == (iString) pointId)
+      {
         contains = true;
         break;
       }
@@ -668,13 +741,16 @@ namespace Isis {
   }
 
 
-  QList< QString > ControlNet::GetCubeSerials() const {
+  QList< QString > ControlNet::GetCubeSerials() const
+  {
     return controlSerials->keys();
   }
 
 
-  void ControlNet::ValidateSerialNumber(iString serialNumber) const {
-    if (!controlSerials->contains(serialNumber)) {
+  void ControlNet::ValidateSerialNumber(iString serialNumber) const
+  {
+    if (!controlSerials->contains(serialNumber))
+    {
       iString msg = "Cube Serial Number [" + serialNumber + "] not found in "
           "the network";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -687,7 +763,8 @@ namespace Isis {
    *
    * @returns A list of all measures which are in a given cube
    */
-  QList< ControlMeasure * > ControlNet::GetMeasuresInCube(iString serialNumber) {
+  QList< ControlMeasure * > ControlNet::GetMeasuresInCube(iString serialNumber)
+  {
     ValidateSerialNumber(serialNumber);
     return (*controlSerials)[serialNumber]->getMeasures();
   }
@@ -698,12 +775,14 @@ namespace Isis {
    *
    * @param serialNumber The cube serial number to be removed from the network
    */
-  void ControlNet::DeleteMeasuresWithId(iString serialNumber) {
+  void ControlNet::DeleteMeasuresWithId(iString serialNumber)
+  {
     ValidateSerialNumber(serialNumber);
 
-    ControlSerialNumber *csn = (*controlSerials)[serialNumber];
+    ControlCubeGraphNode * csn = (*controlSerials)[serialNumber];
     QList< ControlMeasure * > measures = csn->getMeasures();
-    foreach(ControlMeasure * measure, measures) {
+    foreach(ControlMeasure * measure, measures)
+    {
       measure->Parent()->Delete(measure);
     }
   }
@@ -714,11 +793,13 @@ namespace Isis {
    *
    * @history 2010-01-11  Tracie Sucharski, Renamed from ComputeErrors
    */
-  void ControlNet::ComputeResiduals() {
+  void ControlNet::ComputeResiduals()
+  {
     // TODO:  Make sure the cameras have been initialized
 
     QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
       i.next();
       i.value()->ComputeResiduals();
     }
@@ -728,10 +809,12 @@ namespace Isis {
   /**
    * Compute aprior values for each point in the network
    */
-  void ControlNet::ComputeApriori() {
+  void ControlNet::ComputeApriori()
+  {
     // TODO:  Make sure the cameras have been initialized
     QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
       i.next();
       i.value()->ComputeApriori();
     }
@@ -744,15 +827,18 @@ namespace Isis {
    *
    * @history 2010-01-12  Tracie Sucharski - Renamed from AverageError
    */
-  double ControlNet::AverageResidual() {
+  double ControlNet::AverageResidual()
+  {
     // TODO:  Make sure the cameras have been initialized
     double avgResidual = 0.0;
     int count = 0;
     QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
       i.next();
-      ControlPoint *point = i.value();
-      if (!point->IsIgnored()) {
+      ControlPoint * point = i.value();
+      if (!point->IsIgnored())
+      {
         avgResidual += point->GetStatistic(
             &ControlMeasure::GetResidualMagnitude).Average();
         count++;
@@ -773,7 +859,8 @@ namespace Isis {
    *
    * @return Isis::Camera* The pointer to the resultant camera list
    */
-  Isis::Camera *ControlNet::Camera(int index) {
+  Isis::Camera * ControlNet::Camera(int index)
+  {
     return p_cameraList[index];
   }
 
@@ -785,7 +872,8 @@ namespace Isis {
    *
    * @return std::string
    */
-  iString ControlNet::CreatedDate() const {
+  iString ControlNet::CreatedDate() const
+  {
     return p_created;
   }
 
@@ -795,7 +883,8 @@ namespace Isis {
    *
    * @return The description of this Control Network
    */
-  iString ControlNet::Description() const {
+  iString ControlNet::Description() const
+  {
     return p_description;
   }
 
@@ -812,9 +901,11 @@ namespace Isis {
    * @return <B>ControlPoint*</B> Pointer to the ControlPoint
    *         closest to the given line, sample position
    */
-  ControlPoint *ControlNet::FindClosest(iString serialNumber,
-      double sample, double line) {
-    if (!controlSerials->contains(serialNumber)) {
+  ControlPoint * ControlNet::FindClosest(iString serialNumber,
+      double sample, double line)
+  {
+    if (!controlSerials->contains(serialNumber))
+    {
       iString msg = "serialNumber [";
       msg += serialNumber;
       msg += "] not found in ControlNet";
@@ -823,12 +914,13 @@ namespace Isis {
 
     const double SEARCH_DISTANCE = 99999999.0;
     double minDist = SEARCH_DISTANCE;
-    ControlPoint *closestPoint = NULL;
+    ControlPoint * closestPoint = NULL;
 
-    ControlSerialNumber *csn = (*controlSerials)[serialNumber];
+    ControlCubeGraphNode * csn = (*controlSerials)[serialNumber];
     QList< ControlMeasure * > measures = csn->getMeasures();
-    for (int i = 0; i < measures.size(); i++) {
-      ControlMeasure *measureToCheck = measures[i];
+    for (int i = 0; i < measures.size(); i++)
+    {
+      ControlMeasure * measureToCheck = measures[i];
 
       //Find closest line sample & return that controlpoint
       double dx = fabs(sample - measureToCheck->GetSample());
@@ -836,13 +928,15 @@ namespace Isis {
 
       double dist = sqrt((dx * dx) + (dy * dy));
 
-      if (dist < minDist) {
+      if (dist < minDist)
+      {
         minDist = dist;
         closestPoint = measureToCheck->Parent();
       }
     }
 
-    if (!closestPoint) {
+    if (!closestPoint)
+    {
       iString msg = "No point found within ";
       msg += iString(SEARCH_DISTANCE);
       msg += "pixels of sample/line [";
@@ -858,7 +952,8 @@ namespace Isis {
 
 
   //! Return if the control point is invalid
-  bool ControlNet::IsValid() const {
+  bool ControlNet::IsValid() const
+  {
     return !p_invalid;
   }
 
@@ -869,11 +964,13 @@ namespace Isis {
    *
    * @history 2010-01-12  Tracie Sucharski - Renamed from MaximumError
    */
-  double ControlNet::GetMaximumResidual() {
+  double ControlNet::GetMaximumResidual()
+  {
     // TODO:  Make sure the cameras have been initialized
 
     double maxResidual = 0.0;
-    foreach(ControlPoint * p, *points) {
+    foreach(ControlPoint * p, *points)
+    {
       double residual = p->GetStatistic(
           &ControlMeasure::GetResidualMagnitude).Maximum();
       if (residual > maxResidual)
@@ -884,7 +981,8 @@ namespace Isis {
   }
 
 
-  iString ControlNet::GetNetworkId() const {
+  iString ControlNet::GetNetworkId() const
+  {
     return p_networkId;
   }
 
@@ -895,7 +993,8 @@ namespace Isis {
    *
    * @return Number of edit locked measures
    */
-  int ControlNet::GetNumEditLockMeasures() {
+  int ControlNet::GetNumEditLockMeasures()
+  {
     int numLockedMeasures = 0;
     foreach(ControlPoint * p, *points)
     numLockedMeasures += p->GetNumMeasures() - p->GetNumLockedMeasures();
@@ -909,9 +1008,11 @@ namespace Isis {
    *
    * @return Number of edit locked control points
    */
-  int ControlNet::GetNumEditLockPoints() {
+  int ControlNet::GetNumEditLockPoints()
+  {
     int editLockPoints = 0;
-    foreach(ControlPoint * p, *points) {
+    foreach(ControlPoint * p, *points)
+    {
       if (p->IsEditLocked())
         editLockPoints++;
     }
@@ -926,7 +1027,8 @@ namespace Isis {
    *
    * @return Number of valid measures
    */
-  int ControlNet::GetNumIgnoredMeasures() {
+  int ControlNet::GetNumIgnoredMeasures()
+  {
     int numIgnoredMeasures = 0;
     foreach(ControlPoint * p, *points)
     numIgnoredMeasures += p->GetNumMeasures() - p->GetNumValidMeasures();
@@ -940,7 +1042,8 @@ namespace Isis {
    *
    * @return Number of control measures
    */
-  int ControlNet::GetNumMeasures() const {
+  int ControlNet::GetNumMeasures() const
+  {
     int numMeasures = 0;
     foreach(ControlPoint * p, *points)
     numMeasures += p->GetNumMeasures();
@@ -950,7 +1053,8 @@ namespace Isis {
 
 
   //! Return the number of control points in the network
-  int ControlNet::GetNumPoints() const {
+  int ControlNet::GetNumPoints() const
+  {
     return points->size();
   }
 
@@ -961,7 +1065,8 @@ namespace Isis {
    *
    * @return Number of valid measures
    */
-  int ControlNet::GetNumValidMeasures() {
+  int ControlNet::GetNumValidMeasures()
+  {
     int numValidMeasures = 0;
     foreach(ControlPoint * p, *points)
     numValidMeasures += p->GetNumValidMeasures();
@@ -975,9 +1080,11 @@ namespace Isis {
    *
    * @return Number of valid control points
    */
-  int ControlNet::GetNumValidPoints() {
+  int ControlNet::GetNumValidPoints()
+  {
     int validPoints = 0;
-    foreach(ControlPoint * p, *points) {
+    foreach(ControlPoint * p, *points)
+    {
       if (!p->IsIgnored())
         validPoints++;
     }
@@ -987,18 +1094,21 @@ namespace Isis {
 
 
   //! Return the target name
-  iString ControlNet::GetTarget() const {
+  iString ControlNet::GetTarget() const
+  {
     return p_targetName;
   }
 
 
   //! Return the user name
-  iString ControlNet::GetUserName() const {
+  iString ControlNet::GetUserName() const
+  {
     return p_userName;
   }
 
   //! Return QList of ControlPoint Ids used in hash, in order of addition
-  QList< QString > ControlNet::GetPointIds() const {
+  QList< QString > ControlNet::GetPointIds() const
+  {
     return *pointIds;
   }
 
@@ -1008,7 +1118,8 @@ namespace Isis {
    *
    * @param date The date this Control Network was created
    */
-  void ControlNet::SetCreatedDate(const iString &date) {
+  void ControlNet::SetCreatedDate(const iString & date)
+  {
     p_created = date;
   }
 
@@ -1018,7 +1129,8 @@ namespace Isis {
     *
     * @param desc The description of this Control Network
     */
-  void ControlNet::SetDescription(const iString &newDescription) {
+  void ControlNet::SetDescription(const iString & newDescription)
+  {
     p_description = newDescription;
   }
 
@@ -1028,7 +1140,8 @@ namespace Isis {
    *
    * @param imageListFile The list of images
    */
-  void ControlNet::SetImages(const iString &imageListFile) {
+  void ControlNet::SetImages(const iString & imageListFile)
+  {
     SerialNumberList list(imageListFile);
     SetImages(list);
   }
@@ -1047,25 +1160,30 @@ namespace Isis {
    *   @history 2009-01-06 Jeannie Walldren - Fixed typo in
    *            exception output.
    */
-  void ControlNet::SetImages(SerialNumberList &list, Progress *progress) {
+  void ControlNet::SetImages(SerialNumberList & list, Progress * progress)
+  {
     // Prep for reporting progress
-    if (progress != NULL) {
+    if (progress != NULL)
+    {
       progress->SetText("Setting input images...");
       progress->SetMaximumSteps(list.Size());
       progress->CheckStatus();
     }
     // Open the camera for all the images in the serial number list
-    for (int i = 0; i < list.Size(); i++) {
+    for (int i = 0; i < list.Size(); i++)
+    {
       iString serialNumber = list.SerialNumber(i);
       iString filename = list.Filename(i);
       Pvl pvl(filename);
 
-      try {
-        Isis::Camera *cam = CameraFactory::Create(pvl);
+      try
+      {
+        Isis::Camera * cam = CameraFactory::Create(pvl);
         p_cameraMap[serialNumber] = cam;
         p_cameraList.push_back(cam);
       }
-      catch (Isis::iException &e) {
+      catch (Isis::iException & e)
+      {
         iString msg = "Unable to create camera for cube file ";
         msg += filename;
         throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
@@ -1077,20 +1195,25 @@ namespace Isis {
 
     // Loop through all measures and set the camera
     QHashIterator< QString, ControlPoint * > p(*points);
-    while (p.hasNext()) {
+    while (p.hasNext())
+    {
       p.next();
-      ControlPoint *curPoint = p.value();
+      ControlPoint * curPoint = p.value();
 
       QList< QString > serialNums = curPoint->GetCubeSerialNumbers();
-      for (int m = 0; m < serialNums.size(); m++) {
-        ControlMeasure *curMeasure = (*curPoint)[serialNums[m]];
+      for (int m = 0; m < serialNums.size(); m++)
+      {
+        ControlMeasure * curMeasure = (*curPoint)[serialNums[m]];
 
-        if (!curMeasure->IsIgnored()) {
+        if (!curMeasure->IsIgnored())
+        {
           iString serialNumber = curMeasure->GetCubeSerialNumber();
-          if (list.HasSerialNumber(serialNumber)) {
+          if (list.HasSerialNumber(serialNumber))
+          {
             curMeasure->SetCamera(p_cameraMap[serialNumber]);
           }
-          else {
+          else
+          {
             iString msg = "Control point [" + curPoint->GetId() +
                 "], measure [" + curMeasure->GetCubeSerialNumber() +
                 "] does not have a cube with a matching serial number";
@@ -1108,7 +1231,8 @@ namespace Isis {
    *
    * @param date The last date this Control Network was modified
    */
-  void ControlNet::SetModifiedDate(const iString &date) {
+  void ControlNet::SetModifiedDate(const iString & date)
+  {
     p_modified = date;
   }
 
@@ -1118,7 +1242,8 @@ namespace Isis {
    *
    * @param id The Id of this Control Network
    */
-  void ControlNet::SetNetworkId(const iString &id) {
+  void ControlNet::SetNetworkId(const iString & id)
+  {
     p_networkId = id;
   }
 
@@ -1128,7 +1253,8 @@ namespace Isis {
    *
    * @param target The name of the target of this Control Network
    */
-  void ControlNet::SetTarget(const iString &target) {
+  void ControlNet::SetTarget(const iString & target)
+  {
     p_targetName = target;
   }
 
@@ -1138,17 +1264,21 @@ namespace Isis {
    *
    * @param name The name of the user creating or modifying this Control Net
    */
-  void ControlNet::SetUserName(const iString &name) {
+  void ControlNet::SetUserName(const iString & name)
+  {
     p_userName = name;
   }
 
-  const ControlNet &ControlNet::operator=(ControlNet other) {
+  const ControlNet & ControlNet::operator=(ControlNet other)
+  {
     if (this == &other)
       return *this;
 
-    if (points) {
+    if (points)
+    {
       QHashIterator< QString, ControlPoint * > i(*points);
-      while (i.hasNext()) {
+      while (i.hasNext())
+      {
         i.next();
         delete(*points)[i.key()];
         (*points)[i.key()] = NULL;
@@ -1157,9 +1287,11 @@ namespace Isis {
       points = NULL;
     }
 
-    if (controlSerials) {
-      QHashIterator< QString, ControlSerialNumber * > i(*controlSerials);
-      while (i.hasNext()) {
+    if (controlSerials)
+    {
+      QHashIterator< QString, ControlCubeGraphNode * > i(*controlSerials);
+      while (i.hasNext())
+      {
         i.next();
         delete(*controlSerials)[i.key()];
         (*controlSerials)[i.key()] = NULL;
@@ -1169,30 +1301,34 @@ namespace Isis {
     }
 
     points = new QHash< QString, ControlPoint * >;
-    controlSerials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlCubeGraphNode * >;
 
     QHashIterator < QString, ControlPoint * > i(*other.points);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
       i.next();
 
-      ControlPoint *newPoint = new ControlPoint(*i.value());
+      ControlPoint * newPoint = new ControlPoint(*i.value());
       QString newPointId = newPoint->GetId();
       points->insert(newPointId, newPoint);
 
       QList< QString > newPointsSerials = newPoint->GetCubeSerialNumbers();
-      for (int i = 0; i < newPointsSerials.size(); i++) {
+      for (int i = 0; i < newPointsSerials.size(); i++)
+      {
         QString key = newPointsSerials[i];
-        ControlMeasure *newMeasure = newPoint->GetMeasure(key);
+        ControlMeasure * newMeasure = newPoint->GetMeasure(key);
 
-        if (controlSerials->contains(key)) {
+        if (controlSerials->contains(key))
+        {
           (*controlSerials)[key]->addMeasure(newMeasure);
         }
-        else {
-          ControlSerialNumber *newControlSerialNumber =
-            new ControlSerialNumber(key);
+        else
+        {
+          ControlCubeGraphNode * newControlCubeGraphNode =
+            new ControlCubeGraphNode(key);
 
-          newControlSerialNumber->addMeasure(newMeasure);
-          controlSerials->insert(key, newControlSerialNumber);
+          newControlCubeGraphNode->addMeasure(newMeasure);
+          controlSerials->insert(key, newControlCubeGraphNode);
         }
       }
     }
@@ -1213,8 +1349,10 @@ namespace Isis {
   }
 
 
-  const ControlPoint *ControlNet::GetPoint(QString id) const {
-    if (!points->contains(id)) {
+  const ControlPoint * ControlNet::GetPoint(QString id) const
+  {
+    if (!points->contains(id))
+    {
       iString msg = "The control network has no control points with an ID "
           "equal to [" + id + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -1224,8 +1362,10 @@ namespace Isis {
   }
 
 
-  ControlPoint *ControlNet::GetPoint(QString id) {
-    if (!points->contains(id)) {
+  ControlPoint * ControlNet::GetPoint(QString id)
+  {
+    if (!points->contains(id))
+    {
       iString msg = "The control network has no control points with an ID "
           "equal to [" + id + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -1235,8 +1375,10 @@ namespace Isis {
   }
 
 
-  const ControlPoint *ControlNet::GetPoint(int index) const {
-    if (index < 0 || index >= pointIds->size()) {
+  const ControlPoint * ControlNet::GetPoint(int index) const
+  {
+    if (index < 0 || index >= pointIds->size())
+    {
       iString msg = "Index [" + iString(index) + "] out of range";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -1245,8 +1387,10 @@ namespace Isis {
   }
 
 
-  ControlPoint *ControlNet::GetPoint(int index) {
-    if (index < 0 || index >= pointIds->size()) {
+  ControlPoint * ControlNet::GetPoint(int index)
+  {
+    if (index < 0 || index >= pointIds->size())
+    {
       iString msg = "Index [" + iString(index) + "] out of range";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -1255,22 +1399,26 @@ namespace Isis {
   }
 
 
-  const ControlPoint *ControlNet::operator[](QString id) const {
+  const ControlPoint * ControlNet::operator[](QString id) const
+  {
     return GetPoint(id);
   }
 
 
-  ControlPoint *ControlNet::operator[](QString id) {
+  ControlPoint * ControlNet::operator[](QString id)
+  {
     return GetPoint(id);
   }
 
 
-  const ControlPoint *ControlNet::operator[](int index) const {
+  const ControlPoint * ControlNet::operator[](int index) const
+  {
     return GetPoint(index);
   }
 
 
-  ControlPoint *ControlNet::operator[](int index) {
+  ControlPoint * ControlNet::operator[](int index)
+  {
     return GetPoint(index);
   }
 }

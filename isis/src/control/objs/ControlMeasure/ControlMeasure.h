@@ -35,7 +35,7 @@ namespace Isis {
   class Camera;
   class ControlMeasureLogData;
   class ControlPoint;
-  class ControlSerialNumber;
+  class ControlCubeGraphNode;
   class iString;
   class PBControlNet_PBControlPoint_PBControlMeasure;
   class PBControlNetLogData_Point_Measure;
@@ -140,13 +140,13 @@ namespace Isis {
    *   @history 2011-02-10 Eric Hyer - Measures no longer know about or care
    *                about whether they are the reference measure or not.  This
    *                is now completely maintained by the ControlPoint class.
-   *   @history 2011-02-18 Eric Hyer - ControlSerialNumber is now a friend.
+   *   @history 2011-02-18 Eric Hyer - ControlCubeGraphNode is now a friend.
    *                Eliminated ConnectControlSN and DisconnectControlSN methods.
    *                Fixed bug in destructor.
    */
   class ControlMeasure {
       friend class ControlPoint;
-      friend class ControlSerialNumber;
+      friend class ControlCubeGraphNode;
     public:
       /**
        * @brief Control network measurement types
@@ -217,7 +217,7 @@ namespace Isis {
       ~ControlMeasure();
 
       ControlPoint *Parent() { return parentPoint; }
-      ControlSerialNumber *ControlSN() { return associatedCSN; }
+      ControlCubeGraphNode *ControlSN() { return associatedCSN; }
 
       void Load(PvlGroup &p);
 
@@ -301,7 +301,7 @@ namespace Isis {
 
     private: // data
       ControlPoint *parentPoint;  //!< Pointer to parent ControlPoint, may be null
-      ControlSerialNumber *associatedCSN;  //!< Pointer to the Serial Number
+      ControlCubeGraphNode *associatedCSN;  //!< Pointer to the Serial Number
       // structure connecting measures in an image
 
       iString *p_serialNumber;

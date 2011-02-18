@@ -1,6 +1,6 @@
 #include "IsisDebug.h"
 
-#include "ControlSerialNumber.h"
+#include "ControlCubeGraphNode.h"
 
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
@@ -15,27 +15,29 @@ namespace Isis {
   /**
   * Create an empty SerialNumber object.
   */
-  ControlSerialNumber::ControlSerialNumber(iString sn) {
+  ControlCubeGraphNode::ControlCubeGraphNode(iString sn) {
     nullify();
 
     serialNumber = new iString(sn);
     measures = new QHash<ControlPoint *, ControlMeasure *>;
-    connections = new QHash< ControlSerialNumber *, QList< ControlMeasure * > >;
+    connections = new QHash < ControlCubeGraphNode *,
+    QList< ControlMeasure * > >;
   }
 
 
-  ControlSerialNumber::ControlSerialNumber(const ControlSerialNumber &other) {
+  ControlCubeGraphNode::ControlCubeGraphNode(const ControlCubeGraphNode &other) {
     nullify();
 
     serialNumber = new iString(*other.serialNumber);
     measures = new QHash<ControlPoint *, ControlMeasure *>;
-    connections = new QHash< ControlSerialNumber *, QList< ControlMeasure * > >;
+    connections = new QHash < ControlCubeGraphNode *,
+    QList< ControlMeasure * > >;
 
     *measures = *other.measures;
   }
 
 
-  void ControlSerialNumber::nullify() {
+  void ControlCubeGraphNode::nullify() {
     serialNumber = NULL;
     measures = NULL;
     connections = NULL;
@@ -45,7 +47,7 @@ namespace Isis {
   /**
    * Destroy a SerialNumber object.
   */
-  ControlSerialNumber::~ControlSerialNumber() {
+  ControlCubeGraphNode::~ControlCubeGraphNode() {
     if (serialNumber) {
       delete serialNumber;
       serialNumber = NULL;
@@ -68,7 +70,7 @@ namespace Isis {
    *
    * @returns true if the point is contained, false otherwise
    */
-  bool ControlSerialNumber::contains(ControlPoint *point) {
+  bool ControlCubeGraphNode::contains(ControlPoint *point) {
     return measures->contains(point);
   }
 
@@ -78,7 +80,7 @@ namespace Isis {
    *
    * @param measure The ControlMeasure to add
    */
-  void ControlSerialNumber::addMeasure(ControlMeasure *measure) {
+  void ControlCubeGraphNode::addMeasure(ControlMeasure *measure) {
     ASSERT(measure != NULL);
     if (measure->GetCubeSerialNumber() != *serialNumber) {
       iString msg = "Attempted to add Control Measure with Cube Serial Number ";
@@ -88,20 +90,20 @@ namespace Isis {
     }
 
     measure->associatedCSN = this;
-    updateConnections(&ControlSerialNumber::addConnection, measure);
+    updateConnections(&ControlCubeGraphNode::addConnection, measure);
     (*measures)[measure->Parent()] = measure;
   }
 
 
-  void ControlSerialNumber::removeMeasure(ControlMeasure *measure) {
+  void ControlCubeGraphNode::removeMeasure(ControlMeasure *measure) {
     measures->remove(measure->Parent());
-    updateConnections(&ControlSerialNumber::removeConnection, measure);
+    updateConnections(&ControlCubeGraphNode::removeConnection, measure);
     measure->associatedCSN = NULL;
   }
 
 
-  void ControlSerialNumber::updateConnections(
-    void (ControlSerialNumber::*updateFunc)(ControlMeasure *),
+  void ControlCubeGraphNode::updateConnections(
+    void (ControlCubeGraphNode::*updateFunc)(ControlMeasure *),
     ControlMeasure *measure) {
     QList< ControlPoint * > keys = measures->keys();
     for (int i = 0; i < keys.size(); i++) {
@@ -121,24 +123,15 @@ namespace Isis {
   }
 
 
-  void ControlSerialNumber::addConnection(ControlMeasure *measure) {
+  void ControlCubeGraphNode::addConnection(ControlMeasure *measure) {
     ASSERT(measure);
-    ControlSerialNumber *csn = measure->ControlSN();
+    ControlCubeGraphNode *csn = measure->ControlSN();
     ASSERT(csn);
 
     if (connections->contains(csn)) {
       QList< ControlMeasure * > & measureList = (*connections)[csn];
-      if (measureList.contains(measure)) {
-        /********************/
-        // this is still being figured out. For now return early.
-        return;
-        /********************/
-
-        iString msg = "Connection already exists!";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-      }
-
-      measureList.append(measure);
+      if (!measureList.contains(measure))
+        measureList.append(measure);
     }
     else {
       QList< ControlMeasure * > measureList;
@@ -148,49 +141,42 @@ namespace Isis {
   }
 
 
-  void ControlSerialNumber::removeConnection(ControlMeasure *measure) {
+  void ControlCubeGraphNode::removeConnection(ControlMeasure *measure) {
     ASSERT(measure);
-    ControlSerialNumber *csn = measure->ControlSN();
+    ControlCubeGraphNode *csn = measure->ControlSN();
     ASSERT(csn);
 
-    if (!connections->contains(csn)) {
-      /********************/
-      // this is still being figured out. For now return early.
-      return;
-      /********************/
-      iString msg = "Can not remove non-existent connection!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    if (connections->contains(csn)) {
+      QList< ControlMeasure * > & measureList = (*connections)[csn];
+      ASSERT(measureList.count(measure) == 1);
+      measureList.removeAt(measureList.indexOf(measure));
+
+      if (!measureList.size())
+        connections->remove(csn);
     }
-
-    QList< ControlMeasure * > & measureList = (*connections)[csn];
-    ASSERT(measureList.count(measure) == 1);
-    measureList.removeAt(measureList.indexOf(measure));
-
-    if (!measureList.size())
-      connections->remove(csn);
   }
 
 
-  int ControlSerialNumber::size() {
+  int ControlCubeGraphNode::size() {
     return measures->size();
   }
 
 
-  iString ControlSerialNumber::getSerialNumber() {
+  iString ControlCubeGraphNode::getSerialNumber() {
     return *serialNumber;
   }
 
 
-  QList< ControlMeasure * > ControlSerialNumber::getMeasures() const {
+  QList< ControlMeasure * > ControlCubeGraphNode::getMeasures() const {
     return measures->values();
   }
 
 
-  ControlMeasure *ControlSerialNumber::getMeasure(ControlPoint *point) {
+  ControlMeasure *ControlCubeGraphNode::getMeasure(ControlPoint *point) {
     if (!measures->contains(point)) {
       iString msg = "point [";
       msg += (iString) point->GetId();
-      msg += "] not found in the ControlSerialNumber";
+      msg += "] not found in the ControlCubeGraphNode";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -198,12 +184,12 @@ namespace Isis {
   }
 
 
-  const ControlMeasure *ControlSerialNumber::getMeasure(
+  const ControlMeasure *ControlCubeGraphNode::getMeasure(
     ControlPoint *point) const {
     if (!measures->contains(point)) {
       iString msg = "point [";
       msg += (iString) point->GetId();
-      msg += "] not found in the ControlSerialNumber";
+      msg += "] not found in the ControlCubeGraphNode";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -211,19 +197,19 @@ namespace Isis {
   }
 
 
-  ControlMeasure *ControlSerialNumber::operator[](ControlPoint *point) {
+  ControlMeasure *ControlCubeGraphNode::operator[](ControlPoint *point) {
     return getMeasure(point);
   }
 
 
-  const ControlMeasure *ControlSerialNumber::operator[](
+  const ControlMeasure *ControlCubeGraphNode::operator[](
     ControlPoint *point) const {
     return getMeasure(point);
   }
 
 
-  const ControlSerialNumber &ControlSerialNumber::operator=(
-    ControlSerialNumber other) {
+  const ControlCubeGraphNode &ControlCubeGraphNode::operator=(
+    ControlCubeGraphNode other) {
     if (this == &other)
       return *this;
 
@@ -244,7 +230,7 @@ namespace Isis {
 
     serialNumber = new iString;
     measures = new QHash< ControlPoint *, ControlMeasure *>;
-    connections = new QHash< ControlSerialNumber *, QList< ControlMeasure * > >;
+    connections = new QHash< ControlCubeGraphNode *, QList< ControlMeasure * > >;
 
     *serialNumber = *other.serialNumber;
     *measures = *other.measures;

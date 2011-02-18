@@ -1,5 +1,5 @@
-#ifndef ControlSerialNumber_h
-#define ControlSerialNumber_h
+#ifndef ControlCubeGraphNode_h
+#define ControlCubeGraphNode_h
 
 /**
  * @file
@@ -51,15 +51,15 @@ namespace Isis {
    *   @history 2011-02-18 Eric Hyer - This class now also acts as a vertex
    *                class for a graph where edges are the connections between
    *                images.  This means that connections are stored to other
-   *                ControlSerialNumber objects who have measures which have
+   *                ControlCubeGraphNode objects who have measures which have
    *                the same parent (point) as measures here.
    *
    */
-  class ControlSerialNumber {
+  class ControlCubeGraphNode {
     public:
-      explicit ControlSerialNumber(iString sn);
-      ControlSerialNumber(const ControlSerialNumber &other);
-      virtual ~ControlSerialNumber();
+      explicit ControlCubeGraphNode(iString sn);
+      ControlCubeGraphNode(const ControlCubeGraphNode &other);
+      virtual ~ControlCubeGraphNode();
 
       void addMeasure(ControlMeasure *measure);
       void removeMeasure(ControlMeasure *measure);
@@ -76,13 +76,13 @@ namespace Isis {
       ControlMeasure *operator[](ControlPoint *point);
       const ControlMeasure *operator[](ControlPoint *point) const;
 
-      const ControlSerialNumber &operator=(ControlSerialNumber);
+      const ControlCubeGraphNode &operator=(ControlCubeGraphNode);
 
 
     private:
       void nullify();
       void updateConnections(
-        void (ControlSerialNumber::*updateFunc)(ControlMeasure *),
+        void (ControlCubeGraphNode::*updateFunc)(ControlMeasure *),
         ControlMeasure *measure);
 
 
@@ -94,9 +94,9 @@ namespace Isis {
 
       /**
        * Stores a list of ControlMeasures which establish a conection to the
-       * ControlSerialNumber that the list is hashed by
+       * ControlCubeGraphNode that the list is hashed by
        */
-      QHash< ControlSerialNumber *, QList< ControlMeasure * > > * connections;
+      QHash< ControlCubeGraphNode *, QList< ControlMeasure * > > * connections;
 
   };
 }

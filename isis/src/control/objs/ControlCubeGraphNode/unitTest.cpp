@@ -7,7 +7,7 @@
 
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
-#include "ControlSerialNumber.h"
+#include "ControlCubeGraphNode.h"
 
 #include "ControlMeasureLogData.h"
 #include "iException.h"
@@ -20,7 +20,7 @@ using namespace Isis;
 int main() {
   Preference::Preferences(true);
 
-  ControlSerialNumber controlSN("Image1");
+  ControlCubeGraphNode controlSN("Image1");
 
   ControlPoint point1("Point1");
 
