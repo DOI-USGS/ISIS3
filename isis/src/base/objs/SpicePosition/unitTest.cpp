@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     pos.SetEphemerisTime(t);
     vector<double> p = pos.Coordinate();
     vector<double> v = pos.Velocity();
-    cout << setprecision(15) << "Time           = " << pos.EphemerisTime() << endl;
+    cout << "Time           = " << pos.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     pos3.SetEphemerisTime(t);
     vector<double> p = pos3.Coordinate();
     vector<double> v = pos3.Velocity();
-    cout << setprecision(15) << "Time           = " << pos.EphemerisTime() << endl;
+    cout << "Time           = " << pos.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
@@ -112,10 +112,10 @@ int main(int argc, char *argv[]) {
   // Also test Extrapolate method
   cout << "Testing extrapolation..." << std::endl;
   pos3.SetEphemerisTime(endTime);
-  cout << setprecision(15) << "Time           = " << pos3.EphemerisTime() << endl;
+  cout << "Time           = " << pos3.EphemerisTime() << endl;
   vector<double> p = pos3.Coordinate();
   cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-  cout << setprecision(15) << "Time           = " << pos3.EphemerisTime()+.000001 << endl;
+  cout << "Time           = " << pos3.EphemerisTime()+.000001 << endl;
   p = pos3.Extrapolate(endTime+.000001);
   cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
   cout << endl;
