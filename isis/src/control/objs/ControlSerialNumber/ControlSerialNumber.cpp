@@ -129,6 +129,11 @@ namespace Isis {
     if (connections->contains(csn)) {
       QList< ControlMeasure * > & measureList = (*connections)[csn];
       if (measureList.contains(measure)) {
+        /********************/
+        // this is still being figured out. For now return early.
+        return;
+        /********************/
+
         iString msg = "Connection already exists!";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
