@@ -275,9 +275,19 @@ void DoWrap(Buffer &in) {
     avg = avg / outputSize;
     if (avg < minRadius) minRadius = avg;
     if (avg > maxRadius) maxRadius = avg;
+
     if (topPad == 1 && in.Line() == 1) {
       for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
-        outMan[outputIndex] = avg;
+        int inputIndex = outputIndex - leftPad;
+        if(inputIndex < 0) {
+          outMan[outputIndex] = 2.0 * avg - in[inputIndex + inputSize];
+        }
+        else if(inputIndex < inputSize) {
+          outMan[outputIndex] = 2.0 * avg - in[inputIndex];
+        }
+        else {
+          outMan[outputIndex] = 2.0 * avg - in[inputIndex - inputSize];
+        }
       }
       outMan.SetLine(1);
       ocube->Write(outMan);
@@ -304,7 +314,16 @@ void DoWrap(Buffer &in) {
 
   if (bottomPad == 1 && in.Line() == inl) {
     for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
-      outMan[outputIndex] = avg;
+      int inputIndex = outputIndex - leftPad;
+      if(inputIndex < 0) {
+        outMan[outputIndex] = 2.0 * avg - in[inputIndex + inputSize];
+      }
+      else if(inputIndex < inputSize) {
+        outMan[outputIndex] = 2.0 * avg - in[inputIndex];
+      }
+      else {
+        outMan[outputIndex] = 2.0 * avg - in[inputIndex - inputSize];
+      }
     }
     outMan.SetLine(inl + topPad + bottomPad);
     ocube->Write(outMan);

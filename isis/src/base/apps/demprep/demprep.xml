@@ -31,6 +31,15 @@
     <change name="Janet Barrett" date="2010-09-09">
       Original version (demprep) Used the demwrap program as a model for the demprep program.
     </change>
+    <change name="Janet Barrett" date="2011-02-18">
+      The padding at the poles is no longer set to the average value of the line below or above the padded line.
+      In order for the ray tracing routine in the Sensor class to converge when it is right at the poles, the
+      padding had to be changed in the following way: At the north pole, the average of the pixels that lie in
+      the first line of the file is calculated. Then, each pixel in the top padded line is set to 2*average - 
+      the pixel below it. At the south pole, the average of the pixels that lie in the last line of the file
+      is calculated. Then, each pixel in the bottom padded line is set to 2*average - the pixel above it. This
+      change only applies to those DEM files that cover the poles.
+    </change>
   </history>
 
   <category>
