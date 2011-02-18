@@ -456,12 +456,12 @@ namespace Isis {
     AddMeasure(measure);
   }
 
-  void ControlPoint::AddMeasure(ControlMeasure *cmeasure) {
+  void ControlPoint::AddMeasure(ControlMeasure *measure) {
     // Make sure measure is unique
     foreach(ControlMeasure * m, measures->values()) {
-      if (m->GetCubeSerialNumber() == cmeasure->GetCubeSerialNumber()) {
+      if (m->GetCubeSerialNumber() == measure->GetCubeSerialNumber()) {
         iString msg = "The SerialNumber is not unique. A measure with "
-            "serial number [" + cmeasure->GetCubeSerialNumber() + "] already "
+            "serial number [" + measure->GetCubeSerialNumber() + "] already "
             "exists for ControlPoint [" + GetId() + "]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
@@ -469,13 +469,17 @@ namespace Isis {
 
     if (!measures->size()) {
       ASSERT(referenceMeasure == NULL);
-      referenceMeasure = cmeasure;
+      referenceMeasure = measure;
     }
 
-    cmeasure->parentPoint = this;
-    QString newSerial = cmeasure->GetCubeSerialNumber();
-    measures->insert(newSerial, cmeasure);
+    measure->parentPoint = this;
+    QString newSerial = measure->GetCubeSerialNumber();
+    measures->insert(newSerial, measure);
     cubeSerials->append(newSerial);
+
+    // notify parent network if we have one
+    if (parentNetwork)
+      parentNetwork->MeasureAdded(measure);
   }
 
 
@@ -503,11 +507,13 @@ namespace Isis {
    */
   void ControlPoint::Delete(iString serialNumber) {
     validateMeasure(serialNumber);
-
     ControlMeasure *cm = (*measures)[serialNumber];
+
+    // remove measure from the point's data structures
     measures->remove(serialNumber);
     cubeSerials->removeAt(cubeSerials->indexOf(serialNumber));
 
+    // update the reference measure
     if (cubeSerials->size()) {
       if (referenceMeasure == cm)
         referenceMeasure = (*measures)[cubeSerials->at(0)];
@@ -515,10 +521,27 @@ namespace Isis {
     else {
       referenceMeasure = NULL;
     }
+
+    // notify parent network of the change
+    if (parentNetwork)
+      parentNetwork->MeasureDeleted(cm);
+
     delete cm;
     cm = NULL;
 
     PointModified();
+  }
+
+
+  /**
+   * Remove a measurement from the control point, deleting reference measure
+   * is allowed.
+   *
+   * @param measure The measure to delete
+   */
+  void ControlPoint::Delete(ControlMeasure *measure) {
+    ASSERT(measure);
+    Delete(measure->GetCubeSerialNumber());
   }
 
 
@@ -2056,7 +2079,7 @@ namespace Isis {
 
     for (int i = 0; i < cubeSerials->size(); i++)
       *protoBufLog.add_measures() =
-          (*measures)[cubeSerials->at(i)]->GetLogProtocolBuffer();
+        (*measures)[cubeSerials->at(i)]->GetLogProtocolBuffer();
 
     return protoBufLog;
   }

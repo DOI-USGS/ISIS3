@@ -208,7 +208,10 @@ namespace Isis {
    *            interface clearity.  Hungarian notation now eliminated from this
    *            class.
    *   @history 2011-02-11 Steven Lambright - Measure log data is now written to
-   *            the binary file properly since Eric's change on January 17th.
+   *            the binary file properly.
+   *   @history 2011-02-18 Eric Hyer - Added Delete(ControlMeasure *) method.
+   *            Fixed bugs related to network notification of measure addition
+   *            and deletion.
    */
   class ControlPoint {
       friend class ControlNet;
@@ -295,6 +298,7 @@ namespace Isis {
       void Load(PvlObject &p);
 
       void Add(ControlMeasure *measure);
+      void Delete(ControlMeasure *measure);
       void Delete(iString serialNumber);
       void Delete(int index);
       Status ResetApriori();
@@ -398,7 +402,6 @@ namespace Isis {
 
 
     private:
-
       ControlNet *parentNetwork;
 
       //!< List of Control Measures
