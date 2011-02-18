@@ -115,8 +115,14 @@ void IsisMain() {
     // Write out the instrument position table
     Isis::PvlGroup kernels = cube.Label()->FindGroup("Kernels", Isis::Pvl::Traverse);
 
-    // Write out the "Table" label to the tabled kernels in the kernels group
+    // Save original kernels in keyword before changing to "Table" in the kernels group
+    PvlKeyword origCk = kernels["InstrumentPointing"];
     kernels["InstrumentPointing"] = "Table";
+
+    for (int i = 0;  i < origCk.Size();  i++) {
+      kernels["InstrumentPointing"].AddValue(origCk[i]);
+    }
+
     cube.PutGroup(kernels);
     cube.Close();
     gp += PvlKeyword("StatusMaster", ui.GetFilename("MASTER") + ":  camera pointing updated");
