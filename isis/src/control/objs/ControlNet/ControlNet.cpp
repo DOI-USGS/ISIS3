@@ -36,7 +36,7 @@ using namespace google::protobuf::io;
 namespace Isis {
   void ControlNet::Nullify() {
     points = NULL;
-    serials = NULL;
+    controlSerials = NULL;
     pointIds = NULL;
   }
 
@@ -45,7 +45,7 @@ namespace Isis {
     Nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    serials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlSerialNumber * >;
     pointIds = new QStringList;
 
     p_invalid = false;
@@ -59,7 +59,7 @@ namespace Isis {
     Nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    serials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlSerialNumber * >;
     pointIds = new QStringList;
 
     QHashIterator< QString, ControlPoint * > pointsIterator(*other.points);
@@ -76,15 +76,15 @@ namespace Isis {
         QString key = newPointsSerials[i];
         ControlMeasure *newMeasure = newPoint->GetMeasure(key);
 
-        if (serials->contains(key)) {
-          (*serials)[key]->AddMeasure(newPointId, newMeasure);
+        if (controlSerials->contains(key)) {
+          (*controlSerials)[key]->addMeasure(newMeasure);
         }
         else {
           ControlSerialNumber *newControlSerialNumber =
             new ControlSerialNumber(key);
 
-          newControlSerialNumber->AddMeasure(newPointId, newMeasure);
-          serials->insert(key, newControlSerialNumber);
+          newControlSerialNumber->addMeasure(newMeasure);
+          controlSerials->insert(key, newControlSerialNumber);
         }
       }
     }
@@ -112,7 +112,7 @@ namespace Isis {
     Nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    serials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlSerialNumber * >;
     pointIds = new QStringList;
 
     p_invalid = false;
@@ -134,15 +134,15 @@ namespace Isis {
       points = NULL;
     }
 
-    if (serials) {
-      QHashIterator< QString, ControlSerialNumber * > i(*serials);
+    if (controlSerials) {
+      QHashIterator< QString, ControlSerialNumber * > i(*controlSerials);
       while (i.hasNext()) {
         i.next();
-        delete(*serials)[i.key()];
-        (*serials)[i.key()] = NULL;
+        delete(*controlSerials)[i.key()];
+        (*controlSerials)[i.key()] = NULL;
       }
-      delete serials;
-      serials = NULL;
+      delete controlSerials;
+      controlSerials = NULL;
     }
 
     if (pointIds) {
@@ -523,93 +523,120 @@ namespace Isis {
     pointIds->append(pointId);
 
     point->parentNetwork = this;
-    QList< QString > serials = point->GetCubeSerialNumbers();
-    if (serials.size()) {
-      for (int i = 0; i < serials.size(); i++) {
-        AddControlSerialNumber(point, point->GetMeasure(serials[i]));
-      }
-    }
+    QList< QString > pointsSerials = point->GetCubeSerialNumbers();
+    for (int i = 0; i < pointsSerials.size(); i++)
+      MeasureAdded(point->GetMeasure(pointsSerials[i]));
   }
 
 
-  void ControlNet::AddControlSerialNumber(const ControlPoint *point,
-      ControlMeasure *measure) {
-    iString msg;
-    if (!point)
-      msg = "Null point passed to ControlNet::AddMeasure!";
-
-    if (!measure)
-      msg += "\nNull measure passed to ControlNet::AddMeasure!";
-
-    if (msg != "")
+  void ControlNet::MeasureAdded(ControlMeasure *measure) {
+    if (!measure) {
+      iString msg = "NULL measure passed to "
+          "ControlNet::AddControlSerialNumber!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    ControlPoint *point = measure->Parent();
+    if (!point) {
+      iString msg = "Control measure passed to "
+          "ControlNet::AddControlSerialNumber has a NULL parent!";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
 
     if (!ContainsPoint(point->GetId())) {
-      msg = "ControlNet does not contain the point [";
+      iString msg = "ControlNet does not contain the point [";
       msg += point->GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    ControlSerialNumber *csn = NULL;
+
+    // if a ControlSerialNumber already exists with the measure's
+    // cube serial number, then just add this measure to it.  Otherwise,
+    // Create a new ControlSerialNumber first.
     QString key = measure->GetCubeSerialNumber();
-    if (serials->contains(key)) {
-      (*serials)[key]->AddMeasure(point->GetId(), measure);
+    if (controlSerials->contains(key)) {
+      csn = (*controlSerials)[key];
+      csn->addMeasure(measure);
     }
     else {
-      ControlSerialNumber *newControlSerialNumber =
-        new ControlSerialNumber(measure->GetCubeSerialNumber());
-
-      newControlSerialNumber->AddMeasure(point->GetId(), measure);
-      serials->insert(measure->GetCubeSerialNumber(), newControlSerialNumber);
-    }
-  }
-
-  void ControlNet::RemoveControlSerialNumber(ControlPoint *point,
-      ControlMeasure *measure) {
-    QString key = measure->GetCubeSerialNumber();
-    ControlSerialNumber *serialNumber = (*serials)[key];
-
-    QString pointId = point->GetId();
-    serialNumber->RemoveMeasure(pointId);
-
-    if (!serialNumber->GetNumMeasures()) {
-      serials->remove(key);
-
-      delete serialNumber;
-      serialNumber = NULL;
+      csn = new ControlSerialNumber(measure->GetCubeSerialNumber());
+      csn->addMeasure(measure);
+      controlSerials->insert(measure->GetCubeSerialNumber(), csn);
     }
   }
 
 
   /**
+   * Updates the ControlSerialNumber containing this measure to reflect
+   * the deletion.  If this is the only measure left in the containing
+   * ControlSerialNumber, then the ControlSerialNumber is deleted as well.
+   *
+   * @param measure The measure removed from the network.
+   */
+  void ControlNet::MeasureDeleted(ControlMeasure *measure) {
+    QString key = measure->GetCubeSerialNumber();
+    ControlSerialNumber *csn = (*controlSerials)[key];
+
+    csn->removeMeasure(measure);
+    if (!csn->size()) {
+      controlSerials->remove(key);
+
+      delete csn;
+      csn = NULL;
+    }
+  }
+
+
+  /**
+   * Delete a ControlPoint from the network using the point's Id.
+   *
+   * @param pointId The Point Id of the ControlPoint to be deleted.
    */
   void ControlNet::DeletePoint(iString pointId) {
     if (!points->contains(pointId)) {
       iString msg = "point Id [" + pointId + "] does not exist in the network";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
-    else {
-      // See if removing this point qualifies for a re-check of validity
-      bool check = false;
-      if (p_invalid && points->value(pointId)->IsInvalid())
-        check = true;
 
-      points->remove(pointId);
-      pointIds->removeAt(pointIds->indexOf(pointId));
+    ControlPoint *point = (*points)[pointId];
 
-      // Check validity if needed
-      if (check) {
-        p_invalid = false;
+    // notify CubeSerialNumbers of the loss of this point
+    QList< QString > pointsSerials = point->GetCubeSerialNumbers();
+    for (int i = 0; i < pointsSerials.size(); i++)
+      MeasureDeleted(point->GetMeasure(pointsSerials[i]));
 
-        QList< QString > keys = points->keys();
-        for (int i = 0; i < keys.size() && !p_invalid; i++) {
-          if (points->count(keys[i]) > 1)
-            p_invalid = true;
-        }
+    // See if removing this point qualifies for a re-check of validity
+    bool check = false;
+    if (p_invalid && point->IsInvalid())
+      check = true;
+
+    // delete point
+    points->remove(pointId);
+    pointIds->removeAt(pointIds->indexOf(pointId));
+    delete point;
+    point = NULL;
+
+    // Check validity if needed (There were two or more points with the same
+    // Id - see if this is still the case)
+    if (check) {
+      p_invalid = false;
+
+      // check for 2 or more points with same Id
+      QList< QString > keys = points->keys();
+      for (int i = 0; i < keys.size() && !p_invalid; i++) {
+        if (points->count(keys[i]) > 1)
+          p_invalid = true;
       }
     }
   }
 
 
+  /**
+   * Delete a ControlPoint from the network using the point's index.
+   *
+   * @param index The index of the Control Point to be deleted.
+   */
   void ControlNet::DeletePoint(int index) {
     if (index < 0 || index >= pointIds->size()) {
       iString msg = "Index [" + iString(index) + "] out of range";
@@ -620,6 +647,11 @@ namespace Isis {
   }
 
 
+  /**
+   * @param pointId the point Id to check for in the network.
+   *
+   * @returns True if the point is in the network, false otherwise.
+   */
   bool ControlNet::ContainsPoint(iString pointId) const {
     bool contains = false;
 
@@ -636,8 +668,13 @@ namespace Isis {
   }
 
 
+  QList< QString > ControlNet::GetCubeSerials() const {
+    return controlSerials->keys();
+  }
+
+
   void ControlNet::ValidateSerialNumber(iString serialNumber) const {
-    if (!serials->contains(serialNumber)) {
+    if (!controlSerials->contains(serialNumber)) {
       iString msg = "Cube Serial Number [" + serialNumber + "] not found in "
           "the network";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -652,7 +689,7 @@ namespace Isis {
    */
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(iString serialNumber) {
     ValidateSerialNumber(serialNumber);
-    return (*serials)[serialNumber]->GetMeasures();
+    return (*controlSerials)[serialNumber]->getMeasures();
   }
 
 
@@ -664,13 +701,10 @@ namespace Isis {
   void ControlNet::DeleteMeasuresWithId(iString serialNumber) {
     ValidateSerialNumber(serialNumber);
 
-    ControlSerialNumber *csn = (*serials)[serialNumber];
-    QList< QString > pointIds = csn->GetPointIds();
-    foreach(QString id, pointIds) {
-      ControlPoint *point = GetPoint(id);
-      iString serialNumber = csn->GetMeasure(id)->GetCubeSerialNumber();
-
-      point->Delete(serialNumber);
+    ControlSerialNumber *csn = (*controlSerials)[serialNumber];
+    QList< ControlMeasure * > measures = csn->getMeasures();
+    foreach(ControlMeasure * measure, measures) {
+      measure->Parent()->Delete(measure);
     }
   }
 
@@ -780,7 +814,7 @@ namespace Isis {
    */
   ControlPoint *ControlNet::FindClosest(iString serialNumber,
       double sample, double line) {
-    if (!serials->contains(serialNumber)) {
+    if (!controlSerials->contains(serialNumber)) {
       iString msg = "serialNumber [";
       msg += serialNumber;
       msg += "] not found in ControlNet";
@@ -791,10 +825,10 @@ namespace Isis {
     double minDist = SEARCH_DISTANCE;
     ControlPoint *closestPoint = NULL;
 
-    ControlSerialNumber *csn = (*serials)[serialNumber];
-    QList< QString > pointIds = csn->GetPointIds();
-    for (int i = 0; i < pointIds.size(); i++) {
-      ControlMeasure *measureToCheck = (*csn)[pointIds[i]];
+    ControlSerialNumber *csn = (*controlSerials)[serialNumber];
+    QList< ControlMeasure * > measures = csn->getMeasures();
+    for (int i = 0; i < measures.size(); i++) {
+      ControlMeasure *measureToCheck = measures[i];
 
       //Find closest line sample & return that controlpoint
       double dx = fabs(sample - measureToCheck->GetSample());
@@ -1123,19 +1157,19 @@ namespace Isis {
       points = NULL;
     }
 
-    if (serials) {
-      QHashIterator< QString, ControlSerialNumber * > i(*serials);
+    if (controlSerials) {
+      QHashIterator< QString, ControlSerialNumber * > i(*controlSerials);
       while (i.hasNext()) {
         i.next();
-        delete(*serials)[i.key()];
-        (*serials)[i.key()] = NULL;
+        delete(*controlSerials)[i.key()];
+        (*controlSerials)[i.key()] = NULL;
       }
-      delete serials;
-      serials = NULL;
+      delete controlSerials;
+      controlSerials = NULL;
     }
 
     points = new QHash< QString, ControlPoint * >;
-    serials = new QHash< QString, ControlSerialNumber * >;
+    controlSerials = new QHash< QString, ControlSerialNumber * >;
 
     QHashIterator < QString, ControlPoint * > i(*other.points);
     while (i.hasNext()) {
@@ -1150,15 +1184,15 @@ namespace Isis {
         QString key = newPointsSerials[i];
         ControlMeasure *newMeasure = newPoint->GetMeasure(key);
 
-        if (serials->contains(key)) {
-          (*serials)[key]->AddMeasure(newPointId, newMeasure);
+        if (controlSerials->contains(key)) {
+          (*controlSerials)[key]->addMeasure(newMeasure);
         }
         else {
           ControlSerialNumber *newControlSerialNumber =
             new ControlSerialNumber(key);
 
-          newControlSerialNumber->AddMeasure(newPointId, newMeasure);
-          serials->insert(key, newControlSerialNumber);
+          newControlSerialNumber->addMeasure(newMeasure);
+          controlSerials->insert(key, newControlSerialNumber);
         }
       }
     }

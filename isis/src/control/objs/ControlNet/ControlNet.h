@@ -56,71 +56,75 @@ namespace Isis {
    *   @history 2005-07-29 Jeff Anderson Original version
    *   @history 2006-01-11 Jacob Danton Updated unitTest
    *   @history 2006-06-22 Brendan George Updated to conform to changes in
-   *            SerialNumberList class
+   *                SerialNumberList class
    *   @history 2008-04-04 Christopher Austin Added Exists function
    *   @history 2008-04-18 Debbie A. Cook Added Progress reports to loading and
-   *            SetImages and calculates the total number of measurements in
-   *            the control net
+   *                SetImages and calculates the total number of measurements in
+   *                the control net
    *   @history 2008-06-18 Christopher Austin Fixed documentation errors
-   *   @history 2009-01-06 Jeannie Walldren Fixed typo in
-   *            SetImages() exception output. Added
-   *            documentation.
+   *   @history 2009-01-06 Jeannie Walldren Fixed typo in SetImages() exception
+   *                output. Added documentation.
    *   @history 2009-02-05 Christopher Austin when the created date or the
-   *            modified date are not set, they default to the time in which
-   *            Write() is called.
+   *                modified date are not set, they default to the time in which
+   *                Write() is called.
    *   @history 2009-04-07 Tracie Sucharski Added NumValidMeasures and
-   *            NumIgnoredMeasures methods.
+   *                NumIgnoredMeasures methods.
    *   @history 2009-06-03 Christopher Austin Added p_invalid functionality
-   *            along with forceBuild, as well as other small fixes including
-   *            documentation.
-   *   @history 2009-07-13 Stacy Alley The std::vector of
-   *            ControlPoints called 'p_points' was replaced with
-   *            a QVector of QString 'p_pointIds' in conjunction
-   *            with a QHash of <QString, ControlPoint> called
-   *            'p_pointsHash'. This was done to speed up the Add
-   *            method which was essentially slowing down the
-   *            reading or creation of Control Networks.
+   *                along with forceBuild, as well as other small fixes
+   *                including documentation.
+   *   @history 2009-07-13 Stacy Alley The std::vector of ControlPoints called
+   *                'p_points' was replaced with a QVector of QString
+   *                'p_pointIds' in conjunction with a QHash of
+   *                <QString, ControlPoint> called 'p_pointsHash'. This was
+   *                done to speed up the Add method which was essentially
+   *                slowing down the reading or creation of Control Networks.
    *   @history 2010-01-12 Tracie Sucharski Added support for binary networds,
-   *            added new parameters, renamed ComputeErrors to ComputeResiduals,
-   *            renamed MaximumError to MaximumResidual, renamed AverageError to
-   *            AverageResidual.
+   *                added new parameters, renamed ComputeErrors to
+   *                ComputeResiduals, renamed MaximumError to MaximumResidual,
+   *                renamed AverageError to AverageResidual.
    *   @history 2010-05-06 Tracie Sucharski Use defaults of 0. instead of
-   *            Isis::Null, because 0. is the default in the protocol buffers.
+   *                Isis::Null, because 0. is the default in the protocol
+   *                buffers.
    *   @history 2010-08-05 Steven Lambright New label format much closer to a
-   *            cube so that we can expand upon it easily later. Also added
-   *            support for more than just the protocol buffer in the file, at
-   *            the current cost of reading the protocol buffer's binary data
-   *            into memory. This might need to be changed later.
+   *                cube so that we can expand upon it easily later. Also added
+   *                support for more than just the protocol buffer in the file,
+   *                at the current cost of reading the protocol buffer's binary
+   *                data into memory. This might need to be changed later.
    *   @history 2010-08-06 Tracie Sucharski Updated for changes made after
-   *            additional working sessions for Control network
-   *            design.
+   *                additional working sessions for Control network design.
    *   @history 2009-09-01 Eric Hyer Added two includes: QVector and QString
    *   @history 2010-09-09 Sharmila Prasad Added API to sort Control Net by
-   *            Point ID Changed PointID's vector to StringList
-   *   @history 2009-09-25 Travis Addair Changed methods
-   *            which return the number of control measures in the
-   *            network to compute those values at the time the
-   *            method is called, not when the control network is
-   *            first initialized.
+   *                Point ID Changed PointID's vector to StringList
+   *   @history 2009-09-25 Travis Addair Changed methods which return the number
+   *                of control measures in the network to compute those values
+   *                at the time the method is called, not when the control
+   *                network is first initialized.
    *   @history 2010-10-05 Tracie Sucharski Renamed the Write method to
-   *            WritePvl.  Create new method, Write which takes another
-   *            parameter indicating whether to write pvl format or binary
-   *            format, The default will write binary.
+   *                WritePvl.  Create new method, Write which takes another
+   *                parameter indicating whether to write pvl format or binary
+   *                format, The default will write binary.
    *   @history 2010-10-05 Eric Hyer ControlMeasure and ControlPoint now
-   *            return QStrings for some methods.  Fixed breakages caused by
-   *            this.
+   *                return QStrings for some methods.  Fixed breakages caused by
+   *                this.
    *   @history 2010-10-06 Sharmila Prasad Added method to get CreatedDate
    *   @history 2010-11-21 Tracie Sucharski - Added new keyword, jigsawRejected
-   *            to the read and write methods.
+   *                to the read and write methods.
    *   @history 2011-01-13 Mackenzie Boyd Added copy constructor and assignment
-   *            operator.
+   *                operator.
    *   @history 2011-01-17 Eric Hyer - Points are now owned and deleted by the
-   *                           network.  Network now stored in such a way that
-   *                           access to all points in a cube is just as cheap
-   *                           as accessing measures in a point.  Removed
-   *                           redundant methods and made other api changes.
+   *                network.  Network now stored in such a way that access to
+   *                all points in a cube is just as cheap as accessing measures
+   *                in a point.  Removed redundant methods and made other api
+   *                changes.
+   *   @history 2011-02-18 Eric Hyer - Made improvements and bug fixes related
+   *                to interaction to other control network classes including
+   *                ControlPoint and ControlMesure, but most significantly to
+   *                ControlSerialNumber.  Most important fix was network
+   *                notification of measures added to or removed from points
+   *                after the point is added to the network.
    */
   class ControlNet {
+      friend class ControlPoint;
     public:
       ControlNet();
       ControlNet(const ControlNet &other);
@@ -135,14 +139,11 @@ namespace Isis {
       void WritePvl(const iString &ptfile);
 
       void AddPoint(ControlPoint *point);
-      void AddControlSerialNumber(const ControlPoint *point,
-          ControlMeasure *measure);
       void DeletePoint(iString pointId);
       void DeletePoint(int index);
-      void RemoveControlSerialNumber(ControlPoint *point,
-          ControlMeasure *measure);
       bool ContainsPoint(iString pointId) const;
 
+      QList< QString > GetCubeSerials() const;
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
       void DeleteMeasuresWithId(iString serialNumber);
 
@@ -194,11 +195,17 @@ namespace Isis {
     private:
       void Nullify();
       void ValidateSerialNumber(iString serialNumber) const;
+      void MeasureAdded(ControlMeasure *measure);
+      void MeasureDeleted(ControlMeasure *measure);
+
 
 
     private:
+      //! hash ControlPoints by ControlPoint Id
       QHash< QString, ControlPoint * > * points;
-      QHash< QString, ControlSerialNumber * > * serials;
+
+      //! hash ControlSerialNumbers by CubeSerialNumber
+      QHash < QString, ControlSerialNumber *> * controlSerials;
       QStringList *pointIds;
 
       iString p_targetName;            //!< Name of the target
@@ -217,4 +224,3 @@ namespace Isis {
 };
 
 #endif
-
