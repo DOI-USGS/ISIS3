@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
-  cout << setprecision(10);
+  cout << setprecision(8);
   cout << "Unit test for SpicePosition" << endl;
 
   Isis::Filename f("$base/testData/kernels");
