@@ -32,8 +32,7 @@ template< typename A, typename B > class QHash;
 template< typename T > class QList;
 
 
-namespace Isis
-{
+namespace Isis {
   class Camera;
   class ControlMeasure;
   class ControlPoint;
@@ -124,23 +123,22 @@ namespace Isis
    *                notification of measures added to or removed from points
    *                after the point is added to the network.
    */
-  class ControlNet
-  {
+  class ControlNet {
       friend class ControlPoint;
     public:
       ControlNet();
-      ControlNet(const ControlNet & other);
-      ControlNet(const iString & ptfile, Progress * progress = 0);
+      ControlNet(const ControlNet &other);
+      ControlNet(const iString &ptfile, Progress *progress = 0);
 
       ~ControlNet();
 
-      void ReadControl(const iString & ptfile, Progress * progress = 0);
-      void ReadPBControl(const iString & ptfile);
-      void Write(const iString & ptfile, bool pvl = false);
-      void WritePB(const iString & ptfile);
-      void WritePvl(const iString & ptfile);
+      void ReadControl(const iString &ptfile, Progress *progress = 0);
+      void ReadPBControl(const iString &ptfile);
+      void Write(const iString &ptfile, bool pvl = false);
+      void WritePB(const iString &ptfile);
+      void WritePvl(const iString &ptfile);
 
-      void AddPoint(ControlPoint * point);
+      void AddPoint(ControlPoint *point);
       void DeletePoint(iString pointId);
       void DeletePoint(int index);
       bool ContainsPoint(iString pointId) const;
@@ -152,16 +150,16 @@ namespace Isis
       void ComputeResiduals();
       void ComputeApriori();
 
-      const ControlPoint * GetPoint(QString) const;
-      ControlPoint * GetPoint(QString);
-      const ControlPoint * GetPoint(int) const;
-      ControlPoint * GetPoint(int);
+      const ControlPoint *GetPoint(QString) const;
+      ControlPoint *GetPoint(QString);
+      const ControlPoint *GetPoint(int) const;
+      ControlPoint *GetPoint(int);
 
       double AverageResidual();
-      Isis::Camera * Camera(int index);
+      Isis::Camera *Camera(int index);
       iString CreatedDate() const;
       iString Description() const;
-      ControlPoint * FindClosest(iString serialNumber,
+      ControlPoint *FindClosest(iString serialNumber,
           double sample, double line);
       bool IsValid() const;
       double GetMaximumResidual();
@@ -177,28 +175,28 @@ namespace Isis
       iString GetUserName() const;
       QList< QString > GetPointIds() const;
 
-      void SetCreatedDate(const iString & date);
-      void SetDescription(const iString & newDescription);
-      void SetImages(const iString & imageListFile);
-      void SetImages(SerialNumberList & list, Progress * progress = 0);
-      void SetModifiedDate(const iString & date);
-      void SetNetworkId(const iString & id);
-      void SetTarget(const iString & target);
-      void SetUserName(const iString & name);
+      void SetCreatedDate(const iString &date);
+      void SetDescription(const iString &newDescription);
+      void SetImages(const iString &imageListFile);
+      void SetImages(SerialNumberList &list, Progress *progress = 0);
+      void SetModifiedDate(const iString &date);
+      void SetNetworkId(const iString &id);
+      void SetTarget(const iString &target);
+      void SetUserName(const iString &name);
 
-      const ControlNet & operator=(ControlNet other);
+      const ControlNet &operator=(ControlNet other);
 
-      const ControlPoint * operator[](QString id) const;
-      ControlPoint * operator[](QString id);
-      const ControlPoint * operator[](int id) const;
-      ControlPoint * operator[](int id);
+      const ControlPoint *operator[](QString id) const;
+      ControlPoint *operator[](QString id);
+      const ControlPoint *operator[](int id) const;
+      ControlPoint *operator[](int id);
 
 
     private:
       void Nullify();
       void ValidateSerialNumber(iString serialNumber) const;
-      void MeasureAdded(ControlMeasure * measure);
-      void MeasureDeleted(ControlMeasure * measure);
+      void MeasureAdded(ControlMeasure *measure);
+      void MeasureDeleted(ControlMeasure *measure);
 
 
 
@@ -207,8 +205,8 @@ namespace Isis
       QHash< QString, ControlPoint * > * points;
 
       //! hash ControlCubeGraphNodes by CubeSerialNumber
-      QHash < QString, ControlCubeGraphNode *> * controlSerials;
-      QStringList * pointIds;
+      QHash < QString, ControlCubeGraphNode *> * cubeGraphNodes;
+      QStringList *pointIds;
 
       iString p_targetName;            //!< Name of the target
       iString p_networkId;             //!< The Network Id
