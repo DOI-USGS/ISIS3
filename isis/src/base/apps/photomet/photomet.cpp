@@ -21,7 +21,10 @@ Cube *icube;
 Photometry *pho;
 double maxema;
 double maxinc;
-bool useDem;
+string angleSource;
+double centerPhase;
+double centerIncidence;
+double centerEmission;
 
 void photomet(Buffer &in, Buffer &out);
 
@@ -47,8 +50,17 @@ void IsisMain() {
   maxinc = ui.GetDouble("MAXINCIDENCE");
   
   // determine how photometric angles should be calculated
-  useDem = ui.GetBoolean("USEDEM");
-  
+  angleSource = ui.GetString("ANGLESOURCE");
+ 
+  // If the source of photometric angles is the center of the image,
+  // then get the angles at the center of the image.
+  if (angleSource == "CENTER") {
+    cam->SetImage(cam->Samples()/2, cam->Lines()/2);
+    centerPhase = cam->PhaseAngle();
+    centerIncidence = cam->IncidenceAngle();
+    centerEmission = cam->EmissionAngle();
+  }
+ 
   // Get the BandBin Center from the image
   PvlGroup pvlg = icube->GetGroup("BandBin");
   double wl;
@@ -104,23 +116,32 @@ void photomet(Buffer &in, Buffer &out) {
     // otherwise, compute angle values
     else {
       
-      // calculate photometric angles
-      ellipsoidpha = cam->PhaseAngle();
-      ellipsoidinc = cam->IncidenceAngle();
-      ellipsoidema = cam->EmissionAngle();
       bool success = true;
-      if (useDem) {
-        Angle phase, incidence, emission;
-        cam->LocalPhotometricAngles(phase, incidence, emission, success);
-        if (success) {
-          dempha = phase.GetDegrees();
-          deminc = incidence.GetDegrees();
-          demema = emission.GetDegrees();
-        }
+      if (angleSource == "CENTER") {
+        ellipsoidpha = centerPhase;
+        ellipsoidinc = centerIncidence;
+        ellipsoidema = centerEmission;
+        dempha = centerPhase;
+        deminc = centerIncidence;
+        demema = centerEmission;
       } else {
-        dempha = ellipsoidpha;
-        deminc = ellipsoidinc;
-        demema = ellipsoidema;
+        // calculate photometric angles
+        ellipsoidpha = cam->PhaseAngle();
+        ellipsoidinc = cam->IncidenceAngle();
+        ellipsoidema = cam->EmissionAngle();
+        if (angleSource == "DEM") {
+          Angle phase, incidence, emission;
+          cam->LocalPhotometricAngles(phase, incidence, emission, success);
+          if (success) {
+            dempha = phase.GetDegrees();
+            deminc = incidence.GetDegrees();
+            demema = emission.GetDegrees();
+          }
+        } else if (angleSource == "ELLIPSOID") {
+          dempha = ellipsoidpha;
+          deminc = ellipsoidinc;
+          demema = ellipsoidema;
+        }
       }
 
       // if invalid angles, set to null

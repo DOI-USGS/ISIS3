@@ -433,17 +433,22 @@
       off-target pixels to NULL.  Added appTests for new parameters.  Added user
       documentation examples. 
     </change>
-    <change name="Eric Hyer" date="2011-11-10">
+    <change name="Eric Hyer" date="2010-11-10">
       Added USEDEM parameter.
     </change>
-    <change name="Janet Barrett" date="2011-11-22">
+    <change name="Janet Barrett" date="2010-11-22">
       Added error check for situations where there is not an intersection with
       the DEM and the local photometric angles are requested.
     </change>
-    <change name="Janet Barrett" date="2011-11-23">
+    <change name="Janet Barrett" date="2010-11-23">
       Added capability to use both ellipsoid and DEM photometric angles in 
       atmospheric corrections. This provides the ability to do shading using a
       DEM surface.
+    </change>
+    <change name="Janet Barrett" date="2011-02-22">
+      The USEDEM parameter has been removed and the ANGLESOURCE parameter has
+      been added. The ANGLESOURCE parameter lets you specify the source where the
+      photometric angles will come from: ellipsoid, DEM, or center of image.
     </change>
   </history>
 
@@ -520,17 +525,47 @@
     </group>
     
     <group name="Other Options">
-      <parameter name="USEDEM">
-        <type>boolean</type>
-        <default><item>False</item></default>
+      <parameter name="ANGLESOURCE">
+        <type>string</type>
+        <default><item>ELLIPSOID</item></default>
         <brief>
-          Use DEM instead of ellipsoid for photometric angle calculations
+          Source of photometric angles: ELLIPSOID, DEM, or CENTER
         </brief>
         <description>
-          Phase, Emission, and Incidence angles can be calculated from the
-          elipsoid (default) or from the DEM.  The difference is that using the
-          DEM the surface roughness is taken into account.
+          Phase, Incidence, and Emission angles can be calculated from the
+          ellipsoid (default), from the DEM, or from the center of the 
+          image.  When using the DEM, the surface roughness is taken into
+          account to calculate a surface normal which is used to calculate
+          the photometric angles. When the center of the image is used, then
+          the photometric angles are determined at the center pixel of the
+          FROM image based on the ellipsoid and every pixel in the image is
+          photometrically corrected using that same set of photometric angles.
         </description>
+        <list>
+          <option value="ELLIPSOID">
+            <brief>Use the ELLIPSOID to determine photometric angles</brief>
+            <description>
+              The photometric angles for each pixel is obtained using the ellipsoid
+              shape model.
+            </description>
+          </option>
+          <option value="DEM">
+            <brief>Use the DEM to determine photometric angles</brief>
+            <description>
+              The photometric angles for each pixel is obtained using the DEM shape
+              model (if one exists in the image labels).
+            </description>
+          </option>
+          <option value="CENTER">
+            <brief>Use the CENTER to determine photometric angles</brief>
+            <description>
+              The photometric angles are obtained from the center of the input image
+              using the ellipsoid shape model. These angles are then applied to every
+              pixel in the file. This option is good for images where the photometric
+              angles don't change very much and when you want faster processing.
+            </description>
+          </option>
+        </list>
       </parameter>
     </group>
     
