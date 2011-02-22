@@ -102,9 +102,9 @@ namespace Isis {
   }
 
 
-  void ControlCubeGraphNode::updateConnections(
-    void (ControlCubeGraphNode::*updateFunc)(ControlMeasure *),
-    ControlMeasure *measure) {
+  void ControlCubeGraphNode::updateConnections(void
+      (ControlCubeGraphNode::*updateFunc)(ControlMeasure *),
+      ControlMeasure *measure) {
     QList< ControlPoint * > keys = measures->keys();
     for (int i = 0; i < keys.size(); i++) {
       ControlPoint *cp = keys[i];
@@ -169,6 +169,11 @@ namespace Isis {
 
   QList< ControlMeasure * > ControlCubeGraphNode::getMeasures() const {
     return measures->values();
+  }
+
+
+  bool ControlCubeGraphNode::isConnected(ControlCubeGraphNode *other) const {
+    return connections->contains(other);
   }
 
 
