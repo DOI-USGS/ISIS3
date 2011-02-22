@@ -50,6 +50,11 @@
     <change name="Sharmila Prasad" date="2011-02-04">
       Original version converted from Eric Eliason's hical pipeline version 1.42
     </change>
+    <change name="Sharmila Prasad" date="2011-02-22">
+      Renamed hinoise2 to hinoise. Previous redundant hinoise app has been 
+      removed.
+    </change>
+
   </history>
 
   <groups>

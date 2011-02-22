@@ -1,4 +1,4 @@
-APPNAME = hinoise2
+APPNAME = hinoise
 
 include $(ISISROOT)/make/isismake.tsts
 
