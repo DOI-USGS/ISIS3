@@ -269,42 +269,42 @@ void IsisMain() {
       // **********************************************************************************
       // Noise Filter
       if (bNoiseFilter) {
-        p5.AddToPipeline("hinoise2");
-        p5.Application("hinoise2").SetInputParameter ("FROM", false);
-        p5.Application("hinoise2").SetOutputParameter("TO",   "hinoise");
-        p5.Application("hinoise2").AddConstParameter ("REMOVE", iString(bRemoveTempFiles));
+        p5.AddToPipeline("hinoise");
+        p5.Application("hinoise").SetInputParameter ("FROM", false);
+        p5.Application("hinoise").SetOutputParameter("TO",   "hinoise");
+        p5.Application("hinoise").AddConstParameter ("REMOVE", iString(bRemoveTempFiles));
         
         // Values got from HiCal configuration file
         // Lowpass options
-        p5.Application("hinoise2").AddConstParameter ("LPF_LINES",   "251");
-        p5.Application("hinoise2").AddConstParameter ("LPF_SAMPLES", "3");
-        p5.Application("hinoise2").AddConstParameter ("LPF_MINPER",  "5");
+        p5.Application("hinoise").AddConstParameter ("LPF_LINES",   "251");
+        p5.Application("hinoise").AddConstParameter ("LPF_SAMPLES", "3");
+        p5.Application("hinoise").AddConstParameter ("LPF_MINPER",  "5");
         
         // Highpass Options
-        p5.Application("hinoise2").AddConstParameter ("HPF_LINES",   "251");
-        p5.Application("hinoise2").AddConstParameter ("HPF_SAMPLES", "1");
-        p5.Application("hinoise2").AddConstParameter ("HPF_MINPER",  "5");
+        p5.Application("hinoise").AddConstParameter ("HPF_LINES",   "251");
+        p5.Application("hinoise").AddConstParameter ("HPF_SAMPLES", "1");
+        p5.Application("hinoise").AddConstParameter ("HPF_MINPER",  "5");
         
         // Noise Filter options
-        p5.Application("hinoise2").AddConstParameter ("NULL_COLUMNS",         "FALSE");
-        p5.Application("hinoise2").AddConstParameter ("TOLMIN",               "3.5");
-        p5.Application("hinoise2").AddConstParameter ("TOLMAX",               "3.5");
-        p5.Application("hinoise2").AddConstParameter ("FLATTOL",              "1.0");
-        p5.Application("hinoise2").AddConstParameter ("MIN_VALUE",            "0.0");
-        p5.Application("hinoise2").AddConstParameter ("HARD_TOLMIN",          "3.5");
-        p5.Application("hinoise2").AddConstParameter ("HARD_TOLMAX",          "3.5");
-        p5.Application("hinoise2").AddConstParameter ("LPFZ_LINES",           "5");
-        p5.Application("hinoise2").AddConstParameter ("LPFZ_SAMPLES",         "5");
-        p5.Application("hinoise2").AddConstParameter ("NOISE_LINES",          "7");
-        p5.Application("hinoise2").AddConstParameter ("NOISE_SAMPLES",        "7");
-        p5.Application("hinoise2").AddConstParameter ("CLEAR_FRACTION",       "0.8");
-        p5.Application("hinoise2").AddConstParameter ("NONVALID_FRACTION",    "0.9");
-        p5.Application("hinoise2").AddConstParameter ("HARD_FILTERING",       "0.1");
-        p5.Application("hinoise2").AddConstParameter ("HIGHEND_PERCENT",      "99.999");
-        p5.Application("hinoise2").AddConstParameter ("HARD_HIGHEND_PERCENT", "99.99");
+        p5.Application("hinoise").AddConstParameter ("NULL_COLUMNS",         "FALSE");
+        p5.Application("hinoise").AddConstParameter ("TOLMIN",               "3.5");
+        p5.Application("hinoise").AddConstParameter ("TOLMAX",               "3.5");
+        p5.Application("hinoise").AddConstParameter ("FLATTOL",              "1.0");
+        p5.Application("hinoise").AddConstParameter ("MIN_VALUE",            "0.0");
+        p5.Application("hinoise").AddConstParameter ("HARD_TOLMIN",          "3.5");
+        p5.Application("hinoise").AddConstParameter ("HARD_TOLMAX",          "3.5");
+        p5.Application("hinoise").AddConstParameter ("LPFZ_LINES",           "5");
+        p5.Application("hinoise").AddConstParameter ("LPFZ_SAMPLES",         "5");
+        p5.Application("hinoise").AddConstParameter ("NOISE_LINES",          "7");
+        p5.Application("hinoise").AddConstParameter ("NOISE_SAMPLES",        "7");
+        p5.Application("hinoise").AddConstParameter ("CLEAR_FRACTION",       "0.8");
+        p5.Application("hinoise").AddConstParameter ("NONVALID_FRACTION",    "0.9");
+        p5.Application("hinoise").AddConstParameter ("HARD_FILTERING",       "0.1");
+        p5.Application("hinoise").AddConstParameter ("HIGHEND_PERCENT",      "99.999");
+        p5.Application("hinoise").AddConstParameter ("HARD_HIGHEND_PERCENT", "99.99");
         
         
-        p5.Application("hinoise2").Disable();
+        p5.Application("hinoise").Disable();
       }
       p5.Run();
 #ifdef _DEBUG_      

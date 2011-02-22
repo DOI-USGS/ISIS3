@@ -39,6 +39,9 @@
    <change name="Sharmila Prasad" date="2011-02-10">
      Original Version
    </change>
+    <change name="Sharmila Prasad" date="2011-02-22">
+     Use updated hinoise instead of hinoise2
+   </change>
   </history>
 
    <groups>
