@@ -1,3 +1,5 @@
+#include "IsisDebug.h"
+
 #include "ControlNet.h"
 
 #include <cmath>
@@ -5,6 +7,8 @@
 
 #include <QtAlgorithms>
 #include <QPair>
+#include <QQueue>
+#include <QTime>
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -529,6 +533,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Updates the ControlCubeGraphNode for the measure's serial number to
+   * reflect the addition.  If there is currently no ControlCubeGraphNode for
+   * this measure's serial, then a new ControlCubeGraphNode is created with
+   * this measure as its first.
+   *
+   * @param measure The measure added to the network.
+   */
   void ControlNet::MeasureAdded(ControlMeasure *measure) {
     if (!measure) {
       iString msg = "NULL measure passed to "
@@ -568,8 +580,8 @@ namespace Isis {
 
 
   /**
-   * Updates the ControlCubeGraphNode containing this measure to reflect
-   * the deletion.  If this is the only measure left in the containing
+   * Updates the ControlCubeGraphNode for this measure's serial number to
+   * reflect the deletion.  If this is the only measure left in the containing
    * ControlCubeGraphNode, then the ControlCubeGraphNode is deleted as well.
    *
    * @param measure The measure removed from the network.
@@ -585,6 +597,113 @@ namespace Isis {
       delete csn;
       csn = NULL;
     }
+  }
+
+
+  /**
+   * Random breadth-first search.  This meathod starts at a random serial, and
+   * returns a list with the start serial as well as any serial which is
+   * directly or indirectly connected to it.  The list returned will contain
+   * all the serials in the network if and only if the network is completely
+   * connected.  Otherwise, the list returned will be the entire island on
+   * which a random image resides.
+   *
+   * @returns A List of connected images
+   */
+  QList< QString > ControlNet::RandomBFS() const {
+    QList< QString > serials = cubeGraphNodes->keys();
+    Shuffle(serials);
+
+    // for keeping track of visited nodes
+    QMap< QString, bool > searchList;
+    for (int i = 0; i < serials.size(); i++)
+      searchList.insert(serials[i], false);
+    searchList[serials[0]] = true;
+
+    // for storing nodes as they are found
+    QList< QString > results;
+
+    QQueue< QString > q;
+    q.enqueue(serials[0]);
+    while (q.size()) {
+      QString curNode = q.dequeue();
+      if (!results.contains(curNode)) {
+        // add to results
+        results.append(curNode);
+        searchList[curNode] = true;
+
+        // add all the neighbors to the queue
+        QList< QString > neighbors =
+          cubeGraphNodes->value(curNode)->getAdjacentSerials();
+        Shuffle(neighbors);
+        for (int i = 0; i < neighbors.size(); i++)
+          q.enqueue(neighbors[i]);
+      }
+    } // end of breadth-first search
+
+    return results;
+  }
+
+
+  /**
+   * Shuffles the QStrings in a QList< QString >
+   *
+   * @param list The list to be shuffled
+   */
+  void ControlNet::Shuffle(QList< QString > & list) const {
+    for (int i = list.size() - 1; i > 0; i--) {
+      // standard form is rand() / (RAND_MAX + 1.0) * (max + 1 - min) + min
+      // min is always zero here so it is simplified to...
+      int j = qrand() / (RAND_MAX + 1.0) * (i + 1);
+      qSwap(list[j], list[i]);
+    }
+  }
+
+
+  /**
+   * Calculate the band width and critical edges needed by the adjacency matrix
+   * that could store cube connectivity if that matrix used the same ordering
+   * as is in the provided list.  Note that no adjacency matrices are ever used
+   * in this class!
+   *
+   * Critical edges are edges that contribute to band width.
+   *
+   * @param serials A list of cube serial numbers.
+   *
+   * @returns A QPair such that the first element is the needed bandwidth for
+   *          the serials how they are currently ordered in the list, and the
+   *          second element is the number of critical edges.
+   */
+  QPair< int, int > ControlNet::CalcBWAndCE(QList< QString > serials) const {
+    for (int i = 0; i < serials.size(); i++)
+      ASSERT(cubeGraphNodes->contains(serials[i]));
+
+    int bw = 0;
+    QList< int > colWidths;
+
+    for (int i = 0; i < serials.size(); i++) {
+      int colWidth = 0;
+      ControlCubeGraphNode *node1 = (*cubeGraphNodes)[serials[i]];
+      for (int j = 0; j < serials.size(); j++) {
+        if (i != j) {
+          ControlCubeGraphNode *node2 = (*cubeGraphNodes)[serials[j]];
+          int colDiff = abs(i - j);
+          if (node1->isConnected(node2) && colDiff > colWidth)
+            colWidth = colDiff;
+        }
+      }
+      colWidths.append(colWidth);
+      if (colWidth > bw)
+        bw = colWidth;
+    }
+
+    int criticalEdges = 0;
+    foreach(int width, colWidths) {
+      if (width == bw)
+        criticalEdges++;
+    }
+
+    return qMakePair(bw, criticalEdges);
   }
 
 
@@ -656,12 +775,10 @@ namespace Isis {
     bool contains = false;
 
     QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext()) {
+    while (i.hasNext() && !contains) {
       i.next();
-      if (i.value()->GetId() == (iString) pointId) {
+      if (i.value()->GetId() == (iString) pointId)
         contains = true;
-        break;
-      }
     }
 
     return contains;
@@ -680,111 +797,13 @@ namespace Isis {
     return cubeGraphNodes->keys();
   }
 
-  /*
-    QList< QList< QString > > ControlNet::GetCubeConnections() const
-    {
-      QMap< int, bool > searchList;
-      for(int i = 0; i < graph->size(); i++)
-        searchList.insert(i, false);
 
-      // For each subgraph keep a list of the cubes in the subgraph.  This is
-      // represented by a 2d vector where the inner vectors are cubes within a
-      // subgraph and the outer vector is a list of subgraphs
-      islands = new QVector< QVector< int > >();
-
-      // keeps track of which itteration of the breadth-first search we are on and
-      // thus also which subgraph we are currently populating
-      int subgraphIndex = -1;
-
-      //cerr << "searchList.size() :  " << searchList.size() << "\n";
-      while (searchList.size() > 0)
-      {
-        cerr << "searchlist size: " << searchList.size() << "\n";
-
-        // create a new subgraph
-        subgraphIndex++;
-        islands->append(QVector< int >());
-
-        // The queue used for breadth-first searching
-        QQueue< int > q;
-
-        // find the cube with lowest degree
-        int cubeIndexWithLowestDegree = 0;
-        int lowestDegree = 9999;
-        QMapIterator< int, bool > i(searchList);
-        int index = -1;
-
-
-        while (i.hasNext())
-        {
-          i.next();
-          index++;
-          int degree = graph->find(i.key()).value().first.Degree();
-          if (degree < lowestDegree)
-          {
-            lowestDegree = degree;
-            cubeIndexWithLowestDegree = index;
-          }
-        }
-
-        cerr << "lowest degree: " << cubeIndexWithLowestDegree << "\t" << qPrintable(cubeIndexToIdHash->value(cubeIndexWithLowestDegree)) << "\n";
-
-        // visit (remove from search list), add to current island list, and
-        // add it to the queue so it is the first one looked at.
-        searchList[cubeIndexWithLowestDegree] = true;
-        q.enqueue(cubeIndexWithLowestDegree);
-
-        while (q.size())
-        {
-          int curNode = q.dequeue();
-          cerr << "removed " << curNode << " from the q\n";
-
-          cerr << "islands->at(subgraphIndex).contains(curNode) returns: " << islands->at(subgraphIndex).contains(curNode) << "\n";
-          if (!islands->at(subgraphIndex).contains(curNode))
-          {
-            // add to results
-            cerr << "adding " << curNode << qPrintable(cubeIndexToIdHash->value(curNode)) <<" to the results\n";
-            (*islands)[subgraphIndex].append(curNode);
-            searchList[curNode] = true;
-
-            // add all the neighbors to the queue
-            cerr << "calling GetAdjacentCubes for " << curNode << "\n";
-            QVector< int > curNodeNeighbors = graph->find(curNode).value().first
-                .GetAdjacentCubes();
-            for (int i = 0; i < curNodeNeighbors.size(); i++)
-            {
-              cerr << "adding " << curNodeNeighbors[i] << " to the q\n";
-              q.enqueue(curNodeNeighbors[i]);
-            }
-          }
-        } // end of breadth-first search
-
-
-        // remove all the true entries from the search list
-        for (int i = 0; i < (*islands)[subgraphIndex].size(); i++)
-        {
-          cerr << "trying to remove " << (*islands)[subgraphIndex][i] << "\n";
-          searchList.remove((*islands)[subgraphIndex][i]);
-          cerr << "Ken - removing.... searchList.size() : " << searchList.size() << "\n";
-        }
-
-        if( searchList.size() > 0 )
-          cerr << "another island to process\n\n";
-
-        cerr << "\n\n\n";
-        //break;
-      }
-
-      // if there was only ever one subgraph created then the initial assumption
-      // was wrong!  There are no islands at all - this is a connected graph!
-      if (subgraphIndex == 0)
-        connected = true;
-      else
-        connected = false;
-    }
-    */
-
-
+  /**
+   * Does a check to ensure that the given serial number is contained within
+   * the network.  If it is not, then an exception is thrown
+   *
+   * @param serialNumber the cube serial number to validate
+   */
   void ControlNet::ValidateSerialNumber(iString serialNumber) const {
     if (!cubeGraphNodes->contains(serialNumber)) {
       iString msg = "Cube Serial Number [" + serialNumber + "] not found in "

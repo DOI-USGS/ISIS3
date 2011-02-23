@@ -27,9 +27,10 @@
 
 #include "iString.h"
 
-class QString;
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
+template< typename A, typename B > class QPair;
+class QString;
 
 
 namespace Isis {
@@ -122,6 +123,8 @@ namespace Isis {
    *                ControlCubeGraphNode.  Most important fix was network
    *                notification of measures added to or removed from points
    *                after the point is added to the network.
+   *   @history 2011-02-23 Eric Hyer - Added some methods to support graphing
+   *                calculations (RandomBFS, Shuffle, and CalcBWAndCE).
    */
   class ControlNet {
       friend class ControlPoint;
@@ -150,10 +153,10 @@ namespace Isis {
       void ComputeResiduals();
       void ComputeApriori();
 
-      const ControlPoint *GetPoint(QString) const;
-      ControlPoint *GetPoint(QString);
-      const ControlPoint *GetPoint(int) const;
-      ControlPoint *GetPoint(int);
+      const ControlPoint *GetPoint(QString pointId) const;
+      ControlPoint *GetPoint(QString pointId);
+      const ControlPoint *GetPoint(int index) const;
+      ControlPoint *GetPoint(int index);
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
@@ -199,8 +202,13 @@ namespace Isis {
       void MeasureDeleted(ControlMeasure *measure);
 
 
+    private: // graphing functions
+      QList< QString > RandomBFS() const;
+      void Shuffle(QList< QString > & list) const;
+      QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
 
-    private:
+
+    private: // data
       //! hash ControlPoints by ControlPoint Id
       QHash< QString, ControlPoint * > * points;
 
