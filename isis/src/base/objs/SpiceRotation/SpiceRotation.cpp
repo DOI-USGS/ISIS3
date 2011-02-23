@@ -1860,7 +1860,7 @@ namespace Isis {
 
     if(!p_hasAngularVelocity) return p_CJ;
       
-    double diffTime = p_et - timeEt;
+    double diffTime = timeEt - p_et;
     std::vector<double> CJ(9,0.);
     double dmat[3][3];
 

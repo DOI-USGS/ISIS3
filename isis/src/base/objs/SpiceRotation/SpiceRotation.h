@@ -114,6 +114,7 @@ namespace Isis {
    *                        Rotation group labels.
    *  @history 2011-02-17  Debbie A. Cook  Fixed bug in method LineCache and fixed computation of angular velocity in
    *                        method DCJdt (derivative was with respect to scaled et instead of et)
+   *  @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {
