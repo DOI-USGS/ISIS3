@@ -48,6 +48,10 @@ namespace Odyssey {
    *                                          namespace and replaced with "using
    *                                          namespace Isis".  Added NAIF error
    *                                          check to constructor.
+   *   @history 2011-02-23 Mackenzie Boyd -   Modified pixel pitch from 203.9
+   *                                          to 202.059 per request from
+   *                                          Christopher Edwards at ASU,
+   *                                          (Christopher.Edwards@asu.edu) 
    */
   class ThemisVisCamera : public PushFrameCamera {
     public:

@@ -49,7 +49,9 @@ namespace Odyssey {
     NaifStatus::CheckErrors();
     // Set up the camera characteristics
     // LoadFrameMounting("M01_SPACECRAFT","M01_THEMIS_VIS");
-    SetFocalLength(203.9);
+    // Changed Focal Length from 203.9 (millimeters????) to 202.059, per request from
+    // Christopher Edwards (Christopher.Edwards@asu.edu) at ASU, on 2/18/11.
+    SetFocalLength(202.059);
     SetPixelPitch(0.009);
 
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
