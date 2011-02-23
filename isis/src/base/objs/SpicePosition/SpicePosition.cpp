@@ -1565,7 +1565,7 @@ namespace Isis {
    std::vector<double> SpicePosition::Extrapolate(double timeEt) {
      if (!p_hasVelocity) return p_coordinate;
      
-     double diffTime = p_et - timeEt;
+     double diffTime = timeEt - p_et;
      std::vector<double> extrapPos(3, 0.);
      extrapPos[0] = p_coordinate[0] + diffTime*p_velocity[0];
      extrapPos[1] = p_coordinate[1] + diffTime*p_velocity[1];

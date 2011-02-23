@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     pos3.SetEphemerisTime(t);
     vector<double> p = pos3.Coordinate();
     vector<double> v = pos3.Velocity();
-    cout << "Time           = " << pos.EphemerisTime() << endl;
+    cout << "Time           = " << pos3.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
@@ -115,8 +115,9 @@ int main(int argc, char *argv[]) {
   cout << "Time           = " << pos3.EphemerisTime() << endl;
   vector<double> p = pos3.Coordinate();
   cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-  cout << "Time           = " << pos3.EphemerisTime()+.000001 << endl;
-  p = pos3.Extrapolate(endTime+.000001);
+  double timediff = .0001;
+  cout << "Time           = " << pos3.EphemerisTime()+timediff << endl;
+  p = pos3.Extrapolate(endTime+timediff);
   cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
   cout << endl;
   

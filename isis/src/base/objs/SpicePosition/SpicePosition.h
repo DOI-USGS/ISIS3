@@ -121,6 +121,7 @@ namespace Isis {
    *                       obsolete enum Coefficient.
    *  @history 2011-02-17 Debbie A. Cook - Corrected missed problem with degree forced to be 2 and
    *                       corrected calculation of velocity partial
+   *  @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
    */
   class SpicePosition {
     public:
