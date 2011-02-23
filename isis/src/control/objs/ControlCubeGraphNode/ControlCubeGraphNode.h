@@ -53,7 +53,8 @@ namespace Isis {
    *                images.  This means that connections are stored to other
    *                ControlCubeGraphNode objects who have measures which have
    *                the same parent (point) as measures here.
-   *   @history 2011-02-22 Eric Hyer - Addad isConnected() method
+   *   @history 2011-02-22 Eric Hyer - Added isConnected() and
+   *                getAdjacentSerials methods
    *
    */
   class ControlCubeGraphNode {
@@ -71,6 +72,7 @@ namespace Isis {
       iString getSerialNumber();
       int size();
       QList< ControlMeasure * > getMeasures() const;
+      QList< QString > getAdjacentSerials() const;
       bool isConnected(ControlCubeGraphNode *other) const;
 
       ControlMeasure *getMeasure(ControlPoint *point);
