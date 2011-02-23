@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation=
+  "http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+
+  <files>
+    <file>
+      <body>
+
+        <h3>Table of Contents</h3>
+        <ol type="I">
+          <li><a href="#Introduction">Introduction</a></li>
+          <ol type="i">
+            <li><a href="#PluginsAndPvl">Plugins and PVL</a></li>
+          </ol>
+
+          <li><a href="#Chips">Chips</a></li>
+          <ol type="i">
+            <li><a href="#PatternChip">Pattern Chip</a></li>
+            <li><a href="#SearchChip">Search Chip</a></li>
+            <li><a href="#Restrictions">Restrictions</a></li>
+          </ol>
+
+          <li><a href="#MatchAlgorithms">Match Algorithms</a></li>
+          <ol type="i">
+            <li><a href="#MinimumDifference">Minimum Difference</a></li>
+            <li><a href="#MaximumCorrelation">Maximum Correlation</a></li>
+            <li><a href="#Tolerance">Tolerance</a></li>
+          </ol>
+
+          <li><a href="#CreatingFitChip">Creating a Fit Chip</a></li>
+          <ol type="i">
+            <li><a href="#DenseWalk">Dense Walk</a></li>
+            <li><a href="#SparseWalk">Sparse Walk</a></li>
+          </ol>
+
+          <li><a href="#SubPixelAccuracy">Sub-Pixel Accuracy</a></li>
+          <ol type="i">
+            <li><a href="#SurfaceModeling">Surface Modeling</a></li>
+            <li>
+              <a href="#FindingLocalMinMax">Finding a Local Minimum/Maximum</a>
+            </li>
+          </ol>
+
+          <li><a href="#AdvancedFeatures">Advanced Features</a></li>
+          <ol type="i">
+            <li>
+              <a href="#RestrictingPixelRanges">Restricting Pixel Ranges</a>
+            </li>
+            <li>
+              <a href="#ValidPixelCount">Valid Pixel Count</a>
+            </li>
+            <li>
+              <a href="#PCReduction">Reduction of Pattern Cubes</a>
+            </li>
+            <li>
+              <a href="#PCGeoReduction">Geometric Warping of Pattern Cubes</a>
+            </li>
+            <li>
+              <a href="#SamplingMatchAlgo">Sampling in the Match Algorithm</a>
+            </li>
+            <li><a href="#ZScoreTest">Z-Score Test</a></li>
+          </ol>
+        </ol>
+
+        <hr />
+
+        <!-- Introduction -->
+        <h2><a name="Introduction">Introduction</a></h2>
+        <p>
+          This document attempts to describe how automatic registration is
+          accomplished in Isis 3.  In simple terms, automatic registration is
+          the attempt to match a pattern in a cube.  For example, given a reseau
+          template pattern, we would like to find positions in a cube which
+          match the reseau.  Similarly, if we extract from a cube a ground
+          feature (e.g. crater, fault line, etc) as a pattern, we would like to
+          find the same feature in another overlapping cube to define match
+          points.  
+        </p>
+
+        <h3><a name="PluginsAndPvl">Plugins and PVL</a></h3>
+        <p>
+          Automatic registration is a tricky subject.  Algorithms and parameters
+          that successfully work for one pattern are likely not to work for
+          other conditions.  In Isis 3, we do not want to restrict our
+          registration programs (e.g., coreg, coregpr, qmatch, etc) to a single
+          algorithm.  We would view this similar to map projections or camera
+          models.  That is, if a particular registration algorithm meets our
+          needs we can choose to use it, however, if none meet our needs a new
+          algorithm can be developed.  A key element is we want the new
+          algorithm immediately available in all applications without the need
+          to modify them.  We will facilitate this requirement through plugins
+          and the use of Parameter Value Language (PVL) definition files.   The
+          PVL syntax will be introduced gradually as the overall discussion of
+          automatic registration progresses.
+        </p>
+
+        <!-- Chips -->
+        <h2><a name="Chips">Chips</a></h2>
+        <p>
+          There are two chips used in automatic registration, the pattern chip
+          and the search chip.   We will discuss each in the following
+          sections.  For now we describe the basic elements of a chip, which is
+          nothing more than a sub-area of cube, generally small in size.  That
+          is, an NxM chip is defined to be an N sample by M line region of a
+          cube.  Some key elements about a chip are:
+
+          <ol>
+            <li>N and M are natural numbers (1, 2, 3, ...)</li>
+            <li>Like cubes, chip coordinates are sample/line and 1-based</li>
+            <li>The center of the chip is (N-1)/2+1 and (M-1)/2+1.</li>
+          </ol>
+
+          Because a chip is a region of a cube, there must a technique to "load"
+          the chip.  The primary method is to specify a cube coordinate
+          (sample/line) to be loaded at the center of the chip.
+        </p>
+
+        <h3><a name="PatternChip">Pattern Chip</a></h3>
+        <p>
+          A pattern chip will contain the data you would like to match.  In the
+          past we have called this the truth chip or hold chip.  Both of these
+          terms can be confusing.  The term truth has different meanings in
+          regards to match points and term hold is misleading as a pattern chip
+          actually floats through the search chip. So we refrain from their use
+          and stick with the term pattern chip.   The PVL for a pattern chip is:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = PatternChip
+                Samples = 5
+                Lines   = 5
+              End_Group
+            End_Object
+          </pre>
+        </p>
+
+        <h3><a name="SearchChip">Search Chip</a></h3>
+        <p>
+          The search chip is the area of the cube we believe the pattern will
+          fall in.  That is, we will walk the pattern chip through the search
+          chip looking for the best match.  Hopefully it is obvious the search
+          chip must be larger than the pattern chip. However, note that by
+          restricting the search chip size, we effectively define how far the
+          pattern chip is allowed deviate from a desired center search spot:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = PatternChip
+                Samples = 5
+                Lines   = 5
+              End_Group
+
+              Group = SearchChip
+                Samples = 21
+                Lines   = 21
+              End_Group
+            End_Object
+          </pre>
+        </p>
+
+        <h3><a name="Restrictions">Restrictions</a></h3>
+        <p>
+          Because the pattern chip and search chip are tightly coupled there are
+          some restrictions that must be put in place.  There are:
+
+          <ol>
+            <li>
+              N+M>=3 must be satisfied for the pattern chip.  This ensures the
+              pattern is not a single pixel.  However, in practice, small
+              pattern chips often match too many areas in a search chip.
+            </li>
+            <li>
+              We must satisfy N<sub>search</sub> >= N<sub>pattern</sub>+2 and
+              similarly for M.  This ensures that the pattern chip spans at
+              least a 3x3 window in the search chip.  This is subtle but
+              important requirement for surface fitting in order to compute
+              sub-pixel accuracy (which will be discussed later in this
+              document).
+            </li>
+          </ol>
+        </p>
+
+        <!-- Match Algorithms -->
+        <h2><a name="MatchAlgorithms">Match Algorithms</a></h2>
+        <p>
+          An objective of the Isis 3 automatic registration design is to allow
+          for a variety of match algorithms.  For example, an algorithm could be
+          developed that works best for matching MGS/MOC wide angle and Odyssey
+          Themis IR cameras.  For this objective to be met we will utilize
+          applications which allow automatic registration plugins.  This is
+          identical to applications which utilize camera and/or map projection
+          plugins such as cam2map, map2map, etc. 
+        </p>
+        <p>
+          The plugin algorithm will receive the pattern chip and a sub-region of
+          the search chip.  This sub-region will have the same dimensions as the
+          pattern chip to allow for a pixel-by-pixel comparison of the
+          chips.  The algorithm is expected to return single value that
+          represents the goodness of fit (GOF) between the two chips.   The
+          definition of the GOF is algorithm dependent.  For clarity, we present
+          two types of match algorithms in this document with the understanding
+          that more algorithms may be developed in the future.
+        </p>
+
+        <h3><a name="MinimumDifference">Minimum Difference</a></h3>
+        <p>
+          This match algorithm would perform a subtraction of the pattern chip
+          and the sub-region of the search chip over the valid pixel count. It
+          measures the average absolute difference per pixel. The actual equation would be:
+
+          <pre style="padding-left:4em;">
+            GOF =  (&#931; |pattern(i,j) - subregion(i,j)|) / count
+          </pre>
+
+          In this case, a GOF value of zero indicates a perfect match, while
+          larger values indicate a less likely match.  Obviously, negative
+          values could never occur.  This would be represented in PVL as:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = PatternChip
+                Samples = 5
+                Lines   = 5
+              End_Group
+
+              Group = SearchChip
+                Samples = 21
+                Lines   = 21
+              End_Group
+
+              Group = Algorithm 
+                Name = MinimumDifference
+              End_Group
+            End_Object
+          </pre>
+        </p>
+
+        <h3><a name="MaximumCorrelation">Maximum Correlation</a></h3>
+        <p>
+          This match algorithm would compute the correlation coefficient, R,
+          between the pattern chip and the sub-region of the search chip as
+          follows:
+
+          <pre style="padding-left:4em;">
+            R = Covariance(pattern, subregon) / [Variance(pattern) * Variance(subregion)]
+
+            where -1.0 &lt;= R &lt;= 1.0
+
+            GOF = |R|
+          </pre>
+
+          In this case, the goodness of fit will range from no correlation
+          (zero) to perfect correlation (one).  The PVL for this example would
+          be:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = PatternChip
+                Samples = 5
+                Lines   = 5
+              End_Group
+
+              Group = SearchChip
+                Samples = 21
+                Lines   = 21
+              End_Group
+
+              Group = Algorithm 
+                Name      = MaximumCorrelation
+              End_Group
+            End_Object
+          </pre>
+        </p>
+
+        <h3><a name="Tolerance">Tolerance</a></h3>
+        <p>
+          In both algorithms we will want to define a tolerance for goodness of
+          fit.   The tolerance test must be made by the plugin as the direction
+          of the test is dependent on the algorithm.  In our two examples
+          MinimumDifference would use a test for "less than" Tolerance while the
+          MaximumCorrelation would use "greater than" Tolerance.  This is
+          represented in PVL in the following fashion:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = PatternChip
+                Samples = 5
+                Lines   = 5
+              End_Group
+
+              Group = SearchChip
+                Samples = 21
+                Lines   = 21
+              End_Group
+
+              Group = Algorithm 
+                Name      = MaximumCorrelation
+                Tolerance = 0.7
+              End_Group
+            End_Object 
+          </pre>
+
+          In fact, the plugin will have significant control such that one, two,
+          or more tolerances or test conditions must be satisfied to accept the
+          match.  For example:
+
+          <pre style="padding-left:4em;">
+            Group = Algorithm 
+              Name      = SuperSpecialRegistration
+              Tolerance = 0.7
+              ChiSquare = 2.5
+              R         = 0.6
+              T         = 95.0
+            End_Group
+          </pre>
+        </p>
+
+        <!-- Creating a Fit Chip -->
+        <h2><a name="CreatingFitChip">Creating a Fit Chip</a></h2>
+        <p>
+          We define a third chip, the fit chip, which represents the goodness of
+          fit at each equivalent position in the search chip.  That is, we can
+          think of the pattern chip walking through the search chip and at each
+          position extract a sub-region to be used for computing a fit
+          value. After walking and computing at each position we have a chip
+          filled with goodness of fit values that are in 1-1 correspondence with
+          pixels in the search chip.  An example of the pattern chip weaving its
+          way through the search chip is given:
+        </p>
+        <img src="assets/exampleWalk.jpg" alt="Example Walk" />
+        <p>
+          How the pattern chip walks the search chip can vary; currently we
+          define two methods, a dense and sparse walk. 
+        </p>
+
+        <h3><a name="DenseWalk">Dense Walk</a></h3>
+        <p>
+          In the obvious case, we walk every possible position in the search
+          chip by starting in the upper-left corner and moving over by one
+          sample.  When we come to the right edge we will move down one line and
+          reset to the left edge.  However, we do not test where the pattern
+          would lie outside the search chip.  For example:
+        </p>
+        <img src="assets/denseWalk.jpg" alt="Dense Walk" />
+        <p>
+          In other words, we only test the pattern if it is fully inside of the
+          search chip.  This will be true for all walking scenarios.  Therefore,
+          if we have 3x3 pattern chip and a 7x7 search chip, we compute fits for
+          25 of the 49 pixels in the search chip.
+        </p>
+
+        <h3><a name="SparseWalk">Sparse Walk</a></h3>
+        <p>
+          A sparse walk uses a sample and line increment to move the pattern
+          chip.  The resultant fit chip will have a sparse sampling of
+          data.  The walking algorithm will search for the best goodness of fit
+          value in the sparse fit chip and then compute densely around that
+          point.  The advantage is that sparse walking will reduce the number of
+          computations, especially for large chips.  This is facilitated through
+          PVL as:
+
+          <pre style="padding-left:4em;">
+            Group = SearchChip
+              Samples     = 21
+              Lines       = 21
+              Density     = (2,3)
+            End_Group
+          </pre>
+
+          In this case, every other sample and every third line will be tested
+          in the search chip.  If density is not specified it defaults to (1,1)
+          which is a dense walk.  It is important to recognize there is a risk
+          using the sparse walk.  The algorithm can miss the best fit and
+          compute an incorrect pixel match.  So there is a speed versus accuracy
+          tradeoff.
+        </p>
+
+        <!-- Sub-Pixel Accuracy -->
+        <h2><a name="SubPixelAccuracy">Sub-Pixel Accuracy</a></h2>
+        <p>
+          Upon walking the pattern chip through the search chip we will have
+          created the fit chip.  The highest (or lowest) goodness of fit value
+          generally represents the position that best matched between the
+          pattern and search area.  It is however only good to one pixel
+          accuracy.
+        </p>
+        <p>
+          In many cases, the actual registration may lie somewhere between two
+          pixels. This is due to the fact that we are using a set of finite data
+          to estimate something that is in fact continuous.
+        </p>
+
+        <h3><a name="SurfaceModeling">Surface Modeling</a></h3>
+        <p>
+          To get around this problem, we can model a continuous mathematical
+          surface based on the data in the fit chip. By calculating a 2nd degree
+          2-dimentional polynomial given an NxN window of points, we have a
+          reasonable approximation under a given tolerance of the underlying
+          structure. We can then estimate the true registration position of the
+          chip on that surface.
+        </p>
+        <p>
+          Optionally, the window size and tolerance may be supplied through PVL:
+
+          <pre style="padding-left:4em;">
+            Group = SurfaceModel
+              DistanceTolerance = 2.5
+              WindowSize        = 7
+              EccentricityRatio = 50.0
+              ResidualTolerance = 0.05
+            End_Group
+          </pre>
+
+          The distance tolerance in pixels must be greater than 0 and is
+          defaulted to 1.0. The window size must be an odd number greater than 2
+          and is defaulted to 3.
+        </p>
+        <p>
+          The eccentricity ratio and residual tolerance correspond to the
+          optional eccentricity and average residual tests.  By default, neither
+          test is performed during surface model construction.  However, if the
+          SurfaceModel PVL group contains one of both of those keywords, it will
+          enable the respective test(s) with the given tolerance(s).  
+        </p>
+
+        <h3><a name="FindingLocalMinMax">Finding a Local Minimum/Maximum</a></h3>
+        <p>
+          After a surface is modeled over the data, we can use a number of
+          techniques to calculate the local extreme. For example, when using the
+          MinimumDifference algorithm the registration occurs at the minimal
+          value on the surface. The result should fall within one pixel of the
+          best calculated fit.
+        </p>
+        <p>
+          It is important to note that while the surface modeling option is on
+          by default it is possible to turn it off by using the SubpixelAccuracy
+          keyword. Example:
+
+          <pre style="padding-left:4em;">
+            Group = Algorithm 
+              Name             = MaximumCorrelation
+              Tolerance        = 0.7
+              SubpixelAccuracy = False
+            End_Group
+          </pre>
+
+          In this case, the whole pixel with the best fit is returned.
+        </p>
+        <p>
+          Also, if an ideal goodness of fit is found (e.g. 0.0 for
+          MinimumDifference or 1.0 for MaximumCorrelation), we have a perfect
+          fit and, thus, know it is in the best position. In this case, the
+          sub-pixel accuracy phase is omitted.
+        </p>
+
+        <!-- AdvancedFeatures -->
+        <h2><a name="AdvancedFeatures">Advanced Features</a></h2>
+        <p>
+          This section covers advanced features of automatic
+          registration.  While these features are not necessary in order to
+          accomplish the registration, they can be used to significantly improve
+          the chance of success and/or the accuracy of the match.
+        </p>
+
+        <h3><a name="RestrictingPixelRanges">Restricting Pixel Ranges</a></h3>
+        <p>
+          Pixels may be excluded from the match algorithm if they fall outside
+          of a specified range.  This range is independent for both the pattern
+          and search chip.  It is handled via the PVL as follows:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = PatternChip
+                Samples      = 5
+                Lines        = 5
+                ValidMinimum = 0.1
+                ValidMaximum = 0.4
+              End_Group
+
+              Group = SearchChip
+                Samples      = 21
+                Lines        = 21
+                ValidMinimum = 2.5
+                ValidMaximum = 10.5
+              End_Group
+
+              ...
+            End_Object
+          </pre>
+
+          If values are not given in the PVL then all pixels are considered
+          valid (with the exception of special pixels).
+        </p>
+
+        <h3><a name="ValidPixelCount">Valid Pixel Count</a></h3>
+        <p>
+          Prior to the match algorithm being invoked during the walk process, a
+          simple test is performed to ensure there are enough pixels to work
+          with.  Pixels are deemed valid if they are in the minimum/maximum
+          range and/or they are not special pixels.  The pattern chip is only
+          checked once.  If it does not contain enough valid pixels the match is
+          deemed to fail.  As the walk through occurs, the sub-region is
+          extracted from the search chip. If this sub-region does not have
+          enough valid pixels a match will be deemed to fail at that search
+          location.  In the following PVL example we have a 5x5 chip with 25
+          pixels of which 80% or more must be valid:
+
+          <pre style="padding-left:4em;">
+            Group = PatternChip
+              Samples      = 5
+              Lines        = 5
+              ValidMinimum = 0.1
+              ValidMaximum = 0.4
+              ValidPercent = 80
+            End_Group
+          </pre>
+
+          We only need to specify the percent for the pattern chip as the
+          sub-region chip of the search area will use the same value. 
+        </p>
+
+        <h3><a name="PCReduction">Reduction of Pattern Cubes</a></h3>
+        <p>
+          A technique for improving the accuracy of the automatic registration
+          is the repeated reduction of the pattern chip.  The strategy is to use
+          the initial size of the pattern chip to estimate the sub-pixel
+          sample/line in the search cube.  Then reduce the size of the pattern
+          chip and re-match about the estimated point within a limited
+          area.  The technique can be done iteratively all the while searching
+          for the "best" goodness of fit value among the shrinking pattern
+          chips.  This can be accomplished in PVL as follows:
+
+          <pre style="padding-left:4em;">
+            Group = PatternChip
+              Samples = (21,17,11)
+              Lines   = (21,17,11)
+            End_Group
+          </pre>
+
+          The above example finds an initial estimate using a 21x21 chip and
+          then refines using a 17x17 and 11x11 around the estimate. 
+        </p>
+        <p>
+          The amount the reduced chip can move is specified as a percentage of
+          the previous chips area. This is done by using the FloatPercent
+          keyword. If a single value is entered for the FloatPercent keyword, it
+          is used for all reduced pattern chips. For example:
+
+          <pre style="padding-left:4em;">
+            Group = PatternChip
+              Samples      = (21,17,11)
+              Lines        = (21,17,11)
+              FloatPercent = 50
+            End_Group
+          </pre>
+
+          In this example, each reduced chip is allowed to move with an area
+          that is 50% the size of the previous chip. So the 17x17 chip is
+          allowed to move within a 10x10 area and the 11x11 chip an 8x8 area.
+        </p>
+        <p>
+          It is also possible to specify a unique value for each reduced pattern
+          chip. This allows the user greater control over the final results. An
+          example is:
+
+          <pre style="padding-left:4em;">
+            Group = PatternChip
+              Samples      = (21,17,11)
+              Lines        = (21,17,11)
+              FloatPercent = (100,25)
+            End_Group
+          </pre>
+
+          Here, the 17x17 chip is limited to a 21x21 area (100% of the 21x21
+          chip) and the 11x11 chip a 4x4 area (25% of the 17x17 chip).
+        </p>
+        <p>
+          The ability to reduce the pattern chip has direct implications to the
+          valid pixel count.  That is, the specified percentage will be used for
+          each chip.  For example:
+
+          <pre style="padding-left:4em;">
+            Group = PatternChip
+              Samples      = (10,9)
+              Lines        = (10,9)
+              FloatPercent = 50
+              ValidPercent = 60
+            End_Group
+          </pre>
+
+          In this case a 10x10 chip has 100 pixels of which 60% must be
+          valid.  This will apply to all pattern chips and therefore the 9x9
+          chips must have at least 49 valid pixels (60% of 81).
+        </p>
+
+        <h3><a name="PCGeoReduction">Geometric Warping of Pattern Cubes</a></h3>
+        <p>
+          The pattern cube can be forced to match the geometry of the search
+          cube by using map projections and/or camera models.  Additionally,
+          rotations can be applied to the pattern cube.  The warping is
+          application dependent and therefore is under the control of the
+          programmer.  That is, there is no PVL mechanism for warp
+          selection/deselection.
+        </p>
+
+        <h3><a name="SamplingMatchAlgo">Sampling in the Match Algorithm</a></h3>
+        <p>
+          To increase the speed of the match algorithm data in the pattern chip
+          and the sub-region of the search chip can be sampled.  While the
+          sampling may cause the algorithm to run faster it may be at the
+          expense of finding the best registration.  In PVL:
+
+          <pre style="padding-left:4em;">
+            Group = PatternChip
+              Samples  = 10
+              Lines    = 10
+              Sampling = 50
+            End_Group
+          </pre>
+
+          In the above example, half of the data would be compared in the
+          matching algorithm. So, instead of looking at all 100 pixels, the
+          algorithm will compare 50 evenly spaced values.  If the sampling
+          keyword is not present then 100 is assumed and all data will be used.
+        </p>
+
+        <h3><a name="ZScoreTest">Z-Score Test</a></h3>
+        <p>
+          To guarantee an accurate match, we first need to check if the pattern
+          chip has enough variation to perform the algorithm on. This is done by
+          calculating the z-score of both the minimum and maximum values of the
+          chip. The z-score measures the number of standard deviations the value
+          is away from the mean. If the z-score for either value is greater than
+          the specified minimum value, then it is an acceptable pattern
+          chip. For example:
+
+          <pre style="padding-left:4em;">
+            Group = PatternChip 
+              MinimumZScore = 1.5
+            End_Group
+          </pre>
+
+          In this case, the chip's extreme values must be more than 1.5 standard
+          deviations away from the mean. If the MinimumZScore keyword is not
+          included, the default value of 1 standard deviation is used.
+        </p>
+      </body>
+
+      <type>HTML</type>
+      <source>
+        <filename>PatternMatch.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>guide</categoryItem>
+  </category>
+
+  <audience>
+    <target>advanced</target>
+  </audience>
+
+  <bibliography>
+    <title>Pattern Matching</title>
+    <brief>
+      A discussion of pattern matching techniques used in ISIS, designed to help
+      users construct automatic registration templates.
+    </brief>
+    <description>
+      This article describes the pattern matching techniques used for automatic
+      registration in ISIS.  The information is designed to give users an idea
+      of how they can alter their automatic registration templates to improve
+      their results from applications such as "pointreg" and "coreg".  This
+      should also give programmers a better understanding of how AutoReg works.
+    </description>
+    <author>Travis Addair</author>
+    <date>2011-02-23</date>
+  </bibliography>
+</documentation>
