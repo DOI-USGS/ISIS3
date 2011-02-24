@@ -102,6 +102,7 @@ namespace Isis {
    *   @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private
    *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
   *                                         (UpdatePoint, UpdateMeasure)
+  *    @history 2011-02-24 Sharmila Prasad - Fixed segmentation fault
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:

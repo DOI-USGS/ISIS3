@@ -299,7 +299,7 @@ namespace Isis {
       PvlGroup pvlMeasureGrp("MeasureDetails");
       pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
       pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation",
-                                        LocationString(newMeasure->GetSample(), newMeasure->GetLine()));
+                   LocationString(newMeasure->GetSample(), newMeasure->GetLine()));
 
       if (!newMeasure->IsIgnored()) {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
@@ -374,7 +374,7 @@ namespace Isis {
     mStatus.CheckStatus();
 
     // Process each existing control point in the network
-    for (int point = 0; point < pNewNet.GetNumMeasures(); ++point) {
+    for (int point = 0; point < pNewNet.GetNumPoints(); ++point) {
       ControlPoint *newPnt = pNewNet.GetPoint(point);
 
       // Create a copy of original control point
@@ -437,6 +437,9 @@ namespace Isis {
           bestCamera->SetImage(dBestSample, dBestLine);
           dReferenceLat = bestCamera->UniversalLatitude();
           dReferenceLon = bestCamera->UniversalLongitude();
+          
+          // Set the point reference
+          newPnt->SetRefMeasure(iBestMeasureIndex);
         }
 
         // Create a measurment for each image in this point using
@@ -481,8 +484,7 @@ namespace Isis {
                                           mtInterestResults[measure].mdBestLine, ControlMeasure::Candidate);
             //    newMeasure->SetType(ControlMeasure::Reference);
                 
-                if (newPnt == newMeasure->Parent())
-                  exit(68);
+
 
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation",  LocationString(mtInterestResults[measure].mdBestSample,
                                                   mtInterestResults[measure].mdBestLine));
@@ -548,7 +550,7 @@ namespace Isis {
           iPointsModified ++;
         }
 
-        if (!newPnt->IsIgnored() && iBestMeasureIndex != iOrigRefIndex) {
+        if (!newPnt->IsIgnored() && newPnt->HasReference() && iBestMeasureIndex != iOrigRefIndex) {
           iRefChanged ++;
           PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
           pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", mtInterestResults[iOrigRefIndex].msSerialNum);
@@ -690,7 +692,7 @@ namespace Isis {
    * @param piMeasure    - Index for Interest Results structure
    * @param pCnetMeasure - Control Measure for which the best interest
    *                       is calculated
-   *
+   * @param pCube        - Measure Cube
    * @return bool
    */
   bool InterestOperator::InterestByMeasure(int piMeasure, ControlMeasure &pCnetMeasure,
