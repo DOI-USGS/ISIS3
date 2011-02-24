@@ -124,7 +124,8 @@ namespace Isis {
    *                notification of measures added to or removed from points
    *                after the point is added to the network.
    *   @history 2011-02-23 Eric Hyer - Added some methods to support graphing
-   *                calculations (RandomBFS, Shuffle, and CalcBWAndCE).
+   *                calculations (RandomBFS, Shuffle, CalcBWAndCE, and
+   *                GetCubeConnections).
    */
   class ControlNet {
       friend class ControlPoint;
@@ -147,6 +148,7 @@ namespace Isis {
       bool ContainsPoint(iString pointId) const;
 
       QList< QString > GetCubeSerials() const;
+      QList< QList< QString > > GetCubeConnections() const;
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
       void DeleteMeasuresWithId(iString serialNumber);
 
@@ -203,7 +205,7 @@ namespace Isis {
 
 
     private: // graphing functions
-      QList< QString > RandomBFS() const;
+      QList< QString > RandomBFS(QList< QString > list) const;
       void Shuffle(QList< QString > & list) const;
       QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
 

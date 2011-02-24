@@ -610,8 +610,7 @@ namespace Isis {
    *
    * @returns A List of connected images
    */
-  QList< QString > ControlNet::RandomBFS() const {
-    QList< QString > serials = cubeGraphNodes->keys();
+  QList< QString > ControlNet::RandomBFS(QList< QString > serials) const {
     Shuffle(serials);
 
     // for keeping track of visited nodes
@@ -652,9 +651,9 @@ namespace Isis {
    */
   void ControlNet::Shuffle(QList< QString > & list) const {
     for (int i = list.size() - 1; i > 0; i--) {
-      // standard form is rand() / (RAND_MAX + 1.0) * (max + 1 - min) + min
+      // standard form is qrand() / (RAND_MAX + 1.0) * (max + 1 - min) + min
       // min is always zero here so it is simplified to...
-      int j = qrand() / (RAND_MAX + 1.0) * (i + 1);
+      int j = (int)(qrand() / (RAND_MAX + 1.0) * (i + 1));
       qSwap(list[j], list[i]);
     }
   }
@@ -782,6 +781,38 @@ namespace Isis {
     }
 
     return contains;
+  }
+
+
+  /**
+   * This method searches through all the cube serial numbers in the network.
+   * Serials which are connected to other serials through points are grouped
+   * together in the same lists.  The list containing the lists of strings is
+   * nothing more than a list of islands such that each island is a list of
+   * serials which are connected to each other.  If the control network is
+   * completely connected, then this list will only have one element (a list
+   * of all the serials in the network).
+   *
+   * @returns A list of cube islands
+   */
+  QList< QList< QString > > ControlNet::GetCubeConnections() const {
+    QList< QString > notYetFound = cubeGraphNodes->keys();
+    QList< QList< QString > > islands;
+
+    do {
+      // extract an island from the serials which are not yet found
+      QList< QString > island = RandomBFS(notYetFound);
+
+      // remove newly found serials from notYetFound
+      for (int i = 0; i < island.size(); i++)
+        notYetFound.removeOne(island[i]);
+
+      // Add island to list of islands
+      islands.append(island);
+    }
+    while (notYetFound.size());
+
+    return islands;
   }
 
 
