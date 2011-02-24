@@ -112,10 +112,9 @@ namespace Isis {
     }
 
     if (protoBufPt.has_referenceindex()) {
-      referenceMeasure = (*measures)[cubeSerials->at(protoBufPt.referenceindex())];
+      referenceMeasure =
+        (*measures)[cubeSerials->at(protoBufPt.referenceindex())];
     }
-
-
   }
 
 
@@ -132,8 +131,15 @@ namespace Isis {
     for (int m = 0 ; m < protoBufPt.measures_size() ; m++) {
       // Create a PControlMeasure and fill in it's info.
       // with the values from the input file.
-      ControlMeasure *measure = new ControlMeasure(protoBufPt.measures(m), logProtoBuf.measures(m));
+      ControlMeasure *measure =
+        new ControlMeasure(protoBufPt.measures(m), logProtoBuf.measures(m));
+
       AddMeasure(measure);
+    }
+
+    if (protoBufPt.has_referenceindex()) {
+      referenceMeasure =
+        (*measures)[cubeSerials->at(protoBufPt.referenceindex())];
     }
   }
 
