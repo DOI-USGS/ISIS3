@@ -55,6 +55,7 @@ namespace Isis {
    *                                         (UpdatePoint, UpdateMeasure)
    *   @history 2011-01-19 Christopher Austin - Altered to compile with the new
    *                                            Control redesign.
+   *   @history 2011-02-24 Sharmila Prasad - Fixed segmentation fault
    */
   class Pvl;
   class ControlNet;

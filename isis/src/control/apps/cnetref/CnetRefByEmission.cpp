@@ -10,6 +10,9 @@
 #include "SpecialPixel.h"
 #include "Pvl.h"
 
+
+using namespace std;
+
 namespace Isis {
   /**
    * Construct CnetRefByEmission with a PVL Def file
@@ -70,7 +73,7 @@ namespace Isis {
 
       int iRefIndex = -1;
       if (newPnt->HasReference())
-        newPnt->IndexOfRefMeasure();
+        iRefIndex = newPnt->IndexOfRefMeasure();
       iString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
@@ -86,9 +89,9 @@ namespace Isis {
         int iNumIgnore = 0;
         iString istrTemp;
         double dBestEmissionAngle = 135;
-
+        
         for (int measure = 0; measure < newPnt->GetNumMeasures(); ++measure) {
-
+          
           ControlMeasure *newMsr = newPnt->GetMeasure(measure);
           bool bMeasureLocked = newMsr->IsEditLocked();
           if (!bPntEditLock && !bMeasureLocked) {
@@ -162,7 +165,9 @@ namespace Isis {
         if (!newPnt->IsIgnored() && iBestIndex >= 0 &&
             !newPnt->GetMeasure(iBestIndex)->IsIgnored() &&
             !bPntEditLock && !bRefLocked) {
+          //cerr << "Point" << point << "  BestIndex=" << iBestIndex << " PrevIndex=" << iRefIndex;
           newPnt->SetRefMeasure(iBestIndex);
+          //cerr << " New Reference=" << newPnt->IndexOfRefMeasure() << endl;
           pvlGrpVector[iBestIndex] += Isis::PvlKeyword("Reference", "true");
           //newPnt.UpdateMeasure(cm); // Redesign fixed this
 
@@ -189,7 +194,7 @@ namespace Isis {
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
-        if (newPnt->GetType() == ControlPoint::Tie) {
+        if (newPnt->GetType() == ControlPoint::Ground) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
         }
@@ -210,7 +215,7 @@ namespace Isis {
         iPointsModified++;
       }
 
-      if (!newPnt->IsIgnored() && iBestIndex != iRefIndex &&
+      if (!newPnt->IsIgnored() && newPnt->HasReference() && iBestIndex != iRefIndex &&
           !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");

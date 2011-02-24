@@ -10,7 +10,6 @@ commands:
 	  cnet=$(INPUT)/autoseed.net \
 	  deffile=$(INPUT)/deffile.def \
 	  criteria=incidence \
-	  log=out.log \
 	  onet=$(OUTPUT)/truth.bin \
 	  networkid=DefaultTruth \
 	  Description=RefByIncidence > /dev/null;

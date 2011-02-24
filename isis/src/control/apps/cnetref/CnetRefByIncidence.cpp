@@ -69,7 +69,7 @@ namespace Isis {
 
       int iRefIndex = -1;
       if (newPnt->HasReference())
-        newPnt->IndexOfRefMeasure();
+        iRefIndex = newPnt->IndexOfRefMeasure();
       iString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
@@ -187,7 +187,7 @@ namespace Isis {
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
-        if (origPnt->GetType() == ControlPoint::Tie) {
+        if (origPnt->GetType() == ControlPoint::Ground) {
           std::string sComment = "Comment" + iComment++;
           pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
         }
@@ -208,7 +208,8 @@ namespace Isis {
         iPointsModified++;
       }
 
-      if (!newPnt->IsIgnored() && iBestIndex != iRefIndex && !bPntEditLock && !bRefLocked) {
+      if (!newPnt->IsIgnored() && newPnt->HasReference() && iBestIndex != iRefIndex 
+          && !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
         pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",
