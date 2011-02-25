@@ -71,7 +71,6 @@ void IsisMain() {
   std::set<iString> singleMeasureSerialNumbers;
   QMap< iString, std::set<iString> > singleMeasureControlPoints;
 
-  std::set<iString> duplicateSerialNumbers;
   QMap< iString, std::set<iString> > duplicateControlPoints;
 
   std::set<iString> noLatLonSerialNumbers;
@@ -155,14 +154,6 @@ void IsisMain() {
 
         // Records how many times a cube is in the ControlNet
         cubeMeasureCount[currentsn] ++;
-
-        // Compares previous ControlMeasure SerialNumbers with the current
-        for(int pre_cm = controlMeasures.size() - 1 - 1; pre_cm >= 0; pre_cm --) {
-          if(controlMeasures[pre_cm]->GetCubeSerialNumber() == currentsn) {
-            duplicateSerialNumbers.insert(currentsn);   //serial number duplication
-            duplicateControlPoints[currentsn].insert(controlpt->GetId());
-          }
-        }
 
         // Removes from the serial number list, cubes that are included in the cnet
         inListNums.erase(currentsn);
@@ -262,23 +253,6 @@ void IsisMain() {
     ss << " Control Measure." << std::endl;
     ss << "The serial numbers of these measures are listed in [";
     ss <<  Filename(name).Name() + "]" << std::endl;
-  }
-
-  if(ui.GetBoolean("DUPLICATE")  &&  duplicateSerialNumbers.size() > 0) {
-    results.AddKeyword(
-      PvlKeyword("DuplicateMeasures", iString((BigInt)duplicateSerialNumbers.size())));
-
-    iString name(Filename(prefix + "DuplicateMeasures.txt").Expanded());
-    WriteOutput(num2cube, name,
-                duplicateSerialNumbers, duplicateControlPoints);
-
-    ss << "----------------------------------------" \
-       "----------------------------------------" << std::endl;
-    ss << "There are " << duplicateSerialNumbers.size();
-    ss << " duplicate Control Measures in the";
-    ss << " Control Net." << std::endl;
-    ss << "The serial numbers of these duplicate Control Measures";
-    ss << " are listed in [" + Filename(name).Name() + "]" << std::endl;
   }
 
   if(ui.GetBoolean("NOLATLON")  &&  noLatLonSerialNumbers.size() > 0) {
