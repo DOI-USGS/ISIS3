@@ -15,10 +15,17 @@
     of all bands, this will be put in the "Common" object of the PVL.  Other 
     infomation will be for a given band and placed in the "BandSet" object. the 
     user can use the "output options" check boxes to control the infomation that 
-    will be output to the PVL.  If the polygon option is chosen, the image 
-    polygon is output in well known text format.  The following is an example of  
-    the output given when caminfo is ran:
-
+    will be output.  if the polygon option is chosen, the image polygon is 
+    output in well known text format.  
+     <br/> <br/>The output file can be in PVL or CSV (Comma Separated Value) 
+    format. There is an option "APPEND" to allow appending to the output file. 
+    This is especially useful for CSV file format. If the CSV format is chosen, 
+    only Camstats, Statistics and Geometry options are allowed. Isis Label, 
+    Original Label and Polygon options are disabled for CSV format. 
+     <br/> <br/>
+    
+      The following is an example of the output given when caminfo is ran in  
+      PVL Format: 
 <pre> 
     
 Object = Caminfo
@@ -64,50 +71,56 @@ Object = Caminfo
     TotalPixels       = 1048576
   End_Object
 
-  Object = Geometry
-    BandsUsed              = 1
-    ReferenceBand          = 1
-    OriginalBand           = 1
-    Target                 = Mercury
-    StartTime              = 2008-01-14T19:53:48.9698697
-    EndTime                = 2008-01-14T19:53:48.9698697
-    CenterLatitude         = -35.99699070995
-    CenterLongitude        = 183.5425629901
-    CenterRadius           = 2440000.0
-    UpperLeftLongitude     = 130.629425434
-    UpperLeftLatitude      = 2.2131023206612
-    LowerLeftLongitude     = NULL
-    LowerLeftLatitude      = NULL
-    LowerRightLongitude    = NULL
-    LowerRightLatitude     = NULL
-    UpperRightLongitude    = NULL
-    UpperRightLatitude     = NULL
-    PhaseAngle             = 61.158147083403
-    EmissionAngle          = 67.650944858113
-    IncidenceAngle         = 36.012241921332
-    NorthAzimuth           = 301.67928206242
-    OffNadir               = 7.0664149700808
-    SolarLongitude         = 251.5447380459
-    LocalTime              = 11.906107285401
-    TargetCenterDistance   = 2.2131023206612
-    SlantDistance          = 17277.206903028
-    SampleResolution       = 3082.7363142225
-    LineResolution         = 3082.7363142225
-    PixelResolution        = 3082.7363142225
-    MeanGroundResolution   = 3040.5954926264
-    SubSolarAzimuth        = 302.6826986422
-    SubSolarLatitude       = -0.010137623850141
-    SubSolarLongitude      = 184.95095370909
-    SubSpacecraftAzimuth   = 220.05494431655
-    SubSpacecraftLatitude  = -0.010137623850141
-    SubSpacecraftLongitude = 129.16259115677
-    ParallaxX              = 106.67119905901
-    ParallaxY              = -89.682221077406
-    ShadowX                = -22.488549587781
-    ShadowY                = -35.052794194572
-    HasLongitudeBoundary   = FALSE
-    HasNorthPole           = FALSE
-    HasSouthPole           = FALSE
+  Object = Geometry 
+    BandsUsed                  = 1 
+    ReferenceBand              = 1
+    OriginalBand               = 1
+    Target                     = Mercury
+    StartTime                  = 1979-09-06T09:42:01.9839999
+    EndTime                    = 1979-09-06T09:42:01.9839999
+    CenterLine                 = 528.0
+    CenterSample               = 602.0
+    CenterLatitude             = -85.647070453349
+    CenterLongitude            = 280.52753258698
+    CenterRadius               = 3381249.6758357
+    RightAscension             = 214.57706493749
+    Declination                = 17.783065469842
+    UpperLeftLongitude         = 284.18120564717
+    UpperLeftLatitude          = -76.54816017824
+    LowerLeftLongitude         = 266.57864612762
+    LowerLeftLatitude          = -78.179315870983
+    LowerRightLongitude        = NULL
+    LowerRightLatitude         = NULL
+    UpperRightLongitude        = NULL
+    UpperRightLatitude         = NULL
+    PhaseAngle                 = 122.53731928262
+    EmissionAngle              = 79.163772677816
+    IncidenceAngle             = 89.097477040277
+    NorthAzimuth               = 211.29679615977
+    OffNadir                   = 19.200345819794
+    SolarLongitude             = 351.56964491543
+    LocalTime                  = 20.521449284911
+    TargetCenterDistance       = 10098.012836425
+    SlantDistance              = 8900.6217339371
+    SampleResolution           = 220.72857994732
+    LineResolution             = 220.72857994732
+    PixelResolution            = 220.72857994732
+    MeanGroundResolution       = 219.735933647
+    SubSolarAzimuth            = 91.146512760785
+    SubSolarGroundAzimuth      = 232.04379716167
+    SubSolarLatitude           = -3.5774471997474
+    SubSolarLongitude          = 152.70579331331
+    SubSpacecraftAzimuth       = 188.58712541657
+    SubSpacecraftGroundAzimuth = 355.45863591601
+    SubSpacecraftLatitude      = -25.69675975172
+    SubSpacecraftLongitude     = 276.16490699194
+    ParallaxX                  = 295.97116689453
+    ParallaxY                  = -44.693405864191
+    ShadowX                    = 72.774354307711
+    ShadowY                    = 3636.3370314292
+    HasLongitudeBoundary       = TRUE
+    HasNorthPole               = FALSE
+    HasSouthPole               = TRUE
   End_Object
 
   Object = Polygon
@@ -249,40 +262,40 @@ End
       Fixed WKT calls
     </change>
     <change name="Tracie Sucharski" date="2007-11-09">
-      Remove ToWKT calls and PolygonTools.h inclusion.  The geos package now 
-      has a method to return a WKT string, so the ToWKT method has been 
-      removed from the PolygonTools class.
+        Remove ToWKT calls and PolygonTools.h inclusion.  The geos package now 
+        has a method to return a WKT string, so the ToWKT method has been 
+        removed from the PolygonTools class.
     </change>
-    <change name="Kris Becker" date="2007-12-07"> 
-      Made the following modifications:  fixed typo in PercentNull and 
-      MaximumLongitude keywords; use the base file name for generation of 
-      temporary files to further ensure uniqueness; run camstats once if 
-      there is only one band - doubles execution speed for single band 
-      images when CAMSTATS option is used; substitute the NULL string for 
-      all special pixel values; added corner pixel keywords for PDS 
-      compatibility; added phase, emission, incidence angles 
-      and line and sample pixel resolution at the center pixel; added test 
-      for intersection of longitude domain, north and south poles and 
-      keywords that report them; added option to output ISIS cube labels; 
-      corrected computations for parallax and shadow keywords.
-     </change>
-     <change name="Kris Becker" date="2007-12-19"> 
-       Renamed the HasLongitudeDomain keyword to HasLongitudeBoundary.  
-       Makes more sense.
-     </change>
-     <change name="Kris Becker" date="2008-02-27"> 
-       Corrected method call to compute polygon with proper parameters as 
-       well as correct band number.  Added code to better honor specific 
-       cube attributes (such as band numbers) in computations.  Also will 
-       produce NULL valued keywords where NULLs are a produced instead of 
-       the real value for the ISIS NULL pixel value.
-     </change>
+      <change name="Kris Becker" date="2007-12-07"> 
+          Made the following modifications:  fixed typo in PercentNull and 
+          MaximumLongitude keywords; use the base file name for generation of 
+          temporary files to further ensure uniqueness; run camstats once if 
+          there is only one band - doubles execution speed for single band 
+          images when CAMSTATS option is used; substitute the NULL string for 
+          all special pixel values; added corner pixel keywords for PDS 
+          compatibility; added phase, emission, incidence angles 
+          and line and sample pixel resolution at the center pixel; added test 
+          for intersection of longitude domain, north and south poles and 
+          keywords that report them; added option to output ISIS cube labels; 
+          corrected computations for parallax and shadow keywords.
+       </change>
+       <change name="Kris Becker" date="2007-12-19"> 
+           Renamed the HasLongitudeDomain keyword to HasLongitudeBoundary.  
+           Makes more sense.
+       </change>
+       <change name="Kris Becker" date="2008-02-27"> 
+           Corrected method call to compute polygon with proper parameters as 
+           well as correct band number.  Added code to better honor specific 
+           cube attributes (such as band numbers) in computations.  Also will 
+           produce NULL valued keywords where NULLs are a produced instead of 
+           the real value for the ISIS NULL pixel value.
+       </change>
      <change name="Steven Lambright" date="2008-05-12">
-        Removed references to CubeInfo 
+          Removed references to CubeInfo 
      </change>
      <change name="Bob Sucharski" date="2008-07-31">
-       Added Camera Test option  to test for a valid camera at center of image 
-       and return an error and end if a valid camera cannot be created.
+         Added Camera Test option  to test for a valid camera at center of image 
+         and return an error and end if a valid camera cannot be created.
      </change>
      <change name="Kris Becker" date="2008-09-22"> 
        Reworked the output PVL format;  added more keywords to the Common object 
@@ -290,64 +303,68 @@ End
        Polygon object.
      </change>
      <change name="Kris Becker" date="2008-10-22"> 
-       Corrected generation of polygon for multi-band data.  It created a 
-       POLYGON union instead of the required MULTIPOLYGON.
+         Corrected generation of polygon for multi-band data.  It created a 
+         POLYGON union instead of the required MULTIPOLYGON.
      </change>
      <change name="Kris Becker" date="2008-10-30"> 
-       The target center distance and subspacecraft latitude were not properly 
-       propagated to the output PVL file and consequently were invalid.  This 
-       has been corrected.
+         The target center distance and subspacecraft latitude were not properly 
+         propagated to the output PVL file and consequently were invalid.  This 
+         has been corrected.
      </change>
      <change name="Kris Becker" date="2008-12-29"> 
-       Added RightAscension, Declination, SubSolarGroundAzimuth, and
-       SubSpacecraftGroundAzimuth computations; added center line/sample image 
-       coordinate used to compute center geometry; added check of valid image 
-       line/sample coordinates when testing for north/south poles (some camera 
-       models return valid states when coordinates are outside of image 
-       boundaries).
+         Added RightAscension, Declination, SubSolarGroundAzimuth, and
+         SubSpacecraftGroundAzimuth computations; added center line/sample image 
+         coordinate used to compute center geometry; added check of valid image 
+         line/sample coordinates when testing for north/south poles (some camera 
+         models return valid states when coordinates are outside of image 
+         boundaries).
      </change>
      <change name="Kris Becker" date="2009-02-26"> 
-       Modified to actually exclude the unconditional computation of the image 
-       polygon to assist in some geometry values.  It is no longer computed if 
-       the user does not select the POLYGON option.  The implications of this 
-       are that some of the keywords in the output Geometry group are no 
-       longer ever relevant.  These keywords were all moved to the Polygon 
-       group.  These keywords are:   CentroidLine, CentroidSample, 
-       CentroidLatitude, CentroidLongitude, CentroidRadius and SurfaceArea.  
-       User will no longer see these values if the POLYGON option is not 
-       selected.  Also the Radius keyword in the Polygon group has been 
-       removed as it is redundant with CentroidRadius.
+         Modified to actually exclude the unconditional computation of the image 
+         polygon to assist in some geometry values.  It is no longer computed if 
+         the user does not select the POLYGON option.  The implications of this 
+         are that some of the keywords in the output Geometry group are no 
+         longer ever relevant.  These keywords were all moved to the Polygon 
+         group.  These keywords are:   CentroidLine, CentroidSample, 
+         CentroidLatitude, CentroidLongitude, CentroidRadius and SurfaceArea.  
+         User will no longer see these values if the POLYGON option is not 
+         selected.  Also the Radius keyword in the Polygon group has been 
+         removed as it is redundant with CentroidRadius.
      </change>
      <change name="Kris Becker" date="2009-05-29"> 
-       Added PIXINC parameter to allow user to specify number of pixels to 
-       skip around the perimiter of the image to compute the polygon.
+         Added PIXINC parameter to allow user to specify number of pixels to 
+         skip around the perimiter of the image to compute the polygon.
      </change>
      <change name="Kris Becker" date="2009-05-29"> 
-       Fixed bug where image was a 0 longitude boundary crosser.  It would 
-       typically fail when determining centroid information unless converted 
-       to 180 domain.  This will also be used at the poles as it seems to work 
-       better in the 180 domain as well.  (This process projects the footprint 
-       to a Sinusoidal projection to determine area which requires an equal 
-       area projection, such as Sinusoidal.)
+         Fixed bug where image was a 0 longitude boundary crosser.  It would 
+         typically fail when determining centroid information unless converted 
+         to 180 domain.  This will also be used at the poles as it seems to work 
+         better in the 180 domain as well.  (This process projects the footprint 
+         to a Sinusoidal projection to determine area which requires an equal 
+         area projection, such as Sinusoidal.)
      </change>
-     <change name="Kris Becker" date="2009-07-08">
-       Added the MAXEMISSION and MAXINCIDENCE limit parameters to better
-       control limb and terminator polygon generation.
-     </change>
-     <change name="Kris Becker" date="2009-08-24">
-       Allow disabling of shape model use when constructing polygons that 
-       contain limbs.
-     </change>
-     <change name="Mackenzie Boyd" date="2010-06-14">
-       Removed polygon options group and placed the options within output 
-       options. Added inclusion for parameters related to polygons to only be 
-       available when polygons are selected. Made TO option not have a 
-       default of None, updated documentation and modified formatting. 
-     </change>
-     <change name="Jai Rideout" date="2011-02-17">
+      <change name="Kris Becker" date="2009-07-08">
+          Added the MAXEMISSION and MAXINCIDENCE limit parameters to better
+          control limb and terminator polygon generation.
+      </change>
+      <change name="Kris Becker" date="2009-08-24">
+          Allow disabling of shape model use when constructing polygons that 
+          contain limbs.
+      </change>
+      <change name="Mackenzie Boyd" date="2010-06-14">
+          Removed polygon options group and placed the options within output 
+          options. Added inclusion for parameters related to polygons to only be 
+          available when polygons are selected. Made TO option not have a 
+          default of None, updated documentation and modified formatting. 
+      </change>
+    <change name="Jai Rideout" date="2011-02-17">
        Replaced PIXINC with POLYSINC and POLYLINC. Renamed SINC and LINC to
        STATSSINC and STATSLINC.
      </change>
+      <change name="Sharmila Prasad" date="2011-02-24">
+          Added option for the output file to be in CSV format and also ability 
+          to append to the existing output file.
+      </change>
   </history>
 
   <category>
@@ -388,6 +405,41 @@ End
       </group>
     
     <group name="Output Options">
+      <parameter name="FORMAT">
+        <type>string</type>
+         <default><item>PVL</item></default>
+         <brief>Format type of Output file (CSV or PVL)</brief>
+         <description>
+         Specify the Output format type, CSV or PVL style.
+         </description>
+         <list>
+           <option value="PVL">
+            <brief>Create PVL output</brief>
+            <description>
+               Cam info data to be generated in PVL format
+            </description>
+            </option>
+           <option value="CSV">
+            <brief> Create CSV output </brief>
+            <description>
+            Cam info data to be generated in Comma Separated Value (CSV) format
+            </description> 
+             <exclusions>
+               <item>ISISLABEL</item>
+               <item>ORIGINALLABEL</item>
+               <item>POLYGON</item>
+             </exclusions>
+           </option>
+         </list>
+      </parameter>
+      <parameter name="APPEND">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Append CamInfo to existing data</brief>
+        <description> Append CamInfo to existing data. This will append the 
+          caminfo data in a new line.
+         </description>
+      </parameter>
       <parameter name="GEOMETRY">
         <type>boolean</type>
         <brief>
