@@ -167,8 +167,8 @@ void IsisMain() {
 
 ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
     bool allowReferenceOverride, bool &mergeHasConflicts) {
-  ControlPoint *merger = point1;  // Merging from this one
-  ControlPoint *mergee = point2;        //   to this one
+  ControlPoint *merger = point1; // Merging from this one
+  ControlPoint *mergee = new ControlPoint(*point2); // to this one
   mergeHasConflicts = false;
 
   for (int mergerIndex = 0; mergerIndex < mergee->GetNumMeasures(); mergerIndex ++) {
