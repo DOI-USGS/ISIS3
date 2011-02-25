@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iomanip>
 
+#include <QVector>
+
 #include "Angle.h"
 #include "UniversalGroundMap.h"
 #include "Camera.h"
@@ -83,20 +85,44 @@ namespace Isis {
     Distance radius2 = Distance((double)(*p_mapping)["PolarRadius"],
         Distance::Meters);
 
-    p_minLat = new Latitude((*p_mapping)["MinimumLatitude"][0], *p_mapping,
-        Angle::Degrees);
-    p_maxLat = new Latitude((*p_mapping)["MaximumLatitude"][0], *p_mapping,
-        Angle::Degrees);
+    if(p_mapping->HasKeyword("MinimumLatitude")) {
+      p_minLat = new Latitude((*p_mapping)["MinimumLatitude"][0], *p_mapping,
+          Angle::Degrees);
+    }
+    else {
+      p_minLat = new Latitude;
+    }
 
-    p_minLon = new Longitude((*p_mapping)["MinimumLongitude"][0], *p_mapping,
-        Angle::Degrees);
-    p_maxLon = new Longitude((*p_mapping)["MaximumLongitude"][0], *p_mapping,
-        Angle::Degrees);
+    if(p_mapping->HasKeyword("MaximumLatitude")) {
+      p_maxLat = new Latitude((*p_mapping)["MaximumLatitude"][0], *p_mapping,
+          Angle::Degrees);
+    }
+    else {
+      p_maxLat = new Latitude;
+    }
 
-    if(*p_minLon > *p_maxLon) {
-      Longitude tmp(*p_minLon);
-      *p_minLon = *p_maxLon;
-      *p_maxLon = tmp;
+    if(p_mapping->HasKeyword("MinimumLongitude")) {
+      p_minLon = new Longitude((*p_mapping)["MinimumLongitude"][0], *p_mapping,
+          Angle::Degrees);
+    }
+    else {
+      p_minLon = new Longitude;
+    }
+
+    if(p_mapping->HasKeyword("MaximumLongitude")) {
+      p_maxLon = new Longitude((*p_mapping)["MaximumLongitude"][0], *p_mapping,
+          Angle::Degrees);
+    }
+    else {
+      p_maxLon = new Longitude;
+    }
+
+    if(p_minLon->Valid() && p_maxLon->Valid()) {
+      if(*p_minLon > *p_maxLon) {
+        Longitude tmp(*p_minLon);
+        *p_minLon = *p_maxLon;
+        *p_maxLon = tmp;
+      }
     }
 
     Distance largerRadius = max(radius1, radius2);
@@ -209,6 +235,46 @@ namespace Isis {
       }
     }
 
+    // Verify lat/lon range is okay
+    bool badLatLonRange = false;
+    QVector<iString> badLatLonValues;
+    if(!p_minLat || !p_minLat->Valid()) {
+      badLatLonValues.append("MinimumLatitude");
+      badLatLonRange = true;
+    }
+
+    if(!p_maxLat || !p_maxLat->Valid()) {
+      badLatLonValues.append("MaximumLatitude");
+      badLatLonRange = true;
+    }
+
+    if(!p_minLon || !p_minLon->Valid()) {
+      badLatLonValues.append("MinimumLongitude");
+      badLatLonRange = true;
+    }
+
+    if(!p_maxLon || !p_maxLon->Valid()) {
+      badLatLonValues.append("MaximumLongitude");
+      badLatLonRange = true;
+    }
+
+
+    if(badLatLonRange) {
+      iString msg = "Could not determine values for [";
+      for(int i = 0; i < badLatLonValues.size(); i++) {
+        if(i != 0)
+          msg += ",";
+
+        msg += badLatLonValues[i];
+      }
+
+      msg += "], please specify them explicitly";
+
+      // I chose parse because it's not really the user's fault or the
+      //   programmer's. It's a stripped keyword in a Pvl.
+      throw iException::Message(iException::Parse, msg, _FILEINFO_);
+    }
+
     // subsequent calls to this method must always reinitialize the grid
     p_reinitialize = true;
 
@@ -319,13 +385,13 @@ namespace Isis {
     if(minLon.Valid()) *p_minLon = minLon;
     if(maxLon.Valid()) *p_maxLon = maxLon;
 
-    if(*p_minLat > *p_maxLat) {
+    if(p_minLat->Valid() && p_maxLat->Valid() && *p_minLat > *p_maxLat) {
       Latitude tmp(*p_minLat);
       *p_minLat = *p_maxLat;
       *p_maxLat = tmp;
     }
 
-    if(*p_minLon > *p_maxLon) {
+    if(p_minLon->Valid() && p_maxLon->Valid() && *p_minLon > *p_maxLon) {
       Longitude tmp(*p_minLon);
       *p_minLon = *p_maxLon;
       *p_maxLon = tmp;

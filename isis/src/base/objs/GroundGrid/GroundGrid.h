@@ -49,6 +49,8 @@ namespace Isis {
    *   @history 2011-01-26 Steven Lambright Fixed a bug where the grid was not
    *            consistent on the edges and added SetGroundLimits and
    *            WalkBoundary for the new grid options Bound lat/lon range.
+   *   @history 2011-02-25 Steven Lambright Min/Max Lat/Lons do not have
+   *            to be known in the constructor any more
    */
   class GroundGrid {
     public:

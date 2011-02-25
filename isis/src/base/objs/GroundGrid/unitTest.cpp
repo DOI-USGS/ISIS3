@@ -8,6 +8,8 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Progress.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
 #include "UniversalGroundMap.h"
 
 using namespace std;
@@ -68,4 +70,25 @@ void IsisMain() {
   }
 
   cout << endl;
+
+  cout << "Error checking for no lat/lon range:\n";
+  try {
+    Cube incompleteLabelsCube;
+    incompleteLabelsCube.Open("./unitTest.cub");
+    UniversalGroundMap gmap(incompleteLabelsCube,
+        UniversalGroundMap::ProjectionFirst);
+    GroundGrid tmp(&gmap, false, someCube.Samples(), someCube.Lines());
+    Longitude invalidLon;
+    Latitude invalidLat;
+    tmp.SetGroundLimits(Latitude(28.572438078395002, Angle::Degrees),
+                         invalidLon, invalidLat,
+                         Longitude(-134.060950006448195, Angle::Degrees));
+    tmp.CreateGrid(Latitude(0, Angle::Degrees), Longitude(0, Angle::Degrees),
+        Angle(0.2, Angle::Degrees), Angle(0.2, Angle::Degrees),
+        &progress, Angle(0.1, Angle::Degrees), Angle(0.01, Angle::Degrees));
+  }
+  catch(iException &e) {
+    e.Report(false);
+    e.Clear();
+  }
 }
