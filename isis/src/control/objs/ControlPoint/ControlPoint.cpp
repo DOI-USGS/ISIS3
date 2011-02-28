@@ -642,8 +642,7 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    const ControlMeasure *cm = referenceMeasure;
-    return cm;
+    return referenceMeasure;
   }
 
 
@@ -1730,8 +1729,6 @@ namespace Isis {
    * @return ControlPoint&
    */
   const ControlPoint &ControlPoint::operator=(ControlPoint other) {
-    if (this == &other)
-      return *this;
 
     if (measures) {
       QList< QString > keys = measures->keys();
@@ -1755,11 +1752,18 @@ namespace Isis {
     QHashIterator< QString, ControlMeasure * > i(*other.measures);
     while (i.hasNext()) {
       i.next();
-      ControlMeasure *newMeasure = new ControlMeasure(*i.value());
+      ControlMeasure *newMeasure = new ControlMeasure;
+      *newMeasure = *i.value();
+      if (other.referenceMeasure == i.value())
+        referenceMeasure = newMeasure;
+      QString newSerial = newMeasure->GetCubeSerialNumber();
       newMeasure->parentPoint = this;
-      measures->insert(i.key(), newMeasure);
-      cubeSerials->append(i.key());
+      measures->insert(newSerial, newMeasure);
+      cubeSerials->append(newSerial);
     }
+
+    if (referenceMeasure == NULL && cubeSerials->size() != 0)
+      referenceMeasure = measures->value(cubeSerials->at(0));
 
     id             = other.id;
     chooserName    = other.chooserName;

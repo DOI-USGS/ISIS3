@@ -105,6 +105,127 @@ End_Object
 End
 Done printing point.
 
+Testing copy constructor...
+
+Printing point:
+Object = ControlPoint
+  PointType               = Ground
+  PointId                 = C151
+  ChooserName             = cnetref
+  DateTime                = 2005-05-03T00:00:00
+  EditLock                = True
+  Ignore                  = True
+  ReferenceIndex          = 1
+  AprioriXYZSource        = Basemap
+  AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
+  AprioriRadiusSource     = DEM
+  AprioriRadiusSourceFile = $base/dems/molaMarsPlanetaryRadius0003.cub
+  AprioriX                = -424.024048 <meters>
+  AprioriY                = 734.4311949 <meters>
+  AprioriZ                = 529.919264 <meters>
+  AprioriCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+  X                       = -424.024048 <meters>
+  Y                       = 734.4311949 <meters>
+  Z                       = 529.919264 <meters>
+  ApostCovarianceMatrix   = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+
+  Group = ControlMeasure
+    SerialNumber   = Test1
+    MeasureType    = Candidate
+    ChooserName    = seedgrid
+    DateTime       = 2005-05-03T00:00:00
+    Ignore         = True
+    Sample         = 1.0
+    Line           = 2.0
+    Diameter       = 15.0
+    AprioriSample  = 2.0
+    AprioriLine    = 5.0
+    SampleSigma    = 0.01 <pixels>
+    LineSigma      = 0.21 <pixels>
+    SampleResidual = -3.0 <pixels>
+    LineResidual   = 4.0 <pixels>
+  End_Group
+
+  Group = ControlMeasure
+    SerialNumber   = Test2
+    MeasureType    = Candidate
+    ChooserName    = seedgrid
+    DateTime       = 2005-05-03T00:00:00
+    Ignore         = True
+    Sample         = 100.0
+    Line           = 200.0
+    Diameter       = 15.0
+    AprioriSample  = 2.0
+    AprioriLine    = 5.0
+    SampleSigma    = 0.01 <pixels>
+    LineSigma      = 0.21 <pixels>
+    SampleResidual = -2.0 <pixels>
+    LineResidual   = 2.0 <pixels>
+  End_Group
+End_Object
+End
+Done printing point.
+
+Testing assignment operator...
+
+Printing point:
+Object = ControlPoint
+  PointType               = Ground
+  PointId                 = C151
+  ChooserName             = cnetref
+  DateTime                = 2005-05-03T00:00:00
+  Ignore                  = True
+  ReferenceIndex          = 0
+  AprioriXYZSource        = Basemap
+  AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
+  AprioriRadiusSource     = DEM
+  AprioriRadiusSourceFile = $base/dems/molaMarsPlanetaryRadius0003.cub
+  AprioriX                = -424.024048 <meters>
+  AprioriY                = 734.4311949 <meters>
+  AprioriZ                = 529.919264 <meters>
+  AprioriCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+  X                       = -424.024048 <meters>
+  Y                       = 734.4311949 <meters>
+  Z                       = 529.919264 <meters>
+  ApostCovarianceMatrix   = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+
+  Group = ControlMeasure
+    SerialNumber   = Test1
+    MeasureType    = Candidate
+    ChooserName    = seedgrid
+    DateTime       = 2005-05-03T00:00:00
+    Ignore         = True
+    Sample         = 1.0
+    Line           = 2.0
+    Diameter       = 15.0
+    AprioriSample  = 2.0
+    AprioriLine    = 5.0
+    SampleSigma    = 0.01 <pixels>
+    LineSigma      = 0.21 <pixels>
+    SampleResidual = -3.0 <pixels>
+    LineResidual   = 4.0 <pixels>
+  End_Group
+
+  Group = ControlMeasure
+    SerialNumber   = Test2
+    MeasureType    = Candidate
+    ChooserName    = seedgrid
+    DateTime       = 2005-05-03T00:00:00
+    Ignore         = True
+    Sample         = 100.0
+    Line           = 200.0
+    Diameter       = 15.0
+    AprioriSample  = 2.0
+    AprioriLine    = 5.0
+    SampleSigma    = 0.01 <pixels>
+    LineSigma      = 0.21 <pixels>
+    SampleResidual = -2.0 <pixels>
+    LineResidual   = 2.0 <pixels>
+  End_Group
+End_Object
+End
+Done printing point.
+
 Deleting ControlMeasure with cube serial number [Test1]
 Measure type: Candidate
 

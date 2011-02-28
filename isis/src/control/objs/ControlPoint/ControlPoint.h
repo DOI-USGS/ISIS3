@@ -212,6 +212,8 @@ namespace Isis {
    *   @history 2011-02-18 Eric Hyer - Added Delete(ControlMeasure *) method.
    *            Fixed bugs related to network notification of measure addition
    *            and deletion.
+   *   @history 2011-02-28 Eric Hyer - Fixed bug in operator= that caused the
+   *            the reference measure to not get propagated correctly
    */
   class ControlPoint {
       friend class ControlNet;

@@ -100,7 +100,17 @@ int main() {
   cp.SetEditLock(false);
   cp.SetRefMeasure(cm2);
   cp.SetEditLock(true);
+
   printPoint(cp);
+
+  cout << "Testing copy constructor...\n";
+  ControlPoint copy(cp);
+  copy.SetEditLock(false);
+  copy.SetRefMeasure(0);
+  printPoint(cp);
+  cout << "Testing assignment operator...\n";
+  ControlPoint assignment = copy;
+  printPoint(assignment);
 
   // Should be successful
   cout << "Deleting ControlMeasure with cube serial number [" << cp.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
