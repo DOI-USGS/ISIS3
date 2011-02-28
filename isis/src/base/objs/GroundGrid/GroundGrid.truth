@@ -397,5 +397,5 @@ Grid cutout with boundary walk:
 1111111111111111111111111111111111111111100000
 0000000000000000000000000000000000000000000000
 
-**PARSE ERROR** Could not determine values for [MaximumLatitude,MinimumLongitude], please specify them explicitly
 Error checking for no lat/lon range:
+**PARSE ERROR** Could not determine values for [MaximumLatitude,MinimumLongitude], please specify them explicitly

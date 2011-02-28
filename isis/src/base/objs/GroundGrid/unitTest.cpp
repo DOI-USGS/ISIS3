@@ -72,6 +72,7 @@ void IsisMain() {
   cout << endl;
 
   cout << "Error checking for no lat/lon range:\n";
+  cout.flush();
   try {
     Cube incompleteLabelsCube;
     incompleteLabelsCube.Open("./unitTest.cub");
