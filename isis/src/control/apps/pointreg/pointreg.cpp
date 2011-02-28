@@ -9,6 +9,7 @@
 #include "Chip.h"
 #include "ControlNet.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "CubeManager.h"
@@ -171,8 +172,12 @@ void IsisMain() {
 
             double score1, score2;
             ar->ZScores(score1, score2);
-            // TODO can no longer set z-scores on a Control Measure, how to
-            // output to log? add score1 and score2 to some pvl construct
+
+            // Set the minimum and maximum z-score values for the measure
+            measure->SetLogData(ControlMeasureLogData(
+                  ControlMeasureLogData::MinimumPixelZScore, score1));
+            measure->SetLogData(ControlMeasureLogData(
+                  ControlMeasureLogData::MaximumPixelZScore, score2));
 
             if (ar->Success()) {
               // Check to make sure the newly calculated measure position is on
@@ -192,7 +197,9 @@ void IsisMain() {
                     measure->GetSample() - ar->CubeSample(),
                     measure->GetLine() - ar->CubeLine());
                 measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
-                // TODO no longer set goodness of fit, but how to output to log?
+                measure->SetLogData(ControlMeasureLogData(
+                      ControlMeasureLogData::GoodnessOfFit,
+                      ar->GoodnessOfFit()));
                 measure->SetChooserName("Application pointreg");
                 measure->SetDateTime();
                 measure->SetIgnored(false);
@@ -224,7 +231,9 @@ void IsisMain() {
                   measure->SetResidual(
                       measure->GetSample() - ar->CubeSample(),
                       measure->GetLine() - ar->CubeLine());
-                  // TODO no longer set goodness of fit, but how to output to log?
+                  measure->SetLogData(ControlMeasureLogData(
+                        ControlMeasureLogData::GoodnessOfFit,
+                        ar->GoodnessOfFit()));
                 }
                 measure->SetChooserName("Application pointreg");
                 measure->SetDateTime();
@@ -299,7 +308,7 @@ void IsisMain() {
     os <<
        "PointId,OriginalMeasurementSample,OriginalMeasurementLine," <<
        "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleDifference," <<
-       "LineDifference" << endl;
+       "LineDifference,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
     os << NULL8 << endl;
 
     // Create a ControlNet from the original input file
@@ -316,7 +325,7 @@ void IsisMain() {
       if (!outPoint->IsIgnored()) {
         for (int i = 0; i < outPoint->GetNumMeasures(); i++) {
 
-          // get measure and find its corresponding measure from input net
+          // Get measure and find its corresponding measure from input net
           const ControlMeasure * cmTrans = outPoint->GetMeasure(i);
           const ControlMeasure * cmOrig =
               inPoint->GetMeasure((QString) cmTrans->GetCubeSerialNumber());
@@ -330,23 +339,25 @@ void IsisMain() {
           double sampErr = cmTrans->GetSampleResidual();
           double lineErr = cmTrans->GetLineResidual();
 
-          /* TODO long string of calculations derived from values that no longer
-           * exist in binary control networks
-           double zScoreMin = cmTrans->GetZScoreMin();
-           if(fabs(zScoreMin) <= DBL_EPSILON || zScoreMin == NULL8) zScoreMin = 0;
-           double zScoreMax = cmTrans->GetZScoreMax();
-           if(fabs(zScoreMax) <= DBL_EPSILON || zScoreMax == NULL8) zScoreMax = 0;
-           double goodnessOfFit = cmTrans->GoodnessOfFit();
-           if(fabs(goodnessOfFit) <= DBL_EPSILON || goodnessOfFit == NULL8) goodnessOfFit = 0;
-           */
+          double zScoreMin = cmTrans->GetLogData(
+              ControlMeasureLogData::MinimumPixelZScore).GetNumericalValue();
+          if(fabs(zScoreMin) <= DBL_EPSILON || zScoreMin == NULL8) zScoreMin = 0;
+
+          double zScoreMax = cmTrans->GetLogData(
+              ControlMeasureLogData::MaximumPixelZScore).GetNumericalValue();
+          if(fabs(zScoreMax) <= DBL_EPSILON || zScoreMax == NULL8) zScoreMax = 0;
+
+          double goodnessOfFit = cmTrans->GetLogData(
+              ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+          if(fabs(goodnessOfFit) <= DBL_EPSILON || goodnessOfFit == NULL8) goodnessOfFit = 0;
 
           string pointId = outPoint->GetId();
 
           os << pointId << "," << inSamp << ","
             << inLine << "," << outSamp << ","
             << outLine << "," << sampErr << ","
-            << lineErr << endl;
-          // TODO output zScoreMin, zScoreMax, goodnessOfFit
+            << lineErr << "," << zScoreMin << ","
+            << zScoreMax << "," << goodnessOfFit << endl;
         }
       }
     }
