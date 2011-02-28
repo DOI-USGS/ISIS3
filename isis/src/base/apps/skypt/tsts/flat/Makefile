@@ -12,7 +12,9 @@ commands:
 	$(APPNAME) from=$(INPUT)/lub0428b.253.cub \
 	  format=flat SAMP=15 LINE=15 \
 	  TO=$(OUTPUT)/skyptTemp2.txt > /dev/null; 
-	cut -d , -f 2- $(OUTPUT)/skyptTemp.txt >& $(OUTPUT)/skypt_1.txt;
-	cut -d , -f 2- $(OUTPUT)/skyptTemp2.txt >& $(OUTPUT)/skypt_2.txt;
+	cut -d , -f 2- $(OUTPUT)/skyptTemp.txt | \
+	  $(SED) 's/\(\.[0-9][0-9]\)\([0-9]*\)/\1/g' >& $(OUTPUT)/skypt_1.txt;
+	cut -d , -f 2- $(OUTPUT)/skyptTemp2.txt | \
+	  $(SED) 's/\(\.[0-9][0-9]\)\([0-9]*\)/\1/g' >& $(OUTPUT)/skypt_2.txt;
 	rm $(OUTPUT)/skyptTemp.txt;
 	rm $(OUTPUT)/skyptTemp2.txt;
