@@ -1,6 +1,7 @@
 APPNAME = cam2map
 
 cam2mapTruth.cub.TOLERANCE = .000001
+cam2mapCheckRange.cub.TOLERANCE = .000001
 
 include $(ISISROOT)/make/isismake.tsts
 
