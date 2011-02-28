@@ -48,6 +48,7 @@ namespace Isis {
     editLock = false;
     ignore = false;
     jigsawRejected = false;
+    referenceExplicitlySet = false;
     aprioriSurfacePointSource = SurfacePointSource::None;
     aprioriRadiusSource = RadiusSource::None;
     parentNetwork = NULL;
@@ -85,6 +86,7 @@ namespace Isis {
     invalid = other.invalid;
     editLock = other.editLock;
     jigsawRejected = other.jigsawRejected;
+    referenceExplicitlySet = other.referenceExplicitlySet;
     ignore = other.ignore;
     aprioriSurfacePointSource = other.aprioriSurfacePointSource;
     aprioriSurfacePointSourceFile = other.aprioriSurfacePointSourceFile;
@@ -112,8 +114,13 @@ namespace Isis {
     }
 
     if (protoBufPt.has_referenceindex()) {
+      referenceExplicitlySet = true;
+
       referenceMeasure =
         (*measures)[cubeSerials->at(protoBufPt.referenceindex())];
+    }
+    else {
+      referenceExplicitlySet = false;
     }
   }
 
@@ -138,8 +145,13 @@ namespace Isis {
     }
 
     if (protoBufPt.has_referenceindex()) {
+      referenceExplicitlySet = true;
+
       referenceMeasure =
         (*measures)[cubeSerials->at(protoBufPt.referenceindex())];
+    }
+    else {
+      referenceExplicitlySet = false;
     }
   }
 
@@ -160,6 +172,7 @@ namespace Isis {
     type = Tie;
     editLock = false;
     jigsawRejected = false;
+    referenceExplicitlySet = false;
     ignore = false;
     aprioriSurfacePointSource = SurfacePointSource::None;
     aprioriRadiusSource = RadiusSource::None;
@@ -414,11 +427,6 @@ namespace Isis {
       chooserName = p["ChooserName"][0];
     if (p.HasKeyword("DateTime"))
       dateTime = p["DateTime"][0];
-    if (p.HasKeyword("EditLock")) {
-      iString locked = (std::string)p["EditLock"];
-      if (locked.DownCase() == "true")
-        editLock = true;
-    }
     if (p.HasKeyword("JigsawRejected")) {
       iString reject = p["JigsawRejected"][0];
       if (reject.DownCase() == "true")
@@ -434,8 +442,9 @@ namespace Isis {
           cm->Load(measureGroup);
           AddMeasure(cm);
           try {
-            if (measureGroup.FindKeyword("Reference")[0].UpCase() == "TRUE")
+            if (measureGroup.FindKeyword("Reference")[0].UpCase() == "TRUE") {
               SetRefMeasure(cm);
+            }
           }
           catch (iException &e) {
             e.Clear();
@@ -447,6 +456,12 @@ namespace Isis {
             GetId() + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
+    }
+
+    if (p.HasKeyword("EditLock")) {
+      iString locked = (std::string)p["EditLock"];
+      if (locked.DownCase() == "true")
+        editLock = true;
     }
   }
 
@@ -496,7 +511,7 @@ namespace Isis {
    *
    * @param sn The serial number of the measure to validate
    */
-  void ControlPoint::validateMeasure(iString serialNumber) const {
+  void ControlPoint::ValidateMeasure(iString serialNumber) const {
     if (!measures->contains(serialNumber)) {
       iString msg = "No measure with serial number [" + serialNumber +
           "] is owned by this point";
@@ -512,7 +527,7 @@ namespace Isis {
    * @param serialNumber The serial number of the measure to delete
    */
   void ControlPoint::Delete(iString serialNumber) {
-    validateMeasure(serialNumber);
+    ValidateMeasure(serialNumber);
     ControlMeasure *cm = (*measures)[serialNumber];
 
     // remove measure from the point's data structures
@@ -521,8 +536,10 @@ namespace Isis {
 
     // update the reference measure
     if (cubeSerials->size()) {
-      if (referenceMeasure == cm)
+      if (referenceMeasure == cm) {
         referenceMeasure = (*measures)[cubeSerials->at(0)];
+        referenceExplicitlySet = false;
+      }
     }
     else {
       referenceMeasure = NULL;
@@ -594,7 +611,7 @@ namespace Isis {
    * @returns control measure with matching serial number
    */
   ControlMeasure *ControlPoint::GetMeasure(iString serialNumber) {
-    validateMeasure(serialNumber);
+    ValidateMeasure(serialNumber);
     return (*measures)[serialNumber];
   }
 
@@ -606,7 +623,7 @@ namespace Isis {
    * @returns const control measure with matching serial number
    */
   const ControlMeasure *ControlPoint::GetMeasure(iString serialNumber) const {
-    validateMeasure(serialNumber);
+    ValidateMeasure(serialNumber);
     return measures->value(serialNumber);
   }
 
@@ -741,6 +758,7 @@ namespace Isis {
       return PointLocked;
 
     ASSERT(cm);
+    referenceExplicitlySet = true;
     referenceMeasure = cm;
     return Success;
   }
@@ -761,6 +779,7 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    referenceExplicitlySet = true;
     referenceMeasure = (*measures)[cubeSerials->at(index)];
     return Success;
   }
@@ -781,6 +800,7 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    referenceExplicitlySet = true;
     referenceMeasure = (*measures)[sn];
     return Success;
   }
@@ -1354,7 +1374,7 @@ namespace Isis {
 
 
   ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
-  const {
+      const {
     return aprioriRadiusSource;
   }
 
@@ -1422,10 +1442,11 @@ namespace Isis {
 
 
   /**
-   * @returns true if there is a Reference measure, and false otherwise
+   * @returns true Returns true if SetRefMeasure has ever been set on this
+   *               point.
    */
-  bool ControlPoint::HasReference() const {
-    return referenceMeasure != NULL;
+  bool ControlPoint::ReferenceHasBeenExplicitlySet() const {
+    return referenceExplicitlySet;
   }
 
 
@@ -1548,11 +1569,6 @@ namespace Isis {
       p += PvlKeyword("Ignore", "True");
     }
 
-    if (referenceMeasure) {
-      int refIndex = IndexOfRefMeasure();
-      p += PvlKeyword("ReferenceIndex", refIndex);
-    }
-
     switch (aprioriSurfacePointSource) {
       case SurfacePointSource::None:
         break;
@@ -1628,8 +1644,15 @@ namespace Isis {
       }
     }
 
-    for (int i = 0; i < cubeSerials->size(); i++)
+    for (int i = 0; i < cubeSerials->size(); i++) {
       p.AddGroup((*measures)[cubeSerials->at(i)]->CreatePvlGroup());
+
+      if(ReferenceHasBeenExplicitlySet() &&
+         referenceMeasure == (*measures)[cubeSerials->at(i)]) {
+        p.Group(p.Groups() - 1).AddKeyword(
+            PvlKeyword("Reference", "True"));
+      }
+    }
 
     return p;
   }
@@ -1772,6 +1795,7 @@ namespace Isis {
     invalid        = other.invalid;
     editLock       = other.editLock;
     jigsawRejected = other.jigsawRejected;
+    referenceExplicitlySet = other.referenceExplicitlySet;
     ignore         = other.ignore;
     aprioriSurfacePointSource      = other.aprioriSurfacePointSource;
     aprioriSurfacePointSourceFile  = other.aprioriSurfacePointSourceFile;
@@ -1984,7 +2008,7 @@ namespace Isis {
     if (IsRejected())
       pbPoint.set_jigsawrejected(true);
 
-    if (referenceMeasure) {
+    if (referenceMeasure && referenceExplicitlySet) {
       pbPoint.set_referenceindex(IndexOfRefMeasure());
     }
 

@@ -9,7 +9,6 @@ Object = ControlPoint
   DateTime                = 2005-05-03T00:00:00
   EditLock                = True
   Ignore                  = True
-  ReferenceIndex          = 0
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -54,7 +53,6 @@ Object = ControlPoint
   DateTime                = 2005-05-03T00:00:00
   EditLock                = True
   Ignore                  = True
-  ReferenceIndex          = 1
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -100,6 +98,7 @@ Object = ControlPoint
     LineSigma      = 0.21 <pixels>
     SampleResidual = -2.0 <pixels>
     LineResidual   = 2.0 <pixels>
+    Reference      = True
   End_Group
 End_Object
 End
@@ -115,7 +114,6 @@ Object = ControlPoint
   DateTime                = 2005-05-03T00:00:00
   EditLock                = True
   Ignore                  = True
-  ReferenceIndex          = 1
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -161,6 +159,7 @@ Object = ControlPoint
     LineSigma      = 0.21 <pixels>
     SampleResidual = -2.0 <pixels>
     LineResidual   = 2.0 <pixels>
+    Reference      = True
   End_Group
 End_Object
 End
@@ -175,7 +174,6 @@ Object = ControlPoint
   ChooserName             = cnetref
   DateTime                = 2005-05-03T00:00:00
   Ignore                  = True
-  ReferenceIndex          = 0
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -204,6 +202,7 @@ Object = ControlPoint
     LineSigma      = 0.21 <pixels>
     SampleResidual = -3.0 <pixels>
     LineResidual   = 4.0 <pixels>
+    Reference      = True
   End_Group
 
   Group = ControlMeasure
@@ -237,7 +236,6 @@ Object = ControlPoint
   DateTime                = 2005-05-03T00:00:00
   EditLock                = True
   Ignore                  = True
-  ReferenceIndex          = 0
   AprioriXYZSource        = Basemap
   AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
   AprioriRadiusSource     = DEM
@@ -266,6 +264,7 @@ Object = ControlPoint
     LineSigma      = 0.21 <pixels>
     SampleResidual = -2.0 <pixels>
     LineResidual   = 2.0 <pixels>
+    Reference      = True
   End_Group
 End_Object
 End
@@ -297,3 +296,9 @@ Aposteriori Sigma X = 10
 Aposteriori Sigma Y = 50
 Aposteriori Sigma Z = 20
 
+Testing ReferenceHasBeenExplicitlySet...
+cp:                    1
+newCp:                 0
+newCp with implicit:   0
+newCp with explicit:   1
+newCp reverted to implicit:   0

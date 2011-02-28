@@ -361,12 +361,12 @@ namespace Qisis {
     // Check if ControlPoint has reference measure, if reference Measure is
     // not the same measure that is on the left chip viewport, set left
     // measure as reference.
-    if (p_controlPoint->HasReference()) {
+    if (p_controlPoint->ReferenceHasBeenExplicitlySet()) {
       Isis::ControlMeasure *refMeasure = p_controlPoint->GetRefMeasure();
       if (refMeasure != p_leftMeasure) {
         switch (QMessageBox::question((QWidget *)parent(),
             "Qnet Tool Save Point",
-            "This point already contains a reference measure.  Would you like to replace it with the measure on the left?",
+            "Would you like to change the reference measure to the measure on the left?",
             "&Yes", "&No", 0, 0)) {
           case 0: // Yes was clicked or Enter was pressed, replace reference
             p_controlPoint->SetRefMeasure(p_leftMeasure);
@@ -1044,17 +1044,8 @@ namespace Qisis {
     //
     //  Find the file from the cubeViewport that was originally used to select
     //  the point, this will be displayed on the left ChipViewport.
-    int leftIndex = 0;
-    //  Check for reference
-    if (p_controlPoint->HasReference()) {
-      leftIndex = p_controlPoint->IndexOfRefMeasure();
-    }
-    else {
-      if (p_leftFile.length() != 0) {
-        iString tempFilename = Isis::Filename(p_leftFile).Name();
-        leftIndex = p_leftCombo->findText(tempFilename);
-      }
-    }
+    int leftIndex = p_controlPoint->IndexOfRefMeasure();
+
     int rightIndex = 0;
 
     if (leftIndex == 0) {

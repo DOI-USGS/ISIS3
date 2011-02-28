@@ -219,11 +219,7 @@ void IsisMain() {
 
     for(int i = 0 ; i < precnet.GetNumPoints(); i ++) {
       ControlPoint *cp = precnet.GetPoint(i);
-      ControlMeasure *cm = cp->GetMeasure(0);
-      if(cp->HasReference()) {
-        cm = cp->GetRefMeasure();
-      }
-
+      ControlMeasure *cm = cp->GetRefMeasure();
       iString c = serialNumbers.Filename(cm->GetCubeSerialNumber());
       Pvl cubepvl(c);
       Camera *cam = CameraFactory::Create(cubepvl);

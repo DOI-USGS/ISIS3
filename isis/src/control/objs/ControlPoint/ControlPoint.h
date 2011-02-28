@@ -214,6 +214,9 @@ namespace Isis {
    *            and deletion.
    *   @history 2011-02-28 Eric Hyer - Fixed bug in operator= that caused the
    *            the reference measure to not get propagated correctly
+   *   @history 2011-02-28 Steven Lambright - Added a flag for cnetref to say
+   *            whether a reference measure has been explicitly or implicitly
+   *            set.
    */
   class ControlPoint {
       friend class ControlNet;
@@ -367,7 +370,7 @@ namespace Isis {
       int  IndexOf(ControlMeasure *, bool throws = true) const;
       int  IndexOf(iString sn, bool throws = true) const;
       int  IndexOfRefMeasure() const;
-      bool HasReference() const;
+      bool ReferenceHasBeenExplicitlySet() const;
       QString GetReferenceSN() const;
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
@@ -397,7 +400,7 @@ namespace Isis {
 
 
     private:
-      void validateMeasure(iString serialNumber) const;
+      void ValidateMeasure(iString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
       void Init(const PBControlNet_PBControlPoint &);
       void PointModified();
@@ -460,6 +463,14 @@ namespace Isis {
        * @see SetJigsawReject
        */
       bool jigsawRejected;
+
+      /**
+       * This indicates if a program has explicitely set the reference in this
+       *   point or the implicit reference is still the current reference. This
+       *   is useful for programs that want to choose the reference for all
+       *   points where this hasn't happened yet.
+       */
+      bool referenceExplicitlySet;
 
       /**
        * True if we should preserve but ignore the entire control point and its

@@ -104,13 +104,9 @@ namespace Qisis {
       if ((lat1 == Isis::Null) || (lon1 == Isis::Null)) {
         Isis::Camera *cam1;
         Isis::ControlMeasure cm1;
-        // first try to get info from reference measure, if one exists
-        if (cp1.HasReference()) {
-          cm1 = *cp1.GetRefMeasure();
-        }
-        // if no reference measure exists, use the first control measure of the point
-        else
-          cm1 = *cp1[0];
+
+        cm1 = *cp1.GetRefMeasure();
+
         int camIndex1 = g_serialNumberList->SerialNumberIndex(cm1.GetCubeSerialNumber());
         cam1 = g_controlNetwork->Camera(camIndex1);
         cam1->SetImage(cm1.GetSample(), cm1.GetLine());
@@ -133,13 +129,7 @@ namespace Qisis {
         if ((lat2 == Isis::Null) || (lon2 == Isis::Null)) {
           Isis::Camera *cam2;
           Isis::ControlMeasure cm2;
-          // first try to get info from reference measure, if one exists
-          if (cp2.HasReference()) {
-            cm2 = *cp2.GetRefMeasure();
-          }
-          // if no reference measure exists, use the first control measure of the point
-          else
-            cm2 = *cp2[0];
+          cm2 = *cp2.GetRefMeasure();
           int camIndex2 = g_serialNumberList->SerialNumberIndex(cm2.GetCubeSerialNumber());
           cam2 = g_controlNetwork->Camera(camIndex2);
           cam2->SetImage(cm2.GetSample(), cm2.GetLine());

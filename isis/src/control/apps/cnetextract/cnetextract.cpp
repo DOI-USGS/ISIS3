@@ -515,19 +515,15 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
       Distance radius;
 
       // First check the reference Measure
-      if(controlPt->HasReference()) {
-        //cm = controlPt->GetReferenceIndex();
-        //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
-        if(!sn2filename[controlPt->GetReferenceSN()].length() == 0) {
-          sn = controlPt->GetReferenceSN();
-        }
+      //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
+      if(!sn2filename[controlPt->GetReferenceSN()].length() == 0) {
+        sn = controlPt->GetReferenceSN();
       }
 
       // Search for other Control Measures if needed
       if(sn.empty()) {
         // Find the Serial Number if it exists
         for(int cm = 0; (cm < controlPt->GetNumMeasures()) && sn.empty(); cm ++) {
-          //if(!sn2filename[controlPt[cm].GetCubeSerialNumber()].length() == 0) {
           if(!sn2filename[controlPt->GetReferenceSN()].length() == 0) {
             sn = controlPt->GetReferenceSN();
           }

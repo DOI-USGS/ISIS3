@@ -33,7 +33,6 @@ Object = ControlNetwork
     ChooserName             = autoseed
     DateTime                = 2010-08-27T17:10:06
     EditLock                = True
-    ReferenceIndex          = 0
     AprioriXYZSource        = Basemap
     AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
     AprioriRadiusSource     = DEM
@@ -63,6 +62,7 @@ Object = ControlNetwork
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
       GoodnessOfFit  = 0.53523
+      Reference      = True
     End_Group
 
     Group = ControlMeasure
@@ -85,12 +85,11 @@ Object = ControlNetwork
   End_Object
 
   Object = ControlPoint
-    PointType      = Tie
-    PointId        = T0001
-    ChooserName    = autoseed
-    DateTime       = 2010-08-27T17:10:06
-    Ignore         = True
-    ReferenceIndex = 0
+    PointType   = Tie
+    PointId     = T0001
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+    Ignore      = True
 
     Group = ControlMeasure
       SerialNumber   = id0
@@ -108,6 +107,7 @@ Object = ControlNetwork
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
       GoodnessOfFit  = 0.53523
+      Reference      = True
     End_Group
 
     Group = ControlMeasure
@@ -130,11 +130,10 @@ Object = ControlNetwork
   End_Object
 
   Object = ControlPoint
-    PointType      = Tie
-    PointId        = T0003
-    ChooserName    = autoseed
-    DateTime       = 2010-08-27T17:10:06
-    ReferenceIndex = 0
+    PointType   = Tie
+    PointId     = T0003
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
 
     Group = ControlMeasure
       SerialNumber   = id0
@@ -152,6 +151,7 @@ Object = ControlNetwork
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
       GoodnessOfFit  = 0.53523
+      Reference      = True
     End_Group
 
     Group = ControlMeasure
@@ -174,11 +174,10 @@ Object = ControlNetwork
   End_Object
 
   Object = ControlPoint
-    PointType      = Tie
-    PointId        = T0004
-    ChooserName    = autoseed
-    DateTime       = 2010-08-27T17:10:06
-    ReferenceIndex = 0
+    PointType   = Tie
+    PointId     = T0004
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
 
     Group = ControlMeasure
       SerialNumber   = id0
@@ -196,6 +195,7 @@ Object = ControlNetwork
       SampleResidual = -3.0 <pixels>
       LineResidual   = 4.0 <pixels>
       GoodnessOfFit  = 0.53523
+      Reference      = True
     End_Group
 
     Group = ControlMeasure

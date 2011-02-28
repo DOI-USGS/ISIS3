@@ -179,6 +179,45 @@ int main() {
   cout << "Aposteriori Sigma Z = " << point.GetZSigma().GetMeters() << endl;
 
   cout << endl;
+
+  cout << "Testing ReferenceHasBeenExplicitlySet..." << endl;
+  cout << "cp:                    " << cp.ReferenceHasBeenExplicitlySet() << endl;
+
+  ControlMeasure *cm3 = new ControlMeasure;
+  cm3->SetCubeSerialNumber("Test1");
+  cm3->SetIgnored(true);
+  cm3->SetCoordinate(1.0, 2.0);
+  cm3->SetResidual(-3.0, 4.0);
+  cm3->SetDiameter(15.0);
+  cm3->SetAprioriSample(2.0);
+  cm3->SetAprioriLine(5.0);
+  cm3->SetSampleSigma(.01);
+  cm3->SetLineSigma(.21);
+  cm3->SetChooserName("seedgrid");
+  cm3->SetDateTime("2005-05-03T00:00:00");
+
+  ControlMeasure *cm4 = new ControlMeasure;
+  cm4->SetCubeSerialNumber("Test2");
+  cm4->SetIgnored(true);
+  cm4->SetCoordinate(1.0, 2.0);
+  cm4->SetResidual(-3.0, 4.0);
+  cm4->SetDiameter(15.0);
+  cm4->SetAprioriSample(2.0);
+  cm4->SetAprioriLine(5.0);
+  cm4->SetSampleSigma(.01);
+  cm4->SetLineSigma(.21);
+  cm4->SetChooserName("seedgrid");
+  cm4->SetDateTime("2005-05-03T00:00:00");
+
+  ControlPoint newCp;
+  cout << "newCp:                 " << newCp.ReferenceHasBeenExplicitlySet() << endl;
+  newCp.Add(cm3);
+  cout << "newCp with implicit:   " << newCp.ReferenceHasBeenExplicitlySet() << endl;
+  newCp.Add(cm4);
+  newCp.SetRefMeasure(cm3);
+  cout << "newCp with explicit:   " << newCp.ReferenceHasBeenExplicitlySet() << endl;
+  newCp.Delete(cm3);
+  cout << "newCp reverted to implicit:   " << newCp.ReferenceHasBeenExplicitlySet() << endl;
 }
 
 void printPoint(Isis::ControlPoint &p) {

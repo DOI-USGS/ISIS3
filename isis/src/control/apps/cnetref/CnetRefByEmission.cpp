@@ -72,7 +72,7 @@ namespace Isis {
       bool bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
 
       int iRefIndex = -1;
-      if (newPnt->HasReference())
+      if (newPnt->ReferenceHasBeenExplicitlySet())
         iRefIndex = newPnt->IndexOfRefMeasure();
       iString istrTemp;
 
@@ -215,8 +215,8 @@ namespace Isis {
         iPointsModified++;
       }
 
-      if (!newPnt->IsIgnored() && newPnt->HasReference() && iBestIndex != iRefIndex &&
-          !bPntEditLock && !bRefLocked) {
+      if (!newPnt->IsIgnored() && newPnt->ReferenceHasBeenExplicitlySet() &&
+          iBestIndex != iRefIndex && !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
         pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",

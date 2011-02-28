@@ -251,7 +251,6 @@ namespace Isis {
       double GetAprioriSample() const;
       Isis::Camera *Camera() const;
       iString GetChooserName() const;
-      double GetComputedEphemerisTime() const;
       iString GetCubeSerialNumber() const;
       iString GetDateTime() const;
       double GetDiameter() const;

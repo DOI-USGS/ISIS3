@@ -387,11 +387,16 @@ namespace Isis {
       // Get number of measures locked and check if Reference
       // Measure is locked
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
-      bool bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
 
+      bool bRefLocked = false;
       int iOrigRefIndex = -1;
-      if (newPnt->HasReference())
+      try {
         iOrigRefIndex = newPnt->IndexOfRefMeasure();
+        bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
+      }
+      catch(iException &e) {
+        e.Clear();
+      }
 
       // Only perform the interest operation on points of type "Tie" and
       // Points having atleast 1 measure and Point is not Ignored
@@ -550,7 +555,7 @@ namespace Isis {
           iPointsModified ++;
         }
 
-        if (!newPnt->IsIgnored() && newPnt->HasReference() && iBestMeasureIndex != iOrigRefIndex) {
+        if (!newPnt->IsIgnored() && iBestMeasureIndex != iOrigRefIndex) {
           iRefChanged ++;
           PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
           pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", mtInterestResults[iOrigRefIndex].msSerialNum);
