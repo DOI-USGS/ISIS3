@@ -818,7 +818,10 @@ namespace Isis {
    * 
    * 
    * @param pvl    ISIS label containing the Kernels group.
-   * @param kname  Name of keyword to extract
+   * @param kname  Name of keyword to extract 
+   * @param manage Default management state to assign to kernels.  The default 
+   *               is to manage the kernels that are found. See examine() for
+   *               full disclosure of how this is set.
    * 
    * @return Kernels::KernelList List of scrutinized kernel file names 
    */
@@ -930,7 +933,7 @@ namespace Isis {
    * typically follow NAIF identification standards.  These two cases are 
    * handled special. 
    *  
-   * To determine a NAIF stardard conforming file type, the first eight 
+   * To determine a NAIF standard conforming file type, the first eight 
    * characters of the file given will be inspected to determine the NAIF kernel 
    * type.  If this fails to produce a known type, then it is assumed to be an 
    * ISIS DEM or IAK kernel. 
@@ -953,7 +956,12 @@ namespace Isis {
    * SCLK 
    *  
    * 
-   * @param kfile Name of kernel file to inspect
+   * @param kfile Name of kernel file to inspect 
+   * @param manage Default state to assign to kernel.  Note that this only 
+   *               retains effect if the kernel is not loaded.  If it is loaded,
+   *               its state is set to unmanaged.  You must explicitly exert
+   *               management upon kernels that are already loaded.  Optional
+   *               argument so the default is true.
    * 
    * @return Kernels::KernelFile An internal Kernels file structure describing 
    *         the file.
@@ -985,6 +993,7 @@ namespace Isis {
                 source, &handle, &found);
         if (found == SPICETRUE) {
           kf.loaded = true;
+          kf.managed = false;
           kf.ktype = iString(ktype).UpCase();
         }
       }

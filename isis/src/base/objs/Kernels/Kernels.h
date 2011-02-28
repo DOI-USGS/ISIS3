@@ -98,6 +98,9 @@ namespace Isis {
    *                        non-compliant NAIF file type identifiers kernels
    *   @history 2011-02-07 Kris Becker Corrected typo in Kernels/Extra (was
    *                                   Extras)
+   *   @history 2011-02-28 Kris Becker - When using the examine() method, if the
+   *                                     kernel is found to be loaded, its
+   *                                     management state is set to unmanaged
    */
 class Kernels {
     public:
