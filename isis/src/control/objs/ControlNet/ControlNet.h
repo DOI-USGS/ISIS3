@@ -125,7 +125,7 @@ namespace Isis {
    *                after the point is added to the network.
    *   @history 2011-02-23 Eric Hyer - Added some methods to support graphing
    *                calculations (RandomBFS, Shuffle, CalcBWAndCE, and
-   *                GetCubeConnections).
+   *                GetNodeConnections).
    */
   class ControlNet {
       friend class ControlPoint;
@@ -143,12 +143,15 @@ namespace Isis {
       void WritePvl(const iString &ptfile);
 
       void AddPoint(ControlPoint *point);
+      void DeletePoint(ControlPoint *point);
       void DeletePoint(iString pointId);
       void DeletePoint(int index);
       bool ContainsPoint(iString pointId) const;
 
       QList< QString > GetCubeSerials() const;
-      QList< QList< QString > > GetCubeConnections() const;
+      QList< ControlCubeGraphNode * > GetCubeGraphNodes();
+      QList< QList< QString > > GetSerialConnections() const;
+      QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
       void DeleteMeasuresWithId(iString serialNumber);
 
@@ -205,8 +208,9 @@ namespace Isis {
 
 
     private: // graphing functions
-      QList< QString > RandomBFS(QList< QString > list) const;
-      void Shuffle(QList< QString > & list) const;
+      QList< ControlCubeGraphNode * > RandomBFS(QList <
+          ControlCubeGraphNode * > list) const;
+      void Shuffle(QList< ControlCubeGraphNode * > & list) const;
       QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
 
 
@@ -215,7 +219,7 @@ namespace Isis {
       QHash< QString, ControlPoint * > * points;
 
       //! hash ControlCubeGraphNodes by CubeSerialNumber
-      QHash < QString, ControlCubeGraphNode *> * cubeGraphNodes;
+      QHash < QString, ControlCubeGraphNode * > * cubeGraphNodes;
       QStringList *pointIds;
 
       iString p_targetName;            //!< Name of the target

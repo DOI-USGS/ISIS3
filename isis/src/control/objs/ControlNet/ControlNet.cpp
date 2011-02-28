@@ -608,32 +608,32 @@ namespace Isis {
    * connected.  Otherwise, the list returned will be the entire island on
    * which a random image resides.
    *
-   * @returns A List of connected images
+   * @returns A List of connected graph nodes
    */
-  QList< QString > ControlNet::RandomBFS(QList< QString > serials) const {
-    Shuffle(serials);
+  QList< ControlCubeGraphNode * > ControlNet::RandomBFS(
+    QList< ControlCubeGraphNode * > nodes) const {
+    Shuffle(nodes);
 
     // for keeping track of visited nodes
-    QMap< QString, bool > searchList;
-    for (int i = 0; i < serials.size(); i++)
-      searchList.insert(serials[i], false);
-    searchList[serials[0]] = true;
+    QMap< ControlCubeGraphNode *, bool > searchList;
+    for (int i = 0; i < nodes.size(); i++)
+      searchList.insert(nodes[i], false);
+    searchList[nodes[0]] = true;
 
     // for storing nodes as they are found
-    QList< QString > results;
+    QList< ControlCubeGraphNode * > results;
 
-    QQueue< QString > q;
-    q.enqueue(serials[0]);
+    QQueue< ControlCubeGraphNode * > q;
+    q.enqueue(nodes[0]);
     while (q.size()) {
-      QString curNode = q.dequeue();
+      ControlCubeGraphNode *curNode = q.dequeue();
       if (!results.contains(curNode)) {
         // add to results
         results.append(curNode);
         searchList[curNode] = true;
 
         // add all the neighbors to the queue
-        QList< QString > neighbors =
-          cubeGraphNodes->value(curNode)->getAdjacentSerials();
+        QList< ControlCubeGraphNode * > neighbors = curNode->getAdjacentNodes();
         Shuffle(neighbors);
         for (int i = 0; i < neighbors.size(); i++)
           q.enqueue(neighbors[i]);
@@ -649,7 +649,7 @@ namespace Isis {
    *
    * @param list The list to be shuffled
    */
-  void ControlNet::Shuffle(QList< QString > & list) const {
+  void ControlNet::Shuffle(QList< ControlCubeGraphNode * > & list) const {
     for (int i = list.size() - 1; i > 0; i--) {
       // standard form is qrand() / (RAND_MAX + 1.0) * (max + 1 - min) + min
       // min is always zero here so it is simplified to...
@@ -703,6 +703,24 @@ namespace Isis {
     }
 
     return qMakePair(bw, criticalEdges);
+  }
+
+
+  /**
+   * Delete a ControlPoint from the network by the point's address.
+   *
+   * @param point The point to delete
+   */
+  void ControlNet::DeletePoint(ControlPoint *point) {
+    if (points->values().contains(point)) {
+      DeletePoint(point->GetId());
+    }
+    else {
+      iString msg = "point [";
+      msg += (long) point;
+      msg += "] does not exist in the network";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
   }
 
 
@@ -793,17 +811,42 @@ namespace Isis {
    * completely connected, then this list will only have one element (a list
    * of all the serials in the network).
    *
-   * @returns A list of cube islands
+   * @returns A list of cube islands as serial numbers
    */
-  QList< QList< QString > > ControlNet::GetCubeConnections() const {
-    QList< QString > notYetFound = cubeGraphNodes->keys();
-    QList< QList< QString > > islands;
+  QList< QList< QString > > ControlNet::GetSerialConnections() const {
+    QList< QList< QString > > islandStrings;
+    QList< QList< ControlCubeGraphNode * > > islands = GetNodeConnections();
+    for (int i = 0; i < islands.size(); i++) {
+      QList< QString > newIsland;
+      islandStrings.append(newIsland);
+      for (int j = 0; j < islands[i].size(); j++)
+        islandStrings[i].append(islands[i][j]->getSerialNumber());
+    }
+    return islandStrings;
+  }
+
+
+  /**
+   * This method searches through all the cube serial numbers in the network.
+   * Serials which are connected to other serials through points are grouped
+   * together in the same lists.  The list containing the lists of strings is
+   * nothing more than a list of islands such that each island is a list of
+   * serials which are connected to each other.  If the control network is
+   * completely connected, then this list will only have one element (a list
+   * of all the serials in the network).
+   *
+   * @returns A list of cube islands as graph nodes
+   */
+  QList< QList< ControlCubeGraphNode * > > ControlNet::GetNodeConnections()
+  const {
+    QList< ControlCubeGraphNode * > notYetFound = cubeGraphNodes->values();
+    QList< QList< ControlCubeGraphNode * > > islands;
 
     do {
-      // extract an island from the serials which are not yet found
-      QList< QString > island = RandomBFS(notYetFound);
+      // extract an island from the nodes which are not yet found
+      QList< ControlCubeGraphNode * > island = RandomBFS(notYetFound);
 
-      // remove newly found serials from notYetFound
+      // remove newly found nodes from notYetFound
       for (int i = 0; i < island.size(); i++)
         notYetFound.removeOne(island[i]);
 
@@ -826,6 +869,14 @@ namespace Isis {
    */
   QList< QString > ControlNet::GetCubeSerials() const {
     return cubeGraphNodes->keys();
+  }
+
+
+  /**
+   * @returns A list of all the cube graph nodes in the network
+   */
+  QList< ControlCubeGraphNode * > ControlNet::GetCubeGraphNodes() {
+    return cubeGraphNodes->values();
   }
 
 
