@@ -54,7 +54,7 @@ namespace Isis {
    *                ControlCubeGraphNode objects who have measures which have
    *                the same parent (point) as measures here.
    *   @history 2011-02-22 Eric Hyer - Added isConnected() and
-   *                getAdjacentSerials methods
+   *                getAdjacentNodes methods
    *
    */
   class ControlCubeGraphNode {
@@ -72,7 +72,7 @@ namespace Isis {
       iString getSerialNumber();
       int size();
       QList< ControlMeasure * > getMeasures() const;
-      QList< QString > getAdjacentSerials() const;
+      QList< ControlCubeGraphNode * > getAdjacentNodes() const;
       bool isConnected(ControlCubeGraphNode *other) const;
 
       ControlMeasure *getMeasure(ControlPoint *point);

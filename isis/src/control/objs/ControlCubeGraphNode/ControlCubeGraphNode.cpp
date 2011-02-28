@@ -172,14 +172,8 @@ namespace Isis {
   }
 
 
-  QList< QString > ControlCubeGraphNode::getAdjacentSerials() const {
-    QList< QString > adjacentSerials;
-
-    QList< ControlCubeGraphNode * > neighbors = connections->keys();
-    for (int i = 0; i < neighbors.size(); i++)
-      adjacentSerials.append(neighbors[i]->getSerialNumber());
-
-    return adjacentSerials;
+  QList< ControlCubeGraphNode * > ControlCubeGraphNode::getAdjacentNodes() const {
+    return connections->keys();
   }
 
 
