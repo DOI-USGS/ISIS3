@@ -293,7 +293,7 @@ namespace Isis {
       input.clear();
       input.seekg(0, ios::beg);
       IstreamInputStream logInStream(&input);
-      CodedInputStream codedLogInStream(&inStream);
+      CodedInputStream codedLogInStream(&logInStream);
       codedLogInStream.Skip(logStartPos);
       codedLogInStream.PushLimit(logLength);
       // max 512MB, warn at 400MB
