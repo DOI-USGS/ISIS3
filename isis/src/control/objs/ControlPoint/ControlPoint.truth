@@ -296,7 +296,7 @@ Aposteriori Sigma X = 10
 Aposteriori Sigma Y = 50
 Aposteriori Sigma Z = 20
 
-Testing ReferenceHasBeenExplicitlySet...
+Testing IsReferenceExplicit...
 cp:                    1
 newCp:                 0
 newCp with implicit:   0
