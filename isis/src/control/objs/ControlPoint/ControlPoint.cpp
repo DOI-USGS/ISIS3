@@ -1445,7 +1445,7 @@ namespace Isis {
    * @returns true Returns true if SetRefMeasure has ever been set on this
    *               point.
    */
-  bool ControlPoint::ReferenceHasBeenExplicitlySet() const {
+  bool ControlPoint::IsReferenceExplicit() const {
     return referenceExplicitlySet;
   }
 
@@ -1647,7 +1647,7 @@ namespace Isis {
     for (int i = 0; i < cubeSerials->size(); i++) {
       p.AddGroup((*measures)[cubeSerials->at(i)]->CreatePvlGroup());
 
-      if(ReferenceHasBeenExplicitlySet() &&
+      if(IsReferenceExplicit() &&
          referenceMeasure == (*measures)[cubeSerials->at(i)]) {
         p.Group(p.Groups() - 1).AddKeyword(
             PvlKeyword("Reference", "True"));

@@ -361,7 +361,7 @@ namespace Qisis {
     // Check if ControlPoint has reference measure, if reference Measure is
     // not the same measure that is on the left chip viewport, set left
     // measure as reference.
-    if (p_controlPoint->ReferenceHasBeenExplicitlySet()) {
+    if (p_controlPoint->IsReferenceExplicit()) {
       Isis::ControlMeasure *refMeasure = p_controlPoint->GetRefMeasure();
       if (refMeasure != p_leftMeasure) {
         switch (QMessageBox::question((QWidget *)parent(),

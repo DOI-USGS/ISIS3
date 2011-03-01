@@ -370,7 +370,7 @@ namespace Isis {
       int  IndexOf(ControlMeasure *, bool throws = true) const;
       int  IndexOf(iString sn, bool throws = true) const;
       int  IndexOfRefMeasure() const;
-      bool ReferenceHasBeenExplicitlySet() const;
+      bool IsReferenceExplicit() const;
       QString GetReferenceSN() const;
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;

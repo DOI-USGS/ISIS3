@@ -180,8 +180,8 @@ int main() {
 
   cout << endl;
 
-  cout << "Testing ReferenceHasBeenExplicitlySet..." << endl;
-  cout << "cp:                    " << cp.ReferenceHasBeenExplicitlySet() << endl;
+  cout << "Testing IsReferenceExplicit..." << endl;
+  cout << "cp:                    " << cp.IsReferenceExplicit() << endl;
 
   ControlMeasure *cm3 = new ControlMeasure;
   cm3->SetCubeSerialNumber("Test1");
@@ -210,14 +210,14 @@ int main() {
   cm4->SetDateTime("2005-05-03T00:00:00");
 
   ControlPoint newCp;
-  cout << "newCp:                 " << newCp.ReferenceHasBeenExplicitlySet() << endl;
+  cout << "newCp:                 " << newCp.IsReferenceExplicit() << endl;
   newCp.Add(cm3);
-  cout << "newCp with implicit:   " << newCp.ReferenceHasBeenExplicitlySet() << endl;
+  cout << "newCp with implicit:   " << newCp.IsReferenceExplicit() << endl;
   newCp.Add(cm4);
   newCp.SetRefMeasure(cm3);
-  cout << "newCp with explicit:   " << newCp.ReferenceHasBeenExplicitlySet() << endl;
+  cout << "newCp with explicit:   " << newCp.IsReferenceExplicit() << endl;
   newCp.Delete(cm3);
-  cout << "newCp reverted to implicit:   " << newCp.ReferenceHasBeenExplicitlySet() << endl;
+  cout << "newCp reverted to implicit:   " << newCp.IsReferenceExplicit() << endl;
 }
 
 void printPoint(Isis::ControlPoint &p) {

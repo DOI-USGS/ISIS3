@@ -191,7 +191,7 @@ ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
             // Allow reference override refers to the merger's reference, not
             //   the mergee's reference. If we can't change the reference then
             //   keep the merger's reference status.
-            if (mergee->ReferenceHasBeenExplicitlySet() &&
+            if (mergee->IsReferenceExplicit() &&
                 mergeeMeasure != mergee->GetRefMeasure() &&
                 mergerMeasure != merger->GetRefMeasure()) {
               ControlMeasure *origReference = mergee->GetRefMeasure();
@@ -219,7 +219,7 @@ ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
       ControlMeasure *newMeasure = mergerMeasure;
 
       // We have a new reference
-      if (mergee->ReferenceHasBeenExplicitlySet() &&
+      if (mergee->IsReferenceExplicit() &&
           merger->GetRefMeasure() != mergerMeasure) {
         if (allowReferenceOverride) {
           // Use the new reference
