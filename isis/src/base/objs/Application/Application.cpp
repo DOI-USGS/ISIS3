@@ -825,9 +825,10 @@ namespace Isis {
 
   iString Application::Version() {
     TextFile versionFile("$ISISROOT/version");
-    iString versionString = versionFile.GetLine() + " | " +
-                            versionFile.GetLine();
-
+    iString line1, line2;
+    versionFile.GetLine(line1);
+    versionFile.GetLine(line2);
+    iString versionString = line1 + " | " + line2;
     return versionString;
   }
 
