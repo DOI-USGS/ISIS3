@@ -97,8 +97,8 @@ void GetPVLOutput(void)
   //  frequent!  Used below if single band image.
   if(doCamstat) {
     Pvl camPvl;    //  This becomes useful if there is only one band, which is
-    int statsLinc = ui.GetInteger("STATSLINC");
-    int statsSinc = ui.GetInteger("STATSSINC");
+    int linc = ui.GetInteger("LINC");
+    int sinc = ui.GetInteger("SINC");
     Filename tempCamPvl;
     tempCamPvl.Temporary(in.Basename() + "_", "pvl");
     string pvlOut = tempCamPvl.Expanded();
@@ -106,8 +106,8 @@ void GetPVLOutput(void)
     //set up camstats run and execute
     string parameters = "FROM=" + from +
                         " TO=" + pvlOut +
-                        " LINC=" + iString(statsLinc) +
-                        " SINC=" + iString(statsSinc);
+                        " LINC=" + iString(linc) +
+                        " SINC=" + iString(sinc);
 
     ProgramLauncher::RunIsisProgram("camstats", parameters);
     //out put to common object of the PVL
@@ -338,8 +338,8 @@ void GetCSVOutput(void)
   Pvl camPvl;    //  This becomes useful if there is only one band, which is
   //  frequent!  Used below if single band image.
   if(doCamstat) {
-    int linc = ui.GetInteger("STATSLINC");
-    int sinc = ui.GetInteger("STATSSINC");
+    int linc = ui.GetInteger("LINC");
+    int sinc = ui.GetInteger("SINC");
     Filename tempCamPvl;
     tempCamPvl.Temporary(in.Basename() + "_", "pvl");
     string pvlOut = tempCamPvl.Expanded();

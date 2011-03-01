@@ -357,13 +357,16 @@ End
           available when polygons are selected. Made TO option not have a 
           default of None, updated documentation and modified formatting. 
       </change>
-    <change name="Jai Rideout" date="2011-02-17">
+      <change name="Jai Rideout" date="2011-02-17">
        Replaced PIXINC with POLYSINC and POLYLINC. Renamed SINC and LINC to
        STATSSINC and STATSLINC.
-     </change>
+      </change>
       <change name="Sharmila Prasad" date="2011-02-24">
           Added option for the output file to be in CSV format and also ability 
           to append to the existing output file.
+      </change>
+      <change name="Jai Rideout" date="2011-03-01">
+       Renamed STATSSINC and STATSLINC back to SINC and LINC.
       </change>
   </history>
 
@@ -583,13 +586,13 @@ End
           </UL>
         </description>
         <inclusions>
-          <item>STATSSINC</item>
-          <item>STATSLINC</item>
+          <item>SINC</item>
+          <item>LINC</item>
         </inclusions>
         <default><item>FALSE</item></default>
       </parameter>
 
-      <parameter name="STATSLINC">
+      <parameter name="LINC">
         <type>integer</type>
         <brief>
           LINC for camstats
@@ -601,7 +604,7 @@ End
         <minimum inclusive="true">1</minimum>
       </parameter>
 
-      <parameter name="STATSSINC">
+      <parameter name="SINC">
         <type>integer</type>
         <brief>
           SINC for camstats
