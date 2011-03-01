@@ -8,6 +8,7 @@
 #include "ControlNet.h"
 #include "SerialNumber.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Brick.h"
@@ -75,15 +76,23 @@ void IsisMain() {
         c.line = pnt[0]->GetLine();
         c.errSamp = pnt[1]->GetSample();
         c.errLine = pnt[1]->GetLine();
-        c.gof = 0;//pnt[1].GoodnessOfFit();
+
+        c.gof = -1;
+        if(pnt[1]->HasLogData(ControlMeasureLogData::GoodnessOfFit)) {
+          c.gof = pnt[1]->GetLogData(
+              ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+        }
       }
       else {
         c.samp = pnt[1]->GetSample();
         c.line = pnt[1]->GetLine();
         c.errSamp = pnt[0]->GetSample();
         c.errLine = pnt[0]->GetLine();
-        c.gof = 0;//pnt[0].GoodnessOfFit();
-
+        c.gof = -1;
+        if(pnt[0]->HasLogData(ControlMeasureLogData::GoodnessOfFit)) {
+          c.gof = pnt[0]->GetLogData(
+              ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+        }
       }
 
       //  Check for valid point if requested
