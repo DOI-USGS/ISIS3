@@ -172,9 +172,24 @@ int main(int argc, char *argv[]) {
 
   // Show the application window & open the cubes
   vw->show();
+
+  bool openingAFileSucceeded = false;
   for(int i = 1; i < argc; i++) {
     if(i != newWindow) {
-      vw->workspace()->addCubeViewport(QString(argv[i]));
+      try {
+        vw->workspace()->addCubeViewport(QString(argv[i]));
+        openingAFileSucceeded = true;
+      }
+      catch(Isis::iException &e) {
+        e.Report();
+        e.Clear();
+
+        // If we're trying to open more later or have opened a file, allow
+        //   qview to continue running. Otherwise (this if), crash.
+        if(i == argc - 1 && !openingAFileSucceeded) {
+          return 1;
+        }
+      }
     }
   }
 
