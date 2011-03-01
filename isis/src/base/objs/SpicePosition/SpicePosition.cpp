@@ -306,7 +306,7 @@ namespace Isis {
         }
         coeffX.push_back((double)rec[0]);
         coeffY.push_back((double)rec[1]);
-        coeffZ.push_back((double)rec[1]);
+        coeffZ.push_back((double)rec[2]);
       }
       // Take care of function time parameters
       TableRecord &rec = table[table.Records()-1];
@@ -720,10 +720,6 @@ namespace Isis {
     Isis::PolynomialUnivariate function1(p_degree);       //!< Basis function fit to X
     Isis::PolynomialUnivariate function2(p_degree);       //!< Basis function fit to Y
     Isis::PolynomialUnivariate function3(p_degree);       //!< Basis function fit to Z
-    //
-    LeastSquares *fitX = new LeastSquares(function1);
-    LeastSquares *fitY = new LeastSquares(function2);
-    LeastSquares *fitZ = new LeastSquares(function3);
 
     // Compute the base time
     ComputeBaseTime();
@@ -764,8 +760,11 @@ namespace Isis {
       ZC.push_back(slope[2]);
     }
     else {
-      // Load the known values to compute the fit equation
+      LeastSquares *fitX = new LeastSquares(function1);
+      LeastSquares *fitY = new LeastSquares(function2);
+      LeastSquares *fitZ = new LeastSquares(function3);
 
+      // Load the known values to compute the fit equation
       for(std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
         double t = p_cacheTime.at(pos);
         time.push_back( (t - p_baseTime) / p_timeScale);
