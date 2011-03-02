@@ -1299,6 +1299,40 @@ namespace Isis {
 
     return str;
   }
+  
+  
+  /**
+   *  Obtain a RadiusSource::Source from a string
+   *
+   *  @param str string to get a RadiusSource::Source from
+   *
+   *  @returns The RadiusSource::Source matching the given string
+   */
+   ControlPoint::RadiusSource::Source ControlPoint::StringToRadiusSource(
+       QString str) {
+    
+    str = str.toLower();
+    RadiusSource::Source source = RadiusSource::None;
+    
+    if (str == "user")
+      source = RadiusSource::User;
+    else
+      if (str == "averageofmeasures")
+        source = RadiusSource::AverageOfMeasures;
+      else
+        if (str == "ellipsoid")
+          source = RadiusSource::Ellipsoid;
+        else
+          if (str == "dem")
+            source = RadiusSource::DEM;
+          else
+            if (str == "bundlesolution")
+              source = RadiusSource::BundleSolution;
+    
+    return source;
+  }
+
+  
 
   /**
    * Obtain a string representation of the RadiusSource
@@ -1309,6 +1343,7 @@ namespace Isis {
     return RadiusSourceToString(aprioriRadiusSource);
   }
 
+
   /**
    *  Obtain a string representation of a given SurfacePointSource
    *
@@ -1316,7 +1351,9 @@ namespace Isis {
    *
    *  @returns A string representation of SurfacePointSource
    */
-  iString ControlPoint::SurfacePointSourceToString(SurfacePointSource::Source source) {
+  iString ControlPoint::SurfacePointSourceToString(
+      SurfacePointSource::Source source) {
+    
     iString str;
 
     switch (source) {
@@ -1342,6 +1379,40 @@ namespace Isis {
 
     return str;
   }
+
+
+  /**
+   *  Obtain a SurfacePoint::Source from a string
+   *
+   *  @param str string to get a SurfacePoint::Source from
+   *
+   *  @returns The SurfacePint::Source matching the given string
+   */
+   ControlPoint::SurfacePointSource::Source
+       ControlPoint::StringToSurfacePointSource(
+       QString str) {
+    
+    str = str.toLower();
+    SurfacePointSource::Source source = SurfacePointSource::None;
+    
+    if (str == "user")
+      source = SurfacePointSource::User;
+    else
+      if (str == "averageofmeasures")
+        source = SurfacePointSource::AverageOfMeasures;
+      else
+        if (str == "reference")
+          source = SurfacePointSource::Reference;
+        else
+          if (str == "basemap")
+            source = SurfacePointSource::Basemap;
+          else
+            if (str == "bundlesolution")
+              source = SurfacePointSource::BundleSolution;
+    
+    return source;
+  }
+
 
   /**
    * Obtain a string representation of the SurfacePointSource

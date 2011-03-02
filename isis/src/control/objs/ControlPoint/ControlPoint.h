@@ -217,6 +217,8 @@ namespace Isis {
    *   @history 2011-02-28 Steven Lambright - Added a flag for cnetref to say
    *            whether a reference measure has been explicitly or implicitly
    *            set.
+   *   @history 2011-03-01 Eric Hyer - Added StringToRadiusSource and
+   *            StringToSurfacePointSource methods
    */
   class ControlPoint {
       friend class ControlNet;
@@ -353,8 +355,10 @@ namespace Isis {
       static iString PointTypeToString(PointType type);
       iString GetPointTypeString() const;
       static iString RadiusSourceToString(RadiusSource::Source source);
+      static RadiusSource::Source StringToRadiusSource(QString str);
       iString GetRadiusSourceString() const;
       static iString SurfacePointSourceToString(SurfacePointSource::Source source);
+      static SurfacePointSource::Source StringToSurfacePointSource(QString str);
       iString GetSurfacePointSourceString() const;
 
       SurfacePoint GetAprioriSurfacePoint() const;
@@ -367,9 +371,9 @@ namespace Isis {
       int GetNumValidMeasures() const;
       int GetNumLockedMeasures() const;
       bool HasSerialNumber(iString serialNumber) const;
-      int  IndexOf(ControlMeasure *, bool throws = true) const;
-      int  IndexOf(iString sn, bool throws = true) const;
-      int  IndexOfRefMeasure() const;
+      int IndexOf(ControlMeasure *, bool throws = true) const;
+      int IndexOf(iString sn, bool throws = true) const;
+      int IndexOfRefMeasure() const;
       bool IsReferenceExplicit() const;
       QString GetReferenceSN() const;
 
