@@ -12,4 +12,7 @@ commands:
 	to=$(OUTPUT)/f174s47.txt \
 	name=footprint \
 	type=Polygon > /dev/null;
-	rm $(OUTPUT)/f174s47.cub
+	$(CAT) $(OUTPUT)/f174s47.txt | \
+          sed 's/\([0-9]\.[0-9]\{4\}\)\([0-9]*\)/\1/g' | \
+          sed -e '$$G' > $(OUTPUT)/f174s47.trimmed.txt
+	rm $(OUTPUT)/f174s47.cub $(OUTPUT)/f174s47.txt;
