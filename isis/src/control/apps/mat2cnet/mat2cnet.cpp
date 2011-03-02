@@ -186,12 +186,22 @@ void IsisMain() {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
+    bool isReferenceMeasure = false;
+
     //Set the Measure Type
     if (iString::Equal(matClass, "U"))
       //Unmeasured - these are ignored in isis2
     {
       cmeasure->SetType(ControlMeasure::Candidate);
       cmeasure->SetIgnored(true);
+    }
+    else if (iString::Equal(matClass, "T"))
+      //Truth
+    {
+      // Truth type, aka reference measure, is no longer a measure type
+      // what this means is it has to be handled by the control point.
+      // So, further down the boolean set here will be used.
+      isReferenceMeasure = true;
     }
     else if (iString::Equal(matClass, "S"))
       //SubPixel
@@ -239,7 +249,8 @@ void IsisMain() {
     //Add the measure
     try {
       cpoint->Add(cmeasure);
-      if (iString::Equal(matClass, "T")) {
+      // Equivalent to (iString::Equal(matClass, "T")), as seen above 
+      if (isReferenceMeasure) {
         cpoint->SetRefMeasure(cmeasure);
       }
     }
