@@ -143,6 +143,7 @@ namespace Isis {
    *   @history 2011-02-18 Eric Hyer - ControlCubeGraphNode is now a friend.
    *                Eliminated ConnectControlSN and DisconnectControlSN methods.
    *                Fixed bug in destructor.
+   *   @history 2011-03-01 Eric Hyer - Added StringToMeasureType method
    */
   class ControlMeasure {
       friend class ControlPoint;
@@ -284,6 +285,7 @@ namespace Isis {
 
       PvlGroup CreatePvlGroup();
       static iString MeasureTypeToString(MeasureType type);
+      static MeasureType StringToMeasureType(QString str);
       iString GetMeasureTypeString() const;
 
       const ControlMeasure &operator=(const ControlMeasure &other);

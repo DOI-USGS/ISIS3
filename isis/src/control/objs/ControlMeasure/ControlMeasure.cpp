@@ -1042,7 +1042,38 @@ namespace Isis {
 
     return p;
   }
+  
+  
+  /**
+   * @param str The string to get a MeasureType from
+   *
+   * @returns A Measure Type given a string
+   */
+  ControlMeasure::MeasureType ControlMeasure::StringToMeasureType(QString str) {
+    
+    iString err = "String [";
+    err += iString(str) + "] can not be converted to a MeasureType";
 
+    str.toLower();
+    MeasureType measureType;
+    
+    if (str == "candidate")
+      measureType = ControlMeasure::Candidate;
+    else
+      if (str == "Manual")
+        measureType = ControlMeasure::Manual;
+      else
+        if (str == "RegisteredPixel")
+          measureType = ControlMeasure::RegisteredPixel;
+        else
+          if (str == "RegisteredSubPixel")
+            measureType = ControlMeasure::RegisteredSubPixel;
+          else
+            throw iException::Message(iException::Programmer, err, _FILEINFO_);
+          
+    return measureType;
+  }
+        
 
   /**
    * Return the String Control Measure type
