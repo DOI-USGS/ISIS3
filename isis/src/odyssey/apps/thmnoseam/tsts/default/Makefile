@@ -1,5 +1,8 @@
 APPNAME = thmnoseam
 
+V06944003RDR.noseam.even.cub.TOLERANCE = 0.000000001
+V06944003RDR.noseam.odd.cub.TOLERANCE  = 0.000000001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
