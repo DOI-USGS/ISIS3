@@ -1,6 +1,8 @@
 APPNAME = lrowacpho
 FILE=wac0000983c
 
+wac0000983c.vis.even.pho.cub.TOLERANCE = 0.0000001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
