@@ -54,6 +54,10 @@
       Renamed hinoise2 to hinoise. Previous redundant hinoise app has been 
       removed.
     </change>
+    <change name="Sharmila Prasad" date="2011-03-02">
+      Fix App Test - Enable parallel Test runs making input file name as part of 
+      unique temp files for pipeline.
+    </change>
 
   </history>
 
