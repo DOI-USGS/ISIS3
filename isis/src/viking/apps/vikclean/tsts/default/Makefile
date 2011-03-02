@@ -1,5 +1,7 @@
 APPNAME = vikclean
 
+vikcleanTruth.cub.TOLERANCE = 1.0
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
