@@ -368,6 +368,9 @@ End
       <change name="Jai Rideout" date="2011-03-01">
        Renamed STATSSINC and STATSLINC back to SINC and LINC.
       </change>
+    <change name="Sharmila Prasad"  date="2011-03-02">
+       Fix App tests and add header for flat file if file does not exist.
+      </change>
   </history>
 
   <category>
@@ -411,9 +414,9 @@ End
       <parameter name="FORMAT">
         <type>string</type>
          <default><item>PVL</item></default>
-         <brief>Format type of Output file (CSV or PVL)</brief>
+         <brief>Format type of Output file (FLAT or PVL)</brief>
          <description>
-         Specify the Output format type, CSV or PVL style.
+         Specify the Output format type, FLAT or PVL style.
          </description>
          <list>
            <option value="PVL">
@@ -422,7 +425,7 @@ End
                Cam info data to be generated in PVL format
             </description>
             </option>
-           <option value="CSV">
+           <option value="FLAT">
             <brief> Create CSV output </brief>
             <description>
             Cam info data to be generated in Comma Separated Value (CSV) format

@@ -27,8 +27,6 @@ using namespace Isis;
 
 // Constants
 const string caminfo_program  = "caminfo";
-const string caminfo_version  = "2.2";
-const string caminfo_revision = "$Revision: 1.20 $";
   
 void GetPVLOutput(void);
 void GetCSVOutput(void);
@@ -81,7 +79,6 @@ void GetPVLOutput(void)
   PvlObject params("Caminfo");
   PvlObject common("Parameters");
   common += PvlKeyword("Program",     caminfo_program);
-  common += PvlKeyword("Version",     caminfo_version);
   common += PvlKeyword("IsisVersion", Application::Version());
   common += PvlKeyword("RunDate",     iTime::CurrentGMT());
   common += PvlKeyword("IsisId",      SerialNumber::Compose(*icube));
@@ -117,21 +114,27 @@ void GetPVLOutput(void)
     PvlGroup cg = camPvl.FindGroup("Latitude", Pvl::Traverse);
     pcband += ValidateKey("MinimumLatitude", cg["latitudeminimum"]);
     pcband += ValidateKey("MaximumLatitude", cg["latitudemaximum"]);
+    
     cg = camPvl.FindGroup("Longitude", Pvl::Traverse);
     pcband += ValidateKey("MinimumLongitude", cg["longitudeminimum"]);
     pcband += ValidateKey("MaximumLongitude", cg["longitudemaximum"]);
+    
     cg = camPvl.FindGroup("Resolution", Pvl::Traverse);
     pcband += ValidateKey("MinimumResolution", cg["resolutionminimum"]);
     pcband += ValidateKey("MaximumResolution", cg["resolutionmaximum"]);
+    
     cg = camPvl.FindGroup("PhaseAngle", Pvl::Traverse);
     pcband += ValidateKey("MinimumPhase", cg["phaseminimum"]);
     pcband += ValidateKey("MaximumPhase", cg["phasemaximum"]);
+    
     cg = camPvl.FindGroup("EmissionAngle", Pvl::Traverse);
     pcband += ValidateKey("MinimumEmission", cg["emissionminimum"]);
     pcband += ValidateKey("MaximumEmission", cg["emissionmaximum"]);
+    
     cg = camPvl.FindGroup("IncidenceAngle", Pvl::Traverse);
     pcband += ValidateKey("MinimumIncidence", cg["incidenceminimum"]);
     pcband += ValidateKey("MaximumIncidence", cg["incidencemaximum"]);
+    
     cg = camPvl.FindGroup("LocalSolarTime", Pvl::Traverse);
     pcband += ValidateKey("LocalTimeMinimum", cg["localsolartimeMinimum"]);
     pcband += ValidateKey("LocalTimeMaximum", cg["localsolartimeMaximum"]);
@@ -170,14 +173,14 @@ void GetPVLOutput(void)
     }
 
     //  Compute stats of entire cube
-    double nPixels = stats.TotalPixels();
+    double nPixels     = stats.TotalPixels();
     double nullpercent = (stats.NullPixels() / (nPixels)) * 100;
-    double hispercent = (stats.HisPixels() / (nPixels)) * 100;
-    double hrspercent = (stats.HrsPixels() / (nPixels)) * 100;
-    double lispercent = (stats.LisPixels() / (nPixels)) * 100;
-    double lrspercent = (stats.LrsPixels() / (nPixels)) * 100;
-    //statitics keyword output for band
+    double hispercent  = (stats.HisPixels() / (nPixels)) * 100;
+    double hrspercent  = (stats.HrsPixels() / (nPixels)) * 100;
+    double lispercent  = (stats.LisPixels() / (nPixels)) * 100;
+    double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
 
+    // Statitics keyword output for band
     PvlObject sgroup("Statistics");
     sgroup += ValidateKey("MeanValue", stats.Average());
     sgroup += ValidateKey("StandardDeviation", stats.StandardDeviation());
@@ -268,7 +271,8 @@ void GetCSVOutput(void)
   UserInterface &ui = Application::GetUserInterface();
   string from       = ui.GetAsString("FROM");
   Filename in       = ui.GetFilename("FROM");
-
+  string sOutFile   = ui.GetAsString("TO");
+  
   bool doCamstat  = ui.GetBoolean("CAMSTATS");
   bool bAppend    = ui.GetBoolean("APPEND");
   bool doStats    = ui.GetBoolean("STATISTICS");
@@ -279,58 +283,58 @@ void GetCSVOutput(void)
 
   // Output the result
   fstream outFile;
-  
-  if(bAppend) {
-    outFile.open(ui.GetFilename("TO").c_str(), std::ios::out | std::ios::app);
+  bool bFileExists = Filename(sOutFile).Exists();
+  if(bFileExists && bAppend) {
+    outFile.open(sOutFile.c_str(), std::ios::out | std::ios::app);
   }
   else {
-    outFile.open(ui.GetFilename("TO").c_str(), std::ios::out); 
+    outFile.open(sOutFile.c_str(), std::ios::out); 
   }
 
   // Write the header for not Append
-  if(!bAppend) {
-    outFile << "Program, Version, IsisVersion, IsisId, From, Lines, Samples, Bands, ";
+  if(!bAppend || !bFileExists) {
+    outFile << "Program,IsisVersion,IsisId,From,Lines,Samples,Bands,";
     if(doCamstat) {
-      outFile << "CamStats_MinimumLatitude, CamStats_MaximumLatitude, ";
-      outFile << "CamStats_MinimumLongitude, CamStats_MaximumLongitude, ";
-      outFile << "CamStats_MinimumResolution, CamStats_MaximumResolution, ";
-      outFile << "CamStats_MinimumPhase, CamStats_MaximumPhase, ";
-      outFile << "CamStats_MinimumEmission, CamStats_MaximumEmission, ";
-      outFile << "CamStats_MinimumIncidence, CamStats_MaximumIncidence, ";
-      outFile << "CamStats_LocalTimeMinimum, CamStats_LocalTimeMaximum, ";
+      outFile << "CamStats_MinimumLatitude,CamStats_MaximumLatitude,";
+      outFile << "CamStats_MinimumLongitude,CamStats_MaximumLongitude,";
+      outFile << "CamStats_MinimumResolution,CamStats_MaximumResolution,";
+      outFile << "CamStats_MinimumPhase,CamStats_MaximumPhase,";
+      outFile << "CamStats_MinimumEmission,CamStats_MaximumEmission,";
+      outFile << "CamStats_MinimumIncidence,CamStats_MaximumIncidence,";
+      outFile << "CamStats_LocalTimeMinimum,CamStats_LocalTimeMaximum,";
     }
     if(doStats) {
-      outFile << "Stats_MeanValue, Stats_StandardDeviation, Stats_MinimumValue, Stats_MaximumValue, ";
-      outFile << "Stats_PercentHIS, Stats_PercentHRS, ";
-      outFile << "Stats_PercentLIS, Stats_PercentLRS, Stats_PercentNull, Stats_TotalPixels, ";
+      outFile << "Stats_MeanValue,Stats_StandardDeviation,Stats_MinimumValue,Stats_MaximumValue,";
+      outFile << "Stats_PercentHIS,Stats_PercentHRS,";
+      outFile << "Stats_PercentLIS,Stats_PercentLRS,Stats_PercentNull,Stats_TotalPixels,";
     }
     if(doGeometry) {
-      outFile << "Geom_BandsUsed, Geom_ReferenceBand, Geom_OriginalBand, Geom_Target, ";
-      outFile << "Geom_StartTime, Geom_EndTime, Geom_CenterLine, Geom_CenterSample, ";
-      outFile << "Geom_CenterLatitude, Geom_CenterLongitude, Geom_CenterRadius, ";
-      outFile << "Geom_RightAscension, Geom_Declination, ";
-      outFile << "Geom_UpperLeftLongitude, Geom_UpperLeftLatitude, ";
-      outFile << "Geom_LowerLeftLongitude, Geom_LowerLeftLatitude, ";
-      outFile << "Geom_LowerRightLongitude, Geom_LowerRightLatitude, ";
+      outFile << "Geom_BandsUsed,Geom_ReferenceBand,Geom_OriginalBand,Geom_Target,";
+      outFile << "Geom_StartTime,Geom_EndTime,Geom_CenterLine,Geom_CenterSample,";
+      outFile << "Geom_CenterLatitude,Geom_CenterLongitude,Geom_CenterRadius,";
+      outFile << "Geom_RightAscension,Geom_Declination,";
+      outFile << "Geom_UpperLeftLongitude,Geom_UpperLeftLatitude,";
+      outFile << "Geom_LowerLeftLongitude,Geom_LowerLeftLatitude,";
+      outFile << "Geom_LowerRightLongitude,Geom_LowerRightLatitude,";
       outFile << "Geom_UpperRightLongitude, Geom_UpperRightLatitude, ";
-      outFile << "Geom_PhaseAngle, Geom_EmissionAngle, Geom_IncidenceAngle, ";
-      outFile << "Geom_NorthAzimuth, Geom_OffNadir, Geom_SolarLongitude, Geom_LocalTime, ";
-      outFile << "Geom_TargetCenterDistance, Geom_SlantDistance, Geom_SampleResolution, Geom_LineResolution, ";
-      outFile << "Geom_PixelResolution, Geom_MeanGroundResolution, ";
-      outFile << "Geom_SubSolarAzimuth, Geom_SubSolarGroundAzimuth, ";
-      outFile << "Geom_SubSolarLatitude, Geom_SubSolarLongitude, ";
-      outFile << "Geom_SubSpacecraftAzimuth, Geom_SubSpacecraftGroundAzimuth, ";
-      outFile << "Geom_SubSpacecraftLatitude, Geom_SubSpacecraftLongitude, ";
-      outFile << "Geom_ParallaxX, Geom_ParallaxY, Geom_ShadowX, Geom_ShadowY, ";
-      outFile << "Geom_HasLongitudeBoundary, Geom_HasNorthPole, Geom_HasSouthPole, ";
+      outFile << "Geom_PhaseAngle,Geom_EmissionAngle,Geom_IncidenceAngle,";
+      outFile << "Geom_NorthAzimuth,Geom_OffNadir,Geom_SolarLongitude,Geom_LocalTime,";
+      outFile << "Geom_TargetCenterDistance,Geom_SlantDistance,Geom_SampleResolution,Geom_LineResolution,";
+      outFile << "Geom_PixelResolution,Geom_MeanGroundResolution,";
+      outFile << "Geom_SubSolarAzimuth,Geom_SubSolarGroundAzimuth,";
+      outFile << "Geom_SubSolarLatitude,Geom_SubSolarLongitude,";
+      outFile << "Geom_SubSpacecraftAzimuth,Geom_SubSpacecraftGroundAzimuth,";
+      outFile << "Geom_SubSpacecraftLatitude,Geom_SubSpacecraftLongitude,";
+      outFile << "Geom_ParallaxX, Geom_ParallaxY,Geom_ShadowX, Geom_ShadowY, ";
+      outFile << "Geom_HasLongitudeBoundary,Geom_HasNorthPole,Geom_HasSouthPole,";
     }
     outFile << endl;
   }
   
   // Get some common things like #line, #samples, bands.
-  outFile << caminfo_program.c_str() << ", " << caminfo_version << ", " << Application::Version() << ", ";
-  outFile << SerialNumber::Compose(*icube) << ", " << in.Basename()+ ".cub" << ", ";
-  outFile << icube->Lines() << ", " << icube->Samples() << ", " << icube->Bands() << ", ";
+  outFile << caminfo_program.c_str() << "," << Application::Version() << ",";
+  outFile << SerialNumber::Compose(*icube) << "," << in.Basename() + ".cub" << ",";
+  outFile << icube->Lines() << "," << icube->Samples() << "," << icube->Bands() << ",";
 
   // Run camstats on the entire image (all bands)
   // another camstats will be run for each band and output
@@ -356,25 +360,25 @@ void GetCSVOutput(void)
     remove(pvlOut.c_str());
 
     PvlGroup cg = camPvl.FindGroup("Latitude", Pvl::Traverse);
-    outFile << cg["latitudeminimum"][0] << ", " << cg["latitudemaximum"][0] << ", ";
+    outFile << cg["latitudeminimum"][0] << "," << cg["latitudemaximum"][0] << ",";
  
     cg = camPvl.FindGroup("Longitude", Pvl::Traverse);
-    outFile << cg["longitudeminimum"][0] << ", " << cg["longitudemaximum"][0] << ", ";
+    outFile << cg["longitudeminimum"][0] << "," << cg["longitudemaximum"][0] << ",";
     
     cg = camPvl.FindGroup("Resolution", Pvl::Traverse);
-    outFile << cg["resolutionminimum"][0] << ", " << cg["resolutionmaximum"][0] << ", ";
+    outFile << cg["resolutionminimum"][0] << "," << cg["resolutionmaximum"][0] << ",";
     
     cg = camPvl.FindGroup("PhaseAngle", Pvl::Traverse);
-    outFile << cg["phaseminimum"][0] << ", " << cg["phasemaximum"][0] << ", ";
+    outFile << cg["phaseminimum"][0] << "," << cg["phasemaximum"][0] << ",";
 
     cg = camPvl.FindGroup("EmissionAngle", Pvl::Traverse);
-    outFile << cg["emissionminimum"][0] << ", " << cg["emissionmaximum"][0] << ", ";
+    outFile << cg["emissionminimum"][0] << "," << cg["emissionmaximum"][0] << ",";
 
     cg = camPvl.FindGroup("IncidenceAngle", Pvl::Traverse);
-    outFile << cg["incidenceminimum"][0] << ", " << cg["incidencemaximum"][0] << ", ";
+    outFile << cg["incidenceminimum"][0] << "," << cg["incidencemaximum"][0] << ",";
 
     cg = camPvl.FindGroup("LocalSolarTime", Pvl::Traverse);
-    outFile << cg["localsolartimeMinimum"][0] << ", " << cg["localsolartimeMaximum"][0] << ", ";
+    outFile << cg["localsolartimeMinimum"][0] << "," << cg["localsolartimeMaximum"][0] << ",";
   }
 
   //  Compute statistics for entire cube
@@ -401,10 +405,10 @@ void GetCSVOutput(void)
     double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
     //statitics keyword output for band
 
-    outFile << stats.Average() << ", " << stats.StandardDeviation() << ", ";
-    outFile << stats.Minimum() << ", " << stats.Maximum() << ", ";
-    outFile << hispercent << ", " << hrspercent << ", " << lispercent << ", ";
-    outFile << lrspercent << ", " << nullpercent << ", " << stats.TotalPixels() << ", ";
+    outFile << stats.Average() << "," << stats.StandardDeviation() << ",";
+    outFile << stats.Minimum() << "," << stats.Maximum() << ",";
+    outFile << hispercent << "," << hrspercent << "," << lispercent << ",";
+    outFile << lrspercent << "," << nullpercent << "," << stats.TotalPixels() << ",";
   }
 
   Camera *cam = icube->Camera();
@@ -445,45 +449,45 @@ void GetCSVOutput(void)
     PvlObject geomGrp("Geometry");
     bandGeom.generateGeometryKeys(geomGrp);
     
-    outFile << geomGrp["BandsUsed"][0] << ", " << geomGrp["ReferenceBand"][0] << ", ";
-    outFile << geomGrp["OriginalBand"][0] << ", " << geomGrp["Target"][0] << ", ";
-    outFile << geomGrp["StartTime"][0] << ", " << geomGrp["EndTime"][0] << ", ";
-    outFile << geomGrp["CenterLine"][0] << ", " << geomGrp["CenterSample"][0] << ", ";
-    outFile << geomGrp["CenterLatitude"][0] << ", " << geomGrp["CenterLongitude"][0] << ", ";
-    outFile << geomGrp["CenterRadius"][0] << ", " << geomGrp["RightAscension"][0] << ", ";
-    outFile << geomGrp["Declination"][0] << ", ";
+    outFile << geomGrp["BandsUsed"][0] << "," << geomGrp["ReferenceBand"][0] << ",";
+    outFile << geomGrp["OriginalBand"][0] << "," << geomGrp["Target"][0] << ",";
+    outFile << geomGrp["StartTime"][0] << "," << geomGrp["EndTime"][0] << ",";
+    outFile << geomGrp["CenterLine"][0] << "," << geomGrp["CenterSample"][0] << ",";
+    outFile << geomGrp["CenterLatitude"][0] << "," << geomGrp["CenterLongitude"][0] << ",";
+    outFile << geomGrp["CenterRadius"][0] << "," << geomGrp["RightAscension"][0] << ",";
+    outFile << geomGrp["Declination"][0] << ",";
 
-    outFile << geomGrp["UpperLeftLongitude"][0] << ", " << geomGrp["UpperLeftLatitude"][0] << ", ";
-    outFile << geomGrp["LowerLeftLongitude"][0] << ", " << geomGrp["LowerLeftLatitude"][0] << ", ";
-    outFile << geomGrp["LowerRightLongitude"][0] << ", " << geomGrp["LowerRightLatitude"][0] << ", ";
-    outFile << geomGrp["UpperRightLongitude"][0] << ", " << geomGrp["UpperRightLatitude"][0] << ", ";
+    outFile << geomGrp["UpperLeftLongitude"][0] << "," << geomGrp["UpperLeftLatitude"][0] << ",";
+    outFile << geomGrp["LowerLeftLongitude"][0] << "," << geomGrp["LowerLeftLatitude"][0] << ",";
+    outFile << geomGrp["LowerRightLongitude"][0] << "," << geomGrp["LowerRightLatitude"][0] << ",";
+    outFile << geomGrp["UpperRightLongitude"][0] << "," << geomGrp["UpperRightLatitude"][0] << ",";
 
-    outFile << geomGrp["PhaseAngle"][0] << ", " << geomGrp["EmissionAngle"][0] << ", " << geomGrp["IncidenceAngle"][0] << ", ";
+    outFile << geomGrp["PhaseAngle"][0] << "," << geomGrp["EmissionAngle"][0] << "," << geomGrp["IncidenceAngle"][0] << ",";
 
-    outFile << geomGrp["NorthAzimuth"][0] << ", " << geomGrp["OffNadir"][0] << ", ";
-    outFile << geomGrp["SolarLongitude"][0] << ", " << geomGrp["LocalTime"][0] << ", ";
-    outFile << geomGrp["TargetCenterDistance"][0] << ", " << geomGrp["SlantDistance"][0] << ", ";
+    outFile << geomGrp["NorthAzimuth"][0] << "," << geomGrp["OffNadir"][0] << ",";
+    outFile << geomGrp["SolarLongitude"][0] << "," << geomGrp["LocalTime"][0] << ",";
+    outFile << geomGrp["TargetCenterDistance"][0] << "," << geomGrp["SlantDistance"][0] << ",";
 
-    outFile << geomGrp["SampleResolution"][0] << ", " << geomGrp["LineResolution"][0] << ", ";
-    outFile << geomGrp["PixelResolution"][0] << ", " << geomGrp["MeanGroundResolution"][0] << ", ";
+    outFile << geomGrp["SampleResolution"][0] << "," << geomGrp["LineResolution"][0] << ",";
+    outFile << geomGrp["PixelResolution"][0] << "," << geomGrp["MeanGroundResolution"][0] << ",";
 
-    outFile << geomGrp["SubSolarAzimuth"][0] << ", " << geomGrp["SubSolarGroundAzimuth"][0] << ", ";
-    outFile << geomGrp["SubSolarLatitude"][0] << ", " << geomGrp["SubSolarLongitude"][0] << ", ";
+    outFile << geomGrp["SubSolarAzimuth"][0] << "," << geomGrp["SubSolarGroundAzimuth"][0] << ",";
+    outFile << geomGrp["SubSolarLatitude"][0] << "," << geomGrp["SubSolarLongitude"][0] << ",";
 
-    outFile << geomGrp["SubSpacecraftAzimuth"][0] << ", " << geomGrp["SubSpacecraftGroundAzimuth"][0] << ", ";
-    outFile << geomGrp["SubSpacecraftLatitude"][0] << ", " << geomGrp["SubSpacecraftLongitude"][0] << ", ";
+    outFile << geomGrp["SubSpacecraftAzimuth"][0] << "," << geomGrp["SubSpacecraftGroundAzimuth"][0] << ",";
+    outFile << geomGrp["SubSpacecraftLatitude"][0] << "," << geomGrp["SubSpacecraftLongitude"][0] << ",";
 
-    outFile << geomGrp["ParallaxX"][0] << ", " << geomGrp["ParallaxY"][0] << ", ";
+    outFile << geomGrp["ParallaxX"][0] << "," << geomGrp["ParallaxY"][0] << ",";
 
-    outFile << geomGrp["ShadowX"][0] << ", " << geomGrp["ShadowY"][0] << ", ";
+    outFile << geomGrp["ShadowX"][0] << "," << geomGrp["ShadowY"][0] << ",";
 
     //  Determine if image crosses Longitude domain
-    outFile << geomGrp["HasLongitudeBoundary"][0] << ", " << geomGrp["HasNorthPole"][0] << ", ";
-    outFile << geomGrp["HasSouthPole"][0] << ", ";
+    outFile << geomGrp["HasLongitudeBoundary"][0] << "," << geomGrp["HasNorthPole"][0] << ",";
+    outFile << geomGrp["HasSouthPole"][0] << ",";
   }
   
   outFile << endl;
-  outFile.close();  
+  outFile.close();
 }
 
 
