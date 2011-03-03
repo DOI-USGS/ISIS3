@@ -62,10 +62,9 @@ void kuwahara(Buffer &in, double &result) {
     else {
       if(IsValidPixel(stats[i].Variance())) {
 
-        // Problems caused in this if between computers because of rounding errors.
-        // Cases where there are two equal variances will cause this and can be fixed
-        // by checking equality of the doubles with a powerful methods along with && <
-        if(stats[i].Variance() < minimum) {
+        // Computers don't compute variance precisely every time 
+        bool isEqual = fabs(stats[i].Variance() - minimum) < 1e-13;
+        if(stats[i].Variance() < minimum && !isEqual) {
           minimum = stats[i].Variance();
           result = stats[i].Average();
         }
@@ -79,3 +78,4 @@ void kuwahara(Buffer &in, double &result) {
     result = Isis::Null;
   }
 }
+
