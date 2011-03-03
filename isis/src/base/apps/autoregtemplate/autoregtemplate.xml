@@ -55,6 +55,15 @@
         <item>pointreg</item>
         <item>findrx</item>
     </applications>
+    <documents>
+      <document>
+        <title>Pattern Matching in ISIS 3</title>
+        <source>
+          <filename>PatternMatch.html</filename>
+          <path>../../../../documents/PatternMatch/</path>
+        </source>
+      </document>
+    </documents>
   </seeAlso>
 
   <category>
