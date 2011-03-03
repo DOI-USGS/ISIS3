@@ -1,5 +1,7 @@
 APPNAME = mdiscal
 
+nonZeroPxlBin.cub.TOLERANCE = 0.00000000001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
