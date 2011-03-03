@@ -5,7 +5,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis cnet=$(INPUT)/cnet.net \
-	tolist=$(OUTPUT)/newList.lis outnet=$(OUTPUT)/newNet.pvl \
+	tolist=$(OUTPUT)/newList.lis outnet=$(OUTPUT)/newNet.net \
 	networkid=new description=new prefix=$(OUTPUT)/out \
 	nomeasureless=true tolerance=true pixel=8.0 > /dev/null;
 	$(RM) $(OUTPUT)/newList.lis;
