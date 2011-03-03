@@ -3,77 +3,104 @@
 <application name="coreg" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-       Subpixel registration of a pair of images
+    Subpixel registration of a pair of images
   </brief>
 
   <description>
-      This program co-regsisters two images using a constant sample/line translation.  This implies of course that the
-      internal geometry of the both images be nearly the same so that the translation can be computed.   That is, this 
-      program will not work if the translation varies significantly throughout the image.  However, there are still useful 
-      capabilities in this program if this condition is not meet.  If the condition of near constant translation is met then 
-      the translation can be computed  to sub-pixel accuracy.   The basic principle behind this program is to compute 
-      an average translation by computing local translations spaced evenly throughout the image.  The number and 
-      spacing of local translations is user defined.  This allows for many output options including 1) directly creating the  
-      translated image,  2) creating a control network which can be used in other programs (e.g., qnet, warp), especially 
-      if the translation is not constant across the image, or 3) creating a flat-field file usable in spreadsheets or plotting 
-      packages to visualize magnitude and direction of varying translations.
-     <p>
-       NOTE:  This program can utilize many different techniques for computing the translation.  It is recommend that 
-       you read "Automatic Registration in Isis 3.0".  It is essential for under understanding how to create a "registration 
-       definition" file and how to size your search and pattern chips.  We will continue with the discussion of functionality 
-       of this program assuming the reader has a fundamental knowledge of Automatic Registration.  For the brave we 
-       give an example of a defintion file (DEFFILE):
-     </p>
-     <pre>
-         Object = AutoRegistration
-           Group = Algorithm
-             Name         = MaximumCorrelation
-             Tolerance    = 0.7
-           EndGroup
+    <p>
+      This program co-regsisters two images using a constant sample/line
+      translation.  This implies of course that the internal geometry of the
+      both images be nearly the same so that the translation can be computed.
+      That is, this program will not work if the translation varies
+      significantly throughout the image.  However, there are still useful
+      capabilities in this program if this condition is not meet.  If the
+      condition of near constant translation is met then the translation can
+      be computed  to sub-pixel accuracy.   The basic principle behind this
+      program is to compute an average translation by computing local
+      translations spaced evenly throughout the image.  The number and spacing
+      of local translations is user defined.  This allows for many output
+      options including 1) directly creating the  translated image,  2)
+      creating a control network which can be used in other programs (e.g.,
+      qnet, warp), especially if the translation is not constant across the
+      image, or 3) creating a flat-field file usable in spreadsheets or
+      plotting packages to visualize magnitude and direction of varying
+      translations.
+    </p>
 
-           Group = PatternChip
-             Samples = 20
-             Lines   = 20
-             ValidMinimum = 1400
-             ValidPercent = 75
-           EndGroup
+    <p>
+      NOTE:  This program can utilize many different techniques for computing
+      the translation.  It is recommend that you read "Automatic Registration
+      in Isis 3.0".  It is essential for under understanding how to create a
+      "registration definition" file and how to size your search and pattern
+      chips.  We will continue with the discussion of functionality of this
+      program assuming the reader has a fundamental knowledge of Automatic
+      Registration.  For the brave we give an example of a defintion file
+      (DEFFILE):
+    </p>
 
-           Group = SearchChip
-             Samples = 90
-             Lines   = 90
-             ValidMinimum = 1400
-             ValidPercent = 75
-           EndGroup
-         EndObject
-     </pre>
-     <p>
-         You will provide two input cubes, one which will be translated (FROM) and the other is held fixed (MATCH).   
-         The images must have the same number of samples and lines and can have only one band (use cube 
-         attributes if necessary).  A sparse grid will be defined across the held image using the parameters ROWS 
-         and COLUMNS.   If the user does not provide values for the sparse grid size it will be automatically computed 
-         as follows:  COLUMNS = (image samples - 1) / search chip samples + 1.   Similarly for ROWS.  Conceptually, 
-         the sparse grid defined by ROWS and COLUMNS will be laid on top of both images with even spacing between 
-         the rows (or columns) and but no row will touch the top or bottom of the image.  That is, the grid is internal to the 
-         image.
-     </p>
-     <p>
-         At each grid intersection we will compute a translation.  This is done by centering the search chip at the grid 
-         intersection for the image to be translated (FROM) and centering the pattern chip at the grid intersection for the 
-         held image (MATCH).  The pattern chip is walked through the search chip to find the best registration (if any).  
-         Again the details of how this is done is described in the document "Automatic Registation in Isis 3.0".  The local 
-         translation is recorded at all grid intersections that had a successful registration.  It will be written to the control 
-         network and/or flat-file if requested.  The average of the local translations is then used to compute an overall 
-         sub-pixel translation which can be applied to the output image (TO).
-     </p>
+    <pre>
+      Object = AutoRegistration
+        Group = Algorithm
+          Name         = MaximumCorrelation
+          Tolerance    = 0.7
+        EndGroup
 
-     <p>
-         Some tips to improve odds of a successful registration.  In general don't go too small with the pattern chip size, 
-         20x20 is probably a good starting point.  Also, the larger the translation, the larger the search chip size will need 
-         to be.  So if your translation is only a couple of pixels keep the search chip slightly bigger than the pattern 
-         (e.g., 25x25 vs 20x20).  However if the translation is large you will need to expand the seach area.  For example, 
-         if the translation is roughly 45 pixels and your pattern is 20x20 the search area should be 20+2*45 or 110x110.
-     </p>
-  </description>
+        Group = PatternChip
+          Samples = 20
+          Lines   = 20
+          ValidMinimum = 1400
+          ValidPercent = 75
+        EndGroup
+
+        Group = SearchChip
+          Samples = 90
+          Lines   = 90
+          ValidMinimum = 1400
+          ValidPercent = 75
+        EndGroup
+      EndObject
+    </pre>
+
+    <p>
+      You will provide two input cubes, one which will be translated (FROM)
+      and the other is held fixed (MATCH).   The images must have the same
+      number of samples and lines and can have only one band (use cube
+      attributes if necessary).  A sparse grid will be defined across the held
+      image using the parameters ROWS and COLUMNS.   If the user does not
+      provide values for the sparse grid size it will be automatically
+      computed as follows:  COLUMNS = (image samples - 1) / search chip
+      samples + 1.   Similarly for ROWS.  Conceptually, the sparse grid
+      defined by ROWS and COLUMNS will be laid on top of both images with even
+      spacing between the rows (or columns) and but no row will touch the top
+      or bottom of the image.  That is, the grid is internal to the image.
+    </p>
+
+    <p>
+      At each grid intersection we will compute a translation.  This is done
+      by centering the search chip at the grid intersection for the image to
+      be translated (FROM) and centering the pattern chip at the grid
+      intersection for the held image (MATCH).  The pattern chip is walked
+      through the search chip to find the best registration (if any).  Again
+      the details of how this is done is described in the document "Automatic
+      Registation in Isis 3.0".  The local translation is recorded at all grid
+      intersections that had a successful registration.  It will be written to
+      the control network and/or flat-file if requested.  The average of the
+      local translations is then used to compute an overall sub-pixel
+      translation which can be applied to the output image (TO).
+    </p>
+
+    <p>
+      Some tips to improve odds of a successful registration.  In general
+      don't go too small with the pattern chip size, 20x20 is probably a good
+      starting point.  Also, the larger the translation, the larger the search
+      chip size will need to be.  So if your translation is only a couple of
+      pixels keep the search chip slightly bigger than the pattern (e.g.,
+      25x25 vs 20x20).  However if the translation is large you will need to
+      expand the seach area.  For example, if the translation is roughly 45
+      pixels and your pattern is 20x20 the search area should be 20+2*45 or
+      110x110.
+    </p>
+   </description>
 
   <category>
     <categoryItem>Registration and Pattern Matching</categoryItem>
