@@ -10,10 +10,7 @@ commands:
 	  cnet=$(INPUT)/autoseed.net \
 	  deffile=$(INPUT)/deffile.def \
 	  criteria=incidence \
-	  onet=$(OUTPUT)/truth.bin \
+	  onet=$(OUTPUT)/truth.net \
 	  networkid=DefaultTruth \
 	  Description=RefByIncidence > /dev/null;
-	  cnetbin2pvl from=$(OUTPUT)/truth.bin \
-	  to=$(OUTPUT)/truth.pvl >/dev/null;
 	  $(RM) $(OUTPUT)/cube.lis;
-	  $(RM) $(OUTPUT)/truth.bin;
