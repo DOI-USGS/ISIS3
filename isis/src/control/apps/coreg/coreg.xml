@@ -86,20 +86,20 @@
   </oldName>
 
   <seeAlso>
-      <applications>
-          <item>autoregtemplate</item>
-          <item>warp</item>
-          <item>translate</item>
-      </applications>
-      <documents>
-          <document>
-              <title>Automatic Registration in Isis 3.0</title>
-	      <source>
-                <filename>patternMatch.doc</filename>
-                <path>assets/</path>
-              </source>
-          </document>
-      </documents>
+    <applications>
+      <item>autoregtemplate</item>
+      <item>warp</item>
+      <item>translate</item>
+    </applications>
+    <documents>
+      <document>
+        <title>Pattern Matching in ISIS 3</title>
+        <source>
+          <filename>PatternMatch.html</filename>
+          <path>../../../../documents/PatternMatch/</path>
+        </source>
+      </document>
+    </documents>
   </seeAlso>
 
   <history>
