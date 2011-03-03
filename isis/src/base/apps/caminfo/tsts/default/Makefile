@@ -3,7 +3,7 @@ APPNAME = caminfo
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) FROM=$(INPUT)/input.cub \
+	$(APPNAME) FROM=$(INPUT)/input2.cub \
 	TO=$(OUTPUT)/caminfo.pvl ISISLABEL=true ORIGINAL=true \
 	STATISTICS=true CAMSTATS=true POLYGON=true polysinc=100 polylinc=100 > /dev/null;
 	cat $(OUTPUT)/caminfo.pvl | \
@@ -13,7 +13,7 @@ commands:
 	  > $(OUTPUT)/caminfo2.pvl;
 	$(MV) $(OUTPUT)/caminfo2.pvl $(OUTPUT)/caminfo.pvl;
 	
-	$(APPNAME) FROM=$(INPUT)/input.cub \
+	$(APPNAME) FROM=$(INPUT)/input2.cub \
 	TO=$(OUTPUT)/caminfo2.pvl ISISLABEL=true ORIGINAL=true \
 	STATISTICS=true CAMSTATS=true POLYGON=true > /dev/null;
 	cat $(OUTPUT)/caminfo2.pvl | \
