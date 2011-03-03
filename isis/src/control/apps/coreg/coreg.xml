@@ -29,8 +29,12 @@
 
     <p>
       NOTE:  This program can utilize many different techniques for computing
-      the translation.  It is recommend that you read "Automatic Registration
-      in Isis 3.0".  It is essential for under understanding how to create a
+      the translation.  It is recommended that you review the
+      <a href="../../../../documents/PatternMatch/PatternMatch.html">
+        Pattern Matching
+      </a> 
+      page from the "Related Objects and Documents" section below.  It is
+      essential for using this application to understand how to create a
       "registration definition" file and how to size your search and pattern
       chips.  We will continue with the discussion of functionality of this
       program assuming the reader has a fundamental knowledge of Automatic
