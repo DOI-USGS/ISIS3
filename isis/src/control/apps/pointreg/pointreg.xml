@@ -19,9 +19,13 @@
           <item>coreg</item>
       </applications>
       <documents>
-          <document>
-              <title>Automatic Registration in Isis 3.0</title>
-          </document>
+        <document>
+          <title>Pattern Matching in ISIS 3</title>
+          <source>
+            <filename>PatternMatch.html</filename>
+            <path>../../../../documents/PatternMatch/</path>
+          </source>
+        </document>
       </documents>
   </seeAlso>
 
