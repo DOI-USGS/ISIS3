@@ -42,14 +42,12 @@ void IsisMain()
   string sFormat = ui.GetAsString("FORMAT");
   
   // if true then run spiceinit, xml default is FALSE
-  //spiceinit will use system kernels
+  // spiceinit will use system kernels
   if(ui.GetBoolean("SPICE")) {
     string parameters = "FROM=" + in.Expanded();
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
   }
 
-  //cerr << " format=" << sFormat << endl;
-  
   if(sFormat == "PVL" || sFormat=="pvl") {
     GetPVLOutput();
   }
@@ -60,7 +58,6 @@ void IsisMain()
 
 /**
  * Get the output in PVL format
- * 
  */
 void GetPVLOutput(void) 
 {
@@ -316,7 +313,7 @@ void GetCSVOutput(void)
       outFile << "Geom_UpperLeftLongitude,Geom_UpperLeftLatitude,";
       outFile << "Geom_LowerLeftLongitude,Geom_LowerLeftLatitude,";
       outFile << "Geom_LowerRightLongitude,Geom_LowerRightLatitude,";
-      outFile << "Geom_UpperRightLongitude, Geom_UpperRightLatitude, ";
+      outFile << "Geom_UpperRightLongitude,Geom_UpperRightLatitude,";
       outFile << "Geom_PhaseAngle,Geom_EmissionAngle,Geom_IncidenceAngle,";
       outFile << "Geom_NorthAzimuth,Geom_OffNadir,Geom_SolarLongitude,Geom_LocalTime,";
       outFile << "Geom_TargetCenterDistance,Geom_SlantDistance,Geom_SampleResolution,Geom_LineResolution,";
@@ -325,8 +322,8 @@ void GetCSVOutput(void)
       outFile << "Geom_SubSolarLatitude,Geom_SubSolarLongitude,";
       outFile << "Geom_SubSpacecraftAzimuth,Geom_SubSpacecraftGroundAzimuth,";
       outFile << "Geom_SubSpacecraftLatitude,Geom_SubSpacecraftLongitude,";
-      outFile << "Geom_ParallaxX, Geom_ParallaxY,Geom_ShadowX, Geom_ShadowY, ";
-      outFile << "Geom_HasLongitudeBoundary,Geom_HasNorthPole,Geom_HasSouthPole,";
+      outFile << "Geom_ParallaxX,Geom_ParallaxY,Geom_ShadowX,Geom_ShadowY,";
+      outFile << "Geom_HasLongitudeBoundary,Geom_HasNorthPole,Geom_HasSouthPole";
     }
     outFile << endl;
   }
@@ -483,11 +480,10 @@ void GetCSVOutput(void)
 
     //  Determine if image crosses Longitude domain
     outFile << geomGrp["HasLongitudeBoundary"][0] << "," << geomGrp["HasNorthPole"][0] << ",";
-    outFile << geomGrp["HasSouthPole"][0] << ",";
+    outFile << geomGrp["HasSouthPole"][0];
   }
   
   outFile << endl;
   outFile.close();
 }
-
 
