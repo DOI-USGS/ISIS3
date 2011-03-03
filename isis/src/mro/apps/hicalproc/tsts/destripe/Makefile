@@ -1,5 +1,7 @@
 APPNAME = hicalproc
 
+truth.cub.TOLERANCE = 0.000001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
