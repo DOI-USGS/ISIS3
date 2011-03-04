@@ -636,7 +636,7 @@ namespace Isis {
 
 
   void ControlMeasure::DeleteLogData(long dataType) {
-    for (int i = p_loggedData->size(); i >= 0; i--) {
+    for (int i = p_loggedData->size()-1; i >= 0; i--) {
       ControlMeasureLogData logDataEntry = p_loggedData->at(i);
 
       if (logDataEntry.GetDataType() == dataType)

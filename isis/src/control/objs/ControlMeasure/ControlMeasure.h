@@ -144,6 +144,8 @@ namespace Isis {
    *                Eliminated ConnectControlSN and DisconnectControlSN methods.
    *                Fixed bug in destructor.
    *   @history 2011-03-01 Eric Hyer - Added StringToMeasureType method
+   *   @history 2011-03-04 Tracie Sucharski - Fixed bug in DeleteLogData method,
+   *                               subtract 1 from size() in the loop.
    */
   class ControlMeasure {
       friend class ControlPoint;
