@@ -38,6 +38,10 @@
       preference no longer affects the output of this program. The default values of "FILE" and
       "OBSERVATION" have been changed to FALSE.
     </change>
+    <change name="Mackenzie Boyd" date="2011-03-07">
+      Added FORMAT option to choose between PVL and FLAT format. Effects output
+      file only, default is still PVL.
+    </change>
   </history>
 
   <groups>
@@ -134,7 +138,34 @@
         </description>
       </parameter>
     </group>
-    
+
+    <group name="Output format">
+      <parameter name="FORMAT">
+        <type>string</type>
+        <default><item>PVL</item></default>
+        <brief>Output format</brief>
+        <description>
+          Output format options, either PVL or FLAT may be used to display the 
+          selected outputs.
+        </description>
+        <list>
+          <option value="PVL">
+            <brief>Pvl format</brief>
+            <description>
+              Output will be in Pvl format.
+            </description>
+          </option>
+          <option value="FLAT">
+            <brief>Flatfile format</brief>
+            <description>
+              Output file in comma separated value, flatfile, format.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+   
   </groups>
 
 </application>
