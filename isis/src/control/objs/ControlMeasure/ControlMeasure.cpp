@@ -1054,19 +1054,18 @@ namespace Isis {
     iString err = "String [";
     err += iString(str) + "] can not be converted to a MeasureType";
 
-    str.toLower();
+    str = str.toLower();
     MeasureType measureType;
-    
     if (str == "candidate")
       measureType = ControlMeasure::Candidate;
     else
-      if (str == "Manual")
+      if (str == "manual")
         measureType = ControlMeasure::Manual;
       else
-        if (str == "RegisteredPixel")
+        if (str == "registeredpixel")
           measureType = ControlMeasure::RegisteredPixel;
         else
-          if (str == "RegisteredSubPixel")
+          if (str == "registeredsubpixel")
             measureType = ControlMeasure::RegisteredSubPixel;
           else
             throw iException::Message(iException::Programmer, err, _FILEINFO_);
