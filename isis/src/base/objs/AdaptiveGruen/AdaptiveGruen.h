@@ -71,7 +71,7 @@ namespace Isis {
 
     protected:
       /** Return name of Algorithm */
-      virtual std::string AlgorithmName() const {
+      virtual iString AlgorithmName() const {
         return ("AdaptiveGruen");
       }
 

@@ -58,7 +58,7 @@ namespace Isis {
       virtual double IdealFit() const {
         return 1.0;
       };
-      virtual std::string AlgorithmName() const {
+      virtual iString AlgorithmName() const {
         return "MaximumCorrelation";
       };
 

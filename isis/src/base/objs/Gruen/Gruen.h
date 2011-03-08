@@ -150,7 +150,7 @@ namespace Isis {
       typedef GSL::GSLUtility::GSLVector GSLVector;
 
       /** Returns the default name of the algorithm as Gruen */
-      virtual std::string AlgorithmName() const {
+      virtual iString AlgorithmName() const {
         return ("Gruen");
       }
 

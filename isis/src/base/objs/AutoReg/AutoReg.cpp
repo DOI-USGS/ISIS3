@@ -17,6 +17,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "AutoReg.h"
+#include "Buffer.h"
 #include "Chip.h"
 #include "Filename.h"
 #include "Histogram.h"
@@ -24,6 +25,7 @@
 #include "iException.h"
 #include "Interpolator.h"
 #include "Matrix.h"
+#include "PixelType.h"
 #include "Plugin.h"
 #include "PolynomialBivariate.h"
 #include "Pvl.h"
@@ -86,6 +88,7 @@ namespace Isis {
     p_reducedPatternChip.SetSize(3, 3);
     p_reducedSearchChip.SetSize(5, 5);
     p_reducedFitChip.SetSize(5, 5);
+    p_gradientFilterType = AutoReg::None;
 
     SetPatternValidPercent(50.0);
     SetSubsearchValidPercent(50.0);
@@ -104,18 +107,18 @@ namespace Isis {
 
     // Clear statistics
     //TODO: Delete these after control net refactor.
-    p_Total = 0;
-    p_SuccessPixel = 0;
-    p_SuccessSubPixel = 0;
-    p_PatternChipNotEnoughValidData = 0;
-    p_PatternZScoreNotMet = 0;
-    p_FitChipNoData = 0;
-    p_FitChipToleranceNotMet = 0;
-    p_SurfaceModelNotEnoughValidData = 0;
-    p_SurfaceModelSolutionInvalid = 0;
-    p_SurfaceModelDistanceInvalid = 0;
-    p_SurfaceModelEccentricityRatioNotMet = 0;
-    p_SurfaceModelResidualToleranceNotMet = 0;
+    p_totalRegistrations = 0;
+    p_pixelSuccesses = 0;
+    p_subpixelSuccesses = 0;
+    p_patternChipNotEnoughValidDataCount = 0;
+    p_patternZScoreNotMetCount = 0;
+    p_fitChipNoDataCount = 0;
+    p_fitChipToleranceNotMetCount = 0;
+    p_surfaceModelNotEnoughValidDataCount = 0;
+    p_surfaceModelSolutionInvalidCount = 0;
+    p_surfaceModelDistanceInvalidCount = 0;
+    p_surfaceModelEccentricityRatioNotMetCount = 0;
+    p_surfaceModelResidualToleranceNotMetCount = 0;
 
     p_sampMovement = 0.;
     p_lineMovement = 0.;
@@ -132,8 +135,8 @@ namespace Isis {
   void AutoReg::Init() {
     // Set computed parameters to NULL so we don't use values from a previous
     // run
-    p_ZScoreMin = Isis::Null;
-    p_ZScoreMax = Isis::Null;
+    p_zScoreMin = Isis::Null;
+    p_zScoreMax = Isis::Null;
     p_goodnessOfFit = Isis::Null;
     p_surfaceModelEccentricity = Isis::Null;
     p_surfaceModelEccentricityRatio = Isis::Null;
@@ -229,6 +232,10 @@ namespace Isis {
         SetReductionFactor((int)algo["ReductionFactor"]);
       }
 
+      if (algo.HasKeyword("Gradient")) {
+        SetGradientFilterType((string)algo["Gradient"]);
+      }
+
       // Setup the pattern chip
       PvlGroup &pchip = pvl.FindGroup("PatternChip", Pvl::Traverse);
       PatternChip()->SetSize((int)pchip["Samples"], (int)pchip["Lines"]);
@@ -258,7 +265,6 @@ namespace Isis {
       if(schip.HasKeyword("SubchipValidPercent")) {
         SetSubsearchValidPercent((double)schip["SubchipValidPercent"]);
       }
-
 
       // Setup surface model
       PvlObject ar = pvl.FindObject("AutoRegistration");
@@ -291,6 +297,31 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     return;
+  }
+
+  /**
+   * Set the gradient filter type to be applied to the search and pattern
+   * chips.
+   *
+   * @param gradientFilterType the gradient filter type to use
+   * @throw iException::User - "Invalid Gradient type."
+   */
+  void AutoReg::SetGradientFilterType(const iString& gradientFilterType) {
+    if (gradientFilterType == "None") {
+      p_gradientFilterType = AutoReg::None;
+    }
+    else if (gradientFilterType == "Roberts") {
+      p_gradientFilterType = AutoReg::Roberts;
+    }
+    else if (gradientFilterType == "Sobel") {
+      p_gradientFilterType = AutoReg::Sobel;
+    }
+    else {
+      throw iException::Message(iException::User,
+                                "Invalid Gradient type.  Cannot use ["
+                                + gradientFilterType + "] to filter chip",
+                                _FILEINFO_);
+    }
   }
 
   /**
@@ -432,7 +463,7 @@ namespace Isis {
    * @internal
    *   @history 2010-06-15 Jeannie Walldren - Original version.
    */
-  void AutoReg::SetChipInterpolator(const string interpolator) {
+  void AutoReg::SetChipInterpolator(const iString& interpolator) {
 
     Isis::Interpolator::interpType itype;
     if(interpolator == "NearestNeighborType") {
@@ -480,7 +511,6 @@ namespace Isis {
     }
     p_windowSize = size;
   }
-
 
   /**
    * A 1:1 ratio represents a perfect circle.  Allowing the user
@@ -571,7 +601,6 @@ namespace Isis {
     p_reduceFactor = factor;
   }
 
-
   /**
    * This method reduces the given chip by the given reduction
    * factor. Used to speed up the match algorithm.
@@ -651,18 +680,23 @@ namespace Isis {
     }
 
     Init();
-    p_Total++;
+    p_totalRegistrations++;
+
+    // Run a gradient filter over the search and pattern chips before
+    // attempting to match them.
+    ApplyGradientFilter(p_patternChip);
+    ApplyGradientFilter(p_searchChip);
 
     // See if the pattern chip has enough good data
     if(!p_patternChip.IsValid(p_patternValidPercent)) {
-      p_PatternChipNotEnoughValidData++;
-      p_status = PatternChipNotEnoughValidData;
+      p_patternChipNotEnoughValidDataCount++;
+      p_registrationStatus = PatternChipNotEnoughValidData;
       return PatternChipNotEnoughValidData;
     }
 
     if(!ComputeChipZScore(p_patternChip)) {
-      p_PatternZScoreNotMet++;
-      p_status = PatternZScoreNotMet;
+      p_patternZScoreNotMetCount++;
+      p_registrationStatus = PatternZScoreNotMet;
       return PatternZScoreNotMet;
     }
 
@@ -690,7 +724,6 @@ namespace Isis {
     int bestSearchSamp = p_searchChip.TackSample();
     int bestSearchLine = p_searchChip.TackLine();
 
-
     // ---------------------------------------------------------------------
     // if the reduction factor is still not equal to one, then we go ahead
     // with the reduction of the chips and call Match to get the first
@@ -715,8 +748,8 @@ namespace Isis {
 
         p_reducedPatternChip = Reduce(p_patternChip, p_reduceFactor);
         if(!ComputeChipZScore(p_reducedPatternChip)) {
-          p_PatternZScoreNotMet++;
-          p_status = PatternZScoreNotMet;
+          p_patternZScoreNotMetCount++;
+          p_registrationStatus = PatternZScoreNotMet;
           return PatternZScoreNotMet;
         }
 
@@ -728,8 +761,8 @@ namespace Isis {
 
         Match(p_reducedSearchChip, p_reducedPatternChip, p_reducedFitChip, startSamp, endSamp, startLine, endLine);
         if(p_bestFit == Isis::Null) {
-          p_FitChipNoData++;
-          p_status = FitChipNoData;
+          p_fitChipNoDataCount++;
+          p_registrationStatus = FitChipNoData;
           return FitChipNoData;
         }
       }
@@ -774,17 +807,17 @@ namespace Isis {
     // to be closely registered.  Within a few pixels.  So let it take over
     // doing the sub-pixel accuracy computation
     if(IsAdaptive()) {
-      p_status = AdaptiveRegistration(p_searchChip, p_patternChip, p_fitChip,
+      p_registrationStatus = AdaptiveRegistration(p_searchChip, p_patternChip, p_fitChip,
                                       startSamp, startLine, endSamp, endLine, bestSearchSamp,
                                       bestSearchLine);
-      if(p_status == AutoReg::SuccessSubPixel) {
+      if(p_registrationStatus == AutoReg::SuccessSubPixel) {
         p_searchChip.SetChipPosition(p_chipSample, p_chipLine);
         p_cubeSample = p_searchChip.CubeSample();
         p_cubeLine   = p_searchChip.CubeLine();
         p_goodnessOfFit = p_bestFit;
-        p_SuccessSubPixel++;
+        p_subpixelSuccesses++;
       }
-      return p_status;
+      return p_registrationStatus;
     }
 
     // Not adaptive continue with slower search traverse
@@ -793,8 +826,8 @@ namespace Isis {
     // Check to see if we went through the fit chip and never got a fit at
     // any location.
     if(p_bestFit == Isis::Null) {
-      p_FitChipNoData++;
-      p_status = FitChipNoData;
+      p_fitChipNoDataCount++;
+      p_registrationStatus = FitChipNoData;
       return FitChipNoData;
     }
 
@@ -810,8 +843,8 @@ namespace Isis {
 
     // Now see if we satisified the goodness of fit tolerance
     if(!CompareFits(p_bestFit, Tolerance())) {
-      p_FitChipToleranceNotMet++;
-      p_status = FitChipToleranceNotMet;
+      p_fitChipToleranceNotMetCount++;
+      p_registrationStatus = FitChipToleranceNotMet;
       return FitChipToleranceNotMet;
     }
 
@@ -837,8 +870,8 @@ namespace Isis {
       // we are not too close to the edge of the fit chip
       // -----------------------------------------------------------
       if((int)samps.size() < p_windowSize * p_windowSize * 2 / 3 + 1) {
-        p_SurfaceModelNotEnoughValidData++;
-        p_status = SurfaceModelNotEnoughValidData;
+        p_surfaceModelNotEnoughValidDataCount++;
+        p_registrationStatus = SurfaceModelNotEnoughValidData;
         return SurfaceModelNotEnoughValidData;
       }
 
@@ -848,7 +881,7 @@ namespace Isis {
       // -------------------------------------------------------------------
       computedSubPixel = ModelSurface(samps, lines, fits);
       if (!computedSubPixel) {
-        return p_status;
+        return p_registrationStatus;
       }
 
       // ---------------------------------------------------------------------
@@ -859,8 +892,8 @@ namespace Isis {
       p_lineMovement = std::fabs(p_bestLine - p_chipLine);
       if(p_sampMovement > p_distanceTolerance ||
           p_lineMovement > p_distanceTolerance) {
-        p_SurfaceModelDistanceInvalid++;
-        p_status = SurfaceModelDistanceInvalid;
+        p_surfaceModelDistanceInvalidCount++;
+        p_registrationStatus = SurfaceModelDistanceInvalid;
         return SurfaceModelDistanceInvalid;
       }
 
@@ -872,14 +905,14 @@ namespace Isis {
 
     // Registration succeeded, but did it compute to sub-pixel accuracy?
     if (computedSubPixel) {
-      p_SuccessSubPixel++;
-      p_status = SuccessSubPixel;
+      p_subpixelSuccesses++;
+      p_registrationStatus = SuccessSubPixel;
     }
     else {
-      p_SuccessPixel++;
-      p_status = SuccessPixel;
+      p_pixelSuccesses++;
+      p_registrationStatus = SuccessPixel;
     }
-    return p_status;
+    return p_registrationStatus;
   }
 
 
@@ -904,13 +937,13 @@ namespace Isis {
     }
 
     // If it does not pass, return
-    p_ZScoreMin = patternStats.ZScore(patternStats.Minimum());
-    p_ZScoreMax = patternStats.ZScore(patternStats.Maximum());
+    p_zScoreMin = patternStats.ZScore(patternStats.Minimum());
+    p_zScoreMax = patternStats.ZScore(patternStats.Maximum());
 
-    // p_ZScoreMin is made negative here so as to make it the equivalent of
-    // taking the absolute value (because p_ZScoreMin is guaranteed to be
+    // p_zScoreMin is made negative here so as to make it the equivalent of
+    // taking the absolute value (because p_zScoreMin is guaranteed to be
     // negative)
-    if (p_ZScoreMax < p_minimumPatternZScore && -p_ZScoreMin < p_minimumPatternZScore) {
+    if (p_zScoreMax < p_minimumPatternZScore && -p_zScoreMin < p_minimumPatternZScore) {
       return false;
     }
     else {
@@ -918,12 +951,121 @@ namespace Isis {
     }
   }
 
+  /**
+   * Run a gradient filter over the chip. The type of filter is determined by
+   * the Gradient keyword in the Algorithm group.
+   *
+   * @param chip the chip to be filtered
+   */
+  void AutoReg::ApplyGradientFilter(Chip &chip) {
+    if (p_gradientFilterType == None) {
+      return;
+    }
+
+    // Use a different subchip size depending on which gradient filter is 
+    // being applied.
+    int subChipWidth;
+    if (p_gradientFilterType == Roberts) {
+      subChipWidth = 2;
+    }
+    if (p_gradientFilterType == Sobel) {
+      subChipWidth = 3;
+    }
+
+    // Create a new chip to hold output during processing.
+    Chip filteredChip(chip.Samples(), chip.Lines());
+
+    // Move the subchip through the chip, extracting the contents into a buffer
+    // of the same shape. This simulates the processing of a cube by boxcar,
+    // but since that can only operate on cubes, this functionality had to be
+    // replicated for use on chips.
+    for (int line = 1; line <= chip.Lines(); line++) {
+      for (int sample = 1; sample <= chip.Samples(); sample++) {
+        Chip subChip = chip.Extract(subChipWidth, subChipWidth,
+            sample, line);
+
+        // Fill a buffer with subchip's contents. Since we'll never be storing
+        // raw bytes in the buffer, we don't care about the pixel type.
+        Buffer buffer(subChipWidth, subChipWidth, 1, Isis::None);
+        double *doubleBuffer = buffer.DoubleBuffer();
+        int bufferIndex = 0;
+        for (int subChipLine = 1; subChipLine <= subChip.Lines();
+            subChipLine++) {
+          for (int subChipSample = 1; subChipSample <= subChip.Samples();
+              subChipSample++) {
+            doubleBuffer[bufferIndex] = subChip.GetValue(subChipSample,
+                subChipLine);
+            bufferIndex++;
+          }
+        }
+
+        // Calculate gradient based on contents in buffer and insert it into
+        // output chip.
+        double newPixelValue = 0;
+        if (p_gradientFilterType == Roberts) {
+          RobertsGradient(buffer, newPixelValue);
+        }
+        if (p_gradientFilterType == Sobel) {
+          SobelGradient(buffer, newPixelValue);
+        }
+        filteredChip.SetValue(sample, line, newPixelValue);
+      }
+    }
+
+    chip = filteredChip;
+  }
+
+  /**
+   * Compute a Roberts gradient based on an input buffer.
+   *
+   * TODO: Remove this method as it already exists in the
+   * gradient application.
+   *
+   * @param in the input buffer
+   * @param v the value of the gradient computed from the buffer
+   */
+  void AutoReg::RobertsGradient(Buffer &in, double &v) {
+    bool specials = false;
+    for(int i = 0; i < in.size(); ++i) {
+      if(IsSpecial(in[i])) {
+        specials = true;
+      }
+    }
+    if(specials) {
+      v = Isis::Null;
+      return;
+    }
+    v = abs(in[0] - in[3]) + abs(in[1] - in[2]);
+  }
+
+  /**
+   * Compute a Sobel gradient based on an input buffer.
+   *
+   * TODO: Remove this method as it already exists in the
+   * gradient application.
+   *
+   * @param in the input buffer
+   * @param v the value of the gradient computed from the buffer
+   */
+  void AutoReg::SobelGradient(Buffer &in, double &v) {
+    bool specials = false;
+    for(int i = 0; i < in.size(); ++i) {
+      if(IsSpecial(in[i])) {
+        specials = true;
+      }
+    }
+    if(specials) {
+      v = Isis::Null;
+      return;
+    }
+    v = abs((in[0] + 2 * in[1] + in[2]) - (in[6] + 2 * in[7] + in[8])) +
+        abs((in[2] + 2 * in[5] + in[8]) - (in[0] + 2 * in[3] + in[6]));
+  }
 
   /**
    * Here we walk from start sample to end sample and start line to end line, and
    * compare the pattern chip against the search chip to find the
    * best line/sample.
-   *
    *
    * @param sChip Search chip
    * @param pChip Pattern chip
@@ -935,7 +1077,6 @@ namespace Isis {
    *  
    * @throw iException::Programmer - "StartSample = EndSample and StartLine = 
    *        EndLine."
-   *
    */
   void AutoReg::Match(Chip &sChip, Chip &pChip, Chip &fChip, int startSamp, int endSamp, int startLine, int endLine) {
     // Sanity check.  Should have been caught by the two previous tests
@@ -1023,8 +1164,8 @@ namespace Isis {
     }
     catch(iException &e) {
       e.Clear();
-      p_status = SurfaceModelSolutionInvalid;
-      p_SurfaceModelSolutionInvalid++;
+      p_registrationStatus = SurfaceModelSolutionInvalid;
+      p_surfaceModelSolutionInvalidCount++;
       return false;
     }
 
@@ -1113,8 +1254,8 @@ namespace Isis {
 
       // Ensure that the eccentricity is less than or equal to the tolerance
       if(p_surfaceModelEccentricity > p_surfaceModelEccentricityTolerance) {
-        p_status = SurfaceModelEccentricityRatioNotMet;
-        p_SurfaceModelEccentricityRatioNotMet++;
+        p_registrationStatus = SurfaceModelEccentricityRatioNotMet;
+        p_surfaceModelEccentricityRatioNotMetCount++;
         return false;
       }
     }
@@ -1135,8 +1276,8 @@ namespace Isis {
 
       // Ensure the average residual is within the tolerance
       if(meanAbsError > p_surfaceModelResidualTolerance) {
-        p_status = SurfaceModelResidualToleranceNotMet;
-        p_SurfaceModelResidualToleranceNotMet++;
+        p_registrationStatus = SurfaceModelResidualToleranceNotMet;
+        p_surfaceModelResidualToleranceNotMetCount++;
         return false;
       }
     }
@@ -1144,8 +1285,8 @@ namespace Isis {
     // Compute the determinant
     double det = 4.0 * d * f - e * e;
     if(det == 0.0) {
-      p_status = SurfaceModelSolutionInvalid;
-      p_SurfaceModelSolutionInvalid++;
+      p_registrationStatus = SurfaceModelSolutionInvalid;
+      p_surfaceModelSolutionInvalidCount++;
       return false;
     }
 
@@ -1192,19 +1333,19 @@ namespace Isis {
     AutoRegItem item;
     item.setSearchFile(p_searchChip.Filename());
     item.setPatternFile(p_patternChip.Filename());
-    //item.setStatus(p_status);
+    //item.setStatus(p_registrationStatus);
     item.setGoodnessOfFit(p_goodnessOfFit);
     item.setEccentricity(p_surfaceModelEccentricity);
-    item.setZScoreOne(p_ZScoreMin);
-    item.setZScoreTwo(p_ZScoreMax);
+    item.setZScoreOne(p_zScoreMin);
+    item.setZScoreTwo(p_zScoreMax);
 
     /*if(p_goodnessOfFit != Isis::Null)item.setGoodnessOfFit(p_goodnessOfFit);
     if(p_surfaceModelEccentricity != Isis::Null) item.setEccentricity(p_surfaceModelEccentricity);
-    if(p_ZScoreMin != Isis::Null)item.setZScoreOne(p_ZScoreMin);
-    if(p_ZScoreMax != Isis::Null)item.setZScoreTwo(p_ZScoreMax);*/
+    if(p_zScoreMin != Isis::Null)item.setZScoreOne(p_zScoreMin);
+    if(p_zScoreMax != Isis::Null)item.setZScoreTwo(p_zScoreMax);*/
 
     // Set the autoRegItem's change in line/sample numbers.
-    if(p_status == Success) {
+    if(p_registrationStatus == Success) {
       item.setDeltaSample(p_searchChip.TackSample() - p_searchChip.CubeSample());
       item.setDeltaLine(p_searchChip.TackLine() - p_searchChip.CubeLine());
     }
@@ -1231,32 +1372,32 @@ namespace Isis {
   Pvl AutoReg::RegistrationStatistics() {
     Pvl pvl;
     PvlGroup stats("AutoRegStatistics");
-    stats += Isis::PvlKeyword("Total", p_Total);
-    stats += Isis::PvlKeyword("Successful", p_SuccessPixel + p_SuccessSubPixel);
-    stats += Isis::PvlKeyword("Failure", p_Total - (p_SuccessPixel + p_SuccessSubPixel));
+    stats += Isis::PvlKeyword("Total", p_totalRegistrations);
+    stats += Isis::PvlKeyword("Successful", p_pixelSuccesses + p_subpixelSuccesses);
+    stats += Isis::PvlKeyword("Failure", p_totalRegistrations - (p_pixelSuccesses + p_subpixelSuccesses));
     pvl.AddGroup(stats);
 
     PvlGroup successes("Successes");
-    successes += PvlKeyword("SuccessPixel", p_SuccessPixel);
-    successes += PvlKeyword("SuccessSubPixel", p_SuccessSubPixel);
+    successes += PvlKeyword("SuccessPixel", p_pixelSuccesses);
+    successes += PvlKeyword("SuccessSubPixel", p_subpixelSuccesses);
     pvl.AddGroup(successes);
 
     PvlGroup grp("PatternChipFailures");
-    grp += PvlKeyword("PatternNotEnoughValidData", p_PatternChipNotEnoughValidData);
-    grp += PvlKeyword("PatternZScoreNotMet", p_PatternZScoreNotMet);
+    grp += PvlKeyword("PatternNotEnoughValidData", p_patternChipNotEnoughValidDataCount);
+    grp += PvlKeyword("PatternZScoreNotMet", p_patternZScoreNotMetCount);
     pvl.AddGroup(grp);
 
     PvlGroup fit("FitChipFailures");
-    fit += PvlKeyword("FitChipNoData", p_FitChipNoData);
-    fit += PvlKeyword("FitChipToleranceNotMet", p_FitChipToleranceNotMet);
+    fit += PvlKeyword("FitChipNoData", p_fitChipNoDataCount);
+    fit += PvlKeyword("FitChipToleranceNotMet", p_fitChipToleranceNotMetCount);
     pvl.AddGroup(fit);
 
     PvlGroup model("SurfaceModelFailures");
-    model += PvlKeyword("SurfaceModelNotEnoughValidData", p_SurfaceModelNotEnoughValidData);
-    model += PvlKeyword("SurfaceModelSolutionInvalid", p_SurfaceModelSolutionInvalid);
-    model += PvlKeyword("SurfaceModelEccentricityRatioNotMet", p_SurfaceModelEccentricityRatioNotMet);
-    model += PvlKeyword("SurfaceModelDistanceInvalid", p_SurfaceModelDistanceInvalid);
-    model += PvlKeyword("SurfaceModelResidualToleranceNotMet", p_SurfaceModelResidualToleranceNotMet);
+    model += PvlKeyword("SurfaceModelNotEnoughValidData", p_surfaceModelNotEnoughValidDataCount);
+    model += PvlKeyword("SurfaceModelSolutionInvalid", p_surfaceModelSolutionInvalidCount);
+    model += PvlKeyword("SurfaceModelEccentricityRatioNotMet", p_surfaceModelEccentricityRatioNotMetCount);
+    model += PvlKeyword("SurfaceModelDistanceInvalid", p_surfaceModelDistanceInvalidCount);
+    model += PvlKeyword("SurfaceModelResidualToleranceNotMet", p_surfaceModelResidualToleranceNotMetCount);
     pvl.AddGroup(model);
 
     return (AlgorithmStatistics(pvl));
@@ -1332,6 +1473,9 @@ namespace Isis {
     }
     if(algo.HasKeyword("ReductionFactor")) {
       reg += PvlKeyword("ReductionFactor", algo["ReductionFactor"][0]);
+    }
+    if(algo.HasKeyword("Gradient")) {
+      reg += PvlKeyword("Gradient", algo["Gradient"][0]);
     }
 
     PvlGroup &pchip = p_template.FindGroup("PatternChip", Pvl::Traverse);

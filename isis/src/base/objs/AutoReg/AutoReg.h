@@ -23,15 +23,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-
-#include <string>
 #include <vector>
 
 #include "Chip.h"
 #include "Statistics.h"
 
-
-using namespace std;
 namespace Isis {
   /**
    * @brief Auto Registration class
@@ -81,7 +77,7 @@ namespace Isis {
    *             the ModelSurface method.  Also added the 'reduce'
    *             option to speed up the pattern matching process.
    *    @history 2009-06-02 Stacy Alley - ModelSurface method now
-   *             returns a bool instead of an int.  The p_status
+   *             returns a bool instead of an int.  The p_registrationStatus
    *             is set within this method now. The Match method
    *             now takes another arg... fChip, passed in from
    *             Register. Also took out a redundant test,
@@ -152,10 +148,16 @@ namespace Isis {
    *             computed and not computed to sub-pixel accuracy.  Also added
    *             method "Success()" to fill the role of looking at the
    *             original "Success" value to know if AutoReg succeeded.
+   *    @history 2011-03-08 Jai Rideout - Added ability to apply a gradient
+   *             filter to chips before attempting to perform a match. Renamed
+   *             member variables to be consistent with the variable naming
+   *             scheme in the rest of the file.
    *
    */
-  class Pvl;
   class AutoRegItem;
+  class Buffer;
+  class iString;
+  class Pvl;
 
   class AutoReg {
     public:
@@ -182,6 +184,16 @@ namespace Isis {
         SurfaceModelEccentricityRatioNotMet, //!< Ellipse eccentricity of the surface model not satisfied
         SurfaceModelResidualToleranceNotMet, //!< Average residual of the surface model not satisfied
         AdaptiveAlgorithmFailed              //!< Error occured in Adaptive algorithm
+      };
+
+      /**
+       * Enumeration of the different types of gradient filters that can be
+       * applied to the pattern and search chips before matching them.
+       */
+      enum GradientFilterType {
+        None,   //!< default, no gradient filter
+        Sobel,  //!< Sobel gradient filter
+        Roberts //!< Roberts gradient filter
       };
 
       //! Return pointer to pattern chip
@@ -218,13 +230,14 @@ namespace Isis {
       void SetPatternValidPercent(const double percent);
       void SetSubsearchValidPercent(const double percent);
       void SetTolerance(double tolerance);
-      void SetChipInterpolator(const string interpolator);
+      void SetChipInterpolator(const iString& interpolator);
       void SetSurfaceModelWindowSize(int size);
       void SetSurfaceModelDistanceTolerance(double distance);
       void SetReductionFactor(int reductionFactor);
       void SetPatternZScoreMinimum(double minimum);
       void SetSurfaceModelEccentricityRatio(double ratioTolerance);
       void SetSurfaceModelResidualTolerance(double residualTolerance);
+      void SetGradientFilterType(const iString& gradientFilterType);
 
       /**
        * Determine if eccentricity tests should be performed during 
@@ -306,7 +319,7 @@ namespace Isis {
 
       //! Return whether the match algorithm succeeded or not
       inline bool Success() const {
-        return (p_status == SuccessPixel || p_status == SuccessSubPixel);
+        return (p_registrationStatus == SuccessPixel || p_registrationStatus == SuccessSubPixel);
       }
 
       //! Return the goodness of fit of the match algorithm
@@ -363,8 +376,8 @@ namespace Isis {
        * @param score2 Second Z Score
        */
       void ZScores(double &score1, double &score2) const {
-        score1 = p_ZScoreMin;
-        score2 = p_ZScoreMax;
+        score1 = p_zScoreMin;
+        score2 = p_zScoreMax;
       }
 
       //! Return eccentricity tolerance
@@ -386,9 +399,9 @@ namespace Isis {
        * Returns the name of the algorithm.
        *
        *
-       * @return std::string
+       * @return iString
        */
-      virtual string AlgorithmName() const = 0;
+      virtual iString AlgorithmName() const = 0;
 
       PvlGroup RegTemplate();
 
@@ -492,63 +505,66 @@ namespace Isis {
                  int endLine);
       bool ComputeChipZScore(Chip &chip);
       void Init();
+      void ApplyGradientFilter(Chip &chip);
+      void RobertsGradient(Buffer &in, double &v);
+      void SobelGradient(Buffer &in, double &v);
 
-      Chip p_patternChip;                               //!< Chip to be matched
-      Chip p_searchChip;                                //!< Chip to be searched for best registration
-      Chip p_fitChip;                                   //!< Results from MatchAlgorithm() method
-      Chip p_reducedPatternChip;                        //!< Pattern Chip with reduction factor
-      Chip p_reducedSearchChip;                         //!< Search Chip with reduction factor
-      Chip p_reducedFitChip;                            //!< Fit Chip with reduction factor
+      Chip p_patternChip;                                  //!< Chip to be matched
+      Chip p_searchChip;                                   //!< Chip to be searched for best registration
+      Chip p_fitChip;                                      //!< Results from MatchAlgorithm() method
+      Chip p_reducedPatternChip;                           //!< Pattern Chip with reduction factor
+      Chip p_reducedSearchChip;                            //!< Search Chip with reduction factor
+      Chip p_reducedFitChip;                               //!< Fit Chip with reduction factor
 
-      bool p_subpixelAccuracy;                          //!< Indicates whether sub-pixel accuracy is enabled. Default is true.
-      bool p_testEccentricity;                          //!< Indicates whether eccentricity tests should be performed.
-      bool p_testResidual;                              //!< Indicates whether residual tests should be performed.
+      bool p_subpixelAccuracy;                             //!< Indicates whether sub-pixel accuracy is enabled. Default is true.
+      bool p_testEccentricity;                             //!< Indicates whether eccentricity tests should be performed.
+      bool p_testResidual;                                 //!< Indicates whether residual tests should be performed.
 
       //TODO: remove these after control points are refactored.
-      int p_Total;                                      //!< Registration Statistics Total keyword.
-      int p_SuccessPixel;                               //!< Registration statistics Success keyword.
-      int p_SuccessSubPixel;                            //!< Registration statistics Success keyword.
-      int p_PatternChipNotEnoughValidData;              //!< Registration statistics PatternNotEnoughValidData keyword.
-      int p_PatternZScoreNotMet;                        //!< Registration statistics PatternZScoreNotMet keyword.
-      int p_FitChipNoData;                              //!< Registration statistics FitChipNoData keyword.
-      int p_FitChipToleranceNotMet;                     //!< Registration statistics FitChipToleranceNotMet keyword.
-      int p_SurfaceModelNotEnoughValidData;             //!< Registration statistics SurfaceModelNotEnoughValidData keyword.
-      int p_SurfaceModelSolutionInvalid;                //!< Registration statistics SurfaceModelSolutionInvalid keyword.
-      int p_SurfaceModelDistanceInvalid;                //!< Registration statistics SurfaceModelDistanceInvalid keyword.
-      int p_SurfaceModelEccentricityRatioNotMet;        //!< Registration statistics SurfaceModelEccentricityRatioNotMet keyword.
-      int p_SurfaceModelResidualToleranceNotMet;        //!< Registration statistics SurfaceModelResidualToleranceNotMet keyword.
+      int p_totalRegistrations;                            //!< Registration Statistics Total keyword.
+      int p_pixelSuccesses;                                //!< Registration statistics Success keyword.
+      int p_subpixelSuccesses;                             //!< Registration statistics Success keyword.
+      int p_patternChipNotEnoughValidDataCount;            //!< Registration statistics PatternNotEnoughValidData keyword.
+      int p_patternZScoreNotMetCount;                      //!< Registration statistics PatternZScoreNotMet keyword.
+      int p_fitChipNoDataCount;                            //!< Registration statistics FitChipNoData keyword.
+      int p_fitChipToleranceNotMetCount;                   //!< Registration statistics FitChipToleranceNotMet keyword.
+      int p_surfaceModelNotEnoughValidDataCount;           //!< Registration statistics SurfaceModelNotEnoughValidData keyword.
+      int p_surfaceModelSolutionInvalidCount;              //!< Registration statistics SurfaceModelSolutionInvalid keyword.
+      int p_surfaceModelDistanceInvalidCount;              //!< Registration statistics SurfaceModelDistanceInvalid keyword.
+      int p_surfaceModelEccentricityRatioNotMetCount;      //!< Registration statistics SurfaceModelEccentricityRatioNotMet keyword.
+      int p_surfaceModelResidualToleranceNotMetCount;      //!< Registration statistics SurfaceModelResidualToleranceNotMet keyword.
 
-      double p_ZScoreMin;                                 //!< First Z-Score of pattern chip
-      double p_ZScoreMax;                                 //!< Second Z-Score of pattern chip
+      double p_zScoreMin;                                  //!< First Z-Score of pattern chip
+      double p_zScoreMax;                                  //!< Second Z-Score of pattern chip
 
-      double p_minimumPatternZScore;                    //!< Minimum pattern Z-Score
-      double p_patternValidPercent;                     //!< Percentage of data in pattern chip that must be valid
-      double p_subsearchValidPercent;                   //!< Percentage of data in subsearch chip that must be valid
+      double p_minimumPatternZScore;                       //!< Minimum pattern Z-Score
+      double p_patternValidPercent;                        //!< Percentage of data in pattern chip that must be valid
+      double p_subsearchValidPercent;                      //!< Percentage of data in subsearch chip that must be valid
 
-      double p_chipSample;                              //!< Chip sample
-      double p_chipLine;                                //!< Chip line
-      double p_cubeSample;                              //!< Cube sample
-      double p_cubeLine;                                //!< Cube line
-      double p_goodnessOfFit;                           //!< Goodness of fit of the match algorithm
-      double p_tolerance;                               //!< Tolerance for acceptable goodness of fit in match algorithm
+      double p_chipSample;                                 //!< Chip sample
+      double p_chipLine;                                   //!< Chip line
+      double p_cubeSample;                                 //!< Cube sample
+      double p_cubeLine;                                   //!< Cube line
+      double p_goodnessOfFit;                              //!< Goodness of fit of the match algorithm
+      double p_tolerance;                                  //!< Tolerance for acceptable goodness of fit in match algorithm
 
-      int p_windowSize;                                 //!< Surface model window size
-      double p_distanceTolerance;                       //!< Maximum distance the surface model solution may be from the best whole pixel fit in the fit chip
-      double p_surfaceModelResidualTolerance;           //!< Defaults to 0.1 in case enabled directly by programmer
-      double p_surfaceModelAvgResidual;                 //!< Surface model average residual calculated by ModelSurface()
+      int p_windowSize;                                    //!< Surface model window size
+      double p_distanceTolerance;                          //!< Maximum distance the surface model solution may be from the best whole pixel fit in the fit chip
+      double p_surfaceModelResidualTolerance;              //!< Defaults to 0.1 in case enabled directly by programmer
+      double p_surfaceModelAvgResidual;                    //!< Surface model average residual calculated by ModelSurface()
 
-      double p_surfaceModelEccentricityTolerance;       //!< Surface model eccentricity tolerance. Defaults to 2:1 in case enabled directly by programmer
-      double p_surfaceModelEccentricityRatioTolerance;  //!< Surface model eccentricity ratio tolerance. Defaults to 2:1 in case enabled directly by programmer
-      double p_surfaceModelEccentricity;                //!< Surface model eccentricity.
-      double p_surfaceModelEccentricityRatio;           //!< Surface model eccentricity ratio.
-      double p_bestFit;                                 //!< Goodness of fit for adaptive algorithms.
-      int p_bestSamp;                                   //!< Sample value of best fit.
-      int p_bestLine;                                   //!< Line value of best fit.
-      double p_sampMovement;                            //!< The number of samples the point moved.
-      double p_lineMovement;                            //!< The number of lines the point moved.
-      int p_reduceFactor;                               //!< Reduction factor.
-      Isis::AutoReg::RegisterStatus p_status;           //!< Registration status to be returned by Register().
-
+      double p_surfaceModelEccentricityTolerance;          //!< Surface model eccentricity tolerance. Defaults to 2:1 in case enabled directly by programmer
+      double p_surfaceModelEccentricityRatioTolerance;     //!< Surface model eccentricity ratio tolerance. Defaults to 2:1 in case enabled directly by programmer
+      double p_surfaceModelEccentricity;                   //!< Surface model eccentricity.
+      double p_surfaceModelEccentricityRatio;              //!< Surface model eccentricity ratio.
+      double p_bestFit;                                    //!< Goodness of fit for adaptive algorithms.
+      int p_bestSamp;                                      //!< Sample value of best fit.
+      int p_bestLine;                                      //!< Line value of best fit.
+      double p_sampMovement;                               //!< The number of samples the point moved.
+      double p_lineMovement;                               //!< The number of lines the point moved.
+      int p_reduceFactor;                                  //!< Reduction factor.
+      Isis::AutoReg::RegisterStatus p_registrationStatus;  //!< Registration status to be returned by Register().
+      AutoReg::GradientFilterType p_gradientFilterType;    //!< Type of gradient filter to use before matching.
   };
 };
 

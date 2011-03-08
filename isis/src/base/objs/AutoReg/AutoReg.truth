@@ -33,6 +33,12 @@ Test for wrong ChipInterpolator Keyword value
 **USER ERROR** Improper format for AutoReg PVL []
 **USER ERROR** Invalid Interpolator type.  Cannot use [None] to load chip
 
+-----------------------------------
+Test for wrong Gradient Keyword value
+-----------------------------------
+**USER ERROR** Improper format for AutoReg PVL []
+**USER ERROR** Invalid Gradient type.  Cannot use [Random] to filter chip
+
 -------------------------------
 Test for missing Lines Keyword
 -------------------------------
@@ -419,7 +425,7 @@ End
 ------------------------
 Testing SuccessSubPixel
 ------------------------
-Position = 71.0284 51.0874
+Position = 70.9806 51.0435
 Group = AutoRegStatistics
   Total      = 1
   Successful = 1
@@ -449,3 +455,38 @@ Group = SurfaceModelFailures
   SurfaceModelResidualToleranceNotMet = 0
 End_Group
 End
+
+---------------------
+Testing Gradient
+---------------------
+Position = -3.58916 -23.5592
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 1
+  Failure    = 0
+End_Group
+
+Group = Successes
+  SuccessPixel    = 0
+  SuccessSubPixel = 1
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData      = 0
+  SurfaceModelSolutionInvalid         = 0
+  SurfaceModelEccentricityRatioNotMet = 0
+  SurfaceModelDistanceInvalid         = 0
+  SurfaceModelResidualToleranceNotMet = 0
+End_Group
+End
+Goodness of Fit = 0.183328

@@ -64,6 +64,14 @@ int main() {
   mg["ChipInterpolator"] = "BiLinearType";
   cout << endl;
 
+  cout << "-----------------------------------" << endl;
+  cout << "Test for wrong Gradient Keyword value" << endl;
+  cout << "-----------------------------------" << endl;
+  mg += Isis::PvlKeyword("Gradient", "Random");
+  Doit(obj);
+  mg["Gradient"] = "None";
+  cout << endl;
+
   obj.AddGroup(Isis::PvlGroup("PatternChip"));
   Isis::PvlGroup &pc = obj.FindGroup("PatternChip");
   pc += Isis::PvlKeyword("Lines", 90);
@@ -282,7 +290,7 @@ int main() {
   cout << "\n----------------------------------------------------" << endl;
   cout << "Testing Error = SurfaceModelResidualToleranceNotMet" << endl;
   cout << "----------------------------------------------------" << endl;
-  p_ar->SetSurfaceModelResidualTolerance(0.01);
+  p_ar->SetSurfaceModelResidualTolerance(0.005);
   DoRegister();
   //Reset the surface model residual tolerance
   p_ar->SetSurfaceModelResidualTolerance(0.1);
@@ -310,10 +318,18 @@ int main() {
   cout << "Testing SuccessSubPixel" << endl;
   cout << "------------------------" << endl;
   DoRegister();
+  Doit(obj);
+
+  cout << "\n---------------------" << endl;
+  cout << "Testing Gradient" << endl;
+  cout << "---------------------" << endl;
+  p_ar->SetGradientFilterType("Sobel");
+  p_ar->SetTolerance(0.18);
+  DoRegister();
+  cout << "Goodness of Fit = " << p_ar->GoodnessOfFit() << endl;
 
   delete p_ar;
   return 0;
-
 }
 
 void Doit(Isis::PvlObject &obj) {
@@ -322,11 +338,11 @@ void Doit(Isis::PvlObject &obj) {
     lab.AddObject(obj);
     p_ar = AutoRegFactory::Create(lab);
     Cube c;
-    c.Open("$base/testData/search.cub");
+    c.Open("search_low.cub");
     p_ar->SearchChip()->TackCube(75.0, 75.0);
     p_ar->SearchChip()->Load(c);
     Cube d;
-    d.Open("$base/testData/pattern.cub");
+    d.Open("pattern.cub");
     p_ar->PatternChip()->TackCube(45.0, 45.0);
     p_ar->PatternChip()->Load(d);
     p_ar->SetEccentricityTesting(true);
@@ -336,8 +352,8 @@ void Doit(Isis::PvlObject &obj) {
     error.Clear();
     iString err = error.what();
 
-    // We need to get rid of the contents of the second []  on each line to ensure
-    //  file paths do not persist.
+    // We need to get rid of the contents of the second [] on each line to
+    // ensure file paths do not persist.
     iString thisLine;
     iString formattedErr;
 
