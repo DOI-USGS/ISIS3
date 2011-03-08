@@ -116,7 +116,7 @@ namespace Isis
           case MaxPixelZScore:
           case PixelShift:
             return QVariant::fromValue(catchNULL(
-                measure->GetLogData(index.column() - 5).GetNumericalValue()));
+                measure->GetLogData(index.column() - 4).GetNumericalValue()));
           case AprioriSample:
             return QVariant::fromValue(catchNULL(measure->GetAprioriSample()));
           case AprioriLine:
@@ -256,7 +256,7 @@ namespace Isis
     
     if (index.isValid())
     {
-      flags = flags | Qt::ItemIsEnabled;
+//       flags = flags | Qt::ItemIsEnabled;
       
       ControlMeasure * measure = (*measures)[row];
       if (measure)
@@ -264,7 +264,7 @@ namespace Isis
         if (measure->IsEditLocked())
         {
           if (column == EditLock)
-            flags = flags | Qt::ItemIsEditable;
+            flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
         }
         else
         {
@@ -290,7 +290,7 @@ namespace Isis
             case FocalPlaneComputedY:
             case ResidualSample:
             case ResidualLine:
-              flags = flags | Qt::ItemIsEditable;
+              flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
               break;
               
             // READ ONLY
@@ -352,11 +352,13 @@ namespace Isis
             try
             {
               measure->SetLogData(ControlMeasureLogData(
-                  (ControlMeasureLogData::NumericLogDataType)(col - 5),
+                  (ControlMeasureLogData::NumericLogDataType) (col - 4),
                   catchNULL(value.toString())));
             }
             catch (iException e)
             {
+//               cerr << "MeasureTableModel::setData... measure->SetLogData() "
+//                   "FAILED!!!\n";
               e.Clear();
             }
             break;
@@ -371,19 +373,19 @@ namespace Isis
             break;
           case FocalPlaneMeasuredX:
             measure->SetFocalPlaneMeasured(
-                catchNULL(value.toString()), measure->GetFocalPlaneMeasuredX());
+                catchNULL(value.toString()), measure->GetFocalPlaneMeasuredY());
             break;
           case FocalPlaneMeasuredY:
             measure->SetFocalPlaneMeasured(
-                measure->GetFocalPlaneMeasuredY(), catchNULL(value.toString()));
+                measure->GetFocalPlaneMeasuredX(), catchNULL(value.toString()));
             break;
           case FocalPlaneComputedX:
             measure->SetFocalPlaneComputed(
-                catchNULL(value.toString()), measure->GetFocalPlaneComputedX());
+                catchNULL(value.toString()), measure->GetFocalPlaneComputedY());
             break;
           case FocalPlaneComputedY:
             measure->SetFocalPlaneComputed(
-                measure->GetFocalPlaneComputedY(), catchNULL(value.toString()));
+                measure->GetFocalPlaneComputedX(), catchNULL(value.toString()));
             break;
           case JigsawRejected:
             // jigsaw rejected is not editable!

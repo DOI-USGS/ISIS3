@@ -4,9 +4,11 @@
 
 #include <iostream>
 
+#include <QAction>
 #include <QApplication>
 #include <QBoxLayout>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QItemSelection>
 #include <QModelIndex>
 #include <QTableView>
@@ -59,6 +61,7 @@ namespace Isis
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
     pointView->setExpandsOnDoubleClick(false);
+    pointView->setAlternatingRowColors(true);
 
     serialView = new QTreeView();
     serialModel = new SerialModel(controlNet, qApp);
@@ -68,7 +71,8 @@ namespace Isis
         this,
         SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
     serialView->setExpandsOnDoubleClick(false);
-
+    serialView->setAlternatingRowColors(true);
+    
     connectionView = new QTreeView();
     connectionModel = new ConnectionModel(controlNet, qApp);
     connectionView->setModel(connectionModel);
@@ -77,7 +81,8 @@ namespace Isis
         this,
         SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
     connectionView->setExpandsOnDoubleClick(false);
-
+    connectionView->setAlternatingRowColors(true);
+    
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
     editPointView->setModel(editPointModel);
@@ -88,6 +93,11 @@ namespace Isis
         this, SIGNAL(cnetModified()));
     editPointView->setItemDelegate(editPointDelegate);
     editPointView->resizeColumnsToContents();
+    editPointView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+//     QHeaderView * vheader = editPointView->verticalHeader();
+//     vheader->setContextMenuPolicy(Qt::ActionsContextMenu);
+//     QAction * removeAction = new QAction("Remove", this);
+//     vheader->addAction(removeAction);
 
     editMeasureView = new QTableView();
     editMeasureModel = new MeasureTableModel(qApp);
@@ -100,6 +110,8 @@ namespace Isis
         this, SIGNAL(cnetModified()));
     editMeasureView->setItemDelegate(editMeasureDelegate);
     editMeasureView->resizeColumnsToContents();
+    editMeasureView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    
 
     QSplitter * topSplitter = new QSplitter(Qt::Horizontal);
     topSplitter->addWidget(pointView);
@@ -211,6 +223,7 @@ namespace Isis
   {
     QAbstractItemModel * model = view->model();
     view->selectionModel()->clear();
+    view->collapseAll();
     for (int i = 0; i < model->rowCount(); i++)
     {
       QModelIndex index = model->index(i, 0, QModelIndex());
@@ -220,10 +233,6 @@ namespace Isis
             QItemSelectionModel::SelectCurrent);
         view->setExpanded(index, true);
         view->scrollTo(index, QAbstractItemView::PositionAtCenter);
-      }
-      else
-      {
-        view->setExpanded(index, false);
       }
     }    
   }

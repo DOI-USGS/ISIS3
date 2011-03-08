@@ -252,7 +252,7 @@ namespace Isis
     Qt::ItemFlags flags = 0;
     if (index.isValid())
     {
-      flags = flags | Qt::ItemIsEnabled;
+//       flags = flags | Qt::ItemIsEnabled;
 
       ControlPoint * point = (*points)[row];
       if (point)
@@ -260,7 +260,7 @@ namespace Isis
         if (point->IsEditLocked())
         {
           if (column == EditLock)
-            flags = flags | Qt::ItemIsEditable;
+            flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
         }
         else
         {
@@ -283,7 +283,7 @@ namespace Isis
             case AprioriSPSourceFile:
             case AprioriRadiusSource:
             case AprioriRadiusSourceFile:
-              flags = flags | Qt::ItemIsEditable;
+              flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
               break;
             case JigsawRejected:
               break;
