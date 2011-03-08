@@ -24,6 +24,8 @@
 #ifndef ControlPoint_h
 #define ControlPoint_h
 
+#include <bitset>
+
 #include "iString.h"
 #include "ControlMeasure.h"
 #include "SurfacePoint.h"
@@ -219,6 +221,12 @@ namespace Isis {
    *            set.
    *   @history 2011-03-01 Eric Hyer - Added StringToRadiusSource and
    *            StringToSurfacePointSource methods
+   *   @history 2011-03-08 Ken Edmundson and Debbie Cook - Added members
+   *            ConstraintStatus, LatitudeConstrained, LongitudeConstrained,
+   *            RadiusConstrained, constraintStatus and methods
+   *            ConputeResiduals_Millimeters(), HasAprioriCoordinates(),
+   *            IsConstrained(), IsLatitudeConstrained(), IsLongitudeConstrained(),
+   *            and NumberOfConstrainedCoordinates().
    */
   class ControlPoint {
       friend class ControlNet;
@@ -266,6 +274,22 @@ namespace Isis {
          *   but it is currently true. The operation did not take effect.
          */
         PointLocked
+      };
+
+      /**
+       * This is a convenience member for checking number of constrained
+       * coordinates in the SurfacePoint
+       */
+      enum ConstraintStatus {
+        /**
+         * This is the status of constrained coordinates in the SurfacePoint.
+         * @todo We will eventually need to deal with rectangular
+         *             coordinates as well, but for now BundleAdjust uses spherical
+         *             coordinates only.
+         */
+        LatitudeConstrained = 0,
+        LongitudeConstrained = 1,
+        RadiusConstrained = 2,
       };
 
       // This stuff input to jigsaw
@@ -337,8 +361,12 @@ namespace Isis {
       Status SetAprioriSurfacePointSource(SurfacePointSource::Source source);
       Status SetAprioriSurfacePointSourceFile(iString sourceFile);
 
+ //    Status UpdateSphericalPointCoordinates(const Latitude &lat, const Longitude &lon,
+ //                                      const Distance &radius);
+
       Status ComputeApriori();
       Status ComputeResiduals();
+      Status ComputeResiduals_Millimeters();
 
       iString GetChooserName() const;
       iString GetDateTime() const;
@@ -351,6 +379,13 @@ namespace Isis {
       SurfacePoint GetSurfacePoint() const;
       PointType GetType() const;
       bool IsGround() const;
+
+      bool HasAprioriCoordinates();
+      bool IsConstrained();
+      bool IsLatitudeConstrained();
+      bool IsLongitudeConstrained();
+      bool IsRadiusConstrained();
+      int NumberOfConstrainedCoordinates();
 
       static iString PointTypeToString(PointType type);
       iString GetPointTypeString() const;
@@ -467,6 +502,12 @@ namespace Isis {
        * @see SetJigsawReject
        */
       bool jigsawRejected;
+
+      /**
+       * This stores the constraint status of the SurfacePoint
+       *   @todo Eventually add x, y, and z
+       */
+      std::bitset<6> constraintStatus;
 
       /**
        * This indicates if a program has explicitely set the reference in this
