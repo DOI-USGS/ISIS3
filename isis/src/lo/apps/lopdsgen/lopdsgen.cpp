@@ -124,13 +124,6 @@ void IsisMain() {
       orig.Auto(pdsLabel);
 
       pdsLabel.AddKeyword(scanResolution, PvlContainer::Replace);
-
-      /*
-      PvlKeyword newScanDensityRange ("SCAN_DENSITY_RANGE");
-      newScanDensityRange += range1;
-      newScanDensityRange += range2;
-      pdsLabel.AddKeyword(newScanDensityRange, PvlContainer::Replace);
-      */
     }
     // Translation for level1 products
     else if(qube.FindGroup("ISIS_INSTRUMENT").HasKeyword("START_TIME")) {
@@ -138,16 +131,6 @@ void IsisMain() {
       orig.Auto(pdsLabel);
 
       pdsLabel.AddKeyword(scanResolution, PvlContainer::Replace);
-
-      // Keyword SCAN_PARAMETER will contain four elements, defined
-      // by SCAN_PARAMETER_DESCRIPTION
-      /*
-      PvlKeyword scanParameter ("SCAN_PARAMETER");
-      scanParameter += scanResolution[0];
-      scanParameter += qube.FindKeyword("OUTPUT_MICRON")[0];
-      scanParameter += range1;
-      scanParameter += range2;
-      */
 
       PvlKeyword &outputMicron = qube.FindKeyword("OUTPUT_MICRON");
 
@@ -157,11 +140,9 @@ void IsisMain() {
       resolution = outputMicronStr.substr(0, umPos);
       outputMicron[0] = resolution;
       outputMicron.SetUnits("micron");
-      outputMicron.SetName("LO:FILMSTRIP_SCAN_PROCESSING_RESOLUTION");
+      outputMicron.SetName("LO:FILMSTRIP_SCAN_PROCESSING_RES");
 
       pdsLabel.AddKeyword(outputMicron, PvlContainer::Replace);
-
-      //pdsLabel.AddKeyword(scanParameter, PvlContainer::Replace);
 
       // Calculate statistics on the cube to be processed and place
       // its MINIMUM and MAXIMUM into the output label
@@ -199,6 +180,18 @@ void IsisMain() {
     bandBinTransFile = transDir + "LoFiducialExport.trn";
     PvlTranslationManager bandLab(*(iCube->Label()), bandBinTransFile);
     bandLab.Auto(pdsLabel);
+
+    // Change the units of FIDCUAIL_COORDINATE_MICRON from "um" to "<micron>"
+    PvlKeyword &coordMicron = iCube->Label()->FindKeyword(
+        "FiducialCoordinateMicron", Pvl::Traverse);
+    string coordMicronStr = coordMicron[0];
+    unsigned umPos = coordMicronStr.find("um");
+    string coord = coordMicronStr.substr(0, umPos);
+    coordMicron[0] = coord;
+    coordMicron.SetUnits("micron");
+    coordMicron.SetName("LO:FIDUCIAL_COORDINATE_MICRON");
+
+    pdsLabel.AddKeyword(coordMicron, PvlContainer::Replace);
   }
   else if(iCube->Label()->HasKeyword("BoresightSample", Pvl::Traverse)) {
     bandBinTransFile = transDir + "LoBoresightExport.trn";
@@ -226,13 +219,15 @@ void IsisMain() {
   }
 
   // Add a keyword type (i.e., string, bool, int...) file to the PDS label Pvl
-  PvlFormat *formatter = pdsLabel.GetFormat();
+  PvlFormatPds *formatter = new PvlFormatPds();
   formatter->SetCharLimit(128);
-  formatter->Add("$lo/translations/LoExportFormatter.typ");
+  formatter->Add(transDir + "LoExportFormatter.typ");
+  pdsLabel.SetFormat(formatter);
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL
-  pdsLabel.SetFormatTemplate("$lo/templates/labels/LoExportTemplate.pft");
+  iString formatDir = (string) dataDir["Lo"] + "/templates/labels/";
+  pdsLabel.SetFormatTemplate(formatDir + "LoExportTemplate.pft");
 
   // Write labels to output file
   Filename outFile(ui.GetFilename("TO", "img"));
@@ -242,19 +237,6 @@ void IsisMain() {
   p.StartProcess(oCube);
   oCube.close();
   p.EndProcess();
-
-  /*
-  //Records what it did to the print.prt file
-  PvlGroup results( "DNs Used" );
-  results += PvlKeyword( "Null", p.OutputNull() );
-  results += PvlKeyword( "LRS", p.OutputLrs() );
-  results += PvlKeyword( "LIS", p.OutputLis() );
-  results += PvlKeyword( "HIS", p.OutputHis() );
-  results += PvlKeyword( "HRS", p.OutputHrs() );
-  results += PvlKeyword( "ValidMin", min );
-  results += PvlKeyword( "ValidMax", max );
-  Application::Log( results );
-  */
 
   return;
 }
