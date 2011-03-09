@@ -686,10 +686,11 @@ namespace Qisis {
                                      Distance(radius, Distance::Meters)));
       }
       catch (iException &e) {
-        QString message = "Unable to set Surface Point.";
+        QString message = "Unable to set Surface Point.\n";
         message += "Latitude = " + QString::number(lat);
-        message += "   Longitude = " + QString::number(lon);
-        message += "   Radius = " + QString::number(radius) + e.Errors().c_str();
+        message += "  Longitude = " + QString::number(lon);
+        message += "  Radius = " + QString::number(radius) + "\n";
+        message += e.Errors().c_str();
         QMessageBox::critical((QWidget *)parent(),"Error",message);
         e.Clear();
       }
@@ -1592,7 +1593,8 @@ namespace Qisis {
       QString tempFilename = Filename(file).Name().c_str();
       p_leftCombo->addItem(tempFilename);
       p_rightCombo->addItem(tempFilename);
-      if ((QString)m.GetCubeSerialNumber() == p_editPoint->GetReferenceSN()) {
+      if (p_editPoint->IsReferenceExplicit() &&
+          (QString)m.GetCubeSerialNumber() == p_editPoint->GetReferenceSN()) {
           p_leftCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
           p_rightCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
       }
