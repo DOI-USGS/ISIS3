@@ -40,6 +40,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-12-22 Steven Lambright - Original version
+   *   @history 2011-03-08 Eric Hyer - MaximumNumericLogDataType now makes sense
    */
   class ControlMeasureLogData {
     public:
@@ -113,13 +114,13 @@ namespace Isis {
          * from apriori.
          */
         PixelShift                = 5,
-
-        /**
-         * This value must be >= the largest enumerated value in this type or
-         * convertions to and from Pvl will not work.
-         */
-        MaximumNumericLogDataType = 5
       };
+      /**
+       * This value must be > the largest enumerated value in this type or
+       * convertions to and from Pvl will not work.
+       */
+      static const int MaximumNumericLogDataType = 6;
+      
 
       ControlMeasureLogData();
       ControlMeasureLogData(NumericLogDataType);

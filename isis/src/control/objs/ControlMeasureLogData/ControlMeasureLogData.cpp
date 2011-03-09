@@ -51,7 +51,7 @@ namespace Isis {
     iString name = keywordRep.Name();
 
     for(int i = InvalidNumericLogDataType + 1;
-            i <= MaximumNumericLogDataType; i++) {
+            i < MaximumNumericLogDataType; i++) {
       try {
         iString thisTypeName = DataTypeToName((NumericLogDataType)i);
  
