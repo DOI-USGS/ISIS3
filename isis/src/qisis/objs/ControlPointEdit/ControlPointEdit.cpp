@@ -23,6 +23,7 @@
 #include "AutoRegFactory.h"
 #include "ChipViewport.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "Filename.h"
 #include "iString.h"
 #include "ProgramLauncher.h"
@@ -476,7 +477,7 @@ namespace Qisis {
 
     QHBoxLayout *rightLayout = new QHBoxLayout();
     p_autoReg = new QPushButton("Register");
-    QPushButton *save = new QPushButton("Save Measure");
+    QPushButton *save = new QPushButton("Save Measures");
 
     rightLayout->addWidget(p_autoReg);
     rightLayout->addWidget(save);
@@ -645,6 +646,15 @@ namespace Qisis {
    * @author Tracie Sucharski
    */
   void ControlPointEdit::updateRightPositionLabel(double zoomFactor) {
+
+    // If registration Info is on, turn off
+    if (p_autoRegShown) {
+      //  Undo Registration
+      p_autoRegShown = false;
+      p_autoRegExtension->hide();
+      p_autoReg->setText("Register");
+    }
+    
     QString pos = "Sample: " + QString::number(p_rightView->tackSample()) +
                   "    Line:  " + QString::number(p_rightView->tackLine());
     p_rightSampLinePosition->setText(pos);
@@ -823,44 +833,78 @@ namespace Qisis {
    *   @history 2008-12-30 Jeannie Walldren - Modified to update
    *                          user (chooser) name and date when
    *                          point is saved
-   *   @history 2010-11-19 Tracie Sucharski - Renamed from savePoint. 
+   *   @history 2010-11-19 Tracie Sucharski - Renamed from savePoint.
+   *   @history 2011-03-04 Tracie Sucharski - If auto reg info is shown, save
+   *                          the GoodnessOfFit value to the right
+   *                          ControlMeasure log entry.  Changed the way
+   *                          the left viewport is updated if the left and
+   *                          right measure are the same.  Simply copy the
+   *                          right measure into the left and re-load the left
+   *                          measure.  If measure currently has type of
+   *                          subPixelRegistered, but the new position has
+   *                          not be sub-pixel registered, change measure type
+   *                          and get rid of goodness of fit.
+   *  
    */
   void ControlPointEdit::saveMeasure() {
+
     //  Get cube position at right chipViewport crosshair
     if(p_rightMeasure != NULL) {
       p_rightMeasure->SetCoordinate(p_rightView->tackSample(),
                                     p_rightView->tackLine());
       p_rightMeasure->SetDateTime();
-      p_rightMeasure->SetChooserName();
+
+      if (p_autoRegShown) {
+        p_rightMeasure->SetChooserName("Application qnet");
+        p_rightMeasure->SetType(Isis::ControlMeasure::RegisteredSubPixel);
+        //  Save Goodness of Fit to the right measure log entry
+        p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
+                                   Isis::ControlMeasureLogData::GoodnessOfFit,
+                                   p_autoRegFact->GoodnessOfFit()));
+        //  If Apriori sample,line exist, calculate pixel shift, save to log
+        if (p_rightMeasure->GetAprioriSample() != Isis::Null &&
+            p_rightMeasure->GetAprioriLine() != Isis::Null) {
+          double pixelShift = sqrt(
+              pow(p_rightMeasure->GetSample() - p_rightMeasure->GetAprioriSample(), 2.0)
+            + pow(p_rightMeasure->GetLine() - p_rightMeasure->GetAprioriLine(), 2.0));
+          p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
+                                     Isis::ControlMeasureLogData::PixelShift,
+                                     pixelShift));;
+        }
+        p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
+                                   Isis::ControlMeasureLogData::GoodnessOfFit,
+                                   p_autoRegFact->GoodnessOfFit()));
+        p_autoRegShown = false;
+        p_autoRegExtension->hide();
+        p_autoReg->setText("Register");
+      }
+      else {
+        p_rightMeasure->SetChooserName(Isis::Application::UserName());
+        p_rightMeasure->SetType(Isis::ControlMeasure::Manual);
+        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::PixelShift);
+        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::GoodnessOfFit);
+        //  TODO  Should AprioriSample/Line be reset?
+      }
     }
+
     if(p_allowLeftMouse) {
       if(p_leftMeasure != NULL)
         p_leftMeasure->SetCoordinate(p_leftView->tackSample(), p_leftView->tackLine());
       p_leftMeasure->SetDateTime();
-      p_leftMeasure->SetChooserName();
+      p_leftMeasure->SetChooserName(Isis::Application::UserName());
+      p_leftMeasure->SetType(Isis::ControlMeasure::Manual);
     }
 
-    //  If the right chip is the same as the left chip , update the left
-    //  chipViewport.
+    //  If the right chip is the same as the left chip, copy right into left and
+    //  re-load the left.
     if(p_rightMeasure->GetCubeSerialNumber() ==
        p_leftMeasure->GetCubeSerialNumber()) {
-      p_leftMeasure->SetCoordinate(p_rightView->tackSample(),
-                                   p_rightView->tackLine());
-      p_leftMeasure->SetDateTime();
-      p_leftMeasure->SetChooserName();
-      emit updateLeftView(p_rightView->tackSample(), p_rightView->tackLine());
+
+      *p_leftMeasure = *p_rightMeasure;
+      setLeftMeasure(p_leftMeasure,p_leftCube,p_pointId);
     }
 
-
-    //  If autoReg is shown
-    if(p_autoRegShown) {
-      p_autoRegShown = false;
-      p_autoRegExtension->hide();
-      p_autoReg->setText("Register");
-    }
-
-
-    //  Redraw measures and overlaps on viewports
+    //  Redraw measures on viewports
     emit measureSaved();
   }
 
