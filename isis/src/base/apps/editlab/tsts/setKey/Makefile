@@ -1,5 +1,6 @@
 APPNAME = editlab
 editlabTruth1.txt.IGNORELINES=ByteOrder
+tempLab1.txt.IGNORELINES=Bytes
 
 include $(ISISROOT)/make/isismake.tsts
 
