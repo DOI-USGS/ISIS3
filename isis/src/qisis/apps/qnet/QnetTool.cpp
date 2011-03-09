@@ -398,42 +398,6 @@ namespace Qisis {
     p_openDem->setWhatsThis(whatsThis);
     connect (p_openDem,SIGNAL(activated()),this,SLOT(openDem()));
 
-<<<<<<< .mine
-=======
-      }
-    }
-    // Check if ControlPoint has reference measure, if reference Measure is
-    // not the same measure that is on the left chip viewport, set left
-    // measure as reference.
-    if (p_controlPoint->IsReferenceExplicit()) {
-      Isis::ControlMeasure *refMeasure = p_controlPoint->GetRefMeasure();
-      if (refMeasure != p_leftMeasure) {
-        switch (QMessageBox::question((QWidget *)parent(),
-            "Qnet Tool Save Point",
-            "Would you like to change the reference measure to the measure on the left?",
-            "&Yes", "&No", 0, 0)) {
-          case 0: // Yes was clicked or Enter was pressed, replace reference
-            p_controlPoint->SetRefMeasure(p_leftMeasure);
-            // ??? Need to set rest of measures to Candiate and add more warning. ???//
-          case 1: // No was clicked, keep original reference
-            break;
-
-        }
-      }
-    }
-    else {
-      p_controlPoint->SetRefMeasure(p_leftMeasure);
-    }
-
-    // emit signal so the nav tool can update edit point
-    emit editPointChanged(p_controlPoint->GetId());
-    // emit a signal to alert user to save when exiting
-    emit netChanged();
-  }
-
-
-  void QnetTool::createActions() {
->>>>>>> .r1989
     p_saveNet = new QAction(QIcon(":saveAs"), "Save Control Network &As...",
         p_qnetTool);
     p_saveNet->setStatusTip("Save current control network to chosen file");
@@ -1643,7 +1607,6 @@ namespace Qisis {
     //  the point, this will be displayed on the left ChipViewport, unless the
     //  point was selected on the ground source image.  In this case, simply
     //  load the first measure on the left.
-<<<<<<< .mine
     int leftIndex = 0;
     int rightIndex = 0;
     //  Check for reference
@@ -1656,10 +1619,6 @@ namespace Qisis {
         leftIndex = p_leftCombo->findText(tempFilename);
       }
     }
-=======
-    int leftIndex = p_controlPoint->IndexOfRefMeasure();
-
->>>>>>> .r1989
 
     if (p_groundOpen && p_editPoint->IsGround())  {
       rightIndex = p_rightCombo->findText((QString)p_groundSN);
