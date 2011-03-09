@@ -11,9 +11,11 @@
 #include <QHeaderView>
 #include <QItemSelection>
 #include <QModelIndex>
+#include <QSplitter>
+#include <QString>
+#include <QStringList>
 #include <QTableView>
 #include <QTreeView>
-#include <QSplitter>
 #include <QVBoxLayout>
 
 #include "ControlNet.h"
@@ -40,6 +42,7 @@ namespace Isis
   {
     nullify();
     updatingSelection = false;
+    synchronizeViews = true;  //FIXME: create checkbox for this
 
     controlNet = cNet;
 
@@ -59,29 +62,30 @@ namespace Isis
     pointView->setModel(pointModel);
     connect(pointView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
-        SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
-    pointView->setExpandsOnDoubleClick(false);
+        SLOT(pointViewSelectionChanged()));
+//     pointView->setExpandsOnDoubleClick(false);
     pointView->setAlternatingRowColors(true);
-
+    pointView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    
     serialView = new QTreeView();
     serialModel = new SerialModel(controlNet, qApp);
     serialView->setModel(serialModel);
-    connect(serialView->selectionModel(), SIGNAL(
-        selectionChanged(const QItemSelection &, const QItemSelection &)),
-        this,
-        SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
-    serialView->setExpandsOnDoubleClick(false);
+    connect(serialView->selectionModel(), SIGNAL(selectionChanged(
+        const QItemSelection &, const QItemSelection &)), this,
+        SLOT(serialViewSelectionChanged()));
+//     serialView->setExpandsOnDoubleClick(false);
     serialView->setAlternatingRowColors(true);
-    
+    serialView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        
     connectionView = new QTreeView();
     connectionModel = new ConnectionModel(controlNet, qApp);
     connectionView->setModel(connectionModel);
-    connect(connectionView->selectionModel(), SIGNAL(
-        selectionChanged(const QItemSelection &, const QItemSelection &)),
-        this,
-        SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
-    connectionView->setExpandsOnDoubleClick(false);
+    connect(connectionView->selectionModel(), SIGNAL(selectionChanged(
+        const QItemSelection &, const QItemSelection &)), this,
+        SLOT(connectionViewSelectionChanged()));
+//     connectionView->setExpandsOnDoubleClick(false);
     connectionView->setAlternatingRowColors(true);
+    connectionView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
@@ -122,9 +126,9 @@ namespace Isis
     mainSplitter->addWidget(topSplitter);
     mainSplitter->addWidget(editPointView);
     mainSplitter->addWidget(editMeasureView);
-    mainSplitter->setStretchFactor(0, 2);
-    mainSplitter->setStretchFactor(1, 1);
-    mainSplitter->setStretchFactor(2, 1);
+//     mainSplitter->setStretchFactor(0, 2);
+//     mainSplitter->setStretchFactor(1, 1);
+//     mainSplitter->setStretchFactor(2, 1);
 
     QBoxLayout * mainLayout = new QHBoxLayout;
     mainLayout->addWidget(mainSplitter);
@@ -153,73 +157,189 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::selectionChanged(const QItemSelection & selected,
-      const QItemSelection & deselected)
+  void CnetEditorWidget::pointViewSelectionChanged()
   {
-    // DISABLE RECURSIVE CALLS!!!
-    // this method can and will be called INDIRECTLY by this method.
+    // If this method was called because it is synchronized to another view
+    // that got clicked then do nothing.  The *viewSelectionChanged for the
+    // clicked view is already handling how this view should be updated.
     if (updatingSelection)
       return;
-    
     updatingSelection = true;
     
-
-    QList< QModelIndex > indices = selected.indexes();
-
-    if (indices.size() == 1)
+    
+    QList< ControlPoint * > points;
+    QList< ControlMeasure * > measures;
+    QStringList cubeSerialNumbers;
+    QList< QModelIndex > indexes =
+        pointView->selectionModel()->selectedIndexes();
+    for (int i = 0; i < indexes.size(); i++)
     {
       TreeItem * item = static_cast< TreeItem * >(
-          indices[0].internalPointer());
-
+          indexes[i].internalPointer());
       TreeItem::InternalPointerType type = item->pointerType();
-      QString itemLabel = item->data(0).toString();
-      switch (type)
+      
+      if (type == TreeItem::Point)
       {
-        case TreeItem::Point:
-          editPointModel->setPoint(controlNet->GetPoint(itemLabel));
-          if (dynamic_cast< PointChildItem * >(item))
-          {
-            pointView->selectionModel()->clear();
-            focusView(pointView, itemLabel);
-          }
-          break;
+        points << controlNet->GetPoint(item->data(0).toString());
+      }
+      else
+      {
+        if (type == TreeItem::Measure)
+        {
+          QString pointId = item->parent()->data(0).toString();
+          QString serial = item->data(0).toString();
           
-        case TreeItem::Measure:
-          {
-            QString parentLabel = item->parent()->data(0).toString();
-            editMeasureModel->setMeasure(controlNet->GetPoint(
-                parentLabel)->GetMeasure(itemLabel));
-            serialView->selectionModel()->clear();
-            focusView(serialView, itemLabel);
-            connectionView->selectionModel()->clear();
-            focusView(connectionView, itemLabel);
-          }
-          break;
-          
-        case TreeItem::ConnectionParent:
-          serialView->selectionModel()->clear();
-          focusView(serialView, itemLabel);
-          break;
-          
-        case TreeItem::Serial:
-          if (item->parent())
-          {
-            serialView->selectionModel()->clear();
-            focusView(serialView, itemLabel);
-          }
-          else
-          {
-            connectionView->selectionModel()->clear();
-            focusView(connectionView, itemLabel);
-          }
-          break;
+          measures << controlNet->GetPoint(pointId)->GetMeasure(serial);
+          cubeSerialNumbers << serial;
+        }
+        else
+        {
+          // if this is reachable code then we have a serious problem!
+          cerr << "error in CnetEditorWidget::pointViewSelectionChanged!\n";
+        }
       }
     }
+    
+    // populate editor tables
+    editPointModel->setPoints(points);
+    editMeasureModel->setMeasures(measures);
+    
+    if (synchronizeViews)
+    {
+      focusView(serialView, cubeSerialNumbers);
+      focusView(connectionView, cubeSerialNumbers);
+    }
+
     updatingSelection = false;
   }
   
   
-  void CnetEditorWidget::focusView(QTreeView * view, QString label)
+  void CnetEditorWidget::serialViewSelectionChanged()
+  {
+    // If this method was called because it is synchronized to another view
+    // that got clicked then do nothing.  The *viewSelectionChanged for the
+    // clicked view is already handling how this view should be updated.
+    if (updatingSelection)
+      return;
+    updatingSelection = true;
+    
+    
+    QList< ControlPoint * > points;
+    QList< ControlMeasure * > measures;
+    QStringList pointIds;
+    QStringList cubeSerialNumbers;
+    QList< QModelIndex > indexes =
+        serialView->selectionModel()->selectedIndexes();
+    for (int i = 0; i < indexes.size(); i++)
+    {
+      TreeItem * item = static_cast< TreeItem * >(
+          indexes[i].internalPointer());
+      TreeItem::InternalPointerType type = item->pointerType();
+      
+      if (type == TreeItem::Serial)
+      {
+        cubeSerialNumbers << item->data(0).toString();
+      }
+      else
+      {
+        if (type == TreeItem::Point)
+        {
+          QString pointId = item->data(0).toString();
+          pointIds << pointId;
+          
+          ControlPoint * point = controlNet->GetPoint(pointId);
+          points << point;
+          measures << point->GetMeasure(item->parent()->data(0).toString());
+        }
+        else
+        {
+          // This is not an error case!  This code will not be reachable
+          // if things are working correctly.  This is only here to catch
+          // the unlikely event that I made a very serious error.
+          cerr << "error in CnetEditorWidget::pointViewSelectionChanged!\n";
+        }
+      }
+    }
+    
+    // populate editor tables
+    editPointModel->setPoints(points);
+    editMeasureModel->setMeasures(measures);
+    
+    if (synchronizeViews)
+    {
+      focusView(pointView, pointIds);
+      focusView(connectionView, cubeSerialNumbers);
+    }
+
+    updatingSelection = false;
+  }
+  
+
+  
+  void CnetEditorWidget::connectionViewSelectionChanged()
+  {
+    // If this method was called because it is synchronized to another view
+    // that got clicked then do nothing.  The *viewSelectionChanged for the
+    // clicked view is already handling how this view should be updated.
+    if (updatingSelection)
+      return;
+    updatingSelection = true;
+    
+    
+    QList< ControlPoint * > points;
+    QList< ControlMeasure * > measures;
+    QStringList pointIds;
+    QStringList cubeSerialNumbers;
+    QList< QModelIndex > indexes =
+        connectionView->selectionModel()->selectedIndexes();
+    for (int i = 0; i < indexes.size(); i++)
+    {
+      TreeItem * item = static_cast< TreeItem * >(
+          indexes[i].internalPointer());
+      TreeItem::InternalPointerType type = item->pointerType();
+      
+      if (type == TreeItem::ConnectionParent || type == TreeItem::Serial)
+      {
+        cubeSerialNumbers << item->data(0).toString();
+      }
+      else
+      {
+        if (type == TreeItem::Point)
+        {
+          QString pointId = item->data(0).toString();
+          pointIds << pointId;
+          
+          ControlPoint * point = controlNet->GetPoint(pointId);
+          points << point;
+//           measures << point->GetMeasure(item->parent()->data(0).toString()) <<
+//               point->GetMeasure(item->parent()->parent()->data(0).toString());
+        }
+        else
+        {
+          // This is not an error case!  This code will not be reachable
+          // if things are working correctly.  This is only here to catch
+          // the unlikely event that I made a very serious error.
+          cerr << "error in CnetEditorWidget::connectionViewSelectionChanged!"
+              "\n";
+        }
+      }
+    }
+    
+    // populate editor tables
+    editPointModel->setPoints(points);
+    editMeasureModel->setMeasures(measures);
+    
+    if (synchronizeViews)
+    {
+      focusView(pointView, pointIds);
+      focusView(serialView, cubeSerialNumbers);
+    }
+
+    updatingSelection = false;
+  }
+  
+
+  void CnetEditorWidget::focusView(QTreeView * view, QStringList labels)
   {
     QAbstractItemModel * model = view->model();
     view->selectionModel()->clear();
@@ -227,13 +347,14 @@ namespace Isis
     for (int i = 0; i < model->rowCount(); i++)
     {
       QModelIndex index = model->index(i, 0, QModelIndex());
-      if (model->data(index, Qt::DisplayRole).toString() == label)
+      if (labels.contains(model->data(index, Qt::DisplayRole).toString()))
       {
         view->selectionModel()->select(index,
-            QItemSelectionModel::SelectCurrent);
-        view->setExpanded(index, true);
+            QItemSelectionModel::Select);
+        if (labels.size() == 1)
+          view->setExpanded(index, true);
         view->scrollTo(index, QAbstractItemView::PositionAtCenter);
       }
-    }    
+    }
   }
 }

@@ -24,8 +24,6 @@ namespace Isis
   {
     points = NULL;
     points = new QList< ControlPoint * >;
-    points->append(NULL);
-
   }
 
 
@@ -40,23 +38,17 @@ namespace Isis
   }
 
 
-  void PointTableModel::setPoint(ControlPoint * point, int row)
+  void PointTableModel::setPoints(QList< ControlPoint * > newPoints)
   {
-    if (validateRowColumn(row, 0, false))
-    {
-      (*points)[row] = point;
-      emit(dataChanged(QModelIndex(), QModelIndex()));
-    }
-    else
-    {
-      cerr << "PointTableModel::setPoint: row [" << row << "] out of bounds\n";
-    }
-  }
+    beginRemoveRows(QModelIndex(), 0, points->size() - 1);
+    points->clear();
+    endRemoveRows();
+    
+    beginInsertRows(QModelIndex(), 0, newPoints.size() - 1);
+    *points = newPoints;
+    endInsertRows();
 
-
-  void PointTableModel::setPoint(ControlPoint * point)
-  {
-    setPoint(point, points->size() - 1);
+    emit(dataChanged(QModelIndex(), QModelIndex()));
   }
 
 
@@ -429,13 +421,22 @@ namespace Isis
   bool PointTableModel::removeRows(int position, int rows,
       const QModelIndex & index)
   {
+    cerr << "PointTableModel::removeRows called...\n";
     Q_UNUSED(index);
     beginRemoveRows(QModelIndex(), position, position + rows - 1);
-
-    for (int i = 0; i < rows; i++)
+    
+    cerr << "PointTableModel::removeRows :  position: " << position
+        << "\trows: " << rows << "\tpoints->size(): " << points->size()
+        << "\n";
+    for (int i = rows; i < rows; i++)
+    {
+      cerr << "points->size(): " << points->size() << "\t" << points->at(0) << "\n";
       points->removeAt(position);
+      cerr << "removed point\n";
+    }
 
-    endInsertRows();
+    endRemoveRows();
+    cerr << "PointTableModel::removeRows done\n";
     return true;
   }
 

@@ -46,8 +46,7 @@ namespace Isis
       explicit PointTableModel(QObject * parent = 0);
       virtual ~PointTableModel();
 
-      void setPoint(ControlPoint * point, int row);
-      void setPoint(ControlPoint * point);
+      void setPoints(QList< ControlPoint * > newPoints);
       ControlPoint * getPoint(int row) const;
 
       int rowCount(const QModelIndex & parent) const;

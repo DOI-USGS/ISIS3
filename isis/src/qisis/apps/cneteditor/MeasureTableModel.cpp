@@ -43,23 +43,17 @@ namespace Isis
   }
 
 
-  void MeasureTableModel::setMeasure(ControlMeasure * measure, int row)
+  void MeasureTableModel::setMeasures(QList< ControlMeasure * > newMeasures)
   {
-    if (validateRowColumn(row, 0, false))
-    {
-      (*measures)[row] = measure;
-      emit(dataChanged(QModelIndex(), QModelIndex()));
-    }
-    else
-    {
-      cerr << "MeasureTableModel::setMeasure: row [" << row << "] out of bounds\n";
-    }
-  }
-  
-  
-  void MeasureTableModel::setMeasure(ControlMeasure * measure)
-  {
-    setMeasure(measure, measures->size() - 1);
+    beginRemoveRows(QModelIndex(), 0, measures->size() - 1);
+    measures->clear();
+    endRemoveRows();
+    
+    beginInsertRows(QModelIndex(), 0, newMeasures.size() - 1);
+    *measures = newMeasures;
+    endInsertRows();
+
+    emit(dataChanged(QModelIndex(), QModelIndex()));
   }
   
   

@@ -5,6 +5,7 @@
 
 class QBoxLayout;
 class QItemSelection;
+class QStringList;
 class QTableView;
 class QTreeView;
 
@@ -36,16 +37,18 @@ namespace Isis
     private:
       QBoxLayout * createMainLayout();
       void nullify();
-      void focusView(QTreeView * view, QString label);
+      void focusView(QTreeView * view, QStringList label);
 
 
     private slots:
-      void selectionChanged(const QItemSelection & selected,
-          const QItemSelection & deselected);
-
+      void pointViewSelectionChanged();
+      void serialViewSelectionChanged();
+      void connectionViewSelectionChanged();
+          
 
     private: // data
       bool updatingSelection;
+      bool synchronizeViews;
           
           
     private: // widgets

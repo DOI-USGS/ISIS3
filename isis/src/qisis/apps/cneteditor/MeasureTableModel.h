@@ -49,8 +49,7 @@ namespace Isis
       explicit MeasureTableModel(QObject * parent = 0);
       virtual ~MeasureTableModel();
 
-      void setMeasure(ControlMeasure * measure, int row);
-      void setMeasure(ControlMeasure * measure);
+      void setMeasures(QList< ControlMeasure * > newMeasures);
       ControlMeasure * getMeasure(int row) const;
 
       int rowCount(const QModelIndex & parent) const;
