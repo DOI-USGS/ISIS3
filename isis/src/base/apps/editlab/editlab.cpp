@@ -1,107 +1,119 @@
 #include "Isis.h"
-#include "Pvl.h"
+
 #include "Cube.h"
-#include "Blob.h"
-#include "History.h"
-#include <iostream>
-#include <sstream>
-#include <string>
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace Isis;
 using namespace std;
 
+PvlKeyword &modifyKeyword(UserInterface &ui, PvlKeyword &keyword);
+
 void IsisMain() {
-
-  // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  Cube cube;
-  cube.Open(ui.GetFilename("FROM"), "rw");
 
-  // Extract label from cube file
-  Pvl *label = cube.Label();
-
-  // Get user entered option & create IsisCube Object
+  // Extract label from file
+  Pvl *label = new Pvl(ui.GetFilename("FROM"));
+  PvlObject *pvl = label;
   string option = ui.GetString("OPTION");
-  PvlObject &o = label->FindObject("IsisCube");
+
+  // Get user entered option & create IsisCube Object if needed
+  Cube *cube = NULL;
+  if(label->HasObject("IsisCube")) {
+    cube = new Cube();
+    cube->Open(ui.GetFilename("FROM"), "rw");
+    pvl = &(cube->Label()->FindObject("IsisCube"));
+  }
 
   // Add Template File
   if(option == "ADDTEMP") {
     string tempfile = ui.GetFilename("TEMPFILE");
     Pvl tempobj(tempfile);
     for(int i = 0; i < tempobj.Groups(); ++i) {
-      o.AddGroup(tempobj.Group(i));
+      pvl->AddGroup(tempobj.Group(i));
     }
   }
 
   else {
     string grpname = ui.GetString("GRPNAME");
 
-    // Delete Group
-    if(option == "DELG") {
-      o.DeleteGroup(grpname);
-    }
-
     // Add Group
-    else if(option == "ADDG") {
+    if(option == "ADDG") {
       PvlGroup g(grpname);
-      if(ui.WasEntered("COMMENT")) {
-        string cmmnt = ui.GetString("COMMENT");
-        g.AddComment(cmmnt);
-      }
-      o.AddGroup(g);
+      if(ui.WasEntered("COMMENT"))
+        g.AddComment(ui.GetString("COMMENT"));
+      pvl->AddGroup(g);
     }
 
-    // Delete Keyword
-    else if(option == "DELKEY") {
-      string key = ui.GetString("KEYWORD");
-      o.FindGroup(grpname).DeleteKeyword(key);
+    // Delete Group
+    else if(option == "DELG") {
+      pvl->DeleteGroup(grpname);
     }
 
-    // Add Keyword
-    else if(option == "ADDKEY") {
+    else {
       string key = ui.GetString("KEYWORD");
-      iString val = ui.GetString("VALUE");
-      PvlKeyword keywrd(key);
-      if(ui.WasEntered("UNITS")) {
-        string unit = ui.GetString("UNITS");
-        keywrd.SetValue(val, unit);
-      }
-      else {
-        keywrd.SetValue(val);
-      }
-      if(ui.WasEntered("COMMENT")) {
-        string cmmnt = ui.GetString("COMMENT");
-        keywrd.AddComment(cmmnt);
-      }
-      o.FindGroup(grpname).AddKeyword(keywrd);
-    }
+      PvlGroup &grp = pvl->FindGroup(grpname, PvlObject::Traverse);
 
-    // Modify Keyword
-    else if(option == "MODKEY") {
-      string key = ui.GetString("KEYWORD");
-      PvlKeyword &keywrd = o.FindGroup(grpname).FindKeyword(key);
-      string val = ui.GetString("VALUE");
-      if(ui.WasEntered("UNITS")) {
-        string unit = ui.GetString("UNITS");
-        keywrd.SetValue(val, unit);
+      // Add Keyword
+      if(option == "ADDKEY") {
+        PvlKeyword keywrd(key);
+        grp.AddKeyword(modifyKeyword(ui, keywrd));
       }
-      else {
-        keywrd.SetValue(val);
+
+      // Delete Keyword
+      else if(option == "DELKEY") {
+        grp.DeleteKeyword(key);
       }
-      if(ui.WasEntered("COMMENT")) {
-        string cmmnt = ui.GetString("COMMENT");
-        keywrd.AddComment(cmmnt);
+
+      // Modify Keyword
+      else if(option == "MODKEY") {
+        modifyKeyword(ui, grp.FindKeyword(key));
       }
+
+      // Set Keyword
+      else if(option == "SETKEY") {
+        if(grp.HasKeyword(key)) {
+          PvlKeyword *first = NULL;
+          // Clean duplicate keywords of ONLY the provided keyword
+          for(int i = 0; i < grp.Keywords(); i++) {
+            if(grp[i].IsNamed(key))
+              if(not first)
+                first = &grp[i];
+              else
+                grp.DeleteKeyword(i);
+          }
+          modifyKeyword(ui, *first);
+        }
+        else {
+          PvlKeyword keywrd(key);
+          grp.AddKeyword(modifyKeyword(ui, keywrd));
+        }
+      }
+
     }
   }
-  /* History hist = History("IsisCube");
-   try {
-       cube.Read(hist);
-   }
-   catch(iException &e) {
-       e.Clear();
-   }
-   hist.AddEntry();
-   cube.Write(hist); */
-  cube.Close();
+
+  // Write and clean the data
+  if(cube) {
+    cube->Close();
+    delete cube;
+    cube = NULL;
+  }
+  else {
+    label->Write(ui.GetFilename("FROM"));
+  }
+
+  delete label;
+  label = NULL;
+}
+
+PvlKeyword &modifyKeyword(UserInterface &ui, PvlKeyword &keyword) {
+  if(ui.WasEntered("UNITS"))
+    keyword.SetValue(ui.GetString("VALUE"), ui.GetString("UNITS"));
+  else
+    keyword.SetValue(ui.GetString("VALUE"));
+  if(ui.WasEntered("COMMENT"))
+    keyword.AddComment(ui.GetString("COMMENT"));
+  return keyword;
 }

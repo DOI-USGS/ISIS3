@@ -42,21 +42,25 @@
     <change name="Christopher Austin" date="2008-04-18">
        Added Comment allocation and fixed documentation.
     </change>
+    <change name="Christopher Austin" date="2011-03-08">
+       Added the SETKEY parameter to prevent non-explicit duplicate keywords,
+       greatly cleaned and reduced code, and added support for non-cube Pvls.
+    </change>
   </history>
 
   <groups>
     <group name="Files">
       <parameter name="FROM">
-        <type>cube</type>
+        <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Cube file containing the label to be modified
+          Pvl file containing the label to be modified
         </brief>
         <description>
-          The cube file containing the label to be modified.
+          The pvl or cube file containing the label to be modified.
         </description>
         <filter>
-          *.cub
+          *.cub, *.pvl
         </filter>
       </parameter>
     </group>
@@ -67,8 +71,23 @@
            <description>
                A list of the different types of modifications allowed on the label.
            </description>
-           <default><item>ADDKEY</item></default>
+           <default><item>SETKEY</item></default>
             <list>
+               <option value="ADDG">
+                   <brief>Add Group</brief>
+                   <description>
+                       Adds a group to the file label.
+                   </description>
+                   <inclusions>
+                     <item>GRPNAME</item>
+                   </inclusions>
+                   <exclusions>
+                       <item>KEYWORD</item>
+                       <item>VALUE</item>
+                       <item>UNITS</item>
+                       <item>TEMPFILE</item>
+                   </exclusions>
+               </option>
                <option value="DELG">
                     <brief>Delete Group</brief>
                     <description>
@@ -85,18 +104,17 @@
                         <item>COMMENT</item>
                     </exclusions>
                </option>
-               <option value="ADDG">
-                   <brief>Add Group</brief>
+               <option value="ADDKEY">
+                   <brief>Add Keyword</brief>
                    <description>
-                       Adds a group to the file label.
+                       Adds a keyword to the specified group in the file label.
                    </description>
                    <inclusions>
-                     <item>GRPNAME</item>
-                   </inclusions>
-                   <exclusions>
+                       <item>GRPNAME</item>
                        <item>KEYWORD</item>
                        <item>VALUE</item>
-                       <item>UNITS</item>
+                   </inclusions>
+                   <exclusions>
                        <item>TEMPFILE</item>
                    </exclusions>
                </option>
@@ -130,36 +148,39 @@
                        <item>TEMPFILE</item>
                    </exclusions>
                </option>
-                <option value="ADDKEY">
-                    <brief>Add Keyword</brief>
-                    <description>
-                        Adds a keyword to the specified group in the file label.
-                    </description>
-                    <inclusions>
-                      <item>GRPNAME</item>
-                      <item>KEYWORD</item>
-                      <item>VALUE</item>
-                    </inclusions>
-                <exclusions>
-                    <item>TEMPFILE</item>
-                </exclusions>
-                </option>
-                <option value="ADDTEMP">
-                    <brief>Add Template File</brief>
-                    <description>
-                        Adds a template file to the file label.
-                    </description>
-                    <inclusions>
-                      <item>TEMPFILE</item>
-                    </inclusions>
-                    <exclusions>
-                        <item>GRPNAME</item>
-                        <item>KEYWORD</item>
-                        <item>VALUE</item>
-                        <item>UNITS</item>
-                        <item>COMMENT</item>
-                    </exclusions>
-                </option>
+               <option value="SETKEY">
+                   <brief>Set Keyword: deletes duplicates</brief>
+                   <description>
+                       Adds or modifies an existing keyword to the specified
+                       group in the file label. If there are duplicates of the
+                       provided keyword, all duplicates are removed from the
+                       group, leaving only the new, provided value.
+                   </description>
+                   <inclusions>
+                       <item>GRPNAME</item>
+                       <item>KEYWORD</item>
+                       <item>VALUE</item>
+                   </inclusions>
+                   <exclusions>
+                       <item>TEMPFILE</item>
+                   </exclusions>
+               </option>
+               <option value="ADDTEMP">
+                   <brief>Add Template File</brief>
+                   <description>
+                       Adds a template file to the file label.
+                   </description>
+                   <inclusions>
+                       <item>TEMPFILE</item>
+                   </inclusions>
+                   <exclusions>
+                       <item>GRPNAME</item>
+                       <item>KEYWORD</item>
+                       <item>VALUE</item>
+                       <item>UNITS</item>
+                       <item>COMMENT</item>
+                   </exclusions>
+               </option>
             </list>
         </parameter>
     </group>
