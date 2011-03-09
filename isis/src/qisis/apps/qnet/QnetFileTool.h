@@ -67,6 +67,8 @@ namespace Qisis {
    *                          by changes made to the ControlNet,ControlPoint,
    *                          ControlMeasure header files.
    *  @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
+   *  @history 2010-12-10 Tracie Sucharski - Renamed slot loadPoint to
+   *                          loadPointImages.
    *
    */
 
@@ -86,7 +88,7 @@ namespace Qisis {
       virtual void open();
       virtual void exit();
       virtual void saveAs();
-      void loadPoint(Isis::ControlPoint *point);
+      void loadPointImages(Isis::ControlPoint *point);
       void loadImage(const QString &serialNumber);
       void setSaveNet();
 

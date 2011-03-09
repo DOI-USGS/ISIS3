@@ -22,6 +22,7 @@
 #include "QnetPointCubeNameFilter.h"
 #include "QnetPointDistanceFilter.h"
 #include "QnetPointErrorFilter.h"
+#include "QnetPointGoodnessFilter.h"
 #include "QnetPointIdFilter.h"
 #include "QnetPointImagesFilter.h"
 #include "QnetPointMeasureFilter.h"
@@ -283,6 +284,14 @@ namespace Qisis {
                                      than one measure type can be selected. \
                                      Only one Ignore status may be selected.");
 
+    QWidget *goodnessFilter = new QnetPointGoodnessFilter();
+    connect(goodnessFilter, SIGNAL(filteredListModified()),
+            this, SLOT(filterList()));
+    pointFilters->insertTab(GoodnessOfFit, goodnessFilter, "&Goodness of Fit");
+    pointFilters->setTabToolTip(GoodnessOfFit, "Filter Points by the Goodness of Fit of its measures");
+    pointFilters->setTabWhatsThis(GoodnessOfFit,
+                                  "<b>Function: </b> Filter points list by \
+                                     the goodness of fit.");
     QWidget *cubeNamesFilter = new QnetPointCubeNameFilter();
     connect(cubeNamesFilter, SIGNAL(filteredListModified()),
         this, SLOT(filterList()));
@@ -522,7 +531,7 @@ namespace Qisis {
 
 
   /**
-   * Tells the filetool to load an image, point, or overlap
+   * Tells the filetool to load an image, slot for "View Cube(s)" button
    *
    * @internal
    *   @history  2007-06-05 Tracie Sucharski - Use enumerators for the filter
@@ -557,10 +566,10 @@ namespace Qisis {
       // Tell the filetool to load all images for the given point
       if (p_listCombo->currentIndex() == Points) {
         if (g_filteredPoints.size() == 0) {
-          emit loadPoint((*g_controlNetwork)[index]);
+          emit loadPointImages((*g_controlNetwork)[index]);
         }
         else {
-          emit loadPoint((*g_controlNetwork)[g_filteredPoints[index]]);
+          emit loadPointImages((*g_controlNetwork)[g_filteredPoints[index]]);
         }
       }
       // Tell the filetool to load the given image
@@ -585,7 +594,9 @@ namespace Qisis {
 
 
   /**
-   * Slot for double-clicking cube list
+   * Slot for double-clicking cube list.  Needed this slot because the signal 
+   * has a QListWidgetItem parameter.  TODO:  Clean this up by possibly combining 
+   * the two different load slots??? 
    *
    * @author 2010-11-04 Tracie Sucharski
    *
@@ -818,6 +829,12 @@ namespace Qisis {
       else if (pointIndex == MeasureType) {
         QnetPointMeasureFilter *widget =
           (QnetPointMeasureFilter *)(tab->currentWidget());
+        widget->filter();
+      }
+      // We have a goodness of fit filter
+      else if(pointIndex == GoodnessOfFit) {
+        QnetPointGoodnessFilter *widget =
+          (QnetPointGoodnessFilter *)(tab->currentWidget());
         widget->filter();
       }
       // We have a cube name filter

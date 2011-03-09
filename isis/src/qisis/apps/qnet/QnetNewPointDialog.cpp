@@ -24,6 +24,11 @@ namespace Qisis {
    *   @history 2008-11-26 Jeannie Walldren - Set lastPointIdValue
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null.
+   *   @history 2011-03-08 Tracie Sucharski - If there is a saved ID
+   *                          and there is no point in the network with that
+   *                          id, do not disable "ok" button.  This allows
+   *                          user to use the same id from a previous point
+   *                          creation if the point was never saved.
    *
    */
   QnetNewPointDialog::QnetNewPointDialog(QWidget *parent) : QDialog(parent) {
@@ -48,7 +53,11 @@ namespace Qisis {
 
     //  Create OK & Cancel buttons
     p_okButton = new QPushButton("OK");
-    p_okButton->setEnabled(false);
+    //  If the last point id used was never saved to network, do not set ok
+    //  button to faslse
+    if (lastPtIdValue.isEmpty() || g_controlNetwork->ContainsPoint(lastPtIdValue)) {
+      p_okButton->setEnabled(false);
+    }
     QPushButton *cancelButton = new QPushButton("Cancel");
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(p_okButton);

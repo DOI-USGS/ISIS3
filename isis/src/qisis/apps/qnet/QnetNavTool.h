@@ -100,6 +100,10 @@ namespace Qisis {
    *                          from std::string to QString.
    *   @history 2010-11-04 Tracie Sucharski - Added overloaded load slot for
    *                          double-clicking on the cube list.
+   *   @history 2010-12-10 Tracie Sucharski - Renamed signal loadPoint to
+   *                          loadPointImages and the ControlPoint is passed
+   *                          by value so that the original point is preserved
+   *                          until the user selects "Save Point".
    *
    *
    */
@@ -151,7 +155,7 @@ namespace Qisis {
       void showNavTool();
 
     signals:
-      void loadPoint(Isis::ControlPoint *);
+      void loadPointImages (Isis::ControlPoint *);
       void loadImage(const QString &);
       void modifyPoint(Isis::ControlPoint *);
       void ignoredPoints();

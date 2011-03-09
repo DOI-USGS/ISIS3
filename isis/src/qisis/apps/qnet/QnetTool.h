@@ -2,6 +2,9 @@
 #define QnetTool_h
 
 #include "Tool.h"
+#include "ControlPoint.h"
+
+#include <QStringList>
 
 class QAction;
 class QBoxLayout;
@@ -16,14 +19,12 @@ class QPoint;
 class QSplitter;
 class QStackedWidget;
 class QString;
-class QStringList;
 class QTextEdit;
 class QWidget;
 
 namespace Isis {
   class ControlMeasure;
   class ControlNet;
-  class ControlPoint;
   class Cube;
   class iString;
   class Stretch;
@@ -121,10 +122,13 @@ namespace Qisis {
    *   @history 2010-07-12 Jeannie Walldren - Fixed bug in newHoldPoint() method
    *                          that was causing the Hold Point Dialog to call the
    *                          reject() command.  Updated documentation.
-   *   @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
+   *  @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
    *                          by changes made to the ControlNet,ControlPoint,
    *                          ControlMeasure header files.  Remove findPointFiles
    *                          method, the code is now in the createPoint method.
+   *  @history 2010-11-19 Tracie Sucharski - Renamed pointSaved slot to measureSaved.
+   *  
+   *
    *   @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
    *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for
    *                forwarding of SIGNAL from StretchTool to ChipViewport
@@ -141,12 +145,12 @@ namespace Qisis {
    *                display to outside of control point groupbox.
    */
   class QnetTool : public Tool {
-      Q_OBJECT
+    Q_OBJECT
 
     public:
-      QnetTool(QWidget *parent);
-      virtual ~QnetTool();
-      void paintViewport(MdiCubeViewport *cvp, QPainter *painter);
+      QnetTool (QWidget *parent);
+      virtual ~QnetTool ();
+      void paintViewport (MdiCubeViewport *cvp,QPainter *painter);
 
     signals:
       void qnetToolSave();
@@ -163,40 +167,49 @@ namespace Qisis {
     public slots:
       void updateList();
       void updateNet(QString cNetFilename);
-      void createPoint(double lat, double lon);
+      void createPoint(double lat,double lon);
+      void createGroundPoint(double lat,double lon);
       void modifyPoint(Isis::ControlPoint *point);
       void deletePoint(Isis::ControlPoint *point);
       void refresh();
 
     protected:
       QAction *toolPadAction(ToolPad *pad);
-      bool eventFilter(QObject *o, QEvent *e);
+      bool eventFilter(QObject *o,QEvent *e);
 
     protected slots:
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
-      QWidget *createToolBarWidget(QStackedWidget *parent);
+      QWidget *createToolBarWidget (QStackedWidget *parent);
 
     private slots:
-      void paintAllViewports();
+      void paintAllViewports (QString pointId );
       void saveNet();
       void addMeasure();
-      void setIgnorePoint(bool ignore);
-      void newGroundPoint(Isis::ControlPoint &point);
-      void setGroundPoint(bool ground);
-      void setIgnoreLeftMeasure(bool ignore);
-      void setIgnoreRightMeasure(bool ignore);
-      void showNavWindow(bool checked);
+      void setLockPoint (bool ignore);
+      void setIgnorePoint (bool ignore);
+      void setGroundPoint (bool ground);
+      void setLockLeftMeasure (bool ignore);
+      void setIgnoreLeftMeasure (bool ignore);
+      void setLockRightMeasure (bool ignore);
+      void setIgnoreRightMeasure (bool ignore);
+      void showNavWindow (bool checked);
 
-      void selectLeftMeasure(int index);
-      void selectRightMeasure(int index);
-      void updateLeftMeasureInfo();
-      void updateRightMeasureInfo();
+      void updateSurfacePointInfo ();
 
-      void pointSaved();
+      void selectLeftMeasure (int index);
+      void selectRightMeasure (int index);
+      void updateLeftMeasureInfo ();
+      void updateRightMeasureInfo ();
+
+      void measureSaved ();
+      void savePoint();
 
       void openTemplateFile();
       void viewTemplateFile();
       void saveChips();
+
+      void openGround();
+      void openDem();
       void showHideTemplateEditor();
       void saveTemplateFile();
       void saveTemplateFileAs();
@@ -209,60 +222,80 @@ namespace Qisis {
       void createMenus();
       void createToolBars();
       void loadPoint();
-      void drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter);
+      void drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter);
+      void drawMeasures (MdiCubeViewport *vp,QPainter *painter,Isis::ControlPoint &point);
       void createQnetTool(QWidget *parent);
-      QSplitter *createTopSplitter();
-      QGroupBox *createControlPointGroupBox();
-      QGroupBox *createLeftMeasureGroupBox();
-      QGroupBox *createRightMeasureGroupBox();
+      QSplitter * createTopSplitter();
+      QGroupBox * createControlPointGroupBox();
+      QGroupBox * createLeftMeasureGroupBox();
+      QGroupBox * createRightMeasureGroupBox();
       void createTemplateEditorWidget();
       void loadTemplateFile(QString);
       bool okToContinue();
+      void initDem(QString demFile);
+      void clearGroundSource();
 
 
-    private:
       QMainWindow *p_qnetTool;
-
 
       QStringList findPointFiles(double lat, double lon);
 
       QAction *p_createPoint;
       QAction *p_modifyPoint;
       QAction *p_deletePoint;
+
+      QAction *p_openGround;
+      QAction *p_openDem;
       QAction *p_saveNet;
       QAction *p_closeQnetTool;
+
       QAction *p_saveChips;
       QAction *p_showHideTemplateEditor;
       QAction *p_openTemplateFile;
       QAction *p_saveTemplateFile;
       QAction *p_saveTemplateFileAs;
-
+      
       QMainWindow *p_mw;
       ControlPointEdit *p_pointEditor;
+
       QTextEdit *p_templateEditor;
       QWidget *p_templateEditorWidget;
+      bool p_templateModified;
 
       QLabel *p_templateFilenameLabel;
+      QLabel *p_groundFilenameLabel;
+      QLabel *p_radiusFilenameLabel;
       QLabel *p_ptIdValue;
       QLabel *p_numMeasures;
-
+      QLabel *p_pointAprioriLatitude;
+      QLabel *p_pointAprioriLongitude;
+      QLabel *p_pointAprioriRadius;
+      QLabel *p_pointLatitude;
+      QLabel *p_pointLongitude;
+      QLabel *p_pointRadius;
+      
+      QCheckBox *p_lockPoint;
       QCheckBox *p_ignorePoint;
       QCheckBox *p_groundPoint;
       QLabel *p_leftMeasureType;
       QLabel *p_leftSampError;
       QLabel *p_leftLineError;
+      QLabel *p_leftGoodness;
+      QLabel *p_rightGoodness;
       QLabel *p_rightMeasureType;
       QLabel *p_rightSampError;
       QLabel *p_rightLineError;
+      QCheckBox *p_lockLeftMeasure;
       QCheckBox *p_ignoreLeftMeasure;
+      QCheckBox *p_lockRightMeasure;
       QCheckBox *p_ignoreRightMeasure;
 
       QComboBox *p_leftCombo;
       QComboBox *p_rightCombo;
 
-      Isis::ControlPoint *p_controlPoint;
+      Isis::ControlPoint *p_editPoint;
 
-      QStringList *p_pointFiles;
+      QStringList p_pointFiles;
 
       std::string p_leftFile;
       Isis::ControlMeasure *p_leftMeasure;
@@ -270,7 +303,16 @@ namespace Qisis {
       Isis::Cube *p_leftCube;
       Isis::Cube *p_rightCube;
 
-      bool p_templateModified;
+      QString p_groundFile;
+      Isis::Cube *p_groundCube;
+      Isis::iString p_groundSN;
+      Isis::UniversalGroundMap *p_groundGmap;
+      bool p_groundOpen;
+      Isis::ControlPoint::SurfacePointSource::Source p_groundSurfacePointSource;
+      Isis::ControlPoint::RadiusSource::Source p_groundRadiusSource;
+      QString p_demFile;
+      bool p_demOpen;
+      Isis::Cube *p_demCube;
   };
 };
 

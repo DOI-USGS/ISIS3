@@ -196,8 +196,8 @@ namespace Qisis {
         ".", filter);
     if (!fn.isEmpty()) {
       try {
-        g_controlNetwork->Write(fn.toStdString());
-      }
+        g_controlNetwork->WritePvl(fn.toStdString());
+      } 
       catch (Isis::iException &e) {
         QString message = "Error saving control network.  \n";
         string errors = e.Errors();
@@ -256,11 +256,15 @@ namespace Qisis {
   }
 
   /**
-   * Load given point
+   * Load images for the given point 
    *
    * @param point Control point to load
+   *  
+   * @internal 
+   *   @history 2010-12-10 Tracie Sucharski - Renamed slot loadPoint to
+   *                          loadPointImages.
    */
-  void QnetFileTool::loadPoint(Isis::ControlPoint *point) {
+  void QnetFileTool::loadPointImages(Isis::ControlPoint *point) {
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       string cubeSN = (*point)[i]->GetCubeSerialNumber();
       loadImage(cubeSN.c_str());

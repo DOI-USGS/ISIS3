@@ -1,3 +1,4 @@
+#include "IsisDebug.h"
 #include <QApplication>
 #include "AdvancedTrackTool.h"
 #include "BandTool.h"
@@ -9,6 +10,7 @@
 #include "PanTool.h"
 #include "Preference.h"
 #include "PvlGroup.h"
+#include "QIsisApplication.h"
 #include "QnetFileTool.h"
 #include "QnetTool.h"
 #include "QnetNavTool.h"
@@ -22,14 +24,19 @@
 #define IN_QNET
 #include "qnet.h"
 
+void startMonitoringMemory();
+void stopMonitoringMemory();
 using namespace std;
 
 int main(int argc, char *argv[]) {
+#ifdef CWDEBUG
+  startMonitoringMemory();
+#endif
   Qisis::Qnet::g_controlNetwork = NULL;
   Qisis::Qnet::g_serialNumberList = NULL;
 
   try {
-    QApplication *app = new QApplication(argc, argv);
+    Qisis::QIsisApplication *app = new Qisis::QIsisApplication(argc,argv);
     QApplication::setApplicationName("qnet");
 
     // check for forcing of gui style
@@ -123,18 +130,18 @@ int main(int argc, char *argv[]) {
     QObject::connect(ntool, SIGNAL(loadImage(const QString &)),
         ftool, SLOT(loadImage(const QString &)));
     // The fileTool needs to know when to load the images associated with a point
-    QObject::connect(ntool, SIGNAL(loadPoint(Isis::ControlPoint *)),
-        ftool, SLOT(loadPoint(Isis::ControlPoint *)));
+    QObject::connect(ntool,SIGNAL(loadPointImages(Isis::ControlPoint *)),
+                     ftool,SLOT(loadPointImages(Isis::ControlPoint *)));
 
     /**** UPDATING LIST ****/
     // The navTool needs to know when the file tool has changed the serialNumberList
     QObject::connect(ftool, SIGNAL(serialNumberListUpdated()),
-        ntool, SLOT(resetList()));
+                     ntool, SLOT(resetList()));
     // The navTool cube name filter needs to know when the file tool
     // has changed the serialNumberList in order to refresh the list
     // Jeannie Walldren 2009-01-26
     QObject::connect(ftool, SIGNAL(serialNumberListUpdated()),
-        ntool, SLOT(resetCubeList()));
+                     ntool, SLOT(resetCubeList()));
     // The QnetTool needs to know when the file tool has changed the
     // serialNumberList and the controlnetwork.
     //  QObject::connect(ftool,SIGNAL(serialNumberListUpdated()),
@@ -149,7 +156,7 @@ int main(int argc, char *argv[]) {
     /**** MODIFYING POINTS ****/
     // Qnet Tool needs to know when navTool modifies/ignores/deletes points
     QObject::connect(ntool, SIGNAL(modifyPoint(Isis::ControlPoint *)),
-        qnetTool, SLOT(modifyPoint(Isis::ControlPoint *)));
+                     qnetTool, SLOT(modifyPoint(Isis::ControlPoint *)));
     QObject::connect(ntool, SIGNAL(ignoredPoints()), qnetTool, SLOT(refresh()));
     QObject::connect(ntool, SIGNAL(deletedPoints()), qnetTool, SLOT(refresh()));
 
@@ -157,20 +164,20 @@ int main(int argc, char *argv[]) {
     // Connect the FindTool to the AdvancedTrackTool to record the point if the
     // "record" button is clicked in FindTool's dialog
     QObject::connect(findTool, SIGNAL(recordPoint(QPoint)),
-        ttool, SLOT(record(QPoint)));
+                     ttool, SLOT(record(QPoint)));
 
     /**** UPDATING CONTROL NETWORK ****/
     // the next command was uncommented to allows the QnetTool to display the name
     // of the control network file and update when a new control network is selected
     // 2008-11-26 Jeannie Walldren
     QObject::connect(ftool, SIGNAL(controlNetworkUpdated(QString)),
-        qnetTool, SLOT(updateNet(QString)));
+                     qnetTool, SLOT(updateNet(QString)));
     QObject::connect(ftool, SIGNAL(newControlNetwork(Isis::ControlNet *)),
-        qnetTool, SIGNAL(newControlNetwork(Isis::ControlNet *)));
+                     qnetTool, SIGNAL(newControlNetwork(Isis::ControlNet *)));
     QObject::connect(qnetTool, SIGNAL(editPointChanged(QString)),
-        ntool, SLOT(updateEditPoint(QString)));
+                     ntool, SLOT(updateEditPoint(QString)));
     QObject::connect(qnetTool, SIGNAL(refreshNavList()),
-        ntool, SLOT(refreshList()));
+                     ntool, SLOT(refreshList()));
 
     /**** SAVING CONTROL NET CHANGES ****/
     //  The FileTool needs to now if the control network has changed (delete/
@@ -189,8 +196,8 @@ int main(int argc, char *argv[]) {
     /**** EXITING ****/
     // Connect the viewport's close signal to the file tool's exit method
     // Added 2008-12-04 by Jeannie Walldren
-    QObject::connect(Qisis::Qnet::g_vpMainWindow ,
-        SIGNAL(closeWindow()), ftool, SLOT(exit()));
+    QObject::connect(Qisis::Qnet::g_vpMainWindow , SIGNAL(closeWindow()),
+                     ftool, SLOT(exit()));
     //-----------------------------------------------------------------
 
     Qisis::Qnet::g_vpMainWindow->show();
@@ -199,5 +206,46 @@ int main(int argc, char *argv[]) {
   catch (Isis::iException &e) {
     e.Report();
   }
+}
+
+void startMonitoringMemory() {
+#ifdef CWDEBUG
+#ifndef NOMEMCHECK
+  MyMutex *mutex = new MyMutex();
+  std::fstream *alloc_output = new std::fstream("/dev/null");
+  Debug(make_all_allocations_invisible_except(NULL));
+  ForAllDebugChannels(if(debugChannel.is_on()) debugChannel.off());
+  Debug(dc::malloc.on());
+  Debug(libcw_do.on());
+  Debug(libcw_do.set_ostream(alloc_output));
+  Debug(libcw_do.set_ostream(alloc_output, mutex));
+  atexit(stopMonitoringMemory);
+#endif
+#endif
+}
+
+
+void stopMonitoringMemory() {
+#ifdef CWDEBUG
+#ifndef NOMEMCHECK
+  Debug(
+    alloc_filter_ct alloc_filter;
+    std::vector<std::string> objmasks;
+    objmasks.push_back("libc.so*");
+    objmasks.push_back("libstdc++*");
+    std::vector<std::string> srcmasks;
+    srcmasks.push_back("*new_allocator.h*");
+    srcmasks.push_back("*set_ostream.inl*");
+    alloc_filter.hide_objectfiles_matching(objmasks);
+    alloc_filter.hide_sourcefiles_matching(srcmasks);
+    alloc_filter.hide_unknown_locations();
+    delete libcw_do.get_ostream();
+    libcw_do.set_ostream(&std::cout);
+    list_allocations_on(libcw_do, alloc_filter);
+    dc::malloc.off();
+    libcw_do.off()
+  );
+#endif
+#endif
 }
 
