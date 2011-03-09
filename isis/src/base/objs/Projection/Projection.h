@@ -499,7 +499,7 @@ namespace Isis {
                                                    Planetographic or
                                                    Planetocentric.*/
       LongitudeDirection p_longitudeDirection; /**<An enumerated type indicating
-                                                   the LatitudeDirection read
+                                                   the LongitudeDirection read
                                                    from the labels. It can be
                                                    either PositiveEast or
                                                    PositiveWest.Indicating which
