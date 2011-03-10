@@ -61,6 +61,7 @@
               <a href="#SamplingMatchAlgo">Sampling in the Match Algorithm</a>
             </li>
             <li><a href="#ZScoreTest">Z-Score Test</a></li>
+            <li><a href="#GradientFilters">Gradient Filters</a></li>
           </ol>
         </ol>
 
@@ -646,6 +647,30 @@
           deviations away from the mean. If the MinimumZScore keyword is not
           included, the default value of 1 standard deviation is used.
         </p>
+
+        <h3><a name="GradientFilters">Gradient Filters</a></h3>
+        <p>
+          To increase the chances of successful registration, a gradient filter
+          can be applied to both the search and pattern chips before attempting
+          to perform a match. A gradient filter basically calculates the
+          magnitude and direction of the largest possible increase from light to
+          dark. In simple terms, a gradient filter highlights the edges in an
+          image. Thus, the use of a gradient filter on the search and pattern
+          chips may increase the chances of finding a match when the pattern
+          chip contains distinctive features whose edges need to be emphasized.
+
+          Currently, Sobel and Roberts gradient filters are supported. The Sobel
+          gradient filter looks at the eight surrounding pixels for a given
+          point, while the Roberts gradient filter computes the sum of the
+          squares of the differences between diagonally adjacent pixels. A
+          Sobel gradient filter can be specified like so:
+
+          <pre style="padding-left:4em;">
+            Group = Algorithm
+              Gradient = Sobel
+            End_Group
+          </pre>
+        </p>
       </body>
 
       <type>HTML</type>
@@ -676,7 +701,7 @@
       their results from applications such as "pointreg" and "coreg".  This
       should also give programmers a better understanding of how AutoReg works.
     </description>
-    <author>Travis Addair</author>
-    <date>2011-02-23</date>
+    <author>Travis Addair, Jai Rideout</author>
+    <date>2011-03-10</date>
   </bibliography>
 </documentation>
