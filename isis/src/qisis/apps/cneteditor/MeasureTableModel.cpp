@@ -27,8 +27,6 @@ namespace Isis
   {
     measures = NULL;
     measures = new QList< ControlMeasure * >;
-    measures->append(NULL);
-
   }
 
 

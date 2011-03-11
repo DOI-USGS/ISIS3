@@ -103,6 +103,7 @@ namespace Isis
     saveAsAct = NULL;
     aboutAct = NULL;
     closeAct = NULL;
+    synchronizeAct = NULL;
     quitAct = NULL;
 
     fileMenu = NULL;
@@ -145,8 +146,13 @@ namespace Isis
     closeAct = new QAction(QIcon(":close"), tr("&Close"), this);
     closeAct->setStatusTip(tr("Close control net file"));
     connect(closeAct, SIGNAL(triggered()), this, SLOT(closeNetwork()));
+    
+    synchronizeAct = new QAction(tr("Synchronize Views"), this);
+    synchronizeAct->setCheckable(true);
+    connect(synchronizeAct, SIGNAL(triggered()), this,
+        SLOT(handleSynchronizeViews()));
 
-
+    
 //    aboutAct = new QAction(tr("&About"), this);
 //    aboutAct->setStatusTip(tr("Show cneteditor's about box"));
 //    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
@@ -186,6 +192,8 @@ namespace Isis
     mainToolBar->addAction(saveAsAct);
     mainToolBar->addSeparator();
     mainToolBar->addAction(closeAct);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(synchronizeAct);
 
     addToolBar(Qt::TopToolBarArea, mainToolBar);
   }
@@ -207,6 +215,9 @@ namespace Isis
         defaultWindowHeight)).toSize();
     resize(size);
     move(pos);
+    
+    // load view synchronization state
+    synchronized = settings.value("synchronizeViews", false).toBool();
 
     setWindowIcon(QIcon(":usgs"));
   }
@@ -219,6 +230,9 @@ namespace Isis
     // save window position and size
     settings.setValue("pos", pos());
     settings.setValue("size", size());
+    
+    // save view synchronization state
+    settings.setValue("synchronizeViews", synchronized);
   }
 
 
@@ -271,6 +285,7 @@ namespace Isis
 
     saveAsAct->setEnabled(true);
     closeAct->setEnabled(true);
+    handleSynchronizeViews();
     setDirty(false);
     *curFile = filename;
     setWindowTitle(filename + "[*] - cneteditor");
@@ -379,6 +394,16 @@ namespace Isis
 
       setNoFileState();
     }
+  }
+  
+  
+  void CnetEditorWindow::handleSynchronizeViews()
+  {
+    Q_ASSERT(synchronizeAct);
+    synchronized = synchronizeAct->isChecked();
+    
+    if (editorWidget)    
+      editorWidget->setSynchronizedViews(synchronized);
   }
 
 

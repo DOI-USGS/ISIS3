@@ -181,29 +181,19 @@ namespace Isis
     return 1;
   }
 
-  /*
-    Qt::ItemFlags ConnectionModel::flags(const QModelIndex & index) const
+    
+  Qt::ItemFlags ConnectionModel::flags(const QModelIndex & index) const
+  {
+    Qt::ItemFlags flags = 0;
+    if (index.isValid())
     {
-  //    cerr << "ConnectionModel::flags called\n";
-
-      Qt::ItemFlags flags;
-      if (index.isValid())
-      {
-  //      cerr << "\tindex is valid!\n";
-        flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-      }
-      else
-      {
-        flags = 0;
-      }
-
-  //    cerr << "ConnectionModel::flags done\n\n";
-
-      return flags;
+      flags = Qt::ItemIsEnabled;
+      if (selectionEnabled)
+        flags = flags | Qt::ItemIsSelectable;
     }
-  */
 
-
+    return flags;
+  }
 
 
   TreeItem * ConnectionModel::getItem(const QModelIndex & index) const
@@ -216,6 +206,7 @@ namespace Isis
 
     return static_cast< TreeItem * >(index.internalPointer());
   }
+  
 }
 
 

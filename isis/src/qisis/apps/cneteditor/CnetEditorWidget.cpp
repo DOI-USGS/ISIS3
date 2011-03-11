@@ -7,6 +7,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QBoxLayout>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelection>
@@ -42,17 +43,36 @@ namespace Isis
   {
     nullify();
     updatingSelection = false;
-    synchronizeViews = true;  //FIXME: create checkbox for this
-
     controlNet = cNet;
 
     QBoxLayout * mainLayout = createMainLayout();
+    setSynchronizedViews(false);
     setLayout(mainLayout);
   }
 
 
   CnetEditorWidget::~CnetEditorWidget()
   {}
+  
+  
+  void CnetEditorWidget::setSynchronizedViews(bool synchronized)
+  {
+    synchronizeViews = synchronized;
+    
+    if (synchronizeViews)
+    {
+      serialView->setSelectionMode(QAbstractItemView::MultiSelection);
+      connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
+      pointViewSelectionChanged();
+    }
+    else
+    {
+      serialView->setSelectionMode(QAbstractItemView::NoSelection);
+      connectionView->setSelectionMode(QAbstractItemView::NoSelection);
+      serialView->selectionModel()->clear();
+      connectionView->selectionModel()->clear();
+    }
+  }
 
 
   QBoxLayout * CnetEditorWidget::createMainLayout()
@@ -75,7 +95,6 @@ namespace Isis
         SLOT(serialViewSelectionChanged()));
 //     serialView->setExpandsOnDoubleClick(false);
     serialView->setAlternatingRowColors(true);
-    serialView->setSelectionMode(QAbstractItemView::MultiSelection);
         
     connectionView = new QTreeView();
     connectionModel = new ConnectionModel(controlNet, qApp);
@@ -85,7 +104,6 @@ namespace Isis
         SLOT(connectionViewSelectionChanged()));
 //     connectionView->setExpandsOnDoubleClick(false);
     connectionView->setAlternatingRowColors(true);
-    connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
     
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
@@ -98,6 +116,11 @@ namespace Isis
     editPointView->setItemDelegate(editPointDelegate);
     editPointView->resizeColumnsToContents();
     editPointView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    QGroupBox * editPointBox = new QGroupBox(tr("Control Point Table"));
+    QHBoxLayout * editPointLayout = new QHBoxLayout;
+    editPointLayout->addWidget(editPointView);
+    editPointBox->setLayout(editPointLayout);
+
 //     QHeaderView * vheader = editPointView->verticalHeader();
 //     vheader->setContextMenuPolicy(Qt::ActionsContextMenu);
 //     QAction * removeAction = new QAction("Remove", this);
@@ -115,6 +138,10 @@ namespace Isis
     editMeasureView->setItemDelegate(editMeasureDelegate);
     editMeasureView->resizeColumnsToContents();
     editMeasureView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    QGroupBox * editMeasureBox = new QGroupBox(tr("Control Measure Table"));
+    QHBoxLayout * editMeasureLayout = new QHBoxLayout;
+    editMeasureLayout->addWidget(editMeasureView);
+    editMeasureBox->setLayout(editMeasureLayout);
     
 
     QSplitter * topSplitter = new QSplitter(Qt::Horizontal);
@@ -124,8 +151,8 @@ namespace Isis
 
     QSplitter * mainSplitter = new QSplitter(Qt::Vertical);
     mainSplitter->addWidget(topSplitter);
-    mainSplitter->addWidget(editPointView);
-    mainSplitter->addWidget(editMeasureView);
+    mainSplitter->addWidget(editPointBox);
+    mainSplitter->addWidget(editMeasureBox);
 //     mainSplitter->setStretchFactor(0, 2);
 //     mainSplitter->setStretchFactor(1, 1);
 //     mainSplitter->setStretchFactor(2, 1);
@@ -216,10 +243,7 @@ namespace Isis
   
   void CnetEditorWidget::serialViewSelectionChanged()
   {
-    // If this method was called because it is synchronized to another view
-    // that got clicked then do nothing.  The *viewSelectionChanged for the
-    // clicked view is already handling how this view should be updated.
-    if (updatingSelection)
+    if (updatingSelection || !synchronizeViews)
       return;
     updatingSelection = true;
     
@@ -260,17 +284,13 @@ namespace Isis
         }
       }
     }
-    
-    // populate editor tables
+      
     editPointModel->setPoints(points);
     editMeasureModel->setMeasures(measures);
     
-    if (synchronizeViews)
-    {
-      focusView(pointView, pointIds);
-      focusView(connectionView, cubeSerialNumbers);
-    }
-
+    focusView(pointView, pointIds);
+    focusView(connectionView, cubeSerialNumbers);
+    
     updatingSelection = false;
   }
   
@@ -325,12 +345,11 @@ namespace Isis
       }
     }
     
-    // populate editor tables
-    editPointModel->setPoints(points);
-    editMeasureModel->setMeasures(measures);
-    
     if (synchronizeViews)
     {
+      editPointModel->setPoints(points);
+      editMeasureModel->setMeasures(measures);
+    
       focusView(pointView, pointIds);
       focusView(serialView, cubeSerialNumbers);
     }

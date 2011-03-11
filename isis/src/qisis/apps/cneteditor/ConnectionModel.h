@@ -31,8 +31,7 @@ namespace Isis
 
       QModelIndex parent(const QModelIndex & index) const;
 
-
-//       Qt::ItemFlags flags(const QModelIndex & index) const;
+      Qt::ItemFlags flags(const QModelIndex & index) const;
       int rowCount(const QModelIndex & parent = QModelIndex()) const;
       int columnCount(const QModelIndex & parent = QModelIndex()) const;
 
@@ -44,6 +43,7 @@ namespace Isis
     private:
       Isis::ControlNet * cNet;
       QList< TreeItem * > * parentItems;
+      bool selectionEnabled;
   };
 
 }

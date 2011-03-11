@@ -55,6 +55,7 @@ namespace Isis
       void save();
       void saveAs();
       void closeNetwork();
+      void handleSynchronizeViews();
 
 
     private: // data
@@ -63,6 +64,7 @@ namespace Isis
       QString * curFile;
       bool dirty;
       bool saveAsPvl;
+      bool synchronized;
 
 
     private: // widgets
@@ -71,6 +73,7 @@ namespace Isis
       QAction * saveAsAct;
       QAction * aboutAct;
       QAction * closeAct;
+      QAction * synchronizeAct;
       QAction * quitAct;
 
       QMenu * fileMenu;

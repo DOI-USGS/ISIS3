@@ -28,6 +28,10 @@ namespace Isis
     public:
       CnetEditorWidget(Isis::ControlNet *);
       virtual ~CnetEditorWidget();
+      
+      
+    public slots:
+      void setSynchronizedViews(bool synchronized);
 
 
     signals:
