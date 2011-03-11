@@ -65,7 +65,7 @@ namespace Isis
         SLOT(pointViewSelectionChanged()));
 //     pointView->setExpandsOnDoubleClick(false);
     pointView->setAlternatingRowColors(true);
-    pointView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    pointView->setSelectionMode(QAbstractItemView::MultiSelection);
     
     serialView = new QTreeView();
     serialModel = new SerialModel(controlNet, qApp);
@@ -75,7 +75,7 @@ namespace Isis
         SLOT(serialViewSelectionChanged()));
 //     serialView->setExpandsOnDoubleClick(false);
     serialView->setAlternatingRowColors(true);
-    serialView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    serialView->setSelectionMode(QAbstractItemView::MultiSelection);
         
     connectionView = new QTreeView();
     connectionModel = new ConnectionModel(controlNet, qApp);
@@ -85,7 +85,7 @@ namespace Isis
         SLOT(connectionViewSelectionChanged()));
 //     connectionView->setExpandsOnDoubleClick(false);
     connectionView->setAlternatingRowColors(true);
-    connectionView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
     
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
