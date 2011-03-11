@@ -145,8 +145,7 @@ uint8 *predictive_decomp_main(uint8 *data, int len, int height, int width,
 #endif
           *got_height = y;
           if(bitStuff.output - data > len) {
-            /* we tried to read beyond the end of
-               the data. */
+            // we tried to read beyond the end of the data.
             pred_past_eof = 1;
           }
           fprintf(stderr, "aborting\n");
@@ -154,7 +153,6 @@ uint8 *predictive_decomp_main(uint8 *data, int len, int height, int width,
         }
         else {
           bitStuff.output = lastsync;
-          //fprintf(stderr, "restart at %#x\n", lastsync);
         }
       }
       else {
@@ -167,10 +165,10 @@ uint8 *predictive_decomp_main(uint8 *data, int len, int height, int width,
       predictiveDecompressor(curLine, prevLine, width, compType, code, left, right, sync, &bitStuff);
     };
 
-    bcopy(curLine, result + y * width, width);
+    memmove(result + y * width, curLine, width);
   };
 
-  /* Free the temporary storage */
+  // Free the temporary storage
   free((char *)prevLine);
   free((char *)curLine);
 

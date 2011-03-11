@@ -89,9 +89,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
 extern FILE *write_header(int width, int height,
                           FILE *infile, char *outfname);
-//static int in;, out;
 static FILE *out;
-//static struct image_header inf;
 static FILE *infile;
 int errors;
 static int test_pred;
@@ -128,17 +126,13 @@ enum MocCompressEnum {
 int main(int argc, char **argv)
 {
   int height = 0, width = 0;
-  //int frag_lines, n_frags;
   pixel *frag;
-  //int f;
-  //float quant;
   int actual_height;
   int total_image = 0;
   int total = 0;
   int cs_check = 1;
   int pad_cs = 0;
   int i;
-  //char s[8];
   int multi = 0;
   int sequence = -1, processor = 0, n_processors = 1;
   int last_frag = -1;
@@ -178,16 +172,15 @@ int main(int argc, char **argv)
     count = fread(&h, sizeof(h), 1, infile);
     i = MAKELONG(h.len);
     if(count && MAKELONG(h.len) == 0) {
-      /* simulate the EOF even though there's padding */
+      // simulate the EOF even though there's padding
       count = 0;
       h = lasth;
     }
     i = h.status & 2;
     if(count == 0 && MocCompress == PRED && (h.status & 2) == 0) {
-      /* image was short -- last flag missing */
+      // image was short -- last flag missing
       h.status = 2;
       frag = decode(h, indat, 0, &len, mbr);
-      /*      write(out, frag, len);*/
       i = fwrite(frag, 1, len, out);
       total_image += len;
     }
@@ -196,8 +189,6 @@ int main(int argc, char **argv)
     sequence += 1;
 
     if(first && !multi) {
-      //int edit[2];
-
       width = h.edit_length * 16;
       init_output(h);
       first = 0;
@@ -216,14 +207,13 @@ int main(int argc, char **argv)
     if(!multi && MAKESHORT(h.fragment) != last_frag + 1) {
       int n_pad = MAKESHORT(h.fragment) - last_frag - 1;
       char *frag = (char *) malloc(240 * 1024);
-      /* don't pad predictively-compressed data */
+      // don't pad predictively-compressed data
       if(!(h.compression[0] & 3) && n_pad > 0) {
         errors += 1;
         status |= STAT_BADSEQ;
         bzero(frag, 240 * 1024);
         total_image += n_pad * 240 * 1024;
         if(verbose) fprintf(stderr, "padding %d frags\n", n_pad);
-        /*    while(n_pad--) write(out, frag, 240*1024);*/
         while(n_pad--) i = fwrite(frag, 1, 240 * 1024, out);
       }
       free(frag);
@@ -243,9 +233,9 @@ int main(int argc, char **argv)
       break;
     }
 
-    /* check MSDP checksum */
+    // check MSDP checksum
     if(cs_check) {
-      bcopy(&h, chunk, sizeof(h));
+      memmove(chunk, &h, sizeof(h));
       fread(chunk + datlen + sizeof(h), 1, 1, infile);
       if(!CS8EACC2(chunk, datlen + sizeof(h) + 1)) {
         if(verbose) fprintf(stderr, "Error: bad MSDP checksum\n");
@@ -257,7 +247,6 @@ int main(int argc, char **argv)
           total_image += 240 * 1024;
           total += sizeof(struct msdp_header) + datlen + 1;
           if(verbose) fprintf(stderr, "trashing bad frag\n");
-          /*        write(out, frag, 240*1024);*/
           i = fwrite(frag, 1, 240 * 1024, out);
           free(frag);
           continue;
@@ -270,7 +259,6 @@ int main(int argc, char **argv)
     total_image += len;
     if(verbose) fprintf(stderr, "fragment len %d => %d\n", datlen, len);
     total += sizeof(struct msdp_header) + datlen + 1;
-    /*  write(out, frag, len);*/
     i = fwrite(frag, 1, len, out);
     if(0) free(frag);
     free(chunk);
@@ -336,7 +324,7 @@ byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr)
   if(xcomp) MocCompress = XFORM;
 
   if(!rawencode && pcomp == 0 && xcomp == 0) {
-    /* raw image */
+    // raw image
     image = data;
     if(datlen > *len) {
       if(verbose) fprintf(stderr, "Warning: MSDP line count (%d) < implied (%d), using latter\n", height, datlen / width);
@@ -349,7 +337,7 @@ byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr)
   else if(verbose) fprintf(stderr, "%d wide by %d high ", width, height);
 
   if(xcomp > 0) {
-    /* transform compressed; 2 = DCT, 1 = WHT */
+    // transform compressed; 2 = DCT, 1 = WHT
     if(verbose) fprintf(stderr, "%s transformed fragment (%d groups, %.2f requant)\n",
                           xcomp == 2 ? "dct" : "wht", levels, spacing / 16.0);
     image = transform_decomp_main(data, datlen, height, width,
@@ -357,7 +345,7 @@ byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr)
   }
 
   if(rawencode || pcomp > 0) {
-    /* predictively compressed */
+    // predictively compressed
     if(rawencode) {
       if(verbose) fprintf(stderr, "raw encoded fragment\n");
       else if(verbose) fprintf(stderr, "%s%s predictive fragment, table %d\n",
@@ -365,7 +353,7 @@ byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr)
                                  huffman_table);
     }
 
-    /* set up decode arrays */
+    // set up decode arrays
     extern void decodeLoad(char *);
     extern void decodeInit(int);
     if(!init_decode) {
@@ -382,11 +370,11 @@ byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr)
                                      &dummy);
     }
     else {
-      /* squirrel data away */
+      // squirrel data away
       if(!tbuf) tbuf = array_new(datlen * 8);
       if(datlen && !array_append(tbuf, (char*)data, datlen)) {
         // FIXED 2008/10/29, "datalen" was part of the print statement and no arguments
-        //   were provided for the %d. - Steven Lambright, pointed out by "novas0x2a" (Support Forum Member)
+        // were provided for the %d. - Steven Lambright, pointed out by "novas0x2a" (Support Forum Member)
         fprintf(stderr, "can't allocate temp space (%d bytes)\n", datlen);
         exit(1);
       }

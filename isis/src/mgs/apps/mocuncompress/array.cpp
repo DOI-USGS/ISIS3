@@ -85,7 +85,7 @@ int array_append(Array *a, char *data, int len)
     a->free += len + (a->len + a->free);
   }
 
-  bcopy(data, a->data + a->len, len);
+  memmove(a->data + a->len, data, len);
   a->free -= len;
   a->len += len;
   return len;
@@ -99,7 +99,7 @@ int array_append(Array *a, char *data, int len)
 int array_slot_delete(Array *a, int slot, int len)
 {
   if(a->len < (slot + 1)*len) return 0;
-  bcopy(&a->data[(slot+1)*len], &a->data[(slot)*len],
+  memmove(&a->data[(slot)*len], &a->data[(slot+1)*len],
         (a->len / len - slot - 1)*len);
   a->free += len;
   a->len -= len;

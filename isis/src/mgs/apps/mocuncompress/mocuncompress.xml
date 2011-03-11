@@ -36,6 +36,11 @@
     <change name="Steven Lambright" date="2009-02-23">
       Removed some unnecessary code that caused problems on some 64bit systems.
     </change>
+    <change name="Jai Rideout" date="2011-03-11">
+      Replaced all occurences of bcopy() with memmove() as bcopy() is
+      deprecated and memmove() is the preferred, portable alternative. This
+      change was necessary to get this application to work in Suse 10.3 (roma).
+    </change>
   </history>
 
   <category>
