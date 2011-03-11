@@ -956,13 +956,14 @@ namespace Isis {
    * the Gradient keyword in the Algorithm group.
    *
    * @param chip the chip to be filtered
+   * @throw iException::User - "Invalid Gradient type."
    */
   void AutoReg::ApplyGradientFilter(Chip &chip) {
     if (p_gradientFilterType == None) {
       return;
     }
 
-    // Use a different subchip size depending on which gradient filter is 
+    // Use a different subchip size depending on which gradient filter is
     // being applied.
     int subChipWidth;
     if (p_gradientFilterType == Roberts) {
@@ -970,6 +971,12 @@ namespace Isis {
     }
     if (p_gradientFilterType == Sobel) {
       subChipWidth = 3;
+    }
+    else {
+      // Perform extra sanity check.
+      throw iException::Message(iException::User,
+                                "Invalid Gradient type.",
+                                _FILEINFO_);
     }
 
     // Create a new chip to hold output during processing.
