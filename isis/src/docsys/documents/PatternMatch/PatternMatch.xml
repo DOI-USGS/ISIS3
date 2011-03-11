@@ -63,6 +63,13 @@
             <li><a href="#ZScoreTest">Z-Score Test</a></li>
             <li><a href="#GradientFilters">Gradient Filters</a></li>
           </ol>
+
+          <li><a href="#Appendices">Appendices</a></li>
+          <ol type="i">
+            <li>
+              <a href="#DeffileKeywords">Definition File Keywords</a>
+            </li>
+          </ol>
         </ol>
 
         <hr />
@@ -82,50 +89,56 @@
 
         <h3><a name="PluginsAndPvl">Plugins and PVL</a></h3>
         <p>
-          Automatic registration is a tricky subject.  Algorithms and parameters
-          that successfully work for one pattern are likely not to work for
-          other conditions.  In Isis 3, we do not want to restrict our
-          registration programs (e.g., coreg, coregpr, qmatch, etc) to a single
-          algorithm.  We would view this similar to map projections or camera
-          models.  That is, if a particular registration algorithm meets our
-          needs we can choose to use it, however, if none meet our needs a new
-          algorithm can be developed.  A key element is we want the new
-          algorithm immediately available in all applications without the need
-          to modify them.  We will facilitate this requirement through plugins
-          and the use of Parameter Value Language (PVL) definition files.   The
-          PVL syntax will be introduced gradually as the overall discussion of
-          automatic registration progresses.
+          Automatic registration is a tricky subject.  Algorithms and
+          parameters that successfully work for one pattern are likely not to
+          work for other conditions.  In Isis 3, we do not want to restrict our
+          registration programs (e.g., coreg, pointreg) to a single algorithm.
+          We would view this similar to map projections or camera models.  That
+          is, if a particular registration algorithm meets our needs we can
+          choose to use it, however, if none meet our needs a new algorithm can
+          be developed.  A key element is we want the new algorithm immediately
+          available in all applications without the need to modify them.  We
+          will facilitate this requirement through plugins and the use of
+          Parameter Value Language (PVL) definition files.   The PVL syntax
+          will be introduced gradually as the overall discussion of automatic
+          registration progresses.
         </p>
 
         <!-- Chips -->
         <h2><a name="Chips">Chips</a></h2>
         <p>
-          There are two chips used in automatic registration, the pattern chip
-          and the search chip.   We will discuss each in the following
-          sections.  For now we describe the basic elements of a chip, which is
-          nothing more than a sub-area of cube, generally small in size.  That
-          is, an NxM chip is defined to be an N sample by M line region of a
-          cube.  Some key elements about a chip are:
+          In the simplest terms, automatic registration attempts to find some
+          sub-area of a cube (or "pattern") inside some subarea of another cube
+          (or "search" window).  In ISIS, these "generally" small sub-areas of
+          a cube are called "chips".  There are two chips used in automatic
+          registration, the "pattern" chip and the "search" chip, corresponding
+          to the two sub-areas discussed above.   We will discuss each in more
+          detail within the following sections, but for now we describe the
+          basic elements of a chip.  That is, an NxM chip is defined to be an N
+          sample by M line region of a cube.  Some key elements of a chip are
+          as follows:
 
           <ol>
             <li>N and M are natural numbers (1, 2, 3, ...)</li>
-            <li>Like cubes, chip coordinates are sample/line and 1-based</li>
-            <li>The center of the chip is (N-1)/2+1 and (M-1)/2+1.</li>
+            <li>Like cubes, chip coordinates are sample/line based and indexed from 1</li>
+            <li>The center of the chip is (N-1)/2 + 1 and (M-1)/2 + 1.</li>
           </ol>
 
-          Because a chip is a region of a cube, there must a technique to "load"
-          the chip.  The primary method is to specify a cube coordinate
-          (sample/line) to be loaded at the center of the chip.
+          Because a chip is a region of a cube, there must be a technique to
+          "load" the chip.  The most common method for accomplishing this is to
+          specify a cube coordinate (a sample and line) to be loaded as the
+          center pixel of the chip.
         </p>
 
         <h3><a name="PatternChip">Pattern Chip</a></h3>
         <p>
-          A pattern chip will contain the data you would like to match.  In the
-          past we have called this the truth chip or hold chip.  Both of these
-          terms can be confusing.  The term truth has different meanings in
-          regards to match points and term hold is misleading as a pattern chip
-          actually floats through the search chip. So we refrain from their use
-          and stick with the term pattern chip.   The PVL for a pattern chip is:
+          The pattern chip contains the data you want to match.  In the past we
+          have called this the "truth" chip or "hold" chip.  Both of these
+          terms can be confusing.  The term "truth" has different meanings in
+          regards to match points and term "hold" is misleading as a pattern
+          chip actually floats through the search chip. So we refrain from
+          their use and stick with the term "pattern" chip.   The PVL for a
+          pattern chip is:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -139,12 +152,13 @@
 
         <h3><a name="SearchChip">Search Chip</a></h3>
         <p>
-          The search chip is the area of the cube we believe the pattern will
-          fall in.  That is, we will walk the pattern chip through the search
-          chip looking for the best match.  Hopefully it is obvious the search
-          chip must be larger than the pattern chip. However, note that by
-          restricting the search chip size, we effectively define how far the
-          pattern chip is allowed deviate from a desired center search spot:
+          The search chip is the area of an overlapping cube you believe the
+          pattern will fall within (TODO how is this specified).  That is, we
+          will walk the pattern chip through the search chip looking for the
+          best match.  The size of the search chip defines how far the pattern
+          chip is allowed to deviate from a desired center search spot.
+          Consequently, the search chip must be larger than the pattern chip in
+          order for the pattern chip to move through the search chip:  
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -163,22 +177,35 @@
 
         <h3><a name="Restrictions">Restrictions</a></h3>
         <p>
-          Because the pattern chip and search chip are tightly coupled there are
-          some restrictions that must be put in place.  There are:
+          From the above discussion of pattern and search chips, an intuition
+          should be developing about how changes to one chip will necessitate
+          changes to the other.  Because the pattern chip and search chip are
+          tightly coupled in this way, there are some restrictions on the
+          relative dimensions of the two chips that must be put in place.
+          Specifically:
 
           <ol>
             <li>
-              N+M>=3 must be satisfied for the pattern chip.  This ensures the
-              pattern is not a single pixel.  However, in practice, small
-              pattern chips often match too many areas in a search chip.
+              <strong>N + M >= 3</strong>
+              <br />
+              where N and M are the dimensions of the pattern chip.  This
+              ensures the pattern is not a single pixel.  However, in practice,
+              small pattern chips often match too many areas in a search chip.
             </li>
             <li>
-              We must satisfy N<sub>search</sub> >= N<sub>pattern</sub>+2 and
-              similarly for M.  This ensures that the pattern chip spans at
-              least a 3x3 window in the search chip.  This is subtle but
-              important requirement for surface fitting in order to compute
-              sub-pixel accuracy (which will be discussed later in this
-              document).
+              <strong>
+                N<sub>search</sub> >= N<sub>pattern</sub>+2
+              </strong>
+              and
+              <strong>
+                M<sub>search</sub> >= M<sub>pattern</sub>+2
+              </strong>
+              <br />
+              where N and M are again the dimensions of their respective chips.
+              This ensures that the pattern chip spans at least a 3x3 window in
+              the search chip.  This is a subtle but important requirement for
+              surface fitting in order to compute sub-pixel accuracy (which
+              will be discussed later in this document).
             </li>
           </ol>
         </p>
@@ -186,38 +213,52 @@
         <!-- Match Algorithms -->
         <h2><a name="MatchAlgorithms">Match Algorithms</a></h2>
         <p>
-          An objective of the Isis 3 automatic registration design is to allow
-          for a variety of match algorithms.  For example, an algorithm could be
-          developed that works best for matching MGS/MOC wide angle and Odyssey
-          Themis IR cameras.  For this objective to be met we will utilize
-          applications which allow automatic registration plugins.  This is
-          identical to applications which utilize camera and/or map projection
-          plugins such as cam2map, map2map, etc. 
+          Rarely in practice will the pixels in a search chip have a one-to-one
+          correspondance with some sub-area of the search chip.  Consequently,
+          we introduce match algorithms designed to correlate two chips and
+          find the "best" match within the search area.
         </p>
         <p>
-          The plugin algorithm will receive the pattern chip and a sub-region of
-          the search chip.  This sub-region will have the same dimensions as the
-          pattern chip to allow for a pixel-by-pixel comparison of the
-          chips.  The algorithm is expected to return single value that
-          represents the goodness of fit (GOF) between the two chips.   The
-          definition of the GOF is algorithm dependent.  For clarity, we present
-          two types of match algorithms in this document with the understanding
-          that more algorithms may be developed in the future.
+          An objective of the Isis 3 automatic registration design is to allow
+          for a variety of match algorithms.  For example, an algorithm could
+          be developed that works best for matching MGS/MOC wide angle and
+          Odyssey Themis IR cameras.  For this objective to be met we will
+          utilize applications which allow automatic registration plugins.
+          This concept is identical to that of applications which utilize
+          camera and/or map projection plugins such as cam2map, map2map, etc. 
+        </p>
+        <p>
+          The plugin match algorithm will receive the pattern chip and a
+          sub-region of the search chip.  This sub-region will have the same
+          dimensions as the pattern chip to allow for a pixel-by-pixel
+          comparison of the chips.  The algorithm is expected to return a
+          single value that represents the "goodness of fit" (GOF) between the
+          two chips.   The definition of the GOF is algorithm dependent.  For
+          clarity, we present two types of match algorithms in this document
+          with the understanding that more algorithms may be developed in the
+          future.
         </p>
 
         <h3><a name="MinimumDifference">Minimum Difference</a></h3>
         <p>
-          This match algorithm would perform a subtraction of the pattern chip
-          and the sub-region of the search chip over the valid pixel count. It
-          measures the average absolute difference per pixel. The actual equation would be:
+          This match algorithm defines goodness-of-fit as the average absolute
+          difference per pixel between the pattern chip and the search
+          sub-region.  Specifically, it sums the pixel differences within the
+          pattern chip and search sub-region and divides by the total pixel
+          count to get an average.  In equation form:
 
           <pre style="padding-left:4em;">
-            GOF =  (&#931; |pattern(i,j) - subregion(i,j)|) / count
+            GOF =  <span style="font-size:2.0em;">&#931;</span>|pattern(i,j) - subregion(i,j)| / count
           </pre>
 
-          In this case, a GOF value of zero indicates a perfect match, while
-          larger values indicate a less likely match.  Obviously, negative
-          values could never occur.  This would be represented in PVL as:
+          A GOF value of zero indicates a perfect match, while larger values
+          indicate a less likely match.  Obviously, negative values could never
+          occur.
+        </p>
+        <p>
+          To have your automatic registration use this Minimum Difference
+          algorithm, specify the following in the "Algorithm" group of your PVL
+          definition file:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -232,7 +273,7 @@
               End_Group
 
               Group = Algorithm 
-                Name = MinimumDifference
+                Name    = MinimumDifference
               End_Group
             End_Object
           </pre>
@@ -240,9 +281,8 @@
 
         <h3><a name="MaximumCorrelation">Maximum Correlation</a></h3>
         <p>
-          This match algorithm would compute the correlation coefficient, R,
-          between the pattern chip and the sub-region of the search chip as
-          follows:
+          This match algorithm computes the correlation coefficient, R, between
+          the pattern chip and the sub-region of the search chip as follows:
 
           <pre style="padding-left:4em;">
             R = Covariance(pattern, subregon) / [Variance(pattern) * Variance(subregion)]
@@ -252,9 +292,9 @@
             GOF = |R|
           </pre>
 
-          In this case, the goodness of fit will range from no correlation
-          (zero) to perfect correlation (one).  The PVL for this example would
-          be:
+          In this algorithm, the goodness of fit will range from no correlation
+          (zero) to perfect correlation (one).  Example PVL for this algorithm
+          would as follows:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -269,7 +309,7 @@
               End_Group
 
               Group = Algorithm 
-                Name      = MaximumCorrelation
+                Name    = MaximumCorrelation
               End_Group
             End_Object
           </pre>
@@ -456,7 +496,7 @@
           sub-pixel accuracy phase is omitted.
         </p>
 
-        <!-- AdvancedFeatures -->
+        <!-- Advanced Features -->
         <h2><a name="AdvancedFeatures">Advanced Features</a></h2>
         <p>
           This section covers advanced features of automatic
@@ -671,6 +711,204 @@
             End_Group
           </pre>
         </p>
+
+        <!-- Appendices -->
+        <h2><a name="Appendices">Appendices</a></h2>
+        <p>
+          Here you'll find a collection of quick references to help improve
+          your results when performing automatic registration.
+        </p>
+
+        <h3><a name="DeffileKeywords">Definition File Keywords</a></h3>
+        <p>
+          The following table provides an exhaustive listing of every
+          <strong>keyword</strong> that can be provided in an automatic
+          registration definition file.  The keywords are organized by what
+          <strong>group</strong> they are contained within.  The
+          <strong>type</strong> column specifies what kind of value is expected
+          (an integer, real number, or a string).  The <strong>values</strong>
+          column provides either the set of valid values (in the case of
+          strings) or a numerical range, with a paren "(" denoting an exclusive
+          value and a bracket "[" denoting an inclusive value.  The
+          <strong>default</strong> column provides the value that will be taken
+          when the keyword is not provided.  If the value for a particular cell
+          is <span style="color:red;">red</span>, then the given action will be
+          performed if no value is specified.
+        </p>
+
+        <table class="tableFormattedInformation" align="center">
+          <!-- Headers -->
+          <tr>
+            <th>Group</th>
+            <th>Keyword</th>
+            <th>Type</th>
+            <th>Values</th>
+            <th>Default</th>
+          </tr>
+
+          <!-- Algorithm -->
+          <tr>
+            <td><strong>Algorithm</strong></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Name</td>
+            <td>String</td>
+            <td>{MaximumCorrelation, MinimumDifference, Gruen, AdaptiveGruen}</td>
+            <td><span style="color:red;">Exception</span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Tolerance</td>
+            <td>Real</td>
+            <td>[0.0, infinity)</td>
+            <td><span style="color:red;">Exception</span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>ChipInterpolator</td>
+            <td>String</td>
+            <td>{NearestNeighborType, BiLinearType, CubicConvolutionType}</td>
+            <td>CubicConvolutionType</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>ReductionFactor</td>
+            <td>Integer</td>
+            <td>[1, infinity)</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>SubPixelAccuracy</td>
+            <td>Boolean</td>
+            <td>{True, False}</td>
+            <td>True</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Gradient</td>
+            <td>String</td>
+            <td>{None, Roberts, Sobel}</td>
+            <td>None</td>
+          </tr>
+
+          <!-- Pattern Chip -->
+          <tr>
+            <td><strong>PatternChip</strong></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Samples</td>
+            <td>Integer</td>
+            <td>[1, infinity)</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Lines</td>
+            <td>Integer</td>
+            <td>[1, infinity)</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>MinimumZScore</td>
+            <td>Real</td>
+            <td>(0.0, infinity)</td>
+            <td>1.0</td>
+          </tr>
+
+          <!-- Search Chip -->
+          <tr>
+            <td><strong>SearchChip</strong></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Samples</td>
+            <td>Integer</td>
+            <td>[1, infinity)</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Lines</td>
+            <td>Integer</td>
+            <td>[1, infinity)</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>ValidMinimum</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>Isis::ValidMinimum</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>ValidMaximum</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>Isis::ValidMaximum</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>SubchipValidPercent</td>
+            <td>Real</td>
+            <td>[0.0, 100.0]</td>
+            <td>50.0</td>
+          </tr>
+
+          <!-- Surface Model -->
+          <tr>
+            <td><strong>SurfaceModel</strong></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>DistanceTolerance</td>
+            <td>Real</td>
+            <td>(0.0, infinity)</td>
+            <td>1.5</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>WindowSize</td>
+            <td>Integer</td>
+            <td>[3, infinity) odd</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>EccentricityRatio</td>
+            <td>Real</td>
+            <td>[1.0, infinity]</td>
+            <td><span style="color:red;">No Eccentricity Test</span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>ResidualTolerance</td>
+            <td>Real</td>
+            <td>[0.0, infinity]</td>
+            <td><span style="color:red;">No Residual Test</span></td>
+          </tr>
+        </table>
+
       </body>
 
       <type>HTML</type>
@@ -701,7 +939,7 @@
       their results from applications such as "pointreg" and "coreg".  This
       should also give programmers a better understanding of how AutoReg works.
     </description>
-    <author>Travis Addair, Jai Rideout</author>
-    <date>2011-03-10</date>
+    <author>Travis Addair</author>
+    <date>2011-02-23</date>
   </bibliography>
 </documentation>
