@@ -724,23 +724,23 @@
           The following table provides an exhaustive listing of every
           <strong>keyword</strong> that can be provided in an automatic
           registration definition file.  The keywords are organized by what
-          <strong>group</strong> they are contained within.  The
+          <strong>groups</strong> they can appear in.  The
           <strong>type</strong> column specifies what kind of value is expected
-          (an integer, real number, or a string).  The <strong>values</strong>
-          column provides either the set of valid values (in the case of
-          strings) or a numerical range, with a paren "(" denoting an exclusive
-          value and a bracket "[" denoting an inclusive value.  The
-          <strong>default</strong> column provides the value that will be taken
-          when the keyword is not provided.  If the value for a particular cell
-          is <span style="color:red;">red</span>, then the given action will be
-          performed if no value is specified.
+          (an integer, real number, boolean, or a string).  The
+          <strong>values</strong> column provides either the set of valid
+          values (in the case of strings) or a numerical range, with a paren
+          "(" denoting an exclusive value and a bracket "[" denoting an
+          inclusive value.  The <strong>default</strong> column provides the
+          value that will be taken when the keyword is not provided.  If the
+          value for a particular cell is <span style="color:red;">red</span>,
+          then the given action will be performed if no value is specified.
         </p>
 
         <table class="tableFormattedInformation" align="center">
           <!-- Headers -->
           <tr>
-            <th>Group</th>
             <th>Keyword</th>
+            <th>Groups</th>
             <th>Type</th>
             <th>Values</th>
             <th>Default</th>
@@ -748,50 +748,43 @@
 
           <!-- Algorithm -->
           <tr>
-            <td><strong>Algorithm</strong></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>Name</td>
+            <td><a href="#MatchAlgorithms"><strong>Name</strong></a></td>
+            <td>Algorithm</td>
             <td>String</td>
             <td>{MaximumCorrelation, MinimumDifference, Gruen, AdaptiveGruen}</td>
             <td><span style="color:red;">Exception</span></td>
           </tr>
           <tr>
-            <td></td>
-            <td>Tolerance</td>
+            <td><a href="#Tolerance"><strong>Tolerance</strong></a></td>
+            <td>Algorithm</td>
             <td>Real</td>
             <td>[0.0, infinity)</td>
             <td><span style="color:red;">Exception</span></td>
           </tr>
           <tr>
-            <td></td>
-            <td>ChipInterpolator</td>
+            <td><strong>ChipInterpolator</strong></td>
+            <td>Algorithm</td>
             <td>String</td>
             <td>{NearestNeighborType, BiLinearType, CubicConvolutionType}</td>
             <td>CubicConvolutionType</td>
           </tr>
           <tr>
-            <td></td>
-            <td>ReductionFactor</td>
+            <td><strong>ReductionFactor</strong></td>
+            <td>Algorithm</td>
             <td>Integer</td>
             <td>[1, infinity)</td>
             <td>1</td>
           </tr>
           <tr>
-            <td></td>
-            <td>SubPixelAccuracy</td>
+            <td><a href="#SubPixelAccuracy"><strong>SubPixelAccuracy</strong></a></td>
+            <td>Algorithm</td>
             <td>Boolean</td>
             <td>{True, False}</td>
             <td>True</td>
           </tr>
           <tr>
-            <td></td>
-            <td>Gradient</td>
+            <td><a href="#GradientFilters"><strong>Gradient</strong></a></td>
+            <td>Algorithm</td>
             <td>String</td>
             <td>{None, Roberts, Sobel}</td>
             <td>None</td>
@@ -799,110 +792,82 @@
 
           <!-- Pattern Chip -->
           <tr>
-            <td><strong>PatternChip</strong></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>Samples</td>
+            <td><a href="#Chips"><strong>Samples</strong></a></td>
+            <td>PatternChip, SearchChip</td>
             <td>Integer</td>
             <td>[1, infinity)</td>
-            <td>3</td>
+            <td><span style="color:red;">Exception</span></td>
           </tr>
           <tr>
-            <td></td>
-            <td>Lines</td>
+            <td><a href="#Chips"><strong>Lines</strong></a></td>
+            <td>PatternChip, SearchChip</td>
             <td>Integer</td>
             <td>[1, infinity)</td>
-            <td>3</td>
+            <td><span style="color:red;">Exception</span></td>
           </tr>
           <tr>
-            <td></td>
-            <td>MinimumZScore</td>
-            <td>Real</td>
-            <td>(0.0, infinity)</td>
-            <td>1.0</td>
-          </tr>
-
-          <!-- Search Chip -->
-          <tr>
-            <td><strong>SearchChip</strong></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>Samples</td>
-            <td>Integer</td>
-            <td>[1, infinity)</td>
-            <td>3</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>Lines</td>
-            <td>Integer</td>
-            <td>[1, infinity)</td>
-            <td>3</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>ValidMinimum</td>
+            <td><a href="#RestrictingPixelRanges"><strong>ValidMinimum</strong></a></td>
+            <td>PatternChip, SearchChip</td>
             <td>Real</td>
             <td>(-infinity, infinity)</td>
             <td>Isis::ValidMinimum</td>
           </tr>
           <tr>
-            <td></td>
-            <td>ValidMaximum</td>
+            <td><a href="#RestrictingPixelRanges"><strong>ValidMaximum</strong></a></td>
+            <td>PatternChip, SearchChip</td>
             <td>Real</td>
             <td>(-infinity, infinity)</td>
             <td>Isis::ValidMaximum</td>
           </tr>
           <tr>
-            <td></td>
-            <td>SubchipValidPercent</td>
+            <td><a href="#ZScoreTest"><strong>MinimumZScore</strong></a></td>
+            <td>PatternChip</td>
             <td>Real</td>
-            <td>[0.0, 100.0]</td>
+            <td>(0.0, infinity)</td>
+            <td>1.0</td>
+          </tr>
+          <tr>
+            <td><a href="#ValidPixelCount"><strong>ValidPercent</strong></a></td>
+            <td>PatternChip</td>
+            <td>Real</td>
+            <td>(0.0, 100.0]</td>
+            <td>50.0</td>
+          </tr>
+
+          <!-- Search Chip -->
+          <tr>
+            <td><a href="#SamplingMatchAlgo"><strong>SubchipValidPercent</strong></a></td>
+            <td>SearchChip</td>
+            <td>Real</td>
+            <td>(0.0, 100.0]</td>
             <td>50.0</td>
           </tr>
 
           <!-- Surface Model -->
           <tr>
-            <td><strong>SurfaceModel</strong></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>DistanceTolerance</td>
+            <td><a href="#SurfaceModeling"><strong>DistanceTolerance</strong></a></td>
+            <td>SurfaceModel</td>
             <td>Real</td>
             <td>(0.0, infinity)</td>
             <td>1.5</td>
           </tr>
           <tr>
-            <td></td>
-            <td>WindowSize</td>
+            <td><a href="#SurfaceModeling"><strong>WindowSize</strong></a></td>
+            <td>SurfaceModel</td>
             <td>Integer</td>
             <td>[3, infinity) odd</td>
             <td>5</td>
           </tr>
           <tr>
-            <td></td>
-            <td>EccentricityRatio</td>
+            <td><a href="#SurfaceModeling"><strong>EccentricityRatio</strong></a></td>
+            <td>SurfaceModel</td>
             <td>Real</td>
             <td>[1.0, infinity]</td>
             <td><span style="color:red;">No Eccentricity Test</span></td>
           </tr>
           <tr>
-            <td></td>
-            <td>ResidualTolerance</td>
+            <td><a href="#SurfaceModeling"><strong>ResidualTolerance</strong></a></td>
+            <td>SurfaceModel</td>
             <td>Real</td>
             <td>[0.0, infinity]</td>
             <td><span style="color:red;">No Residual Test</span></td>
@@ -942,4 +907,13 @@
     <author>Travis Addair</author>
     <date>2011-02-23</date>
   </bibliography>
+
+  <history>
+    <change name="Travis Addair" date="2011-02-23">
+      Original version
+    </change>
+    <change name="Jai Rideout" date="2011-03-10">
+      Added gradient filter section
+    </change>
+  </history>
 </documentation>
