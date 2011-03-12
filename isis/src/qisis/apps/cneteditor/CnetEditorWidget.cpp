@@ -115,7 +115,9 @@ namespace Isis
         this, SIGNAL(cnetModified()));
     editPointView->setItemDelegate(editPointDelegate);
     editPointView->resizeColumnsToContents();
-    editPointView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    editPointView->setEditTriggers(QAbstractItemView::SelectedClicked |
+        QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
+    editPointView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     QGroupBox * editPointBox = new QGroupBox(tr("Control Point Table"));
     QHBoxLayout * editPointLayout = new QHBoxLayout;
     editPointLayout->addWidget(editPointView);
@@ -137,7 +139,9 @@ namespace Isis
         this, SIGNAL(cnetModified()));
     editMeasureView->setItemDelegate(editMeasureDelegate);
     editMeasureView->resizeColumnsToContents();
-    editMeasureView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    editMeasureView->setEditTriggers(QAbstractItemView::SelectedClicked |
+        QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
+    editMeasureView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     QGroupBox * editMeasureBox = new QGroupBox(tr("Control Measure Table"));
     QHBoxLayout * editMeasureLayout = new QHBoxLayout;
     editMeasureLayout->addWidget(editMeasureView);

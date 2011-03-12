@@ -252,7 +252,8 @@ namespace Isis
         if (point->IsEditLocked())
         {
           if (column == EditLock)
-            flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+            flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled |
+                Qt::ItemIsSelectable;
         }
         else
         {
@@ -275,7 +276,8 @@ namespace Isis
             case AprioriSPSourceFile:
             case AprioriRadiusSource:
             case AprioriRadiusSourceFile:
-              flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+              flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled |
+                  Qt::ItemIsSelectable;
               break;
             case JigsawRejected:
               break;

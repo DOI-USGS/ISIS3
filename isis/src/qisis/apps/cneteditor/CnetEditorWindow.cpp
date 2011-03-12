@@ -217,7 +217,8 @@ namespace Isis
     move(pos);
     
     // load view synchronization state
-    synchronized = settings.value("synchronizeViews", false).toBool();
+    synchronizeAct->setChecked(
+        settings.value("synchronizeViews", false).toBool());
 
     setWindowIcon(QIcon(":usgs"));
   }

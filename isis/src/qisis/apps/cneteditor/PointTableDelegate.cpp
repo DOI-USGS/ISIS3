@@ -182,6 +182,8 @@ namespace Isis
   {
 //     cerr << "PointTableDelegate::setModelData called...\n";
     int col = index.column();
+//     int row = index.row();
+    QVariant newData;
 
     switch ((PointTableModel::Column) col)
     {
@@ -191,22 +193,25 @@ namespace Isis
       case PointTableModel::AprioriRadiusSource:
         {
           QComboBox * combo = static_cast< QComboBox * >(editor);
-          model->setData(index, combo->currentText(), Qt::EditRole);
+          newData = QVariant::fromValue(combo->currentText());
         }
         break;
       case PointTableModel::RefIndex:
         {
           QSpinBox * spinBox = static_cast< QSpinBox * >(editor);
           spinBox->interpretText();
-          model->setData(index, spinBox->value(), Qt::EditRole);
+          newData = QVariant::fromValue(spinBox->value());
         }
         break;
       default:
         {
           QLineEdit * lineEdit = static_cast< QLineEdit * >(editor);
-          model->setData(index, lineEdit->text(), Qt::EditRole);
+          newData = QVariant::fromValue(lineEdit->text());
         }
     }
+    
+    
+    model->setData(index, newData, Qt::EditRole);
 
     emit dataEdited();
 //     cerr << "PointTableDelegate::setModelData done\n";

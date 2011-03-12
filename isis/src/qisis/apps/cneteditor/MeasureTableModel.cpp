@@ -256,7 +256,8 @@ namespace Isis
         if (measure->IsEditLocked())
         {
           if (column == EditLock)
-            flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+            flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled |
+                Qt::ItemIsSelectable;
         }
         else
         {
@@ -282,7 +283,8 @@ namespace Isis
             case FocalPlaneComputedY:
             case ResidualSample:
             case ResidualLine:
-              flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+              flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled |
+                  Qt::ItemIsSelectable;
               break;
               
             // READ ONLY
