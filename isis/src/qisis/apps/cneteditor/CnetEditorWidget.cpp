@@ -227,9 +227,18 @@ namespace Isis
       }
     }
     
+    //********************FIXME***************************************/
     // populate editor tables
     editPointModel->setPoints(points);
-    editMeasureModel->setMeasures(measures);
+    QList< ControlMeasure * > allMeasuresForSelectedPoints;
+    foreach (ControlPoint * point, points)
+    {
+      for (int i = 0; i < point->GetNumMeasures(); i++)
+        allMeasuresForSelectedPoints.append((*point)[i]);
+    }
+    editMeasureModel->setMeasures(allMeasuresForSelectedPoints);
+    //********************FIXME***************************************/
+    
     
     if (synchronizeViews)
     {
