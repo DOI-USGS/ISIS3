@@ -8,6 +8,7 @@
 
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
+#include "ControlPoint.h"
 #include "Distance.h"
 #include "iException.h"
 #include "iString.h"
@@ -85,6 +86,12 @@ namespace Isis
       {
         switch ((Column) index.column())
         {
+
+          case PointId:
+            return QVariant::fromValue((QString) measure->Parent()->GetId());
+          case CubeSerialNumber:
+            return QVariant::fromValue(
+                (QString) measure->GetCubeSerialNumber());
           case Sample:
             return QVariant::fromValue(catchNULL(measure->GetSample()));
           case Line:
@@ -158,6 +165,12 @@ namespace Isis
       {
         switch ((Column) section)
         {
+          case PointId:
+            result = QVariant::fromValue(QString("Point ID"));
+            break;
+          case CubeSerialNumber:
+            result = QVariant::fromValue(QString("Cube Serial #"));
+            break;
           case Sample:
             result = QVariant::fromValue(QString("Sample"));
             break;
@@ -225,11 +238,8 @@ namespace Isis
       }
       else
       {
-        const ControlMeasure * cm = measures->at(section);
-        if (cm)
-          result = QVariant::fromValue((QString) cm->GetCubeSerialNumber());
-        else
-          result = QVariant::fromValue(section);
+        QString label = "   " + QString::number(section) + "   ";
+        result = QVariant::fromValue(label);
       }
     }
     return result;
@@ -248,8 +258,6 @@ namespace Isis
 
     if (index.isValid())
     {
-//       flags = flags | Qt::ItemIsEnabled;
-
       ControlMeasure * measure = (*measures)[row];
       if (measure)
       {
@@ -263,7 +271,7 @@ namespace Isis
         {
           switch (column)
           {
-              // enable WRITE
+            case CubeSerialNumber:
             case Sample:
             case Line:
             case EditLock:
@@ -288,6 +296,7 @@ namespace Isis
               break;
 
               // READ ONLY
+            case PointId:
             case ResidualMagnitude:
             case JigsawRejected:
               break;
@@ -313,6 +322,12 @@ namespace Isis
         ControlMeasure * measure = measures->at(row);
         switch ((Column) col)
         {
+          case PointId:
+            // PointId is not editable in the measure table
+            break;
+          case CubeSerialNumber:
+            measure->SetCubeSerialNumber(value.toString());
+            break;
           case Sample:
             measure->SetCoordinate(catchNULL(value.toString()),
                 measure->GetLine());

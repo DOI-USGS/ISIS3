@@ -20,29 +20,31 @@ namespace Isis
       // the COLS constant that immediately follows this enum.
       enum Column
       {
-        Sample = 0,
-        Line = 1,
-        EditLock = 2,
-        Ignored = 3,
-        Type = 4,
-        Eccentricity = 5,
-        GoodnessOfFit = 6,
-        MinPixelZScore = 7,
-        MaxPixelZScore = 8,
-        PixelShift = 9,
-        AprioriSample = 10,
-        AprioriLine = 11,
-        Diameter = 12,
-        FocalPlaneMeasuredX = 13,
-        FocalPlaneMeasuredY = 14,
-        FocalPlaneComputedX = 15,
-        FocalPlaneComputedY = 16,
-        JigsawRejected = 17,
-        ResidualSample = 18,
-        ResidualLine = 19,
-        ResidualMagnitude = 20
+        PointId = 0,
+        CubeSerialNumber = 1,
+        Sample = 2,
+        Line = 3,
+        EditLock = 4,
+        Ignored = 5,
+        Type = 6,
+        Eccentricity = 7,
+        GoodnessOfFit = 8,
+        MinPixelZScore = 9,
+        MaxPixelZScore = 10,
+        PixelShift = 11,
+        AprioriSample = 12,
+        AprioriLine = 13,
+        Diameter = 14,
+        FocalPlaneMeasuredX = 15,
+        FocalPlaneMeasuredY = 16,
+        FocalPlaneComputedX = 17,
+        FocalPlaneComputedY = 18,
+        JigsawRejected = 19,
+        ResidualSample = 20,
+        ResidualLine = 21,
+        ResidualMagnitude = 22
       };
-      static const int COLS = 21;
+      static const int COLS = 23;
 
 
     public:

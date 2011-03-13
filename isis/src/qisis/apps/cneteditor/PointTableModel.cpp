@@ -221,11 +221,8 @@ namespace Isis
       }
       else
       {
-        const ControlPoint * point = points->at(section);
-        if (point)
-          result = QVariant::fromValue((QString) point->GetId());
-        else
-          result = QVariant::fromValue(section);
+        QString label = "   " + QString::number(section) + "   ";
+        result = QVariant::fromValue(label);
       }
     }
 
@@ -244,8 +241,6 @@ namespace Isis
     Qt::ItemFlags flags = 0;
     if (index.isValid())
     {
-//       flags = flags | Qt::ItemIsEnabled;
-
       ControlPoint * point = (*points)[row];
       if (point)
       {

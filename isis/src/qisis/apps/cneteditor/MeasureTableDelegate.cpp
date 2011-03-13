@@ -170,12 +170,16 @@ namespace Isis
     model->setData(index, newData, Qt::EditRole);
 
     // now look for all other selected cells in the same column and set them
-    // as well
-    QList< QModelIndex > selection =
-      tableView->selectionModel()->selectedIndexes();
-    for (int i = 0; i < selection.size(); i++)
-      if (selection[i].column() == col)
-        model->setData(selection[i], newData, Qt::EditRole);
+    // as well... unless of course it is the CubeSerialNumber, in which case
+    // DO NOT ALLOW setting of more than one at a time.
+    if (col != (int) MeasureTableModel::CubeSerialNumber)
+    {
+      QList< QModelIndex > selection =
+        tableView->selectionModel()->selectedIndexes();
+      for (int i = 0; i < selection.size(); i++)
+        if (selection[i].column() == col)
+          model->setData(selection[i], newData, Qt::EditRole);
+    }
 
     emit dataEdited();
 //     cerr << "MeasureTableDelegate::setModelData done\n";
