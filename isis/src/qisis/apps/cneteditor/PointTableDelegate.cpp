@@ -42,62 +42,55 @@ namespace Isis
       switch ((PointTableModel::Column) col)
       {
         case PointTableModel::EditLock:
-          {
-            QComboBox * combo = new QComboBox(parent);
-//             combo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-            combo->insertItem(0, "Yes");
-            combo->insertItem(1, "No");
-            if (point->IsEditLocked())
-              combo->setCurrentIndex(0);
-            else
-              combo->setCurrentIndex(1);
-            return combo;
-          }
         case PointTableModel::Ignored:
-          {
-            QComboBox * combo = new QComboBox(parent);
-//             combo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-            combo->insertItem(0, "Yes");
-            combo->insertItem(1, "No");
-            if (point->IsIgnored())
-              combo->setCurrentIndex(0);
-            else
-              combo->setCurrentIndex(1);
-            return combo;
-          }
-        case PointTableModel::RefIndex:
-          {
-            QSpinBox * spinBox = new QSpinBox(parent);
-            spinBox->setMinimum(0);
-            spinBox->setMaximum(point->GetNumMeasures() - 1);
-            return spinBox;
-          }
+        case PointTableModel::Reference:
         case PointTableModel::AprioriSPSource:
-          {
-            QComboBox * combo = new QComboBox(parent);
-//             combo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-            combo->insertItem(0, "None");
-            combo->insertItem(1, "User");
-            combo->insertItem(2, "AverageOfMeasures");
-            combo->insertItem(3, "Reference");
-            combo->insertItem(4, "Basemap");
-            combo->insertItem(5, "BundleSolution");
-            combo->setCurrentIndex((int) point->GetAprioriSurfacePointSource());
-            return combo;
-          }
         case PointTableModel::AprioriRadiusSource:
           {
             QComboBox * combo = new QComboBox(parent);
-//             combo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-            combo->insertItem(0, "None");
-            combo->insertItem(1, "User");
-            combo->insertItem(2, "AverageOfMeasures");
-            combo->insertItem(3, "Ellipsoid");
-            combo->insertItem(4, "DEM");
-            combo->insertItem(5, "BundleSolution");
-            combo->setCurrentIndex((int) point->GetAprioriRadiusSource());
+
+            switch ((PointTableModel::Column) col)
+            {
+              case PointTableModel::EditLock:
+                combo->insertItem(0, "Yes");
+                combo->insertItem(1, "No");
+                combo->setCurrentIndex(point->IsEditLocked() ? 0 : 1);
+                break;
+              case PointTableModel::Ignored:
+                combo->insertItem(0, "Yes");
+                combo->insertItem(1, "No");
+                combo->setCurrentIndex(point->IsIgnored() ? 0 : 1);
+                break;
+              case PointTableModel::Reference:
+                for (int i = 0; i < point->GetNumMeasures(); i++)
+                  combo->insertItem(i,
+                      point->GetMeasure(i)->GetCubeSerialNumber());
+                combo->setCurrentIndex(point->IndexOfRefMeasure());
+                break;
+              case PointTableModel::AprioriSPSource:
+                combo->insertItem(0, "None");
+                combo->insertItem(1, "User");
+                combo->insertItem(2, "AverageOfMeasures");
+                combo->insertItem(3, "Reference");
+                combo->insertItem(4, "Basemap");
+                combo->insertItem(5, "BundleSolution");
+                combo->setCurrentIndex((int) point->GetAprioriSurfacePointSource());
+                break;
+              case PointTableModel::AprioriRadiusSource:
+                combo->insertItem(0, "None");
+                combo->insertItem(1, "User");
+                combo->insertItem(2, "AverageOfMeasures");
+                combo->insertItem(3, "Ellipsoid");
+                combo->insertItem(4, "DEM");
+                combo->insertItem(5, "BundleSolution");
+                combo->setCurrentIndex((int) point->GetAprioriRadiusSource());
+                break;
+              default:
+                break;
+            }
             return combo;
           }
+          break;
         default:
           {
             QLineEdit * lineEdit = new QLineEdit(parent);
@@ -120,54 +113,43 @@ namespace Isis
 
     if (point)
     {
+      QString value = tableModel->data(index, Qt::DisplayRole).toString();
+
       switch ((PointTableModel::Column) col)
       {
         case PointTableModel::EditLock:
-          {
-            QString value = tableModel->data(index, Qt::DisplayRole).toString();
-            QComboBox * combo = static_cast< QComboBox * >(editor);
-            if (point->IsEditLocked())
-              combo->setCurrentIndex(0);
-            else
-              combo->setCurrentIndex(1);
-          }
-          break;
         case PointTableModel::Ignored:
-          {
-            QString value = tableModel->data(index, Qt::DisplayRole).toString();
-            QComboBox * combo = static_cast< QComboBox * >(editor);
-            if (point->IsIgnored())
-              combo->setCurrentIndex(0);
-            else
-              combo->setCurrentIndex(1);
-          }
-          break;
-        case PointTableModel::RefIndex:
-          {
-            int value = tableModel->data(index, Qt::DisplayRole).toInt();
-            QSpinBox * spinBox = static_cast< QSpinBox * >(editor);
-            spinBox->setValue(value);
-          }
-          break;
+        case PointTableModel::Reference:
         case PointTableModel::AprioriSPSource:
-          {
-            QString value = tableModel->data(index, Qt::DisplayRole).toString();
-            QComboBox * combo = static_cast< QComboBox * >(editor);
-            combo->setCurrentIndex(
-              (int) point->StringToSurfacePointSource(value));
-          }
-          break;
         case PointTableModel::AprioriRadiusSource:
           {
-            QString value = tableModel->data(index, Qt::DisplayRole).toString();
             QComboBox * combo = static_cast< QComboBox * >(editor);
-            combo->setCurrentIndex(
-              (int) point->StringToRadiusSource(value));
+            switch ((PointTableModel::Column) col)
+            {
+              case PointTableModel::EditLock:
+                combo->setCurrentIndex(point->IsEditLocked() ? 0 : 1);
+                break;
+              case PointTableModel::Ignored:
+                combo->setCurrentIndex(point->IsIgnored() ? 0 : 1);
+                break;
+              case PointTableModel::Reference:
+                combo->setCurrentIndex(point->IndexOfRefMeasure());
+                break;
+              case PointTableModel::AprioriSPSource:
+                combo->setCurrentIndex(
+                  (int) point->StringToSurfacePointSource(value));
+                break;
+              case PointTableModel::AprioriRadiusSource:
+                combo->setCurrentIndex(
+                  (int) point->StringToRadiusSource(value));
+                break;
+              default:
+                break;
+            }
           }
           break;
         default:
           {
-            QString value = tableModel->data(index, Qt::DisplayRole).toString();
             QLineEdit * lineEdit = static_cast< QLineEdit * >(editor);
             lineEdit->setText(value);
           }
@@ -189,6 +171,7 @@ namespace Isis
     {
       case PointTableModel::EditLock:
       case PointTableModel::Ignored:
+      case PointTableModel::Reference:
       case PointTableModel::AprioriSPSource:
       case PointTableModel::AprioriRadiusSource:
         {
@@ -196,13 +179,13 @@ namespace Isis
           newData = QVariant::fromValue(combo->currentText());
         }
         break;
-      case PointTableModel::RefIndex:
-        {
-          QSpinBox * spinBox = static_cast< QSpinBox * >(editor);
-          spinBox->interpretText();
-          newData = QVariant::fromValue(spinBox->value());
-        }
-        break;
+//       case PointTableModel::RefIndex:
+//         {
+//           QSpinBox * spinBox = static_cast< QSpinBox * >(editor);
+//           spinBox->interpretText();
+//           newData = QVariant::fromValue(spinBox->value());
+//         }
+//         break;
       default:
         {
           QLineEdit * lineEdit = static_cast< QLineEdit * >(editor);
@@ -216,11 +199,14 @@ namespace Isis
 
     // now look for all other selected cells in the same column and set them
     // as well
-    QList< QModelIndex > selection =
-      tableView->selectionModel()->selectedIndexes();
-    for (int i = 0; i < selection.size(); i++)
-      if (selection[i].column() == col)
-        model->setData(selection[i], newData, Qt::EditRole);
+    if (col != PointTableModel::Reference)
+    {
+      QList< QModelIndex > selection =
+        tableView->selectionModel()->selectedIndexes();
+      for (int i = 0; i < selection.size(); i++)
+        if (selection[i].column() == col)
+          model->setData(selection[i], newData, Qt::EditRole);
+    }
 
     emit dataEdited();
 //     cerr << "PointTableDelegate::setModelData done\n";

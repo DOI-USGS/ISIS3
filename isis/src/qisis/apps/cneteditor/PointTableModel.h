@@ -25,21 +25,20 @@ namespace Isis
         DateTime = 2,
         EditLock = 3,
         Ignored = 4,
-        RefIndex = 5,
-        Reference = 6,
-        SPLat = 7,
-        SPLon = 8,
-        SPRadius = 9,
-        AprioriSPLat = 10,
-        AprioriSPLon = 11,
-        AprioriSPRadius = 12,
-        AprioriSPSource = 13,
-        AprioriSPSourceFile = 14,
-        AprioriRadiusSource = 15,
-        AprioriRadiusSourceFile = 16,
-        JigsawRejected = 17,
+        Reference = 5,
+        SPLat = 6,
+        SPLon = 7,
+        SPRadius = 8,
+        AprioriSPLat = 9,
+        AprioriSPLon = 10,
+        AprioriSPRadius = 11,
+        AprioriSPSource = 12,
+        AprioriSPSourceFile = 13,
+        AprioriRadiusSource = 14,
+        AprioriRadiusSourceFile = 15,
+        JigsawRejected = 16,
       };
-      static const int COLS = 18;
+      static const int COLS = 17;
 
 
     public:

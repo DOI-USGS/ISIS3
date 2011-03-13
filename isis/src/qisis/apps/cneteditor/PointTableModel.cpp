@@ -102,8 +102,6 @@ namespace Isis
               return QVariant::fromValue(QString("Yes"));
             else
               return QVariant::fromValue(QString("No"));
-          case RefIndex:
-            return QVariant::fromValue(point->IndexOfRefMeasure());
           case Reference:
             return QVariant::fromValue(
                 (QString) point->GetRefMeasure()->GetCubeSerialNumber());
@@ -178,11 +176,21 @@ namespace Isis
           case Ignored:
             result = QVariant::fromValue(QString("Ignored"));
             break;
-          case RefIndex:
-            result = QVariant::fromValue(QString("Ref index"));
-            break;
           case Reference:
-            result = QVariant::fromValue(QString("Reference"));
+            {
+              int widthAdditions = 0;
+              if (points->size())
+              {
+                widthAdditions =
+                  points->at(0)->GetMeasure(0)->GetCubeSerialNumber().size()
+                  - 7;
+              }
+              QString label;
+              for (int i = 0; i < widthAdditions; i++) label += " ";
+              label += "Reference";
+              for (int i = 0; i < widthAdditions; i++) label += " ";
+              result = QVariant::fromValue(label);
+            }
             break;
           case SPLat:
             result = QVariant::fromValue(QString("SP Lat"));
@@ -203,7 +211,7 @@ namespace Isis
             result = QVariant::fromValue(QString("Apriori SP Radius (m)"));
             break;
           case AprioriSPSource:
-            result = QVariant::fromValue(QString("Apriori SP Source    "));
+            result = QVariant::fromValue(QString("  Apriori SP Source  "));
             break;
           case AprioriSPSourceFile:
             result = QVariant::fromValue(QString("Apriori SP Source File"));
@@ -259,7 +267,6 @@ namespace Isis
             case DateTime:
             case EditLock:
             case Ignored:
-            case RefIndex:
             case Reference:
             case SPLat:
             case SPLon:
@@ -310,26 +317,14 @@ namespace Isis
               point->SetDateTime(value.toString());
               break;
             case EditLock:
-              if (value.toString() == "Yes")
-                point->SetEditLock(true);
-              else
-                if (value.toString() == "No")
-                  point->SetEditLock(false);
+              point->SetEditLock(value.toString() == "Yes");
               break;
             case Ignored:
-              if (value.toString() == "Yes")
-                point->SetIgnored(true);
-              else
-                if (value.toString() == "No")
-                  point->SetIgnored(false);
-              break;
-            case RefIndex:
-              if (value.toInt() >= 0 && value.toInt() < point->GetNumMeasures())
-                point->SetRefMeasure(value.toInt());
+              point->SetIgnored(value.toString() == "Yes");
               break;
             case Reference:
-              if (point->HasSerialNumber(value.toString()))
-                point->SetRefMeasure(value.toString());
+              Q_ASSERT(point->HasSerialNumber(value.toString()));
+              point->SetRefMeasure(value.toString());
               break;
             case SPLat:
               point->SetSurfacePoint(SurfacePoint(
@@ -397,39 +392,6 @@ namespace Isis
     return success;
   }
 
-  /*
-    bool PointTableModel::insertRows(int position, int rows,
-        const QModelIndex & index)
-    {
-      Q_UNUSED(index);
-      beginInsertRows(QModelIndex(), position, position + rows - 1);
-
-      for (int i = 0; i < rows; i++)
-      {
-        ControlPoint * newPoint = NULL;
-        points->insert(position, newPoint);
-      }
-
-      endInsertRows();
-      return true;
-    }
-
-
-    bool PointTableModel::removeRows(int position, int rows,
-        const QModelIndex & index)
-    {
-      Q_UNUSED(index);
-      beginRemoveRows(QModelIndex(), position, position + rows - 1);
-
-      for (int i = rows; i < rows; i++)
-      {
-        points->removeAt(position);
-      }
-
-      endRemoveRows();
-      return true;
-    }
-  */
 
   bool PointTableModel::validateRowColumn(int row, int column,
       bool checkPoint) const
