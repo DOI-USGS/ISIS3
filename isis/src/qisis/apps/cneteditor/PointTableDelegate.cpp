@@ -5,8 +5,9 @@
 #include <iostream>
 
 #include <QComboBox>
-#include <QSpinBox>
 #include <QLineEdit>
+#include <QSpinBox>
+#include <QTableView>
 
 #include "ControlPoint.h"
 #include "PointTableModel.h"
@@ -17,8 +18,8 @@ using std::cerr;
 
 namespace Isis
 {
-  PointTableDelegate::PointTableDelegate(PointTableModel * tm,
-      QObject * parent) : QItemDelegate(parent), tableModel(tm)
+  PointTableDelegate::PointTableDelegate(PointTableModel * tm, QTableView * tv,
+      QObject * parent) : QItemDelegate(parent), tableModel(tm), tableView(tv)
   {
   }
 
@@ -171,7 +172,6 @@ namespace Isis
             lineEdit->setText(value);
           }
       }
-      emit editorDataSet();
     }
 //     cerr << "PointTableDelegate::setEditorData done\n";
   }
@@ -182,7 +182,7 @@ namespace Isis
   {
 //     cerr << "PointTableDelegate::setModelData called...\n";
     int col = index.column();
-//     int row = index.row();
+
     QVariant newData;
 
     switch ((PointTableModel::Column) col)
@@ -209,9 +209,18 @@ namespace Isis
           newData = QVariant::fromValue(lineEdit->text());
         }
     }
-    
-    
+
+    // The cell doing the editing may or may not be selected, so we need to
+    // always set it in case it is not selected.
     model->setData(index, newData, Qt::EditRole);
+
+    // now look for all other selected cells in the same column and set them
+    // as well
+    QList< QModelIndex > selection =
+      tableView->selectionModel()->selectedIndexes();
+    for (int i = 0; i < selection.size(); i++)
+      if (selection[i].column() == col)
+        model->setData(selection[i], newData, Qt::EditRole);
 
     emit dataEdited();
 //     cerr << "PointTableDelegate::setModelData done\n";

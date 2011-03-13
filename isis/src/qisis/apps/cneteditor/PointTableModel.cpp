@@ -43,7 +43,7 @@ namespace Isis
     beginRemoveRows(QModelIndex(), 0, points->size() - 1);
     points->clear();
     endRemoveRows();
-    
+
     beginInsertRows(QModelIndex(), 0, newPoints.size() - 1);
     *points = newPoints;
     endInsertRows();
@@ -402,46 +402,39 @@ namespace Isis
     return success;
   }
 
-
-  bool PointTableModel::insertRows(int position, int rows,
-      const QModelIndex & index)
-  {
-    Q_UNUSED(index);
-    beginInsertRows(QModelIndex(), position, position + rows - 1);
-
-    for (int i = 0; i < rows; i++)
+  /*
+    bool PointTableModel::insertRows(int position, int rows,
+        const QModelIndex & index)
     {
-      ControlPoint * newPoint = NULL;
-      points->insert(position, newPoint);
+      Q_UNUSED(index);
+      beginInsertRows(QModelIndex(), position, position + rows - 1);
+
+      for (int i = 0; i < rows; i++)
+      {
+        ControlPoint * newPoint = NULL;
+        points->insert(position, newPoint);
+      }
+
+      endInsertRows();
+      return true;
     }
 
-    endInsertRows();
-    return true;
-  }
 
-
-  bool PointTableModel::removeRows(int position, int rows,
-      const QModelIndex & index)
-  {
-    cerr << "PointTableModel::removeRows called...\n";
-    Q_UNUSED(index);
-    beginRemoveRows(QModelIndex(), position, position + rows - 1);
-    
-    cerr << "PointTableModel::removeRows :  position: " << position
-        << "\trows: " << rows << "\tpoints->size(): " << points->size()
-        << "\n";
-    for (int i = rows; i < rows; i++)
+    bool PointTableModel::removeRows(int position, int rows,
+        const QModelIndex & index)
     {
-      cerr << "points->size(): " << points->size() << "\t" << points->at(0) << "\n";
-      points->removeAt(position);
-      cerr << "removed point\n";
+      Q_UNUSED(index);
+      beginRemoveRows(QModelIndex(), position, position + rows - 1);
+
+      for (int i = rows; i < rows; i++)
+      {
+        points->removeAt(position);
+      }
+
+      endRemoveRows();
+      return true;
     }
-
-    endRemoveRows();
-    cerr << "PointTableModel::removeRows done\n";
-    return true;
-  }
-
+  */
 
   bool PointTableModel::validateRowColumn(int row, int column,
       bool checkPoint) const
@@ -464,9 +457,10 @@ namespace Isis
   double PointTableModel::catchNULL(QString str) const
   {
     double d = Isis::NULL8;
-    if (str != "NULL")
+    if (str.toLower() != "null")
       d = str.toDouble();
 
     return d;
   }
+
 }

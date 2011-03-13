@@ -181,7 +181,7 @@ namespace Isis
     return 1;
   }
 
-    
+
   Qt::ItemFlags ConnectionModel::flags(const QModelIndex & index) const
   {
     Qt::ItemFlags flags = 0;
@@ -206,7 +206,7 @@ namespace Isis
 
     return static_cast< TreeItem * >(index.internalPointer());
   }
-  
+
 }
 
 

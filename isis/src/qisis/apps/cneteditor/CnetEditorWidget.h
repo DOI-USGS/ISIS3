@@ -28,8 +28,8 @@ namespace Isis
     public:
       CnetEditorWidget(Isis::ControlNet *);
       virtual ~CnetEditorWidget();
-      
-      
+
+
     public slots:
       void setSynchronizedViews(bool synchronized);
 
@@ -48,13 +48,13 @@ namespace Isis
       void pointViewSelectionChanged();
       void serialViewSelectionChanged();
       void connectionViewSelectionChanged();
-          
+
 
     private: // data
       bool updatingSelection;
       bool synchronizeViews;
-          
-          
+
+
     private: // widgets
       QTreeView * pointView;
       QTreeView * serialView;

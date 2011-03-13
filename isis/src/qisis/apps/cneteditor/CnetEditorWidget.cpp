@@ -53,12 +53,12 @@ namespace Isis
 
   CnetEditorWidget::~CnetEditorWidget()
   {}
-  
-  
+
+
   void CnetEditorWidget::setSynchronizedViews(bool synchronized)
   {
     synchronizeViews = synchronized;
-    
+
     if (synchronizeViews)
     {
       serialView->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -86,7 +86,7 @@ namespace Isis
 //     pointView->setExpandsOnDoubleClick(false);
     pointView->setAlternatingRowColors(true);
     pointView->setSelectionMode(QAbstractItemView::MultiSelection);
-    
+
     serialView = new QTreeView();
     serialModel = new SerialModel(controlNet, qApp);
     serialView->setModel(serialModel);
@@ -95,7 +95,7 @@ namespace Isis
         SLOT(serialViewSelectionChanged()));
 //     serialView->setExpandsOnDoubleClick(false);
     serialView->setAlternatingRowColors(true);
-        
+
     connectionView = new QTreeView();
     connectionModel = new ConnectionModel(controlNet, qApp);
     connectionView->setModel(connectionModel);
@@ -104,13 +104,13 @@ namespace Isis
         SLOT(connectionViewSelectionChanged()));
 //     connectionView->setExpandsOnDoubleClick(false);
     connectionView->setAlternatingRowColors(true);
-    
+
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
     editPointView->setModel(editPointModel);
     connect(editPointModel, SIGNAL(dataChanged(const QModelIndex &,
         const QModelIndex &)), editPointView, SLOT(resizeColumnsToContents()));
-    editPointDelegate = new PointTableDelegate(editPointModel);
+    editPointDelegate = new PointTableDelegate(editPointModel, editPointView);
     connect(editPointDelegate, SIGNAL(dataEdited()),
         this, SIGNAL(cnetModified()));
     editPointView->setItemDelegate(editPointDelegate);
@@ -134,8 +134,9 @@ namespace Isis
     connect(editMeasureModel, SIGNAL(dataChanged(const QModelIndex &,
         const QModelIndex &)),
         editMeasureView, SLOT(resizeColumnsToContents()));
-    editMeasureDelegate = new MeasureTableDelegate(editMeasureModel);
-    connect(editMeasureDelegate, SIGNAL(dataEdited()), 
+    editMeasureDelegate = new MeasureTableDelegate(editMeasureModel,
+        editMeasureView);
+    connect(editMeasureDelegate, SIGNAL(dataEdited()),
         this, SIGNAL(cnetModified()));
     editMeasureView->setItemDelegate(editMeasureDelegate);
     editMeasureView->resizeColumnsToContents();
@@ -146,7 +147,7 @@ namespace Isis
     QHBoxLayout * editMeasureLayout = new QHBoxLayout;
     editMeasureLayout->addWidget(editMeasureView);
     editMeasureBox->setLayout(editMeasureLayout);
-    
+
 
     QSplitter * topSplitter = new QSplitter(Qt::Horizontal);
     topSplitter->addWidget(pointView);
@@ -196,19 +197,19 @@ namespace Isis
     if (updatingSelection)
       return;
     updatingSelection = true;
-    
-    
+
+
     QList< ControlPoint * > points;
     QList< ControlMeasure * > measures;
     QStringList cubeSerialNumbers;
     QList< QModelIndex > indexes =
-        pointView->selectionModel()->selectedIndexes();
+      pointView->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.size(); i++)
     {
       TreeItem * item = static_cast< TreeItem * >(
           indexes[i].internalPointer());
       TreeItem::InternalPointerType type = item->pointerType();
-      
+
       if (type == TreeItem::Point)
       {
         points << controlNet->GetPoint(item->data(0).toString());
@@ -219,7 +220,7 @@ namespace Isis
         {
           QString pointId = item->parent()->data(0).toString();
           QString serial = item->data(0).toString();
-          
+
           measures << controlNet->GetPoint(pointId)->GetMeasure(serial);
           cubeSerialNumbers << serial;
         }
@@ -230,20 +231,20 @@ namespace Isis
         }
       }
     }
-    
+
     //********************FIXME***************************************/
     // populate editor tables
     editPointModel->setPoints(points);
     QList< ControlMeasure * > allMeasuresForSelectedPoints;
-    foreach (ControlPoint * point, points)
+    foreach(ControlPoint * point, points)
     {
       for (int i = 0; i < point->GetNumMeasures(); i++)
         allMeasuresForSelectedPoints.append((*point)[i]);
     }
     editMeasureModel->setMeasures(allMeasuresForSelectedPoints);
     //********************FIXME***************************************/
-    
-    
+
+
     if (synchronizeViews)
     {
       focusView(serialView, cubeSerialNumbers);
@@ -252,27 +253,27 @@ namespace Isis
 
     updatingSelection = false;
   }
-  
-  
+
+
   void CnetEditorWidget::serialViewSelectionChanged()
   {
     if (updatingSelection || !synchronizeViews)
       return;
     updatingSelection = true;
-    
-    
+
+
     QList< ControlPoint * > points;
     QList< ControlMeasure * > measures;
     QStringList pointIds;
     QStringList cubeSerialNumbers;
     QList< QModelIndex > indexes =
-        serialView->selectionModel()->selectedIndexes();
+      serialView->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.size(); i++)
     {
       TreeItem * item = static_cast< TreeItem * >(
           indexes[i].internalPointer());
       TreeItem::InternalPointerType type = item->pointerType();
-      
+
       if (type == TreeItem::Serial)
       {
         cubeSerialNumbers << item->data(0).toString();
@@ -283,7 +284,7 @@ namespace Isis
         {
           QString pointId = item->data(0).toString();
           pointIds << pointId;
-          
+
           ControlPoint * point = controlNet->GetPoint(pointId);
           points << point;
           measures << point->GetMeasure(item->parent()->data(0).toString());
@@ -297,18 +298,18 @@ namespace Isis
         }
       }
     }
-      
+
     editPointModel->setPoints(points);
     editMeasureModel->setMeasures(measures);
-    
+
     focusView(pointView, pointIds);
     focusView(connectionView, cubeSerialNumbers);
-    
+
     updatingSelection = false;
   }
-  
 
-  
+
+
   void CnetEditorWidget::connectionViewSelectionChanged()
   {
     // If this method was called because it is synchronized to another view
@@ -317,20 +318,20 @@ namespace Isis
     if (updatingSelection)
       return;
     updatingSelection = true;
-    
-    
+
+
     QList< ControlPoint * > points;
     QList< ControlMeasure * > measures;
     QStringList pointIds;
     QStringList cubeSerialNumbers;
     QList< QModelIndex > indexes =
-        connectionView->selectionModel()->selectedIndexes();
+      connectionView->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.size(); i++)
     {
       TreeItem * item = static_cast< TreeItem * >(
           indexes[i].internalPointer());
       TreeItem::InternalPointerType type = item->pointerType();
-      
+
       if (type == TreeItem::ConnectionParent || type == TreeItem::Serial)
       {
         cubeSerialNumbers << item->data(0).toString();
@@ -341,7 +342,7 @@ namespace Isis
         {
           QString pointId = item->data(0).toString();
           pointIds << pointId;
-          
+
           ControlPoint * point = controlNet->GetPoint(pointId);
           points << point;
 //           measures << point->GetMeasure(item->parent()->data(0).toString()) <<
@@ -357,19 +358,19 @@ namespace Isis
         }
       }
     }
-    
+
     if (synchronizeViews)
     {
       editPointModel->setPoints(points);
       editMeasureModel->setMeasures(measures);
-    
+
       focusView(pointView, pointIds);
       focusView(serialView, cubeSerialNumbers);
     }
 
     updatingSelection = false;
   }
-  
+
 
   void CnetEditorWidget::focusView(QTreeView * view, QStringList labels)
   {

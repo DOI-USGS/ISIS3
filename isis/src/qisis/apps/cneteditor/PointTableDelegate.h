@@ -4,6 +4,7 @@
 
 #include <QItemDelegate>
 
+class QTableView;
 
 
 namespace Isis
@@ -16,7 +17,8 @@ namespace Isis
       Q_OBJECT
 
     public:
-      PointTableDelegate(PointTableModel * tm, QObject * parent = 0);
+      PointTableDelegate(PointTableModel * tm, QTableView * tv,
+          QObject * parent = 0);
       virtual ~PointTableDelegate();
 
       QWidget * createEditor(QWidget * parent,
@@ -34,11 +36,11 @@ namespace Isis
 
     signals:
       void dataEdited() const;
-      void editorDataSet() const;
 
 
     private:
       PointTableModel * tableModel;
+      QTableView * tableView;
   };
 }
 

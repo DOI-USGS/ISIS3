@@ -14,7 +14,7 @@ namespace Isis
   class MeasureTableModel : public QAbstractTableModel
   {
       Q_OBJECT
-      
+
     public:
       // If a column is added or removed then make sure you also update
       // the COLS constant that immediately follows this enum.
@@ -43,7 +43,7 @@ namespace Isis
         ResidualMagnitude = 20
       };
       static const int COLS = 21;
-      
+
 
     public:
       explicit MeasureTableModel(QObject * parent = 0);
@@ -60,10 +60,10 @@ namespace Isis
       Qt::ItemFlags flags(const QModelIndex & index) const;
       bool setData(const QModelIndex & index,
           const QVariant & value, int role = Qt::EditRole);
-      bool insertRows(int position, int rows,
-          const QModelIndex & index = QModelIndex());
-      bool removeRows(int position, int rows,
-          const QModelIndex & index = QModelIndex());
+//       bool insertRows(int position, int rows,
+//           const QModelIndex & index = QModelIndex());
+//       bool removeRows(int position, int rows,
+//           const QModelIndex & index = QModelIndex());
 
 
     private:

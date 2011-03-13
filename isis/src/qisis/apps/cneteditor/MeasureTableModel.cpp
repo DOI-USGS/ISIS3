@@ -46,15 +46,15 @@ namespace Isis
     beginRemoveRows(QModelIndex(), 0, measures->size() - 1);
     measures->clear();
     endRemoveRows();
-    
+
     beginInsertRows(QModelIndex(), 0, newMeasures.size() - 1);
     *measures = newMeasures;
     endInsertRows();
 
     emit(dataChanged(QModelIndex(), QModelIndex()));
   }
-  
-  
+
+
   ControlMeasure * MeasureTableModel::getMeasure(int row) const
   {
     return (*measures)[row];
@@ -240,16 +240,16 @@ namespace Isis
   {
     int row = index.row();
     Column column = (Column) index.column();
-    
+
     // write permissions are granted, NOT ASSUMED!
     // This method could be much shorter by just checking for read only, but
     // this framework is safer, clearer, and more easily extended.
     Qt::ItemFlags flags = 0;
-    
+
     if (index.isValid())
     {
 //       flags = flags | Qt::ItemIsEnabled;
-      
+
       ControlMeasure * measure = (*measures)[row];
       if (measure)
       {
@@ -263,7 +263,7 @@ namespace Isis
         {
           switch (column)
           {
-            // enable WRITE
+              // enable WRITE
             case Sample:
             case Line:
             case EditLock:
@@ -286,8 +286,8 @@ namespace Isis
               flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled |
                   Qt::ItemIsSelectable;
               break;
-              
-            // READ ONLY
+
+              // READ ONLY
             case ResidualMagnitude:
             case JigsawRejected:
               break;
@@ -343,17 +343,25 @@ namespace Isis
           case MinPixelZScore:
           case MaxPixelZScore:
           case PixelShift:
-            try
+//             try
             {
-              measure->SetLogData(ControlMeasureLogData(
-                  (ControlMeasureLogData::NumericLogDataType) (col - 4),
-                  catchNULL(value.toString())));
-            }
-            catch (iException e)
-            {
-//               cerr << "MeasureTableModel::setData... measure->SetLogData() "
-//                   "FAILED!!!\n";
-              e.Clear();
+              QString newDataStr = value.toString().toLower();
+              ControlMeasureLogData::NumericLogDataType type =
+                (ControlMeasureLogData::NumericLogDataType)(col - 4);
+              if (newDataStr == "null")
+              {
+                measure->DeleteLogData(type);
+              }
+              else
+              {
+                measure->SetLogData(ControlMeasureLogData(type,
+                    value.toDouble()));
+              }
+//             }
+//             catch (iException e)
+//             {
+//               cerr << "MeasureTableModel::setData... FAILED!!!\n";
+//               e.Clear();
             }
             break;
           case AprioriSample:
@@ -367,30 +375,30 @@ namespace Isis
             break;
           case FocalPlaneMeasuredX:
             measure->SetFocalPlaneMeasured(
-                catchNULL(value.toString()), measure->GetFocalPlaneMeasuredY());
+              catchNULL(value.toString()), measure->GetFocalPlaneMeasuredY());
             break;
           case FocalPlaneMeasuredY:
             measure->SetFocalPlaneMeasured(
-                measure->GetFocalPlaneMeasuredX(), catchNULL(value.toString()));
+              measure->GetFocalPlaneMeasuredX(), catchNULL(value.toString()));
             break;
           case FocalPlaneComputedX:
             measure->SetFocalPlaneComputed(
-                catchNULL(value.toString()), measure->GetFocalPlaneComputedY());
+              catchNULL(value.toString()), measure->GetFocalPlaneComputedY());
             break;
           case FocalPlaneComputedY:
             measure->SetFocalPlaneComputed(
-                measure->GetFocalPlaneComputedX(), catchNULL(value.toString()));
+              measure->GetFocalPlaneComputedX(), catchNULL(value.toString()));
             break;
           case JigsawRejected:
             // jigsaw rejected is not editable!
             break;
           case ResidualSample:
             measure->SetResidual(
-                catchNULL(value.toString()), measure->GetLineResidual());
+              catchNULL(value.toString()), measure->GetLineResidual());
             break;
           case ResidualLine:
             measure->SetResidual(
-                measure->GetSampleResidual(), catchNULL(value.toString()));
+              measure->GetSampleResidual(), catchNULL(value.toString()));
             break;
           case ResidualMagnitude:
             // residual magnitude is not editable!
@@ -403,37 +411,37 @@ namespace Isis
     return success;
   }
 
-
-  bool MeasureTableModel::insertRows(int position, int rows,
-      const QModelIndex & index)
-  {
-    Q_UNUSED(index);
-    beginInsertRows(QModelIndex(), position, position + rows - 1);
-
-    for (int i = 0; i < rows; i++)
+  /*
+    bool MeasureTableModel::insertRows(int position, int rows,
+        const QModelIndex & index)
     {
-      ControlMeasure * newPoint = NULL;
-      measures->insert(position, newPoint);
+      Q_UNUSED(index);
+      beginInsertRows(QModelIndex(), position, position + rows - 1);
+
+      for (int i = 0; i < rows; i++)
+      {
+        ControlMeasure * newPoint = NULL;
+        measures->insert(position, newPoint);
+      }
+
+      endInsertRows();
+      return true;
     }
 
-    endInsertRows();
-    return true;
-  }
 
+    bool MeasureTableModel::removeRows(int position, int rows,
+        const QModelIndex & index)
+    {
+      Q_UNUSED(index);
+      beginRemoveRows(QModelIndex(), position, position + rows - 1);
 
-  bool MeasureTableModel::removeRows(int position, int rows,
-      const QModelIndex & index)
-  {
-    Q_UNUSED(index);
-    beginRemoveRows(QModelIndex(), position, position + rows - 1);
+      for (int i = 0; i < rows; i++)
+        measures->removeAt(position);
 
-    for (int i = 0; i < rows; i++)
-      measures->removeAt(position);
-
-    endInsertRows();
-    return true;
-  }
-
+      endInsertRows();
+      return true;
+    }
+  */
 
   bool MeasureTableModel::validateRowColumn(int row, int column,
       bool checkPoint) const
@@ -441,8 +449,8 @@ namespace Isis
     return row >= 0 && row < measures->size() && column >= 0 &&
         column < COLS && (!checkPoint || (checkPoint && measures->at(row)));
   }
-  
-  
+
+
   QString MeasureTableModel::catchNULL(double d) const
   {
     QString str = "NULL";
@@ -456,28 +464,11 @@ namespace Isis
   double MeasureTableModel::catchNULL(QString str) const
   {
     double d = Isis::NULL8;
-    if (str != "NULL")
+    if (str.toLower() != "null")
       d = str.toDouble();
 
     return d;
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

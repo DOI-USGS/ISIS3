@@ -5,6 +5,9 @@
 #include <QItemDelegate>
 
 
+class QTableView;
+
+
 
 namespace Isis
 {
@@ -16,7 +19,8 @@ namespace Isis
       Q_OBJECT
 
     public:
-      MeasureTableDelegate(MeasureTableModel * tm, QObject * parent = 0);
+      MeasureTableDelegate(MeasureTableModel * tm, QTableView * tv,
+          QObject * parent = 0);
       virtual ~MeasureTableDelegate();
 
       QWidget * createEditor(QWidget * parent,
@@ -38,6 +42,7 @@ namespace Isis
 
     private:
       MeasureTableModel * tableModel;
+      QTableView * tableView;
   };
 }
 

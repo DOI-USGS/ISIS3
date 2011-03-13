@@ -5,8 +5,9 @@
 #include <iostream>
 
 #include <QComboBox>
-#include <QSpinBox>
 #include <QLineEdit>
+#include <QSpinBox>
+#include <QTableView>
 
 #include "ControlPoint.h"
 #include "MeasureTableModel.h"
@@ -18,7 +19,8 @@ using std::cerr;
 namespace Isis
 {
   MeasureTableDelegate::MeasureTableDelegate(MeasureTableModel * tm,
-      QObject * parent) : QItemDelegate(parent), tableModel(tm)
+      QTableView * tv, QObject * parent) : QItemDelegate(parent),
+    tableModel(tm), tableView(tv)
   {
   }
 
@@ -144,6 +146,8 @@ namespace Isis
 //     cerr << "MeasureTableDelegate::setModelData called...\n";
     int col = index.column();
 
+    QVariant newData;
+
     switch ((MeasureTableModel::Column) col)
     {
       case MeasureTableModel::EditLock:
@@ -151,15 +155,27 @@ namespace Isis
       case MeasureTableModel::Type:
         {
           QComboBox * combo = static_cast< QComboBox * >(editor);
-          model->setData(index, combo->currentText(), Qt::EditRole);
+          newData = QVariant::fromValue(combo->currentText());
         }
         break;
       default:
         {
           QLineEdit * lineEdit = static_cast< QLineEdit * >(editor);
-          model->setData(index, lineEdit->text(), Qt::EditRole);
+          newData = QVariant::fromValue(lineEdit->text());
         }
     }
+
+    // The cell doing the editing may or may not be selected, so we need to
+    // always set it in case it is not selected.
+    model->setData(index, newData, Qt::EditRole);
+
+    // now look for all other selected cells in the same column and set them
+    // as well
+    QList< QModelIndex > selection =
+      tableView->selectionModel()->selectedIndexes();
+    for (int i = 0; i < selection.size(); i++)
+      if (selection[i].column() == col)
+        model->setData(selection[i], newData, Qt::EditRole);
 
     emit dataEdited();
 //     cerr << "MeasureTableDelegate::setModelData done\n";
