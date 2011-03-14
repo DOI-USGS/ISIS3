@@ -21,6 +21,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "ControlCubeGraphNode.h"
+#include "Distance.h"
 #include "iException.h"
 #include "iTime.h"
 #include "PBControlNetIO.pb.h"
@@ -71,6 +72,7 @@ namespace Isis {
       pointsIterator.next();
 
       ControlPoint *newPoint = new ControlPoint(*pointsIterator.value());
+      newPoint->parentNetwork = this;
       QString newPointId = newPoint->GetId();
       points->insert(newPointId, newPoint);
       pointIds->append(newPointId);
@@ -94,6 +96,7 @@ namespace Isis {
     }
 
     p_targetName = other.p_targetName;
+    p_targetRadii = other.p_targetRadii;
     p_networkId = other.p_networkId;
     p_created = other.p_created;
     p_modified = other.p_modified;
@@ -185,7 +188,7 @@ namespace Isis {
 
         if (cn.HasKeyword("NetworkId"))
           p_networkId = cn["NetworkId"][0];
-        p_targetName = (std::string)cn["TargetName"];
+        SetTarget(iString((std::string) cn["TargetName"]));
         p_userName = (std::string)cn["UserName"];
         p_created = (std::string)cn["Created"];
         p_modified = (std::string)cn["LastModified"];
@@ -202,6 +205,9 @@ namespace Isis {
           try {
             if (cn.Object(i).IsNamed("ControlPoint")) {
               ControlPoint *newPoint = new ControlPoint;
+              // Temporarily set the parent so ControlPoint can get target radii
+              // for unit conversions
+              newPoint->parentNetwork = this;
               newPoint->Load(cn.Object(i));
               p_numMeasures += newPoint->GetNumMeasures();
               if (newPoint->IsIgnored()) {
@@ -318,7 +324,7 @@ namespace Isis {
 
     // Set the private variable to the read in values from the input file.
     p_networkId = pbnet.networkid();
-    p_targetName = pbnet.targetname();
+    SetTarget(pbnet.targetname());
     p_created = pbnet.created();
     p_modified = pbnet.lastmodified();
     p_description = pbnet.description();
@@ -329,11 +335,13 @@ namespace Isis {
     for (int pnts = 0 ; pnts < pbnet.points_size(); pnts++) {
       if (!readLogData) {
         ControlPoint *point = new ControlPoint(pbnet.points(pnts));
+        point->parentNetwork = this;
         AddPoint(point);
       }
       else {
         ControlPoint *point = new ControlPoint(pbnet.points(pnts),
             logData.points(pnts));
+        point->parentNetwork = this;
         AddPoint(point);
       }
     }
@@ -1149,6 +1157,45 @@ namespace Isis {
 
 
   /**
+   * Return the number of measures in image specified by serialNumber
+   *
+   * @return Number of valid measures in image
+   */
+  int ControlNet::GetNumberOfMeasuresInImage(const std::string &serialNumber) {
+      return p_cameraMeasuresMap[serialNumber];
+  }
+
+
+  /**
+   * Return the number of jigsaw rejected measures in image specified by serialNumber
+   *
+   * @return Number of jigsaw rejected measures in image
+   */
+  int ControlNet::GetNumberOfJigsawRejectedMeasuresInImage(const std::string &serialNumber) {
+      return p_cameraRejectedMeasuresMap[serialNumber];
+  }
+
+
+/**
+ * Increment number of jigsaw rejected measures in image specified by serialNumber
+ *
+ */
+  void ControlNet::IncrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber) {
+      p_cameraRejectedMeasuresMap[serialNumber]++;
+  }
+
+
+  /**
+   * Decrement number of jigsaw rejected measures in image specified by serialNumber
+   *
+   */
+  void ControlNet::DecrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber) {
+      if ( p_cameraRejectedMeasuresMap[serialNumber] > 0 )
+          p_cameraRejectedMeasuresMap[serialNumber]--;
+  }
+
+
+  /**
    * Returns the total number of measures for all control points in the network
    *
    * @return Number of control measures
@@ -1343,6 +1390,13 @@ namespace Isis {
    */
   void ControlNet::SetTarget(const iString &target) {
     p_targetName = target;
+    PvlGroup pvlRadii = Projection::TargetRadii(target);
+    p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
+                                     Distance::Meters));
+    // The method Projection::Radii does not provide the B radius
+  p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
+                                   Distance::Meters));
+  p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"], Distance::Meters));
   }
 
 
@@ -1389,6 +1443,7 @@ namespace Isis {
       i.next();
 
       ControlPoint *newPoint = new ControlPoint(*i.value());
+      newPoint->parentNetwork = this;
       QString newPointId = newPoint->GetId();
       points->insert(newPointId, newPoint);
 
@@ -1411,6 +1466,7 @@ namespace Isis {
     }
 
     p_targetName = other.p_targetName;
+    p_targetRadii = other.p_targetRadii;
     p_networkId = other.p_networkId;
     p_created = other.p_created;
     p_modified = other.p_modified;
@@ -1465,6 +1521,16 @@ namespace Isis {
     }
 
     return GetPoint(pointIds->at(index));
+  }
+
+
+  /**
+   * Get the target radii
+   *
+   * @returns the radii of the target body
+   */
+  std::vector<Distance> ControlNet::GetTargetRadii() {
+    return p_targetRadii;
   }
 
 

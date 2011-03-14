@@ -52,19 +52,23 @@ int main () {
   pbPoint->add_aprioricovar(0.);
   pbPoint->add_aprioricovar(400.);
 
-  pbPoint->set_x(-424.024048);
-  pbPoint->set_y(734.4311949);
-  pbPoint->set_z(529.919264);
+  pbPoint->set_latitudeconstrained(true);
+  pbPoint->set_longitudeconstrained(true);
+  pbPoint->set_radiusconstrained(true);
 
-  pbPoint->add_apostcovar(100.);
-  pbPoint->add_apostcovar(0.);
-  pbPoint->add_apostcovar(0.);
-  pbPoint->add_apostcovar(0.);
-  pbPoint->add_apostcovar(2500.);
-  pbPoint->add_apostcovar(0.);
-  pbPoint->add_apostcovar(0.);
-  pbPoint->add_apostcovar(0.);
-  pbPoint->add_apostcovar(400.);
+  pbPoint->set_adjustedx(-424.024048);
+  pbPoint->set_adjustedy(734.4311949);
+  pbPoint->set_adjustedz(529.919264);
+
+  pbPoint->add_adjustedcovar(100.);
+  pbPoint->add_adjustedcovar(0.);
+  pbPoint->add_adjustedcovar(0.);
+  pbPoint->add_adjustedcovar(0.);
+  pbPoint->add_adjustedcovar(2500.);
+  pbPoint->add_adjustedcovar(0.);
+  pbPoint->add_adjustedcovar(0.);
+  pbPoint->add_adjustedcovar(0.);
+  pbPoint->add_adjustedcovar(400.);
 
   PBControlNet_PBControlPoint_PBControlMeasure *pbMeas = pbPoint->add_measures();
   pbMeas->set_serialnumber("APOLLO15/METRIC/1971-07-30T02:17:20.758");

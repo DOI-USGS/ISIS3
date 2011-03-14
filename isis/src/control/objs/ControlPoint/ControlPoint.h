@@ -227,6 +227,10 @@ namespace Isis {
    *            ConputeResiduals_Millimeters(), HasAprioriCoordinates(),
    *            IsConstrained(), IsLatitudeConstrained(), IsLongitudeConstrained(),
    *            and NumberOfConstrainedCoordinates().
+   *   @history 2011-03-11 Debbie Cook - changed name of member surfacePoint to
+   *            adjustedSurfacePoint.  Also changed methods SetSurfacePoint to
+   *            SetAdjustedSurfacePoint and GetSurfacePoint to
+   *            GetAdjustedSurfacePoint.
    */
   class ControlPoint {
       friend class ControlNet;
@@ -290,6 +294,9 @@ namespace Isis {
         LatitudeConstrained = 0,
         LongitudeConstrained = 1,
         RadiusConstrained = 2,
+//      XConstrained = 3,
+//      YConstrained = 4,
+//      ZConstrained = 5;
       };
 
       // This stuff input to jigsaw
@@ -352,7 +359,7 @@ namespace Isis {
       Status SetRefMeasure(iString sn);
       Status SetRejected(bool rejected);
       Status SetIgnored(bool newIgnoreStatus);
-      Status SetSurfacePoint(SurfacePoint newSurfacePoint);
+      Status SetAdjustedSurfacePoint(SurfacePoint newSurfacePoint);
       Status SetType(PointType newType);
 
       Status SetAprioriRadiusSource(RadiusSource::Source source);
@@ -376,7 +383,7 @@ namespace Isis {
       bool IsIgnored() const;
       bool IsValid() const;
       bool IsInvalid() const;
-      SurfacePoint GetSurfacePoint() const;
+      SurfacePoint GetAdjustedSurfacePoint() const;
       PointType GetType() const;
       bool IsGround() const;
 
@@ -504,7 +511,7 @@ namespace Isis {
       bool jigsawRejected;
 
       /**
-       * This stores the constraint status of the SurfacePoint
+       * This stores the constraint status of the a priori SurfacePoint
        *   @todo Eventually add x, y, and z
        */
       std::bitset<6> constraintStatus;
@@ -554,7 +561,7 @@ namespace Isis {
        * This is the calculated, or aposterori, surface point. This is what most
        *   programs should be working with and updating.
        */
-      SurfacePoint surfacePoint;
+      SurfacePoint adjustedSurfacePoint;
 
       /**
        * This parameter is used and maintained by BundleAdjust for the jigsaw

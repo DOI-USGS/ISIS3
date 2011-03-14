@@ -54,6 +54,7 @@ namespace Isis {
     parentNetwork = NULL;
     referenceMeasure = NULL;
     numberOfRejectedMeasures = 0;
+    constraintStatus.reset();
   }
 
   ControlPoint::ControlPoint(const ControlPoint &other) {
@@ -94,7 +95,7 @@ namespace Isis {
     aprioriRadiusSource = other.aprioriRadiusSource;
     aprioriRadiusSourceFile = other.aprioriRadiusSourceFile;
     aprioriSurfacePoint = other.aprioriSurfacePoint;
-    surfacePoint = other.surfacePoint;
+    adjustedSurfacePoint = other.adjustedSurfacePoint;
     numberOfRejectedMeasures = other.numberOfRejectedMeasures;
     constraintStatus = other.constraintStatus;
   }
@@ -251,9 +252,15 @@ namespace Isis {
   *                         since that is what most applications need.
   * @history 2010-12-02 Debbie A. Cook, Added units to
   *                         SurfacePoint.SetSpherical calls.
+  * @history 2011-03-12 Debbie A. Cook, Added targetRadius to do conversions
   */
   void ControlPoint::Load(PvlObject &p) {
     id = (std::string) p["PointId"];
+    std::vector<Distance> targetRadii;
+
+    if (parentNetwork) 
+      targetRadii = parentNetwork->GetTargetRadii();
+
     if ((std::string)p["PointType"] == "Ground") {
       type = Ground;
     }
@@ -365,6 +372,9 @@ namespace Isis {
         Displacement(p["AprioriX"], Displacement::Meters),
         Displacement(p["AprioriY"], Displacement::Meters),
         Displacement(p["AprioriZ"], Displacement::Meters));
+      if (targetRadii.size() == 3) 
+        aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
+                                     targetRadii[2]);
     }
 
     //  Look for AprioriLatitude/Longitude/Radius.  These keywords may
@@ -376,23 +386,45 @@ namespace Isis {
         Latitude(p["AprioriLatitude"], Angle::Degrees),
         Longitude(p["AprioriLongitude"], Angle::Degrees),
         Distance(p["AprioriRadius"], Distance::Meters));
+      if (targetRadii.size() == 3) 
+        aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
+                                     targetRadii[2]);
     }
 
     if (p.HasKeyword("X") && p.HasKeyword("Y") && p.HasKeyword("Z")) {
-      surfacePoint.SetRectangular(
+      adjustedSurfacePoint.SetRectangular(
         Displacement(p["X"], Displacement::Meters),
         Displacement(p["Y"], Displacement::Meters),
         Displacement(p["Z"], Displacement::Meters));
+      if (targetRadii.size() == 3) 
+        adjustedSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
+                                      targetRadii[2]);
+    }
+
+    else if (p.HasKeyword("AdjustedX") && p.HasKeyword("AdjustedY") && p.HasKeyword("AdjustedZ")) {
+      adjustedSurfacePoint.SetRectangular(
+        Displacement(p["AdjustedX"], Displacement::Meters),
+        Displacement(p["AdjustedY"], Displacement::Meters),
+        Displacement(p["AdjustedZ"], Displacement::Meters));
+      if (targetRadii.size() == 3) 
+        adjustedSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
+                                      targetRadii[2]);
     }
 
     // Look for Latitude/Longitude/Radius.  These keywords may exist in old
     // nets.  Convert to x/y/z.
     else if (p.HasKeyword("Latitude") && p.HasKeyword("Longitude") &&
-        p.HasKeyword("Radius")) {
-      surfacePoint.SetSpherical(
+             p.HasKeyword("Radius")) {
+      adjustedSurfacePoint.SetSpherical(
         Latitude(p["Latitude"], Angle::Degrees),
         Longitude(p["Longitude"], Angle::Degrees),
         Distance(p["Radius"], Distance::Meters));
+      if (targetRadii.size() == 3) {
+        adjustedSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
+                                      targetRadii[2]);
+        aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
+                                     targetRadii[2]);
+      }
       if (!p.HasKeyword("AprioriLatitude"))
         aprioriSurfacePoint.SetSpherical(
           Latitude(p["Latitude"], Angle::Degrees),
@@ -412,6 +444,36 @@ namespace Isis {
       aprioriCovariance(1, 1) = matrix[3];
       aprioriCovariance(1, 2) = matrix[4];
       aprioriCovariance(2, 2) = matrix[5];
+
+      // If (2,2) is valid, then z is constrained, making latitude and radius
+      // constrained
+      if (Distance(aprioriCovariance(2,2), Distance::Meters).Valid()) {
+        constraintStatus.set(LatitudeConstrained, 1);
+        constraintStatus.set(RadiusConstrained, 1);
+      }
+
+      // If (0,0) or (1,1) are valid, then x or y are constrained, making
+      // latitude, longitude, and radius constrained
+      if (Distance(aprioriCovariance(0,0), Distance::Meters).Valid() ||
+          Distance(aprioriCovariance(1,1), Distance::Meters).Valid()) 
+        constraintStatus.set();
+
+      // Check to see if pvl keywords override covariance matrix
+      if (p.HasKeyword("LatitudeConstrained")) {
+        iString constrStr = (std::string)p["LatitudeConstrained"];
+        if (constrStr.DownCase() == "false")
+          constraintStatus.set(LatitudeConstrained, 0);
+      }
+      if (p.HasKeyword("LongitudeConstrained")) {
+        iString constrStr = (std::string)p["LatitudeConstrained"];
+        if (constrStr.DownCase() == "false")
+          constraintStatus.set(LatitudeConstrained, 0);
+      }
+      if (p.HasKeyword("RadiusConstrained")) {
+        iString constrStr = (std::string)p["LatitudeConstrained"];
+        if (constrStr.DownCase() == "false")
+          constraintStatus.set(LatitudeConstrained, 0);
+      }
 
       aprioriSurfacePoint.SetRectangularMatrix(aprioriCovariance);
     }
@@ -447,26 +509,27 @@ namespace Isis {
                 constraintStatus.set(RadiusConstrained,1);
         }
 
-        aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(dapriorisigmalatitude, Distance::Meters),
-                                                       Distance(dapriorisigmalongtitude, Distance::Meters),
-                                                       Distance(dapriorisigmaradius, Distance::Meters));
+        aprioriSurfacePoint.SetSphericalSigmasDistance
+          (Distance(dapriorisigmalatitude, Distance::Meters),
+           Distance(dapriorisigmalongtitude, Distance::Meters),
+           Distance(dapriorisigmaradius, Distance::Meters));
     }
 
-    if (p.HasKeyword("ApostCovarianceMatrix")) {
-      PvlKeyword &matrix = p["ApostCovarianceMatrix"];
+    if (p.HasKeyword("AdjustedCovarianceMatrix")) {
+      PvlKeyword &matrix = p["AdjustedCovarianceMatrix"];
 
-      symmetric_matrix<double, upper> apostCovariance;
-      apostCovariance.resize(3);
-      apostCovariance.clear();
+      symmetric_matrix<double, upper> adjustedCovariance;
+      adjustedCovariance.resize(3);
+      adjustedCovariance.clear();
 
-      apostCovariance(0, 0) = matrix[0];
-      apostCovariance(0, 1) = matrix[1];
-      apostCovariance(0, 2) = matrix[2];
-      apostCovariance(1, 1) = matrix[3];
-      apostCovariance(1, 2) = matrix[4];
-      apostCovariance(2, 2) = matrix[5];
+      adjustedCovariance(0, 0) = matrix[0];
+      adjustedCovariance(0, 1) = matrix[1];
+      adjustedCovariance(0, 2) = matrix[2];
+      adjustedCovariance(1, 1) = matrix[3];
+      adjustedCovariance(1, 2) = matrix[4];
+      adjustedCovariance(2, 2) = matrix[5];
 
-      surfacePoint.SetRectangularMatrix(apostCovariance);
+      adjustedSurfacePoint.SetRectangularMatrix(adjustedCovariance);
     }
 
     if (p.HasKeyword("ChooserName"))
@@ -478,6 +541,9 @@ namespace Isis {
       if (reject.DownCase() == "true")
         jigsawRejected = true;
     }
+    // Get rid of parentNetwork now that conversions are done.  The point
+    // hasn't been added yet, and it doesn't have a parent officially until it is.
+    parentNetwork = NULL;
 
     //  Process Measures
     for (int g = 0; g < p.Groups(); g++) {
@@ -645,6 +711,7 @@ namespace Isis {
     aprioriRadiusSourceFile = "";
 
     aprioriSurfacePoint = SurfacePoint();
+    constraintStatus.reset();
 
     return Success;
   }
@@ -875,18 +942,12 @@ namespace Isis {
    * @param newSurfacePoint The point on the target's surface the measures are
    *                        tied to
    */
-  ControlPoint::Status ControlPoint::SetSurfacePoint(
+  ControlPoint::Status ControlPoint::SetAdjustedSurfacePoint(
     SurfacePoint newSurfacePoint) {
     if (editLock)
       return PointLocked;
-    if (surfacePoint.GetLatSigma().Valid())
-        constraintStatus.set(LatitudeConstrained);
-    if (surfacePoint.GetLonSigma().Valid())
-        constraintStatus.set(LongitudeConstrained);
-    if (surfacePoint.GetLocalRadiusSigma().Valid())
-        constraintStatus.set(RadiusConstrained);
     PointModified();
-    surfacePoint = newSurfacePoint;
+    adjustedSurfacePoint = newSurfacePoint;
     return Success;
   }
 
@@ -958,12 +1019,24 @@ namespace Isis {
    * @see SetAprioriPointSourceFile
    * @see aprioriSurfacePoint
    *
-   * @param aprioriSP The apriori surface point to remember
+   * @param aprioriSP The apriori surface point to remember 
+   * @todo This method needs to be revisited.  It will set the constraint 
+   *       status based on the sigmas and override the existing status. 
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePoint(
     SurfacePoint aprioriSP) {
+    if (parentNetwork) {
+      std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
+      aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],targetRadii[2]);
+    }
     if (editLock)
       return PointLocked;
+    if (aprioriSP.GetLatSigma().Valid())
+        constraintStatus.set(LatitudeConstrained);
+    if (aprioriSP.GetLonSigma().Valid())
+        constraintStatus.set(LongitudeConstrained);
+    if (aprioriSP.GetLocalRadiusSigma().Valid())
+        constraintStatus.set(RadiusConstrained);
     PointModified();
     aprioriSurfacePoint = aprioriSP;
     return Success;
@@ -1038,9 +1111,9 @@ namespace Isis {
     // Don't goof with ground points.  The lat/lon is what it is ... if
     // it exists!
     if (GetType() == Ground) {
-      if (!surfacePoint.Valid()) {
+      if (!aprioriSurfacePoint.Valid()) {
         iString msg = "ControlPoint [" + GetId() + "] is a ground point ";
-        msg += "and requires x/y/z";
+        msg += "and requires an apriori x/y/z";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
       // Don't return until after the FocalPlaneMeasures have been set
@@ -1097,7 +1170,9 @@ namespace Isis {
     }
 
     // Don't update the x/y/z for ground points
-    if (GetType() == Ground || NumberOfConstrainedCoordinates() == 3)
+    if (GetType() == Ground || NumberOfConstrainedCoordinates() == 3
+                            || IsLatitudeConstrained()
+                            || IsRadiusConstrained())
       return Success;
 
     // Did we have any measures?
@@ -1108,11 +1183,20 @@ namespace Isis {
     }
 
     // Compute the averages
-    // TODO Add checks to only update unconstrained coordinates
-    aprioriSurfacePoint.SetRectangular(
-      Displacement((xB / goodMeasures), Displacement::Kilometers),
-      Displacement((yB / goodMeasures), Displacement::Kilometers),
-      Displacement((zB / goodMeasures), Displacement::Kilometers));
+    if (NumberOfConstrainedCoordinates() == 0) {
+      aprioriSurfacePoint.SetRectangular(
+        Displacement((xB / goodMeasures), Displacement::Kilometers),
+        Displacement((yB / goodMeasures), Displacement::Kilometers),
+        Displacement((zB / goodMeasures), Displacement::Kilometers));
+    }
+    // Since we are not solving yet for x,y,and z in the bundle directly,
+    // longitude must be constrained.  This constrains x and y as well.
+    else {
+      aprioriSurfacePoint.SetRectangular(
+              aprioriSurfacePoint.GetX(),
+              aprioriSurfacePoint.GetY(),
+              Displacement((zB / goodMeasures), Displacement::Kilometers));
+    }
 
     SetAprioriSurfacePointSource(SurfacePointSource::AverageOfMeasures);
     SetAprioriRadiusSource(RadiusSource::AverageOfMeasures);
@@ -1163,7 +1247,7 @@ namespace Isis {
         // done manually because the camera will compute a new time for line scanners,
         // instead of using the measured time.
         double cudx, cudy;
-        cam->GroundMap()->GetXY(GetSurfacePoint(), &cudx, &cudy);
+        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
         m->SetFocalPlaneComputed(cudx, cudy);
 
         // Now things get tricky.  We want to produce errors in pixels not mm
@@ -1186,9 +1270,9 @@ namespace Isis {
         // focal plane is doppler shift.  Line is calculated from time.  If
         // we hold time and the Spice, we'll get the same sample/line as
         // measured
-        double lat = GetSurfacePoint().GetLatitude().GetDegrees();
-        double lon = GetSurfacePoint().GetLatitude().GetDegrees();
-        double rad = GetSurfacePoint().GetLocalRadius().GetMeters();
+        double lat = GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+        double lon = GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+        double rad = GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
         if (!cam->SetUniversalGround(lat, lon, rad)) {
           std::string msg = "ControlPoint [" +
               GetId() + "], ControlMeasure [" +
@@ -1247,9 +1331,9 @@ namespace Isis {
 
       PointModified();
 
-//    Latitude lat = surfacePoint.GetLatitude();
-//    Longitude lon = surfacePoint.GetLongitude();;
-//    Distance rad = surfacePoint.GetLocalRadius();
+//    Latitude lat = adjustedSurfacePoint.GetLatitude();
+//    Longitude lon = adjustedSurfacePoint.GetLongitude();;
+//    Distance rad = adjustedSurfacePoint.GetLocalRadius();
 
     // Loop for each measure to compute the error
     QList<QString> keys = measures->keys();
@@ -1272,9 +1356,9 @@ namespace Isis {
       // First compute the look vector in body-fixed coordinates
       double pB[3];
 
-      latrec_c((double) GetSurfacePoint().GetLocalRadius().GetKilometers(),
-               (double) GetSurfacePoint().GetLongitude().GetRadians(),
-               (double) GetSurfacePoint().GetLatitude().GetRadians(),
+      latrec_c((double) GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
+               (double) GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
+               (double) GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
                pB);
 
 
@@ -1552,8 +1636,8 @@ namespace Isis {
     return SurfacePointSourceToString(aprioriSurfacePointSource);
   }
 
-  SurfacePoint ControlPoint::GetSurfacePoint() const {
-    return surfacePoint;
+  SurfacePoint ControlPoint::GetAdjustedSurfacePoint() const {
+    return adjustedSurfacePoint;
   }
 
 
@@ -1843,7 +1927,10 @@ namespace Isis {
       p += PvlKeyword("AprioriZ", apriori.GetZ().GetMeters(), "meters");
 
       symmetric_matrix<double, upper> covar = apriori.GetRectangularMatrix();
-      if (covar(0, 0) != 0. || covar(1, 1) != 0. || covar(2, 2) != 0.) {
+//      if (covar(0, 0) != 0. || covar(1, 1) != 0. || covar(2, 2) != 0.) {
+      if (Displacement(covar(0, 0), Displacement::Meters).Valid() || 
+          Displacement(covar(1, 1), Displacement::Meters).Valid() ||
+          Displacement(covar(2, 2), Displacement::Meters).Valid()) {
         PvlKeyword matrix("AprioriCovarianceMatrix");
         matrix += covar(0, 0);
         matrix += covar(0, 1);
@@ -1853,10 +1940,22 @@ namespace Isis {
         matrix += covar(2, 2);
         p += matrix;
       }
+
+      if (constraintStatus.any()) {
+        if (constraintStatus.test(LatitudeConstrained)) 
+//        if (IsLatitudeConstrained()) 
+          p += PvlKeyword("LatitudeConstrained", "True");
+        if (constraintStatus.test(LongitudeConstrained))
+//        if (IsLongitudeConstrained())
+          p += PvlKeyword("LongitudeConstrained", "True");
+        if (constraintStatus.test(RadiusConstrained))
+//        if (IsRadiusConstrained())
+          p += PvlKeyword("RadiusConstrained", "True");
+      }
     }
 
-    if (surfacePoint.Valid()) {
-      const SurfacePoint &point = surfacePoint;
+    if (adjustedSurfacePoint.Valid()) {
+      const SurfacePoint &point = adjustedSurfacePoint;
 
       p += PvlKeyword("X", point.GetX().GetMeters(), "meters");
       p += PvlKeyword("Y", point.GetY().GetMeters(), "meters");
@@ -1865,7 +1964,7 @@ namespace Isis {
       symmetric_matrix<double, upper> covar = point.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(1, 1) != 0. ||
           covar(2, 2) != 0.) {
-        PvlKeyword matrix("ApostCovarianceMatrix");
+        PvlKeyword matrix("AdjustedCovarianceMatrix");
         matrix += covar(0, 0);
         matrix += covar(0, 1);
         matrix += covar(0, 2);
@@ -1971,7 +2070,7 @@ namespace Isis {
         other.aprioriRadiusSource  == aprioriRadiusSource &&
         other.aprioriRadiusSourceFile  == aprioriRadiusSourceFile &&
         other.aprioriSurfacePoint == aprioriSurfacePoint &&
-        other.surfacePoint == surfacePoint &&
+        other.adjustedSurfacePoint == adjustedSurfacePoint &&
         other.invalid == invalid &&
         other.measures == measures;
   }
@@ -2034,7 +2133,7 @@ namespace Isis {
     aprioriRadiusSource            = other.aprioriRadiusSource;
     aprioriRadiusSourceFile        = other.aprioriRadiusSourceFile;
     aprioriSurfacePoint            = other.aprioriSurfacePoint;
-    surfacePoint = other.surfacePoint;
+    adjustedSurfacePoint = other.adjustedSurfacePoint;
     numberOfRejectedMeasures = other.numberOfRejectedMeasures;
     constraintStatus = other.constraintStatus;
 
@@ -2152,30 +2251,50 @@ namespace Isis {
         covar(1, 2) = protoBufPt.aprioricovar(4);
         covar(2, 2) = protoBufPt.aprioricovar(5);
         apriori.SetRectangularMatrix(covar);
-      }
 
+        if (Displacement(covar(0,0), Displacement::Meters).Valid() ||
+            Displacement(covar(1,1), Displacement::Meters).Valid()) {
+          if (protoBufPt.latitudeconstrained()) 
+            constraintStatus.set(LatitudeConstrained);
+          if (protoBufPt.longitudeconstrained())
+            constraintStatus.set(LongitudeConstrained);
+          if (protoBufPt.radiusconstrained())
+            constraintStatus.set(RadiusConstrained);
+        }
+        else if (Displacement(covar(2,2), Displacement::Meters).Valid()) {
+          if (protoBufPt.latitudeconstrained()) 
+            constraintStatus.set(LatitudeConstrained);
+          if (protoBufPt.radiusconstrained())
+            constraintStatus.set(RadiusConstrained);
+        }
+        else
+          constraintStatus.reset();
+      }
       aprioriSurfacePoint = apriori;
     }
 
-    if (protoBufPt.has_x() && protoBufPt.has_y() && protoBufPt.has_z()) {
-      SurfacePoint apost(Displacement(protoBufPt.x(), Displacement::Meters),
-          Displacement(protoBufPt.y(), Displacement::Meters),
-          Displacement(protoBufPt.z(), Displacement::Meters));
+    if (protoBufPt.has_adjustedx() &&
+             protoBufPt.has_adjustedy() &&
+             protoBufPt.has_adjustedz()) {
+      SurfacePoint adjusted(
+          Displacement(protoBufPt.adjustedx(), Displacement::Meters),
+          Displacement(protoBufPt.adjustedy(), Displacement::Meters),
+          Displacement(protoBufPt.adjustedz(), Displacement::Meters));
 
-      if (protoBufPt.apostcovar_size() > 0) {
+      if (protoBufPt.adjustedcovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
         covar.resize(3);
         covar.clear();
-        covar(0, 0) = protoBufPt.aprioricovar(0);
-        covar(0, 1) = protoBufPt.aprioricovar(1);
-        covar(0, 2) = protoBufPt.aprioricovar(2);
-        covar(1, 1) = protoBufPt.aprioricovar(3);
-        covar(1, 2) = protoBufPt.aprioricovar(4);
-        covar(2, 2) = protoBufPt.aprioricovar(5);
-        apost.SetRectangularMatrix(covar);
+        covar(0, 0) = protoBufPt.adjustedcovar(0);
+        covar(0, 1) = protoBufPt.adjustedcovar(1);
+        covar(0, 2) = protoBufPt.adjustedcovar(2);
+        covar(1, 1) = protoBufPt.adjustedcovar(3);
+        covar(1, 2) = protoBufPt.adjustedcovar(4);
+        covar(2, 2) = protoBufPt.adjustedcovar(5);
+        adjusted.SetRectangularMatrix(covar);
       }
 
-      surfacePoint = apost;
+      adjustedSurfacePoint = adjusted;
     }
   }
 
@@ -2311,25 +2430,34 @@ namespace Isis {
         pbPoint.add_aprioricovar(covar(1, 2));
         pbPoint.add_aprioricovar(covar(2, 2));
       }
+      if (!constraintStatus.test(LatitudeConstrained))
+//      if (!IsLatitudeConstrained())
+        pbPoint.set_latitudeconstrained(false);
+      if (!constraintStatus.test(LongitudeConstrained))
+//      if (!IsLongitudeConstrained())
+        pbPoint.set_longitudeconstrained(false);
+      if (!constraintStatus.test(RadiusConstrained))
+//      if (!IsRadiusConstrained())
+        pbPoint.set_radiusconstrained(false);
     }
 
 
-    if (GetSurfacePoint().Valid()) {
-      SurfacePoint apost = GetSurfacePoint();
-      pbPoint.set_x(apost.GetX().GetMeters());
-      pbPoint.set_y(apost.GetY().GetMeters());
-      pbPoint.set_z(apost.GetZ().GetMeters());
+    if (GetAdjustedSurfacePoint().Valid()) {
+      SurfacePoint adjusted = GetAdjustedSurfacePoint();
+      pbPoint.set_adjustedx(adjusted.GetX().GetMeters());
+      pbPoint.set_adjustedy(adjusted.GetY().GetMeters());
+      pbPoint.set_adjustedz(adjusted.GetZ().GetMeters());
 
-      symmetric_matrix< double, upper > covar = apost.GetRectangularMatrix();
+      symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
           covar(0, 2) != 0. || covar(1, 1) != 0. ||
           covar(1, 2) != 0. || covar(2, 2) != 0.) {
-        pbPoint.add_apostcovar(covar(0, 0));
-        pbPoint.add_apostcovar(covar(0, 1));
-        pbPoint.add_apostcovar(covar(0, 2));
-        pbPoint.add_apostcovar(covar(1, 1));
-        pbPoint.add_apostcovar(covar(1, 2));
-        pbPoint.add_apostcovar(covar(2, 2));
+        pbPoint.add_adjustedcovar(covar(0, 0));
+        pbPoint.add_adjustedcovar(covar(0, 1));
+        pbPoint.add_adjustedcovar(covar(0, 2));
+        pbPoint.add_adjustedcovar(covar(1, 1));
+        pbPoint.add_adjustedcovar(covar(1, 2));
+        pbPoint.add_adjustedcovar(covar(2, 2));
       }
     }
 

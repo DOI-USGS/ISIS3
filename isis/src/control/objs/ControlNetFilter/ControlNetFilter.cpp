@@ -414,7 +414,7 @@ namespace Isis {
 
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       const ControlPoint *cPoint = mCNet->GetPoint(i);
-      SurfacePoint cPointSurfPt = cPoint->GetSurfacePoint();
+      SurfacePoint cPointSurfPt = cPoint->GetAdjustedSurfacePoint();
 
       if (!cPointSurfPt.Valid()) {
         const ControlMeasure *cm = cPoint->GetRefMeasure();
@@ -486,7 +486,7 @@ namespace Isis {
       double dSample1 = Isis::Null, dLine1 = Isis::Null;
 
       if (sUnits == "meters") {
-        surfacePt1 = cp1->GetSurfacePoint();
+        surfacePt1 = cp1->GetAdjustedSurfacePoint();
 
         if (!surfacePt1.Valid()) {
           string sn1 = cp1RefMeasure->GetCubeSerialNumber();
@@ -524,7 +524,7 @@ namespace Isis {
         double dSample2 = Isis::Null, dLine2 = Isis::Null;
 
         if (sUnits == "meters") {
-          surfacePt2 = cp2->GetSurfacePoint();
+          surfacePt2 = cp2->GetAdjustedSurfacePoint();
 
           if (!surfacePt2.Valid()) {
             string sn2 = cp2RefMeasure->GetCubeSerialNumber();

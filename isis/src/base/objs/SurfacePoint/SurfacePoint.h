@@ -63,6 +63,9 @@ namespace Isis {
    *           where we only have an x,y,z but no other data. Fixed a problem
    *           where points were not properly considered valid at some
    *           boundary conditions
+   * @history 2011-03-05 Ken Edmundson Added GetLatWeight, GetLonWeight, 
+   *           GetLocalRadiusWeight, and SetSphericalCoordinates methods for use
+   *           in BundleAdjust.
    */
 
   class SurfacePoint {
@@ -107,7 +110,7 @@ namespace Isis {
       void SetRectangularMatrix(
         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
 
-// Spherical loading utilites
+// Spherical loading utilities
 
       //! Set surface point and covariance matrix in planetocentric coordinates and convert to rectangular
       //! (Latitude, Longitude in degrees, Radius in meters; matrix in radians and radians**2)
@@ -120,6 +123,9 @@ namespace Isis {
           const Distance &radius,
           const boost::numeric::ublas::symmetric_matrix
             <double,boost::numeric::ublas::upper>& covar);
+
+      void SetSphericalCoordinates(const Latitude &lat, const Longitude &lon,
+                                   const Distance &radius);
 
       void SetSphericalMatrix(
         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
@@ -151,9 +157,12 @@ namespace Isis {
       Distance GetLocalRadius() const;
       Angle GetLatSigma() const;
       Distance GetLatSigmaDistance() const;
+      double GetLatWeight() const;
       Angle GetLonSigma() const;
       Distance GetLonSigmaDistance() const;
+      double GetLonWeight() const;
       Distance GetLocalRadiusSigma() const;
+      double GetLocalRadiusWeight() const;
       boost::numeric::ublas::symmetric_matrix
           <double,boost::numeric::ublas::upper> GetSphericalMatrix() const;
 

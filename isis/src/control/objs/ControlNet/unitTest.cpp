@@ -50,7 +50,7 @@ int main() {
           Distance(50, Distance::Meters),
           Distance(20, Distance::Meters));
 
-      cp->SetSurfacePoint(surfacePt);
+      cp->SetAdjustedSurfacePoint(surfacePt);
       cp->SetAprioriSurfacePoint(surfacePt);
     }
     else if (i == 1) {

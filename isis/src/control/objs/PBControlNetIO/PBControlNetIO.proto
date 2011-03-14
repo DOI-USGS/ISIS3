@@ -52,6 +52,9 @@ message PBControlNet {
     optional string               aprioriXYZSourceFile = 9;
     optional AprioriSource        aprioriRadiusSource = 10;
     optional string               aprioriRadiusSourceFile = 11;
+    optional bool                 latitudeConstrained = 22 [default = true];
+    optional bool                 longitudeConstrained = 23 [default = true];
+    optional bool                 radiusConstrained = 24 [default = true];
     optional double               aprioriX = 12;   // <meters>
     optional double               aprioriY = 13;   // <meters>
     optional double               aprioriZ = 14;   // <meters>
@@ -61,13 +64,13 @@ message PBControlNet {
     //  3 x 3 variance-covariance matrix.
     repeated double aprioriCovar = 15 [packed = true];
         
-    optional double         X = 16;
-    optional double         Y = 17;
-    optional double         Z = 18;
+    optional double         adjustedX = 16;
+    optional double         adjustedY = 17;
+    optional double         adjustedZ = 18;
 
-    //  Set in jigsaw.  Accuracy of apostiori lat/lon from basemap,user or mission SPICE
+    //  Set in jigsaw.  Accuracy of adjusted lat/lon from basemap,user or mission SPICE
     //  Stored as a 3 x 3 variance-covariance matrix.
-    repeated double apostCovar = 19 [packed = true];
+    repeated double adjustedCovar = 19 [packed = true];
 
      
 // Start of ControlMeasure definition

@@ -38,6 +38,7 @@ namespace Isis {
   class ControlMeasure;
   class ControlPoint;
   class ControlCubeGraphNode;
+  class Distance;
   class iString;
   class Progress;
   class SerialNumberList;
@@ -126,6 +127,14 @@ namespace Isis {
    *   @history 2011-02-23 Eric Hyer - Added some methods to support graphing
    *                calculations (RandomBFS, Shuffle, CalcBWAndCE, and
    *                GetNodeConnections).
+   *   @history 2011-03-08 Ken Edmundson - Added methods GetNumberOfMeasuresInImage,
+   *                GetNumberOfJigsawRejectedMeasuresInImage,
+   *                IncrementNumberOfRejectedMeasuresInImage,
+   *                DecrementNumberOfRejectedMeasuresInImage, and members
+   *                p_cameraMeasuresMap and p_cameraRejectedMeasuresMap.
+   *   @history 2011-03-12 Debbie A. Cook - Added member p_targetRadii and
+   *                method GetTargetRadii to support SurfacePoint sigma
+   *                conversions in ControlPoint.  
    */
   class ControlNet {
       friend class ControlPoint;
@@ -175,6 +184,10 @@ namespace Isis {
       int GetNumEditLockMeasures();
       int GetNumEditLockPoints();
       int GetNumIgnoredMeasures();
+      int GetNumberOfMeasuresInImage(const std::string &serialNumber);
+      int GetNumberOfJigsawRejectedMeasuresInImage(const std::string &serialNumber);
+      void IncrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber);
+      void DecrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber);
       int GetNumMeasures() const;
       int GetNumPoints() const;
       int GetNumValidMeasures();
@@ -182,6 +195,7 @@ namespace Isis {
       iString GetTarget() const;
       iString GetUserName() const;
       QList< QString > GetPointIds() const;
+      std::vector<Distance> GetTargetRadii();
 
       void SetCreatedDate(const iString &date);
       void SetDescription(const iString &newDescription);
@@ -231,7 +245,11 @@ namespace Isis {
       int p_numMeasures;          //!< Total number of measures in the network
       int p_numIgnoredMeasures;            //!< Number of ignored measures
       std::map<iString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
+      std::map<std::string,int> p_cameraMeasuresMap; //!< A map from serialnumber to #measures
+      std::map<std::string,int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
+                                                             //!  #rejected measures
       std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
+      std::vector<Distance> p_targetRadii;        //!< Radii of target body
 
       bool p_invalid;  //!< If the Control Network is currently invalid
   };

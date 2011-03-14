@@ -494,14 +494,29 @@ namespace Isis {
 
 
   /**
+   * Update spherical coordinates (lat/lon/radius)
+   *
+   * @param lat
+   * @param lon
+   * @param radius
+   *
+   */
+  void SurfacePoint::SetSphericalCoordinates(const Latitude &lat,
+                                                const Longitude &lon, const Distance &radius) {
+
+      SetSphericalPoint(lat, lon, radius);
+  }
+
+
+  /**
    * Set the spherical sigmas into the spherical variance/covariance matrix.
    *  
    * @param latSigma Latitude sigma of body-fixed coordinate of surface point 
    * @param lonSigma Longitude sigma of body-fixed coordinate of surface point 
    * @param radiusSigma Radius sigma of body-fixed coordinate of surface point 
    */
-  void SurfacePoint::SetSphericalSigmas(const Angle    &latSigma,
-                                        const Angle    &lonSigma,
+  void SurfacePoint::SetSphericalSigmas(const Angle &latSigma,
+                                        const Angle &lonSigma,
                                         const Distance &radiusSigma) {
     // Is any error checking necessary beyond Angle and Distance????
 
@@ -532,6 +547,7 @@ namespace Isis {
    */
   void SurfacePoint::SetSphericalSigmasDistance(const Distance &latSigma,
     const Distance &lonSigma, const Distance &radiusSigma) {
+
     if (!p_majorAxis || !p_minorAxis || !p_polarAxis || !p_majorAxis->Valid() ||
         !p_minorAxis->Valid() || !p_polarAxis->Valid()) {
       iString msg = "In order to use sigmas in meter units, the equitorial "
@@ -946,6 +962,55 @@ namespace Isis {
     return *p_sphereCovar;
   }
 
+
+  /**
+   * Return latitude weight for bundle adjustment
+   * Units are 1/(radians)^2
+   *
+   */
+  double SurfacePoint::GetLatWeight() const {
+    double dlatSigma = GetLatSigma().GetRadians();
+
+      if( dlatSigma <= 0.0 ) {
+          iString msg = "SurfacePoint::GetLatWeight(): Sigma <= 0.0";
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+
+      return 1.0/(dlatSigma*dlatSigma);
+  }
+
+  /**
+  * Return longitude weight for bundle adjustment
+  * Units are 1/(radians)^2
+  *
+  */
+  double SurfacePoint::GetLonWeight() const {
+    double dlonSigma = GetLonSigma().GetRadians();
+
+        if( dlonSigma <= 0.0 ) {
+            iString msg = "SurfacePoint::GetLonWeight(): Sigma <= 0.0";
+            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        }
+
+        return 1.0/(dlonSigma*dlonSigma);
+      }
+
+  /**
+  * Return radius weight for bundle adjustment
+  * Units are 1/(meters)^2
+  *
+  */
+  double SurfacePoint::GetLocalRadiusWeight() const {
+
+    double dlocalRadiusSigma = GetLocalRadiusSigma().GetKilometers();
+
+        if (dlocalRadiusSigma <= 0.0 ) {
+            iString msg = "SurfacePoint::GetRadWeight(): Sigma <= 0.0";
+            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        }
+
+        return 1.0/(dlocalRadiusSigma*dlocalRadiusSigma);
+      }
 
   /**
    * Computes and returns the distance between two surface points. This does
