@@ -50,6 +50,11 @@ void IsisMain ()
     throw iException::Message(iException::Io,msg, _FILEINFO_);
   }
 
+  std::string target;
+  if(ui.WasEntered("TARGET")) {
+    target = ui.GetString("TARGET");
+  }
+
 //  p.SetPdsFile (inFile.Expanded(),imageFile,pdsLabel);
 //  string labelFile = ui.GetFilename("FROM");
   p.SetPdsFile (inFile.Expanded(),imageFile,pdsLabel);
@@ -88,6 +93,12 @@ void IsisMain ()
   PvlTranslationManager instrumentXlater (labelPvl, transFile.Expanded());
   instrumentXlater.Auto(outLabel);
 
+  //  Update target if user specifies it
+  if (!target.empty()) {
+    PvlGroup &igrp = outLabel.FindGroup("Instrument",Pvl::Traverse);
+    igrp["TargetName"] = iString(target);
+  }
+
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label
   outcube->PutGroup(outLabel.FindGroup("BandBin",Pvl::Traverse));
@@ -115,6 +126,7 @@ void IsisMain ()
       throw iException::Message(iException::Io,msg, _FILEINFO_);
     }
   }
+
 
   PvlGroup kerns("Kernels");
   if (instid == "VIS") {

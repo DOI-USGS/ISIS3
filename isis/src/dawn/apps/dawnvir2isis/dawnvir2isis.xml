@@ -22,6 +22,9 @@
       <change name="Kris Becker" date="2011-03-09">
           Updated documentation
       </change>
+     <change name="Kris Becker" date="2011-03-14">
+          Added optional TARGET parameter to allow TargetName specification
+      </change>
   </history>
 
   <category>
@@ -81,6 +84,32 @@
          </filter>
        </parameter>
 
+    </group>
+    <group name="Parameters">
+        <parameter name="TARGET">
+            <type>string</type>
+            <brief>Provide target name if it needs to be changed</brief>
+            <description>
+                This parameter may be necessary as some EDR labels do not adequately defined
+                the TARGET_NAME keyword in the labels.  DAWN has a long cruise 
+                period before ariving at Vesta in August 2011.  During cruise, 
+                a Mars flyby and stellar observatoins will occur.  The proper 
+                specification of the TARGET_NAME is critical to valid 
+                instantiation of ISIS camera models. 
+
+                 There are many star observations being made and in order to 
+                 properly instantiate the ISIS camera model, the target must be 
+                 a recognized NAIF body or "Sky".  NAIF bodies provide the means 
+                 to map image coordinates to latitude/longitude values.  "Sky" 
+                 is a special instantiation within ISIS that provides the 
+                 ability to map image coordinates to RA/DEC coordinates.
+                
+                The default is to honor the value in the  EDR label.  For some 
+                observed targets, "Sky" would be required in order to properly 
+                instantiate the camera model.
+            </description>
+            <internalDefault>Label Value</internalDefault> 
+        </parameter>
     </group>
   </groups>
 </application>
