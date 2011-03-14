@@ -142,13 +142,17 @@ void IsisMain() {
       }
       else {
         // Get the lat/long coords from the current control point
-        latitude = point->GetSurfacePoint().GetLatitude().GetDegrees();
-        longitude = point->GetSurfacePoint().GetLongitude().GetDegrees();
+        latitude = point->GetAprioriSurfacePoint().GetLatitude().GetDegrees();
+        longitude = point->GetAprioriSurfacePoint().GetLongitude().GetDegrees();
         if(latitude == Null  ||  longitude == Null) {
-          std::string msg = "Unable to retreive lat/lon from Control Point [";
-          msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
-          msg += "all Control Points have Latitude/Longitude keywords.";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          latitude = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+          longitude = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+          if(latitude == Null  ||  longitude == Null) {
+            std::string msg = "Unable to retreive lat/lon from Control Point [";
+            msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
+            msg += "all Control Points have Latitude/Longitude keywords.";
+            throw iException::Message(iException::User, msg, _FILEINFO_);
+          }
         }
       }
 
