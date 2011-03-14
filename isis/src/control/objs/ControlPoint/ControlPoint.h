@@ -27,7 +27,6 @@
 #include <bitset>
 
 #include "iString.h"
-#include "ControlMeasure.h"
 #include "SurfacePoint.h"
 
 template< typename A, typename B > class QHash;
@@ -35,6 +34,7 @@ template< typename A, typename B > class QHash;
 class QStringList;
 
 namespace Isis {
+  class ControlMeasure;
   class ControlNet;
   class Latitude;
   class Longitude;
@@ -235,6 +235,8 @@ namespace Isis {
    *            notified when a point's ignored status changes for updating
    *            its cube connection graph (cube connections were not respecting
    *            ignored flags on points / measures).
+   *   @history 2011-03-14 Christopher Austin - Added GetBestSurfacePoint to
+   *            reduce external duplicate code.
    */
   class ControlPoint {
       friend class ControlNet;
@@ -379,6 +381,8 @@ namespace Isis {
       Status ComputeResiduals();
       Status ComputeResiduals_Millimeters();
 
+      SurfacePoint GetAdjustedSurfacePoint() const;
+      SurfacePoint GetBestSurfacePoint() const;
       iString GetChooserName() const;
       iString GetDateTime() const;
       bool IsEditLocked() const;
@@ -387,7 +391,6 @@ namespace Isis {
       bool IsIgnored() const;
       bool IsValid() const;
       bool IsInvalid() const;
-      SurfacePoint GetAdjustedSurfacePoint() const;
       PointType GetType() const;
       bool IsGround() const;
 

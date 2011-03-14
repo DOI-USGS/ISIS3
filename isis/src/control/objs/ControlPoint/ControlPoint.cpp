@@ -13,6 +13,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "Cube.h"
 #include "iString.h"
@@ -1441,6 +1442,23 @@ namespace Isis {
   }
 
 
+  SurfacePoint ControlPoint::GetAdjustedSurfacePoint() const {
+    return adjustedSurfacePoint;
+  }
+
+
+  /**
+   * Returns the adjusted surface point if it exists, otherwise returns
+   * the a priori surface point.
+   */
+  SurfacePoint ControlPoint::GetBestSurfacePoint() const {
+    if(adjustedSurfacePoint.Valid())
+      return adjustedSurfacePoint;
+    else
+      return aprioriSurfacePoint;
+  }
+
+
   /**
    * Return the Id of the control point
    *
@@ -1652,10 +1670,6 @@ namespace Isis {
    */
   iString ControlPoint::GetSurfacePointSourceString() const {
     return SurfacePointSourceToString(aprioriSurfacePointSource);
-  }
-
-  SurfacePoint ControlPoint::GetAdjustedSurfacePoint() const {
-    return adjustedSurfacePoint;
   }
 
 
