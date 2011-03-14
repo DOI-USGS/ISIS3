@@ -7,7 +7,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) CNET=$(INPUT)/AS15_Rev4_Reg_wLOLA.edited.net \
 	  DEM=$(INPUT)/ldem_8ppd_LATneg15to0_LON140to180.cub \
-	  TO=$(OUTPUT)/outputcnet.pvl \
+	  TO=$(OUTPUT)/outputcnet.pvl getlatlon=adjusted \
 	  networkid=ErrorsTestCase_CnetNewRadii \
 	  errors=errors.pvl \
 	  -preference=$$ISISROOT/src/base/objs/Preference/TestPreferences \

@@ -17,6 +17,8 @@
 using namespace std;
 using namespace Isis;
 
+enum GetLatLon { Adjusted, Apriori };
+
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   ControlNet cnet(ui.GetFilename("CNET"));
@@ -34,6 +36,20 @@ void IsisMain() {
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
+  GetLatLon newRadiiSource;
+  iString getLatLon = iString(ui.GetAsString("GETLATLON")).UpCase();
+  if (getLatLon == "ADJUSTED") {
+      newRadiiSource = Adjusted;
+  }
+  else if (getLatLon == "APRIORI") {
+      newRadiiSource = Apriori;
+  }
+  else {
+      string msg = "The value for parameter GETLATLON [";
+      msg += ui.GetAsString("GETLATLON") + "] must be provided.";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
   int numSuccesses = 0;
   int numFailures = 0;
   string failedIDs = "";
@@ -43,7 +59,11 @@ void IsisMain() {
 
     if(cp->GetType() == ControlPoint::Ground) {
       // Create Brick on samp, line to get the dn value of the pixel
-      SurfacePoint surfacePt = cp->GetSurfacePoint();
+      SurfacePoint surfacePt;
+      if (newRadiiSource == Adjusted)
+        surfacePt = cp->GetAdjustedSurfacePoint();
+      else if (newRadiiSource == Apriori)
+        surfacePt = cp->GetAprioriSurfacePoint();
       bool success = surfacePt.Valid();
 
       if(success) {
@@ -72,11 +92,12 @@ void IsisMain() {
       else {
         numSuccesses++;
         surfacePt.ResetLocalRadius(Distance(b[0], Distance::Meters));
-        cp->SetSurfacePoint(surfacePt);
+        if (newRadiiSource == Adjusted)
+          cp->SetAdjustedSurfacePoint(surfacePt);
+        else if (newRadiiSource == Apriori)
+          cp->SetAprioriSurfacePoint(surfacePt);
       }
     }
-
-    //cnet.UpdatePoint(cp); // Redesign fixed this
   }
 
   delete ugm;
