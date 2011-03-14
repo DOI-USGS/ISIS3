@@ -80,6 +80,9 @@
     <change name="Christopher Austin" date="2011-02-18">
       Added the TOLIST parameter.
     </change>
+    <change name="Christopher Austin" date="2011-03-14">
+      Changed to use SurfacePoints instead of lat/lon calculations.
+    </change>
   </history>
 
   <groups>

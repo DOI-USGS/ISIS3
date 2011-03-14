@@ -15,6 +15,7 @@
 #include "Pvl.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
+#include "SurfacePoint.h"
 #include "UserInterface.h"
 
 #include <map>
@@ -24,7 +25,7 @@ using namespace Isis;
 
 void SetControlPointLatLon(const std::string &incubes, const std::string &cnet);
 
-std::map< std::string, std::pair<double, double> > p_pointLatLon;
+std::map< std::string, SurfacePoint > p_surfacePoints;
 std::map< int, std::set<std::string> > p_modifiedMeasures;
 
 void IsisMain() {
@@ -133,30 +134,24 @@ void IsisMain() {
         }
       }
 
-      double latitude;
-      double longitude;
+      SurfacePoint cpSurfacePoint;
       if(retrievalOpt == "REFERENCE") {
         // Get the lat/long coords from the existing reference measure
-        latitude = p_pointLatLon[point->GetId()].first;
-        longitude = p_pointLatLon[point->GetId()].second;
+        cpSurfacePoint = p_surfacePoints[point->GetId()];
       }
       else {
-        // Get the lat/long coords from the current control point
-        latitude = point->GetAprioriSurfacePoint().GetLatitude().GetDegrees();
-        longitude = point->GetAprioriSurfacePoint().GetLongitude().GetDegrees();
-        if(latitude == Null  ||  longitude == Null) {
-          latitude = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-          longitude = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-          if(latitude == Null  ||  longitude == Null) {
-            std::string msg = "Unable to retreive lat/lon from Control Point [";
-            msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
-            msg += "all Control Points have Latitude/Longitude keywords.";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
-          }
+        // Get the surface point from the current control point
+        cpSurfacePoint = point->GetBestSurfacePoint();
+        if(not cpSurfacePoint.Valid()) {
+          std::string msg = "Unable to retreive lat/lon from Control Point [";
+          msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
+          msg += "all Control Points have Latitude/Longitude keywords.";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
         }
       }
 
-      if(cam->SetUniversalGround(latitude, longitude)) {
+      //if(cam->SetUniversalGround(latitude, longitude)) {
+      if(cam->SetGround(cpSurfacePoint)) {
 
         // Make sure the samp & line are inside the image
         if(cam->InCube()) {
@@ -393,8 +388,7 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
     Cube *cube = manager.OpenCube(snl.Filename(cm->GetCubeSerialNumber()));
     try {
       cube->Camera()->SetImage(cm->GetSample(), cm->GetLine());
-      p_pointLatLon[point->GetId()].first = cube->Camera()->UniversalLatitude();
-      p_pointLatLon[point->GetId()].second = cube->Camera()->UniversalLongitude();
+      p_surfacePoints[point->GetId()] = cube->Camera()->GetSurfacePoint();
     }
     catch(iException &e) {
       std::string msg = "Unable to create camera for cube file [";
