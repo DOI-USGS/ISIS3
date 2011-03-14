@@ -9,6 +9,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "CubeManager.h"
