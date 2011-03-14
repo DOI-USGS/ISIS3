@@ -231,6 +231,10 @@ namespace Isis {
    *            adjustedSurfacePoint.  Also changed methods SetSurfacePoint to
    *            SetAdjustedSurfacePoint and GetSurfacePoint to
    *            GetAdjustedSurfacePoint.
+   *   @history 2011-03-14 Eric Hyer - Added GetMeasures method.  Network now
+   *            notified when a point's ignored status changes for updating
+   *            its cube connection graph (cube connections were not respecting
+   *            ignored flags on points / measures).
    */
   class ControlPoint {
       friend class ControlNet;
@@ -421,7 +425,7 @@ namespace Isis {
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
 
-
+      QList< ControlMeasure * > GetMeasures() const;
       QList< QString > GetCubeSerialNumbers() const;
 
       PvlObject ToPvlObject() const;
