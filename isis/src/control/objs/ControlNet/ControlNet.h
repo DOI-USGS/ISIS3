@@ -23,6 +23,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QObject> // parent class
+
 #include "PBControlNetIO.pb.h"
 
 #include "iString.h"
@@ -134,10 +136,16 @@ namespace Isis {
    *                p_cameraMeasuresMap and p_cameraRejectedMeasuresMap.
    *   @history 2011-03-12 Debbie A. Cook - Added member p_targetRadii and
    *                method GetTargetRadii to support SurfacePoint sigma
-   *                conversions in ControlPoint.  
+   *                conversions in ControlPoint.
+   *   @history 2011-03-14 Eric Hyer - Cube connection graph now updated when
+   *                points or measures are ignored.
    */
-  class ControlNet {
+  class ControlNet : public QObject {
+      Q_OBJECT
+
+      friend class ControlMeasure;
       friend class ControlPoint;
+
     public:
       ControlNet();
       ControlNet(const ControlNet &other);
@@ -214,6 +222,10 @@ namespace Isis {
       ControlPoint *operator[](int id);
 
 
+    signals:
+      void connectivityChanged();
+
+
     private:
       void Nullify();
       void ValidateSerialNumber(iString serialNumber) const;
@@ -245,9 +257,9 @@ namespace Isis {
       int p_numMeasures;          //!< Total number of measures in the network
       int p_numIgnoredMeasures;            //!< Number of ignored measures
       std::map<iString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
-      std::map<std::string,int> p_cameraMeasuresMap; //!< A map from serialnumber to #measures
-      std::map<std::string,int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
-                                                             //!  #rejected measures
+      std::map<std::string, int> p_cameraMeasuresMap; //!< A map from serialnumber to #measures
+      std::map<std::string, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
+      //!  #rejected measures
       std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
       std::vector<Distance> p_targetRadii;        //!< Radii of target body
 

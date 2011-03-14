@@ -535,9 +535,14 @@ namespace Isis {
     pointIds->append(pointId);
 
     point->parentNetwork = this;
-    QList< QString > pointsSerials = point->GetCubeSerialNumbers();
-    for (int i = 0; i < pointsSerials.size(); i++)
-      MeasureAdded(point->GetMeasure(pointsSerials[i]));
+
+    // notify control network of new (non-ignored) measures
+    if (!point->IsIgnored()) {
+      foreach(ControlMeasure * measure, point->GetMeasures()) {
+        if (!measure->IsIgnored())
+          MeasureAdded(measure);
+      }
+    }
   }
 
 
@@ -584,6 +589,8 @@ namespace Isis {
       csn->addMeasure(measure);
       cubeGraphNodes->insert(measure->GetCubeSerialNumber(), csn);
     }
+
+    emit connectivityChanged();
   }
 
 
@@ -605,6 +612,8 @@ namespace Isis {
       delete csn;
       csn = NULL;
     }
+
+    emit connectivityChanged();
   }
 
 
@@ -746,9 +755,12 @@ namespace Isis {
     ControlPoint *point = (*points)[pointId];
 
     // notify CubeSerialNumbers of the loss of this point
-    QList< QString > pointsSerials = point->GetCubeSerialNumbers();
-    for (int i = 0; i < pointsSerials.size(); i++)
-      MeasureDeleted(point->GetMeasure(pointsSerials[i]));
+    if (!point->IsIgnored()) {
+      foreach(ControlMeasure * measure, point->GetMeasures()) {
+        if (!measure->IsIgnored())
+          MeasureDeleted(measure);
+      }
+    }
 
     // See if removing this point qualifies for a re-check of validity
     bool check = false;
@@ -1162,7 +1174,7 @@ namespace Isis {
    * @return Number of valid measures in image
    */
   int ControlNet::GetNumberOfMeasuresInImage(const std::string &serialNumber) {
-      return p_cameraMeasuresMap[serialNumber];
+    return p_cameraMeasuresMap[serialNumber];
   }
 
 
@@ -1172,16 +1184,16 @@ namespace Isis {
    * @return Number of jigsaw rejected measures in image
    */
   int ControlNet::GetNumberOfJigsawRejectedMeasuresInImage(const std::string &serialNumber) {
-      return p_cameraRejectedMeasuresMap[serialNumber];
+    return p_cameraRejectedMeasuresMap[serialNumber];
   }
 
 
-/**
- * Increment number of jigsaw rejected measures in image specified by serialNumber
- *
- */
+  /**
+   * Increment number of jigsaw rejected measures in image specified by serialNumber
+   *
+   */
   void ControlNet::IncrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber) {
-      p_cameraRejectedMeasuresMap[serialNumber]++;
+    p_cameraRejectedMeasuresMap[serialNumber]++;
   }
 
 
@@ -1190,8 +1202,8 @@ namespace Isis {
    *
    */
   void ControlNet::DecrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber) {
-      if ( p_cameraRejectedMeasuresMap[serialNumber] > 0 )
-          p_cameraRejectedMeasuresMap[serialNumber]--;
+    if (p_cameraRejectedMeasuresMap[serialNumber] > 0)
+      p_cameraRejectedMeasuresMap[serialNumber]--;
   }
 
 
@@ -1392,11 +1404,11 @@ namespace Isis {
     p_targetName = target;
     PvlGroup pvlRadii = Projection::TargetRadii(target);
     p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-                                     Distance::Meters));
+        Distance::Meters));
     // The method Projection::Radii does not provide the B radius
-  p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-                                   Distance::Meters));
-  p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"], Distance::Meters));
+    p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
+        Distance::Meters));
+    p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"], Distance::Meters));
   }
 
 
