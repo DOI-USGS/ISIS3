@@ -28,6 +28,7 @@
 #include "Application.h"
 #include "Camera.h"
 #include "ControlMeasureLogData.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlCubeGraphNode.h"
 #include "iString.h"
@@ -567,11 +568,23 @@ namespace Isis {
   }
 
 
-  ControlMeasure::Status ControlMeasure::SetIgnored(bool ignore) {
+  ControlMeasure::Status ControlMeasure::SetIgnored(bool newIgnoreStatus) {
     if (p_editLock)
       return MeasureLocked;
-    MeasureModified();
-    p_ignore = ignore;
+    
+    bool oldStatus = p_ignore;
+    p_ignore = newIgnoreStatus;
+    
+    // only update if there was a change in status
+    if (oldStatus != p_ignore) {
+      MeasureModified();
+      if (parentPoint && parentPoint->Parent())
+      {
+        ControlNet * cnet = parentPoint->Parent();
+        p_ignore ? cnet->MeasureDeleted(this) : cnet->MeasureAdded(this);
+      }
+    }
+    
     return Success;
   }
 

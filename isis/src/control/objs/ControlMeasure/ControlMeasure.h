@@ -146,6 +146,8 @@ namespace Isis {
    *   @history 2011-03-01 Eric Hyer - Added StringToMeasureType method
    *   @history 2011-03-04 Tracie Sucharski - Fixed bug in DeleteLogData method,
    *                               subtract 1 from size() in the loop.
+   *   @history 2011-03-14 Eric Hyer - ControlMeasures now notify their network
+   *                when their ignored status changes.
    */
   class ControlMeasure {
       friend class ControlPoint;
@@ -238,7 +240,7 @@ namespace Isis {
       Status SetEditLock(bool editLock);
       Status SetFocalPlaneMeasured(double x, double y);
       Status SetFocalPlaneComputed(double x, double y);
-      Status SetIgnored(bool ignore);
+      Status SetIgnored(bool newIgnoredStatus);
       Status SetLineSigma(double lineSigma);
       Status SetRejected(bool rejected);
       Status SetResidual(double sampResidual, double lineResidual);
