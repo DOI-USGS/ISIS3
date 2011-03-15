@@ -48,8 +48,8 @@ message PBControlNet {
     optional bool           jigsawRejected = 7 [default = false];
     optional int32          referenceIndex = 21;
 
-    optional AprioriSource        aprioriXYZSource = 8; 
-    optional string               aprioriXYZSourceFile = 9;
+    optional AprioriSource        aprioriSurfPointSource = 8; 
+    optional string               aprioriSurfPointSourceFile = 9;
     optional AprioriSource        aprioriRadiusSource = 10;
     optional string               aprioriRadiusSourceFile = 11;
     optional bool                 latitudeConstrained = 22 [default = true];
@@ -63,7 +63,7 @@ message PBControlNet {
     //   jigsaw weights based on these values. The sigmas are stored as a
     //  3 x 3 variance-covariance matrix.
     repeated double aprioriCovar = 15 [packed = true];
-        
+
     optional double         adjustedX = 16;
     optional double         adjustedY = 17;
     optional double         adjustedZ = 18;
@@ -72,7 +72,7 @@ message PBControlNet {
     //  Stored as a 3 x 3 variance-covariance matrix.
     repeated double adjustedCovar = 19 [packed = true];
 
-     
+
 // Start of ControlMeasure definition
     message PBControlMeasure {
       enum MeasureType {

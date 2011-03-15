@@ -237,6 +237,9 @@ namespace Isis {
    *            ignored flags on points / measures).
    *   @history 2011-03-14 Christopher Austin - Added GetBestSurfacePoint to
    *            reduce external duplicate code.
+   *   @history 2011-03-15 Steven Lambright - Now writes AdjustedX, AdjustedY,
+   *            and AdjustedZ to the pvl format. Also updated proto buffer calls
+   *            to reflect naming changes.
    */
   class ControlPoint {
       friend class ControlNet;

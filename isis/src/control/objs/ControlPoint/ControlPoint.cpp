@@ -58,6 +58,12 @@ namespace Isis {
     constraintStatus.reset();
   }
 
+
+  /**
+   * Copy the given control point into this instance.
+   *
+   * @param other The control point to duplicate
+   */
   ControlPoint::ControlPoint(const ControlPoint &other) {
     measures = NULL;
     cubeSerials = NULL;
@@ -101,6 +107,12 @@ namespace Isis {
     constraintStatus = other.constraintStatus;
   }
 
+
+  /**
+   * This is used when reading from a protocol buffer. Given a file
+   *   representation (protocol buffer), construct the control point.
+   *   This constructor should be able to go away soon.
+   */
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt) {
     measures = NULL;
     cubeSerials = NULL;
@@ -129,6 +141,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This is used when reading from a protocol buffer. Given a file
+   *   representation (protocol buffer), and log data,
+   *   construct the control point.
+   */
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt,
       const PBControlNetLogData_Point &logProtoBuf) {
     measures = NULL;
@@ -402,7 +419,8 @@ namespace Isis {
                                       targetRadii[2]);
     }
 
-    else if (p.HasKeyword("AdjustedX") && p.HasKeyword("AdjustedY") && p.HasKeyword("AdjustedZ")) {
+    else if (p.HasKeyword("AdjustedX") && p.HasKeyword("AdjustedY") &&
+             p.HasKeyword("AdjustedZ")) {
       adjustedSurfacePoint.SetRectangular(
         Displacement(p["AdjustedX"], Displacement::Meters),
         Displacement(p["AdjustedY"], Displacement::Meters),
@@ -590,6 +608,11 @@ namespace Isis {
     AddMeasure(measure);
   }
 
+
+  /**
+   * Do the actual work of adding a measure to this point, without changing
+   *   any extra data.
+   */
   void ControlPoint::AddMeasure(ControlMeasure *measure) {
     // Make sure measure is unique
     foreach(ControlMeasure * m, measures->values()) {
@@ -777,6 +800,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the measure that is the reference directly.
+   */
   ControlMeasure *ControlPoint::GetRefMeasure() {
     if (referenceMeasure == NULL) {
       iString msg = "Control point [" + GetId() + "] has no reference measure!";
@@ -1094,6 +1120,7 @@ namespace Isis {
     aprioriSurfacePointSourceFile = sourceFile;
     return Success;
   }
+
 
   /**
    * This method computes the apriori lat/lon for a point.  It computes this
@@ -1967,6 +1994,7 @@ namespace Isis {
       p += PvlKeyword("AprioriZ", apriori.GetZ().GetMeters(), "meters");
 
       symmetric_matrix<double, upper> covar = apriori.GetRectangularMatrix();
+      // This is problematic and needs fixed
 //      if (covar(0, 0) != 0. || covar(1, 1) != 0. || covar(2, 2) != 0.) {
       if (Displacement(covar(0, 0), Displacement::Meters).Valid() || 
           Displacement(covar(1, 1), Displacement::Meters).Valid() ||
@@ -1997,9 +2025,9 @@ namespace Isis {
     if (adjustedSurfacePoint.Valid()) {
       const SurfacePoint &point = adjustedSurfacePoint;
 
-      p += PvlKeyword("X", point.GetX().GetMeters(), "meters");
-      p += PvlKeyword("Y", point.GetY().GetMeters(), "meters");
-      p += PvlKeyword("Z", point.GetZ().GetMeters(), "meters");
+      p += PvlKeyword("AdjustedX", point.GetX().GetMeters(), "meters");
+      p += PvlKeyword("AdjustedY", point.GetY().GetMeters(), "meters");
+      p += PvlKeyword("AdjustedZ", point.GetZ().GetMeters(), "meters");
 
       symmetric_matrix<double, upper> covar = point.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(1, 1) != 0. ||
@@ -2206,8 +2234,8 @@ namespace Isis {
     jigsawRejected = protoBufPt.jigsawrejected();
 
     // Read apriori keywords
-    if (protoBufPt.has_apriorixyzsource()) {
-      switch (protoBufPt.apriorixyzsource()) {
+    if (protoBufPt.has_apriorisurfpointsource()) {
+      switch (protoBufPt.apriorisurfpointsource()) {
         case PBControlNet_PBControlPoint_AprioriSource_None:
           aprioriSurfacePointSource = SurfacePointSource::None;
           break;
@@ -2238,8 +2266,8 @@ namespace Isis {
       }
     }
 
-    if (protoBufPt.has_apriorixyzsourcefile()) {
-      aprioriSurfacePointSourceFile = protoBufPt.apriorixyzsourcefile();
+    if (protoBufPt.has_apriorisurfpointsourcefile()) {
+      aprioriSurfacePointSourceFile = protoBufPt.apriorisurfpointsourcefile();
     }
 
     if (protoBufPt.has_aprioriradiussource()) {
@@ -2408,25 +2436,25 @@ namespace Isis {
       case ControlPoint::SurfacePointSource::None:
         break;
       case ControlPoint::SurfacePointSource::User:
-        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_User);
+        pbPoint.set_apriorisurfpointsource(PBControlNet_PBControlPoint_AprioriSource_User);
         break;
       case ControlPoint::SurfacePointSource::AverageOfMeasures:
-        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures);
+        pbPoint.set_apriorisurfpointsource(PBControlNet_PBControlPoint_AprioriSource_AverageOfMeasures);
         break;
       case ControlPoint::SurfacePointSource::Reference:
-        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_Reference);
+        pbPoint.set_apriorisurfpointsource(PBControlNet_PBControlPoint_AprioriSource_Reference);
         break;
       case ControlPoint::SurfacePointSource::Basemap:
-        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_Basemap);
+        pbPoint.set_apriorisurfpointsource(PBControlNet_PBControlPoint_AprioriSource_Basemap);
         break;
       case ControlPoint::SurfacePointSource::BundleSolution:
-        pbPoint.set_apriorixyzsource(PBControlNet_PBControlPoint_AprioriSource_BundleSolution);
+        pbPoint.set_apriorisurfpointsource(PBControlNet_PBControlPoint_AprioriSource_BundleSolution);
         break;
       default:
         break;
     }
     if (!GetAprioriSurfacePointSourceFile().empty()) {
-      pbPoint.set_apriorixyzsourcefile(GetAprioriSurfacePointSourceFile());
+      pbPoint.set_apriorisurfpointsourcefile(GetAprioriSurfacePointSourceFile());
     }
     switch (GetAprioriRadiusSource()) {
       case ControlPoint::RadiusSource::None:

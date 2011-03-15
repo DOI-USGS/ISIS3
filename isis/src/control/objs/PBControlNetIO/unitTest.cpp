@@ -34,8 +34,8 @@ int main () {
   pbPoint->set_type(PBControlNet_PBControlPoint::Ground);
   pbPoint->set_choosername("autoseed");
   pbPoint->set_editlock(true);
-  pbPoint->set_apriorixyzsource(PBControlNet_PBControlPoint::Basemap);
-  pbPoint->set_apriorixyzsourcefile("basemap.cub");
+  pbPoint->set_apriorisurfpointsource(PBControlNet_PBControlPoint::Basemap);
+  pbPoint->set_apriorisurfpointsourcefile("basemap.cub");
   pbPoint->set_aprioriradiussource(PBControlNet_PBControlPoint::DEM);
   pbPoint->set_aprioriradiussourcefile("$base/dems/ulcn2005_clean.cub");
   pbPoint->set_apriorix(-424.024048);
