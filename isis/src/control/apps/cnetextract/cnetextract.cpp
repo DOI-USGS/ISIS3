@@ -488,7 +488,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
   for(int cp = outNet.GetNumPoints() - 1; cp >= 0; cp --) {
     progress.CheckStatus();
     const ControlPoint *controlPt = outNet.GetPoint(cp);
-    SurfacePoint surfacePt = controlPt->GetSurfacePoint();
+    SurfacePoint surfacePt = controlPt->GetBestSurfacePoint();
 
     // If the Contorl Network takes priority, use it
     //Latitude pointLat(controlPt.UniversalLatitude(),Angle::Degrees);
@@ -572,9 +572,9 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
             remove = true;
           }
 
-          lat = Latitude(camera->UniversalLatitude(), Angle::Degrees);
-          lon = Longitude(camera->UniversalLongitude(), Angle::Degrees);
-          radius = Distance(camera->LocalRadius());
+          lat = camera->GetLatitude();
+          lon = camera->GetLongitude();
+          radius = camera->LocalRadius();
 
           camera = NULL;
         }
@@ -593,7 +593,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
           outNet.DeletePoint(cp);
         }
         else if(validLatLonRadius) { // Add the reference lat/lon/radius to the Control Point
-          outNet.GetPoint(cp)->SetSurfacePoint(SurfacePoint(lat, lon, radius));
+          outNet.GetPoint(cp)->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
         }
       }
     }
