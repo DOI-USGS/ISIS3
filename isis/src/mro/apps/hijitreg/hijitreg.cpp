@@ -186,7 +186,8 @@ void IsisMain() {
   string transSN = SerialNumber::Compose(trans, true);
   string matchSN = SerialNumber::Compose(match, true);
 
-  cn.SetTarget(transSN);
+  PvlGroup &instrument = trans.Label()->FindGroup("Instrument", Pvl::Traverse);
+  cn.SetTarget(instrument["TargetName"][0]);
   cn.SetDescription("Records s/c jitter between two adjacent HiRISE images");
 
 //  Set up results parameter saves
