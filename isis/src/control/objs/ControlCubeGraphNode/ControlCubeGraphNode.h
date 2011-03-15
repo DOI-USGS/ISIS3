@@ -55,6 +55,8 @@ namespace Isis {
    *                the same parent (point) as measures here.
    *   @history 2011-02-22 Eric Hyer - Added isConnected() and
    *                getAdjacentNodes methods
+   *   @history 2011-03-15 Eric Hyer - Connections handled more simply - fixed
+   *                connection related bugs
    *
    */
   class ControlCubeGraphNode {
@@ -65,12 +67,12 @@ namespace Isis {
 
       void addMeasure(ControlMeasure *measure);
       void removeMeasure(ControlMeasure *measure);
-      void addConnection(ControlMeasure *measure);
-      void removeConnection(ControlMeasure *measure);
+      void addConnection(ControlCubeGraphNode *, ControlPoint *);
+      void removeConnection(ControlCubeGraphNode *, ControlPoint *);
 
       bool contains(ControlPoint *point);
       iString getSerialNumber();
-      int size();
+      int getNumMeasures();
       QList< ControlMeasure * > getMeasures() const;
       QList< ControlCubeGraphNode * > getAdjacentNodes() const;
       bool isConnected(ControlCubeGraphNode *other) const;
@@ -82,25 +84,24 @@ namespace Isis {
 
       const ControlCubeGraphNode &operator=(ControlCubeGraphNode);
 
+      void printConnections() const;
+
 
     private:
       void nullify();
-      void updateConnections(void
-          (ControlCubeGraphNode::*updateFunc)(ControlMeasure *),
-          ControlMeasure *measure);
 
 
     private:
       iString *serialNumber;
 
-      //! ControlMeasures hashed by ControlPoint ID
+      //! ControlMeasures hashed by ControlPoint
       QHash< ControlPoint *, ControlMeasure * > * measures;
 
       /**
-       * Stores a list of ControlMeasures which establish a conection to the
+       * Stores a list of ControlPoints which establish a conection to the
        * ControlCubeGraphNode that the list is hashed by
        */
-      QHash< ControlCubeGraphNode *, QList< ControlMeasure * > > * connections;
+      QHash< ControlCubeGraphNode *, QList< ControlPoint * > > * connections;
 
   };
 }
