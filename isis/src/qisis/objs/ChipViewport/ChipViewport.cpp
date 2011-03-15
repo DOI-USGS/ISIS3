@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QPainter>
 
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Cube.h"
