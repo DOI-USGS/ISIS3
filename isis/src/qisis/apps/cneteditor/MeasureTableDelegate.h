@@ -38,7 +38,7 @@ namespace Isis
 
     signals:
       void dataEdited() const;
-
+      
 
     private:
       MeasureTableModel * tableModel;

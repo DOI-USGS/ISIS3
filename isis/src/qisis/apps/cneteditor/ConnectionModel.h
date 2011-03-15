@@ -35,6 +35,10 @@ namespace Isis
       int rowCount(const QModelIndex & parent = QModelIndex()) const;
       int columnCount(const QModelIndex & parent = QModelIndex()) const;
 
+      
+    private slots:
+      void rebuildItems();
+      
 
     private:
       TreeItem * getItem(const QModelIndex & index) const;

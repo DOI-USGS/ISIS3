@@ -32,6 +32,8 @@
 #include "SerialModel.h"
 #include "TreeItem.h"
 
+#include <QPushButton>
+
 
 using std::cerr;
 
@@ -110,6 +112,8 @@ namespace Isis
     editPointView->setModel(editPointModel);
     connect(editPointModel, SIGNAL(dataChanged(const QModelIndex &,
         const QModelIndex &)), editPointView, SLOT(resizeColumnsToContents()));
+//     connect(editPointModel, SIGNAL(dataChanged(const QModelIndex &,
+//         const QModelIndex &)), connectionModel, SLOT(rebuildItems()));
     editPointDelegate = new PointTableDelegate(editPointModel, editPointView);
     connect(editPointDelegate, SIGNAL(dataEdited()),
         this, SIGNAL(cnetModified()));
@@ -149,7 +153,7 @@ namespace Isis
     editMeasureBox->setLayout(editMeasureLayout);
 
 
-    QSplitter * topSplitter = new QSplitter(Qt::Horizontal);
+    topSplitter = new QSplitter(Qt::Horizontal);
     topSplitter->addWidget(pointView);
     topSplitter->addWidget(serialView);
     topSplitter->addWidget(connectionView);
@@ -158,6 +162,10 @@ namespace Isis
     mainSplitter->addWidget(topSplitter);
     mainSplitter->addWidget(editPointBox);
     mainSplitter->addWidget(editMeasureBox);
+    
+//     QPushButton * button = new QPushButton("push me");
+//     connect(button, SIGNAL(clicked()), this, SLOT(blah()));
+//     mainSplitter->addWidget(button);
 //     mainSplitter->setStretchFactor(0, 2);
 //     mainSplitter->setStretchFactor(1, 1);
 //     mainSplitter->setStretchFactor(2, 1);
@@ -167,6 +175,24 @@ namespace Isis
 
     return mainLayout;
   }
+  
+  
+  void CnetEditorWidget::blah()
+  {
+    cerr << "blah\n";
+    delete connectionModel;
+    delete connectionView;
+    connectionView = new QTreeView();
+    connectionModel = new ConnectionModel(controlNet, qApp);
+    connectionView->setModel(connectionModel);
+    connect(connectionView->selectionModel(), SIGNAL(selectionChanged(
+        const QItemSelection &, const QItemSelection &)), this,
+        SLOT(connectionViewSelectionChanged()));
+//     connectionView->setExpandsOnDoubleClick(false);
+    connectionView->setAlternatingRowColors(true);
+    topSplitter->addWidget(connectionView);
+  }
+  
 
 
   void CnetEditorWidget::nullify()

@@ -106,13 +106,13 @@ namespace Isis
           case Reference:
             return QVariant::fromValue(
                 (QString) point->GetRefMeasure()->GetCubeSerialNumber());
-          case SPLat:
+          case AdjustedSPLat:
             return QVariant::fromValue(catchNULL(
                 point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees()));
-          case SPLon:
+          case AdjustedSPLon:
             return QVariant::fromValue(catchNULL(
                 point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees()));
-          case SPRadius:
+          case AdjustedSPRadius:
             return QVariant::fromValue(catchNULL(
                 point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters()));
           case AprioriSPLat:
@@ -193,14 +193,14 @@ namespace Isis
               result = QVariant::fromValue(label);
             }
             break;
-          case SPLat:
-            result = QVariant::fromValue(QString("Adjusted Lat"));
+          case AdjustedSPLat:
+            result = QVariant::fromValue(QString("Adjusted SP Lat"));
             break;
-          case SPLon:
-            result = QVariant::fromValue(QString("Adjusted Lon"));
+          case AdjustedSPLon:
+            result = QVariant::fromValue(QString("Adjusted SP Lon"));
             break;
-          case SPRadius:
-            result = QVariant::fromValue(QString("Adjusted Radius (m)"));
+          case AdjustedSPRadius:
+            result = QVariant::fromValue(QString("Adjusted SP Radius (m)"));
             break;
           case AprioriSPLat:
             result = QVariant::fromValue(QString("A Priori Lat"));
@@ -269,9 +269,9 @@ namespace Isis
             case EditLock:
             case Ignored:
             case Reference:
-            case SPLat:
-            case SPLon:
-            case SPRadius:
+            case AdjustedSPLat:
+            case AdjustedSPLon:
+            case AdjustedSPRadius:
             case AprioriSPLat:
             case AprioriSPLon:
             case AprioriSPRadius:
@@ -327,19 +327,19 @@ namespace Isis
               Q_ASSERT(point->HasSerialNumber(value.toString()));
               point->SetRefMeasure(value.toString());
               break;
-            case SPLat:
+            case AdjustedSPLat:
               point->SetAdjustedSurfacePoint(SurfacePoint(
                   Latitude(catchNULL(value.toString()), Angle::Degrees),
                   point->GetAdjustedSurfacePoint().GetLongitude(),
                   point->GetAdjustedSurfacePoint().GetLocalRadius()));
               break;
-            case SPLon:
+            case AdjustedSPLon:
               point->SetAdjustedSurfacePoint(SurfacePoint(
                   point->GetAdjustedSurfacePoint().GetLatitude(),
                   Longitude(catchNULL(value.toString()), Angle::Degrees),
                   point->GetAdjustedSurfacePoint().GetLocalRadius()));
               break;
-            case SPRadius:
+            case AdjustedSPRadius:
               point->SetAdjustedSurfacePoint(SurfacePoint(
                   point->GetAdjustedSurfacePoint().GetLatitude(),
                   point->GetAdjustedSurfacePoint().GetLongitude(),

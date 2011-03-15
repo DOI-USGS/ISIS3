@@ -183,7 +183,6 @@ namespace Isis
     }
 
     emit dataEdited();
-//     cerr << "MeasureTableDelegate::setModelData done\n";
   }
 
 

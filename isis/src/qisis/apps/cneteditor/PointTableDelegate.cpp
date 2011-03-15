@@ -91,7 +91,6 @@ namespace Isis
             }
             return combo;
           }
-          break;
         default:
           {
             QLineEdit * lineEdit = new QLineEdit(parent);
@@ -180,13 +179,6 @@ namespace Isis
           newData = QVariant::fromValue(combo->currentText());
         }
         break;
-//       case PointTableModel::RefIndex:
-//         {
-//           QSpinBox * spinBox = static_cast< QSpinBox * >(editor);
-//           spinBox->interpretText();
-//           newData = QVariant::fromValue(spinBox->value());
-//         }
-//         break;
       default:
         {
           QLineEdit * lineEdit = static_cast< QLineEdit * >(editor);
@@ -210,7 +202,6 @@ namespace Isis
     }
 
     emit dataEdited();
-//     cerr << "PointTableDelegate::setModelData done\n";
   }
 
 

@@ -5,6 +5,7 @@
 
 class QBoxLayout;
 class QItemSelection;
+class QSplitter;
 class QStringList;
 class QTableView;
 class QTreeView;
@@ -48,6 +49,7 @@ namespace Isis
       void pointViewSelectionChanged();
       void serialViewSelectionChanged();
       void connectionViewSelectionChanged();
+      void blah();
 
 
     private: // data
@@ -72,7 +74,11 @@ namespace Isis
 
       QTableView * editPointView;
       QTableView * editMeasureView;
-
+      
+      QSplitter * topSplitter;
+      
+      
+    private:
       Isis::ControlNet * controlNet;
   };
 

@@ -26,9 +26,9 @@ namespace Isis
         EditLock = 3,
         Ignored = 4,
         Reference = 5,
-        SPLat = 6,
-        SPLon = 7,
-        SPRadius = 8,
+        AdjustedSPLat = 6,
+        AdjustedSPLon = 7,
+        AdjustedSPRadius = 8,
         AprioriSPLat = 9,
         AprioriSPLon = 10,
         AprioriSPRadius = 11,
@@ -61,7 +61,7 @@ namespace Isis
 //       bool removeRows(int position, int rows,
 //           const QModelIndex & index = QModelIndex());
 
-
+    
     private:
       PointTableModel(const PointTableModel &);
       const PointTableModel & operator=(PointTableModel);

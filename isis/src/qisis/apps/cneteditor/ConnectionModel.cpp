@@ -30,42 +30,28 @@ namespace Isis
       QObject * parent) : QAbstractItemModel(parent), cNet(controlNet)
   {
     ASSERT(cNet);
-
     parentItems = NULL;
     parentItems = new QList< TreeItem * >;
-
-    QList< ControlCubeGraphNode * > nodes = cNet->GetCubeGraphNodes();
-
-    for (int i = 0; i < nodes.size(); i++)
-    {
-      ControlCubeGraphNode * node = nodes[i];
-      SerialConnectionParentItem * parentItem =
-        new SerialConnectionParentItem(node);
-      parentItems->append(parentItem);
-
-      QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
-      for (int j = 0; j < connectedNodes.size(); j++)
-      {
-        ControlCubeGraphNode * connectedNode = connectedNodes[j];
-        SerialParentItem * serialItem = new SerialParentItem(connectedNode,
-            parentItem);
-
-        QList< ControlMeasure * > measures = connectedNode->getMeasures();
-        for (int k = 0; k < measures.size(); k++)
-        {
-          ControlPoint * point = measures[k]->Parent();
-          PointChildItem * pointItem = new PointChildItem(point, serialItem);
-          serialItem->addChild(pointItem);
-        }
-
-        parentItem->addChild(serialItem);
-      }
-    }
+    connect(cNet, SIGNAL(connectivityChanged()), this, SLOT(rebuildItems()));
+    rebuildItems();
   }
 
 
   ConnectionModel::~ConnectionModel()
   {
+    if (parentItems)
+    {
+      for (int i = 0; i < parentItems->size(); i++)
+      {
+        if (parentItems->at(i))
+        {
+          delete (*parentItems)[i];
+          (*parentItems)[i] = NULL;
+        }
+      }
+      delete parentItems;
+      parentItems = NULL;
+    }
     cNet = NULL;
   }
 
@@ -194,8 +180,61 @@ namespace Isis
 
     return flags;
   }
+  
+  
+  void ConnectionModel::rebuildItems()
+  {
+    cerr << "\nConnectionModel::rebuildItems called...\n";
+    Q_ASSERT(parentItems);
+    
+    cerr << "ConnectionModel::rebuildItems removing rows\n";
+    beginRemoveRows(QModelIndex(), 0, parentItems->size() - 1);
+    for (int i = 0; i < parentItems->size(); i++)
+    {
+      if (parentItems->at(i))
+      {
+        delete (*parentItems)[i];
+        (*parentItems)[i] = NULL;
+      }
+    }
+    parentItems->clear();
+    endRemoveRows();
+    cerr << "ConnectionModel::rebuildItems rows removed\n";
+    
+    QList< ControlCubeGraphNode * > nodes = cNet->GetCubeGraphNodes();
+    cerr << "ConnectionModel::rebuildItems inserting rows\n";
+    beginInsertRows(QModelIndex(), 0, nodes.size() - 1);
+    for (int i = 0; i < nodes.size(); i++)
+    {
+      ControlCubeGraphNode * node = nodes[i];
+      SerialConnectionParentItem * parentItem =
+        new SerialConnectionParentItem(node);
+      parentItems->append(parentItem);
 
+      QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
+      for (int j = 0; j < connectedNodes.size(); j++)
+      {
+        ControlCubeGraphNode * connectedNode = connectedNodes[j];
+        SerialParentItem * serialItem = new SerialParentItem(connectedNode,
+            parentItem);
 
+        QList< ControlMeasure * > measures = connectedNode->getMeasures();
+        for (int k = 0; k < measures.size(); k++)
+        {
+          ControlPoint * point = measures[k]->Parent();
+          PointChildItem * pointItem = new PointChildItem(point, serialItem);
+          serialItem->addChild(pointItem);
+        }
+
+        parentItem->addChild(serialItem);
+      }
+    }
+    endInsertRows();
+    cerr << "ConnectionModel::rebuildItems rows inserted\n";
+    cerr << "ConnectionModel::rebuildItems done\n";
+  }
+  
+  
   TreeItem * ConnectionModel::getItem(const QModelIndex & index) const
   {
     if (!index.isValid())
