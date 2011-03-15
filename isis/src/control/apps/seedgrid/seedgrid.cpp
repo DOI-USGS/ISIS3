@@ -141,7 +141,7 @@ void IsisMain() {
           ControlPoint * control = new ControlPoint;
           control->SetId(pointId.Next());
           control->SetIgnored(true);
-          control->SetSurfacePoint(pt);
+          control->SetAprioriSurfacePoint(pt);
           cnet.AddPoint(control);
         }
         y += yStepSize;
@@ -215,7 +215,7 @@ void IsisMain() {
         SurfacePoint pt(Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(equatorialRadius, Distance::Meters));
-        control->SetSurfacePoint(pt);
+        control->SetAprioriSurfacePoint(pt);
         cnet.AddPoint(control);
 
         lat += latStep;
