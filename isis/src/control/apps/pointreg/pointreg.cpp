@@ -127,8 +127,6 @@ void IsisMain() {
 
       if (outPoint->GetRefMeasure() != patternCM) {
         outPoint->SetRefMeasure(patternCM);
-        patternCM->SetChooserName("Application pointreg");
-        patternCM->SetDateTime();
       }
 
       // reset goodMeasureCount for this point before looping measures
@@ -138,7 +136,7 @@ void IsisMain() {
       int j = 0;
       while (j < outPoint->GetNumMeasures()) {
         ControlMeasure * measure = outPoint->GetMeasure(j);
-        
+
         if (j == outPoint->IndexOfRefMeasure()) {
           // don't register the reference, go to next measure
           if (!measure->IsIgnored()) goodMeasureCount++;
@@ -200,8 +198,6 @@ void IsisMain() {
                 measure->SetLogData(ControlMeasureLogData(
                       ControlMeasureLogData::GoodnessOfFit,
                       ar->GoodnessOfFit()));
-                measure->SetChooserName("Application pointreg");
-                measure->SetDateTime();
                 measure->SetIgnored(false);
                 goodMeasureCount++;
               }
@@ -210,8 +206,6 @@ void IsisMain() {
 
                 if (ui.GetBoolean("OUTPUTFAILED")) {
                   measure->SetType(ControlMeasure::Candidate);
-                  measure->SetChooserName("Application pointreg");
-                  measure->SetDateTime();
                   measure->SetIgnored(true);
                 }
                 else {
@@ -235,8 +229,6 @@ void IsisMain() {
                         ControlMeasureLogData::GoodnessOfFit,
                         ar->GoodnessOfFit()));
                 }
-                measure->SetChooserName("Application pointreg");
-                measure->SetDateTime();
                 measure->SetIgnored(true);
               }
               else {
@@ -251,8 +243,6 @@ void IsisMain() {
 
             if (ui.GetBoolean("OUTPUTFAILED")) {
               measure->SetType(ControlMeasure::Candidate);
-              measure->SetChooserName("Application pointreg");
-              measure->SetDateTime();
               measure->SetIgnored(true);
             }
             else {
