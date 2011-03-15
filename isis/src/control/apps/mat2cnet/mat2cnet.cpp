@@ -408,7 +408,7 @@ void IsisMain() {
           SurfacePoint surfacePt(Latitude(lat, Angle::Degrees),
               Longitude(lon, Angle::Degrees),
               Distance(rad, Distance::Meters));
-          cpoint->SetSurfacePoint(surfacePt);
+          cpoint->SetAprioriSurfacePoint(surfacePt);
         }
         catch (iException &e) {
           iString msg = "Unable to set universal ground point to control network from line [";
