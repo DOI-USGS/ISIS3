@@ -23,8 +23,9 @@
           Updated documentation
       </change>
      <change name="Kris Becker" date="2011-03-14">
-          Added optional TARGET parameter to allow TargetName specification
-      </change>
+          Removed HorixontalPixelScale and VerticalPixelScale compliancy test; 
+          Added optional TARGET parameter to allow TargetName specification 
+     </change>
   </history>
 
   <category>

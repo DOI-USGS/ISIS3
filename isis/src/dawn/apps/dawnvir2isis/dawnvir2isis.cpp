@@ -105,29 +105,6 @@ void IsisMain ()
   outcube->PutGroup(outLabel.FindGroup("Archive",Pvl::Traverse));
   outcube->PutGroup(outLabel.FindGroup("Instrument",Pvl::Traverse));
   
-  // Make sure the HorizontalPixelScale and VerticalPixelScale are the same
-  PvlGroup &instGrp(outLabel.FindGroup("Instrument", Pvl::Traverse));
-  iString sheight = (string) instGrp["VerticalPixelScale"];
-  iString swidth = (string) instGrp["HorizontalPixelScale"];
-  if ((sheight == "N/A" && swidth != "N/A") || (sheight != "N/A" &&
-      swidth == "N/A")) {
-    string msg = "Input file [" + inFile.Expanded() + "] does not have valid " +
-                 "HorizontalPixelScale and VerticalPixelScale values. These values " +
-                 "must be equivalent or the image is considered to be invalid.";
-    throw iException::Message(iException::Io,msg, _FILEINFO_);
-  }
-  if (sheight != "N/A" && swidth != "N/A") {
-    double pheight = sheight.ToDouble();
-    double pwidth = swidth.ToDouble();
-    if (pheight != pwidth) {
-      string msg = "Input file [" + inFile.Expanded() + "] does not have valid " +
-                   "HorizontalPixelScale and VerticalPixelScale values. These values " +
-                   "must be equivalent or the image is considered to be invalid.";
-      throw iException::Message(iException::Io,msg, _FILEINFO_);
-    }
-  }
-
-
   PvlGroup kerns("Kernels");
   if (instid == "VIS") {
     kerns += PvlKeyword("NaifFrameCode",-203211);
