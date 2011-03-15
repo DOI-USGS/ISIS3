@@ -49,7 +49,7 @@ void IsisMain() {
   m->SetType(ControlMeasure::Manual);
 
   ControlPoint * p = new ControlPoint;
-  p->SetSurfacePoint(SurfacePoint(lat1, lon1, rad1));
+  p->SetAprioriSurfacePoint(SurfacePoint(lat1, lon1, rad1));
   p->SetId("Point1");
   p->SetType(ControlPoint::Ground);
   p->Add(m);
@@ -78,7 +78,7 @@ void IsisMain() {
     m->SetType(ControlMeasure::Manual);
 
     ControlPoint * p = new ControlPoint;
-    p->SetSurfacePoint(SurfacePoint(lat2, lon2, rad2));
+    p->SetAprioriSurfacePoint(SurfacePoint(lat2, lon2, rad2));
     p->SetId("Point2");
     p->SetType(ControlPoint::Ground);
     p->Add(m);
