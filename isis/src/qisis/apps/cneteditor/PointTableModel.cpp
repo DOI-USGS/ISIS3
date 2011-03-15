@@ -6,6 +6,7 @@
 
 #include <QList>
 
+#include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Distance.h"
 #include "iException.h"
@@ -107,13 +108,13 @@ namespace Isis
                 (QString) point->GetRefMeasure()->GetCubeSerialNumber());
           case SPLat:
             return QVariant::fromValue(catchNULL(
-                point->GetSurfacePoint().GetLatitude().GetDegrees()));
+                point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees()));
           case SPLon:
             return QVariant::fromValue(catchNULL(
-                point->GetSurfacePoint().GetLongitude().GetDegrees()));
+                point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees()));
           case SPRadius:
             return QVariant::fromValue(catchNULL(
-                point->GetSurfacePoint().GetLocalRadius().GetMeters()));
+                point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters()));
           case AprioriSPLat:
             return QVariant::fromValue(catchNULL(
                 point->GetAprioriSurfacePoint().GetLatitude().GetDegrees()));
@@ -193,34 +194,34 @@ namespace Isis
             }
             break;
           case SPLat:
-            result = QVariant::fromValue(QString("SP Lat"));
+            result = QVariant::fromValue(QString("Adjusted Lat"));
             break;
           case SPLon:
-            result = QVariant::fromValue(QString("SP Lon"));
+            result = QVariant::fromValue(QString("Adjusted Lon"));
             break;
           case SPRadius:
-            result = QVariant::fromValue(QString("SP Radius (m)"));
+            result = QVariant::fromValue(QString("Adjusted Radius (m)"));
             break;
           case AprioriSPLat:
-            result = QVariant::fromValue(QString("Apriori SP Lat"));
+            result = QVariant::fromValue(QString("A Priori Lat"));
             break;
           case AprioriSPLon:
-            result = QVariant::fromValue(QString("Apriori SP Lon"));
+            result = QVariant::fromValue(QString("A Priori Lon"));
             break;
           case AprioriSPRadius:
-            result = QVariant::fromValue(QString("Apriori SP Radius (m)"));
+            result = QVariant::fromValue(QString("A Priori Radius (m)"));
             break;
           case AprioriSPSource:
-            result = QVariant::fromValue(QString("  Apriori SP Source  "));
+            result = QVariant::fromValue(QString("  A Priori Source  "));
             break;
           case AprioriSPSourceFile:
-            result = QVariant::fromValue(QString("Apriori SP Source File"));
+            result = QVariant::fromValue(QString("A Priori Source File"));
             break;
           case AprioriRadiusSource:
-            result = QVariant::fromValue(QString("Apriori Radius Source"));
+            result = QVariant::fromValue(QString("A Priori Radius Source"));
             break;
           case AprioriRadiusSourceFile:
-            result = QVariant::fromValue(QString("Apriori Radius Source File"));
+            result = QVariant::fromValue(QString("A Priori Radius Source File"));
             break;
           case JigsawRejected:
             result = QVariant::fromValue(QString("Jigsaw Rejected"));
@@ -327,21 +328,21 @@ namespace Isis
               point->SetRefMeasure(value.toString());
               break;
             case SPLat:
-              point->SetSurfacePoint(SurfacePoint(
+              point->SetAdjustedSurfacePoint(SurfacePoint(
                   Latitude(catchNULL(value.toString()), Angle::Degrees),
-                  point->GetSurfacePoint().GetLongitude(),
-                  point->GetSurfacePoint().GetLocalRadius()));
+                  point->GetAdjustedSurfacePoint().GetLongitude(),
+                  point->GetAdjustedSurfacePoint().GetLocalRadius()));
               break;
             case SPLon:
-              point->SetSurfacePoint(SurfacePoint(
-                  point->GetSurfacePoint().GetLatitude(),
+              point->SetAdjustedSurfacePoint(SurfacePoint(
+                  point->GetAdjustedSurfacePoint().GetLatitude(),
                   Longitude(catchNULL(value.toString()), Angle::Degrees),
-                  point->GetSurfacePoint().GetLocalRadius()));
+                  point->GetAdjustedSurfacePoint().GetLocalRadius()));
               break;
             case SPRadius:
-              point->SetSurfacePoint(SurfacePoint(
-                  point->GetSurfacePoint().GetLatitude(),
-                  point->GetSurfacePoint().GetLongitude(),
+              point->SetAdjustedSurfacePoint(SurfacePoint(
+                  point->GetAdjustedSurfacePoint().GetLatitude(),
+                  point->GetAdjustedSurfacePoint().GetLongitude(),
                   Distance(catchNULL(value.toString()), Distance::Meters)));
               break;
             case AprioriSPLat:

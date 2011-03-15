@@ -9,6 +9,7 @@
 #include <QSpinBox>
 #include <QTableView>
 
+#include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "PointTableModel.h"
 
