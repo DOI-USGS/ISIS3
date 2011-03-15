@@ -3,6 +3,7 @@
 #include <sstream>
 #include <ctime>
 
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasureLogData.h"
