@@ -45,6 +45,12 @@ void IsisMain() {
     throw iException::Message(iException::Io, msg, _FILEINFO_);
   }
 
+  std::string target;
+  if(ui.WasEntered("TARGET")) {
+    target = ui.GetString("TARGET");
+  }
+
+
   p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
   p.SetOrganization(Isis::ProcessImport::BSQ);
   string tmpName = "$TEMPORARY/" + inFile.Basename() + ".tmp.cub";
@@ -85,33 +91,17 @@ void IsisMain() {
   PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
   instrumentXlater.Auto(outLabel);
 
+  //  Update target if user specifies it
+  if (!target.empty()) {
+    PvlGroup &igrp = outLabel.FindGroup("Instrument",Pvl::Traverse);
+    igrp["TargetName"] = iString(target);
+  }
+
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label
   outcube->PutGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
   outcube->PutGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
   outcube->PutGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
-
-  // Make sure the HorizontalPixelScale and VerticalPixelScale are the same
-  PvlGroup &instGrp(outLabel.FindGroup("Instrument", Pvl::Traverse));
-  iString sheight = (string) instGrp["VerticalPixelScale"];
-  iString swidth = (string) instGrp["HorizontalPixelScale"];
-  if((sheight == "N/A" && swidth != "N/A") || (sheight != "N/A" &&
-      swidth == "N/A")) {
-    string msg = "Input file [" + inFile.Expanded() + "] does not have valid " +
-                 "HorizontalPixelScale and VerticalPixelScale values. These values " +
-                 "must be equivalent or the image is considered to be invalid.";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
-  }
-  if(sheight != "N/A" && swidth != "N/A") {
-    double pheight = sheight.ToDouble();
-    double pwidth = swidth.ToDouble();
-    if(pheight != pwidth) {
-      string msg = "Input file [" + inFile.Expanded() + "] does not have valid " +
-                   "HorizontalPixelScale and VerticalPixelScale values. These values " +
-                   "must be equivalent or the image is considered to be invalid.";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
-    }
-  }
 
   // Set the BandBin filter name, center, and width values based on the
   // FilterNumber.
