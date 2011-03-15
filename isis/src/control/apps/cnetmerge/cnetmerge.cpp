@@ -119,9 +119,9 @@ void IsisMain() {
             sourcePoint->GetType() == ControlPoint::Ground) {
           // See if there are conflicts in merging the two points
           bool pointHasConflict = false;
-          SurfacePoint surfPt(dupPoint->GetSurfacePoint());
+          SurfacePoint surfPt(dupPoint->GetAprioriSurfacePoint());
           if (surfPt.Valid() &&
-              dupPoint->GetSurfacePoint() == sourcePoint->GetSurfacePoint()) {
+              surfPt == sourcePoint->GetAprioriSurfacePoint()) {
             pointHasConflict = true;
           }
 
