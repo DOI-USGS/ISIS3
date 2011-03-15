@@ -561,10 +561,16 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    if (measure->IsIgnored()) {
+      iString msg = "Ignored measure passed to "
+          "ControlNet::AddControlCubeGraphNode!";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
     ControlPoint *point = measure->Parent();
     if (!point) {
-      iString msg = "Control measure passed to "
-          "ControlNet::AddControlCubeGraphNode has a NULL parent!";
+      iString msg = "Control measure with NULL parent passed to "
+          "ControlNet::AddControlCubeGraphNode!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -574,20 +580,30 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    ControlCubeGraphNode *csn = NULL;
-
-    // if a ControlCubeGraphNode already exists with the measure's
-    // cube serial number, then just add this measure to it.  Otherwise,
-    // Create a new ControlCubeGraphNode first.
-    QString key = measure->GetCubeSerialNumber();
-    if (cubeGraphNodes->contains(key)) {
-      csn = (*cubeGraphNodes)[key];
-      csn->addMeasure(measure);
+    // make sure there is a node for every measure in this measure's parent
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+      if (!cubeGraphNodes->contains(sn) && !point->GetMeasure(sn)->IsIgnored())
+        cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
     }
-    else {
-      csn = new ControlCubeGraphNode(measure->GetCubeSerialNumber());
-      csn->addMeasure(measure);
-      cubeGraphNodes->insert(measure->GetCubeSerialNumber(), csn);
+
+    // add the measure to the corresponding node
+    QString serial = measure->GetCubeSerialNumber();
+    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+    node->addMeasure(measure);
+
+    // in this measure's node add connections to the other nodes reachable from
+    // its point
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      ControlMeasure *cm = point->GetMeasure(i);
+      if (!cm->IsIgnored()) {
+        QString sn = cm->GetCubeSerialNumber();
+        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
+        if (neighborNode != node) {
+          node->addConnection(neighborNode, point);
+          neighborNode->addConnection(node, point);
+        }
+      }
     }
 
     emit connectivityChanged();
@@ -602,15 +618,32 @@ namespace Isis {
    * @param measure The measure removed from the network.
    */
   void ControlNet::MeasureDeleted(ControlMeasure *measure) {
-    QString key = measure->GetCubeSerialNumber();
-    ControlCubeGraphNode *csn = (*cubeGraphNodes)[key];
+    ASSERT(measure);
 
-    csn->removeMeasure(measure);
-    if (!csn->size()) {
-      cubeGraphNodes->remove(key);
+    ControlPoint *point = measure->Parent();
+    QString serial = measure->GetCubeSerialNumber();
+    ASSERT(cubeGraphNodes->contains(serial));
+    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
 
-      delete csn;
-      csn = NULL;
+    // remove connections to and from this node
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+      if (cubeGraphNodes->contains(sn)) {
+        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
+        if (node != neighborNode) {
+          neighborNode->removeConnection(node, point);
+          node->removeConnection(neighborNode, point);
+        }
+      }
+    }
+
+    // Remove the measure from the node.  If this caused the node to be empty,
+    // then delete the node.
+    node->removeMeasure(measure);
+    if (!node->getNumMeasures()) {
+      delete node;
+      node = NULL;
+      cubeGraphNodes->remove(serial);
     }
 
     emit connectivityChanged();
@@ -635,7 +668,6 @@ namespace Isis {
     QMap< ControlCubeGraphNode *, bool > searchList;
     for (int i = 0; i < nodes.size(); i++)
       searchList.insert(nodes[i], false);
-    searchList[nodes[0]] = true;
 
     // for storing nodes as they are found
     QList< ControlCubeGraphNode * > results;
@@ -857,8 +889,7 @@ namespace Isis {
    *
    * @returns A list of cube islands as graph nodes
    */
-  QList< QList< ControlCubeGraphNode * > > ControlNet::GetNodeConnections()
-  const {
+  QList< QList< ControlCubeGraphNode * > > ControlNet::GetNodeConnections() const {
     QList< ControlCubeGraphNode * > notYetFound = cubeGraphNodes->values();
     QList< QList< ControlCubeGraphNode * > > islands;
 
@@ -876,6 +907,20 @@ namespace Isis {
     while (notYetFound.size());
 
     return islands;
+  }
+
+
+  /**
+   * Used for verifying graph intergrity
+   */
+  void ControlNet::PrintCubeGraph() const {
+    cout << "ControlNet::PrintCubeGraph...\n";
+    QHashIterator < QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
+    while (i.hasNext()) {
+      i.next();
+      i.value()->printConnections();
+    }
+    cout << "\n";
   }
 
 

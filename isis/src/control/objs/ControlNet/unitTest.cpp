@@ -1,12 +1,17 @@
+#include "ControlNet.h"
+
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <ctime>
 
+#include <QList>
+#include <QString>
+
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "ControlMeasureLogData.h"
 #include "SurfacePoint.h"
 #include "SpecialPixel.h"
 #include "TextFile.h"
@@ -16,9 +21,79 @@
 using namespace std;
 using namespace Isis;
 
+
+
 int main() {
   Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;
+/*
+  cout << "******* test cube connection graph ************\n";
+  ControlMeasure *p0m0 = new ControlMeasure;
+  p0m0->SetCubeSerialNumber("ALPHA");
+  ControlMeasure *p0m1 = new ControlMeasure;
+  p0m1->SetCubeSerialNumber("BRAVO");
+  ControlPoint *p0 = new ControlPoint("p0");
+  p0->Add(p0m0);
+  p0->Add(p0m1);
+
+  ControlNet net;
+  net.AddPoint(p0);
+
+  // test ignoring of measures
+  net.PrintCubeGraph();
+  p0m1->SetIgnored(true);
+  net.PrintCubeGraph();
+  p0m1->SetIgnored(false);
+  net.PrintCubeGraph();
+
+  // add another point - testing case where measures are added to points which
+  // are already added to a net.
+  cout << "testing measure addition to point already in network...\n";
+  ControlMeasure *p1m0 = new ControlMeasure;
+  p1m0->SetCubeSerialNumber("ALPHA");
+  ControlPoint *p1 = new ControlPoint("p1");
+  p1->Add(p1m0);
+  net.AddPoint(p1);
+  ControlMeasure *p1m1 = new ControlMeasure;
+  p1m1->SetCubeSerialNumber("BRAVO");
+  ControlMeasure *p1m2 = new ControlMeasure;
+  p1m2->SetCubeSerialNumber("CHARLIE");
+  p1->Add(p1m1);
+  p1->Add(p1m2);
+  net.PrintCubeGraph();
+
+  // test ignoring of point
+  cout << "testing setting point to ignored.......................\n";
+  p1->SetIgnored(true);
+  net.PrintCubeGraph();
+  p1->SetIgnored(false);
+  net.PrintCubeGraph();
+
+  // test measure deletion
+  cout << "testing measure deletion & addition....................\n";
+  p0->Delete(p0m1);
+  p0m1 = NULL;
+  net.PrintCubeGraph();
+  p0m0 = new ControlMeasure;
+  p0m0->SetCubeSerialNumber("DELTA");
+  p0->Add(p0m0);
+  net.PrintCubeGraph();
+
+  // test point deletion
+  cout << "testing point deletion.................................\n";
+  net.DeletePoint(p1);
+  p1 = NULL;
+  net.PrintCubeGraph();
+
+  cout << "******* Done testing cube graph ***************\n\n\n";
+
+  cout << "testing GetCubeSerials...\n";
+  QList< QString > serials = net.GetCubeSerials();
+  for (int i = 0; i < serials.size(); i++)
+    cout << "  " << qPrintable(serials[i]) << "\n";
+  cout << "\n";
+*/
+
   ControlNet cn1;
 
   cn1.SetTarget("Mars");
@@ -166,8 +241,8 @@ int main() {
   cn3.Write("temp.txt", true);
 
   cout << "Reading Pvl from temp.txt and then printing" << endl;
-  Pvl p1("temp.txt");
-  cout << endl << p1 << endl << endl;
+  Pvl pvl1("temp.txt");
+  cout << endl << pvl1 << endl << endl;
 
   cout << "Writing ControlNet to temp2.bin in binary format" << endl;
   cn3.Write("temp2.bin");

@@ -139,6 +139,7 @@ namespace Isis {
    *                conversions in ControlPoint.
    *   @history 2011-03-14 Eric Hyer - Cube connection graph now updated when
    *                points or measures are ignored.
+   *   @history 2011-03-15 Eric Hyer - Some cube graph bugs fixed.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -169,6 +170,7 @@ namespace Isis {
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
       QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
+      void PrintCubeGraph() const;
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
       void DeleteMeasuresWithId(iString serialNumber);
 
