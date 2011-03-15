@@ -7,6 +7,7 @@
 #include "WarpTransform.h"
 #include "PolynomialBivariate.h"
 #include "UserInterface.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 
