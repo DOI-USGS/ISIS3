@@ -122,20 +122,20 @@ void IsisMain() {
       measureLabels += "AprioriLatitudeSigmaDistance,";
       measureLabels += "AprioriLongitudeSigmaDistance,";
 
-      measureLabels += "X,";
-      measureLabels += "Y,";
-      measureLabels += "Z,";
-      measureLabels += "XSigma,";
-      measureLabels += "YSigma,";
-      measureLabels += "ZSigma,";
-      measureLabels += "Latitude,";
-      measureLabels += "Longitude,";
-      measureLabels += "LocalRadius,";
-      measureLabels += "LatitudeSigma,";
-      measureLabels += "LongitudeSigma,";
-      measureLabels += "LocalRadiusSigma,";
-      measureLabels += "LatitudeSigmaDistance,";
-      measureLabels += "LongitudeSigmaDistance,";
+      measureLabels += "AdjustedX,";
+      measureLabels += "AdjustedY,";
+      measureLabels += "AdjustedZ,";
+      measureLabels += "AdjustedXSigma,";
+      measureLabels += "AdjustedYSigma,";
+      measureLabels += "AdjustedZSigma,";
+      measureLabels += "AdjustedLatitude,";
+      measureLabels += "AdjustedLongitude,";
+      measureLabels += "AdjustedLocalRadius,";
+      measureLabels += "AdjustedLatitudeSigma,";
+      measureLabels += "AdjustedLongitudeSigma,";
+      measureLabels += "AdjustedLocalRadiusSigma,";
+      measureLabels += "AdjustedLatitudeSigmaDistance,";
+      measureLabels += "AdjustedLongitudeSigmaDistance,";
 
       measureLabels += "MinimumResidual,";
       measureLabels += "MaximumResidual,";
@@ -145,40 +145,6 @@ void IsisMain() {
       measureLabels += "MinimumLineResidual,";
       measureLabels += "MaximumLineResidual,";
     }
-/*
- * ChooserName
- * DateTime
-   EditLock
-   Ignore
-   AprioriXYZSource
-   AprioriXYZSourceFile
-   AprioriRadiusSrouce
-   AprioriRadiusSourceFile
-   AprioriX
-   AprioriY
-   AprioriZ
-   AprioriSigmaX
-   AprioriSigmaY
-   AprioriSigmaZ
-   X
-   Y
-   Z
-   ApostSigmaX
-   ApostSigmaY
-   ApostSigmaZ
-   double MinimumSampleResidual() const;
-   double MinimumLineResidual() const;
-   double MinimumResidual() const;
-   double MaximumLineResidual() const;
-   double MaximumSampleResidual() const;
-   UniversalLatitude
-   UniversalLongitude
-   Radius
-   XYZSource
-   RadiusSource
-   AverageResidual
-   MaximumResidual
- */
 
     // Always add data
     measureInfo.clear();
@@ -218,7 +184,7 @@ void IsisMain() {
       measureInfo += ",";
     }
 
-    SurfacePoint sp = cpoint->GetSurfacePoint();
+    SurfacePoint sp = cpoint->GetAdjustedSurfacePoint();
     measureInfo += iString(sp.GetX().GetKilometers()) + ",";
     measureInfo += iString(sp.GetY().GetKilometers()) + ",";
     measureInfo += iString(sp.GetZ().GetKilometers()) + ",";
