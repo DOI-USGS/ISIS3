@@ -578,7 +578,7 @@ namespace Isis {
     // only update if there was a change in status
     if (oldStatus != p_ignore) {
       MeasureModified();
-      if (parentPoint && parentPoint->Parent())
+      if (parentPoint && !parentPoint->IsIgnored() && parentPoint->Parent())
       {
         ControlNet * cnet = parentPoint->Parent();
         p_ignore ? cnet->MeasureDeleted(this) : cnet->MeasureAdded(this);
