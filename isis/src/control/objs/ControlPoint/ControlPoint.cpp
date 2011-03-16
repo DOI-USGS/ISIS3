@@ -635,7 +635,7 @@ namespace Isis {
     cubeSerials->append(newSerial);
 
     // notify parent network if we have one
-    if (parentNetwork && !measure->IsIgnored())
+    if (!IsIgnored() && parentNetwork && !measure->IsIgnored())
       parentNetwork->MeasureAdded(measure);
   }
 
@@ -682,7 +682,7 @@ namespace Isis {
     }
 
     // notify parent network of the change
-    if (parentNetwork && !cm->IsIgnored())
+    if (!IsIgnored() && parentNetwork && !cm->IsIgnored())
       parentNetwork->MeasureDeleted(cm);
 
     delete cm;
@@ -963,15 +963,14 @@ namespace Isis {
     if (oldStatus != ignore) {
       PointModified();
       if (parentNetwork) {
-        void (ControlNet::*meth)(ControlMeasure *);
-        if (ignore)
-          meth = &ControlNet::MeasureDeleted;
-        else
-          meth = &ControlNet::MeasureAdded;
-        
-        foreach (ControlMeasure * cm, measures->values())
-          if (!cm->IsIgnored())
-            (parentNetwork->*meth)(cm);
+        foreach (ControlMeasure * cm, measures->values()) {
+          if (!cm->IsIgnored()) {
+            if (ignore)
+              parentNetwork->MeasureDeleted(cm);
+            else
+              parentNetwork->MeasureAdded(cm);
+          }
+        }
       }
     }
     
