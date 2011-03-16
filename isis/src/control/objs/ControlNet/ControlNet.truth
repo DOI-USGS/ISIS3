@@ -1,5 +1,83 @@
 UnitTest for ControlNet ....
 
+******* test cube connection graph ************
+  ALPHA
+    BRAVO :  p0
+  BRAVO
+    ALPHA :  p0
+
+  ALPHA
+
+
+  ALPHA
+    BRAVO :  p0
+  BRAVO
+    ALPHA :  p0
+
+testing measure addition to point already in network...
+  ALPHA
+    BRAVO :  p0, p1
+    CHARLIE :  p1
+  BRAVO
+    ALPHA :  p0, p1
+    CHARLIE :  p1
+  CHARLIE
+    ALPHA :  p1
+    BRAVO :  p1
+
+testing setting point to ignored.......................
+  ALPHA
+    BRAVO :  p0
+  BRAVO
+    ALPHA :  p0
+
+  ALPHA
+    BRAVO :  p0, p1
+    CHARLIE :  p1
+  BRAVO
+    ALPHA :  p0, p1
+    CHARLIE :  p1
+  CHARLIE
+    ALPHA :  p1
+    BRAVO :  p1
+
+testing measure deletion & addition....................
+  ALPHA
+    BRAVO :  p1
+    CHARLIE :  p1
+  BRAVO
+    ALPHA :  p1
+    CHARLIE :  p1
+  CHARLIE
+    ALPHA :  p1
+    BRAVO :  p1
+
+  ALPHA
+    BRAVO :  p1
+    CHARLIE :  p1
+    DELTA :  p0
+  BRAVO
+    ALPHA :  p1
+    CHARLIE :  p1
+  CHARLIE
+    ALPHA :  p1
+    BRAVO :  p1
+  DELTA
+    ALPHA :  p0
+
+testing point deletion.................................
+  ALPHA
+    DELTA :  p0
+  DELTA
+    ALPHA :  p0
+
+******* Done testing cube graph ***************
+
+
+testing GetCubeSerials...
+  DELTA
+  ALPHA
+
 Test adding control points with identical id numbers ...
 **PROGRAMMER ERROR** ControlPoint must have unique Id
 

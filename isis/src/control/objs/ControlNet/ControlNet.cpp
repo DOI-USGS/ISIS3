@@ -60,6 +60,7 @@ namespace Isis {
     p_modified = Application::DateTime();
   }
 
+  
   ControlNet::ControlNet(const ControlNet &other) {
     Nullify();
 
@@ -76,21 +77,26 @@ namespace Isis {
       QString newPointId = newPoint->GetId();
       points->insert(newPointId, newPoint);
       pointIds->append(newPointId);
-
-      QList< QString > newPointsSerials = newPoint->GetCubeSerialNumbers();
-      for (int i = 0; i < newPointsSerials.size(); i++) {
-        QString key = newPointsSerials[i];
-        ControlMeasure *newMeasure = newPoint->GetMeasure(key);
-
-        if (cubeGraphNodes->contains(key)) {
-          (*cubeGraphNodes)[key]->addMeasure(newMeasure);
-        }
-        else {
-          ControlCubeGraphNode *newControlCubeGraphNode =
-            new ControlCubeGraphNode(key);
-
-          newControlCubeGraphNode->addMeasure(newMeasure);
-          cubeGraphNodes->insert(key, newControlCubeGraphNode);
+      
+      // create graph for non-ignored points and measures
+      if (!newPoint->IsIgnored()) {
+        QList< ControlMeasure * > measures = newPoint->GetMeasures();
+        for (int i = 0; i < measures.size(); i++) {
+          ControlMeasure * measure = measures[i];
+          QString serial = measure->GetCubeSerialNumber();
+          
+          if (!measure->IsIgnored()) {
+            if (cubeGraphNodes->contains(serial)) {
+              (*cubeGraphNodes)[serial]->addMeasure(measure);
+            }
+            else {
+              ControlCubeGraphNode *newControlCubeGraphNode =
+                  new ControlCubeGraphNode(serial);
+    
+              newControlCubeGraphNode->addMeasure(measure);
+              cubeGraphNodes->insert(serial, newControlCubeGraphNode);
+            }
+          }
         }
       }
     }
@@ -579,6 +585,8 @@ namespace Isis {
       msg += point->GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
+    
+    ASSERT(!point->IsIgnored());
 
     // make sure there is a node for every measure in this measure's parent
     for (int i = 0; i < point->GetNumMeasures(); i++) {
@@ -662,6 +670,7 @@ namespace Isis {
    */
   QList< ControlCubeGraphNode * > ControlNet::RandomBFS(
     QList< ControlCubeGraphNode * > nodes) const {
+    qsrand(42);
     Shuffle(nodes);
 
     // for keeping track of visited nodes
@@ -912,15 +921,25 @@ namespace Isis {
 
   /**
    * Used for verifying graph intergrity
+   *
+   * @returns A string representation of the cube graph
    */
-  void ControlNet::PrintCubeGraph() const {
-    cout << "ControlNet::PrintCubeGraph...\n";
+  iString ControlNet::CubeGraphToString() const {
+    QStringList serials;
     QHashIterator < QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
     while (i.hasNext()) {
       i.next();
-      i.value()->printConnections();
+      serials << i.value()->getSerialNumber();
     }
-    cout << "\n";
+    qSort(serials);
+   
+    QString str;
+    for (int i = 0; i < serials.size(); i++) {
+      str += "  " + serials[i] + "\n"
+          + (*cubeGraphNodes)[serials[i]]->connectionsToString() + "\n";
+    }
+    
+    return str;
   }
 
 
@@ -1504,20 +1523,25 @@ namespace Isis {
       QString newPointId = newPoint->GetId();
       points->insert(newPointId, newPoint);
 
-      QList< QString > newPointsSerials = newPoint->GetCubeSerialNumbers();
-      for (int i = 0; i < newPointsSerials.size(); i++) {
-        QString key = newPointsSerials[i];
-        ControlMeasure *newMeasure = newPoint->GetMeasure(key);
-
-        if (cubeGraphNodes->contains(key)) {
-          (*cubeGraphNodes)[key]->addMeasure(newMeasure);
-        }
-        else {
-          ControlCubeGraphNode *newControlCubeGraphNode =
-            new ControlCubeGraphNode(key);
-
-          newControlCubeGraphNode->addMeasure(newMeasure);
-          cubeGraphNodes->insert(key, newControlCubeGraphNode);
+      // create graph for non-ignored points and measures
+      if (!newPoint->IsIgnored()) {
+        QList< ControlMeasure * > measures = newPoint->GetMeasures();
+        for (int i = 0; i < measures.size(); i++) {
+          ControlMeasure * measure = measures[i];
+          QString serial = measure->GetCubeSerialNumber();
+          
+          if (!measure->IsIgnored()) {
+            if (cubeGraphNodes->contains(serial)) {
+              (*cubeGraphNodes)[serial]->addMeasure(measure);
+            }
+            else {
+              ControlCubeGraphNode *newControlCubeGraphNode =
+                  new ControlCubeGraphNode(serial);
+    
+              newControlCubeGraphNode->addMeasure(measure);
+              cubeGraphNodes->insert(serial, newControlCubeGraphNode);
+            }
+          }
         }
       }
     }

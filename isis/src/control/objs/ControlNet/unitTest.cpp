@@ -24,9 +24,11 @@ using namespace Isis;
 
 
 int main() {
+  qsrand(42);
+
   Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;
-/*
+
   cout << "******* test cube connection graph ************\n";
   ControlMeasure *p0m0 = new ControlMeasure;
   p0m0->SetCubeSerialNumber("ALPHA");
@@ -40,11 +42,11 @@ int main() {
   net.AddPoint(p0);
 
   // test ignoring of measures
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
   p0m1->SetIgnored(true);
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
   p0m1->SetIgnored(false);
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
 
   // add another point - testing case where measures are added to points which
   // are already added to a net.
@@ -60,30 +62,30 @@ int main() {
   p1m2->SetCubeSerialNumber("CHARLIE");
   p1->Add(p1m1);
   p1->Add(p1m2);
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
 
   // test ignoring of point
   cout << "testing setting point to ignored.......................\n";
   p1->SetIgnored(true);
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
   p1->SetIgnored(false);
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
 
   // test measure deletion
   cout << "testing measure deletion & addition....................\n";
   p0->Delete(p0m1);
   p0m1 = NULL;
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
   p0m0 = new ControlMeasure;
   p0m0->SetCubeSerialNumber("DELTA");
   p0->Add(p0m0);
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
 
   // test point deletion
   cout << "testing point deletion.................................\n";
   net.DeletePoint(p1);
   p1 = NULL;
-  net.PrintCubeGraph();
+  cout << net.CubeGraphToString() << "\n";
 
   cout << "******* Done testing cube graph ***************\n\n\n";
 
@@ -92,7 +94,7 @@ int main() {
   for (int i = 0; i < serials.size(); i++)
     cout << "  " << qPrintable(serials[i]) << "\n";
   cout << "\n";
-*/
+
 
   ControlNet cn1;
 

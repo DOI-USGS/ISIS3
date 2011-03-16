@@ -170,7 +170,7 @@ namespace Isis {
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
       QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
-      void PrintCubeGraph() const;
+      iString CubeGraphToString() const;
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
       void DeleteMeasuresWithId(iString serialNumber);
 
