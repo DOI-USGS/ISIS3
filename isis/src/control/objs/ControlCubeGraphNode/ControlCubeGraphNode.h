@@ -84,7 +84,7 @@ namespace Isis {
 
       const ControlCubeGraphNode &operator=(ControlCubeGraphNode);
 
-      void printConnections() const;
+      QString connectionsToString() const;
 
 
     private:

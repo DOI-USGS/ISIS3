@@ -105,6 +105,7 @@ namespace Isis {
   void ControlCubeGraphNode::removeMeasure(ControlMeasure *measure) {
 
     if (measures->remove(measure->Parent()) != 1) {
+      abort();
       ASSERT(0);
     }
 
@@ -238,18 +239,25 @@ namespace Isis {
   }
 
 
-  void ControlCubeGraphNode::printConnections() const {
-    QHashIterator< ControlCubeGraphNode *, QList< ControlPoint * > >
-    i(*connections);
+  QString ControlCubeGraphNode::connectionsToString() const {
+    QHashIterator< ControlCubeGraphNode *, QList< ControlPoint * > > i(
+        *connections);
 
-    cout << "  " << *serialNumber << "\n";
+    QStringList serials;
     while (i.hasNext()) {
       i.next();
+      QString line = "    " + (QString) i.key()->getSerialNumber();
+      line += " :  ";
       for (int j = 0; j < i.value().size(); j++) {
-        cout << "    " << i.key()->getSerialNumber() << " : "
-            << i.value()[j]->GetId() << "\n";
+        line += (QString) i.value()[j]->GetId();
+        if (j != i.value().size() - 1)
+          line += ", ";
       }
+      serials << line;
     }
+    qSort(serials);
+    
+    return serials.join("\n");
   }
 
 }
