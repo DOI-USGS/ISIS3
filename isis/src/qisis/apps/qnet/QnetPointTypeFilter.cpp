@@ -1,6 +1,7 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include "QnetPointTypeFilter.h"
+#include "ControlMeasure.h"
 #include "QnetNavTool.h"
 #include "ControlNet.h"
 #include "SerialNumberList.h"

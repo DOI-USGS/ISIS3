@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include "QnetPointCubeNameFilter.h"
 #include "QnetNavTool.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "SerialNumberList.h"
 #include "qnet.h"

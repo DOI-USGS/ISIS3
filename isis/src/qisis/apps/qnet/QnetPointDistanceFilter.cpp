@@ -5,6 +5,7 @@
 #include <QMessageBox>
 
 #include "Camera.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "Distance.h"
 #include "Latitude.h"
@@ -28,15 +29,15 @@ namespace Qisis {
    *                          distance filter value.
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null.
-   *
+   *   @history 2011-03-17 Tracie Sucharski - Changed text on filter gui.
    *
    */
   QnetPointDistanceFilter::QnetPointDistanceFilter(QWidget *parent) : QnetFilter(parent) {
     p_lineEdit = NULL;
 
     // Create the labels and widgets to be added to the main window
-    QLabel *label = new QLabel("Filter points that are within given distance of some other point.");
-    QLabel *lessThan = new QLabel("Minimum distance is less than");
+    QLabel *label = new QLabel("Filter points that are within given distance of another point.");
+    QLabel *lessThan = new QLabel("Distance to another point is less than");
     p_lineEdit = new QLineEdit();
     QLabel *meters = new QLabel("meters");
     QLabel *pad = new QLabel();
@@ -71,6 +72,8 @@ namespace Qisis {
    *                          of that list. Previously, a new
    *                          filtered list was created from the
    *                          entire control net each time.
+   *   @history 2011-03-17 Tracie Sucharski - Use surface point from camera
+   *                          and updated for changes to SurfacePoint.
    */
   void QnetPointDistanceFilter::filter() {
     // Make sure we have a control network to filter through
@@ -87,7 +90,7 @@ namespace Qisis {
       return;
     }
     // Get the user entered value for filtering
-    int userEntered = p_lineEdit->text().toInt();
+    double userEntered = p_lineEdit->text().toDouble();
 
     // create temporary QList to contain new filtered images
     QList <int> temp;
@@ -96,12 +99,13 @@ namespace Qisis {
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
       Isis::ControlPoint &cp1 = *(*g_controlNetwork)[g_filteredPoints[i]];
       // Get necessary info from the control point for later use
-      double rad = cp1.GetSurfacePoint().GetLocalRadius().GetMeters();
-      double lat1 = cp1.GetSurfacePoint().GetLatitude().GetRadians();
-      double lon1 = cp1.GetSurfacePoint().GetLongitude().GetRadians();
+      //  First check if an adjusted point from jigsaw exists.  If not, use
+      //  the apriori values.
+      
+      Isis::SurfacePoint sp1 = cp1.GetBestSurfacePoint();
 
       // If no lat/lon for this point, use lat/lon of first measure
-      if ((lat1 == Isis::Null) || (lon1 == Isis::Null)) {
+      if (!sp1.Valid()) {
         Isis::Camera *cam1;
         Isis::ControlMeasure cm1;
 
@@ -110,9 +114,7 @@ namespace Qisis {
         int camIndex1 = g_serialNumberList->SerialNumberIndex(cm1.GetCubeSerialNumber());
         cam1 = g_controlNetwork->Camera(camIndex1);
         cam1->SetImage(cm1.GetSample(), cm1.GetLine());
-        rad = cam1->LocalRadius().GetMeters();
-        lat1 = cam1->GetLatitude().GetDegrees();
-        lon1 = cam1->GetLongitude().GetDegrees();
+        sp1 = cam1->GetSurfacePoint();
       }
       // Loop through each control point, comparing it to the initial point
       // from the filtered list
@@ -122,31 +124,20 @@ namespace Qisis {
           continue;
         }
         Isis::ControlPoint cp2 = *(*g_controlNetwork)[j];
-        double lat2 = cp2.GetSurfacePoint().GetLatitude().GetRadians();
-        double lon2 = cp2.GetSurfacePoint().GetLongitude().GetRadians();
+        Isis::SurfacePoint sp2 = cp2.GetBestSurfacePoint();
 
         // If no lat/lon for this point, use lat/lon of first measure
-        if ((lat2 == Isis::Null) || (lon2 == Isis::Null)) {
+        if (!sp2.Valid()) {
           Isis::Camera *cam2;
           Isis::ControlMeasure cm2;
           cm2 = *cp2.GetRefMeasure();
           int camIndex2 = g_serialNumberList->SerialNumberIndex(cm2.GetCubeSerialNumber());
           cam2 = g_controlNetwork->Camera(camIndex2);
           cam2->SetImage(cm2.GetSample(), cm2.GetLine());
-          lat2 = cam2->UniversalLatitude();
-          lon2 = cam2->UniversalLongitude();
+          sp2 = cam2->GetSurfacePoint();
         }
         // Get the distance from the camera class
-        Isis::SurfacePoint point1(
-            Isis::Latitude(lat1, Isis::Angle::Degrees),
-            Isis::Longitude(lon1, Isis::Angle::Degrees),
-            Isis::Distance(rad, Isis::Distance::Meters));
-        Isis::SurfacePoint point2(
-            Isis::Latitude(lat2, Isis::Angle::Degrees),
-            Isis::Longitude(lon2, Isis::Angle::Degrees),
-            Isis::Distance(rad, Isis::Distance::Meters));
-        double dist = point1.GetDistanceToPoint(point2,
-            Isis::Distance(rad, Isis::Distance::Meters)).GetMeters();
+        double dist = sp1.GetDistanceToPoint(sp2,sp1.GetLocalRadius()).GetMeters();
 
         // If the distance found is less than the input number, add the
         // control points' indices to the new filtered points list

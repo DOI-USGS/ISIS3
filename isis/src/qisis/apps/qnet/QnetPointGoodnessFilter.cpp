@@ -4,6 +4,7 @@
 #include "QnetPointGoodnessFilter.h"
 #include "QnetNavTool.h"
 
+#include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "SerialNumberList.h"

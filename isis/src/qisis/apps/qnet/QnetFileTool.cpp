@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "Application.h"
+#include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Filename.h"
 #include "MdiCubeViewport.h"

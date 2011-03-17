@@ -310,6 +310,11 @@ namespace Qisis {
       bool p_groundOpen;
       Isis::ControlPoint::SurfacePointSource::Source p_groundSurfacePointSource;
       Isis::ControlPoint::RadiusSource::Source p_groundRadiusSource;
+      //  TODO:  Combine the following p_groundSourceFile, p_radiusSourceFile
+      //           with p_groundFile and p_demFile.  Is it just a matter of
+      //           full path vs filename only?
+      Isis::iString p_groundSourceFile;
+      Isis::iString p_radiusSourceFile;
       QString p_demFile;
       bool p_demOpen;
       Isis::Cube *p_demCube;

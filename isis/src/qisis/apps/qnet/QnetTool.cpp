@@ -680,13 +680,13 @@ namespace Qisis {
         radius = p_groundGmap->Projection()->LocalRadius();
       }
       try {
-        p_editPoint->SetSurfacePoint(SurfacePoint(
-                                     Latitude(lat, Angle::Degrees),
-                                     Longitude(lon, Angle::Degrees),
-                                     Distance(radius, Distance::Meters)));
+        p_editPoint->SetAprioriSurfacePoint(SurfacePoint(
+                                            Latitude(lat, Angle::Degrees),
+                                            Longitude(lon, Angle::Degrees),
+                                            Distance(radius, Distance::Meters)));
       }
       catch (iException &e) {
-        QString message = "Unable to set Surface Point.\n";
+        QString message = "Unable to set Apriori Surface Point.\n";
         message += "Latitude = " + QString::number(lat);
         message += "  Longitude = " + QString::number(lon);
         message += "  Radius = " + QString::number(radius) + "\n";
@@ -694,12 +694,18 @@ namespace Qisis {
         QMessageBox::critical((QWidget *)parent(),"Error",message);
         e.Clear();
       }
+      p_editPoint->SetAprioriSurfacePointSource(p_groundSurfacePointSource);
+      p_editPoint->SetAprioriSurfacePointSourceFile(p_groundSourceFile);
+      p_editPoint->SetAprioriRadiusSource(p_groundRadiusSource);
+      p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
+
       updateSurfacePointInfo ();
     }
 
     // Save the right measure and left (if ignore or edit lock flag changed) to
     // the editPoint The Ignore flag is the only thing that can change on the left
     // measure. First find measure, then replace with the edit Tool measure
+    p_rightMeasure->SetChooserName(Application::UserName());
     ControlMeasure *rightMeasure =
                 p_editPoint->GetMeasure(p_rightMeasure->GetCubeSerialNumber());
     *rightMeasure = *p_rightMeasure;
@@ -710,7 +716,6 @@ namespace Qisis {
     if (p_leftMeasure->IsIgnored() != leftMeasure->IsIgnored() ||
         p_leftMeasure->IsEditLocked() != leftMeasure->IsEditLocked()) {
       p_leftMeasure->SetChooserName(Application::UserName());
-      p_leftMeasure->SetDateTime();
       *leftMeasure = *p_leftMeasure;
     }
 
@@ -745,6 +750,8 @@ namespace Qisis {
         }
       }
     }
+
+    p_editPoint->SetChooserName(Application::UserName());
 
     //  Make a copy of edit point for updating the control net since the edit
     //  point is still loaded in the point editor.
@@ -1221,7 +1228,6 @@ namespace Qisis {
         m->SetAprioriSample(cam->Sample());
         m->SetAprioriLine(cam->Line());
         m->SetType(ControlMeasure::Manual);
-        m->SetDateTime();
         m->SetChooserName(Application::UserName());
         m->SetCamera(cam);
         newPoint->Add(m);
@@ -1297,10 +1303,10 @@ namespace Qisis {
       //  ??????       What radius , check for dem or shape model
       double radius = p_groundGmap->Projection()->LocalRadius();
 
-      groundPoint->SetSurfacePoint(SurfacePoint(
-                                   Latitude(lat, Angle::Degrees),
-                                   Longitude(lon, Angle::Degrees),
-                                   Distance(radius, Distance::Meters)));
+      groundPoint->SetAprioriSurfacePoint(SurfacePoint(
+                                          Latitude(lat, Angle::Degrees),
+                                          Longitude(lon, Angle::Degrees),
+                                          Distance(radius, Distance::Meters)));
 
       // If this ControlPointId already exists, message box pops up and user is 
       // asked to enter a new value.
@@ -1332,7 +1338,6 @@ namespace Qisis {
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
         m->SetType(ControlMeasure::Manual);
-        m->SetDateTime();
         m->SetChooserName(Application::UserName());
         m->SetCamera(cam);
         groundPoint->Add(m);
@@ -1543,45 +1548,39 @@ namespace Qisis {
     //  If ground, add ground source file to combos, create a measure for
     //  the ground source, load reference on left, ground source on right
     if (p_editPoint->IsGround() && p_groundOpen) {
+
       // TODO:  Does open ground source match point ground source
 
 
 
-      // If no apriori lat/lon for this point, use lat/lon of first measure
-      double lat = p_editPoint->GetSurfacePoint().GetLatitude().GetDegrees();
-      double lon = p_editPoint->GetSurfacePoint().GetLongitude().GetDegrees();
-      if (lat == Null || lon == Null) {
-        // Find lat/lon of reference measure, otherwise use 1st measure
-        ControlMeasure m;
-        if (p_editPoint->IsReferenceExplicit()) {
-          m = *(p_editPoint->GetRefMeasure());
-        }
-        else {
-          m = *(p_editPoint->GetMeasure(0));
-        }
-        int camIndex = g_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
-        Camera *cam;
-        cam = g_controlNetwork->Camera(camIndex);
-        cam->SetImage(m.GetSample(),m.GetLine());
-        lat = cam->UniversalLatitude();
-        lon = cam->UniversalLongitude();
-      }
+      // Find lat/lon of reference measure, otherwise use 1st measure
+      ControlMeasure m = *(p_editPoint->GetRefMeasure());
+      int camIndex = g_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
+      Camera *cam;
+      cam = g_controlNetwork->Camera(camIndex);
+      cam->SetImage(m.GetSample(),m.GetLine());
+      double lat = cam->UniversalLatitude();
+      double lon = cam->UniversalLongitude();
 
       //  Try to locate point position on current ground source,
       //  TODO ???if doesn't exist,???
       if (!p_groundGmap->SetUniversalGround(lat,lon)) {
-
-
+        QString message = "This point does not exist on the ground source.\n";
+        message += "Latitude = " + QString::number(lat);
+        message += "  Longitude = " + QString::number(lon);
+        message += "\n A ground measure will not be created.";
+        QMessageBox::warning((QWidget *)parent(),"Warning",message);
       }
-
-      // Create a temporary measure to hold the ground point info for ground source
-      // This measure will be deleted when the ControlPoint is saved to the
-      // ControlNet.
-      Isis::ControlMeasure *groundMeasure = new ControlMeasure;
-      groundMeasure->SetCubeSerialNumber(p_groundSN);
-      groundMeasure->SetType(ControlMeasure::Candidate);
-      groundMeasure->SetCoordinate(p_groundGmap->Sample(),p_groundGmap->Line());
-      p_editPoint->Add(groundMeasure);
+      else {
+        // Create a temporary measure to hold the ground point info for ground source
+        // This measure will be deleted when the ControlPoint is saved to the
+        // ControlNet.
+        Isis::ControlMeasure *groundMeasure = new ControlMeasure;
+        groundMeasure->SetCubeSerialNumber(p_groundSN);
+        groundMeasure->SetType(ControlMeasure::Candidate);
+        groundMeasure->SetCoordinate(p_groundGmap->Sample(),p_groundGmap->Line());
+        p_editPoint->Add(groundMeasure);
+      }
     }
 
 
@@ -1687,26 +1686,26 @@ namespace Qisis {
     }
     p_pointAprioriRadius->setText(s);
   
-    SurfacePoint point = p_editPoint->GetSurfacePoint();
+    SurfacePoint point = p_editPoint->GetAdjustedSurfacePoint();
     if (point.GetLatitude().GetDegrees() == Isis::Null) {
-      s = "Latitude:  Null";
+      s = "Adjusted Latitude:  Null";
     }
     else {
-      s = "Latitude:  " + QString::number(point.GetLatitude().GetDegrees());
+      s = "Adjusted Latitude:  " + QString::number(point.GetLatitude().GetDegrees());
     }
     p_pointLatitude->setText(s);
     if (point.GetLongitude().GetDegrees() == Isis::Null) {
-      s = "Longitude:  Null";
+      s = "Adjusted Longitude:  Null";
     }
     else {
-      s = "Longitude:  " + QString::number(point.GetLongitude().GetDegrees());
+      s = "Adjusted Longitude:  " + QString::number(point.GetLongitude().GetDegrees());
     }
     p_pointLongitude->setText(s);
     if (point.GetLocalRadius().GetMeters() == Isis::Null) {
-      s = "Radius:  Null";
+      s = "Adjusted Radius:  Null";
     }
     else {
-      s = "Radius:  " +
+      s = "Adjusted Radius:  " +
           QString::number(point.GetLocalRadius().GetMeters(),'f',2) + " <meters>";
     }
     p_pointRadius->setText(s);
@@ -1922,9 +1921,9 @@ namespace Qisis {
     //  TODO::   Needs to be moved to QnetFileTool.cpp
     Camera *cam;
 
-    // If no apriori lat/lon for this point, use lat/lon of first measure
-    double lat = p_editPoint->GetSurfacePoint().GetLatitude().GetDegrees();
-    double lon = p_editPoint->GetSurfacePoint().GetLongitude().GetDegrees();
+    // If no apriori or adjusted lat/lon for this point, use lat/lon of first measure
+    double lat = p_editPoint->GetBestSurfacePoint().GetLatitude().GetDegrees();
+    double lon = p_editPoint->GetBestSurfacePoint().GetLongitude().GetDegrees();
     if (lat == Null || lon == Null) {
       ControlMeasure m = *(p_editPoint->GetMeasure(0));
       int camIndex = g_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
@@ -1967,7 +1966,6 @@ namespace Qisis {
         m->SetAprioriSample(cam->Sample());
         m->SetAprioriLine(cam->Line());
         m->SetType(ControlMeasure::Manual);
-        m->SetDateTime();
         m->SetChooserName(Application::UserName());
         p_editPoint->Add(m);
       }
@@ -2494,6 +2492,7 @@ namespace Qisis {
 
     }
 
+    p_groundSourceFile = ground;
     p_groundCube = new Cube();
     try {
       p_groundCube->Open(ground.toStdString());
@@ -2524,17 +2523,15 @@ namespace Qisis {
     if (!g_serialNumberList->HasSerialNumber(serialNumber)) {
       g_serialNumberList->Add(ground.toStdString(),true);
     }
-/*
-      for (int i=0; i<g_serialNumberList->Size(); i++) {
-        cout<<"file = "<<g_serialNumberList->Filename(i)<<"   sn = "<<g_serialNumberList->SerialNumber(i)<<std::endl;
 
-      }
-*/
     //  Determine file type of ground for setting AprioriSurfacePointSource
     //  and AprioriRadiusSource.
     if (p_groundCube->HasTable("ShapeModelStatistics")) {
       p_groundSurfacePointSource = ControlPoint::SurfacePointSource::Basemap;
-      if (!p_demOpen) p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
+      if (!p_demOpen) {
+        p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
+        p_radiusSourceFile = ground;
+      }
     }
     // Is this a level 1 or level 2?
     else {
@@ -2546,10 +2543,12 @@ namespace Qisis {
         // TODO  Add Basemap to ControlPoint::RadiusSource
         if (!p_demOpen) {
           // TODO p_groundRadiusSource = ControlPoint::RadiusSource::Basemap;
-          p_groundRadiusSource = ControlPoint::RadiusSource::BundleSolution;
+          p_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
           PvlGroup mapping = p_groundCube->GetGroup("Mapping");
           p_demFile = QString::fromStdString(mapping ["EquatorialRadius"])
                          + ", " + QString::fromStdString(mapping ["PolarRadius"]);
+          //  
+          p_radiusSourceFile = "";
         }
       }
       catch (iException &e) {
@@ -2563,12 +2562,15 @@ namespace Qisis {
             QString shapeFile = QString::fromStdString(kernels ["ShapeModel"]);
             if (shapeFile.contains("dem")) {
               p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
+              p_radiusSourceFile = shapeFile;
               //  Open shape file for reading radius later
               initDem(shapeFile);
             }
             else {
               p_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
               p_demFile = "Ellipsoid";
+              //  Find pck file from Kernels group
+              p_radiusSourceFile = (string) kernels["TargetAttitudeShape"];
             }
           }
         }
@@ -2580,6 +2582,7 @@ namespace Qisis {
           QMessageBox::critical((QWidget *)parent(),"Error",message);
           //  Clear out everything relating to ground source
           clearGroundSource ();
+          QApplication::restoreOverrideCursor();
           return;
         }
       }
@@ -2668,6 +2671,7 @@ namespace Qisis {
       p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
       p_groundFilenameLabel->setText("Ground Source File:  " + p_groundFile);
       p_radiusFilenameLabel->setText("Radius Source File:  " + p_demFile);
+      p_radiusSourceFile = demFile;
 
       QApplication::restoreOverrideCursor();
   }
