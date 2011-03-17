@@ -346,7 +346,6 @@ namespace Isis {
       p_residuals.push_back(value - p_expected[i]);
       p_sigma0 += p_residuals[i]*p_residuals[i]*p_sqrtWeight[i]*p_sqrtWeight[i];
     }
-
     // calculate degrees of freedom (or redundancy)
     // DOF = # observations + # constrained parameters - # unknown parameters
     p_degreesOfFreedom = p_basis->Coefficients() - coefs.dim1();
@@ -455,6 +454,7 @@ namespace Isis {
    *          from p_weight to p_sqrtweight.
    * @history 2010        Ken Edmundson 
    * @history 2010-11-20  Debbie A. Cook Merged Ken Edmundson verion with system version
+   * @history 2011-03-17  Ken Edmundson Corrected computation of residuals 
    *
    */
 #if !defined(__sun__)
@@ -547,8 +547,9 @@ namespace Isis {
     p_sigma0 = 0.0;
 
     for ( int i = 0; i < p_sparseRows; i++ ) {
-      p_residuals[i] -= p_expected[i];
-      p_sigma0 += p_residuals[i]*p_residuals[i]*p_sqrtWeight[i]*p_sqrtWeight[i];
+        p_residuals[i] = p_residuals[i]/p_sqrtWeight[i];
+        p_residuals[i] -= p_expected[i];
+        p_sigma0 += p_residuals[i]*p_residuals[i]*p_sqrtWeight[i]*p_sqrtWeight[i];
     }
 
     // if Jigsaw (bundle adjustment)
@@ -565,8 +566,11 @@ namespace Isis {
         constrained_vTPv += p_epsilonsSparse[i]*p_epsilonsSparse[i]*weight;
       }
       p_sigma0 += constrained_vTPv;
-    }
 
+    std::cout << "***constrained_vTPv = " << constrained_vTPv  << "***" << std::endl;
+
+
+    }
     // calculate degrees of freedom (or redundancy)
     // DOF = # observations + # constrained parameters - # unknown parameters
     p_degreesOfFreedom = p_sparseRows + p_constrainedParameters - p_sparseCols;
@@ -709,8 +713,9 @@ namespace Isis {
     }
     else {
       p_input.clear();
-      p_sigma0 = 0.;
+      //      p_sigma0 = 0.;
     }
+      p_sigma0 = 0.;
     p_residuals.clear();
     p_expected.clear();
     p_sqrtWeight.clear();
