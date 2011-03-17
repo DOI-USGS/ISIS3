@@ -218,6 +218,22 @@ int main() {
   cout << "newCp with explicit:   " << newCp.IsReferenceExplicit() << endl;
   newCp.Delete(cm3);
   cout << "newCp reverted to implicit:   " << newCp.IsReferenceExplicit() << endl;
+  
+  cout << "\ntesting GetMeasures method...\n";
+  ControlMeasure * alpha = new ControlMeasure;
+  alpha->SetCubeSerialNumber("alpha");
+  ControlMeasure * beta = new ControlMeasure;
+  beta->SetCubeSerialNumber("beta");
+  ControlPoint GetMeasuresTestPoint;
+  GetMeasuresTestPoint.Add(alpha);
+  GetMeasuresTestPoint.Add(beta);
+  QList< ControlMeasure * > measures = GetMeasuresTestPoint.GetMeasures();
+  foreach (ControlMeasure * measure, measures)
+    cout << measure->GetCubeSerialNumber() << "\n";
+  beta->SetIgnored(true);
+  measures = GetMeasuresTestPoint.GetMeasures(true);
+  foreach (ControlMeasure * measure, measures)
+    cout << measure->GetCubeSerialNumber() << "\n";
 }
 
 void printPoint(Isis::ControlPoint &p) {

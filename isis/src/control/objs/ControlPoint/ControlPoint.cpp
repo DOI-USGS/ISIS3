@@ -1915,10 +1915,14 @@ namespace Isis {
   }
 
 
-  QList< ControlMeasure * > ControlPoint::GetMeasures() const {
+  QList< ControlMeasure * > ControlPoint::GetMeasures(
+      bool excludeIgnored) const {
     QList< ControlMeasure * > orderedMeasures;
-    for (int i = 0; i < cubeSerials->size(); i++)
-      orderedMeasures.append(measures->value((*cubeSerials)[i]));
+    for (int i = 0; i < cubeSerials->size(); i++) {
+      ControlMeasure * measure = measures->value((*cubeSerials)[i]);
+      if (!excludeIgnored || !measure->IsIgnored())
+        orderedMeasures.append(measures->value((*cubeSerials)[i]));
+    }
     return orderedMeasures;
   }
 

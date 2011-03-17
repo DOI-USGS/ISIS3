@@ -240,6 +240,8 @@ namespace Isis {
    *   @history 2011-03-15 Steven Lambright - Now writes AdjustedX, AdjustedY,
    *            and AdjustedZ to the pvl format. Also updated proto buffer calls
    *            to reflect naming changes.
+   *   @history 2011-03-17 Eric Hyer - Added default parameter to GetMeasures
+   *            method for excluding ignored measures.
    */
   class ControlPoint {
       friend class ControlNet;
@@ -431,7 +433,7 @@ namespace Isis {
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
 
-      QList< ControlMeasure * > GetMeasures() const;
+      QList< ControlMeasure * > GetMeasures(bool excludeIgnored = false) const;
       QList< QString > GetCubeSerialNumbers() const;
 
       PvlObject ToPvlObject() const;
