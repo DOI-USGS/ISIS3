@@ -567,9 +567,6 @@ namespace Isis {
       }
       p_sigma0 += constrained_vTPv;
 
-    std::cout << "***constrained_vTPv = " << constrained_vTPv  << "***" << std::endl;
-
-
     }
     // calculate degrees of freedom (or redundancy)
     // DOF = # observations + # constrained parameters - # unknown parameters
