@@ -1296,11 +1296,14 @@ namespace Isis {
    * in the network
    *
    * @return Number of valid measures
+   *
+   * @internal
+   * @history 2011-03-17 Debbie A. Cook - Modified to not count ignored measures.
    */
   int ControlNet::GetNumValidMeasures() {
     int numValidMeasures = 0;
     foreach(ControlPoint * p, *points)
-    numValidMeasures += p->GetNumValidMeasures();
+      if (!p->IsIgnored()) numValidMeasures += p->GetNumValidMeasures();
 
     return numValidMeasures;
   }
