@@ -614,7 +614,7 @@ namespace Isis {
       }
     }
 
-    emit connectivityChanged();
+    emit networkStructureModified();
   }
 
 
@@ -654,7 +654,7 @@ namespace Isis {
       cubeGraphNodes->remove(serial);
     }
 
-    emit connectivityChanged();
+    emit networkStructureModified();
   }
 
 

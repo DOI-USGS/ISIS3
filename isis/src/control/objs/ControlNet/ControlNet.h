@@ -139,7 +139,7 @@ namespace Isis {
    *                conversions in ControlPoint.
    *   @history 2011-03-14 Eric Hyer - Cube connection graph now updated when
    *                points or measures are ignored.
-   *   @history 2011-03-15 Eric Hyer - Some cube graph bugs fixed.
+   *   @history 2011-03-15 Eric Hyer - Some cube graph bugs were fixed.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -225,7 +225,7 @@ namespace Isis {
 
 
     signals:
-      void connectivityChanged();
+      void networkStructureModified();
 
 
     private:
