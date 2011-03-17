@@ -1915,6 +1915,12 @@ namespace Isis {
   }
 
 
+  /**
+   * @param excludeIgnored Ignored measures are excluded if this is true.  It
+   *                       is false by default.
+   *
+   * @returns A list of this points measurs
+   */
   QList< ControlMeasure * > ControlPoint::GetMeasures(
       bool excludeIgnored) const {
     QList< ControlMeasure * > orderedMeasures;
