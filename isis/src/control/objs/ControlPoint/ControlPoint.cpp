@@ -1140,6 +1140,10 @@ namespace Isis {
    *   @history 2010-12-02 Debbie A. Cook - Added units to SetRectangular
    *                               calls since default is meters and units
    *                               are km.
+   *   @history 2011-03-17 Debbie A. Cook - Added initialization of
+   *                               adjustedSurfacePoint to aprioriSurfacePoint
+   *                               and set test for empty covariance matrix
+   *                               to use 0. instead of nulls.
    *
    * @return Status Success or PointLocked
    */
@@ -1214,11 +1218,14 @@ namespace Isis {
       }
     }
 
-    // Don't update the x/y/z for ground points
+    // Don't update the apriori x/y/z for ground points  TODO This need a closer look
     if (GetType() == Ground || NumberOfConstrainedCoordinates() == 3
                             || IsLatitudeConstrained()
-                            || IsRadiusConstrained())
+                            || IsRadiusConstrained()) {
+      // Initialize the adjusted x/y/z to the apriori in this case
+      adjustedSurfacePoint = aprioriSurfacePoint;
       return Success;
+    }
 
     // Did we have any measures?
     if (goodMeasures == 0) {
@@ -1243,6 +1250,7 @@ namespace Isis {
               Displacement((zB / goodMeasures), Displacement::Kilometers));
     }
 
+    adjustedSurfacePoint = aprioriSurfacePoint;
     SetAprioriSurfacePointSource(SurfacePointSource::AverageOfMeasures);
     SetAprioriRadiusSource(RadiusSource::AverageOfMeasures);
 
@@ -2003,11 +2011,7 @@ namespace Isis {
       p += PvlKeyword("AprioriZ", apriori.GetZ().GetMeters(), "meters");
 
       symmetric_matrix<double, upper> covar = apriori.GetRectangularMatrix();
-      // This is problematic and needs fixed
-//      if (covar(0, 0) != 0. || covar(1, 1) != 0. || covar(2, 2) != 0.) {
-      if (Displacement(covar(0, 0), Displacement::Meters).Valid() || 
-          Displacement(covar(1, 1), Displacement::Meters).Valid() ||
-          Displacement(covar(2, 2), Displacement::Meters).Valid()) {
+      if (covar(0, 0) != 0. || covar(1, 1) != 0. || covar(2, 2) != 0.) {
         PvlKeyword matrix("AprioriCovarianceMatrix");
         matrix += covar(0, 0);
         matrix += covar(0, 1);
