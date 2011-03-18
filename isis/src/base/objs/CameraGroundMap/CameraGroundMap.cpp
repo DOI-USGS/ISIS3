@@ -122,7 +122,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool CameraGroundMap::GetXY(SurfacePoint point, double *cudx, double *cudy) {
+  bool CameraGroundMap::GetXY(const SurfacePoint &point, double *cudx, double *cudy) {
 
     double pB[3];
     pB[0] = point.GetX().GetKilometers();

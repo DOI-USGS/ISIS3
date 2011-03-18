@@ -66,6 +66,7 @@ namespace Isis {
    *                       calling this method.
    *  @history 2011-02-09 Steven Lambright SetGround now uses the Latitude,
    *                       Longitude and SurfacePoint classes.
+   *  @history 2011-03-18 Debbie A. Cook Added reference to surface point in GetXY
    *
    */
   class CameraGroundMap {
@@ -86,7 +87,7 @@ namespace Isis {
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
-      virtual bool GetXY(const SurfacePoint spoint, double *cudx, double *cudy);
+      virtual bool GetXY(const SurfacePoint &spoint, double *cudx, double *cudy);
       virtual bool GetXY(const double lat, const double lon,
                          const double radius, double *cudx, double *cudy);
       virtual bool GetdXYdPosition(const SpicePosition::PartialType varType,
