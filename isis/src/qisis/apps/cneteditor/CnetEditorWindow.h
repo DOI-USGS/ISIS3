@@ -4,7 +4,9 @@
 #include <QMainWindow>
 
 class QAction;
+class QButtonGroup;
 class QCloseEvent;
+class QFont;
 class QMenu;
 class QString;
 class QToolBar;
@@ -55,16 +57,15 @@ namespace Isis
       void save();
       void saveAs();
       void closeNetwork();
-      void handleSynchronizeViews();
 
 
     private: // data
       ControlNet * cnet;
       CnetEditorWidget * editorWidget;
       QString * curFile;
+      QFont * labelFont;
       bool dirty;
       bool saveAsPvl;
-      bool synchronized;
 
 
     private: // widgets
@@ -73,13 +74,14 @@ namespace Isis
       QAction * saveAsAct;
       QAction * aboutAct;
       QAction * closeAct;
-      QAction * synchronizeAct;
       QAction * quitAct;
 
       QMenu * fileMenu;
       QMenu * helpMenu;
 
       QToolBar * mainToolBar;
+
+      QButtonGroup * driveViewGrp;
   };
 }
 

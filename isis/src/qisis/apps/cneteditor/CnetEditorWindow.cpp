@@ -1,3 +1,5 @@
+#include "IsisDebug.h"
+
 #include "CnetEditorWindow.h"
 
 #include <iostream>
@@ -9,7 +11,9 @@
 #include <QCloseEvent>
 #include <QHBoxLayout>
 #include <QLayout>
+#include <QFont>
 #include <QFileDialog>
+#include <QLabel>
 #include <QMessageBox>
 #include <QMenu>
 #include <QMenuBar>
@@ -47,7 +51,7 @@ namespace Isis
     setAcceptMode(AcceptSave);
     setNameFilter("Control Network files (*.net);;All files (*)");
     QGridLayout * mainLayout = dynamic_cast< QGridLayout * >(layout());
-    Q_ASSERT(mainLayout);
+    ASSERT(mainLayout);
     if (mainLayout)
       mainLayout->addLayout(l, mainLayout->rowCount(), 0, 1, -1);
   }
@@ -58,8 +62,10 @@ namespace Isis
     // For some reason GUI style is not detected correctly by Qt for Isis.
     // This solution is less than ideal since it assumes one of at least 4
     // possible styles that could exist for X11 systems.  Plastique will
-    // probably be the most common for KDE users.  If its wrong (say it was
-    // really Oxygen) then it will still be better than using Windows style.
+    // probably be the most common style for KDE users.  If its wrong (say it
+    // was really Oxygen) then it will still be better than using Windows style,
+    // which is what Qt is falling back to after it fails to choose the correct
+    // style.
 #ifdef Q_WS_X11
     QApplication::setStyle("Plastique");
 #endif
@@ -69,6 +75,7 @@ namespace Isis
 
     nullify();
     curFile = new QString;
+    labelFont = new QFont("Sansserif", 9);
 
     createActions();
     createMenus();
@@ -88,6 +95,12 @@ namespace Isis
       curFile = NULL;
     }
 
+    if (labelFont)
+    {
+      delete labelFont;
+      labelFont = NULL;
+    }
+
     nullify();
   }
 
@@ -97,13 +110,13 @@ namespace Isis
     cnet = NULL;
     editorWidget = NULL;
     curFile = NULL;
+    labelFont = NULL;
 
     openAct = NULL;
     saveAct = NULL;
     saveAsAct = NULL;
     aboutAct = NULL;
     closeAct = NULL;
-    synchronizeAct = NULL;
     quitAct = NULL;
 
     fileMenu = NULL;
@@ -118,6 +131,8 @@ namespace Isis
     if (okToContinue())
     {
       writeSettings();
+      if (editorWidget)
+        editorWidget->writeSettings();
       event->accept();
     }
     else
@@ -146,12 +161,6 @@ namespace Isis
     closeAct = new QAction(QIcon(":close"), tr("&Close"), this);
     closeAct->setStatusTip(tr("Close control net file"));
     connect(closeAct, SIGNAL(triggered()), this, SLOT(closeNetwork()));
-
-    synchronizeAct = new QAction(tr("Synchronize Views"), this);
-    synchronizeAct->setCheckable(true);
-    connect(synchronizeAct, SIGNAL(triggered()), this,
-        SLOT(handleSynchronizeViews()));
-
 
 //    aboutAct = new QAction(tr("&About"), this);
 //    aboutAct->setStatusTip(tr("Show cneteditor's about box"));
@@ -193,7 +202,31 @@ namespace Isis
     mainToolBar->addSeparator();
     mainToolBar->addAction(closeAct);
     mainToolBar->addSeparator();
-    mainToolBar->addAction(synchronizeAct);
+
+    QFont boldFont(*labelFont);
+    boldFont.setBold(true);
+
+    QLabel * driverSelectionLabel = new QLabel("   Driver View:  ");
+    driverSelectionLabel->setFont(boldFont);
+    driverSelectionLabel->setAlignment(Qt::AlignCenter);
+
+    QRadioButton * drivePointViewButton = new QRadioButton("Point View");
+    QRadioButton * driveSerialViewButton = new QRadioButton("Cube View");
+    QRadioButton * driveConnectionViewButton = new QRadioButton(
+      "Connection View");
+
+    driveViewGrp = new QButtonGroup(this);
+    driveViewGrp->addButton(drivePointViewButton,
+        (int) CnetEditorWidget::PointView);
+    driveViewGrp->addButton(driveSerialViewButton,
+        (int) CnetEditorWidget::SerialView);
+    driveViewGrp->addButton(driveConnectionViewButton,
+        (int) CnetEditorWidget::ConnectionView);
+
+    mainToolBar->addWidget(driverSelectionLabel);
+    mainToolBar->addWidget(drivePointViewButton);
+    mainToolBar->addWidget(driveSerialViewButton);
+    mainToolBar->addWidget(driveConnectionViewButton);
 
     addToolBar(Qt::TopToolBarArea, mainToolBar);
   }
@@ -216,10 +249,6 @@ namespace Isis
     resize(size);
     move(pos);
 
-    // load view synchronization state
-    synchronizeAct->setChecked(
-      settings.value("synchronizeViews", false).toBool());
-
     setWindowIcon(QIcon(":usgs"));
   }
 
@@ -232,8 +261,6 @@ namespace Isis
     settings.setValue("pos", pos());
     settings.setValue("size", size());
 
-    // save view synchronization state
-    settings.setValue("synchronizeViews", synchronized);
   }
 
 
@@ -286,10 +313,10 @@ namespace Isis
 
     saveAsAct->setEnabled(true);
     closeAct->setEnabled(true);
-    handleSynchronizeViews();
     setDirty(false);
     *curFile = filename;
     setWindowTitle(filename + "[*] - cneteditor");
+    driveViewGrp->button(editorWidget->getDriverView())->click();
   }
 
 
@@ -313,6 +340,8 @@ namespace Isis
       cnet = new ControlNet(filename);
       editorWidget = new CnetEditorWidget(cnet);
       connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
+      connect(driveViewGrp, SIGNAL(buttonClicked(int)), editorWidget,
+          SLOT(setDriverView(int)));
       setCentralWidget(editorWidget);
       setHasFileState(filename);
       saveAsPvl = !Pvl((iString) filename).HasObject("ProtoBuffer");
@@ -388,6 +417,8 @@ namespace Isis
     if (okToContinue())
     {
       disconnect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
+      disconnect(driveViewGrp, SIGNAL(buttonClicked(int)), editorWidget,
+          SLOT(setDriverView(int)));
       delete editorWidget;
       editorWidget = NULL;
       delete cnet;
@@ -395,16 +426,6 @@ namespace Isis
 
       setNoFileState();
     }
-  }
-
-
-  void CnetEditorWindow::handleSynchronizeViews()
-  {
-    Q_ASSERT(synchronizeAct);
-    synchronized = synchronizeAct->isChecked();
-
-    if (editorWidget)
-      editorWidget->setSynchronizedViews(synchronized);
   }
 
 

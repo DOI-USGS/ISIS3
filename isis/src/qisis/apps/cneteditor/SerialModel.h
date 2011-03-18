@@ -1,52 +1,30 @@
 #ifndef SerialModel_H
 #define SerialModel_H
 
-#include <QAbstractItemModel>
+#include "TreeModel.h"
 
 
-class QVariant;
-class QModelIndex;
+class QString;
 
 
 namespace Isis
 {
   class ControlNet;
-  class PointParentItem;
-  class TreeItem;
 
-  class SerialModel : public QAbstractItemModel
+  class SerialModel : public TreeModel
   {
       Q_OBJECT
 
     public:
-      SerialModel(Isis::ControlNet * cNet, QObject * parent = 0);
+      SerialModel(Isis::ControlNet * cNet, QString name, QObject * parent = 0);
       virtual ~SerialModel();
 
-      QVariant data(const QModelIndex & index, int role) const;
-      QVariant headerData(int section, Qt::Orientation orientation,
-          int role = Qt::DisplayRole) const;
-
-      QModelIndex index(int row, int column,
-          const QModelIndex & parent = QModelIndex()) const;
-
-      QModelIndex parent(const QModelIndex & index) const;
-
-
-//       Qt::ItemFlags flags(const QModelIndex & index) const;
-      int rowCount(const QModelIndex & parent = QModelIndex()) const;
-      int columnCount(const QModelIndex & parent = QModelIndex()) const;
-
-
-    private:
-      TreeItem * getItem(const QModelIndex & index) const;
-
-
-    private:
-      ControlNet * cNet;
-      QList< TreeItem * > * serialItems;
+      // This is a slot!!!  There is no "pubic slots:" because it has already
+      // been marked as a slot in the parent (pure virtual).  Adding the slots
+      // keyword here would do nothing except make more work for both MOC and
+      // the compiler!
+      void rebuildItems();
   };
-
 }
 
 #endif
-

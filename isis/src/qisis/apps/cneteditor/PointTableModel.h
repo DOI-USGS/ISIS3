@@ -61,7 +61,7 @@ namespace Isis
 //       bool removeRows(int position, int rows,
 //           const QModelIndex & index = QModelIndex());
 
-    
+
     private:
       PointTableModel(const PointTableModel &);
       const PointTableModel & operator=(PointTableModel);

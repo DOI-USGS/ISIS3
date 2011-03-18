@@ -12,6 +12,7 @@
 #include <QHeaderView>
 #include <QItemSelection>
 #include <QModelIndex>
+#include <QSettings>
 #include <QSplitter>
 #include <QString>
 #include <QStringList>
@@ -48,39 +49,59 @@ namespace Isis
     controlNet = cNet;
 
     QBoxLayout * mainLayout = createMainLayout();
-    setSynchronizedViews(false);
     setLayout(mainLayout);
+    readSettings();
   }
 
 
   CnetEditorWidget::~CnetEditorWidget()
-  {}
-
-
-  void CnetEditorWidget::setSynchronizedViews(bool synchronized)
   {
-    synchronizeViews = synchronized;
+    writeSettings();
+  }
 
-    if (synchronizeViews)
+
+  void CnetEditorWidget::setDriverView(int driverView)
+  {
+    View view = (View) driverView;
+    pointModel->setDrivable(view == PointView);
+    serialModel->setDrivable(view == SerialView);
+    connectionModel->setDrivable(view == ConnectionView);
+  }
+
+
+  int CnetEditorWidget::getDriverView() const
+  {
+    View driverView;
+    if (pointModel->isDrivable())
     {
-      serialView->setSelectionMode(QAbstractItemView::MultiSelection);
-      connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
-      pointViewSelectionChanged();
+      driverView = PointView;
+      ASSERT(!serialModel->isDrivable());
+      ASSERT(!connectionModel->isDrivable());
     }
     else
     {
-      serialView->setSelectionMode(QAbstractItemView::NoSelection);
-      connectionView->setSelectionMode(QAbstractItemView::NoSelection);
-      serialView->selectionModel()->clear();
-      connectionView->selectionModel()->clear();
+      if (serialModel->isDrivable())
+      {
+        driverView = SerialView;
+        ASSERT(!pointModel->isDrivable());
+        ASSERT(!connectionModel->isDrivable());
+      }
+      else
+      {
+        driverView = ConnectionView;
+        ASSERT(connectionModel->isDrivable());
+        ASSERT(!pointModel->isDrivable());
+        ASSERT(!serialModel->isDrivable());
+      }
     }
+    return (int) driverView;
   }
 
 
   QBoxLayout * CnetEditorWidget::createMainLayout()
   {
     pointView = new QTreeView();
-    pointModel = new PointModel(controlNet, qApp);
+    pointModel = new PointModel(controlNet, "Point View", qApp);
     pointView->setModel(pointModel);
     connect(pointView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
@@ -90,22 +111,25 @@ namespace Isis
     pointView->setSelectionMode(QAbstractItemView::MultiSelection);
 
     serialView = new QTreeView();
-    serialModel = new SerialModel(controlNet, qApp);
+    serialModel = new SerialModel(controlNet, "Cube View", qApp);
     serialView->setModel(serialModel);
     connect(serialView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(serialViewSelectionChanged()));
 //     serialView->setExpandsOnDoubleClick(false);
     serialView->setAlternatingRowColors(true);
+    serialView->setSelectionMode(QAbstractItemView::MultiSelection);
 
     connectionView = new QTreeView();
-    connectionModel = new ConnectionModel(controlNet, qApp);
+    connectionModel = new ConnectionModel(controlNet, "Cube Connection View",
+        qApp);
     connectionView->setModel(connectionModel);
     connect(connectionView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(connectionViewSelectionChanged()));
 //     connectionView->setExpandsOnDoubleClick(false);
     connectionView->setAlternatingRowColors(true);
+    connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
 
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
@@ -158,11 +182,11 @@ namespace Isis
     topSplitter->addWidget(serialView);
     topSplitter->addWidget(connectionView);
 
-    QSplitter * mainSplitter = new QSplitter(Qt::Vertical);
+    mainSplitter = new QSplitter(Qt::Vertical);
     mainSplitter->addWidget(topSplitter);
     mainSplitter->addWidget(editPointBox);
     mainSplitter->addWidget(editMeasureBox);
-    
+
 //     QPushButton * button = new QPushButton("push me");
 //     connect(button, SIGNAL(clicked()), this, SLOT(blah()));
 //     mainSplitter->addWidget(button);
@@ -175,24 +199,6 @@ namespace Isis
 
     return mainLayout;
   }
-  
-  
-  void CnetEditorWidget::blah()
-  {
-    cerr << "blah\n";
-    delete connectionModel;
-    delete connectionView;
-    connectionView = new QTreeView();
-    connectionModel = new ConnectionModel(controlNet, qApp);
-    connectionView->setModel(connectionModel);
-    connect(connectionView->selectionModel(), SIGNAL(selectionChanged(
-        const QItemSelection &, const QItemSelection &)), this,
-        SLOT(connectionViewSelectionChanged()));
-//     connectionView->setExpandsOnDoubleClick(false);
-    connectionView->setAlternatingRowColors(true);
-    topSplitter->addWidget(connectionView);
-  }
-  
 
 
   void CnetEditorWidget::nullify()
@@ -208,8 +214,14 @@ namespace Isis
     editPointModel = NULL;
     editMeasureModel = NULL;
 
+    editPointDelegate = NULL;
+    editMeasureDelegate = NULL;
+
     editPointView = NULL;
     editMeasureView = NULL;
+
+    topSplitter = NULL;
+    mainSplitter = NULL;
 
     controlNet = NULL;
   }
@@ -252,26 +264,19 @@ namespace Isis
         }
         else
         {
-          // if this is reachable code then we have a serious problem!
-          cerr << "error in CnetEditorWidget::pointViewSelectionChanged!\n";
+          ASSERT(0);
         }
       }
     }
 
-    //********************FIXME***************************************/
     // populate editor tables
     editPointModel->setPoints(points);
     QList< ControlMeasure * > allMeasuresForSelectedPoints;
     foreach(ControlPoint * point, points)
-    {
-      for (int i = 0; i < point->GetNumMeasures(); i++)
-        allMeasuresForSelectedPoints.append((*point)[i]);
-    }
+    allMeasuresForSelectedPoints.append(point->GetMeasures());
     editMeasureModel->setMeasures(allMeasuresForSelectedPoints);
-    //********************FIXME***************************************/
 
-
-    if (synchronizeViews)
+    if (pointModel->isDrivable())
     {
       focusView(serialView, cubeSerialNumbers);
       focusView(connectionView, cubeSerialNumbers);
@@ -283,7 +288,7 @@ namespace Isis
 
   void CnetEditorWidget::serialViewSelectionChanged()
   {
-    if (updatingSelection || !synchronizeViews)
+    if (updatingSelection)
       return;
     updatingSelection = true;
 
@@ -317,10 +322,7 @@ namespace Isis
         }
         else
         {
-          // This is not an error case!  This code will not be reachable
-          // if things are working correctly.  This is only here to catch
-          // the unlikely event that I made a very serious error.
-          cerr << "error in CnetEditorWidget::pointViewSelectionChanged!\n";
+          ASSERT(0);
         }
       }
     }
@@ -328,8 +330,11 @@ namespace Isis
     editPointModel->setPoints(points);
     editMeasureModel->setMeasures(measures);
 
-    focusView(pointView, pointIds);
-    focusView(connectionView, cubeSerialNumbers);
+    if (serialModel->isDrivable())
+    {
+      focusView(pointView, pointIds);
+      focusView(connectionView, cubeSerialNumbers);
+    }
 
     updatingSelection = false;
   }
@@ -376,20 +381,16 @@ namespace Isis
         }
         else
         {
-          // This is not an error case!  This code will not be reachable
-          // if things are working correctly.  This is only here to catch
-          // the unlikely event that I made a very serious error.
-          cerr << "error in CnetEditorWidget::connectionViewSelectionChanged!"
-              "\n";
+          ASSERT(0);
         }
       }
     }
 
-    if (synchronizeViews)
-    {
-      editPointModel->setPoints(points);
-      editMeasureModel->setMeasures(measures);
+    editPointModel->setPoints(points);
+    editMeasureModel->setMeasures(measures);
 
+    if (connectionModel->isDrivable())
+    {
       focusView(pointView, pointIds);
       focusView(serialView, cubeSerialNumbers);
     }
@@ -415,5 +416,29 @@ namespace Isis
         view->scrollTo(index, QAbstractItemView::PositionAtCenter);
       }
     }
+  }
+
+
+  void CnetEditorWidget::readSettings()
+  {
+    ASSERT(topSplitter);
+    ASSERT(mainSplitter);
+
+    QSettings settings("USGS", "CnetEditorWidget");
+    topSplitter->restoreState(settings.value("topSplitter").toByteArray());
+    mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
+    setDriverView(settings.value("driverView", PointView).toInt());
+  }
+
+
+  void CnetEditorWidget::writeSettings()
+  {
+    ASSERT(topSplitter);
+    ASSERT(mainSplitter);
+
+    QSettings settings("USGS", "CnetEditorWidget");
+    settings.setValue("topSplitter", topSplitter->saveState());
+    settings.setValue("mainSplitter", mainSplitter->saveState());
+    settings.setValue("driverView", getDriverView());
   }
 }

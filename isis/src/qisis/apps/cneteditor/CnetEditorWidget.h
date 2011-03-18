@@ -27,12 +27,24 @@ namespace Isis
       Q_OBJECT
 
     public:
+      enum View
+      {
+        PointView,
+        SerialView,
+        ConnectionView
+      };
+
+
+    public:
       CnetEditorWidget(Isis::ControlNet *);
       virtual ~CnetEditorWidget();
+      int getDriverView() const;
+      void readSettings();
+      void writeSettings();
 
 
     public slots:
-      void setSynchronizedViews(bool synchronized);
+      void setDriverView(int);
 
 
     signals:
@@ -49,12 +61,10 @@ namespace Isis
       void pointViewSelectionChanged();
       void serialViewSelectionChanged();
       void connectionViewSelectionChanged();
-      void blah();
 
 
     private: // data
       bool updatingSelection;
-      bool synchronizeViews;
 
 
     private: // widgets
@@ -74,10 +84,11 @@ namespace Isis
 
       QTableView * editPointView;
       QTableView * editMeasureView;
-      
+
       QSplitter * topSplitter;
-      
-      
+      QSplitter * mainSplitter;
+
+
     private:
       Isis::ControlNet * controlNet;
   };
