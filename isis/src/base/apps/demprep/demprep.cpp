@@ -1,4 +1,8 @@
 #include "Isis.h"
+
+#include <iomanip>
+
+#include "Distance.h"
 #include "ProcessByLine.h"
 #include "Projection.h"
 #include "SpecialPixel.h"
@@ -19,8 +23,7 @@ int rightPad;
 int topPad;
 int bottomPad;
 int inl;
-double minRadius;
-double maxRadius;
+Statistics outCubeStats;
 
 void IsisMain() {
   // We will be using a mosaic technique so get the size of the input file
@@ -29,6 +32,7 @@ void IsisMain() {
   int ins = icube->Samples();
   inl = icube->Lines();
   int inb = icube->Bands();
+  outCubeStats.Reset();
 
   PvlGroup mapgrp = icube->Label()->FindGroup("Mapping", Pvl::Traverse);
   bool hasExtents = false;
@@ -222,13 +226,16 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   ocube->Open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
 
-  minRadius = DBL_MAX;
-  maxRadius = DBL_MIN;
   p.StartProcess(DoWrap);
 
   // Update mapping grp
   ocube->PutGroup(mapgrp);
-  
+
+  PvlGroup demRange("Results");
+  demRange += PvlKeyword("MinimumRadius", outCubeStats.Minimum(), "meters");
+  demRange += PvlKeyword("MaximumRadius", outCubeStats.Maximum(), "meters");
+  Application::Log(demRange);
+
   // Store min/max radii values in new ShapeModelStatistics table
   string shp_name = "ShapeModelStatistics";
   TableField fmin("MinimumRadius",Isis::TableField::Double);
@@ -240,8 +247,10 @@ void IsisMain() {
 
   Table table(shp_name,record);
 
-  record[0] = minRadius/1000.0;
-  record[1] = maxRadius/1000.0;
+  record[0] = Distance(outCubeStats.Minimum(),
+                       Distance::Meters).GetKilometers();
+  record[1] = Distance(outCubeStats.Maximum(),
+                       Distance::Meters).GetKilometers();
   table += record;
 
   ocube->Write(table);
@@ -257,44 +266,48 @@ void DoWrap(Buffer &in) {
   int inputSize = in.size();
   outMan.SetLine(in.Line() + topPad);
   int outputSize = outMan.size();
-  double avg = 0.0;
 
+  Statistics inputLineStats;
+
+  // We only need stats for the first and last lines of the input cube...
   if ((topPad == 1 && in.Line() == 1) || (bottomPad == 1 && in.Line() == inl)) {
     for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
       int inputIndex = outputIndex - leftPad;
       if(inputIndex < 0) {
-        avg = avg + in[inputIndex + inputSize];
+        inputLineStats.AddData(in[inputIndex + inputSize]);
       }
       else if(inputIndex < inputSize) {
-        avg = avg + in[inputIndex];
+        inputLineStats.AddData(in[inputIndex]);
       }
       else {
-        avg = avg + in[inputIndex - inputSize];
+        inputLineStats.AddData(in[inputIndex - inputSize]);
       }
-    }
-    avg = avg / outputSize;
-    if (avg < minRadius) minRadius = avg;
-    if (avg > maxRadius) maxRadius = avg;
-
-    if (topPad == 1 && in.Line() == 1) {
-      for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
-        int inputIndex = outputIndex - leftPad;
-        if(inputIndex < 0) {
-          outMan[outputIndex] = 2.0 * avg - in[inputIndex + inputSize];
-        }
-        else if(inputIndex < inputSize) {
-          outMan[outputIndex] = 2.0 * avg - in[inputIndex];
-        }
-        else {
-          outMan[outputIndex] = 2.0 * avg - in[inputIndex - inputSize];
-        }
-      }
-      outMan.SetLine(1);
-      ocube->Write(outMan);
-      outMan.SetLine(2);
     }
   }
 
+  // Write top pad?
+  if (topPad == 1 && in.Line() == 1) {
+    double average = inputLineStats.Average();
+    for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
+      int inputIndex = outputIndex - leftPad;
+      if(inputIndex < 0) {
+        outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
+      }
+      else if(inputIndex < inputSize) {
+        outMan[outputIndex] = 2.0 * average - in[inputIndex];
+      }
+      else {
+        outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
+      }
+    }
+    outMan.SetLine(1);
+
+    outCubeStats.AddData(&outMan[0], outMan.size());
+    ocube->Write(outMan);
+    outMan.SetLine(2);
+  }
+
+  // Copy most data
   for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
     int inputIndex = outputIndex - leftPad;
     if(inputIndex < 0) {
@@ -306,26 +319,28 @@ void DoWrap(Buffer &in) {
     else {
       outMan[outputIndex] = in[inputIndex - inputSize];
     }
-    if (outMan[outputIndex] < minRadius) minRadius = outMan[outputIndex];
-    if (outMan[outputIndex] > maxRadius) maxRadius = outMan[outputIndex];
   }
 
+  outCubeStats.AddData(&outMan[0], outMan.size());
   ocube->Write(outMan);
 
+  // Write bottom pad?
   if (bottomPad == 1 && in.Line() == inl) {
+    double average = inputLineStats.Average();
     for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
       int inputIndex = outputIndex - leftPad;
       if(inputIndex < 0) {
-        outMan[outputIndex] = 2.0 * avg - in[inputIndex + inputSize];
+        outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
       }
       else if(inputIndex < inputSize) {
-        outMan[outputIndex] = 2.0 * avg - in[inputIndex];
+        outMan[outputIndex] = 2.0 * average - in[inputIndex];
       }
       else {
-        outMan[outputIndex] = 2.0 * avg - in[inputIndex - inputSize];
+        outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
       }
     }
     outMan.SetLine(inl + topPad + bottomPad);
+    outCubeStats.AddData(&outMan[0], outMan.size());
     ocube->Write(outMan);
   }
 }

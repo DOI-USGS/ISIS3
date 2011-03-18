@@ -26,7 +26,8 @@
       Original version (demwrap)
     </change>
     <change name="Steven Lambright" date="2008-10-03">
-      Added additional checks for valid projections and fixed the implementation of the north and south poles.
+      Added additional checks for valid projections and fixed the implementation
+      of the north and south poles.
     </change>
     <change name="Janet Barrett" date="2010-09-09">
       Original version (demprep) Used the demwrap program as a model for the demprep program.
@@ -39,6 +40,10 @@
       the pixel below it. At the south pole, the average of the pixels that lie in the last line of the file
       is calculated. Then, each pixel in the bottom padded line is set to 2*average - the pixel above it. This
       change only applies to those DEM files that cover the poles.
+    </change>
+    <change name="Steven Lambright" date="2011-03-18">
+      Fixed handling of special pixels. Now reports the min/max radius
+      encountered. A negative radius will now cause this program to fail.
     </change>
   </history>
 
