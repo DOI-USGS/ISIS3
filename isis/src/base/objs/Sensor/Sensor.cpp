@@ -100,8 +100,8 @@ namespace Isis {
         }
         Table table("ShapeModelStatistics");
         p_demCube->Read(table);
-        p_minRadius = new Distance(table[0]["MinimumRadius"], Distance::Meters);
-        p_maxRadius = new Distance(table[0]["MaximumRadius"], Distance::Meters);
+        p_minRadius = new Distance(table[0]["MinimumRadius"], Distance::Kilometers);
+        p_maxRadius = new Distance(table[0]["MaximumRadius"], Distance::Kilometers);
         PvlGroup &mapgrp = demlab.FindGroup("Mapping", Pvl::Traverse);
         p_demScale = (double) mapgrp["Scale"];
       }
@@ -325,7 +325,7 @@ namespace Isis {
             Angle::Radians); // angle/pixel
         const static Angle ninetyDegrees(PI / 2.0, Angle::Radians);
         double maxRadiusMetersSquared = 
-            p_maxRadius->GetMeters() * p_maxRadius->GetMeters();
+            p_maxRadius->GetKilometers() * p_maxRadius->GetKilometers();
         double cmin = cos(
             (ninetyDegrees - 1.0 * (demResolution / 2.0)).GetRadians());
 
