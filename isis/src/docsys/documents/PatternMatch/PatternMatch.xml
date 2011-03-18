@@ -565,7 +565,7 @@
         <h3><a name="ReductionFactor">Reduction Factor</a></h3>
         <p>
           The automatic registration process can often be a time-consuming one,
-          especially when needing to consider a large search area to talk
+          especially when needing to consider a large search area to walk
           through.  In order to help speed up this portion of the process, we
           introduce the notion of a "Reduction Factor".
         </p>
@@ -575,8 +575,10 @@
           looking for a match, the algorithm will first perform a "reduced
           match".  In other words, new pattern and search chips will be created
           with dimensions equal to the original chip dimensions divided by the
-          reduction factor.  For example, a common reduction factor is 1.5, and
-          can be specified in the definition file as follows:
+          reduction factor, and a match will be performed on them first to help
+          refine the general match to a smaller search area.  For example, a
+          common reduction factor is 1.5, and can be specified in the
+          definition file as follows:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -596,10 +598,10 @@
             End_Object
           </pre>
 
-          In the above example, a new pattern chip will be constructed with
+          In the above example, a new pattern chip would be constructed with
           dimensions of 3 samples by 3 lines (i.e., 5 / 1.5 rounded down).  The
-          new search chip, likewise, will be 14 samples by 14 lines (i.e., 21 /
-          1.5).
+          new search chip, likewise, would be 14 samples by 14 lines (i.e., 21
+          / 1.5).
         </p>
         <p>
           Of course, by reducing the chips we lose an amount of detail directly
@@ -629,9 +631,37 @@
           The pattern cube can be forced to match the geometry of the search
           cube by using map projections and/or camera models.  Additionally,
           rotations can be applied to the pattern cube.  The warping is
-          application dependent and therefore is under the control of the
+          application-dependent and therefore is under the control of the
           programmer.  That is, there is no PVL mechanism for warp
           selection/deselection.
+        </p>
+        <p>
+          However, when interpolating during the warp process, the user can
+          choose, via the definition file, which interpolation algorithm to
+          use.  Available interpolation algorithms include 
+          <a href="http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation">
+            Nearest Neighbor
+          </a>,
+          <a href="http://en.wikipedia.org/wiki/Bilinear_interpolation">
+            Bilinear
+          </a>,
+          and
+          <a href="http://en.wikipedia.org/wiki/Bicubic_interpolation#Bicubic_convolution_algorithm">
+            Cube Convolution
+          </a>.
+          As an example of how to specify which algorithm to use:
+
+          <pre style="padding-left:4em;">
+            Group = Algorithm
+              ChipInterpolator = NearestNeighborType
+            End_Group
+          </pre>
+
+          The above example would warp the geometry of the pattern cube using
+          the Nearest Neighbor algorithm.  For a complete list of all
+          possible values for this keyword, see the 
+          <a href="#DeffileKeywords">Definition File Keywords</a>
+          appendix below.
         </p>
 
         <h3><a name="SamplingMatchAlgo">Sampling in the Match Algorithm</a></h3>
