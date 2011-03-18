@@ -1218,7 +1218,7 @@ namespace Isis {
       }
     }
 
-    // Don't update the apriori x/y/z for ground points  TODO This need a closer look
+    // Don't update the apriori x/y/z for ground points  TODO This needs a closer look
     if (GetType() == Ground || NumberOfConstrainedCoordinates() == 3
                             || IsLatitudeConstrained()
                             || IsRadiusConstrained()) {
@@ -1267,6 +1267,7 @@ namespace Isis {
    * @history 2010-08-05 Tracie Sucharski, Changed lat/lon/radius to x/y/z
    * @history 2010-12-10 Debbie A. Cook,  Revised error calculation for radar
    *                            because it was always reporting line errors=0.
+   * @history 2011-03-17 Debbie A. Cook,  Fixed typo in radar call to get longitude
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
     if (editLock)
@@ -1324,7 +1325,7 @@ namespace Isis {
         // we hold time and the Spice, we'll get the same sample/line as
         // measured
         double lat = GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-        double lon = GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+        double lon = GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
         double rad = GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
         if (!cam->SetUniversalGround(lat, lon, rad)) {
           std::string msg = "ControlPoint [" +
