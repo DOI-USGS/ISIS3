@@ -975,7 +975,7 @@ namespace Isis {
     else {
       // Perform extra sanity check.
       string msg =
-        "Unrecognized Gradient Filter Type selected for application.";
+        "No rule to set sub-chip width for selected Gradient Filter Type.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
