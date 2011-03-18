@@ -387,6 +387,7 @@ namespace Isis {
    *
    *
    * @param ptfile
+   * @history 2011-03-18 Debbie A. Cook and Steven Lambright - Added delete of blankLabel
    */
   void ControlNet::WritePB(const iString &ptfile) {
 
@@ -420,6 +421,7 @@ namespace Isis {
     char *blankLabel = new char[labelBytes];
     memset(blankLabel, 0, labelBytes);
     output.write(blankLabel, labelBytes);
+    delete [] blankLabel;
 
     streampos startCorePos = output.tellp();
 
