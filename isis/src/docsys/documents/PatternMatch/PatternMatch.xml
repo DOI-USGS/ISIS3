@@ -52,10 +52,10 @@
               <a href="#ValidPixelCount">Valid Pixel Count</a>
             </li>
             <li>
-              <a href="#PCReduction">Reduction of Pattern Cubes</a>
+              <a href="#ReductionFactor">Reduction Factor</a>
             </li>
             <li>
-              <a href="#PCGeoReduction">Geometric Warping of Pattern Cubes</a>
+              <a href="#GeoWarping">Geometric Warping of Pattern Cubes</a>
             </li>
             <li>
               <a href="#SamplingMatchAlgo">Sampling in the Match Algorithm</a>
@@ -562,81 +562,69 @@
           sub-region chip of the search area will use the same value. 
         </p>
 
-        <h3><a name="PCReduction">Reduction of Pattern Cubes</a></h3>
+        <h3><a name="ReductionFactor">Reduction Factor</a></h3>
         <p>
-          A technique for improving the accuracy of the automatic registration
-          is the repeated reduction of the pattern chip.  The strategy is to use
-          the initial size of the pattern chip to estimate the sub-pixel
-          sample/line in the search cube.  Then reduce the size of the pattern
-          chip and re-match about the estimated point within a limited
-          area.  The technique can be done iteratively all the while searching
-          for the "best" goodness of fit value among the shrinking pattern
-          chips.  This can be accomplished in PVL as follows:
-
-          <pre style="padding-left:4em;">
-            Group = PatternChip
-              Samples = (21,17,11)
-              Lines   = (21,17,11)
-            End_Group
-          </pre>
-
-          The above example finds an initial estimate using a 21x21 chip and
-          then refines using a 17x17 and 11x11 around the estimate. 
+          The automatic registration process can often be a time-consuming one,
+          especially when needing to consider a large search area to talk
+          through.  In order to help speed up this portion of the process, we
+          introduce the notion of a "Reduction Factor".
         </p>
         <p>
-          The amount the reduced chip can move is specified as a percentage of
-          the previous chips area. This is done by using the FloatPercent
-          keyword. If a single value is entered for the FloatPercent keyword, it
-          is used for all reduced pattern chips. For example:
+          If a reduction factor greater than 1 is specified by the user, then
+          before attempting to walk the pattern chip through the search chip
+          looking for a match, the algorithm will first perform a "reduced
+          match".  In other words, new pattern and search chips will be created
+          with dimensions equal to the original chip dimensions divided by the
+          reduction factor.  For example, a common reduction factor is 1.5, and
+          can be specified in the definition file as follows:
 
           <pre style="padding-left:4em;">
-            Group = PatternChip
-              Samples      = (21,17,11)
-              Lines        = (21,17,11)
-              FloatPercent = 50
-            End_Group
+            Object = AutoRegistration
+              Group = Algorithm
+                ReductionFactor = 1.5
+              End_Group
+
+              Group = PatternChip
+                Samples      = 5
+                Lines        = 5
+              End_Group
+
+              Group = SearchChip
+                Samples      = 21
+                Lines        = 21
+              End_Group
+            End_Object
           </pre>
 
-          In this example, each reduced chip is allowed to move with an area
-          that is 50% the size of the previous chip. So the 17x17 chip is
-          allowed to move within a 10x10 area and the 11x11 chip an 8x8 area.
+          In the above example, a new pattern chip will be constructed with
+          dimensions of 3 samples by 3 lines (i.e., 5 / 1.5 rounded down).  The
+          new search chip, likewise, will be 14 samples by 14 lines (i.e., 21 /
+          1.5).
         </p>
         <p>
-          It is also possible to specify a unique value for each reduced pattern
-          chip. This allows the user greater control over the final results. An
-          example is:
-
-          <pre style="padding-left:4em;">
-            Group = PatternChip
-              Samples      = (21,17,11)
-              Lines        = (21,17,11)
-              FloatPercent = (100,25)
-            End_Group
-          </pre>
-
-          Here, the 17x17 chip is limited to a 21x21 area (100% of the 21x21
-          chip) and the 11x11 chip a 4x4 area (25% of the 17x17 chip).
+          Of course, by reducing the chips we lose an amount of detail directly
+          proportionate to the magnitude of the reduction factor.  Increasing
+          the reduction factor will speed up computation, but also decrease the
+          reliability of the result.  A pixel in a reduced chip is simply
+          computed by averaging surrounding pixels in the original chip.
         </p>
         <p>
-          The ability to reduce the pattern chip has direct implications to the
-          valid pixel count.  That is, the specified percentage will be used for
-          each chip.  For example:
-
-          <pre style="padding-left:4em;">
-            Group = PatternChip
-              Samples      = (10,9)
-              Lines        = (10,9)
-              FloatPercent = 50
-              ValidPercent = 60
-            End_Group
-          </pre>
-
-          In this case a 10x10 chip has 100 pixels of which 60% must be
-          valid.  This will apply to all pattern chips and therefore the 9x9
-          chips must have at least 49 valid pixels (60% of 81).
+          After the match has been performed on the reduced chips, instead of
+          simply accepting the result, the algorithm will continue on to
+          matching the original chips, but decrease the search area to some
+          smaller area surrounding the "best" sample and line derived from the
+          reduced match, effectively cropping the search chip (not scaling it,
+          as in the reduced match) to some general area suspected to contain
+          the exact match.  Increasing the reduction factor will increase the
+          size of the resulting search area.
+        </p>
+        <p>
+          Adaptive algorithms will make additional use the "best" sample and
+          line dervied from the reduced match when setting up its affine
+          transformations.
         </p>
 
-        <h3><a name="PCGeoReduction">Geometric Warping of Pattern Cubes</a></h3>
+        <h3><a name="GeoWarping">Geometric Warping of Pattern Cubes</a></h3>
         <p>
           The pattern cube can be forced to match the geometry of the search
           cube by using map projections and/or camera models.  Additionally,
@@ -733,7 +721,11 @@
           inclusive value.  The <strong>default</strong> column provides the
           value that will be taken when the keyword is not provided.  If the
           value for a particular cell is <span style="color:red;">red</span>,
-          then the given action will be performed if no value is specified.
+          then instead of the corresponding keyword defaulting to some value in
+          the registration process, the stated action will be performed.  In
+          the case of an <span style="color:red;">Exception</span>, unless the
+          specific application being used handles the missing value, the
+          registration will fail.
         </p>
 
         <table class="tableFormattedInformation" align="center">
@@ -762,14 +754,14 @@
             <td><span style="color:red;">Exception</span></td>
           </tr>
           <tr>
-            <td><strong>ChipInterpolator</strong></td>
+            <td><a href="#GeoWarping"><strong>ChipInterpolator</strong></a></td>
             <td>Algorithm</td>
             <td>String</td>
             <td>{NearestNeighborType, BiLinearType, CubicConvolutionType}</td>
             <td>CubicConvolutionType</td>
           </tr>
           <tr>
-            <td><strong>ReductionFactor</strong></td>
+            <td><a href="#ReductionFactor"><strong>ReductionFactor</strong></a></td>
             <td>Algorithm</td>
             <td>Integer</td>
             <td>[1, infinity)</td>
@@ -836,7 +828,7 @@
 
           <!-- Search Chip -->
           <tr>
-            <td><a href="#SamplingMatchAlgo"><strong>SubchipValidPercent</strong></a></td>
+            <td><a href="#ValidPixelCount"><strong>SubchipValidPercent</strong></a></td>
             <td>SearchChip</td>
             <td>Real</td>
             <td>(0.0, 100.0]</td>
