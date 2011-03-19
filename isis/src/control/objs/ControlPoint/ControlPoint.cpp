@@ -1279,6 +1279,7 @@ namespace Isis {
 
     // Loop for each measure to compute the error
     QList<QString> keys = measures->keys();
+
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
       if (m->IsIgnored())
@@ -1372,25 +1373,27 @@ namespace Isis {
   /**
    * This method computes the residuals for a point.
    *
-   * @history 2008-07-17  Tracie Sucharski,  Added ptid and measure serial
+   * @history 2008-07-17  Tracie Sucharski -  Added ptid and measure serial
    *                            number to the unable to map to surface error.
-   * @history 2010-12-06  Tracie Sucharski, Renamed from ComputeErrors
+   * @history 2010-12-06  Tracie Sucharski - Renamed from ComputeErrors
+   * @history 2011-03-19  Debbie A. Cook - Changed to use the Camera classes
+   *                            like ComputeResiduals and get the correct
+   *                            calculations for each camera type.
+   *
+   * @todo Use this method in ComputeResiduals to avoid duplication of code
    */
 
   ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters() {
-      if (editLock)
-        return PointLocked;
-      if (IsIgnored())
-        return Failure;
+    if (editLock)
+      return PointLocked;
+    if (IsIgnored())
+      return Failure;
 
-      PointModified();
-
-//    Latitude lat = adjustedSurfacePoint.GetLatitude();
-//    Longitude lon = adjustedSurfacePoint.GetLongitude();;
-//    Distance rad = adjustedSurfacePoint.GetLocalRadius();
+    PointModified();
 
     // Loop for each measure to compute the error
     QList<QString> keys = measures->keys();
+
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
       if (m->IsIgnored())
@@ -1400,42 +1403,23 @@ namespace Isis {
 
       // TODO:  Should we use crater diameter?
       Camera* cam = m->Camera();
-      if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
-          cam->SetImage(m->GetSample(), m->GetLine());
+      double cudx, cudy;
 
       // Map the lat/lon/radius of the control point through the Spice of the
-      // measurement sample/line to get the computed sample/line.  This must be
-      // done manually because the camera will compute a new time for line scanners,
-      // instead of using the measured time.
-      // First compute the look vector in body-fixed coordinates
-      double pB[3];
-
-      latrec_c((double) GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
-               (double) GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
-               (double) GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
-               pB);
-
-
-//      latrec_c(rad/1000., lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
-      std::vector<double> lookB(3);
-      SpiceRotation *bodyRot = cam->BodyRotation();
-      std::vector<double> sB(3);
-      sB = bodyRot->ReferenceVector(cam->InstrumentPosition()->Coordinate());
-      for (int ic=0; ic<3; ic++)  lookB[ic]  =  pB[ic] - sB[ic];
-      // TODO: Probably need to a back of the planet test here
-
-      // Rotate the look vector to camera coordinates
-      std::vector<double> lookC(3);
-      std::vector<double> lookJ(3);
-      lookJ = bodyRot->J2000Vector( lookB );
-      lookC = cam->InstrumentRotation()->ReferenceVector( lookJ );
-
-      // Scale to undistorted focal plane coordinates...
-      // Make sure to get the directional fl value from DistortionMap
-      double scale = cam->DistortionMap()->UndistortedFocalPlaneZ() / lookC[2];
-      double cudx = lookC[0] * scale;
-      double cudy = lookC[1] * scale;
-
+      // measurement sample/line to get the computed sample/line.
+      if( cam->GetCameraType() != Isis::Camera::Radar ) { 
+        if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
+          cam->SetImage(m->GetSample(), m->GetLine());
+        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+      }
+      // y is doppler shift for radar.  If we map through the current Spice
+      // line will be calculated from time and if we hold the time and the
+      // Spice we will get the same x/y as measured.
+      else {  
+        cam->GroundMap()->SetGround(GetAdjustedSurfacePoint());
+        cudx = cam->GroundMap()->FocalPlaneX();  // Get undistorted 
+        cudy = cam->GroundMap()->FocalPlaneY();
+      }
       double mudx = m->GetFocalPlaneMeasuredX();
       double mudy = m->GetFocalPlaneMeasuredY();
 
