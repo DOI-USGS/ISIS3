@@ -687,15 +687,15 @@ namespace Isis {
     if(IsSpecial(radius)) return (false);
 
     SurfacePoint point1(
-        Latitude(lat1, Angle::Degrees),
-        Longitude(lon1, Angle::Degrees),
-        Distance(radius, Distance::Meters));
+      Latitude(lat1, Angle::Degrees),
+      Longitude(lon1, Angle::Degrees),
+      Distance(radius, Distance::Meters));
     SurfacePoint point2(
-        Latitude(lat2, Angle::Degrees),
-        Longitude(lon2, Angle::Degrees),
-        Distance(radius, Distance::Meters));
+      Latitude(lat2, Angle::Degrees),
+      Longitude(lon2, Angle::Degrees),
+      Distance(radius, Distance::Meters));
     thisDist = point1.GetDistanceToPoint(point2,
-        Distance(radius, Distance::Meters)).GetMeters();
+                      Distance(radius, Distance::Meters)).GetMeters();
     return (thisDist < bestDist);
   }
 

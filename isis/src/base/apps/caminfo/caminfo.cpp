@@ -1,12 +1,10 @@
 #include "Isis.h"
+
 #include <cstdio>
-#include <cmath>
 #include <string>
 #include <iostream>
 
 #include "CamTools.h"
-#include "Constants.h"
-#include "CubeAttribute.h"
 #include "Filename.h"
 #include "iException.h"
 #include "iString.h"
@@ -18,29 +16,40 @@
 #include "Progress.h"
 #include "Pvl.h"
 #include "SerialNumber.h"
-#include "SpecialPixel.h"
 #include "Statistics.h"
 #include "UserInterface.h"
+
+#include <QList>
+#include <QPair>
 
 using namespace std;
 using namespace Isis;
 
-// Constants
-const string caminfo_program  = "caminfo";
-  
-void GetPVLOutput(void);
-void GetCSVOutput(void);
+QPair<iString, iString> MakePair(iString key, iString val);
+void GeneratePVLOutput(Cube *incube,
+                       QList< QPair<iString, iString> > *general,
+                       QList< QPair<iString, iString> > *camstats,
+                       QList< QPair<iString, iString> > *statistics,
+                       BandGeometry *bandGeom);
+void GenerateCSVOutput(Cube *incube,
+                       QList< QPair<iString, iString> > *general,
+                       QList< QPair<iString, iString> > *camstats,
+                       QList< QPair<iString, iString> > *statistics,
+                       BandGeometry *bandGeom);
 
-void IsisMain() 
-{
+void IsisMain() {
+  const string caminfo_program  = "caminfo";
   UserInterface &ui = Application::GetUserInterface();
+
+  QList< QPair<iString, iString> > *general = NULL, *camstats = NULL, *statistics = NULL;
+  BandGeometry *bandGeom = NULL;
 
   // Get input filename
   Filename in = ui.GetFilename("FROM");
-  
+
   // Get the format
-  string sFormat = ui.GetAsString("FORMAT");
-  
+  iString sFormat = ui.GetAsString("FORMAT");
+
   // if true then run spiceinit, xml default is FALSE
   // spiceinit will use system kernels
   if(ui.GetBoolean("SPICE")) {
@@ -48,442 +57,318 @@ void IsisMain()
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
   }
 
-  if(sFormat == "PVL" || sFormat=="pvl") {
-    GetPVLOutput();
-  }
-  else {
-    GetCSVOutput();
-  }
-}
-
-/**
- * Get the output in PVL format
- */
-void GetPVLOutput(void) 
-{
-  UserInterface &ui = Application::GetUserInterface();
-  string from    = ui.GetAsString("FROM");
-  Filename in    = ui.GetFilename("FROM");
-  bool doCamstat = ui.GetBoolean("CAMSTATS");
-  bool bAppend   = ui.GetBoolean("APPEND");
-
   Process p;
-  Cube *icube = p.SetInputCube("FROM");
+  Cube *incube = p.SetInputCube("FROM");
 
-  Pvl pout;
-
-  // Get some common things like #line, #samples, bands.
-  PvlObject params("Caminfo");
-  PvlObject common("Parameters");
-  common += PvlKeyword("Program",     caminfo_program);
-  common += PvlKeyword("IsisVersion", Application::Version());
-  common += PvlKeyword("RunDate",     iTime::CurrentGMT());
-  common += PvlKeyword("IsisId",      SerialNumber::Compose(*icube));
-  common += PvlKeyword("From",        in.Basename() + ".cub");
-  common += PvlKeyword("Lines",       icube->Lines());
-  common += PvlKeyword("Samples",     icube->Samples());
-  common += PvlKeyword("Bands",       icube->Bands());
-  params.AddObject(common);
+  // General data gathering
+  general = new QList< QPair<iString, iString> >;
+  general->append(MakePair("Program",     caminfo_program));
+  general->append(MakePair("IsisVersion", Application::Version()));
+  general->append(MakePair("RunDate",     iTime::CurrentGMT()));
+  general->append(MakePair("IsisId",      SerialNumber::Compose(*incube)));
+  general->append(MakePair("From",        in.Basename() + ".cub"));
+  general->append(MakePair("Lines",       incube->Lines()));
+  general->append(MakePair("Samples",     incube->Samples()));
+  general->append(MakePair("Bands",       incube->Bands()));
 
   // Run camstats on the entire image (all bands)
   // another camstats will be run for each band and output
   // for each band.
-  //  frequent!  Used below if single band image.
-  if(doCamstat) {
-    Pvl camPvl;    //  This becomes useful if there is only one band, which is
-    int linc = ui.GetInteger("LINC");
-    int sinc = ui.GetInteger("SINC");
+  if(ui.GetBoolean("CAMSTATS")) {
+    camstats = new QList< QPair<iString, iString> >;
+
+    Pvl camPvl; // This becomes useful if there is only one band, which is
     Filename tempCamPvl;
     tempCamPvl.Temporary(in.Basename() + "_", "pvl");
     string pvlOut = tempCamPvl.Expanded();
-    PvlObject pcband("Camstats");
-    //set up camstats run and execute
-    string parameters = "FROM=" + from +
+    // Set up camstats run and execute
+    string parameters = "FROM=" + ui.GetAsString("FROM") +
                         " TO=" + pvlOut +
-                        " LINC=" + iString(linc) +
-                        " SINC=" + iString(sinc);
+                        " LINC=" + iString(ui.GetInteger("LINC")) +
+                        " SINC=" + iString(ui.GetInteger("SINC"));
 
     ProgramLauncher::RunIsisProgram("camstats", parameters);
-    //out put to common object of the PVL
+    // Output to common object of the PVL
     camPvl.Read(pvlOut);
     remove(pvlOut.c_str());
 
     PvlGroup cg = camPvl.FindGroup("Latitude", Pvl::Traverse);
-    pcband += ValidateKey("MinimumLatitude", cg["latitudeminimum"]);
-    pcband += ValidateKey("MaximumLatitude", cg["latitudemaximum"]);
-    
+    camstats->append(MakePair("MinimumLatitude", cg["latitudeminimum"][0]));
+    camstats->append(MakePair("MaximumLatitude", cg["latitudemaximum"][0]));
+
     cg = camPvl.FindGroup("Longitude", Pvl::Traverse);
-    pcband += ValidateKey("MinimumLongitude", cg["longitudeminimum"]);
-    pcband += ValidateKey("MaximumLongitude", cg["longitudemaximum"]);
-    
+    camstats->append(MakePair("MinimumLongitude", cg["longitudeminimum"][0]));
+    camstats->append(MakePair("MaximumLongitude", cg["longitudemaximum"][0]));
+
     cg = camPvl.FindGroup("Resolution", Pvl::Traverse);
-    pcband += ValidateKey("MinimumResolution", cg["resolutionminimum"]);
-    pcband += ValidateKey("MaximumResolution", cg["resolutionmaximum"]);
-    
+    camstats->append(MakePair("MinimumResolution", cg["resolutionminimum"][0]));
+    camstats->append(MakePair("MaximumResolution", cg["resolutionmaximum"][0]));
+
     cg = camPvl.FindGroup("PhaseAngle", Pvl::Traverse);
-    pcband += ValidateKey("MinimumPhase", cg["phaseminimum"]);
-    pcband += ValidateKey("MaximumPhase", cg["phasemaximum"]);
-    
+    camstats->append(MakePair("MinimumPhase", cg["phaseminimum"][0]));
+    camstats->append(MakePair("MaximumPhase", cg["phasemaximum"][0]));
+
     cg = camPvl.FindGroup("EmissionAngle", Pvl::Traverse);
-    pcband += ValidateKey("MinimumEmission", cg["emissionminimum"]);
-    pcband += ValidateKey("MaximumEmission", cg["emissionmaximum"]);
-    
+    camstats->append(MakePair("MinimumEmission", cg["emissionminimum"][0]));
+    camstats->append(MakePair("MaximumEmission", cg["emissionmaximum"][0]));
+
     cg = camPvl.FindGroup("IncidenceAngle", Pvl::Traverse);
-    pcband += ValidateKey("MinimumIncidence", cg["incidenceminimum"]);
-    pcband += ValidateKey("MaximumIncidence", cg["incidencemaximum"]);
-    
+    camstats->append(MakePair("MinimumIncidence", cg["incidenceminimum"][0]));
+    camstats->append(MakePair("MaximumIncidence", cg["incidencemaximum"][0]));
+
     cg = camPvl.FindGroup("LocalSolarTime", Pvl::Traverse);
-    pcband += ValidateKey("LocalTimeMinimum", cg["localsolartimeMinimum"]);
-    pcband += ValidateKey("LocalTimeMaximum", cg["localsolartimeMaximum"]);
+    camstats->append(MakePair("LocalTimeMinimum", cg["localsolartimeMinimum"][0]));
+    camstats->append(MakePair("LocalTimeMaximum", cg["localsolartimeMaximum"][0]));
+  }
+
+  // Compute statistics for entire cube
+  if(ui.GetBoolean("STATISTICS")) {
+    statistics = new QList< QPair<iString, iString> >;
+
+    LineManager iline(*incube);
+    Statistics stats;
+    Progress progress;
+    progress.SetText("Statistics...");
+    progress.SetMaximumSteps(incube->Lines()*incube->Bands());
+    progress.CheckStatus();
+    iline.SetLine(1);
+    for(; !iline.end() ; iline.next()) {
+      incube->Read(iline);
+      stats.AddData(iline.DoubleBuffer(), iline.size());
+      progress.CheckStatus();
+    }
+
+    //  Compute stats of entire cube
+    double nPixels     = stats.TotalPixels();
+    double nullpercent = (stats.NullPixels() / (nPixels)) * 100;
+    double hispercent  = (stats.HisPixels() / (nPixels)) * 100;
+    double hrspercent  = (stats.HrsPixels() / (nPixels)) * 100;
+    double lispercent  = (stats.LisPixels() / (nPixels)) * 100;
+    double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
+
+    // Statitics output for band
+    statistics->append(MakePair("MeanValue", stats.Average()));
+    statistics->append(MakePair("StandardDeviation", stats.StandardDeviation()));
+    statistics->append(MakePair("MinimumValue", stats.Minimum()));
+    statistics->append(MakePair("MaximumValue", stats.Maximum()));
+    statistics->append(MakePair("PercentHIS", hispercent));
+    statistics->append(MakePair("PercentHRS", hrspercent));
+    statistics->append(MakePair("PercentLIS", lispercent));
+    statistics->append(MakePair("PercentLRS", lrspercent));
+    statistics->append(MakePair("PercentNull", nullpercent));
+    statistics->append(MakePair("TotalPixels", stats.TotalPixels()));
+  }
+
+  bool doGeometry = ui.GetBoolean("GEOMETRY");
+  bool doPolygon = ui.GetBoolean("POLYGON");
+  if(doGeometry || doPolygon) {
+    Camera *cam = incube->Camera();
+
+    int polySinc, polyLinc;
+    if(doPolygon && ui.GetBoolean("FLATINC")) {
+      polySinc = polyLinc = (int)(0.5 + (((incube->Samples() * 2) +
+                                 (incube->Lines() * 2) - 3.0) /
+                                 ui.GetInteger("NUMSTEPS")));
+    }
+    else {
+      if(ui.WasEntered("POLYSINC")) {
+        polySinc = ui.GetInteger("POLYSINC");
+      }
+      else {
+        polySinc = (int)(0.5 + 0.10 * incube->Samples());
+        if(polySinc == 0) polySinc = 1;
+      }
+      if(ui.WasEntered("POLYLINC")) {
+        polyLinc = ui.GetInteger("POLYLINC");
+      }
+      else {
+        polyLinc = (int)(0.5 + 0.10 * incube->Lines());
+        if(polyLinc == 0) polyLinc = 1;
+      }
+    }
+
+    bandGeom = new BandGeometry();
+    bandGeom->setSampleInc(polySinc);
+    bandGeom->setLineInc(polyLinc);
+    bandGeom->setMaxIncidence(ui.GetDouble("MAXINCIDENCE"));
+    bandGeom->setMaxEmission(ui.GetDouble("MAXEMISSION"));
+    bandGeom->collect(*cam, *incube, doGeometry, doPolygon);
+
+    // Check if the user requires valid image center geometry
+    if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
+      string msg = "Image center does not project in camera model";
+      throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    }
+  }
+
+  if(sFormat.UpCase() == "PVL")
+    GeneratePVLOutput(incube, general, camstats, statistics, bandGeom);
+  else
+    GenerateCSVOutput(incube, general, camstats, statistics, bandGeom);
+
+  // Clean the data
+  delete general;
+  general = NULL;
+  if(camstats) {
+    delete camstats;
+    camstats = NULL;
+  }
+  if(statistics) {
+    delete statistics;
+    statistics = NULL;
+  }
+  if(bandGeom) {
+    delete bandGeom;
+    bandGeom = NULL;
+  }
+
+}
+
+
+/**
+ * Convience method for gracefully staying in 80 characters
+ */
+QPair<iString, iString> MakePair(iString key, iString val) {
+  return QPair<iString, iString>(key, val);
+}
+
+
+/**
+ * Get the output in PVL format
+ */
+void GeneratePVLOutput(Cube *incube,
+                       QList< QPair<iString, iString> > *general,
+                       QList< QPair<iString, iString> > *camstats,
+                       QList< QPair<iString, iString> > *statistics,
+                       BandGeometry *bandGeom) {
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Add some common/general things
+  PvlObject params("Caminfo");
+  PvlObject common("Parameters");
+  for(int i = 0; i < general->size(); i++)
+    common += PvlKeyword((*general)[i].first, (*general)[i].second);
+  params.AddObject(common);
+
+  // Add the camstats
+  if(camstats) {
+    PvlObject pcband("Camstats");
+    for(int i = 0; i < camstats->size(); i++)
+      pcband += ValidateKey((*camstats)[i].first, (*camstats)[i].second);
     params.AddObject(pcband);
   }
 
-  //  Add the input ISIS label if requested
+  // Add the input ISIS label if requested
   if(ui.GetBoolean("ISISLABEL")) {
-    Pvl label = *(icube->Label());
+    Pvl label = *(incube->Label());
     label.SetName("IsisLabel");
     params.AddObject(label);
   }
 
-  // write out the orginal label blob
+  // Add the orginal label blob
   if(ui.GetBoolean("ORIGINALLABEL")) {
     OriginalLabel orig;
-    icube->Read(orig);
+    incube->Read(orig);
     Pvl p = orig.ReturnLabels();
     p.SetName("OriginalLabel");
     params.AddObject(p);
   }
 
-  //  Compute statistics for entire cube
-  if(ui.GetBoolean("STATISTICS")) {
-    LineManager iline(*icube);
-    Statistics stats;
-    Progress progress;
-    progress.SetText("Statistics...");
-    progress.SetMaximumSteps(icube->Lines()*icube->Bands());
-    progress.CheckStatus();
-    iline.SetLine(1);
-    for(; !iline.end() ; iline.next()) {
-      icube->Read(iline);
-      stats.AddData(iline.DoubleBuffer(), iline.size());
-      progress.CheckStatus();
-    }
-
-    //  Compute stats of entire cube
-    double nPixels     = stats.TotalPixels();
-    double nullpercent = (stats.NullPixels() / (nPixels)) * 100;
-    double hispercent  = (stats.HisPixels() / (nPixels)) * 100;
-    double hrspercent  = (stats.HrsPixels() / (nPixels)) * 100;
-    double lispercent  = (stats.LisPixels() / (nPixels)) * 100;
-    double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
-
-    // Statitics keyword output for band
+  // Add the stats
+  if(statistics) {
     PvlObject sgroup("Statistics");
-    sgroup += ValidateKey("MeanValue", stats.Average());
-    sgroup += ValidateKey("StandardDeviation", stats.StandardDeviation());
-    sgroup += ValidateKey("MinimumValue", stats.Minimum());
-    sgroup += ValidateKey("MaximumValue", stats.Maximum());
-    sgroup += PvlKeyword("PercentHIS", hispercent);
-    sgroup += PvlKeyword("PercentHRS", hrspercent);
-    sgroup += PvlKeyword("PercentLIS", lispercent);
-    sgroup += PvlKeyword("PercentLRS", lrspercent);
-    sgroup += PvlKeyword("PercentNull", nullpercent);
-    sgroup += PvlKeyword("TotalPixels", stats.TotalPixels());
-
+    for(int i = 0; i < statistics->size(); i++)
+      sgroup += ValidateKey((*statistics)[i].first, (*statistics)[i].second);
     params.AddObject(sgroup);
   }
 
-  Camera *cam = icube->Camera();
-
-  // for geometry, stats, camstats, or polygon get the info for each band
-  BandGeometry bandGeom;
-  bool doGeometry = ui.GetBoolean("GEOMETRY");
-  bool doPolygon = ui.GetBoolean("POLYGON");
-  if(doGeometry || doPolygon) {
-    int polySinc, polyLinc;
-    if(ui.WasEntered("POLYSINC")) {
-      polySinc = ui.GetInteger("POLYSINC");
-    }
-    else {
-      polySinc = (int)round(0.10 * icube->Samples());
-      if (polySinc == 0)
-        polySinc = 1;
-    }
-    if(ui.WasEntered("POLYLINC")) {
-      polyLinc = ui.GetInteger("POLYLINC");
-    }
-    else {
-      polyLinc = (int)round(0.10 * icube->Lines());
-      if (polyLinc == 0)
-        polyLinc = 1;
-    }
-
-    bandGeom.setSampleInc(polySinc);
-    bandGeom.setLineInc(polyLinc);
-    bandGeom.setMaxIncidence(ui.GetDouble("MAXINCIDENCE"));
-    bandGeom.setMaxEmission(ui.GetDouble("MAXEMISSION"));
-    bandGeom.collect(*cam, *icube, doGeometry, doPolygon);
-
-    // Check if the user requires valid image center geometry
-    if(ui.GetBoolean("VCAMERA") && (!bandGeom.hasCenterGeometry())) {
-      string msg = "Image center does not project in camera model";
-      throw iException::Message(iException::Camera, msg, _FILEINFO_);
-    }
-
-    // Write geometry data if requested
-    if(doGeometry) {
+  // Add the geometry info
+  if(bandGeom) {
+    if(ui.GetBoolean("GEOMETRY")) {
       PvlObject ggroup("Geometry");
-      bandGeom.generateGeometryKeys(ggroup);
+      bandGeom->generateGeometryKeys(ggroup);
       params.AddObject(ggroup);
     }
 
-    // Write polygon group if requested
-    if(doPolygon) {
+    if(ui.GetBoolean("POLYGON")) {
       PvlObject ggroup("Polygon");
-      bandGeom.generatePolygonKeys(ggroup);
+      bandGeom->generatePolygonKeys(ggroup);
       params.AddObject(ggroup);
     }
   }
 
-  //  Output the result
+  // Output the result
+  Pvl pout;
   string outFile = ui.GetFilename("TO");
   pout.AddObject(params);
-  
-  if(bAppend) {
+
+  if(ui.GetBoolean("APPEND"))
     pout.Append(outFile);
-  }
-  else {
+  else
     pout.Write(outFile);
-  }
 }
 
+
 /**
- * Get the output in CSV Format. If CSV format is chosen only 
- * CamStats, Stats, Geometry are info are recorded 
- * 
- * @author Sharmila Prasad (2/24/2011)
+ * Get the output in CSV Format. If CSV format is chosen only
+ * CamStats, Stats, Geometry are info are recorded.
  */
-void GetCSVOutput(void)
-{
+void GenerateCSVOutput(Cube *incube,
+                       QList< QPair<iString, iString> > *general,
+                       QList< QPair<iString, iString> > *camstats,
+                       QList< QPair<iString, iString> > *statistics,
+                       BandGeometry *bandGeom) {
   UserInterface &ui = Application::GetUserInterface();
-  string from       = ui.GetAsString("FROM");
-  Filename in       = ui.GetFilename("FROM");
-  string sOutFile   = ui.GetAsString("TO");
-  
-  bool doCamstat  = ui.GetBoolean("CAMSTATS");
-  bool bAppend    = ui.GetBoolean("APPEND");
-  bool doStats    = ui.GetBoolean("STATISTICS");
-  bool doGeometry = ui.GetBoolean("GEOMETRY");
-  
-  Process p;
-  Cube *icube = p.SetInputCube("FROM");
+
+  // Create the vars for holding the info
+  iString keys;
+  iString values;
+  const iString delim = ",";
 
   // Output the result
   fstream outFile;
-  bool bFileExists = Filename(sOutFile).Exists();
-  if(bFileExists && bAppend) {
+  string sOutFile = ui.GetAsString("TO");
+  bool appending = ui.GetBoolean("APPEND") && Filename(sOutFile).Exists();
+  if(appending)
     outFile.open(sOutFile.c_str(), std::ios::out | std::ios::app);
-  }
-  else {
-    outFile.open(sOutFile.c_str(), std::ios::out); 
-  }
+  else
+    outFile.open(sOutFile.c_str(), std::ios::out);
 
-  // Write the header for not Append
-  if(!bAppend || !bFileExists) {
-    outFile << "Program,IsisVersion,IsisId,From,Lines,Samples,Bands,";
-    if(doCamstat) {
-      outFile << "CamStats_MinimumLatitude,CamStats_MaximumLatitude,";
-      outFile << "CamStats_MinimumLongitude,CamStats_MaximumLongitude,";
-      outFile << "CamStats_MinimumResolution,CamStats_MaximumResolution,";
-      outFile << "CamStats_MinimumPhase,CamStats_MaximumPhase,";
-      outFile << "CamStats_MinimumEmission,CamStats_MaximumEmission,";
-      outFile << "CamStats_MinimumIncidence,CamStats_MaximumIncidence,";
-      outFile << "CamStats_LocalTimeMinimum,CamStats_LocalTimeMaximum,";
+  // Add some common/general things
+  for(int i = 0; i < general->size(); i++)
+    if((*general)[i].first != "RunDate") {
+      if(not appending) keys += (*general)[i].first + delim;
+      values += (*general)[i].second + delim;
     }
-    if(doStats) {
-      outFile << "Stats_MeanValue,Stats_StandardDeviation,Stats_MinimumValue,Stats_MaximumValue,";
-      outFile << "Stats_PercentHIS,Stats_PercentHRS,";
-      outFile << "Stats_PercentLIS,Stats_PercentLRS,Stats_PercentNull,Stats_TotalPixels,";
+
+  // Add the camstats
+  if(ui.GetBoolean("CAMSTATS")) {
+    for(int i = 0; i < camstats->size(); i++) {
+      if(not appending) keys += "CamStats_" + (*camstats)[i].first + delim;
+      values += (*camstats)[i].second + delim;
     }
-    if(doGeometry) {
-      outFile << "Geom_BandsUsed,Geom_ReferenceBand,Geom_OriginalBand,Geom_Target,";
-      outFile << "Geom_StartTime,Geom_EndTime,Geom_CenterLine,Geom_CenterSample,";
-      outFile << "Geom_CenterLatitude,Geom_CenterLongitude,Geom_CenterRadius,";
-      outFile << "Geom_RightAscension,Geom_Declination,";
-      outFile << "Geom_UpperLeftLongitude,Geom_UpperLeftLatitude,";
-      outFile << "Geom_LowerLeftLongitude,Geom_LowerLeftLatitude,";
-      outFile << "Geom_LowerRightLongitude,Geom_LowerRightLatitude,";
-      outFile << "Geom_UpperRightLongitude,Geom_UpperRightLatitude,";
-      outFile << "Geom_PhaseAngle,Geom_EmissionAngle,Geom_IncidenceAngle,";
-      outFile << "Geom_NorthAzimuth,Geom_OffNadir,Geom_SolarLongitude,Geom_LocalTime,";
-      outFile << "Geom_TargetCenterDistance,Geom_SlantDistance,Geom_SampleResolution,Geom_LineResolution,";
-      outFile << "Geom_PixelResolution,Geom_MeanGroundResolution,";
-      outFile << "Geom_SubSolarAzimuth,Geom_SubSolarGroundAzimuth,";
-      outFile << "Geom_SubSolarLatitude,Geom_SubSolarLongitude,";
-      outFile << "Geom_SubSpacecraftAzimuth,Geom_SubSpacecraftGroundAzimuth,";
-      outFile << "Geom_SubSpacecraftLatitude,Geom_SubSpacecraftLongitude,";
-      outFile << "Geom_ParallaxX,Geom_ParallaxY,Geom_ShadowX,Geom_ShadowY,";
-      outFile << "Geom_HasLongitudeBoundary,Geom_HasNorthPole,Geom_HasSouthPole";
-    }
-    outFile << endl;
-  }
-  
-  // Get some common things like #line, #samples, bands.
-  outFile << caminfo_program.c_str() << "," << Application::Version() << ",";
-  outFile << SerialNumber::Compose(*icube) << "," << in.Basename() + ".cub" << ",";
-  outFile << icube->Lines() << "," << icube->Samples() << "," << icube->Bands() << ",";
-
-  // Run camstats on the entire image (all bands)
-  // another camstats will be run for each band and output
-  // for each band.
-  Pvl camPvl;    //  This becomes useful if there is only one band, which is
-  //  frequent!  Used below if single band image.
-  if(doCamstat) {
-    int linc = ui.GetInteger("LINC");
-    int sinc = ui.GetInteger("SINC");
-    Filename tempCamPvl;
-    tempCamPvl.Temporary(in.Basename() + "_", "pvl");
-    string pvlOut = tempCamPvl.Expanded();
-    PvlObject pcband("Camstats");
-    //set up camstats run and execute
-    string parameters = "FROM=" + from +
-                        " TO=" + pvlOut +
-                        " LINC=" + iString(linc) +
-                        " SINC=" + iString(sinc);
-
-    ProgramLauncher::RunIsisProgram("camstats", parameters);
-    //outFile put to common object of the PVL
-    camPvl.Read(pvlOut);
-    remove(pvlOut.c_str());
-
-    PvlGroup cg = camPvl.FindGroup("Latitude", Pvl::Traverse);
-    outFile << cg["latitudeminimum"][0] << "," << cg["latitudemaximum"][0] << ",";
- 
-    cg = camPvl.FindGroup("Longitude", Pvl::Traverse);
-    outFile << cg["longitudeminimum"][0] << "," << cg["longitudemaximum"][0] << ",";
-    
-    cg = camPvl.FindGroup("Resolution", Pvl::Traverse);
-    outFile << cg["resolutionminimum"][0] << "," << cg["resolutionmaximum"][0] << ",";
-    
-    cg = camPvl.FindGroup("PhaseAngle", Pvl::Traverse);
-    outFile << cg["phaseminimum"][0] << "," << cg["phasemaximum"][0] << ",";
-
-    cg = camPvl.FindGroup("EmissionAngle", Pvl::Traverse);
-    outFile << cg["emissionminimum"][0] << "," << cg["emissionmaximum"][0] << ",";
-
-    cg = camPvl.FindGroup("IncidenceAngle", Pvl::Traverse);
-    outFile << cg["incidenceminimum"][0] << "," << cg["incidencemaximum"][0] << ",";
-
-    cg = camPvl.FindGroup("LocalSolarTime", Pvl::Traverse);
-    outFile << cg["localsolartimeMinimum"][0] << "," << cg["localsolartimeMaximum"][0] << ",";
   }
 
-  //  Compute statistics for entire cube
-  if(doStats) {
-    LineManager iline(*icube);
-    Statistics stats;
-    Progress progress;
-    progress.SetText("Statistics...");
-    progress.SetMaximumSteps(icube->Lines()*icube->Bands());
-    progress.CheckStatus();
-    iline.SetLine(1);
-    for(; !iline.end() ; iline.next()) {
-      icube->Read(iline);
-      stats.AddData(iline.DoubleBuffer(), iline.size());
-      progress.CheckStatus();
+  // Add the stats
+  if(ui.GetBoolean("STATISTICS")) {
+    for(int i = 0; i < statistics->size(); i++) {
+      if(not appending) keys += "Stats_" + (*statistics)[i].first + delim;
+      values += (*statistics)[i].second + delim;
     }
-
-    //  Compute stats of entire cube
-    double nPixels     = stats.TotalPixels();
-    double nullpercent = (stats.NullPixels() / (nPixels)) * 100;
-    double hispercent  = (stats.HisPixels() / (nPixels)) * 100;
-    double hrspercent  = (stats.HrsPixels() / (nPixels)) * 100;
-    double lispercent  = (stats.LisPixels() / (nPixels)) * 100;
-    double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
-    //statitics keyword output for band
-
-    outFile << stats.Average() << "," << stats.StandardDeviation() << ",";
-    outFile << stats.Minimum() << "," << stats.Maximum() << ",";
-    outFile << hispercent << "," << hrspercent << "," << lispercent << ",";
-    outFile << lrspercent << "," << nullpercent << "," << stats.TotalPixels() << ",";
   }
 
-  Camera *cam = icube->Camera();
-
-  // for geometry, stats, camstats, or polygon get the info for each band
-  BandGeometry bandGeom;
-  if(doGeometry) {
-    int polySinc, polyLinc;
-    if(ui.WasEntered("POLYSINC")) {
-      polySinc = ui.GetInteger("POLYSINC");
-    }
-    else {
-      polySinc = (int)round(0.10 * icube->Samples());
-      if (polySinc == 0)
-        polySinc = 1;
-    }
-    if(ui.WasEntered("POLYLINC")) {
-      polyLinc = ui.GetInteger("POLYLINC");
-    }
-    else {
-      polyLinc = (int)round(0.10 * icube->Lines());
-      if (polyLinc == 0)
-        polyLinc = 1;
-    }
-
-    bandGeom.setSampleInc(polySinc);
-    bandGeom.setLineInc(polyLinc);
-    bandGeom.setMaxIncidence(ui.GetDouble("MAXINCIDENCE"));
-    bandGeom.setMaxEmission(ui.GetDouble("MAXEMISSION"));
-    bandGeom.collect(*cam, *icube, doGeometry, false);
-
-    // Check if the user requires valid image center geometry
-    if(ui.GetBoolean("VCAMERA") && (!bandGeom.hasCenterGeometry())) {
-      string msg = "Image center does not project in camera model";
-      throw iException::Message(iException::Camera, msg, _FILEINFO_);
-    }
-    
+  // Add the geometry info
+  if(ui.GetBoolean("GEOMETRY")) {
     PvlObject geomGrp("Geometry");
-    bandGeom.generateGeometryKeys(geomGrp);
-    
-    outFile << geomGrp["BandsUsed"][0] << "," << geomGrp["ReferenceBand"][0] << ",";
-    outFile << geomGrp["OriginalBand"][0] << "," << geomGrp["Target"][0] << ",";
-    outFile << geomGrp["StartTime"][0] << "," << geomGrp["EndTime"][0] << ",";
-    outFile << geomGrp["CenterLine"][0] << "," << geomGrp["CenterSample"][0] << ",";
-    outFile << geomGrp["CenterLatitude"][0] << "," << geomGrp["CenterLongitude"][0] << ",";
-    outFile << geomGrp["CenterRadius"][0] << "," << geomGrp["RightAscension"][0] << ",";
-    outFile << geomGrp["Declination"][0] << ",";
-
-    outFile << geomGrp["UpperLeftLongitude"][0] << "," << geomGrp["UpperLeftLatitude"][0] << ",";
-    outFile << geomGrp["LowerLeftLongitude"][0] << "," << geomGrp["LowerLeftLatitude"][0] << ",";
-    outFile << geomGrp["LowerRightLongitude"][0] << "," << geomGrp["LowerRightLatitude"][0] << ",";
-    outFile << geomGrp["UpperRightLongitude"][0] << "," << geomGrp["UpperRightLatitude"][0] << ",";
-
-    outFile << geomGrp["PhaseAngle"][0] << "," << geomGrp["EmissionAngle"][0] << "," << geomGrp["IncidenceAngle"][0] << ",";
-
-    outFile << geomGrp["NorthAzimuth"][0] << "," << geomGrp["OffNadir"][0] << ",";
-    outFile << geomGrp["SolarLongitude"][0] << "," << geomGrp["LocalTime"][0] << ",";
-    outFile << geomGrp["TargetCenterDistance"][0] << "," << geomGrp["SlantDistance"][0] << ",";
-
-    outFile << geomGrp["SampleResolution"][0] << "," << geomGrp["LineResolution"][0] << ",";
-    outFile << geomGrp["PixelResolution"][0] << "," << geomGrp["MeanGroundResolution"][0] << ",";
-
-    outFile << geomGrp["SubSolarAzimuth"][0] << "," << geomGrp["SubSolarGroundAzimuth"][0] << ",";
-    outFile << geomGrp["SubSolarLatitude"][0] << "," << geomGrp["SubSolarLongitude"][0] << ",";
-
-    outFile << geomGrp["SubSpacecraftAzimuth"][0] << "," << geomGrp["SubSpacecraftGroundAzimuth"][0] << ",";
-    outFile << geomGrp["SubSpacecraftLatitude"][0] << "," << geomGrp["SubSpacecraftLongitude"][0] << ",";
-
-    outFile << geomGrp["ParallaxX"][0] << "," << geomGrp["ParallaxY"][0] << ",";
-
-    outFile << geomGrp["ShadowX"][0] << "," << geomGrp["ShadowY"][0] << ",";
-
-    //  Determine if image crosses Longitude domain
-    outFile << geomGrp["HasLongitudeBoundary"][0] << "," << geomGrp["HasNorthPole"][0] << ",";
-    outFile << geomGrp["HasSouthPole"][0];
+    bandGeom->generateGeometryKeys(geomGrp);
+    for(int i = 0; i < geomGrp.Keywords(); i++) {
+      if(not appending) keys += "Geom_" + geomGrp[i].Name() + delim;
+      values += geomGrp[i][0] + delim;
+    }
   }
-  
-  outFile << endl;
+
+  keys.TrimTail(delim); // Get rid of the extra delim char (",")
+  values.TrimTail(delim); // Get rid of the extra delim char (",")
+  outFile << keys << endl << values;
   outFile.close();
 }
-
