@@ -57,5 +57,9 @@
     <change name="Sharmila Prasad" date="2011-02-16">Added columns Local 
      Emission and  Incidence Angles for Advanced Tracking Tool
     </change>
+    <change name="Sharmila Prasad" date="2011-03-18">
+      Connect the viewport's close signal to the all windows/subwindows like 
+      plottool and histogram tools as well.
+    </change>
   </history>
 </application>

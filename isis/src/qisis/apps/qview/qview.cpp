@@ -215,8 +215,10 @@ int main(int argc, char *argv[]) {
   //Connect the FindTool to the AdvancedTrackTool to record the point if the "record" button is clicked
   QObject::connect(findtool, SIGNAL(recordPoint(QPoint)), attool, SLOT(record(QPoint)));
 
-  //Connect the viewport's close signal to the file tool's exit method
-  QObject::connect(vw , SIGNAL(closeWindow()), ftool, SLOT(exit()));
+  //Connect the viewport's close signal to the all windows/subwindows
+  QObject::connect(vw , SIGNAL(closeWindow()), histtool, SLOT(removeWindow()));
+  QObject::connect(vw , SIGNAL(closeWindow()), pltool,   SLOT(removeWindow()));
+  QObject::connect(vw , SIGNAL(closeWindow()), ftool,    SLOT(exit()));
 
   int status = app->exec();
 
