@@ -80,31 +80,45 @@
     </table>
 
     <p>
-    If SpatialSumming is 1 the dark current pixels are averaged together then
-    this average is subtracted from all image pixels.  If SpatialSumming is 2,
-    the dark current pixels for the A and B channel are averaged separately,
-    then the A channel dark average is subtracted from the A channel image
-    pixels and the B channel dark average is subtracted from the B channel
-    image pixels.
+    If SpatialSumming is 1, the dark current pixels for the A and B channel are 
+    averaged separately, then the A channel dark average is subtracted from the 
+    A channel image pixels and the B channel dark average is subtracted from the 
+    B channel image pixels.  If SpatialSumming is 2 the dark current pixels are 
+    averaged together then this average is subtracted from all image pixels.
     </p>
 
     <p>
     The equation ctxcal implements is as follows:
 
     <pre>
-    r = ( dn - dc / (gain(i,j) * exp)
+    For any pixel i, on line L, compute r in counts/msec
+
+    r(i,L) = ( inputPixel(i,L) - darkCurrent(L) ) / (flatPixel(i,L) * exposure)
     </pre>
 
     where r is the average signal being generated at the focal plane (in
-    DN/msec), dc is the dark current term (in DN/msec), gain(i,j) is the pixel
-    dependent gain, and ex is the exposure time in milliseconds.
-    </p>
+    DN/msec), darkCurrent is the dark current term (in DN/msec), flatPixel is 
+    the pixel dependent gain, and exposure is the exposure time in milliseconds. 
+    </p> 
 
     <p>
     If the IOF parameter is chosen, the output pixels are converted to
     relative reflectance (I/F) using the solar radiance, with an albedo 1
     target at normal incidence at Mars perihelion distance (2.07e+08 km) and
     a CTX response of 3660.5 DN/msec.
+
+    <pre>
+        
+    For any pixel i, on line L
+
+      r(i,L) = ( inputPixel(i,L) - darkCurrent(L) ) / flatPixel(i,L) ) / iof
+
+    iof = 1.0 / (exposure * w1)
+    w1 = w0 * (2.07E8)^2 / dist^2
+    w0 = 3660.5 dn/msec
+    dist = distance between Sun and Mars in kilometers
+    exposure = line exposure duration in milliseconds 
+    </pre>
     </p>
 
   </description>
