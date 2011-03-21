@@ -46,7 +46,8 @@ namespace Qisis {
    *          plot
    * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *          CubeViewport.  Fixed some include issues (many still remain!).
-   * @history 2010-11-08 Eric Hyer - Spacial plot now handles linked images.
+   * @history 2010-11-08 Eric Hyer - Spacial plot now handles linked images. 
+   * @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal  
    */
   class PlotTool : public Tool {
       Q_OBJECT
@@ -83,6 +84,7 @@ namespace Qisis {
       void pasteCurve(Qisis::PlotWindow *);
       void pasteCurveSpecial(Qisis::PlotWindow *);
       void removeWindow(QObject *);
+      void removeWindow(void);
 
     private slots:
       void bilinearInterpolationChanged();
@@ -139,7 +141,8 @@ namespace Qisis {
       QList<PlotWindow *> p_plotWindows;//!< List of all plot windows
       RubberBandComboBox *p_spectralRubberBand;//!< Spectral plot rubber band combo box
       RubberBandComboBox *p_spacialRubberBand;//!< Spacial plot rubber band combo box
-
+      QList<PlotWindow *> p_plotWindowsCopy;//!< List of all plot windows
+      
       geos::geom::Polygon *p_poly;//!< For plotting/drawing polygons
       const geos::geom::Envelope *p_envelope;//!< Bounding box of polygon
       int p_color;//!< Keeps track of which color we are at

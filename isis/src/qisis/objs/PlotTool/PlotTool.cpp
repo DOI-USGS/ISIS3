@@ -411,6 +411,7 @@ namespace Qisis {
     connect(p_plotTypeCombo, SIGNAL(activated(int)), this,
             SLOT(changePlotType(int)));
     changePlotType(0); /* first element is default*/
+    p_plotWindowsCopy.push_back(p_plotToolWindow);
   }
 
 
@@ -722,7 +723,19 @@ namespace Qisis {
     updateViewPort();
   }
 
-
+  /**
+   * Remove plot window when main app is closed
+   * 
+   * @author Sharmila Prasad (3/18/2011)
+   */
+  void PlotTool::removeWindow(void)
+  {
+    for(int i = 0; i < p_plotWindowsCopy.size(); i++) {
+        p_plotWindowsCopy[i]->closeAll();
+        p_plotWindowsCopy.removeAt(i);
+    }   
+  }
+  
   /**
    * This method sets up the names, line style, and color  of the
    * all the PlotToolCurves that will be used in this class. This
