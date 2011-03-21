@@ -53,6 +53,7 @@ namespace Qisis {
    *
    * @internal
    *   @history 2010-11-08 Eric Hyer - Added replot method
+   *   @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal 
    */
   class PlotWindow : public Qisis::MainWindow {
       Q_OBJECT
@@ -76,7 +77,8 @@ namespace Qisis {
       void setCustomMenu(QList<QMenu *> &menu, QList<QAction *> &actions);
       void getDefaultMenus(QList<QMenu *> &menu, QList<QAction *> &actions);
       void replot();
-
+      void closeAll(void);
+      
       /**
        *
        *

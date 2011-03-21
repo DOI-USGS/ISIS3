@@ -86,6 +86,16 @@ namespace Qisis {
     p_yMax = 1000;
   }
 
+  /**
+   * Remove current plot window when main app is closed
+   * 
+   * @author Sharmila Prasad (3/18/2011)
+   */
+  void PlotWindow::closeAll(void)
+  {
+    clearPlot();
+    p_mainWindow->close();
+  }
 
   /**
    * Shows the plot window, and raises it to the front of any
