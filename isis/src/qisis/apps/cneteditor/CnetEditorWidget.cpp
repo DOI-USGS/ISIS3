@@ -106,7 +106,10 @@ namespace Isis
     connect(pointView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(pointViewSelectionChanged()));
-//     pointView->setExpandsOnDoubleClick(false);
+    connect(pointView, SIGNAL(expanded(const QModelIndex &)), this,
+        SLOT(itemExpanded(const QModelIndex &)));
+    connect(pointView, SIGNAL(collapsed(const QModelIndex &)), this,
+        SLOT(itemCollapsed(const QModelIndex &)));
     pointView->setAlternatingRowColors(true);
     pointView->setSelectionMode(QAbstractItemView::MultiSelection);
 
@@ -116,7 +119,10 @@ namespace Isis
     connect(serialView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(serialViewSelectionChanged()));
-//     serialView->setExpandsOnDoubleClick(false);
+    connect(serialView, SIGNAL(expanded(const QModelIndex &)), this,
+        SLOT(itemExpanded(const QModelIndex &)));
+    connect(serialView, SIGNAL(collapsed(const QModelIndex &)), this,
+        SLOT(itemCollapsed(const QModelIndex &)));
     serialView->setAlternatingRowColors(true);
     serialView->setSelectionMode(QAbstractItemView::MultiSelection);
 
@@ -127,7 +133,10 @@ namespace Isis
     connect(connectionView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(connectionViewSelectionChanged()));
-//     connectionView->setExpandsOnDoubleClick(false);
+    connect(connectionView, SIGNAL(expanded(const QModelIndex &)), this,
+        SLOT(itemExpanded(const QModelIndex &)));
+    connect(connectionView, SIGNAL(collapsed(const QModelIndex &)), this,
+        SLOT(itemCollapsed(const QModelIndex &)));
     connectionView->setAlternatingRowColors(true);
     connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
 
@@ -397,7 +406,19 @@ namespace Isis
 
     updatingSelection = false;
   }
-
+  
+  
+  void CnetEditorWidget::itemExpanded(const QModelIndex & index)
+  {
+//     cerr << "CnetEditorWidget::itemExpanded called\n";
+  }
+  
+  
+  void CnetEditorWidget::itemCollapsed(const QModelIndex & index)
+  {
+//     cerr << "CnetEditorWidget::itemCollapsed called\n";
+  }
+  
 
   void CnetEditorWidget::focusView(QTreeView * view, QStringList labels)
   {

@@ -5,6 +5,7 @@
 
 class QBoxLayout;
 class QItemSelection;
+class QModelIndex;
 class QSplitter;
 class QStringList;
 class QTableView;
@@ -61,6 +62,9 @@ namespace Isis
       void pointViewSelectionChanged();
       void serialViewSelectionChanged();
       void connectionViewSelectionChanged();
+      
+      void itemExpanded(const QModelIndex & index);
+      void itemCollapsed(const QModelIndex & index);
 
 
     private: // data
