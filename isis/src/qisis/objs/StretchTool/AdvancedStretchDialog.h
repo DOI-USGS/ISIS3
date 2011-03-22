@@ -22,7 +22,9 @@ namespace Qisis {
    *
    * @author Steven Lambright 2010-05-20
    *
-   * @internal
+   * @internal 
+   * @history 2011-03-22 Sharmila Prasad - Added API updateForRGBMode to 
+   *      accomodate changes for all Bands for BandID All. 
    */
 
   class AdvancedStretchDialog : public QDialog {
@@ -38,6 +40,10 @@ namespace Qisis {
       void updateHistograms(const Isis::Histogram &redHist,
                             const Isis::Histogram &grnHist,
                             const Isis::Histogram &bluHist);
+      
+      void updateForRGBMode(Isis::Stretch &redStretch, Isis::Histogram &redHist,
+                            Isis::Stretch &grnStretch, Isis::Histogram &grnHist,
+                            Isis::Stretch &bluStretch, Isis::Histogram &bluHist);
 
       void enableGrayMode(Isis::Stretch &grayStretch,
                           Isis::Histogram &grayHist);

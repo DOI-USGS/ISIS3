@@ -79,6 +79,7 @@ namespace Qisis {
    *  @history 2010-12-01 Steven Lambright - Improved stretch copy abilities
    *  @history 2010-12-02 Eric Hyer - changed where stretchChipViewport is
    *      emitted.
+   *  @history 2011-03-22 Sharmila Prasad - Add option to stretch All Bands
    */
   class StretchTool : public Qisis::Tool {
       Q_OBJECT
@@ -96,7 +97,7 @@ namespace Qisis {
         Red,   //!< Red Band
         Green, //!< Green Band
         Blue,  //!< Blue Band
-        //All  //!< All Bands
+        All    //!< All Bands
       };
 
       static Isis::Stretch stretchBuffer(ViewportBuffer *buffer, QRect rect);
@@ -109,6 +110,8 @@ namespace Qisis {
       static Isis::Histogram histFromBuffer(ViewportBuffer *buffer);
       static Isis::Histogram histFromBuffer(ViewportBuffer *buffer, QRect rect,
                                             double min, double max);
+      void updateAdvStretchDialogforAll(void);
+      
 
     signals:
       /**
@@ -170,7 +173,7 @@ namespace Qisis {
 
     private:
       void stretchRect(CubeViewport *cvp, QRect rect);
-
+      
     private:
       AdvancedStretchDialog *p_advancedStretch; //!< The advanced dialog
 

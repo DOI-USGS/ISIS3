@@ -70,6 +70,41 @@ namespace Qisis {
     connect(p_bluStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));
   }
+  
+  /**
+   * Update the stretch and histogram for all the bands 
+   * for All BandId option.
+   * 
+   * @author Sharmila Prasad (3/14/2011)
+   * 
+   * @param redStretch - Updated Red Stretch
+   * @param redHist    - Updated Red Histogram
+   * @param grnStretch - Updated Green Stretch
+   * @param grnHist    - Updated Green Histogram
+   * @param bluStretch - Updated Blue Stretch
+   * @param bluHist    - Updated Blue Histogram
+   */
+  void AdvancedStretchDialog::updateForRGBMode(Isis::Stretch &redStretch,
+      Isis::Histogram &redHist,
+      Isis::Stretch &grnStretch, Isis::Histogram &grnHist,
+      Isis::Stretch &bluStretch, Isis::Histogram &bluHist) 
+  {
+    if(p_redStretch) {
+      p_redStretch->setStretch(redStretch);
+      p_redStretch->setHistogram(redHist);
+    }
+
+    if(p_grnStretch) {
+      p_grnStretch->setStretch(grnStretch);
+      p_grnStretch->setHistogram(grnHist);
+    }
+    
+    if(p_bluStretch) {
+      p_bluStretch->setStretch(bluStretch);
+      p_bluStretch->setHistogram(bluHist);
+    }
+  }
+  
 
 
   /**
@@ -81,7 +116,7 @@ namespace Qisis {
   void AdvancedStretchDialog::enableGrayMode(Isis::Stretch &grayStretch,
       Isis::Histogram &grayHist) {
     destroyCurrentStretches();
-
+    
     p_grayStretch = new AdvancedStretch(grayHist, grayStretch,
                                         "Gray", QColor(Qt::gray));
     layout()->addWidget(p_grayStretch);
@@ -137,14 +172,18 @@ namespace Qisis {
    * @param cvp
    */
   void AdvancedStretchDialog::updateStretch(CubeViewport *cvp) {
-    if(p_grayStretch)
+    if(p_grayStretch){
       p_grayStretch->setStretch(cvp->grayStretch());
-    if(p_redStretch)
+    }
+    if(p_redStretch) {
       p_redStretch->setStretch(cvp->redStretch());
-    if(p_grnStretch)
+    }
+    if(p_grnStretch){
       p_grnStretch->setStretch(cvp->greenStretch());
-    if(p_bluStretch)
+    }
+    if(p_bluStretch){
       p_bluStretch->setStretch(cvp->blueStretch());
+    }
   }
 
 
@@ -159,12 +198,16 @@ namespace Qisis {
   void AdvancedStretchDialog::updateHistograms(const Isis::Histogram &redHist,
       const Isis::Histogram &grnHist,
       const Isis::Histogram &bluHist) {
-    if(p_redStretch)
+
+    if(p_redStretch){
       p_redStretch->setHistogram(redHist);
-    if(p_grnStretch)
+    }
+    if(p_grnStretch){
       p_grnStretch->setHistogram(grnHist);
-    if(p_bluStretch)
+    }
+    if(p_bluStretch){
       p_bluStretch->setHistogram(bluHist);
+    }
   }
 
 
@@ -267,7 +310,7 @@ namespace Qisis {
    * @return Isis::Stretch
    */
   Isis::Stretch AdvancedStretchDialog::getBluStretch() {
-    if(p_redStretch) {
+    if(p_bluStretch) {
       return p_bluStretch->getStretch();
     }
     else {
