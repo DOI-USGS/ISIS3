@@ -91,7 +91,10 @@ namespace Isis {
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
     setlocale(LC_ALL, "en_US");
-    putenv("LANG=en_US");
+
+    char env[1024];
+    strncpy(env, "LANG=en_US", 1023);
+    putenv(env);
 
     // Verify ISISROOT was set
     if (getenv("ISISROOT") == NULL || iString(getenv("ISISROOT")) == "") {
