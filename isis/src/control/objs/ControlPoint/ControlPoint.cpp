@@ -1407,19 +1407,9 @@ namespace Isis {
 
       // Map the lat/lon/radius of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.
-      if( cam->GetCameraType() != Isis::Camera::Radar ) { 
-        if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
-          cam->SetImage(m->GetSample(), m->GetLine());
-        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
-      }
-      // y is doppler shift for radar.  If we map through the current Spice
-      // line will be calculated from time and if we hold the time and the
-      // Spice we will get the same x/y as measured.
-      else {  
-        cam->GroundMap()->SetGround(GetAdjustedSurfacePoint());
-        cudx = cam->GroundMap()->FocalPlaneX();  // Get undistorted 
-        cudy = cam->GroundMap()->FocalPlaneY();
-      }
+      if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
+        cam->SetImage(m->GetSample(), m->GetLine());
+      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
       double mudx = m->GetFocalPlaneMeasuredX();
       double mudy = m->GetFocalPlaneMeasuredY();
 
