@@ -1263,6 +1263,8 @@ namespace Isis {
    *
    * @param [in] degree Degree of the polynomial to be fit
    *
+   * @history 2011-03-22 Debbie A. Cook - Fixed bug in second branch where existing
+   *                       degree is greater than new degree
    */
   void SpiceRotation::SetPolynomialDegree(int degree) {
     // Adjust the degree for the data
@@ -1298,12 +1300,12 @@ namespace Isis {
           coefAngle3(degree + 1);
 
       for(int icoef = 0;  icoef <= degree;  icoef++) {
-        coefAngle1.push_back(p_coefficients[0][icoef]);
-        coefAngle2.push_back(p_coefficients[1][icoef]);
-        coefAngle3.push_back(p_coefficients[2][icoef]);
+        coefAngle1[icoef] = p_coefficients[0][icoef];
+        coefAngle2[icoef] = p_coefficients[1][icoef];
+        coefAngle3[icoef] = p_coefficients[2][icoef];
       }
-      SetPolynomial(coefAngle1, coefAngle2, coefAngle3);
       p_degree = degree;
+      SetPolynomial(coefAngle1, coefAngle2, coefAngle3);
     }
   }
 
