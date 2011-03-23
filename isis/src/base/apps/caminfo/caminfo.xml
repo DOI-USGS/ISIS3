@@ -382,6 +382,9 @@ End
      <change name="Christopher Austin" date="2011-03-18">
        Added new parameters including FLATINC.
      </change>
+     <change name="Christopher Austin" date="2011-03-22">
+       Changed the new parameter's names. (INCTYPE, NUMVERTICES)
+     </change>
   </history>
 
   <category>
@@ -421,7 +424,7 @@ End
       </parameter>
       </group>
     
-    <group name="Output Options">
+    <group name="General Output Options">
       <parameter name="FORMAT">
         <type>string</type>
          <default><item>PVL</item></default>
@@ -449,6 +452,7 @@ End
            </option>
          </list>
       </parameter>
+      
       <parameter name="APPEND">
         <type>boolean</type>
         <default><item>false</item></default>
@@ -457,6 +461,7 @@ End
           caminfo data in a new line.
          </description>
       </parameter>
+      
       <parameter name="GEOMETRY">
         <type>boolean</type>
         <brief>
@@ -550,10 +555,10 @@ End
       <parameter name="STATISTICS">
         <type>boolean</type>
         <brief>
-          Gather DN Statistics.
+          Include DN Statistics.
         </brief>
         <description>
-          Get DN statistics for all band within the cube.  These data are
+          Include DN statistics for all band within the cube.  These data are
           contained in the Statistics object.  The keyword/values contained 
           therein are:
           <UL>
@@ -629,7 +634,9 @@ End
         <default><item>1</item></default>
         <minimum inclusive="true">1</minimum>
       </parameter>
-
+    </group>
+      
+    <group name="Polygon Output  Options">
       <parameter name="POLYGON">
         <type>boolean</type>
         <default><item>FALSE</item></default>
@@ -653,53 +660,59 @@ End
             </UL>
         </description>
         <inclusions>
-          <item>FLATINC</item>
-          <item>NUMSTEPS</item>
+          <item>INCTYPE</item>
+          <item>NUMVERTICES</item>
           <item>POLYLINC</item>
           <item>POLYSINC</item>
           <item>MAXEMISSION</item>
           <item>MAXINCIDENCE</item>
         </inclusions>
       </parameter>
-      
-      <parameter name="FLATINC">
-        <type>boolean</type>
-        <default><item>TRUE</item></default>
+
+      <parameter name="INCTYPE">
+        <type>string</type>
+        <default><item>LINCSINC</item></default>
         <brief>
-          Create a polygon with a set number of steps
+          Polygon quality
         </brief>
         <description>
-          When true, use NUMSTEPS to set an approximate number of steps for
+          When true, use NUMVERTICES to set an approximate number of steps for
           the footprint. Otherwise use POLYLINC and POLYSINC to create the
           polygon based on the dimentions of the cube.
         </description>
-        <inclusions>
-          <item>NUMSTEPS</item>
-        </inclusions>
-        <exclusions>
-          <item>POLYLINC</item>
-          <item>POLYSINC</item>
-        </exclusions>
+        <list>
+          <option value="LINCSINC">
+            <brief>
+              Use POLYLINC and POLYSINC for polygon quality
+            </brief>
+            <description>
+              Enable this option to use the number of samples and lines to skip
+              around the perimeter of the image to compute the polygon
+              footprint.
+            </description>
+            <exclusions>
+              <item>NUMVERTICES</item>
+            </exclusions>
+          </option>
+          <option value="VERTICES">
+            <brief>
+              Use NUMVERTICES for polygon quality
+            </brief>
+            <description>
+              Enable this option to use a total number of vertices around the
+              perimeter of the image to compute the polygon footprint.
+            </description>
+            <exclusions>
+              <item>POLYLINC</item>
+              <item>POLYSINC</item>
+            </exclusions>
+          </option>
+        </list>
       </parameter>
           
-      <parameter name="NUMSTEPS">
-        <type>integer</type>
-        <default><item>40</item></default>
-        <brief>
-          Polygon steps
-        </brief>
-        <description>
-          Specifies the approximate number of steps (+/- 3) to take around the
-          image to compute the polygon footprint. (In limb images, the number
-          of steps can be much more or less than 3 off.) Note that currently, an
-          increment of 4 or less will not work for pushframe instruments such as
-          THEMIS-VIS.
-        </description>
-        <minimum inclusive="true">1</minimum>
-      </parameter>
-      
       <parameter name="POLYLINC">
         <type>integer</type>
+        <internalDefault>10% of the cube's total lines</internalDefault>
         <brief>
           Polygon line increment
         </brief>
@@ -709,12 +722,12 @@ End
           increment of 1 will not work for pushframe instruments such as
           THEMIS-VIS.
         </description>
-        <internalDefault>10% of the cube's total lines</internalDefault>
         <minimum inclusive="true">1</minimum>
       </parameter>
 
       <parameter name="POLYSINC">
         <type>integer</type>
+        <internalDefault>10% of the cube's total samples</internalDefault>
         <brief>
           Polygon sample increment
         </brief>
@@ -724,10 +737,25 @@ End
           increment of 1 will not work for pushframe instruments such as
           THEMIS-VIS.
         </description>
-        <internalDefault>10% of the cube's total samples</internalDefault>
         <minimum inclusive="true">1</minimum>
       </parameter>
 
+      <parameter name="NUMVERTICES">
+        <type>integer</type>
+        <default><item>40</item></default>
+        <brief>
+          Polygon steps
+        </brief>
+        <description>
+          Specifies the approximate number of vertices (+/- 3) to take around
+          the image to compute the polygon footprint. (In limb images, the
+          number of steps can be much more or less than 3 off.) Note that
+          currently, an increment of 4 or less will not work for pushframe
+          instruments such as THEMIS-VIS.
+        </description>
+        <minimum inclusive="true">4</minimum>
+      </parameter>
+      
       <parameter name="MAXEMISSION">
         <type>double</type>
         <brief>

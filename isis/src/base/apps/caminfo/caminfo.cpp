@@ -164,13 +164,14 @@ void IsisMain() {
   if(doGeometry || doPolygon) {
     Camera *cam = incube->Camera();
 
+    iString incType = ui.GetString("INCTYPE");
     int polySinc, polyLinc;
-    if(doPolygon && ui.GetBoolean("FLATINC")) {
+    if(doPolygon && incType.UpCase() == "VERTICES") {
       polySinc = polyLinc = (int)(0.5 + (((incube->Samples() * 2) +
                                  (incube->Lines() * 2) - 3.0) /
-                                 ui.GetInteger("NUMSTEPS")));
+                                 ui.GetInteger("NUMVERTICES")));
     }
-    else {
+    else if (incType.UpCase() == "LINCSINC"){
       if(ui.WasEntered("POLYSINC")) {
         polySinc = ui.GetInteger("POLYSINC");
       }
@@ -185,6 +186,10 @@ void IsisMain() {
         polyLinc = (int)(0.5 + 0.10 * incube->Lines());
         if(polyLinc == 0) polyLinc = 1;
       }
+    }
+    else {
+      string msg = "Invalid INCTYPE option[" + incType + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     bandGeom = new BandGeometry();
@@ -369,6 +374,6 @@ void GenerateCSVOutput(Cube *incube,
 
   keys.TrimTail(delim); // Get rid of the extra delim char (",")
   values.TrimTail(delim); // Get rid of the extra delim char (",")
-  outFile << keys << endl << values;
+  outFile << keys << endl << values << endl;
   outFile.close();
 }
