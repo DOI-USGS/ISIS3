@@ -513,7 +513,6 @@ namespace Qisis {
         }
       }
     }
-    cerr << "\n";
     stretchChanged();
   }
 
