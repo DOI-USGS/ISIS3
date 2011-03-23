@@ -1694,7 +1694,9 @@ namespace Isis {
    */
   pair<double, double> Camera::StartEndEphemerisTimes() {
     pair<double,double> ephemerisTimes;
-    double startTime, endTime;
+    double startTime = -DBL_MAX;
+    double endTime = -DBL_MAX;
+
     for(int band = 1; band <= Bands(); band++) {
       SetBand(band);
       SetImage(0.5, 0.5);
