@@ -52,8 +52,10 @@ namespace Qisis {
    * @author Stacy Alley
    *
    * @internal
-   *   @history 2010-11-08 Eric Hyer - Added replot method
-   *   @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal 
+   *  @history 2010-11-08 Eric Hyer - Added replot method
+   *  @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal
+   *  @history 2011-03-23 Sharmila Prasad - PlotWindow to be ontop even when it
+   *           loses focus. This works for both histogram and plot tools.
    */
   class PlotWindow : public Qisis::MainWindow {
       Q_OBJECT

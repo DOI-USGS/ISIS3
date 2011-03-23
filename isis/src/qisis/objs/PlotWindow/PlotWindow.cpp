@@ -79,6 +79,15 @@ namespace Qisis {
     p_mainWindow->setCentralWidget(p_plot);
     setupDefaultMenu();
 
+  #if defined(__APPLE__)
+    p_mainWindow->setWindowFlags(Qt::Tool);
+  #endif
+
+  #if !defined(__APPLE__)
+    p_mainWindow->setWindowFlags(Qt::Dialog);
+  #endif
+
+
     /*set max and min*/
     p_xMin = 0;
     p_yMin = 0;
