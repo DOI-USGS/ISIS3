@@ -69,7 +69,7 @@ void IsisMain() {
   int unregistered = 0;
 
   CubeManager cubeMgr;
-  cubeMgr.SetNumOpenCubes(50);
+  cubeMgr.SetNumOpenCubes(500);
 
   // Register the points and create a new
   // ControlNet containing the refined measurements
@@ -167,6 +167,8 @@ void IsisMain() {
             // If the measurements were correctly registered
             // Write them to the new ControlNet
             AutoReg::RegisterStatus res = ar->Register();
+            searchCube.ClearCache();
+            patternCube.ClearCache();
 
             double score1, score2;
             ar->ZScores(score1, score2);

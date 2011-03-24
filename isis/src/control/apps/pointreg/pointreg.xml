@@ -124,6 +124,11 @@
     <change name="Travis Addair" date="2010-11-02">
         Binary Control Network conversion
     </change>
+    <change name="Steven Lambright" date="2011-03-24">
+      Added ClearCache calls to free up the large amount of cube data in memory
+      and increased the number of simultaneous open cubes to 500. This program
+      should have a much smaller memory footprint.
+    </change>
   </history>
 
   <groups>
