@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
       for(int i = 0; i < oline.size(); i++) {
         oline[i] = (double) j;
       }
+      out2.ClearCache();
       out2.Write(oline);
       j++;
     }
@@ -102,6 +103,7 @@ int main(int argc, char *argv[]) {
                << inLine2[i] << " != " << double(j) << endl;
         }
       }
+      in2.ClearCache();
       j++;
     }
     in2.Close();
@@ -136,6 +138,7 @@ int main(int argc, char *argv[]) {
     Isis::LineManager inLine3(in3);
     for(inLine3.begin(); !inLine3.end(); inLine3++) {
       in3.Read(inLine3);
+      in3.ClearCache();
       for(int i = 0; i < inLine3.size(); i++) {
         if(inLine3[i] != (double) j) {
           cout << "Problem at line " << inLine3.Line()

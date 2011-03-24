@@ -20,15 +20,14 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Cube.h"
 
 #include <sstream>
-
 #include <QMutex>
 
 #include "Application.h"
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Cube.h"
 #include "CubeBsqHandler.h"
 #include "CubeTileHandler.h"
 #include "Endian.h"
@@ -997,6 +996,15 @@ namespace Isis {
       }
     }
     return false;
+  }
+
+
+  void Cube::ClearCache() {
+    if(p_ioHandler) {
+      p_mutex->lock();
+      p_ioHandler->ClearCache();
+      p_mutex->unlock();
+    }
   }
 
   /**

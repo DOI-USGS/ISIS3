@@ -63,6 +63,7 @@ namespace Isis {
       virtual void Close(const bool remove = false) = 0;
       virtual void Read(Isis::Buffer &rbuf) = 0;
       virtual void Write(Isis::Buffer &wbuf) = 0;
+      virtual void ClearCache() = 0;
       void ToDouble(Isis::Buffer &buf);
       void ToRaw(Isis::Buffer &buf);
 

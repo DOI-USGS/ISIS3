@@ -75,6 +75,30 @@ namespace Isis {
     }
   }
 
+  void CubeBsqHandler::ClearCache() {
+    // Empty the cache
+    unsigned int listSize = p_cacheList.size();
+    for(unsigned int i = 0; i < listSize; i++) {
+      if(p_cacheList[i]->buf != NULL) {
+        InternalCache *cache = p_cacheList[i];
+        WriteCache(cache);
+        delete [] cache->buf;
+        cache->buf = NULL;
+      }
+      delete p_cacheList[i];
+      p_cacheList[i] = NULL;
+    }
+
+    p_cacheList.clear();
+    p_bufList.clear();
+
+    if(p_nullCache.buf != NULL) {
+      delete [] p_nullCache.buf;
+      p_nullCache.buf = NULL;
+    }
+  }
+
+
   void CubeBsqHandler::Close(const bool removeFile) {
     // Don't do much if the file wasn't opened
     if(!p_cube->stream.is_open()) return;

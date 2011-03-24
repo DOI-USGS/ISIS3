@@ -238,6 +238,30 @@ namespace Isis {
     }
   }
 
+
+  void CubeTileHandler::ClearCache() {
+    // Empty the cache
+    unsigned int listSize = p_cacheList.size();
+    for(unsigned int i = 0; i < listSize; i++) {
+      if(p_cacheList[i]->buf != NULL) {
+        InternalCache *cache = p_cacheList[i];
+        WriteCache(cache);
+        delete [] cache->buf;
+        cache->buf = NULL;
+      }
+      delete p_cacheList[i];
+      p_cacheList[i] = NULL;
+    }
+
+    p_cacheList.clear();
+    p_bufList.clear();
+
+    if(p_nullCache.buf != NULL) {
+      delete [] p_nullCache.buf;
+      p_nullCache.buf = NULL;
+    }
+  }
+
   void CubeTileHandler::GrowCache(const Isis::Buffer &buf) {
     // The old method created a new cache for every new buffer used
     // on a cube
@@ -259,6 +283,7 @@ namespace Isis {
     // The new method makes six tiles sets worth of caches total.
     // Six was used to ensure large highpass filters don't thrash
     if(p_nullCache.buf != NULL) return;
+
     MakeNullCache();
     for(int j = 0; j < 6; j++) {
       for(int i = 0; i < p_maxTiles; i++) {
@@ -314,7 +339,7 @@ namespace Isis {
 
       bool loopStarted = false;
 
-      while(!loopStarted || cacheIterator != loopEnd) {
+      while(p_cacheList.size() && (!loopStarted || cacheIterator != loopEnd)) {
         loopStarted = true;
         cache = *cacheIterator;
         if(cache->buf != NULL) {

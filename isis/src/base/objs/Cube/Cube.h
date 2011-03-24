@@ -108,6 +108,7 @@ namespace Isis {
    *            projection existance test
    *   @history 2010-03-22 Steven Lambright - Added a mutex for reading and writing,
    *            which makes these methods thread safe.
+   *   @history 2011-03-23 Steven Lambright - Added ClearCache method. 
    *
    */
   class Cube {
@@ -315,6 +316,8 @@ namespace Isis {
       bool HasGroup(const std::string &group);
 
       bool HasTable(const std::string &name);
+
+      void ClearCache();
 
     private:
       IsisCubeDef p_cube;

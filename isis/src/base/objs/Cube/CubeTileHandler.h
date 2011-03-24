@@ -53,6 +53,7 @@ namespace Isis {
       void Read(Isis::Buffer &rbuf);
       void Write(Isis::Buffer &wbuf);
       void Create(bool overwrite);
+      void ClearCache();
 
     private:
       class InternalCache {
