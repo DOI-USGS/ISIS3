@@ -1,7 +1,3 @@
-INTENTIONAL_COMPILE_ERROR
-To be removed when BundleAdjust is working properly again
-
-
 #include "Isis.h"
 #include "Process.h"
 #include "BundleAdjust.h"
@@ -23,13 +19,13 @@ void IsisMain() {
   // Get the held list if entered and prep for bundle adjustment
   BundleAdjust *b = NULL;
 
-//   if (ui.WasEntered("HELDLIST")) {
-//     std::string heldList = ui.GetFilename("HELDLIST");
-//     b = new BundleAdjust(cnetFile, cubeList, heldList);
-//   }
-//   else {
+  if (ui.WasEntered("HELDLIST")) {
+    std::string heldList = ui.GetFilename("HELDLIST");
+    b = new BundleAdjust(cnetFile, cubeList, heldList);
+  }
+  else {
     b = new BundleAdjust(cnetFile, cubeList);
-//   }
+   }
 
   if (ui.WasEntered("SC_SIGMAS"))
     b->ReadSCSigmas(ui.GetFilename("SC_SIGMAS"));
@@ -88,6 +84,11 @@ void IsisMain() {
   b->SetGlobalCameraAnglesAprioriSigma(ui.GetDouble("CAMERA_ANGLES_SIGMA"));
   b->SetGlobalCameraAngularVelocityAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_VELOCITY_SIGMA"));
   b->SetGlobalCameraAngularAccelerationAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA"));
+
+  // output options
+  b->SetStandardOutput(ui.GetBoolean("BUNDLEOUT_TXT"));
+  b->SetCSVOutput(ui.GetBoolean("OUTPUT_CSV"));
+  b->SetResidualOutput(ui.GetBoolean("RESIDUALS_CSV"));
 
   // Check to make sure user entered something to adjust... Or can just points be in solution?
 //   if (camsolve == "NONE"  &&  spsolve == "NONE") {

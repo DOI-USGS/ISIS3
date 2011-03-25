@@ -68,7 +68,7 @@
         </filter>
       </parameter>
 
-<!--    <parameter name="HELDLIST">
+      <parameter name="HELDLIST">
         <type>filename</type>
         <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
@@ -81,7 +81,7 @@
         <filter>
           *.txt *.lis
         </filter>
-      </parameter>  -->
+      </parameter>
 
       <parameter name="CNET">
         <type>filename</type>
@@ -133,6 +133,7 @@
       </group>
 
     <group name="Solve Options">
+<!--
       <parameter name="OBSERVATIONS">
         <brief> Keep instances of the same observation in different cube files dependent</brief>
         <description>
@@ -147,7 +148,7 @@
           <item>No</item>
         </default>
       </parameter>
-
+-->
       <parameter name="RADIUS">
         <brief> Solve for local radii of points</brief>
         <description>
@@ -171,7 +172,7 @@
         </description>
         <type>boolean</type>
         <default>
-          <item>Yes</item>
+          <item>No</item>
         </default>
       </parameter>
 
@@ -359,23 +360,23 @@
           </option>
 
           <option value="ANGLES">
-            <brief>Solve for camera angles:   right ascension, declination, and optionally twist</brief>
+            <brief>Solve for camera angles: right ascension, declination, and optionally twist</brief>
             <description>
-                        If this option is selected the camera angles in each cube will be adjusted in the solution, but not the angular velocity or angular acceleration.  The adjustments will not be applied unless UPDATE is selected.
+                        Camera angles in each cube will be adjusted in the solution, but not angular velocities or accelerations. Adjustments are not be applied unless UPDATE is selected.
             </description>
           </option>
 
           <option value="VELOCITIES">
             <brief>Solve for camera angles AND their angular velocities</brief>
             <description>
-                        If this option is selected, camera angles (right ascension, declination, and optionally twist) and their angular velocites will be adjusted in the solution.
+                        Camera angles (right ascension, declination, and optionally twist) and their angular velocities will be adjusted in the solution.
             </description>
           </option>
 
           <option value="ACCELERATIONS">
-            <brief>Solve for camera angles, their angular velocities, and their angular accelerations</brief>
+            <brief>Solve for camera angles, their angular velocities and accelerations</brief>
             <description>
-                        If this option is selected, camera angles (right ascension, declination, and optionall twist), their angular velocities, and their angular accelerations will be adjusted in the solution.
+                        Camera angles (right ascension, declination, and optionally twist), their angular velocities and accelerations will be adjusted in the solution.
             </description>
           </option>
 
@@ -416,28 +417,28 @@
           <option value="NONE">
             <brief>Don't solve for any spacecraft position factors</brief>
             <description>
-                         If this option is selected, no spacecraft position factors will be adjusted.  A camera angle factor must be included in the adjustment in order for the application to run.
+                         No spacecraft position factors will be adjusted.  A camera angle factor must be included in the adjustment in order for the application to run.
             </description>
           </option>
 
           <option value="POSITION">
             <brief>Solve for the spacecraft positions</brief>
             <description>
-                         If this option is selected, the spacecraft positions will be adjusted in the solution, but not the velocity or the acceleration.
+                         Spacecraft positions will be adjusted in the solution, but not the velocity or the acceleration.
             </description>
           </option>
 
           <option value="VELOCITIES">
             <brief>Solve for the spacecraft positions and velocities</brief>
             <description>
-                         If this option is selected, the spacecraft positions will be adjusted in the solution, as well as the velocities of the spacecraft at each instance.
+                         Spacecraft positions will be adjusted in the solution, as well as the velocities of the spacecraft at each instance.
             </description>
           </option>
 
           <option value="ACCELERATIONS">
             <brief>Solve for the spacecraft positions, velocities, and accelerations</brief>
             <description>
-                         If this option is selected, the spacecraft positions will be adjusted in the solution, as well as the velocities and accelerations of the spacecraft at each instance.
+                         Spacecraft positions will be adjusted in the solution, as well as the velocities and accelerations of the spacecraft at each instance.
             </description>
           </option>
         </list>
@@ -543,6 +544,37 @@
             <item>-1.0</item>
           </default>
         </parameter>
+        </group>
+
+        <group name="Output Options">
+          <parameter name="BUNDLEOUT_TXT">
+            <brief> standard bundle output file - bundleout.txt
+            </brief>
+            <description> flags generation of standard bundle output file</description>
+            <type>boolean</type>
+            <default>
+              <item>yes</item>
+            </default>
+          </parameter>
+
+          <parameter name="OUTPUT_CSV">
+            <brief> outputs point and image data (body-fixed) to csv file - bundleout_points.csv
+            </brief>
+            <description> flags output of point and image data (body-fixed) to csv file</description>
+            <type>boolean</type>
+            <default>
+              <item>yes</item>
+            </default>
+          </parameter>
+
+          <parameter name="RESIDUALS_CSV">
+            <brief> outputs image coordinate residuals to csv file - residuals.csv</brief>
+            <description> flags output of image coordinate residuals to csv file</description>
+            <type>boolean</type>
+            <default>
+              <item>yes</item>
+            </default>
+          </parameter>
         </group>
 
     </groups>
