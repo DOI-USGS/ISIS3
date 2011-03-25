@@ -1144,6 +1144,9 @@ namespace Isis {
    *                               adjustedSurfacePoint to aprioriSurfacePoint
    *                               and set test for empty covariance matrix
    *                               to use 0. instead of nulls.
+   *   @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
+   *                               was really checking for Candidate measures.
+   *                               
    *
    * @return Status Success or PointLocked
    */
@@ -1177,10 +1180,14 @@ namespace Isis {
     // Loop for each measure and compute the sum of the lat/lon/radii
     for (int j = 0; j < cubeSerials->size(); j++) {
       ControlMeasure *m = GetMeasure(j);
-      if (!m->IsMeasured()) {
-        // TODO: How do we deal with unmeasured measures
-      }
-      else if (m->IsIgnored()) {
+
+      // The comment code was really checking for candidate measures
+      // Commented out 2011-03-24 by DAC
+//       if (!m->IsMeasured()) {
+//         // TODO: How do we deal with unmeasured measures
+//       }
+//       else if (m->IsIgnored()) {
+      if (m->IsIgnored()) {
         // TODO: How do we deal with ignored measures
       }
       else {
@@ -1268,6 +1275,8 @@ namespace Isis {
    * @history 2010-12-10 Debbie A. Cook,  Revised error calculation for radar
    *                            because it was always reporting line errors=0.
    * @history 2011-03-17 Debbie A. Cook,  Fixed typo in radar call to get longitude
+   * @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
+   *                            was really checking for Candidate measures.
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
     if (editLock)
@@ -1284,8 +1293,10 @@ namespace Isis {
       ControlMeasure *m = (*measures)[keys[j]];
       if (m->IsIgnored())
         continue;
-      if (!m->IsMeasured())
-        continue;
+      // The following lines actually check for Candidate measures
+      // Commented out on 2011-03-24 by DAC
+//       if (!m->IsMeasured())
+//         continue;
 
       // TODO:  Should we use crater diameter?
       Camera *cam = m->Camera();
@@ -1379,6 +1390,8 @@ namespace Isis {
    * @history 2011-03-19  Debbie A. Cook - Changed to use the Camera classes
    *                            like ComputeResiduals and get the correct
    *                            calculations for each camera type.
+   * @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
+   *                            was really checking for Candidate measures.
    *
    * @todo Use this method in ComputeResiduals to avoid duplication of code
    */
@@ -1398,8 +1411,10 @@ namespace Isis {
       ControlMeasure *m = (*measures)[keys[j]];
       if (m->IsIgnored())
         continue;
-      if (!m->IsMeasured())
-        continue;
+      // The following lines actually check for Candidate measures
+      // Commented out on 2011-03-24 by DAC
+//       if (!m->IsMeasured())
+//         continue;
 
       // TODO:  Should we use crater diameter?
       Camera* cam = m->Camera();
@@ -1407,9 +1422,19 @@ namespace Isis {
 
       // Map the lat/lon/radius of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.
-      if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
-        cam->SetImage(m->GetSample(), m->GetLine());
-      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+      if( cam->GetCameraType() != Isis::Camera::Radar ) { 
+        if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
+          cam->SetImage(m->GetSample(), m->GetLine());
+        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+      }
+      // y is doppler shift for radar.  If we map through the current Spice
+      // line will be calculated from time and if we hold the time and the
+      // Spice we will get the same x/y as measured.
+      else {  
+        cam->GroundMap()->SetGround(GetAdjustedSurfacePoint());
+        cudx = cam->GroundMap()->FocalPlaneX();  // Get undistorted 
+        cudy = cam->GroundMap()->FocalPlaneY();
+      }
       double mudx = m->GetFocalPlaneMeasuredX();
       double mudy = m->GetFocalPlaneMeasuredY();
 
