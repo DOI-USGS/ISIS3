@@ -1404,6 +1404,8 @@ namespace Isis {
       try {
         Isis::Camera *cam = CameraFactory::Create(pvl);
         p_cameraMap[serialNumber] = cam;
+        p_cameraMeasuresMap[serialNumber] = 0;
+        p_cameraRejectedMeasuresMap[serialNumber] = 0;
         p_cameraList.push_back(cam);
       }
       catch (Isis::iException &e) {
@@ -1430,6 +1432,9 @@ namespace Isis {
           iString serialNumber = curMeasure->GetCubeSerialNumber();
           if (list.HasSerialNumber(serialNumber)) {
             curMeasure->SetCamera(p_cameraMap[serialNumber]);
+
+            // increment number of measures for this image (camera)
+            p_cameraMeasuresMap[serialNumber]++;
           }
           else {
             iString msg = "Control point [" + curPoint->GetId() +
