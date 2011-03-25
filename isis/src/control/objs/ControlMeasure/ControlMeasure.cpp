@@ -582,6 +582,7 @@ namespace Isis {
       {
         ControlNet * cnet = parentPoint->Parent();
         p_ignore ? cnet->MeasureDeleted(this) : cnet->MeasureAdded(this);
+        cnet->emitNetworkStructureModified();
       }
     }
     
