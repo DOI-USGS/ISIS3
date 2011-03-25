@@ -552,6 +552,8 @@ namespace Isis {
         p_sigma0 += p_residuals[i]*p_residuals[i]*p_sqrtWeight[i]*p_sqrtWeight[i];
     }
 
+//    std::cout << p_residuals << std::endl;
+
     // if Jigsaw (bundle adjustment)
     // add contibution to Sigma0 from constrained parameters
     if ( p_jigsaw ) {
@@ -565,7 +567,13 @@ namespace Isis {
 
         constrained_vTPv += p_epsilonsSparse[i]*p_epsilonsSparse[i]*weight;
       }
+
+//      std::cout << "vtpv image = " << p_sigma0 << std::endl;
+//      std::cout << "sqrtWeight = " << p_sqrtWeight[0] << std::endl;
+
       p_sigma0 += constrained_vTPv;
+
+//      std::cout << "vtpv constrained = " << constrained_vTPv << std::endl;
 
     }
     // calculate degrees of freedom (or redundancy)
@@ -579,6 +587,9 @@ namespace Isis {
     }
     else
       p_sigma0 = p_sigma0/(double)p_degreesOfFreedom;
+
+
+//    std::cout << "degrees of freedom = " << p_degreesOfFreedom << std::endl;
 
     // check for p_sigma0 < 0
     p_sigma0 = sqrt(p_sigma0);
