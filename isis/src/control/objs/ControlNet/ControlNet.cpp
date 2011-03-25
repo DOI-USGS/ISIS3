@@ -620,6 +620,21 @@ namespace Isis {
 
 
   /**
+   * Updates the key reference (poind Id) from the old one to what the point
+   * id was changet to. This function should only be called from ControlPoint's
+   * SetId().
+   *
+   * @param point The point that needs to be updated.
+   * @param oldId The pointId that the point had.
+   */
+  void ControlNet::UpdatePointReference(ControlPoint *point, iString oldId) {
+    points->remove(oldId);
+    (*points)[point->GetId()] = point;
+    pointIds->insert(pointIds->indexOf(oldId), point->GetId());
+  }
+
+
+  /**
    * Updates the ControlCubeGraphNode for this measure's serial number to
    * reflect the deletion.  If this is the only measure left in the containing
    * ControlCubeGraphNode, then the ControlCubeGraphNode is deleted as well.
@@ -860,16 +875,7 @@ namespace Isis {
    * @returns True if the point is in the network, false otherwise.
    */
   bool ControlNet::ContainsPoint(iString pointId) const {
-    bool contains = false;
-
-    QHashIterator< QString, ControlPoint * > i(*points);
-    while (i.hasNext() && !contains) {
-      i.next();
-      if (i.value()->GetId() == (iString) pointId)
-        contains = true;
-    }
-
-    return contains;
+    return points->contains(pointId);
   }
 
 
@@ -1205,7 +1211,7 @@ namespace Isis {
   int ControlNet::GetNumEditLockMeasures() {
     int numLockedMeasures = 0;
     foreach(ControlPoint * p, *points)
-    numLockedMeasures += p->GetNumMeasures() - p->GetNumLockedMeasures();
+      numLockedMeasures += p->GetNumMeasures() - p->GetNumLockedMeasures();
 
     return numLockedMeasures;
   }
@@ -1236,7 +1242,7 @@ namespace Isis {
   int ControlNet::GetNumIgnoredMeasures() {
     int numIgnoredMeasures = 0;
     foreach(ControlPoint * p, *points)
-    numIgnoredMeasures += p->GetNumMeasures() - p->GetNumValidMeasures();
+      numIgnoredMeasures += p->GetNumMeasures() - p->GetNumValidMeasures();
 
     return numIgnoredMeasures;
   }
@@ -1289,7 +1295,7 @@ namespace Isis {
   int ControlNet::GetNumMeasures() const {
     int numMeasures = 0;
     foreach(ControlPoint * p, *points)
-    numMeasures += p->GetNumMeasures();
+      numMeasures += p->GetNumMeasures();
 
     return numMeasures;
   }

@@ -140,6 +140,8 @@ namespace Isis {
    *   @history 2011-03-14 Eric Hyer - Cube connection graph now updated when
    *                points or measures are ignored.
    *   @history 2011-03-15 Eric Hyer - Some cube graph bugs were fixed.
+   *   @history 2011-03-25 Christopher Austin - Added UpdatePointReference() to
+   *                                 work with ControlPoint's SetId()
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -233,6 +235,7 @@ namespace Isis {
       void ValidateSerialNumber(iString serialNumber) const;
       void MeasureAdded(ControlMeasure *measure);
       void MeasureDeleted(ControlMeasure *measure);
+      void UpdatePointReference(ControlPoint *point, iString oldId);
       void emitNetworkStructureModified();
 
 
