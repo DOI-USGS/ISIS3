@@ -889,7 +889,10 @@ namespace Isis {
   ControlPoint::Status ControlPoint::SetId(iString newId) {
     if (editLock)
       return PointLocked;
+    iString oldId = id;
     id = newId;
+    if (parentNetwork)
+      parentNetwork->UpdatePointReference(this, oldId);
     return Success;
   }
 

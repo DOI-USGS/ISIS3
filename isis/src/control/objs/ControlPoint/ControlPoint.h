@@ -242,6 +242,7 @@ namespace Isis {
    *            to reflect naming changes.
    *   @history 2011-03-17 Eric Hyer - Added default parameter to GetMeasures
    *            method for excluding ignored measures.
+   *   @history 2011-03-25 Christopher Austin - Added functionality to SetId()
    */
   class ControlPoint {
       friend class ControlNet;
