@@ -636,7 +636,10 @@ namespace Isis {
 
     // notify parent network if we have one
     if (!IsIgnored() && parentNetwork && !measure->IsIgnored())
+    {
       parentNetwork->MeasureAdded(measure);
+      parentNetwork->emitNetworkStructureModified();
+    }
   }
 
 
@@ -683,7 +686,10 @@ namespace Isis {
 
     // notify parent network of the change
     if (!IsIgnored() && parentNetwork && !cm->IsIgnored())
+    {
       parentNetwork->MeasureDeleted(cm);
+      parentNetwork->emitNetworkStructureModified();
+    }
 
     delete cm;
     cm = NULL;
@@ -971,6 +977,7 @@ namespace Isis {
               parentNetwork->MeasureAdded(cm);
           }
         }
+        parentNetwork->emitNetworkStructureModified();
       }
     }
     
@@ -1927,7 +1934,7 @@ namespace Isis {
    * @param excludeIgnored Ignored measures are excluded if this is true.  It
    *                       is false by default.
    *
-   * @returns A list of this points measurs
+   * @returns A list of this points measures
    */
   QList< ControlMeasure * > ControlPoint::GetMeasures(
       bool excludeIgnored) const {
@@ -1941,6 +1948,9 @@ namespace Isis {
   }
 
 
+  /**
+   * @returns A list of cube serial numbers
+   */
   QList< QString > ControlPoint::GetCubeSerialNumbers() const {
     return *cubeSerials;
   }
