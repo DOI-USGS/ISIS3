@@ -10,10 +10,12 @@ commands:
 	$(APPNAME) fromlist=$(OUTPUT)/cub.lis  \
 	heldlist=$(OUTPUT)/held.lis  \
 	cnet=$(INPUT)/mocVik.net \
-	onet=$(OUTPUT)/case2OutNet.pvl \
+	onet=$(OUTPUT)/case2OutNet.bin \
 	maxits=10 \
-	tol=0.908  \
+	method=sparse \
+	sigma0=1.e-5  \
 	update=no \
 	spsolve=position | grep -v "100% Processed" | \
 	grep -v "jigsaw" > $(OUTPUT)/case2OutLog.pvl;
-	$(RM) $(OUTPUT)/cub.lis $(OUTPUT)/held.lis > /dev/null;
+	cnetbin2pvl from=$(OUTPUT)/case2OutNet.bin to=$(OUTPUT)/case2OutNet.pvl > /dev/null;
+	$(RM) $(OUTPUT)/cub.lis $(OUTPUT)/held.lis $(OUTPUT)/case2OutNet.bin > /dev/null;
