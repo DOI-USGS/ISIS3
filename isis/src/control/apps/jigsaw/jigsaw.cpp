@@ -30,7 +30,8 @@ void IsisMain() {
   if (ui.WasEntered("SC_SIGMAS"))
     b->ReadSCSigmas(ui.GetFilename("SC_SIGMAS"));
 
-  b->SetObservationMode(ui.GetBoolean("OBSERVATIONS"));
+  //  Temporarily commented out until output functional
+  //  b->SetObservationMode(ui.GetBoolean("OBSERVATIONS"));
   b->SetSolutionMethod(ui.GetString("METHOD"));
   b->SetSolveRadii(ui.GetBoolean("RADIUS"));
   b->SetErrorPropagation(ui.GetBoolean("ERRORPROPAGATION"));
