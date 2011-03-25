@@ -550,6 +550,7 @@ namespace Isis {
         if (!measure->IsIgnored())
           MeasureAdded(measure);
       }
+      emit networkStructureModified();
     }
   }
 
@@ -615,8 +616,6 @@ namespace Isis {
         }
       }
     }
-
-    emit networkStructureModified();
   }
 
 
@@ -655,7 +654,11 @@ namespace Isis {
       node = NULL;
       cubeGraphNodes->remove(serial);
     }
-
+  }
+  
+  
+  void ControlNet::emitNetworkStructureModified()
+  {
     emit networkStructureModified();
   }
 
@@ -796,9 +799,11 @@ namespace Isis {
     }
 
     ControlPoint *point = (*points)[pointId];
+    bool wasIgnored = point->IsIgnored();
 
     // notify CubeSerialNumbers of the loss of this point
-    if (!point->IsIgnored()) {
+    
+    if (!wasIgnored) {
       foreach(ControlMeasure * measure, point->GetMeasures()) {
         if (!measure->IsIgnored())
           MeasureDeleted(measure);
@@ -828,6 +833,9 @@ namespace Isis {
           p_invalid = true;
       }
     }
+    
+    if (!wasIgnored)
+      emit networkStructureModified();
   }
 
 

@@ -233,6 +233,7 @@ namespace Isis {
       void ValidateSerialNumber(iString serialNumber) const;
       void MeasureAdded(ControlMeasure *measure);
       void MeasureDeleted(ControlMeasure *measure);
+      void emitNetworkStructureModified();
 
 
     private: // graphing functions
