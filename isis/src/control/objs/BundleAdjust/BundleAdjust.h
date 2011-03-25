@@ -64,7 +64,11 @@
  *   @history 2010-07-09 Ken Edmundson Added Folding in solution method (SPECIALK), error propogation, statistical report, etc.
  *   @history 2010-08-13 Debbie A. Cook Changed surface point from lat/lon/radius to body-fixed XYZ.
  *   @history 2010-12-17 Debbie A. Cook Merged Ken Edmundson version with system and updated to new binary control net
- *   @history 2010-02-17 Debbie A. Cook Updated to use new parameter added to SpicePosition, p_timeScale
+ *   @history 2011-02-01 Debbie A. Cook Moved code to create point index map into its own method to be called after the solution
+ *                          method has been set.
+ *   @history 2011-02-17 Debbie A. Cook Updated to use new parameter added to SpicePosition, p_timeScale
+ *   @history 2011-03-05 Debbie A. Cook Put point index creation back in init.  This will prevent QRD and SVD from working if ground
+ *                          points are in the control net.
 */
 
 #include <vector>
@@ -139,6 +143,10 @@ namespace Isis {
       void SetGlobalCameraAngularVelocityAprioriSigma(double d) { m_dGlobalCameraAngularVelocityAprioriSigma = d; }
       void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { m_dGlobalCameraAngularAccelerationAprioriSigma = d; }
 
+      void SetStandardOutput(bool b) { m_bOutputStandard = b; }
+      void SetCSVOutput(bool b) { m_bOutputCSV = b; }
+      void SetResidualOutput(bool b) { m_bOutputResiduals = b; }
+
       enum CmatrixSolveType {
         None,
         AnglesOnly,
@@ -182,9 +190,9 @@ namespace Isis {
 
       void SetConvergenceThreshold(double d) { m_dConvergenceThreshold = d; }
       void SetMaxIterations(int n) { m_nMaxIterations = n; }
+      void SetSolutionMethod(std::string str);
 
-      //! Set the solution method to use for solving the matrix
-      void SetSolutionMethod(std::string str) { m_strSolutionMethod = str; }
+      void GetSparseParameterCorrections();
 
     private:
 
@@ -192,8 +200,10 @@ namespace Isis {
 
       void ComputeNumberPartials();
       void ComputeImageParameterWeights();
+      void SetSpaceCraftWeights();
 
       void AddPartials(int nPointIndex);
+      void FillPointIndexMap();
       void Update(BasisFunction &basis);
 
       int PointIndex(int i) const;
@@ -212,8 +222,8 @@ namespace Isis {
       void SetPostBundleSigmas();
 
       // output functions
-      void IterationSummary(double avErr, double sigmaXY, double sigmaHat, double sigmaX,
-                            double sigmaY);
+      void IterationSummary(double avErr, double sigmaXY, double sigmaHat, 
+                            double sigmaX, double sigmaY);
       bool Output();
       bool OutputWithErrorPropagation();
       bool OutputNoErrorPropagation();
@@ -222,14 +232,16 @@ namespace Isis {
       bool OutputResiduals();
       bool WrapUp();
 
-      //!< flags...
+                                                             //!< flags...
       bool m_bSolveTwist;                                    //!< to solve for "twist" angle
       bool m_bSolveRadii;                                    //!< to solve for point radii
       bool m_bObservationMode;                               //!< for observation mode (explain this somewhere)
       bool m_bErrorPropagation;                              //!< to perform error propagation
       bool m_bOutlierRejection;                              //!< to perform automatic outlier detection/rejection
       bool m_bPrintSummary;                                  //!< to print summary
-      bool m_bOutputCSV;                                     //!< to output points and image station data in csv format                                            //!
+      bool m_bOutputStandard;                                //!< to print standard bundle output file (bundleout.txt)
+      bool m_bOutputCSV;                                     //!< to output points and image station data in csv format
+      bool m_bOutputResiduals;                               //!< to output residuals in csv format
       bool m_bCleanUp;                                       //!< for cleanup (i.e. in destructor)
       bool m_bSimulatedData;                                 //!< indicating simulated (i.e. 'perfect' data)
       bool m_bLastIteration;
@@ -240,7 +252,7 @@ namespace Isis {
       int m_nNumImagePartials;                               //!< number of image-related partials
       int m_nNumPointPartials;                               //!< number of point-related partials
       int m_nObservations;                                   //!< number of image coordinate observations
-      //      int m_nRejectedObservations;                         //!< number of rejected image coordinate observations                                             //!
+      int m_nRejectedObservations;                         //!< number of rejected image coordinate observations                                             //!
       int m_nImageParameters;                                //!< number of image parameters
       int m_nPointParameters;                                //!< total number of point parameters (including constrained)
       int m_nConstrainedPointParameters;                     //!< number of constrained point parameters
@@ -301,7 +313,7 @@ namespace Isis {
 
       double m_dRTM;                                         //!< radians to meters conversion factor (body specific)
       double m_dMTR;                                         //!< meters to radians conversion factor (body specific)
-      Distance m_BodyRadii[3];                               //!< body radii
+      Distance m_BodyRadii[3];                               //!< body radii i meters
 
       std::vector<double> m_dEpsilons;                       //!< vector maintaining total corrections to parameters
       std::vector<double> m_dParameterWeights;               //!< vector of parameter weights
@@ -309,7 +321,7 @@ namespace Isis {
       std::vector<double> m_dxKnowns;
       std::vector<double> m_dyKnowns;
 
-      std::string p_cnetFile;                                //!< Control Net file specification
+      std::string m_strCnetFilename;                                //!< Control Net file specification
       std::string m_strSolutionMethod;                       //!< solution method string (QR,SVD,SPARSE-LU,SPECIALK)
 
       //!< pointers to...
@@ -367,7 +379,7 @@ namespace Isis {
 
       bool FormNormalEquations();
 
-      bool ComputePartials(boost::numeric::ublas::matrix<double>& coeff_image, boost::numeric::ublas::matrix<double>& coeff_point3D,
+      bool ComputePartials_DC(boost::numeric::ublas::matrix<double>& coeff_image, boost::numeric::ublas::matrix<double>& coeff_point3D,
                            boost::numeric::ublas::vector<double>& coeff_RHS, const ControlMeasure &measure,
                            const ControlPoint &point);
 

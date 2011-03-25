@@ -23,7 +23,6 @@
 #include "boost/numeric/ublas/matrix_sparse.hpp"
 #include "boost/numeric/ublas/io.hpp"
 #include "boost/numeric/ublas/vector.hpp"
-#include "cholesky.hpp"
 #include "boost/numeric/ublas/matrix_expression.hpp"
 
 using namespace boost::numeric::ublas;
@@ -40,7 +39,7 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = NULL;
     m_bPrintSummary = bPrintSummary;
-    p_cnetFile = cnetFile;
+    m_strCnetFilename = cnetFile;
 
     Init(&progress);
   }
@@ -55,7 +54,7 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = new Isis::SerialNumberList(heldList);
     m_bPrintSummary = bPrintSummary;
-    p_cnetFile = cnetFile;
+    m_strCnetFilename = cnetFile;
 
     Init(&progress);
   }
@@ -69,7 +68,7 @@ namespace Isis {
     m_pHeldSnList = NULL;
     m_bPrintSummary = bPrintSummary;
     m_dConvergenceThreshold = 0.;    // This is needed for deltack???
-    p_cnetFile = "";
+    m_strCnetFilename = "";
 
     Init();
   }
@@ -83,12 +82,13 @@ namespace Isis {
     m_pSnList = &snlist;
     m_pHeldSnList = &heldsnlist;
     m_bPrintSummary = bPrintSummary;
-    p_cnetFile = "";
+    m_strCnetFilename = "";
 
     Init();
   }
 
   BundleAdjust::~BundleAdjust() {
+    // If we have ownership 
     if (m_bCleanUp) {
       delete m_pCnet;
       delete m_pSnList;
@@ -100,11 +100,8 @@ namespace Isis {
         delete m_pObsNumList;
     }
 
-// Next 2 lines may be needed for deltack and other cases
-// if Special K doesn't work for them
-//
-//    if ( m_pLsq )
-//      delete m_pLsq;
+    if ( m_pLsq )
+      delete m_pLsq;
   }
 
   bool BundleAdjust::ReadSCSigmas(const std::string &scsigmasList) {
@@ -157,9 +154,8 @@ namespace Isis {
 //    m_pProgressBar = progress;
 
     m_dError = DBL_MAX;
-    m_bOutputCSV = false;
     m_bSimulatedData = true;
-    m_bObservationMode = false;    // Handled with constraints now...make sure answers match
+    m_bObservationMode = false;
     m_strSolutionMethod = "SPECIALK";
     m_pObsNumList = NULL;
     m_pLsq = NULL;
@@ -172,52 +168,27 @@ namespace Isis {
 
     int count;
 
+    // Create the image index
     if (m_pHeldSnList != NULL) {
       //Check to make sure held images are in the control net
       CheckHeldList();
 
-      // Set all points on held images to held, using measurement on held image
-      // to get lat/lon/radius of point OBSOLETE way of holding image -- delete these lines once code is tested.
-//      ApplyHeldList();
+      // Get a count of held images too
+      count = 0;
+      for ( int i = 0; i < nImages; i++ ) {
+        if ( m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+          m_nHeldImages++;
 
-      // Create a lookup table of held images  OBSOLETE -- done with constraints -- delete these lines once code is tested.
-//      count = 0;
-//      for ( int i = 0; i < nImages; i++ ) {
-//        if ( m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) ) {
-//          m_nImageIndexMap.push_back(-1);
-//          m_nHeldImages++;
-//        }
-//        else {
-//          m_nImageIndexMap.push_back(count);
-//          count++;
-//        }
-//      }
+        m_nImageIndexMap.push_back(count);
+        count++;
+      }
     }
     else {
       for (int i = 0; i < nImages; i++)
         m_nImageIndexMap.push_back(i);
     }
 
-    // Create a lookup table of ignored, held, and ground points
-    m_nHeldPoints = m_nGroundPoints = m_nIgnoredPoints = 0;
-    count = 0;
-    int nObjectPoints = m_pCnet->GetNumPoints();
-
-    for (int i = 0; i < nObjectPoints; i++)     {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
-
-      if (point->IsIgnored()) {
-        m_nPointIndexMap.push_back(-1);
-        m_nIgnoredPoints++;
-        continue;
-      }
-
-      if (point->GetType() == ControlPoint::Ground)
-        m_nGroundPoints++;
-
-      m_nPointIndexMap.push_back(count);
-      count++;
-    }
+    FillPointIndexMap();
 
     // Set default variables to solve for
     m_bSolveTwist = true;
@@ -230,6 +201,9 @@ namespace Isis {
     m_nsolveCamDegree = m_nckDegree;
     m_nNumberCameraCoefSolved = 1;
     m_nUnknownParameters = 0;
+    m_bOutputStandard = true;
+    m_bOutputCSV = true;
+    m_bOutputResiduals = true;
 
     m_dGlobalLatitudeAprioriSigma = 1000.0;
     m_dGlobalLongitudeAprioriSigma = 1000.0;
@@ -244,17 +218,15 @@ namespace Isis {
     m_dGlobalCameraAngularVelocityAprioriSigma = -1.0;
     m_dGlobalCameraAngularAccelerationAprioriSigma = -1.0;
 
-    m_dGlobalSpacecraftPositionWeight = -1.0;
-    m_dGlobalSpacecraftVelocityWeight = -1.0;
-    m_dGlobalSpacecraftAccelerationWeight = -1.0;
-    m_dGlobalCameraAnglesWeight = -1.0;
-    m_dGlobalCameraAngularVelocityWeight = -1.0;
-    m_dGlobalCameraAngularAccelerationWeight = -1.0;
-
-    if (!m_bSolveRadii)
-      m_dGlobalRadiusAprioriSigma *= -1.0;
+    m_dGlobalSpacecraftPositionWeight = 0.0;
+    m_dGlobalSpacecraftVelocityWeight = 0.0;
+    m_dGlobalSpacecraftAccelerationWeight = 0.0;
+    m_dGlobalCameraAnglesWeight = 0.0;
+    m_dGlobalCameraAngularVelocityWeight = 0.0;
+    m_dGlobalCameraAngularAccelerationWeight = 0.0;
 
     m_dConvergenceThreshold = 1.0e-10;
+    m_nRejectedObservations = 0;
 
     if (!m_bSolveRadii)
       m_dGlobalRadiusAprioriSigma *= -1.0;
@@ -268,7 +240,7 @@ namespace Isis {
     m_BodyRadii[0] = m_BodyRadii[1] = m_BodyRadii[2] = Distance();
     Camera *pCamera = m_pCnet->Camera(0);
     if (pCamera) {
-      pCamera->Radii(m_BodyRadii);
+      pCamera->Radii(m_BodyRadii);  // meters
 
 //      printf("radii: %lf %lf %lf\n",m_BodyRadii[0],m_BodyRadii[1],m_BodyRadii[2]);
 
@@ -286,6 +258,46 @@ namespace Isis {
     // residuals) and ?.
   }
 
+
+  /**
+   * This method fills the point index map and needs to know the solution
+   * method in order to work properly.
+   */
+  void BundleAdjust::FillPointIndexMap() {
+
+    // Create a lookup table of ignored, and ground points
+    // TODO  Deal with edit lock points
+    m_nGroundPoints = m_nIgnoredPoints = 0;
+    int count = 0;
+    int nObjectPoints = m_pCnet->GetNumPoints();
+
+    for (int i = 0; i < nObjectPoints; i++)     {
+      const ControlPoint *point = m_pCnet->GetPoint(i);
+
+      if (point->IsIgnored()) {
+        m_nPointIndexMap.push_back(-1);
+        m_nIgnoredPoints++;
+        continue;
+      }
+
+      else if (point->GetType() == ControlPoint::Ground) {
+        m_nGroundPoints++;
+
+        if (m_strSolutionMethod == "SPECIALK"  ||  m_strSolutionMethod == "SPARSE") {
+          m_nPointIndexMap.push_back(count);
+          count++;
+        }
+        else
+          m_nPointIndexMap.push_back(-1);
+      }
+
+      else {
+        m_nPointIndexMap.push_back(count);
+        count++;
+      }
+    }
+  }
+
   /**
    * This method checks all cube files in the held list to make sure they are in the
    * input list.
@@ -298,14 +310,6 @@ namespace Isis {
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
-  }
-
-  /**
-   * This method loads heavy constraints on image parameters of images in the held list.
-   * The implementation will be done later after a mechanism for loading individual
-   * image constraints has been established.
-   */
-  void BundleAdjust::ApplyHeldList() {
   }
 
   /**
@@ -351,6 +355,15 @@ namespace Isis {
     // 2010-03-01 KLE now always solving for all 3 coordinates,
     // but now, we "hold", "fix", or constrain via weights
     m_nNumPointPartials = 3;
+
+
+    // Test code to match old test runs which don't solve for radius
+    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE") {
+      m_nNumPointPartials = 2;
+
+      if (m_bSolveRadii) 
+        m_nNumPointPartials++;
+    }
   }
 
   /**
@@ -358,10 +371,10 @@ namespace Isis {
    * ComputeNumberPartials must be called first
    */
   void BundleAdjust::ComputeImageParameterWeights() {
-    // size and initialize to -1.0
+    // size and initialize to 0.0
     m_dImageParameterWeights.resize(m_nNumImagePartials);
     for (int i = 0; i < m_nNumImagePartials; i++)
-      m_dImageParameterWeights[i] = -1.0;
+      m_dImageParameterWeights[i] = 0.0;
 
     int nIndex = 0;
     if (m_spacecraftPositionSolveType == PositionOnly) {
@@ -412,22 +425,17 @@ namespace Isis {
     if (m_cmatrixSolveType == AnglesVelocityAcceleration) {
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
-      m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationAprioriSigma;
+      m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
-      m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationAprioriSigma;
-      m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
-      m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
-      m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationAprioriSigma;
+      m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
 
       if (m_bSolveTwist) {
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
-        m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationAprioriSigma;
+        m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
       }
     }
-
-//    std::cout << m_dImageParameterWeights << std::endl;
   }
 
   /**
@@ -445,9 +453,6 @@ namespace Isis {
 
     // Create the observation number list
     m_pObsNumList = new Isis::ObservationNumberList(m_pSnList);
-
-    if (m_nHeldImages != 0)
-      m_pObsNumList->Remove(m_pHeldSnList);
 
     if (m_pHeldSnList == NULL)
       return;
@@ -511,25 +516,12 @@ namespace Isis {
   int BundleAdjust::BasisColumns() {
     m_nImageParameters = Observations() * m_nNumImagePartials;
 
-    int nPointParameterColumns = m_pCnet->GetNumValidPoints() * 3;
+    int nPointParameterColumns = m_pCnet->GetNumValidPoints() * m_nNumPointPartials;
+
+    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE")
+      nPointParameterColumns -= m_nGroundPoints * m_nNumPointPartials;
 
     return m_nImageParameters + nPointParameterColumns;
-  }
-
-  /**
-   * Determine the number of constrained parameters
-   *
-   */
-  int BundleAdjust::ComputeConstrainedParameters() {
-//  m_nConstrainedImageParameters = Observations() * (6 - m_nNumImagePartials);
-
-//  int nConstrained = m_nConstrainedPointParameters + m_nConstrainedImageParameters;
-
-//  m_pLsq->SetNumberOfConstrainedParameters(nConstrained);
-
-//    m_pLsq->SetNumberOfConstrainedParameters(m_nConstrainedPointParameters);
-
-    return m_nConstrainedPointParameters;
   }
 
   /**
@@ -545,7 +537,7 @@ namespace Isis {
 
     m_nUnknownParameters = m_nRank + 3 * n3DPoints;
 
-//  m_nRejectedObservations = 0;
+    m_nRejectedObservations = 0;
 
     m_Image_Solution.resize(m_nRank);
     m_Image_Corrections.resize(m_nRank);
@@ -567,11 +559,11 @@ namespace Isis {
     m_bConverged = false;                             // flag indicating convergence
     m_bError = false;                                 // flag indicating general bundle error
 
-//    InitializePointWeights();
-
-//  InitializeImageWeights();
-
     // convert apriori sigmas into weights (if they're negative or zero, we don't use them)
+    SetSpaceCraftWeights();
+  }
+
+  void BundleAdjust::SetSpaceCraftWeights() {
 
     if (m_dGlobalSpacecraftPositionAprioriSigma > 0.0) {
       m_dGlobalSpacecraftPositionWeight
@@ -595,12 +587,12 @@ namespace Isis {
 
     if (m_dGlobalCameraAngularVelocityAprioriSigma > 0.0) {
       m_dGlobalCameraAngularVelocityWeight
-      = 1.0 / (m_dGlobalSpacecraftAccelerationAprioriSigma * m_dGlobalSpacecraftAccelerationAprioriSigma * DEG2RAD * DEG2RAD);
+      = 1.0 / (m_dGlobalCameraAngularVelocityAprioriSigma * m_dGlobalCameraAngularVelocityAprioriSigma * DEG2RAD * DEG2RAD);
     }
 
     if (m_dGlobalCameraAngularAccelerationAprioriSigma > 0.0) {
-      m_dGlobalSpacecraftAccelerationWeight
-      = 1.0 / (m_dGlobalSpacecraftAccelerationAprioriSigma * m_dGlobalSpacecraftAccelerationAprioriSigma * DEG2RAD * DEG2RAD);
+      m_dGlobalCameraAngularAccelerationWeight
+      = 1.0 / (m_dGlobalCameraAngularAccelerationAprioriSigma * m_dGlobalCameraAngularAccelerationAprioriSigma * DEG2RAD * DEG2RAD);
     }
   }
 
@@ -630,10 +622,9 @@ namespace Isis {
     if (m_bObservationMode)
       observationInitialValueIndex.assign(m_pObsNumList->ObservationSize(), -1);
 
-    for (int i = 0; i < Images(); i++) {
-      if (m_nHeldImages > 0)
-        if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))) continue;
+    std::cout << observationInitialValueIndex << std::endl;
 
+    for (int i = 0; i < Images(); i++) {
       Camera *pCamera = m_pCnet->Camera(i);
 
       if (m_bObservationMode) {
@@ -778,11 +769,9 @@ namespace Isis {
 //      printf("Residuals Elapsed Time: %20.10lf\n",dResidualsTime);
 
       // flag outliers
-      if (m_bOutlierRejection) {
-        // compute outlier rejection limit
-        ComputeRejectionLimit();
-
-        FlagOutliers();
+      if ( m_bOutlierRejection ) {
+          ComputeRejectionLimit(); // compute outlier rejection limit
+          FlagOutliers();
       }
 
       // variance of unit weight (also reference variance, variance factor, etc.)
@@ -790,6 +779,9 @@ namespace Isis {
         m_nObservations + (m_nConstrainedPointParameters + m_nConstrainedImageParameters) - m_nUnknownParameters;
 
       m_dSigma0 = dvtpv / m_nDegreesOfFreedom;
+
+      std::cout << "degrees of freedom = " << m_nDegreesOfFreedom << std::endl;
+
       m_dSigma0 = sqrt(m_dSigma0);
 
       printf("Iteration: %d\nSigma0: %20.10lf\n", m_nIteration, m_dSigma0);
@@ -833,19 +825,7 @@ namespace Isis {
 
     WrapUp();
 
-//    printf("Start Output\n");
     Output();
-//    printf("End Output\n");
-
-//    printf("Start Output Points CSV\n");
-    OutputPointsCSV();
-//    printf("End Output Points\n");
-//    printf("Start Output Images CSV\n");
-    OutputImagesCSV();
-//    printf("End Output Images\n");
-//    printf("Start Output Residuals CSV\n");
-    OutputResiduals();
-//    printf("End Output Residuals CSV\n");
 
     return true;
 
@@ -897,35 +877,42 @@ namespace Isis {
     n2.clear();
 
     // loop over 3D points
+    int nGood3DPoints = 0;
+    int nRejected3DPoints = 0;
     int nPointIndex = 0;
     int nImageIndex;
     int n3DPoints = m_pCnet->GetNumPoints();
 
+//    char buf[1056];
+//    sprintf(buf,"\n\t                      Points:%10d\n", n3DPoints);
+//    m_fp_log << buf;
+//    printf("%s", buf);
+
     for (int i = 0; i < n3DPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
 
-//      std::cout << "   processing point " << i << " with id = " << point->Id() << std::endl;
+        const ControlPoint *point = m_pCnet->GetPoint(i);
 
+        if ( point->IsIgnored() )
+            continue;
 
-      if (point->IsIgnored())
-        continue;
+        if( point->IsRejected() ) {
+            nRejected3DPoints++;
+//            sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().c_str(),nPointIndex,n3DPoints,m_dRejectionLimit);
+//            m_fp_log << buf;
 
-//    printf("Processing %s - 3D Point %d of %d\n", point->Id().c_str(),nPointIndex,n3DPoints);
+            nPointIndex++;
+            continue;
+        }
 
-      // flagged as "JigsawHighSigma" implies this point has
-      // insufficient number of observations (kluge on this flag - need specific flag)
-//      if( point->Status() == ControlPoint::JigsawHighSigma )
-//        continue;
+        // send notification to UI indicating index of point currently being processed
+        // m_nProcessedPoint = i+1;
+        // UI.Notify(BundleEvent.NEW_POINT_PROCESSED);
 
-      // send notification to UI indicating index of point currently being processed
-      // m_nProcessedPoint = i+1;
-      // UI.Notify(BundleEvent.NEW_POINT_PROCESSED);
-
-      if (i != 0) {
-        N22.clear();
-        N12.clear();
-        n2.clear();
-      }
+        if ( i != 0 ) {
+            N22.clear();
+            N12.clear();
+            n2.clear();
+        }
 
       int nMeasures = point->GetNumMeasures();
 
@@ -938,57 +925,51 @@ namespace Isis {
 
       // loop over measures for this point
       for (int j = 0; j < nMeasures; j++) {
-        const ControlMeasure *measure = point->GetMeasure(j);
 
-        if (measure->IsIgnored())
-          continue;
+          const ControlMeasure *measure = point->GetMeasure(j);
+          if ( measure->IsIgnored() )
+              continue;
 
-        // flagged as "JigsawFail" implies this measure has been rejected
-        // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
-        if (measure->IsRejected()) {
-          printf("skipping rejected observation for %s\n",
-                 point->GetId().c_str());
-          continue;
-        }
+          // flagged as "JigsawFail" implies this measure has been rejected
+          // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
+          if (measure->IsRejected())
+              continue;
 
-        if (m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(measure->GetCubeSerialNumber()))
-          continue;
+          // printf("   Processing Measure %d of %d\n", j,nMeasures);
 
-//        printf("   Processing Measure %d of %d\n", j,nMeasures);
+          // fill non-zero indices for this point - do we have to do this?
+          // see BundleDistanceConstraints.java for code snippet (line 926)
 
-        // fill non-zero indices for this point - do we have to do this?
-        // see BundleDistanceConstraints.java for code snippet (line 926)
+          // Determine the image index
+          nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+          //nImageIndex = ImageIndex(nImageIndex);
 
-        // Determine the image index
-        nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
-
-//        std::cout << "  About to call ComputePartials..." << std::endl;
-
-
-        bStatus = ComputePartials(coeff_image, coeff_point3D, coeff_RHS,
+        bStatus = ComputePartials_DC(coeff_image, coeff_point3D, coeff_RHS,
                                   *measure, *point);
 
 //        std::cout << coeff_image << std::endl;
 //        std::cout << coeff_point3D << std::endl;
 //        std::cout << coeff_RHS << std::endl;
 
-        if (!bStatus)
-          continue;     // this measure should be flagged as rejected
+        if ( !bStatus )
+            continue;     // this measure should be flagged as rejected
 
         // update number of observations
         m_nObservations += 2;
 
         FormNormalEquations1(N22, N12, n1, n2, coeff_image, coeff_point3D,
                              coeff_RHS, nImageIndex);
-      } // end loop over this points measures
+    } // end loop over this points measures
 
       FormNormalEquations2(N22, N12, n2, m_nj, nPointIndex, i);
       nPointIndex++;
 
 //      if (m_pProgressBar != NULL)
-//        m_pProgressBar->CheckStatus();
+//          m_pProgressBar->CheckStatus();
 
-    } // end loop over 3D points
+      nGood3DPoints++;
+
+  } // end loop over 3D points
 
     // finally, form the reduced normal equations
     FormNormalEquations3(n1, m_nj);
@@ -1005,11 +986,10 @@ namespace Isis {
 //    std::cout << m_Normals << std::endl;
 
     // update number of unknown parameters
-
-//    m_nUnknownParameters = m_nRank + 3 * nGood3DPoints;
+    m_nUnknownParameters = m_nRank + 3 * nGood3DPoints;
 
     return bStatus;
-  }
+}
 
   bool BundleAdjust::FormNormalEquations1(symmetric_matrix<double, upper>&N22, matrix<double>& N12,
                                           compressed_vector<double>& n1, vector<double>& n2,
@@ -1082,12 +1062,6 @@ namespace Isis {
 
   bool BundleAdjust::FormNormalEquations2(symmetric_matrix<double, upper>&N22, matrix<double>& N12,
                                           vector<double>& n2, vector<double>& nj, int nPointIndex, int i) {
-//    if( m_nIteration == 0 )
-//    {
-//      m_NICs(nPointIndex).clear();
-//    }
-
-//    m_NICs(nPointIndex).clear();
     bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
     compressed_matrix<double>& Q = m_Qs[nPointIndex];
 
@@ -1095,12 +1069,13 @@ namespace Isis {
     Q.clear();
 
     // weighting of 3D point parameters
-    const ControlPoint *point = m_pCnet->GetPoint(i);
+//    const ControlPoint *point = m_pCnet->GetPoint(i);
+    ControlPoint *point = m_pCnet->GetPoint(i); //TODO: what about this const business, regarding SetAdjustedSurfacePoint below???
 
     bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
     bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
 
-//    std::cout << "weights" << std::endl << weights << std::endl;
+//    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
 
 //    std::cout << "corrections" << std::endl << corrections << std::endl;
 
@@ -1122,13 +1097,19 @@ namespace Isis {
       m_nConstrainedPointParameters++;
     }
 
+//    std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
     // invert N22
     Invert_3x3(N22);
+//    std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
 
     // save upper triangular covariance matrix for error propagation
     // TODO:  The following method does not exist yet (08-13-2010)
-    // Can N22 be cast to vector type? Or should SurfacePoint be changed to use matrix type?
-    point->GetSurfacePoint().SetSphericalMatrix(N22);
+    SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+    SurfacePoint.SetSphericalMatrix(N22);
+    point->SetAdjustedSurfacePoint(SurfacePoint);
+//    point->GetAdjustedSurfacePoint().SetSphericalMatrix(N22);
+
+// TODO  Test to make sure spherical matrix is truly set.  Try to read it back
 
     // Next 3 lines obsolete because only the matrix is stored and sigmas are calculated from it.
 //    point->SetSigmaLatitude(N22(0,0));
@@ -1141,6 +1122,8 @@ namespace Isis {
 //    clock_t FormQ2 = clock();
 //    double dFormQTime = ((FormQ2-FormQ1)/(double)CLOCKS_PER_SEC);
 //    printf("FormQ Elapsed Time: %20.10lf\n",dFormQTime);
+
+//    std::cout << "Q: " << Q << std::endl;
 
     // form product of N22(inverse) and n2; store in NIC
 //    clock_t FormNIC1 = clock();
@@ -1171,9 +1154,6 @@ namespace Isis {
 
   bool BundleAdjust::InitializePointWeights() {
     // TODO:  Get working as is then convert to use new classes (Angles, etc.) and xyz with radius constraints
-    double dAprioriSigmaLat;
-    double dAprioriSigmaLon;
-    double dAprioriSigmaRad;
 //  Distance dAprioriXSigma;
 //  Distance dAprioriYSigma;
 //  Distance dAprioriZSigma;
@@ -1193,6 +1173,14 @@ namespace Isis {
 //      }
 
       SurfacePoint aprioriSurfacePoint = point->GetAprioriSurfacePoint();
+
+      // Discussion points:  1) Should these primitive classes like Distance and angles not have a default unit?
+      // I have already seen mistakes made because of assumptions about the default unit.  2) What should be the
+      // unit for distances in the bundle? I believe it is currently km.  The Isis default unit, I believe, is m.
+      // When we deal with landers, m would be a more reasonable distance unit for dealing with both orbiters and
+      // landers.
+
+      // TODO We may need to set the units for the radii.  I think the units are meters
       aprioriSurfacePoint.SetRadii(Distance(m_BodyRadii[0]),
                                    Distance(m_BodyRadii[1]),
                                    Distance(m_BodyRadii[2]));
@@ -1205,28 +1193,20 @@ namespace Isis {
 
 //      if( point->Held() || point->Type() == ControlPoint::Ground )
       if (point->GetType() == ControlPoint::Ground) {
-        weights[0] = 1.0e+25;
-        weights[1] = 1.0e+25;
-        weights[2] = 1.0e+25;
+        weights[0] = 1.0e+50;
+        weights[1] = 1.0e+50;
+        weights[2] = 1.0e+50;
       }
       else {
-//      if(  m_dGlobalLatitudeAprioriSigma > 0.0 )
-//        dAprioriSigmaLat = m_dGlobalLatitudeAprioriSigma;
-//      else
-//        dAprioriSigmaLat = (double) point->GetAprioriSurfacePoint().GetLatSigma();
-
-        dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
-
-        if (dAprioriSigmaLat <= 0.0 || dAprioriSigmaLat >= 1000.0) {
-          if (m_dGlobalLatitudeAprioriSigma > 0.0)
-            dAprioriSigmaLat = m_dGlobalLatitudeAprioriSigma;
-        }
-        apriorisigmas[0] = dAprioriSigmaLat;
-
-        if (dAprioriSigmaLat > 0.0  &&  dAprioriSigmaLat < 1000.0) {
-          d = dAprioriSigmaLat * m_dMTR;
-          weights[0] = 1.0 / (d * d);
-        }
+          if( point->IsLatitudeConstrained() ) {
+            apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
+              weights[0] = point->GetAprioriSurfacePoint().GetLatWeight();
+          }
+          else if( m_dGlobalLatitudeAprioriSigma > 0.0 ) {
+              apriorisigmas[0] = m_dGlobalLatitudeAprioriSigma;
+              d = m_dGlobalLatitudeAprioriSigma*m_dMTR;
+              weights[0] = 1.0/(d*d);
+          }
 
 //      dAprioriSigmaX = point->GetAprioriSurfacePoint().GetXSigma();
 //      if(  dAprioriSigmaX <= 0.0 || dAprioriSigmaX >= 1000.0 ) {
@@ -1246,17 +1226,15 @@ namespace Isis {
 //     else
 //       dAprioriSigmaLon = point->AprioriSigmaLongitude();
 
-        dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
-        if (dAprioriSigmaLon <= 0.0 || dAprioriSigmaLon >= 1000.0) {
-          if (m_dGlobalLongitudeAprioriSigma > 0.0)
-            dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
-        }
-        apriorisigmas[1] = dAprioriSigmaLon;
-
-        if (dAprioriSigmaLon > 0.0  &&  dAprioriSigmaLon < 1000.0) {
-          d = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude().GetRadians());
-          weights[1] = 1.0 / (d * d);
-        }
+          if( point->IsLongitudeConstrained() ) {
+            apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
+              weights[1] = point->GetAprioriSurfacePoint().GetLonWeight();
+          }
+          else if( m_dGlobalLongitudeAprioriSigma > 0.0 ) {
+              apriorisigmas[1] = m_dGlobalLongitudeAprioriSigma;
+              d = m_dGlobalLongitudeAprioriSigma*m_dMTR;
+              weights[1] = 1.0/(d*d);
+          }
 
 //      dAprioriSigmaY = point->GetAprioriSurfacePoint().GetYSigma();
 //        if(  dAprioriSigmaY <= 0.0 || dAprioriSigmaY >= 1000.0 ) {
@@ -1276,20 +1254,19 @@ namespace Isis {
 //      else
 //        dAprioriSigmaRad = point->AprioriSigmaRadius();
 
-        dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
-        if (dAprioriSigmaRad <= 0.0 || dAprioriSigmaRad >= 1000.0) {
-          if (m_dGlobalRadiusAprioriSigma > 0.0)
-            dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
-        }
-        apriorisigmas[2] = dAprioriSigmaRad;
-
-        if (!m_bSolveRadii) {
-          weights[2] = 1.0e+25;
-        }
-        else if (dAprioriSigmaRad > 0.0  &&  dAprioriSigmaRad < 1000.0) {
-          d = dAprioriSigmaRad * 0.001;
-          weights[2] = 1.0 / (d * d);
-        }
+          if ( !m_bSolveRadii )
+              weights[2] = 1.0e+50;
+          else {
+              if( point->IsRadiusConstrained() ) {
+                apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
+                  weights[2] = point->GetAprioriSurfacePoint().GetLocalRadiusWeight();
+              }
+              else if( m_dGlobalRadiusAprioriSigma > 0.0 ) {
+                  apriorisigmas[2] = m_dGlobalRadiusAprioriSigma;
+                  d = m_dGlobalRadiusAprioriSigma*0.001;
+                  weights[2] = 1.0/(d*d);
+              }
+          }
 
 //      dAprioriSigmaZ = point->GetAprioriSurfacePoint().GetZSigma();
 //        if(  dAprioriSigmaZ <= 0.0 || dAprioriSigmaZ >= 1000.0 ) {
@@ -1308,8 +1285,8 @@ namespace Isis {
 
 //      printf("LatWt: %20.10lf LonWt: %20.10lf RadWt: %20.10lf\n",weights[0],weights[1],weights[2]);
 
-      aprioriSurfacePoint.SetSphericalSigmasDistance(
-          Distance(apriorisigmas[0], Distance::Meters),
+      // TODO: do we need the four lines below??????
+      aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(apriorisigmas[0], Distance::Meters),
           Distance(apriorisigmas[1], Distance::Meters),
           Distance(apriorisigmas[2], Distance::Meters));
       point->SetAprioriSurfacePoint(aprioriSurfacePoint);
@@ -1330,7 +1307,7 @@ namespace Isis {
         continue;
 
       SurfacePoint aprioriSurfacePoint = point->GetAprioriSurfacePoint();
-      point->SetSurfacePoint(aprioriSurfacePoint);
+      point->SetAdjustedSurfacePoint(aprioriSurfacePoint);
     }
 
   }
@@ -1687,7 +1664,7 @@ namespace Isis {
   /**
    * compute partials for measure
    */
-  bool BundleAdjust::ComputePartials(matrix<double>& coeff_image, matrix<double>& coeff_point3D,
+  bool BundleAdjust::ComputePartials_DC(matrix<double>& coeff_image, matrix<double>& coeff_point3D,
                                      vector<double>& coeff_RHS, const ControlMeasure &measure,
                                      const ControlPoint &point) {
 
@@ -1713,6 +1690,12 @@ namespace Isis {
     double dMeasuredx, dComputedx, dMeasuredy, dComputedy;
     double deltax, deltay;
     double dObservationSigma;
+    // Compute ground point in body-fixed coordinates km
+//    latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
+//             (double) point->GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
+//             (double) point->GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
+//             pB);
+
     double dObservationWeight;
 
     // auxiliary variables
@@ -1760,19 +1743,24 @@ namespace Isis {
     }
 
     //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
-    if (!(pCamera->GroundMap()->GetXY(point.GetSurfacePoint(), &dComputedx, &dComputedy))) {
+    if (!(pCamera->GroundMap()->GetXY(point.GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
       std::string msg = "Unable to map apriori surface point for measure ";
       msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // partials for ground point w/r lat, long, radius in Body-Fixed
-    d_lookB_WRT_LAT = pCamera->GroundMap()->PointPartial(point.GetSurfacePoint(),
+    d_lookB_WRT_LAT = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
                       CameraGroundMap::WRT_Latitude);
-    d_lookB_WRT_LON = pCamera->GroundMap()->PointPartial(point.GetSurfacePoint(),
+    d_lookB_WRT_LON = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
                       CameraGroundMap::WRT_Longitude);
-    d_lookB_WRT_RAD = pCamera->GroundMap()->PointPartial(point.GetSurfacePoint(),
+    d_lookB_WRT_RAD = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
                       CameraGroundMap::WRT_Radius);
+
+//    std::cout << "d_lookB_WRT_LAT" << d_lookB_WRT_LAT << std::endl;
+//    std::cout << "d_lookB_WRT_LON" << d_lookB_WRT_LON << std::endl;
+//    std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
+
 
     //    SpiceRotation* pBodyRot = pCamera->BodyRotation();
 
@@ -1818,6 +1806,7 @@ namespace Isis {
         nIndex++;
       }
 
+//      std::cout << coeff_image << std::endl;
 //      if ( m_spacecraftPositionSolveType > PositionOnly ) {
 //        dTime = pInstPos->EphemerisTime() - pInstPos->GetBaseTime();
 //        dTime = dTime/pInstRot->GetTimeScale();
@@ -1974,9 +1963,13 @@ namespace Isis {
                                        &coeff_point3D(1, 0));
     pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LON, &coeff_point3D(0, 1),
                                        &coeff_point3D(1, 1));
-    pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &coeff_point3D(0, 2),
+
+    // test added to check old test case that didn't solve for radius
+    //    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
+      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &coeff_point3D(0, 2),
                                        &coeff_point3D(1, 2));
 
+//    std::cout << coeff_point3D << std::endl;
     // right-hand side (measured - computed)
     dMeasuredx = measure.GetFocalPlaneMeasuredX();
 //    dComputedx = lookC[0] * fl / lookC[2];
@@ -1993,6 +1986,8 @@ namespace Isis {
     dObservationSigma = 1.4 * pCamera->PixelPitch();
     dObservationWeight = 1.0 / dObservationSigma;
 
+//    std::cout << "Measuredx " << dMeasuredx << " Measuredy = " << dMeasuredy << std::endl;
+//    std::cout << "dComputedx " << dComputedx << " dComputedy = " << dComputedy << std::endl;
 //    std::cout << coeff_image << std::endl;
 //    std::cout << coeff_point3D << std::endl;
 //    std::cout << dMeasuredx << " " << dComputedx << std::endl << dMeasuredy << " " << dComputedy << std::endl;
@@ -2032,13 +2027,12 @@ namespace Isis {
 
     ComputeNumberPartials();
 
+    ComputeImageParameterWeights();
+
     if (m_bObservationMode)
       observationInitialValueIndex.assign(m_pObsNumList->ObservationSize(), -1);
 
     for (int i = 0; i < Images(); i++) {
-      if (m_nHeldImages > 0)
-        if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))) continue;
-
       Camera *pCamera = m_pCnet->Camera(i);
 
       if (m_bObservationMode) {
@@ -2122,7 +2116,8 @@ namespace Isis {
     BasisFunction basis("Bundle", m_nBasisColumns, m_nBasisColumns);
     if (m_strSolutionMethod == "SPARSE") {
       m_pLsq = new Isis::LeastSquares(basis, true,
-                                      m_pCnet->GetNumValidMeasures() * 2, m_nBasisColumns);
+                                      m_pCnet->GetNumValidMeasures() * 2, m_nBasisColumns, true);
+        SetParameterWeights();
     }
     else
       m_pLsq = new Isis::LeastSquares(basis);
@@ -2131,7 +2126,8 @@ namespace Isis {
     m_dxKnowns.resize(m_nBasisColumns);
     m_dyKnowns.resize(m_nBasisColumns);
 
-    double dprevious_Sigma0 = 0.0;
+    double dprevious_Sigma0 = 10;
+    m_dSigma0 = 0.0;
 
     Progress progress;
 
@@ -2159,38 +2155,40 @@ namespace Isis {
       m_Statsrxy.Reset();
 
       if (m_nIteration == 1)
-        m_dSigma0 = sigmaHat = 10.0;
+        sigmaHat = 10.0;
 
       // we've converged
       if (fabs(dprevious_Sigma0 - m_dSigma0) <= m_dConvergenceThreshold) {
         clock_t t2 = clock();
+
+        m_bConverged = true;
+
         m_dElapsedTime = ((t2 - t1) / (double)CLOCKS_PER_SEC);
 
-        // retrieve vector of parameter corrections
-        m_dEpsilons = m_pLsq->GetEpsilons();
+        // retrieve vectors of image and point parameter corrections
+        GetSparseParameterCorrections();
 
         if (m_bErrorPropagation) {
           progress.SetText("Performing Error Propagation...");
 
           printf("start error prop\n");
+          clock_t terror1 = clock();
           if (m_pLsq->SparseErrorPropagation())
             SetPostBundleSigmas();
+          clock_t terror2 = clock();
+          m_dElapsedTimeErrorProp = ((terror2 - terror1) / (double)CLOCKS_PER_SEC);
           printf("end error prop\n");
         }
 
-        printf("start output\n");
         Output();
-        OutputPointsCSV();
-        OutputImagesCSV();
-        printf("end output\n");
 
         return m_dError;
-      }
+    }
 
       dprevious_Sigma0 = m_dSigma0;
 
-      if (m_nIteration > 1  && m_strSolutionMethod == "SPARSE")
-        m_pLsq->ResetSparse();
+      if (m_nIteration > 1)
+        m_pLsq->Reset();
 
       // Loop through the control net and add the partials for each point
       // need generic 'AddPartials' function which calls necessary partials
@@ -2207,10 +2205,8 @@ namespace Isis {
         else if (m_strSolutionMethod == "QRD") {
           m_pLsq->Solve(Isis::LeastSquares::QRD);
         }
+        // next is the SPARSE solution
         else {
-          // set parameter weights
-          SetParameterWeights();
-          ComputeConstrainedParameters();
 
           int zeroColumn = m_pLsq->Solve(Isis::LeastSquares::SPARSE);
 
@@ -2264,12 +2260,12 @@ namespace Isis {
       printf("avg rxy: %20.10lf\nrms x: %20.10lf\nrms y: %20.10lf\nrms xy: %20.10lf\n", davg_rxy, drms_rx, drms_ry, drms_rxy);
 
       sigmaXY = sqrt((m_Statsx.SumSquare() + m_Statsy.SumSquare()) / m_pLsq->Knowns());
+      m_nDegreesOfFreedom = m_pLsq->GetDegreesOfFreedom();
       sigmaHat = (m_nObservations - m_nBasisColumns) ?
-                 (sqrt((m_Statsx.SumSquare() + m_Statsy.SumSquare()) / (m_nObservations - m_nBasisColumns)))
+                 (sqrt((m_Statsx.SumSquare() + m_Statsy.SumSquare()) / m_nDegreesOfFreedom))
                  : 0.;
 
       m_dSigma0 = m_pLsq->GetSigma0();
-      m_nDegreesOfFreedom = m_pLsq->GetDegreesOfFreedom();
 
       printf("Observations: %d   Unknowns: %d\n", m_nObservations, m_nUnknownParameters);
       printf("SigmaHat: %20.10lf   Sigma0: %20.10lf\n", sigmaHat, m_dSigma0);
@@ -2284,6 +2280,47 @@ namespace Isis {
     msg += iString(tol) + "] in less than [";
     msg += iString(m_nMaxIterations) + "] iterations";
     throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
+  /**
+   * Retrieve parameter correction vector for sparse least-squares object and parse
+   * into m_Image_Corrections and m_Point_Corrections vectors so we can use the
+   * same output as SpecialK solution
+   */
+  void BundleAdjust::GetSparseParameterCorrections() {
+
+      int nValidPoints = m_pCnet->GetNumValidPoints();
+      int nTotalPoints = m_pCnet->GetNumPoints();
+      int nPointCorrections = 3 * nValidPoints;
+      m_Point_Corrections.resize(nValidPoints);
+
+      m_dEpsilons = m_pLsq->GetEpsilons();
+      int nCorrections = m_dEpsilons.size();
+      int nImageCorrections = nCorrections - nPointCorrections;
+      m_Image_Corrections.resize(nImageCorrections);
+
+      // fill image corrections
+      for( int i = 0; i < nImageCorrections; i++ )
+          m_Image_Corrections[i] = m_dEpsilons[i];
+
+      // fill point corrections
+      int nindex = nImageCorrections;
+      int nPointIndex = 0;
+      for ( int i = 0; i < nTotalPoints; i++ ) {
+
+          const ControlPoint *point = m_pCnet->GetPoint(i);
+          if ( point->IsIgnored() )
+              continue;
+
+          bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+
+          corrections[0] = m_dEpsilons[nindex];
+          corrections[1] = m_dEpsilons[nindex+1];
+          corrections[2] = m_dEpsilons[nindex+2];
+
+          nindex += 3;
+          nPointIndex++;
+      }
   }
 
   /**
@@ -2303,7 +2340,7 @@ namespace Isis {
     double *py = &m_dyKnowns[0];
 
     // additional vectors
-    double pB[3];                        // Point on surface
+//     double pB[3];                        // Point on surface
     std::vector<double> sB(3);           // Spacecraft position in body-fixed coordinates
     std::vector<double> lookB(3);        // "look" vector in body-fixed coordinates
     std::vector<double> lookC(3);        // "look" vector in camera coordinates
@@ -2319,7 +2356,7 @@ namespace Isis {
     std::vector<double> CJ; // J2000 to Camera (product of TB and TC)
 
     Camera *pCamera = NULL;
-    double fl;
+//     double fl;
 
     int nIndex;
 //    double dMeasuredx,dComputedx,dMeasuredy,dComputedy;
@@ -2329,29 +2366,36 @@ namespace Isis {
     double dObservationWeight;
 
     // auxiliary variables
-    double NX_C, NY_C, D_C;
-    double NX, NY;
-    double a1, a2, a3;
-    double z1, z2, z3, z4;
+//     double NX_C, NY_C, D_C;
+//     double NX, NY;
+//     double a1, a2, a3;
+//     double z1, z2, z3, z4;
 
-    double dTime = -1.0;
+//     double dTime = -1.0;
 
-    // partials for ground point w/r lat, long, radius in Body-Fixed
+    // partials for ground point w/r lat, long, radius in Body-Fixed km
     d_lookB_WRT_LAT = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
-                        point->GetSurfacePoint(),
+                        point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Latitude);
     d_lookB_WRT_LON = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
-                        point->GetSurfacePoint(),
+                        point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Longitude);
+
+    // Test to match old test run that didn't solve for radius
+    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
     d_lookB_WRT_RAD = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
-                        point->GetSurfacePoint(),
+                        point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Radius);
 
-    // Compute ground point in body-fixed coordinates
-    latrec_c((double) point->GetSurfacePoint().GetLocalRadius().GetKilometers(),
-             (double) point->GetSurfacePoint().GetLongitude().GetRadians(),
-             (double) point->GetSurfacePoint().GetLatitude().GetRadians(),
-             pB);
+//    std::cout << "d_lookB_WRT_LAT" << d_lookB_WRT_LAT << std::endl;
+//    std::cout << "d_lookB_WRT_LON" << d_lookB_WRT_LON << std::endl;
+//    std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
+
+    // Compute ground point in body-fixed coordinates km
+//     latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
+//              (double) point->GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
+//              (double) point->GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
+//              pB);
 
     int nObservations = point->GetNumMeasures();
     for (int i = 0; i < nObservations; i++) {
@@ -2359,10 +2403,6 @@ namespace Isis {
       if (measure->IsIgnored())
         continue;
 
-      if (m_nHeldImages > 0) {
-        if (m_pHeldSnList->HasSerialNumber(measure->GetCubeSerialNumber()))
-          continue;
-      }
 
       // zero partial derivative vectors
       memset(px, 0, m_nBasisColumns * sizeof(double));
@@ -2371,7 +2411,7 @@ namespace Isis {
       pCamera = measure->Camera();
 
       // Get focal length with direction
-      fl = pCamera->DistortionMap()->UndistortedFocalPlaneZ();
+//       fl = pCamera->DistortionMap()->UndistortedFocalPlaneZ();
 
       // no need to call SetImage for framing camera ( CameraType  = 0 )
       if (pCamera->GetCameraType() != 0) {
@@ -2383,105 +2423,121 @@ namespace Isis {
 
       //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
       double dComputedx, dComputedy;
-      if (!(pCamera->GroundMap()->GetXY(point->GetSurfacePoint(), &dComputedx, &dComputedy))) {
+      if (!(pCamera->GroundMap()->GetXY(point->GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
         std::string msg = "Unable to map apriori surface point for measure ";
         msg += measure->GetCubeSerialNumber() + " on point " + point->GetId() + " into focal plane";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
       // May need to do back of planet test here TODO
-      SpiceRotation *pBodyRot = pCamera->BodyRotation();
+//       SpiceRotation *pBodyRot = pCamera->BodyRotation();
 
       // "InstumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
       // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
-      sB = pBodyRot->ReferenceVector(pCamera->InstrumentPosition()->Coordinate());
+//       sB = pBodyRot->ReferenceVector(pCamera->InstrumentPosition()->Coordinate());
 
-      lookB[0] = pB[0] - sB[0];
-      lookB[1] = pB[1] - sB[1];
-      lookB[2] = pB[2] - sB[2];
+//       lookB[0] = pB[0] - sB[0];
+//       lookB[1] = pB[1] - sB[1];
+//       lookB[2] = pB[2] - sB[2];
 
       // get look vector in the camera frame
-      lookJ = pBodyRot->J2000Vector(lookB);
-      SpiceRotation *pInstRot = pCamera->InstrumentRotation();
-      lookC = pInstRot->ReferenceVector(lookJ);
+//       lookJ = pBodyRot->J2000Vector(lookB);
+//       SpiceRotation *pInstRot = pCamera->InstrumentRotation();
+//       lookC = pInstRot->ReferenceVector(lookJ);
 
       // get J2000 to camera rotation matrix
-      CJ = pCamera->InstrumentRotation()->Matrix();
+//       CJ = pCamera->InstrumentRotation()->Matrix();
 
       // collinearity auxiliaries
-      NX_C = CJ[0] * lookJ[0] + CJ[1] * lookJ[1] + CJ[2] * lookJ[2];
-      NY_C = CJ[3] * lookJ[0] + CJ[4] * lookJ[1] + CJ[5] * lookJ[2];
-      D_C = CJ[6] * lookJ[0] + CJ[7] * lookJ[1] + CJ[8] * lookJ[2];
-      a1 = fl / D_C;
-      a2 = NX_C / D_C;
-      a3 = NY_C / D_C;
+//       NX_C = CJ[0] * lookJ[0] + CJ[1] * lookJ[1] + CJ[2] * lookJ[2];
+//       NY_C = CJ[3] * lookJ[0] + CJ[4] * lookJ[1] + CJ[5] * lookJ[2];
+//       D_C = CJ[6] * lookJ[0] + CJ[7] * lookJ[1] + CJ[8] * lookJ[2];
+//       a1 = fl / D_C;
+//       a2 = NX_C / D_C;
+//       a3 = NY_C / D_C;
 
       // Determine the image index
       nIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
       nIndex = ImageIndex(nIndex);
 
       if (m_spacecraftPositionSolveType != Nothing) {
-        SpicePosition *pInstPos = pCamera->InstrumentPosition();
+//         SpicePosition *pInstPos = pCamera->InstrumentPosition();
 
         // Add the partial for the x coordinate of the position (differentiating
         // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
         // ***TODO*** check derivative with scale added to dTime
-        px[nIndex] = a1 * (CJ[6] * a2 - CJ[0]);
-        py[nIndex] = a1 * (CJ[6] * a3 - CJ[3]);
-        nIndex++;
+//         px[nIndex] = a1 * (CJ[6] * a2 - CJ[0]);
+//         py[nIndex] = a1 * (CJ[6] * a3 - CJ[3]);
 
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          dTime = pInstPos->EphemerisTime() - pInstPos->GetBaseTime();
-          dTime = dTime / pInstPos->GetTimeScale();
-
-          px[nIndex] = px[nIndex-1] * dTime;
-          py[nIndex] = py[nIndex-1] * dTime;
+        for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+          pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, icoef,
+                                                &px[nIndex], &py[nIndex]);
           nIndex++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            px[nIndex] = px[nIndex-1] * dTime;
-            py[nIndex] = py[nIndex-1] * dTime;
-            nIndex++;
-          }
         }
+
+//         nIndex++;
+
+//         if (m_spacecraftPositionSolveType > PositionOnly) {
+//           dTime = pInstPos->EphemerisTime() - pInstPos->GetBaseTime();
+//           dTime = dTime / pInstPos->GetTimeScale();
+
+//           px[nIndex] = px[nIndex-1] * dTime;
+//           py[nIndex] = py[nIndex-1] * dTime;
+//           nIndex++;
+
+//           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
+//             px[nIndex] = px[nIndex-1] * dTime;
+//             py[nIndex] = py[nIndex-1] * dTime;
+//             nIndex++;
+//           }
+//         }
 
         // Add the partial for the y coordinate of the position
-        px[nIndex] = a1 * (CJ[7] * a2 - CJ[1]);
-        py[nIndex] = a1 * (CJ[7] * a3 - CJ[4]);
-        nIndex++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          px[nIndex] = px[nIndex-1] * dTime;
-          py[nIndex] = py[nIndex-1] * dTime;
+        for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+          pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            px[nIndex] = px[nIndex-1] * dTime;
-            py[nIndex] = py[nIndex-1] * dTime;
-            nIndex++;
-          }
         }
+//         px[nIndex] = a1 * (CJ[7] * a2 - CJ[1]);
+//         py[nIndex] = a1 * (CJ[7] * a3 - CJ[4]);
+//         nIndex++;
+
+//         if (m_spacecraftPositionSolveType > PositionOnly) {
+//           px[nIndex] = px[nIndex-1] * dTime;
+//           py[nIndex] = py[nIndex-1] * dTime;
+//           nIndex++;
+
+//           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
+//             px[nIndex] = px[nIndex-1] * dTime;
+//             py[nIndex] = py[nIndex-1] * dTime;
+//             nIndex++;
+//           }
+//         }
 
         // Add the partial for the z coordinate of the position
-        px[nIndex] = a1 * (CJ[8] * a2 - CJ[2]);
-        py[nIndex] = a1 * (CJ[8] * a3 - CJ[5]);
-        nIndex++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          px[nIndex] = px[nIndex-1] * dTime;
-          py[nIndex] = py[nIndex-1] * dTime;
-
+//         px[nIndex] = a1 * (CJ[8] * a2 - CJ[2]);
+//         py[nIndex] = a1 * (CJ[8] * a3 - CJ[5]);
+        for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+          pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            px[nIndex] = px[nIndex-1] * dTime;
-            py[nIndex] = py[nIndex-1] * dTime;
-            nIndex++;
-          }
         }
+//         nIndex++;
+
+//         if (m_spacecraftPositionSolveType > PositionOnly) {
+//           px[nIndex] = px[nIndex-1] * dTime;
+//           py[nIndex] = py[nIndex-1] * dTime;
+
+//           nIndex++;
+
+//           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
+//             px[nIndex] = px[nIndex-1] * dTime;
+//             py[nIndex] = py[nIndex-1] * dTime;
+//             nIndex++;
+//           }
+//         }
       }
 
       if (m_cmatrixSolveType != None) {
+        /*
         TC = pInstRot->ConstantMatrix();
         TB = pInstRot->TimeBasedMatrix();
 
@@ -2491,9 +2547,12 @@ namespace Isis {
         // additional collinearity auxiliaries
         NX = TB[0] * lookJ[0] + TB[1] * lookJ[1] + TB[2] * lookJ[2];
         NY = TB[3] * lookJ[0] + TB[4] * lookJ[1] + TB[5] * lookJ[2];
+        */
 
         // Add the partials for ra
         for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension, icoef, &px[nIndex], &py[nIndex]);
+          /*
           if (icoef == 0) {
             z1 = -TB[1] * lookJ[0] + TB[0] * lookJ[1];
             z2 = -TB[4] * lookJ[0] + TB[3] * lookJ[1];
@@ -2507,6 +2566,7 @@ namespace Isis {
             px[nIndex] = px[nIndex-1] * dTime;
             py[nIndex] = py[nIndex-1] * dTime;
           }
+          */
           nIndex++;
         }
 
@@ -2537,9 +2597,12 @@ namespace Isis {
 
         // Add the partial for twist if necessary
         if (m_bSolveTwist) {
+          /*
           z1 = TC[6] * NY - TC[7] * NX;
-
+          */
           for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+            pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist, icoef, &px[nIndex], &py[nIndex]);
+            /*
             if (icoef == 0) {
               px[nIndex] = a1 * (((TC[0] * NY - TC[1] * NX) - z1 * a2));
               py[nIndex] = a1 * (((TC[3] * NY - TC[4] * NX) - z1 * a3));
@@ -2548,21 +2611,28 @@ namespace Isis {
               px[nIndex] = px[nIndex-1] * dTime;
               py[nIndex] = py[nIndex-1] * dTime;
             }
+          */
             nIndex++;
           }
+ //   nIndex = (Images() - m_nHeldImages) * m_nNumImagePartials;
         }
       }
 
       // partials for 3D point
-      nIndex = PointIndex(nPointIndex);
+      if (point->GetType() != ControlPoint::Ground  ||
+          m_strSolutionMethod == "SPECIALK"  ||
+          m_strSolutionMethod == "SPARSE") {
+        nIndex = PointIndex(nPointIndex);
+        pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &px[nIndex],
+                                         &py[nIndex]);
+        nIndex++;
+        pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LON, &px[nIndex],
+                                         &py[nIndex]);
+        nIndex++;
 
-      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &px[nIndex],
-                                         &py[nIndex]);
-      nIndex++;
-      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LON, &px[nIndex],
-                                         &py[nIndex]);
-      nIndex++;
-      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &px[nIndex],
+        // test added to check old test case that didn't solve for radii
+        if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
+          pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &px[nIndex],
                                          &py[nIndex]);
 
 //    d_lookJ = pBodyRot->J2000Vector(d_lookB_WRT_LAT);
@@ -2585,18 +2655,31 @@ namespace Isis {
 //    px[nIndex] = fl * LowDHigh(lookC,d_lookC,0);
 //    py[nIndex] = fl * LowDHigh(lookC,d_lookC,1);
 //
+      }
       // right-hand side (measured - computed)
       dMeasuredx = measure->GetFocalPlaneMeasuredX();
-      dComputedx = lookC[0] * fl / lookC[2];
+      //      dComputedx = lookC[0] * fl / lookC[2];
 
       dMeasuredy = measure->GetFocalPlaneMeasuredY();
-      dComputedy = lookC[1] * fl / lookC[2];
+      //      dComputedy = lookC[1] * fl / lookC[2];
 
       deltax = dMeasuredx - dComputedx;
       deltay = dMeasuredy - dComputedy;
 
       dObservationSigma = 1.4 * pCamera->PixelPitch();
       dObservationWeight = 1.0 / (dObservationSigma * dObservationSigma);
+      //      dObservationWeight = 1.0 / dObservationSigma;
+
+      // test to match old runs
+      //      dObservationWeight = 1.0;
+
+//       std::cout << "yKnowns = ";
+//       for (int i=0; i<m_dyKnowns.size(); i++)
+//         std::cout << "          " << m_dyKnowns[i] << std::endl;
+//       std::cout << std::endl;
+//       std::cout << "deltax and deltay = " << deltax << " " << deltay << " " << dObservationWeight << std::endl;
+
+
 
       m_pLsq->AddKnown(m_dxKnowns, deltax, dObservationWeight);
       m_pLsq->AddKnown(m_dyKnowns, deltay, dObservationWeight);
@@ -2886,7 +2969,7 @@ namespace Isis {
 //  double avgrad = rPoint.Radius();
 
     // set the apriori control net value to the closest approach version
-    m_pCnet->GetPoint(nIndex)->SetSurfacePoint(
+    m_pCnet->GetPoint(nIndex)->SetAdjustedSurfacePoint(
         SurfacePoint(
           Latitude(lat, Angle::Radians),
           Longitude(lon, Angle::Radians),
@@ -2894,9 +2977,9 @@ namespace Isis {
 
     // Compute ground point in body-fixed coordinates
     double pB[3];
-    latrec_c((double) rPoint.GetSurfacePoint().GetLocalRadius().GetKilometers(),
-             (double) rPoint.GetSurfacePoint().GetLongitude().GetRadians(),
-             (double) rPoint.GetSurfacePoint().GetLatitude().GetRadians(),
+    latrec_c((double) rPoint.GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
+             (double) rPoint.GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
+             (double) rPoint.GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
              pB);
 
 //    printf("%s: %lf   %lf   %lf\n",rPoint.Id().c_str(), AveragePoint[0],AveragePoint[1],AveragePoint[2]);
@@ -2921,10 +3004,12 @@ namespace Isis {
    * apply parameter corrections
    */
   void BundleAdjust::ApplyParameterCorrections() {
-//    std::cout << "image corrections: " << m_Image_Corrections <<\ std::endl;
+//    std::cout << "image corrections: " << m_Image_Corrections << std::endl;
 //    std::cout << "   image solution: " << m_Image_Solution << std::endl;
 
     // Update selected spice for each image
+//    int baseindex = -1;
+//    bool bindexchanged = true;
     int nImages = Images();
     for (int i = 0; i < nImages; i++) {
       if (m_nHeldImages > 0)
@@ -2932,7 +3017,14 @@ namespace Isis {
 
       Camera *pCamera = m_pCnet->Camera(i);
       int index = i;
-      index = ImageIndex(index);
+      index = ImageIndex(i);
+//      if ( index != baseindex ) {
+//          bindexchanged = true;
+//          baseindex = index;
+//      }
+//      else
+//          bindexchanged = false;
+
       if (m_spacecraftPositionSolveType != Nothing) {
         SpicePosition *pInstPos = pCamera->InstrumentPosition();
         std::vector<double> abcX(3), abcY(3), abcZ(3);
@@ -2942,51 +3034,60 @@ namespace Isis {
 
         // Update the X coordinate coefficient(s) and sum parameter correction
         abcX[0] += m_Image_Solution(index);
-        m_Image_Corrections(index) += m_Image_Solution(index);
+//        if ( bindexchanged )
+            m_Image_Corrections(index) += m_Image_Solution(index);
         index++;
 
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcX[1] += m_Image_Solution(index);
-          m_Image_Corrections(index) += m_Image_Solution(index);
+//          if ( bindexchanged )
+              m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
 
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcX[2] += m_Image_Solution(index);
-            m_Image_Corrections(index) += m_Image_Solution(index);
+//            if ( bindexchanged )
+                m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
         }
 
         // Update the Y coordinate coefficient(s)
         abcY[0] += m_Image_Solution(index);
-        m_Image_Corrections(index) += m_Image_Solution(index);
+//        if ( bindexchanged )
+            m_Image_Corrections(index) += m_Image_Solution(index);
         index++;
 
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcY[1] += m_Image_Solution(index);
-          m_Image_Corrections(index) += m_Image_Solution(index);
+//          if ( bindexchanged )
+              m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
 
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcY[2] += m_Image_Solution(index);
-            m_Image_Corrections(index) += m_Image_Solution(index);
+//            if ( bindexchanged )
+                m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
         }
 
         // Update the Z coordinate coefficient(s)
         abcZ[0] += m_Image_Solution(index);
-        m_Image_Corrections(index) += m_Image_Solution(index);
+//        if ( bindexchanged )
+            m_Image_Corrections(index) += m_Image_Solution(index);
         index++;
 
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcZ[1] += m_Image_Solution(index);
-          m_Image_Corrections(index) += m_Image_Solution(index);
+//          if ( bindexchanged )
+              m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
 
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcZ[2] += m_Image_Solution(index);
-            m_Image_Corrections(index) += m_Image_Solution(index);
+//            if ( bindexchanged )
+                m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
         }
@@ -3004,14 +3105,16 @@ namespace Isis {
         // Update right ascension coefficient(s)
         for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           coefRA[icoef] += m_Image_Solution(index);
-          m_Image_Corrections(index) += m_Image_Solution(index);
+//          if ( bindexchanged )
+              m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
         }
 
         // Update declination coefficient(s)
         for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           coefDEC[icoef] += m_Image_Solution(index);
-          m_Image_Corrections(index) += m_Image_Solution(index);
+//          if ( bindexchanged )
+              m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
         }
 
@@ -3019,7 +3122,8 @@ namespace Isis {
           // Update twist coefficient(s)
           for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
             coefTWI[icoef] += m_Image_Solution(index);
-            m_Image_Corrections(index) += m_Image_Solution(index);
+//            if ( bindexchanged )
+                m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
         }
@@ -3037,13 +3141,10 @@ namespace Isis {
       if (point->IsIgnored())
         continue;
 
-//      if( point->Status() == ControlPoint::JigsawHighSigma )
-//        continue;
-
-      // no update to points that are being held absolutely
-      // ***NOTE: think about this
-//      if( point->Held() || point->Type() == ControlPoint::Ground )
-//        continue;
+      if( point->IsRejected() ) {
+          nPointIndex++;
+          continue;
+      }
 
       // get NIC, Q, and correction vector for this point
       bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
@@ -3066,11 +3167,12 @@ namespace Isis {
       dLongCorr = NIC(1);
       dRadCorr = NIC(2);
 
-//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->Id().c_str(),dLatCorr, dLongCorr, dRadCorr);
+//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().c_str(),dLatCorr, dLongCorr, dRadCorr);
+//      std::cout <<"Point " <<  point->GetId().c_str() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
-      double dLat = point->GetSurfacePoint().GetLatitude().GetDegrees();
-      double dLon = point->GetSurfacePoint().GetLongitude().GetDegrees();
-      double dRad = point->GetSurfacePoint().GetLocalRadius().GetMeters();
+      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
 
       dLat += RAD2DEG * dLatCorr;
       dLon += RAD2DEG * dLongCorr;
@@ -3099,9 +3201,14 @@ namespace Isis {
 
 //      std::cout << corrections << std::endl;
 
-      point->SetSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
-                                          Longitude(dLon, Angle::Degrees),
-                                          Distance(dRad, Distance::Meters)));
+      SurfacePoint surfacepoint = point->GetAdjustedSurfacePoint();
+
+      surfacepoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
+                                              Longitude(dLon, Angle::Degrees),
+                                              Distance(dRad, Distance::Meters));
+
+      point->SetAdjustedSurfacePoint(surfacepoint);
+
       nPointIndex++;
 
       // testing
@@ -3134,12 +3241,11 @@ namespace Isis {
     // vtpv for image coordinates
     int nObjectPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nObjectPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
+      ControlPoint *point = m_pCnet->GetPoint(i);
       if (point->IsIgnored())
         continue;
 
-// Next line appears to do nothing so skip it.
-//      point->ComputeResiduals_Millimeters();
+      point->ComputeResiduals_Millimeters();
 
       int nMeasures = point->GetNumMeasures();
       for (int j = 0; j < nMeasures; j++) {
@@ -3153,6 +3259,8 @@ namespace Isis {
 
         vx = measure->GetSampleResidual();
         vy = measure->GetLineResidual();
+
+        std::cout << "vx vy" << vx << " " << vy << std::endl;
 
         // if rejected, don't include in statistics
         if (measure->IsRejected())
@@ -3168,6 +3276,9 @@ namespace Isis {
         vtpv += vx * vx * dWeight + vy * vy * dWeight;
       }
     }
+
+    std::cout << "vtpv image = " << vtpv << std::endl;
+    std::cout << "dWeight = " << dWeight << std::endl;
 
     // add vtpv from constrained 3D points
     int nPointIndex = 0;
@@ -3190,6 +3301,9 @@ namespace Isis {
       vtpv_control += vx * vx * weights[0] + vy * vy * weights[1] + vz * vz * weights[2];
       nPointIndex++;
     }
+
+    std::cout << "vtpv control = " << vtpv_control << std::endl;
+
 
     // add vtpv from constrained image parameters
     int n = 0;
@@ -3257,160 +3371,167 @@ namespace Isis {
   }
 
   bool BundleAdjust::ComputeRejectionLimit() {
-    double vx, vy;
 
-    int nResiduals = m_nObservations / 2;
+      double vx, vy;
 
-    std::vector<double> x_residuals;
-    std::vector<double> y_residuals;
+      int nResiduals = m_nObservations / 2;
 
-    x_residuals.resize(nResiduals);
-    y_residuals.resize(nResiduals);
+      std::vector<double> x_residuals;
+      std::vector<double> y_residuals;
 
-    // load absolute value of residuals into vectors
-    int nObservation = 0;
-    int nObjectPoints = m_pCnet->GetNumPoints();
-    for (int i = 0; i < nObjectPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored())
-        continue;
+      x_residuals.resize(nResiduals);
+      y_residuals.resize(nResiduals);
 
-//      if ( point->Status() == ControlPoint::JigsawHighSigma )
-//        continue;
+      // load absolute value of residuals into vectors
+      int nObservation = 0;
+      int nObjectPoints = m_pCnet->GetNumPoints();
+      for (int i = 0; i < nObjectPoints; i++) {
 
-      int nMeasures = point->GetNumMeasures();
-      for (int j = 0; j < nMeasures; j++) {
-        const ControlMeasure *measure = point->GetMeasure(j);
-        if (measure->IsIgnored())
-          continue;
+          const ControlPoint *point = m_pCnet->GetPoint(i);
+          if ( point->IsIgnored() )
+              continue;
 
-        if (measure->IsRejected())
-          continue;
+          if ( point->IsRejected() )
+              continue;
 
-        vx = measure->GetSampleResidual();
-        vy = measure->GetLineResidual();
+          int nMeasures = point->GetNumMeasures();
+          for (int j = 0; j < nMeasures; j++) {
 
-        x_residuals[nObservation] = fabs(vx);
-        y_residuals[nObservation] = fabs(vy);
+              const ControlMeasure *measure = point->GetMeasure(j);
+              if ( measure->IsIgnored() )
+                  continue;
 
-        nObservation++;
+              if ( measure->IsRejected() )
+                  continue;
+
+              vx = measure->GetSampleResidual();
+              vy = measure->GetLineResidual();
+
+              x_residuals[nObservation] = fabs(vx);
+              y_residuals[nObservation] = fabs(vy);
+
+              nObservation++;
+          }
       }
-    }
 
-//    std::cout << "x residuals\n" << x_residuals << std::endl;
-//    std::cout << "y_residuals\n" << y_residuals << std::endl;
+//      std::cout << "x residuals\n" << x_residuals << std::endl;
+//      std::cout << "y_residuals\n" << y_residuals << std::endl;
 
-    // sort vectors
-    std::sort(x_residuals.begin(), x_residuals.end());
-    std::sort(y_residuals.begin(), y_residuals.end());
+      // sort vectors
+      std::sort(x_residuals.begin(), x_residuals.end());
+      std::sort(y_residuals.begin(), y_residuals.end());
 
-//    std::cout << "x residuals sorted\n" << x_residuals << std::endl;
-//    std::cout << "y_residuals sorted\n" << y_residuals << std::endl;
+//      std::cout << "x residuals sorted\n" << x_residuals << std::endl;
+//      std::cout << "y_residuals sorted\n" << y_residuals << std::endl;
 
-    double xmedian, ymedian;
-    double xmad, ymad;
+      double xmedian, ymedian;
+      double xmad, ymad;
 
-    int nmidpoint = nResiduals / 2;
+      int nmidpoint = nResiduals / 2;
 
-    if (nResiduals % 2) {
-      xmedian = x_residuals[nmidpoint];
-      ymedian = y_residuals[nmidpoint];
-    }
-    else {
-      xmedian = (x_residuals[nmidpoint-1] + x_residuals[nmidpoint]) / 2;
-      ymedian = (y_residuals[nmidpoint-1] + y_residuals[nmidpoint]) / 2;
-    }
+      if ( nResiduals % 2 ) {
+          xmedian = x_residuals[nmidpoint];
+          ymedian = y_residuals[nmidpoint];
+      }
+      else {
+          xmedian = (x_residuals[nmidpoint-1] + x_residuals[nmidpoint]) / 2;
+          ymedian = (y_residuals[nmidpoint-1] + y_residuals[nmidpoint]) / 2;
+      }
 
-    // compute M.A.D.
-    for (int i = 0; i < nResiduals; i++) {
-      x_residuals[i] = fabs(x_residuals[i] - xmedian);
-      y_residuals[i] = fabs(y_residuals[i] - ymedian);
-    }
+      // compute M.A.D.
+      for (int i = 0; i < nResiduals; i++) {
+          x_residuals[i] = fabs(x_residuals[i] - xmedian);
+          y_residuals[i] = fabs(y_residuals[i] - ymedian);
+      }
 
-    std::sort(x_residuals.begin(), x_residuals.end());
-    std::sort(y_residuals.begin(), y_residuals.end());
+      std::sort(x_residuals.begin(), x_residuals.end());
+      std::sort(y_residuals.begin(), y_residuals.end());
 
-    if (nResiduals % 2) {
-      xmad = 1.4826 * x_residuals[nmidpoint];
-      ymad = 1.4826 * y_residuals[nmidpoint];
-    }
-    else {
-      xmad = 1.4826 * (x_residuals[nmidpoint-1] + x_residuals[nmidpoint]) / 2;
-      ymad = 1.4826 * (y_residuals[nmidpoint-1] + y_residuals[nmidpoint]) / 2;
-    }
+      if ( nResiduals % 2 ) {
+          xmad = 1.4826 * x_residuals[nmidpoint];
+          ymad = 1.4826 * y_residuals[nmidpoint];
+      }
+      else {
+          xmad = 1.4826 * (x_residuals[nmidpoint-1] + x_residuals[nmidpoint]) / 2;
+          ymad = 1.4826 * (y_residuals[nmidpoint-1] + y_residuals[nmidpoint]) / 2;
+      }
 
-    m_dRejectionLimit = 5.0 * std::max(xmad, ymad);
+      m_dRejectionLimit = 10.0 * std::max(xmad, ymad);
 
-    return true;
+      return true;
   }
 
   bool BundleAdjust::FlagOutliers() {
     double vx, vy;
     int nRejected;
+    int ntotalrejected = 0;
 
     int nIndexMaxResidual = -1;
     double dMaxResidual;
     double dSumSquares;
+    double dUsedRejectionLimit = m_dRejectionLimit;
 
-    printf("Iteration %d Rejection Limit: %20.10lf\n", m_nIteration, m_dRejectionLimit);
-
-//    m_nRejectedObservations = 0;
-
-    int ntotalrejected = 0;
+    if ( m_dRejectionLimit < 0.05 )
+        dUsedRejectionLimit = 0.05;
 
     int nObjectPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nObjectPoints; i++) {
       ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored())
+      if ( point->IsIgnored() )
         continue;
 
-// Do we need this method below...TODO
-      //      point->ZeroNumberOfRejectedMeasures();
+      point->ZeroNumberOfRejectedMeasures();
 
       nRejected = 0;
       dMaxResidual = -1.0;
 
       int nMeasures = point->GetNumMeasures();
       for (int j = 0; j < nMeasures; j++) {
-        ControlMeasure *measure = point->GetMeasure(j);
-        if (measure->IsIgnored())
-          continue;
 
-        vx = measure->GetSampleResidual();
-        vy = measure->GetLineResidual();
+          ControlMeasure *measure = point->GetMeasure(j);
+          if ( measure->IsIgnored() )
+              continue;
 
-        if (fabs(vx) < m_dRejectionLimit && fabs(vy) < m_dRejectionLimit) {
-          measure->SetRejected(false);
-          continue;
-        }
+          vx = measure->GetSampleResidual();
+          vy = measure->GetLineResidual();
 
-        // if it's still rejected, skip it
-        if (measure->IsRejected()) {
-          nRejected++;
-          continue;
-        }
+          if ( fabs(vx) < dUsedRejectionLimit && fabs(vy) < dUsedRejectionLimit ) {
+              if( measure->IsRejected() ) {
+                  printf("Coming back in: %s\r",point->GetId().c_str());
+                  m_pCnet->DecrementNumberOfRejectedMeasuresInImage(measure->GetCubeSerialNumber());
+              }
 
-        dSumSquares = vx * vx + vy * vy;
+              measure->SetRejected(false);
+              continue;
+          }
 
-        if (dSumSquares > dMaxResidual) {
-          dMaxResidual = dSumSquares;
-          nIndexMaxResidual = j;
-        }
+          // if it's still rejected, skip it
+          if ( measure->IsRejected() ) {
+              nRejected++;
+              ntotalrejected++;
+              continue;
+          }
+
+          dSumSquares = vx * vx + vy * vy;
+
+          if ( dSumSquares > dMaxResidual ) {
+              dMaxResidual = dSumSquares;
+              nIndexMaxResidual = j;
+          }
       }
 
-      // no observations above the current
-      // rejection limit for this 3D point
-      if (dMaxResidual == -1.0) {
-        point->SetNumberOfRejectedMeasures(nRejected);
-        continue;
+      // no observations above the current rejection limit for this 3D point
+      if ( dMaxResidual == -1.0 ) {
+          point->SetNumberOfRejectedMeasures(nRejected);
+          continue;
       }
 
       // this is another kluge - if we only have two observations
       // we won't reject (for now)
-      if ((nMeasures - (nRejected + 1)) < 2) {
-        point->SetNumberOfRejectedMeasures(nRejected);
-        continue;
-      }
+//      if ((nMeasures - (nRejected + 1)) < 2) {
+//          point->SetNumberOfRejectedMeasures(nRejected);
+//          continue;
+//      }
 
       // otherwise, we have at least one observation
       // for this point whose residual is above the
@@ -3420,79 +3541,95 @@ namespace Isis {
       rejected->SetRejected(true);
       nRejected++;
       point->SetNumberOfRejectedMeasures(nRejected);
+      m_pCnet->IncrementNumberOfRejectedMeasuresInImage(rejected->GetCubeSerialNumber());
       ntotalrejected++;
 
       // do we still have sufficient remaining observations for this 3D point?
-//      if( (nMeasures-nRejected) < 2 )
-//        point->SetStatus(ControlPoint::JigsawHighSigma); // ATTENTION: this is a kluge, need to check number of valid
-//      else                                              // measures that the 3D point has
-//        point->SetStatus(ControlPoint::Valid);
+      if( ( nMeasures-nRejected ) < 2 ) {
+          point->SetRejected(true);
+          printf("Rejecting Entire Point: %s\r",point->GetId().c_str());
+      }
+      else
+          point->SetRejected(false);
 
-      int ndummy = point->GetNumberOfRejectedMeasures();
-      printf("Rejected for point %s = %d\n", point->GetId().c_str(), ndummy);
-      printf("%s: %20.10lf  %20.10lf*\n",
-             point->GetId().c_str(), rejected->GetSampleResidual(), rejected->GetLineResidual());
-    }
-
-    printf("Total Rejections: %d\n", ntotalrejected);
-
-    return true;
+//      int ndummy = point->GetNumberOfRejectedMeasures();
+//      printf("Rejected for point %s = %d\n", point->GetId().c_str(), ndummy);
+//      printf("%s: %20.10lf  %20.10lf*\n",point->GetId().c_str(), rejected->GetSampleResidual(), rejected->GetLineResidual());
   }
 
+    m_nRejectedObservations = 2*ntotalrejected;
+
+    printf("\n\t       Rejected Observations:%10d (Rejection Limit:%12.5lf\n",
+           m_nRejectedObservations, dUsedRejectionLimit);
+
+    return true;
+}
+
   bool BundleAdjust::ErrorPropagation() {
-    // create inverse of normal equations matrix
-    if (!CholeskyUT_NOSQR_Inverse())
-      return false;
 
-    matrix<double> T(3, 3);
-    matrix<double> QS(3, m_nRank);
-    double dSigmaLat, dSigmaLong, dSigmaRadius;
-    double t;
+      // create inverse of normal equations matrix
+      if ( !CholeskyUT_NOSQR_Inverse() )
+          return false;
 
-    double dSigma02 = m_dSigma0 * m_dSigma0;
+      matrix<double> T(3, 3);
+      matrix<double> QS(3, m_nRank);
+      double dSigmaLat, dSigmaLong, dSigmaRadius;
+      double t;
 
-    int nPointIndex = 0;
-    int nObjectPoints = m_pCnet->GetNumPoints();
-    for (int i = 0; i < nObjectPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored())
-        continue;
+      double dSigma02 = m_dSigma0 * m_dSigma0;
 
-      T.clear();
-      QS.clear();
+      int nPointIndex = 0;
+      int nObjectPoints = m_pCnet->GetNumPoints();
+      for (int i = 0; i < nObjectPoints; i++) {
+//          const ControlPoint *point = m_pCnet->GetPoint(i);
+          ControlPoint *point = m_pCnet->GetPoint(i);
+          if ( point->IsIgnored() )
+              continue;
 
-      // get corresponding Q matrix
-      compressed_matrix<double>& Q = m_Qs[nPointIndex];
+          if ( point->IsRejected() )
+              continue;
 
-      // form QS
-      QS = prod(Q, m_Normals);
+          T.clear();
+          QS.clear();
 
-      // form T
-      T = prod(QS, trans(Q));
+          // get corresponding Q matrix
+          compressed_matrix<double>& Q = m_Qs[nPointIndex];
+
+          // form QS
+          QS = prod(Q, m_Normals);
+
+          // form T
+          T = prod(QS, trans(Q));
 
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO
-      point->GetSurfacePoint().SetRadii(Distance(m_BodyRadii[0]),
-                                        Distance(m_BodyRadii[1]),
-                                        Distance(m_BodyRadii[0]));
-      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
-      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
-      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
+      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+      SurfacePoint.SetRadii(m_BodyRadii[0], m_BodyRadii[1], m_BodyRadii[2]);  // TODO: original call to get ControlPoint returns a const, here we are changing it's SurfacePoint member, can't do it (GOTTA BE A BETTER WAY)
 
-      t = dSigmaLat + T(0, 0);
+      dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
+      dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
+      dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
+
+//      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+//      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+//      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+
+      t = dSigmaLat*dSigmaLat + T(0, 0);
       Distance tLatSig(sqrt(dSigma02 * t) * m_dRTM, Distance::Meters);
 
-      t = dSigmaLong + T(1, 1);
+      t = dSigmaLong*dSigmaLong + T(1, 1);
       t = sqrt(dSigma02 * t) * m_dRTM;
       Distance tLonSig(
-          t / cos(point->GetSurfacePoint().GetLatitude().GetRadians()),
+          t * cos(point->GetAdjustedSurfacePoint().GetLatitude().GetRadians()),
           Distance::Meters);
-//      point->SetSigmaLongitude(t);
 
-      t = dSigmaRadius + T(2, 2);
+      t = dSigmaRadius*dSigmaRadius + T(2, 2);
       t = sqrt(dSigma02 * t) * 1000.0;
-      point->GetSurfacePoint().SetSphericalSigmasDistance(tLatSig, tLonSig,
-          Distance(t, Distance::Meters));
+
+      SurfacePoint.SetSphericalSigmasDistance(tLatSig, tLonSig,
+                                              Distance(t, Distance::Meters));
+
+      point->SetAdjustedSurfacePoint(SurfacePoint);
 
       nPointIndex++;
     }
@@ -3532,9 +3669,10 @@ namespace Isis {
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcX[1] += basis.Coefficient(index);
           index++;
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration)
+          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcX[2] += basis.Coefficient(index);
           index++;
+          }
         }
 
         // Update the Y coordinate coefficient(s)
@@ -3543,9 +3681,10 @@ namespace Isis {
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcY[1] += basis.Coefficient(index);
           index++;
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration)
+          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcY[2] += basis.Coefficient(index);
-          index++;
+            index++;
+          }
         }
 
         // Update the Z coordinate cgoefficient(s)
@@ -3554,9 +3693,10 @@ namespace Isis {
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcZ[1] += basis.Coefficient(index);
           index++;
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration)
+          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcZ[2] += basis.Coefficient(index);
-          index++;
+            index++;
+          }
         }
 
         pInstPos->SetPolynomial(abcX, abcY, abcZ);
@@ -3570,20 +3710,23 @@ namespace Isis {
         pInstRot->GetPolynomial(coefRA, coefDEC, coefTWI);
 
         // Update right ascension coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++)
+        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           coefRA[icoef] += basis.Coefficient(index);
-        index++;
+          index++;
+        }
 
         // Update declination coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++)
+        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           coefDEC[icoef] += basis.Coefficient(index);
-        index++;
+          index++;
+        }
 
         if (m_bSolveTwist) {
           // Update twist coefficient(s)
-          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++)
+          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
             coefTWI[icoef] += basis.Coefficient(index);
-          index++;
+            index++;
+          }
         }
 
         pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI);
@@ -3596,11 +3739,14 @@ namespace Isis {
       ControlPoint *point = m_pCnet->GetPoint(i);
       if (point->IsIgnored())
         continue;
+      if (m_strSolutionMethod != "SPECIALK" &&
+          m_strSolutionMethod != "SPARSE"  &&
+          point->GetType() == ControlPoint::Ground)
+        continue;
 
-      double dLat = point->GetSurfacePoint().GetLatitude().GetDegrees();
-      double dLon = point->GetSurfacePoint().GetLongitude().GetDegrees();
-      double dRad = point->GetSurfacePoint().GetLocalRadius().GetMeters();
-
+      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
       int index = PointIndex(i);
       dLat += RAD2DEG * (basis.Coefficient(index));
       index++;
@@ -3620,9 +3766,11 @@ namespace Isis {
       while (dLon > 360.0) dLon = dLon - 360.0;
       while (dLon < 0.0) dLon = dLon + 360.0;
 
-//    if ( m_bSolveRadii )
+      // test to match results of old test case that didn't solve for radius
+      if ( m_bSolveRadii || m_strSolutionMethod == "SPARSE") {
       dRad += 1000.*basis.Coefficient(index);
       index++;
+      }
 
       // testing
       // Compute ground point in body-fixed coordinates
@@ -3639,7 +3787,7 @@ namespace Isis {
               cam->SetUniversalGround(lat, lon);
               rad = cam->LocalRadius(); //meters
            }*/
-      point->SetSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
+      point->SetAdjustedSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
                                           Longitude(dLon, Angle::Degrees),
                                           Distance(dRad, Distance::Meters)));
     }
@@ -3651,7 +3799,7 @@ namespace Isis {
     int nIndex;
 
     if (!m_bObservationMode)
-      nIndex = (Images() - m_nHeldImages) * m_nNumImagePartials;
+      nIndex = Images() * m_nNumImagePartials;
     else
       nIndex = Observations() * m_nNumImagePartials;
 
@@ -3661,12 +3809,26 @@ namespace Isis {
   }
 
   //! Return index to basis function for ith image
-  int BundleAdjust::ImageIndex(int i) const {
-    if (!m_bObservationMode)
+  int BundleAdjust::ImageIndex (int i) const
+  {
+    if ( !m_bObservationMode )
       return m_nImageIndexMap[i] * m_nNumImagePartials;
     else
       return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
   }
+//  int BundleAdjust::ImageIndex (int i) const
+//  {
+//      if ( !m_bObservationMode ) {
+//          if ( m_strSolutionMethod == "SPECIALK" )
+//              return m_nImageIndexMap[i];
+//          return m_nImageIndexMap[i] * m_nNumImagePartials;;
+//      }
+//      else {
+//          if ( m_strSolutionMethod == "SPECIALK" )
+//              return m_pObsNumList->ObservationNumberMapIndex(i);
+//          return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
+//      }
+//  }
 
   //! Return the ith filename in the cube list file given to constructor
   std::string BundleAdjust::Filename(int i) {
@@ -3690,20 +3852,21 @@ namespace Isis {
   //! Return the number of observations in list given to the constructor
   int BundleAdjust::Observations() const {
     if (!m_bObservationMode)
-      return m_pSnList->Size() - m_nHeldImages;
+      return m_pSnList->Size();
+//    return m_pSnList->Size() - m_nHeldImages;
     else
       return m_pObsNumList->ObservationSize();
   }
 
 //std::vector<double> BundleAdjust::PointPartial(Isis::ControlPoint &point, PartialDerivative wrt)
 //{
-//  double lat = point.GetSurfacePoint().GetLatitude();  // Radians
-//  double lon = point.GetSurfacePoint().GetLongitude();
+//  double lat = point.GetAdjustedSurfacePoint().GetLatitude();  // Radians
+//  double lon = point.GetAdjustedSurfacePoint().GetLongitude();
 //  double sinLon = sin(lon);
 //  double cosLon = cos(lon);
 //  double sinLat = sin(lat);
 //  double cosLat = cos(lat);
-//  double radius = point.GetSurfacePoint().GetLocalRadius() * 0.001;  /km
+//  double radius = point.GetAdjustedSurfacePoint().GetLocalRadius() * 0.001;  /km
 //
 //  std::vector<double> v(3);
 //
@@ -3757,7 +3920,8 @@ namespace Isis {
     gp += PvlKeyword("MaximumError", m_dError, "pixels");
     gp += PvlKeyword("AverageError", avErr, "pixels");
     gp += PvlKeyword("SigmaXY", sigmaXY, "mm");
-    gp += PvlKeyword("SigmaHat", sigmaHat, "mm");
+//    gp += PvlKeyword("SigmaHat", sigmaHat, "mm");
+    gp += PvlKeyword("Sigma0", m_dSigma0, "mm");
     gp += PvlKeyword("SigmaX", sigmaX, "mm");
     gp += PvlKeyword("SigmaY", sigmaY, "mm");
 
@@ -3765,100 +3929,117 @@ namespace Isis {
   }
 
   /**
-   * set parameter weighting
+   * set parameter weighting for SPARSE solution
    */
   bool BundleAdjust::SetParameterWeights() {
-    double dAprioriSigmaLat;
-    double dAprioriSigmaLon;
-    double dAprioriSigmaRad;
-    double dVarianceLat;
-    double dVarianceLon;
-    double dVarianceRad;
+
+    SetSpaceCraftWeights();
+    ComputeImageParameterWeights();
 
     m_dParameterWeights.resize(m_nBasisColumns);
     std::fill_n(m_dParameterWeights.begin(), m_nBasisColumns, 0.0);
+    m_nConstrainedImageParameters = 0;
+    m_nConstrainedPointParameters = 0;
+
+    int nconstraintsperimage = std::count_if( m_dImageParameterWeights.begin(),
+                                              m_dImageParameterWeights.end(),
+                                              std::bind2nd(std::greater<double>(),0.0));
+
+    int nWtIndex;
+    int nImages = m_pSnList->Size();
+    for( int i = 0; i < nImages; i++ ) {
+
+        nWtIndex = ImageIndex(i);
+
+        if ( m_pHeldSnList != NULL &&
+             (m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))) ) {
+            std::fill_n(m_dParameterWeights.begin()+nWtIndex, m_nNumImagePartials, 1.0e+50);
+            m_nConstrainedImageParameters += m_nNumImagePartials;
+        }
+        else {
+            std::copy(m_dImageParameterWeights.begin(),
+                      m_dImageParameterWeights.end(),
+                      m_dParameterWeights.begin()+nWtIndex);
+            m_nConstrainedImageParameters += nconstraintsperimage;
+        }
+    }
 
     // loop over 3D object points
-    int nWtIndex = m_nImageParameters;
+    nWtIndex = m_nImageParameters;
     int nObjectPoints = m_pCnet->GetNumPoints();
-    m_nConstrainedPointParameters = 0;
+
+    m_Point_AprioriSigmas.resize(nObjectPoints);
+
+    int nPointIndex = 0;
     for (int i = 0; i < nObjectPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
+      ControlPoint *point = m_pCnet->GetPoint(i);
       if (point->IsIgnored())
         continue;
-      /*
-             if(  m_dGlobalLatitudeAprioriSigma > 0.0 )
-               dAprioriSigmaLat = m_dGlobalLatitudeAprioriSigma;
-             else
-               dAprioriSigmaLat = point->AprioriSigmaLatitude();
 
-             if(  m_dGlobalLatitudeAprioriSigma > 0.0 )
-               dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
-             else
-               dAprioriSigmaLon = point->AprioriSigmaLongitude();
+      bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
 
-             if(  m_dGlobalRadiusAprioriSigma > 0.0 )
-               dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
-             else
-               dAprioriSigmaRad = point->AprioriSigmaRadius();
-      */
-
-      dAprioriSigmaLat = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
-      dAprioriSigmaLon = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
-      dAprioriSigmaRad = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
-
-      if (dAprioriSigmaLat > 1000.0 || dAprioriSigmaLat <= 0.0) {
-        if (m_dGlobalLatitudeAprioriSigma > 0.0)
-          dAprioriSigmaLat = m_dGlobalLatitudeAprioriSigma;
-      }
-
-      if (dAprioriSigmaLon > 1000.0 || dAprioriSigmaLon <= 0.0) {
-        if (m_dGlobalLongitudeAprioriSigma > 0.0)
-          dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
-      }
-
-      if (dAprioriSigmaRad > 1000.0 || dAprioriSigmaRad <= 0.0) {
-        if (m_dGlobalRadiusAprioriSigma > 0.0)
-          dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
-      }
-
-      dVarianceLat = dAprioriSigmaLat * m_dMTR;
-      dVarianceLat *= dVarianceLat;
-      dVarianceLon = dAprioriSigmaLon * m_dMTR * cos(point->GetSurfacePoint().GetLatitude().GetRadians()); // Lat in radians
-      dVarianceLon *= dVarianceLon;
-      dVarianceRad = dAprioriSigmaRad * 0.001;
-      dVarianceRad *= dVarianceRad;
+       SurfacePoint aprioriSurfacePoint = point->GetAprioriSurfacePoint();
+       aprioriSurfacePoint.SetRadii(m_BodyRadii[0], m_BodyRadii[1], m_BodyRadii[2]);
+//       // How do I solve the compile error regarding the const?
+//       //      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
 
       if (point->GetType() == ControlPoint::Ground) {
-        m_dParameterWeights[nWtIndex] = 1.0e+25;
-        m_dParameterWeights[nWtIndex+1] = 1.0e+25;
-        m_dParameterWeights[nWtIndex+2] = 1.0e+25;
+        m_dParameterWeights[nWtIndex] = 1.0e+50;
+        m_dParameterWeights[nWtIndex+1] = 1.0e+50;
+        m_dParameterWeights[nWtIndex+2] = 1.0e+50;
         m_nConstrainedPointParameters += 3;
       }
       else {
-        if (dAprioriSigmaLat < 1000.0) {
-          m_dParameterWeights[nWtIndex] = 1.0 / dVarianceLat;
+        if( point->IsLatitudeConstrained() ) {
+          apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
+          m_dParameterWeights[nWtIndex] = point->GetAprioriSurfacePoint().GetLatWeight();
           m_nConstrainedPointParameters++;
         }
-        if (dAprioriSigmaLon < 1000.0) {
-          m_dParameterWeights[nWtIndex+1] = 1.0 / dVarianceLon;
+        else if( m_dGlobalLatitudeAprioriSigma > 0.0 ) {
+          apriorisigmas[0] = m_dGlobalLatitudeAprioriSigma;
+          m_dParameterWeights[nWtIndex] = 1. / (m_dGlobalLatitudeAprioriSigma*m_dMTR);
+          m_dParameterWeights[nWtIndex] *= m_dParameterWeights[nWtIndex];
+          m_nConstrainedPointParameters++;
+        }
+      
+        if( point->IsLongitudeConstrained() ) {
+          apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
+          m_dParameterWeights[nWtIndex+1] = point->GetAprioriSurfacePoint().GetLonWeight();
+          m_nConstrainedPointParameters++;
+        }
+        else if( m_dGlobalLongitudeAprioriSigma > 0.0 ) {
+          apriorisigmas[1] = m_dGlobalLongitudeAprioriSigma;
+          m_dParameterWeights[nWtIndex+1] = 1. / (m_dGlobalLongitudeAprioriSigma*m_dMTR);
+          m_dParameterWeights[nWtIndex+1] *= m_dParameterWeights[nWtIndex+1];
           m_nConstrainedPointParameters++;
         }
 
-        if (!m_bSolveRadii) {
-          m_dParameterWeights[nWtIndex+2] = 1.0e+10;
+        if ( !m_bSolveRadii ) {
+          m_dParameterWeights[nWtIndex+2] = 1.0e+50;
           m_nConstrainedPointParameters++;
         }
-        else if (dAprioriSigmaRad < 1000.0) {
-          m_dParameterWeights[nWtIndex+2] = 1.0 / dVarianceRad;
+        else if( point->IsRadiusConstrained() ) {
+          apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
+          m_dParameterWeights[nWtIndex+2] = point->GetAprioriSurfacePoint().GetLocalRadiusWeight();
+          m_nConstrainedPointParameters++;
+        }
+        else if( m_dGlobalRadiusAprioriSigma > 0.0 ) {
+          apriorisigmas[2] = m_dGlobalRadiusAprioriSigma;
+          m_dParameterWeights[nWtIndex+2] = 1000. / m_dGlobalRadiusAprioriSigma;
+          m_dParameterWeights[nWtIndex+2] *= m_dParameterWeights[nWtIndex+2];
           m_nConstrainedPointParameters++;
         }
       }
 
       nWtIndex += 3;
+      nPointIndex++;
     }
 
     m_pLsq->SetParameterWeights(m_dParameterWeights);
+
+    // Next call added by DAC 02-04-2011...Is this correct? Ask Ken
+    m_pLsq->SetNumberOfConstrainedParameters(
+      m_nConstrainedPointParameters+m_nConstrainedImageParameters);
 
     return true;
   }
@@ -3884,16 +4065,24 @@ namespace Isis {
       nIndex++;
 
       dSigmaLong = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-      dSigmaLong *= m_dRTM / cos(point->GetSurfacePoint().GetLatitude().GetRadians()); // Lat in radians
+      dSigmaLong *= m_dRTM * cos(point->GetAdjustedSurfacePoint().GetLatitude().GetRadians()); // Lat in radians
       nIndex++;
 
       dSigmaRadius = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
       nIndex++;
 
-      point->GetSurfacePoint().SetSphericalSigmasDistance(
+      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+
+      SurfacePoint.SetRadii(Distance(m_BodyRadii[0]),
+                                   Distance(m_BodyRadii[1]),
+                                   Distance(m_BodyRadii[2]));
+
+      SurfacePoint.SetSphericalSigmasDistance(
           Distance(dSigmaLat, Distance::Meters),
           Distance(dSigmaLong, Distance::Meters),
           Distance(dSigmaRadius, Distance::Kilometers));
+
+      point->SetAdjustedSurfacePoint(SurfacePoint);
     }
   }
 
@@ -3901,517 +4090,1528 @@ namespace Isis {
    * output bundle results to file
    */
   bool BundleAdjust::Output() {
-    if (m_bConverged && m_bErrorPropagation)
-      OutputWithErrorPropagation();
-    else
-      OutputNoErrorPropagation();
 
-    if (m_bOutputCSV) {
-      OutputPointsCSV();
-      OutputImagesCSV();
-    }
+      if ( m_bOutputStandard ) {
+          if( m_bConverged && m_bErrorPropagation )
+              OutputWithErrorPropagation();
+          else
+              OutputNoErrorPropagation();
+      }
+
+      if ( m_bOutputCSV ) {
+          OutputPointsCSV();
+          OutputImagesCSV();
+      }
+
+      if ( m_bOutputResiduals )
+          OutputResiduals();
 
     return true;
   }
 
-  /**
-   * output bundle results to file with error propagation
-   */
-  bool BundleAdjust::OutputWithErrorPropagation() {
-    char buf[1056];
+/**
+ * output bundle results to file with error propagation
+ */
+    bool BundleAdjust::OutputWithErrorPropagation() {
 
-    bool bHeld = false;
-    std::vector<double> PosX(3);
-    std::vector<double> PosY(3);
-    std::vector<double> PosZ(3);
-    std::vector<double> coefRA(m_nNumberCameraCoefSolved);
-    std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
-    std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
-    Camera *pCamera = NULL;
-    SpicePosition *pSpicePosition = NULL;
-    SpiceRotation *pSpiceRotation = NULL;
+      std::ofstream fp_out("bundleout.txt", std::ios::out);
+      if (!fp_out)
+          return false;
 
-    std::ofstream fp_out("bundleout.txt", std::ios::out);
-    if (!fp_out)
-      return false;
+      char buf[1056];
+      bool bHeld = false;
+      std::vector<double> PosX(3);
+      std::vector<double> PosY(3);
+      std::vector<double> PosZ(3);
+      std::vector<double> coefRA(m_nNumberCameraCoefSolved);
+      std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
+      std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+      std::vector<double> angles;
+      std::vector<double> angvel;
+      Camera *pCamera = NULL;
+      SpicePosition *pSpicePosition = NULL;
+      SpiceRotation *pSpiceRotation = NULL;
 
-    int nImages = Images();
-    int nValidPoints = m_pCnet->GetNumValidPoints();
-    int nInnerConstraints = 0;
-    int nDistanceConstraints = 0;
-    int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
-    int nConvergenceCriteria = 1;
+      int nImages = Images();
+      int nValidPoints = m_pCnet->GetNumValidPoints();
+      int nInnerConstraints = 0;
+      int nDistanceConstraints = 0;
+      int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
+      int nConvergenceCriteria = 1;
 
-    sprintf(buf, "\n\t\tJIGSAW: BUNDLE ADJUSTMENT\n\t\t=========================\n");
-    fp_out << buf;
-    sprintf(buf, "\n               Network Filename: %s", p_cnetFile.c_str());
-    fp_out << buf;
-    sprintf(buf, "\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
-    fp_out << buf;
-    sprintf(buf, "\n            Network Description: %s", m_pCnet->Description().c_str());
-    fp_out << buf;
-    sprintf(buf, "\n                         Target: %s", m_pCnet->GetTarget().c_str());
-    fp_out << buf;
-    sprintf(buf, "\n                   Linear Units: kilometers");
-    fp_out << buf;
-    sprintf(buf, "\n                  Angular Units: decimal degrees");
-    fp_out << buf;
-    sprintf(buf, "\n\n                         Images: %6d", nImages);
-    fp_out << buf;
-    sprintf(buf, "\n                         Points: %6d", nValidPoints);
-    fp_out << buf;
-    sprintf(buf, "\n                   Observations: %6d", m_nObservations);
-    fp_out << buf;
-    if (m_nConstrainedPointParameters > 0) {
-      sprintf(buf, "\n   Constrained Point Parameters: %6d", m_nConstrainedPointParameters);
-      fp_out << buf;
-    }
-    if (m_nConstrainedImageParameters > 0) {
-      sprintf(buf, "\n   Constrained Image Parameters: %6d", m_nConstrainedImageParameters);
-      fp_out << buf;
-    }
-    sprintf(buf, "\n                       Unknowns: %6d", m_nUnknownParameters);
-    fp_out << buf;
-    if (nInnerConstraints > 0) {
-      sprintf(buf, "\n      Inner Constraints: %6d", nInnerConstraints);
-      fp_out << buf;
-    }
-    if (nDistanceConstraints > 0) {
-      sprintf(buf, "\n   Distance Constraints: %d", nDistanceConstraints);
-      fp_out << buf;
-    }
-    sprintf(buf, "\n             Degrees of Freedom: %6d", nDegreesOfFreedom);
-    fp_out << buf;
-    sprintf(buf, "\n           Convergence Criteria: %6.3g", m_dConvergenceThreshold);
-    fp_out << buf;
-    if (nConvergenceCriteria == 1) {
-      sprintf(buf, "(Sigma0)");
-      fp_out << buf;
-    }
-    sprintf(buf, "\n                     Iterations: %6d", m_nIteration);
-    fp_out << buf;
-    if (m_nIteration >= m_nMaxIterations) {
-      sprintf(buf, "(Maximum reached)");
-      fp_out << buf;
-    }
-    sprintf(buf, "\n                         Sigma0: %6.4lf\n", m_dSigma0);
-    fp_out << buf;
+      bool bSolveSparse = false;
 
-    sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n", m_dElapsedTimeErrorProp);
-    fp_out << buf;
+      gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
 
-    sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n", m_dElapsedTime);
-    fp_out << buf;
-
-//     sprintf(buf, "\n  Meters to Radians Conversion: %6.4g\n",m_dMTR);
-//     fp_out << buf;
-//     sprintf(buf, "\n  Radians to Meters Conversion: %6.4g\n",m_dRTM);
-//     fp_out << buf;
-
-    double dSigma;
-    int nIndex = 0;
-
-    sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
-    fp_out << buf;
-
-    for (int i = 0; i < nImages; i++) {
-      if (m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))
-        bHeld = true;
-
-      pCamera = m_pCnet->Camera(i);
-      if (!pCamera)
-        continue;
-
-      pSpicePosition = pCamera->InstrumentPosition();
-      if (!pSpicePosition)
-        continue;
-
-      pSpiceRotation = pCamera->InstrumentRotation();
-      if (!pSpiceRotation)
-        continue;
-
-      if (m_spacecraftPositionSolveType > 0)
-        pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
-      else {
-        pSpicePosition->SetPolynomial();
-        pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+      if( m_strSolutionMethod == "SPARSE" )
+      {
+          lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
+          bSolveSparse = true;
       }
 
-      if (m_cmatrixSolveType > 0)
-        pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
-      else {
-        pSpiceRotation->SetPolynomial();
-        pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
-      }
-
-      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
+      sprintf(buf, "\n\t\tJIGSAW: BUNDLE ADJUSTMENT\n\t\t=========================\n");
       fp_out << buf;
-      sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
+      sprintf(buf,"\n               Network Filename: %s", m_strCnetFilename.c_str());
       fp_out << buf;
-      sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
-              "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
+      sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
+      fp_out << buf;
+      sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().c_str());
+      fp_out << buf;
+      sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().c_str());
+      fp_out << buf;
+      sprintf(buf,"\n                  Solution Type: %s", m_strSolutionMethod.c_str());
+      fp_out << buf;
+      sprintf(buf,"\n                   Linear Units: kilometers");
+      fp_out << buf;
+      sprintf(buf,"\n                  Angular Units: decimal degrees");
+      fp_out << buf;
+      sprintf(buf,"\n\n                         Images: %6d",nImages);
+      fp_out << buf;
+      sprintf(buf,"\n                         Points: %6d",nValidPoints);
+      fp_out << buf;
+      sprintf(buf,"\n                 Total Measures: %6d",(m_nObservations+m_nRejectedObservations)/2);
+      fp_out << buf;
+      sprintf(buf,"\n             Total Observations: %6d",m_nObservations+m_nRejectedObservations);
+      fp_out << buf;
+      sprintf(buf,"\n              Good Observations: %6d",m_nObservations);
+      fp_out << buf;
+      sprintf(buf,"\n          Rejected Observations: %6d",m_nRejectedObservations);
       fp_out << buf;
 
-      if (m_spacecraftPositionSolveType == 0) {
-        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosX[0], 0.0, PosX[0], 0.0, "N/A");
-        fp_out << buf;
-        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosY[0], 0.0, PosY[0], 0.0, "N/A");
-        fp_out << buf;
-        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosZ[0], 0.0, PosZ[0], 0.0, "N/A");
-        fp_out << buf;
-      }
-      else if (m_spacecraftPositionSolveType == 1) {
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-      }
-      else if (m_spacecraftPositionSolveType == 2) {
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-      }
-      else if (m_spacecraftPositionSolveType == 3) {
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n", PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Xa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosX[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        Y%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
-                PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Ya%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosY[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "        Z%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
-                PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       Za%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                PosZ[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-        fp_out << buf;
-        nIndex++;
-      }
-
-      if (m_cmatrixSolveType == 0) {
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
-        sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
-      }
-      else if (m_cmatrixSolveType == 1) {
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-
-        if (!m_bSolveTwist) {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+      if( m_nConstrainedPointParameters > 0 ) {
+          sprintf(buf, "\n   Constrained Point Parameters: %6d",m_nConstrainedPointParameters);
           fp_out << buf;
-        }
-        else {
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-          fp_out << buf;
-          nIndex++;
-        }
       }
-      else if (m_cmatrixSolveType == 2) {
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-
-        if (!m_bSolveTwist) {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+      if( m_nConstrainedImageParameters > 0 ){
+          sprintf(buf, "\n   Constrained Image Parameters: %6d",m_nConstrainedImageParameters);
           fp_out << buf;
-        }
-        else {
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-          fp_out << buf;
-          nIndex++;
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-          fp_out << buf;
-          nIndex++;
-        }
       }
-      else if (m_cmatrixSolveType == 3 || m_cmatrixSolveType == 4) {
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n", (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n", (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "      RAa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n", (coefRA[2] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[2]*RAD2DEG, m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n", (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n", (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-        dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-        sprintf(buf, "     DECa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n", (coefDEC[2] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[2]*RAD2DEG, m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-        fp_out << buf;
-        nIndex++;
-
-        if (!m_bSolveTwist) {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+      sprintf(buf,"\n                       Unknowns: %6d",m_nUnknownParameters);
+      fp_out << buf;
+      if( nInnerConstraints > 0) {
+          sprintf(buf, "\n      Inner Constraints: %6d",nInnerConstraints);
           fp_out << buf;
-        }
-        else {
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-          fp_out << buf;
-          nIndex++;
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-          fp_out << buf;
-          nIndex++;
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          sprintf(buf, "   TWISTa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  (coefTWI[2] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[2]*RAD2DEG, m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-          fp_out << buf;
-          nIndex++;
-        }
       }
-    }
+      if( nDistanceConstraints > 0) {
+          sprintf(buf, "\n   Distance Constraints: %d",nDistanceConstraints);
+          fp_out << buf;
+      }
 
-    fp_out << "\n\n\n";
-
-    // output point data
-    sprintf(buf, "\nPOINTS SUMMARY\n==============\n%91sSigma           Sigma             Sigma\n"
-            "           Label   Status     Rays        Latitude       Longitude          Radius"
-            "        Latitude       Longitude          Radius\n", "");
-    fp_out << buf;
-
-    int nRays = 0;
-    double dLat, dLon, dRadius;
-    double dSigmaLat, dSigmaLong, dSigmaRadius;
-    double cor_lat_dd, cor_lon_dd, cor_rad_m;
-    double cor_lat_m, cor_lon_m;
-    double dLatInit, dLonInit, dRadiusInit;
-    int nGoodRays;
-
-    std::string strStatus;
-    int nPointIndex = 0;
-
-    int nPoints = m_pCnet->GetNumPoints();
-    for (int i = 0; i < nPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored())
-        continue;
-
-      nRays = point->GetNumMeasures();
-      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
-      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
-      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
-      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
-      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
-      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
-      nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-//     Held point type is obsolete
-//     if( point->Held() )
-//       strStatus = "HELD";
-//     else if( point->Type() == ControlPoint::Ground)
-      if (point->GetType() == ControlPoint::Ground)
-        strStatus = "GROUND";
-      else if (point->GetType() == ControlPoint::Tie)
-        strStatus = "TIE";
-      else
-        strStatus = "UNKNOWN";
-
-      sprintf(buf, "%16s%9s%5d of %d%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-              point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon, dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
-
+      sprintf(buf,"\n             Degrees of Freedom: %6d",nDegreesOfFreedom);
       fp_out << buf;
-      nPointIndex++;
-    }
-
-    // output point data
-    sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
-    fp_out << buf;
-
-    nPointIndex = 0;
-    for (int i = 0; i < nPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored())
-        continue;
-
-      nRays = point->GetNumMeasures();
-      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
-      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
-      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
-      dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
-      dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
-      dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
-      nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-      // point corrections and initial sigmas
-      bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
-      bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
-
-      cor_lat_dd = corrections[0] * Isis::RAD2DEG;
-      cor_lon_dd = corrections[1] * Isis::RAD2DEG;
-      cor_rad_m  = corrections[2] * 1000.0;
-
-      cor_lat_m = corrections[0] * m_dRTM;
-      cor_lon_m = corrections[1] * m_dRTM / cos(dLat);
-
-      dLatInit = dLat - cor_lat_dd;
-      dLonInit = dLon - cor_lon_dd;
-      dRadiusInit = dRadius - (corrections[2] * 1000.0);
-
-// Held method is obsolete
-//     if( point->Held() )
-//       strStatus = "HELD";
-//     else if( point->Type() == ControlPoint::Ground)
-      if (point->GetType() == ControlPoint::Ground)
-        strStatus = "GROUND";
-      else if (point->GetType() == ControlPoint::Tie)
-        strStatus = "TIE";
-      else
-        strStatus = "UNKNOWN";
-
-      sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n", point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays);
+      sprintf(buf,"\n           Convergence Criteria: %6.3g",m_dConvergenceThreshold);
       fp_out << buf;
 
-//       sprintf(buf,"%16s%9s%9d\n",
-//               point->Id().c_str(),strStatus.c_str(),nRays);
-//       fp_out << buf;
+      if( nConvergenceCriteria == 1 ) {
+          sprintf(buf, "(Sigma0)");
+          fp_out << buf;
+      }
 
-      sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
-              "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
-              "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
+      sprintf(buf, "\n                     Iterations: %6d",m_nIteration);
       fp_out << buf;
 
-      sprintf(buf, "  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
-              dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], dSigmaLat);
+      if( m_nIteration >= m_nMaxIterations ) {
+          sprintf(buf, "(Maximum reached)");
+          fp_out << buf;
+      }
+
+//      sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
+      sprintf(buf, "\n                         Sigma0: %30.20lf\n",m_dSigma0);
+      fp_out << buf;
+      sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTimeErrorProp);
+      fp_out << buf;
+      sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
       fp_out << buf;
 
-      sprintf(buf, " LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
-              dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], dSigmaLong);
+      double dSigma;
+      int nIndex = 0;
+      int nMeasures;
+      int nRejectedMeasures;
+
+    sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
       fp_out << buf;
 
-      sprintf(buf, "    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n\n",
-              dRadiusInit * 0.001, corrections[2], cor_rad_m, dRadius * 0.001, apriorisigmas[2], dSigmaRadius);
+      for ( int i = 0; i < nImages; i++ ) {
 
+          nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+          nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
+          int nUsed = nMeasures - nRejectedMeasures;
+
+          if( nUsed == nMeasures )
+              sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+          else
+              sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+          fp_out << buf;
+      }
+
+      sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
       fp_out << buf;
 
-      nPointIndex++;
-    }
+      for ( int i = 0; i < nImages; i++ ) {
 
-    fp_out.close();
+          if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+              bHeld = true;
 
-    return true;
+          pCamera = m_pCnet->Camera(i);
+          if ( !pCamera )
+              continue;
+
+//          nIndex = ImageIndex(i) * m_nNumImagePartials;
+
+          // if not a frame camera, SetImage to center line and sample
+//          if( pCamera->GetCameraType() != 0 ) {
+//              if( !pCamera->SetImage(pCamera->Samples()/2,pCamera->Lines()) )
+//                  continue;
+//          }
+
+          pSpicePosition = pCamera->InstrumentPosition();
+          if ( !pSpicePosition )
+              continue;
+
+          pSpiceRotation = pCamera->InstrumentRotation();
+          if ( !pSpiceRotation )
+              continue;
+
+          if ( m_spacecraftPositionSolveType > 0 )
+              pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+          else {
+              pSpicePosition->SetPolynomial();
+              pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+          }
+
+          if ( m_cmatrixSolveType > 0 ) {
+              angles = pSpiceRotation->Angles(3,1,3);
+              pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+          }
+          else {
+              angles = pSpiceRotation->Angles(3,1,3);
+              pSpiceRotation->SetPolynomial();
+              pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+          }
+
+          sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
+          fp_out << buf;
+          sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
+          fp_out << buf;
+          sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
+                  "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
+          fp_out << buf;
+
+          if ( m_spacecraftPositionSolveType == 0 ) {
+              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosX[0], 0.0, PosX[0], 0.0, "N/A");
+              fp_out << buf;
+              sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosY[0], 0.0, PosY[0], 0.0, "N/A");
+              fp_out << buf;
+              sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosZ[0], 0.0, PosZ[0], 0.0, "N/A");
+              fp_out << buf;
+          }
+          else if ( m_spacecraftPositionSolveType == 1 ) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+
+              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+          }
+          else if (m_spacecraftPositionSolveType == 2) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+          }
+          else if ( m_spacecraftPositionSolveType == 3 ) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Xa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosX[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosX[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        Y%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
+                      PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Ya%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosY[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosY[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "        Z%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
+                      PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       Za%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      PosZ[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                      PosZ[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
+              fp_out << buf;
+              nIndex++;
+          }
+
+          if( m_cmatrixSolveType > 0 && m_nsolveCamDegree > 2 && m_nNumberCameraCoefSolved > 2 ) {
+              char strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+              std::ostringstream ostr;
+              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                  if( i ==0 )
+                      ostr << "  " << strcoeff;
+                  else if ( i == 1 )
+                      ostr << " " << strcoeff << "t";
+                  else
+                      ostr << strcoeff << "t" << i;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+//                  sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+//                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+//                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[i]*RAD2DEG,
+//                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)),
+                          m_Image_Corrections(nIndex), coefRA[i],
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  ostr.str("");
+                  strcoeff--;
+                  nIndex++;
+              }
+              strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                  if( i ==0 )
+                      ostr << "  " << strcoeff;
+                  else if ( i == 1 )
+                      ostr << " " << strcoeff << "t";
+                  else
+                      ostr << strcoeff << "t" << i;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  ostr.str("");
+                  strcoeff--;
+                  nIndex++;
+              }
+              if ( !m_bSolveTwist ) {
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                  fp_out << buf;
+              }
+              else {
+                  strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+                  for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                      if( i ==0 )
+                          ostr << "  " << strcoeff;
+                      else if ( i == 1 )
+                          ostr << " " << strcoeff << "t";
+                      else
+                          ostr << strcoeff << "t" << i;
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                      fp_out << buf;
+                      ostr.str("");
+                      strcoeff--;
+                      nIndex++;
+                  }
+              }
+          }
+          else if ( m_cmatrixSolveType == 0 ) {
+              sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
+              fp_out << buf;
+              sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
+              fp_out << buf;
+              sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+              fp_out << buf;
+          }
+          else if ( m_cmatrixSolveType == 1 ) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
+                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
+                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+
+              if ( !m_bSolveTwist ) {
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                  fp_out << buf;
+              }
+              else {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+              }
+          }
+          else if ( m_cmatrixSolveType == 2 ) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
+                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
+                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
+                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
+                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+
+              if ( !m_bSolveTwist ) {
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                  fp_out << buf;
+              }
+              else {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
+                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+              }
+          }
+          else if ( m_cmatrixSolveType == 3 || m_cmatrixSolveType == 4 ) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
+                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
+                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "      RAa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefRA[2] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[2]*RAD2DEG,
+                      m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
+                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
+                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              sprintf(buf, "     DECa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                      (coefDEC[2] - m_Image_Corrections(nIndex))*RAD2DEG,
+                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[2]*RAD2DEG,
+                      m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
+              fp_out << buf;
+              nIndex++;
+
+              if ( !m_bSolveTwist ) {
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                  fp_out << buf;
+              }
+              else {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
+                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "   TWISTa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefTWI[2] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[2]*RAD2DEG,
+                          m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+              }
+          }
+      }
+
+      fp_out << "\n\n\n";
+
+      // output point data
+      sprintf(buf, "\nPOINTS SUMMARY\n==============\n%91sSigma           Sigma             Sigma\n"
+              "           Label   Status     Rays        Latitude       Longitude          Radius"
+              "        Latitude       Longitude          Radius\n", "");
+      fp_out << buf;
+
+      int nRays = 0;
+      double dLat, dLon, dRadius;
+      double dSigmaLat, dSigmaLong, dSigmaRadius;
+      double cor_lat_dd, cor_lon_dd, cor_rad_m;
+      double cor_lat_m, cor_lon_m;
+      double dLatInit, dLonInit, dRadiusInit;
+      int nGoodRays;
+      std::string strStatus;
+      int nPointIndex = 0;
+
+      int nPoints = m_pCnet->GetNumPoints();
+      for ( int i = 0; i < nPoints; i++ ) {
+
+          const ControlPoint *point = m_pCnet->GetPoint(i);
+          if ( point->IsIgnored() )
+              continue;
+
+          nRays = point->GetNumMeasures();
+          dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+          dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+          dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+          dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+          dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+          dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+          nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+
+          if (point->GetType() == ControlPoint::Ground)
+              strStatus = "GROUND";
+          else if (point->GetType() == ControlPoint::Tie)
+              strStatus = "TIE";
+          else
+              strStatus = "UNKNOWN";
+
+          sprintf(buf, "%16s%9s%5d of %d%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
+                  point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon,
+                  dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
+          fp_out << buf;
+          nPointIndex++;
+      }
+
+      // output point data
+      sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
+      fp_out << buf;
+
+      nPointIndex = 0;
+      for ( int i = 0; i < nPoints; i++ ) {
+
+          const ControlPoint *point = m_pCnet->GetPoint(i);
+          if ( point->IsIgnored() )
+              continue;
+
+          nRays = point->GetNumMeasures();
+          dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+          dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+          dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+          dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+          dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+          dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+          nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+
+          // point corrections and initial sigmas
+          bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+          bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
+
+          cor_lat_dd = corrections[0] * Isis::RAD2DEG;
+          cor_lon_dd = corrections[1] * Isis::RAD2DEG;
+          cor_rad_m  = corrections[2] * 1000.0;
+
+          cor_lat_m = corrections[0] * m_dRTM;
+          cor_lon_m = corrections[1] * m_dRTM * cos(dLat*Isis::DEG2RAD);
+
+          dLatInit = dLat - cor_lat_dd;
+          dLonInit = dLon - cor_lon_dd;
+          dRadiusInit = dRadius - (corrections[2] * 1000.0);
+
+          if (point->GetType() == ControlPoint::Ground)
+              strStatus = "GROUND";
+          else if (point->GetType() == ControlPoint::Tie)
+              strStatus = "TIE";
+          else
+              strStatus = "UNKNOWN";
+
+          sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
+                  point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays);
+          fp_out << buf;
+
+          sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
+                  "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
+                  "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
+          fp_out << buf;
+
+          sprintf(buf, "  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
+                  dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], dSigmaLat);
+          fp_out << buf;
+
+          sprintf(buf, " LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
+                  dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], dSigmaLong);
+          fp_out << buf;
+
+          sprintf(buf, "    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n\n",
+                  dRadiusInit * 0.001, corrections[2], cor_rad_m, dRadius * 0.001,
+                  apriorisigmas[2], dSigmaRadius);
+
+          fp_out << buf;
+          nPointIndex++;
+      }
+
+      fp_out.close();
+
+      return true;
   }
 
-  /**
+    /**
+     * output bundle results to file with error propagation
+
+        bool BundleAdjust::OutputWithErrorPropagation() {
+
+          std::ofstream fp_out("bundleout.txt", std::ios::out);
+          if (!fp_out)
+              return false;
+
+          char buf[1056];
+          bool bHeld = false;
+          std::vector<double> PosX(3);
+          std::vector<double> PosY(3);
+          std::vector<double> PosZ(3);
+          std::vector<double> coefRA(m_nNumberCameraCoefSolved);
+          std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
+          std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+          std::vector<double> angles;
+          std::vector<double> angvel;
+          Camera *pCamera = NULL;
+          SpicePosition *pSpicePosition = NULL;
+          SpiceRotation *pSpiceRotation = NULL;
+
+          int nImages = Images();
+          int nValidPoints = m_pCnet->GetNumValidPoints();
+          int nInnerConstraints = 0;
+          int nDistanceConstraints = 0;
+          int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
+          int nConvergenceCriteria = 1;
+
+          bool bSolveSparse = false;
+
+          gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
+
+          if( m_strSolutionMethod == "SPARSE" )
+          {
+              lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
+              bSolveSparse = true;
+          }
+
+          sprintf(buf, "\n\t\tJIGSAW: BUNDLE ADJUSTMENT\n\t\t=========================\n");
+          fp_out << buf;
+          sprintf(buf,"\n               Network Filename: %s", m_strCnetFilename.c_str());
+          fp_out << buf;
+          sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
+          fp_out << buf;
+          sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().c_str());
+          fp_out << buf;
+          sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().c_str());
+          fp_out << buf;
+          sprintf(buf,"\n                  Solution Type: %s", m_strSolutionMethod.c_str());
+          fp_out << buf;
+          sprintf(buf,"\n                   Linear Units: kilometers");
+          fp_out << buf;
+          sprintf(buf,"\n                  Angular Units: decimal degrees");
+          fp_out << buf;
+          sprintf(buf,"\n\n                         Images: %6d",nImages);
+          fp_out << buf;
+          sprintf(buf,"\n                         Points: %6d",nValidPoints);
+          fp_out << buf;
+          sprintf(buf,"\n                 Total Measures: %6d",(m_nObservations+m_nRejectedObservations)/2);
+          fp_out << buf;
+          sprintf(buf,"\n             Total Observations: %6d",m_nObservations+m_nRejectedObservations);
+          fp_out << buf;
+          sprintf(buf,"\n              Good Observations: %6d",m_nObservations);
+          fp_out << buf;
+          sprintf(buf,"\n          Rejected Observations: %6d",m_nRejectedObservations);
+          fp_out << buf;
+
+          if( m_nConstrainedPointParameters > 0 ) {
+              sprintf(buf, "\n   Constrained Point Parameters: %6d",m_nConstrainedPointParameters);
+              fp_out << buf;
+          }
+          if( m_nConstrainedImageParameters > 0 ){
+              sprintf(buf, "\n   Constrained Image Parameters: %6d",m_nConstrainedImageParameters);
+              fp_out << buf;
+          }
+          sprintf(buf,"\n                       Unknowns: %6d",m_nUnknownParameters);
+          fp_out << buf;
+          if( nInnerConstraints > 0) {
+              sprintf(buf, "\n      Inner Constraints: %6d",nInnerConstraints);
+              fp_out << buf;
+          }
+          if( nDistanceConstraints > 0) {
+              sprintf(buf, "\n   Distance Constraints: %d",nDistanceConstraints);
+              fp_out << buf;
+          }
+
+          sprintf(buf,"\n             Degrees of Freedom: %6d",nDegreesOfFreedom);
+          fp_out << buf;
+          sprintf(buf,"\n           Convergence Criteria: %6.3g",m_dConvergenceThreshold);
+          fp_out << buf;
+
+          if( nConvergenceCriteria == 1 ) {
+              sprintf(buf, "(Sigma0)");
+              fp_out << buf;
+          }
+
+          sprintf(buf, "\n                     Iterations: %6d",m_nIteration);
+          fp_out << buf;
+
+          if( m_nIteration >= m_nMaxIterations ) {
+              sprintf(buf, "(Maximum reached)");
+              fp_out << buf;
+          }
+
+    //      sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
+          sprintf(buf, "\n                         Sigma0: %30.20lf\n",m_dSigma0);
+          fp_out << buf;
+          sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTimeErrorProp);
+          fp_out << buf;
+          sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
+          fp_out << buf;
+
+          double dSigma;
+          int nIndex = 0;
+          int nMeasures;
+          int nRejectedMeasures;
+
+        sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
+          fp_out << buf;
+
+          for ( int i = 0; i < nImages; i++ ) {
+
+              nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+              nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
+              int nUsed = nMeasures - nRejectedMeasures;
+
+              if( nUsed == nMeasures )
+                  sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+              else
+                  sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+              fp_out << buf;
+          }
+
+          sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
+          fp_out << buf;
+
+          for ( int i = 0; i < nImages; i++ ) {
+
+              if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+                  bHeld = true;
+
+              pCamera = m_pCnet->Camera(i);
+              if ( !pCamera )
+                  continue;
+
+              // if not a frame camera, SetImage to center line and sample
+              if( pCamera->GetCameraType() != 0 ) {
+                  if( !pCamera->SetImage(pCamera->Samples()/2,pCamera->Lines()) )
+                      continue;
+              }
+
+              pSpicePosition = pCamera->InstrumentPosition();
+              if ( !pSpicePosition )
+                  continue;
+
+              pSpiceRotation = pCamera->InstrumentRotation();
+              if ( !pSpiceRotation )
+                  continue;
+
+              if ( m_spacecraftPositionSolveType > 0 )
+                  pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+              else {
+                  pSpicePosition->SetPolynomial();
+                  pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+              }
+
+              if ( m_cmatrixSolveType > 0 ) {
+                  angles = pSpiceRotation->Angles(3,1,3);
+                  pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+              }
+              else {
+                  angles = pSpiceRotation->Angles(3,1,3);
+                  pSpiceRotation->SetPolynomial();
+                  pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+              }
+
+              sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
+              fp_out << buf;
+              sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
+              fp_out << buf;
+              sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
+                      "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
+              fp_out << buf;
+
+              if ( m_spacecraftPositionSolveType == 0 ) {
+                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosX[0], 0.0, PosX[0], 0.0, "N/A");
+                  fp_out << buf;
+                  sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosY[0], 0.0, PosY[0], 0.0, "N/A");
+                  fp_out << buf;
+                  sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosZ[0], 0.0, PosZ[0], 0.0, "N/A");
+                  fp_out << buf;
+              }
+              else if ( m_spacecraftPositionSolveType == 1 ) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+
+                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+              }
+              else if (m_spacecraftPositionSolveType == 2) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+              }
+              else if ( m_spacecraftPositionSolveType == 3 ) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Xa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosX[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosX[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        Y%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
+                          PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Ya%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosY[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosY[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "        Z%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
+                          PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       Za%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          PosZ[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
+                          PosZ[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
+                  fp_out << buf;
+                  nIndex++;
+              }
+
+              if ( m_cmatrixSolveType == 0 ) {
+                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
+                  fp_out << buf;
+                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
+                  fp_out << buf;
+                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                  fp_out << buf;
+              }
+              else if ( m_cmatrixSolveType == 1 ) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+
+                  if ( !m_bSolveTwist ) {
+                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                      fp_out << buf;
+                  }
+                  else {
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                      fp_out << buf;
+                      nIndex++;
+                  }
+              }
+              else if ( m_cmatrixSolveType == 2 ) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
+                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
+                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+
+                  if ( !m_bSolveTwist ) {
+                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                      fp_out << buf;
+                  }
+                  else {
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                      fp_out << buf;
+                      nIndex++;
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
+                              m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                      fp_out << buf;
+                      nIndex++;
+                  }
+              }
+              else if ( m_cmatrixSolveType == 3 || m_cmatrixSolveType == 4 ) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
+                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "      RAa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefRA[2] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[2]*RAD2DEG,
+                          m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
+                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  sprintf(buf, "     DECa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          (coefDEC[2] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[2]*RAD2DEG,
+                          m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
+                  fp_out << buf;
+                  nIndex++;
+
+                  if ( !m_bSolveTwist ) {
+                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+                      fp_out << buf;
+                  }
+                  else {
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                      fp_out << buf;
+                      nIndex++;
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
+                              m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
+                      fp_out << buf;
+                      nIndex++;
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      sprintf(buf, "   TWISTa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              (coefTWI[2] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[2]*RAD2DEG,
+                              m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
+                      fp_out << buf;
+                      nIndex++;
+                  }
+              }
+          }
+
+          fp_out << "\n\n\n";
+
+          // output point data
+          sprintf(buf, "\nPOINTS SUMMARY\n==============\n%91sSigma           Sigma             Sigma\n"
+                  "           Label   Status     Rays        Latitude       Longitude          Radius"
+                  "        Latitude       Longitude          Radius\n", "");
+          fp_out << buf;
+
+          int nRays = 0;
+          double dLat, dLon, dRadius;
+          double dSigmaLat, dSigmaLong, dSigmaRadius;
+          double cor_lat_dd, cor_lon_dd, cor_rad_m;
+          double cor_lat_m, cor_lon_m;
+          double dLatInit, dLonInit, dRadiusInit;
+          int nGoodRays;
+          std::string strStatus;
+          int nPointIndex = 0;
+
+          int nPoints = m_pCnet->GetNumPoints();
+          for ( int i = 0; i < nPoints; i++ ) {
+
+              const ControlPoint *point = m_pCnet->GetPoint(i);
+              if ( point->IsIgnored() )
+                  continue;
+
+              nRays = point->GetNumMeasures();
+              dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+              dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+              dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+              dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+              dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+              dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+              nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+
+              if (point->GetType() == ControlPoint::Ground)
+                  strStatus = "GROUND";
+              else if (point->GetType() == ControlPoint::Tie)
+                  strStatus = "TIE";
+              else
+                  strStatus = "UNKNOWN";
+
+              sprintf(buf, "%16s%9s%5d of %d%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
+                      point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon,
+                      dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
+              fp_out << buf;
+              nPointIndex++;
+          }
+
+          // output point data
+          sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
+          fp_out << buf;
+
+          nPointIndex = 0;
+          for ( int i = 0; i < nPoints; i++ ) {
+
+              const ControlPoint *point = m_pCnet->GetPoint(i);
+              if ( point->IsIgnored() )
+                  continue;
+
+              nRays = point->GetNumMeasures();
+              dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+              dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+              dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+              dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+              dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+              dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+              nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+
+              // point corrections and initial sigmas
+              bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+              bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
+
+              cor_lat_dd = corrections[0] * Isis::RAD2DEG;
+              cor_lon_dd = corrections[1] * Isis::RAD2DEG;
+              cor_rad_m  = corrections[2] * 1000.0;
+
+              cor_lat_m = corrections[0] * m_dRTM;
+              cor_lon_m = corrections[1] * m_dRTM * cos(dLat*Isis::DEG2RAD);
+
+              dLatInit = dLat - cor_lat_dd;
+              dLonInit = dLon - cor_lon_dd;
+              dRadiusInit = dRadius - (corrections[2] * 1000.0);
+
+              if (point->GetType() == ControlPoint::Ground)
+                  strStatus = "GROUND";
+              else if (point->GetType() == ControlPoint::Tie)
+                  strStatus = "TIE";
+              else
+                  strStatus = "UNKNOWN";
+
+              sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
+                      point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays);
+              fp_out << buf;
+
+              sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
+                      "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
+                      "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
+              fp_out << buf;
+
+              sprintf(buf, "  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
+                      dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], dSigmaLat);
+              fp_out << buf;
+
+              sprintf(buf, " LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
+                      dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], dSigmaLong);
+              fp_out << buf;
+
+              sprintf(buf, "    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n\n",
+                      dRadiusInit * 0.001, corrections[2], cor_rad_m, dRadius * 0.001,
+                      apriorisigmas[2], dSigmaRadius);
+
+              fp_out << buf;
+              nPointIndex++;
+          }
+
+          fp_out.close();
+
+          return true;
+      }
+*/
+   /**
    * output bundle results to file with no error propagation
    */
   bool BundleAdjust::OutputNoErrorPropagation() {
-    char buf[1056];
+
+      std::ofstream fp_out("bundleout.txt", std::ios::out);
+      if (!fp_out)
+        return false;
+
+      char buf[1056];
 
     bool bHeld = false;
     std::vector<double> PosX(3);
@@ -4424,10 +5624,6 @@ namespace Isis {
     SpicePosition *pSpicePosition = NULL;
     SpiceRotation *pSpiceRotation = NULL;
 
-    std::ofstream fp_out("bundleout.txt", std::ios::out);
-    if (!fp_out)
-      return false;
-
     int nImages = Images();
     int nValidPoints = m_pCnet->GetNumValidPoints();
     int nInnerConstraints = 0;
@@ -4437,67 +5633,91 @@ namespace Isis {
 
     sprintf(buf, "\n\t\tJIGSAW: BUNDLE ADJUSTMENT\n\t\t=========================\n");
     fp_out << buf;
-    sprintf(buf, "\n               Network Filename: %s", p_cnetFile.c_str());
+    sprintf(buf,"\n               Network Filename: %s", m_strCnetFilename.c_str());
     fp_out << buf;
-    sprintf(buf, "\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
+    sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
     fp_out << buf;
-    sprintf(buf, "\n            Network Description: %s", m_pCnet->Description().c_str());
+    sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().c_str());
     fp_out << buf;
-    sprintf(buf, "\n                         Target: %s", m_pCnet->GetTarget().c_str());
+    sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().c_str());
     fp_out << buf;
-    sprintf(buf, "\n                   Linear Units: kilometers");
+    sprintf(buf,"\n                   Linear Units: kilometers");
     fp_out << buf;
-    sprintf(buf, "\n                  Angular Units: decimal degrees");
+    sprintf(buf,"\n                  Angular Units: decimal degrees");
     fp_out << buf;
-    sprintf(buf, "\n\n                         Images: %6d", nImages);
+    sprintf(buf,"\n\n                         Images: %6d",nImages);
     fp_out << buf;
-    sprintf(buf, "\n                         Points: %6d", nValidPoints);
+    sprintf(buf,"\n                         Points: %6d",nValidPoints);
     fp_out << buf;
-    sprintf(buf, "\n                   Observations: %6d", m_nObservations);
+    sprintf(buf,"\n                 Total Measures: %6d",(m_nObservations+m_nRejectedObservations)/2);
     fp_out << buf;
-    sprintf(buf, "\n                       Unknowns: %6d", m_nUnknownParameters);
+    sprintf(buf,"\n             Total Observations: %6d",m_nObservations+m_nRejectedObservations);
     fp_out << buf;
-    if (m_nConstrainedPointParameters > 0) {
-      sprintf(buf, "\n   Constrained Point Parameters: %6d", m_nConstrainedPointParameters);
+    sprintf(buf,"\n              Good Observations: %6d",m_nObservations);
+    fp_out << buf;
+    sprintf(buf,"\n          Rejected Observations: %6d",m_nRejectedObservations);
+    fp_out << buf;
+    sprintf(buf,"\n                       Unknowns: %6d",m_nUnknownParameters);
+    fp_out << buf;
+    if( m_nConstrainedPointParameters > 0)
+    {
+      sprintf(buf,"\n   Constrained Point Parameters: %6d",m_nConstrainedPointParameters);
       fp_out << buf;
     }
-    if (m_nConstrainedImageParameters > 0) {
-      sprintf(buf, "\n   Constrained Image Parameters: %6d", m_nConstrainedImageParameters);
+    if( m_nConstrainedImageParameters > 0)
+    {
+      sprintf(buf,"\n  Constrained Image Parameters: %6d",m_nConstrainedImageParameters);
       fp_out << buf;
     }
-    if (nInnerConstraints > 0) {
-      sprintf(buf, "\n      Inner Constraints: %6d", nInnerConstraints);
+    if( nInnerConstraints > 0)
+    {
+      sprintf(buf,"\n      Inner Constraints: %6d",nInnerConstraints);
       fp_out << buf;
     }
-    if (nDistanceConstraints > 0) {
-      sprintf(buf, "\n   Distance Constraints: %d", nDistanceConstraints);
+    if( nDistanceConstraints > 0)
+    {
+      sprintf(buf, "\n   Distance Constraints: %d",nDistanceConstraints);
       fp_out << buf;
     }
-    sprintf(buf, "\n             Degrees of Freedom: %6d", nDegreesOfFreedom);
+    sprintf(buf,"\n             Degrees of Freedom: %6d",nDegreesOfFreedom);
     fp_out << buf;
-    sprintf(buf, "\n           Convergence Criteria: %6.3g", m_dConvergenceThreshold);
+    sprintf(buf,"\n           Convergence Criteria: %6.3g",m_dConvergenceThreshold);
     fp_out << buf;
-    if (nConvergenceCriteria == 1) {
+    if( nConvergenceCriteria == 1)
+    {
       sprintf(buf, "(Sigma0)");
       fp_out << buf;
     }
-    sprintf(buf, "\n                     Iterations: %6d", m_nIteration);
+    sprintf(buf, "\n                     Iterations: %6d",m_nIteration);
     fp_out << buf;
-    if (m_nIteration >= m_nMaxIterations) {
+    if( m_nIteration >= m_nMaxIterations )
+    {
       sprintf(buf, "(Maximum reached)");
       fp_out << buf;
     }
-    sprintf(buf, "\n                         Sigma0: %6.4lf\n", m_dSigma0);
+    sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
     fp_out << buf;
-    sprintf(buf, "                   Elapsed Time: %6.4lf (seconds)\n", m_dElapsedTime);
-    fp_out << buf;
-
-    sprintf(buf, "\n  Meters to Radians Conversion: %6.4g\n", m_dMTR);
-    fp_out << buf;
-    sprintf(buf, "\n  Radians to Meters Conversion: %6.4g\n", m_dRTM);
+    sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
     fp_out << buf;
 
     int nIndex = 0;
+    int nMeasures;
+    int nRejectedMeasures;
+
+    sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
+    fp_out << buf;
+
+    for (int i = 0; i < nImages; i++)
+    {
+      nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+      nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
+      int nUsed = nMeasures - nRejectedMeasures;
+      if( nUsed == nMeasures)
+          sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+      else
+          sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+      fp_out << buf;
+    }
 
     sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION ***J2000***\n==========================\n");
     fp_out << buf;
@@ -4605,7 +5825,7 @@ namespace Isis {
                 PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
         fp_out << buf;
         nIndex++;
-        sprintf(buf, "       Y1%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+        sprintf(buf, "       Y2%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                 PosY[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[2], m_dGlobalSpacecraftAccelerationAprioriSigma, "N/A");
         fp_out << buf;
         nIndex++;
@@ -4617,7 +5837,7 @@ namespace Isis {
                 PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
         fp_out << buf;
         nIndex++;
-        sprintf(buf, "       Z1%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+        sprintf(buf, "       Z2%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                 PosZ[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[2], m_dGlobalSpacecraftAccelerationAprioriSigma, "N/A");
         fp_out << buf;
         nIndex++;
@@ -4735,41 +5955,108 @@ namespace Isis {
     fp_out << "\n\n\n";
 
     // output point data
-    sprintf(buf, "\nPOINTS\n======\n%91sSigma           Sigma             Sigma\n"
-            "           Label   Status     Rays        Latitude       Longitude          Radius"
-            "        Latitude       Longitude          Radius\n", "");
+    sprintf(buf,"\nPOINTS SUMMARY\n==============\n%91sSigma           Sigma             Sigma\n"
+                "           Label   Status     Rays        Latitude       Longitude          Radius"
+                "        Latitude       Longitude          Radius\n","");
     fp_out << buf;
 
     int nRays = 0;
-    double dLat, dLon, dRadius;
+    double dLat,dLon,dRadius;
+    double cor_lat_dd,cor_lon_dd,cor_rad_m;
+    double cor_lat_m,cor_lon_m;
+    double dLatInit,dLonInit,dRadiusInit;
+    int nGoodRays;
+
     std::string strStatus;
 
     int nPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nPoints; i++) {
-      const ControlPoint *point = m_pCnet->GetPoint(i);
 
-      if (point->IsIgnored())
-        continue;
+        const ControlPoint* point = m_pCnet->GetPoint(i);
+        if( point->IsIgnored() )
+            continue;
 
-      nRays = point->GetNumMeasures();
-      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
-      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
-      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
+        nRays = point->GetNumMeasures();
+        dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+        dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+        nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
-//     if( point->Held() )
-//       strStatus = "HELD";
-//     else if( point->Type() == ControlPoint::Ground)
-      if (point->GetType() == ControlPoint::Ground)
-        strStatus = "GROUND";
-      else if (point->GetType() == ControlPoint::Tie)
-        strStatus = "TIE";
-      else
-        strStatus = "UNKNOWN";
+        if( point->GetType() == ControlPoint::Ground)
+            strStatus = "GROUND";
+        else if( point->GetType() == ControlPoint::Tie)
+            strStatus = "TIE";
+        else
+            strStatus = "UNKNOWN";
 
-      sprintf(buf, "%16s%9s%9d%16.8lf%16.8lf%16.8lf%16s%16s%16s\n",
-              point->GetId().c_str(), strStatus.c_str(), nRays, dLat, dLon, dRadius * 0.001, "N/A", "N/A", "N/A");
+        sprintf(buf, "%16s%9s%4d of %d%16.8lf%16.8lf%16.8lf%16s%16s%16s\n",
+                point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon,
+                dRadius * 0.001,"N/A","N/A","N/A");
 
-      fp_out << buf;
+        fp_out << buf;
+    }
+
+    sprintf(buf,"\n\nPOINTS DETAIL\n=============\n\n");
+    fp_out << buf;
+
+    int nPointIndex = 0;
+    for (int i = 0; i < nPoints; i++) {
+
+        const ControlPoint* point = m_pCnet->GetPoint(i);
+        if( point->IsIgnored() )
+            continue;
+
+        nRays = point->GetNumMeasures();
+        dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+        dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+        nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+
+        // point corrections and initial sigmas
+        bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
+        bounded_vector<double,3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
+
+        cor_lat_dd = corrections[0]*Isis::RAD2DEG;
+        cor_lon_dd = corrections[1]*Isis::RAD2DEG;
+        cor_rad_m  = corrections[2]*1000.0;
+
+        cor_lat_m = corrections[0]*m_dRTM;
+        cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
+
+        dLatInit = dLat-cor_lat_dd;
+        dLonInit = dLon-cor_lon_dd;
+        dRadiusInit = dRadius-(corrections[2]*1000.0);
+
+        if( point->GetType() == ControlPoint::Ground)
+            strStatus = "GROUND";
+        else if( point->GetType() == ControlPoint::Tie)
+            strStatus = "TIE";
+        else
+            strStatus = "UNKNOWN";
+
+        sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",
+                point->GetId().c_str(),strStatus.c_str(),nGoodRays,nRays);
+        fp_out << buf;
+
+        sprintf(buf,"\n     Point         Initial               Total               Total              Final             Initial             Final\n"
+                "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
+                "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
+        fp_out << buf;
+
+        sprintf(buf,"  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
+                dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], "N/A");
+        fp_out << buf;
+
+        sprintf(buf," LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
+                dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], "N/A");
+        fp_out << buf;
+
+        sprintf(buf,"    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n\n",
+                dRadiusInit*0.001, corrections[2], cor_rad_m, dRadius*0.001, apriorisigmas[2], "N/A");
+
+        fp_out << buf;
+
+        nPointIndex++;
     }
 
     fp_out.close();
@@ -4790,22 +6077,26 @@ namespace Isis {
     int nPoints = m_pCnet->GetNumPoints();
 
     double dLat, dLon, dRadius;
+    double dX, dY, dZ;
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     std::string strStatus;
 
     for (int i = 0; i < nPoints; i++) {
       const ControlPoint *point = m_pCnet->GetPoint(i);
 
-      if (point->IsIgnored())
+      if ( !point )
+          continue;
+
+      if ( point->IsIgnored() || point->IsRejected() )
         continue;
 
-      dLat = point->GetSurfacePoint().GetLatitude().GetRadians();
-      dLon = point->GetSurfacePoint().GetLongitude().GetRadians();
-      dRadius = point->GetSurfacePoint().GetLocalRadius().GetMeters();
+      dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+      dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers();
+      dX = point->GetAdjustedSurfacePoint().GetX().GetKilometers();
+      dY = point->GetAdjustedSurfacePoint().GetY().GetKilometers();
+      dZ = point->GetAdjustedSurfacePoint().GetZ().GetKilometers();
 
-//     if( point->Held() )
-//       strStatus = "HELD";
-//     else if( point->Type() == ControlPoint::Ground)
       if (point->GetType() == ControlPoint::Ground)
         strStatus = "GROUND";
       else if (point->GetType() == ControlPoint::Tie)
@@ -4814,16 +6105,17 @@ namespace Isis {
         strStatus = "UNKNOWN";
 
       if (m_bErrorPropagation) {
-        dSigmaLat = point->GetSurfacePoint().GetLatSigmaDistance().GetMeters();
-        dSigmaLong = point->GetSurfacePoint().GetLonSigmaDistance().GetMeters();
-        dSigmaRadius = point->GetSurfacePoint().GetLocalRadiusSigma().GetMeters();
+        dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+        dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+        dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
 
-        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius * 0.001,
-                dSigmaLat, dSigmaLong, dSigmaRadius);
+        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius,
+                dSigmaLat, dSigmaLong, dSigmaRadius, dX, dY, dZ);
       }
       else
-        sprintf(buf, "%s,%16.8lf,%16.8lf,%16.8lf\n", point->GetId().c_str(), dLat, dLon, dRadius * 0.001);
+        sprintf(buf, "%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                point->GetId().c_str(), dLat, dLon, dRadius, dX, dY, dZ);
 
       fp_out << buf;
     }
@@ -4951,5 +6243,16 @@ namespace Isis {
 
     return true;
   }
+
+
+  /**
+   * This method sets the solution method for solving the matrix and fills
+   * the point index map, which is dependent on the solution method.
+   */
+  void BundleAdjust::SetSolutionMethod(std::string str) {
+    m_strSolutionMethod = str;
+    FillPointIndexMap();
+  }
+
 }
 
