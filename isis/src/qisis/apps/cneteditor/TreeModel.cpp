@@ -7,6 +7,7 @@
 #include <QList>
 #include <QModelIndex>
 #include <QString>
+#include <QTreeView>
 #include <QVariant>
 
 #include "ControlMeasure.h"
@@ -25,9 +26,13 @@ namespace Isis
 
     headerTitle = NULL;
     parentItems = NULL;
+    expandedItems = NULL;
+    views = NULL;
 
     headerTitle = new QString(name);
     parentItems = new QList< TreeItem * >;
+    expandedItems = new QList< QString >;
+    views = new QList< QTreeView * >;
 
     connect(cNet, SIGNAL(networkStructureModified()),
         this, SLOT(rebuildItems()));
@@ -50,12 +55,24 @@ namespace Isis
       {
         if (parentItems->at(i))
         {
-          delete(*parentItems)[i];
+          delete (*parentItems)[i];
           (*parentItems)[i] = NULL;
         }
       }
       delete parentItems;
       parentItems = NULL;
+    }
+    
+    if (expandedItems)
+    {
+      delete expandedItems;
+      expandedItems = NULL;
+    }
+    
+    if (views)
+    {
+      delete views;
+      views = NULL;
     }
 
     cNet = NULL;
@@ -182,6 +199,13 @@ namespace Isis
 
     return flags;
   }
+  
+  
+  void TreeModel::addView(QTreeView * newView)
+  {
+    views->append(newView);
+  }
+  
 
   void TreeModel::setDrivable(bool drivableStatus)
   {
@@ -196,12 +220,19 @@ namespace Isis
   void TreeModel::clearParentItems()
   {
     ASSERT(parentItems);
+    ASSERT(expandedItems);
+    
+    expandedItems->clear();
 
     beginRemoveRows(QModelIndex(), 0, parentItems->size() - 1);
     for (int i = 0; i < parentItems->size(); i++)
     {
       if (parentItems->at(i))
       {
+        // save off expanded items
+        if (parentItems->at(i)->isExpanded())
+          expandedItems->append(parentItems->at(i)->data(0).toString());
+          
         delete(*parentItems)[i];
         (*parentItems)[i] = NULL;
       }

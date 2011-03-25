@@ -49,5 +49,10 @@ namespace Isis
       }
     }
     endInsertRows();
+    
+    
+//     if (expandedItems->contains(serialItem->data(0)))
+//       serialItem->
+
   }
 }

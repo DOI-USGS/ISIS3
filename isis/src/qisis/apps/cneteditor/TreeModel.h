@@ -5,6 +5,7 @@
 
 
 class QModelIndex;
+class QTreeView;
 
 namespace Isis
 {
@@ -32,9 +33,17 @@ namespace Isis
       int columnCount(const QModelIndex & parent) const;
 
       Qt::ItemFlags flags(const QModelIndex & index) const;
+      
+      void addView(QTreeView * newView);
 
       void setDrivable(bool drivableStatus);
       bool isDrivable() { return drivable; }
+      
+    
+    // disable copying of this class
+    private:
+      TreeModel(const TreeModel &);
+      const TreeModel & operator=(const TreeModel &);
 
 
     public slots:
@@ -53,6 +62,8 @@ namespace Isis
       ControlNet * cNet;
       QString * headerTitle;
       QList< TreeItem * > * parentItems;
+      QList< QString > * expandedItems;
+      QList< QTreeView * > * views;
       bool drivable;
   };
 }

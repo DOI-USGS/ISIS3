@@ -29,11 +29,15 @@ namespace Isis
       virtual void setData(int column, const QVariant & value) = 0;
       virtual void deleteSource() = 0;
       virtual InternalPointerType pointerType() const = 0;
+      
+      void setExpanded(bool newState) { expanded = newState; }
+      bool isExpanded() { return expanded; }
 
 
+    // disable copying of this class
     private:
-      TreeItem(const TreeItem & other);
-      const TreeItem & operator=(const TreeItem & other);
+      TreeItem(const TreeItem &);
+      const TreeItem & operator=(const TreeItem &);
 
 
     protected:
@@ -44,6 +48,7 @@ namespace Isis
       TreeItem * parentItem;
       QList< TreeItem * > * children;
       int numColumns;
+      bool expanded;
   };
 }
 

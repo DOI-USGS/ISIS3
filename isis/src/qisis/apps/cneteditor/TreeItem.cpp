@@ -15,6 +15,7 @@ namespace Isis
     children = NULL;
     children = new QList< TreeItem * >;
     numColumns = 1;
+    expanded = false;
   }
 
 

@@ -410,13 +410,13 @@ namespace Isis
   
   void CnetEditorWidget::itemExpanded(const QModelIndex & index)
   {
-//     cerr << "CnetEditorWidget::itemExpanded called\n";
+    static_cast< TreeItem * >(index.internalPointer())->setExpanded(true);
   }
   
   
   void CnetEditorWidget::itemCollapsed(const QModelIndex & index)
   {
-//     cerr << "CnetEditorWidget::itemCollapsed called\n";
+    static_cast< TreeItem * >(index.internalPointer())->setExpanded(false);
   }
   
 
