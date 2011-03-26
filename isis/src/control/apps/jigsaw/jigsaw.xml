@@ -133,7 +133,6 @@
       </group>
 
     <group name="Solve Options">
-<!--
       <parameter name="OBSERVATIONS">
         <brief> Keep instances of the same observation in different cube files dependent</brief>
         <description>
@@ -148,7 +147,7 @@
           <item>No</item>
         </default>
       </parameter>
--->
+
       <parameter name="RADIUS">
         <brief> Solve for local radii of points</brief>
         <description>

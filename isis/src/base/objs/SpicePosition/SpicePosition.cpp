@@ -1529,6 +1529,17 @@ namespace Isis {
     }
   }
 
+  /** Compute and return the coordinate at the center time
+   *
+   */
+  const std::vector<double> &SpicePosition::GetCenterCoordinate() {
+    // Compute the center time
+    double etCenter = (p_fullCacheEndTime + p_fullCacheStartTime) / 2.; 
+    SetEphemerisTime(etCenter);
+
+    return Coordinate();
+  }
+
 
   /** Compute the velocity with respect to time instead of
    *  scaled time.

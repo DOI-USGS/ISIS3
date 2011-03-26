@@ -153,6 +153,8 @@ namespace Isis {
         return p_et;
       };
 
+      const std::vector<double> &GetCenterCoordinate();
+
       //! Return the current J2000 position
       const std::vector<double> &Coordinate() {
         return p_coordinate;

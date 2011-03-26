@@ -115,6 +115,7 @@ namespace Isis {
    *  @history 2011-02-17  Debbie A. Cook  Fixed bug in method LineCache and fixed computation of angular velocity in
    *                        method DCJdt (derivative was with respect to scaled et instead of et)
    *  @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
+   *  @history 2011-03-25 Debbie A. Cook - Added method GetCenterAngles()
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {
@@ -156,6 +157,8 @@ namespace Isis {
         return p_et;
       };
 
+      std::vector<double> GetCenterAngles();
+      
       std::vector<double> Matrix();
       std::vector<double> AngularVelocity() {
         return p_av;

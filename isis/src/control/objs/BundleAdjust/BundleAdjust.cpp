@@ -622,7 +622,7 @@ namespace Isis {
     if (m_bObservationMode)
       observationInitialValueIndex.assign(m_pObsNumList->ObservationSize(), -1);
 
-    std::cout << observationInitialValueIndex << std::endl;
+    //    std::cout << observationInitialValueIndex << std::endl;
 
     for (int i = 0; i < Images(); i++) {
       Camera *pCamera = m_pCnet->Camera(i);
@@ -942,7 +942,8 @@ namespace Isis {
 
           // Determine the image index
           nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
-          //nImageIndex = ImageIndex(nImageIndex);
+          if ( m_bObservationMode )
+              nImageIndex = ImageIndex(nImageIndex)/m_nNumImagePartials;
 
         bStatus = ComputePartials_DC(coeff_image, coeff_point3D, coeff_RHS,
                                   *measure, *point);
@@ -2171,13 +2172,13 @@ namespace Isis {
         if (m_bErrorPropagation) {
           progress.SetText("Performing Error Propagation...");
 
-          printf("start error prop\n");
+          //          printf("start error prop\n");
           clock_t terror1 = clock();
           if (m_pLsq->SparseErrorPropagation())
             SetPostBundleSigmas();
           clock_t terror2 = clock();
           m_dElapsedTimeErrorProp = ((terror2 - terror1) / (double)CLOCKS_PER_SEC);
-          printf("end error prop\n");
+          //          printf("end error prop\n");
         }
 
         Output();
@@ -3007,23 +3008,24 @@ namespace Isis {
 //    std::cout << "image corrections: " << m_Image_Corrections << std::endl;
 //    std::cout << "   image solution: " << m_Image_Solution << std::endl;
 
-    // Update selected spice for each image
-//    int baseindex = -1;
-//    bool bindexchanged = true;
-    int nImages = Images();
-    for (int i = 0; i < nImages; i++) {
-      if (m_nHeldImages > 0)
-        if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))) continue;
+      int index;
+      int currentindex = -1;
+      bool bsameindex = false;
 
-      Camera *pCamera = m_pCnet->Camera(i);
-      int index = i;
-      index = ImageIndex(i);
-//      if ( index != baseindex ) {
-//          bindexchanged = true;
-//          baseindex = index;
-//      }
-//      else
-//          bindexchanged = false;
+      // Update selected spice for each image
+      int nImages = Images();
+      for (int i = 0; i < nImages; i++) {
+
+          if ( m_nHeldImages > 0 )
+              if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))))
+                  continue;
+
+          Camera *pCamera = m_pCnet->Camera(i);
+          index = ImageIndex(i);
+          if( index == currentindex )
+              bsameindex = true;
+
+          currentindex = index;
 
       if (m_spacecraftPositionSolveType != Nothing) {
         SpicePosition *pInstPos = pCamera->InstrumentPosition();
@@ -3034,19 +3036,19 @@ namespace Isis {
 
         // Update the X coordinate coefficient(s) and sum parameter correction
         abcX[0] += m_Image_Solution(index);
-//        if ( bindexchanged )
+        if ( !bsameindex )
             m_Image_Corrections(index) += m_Image_Solution(index);
         index++;
 
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcX[1] += m_Image_Solution(index);
-//          if ( bindexchanged )
+          if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
 
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcX[2] += m_Image_Solution(index);
-//            if ( bindexchanged )
+            if ( !bsameindex )
                 m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
@@ -3054,19 +3056,19 @@ namespace Isis {
 
         // Update the Y coordinate coefficient(s)
         abcY[0] += m_Image_Solution(index);
-//        if ( bindexchanged )
+        if ( !bsameindex )
             m_Image_Corrections(index) += m_Image_Solution(index);
         index++;
 
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcY[1] += m_Image_Solution(index);
-//          if ( bindexchanged )
+          if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
 
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcY[2] += m_Image_Solution(index);
-//            if ( bindexchanged )
+            if ( !bsameindex )
                 m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
@@ -3074,19 +3076,19 @@ namespace Isis {
 
         // Update the Z coordinate coefficient(s)
         abcZ[0] += m_Image_Solution(index);
-//        if ( bindexchanged )
+        if ( !bsameindex )
             m_Image_Corrections(index) += m_Image_Solution(index);
         index++;
 
         if (m_spacecraftPositionSolveType > PositionOnly) {
           abcZ[1] += m_Image_Solution(index);
-//          if ( bindexchanged )
+          if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
 
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcZ[2] += m_Image_Solution(index);
-//            if ( bindexchanged )
+            if ( !bsameindex )
                 m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
@@ -3105,7 +3107,7 @@ namespace Isis {
         // Update right ascension coefficient(s)
         for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           coefRA[icoef] += m_Image_Solution(index);
-//          if ( bindexchanged )
+          if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
         }
@@ -3113,7 +3115,7 @@ namespace Isis {
         // Update declination coefficient(s)
         for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           coefDEC[icoef] += m_Image_Solution(index);
-//          if ( bindexchanged )
+          if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
         }
@@ -3122,7 +3124,7 @@ namespace Isis {
           // Update twist coefficient(s)
           for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
             coefTWI[icoef] += m_Image_Solution(index);
-//            if ( bindexchanged )
+            if ( !bsameindex )
                 m_Image_Corrections(index) += m_Image_Solution(index);
             index++;
           }
@@ -3260,7 +3262,7 @@ namespace Isis {
         vx = measure->GetSampleResidual();
         vy = measure->GetLineResidual();
 
-        std::cout << "vx vy" << vx << " " << vy << std::endl;
+        //        std::cout << "vx vy" << vx << " " << vy << std::endl;
 
         // if rejected, don't include in statistics
         if (measure->IsRejected())
@@ -3277,8 +3279,8 @@ namespace Isis {
       }
     }
 
-    std::cout << "vtpv image = " << vtpv << std::endl;
-    std::cout << "dWeight = " << dWeight << std::endl;
+//     std::cout << "vtpv image = " << vtpv << std::endl;
+//     std::cout << "dWeight = " << dWeight << std::endl;
 
     // add vtpv from constrained 3D points
     int nPointIndex = 0;
@@ -3302,7 +3304,7 @@ namespace Isis {
       nPointIndex++;
     }
 
-    std::cout << "vtpv control = " << vtpv_control << std::endl;
+    //    std::cout << "vtpv control = " << vtpv_control << std::endl;
 
 
     // add vtpv from constrained image parameters
@@ -3816,19 +3818,6 @@ namespace Isis {
     else
       return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
   }
-//  int BundleAdjust::ImageIndex (int i) const
-//  {
-//      if ( !m_bObservationMode ) {
-//          if ( m_strSolutionMethod == "SPECIALK" )
-//              return m_nImageIndexMap[i];
-//          return m_nImageIndexMap[i] * m_nNumImagePartials;;
-//      }
-//      else {
-//          if ( m_strSolutionMethod == "SPECIALK" )
-//              return m_pObsNumList->ObservationNumberMapIndex(i);
-//          return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
-//      }
-//  }
 
   //! Return the ith filename in the cube list file given to constructor
   std::string BundleAdjust::Filename(int i) {
@@ -3945,11 +3934,16 @@ namespace Isis {
                                               m_dImageParameterWeights.end(),
                                               std::bind2nd(std::greater<double>(),0.0));
 
-    int nWtIndex;
+    int nWtIndex = 0;
+    int nCurrentIndex = -1;
     int nImages = m_pSnList->Size();
     for( int i = 0; i < nImages; i++ ) {
 
         nWtIndex = ImageIndex(i);
+        if ( nWtIndex == nCurrentIndex )
+            continue;
+
+        nCurrentIndex = nWtIndex;
 
         if ( m_pHeldSnList != NULL &&
              (m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))) ) {
@@ -4256,7 +4250,7 @@ namespace Isis {
           if ( !pCamera )
               continue;
 
-//          nIndex = ImageIndex(i) * m_nNumImagePartials;
+          nIndex = ImageIndex(i) ;
 
           // if not a frame camera, SetImage to center line and sample
 //          if( pCamera->GetCameraType() != 0 ) {
@@ -4275,8 +4269,13 @@ namespace Isis {
           if ( m_spacecraftPositionSolveType > 0 )
               pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
           else {
-              pSpicePosition->SetPolynomial();
-              pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+//               pSpicePosition->SetPolynomial();
+//               pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+              std::vector <double> coordinate(3);
+              coordinate = pSpicePosition->GetCenterCoordinate();
+              PosX[0] = coordinate[0];
+              PosY[0] = coordinate[1];
+              PosZ[0] = coordinate[2];
           }
 
           if ( m_cmatrixSolveType > 0 ) {
@@ -4284,9 +4283,14 @@ namespace Isis {
               pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
           }
           else {
-              angles = pSpiceRotation->Angles(3,1,3);
-              pSpiceRotation->SetPolynomial();
-              pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+            // TODO Make a similar change for the angles as was done for position
+//               angles = pSpiceRotation->Angles(3,1,3);
+//               pSpiceRotation->SetPolynomial();
+//               pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+            angles = pSpiceRotation->GetCenterAngles();
+            coefRA.push_back(angles.at(0));
+            coefDEC.push_back(angles.at(1));
+            coefTWI.push_back(angles.at(2));
           }
 
           sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
@@ -4494,8 +4498,8 @@ namespace Isis {
 //                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[i]*RAD2DEG,
 //                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
                   sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)),
-                          m_Image_Corrections(nIndex), coefRA[i],
+                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                          m_Image_Corrections(nIndex), coefRA[i] * RAD2DEG,
                           m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
                   fp_out << buf;
                   ostr.str("");
@@ -5730,6 +5734,8 @@ namespace Isis {
       if (!pCamera)
         continue;
 
+      nIndex = ImageIndex(i);
+
       pSpicePosition = pCamera->InstrumentPosition();
       if (!pSpicePosition)
         continue;
@@ -6144,7 +6150,7 @@ namespace Isis {
 
     int nImageIndex;
 
-    printf("output residuals!!!\n");
+    //    printf("output residuals!!!\n");
 
     int nObjectPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nObjectPoints; i++) {

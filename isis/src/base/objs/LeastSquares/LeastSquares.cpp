@@ -684,7 +684,7 @@ namespace Isis {
 
     // scale inverse by Sigma0 squared to get variance-covariance matrix
     // if simulated data, we don't scale (effectively scaling by 1.0)
-    printf("scaling by Sigma0\n");
+    //    printf("scaling by Sigma0\n");
     gmm::scale(p_normals,(p_sigma0*p_sigma0));
 
 //    printf("covariance matrix\n");

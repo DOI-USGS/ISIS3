@@ -801,6 +801,18 @@ namespace Isis {
   }
 
 
+  /** Return the camera angles at the center time of the observation
+  *
+  */
+  std::vector<double> SpiceRotation::GetCenterAngles() {
+    // Compute the center time
+    double etCenter = (p_fullCacheEndTime + p_fullCacheStartTime) / 2.; 
+    SetEphemerisTime(etCenter);
+
+    return Angles(p_axis3, p_axis2, p_axis1);
+  }
+
+
   /** Return the camera angles (right ascension, declination, and twist) for
   *
   * the time-based matrix CJ
