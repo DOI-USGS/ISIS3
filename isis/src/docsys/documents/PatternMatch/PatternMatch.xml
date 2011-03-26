@@ -57,9 +57,6 @@
             <li>
               <a href="#GeoWarping">Geometric Warping of Pattern Cubes</a>
             </li>
-            <li>
-              <a href="#SamplingMatchAlgo">Sampling in the Match Algorithm</a>
-            </li>
             <li><a href="#ZScoreTest">Z-Score Test</a></li>
             <li><a href="#GradientFilters">Gradient Filters</a></li>
           </ol>
@@ -613,7 +610,7 @@
         <p>
           After the match has been performed on the reduced chips, instead of
           simply accepting the result, the algorithm will continue on to
-          matching the original chips, but decrease the search area to some
+          matching the original chips, but decrease the search area to a
           smaller area surrounding the "best" sample and line derived from the
           reduced match, effectively cropping the search chip (not scaling it,
           as in the reduced match) to some general area suspected to contain
@@ -621,8 +618,56 @@
           size of the resulting search area.
         </p>
         <p>
+          After finding the reduced match, the new search window is defined by
+          expanding outwards from the best pixel (remapped from the reduced
+          chips to the original chips) by:
+
+          <pre style="padding-left:4em;">
+            ReductionFactor + WindowSize + 1
+          </pre>
+
+          ...in all four directions.  The WindowSize can be specified by the
+          user in the definition file's SurfaceModel group.  To help understand
+          why the reduction factor is used in this manner, consider the
+          following example:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = Algorithm
+                ReductionFactor = 10
+              End_Group
+
+              Group = PatternChip
+                Samples         = 700
+                Lines           = 700
+              End_Group
+
+              Group = SearchChip
+                Samples         = 1000
+                Lines           = 1000
+              End_Group
+
+              Group = SurfaceModel
+                WindowSize      = 3
+              End_Group
+            End_Object
+          </pre>
+
+          Using a reduction factor of 10: the search chip becomes 100x100, the
+          pattern 70x70, and only 900 different comparison are made.  However,
+          the best pixel match is only accurate to about 10 pixels because of
+          the reduction.  So we repeat the matching process in a window around
+          the best pixel.  The windows size is 10 in either direction plus the
+          number of pixels needed for sub-pixel accuracy computations
+          (WindowSize is usually 3).  In the our case the matching would be
+          done on a 2*(10+3+1) or 28x28 window, or 784 additional comparisons.
+          Therefore the total comparisons to get a match is 900 + 784 = 1684
+          and is significantly less than the 90000 comparisons done without the
+          reduction factor.
+        </p>
+        <p>
           Adaptive algorithms will make additional use the "best" sample and
-          line dervied from the reduced match when setting up its affine
+          line dervied from the reduced match when setting up affine
           transformations.
         </p>
 
@@ -664,27 +709,6 @@
           appendix below.
         </p>
 
-        <h3><a name="SamplingMatchAlgo">Sampling in the Match Algorithm</a></h3>
-        <p>
-          To increase the speed of the match algorithm data in the pattern chip
-          and the sub-region of the search chip can be sampled.  While the
-          sampling may cause the algorithm to run faster it may be at the
-          expense of finding the best registration.  In PVL:
-
-          <pre style="padding-left:4em;">
-            Group = PatternChip
-              Samples  = 10
-              Lines    = 10
-              Sampling = 50
-            End_Group
-          </pre>
-
-          In the above example, half of the data would be compared in the
-          matching algorithm. So, instead of looking at all 100 pixels, the
-          algorithm will compare 50 evenly spaced values.  If the sampling
-          keyword is not present then 100 is assumed and all data will be used.
-        </p>
-
         <h3><a name="ZScoreTest">Z-Score Test</a></h3>
         <p>
           To guarantee an accurate match, we first need to check if the pattern
@@ -716,12 +740,21 @@
           image. Thus, the use of a gradient filter on the search and pattern
           chips may increase the chances of finding a match when the pattern
           chip contains distinctive features whose edges need to be emphasized.
-
-          Currently, Sobel and Roberts gradient filters are supported. The Sobel
-          gradient filter looks at the eight surrounding pixels for a given
-          point, while the Roberts gradient filter computes the sum of the
-          squares of the differences between diagonally adjacent pixels. A
-          Sobel gradient filter can be specified like so:
+        </p>
+        <p>
+          Currently,
+          <a href="http://en.wikipedia.org/wiki/Sobel_operator">
+            Sobel
+          </a>
+          and
+          <a href="http://en.wikipedia.org/wiki/Roberts_Cross">
+            Roberts
+          </a> 
+          gradient filters are supported. The Sobel gradient filter looks at
+          the eight surrounding pixels for a given point, while the Roberts
+          gradient filter computes the sum of the squares of the differences
+          between diagonally adjacent pixels. A Sobel gradient filter can be
+          specified like so:
 
           <pre style="padding-left:4em;">
             Group = Algorithm
