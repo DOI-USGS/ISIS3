@@ -319,7 +319,7 @@
 
         <h3><a name="Gruen">Gruen</a></h3>
         <p>
-          This algorithm provides adaptive image (chip) registration, using an
+          This algorithm provides adaptive image (chip) registration using an
           Affine transform to iteratively adjust the search chip at each
           iteration.  Each iteration solves for new adjustments to the Affine
           transform until the 6 affine parameters fall below the tolerances as
