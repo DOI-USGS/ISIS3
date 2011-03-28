@@ -48,6 +48,55 @@ namespace Isis {
   }
 
 
+  /** 
+   * @brief Initialize new Kernels from state of existing one
+   *  
+   *  Initialize new Kernels object from the state of an existing one while
+   *  preserving the state of one copied.  Each kernel file state is copied to
+   *  this new one.  It ensures that ones that are already opened are set to an
+   *  unmanaged state from the source.  It also checks the current open state
+   *  and will set ones found to be open as unmanaged as well. All other kernels
+   *  files can be managed by this new instance.
+   * 
+   * @author kbecker (3/26/2011)
+   * 
+   * @param kernels Source kernels object
+   */
+  Kernels::Kernels(const Kernels &kernels) {
+    _kernels = kernels._kernels;
+    _camVersion = kernels._camVersion;
+    UpdateLoadStatus();
+    UpdateManagedStatus();
+  }
+
+  /**
+   * @brief Copy constructor for existing Kernels objecr
+   *  
+   * This copy constructor ensures the kernel list copied from an existing 
+   * object is set to proper conditions as to minimize interference of both 
+   * object that existence. 
+   *  
+   * Any current kernels that in this object are removed without regard for ther
+   * current state.  The list of kernels in the source object are copied and 
+   * their state is analyzed.  Any opened kernels are set to unmanaged state. 
+   *  
+   * @author kbecker (3/26/2011)
+   * 
+   * @param kernels Source list from which the list is copied
+   * 
+   * @return Kernels&  Returned Kernel instance
+   */
+  Kernels &Kernels::operator=(const Kernels &kernels) {
+    if (this != &kernels) {
+      Clear();
+      _kernels = kernels._kernels;
+      _camVersion = kernels._camVersion;
+      UpdateLoadStatus();
+      UpdateManagedStatus();
+    }
+    return (*this);
+  }
+
   /**
    * @brief Construct using an ISIS file name
    * 
@@ -473,6 +522,38 @@ namespace Isis {
     return (nchanged);
   }
 
+  /**
+   * @brief Update the managed state of the kernel file list 
+   *  
+   * This method changes the managed state of individual files that are opened. 
+   * If a file is determined to be open it sets the managed state such that this 
+   * object will not manage it.  In other words, it ensures it will not close 
+   * the file when asked. 
+   *  
+   * This method is intended to be used when copying the contents of another 
+   * Kernels object and it will not allow closing of existing kernel files that 
+   * are found to be open.  It is useful to call the UpdateLoadStatus() method 
+   * first to determine load states of files. 
+   *  
+   * And files that it finds to be unloaded, it will set it manageable. 
+   * 
+   * @author kbecker (3/26/2011)
+   * 
+   * @return int 
+   */
+  int Kernels::UpdateManagedStatus() {
+    int nchanged(0);
+    for (unsigned int i = 0 ; i < _kernels.size() ; i++) {
+      if (_kernels[i].loaded) {
+        _kernels[i].managed = false;
+        nchanged++;
+      }
+      else {
+        _kernels[i].managed = true;
+      }
+    }
+    return (nchanged);
+  }
 
   /**
    * @brief Merge the contents of another Kernels object 
@@ -656,7 +737,6 @@ namespace Isis {
             flist.push_back(_kernels[k].pathname);
           }
         }
-
       }
     }
     return (flist);

@@ -101,16 +101,21 @@ namespace Isis {
    *   @history 2011-02-28 Kris Becker - When using the examine() method, if the
    *                                     kernel is found to be loaded, its
    *                                     management state is set to unmanaged
+   *   @history 2011-03-27 Kris Becker - Added copy constructor and assignment
+   *                                     operator
    */
 class Kernels {
     public:
       /** Default Constructor */
       Kernels();
+      Kernels(const Kernels &kernels);
       Kernels(const std::string &filename);
       Kernels(Cube &cube);
       Kernels(Pvl &pvl);
       /** Destructor always unloads the kernels from the pool */
       virtual ~Kernels() { UnLoad(); }
+
+      Kernels &operator=(const Kernels &kernels);
 
       /** Returns the number of kernels found and/or loaded */
       int size() const { return (_kernels.size());  }
@@ -178,11 +183,12 @@ class Kernels {
     bool IsNaifType(const std::string &ktype) const;
     KernelFile examine(const std::string &fname, const bool &manage = true) 
                        const;
+    int UpdateManagedStatus();
     std::vector<KernelFile> findKernels(Pvl &pvl, const std::string &kname,
                                        const bool &manage = true);
     KernelFile *findByName(const std::string &kfile);
     TypeList categorizeByType() const;
-     
+      
     void addKernels(const KernelList &klist);
     std::string getKernelType(const std::string &kname) const; 
     void loadKernel(const std::string &ktype = "");
