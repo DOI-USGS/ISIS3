@@ -148,6 +148,11 @@ namespace Isis {
    *                                     SetLookDirection. These changes were
    *                                     meant primarily for readability and
    *                                     reducing error-proneness of the code.
+   *  @history 2011-03-28 Janet Barrett - Fixed the SetLookDirection routine so that it checks to
+   *                                     make sure that the projection of the DEM is in an 
+   *                                     Equatorial cylindrical projection before using the new ray 
+   *                                     tracing routine. The check for this was moved when other
+   *                                     code was added. This was causing a problem with footprintinit.
    */
   class Sensor : public Spice {
     public:
