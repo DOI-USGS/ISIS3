@@ -24,8 +24,9 @@
 
           <li><a href="#MatchAlgorithms">Match Algorithms</a></li>
           <ol type="i">
-            <li><a href="#MinimumDifference">Minimum Difference</a></li>
             <li><a href="#MaximumCorrelation">Maximum Correlation</a></li>
+            <li><a href="#MinimumDifference">Minimum Difference</a></li>
+            <li><a href="#Gruen">Gruen</a></li>
             <li><a href="#Tolerance">Tolerance</a></li>
           </ol>
 
@@ -41,6 +42,10 @@
             <li>
               <a href="#FindingLocalMinMax">Finding a Local Minimum/Maximum</a>
             </li>
+            <li><a href="#DistanceTolerance">Distance Tolerance</a></li>
+            <li><a href="#WindowSize">Window Size</a></li>
+            <li><a href="#EccentricityRatio">Eccentricity Ratio</a></li>
+            <li><a href="#ResidualTolerance">Residual Tolerance</a></li>
           </ol>
 
           <li><a href="#AdvancedFeatures">Advanced Features</a></li>
@@ -236,6 +241,42 @@
           future.
         </p>
 
+        <h3><a name="MaximumCorrelation">Maximum Correlation</a></h3>
+        <p>
+          This match algorithm computes the correlation coefficient, R, between
+          the pattern chip and the sub-region of the search chip as follows:
+
+          <pre style="padding-left:4em;">
+            R = Covariance(pattern, subregon) / [Variance(pattern) * Variance(subregion)]
+
+            where -1.0 &lt;= R &lt;= 1.0
+
+            GOF = |R|
+          </pre>
+
+          In this algorithm, the goodness of fit will range from no correlation
+          (zero) to perfect correlation (one).  Example PVL for this algorithm
+          would as follows:
+
+          <pre style="padding-left:4em;">
+            Object = AutoRegistration
+              Group = PatternChip
+                Samples = 5
+                Lines   = 5
+              End_Group
+
+              Group = SearchChip
+                Samples = 21
+                Lines   = 21
+              End_Group
+
+              Group = Algorithm 
+                Name    = MaximumCorrelation
+              End_Group
+            End_Object
+          </pre>
+        </p>
+
         <h3><a name="MinimumDifference">Minimum Difference</a></h3>
         <p>
           This match algorithm defines goodness-of-fit as the average absolute
@@ -276,22 +317,51 @@
           </pre>
         </p>
 
-        <h3><a name="MaximumCorrelation">Maximum Correlation</a></h3>
+        <h3><a name="Gruen">Gruen</a></h3>
         <p>
-          This match algorithm computes the correlation coefficient, R, between
-          the pattern chip and the sub-region of the search chip as follows:
+          This algorithm provides adaptive image (chip) registration, using an
+          Affine transform to iteratively adjust the search chip at each
+          iteration.  Each iteration solves for new adjustments to the Affine
+          transform until the 6 affine parameters fall below the tolerances as
+          specified in AffineThreshold1 and AffineThreshold2.
+        </p>
+        <p>
+          This algorithm minimizes the 6 specifiable Affine transform
+          components of a 3x3 matrix.  The three Affine components for X
+          (sample) and Y (line) are scale, shear, and translation.  Gruen
+          provides control over the maximum values these three components
+          should attain in order for the registration to converge to a
+          successful match.  These limits are specified by
+          <b>AffineScaleTolerance</b>, <b>AffineShearTolerance</b> and
+          <b>AffineTranslationTolerance</b>.  <b>AffineShearTolerance</b> is
+          optional and if not specified, it defaults to the value of
+          <b>AffineScaleTolerance</b>.  These tolerances specify the maximum
+          amount of translation pixels can be shifted between one Gruen
+          iteration and another.  For example:
 
           <pre style="padding-left:4em;">
-            R = Covariance(pattern, subregon) / [Variance(pattern) * Variance(subregion)]
-
-            where -1.0 &lt;= R &lt;= 1.0
-
-            GOF = |R|
+            AffineTranslationTolerance = 0.2
           </pre>
 
-          In this algorithm, the goodness of fit will range from no correlation
-          (zero) to perfect correlation (one).  Example PVL for this algorithm
-          would as follows:
+          ...means that a subsearch chip cannot move in sample or line
+          direction more than 0.2 pixels in order to satisfy convergence.
+          <b>AffineScaleTolerance</b> constrains the sample and line scale
+          elements of the Affine transformation.  And
+          <b>AffineShearTolerance</b> constrains the sample and line shear
+          elements of the Affine transformation.  The scale and shear
+          parameters are scaled by size of the Chip.  The sample scale and
+          shear Affine components maximum limit is computed as:
+
+          <pre style="padding-left:4em;">
+            SampleScale = AffineScaleTolerance / ((#Samples - 1) / 2)
+            SampleShear = AffineShearTolerance / ((#Samples - 1) / 2)
+          </pre>
+
+          Likewise, the line scale and shear maximums are computed using
+          <b>#Lines</b> in the preceding equation.
+        </p>
+        <p>
+          Example PVL for this algorithm would as follows:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -306,7 +376,19 @@
               End_Group
 
               Group = Algorithm 
-                Name    = MaximumCorrelation
+                Name                       = Gruen
+                MaximumIterations          = 30
+                AffineTranslationTolerance = 0.2
+                AffineScaleTolerance       = 0.7
+                AffineShearTolerance       = 0.7
+                AffineTolerance            = 5.0
+                SpiceTolerance             = 7.0
+                RadioShiftTolerance        = 256.0
+                RadioGainMinTolerance      = -0.75
+                RadioGainMaxTolerance      = 3.0
+                FitChipScale               = 0.1
+                DefaultRadioGain           = 0.0
+                DefaultRadioShift          = 0.0
               End_Group
             End_Object
           </pre>
@@ -660,10 +742,10 @@
           the best pixel.  The windows size is 10 in either direction plus the
           number of pixels needed for sub-pixel accuracy computations
           (WindowSize is usually 3).  In the our case the matching would be
-          done on a 2*(10+3+1) or 28x28 window, or 784 additional comparisons.
-          Therefore the total comparisons to get a match is 900 + 784 = 1684
-          and is significantly less than the 90000 comparisons done without the
-          reduction factor.
+          done on a 2 * (10 + 3 + 1) or 28x28 window, or 784 additional
+          comparisons.  Therefore the total comparisons to get a match is 900 +
+          784 = 1684 and is significantly less than the 90000 comparisons done
+          without the reduction factor.
         </p>
         <p>
           Adaptive algorithms will make additional use the "best" sample and
@@ -775,9 +857,11 @@
           The following table provides an exhaustive listing of every
           <strong>keyword</strong> that can be provided in an automatic
           registration definition file.  The keywords are organized by what
-          <strong>groups</strong> they can appear in.  The
-          <strong>type</strong> column specifies what kind of value is expected
-          (an integer, real number, boolean, or a string).  The
+          <strong>groups</strong> they can appear in after what
+          <strong>algorithms</strong> they can be used with.  If a keyword can
+          be used with every algorithm, then its value for this cell is "All".
+          The <strong>type</strong> column specifies what kind of value is
+          expected (an integer, real number, boolean, or a string).  The
           <strong>values</strong> column provides either the set of valid
           values (in the case of strings) or a numerical range, with a paren
           "(" denoting an exclusive value and a bracket "[" denoting an
@@ -796,6 +880,7 @@
           <tr>
             <th>Keyword</th>
             <th>Groups</th>
+            <th>Algorithms</th>
             <th>Type</th>
             <th>Values</th>
             <th>Default</th>
@@ -805,6 +890,7 @@
           <tr>
             <td><a href="#MatchAlgorithms"><strong>Name</strong></a></td>
             <td>Algorithm</td>
+            <td>All</td>
             <td>String</td>
             <td>{MaximumCorrelation, MinimumDifference, Gruen, AdaptiveGruen}</td>
             <td><span style="color:red;">Exception</span></td>
@@ -812,6 +898,7 @@
           <tr>
             <td><a href="#Tolerance"><strong>Tolerance</strong></a></td>
             <td>Algorithm</td>
+            <td>All</td>
             <td>Real</td>
             <td>[0.0, infinity)</td>
             <td><span style="color:red;">Exception</span></td>
@@ -819,6 +906,7 @@
           <tr>
             <td><a href="#GeoWarping"><strong>ChipInterpolator</strong></a></td>
             <td>Algorithm</td>
+            <td>All</td>
             <td>String</td>
             <td>{NearestNeighborType, BiLinearType, CubicConvolutionType}</td>
             <td>CubicConvolutionType</td>
@@ -826,6 +914,7 @@
           <tr>
             <td><a href="#ReductionFactor"><strong>ReductionFactor</strong></a></td>
             <td>Algorithm</td>
+            <td>All</td>
             <td>Integer</td>
             <td>[1, infinity)</td>
             <td>1</td>
@@ -833,6 +922,7 @@
           <tr>
             <td><a href="#SubPixelAccuracy"><strong>SubPixelAccuracy</strong></a></td>
             <td>Algorithm</td>
+            <td>All</td>
             <td>Boolean</td>
             <td>{True, False}</td>
             <td>True</td>
@@ -840,6 +930,7 @@
           <tr>
             <td><a href="#GradientFilters"><strong>Gradient</strong></a></td>
             <td>Algorithm</td>
+            <td>All</td>
             <td>String</td>
             <td>{None, Roberts, Sobel}</td>
             <td>None</td>
@@ -849,6 +940,7 @@
           <tr>
             <td><a href="#Chips"><strong>Samples</strong></a></td>
             <td>PatternChip, SearchChip</td>
+            <td>All</td>
             <td>Integer</td>
             <td>[1, infinity)</td>
             <td><span style="color:red;">Exception</span></td>
@@ -856,6 +948,7 @@
           <tr>
             <td><a href="#Chips"><strong>Lines</strong></a></td>
             <td>PatternChip, SearchChip</td>
+            <td>All</td>
             <td>Integer</td>
             <td>[1, infinity)</td>
             <td><span style="color:red;">Exception</span></td>
@@ -863,6 +956,7 @@
           <tr>
             <td><a href="#RestrictingPixelRanges"><strong>ValidMinimum</strong></a></td>
             <td>PatternChip, SearchChip</td>
+            <td>All</td>
             <td>Real</td>
             <td>(-infinity, infinity)</td>
             <td>Isis::ValidMinimum</td>
@@ -870,6 +964,7 @@
           <tr>
             <td><a href="#RestrictingPixelRanges"><strong>ValidMaximum</strong></a></td>
             <td>PatternChip, SearchChip</td>
+            <td>All</td>
             <td>Real</td>
             <td>(-infinity, infinity)</td>
             <td>Isis::ValidMaximum</td>
@@ -877,6 +972,7 @@
           <tr>
             <td><a href="#ZScoreTest"><strong>MinimumZScore</strong></a></td>
             <td>PatternChip</td>
+            <td>All</td>
             <td>Real</td>
             <td>(0.0, infinity)</td>
             <td>1.0</td>
@@ -884,6 +980,7 @@
           <tr>
             <td><a href="#ValidPixelCount"><strong>ValidPercent</strong></a></td>
             <td>PatternChip</td>
+            <td>All</td>
             <td>Real</td>
             <td>(0.0, 100.0]</td>
             <td>50.0</td>
@@ -893,6 +990,7 @@
           <tr>
             <td><a href="#ValidPixelCount"><strong>SubchipValidPercent</strong></a></td>
             <td>SearchChip</td>
+            <td>All</td>
             <td>Real</td>
             <td>(0.0, 100.0]</td>
             <td>50.0</td>
@@ -902,6 +1000,7 @@
           <tr>
             <td><a href="#SurfaceModeling"><strong>DistanceTolerance</strong></a></td>
             <td>SurfaceModel</td>
+            <td>All</td>
             <td>Real</td>
             <td>(0.0, infinity)</td>
             <td>1.5</td>
@@ -909,6 +1008,7 @@
           <tr>
             <td><a href="#SurfaceModeling"><strong>WindowSize</strong></a></td>
             <td>SurfaceModel</td>
+            <td>All</td>
             <td>Integer</td>
             <td>[3, infinity) odd</td>
             <td>5</td>
@@ -916,6 +1016,7 @@
           <tr>
             <td><a href="#SurfaceModeling"><strong>EccentricityRatio</strong></a></td>
             <td>SurfaceModel</td>
+            <td>All</td>
             <td>Real</td>
             <td>[1.0, infinity]</td>
             <td><span style="color:red;">No Eccentricity Test</span></td>
@@ -923,9 +1024,108 @@
           <tr>
             <td><a href="#SurfaceModeling"><strong>ResidualTolerance</strong></a></td>
             <td>SurfaceModel</td>
+            <td>All</td>
             <td>Real</td>
             <td>[0.0, infinity]</td>
             <td><span style="color:red;">No Residual Test</span></td>
+          </tr>
+
+          <!-- Gruen -->
+          <tr>
+            <td><a href="#Gruen"><strong>MaximumIterations</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Integer</td>
+            <td>(-infinity, infinity)</td>
+            <td>25</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>AffineTranslationTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>0.1</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>AffineScaleTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>0.5</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>AffineShearTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>AffineScaleTolerance</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>AffineTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>DBL_MAX</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>SpiceTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>DBL_MAX</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>RadioShiftTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>DBL_MAX</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>RadioGainMinTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>-DBL_MAX</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>RadioGainMaxTolerance</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>DBL_MAX</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>FitChipScale</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>0.1</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>DefaultRadioGain</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>0.0</td>
+          </tr>
+          <tr>
+            <td><a href="#Gruen"><strong>DefaultRadioShift</strong></a></td>
+            <td>Algorithm</td>
+            <td>Gruen</td>
+            <td>Real</td>
+            <td>(-infinity, infinity)</td>
+            <td>0.0</td>
           </tr>
         </table>
 
