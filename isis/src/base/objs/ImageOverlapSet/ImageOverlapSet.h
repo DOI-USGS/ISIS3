@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 
+#include <QList>
 #include <QThread>
 #include <QMutex>
 
@@ -85,6 +86,8 @@ namespace Isis {
    *           error-recovery solutions.
    *  @history 2010-09-27 Christopher Austin - Added an error when no new overlaps
    *           are calculated. (i.e. All overlaps contain only a single Serial Number)
+   *  @history 2011-03-29 Steven Lambright - Added some safety around
+   *           p_lonLatOverlaps to (hopefully) get rid of a race condition.
    */
   class ImageOverlapSet : private QThread {
     public:
@@ -140,7 +143,7 @@ namespace Isis {
 
       void DespikeLonLatOverlaps();
 
-      std::vector<ImageOverlap *> p_lonLatOverlaps; //!< The list of lat/lon overlaps
+      QList<ImageOverlap *> p_lonLatOverlaps; //!< The list of lat/lon overlaps
 
       ImageOverlap *CreateNewOverlap(std::string serialNumber,
                                      geos::geom::MultiPolygon *lonLatPolygon);
@@ -166,6 +169,7 @@ namespace Isis {
        * WriteImageOverlaps(...).
        */
       QMutex p_calculatePolygonMutex;
+      QMutex p_lonLatOverlapsMutex;
   };
 };
 

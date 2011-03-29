@@ -177,7 +177,7 @@ namespace Isis {
 
     // While our exit condition is not true, call WriteImageOverlaps with the filename. The
     //   WriteImageOverlaps call will block if it is waiting on calculations.
-    while(p_calculatedSoFar != (int)p_lonLatOverlaps.size()) {
+    while(p_calculatedSoFar != p_lonLatOverlaps.size()) {
       WriteImageOverlaps(outputFile);
     }
 
@@ -355,7 +355,7 @@ namespace Isis {
       multiPolygon = Isis::globalFactory.createMultiPolygon();
     }
 
-    if(position > (int)p_lonLatOverlaps.size()) {
+    if(position > p_lonLatOverlaps.size()) {
       position = p_lonLatOverlaps.size();
     }
 
@@ -388,6 +388,9 @@ namespace Isis {
           AddSerialNumbers(imageOverlap, sncopy);
         }
 
+        // Insert could cause a reallocate of the overlap list, so lock it with
+        //   the writing code so that we don't conflict
+        QMutexLocker locker(&p_lonLatOverlapsMutex);
         p_lonLatOverlaps.insert(p_lonLatOverlaps.begin() + position, imageOverlap);
       }
 
@@ -428,7 +431,10 @@ namespace Isis {
 
       static bool overlapWritten = false;
       for(int overlap = p_writtenSoFar; !failed && overlap <= p_calculatedSoFar; overlap++) {
-        if(overlap < (int)p_lonLatOverlaps.size() && p_lonLatOverlaps[overlap]) {
+        // Let's not try anything during a possible reallocate
+        QMutexLocker locker(&p_lonLatOverlapsMutex);
+
+        if(overlap < p_lonLatOverlaps.size() && p_lonLatOverlaps[overlap]) {
           if(!p_lonLatOverlaps[overlap]->Polygon()->isEmpty()) {
             if(overlapWritten) {
               outStream << std::endl;
@@ -457,7 +463,7 @@ namespace Isis {
      * Don't wait for an unlock from FindImageOverlaps(...) if we're done
      * calculating.
      */
-    if(p_calculatedSoFar == (int)p_lonLatOverlaps.size()) {
+    if(p_calculatedSoFar == p_lonLatOverlaps.size()) {
       if(p_threadedCalculate) p_calculatePolygonMutex.unlock();
     }
 
@@ -485,7 +491,7 @@ namespace Isis {
     geos::geom::MultiPolygon *emptyPolygon = Isis::globalFactory.createMultiPolygon();
 
     // Compare each polygon with all of the others
-    for(unsigned int outside = 0; outside < p_lonLatOverlaps.size() - 1; ++outside) {
+    for(int outside = 0; outside < p_lonLatOverlaps.size() - 1; ++outside) {
       p_calculatedSoFar = outside - 1;
 
       // unblock the writing process after every 10 polygons if we need to write
@@ -495,7 +501,7 @@ namespace Isis {
 
       // Intersect the current polygon (from the outside loop) with all others
       // below it
-      for(unsigned int inside = outside + 1; inside < p_lonLatOverlaps.size(); ++inside) {
+      for(int inside = outside + 1; inside < p_lonLatOverlaps.size(); ++inside) {
         try {
           if(p_lonLatOverlaps.at(outside)->HasAnySameSerialNumber(*p_lonLatOverlaps.at(inside))) continue;
 
@@ -777,7 +783,7 @@ namespace Isis {
 
     // Look at all the ImageOverlaps we have and return the ones that
     // have this sn
-    for(unsigned int ov = 0; ov < p_lonLatOverlaps.size(); ++ov) {
+    for(int ov = 0; ov < p_lonLatOverlaps.size(); ++ov) {
       for(int sn = 0; sn < p_lonLatOverlaps[ov]->Size(); ++sn) {
         if((*p_lonLatOverlaps[ov])[sn] == serialNumber) {
           matches.push_back(p_lonLatOverlaps[ov]);
