@@ -18,8 +18,8 @@ void IsisMain() {
 
   cerr << "Testing ls, grep, sed and pipes ... " << endl;
   cerr << endl;
-  ProgramLauncher::RunSystemCommand("ls -l * | grep Program | "
-      "sed 's/\\(.*\\)\\(ProgramLauncher.*\\)/\\2/'");
+  ProgramLauncher::RunSystemCommand("ls -l * | grep -e 'ProgramLauncher\\.' | "
+      "sed 's/\\(.*\\)\\(ProgramLauncher\\..*\\)/\\2/'");
 
   cerr << "Testing stats ... " << endl;
   cerr << endl;
