@@ -264,6 +264,33 @@ namespace Isis {
     Pvl protoFile(ptfile);
 
     PvlObject &protoBufferInfo = protoFile.FindObject("ProtoBuffer");
+    PvlGroup &cnetInfo = protoBufferInfo.FindGroup("ControlNetworkInfo");
+
+    int version = -1;
+
+    if(cnetInfo.HasKeyword("Version"))
+      version = cnetInfo["Version"][0];
+    // This should be able to go away by v2 or v3, they were made only
+    //   internally.
+    else if(cnetInfo.HasKeyword("Proto_Version"))
+      version = (int)((double)cnetInfo["Proto_Version"][0] + 0.5);
+
+    if(version != 1) {
+      if(version > 1) {
+        iString msg = "The control network file [" + ptfile + "] is too new "
+                      "for this version of Isis to read. The version is [" +
+                      iString(version) + "] which is greater than the known "
+                      "version 1.";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+      else {
+        iString msg = "The control network file [" + ptfile + "] has an unknown"
+                      " version and is probably too new for this version of "
+                      "Isis to read. The maximum version that can be read is 1";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+    }
+
     PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
     BigInt coreStartPos = protoBufferCore["StartByte"];
     BigInt coreLength =  protoBufferCore["Bytes"];
@@ -456,8 +483,9 @@ namespace Isis {
     netInfo += Isis::PvlKeyword("Created", p_created);
     netInfo += Isis::PvlKeyword("LastModified", p_modified);
     netInfo += Isis::PvlKeyword("Description", p_description);
-    netInfo += Isis::PvlKeyword("NumberOfPoints", points->count());
-    netInfo += Isis::PvlKeyword("Proto_Version", pbnet.pedigree().version());
+    netInfo += Isis::PvlKeyword("NumberOfPoints", GetNumPoints());
+    netInfo += Isis::PvlKeyword("NumberOfMeasures", GetNumMeasures());
+    netInfo += Isis::PvlKeyword("Version", "1");
     protoObj.AddGroup(netInfo);
 
     // Now write the log data section

@@ -141,7 +141,9 @@ namespace Isis {
    *                points or measures are ignored.
    *   @history 2011-03-15 Eric Hyer - Some cube graph bugs were fixed.
    *   @history 2011-03-25 Christopher Austin - Added UpdatePointReference() to
-   *                                 work with ControlPoint's SetId()
+   *                work with ControlPoint's SetId()
+   *   @history 2011-03-29 Steven Lambright - Made versioning viable for first
+   *                release. 
    */
   class ControlNet : public QObject {
       Q_OBJECT
