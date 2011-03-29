@@ -682,19 +682,21 @@ namespace Isis {
     Init();
     p_totalRegistrations++;
 
-    // Run a gradient filter over the search and pattern chips before
-    // attempting to match them.
-    ApplyGradientFilter(p_patternChip);
-    ApplyGradientFilter(p_searchChip);
+    // Create copies of the search and pattern chips and run a gradient filter
+    // over them before attempting to perform a match.
+    Chip gradientPatternChip(p_patternChip);
+    Chip gradientSearchChip(p_searchChip);
+    ApplyGradientFilter(gradientPatternChip);
+    ApplyGradientFilter(gradientSearchChip);
 
     // See if the pattern chip has enough good data
-    if(!p_patternChip.IsValid(p_patternValidPercent)) {
+    if(!gradientPatternChip.IsValid(p_patternValidPercent)) {
       p_patternChipNotEnoughValidDataCount++;
       p_registrationStatus = PatternChipNotEnoughValidData;
       return PatternChipNotEnoughValidData;
     }
 
-    if(!ComputeChipZScore(p_patternChip)) {
+    if(!ComputeChipZScore(gradientPatternChip)) {
       p_patternZScoreNotMetCount++;
       p_registrationStatus = PatternZScoreNotMet;
       return PatternZScoreNotMet;
@@ -705,24 +707,24 @@ namespace Isis {
     // and line for the search.  Also compute the sample and line
     // increment for sparse walking
     // ------------------------------------------------------------------
-    int startSamp = (p_patternChip.Samples() - 1) / 2 + 1;
-    int startLine = (p_patternChip.Lines() - 1) / 2 + 1;
-    int endSamp = p_searchChip.Samples() - startSamp + 1;
-    int endLine = p_searchChip.Lines() - startLine + 1;
+    int startSamp = (gradientPatternChip.Samples() - 1) / 2 + 1;
+    int startLine = (gradientPatternChip.Lines() - 1) / 2 + 1;
+    int endSamp = gradientSearchChip.Samples() - startSamp + 1;
+    int endLine = gradientSearchChip.Lines() - startLine + 1;
 
     // ----------------------------------------------------------------------
     // Before we attempt to apply the reduction factor, we need to make sure
     // we won't produce a chip of a bad size.
     // ----------------------------------------------------------------------
-    if(p_patternChip.Samples() / p_reduceFactor < 2 || p_patternChip.Lines() / p_reduceFactor < 2) {
+    if(gradientPatternChip.Samples() / p_reduceFactor < 2 || gradientPatternChip.Lines() / p_reduceFactor < 2) {
       string msg = "Reduction factor is too large";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // Establish the center search tack point as best pixel to start for the
     // adaptive algorithm prior to reduction.
-    int bestSearchSamp = p_searchChip.TackSample();
-    int bestSearchLine = p_searchChip.TackLine();
+    int bestSearchSamp = gradientSearchChip.TackSample();
+    int bestSearchLine = gradientSearchChip.TackLine();
 
     // ---------------------------------------------------------------------
     // if the reduction factor is still not equal to one, then we go ahead
@@ -734,8 +736,8 @@ namespace Isis {
         //Do not remove this brace.  It keeps startSamp, startLine, endSamp, and endLine in the
         //proper scope.
 
-        p_reducedPatternChip.SetSize((int)p_patternChip.Samples() / p_reduceFactor,
-                                     (int)p_patternChip.Lines() / p_reduceFactor);
+        p_reducedPatternChip.SetSize((int)gradientPatternChip.Samples() / p_reduceFactor,
+                                     (int)gradientPatternChip.Lines() / p_reduceFactor);
 
         // ----------------------------------
         // Fill the reduced Chip with nulls.
@@ -746,14 +748,14 @@ namespace Isis {
           }
         }
 
-        p_reducedPatternChip = Reduce(p_patternChip, p_reduceFactor);
+        p_reducedPatternChip = Reduce(gradientPatternChip, p_reduceFactor);
         if(!ComputeChipZScore(p_reducedPatternChip)) {
           p_patternZScoreNotMetCount++;
           p_registrationStatus = PatternZScoreNotMet;
           return PatternZScoreNotMet;
         }
 
-        p_reducedSearchChip = Reduce(p_searchChip, p_reduceFactor);
+        p_reducedSearchChip = Reduce(gradientSearchChip, p_reduceFactor);
         int startSamp = (p_reducedPatternChip.Samples() - 1) / 2 + 1;
         int startLine = (p_reducedPatternChip.Lines() - 1) / 2 + 1;
         int endSamp = p_reducedSearchChip.Samples() - startSamp + 1;
@@ -807,13 +809,17 @@ namespace Isis {
     // to be closely registered.  Within a few pixels.  So let it take over
     // doing the sub-pixel accuracy computation
     if(IsAdaptive()) {
-      p_registrationStatus = AdaptiveRegistration(p_searchChip, p_patternChip, p_fitChip,
+      p_registrationStatus = AdaptiveRegistration(gradientSearchChip, gradientPatternChip, p_fitChip,
                                       startSamp, startLine, endSamp, endLine, bestSearchSamp,
                                       bestSearchLine);
       if(p_registrationStatus == AutoReg::SuccessSubPixel) {
         p_searchChip.SetChipPosition(p_chipSample, p_chipLine);
-        p_cubeSample = p_searchChip.CubeSample();
-        p_cubeLine   = p_searchChip.CubeLine();
+
+        // We need to get the cube position from the gradient search chip that
+        // was modified by the adaptive registration.
+        gradientSearchChip.SetChipPosition(p_chipSample, p_chipLine);
+        p_cubeSample = gradientSearchChip.CubeSample();
+        p_cubeLine   = gradientSearchChip.CubeLine();
         p_goodnessOfFit = p_bestFit;
         p_subpixelSuccesses++;
       }
@@ -821,7 +827,7 @@ namespace Isis {
     }
 
     // Not adaptive continue with slower search traverse
-    Match(p_searchChip, p_patternChip, p_fitChip, startSamp, endSamp, startLine, endLine);
+    Match(gradientSearchChip, gradientPatternChip, p_fitChip, startSamp, endSamp, startLine, endLine);
 
     // Check to see if we went through the fit chip and never got a fit at
     // any location.
@@ -1019,7 +1025,12 @@ namespace Isis {
       }
     }
 
-    chip = filteredChip;
+    // Copy the data from the filtered chip back into the original chip.
+    for (int line = 1; line <= filteredChip.Lines(); line++) {
+      for (int sample = 1; sample <= filteredChip.Samples(); sample++) {
+        chip.SetValue(sample, line, filteredChip.GetValue(sample, line));
+      }
+    }
   }
 
   /**

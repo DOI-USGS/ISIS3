@@ -152,6 +152,10 @@ namespace Isis {
    *             filter to chips before attempting to perform a match. Renamed
    *             member variables to be consistent with the variable naming
    *             scheme in the rest of the file.
+   *    @history 2011-03-29 Jai Rideout - Fixed bug where gradient filter was
+   *             being reapplied to pattern and search chips each time
+   *             Register() was called. Also fixed bug where filtered chips
+   *             lost cube positioning information in ApplyGradientFilter().
    *
    */
   class AutoRegItem;
@@ -221,7 +225,7 @@ namespace Isis {
         return &p_reducedSearchChip;
       };
 
-      //! Return pointer to reduced fix chip
+      //! Return pointer to reduced fit chip
       inline Chip *ReducedFitChip() {
         return &p_reducedFitChip;
       };

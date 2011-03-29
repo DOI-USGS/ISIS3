@@ -48,6 +48,40 @@ namespace Isis {
     Init(3, 3);
   }
 
+  /**
+   * Constructs a copy of the passed in chip.
+   *
+   * @param other the chip to be copied
+   */
+  Chip::Chip(const Chip &other) {
+    p_chipSamples = other.p_chipSamples;
+    p_chipLines = other.p_chipLines;
+    p_buf = other.p_buf;
+    p_tackSample = other.p_tackSample;
+    p_tackLine = other.p_tackLine;
+ 
+    p_cubeTackSample = other.p_cubeTackSample;
+    p_cubeTackLine = other.p_cubeTackLine;
+
+    p_validMinimum = other.p_validMinimum;
+    p_validMaximum = other.p_validMaximum;
+
+    p_chipSample = other.p_chipSample;
+    p_chipLine = other.p_chipLine;
+    p_cubeSample = other.p_cubeSample;
+    p_cubeLine = other.p_cubeLine;
+
+    if (other.p_clipPolygon) {
+      p_clipPolygon = (geos::geom::MultiPolygon*)other.p_clipPolygon->clone();
+    }
+    else {
+      p_clipPolygon = NULL;
+    }
+
+    p_affine = other.p_affine;
+    p_readInterpolator = other.p_readInterpolator;
+    p_filename = other.p_filename;
+  }
 
   /**
    * Construct a Chip with specified dimensions
@@ -1011,4 +1045,44 @@ namespace Isis {
     p_clipPolygon = PolygonTools::CopyMultiPolygon(clipPolygon);
   }
 
+  /**
+   * Copy assignment operator.
+   *
+   * @param other chip to be copied to this
+   */
+  Chip &Chip::operator=(const Chip &other) {
+    p_chipSamples = other.p_chipSamples;
+    p_chipLines = other.p_chipLines;
+    p_buf = other.p_buf;
+    p_tackSample = other.p_tackSample;
+    p_tackLine = other.p_tackLine;
+
+    p_cubeTackSample = other.p_cubeTackSample;
+    p_cubeTackLine = other.p_cubeTackLine;
+
+    p_validMinimum = other.p_validMinimum;
+    p_validMaximum = other.p_validMaximum;
+
+    p_chipSample = other.p_chipSample;
+    p_chipLine = other.p_chipLine;
+    p_cubeSample = other.p_cubeSample;
+    p_cubeLine = other.p_cubeLine;
+
+    // Free allocated memory.
+    if (p_clipPolygon) {
+      delete p_clipPolygon;
+      p_clipPolygon = NULL;
+    }
+
+    if (other.p_clipPolygon) {
+      p_clipPolygon = (geos::geom::MultiPolygon*)other.p_clipPolygon->clone();
+    }
+
+    p_affine = other.p_affine;
+    p_readInterpolator = other.p_readInterpolator;
+    p_filename = other.p_filename;
+
+    return *this;
+  }
 } // end namespace isis
+

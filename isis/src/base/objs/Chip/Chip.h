@@ -104,12 +104,14 @@ namespace Isis {
    *   @history 2010-09-16  Jeannie Walldren - Updated unitTest, truth file and
    *                          test cube to run properly with ShapeModel changes
    *                          to Sensor class.
-   *  
+   *   @history 2011-03-29  Jai Rideout - Added copy constructor and equals
+   *                          operator.
    *
    */
   class Chip {
     public:
       Chip();
+      Chip(const Chip &other);
       Chip(const int samples, const int lines);
       virtual ~Chip();
 
@@ -251,6 +253,8 @@ namespace Isis {
       void Write(const string &filename);
 
       void SetClipPolygon(const geos::geom::MultiPolygon &clipPolygon);
+
+      Chip &operator=(const Chip &other);
 
       /**
        * @brief Returns the Affine transformation of chip-to-cube indices
