@@ -495,7 +495,7 @@ namespace Isis {
       p_calculatedSoFar = outside - 1;
 
       // unblock the writing process after every 10 polygons if we need to write
-      if(p_calculatedSoFar % 10 == 0 && (!snlist || p_lonLatOverlaps.size() > (unsigned)snlist->Size())) {
+      if(p_calculatedSoFar % 10 == 0 && (!snlist || p_lonLatOverlaps.size() > snlist->Size())) {
         if(p_threadedCalculate) p_calculatePolygonMutex.unlock();
       }
 
@@ -723,7 +723,7 @@ namespace Isis {
 
     // Do not write empty overlap files
     if(snlist) {
-      if(p_lonLatOverlaps.size() == (unsigned)snlist->Size()) {
+      if(p_lonLatOverlaps.size() == snlist->Size()) {
         p_lonLatOverlaps.clear();
       }
     }
@@ -807,7 +807,7 @@ namespace Isis {
   void ImageOverlapSet::HandleError(iException &e, SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
-    if(overlap1 >= 0 && (unsigned)overlap1 < p_lonLatOverlaps.size()) {
+    if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("Filenames");
       PvlKeyword polygon("Polygon");
@@ -830,7 +830,7 @@ namespace Isis {
       err += polygon;
     }
 
-    if(overlap2 >= 0 && (unsigned)overlap1 < p_lonLatOverlaps.size() && (unsigned)overlap2 < p_lonLatOverlaps.size()) {
+    if(overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("Filenames");
       PvlKeyword polygon("Polygon");
@@ -879,7 +879,7 @@ namespace Isis {
   void ImageOverlapSet::HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
-    if(overlap1 >= 0 && (unsigned)overlap1 < p_lonLatOverlaps.size()) {
+    if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("Filenames");
 
@@ -898,7 +898,7 @@ namespace Isis {
       }
     }
 
-    if(overlap2 >= 0 && (unsigned)overlap1 < p_lonLatOverlaps.size() && (unsigned)overlap2 < p_lonLatOverlaps.size()) {
+    if(overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("Filenames");
 
@@ -945,7 +945,7 @@ namespace Isis {
   void ImageOverlapSet::HandleError(SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
-    if(overlap1 >= 0 && (unsigned)overlap1 < p_lonLatOverlaps.size()) {
+    if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("Filenames");
 
@@ -964,7 +964,7 @@ namespace Isis {
       }
     }
 
-    if(overlap2 >= 0 && (unsigned)overlap1 < p_lonLatOverlaps.size() && (unsigned)overlap2 < p_lonLatOverlaps.size()) {
+    if(overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
       PvlKeyword filename("Filenames");
 
