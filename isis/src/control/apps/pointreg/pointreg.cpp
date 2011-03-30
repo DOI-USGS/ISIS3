@@ -21,6 +21,7 @@
 using namespace std;
 using namespace Isis;
 
+void VerifyCube(Cube & cube);
 void PrintTemp();
 
 map <string, void *> GuiHelpers() {
@@ -160,8 +161,12 @@ void IsisMain() {
                 measure->GetCubeSerialNumber()));
 
           ar->SearchChip()->TackCube(measure->GetSample(), measure->GetLine());
+          
+          VerifyCube(patternCube);
+          VerifyCube(searchCube);
 
           try {
+
             ar->SearchChip()->Load(searchCube, *(ar->PatternChip()), patternCube);
 
             // If the measurements were correctly registered
@@ -240,6 +245,7 @@ void IsisMain() {
             }
           }
           catch (iException &e) {
+            std::cout << "catch" << std::endl;
             e.Clear();
             unregistered++;
 
@@ -382,6 +388,18 @@ void IsisMain() {
 
   delete ar;
 }
+
+// Verify a cube has either a Camera or a Projection, throw an exception if not
+void VerifyCube(Cube & cube) {
+  try {
+    cube.Camera();
+  }
+  catch (iException &e) {
+    cube.Projection();
+    e.Clear();
+  }
+}
+
 
 // Helper function to print out template to session log
 void PrintTemp() {
