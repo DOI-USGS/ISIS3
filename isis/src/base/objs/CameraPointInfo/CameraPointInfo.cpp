@@ -101,7 +101,7 @@ namespace Isis {
    */
   PvlGroup *CameraPointInfo::SetCenter(const bool outside, const bool errors) {
     if(CheckCube()) {
-      bool passed = camera->SetImage(currentCube->Samples() / 2, currentCube->Lines() / 2);
+      bool passed = camera->SetImage(currentCube->Samples() / 2.0, currentCube->Lines() / 2.0);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -119,7 +119,7 @@ namespace Isis {
   PvlGroup *CameraPointInfo::SetSample(const double sample,
                                        const bool outside, const bool errors) {
     if(CheckCube()) {
-      bool passed = camera->SetImage(sample, currentCube->Lines() / 2);
+      bool passed = camera->SetImage(sample, currentCube->Lines() / 2.0);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -137,7 +137,7 @@ namespace Isis {
   PvlGroup *CameraPointInfo::SetLine(const double line,
                                      const bool outside, const bool errors) {
     if(CheckCube()) {
-      bool passed = camera->SetImage(currentCube->Samples() / 2, line);
+      bool passed = camera->SetImage(currentCube->Samples() / 2.0, line);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
