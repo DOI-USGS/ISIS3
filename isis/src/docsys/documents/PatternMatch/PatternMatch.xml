@@ -353,8 +353,8 @@
           shear Affine components maximum limit is computed as:
 
           <pre style="padding-left:4em;">
-            SampleScale = AffineScaleTolerance / ((#Samples - 1) / 2)
-            SampleShear = AffineShearTolerance / ((#Samples - 1) / 2)
+            SampleMaximum = AffineScaleTolerance / ((#Samples - 1) / 2)
+            SampleMaximum = AffineShearTolerance / ((#Samples - 1) / 2)
           </pre>
 
           Likewise, the line scale and shear maximums are computed using
@@ -573,6 +573,92 @@
           MinimumDifference or 1.0 for MaximumCorrelation), we have a perfect
           fit and, thus, know it is in the best position. In this case, the
           sub-pixel accuracy phase is omitted.
+        </p>
+
+        <h3><a name="DistanceTolerance">Distance Tolerance</a></h3>
+        <p>
+          The result of a sub-pixel accuracy computation is likely to move the
+          result away from its original whole-pixel fit.  However, sometimes
+          the move could be so drastic that it calls into question the validity
+          of the match.  This tolerance value thus specifies the max number of
+          pixels (with sub-pixel granularity) the sub-pixel accuracy
+          computation can move the best fit before the registration is rejected
+          entirely.  
+        </p>
+        <p>
+          For example:
+
+          <pre style="padding-left:4em;">
+            Group = SurfaceModel
+              DistanceTolerance = 3.5
+            End_Group
+          </pre>
+
+          Here a registration will be rejected if the new position is more than
+          3.5 pixels away from the original whole-pixel result.
+        </p>
+
+        <h3><a name="WindowSize">Window Size</a></h3>
+        <p>
+          COMING SOON
+        </p>
+
+        <h3><a name="EccentricityRatio">Eccentricity Ratio</a></h3>
+        <p>
+          After the least squares fit is performed to model a surface, the
+          ideal result is a circular formation of goodness-of-fit values
+          improving towards the center of the surface.  The less circular, or
+          more "eccentric", the formation of goodness-of-fit values, the less
+          likely the modelling result is accurate.
+        </p>
+        <p>
+          In an attempt to let the user define what constitutes a tolerable
+          amount of eccentricity in their surface models, we introduce the
+          notion of an "Eccentricity Ratio".  The name itself might be a bit
+          misleading, as the value specified is not an actual ratio, nor is it
+          compared directly to the eccentricity of the surface model.  Whereas
+          the 
+          <a href="http://mathworld.wolfram.com/Ellipse.html">
+            mathematical definition of eccentricity
+          </a>
+          is a number between 0 and 1 -- those bounds representing a perfect
+          circle and a parabola, respectively -- here we think of eccentricity
+          itself as a ratio between the semi-major and semi-minor axes of an
+          ellipse.  The value specified by the EccentricityRatio keyword then
+          represents the user's tolerance for this ratio.  In other words, the
+          EccentricityRatio keyword tells us how much bigger than the
+          semi-minor axis the semi-major axis can be before we reject the
+          result.
+        </p>
+        <p>
+          For example, consider the following PVL:
+
+          <pre style="padding-left:4em;">
+            Group = SurfaceModel
+              EccentricityRatio = 5.0
+            End_Group
+          </pre>
+
+          In this instance, if the length of the semi-major axis of the
+          computed surface model is greater than 5 times the length of the
+          semi-minor axis, then the surface model will be thrown out and the
+          point will not be registered to sub-pixel accuracy.
+        </p>
+        <p>
+          Sometimes the eccentricity can not be computed for a given surface
+          model because the math simply doesn't work out (negative numbers
+          appear in square root calculations).  In this case the eccentricity
+          is assumed to be 0, or perfectly circular.
+        </p>
+        <p>
+          If the user does not wish to perform the eccentricity test on their
+          surface models, the keyword can be optionally left out of the
+          definition file and the test will be completely skipped.
+        </p>
+
+        <h3><a name="ResidualTolerance">Residual Tolerance</a></h3>
+        <p>
+          COMING SOON
         </p>
 
         <!-- Advanced Features -->
