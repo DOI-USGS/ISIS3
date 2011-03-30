@@ -388,7 +388,8 @@ namespace Qisis {
     p_viewportHeight = p_viewport->viewport()->height();
 
     p_oldVertScrollBarPos = p_vertScrollBarPos;
-    p_vertScrollBarPos = p_viewport->verticalScrollBar()->value();
+    // Add +1 to remove the black line at the top
+    p_vertScrollBarPos = p_viewport->verticalScrollBar()->value() + 1; 
   }
 
 
@@ -407,7 +408,7 @@ namespace Qisis {
   ViewportBufferFill *ViewportBuffer::createViewportBufferFill(
     QRect someRect, bool useOldY) {
     QScrollBar *hsb = p_viewport->horizontalScrollBar();
-    int xConstCoef = hsb->value();
+    int xConstCoef = hsb->value() + 1; // Add +1 to remove the black line on left
     xConstCoef -= p_viewport->viewport()->width() / 2;
 
     // If panning over a full screen, it will try to create a fill rect that
@@ -424,10 +425,10 @@ namespace Qisis {
     int yConstCoef = 0;
 
     if(!useOldY)
-      yConstCoef = p_vertScrollBarPos - p_viewportHeight / 2;
+      yConstCoef = (p_vertScrollBarPos) - p_viewportHeight / 2;
     else
-      yConstCoef = p_oldVertScrollBarPos - p_oldViewportHeight / 2;
-
+      yConstCoef = (p_oldVertScrollBarPos) - p_oldViewportHeight / 2;
+    
     double yScale = xScale;
 
     QPoint topLeft;

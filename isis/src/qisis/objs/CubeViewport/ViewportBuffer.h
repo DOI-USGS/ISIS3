@@ -21,6 +21,7 @@
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
+ *  
  */
 
 #include <vector>
@@ -70,6 +71,8 @@ namespace Qisis {
    *                          were in wrong order)
    *   @history 2010-07-12 Jeannie Walldren - Added exceptiona to help track
    *                          errors.
+   *   @history 2011-03-30 Sharmila Prasad - Edited to remove black line on
+   *                       the left and on top
    */
   class ViewportBuffer : public QObject {
       Q_OBJECT

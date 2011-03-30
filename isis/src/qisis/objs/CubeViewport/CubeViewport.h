@@ -97,6 +97,8 @@ namespace Qisis {
   *  @history 2010-11-08 Eric Hyer -  Added better mouseMove signal
   *  @history 2010-12-01 Steven Lambright - The initial scale now uses fitScale
   *                         so that it is consistent with the zoom tool.
+  *  @history 2011-03-30 Sharmila Prasad - Set the frame shadow and style to remove
+  *                      border around the image
   */
 
   class Tool;

@@ -96,6 +96,11 @@ namespace Qisis {
     viewport()->installEventFilter(this);
     viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
 
+    setAttribute(Qt::WA_NoSystemBackground);
+    setFrameShadow(QFrame::Plain);
+    setFrameShape(QFrame::NoFrame);
+    setAutoFillBackground(false);
+    
 //    viewport()->setAttribute(Qt::WA_NoSystemBackground);
 //    viewport()->setAttribute(Qt::WA_PaintOnScreen,false);
 
