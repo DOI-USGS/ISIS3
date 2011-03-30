@@ -288,7 +288,7 @@ namespace Qisis {
         double baseSamp, baseLine;
 
 
-        if (p_baseGM->SetGround(p.GetSurfacePoint())) {
+        if (p_baseGM->SetGround(p.GetBestSurfacePoint())) {
           //  Make sure point on base cube
           baseSamp = p_baseGM->Sample();
           baseLine = p_baseGM->Line();
@@ -364,7 +364,7 @@ namespace Qisis {
     Longitude lon(p_baseGM->UniversalLongitude(), Angle::Degrees);
     Distance radius(p_baseGM->Projection()->LocalRadius(), Distance::Meters);
 
-    p_controlPoint->SetSurfacePoint(SurfacePoint(lat, lon, radius));
+    p_controlPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
 
     emit editPointChanged();
   }
