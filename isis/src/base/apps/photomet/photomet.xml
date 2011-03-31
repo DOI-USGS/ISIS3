@@ -450,6 +450,12 @@
       been added. The ANGLESOURCE parameter lets you specify the source where the
       photometric angles will come from: ellipsoid, DEM, or center of image.
     </change>
+    <change name="Janet Barrett" date="2011-03-29">
+      The CENTER option of the ANGLESOURCE parameter has been removed and the
+      CENTER_FROM_IMAGE, CENTER_FROM_LABEL and CENTER_FROM_USER options have been 
+      added. This allows the user to determine where the center photometric angles
+      will come from.
+    </change>
   </history>
 
   <category>
@@ -548,6 +554,11 @@
               The photometric angles for each pixel is obtained using the ellipsoid
               shape model.
             </description>
+            <exclusions>
+              <item>PHASE_ANGLE</item>
+              <item>INCIDENCE_ANGLE</item>
+              <item>EMISSION_ANGLE</item>
+            </exclusions>
           </option>
           <option value="DEM">
             <brief>Use the DEM to determine photometric angles</brief>
@@ -555,17 +566,86 @@
               The photometric angles for each pixel is obtained using the DEM shape
               model (if one exists in the image labels).
             </description>
+            <exclusions>
+              <item>PHASE_ANGLE</item>
+              <item>INCIDENCE_ANGLE</item>
+              <item>EMISSION_ANGLE</item>
+            </exclusions>
           </option>
-          <option value="CENTER">
-            <brief>Use the CENTER to determine photometric angles</brief>
+          <option value="CENTER_FROM_IMAGE">
+            <brief>Use the photometric angles obtained from the center of the image</brief>
             <description>
               The photometric angles are obtained from the center of the input image
               using the ellipsoid shape model. These angles are then applied to every
               pixel in the file. This option is good for images where the photometric
               angles don't change very much and when you want faster processing.
             </description>
+            <exclusions>
+              <item>PHASE_ANGLE</item>
+              <item>INCIDENCE_ANGLE</item>
+              <item>EMISSION_ANGLE</item>
+            </exclusions>
+          </option>
+          <option value="CENTER_FROM_LABEL">
+            <brief>Use the photometric angles obtained from the image label</brief>
+            <description>
+              The photometric angles are obtained from the label of the input image
+              These angles are then applied to every pixel in the file. This option is
+              good for images where the photometric angles don't change very much and
+              when you want faster processing.
+            </description>
+            <exclusions>
+              <item>PHASE_ANGLE</item>
+              <item>INCIDENCE_ANGLE</item>
+              <item>EMISSION_ANGLE</item>
+            </exclusions>
+          </option>
+          <option value="CENTER_FROM_USER">
+            <brief>Use the photometric angles obtained from the user</brief>
+            <description>
+              The photometric angles are obtained from the user. These angles are then
+              applied to every pixel in the file. This option is good for images where
+              the photometric angles don't change very much and when you want faster
+              processing.
+            </description>
           </option>
         </list>
+      </parameter>
+      <parameter name="PHASE_ANGLE">
+        <type>double</type>
+        <brief>
+          Center phase angle
+        </brief>
+        <description>
+          The center phase angle to use if the CENTER_FROM_USER option is chosen.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">180.0</maximum>
+        <default><item> 0.0</item></default>
+      </parameter>
+      <parameter name="INCIDENCE_ANGLE">
+        <type>double</type>
+        <brief>
+          Center incidence angle
+        </brief>
+        <description>
+          The center incidence angle to use if the CENTER_FROM_USER option is chosen.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <default><item> 0.0</item></default>
+      </parameter>
+      <parameter name="EMISSION_ANGLE">
+        <type>double</type>
+        <brief>
+          Center emission angle
+        </brief>
+        <description>
+          The center emission angle to use if the CENTER_FROM_USER option is chosen.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <default><item> 0.0</item></default>
       </parameter>
     </group>
     

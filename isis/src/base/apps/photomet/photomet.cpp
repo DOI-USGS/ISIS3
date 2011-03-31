@@ -32,13 +32,6 @@ void IsisMain() {
   // We will be processing by line
   ProcessByLine p;
 
-  // Set up the input cube and get camera information
-  icube = p.SetInputCube("FROM");
-  cam = icube->Camera();
-
-  // Create the output cube
-  p.SetOutputCube("TO");
-
   // Set up the user interface
   UserInterface &ui = Application::GetUserInterface();
   
@@ -52,17 +45,44 @@ void IsisMain() {
   // determine how photometric angles should be calculated
   angleSource = ui.GetString("ANGLESOURCE");
  
+  // Get camera information if needed
+  if (angleSource == "ELLIPSOID" || angleSource == "DEM" || 
+      angleSource == "CENTER_FROM_IMAGE") {
+    // Set up the input cube 
+    icube = p.SetInputCube("FROM");
+    cam = icube->Camera();
+  } 
+  else {
+    p.SetInputCube("FROM");
+  }
+
+  // Create the output cube
+  p.SetOutputCube("TO");
+
+  Pvl inLabel;
+  inLabel.Read(ui.GetFilename("FROM"));
+
   // If the source of photometric angles is the center of the image,
   // then get the angles at the center of the image.
-  if (angleSource == "CENTER") {
+  if (angleSource == "CENTER_FROM_IMAGE") {
     cam->SetImage(cam->Samples()/2, cam->Lines()/2);
     centerPhase = cam->PhaseAngle();
     centerIncidence = cam->IncidenceAngle();
     centerEmission = cam->EmissionAngle();
   }
+  else if (angleSource == "CENTER_FROM_LABEL") {
+    centerPhase = inLabel.FindKeyword("PhaseAngle", Pvl::Traverse);
+    centerIncidence = inLabel.FindKeyword("IncidenceAngle", Pvl::Traverse);
+    centerEmission = inLabel.FindKeyword("EmissionAngle", Pvl::Traverse);
+  }
+  else if (angleSource == "CENTER_FROM_USER") {
+    centerPhase = ui.GetDouble("PHASE_ANGLE");
+    centerIncidence = ui.GetDouble("INCIDENCE_ANGLE");
+    centerEmission = ui.GetDouble("EMISSION_ANGLE");
+  }
  
   // Get the BandBin Center from the image
-  PvlGroup pvlg = icube->GetGroup("BandBin");
+  PvlGroup pvlg = inLabel.FindGroup("BandBin", Pvl::Traverse);
   double wl;
   if(pvlg.HasKeyword("Center")) {
     PvlKeyword &wavelength = pvlg.FindKeyword("Center");
@@ -109,7 +129,9 @@ void photomet(Buffer &in, Buffer &out) {
     }
     
     // if off the target, set to null
-    else if(!cam->SetImage(in.Sample(i), in.Line(i))) {
+    else if((angleSource == "ELLIPSOID" || angleSource == "DEM" ||
+            angleSource == "CENTER_FROM_IMAGE") &&
+            (!cam->SetImage(in.Sample(i), in.Line(i)))) {
       out[i] = NULL8;
     }
     
@@ -117,7 +139,9 @@ void photomet(Buffer &in, Buffer &out) {
     else {
       
       bool success = true;
-      if (angleSource == "CENTER") {
+      if (angleSource == "CENTER_FROM_IMAGE" || 
+          angleSource == "CENTER_FROM_LABEL" ||
+          angleSource == "CENTER_FROM_USER") {
         ellipsoidpha = centerPhase;
         ellipsoidinc = centerIncidence;
         ellipsoidema = centerEmission;
