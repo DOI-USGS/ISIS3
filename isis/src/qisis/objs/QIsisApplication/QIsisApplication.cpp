@@ -24,18 +24,24 @@ namespace Qisis {
   * handles the exception by catching it and displaying the
   * MessageBox Warning.
   *
-  * @author Sharmila Prasad (11/24/2009)
-  *
+  * @author Sharmila Prasad (11/24/2009) 
+  *  
   * @param rec - QObject where the exception occured
   * @param ev  - Event where the exception occured
   *
   * @return bool
+  *  
+  * @internal 
+  * @history 2011-03-11 Tracie Sucharski - Create dialog with thrown errors 
+  *                        instead of ignoring and clearing. 
   */
   bool QIsisApplication::notify(QObject *rec, QEvent *ev) {
     try {
       return QApplication::notify(rec, ev);
     }
     catch(Isis::iException &e) {
+      QString message = e.what();
+      QMessageBox::critical(NULL,"Error",message);
       e.Clear();
     }
     return false;
