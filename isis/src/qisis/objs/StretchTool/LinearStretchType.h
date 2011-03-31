@@ -14,6 +14,20 @@ class QString;
 class QColor;
 
 namespace Qisis {
+
+  /**
+   * @brief This handles the advanced linear stretch
+   *
+   * The linear stretch is what happens without the advanced stretch tool. This
+   *   is useful for visualizing and making adjustments of the linear stretch
+   *   with a histogram of the data.
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2010-05-20 Steven Lambright
+   *
+   * @internal
+   */
   class LinearStretchType : public StretchType {
       Q_OBJECT
 

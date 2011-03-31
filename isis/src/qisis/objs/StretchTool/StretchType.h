@@ -16,6 +16,20 @@ class QGridLayout;
 namespace Qisis {
   class HistogramWidget;
 
+  /**
+   * @brief This is the base class for advanced stretches
+   *
+   * This has the common functionality between the advanced stretch types. It
+   *  provides a histogram, the stretch table, and layouts. It also stores the
+   *  stretch pairs. Using this should keep all of the advanced stretch
+   *  interfaces similar and uniformly accessible from the stretch tool.
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2010-05-20 Steven Lambright
+   *
+   * @internal
+   */
   class StretchType : public QWidget {
       Q_OBJECT
 

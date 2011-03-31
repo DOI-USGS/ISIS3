@@ -21,7 +21,6 @@ namespace Qisis {
    *
    *
    */
-
   class StretchTool;
 
   class QStretch : public QObject {

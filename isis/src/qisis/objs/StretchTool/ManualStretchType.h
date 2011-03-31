@@ -14,6 +14,19 @@ class QString;
 class QColor;
 
 namespace Qisis {
+
+  /**
+   * @brief This handles arbitrary user-input stretches
+   *
+   * This is designed to take any stretch pairs the user wants that we can
+   *   handle.
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2010-05-20 Steven Lambright
+   *
+   * @internal
+   */
   class ManualStretchType : public StretchType {
       Q_OBJECT
 

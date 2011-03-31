@@ -14,6 +14,20 @@ class QString;
 class QColor;
 
 namespace Qisis {
+  /**
+   * @brief This handles the advanced binary stretch
+   *
+   * The binary stretch consists off DNs being "ON" or "OFF" (0 or 255). This
+   *   is useful for finding DNs in a certain range. Because all stretches
+   *   consist of lines with a slope, we can't actually have a binary stretch.
+   *   This, however, makes a stretch as close to binary as it can.
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2010-05-20 Steven Lambright
+   *
+   * @internal
+   */
   class BinaryStretchType : public StretchType {
       Q_OBJECT
 
