@@ -150,10 +150,10 @@ void phocube(Buffer &out) {
         }
         if(localEmission || localIncidence) {
           Angle phase;
-          Angle emission;
           Angle incidence;
+          Angle emission;
           bool success;
-          cam->LocalPhotometricAngles(phase, emission, incidence, success);
+          cam->LocalPhotometricAngles(phase, incidence, emission, success);
 
           if (localEmission) {
             out[index] = emission.GetDegrees();
