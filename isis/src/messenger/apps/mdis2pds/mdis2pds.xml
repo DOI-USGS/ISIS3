@@ -44,6 +44,9 @@
         characters.  Also quoted the SOFTWARE_VERSION_ID and FILTER_NUMBER 
         keyword values.  Added units to RETICLE_POINT_* keywords where missing.
     </change>
+    <change name="Steven Lambright" date="2011-03-31">
+      The DarkStripMean keyword can now be "N/A"
+    </change>
   </history>
 
   <category>

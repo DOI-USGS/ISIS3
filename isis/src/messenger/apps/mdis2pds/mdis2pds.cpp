@@ -259,8 +259,16 @@ void IsisMain() {
   imageObj.AddKeyword(saturated);
   if(imageObj.HasKeyword("DARK_STRIP_MEAN")) {
     PvlKeyword &darkStripMean = imageObj.FindKeyword("DARK_STRIP_MEAN");
-    if(darkStripMean.Size() > 0) {
-      darkStripMean[0] = iString(SetRound(darkStripMean[0], 16));
+
+    try {
+      if(darkStripMean.Size() > 0) {
+        darkStripMean[0] = iString(SetRound(darkStripMean[0], 16));
+      }
+    }
+    catch(iException &e) {
+      // If we fail to convert this keyword to a number, then preserve
+      // its existing value
+      e.Clear();
     }
   }
 
