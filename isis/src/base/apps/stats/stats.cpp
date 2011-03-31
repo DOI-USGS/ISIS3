@@ -28,11 +28,26 @@ void IsisMain() {
     validMax = ui.GetDouble("VALIDMAX");
   }
 
+  int iNumBands = icube->Bands();
+  
   Histogram *stats = icube->Histogram(1, validMin, validMax);
 
   // Construct a label with the results
-  PvlGroup results("Results");
+  PvlGroup results("Results");  
   results += PvlKeyword("From", icube->Filename());
+  if(iNumBands==1) {
+    results += PvlKeyword("Band", icube->PhysicalBand(1));
+  }
+  else {
+    iString sBands="";
+    for(int i=0; i<iNumBands; i++) {
+      sBands += iString(icube->PhysicalBand(i+1));
+      if(i != (iNumBands-1)) {
+        sBands += ", ";
+      }
+    }
+    results += PvlKeyword("Bands", sBands);
+  }
   if(stats->ValidPixels() != 0) {
     results += PvlKeyword("Average", stats->Average());
     results += PvlKeyword("StandardDeviation", stats->StandardDeviation());
