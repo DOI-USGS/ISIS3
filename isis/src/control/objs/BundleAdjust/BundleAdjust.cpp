@@ -1,7 +1,6 @@
 #include "BundleAdjust.h"
 
 #include <iomanip>
-#include <fstream>
 
 #include "SpecialPixel.h"
 #include "BasisFunction.h"
@@ -19,6 +18,7 @@
 #include "SurfacePoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "iTime.h"
 
 #include "boost/numeric/ublas/matrix_sparse.hpp"
 #include "boost/numeric/ublas/io.hpp"
@@ -214,9 +214,10 @@ namespace Isis {
     m_dGlobalSpacecraftPositionAprioriSigma = -1.0;
     m_dGlobalSpacecraftVelocityAprioriSigma = -1.0;
     m_dGlobalSpacecraftAccelerationAprioriSigma = -1.0;
-    m_dGlobalCameraAnglesAprioriSigma = -1.0;
-    m_dGlobalCameraAngularVelocityAprioriSigma = -1.0;
-    m_dGlobalCameraAngularAccelerationAprioriSigma = -1.0;
+
+//    m_dGlobalCameraAnglesAprioriSigma = -1.0;
+//    m_dGlobalCameraAngularVelocityAprioriSigma = -1.0;
+//    m_dGlobalCameraAngularAccelerationAprioriSigma = -1.0;
 
     m_dGlobalSpacecraftPositionWeight = 0.0;
     m_dGlobalSpacecraftVelocityWeight = 0.0;
@@ -422,7 +423,7 @@ namespace Isis {
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
       }
     }
-    if (m_cmatrixSolveType == AnglesVelocityAcceleration) {
+    if (m_cmatrixSolveType >= AnglesVelocityAcceleration) {
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
@@ -435,7 +436,7 @@ namespace Isis {
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
       }
-    }
+    }    
   }
 
   /**
@@ -497,6 +498,10 @@ namespace Isis {
         m_nNumberCameraCoefSolved = 0;
         break;
     }
+
+    m_dGlobalCameraAnglesAprioriSigma.resize(m_nNumberCameraCoefSolved);
+    for( int i = 0; i < m_nNumberCameraCoefSolved; i++ )
+        m_dGlobalCameraAnglesAprioriSigma[i] = -1.0;
 
     // Make sure the degree of the polynomial the user selected for
     // the camera angles fit is sufficient for the selected CAMSOLVE
@@ -580,19 +585,27 @@ namespace Isis {
       = 1.0 / (m_dGlobalSpacecraftAccelerationAprioriSigma * m_dGlobalSpacecraftAccelerationAprioriSigma * 1.0e-6);
     }
 
-    if (m_dGlobalCameraAnglesAprioriSigma > 0.0) {
-      m_dGlobalCameraAnglesWeight
-      = 1.0 / (m_dGlobalCameraAnglesAprioriSigma * m_dGlobalCameraAnglesAprioriSigma * DEG2RAD * DEG2RAD);
+    if ( m_nNumberCameraCoefSolved >= 1 ) {
+        if ( m_dGlobalCameraAnglesAprioriSigma[0] > 0.0 ) {
+            m_dGlobalCameraAnglesWeight
+                    = 1.0 / (m_dGlobalCameraAnglesAprioriSigma[0] * m_dGlobalCameraAnglesAprioriSigma[0] * DEG2RAD * DEG2RAD);
+        }
     }
 
-    if (m_dGlobalCameraAngularVelocityAprioriSigma > 0.0) {
-      m_dGlobalCameraAngularVelocityWeight
-      = 1.0 / (m_dGlobalCameraAngularVelocityAprioriSigma * m_dGlobalCameraAngularVelocityAprioriSigma * DEG2RAD * DEG2RAD);
+//    if (m_dGlobalCameraAngularVelocityAprioriSigma > 0.0) {
+    if ( m_nNumberCameraCoefSolved >= 2 ) {
+        if ( m_dGlobalCameraAnglesAprioriSigma[1] > 0.0 ) {
+            m_dGlobalCameraAngularVelocityWeight
+                    = 1.0 / (m_dGlobalCameraAnglesAprioriSigma[1]  * m_dGlobalCameraAnglesAprioriSigma[1]  * DEG2RAD * DEG2RAD);
+        }
     }
 
-    if (m_dGlobalCameraAngularAccelerationAprioriSigma > 0.0) {
-      m_dGlobalCameraAngularAccelerationWeight
-      = 1.0 / (m_dGlobalCameraAngularAccelerationAprioriSigma * m_dGlobalCameraAngularAccelerationAprioriSigma * DEG2RAD * DEG2RAD);
+//    if (m_dGlobalCameraAngularAccelerationAprioriSigma > 0.0) {
+    if ( m_nNumberCameraCoefSolved >= 3 ) {
+        if( m_dGlobalCameraAnglesAprioriSigma[2] > 0.0 ) {
+            m_dGlobalCameraAngularAccelerationWeight
+                    = 1.0 / (m_dGlobalCameraAnglesAprioriSigma[2]  * m_dGlobalCameraAnglesAprioriSigma[2]  * DEG2RAD * DEG2RAD);
+        }
     }
   }
 
@@ -681,6 +694,7 @@ namespace Isis {
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
             double timeScale = pOpos->GetTimeScale();
+            pSpicePos->SetPolynomial();
             pSpicePos->SetOverrideBaseTime(baseTime, timeScale);
             pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3);
           }
@@ -2090,6 +2104,7 @@ namespace Isis {
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
             double timeScale = pOpos->GetTimeScale();
+            pSpicePos->SetPolynomial();
             pSpicePos->SetOverrideBaseTime(baseTime, timeScale);
             pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3);
           }
@@ -3024,6 +3039,8 @@ namespace Isis {
           index = ImageIndex(i);
           if( index == currentindex )
               bsameindex = true;
+          else
+              bsameindex = false;
 
           currentindex = index;
 
@@ -4103,29 +4120,12 @@ namespace Isis {
     return true;
   }
 
-/**
- * output bundle results to file with error propagation
- */
-    bool BundleAdjust::OutputWithErrorPropagation() {
+  bool BundleAdjust::OutputHeader(std::ofstream& fp_out) {
 
-      std::ofstream fp_out("bundleout.txt", std::ios::out);
       if (!fp_out)
           return false;
 
       char buf[1056];
-      bool bHeld = false;
-      std::vector<double> PosX(3);
-      std::vector<double> PosY(3);
-      std::vector<double> PosZ(3);
-      std::vector<double> coefRA(m_nNumberCameraCoefSolved);
-      std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
-      std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
-      std::vector<double> angles;
-      std::vector<double> angvel;
-      Camera *pCamera = NULL;
-      SpicePosition *pSpicePosition = NULL;
-      SpiceRotation *pSpiceRotation = NULL;
-
       int nImages = Images();
       int nValidPoints = m_pCnet->GetNumValidPoints();
       int nInnerConstraints = 0;
@@ -4133,17 +4133,9 @@ namespace Isis {
       int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
       int nConvergenceCriteria = 1;
 
-      bool bSolveSparse = false;
-
-      gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
-
-      if( m_strSolutionMethod == "SPARSE" )
-      {
-          lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
-          bSolveSparse = true;
-      }
-
-      sprintf(buf, "\n\t\tJIGSAW: BUNDLE ADJUSTMENT\n\t\t=========================\n");
+      sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
+      fp_out << buf;
+      sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().c_str());
       fp_out << buf;
       sprintf(buf,"\n               Network Filename: %s", m_strCnetFilename.c_str());
       fp_out << buf;
@@ -4153,13 +4145,102 @@ namespace Isis {
       fp_out << buf;
       sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().c_str());
       fp_out << buf;
-      sprintf(buf,"\n                  Solution Type: %s", m_strSolutionMethod.c_str());
-      fp_out << buf;
-      sprintf(buf,"\n                   Linear Units: kilometers");
+      sprintf(buf,"\n\n                   Linear Units: kilometers");
       fp_out << buf;
       sprintf(buf,"\n                  Angular Units: decimal degrees");
       fp_out << buf;
-      sprintf(buf,"\n\n                         Images: %6d",nImages);
+      sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
+      fp_out << buf;
+      m_bObservationMode ? sprintf(buf, "\n                   OBSERVATIONS: ON"):
+              sprintf(buf, "\n                   OBSERVATIONS: OFF");
+      fp_out << buf;
+      m_bSolveRadii ? sprintf(buf, "\n                         RADIUS: ON"):
+              sprintf(buf, "\n                         RADIUS: OFF");
+      fp_out << buf;
+      sprintf(buf,"\n                  SOLUTION TYPE: %s", m_strSolutionMethod.c_str());
+      fp_out << buf;
+      m_bErrorPropagation ? sprintf(buf, "\n              ERROR PROPAGATION: ON"):
+              sprintf(buf, "\n              ERROR PROPAGATION: OFF");
+      fp_out << buf;
+      m_bOutlierRejection ? sprintf(buf, "\n              OUTLIER REJECTION: ON"):
+              sprintf(buf, "\n              OUTLIER REJECTION: OFF");
+      fp_out << buf;
+      sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
+      fp_out << buf;
+      sprintf(buf,"\n                         SIGMA0: %e",m_dConvergenceThreshold);
+      fp_out << buf;
+      sprintf(buf,"\n             MAXIMUM ITERATIONS: %d",m_nMaxIterations);
+      fp_out << buf;
+      sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
+      fp_out << buf;
+      switch (m_cmatrixSolveType) {
+        case BundleAdjust::AnglesOnly:
+          sprintf(buf,"\n                       CAMSOLVE: ANGLES");
+          break;
+        case BundleAdjust::AnglesVelocity:
+          sprintf(buf,"\n                       CAMSOLVE: ANGLES, VELOCITIES");
+          break;
+        case BundleAdjust::AnglesVelocityAcceleration:
+          sprintf(buf,"\n                       CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
+          break;
+        case BundleAdjust::All:
+          sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveCamDegree);
+          break;
+      case BundleAdjust::None:
+          sprintf(buf,"\n                       CAMSOLVE: NONE");
+          break;
+      default:
+        break;
+      }
+      fp_out << buf;
+      m_bSolveTwist ? sprintf(buf, "\n                          TWIST: ON"):
+              sprintf(buf, "\n                          TWIST: OFF");
+      fp_out << buf;
+      sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
+      fp_out << buf;
+      switch (m_spacecraftPositionSolveType) {
+        case Nothing:
+          sprintf(buf,"\n                        SPSOLVE: NONE");
+          break;
+        case PositionOnly:
+          sprintf(buf,"\n                        SPSOLVE: POSITION");
+          break;
+        case PositionVelocity:
+          sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES");
+          break;
+        case PositionVelocityAcceleration:
+          sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
+          break;
+        default:
+          break;
+      }
+      fp_out << buf;
+      sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
+      fp_out << buf;
+      (m_dGlobalLatitudeAprioriSigma == -1) ? sprintf(buf,"\n           POINT LATITUDE SIGMA: N/A"):
+              sprintf(buf,"\n           POINT LATITUDE SIGMA: %lf (meters)",m_dGlobalLatitudeAprioriSigma);
+      fp_out << buf;
+      (m_dGlobalLongitudeAprioriSigma == -1) ? sprintf(buf,"\n          POINT LONGITUDE SIGMA: N/A"):
+              sprintf(buf,"\n          POINT LONGITUDE SIGMA: %lf (meters)",m_dGlobalLongitudeAprioriSigma);
+      fp_out << buf;
+      (m_dGlobalRadiusAprioriSigma == -1) ? sprintf(buf,"\n             POINT RADIUS SIGMA: N/A"):
+              sprintf(buf,"\n             POINT RADIUS SIGMA: %lf (meters)",m_dGlobalRadiusAprioriSigma);
+      fp_out << buf;
+      (m_dGlobalSpacecraftPositionAprioriSigma == -1) ? sprintf(buf,"\n      SPACECRAFT POSITION SIGMA: N/A"):
+              sprintf(buf,"\n      SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma);
+      fp_out << buf;
+      (m_dGlobalSpacecraftVelocityAprioriSigma == -1) ? sprintf(buf,"\n      SPACECRAFT VELOCITY SIGMA: N/A"):
+              sprintf(buf,"\n      SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftVelocityAprioriSigma);
+      fp_out << buf;
+      (m_dGlobalSpacecraftAccelerationAprioriSigma == -1) ? sprintf(buf,"\n  SPACECRAFT ACCELERATION SIGMA: N/A"):
+              sprintf(buf,"\n  SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftAccelerationAprioriSigma);
+      fp_out << buf;
+
+    //      std::vector<double> m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas: size is # camera coefficients solved
+
+      sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");
+      fp_out << buf;
+      sprintf(buf,"\n                         Images: %6d",nImages);
       fp_out << buf;
       sprintf(buf,"\n                         Points: %6d",nValidPoints);
       fp_out << buf;
@@ -4209,7 +4290,7 @@ namespace Isis {
           fp_out << buf;
       }
 
-//      sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
+    //      sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
       sprintf(buf, "\n                         Sigma0: %30.20lf\n",m_dSigma0);
       fp_out << buf;
       sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTimeErrorProp);
@@ -4217,26 +4298,65 @@ namespace Isis {
       sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
       fp_out << buf;
 
-      double dSigma;
-      int nIndex = 0;
-      int nMeasures;
-      int nRejectedMeasures;
-
-    sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
+      sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
       fp_out << buf;
 
-      for ( int i = 0; i < nImages; i++ ) {
-
-          nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
-          nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
-          int nUsed = nMeasures - nRejectedMeasures;
-
-          if( nUsed == nMeasures )
-              sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-          else
-              sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-          fp_out << buf;
+      int nMeasures;
+      int nRejectedMeasures;
+      int nUsed;
+      for (int i = 0; i < nImages; i++)
+      {
+        nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+        nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
+        nUsed = nMeasures - nRejectedMeasures;
+        if( nUsed == nMeasures)
+            sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+        else
+            sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
+        fp_out << buf;
       }
+
+      return true;
+  }
+
+/**
+ * output bundle results to file with error propagation
+ */
+    bool BundleAdjust::OutputWithErrorPropagation() {
+
+      std::ofstream fp_out("bundleout.txt", std::ios::out);
+      if (!fp_out)
+          return false;
+
+      char buf[1056];
+      bool bHeld = false;
+      std::vector<double> PosX(3);
+      std::vector<double> PosY(3);
+      std::vector<double> PosZ(3);
+      std::vector<double> coefRA(m_nNumberCameraCoefSolved);
+      std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
+      std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+      std::vector<double> angles;
+      Camera *pCamera = NULL;
+      SpicePosition *pSpicePosition = NULL;
+      SpiceRotation *pSpiceRotation = NULL;
+
+      int nImages = Images();
+      double dSigma;
+      int nIndex = 0;
+      bool bSolveSparse = false;
+
+      gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
+
+//      std::cout << m_Image_Corrections << std::endl;
+
+      if( m_strSolutionMethod == "SPARSE" )
+      {
+          lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
+          bSolveSparse = true;
+      }
+
+      OutputHeader(fp_out);
 
       sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
       fp_out << buf;
@@ -4250,13 +4370,8 @@ namespace Isis {
           if ( !pCamera )
               continue;
 
+          // ImageIndex(i) retrieves index into the normal equations matrix for Image(i)
           nIndex = ImageIndex(i) ;
-
-          // if not a frame camera, SetImage to center line and sample
-//          if( pCamera->GetCameraType() != 0 ) {
-//              if( !pCamera->SetImage(pCamera->Samples()/2,pCamera->Lines()) )
-//                  continue;
-//          }
 
           pSpicePosition = pCamera->InstrumentPosition();
           if ( !pSpicePosition )
@@ -4266,11 +4381,12 @@ namespace Isis {
           if ( !pSpiceRotation )
               continue;
 
+          // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
+          // and orientation angles). For others (linescan, radar) we retrieve the polynomial
+          // coefficients from which the Exterior Orientation parameters are derived.
           if ( m_spacecraftPositionSolveType > 0 )
               pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
-          else {
-//               pSpicePosition->SetPolynomial();
-//               pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+          else { // frame camera
               std::vector <double> coordinate(3);
               coordinate = pSpicePosition->GetCenterCoordinate();
               PosX[0] = coordinate[0];
@@ -4278,15 +4394,10 @@ namespace Isis {
               PosZ[0] = coordinate[2];
           }
 
-          if ( m_cmatrixSolveType > 0 ) {
-              angles = pSpiceRotation->Angles(3,1,3);
+          if ( m_cmatrixSolveType > 0 )
               pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
-          }
-          else {
-            // TODO Make a similar change for the angles as was done for position
-//               angles = pSpiceRotation->Angles(3,1,3);
-//               pSpiceRotation->SetPolynomial();
-//               pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+          //          else { // frame camera
+          else { // This is for m_cmatrixSolveType = None and no polynomial fit has occurred
             angles = pSpiceRotation->GetCenterAngles();
             coefRA.push_back(angles.at(0));
             coefDEC.push_back(angles.at(1));
@@ -4479,7 +4590,7 @@ namespace Isis {
               nIndex++;
           }
 
-          if( m_cmatrixSolveType > 0 && m_nsolveCamDegree > 2 && m_nNumberCameraCoefSolved > 2 ) {
+          if( m_nNumberCameraCoefSolved > 0 ) {
               char strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
               std::ostringstream ostr;
               for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
@@ -4493,14 +4604,18 @@ namespace Isis {
                       dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
                   else
                       dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-//                  sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-//                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex))*RAD2DEG,
-//                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[i]*RAD2DEG,
-//                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
-                          m_Image_Corrections(nIndex), coefRA[i] * RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  if( i == 0 ) {
+                      sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                              m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+                  }
+                  else {
+                      sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                              m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+                  }
                   fp_out << buf;
                   ostr.str("");
                   strcoeff--;
@@ -4518,10 +4633,18 @@ namespace Isis {
                       dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
                   else
                       dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                  if( i == 0 ) {
+                      sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+                  }
+                  else {
+                      sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+                  }
                   fp_out << buf;
                   ostr.str("");
                   strcoeff--;
@@ -4545,10 +4668,18 @@ namespace Isis {
                           dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
                       else
                           dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                              ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
-                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
+                      if( i == 0 ) {
+                          sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                                  ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                                  m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                                  m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+                      }
+                      else {
+                          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                                  ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                                  m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                                  m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+                      }
                       fp_out << buf;
                       ostr.str("");
                       strcoeff--;
@@ -4556,7 +4687,8 @@ namespace Isis {
                   }
               }
           }
-          else if ( m_cmatrixSolveType == 0 ) {
+
+          else{
               sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                       coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
               fp_out << buf;
@@ -4566,216 +4698,6 @@ namespace Isis {
               sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                       coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
               fp_out << buf;
-          }
-          else if ( m_cmatrixSolveType == 1 ) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
-                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
-                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-
-              if ( !m_bSolveTwist ) {
-                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-                  fp_out << buf;
-              }
-              else {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-              }
-          }
-          else if ( m_cmatrixSolveType == 2 ) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
-                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
-                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
-                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
-                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-
-              if ( !m_bSolveTwist ) {
-                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-                  fp_out << buf;
-              }
-              else {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
-                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-              }
-          }
-          else if ( m_cmatrixSolveType == 3 || m_cmatrixSolveType == 4 ) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
-                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
-                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "      RAa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefRA[2] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefRA[2]*RAD2DEG,
-                      m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
-                      m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
-                      m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "     DECa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      (coefDEC[2] - m_Image_Corrections(nIndex))*RAD2DEG,
-                      m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[2]*RAD2DEG,
-                      m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-              fp_out << buf;
-              nIndex++;
-
-              if ( !m_bSolveTwist ) {
-                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-                  fp_out << buf;
-              }
-              else {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
-                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "   TWISTa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefTWI[2] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[2]*RAD2DEG,
-                          m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-              }
           }
       }
 
@@ -4899,713 +4821,6 @@ namespace Isis {
       return true;
   }
 
-    /**
-     * output bundle results to file with error propagation
-
-        bool BundleAdjust::OutputWithErrorPropagation() {
-
-          std::ofstream fp_out("bundleout.txt", std::ios::out);
-          if (!fp_out)
-              return false;
-
-          char buf[1056];
-          bool bHeld = false;
-          std::vector<double> PosX(3);
-          std::vector<double> PosY(3);
-          std::vector<double> PosZ(3);
-          std::vector<double> coefRA(m_nNumberCameraCoefSolved);
-          std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
-          std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
-          std::vector<double> angles;
-          std::vector<double> angvel;
-          Camera *pCamera = NULL;
-          SpicePosition *pSpicePosition = NULL;
-          SpiceRotation *pSpiceRotation = NULL;
-
-          int nImages = Images();
-          int nValidPoints = m_pCnet->GetNumValidPoints();
-          int nInnerConstraints = 0;
-          int nDistanceConstraints = 0;
-          int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
-          int nConvergenceCriteria = 1;
-
-          bool bSolveSparse = false;
-
-          gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
-
-          if( m_strSolutionMethod == "SPARSE" )
-          {
-              lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
-              bSolveSparse = true;
-          }
-
-          sprintf(buf, "\n\t\tJIGSAW: BUNDLE ADJUSTMENT\n\t\t=========================\n");
-          fp_out << buf;
-          sprintf(buf,"\n               Network Filename: %s", m_strCnetFilename.c_str());
-          fp_out << buf;
-          sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
-          fp_out << buf;
-          sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().c_str());
-          fp_out << buf;
-          sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().c_str());
-          fp_out << buf;
-          sprintf(buf,"\n                  Solution Type: %s", m_strSolutionMethod.c_str());
-          fp_out << buf;
-          sprintf(buf,"\n                   Linear Units: kilometers");
-          fp_out << buf;
-          sprintf(buf,"\n                  Angular Units: decimal degrees");
-          fp_out << buf;
-          sprintf(buf,"\n\n                         Images: %6d",nImages);
-          fp_out << buf;
-          sprintf(buf,"\n                         Points: %6d",nValidPoints);
-          fp_out << buf;
-          sprintf(buf,"\n                 Total Measures: %6d",(m_nObservations+m_nRejectedObservations)/2);
-          fp_out << buf;
-          sprintf(buf,"\n             Total Observations: %6d",m_nObservations+m_nRejectedObservations);
-          fp_out << buf;
-          sprintf(buf,"\n              Good Observations: %6d",m_nObservations);
-          fp_out << buf;
-          sprintf(buf,"\n          Rejected Observations: %6d",m_nRejectedObservations);
-          fp_out << buf;
-
-          if( m_nConstrainedPointParameters > 0 ) {
-              sprintf(buf, "\n   Constrained Point Parameters: %6d",m_nConstrainedPointParameters);
-              fp_out << buf;
-          }
-          if( m_nConstrainedImageParameters > 0 ){
-              sprintf(buf, "\n   Constrained Image Parameters: %6d",m_nConstrainedImageParameters);
-              fp_out << buf;
-          }
-          sprintf(buf,"\n                       Unknowns: %6d",m_nUnknownParameters);
-          fp_out << buf;
-          if( nInnerConstraints > 0) {
-              sprintf(buf, "\n      Inner Constraints: %6d",nInnerConstraints);
-              fp_out << buf;
-          }
-          if( nDistanceConstraints > 0) {
-              sprintf(buf, "\n   Distance Constraints: %d",nDistanceConstraints);
-              fp_out << buf;
-          }
-
-          sprintf(buf,"\n             Degrees of Freedom: %6d",nDegreesOfFreedom);
-          fp_out << buf;
-          sprintf(buf,"\n           Convergence Criteria: %6.3g",m_dConvergenceThreshold);
-          fp_out << buf;
-
-          if( nConvergenceCriteria == 1 ) {
-              sprintf(buf, "(Sigma0)");
-              fp_out << buf;
-          }
-
-          sprintf(buf, "\n                     Iterations: %6d",m_nIteration);
-          fp_out << buf;
-
-          if( m_nIteration >= m_nMaxIterations ) {
-              sprintf(buf, "(Maximum reached)");
-              fp_out << buf;
-          }
-
-    //      sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
-          sprintf(buf, "\n                         Sigma0: %30.20lf\n",m_dSigma0);
-          fp_out << buf;
-          sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTimeErrorProp);
-          fp_out << buf;
-          sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
-          fp_out << buf;
-
-          double dSigma;
-          int nIndex = 0;
-          int nMeasures;
-          int nRejectedMeasures;
-
-        sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
-          fp_out << buf;
-
-          for ( int i = 0; i < nImages; i++ ) {
-
-              nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
-              nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
-              int nUsed = nMeasures - nRejectedMeasures;
-
-              if( nUsed == nMeasures )
-                  sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-              else
-                  sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-              fp_out << buf;
-          }
-
-          sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
-          fp_out << buf;
-
-          for ( int i = 0; i < nImages; i++ ) {
-
-              if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
-                  bHeld = true;
-
-              pCamera = m_pCnet->Camera(i);
-              if ( !pCamera )
-                  continue;
-
-              // if not a frame camera, SetImage to center line and sample
-              if( pCamera->GetCameraType() != 0 ) {
-                  if( !pCamera->SetImage(pCamera->Samples()/2,pCamera->Lines()) )
-                      continue;
-              }
-
-              pSpicePosition = pCamera->InstrumentPosition();
-              if ( !pSpicePosition )
-                  continue;
-
-              pSpiceRotation = pCamera->InstrumentRotation();
-              if ( !pSpiceRotation )
-                  continue;
-
-              if ( m_spacecraftPositionSolveType > 0 )
-                  pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
-              else {
-                  pSpicePosition->SetPolynomial();
-                  pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
-              }
-
-              if ( m_cmatrixSolveType > 0 ) {
-                  angles = pSpiceRotation->Angles(3,1,3);
-                  pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
-              }
-              else {
-                  angles = pSpiceRotation->Angles(3,1,3);
-                  pSpiceRotation->SetPolynomial();
-                  pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
-              }
-
-              sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
-              fp_out << buf;
-              sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
-              fp_out << buf;
-              sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
-                      "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
-              fp_out << buf;
-
-              if ( m_spacecraftPositionSolveType == 0 ) {
-                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosX[0], 0.0, PosX[0], 0.0, "N/A");
-                  fp_out << buf;
-                  sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosY[0], 0.0, PosY[0], 0.0, "N/A");
-                  fp_out << buf;
-                  sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosZ[0], 0.0, PosZ[0], 0.0, "N/A");
-                  fp_out << buf;
-              }
-              else if ( m_spacecraftPositionSolveType == 1 ) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-
-                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-              }
-              else if (m_spacecraftPositionSolveType == 2) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-              }
-              else if ( m_spacecraftPositionSolveType == 3 ) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Xa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosX[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosX[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        Y%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
-                          PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Ya%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosY[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosY[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "        Z%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
-                          PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       Za%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          PosZ[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                          PosZ[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-                  fp_out << buf;
-                  nIndex++;
-              }
-
-              if ( m_cmatrixSolveType == 0 ) {
-                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
-                  fp_out << buf;
-                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
-                  fp_out << buf;
-                  sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-                  fp_out << buf;
-              }
-              else if ( m_cmatrixSolveType == 1 ) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-
-                  if ( !m_bSolveTwist ) {
-                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-                      fp_out << buf;
-                  }
-                  else {
-                      if( bSolveSparse )
-                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                      else
-                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                              (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
-                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                      fp_out << buf;
-                      nIndex++;
-                  }
-              }
-              else if ( m_cmatrixSolveType == 2 ) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
-                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
-                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-
-                  if ( !m_bSolveTwist ) {
-                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-                      fp_out << buf;
-                  }
-                  else {
-                      if( bSolveSparse )
-                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                      else
-                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                              (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
-                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                      fp_out << buf;
-                      nIndex++;
-                      if( bSolveSparse )
-                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                      else
-                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                              (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
-                              m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                      fp_out << buf;
-                      nIndex++;
-                  }
-              }
-              else if ( m_cmatrixSolveType == 3 || m_cmatrixSolveType == 4 ) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG,
-                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "      RAa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefRA[2] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefRA[2]*RAD2DEG,
-                          m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG,
-                          m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  sprintf(buf, "     DECa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                          (coefDEC[2] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[2]*RAD2DEG,
-                          m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-                  fp_out << buf;
-                  nIndex++;
-
-                  if ( !m_bSolveTwist ) {
-                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-                      fp_out << buf;
-                  }
-                  else {
-                      if( bSolveSparse )
-                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                      else
-                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                              (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG,
-                              m_dGlobalCameraAnglesAprioriSigma, dSigma * RAD2DEG);
-                      fp_out << buf;
-                      nIndex++;
-                      if( bSolveSparse )
-                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                      else
-                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                              (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG,
-                              m_dGlobalCameraAngularVelocityAprioriSigma, dSigma * RAD2DEG);
-                      fp_out << buf;
-                      nIndex++;
-                      if( bSolveSparse )
-                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                      else
-                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      sprintf(buf, "   TWISTa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                              (coefTWI[2] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[2]*RAD2DEG,
-                              m_dGlobalCameraAngularAccelerationAprioriSigma, dSigma * RAD2DEG);
-                      fp_out << buf;
-                      nIndex++;
-                  }
-              }
-          }
-
-          fp_out << "\n\n\n";
-
-          // output point data
-          sprintf(buf, "\nPOINTS SUMMARY\n==============\n%91sSigma           Sigma             Sigma\n"
-                  "           Label   Status     Rays        Latitude       Longitude          Radius"
-                  "        Latitude       Longitude          Radius\n", "");
-          fp_out << buf;
-
-          int nRays = 0;
-          double dLat, dLon, dRadius;
-          double dSigmaLat, dSigmaLong, dSigmaRadius;
-          double cor_lat_dd, cor_lon_dd, cor_rad_m;
-          double cor_lat_m, cor_lon_m;
-          double dLatInit, dLonInit, dRadiusInit;
-          int nGoodRays;
-          std::string strStatus;
-          int nPointIndex = 0;
-
-          int nPoints = m_pCnet->GetNumPoints();
-          for ( int i = 0; i < nPoints; i++ ) {
-
-              const ControlPoint *point = m_pCnet->GetPoint(i);
-              if ( point->IsIgnored() )
-                  continue;
-
-              nRays = point->GetNumMeasures();
-              dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-              dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-              dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
-              dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-              dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-              dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
-              nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-              if (point->GetType() == ControlPoint::Ground)
-                  strStatus = "GROUND";
-              else if (point->GetType() == ControlPoint::Tie)
-                  strStatus = "TIE";
-              else
-                  strStatus = "UNKNOWN";
-
-              sprintf(buf, "%16s%9s%5d of %d%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-                      point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon,
-                      dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
-              fp_out << buf;
-              nPointIndex++;
-          }
-
-          // output point data
-          sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
-          fp_out << buf;
-
-          nPointIndex = 0;
-          for ( int i = 0; i < nPoints; i++ ) {
-
-              const ControlPoint *point = m_pCnet->GetPoint(i);
-              if ( point->IsIgnored() )
-                  continue;
-
-              nRays = point->GetNumMeasures();
-              dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-              dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-              dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
-              dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-              dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-              dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
-              nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-              // point corrections and initial sigmas
-              bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
-              bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
-
-              cor_lat_dd = corrections[0] * Isis::RAD2DEG;
-              cor_lon_dd = corrections[1] * Isis::RAD2DEG;
-              cor_rad_m  = corrections[2] * 1000.0;
-
-              cor_lat_m = corrections[0] * m_dRTM;
-              cor_lon_m = corrections[1] * m_dRTM * cos(dLat*Isis::DEG2RAD);
-
-              dLatInit = dLat - cor_lat_dd;
-              dLonInit = dLon - cor_lon_dd;
-              dRadiusInit = dRadius - (corrections[2] * 1000.0);
-
-              if (point->GetType() == ControlPoint::Ground)
-                  strStatus = "GROUND";
-              else if (point->GetType() == ControlPoint::Tie)
-                  strStatus = "TIE";
-              else
-                  strStatus = "UNKNOWN";
-
-              sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-                      point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays);
-              fp_out << buf;
-
-              sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
-                      "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
-                      "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
-              fp_out << buf;
-
-              sprintf(buf, "  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
-                      dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], dSigmaLat);
-              fp_out << buf;
-
-              sprintf(buf, " LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
-                      dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], dSigmaLong);
-              fp_out << buf;
-
-              sprintf(buf, "    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n\n",
-                      dRadiusInit * 0.001, corrections[2], cor_rad_m, dRadius * 0.001,
-                      apriorisigmas[2], dSigmaRadius);
-
-              fp_out << buf;
-              nPointIndex++;
-          }
-
-          fp_out.close();
-
-          return true;
-      }
-*/
    /**
    * output bundle results to file with no error propagation
    */
@@ -5624,106 +4839,16 @@ namespace Isis {
     std::vector<double> coefRA(m_nNumberCameraCoefSolved);
     std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
     std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+    std::vector<double> angles;
     Camera *pCamera = NULL;
     SpicePosition *pSpicePosition = NULL;
     SpiceRotation *pSpiceRotation = NULL;
-
-    int nImages = Images();
-    int nValidPoints = m_pCnet->GetNumValidPoints();
-    int nInnerConstraints = 0;
-    int nDistanceConstraints = 0;
-    int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
-    int nConvergenceCriteria = 1;
-
-    sprintf(buf, "\n\t\tJIGSAW: BUNDLE ADJUSTMENT\n\t\t=========================\n");
-    fp_out << buf;
-    sprintf(buf,"\n               Network Filename: %s", m_strCnetFilename.c_str());
-    fp_out << buf;
-    sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
-    fp_out << buf;
-    sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().c_str());
-    fp_out << buf;
-    sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().c_str());
-    fp_out << buf;
-    sprintf(buf,"\n                   Linear Units: kilometers");
-    fp_out << buf;
-    sprintf(buf,"\n                  Angular Units: decimal degrees");
-    fp_out << buf;
-    sprintf(buf,"\n\n                         Images: %6d",nImages);
-    fp_out << buf;
-    sprintf(buf,"\n                         Points: %6d",nValidPoints);
-    fp_out << buf;
-    sprintf(buf,"\n                 Total Measures: %6d",(m_nObservations+m_nRejectedObservations)/2);
-    fp_out << buf;
-    sprintf(buf,"\n             Total Observations: %6d",m_nObservations+m_nRejectedObservations);
-    fp_out << buf;
-    sprintf(buf,"\n              Good Observations: %6d",m_nObservations);
-    fp_out << buf;
-    sprintf(buf,"\n          Rejected Observations: %6d",m_nRejectedObservations);
-    fp_out << buf;
-    sprintf(buf,"\n                       Unknowns: %6d",m_nUnknownParameters);
-    fp_out << buf;
-    if( m_nConstrainedPointParameters > 0)
-    {
-      sprintf(buf,"\n   Constrained Point Parameters: %6d",m_nConstrainedPointParameters);
-      fp_out << buf;
-    }
-    if( m_nConstrainedImageParameters > 0)
-    {
-      sprintf(buf,"\n  Constrained Image Parameters: %6d",m_nConstrainedImageParameters);
-      fp_out << buf;
-    }
-    if( nInnerConstraints > 0)
-    {
-      sprintf(buf,"\n      Inner Constraints: %6d",nInnerConstraints);
-      fp_out << buf;
-    }
-    if( nDistanceConstraints > 0)
-    {
-      sprintf(buf, "\n   Distance Constraints: %d",nDistanceConstraints);
-      fp_out << buf;
-    }
-    sprintf(buf,"\n             Degrees of Freedom: %6d",nDegreesOfFreedom);
-    fp_out << buf;
-    sprintf(buf,"\n           Convergence Criteria: %6.3g",m_dConvergenceThreshold);
-    fp_out << buf;
-    if( nConvergenceCriteria == 1)
-    {
-      sprintf(buf, "(Sigma0)");
-      fp_out << buf;
-    }
-    sprintf(buf, "\n                     Iterations: %6d",m_nIteration);
-    fp_out << buf;
-    if( m_nIteration >= m_nMaxIterations )
-    {
-      sprintf(buf, "(Maximum reached)");
-      fp_out << buf;
-    }
-    sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
-    fp_out << buf;
-    sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
-    fp_out << buf;
-
     int nIndex = 0;
-    int nMeasures;
-    int nRejectedMeasures;
+    int nImages = Images();
 
-    sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
-    fp_out << buf;
+    OutputHeader(fp_out);
 
-    for (int i = 0; i < nImages; i++)
-    {
-      nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
-      nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
-      int nUsed = nMeasures - nRejectedMeasures;
-      if( nUsed == nMeasures)
-          sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-      else
-          sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-      fp_out << buf;
-    }
-
-    sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION ***J2000***\n==========================\n");
+    sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION ***J2000***\n======================================\n");
     fp_out << buf;
 
     for (int i = 0; i < nImages; i++) {
@@ -5744,15 +4869,34 @@ namespace Isis {
       if (!pSpiceRotation)
         continue;
 
-//       if( m_spacecraftPositionSolveType > 0 )
-      pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
-//       else
-//         PosX = pSpicePosition->Coordinate();
+      // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
+      // and orientation angles). For others (linescan, radar) we retrieve the polynomial
+      // coefficients from which the Exterior Orientation paramters are derived.
+      // This is incorrect...Correction below
+      // For all instruments we retrieve the polynomial coefficients from which the
+      // Exterior Orientation parameters are derived.  For framing cameras, a single
+      // coefficient for each coordinate is returned.
+      if ( m_spacecraftPositionSolveType > 0 )
+          pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+      //      else { // frame camera
+      else { // This is for m_spacecraftPositionSolveType = None and no polynomial fit has occurred
+          std::vector <double> coordinate(3);
+          coordinate = pSpicePosition->GetCenterCoordinate();
+          PosX[0] = coordinate[0];
+          PosY[0] = coordinate[1];
+          PosZ[0] = coordinate[2];
+      }
 
-//       if( m_cmatrixSolveType > 0 )
-      pSpiceRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
-//       else
-//         coefRA = pSpiceRotation->Angles();
+      if ( m_cmatrixSolveType > 0 ) {
+//          angles = pSpiceRotation->Angles(3,1,3);
+          pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+      }
+      else { // frame camera
+        angles = pSpiceRotation->GetCenterAngles();
+        coefRA.push_back(angles.at(0));
+        coefDEC.push_back(angles.at(1));
+        coefTWI.push_back(angles.at(2));
+      }
 
       sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
       fp_out << buf;
@@ -5849,114 +4993,103 @@ namespace Isis {
         nIndex++;
       }
 
-      if (m_cmatrixSolveType == 0) {
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
-        sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
+      if( m_nNumberCameraCoefSolved > 0 ) {
+          char strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+          std::ostringstream ostr;
+          for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+              if( i ==0 )
+                  ostr << "  " << strcoeff;
+              else if ( i == 1 )
+                  ostr << " " << strcoeff << "t";
+              else
+                  ostr << strcoeff << "t" << i;
+              if( i == 0 ) {                 
+                  sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                          m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+              }
+              else {
+                  sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                          m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+              }
+              fp_out << buf;
+              ostr.str("");
+              strcoeff--;
+              nIndex++;
+          }
+          strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+          for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+              if( i ==0 )
+                  ostr << "  " << strcoeff;
+              else if ( i == 1 )
+                  ostr << " " << strcoeff << "t";
+              else
+                  ostr << strcoeff << "t" << i;
+              if( i == 0 ) {
+                  sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+              }
+              else {
+                  sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+              }
+              fp_out << buf;
+              ostr.str("");
+              strcoeff--;
+              nIndex++;
+          }
+          if ( !m_bSolveTwist ) {
+              sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+              fp_out << buf;
+          }
+          else {
+              strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                  if( i ==0 )
+                      ostr << "  " << strcoeff;
+                  else if ( i == 1 )
+                      ostr << " " << strcoeff << "t";
+                  else
+                      ostr << strcoeff << "t" << i;
+                  if( i == 0 ) {
+                      sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                              ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+                  }
+                  else {
+                      sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                              ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                              m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+                  }
+                  fp_out << buf;
+                  ostr.str("");
+                  strcoeff--;
+                  nIndex++;
+              }
+          }
       }
-      else if (m_cmatrixSolveType == 1) {
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-
-        if (!m_bSolveTwist) {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+      else{
+          sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                  coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
           fp_out << buf;
-        }
-        else {
+          sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                  coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
+          fp_out << buf;
           sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
+                  coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
           fp_out << buf;
-          nIndex++;
-        }
       }
-      else if (m_cmatrixSolveType == 2) {
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-
-        if (!m_bSolveTwist) {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-          fp_out << buf;
-        }
-        else {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-          fp_out << buf;
-          nIndex++;
-          sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, "N/A");
-          fp_out << buf;
-          nIndex++;
-        }
-      }
-      else if (m_cmatrixSolveType == 3 || m_cmatrixSolveType == 4) {
-        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefRA[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "      RAv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefRA[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "      RAa%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefRA[2] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefRA[2]*RAD2DEG, m_dGlobalCameraAngularAccelerationAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefDEC[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "     DECv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefDEC[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "     DECa%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                (coefDEC[2] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[2]*RAD2DEG, m_dGlobalCameraAngularAccelerationAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-
-        if (!m_bSolveTwist) {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-          fp_out << buf;
-        }
-        else {
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  (coefTWI[0] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[0]*RAD2DEG, m_dGlobalCameraAnglesAprioriSigma, "N/A");
-          fp_out << buf;
-          nIndex++;
-          sprintf(buf, "   TWISTv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  (coefTWI[1] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[1]*RAD2DEG, m_dGlobalCameraAngularVelocityAprioriSigma, "N/A");
-          fp_out << buf;
-          nIndex++;
-          sprintf(buf, "   TWISTa%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  (coefTWI[2] - m_Image_Corrections(nIndex))*RAD2DEG, m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[2]*RAD2DEG, m_dGlobalCameraAngularAccelerationAprioriSigma, "N/A");
-          fp_out << buf;
-          nIndex++;
-        }
-      }
-    }
+  }
 
     fp_out << "\n\n\n";
 
@@ -5995,7 +5128,7 @@ namespace Isis {
         else
             strStatus = "UNKNOWN";
 
-        sprintf(buf, "%16s%9s%4d of %d%16.8lf%16.8lf%16.8lf%16s%16s%16s\n",
+        sprintf(buf, "%16s%9s%4d of %d%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
                 point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon,
                 dRadius * 0.001,"N/A","N/A","N/A");
 

@@ -69,9 +69,11 @@
  *   @history 2011-02-17 Debbie A. Cook Updated to use new parameter added to SpicePosition, p_timeScale
  *   @history 2011-03-05 Debbie A. Cook Put point index creation back in init.  This will prevent QRD and SVD from working if ground
  *                          points are in the control net.
+ *   @history 2011-03-29 Ken Edmundson Fixed bug in observation mode when solving for spacecraft position and improved output
 */
 
 #include <vector>
+#include <fstream>
 
 #include "ControlNet.h"
 #include "SerialNumberList.h"
@@ -139,9 +141,12 @@ namespace Isis {
       void SetGlobalSpacecraftVelocityAprioriSigma(double d) { m_dGlobalSpacecraftVelocityAprioriSigma = d; }
       void SetGlobalSpacecraftAccelerationAprioriSigma(double d) { m_dGlobalSpacecraftAccelerationAprioriSigma = d; }
 
-      void SetGlobalCameraAnglesAprioriSigma(double d) { m_dGlobalCameraAnglesAprioriSigma = d; }
-      void SetGlobalCameraAngularVelocityAprioriSigma(double d) { m_dGlobalCameraAngularVelocityAprioriSigma = d; }
-      void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { m_dGlobalCameraAngularAccelerationAprioriSigma = d; }
+      void SetGlobalCameraAnglesAprioriSigma(double d) {  if( m_nNumberCameraCoefSolved < 1 ) return; m_dGlobalCameraAnglesAprioriSigma[0] = d; }
+      void SetGlobalCameraAngularVelocityAprioriSigma(double d) { if( m_nNumberCameraCoefSolved < 2 ) return; m_dGlobalCameraAnglesAprioriSigma[1] = d; }
+      void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { if( m_nNumberCameraCoefSolved < 3 ) return; m_dGlobalCameraAnglesAprioriSigma[2] = d; }
+
+//      void SetGlobalCameraAngularVelocityAprioriSigma(double d) { m_dGlobalCameraAngularVelocityAprioriSigma = d; }
+//      void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { m_dGlobalCameraAngularAccelerationAprioriSigma = d; }
 
       void SetStandardOutput(bool b) { m_bOutputStandard = b; }
       void SetCSVOutput(bool b) { m_bOutputCSV = b; }
@@ -225,6 +230,7 @@ namespace Isis {
       void IterationSummary(double avErr, double sigmaXY, double sigmaHat, 
                             double sigmaX, double sigmaY);
       bool Output();
+      bool OutputHeader(std::ofstream& fp_out);
       bool OutputWithErrorPropagation();
       bool OutputNoErrorPropagation();
       bool OutputPointsCSV();
@@ -297,9 +303,10 @@ namespace Isis {
       double m_dGlobalSpacecraftVelocityAprioriSigma;        //!< spacecraft coordinate velocities apriori sigmas
       double m_dGlobalSpacecraftAccelerationAprioriSigma;    //!< spacecraft coordinate accelerations apriori sigmas
 
-      double m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas
-      double m_dGlobalCameraAngularVelocityAprioriSigma;     //!< camera angular velocities apriori sigmas
-      double m_dGlobalCameraAngularAccelerationAprioriSigma; //!< camera angular accelerations apriori sigmas
+      std::vector<double> m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas: size is # camera coefficients solved
+//      double m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas
+//      double m_dGlobalCameraAngularVelocityAprioriSigma;     //!< camera angular velocities apriori sigmas
+//      double m_dGlobalCameraAngularAccelerationAprioriSigma; //!< camera angular accelerations apriori sigmas
 
       double m_dGlobalSpacecraftPositionWeight;
       double m_dGlobalSpacecraftVelocityWeight;
