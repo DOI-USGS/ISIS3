@@ -8,13 +8,13 @@
 #include "ControlPoint.h"
 
 #include "PointParentItem.h"
-#include "MeasureChildItem.h"
+#include "MeasureLeafItem.h"
 
 
 namespace Isis
 {
-  PointModel::PointModel(ControlNet * controlNet, QString name,
-      QObject * parent) : TreeModel(controlNet, name, parent)
+  PointModel::PointModel(ControlNet * controlNet, QString name, QTreeView * tv,
+      QObject * parent) : TreeModel(controlNet, name, tv, parent)
   {
     rebuildItems();
   }
@@ -38,7 +38,8 @@ namespace Isis
       for (int j = 0; j < point->GetNumMeasures(); j++)
       {
         ControlMeasure * measure = point->GetMeasure(j);
-        MeasureChildItem * measureItem = new MeasureChildItem(measure, pointItem);
+        ASSERT(measure);
+        MeasureLeafItem * measureItem = new MeasureLeafItem(measure, pointItem);
         pointItem->addChild(measureItem);
       }
     }

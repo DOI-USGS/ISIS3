@@ -56,19 +56,27 @@ namespace Isis
       QBoxLayout * createMainLayout();
       void nullify();
       void focusView(QTreeView * view, QStringList label);
+      void updateTreeItemsWithNewSelection(const QItemSelection & newSelected,
+          const QItemSelection & newDeselected);
 
 
     private slots:
-      void pointViewSelectionChanged();
-      void serialViewSelectionChanged();
-      void connectionViewSelectionChanged();
-      
+      void pointViewSelectionChanged(const QItemSelection &,
+          const QItemSelection &);
+      void serialViewSelectionChanged(const QItemSelection &,
+          const QItemSelection &);
+      void connectionViewSelectionChanged(const QItemSelection &,
+          const QItemSelection &);
+
       void itemExpanded(const QModelIndex & index);
       void itemCollapsed(const QModelIndex & index);
+      void rebuildModels();
+      void handleButtonClicked();
 
 
     private: // data
       bool updatingSelection;
+      Isis::ControlNet * controlNet;
 
 
     private: // widgets
@@ -91,10 +99,6 @@ namespace Isis
 
       QSplitter * topSplitter;
       QSplitter * mainSplitter;
-
-
-    private:
-      Isis::ControlNet * controlNet;
   };
 
 }

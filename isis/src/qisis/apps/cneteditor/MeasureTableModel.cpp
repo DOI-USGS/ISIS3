@@ -202,10 +202,10 @@ namespace Isis
             result = QVariant::fromValue(QString("Pixel Shift"));
             break;
           case AprioriSample:
-            result = QVariant::fromValue(QString("Apriori Sample"));
+            result = QVariant::fromValue(QString("A Priori Sample"));
             break;
           case AprioriLine:
-            result = QVariant::fromValue(QString("Apriori Line"));
+            result = QVariant::fromValue(QString("A Priori Line"));
             break;
           case Diameter:
             result = QVariant::fromValue(QString("Diameter"));
@@ -339,16 +339,14 @@ namespace Isis
           case EditLock:
             if (value.toString() == "Yes")
               measure->SetEditLock(true);
-            else
-              if (value.toString() == "No")
-                measure->SetEditLock(false);
+            else if (value.toString() == "No")
+              measure->SetEditLock(false);
             break;
           case Ignored:
             if (value.toString() == "Yes")
               measure->SetIgnored(true);
-            else
-              if (value.toString() == "No")
-                measure->SetIgnored(false);
+            else if (value.toString() == "No")
+              measure->SetIgnored(false);
             break;
           case Type:
             measure->SetType(measure->StringToMeasureType(value.toString()));
@@ -426,37 +424,6 @@ namespace Isis
     return success;
   }
 
-  /*
-    bool MeasureTableModel::insertRows(int position, int rows,
-        const QModelIndex & index)
-    {
-      Q_UNUSED(index);
-      beginInsertRows(QModelIndex(), position, position + rows - 1);
-
-      for (int i = 0; i < rows; i++)
-      {
-        ControlMeasure * newPoint = NULL;
-        measures->insert(position, newPoint);
-      }
-
-      endInsertRows();
-      return true;
-    }
-
-
-    bool MeasureTableModel::removeRows(int position, int rows,
-        const QModelIndex & index)
-    {
-      Q_UNUSED(index);
-      beginRemoveRows(QModelIndex(), position, position + rows - 1);
-
-      for (int i = 0; i < rows; i++)
-        measures->removeAt(position);
-
-      endInsertRows();
-      return true;
-    }
-  */
 
   bool MeasureTableModel::validateRowColumn(int row, int column,
       bool checkPoint) const
@@ -469,7 +436,7 @@ namespace Isis
   QString MeasureTableModel::catchNULL(double d) const
   {
     QString str = "NULL";
-    if (d != Isis::NULL8)
+    if (d != Isis::Null)
       str = QString::number(d);
 
     return str;
@@ -478,7 +445,7 @@ namespace Isis
 
   double MeasureTableModel::catchNULL(QString str) const
   {
-    double d = Isis::NULL8;
+    double d = Isis::Null;
     if (str.toLower() != "null")
       d = str.toDouble();
 

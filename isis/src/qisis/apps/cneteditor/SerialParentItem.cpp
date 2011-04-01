@@ -2,80 +2,27 @@
 
 #include "SerialParentItem.h"
 
-#include <iostream>
-
-#include <QVariant>
-
-#include "ControlCubeGraphNode.h"
-#include "ControlNet.h"
-#include "MeasureChildItem.h"
-#include "PointChildItem.h"
-
-
-using std::cerr;
+#include "PointLeafItem.h"
 
 
 namespace Isis
 {
-  SerialParentItem::SerialParentItem(ControlCubeGraphNode * cubeGraphNode,
-      TreeItem * parent) : TreeItem(parent)
+  SerialParentItem::SerialParentItem(ControlCubeGraphNode * node,
+      AbstractTreeItem * parent) : AbstractTreeItem(parent),
+    AbstractSerialItem(node)
   {
-    ccgn = cubeGraphNode;
-    ASSERT(ccgn);
   }
 
 
   SerialParentItem::~SerialParentItem()
   {
-    ccgn = NULL;
   }
 
 
-  void SerialParentItem::addChild(TreeItem * child)
+  void SerialParentItem::addChild(AbstractTreeItem * child)
   {
-    // Only MeasureChildItems or PointChildItems should be children of
-    // SerialParentItems
-    ASSERT(dynamic_cast< MeasureChildItem * >(child) ||
-        dynamic_cast< PointChildItem * >(child));
-
-    children->append(child);
+    // Only PointLeafItems should be children of SerialParentItems
+    ASSERT(dynamic_cast< PointLeafItem * >(child));
+    AbstractParentItem::addChild(child);
   }
-
-
-  void SerialParentItem::removeChild(int row)
-  {
-    children->removeAt(row);
-  }
-
-
-  QVariant SerialParentItem::data(int column) const
-  {
-    ASSERT(ccgn);
-    validateColumn(column);
-//     return QVariant((measure->*cmGetter(column))());
-
-    return QVariant((QString) ccgn->getSerialNumber());
-  }
-
-
-  void SerialParentItem::setData(int column, const QVariant & value)
-  {
-    validateColumn(column);
-  }
-
-
-  void SerialParentItem::deleteSource()
-  {
-    ASSERT(ccgn);
-
-    // not sure yet if we will be deleting serials from the network using
-    // this class
-  }
-
-
-  TreeItem::InternalPointerType SerialParentItem::pointerType() const
-  {
-    return TreeItem::Serial;
-  }
-
 }

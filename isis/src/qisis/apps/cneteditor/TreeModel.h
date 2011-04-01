@@ -10,14 +10,15 @@ class QTreeView;
 namespace Isis
 {
   class ControlNet;
-  class TreeItem;
+  class AbstractTreeItem;
 
   class TreeModel : public QAbstractItemModel
   {
       Q_OBJECT
 
     public:
-      TreeModel(ControlNet * controlNet, QString name, QObject * parent = 0);
+      TreeModel(ControlNet * controlNet, QString name, QTreeView * tv,
+          QObject * parent = 0);
       virtual ~TreeModel();
 
       QVariant data(const QModelIndex & index, int role) const;
@@ -33,21 +34,19 @@ namespace Isis
       int columnCount(const QModelIndex & parent) const;
 
       Qt::ItemFlags flags(const QModelIndex & index) const;
-      
-      void addView(QTreeView * newView);
 
       void setDrivable(bool drivableStatus);
       bool isDrivable() { return drivable; }
-      
-    
-    // disable copying of this class
+
+      virtual void rebuildItems() = 0;
+      void saveViewState();
+      void loadViewState();
+
+
+      // disable copying of this class
     private:
       TreeModel(const TreeModel &);
       const TreeModel & operator=(const TreeModel &);
-
-
-    public slots:
-      virtual void rebuildItems() = 0;
 
 
     protected:
@@ -55,15 +54,16 @@ namespace Isis
 
 
     private:
-      TreeItem * getItem(const QModelIndex & index) const;
+      AbstractTreeItem * getItem(const QModelIndex & index) const;
 
 
     protected: // data
       ControlNet * cNet;
       QString * headerTitle;
-      QList< TreeItem * > * parentItems;
-      QList< QString > * expandedItems;
-      QList< QTreeView * > * views;
+      QList< AbstractTreeItem * > * parentItems;
+      QList< QPair< QString, QString > > * expandedState;
+      QList< QPair< QString, QString > > * selectedState;
+      QTreeView * view;
       bool drivable;
   };
 }

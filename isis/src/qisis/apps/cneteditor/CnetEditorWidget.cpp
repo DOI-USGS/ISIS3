@@ -26,12 +26,11 @@
 #include "ConnectionModel.h"
 #include "MeasureTableDelegate.h"
 #include "MeasureTableModel.h"
-#include "PointChildItem.h"
 #include "PointTableDelegate.h"
 #include "PointTableModel.h"
 #include "PointModel.h"
 #include "SerialModel.h"
-#include "TreeItem.h"
+#include "AbstractTreeItem.h"
 
 #include <QPushButton>
 
@@ -47,6 +46,8 @@ namespace Isis
     nullify();
     updatingSelection = false;
     controlNet = cNet;
+    connect(cNet, SIGNAL(networkStructureModified()),
+        this, SLOT(rebuildModels()));
 
     QBoxLayout * mainLayout = createMainLayout();
     setLayout(mainLayout);
@@ -66,6 +67,16 @@ namespace Isis
     pointModel->setDrivable(view == PointView);
     serialModel->setDrivable(view == SerialView);
     connectionModel->setDrivable(view == ConnectionView);
+
+    QTreeView * treeView = NULL;
+    switch (view)
+    {
+      case PointView: treeView = pointView; break;
+      case SerialView: treeView = serialView; break;
+      case ConnectionView: treeView = connectionView; break;
+    }
+
+    treeView->selectionModel()->clear();
   }
 
 
@@ -101,11 +112,12 @@ namespace Isis
   QBoxLayout * CnetEditorWidget::createMainLayout()
   {
     pointView = new QTreeView();
-    pointModel = new PointModel(controlNet, "Point View", qApp);
+    pointModel = new PointModel(controlNet, "Point View", pointView, qApp);
     pointView->setModel(pointModel);
     connect(pointView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
-        SLOT(pointViewSelectionChanged()));
+        SLOT(pointViewSelectionChanged(const QItemSelection &,
+            const QItemSelection &)));
     connect(pointView, SIGNAL(expanded(const QModelIndex &)), this,
         SLOT(itemExpanded(const QModelIndex &)));
     connect(pointView, SIGNAL(collapsed(const QModelIndex &)), this,
@@ -114,11 +126,12 @@ namespace Isis
     pointView->setSelectionMode(QAbstractItemView::MultiSelection);
 
     serialView = new QTreeView();
-    serialModel = new SerialModel(controlNet, "Cube View", qApp);
+    serialModel = new SerialModel(controlNet, "Cube View", serialView, qApp);
     serialView->setModel(serialModel);
     connect(serialView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
-        SLOT(serialViewSelectionChanged()));
+        SLOT(serialViewSelectionChanged(const QItemSelection &,
+            const QItemSelection &)));
     connect(serialView, SIGNAL(expanded(const QModelIndex &)), this,
         SLOT(itemExpanded(const QModelIndex &)));
     connect(serialView, SIGNAL(collapsed(const QModelIndex &)), this,
@@ -128,11 +141,12 @@ namespace Isis
 
     connectionView = new QTreeView();
     connectionModel = new ConnectionModel(controlNet, "Cube Connection View",
-        qApp);
+        connectionView, qApp);
     connectionView->setModel(connectionModel);
     connect(connectionView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
-        SLOT(connectionViewSelectionChanged()));
+        SLOT(connectionViewSelectionChanged(const QItemSelection &,
+            const QItemSelection &)));
     connect(connectionView, SIGNAL(expanded(const QModelIndex &)), this,
         SLOT(itemExpanded(const QModelIndex &)));
     connect(connectionView, SIGNAL(collapsed(const QModelIndex &)), this,
@@ -145,8 +159,6 @@ namespace Isis
     editPointView->setModel(editPointModel);
     connect(editPointModel, SIGNAL(dataChanged(const QModelIndex &,
         const QModelIndex &)), editPointView, SLOT(resizeColumnsToContents()));
-//     connect(editPointModel, SIGNAL(dataChanged(const QModelIndex &,
-//         const QModelIndex &)), connectionModel, SLOT(rebuildItems()));
     editPointDelegate = new PointTableDelegate(editPointModel, editPointView);
     connect(editPointDelegate, SIGNAL(dataEdited()),
         this, SIGNAL(cnetModified()));
@@ -159,11 +171,6 @@ namespace Isis
     QHBoxLayout * editPointLayout = new QHBoxLayout;
     editPointLayout->addWidget(editPointView);
     editPointBox->setLayout(editPointLayout);
-
-//     QHeaderView * vheader = editPointView->verticalHeader();
-//     vheader->setContextMenuPolicy(Qt::ActionsContextMenu);
-//     QAction * removeAction = new QAction("Remove", this);
-//     vheader->addAction(removeAction);
 
     editMeasureView = new QTableView();
     editMeasureModel = new MeasureTableModel(qApp);
@@ -195,13 +202,6 @@ namespace Isis
     mainSplitter->addWidget(topSplitter);
     mainSplitter->addWidget(editPointBox);
     mainSplitter->addWidget(editMeasureBox);
-
-//     QPushButton * button = new QPushButton("push me");
-//     connect(button, SIGNAL(clicked()), this, SLOT(blah()));
-//     mainSplitter->addWidget(button);
-//     mainSplitter->setStretchFactor(0, 2);
-//     mainSplitter->setStretchFactor(1, 1);
-//     mainSplitter->setStretchFactor(2, 1);
 
     QBoxLayout * mainLayout = new QHBoxLayout;
     mainLayout->addWidget(mainSplitter);
@@ -236,15 +236,14 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::pointViewSelectionChanged()
+  void CnetEditorWidget::pointViewSelectionChanged(
+    const QItemSelection & newSelected, const QItemSelection & newDeselected)
   {
-    // If this method was called because it is synchronized to another view
-    // that got clicked then do nothing.  The *viewSelectionChanged for the
-    // clicked view is already handling how this view should be updated.
     if (updatingSelection)
       return;
     updatingSelection = true;
 
+    updateTreeItemsWithNewSelection(newSelected, newDeselected);
 
     QList< ControlPoint * > points;
     QList< ControlMeasure * > measures;
@@ -253,20 +252,20 @@ namespace Isis
       pointView->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.size(); i++)
     {
-      TreeItem * item = static_cast< TreeItem * >(
+      AbstractTreeItem * item = static_cast< AbstractTreeItem * >(
           indexes[i].internalPointer());
-      TreeItem::InternalPointerType type = item->pointerType();
+      AbstractTreeItem::InternalPointerType type = item->pointerType();
 
-      if (type == TreeItem::Point)
+      if (type == AbstractTreeItem::Point)
       {
-        points << controlNet->GetPoint(item->data(0).toString());
+        points << controlNet->GetPoint(item->data().toString());
       }
       else
       {
-        if (type == TreeItem::Measure)
+        if (type == AbstractTreeItem::Measure)
         {
-          QString pointId = item->parent()->data(0).toString();
-          QString serial = item->data(0).toString();
+          QString pointId = item->parent()->data().toString();
+          QString serial = item->data().toString();
 
           measures << controlNet->GetPoint(pointId)->GetMeasure(serial);
           cubeSerialNumbers << serial;
@@ -295,12 +294,14 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::serialViewSelectionChanged()
+  void CnetEditorWidget::serialViewSelectionChanged(
+    const QItemSelection & newSelected, const QItemSelection & newDeselected)
   {
     if (updatingSelection)
       return;
     updatingSelection = true;
 
+    updateTreeItemsWithNewSelection(newSelected, newDeselected);
 
     QList< ControlPoint * > points;
     QList< ControlMeasure * > measures;
@@ -310,24 +311,24 @@ namespace Isis
       serialView->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.size(); i++)
     {
-      TreeItem * item = static_cast< TreeItem * >(
+      AbstractTreeItem * item = static_cast< AbstractTreeItem * >(
           indexes[i].internalPointer());
-      TreeItem::InternalPointerType type = item->pointerType();
+      AbstractTreeItem::InternalPointerType type = item->pointerType();
 
-      if (type == TreeItem::Serial)
+      if (type == AbstractTreeItem::CubeGraphNode)
       {
-        cubeSerialNumbers << item->data(0).toString();
+        cubeSerialNumbers << item->data().toString();
       }
       else
       {
-        if (type == TreeItem::Point)
+        if (type == AbstractTreeItem::Point)
         {
-          QString pointId = item->data(0).toString();
+          QString pointId = item->data().toString();
           pointIds << pointId;
 
           ControlPoint * point = controlNet->GetPoint(pointId);
           points << point;
-          measures << point->GetMeasure(item->parent()->data(0).toString());
+          measures << point->GetMeasure(item->parent()->data().toString());
         }
         else
         {
@@ -350,15 +351,14 @@ namespace Isis
 
 
 
-  void CnetEditorWidget::connectionViewSelectionChanged()
+  void CnetEditorWidget::connectionViewSelectionChanged(
+    const QItemSelection & newSelected, const QItemSelection & newDeselected)
   {
-    // If this method was called because it is synchronized to another view
-    // that got clicked then do nothing.  The *viewSelectionChanged for the
-    // clicked view is already handling how this view should be updated.
     if (updatingSelection)
       return;
     updatingSelection = true;
 
+    updateTreeItemsWithNewSelection(newSelected, newDeselected);
 
     QList< ControlPoint * > points;
     QList< ControlMeasure * > measures;
@@ -368,25 +368,25 @@ namespace Isis
       connectionView->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.size(); i++)
     {
-      TreeItem * item = static_cast< TreeItem * >(
+      AbstractTreeItem * item = static_cast< AbstractTreeItem * >(
           indexes[i].internalPointer());
-      TreeItem::InternalPointerType type = item->pointerType();
+      AbstractTreeItem::InternalPointerType type = item->pointerType();
 
-      if (type == TreeItem::ConnectionParent || type == TreeItem::Serial)
+      if (type == AbstractTreeItem::CubeGraphNode)
       {
-        cubeSerialNumbers << item->data(0).toString();
+        cubeSerialNumbers << item->data().toString();
       }
       else
       {
-        if (type == TreeItem::Point)
+        if (type == AbstractTreeItem::Point)
         {
-          QString pointId = item->data(0).toString();
+          QString pointId = item->data().toString();
           pointIds << pointId;
 
           ControlPoint * point = controlNet->GetPoint(pointId);
           points << point;
-//           measures << point->GetMeasure(item->parent()->data(0).toString()) <<
-//               point->GetMeasure(item->parent()->parent()->data(0).toString());
+//           measures << point->GetMeasure(item->parent()->data().toString()) <<
+//               point->GetMeasure(item->parent()->parent()->data().toString());
         }
         else
         {
@@ -406,19 +406,52 @@ namespace Isis
 
     updatingSelection = false;
   }
-  
-  
+
+
   void CnetEditorWidget::itemExpanded(const QModelIndex & index)
   {
-    static_cast< TreeItem * >(index.internalPointer())->setExpanded(true);
+    static_cast< AbstractTreeItem * >(index.internalPointer())->setExpanded(
+      true);
   }
-  
-  
+
+
   void CnetEditorWidget::itemCollapsed(const QModelIndex & index)
   {
-    static_cast< TreeItem * >(index.internalPointer())->setExpanded(false);
+    static_cast< AbstractTreeItem * >(index.internalPointer())->setExpanded(
+      false);
   }
-  
+
+
+  void CnetEditorWidget::rebuildModels()
+  {
+    cerr << "CnetEditorWidget::rebuildModels called\n";
+    ASSERT(pointModel);
+    ASSERT(serialModel);
+    ASSERT(connectionModel);
+
+    updatingSelection = true;
+
+    pointModel->saveViewState();
+    pointModel->rebuildItems();
+    pointModel->loadViewState();
+
+    serialModel->saveViewState();
+    serialModel->rebuildItems();
+    serialModel->loadViewState();
+
+    connectionModel->saveViewState();
+    connectionModel->rebuildItems();
+    connectionModel->loadViewState();
+
+    updatingSelection = false;
+  }
+
+
+  void CnetEditorWidget::handleButtonClicked()
+  {
+    serialModel->loadViewState();
+  }
+
 
   void CnetEditorWidget::focusView(QTreeView * view, QStringList labels)
   {
@@ -430,12 +463,36 @@ namespace Isis
       QModelIndex index = model->index(i, 0, QModelIndex());
       if (labels.contains(model->data(index, Qt::DisplayRole).toString()))
       {
-        view->selectionModel()->select(index,
-            QItemSelectionModel::Select);
+        view->selectionModel()->select(index, QItemSelectionModel::Select);
         if (labels.size() == 1)
+        {
           view->setExpanded(index, true);
+//           cerr << "CnetEditorWidget::focusView... "
+//                << static_cast< AbstractTreeItem * >(index.internalPointer())->isExpanded()
+//                << "\t" << index.internalPointer() << "\n";
+
+        }
         view->scrollTo(index, QAbstractItemView::PositionAtCenter);
       }
+    }
+  }
+
+
+  void CnetEditorWidget::updateTreeItemsWithNewSelection(
+    const QItemSelection & newSelected, const QItemSelection & newDeselected)
+  {
+    QList< QModelIndex > newSelectedIndexes = newSelected.indexes();
+    for (int i = 0; i < newSelectedIndexes.size(); i++)
+    {
+      static_cast< AbstractTreeItem * >(
+        newSelectedIndexes[i].internalPointer())->setSelected(true);
+    }
+
+    QList< QModelIndex > newDeselectedIndexes = newDeselected.indexes();
+    for (int i = 0; i < newDeselectedIndexes.size(); i++)
+    {
+      static_cast< AbstractTreeItem * >(
+        newDeselectedIndexes[i].internalPointer())->setSelected(false);
     }
   }
 

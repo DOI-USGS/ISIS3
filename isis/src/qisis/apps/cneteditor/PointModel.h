@@ -5,6 +5,7 @@
 
 
 class QString;
+class QTreeView;
 
 
 namespace Isis
@@ -16,7 +17,8 @@ namespace Isis
       Q_OBJECT
 
     public:
-      PointModel(Isis::ControlNet * cNet, QString name, QObject * parent = 0);
+      PointModel(Isis::ControlNet * cNet, QString name, QTreeView * tv,
+          QObject * parent = 0);
       virtual ~PointModel();
 
       // This is a slot!!!  There is no "pubic slots:" because it has already

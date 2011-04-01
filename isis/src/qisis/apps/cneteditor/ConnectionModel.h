@@ -6,6 +6,7 @@
 
 
 class QString;
+class QTreeView;
 
 
 namespace Isis
@@ -17,7 +18,7 @@ namespace Isis
       Q_OBJECT
 
     public:
-      ConnectionModel(Isis::ControlNet * cNet, QString name,
+      ConnectionModel(Isis::ControlNet * cNet, QString name, QTreeView * tv,
           QObject * parent = 0);
       virtual ~ConnectionModel();
 

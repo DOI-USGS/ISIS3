@@ -2,7 +2,8 @@
 #define PointParentItem_H
 
 
-#include "TreeItem.h"
+#include "AbstractPointItem.h"
+#include "AbstractParentItem.h"
 
 
 class QVariant;
@@ -11,28 +12,19 @@ namespace Isis
 {
   class ControlPoint;
 
-  class PointParentItem : public TreeItem
+  class PointParentItem : public AbstractPointItem, public AbstractParentItem
   {
     public:
       PointParentItem(Isis::ControlPoint * cp,
-          TreeItem * parent = 0);
+          AbstractTreeItem * parent = 0);
       virtual ~PointParentItem();
 
-      void addChild(TreeItem * child);
-      void removeChild(int row);
-      int columnCount() const;
-      QVariant data(int column) const;
-      void setData(int column, const QVariant & value);
-      void deleteSource();
-      TreeItem::InternalPointerType pointerType() const;
+      void addChild(AbstractTreeItem * child);
+
 
     private: // Disallow copying of this class
       PointParentItem(const PointParentItem & other);
       const PointParentItem & operator=(const PointParentItem & other);
-
-
-    private:
-      Isis::ControlPoint * point;
   };
 }
 

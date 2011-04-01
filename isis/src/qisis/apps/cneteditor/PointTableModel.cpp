@@ -324,7 +324,7 @@ namespace Isis
               point->SetIgnored(value.toString() == "Yes");
               break;
             case Reference:
-              Q_ASSERT(point->HasSerialNumber(value.toString()));
+              ASSERT(point->HasSerialNumber(value.toString()));
               point->SetRefMeasure(value.toString());
               break;
             case AdjustedSPLat:
@@ -405,7 +405,7 @@ namespace Isis
   QString PointTableModel::catchNULL(double d) const
   {
     QString str = "NULL";
-    if (d != Isis::NULL8)
+    if (d != Isis::Null)
       str = QString::number(d);
 
     return str;
@@ -414,7 +414,7 @@ namespace Isis
 
   double PointTableModel::catchNULL(QString str) const
   {
-    double d = Isis::NULL8;
+    double d = Isis::Null;
     if (str.toLower() != "null")
       d = str.toDouble();
 

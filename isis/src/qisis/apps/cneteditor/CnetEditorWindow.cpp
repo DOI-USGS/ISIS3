@@ -213,7 +213,7 @@ namespace Isis
     QRadioButton * drivePointViewButton = new QRadioButton("Point View");
     QRadioButton * driveSerialViewButton = new QRadioButton("Cube View");
     QRadioButton * driveConnectionViewButton = new QRadioButton(
-      "Connection View");
+      "Cube Connection View");
 
     driveViewGrp = new QButtonGroup(this);
     driveViewGrp->addButton(drivePointViewButton,

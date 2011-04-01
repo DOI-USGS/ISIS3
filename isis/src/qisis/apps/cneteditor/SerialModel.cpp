@@ -3,6 +3,7 @@
 #include "SerialModel.h"
 
 #include <QList>
+#include <QModelIndex>
 #include <QString>
 
 #include "ControlCubeGraphNode.h"
@@ -11,13 +12,14 @@
 #include "ControlPoint.h"
 
 #include "SerialParentItem.h"
-#include "PointChildItem.h"
+#include "PointLeafItem.h"
 
 
 namespace Isis
 {
   SerialModel::SerialModel(ControlNet * controlNet, QString name,
-      QObject * parent) : TreeModel(controlNet, name, parent)
+      QTreeView * tv, QObject * parent) : TreeModel(controlNet, name, tv,
+            parent)
   {
     rebuildItems();
   }
@@ -38,21 +40,19 @@ namespace Isis
     {
       ControlCubeGraphNode * node = nodes[i];
       SerialParentItem * serialItem = new SerialParentItem(node);
+//       serialItem->setRow(i);
       parentItems->append(serialItem);
 
       QList< ControlMeasure * > measures = node->getMeasures();
       for (int j = 0; j < measures.size(); j++)
       {
         ControlPoint * point = measures[j]->Parent();
-        PointChildItem * pointItem = new PointChildItem(point, serialItem);
+        PointLeafItem * pointItem = new PointLeafItem(point, serialItem);
         serialItem->addChild(pointItem);
       }
     }
     endInsertRows();
-    
-    
-//     if (expandedItems->contains(serialItem->data(0)))
-//       serialItem->
 
+//     emit (dataChanged(QModelIndex(), QModelIndex()));
   }
 }

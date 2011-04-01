@@ -9,15 +9,15 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 
-#include "SerialConnectionParentItem.h"
+#include "ConnectionParentItem.h"
 #include "SerialParentItem.h"
-#include "PointChildItem.h"
+#include "PointLeafItem.h"
 
 
 namespace Isis
 {
   ConnectionModel::ConnectionModel(ControlNet * controlNet, QString name,
-      QObject * parent) : TreeModel(controlNet, name, parent)
+      QTreeView * tv, QObject * parent) : TreeModel(controlNet, name, tv, parent)
   {
     rebuildItems();
   }
@@ -37,8 +37,8 @@ namespace Isis
     for (int i = 0; i < nodes.size(); i++)
     {
       ControlCubeGraphNode * node = nodes[i];
-      SerialConnectionParentItem * parentItem =
-        new SerialConnectionParentItem(node);
+      ConnectionParentItem * parentItem =
+        new ConnectionParentItem(node);
       parentItems->append(parentItem);
 
       QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
@@ -52,7 +52,7 @@ namespace Isis
         for (int k = 0; k < measures.size(); k++)
         {
           ControlPoint * point = measures[k]->Parent();
-          PointChildItem * pointItem = new PointChildItem(point, serialItem);
+          PointLeafItem * pointItem = new PointLeafItem(point, serialItem);
           serialItem->addChild(pointItem);
         }
 

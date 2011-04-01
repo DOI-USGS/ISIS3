@@ -2,38 +2,27 @@
 #define SerialParentItem_H
 
 
-#include "TreeItem.h"
+#include "AbstractSerialItem.h"
+#include "AbstractParentItem.h"
 
-
-class QVariant;
 
 namespace Isis
 {
   class ControlCubeGraphNode;
 
-  class SerialParentItem : public TreeItem
+  class SerialParentItem : public AbstractSerialItem, public AbstractParentItem
   {
     public:
-      SerialParentItem(Isis::ControlCubeGraphNode * cubeGraphNode,
-          TreeItem * parent = 0);
+      SerialParentItem(Isis::ControlCubeGraphNode * node,
+          AbstractTreeItem * parent = 0);
       virtual ~SerialParentItem();
 
-      void addChild(TreeItem * child);
-      void removeChild(int row);
-      int columnCount() const;
-      QVariant data(int column) const;
-      void setData(int column, const QVariant & value);
-      void deleteSource();
-      TreeItem::InternalPointerType pointerType() const;
+      void addChild(AbstractTreeItem * child);
 
 
     private: // Disallow copying of this class
       SerialParentItem(const SerialParentItem & other);
       const SerialParentItem & operator=(const SerialParentItem & other);
-
-
-    private:
-      Isis::ControlCubeGraphNode * ccgn;
   };
 }
 
