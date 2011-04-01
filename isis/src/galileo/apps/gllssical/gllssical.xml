@@ -73,6 +73,14 @@
     then the correction will be applied to the dark-current as well. The current 
     correction table was supplied by Herb Breneman, 2 Mar 89, and is based on 
     1975 calibration data.
+
+    Please note that the original Isis 2 version of this app (ssical) included
+    negative I/F values in the output. We will not be supporting this bevior as
+    negative I/F are not useful and do not make sense. Thus, this app outputs
+    LRS for any negative I/F values that are encountered.
+
+    In the future, this app needs to be modified to output units in either I/F
+    or radiance.
   </description>
 
   <history>

@@ -125,6 +125,9 @@ void Calibrate1(vector<Buffer *> &in, vector<Buffer *> &out) {
     double xdc = weight[(unsigned long)(darkFile[samp])];
     double xdo = scaleFactor * gainFile[samp] * (xdn - xdc);
 
+    // The following behavior does not match the Isis 2 version of this app.
+    // In the Isis 2 version, negative I/F were kept in the output, which
+    // doesn't make sense.
     if(xdo >= 0) {
       outputFile[samp] = xdo;
     }
@@ -157,6 +160,9 @@ void Calibrate2(vector<Buffer *> &in, vector<Buffer *> &out) {
     double xdn = weight[(unsigned long)(inputFile[samp])];
     double xdo = scaleFactor * gainFile[samp] * (xdn - (1.0 / picScale) * darkFile[samp]); // weight of dark file DN??? See decal1
 
+    // The following behavior does not match the Isis 2 version of this app.
+    // In the Isis 2 version, negative I/F were kept in the output, which
+    // doesn't make sense.
     if(xdo >= 0) {
       outputFile[samp] = xdo;
     }
