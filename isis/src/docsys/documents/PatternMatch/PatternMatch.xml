@@ -33,7 +33,6 @@
           <li><a href="#CreatingFitChip">Creating a Fit Chip</a></li>
           <ol type="i">
             <li><a href="#DenseWalk">Dense Walk</a></li>
-            <li><a href="#SparseWalk">Sparse Walk</a></li>
           </ol>
 
           <li><a href="#SubPixelAccuracy">Sub-Pixel Accuracy</a></li>
@@ -452,7 +451,7 @@
         <img src="assets/exampleWalk.jpg" alt="Example Walk" />
         <p>
           How the pattern chip walks the search chip can vary; currently we
-          define two methods, a dense and sparse walk. 
+          define one method: a dense walk. 
         </p>
 
         <h3><a name="DenseWalk">Dense Walk</a></h3>
@@ -469,32 +468,6 @@
           search chip.  This will be true for all walking scenarios.  Therefore,
           if we have 3x3 pattern chip and a 7x7 search chip, we compute fits for
           25 of the 49 pixels in the search chip.
-        </p>
-
-        <h3><a name="SparseWalk">Sparse Walk</a></h3>
-        <p>
-          A sparse walk uses a sample and line increment to move the pattern
-          chip.  The resultant fit chip will have a sparse sampling of
-          data.  The walking algorithm will search for the best goodness of fit
-          value in the sparse fit chip and then compute densely around that
-          point.  The advantage is that sparse walking will reduce the number of
-          computations, especially for large chips.  This is facilitated through
-          PVL as:
-
-          <pre style="padding-left:4em;">
-            Group = SearchChip
-              Samples     = 21
-              Lines       = 21
-              Density     = (2,3)
-            End_Group
-          </pre>
-
-          In this case, every other sample and every third line will be tested
-          in the search chip.  If density is not specified it defaults to (1,1)
-          which is a dense walk.  It is important to recognize there is a risk
-          using the sparse walk.  The algorithm can miss the best fit and
-          compute an incorrect pixel match.  So there is a speed versus accuracy
-          tradeoff.
         </p>
 
         <!-- Sub-Pixel Accuracy -->
@@ -600,7 +573,24 @@
 
         <h3><a name="WindowSize">Window Size</a></h3>
         <p>
-          COMING SOON
+          When refining a whole-pixel match to sub-pixel accuracy, it's
+          important to consider how much area around that best whole-pixel fit
+          to sample for constructing a surface model.  The WindowSize keyword
+          defines the size of the window, centered on the best whole-pixel
+          match, that will be used for modelling the surface.  Values for
+          WindowSize specify the N of an NxN chip, and must be odd numbers
+          greater than or equal to 3.  By default, this window size is 5x5
+          pixels, but can be specified in the SurfaceModel group as follows:
+
+          <pre style="padding-left:4em;">
+            Group = SurfaceModel
+              WindowSize = 3
+            End_Group
+          </pre>
+
+          Here we define our window to be 3x3 pixels around the best
+          whole-pixel match, and the resulting surface will be modelled with
+          the data in this chip.
         </p>
 
         <h3><a name="EccentricityRatio">Eccentricity Ratio</a></h3>
@@ -658,7 +648,33 @@
 
         <h3><a name="ResidualTolerance">Residual Tolerance</a></h3>
         <p>
-          COMING SOON
+          The least-squares fit performed to construct the surface model takes
+          discrete data from the whole-pixels around the best-fit (as defined
+          by WindowSize).  When this discrete data is fit with a continuous
+          function, there is likely going to be some amount of error in the
+          original value for some pixel and its evaluated value in the
+          least-squares solution.  The ResidualTolerance keyword thus allows
+          the user to specify the maximum average residual, or
+          <a href="http://en.wikipedia.org/wiki/Mean_absolute_error">
+            mean absolute error
+          </a>,
+          for all pixels in the surface model area, that will be tolerated
+          before the sub-pixel accuracy computation is rejected and the best
+          whole-pixel fit is kept.
+        </p>
+        <p>
+          An example of using this keyword in PVL:
+
+          <pre style="padding-left:4em;">
+            Group = SurfaceModel
+              ResidualTolerance = 0.1
+            End_Group
+          </pre>
+
+          With the ResidualTolerance set here to 0.1, if the average residual
+          of the surface model is greater than 0.1, the sub-pixel accuracy
+          computation will be rejected for that point and the registration will
+          keep the best whole-pixel fit instead.
         </p>
 
         <!-- Advanced Features -->
