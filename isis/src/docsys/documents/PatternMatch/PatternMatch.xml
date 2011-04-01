@@ -1100,7 +1100,7 @@
 
           <!-- Surface Model -->
           <tr>
-            <td><a href="#SurfaceModeling"><strong>DistanceTolerance</strong></a></td>
+            <td><a href="#DistanceTolerance"><strong>DistanceTolerance</strong></a></td>
             <td>SurfaceModel</td>
             <td>All</td>
             <td>Real</td>
@@ -1108,7 +1108,7 @@
             <td>1.5</td>
           </tr>
           <tr>
-            <td><a href="#SurfaceModeling"><strong>WindowSize</strong></a></td>
+            <td><a href="#WindowSize"><strong>WindowSize</strong></a></td>
             <td>SurfaceModel</td>
             <td>All</td>
             <td>Integer</td>
@@ -1116,7 +1116,7 @@
             <td>5</td>
           </tr>
           <tr>
-            <td><a href="#SurfaceModeling"><strong>EccentricityRatio</strong></a></td>
+            <td><a href="#EccentricityRatio"><strong>EccentricityRatio</strong></a></td>
             <td>SurfaceModel</td>
             <td>All</td>
             <td>Real</td>
@@ -1124,7 +1124,7 @@
             <td><span style="color:red;">No Eccentricity Test</span></td>
           </tr>
           <tr>
-            <td><a href="#SurfaceModeling"><strong>ResidualTolerance</strong></a></td>
+            <td><a href="#ResidualTolerance"><strong>ResidualTolerance</strong></a></td>
             <td>SurfaceModel</td>
             <td>All</td>
             <td>Real</td>
