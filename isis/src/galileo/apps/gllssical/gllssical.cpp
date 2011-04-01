@@ -19,7 +19,7 @@ using namespace std;
  *   using the book "In Orbit at Jupiter, Contributions of the Galileo
  *   Science Team," Section H Part I.
  */
-
+ 
 vector<double> weight;
 double scaleFactor0;
 double a2;

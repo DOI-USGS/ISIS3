@@ -127,7 +127,7 @@
         </filter>
       </parameter>
     </group>
-
+ 
     <group name="Settings">
       <parameter name="BITWEIGHTING">
         <type>boolean</type>
