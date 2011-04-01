@@ -487,12 +487,16 @@
 
         <h3><a name="SurfaceModeling">Surface Modeling</a></h3>
         <p>
-          To get around this problem, we can model a continuous mathematical
-          surface based on the data in the fit chip. By calculating a 2nd degree
-          2-dimentional polynomial given an NxN window of points, we have a
-          reasonable approximation under a given tolerance of the underlying
-          structure. We can then estimate the true registration position of the
-          chip on that surface.
+          To get around the problem of a true best fit lying somewhere between
+          two pixels, we can model a continuous mathematical surface based on
+          the data in the fit chip. By using a
+          <a href="http://en.wikipedia.org/wiki/Least-squares">
+            least squares fit
+          </a>
+          to generate a 2nd degree 2-dimentional polynomial given an NxN
+          window of points, we have a reasonable approximation under a given
+          tolerance of the underlying structure. We can then estimate the true
+          registration position of the chip on that surface.
         </p>
         <p>
           Optionally, the window size and tolerance may be supplied through PVL:
@@ -632,13 +636,13 @@
           In this instance, if the length of the semi-major axis of the
           computed surface model is greater than 5 times the length of the
           semi-minor axis, then the surface model will be thrown out and the
-          point will not be registered to sub-pixel accuracy.
+          registration will fail for that point.
         </p>
         <p>
           Sometimes the eccentricity can not be computed for a given surface
           model because the math simply doesn't work out (negative numbers
           appear in square root calculations).  In this case the eccentricity
-          is assumed to be 0, or perfectly circular.
+          (in mathematical terms) is assumed to be 0, or perfectly circular.
         </p>
         <p>
           If the user does not wish to perform the eccentricity test on their
@@ -648,19 +652,19 @@
 
         <h3><a name="ResidualTolerance">Residual Tolerance</a></h3>
         <p>
-          The least-squares fit performed to construct the surface model takes
+          The least squares fit performed to construct the surface model takes
           discrete data from the whole-pixels around the best-fit (as defined
           by WindowSize).  When this discrete data is fit with a continuous
-          function, there is likely going to be some amount of error in the
-          original value for some pixel and its evaluated value in the
-          least-squares solution.  The ResidualTolerance keyword thus allows
+          function, there is likely going to be some amount of error between
+          the original value for some pixel and its interpolated value in the
+          least squares solution.  The ResidualTolerance keyword thus allows
           the user to specify the maximum average residual, or
           <a href="http://en.wikipedia.org/wiki/Mean_absolute_error">
             mean absolute error
           </a>,
           for all pixels in the surface model area, that will be tolerated
-          before the sub-pixel accuracy computation is rejected and the best
-          whole-pixel fit is kept.
+          before the sub-pixel accuracy computation is rejected and the
+          registration fails for that point.
         </p>
         <p>
           An example of using this keyword in PVL:
@@ -673,8 +677,8 @@
 
           With the ResidualTolerance set here to 0.1, if the average residual
           of the surface model is greater than 0.1, the sub-pixel accuracy
-          computation will be rejected for that point and the registration will
-          keep the best whole-pixel fit instead.
+          computation will be rejected and the registration will fail for that
+          point.
         </p>
 
         <!-- Advanced Features -->
