@@ -2,8 +2,8 @@
 #define MdisCamera_h
 /**
  * @file
- * $Revision: 1.9 $
- * $Date: 2009/08/31 15:12:30 $
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -69,6 +69,10 @@ namespace Isis {
      *            changes.
      *   @history 2010-12-20 Kris Becker - Added implementation of CK and SPK
      *            NAIF codes for the Camera class.
+     *   @history 2011-03-31 Kris Becker - Fixed bug in handling of pixel
+     *            binning.  Valid values for PixelBinningMode are 0, 2 or 4.
+     *            This was not handled properly until it was used in conjuction
+     *            with FPU binning in orbit.
      */
     class MdisCamera : public FramingCamera {
       public:

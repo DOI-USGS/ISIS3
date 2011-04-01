@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision: 1.11 $
- * $Date: 2009/08/31 15:12:30 $
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -154,7 +154,7 @@ namespace Isis {
       int fpuBinMode   = inst["FpuBinningMode"];
       int pixelBinMode = inst["PixelBinningMode"];
 
-      int summing(1 + (1 * pixelBinMode));
+      int summing = ((pixelBinMode == 0) ? 1 : pixelBinMode);
       //  FPU binning was performed, retrieve the FPU binning offsets and
       //  apply them to the focal plane mapping.
       if(fpuBinMode == 1) {
