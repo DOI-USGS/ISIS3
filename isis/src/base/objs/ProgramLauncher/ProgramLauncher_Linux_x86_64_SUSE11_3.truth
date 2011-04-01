@@ -15,6 +15,7 @@ hist: Gathering histogram
 Group = Results
   From                    = /usgs/cpkgs/isis3/data/base/testData/ab102401_ide-
                             al.cub
+  Band                    = 1
   Average                 = 0.040536894512714
   StandardDeviation       = 0.01519314883071
   Variance                = 2.30831771392117e-04
@@ -61,6 +62,7 @@ stats: Gathering histogram
 Group = Results
   From                    = /usgs/cpkgs/isis3/data/base/testData/ab102401_ide-
                             al.cub
+  Band                    = 1
   Average                 = 0.040536894512714
   StandardDeviation       = 0.01519314883071
   Variance                = 2.30831771392117e-04
