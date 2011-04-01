@@ -35,6 +35,7 @@
 #include <QScrollBar>
 #include <QString>
 #include <QTimer>
+#include "iString.h"
 
 #include "Camera.h"
 #include "CubeDataThread.h"
@@ -1346,12 +1347,29 @@ namespace Qisis {
       el = cubeLines();
     }
 
+    // get the band info
+    iString sBandInfo ;
+    // color
+    if(p_color ) {
+      sBandInfo = "Bands(RGB)&nbsp;Virtual  = (" + iString(p_redBuffer->getBand()) + " ";
+      sBandInfo += iString(p_greenBuffer->getBand()) + " ";
+      sBandInfo += iString(p_blueBuffer->getBand()) + ") ";
+      sBandInfo += "Physical = (" + iString(p_cube->PhysicalBand(p_redBuffer->getBand())) + " ";
+      sBandInfo += iString(p_cube->PhysicalBand(p_greenBuffer->getBand())) + " ";
+      sBandInfo += iString(p_cube->PhysicalBand(p_blueBuffer->getBand())) + ")";
+    }
+    else { // gray
+      sBandInfo = "Band(Gray)&nbsp;Virtual = " + iString(p_grayBuffer->getBand()) + " ";
+      sBandInfo += "Physical = " + iString(p_cube->PhysicalBand(p_grayBuffer->getBand()));
+    }
+    
     QString area =
       "<p><b>Visible Cube Area:</b><blockQuote> \
       Samples = " + QString::number(int(ss + 0.5)) + "-" +
       QString::number(int(es + 0.5)) + "<br> \
       Lines = " + QString::number(int(sl + 0.5)) + "-" +
-      QString::number(int(el + 0.5)) + "<br></blockQuote></p>";
+      QString::number(int(el + 0.5)) + "<br> " +
+      sBandInfo.ToQt() + "</blockQuote></p>";
     viewport()->setWhatsThis(p_whatsThisText +
                              area +
                              p_cubeWhatsThisText +

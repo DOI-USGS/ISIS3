@@ -99,6 +99,7 @@ namespace Qisis {
   *                         so that it is consistent with the zoom tool.
   *  @history 2011-03-30 Sharmila Prasad - Set the frame shadow and style to remove
   *                      border around the image
+  *  @history 2011-03-31 Sharmila Prasad - Added band info to "whatsthis"
   */
 
   class Tool;
