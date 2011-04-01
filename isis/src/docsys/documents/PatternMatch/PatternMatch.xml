@@ -154,12 +154,12 @@
         <h3><a name="SearchChip">Search Chip</a></h3>
         <p>
           The search chip is the area of an overlapping cube you believe the
-          pattern will fall within (TODO how is this specified).  That is, we
-          will walk the pattern chip through the search chip looking for the
-          best match.  The size of the search chip defines how far the pattern
-          chip is allowed to deviate from a desired center search spot.
-          Consequently, the search chip must be larger than the pattern chip in
-          order for the pattern chip to move through the search chip:  
+          pattern will fall within.  That is, we will walk the pattern chip
+          through the search chip looking for the best match.  The size of the
+          search chip defines how far the pattern chip is allowed to deviate
+          from a desired center search spot.  Consequently, the search chip
+          must be larger than the pattern chip in order for the pattern chip to
+          move through the search chip:  
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
