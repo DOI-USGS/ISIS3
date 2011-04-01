@@ -149,7 +149,19 @@ namespace Qisis {
     }
 
     //  Initialize cameras for control net
-    g_controlNetwork->SetImages(*g_serialNumberList);
+    try {
+      g_controlNetwork->SetImages(*g_serialNumberList);
+    }
+    catch (Isis::iException &e) {
+      QString message = "Cannot initialize images in control network.  \n";
+      string errors = e.Errors();
+      message += errors.c_str();
+      e.Clear();
+      QMessageBox::information((QWidget *)parent(), "Error", message);
+      QApplication::restoreOverrideCursor();
+      return;
+    }
+    
 
     emit serialNumberListUpdated();
     emit controlNetworkUpdated(cNetFilename);
@@ -197,7 +209,7 @@ namespace Qisis {
         ".", filter);
     if (!fn.isEmpty()) {
       try {
-        g_controlNetwork->WritePvl(fn.toStdString());
+        g_controlNetwork->Write(fn.toStdString());
       } 
       catch (Isis::iException &e) {
         QString message = "Error saving control network.  \n";

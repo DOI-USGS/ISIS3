@@ -31,6 +31,7 @@
 #include "Pvl.h"
 #include "PvlEditDialog.h"
 #include "SerialNumber.h"
+#include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
@@ -384,17 +385,20 @@ namespace Qisis {
   void QnetTool::createActions() {
     p_openGround = new QAction(p_qnetTool);
     p_openGround->setText("Open &Ground Source");
+    p_openGround->setStatusTip("Open a ground source for choosing ground points");
     QString whatsThis =
-      "<b>Function:</b> Open a <i>ground source</i> for choosing ground points \
-       <p><b>Shortcut:</b>  Ctrl+B\n</p>";
+      "<b>Function:</b> Open and display a ground source for choosing ground points."
+      "This can be level1, level2 or dem cube.";
     p_openGround->setWhatsThis(whatsThis);
     connect (p_openGround,SIGNAL(activated()),this,SLOT(openGround()));
 
     p_openDem = new QAction(p_qnetTool);
-    p_openDem->setText("Open &DEM");
+    p_openDem->setText("Open &Radius Source");
     whatsThis =
-      "<b>Function:</b> Open a <i>DEM</i> for determining the radius when "
-      "choosing ground points <p><b>Shortcut:</b>  Ctrl+D\n</p>";
+      "<b>Function:</b> Open a DEM for determining the radius when "
+      "choosing ground points.  This is not the file that will be displayed "
+      "to be used for visually picking points.  This is strictly used to "
+      "determine the radius value.";
     p_openDem->setWhatsThis(whatsThis);
     connect (p_openDem,SIGNAL(activated()),this,SLOT(openDem()));
 
@@ -1143,6 +1147,10 @@ namespace Qisis {
    *   @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is 
    *                           not changed in the net unless "Save Point" is
    *                           selected.
+   *   @history 2011-03-31 Tracie Sucharski - Remove check for point only
+   *                           existing on a single image.  This will be
+   *                           shown on new point dialog and user can always
+   *                           hit "Cancel".
    *  
    */
   void QnetTool::createPoint(double lat,double lon) {
@@ -1174,19 +1182,19 @@ namespace Qisis {
     //  point.
     //     ????  Need to allow a point to be created w/single measure.  Display
     //     ????  measure on right or left?
-    if(pointFiles.size() == 1) {
-      try {
-        throw iException::Message(iException::User,
-                "Cannot add point, it only exists on 1 image. Point will not be added to control network.",
-                                        _FILEINFO_);
-      }
-      catch (iException &e) {
-        QString message = e.Errors().c_str();
-        QMessageBox::warning((QWidget *)parent(), "Warning", message);
-        e.Clear();
-        return;
-      }
-    }
+//  if(pointFiles.size() == 1) {
+//    try {
+//      throw iException::Message(iException::User,
+//              "Cannot add point, it only exists on 1 image. Point will not be added to control network.",
+//                                      _FILEINFO_);
+//    }
+//    catch (iException &e) {
+//      QString message = e.Errors().c_str();
+//      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+//      e.Clear();
+//      return;
+//    }
+//  }
 
     QnetNewPointDialog *newPointDialog = new QnetNewPointDialog();
     newPointDialog->SetFiles(pointFiles);
@@ -2511,6 +2519,8 @@ namespace Qisis {
         p_groundGmap = NULL;
       }
       QApplication::restoreOverrideCursor();
+      // Re-load point w/o ground source
+      loadPoint();
       return;
     }
     p_groundOpen = true;
@@ -2679,6 +2689,15 @@ namespace Qisis {
 
 
   void QnetTool::clearGroundSource () {
+
+    //  If the loaded point is a ground point, see if there is a temporary measure
+    //  holding the coordinate information for the currentground source. If so,
+    //  delete this measure.
+    if (p_editPoint->IsGround()) {
+      if (p_editPoint->HasSerialNumber(p_groundSN)) {
+        p_editPoint->Delete(p_groundSN);
+      }
+    }
 
     p_leftCombo->removeItem(p_leftCombo->findText(p_groundFile));
     p_rightCombo->removeItem(p_rightCombo->findText(p_groundFile));

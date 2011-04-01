@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QnetSetAprioriDialog</class>
+ <widget class="QDialog" name="QnetSetAprioriDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>388</width>
+    <height>586</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Set Apriori Point and Constraints</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>510</y>
+     <width>160</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="pointSourceGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>331</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Point Ground Source</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>31</y>
+      <width>147</width>
+      <height>89</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QRadioButton" name="referenceMeasureRadioButton">
+       <property name="text">
+        <string>Reference Measure</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="averageMeasuresRadioButton">
+       <property name="text">
+        <string>Average Measures</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="groundSourceRadioButton">
+       <property name="text">
+        <string>Ground Source</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="userEnteredRadioButton">
+       <property name="text">
+        <string>User Entered</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="latitudeConstraintsGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>341</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Latitude Constraints</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget2">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>20</y>
+      <width>276</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="aprioriLatLabel">
+       <property name="text">
+        <string>Apriori Latitude:</string>
+       </property>
+       <property name="buddy">
+        <cstring>aprioriLatEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="aprioriLatEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="aprioriLatUnitLabel">
+       <property name="text">
+        <string>Degrees</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget3">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>50</y>
+      <width>264</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="latSigmaLabel">
+       <property name="text">
+        <string>Latitude Sigma:</string>
+       </property>
+       <property name="buddy">
+        <cstring>latSigmaEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="latSigmaEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="latSigmaUnitLabel">
+       <property name="text">
+        <string>Meters</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="longitudeConstraintsGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>250</y>
+     <width>341</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Longitude Constraints</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget4">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>22</y>
+      <width>287</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="aprioriLonLabel">
+       <property name="text">
+        <string>Apriori Longitude:</string>
+       </property>
+       <property name="buddy">
+        <cstring>aprioriLatEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="aprioriLonEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="aprioriLonUnitLabel">
+       <property name="text">
+        <string>Degrees</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget5">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>50</y>
+      <width>275</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="longSigmaLabel">
+       <property name="text">
+        <string>Longitude Sigma:</string>
+       </property>
+       <property name="buddy">
+        <cstring>latSigmaEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lonSigmaEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="lonSigmaUnitLabel">
+       <property name="text">
+        <string>Meters</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="radiusConstraintsGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>350</y>
+     <width>341</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Radius Constraints</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget6">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>20</y>
+      <width>263</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="aprioriRadiusLabel">
+       <property name="text">
+        <string>Apriori Radius</string>
+       </property>
+       <property name="buddy">
+        <cstring>aprioriLatEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="aprioriRadiusEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="aprioriRadiusUnitLabel">
+       <property name="text">
+        <string>Meters</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget7">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>51</y>
+      <width>255</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLabel" name="radiusSigmaLabel">
+       <property name="text">
+        <string>Radius Sigma:</string>
+       </property>
+       <property name="buddy">
+        <cstring>latSigmaEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="radiusSigmaEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="radiusSigmaUnitLabel">
+       <property name="text">
+        <string>Meters</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>QnetSetAprioriDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>QnetSetAprioriDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

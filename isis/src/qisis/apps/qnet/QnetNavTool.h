@@ -104,6 +104,8 @@ namespace Qisis {
    *                          loadPointImages and the ControlPoint is passed
    *                          by value so that the original point is preserved
    *                          until the user selects "Save Point".
+   *   @history 2011-03-24 Tracie Sucharski - Added ability to enter Apriori Point values and
+   *                          sigmas.
    *
    *
    */
@@ -151,6 +153,7 @@ namespace Qisis {
       void enableButtons();
       void ignorePoints();
       void deletePoints();
+      void setApriori();
       void resetCubeList();
       void showNavTool();
 
@@ -174,6 +177,7 @@ namespace Qisis {
       QPushButton *p_tie;
       QPushButton *p_multiIgnore;
       QPushButton *p_multiDelete;
+      QPushButton *p_setApriori;
       QStackedWidget *p_filterStack;
       QComboBox *p_listCombo;
       QListWidget *p_listBox;

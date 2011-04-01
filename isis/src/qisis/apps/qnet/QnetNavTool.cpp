@@ -28,6 +28,18 @@
 #include "QnetPointMeasureFilter.h"
 #include "QnetPointRangeFilter.h"
 #include "QnetPointTypeFilter.h"
+#include "QnetSetAprioriDialog.h"
+
+#include "Angle.h"
+#include "Camera.h"
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
+#include "Distance.h"
+#include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "SpecialPixel.h"
+#include "SurfacePoint.h"
 
 #include "qnet.h"
 using namespace Qisis::Qnet;
@@ -52,6 +64,7 @@ namespace Qisis {
     p_tie = NULL;
     p_multiIgnore = NULL;
     p_multiDelete = NULL;
+    p_setApriori = NULL;
     p_filterStack = NULL;
     p_listCombo = NULL;
     p_listBox = NULL;
@@ -139,6 +152,16 @@ namespace Qisis {
     connect(p_multiDelete, SIGNAL(clicked()),
         this, SLOT(deletePoints()));
 
+    p_setApriori = new QPushButton("&Set Apriori/Sigmas", actionArea);
+    p_setApriori->setToolTip("Set selected points apriori/sigmas");
+    p_setApriori->setWhatsThis("<b>Function: </b> Set the apriori points \
+                               and sigmas. \
+                               <p><b>Hint: </b> You can select more than one \
+                               item in the list by using the shift or control \
+                               key.</p>");
+    connect(p_setApriori, SIGNAL(clicked()),
+        this, SLOT(setApriori()));
+
     p_filter = new QPushButton("&Filter", actionArea);
     p_filter->setToolTip("Filter Current List");
     p_filter->setWhatsThis("<b>Function: </b> Filters the current list by user \
@@ -164,6 +187,7 @@ namespace Qisis {
     layout->addWidget(p_tie);
     layout->addWidget(p_multiIgnore);
     layout->addWidget(p_multiDelete);
+    layout->addWidget(p_setApriori);
     layout->addWidget(p_filter);
     layout->addWidget(reset);
 
@@ -758,6 +782,120 @@ namespace Qisis {
 
 
   /**
+   * Set apriori on selected Points from control network
+   *
+   * @author 2011-03-24 Tracie Sucharski 
+   *  
+   * @internal 
+   * @todo  This method should be temporary until the control point editor 
+   *           comes online.  If this stick around, needs to be re-disigned-
+   *           put in a separate class??
+   */
+  void QnetNavTool::setApriori() {
+    // If not cubes are loaded, simply return
+    if (g_serialNumberList == NULL)
+      return;
+
+    int index = p_listBox->currentRow();
+    if (index < 0) {
+      QApplication::restoreOverrideCursor();
+      QMessageBox::information((QWidget *)parent(),
+          "Error", "No point selected to set apriori values.");
+      return;
+    }
+
+    double latSigma = Isis::Null;
+    double lat = Isis::Null;
+    double lonSigma = Isis::Null;
+    double lon = Isis::Null;
+    double radiusSigma = Isis::Null;
+    double radius = Isis::Null;
+    //  Get the apriori values from user
+    QnetSetAprioriDialog *setAprioriDialog = new QnetSetAprioriDialog;
+    if (setAprioriDialog->exec()) {
+      if (setAprioriDialog->latitudeConstraintsGroupBox->isChecked()) {
+        
+        if (setAprioriDialog->aprioriLatEdit->text() != "") {
+          lat = setAprioriDialog->aprioriLatEdit->text().toDouble();
+        }
+        latSigma = setAprioriDialog->latSigmaEdit->text().toDouble();
+      }
+      if (setAprioriDialog->longitudeConstraintsGroupBox->isChecked()) {
+        if (setAprioriDialog->aprioriLonEdit->text() != "") {
+          lon = setAprioriDialog->aprioriLonEdit->text().toDouble();
+        }
+        lonSigma = setAprioriDialog->lonSigmaEdit->text().toDouble();
+      }
+      if (setAprioriDialog->radiusConstraintsGroupBox->isChecked()) {
+        if (setAprioriDialog->aprioriRadiusEdit->text() != "") {
+          radius = setAprioriDialog->aprioriRadiusEdit->text().toDouble();
+        }
+        radiusSigma = setAprioriDialog->radiusSigmaEdit->text().toDouble();
+      }
+
+    }
+    QList<QListWidgetItem *> selected = p_listBox->selectedItems();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    for (int i = 0; i < selected.size(); i++) {
+      QString id = selected.at(i)->text();
+      Isis::ControlPoint *pt = g_controlNetwork->GetPoint(id);
+     
+      if (setAprioriDialog->referenceMeasureRadioButton->isChecked()) {
+        Isis::ControlMeasure *m = pt->GetRefMeasure();
+        // Find camera from network camera list
+        int camIndex = g_serialNumberList->SerialNumberIndex(m->GetCubeSerialNumber());
+        Isis::Camera *cam = g_controlNetwork->Camera(camIndex);
+        cam->SetImage(m->GetSample(),m->GetLine());
+        pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
+        pt->SetAprioriSurfacePointSource(Isis::ControlPoint::SurfacePointSource::Reference);
+      }
+      else if (setAprioriDialog->averageMeasuresRadioButton->isChecked()) {
+        pt->ComputeApriori();
+        // Do not need to set AprioriSurfacePointSource or AprioriRadiusSource,
+        // ComputeApriori does this for us.
+      }
+      else if (setAprioriDialog->userEnteredRadioButton->isChecked()) {
+        pt->SetAprioriSurfacePoint(Isis::SurfacePoint(
+                                   Isis::Latitude(lat, Isis::Angle::Degrees),
+                                   Isis::Longitude(lon, Isis::Angle::Degrees),
+                                   Isis::Distance(radius,Isis::Distance::Meters)));
+        pt->SetAprioriSurfacePointSource(Isis::ControlPoint::SurfacePointSource::User);
+        pt->SetAprioriRadiusSource(Isis::ControlPoint::RadiusSource::User);
+      }
+
+      try {
+        //  Read Surface point from the control point and set the sigmas,
+        //  first set the target radii
+        Isis::SurfacePoint spt = pt->GetAprioriSurfacePoint();
+        vector<Isis::Distance> targetRadii = g_controlNetwork->GetTargetRadii();
+        spt.SetRadii(Isis::Distance(targetRadii[0]), 
+                     Isis::Distance(targetRadii[1]),
+                     Isis::Distance(targetRadii[2]));
+        spt.SetSphericalSigmasDistance(Isis::Distance(latSigma,Isis::Distance::Meters),
+                                 Isis::Distance(lonSigma,Isis::Distance::Meters),
+                                 Isis::Distance(radiusSigma,Isis::Distance::Meters));
+        //  Write the surface point back out to the controlPoint and set to Ground
+        pt->SetAprioriSurfacePoint(spt);
+        pt->SetType(Isis::ControlPoint::Ground);
+      }
+      catch (Isis::iException &e )  {
+        QString message = "Error setting sigmas. \n";
+        message += e.Errors().c_str();
+        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        e.Clear();
+        QApplication::restoreOverrideCursor();
+        return;
+      }
+    }
+
+    QApplication::restoreOverrideCursor();
+    emit netChanged();
+    return;
+  }
+
+
+  /**
    * Figures out what type of widget the filter was selected for and calls the
    * filter method for that filter class
    *
@@ -884,11 +1022,13 @@ namespace Qisis {
       p_tie->setEnabled(true);
       p_multiIgnore->setEnabled(true);
       p_multiDelete->setEnabled(true);
+      p_setApriori->setEnabled(true);
     }
     else {
       p_tie->setEnabled(false);
       p_multiIgnore->setEnabled(false);
       p_multiDelete->setEnabled(false);
+      p_setApriori->setEnabled(false);
     }
   }
 
