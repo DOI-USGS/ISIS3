@@ -24,6 +24,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "Environment.h"
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -89,8 +91,9 @@ namespace Isis {
    *            functions' functionality. Moved some of the inter-process
    *            communication to ProgramLauncher.
    *   @history 2011-03-01 Steven Lambright - Fixed Version method
+   *   @history 2011-04-01 Eric Hyer - Now inherits from Environment
    */
-  class Application {
+  class Application : public Environment {
     public:
       Application(int &argc, char *argv[]);
       ~Application();
