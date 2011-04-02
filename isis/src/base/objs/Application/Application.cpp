@@ -99,7 +99,7 @@ namespace Isis {
     // Verify ISISROOT was set
     if (getenv("ISISROOT") == NULL || iString(getenv("ISISROOT")) == "") {
       string message = "Please set ISISROOT before running any Isis "
-                            "applications";
+          "applications";
       cerr << message << endl;
       abort();
     }
@@ -117,9 +117,9 @@ namespace Isis {
       // Create preferences
       Preference::Preferences(f.Name() == "unitTest.xml");
 
-      if(!f.Exists()) {
+      if (!f.Exists()) {
         f = "$ISISROOT/bin/xml/" + f.Name();
-        if(!f.Exists()) {
+        if (!f.Exists()) {
           string message = Message::FileOpen(f.Expanded());
           throw iException::Message(iException::Io, message, _FILEINFO_);
         }
@@ -127,7 +127,7 @@ namespace Isis {
       string xmlfile = f.Expanded();
 
       p_ui = new UserInterface(xmlfile, argc, argv);
-      if(!p_ui->IsInteractive()) {
+      if (!p_ui->IsInteractive()) {
         new QCoreApplication(argc, argv);
 
         // Add the Qt plugin directory to the library path
@@ -135,21 +135,21 @@ namespace Isis {
         QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
       }
     }
-    catch(iException &e) {
+    catch (iException &e) {
       exit(e.Report());
     }
 
     iApp = this;
 
     // If we were run by another Isis app, connect to it
-    if(GetUserInterface().ParentId()) {
+    if (GetUserInterface().ParentId()) {
       p_connectionToParent = new QLocalSocket;
 
       iString serverName = "isis_" + UserName() +
           "_" + iString(iApp->GetUserInterface().ParentId());
 
       p_connectionToParent->connectToServer(serverName);
-      if(!p_connectionToParent->waitForConnected()) {
+      if (!p_connectionToParent->waitForConnected()) {
         delete p_connectionToParent;
         p_connectionToParent = NULL;
       }
@@ -158,7 +158,7 @@ namespace Isis {
 
   //! Destroys the Application object
   Application::~Application() {
-    if(p_ui) {
+    if (p_ui) {
       delete p_ui;
     }
   }
@@ -173,16 +173,16 @@ namespace Isis {
   int Application::Run(void (*funct)()) {
     int status = 0;
     try {
-      if(p_ui->IsInteractive()) {
+      if (p_ui->IsInteractive()) {
         p_ui->TheGui()->Exec(funct);
       }
       else {
-        if(p_ui->BatchListSize() > 0) {
-          for(int i = 0; i < p_ui->BatchListSize(); i++) {
+        if (p_ui->BatchListSize() > 0) {
+          for (int i = 0; i < p_ui->BatchListSize(); i++) {
             try {
               p_ui->SetBatchList(i);
 
-              if(i != 0) {
+              if (i != 0) {
                 p_datetime = DateTime(&p_startTime);
                 p_startClock = clock();
                 p_startDirectIO = DirectIO();
@@ -195,11 +195,11 @@ namespace Isis {
               Application::FunctionCleanup();
               p_BatchlistPass++;
             }
-            catch(iException &e) {
+            catch (iException &e) {
               p_ui->SetErrorList(i);
               status = Application::FunctionError(e);
-              if(p_ui->AbortOnError()) {
-                for(int j = (i + 1); j < p_ui->BatchListSize(); j++) {
+              if (p_ui->AbortOnError()) {
+                for (int j = (i + 1); j < p_ui->BatchListSize(); j++) {
                   p_ui->SetErrorList(j);
                   p_BatchlistPass++;
                 }
@@ -218,17 +218,17 @@ namespace Isis {
         }
       }
     }
-    catch(iException &e) {
+    catch (iException &e) {
       status = Application::FunctionError(e);
     }
 
 #if 0
-    catch(exception &e) {
+    catch (exception &e) {
       string message = e.what();
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
     }
-    catch(...) {
+    catch (...) {
       string message = "Unknown error expection";
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
@@ -346,21 +346,21 @@ namespace Isis {
     SessionLog::TheLog().AddResults(results);
 
     // See if the log file will be written to the terminal/gui
-    if(SessionLog::TheLog().TerminalOutput()) return;
+    if (SessionLog::TheLog().TerminalOutput()) return;
 
     // See if we should write the info to our parents gui
-    if(HasParent()) {
+    if (HasParent()) {
       ostringstream ostr;
-      if(blankLine) ostr << endl;
+      if (blankLine) ostr << endl;
       ostr << results << endl;
       string data = ostr.str();
       iApp->SendParentData(string("LOG"), data);
     }
 
     // Otherwise see if we need to write to our gui
-    else if(iApp->GetUserInterface().IsInteractive()) {
+    else if (iApp->GetUserInterface().IsInteractive()) {
       ostringstream ostr;
-      if(blankLine) ostr << endl;
+      if (blankLine) ostr << endl;
       ostr << results << endl;
       iApp->GetUserInterface().TheGui()->Log(ostr.str());
       iApp->GetUserInterface().TheGui()->ShowLog();
@@ -368,7 +368,7 @@ namespace Isis {
 
     // Otherwise its command line mode
     else {
-      if(blankLine) cout << endl;
+      if (blankLine) cout << endl;
       cout << results << endl;
     }
     blankLine = true;
@@ -381,7 +381,7 @@ namespace Isis {
    */
   void Application::GuiLog(Pvl &results) {
     // See if we should write the info to our parents gui
-    if(HasParent()) {
+    if (HasParent()) {
       ostringstream ostr;
       ostr << results << endl;
       string data = ostr.str();
@@ -389,7 +389,7 @@ namespace Isis {
     }
 
     // Otherwise see if we need to write to our gui
-    else if(iApp->GetUserInterface().IsInteractive()) {
+    else if (iApp->GetUserInterface().IsInteractive()) {
       ostringstream ostr;
       ostr << results << endl;
       iApp->GetUserInterface().TheGui()->Log(ostr.str());
@@ -404,7 +404,7 @@ namespace Isis {
    */
   void Application::GuiLog(PvlGroup &results) {
     // See if we should write the info to our parents gui
-    if(HasParent()) {
+    if (HasParent()) {
       ostringstream ostr;
       ostr << results << endl;
       string data = ostr.str();
@@ -412,7 +412,7 @@ namespace Isis {
     }
 
     // Otherwise see if we need to write to our gui
-    else if(iApp->GetUserInterface().IsInteractive()) {
+    else if (iApp->GetUserInterface().IsInteractive()) {
       ostringstream ostr;
       ostr << results << endl;
       iApp->GetUserInterface().TheGui()->Log(ostr.str());
@@ -427,12 +427,12 @@ namespace Isis {
    */
   void Application::GuiLog(string &results) {
     // See if we should write the info to our parents gui
-    if(HasParent()) {
+    if (HasParent()) {
       iApp->SendParentData(string("GUILOG"), results);
     }
 
     // Otherwise see if we need to write to our gui
-    else if(iApp->GetUserInterface().IsInteractive()) {
+    else if (iApp->GetUserInterface().IsInteractive()) {
       iApp->GetUserInterface().TheGui()->Log(results);
       iApp->GetUserInterface().TheGui()->ShowLog();
     }
@@ -453,9 +453,9 @@ namespace Isis {
    * @return bool Returns true if it has a parent, and false if it does not
    */
   bool Application::HasParent() {
-    if(iApp == NULL) return false;
-    if(iApp->p_ui == NULL) return false;
-    if(iApp->p_ui->ParentId() == 0) return false;
+    if (iApp == NULL) return false;
+    if (iApp->p_ui == NULL) return false;
+    if (iApp->p_ui->ParentId() == 0) return false;
     return true;
   }
 
@@ -465,9 +465,9 @@ namespace Isis {
    * @param &errors A PvlObject of the errors
    */
   void Application::SendParentErrors(Isis::PvlObject &errors) {
-    if(!HasParent()) return;
+    if (!HasParent()) return;
 
-    for(int i = 0; i < errors.Groups(); i++) {
+    for (int i = 0; i < errors.Groups(); i++) {
       ostringstream ostr;
       ostr << errors.Group(i) << endl;
       string data = ostr.str();
@@ -477,9 +477,9 @@ namespace Isis {
 
 
   void Application::SendParentData(const string code,
-                                   const string &message) {
+      const string &message) {
     // See if we need to connect to the parent
-    if(p_connectionToParent == NULL) {
+    if (p_connectionToParent == NULL) {
       iString msg = "Unable to communicate with parent process with pid [" +
           iString(iApp->GetUserInterface().ParentId()) + "]";
       throw iException::Message(iException::System, msg, _FILEINFO_);
@@ -492,9 +492,9 @@ namespace Isis {
     data += char(27);
     data += '\n';
 
-    if(p_connectionToParent->write(data.c_str(), data.size()) == -1) {
+    if (p_connectionToParent->write(data.c_str(), data.size()) == -1) {
       string msg = "Unable to send data to parent [" +
-                        iString(iApp->GetUserInterface().ParentId()) + "]";
+          iString(iApp->GetUserInterface().ParentId()) + "]";
       throw iException::Message(iException::System, msg, _FILEINFO_);
     }
 
@@ -512,14 +512,14 @@ namespace Isis {
 
     SessionLog::TheLog().Write();
 
-    if(SessionLog::TheLog().TerminalOutput()) {
-      if(HasParent()) {
+    if (SessionLog::TheLog().TerminalOutput()) {
+      if (HasParent()) {
         ostringstream ostr;
         ostr << SessionLog::TheLog() << endl;
         string data = ostr.str();
         iApp->SendParentData(string("LOG"), data);
       }
-      else if(p_ui->IsInteractive()) {
+      else if (p_ui->IsInteractive()) {
         ostringstream ostr;
         ostr << SessionLog::TheLog() << endl;
         p_ui->TheGui()->Log(ostr.str());
@@ -531,11 +531,11 @@ namespace Isis {
     }
 
     // If debugging flag on write debugging log
-    if(p_ui->GetInfoFlag()) {
+    if (p_ui->GetInfoFlag()) {
       string filename = p_ui->GetInfoFileName();
       Pvl log;
       iString app = (iString)QCoreApplication::applicationDirPath() + "/" + p_appName;
-      if(p_BatchlistPass == 0) {
+      if (p_BatchlistPass == 0) {
         stringstream ss ;
         ss << SessionLog::TheLog();
         ss.clear();
@@ -547,11 +547,11 @@ namespace Isis {
       }
 
       // Write to file
-      if(filename.compare("") != 0) {
+      if (filename.compare("") != 0) {
 
-        if(p_BatchlistPass == 0) {
+        if (p_BatchlistPass == 0) {
           ofstream debugingLog(filename.c_str());
-          if(!debugingLog.good()) {
+          if (!debugingLog.good()) {
             string msg = "Error opening debugging log file [" + filename + "]";
             throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
           }
@@ -571,7 +571,7 @@ namespace Isis {
         }
       }
       else {   // Write to std out
-        if(p_BatchlistPass == 0) {
+        if (p_BatchlistPass == 0) {
           cout << log << endl;
           cout << "\n############### User Preferences ################\n" << endl;
           cout << Preference::Preferences();
@@ -603,11 +603,11 @@ namespace Isis {
     SessionLog::TheLog().AddError(errors);
     SessionLog::TheLog().Write();
 
-    if(HasParent()) {
+    if (HasParent()) {
       SendParentErrors(errors);
     }
-    else if(p_ui->IsInteractive()) {
-      if(e.IsPvlFormat()) {
+    else if (p_ui->IsInteractive()) {
+      if (e.IsPvlFormat()) {
         ostringstream ostr;
         ostr << errors << endl;
         p_ui->TheGui()->LoadMessage(ostr.str());
@@ -616,10 +616,10 @@ namespace Isis {
         p_ui->TheGui()->LoadMessage(e.Errors());
       }
     }
-    else if(SessionLog::TheLog().TerminalOutput()) {
+    else if (SessionLog::TheLog().TerminalOutput()) {
       cerr << SessionLog::TheLog() << endl;
     }
-    else if(e.IsPvlFormat()) {
+    else if (e.IsPvlFormat()) {
       cerr << errors << endl;
     }
     else {
@@ -627,11 +627,11 @@ namespace Isis {
     }
 
     // If debugging flag on write debugging log
-    if(p_ui->GetInfoFlag()) {
+    if (p_ui->GetInfoFlag()) {
       string filename = p_ui->GetInfoFileName();
       Pvl log;
       iString app = (iString)QCoreApplication::applicationDirPath() + "/" + p_appName;
-      if(p_BatchlistPass == 0) {
+      if (p_BatchlistPass == 0) {
         stringstream ss ;
         ss << SessionLog::TheLog();
         ss.clear();
@@ -643,10 +643,10 @@ namespace Isis {
       }
 
       // Write to file
-      if(filename.compare("") != 0) {
-        if(p_BatchlistPass == 0) {
+      if (filename.compare("") != 0) {
+        if (p_BatchlistPass == 0) {
           ofstream debugingLog(filename.c_str());
-          if(!debugingLog.good()) {
+          if (!debugingLog.good()) {
             string msg = "Error opening debugging log file [" + filename + "]";
             throw iException::Message(iException::System, msg, _FILEINFO_);
           }
@@ -666,7 +666,7 @@ namespace Isis {
         }
       }
       else {   // Write to std out
-        if(p_BatchlistPass == 0) {
+        if (p_BatchlistPass == 0) {
           cout << log << endl;
           cout << "\n############### User Preferences ################\n" << endl;
           cout << Preference::Preferences();
@@ -694,11 +694,11 @@ namespace Isis {
    */
   void Application::GuiReportError(Isis::iException &e) {
     Pvl errors = e.PvlErrors();
-    if(e.Type() == iException::Cancel) {
+    if (e.Type() == iException::Cancel) {
       e.Clear();
       p_ui->TheGui()->ProgressText("Stopped");
     }
-    if(e.IsPvlFormat()) {
+    if (e.IsPvlFormat()) {
       ostringstream ostr;
       ostr << errors << endl;
       p_ui->TheGui()->LoadMessage(ostr.str());
@@ -707,7 +707,7 @@ namespace Isis {
       p_ui->TheGui()->LoadMessage(e.Errors());
     }
 
-    if(p_ui->TheGui()->ShowWarning()) exit(0);
+    if (p_ui->TheGui()->ShowWarning()) exit(0);
     p_ui->TheGui()->ProgressText("Error");
     e.Clear();
   }
@@ -731,13 +731,13 @@ namespace Isis {
    * @param print
    */
   void Application::UpdateProgress(const string &text, bool print) {
-    if(HasParent() && print) {
+    if (HasParent() && print) {
       iApp->SendParentData(string("PROGRESSTEXT"), text);
     }
-    else if(p_ui->IsInteractive()) {
+    else if (p_ui->IsInteractive()) {
       p_ui->TheGui()->ProgressText(text);
     }
-    else if(print) {
+    else if (print) {
       string msg = p_ui->ProgramName() + ": " + text;
       cout << msg << endl;
     }
@@ -753,15 +753,15 @@ namespace Isis {
    * @param print
    */
   void Application::UpdateProgress(int percent, bool print) {
-    if(HasParent() && print) {
+    if (HasParent() && print) {
       string data = iString(percent);
       iApp->SendParentData(string("PROGRESS"), data);
     }
-    else if(p_ui->IsInteractive()) {
+    else if (p_ui->IsInteractive()) {
       p_ui->TheGui()->Progress(percent);
     }
-    else if(print) {
-      if(percent < 100) {
+    else if (print) {
+      if (percent < 100) {
         cout << percent << "% Processed\r" << flush;
       }
       else {
@@ -777,8 +777,8 @@ namespace Isis {
    * @throws Isis::iException::Cancel - The event was cancelled
    */
   void Application::ProcessGuiEvents() {
-    if(p_ui->IsInteractive()) {
-      if(p_ui->TheGui()->ProcessEvents()) {
+    if (p_ui->IsInteractive()) {
+      if (p_ui->TheGui()->ProcessEvents()) {
         throw iException::Message(iException::Cancel, "", _FILEINFO_);
       }
     }
@@ -794,7 +794,7 @@ namespace Isis {
    */
   iString Application::DateTime(time_t *curtime) {
     time_t startTime = time(NULL);
-    if(curtime != 0) *curtime = startTime;
+    if (curtime != 0) *curtime = startTime;
     struct tm *tmbuf = localtime(&startTime);
     char timestr[80];
     strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
@@ -807,10 +807,7 @@ namespace Isis {
    * @return string User Name
    */
   iString Application::UserName() {
-    string user = "Unknown";
-    char *userPtr = getenv("USER");
-    if(userPtr != NULL) user = userPtr;
-    return user;
+    return userName();
   }
 
   /**
@@ -819,20 +816,11 @@ namespace Isis {
    * @return string Host Name
    */
   iString Application::HostName() {
-    string host = "Unknown";
-    char *hostPtr = getenv("HOST");
-    if(hostPtr == NULL) hostPtr = getenv("HOSTNAME");
-    if(hostPtr != NULL) host = hostPtr;
-    return host;
+    return hostName();
   }
 
   iString Application::Version() {
-    TextFile versionFile("$ISISROOT/version");
-    iString line1, line2;
-    versionFile.GetLine(line1);
-    versionFile.GetLine(line2);
-    iString versionString = line1 + " | " + line2;
-    return versionString;
+    return isisVersion();
   }
 
 
@@ -976,7 +964,7 @@ namespace Isis {
 
     iString results = "";
     char tmp[512];
-    while(!readTemp.eof()) {
+    while (!readTemp.eof()) {
       readTemp.getline(tmp, 512);
       results += tmp;
       results += "\n";
@@ -1011,7 +999,7 @@ namespace Isis {
 
     iString results = "";
     char tmp[512];
-    while(!readTemp.eof()) {
+    while (!readTemp.eof()) {
       readTemp.getline(tmp, 512);
       results += tmp;
       results += "\n";

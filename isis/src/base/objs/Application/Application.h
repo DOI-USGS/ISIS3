@@ -128,7 +128,7 @@ namespace Isis {
       int PageFaults();
       int ProcessSwaps();
 
-      QLocalSocket * p_connectionToParent;
+      QLocalSocket *p_connectionToParent;
       time_t p_startTime;
       clock_t p_startClock;
       std::string p_datetime;
@@ -140,7 +140,7 @@ namespace Isis {
 
       UserInterface *p_ui;  //!<Pointer to a User Interface object
 
-      void SendParentData(std::string, const std::string&);
+      void SendParentData(std::string, const std::string &);
       void SendParentErrors(Isis::PvlObject &errors);
 
       static Isis::PvlGroup GetUnameInfo();

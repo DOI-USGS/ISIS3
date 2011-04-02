@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   std::map<std::string, void *> helpers;
   helpers["helper"] = (void *) myFunct;
   a.RegisterGuiHelpers(helpers);
-  if(a.GetGuiHelper("helper") == (void *) myFunct) {
+  if (a.GetGuiHelper("helper") == (void *) myFunct) {
     std::cout << "GuiHelpers ok" << std::endl;
   }
   else {
