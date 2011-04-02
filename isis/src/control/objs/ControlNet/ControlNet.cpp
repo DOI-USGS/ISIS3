@@ -180,6 +180,11 @@ namespace Isis {
    * @history 2010-08-06 Tracie Sucharski, Updated for changes made after
    *                           additional working sessions for Control network
    *                           design.
+   * @history 2011-04-02 Debbie A. Cook - Added code to set the target radii
+   *                           in the surface points of the control points as
+   *                           they are read into memory instead of setting
+   *                           parent prematurely to be able to set the radii
+   *                           in ControlPoint.
    *
    */
   void ControlNet::ReadControl(const iString &ptfile, Progress *progress) {
@@ -211,9 +216,14 @@ namespace Isis {
           try {
             if (cn.Object(i).IsNamed("ControlPoint")) {
               ControlPoint *newPoint = new ControlPoint;
+              SurfacePoint sp = newPoint->GetAdjustedSurfacePoint();
+              sp.SetRadii(p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]);
+              newPoint->SetAdjustedSurfacePoint(sp);
+              sp = newPoint->GetAprioriSurfacePoint();
+              sp.SetRadii(p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]);
+              newPoint->SetAprioriSurfacePoint(sp);
               // Temporarily set the parent so ControlPoint can get target radii
               // for unit conversions
-              newPoint->parentNetwork = this;
               newPoint->Load(cn.Object(i));
               p_numMeasures += newPoint->GetNumMeasures();
               if (newPoint->IsIgnored()) {
@@ -258,6 +268,7 @@ namespace Isis {
    *                           stream so we can set the byte limits.
    * @history 2010-10-06 Tracie Sucharski, Changed long to BigInt.
    * @history 2010-12-09 Tracie Sucharski, Added new measure type of Ground
+   * @history 2011-04-02 Debbie A. Cook, Updated ControlPoint constructor
    */
   void ControlNet::ReadPBControl(const iString &ptfile) {
     // Create an input file stream with the input file.
@@ -373,7 +384,8 @@ namespace Isis {
       }
       else {
         ControlPoint *point = new ControlPoint(pbnet.points(pnts),
-            logData.points(pnts));
+                                               logData.points(pnts),
+                                               p_targetRadii);
         point->parentNetwork = this;
         AddPoint(point);
       }
