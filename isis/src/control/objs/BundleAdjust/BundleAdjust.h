@@ -70,6 +70,8 @@
  *   @history 2011-03-05 Debbie A. Cook Put point index creation back in init.  This will prevent QRD and SVD from working if ground
  *                          points are in the control net.
  *   @history 2011-03-29 Ken Edmundson Fixed bug in observation mode when solving for spacecraft position and improved output
+ *   @history 2011-04-02 Debbie A. Cook Updated to ControlPoint class changes regarding target radii.  Also separated out 2 sets of
+ *                          calculations to test later for efficiency
 */
 
 #include <vector>

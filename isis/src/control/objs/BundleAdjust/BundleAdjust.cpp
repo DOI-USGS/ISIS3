@@ -1195,12 +1195,6 @@ namespace Isis {
       // When we deal with landers, m would be a more reasonable distance unit for dealing with both orbiters and
       // landers.
 
-      // TODO We may need to set the units for the radii.  I think the units are meters
-      aprioriSurfacePoint.SetRadii(Distance(m_BodyRadii[0]),
-                                   Distance(m_BodyRadii[1]),
-                                   Distance(m_BodyRadii[2]));
-      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
-
       bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
       bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
 
@@ -1301,9 +1295,17 @@ namespace Isis {
 //      printf("LatWt: %20.10lf LonWt: %20.10lf RadWt: %20.10lf\n",weights[0],weights[1],weights[2]);
 
       // TODO: do we need the four lines below??????
-      aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(apriorisigmas[0], Distance::Meters),
+      try {
+        aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(apriorisigmas[0], Distance::Meters),
           Distance(apriorisigmas[1], Distance::Meters),
           Distance(apriorisigmas[2], Distance::Meters));
+      }
+      catch (iException &e) {
+        std::string msg = "Required target radii not available for converting lat/lon sigmas from meters ";
+        msg += "for control point " + Isis::iString(point->GetId());
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
       point->SetAprioriSurfacePoint(aprioriSurfacePoint);
       nPointIndex++;
     }
@@ -1684,6 +1686,163 @@ namespace Isis {
                                      const ControlPoint &point) {
 
     // additional vectors
+    std::vector<double> d_lookB_WRT_LAT;
+    std::vector<double> d_lookB_WRT_LON;
+    std::vector<double> d_lookB_WRT_RAD;
+
+    Camera *pCamera = NULL;
+
+    double dMeasuredx, dComputedx, dMeasuredy, dComputedy;
+    double deltax, deltay;
+    double dObservationSigma;
+    double dObservationWeight;
+
+    pCamera = measure.Camera();
+
+    // clear partial derivative matrices and vectors
+    coeff_image.clear();
+    coeff_point3D.clear();
+    coeff_RHS.clear();
+
+    // no need to call SetImage for framing camera ( CameraType  = 0 )
+    if (pCamera->GetCameraType() != 0) {
+      // Set the Spice to the measured point
+      // but, can this be simplified???
+      pCamera->SetImage(measure.GetSample(), measure.GetLine());
+    }
+
+    //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
+    if (!(pCamera->GroundMap()->GetXY(point.GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
+      std::string msg = "Unable to map apriori surface point for measure ";
+      msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    // partials for ground point w/r lat, long, radius in Body-Fixed
+    d_lookB_WRT_LAT = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
+                      CameraGroundMap::WRT_Latitude);
+    d_lookB_WRT_LON = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
+                      CameraGroundMap::WRT_Longitude);
+    d_lookB_WRT_RAD = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
+                      CameraGroundMap::WRT_Radius);
+
+//    std::cout << "d_lookB_WRT_LAT" << d_lookB_WRT_LAT << std::endl;
+//    std::cout << "d_lookB_WRT_LON" << d_lookB_WRT_LON << std::endl;
+//    std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
+
+    int nIndex = 0;
+
+    if (m_spacecraftPositionSolveType != Nothing) {
+//      SpicePosition* pInstPos = pCamera->InstrumentPosition();
+
+      // Add the partial for the x coordinate of the position (differentiating
+      // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
+      for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+        pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, icoef,
+                                              &coeff_image(0, nIndex),
+                                              &coeff_image(1, nIndex));
+        nIndex++;
+      }
+
+      // Add the partial for the y coordinate of the position
+      for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+        pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, icoef,
+                                              &coeff_image(0, nIndex),
+                                              &coeff_image(1, nIndex));
+        nIndex++;
+      }
+
+      // Add the partial for the z coordinate of the position
+      for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+        pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, icoef,
+                                              &coeff_image(0, nIndex),
+                                              &coeff_image(1, nIndex));
+        nIndex++;
+      }
+
+    }
+
+    if (m_cmatrixSolveType != None) {
+
+      // Add the partials for ra
+      for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
+                                                 icoef, &coeff_image(0, nIndex),
+                                                 &coeff_image(1, nIndex));
+        nIndex++;
+      }
+
+
+      // Add the partials for dec
+      for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
+                                                 icoef, &coeff_image(0, nIndex),
+                                                 &coeff_image(1, nIndex));
+        nIndex++;
+      }
+
+      // Add the partial for twist if necessary
+      if (m_bSolveTwist) {
+        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
+                                                   icoef, &coeff_image(0, nIndex),
+                                                   &coeff_image(1, nIndex));
+          nIndex++;
+        }
+      }
+    }
+
+    // partials for 3D point
+    pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &coeff_point3D(0, 0),
+                                       &coeff_point3D(1, 0));
+    pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LON, &coeff_point3D(0, 1),
+                                       &coeff_point3D(1, 1));
+
+    pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &coeff_point3D(0, 2),
+                                       &coeff_point3D(1, 2));
+
+//    std::cout << coeff_point3D << std::endl;
+    // right-hand side (measured - computed)
+    dMeasuredx = measure.GetFocalPlaneMeasuredX();
+    dMeasuredy = measure.GetFocalPlaneMeasuredY();
+
+    deltax = dMeasuredx - dComputedx;
+    deltay = dMeasuredy - dComputedy;
+
+    coeff_RHS(0) = deltax;
+    coeff_RHS(1) = deltay;
+
+    dObservationSigma = 1.4 * pCamera->PixelPitch();
+    dObservationWeight = 1.0 / dObservationSigma;
+
+//    std::cout << "Measuredx " << dMeasuredx << " Measuredy = " << dMeasuredy << std::endl;
+//    std::cout << "dComputedx " << dComputedx << " dComputedy = " << dComputedy << std::endl;
+//    std::cout << coeff_image << std::endl;
+//    std::cout << coeff_point3D << std::endl;
+//    std::cout << dMeasuredx << " " << dComputedx << std::endl << dMeasuredy << " " << dComputedy << std::endl;
+//    std::cout << coeff_RHS << std::endl;
+
+    // multiply coefficients by observation weight
+    coeff_image *= dObservationWeight;
+    coeff_point3D *= dObservationWeight;
+    coeff_RHS *= dObservationWeight;
+
+    m_Statsx.AddData(deltax);
+    m_Statsy.AddData(deltay);
+
+    return true;
+  }
+
+
+  /**
+   * compute partials for measure
+   */
+  /*
+  bool BundleAdjust::ComputePartials(matrix<double>& coeff_image, matrix<double>& coeff_point3D,
+                                     vector<double>& coeff_RHS, const ControlMeasure &measure,
+                                     const ControlPoint &point) {
+
+    // additional vectors
 //    double pB[3];                        // Point on surface
 //    std::vector<double> sB(3);           // Spacecraft position in body-fixed coordinates
 //    std::vector<double> lookB(3);        // "look" vector in body-fixed coordinates
@@ -2018,6 +2177,7 @@ namespace Isis {
 
     return true;
   }
+  */
 
   /**
   * The solve method is an least squares solution for updating the camera
@@ -2356,6 +2516,185 @@ namespace Isis {
     double *py = &m_dyKnowns[0];
 
     // additional vectors
+    std::vector<double> d_lookB_WRT_LAT;
+    std::vector<double> d_lookB_WRT_LON;
+    std::vector<double> d_lookB_WRT_RAD;
+
+    std::vector<double> TC; // platform to camera  (constant rotation matrix)
+    std::vector<double> TB; // J2000 to platform (time-based rotation matrix)
+    std::vector<double> CJ; // J2000 to Camera (product of TB and TC)
+
+    Camera *pCamera = NULL;
+
+    int nIndex;
+    double dMeasuredx, dMeasuredy;
+    double deltax, deltay;
+    double dObservationSigma;
+    double dObservationWeight;
+
+    // partials for ground point w/r lat, long, radius in Body-Fixed km
+    d_lookB_WRT_LAT = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
+                        point->GetAdjustedSurfacePoint(),
+                        CameraGroundMap::WRT_Latitude);
+    d_lookB_WRT_LON = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
+                        point->GetAdjustedSurfacePoint(),
+                        CameraGroundMap::WRT_Longitude);
+
+    // Test to match old test run that didn't solve for radius
+    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
+    d_lookB_WRT_RAD = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
+                        point->GetAdjustedSurfacePoint(),
+                        CameraGroundMap::WRT_Radius);
+
+//    std::cout << "d_lookB_WRT_LAT" << d_lookB_WRT_LAT << std::endl;
+//    std::cout << "d_lookB_WRT_LON" << d_lookB_WRT_LON << std::endl;
+//    std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
+
+    int nObservations = point->GetNumMeasures();
+    for (int i = 0; i < nObservations; i++) {
+      const ControlMeasure *measure = point->GetMeasure(i);
+      if (measure->IsIgnored())
+        continue;
+
+
+      // zero partial derivative vectors
+      memset(px, 0, m_nBasisColumns * sizeof(double));
+      memset(py, 0, m_nBasisColumns * sizeof(double));
+
+      pCamera = measure->Camera();
+
+      // no need to call SetImage for framing camera ( CameraType  = 0 )
+      if (pCamera->GetCameraType() != 0) {
+        // Set the Spice to the measured point
+        // but, can this be simplified???
+        if (!pCamera->SetImage(measure->GetSample(), measure->GetLine()))
+          printf("\n***Call to Camera::SetImage failed - need to handle this***\n");
+      }
+
+      //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
+      double dComputedx, dComputedy;
+      if (!(pCamera->GroundMap()->GetXY(point->GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
+        std::string msg = "Unable to map apriori surface point for measure ";
+        msg += measure->GetCubeSerialNumber() + " on point " + point->GetId() + " into focal plane";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+
+      // Determine the image index
+      nIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+      nIndex = ImageIndex(nIndex);
+
+      if (m_spacecraftPositionSolveType != Nothing) {
+
+        // Add the partial for the x coordinate of the position (differentiating
+        // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
+
+        for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+          pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, icoef,
+                                                &px[nIndex], &py[nIndex]);
+          nIndex++;
+        }
+
+        // Add the partial for the y coordinate of the position
+        for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+          pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, icoef, &px[nIndex], &py[nIndex]);
+          nIndex++;
+        }
+
+        // Add the partial for the z coordinate of the position
+        for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+          pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, icoef, &px[nIndex], &py[nIndex]);
+          nIndex++;
+        }
+      }
+
+      if (m_cmatrixSolveType != None) {
+
+        // Add the partials for ra
+        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension, icoef, &px[nIndex], &py[nIndex]);
+          nIndex++;
+        }
+
+        // Add the partials for dec
+        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination, icoef, &px[nIndex], &py[nIndex]);
+          nIndex++;
+        }
+
+        // Add the partial for twist if necessary
+        if (m_bSolveTwist) {
+          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+            pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist, icoef, &px[nIndex], &py[nIndex]);
+            nIndex++;
+          }
+        }
+      }
+
+      // partials for 3D point
+      if (point->GetType() != ControlPoint::Ground  ||
+          m_strSolutionMethod == "SPECIALK"  ||
+          m_strSolutionMethod == "SPARSE") {
+        nIndex = PointIndex(nPointIndex);
+        pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &px[nIndex],
+                                         &py[nIndex]);
+        nIndex++;
+        pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LON, &px[nIndex],
+                                         &py[nIndex]);
+        nIndex++;
+
+        // test added to check old test case that didn't solve for radii
+        if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
+          pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &px[nIndex],
+                                         &py[nIndex]);
+
+      }
+      // right-hand side (measured - computed)
+      dMeasuredx = measure->GetFocalPlaneMeasuredX();
+      dMeasuredy = measure->GetFocalPlaneMeasuredY();
+
+      deltax = dMeasuredx - dComputedx;
+      deltay = dMeasuredy - dComputedy;
+
+      dObservationSigma = 1.4 * pCamera->PixelPitch();
+      dObservationWeight = 1.0 / (dObservationSigma * dObservationSigma);
+
+//       std::cout << "yKnowns = ";
+//       for (int i=0; i<m_dyKnowns.size(); i++)
+//         std::cout << "          " << m_dyKnowns[i] << std::endl;
+//       std::cout << std::endl;
+//       std::cout << "deltax and deltay = " << deltax << " " << deltay << " " << dObservationWeight << std::endl;
+
+
+
+      m_pLsq->AddKnown(m_dxKnowns, deltax, dObservationWeight);
+      m_pLsq->AddKnown(m_dyKnowns, deltay, dObservationWeight);
+
+      m_Statsx.AddData(deltax);
+      m_Statsy.AddData(deltay);
+    }
+  }
+
+
+
+
+  /**
+   * Populate the least squares matrix with measures for a point
+   * specific to frame cameras (for now)
+   */
+  /*
+  void BundleAdjust::AddPartials(int nPointIndex) {
+    const ControlPoint *point = m_pCnet->GetPoint(nPointIndex);
+
+    if (point->IsIgnored())
+      return;
+
+    // pointers to partial derivative vectors
+    // ***** can this be a 2xm gmm sparse matrix?
+    // ***** or 2 1xm gmm sparse vectors?
+    double *px = &m_dxKnowns[0];
+    double *py = &m_dyKnowns[0];
+
+    // additional vectors
 //     double pB[3];                        // Point on surface
     std::vector<double> sB(3);           // Spacecraft position in body-fixed coordinates
     std::vector<double> lookB(3);        // "look" vector in body-fixed coordinates
@@ -2553,36 +2892,36 @@ namespace Isis {
       }
 
       if (m_cmatrixSolveType != None) {
-        /*
-        TC = pInstRot->ConstantMatrix();
-        TB = pInstRot->TimeBasedMatrix();
+        
+//         TC = pInstRot->ConstantMatrix();
+//         TB = pInstRot->TimeBasedMatrix();
 
-        dTime = pInstRot->EphemerisTime() - pInstRot->GetBaseTime();
-        dTime = dTime / pInstRot->GetTimeScale();
+//         dTime = pInstRot->EphemerisTime() - pInstRot->GetBaseTime();
+//         dTime = dTime / pInstRot->GetTimeScale();
 
         // additional collinearity auxiliaries
-        NX = TB[0] * lookJ[0] + TB[1] * lookJ[1] + TB[2] * lookJ[2];
-        NY = TB[3] * lookJ[0] + TB[4] * lookJ[1] + TB[5] * lookJ[2];
-        */
+//         NX = TB[0] * lookJ[0] + TB[1] * lookJ[1] + TB[2] * lookJ[2];
+//         NY = TB[3] * lookJ[0] + TB[4] * lookJ[1] + TB[5] * lookJ[2];
+
 
         // Add the partials for ra
         for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension, icoef, &px[nIndex], &py[nIndex]);
-          /*
-          if (icoef == 0) {
-            z1 = -TB[1] * lookJ[0] + TB[0] * lookJ[1];
-            z2 = -TB[4] * lookJ[0] + TB[3] * lookJ[1];
-            z3 = -TB[7] * lookJ[0] + TB[6] * lookJ[1];
-            z4 =  TC[6] * z1 + TC[7] * z2 + TC[8] * z3;
+          
+//           if (icoef == 0) {
+//             z1 = -TB[1] * lookJ[0] + TB[0] * lookJ[1];
+//             z2 = -TB[4] * lookJ[0] + TB[3] * lookJ[1];
+//             z3 = -TB[7] * lookJ[0] + TB[6] * lookJ[1];
+//             z4 =  TC[6] * z1 + TC[7] * z2 + TC[8] * z3;
 
-            px[nIndex] = a1 * (TC[0] * z1 + TC[1] * z2 + TC[2] * z3 - z4 * a2);
-            py[nIndex] = a1 * (TC[3] * z1 + TC[4] * z2 + TC[5] * z3 - z4 * a3);
-          }
-          else {
-            px[nIndex] = px[nIndex-1] * dTime;
-            py[nIndex] = py[nIndex-1] * dTime;
-          }
-          */
+//             px[nIndex] = a1 * (TC[0] * z1 + TC[1] * z2 + TC[2] * z3 - z4 * a2);
+//             py[nIndex] = a1 * (TC[3] * z1 + TC[4] * z2 + TC[5] * z3 - z4 * a3);
+//           }
+//           else {
+//             px[nIndex] = px[nIndex-1] * dTime;
+//             py[nIndex] = py[nIndex-1] * dTime;
+//           }
+          
           nIndex++;
         }
 
@@ -2613,21 +2952,21 @@ namespace Isis {
 
         // Add the partial for twist if necessary
         if (m_bSolveTwist) {
-          /*
-          z1 = TC[6] * NY - TC[7] * NX;
-          */
+          
+//           z1 = TC[6] * NY - TC[7] * NX;
+          
           for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
             pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist, icoef, &px[nIndex], &py[nIndex]);
-            /*
-            if (icoef == 0) {
-              px[nIndex] = a1 * (((TC[0] * NY - TC[1] * NX) - z1 * a2));
-              py[nIndex] = a1 * (((TC[3] * NY - TC[4] * NX) - z1 * a3));
-            }
-            else {
-              px[nIndex] = px[nIndex-1] * dTime;
-              py[nIndex] = py[nIndex-1] * dTime;
-            }
-          */
+            
+//             if (icoef == 0) {
+//               px[nIndex] = a1 * (((TC[0] * NY - TC[1] * NX) - z1 * a2));
+//               py[nIndex] = a1 * (((TC[3] * NY - TC[4] * NX) - z1 * a3));
+//             }
+//             else {
+//               px[nIndex] = px[nIndex-1] * dTime;
+//               py[nIndex] = py[nIndex-1] * dTime;
+//             }
+          
             nIndex++;
           }
  //   nIndex = (Images() - m_nHeldImages) * m_nNumImagePartials;
@@ -2704,6 +3043,9 @@ namespace Isis {
       m_Statsy.AddData(deltay);
     }
   }
+*/
+
+
 
   /**
    * Triangulates all points (including control points).
@@ -3623,7 +3965,6 @@ namespace Isis {
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO
       SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
-      SurfacePoint.SetRadii(m_BodyRadii[0], m_BodyRadii[1], m_BodyRadii[2]);  // TODO: original call to get ControlPoint returns a const, here we are changing it's SurfacePoint member, can't do it (GOTTA BE A BETTER WAY)
 
       dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
       dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
@@ -3990,7 +4331,6 @@ namespace Isis {
       bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
 
        SurfacePoint aprioriSurfacePoint = point->GetAprioriSurfacePoint();
-       aprioriSurfacePoint.SetRadii(m_BodyRadii[0], m_BodyRadii[1], m_BodyRadii[2]);
 //       // How do I solve the compile error regarding the const?
 //       //      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
 
@@ -4083,10 +4423,6 @@ namespace Isis {
       nIndex++;
 
       SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
-
-      SurfacePoint.SetRadii(Distance(m_BodyRadii[0]),
-                                   Distance(m_BodyRadii[1]),
-                                   Distance(m_BodyRadii[2]));
 
       SurfacePoint.SetSphericalSigmasDistance(
           Distance(dSigmaLat, Distance::Meters),
