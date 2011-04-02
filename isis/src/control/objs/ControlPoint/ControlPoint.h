@@ -243,6 +243,8 @@ namespace Isis {
    *   @history 2011-03-17 Eric Hyer - Added default parameter to GetMeasures
    *            method for excluding ignored measures.
    *   @history 2011-03-25 Christopher Austin - Added functionality to SetId()
+   *   @history 2011-04-01 Debbie A. Cook and Ken Edmundson - Added argument to
+   *            constructor for target radii
    */
   class ControlPoint {
       friend class ControlNet;
@@ -340,7 +342,8 @@ namespace Isis {
       ControlPoint(const iString &id);
       ControlPoint(const PBControlNet_PBControlPoint &);
       ControlPoint(const PBControlNet_PBControlPoint &,
-          const PBControlNetLogData_Point &);
+                   const PBControlNetLogData_Point &,
+                   const std::vector<Distance> targetRadii);
       ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }

@@ -147,7 +147,8 @@ namespace Isis {
    *   construct the control point.
    */
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt,
-      const PBControlNetLogData_Point &logProtoBuf) {
+                             const PBControlNetLogData_Point &logProtoBuf,
+                             const std::vector<Distance> targetRadii) {
     measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;
@@ -155,6 +156,8 @@ namespace Isis {
 
     measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
+    aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],targetRadii[2]);
+    adjustedSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],targetRadii[2]);
     Init(protoBufPt);
 
     for (int m = 0 ; m < protoBufPt.measures_size() ; m++) {
