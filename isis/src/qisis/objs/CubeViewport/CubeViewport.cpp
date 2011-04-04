@@ -1348,19 +1348,64 @@ namespace Qisis {
     }
 
     // get the band info
+    Pvl* cubeLbl = p_cube->Label();
+    bool bHasFilterName=false;
+    PvlKeyword filterNameKW;
+    PvlObject isisObj = cubeLbl->FindObject("IsisCube");
+    if (isisObj.HasGroup("BandBin")) {
+      PvlGroup bandBinGrp = isisObj.FindGroup("BandBin");
+      if(bandBinGrp.HasKeyword("FilterName")) {
+        filterNameKW =bandBinGrp.FindKeyword("FilterName") ;
+        bHasFilterName = true;
+      }
+    }
+    int iFilterSize = filterNameKW.Size();
+    
     iString sBandInfo ;
     // color
     if(p_color ) {
-      sBandInfo = "Bands(RGB)&nbsp;Virtual  = (" + iString(p_redBuffer->getBand()) + " ";
-      sBandInfo += iString(p_greenBuffer->getBand()) + " ";
-      sBandInfo += iString(p_blueBuffer->getBand()) + ") ";
-      sBandInfo += "Physical = (" + iString(p_cube->PhysicalBand(p_redBuffer->getBand())) + " ";
-      sBandInfo += iString(p_cube->PhysicalBand(p_greenBuffer->getBand())) + " ";
-      sBandInfo += iString(p_cube->PhysicalBand(p_blueBuffer->getBand())) + ")";
+      int iRedBand = p_redBuffer->getBand();
+      int iGreenBand = p_greenBuffer->getBand();
+      int iBlueBand = p_blueBuffer->getBand();
+      sBandInfo = "Bands(RGB)&nbsp;Virtual  = " + iString(iRedBand) + ", ";
+      sBandInfo += iString(iGreenBand) + ", ";
+      sBandInfo += iString(iBlueBand) + " ";
+      sBandInfo += "Physical = " + iString(p_cube->PhysicalBand(iRedBand)) + ", ";
+      sBandInfo += iString(p_cube->PhysicalBand(iGreenBand)) + ", ";
+      sBandInfo += iString(p_cube->PhysicalBand(iBlueBand));
+      if(bHasFilterName) {
+        sBandInfo += "<br>FilterName = ";
+        if(iRedBand <= iFilterSize) {
+          sBandInfo += filterNameKW[iRedBand-1];
+        }
+        else {
+          sBandInfo += "None";
+        }
+        sBandInfo += ", ";
+        
+        if(iGreenBand <= iFilterSize) {
+          sBandInfo += filterNameKW[iGreenBand-1];
+        }
+        else {
+          sBandInfo += "None";
+        }
+        sBandInfo += ", ";
+        
+        if(iBlueBand <= iFilterSize) {
+          sBandInfo += filterNameKW[iBlueBand-1];
+        }
+        else {
+          sBandInfo += "None";
+        }
+      }
     }
     else { // gray
-      sBandInfo = "Band(Gray)&nbsp;Virtual = " + iString(p_grayBuffer->getBand()) + " ";
-      sBandInfo += "Physical = " + iString(p_cube->PhysicalBand(p_grayBuffer->getBand()));
+      int iGrayBand = p_grayBuffer->getBand();
+      sBandInfo = "Band(Gray)&nbsp;Virtual = " + iString(iGrayBand) + " ";
+      sBandInfo += "Physical = " + iString(p_cube->PhysicalBand(iGrayBand));
+      if(bHasFilterName && iGrayBand <= iFilterSize) {
+        sBandInfo += "<br>FilterName = " + filterNameKW[iGrayBand-1];
+      }
     }
     
     QString area =
