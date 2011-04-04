@@ -790,7 +790,11 @@ namespace Qisis {
    * @todo  This method should be temporary until the control point editor 
    *           comes online.  If this stick around, needs to be re-disigned-
    *           put in a separate class??
-   */
+   *  
+   * @history 2011-04-04 Tracie Sucharski - Grey out userEntered if more than 
+   *                        a single point is selected.  Grey out lat,lon,radius
+   *                        edits if UserEntered is not selected.
+   */ 
   void QnetNavTool::setApriori() {
     // If not cubes are loaded, simply return
     if (g_serialNumberList == NULL)
@@ -804,6 +808,8 @@ namespace Qisis {
       return;
     }
 
+    QList<QListWidgetItem *> selected = p_listBox->selectedItems();
+
     double latSigma = Isis::Null;
     double lat = Isis::Null;
     double lonSigma = Isis::Null;
@@ -812,6 +818,8 @@ namespace Qisis {
     double radius = Isis::Null;
     //  Get the apriori values from user
     QnetSetAprioriDialog *setAprioriDialog = new QnetSetAprioriDialog;
+    if (selected.size() > 1) setAprioriDialog->userEnteredRadioButton->setEnabled(false);
+
     if (setAprioriDialog->exec()) {
       if (setAprioriDialog->latitudeConstraintsGroupBox->isChecked()) {
         
@@ -833,65 +841,61 @@ namespace Qisis {
         radiusSigma = setAprioriDialog->radiusSigmaEdit->text().toDouble();
       }
 
+      for (int i = 0; i < selected.size(); i++) {
+        QString id = selected.at(i)->text();
+        Isis::ControlPoint *pt = g_controlNetwork->GetPoint(id);
+       
+        if (setAprioriDialog->referenceMeasureRadioButton->isChecked()) {
+          Isis::ControlMeasure *m = pt->GetRefMeasure();
+          // Find camera from network camera list
+          int camIndex = g_serialNumberList->SerialNumberIndex(m->GetCubeSerialNumber());
+          Isis::Camera *cam = g_controlNetwork->Camera(camIndex);
+          cam->SetImage(m->GetSample(),m->GetLine());
+          pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
+          pt->SetAprioriSurfacePointSource(Isis::ControlPoint::SurfacePointSource::Reference);
+        }
+        else if (setAprioriDialog->averageMeasuresRadioButton->isChecked()) {
+          pt->ComputeApriori();
+          // Do not need to set AprioriSurfacePointSource or AprioriRadiusSource,
+          // ComputeApriori does this for us.
+        }
+        else if (setAprioriDialog->userEnteredRadioButton->isChecked()) {
+          pt->SetAprioriSurfacePoint(Isis::SurfacePoint(
+                                     Isis::Latitude(lat, Isis::Angle::Degrees),
+                                     Isis::Longitude(lon, Isis::Angle::Degrees),
+                                     Isis::Distance(radius,Isis::Distance::Meters)));
+          pt->SetAprioriSurfacePointSource(Isis::ControlPoint::SurfacePointSource::User);
+          pt->SetAprioriRadiusSource(Isis::ControlPoint::RadiusSource::User);
+        }
+  
+        try {
+          //  Read Surface point from the control point and set the sigmas,
+          //  first set the target radii
+          Isis::SurfacePoint spt = pt->GetAprioriSurfacePoint();
+          vector<Isis::Distance> targetRadii = g_controlNetwork->GetTargetRadii();
+          spt.SetRadii(Isis::Distance(targetRadii[0]), 
+                       Isis::Distance(targetRadii[1]),
+                       Isis::Distance(targetRadii[2]));
+          spt.SetSphericalSigmasDistance(Isis::Distance(latSigma,Isis::Distance::Meters),
+                                   Isis::Distance(lonSigma,Isis::Distance::Meters),
+                                   Isis::Distance(radiusSigma,Isis::Distance::Meters));
+          //  Write the surface point back out to the controlPoint and set to Ground
+          pt->SetAprioriSurfacePoint(spt);
+          pt->SetType(Isis::ControlPoint::Ground);
+        }
+        catch (Isis::iException &e )  {
+          QString message = "Error setting sigmas. \n";
+          message += e.Errors().c_str();
+          QMessageBox::critical((QWidget *)parent(),"Error",message);
+          e.Clear();
+          QApplication::restoreOverrideCursor();
+          return;
+        }
+      }
+  
+      QApplication::restoreOverrideCursor();
+      emit netChanged();
     }
-    QList<QListWidgetItem *> selected = p_listBox->selectedItems();
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    for (int i = 0; i < selected.size(); i++) {
-      QString id = selected.at(i)->text();
-      Isis::ControlPoint *pt = g_controlNetwork->GetPoint(id);
-     
-      if (setAprioriDialog->referenceMeasureRadioButton->isChecked()) {
-        Isis::ControlMeasure *m = pt->GetRefMeasure();
-        // Find camera from network camera list
-        int camIndex = g_serialNumberList->SerialNumberIndex(m->GetCubeSerialNumber());
-        Isis::Camera *cam = g_controlNetwork->Camera(camIndex);
-        cam->SetImage(m->GetSample(),m->GetLine());
-        pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
-        pt->SetAprioriSurfacePointSource(Isis::ControlPoint::SurfacePointSource::Reference);
-      }
-      else if (setAprioriDialog->averageMeasuresRadioButton->isChecked()) {
-        pt->ComputeApriori();
-        // Do not need to set AprioriSurfacePointSource or AprioriRadiusSource,
-        // ComputeApriori does this for us.
-      }
-      else if (setAprioriDialog->userEnteredRadioButton->isChecked()) {
-        pt->SetAprioriSurfacePoint(Isis::SurfacePoint(
-                                   Isis::Latitude(lat, Isis::Angle::Degrees),
-                                   Isis::Longitude(lon, Isis::Angle::Degrees),
-                                   Isis::Distance(radius,Isis::Distance::Meters)));
-        pt->SetAprioriSurfacePointSource(Isis::ControlPoint::SurfacePointSource::User);
-        pt->SetAprioriRadiusSource(Isis::ControlPoint::RadiusSource::User);
-      }
-
-      try {
-        //  Read Surface point from the control point and set the sigmas,
-        //  first set the target radii
-        Isis::SurfacePoint spt = pt->GetAprioriSurfacePoint();
-        vector<Isis::Distance> targetRadii = g_controlNetwork->GetTargetRadii();
-        spt.SetRadii(Isis::Distance(targetRadii[0]), 
-                     Isis::Distance(targetRadii[1]),
-                     Isis::Distance(targetRadii[2]));
-        spt.SetSphericalSigmasDistance(Isis::Distance(latSigma,Isis::Distance::Meters),
-                                 Isis::Distance(lonSigma,Isis::Distance::Meters),
-                                 Isis::Distance(radiusSigma,Isis::Distance::Meters));
-        //  Write the surface point back out to the controlPoint and set to Ground
-        pt->SetAprioriSurfacePoint(spt);
-        pt->SetType(Isis::ControlPoint::Ground);
-      }
-      catch (Isis::iException &e )  {
-        QString message = "Error setting sigmas. \n";
-        message += e.Errors().c_str();
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
-        e.Clear();
-        QApplication::restoreOverrideCursor();
-        return;
-      }
-    }
-
-    QApplication::restoreOverrideCursor();
-    emit netChanged();
-    return;
   }
 
 

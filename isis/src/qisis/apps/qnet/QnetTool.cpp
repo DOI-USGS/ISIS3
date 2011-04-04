@@ -1381,6 +1381,9 @@ namespace Qisis {
    * @history 2010-07-12 Jeannie Walldren - Fixed bug by setting control point
    *                          to NULL if removed from the control net and check
    *                          for NULL points before emitting editPointChanged
+   * @history 2011-04-04 Tracie Sucharski - Move code that was after the exec 
+   *                          block within, so that if the Cancel button is
+   *                          selected, nothing else happens.
    *  
    */
   void QnetTool::deletePoint(ControlPoint *point) {
@@ -1445,20 +1448,19 @@ namespace Qisis {
         loadTemplateFile(QString::fromStdString(
             p_pointEditor->templateFilename()));
       }
-    }
-
-    // emit a signal to alert user to save when exiting 
-    emit netChanged();
-
-    // emit signal so the nav tool can update edit point
-    if (p_editPoint != NULL) {
-      emit editPointChanged(p_editPoint->GetId());
-    }
-    else {
-      // if the entire point is deleted, update with point Id = ""
-      // this signal is connected to QnetTool::paintAllViewports
-      // and QnetNavTool::updateEditPoint
-      emit editPointChanged("");
+      // emit a signal to alert user to save when exiting 
+      emit netChanged();
+  
+      // emit signal so the nav tool can update edit point
+      if (p_editPoint != NULL) {
+        emit editPointChanged(p_editPoint->GetId());
+      }
+      else {
+        // if the entire point is deleted, update with point Id = ""
+        // this signal is connected to QnetTool::paintAllViewports
+        // and QnetNavTool::updateEditPoint
+        emit editPointChanged("");
+      }
     }
   }
 

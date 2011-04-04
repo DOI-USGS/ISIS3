@@ -13,22 +13,6 @@
   <property name="windowTitle">
    <string>Set Apriori Point and Constraints</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>510</y>
-     <width>160</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="pointSourceGroupBox">
    <property name="geometry">
     <rect>
@@ -72,13 +56,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="groundSourceRadioButton">
-       <property name="text">
-        <string>Ground Source</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QRadioButton" name="userEnteredRadioButton">
        <property name="text">
         <string>User Entered</string>
@@ -115,6 +92,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="aprioriLatLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Apriori Latitude:</string>
        </property>
@@ -124,10 +104,17 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="aprioriLatEdit"/>
+      <widget class="QLineEdit" name="aprioriLatEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="aprioriLatUnitLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Degrees</string>
        </property>
@@ -195,19 +182,29 @@
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QLabel" name="aprioriLonLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Apriori Longitude:</string>
        </property>
        <property name="buddy">
-        <cstring>aprioriLatEdit</cstring>
+        <cstring>aprioriLonEdit</cstring>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="aprioriLonEdit"/>
+      <widget class="QLineEdit" name="aprioriLonEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="aprioriLonUnitLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Degrees</string>
        </property>
@@ -231,7 +228,7 @@
         <string>Longitude Sigma:</string>
        </property>
        <property name="buddy">
-        <cstring>latSigmaEdit</cstring>
+        <cstring>lonSigmaEdit</cstring>
        </property>
       </widget>
      </item>
@@ -275,19 +272,29 @@
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QLabel" name="aprioriRadiusLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Apriori Radius</string>
        </property>
        <property name="buddy">
-        <cstring>aprioriLatEdit</cstring>
+        <cstring>aprioriRadiusEdit</cstring>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="aprioriRadiusEdit"/>
+      <widget class="QLineEdit" name="aprioriRadiusEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="aprioriRadiusUnitLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Meters</string>
        </property>
@@ -311,7 +318,7 @@
         <string>Radius Sigma:</string>
        </property>
        <property name="buddy">
-        <cstring>latSigmaEdit</cstring>
+        <cstring>radiusSigmaEdit</cstring>
        </property>
       </widget>
      </item>
@@ -328,38 +335,221 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>21</x>
+     <y>550</y>
+     <width>351</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="okButton">
+      <property name="text">
+       <string>Ok</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancelButton">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriLatLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>72</x>
+     <y>181</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriLatEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>181</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriLatUnitLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>181</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriLonLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>77</x>
+     <y>283</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriLonEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>192</x>
+     <y>283</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriLonUnitLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>281</x>
+     <y>283</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriRadiusLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>65</x>
+     <y>381</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriRadiusEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>173</x>
+     <y>381</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>userEnteredRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aprioriRadiusUnitLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>262</x>
+     <y>381</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>okButton</sender>
+   <signal>clicked()</signal>
    <receiver>QnetSetAprioriDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>248</x>
-     <y>254</y>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
+     <x>193</x>
+     <y>292</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
    <receiver>QnetSetAprioriDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>333</x>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
+     <x>193</x>
+     <y>292</y>
     </hint>
    </hints>
   </connection>
