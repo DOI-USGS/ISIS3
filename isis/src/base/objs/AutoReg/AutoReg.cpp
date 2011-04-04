@@ -702,11 +702,25 @@ namespace Isis {
       return PatternZScoreNotMet;
     }
 
-    // ------------------------------------------------------------------
-    // Prep for walking the search chip by computing the starting sample
-    // and line for the search.  Also compute the sample and line
-    // increment for sparse walking
-    // ------------------------------------------------------------------
+    /**
+     * Prep for walking the search chip by computing the starting and ending
+     * sample and line positions of the search chip to extract a sub-search
+     * chip to compare with the pattern chip.
+     *
+     * Because the sub-search chip needs to have the same pixel dimensions as
+     * the pattern chip, and will be composed from its center pixel outwards,
+     * buffer the start and end boundaries so an area the size of the pattern
+     * chip can always be extracted around the current position.
+     *
+     * For example, consider trying to extract a 5x5 sub-search chip from some
+     * search chip.  If one starts at sample 1 and line 1, then because the
+     * "current position" is treated as the center of the sub-search chip, the
+     * algorithm could not form a 5x5 chip because there is nothing up and to
+     * the left of the current position.  Consequently, for this example,
+     * there needs to be a two-pixel buffer from the edge of the search chip
+     * as the algorithm walks through it to make sure a 5x5 sub-search chip
+     * can always be extracted with the current position as its center.
+     */
     int startSamp = (gradientPatternChip.Samples() - 1) / 2 + 1;
     int startLine = (gradientPatternChip.Lines() - 1) / 2 + 1;
     int endSamp = gradientSearchChip.Samples() - startSamp + 1;
@@ -732,41 +746,37 @@ namespace Isis {
     // estimate of the best line/sample.
     // ---------------------------------------------------------------------
     if(p_reduceFactor != 1) {
-      {
-        //Do not remove this brace.  It keeps startSamp, startLine, endSamp, and endLine in the
-        //proper scope.
+      p_reducedPatternChip.SetSize((int)gradientPatternChip.Samples() / p_reduceFactor,
+          (int)gradientPatternChip.Lines() / p_reduceFactor);
 
-        p_reducedPatternChip.SetSize((int)gradientPatternChip.Samples() / p_reduceFactor,
-                                     (int)gradientPatternChip.Lines() / p_reduceFactor);
-
-        // ----------------------------------
-        // Fill the reduced Chip with nulls.
-        // ----------------------------------
-        for(int line = 1; line <= p_reducedPatternChip.Lines(); line++) {
-          for(int samp = 1; samp <= p_reducedPatternChip.Samples(); samp++) {
-            p_reducedPatternChip.SetValue(samp, line, Isis::Null);
-          }
+      // ----------------------------------
+      // Fill the reduced Chip with nulls.
+      // ----------------------------------
+      for(int line = 1; line <= p_reducedPatternChip.Lines(); line++) {
+        for(int samp = 1; samp <= p_reducedPatternChip.Samples(); samp++) {
+          p_reducedPatternChip.SetValue(samp, line, Isis::Null);
         }
+      }
 
-        p_reducedPatternChip = Reduce(gradientPatternChip, p_reduceFactor);
-        if(!ComputeChipZScore(p_reducedPatternChip)) {
-          p_patternZScoreNotMetCount++;
-          p_registrationStatus = PatternZScoreNotMet;
-          return PatternZScoreNotMet;
-        }
+      p_reducedPatternChip = Reduce(gradientPatternChip, p_reduceFactor);
+      if(!ComputeChipZScore(p_reducedPatternChip)) {
+        p_patternZScoreNotMetCount++;
+        p_registrationStatus = PatternZScoreNotMet;
+        return PatternZScoreNotMet;
+      }
 
-        p_reducedSearchChip = Reduce(gradientSearchChip, p_reduceFactor);
-        int startSamp = (p_reducedPatternChip.Samples() - 1) / 2 + 1;
-        int startLine = (p_reducedPatternChip.Lines() - 1) / 2 + 1;
-        int endSamp = p_reducedSearchChip.Samples() - startSamp + 1;
-        int endLine = p_reducedSearchChip.Lines() - startLine + 1;
+      p_reducedSearchChip = Reduce(gradientSearchChip, p_reduceFactor);
+      int reducedStartSamp = (p_reducedPatternChip.Samples() - 1) / 2 + 1;
+      int reducedEndSamp = p_reducedSearchChip.Samples() - startSamp + 1;
+      int reducedStartLine = (p_reducedPatternChip.Lines() - 1) / 2 + 1;
+      int reducedEndLine = p_reducedSearchChip.Lines() - startLine + 1;
 
-        Match(p_reducedSearchChip, p_reducedPatternChip, p_reducedFitChip, startSamp, endSamp, startLine, endLine);
-        if(p_bestFit == Isis::Null) {
-          p_fitChipNoDataCount++;
-          p_registrationStatus = FitChipNoData;
-          return FitChipNoData;
-        }
+      Match(p_reducedSearchChip, p_reducedPatternChip, p_reducedFitChip,
+          reducedStartSamp, reducedEndSamp, reducedStartLine, reducedEndLine);
+      if(p_bestFit == Isis::Null) {
+        p_fitChipNoDataCount++;
+        p_registrationStatus = FitChipNoData;
+        return FitChipNoData;
       }
 
       // ------------------------------------------------------
@@ -778,7 +788,7 @@ namespace Isis {
 
       // ---------------------------------------------------------------
       // Now we grow our window size according to the reduction factor.
-      // And we grow around were the first call Match() told us was the
+      // And we grow around where the first call Match() told us was the
       // best line/sample.
       // ---------------------------------------------------------------
       int newstartSamp = bs - p_reduceFactor - p_windowSize - 1;
@@ -796,7 +806,7 @@ namespace Isis {
       startLine = newstartLine;
       endLine = newendLine;
       // We have found a good pixel in the reduction chip, but we
-      // don't want to use it's position, so reset in prep. for
+      // don't want to use its position, so reset in prep. for
       // non-adaptive registration.  Save it off for the adaptive algorithm.
       bestSearchSamp = bs;
       bestSearchLine = bl;
