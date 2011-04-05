@@ -110,45 +110,12 @@ namespace Isis {
 
   /**
    * This is used when reading from a protocol buffer. Given a file
-   *   representation (protocol buffer), construct the control point.
-   *   This constructor should be able to go away soon.
-   */
-  ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt) {
-    measures = NULL;
-    cubeSerials = NULL;
-    referenceMeasure = NULL;
-
-    measures = new QHash< QString, ControlMeasure * >;
-    cubeSerials = new QStringList;
-    Init(protoBufPt);
-
-    for (int m = 0 ; m < protoBufPt.measures_size() ; m++) {
-      // Create a PControlMeasure and fill in it's info.
-      // with the values from the input file.
-      ControlMeasure *measure = new ControlMeasure(protoBufPt.measures(m));
-      AddMeasure(measure);
-    }
-
-    if (protoBufPt.has_referenceindex()) {
-      referenceExplicitlySet = true;
-
-      referenceMeasure =
-        (*measures)[cubeSerials->at(protoBufPt.referenceindex())];
-    }
-    else {
-      referenceExplicitlySet = false;
-    }
-  }
-
-
-  /**
-   * This is used when reading from a protocol buffer. Given a file
    *   representation (protocol buffer), and log data,
    *   construct the control point.
    */
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt,
                              const PBControlNetLogData_Point &logProtoBuf,
-                             const std::vector<Distance> targetRadii) {
+                             const std::vector<Distance> &targetRadii) {
     measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;
@@ -279,7 +246,7 @@ namespace Isis {
     id = (std::string) p["PointId"];
     std::vector<Distance> targetRadii;
 
-    if (parentNetwork) 
+    if (parentNetwork)
       targetRadii = parentNetwork->GetTargetRadii();
 
     if ((std::string)p["PointType"] == "Ground") {
@@ -393,7 +360,7 @@ namespace Isis {
         Displacement(p["AprioriX"], Displacement::Meters),
         Displacement(p["AprioriY"], Displacement::Meters),
         Displacement(p["AprioriZ"], Displacement::Meters));
-      if (targetRadii.size() == 3) 
+      if (targetRadii.size() == 3)
         aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
                                      targetRadii[2]);
     }
@@ -407,7 +374,7 @@ namespace Isis {
         Latitude(p["AprioriLatitude"], Angle::Degrees),
         Longitude(p["AprioriLongitude"], Angle::Degrees),
         Distance(p["AprioriRadius"], Distance::Meters));
-      if (targetRadii.size() == 3) 
+      if (targetRadii.size() == 3)
         aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
                                      targetRadii[2]);
     }
@@ -417,7 +384,7 @@ namespace Isis {
         Displacement(p["X"], Displacement::Meters),
         Displacement(p["Y"], Displacement::Meters),
         Displacement(p["Z"], Displacement::Meters));
-      if (targetRadii.size() == 3) 
+      if (targetRadii.size() == 3)
         adjustedSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
                                       targetRadii[2]);
     }
@@ -428,7 +395,7 @@ namespace Isis {
         Displacement(p["AdjustedX"], Displacement::Meters),
         Displacement(p["AdjustedY"], Displacement::Meters),
         Displacement(p["AdjustedZ"], Displacement::Meters));
-      if (targetRadii.size() == 3) 
+      if (targetRadii.size() == 3)
         adjustedSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],
                                       targetRadii[2]);
     }
@@ -477,7 +444,7 @@ namespace Isis {
       // If (0,0) or (1,1) are valid, then x or y are constrained, making
       // latitude, longitude, and radius constrained
       if (Distance(aprioriCovariance(0,0), Distance::Meters).Valid() ||
-          Distance(aprioriCovariance(1,1), Distance::Meters).Valid()) 
+          Distance(aprioriCovariance(1,1), Distance::Meters).Valid())
         constraintStatus.set();
 
       // Check to see if pvl keywords override covariance matrix
@@ -967,10 +934,10 @@ namespace Isis {
   ControlPoint::Status ControlPoint::SetIgnored(bool newIgnoreStatus) {
     if (editLock)
       return PointLocked;
-    
+
     bool oldStatus = ignore;
     ignore = newIgnoreStatus;
-    
+
     // only update if there was a change in status
     if (oldStatus != ignore) {
       PointModified();
@@ -986,7 +953,7 @@ namespace Isis {
         parentNetwork->emitNetworkStructureModified();
       }
     }
-    
+
     return Success;
   }
 
@@ -1076,9 +1043,9 @@ namespace Isis {
    * @see SetAprioriPointSourceFile
    * @see aprioriSurfacePoint
    *
-   * @param aprioriSP The apriori surface point to remember 
-   * @todo This method needs to be revisited.  It will set the constraint 
-   *       status based on the sigmas and override the existing status. 
+   * @param aprioriSP The apriori surface point to remember
+   * @todo This method needs to be revisited.  It will set the constraint
+   *       status based on the sigmas and override the existing status.
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePoint(
     SurfacePoint aprioriSP) {
@@ -1159,7 +1126,7 @@ namespace Isis {
    *                               to use 0. instead of nulls.
    *   @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
    *                               was really checking for Candidate measures.
-   *                               
+   *
    *
    * @return Status Success or PointLocked
    */
@@ -1435,7 +1402,7 @@ namespace Isis {
 
       // Map the lat/lon/radius of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.
-      if( cam->GetCameraType() != Isis::Camera::Radar ) { 
+      if( cam->GetCameraType() != Isis::Camera::Radar ) {
         if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
           cam->SetImage(m->GetSample(), m->GetLine());
         cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
@@ -1443,9 +1410,9 @@ namespace Isis {
       // y is doppler shift for radar.  If we map through the current Spice
       // line will be calculated from time and if we hold the time and the
       // Spice we will get the same x/y as measured.
-      else {  
+      else {
         cam->GroundMap()->SetGround(GetAdjustedSurfacePoint());
-        cudx = cam->GroundMap()->FocalPlaneX();  // Get undistorted 
+        cudx = cam->GroundMap()->FocalPlaneX();  // Get undistorted
         cudy = cam->GroundMap()->FocalPlaneY();
       }
       double mudx = m->GetFocalPlaneMeasuredX();
@@ -1595,8 +1562,8 @@ namespace Isis {
 
     return str;
   }
-  
-  
+
+
   /**
    *  Obtain a RadiusSource::Source from a string
    *
@@ -1606,10 +1573,10 @@ namespace Isis {
    */
    ControlPoint::RadiusSource::Source ControlPoint::StringToRadiusSource(
        QString str) {
-    
+
     str = str.toLower();
     RadiusSource::Source source = RadiusSource::None;
-    
+
     if (str == "user")
       source = RadiusSource::User;
     else
@@ -1624,11 +1591,11 @@ namespace Isis {
           else
             if (str == "bundlesolution")
               source = RadiusSource::BundleSolution;
-    
+
     return source;
   }
 
-  
+
 
   /**
    * Obtain a string representation of the RadiusSource
@@ -1649,7 +1616,7 @@ namespace Isis {
    */
   iString ControlPoint::SurfacePointSourceToString(
       SurfacePointSource::Source source) {
-    
+
     iString str;
 
     switch (source) {
@@ -1687,10 +1654,10 @@ namespace Isis {
    ControlPoint::SurfacePointSource::Source
        ControlPoint::StringToSurfacePointSource(
        QString str) {
-    
+
     str = str.toLower();
     SurfacePointSource::Source source = SurfacePointSource::None;
-    
+
     if (str == "user")
       source = SurfacePointSource::User;
     else
@@ -1705,7 +1672,7 @@ namespace Isis {
           else
             if (str == "bundlesolution")
               source = SurfacePointSource::BundleSolution;
-    
+
     return source;
   }
 
@@ -2039,8 +2006,8 @@ namespace Isis {
       }
 
       if (constraintStatus.any()) {
-        if (constraintStatus.test(LatitudeConstrained)) 
-//        if (IsLatitudeConstrained()) 
+        if (constraintStatus.test(LatitudeConstrained))
+//        if (IsLatitudeConstrained())
           p += PvlKeyword("LatitudeConstrained", "True");
         if (constraintStatus.test(LongitudeConstrained))
 //        if (IsLongitudeConstrained())
@@ -2351,7 +2318,7 @@ namespace Isis {
 
         if (Displacement(covar(0,0), Displacement::Meters).Valid() ||
             Displacement(covar(1,1), Displacement::Meters).Valid()) {
-          if (protoBufPt.latitudeconstrained()) 
+          if (protoBufPt.latitudeconstrained())
             constraintStatus.set(LatitudeConstrained);
           if (protoBufPt.longitudeconstrained())
             constraintStatus.set(LongitudeConstrained);
@@ -2359,7 +2326,7 @@ namespace Isis {
             constraintStatus.set(RadiusConstrained);
         }
         else if (Displacement(covar(2,2), Displacement::Meters).Valid()) {
-          if (protoBufPt.latitudeconstrained()) 
+          if (protoBufPt.latitudeconstrained())
             constraintStatus.set(LatitudeConstrained);
           if (protoBufPt.radiusconstrained())
             constraintStatus.set(RadiusConstrained);

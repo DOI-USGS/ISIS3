@@ -67,18 +67,6 @@ namespace Isis {
    * @param other The control measure to copy all of the values from
    */
   ControlMeasure::ControlMeasure(
-    const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf) {
-    Init(protoBuf);
-  }
-
-
-  /**
-   * Converts the protocol buffer version of the measure into a real
-   *   ControlMeasure
-   *
-   * @param other The control measure to copy all of the values from
-   */
-  ControlMeasure::ControlMeasure(
     const PBControlNet_PBControlPoint_PBControlMeasure &protoBuf,
     const PBControlNetLogData_Point_Measure &logData) {
     Init(protoBuf);
@@ -571,10 +559,10 @@ namespace Isis {
   ControlMeasure::Status ControlMeasure::SetIgnored(bool newIgnoreStatus) {
     if (p_editLock)
       return MeasureLocked;
-    
+
     bool oldStatus = p_ignore;
     p_ignore = newIgnoreStatus;
-    
+
     // only update if there was a change in status
     if (oldStatus != p_ignore) {
       MeasureModified();
@@ -585,7 +573,7 @@ namespace Isis {
         cnet->emitNetworkStructureModified();
       }
     }
-    
+
     return Success;
   }
 
@@ -1056,15 +1044,15 @@ namespace Isis {
 
     return p;
   }
-  
-  
+
+
   /**
    * @param str The string to get a MeasureType from
    *
    * @returns A Measure Type given a string
    */
   ControlMeasure::MeasureType ControlMeasure::StringToMeasureType(QString str) {
-    
+
     iString err = "String [";
     err += iString(str) + "] can not be converted to a MeasureType";
 
@@ -1083,10 +1071,10 @@ namespace Isis {
             measureType = ControlMeasure::RegisteredSubPixel;
           else
             throw iException::Message(iException::Programmer, err, _FILEINFO_);
-          
+
     return measureType;
   }
-        
+
 
   /**
    * Return the String Control Measure type

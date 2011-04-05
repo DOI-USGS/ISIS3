@@ -1,5 +1,7 @@
 #include "IsisDebug.h"
 
+#include <iostream>
+
 #include "ControlNet.h"
 
 #include <cmath>
@@ -60,7 +62,7 @@ namespace Isis {
     p_modified = Application::DateTime();
   }
 
-  
+
   ControlNet::ControlNet(const ControlNet &other) {
     Nullify();
 
@@ -77,14 +79,14 @@ namespace Isis {
       QString newPointId = newPoint->GetId();
       points->insert(newPointId, newPoint);
       pointIds->append(newPointId);
-      
+
       // create graph for non-ignored points and measures
       if (!newPoint->IsIgnored()) {
         QList< ControlMeasure * > measures = newPoint->GetMeasures();
         for (int i = 0; i < measures.size(); i++) {
           ControlMeasure * measure = measures[i];
           QString serial = measure->GetCubeSerialNumber();
-          
+
           if (!measure->IsIgnored()) {
             if (cubeGraphNodes->contains(serial)) {
               (*cubeGraphNodes)[serial]->addMeasure(measure);
@@ -92,7 +94,7 @@ namespace Isis {
             else {
               ControlCubeGraphNode *newControlCubeGraphNode =
                   new ControlCubeGraphNode(serial);
-    
+
               newControlCubeGraphNode->addMeasure(measure);
               cubeGraphNodes->insert(serial, newControlCubeGraphNode);
             }
@@ -188,10 +190,15 @@ namespace Isis {
    *
    */
   void ControlNet::ReadControl(const iString &ptfile, Progress *progress) {
+    if (progress != NULL) {
+      progress->SetText("Loading Control Points...");
+    }
+
     Pvl p(ptfile);
+
     //Test to see if this is a binary control net file.
     if (p.HasObject("ProtoBuffer")) {
-      ReadPBControl(ptfile);
+      ReadPBControl(ptfile, progress);
     }
     else {
       try {
@@ -208,7 +215,6 @@ namespace Isis {
 
         // Prep for reporting progress
         if (progress != NULL) {
-          progress->SetText("Loading Control Points...");
           progress->SetMaximumSteps(cn.Objects());
           progress->CheckStatus();
         }
@@ -270,7 +276,7 @@ namespace Isis {
    * @history 2010-12-09 Tracie Sucharski, Added new measure type of Ground
    * @history 2011-04-02 Debbie A. Cook, Updated ControlPoint constructor
    */
-  void ControlNet::ReadPBControl(const iString &ptfile) {
+  void ControlNet::ReadPBControl(const iString &ptfile, Progress *progress) {
     // Create an input file stream with the input file.
     Pvl protoFile(ptfile);
 
@@ -312,19 +318,19 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    input.seekg(coreStartPos, ios::beg);
     IstreamInputStream inStream(&input);
     CodedInputStream codedInStream(&inStream);
-    codedInStream.Skip(coreStartPos);
     codedInStream.PushLimit(coreLength);
     // max 512MB, warn at 400MB
-    codedInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
+    codedInStream.SetTotalBytesLimit(coreLength, coreLength);
 
     PBControlNet pbnet;
 
 
     // Now stream the rest of the input into the google protocol buffer.
     try {
-      if (!pbnet.ParsePartialFromCodedStream(&codedInStream)) {
+      if (!pbnet.ParseFromCodedStream(&codedInStream)) {
         string msg = "Failed to read input PB file " + ptfile;
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
@@ -333,37 +339,31 @@ namespace Isis {
       string msg = "Cannot parse binary PB file";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
+
     PBControlNetLogData logData;
-    bool readLogData = protoBufferInfo.HasObject("LogData");
-    if (readLogData) {
-      PvlObject &logDataInfo = protoBufferInfo.FindObject("LogData");
-      BigInt logStartPos = logDataInfo["StartByte"];
-      BigInt logLength = logDataInfo["Bytes"];
 
-      input.clear();
-      input.seekg(0, ios::beg);
-      IstreamInputStream logInStream(&input);
-      CodedInputStream codedLogInStream(&logInStream);
-      codedLogInStream.Skip(logStartPos);
-      codedLogInStream.PushLimit(logLength);
-      // max 512MB, warn at 400MB
-      codedLogInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
+    PvlObject &logDataInfo = protoBufferInfo.FindObject("LogData");
+    BigInt logStartPos = logDataInfo["StartByte"];
+    BigInt logLength = logDataInfo["Bytes"];
 
-      // Now stream the rest of the input into the google protocol buffer.
-      try {
-        if (!logData.ParsePartialFromCodedStream(&codedLogInStream)) {
-          string msg = "Failed to read log data in PB file " + ptfile;
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-        }
-      }
-      catch (...) {
-        string msg = "Cannot parse binary PB file's log data";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
-      }
+    input.clear();
+    input.seekg(logStartPos, ios::beg);
+    IstreamInputStream logInStream(&input);
+    CodedInputStream codedLogInStream(&logInStream);
+    codedLogInStream.PushLimit(logLength);
+    // max 512MB, warn at 400MB
+    codedLogInStream.SetTotalBytesLimit(logLength, logLength);
 
-      if (logData.points_size() != pbnet.points_size() || logData.points_size() == 0) {
-        readLogData = false;
+    // Now stream the rest of the input into the google protocol buffer.
+    try {
+      if (!logData.ParseFromCodedStream(&codedLogInStream)) {
+        string msg = "Failed to read log data in PB file [" + ptfile + "]";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
+    }
+    catch (...) {
+      string msg = "Cannot parse binary PB file's log data";
+      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
     // Set the private variable to the read in values from the input file.
@@ -374,20 +374,22 @@ namespace Isis {
     p_description = pbnet.description();
     p_userName = pbnet.username();
 
+    if (progress != NULL) {
+      progress->SetMaximumSteps(pbnet.points_size());
+      progress->CheckStatus();
+    }
+
     // Create a PvlObject for each point and create an Isis::ControlPoint
     // and call the Load(PvlObject &p, bool forceBuild = false) command with the pvlobject.
     for (int pnts = 0 ; pnts < pbnet.points_size(); pnts++) {
-      if (!readLogData) {
-        ControlPoint *point = new ControlPoint(pbnet.points(pnts));
-        point->parentNetwork = this;
-        AddPoint(point);
-      }
-      else {
-        ControlPoint *point = new ControlPoint(pbnet.points(pnts),
-                                               logData.points(pnts),
-                                               p_targetRadii);
-        point->parentNetwork = this;
-        AddPoint(point);
+      ControlPoint *point = new ControlPoint(pbnet.points(pnts),
+                                             logData.points(pnts),
+                                             p_targetRadii);
+      point->parentNetwork = this;
+      AddPoint(point);
+
+      if (progress != NULL) {
+        progress->CheckStatus();
       }
     }
 
@@ -429,7 +431,6 @@ namespace Isis {
    * @history 2011-03-18 Debbie A. Cook and Steven Lambright - Added delete of blankLabel
    */
   void ControlNet::WritePB(const iString &ptfile) {
-
     //  Clear message before writing new
     PBControlNet pbnet;
     PBControlNetLogData logData;
@@ -468,6 +469,9 @@ namespace Isis {
       string msg = "Failed to write output PB file [" + ptfile + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
+
+    output.clear();
+    output.seekg(0, ios::end);
 
     streampos coreSize = output.tellp() - startCorePos;
 
@@ -628,7 +632,7 @@ namespace Isis {
       msg += point->GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-    
+
     ASSERT(!point->IsIgnored());
 
     // make sure there is a node for every measure in this measure's parent
@@ -710,8 +714,8 @@ namespace Isis {
       cubeGraphNodes->remove(serial);
     }
   }
-  
-  
+
+
   void ControlNet::emitNetworkStructureModified()
   {
     emit networkStructureModified();
@@ -857,7 +861,7 @@ namespace Isis {
     bool wasIgnored = point->IsIgnored();
 
     // notify CubeSerialNumbers of the loss of this point
-    
+
     if (!wasIgnored) {
       foreach(ControlMeasure * measure, point->GetMeasures()) {
         if (!measure->IsIgnored())
@@ -888,7 +892,7 @@ namespace Isis {
           p_invalid = true;
       }
     }
-    
+
     if (!wasIgnored)
       emit networkStructureModified();
   }
@@ -988,13 +992,13 @@ namespace Isis {
       serials << i.value()->getSerialNumber();
     }
     qSort(serials);
-   
+
     QString str;
     for (int i = 0; i < serials.size(); i++) {
       str += "  " + serials[i] + "\n"
           + (*cubeGraphNodes)[serials[i]]->connectionsToString() + "\n";
     }
-    
+
     return str;
   }
 
@@ -1593,7 +1597,7 @@ namespace Isis {
         for (int i = 0; i < measures.size(); i++) {
           ControlMeasure * measure = measures[i];
           QString serial = measure->GetCubeSerialNumber();
-          
+
           if (!measure->IsIgnored()) {
             if (cubeGraphNodes->contains(serial)) {
               (*cubeGraphNodes)[serial]->addMeasure(measure);
@@ -1601,7 +1605,7 @@ namespace Isis {
             else {
               ControlCubeGraphNode *newControlCubeGraphNode =
                   new ControlCubeGraphNode(serial);
-    
+
               newControlCubeGraphNode->addMeasure(measure);
               cubeGraphNodes->insert(serial, newControlCubeGraphNode);
             }

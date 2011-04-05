@@ -41,6 +41,8 @@ namespace Isis {
    * @internal
    *   @history 2010-12-22 Steven Lambright - Original version
    *   @history 2011-03-08 Eric Hyer - MaximumNumericLogDataType now makes sense
+   *   @history 2011-04-04 Steven Lambright - Added error checking to the
+   *                         conversion to protocol buffer
    */
   class ControlMeasureLogData {
     public:

@@ -58,12 +58,12 @@ namespace Isis {
         if(name == thisTypeName) {
           p_dataType = (NumericLogDataType)i;
           p_numericalValue = keywordRep[0];
-
           // There is no reason to keep searching
           break;
         }
       }
       catch(iException &e) {
+std::cerr << "Failed to read log data:" << e.what() << std::endl;
         e.Clear();
       }
     }
@@ -190,6 +190,11 @@ namespace Isis {
    */
   PBControlNetLogData_Point_Measure_DataEntry
       ControlMeasureLogData::ToProtocolBuffer() const {
+    if(!IsValid()) {
+      iString msg = "Cannot write an invalid log data entry to binary format";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
     PBControlNetLogData_Point_Measure_DataEntry protoBufDataEntry;
 
     protoBufDataEntry.set_datatype(p_dataType);

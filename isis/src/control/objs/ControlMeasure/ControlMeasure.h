@@ -148,6 +148,7 @@ namespace Isis {
    *                               subtract 1 from size() in the loop.
    *   @history 2011-03-14 Eric Hyer - ControlMeasures now notify their network
    *                when their ignored status changes.
+   *   @history 2011-04-04 Steven Lambright - Removed an old constructor
    */
   class ControlMeasure {
       friend class ControlPoint;
@@ -215,7 +216,6 @@ namespace Isis {
       };
 
       ControlMeasure();
-      ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &);
       ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &,
           const PBControlNetLogData_Point_Measure &);
       ControlMeasure(const ControlMeasure &other);

@@ -143,7 +143,11 @@ namespace Isis {
    *   @history 2011-03-25 Christopher Austin - Added UpdatePointReference() to
    *                work with ControlPoint's SetId()
    *   @history 2011-03-29 Steven Lambright - Made versioning viable for first
-   *                release. 
+   *                release.
+   *   @history 2011-04-04 Steven Lambright - Reading is more likely to work...
+   *                not sure why my changes fixed it for very large networks.
+   *                Binary reads now do the same progress as Pvl for console
+   *                output consistency (and because it can take time).
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -159,7 +163,7 @@ namespace Isis {
       ~ControlNet();
 
       void ReadControl(const iString &ptfile, Progress *progress = 0);
-      void ReadPBControl(const iString &ptfile);
+      void ReadPBControl(const iString &ptfile, Progress *progress = 0);
       void Write(const iString &ptfile, bool pvl = false);
       void WritePB(const iString &ptfile);
       void WritePvl(const iString &ptfile);
