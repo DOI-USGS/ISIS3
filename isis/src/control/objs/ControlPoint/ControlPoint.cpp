@@ -112,6 +112,9 @@ namespace Isis {
    * This is used when reading from a protocol buffer. Given a file
    *   representation (protocol buffer), and log data,
    *   construct the control point.
+   *
+   * @history 2008-06-18  Debbie A. Cook, Swapped Init with SetRadii
+   *          calls to avoid resetting the surface points with no radii
    */
   ControlPoint::ControlPoint(const PBControlNet_PBControlPoint &protoBufPt,
                              const PBControlNetLogData_Point &logProtoBuf,
@@ -123,9 +126,9 @@ namespace Isis {
 
     measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
+    Init(protoBufPt);
     aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],targetRadii[2]);
     adjustedSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],targetRadii[2]);
-    Init(protoBufPt);
 
     for (int m = 0 ; m < protoBufPt.measures_size() ; m++) {
       // Create a PControlMeasure and fill in it's info.
