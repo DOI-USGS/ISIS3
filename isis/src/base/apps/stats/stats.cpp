@@ -13,7 +13,6 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Process p;
-  int iBandIndex=-1;
 
   // Get the histogram
   Cube *icube = p.SetInputCube("FROM");
@@ -29,24 +28,12 @@ void IsisMain() {
     validMax = ui.GetDouble("VALIDMAX");
   }
 
-  int iNumBands = icube->Bands();
-  
   Histogram *stats = icube->Histogram(1, validMin, validMax);
 
   // Construct a label with the results
   PvlGroup results("Results");  
   results += PvlKeyword("From", icube->Filename());
-  if(iNumBands==1) {
-    results += PvlKeyword("Band", icube->PhysicalBand(1));
-  }
-  else {
-    PvlKeyword pvlBand("Bands");
-    iString sBands;
-    for(int i=0; i<iNumBands; i++) {
-      pvlBand += icube->PhysicalBand(i+1);
-    }
-    results += pvlBand;
-  }
+  results += PvlKeyword("Band", icube->PhysicalBand(1));
   if(stats->ValidPixels() != 0) {
     results += PvlKeyword("Average", stats->Average());
     results += PvlKeyword("StandardDeviation", stats->StandardDeviation());
@@ -103,9 +90,6 @@ void IsisMain() {
     if(writeHeader) {
       for(int i = 0; i < results.Keywords(); i++) {
         os << results[i].Name();
-        if(iBandIndex < 0 && results[i].Name() == "Bands") {
-          iBandIndex = i;
-        }
         if(i < results.Keywords() - 1) {
           os << ",";
         }
@@ -113,20 +97,7 @@ void IsisMain() {
       os << endl;
     }
     for(int i = 0; i < results.Keywords(); i++) {
-      if(i != iBandIndex) {
-        os << (string)results[i];
-      }
-      else {
-        os << "\"";
-        int iSize = results[i].Size();
-        for (int j=0; j<iSize; j++){
-          os << (string)results[i][j]; 
-          if(j < (iSize-1)) {
-            os << ",";
-          }
-        }
-        os << "\"";
-      }
+      os << (string)results[i];
       if(i < results.Keywords() - 1) {
         os << ",";
       }

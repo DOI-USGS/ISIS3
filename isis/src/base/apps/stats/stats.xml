@@ -91,7 +91,8 @@
       Added the Format option for the output file.
     </change>
     <change name="Sharmila Prasad" date="2011-03-31">
-      Added Bands Keyword
+      Added Band Keyword - displays the first physical band used to get the 
+      stats
     </change>
   </history>
 
