@@ -23,6 +23,9 @@
     <change name="Tracie Sucharski" date="2010-10-13">
       Change parameter name to FROM and TO.
     </change>
+    <change name="Steven Lambright" date="2011-04-05">
+      Added a basic progress
+    </change>
   </history>
 
   <groups>

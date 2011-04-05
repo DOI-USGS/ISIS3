@@ -1,23 +1,21 @@
 #include "Isis.h"
 
-#include <sstream>
-
-#include "Pvl.h"
 #include "ControlNet.h"
 #include "iString.h"
+#include "Progress.h"
 
 using namespace Isis;
-using namespace std;
 
-void IsisMain(){
-
+void IsisMain() {
   // Get user entered file name & mode 
   UserInterface &ui = Application::GetUserInterface();
+  Progress p;
 
-  ControlNet *cnet = new ControlNet;
-  cnet->ReadControl(ui.GetFilename("FROM"));
-  cnet->WritePvl(ui.GetFilename("TO"));
-
-  delete cnet;
-
+  ControlNet cnet;
+  cnet.ReadControl(ui.GetFilename("FROM"), &p);
+  p.SetText("Writing Control Network...");
+  p.SetMaximumSteps(1);
+  p.CheckStatus();
+  cnet.WritePvl(ui.GetFilename("TO"));
+  p.CheckStatus();
 }
