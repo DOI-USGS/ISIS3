@@ -20,6 +20,8 @@ using namespace Isis;
 // Global variables
 PhotometricFunction *pho;
 
+bool useDem;
+
 void phoCal ( Buffer &in, Buffer &out );
 void phoCalWithBackplane ( std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out );
 
@@ -93,6 +95,9 @@ void IsisMain () {
     pho->SetMinimumIncidenceAngle(ui.GetDouble("MININCIDENCE"));
     pho->SetMaximumIncidenceAngle(ui.GetDouble("MAXINCIDENCE"));
 
+    // determine how photometric angles should be calculated
+    useDem = ui.GetBoolean("USEDEM");
+
     // Start the processing
     if (useBackplane)
         p.StartProcess(phoCalWithBackplane);
@@ -126,7 +131,7 @@ void phoCal ( Buffer &in, Buffer &out ) {
         }
         else {
             // Get correction and test for validity
-            double ph = pho->Compute(in.Line(i), in.Sample(i), in.Band(i));
+            double ph = pho->Compute(in.Line(i), in.Sample(i), in.Band(i), useDem);
             out[i] = (IsSpecial(ph) ? Null : in[i] * ph);
         }
     }

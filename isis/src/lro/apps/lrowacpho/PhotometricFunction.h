@@ -89,7 +89,7 @@ namespace Isis {
                 return pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse).FindKeyword("Name")[0];
             }
 
-            virtual double Compute ( const double &line, const double &sample, int band = 1 );
+            virtual double Compute ( const double &line, const double &sample, int band = 1, bool useDem = false);
             virtual double photometry ( double i, double e, double g, int band = 1 ) const = 0;
             virtual void Report ( PvlContainer &pvl ) = 0;
 

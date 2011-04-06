@@ -103,7 +103,8 @@ namespace Isis {
 
         // Simple Hillier photometric polynomial equation with exponential opposition
         //  surge term.
-        double rcal = (mu0 / (mu + mu0)) * (parms.b0 * exp(-parms.b1 * alpha) + parms.a0 + (parms.a1 * alpha) + (parms.a2 * alpha2) + (parms.a3 * alpha * alpha2) + (parms.a4 * alpha2 * alpha2));
+        double rcal = (mu0 / (mu + mu0)) * (parms.b0 * exp(-parms.b1 * alpha) + parms.a0 + (parms.a1 * alpha) + (parms.a2
+                * alpha2) + (parms.a3 * alpha * alpha2) + (parms.a4 * alpha2 * alpha2));
 
         return (rcal);
     }
@@ -119,187 +120,192 @@ namespace Isis {
      * @param pvl Output PVL container write keywords
      */
     void Hillier::Report ( PvlContainer &pvl ) {
-        pvl.AddComment("I/F = mu0/(mu0+mu) * F(phase)\n where:\n  mu0 = cos(incidence)\n  mu = cos(incidence)\n  F(phase) = B0*exp(-B1*phase) + A0 + A1*phase + A2*phase^2 + A3*phase^3 + A4*phase^4");
-        pvl += PvlKeyword("Algorithm", "Hillier");
-        pvl += PvlKeyword("IncRef", _iRef, "degrees");
-        pvl += PvlKeyword("EmaRef", _eRef, "degrees");
-        pvl += PvlKeyword("PhaRef", _gRef, "degrees");
-        PvlKeyword units("HillierUnits");
-        PvlKeyword phostd("PhotometricStandard");
-        PvlKeyword bbc("BandBinCenter");
-        PvlKeyword bbct("BandBinCenterTolerance");
-        PvlKeyword bbn("BandNumber");
-        PvlKeyword b0("B0");
-        PvlKeyword b1("B1");
-        PvlKeyword a0("A0");
-        PvlKeyword a1("A1");
-        PvlKeyword a2("A2");
-        PvlKeyword a3("A3");
-        PvlKeyword a4("A4");
-        for (unsigned int i = 0; i < _bandpho.size(); i++) {
-            Parameters &p = _bandpho[i];
-            units.AddValue(p.units);
-            phostd.AddValue(p.phoStd);
-            bbc.AddValue(p.wavelength);
-            bbct.AddValue(p.tolerance);
-            bbn.AddValue(p.band);
-            b0.AddValue(p.b0);
-            b1.AddValue(p.b1);
-            a0.AddValue(p.a0);
-            a1.AddValue(p.a1);
-            a2.AddValue(p.a2);
-            a3.AddValue(p.a3);
-            a4.AddValue(p.a4);
-        }
-        pvl += units;
-        pvl += phostd;
-        pvl += bbc;
-        pvl += bbct;
-        pvl += bbn;
-        pvl += b0;
-        pvl += b1;
-        pvl += a0;
-        pvl += a1;
-        pvl += a2;
-        pvl += a3;
-        pvl += a4;
-        return;
-    }
+        pvl.AddComment("I/F = mu0/(mu0+mu) * F(phase)");
+                pvl.AddComment(" where:");
+                pvl.AddComment("  mu0 = cos(incidence)");
+                pvl.AddComment("  mu = cos(incidence)");
+                pvl.AddComment("  F(phase) = B0*exp(-B1*phase) + A0 + A1*phase + A2*phase^2 + A3*phase^3 + A4*phase^4");
 
-    /**
-     * @brief Determine Hillier parameters given a wavelength
-     *
-     * This method determines the set of Hillier parameters to use
-     * for a given wavelength.  It iterates through all band
-     * profiles as read from the PVL file and computes the
-     * difference between the "wavelength" parameter and the
-     * BandBinCenter keyword.  The absolute value of this value is
-     * checked against the BandBinCenterTolerance paramter and if it
-     * is less than or equal to it, a Parameter container is
-     * returned.
-     *
-     * @author Kris Becker - 2/22/2010
-     *
-     * @param wavelength Wavelength used to find parameter set
-     *
-     * @return Hillier::Parameters Container of valid values.  If
-     *         not found, a value of iProfile = -1 is returned.
-     */
-    Hillier::Parameters Hillier::findParameters ( const double wavelength ) const {
-        for (unsigned int i = 0; i < _profiles.size(); i++) {
-            const DbProfile &p = _profiles[i];
-            if (p.exists("BandBinCenter")) {
-                double p_center = ConfKey(p, "BandBinCenter", Null);
-                double tolerance = ConfKey(p, "BandBinCenterTolerance", 1.0E-6);
-                if (fabs(wavelength - p_center) <= fabs(tolerance)) {
-                    Parameters pars = extract(p);
-                    pars.iProfile = i;
-                    pars.wavelength = wavelength;
-                    pars.tolerance = tolerance;
-                    return (pars);
+                pvl += PvlKeyword("Algorithm", "Hillier");
+                pvl += PvlKeyword("IncRef", _iRef, "degrees");
+                pvl += PvlKeyword("EmaRef", _eRef, "degrees");
+                pvl += PvlKeyword("PhaRef", _gRef, "degrees");
+                PvlKeyword units("HillierUnits");
+                PvlKeyword phostd("PhotometricStandard");
+                PvlKeyword bbc("BandBinCenter");
+                PvlKeyword bbct("BandBinCenterTolerance");
+                PvlKeyword bbn("BandNumber");
+                PvlKeyword b0("B0");
+                PvlKeyword b1("B1");
+                PvlKeyword a0("A0");
+                PvlKeyword a1("A1");
+                PvlKeyword a2("A2");
+                PvlKeyword a3("A3");
+                PvlKeyword a4("A4");
+                for (unsigned int i = 0; i < _bandpho.size(); i++) {
+                    Parameters &p = _bandpho[i];
+                    units.AddValue(p.units);
+                    phostd.AddValue(p.phoStd);
+                    bbc.AddValue(p.wavelength);
+                    bbct.AddValue(p.tolerance);
+                    bbn.AddValue(p.band);
+                    b0.AddValue(p.b0);
+                    b1.AddValue(p.b1);
+                    a0.AddValue(p.a0);
+                    a1.AddValue(p.a1);
+                    a2.AddValue(p.a2);
+                    a3.AddValue(p.a3);
+                    a4.AddValue(p.a4);
                 }
+                pvl += units;
+                pvl += phostd;
+                pvl += bbc;
+                pvl += bbct;
+                pvl += bbn;
+                pvl += b0;
+                pvl += b1;
+                pvl += a0;
+                pvl += a1;
+                pvl += a2;
+                pvl += a3;
+                pvl += a4;
+                return;
             }
-        }
 
-        // Not found if we reach here
-        return (Parameters());
-    }
+            /**
+             * @brief Determine Hillier parameters given a wavelength
+             *
+             * This method determines the set of Hillier parameters to use
+             * for a given wavelength.  It iterates through all band
+             * profiles as read from the PVL file and computes the
+             * difference between the "wavelength" parameter and the
+             * BandBinCenter keyword.  The absolute value of this value is
+             * checked against the BandBinCenterTolerance paramter and if it
+             * is less than or equal to it, a Parameter container is
+             * returned.
+             *
+             * @author Kris Becker - 2/22/2010
+             *
+             * @param wavelength Wavelength used to find parameter set
+             *
+             * @return Hillier::Parameters Container of valid values.  If
+             *         not found, a value of iProfile = -1 is returned.
+             */
+            Hillier::Parameters Hillier::findParameters ( const double wavelength ) const {
+                for (unsigned int i = 0; i < _profiles.size(); i++) {
+                    const DbProfile &p = _profiles[i];
+                    if (p.exists("BandBinCenter")) {
+                        double p_center = ConfKey(p, "BandBinCenter", Null);
+                        double tolerance = ConfKey(p, "BandBinCenterTolerance", 1.0E-6);
+                        if (fabs(wavelength - p_center) <= fabs(tolerance)) {
+                            Parameters pars = extract(p);
+                            pars.iProfile = i;
+                            pars.wavelength = wavelength;
+                            pars.tolerance = tolerance;
+                            return (pars);
+                        }
+                    }
+                }
 
-    /**
-     * @brief Extracts necessary Hillier parameters from profile
-     *
-     * Given a profile read from the input PVL file, this method
-     * extracts needed parameters (from Keywords) in the PVL profile
-     * and creates a container of the converted values.
-     *
-     * @author Kris Becker - 2/22/2010
-     *
-     * @param p Profile to extract/convert
-     *
-     * @return Hillier::Parameters Container of extracted values
-     */
-    Hillier::Parameters Hillier::extract ( const DbProfile &p ) const {
-        Parameters pars;
-        pars.b0 = ConfKey(p, "B0", 0.0);
-        pars.b1 = ConfKey(p, "B1", 0.0);
-        pars.a0 = ConfKey(p, "A0", 0.0);
-        pars.a1 = ConfKey(p, "A1", 0.0);
-        pars.a2 = ConfKey(p, "A2", 0.0);
-        pars.a3 = ConfKey(p, "A3", 0.0);
-        pars.a4 = ConfKey(p, "A4", 0.0);
-        pars.wavelength = ConfKey(p, "BandBinCenter", Null);
-        pars.tolerance = ConfKey(p, "BandBinCenterTolerance", Null);
-        //  Determine equation units - defaults to Radians
-        pars.units = ConfKey(p, "HillierUnits", iString("Radians"));
-        pars.phaUnit = (iString::Equal(pars.units, "Degrees")) ? 1.0 : rpd_c();
-        return (pars);
-    }
-
-    /**
-     * @brief Initialize class from input PVL and Cube files
-     *
-     * This method is typically called at class instantiation time,
-     * but is reentrant.  It reads the parameter PVL file and
-     * extracts Photometric model and Normalization models from it.
-     * The cube is needed to match all potential profiles for each
-     * band.
-     *
-     * @author Kris Becker - 2/22/2010
-     *
-     * @param pvl  Input PVL parameter files
-     * @param cube Input cube file to correct
-     */
-    void Hillier::init ( PvlObject &pvl, Cube &cube ) {
-        //  Make it reentrant
-        _profiles.clear();
-        _bandpho.clear();
-
-        //  Interate over all Photometric groups
-        _normProf = DbProfile(pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse));
-        _iRef = ConfKey(_normProf, "IncRef", 30.0);
-        _eRef = ConfKey(_normProf, "EmaRef", 0.0);
-        _gRef = ConfKey(_normProf, "PhaRef", _iRef);
-
-        PvlObject &phoObj = pvl.FindObject("PhotometricModel");
-        DbProfile phoProf = DbProfile(phoObj);
-        PvlObject::PvlGroupIterator algo = phoObj.BeginGroup();
-        while (algo != phoObj.EndGroup()) {
-            if (iString::Equal(algo->Name(), "Algorithm")) {
-                _profiles.push_back(DbProfile(phoProf, DbProfile(*algo)));
+                // Not found if we reach here
+                return (Parameters());
             }
-            ++algo;
-        }
 
-        Pvl *label = cube.Label();
-        PvlKeyword center = label->FindGroup("BandBin", Pvl::Traverse)["Center"];
-        string errs("");
-        for (int i = 0; i < cube.Bands(); i++) {
-            Parameters parms = findParameters(center[i]);
-            if (parms.IsValid()) {
-                parms.band = i + 1;
-                //_camera->SetBand(i + 1);
-                parms.phoStd = photometry(parms, _iRef, _eRef, _gRef);
-                _bandpho.push_back(parms);
+            /**
+             * @brief Extracts necessary Hillier parameters from profile
+             *
+             * Given a profile read from the input PVL file, this method
+             * extracts needed parameters (from Keywords) in the PVL profile
+             * and creates a container of the converted values.
+             *
+             * @author Kris Becker - 2/22/2010
+             *
+             * @param p Profile to extract/convert
+             *
+             * @return Hillier::Parameters Container of extracted values
+             */
+            Hillier::Parameters Hillier::extract ( const DbProfile &p ) const {
+                Parameters pars;
+                pars.b0 = ConfKey(p, "B0", 0.0);
+                pars.b1 = ConfKey(p, "B1", 0.0);
+                pars.a0 = ConfKey(p, "A0", 0.0);
+                pars.a1 = ConfKey(p, "A1", 0.0);
+                pars.a2 = ConfKey(p, "A2", 0.0);
+                pars.a3 = ConfKey(p, "A3", 0.0);
+                pars.a4 = ConfKey(p, "A4", 0.0);
+                pars.wavelength = ConfKey(p, "BandBinCenter", Null);
+                pars.tolerance = ConfKey(p, "BandBinCenterTolerance", Null);
+                //  Determine equation units - defaults to Radians
+                pars.units = ConfKey(p, "HillierUnits", iString("Radians"));
+                pars.phaUnit = (iString::Equal(pars.units, "Degrees")) ? 1.0 : rpd_c();
+                return (pars);
             }
-            else { // Appropriate photometric parameters not found
-                ostringstream mess;
-                mess << "Band " << i + 1 << " with wavelength Center = " << center[i]
-                        << " does not have PhotometricModel Algorithm group/profile";
-                iException &e = iException::Message(iException::User, mess.str(), _FILEINFO_);
-                errs += e.Errors() + "\n";
-                e.Clear();
+
+            /**
+             * @brief Initialize class from input PVL and Cube files
+             *
+             * This method is typically called at class instantiation time,
+             * but is reentrant.  It reads the parameter PVL file and
+             * extracts Photometric model and Normalization models from it.
+             * The cube is needed to match all potential profiles for each
+             * band.
+             *
+             * @author Kris Becker - 2/22/2010
+             *
+             * @param pvl  Input PVL parameter files
+             * @param cube Input cube file to correct
+             */
+            void Hillier::init ( PvlObject &pvl, Cube &cube ) {
+                //  Make it reentrant
+                _profiles.clear();
+                _bandpho.clear();
+
+                //  Interate over all Photometric groups
+                _normProf = DbProfile(pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse));
+                _iRef = ConfKey(_normProf, "IncRef", 30.0);
+                _eRef = ConfKey(_normProf, "EmaRef", 0.0);
+                _gRef = ConfKey(_normProf, "PhaRef", _iRef);
+
+                PvlObject &phoObj = pvl.FindObject("PhotometricModel");
+                DbProfile phoProf = DbProfile(phoObj);
+                PvlObject::PvlGroupIterator algo = phoObj.BeginGroup();
+                while (algo != phoObj.EndGroup()) {
+                    if (iString::Equal(algo->Name(), "Algorithm")) {
+                        _profiles.push_back(DbProfile(phoProf, DbProfile(*algo)));
+                    }
+                    ++algo;
+                }
+
+                Pvl *label = cube.Label();
+                PvlKeyword center = label->FindGroup("BandBin", Pvl::Traverse)["Center"];
+                string errs("");
+                for (int i = 0; i < cube.Bands(); i++) {
+                    Parameters parms = findParameters(center[i]);
+                    if (parms.IsValid()) {
+                        parms.band = i + 1;
+                        //_camera->SetBand(i + 1);
+                        parms.phoStd = photometry(parms, _iRef, _eRef, _gRef);
+                        _bandpho.push_back(parms);
+                    }
+                    else { // Appropriate photometric parameters not found
+                        ostringstream mess;
+                        mess << "Band " << i + 1 << " with wavelength Center = " << center[i]
+                                << " does not have PhotometricModel Algorithm group/profile";
+                        iException &e = iException::Message(iException::User, mess.str(), _FILEINFO_);
+                        errs += e.Errors() + "\n";
+                        e.Clear();
+                    }
+                }
+
+                // Check for errors and throw them all at the same time
+                if (!errs.empty()) {
+                    errs += " --> Errors in the input PVL file \"" + pvl.Filename() + "\"";
+                    throw iException::Message(iException::User, errs, _FILEINFO_);
+                }
+
+                return;
             }
-        }
 
-        // Check for errors and throw them all at the same time
-        if (!errs.empty()) {
-            errs += " --> Errors in the input PVL file \"" + pvl.Filename() + "\"";
-            throw iException::Message(iException::User, errs, _FILEINFO_);
-        }
-
-        return;
-    }
-
-} // namespace Isis
+        } // namespace Isis
 
 

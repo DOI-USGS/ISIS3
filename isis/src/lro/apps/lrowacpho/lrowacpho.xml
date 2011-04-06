@@ -194,7 +194,8 @@ EndObject
   </history>
 
   <category>
-     <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+    <categoryItem>Cameras</categoryItem>
   </category>
 
   <groups>
@@ -331,6 +332,21 @@ EndObject
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">180.0</maximum>
         <greaterThanOrEqual><item>MININCIDENCE</item></greaterThanOrEqual>
+      </parameter>
+    </group>
+    
+    <group name="Other Options">
+      <parameter name="USEDEM">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Use DEM instead of ellipsoid for photometric angle calculations
+        </brief>
+        <description>
+          Phase, Emission, and Incidence angles can be calculated from the
+          elipsoid (default) or from the DEM.  The difference is that using the
+          DEM the surface roughness is taken into account.
+        </description>
       </parameter>
     </group>
     

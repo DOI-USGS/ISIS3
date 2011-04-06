@@ -122,7 +122,11 @@ namespace Isis {
      * @param pvl Output PVL container write keywords
      */
     void Exponential::Report ( PvlContainer &pvl ) {
-        pvl.AddComment("I/F = mu0/(mu0+mu) * F(phase)\n where:\n  mu0 = cos(incidence)\n  mu = cos(incidence)\n  F(phase) =  A0*exp(B0*phase) + A1*exp(B1*phase) + ... + An*exp(Bn*phase)");
+        pvl.AddComment("I/F = mu0/(mu0+mu) * F(phase)");
+        pvl.AddComment("where:");
+        pvl.AddComment("  mu0 = cos(incidence)");
+        pvl.AddComment("  mu = cos(incidence)");
+        pvl.AddComment("  F(phase) =  A0*exp(B0*phase) + A1*exp(B1*phase) + ... + An*exp(Bn*phase)");
 
         pvl += PvlKeyword("Algorithm", "Exponential");
         pvl += PvlKeyword("IncRef", _iRef, "degrees");
@@ -134,8 +138,8 @@ namespace Isis {
         PvlKeyword bbct("BandBinCenterTolerance");
         PvlKeyword bbn("BandNumber");
 
-        std::vector<PvlKeyword> aTermKeywords;
-        std::vector<PvlKeyword> bTermKeywords;
+        std::vector < PvlKeyword > aTermKeywords;
+        std::vector < PvlKeyword > bTermKeywords;
         for (unsigned int i = 0; i < _bandpho[0].aTerms.size(); i++)
             aTermKeywords.push_back(PvlKeyword("A" + iString((int) i)));
         for (unsigned int i = 0; i < _bandpho[0].bTerms.size(); i++)
@@ -222,7 +226,7 @@ namespace Isis {
     Exponential::Parameters Exponential::extract ( const DbProfile &p ) const {
         Parameters pars;
 
-        for (int i = 0;i < p.size(); i++) {
+        for (int i = 0; i < p.size(); i++) {
             if (p.exists("A" + iString(i)) || p.exists("B" + iString(i))) {
                 pars.aTerms.push_back(ConfKey(p, "A" + iString(i), 1.0));
                 pars.bTerms.push_back(ConfKey(p, "B" + iString(i), 0.0));

@@ -29,6 +29,7 @@
 
 #include "Camera.h"
 #include "PhotometricFunction.h"
+#include "Angle.h"
 #include "DbProfile.h"
 #include "PvlObject.h"
 #include "naif/SpiceUsr.h"
@@ -69,7 +70,7 @@ namespace Isis {
      *
      * @return double Photometric correction at cube loation
      */
-    double PhotometricFunction::Compute ( const double &line, const double &sample, int band ) {
+    double PhotometricFunction::Compute ( const double &line, const double &sample, int band, bool useDem) {
         // Update band if necessary
         if (_camera->Band() != band) {
             _camera->SetBand(band);
@@ -77,11 +78,23 @@ namespace Isis {
         if (!_camera->SetImage(sample, line))
             return (Null);
 
+        // calculate photometric angles
         double i = _camera->IncidenceAngle();
         double e = _camera->EmissionAngle();
         double g = _camera->PhaseAngle();
+        bool success = true;
 
-        if (i < MinimumIncidenceAngle() || i > MaximumIncidenceAngle() || e < MinimumEmissionAngle() || e
+        if (useDem) {
+            Angle phase, incidence, emission;
+            _camera->LocalPhotometricAngles(phase, incidence, emission, success);
+            if (success) {
+                g = phase.GetDegrees();
+                i = incidence.GetDegrees();
+                e = emission.GetDegrees();
+            }
+        }
+
+        if ( !success || i < MinimumIncidenceAngle() || i > MaximumIncidenceAngle() || e < MinimumEmissionAngle() || e
                         > MaximumEmissionAngle() || g < MinimumPhaseAngle() || g > MaximumPhaseAngle())
             return (Null);
 
