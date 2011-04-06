@@ -42,6 +42,10 @@
 #include "iException.h"
 #include "Filename.h"
 #include "Histogram.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
 #include "Stretch.h"
 #include "StretchTool.h"
 #include "Tool.h"
@@ -1321,62 +1325,189 @@ namespace Qisis {
     viewport()->update();
   }
 
+  /**
+   * Get All WhatsThis info - viewport, cube, area in PVL format
+   * 
+   * @author Sharmila Prasad (4/5/2011)
+   * 
+   * @param pWhatsThisPvl - Pvl for all whatsthis info 
+   */
+  void CubeViewport::getAllWhatsThisInfo(Pvl & pWhatsThisPvl)
+  {
+    // Get Cube Info
+    PvlObject whatsThisObj = PvlObject("WhatsThis");
+    whatsThisObj += PvlKeyword("Cube", p_cube->Filename());
 
+    PvlGroup cubeGrp("CubeDimensions");
+    cubeGrp += PvlKeyword("Samples", p_cube->Samples());
+    cubeGrp += PvlKeyword("Lines",   p_cube->Lines());
+    cubeGrp += PvlKeyword("Bands",   p_cube->Bands());
+    whatsThisObj += cubeGrp;
+
+    // Get Viewport Info
+    PvlGroup viewportGrp("ViewportDimensions");
+    viewportGrp += PvlKeyword("Samples", viewport()->width());
+    viewportGrp += PvlKeyword("Lines",   viewport()->height());
+    whatsThisObj += viewportGrp;
+    
+    // Get Cube area Info
+    PvlObject cubeAreaPvl("CubeArea");
+    PvlGroup bandGrp("Bands");
+    
+    PvlKeyword filterName;
+    getBandFilterName(filterName);
+    int iFilterSize = filterName.Size();
+    
+    // color
+    if(p_color ) {
+      PvlKeyword virtualKey("Virtual"), physicalKey("Physical"), filterNameKey;
+      int iRedBand   = p_redBuffer->getBand();
+      int iGreenBand = p_greenBuffer->getBand();
+      int iBlueBand  = p_blueBuffer->getBand();
+      
+      bandGrp += PvlKeyword("Color", "RGB");
+      
+      virtualKey = iRedBand;
+      virtualKey += iGreenBand;
+      virtualKey += iBlueBand;
+      bandGrp   += virtualKey;
+      
+      physicalKey =  p_cube->PhysicalBand(iRedBand);
+      physicalKey += p_cube->PhysicalBand(iGreenBand);
+      physicalKey += p_cube->PhysicalBand(iBlueBand);
+      bandGrp += physicalKey;
+      
+      if(iFilterSize) {
+        if(iRedBand <= iFilterSize) {
+          filterNameKey += filterName[iRedBand-1];
+        }
+        else {
+          filterNameKey += "None";
+        }
+        
+        if(iGreenBand <= iFilterSize) {
+          filterNameKey += filterName[iGreenBand-1];
+        }
+        else {
+          filterNameKey += "None";
+        }
+        
+        if(iBlueBand <= iFilterSize) {
+          filterNameKey += filterName[iBlueBand-1];
+        }
+        else {
+          filterNameKey += "None";
+        }
+        bandGrp += filterNameKey;
+      }
+    }
+    else { // gray
+      int iGrayBand = p_grayBuffer->getBand();
+      
+      bandGrp  += PvlKeyword("Color", "Gray");
+      
+      bandGrp  += PvlKeyword("Virtual", iGrayBand);
+      bandGrp  += PvlKeyword("Physical", p_cube->PhysicalBand(iGrayBand));
+      
+      if(iFilterSize && iGrayBand <= iFilterSize) {
+        bandGrp  += PvlKeyword("FilterName", filterName[iGrayBand-1]);
+      }
+    }
+    
+    //start, end  line and sample
+    double sl, ss, es, el;
+    getCubeArea(ss, es, sl, el);
+    cubeAreaPvl += PvlKeyword("StartSample", int(ss + 0.5));
+    cubeAreaPvl += PvlKeyword("EndSample",   int(es + 0.5));
+    cubeAreaPvl += PvlKeyword("StartLine",   int(sl + 0.5));
+    cubeAreaPvl += PvlKeyword("EndLine",     int(el + 0.5));
+    cubeAreaPvl += bandGrp;
+    whatsThisObj += cubeAreaPvl;
+    pWhatsThisPvl += whatsThisObj;
+  }
+
+  /**
+   * Get Band Filter name from the Isis cube label
+   * 
+   * @author Sharmila Prasad (4/5/2011)
+   * 
+   * @param PvlKeyword& pFilterNameKey - FilterName keyword containing the 
+   *              corresponding keyword from the Isis Cube label
+   */
+  void CubeViewport::getBandFilterName(PvlKeyword & pFilterNameKey)
+  {
+    // get the band info
+    Pvl* cubeLbl = p_cube->Label();
+    PvlObject isisObj = cubeLbl->FindObject("IsisCube");
+    if (isisObj.HasGroup("BandBin")) {
+      PvlGroup bandBinGrp = isisObj.FindGroup("BandBin");
+      if(bandBinGrp.HasKeyword("FilterName")) {
+        pFilterNameKey =bandBinGrp.FindKeyword("FilterName") ;
+      }
+    }
+  }
+  
+  /**
+   * Get Cube area corresponding to the viewport's dimension
+   * 
+   * @param pdStartSample - Cube Start Sample
+   * @param pdEndSample   - Cube End Sample
+   * @param pdStartLine   - Cube Start Line
+   * @param pdEndLine     - Cube End Line 
+   */
+  void CubeViewport::getCubeArea(double & pdStartSample, double & pdEndSample, 
+                                 double & pdStartLine, double & pdEndLine)
+  {
+    viewportToCube(0, 0, pdStartSample, pdStartLine);
+    if(pdStartSample < 1.0){
+      pdStartSample = 1.0;
+    }
+    if(pdStartLine < 1.0){
+      pdStartLine = 1.0;
+    }
+
+    //end line and samples
+    viewportToCube(viewport()->width() - 1, viewport()->height() - 1, pdEndSample, pdEndLine);
+    if(pdEndSample > cubeSamples()){
+      pdEndSample = cubeSamples();
+    }
+    if(pdEndLine > cubeLines()){
+      pdEndLine = cubeLines();
+    }
+  }
+  
   /**
    * Update the What's This text.
    *
    */
   void CubeViewport::updateWhatsThis() {
-    //start line and sample
-    double sl, ss;
-    viewportToCube(0, 0, ss, sl);
-    if(ss < 1.0){
-      ss = 1.0;
-    }
-    if(sl < 1.0){
-      sl = 1.0;
-    }
+    //start, end  line and sample
+    double sl, ss, es, el;
+    getCubeArea(ss, es, sl, el);
 
-    //end line and samples
-    double el, es;
-    viewportToCube(viewport()->width() - 1, viewport()->height() - 1, es, el);
-    if(es > cubeSamples()){
-      es = cubeSamples();
-    }
-    if(el > cubeLines()){
-      el = cubeLines();
-    }
-
-    // get the band info
-    Pvl* cubeLbl = p_cube->Label();
-    bool bHasFilterName=false;
-    PvlKeyword filterNameKW;
-    PvlObject isisObj = cubeLbl->FindObject("IsisCube");
-    if (isisObj.HasGroup("BandBin")) {
-      PvlGroup bandBinGrp = isisObj.FindGroup("BandBin");
-      if(bandBinGrp.HasKeyword("FilterName")) {
-        filterNameKW =bandBinGrp.FindKeyword("FilterName") ;
-        bHasFilterName = true;
-      }
-    }
-    int iFilterSize = filterNameKW.Size();
+    QString sBandInfo ;
+    PvlKeyword filterNameKey;
+    getBandFilterName(filterNameKey);
+    int iFilterSize = filterNameKey.Size();
     
-    iString sBandInfo ;
     // color
     if(p_color ) {
-      int iRedBand = p_redBuffer->getBand();
+      int iRedBand   = p_redBuffer->getBand();
       int iGreenBand = p_greenBuffer->getBand();
-      int iBlueBand = p_blueBuffer->getBand();
-      sBandInfo = "Bands(RGB)&nbsp;Virtual  = " + iString(iRedBand) + ", ";
-      sBandInfo += iString(iGreenBand) + ", ";
-      sBandInfo += iString(iBlueBand) + " ";
-      sBandInfo += "Physical = " + iString(p_cube->PhysicalBand(iRedBand)) + ", ";
-      sBandInfo += iString(p_cube->PhysicalBand(iGreenBand)) + ", ";
-      sBandInfo += iString(p_cube->PhysicalBand(iBlueBand));
-      if(bHasFilterName) {
+      int iBlueBand  = p_blueBuffer->getBand();
+      
+      sBandInfo = "Bands(RGB)&nbsp;Virtual  = " + QString::number(iRedBand) + ", ";
+      sBandInfo += QString::number(iGreenBand) + ", ";
+      sBandInfo += QString::number(iBlueBand) + " ";
+      
+      sBandInfo += "Physical = " + QString::number(p_cube->PhysicalBand(iRedBand)) + ", ";
+      sBandInfo += QString::number(p_cube->PhysicalBand(iGreenBand)) + ", ";
+      sBandInfo += QString::number(p_cube->PhysicalBand(iBlueBand));
+      
+      if(iFilterSize) {
         sBandInfo += "<br>FilterName = ";
         if(iRedBand <= iFilterSize) {
-          sBandInfo += filterNameKW[iRedBand-1];
+          sBandInfo += QString(filterNameKey[iRedBand-1]);
         }
         else {
           sBandInfo += "None";
@@ -1384,7 +1515,7 @@ namespace Qisis {
         sBandInfo += ", ";
         
         if(iGreenBand <= iFilterSize) {
-          sBandInfo += filterNameKW[iGreenBand-1];
+          sBandInfo += QString(filterNameKey[iGreenBand-1]);
         }
         else {
           sBandInfo += "None";
@@ -1392,7 +1523,7 @@ namespace Qisis {
         sBandInfo += ", ";
         
         if(iBlueBand <= iFilterSize) {
-          sBandInfo += filterNameKW[iBlueBand-1];
+          sBandInfo += QString(filterNameKey[iBlueBand-1]);
         }
         else {
           sBandInfo += "None";
@@ -1401,10 +1532,13 @@ namespace Qisis {
     }
     else { // gray
       int iGrayBand = p_grayBuffer->getBand();
-      sBandInfo = "Band(Gray)&nbsp;Virtual = " + iString(iGrayBand) + " ";
-      sBandInfo += "Physical = " + iString(p_cube->PhysicalBand(iGrayBand));
-      if(bHasFilterName && iGrayBand <= iFilterSize) {
-        sBandInfo += "<br>FilterName = " + filterNameKW[iGrayBand-1];
+      
+      sBandInfo = "Band(Gray)&nbsp;Virtual = " + QString::number(iGrayBand) + " ";
+      
+      sBandInfo += "Physical = " + QString::number(p_cube->PhysicalBand(iGrayBand));
+      
+      if(iFilterSize && iGrayBand <= iFilterSize) {
+        sBandInfo += "<br>FilterName = " + QString(filterNameKey[iGrayBand-1]);
       }
     }
     
@@ -1414,11 +1548,10 @@ namespace Qisis {
       QString::number(int(es + 0.5)) + "<br> \
       Lines = " + QString::number(int(sl + 0.5)) + "-" +
       QString::number(int(el + 0.5)) + "<br> " +
-      sBandInfo.ToQt() + "</blockQuote></p>";
-    viewport()->setWhatsThis(p_whatsThisText +
-                             area +
-                             p_cubeWhatsThisText +
-                             p_viewportWhatsThisText);
+      sBandInfo + "</blockQuote></p>";
+    
+    viewport()->setWhatsThis(p_whatsThisText + area + p_cubeWhatsThisText + 
+                         p_viewportWhatsThisText);
   }
 
   /**
