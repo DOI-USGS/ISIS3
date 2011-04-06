@@ -1919,6 +1919,8 @@ namespace Qisis {
    * @history 2010-07-22  Tracie Sucharski - MeasureType of Estimated is now 
    *                           Reference.  This change associated with
    *                           implementation of binary control networks.
+   * @history 2011-04-06  Tracie Sucharski - If not a ground point, use the 
+   *                           Reference measure to get lat,lon. 
    * 
    */
   void QnetTool::addMeasure() {
@@ -1935,7 +1937,7 @@ namespace Qisis {
     double lat = p_editPoint->GetBestSurfacePoint().GetLatitude().GetDegrees();
     double lon = p_editPoint->GetBestSurfacePoint().GetLongitude().GetDegrees();
     if (lat == Null || lon == Null) {
-      ControlMeasure m = *(p_editPoint->GetMeasure(0));
+      ControlMeasure m = *(p_editPoint->GetRefMeasure());
       int camIndex = g_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
       cam = g_controlNetwork->Camera(camIndex);
       //cam = m.Camera();

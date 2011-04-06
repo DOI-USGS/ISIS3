@@ -8,6 +8,7 @@
 #include "ControlPoint.h"
 #include "Filename.h"
 #include "MdiCubeViewport.h"
+#include "Progress.h"
 #include "QnetFileTool.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
@@ -135,7 +136,9 @@ namespace Qisis {
     }
     else {
       try {
-        g_controlNetwork = new Isis::ControlNet(cNetFilename.toStdString());
+        Isis::Progress progress;
+        g_controlNetwork = new Isis::ControlNet(cNetFilename.toStdString(),
+                                                &progress);
       }
       catch (Isis::iException &e) {
         QString message = "Invalid control network.  \n";
@@ -150,7 +153,8 @@ namespace Qisis {
 
     //  Initialize cameras for control net
     try {
-      g_controlNetwork->SetImages(*g_serialNumberList);
+      Isis::Progress progress;
+      g_controlNetwork->SetImages(*g_serialNumberList,&progress);
     }
     catch (Isis::iException &e) {
       QString message = "Cannot initialize images in control network.  \n";
@@ -162,11 +166,11 @@ namespace Qisis {
       return;
     }
     
+    QApplication::restoreOverrideCursor();
 
     emit serialNumberListUpdated();
     emit controlNetworkUpdated(cNetFilename);
     emit newControlNetwork(g_controlNetwork);
-    QApplication::restoreOverrideCursor();
     return;
   }
 
