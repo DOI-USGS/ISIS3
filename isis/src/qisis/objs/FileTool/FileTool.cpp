@@ -18,6 +18,9 @@
 #include "MdiCubeViewport.h"
 #include "OriginalLabel.h"
 #include "Workspace.h"
+#include "Pvl.h"
+
+using namespace Isis;
 
 namespace Qisis {
   /**
@@ -74,7 +77,18 @@ namespace Qisis {
       "<b>Function:</b> Save the current Cube to the specified location";
     p_saveAs->setWhatsThis(whatsThis);
     connect(p_saveAs, SIGNAL(activated()), this, SLOT(saveAs()));
-
+    p_saveAs->setEnabled(false);
+    
+    p_saveInfo = new QAction(parent);
+    p_saveInfo->setText("Save &Info...");
+    p_saveInfo->setIcon(QPixmap(toolIconDir() + "/filesaveas.png"));
+    p_saveInfo->setToolTip("Save Info");
+    whatsThis =
+      "<b>Function:</b> Save the current Cube's Whatsthis Info to the specified location";
+    p_saveInfo->setWhatsThis(whatsThis);
+    connect(p_saveInfo, SIGNAL(activated()), this, SLOT(saveInfo()));
+    p_saveInfo->setEnabled(false);
+    
     p_exportView = new QAction(parent);
     p_exportView->setText("Export View");
     p_exportView->setIcon(QPixmap(toolIconDir() + "/fileexport.png"));
@@ -133,6 +147,7 @@ namespace Qisis {
     menu->addAction(p_browse);
     menu->addAction(p_save);
     menu->addAction(p_saveAs);
+    menu->addAction(p_saveInfo);
     menu->addAction(p_exportView);
     menu->addAction(p_print);
     menu->addAction(p_closeAll);
@@ -424,6 +439,39 @@ namespace Qisis {
   }
 
   /**
+   * Saves the whatsthis info of the cubeviewport to 
+   * user specified output file 
+   * 
+   * @author Sharmila Prasad (4/6/2011)
+   */
+  void FileTool::saveInfo(void)
+  {
+    if(cubeViewport() == NULL) {
+      QMessageBox::information((QWidget *)parent(), "Error", "No active cube to save info");
+      return;
+    }
+    
+    //Get the new cube's filename
+    QString output =
+      QFileDialog::getSaveFileName((QWidget *)parent(),
+                                   "Choose output file",
+                                   p_lastDir,
+                                   QString("PVL Files (*.pvl)"));
+    
+    //If the filename is empty, return
+    if(output.isEmpty()) {
+      return;
+    }
+    else if(!output.endsWith(".pvl")) {
+      output += ".pvl";
+    }
+
+    Pvl whatsThisPvl;
+    cubeViewport()->getAllWhatsThisInfo(whatsThisPvl);
+    whatsThisPvl.Write(output.toStdString());
+  }
+  
+  /**
    * This method copies from the input buffer to the output buffer
    *
    * @param in
@@ -587,6 +635,8 @@ namespace Qisis {
       p_print->setEnabled(false);
       p_save->setEnabled(false);
       p_exportView->setEnabled(false);
+      p_saveAs->setEnabled(false);
+      p_saveInfo->setEnabled(false);
     }
     else {
       if(p_lastViewport == NULL) {
@@ -615,6 +665,8 @@ namespace Qisis {
       }
       p_print->setEnabled(true);
       p_exportView->setEnabled(true);
+      p_saveAs->setEnabled(true);
+      p_saveInfo->setEnabled(true);
     }
   }
 }
