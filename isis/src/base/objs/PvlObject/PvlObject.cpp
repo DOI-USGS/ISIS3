@@ -28,6 +28,8 @@
 #include "PvlFormat.h"
 #include "PvlObject.h"
 
+#include <QList>
+
 #include <iostream>
 #include <sstream>
 

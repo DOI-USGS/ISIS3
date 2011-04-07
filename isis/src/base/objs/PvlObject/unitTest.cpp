@@ -222,4 +222,28 @@ int main() {
     cout.flush();
     e.Report(false);
   }
+
+  cout << endl << "Testing reallocation ..." << endl;
+  PvlObject po;
+  po += PvlObject("firstObj");
+  PvlObject * ptro1 = &po.FindObject("firstObj");
+  for (int i = 0; i < 250; i++) 
+    po += PvlObject("testObj" + i);
+
+  PvlObject * ptro2 = &po.FindObject("firstObj");
+  if (ptro1 == ptro2) 
+    cout << "PvlObject pointers are equal" << endl; 
+  else
+    cout << "FAILURE: PvlObject pointers were not the same after adding more objects" << endl;
+  
+  po += PvlGroup("firstGroup");
+  PvlGroup * ptrg1 = &po.FindGroup("firstGroup");
+  for (int i = 0; i < 250; i++)
+    po += PvlObject("testGroup" + i);
+
+  PvlGroup * ptrg2 = &po.FindGroup("firstGroup");
+  if (ptrg1 == ptrg2)
+    cout << "PvlGroup pointers are equal" << endl;
+  else
+    cout << "FAILURE: PvlGroup pointers were not the same after adding more groups" << endl;
 }

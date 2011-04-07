@@ -219,3 +219,7 @@ Object = Object0
     End_Object
   End_Object
 End_Object
+
+Testing reallocation ...
+PvlObject pointers are equal
+PvlGroup pointers are equal

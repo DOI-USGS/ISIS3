@@ -26,6 +26,9 @@
 #include "PvlContainer.h"
 #include "PvlGroup.h"
 
+
+template<typename T> class QList;
+
 namespace Isis {
   /**
    * @brief Contains Pvl Groups and Pvl Objects.
@@ -82,8 +85,8 @@ namespace Isis {
       const PvlGroup &Group(const int index) const;
 
       //! The counter for groups.
-      typedef std::vector<Isis::PvlGroup>::iterator PvlGroupIterator;
-      typedef std::vector<Isis::PvlGroup>::const_iterator ConstPvlGroupIterator;
+      typedef QList<Isis::PvlGroup>::iterator PvlGroupIterator;
+      typedef QList<Isis::PvlGroup>::const_iterator ConstPvlGroupIterator;
 
 
       /**
@@ -132,7 +135,7 @@ namespace Isis {
                                  PvlGroupIterator beg,
                                  PvlGroupIterator end) {
         Isis::PvlGroup temp(name);
-        return find(beg, end, temp);
+        return std::find(beg, end, temp);
       }
 
 
@@ -146,7 +149,7 @@ namespace Isis {
                                       ConstPvlGroupIterator beg,
                                       ConstPvlGroupIterator end) const {
         Isis::PvlGroup temp(name);
-        return find(beg, end, temp);
+        return std::find(beg, end, temp);
       }
 
 
@@ -226,8 +229,8 @@ namespace Isis {
       const PvlObject &Object(const int index) const;
 
       //! The counter for objects.
-      typedef std::vector<PvlObject>::iterator PvlObjectIterator;
-      typedef std::vector<PvlObject>::const_iterator ConstPvlObjectIterator;
+      typedef QList<PvlObject>::iterator PvlObjectIterator;
+      typedef QList<PvlObject>::const_iterator ConstPvlObjectIterator;
 
 
       /**
@@ -277,7 +280,7 @@ namespace Isis {
                                    PvlObjectIterator beg,
                                    PvlObjectIterator end) {
         PvlObject temp(name);
-        return find(beg, end, temp);
+        return std::find(beg, end, temp);
       }
 
 
@@ -292,7 +295,7 @@ namespace Isis {
                                         ConstPvlObjectIterator beg,
                                         ConstPvlObjectIterator end) const {
         PvlObject temp(name);
-        return find(beg, end, temp);
+        return std::find(beg, end, temp);
       }
 
 
@@ -352,9 +355,9 @@ namespace Isis {
       void ValidateObject(PvlObject & pPvlObj);
       
     private:
-      std::vector<PvlObject> p_objects;    /**<A vector of PvlObjects contained
+      QList<PvlObject> p_objects;    /**<A vector of PvlObjects contained
                                                 in the current PvlObject. */
-      std::vector<PvlGroup> p_groups;/**<A vector of PvlGroups contained
+      QList<PvlGroup> p_groups;/**<A vector of PvlGroups contained
                                                 in the current PvlObject. */
   };
 }
