@@ -96,8 +96,6 @@ void IsisMain() {
 //     throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
 //   }
 
-  double tol = ui.GetDouble("TOL");
-
   // set convergence threshold
   b->SetConvergenceThreshold(ui.GetDouble("SIGMA0"));
 
@@ -110,7 +108,7 @@ void IsisMain() {
     if(ui.GetString("METHOD") == "SPECIALK" )
       b->SolveSpecialK();
     else
-      b->Solve(tol);
+      b->Solve();
 
     b->ControlNet()->Write(ui.GetFilename("ONET"));
     PvlGroup gp("JigsawResults");

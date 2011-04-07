@@ -228,7 +228,7 @@
                       technique.
             </description>
           </option>
-          <option value="SVD">
+<!--          <option value="SVD">
             <brief> Single Value Decomposition</brief>
             <description>
                       Solve the matrix using the method of single value
@@ -243,6 +243,7 @@
                       transpose * Q =I, and R is an upper triangular matrix. 
             </description>
           </option>
+-->
           <option value="SPARSE">
             <brief> Sparse matrix solver</brief>
             <description> 
@@ -273,7 +274,7 @@
       </description>
       <type>boolean</type>
       <default>
-        <item>Yes</item>
+        <item>No</item>
       </default>
     </parameter>
     </group>
@@ -298,16 +299,7 @@
           <item>50</item>
         </default>
       </parameter>
-
-      <parameter name="TOL">
-        <brief> tolerance</brief>
-        <description> Tolerance in pixels</description>
-        <type>double</type>
-        <default>
-          <item>0.5</item>
-        </default>
-      </parameter>
-    </group>
+      </group>
 
     <group name="Camera Pointing Options">
       <parameter name="CKDEGREE">

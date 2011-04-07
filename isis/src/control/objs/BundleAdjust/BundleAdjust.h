@@ -114,7 +114,7 @@ namespace Isis {
 
       bool ReadSCSigmas(const std::string &scsigmasList);
 
-      double Solve(double tol);
+      double Solve();
       bool SolveSpecialK();
 
       Isis::ControlNet *ControlNet() { return m_pCnet; }

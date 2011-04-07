@@ -159,6 +159,8 @@ namespace Isis {
     m_strSolutionMethod = "SPECIALK";
     m_pObsNumList = NULL;
     m_pLsq = NULL;
+    m_dElapsedTimeErrorProp = 0.0;
+    m_dElapsedTime = 0.0;
 
     // Get the cameras set up for all images
     m_pCnet->SetImages(*m_pSnList, progress);
@@ -2194,7 +2196,7 @@ namespace Isis {
   * @param maxIterations   Maximum iterations, if tolerance is never
   *                        met an iException will be thrown.
   */
-  double BundleAdjust::Solve(double tol) {
+  double BundleAdjust::Solve() {
     double averageError;
     std::vector<int> observationInitialValueIndex;  // image index for observation inital values
     int iIndex = -1;                                // image index for initial spice for an observation
@@ -2203,6 +2205,8 @@ namespace Isis {
     ComputeNumberPartials();
 
     ComputeImageParameterWeights();
+
+//    InitializePoints();
 
     if (m_bObservationMode)
       observationInitialValueIndex.assign(m_pObsNumList->ObservationSize(), -1);
@@ -2283,7 +2287,7 @@ namespace Isis {
     // Initialize solution parameters
     double sigmaXY, sigmaHat, sigmaX, sigmaY;
     sigmaXY = sigmaHat = sigmaX = sigmaY = 0.;
-    m_nIteration = 0;
+    m_nIteration = -1;
 
     clock_t t1 = clock();
 
@@ -2330,7 +2334,7 @@ namespace Isis {
       m_Statsry.Reset();
       m_Statsrxy.Reset();
 
-      if (m_nIteration == 1)
+      if ( m_nIteration == 0 )
         sigmaHat = 10.0;
 
       // we've converged
@@ -2363,7 +2367,7 @@ namespace Isis {
 
       dprevious_Sigma0 = m_dSigma0;
 
-      if (m_nIteration > 1)
+      if ( m_nIteration > 0 )
         m_pLsq->Reset();
 
       // Loop through the control net and add the partials for each point
@@ -2406,8 +2410,8 @@ namespace Isis {
       catch (iException &e) {
         std::string msg = "Unable to solve in BundleAdjust, ";
         msg += "Iteration " + Isis::iString(m_nIteration) + " of ";
-        msg += Isis::iString(m_nMaxIterations) + ", Tolerance = ";
-        msg += Isis::iString(tol);
+        msg += Isis::iString(m_nMaxIterations) + ", Sigma0 = ";
+        msg += Isis::iString(m_dConvergenceThreshold);
         throw Isis::iException::Message(iException::Math, msg, _FILEINFO_);
       }
 
@@ -2452,8 +2456,8 @@ namespace Isis {
                sqrt(m_Statsy.SumSquare() / m_Statsy.TotalPixels()) : 0.;
     }
 
-    std::string msg = "Did not converge to tolerance [";
-    msg += iString(tol) + "] in less than [";
+    std::string msg = "Did not converge to Sigma0 criteria [";
+    msg += iString(m_dConvergenceThreshold) + "] in less than [";
     msg += iString(m_nMaxIterations) + "] iterations";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -4147,11 +4151,13 @@ namespace Isis {
               cam->SetUniversalGround(lat, lon);
               rad = cam->LocalRadius(); //meters
            }*/
-      point->SetAdjustedSurfacePoint(SurfacePoint(Latitude(dLat, Angle::Degrees),
-                                          Longitude(dLon, Angle::Degrees),
-                                          Distance(dRad, Distance::Meters)));
-    }
 
+      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+      SurfacePoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
+                                              Longitude(dLon, Angle::Degrees),
+                                              Distance(dRad, Distance::Meters));
+      point->SetAdjustedSurfacePoint(SurfacePoint);
+    }
   }
 
   //! Return index to basis function for ith point
@@ -4427,7 +4433,7 @@ namespace Isis {
       SurfacePoint.SetSphericalSigmasDistance(
           Distance(dSigmaLat, Distance::Meters),
           Distance(dSigmaLong, Distance::Meters),
-          Distance(dSigmaRadius, Distance::Kilometers));
+          Distance(dSigmaRadius, Distance::Kilometers));    
 
       point->SetAdjustedSurfacePoint(SurfacePoint);
     }
