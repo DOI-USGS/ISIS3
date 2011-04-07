@@ -24,6 +24,8 @@
 
 #include "PvlKeyword.h"
 
+template<typename T> class QList;
+
 namespace Isis {
   /**
    * @brief Contains more than one keyword-value pair.
@@ -166,10 +168,10 @@ namespace Isis {
 
       bool HasKeyword(const std::string &name) const;
       //! The keyword iterator.
-      typedef std::vector<PvlKeyword>::iterator PvlKeywordIterator;
+      typedef QList<PvlKeyword>::iterator PvlKeywordIterator;
 
       //! The const keyword iterator
-      typedef std::vector<PvlKeyword>::const_iterator ConstPvlKeywordIterator;
+      typedef QList<PvlKeyword>::const_iterator ConstPvlKeywordIterator;
 
 
       PvlKeywordIterator FindKeyword(const std::string &name,
@@ -299,7 +301,7 @@ namespace Isis {
                                                     initialized using a filename
                                                     the string is empty.*/
       PvlKeyword p_name;                   //!< This is the name keyword
-      std::vector<PvlKeyword> p_keywords; /**<This is the vector of
+      QList<PvlKeyword> p_keywords; /**<This is the vector of
                                                     PvlKeywords the container is
                                                     holding. */
 

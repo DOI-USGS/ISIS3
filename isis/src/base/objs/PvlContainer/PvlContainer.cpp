@@ -22,6 +22,8 @@
 
 #include <algorithm>
 
+#include <QList>
+
 #include "PvlContainer.h"
 #include "Pvl.h"
 #include "Filename.h"
@@ -151,7 +153,7 @@ namespace Isis {
   bool PvlContainer::CleanDuplicateKeywords() {
     bool keywordDeleted = false;
 
-    for(unsigned int index = 0; index < p_keywords.size(); index ++) {
+    for(int index = 0; index < p_keywords.size(); index ++) {
       PvlKeyword &current = p_keywords[index];
 
       for(PvlKeywordIterator key = Begin() + index + 1; key < End(); key ++) {

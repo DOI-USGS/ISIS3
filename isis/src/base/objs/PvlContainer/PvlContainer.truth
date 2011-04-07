@@ -9,3 +9,6 @@ CATTLE = Meow
 Test inserter ...
 Orangutan = gross
 DOG       = 5.2 <meters>
+
+Test reallocation ...
+Pointer to DOG is equivalent
