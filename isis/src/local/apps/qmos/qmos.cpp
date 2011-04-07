@@ -39,10 +39,10 @@ int main(int argc, char *argv[]) {
 
     Isis::PvlGroup mapping("Mapping");
     {
-      mapping += Isis::PvlKeyword("ProjectionName", "PolarStereographic");
-      mapping += Isis::PvlKeyword("CenterLatitude", "45.0");
+      mapping += Isis::PvlKeyword("ProjectionName", "Equirectangular");
+      mapping += Isis::PvlKeyword("CenterLatitude", "0.0");
       mapping += Isis::PvlKeyword("CenterLongitude", "0.0");
-      mapping += Isis::PvlKeyword("TargetName", "Mars");
+      mapping += Isis::PvlKeyword("TargetName", "Moon");
       mapping += Isis::PvlKeyword("LatitudeType", "Planetocentric");
       mapping += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
       mapping += Isis::PvlKeyword("LongitudeDomain", "360");
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     Qisis::MosaicWidget *mos = new Qisis::MosaicWidget(mainWindow);
     mos->setProjection(proj);
-    mos->setLabelText("Polar Stereographic");
+    mos->setLabelText("Equirectangular");
     mainWindow->setCentralWidget(mos);
     mainWindow->show();
 
