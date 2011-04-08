@@ -178,10 +178,6 @@ namespace Isis {
    *
    */
   void ControlNet::ReadControl(const iString &filename, Progress *progress) {
-    if (progress != NULL) {
-      progress->SetText("Loading Control Points...");
-    }
-
     LatestControlNetFile *fileData = ControlNetVersioner::Read(filename);
 
     ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
@@ -194,6 +190,12 @@ namespace Isis {
 
     QList< ControlPointFileEntryV0002 > &fileDataPoints =
         fileData->GetNetworkPoints();
+
+    if (progress != NULL) {
+      progress->SetText("Loading Control Points...");
+      progress->SetMaximumSteps(fileDataPoints.size());
+      progress->CheckStatus();
+    }
 
     ControlPointFileEntryV0002 fileDataPoint;
     foreach(fileDataPoint, fileDataPoints) {
