@@ -42,6 +42,9 @@
     <change name="Steven Koechle" date="2007-10-05">
       Added check to see if cube has existing polygon, if so delete it.
     </change>
+    <change name="Debbie A. Cook" date="2011-04-07">
+        Removed obsolete user input parameters maxits and tol.
+    </change>
   </history>
 
   <groups>
@@ -63,24 +66,6 @@
     </group>
 
     <group name="Bundle Adjustment Options">
-        <parameter name="MAXITS">
-            <brief>Number of iterations</brief>
-            <description>Maximum number of iterations to try for convergence to tolerance before stopping</description>
-            <type>integer</type>
-            <default><item>5</item></default>
-        </parameter>
-
-        <parameter name="TOL">
-            <brief>Tolerance</brief>
-            <description>
-              Tolerance in pixels.  When the bundle adjustment error drops below this value the solution has converged and
-              the camera pointing will be updated.  If the solution does not converge in MAXITS then the camera pointing will
-              not be updated.
-            </description>
-             <type>double</type>
-            <default><item>0.5</item></default>
-        </parameter>
-
         <parameter name="TWIST">
           <type>boolean</type>
           <brief>Solve for camera twist</brief>

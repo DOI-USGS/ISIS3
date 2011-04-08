@@ -90,10 +90,10 @@ void IsisMain() {
   try {
     BundleAdjust b(cnet, serialNumberList);
     b.SetSolveTwist(ui.GetBoolean("TWIST"));
-    double tol = ui.GetDouble("TOL");
+    //    double tol = ui.GetDouble("TOL");
     //int maxIterations = ui.GetInteger("MAXITS");
     //b.Solve(tol, maxIterations);
-    b.Solve(tol);
+    b.Solve();
 
     Cube c;
     c.Open(filename, "rw");
