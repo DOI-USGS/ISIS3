@@ -26,7 +26,7 @@ namespace Isis {
       /**
        * Destructor. No data so this does nothing.
        */
-      ~ControlNetFile() {};
+      virtual ~ControlNetFile() {};
 
       /**
        * This reads the binary file into memory. The header is the Pvl that must

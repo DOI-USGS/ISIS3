@@ -58,7 +58,7 @@ namespace Isis {
   class ControlNetFileV0001 : public ControlNetFile {
     public:
       ControlNetFileV0001();
-      ~ControlNetFileV0001();
+      virtual ~ControlNetFileV0001();
 
       virtual void Read(const Pvl &header, const Filename &file);
 
