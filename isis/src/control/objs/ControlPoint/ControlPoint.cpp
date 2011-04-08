@@ -249,9 +249,6 @@ namespace Isis {
     id = (std::string) p["PointId"];
     std::vector<Distance> targetRadii;
 
-    if (parentNetwork)
-      targetRadii = parentNetwork->GetTargetRadii();
-
     if ((std::string)p["PointType"] == "Ground") {
       type = Ground;
     }
@@ -533,9 +530,6 @@ namespace Isis {
       if (reject.DownCase() == "true")
         jigsawRejected = true;
     }
-    // Get rid of parentNetwork now that conversions are done.  The point
-    // hasn't been added yet, and it doesn't have a parent officially until it is.
-    parentNetwork = NULL;
 
     //  Process Measures
     for (int g = 0; g < p.Groups(); g++) {

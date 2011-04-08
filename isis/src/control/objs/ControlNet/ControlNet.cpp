@@ -228,8 +228,6 @@ namespace Isis {
               sp = newPoint->GetAprioriSurfacePoint();
               sp.SetRadii(p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]);
               newPoint->SetAprioriSurfacePoint(sp);
-              // Temporarily set the parent so ControlPoint can get target radii
-              // for unit conversions
               newPoint->Load(cn.Object(i));
               p_numMeasures += newPoint->GetNumMeasures();
               if (newPoint->IsIgnored()) {
