@@ -181,6 +181,10 @@ namespace Isis {
       WriteImageOverlaps(outputFile);
     }
 
+    // flush the output if we're still not done writing
+    if(p_calculatedSoFar != p_writtenSoFar)
+      WriteImageOverlaps(outputFile);
+
     // Wait for the calculation thread to actually exit, this has more than likely already occurred.
     wait();
 
