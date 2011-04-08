@@ -461,13 +461,14 @@ namespace Isis {
     }
 
     // If we had an error then the errors aren't flushed
-    bool errorsFlushed = !error;
+    bool errorsFlushed = false;
     while(!errorsFlushed) {
       try {
         NaifStatus::CheckErrors();
         errorsFlushed = true;
       }
       catch(iException &e) {
+        error = true;
       }
     }
 
