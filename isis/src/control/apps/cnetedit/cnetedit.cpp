@@ -70,7 +70,6 @@ ControlNetValidMeasure *validator;
 
 // Main program
 void IsisMain() {
-
   // Reset the counts of points and measures deleted
   numPointsDeleted = 0;
   numMeasuresDeleted = 0;
@@ -90,7 +89,7 @@ void IsisMain() {
   // If the user wants to keep a log, go ahead and populate it with all the
   // existing ignored points and measures
   ControlNet cnet(ui.GetFilename("CNET"));
-  if(keepLog)
+  if(keepLog && cnet.GetNumPoints() > 0)
     PopulateLog(cnet);
 
   /*
@@ -104,7 +103,7 @@ void IsisMain() {
    * all, because these same checks would need to have been done later
    * regardless.
    */
-  if(deleteIgnored) {
+  if(deleteIgnored && cnet.GetNumPoints() > 0) {
 
     Progress progress;
     progress.SetText("Deleting Ignored in Input");
@@ -143,19 +142,19 @@ void IsisMain() {
   }
 
   //List has Points Ids
-  if(ui.WasEntered("POINTLIST")) {
+  if(ui.WasEntered("POINTLIST") && cnet.GetNumPoints() > 0) {
     string pointlistFilename = ui.GetFilename("POINTLIST");
     ProcessControlPoints(pointlistFilename, cnet);
   }
 
   //List has Cube file names
-  if(ui.WasEntered("CUBELIST")) {
+  if(ui.WasEntered("CUBELIST") && cnet.GetNumPoints() > 0) {
     string ignorelistFilename = ui.GetFilename("CUBELIST");
     ProcessControlMeasures(ignorelistFilename, cnet);
   }
 
   // Perform validity check
-  if(ui.GetBoolean("CHECKVALID")) {
+  if(ui.GetBoolean("CHECKVALID") && cnet.GetNumPoints() > 0) {
     validator = NULL;
 
     // Construct the validator from the user-specified definition file
