@@ -41,7 +41,7 @@ namespace Isis {
 
     fstream input(file.Expanded().c_str(), ios::in | ios::binary);
     if (!input.is_open()) {
-      iString msg = "Failed to open PB file" + file.Expanded();
+      iString msg = "Failed to open PB file" + file.fileName();
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -55,7 +55,7 @@ namespace Isis {
     // Now stream the rest of the input into the google protocol buffer.
     try {
       if (!p_network->ParseFromCodedStream(&codedInStream)) {
-        string msg = "Failed to read input PB file " + file.Expanded();
+        iString msg = "Failed to read input PB file " + file.fileName();
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -79,7 +79,7 @@ namespace Isis {
     // Now stream the rest of the input into the google protocol buffer.
     try {
       if (!p_logData->ParseFromCodedStream(&codedLogInStream)) {
-        string msg = "Failed to read log data in PB file [" + file.Expanded() + "]";
+        iString msg = "Failed to read log data in PB file [" + file.fileName() + "]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }

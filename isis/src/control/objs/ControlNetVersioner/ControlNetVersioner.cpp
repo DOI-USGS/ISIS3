@@ -51,7 +51,7 @@ namespace Isis {
       }
     }
     catch(iException &e) {
-      iString msg = "Reading the control network [" + networkFilename.Expanded()
+      iString msg = "Reading the control network [" + networkFilename.fileName()
           + "] failed";
       throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
