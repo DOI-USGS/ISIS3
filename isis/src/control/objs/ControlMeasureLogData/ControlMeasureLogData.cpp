@@ -1,6 +1,7 @@
 #include "ControlMeasureLogData.h"
 
-#include "PBControlNetLogData.pb.h"
+#include "ControlNetFileV0001.pb.h"
+#include "ControlNetFileV0002.pb.h"
 #include "PvlKeyword.h"
 #include "SpecialPixel.h"
 
@@ -54,7 +55,7 @@ namespace Isis {
             i < MaximumNumericLogDataType; i++) {
       try {
         iString thisTypeName = DataTypeToName((NumericLogDataType)i);
- 
+
         if(name == thisTypeName) {
           p_dataType = (NumericLogDataType)i;
           p_numericalValue = keywordRep[0];
@@ -63,7 +64,6 @@ namespace Isis {
         }
       }
       catch(iException &e) {
-std::cerr << "Failed to read log data:" << e.what() << std::endl;
         e.Clear();
       }
     }
@@ -77,9 +77,24 @@ std::cerr << "Failed to read log data:" << e.what() << std::endl;
    * @param protoBuf The protocol buffer version of a log data
    */
   ControlMeasureLogData::ControlMeasureLogData(
-      const PBControlNetLogData_Point_Measure_DataEntry &protoBuf) {
+      const ControlNetLogDataProtoV0001_Point_Measure_DataEntry &protoBuf) {
     p_dataType = (NumericLogDataType)protoBuf.datatype();
     p_numericalValue = protoBuf.datavalue();
+  }
+
+
+  /**
+   * This creates an instance based on the protocol buffer. This assumes the
+   *   protocol buffer is correct and does no extra validation.
+   *
+   * @param protoBuf The protocol buffer version of a log data
+   */
+  ControlMeasureLogData::ControlMeasureLogData(
+      const ControlPointFileEntryV0002_Measure_MeasureLogData &protoBuf) {
+    if(protoBuf.has_doubledatatype()) {
+      p_dataType = (NumericLogDataType)protoBuf.doubledatatype();
+      p_numericalValue = protoBuf.doubledatavalue();
+    }
   }
 
 
@@ -188,17 +203,17 @@ std::cerr << "Failed to read log data:" << e.what() << std::endl;
    *
    * @return A protocol buffer representation of this log data
    */
-  PBControlNetLogData_Point_Measure_DataEntry
+  ControlPointFileEntryV0002_Measure_MeasureLogData
       ControlMeasureLogData::ToProtocolBuffer() const {
     if(!IsValid()) {
       iString msg = "Cannot write an invalid log data entry to binary format";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    PBControlNetLogData_Point_Measure_DataEntry protoBufDataEntry;
+    ControlPointFileEntryV0002_Measure_MeasureLogData protoBufDataEntry;
 
-    protoBufDataEntry.set_datatype(p_dataType);
-    protoBufDataEntry.set_datavalue(p_numericalValue);
+    protoBufDataEntry.set_doubledatatype(p_dataType);
+    protoBufDataEntry.set_doubledatavalue(p_numericalValue);
 
     return protoBufDataEntry;
   }

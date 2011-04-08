@@ -104,6 +104,7 @@ Object = ControlNetwork
   Created      = 2010-07-10T12:50:15
   LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
+  Version      = 2
 
   Object = ControlPoint
     PointType                = Ground

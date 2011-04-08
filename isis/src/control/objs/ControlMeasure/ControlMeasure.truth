@@ -1,104 +1,222 @@
 Test 1 Default values
-Group = ControlMeasure
-  SerialNumber = Null
-  MeasureType  = Candidate
-  ChooserName  = ManuallySet
-  DateTime     = 2001-01-01T00:00:00
-  Sample       = 0.0
-  Line         = 0.0
-End_Group
+Printing measure:
+Object = ControlNetwork
+  NetworkId    = Identifier
+  TargetName   = Null
+  UserName     = Null
+  Created      = Yesterday
+  LastModified = Yesterday
+  Description  = Null
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = CP01
+    ChooserName = Me
+    DateTime    = Yesterday
+
+    Group = ControlMeasure
+      SerialNumber = Null
+      MeasureType  = Candidate
+      ChooserName  = ManuallySet
+      DateTime     = 2001-01-01T00:00:00
+    End_Group
+  End_Object
+End_Object
 End
+Done printing measure.
+
 Test 2
-Group = ControlMeasure
-  SerialNumber   = Test
-  MeasureType    = Candidate
-  ChooserName    = Bob
-  DateTime       = 2005-05-03T00:00:00
-  Ignore         = True
-  Sample         = 1.0
-  Line           = 2.0
-  Diameter       = 15.0
-  AprioriSample  = 2.0
-  AprioriLine    = 5.0
-  SampleSigma    = 0.01 <pixels>
-  LineSigma      = 0.21 <pixels>
-  SampleResidual = -3.0 <pixels>
-  LineResidual   = 4.0 <pixels>
-End_Group
+Printing measure:
+Object = ControlNetwork
+  NetworkId    = Identifier
+  TargetName   = Null
+  UserName     = Null
+  Created      = Yesterday
+  LastModified = Yesterday
+  Description  = Null
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = CP01
+    ChooserName = Me
+    DateTime    = Yesterday
+
+    Group = ControlMeasure
+      SerialNumber   = Test
+      MeasureType    = Candidate
+      ChooserName    = Bob
+      DateTime       = 2005-05-03T00:00:00
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+End_Object
 End
+Done printing measure.
+
 Test 3
-Group = ControlMeasure
-  SerialNumber   = Test
-  MeasureType    = Candidate
-  ChooserName    = Bob
-  DateTime       = 2005-05-03T00:00:00
-  Ignore         = True
-  Sample         = 1.0
-  Line           = 2.0
-  Diameter       = 15.0
-  AprioriSample  = 2.0
-  AprioriLine    = 5.0
-  SampleSigma    = 0.01 <pixels>
-  LineSigma      = 0.21 <pixels>
-  SampleResidual = -3.0 <pixels>
-  LineResidual   = 4.0 <pixels>
-End_Group
+Printing measure:
+Object = ControlNetwork
+  NetworkId    = Identifier
+  TargetName   = Null
+  UserName     = Null
+  Created      = Yesterday
+  LastModified = Yesterday
+  Description  = Null
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = CP01
+    ChooserName = Me
+    DateTime    = Yesterday
+
+    Group = ControlMeasure
+      SerialNumber   = Test
+      MeasureType    = Candidate
+      ChooserName    = Bob
+      DateTime       = 2005-05-03T00:00:00
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+End_Object
 End
+Done printing measure.
+
 Test 4
-Group = ControlMeasure
-  SerialNumber   = Test
-  MeasureType    = Manual
-  ChooserName    = Bob
-  DateTime       = 2005-05-03T00:00:00
-  EditLock       = True
-  Ignore         = True
-  Sample         = 1.0
-  Line           = 2.0
-  Diameter       = 15.0
-  AprioriSample  = 2.0
-  AprioriLine    = 5.0
-  SampleSigma    = 0.01 <pixels>
-  LineSigma      = 0.21 <pixels>
-  SampleResidual = -3.0 <pixels>
-  LineResidual   = 4.0 <pixels>
-End_Group
+Printing measure:
+Object = ControlNetwork
+  NetworkId    = Identifier
+  TargetName   = Null
+  UserName     = Null
+  Created      = Yesterday
+  LastModified = Yesterday
+  Description  = Null
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = CP01
+    ChooserName = Me
+    DateTime    = Yesterday
+
+    Group = ControlMeasure
+      SerialNumber   = Test
+      MeasureType    = Manual
+      ChooserName    = Bob
+      DateTime       = 2005-05-03T00:00:00
+      EditLock       = True
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+End_Object
 End
+Done printing measure.
+
 Test 5
-Group = ControlMeasure
-  SerialNumber   = Test
-  MeasureType    = Manual
-  ChooserName    = Bob
-  DateTime       = 2005-05-03T00:00:00
-  Ignore         = True
-  Sample         = 1.0
-  Line           = 2.0
-  Diameter       = 15.0
-  AprioriSample  = 2.0
-  AprioriLine    = 5.0
-  SampleSigma    = 0.01 <pixels>
-  LineSigma      = 0.21 <pixels>
-  SampleResidual = -3.0 <pixels>
-  LineResidual   = 4.0 <pixels>
-End_Group
+Printing measure:
+Object = ControlNetwork
+  NetworkId    = Identifier
+  TargetName   = Null
+  UserName     = Null
+  Created      = Yesterday
+  LastModified = Yesterday
+  Description  = Null
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = CP01
+    ChooserName = Me
+    DateTime    = Yesterday
+
+    Group = ControlMeasure
+      SerialNumber   = Test
+      MeasureType    = Manual
+      ChooserName    = Bob
+      DateTime       = 2005-05-03T00:00:00
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+End_Object
 End
+Done printing measure.
+
 Test 6
-Group = ControlMeasure
-  SerialNumber   = Test
-  MeasureType    = RegisteredSubPixel
-  ChooserName    = Bob
-  DateTime       = 2005-05-03T00:00:00
-  Ignore         = True
-  Sample         = 1.0
-  Line           = 2.0
-  Diameter       = 15.0
-  AprioriSample  = 2.0
-  AprioriLine    = 5.0
-  SampleSigma    = 0.01 <pixels>
-  LineSigma      = 0.21 <pixels>
-  SampleResidual = -3.0 <pixels>
-  LineResidual   = 4.0 <pixels>
-End_Group
+Printing measure:
+Object = ControlNetwork
+  NetworkId    = Identifier
+  TargetName   = Null
+  UserName     = Null
+  Created      = Yesterday
+  LastModified = Yesterday
+  Description  = Null
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = CP01
+    ChooserName = Me
+    DateTime    = Yesterday
+
+    Group = ControlMeasure
+      SerialNumber   = Test
+      MeasureType    = RegisteredSubPixel
+      ChooserName    = Bob
+      DateTime       = 2005-05-03T00:00:00
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+End_Object
 End
+Done printing measure.
+
 Test 7
 AprioriLine=5
 AprioriSample=2

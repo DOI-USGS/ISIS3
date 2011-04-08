@@ -25,7 +25,8 @@
 
 namespace Isis {
   class iString;
-  class PBControlNetLogData_Point_Measure_DataEntry;
+  class ControlNetLogDataProtoV0001_Point_Measure_DataEntry;
+  class ControlPointFileEntryV0002_Measure_MeasureLogData;
   class PvlKeyword;
 
   /**
@@ -129,7 +130,9 @@ namespace Isis {
       ControlMeasureLogData(PvlKeyword);
       ControlMeasureLogData(NumericLogDataType, double value);
       ControlMeasureLogData(
-          const PBControlNetLogData_Point_Measure_DataEntry &);
+          const ControlNetLogDataProtoV0001_Point_Measure_DataEntry &);
+      ControlMeasureLogData(
+          const ControlPointFileEntryV0002_Measure_MeasureLogData &);
       ControlMeasureLogData(const ControlMeasureLogData & other);
       ~ControlMeasureLogData();
 
@@ -141,7 +144,8 @@ namespace Isis {
       bool IsValid() const;
       PvlKeyword ToKeyword() const;
 
-      PBControlNetLogData_Point_Measure_DataEntry ToProtocolBuffer() const;
+      ControlPointFileEntryV0002_Measure_MeasureLogData 
+          ToProtocolBuffer() const;
 
       iString DataTypeToName(NumericLogDataType) const;
 

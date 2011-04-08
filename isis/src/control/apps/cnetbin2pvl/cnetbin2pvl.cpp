@@ -16,6 +16,6 @@ void IsisMain() {
   p.SetText("Writing Control Network...");
   p.SetMaximumSteps(1);
   p.CheckStatus();
-  cnet.WritePvl(ui.GetFilename("TO"));
+  cnet.Write(ui.GetFilename("TO"), true);
   p.CheckStatus();
 }

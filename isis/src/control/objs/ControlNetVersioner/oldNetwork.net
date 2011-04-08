@@ -1,0 +1,51 @@
+Object = ControlNetwork
+  NetworkId    = TestNet01
+  NetworkType  = ImageToGround
+  TargetName   = Titan
+  UserName     = bgeorge
+  Created      = Null
+  LastModified = Null
+  Description  = "Test Network"
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = 1001
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467436709.122
+      MeasureType    = ValidatedManual
+      Sample         = 893.0
+      Line           = 616.0
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False 
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467443189.122
+      MeasureType    = ValidatedManual
+      Reference      = True
+      Sample         = 799.25
+      Line           = 701.21
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = ValidatedManual
+      Sample         = 569.01
+      Line           = 807.23
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      Diameter       = 0.0
+      Reference      = False
+    End_Group
+  End_Object
+End_Object
+End

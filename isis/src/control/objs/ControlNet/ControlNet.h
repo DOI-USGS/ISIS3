@@ -25,7 +25,9 @@
 
 #include <QObject> // parent class
 
-#include "PBControlNetIO.pb.h"
+#include <map>
+
+#include "ControlNetFile.h"
 
 #include "iString.h"
 
@@ -82,18 +84,9 @@ namespace Isis {
    *                <QString, ControlPoint> called 'p_pointsHash'. This was
    *                done to speed up the Add method which was essentially
    *                slowing down the reading or creation of Control Networks.
-   *   @history 2010-01-12 Tracie Sucharski Added support for binary networds,
-   *                added new parameters, renamed ComputeErrors to
-   *                ComputeResiduals, renamed MaximumError to MaximumResidual,
-   *                renamed AverageError to AverageResidual.
    *   @history 2010-05-06 Tracie Sucharski Use defaults of 0. instead of
    *                Isis::Null, because 0. is the default in the protocol
    *                buffers.
-   *   @history 2010-08-05 Steven Lambright New label format much closer to a
-   *                cube so that we can expand upon it easily later. Also added
-   *                support for more than just the protocol buffer in the file,
-   *                at the current cost of reading the protocol buffer's binary
-   *                data into memory. This might need to be changed later.
    *   @history 2010-08-06 Tracie Sucharski Updated for changes made after
    *                additional working sessions for Control network design.
    *   @history 2009-09-01 Eric Hyer Added two includes: QVector and QString
@@ -144,10 +137,6 @@ namespace Isis {
    *                work with ControlPoint's SetId()
    *   @history 2011-03-29 Steven Lambright - Made versioning viable for first
    *                release.
-   *   @history 2011-04-04 Steven Lambright - Reading is more likely to work...
-   *                not sure why my changes fixed it for very large networks.
-   *                Binary reads now do the same progress as Pvl for console
-   *                output consistency (and because it can take time).
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -158,15 +147,12 @@ namespace Isis {
     public:
       ControlNet();
       ControlNet(const ControlNet &other);
-      ControlNet(const iString &ptfile, Progress *progress = 0);
+      ControlNet(const iString &filename, Progress *progress = 0);
 
       ~ControlNet();
 
-      void ReadControl(const iString &ptfile, Progress *progress = 0);
-      void ReadPBControl(const iString &ptfile, Progress *progress = 0);
-      void Write(const iString &ptfile, bool pvl = false);
-      void WritePB(const iString &ptfile);
-      void WritePvl(const iString &ptfile);
+      void ReadControl(const iString &filename, Progress *progress = 0);
+      void Write(const iString &filename, bool pvl = false);
 
       void AddPoint(ControlPoint *point);
       void DeletePoint(ControlPoint *point);
@@ -266,8 +252,6 @@ namespace Isis {
       iString p_modified;              //!< Date Last Modified
       iString p_description;           //!< Textual Description of network
       iString p_userName;              //!< The user who created the network
-      int p_numMeasures;          //!< Total number of measures in the network
-      int p_numIgnoredMeasures;            //!< Number of ignored measures
       std::map<iString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
       std::map<std::string, int> p_cameraMeasuresMap; //!< A map from serialnumber to #measures
       std::map<std::string, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
@@ -277,6 +261,6 @@ namespace Isis {
 
       bool p_invalid;  //!< If the Control Network is currently invalid
   };
-};
+}
 
 #endif

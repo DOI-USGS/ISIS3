@@ -35,10 +35,9 @@ namespace Isis {
   class Camera;
   class ControlMeasureLogData;
   class ControlPoint;
+  class ControlPointFileEntryV0002_Measure;
   class ControlCubeGraphNode;
   class iString;
-  class PBControlNet_PBControlPoint_PBControlMeasure;
-  class PBControlNetLogData_Point_Measure;
   class PvlGroup;
   class PvlKeyword;
 
@@ -149,6 +148,8 @@ namespace Isis {
    *   @history 2011-03-14 Eric Hyer - ControlMeasures now notify their network
    *                when their ignored status changes.
    *   @history 2011-04-04 Steven Lambright - Removed an old constructor
+   *   @history 2011-04-07 Steven Lambright - GetResidualMagnitude no longer
+   *                              does math on special pixels.
    */
   class ControlMeasure {
       friend class ControlPoint;
@@ -216,15 +217,12 @@ namespace Isis {
       };
 
       ControlMeasure();
-      ControlMeasure(const PBControlNet_PBControlPoint_PBControlMeasure &,
-          const PBControlNetLogData_Point_Measure &);
+      ControlMeasure(const ControlPointFileEntryV0002_Measure &);
       ControlMeasure(const ControlMeasure &other);
       ~ControlMeasure();
 
       ControlPoint *Parent() { return parentPoint; }
       ControlCubeGraphNode *ControlSN() { return associatedCSN; }
-
-      void Load(PvlGroup &p);
 
       Status SetAprioriLine(double aprioriLine);
       Status SetAprioriSample(double aprioriSample);
@@ -287,7 +285,6 @@ namespace Isis {
 
       QList<QStringList> PrintableClassData() const;
 
-      PvlGroup CreatePvlGroup();
       static iString MeasureTypeToString(MeasureType type);
       static MeasureType StringToMeasureType(QString str);
       iString GetMeasureTypeString() const;
@@ -296,11 +293,9 @@ namespace Isis {
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
       bool operator == (const Isis::ControlMeasure &pMeasure) const;
 
-      PBControlNet_PBControlPoint_PBControlMeasure ToProtocolBuffer() const;
-      PBControlNetLogData_Point_Measure GetLogProtocolBuffer() const;
+      ControlPointFileEntryV0002_Measure ToProtocolBuffer() const;
 
     private: // methods
-      void Init(const PBControlNet_PBControlPoint_PBControlMeasure &);
       void InitializeToNull();
       void MeasureModified();
 

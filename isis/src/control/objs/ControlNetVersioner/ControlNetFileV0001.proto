@@ -2,7 +2,7 @@
 
 package Isis;
 
-message PBControlNet {
+message ControlNetFileProtoV0001 {
 // Version tracking so we know which version of the code we are dealing with
   message Pedigree {
     required float  version = 1 [default = 1.0];
@@ -32,8 +32,8 @@ message PBControlNet {
       User              = 1;
       AverageOfMeasures = 2;
       Reference         = 3;
-      Ellipsoid         = 4;  
-      DEM               = 5;  
+      Ellipsoid         = 4;
+      DEM               = 5;
       Basemap           = 6;
       BundleSolution    = 7;
     }
@@ -48,7 +48,7 @@ message PBControlNet {
     optional bool           jigsawRejected = 7 [default = false];
     optional int32          referenceIndex = 21;
 
-    optional AprioriSource        aprioriSurfPointSource = 8; 
+    optional AprioriSource        aprioriSurfPointSource = 8;
     optional string               aprioriSurfPointSourceFile = 9;
     optional AprioriSource        aprioriRadiusSource = 10;
     optional string               aprioriRadiusSourceFile = 11;
@@ -78,8 +78,8 @@ message PBControlNet {
       enum MeasureType {
 //        Reference           = 0;   // Reference (or truth) measure
         Candidate           = 1;   // (e.g., autoseed, interest) AKA predicted, unmeasured, unverified
-        Manual              = 2;   // Hand Measured (e.g., qnet)                                      
-        RegisteredPixel     = 3;   // Automatically registered to whole pixel (e.g.,pointreg/qnet)           
+        Manual              = 2;   // Hand Measured (e.g., qnet)
+        RegisteredPixel     = 3;   // Automatically registered to whole pixel (e.g.,pointreg/qnet)
         RegisteredSubPixel  = 4;   // Automatically registered to sub-pixel (e.g., pointreg/qnet)
 //        Ground              = 5;   // Measure holding coordinate information in ground source
       }
@@ -131,3 +131,19 @@ message PBControlNet {
   optional PBNetCubes netcubes = 9;
 }
 
+message ControlNetLogDataProtoV0001 {
+  message Point {
+    message Measure {
+      message DataEntry {
+        required int32 dataType = 2;
+        required double dataValue = 3;
+      }
+
+      repeated DataEntry loggedMeasureData = 2;
+    }
+
+    repeated Measure measures = 2;
+  }
+
+  repeated Point points = 1;
+}

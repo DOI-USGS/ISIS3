@@ -1,9 +1,8 @@
 #include "IsisDebug.h"
 
-#include <iostream>
-
 #include "ControlNet.h"
 
+#include <iostream>
 #include <cmath>
 #include <sstream>
 
@@ -12,32 +11,26 @@
 #include <QQueue>
 #include <QTime>
 
-#include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 #include "Application.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
+#include "ControlNetVersioner.h"
 #include "ControlPoint.h"
 #include "ControlCubeGraphNode.h"
 #include "Distance.h"
 #include "iException.h"
 #include "iTime.h"
-#include "PBControlNetIO.pb.h"
-#include "PBControlNetLogData.pb.h"
+#include "ControlNetFile.h"
 #include "Progress.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
 
 using namespace std;
-using namespace google::protobuf;
-using namespace google::protobuf::io;
 using namespace boost::numeric::ublas;
-using namespace google::protobuf::io;
 
 
 namespace Isis {
@@ -56,8 +49,6 @@ namespace Isis {
     pointIds = new QStringList;
 
     p_invalid = false;
-    p_numMeasures = 0;
-    p_numIgnoredMeasures = 0;
     p_created = Application::DateTime();
     p_modified = Application::DateTime();
   }
@@ -110,12 +101,11 @@ namespace Isis {
     p_modified = other.p_modified;
     p_description = other.p_description;
     p_userName = other.p_userName;
-    p_numMeasures = other.p_numMeasures;
-    p_numIgnoredMeasures = other.p_numIgnoredMeasures;
     p_invalid = other.p_invalid;
     p_cameraMap = other.p_cameraMap;
     p_cameraList = other.p_cameraList;
   }
+
 
   /**
    * Creates a ControlNet object with the given list of control points and cubes
@@ -131,8 +121,6 @@ namespace Isis {
     pointIds = new QStringList;
 
     p_invalid = false;
-    p_numMeasures = 0;
-    p_numIgnoredMeasures = 0;
     ReadControl(ptfile, progress);
   }
 
@@ -189,209 +177,32 @@ namespace Isis {
    *                           in ControlPoint.
    *
    */
-  void ControlNet::ReadControl(const iString &ptfile, Progress *progress) {
+  void ControlNet::ReadControl(const iString &filename, Progress *progress) {
     if (progress != NULL) {
       progress->SetText("Loading Control Points...");
     }
 
-    Pvl p(ptfile);
+    LatestControlNetFile *fileData = ControlNetVersioner::Read(filename);
 
-    //Test to see if this is a binary control net file.
-    if (p.HasObject("ProtoBuffer")) {
-      ReadPBControl(ptfile, progress);
-    }
-    else {
-      try {
-        PvlObject &cn = p.FindObject("ControlNetwork");
+    ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
+    p_networkId     = header.networkid();
+    SetTarget(header.targetname());
+    p_userName      = header.username();
+    p_created       = header.created();
+    p_modified      = header.lastmodified();
+    p_description   = header.description();
 
-        if (cn.HasKeyword("NetworkId"))
-          p_networkId = cn["NetworkId"][0];
-        SetTarget(iString((std::string) cn["TargetName"]));
-        p_userName = (std::string)cn["UserName"];
-        p_created = (std::string)cn["Created"];
-        p_modified = (std::string)cn["LastModified"];
-        if (cn.HasKeyword("Description"))
-          p_description = cn["Description"][0];
+    QList< ControlPointFileEntryV0002 > &fileDataPoints =
+        fileData->GetNetworkPoints();
 
-        // Prep for reporting progress
-        if (progress != NULL) {
-          progress->SetMaximumSteps(cn.Objects());
-          progress->CheckStatus();
-        }
-        for (int i = 0; i < cn.Objects(); i++) {
-          try {
-            if (cn.Object(i).IsNamed("ControlPoint")) {
-              ControlPoint *newPoint = new ControlPoint;
-              SurfacePoint sp = newPoint->GetAdjustedSurfacePoint();
-              sp.SetRadii(p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]);
-              newPoint->SetAdjustedSurfacePoint(sp);
-              sp = newPoint->GetAprioriSurfacePoint();
-              sp.SetRadii(p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]);
-              newPoint->SetAprioriSurfacePoint(sp);
-              newPoint->Load(cn.Object(i));
-              p_numMeasures += newPoint->GetNumMeasures();
-              if (newPoint->IsIgnored()) {
-                p_numIgnoredMeasures += newPoint->GetNumMeasures();
-              }
-              else {
-                QList< QString > measureIds = newPoint->GetCubeSerialNumbers();
-                for (int i = 0; i < measureIds.size(); i++) {
-                  if ((*newPoint)[measureIds[i]]->IsIgnored())
-                    p_numIgnoredMeasures++;
-                }
-              }
-              AddPoint(newPoint);
-            }
-          }
-          catch (iException &e) {
-            iString msg = "Invalid Control Point at position [" + iString(i)
-                + "]";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
-          }
-          if (progress != NULL)
-            progress->CheckStatus();
-        }
-      }
-      catch (iException &e) {
-        iString msg = "Invalid Format in [" + ptfile + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-    }
-  }
-
-
-  /**
-   * Read control network from a google protocol binary file
-   *
-   * @param ptfile
-   *
-   * @history 2010-08-06 Tracie Sucharski, Updated for changes made after
-   *                           additional working sessions for Control network
-   *                           design.
-   * @history 2010-09-01 Tracie Sucharski, Use google::protobuf coded input
-   *                           stream so we can set the byte limits.
-   * @history 2010-10-06 Tracie Sucharski, Changed long to BigInt.
-   * @history 2010-12-09 Tracie Sucharski, Added new measure type of Ground
-   * @history 2011-04-02 Debbie A. Cook, Updated ControlPoint constructor
-   */
-  void ControlNet::ReadPBControl(const iString &ptfile, Progress *progress) {
-    // Create an input file stream with the input file.
-    Pvl protoFile(ptfile);
-
-    PvlObject &protoBufferInfo = protoFile.FindObject("ProtoBuffer");
-    PvlGroup &cnetInfo = protoBufferInfo.FindGroup("ControlNetworkInfo");
-
-    int version = -1;
-
-    if(cnetInfo.HasKeyword("Version"))
-      version = cnetInfo["Version"][0];
-    // This should be able to go away by v2 or v3, they were made only
-    //   internally.
-    else if(cnetInfo.HasKeyword("Proto_Version"))
-      version = (int)((double)cnetInfo["Proto_Version"][0] + 0.5);
-
-    if(version != 1) {
-      if(version > 1) {
-        iString msg = "The control network file [" + ptfile + "] is too new "
-                      "for this version of Isis to read. The version is [" +
-                      iString(version) + "] which is greater than the known "
-                      "version 1.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-      else {
-        iString msg = "The control network file [" + ptfile + "] has an unknown"
-                      " version and is probably too new for this version of "
-                      "Isis to read. The maximum version that can be read is 1";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-    }
-
-    PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
-    BigInt coreStartPos = protoBufferCore["StartByte"];
-    BigInt coreLength =  protoBufferCore["Bytes"];
-
-    fstream input(ptfile.c_str(), ios::in | ios::binary);
-    if (!input.is_open()) {
-      string msg = "Failed to open PB file" + ptfile;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    input.seekg(coreStartPos, ios::beg);
-    IstreamInputStream inStream(&input);
-    CodedInputStream codedInStream(&inStream);
-    codedInStream.PushLimit(coreLength);
-    // max 512MB, warn at 400MB
-    codedInStream.SetTotalBytesLimit(coreLength, coreLength);
-
-    PBControlNet pbnet;
-
-
-    // Now stream the rest of the input into the google protocol buffer.
-    try {
-      if (!pbnet.ParseFromCodedStream(&codedInStream)) {
-        string msg = "Failed to read input PB file " + ptfile;
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-      }
-    }
-    catch (...) {
-      string msg = "Cannot parse binary PB file";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
-    }
-
-    PBControlNetLogData logData;
-
-    PvlObject &logDataInfo = protoBufferInfo.FindObject("LogData");
-    BigInt logStartPos = logDataInfo["StartByte"];
-    BigInt logLength = logDataInfo["Bytes"];
-
-    input.clear();
-    input.seekg(logStartPos, ios::beg);
-    IstreamInputStream logInStream(&input);
-    CodedInputStream codedLogInStream(&logInStream);
-    codedLogInStream.PushLimit(logLength);
-    // max 512MB, warn at 400MB
-    codedLogInStream.SetTotalBytesLimit(logLength, logLength);
-
-    // Now stream the rest of the input into the google protocol buffer.
-    try {
-      if (!logData.ParseFromCodedStream(&codedLogInStream)) {
-        string msg = "Failed to read log data in PB file [" + ptfile + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-      }
-    }
-    catch (...) {
-      string msg = "Cannot parse binary PB file's log data";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
-    }
-
-    // Set the private variable to the read in values from the input file.
-    p_networkId = pbnet.networkid();
-    SetTarget(pbnet.targetname());
-    p_created = pbnet.created();
-    p_modified = pbnet.lastmodified();
-    p_description = pbnet.description();
-    p_userName = pbnet.username();
-
-    if (progress != NULL) {
-      progress->SetMaximumSteps(pbnet.points_size());
-      progress->CheckStatus();
-    }
-
-    // Create a PvlObject for each point and create an Isis::ControlPoint
-    // and call the Load(PvlObject &p, bool forceBuild = false) command with the pvlobject.
-    for (int pnts = 0 ; pnts < pbnet.points_size(); pnts++) {
-      ControlPoint *point = new ControlPoint(pbnet.points(pnts),
-                                             logData.points(pnts),
-                                             p_targetRadii);
-      point->parentNetwork = this;
-      AddPoint(point);
-
-      if (progress != NULL) {
+    ControlPointFileEntryV0002 fileDataPoint;
+    foreach(fileDataPoint, fileDataPoints) {
+      AddPoint(new ControlPoint(fileDataPoint));
+      if (progress != NULL)
         progress->CheckStatus();
-      }
     }
-
-    input.close();
+    delete fileData;
+    fileData = NULL;
   }
 
 
@@ -412,152 +223,31 @@ namespace Isis {
    *                     be written.
    */
   void ControlNet::Write(const iString &ptfile, bool pvl) {
-    if (pvl) {
-      WritePvl(ptfile);
-    }
-    else {
-      WritePB(ptfile);
-    }
-  }
+    LatestControlNetFile *fileData = new LatestControlNetFile();
 
+    ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
 
-  /**
-   *
-   *
-   *
-   * @param ptfile
-   * @history 2011-03-18 Debbie A. Cook and Steven Lambright - Added delete of blankLabel
-   */
-  void ControlNet::WritePB(const iString &ptfile) {
-    //  Clear message before writing new
-    PBControlNet pbnet;
-    PBControlNetLogData logData;
+    header.set_networkid(p_networkId);
+    header.set_targetname(p_targetName);
+    header.set_username(p_userName);
+    header.set_created(p_created);
+    header.set_lastmodified(p_modified);
+    header.set_description(p_description);
 
-    //  Gotta assign the Pedigree explicitly even though they default, otherwise
-    //  they do not make it to the output file and error out!  Yes, this is by
-    //  design.
-    pbnet.mutable_pedigree()->set_version(pbnet.pedigree().version());
-    pbnet.mutable_pedigree()->set_date(pbnet.pedigree().date());
-
-    pbnet.set_networkid(p_networkId);
-    pbnet.set_targetname(p_targetName);
-    pbnet.set_created(p_created);
-    pbnet.set_lastmodified(p_modified);
-    pbnet.set_description(p_description);
-    pbnet.set_username(p_userName);
-
-    //  Now create ControlPoints
-    for (int i = 0; i < pointIds->size(); i++) {
-      ControlPoint *point = points->value(pointIds->at(i));
-      *pbnet.add_points() = point->ToProtocolBuffer();
-      *logData.add_points() = point->GetLogProtocolBuffer();
-    }
-
-    const int labelBytes = 65536;
-    fstream output(ptfile.c_str(), ios::out | ios::trunc | ios::binary);
-
-    char *blankLabel = new char[labelBytes];
-    memset(blankLabel, 0, labelBytes);
-    output.write(blankLabel, labelBytes);
-    delete [] blankLabel;
-
-    streampos startCorePos = output.tellp();
-
-    if (!pbnet.SerializeToOstream(&output)) {
-      string msg = "Failed to write output PB file [" + ptfile + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    output.clear();
-    output.seekg(0, ios::end);
-
-    streampos coreSize = output.tellp() - startCorePos;
-
-    streampos startLogPos = output.tellp();
-    if (!logData.SerializeToOstream(&output)) {
-      string msg = "Failed to write output PB file [" + ptfile + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    streampos logSize = output.tellp() - startLogPos;
-
-    Pvl p;
-    PvlObject protoObj("ProtoBuffer");
-
-    PvlObject protoCore("Core");
-    protoCore.AddKeyword(PvlKeyword("StartByte", iString(startCorePos)));
-    protoCore.AddKeyword(PvlKeyword("Bytes", iString(coreSize)));
-    protoObj.AddObject(protoCore);
-
-    PvlGroup netInfo("ControlNetworkInfo");
-    netInfo.AddComment("This group is for informational purposes only");
-    netInfo += Isis::PvlKeyword("NetworkId", p_networkId);
-    netInfo += Isis::PvlKeyword("TargetName", p_targetName);
-    netInfo += Isis::PvlKeyword("UserName", p_userName);
-    netInfo += Isis::PvlKeyword("Created", p_created);
-    netInfo += Isis::PvlKeyword("LastModified", p_modified);
-    netInfo += Isis::PvlKeyword("Description", p_description);
-    netInfo += Isis::PvlKeyword("NumberOfPoints", GetNumPoints());
-    netInfo += Isis::PvlKeyword("NumberOfMeasures", GetNumMeasures());
-    netInfo += Isis::PvlKeyword("Version", "1");
-    protoObj.AddGroup(netInfo);
-
-    // Now write the log data section
-    PvlObject logInfo("LogData");
-    logInfo.AddKeyword(PvlKeyword("StartByte", iString(startLogPos)));
-    logInfo.AddKeyword(PvlKeyword("Bytes", iString(logSize)));
-    protoObj.AddObject(logInfo);
-
-    p.AddObject(protoObj);
-
-    output.seekp(0, ios::beg);
-    output << p;
-    output << '\n';
-    output.close();
-  }
-
-
-  /**
-   * Writes out the ControlPoints in Pvl format
-   *
-   * @param ptfile Name of file containing a Pvl list of control points
-   * @throws Isis::iException::Programmer - "Invalid Net
-   *             Enumeration"
-   * @throws Isis::iException::Io - "Unable to write PVL
-   *             infomation to file"
-   */
-  void ControlNet::WritePvl(const iString &ptfile) {
-
-    Pvl p;
-    PvlObject net("ControlNetwork");
-    net += PvlKeyword("NetworkId", p_networkId);
-
-    net += PvlKeyword("TargetName", p_targetName);
-    net += PvlKeyword("UserName", p_userName);
-    iString mod = iString(p_modified).UpCase();
-    if (mod == "NULL"  ||  mod == "") {
-      SetModifiedDate(Isis::iTime::CurrentLocalTime());
-    }
-    net += PvlKeyword("Created", p_created);
-    net += PvlKeyword("LastModified", p_modified);
-    net += PvlKeyword("Description", p_description);
+    QList< ControlPointFileEntryV0002 > &fileDataPoints =
+        fileData->GetNetworkPoints();
 
     for (int i = 0; i < pointIds->size(); i++) {
       ControlPoint *point = points->value(pointIds->at(i));
-      PvlObject cp = point->ToPvlObject();
-      net.AddObject(cp);
+
+      ControlPointFileEntryV0002 pointFileEntry = point->ToFileEntry();
+      fileDataPoints.append(pointFileEntry);
     }
 
-    p.AddObject(net);
+    ControlNetVersioner::Write(ptfile, *fileData, pvl);
 
-    try {
-      p.Write(ptfile);
-    }
-    catch (iException e) {
-      iString message = "Unable to write PVL infomation to file [" +
-          ptfile + "]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
-    }
+    delete fileData;
+    fileData = NULL;
   }
 
 
@@ -1619,8 +1309,6 @@ namespace Isis {
     p_modified = other.p_modified;
     p_description = other.p_description;
     p_userName = other.p_userName;
-    p_numMeasures = other.p_numMeasures;
-    p_numIgnoredMeasures = other.p_numIgnoredMeasures;
     p_invalid = other.p_invalid;
     p_cameraMap = other.p_cameraMap;
     p_cameraList = other.p_cameraList;

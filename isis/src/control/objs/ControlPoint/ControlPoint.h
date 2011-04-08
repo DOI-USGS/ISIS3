@@ -36,6 +36,7 @@ class QStringList;
 namespace Isis {
   class ControlMeasure;
   class ControlNet;
+  class ControlPointFileEntryV0002;
   class Latitude;
   class Longitude;
   class PBControlNet_PBControlPoint;
@@ -343,9 +344,7 @@ namespace Isis {
       ControlPoint();
       ControlPoint(const ControlPoint &);
       ControlPoint(const iString &id);
-      ControlPoint(const PBControlNet_PBControlPoint &,
-                   const PBControlNetLogData_Point &,
-                   const std::vector<Distance> &targetRadii);
+      ControlPoint(const ControlPointFileEntryV0002 &fileEntry);
       ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }
@@ -442,8 +441,6 @@ namespace Isis {
       QList< ControlMeasure * > GetMeasures(bool excludeIgnored = false) const;
       QList< QString > GetCubeSerialNumbers() const;
 
-      PvlObject ToPvlObject() const;
-
       const ControlMeasure *operator[](iString serialNumber) const;
       ControlMeasure *operator[](iString serialNumber);
 
@@ -459,14 +456,11 @@ namespace Isis {
       void SetNumberOfRejectedMeasures(int numRejected);
       int GetNumberOfRejectedMeasures() const;
 
-      PBControlNet_PBControlPoint ToProtocolBuffer() const;
-      PBControlNetLogData_Point GetLogProtocolBuffer() const;
-
+      ControlPointFileEntryV0002 ToFileEntry() const;
 
     private:
       void ValidateMeasure(iString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
-      void Init(const PBControlNet_PBControlPoint &);
       void PointModified();
 
 

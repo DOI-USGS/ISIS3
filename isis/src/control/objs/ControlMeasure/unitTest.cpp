@@ -6,6 +6,8 @@
 #include <QStringList>
 
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 #include "ControlMeasureLogData.h"
 #include "iException.h"
 #include "Preference.h"
@@ -103,7 +105,19 @@ int main() {
 }
 
 void outit(ControlMeasure &d) {
-  Pvl pvl;
-  pvl.AddGroup(d.CreatePvlGroup());
-  cout << pvl << endl;
+  ControlNet net;
+  ControlPoint *pt = new ControlPoint;
+  pt->Add(new ControlMeasure(d));
+  pt->SetId("CP01");
+  pt->SetChooserName("Me");
+  pt->SetDateTime("Yesterday");
+  net.AddPoint(pt);
+  net.SetNetworkId("Identifier");
+  net.SetCreatedDate("Yesterday");
+  net.SetModifiedDate("Yesterday");
+  net.Write("./tmp.net", true);
+  Pvl tmp("./tmp.net");
+  cout << "Printing measure:\n" << tmp << "\nDone printing measure." << endl
+       << endl;
+  remove("./tmp.net");
 }

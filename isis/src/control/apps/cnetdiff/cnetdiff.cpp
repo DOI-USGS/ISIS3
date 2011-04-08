@@ -6,6 +6,8 @@
 #include <QList>
 #include <QString>
 
+#include "ControlNetVersioner.h"
+#include "ControlNetFile.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
@@ -25,8 +27,8 @@ PvlGroup ignorekeys;
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
 void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2);
-void Compare(const ControlPoint *point1, const ControlPoint *point2);
-void Compare(ControlNet net1, ControlNet net2);
+void Compare(const PvlObject &point1, const PvlObject &point2);
+void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -37,8 +39,10 @@ void IsisMain() {
   differenceReason = "";
   filesMatch = true;
 
-  const ControlNet net1(ui.GetFilename("FROM"));
-  const ControlNet net2(ui.GetFilename("FROM2"));
+  LatestControlNetFile *net1 = ControlNetVersioner::Read(
+      ui.GetFilename("FROM"));
+  LatestControlNetFile *net2 = ControlNetVersioner::Read(
+      ui.GetFilename("FROM2"));
 
   if(ui.WasEntered("DIFF")) {
     Pvl diffFile(ui.GetFilename("DIFF"));
@@ -60,6 +64,9 @@ void IsisMain() {
 
   Compare(net1, net2);
 
+  delete net1;
+  delete net2;
+
   PvlGroup differences("Results");
   if(filesMatch) {
     differences += PvlKeyword("Compare", "Identical");
@@ -80,41 +87,56 @@ void IsisMain() {
   differenceReason = "";
 }
 
-void Compare(ControlNet net1, ControlNet net2) {
-  if(net1.GetNumPoints() != net2.GetNumPoints()) {
+void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
+  Pvl net1Pvl(net1->ToPvl());
+  Pvl net2Pvl(net2->ToPvl());
+
+  PvlObject &net1Obj = net1Pvl.FindObject("ControlNetwork");
+  PvlObject &net2Obj = net2Pvl.FindObject("ControlNetwork");
+
+  BigInt net1NumPts = net1Obj.Objects();
+  BigInt net2NumPts = net2Obj.Objects();
+
+  if(net1NumPts != net2NumPts) {
     differenceReason = "The number of control points in the networks, [" +
-                       iString(net1.GetNumPoints()) + "] and [" +
-                       iString(net2.GetNumPoints()) + ", differ";
+                       iString(net1NumPts) + "] and [" +
+                       iString(net2NumPts) + ", differ";
     filesMatch = false;
     return;
   }
 
-  if(net1.GetNetworkId() != net2.GetNetworkId()) {
-    differenceReason = "The network IDs, [" +
-                       iString(net1.GetNetworkId()) + "] and [" +
-                       iString(net2.GetNetworkId()) + " differ";
+  iString id1 = net1Obj["NetworkId"][0];
+  iString id2 = net2Obj["NetworkId"][0];
+
+  if(id1 != id2) {
+    differenceReason = "The network IDs [" +
+                       id1 + "] and [" +
+                       id2 + " differ";
     filesMatch = false;
     return;
   }
 
-  if(net1.GetTarget() != net2.GetTarget()) {
-    differenceReason = "The targets, [" +
-                       iString(net1.GetTarget()) + "] and [" +
-                       iString(net2.GetTarget()) + " differ";
+  iString target1 = net1Obj["TargetName"][0];
+  iString target2 = net2Obj["TargetName"][0];
+
+  if(target1 != target2) {
+    differenceReason = "The targets [" +
+                       target1 + "] and [" +
+                       target2 + " differ";
     filesMatch = false;
     return;
   }
 
-  QList <QString> net1Points = net1.GetPointIds();
-  QList <QString> net2Points = net2.GetPointIds();
-  qSort(net1Points);
-  qSort(net2Points);
+//  QList <QString> net1Points = net1.GetPointIds();
+//  QList <QString> net2Points = net2.GetPointIds();
+//  qSort(net1Points);
+//  qSort(net2Points);
 
-  for(int cpIndex = 0; cpIndex < net1Points.size(); cpIndex ++) {
-    const ControlPoint *net1Point = net1.GetPoint(net1Points[cpIndex]);
-    const ControlPoint *net2Point = net2.GetPoint(net2Points[cpIndex]);
+  for(int cpIndex = 0; cpIndex < net1NumPts; cpIndex ++) {
+    PvlObject &cp1 = net1Obj.Object(cpIndex);
+    PvlObject &cp2 = net2Obj.Object(cpIndex);
 
-    Compare(net1Point, net2Point);
+    Compare(cp1, cp2);
 
     if(!filesMatch) {
       return;
@@ -122,10 +144,7 @@ void Compare(ControlNet net1, ControlNet net2) {
   }
 }
 
-void Compare(const ControlPoint *point1, const ControlPoint *point2) {
-  PvlObject point1Pvl = point1->ToPvlObject();
-  PvlObject point2Pvl = point2->ToPvlObject();
-
+void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   // both names must be at least equal, should be named ControlPoint
   if(point1Pvl.Name() != point2Pvl.Name()) {
     iString msg = "The control points' CreatePvlOject method returned an "
@@ -145,8 +164,8 @@ void Compare(const ControlPoint *point1, const ControlPoint *point2) {
 
   // Now compare each measure
   for(int cmIndex = 0; filesMatch && cmIndex < point1Pvl.Groups(); cmIndex ++) {
-    PvlGroup &measure1 = point1Pvl.Group(cmIndex);
-    PvlGroup &measure2 = point2Pvl.Group(cmIndex);
+    const PvlGroup &measure1 = point1Pvl.Group(cmIndex);
+    const PvlGroup &measure2 = point2Pvl.Group(cmIndex);
 
     CompareGroups(measure1, measure2);
 
@@ -157,7 +176,7 @@ void Compare(const ControlPoint *point1, const ControlPoint *point2) {
   }
 
   if(!filesMatch) {
-    differenceReason = "Control Point [" + point1->GetId() +
+    differenceReason = "Control Point [" + point1Pvl["PointId"][0] +
                        "] " + differenceReason;
   }
 }

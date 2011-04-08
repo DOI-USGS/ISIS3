@@ -1,0 +1,184 @@
+Object = ControlNetwork
+  NetworkId    = ""
+  NetworkType  = ImageToImage
+  TargetName   = ""
+  UserName     = ""
+  Created      = ""
+  LastModified = ""
+  Description  = ""
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = "1"
+
+    Group = ControlMeasure
+      SerialNumber   = "M1"
+      MeasureType    = Estimated
+      Sample         = 1
+      Line           = 1
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = "M2"
+      MeasureType    = Estimated
+      Sample         = 1
+      Line           = 1
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = "2"
+
+    Group = ControlMeasure
+      SerialNumber   = "M1"
+      MeasureType    = Estimated
+      Sample         = 100
+      Line           = 1
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = "M2"
+      MeasureType    = Estimated
+      Sample         = 1000
+      Line           = 1
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = "3"
+
+    Group = ControlMeasure
+      SerialNumber   = "M1"
+      MeasureType    = Estimated
+      Sample         = 1
+      Line           = 500
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = "M2"
+      MeasureType    = Estimated
+      Sample         = 250
+      Line           = 500
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = "4"
+
+    Group = ControlMeasure
+      SerialNumber   = "M1"
+      MeasureType    = Estimated
+      Sample         = 100
+      Line           = 500
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = "M2"
+      MeasureType    = Estimated
+      Sample         = 750
+      Line           = 500
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = "5"
+
+    Group = ControlMeasure
+      SerialNumber   = "M1"
+      MeasureType    = Estimated
+      Sample         = 1
+      Line           = 1000
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = "M2"
+      MeasureType    = Estimated
+      Sample         = 1
+      Line           = 1000
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Tie
+    PointId   = "6"
+
+    Group = ControlMeasure
+      SerialNumber   = "M1"
+      MeasureType    = Estimated
+      Sample         = 100
+      Line           = 1000
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = "M2"
+      MeasureType    = Estimated
+      Sample         = 1000
+      Line           = 1000
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = ""
+      ChooserName    = ""
+    End_Group
+  End_Object
+ End_Object
+End

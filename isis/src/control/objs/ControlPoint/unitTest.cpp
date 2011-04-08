@@ -4,6 +4,7 @@
 #include "boost/numeric/ublas/symmetric.hpp"
 
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "iException.h"
 #include "Latitude.h"
@@ -97,6 +98,7 @@ int main() {
   else {
     cout << "Failed!\n";
   }
+  cout << "\n";
   cp.SetEditLock(false);
   cp.SetRefMeasure(cm2);
   cp.SetEditLock(true);
@@ -218,7 +220,7 @@ int main() {
   cout << "newCp with explicit:   " << newCp.IsReferenceExplicit() << endl;
   newCp.Delete(cm3);
   cout << "newCp reverted to implicit:   " << newCp.IsReferenceExplicit() << endl;
-  
+
   cout << "\ntesting GetMeasures method...\n";
   ControlMeasure * alpha = new ControlMeasure;
   alpha->SetCubeSerialNumber("alpha");
@@ -243,7 +245,13 @@ void printPoint(Isis::ControlPoint &p) {
   p.SetDateTime("2005-05-03T00:00:00");
   p.SetEditLock(wasLocked);
 
-  Pvl tmp;
-  tmp.AddObject(p.ToPvlObject());
-  cout << endl << "Printing point:\n" << tmp << "\nDone printing point." << endl << endl;
+  ControlNet net;
+  net.AddPoint(new ControlPoint(p));
+  net.SetNetworkId("Identifier");
+  net.SetCreatedDate("Yesterday");
+  net.SetModifiedDate("Yesterday");
+  net.Write("./tmp.net", true);
+  Pvl tmp("./tmp.net");
+  cout << "Printing point:\n" << tmp << "\nDone printing point." << endl << endl;
+  remove("./tmp.net");
 }

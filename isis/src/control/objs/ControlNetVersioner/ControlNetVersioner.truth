@@ -1,0 +1,276 @@
+Test ControlNetVersioner
+Reading: ./reallyOldNetwork.net...
+
+Read network...
+**I/O ERROR** Reading the control network [/work1/slambright/prog/isis3/trunk/isis/src/control/objs/ControlNetVersioner/reallyOldNetwork.net] failed
+**I/O ERROR** The target name is not recognized
+**SPICE ERROR** An empty string was passed into a naif routine. The short explanation provided by NAIF is [SPICE(EMPTYSTRING)]. The Naif error is [String "name" has length zero.]
+
+Reading: ./reallyOldNetwork2.net...
+
+Read network...
+Converted directly to Pvl:
+Object = ControlNetwork
+  NetworkId    = Null
+  TargetName   = Moon
+  UserName     = Null
+  Created      = Null
+  LastModified = Null
+  Description  = Null
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = 1
+    ChooserName = Null
+    DateTime    = Null
+
+    Group = ControlMeasure
+      SerialNumber = M1
+      MeasureType  = Candidate
+      ChooserName  = Null
+      Sample       = 1.0
+      Line         = 1.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M2
+      MeasureType  = Candidate
+      ChooserName  = Null
+      Sample       = 1.0
+      Line         = 1.0
+    End_Group
+  End_Object
+End_Object
+End
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Conversion to Pvl stays consistent
+Reading/Writing control network is consistent
+
+Reading: ./oldNetwork.net...
+
+Read network...
+Converted directly to Pvl:
+Object = ControlNetwork
+  NetworkId    = TestNet01
+  TargetName   = Titan
+  UserName     = bgeorge
+  Created      = Null
+  LastModified = Null
+  Description  = "Test Network"
+  Version      = 2
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = 1001
+    ChooserName = Null
+    DateTime    = Null
+
+    Group = ControlMeasure
+      SerialNumber = Cassini-Huygens/ISSNA/1/1467436709.122
+      MeasureType  = RegisteredPixel
+      Sample       = 893.0
+      Line         = 616.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = Cassini-Huygens/ISSNA/1/1467443189.122
+      MeasureType  = RegisteredPixel
+      Sample       = 799.25
+      Line         = 701.21
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType  = RegisteredPixel
+      Sample       = 569.01
+      Line         = 807.23
+    End_Group
+  End_Object
+End_Object
+End
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Conversion to Pvl stays consistent
+Reading/Writing control network is consistent
+
+Reading: ./oldNetwork2.net...
+
+Read network...
+Converted directly to Pvl:
+Object = ControlNetwork
+  NetworkId    = Test
+  TargetName   = Mars
+  UserName     = TSucharski
+  Created      = 2010-07-10T12:50:15
+  LastModified = 2010-07-10T12:50:55
+  Description  = "UnitTest of ControlNetwork"
+  Version      = 2
+
+  Object = ControlPoint
+    PointType                = Ground
+    PointId                  = T0000
+    ChooserName              = autoseed
+    DateTime                 = 2010-08-27T17:10:06
+    EditLock                 = True
+    AprioriXYZSource         = Basemap
+    AprioriXYZSourceFile     = /work1/tsucharski/basemap.cub
+    AprioriRadiusSource      = DEM
+    AprioriRadiusSourceFile  = $base/dems/molaMarsPlanetaryRadius0003.cub
+    AprioriX                 = -424.024048 <meters>
+    AprioriY                 = 734.4311949 <meters>
+    AprioriZ                 = 529.919264 <meters>
+    AprioriCovarianceMatrix  = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+    LatitudeConstrained      = True
+    LongitudeConstrained     = True
+    RadiusConstrained        = True
+    AdjustedX                = -424.024048 <meters>
+    AdjustedY                = 734.4311949 <meters>
+    AdjustedZ                = 529.919264 <meters>
+    AdjustedCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0001
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+    Ignore      = True
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0003
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0004
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+End_Object
+End
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Conversion to Pvl stays consistent
+Reading/Writing control network is consistent
+
+Reading: ./badNetwork.net...
+
+Read network...
+**I/O ERROR** Reading the control network [/work1/slambright/prog/isis3/trunk/isis/src/control/objs/ControlNetVersioner/badNetwork.net] failed
+**USER ERROR** Cannot parse binary PB file
+**PROGRAMMER ERROR** Failed to read input PB file /work1/slambright/prog/isis3/trunk/isis/src/control/objs/ControlNetVersioner/badNetwork.net
+
+Reading: ./semilarge.net...
+
+Read network...
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
