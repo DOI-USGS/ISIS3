@@ -1151,6 +1151,8 @@ namespace Qisis {
    *                           existing on a single image.  This will be
    *                           shown on new point dialog and user can always
    *                           hit "Cancel".
+   *   @history 2011-04-08 Tracie Sucharski - Added check for NULL pointer
+   *                           before deleting p_editPOint if parent is NULL.
    *  
    */
   void QnetTool::createPoint(double lat,double lon) {
@@ -1240,7 +1242,7 @@ namespace Qisis {
         m->SetCamera(cam);
         newPoint->Add(m);
       }
-      if (p_editPoint->Parent() == NULL) delete p_editPoint;
+      if (p_editPoint != NULL && p_editPoint->Parent() == NULL) delete p_editPoint;
       p_editPoint = newPoint;
 
       //  Load new point in QnetTool
