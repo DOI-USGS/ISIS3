@@ -228,7 +228,8 @@ void IsisMain() {
     //Set Diameter
     try {
       //Check to see if the column was, in fact, a double
-      cmeasure->SetDiameter(diam);
+      if((double)iString(diam) != 0.0)
+        cmeasure->SetDiameter(diam);
     }
     catch (iException &e) {
       //If we get here, diam was not a double,
