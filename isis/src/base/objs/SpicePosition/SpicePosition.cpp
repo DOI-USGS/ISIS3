@@ -216,6 +216,8 @@ namespace Isis {
    *            CacheType keyword, we know this is an older image,
    *            so set p_source to Memcache.
    *   @history 2011-01-05 Debbie A. Cook - Added PolyFunction type
+   *   @history 2011-04-08 Debbie A. Cook - Corrected loop counter in
+   *            PolyFunction section to only go up to table.Records() - 1
    *
    */
   void SpicePosition::LoadCache(Table &table) {
@@ -298,7 +300,7 @@ namespace Isis {
       // Coefficient table for postion coordinates x, y, and z
       std::vector<double> coeffX, coeffY, coeffZ;
 
-      for (int r = 0; r < table.Records(); r++) {
+      for (int r = 0; r < table.Records() - 1; r++) {
         TableRecord &rec = table[r];
 
         if(rec.Fields() != 3) {
@@ -899,11 +901,13 @@ namespace Isis {
    * the positions.
    *
    * @param [in] baseTime The baseTime to use and override the computed base time
+   * 
+   * @history 2011-04-08 Debbie A. Cook - Corrected p_override set to BaseAndScale
    */
   void SpicePosition::SetOverrideBaseTime(double baseTime, double timeScale) {
     p_overrideBaseTime = baseTime;
     p_overrideTimeScale = timeScale;
-    p_override = NoOverrides;
+    p_override = BaseAndScale;
     return;
   }
 
