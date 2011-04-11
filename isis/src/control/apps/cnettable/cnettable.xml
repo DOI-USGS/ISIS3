@@ -114,6 +114,10 @@
     <change name="Christopher Austin" date="2010-06-08">
       Gave cnettable the ability to compile
     </change>
+    <change name="Mackenzie Boyd" date="2011-04-11">
+      Modified outputs which would have been Isis::Null double values to now
+      be empty strings.
+    </change>
   </history>
 
   <category>
