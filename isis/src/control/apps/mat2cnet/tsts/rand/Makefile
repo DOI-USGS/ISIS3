@@ -10,10 +10,10 @@ commands:
 	inputppp=true \
 	ppp=$(INPUT)/rand.ppp \
 	list3=$(OUTPUT)/cub3.lis \
-	cnet=$(OUTPUT)/mat2cnetTruth2.net \
+	onet=$(OUTPUT)/mat2cnetTruth2.net \
 	description="Rand Test Network - Default Ground Point Type" \
 	networkid=TestNet02 \
 	target=Titan \
-    ppplog=$(OUTPUT)/randppp.txt > /dev/null;
+    log=$(OUTPUT)/randppp.txt > /dev/null;
 	rm -f $(OUTPUT)/cub2.lis;
 	rm -f $(OUTPUT)/cub3.lis;

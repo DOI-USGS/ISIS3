@@ -89,6 +89,9 @@
     <change name="Jeannie Walldren" date="2010-12-01">
       Modified to be compatible with binary control network.  Modified errors app test Makefile.
     </change>
+    <change name="Travis Addair" date="2011-04-11">
+      Changed CNET to ONET and PPPLOG to LOG as per consistency wiki.
+    </change>
   </history>
 
   <groups>
@@ -156,7 +159,7 @@
         <inclusions>
           <item>PPP</item>
           <item>POINTTYPE</item>
-          <item>PPPLOG</item>
+          <item>LOG</item>
         </inclusions>
       </parameter>
 
@@ -180,7 +183,7 @@
           alphanumeric.  If this file contains a Point ID that does not exist 
           in the match point file, it will not be added to the ControlNet 
           output and the corresponding lines from the RAND PPP file will be 
-          copied to the PPPLOG output file.
+          copied to the LOG output file.
         </description>
         <filter>
           *.ppp *.dat
@@ -255,7 +258,7 @@
         </filter>
       </parameter>
 
-      <parameter name="CNET">
+      <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
@@ -308,7 +311,7 @@
     </group>
     <group name="Log">
 
-      <parameter name="PPPLOG">
+      <parameter name="LOG">
         <type>filename</type>
         <fileMode>output</fileMode>
         <internalDefault>No Log Output</internalDefault>

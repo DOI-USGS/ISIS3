@@ -437,9 +437,9 @@ void IsisMain() {
     bool log;
     Filename logFile;
     // if a filename was entered, use it to create the log
-    if (ui.WasEntered("PPPLOG")) {
+    if (ui.WasEntered("LOG")) {
       log = true;
-      logFile = ui.GetFilename("PPPLOG");
+      logFile = ui.GetFilename("LOG");
     }
     // if no filename was entered, but there were some RAND PPP only points,
     // create an log named "randOnlyPoints" in the current directory
@@ -477,7 +477,7 @@ void IsisMain() {
 
   }
   // Write the control network out
-  cnet.Write(ui.GetFilename("CNET"));
+  cnet.Write(ui.GetFilename("ONET"));
 
 
 }
