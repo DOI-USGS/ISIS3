@@ -4,6 +4,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <QVariant>
 
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -94,6 +95,8 @@ int main() {
   cout << "Test 8" << endl;
   cout << d.GetLogData(ControlMeasureLogData::GoodnessOfFit).
       GetNumericalValue() << endl;
+  cout << d.GetLogValue(ControlMeasureLogData::GoodnessOfFit).
+      toDouble() << endl;
 
   try {
     d.SetLogData(ControlMeasureLogData());

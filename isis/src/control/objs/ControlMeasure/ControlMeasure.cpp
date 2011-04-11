@@ -448,6 +448,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This adds or updates the log data information associated with data's type.
+   *
+   * In most cases, this is what you want to use to assign log data.
+   */
   void ControlMeasure::SetLogData(ControlMeasureLogData data) {
     if (!data.IsValid()) {
       iString msg = "Cannot set log data with invalid information stored in "
@@ -462,6 +467,12 @@ namespace Isis {
   }
 
 
+  /**
+   * This deletes log data of the specified type. If none exist, this does
+   *   nothing.
+   *
+   * @param dataType A ControlMeasureLogData::NumericLogDataType
+   */
   void ControlMeasure::DeleteLogData(long dataType) {
     for (int i = p_loggedData->size()-1; i >= 0; i--) {
       ControlMeasureLogData logDataEntry = p_loggedData->at(i);
@@ -472,6 +483,27 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the value of the log data with the specified type as a variant. This
+   *   should work for all types of log data.
+   */
+  QVariant ControlMeasure::GetLogValue(long dataType) const {
+    for (int i = 0; i < p_loggedData->size(); i++) {
+      const ControlMeasureLogData &logDataEntry = p_loggedData->at(i);
+
+      if (logDataEntry.GetDataType() == dataType)
+        return logDataEntry.GetValue();
+    }
+
+    return QVariant();
+  }
+
+
+  /**
+   * Test if we have a valid log data value of the specified type
+   *
+   * @param dataType A ControlMeasureLogData::NumericLogDataType
+   */
   bool ControlMeasure::HasLogData(long dataType) const {
     for (int i = 0; i < p_loggedData->size(); i++) {
       const ControlMeasureLogData &logDataEntry = p_loggedData->at(i);
@@ -484,6 +516,12 @@ namespace Isis {
   }
 
 
+  /**
+   * This updates existing log data information associated with data's type. If
+   *   none exist, an error is thrown.
+   *
+   * @see SetLogData
+   */
   void ControlMeasure::UpdateLogData(ControlMeasureLogData newLogData) {
     bool updated = false;
 

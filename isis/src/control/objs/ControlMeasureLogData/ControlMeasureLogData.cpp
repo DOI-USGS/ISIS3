@@ -1,5 +1,7 @@
 #include "ControlMeasureLogData.h"
 
+#include <QVariant>
+
 #include "ControlNetFileV0001.pb.h"
 #include "ControlNetFileV0002.pb.h"
 #include "PvlKeyword.h"
@@ -169,6 +171,15 @@ namespace Isis {
   ControlMeasureLogData::NumericLogDataType
       ControlMeasureLogData::GetDataType() const {
     return p_dataType;
+  }
+
+
+  /**
+   * Get the data type associated with this log data. The return value is
+   *   an invalid variant type if the value is not set.
+   */
+  QVariant ControlMeasureLogData::GetValue() const {
+    return QVariant(p_numericalValue);
   }
 
 

@@ -233,4 +233,5 @@ ResidualMagnitude=5
 MeasureType=RegisteredSubPixel
 Test 8
 5
+5
 **PROGRAMMER ERROR** Cannot set log data with invalid information stored in the ControlMeasureLogData

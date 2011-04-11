@@ -150,6 +150,7 @@ namespace Isis {
    *   @history 2011-04-04 Steven Lambright - Removed an old constructor
    *   @history 2011-04-07 Steven Lambright - GetResidualMagnitude no longer
    *                              does math on special pixels.
+   *   @history 2011-04-11 Steven Lambright - Added GetLogValue for convenience
    */
   class ControlMeasure {
       friend class ControlPoint;
@@ -246,6 +247,7 @@ namespace Isis {
       Status SetType(MeasureType type);
 
       void DeleteLogData(long dataType);
+      QVariant GetLogValue(long dataType) const;
       bool HasLogData(long dataType) const;
       void SetLogData(ControlMeasureLogData);
       void UpdateLogData(ControlMeasureLogData);

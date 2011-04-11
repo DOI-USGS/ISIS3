@@ -23,6 +23,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+class QVariant;
+
 namespace Isis {
   class iString;
   class ControlNetLogDataProtoV0001_Point_Measure_DataEntry;
@@ -44,6 +46,7 @@ namespace Isis {
    *   @history 2011-03-08 Eric Hyer - MaximumNumericLogDataType now makes sense
    *   @history 2011-04-04 Steven Lambright - Added error checking to the
    *                         conversion to protocol buffer
+   *   @history 2011-04-11 Steven Lambright - Added GetValue method
    */
   class ControlMeasureLogData {
     public:
@@ -123,7 +126,7 @@ namespace Isis {
        * convertions to and from Pvl will not work.
        */
       static const int MaximumNumericLogDataType = 6;
-      
+
 
       ControlMeasureLogData();
       ControlMeasureLogData(NumericLogDataType);
@@ -141,10 +144,11 @@ namespace Isis {
 
       double GetNumericalValue() const;
       NumericLogDataType GetDataType() const;
+      QVariant GetValue() const;
       bool IsValid() const;
       PvlKeyword ToKeyword() const;
 
-      ControlPointFileEntryV0002_Measure_MeasureLogData 
+      ControlPointFileEntryV0002_Measure_MeasureLogData
           ToProtocolBuffer() const;
 
       iString DataTypeToName(NumericLogDataType) const;

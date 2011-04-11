@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <QVariant>
+
 #include "Preference.h"
 
 using namespace Isis;
@@ -47,7 +49,7 @@ int main() {
 
     cout << "Valid? " << logData.IsValid() << "\n"
          << "Type?  " << logData.GetDataType() << "\n"
-         << "Value? " << logData.GetNumericalValue() << "\n"
+         << "Value? " << logData.GetValue().toDouble() << "\n"
          << "Keyword: '" << logData.ToKeyword() << "'\n\n";
   }
 
