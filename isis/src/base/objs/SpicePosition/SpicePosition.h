@@ -135,9 +135,21 @@ namespace Isis {
    *  @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
    *  @history 2011-02-28 Debbie A. Cook - Fixed typo in LoadCache and potential
    *                       memory problem in SetPolynomial
+   *  @history 2011-04-10 Debbie A. Cook - Added GetSource method to support
+   *                       spkwriter.
    */
   class SpicePosition {
     public:
+      //??? jw
+      /**
+       * This enum defines indicates the status of the object
+       */
+      enum Source { Spice,       //!< Object is reading directly from the kernels
+                    Memcache,    //!< Object is reading from cached table
+                    HermiteCache,//!< Object is reading from splined table
+                    PolyFunction //!< Object is calculated from nth degree polynomial
+                  };
+
       SpicePosition(int targetCode, int observerCode);
 
       //! Destructor
@@ -199,6 +211,11 @@ namespace Isis {
       //! Set the polynomial degree
       void SetPolynomialDegree(int degree);
 
+      //! Return the source of the position
+      Source GetSource() {
+        return p_source;
+      };
+
       void ComputeBaseTime();
 
       //! Return the base time for the position
@@ -218,17 +235,6 @@ namespace Isis {
       std::vector<double> CoordinatePartial(SpicePosition::PartialType partialVar, int coeffIndex);
 
       std::vector<double> VelocityPartial(SpicePosition::PartialType partialVar, int coeffIndex);
-
-
-      //??? jw
-      /**
-       * This enum defines indicates the status of the object
-       */
-      enum Source { Spice,       //!< Object is reading directly from the kernels
-                    Memcache,    //!< Object is reading from cached table
-                    HermiteCache,//!< Object is reading from splined table
-                    PolyFunction //!< Object is calculated from nth degree polynomial
-                  };
       enum OverrideType {NoOverrides, ScaleOnly, BaseAndScale};
       void Memcache2HermiteCache(double tolerance);
       std::vector<double> Extrapolate(double timeEt);

@@ -494,6 +494,9 @@ namespace Isis {
    *        or equal to endTime"
    * @throw Isis::iException::User - "This instrument does not support time 
    *             padding"
+   *
+   * @history 2011-04-10 Debbie A. Cook - Updated to only create cache for
+   *          instrumentPosition if type is Spice.
    */
   void Spice::CreateCache(iTime startTime, iTime endTime,
       int cacheSize, double tol) {
@@ -541,7 +544,7 @@ namespace Isis {
           cacheSize);
     }
 
-    if(!p_instrumentPosition->IsCached()) {
+    if(p_instrumentPosition->GetSource() < SpicePosition::Memcache) {
       p_instrumentPosition->LoadCache(
           startTime.Et() - *p_startTimePadding,
           endTime.Et() + *p_endTimePadding,
