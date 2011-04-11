@@ -45,7 +45,7 @@ void IsisMain() {
   SerialNumberList serialNumbers(ui.GetFilename("FROMLIST"));
 
   // Get the AutoSeed PVL internalized
-  Pvl seedDef(ui.GetFilename("SEEDDEF"));
+  Pvl seedDef(ui.GetFilename("DEFFILE"));
 
   PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
   Pvl invalidInput = seeder->InvalidInput();
@@ -463,13 +463,13 @@ void IsisMain() {
 
   // Make sure the control network is not empty
   if(cnet.GetNumPoints() == 0) {
-    string msg = "The ouput Control Network [TO] is empty. This is likely due";
+    string msg = "The ouput control network is empty. This is likely due";
     msg += " to the input cubes failing to overlap.";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   // Write the control network out
-  cnet.Write(ui.GetFilename("TO"));
+  cnet.Write(ui.GetFilename("ONET"));
 
   // create SeedDef group and add to print.prt
   PvlGroup pluginInfo = seeder->PluginParameters("SeedDefinition");

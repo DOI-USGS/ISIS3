@@ -98,6 +98,10 @@
     <change name="Christopher Austin" date="2011-01-18">
       Altered to compile with the new Control redesign.
     </change>
+    <change name="Steven Lambright" date="2011-04-11">
+      Changed SEEDDEF to DEFFILE and TO to ONET as per the control network
+      standard application parameter names.
+    </change>
   </history>
 
   <groups>
@@ -119,7 +123,7 @@
         </filter>
       </parameter>
 
-      <parameter name="SEEDDEF">
+      <parameter name="DEFFILE">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -158,13 +162,13 @@
           prevent re-seeding during execution, resulting in a new Control
           Network that only seeds overlaps that do not contain any Control
           Points. You may then use cnetmerge to combine this Control Network
-          (CNET) with the resultant Control Network (TO) to create a single
+          (CNET) with the resultant Control Network (ONET) to create a single
           Control Network for the entire overlap.
         </description>
         <filter> *.net </filter>
       </parameter>
 
-      <parameter name="TO">
+      <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>

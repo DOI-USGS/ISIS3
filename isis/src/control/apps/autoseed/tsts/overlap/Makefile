@@ -6,18 +6,18 @@ commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
 	$(LS) $(INPUT)/*sub.cub > $(OUTPUT)/sub.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/sub.lis \
-	seeddef=$(INPUT)/grid.pvl \
+	deffile=$(INPUT)/grid.pvl \
 	overlaplist=$(INPUT)/suboverlaps.def \
-	to=$(OUTPUT)/sub.net \
+	onet=$(OUTPUT)/sub.net \
 	networkid=SubNetwork \
 	pointid="sub????" \
 	description=SubNetwork \
 	> /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis \
-	seeddef=$(INPUT)/smallgrid.pvl \
+	deffile=$(INPUT)/smallgrid.pvl \
 	overlaplist=$(INPUT)/listoverlaps.def \
 	cnet=$(OUTPUT)/sub.net \
-	to=$(OUTPUT)/new.net \
+	onet=$(OUTPUT)/new.net \
 	networkid=NewNetwork \
 	pointid="new????" \
 	description=NewNetwork \

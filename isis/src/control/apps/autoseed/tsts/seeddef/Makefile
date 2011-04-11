@@ -5,33 +5,33 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis \
-	seeddef=$(INPUT)/gridPixels.pvl \
+	deffile=$(INPUT)/gridPixels.pvl \
 	overlaplist=$(INPUT)/listoverlaps.def \
-	to=$(OUTPUT)/new.pixels.net \
+	onet=$(OUTPUT)/new.pixels.net \
 	networkid=NewNetwork pointid="new????" description=NewNetwork \
 	> /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis \
-	seeddef=$(INPUT)/gridEmission.pvl \
+	deffile=$(INPUT)/gridEmission.pvl \
 	overlaplist=$(INPUT)/listoverlaps.def \
-	to=$(OUTPUT)/new.emission.net \
+	onet=$(OUTPUT)/new.emission.net \
 	networkid=NewNetwork pointid="new????" description=NewNetwork \
 	> /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis \
-	seeddef=$(INPUT)/gridIncidence.pvl \
+	deffile=$(INPUT)/gridIncidence.pvl \
 	overlaplist=$(INPUT)/listoverlaps.def \
-	to=$(OUTPUT)/new.incidence.net \
+	onet=$(OUTPUT)/new.incidence.net \
 	networkid=NewNetwork pointid="new????" description=NewNetwork \
 	> /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis \
-	seeddef=$(INPUT)/gridResolution.pvl \
+	deffile=$(INPUT)/gridResolution.pvl \
 	overlaplist=$(INPUT)/listoverlaps.def \
-	to=$(OUTPUT)/new.resolution.net \
+	onet=$(OUTPUT)/new.resolution.net \
 	networkid=NewNetwork pointid="new????" description=NewNetwork \
 	> /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis \
-	seeddef=$(INPUT)/gridDN.pvl \
+	deffile=$(INPUT)/gridDN.pvl \
 	overlaplist=$(INPUT)/listoverlaps.def \
-	to=$(OUTPUT)/new.dn.net \
+	onet=$(OUTPUT)/new.dn.net \
 	networkid=NewNetwork pointid="new????" description=NewNetwork \
 	> /dev/null;
 	$(RM) $(OUTPUT)/list.lis;
