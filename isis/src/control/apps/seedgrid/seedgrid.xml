@@ -45,6 +45,9 @@
     <change name="Tracie Sucharski" date="2010-10-26">
       Changed for new Control Network format.
     </change>
+    <change name="Travis Addair" date="2011-04-11">
+      Changed parameters PROJECTION to MAP and TO to ONET for consistency.
+    </change>
   </history>
 
   <groups>
@@ -60,15 +63,15 @@
           This is the planet on which the Lat/Lon range resides.  The target 
           can be specified in one of two ways: by typing the name of a planet
           for this parameter, or by including a value for the keyword TargetName
-          in the PROJECTION file, which will set the value of this parameter at 
+          in the MAP file, which will set the value of this parameter at 
           runtime, and show up in the print file.  If the user specifies both,
           then the value for the TARGET parameter will be used.  If neither is
           specified, the program will throw an error.
         </description>
-        <internalDefault>From PROJECTION file</internalDefault>
+        <internalDefault>From MAP file</internalDefault>
       </parameter>                                                   
 
-      <parameter name="PROJECTION">
+      <parameter name="MAP">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -170,11 +173,11 @@
                     This option will space control points in the range by a 
                     specified XSTEP and YSTEP given in meters on the planet's 
                     surface.  If this option is selected, the user must also 
-                    specify a PROJECTION file, but not necessarily a value for 
+                    specify a MAP file, but not necessarily a value for 
                     TARGET if the projection contains the TargetName keyword.
                 </description>
                 <inclusions>
-                    <item>PROJECTION</item>
+                    <item>MAP</item>
                     <item>XSTEP</item>
                     <item>YSTEP</item>
                 </inclusions>
@@ -193,7 +196,7 @@
                     specified LATSTEP and LONSTEP, given in terms of the 
                     planet's degrees latitude and longitude, respectively.  If 
                     this option is selected, the user must specify a TARGET 
-                    name, but not a PROJECTION file.
+                    name, but not a MAP file.
                 </description>
                 <inclusions>
                     <item>TARGET</item>
@@ -201,7 +204,7 @@
                     <item>LONSTEP</item>
                 </inclusions>
                 <exclusions>
-                    <item>PROJECTION</item>
+                    <item>MAP</item>
                     <item>XSTEP</item>
                     <item>YSTEP</item>
                 </exclusions>
@@ -304,7 +307,7 @@
     </group>
 
     <group name="Files">
-      <parameter name="TO">
+      <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>

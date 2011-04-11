@@ -36,7 +36,7 @@ void IsisMain() {
   string spacing = ui.GetString("SPACING");
   if(spacing == "METER") {
     Pvl userMap;
-    userMap.Read(ui.GetFilename("PROJECTION"));
+    userMap.Read(ui.GetFilename("MAP"));
     PvlGroup &mapGroup = userMap.FindGroup("Mapping", Pvl::Traverse);
 
     // Construct a Projection for converting between Lon/Lat and X/Y
@@ -61,7 +61,7 @@ void IsisMain() {
     mapGroup.AddKeyword(PvlKeyword("EquatorialRadius", (string) radii["EquatorialRadius"]));
     mapGroup.AddKeyword(PvlKeyword("PolarRadius", (string) radii["PolarRadius"]));
 
-    if(!ui.WasEntered("PROJECTION")) {
+    if(!ui.WasEntered("MAP")) {
       mapGroup.AddKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
       mapGroup.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
       mapGroup.AddKeyword(PvlKeyword("LongitudeDomain", 360));
@@ -230,7 +230,7 @@ void IsisMain() {
   results += PvlKeyword("NumberControlPoints", cnet.GetNumPoints());
   Application::Log(results);
 
-  cnet.Write(ui.GetFilename("TO"));
+  cnet.Write(ui.GetFilename("ONET"));
 }
 
 // Helper function to print out mapfile to session log
@@ -239,7 +239,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("PROJECTION"));
+  userMap.Read(ui.GetFilename("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
