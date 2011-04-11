@@ -22,13 +22,13 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList filelist;
   if (ui.GetString("INPUTTYPE") == "LIST") {
-    filelist = ui.GetFilename("FROMLIST");
+    filelist = ui.GetFilename("CLIST");
   }
   else if (ui.GetString("INPUTTYPE") == "CNETS") {
-    filelist.push_back(ui.GetFilename("FROM1"));
-    filelist.push_back(ui.GetFilename("FROM2"));
+    filelist.push_back(ui.GetFilename("CNET"));
+    filelist.push_back(ui.GetFilename("CNET2"));
   }
-  Filename outfile(ui.GetFilename("TO"));
+  Filename outfile(ui.GetFilename("ONET"));
 
   bool allowPointOverride = false;
   bool allowMeasureOverride = false;
@@ -44,7 +44,7 @@ void IsisMain() {
 
   // Set up the output ControlNet with the first Control Net in the list
   ControlNet destinationNet(Filename(filelist[0]).Expanded());
-  destinationNet.SetNetworkId(ui.GetString("ID"));
+  destinationNet.SetNetworkId(ui.GetString("NETWORKID"));
   destinationNet.SetUserName(Isis::Application::UserName());
   destinationNet.SetCreatedDate(Isis::Application::DateTime());
   destinationNet.SetModifiedDate(Isis::iTime::CurrentLocalTime());
@@ -54,9 +54,9 @@ void IsisMain() {
 
   ofstream ss;
   bool report = false;
-  if (ui.WasEntered("REPORT")) {
+  if (ui.WasEntered("LOG")) {
     report = true;
-    string report = ui.GetFilename("REPORT");
+    string report = ui.GetFilename("LOG");
     ss.open(report.c_str(), ios::out);
   }
 

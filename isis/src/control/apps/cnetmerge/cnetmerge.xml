@@ -59,6 +59,9 @@
     <change name="Christopher Austin" date="2011-02-25">
       Fixed a simple pointer ownership issue.
     </change>
+    <change name="Steven Lambright" date="2011-04-11">
+      Updated parameter names
+    </change>
   </history> 
   
   <category>
@@ -83,8 +86,8 @@
               Select a list of Control Nets, all to be merged.
             </description>
             <exclusions>
-              <item>FROM1</item>
-              <item>FROM2</item>
+              <item>CNET</item>
+              <item>CNET2</item>
             </exclusions>
           </option>
           <option value = "CNETS">
@@ -93,13 +96,13 @@
               Select the 2 Control Nets to be merged directly.
             </description>
             <exclusions>
-              <item>FROMLIST</item>
+              <item>CLIST</item>
             </exclusions>
           </option>
         </list>
       </parameter>
 
-      <parameter name = "FROMLIST">
+      <parameter name = "CLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -113,7 +116,7 @@
         </filter>
       </parameter>
       
-      <parameter name="FROM1">
+      <parameter name="CNET">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -127,7 +130,7 @@
         </filter>
       </parameter>
 
-      <parameter name="FROM2">
+      <parameter name="CNET2">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
@@ -145,7 +148,7 @@
 
     <group name="Output">
 
-      <parameter name="TO">
+      <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
@@ -160,7 +163,7 @@
         </filter>
       </parameter>
 
-      <parameter name="REPORT">
+      <parameter name="LOG">
         <type>filename</type>
         <fileMode>output</fileMode>
         <internalDefault>No Report Output</internalDefault>
@@ -178,7 +181,7 @@
 
     <group name="Output Control">
 
-      <parameter name="ID">
+      <parameter name="NETWORKID">
         <type>string</type>
         <brief>The NetworkId for the merged ControlNet</brief>
         <description>
@@ -214,7 +217,7 @@
                 to the new Control Net as is.
               </description>
               <exclusions>
-                <item>REPORT</item>
+                <item>LOG</item>
               </exclusions>
             </option>
             <option value="MERGE">
@@ -222,8 +225,8 @@
               <description>
                 This option will merge all duplicate Control Points in the
                 following Control Net over the first Control Net.  When
-                INPUTTYPE=CNETS, the FROM2 Control Net will override the
-                duplicate Control Points in FROM1. When INPUTTYPE=LIST, a
+                INPUTTYPE=CNETS, the CNET2 Control Net will override the
+                duplicate Control Points in CNET. When INPUTTYPE=LIST, a
                 listed Control Net will override any and all duplicate Control
                 Points from any and all previously listed Control Nets.
               </description>
@@ -239,7 +242,7 @@
           Whenever a latitude or a longitude value has been changed on a held
           or ground Control Point, then the changed values will be merged when
           this parameter is TRUE. If this parameter is FALSE and a change is
-          found, the change will be noted in the REPORT file, but will not be
+          found, the change will be noted in the LOG file, but will not be
           merged in the final output.
         </description>
       </parameter>
@@ -252,7 +255,7 @@
           Whenever a the reference measure has been changed in a held or
           ground Control Measure, then the change will be merged when this
           parameter is TRUE. If this parameter is FALSE and a reference measure
-          change is found, the change will be noted in the REPORT file, but
+          change is found, the change will be noted in the LOG file, but
           will not be merged in the final output.
         </description>
       </parameter>

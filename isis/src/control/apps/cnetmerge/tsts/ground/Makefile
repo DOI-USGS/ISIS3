@@ -4,19 +4,19 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) INPUTTYPE=cnets \
-	FROM1=$(INPUT)/testNetGround.ctl \
-	FROM2=$(INPUT)/testNetReferences.ctl \
-	TO=$(OUTPUT)/testGround.net \
-	REPORT=$(OUTPUT)/groundReport.txt \
+	CNET=$(INPUT)/testNetGround.ctl \
+	CNET2=$(INPUT)/testNetReferences.ctl \
+	ONET=$(OUTPUT)/testGround.net \
+	LOG=$(OUTPUT)/groundReport.txt \
 	DUPLICATEPOINTS=merge \
-	ID=testReplaceMerge DESCRIPTION=NewTextCtl \
+	NETWORKID=testReplaceMerge DESCRIPTION=NewTextCtl \
 	> /dev/null;
 	$(APPNAME) INPUTTYPE=cnets \
-	FROM1=$(INPUT)/testNetReferences.ctl \
-	FROM2=$(INPUT)/testNetGround.ctl \
-	TO=$(OUTPUT)/testReferences.net \
-	REPORT=$(OUTPUT)/referenceReport.txt \
+	CNET=$(INPUT)/testNetReferences.ctl \
+	CNET2=$(INPUT)/testNetGround.ctl \
+	ONET=$(OUTPUT)/testReferences.net \
+	LOG=$(OUTPUT)/referenceReport.txt \
 	DUPLICATEPOINTS=merge \
 	OVERWRITEMEASURES=true \
-	ID=testReplaceMerge DESCRIPTION=NewTextCtl \
+	NETWORKID=testReplaceMerge DESCRIPTION=NewTextCtl \
 	> /dev/null;

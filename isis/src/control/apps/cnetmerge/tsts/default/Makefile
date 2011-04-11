@@ -4,9 +4,9 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) INPUTTYPE=cnets \
-	FROM1=$(INPUT)/testNet.ctl \
-	FROM2=$(INPUT)/testNet2.ctl \
-	TO=$(OUTPUT)/testReplace.net \
+	CNET=$(INPUT)/testNet.ctl \
+	CNET2=$(INPUT)/testNet2.ctl \
+	ONET=$(OUTPUT)/testReplace.net \
 	DUPLICATEPOINTS=merge \
-	ID=testReplaceMerge DESCRIPTION=NewTextCtl \
+	NETWORKID=testReplaceMerge DESCRIPTION=NewTextCtl \
 	> /dev/null;
