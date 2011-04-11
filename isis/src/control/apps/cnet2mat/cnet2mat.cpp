@@ -52,7 +52,7 @@ void IsisMain() {
     snMap.insert(std::pair<string, int>(sn, f));
   }
 
-  ControlNet cnet(ui.GetFilename("CONTROL"));
+  ControlNet cnet(ui.GetFilename("CNET"));
 
   int mpTotal = 0;
 
