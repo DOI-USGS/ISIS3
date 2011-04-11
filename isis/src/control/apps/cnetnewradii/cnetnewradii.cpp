@@ -24,7 +24,7 @@ void IsisMain() {
   ControlNet cnet(ui.GetFilename("CNET"));
 
   // Get input cube and get camera model for it
-  string from = ui.GetFilename("DEM");
+  string from = ui.GetFilename("MODEL");
   Cube cube;
   cube.Open(from);
   UniversalGroundMap *ugm = NULL;
@@ -104,7 +104,7 @@ void IsisMain() {
   ugm = NULL;
 
   if(numSuccesses == 0) {
-    string msg = "No valid radii can be calculated. Verify that the DEM [" + ui.GetAsString("DEM") + "] is valid.";
+    string msg = "No valid radii can be calculated. Verify that the DEM [" + ui.GetAsString("MODEL") + "] is valid.";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
