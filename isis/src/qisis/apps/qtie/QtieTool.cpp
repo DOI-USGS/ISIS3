@@ -687,7 +687,8 @@ namespace Qisis {
   /**
    * Perform the BundleAdjust Solve
    *
-   *
+   * @history 2011-04-11 Debbie A. Cook - Removed obsolete argument from
+   *          BundleAdjust method Solve
    */
   void QtieTool::solve() {
 
@@ -719,7 +720,7 @@ namespace Qisis {
       BundleAdjust b(net, *p_serialNumberList, false);
       b.SetSolveTwist(p_twist);
       //b.Solve(p_tolerance, p_maxIterations);
-      b.Solve(p_tolerance);
+      b.Solve();
 
       // Print results and give user option of updating cube pointin
 //      double maxError = net.MaximumResidual();
