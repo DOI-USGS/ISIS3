@@ -60,7 +60,7 @@
         </filter>
       </parameter>
 
-      <parameter name="TO">
+      <parameter name="OVERLAPLIST">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>

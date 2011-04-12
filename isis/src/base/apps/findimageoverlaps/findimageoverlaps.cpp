@@ -39,7 +39,8 @@ void IsisMain() {
   ImageOverlapSet overlaps(true);
 
   // Use multi-threading to create the overlaps
-  overlaps.FindImageOverlaps(serialNumbers, Filename(ui.GetFilename("TO")).Expanded());
+  overlaps.FindImageOverlaps(serialNumbers, Filename(ui.GetFilename(
+      "OVERLAPLIST")).Expanded());
 
 
   // This will only occur when "CONTINUE" was true, so we can assume "ERRORS" was
