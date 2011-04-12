@@ -25,6 +25,10 @@
 #include <vector>
 #include <map>
 #include <iostream>
+
+#include <QVariant>
+#include <QVarLengthArray>
+
 #include "iString.h"
 #include "Constants.h"
 
@@ -78,6 +82,9 @@ namespace Isis {
    *  @history 2010-06-25 Steven Lambright - NULLs ('\0') now count as binary
    *  @history 2010-09-27 Sharmila Prasad - API to Validate a Keyword for type and values
    *  @history 2010-10-18 Sharmila Prasad - Added more options for the keyword validation
+   *  @history 2011-04-12 Steven Lambright - Lessened the memory footprint by
+   *            changing p_comments and p_units to pointers, p_values to a
+   *            QVarLengthArray and p_name to a char *.
    */
   class PvlSequence;
   class PvlFormat;
@@ -99,7 +106,10 @@ namespace Isis {
        * @return The name of the keyword.
        */
       std::string Name() const {
-        return p_name;
+        if(p_name)
+          return p_name;
+        else
+          return "";
       };
       /**
        * Determines whether two PvlKeywords have the same name or not.
@@ -148,7 +158,7 @@ namespace Isis {
       operator std::string() const {
         return (std::string) operator[](0);
       };
-      
+
       operator QString() const;
 
       const Isis::iString &operator[](const int index) const;
@@ -162,7 +172,7 @@ namespace Isis {
 
       //! Returns the number of lines of comments associated with this keyword
       int Comments() const {
-        return p_comments.size();
+        return (p_comments ? p_comments->size() : 0);
       };
       std::string Comment(const int index) const;
       void ClearComments();
@@ -173,6 +183,9 @@ namespace Isis {
        * @param key The keyword to compare names with
        */
       bool operator==(const PvlKeyword &key) const {
+        if(!p_name && !key.p_name) return true;
+        if(!p_name || !key.p_name) return false;
+
         return (StringEqual(p_name, key.p_name));
       };
 
@@ -182,7 +195,7 @@ namespace Isis {
        * @param key The keyword to compare names with
        */
       bool operator!=(const PvlKeyword &key) const {
-        return (!StringEqual(p_name, key.p_name));
+        return !(*this == key);
       };
 
       bool IsEquivalent(const std::string &string1, int index = 0) const;
@@ -238,7 +251,7 @@ namespace Isis {
                                    otherDelimiters);
 
       const PvlKeyword &operator=(const PvlKeyword &other);
-      
+
       //! Validate Keyword for type and required values
       void ValidateKeyword(PvlKeyword & pvlKwrd, std::string psValueType="", PvlKeyword* pvlKwrdRange=NULL);
 
@@ -255,16 +268,24 @@ namespace Isis {
       PvlFormat *p_formatter;
 
     private:
+      //! The keyword's name... This is a c-string for memory efficiency
+      char * p_name;
 
+      /**
+       * The values in the keyword. This is a QVarLengthArray purely for
+       *   optimization purposes. The amount of memory consumed by other data
+       *   types introduces very significant overhead relative to this type
+       *   which is meant to be as cost-effective and cheap as possible. Most
+       *   of the time we have one value per keyword so that is what we're
+       *   allocating by default with this variable.
+       */
+      QVarLengthArray<Isis::iString, 1> p_values;
 
-      //! The keyword name
-      std::string p_name;
-      //! A vector of values for the keyword.
-      std::vector<Isis::iString> p_values;
       //! The units for the values.
-      std::vector<std::string> p_units;
+      std::vector<std::string> *p_units;
+
       //! The comments for the keyword.
-      std::vector<std::string> p_comments;
+      std::vector<std::string> *p_comments;
 
       void Init();
 

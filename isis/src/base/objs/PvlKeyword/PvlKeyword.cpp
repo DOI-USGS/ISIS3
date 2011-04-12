@@ -68,6 +68,7 @@ namespace Isis {
 
   //! Copy constructor
   PvlKeyword::PvlKeyword(const PvlKeyword &other) {
+    Init();
     *this = other;
   }
 
@@ -75,17 +76,34 @@ namespace Isis {
   /**
    * Destructs a PvlKeyword object.
    */
-  PvlKeyword::~PvlKeyword() {}
+  PvlKeyword::~PvlKeyword() {
+    if(p_units) {
+      delete p_units;
+      p_units = NULL;
+    }
+
+    if(p_comments) {
+      delete p_comments;
+      p_comments = NULL;
+    }
+
+    if(p_name) {
+      delete [] p_name;
+      p_name = NULL;
+    }
+  }
 
 
   //! Clears all PvlKeyword data.
   void PvlKeyword::Init() {
-    Clear();
-    ClearComments();
-    SetName("");
+    p_name = NULL;
+    p_units = NULL;
+    p_comments = NULL;
     p_width = 0;
     p_indent = 0;
     p_formatter = NULL;
+
+    Clear();
   }
 
   /**
@@ -124,7 +142,16 @@ namespace Isis {
       msg += "contain whitespace.";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
-    p_name = final;
+
+    if(p_name) {
+      delete [] p_name;
+      p_name = NULL;
+    }
+
+    if(final != "") {
+      p_name = new char[final.size() + 1];
+      strncpy(p_name, final.c_str(), final.size() + 1);
+    }
   }
 
   /**
@@ -154,9 +181,14 @@ namespace Isis {
    * @param units New units to be assigned.
    */
   void PvlKeyword::SetUnits(const iString &units) {
-    p_units.clear();
-    for(unsigned int i = 0; i < p_values.size(); i++) {
-      p_units.push_back(units);
+    if(!p_units) {
+      p_units = new std::vector<std::string>();
+    }
+
+    p_units->clear();
+
+    for(int i = 0; i < p_values.size(); i++) {
+      p_units->push_back(units);
     }
   }
 
@@ -180,9 +212,16 @@ namespace Isis {
     }
 
     if(found) {
-      ASSERT(i < (int) p_units.size());
+      if(!p_units) {
+        p_units = new std::vector<std::string>(p_values.size());
+      }
+      else {
+        p_units->resize(p_values.size());
+      }
 
-      p_units[i] = units;
+      ASSERT(i < (int) p_units->size());
+
+      (*p_units)[i] = units;
     }
     else {
       iString msg = "PvlKeyword::SetUnits called with value [" + value +
@@ -228,8 +267,21 @@ namespace Isis {
    * @see operator+=
    */
   void PvlKeyword::AddValue(const Isis::iString value, const std::string unit) {
-    p_values.push_back(value);
-    p_units.push_back(unit);
+    p_values.append(value);
+
+    if(unit != "") {
+      if(!p_units) {
+        p_units = new std::vector<std::string>(p_values.size());
+      }
+      else {
+        p_units->resize(p_values.size());
+      }
+
+      (*p_units)[p_units->size() - 1] = unit;
+    }
+    else if(p_units) {
+      p_units->push_back("");
+    }
   }
 
   /**
@@ -255,14 +307,18 @@ namespace Isis {
   //! Clears all values and units for this PvlKeyword object.
   void PvlKeyword::Clear() {
     p_values.clear();
-    p_units.clear();
+
+    if(p_units) {
+      delete p_units;
+      p_units = NULL;
+    }
   }
-  
-  
+
+
   PvlKeyword::operator QString() const {
     return QString::fromStdString((std::string) operator[](0));
   }
-  
+
 
   /**
    * Gets value for this object at specified index.
@@ -279,7 +335,7 @@ namespace Isis {
   Isis::iString &PvlKeyword::operator[](const int index) {
     if(index < 0 || index >= (int)p_values.size()) {
       string msg = (Isis::Message::ArraySubscriptNotInRange(index)) +
-                   "for Keyword [" + p_name + "]";
+                   "for Keyword [" + string(p_name) + "]";
       throw Isis::iException::Message(Isis::iException::Programmer,
                                       msg,
                                       _FILEINFO_);
@@ -319,13 +375,15 @@ namespace Isis {
    * @throws iException ArraySubscriptNotInRange (index) Index out of bounds.
    */
   string PvlKeyword::Unit(const int index) const {
-    if(index < 0 || index >= (int)p_units.size()) {
+    if(!p_units) return "";
+
+    if(index < 0 || index >= (int)p_units->size()) {
       string msg = Isis::Message::ArraySubscriptNotInRange(index);
       throw Isis::iException::Message(Isis::iException::Programmer,
                                       msg,
                                       _FILEINFO_);
     }
-    return p_units[index];
+    return (*p_units)[index];
   }
 
   /**
@@ -338,23 +396,27 @@ namespace Isis {
    * @see ClearComments()
    */
   void PvlKeyword::AddComment(const std::string &comment) {
+    if(!p_comments) {
+      p_comments = new std::vector<std::string>();
+    }
+
     if(comment.size() == 0) {
-      p_comments.push_back("#");
+      p_comments->push_back("#");
     }
     if(comment[0] == '#') {
-      p_comments.push_back(comment);
+      p_comments->push_back(comment);
     }
     else if(comment.size() == 1) {
-      p_comments.push_back("# " + comment);
+      p_comments->push_back("# " + comment);
     }
     else if((comment[0] == '/') && (comment[1] == '*')) {
-      p_comments.push_back(comment);
+      p_comments->push_back(comment);
     }
     else if((comment[0] == '/') && (comment[1] == '/')) {
-      p_comments.push_back(comment);
+      p_comments->push_back(comment);
     }
     else {
-      p_comments.push_back("# " + comment);
+      p_comments->push_back("# " + comment);
     }
   }
 
@@ -386,7 +448,10 @@ namespace Isis {
 
   //! Clears the current comments.
   void PvlKeyword::ClearComments() {
-    p_comments.clear();
+    if(p_comments) {
+      delete p_comments;
+      p_comments = NULL;
+    }
   }
 
   /**
@@ -396,13 +461,15 @@ namespace Isis {
    * @throws iException ArraySubscriptNotInRange (index) Index out of bounds.
    */
   string PvlKeyword::Comment(const int index) const {
-    if(index < 0 || index >= (int)p_comments.size()) {
+    if(!p_comments) return "";
+
+    if(index < 0 || index >= (int)p_comments->size()) {
       string msg = Isis::Message::ArraySubscriptNotInRange(index);
       throw Isis::iException::Message(Isis::iException::Programmer,
                                       msg,
                                       _FILEINFO_);
     }
-    return p_comments[index];
+    return (*p_comments)[index];
   };
 
   /**
@@ -1783,10 +1850,36 @@ namespace Isis {
   //! This is an assignment operator
   const PvlKeyword &PvlKeyword::operator=(const PvlKeyword &other) {
     p_formatter = other.p_formatter;
-    p_name = other.p_name;
+
+    if(p_name) {
+      delete [] p_name;
+      p_name = NULL;
+    }
+
+    if(other.p_name) {
+      SetName(other.p_name);
+    }
+
     p_values = other.p_values;
-    p_units = other.p_units;
-    p_comments = other.p_comments;
+
+    if(p_units) {
+      delete p_units;
+      p_units = NULL;
+    }
+
+    if(other.p_units) {
+      p_units = new std::vector<std::string>(*other.p_units);
+    }
+
+    if(p_comments) {
+      delete p_comments;
+      p_comments = NULL;
+    }
+
+    if(other.p_comments) {
+      p_comments = new std::vector<std::string>(*other.p_comments);
+    }
+
     p_width = other.p_width;
     p_indent = other.p_indent;
 
@@ -1795,22 +1888,22 @@ namespace Isis {
 
   /**
    * Validate a Keyword, comparing against corresponding Template Keyword.
-   *  
-   * Template Keyword has the format: 
-   * keyName = (valueType, optional/required, Values allowed separated by comma)  
-   * 
+   *
+   * Template Keyword has the format:
+   * keyName = (valueType, optional/required, Values allowed separated by comma)
+   *
    * @author Sharmila Prasad (9/22/2010)
-   * 
-   * @param pvlKwrd      - Keyword to be validated 
+   *
+   * @param pvlKwrd      - Keyword to be validated
    * @param psValueType  - Value Type (positive / negative) for numbers
    * @param pvlKwrdValue - Template Keyword __Value or __Range to validate keyword's value
    */
   void PvlKeyword::ValidateKeyword(PvlKeyword & pvlKwrd, std::string psValueType, PvlKeyword* pvlKwrdValue)
   {
     int iSize = pvlKwrd.Size();
-    
+
     string sType = iString::DownCase(p_values[0]);
-    
+
     // Value type
     if(psValueType.length()) {
       psValueType = iString::DownCase(psValueType);
@@ -1821,7 +1914,7 @@ namespace Isis {
     bool bValue = false;
     if(pvlKwrdValue != NULL) {
       string sValueName = pvlKwrdValue->Name();
-      
+
       // Check for Range
       if(sValueName.find("__Range") != string::npos ) {
         dRangeMin = (*pvlKwrdValue)[0];
@@ -1832,7 +1925,7 @@ namespace Isis {
         bValue = true;
       }
     }
-    
+
     // Type integer
     if(sType == "integer") {
       for(int i=0; i<iSize; i++) {
@@ -1841,7 +1934,7 @@ namespace Isis {
           int iValue = iString::ToInteger(sValue);
           if(bRange && (iValue < dRangeMin || iValue > dRangeMax)) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
-            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
+            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
           }
           if(bValue) {
             bool bFound = false;
@@ -1867,7 +1960,7 @@ namespace Isis {
       }
       return;
     }
-    
+
     // Type double
     if(sType == "double") {
       for(int i=0; i<iSize; i++) {
@@ -1876,7 +1969,7 @@ namespace Isis {
           double dValue = iString::ToDouble(sValue);
           if(bRange && (dValue < dRangeMin || dValue > dRangeMax)) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
-            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_); 
+            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
           }
           if(bValue) {
             bool bFound = false;
@@ -1902,7 +1995,7 @@ namespace Isis {
       }
       return;
     }
-    
+
     // Type boolean
     if(sType == "boolean") {
       for(int i=0; i<iSize; i++) {
@@ -1914,7 +2007,7 @@ namespace Isis {
       }
       return;
     }
-    
+
     // Type String
     if(sType == "string") {
       for(int i=0; i<iSize; i++) {
