@@ -596,18 +596,20 @@ namespace Qisis {
       ControlMeasure *refMeasure = p_editPoint->GetRefMeasure();
       // Reference Measure not on left.  Ask user if they want to change
       // the reference measure, but only if it is not the ground source on the left
-      if (refMeasure->GetCubeSerialNumber() != p_leftMeasure->GetCubeSerialNumber() &&
-         (p_editPoint->IsGround() && (p_leftCube != p_groundCube)) ) {
-        QString message = "This point already contains a reference measure.  ";
-        message += "Would you like to replace it with the measure on the left?";
-        switch(QMessageBox::question((QWidget *)parent(),
-                                  "Qnet Tool Save Measure", message,
-                                  "&Yes", "&No", 0, 0)){
-          case 0: // Yes was clicked or Enter was pressed, replace reference
-            p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
-            // ??? Need to set rest of measures to Candiate and add more warning. ???//
-          case 1: // No was clicked, keep original reference
-            break;
+      if (refMeasure->GetCubeSerialNumber() != p_leftMeasure->GetCubeSerialNumber() ) {
+        if (!p_editPoint->IsGround() || 
+            (p_editPoint->IsGround() && (p_leftMeasure->GetCubeSerialNumber() != p_groundSN))) {
+          QString message = "This point already contains a reference measure.  ";
+          message += "Would you like to replace it with the measure on the left?";
+          switch(QMessageBox::question((QWidget *)parent(),
+                                    "Qnet Tool Save Measure", message,
+                                    "&Yes", "&No", 0, 0)){
+            case 0: // Yes was clicked or Enter was pressed, replace reference
+              p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
+              // ??? Need to set rest of measures to Candiate and add more warning. ???//
+            case 1: // No was clicked, keep original reference
+              break;
+          }
         }
       }
       // If the right measure is the reference, make sure they really want
@@ -742,25 +744,25 @@ namespace Qisis {
    */
   void QnetTool::savePoint () {
 
-    //  If this is a ground point, see if there is a temporary
-    //  measure holding the coordinate information from the ground source. 
-    //  If so, delete this measure before saving point.  Clear out the
-    //  ground Measure variable (memory deleted in ControlPoint::Delete).
-    if (p_editPoint->GetType() == ControlPoint::Ground) {
-      for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
-        if ((*p_editPoint)[i]->GetCubeSerialNumber() == p_groundSN) {
-          p_editPoint->Delete(i);
-          break;
-        }
-      }
-    }
-
     p_editPoint->SetChooserName(Application::UserName());
 
     //  Make a copy of edit point for updating the control net since the edit
     //  point is still loaded in the point editor.
     ControlPoint *updatePoint = new ControlPoint;
     *updatePoint = *p_editPoint;
+
+    //  If this is a ground point, see if there is a temporary
+    //  measure holding the coordinate information from the ground source. 
+    //  If so, delete this measure before saving point.  Clear out the
+    //  ground Measure variable (memory deleted in ControlPoint::Delete).
+    if (updatePoint->GetType() == ControlPoint::Ground) {
+      for (int i=0; i<updatePoint->GetNumMeasures(); i++) {
+        if ((*updatePoint)[i]->GetCubeSerialNumber() == p_groundSN) {
+          updatePoint->Delete(i);
+          break;
+        }
+      }
+    }
 
     //  If edit point exists in the network, save the updated point.  If it
     //  does not exist, add it.
@@ -2029,7 +2031,6 @@ namespace Qisis {
    * @param painter 
    */
   void QnetTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
-
     drawAllMeasurments (vp,painter);
 
   }
@@ -2059,7 +2060,89 @@ namespace Qisis {
     }
   }
 
+  /**
+   * Draw all measurments which are on this viewPort
+   * @param vp Viewport whose measurements will be drawn
+   * @param painter
+   * @internal
+   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   *                          namespace std"
+   *   @history 2010-06-08 Jeannie Walldren - Fixed bug that was causing ignored
+   *                          measures not be drawn as yellow unless QnetTool was
+   *                          open
+   *   @history 2010-07-01 Jeannie Walldren - Modified to draw points selected in
+   *                          QnetTool last so they lay on top of all other points
+   *                          in the image.
+   */
+  void QnetTool::drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter) {
+    // Without a controlnetwork there are no points
+    if(g_controlNetwork == 0) return;
 
+    // Don't show the measurments on cubes not in the serial number list
+    // TODO: Should we show them anyway
+    // TODO: Should we add the SN to the viewPort
+    string serialNumber = Isis::SerialNumber::Compose(*vp->cube());
+    if(!g_serialNumberList->HasSerialNumber(serialNumber)) return;
+
+    // loop through all points in the control net
+    for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
+      Isis::ControlPoint &p = *((*g_controlNetwork)[i]);
+      // loop through the measurements
+      for (int j = 0; j < p.GetNumMeasures(); j++) {
+        // check whether this point is contained in the image
+        if (p.HasSerialNumber(serialNumber)) {
+          // Find the measurments on the viewport
+          double samp = p[j]->GetSample();
+          double line = p[j]->GetLine();
+          int x, y;
+          vp->cubeToViewport(samp, line, x, y);
+          // if the point is ignored,
+          if (p.IsIgnored()) {
+            painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+          }
+          // point is not ignored
+          // if the measure matching this image is ignored,
+          else if (p[j]->IsIgnored()) {
+            painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+          }
+          // Neither point nor measure is not ignored and the measure is ground,
+          else if (p.GetType() == Isis::ControlPoint::Ground) {
+            painter->setPen(Qt::magenta);// set point marker magenta
+          }
+          else {
+            painter->setPen(Qt::green); // set all other point markers green
+          }
+          // draw points
+          painter->drawLine(x - 5, y, x + 5, y);
+          painter->drawLine(x, y - 5, x, y + 5);
+        }
+        // if point is not in the image, go to next point
+        else continue;
+      }
+    }
+    // if QnetTool is open,
+    if (p_editPoint != NULL) {
+      // and the selected point is in the image,
+      if(p_editPoint->HasSerialNumber(serialNumber)) {
+        // find the measurement
+        double samp = (*p_editPoint)[serialNumber]->GetSample();
+        double line = (*p_editPoint)[serialNumber]->GetLine();
+        int x, y;
+        vp->cubeToViewport(samp, line, x, y);
+        // set point marker red
+        QBrush brush(Qt::red);
+        // set point marker bold - line width 2
+        QPen pen(brush, 2);
+        // draw the selected point in each image last so it's on top of the rest of the points
+        painter->setPen(pen);
+        painter->drawLine(x - 5, y, x + 5, y);
+        painter->drawLine(x, y - 5, x, y + 5);
+      }
+    }
+  }
+
+
+#if 0
   /** 
    * Draw all measurments which are on this viewPort
    * @param vp Viewport whose measurements will be drawn
@@ -2091,7 +2174,7 @@ namespace Qisis {
     for (int i=0; i<g_controlNetwork->GetNumPoints(); i++) {
       drawMeasures (vp, painter, *((*g_controlNetwork)[i]));
     }
-    drawMeasures (vp, painter, *p_editPoint);
+    //drawMeasures (vp, painter, *p_editPoint);
 
     // If ground cube, return since there are probably not a dense # of ground
     // pts and don't need to redraw current edit point.
@@ -2159,7 +2242,7 @@ namespace Qisis {
     painter->drawLine(x-5,y,x+5,y);
     painter->drawLine(x,y-5,x,y+5);
   }
-
+#endif
 
 
 
