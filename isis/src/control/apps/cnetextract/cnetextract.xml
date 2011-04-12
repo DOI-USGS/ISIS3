@@ -108,6 +108,9 @@
     <change name="Christopher Austin" date="2011-01-18">
       Altered to compile with the new Control redesign.
     </change>
+    <change name="Jai Rideout" date="2011-04-12">
+      Changed OUTNET to ONET for consistency.
+    </change>
   </history>
 
   <category>
@@ -138,7 +141,7 @@
           <brief>Isis3 input Control Network file</brief>
           <description>
             Use this parameter to specify the control network file to extract
-            the OUTNET from.
+            the ONET from.
             </description>
           <filter>
             *.net
@@ -169,7 +172,7 @@
           <brief>List of ISIS3 output cubes</brief>
           <description>
           This text file contains one column of ISIS3 cube file names associated
-          with the OUTNET. This list can only include cubes that were privided
+          with the ONET. This list can only include cubes that were privided
           in the FROMLIST.
           </description>
           <filter>
@@ -177,7 +180,7 @@
           </filter>
         </parameter>
 
-        <parameter name="OUTNET">
+        <parameter name="ONET">
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>Isis3 output Control Network file</brief>
@@ -420,7 +423,7 @@
            <p>Ground Points will use the lat/lon values provided in the CNET
            while Tie Points will calculate their lat/lon from the images
            provided by the FROMLIST.  These calculated lat/lon values will be
-           added to Tie Point in the OUTNET for reference purposes. No Isis
+           added to Tie Point in the ONET for reference purposes. No Isis
            application will use these added Control Point keywords.</p>
 
           <p>When PREFIX is used, the files [PREFIX]LatLonOutOfRange.txt and

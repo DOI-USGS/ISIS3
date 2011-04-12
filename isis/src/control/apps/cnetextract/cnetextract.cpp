@@ -277,7 +277,7 @@ void IsisMain() {
   outProgress.CheckStatus();
 
   // Write the extracted Control Network
-  outNet.Write(ui.GetFilename("OUTNET"));
+  outNet.Write(ui.GetFilename("ONET"));
 
   outProgress.CheckStatus();
 
