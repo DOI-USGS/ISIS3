@@ -45,11 +45,14 @@
     <change name="Sharmila Prasad" date="2011-01-20">
       Updated for changes in ProcessMosaic
     </change>
+    <change name="Mackenzie Boyd" date="2011-04-11">
+      Changed parameter LIST to FROMLIST 
+    </change>
   </history>
 
   <groups>
     <group name="Files">
-      <parameter name="LIST">
+      <parameter name="FROMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
