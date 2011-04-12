@@ -20,10 +20,10 @@
     </pre>
 
     The FROM2 cube must have either one band or the same number of bands as the
-    FROM1 cube.  If the FROM2 cube has one band, then the algebraic formula will
-    be applied to all bands in FROM1 using that single band in FROM2.  If FROM2
+    FROM cube.  If the FROM2 cube has one band, then the algebraic formula will
+    be applied to all bands in FROM using that single band in FROM2.  If FROM2
     is a multi-band cube, the algebra will be performed between corresponding
-    bands from FROM1 and FROM2.
+    bands from FROM and FROM2.
   </description>
 
   <history>
@@ -69,9 +69,9 @@
     <change name="Kris Becker" date="2006-12-14">
        Modifed how special pixels are propagated to the output file.
        Originally, all special pixel values and operations resulted in
-       Null being set to the output pixel.  Now if the FROM1 pixel
+       Null being set to the output pixel.  Now if the FROM pixel
        is a special pixel, it is always propagated to the output file
-       unchanged without regard of the FROM2 pixel.  If FROM1 is
+       unchanged without regard of the FROM2 pixel.  If FROM is
        not a special pixel and FROM2 is, the output pixel is set to
        Null.
     </change>
@@ -79,6 +79,9 @@
         Fixed segmenation fault error. If the user did not enter a FROM2 value then tried to perform a non-unary operation
         the program would crash. FIX:The program will inform the user of the error without crashing so they can make the 
         proper correction.
+    </change>
+    <change name="Mackenzie Boyd" date="2011-04-11">
+        Changed parameter FROM1 to be FROM
     </change>
   </history>
 
@@ -102,7 +105,7 @@
 
   <groups>
     <group name="Files">
-      <parameter name="FROM1">
+      <parameter name="FROM">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
@@ -126,10 +129,10 @@
          <description>
            This image will be used as the second term in the equation. This
            cube must have either one band or the same number of bands as the
-           cube in FROM1.  If this cube has one band, then the single band will
-           be applied to each band in FROM1 using the equation.  If this cube
+           cube in FROM.  If this cube has one band, then the single band will
+           be applied to each band in FROM using the equation.  If this cube
            has multi-bands then each corresponding band in FROM2 is applied to
-           FROM1 using the equation.
+           FROM using the equation.
          </description>
          <filter>
            *.cub
@@ -187,7 +190,7 @@
           <option value="SUBTRACT">
             <brief>Subtract images</brief>
             <description>
-              Subtract FROM2 from FROM1 using the following equation:
+              Subtract FROM2 from FROM using the following equation:
                 out = ((from1 - D) * A) - ((from2 - E) * B) + C
             </description>
             <inclusions>
@@ -207,7 +210,7 @@
           <option value="DIVIDE">
             <brief>Divide images</brief>
             <description>
-              Divide FROM1 by FROM2 using the following equation:
+              Divide FROM by FROM2 using the following equation:
                 out = ((from1 - D) * A) + ((from2 - E) * B) + C
             </description>
             <inclusions>

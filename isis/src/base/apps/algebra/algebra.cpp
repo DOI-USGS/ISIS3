@@ -25,7 +25,7 @@ void IsisMain() {
   // Setup the input and output files
   UserInterface &ui = Application::GetUserInterface();
   // Setup the input and output cubes
-  p.SetInputCube("FROM1");
+  p.SetInputCube("FROM");
   if(ui.WasEntered("FROM2")) p.SetInputCube("FROM2");
   p.SetOutputCube("TO");
 
