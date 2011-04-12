@@ -223,7 +223,7 @@ namespace Qisis {
       void createToolBars();
       void loadPoint();
       void drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter);
-      void drawMeasures (MdiCubeViewport *vp,QPainter *painter,Isis::ControlPoint &point);
+//      void drawMeasures (MdiCubeViewport *vp,QPainter *painter,Isis::ControlPoint &point);
       void createQnetTool(QWidget *parent);
       QSplitter * createTopSplitter();
       QGroupBox * createControlPointGroupBox();
