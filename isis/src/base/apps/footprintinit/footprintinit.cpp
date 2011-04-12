@@ -43,19 +43,36 @@ void IsisMain() {
     poly.EllipsoidLimb(true);
   }
 
-  // Reduce the increment size to find a valid polygon
-  int sinc = ui.GetInteger("SINC");
-  int linc = ui.GetInteger("LINC");
+  int sinc = 1;
+  int linc = 1;
+  iString incType = ui.GetString("INCTYPE");
+  if(incType.UpCase() == "VERTICES") {
+    sinc = linc = (int)(0.5 + (((cube.Samples() * 2) +
+                       (cube.Lines() * 2) - 3.0) /
+                       ui.GetInteger("NUMVERTICES")));
+  }
+  else if (incType.UpCase() == "LINCSINC"){
+    sinc = ui.GetInteger("SINC");
+    linc = ui.GetInteger("LINC");
+  }
+  else {
+    string msg = "Invalid INCTYPE option[" + incType + "]";
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+  }
+
   bool precision = ui.GetBoolean("INCREASEPRECISION");
+  // Reduce the increment size to find a valid polygon
   while(true) {
     try {
       poly.Create(cube, sinc, linc);
       break;
     }
     catch(iException &e) {
-      if(precision && sinc > 1 && linc > 1) {
-        sinc = sinc * 2 / 3;
-        linc = linc * 2 / 3;
+      if(precision && (sinc > 1 || linc > 1)) {
+        if(sinc > 1)
+          sinc = sinc * 2 / 3;
+        if(linc > 1)
+          linc = linc * 2 / 3;
         e.Clear();
       }
       else {

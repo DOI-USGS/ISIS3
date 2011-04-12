@@ -94,6 +94,9 @@
     <change name="Christopher Austin" date="2010-07-13">
       Fixed error reporting.
     </change>
+    <change name="Christopher Austin" date="2011-04-12">
+      Added the INCTYPE parameter (so it is consistant with caminfo).
+    </change>
   </history>
 
   <groups>
@@ -134,6 +137,61 @@
         </description>
       </parameter>
 
+      <parameter name="INCTYPE">
+        <type>string</type>
+        <default><item>LINCSINC</item></default>
+        <brief>
+          Polygon quality
+        </brief>
+        <description>
+          When true, use NUMVERTICES to set an approximate number of steps for
+          the footprint. Otherwise use POLYLINC and POLYSINC to create the
+          polygon based on the dimentions of the cube.
+        </description>
+        <list>
+          <option value="LINCSINC">
+            <brief>
+              Use POLYLINC and POLYSINC for polygon quality
+            </brief>
+            <description>
+              Enable this option to use the number of samples and lines to skip
+              around the perimeter of the image to compute the polygon
+              footprint.
+            </description>
+            <exclusions>
+              <item>NUMVERTICES</item>
+            </exclusions>
+          </option>
+          <option value="VERTICES">
+            <brief>
+              Use NUMVERTICES for polygon quality
+            </brief>
+            <description>
+              Enable this option to use a total number of vertices around the
+              perimeter of the image to compute the polygon footprint.
+            </description>
+            <exclusions>
+              <item>LINC</item>
+              <item>SINC</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+      
+      <parameter name="LINC">
+        <type>integer</type>
+        <minimum inclusive="yes">1</minimum>
+        <default><item>100</item></default>
+        <brief>
+          The accuracy of the footprint in the line direction (larger is less
+          accurate)
+        </brief>
+        <description>
+          This is approximately how many lines in the input image 
+          to skip for every point stored in the footprint.
+        </description>
+      </parameter>
+      
       <parameter name="SINC">
         <type>integer</type>
         <minimum inclusive="yes">1</minimum>
@@ -148,20 +206,22 @@
         </description>
       </parameter>
 
-      <parameter name="LINC">
+      <parameter name="NUMVERTICES">
         <type>integer</type>
-        <minimum inclusive="yes">1</minimum>
-        <default><item>100</item></default>
+        <default><item>40</item></default>
         <brief>
-          The accuracy of the footprint in the line direction (larger is less
-          accurate)
+          Polygon steps
         </brief>
         <description>
-          This is approximately how many lines in the input image 
-          to skip for every point stored in the footprint.
+          Specifies the approximate number of vertices (+/- 3) to take around
+          the image to compute the polygon footprint. (In limb images, the
+          number of steps can be much more or less than 3 off.) Note that
+          currently, an increment of 4 or less will not work for pushframe
+          instruments such as THEMIS-VIS.
         </description>
+        <minimum inclusive="true">4</minimum>
       </parameter>
-
+      
       <parameter name="MAXEMISSION">
         <type>double</type>
         <minimum inclusive="yes">0.0</minimum>
