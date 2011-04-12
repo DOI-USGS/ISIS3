@@ -57,6 +57,9 @@
       necessary keywords for later processing, and enhanced documentation to 
       discuss necessary keywords and pixel coordinates.
     </change>
+    <change name="Mackenzie Boyd" date="2011-04-11">
+      Changed parameter LONG to LON, removed duplicate code. 
+    </change>
   </history>
 
   <groups>
@@ -123,20 +126,20 @@
             <brief>Allows X, Y as Input Values</brief>
             <description> 
               This option requires the user to enter x/y coordinates that 
-              correspond to the given sample and line positions.  LAT and LONG 
+              correspond to the given sample and line positions.  LAT and LON 
               Input Values are not allowed.
             </description>
             <exclusions> 
               <item>LAT</item>
-              <item>LONG</item>
+              <item>LON</item>
             </exclusions>
             <inclusions> 
               <item>X</item>
               <item>Y</item>
             </inclusions>
           </option>
-          <option value="LATLONG">
-            <brief>Allows LAT, LONG as Input Values</brief>
+          <option value="LATLON">
+            <brief>Allows LAT, LON as Input Values</brief>
             <description> 
               This option requires the user to enter latitude/longitude that 
               correspond to the entered sample and line positions. X and Y  
@@ -148,7 +151,7 @@
             </exclusions>
             <inclusions> 
               <item>LAT</item>
-              <item>LONG</item>
+              <item>LON</item>
               </inclusions>
           </option>
         </list>
@@ -176,7 +179,7 @@
               Latitude for the given sample value of the cube.
         </description>
       </parameter>
-      <parameter name="LONG">
+      <parameter name="LON">
         <type>double</type>
         <brief>Longitude</brief>
         <description> 
@@ -326,7 +329,7 @@ End_Object
             <description>
               Screenshot of GUI with parameters filled in to perform the maplab
               application.  Input files, SAMPLE, and LINE are always required.  
-              The radio button LATLONG is chosen to input latitude and longitude 
+              The radio button LATLON is chosen to input latitude and longitude 
               input values that correspond to the given sample and line values, 
               respectively.
             </description>
@@ -528,7 +531,7 @@ End_Object
             <description>
               Screenshot of GUI with parameters filled in to perform the maplab
               application.  Input files, SAMPLE, and LINE are always required.  
-              The radio button LATLONG is chosen to input latitude and longitude 
+              The radio button LATLON is chosen to input latitude and longitude 
               input values that correspond to the given sample and line values, 
               respectively.
             </description>
