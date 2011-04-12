@@ -24,7 +24,7 @@ void IsisMain() {
   tf.PutLine(bgFile + "\n");
   tf.Close();
 
-  string parameters = string(" LIST = ")    + tempFile.Expanded() +
+  string parameters = string(" FROMLIST = ")    + tempFile.Expanded() +
                       string(" TO = ")      + ui.GetFilename("TO") +
                       string(" PROPLAB = ") + redFile;
   ProgramLauncher::RunIsisProgram("cubeit", parameters);
