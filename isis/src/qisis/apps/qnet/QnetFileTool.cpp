@@ -239,37 +239,35 @@ namespace Qisis {
    * @author  2007-05-01 Elizabeth Ribelin
    *
    * @internal
-   *   @history  2008-10-08 Tracie Sucharski - Do not display cube if it is
-   *                             already displayed, set as active window.
-   *   @history 2008-12-10 Jeannie Walldren - Fixed documentation
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
+   *  @history  2008-10-08 Tracie Sucharski - Do not display cube if it is
+   *                          already displayed, set as active window.
+   *  @history 2008-12-10 Jeannie Walldren - Fixed documentation
+   *  @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
    *  @history 2010-07-12 Jeannie Walldren - Updated setActiveSubWindow call due
-   *           to change in Workspace class
-   *
+   *                          to change in Workspace class
+   *  @history 2011-04-08  Tracie Sucharski - Remove test for sn existing in
+   *                          serial number list since the list is where the
+   *                          serial number came from.
    */
   void QnetFileTool::loadImage(const QString &serialNumber) {
-    if (g_serialNumberList->HasSerialNumber(serialNumber.toStdString())) {
-      string tempFilename = g_serialNumberList->Filename(serialNumber.toStdString());
-      QString filename = tempFilename.c_str();
-      QVector< MdiCubeViewport * > * cvpList =
-        g_vpMainWindow->workspace()->cubeViewportList();
-      bool found = false;
-      for (int i = 0; i < (int)cvpList->size(); i++) {
-        string sn = Isis::SerialNumber::Compose(*((*cvpList)[i]->cube()));
-        if (sn == serialNumber.toStdString()) {
-          g_vpMainWindow->workspace()->
-          setActiveSubWindow((QMdiSubWindow *)(*cvpList)[i]->parentWidget()->parent());
-          found = true;
-          break;
-        }
+
+    string tempFilename = g_serialNumberList->Filename(serialNumber.toStdString());
+    QString filename = tempFilename.c_str();
+    QVector< MdiCubeViewport * > * cvpList =
+      g_vpMainWindow->workspace()->cubeViewportList();
+    bool found = false;
+    for (int i = 0; i < (int)cvpList->size(); i++) {
+      string sn = Isis::SerialNumber::Compose(*((*cvpList)[i]->cube()));
+      if (sn == serialNumber.toStdString()) {
+        g_vpMainWindow->workspace()->
+        setActiveSubWindow((QMdiSubWindow *)(*cvpList)[i]->parentWidget()->parent());
+        found = true;
+        break;
       }
-      if (!found)
-        emit fileSelected(filename);
     }
-    else {
-      // TODO:  Handle error?
-    }
+    if (!found)
+      emit fileSelected(filename);
   }
 
   /**
