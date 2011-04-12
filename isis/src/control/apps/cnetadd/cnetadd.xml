@@ -83,6 +83,9 @@
     <change name="Christopher Austin" date="2011-03-14">
       Changed to use SurfacePoints instead of lat/lon calculations.
     </change>
+    <change name="Jai Rideout" date="2011-04-12">
+      Changed INNET to CNET and OUTNET to ONET for consistency.
+    </change>
   </history>
 
   <groups>
@@ -105,7 +108,7 @@
           </filter>
         </parameter>
 
-        <parameter name="INNET">
+        <parameter name="CNET">
           <type>filename</type>
           <fileMode>input</fileMode>
           <brief>
@@ -140,7 +143,7 @@
 
     <group name="Output Files">
 
-      <parameter name="OUTNET">
+      <parameter name="ONET">
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
@@ -159,10 +162,10 @@
         <type>filename</type>                
         <fileMode>input</fileMode>
         <brief>
-          List of ISIS3 output cubes in the OUTNET
+          List of ISIS3 output cubes in the ONET
         </brief>
         <description>
-          Use this parameter to receive a cubelist of all cubes in the OUTNET
+          Use this parameter to receive a cubelist of all cubes in the ONET
           that are also in the FROMLIST or ADDLIST.
         </description>
         <filter>
@@ -241,29 +244,29 @@
         <parameter name="EXTRACT">
           <type>string</type>
           <default><item>ALL</item></default>
-          <brief>Defines what Control Points are to be placed in OUTNET</brief>
+          <brief>Defines what Control Points are to be placed in ONET</brief>
           <description>
             Use this parameter to determine whether to place all Control Points
-            in the OUTNET, or just the Control Points with new Control Measures
-            and reference image measures in the OUTNET. In this case, only
+            in the ONET, or just the Control Points with new Control Measures
+            and reference image measures in the ONET. In this case, only
             reference measures and new measures are placed in the Control
-            Points of the OUTNET.
+            Points of the ONET.
           </description>
           <list>
              <option value="ALL">
-                <brief>Place all Control Points in the OUTNET</brief>
+                <brief>Place all Control Points in the ONET</brief>
                 <description>
-                  This option will add the new cubes to the INNET and place
-                  the result in OUTNET.
+                  This option will add the new cubes to the CNET and place
+                  the result in ONET.
                 </description>
               </option>
              <option value="MODIFIED">
-                <brief>Only place changed Control Points in OUTNET</brief>
+                <brief>Only place changed Control Points in ONET</brief>
                 <description>
-                  This option will add the new cubes to the INNET, but only
-                  place Control Points that have been added to in the OUTNET.
+                  This option will add the new cubes to the CNET, but only
+                  place Control Points that have been added to in the ONET.
                   In addition, only new and reference Control Measures will be
-                  placed in the resultant Control Points of the OUTNET.
+                  placed in the resultant Control Points of the ONET.
                  </description>
               </option>
           </list>
@@ -281,7 +284,7 @@
             PVL file containing the description of the Validity Control
             Measure Keywords. <strong>Newly added Control Measures</strong>
             which are not valid based on these keywords will be set to Ignored.
-            Control Measures that are originally in the INNET will
+            Control Measures that are originally in the CNET will
             <strong>not</strong> be evaluated/Ignored by the DEFFILE.
           </description>
           <filter>

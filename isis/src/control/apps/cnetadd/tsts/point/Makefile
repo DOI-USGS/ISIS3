@@ -6,8 +6,8 @@ outnet.pvl.IGNORELINES = DateTime
 
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/add.lis;
-	$(APPNAME) innet=$(INPUT)/seedGrid.net addlist=$(OUTPUT)/add.lis \
-	  outnet=$(OUTPUT)/outnet.net log=$(OUTPUT)/outlog.pvl \
+	$(APPNAME) cnet=$(INPUT)/seedGrid.net addlist=$(OUTPUT)/add.lis \
+	  onet=$(OUTPUT)/outnet.net log=$(OUTPUT)/outlog.pvl \
 	  retrieval=POINT tolist=$(OUTPUT)/outlist.txt \
 	  > /dev/null;
 	$(CAT) $(OUTPUT)/outlist.txt | sed 's#.*/##' > $(OUTPUT)/temp.txt;

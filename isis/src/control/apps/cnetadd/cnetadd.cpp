@@ -82,12 +82,12 @@ void IsisMain() {
     if(duplicates.Size() > 0) {
       hasDuplicateSerialNumbers = true;
     }
-    SetControlPointLatLon(ui.GetFilename("FROMLIST"), ui.GetFilename("INNET"));
+    SetControlPointLatLon(ui.GetFilename("FROMLIST"), ui.GetFilename("CNET"));
   }
 
-  Filename outNetFile(ui.GetFilename("OUTNET"));
+  Filename outNetFile(ui.GetFilename("ONET"));
 
-  ControlNet inNet = ControlNet(ui.GetFilename("INNET"));
+  ControlNet inNet = ControlNet(ui.GetFilename("CNET"));
   inNet.SetUserName(Application::UserName());
   inNet.SetModifiedDate(iTime::CurrentLocalTime()); //This should be done in ControlNet's Write fn
 
