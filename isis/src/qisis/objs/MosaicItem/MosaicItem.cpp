@@ -77,6 +77,11 @@ namespace Qisis {
 
     createFootprint();
 
+    setAcceptHoverEvents(true);
+
+    setFootprintVisible(false);
+    setOutlineVisible(true);
+
     //If this item was constructed with a PvlGroup
     //call setUpItem so set all the item's attributes
     //to the last state they were in.
@@ -84,10 +89,6 @@ namespace Qisis {
       setUpItem(group);
     }
 
-    setAcceptHoverEvents(true);
-
-    setFootprintVisible(false);
-    setOutlineVisible(true);
   }
 
 
@@ -181,12 +182,12 @@ namespace Qisis {
     //Set item state
     Isis::iString state = grp->FindKeyword("Item")[0];
     bool checked = state.Equal("Yes");
-    this->setItemVisible(checked ? true : false);
+    setItemVisible(checked);
 
     //Set footprint state
     state = grp->FindKeyword("Footprint")[0];
     checked = state.Equal("Yes");
-    this->setFootprintVisible(checked ? true : false);
+    setFootprintVisible(checked);
 
     //Set outline state
     state = grp->FindKeyword("Outline")[0];
