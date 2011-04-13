@@ -794,6 +794,8 @@ namespace Qisis {
    * @history 2011-04-04 Tracie Sucharski - Grey out userEntered if more than 
    *                        a single point is selected.  Grey out lat,lon,radius
    *                        edits if UserEntered is not selected.
+   * @history 2011-04-13 Tracie Sucharski - If single point selected, fill in 
+   *                        LineEdit's with current controlPoint values. 
    */ 
   void QnetNavTool::setApriori() {
     // If not cubes are loaded, simply return
@@ -818,6 +820,39 @@ namespace Qisis {
     double radius = Isis::Null;
     //  Get the apriori values from user
     QnetSetAprioriDialog *setAprioriDialog = new QnetSetAprioriDialog;
+
+    // If only single point selected, fill in dialog with existing values from the
+    // controlPoint.
+    if (selected.size() == 1) {
+      QString id = selected.at(0)->text();
+      Isis::ControlPoint *pt = g_controlNetwork->GetPoint(id);
+      Isis::SurfacePoint sPt = pt->GetAprioriSurfacePoint();
+      if (sPt.GetLatitude().GetDegrees() != Isis::Null) {
+        setAprioriDialog->aprioriLatEdit->setText(
+          QString::number(sPt.GetLatitude().GetDegrees()));
+      }
+      if (sPt.GetLatSigmaDistance().GetMeters() != Isis::Null) {
+        setAprioriDialog->latSigmaEdit->setText(
+          QString::number(sPt.GetLatSigmaDistance().GetMeters()));
+      }
+      if (sPt.GetLongitude().GetDegrees() != Isis::Null) {
+        setAprioriDialog->aprioriLonEdit->setText(
+          QString::number(sPt.GetLongitude().GetDegrees()));
+      }
+      if (sPt.GetLonSigmaDistance().GetMeters() != Isis::Null) {
+        setAprioriDialog->lonSigmaEdit->setText(
+          QString::number(sPt.GetLonSigmaDistance().GetMeters()));
+      }
+      if (sPt.GetLocalRadius().GetMeters() != Isis::Null) {
+        setAprioriDialog->aprioriRadiusEdit->setText(
+          QString::number(sPt.GetLocalRadius().GetMeters()));
+      }
+      if (sPt.GetLocalRadiusSigma().GetMeters() != Isis::Null) {
+        setAprioriDialog->radiusSigmaEdit->setText(
+          QString::number(sPt.GetLocalRadiusSigma().GetMeters()));
+      }
+    }
+
     if (selected.size() > 1) setAprioriDialog->userEnteredRadioButton->setEnabled(false);
 
     if (setAprioriDialog->exec()) {
