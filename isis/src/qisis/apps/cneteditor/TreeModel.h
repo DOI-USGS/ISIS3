@@ -9,9 +9,10 @@ class QTreeView;
 
 namespace Isis
 {
-  class ControlNet;
   class AbstractTreeItem;
-
+  class ControlNet;
+  class RootItem;
+  
   class TreeModel : public QAbstractItemModel
   {
       Q_OBJECT
@@ -50,17 +51,19 @@ namespace Isis
 
 
     protected:
-      void clearParentItems();
+      void clear();
 
 
     private:
-      AbstractTreeItem * getItem(const QModelIndex & index) const;
+      AbstractTreeItem * indexToItem(const QModelIndex & index) const;
+      QModelIndex itemToIndex(AbstractTreeItem * item) const;
+//       int itemToRow(AbstractTreeItem * item) const;
 
 
     protected: // data
       ControlNet * cNet;
       QString * headerTitle;
-      QList< AbstractTreeItem * > * parentItems;
+      RootItem * rootItem;
       QList< QPair< QString, QString > > * expandedState;
       QList< QPair< QString, QString > > * selectedState;
       QTreeView * view;

@@ -304,8 +304,8 @@ namespace Isis
       if (validateRowColumn(row, col))
       {
         ControlPoint * point = points->at(row);
-        try
-        {
+//         try
+//         {
           switch ((Column) col)
           {
             case Id:
@@ -382,11 +382,12 @@ namespace Isis
               break;
           }
           success = true;
-        }
-        catch (iException e)
-        {
-          e.Clear();
-        }
+//         }
+//         catch (iException e)
+//         {
+//           
+//           e.Clear();
+//         }
         emit(dataChanged(index, index));
       }
     }

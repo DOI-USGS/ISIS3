@@ -24,6 +24,7 @@ namespace Isis
       virtual ~AbstractTreeItem();
 
       AbstractTreeItem * parent();
+      void setParent(AbstractTreeItem * newParent);
       int row() const;
 
       virtual AbstractTreeItem * childAt(int row) const = 0;

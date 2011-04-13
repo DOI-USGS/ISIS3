@@ -10,7 +10,7 @@
 
 namespace Isis
 {
-  RootItem::RootItem(AbstractTreeItem * parent) : AbstractParentItem(parent)
+  RootItem::RootItem() : AbstractParentItem(NULL)
   {
   }
 
@@ -22,8 +22,8 @@ namespace Isis
 
   QVariant RootItem::data() const
   {
-    iString msg = "data called on a RootItem!";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+//     iString msg = "data called on a RootItem!";
+//     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     return QVariant();
   }
 

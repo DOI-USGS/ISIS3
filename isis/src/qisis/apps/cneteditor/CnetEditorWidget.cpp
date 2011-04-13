@@ -153,7 +153,7 @@ namespace Isis
         SLOT(itemCollapsed(const QModelIndex &)));
     connectionView->setAlternatingRowColors(true);
     connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
-
+    
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
     editPointView->setModel(editPointModel);
@@ -424,26 +424,30 @@ namespace Isis
 
   void CnetEditorWidget::rebuildModels()
   {
-    cerr << "CnetEditorWidget::rebuildModels called\n";
+//     cerr << "CnetEditorWidget::rebuildModels called\n";
     ASSERT(pointModel);
     ASSERT(serialModel);
     ASSERT(connectionModel);
 
     updatingSelection = true;
-
+    
+//     cerr << "CnetEditorWidget::rebuildModels one\n";
     pointModel->saveViewState();
     pointModel->rebuildItems();
     pointModel->loadViewState();
 
+//     cerr << "CnetEditorWidget::rebuildModels two\n";
     serialModel->saveViewState();
     serialModel->rebuildItems();
     serialModel->loadViewState();
 
+//     cerr << "CnetEditorWidget::rebuildModels three\n";
     connectionModel->saveViewState();
     connectionModel->rebuildItems();
     connectionModel->loadViewState();
-
+    
     updatingSelection = false;
+//     cerr << "CnetEditorWidget::rebuildModels done\n";
   }
 
 

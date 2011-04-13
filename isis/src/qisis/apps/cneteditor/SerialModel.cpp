@@ -11,8 +11,9 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 
-#include "SerialParentItem.h"
 #include "PointLeafItem.h"
+#include "RootItem.h"
+#include "SerialParentItem.h"
 
 
 namespace Isis
@@ -32,7 +33,7 @@ namespace Isis
 
   void SerialModel::rebuildItems()
   {
-    clearParentItems();
+    clear();
 
     QList< ControlCubeGraphNode * > nodes = cNet->GetCubeGraphNodes();
     beginInsertRows(QModelIndex(), 0, nodes.size() - 1);
@@ -40,8 +41,7 @@ namespace Isis
     {
       ControlCubeGraphNode * node = nodes[i];
       SerialParentItem * serialItem = new SerialParentItem(node);
-//       serialItem->setRow(i);
-      parentItems->append(serialItem);
+      rootItem->addChild(serialItem);
 
       QList< ControlMeasure * > measures = node->getMeasures();
       for (int j = 0; j < measures.size(); j++)

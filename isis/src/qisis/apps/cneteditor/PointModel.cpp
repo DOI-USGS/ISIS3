@@ -9,6 +9,7 @@
 
 #include "PointParentItem.h"
 #include "MeasureLeafItem.h"
+#include "RootItem.h"
 
 
 namespace Isis
@@ -27,14 +28,14 @@ namespace Isis
 
   void PointModel::rebuildItems()
   {
-    clearParentItems();
+    clear();
 
     beginInsertRows(QModelIndex(), 0, cNet->GetNumPoints() - 1);
     for (int i = 0; i < cNet->GetNumPoints(); i++)
     {
       ControlPoint * point = cNet->GetPoint(i);
       PointParentItem * pointItem = new PointParentItem(point);
-      parentItems->append(pointItem);
+      rootItem->addChild(pointItem);
       for (int j = 0; j < point->GetNumMeasures(); j++)
       {
         ControlMeasure * measure = point->GetMeasure(j);

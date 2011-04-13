@@ -15,7 +15,7 @@ namespace Isis
   class RootItem : public AbstractParentItem
   {
     public:
-      RootItem(AbstractTreeItem * parent = 0);
+      RootItem();
       virtual ~RootItem();
 
       QVariant data() const;

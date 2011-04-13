@@ -10,6 +10,7 @@
 #include "ControlNet.h"
 
 #include "ConnectionParentItem.h"
+#include "RootItem.h"
 #include "SerialParentItem.h"
 #include "PointLeafItem.h"
 
@@ -30,16 +31,15 @@ namespace Isis
 
   void ConnectionModel::rebuildItems()
   {
-    clearParentItems();
+    clear();
 
     QList< ControlCubeGraphNode * > nodes = cNet->GetCubeGraphNodes();
     beginInsertRows(QModelIndex(), 0, nodes.size() - 1);
     for (int i = 0; i < nodes.size(); i++)
     {
       ControlCubeGraphNode * node = nodes[i];
-      ConnectionParentItem * parentItem =
-        new ConnectionParentItem(node);
-      parentItems->append(parentItem);
+      ConnectionParentItem * parentItem = new ConnectionParentItem(node);
+      rootItem->addChild(parentItem);
 
       QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
       for (int j = 0; j < connectedNodes.size(); j++)

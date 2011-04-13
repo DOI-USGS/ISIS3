@@ -61,6 +61,7 @@ namespace Isis
     ASSERT(children);
     ASSERT(!dynamic_cast< RootItem * >(child));
     children->append(child);
+    child->setParent(this);
   }
 
 
