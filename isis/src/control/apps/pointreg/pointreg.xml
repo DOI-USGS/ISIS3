@@ -70,8 +70,8 @@
       Added PointId to the FlatFile output
     </change>
     <change name="Jeff Anderson" date="2008-12-04">
- 	  Modified to allow control points to have measures which can't be 
-	  registered to not be ignored.  The point is not ignored so long as at
+      Modified to allow control points to have measures which can't be 
+      registered to not be ignored.  The point is not ignored so long as at
       least two measures can be registered.     
     </change>
     <change name="Jeannie Walldren" date="2008-12-22">
@@ -96,38 +96,43 @@
       and closing them each time.
     </change>
     <change name="Travis Addair" date="2009-08-10">
-        Auto registration parameters are now placed into the print file.
+      Auto registration parameters are now placed into the print file.
     </change>
     <change name="Jeannie Walldren" date="2010-03-18">
-        Added REGISTERNEWONLY parameter to allow user to choose to keep 
-        previously registered points unchanged.  If checked, this will only 
-        process new points that do not have ChooserName = "Application 
-        pointreg".
+      Added REGISTERNEWONLY parameter to allow user to choose to keep 
+      previously registered points unchanged.  If checked, this will only 
+      process new points that do not have ChooserName = "Application 
+      pointreg".
     </change>
     <change name="Travis Addair" date="2010-04-13">
-        Template now defaults to a def file containing all keywords with their 
-        default values (except for ValidMinimum and ValidMaximum).
+      Template now defaults to a def file containing all keywords with their 
+      default values (except for ValidMinimum and ValidMaximum).
     </change>
     <change name="Travis Addair" date="2010-04-23">
-        Parameter REGISTERNEWONLY will now only process new points that have 
-        MeasureType = Estimated 
+      Parameter REGISTERNEWONLY will now only process new points that have 
+      MeasureType = Estimated 
     </change>
     <change name="Travis Addair" date="2010-04-29">
-        Groups PointsToRegister and MeasuresToRegister have been condensed into 
-        WhatToRegister with radio buttons allowing the user to specify whether 
-        to process non-ignored, ignored, or all Control Points, and estimated or 
-        all Control Measures.
+      Groups PointsToRegister and MeasuresToRegister have been condensed into 
+      WhatToRegister with radio buttons allowing the user to specify whether 
+      to process non-ignored, ignored, or all Control Points, and estimated or 
+      all Control Measures.
     </change>
     <change name="Travis Addair" date="2010-05-25">
-        Added a validity test for ensuring newly registered measure has a computable lat-lon position.
+      Added a validity test for ensuring newly registered measure has a computable lat-lon position.
     </change>
     <change name="Travis Addair" date="2010-11-02">
-        Binary Control Network conversion
+      Binary Control Network conversion
     </change>
     <change name="Steven Lambright" date="2011-03-24">
       Added ClearCache calls to free up the large amount of cube data in memory
       and increased the number of simultaneous open cubes to 500. This program
       should have a much smaller memory footprint.
+    </change>
+    <change name="Travis Addair" date="2011-04-13">
+      Changed optional Control Network keywords SampleResidual, LineResidual,
+      MinimumPixelZScore, MaximumPixelZScore, and GoodnessOfFit to output
+      nothing in the flat file if not existant, as opposed to 0 or Isis::Null.
     </change>
   </history>
 

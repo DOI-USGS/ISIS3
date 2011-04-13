@@ -15,6 +15,7 @@
 #include "CubeManager.h"
 #include "iException.h"
 #include "iTime.h"
+#include "Pixel.h"
 #include "Progress.h"
 #include "SerialNumberList.h"
 
@@ -328,34 +329,46 @@ void IsisMain() {
           const ControlMeasure * cmOrig =
               inPoint->GetMeasure((QString) cmTrans->GetCubeSerialNumber());
 
+          string pointId = outPoint->GetId();
+
           double inSamp = cmOrig->GetSample();
           double inLine = cmOrig->GetLine();
 
           double outSamp = cmTrans->GetSample();
           double outLine = cmTrans->GetLine();
 
-          double sampErr = cmTrans->GetSampleResidual();
-          double lineErr = cmTrans->GetLineResidual();
+          os << pointId << "," << inSamp << "," << inLine << "," <<
+            outSamp << "," << outLine;
 
+          os << ",";
+          double sampErr = cmTrans->GetSampleResidual();
+          if (!Pixel::IsNull(sampErr))
+            os << sampErr;
+          
+          os << ",";
+          double lineErr = cmTrans->GetLineResidual();
+          if (!Pixel::IsNull(lineErr))
+            os << lineErr;
+
+          os << ",";
           double zScoreMin = cmTrans->GetLogData(
               ControlMeasureLogData::MinimumPixelZScore).GetNumericalValue();
-          if(fabs(zScoreMin) <= DBL_EPSILON || zScoreMin == NULL8) zScoreMin = 0;
+          if (fabs(zScoreMin) > DBL_EPSILON && zScoreMin != NULL8)
+            os << zScoreMin;
 
+          os << ",";
           double zScoreMax = cmTrans->GetLogData(
               ControlMeasureLogData::MaximumPixelZScore).GetNumericalValue();
-          if(fabs(zScoreMax) <= DBL_EPSILON || zScoreMax == NULL8) zScoreMax = 0;
+          if (fabs(zScoreMax) > DBL_EPSILON && zScoreMax != NULL8)
+            os << zScoreMax;
 
+          os << ",";
           double goodnessOfFit = cmTrans->GetLogData(
               ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-          if(fabs(goodnessOfFit) <= DBL_EPSILON || goodnessOfFit == NULL8) goodnessOfFit = 0;
+          if (fabs(goodnessOfFit) > DBL_EPSILON && goodnessOfFit != NULL8)
+            os << goodnessOfFit;
 
-          string pointId = outPoint->GetId();
-
-          os << pointId << "," << inSamp << ","
-            << inLine << "," << outSamp << ","
-            << outLine << "," << sampErr << ","
-            << lineErr << "," << zScoreMin << ","
-            << zScoreMax << "," << goodnessOfFit << endl;
+          os << endl;
         }
       }
     }
