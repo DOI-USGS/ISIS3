@@ -256,8 +256,6 @@ namespace Isis {
         }
       }
 
-      apriori.SetRadii(majorRad, minorRad, polarRad);
-
       aprioriSurfacePoint = apriori;
     }
 
@@ -282,10 +280,11 @@ namespace Isis {
         adjusted.SetRectangularMatrix(covar);
       }
 
-      adjusted.SetRadii(majorRad, minorRad, polarRad);
-
       adjustedSurfacePoint = adjusted;
     }
+
+    aprioriSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
+    adjustedSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
 
     for (int m = 0 ; m < fileEntry.measures_size() ; m++) {
       ControlMeasure *measure = new ControlMeasure(fileEntry.measures(m));
@@ -326,7 +325,6 @@ namespace Isis {
     aprioriRadiusSource = RadiusSource::None;
     constraintStatus.reset();
   }
-
 
   /**
    * This destroys the current instance and cleans up any and all allocated
