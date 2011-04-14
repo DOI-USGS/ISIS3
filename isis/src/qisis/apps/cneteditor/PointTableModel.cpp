@@ -306,86 +306,86 @@ namespace Isis
         ControlPoint * point = points->at(row);
 //         try
 //         {
-          switch ((Column) col)
-          {
-            case Id:
-              point->SetId(value.toString());
-              break;
-            case ChooserName:
-              point->SetChooserName(value.toString());
-              break;
-            case DateTime:
-              point->SetDateTime(value.toString());
-              break;
-            case EditLock:
-              point->SetEditLock(value.toString() == "Yes");
-              break;
-            case Ignored:
-              point->SetIgnored(value.toString() == "Yes");
-              break;
-            case Reference:
-              ASSERT(point->HasSerialNumber(value.toString()));
-              point->SetRefMeasure(value.toString());
-              break;
-            case AdjustedSPLat:
-              point->SetAdjustedSurfacePoint(SurfacePoint(
-                  Latitude(catchNULL(value.toString()), Angle::Degrees),
-                  point->GetAdjustedSurfacePoint().GetLongitude(),
-                  point->GetAdjustedSurfacePoint().GetLocalRadius()));
-              break;
-            case AdjustedSPLon:
-              point->SetAdjustedSurfacePoint(SurfacePoint(
-                  point->GetAdjustedSurfacePoint().GetLatitude(),
-                  Longitude(catchNULL(value.toString()), Angle::Degrees),
-                  point->GetAdjustedSurfacePoint().GetLocalRadius()));
-              break;
-            case AdjustedSPRadius:
-              point->SetAdjustedSurfacePoint(SurfacePoint(
-                  point->GetAdjustedSurfacePoint().GetLatitude(),
-                  point->GetAdjustedSurfacePoint().GetLongitude(),
-                  Distance(catchNULL(value.toString()), Distance::Meters)));
-              break;
-            case AprioriSPLat:
-              point->SetAprioriSurfacePoint(SurfacePoint(
-                  Latitude(catchNULL(value.toString()), Angle::Degrees),
-                  point->GetAprioriSurfacePoint().GetLongitude(),
-                  point->GetAprioriSurfacePoint().GetLocalRadius()));
-              break;
-            case AprioriSPLon:
-              point->SetAprioriSurfacePoint(SurfacePoint(
-                  point->GetAprioriSurfacePoint().GetLatitude(),
-                  Longitude(catchNULL(value.toString()), Angle::Degrees),
-                  point->GetAprioriSurfacePoint().GetLocalRadius()));
-              break;
-            case AprioriSPRadius:
-              point->SetAprioriSurfacePoint(SurfacePoint(
-                  point->GetAprioriSurfacePoint().GetLatitude(),
-                  point->GetAprioriSurfacePoint().GetLongitude(),
-                  Distance(catchNULL(value.toString()), Distance::Meters)));
-              break;
-            case AprioriSPSource:
-              point->SetAprioriSurfacePointSource(
-                point->StringToSurfacePointSource(value.toString()));
-              break;
-            case AprioriSPSourceFile:
-              point->SetAprioriSurfacePointSourceFile(value.toString());
-              break;
-            case AprioriRadiusSource:
-              point->SetAprioriRadiusSource(
-                point->StringToRadiusSource(value.toString()));
-              break;
-            case AprioriRadiusSourceFile:
-              point->SetAprioriRadiusSourceFile(value.toString());
-              break;
-            case JigsawRejected:
-              // jigsaw rejected is not editable!
-              break;
-          }
-          success = true;
+        switch ((Column) col)
+        {
+          case Id:
+            point->SetId(value.toString());
+            break;
+          case ChooserName:
+            point->SetChooserName(value.toString());
+            break;
+          case DateTime:
+            point->SetDateTime(value.toString());
+            break;
+          case EditLock:
+            point->SetEditLock(value.toString() == "Yes");
+            break;
+          case Ignored:
+            point->SetIgnored(value.toString() == "Yes");
+            break;
+          case Reference:
+            ASSERT(point->HasSerialNumber(value.toString()));
+            point->SetRefMeasure(value.toString());
+            break;
+          case AdjustedSPLat:
+            point->SetAdjustedSurfacePoint(SurfacePoint(
+                Latitude(catchNULL(value.toString()), Angle::Degrees),
+                point->GetAdjustedSurfacePoint().GetLongitude(),
+                point->GetAdjustedSurfacePoint().GetLocalRadius()));
+            break;
+          case AdjustedSPLon:
+            point->SetAdjustedSurfacePoint(SurfacePoint(
+                point->GetAdjustedSurfacePoint().GetLatitude(),
+                Longitude(catchNULL(value.toString()), Angle::Degrees),
+                point->GetAdjustedSurfacePoint().GetLocalRadius()));
+            break;
+          case AdjustedSPRadius:
+            point->SetAdjustedSurfacePoint(SurfacePoint(
+                point->GetAdjustedSurfacePoint().GetLatitude(),
+                point->GetAdjustedSurfacePoint().GetLongitude(),
+                Distance(catchNULL(value.toString()), Distance::Meters)));
+            break;
+          case AprioriSPLat:
+            point->SetAprioriSurfacePoint(SurfacePoint(
+                Latitude(catchNULL(value.toString()), Angle::Degrees),
+                point->GetAprioriSurfacePoint().GetLongitude(),
+                point->GetAprioriSurfacePoint().GetLocalRadius()));
+            break;
+          case AprioriSPLon:
+            point->SetAprioriSurfacePoint(SurfacePoint(
+                point->GetAprioriSurfacePoint().GetLatitude(),
+                Longitude(catchNULL(value.toString()), Angle::Degrees),
+                point->GetAprioriSurfacePoint().GetLocalRadius()));
+            break;
+          case AprioriSPRadius:
+            point->SetAprioriSurfacePoint(SurfacePoint(
+                point->GetAprioriSurfacePoint().GetLatitude(),
+                point->GetAprioriSurfacePoint().GetLongitude(),
+                Distance(catchNULL(value.toString()), Distance::Meters)));
+            break;
+          case AprioriSPSource:
+            point->SetAprioriSurfacePointSource(
+              point->StringToSurfacePointSource(value.toString()));
+            break;
+          case AprioriSPSourceFile:
+            point->SetAprioriSurfacePointSourceFile(value.toString());
+            break;
+          case AprioriRadiusSource:
+            point->SetAprioriRadiusSource(
+              point->StringToRadiusSource(value.toString()));
+            break;
+          case AprioriRadiusSourceFile:
+            point->SetAprioriRadiusSourceFile(value.toString());
+            break;
+          case JigsawRejected:
+            // jigsaw rejected is not editable!
+            break;
+        }
+        success = true;
 //         }
 //         catch (iException e)
 //         {
-//           
+//
 //           e.Clear();
 //         }
         emit(dataChanged(index, index));

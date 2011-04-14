@@ -78,7 +78,7 @@ namespace Isis
   QVariant TreeModel::data(const QModelIndex & index, int role) const
   {
     QVariant variant;
-    
+
     if (index.isValid() && role == Qt::DisplayRole)
     {
       AbstractTreeItem * item = indexToItem(index);
@@ -125,13 +125,13 @@ namespace Isis
   {
     AbstractTreeItem * childItem = indexToItem(index);
     AbstractTreeItem * parentItem = childItem->parent();
-    
+
     QModelIndex parentIndex;
-    
+
     int row = parentItem->row();
     if (row != -1)
       parentIndex = createIndex(row, 0, parentItem);
-    
+
     return parentIndex;
   }
 
@@ -174,7 +174,7 @@ namespace Isis
   void TreeModel::clear()
   {
     ASSERT(rootItem);
-    
+
     beginRemoveRows(QModelIndex(), 0, rootItem->childCount() - 1);
     delete rootItem;
     rootItem = NULL;
@@ -190,7 +190,7 @@ namespace Isis
     selectedState->clear();
 
     ASSERT(rootItem);
-    
+
     QStack< AbstractTreeItem * > stack;
     stack.push(rootItem);
 
@@ -211,6 +211,8 @@ namespace Isis
 
       if (item->isSelected())
       {
+//         cerr << "      [" << qPrintable(newPair.first) << "]\t["
+//             << qPrintable(newPair.second) << "]\n";
         selectedState->append(newPair);
       }
 
@@ -224,9 +226,9 @@ namespace Isis
   void TreeModel::loadViewState()
   {
 //     cerr << "    TreeModel::loadViewState called... " << expandedState->size() << "\n";
-//     for (int i = 0; i < expandedState->size(); i++)
-//       cerr << "      [" << qPrintable(expandedState->at(i).first) << "]\t["
-//           << qPrintable(expandedState->at(i).second) << "]\n";
+//     for (int i = 0; i < selectedState->size(); i++)
+//       cerr << "      [" << qPrintable(selectedState->at(i).first) << "]\t["
+//           << qPrintable(selectedState->at(i).second) << "]\n";
 
 //     view->setUpdatesEnabled(false);
 
@@ -234,7 +236,7 @@ namespace Isis
 
     QStack< AbstractTreeItem * > stack;
     stack.push(rootItem);
-    
+
     while (!stack.isEmpty() && (expandedState->size() || selectedState->size()))
     {
       AbstractTreeItem * item = stack.pop();
@@ -243,29 +245,29 @@ namespace Isis
       {
         int row = item->row();
         ASSERT(row != -1);
-        
+
         QPair< QString, QString > occurrence = qMakePair(
             item->data().toString(), item->parent()->data().toString());
-     
+
         QModelIndex index = createIndex(row, 0, item);
         if (expandedState->contains(occurrence))
         {
-  
+
 //           cerr << "      occurrence: [" << qPrintable(occurrence.first) << "]\t["
 //               << qPrintable(occurrence.second) << "]\n";
-  
+
           item->setExpanded(true);
           ASSERT(index.isValid());
           view->expand(index);
 //           expandedState->removeOne(occurrence);
         }
-  
-  
+
+
         if (selectedState->contains(occurrence))
         {
           item->setSelected(true);
           view->selectionModel()->select(index, QItemSelectionModel::Select);
-  //         selectedState->removeOne(occurrence);
+          //         selectedState->removeOne(occurrence);
         }
       }
 
@@ -273,8 +275,8 @@ namespace Isis
         stack.push(item->childAt(i));
     }
 
-    view->setUpdatesEnabled(true);
-    emit(dataChanged(QModelIndex(), QModelIndex()));
+//     view->setUpdatesEnabled(true);
+//     emit(dataChanged(QModelIndex(), QModelIndex()));
 //     cerr << "    TreeModel::loadViewState done... " << expandedState->size() << "\n";
   }
 
@@ -282,21 +284,21 @@ namespace Isis
   AbstractTreeItem * TreeModel::indexToItem(const QModelIndex & index) const
   {
     AbstractTreeItem * item = rootItem;
-    
+
     if (index.isValid())
       return static_cast< AbstractTreeItem * >(index.internalPointer());
-      
+
     return item;
   }
-  
-  
+
+
   QModelIndex TreeModel::itemToIndex(AbstractTreeItem * item) const
   {
     QModelIndex index;
     int row = item->row();
     if (row != -1)
       index = createIndex(row, 0, item);
-    
+
     return index;
   }
 }

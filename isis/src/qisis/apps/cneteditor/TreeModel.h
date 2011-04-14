@@ -12,7 +12,7 @@ namespace Isis
   class AbstractTreeItem;
   class ControlNet;
   class RootItem;
-  
+
   class TreeModel : public QAbstractItemModel
   {
       Q_OBJECT

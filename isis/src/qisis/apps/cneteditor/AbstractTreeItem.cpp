@@ -25,8 +25,8 @@ namespace Isis
   {
     return parentItem;
   }
-  
-  
+
+
   void AbstractTreeItem::setParent(AbstractTreeItem * newParent)
   {
     parentItem = newParent;

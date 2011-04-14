@@ -68,15 +68,14 @@ namespace Isis
     serialModel->setDrivable(view == SerialView);
     connectionModel->setDrivable(view == ConnectionView);
 
-    QTreeView * treeView = NULL;
-    switch (view)
-    {
-      case PointView: treeView = pointView; break;
-      case SerialView: treeView = serialView; break;
-      case ConnectionView: treeView = connectionView; break;
-    }
+    pointView->selectionModel()->clear();
+    pointView->collapseAll();
 
-    treeView->selectionModel()->clear();
+    serialView->selectionModel()->clear();
+    serialView->collapseAll();
+
+    connectionView->selectionModel()->clear();
+    connectionView->collapseAll();
   }
 
 
@@ -153,7 +152,7 @@ namespace Isis
         SLOT(itemCollapsed(const QModelIndex &)));
     connectionView->setAlternatingRowColors(true);
     connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
-    
+
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
     editPointView->setModel(editPointModel);
@@ -281,7 +280,9 @@ namespace Isis
     editPointModel->setPoints(points);
     QList< ControlMeasure * > allMeasuresForSelectedPoints;
     foreach(ControlPoint * point, points)
-    allMeasuresForSelectedPoints.append(point->GetMeasures());
+    {
+      allMeasuresForSelectedPoints.append(point->GetMeasures());
+    }
     editMeasureModel->setMeasures(allMeasuresForSelectedPoints);
 
     if (pointModel->isDrivable())
@@ -410,15 +411,15 @@ namespace Isis
 
   void CnetEditorWidget::itemExpanded(const QModelIndex & index)
   {
-    static_cast< AbstractTreeItem * >(index.internalPointer())->setExpanded(
-      true);
+    static_cast< AbstractTreeItem * >(
+      index.internalPointer())->setExpanded(true);
   }
 
 
   void CnetEditorWidget::itemCollapsed(const QModelIndex & index)
   {
-    static_cast< AbstractTreeItem * >(index.internalPointer())->setExpanded(
-      false);
+    static_cast< AbstractTreeItem * >(
+      index.internalPointer())->setExpanded(false);
   }
 
 
@@ -430,7 +431,7 @@ namespace Isis
     ASSERT(connectionModel);
 
     updatingSelection = true;
-    
+
 //     cerr << "CnetEditorWidget::rebuildModels one\n";
     pointModel->saveViewState();
     pointModel->rebuildItems();
@@ -445,39 +446,34 @@ namespace Isis
     connectionModel->saveViewState();
     connectionModel->rebuildItems();
     connectionModel->loadViewState();
-    
+
     updatingSelection = false;
 //     cerr << "CnetEditorWidget::rebuildModels done\n";
-  }
-
-
-  void CnetEditorWidget::handleButtonClicked()
-  {
-    serialModel->loadViewState();
   }
 
 
   void CnetEditorWidget::focusView(QTreeView * view, QStringList labels)
   {
     QAbstractItemModel * model = view->model();
-    view->selectionModel()->clear();
-    view->collapseAll();
     for (int i = 0; i < model->rowCount(); i++)
     {
       QModelIndex index = model->index(i, 0, QModelIndex());
-      if (labels.contains(model->data(index, Qt::DisplayRole).toString()))
-      {
-        view->selectionModel()->select(index, QItemSelectionModel::Select);
-        if (labels.size() == 1)
-        {
-          view->setExpanded(index, true);
-//           cerr << "CnetEditorWidget::focusView... "
-//                << static_cast< AbstractTreeItem * >(index.internalPointer())->isExpanded()
-//                << "\t" << index.internalPointer() << "\n";
+      AbstractTreeItem * item = static_cast< AbstractTreeItem * >(
+          index.internalPointer());
 
-        }
+      bool hit = labels.contains(
+          model->data(index, Qt::DisplayRole).toString());
+      bool shouldExpand = hit && labels.size() == 1;
+
+      item->setSelected(hit);
+      view->selectionModel()->select(index, hit ? QItemSelectionModel::Select :
+          QItemSelectionModel::Deselect);
+
+      item->setExpanded(shouldExpand);
+      view->setExpanded(index, shouldExpand);
+
+      if (hit)
         view->scrollTo(index, QAbstractItemView::PositionAtCenter);
-      }
     }
   }
 
