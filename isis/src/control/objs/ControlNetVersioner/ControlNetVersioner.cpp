@@ -526,6 +526,106 @@ namespace Isis {
       if(cp.HasKeyword("Z"))
         cp["Z"].SetName("AdjustedZ");
 
+      if(cp.HasKeyword("AprioriSigmaLatitude") ||
+         cp.HasKeyword("AprioriSigmaLongitude") ||
+         cp.HasKeyword("AprioriSigmaRadius")) {
+        double sigmaLat = 10000.0;
+        double sigmaLon = 10000.0;
+        double sigmaRad = 10000.0;
+
+        if(cp.HasKeyword("AprioriSigmaLatitude")) {
+          if((double)cp["AprioriSigmaLatitude"][0] > 0 &&
+             (double)cp["AprioriSigmaLatitude"][0] < sigmaLat)
+            sigmaLat = cp["AprioriSigmaLatitude"];
+
+          cp += PvlKeyword("LatitudeConstrained", "True");
+        }
+
+        if(cp.HasKeyword("AprioriSigmaLongitude")) {
+          if((double)cp["AprioriSigmaLongitude"][0] > 0 &&
+             (double)cp["AprioriSigmaLongitude"][0] < sigmaLon)
+            sigmaLon = cp["AprioriSigmaLongitude"];
+
+          cp += PvlKeyword("LongitudeConstrained", "True");
+        }
+
+        if(cp.HasKeyword("AprioriSigmaRadius")) {
+          if((double)cp["AprioriSigmaRadius"][0] > 0 &&
+             (double)cp["AprioriSigmaRadius"][0] < sigmaRad)
+            sigmaRad = cp["AprioriSigmaRadius"];
+
+          cp += PvlKeyword("RadiusConstrained", "True");
+        }
+
+        SurfacePoint tmp;
+        tmp.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+        tmp.SetRectangular(
+            Distance(cp["AprioriX"], Distance::Meters),
+            Distance(cp["AprioriY"], Distance::Meters),
+            Distance(cp["AprioriZ"], Distance::Meters));
+        tmp.SetSphericalSigmasDistance(
+          Distance(sigmaLat, Distance::Meters),
+          Distance(sigmaLon, Distance::Meters),
+          Distance(sigmaRad, Distance::Meters));
+
+        PvlKeyword aprioriCovarMatrix("AprioriCovarianceMatrix");
+        aprioriCovarMatrix += tmp.GetRectangularMatrix()(0, 0);
+        aprioriCovarMatrix += tmp.GetRectangularMatrix()(0, 1);
+        aprioriCovarMatrix += tmp.GetRectangularMatrix()(0, 2);
+        aprioriCovarMatrix += tmp.GetRectangularMatrix()(1, 1);
+        aprioriCovarMatrix += tmp.GetRectangularMatrix()(1, 2);
+        aprioriCovarMatrix += tmp.GetRectangularMatrix()(2, 2);
+
+        cp += aprioriCovarMatrix;
+      }
+
+      if(cp.HasKeyword("AdjustedSigmaLatitude") ||
+         cp.HasKeyword("AdjustedSigmaLongitude") ||
+         cp.HasKeyword("AdjustedSigmaRadius")) {
+        double sigmaLat = 10000.0;
+        double sigmaLon = 10000.0;
+        double sigmaRad = 10000.0;
+
+        if(cp.HasKeyword("AdjustedSigmaLatitude")) {
+          if((double)cp["AdjustedSigmaLatitude"][0] > 0 &&
+             (double)cp["AdjustedSigmaLatitude"][0] < sigmaLat)
+            sigmaLat = cp["AdjustedSigmaLatitude"];
+        }
+
+        if(cp.HasKeyword("AdjustedSigmaLongitude")) {
+          if((double)cp["AdjustedSigmaLongitude"][0] > 0 &&
+             (double)cp["AdjustedSigmaLongitude"][0] < sigmaLon)
+            sigmaLon = cp["AdjustedSigmaLongitude"];
+        }
+
+        if(cp.HasKeyword("AdjustedSigmaRadius")) {
+          if((double)cp["AdjustedSigmaRadius"][0] > 0 &&
+             (double)cp["AdjustedSigmaRadius"][0] < sigmaRad)
+            sigmaRad = cp["AdjustedSigmaRadius"];
+        }
+
+        SurfacePoint tmp;
+        tmp.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+        tmp.SetRectangular(
+            Distance(cp["AdjustedX"], Distance::Meters),
+            Distance(cp["AdjustedY"], Distance::Meters),
+            Distance(cp["AdjustedZ"], Distance::Meters));
+        tmp.SetSphericalSigmasDistance(
+          Distance(sigmaLat, Distance::Meters),
+          Distance(sigmaLon, Distance::Meters),
+          Distance(sigmaRad, Distance::Meters));
+
+        PvlKeyword adjustedCovarMatrix("AdjustedCovarianceMatrix");
+        adjustedCovarMatrix += tmp.GetRectangularMatrix()(0, 0);
+        adjustedCovarMatrix += tmp.GetRectangularMatrix()(0, 1);
+        adjustedCovarMatrix += tmp.GetRectangularMatrix()(0, 2);
+        adjustedCovarMatrix += tmp.GetRectangularMatrix()(1, 1);
+        adjustedCovarMatrix += tmp.GetRectangularMatrix()(1, 2);
+        adjustedCovarMatrix += tmp.GetRectangularMatrix()(2, 2);
+
+        cp += adjustedCovarMatrix;
+      }
+
       if(cp.HasKeyword("ApostCovarianceMatrix"))
         cp["ApostCovarianceMatrix"].SetName("AdjustedCovarianceMatrix");
 

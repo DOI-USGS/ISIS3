@@ -110,6 +110,7 @@ namespace Isis {
    * @author 2011-04-05 Steven Lambright
    *
    * @internal
+   *   @history 2011-04-14 Steven Lambright - Improved handling of V1 networks
    */
   class ControlNetVersioner {
     public:
