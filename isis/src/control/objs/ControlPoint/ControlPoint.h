@@ -247,8 +247,9 @@ namespace Isis {
    *   @history 2011-04-01 Debbie A. Cook and Ken Edmundson - Added argument to
    *            constructor for target radii
    *   @history 2011-04-04 Steven Lambright - Removed an old constructor
-   *                              and made the Distance vector one take a const
-   *                              reference.
+   *            and made the Distance vector one take a const reference.
+   *   @history 2011-04-04 Steven Lambright - Updated constructor from binary to
+   *            take planetary radii
    */
   class ControlPoint {
       friend class ControlNet;
@@ -344,7 +345,9 @@ namespace Isis {
       ControlPoint();
       ControlPoint(const ControlPoint &);
       ControlPoint(const iString &id);
-      ControlPoint(const ControlPointFileEntryV0002 &fileEntry);
+      ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
+                   const Distance &majorRad, const Distance &minorRad,
+                   const Distance &polarRad);
       ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }

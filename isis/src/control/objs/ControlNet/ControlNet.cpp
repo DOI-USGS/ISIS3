@@ -199,10 +199,13 @@ namespace Isis {
 
     ControlPointFileEntryV0002 fileDataPoint;
     foreach(fileDataPoint, fileDataPoints) {
-      AddPoint(new ControlPoint(fileDataPoint));
+      AddPoint(new ControlPoint(fileDataPoint,
+          p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]));
+
       if (progress != NULL)
         progress->CheckStatus();
     }
+
     delete fileData;
     fileData = NULL;
   }

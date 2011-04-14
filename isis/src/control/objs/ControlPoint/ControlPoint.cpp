@@ -117,7 +117,9 @@ namespace Isis {
    * @history 2008-06-18  Debbie A. Cook, Swapped Init with SetRadii
    *          calls to avoid resetting the surface points with no radii
    */
-  ControlPoint::ControlPoint(const ControlPointFileEntryV0002 &fileEntry) {
+  ControlPoint::ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
+      const Distance &majorRad, const Distance &minorRad,
+      const Distance &polarRad) {
     measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;
@@ -254,6 +256,8 @@ namespace Isis {
         }
       }
 
+      apriori.SetRadii(majorRad, minorRad, polarRad);
+
       aprioriSurfacePoint = apriori;
     }
 
@@ -277,6 +281,8 @@ namespace Isis {
         covar(2, 2) = fileEntry.adjustedcovar(5);
         adjusted.SetRectangularMatrix(covar);
       }
+
+      adjusted.SetRadii(majorRad, minorRad, polarRad);
 
       adjustedSurfacePoint = adjusted;
     }
