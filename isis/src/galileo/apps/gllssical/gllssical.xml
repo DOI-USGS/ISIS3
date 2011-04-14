@@ -98,6 +98,10 @@
       values are zero based and the gain mode id is 1 based.
       based.
     </change>
+    <change name="Jai Rideout" date="2011-04-14">
+      Fixed bug where shutter file buffers were being accessed out of array
+      bounds.
+    </change>
   </history>
 
   <groups>     

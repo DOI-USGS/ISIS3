@@ -98,6 +98,7 @@ void IsisMain() {
 
   ocube->PutGroup(calibrationLog);
   Application::Log(calibrationLog);
+
   p.EndProcess();
 }
 
@@ -111,12 +112,16 @@ void Calibrate1(vector<Buffer *> &in, vector<Buffer *> &out) {
   double scaleFactor = scaleFactor0 / (exposureDuration - shutterFile[0]);
 
   for(int samp = 0; samp < inputFile.size(); samp++) {
+    // Some shutter files are only a single sample. Others may match the number
+    // of samples in the cube.
+    int shutterIndex = (shutterFile.size() == 1) ? 0 : samp;
+
     if(IsSpecial(inputFile[samp])) {
       outputFile[samp] = inputFile[samp];
       continue;
     }
 
-    if(IsSpecial(darkFile[samp]) || IsSpecial(gainFile[samp]) || IsSpecial(shutterFile[samp])) {
+    if(IsSpecial(darkFile[samp]) || IsSpecial(gainFile[samp]) || IsSpecial(shutterFile[shutterIndex])) {
       outputFile[samp] = Isis::Null;
       continue;
     }
@@ -147,12 +152,16 @@ void Calibrate2(vector<Buffer *> &in, vector<Buffer *> &out) {
   double scaleFactor = scaleFactor0 / (exposureDuration - shutterFile[0]);
 
   for(int samp = 0; samp < inputFile.size(); samp++) {
+    // Some shutter files are only a single sample. Others may match the number
+    // of samples in the cube.
+    int shutterIndex = (shutterFile.size() == 1) ? 0 : samp;
+
     if(IsSpecial(inputFile[samp])) {
       outputFile[samp] = inputFile[samp];
       continue;
     }
 
-    if(IsSpecial(darkFile[samp]) || IsSpecial(gainFile[samp]) || IsSpecial(shutterFile[samp])) {
+    if(IsSpecial(darkFile[samp]) || IsSpecial(gainFile[samp]) || IsSpecial(shutterFile[shutterIndex])) {
       outputFile[samp] = Isis::Null;
       continue;
     }
