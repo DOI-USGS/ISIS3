@@ -67,7 +67,7 @@ void IsisMain() {
   ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
   //Finally combines the highpass and lowpass mosaics
-  parameters = "FROM1=" + pathName + "HighpassMosaic.cub" +
+  parameters = "FROM=" + pathName + "HighpassMosaic.cub" +
                " FROM2=" + pathName + "LowpassMosaic.cub" +
                " TO=" + ui.GetFilename("TO") +
                " OPERATOR= add";
