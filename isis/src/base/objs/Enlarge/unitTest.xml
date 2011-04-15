@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Unit test for Enlarge class
+  </brief>
+
+  <description>
+    Just a test only a test
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Sharmila Prasad" date="2011-04-14">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>$base/testData/isisTruth.cub</item></default>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>real</pixelType>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>/tmp/enlarged.cub</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>
+

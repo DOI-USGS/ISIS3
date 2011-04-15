@@ -1,0 +1,50 @@
+Testing Isis::Enlarge Class ... 
+unittest: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 252
+      Lines   = 252
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = AlphaCube
+    AlphaSamples        = 126
+    AlphaLines          = 126
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 126.5
+    AlphaEndingLine     = 126.5
+    BetaSamples         = 252
+    BetaLines           = 252
+  End_Group
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 589825
+  Bytes     = 1135
+End_Object
+End
