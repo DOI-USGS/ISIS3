@@ -74,7 +74,8 @@ void IsisMain() {
 
   // Set up the transform object with the calculated scale and number of
   // output pixels
-  Transform *transform = new Enlarge(icube, sampleScale, lineScale);
+  //Transform *transform = new Enlarge(icube, sampleScale, lineScale);
+  Enlarge *transform = new Enlarge(icube, sampleScale, lineScale);
   p.StartProcess(*transform, *interp);
   PvlGroup resultsGrp = transform->UpdateOutputLabel(ocube);
   
