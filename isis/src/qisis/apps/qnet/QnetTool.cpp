@@ -2073,6 +2073,10 @@ namespace Qisis {
    *   @history 2010-07-01 Jeannie Walldren - Modified to draw points selected in
    *                          QnetTool last so they lay on top of all other points
    *                          in the image.
+   *   @history 2011-04-15 Tracie Sucharski - Fixed bug which was causing all
+   *                          measures to be drawn on all cubes.  Also removed
+   *                          loop through measures, instead just get measure
+   *                          for given serial number.
    */
   void QnetTool::drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter) {
     // Without a controlnetwork there are no points
@@ -2082,42 +2086,37 @@ namespace Qisis {
     // TODO: Should we show them anyway
     // TODO: Should we add the SN to the viewPort
     string serialNumber = Isis::SerialNumber::Compose(*vp->cube());
+
     if(!g_serialNumberList->HasSerialNumber(serialNumber)) return;
 
     // loop through all points in the control net
     for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
       Isis::ControlPoint &p = *((*g_controlNetwork)[i]);
-      // loop through the measurements
-      for (int j = 0; j < p.GetNumMeasures(); j++) {
-        // check whether this point is contained in the image
-        if (p.HasSerialNumber(serialNumber)) {
-          // Find the measurments on the viewport
-          double samp = p[j]->GetSample();
-          double line = p[j]->GetLine();
-          int x, y;
-          vp->cubeToViewport(samp, line, x, y);
-          // if the point is ignored,
-          if (p.IsIgnored()) {
-            painter->setPen(QColor(255, 255, 0)); // set point marker yellow
-          }
-          // point is not ignored
-          // if the measure matching this image is ignored,
-          else if (p[j]->IsIgnored()) {
-            painter->setPen(QColor(255, 255, 0)); // set point marker yellow
-          }
-          // Neither point nor measure is not ignored and the measure is ground,
-          else if (p.GetType() == Isis::ControlPoint::Ground) {
-            painter->setPen(Qt::magenta);// set point marker magenta
-          }
-          else {
-            painter->setPen(Qt::green); // set all other point markers green
-          }
-          // draw points
-          painter->drawLine(x - 5, y, x + 5, y);
-          painter->drawLine(x, y - 5, x, y + 5);
+      // check whether this point is contained in the image
+      if (p.HasSerialNumber(serialNumber)) {
+        // Find the measurments on the viewport
+        double samp = p[serialNumber]->GetSample();
+        double line = p[serialNumber]->GetLine();
+        int x, y;
+        vp->cubeToViewport(samp, line, x, y);
+        // if the point is ignored,
+        if (p.IsIgnored()) {
+          painter->setPen(QColor(255, 255, 0)); // set point marker yellow
         }
-        // if point is not in the image, go to next point
-        else continue;
+        // point is not ignored, but measure matching this image is ignored,
+        else if (p[serialNumber]->IsIgnored()) {
+          painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+        }
+        // Neither point nor measure is not ignored and the measure is ground,
+        else if (p.GetType() == Isis::ControlPoint::Ground) {
+          painter->setPen(Qt::magenta);// set point marker magenta
+        }
+        else {
+          painter->setPen(Qt::green); // set all other point markers green
+        }
+        // draw points
+        painter->drawLine(x - 5, y, x + 5, y);
+        painter->drawLine(x, y - 5, x, y + 5);
       }
     }
     // if QnetTool is open,
