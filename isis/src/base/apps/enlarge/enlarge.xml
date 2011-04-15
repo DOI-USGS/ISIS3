@@ -68,6 +68,9 @@
     <change name="Travis Addair" date="2009-12-11">
       Updated example.
     </change>
+    <change name="Sharmila Prasad" date="2011-04-14">
+      Ported the enlarge functionality to base/objs/Enlarge class
+    </change>
   </history>
 
   <category>
