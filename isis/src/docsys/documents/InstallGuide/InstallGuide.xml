@@ -94,39 +94,39 @@ you must <em>not</em> upgrade the Isis Data Files!!!
           Example for Suse 10.1 Linux x86 64-bit Intel compatible systems:
         </p>
 <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::x86-64_linux_SUSE/isis .
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86-64_linux_SUSE/isis .
 </pre>
         <p>
           Example for Suse 10.1 Linux x86 32-bit Intel compatible systems:
         </p>
 <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::x86_linux_SUSE/isis .
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86_linux_SUSE/isis .
 </pre>
 
         <p>
           Example for Red Hat 5.4 Linux x86 64-bit Intel compatible systems:    
         </p> 
 <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::x86-64_linux_RHEL/isis .
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86-64_linux_RHEL/isis .
 </pre>
         <p>
           Example for Red Hat 5.4 Linux x86 32-bit Intel compatible systems:
         </p>
 <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::x86_linux_RHEL/isis .
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86_linux_RHEL/isis .
 </pre>
 
         <p>
           Example for MacOSX 10.5 32-bit Intel compatible systems:
         </p>
 <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::x86_darwin_OSX/isis .
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86_darwin_OSX/isis .
 </pre>
 
         <p>
           <i><b>Note:</b> Isis3 can also be downloaded over port 80. To use port 80 change
            isisdist.wr.usgs.gov:: in the previous commands to rsync://isisdist.wr.usgs.gov:80::.
-           Example: <pre>rsync -azv --delete rsync://isisdist.wr.usgs.gov:80::x86-64_linux_RHEL/isis .</pre>
+           Example: <pre>rsync -azv --delete --partial rsync://isisdist.wr.usgs.gov:80::x86-64_linux_RHEL/isis .</pre>
           </i>
         </p>
 
@@ -151,7 +151,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
             To download all Isis3 data files use the following command.
         </p>
 <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data .
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data .
 </pre>
         <p>
           <b>Note:</b> The isis3 data area is very large (over 70GB). You may want to 
@@ -165,99 +165,131 @@ you must <em>not</em> upgrade the Isis Data Files!!!
           </b>
         </p>
 <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/base data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/base data/
 </pre>
+<p>
+  Apollo Mission:
+</p>
+        <pre>
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/apollo15 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/apollo16 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/apollo17 data/
+        </pre>
 <p>
   Cassini Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/cassini data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/cassini data/
         </pre>
- <p>
+<p>
+  Chan1 Mission:
+</p>
+        <pre>
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/chan1 data/
+        </pre>
+<p>
   Clementine Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/clementine1 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/clementine1 data/
+        </pre>
+<p>
+  Dawn Mission:
+</p>
+        <pre>
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/dawn data/
         </pre>
  <p>
   Galileo Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/galileo data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/galileo data/
         </pre>
 <p>
   Ideal Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/ideal data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/ideal data/
         </pre>
 <p>
   Lunar Orbiter Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/lo data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/lo data/
         </pre>
 <p>
   Lunar Reconnaissance Orbiter Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/lro data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/lro data/
         </pre>
 <p>
   Mars Exploration Rover Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/mer data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mer data/
+        </pre>
+<p>
+  Mariner10 Mission:
+</p>
+        <pre>
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mariner10 data/
         </pre>
 <p>
   Messenger Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/messenger data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/messenger data/
         </pre>
 <p>
   Mars Express Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/mex data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mex data/
         </pre>
 <p>
   Mars Global Surveyor Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/mgs data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mgs data/
         </pre>
 <p>
   Mars Reconnaissance Orbiter Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/mro data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mro data/
         </pre>
 <p>
   Odyssey Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/odyssey data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/odyssey data/
+        </pre>
+<p>
+  Rolo Mission:
+</p>
+        <pre>
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/rolo data/
         </pre>
 <p>
   Smart1 Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/smart1 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/smart1 data/
         </pre>
 <p>
   Viking Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/viking1 data/
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/viking2 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/viking1 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/viking2 data/
         </pre>
 <p>
   Voyager Mission:
 </p>
         <pre>
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/voyager1 data/
-        rsync -azv --delete isisdist.wr.usgs.gov::isis3data/data/voyager2 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/voyager1 data/
+        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/voyager2 data/
         </pre>
 
         <h2>4) Set up your environment</h2>
@@ -358,10 +390,11 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Stuart C. Sides" date="2006-05-12">Updated for isis 3.0.18</change>
     <change name="Jeff Anderson" date="2006-10-30">Remove references to beta version</change>
     <change name="Jac Shinaman" date="2007-01-18">Updated for isis 3.1.5 - Mac OS X</change>
-   <change name="Steven Koechle" date="2008-04-09">Added rsync options for data </change>
-   <change name="Stuart sides" date="2008-09-22">Updated for 3.1.17</change>
-   <change name="Stuart Sides" date="2010-03-18">Updated for release 3.2.0</change>
-   <change name="Steven Lambright" date="2010-06-25">Updated for release 3.2.1</change>
+    <change name="Steven Koechle" date="2008-04-09">Added rsync options for data </change>
+    <change name="Stuart sides" date="2008-09-22">Updated for 3.1.17</change>
+    <change name="Stuart Sides" date="2010-03-18">Updated for release 3.2.0</change>
+    <change name="Steven Lambright" date="2010-06-25">Updated for release 3.2.1</change>
+    <change name="Jai Rideout" date="2011-04-15">Added rsync partial option to rsync commands and added new mission-specific sections</change>
   </history>
 
   <bibliography>
