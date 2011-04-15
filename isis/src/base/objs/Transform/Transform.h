@@ -23,6 +23,9 @@
 #ifndef Transform_h
 #define Transform_h
 
+#include "Cube.h"
+#include "PvlGroup.h"
+
 namespace Isis {
   /**
    * @brief Pixel transformation
@@ -83,7 +86,8 @@ namespace Isis {
    *                                      was not const
    *  @history 2005-02-22 Elizabeth Ribelin - Modified file to support Doxygen
    *                                          documentation
-   *
+   *  @history 2011-04-15 Sharmila Prasad - Added API pure virtual function UpdateOutputLabel
+   *                      to be implemented by the derived classes
    *  @todo 2005-02-22 Stuart Sides - finish documentation
    */
   class Transform {
@@ -136,6 +140,17 @@ namespace Isis {
       virtual bool Xform(double &inSample, double &inLine,
                          const double outSample,
                          const double outLine) = 0;
+      
+      /**
+       * Update the label for the transformed output image
+       * 
+       * @author Sharmila Prasad (4/15/2011)
+       * 
+       * @param pOutCube - Transformed output image
+       * 
+       * @return Isis::PvlGroup - Result Group with Transformation details
+       */
+      virtual Isis::PvlGroup UpdateOutputLabel(Isis::Cube *pOutCube)=0;
 
   };
 };
