@@ -113,7 +113,7 @@ void IsisMain() {
   ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
   //Finally combines the first highpass and lowpass mosaics
-  parameters = "FROM1=" + cubeListBaseName + "_newmosFirst.cub" +
+  parameters = "FROM=" + cubeListBaseName + "_newmosFirst.cub" +
                " FROM2=" + cubeListBaseName + "_lpfmos.cub" +
                " TO= " + cubeListBaseName + "_untrimmedmoc.cub" +
                " OPERATOR= add";
