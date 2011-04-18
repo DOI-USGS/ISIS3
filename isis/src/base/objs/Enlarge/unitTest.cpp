@@ -16,7 +16,7 @@ void IsisMain() {
   Isis::Cube *inCube = p.SetInputCube("FROM");
   
   double sampleScale=2.0, lineScale=2.0;
-  Isis::Transform *trans = new Isis::Enlarge(inCube, sampleScale, lineScale);
+  Isis::Enlarge *trans = new Isis::Enlarge(inCube, sampleScale, lineScale);
 
   Isis::Interpolator *interp;
   interp = new Isis::Interpolator(Isis::Interpolator::NearestNeighborType);
@@ -26,11 +26,11 @@ void IsisMain() {
   int onl = (int)ceil(inCube->Lines() * lineScale);
   Isis::Cube *outCube = p.SetOutputCube("TO", ons, onl, inCube->Bands());
   
-  cout << "Testing Isis::Enlarge Class ... " << endl;
+  cerr << "Testing Isis::Enlarge Class ... " << endl;
   p.StartProcess(*trans, *interp);
   trans->UpdateOutputLabel(outCube);
   Isis::Pvl *outLabel = outCube->Label();
-  cout << *outLabel;
+  cerr << *outLabel;
   p.EndProcess();
 
   delete trans;
