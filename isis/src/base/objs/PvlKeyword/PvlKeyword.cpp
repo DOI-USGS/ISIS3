@@ -1849,39 +1849,41 @@ namespace Isis {
 
   //! This is an assignment operator
   const PvlKeyword &PvlKeyword::operator=(const PvlKeyword &other) {
-    p_formatter = other.p_formatter;
+    if(this != &other) {
+      p_formatter = other.p_formatter;
 
-    if(p_name) {
-      delete [] p_name;
-      p_name = NULL;
+      if(p_name) {
+        delete [] p_name;
+        p_name = NULL;
+      }
+
+      if(other.p_name) {
+        SetName(other.p_name);
+      }
+
+      p_values = other.p_values;
+
+      if(p_units) {
+        delete p_units;
+        p_units = NULL;
+      }
+
+      if(other.p_units) {
+        p_units = new std::vector<std::string>(*other.p_units);
+      }
+
+      if(p_comments) {
+        delete p_comments;
+        p_comments = NULL;
+      }
+
+      if(other.p_comments) {
+        p_comments = new std::vector<std::string>(*other.p_comments);
+      }
+
+      p_width = other.p_width;
+      p_indent = other.p_indent;
     }
-
-    if(other.p_name) {
-      SetName(other.p_name);
-    }
-
-    p_values = other.p_values;
-
-    if(p_units) {
-      delete p_units;
-      p_units = NULL;
-    }
-
-    if(other.p_units) {
-      p_units = new std::vector<std::string>(*other.p_units);
-    }
-
-    if(p_comments) {
-      delete p_comments;
-      p_comments = NULL;
-    }
-
-    if(other.p_comments) {
-      p_comments = new std::vector<std::string>(*other.p_comments);
-    }
-
-    p_width = other.p_width;
-    p_indent = other.p_indent;
 
     return *this;
   }
