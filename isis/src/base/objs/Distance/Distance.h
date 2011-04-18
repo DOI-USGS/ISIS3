@@ -39,6 +39,7 @@ namespace Isis {
    * @author 2010-10-12 Steven Lambright
    *
    * @internal
+   *   @history 2011-04-18 Steven Lambright Improved special pixel math handling
    */
   class Distance {
     public:

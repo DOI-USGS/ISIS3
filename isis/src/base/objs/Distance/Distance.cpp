@@ -66,7 +66,7 @@ namespace Isis {
    */
   Distance::~Distance() {
     // This will help debug memory problems, better to reset to obviously bad
-    //   values in case we're used after we're deleted. 
+    //   values in case we're used after we're deleted.
     p_distanceInMeters = Null;
   }
 
@@ -106,7 +106,7 @@ namespace Isis {
    * Set the distance in kilometers.
    *
    * @param distanceInKilometers This is the value to set this distance to,
-   *     given in kilometers. This will throw an exception if the value is 
+   *     given in kilometers. This will throw an exception if the value is
    *     negative.
    */
   void Distance::SetKilometers(double distanceInKilometers) {
@@ -196,8 +196,11 @@ namespace Isis {
    * @return Resulting distance, self not modified
    */
   Displacement Distance::operator -(const Distance &distanceToSub) const {
+    if(!Valid() || !distanceToSub.Valid()) return Displacement();
+
     Displacement result(GetMeters() - distanceToSub.GetMeters(),
         Displacement::Meters);
+
     return result;
   }
 
@@ -209,6 +212,8 @@ namespace Isis {
    * @return Resulting value
    */
   double Distance::operator /(const Distance &distanceToDiv) const {
+    if(!Valid() || !distanceToDiv.Valid()) return Null;
+
     double result = GetMeters() / distanceToDiv.GetMeters();
     return result;
   }
@@ -221,7 +226,10 @@ namespace Isis {
    * @return Resulting value
    */
   Distance Distance::operator /(const double &valueToDiv) const {
+    if(!Valid() || IsSpecial(valueToDiv)) return Distance();
+
     Distance result = Distance(GetMeters() / valueToDiv, Meters);
+
     return result;
   }
 
@@ -233,7 +241,10 @@ namespace Isis {
    * @return Resulting value
    */
   Distance Distance::operator *(const double &valueToMult) const {
+    if(!Valid() || IsSpecial(valueToMult)) return Distance();
+
     Distance result = Distance(GetMeters() * valueToMult, Meters);
+
     return result;
   }
 
@@ -257,7 +268,12 @@ namespace Isis {
    * @param distanceToAdd This is the distance we are to duplicate exactly
    */
   void Distance::operator +=(const Distance &distanceToAdd) {
-    SetDistance(GetMeters() + distanceToAdd.GetMeters(), Meters);
+    if(!Valid() || !distanceToAdd.Valid()) {
+      SetDistance(Null, Meters);
+    }
+    else {
+      SetDistance(GetMeters() + distanceToAdd.GetMeters(), Meters);
+    }
   }
 
 
@@ -269,7 +285,12 @@ namespace Isis {
    * @param distanceToSub This is the distance we are to subtract
    */
   void Distance::operator -=(const Distance &distanceToSub) {
-    SetDistance(GetMeters() - distanceToSub.GetMeters(), Meters);
+    if(!Valid() || !distanceToSub.Valid()) {
+      SetDistance(Null, Meters);
+    }
+    else {
+      SetDistance(GetMeters() - distanceToSub.GetMeters(), Meters);
+    }
   }
 
 
@@ -279,7 +300,12 @@ namespace Isis {
    * @param valueToDiv This is the displacement we are to divide by
    */
   void Distance::operator /=(const double &valueToDiv) {
-    SetDistance(GetMeters() / valueToDiv, Meters);
+    if(!Valid() || IsSpecial(valueToDiv)) {
+      SetDistance(Null, Meters);
+    }
+    else {
+      SetDistance(GetMeters() / valueToDiv, Meters);
+    }
   }
 
 
@@ -289,7 +315,12 @@ namespace Isis {
    * @param valueToMult This is the value we are going to multiply by
    */
   void Distance::operator *=(const double &valueToMult) {
-    SetDistance(GetMeters() * valueToMult, Meters);
+    if(!Valid() || IsSpecial(valueToMult)) {
+      SetDistance(Null, Meters);
+    }
+    else {
+      SetDistance(GetMeters() * valueToMult, Meters);
+    }
   }
 
 
