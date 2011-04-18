@@ -146,7 +146,6 @@ void IsisMain() {
     stretch.AddPair(65536.0, 65536.0);
     instgrp.AddKeyword(PvlKeyword("Unlutted", "FALSE"));
   }
-  ocube->PutGroup(instgrp);
 
   // Save the calibration and ancillary data as BLOBs. Both get run thru the
   // lookup table just like the image data.

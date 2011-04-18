@@ -195,6 +195,9 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
+    <change name="Steven Lambright" date="2011-04-18">
+      Removed a line of code that didn't make sense
+    </change>
   </history>
 
   <category>
