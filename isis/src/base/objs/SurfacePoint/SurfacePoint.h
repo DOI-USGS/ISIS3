@@ -66,6 +66,9 @@ namespace Isis {
    * @history 2011-03-05 Ken Edmundson Added GetLatWeight, GetLonWeight, 
    *           GetLocalRadiusWeight, and SetSphericalCoordinates methods for use
    *           in BundleAdjust.
+   * @history 2011-04-18 Steven Lambright GetLatSigmaDistance and
+   *           GetLonSigmaDistance now return appropriate results when the
+   *           point is invalid but has radii. 
    */
 
   class SurfacePoint {

@@ -913,9 +913,15 @@ namespace Isis {
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
-      Angle latSigma = GetLatSigma();
-      // Convert from radians to meters
-      return latSigma.GetRadians() * *p_majorAxis;
+      Distance latSigmaDistance;
+
+      if(Valid()) {
+        Angle latSigma = GetLatSigma();
+        // Convert from radians to meters
+        latSigmaDistance = latSigma.GetRadians() * *p_majorAxis;
+      }
+
+      return latSigmaDistance;
     }
 
 
@@ -932,15 +938,19 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    Angle lonSigma = GetLonSigma();
-    Latitude lat = GetLatitude();
-    double scaler = cos(lat.GetRadians());
+    Distance lonSigmaDistance;
 
-    // Convert from radians to meters and return
-    if (scaler != 0.) 
-      return lonSigma.GetRadians() * *p_majorAxis / scaler;
-    else
-      return Distance();
+    if(Valid()) {
+      Angle lonSigma = GetLonSigma();
+      Latitude lat = GetLatitude();
+      double scaler = cos(lat.GetRadians());
+
+      // Convert from radians to meters and return
+      if (scaler != 0.)  
+        lonSigmaDistance = lonSigma.GetRadians() * *p_majorAxis / scaler;
+    }
+
+    return lonSigmaDistance;
   }
 
 
