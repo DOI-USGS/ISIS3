@@ -10,6 +10,12 @@ class QnetSetAprioriDialog : public QDialog, public Ui::QnetSetAprioriDialog {
 
   public:
     QnetSetAprioriDialog(QWidget *parent = 0);
+    void clearLineEdits();
+
+  signals:
+    void setApriori();
+//    void aprioriDialogClosed();
+
 
 };
 

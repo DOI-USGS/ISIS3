@@ -335,7 +335,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>21</x>
@@ -359,16 +359,16 @@
      </spacer>
     </item>
     <item>
-     <widget class="QPushButton" name="okButton">
+     <widget class="QPushButton" name="setAprioriButton">
       <property name="text">
-       <string>Ok</string>
+       <string>SetApriori</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="cancelButton">
+     <widget class="QPushButton" name="closeButton">
       <property name="text">
-       <string>Cancel</string>
+       <string>Close</string>
       </property>
      </widget>
     </item>
@@ -522,23 +522,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>okButton</sender>
-   <signal>clicked()</signal>
-   <receiver>QnetSetAprioriDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>563</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>193</x>
-     <y>292</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cancelButton</sender>
+   <sender>closeButton</sender>
    <signal>clicked()</signal>
    <receiver>QnetSetAprioriDialog</receiver>
    <slot>reject()</slot>

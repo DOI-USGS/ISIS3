@@ -35,6 +35,8 @@ class QStackedWidget;
 class QString;
 class QWidget;
 
+class QnetSetAprioriDialog;
+
 using namespace std;
 namespace Qisis {
   /**
@@ -141,6 +143,7 @@ namespace Qisis {
       void resetList();
       void refreshList();
       void updateEditPoint(QString pointId);
+      void setApriori();
 
     private slots:
       void load();
@@ -153,9 +156,10 @@ namespace Qisis {
       void enableButtons();
       void ignorePoints();
       void deletePoints();
-      void setApriori();
       void resetCubeList();
       void showNavTool();
+      void aprioriDialog();
+      void fillAprioriEdits();
 
     signals:
       void loadPointImages (Isis::ControlPoint *);
@@ -185,6 +189,8 @@ namespace Qisis {
       int p_filterCount;
 
       QString p_editPointId;
+
+      QnetSetAprioriDialog *p_aprioriDialog;
   };
 };
 

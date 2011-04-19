@@ -2050,6 +2050,7 @@ namespace Qisis {
    *                          namespace std"
    */    
   void QnetTool::paintAllViewports(QString pointId) {
+    
     // Take care of drawing things on all viewPorts.
     // Calling update will cause the Tool class to call all registered tools 
     // if point has been deleted, this will remove it from the main window
@@ -2079,6 +2080,7 @@ namespace Qisis {
    *                          for given serial number.
    */
   void QnetTool::drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter) {
+    
     // Without a controlnetwork there are no points
     if(g_controlNetwork == 0) return;
 
@@ -2475,6 +2477,7 @@ namespace Qisis {
    *  
    */
   void QnetTool::refresh() {
+    
 
     //  Check point being edited, make sure it still exists, if not ???
     //  Update ignored checkbox??
