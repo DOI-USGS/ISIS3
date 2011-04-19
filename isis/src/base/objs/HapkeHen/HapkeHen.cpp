@@ -60,7 +60,7 @@ namespace Isis {
    */
   double HapkeHen::PhotoModelAlgorithm(double phase, double incidence,
                                        double emission) {
-    double pht_hapkehen;
+    static double pht_hapkehen;
     double pharad;  //phase angle in radians
     double incrad;  // incidence angle in radians
     double emarad; // emission angle in radians
@@ -108,6 +108,18 @@ namespace Isis {
     double s2ee;
     double rr1;
     double rr2;
+
+    static double old_phase = -9999;
+    static double old_incidence = -9999;
+    static double old_emission= -9999;
+
+    if (old_phase == phase && old_incidence == incidence && old_emission == emission) {
+      return pht_hapkehen;
+    }
+
+    old_phase = phase;
+    old_incidence = incidence;
+    old_emission = emission;
 
     pharad = phase * PI / 180.0;
     incrad = incidence * PI / 180.0;

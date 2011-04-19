@@ -92,10 +92,10 @@ namespace Isis {
                                    double demincidence, double dememission, double dn, 
                                    double &albedo, double &mult, double &base) {
     double eps = 0.1;
-    double psurf;
-    double pprime;
-    double ahInterp;
-    double munot;
+    static double psurf;
+    static double pprime;
+    static double ahInterp;
+    static double munot;
     double pstd;
     double trans;
     double trans0;
@@ -110,11 +110,28 @@ namespace Isis {
     double pflat;
     double rhoflat;
 
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
-    pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
-    ahInterp = (GetAtmosModel()->AtmosAhSpline()).Evaluate(incidence, NumericalApproximation::Extrapolate);
+    static double old_phase = -9999;
+    static double old_incidence = -9999;
+    static double old_emission = -9999;
+    static double old_demincidence = -9999;
+    static double old_dememission = -9999;
 
-    munot = cos(incidence * (PI / 180.0));
+    if (old_phase != phase || old_incidence != incidence || old_emission != emission ||
+        old_demincidence != demincidence || old_dememission != dememission) {
+
+      psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
+      pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
+      ahInterp = (GetAtmosModel()->AtmosAhSpline()).Evaluate(incidence, NumericalApproximation::Extrapolate);
+
+      munot = cos(incidence * (PI / 180.0));
+
+      old_phase = phase;
+      old_incidence = incidence;
+      old_emission = emission;
+      old_demincidence = demincidence;
+      old_dememission = dememission;
+    }
+
     GetAtmosModel()->CalcAtmEffect(phase, incidence, emission, &pstd, &trans, &trans0, &sbar);
     pflat = pstd + p_normRhobar * (trans * ahInterp * munot /
                                    (1.0 - p_normRhobar * GetAtmosModel()->AtmosAb() * sbar) + trans0 * (psurf -

@@ -28,11 +28,28 @@ namespace Isis {
 
   double LunarLambert::PhotoModelAlgorithm(double phase, double incidence,
       double emission) {
-    double pht_lunlam;
-    double incrad = incidence * Isis::PI / 180.0;
-    double emarad = emission * Isis::PI / 180.0;
-    double munot = cos(incrad);
-    double mu = cos(emarad);
+    static double pht_lunlam;
+    double incrad;
+    double emarad;
+    double munot;
+    double mu;
+
+    static double old_phase = -9999;
+    static double old_incidence = -9999;
+    static double old_emission= -9999;
+
+    if (old_phase == phase && old_incidence == incidence && old_emission == emission) {
+      return pht_lunlam;
+    }
+
+    old_phase = phase;
+    old_incidence = incidence;
+    old_emission = emission;
+
+    incrad = incidence * Isis::PI / 180.0;
+    emarad = emission * Isis::PI / 180.0;
+    munot = cos(incrad);
+    mu = cos(emarad);
 
     if(munot <= 0.0 || mu <= 0.0 || incidence == 90.0 ||
         emission == 90.0) {

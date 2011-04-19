@@ -86,15 +86,31 @@ namespace Isis {
   void Mixed::NormModelAlgorithm(double phase, double incidence, double emission,
                                  double demincidence, double dememission, double dn, 
                                  double &albedo, double &mult, double &base) {
-    double psurf;
-    double pprime;
-    double aden;
+    static double psurf;
+    static double pprime;
+    static double aden;
 
-    // code for scaling each pixel
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
-    pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
-    double arg = pow(psurf, 2.0) + pow(p_psurfmatch * pprime / std::max(1.0e-30, p_pprimematch), 2.0);
-    aden = sqrt(std::max(1.0e-30, arg));
+    static double old_phase = -9999;
+    static double old_incidence = -9999;
+    static double old_emission = -9999;
+    static double old_demincidence = -9999;
+    static double old_dememission = -9999;
+
+    if (old_phase != phase || old_incidence != incidence || old_emission != emission ||
+        old_demincidence != demincidence || old_dememission != dememission) {
+
+      // code for scaling each pixel
+      psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
+      pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
+      double arg = pow(psurf, 2.0) + pow(p_psurfmatch * pprime / std::max(1.0e-30, p_pprimematch), 2.0);
+      aden = sqrt(std::max(1.0e-30, arg));
+
+      old_phase = phase;
+      old_incidence = incidence;
+      old_emission = emission;
+      old_demincidence = demincidence;
+      old_dememission = dememission;
+    }
 
     // thresh is a parameter limiting how much we amplify the dns
     // shouldn't actually get a large amplification in this mode because

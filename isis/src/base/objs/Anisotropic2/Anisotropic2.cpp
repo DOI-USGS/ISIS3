@@ -87,6 +87,19 @@ namespace Isis {
     double xmunot_1, ymunot_1;
     double xmu_1, ymu_1;
 
+    static double old_phase = -9999;
+    static double old_incidence = -9999;
+    static double old_emission = -9999;
+
+    if (phase == old_phase && incidence == old_incidence &&
+        emission == old_emission) {
+      return;
+    }
+
+    old_phase = phase;
+    old_incidence = incidence;
+    old_emission = emission;
+
     if(p_atmosBha == 0.0) {
       p_atmosBha = 1.0e-6;
     }

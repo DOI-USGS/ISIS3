@@ -41,31 +41,47 @@ namespace Isis {
   void Topo::NormModelAlgorithm(double phase, double incidence, double emission,
                                 double demincidence, double dememission, double dn, 
                                 double &albedo, double &mult, double &base) {
-    double rhobar;
-    double pprimeref;
-    double psurfref;
-    double psurf;
-    double psurf0;
-    double pprime;
+    static double rhobar;
+    static double pprimeref;
+    static double psurfref;
+    static double psurf;
+    static double psurf0;
+    static double pprime;
 
-    GetPhotoModel()->SetStandardConditions(true);
-    psurf0 = GetPhotoModel()->CalcSurfAlbedo(0.0, 0.0, 0.0);
+    static double old_phase = -9999;
+    static double old_incidence = -9999;
+    static double old_emission = -9999;
+    static double old_demincidence = -9999;
+    static double old_dememission = -9999;
 
-    if(psurf0 == 0.0) {
-      std::string msg = "Divide by zero error";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+    if (old_phase != phase || old_incidence != incidence || old_emission != emission ||
+        old_demincidence != demincidence || old_dememission != dememission) {
+
+      GetPhotoModel()->SetStandardConditions(true);
+      psurf0 = GetPhotoModel()->CalcSurfAlbedo(0.0, 0.0, 0.0);
+
+      if(psurf0 == 0.0) {
+        std::string msg = "Divide by zero error";
+        throw iException::Message(iException::Math, msg, _FILEINFO_);
+      }
+      else {
+        rhobar = p_normAlbedo / psurf0;
+      }
+
+      psurfref = GetPhotoModel()->CalcSurfAlbedo(p_normPharef, p_normIncref, p_normEmaref);
+      pprimeref = GetPhotoModel()->PhtTopder(p_normPharef, p_normIncref, p_normEmaref);
+      GetPhotoModel()->SetStandardConditions(false);
+
+      // code for scaling each pixel
+      psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
+      pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
+
+      old_phase = phase;
+      old_incidence = incidence;
+      old_emission = emission;
+      old_demincidence = demincidence;
+      old_dememission = dememission;
     }
-    else {
-      rhobar = p_normAlbedo / psurf0;
-    }
-
-    psurfref = GetPhotoModel()->CalcSurfAlbedo(p_normPharef, p_normIncref, p_normEmaref);
-    pprimeref = GetPhotoModel()->PhtTopder(p_normPharef, p_normIncref, p_normEmaref);
-    GetPhotoModel()->SetStandardConditions(false);
-
-    // code for scaling each pixel
-    psurf = GetPhotoModel()->CalcSurfAlbedo(phase, demincidence, dememission);
-    pprime = GetPhotoModel()->PhtTopder(phase, demincidence, dememission);
 
     if(psurf * pprimeref > pprime * p_normThresh) {
       albedo = NULL8;
