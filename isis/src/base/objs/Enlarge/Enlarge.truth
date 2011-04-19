@@ -41,10 +41,4 @@ End_Object
 Object = Label
   Bytes = 65536
 End_Object
-
-Object = History
-  Name      = IsisCube
-  StartByte = 589825
-  Bytes     = 1135
-End_Object
 End
