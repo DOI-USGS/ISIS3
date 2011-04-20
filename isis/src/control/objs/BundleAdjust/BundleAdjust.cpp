@@ -2319,8 +2319,8 @@ namespace Isis {
       averageError = m_pCnet->AverageResidual();
 
       // kle testing - print residual(?) statistics
-      printf("Iteration #%d\n\tAverage Error: %lf\n\tSigmaXY: %lf\n\tSigmaHat: %lf\n\tSigmaX: %lf\n\tSigmaY: %lf\n",
-             m_nIteration, averageError, sigmaXY, sigmaHat, sigmaX, sigmaY);
+//       printf("Iteration #%d\n\tAverage Error: %lf\n\tSigmaXY: %lf\n\tSigmaHat: %lf\n\tSigmaX: %lf\n\tSigmaY: %lf\n",
+//              m_nIteration, averageError, sigmaXY, sigmaHat, sigmaX, sigmaY);
 
       if (m_bPrintSummary)
         IterationSummary(averageError, sigmaXY, sigmaHat, sigmaX, sigmaY);
@@ -4283,6 +4283,9 @@ namespace Isis {
 
   /**
    * set parameter weighting for SPARSE solution
+   *
+   * @history 2011-04-19 Debbie A. Cook - Added initialization to m_Point_AprioriSigmas
+   *                      for sparse method case
    */
   bool BundleAdjust::SetParameterWeights() {
 
@@ -4327,6 +4330,11 @@ namespace Isis {
     int nObjectPoints = m_pCnet->GetNumPoints();
 
     m_Point_AprioriSigmas.resize(nObjectPoints);
+
+    // initialize sigmas to zero
+    for (int i = 0; i < nObjectPoints; i++) {
+      m_Point_AprioriSigmas[i].clear();
+    }
 
     int nPointIndex = 0;
     for (int i = 0; i < nObjectPoints; i++) {
