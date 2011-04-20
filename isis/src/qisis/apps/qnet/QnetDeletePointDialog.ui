@@ -18,7 +18,7 @@
   <property name="modal" >
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="layoutWidget" >
+  <widget class="QWidget" name="deletePointLayoutWidget" >
    <property name="geometry" >
     <rect>
      <x>20</x>
