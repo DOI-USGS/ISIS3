@@ -527,6 +527,8 @@ namespace Qisis {
    *   @history 2011-03-03 Tracie Sucharski - Do not save left measure unless
    *                          the ignore flag was changed, that is the only
    *                          change allowed on the left measure.
+   *   @history 2011-04-20 Tracie Sucharski - If left measure equals right
+   *                          measure, copy right into left.
    */
   void QnetTool::measureSaved() {
 
@@ -723,6 +725,11 @@ namespace Qisis {
         p_leftMeasure->IsEditLocked() != leftMeasure->IsEditLocked()) {
       p_leftMeasure->SetChooserName(Application::UserName());
       *leftMeasure = *p_leftMeasure;
+    }
+
+    // If left measure == right measure, update left
+    if (p_leftMeasure->GetCubeSerialNumber() == p_rightMeasure->GetCubeSerialNumber()) {
+      *p_leftMeasure = *p_rightMeasure;
     }
 
     //  Update measure info
