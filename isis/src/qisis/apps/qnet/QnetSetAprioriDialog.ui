@@ -28,7 +28,7 @@
    <property name="flat">
     <bool>false</bool>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="groundSourceLayoutWidget">
     <property name="geometry">
      <rect>
       <x>11</x>
@@ -335,7 +335,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="buttonLayoutWidget">
    <property name="geometry">
     <rect>
      <x>21</x>
