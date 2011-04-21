@@ -5570,6 +5570,15 @@ namespace Isis {
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     std::string strStatus;
 
+    // print column headers
+    if (m_bErrorPropagation) {
+        sprintf(buf, ",,,,,Sigma,Sigma,Sigma\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+    }
+    else {
+        sprintf(buf, ",,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(km),(km),(km)\n");
+    }
+    fp_out << buf;
+
     for (int i = 0; i < nPoints; i++) {
       const ControlPoint *point = m_pCnet->GetPoint(i);
 
@@ -5603,8 +5612,8 @@ namespace Isis {
                 dSigmaLat, dSigmaLong, dSigmaRadius, dX, dY, dZ);
       }
       else
-        sprintf(buf, "%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().c_str(), dLat, dLon, dRadius, dX, dY, dZ);
+        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius, dX, dY, dZ);
 
       fp_out << buf;
     }
@@ -5626,9 +5635,11 @@ namespace Isis {
       return false;
 
     // output column headers
-    sprintf(buf, "Point,Image,Image,x image,y image,sample,line,Residual Vector\n");
+    sprintf(buf, ",,,x image,y image,sample,line,Residual Vector\n");
     fp_out << buf;
-    sprintf(buf, "Label,Filename,Serial Number,coordinate,coordinate,residual,residual,Magnitude,Rejected\n");
+    sprintf(buf, "Point,Image,Image,coordinate,coordinate,residual,residual,Magnitude\n");
+    fp_out << buf;
+    sprintf(buf, "Label,Filename,Serial Number,(mm),(mm),(pixels),(pixels),(pixels),Rejected\n");
     fp_out << buf;
 
     int nImageIndex;
@@ -5692,6 +5703,10 @@ namespace Isis {
     std::vector<double> coefRA(m_nNumberCameraCoefSolved);
     std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
     std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+
+    // output column headers
+    sprintf(buf, "Image Path,X,Y,Z,RA,DEC,TWIST\n");
+    fp_out << buf;
 
     int nImages = Images();
     for (int i = 0; i < nImages; i++) {
