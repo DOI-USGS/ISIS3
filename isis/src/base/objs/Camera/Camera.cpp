@@ -203,6 +203,10 @@ namespace Isis {
         Latitude lat(p_projection->UniversalLatitude(), Angle::Degrees);
         Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
         Distance rad(LocalRadius(lat, lon));
+        if(!rad.Valid()) {
+          p_hasIntersection = false;
+          return p_hasIntersection;
+        }
         SurfacePoint surfPt(lat, lon, rad);
         if(SetGround(surfPt)) {
           p_childSample = sample;
@@ -533,16 +537,20 @@ namespace Isis {
       Latitude latitude(lat, Angle::Degrees);
       Longitude longitude(lon, Angle::Degrees);
       Distance radius(LocalRadius(latitude, longitude));
+      SurfacePoint testPoint;
 
-      SurfacePoint testPoint(latitude, longitude, radius);
+      if (radius.Valid()) {
 
-      if(SetGround(testPoint)) {
-        if(Sample() >= 0.5 && Line() >= 0.5 &&
-            Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-          double res = PixelResolution();
-          if(res > 0.0) {
-            if(res < p_minres) p_minres = res;
-            if(res > p_maxres) p_maxres = res;
+        testPoint = SurfacePoint(latitude, longitude, radius);
+
+        if(SetGround(testPoint)) {
+          if(Sample() >= 0.5 && Line() >= 0.5 &&
+              Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
+            double res = PixelResolution();
+            if(res > 0.0) {
+              if(res < p_minres) p_minres = res;
+              if(res > p_maxres) p_maxres = res;
+            }
           }
         }
       }
@@ -552,31 +560,37 @@ namespace Isis {
       longitude = Longitude(0.0, Angle::Degrees);
       radius = LocalRadius(latitude, longitude);
 
-      testPoint = SurfacePoint(latitude, longitude, radius);
+      if (radius.Valid()) {
 
-      if(SetGround(testPoint)) {
-        if(Sample() >= 0.5 && Line() >= 0.5 &&
-            Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-          p_maxlat = 90.0;
-          p_minlon = 0.0;
-          p_maxlon = 360.0;
-          p_minlon180 = -180.0;
-          p_maxlon180 = 180.0;
+        testPoint = SurfacePoint(latitude, longitude, radius);
+
+        if(SetGround(testPoint)) {
+          if(Sample() >= 0.5 && Line() >= 0.5 &&
+              Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
+            p_maxlat = 90.0;
+            p_minlon = 0.0;
+            p_maxlon = 360.0;
+            p_minlon180 = -180.0;
+            p_maxlon180 = 180.0;
+          }
         }
       }
 
       latitude = Latitude(-90, Angle::Degrees);
       radius = LocalRadius(latitude, longitude);
 
-      testPoint = SurfacePoint(latitude, longitude, radius);
-      if(SetGround(testPoint)) {
-        if(Sample() >= 0.5 && Line() >= 0.5 &&
-            Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-          p_minlat = -90.0;
-          p_minlon = 0.0;
-          p_maxlon = 360.0;
-          p_minlon180 = -180.0;
-          p_maxlon180 = 180.0;
+      if (radius.Valid()) {
+
+        testPoint = SurfacePoint(latitude, longitude, radius);
+        if(SetGround(testPoint)) {
+          if(Sample() >= 0.5 && Line() >= 0.5 &&
+              Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
+            p_minlat = -90.0;
+            p_minlon = 0.0;
+            p_maxlon = 360.0;
+            p_minlon180 = -180.0;
+            p_maxlon180 = 180.0;
+          }
         }
       }
 
@@ -1385,6 +1399,9 @@ namespace Isis {
     SpiceDouble oB[3];
     Coordinate(oB);
     Distance originRadius = LocalRadius();
+    if (!originRadius.Valid()) {
+      return -1.0;
+    }
 
     // Convert the point of interest to x/y/z in body-fixed and use the origin radius
     // to avoid the situation where the DEM does not cover the entire planet
