@@ -528,7 +528,9 @@ namespace Qisis {
    *                          the ignore flag was changed, that is the only
    *                          change allowed on the left measure.
    *   @history 2011-04-20 Tracie Sucharski - If left measure equals right
-   *                          measure, copy right into left.
+   *                          measure, copy right into left.  Also if EditLock
+   *                          true and user does not want to change, then
+   *                          do not save measure.
    */
   void QnetTool::measureSaved() {
 
@@ -544,9 +546,9 @@ namespace Qisis {
         case 0: 
           p_rightMeasure->SetEditLock(false);
           p_lockRightMeasure->setChecked(false);
-        // No was clicked, keep Ignore=true and save point
+        // No was clicked, keep EditLock=true and do NOT save measure
         case 1: 
-          break;
+          return;
       }
     }
 
@@ -569,7 +571,7 @@ namespace Qisis {
             p_rightMeasure->SetIgnored(false);
             emit ignoreRightChanged();
           }
-        // No was clicked, keep Ignore=true and save point
+        // No was clicked, keep Ignore=true and save measure
         case 1: 
           break;
 
@@ -736,10 +738,6 @@ namespace Qisis {
     updateLeftMeasureInfo();
     updateRightMeasureInfo();
 
-    // emit signal so the nav tool can update edit point
-    emit editPointChanged(p_editPoint->GetId());
-    // emit a signal to alert user to save when exiting 
-    emit netChanged();
   }
 
 
@@ -748,8 +746,30 @@ namespace Qisis {
    * simply a copy and does not exist in the network. 
    *  
    * @author 2010-11-19 Tracie Sucharski 
+   *  
+   * @internal 
+   * @history 2011-04-20 Tracie Sucharski - If EditLock set, prompt for changing 
+   *                        and do not save point if editLock not changed.
+   *      
    */
   void QnetTool::savePoint () {
+
+    if (p_editPoint->IsEditLocked()) {
+      QString message = "You are saving changes to a point that is locked ";
+      message += "for editing.  Do you want to set EditLock = False for this ";
+      message += "point?";
+      switch (QMessageBox::question((QWidget *)parent(),
+                "Qnet Tool Save Point", message,
+                "&Yes", "&No", 0, 0)) {
+        // Yes was clicked or Enter was pressed, set EditLock=false for the point
+        case 0: 
+          p_editPoint->SetEditLock(false);
+          p_lockPoint->setChecked(false);
+        // No was clicked, keep EditLocke=true and DO NOT save point
+        case 1: 
+          return;
+      }
+    }
 
     p_editPoint->SetChooserName(Application::UserName());
 
@@ -1532,7 +1552,8 @@ namespace Qisis {
    *                           QnetTool point information.
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
-   *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList 
+   *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList
+   *   @history 2011-04-20 Tracie Sucharski - Was not setting EditLock check box
    *
    */
   void QnetTool::loadPoint () {
@@ -1548,6 +1569,8 @@ namespace Qisis {
                    QString::number(p_editPoint->GetNumMeasures());
     p_numMeasures->setText(ptsize);
 
+    //  Set EditLock box correctly
+    p_lockPoint->setChecked(p_editPoint->IsEditLocked());
 
     //  Set ignore box correctly
     p_ignorePoint->setChecked(p_editPoint->IsIgnored());
@@ -1821,10 +1844,14 @@ namespace Qisis {
    *                           associated with implementation of binary
    *                           control networks.
    * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of 
-   *                           the numeric Null for sample & line residuals. 
+   *                           the numeric Null for sample & line residuals.
+   * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
    * 
    */
   void QnetTool::updateLeftMeasureInfo () {
+
+    //  Set editLock measure box correctly
+    p_lockLeftMeasure->setChecked(p_leftMeasure->IsEditLocked());
     //  Set ignore measure box correctly
     p_ignoreLeftMeasure->setChecked(p_leftMeasure->IsIgnored());
 
@@ -1878,12 +1905,15 @@ namespace Qisis {
    *                           control networks.
    * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of 
    *                           the numeric Null for sample & line residuals. 
+   * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
    * 
    */
 
   void QnetTool::updateRightMeasureInfo () {
 
-    //  Set ignore measure box correctly
+  //  Set editLock measure box correctly
+    p_lockRightMeasure->setChecked(p_rightMeasure->IsEditLocked());
+      //  Set ignore measure box correctly
     p_ignoreRightMeasure->setChecked(p_rightMeasure->IsIgnored());
 
     QString s = "Measure Type: ";
