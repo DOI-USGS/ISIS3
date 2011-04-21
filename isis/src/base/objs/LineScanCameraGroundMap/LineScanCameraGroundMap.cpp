@@ -51,7 +51,11 @@ namespace Isis {
   bool LineScanCameraGroundMap::SetGround(const Latitude &lat,
       const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
-    return SetGround(SurfacePoint(lat, lon, radius));
+    if (radius.Valid()) {
+      return SetGround(SurfacePoint(lat, lon, radius));
+    } else {
+      return false;
+    }
   }
 
   /** Compute undistorted focal plane coordinate from ground position

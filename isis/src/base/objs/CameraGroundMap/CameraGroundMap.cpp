@@ -76,9 +76,11 @@ namespace Isis {
    */
   bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
-    if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
-      LookCtoFocalPlaneXY();
-      return true;
+    if (radius.Valid()) {
+      if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
+        LookCtoFocalPlaneXY();
+        return true;
+      }
     }
 
     return false;
