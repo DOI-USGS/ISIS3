@@ -55,11 +55,17 @@ void IsisMain() {
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
-    PvlGroup radii = Projection::TargetRadii(target);
-
     mapGroup.AddKeyword(PvlKeyword("TargetName", target), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("EquatorialRadius", (string) radii["EquatorialRadius"]));
-    mapGroup.AddKeyword(PvlKeyword("PolarRadius", (string) radii["PolarRadius"]));
+
+    if (!mapGroup.HasKeyword("EquatorialRadius") ||
+        !mapGroup.HasKeyword("PolarRadius")) {
+
+      PvlGroup radii = Projection::TargetRadii(target);
+      mapGroup.AddKeyword(PvlKeyword("EquatorialRadius",
+            (string) radii["EquatorialRadius"]));
+      mapGroup.AddKeyword(PvlKeyword("PolarRadius",
+            (string) radii["PolarRadius"]));
+    }
 
     if(!ui.WasEntered("MAP")) {
       mapGroup.AddKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
@@ -105,7 +111,7 @@ void IsisMain() {
     double xStepSize = ui.GetDouble("XSTEP");
     double yStepSize = ui.GetDouble("YSTEP");
 
-    equatorialRadius = radii["EquatorialRadius"];
+    equatorialRadius = mapGroup.FindKeyword("EquatorialRadius")[0];
 
     Progress gridStatus;
 
