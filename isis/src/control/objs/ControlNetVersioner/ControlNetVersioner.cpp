@@ -560,9 +560,9 @@ namespace Isis {
         SurfacePoint tmp;
         tmp.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
         tmp.SetRectangular(
-            Distance(cp["AprioriX"], Distance::Meters),
-            Distance(cp["AprioriY"], Distance::Meters),
-            Distance(cp["AprioriZ"], Distance::Meters));
+            Displacement(cp["AprioriX"], Displacement::Meters),
+            Displacement(cp["AprioriY"], Displacement::Meters),
+            Displacement(cp["AprioriZ"], Displacement::Meters));
         tmp.SetSphericalSigmasDistance(
           Distance(sigmaLat, Distance::Meters),
           Distance(sigmaLon, Distance::Meters),
@@ -607,9 +607,9 @@ namespace Isis {
         SurfacePoint tmp;
         tmp.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
         tmp.SetRectangular(
-            Distance(cp["AdjustedX"], Distance::Meters),
-            Distance(cp["AdjustedY"], Distance::Meters),
-            Distance(cp["AdjustedZ"], Distance::Meters));
+            Displacement(cp["AdjustedX"], Displacement::Meters),
+            Displacement(cp["AdjustedY"], Displacement::Meters),
+            Displacement(cp["AdjustedZ"], Displacement::Meters));
         tmp.SetSphericalSigmasDistance(
           Distance(sigmaLat, Distance::Meters),
           Distance(sigmaLon, Distance::Meters),
@@ -636,9 +636,9 @@ namespace Isis {
           cp += PvlKeyword("LatitudeConstrained", "False");
       }
 
-      if(cp.HasKeyword("AprioriCovarianceMatrix") ||
-         cp.HasKeyword("AdjustedCovarianceMatrix"))
-        cp["PointType"] = "Ground";
+//      if(cp.HasKeyword("AprioriCovarianceMatrix") ||
+//         cp.HasKeyword("AdjustedCovarianceMatrix"))
+//        cp["PointType"] = "Ground";
 
       if(!cp.HasKeyword("LongitudeConstrained")) {
         if(cp.HasKeyword("AprioriCovarianceMatrix"))
