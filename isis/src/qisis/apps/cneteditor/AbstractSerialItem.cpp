@@ -42,4 +42,11 @@ namespace Isis
   {
     return AbstractTreeItem::CubeGraphNode;
   }
+
+
+  bool AbstractSerialItem::hasNode(ControlCubeGraphNode * node) const
+  {
+    return ccgn == node || AbstractTreeItem::hasNode(node);
+  }
+
 }

@@ -43,4 +43,10 @@ namespace Isis
   {
     return AbstractTreeItem::Point;
   }
+
+
+  bool AbstractPointItem::hasPoint(ControlPoint * p) const
+  {
+    return point == p;
+  }
 }

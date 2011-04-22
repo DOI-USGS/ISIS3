@@ -22,6 +22,7 @@ namespace Isis
       QVariant data() const;
       void deleteSource();
       InternalPointerType pointerType() const;
+      bool hasNode(ControlCubeGraphNode *) const;
 
 
     private: // disable copying of this class

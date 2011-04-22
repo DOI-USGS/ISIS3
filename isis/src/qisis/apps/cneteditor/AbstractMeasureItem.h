@@ -22,6 +22,7 @@ namespace Isis
       QVariant data() const;
       void deleteSource();
       InternalPointerType pointerType() const;
+      bool hasMeasure(ControlMeasure *) const;
 
 
     private: // disable copying of this class

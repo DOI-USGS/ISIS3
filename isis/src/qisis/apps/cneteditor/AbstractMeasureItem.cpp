@@ -43,4 +43,10 @@ namespace Isis
   {
     return AbstractTreeItem::Measure;
   }
+
+
+  bool AbstractMeasureItem::hasMeasure(ControlMeasure * m) const
+  {
+    return measure == m;
+  }
 }

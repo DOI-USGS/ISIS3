@@ -2,11 +2,16 @@
 #define AbstractTreeItem_H
 
 
+class QString;
 class QVariant;
 
 
 namespace Isis
 {
+  class ControlCubeGraphNode;
+  class ControlPoint;
+  class ControlMeasure;
+
   class AbstractTreeItem
   {
     public:
@@ -36,6 +41,10 @@ namespace Isis
       virtual QVariant data() const = 0;
       virtual void deleteSource() = 0;
       virtual InternalPointerType pointerType() const = 0;
+
+      virtual bool hasPoint(ControlPoint *) const;
+      virtual bool hasMeasure(ControlMeasure *) const;
+      virtual bool hasNode(ControlCubeGraphNode *) const;
 
       virtual void setExpanded(bool newState);
       virtual bool isExpanded() const;
