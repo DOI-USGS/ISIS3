@@ -1,7 +1,7 @@
 #ifndef PointIdFilter_H
 #define PointIdFilter_H
 
-#include "AbstractPointFilter.h"
+#include "AbstractFilter.h"
 
 
 class QLineEdit;
@@ -11,7 +11,7 @@ namespace Isis
 {
   class ControlPoint;
 
-  class PointIdFilter : public AbstractPointFilter
+  class PointIdFilter : public AbstractFilter
   {
       Q_OBJECT
 
@@ -19,8 +19,9 @@ namespace Isis
       PointIdFilter();
       virtual ~PointIdFilter();
 
-      bool evaluate(ControlPoint const *) const;
-
+      bool evaluate(const ControlPoint *) const;
+      bool evaluate(const ControlMeasure *) const;
+      bool evaluate(const ControlCubeGraphNode *) const;
 
     protected:
       void nullify();

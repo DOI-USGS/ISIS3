@@ -10,7 +10,7 @@
 
 namespace Isis
 {
-  PointIdFilter::PointIdFilter() : AbstractPointFilter()
+  PointIdFilter::PointIdFilter() : AbstractFilter()
   {
     nullify();
     createWidget();
@@ -43,6 +43,21 @@ namespace Isis
 
   bool PointIdFilter::evaluate(ControlPoint const * point) const
   {
-    return ((QString) point->GetId()).startsWith(lineEdit->text());
+    if (inclusive())
+      return ((QString) point->GetId()).startsWith(lineEdit->text());
+    else
+      return !((QString) point->GetId()).startsWith(lineEdit->text());
+  }
+
+
+  bool PointIdFilter::evaluate(ControlMeasure const * measure) const
+  {
+    return true;
+  }
+
+
+  bool PointIdFilter::evaluate(ControlCubeGraphNode const * node) const
+  {
+    return true;
   }
 }

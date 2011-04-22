@@ -10,6 +10,10 @@ class QHBoxLayout;
 
 namespace Isis
 {
+  class ControlPoint;
+  class ControlMeasure;
+  class ControlCubeGraphNode;
+  
   class AbstractFilter : public QWidget
   {
       Q_OBJECT
@@ -17,6 +21,10 @@ namespace Isis
     public:
       AbstractFilter();
       virtual ~AbstractFilter();
+      
+      virtual bool evaluate(const ControlPoint *) const = 0;
+      virtual bool evaluate(const ControlMeasure *) const = 0;
+      virtual bool evaluate(const ControlCubeGraphNode *) const = 0;
 
 
     signals:
