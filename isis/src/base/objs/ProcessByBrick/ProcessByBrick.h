@@ -21,9 +21,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include "Process.h"
+#include "Brick.h"
 #include "Buffer.h"
+#include "Cube.h"
+#include "Process.h"
+
+using namespace std;
 
 namespace Isis {
   /**
@@ -47,9 +50,11 @@ namespace Isis {
    *           on input cubes when there are multiple input cubes
    *  @history 2008-01-09 Steven Lambright - Fixed a memory leak
    *  @history 2008-06-18 Steven Koechle - Fixed Documentation
+   *  @history 2011-04-22 Sharmila Prasad - Extended StartProcess functionality
+   *     to be able to be called from any Object class by using Functors
    */
   class ProcessByBrick : public Isis::Process {
-
+    
     private:
       bool p_wrapOption;    //!<Indicates whether the brick manager will wrap
       bool p_inputBrickSizeSet;  //!<Indicates whether the brick size has been set
@@ -62,7 +67,6 @@ namespace Isis {
       std::vector<int> p_outputBrickBands;     //!<Number of bands in the output bricks
 
     public:
-
       //! Constructs a ProcessByBrick object
       ProcessByBrick();
 
@@ -113,6 +117,156 @@ namespace Isis {
       void StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                                    std::vector<Isis::Buffer *> &out));
       void EndProcess();
+      
+      //! Prepare and check to run "function" parameter for 
+      //! StartProcess(void funct(Isis::Buffer &in)) and 
+      //! StartProcessInPlace(Functor funct)
+      bool ProcessInPlace(Isis::Cube **cube, Isis::Brick **bricks);
+      
+      /**
+       * Same functionality as StartProcess(void funct(Isis::Buffer &inout)) 
+       * using Functors. The Functor operator(), takes the parameter (Isis::Buffer &)
+       * 
+       * @author Sharmila Prasad (4/22/2011)
+       * 
+       * @param funct - Functor with overloaded operator()(Isis::Buffer &) 
+       */
+      template <typename Functor> 
+      void StartProcessInPlace(Functor funct) {
+        Isis::Cube *cube=NULL;
+        Isis::Brick *bricks=NULL;
+        
+        bool haveInput = ProcessInPlace(&cube, &bricks);
+        
+        p_progress->SetMaximumSteps(bricks->Bricks());
+        p_progress->CheckStatus();
+        
+        // Loop and let the app programmer work with the bricks
+        for(bricks->begin(); bricks->end(); (*bricks)++) {
+          if(haveInput) {
+            cube->Read(*bricks);  // input only
+          }
+          funct(*bricks);
+          if((!haveInput) || (cube->IsReadWrite())){
+            cube->Write(*bricks);  // output only or input/output
+          }
+          p_progress->CheckStatus();
+        }
+        delete bricks;
+      }
+      
+      //! Prepare and check to run "function" parameter for 
+      //! StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) and 
+      //! StartProcessIO(Functor funct)
+      int ProcessIO(Isis::Brick **ibrick, Isis::Brick **obrick);
+      
+      /**
+       * Same functionality as StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) 
+       * using Functors.The Functor operator(), takes the parameter (Isis::Buffer &, Isis::Buffer &)
+       * 
+       * @author Sharmila Prasad (4/22/2011)
+       * 
+       * @param funct - Functor with overloaded operator()(Isis::Buffer &, Isis::Buffer &) 
+       */
+      template <typename FunctorIO>
+      void StartProcessIO(FunctorIO funct) {
+
+        Isis::Brick *ibrick=NULL, *obrick=NULL;
+    
+        int numBricks = ProcessIO(&ibrick, &obrick);
+    
+        // Loop and let the app programmer work with the bricks
+        p_progress->SetMaximumSteps(numBricks);
+        p_progress->CheckStatus();
+
+        ibrick->begin();
+        obrick->begin();
+        for(int i = 0; i < numBricks; i++) {
+          InputCubes[0]->Read(*ibrick);
+          funct(*ibrick, *obrick);
+          OutputCubes[0]->Write(*obrick);
+          p_progress->CheckStatus();
+          (*ibrick)++;
+          (*obrick)++;
+        }
+        delete ibrick;
+        delete obrick;
+      }
+      
+      //! Prepare and check to run "function" parameter for 
+      //! StartProcess(void funct(vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out)), 
+      //! StartProcessIOList(Functor funct)
+      int ProcessIOList(std::vector<Isis::Buffer *> & ibufs, std::vector<Isis::Buffer *> & obufs,
+                        std::vector<Isis::Brick *> & imgrs,  std::vector<Isis::Brick *> & omgrs);
+      
+      /**
+       * Same functionality as StartProcess(void funct(vector<Isis::Buffer *> &in,
+       * vector<Isis::Buffer *> &out)) using Functors.The Functor operator(), takes the 
+       * parameter (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out)
+       * 
+       * @author Sharmila Prasad (4/22/2011)
+       * 
+       * @param funct - Functor with overloaded operator()(vector<Isis::Buffer *> &in, 
+       *                vector<Isis::Buffer *> &out) 
+       */
+      template <typename FunctorIOList>
+      void StartProcessIOList(FunctorIOList funct) {
+        // Construct two vectors of brick buffer managers
+        // The input buffer managers
+        vector<Isis::Brick *> imgrs;
+        vector<Isis::Buffer *> ibufs;
+    
+        // And the output buffer managers
+        vector<Isis::Brick *> omgrs;
+        vector<Isis::Buffer *> obufs;
+    
+        int numBricks = ProcessIOList (ibufs, obufs, imgrs, omgrs);
+    
+        // Loop and let the app programmer process the bricks
+        p_progress->SetMaximumSteps(numBricks);
+        p_progress->CheckStatus();
+
+        for(int t = 0; t < numBricks; t++) {
+          // Read the input buffers
+          for(unsigned int i = 0; i < InputCubes.size(); i++) {
+            InputCubes[i]->Read(*ibufs[i]);
+          }
+
+          // Pass them to the application function
+          funct(ibufs, obufs);
+
+          // And copy them into the output cubes
+          for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+            OutputCubes[i]->Write(*obufs[i]);
+            omgrs[i]->next();
+          }
+
+          for(unsigned int i = 0; i < InputCubes.size(); i++) {
+            imgrs[i]->next();
+            // if the manager has reached the end and the
+            // wrap option is on, wrap around to the beginning
+            if(Wraps() && imgrs[i]->end()) imgrs[i]->begin();
+
+            // Enforce same band
+            if(imgrs[i]->Band() != imgrs[0]->Band() && InputCubes[i]->Bands() != 1) {
+              imgrs[i]->SetBaseBand(imgrs[0]->Band());
+            }
+          }
+          p_progress->CheckStatus();
+        }
+  
+        for(unsigned int i = 0; i < ibufs.size(); i++) {
+          delete ibufs[i];
+        }
+        ibufs.clear();
+        imgrs.clear();
+
+        for(unsigned int i = 0; i < obufs.size(); i++) {
+          delete obufs[i];
+        }
+        obufs.clear();
+        omgrs.clear();
+      }
   };
 };
 

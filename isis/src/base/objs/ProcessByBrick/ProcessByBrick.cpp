@@ -21,7 +21,6 @@
  */
 
 #include "ProcessByBrick.h"
-#include "Brick.h"
 #include "Cube.h"
 
 using namespace std;
@@ -239,20 +238,19 @@ namespace Isis {
   }
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method requires that exactly one input
-   * cube and one output cube be loaded using the SetInputCube and SetOutputCube
-   * methods.
-   *
-   * @param funct (Isis::Buffer &in, Isis::Buffer &out) Receive an nxm brick in
-   *              the input buffer and output the an nxm brick. If n=1 and m=lines
-   *              this will process by columns. Likewise if n=samples and m=1
-   *              this will process by lines.
-   *
-   * @throws Isis::iException::Programmer
+   * Prepare and check to run "function" parameter for 
+   * StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) and 
+   * StartProcessIO(Functor funct)
+   * 
+   * @param ibricks - Pointer to first input cube brick
+   * @param obricks - Pointer to first output cube brick
+   *  
+   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess 
+   *                                (void funct(Isis::Buffer &in, Isis::Buffer &out)) 
+   * @return bool 
    */
-  void ProcessByBrick::StartProcess(void
-                                    funct(Isis::Buffer &in, Isis::Buffer &out)) {
+  int ProcessByBrick::ProcessIO(Isis::Brick **ibrick, Isis::Brick **obrick)
+  {
     // Error checks ... there must be one input and output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
@@ -278,52 +276,80 @@ namespace Isis {
     }
 
     // Construct brick buffers
-    Isis::Brick ibrick(*InputCubes[0], p_inputBrickSamples[1], p_inputBrickLines[1], p_inputBrickBands[1]);
-    Isis::Brick obrick(*OutputCubes[0], p_outputBrickSamples[1], p_outputBrickLines[1], p_outputBrickBands[1]);
+    *ibrick = new Isis::Brick(*InputCubes[0], p_inputBrickSamples[1], p_inputBrickLines[1], p_inputBrickBands[1]);
+    *obrick = new Isis::Brick(*OutputCubes[0], p_outputBrickSamples[1], p_outputBrickLines[1], p_outputBrickBands[1]);
 
     int numBricks;
-    if(ibrick.Bricks() > obrick.Bricks()) numBricks = ibrick.Bricks();
-    else numBricks = obrick.Bricks();
+    if((*ibrick)->Bricks() > (*obrick)->Bricks()) {
+      numBricks = (*ibrick)->Bricks();
+    } 
+    else {
+      numBricks = (*obrick)->Bricks();
+    }
+    
+    return numBricks;
+  }
+  
+  /**
+   * Starts the systematic processing of the input cube by moving an arbitrary
+   * shaped brick through the cube. This method requires that exactly one input
+   * cube and one output cube be loaded using the SetInputCube and SetOutputCube
+   * methods.
+   *
+   * @param funct (Isis::Buffer &in, Isis::Buffer &out) Receive an nxm brick in
+   *              the input buffer and output the an nxm brick. If n=1 and m=lines
+   *              this will process by columns. Likewise if n=samples and m=1
+   *              this will process by lines.
+   *
+   * @throws Isis::iException::Programmer
+   */
+  void ProcessByBrick::StartProcess(void
+                                    funct(Isis::Buffer &in, Isis::Buffer &out)) {
 
+    Isis::Brick *ibrick=NULL, *obrick=NULL;
+    
+    int numBricks = ProcessIO(&ibrick, &obrick);
+    
     // Loop and let the app programmer work with the bricks
     p_progress->SetMaximumSteps(numBricks);
     p_progress->CheckStatus();
 
-    ibrick.begin();
-    obrick.begin();
+    ibrick->begin();
+    obrick->begin();
     for(int i = 0; i < numBricks; i++) {
-      InputCubes[0]->Read(ibrick);
-      funct(ibrick, obrick);
-      OutputCubes[0]->Write(obrick);
+      InputCubes[0]->Read(*ibrick);
+      funct(*ibrick, *obrick);
+      OutputCubes[0]->Write(*obrick);
       p_progress->CheckStatus();
-      ibrick++;
-      obrick++;
+      (*ibrick)++;
+      (*obrick)++;
     }
+    delete ibrick;
+    delete obrick;
   }
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method requires that exactly one input
-   * cube be loaded. No output cubes are produced.
-   *
-   * @param funct (Isis::Buffer &in) Receive an nxm brick in the input buffer. If
-   *                                n=1 and m=lines this will process by columns.
-   *                                Likewise if n=samples and m=1 this will
-   *                                process by lines.
-   *
-   * @throws Isis::iException::Programmer
+   * Prepare and check to run "function" parameter for 
+   * StartProcess(void funct(Isis::Buffer &in)) and 
+   * StartProcessInPlace(Functor funct)
+   * 
+   * @param cube - Pointer to input or output cube depending if the input 
+   *               cube is available 
+   * @param bricks - Pointer to first cube brick to be processed
+   * 
+   * @return bool - If input cube is available(true/false) 
+   *  
+   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess 
+   *                                (void funct(Isis::Buffer &in))
+   *  
    */
-  void ProcessByBrick::StartProcess(void funct(Isis::Buffer &in)) {
+  bool ProcessByBrick::ProcessInPlace(Isis::Cube **cube, Isis::Brick **bricks){
     // Error checks
     if((InputCubes.size() + OutputCubes.size()) != 1) {
       string m = "You can only specify exactly one input or output cube";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    // Determine if we have an input or output
-    Isis::Cube *cube;
-    // Construct brick buffers
-    Isis::Brick *bricks;
     bool haveInput;
     if(InputCubes.size() == 1) {
       //  Make sure the brick size has been set
@@ -337,8 +363,8 @@ namespace Isis {
       }
 
       haveInput = true;
-      cube = InputCubes[0];
-      bricks = new Isis::Brick(*cube, p_inputBrickSamples[1], p_inputBrickLines[1], p_inputBrickBands[1]);
+      *cube = InputCubes[0];
+      *bricks = new Isis::Brick(**cube, p_inputBrickSamples[1], p_inputBrickLines[1], p_inputBrickBands[1]);
     }
     else {
       //  Make sure the brick size has been set
@@ -352,10 +378,31 @@ namespace Isis {
       }
 
       haveInput = false;
-      cube = OutputCubes[0];
-      bricks = new Isis::Brick(*cube, p_outputBrickSamples[1], p_outputBrickLines[1], p_outputBrickBands[1]);
+      *cube = OutputCubes[0];
+      *bricks = new Isis::Brick(**cube, p_outputBrickSamples[1], p_outputBrickLines[1], p_outputBrickBands[1]);
     }
-
+    
+    return haveInput;
+  }
+  
+  /**
+   * Starts the systematic processing of the input cube by moving an arbitrary
+   * shaped brick through the cube. This method requires that exactly one input
+   * cube be loaded. No output cubes are produced.
+   *
+   * @param funct (Isis::Buffer &in) Receive an nxm brick in the input buffer. If
+   *                                n=1 and m=lines this will process by columns.
+   *                                Likewise if n=samples and m=1 this will
+   *                                process by lines.
+   *
+   * @throws Isis::iException::Programmer
+   */
+  void ProcessByBrick::StartProcess(void funct(Isis::Buffer &in)) {
+    Isis::Cube *cube=NULL;
+    Isis::Brick *bricks=NULL;
+    
+    bool haveInput = ProcessInPlace(&cube, &bricks);
+    
     // Loop and let the app programmer work with the bricks
     p_progress->SetMaximumSteps(bricks->Bricks());
     p_progress->CheckStatus();
@@ -371,21 +418,22 @@ namespace Isis {
   }
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method allows multiple input and output
-   * cubes.
-   *
-   * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Receive
-   *                                an nxm brick in the input buffer. If
-   *                                n=1 and m=lines this will process by columns.
-   *                                Likewise if n=samples and m=1 this will
-   *                                process by lines.
-   *
-   * @throws Isis::iException::Programmer
+   * Prepare and check to run "function" parameter for 
+   * StartProcess(void funct(vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out)), 
+   * StartProcessIOList(Functor funct)
+   * 
+   * @param ibufs - input buffer manager
+   * @param obufs - output buffer manager
+   * @param imgrs - input brick manager
+   * @param omgrs - output brick manager
+   * 
+   * @return int  - Number of bricks
+   *  
+   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess 
+   * (void funct(std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out)) 
    */
-  void ProcessByBrick::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
-                                    std::vector<Isis::Buffer *> &out)) {
-
+  int ProcessByBrick::ProcessIOList(vector<Isis::Buffer *> & ibufs, vector<Isis::Buffer *> & obufs,
+                                    vector<Isis::Brick *> & imgrs, vector<Isis::Brick *> & omgrs) {
     // Make sure we had an image
     if(InputCubes.size() == 0 && OutputCubes.size() == 0) {
       string m = "You have not specified any input or output cubes";
@@ -409,32 +457,58 @@ namespace Isis {
     }
 
     // this parameter holds the number of bricks to be used in processing
-    //      which is the maximum number of bricks of all the cubes.
+    // which is the maximum number of bricks of all the cubes.
     int numBricks = 0;
 
-    // Construct two vectors of brick buffer managers
-    // The input buffer managers
-    std::vector<Isis::Brick *> imgrs;
-    vector<Isis::Buffer *> ibufs;
+    
     for(unsigned int i = 1; i <= InputCubes.size(); i++) {
       Isis::Brick *ibrick = new Isis::Brick(*InputCubes[i-1], p_inputBrickSamples[i], p_inputBrickLines[i], p_inputBrickBands[i]);
       ibrick->begin();
       ibufs.push_back(ibrick);
       imgrs.push_back(ibrick);
-      if(numBricks < ibrick->Bricks()) numBricks = ibrick->Bricks();
+      if(numBricks < ibrick->Bricks()) {
+        numBricks = ibrick->Bricks();
+      }
     }
-
-    // And the output buffer managers
-    std::vector<Isis::Brick *> omgrs;
-    vector<Isis::Buffer *> obufs;
+    
     for(unsigned int i = 1; i <= OutputCubes.size(); i++) {
       Isis::Brick *obrick = new Isis::Brick(*OutputCubes[i-1], p_outputBrickSamples[i], p_outputBrickLines[i], p_outputBrickBands[i]);
       obrick->begin();
       obufs.push_back(obrick);
       omgrs.push_back(obrick);
-      if(numBricks < obrick->Bricks()) numBricks = obrick->Bricks();
+      if(numBricks < obrick->Bricks()) {
+        numBricks = obrick->Bricks();
+      }
     }
-
+    
+    return numBricks;
+  }
+  /**
+   * Starts the systematic processing of the input cube by moving an arbitrary
+   * shaped brick through the cube. This method allows multiple input and output
+   * cubes.
+   *
+   * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Receive
+   *                                an nxm brick in the input buffer. If
+   *                                n=1 and m=lines this will process by columns.
+   *                                Likewise if n=samples and m=1 this will
+   *                                process by lines.
+   *
+   * @throws Isis::iException::Programmer
+   */
+  void ProcessByBrick::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
+                                    std::vector<Isis::Buffer *> &out)) {
+    // Construct two vectors of brick buffer managers
+    // The input buffer managers
+    vector<Isis::Brick *> imgrs;
+    vector<Isis::Buffer *> ibufs;
+    
+    // And the output buffer managers
+    vector<Isis::Brick *> omgrs;
+    vector<Isis::Buffer *> obufs;
+    
+    int numBricks = ProcessIOList (ibufs, obufs, imgrs, omgrs);
+    
     // Loop and let the app programmer process the bricks
     p_progress->SetMaximumSteps(numBricks);
     p_progress->CheckStatus();
@@ -465,7 +539,6 @@ namespace Isis {
           imgrs[i]->SetBaseBand(imgrs[0]->Band());
         }
       }
-
       p_progress->CheckStatus();
     }
 
