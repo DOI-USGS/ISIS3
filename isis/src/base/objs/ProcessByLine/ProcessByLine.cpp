@@ -62,6 +62,32 @@ namespace Isis {
   }
 
   /**
+   * Verify input and output cubes and set brick size. 
+   * 
+   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess 
+   *                             (void funct(Isis::Buffer &inout))
+   */
+  void ProcessByLine::VerifyCubeInPlace(void){
+     // Error checks
+     if((InputCubes.size() + OutputCubes.size()) > 1) {
+       string m = "You can only specify exactly one input or output cube";
+       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+     }
+     else if((InputCubes.size() + OutputCubes.size()) == 0) {
+       string m = "You haven't specified an input or output cube";
+       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+     }
+
+     // Determine if we have an input or output
+     if(InputCubes.size() == 1) {
+       SetBrickSize(InputCubes[0]->Samples(), 1, 1);
+     } 
+     else {
+       SetBrickSize(OutputCubes[0]->Samples(), 1, 1);
+     }
+   }
+  
+  /**
    * This method invokes the process by line operation over a single input or
    * output cube. It will be an input cube if the method SetInputCube was invoked
    * exactly one time before calling StartProcess. It will be an output cube if
@@ -81,35 +107,18 @@ namespace Isis {
    */
   void ProcessByLine::StartProcess(void funct(Isis::Buffer &inout)) {
     // Error checks
-    if((InputCubes.size() + OutputCubes.size()) > 1) {
-      string m = "You can only specify exactly one input or output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
-    }
-    else if((InputCubes.size() + OutputCubes.size()) == 0) {
-      string m = "You haven't specified an input or output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
-    }
-
-    // Determine if we have an input or output
-    if(InputCubes.size() == 1) SetBrickSize(InputCubes[0]->Samples(), 1, 1);
-    else SetBrickSize(OutputCubes[0]->Samples(), 1, 1);
-
+    VerifyCubeInPlace();
     Isis::ProcessByBrick::StartProcess(funct);
   }
 
   /**
-   * This method invokes the process by line operation over exactly one input and
-   * one output cube. Typically, this method is used for simple operations such
-   * as stretching a cube or applying various operators to a cube (add constant,
-   * multiply by constant, etc).
-   *
-   * @param funct (Isis::Buffer &in, Isis::Buffer &out) Name of your processing
-   *                                                    function
-   *
-   * @throws Isis::iException::Message
+   * Verify input and output cubes and set brick size for StartProcess(in,out)
+   * 
+   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess 
+   *                 (void funct(Isis::Buffer &in, Isis::Buffer &out))
    */
-  void ProcessByLine::StartProcess(void
-                                   funct(Isis::Buffer &in, Isis::Buffer &out)) {
+  void ProcessByLine::VerifyCubeIO(void)
+  {
     // Error checks ... there must be one input and output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
@@ -136,22 +145,35 @@ namespace Isis {
 
     SetInputBrickSize(InputCubes[0]->Samples(), 1, 1);
     SetOutputBrickSize(OutputCubes[0]->Samples(), 1, 1);
-
-    Isis::ProcessByBrick::StartProcess(funct);
   }
-
+  
   /**
-   * This method invokes the process by line operation over multiple input and
-   * output cubes. Typically, this method is used when two input cubes are
-   * required for operations like ratios, differences, masking, etc.
+   * This method invokes the process by line operation over exactly one input and
+   * one output cube. Typically, this method is used for simple operations such
+   * as stretching a cube or applying various operators to a cube (add constant,
+   * multiply by constant, etc).
    *
-   * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Name
-   *                of your processing function
+   * @param funct (Isis::Buffer &in, Isis::Buffer &out) Name of your processing
+   *                                                    function
    *
    * @throws Isis::iException::Message
    */
   void ProcessByLine::StartProcess(void
-                                   funct(std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out)) {
+                                   funct(Isis::Buffer &in, Isis::Buffer &out)) {
+    
+    VerifyCubeIO();
+    Isis::ProcessByBrick::StartProcess(funct);
+  }
+
+  /**
+   * Verify input and output cubes and set brick size for StartProcessIOList(Functor funct)
+   * and StartProcess(func(vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out))
+   * 
+   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess 
+   *          (void func(vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out))
+   */
+  void ProcessByLine::VerifyCubeIOList(void)
+  {
     // Make sure we had an image
     if(InputCubes.size() + OutputCubes.size() < 1) {
       string m = "You have not specified any input or output cubes";
@@ -179,7 +201,21 @@ namespace Isis {
     for(unsigned int i = 0; i < OutputCubes.size(); i++) {
       SetOutputBrickSize(OutputCubes[i]->Samples(), 1, 1, i + 1);
     }
-
+  }
+  /**
+   * This method invokes the process by line operation over multiple input and
+   * output cubes. Typically, this method is used when two input cubes are
+   * required for operations like ratios, differences, masking, etc.
+   *
+   * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Name
+   *                of your processing function
+   *
+   * @throws Isis::iException::Message
+   */
+  void ProcessByLine::StartProcess(
+       void funct(std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out)) {
+    
+    VerifyCubeIOList();
     Isis::ProcessByBrick::StartProcess(funct);
   }
 }

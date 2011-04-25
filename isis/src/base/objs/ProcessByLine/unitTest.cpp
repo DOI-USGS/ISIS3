@@ -1,14 +1,36 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "Cube.h"
+#include <iostream>
 #include <string>
 
 using namespace std;
-void oneInput(Isis::Buffer &b);
-void oneOutput(Isis::Buffer &b);
-void oneInAndOut(Isis::Buffer &ob, Isis::Buffer &ib);
-void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob);
+extern "C" void oneInput(Isis::Buffer &b);
+extern "C" void oneOutput(Isis::Buffer &b);
+extern "C" void oneInAndOut(Isis::Buffer &ob, Isis::Buffer &ib);
+extern "C" void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob);
 
+class Functor1 {
+  public:
+    void operator()(Isis::Buffer & in){
+      cout << "Functor1\n";
+      oneInput(in);
+    };
+};
+
+class Functor2 {
+  public:
+  void operator()(Isis::Buffer & in, Isis::Buffer & out){
+    oneInAndOut(in, out);
+  };
+};
+
+class Functor3 {
+  public:
+  void operator()(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob){
+    twoInAndOut(ib, ob);
+  };
+};
 void IsisMain() {
 
   Isis::Preference::Preferences(true);
@@ -35,6 +57,32 @@ void IsisMain() {
   p.SetOutputCube("TO2");
   p.StartProcess(twoInAndOut);
   p.EndProcess();
+  
+  cout << "Testing for Functors\n";
+  Functor1 func1;
+  Functor2 func2;
+  Functor3 func3;
+  p.SetInputCube("FROM");
+  p.StartProcessInPlace(func1);
+  p.EndProcess();
+
+  p.SetOutputCube("TO", 10, 20, 3);
+  p.StartProcessInPlace(func1);
+  p.EndProcess();
+
+  p.SetInputCube("FROM");
+  p.SetOutputCube("TO");
+  p.StartProcessIO(func2);
+  p.EndProcess();
+
+  p.SetInputCube("FROM");
+  p.SetInputCube("FROM2");
+  p.SetOutputCube("TO");
+  p.SetOutputCube("TO2");
+  p.StartProcessIOList(func3);
+  p.EndProcess();
+  
+  cout << "End Testing Functors\n";
 
   try {
     cout << "Testing error for no input/output ..." << endl;

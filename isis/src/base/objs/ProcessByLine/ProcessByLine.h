@@ -24,7 +24,6 @@
 
 #include "ProcessByBrick.h"
 #include "Buffer.h"
-
 namespace Isis {
   /**
    * @brief Process cubes by line
@@ -81,6 +80,8 @@ namespace Isis {
    *                                      concatenate in the sample direction.
    *  @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
    *                                          documentation
+   *  @history 2011-04-22 Sharmila Prasad - Extended StartProcess functionality to
+   *     be able to be called from any Object class by using Functors
    *
    *  @history 2006-03-29 Jacob Danton Rewrote code to extend ProcessByBrick class.
    */
@@ -103,6 +104,62 @@ namespace Isis {
 
       void StartProcess(void
                         funct(std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out));
+
+      //! Verify input and output cubes and set brick size for 
+      //! StartProcessInPlace(Functor funct) & StartProcess(funct(inout))
+      void VerifyCubeInPlace(void);
+      
+      /**
+       * Same functionality as StartProcess(void funct(Isis::Buffer &inout)) 
+       * using Functors. The Functor operator(), takes the parameter (Isis::Buffer &)
+       * 
+       * @author Sharmila Prasad (4/22/2011)
+       * 
+       * @param funct - Functor with overloaded operator()(Isis::Buffer &)
+       */
+      template <typename Functor> 
+      void StartProcessInPlace(Functor funct) {
+        VerifyCubeInPlace();
+        Isis::ProcessByBrick::StartProcessInPlace(funct);
+      }
+      
+      //! Verify input and output cubes and set brick size for StartProcessIO(Functor funct)
+      //! and StartProcess(funct(in,out))
+      void VerifyCubeIO(void);
+      
+      /**
+       * Same functionality as StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) 
+       * using Functors. The Functor operator(), takes parameters (Isis::Buffer &, Isis::Buffer &)
+       * 
+       * @author Sharmila Prasad (4/22/2011)
+       * 
+       * @param funct - Functor with overloaded operator()(Isis::Buffer &, Isis::Buffer &)
+       */
+      template <typename Functor> 
+      void StartProcessIO(Functor funct) {
+        VerifyCubeIO();
+        Isis::ProcessByBrick::StartProcessIO(funct);
+      }
+      
+      //! Verify input and output cubes and set brick size for StartProcessIOList(Functor funct)
+      //! and StartProcess(func(vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out))
+      void VerifyCubeIOList(void);
+      
+      /**
+       * Same functionality as StartProcess(std::vector<Isis::Buffer *> &in, 
+       * std::vector<Isis::Buffer *> &out) using Functors. The Functor operator(), 
+       * takes parameters (std::vector<Isis::Buffer *> &, std::vector<Isis::Buffer *> &)
+       * 
+       * @author Sharmila Prasad (4/22/2011)
+       * 
+       * @param funct - Functor with overloaded operator()(Istd::vector<Isis::Buffer *> &, 
+       *                std::vector<Isis::Buffer *> &)
+       */
+      template <typename Functor> 
+      void StartProcessIOList(Functor funct) {
+        VerifyCubeIOList();
+        Isis::ProcessByBrick::StartProcessIOList(funct);
+      }
   };
 };
 
