@@ -77,11 +77,12 @@ void IsisMain() {
           PvlKeyword *first = NULL;
           // Clean duplicate keywords of ONLY the provided keyword
           for(int i = 0; i < grp.Keywords(); i++) {
-            if(grp[i].IsNamed(key))
+            if(grp[i].IsNamed(key)) {
               if(not first)
                 first = &grp[i];
               else
                 grp.DeleteKeyword(i);
+            }
           }
           modifyKeyword(ui, *first);
         }
