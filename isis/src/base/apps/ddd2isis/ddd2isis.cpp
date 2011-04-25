@@ -41,6 +41,7 @@ void IsisMain() {
    */
 
   // Verify the magic number
+  readBytes.readLong = 0;
   fin.seekg(0);
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
