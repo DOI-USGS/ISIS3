@@ -845,9 +845,10 @@ Sample:  1:1  Line:  125:125  Band:  2:1
 Sample:  1:1  Line:  126:126  Band:  2:1
 100% Processed
 Testing for Functors
+Functor1
 unittest: Working
-0% Processedunittest: Working
-0% Processedunittest: Working
+0% ProcessedFunctor2
+unittest: Working
 0% Processed
 Testing one input and output cube ... 
 Buffer Samples:  126
@@ -1107,6 +1108,7 @@ Sample:  1  Line:  124  Band:  2
 Sample:  1  Line:  125  Band:  2
 Sample:  1  Line:  126  Band:  2
 100% Processed
+Functor3
 unittest: Working
 0% ProcessedSample:  1:1  Line:  1:1  Band:  1:1
 Sample:  1:1  Line:  2:2  Band:  1:1

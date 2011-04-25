@@ -5,15 +5,14 @@
 #include <string>
 
 using namespace std;
-extern "C" void oneInput(Isis::Buffer &b);
-extern "C" void oneOutput(Isis::Buffer &b);
-extern "C" void oneInAndOut(Isis::Buffer &ob, Isis::Buffer &ib);
-extern "C" void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob);
+void oneInput(Isis::Buffer &b);
+void oneOutput(Isis::Buffer &b);
+void oneInAndOut(Isis::Buffer &ob, Isis::Buffer &ib);
+void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob);
 
 class Functor1 {
   public:
     void operator()(Isis::Buffer & in){
-      cout << "Functor1\n";
       oneInput(in);
     };
 };
@@ -63,15 +62,18 @@ void IsisMain() {
   Functor2 func2;
   Functor3 func3;
   p.SetInputCube("FROM");
+  cout << "Functor1\n";
   p.StartProcessInPlace(func1);
   p.EndProcess();
 
-  p.SetOutputCube("TO", 10, 20, 3);
+  /*p.SetOutputCube("TO", 10, 20, 3);
+  cout << "Functor\n";
   p.StartProcessInPlace(func1);
-  p.EndProcess();
+  p.EndProcess();*/
 
   p.SetInputCube("FROM");
   p.SetOutputCube("TO");
+  cout << "Functor2\n";
   p.StartProcessIO(func2);
   p.EndProcess();
 
@@ -79,6 +81,7 @@ void IsisMain() {
   p.SetInputCube("FROM2");
   p.SetOutputCube("TO");
   p.SetOutputCube("TO2");
+  cout << "Functor3\n";
   p.StartProcessIOList(func3);
   p.EndProcess();
   
