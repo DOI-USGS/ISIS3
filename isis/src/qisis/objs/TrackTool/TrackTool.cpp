@@ -137,8 +137,10 @@ namespace Qisis {
    */
   void TrackTool::updateLabels(QPoint p) {
     MdiCubeViewport *cvp = cubeViewport();
+
+    clearLabels();
+
     if(cvp == NULL) {
-      clearLabels();
       return;
     }
 
@@ -147,7 +149,6 @@ namespace Qisis {
     if((sample < 0.5) || (line < 0.5) ||
         (sample > cvp->cubeSamples() + 0.5) ||
         (line > cvp->cubeLines() + 0.5)) {
-      clearLabels();
       return;
     }
 
@@ -215,8 +216,8 @@ namespace Qisis {
       else {
         const QRect rect(grayBuf->bufferXYRect());
 
-        if(p.x() >= 0 && p.x() < rect.right() &&
-            p.y() >= 0 && p.y() < rect.bottom()) {
+        if(p.x() >= 0 && p.x() <= rect.right() &&
+            p.y() >= 0 && p.y() <= rect.bottom()) {
           const int bufX = p.x() - rect.left();
           const int bufY = p.y() - rect.top();
           QString pixelString = Isis::iString(Isis::PixelToString(

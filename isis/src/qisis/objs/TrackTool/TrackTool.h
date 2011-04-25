@@ -23,11 +23,12 @@ namespace Qisis {
    *
    * @internal
    *
-   * @history 2010-03-18 Sharmila Prasad - Added the Warning widget to the
-   *          status bar to display the error status both icon and message for
-   *          any application activity
-   * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-   *          CubeViewport.  Fixed include issues.
+   *   @history 2010-03-18 Sharmila Prasad - Added the Warning widget to the
+   *            status bar to display the error status both icon and message for
+   *            any application activity
+   *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
+   *            CubeViewport.  Fixed include issues.
+   *   @history 2011-04-25 Steven Lambright - Fixed updates at the bottom right
    */
   class TrackTool : public Tool {
       Q_OBJECT
