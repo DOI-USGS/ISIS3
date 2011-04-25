@@ -21,15 +21,14 @@ namespace Qisis {
    * @param topLeftPixel
    */
   ViewportBufferFill::ViewportBufferFill(const QRect &rect,
-                                         const int &xCoef, const double &xScale, const int &yCoef,
-                                         const double &yScale, const QPoint &topLeftPixel)
-    : ViewportBufferAction() {
+      const int &xCoef, const double &xScale, const int &yCoef,
+      const double &yScale, const QPoint &topLeftPixel)
+      : ViewportBufferAction() {
     p_rect = NULL;
     p_topLeftPixel = NULL;
 
     p_rect = new QRect(rect);
     p_topLeftPixel = new QPoint(topLeftPixel);
-
     p_requestPosition = rect.top();
     p_readPosition = rect.top();
     p_xCoef = xCoef;
@@ -79,7 +78,7 @@ namespace Qisis {
    * @return bool
    */
   bool ViewportBufferFill::doneReading() {
-    return p_readPosition >= (unsigned)(p_rect->top() + p_rect->height() - 1);
+    return p_readPosition >= (unsigned)(p_rect->top() + p_rect->height());
   }
 
 
@@ -89,7 +88,7 @@ namespace Qisis {
    * @return bool
    */
   bool ViewportBufferFill::shouldRequestMore() {
-    return p_requestPosition < (unsigned)(p_rect->top() + p_rect->height() - 1);
+    return p_requestPosition < (unsigned)(p_rect->top() + p_rect->height());
   }
 
 

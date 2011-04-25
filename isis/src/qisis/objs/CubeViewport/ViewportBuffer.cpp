@@ -303,9 +303,36 @@ namespace Qisis {
   QRect ViewportBuffer::getXYBoundingRect() {
     int startx, starty, endx, endy;
     p_viewport->cubeToViewport(0.5, 0.5, startx, starty);
-    p_viewport->cubeToViewport(p_viewport->cubeSamples() + 0.5,
-                               p_viewport->cubeLines() + 0.5, endx, endy);
 
+    // Handle case where x,y 0,0 is sample,line 0,0 (which is outside the cube)
+    //   and cubeToViewport still tells us 0.5, 0.5 is at x,y 0,0.
+    double startSamp, startLine;
+    p_viewport->viewportToCube(startx, starty, startSamp, startLine);
+
+    if(startSamp < 0.5)
+      startx ++;
+
+    if(startLine < 0.5)
+      starty ++;
+
+    double rightmost = p_viewport->cubeSamples() + 0.5;
+    double bottommost = p_viewport->cubeLines() + 0.5;
+
+    p_viewport->cubeToViewport(rightmost, bottommost, endx, endy);
+
+    if(endx < 0 || endy < 0)
+      return QRect();
+
+    double endSamp = -1, endLine = -1;
+    p_viewport->viewportToCube(endx, endy, endSamp, endLine);
+
+    if(endSamp > rightmost)
+      endx --;
+
+    if(endLine > bottommost)
+      endy --;
+
+    // Make sure our rect makes sense
     if(startx < 0) {
       startx = 0;
     }
@@ -314,15 +341,15 @@ namespace Qisis {
       starty = 0;
     }
 
-    if(endx > p_viewport->viewport()->width()) {
-      endx = p_viewport->viewport()->width();
+    if(endx >= p_viewport->viewport()->width()) {
+      endx = p_viewport->viewport()->width() - 1;
     }
 
-    if(endy > p_viewport->viewport()->height()) {
-      endy = p_viewport->viewport()->height();
+    if(endy >= p_viewport->viewport()->height()) {
+      endy = p_viewport->viewport()->height() - 1;
     }
 
-    return QRect(startx, starty, endx - startx, endy - starty);
+    return QRect(startx, starty, endx - startx + 1, endy - starty + 1);
   }
 
 
@@ -389,7 +416,7 @@ namespace Qisis {
 
     p_oldVertScrollBarPos = p_vertScrollBarPos;
     // Add +1 to remove the black line at the top
-    p_vertScrollBarPos = p_viewport->verticalScrollBar()->value() + 1; 
+    p_vertScrollBarPos = p_viewport->verticalScrollBar()->value() + 1;
   }
 
 
@@ -408,7 +435,7 @@ namespace Qisis {
   ViewportBufferFill *ViewportBuffer::createViewportBufferFill(
     QRect someRect, bool useOldY) {
     QScrollBar *hsb = p_viewport->horizontalScrollBar();
-    int xConstCoef = hsb->value() + 1; // Add +1 to remove the black line on left
+    int xConstCoef = hsb->value();
     xConstCoef -= p_viewport->viewport()->width() / 2;
 
     // If panning over a full screen, it will try to create a fill rect that
@@ -425,10 +452,10 @@ namespace Qisis {
     int yConstCoef = 0;
 
     if(!useOldY)
-      yConstCoef = (p_vertScrollBarPos) - p_viewportHeight / 2;
+      yConstCoef = (p_vertScrollBarPos) - p_viewportHeight / 2 - 1;
     else
-      yConstCoef = (p_oldVertScrollBarPos) - p_oldViewportHeight / 2;
-    
+      yConstCoef = (p_oldVertScrollBarPos) - p_oldViewportHeight / 2 - 1;
+
     double yScale = xScale;
 
     QPoint topLeft;
@@ -1181,16 +1208,15 @@ namespace Qisis {
     if(rect.width() > (int) p_buffer[0].size())
       rect.setRight(rect.left() + p_buffer[0].size() - 1);
 
-
     return rect;
   }
 
 
   /**
    * Call this when zoomed, re-reads visible area.
-   *  
-   * @throw iException - "Unable to change scale" 
-   * @internal 
+   *
+   * @throw iException - "Unable to change scale"
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Added exception to help track
    *                          errors.
    */
@@ -1247,8 +1273,8 @@ namespace Qisis {
 
   /**
    * This resizes and fills entire buffer.
-   * @throw iException - "Unable to resize and fill buffer." 
-   * @internal 
+   * @throw iException - "Unable to resize and fill buffer."
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Added exception to help track
    *                          errors.
    */
@@ -1260,20 +1286,20 @@ namespace Qisis {
       if(working() && p_initialStretchDone) {
         // We only need to handle the current action, can ignore others
         ViewportBufferAction *curAction = p_actions->head();
-      
+
         // Delete older actions
         for(int i = p_actions->size() - 1; i > 0; i--) {
           delete(*p_actions)[i];
           p_actions->pop_back();
         }
-      
+
         // Deal with current action
         if(curAction->started()) {
           if(curAction->getActionType() == ViewportBufferAction::fill) {
             ViewportBufferFill *fill = (ViewportBufferFill *)curAction;
-      
+
             fill->stop();
-      
+
             p_requestedFillArea = fill->getRect()->height() *
                                   fill->getRect()->width();
           }
@@ -1284,14 +1310,14 @@ namespace Qisis {
           p_requestedFillArea = 0.0;
         }
       }
-      
-      
+
+
       p_bufferInitialized = true;
-      
+
       ViewportBufferTransform *reset = new ViewportBufferTransform();
       reset->setResize(0, 0);
       enqueueAction(reset);
-      
+
       ViewportBufferTransform *transform = new ViewportBufferTransform();
       transform->setResize(p_XYBoundingRect.width(), p_XYBoundingRect.height());
       enqueueAction(transform);

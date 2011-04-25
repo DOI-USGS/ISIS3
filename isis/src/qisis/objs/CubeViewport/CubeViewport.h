@@ -102,6 +102,8 @@ namespace Qisis {
   *                      border around the image
   *  @history 2011-03-31 Sharmila Prasad - Added band info to "whatsthis"
   *                      API to store the whatsthis info in a PVL format
+  *  @history 2011-04-25 Steven Lambright - Fixed "center" and added more safety
+  *                      checks.
   */
 
   class Tool;
@@ -306,31 +308,31 @@ namespace Qisis {
        * @param stretch
        */
       void setAllBandStretches(Isis::Stretch stretch);
-      
+
       /**
        * Get All WhatsThis info - viewport, cube, area in PVL format
-       * 
-       * @param pWhatsThisPvl - Pvl for all whatsthis info 
+       *
+       * @param pWhatsThisPvl - Pvl for all whatsthis info
        */
       void getAllWhatsThisInfo(Isis::Pvl & pWhatsThisPvl);
-      
+
       /**
        * Get Band Filter name from the Isis cube label
-       * 
-       * @param pFilterNameKey - FilterName keyword containing the 
-       *              corresponding keyword from the Isis Cube label 
+       *
+       * @param pFilterNameKey - FilterName keyword containing the
+       *              corresponding keyword from the Isis Cube label
        */
       void getBandFilterName(Isis::PvlKeyword & pFilterNameKey);
-      
+
       /**
        * Get Cube area corresponding to the viewport's dimension
-       * 
+       *
        * @param pdStartSample - Cube Start Sample
        * @param pdEndSample   - Cube End Sample
        * @param pdStartLine   - Cube Start Line
        * @param pdEndLine     - Cube End Line
        */
-      void getCubeArea(double & pdStartSample, double & pdEndSample, 
+      void getCubeArea(double & pdStartSample, double & pdEndSample,
                                      double & pdStartLine, double & pdEndLine);
 
 

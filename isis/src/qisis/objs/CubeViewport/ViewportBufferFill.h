@@ -7,6 +7,11 @@ class QRect;
 class QPoint;
 
 namespace Qisis {
+  /**
+   * @internal
+   *   @history 2011-04-25 Steven Lambright Fixed a problem where 1 too few
+   *                       lines were being read
+   */
   class ViewportBufferFill : public ViewportBufferAction {
     public:
       ViewportBufferFill(const QRect &rect, const int &xCoef,

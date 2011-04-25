@@ -105,7 +105,7 @@ namespace Qisis {
     setFrameShadow(QFrame::Plain);
     setFrameShape(QFrame::NoFrame);
     setAutoFillBackground(false);
-    
+
 //    viewport()->setAttribute(Qt::WA_NoSystemBackground);
 //    viewport()->setAttribute(Qt::WA_PaintOnScreen,false);
 
@@ -508,7 +508,7 @@ namespace Qisis {
                                       "The document contains unsaved changes\n"
                                       "Do you want to save the changes before exiting?",
                                       "&Save", "&Discard", "Cancel",
-                                      0,    
+                                      0,
                                       2)){
         //Save changes and close viewport
         case 0:
@@ -555,7 +555,7 @@ namespace Qisis {
    *  reset the scale value if the value passed in is too large or too small.
    *
    * @param scale Value by which to scale the image.
-   * @internal 
+   * @internal
    *  @history 2010-07-12 Jeannie Walldren - Changed scale maximum value from
    *                         hard-coded 16 to the max of the viewport width and
    *                         height.  Added scale minimum value of
@@ -572,7 +572,7 @@ namespace Qisis {
     if (scale > maxScale) {
       scale = maxScale;
     }
-    // don't let zoom scale be smaller than one pixel high/wide showing 
+    // don't let zoom scale be smaller than one pixel high/wide showing
     double minScale = 1.0 / (min(cubeSamples(),cubeLines()));
     if (scale < minScale) {
       scale = minScale;
@@ -717,10 +717,11 @@ namespace Qisis {
    * @param line
    */
   void CubeViewport::center(double sample, double line) {
-    // TODO:  If the x/y is close to the scrollbar values then
-    // we should use the scrollBy routine to make the display faster
     int x, y;
     cubeToContents(sample, line, x, y);
+
+    x ++;
+    y ++;
 
     int panX = horizontalScrollBar()->value() - x;
     int panY = verticalScrollBar()->value() - y;
@@ -1116,7 +1117,7 @@ namespace Qisis {
    * @param rect
    */
   void CubeViewport::paintPixmap(QRect rect) {
-    if(!p_paintPixmap){
+    if(!p_paintPixmap) {
       return;
     }
 
@@ -1148,8 +1149,13 @@ namespace Qisis {
         const vector< double > & line =
           p_grayBuffer->getLine(y - p_grayBuffer->bufferXYRect().top());
 
-        if(line.size() == 0){
+        if(line.size() == 0) {
           break;
+        }
+
+        if(y >= p_image->height()) {
+          throw iException::Message(iException::Programmer, "y too big",
+                                    _FILEINFO_);
         }
 
         QRgb *rgb = (QRgb *) p_image->scanLine(y);
@@ -1168,7 +1174,7 @@ namespace Qisis {
           }
 
           if(x >= p_image->width()) {
-            throw iException::Message(iException::Programmer, "bufferX too big",
+            throw iException::Message(iException::Programmer, "x too big",
                                       _FILEINFO_);
           }
 
@@ -1276,6 +1282,7 @@ namespace Qisis {
     // Ok we can shift the pixmap and filling
     int pixmapDrawWidth  = p_pixmap.width()  - pixmapStartX + 1;
     int pixmapDrawHeight = p_pixmap.height() - pixmapStartY + 1;
+
     QRect rect(0, 0, p_pixmap.width(), p_pixmap.height());
     QPixmap pixmapCopy   = p_pixmap.copy();
 
@@ -1327,10 +1334,10 @@ namespace Qisis {
 
   /**
    * Get All WhatsThis info - viewport, cube, area in PVL format
-   * 
+   *
    * @author Sharmila Prasad (4/5/2011)
-   * 
-   * @param pWhatsThisPvl - Pvl for all whatsthis info 
+   *
+   * @param pWhatsThisPvl - Pvl for all whatsthis info
    */
   void CubeViewport::getAllWhatsThisInfo(Pvl & pWhatsThisPvl)
   {
@@ -1349,34 +1356,34 @@ namespace Qisis {
     viewportGrp += PvlKeyword("Samples", viewport()->width());
     viewportGrp += PvlKeyword("Lines",   viewport()->height());
     whatsThisObj += viewportGrp;
-    
+
     // Get Cube area Info
     PvlObject cubeAreaPvl("CubeArea");
     PvlGroup bandGrp("Bands");
-    
+
     PvlKeyword filterName;
     getBandFilterName(filterName);
     int iFilterSize = filterName.Size();
-    
+
     // color
     if(p_color ) {
       PvlKeyword virtualKey("Virtual"), physicalKey("Physical"), filterNameKey;
       int iRedBand   = p_redBuffer->getBand();
       int iGreenBand = p_greenBuffer->getBand();
       int iBlueBand  = p_blueBuffer->getBand();
-      
+
       bandGrp += PvlKeyword("Color", "RGB");
-      
+
       virtualKey = iRedBand;
       virtualKey += iGreenBand;
       virtualKey += iBlueBand;
       bandGrp   += virtualKey;
-      
+
       physicalKey =  p_cube->PhysicalBand(iRedBand);
       physicalKey += p_cube->PhysicalBand(iGreenBand);
       physicalKey += p_cube->PhysicalBand(iBlueBand);
       bandGrp += physicalKey;
-      
+
       if(iFilterSize) {
         if(iRedBand <= iFilterSize) {
           filterNameKey += filterName[iRedBand-1];
@@ -1384,14 +1391,14 @@ namespace Qisis {
         else {
           filterNameKey += "None";
         }
-        
+
         if(iGreenBand <= iFilterSize) {
           filterNameKey += filterName[iGreenBand-1];
         }
         else {
           filterNameKey += "None";
         }
-        
+
         if(iBlueBand <= iFilterSize) {
           filterNameKey += filterName[iBlueBand-1];
         }
@@ -1403,17 +1410,17 @@ namespace Qisis {
     }
     else { // gray
       int iGrayBand = p_grayBuffer->getBand();
-      
+
       bandGrp  += PvlKeyword("Color", "Gray");
-      
+
       bandGrp  += PvlKeyword("Virtual", iGrayBand);
       bandGrp  += PvlKeyword("Physical", p_cube->PhysicalBand(iGrayBand));
-      
+
       if(iFilterSize && iGrayBand <= iFilterSize) {
         bandGrp  += PvlKeyword("FilterName", filterName[iGrayBand-1]);
       }
     }
-    
+
     //start, end  line and sample
     double sl, ss, es, el;
     getCubeArea(ss, es, sl, el);
@@ -1428,10 +1435,10 @@ namespace Qisis {
 
   /**
    * Get Band Filter name from the Isis cube label
-   * 
+   *
    * @author Sharmila Prasad (4/5/2011)
-   * 
-   * @param PvlKeyword& pFilterNameKey - FilterName keyword containing the 
+   *
+   * @param PvlKeyword& pFilterNameKey - FilterName keyword containing the
    *              corresponding keyword from the Isis Cube label
    */
   void CubeViewport::getBandFilterName(PvlKeyword & pFilterNameKey)
@@ -1446,16 +1453,16 @@ namespace Qisis {
       }
     }
   }
-  
+
   /**
    * Get Cube area corresponding to the viewport's dimension
-   * 
+   *
    * @param pdStartSample - Cube Start Sample
    * @param pdEndSample   - Cube End Sample
    * @param pdStartLine   - Cube Start Line
-   * @param pdEndLine     - Cube End Line 
+   * @param pdEndLine     - Cube End Line
    */
-  void CubeViewport::getCubeArea(double & pdStartSample, double & pdEndSample, 
+  void CubeViewport::getCubeArea(double & pdStartSample, double & pdEndSample,
                                  double & pdStartLine, double & pdEndLine)
   {
     viewportToCube(0, 0, pdStartSample, pdStartLine);
@@ -1475,7 +1482,7 @@ namespace Qisis {
       pdEndLine = cubeLines();
     }
   }
-  
+
   /**
    * Update the What's This text.
    *
@@ -1489,21 +1496,21 @@ namespace Qisis {
     PvlKeyword filterNameKey;
     getBandFilterName(filterNameKey);
     int iFilterSize = filterNameKey.Size();
-    
+
     // color
     if(p_color ) {
       int iRedBand   = p_redBuffer->getBand();
       int iGreenBand = p_greenBuffer->getBand();
       int iBlueBand  = p_blueBuffer->getBand();
-      
+
       sBandInfo = "Bands(RGB)&nbsp;Virtual  = " + QString::number(iRedBand) + ", ";
       sBandInfo += QString::number(iGreenBand) + ", ";
       sBandInfo += QString::number(iBlueBand) + " ";
-      
+
       sBandInfo += "Physical = " + QString::number(p_cube->PhysicalBand(iRedBand)) + ", ";
       sBandInfo += QString::number(p_cube->PhysicalBand(iGreenBand)) + ", ";
       sBandInfo += QString::number(p_cube->PhysicalBand(iBlueBand));
-      
+
       if(iFilterSize) {
         sBandInfo += "<br>FilterName = ";
         if(iRedBand <= iFilterSize) {
@@ -1513,7 +1520,7 @@ namespace Qisis {
           sBandInfo += "None";
         }
         sBandInfo += ", ";
-        
+
         if(iGreenBand <= iFilterSize) {
           sBandInfo += QString(filterNameKey[iGreenBand-1]);
         }
@@ -1521,7 +1528,7 @@ namespace Qisis {
           sBandInfo += "None";
         }
         sBandInfo += ", ";
-        
+
         if(iBlueBand <= iFilterSize) {
           sBandInfo += QString(filterNameKey[iBlueBand-1]);
         }
@@ -1532,16 +1539,16 @@ namespace Qisis {
     }
     else { // gray
       int iGrayBand = p_grayBuffer->getBand();
-      
+
       sBandInfo = "Band(Gray)&nbsp;Virtual = " + QString::number(iGrayBand) + " ";
-      
+
       sBandInfo += "Physical = " + QString::number(p_cube->PhysicalBand(iGrayBand));
-      
+
       if(iFilterSize && iGrayBand <= iFilterSize) {
         sBandInfo += "<br>FilterName = " + QString(filterNameKey[iGrayBand-1]);
       }
     }
-    
+
     QString area =
       "<p><b>Visible Cube Area:</b><blockQuote> \
       Samples = " + QString::number(int(ss + 0.5)) + "-" +
@@ -1549,8 +1556,8 @@ namespace Qisis {
       Lines = " + QString::number(int(sl + 0.5)) + "-" +
       QString::number(int(el + 0.5)) + "<br> " +
       sBandInfo + "</blockQuote></p>";
-    
-    viewport()->setWhatsThis(p_whatsThisText + area + p_cubeWhatsThisText + 
+
+    viewport()->setWhatsThis(p_whatsThisText + area + p_cubeWhatsThisText +
                          p_viewportWhatsThisText);
   }
 
