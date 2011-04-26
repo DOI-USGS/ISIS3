@@ -142,7 +142,7 @@ namespace Isis {
         p_progress->CheckStatus();
         
         // Loop and let the app programmer work with the bricks
-        for(bricks->begin(); bricks->end(); (*bricks)++) {
+        for(bricks->begin(); !bricks->end(); (*bricks)++) {
           if(haveInput) {
             cube->Read(*bricks);  // input only
           }
