@@ -93,7 +93,7 @@ endif
 testFile = $(wildcard /etc/SuSE-release /etc/redhat-release /usr/bin/sw_vers )
 ifeq ($(testFile), /etc/SuSE-release)
   HOST_OS := $(shell $(GREP) VERSION /etc/SuSE-release | $(SED) 's/.*= *//g' | $(SED) 's/\./_/g')
-  HOST_OS := "SUSE$(HOST_OS)"
+  HOST_OS := SUSE$(HOST_OS)
 else
   ifeq ($(testFile), /etc/redhat-release)
     HOST_OS = $(shell $(CUT) -d ' ' -f 1,2,7 /etc/redhat-release | $(SED) 's/ //g' | $(SED) 's/\./_/g')
