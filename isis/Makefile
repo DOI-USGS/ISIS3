@@ -13,7 +13,7 @@ help:
 	echo "make api       : Build and install the Isis API"
 	echo "make apps      : Build and install Isis Applications"
 	echo "make docs      : Build Isis Web Documentation"
-	echo "make cleansrc  : Clean binaries from source tree" 
+	echo "make cleansrc  : Clean binaries from source tree"
 	echo "make clean     : Clean source tree and install area"
 	echo "make unitTest  : Build and execute unit tests for Isis API"
 	echo "make appTest   : Build and execute application tests"
@@ -34,7 +34,7 @@ all: incs thirdParty api apps docs
 # Target = incs
 # Dependencies = none
 #
-# The API include files will be installed in $(ISISROOT)/inc.  The Isis 
+# The API include files will be installed in $(ISISROOT)/inc.  The Isis
 # make system will traverse the objs directories (src/base/objs/*) and
 # copy the include file from the individual object directory into the
 # system directory $(ISISROOT)/inc.
@@ -58,7 +58,7 @@ incs:
 # Target = objects
 # Dependencies = none
 #
-# Before the API can be built each individual object must be built.  
+# Before the API can be built each individual object must be built.
 # This target will traverse the objs directories and create the C++
 # object classes leaving the ".o" file in each individual directory.
 # The API is not created until "make api" is performed
@@ -67,25 +67,25 @@ incs:
 # constructed from libisis.a
 #----------------------------------------------------------------------------
 api:
-	echo "Building Isis API" 
+	echo "Building Isis API"
 	mkdir -p lib
-	cd src; $(MAKE) objects
+	$(MAKE) --directory=src objects
 	echo "Finished building Isis API"
 	echo ""
 	echo "Adding API objects"
-	cd src; $(MAKE) api
-	echo "Finished adding API objects" 
+	$(MAKE) --directory=src api
+	echo "Finished adding API objects"
 	echo " "
 
-#	echo "Building Isis API with debugging" 
+#	echo "Building Isis API with debugging"
 #	cd src; $(MAKE) objects MODE=DEBUG
 #	cd src; $(MAKE) api MODE=DEBUG
-#	echo "Finished building Isis API with debugging" 
+#	echo "Finished building Isis API with debugging"
 #	echo " "
 
 	echo "Creating Shared Libraries ..."
 	cp make/Makefile.libs lib/Makefile
-	cd lib; $(MAKE) shared
+	$(MAKE) --directory=lib shared
 	echo "Finished creating Shared Libraries ..."
 	echo " "
 
@@ -100,10 +100,10 @@ api:
 # API must be built for this to work properly
 #----------------------------------------------------------------------------
 apps:
-	echo "Building Isis Applications" 
+	echo "Building Isis Applications"
 	mkdir -p bin/xml
-	cd src; $(MAKE) applications
-	echo "Finished building Isis Applications" 
+	$(MAKE) --directory=src applications
+	echo "Finished building Isis Applications"
 	echo " "
 
 #----------------------------------------------------------------------------
@@ -116,11 +116,11 @@ apps:
 # generates the Isis Documentation under $(ISISROOT)/doc
 #----------------------------------------------------------------------------
 docs:
-	echo "Building Isis Documentation" 
+	echo "Building Isis Documentation"
 	mkdir -p doc
-	cd src; $(MAKE) documentation
-	cd src/docsys; $(MAKE) docs
-	echo "Finished building Isis Documentation" 
+	$(MAKE) --directory=src documentation
+	$(MAKE) --directory=src/docsys docs
+	echo "Finished building Isis Documentation"
 
 #----------------------------------------------------------------------------
 # Target = clean
@@ -159,18 +159,18 @@ cleansrc:
 # output data (whether it be a cube, text file, postscript file, etc)
 #----------------------------------------------------------------------------
 unitTest:
-	echo "Testing Isis API" 
-	cd src; $(MAKE) unitTest
-	echo "Finished testing Isis API" 
+	echo "Testing Isis API"
+	$(MAKE) --directory=src unitTest
+	echo "Finished testing Isis API"
 
 appTest:
-	echo "Testing Isis Applications version 2" 
-	cd src; $(MAKE) appTest
+	echo "Testing Isis Applications version 2"
+	$(MAKE) --directory=src appTest
 	echo "Finished testing Isis Applications version 2"
 
 catTest:
-	echo "Testing Isis Category" 
-	cd src; $(MAKE) catTest
+	echo "Testing Isis Category"
+	$(MAKE) --directory=src catTest
 	echo "Finished testing Isis Category"
 
 #----------------------------------------------------------------------------
