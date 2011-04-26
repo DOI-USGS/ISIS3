@@ -18,7 +18,6 @@
     <change name="Jeff Anderson" date="1995-11-06">
       Original version
     </change>
-
     <change name="Tracie Sucharski" date="2002-10-12">
       Ported to Isis 3.0, Separated magcube into reduce and enlarge.
     </change>
@@ -80,7 +79,11 @@
       Updated documentation and changed parameters STOTAL and LTOTAL back to ONS 
       and ONL, respectively.
     </change>
-  </history>
+    <change name="Sharmila Prasad" date="2011-04-26">
+      Ported the reduce by near and average functionality from the app to 
+      base/objs/Reduce class
+     </change> 
+    </history> 
 
   <category>
     <categoryItem>Geometry</categoryItem>
