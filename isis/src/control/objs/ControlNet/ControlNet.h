@@ -137,6 +137,8 @@ namespace Isis {
    *                work with ControlPoint's SetId()
    *   @history 2011-03-29 Steven Lambright - Made versioning viable for first
    *                release.
+   *   @history 2011-04-27 Steven Lambright - UpdatePointReference had a bug
+   *                where the pointIds list was not being correctly updated.
    */
   class ControlNet : public QObject {
       Q_OBJECT
