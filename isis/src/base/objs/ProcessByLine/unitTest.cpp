@@ -66,11 +66,6 @@ void IsisMain() {
   p.StartProcessInPlace(func1);
   p.EndProcess();
 
-  /*p.SetOutputCube("TO", 10, 20, 3);
-  cout << "Functor\n";
-  p.StartProcessInPlace(func1);
-  p.EndProcess();*/
-
   p.SetInputCube("FROM");
   p.SetOutputCube("TO");
   cout << "Functor2\n";
