@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="copylabel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Copys labels and blobs from one cube into another cube.
+  </brief>
+
+  <description>
+    <p>
+      This application copys labels between cubes. Think long and hard before you
+      use this program as there should hopefully be some way of doing what you
+      want that doesn't require this. Be thoughtful and careful when using this
+      program, it can be used to create cubes which are 100% invalid, incorrect,
+      and wrong. This is especially true when the source file is not a cube but
+      a simple Pvl.
+    </p>
+    <p>
+      With that out of the way, the label groups that can be copied by default are:<br/>
+      <UL>
+        <LI>Instrument</LI>
+        <LI>Bandbin</LI>
+        <LI>Kernels</LI>
+        <LI>Mapping</LI>
+        <LI>Radiometry</LI>
+      </UL>
+      As well as the following blobs:
+      <UL>
+        <LI>Polygon</LI>
+        <LI>CameraStatistics</LI>
+      </UL>
+      By default, the blobs associated with Kernels are copied, if it is 
+      requested for kernels to be copied. The application also allows for and
+      groups desired to be manually put in and copied, as well as any blobs
+      that may exist in the source cube.
+    </p>
+    <p>
+      There are effectively three input sets that the program may be run on,
+      those are:
+      <UL><LI>The SOURCE cube matchs FROM cube in dimensions 
+          <UL><LI>Limited safety checks can occur on this case regarding sizing.</LI></UL></LI>
+          <LI>The SOURCE cube and FROM cube have matching sample and line scale
+          <UL><LI>Safety checks can occur on this case. A very major assumption
+      is made using this case, that is, that the cube data in both cubes has the
+      same four corners, it is just scaled differently. This case makes an AlphaCube
+      group to make the cube valid, if the above stated fact isn't true, the cube
+      is entirely invalid.</LI></UL></LI>
+      <LI>The SOURCE file is a pvl or lbl file.
+        <UL><LI>No safety checks can be done in this case.</LI></UL></LI></UL>
+    </p>
+    <p>
+      For the last details about how the program works, Groups are always
+      expected to be inside an IsisCube Object, and Blobs to be copied always
+      inside the base Pvl. The program will throw exceptions if it encounters
+      conditions where it can't legitimately continue copying, however, in most
+      cases it will run through. To do this, it makes several assumptions about
+      desired behaviors. If a group or blob is requested, the application will
+      try to copy it, if the application can't find the group, the app continues,
+      if the group exists in the FROM cube, the app will delete it. For blobs,
+      again, if the app can find it, the app will copy it over, if it can't be
+      found, the app will continue.
+    </p>
+  </description>
+
+  <history>
+   <change name="Mackenzie Boyd" date="2011-04-27">
+     Original version.  
+   </change>
+  </history>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Cube to have labels copied to
+        </brief>
+        <description>
+          The cube which will be modified and have the labels copied into.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="SOURCE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Label source file
+        </brief>
+        <description>
+          The file which the labels will come from. If this file is a cube then
+          some minimal safety checks will be performed. If it is not a cube,
+          the desired groups must be in the IsisCube object. Blobs will not be
+          copied if it is just a label file.
+        </description>
+        <filter>
+          *.cub *.lbl *.pvl
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Labels to copy">
+ 
+      <parameter name="INSTRUMENT">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Copy Instrument group
+        </brief>
+        <description>
+          Copy the Instrument group over, can only be copied if sample and line
+          counts are equal or of equal scale.
+        </description>
+      </parameter>
+
+      <parameter name="BANDBIN">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Copy BandBin group
+        </brief>
+        <description>
+          Copy the BandBin group over, can only be copied if the number of bands
+          matches.
+        </description>
+      </parameter>
+
+      <parameter name="KERNELS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Copy the Kernels group
+        </brief>
+        <description>
+          Copy the Kernels group over as well as the four table blobs usually
+          associated with it, those are InstrumentPointing, InstrumentPosition,
+          SunPosition, and BodyRotation. They will only be copied if they exist.
+          Obviously these blobs can only be copied if SOURCE is a cube.
+        </description>
+      </parameter>
+
+      <parameter name="MAPPING">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Copy the Mapping group
+        </brief>
+        <description>
+          Copy the Mapping group over, can only be done when the cubes rae the
+          same size or have matching scaling factors.
+        </description>
+      </parameter>
+
+      <parameter name="RADIOMETRY">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Copy the Radiometry group
+        </brief>
+        <description>
+          Copy the Radiometry group over, if the image data isn't the same
+          between the two cubes, the data stored in the Radiometry group will
+          be completely invalid. 
+        </description>
+      </parameter>
+
+      <parameter name="POLYGON">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Copy the Polygon blob
+        </brief>
+        <description>
+          Copy the Polygon blob over, if the input file is a cube and has a
+          Polygon blob.
+        </description>
+      </parameter>
+
+      <parameter name="CAMSTATS">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Copy the CameraStatistics blob
+        </brief>
+        <description>
+          Copy the CameraStatistics blob over, if the input file is a cube and
+          has a CameraStatistics blob.
+        </description>
+      </parameter>
+
+      <parameter name="GROUPS">
+        <type>string</type>
+        <internalDefault>none</internalDefault> 
+        <brief>
+          Copy the given groups, in CSV format
+        </brief>
+        <description>
+          Copy and given groups over to the FROM cube, groups must exist in the
+          IsisCube Object to be copied, and must be specified with exact spelling,
+          comma separated.
+        </description>
+      </parameter>
+
+      <parameter name="BLOBS">
+        <type>string</type>
+        <internalDefault>none</internalDefault> 
+        <brief>
+          Copy over the given blobs, in CSV format
+        </brief>
+        <description>
+          Copy over the given Blobs to the FROM cube, blobs must be specified in
+          the following format: &lt;Object name&gt;:Name keyword comma separated.
+          For example, Table:CameraStatistics,... would do the same as the above
+          CAMSTATS option.
+        </description>
+      </parameter>
+
+    </group>
+  </groups>
+
+</application>
+
