@@ -84,6 +84,8 @@ namespace Qisis {
    *                           entire control net each time.
    *   @history  2010-07-14 Tracie Sucharski - ControlPoint::MaximumError
    *                           renamed to MaximumResidual.
+   *   @history  2011-04-28 Tracie Sucharski - Sort points in decsending order
+   *                           of max residual.
    */
   void QnetPointErrorFilter::filter() {
     // Make sure we have a list of control points to filter
@@ -111,6 +113,7 @@ namespace Qisis {
     lessNum = p_lessErrorEdit->text().toDouble();
     greaterNum = p_greaterErrorEdit->text().toDouble();
 
+    QMultiMap <double, int> pointMap;
     // Loop through each value of the filtered points list comparing the error of its
     // corresponding point with error with the user entered value and remove it from
     // the filtered list if it is outside the filtering range
@@ -120,6 +123,7 @@ namespace Qisis {
       double maxResidual = cp.GetStatistic(&ControlMeasure::GetResidualMagnitude).Maximum();
       if (p_lessThanCB->isChecked() && p_greaterThanCB->isChecked()) {
         if (maxResidual < lessNum && maxResidual > greaterNum) {
+          pointMap.insert(maxResidual, g_filteredPoints[i]);
           continue;
         }
         else
@@ -127,6 +131,7 @@ namespace Qisis {
       }
       else if (p_lessThanCB->isChecked()) {
         if (maxResidual < lessNum) {
+          pointMap.insert(maxResidual, g_filteredPoints[i]);
           continue;
         }
         else
@@ -134,11 +139,20 @@ namespace Qisis {
       }
       else if (p_greaterThanCB->isChecked()) {
         if (maxResidual > greaterNum) {
+          pointMap.insert(maxResidual, g_filteredPoints[i]);
           continue;
         }
         else
           g_filteredPoints.removeAt(i);
       }
+    }
+
+    int filteredIndex = 0;
+    QMultiMap<double, int>::const_iterator i = pointMap.constEnd();
+    while (i != pointMap.constBegin()) {
+      --i;
+      g_filteredPoints[filteredIndex] = i.value();
+      filteredIndex++;
     }
     // Tell the navtool that a list has been filtered and it needs to update
     emit filteredListModified();
