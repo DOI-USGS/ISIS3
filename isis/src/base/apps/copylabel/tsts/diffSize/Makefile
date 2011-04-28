@@ -5,8 +5,9 @@
 # The only things not copied back in would be Mapping and Radiometry which didn't
 # exist in the first place. So, labels, and blobs.
 
-
 APPNAME = copylabel
+
+reducedStripped.pvl.IGNORELINES = Bytes
 
 include $(ISISROOT)/make/isismake.tsts
 

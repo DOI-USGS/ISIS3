@@ -1,5 +1,7 @@
 APPNAME = copylabel
 
+stripped.pvl.IGNORELINES = Bytes
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:

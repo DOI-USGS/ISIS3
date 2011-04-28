@@ -4,6 +4,8 @@
 
 APPNAME = copylabel
 
+labelsReAdded.pvl.IGNORELINES = Bytes
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
@@ -11,5 +13,5 @@ commands:
 	$(APPNAME) FROM=$(OUTPUT)/missInsBBKern.cub \
 	  SOURCE=$(INPUT)/lub2458i.342.lev1.cub > /dev/null;
 	catlab FROM=$(OUTPUT)/missInsBBKern.cub \
-	  TO=$(OUTPUT)/lablesReAdded.pvl > /dev/null;
+	  TO=$(OUTPUT)/labelsReAdded.pvl > /dev/null;
 
