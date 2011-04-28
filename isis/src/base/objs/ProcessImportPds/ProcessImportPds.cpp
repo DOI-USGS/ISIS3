@@ -182,8 +182,8 @@ namespace Isis {
     int offset = -1;
 
     // If only size 1, we either have a file name or an offset
-    // Either way, when we're done with these two ifs, offst and fname
-    // will be set.
+    // Either way, when we're done with these two ifs, variables offset and 
+    // dataFileName will be set.
     if (dataFilePointer.Size() == 1) {
       try {
         str = pdsXlater.Translate("DataFilePointer");
@@ -472,6 +472,10 @@ namespace Isis {
     else if(str == "BIL") {
       SetOrganization(ProcessImport::BIL);
     }
+    else {
+      string msg = "Unsupported axis order [" + str + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -531,12 +535,22 @@ namespace Isis {
     else if(tmp == "SAMPLELINEBAND") {
       SetOrganization(ProcessImport::BSQ);
     }
-    else if(tmp == "LINEBANDSAMPLE") {
+    else if(tmp == "BANDSAMPLELINE") {
       SetOrganization(ProcessImport::BIP);
     }
     else if(tmp == "SAMPLEBANDLINE") {
       SetOrganization(ProcessImport::BIL);
     }
+    else {
+      PvlKeyword pdsCoreOrg = p_pdsLabel.FindKeyword(pdsXlater.                           InputKeywordName("CoreOrganization"), Pvl::Traverse);
+
+      stringstream pdsCoreOrgStream;
+      pdsCoreOrgStream << pdsCoreOrg;
+
+      string msg = "Unsupported axis order [" + pdsCoreOrgStream.str() + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
 
     // Set the number of byte preceding the second dimension (left side plane)
     // There are no capabilities in a PDS QUBE for this

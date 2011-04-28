@@ -178,6 +178,9 @@ namespace Isis {
    *                          ProcessPixelBitandType, and ProcessSpecialPixels, removed
    *                          duplicate code in ProcessImage and ProcessQube labels.
    *                          Fixed functionality regarding ^QUBE pointer having no offest.
+   *  @history 2011-04-27 Mackenzie Boyd - Changed ProcessQubeLabels to set BIP 
+   *                          for BANDSAMPLELINE axes instead of LINEBANDSAMPLE
+   *                          and added exception for unknown storage order.
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
