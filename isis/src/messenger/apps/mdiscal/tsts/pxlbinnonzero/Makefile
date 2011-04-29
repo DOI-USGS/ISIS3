@@ -1,6 +1,7 @@
 APPNAME = mdiscal
 
 nonZeroPxlBin.cub.TOLERANCE = 0.00000000001
+nonZeroPxlBin.pvl.IGNORELINES = ProcessDate
 
 include $(ISISROOT)/make/isismake.tsts
 
