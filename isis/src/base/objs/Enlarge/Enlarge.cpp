@@ -72,7 +72,7 @@ namespace Isis {
                              double pdStartLine, double pdEndLine)
   {
     // Check for the right image dimensions
-    if (pdStartSample > pdEndSample || pdEndLine > pdStartLine) {
+    if (pdStartSample > pdEndSample || pdStartLine > pdEndLine) {
       string sErrMsg = "Error in Input Area Dimesions";
       throw Isis::iException::Message(Isis::iException::Programmer, sErrMsg, _FILEINFO_); 
     }
