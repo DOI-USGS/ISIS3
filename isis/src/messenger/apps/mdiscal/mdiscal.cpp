@@ -359,7 +359,6 @@ void IsisMain() {
   calibrationLog.AddKeyword(PvlKeyword("SoftwareName", mdiscal_program));
   calibrationLog.AddKeyword(PvlKeyword("SoftwareVersion", mdiscal_version));
   calibrationLog.AddKeyword(PvlKeyword("ProcessDate", mdiscal_runtime));
-  calibrationLog.AddKeyword(PvlKeyword("From", (string)ui.GetFilename("FROM")));
   calibrationLog.AddKeyword(PvlKeyword("DarkCurrentModel", darkCurr));
 
   if(darkCurrentMode == DarkCurrentLinear) {
@@ -413,6 +412,8 @@ void IsisMain() {
   }
 
   calibrationLog.AddKeyword(PvlKeyword("DarkStripColumns", nDarkColumns),
+                            Pvl::Replace);
+  calibrationLog.AddKeyword(PvlKeyword("ValidDarkColumns", nValidDark),
                             Pvl::Replace);
   if(darkStrip.TotalPixels() > 0) {
     calibrationLog.AddKeyword(PvlKeyword("DarkStripMean", darkStrip.Average()),

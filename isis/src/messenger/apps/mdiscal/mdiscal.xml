@@ -459,6 +459,12 @@ in the SOLAR directory.
         indicating the number of NULLed columns.  These changes result in 
         version number 4 of the output calibration file.
     </change> 
+      <change name="Kris Becker" date="2011-04-29">
+          Removed the From keyword from the RadiometricCalibration group created 
+          by this application.  Added ValidDarkColumns to this group.  This 
+          value indicates the number of samples used to compute the  
+          DarkStripMean.
+      </change>
   </history>
 
   <groups>

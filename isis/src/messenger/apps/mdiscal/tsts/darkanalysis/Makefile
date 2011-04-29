@@ -1,7 +1,7 @@
 APPNAME = mdiscal
 
 darkanalysis.cub.TOLERANCE = 0.00000000001
-darkanalysis.pvl.IGNORELINES = ProcessDate
+darkanalysis.pvl.IGNORELINES = ProcessDate Bytes
 
 include $(ISISROOT)/make/isismake.tsts
 
