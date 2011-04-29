@@ -143,7 +143,6 @@ namespace Qisis {
       void resetList();
       void refreshList();
       void updateEditPoint(QString pointId);
-      void setApriori();
 
     private slots:
       void load();
@@ -159,7 +158,7 @@ namespace Qisis {
       void resetCubeList();
       void showNavTool();
       void aprioriDialog();
-      void fillAprioriEdits();
+      void setAprioriDialogPoints();
 
     signals:
       void loadPointImages (Isis::ControlPoint *);

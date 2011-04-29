@@ -530,7 +530,9 @@ namespace Qisis {
    *   @history 2011-04-20 Tracie Sucharski - If left measure equals right
    *                          measure, copy right into left.  Also if EditLock
    *                          true and user does not want to change, then
-   *                          do not save measure.
+   *                          do not save measure.  Remove signals
+   *                          EditPointChanged and netChanged, since these
+   *                          should only happen when the point is saved.
    */
   void QnetTool::measureSaved() {
 

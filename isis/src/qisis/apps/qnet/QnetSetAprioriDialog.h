@@ -5,16 +5,30 @@
 
 #include "ui_QnetSetAprioriDialog.h"
 
+#include "SurfacePoint.h"
+
+
 class QnetSetAprioriDialog : public QDialog, public Ui::QnetSetAprioriDialog {
     Q_OBJECT
 
   public:
     QnetSetAprioriDialog(QWidget *parent = 0);
-    void clearLineEdits();
+    void setPoints(QList<QListWidgetItem *> selectedPoints);
 
   signals:
+   // void aprioriDialogClosed();
+    void netChanged();
+
+  private slots:
+    void unlockPoint(QListWidgetItem *ptId);
     void setApriori();
-//    void aprioriDialogClosed();
+
+  private:
+    void clearLineEdits();
+    void fillLineEdits();
+
+
+    QList<QListWidgetItem *> p_points;
 
 
 };
