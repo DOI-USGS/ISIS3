@@ -1,4 +1,4 @@
-// $Id: mdiscal.cpp,v 1.22 2009/09/04 17:59:05 mboyd Exp $
+// $Id$
 #include "Isis.h"
 
 #include <vector>
@@ -66,8 +66,8 @@ void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out);
 void IsisMain() {
 
   const string mdiscal_program = "mdiscal";
-  const string mdiscal_version = "1.2";
-  const string mdiscal_revision = "$Revision: 1.22 $";
+  const string mdiscal_version = "1.3";
+  const string mdiscal_revision = "$Revision$";
   string mdiscal_runtime = Application::DateTime();
 
   // Specify the version of the CDR generated

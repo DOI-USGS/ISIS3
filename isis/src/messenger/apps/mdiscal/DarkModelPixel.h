@@ -2,8 +2,8 @@
 #define DarkModelPixel_h
 /**
  * @file
- * $Revision: 1.1 $
- * $Date: 2008/09/04 18:48:13 $
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
