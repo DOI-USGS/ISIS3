@@ -111,6 +111,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-04-14 Steven Lambright - Improved handling of V1 networks
+   *   @history 2011-05-02 Tracie Sucharski - If Held=True exists in input net,
+   *                           set PointType=Ground.
    */
   class ControlNetVersioner {
     public:

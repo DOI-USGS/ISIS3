@@ -10,6 +10,7 @@ Object = ControlNetwork
   Object = ControlPoint
     PointType = Tie
     PointId   = 1001
+    Held      = True
 
     Group = ControlMeasure
       SerialNumber   = Cassini-Huygens/ISSNA/1/1467436709.122

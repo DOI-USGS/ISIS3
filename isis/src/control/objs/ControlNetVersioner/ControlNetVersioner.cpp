@@ -483,6 +483,9 @@ namespace Isis {
     for(int cpIndex = 0; cpIndex < network.Objects(); cpIndex ++) {
       PvlObject &cp = network.Object(cpIndex);
 
+      if(cp.HasKeyword("Held") && cp["Held"][0] == "True") 
+        cp["PointType"] = "Ground";
+
       if(cp.HasKeyword("AprioriLatLonSource"))
         cp["AprioriLatLonSource"].SetName("AprioriXYZSource");
 

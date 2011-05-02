@@ -62,7 +62,7 @@ Object = ControlNetwork
   Version      = 2
 
   Object = ControlPoint
-    PointType   = Tie
+    PointType   = Ground
     PointId     = 1001
     ChooserName = Null
     DateTime    = Null
