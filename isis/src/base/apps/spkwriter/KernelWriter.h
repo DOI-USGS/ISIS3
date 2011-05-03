@@ -1,0 +1,186 @@
+#if !defined(KernelWriter_h)
+#define KernelWriter_h
+/**                                                                       
+ * @file                                                                  
+ * $Revision$ 
+ * $Date$
+ *                                                                        
+ *   Unless noted otherwise, the portions of Isis written by the USGS are 
+ *   public domain. See individual third-party library and package descriptions 
+ *   for intellectual property information, user agreements, and related  
+ *   information.                                                         
+ *                                                                        
+ *   Although Isis has been used by the USGS, no warranty, expressed or   
+ *   implied, is made by the USGS as to the accuracy and functioning of such 
+ *   software and related material nor shall the fact of distribution     
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.                                        
+ *                                                                        
+ *   For additional information, launch                                   
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ *  
+ *   $Id$
+ */                                                                       
+#include <string>
+#include "iException.h"
+#include "Commentor.h"
+#include "NaifStatus.h"
+
+#include "naif/SpiceUsr.h"
+
+namespace Isis {
+
+/**
+ * @brief Support writting of kernels to NAIF SPICE files
+ * 
+ * This class is designed as the base class to support the fundamentals of 
+ * opening/creating a NAIF kernel file for writing of NAIF kernel segments 
+ * (typically CK and SPK types). 
+ * 
+ * As such, this object provides the ability to create general files, specify
+ * comment section size, get the I/O handle associated with the output file,
+ * write comments to the kernel and then close the file when you are done.
+ * 
+ * The thing you may see as missing is the explicit write method.  Due to the
+ * structure of the NAIF writing procedure, each kernel type has its own routine 
+ * that has different arguments.  This makes it "messy" to try and support 
+ * writing of all CK/SPK types directly in this class.  The template class K 
+ * must provide some internal virtual methods.  These methods are: 
+ * @code 
+ *   int k_open(const std::string &fname, const int commnt_size);
+ *   void k_write(int _handle, const K kernels);
+ *   void k_close(int handle);
+ * @endcode 
+ *  
+ * The class K may also provide a WriteComment(const int handle, const 
+ * std::string &comment) method that will write comments to the output kernel 
+ * file if the provided one is not adequate. 
+ *  
+ * @author 2010-11-10 Kris Becker 
+ * @internal 
+ * @history 2010-12-09 Kris Becker Added more documentation
+ */
+template <class K>
+class KernelWriter {
+  public:
+    typedef typename K::SegmentType SegmentType;
+
+    /** Default constructor */
+    KernelWriter() :_handle(0) { }
+    /** Destructor  */
+    virtual ~KernelWriter() { }
+
+    /** Open a kernel file using virtual method provided in K */
+    void open(const std::string &kfile, const int &commnt_size = 5120) {
+      _handle = k_open(kfile, commnt_size);
+
+    }
+
+    /** Write header with comments provided   */
+    void header(const std::string &comment) {
+      WriteComment(_handle, comment);
+    }
+
+    /** Write a set of kernel segments from teh Kernels segment container */
+    void write(const K &kernels)  {
+      k_write(_handle, kernels);
+    }
+
+    /**
+     * @brief Write a set of kernels to file and comment file
+     * 
+     * This method is the typical one called to write a complete kernel file to
+     * the named file.  It will write each kernel from list provided in the K
+     * list of kernels.
+     * 
+     * @param K Kernel container with segments to write
+     * @param std::string Name of file to write kernel to
+     * @param std::string Name 
+     */
+    void write(const K &kernels, const std::string &kfile, 
+               const std::string &comfile = "") {
+      std::string comments = getComment(kernels, comfile);
+      open(kfile, comments.size() + 512);
+      header(comments);  // Writes header
+      write(kernels);
+      close();
+      return;
+    }
+
+
+    /** Generic close method simply calls specified method */
+    void close() {
+      k_close(_handle);
+    }
+
+    /** Accumulate comment from K object and individed set */
+    std::string getComment(const K &kernels, const std::string &comfile) {
+      Commentor<SegmentType> commentor(comfile);
+      if (comfile.empty()) { commentor.setCommentHeader(k_header()); }
+      kernels.Accept(commentor);
+      return (commentor.Comments());
+    }
+
+  protected:
+    /** These virtual methods must be provided by the K class */
+    virtual int k_open(const std::string &kfile, const int &comsize = 512) = 0;
+    virtual void k_write(const SpiceInt &handle, const K &kernels) = 0;
+    virtual void k_close(SpiceInt &handle) = 0;
+    virtual std::string k_header() const = 0;
+
+  private:
+    SpiceInt    _handle;    ///< SPICE file handle
+
+
+    /**
+     * @brief WRite comments to output NAIF SPICE kernel.
+     * 
+     * @return bool Returns success if so.
+     */
+    virtual bool WriteComment(SpiceInt handle, const std::string &comment) 
+                              const {
+      if ( handle == 0 ) {
+        std::string mess = "Comments cannot be written as the file is not open";
+        throw iException::Message(iException::Programmer, mess, _FILEINFO_);
+      }
+   
+      // Trap errors so they are not fatal if the comment section fills up.
+      // Calling environments can decide how to handle it.
+      try {
+        std::string commOut;
+        NaifStatus::CheckErrors();
+        for ( unsigned int i = 0 ; i < comment.size() ; i++ ) {
+           if ( comment[i] == '\n' ) {
+             while ( commOut.size() < 2 ) { commOut.append(" "); }
+             dafac_c(handle, 1, commOut.size(), commOut.c_str());
+             NaifStatus::CheckErrors();
+             commOut.clear();
+           }
+           else {
+             commOut.push_back(comment[i]);
+           }
+        }
+     
+        // See if there is residual to write
+        if ( commOut.size() > 0 ) {
+          while ( commOut.size() < 2 ) { commOut.append(" "); }
+          dafac_c(handle, 1, commOut.size(), commOut.c_str());
+          NaifStatus::CheckErrors();
+        }
+      } catch (iException &ie ) {
+        ie.Clear();
+        return (false);
+      }
+   
+      return (true);
+    }
+
+};
+
+};     // namespace Isis
+#endif
+
+
