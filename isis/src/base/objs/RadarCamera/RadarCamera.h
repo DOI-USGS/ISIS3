@@ -31,16 +31,21 @@ namespace Isis {
    *
    * This class is used to abstract out radar camera functionality from children
    * classes.
+   *  
+   * @ingroup SpiceInstrumentsAndCameras
    *
    * @author 2009-08-26 Steven Lambright
    *
    * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Added documentation and Isis
+   *            Disclaimer to files.
+   *  
    *   @todo Implement more functionality in this class and abstract away from the children
    */
 
   class RadarCamera : public Camera {
     public:
-      RadarCamera(Isis::Pvl &lab);
+      RadarCamera(Pvl &lab);
 
       virtual CameraType GetCameraType() const {
         return Radar;
