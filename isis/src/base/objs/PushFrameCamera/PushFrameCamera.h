@@ -39,9 +39,11 @@ namespace Isis {
    * @author 2009-08-26 Steven Lambright
    *
    * @internal
-   *   @todo Implement more functionality in this class and abstract away from the children
    *   @history 2010-08-04 Jeannie Walldren - Fixed the \#ifndef identifier to
    *                          define PushFrameCamera_h.  Updated documentation.
+   *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *  
+   *   @todo Implement more functionality in this class and abstract away from the children
    */
 
   class PushFrameCamera : public Camera {
