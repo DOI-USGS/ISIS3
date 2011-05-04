@@ -15,7 +15,7 @@ using namespace std;
 namespace Isis {
 
   //! String names for Point Type
-  string sPointType [] = { "Ground", "Tie" };
+  string sPointType [] = { "Ground", "Constrained", "Tie" };
 
   //! String values for Boolean
   string sBoolean[]    = { "False", "True" };

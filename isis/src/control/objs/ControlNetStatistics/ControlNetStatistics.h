@@ -61,6 +61,7 @@ namespace Isis {
    *                                       faults.
    *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
    *                                       removing includes from ControlNet.h.
+   *   @history 2011-05-03 Debbie A. Cook Added type "Constrained" to sPointType values
    */
   class ControlNetStatistics {
     public:

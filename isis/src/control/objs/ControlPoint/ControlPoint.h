@@ -250,6 +250,7 @@ namespace Isis {
    *            and made the Distance vector one take a const reference.
    *   @history 2011-04-04 Steven Lambright - Updated constructor from binary to
    *            take planetary radii
+   *   @history 2011-05-02 Debbie A. Cook - Added new point type Constrained
    */
   class ControlPoint {
       friend class ControlNet;
@@ -268,10 +269,16 @@ namespace Isis {
           */
         Ground,
         /**
+          * A Constrained point is a Control Point whose lat/lon/radius is somewhat
+          * established and should not be changed.
+          */
+        Constrained,
+        /**
           * A Tie point is a Control Point that identifies common measurements
           * between two or more cubes. While it could have a lat/lon, it is not
           * necessarily correct and is subject to change.  This is the most
-          * common type of control point.
+          * common type of control point.  This point type floats freely in
+          * a bundle adjustment
           */
         Tie
       };

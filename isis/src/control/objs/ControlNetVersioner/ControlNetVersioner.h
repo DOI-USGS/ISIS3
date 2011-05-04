@@ -113,6 +113,8 @@ namespace Isis {
    *   @history 2011-04-14 Steven Lambright - Improved handling of V1 networks
    *   @history 2011-05-02 Tracie Sucharski - If Held=True exists in input net,
    *                           set PointType=Ground.
+   *   @history 2011-05-02 Debbie A. Cook - Created pvl version 3 which added
+   *                           point type of constrained.
    */
   class ControlNetVersioner {
     public:
@@ -130,10 +132,11 @@ namespace Isis {
                                                      const Filename &file);
 
       static void ConvertVersion1ToVersion2(PvlObject &network);
+      static void ConvertVersion2ToVersion3(PvlObject &network);
 
       // We only need the latest Pvl version because it has our update cycle
       //! The latest version of the Pvl formatted control networks
-      static const int LATEST_PVL_VERSION = 2;
+      static const int LATEST_PVL_VERSION = 3;
       //! The latest version of the Binary formatted control networks
       static const int LATEST_BINARY_VERSION = 2;
 

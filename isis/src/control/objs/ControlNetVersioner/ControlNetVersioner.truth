@@ -17,7 +17,7 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = Null
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
     PointType   = Tie
@@ -59,7 +59,7 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = "Test Network"
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
     PointType   = Ground
@@ -107,10 +107,10 @@ Object = ControlNetwork
   Created      = 2010-07-10T12:50:15
   LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
-    PointType                = Ground
+    PointType                = Constrained
     PointId                  = T0000
     ChooserName              = autoseed
     DateTime                 = 2010-08-27T17:10:06

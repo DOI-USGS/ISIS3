@@ -109,6 +109,10 @@ namespace Isis {
           ConvertVersion1ToVersion2(network);
           break;
 
+        case 2:
+          ConvertVersion2ToVersion3(network);
+          break;
+
         default:
           iString msg = "The Pvl file version [" + iString(version) + "] is not"
               " supported";
@@ -201,8 +205,12 @@ namespace Isis {
       Copy(object, "RadiusConstrained",
            point, &ControlPointFileEntryV0002::set_radiusconstrained);
 
-      point.set_type( (object["PointType"][0] == "Ground") ?
-          ControlPointFileEntryV0002::Ground : ControlPointFileEntryV0002::Tie);
+      if (object["PointType"][0] == "Ground")
+        point.set_type(ControlPointFileEntryV0002::Ground);
+      else if (object["PointType"][0] == "Constrained")
+        point.set_type(ControlPointFileEntryV0002::Constrained);
+      else
+        point.set_type(ControlPointFileEntryV0002::Tie);
 
       if (object.HasKeyword("AprioriXYZSource")) {
         iString source = object["AprioriXYZSource"][0];
@@ -639,10 +647,6 @@ namespace Isis {
           cp += PvlKeyword("LatitudeConstrained", "False");
       }
 
-//      if(cp.HasKeyword("AprioriCovarianceMatrix") ||
-//         cp.HasKeyword("AdjustedCovarianceMatrix"))
-//        cp["PointType"] = "Ground";
-
       if(!cp.HasKeyword("LongitudeConstrained")) {
         if(cp.HasKeyword("AprioriCovarianceMatrix"))
           cp += PvlKeyword("LongitudeConstrained", "True");
@@ -717,6 +721,28 @@ namespace Isis {
           }
         }
       }
+    }
+  }
+
+
+
+  /**
+   * This converts pvl networks from their version 2 to version 3.
+   *
+   * Modify in place to prevent unnecessary memory usage.
+   *
+   * @param network Input is Version 2, must be modified to conform to Version 3
+   */
+  void ControlNetVersioner::ConvertVersion2ToVersion3(
+      PvlObject &network) {
+    network["Version"] = 3;
+
+    for(int cpIndex = 0; cpIndex < network.Objects(); cpIndex ++) {
+      PvlObject &cp = network.Object(cpIndex);
+
+     if(cp.HasKeyword("AprioriCovarianceMatrix") ||
+        cp.HasKeyword("AdjustedCovarianceMatrix"))
+       cp["PointType"] = "Constrained";
     }
   }
 

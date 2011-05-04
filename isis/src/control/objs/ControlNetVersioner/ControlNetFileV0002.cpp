@@ -31,6 +31,14 @@ namespace Isis {
 
 
 
+  /**
+   * Reads binary version 2
+   * 
+   * @internal
+   * @history 2011-05-02 Debbie A. Cook - Converted to read constrained
+   *                     point type
+   *
+   */
   void ControlNetFileV0002::Read(const Pvl &header, const Filename &file) {
     const PvlObject &protoBufferInfo = header.FindObject("ProtoBuffer");
     const PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
@@ -71,6 +79,13 @@ namespace Isis {
 
         ControlPointFileEntryV0002 newPoint;
         newPoint.ParseFromCodedStream(&codedInStream);
+        
+        if (newPoint.type() == ControlPointFileEntryV0002::obsolete_Tie ||
+            newPoint.type() == ControlPointFileEntryV0002::obsolete_Ground) {
+          if (newPoint.aprioricovar_size())
+            newPoint.set_type(ControlPointFileEntryV0002::Constrained);
+        }
+
         p_controlPoints->append(newPoint);
 
         codedInStream.PopLimit(oldLimit);
@@ -166,6 +181,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Converts binary control net version 2 to pvl version 3
+   * 
+   * @internal
+   * @history 2011-05-02 Debbie A. Cook - Converted to version pvl 3
+   *                     instead of 2
+   *
+   */
   Pvl ControlNetFileV0002::ToPvl() const {
     Pvl pvl;
     pvl.AddObject(PvlObject("ControlNetwork"));
@@ -179,7 +202,7 @@ namespace Isis {
     network += PvlKeyword("Description", p_networkHeader->description());
 
     // This is the Pvl version we're converting to
-    network += PvlKeyword("Version", "2");
+    network += PvlKeyword("Version", "3");
 
     ControlPointFileEntryV0002 binaryPoint;
     foreach(binaryPoint, *p_controlPoints) {
@@ -187,6 +210,8 @@ namespace Isis {
 
       if(binaryPoint.type() == ControlPointFileEntryV0002::Ground)
         pvlPoint += PvlKeyword("PointType", "Ground");
+      else if(binaryPoint.type() == ControlPointFileEntryV0002::Constrained)
+        pvlPoint += PvlKeyword("PointType", "Constrained");
       else
         pvlPoint += PvlKeyword("PointType", "Tie");
 

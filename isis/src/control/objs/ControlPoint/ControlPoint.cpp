@@ -139,12 +139,20 @@ namespace Isis {
     parentNetwork = NULL;
 
     switch (fileEntry.type()) {
+    case ControlPointFileEntryV0002_PointType_obsolete_Tie:
       case ControlPointFileEntryV0002_PointType_Tie:
         type = Tie;
         break;
+      case ControlPointFileEntryV0002_PointType_Constrained:
+        type = Constrained;
+        break;
+    case ControlPointFileEntryV0002_PointType_obsolete_Ground:
       case ControlPointFileEntryV0002_PointType_Ground:
         type = Ground;
         break;
+      default:
+        iString msg = "Point type is invalid.";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);        
     }
 
     ignore = fileEntry.ignore();
@@ -818,7 +826,7 @@ namespace Isis {
    * @param newType The new type this control point should be
    */
   ControlPoint::Status ControlPoint::SetType(PointType newType) {
-    if (type != Ground && type != Tie) {
+    if (type != Ground && type != Tie && type != Constrained) {
       iString msg = "Invalid Point Enumeration, [" + iString(type) + "], for "
           "Control Point [" + GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -1344,6 +1352,9 @@ namespace Isis {
     switch (pointType) {
       case Ground:
         str = "Ground";
+        break;
+      case Constrained:
+        str = "Constrained";
         break;
       case Tie:
         str = "Tie";
@@ -1957,6 +1968,9 @@ namespace Isis {
     switch (GetType()) {
       case ControlPoint::Tie:
         fileEntry.set_type(ControlPointFileEntryV0002::Tie);
+        break;
+      case ControlPoint::Constrained:
+        fileEntry.set_type(ControlPointFileEntryV0002::Constrained);
         break;
       case ControlPoint::Ground:
         fileEntry.set_type(ControlPointFileEntryV0002::Ground);

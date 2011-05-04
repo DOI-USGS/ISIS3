@@ -8,7 +8,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
     PointType                = Ground
@@ -65,7 +65,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
     PointType                = Ground
@@ -138,7 +138,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
     PointType                = Ground
@@ -211,7 +211,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
     PointType                = Ground
@@ -284,7 +284,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 2
+  Version      = 3
 
   Object = ControlPoint
     PointType                = Ground
