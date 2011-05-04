@@ -1,6 +1,8 @@
 #ifndef ThemisVisDistortionMap_h
 #define ThemisVisDistortionMap_h
 /**
+ * @file
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -19,8 +21,7 @@
  */
 #include "CameraDistortionMap.h"
 
-using namespace Isis;
-namespace Odyssey {
+namespace Isis {
   /**
    * @brief Distort/undistort focal plane coordinates
    *
@@ -30,13 +31,13 @@ namespace Odyssey {
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsOdyssey
    *
+   * @see ThemisVisCamera 
+   *  
    * @author 2006-01-03 Elizabeth Miller
    *
-   * @see Camera 
    * @internal 
-   *   @history 2010-08-04 Jeannie Walldren - Fixed documentation.  Removed Isis
-   *                          namespace wrap around Odyssey namespace and
-   *                          replaced with "using namespace Isis".
+   *   @history 2011-05-03 Jeannie Walldren - Fixed documentation.  Removed
+   *                          Odyssey namespace wrap inside Isis wrap.
    */
   class ThemisVisDistortionMap : public CameraDistortionMap {
     public:
@@ -47,11 +48,10 @@ namespace Odyssey {
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
     private:
-      double p_irPixelPitch;    //!<Pixel Pitch for Themis Ir Camera
-      double p_visPixelPitch;   //!<Pixel Pitch for Themis Vis Camera
+      double p_irPixelPitch;    //!< Pixel Pitch for Themis Ir Camera
+      double p_visPixelPitch;   //!< Pixel Pitch for Themis Vis Camera
 
-      //! Effective Band 5 Detector Value for the Ir Camera
-      double p_ir_b5;
+      double p_ir_b5; //!< Effective Band 5 Detector Value for the Ir Camera
   };
 };
 #endif

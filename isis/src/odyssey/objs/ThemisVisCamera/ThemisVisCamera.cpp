@@ -1,4 +1,6 @@
 /**
+ * @file
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -29,21 +31,18 @@
 
 
 using namespace std;
-using namespace Isis;
-namespace Odyssey {
+
+namespace Isis {
 
   /**
    * Constructor for the Themis Vis Camera Model
    *
    * @param lab Pvl label from an Odyssey Themis VIS image. 
    *
-   * @throws Isis::iException::User - The image does not appear to be a Themis
+   * @throws iException::User - The image does not appear to be a Themis
    *                                  VIS image
-   * @internal 
-   *   @history 2010-08-04 Jeannie Walldren -  - Fixed documentation.  Removed
-   *                          Isis namespace wrap around Odyssey namespace and
-   *                          replaced with "using namespace Isis".  Added NAIF
-   *                          error check.
+   * @internal
+   *   @history 2010-08-04 Jeannie Walldren - Added NAIF error check.
    */
   ThemisVisCamera::ThemisVisCamera(Pvl &lab) : PushFrameCamera(lab) {
     NaifStatus::CheckErrors();
@@ -161,7 +160,9 @@ namespace Odyssey {
  * @param lab Cube labels
  *
  * @return Isis::Camera* ThemisVisCamera
+ * @internal
+ *   @history 2011-05-03 Jeannie Walldren - Removed Odyssey namespace.
  */
-extern "C" Camera *ThemisVisCameraPlugin(Pvl &lab) {
-  return new Odyssey::ThemisVisCamera(lab);
+extern "C" Isis::Camera *ThemisVisCameraPlugin(Isis::Pvl &lab) {
+  return new Isis::ThemisVisCamera(lab);
 }

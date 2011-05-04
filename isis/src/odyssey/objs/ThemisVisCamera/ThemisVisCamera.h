@@ -1,6 +1,8 @@
 #ifndef ThemisVisCamera_h
 #define ThemisVisCamera_h
 /**
+ * @file
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
  *   for intellectual property information, user agreements, and related
@@ -21,12 +23,12 @@
 
 #include "PushFrameCamera.h"
 
-using namespace Isis;
-namespace Odyssey {
+namespace Isis {
   /**
-   * @brief Themis VIS Camera Model
+   * @brief THEMIS VIS Camera Model
    *
-   * This is the camera model for the Themis Vis Push Frame camera
+   * This is the camera model for the Thermal Emission Imaging System 
+   * Visible-Imaging Subsystem (THEMIS VIS) Push Frame camera 
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsOdyssey
@@ -43,15 +45,28 @@ namespace Odyssey {
    *                                          frame classes
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
    *                                          inherit directly from Camera
-   *   @history 2010-08-04 Jeannie Walldren - Fixed documentation.  Removed Isis
-   *                                          namespace wrap around Odyssey
-   *                                          namespace and replaced with "using
-   *                                          namespace Isis".  Added NAIF error
-   *                                          check to constructor.
+   *   @history 2010-07-27 Jeannie Walldren - Fixed documentation.
+   *   @history 2010-08-04 Jeannie Walldren - Removed Isis namespace wrap around
+   *                                          Odyssey namespace and replaced
+   *                                          with "using namespace Isis".
+   *                                          Added NAIF error check to
+   *                                          constructor.
+   *   @history 2010-09-14 Steven Lambright - Updated unitTest to not use a DEM.
+   *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
+   *                                          pure virtual in Camera,
+   *                                          implemented in mission specific
+   *                                          cameras.
+   *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
    *   @history 2011-02-23 Mackenzie Boyd -   Modified pixel pitch from 203.9
    *                                          to 202.059 per request from
    *                                          Christopher Edwards at ASU,
-   *                                          (Christopher.Edwards@asu.edu) 
+   *                                          (Christopher.Edwards@asu.edu).
+   *                                          Updated unitTest.
+   *   @history 2011-05-03 Jeannie Walldren - Fixed documentation.  Replaced
+   *                                          Odyssey namespace wrap with Isis
+   *                                          namespace wrap. Added Isis
+   *                                          Disclaimer to files. Updated
+   *                                          unitTest to test for new methods.
    */
   class ThemisVisCamera : public PushFrameCamera {
     public:
@@ -75,13 +90,28 @@ namespace Odyssey {
         return false;
       };
 
-      /** CK Frame ID - Instrument Code from spacit run on CK */
+      /**
+       * CK frame ID -  - Instrument Code from spacit run on CK
+       *  
+       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *         Kernel Frame ID
+       */
       virtual int CkFrameId() const { return (-53000); }
 
-      /** CK Reference ID - MARSIAU */
+      /** 
+       * CK Reference ID - MARSIAU
+       * 
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
+       *         Kernel Reference ID
+       */
       virtual int CkReferenceId() const { return (16); }
 
-      /** SPK Reference ID - J2000 */
+      /** 
+       * SPK Reference ID - J2000
+       * 
+       * @return @b int The appropriate instrument code for the Spacecraft
+       *         Kernel Reference ID
+       */
       virtual int SpkReferenceId() const { return (1); }
 
     private:

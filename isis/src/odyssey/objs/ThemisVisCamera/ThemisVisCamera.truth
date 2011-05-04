@@ -1,19 +1,28 @@
 Unit Test for ThemisVisCamera...
+Filename: V14093008RDR.even.cub
+CK Frame: -53032
+
+Kernel IDs: 
+CK Frame ID = -53000
+CK Reference ID = 16
+SPK Target ID = -53
+SPK Reference ID = 1
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK

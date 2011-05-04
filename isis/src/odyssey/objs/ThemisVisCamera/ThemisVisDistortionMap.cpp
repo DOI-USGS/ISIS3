@@ -1,4 +1,5 @@
 /**
+ * @file 
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -20,18 +21,16 @@
 
 
 using namespace std;
-using namespace Isis;
-namespace Odyssey {
+
+namespace Isis {
   /**
    * Constructs a Distortion Map for the Themis Vis Camera
    *
    * @param parent Pointer to the parent Camera object 
    * 
    * @internal 
-   *   @history 2010-08-04 Jeannie Walldren -  - Fixed documentation.  Removed
-   *                          Isis namespace wrap around Odyssey namespace and
-   *                          replaced with "using namespace Isis".  Added NAIF
-   *                          error check.
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.  Fixed
+   *                          documentation.
    */
   ThemisVisDistortionMap::ThemisVisDistortionMap(Camera *parent) :
     CameraDistortionMap(parent, 1.0) {
