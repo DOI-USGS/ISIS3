@@ -1,19 +1,31 @@
 Unit Test for LwirCamera...
+Filename: lla4263l.153.lev1.cub
+CK Frame: -40004
+
+Kernel IDs: 
+CK Frame ID = -40000
+CK Reference ID = 1
+SPK Target ID = -40
+SPK Reference ID = 1
+
+Shutter open = -182261983.306371659
+Shutter close = -182261983.306227654
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK
